@@ -5,6 +5,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +26,7 @@ import com.realtech.socialsurvey.api.utils.RestUtils;
 public class GlobalControllerExceptionHandler
 {
     private final static String ERRORS = "errors";
+    private static final Logger LOG = LoggerFactory.getLogger(GlobalControllerExceptionHandler.class);
     
     @Autowired
     private RestUtils restUtils;
@@ -33,6 +36,7 @@ public class GlobalControllerExceptionHandler
     @ResponseBody
     public ResponseEntity<Map<String, Object>> handleValidationException( ValidationException validationException )
     {
+    	LOG.warn("Validation Exception occurred", validationException);
         Map<String, Object> result = createErrorResponse( validationException.getErrors() );
         return new ResponseEntity<Map<String, Object>>( result, HttpStatus.OK );
     }
@@ -42,6 +46,7 @@ public class GlobalControllerExceptionHandler
     @ResponseBody
     public ResponseEntity<Map<String, Object>> handleBadRequestException( BadRequestException badRequestException )
     {
+    	LOG.warn("Bad Request Exception occurred", badRequestException);
         Map<String, Object> result = createErrorResponse( badRequestException.getErrors() );
         return new ResponseEntity<Map<String, Object>>( result, HttpStatus.BAD_REQUEST );
     }
@@ -51,6 +56,7 @@ public class GlobalControllerExceptionHandler
     @ResponseBody
     public ResponseEntity<?> handleSSApiException( SSApiException ssapiException, HttpServletRequest request )
     {
+    	LOG.error("SSAPI Exception occurred", ssapiException);
         long companyId = 0;
 		return restUtils.getRestResponseEntity( HttpStatus.INTERNAL_SERVER_ERROR, ssapiException.getMessage(), null, null,
                 request, companyId );
@@ -59,10 +65,11 @@ public class GlobalControllerExceptionHandler
 
     @ExceptionHandler ( NumberFormatException.class)
     @ResponseBody
-    public ResponseEntity<?> handleNumberFormatException( NumberFormatException ie, HttpServletRequest request )
+    public ResponseEntity<?> handleNumberFormatException( NumberFormatException nfe, HttpServletRequest request )
     {
+    	LOG.error("NumberFormatException occurred", nfe);
         long companyId = 0;
-		return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, ie.getMessage(), null, null,
+		return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, nfe.getMessage(), null, null,
                 request, companyId );
     }
     
@@ -70,8 +77,9 @@ public class GlobalControllerExceptionHandler
     @ResponseBody
     public ResponseEntity<?> handleAnyException( Throwable e , HttpServletRequest request)
     {
+    	LOG.error("Uncaught Exception occurred", e);
     	long companyId = 0;
-		return restUtils.getRestResponseEntity( HttpStatus.INTERNAL_SERVER_ERROR, "Could not process request due to server error", null, null,
+    	return restUtils.getRestResponseEntity( HttpStatus.INTERNAL_SERVER_ERROR, "Could not process request due to server error", null, null,
                 request, companyId );
     }
 
