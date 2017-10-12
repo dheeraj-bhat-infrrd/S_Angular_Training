@@ -464,6 +464,20 @@
 		<property name="durability" value="true" />
 	</bean>
 
+	<bean id="transactionActivityMonitorJobDetail"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass"
+			value="com.realtech.socialsurvey.core.starter.TransactionActivityMonitor" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="activityManagementService" value-ref="activityManagementService" />
+				<entry key="organizationManagementService" value-ref="organizationManagementService" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
+	
+
 	<!-- setting cron for Review Count Updater -->
 	<bean id="solrreviewcounterupdatercron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
@@ -697,6 +711,13 @@
 		<property name="jobDetail" ref="deleteUsedVendastaTickets" />
 		<property name="cronExpression" value="0 0 0/1 1/1 * ?" />
 	</bean>
+	
+	<bean id="transactionActivityMonitorCron"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="transactionActivityMonitorJobDetail" />
+		<property name="cronExpression" value="0 20 00 * * ?" />
+	</bean>
+	
 
 	<!-- Scheduler factory -->
 	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
@@ -731,7 +752,8 @@
 				<!-- <ref bean="updateExistingCompanyPrice" /> -->
 				<!-- <ref bean="hideUsersFromSearch" />	-->
 				<!-- <ref bean="surveysourceidupdater" /> -->
-				<!-- <ref bean="surveyquestionupdater" /> -->		
+				<!-- <ref bean="surveyquestionupdater" /> -->	
+				<ref bean="transactionActivityMonitorJobDetail" />	
 			</list>
 		</property>
 
@@ -768,6 +790,7 @@
 				<!--  <ref bean="deleteUsedVendastaTicketscron" />-->	
 				<!-- <ref bean="surveysourceidupdatercron" /> -->
 				<!-- <ref bean="surveyquestionupdatercron" /> -->
+				<ref bean="transactionActivityMonitorCron" />
 			</list>
 		</property>
 		<property name="quartzProperties">
@@ -897,5 +920,9 @@
 	<!-- dependency for deleteUsedVendastaTickets -->	
 	<bean id="vendastaManagementService" 
 		class="com.realtech.socialsurvey.core.services.organizationmanagement.impl.VendastaManagementServiceImpl" />
+		
+	<!-- Activity Management service bean -->
+	<bean id="activityManagementService"
+		class="com.realtech.socialsurvey.core.services.activitymanager.impl.ActivityManagementServiceImpl" />	
 		
 </beans>
