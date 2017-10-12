@@ -553,10 +553,6 @@ function paintReportingDashboard(profileMasterId, newProfileName, newProfileValu
 	fetchReviewsOnDashboard(false);
 }
 
-function reportingSocialMediaButtons(data){
-	
-}
-
 function bindAutosuggestForIndividualRegionBranchSearch(elementId) {
 	// Bind keyup on search for region, branch, individual for dashboard
 	$('#' + elementId).on('keyup', function(e) {
