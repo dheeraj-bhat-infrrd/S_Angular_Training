@@ -76,6 +76,7 @@ import com.realtech.socialsurvey.core.dao.UserRankingThisYearRegionDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.CompanyDigestRequestData;
 import com.realtech.socialsurvey.core.entities.CompanyUserReport;
 import com.realtech.socialsurvey.core.entities.Digest;
 import com.realtech.socialsurvey.core.entities.DigestTemplateData;
@@ -291,6 +292,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     @Value ( "${APPLICATION_BASE_URL}")
     private String applicationBaseUrl;
 
+    public static final int DIGEST_MAIL_START_INDEX = 0;
+
+    public static final int DIGEST_MAIL_BATCH_SIZE = 50;
+
 
     @Override
     public void createEntryInFileUploadForReporting( int reportId, Date startDate, Date endDate, Long entityId,
@@ -324,18 +329,18 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT );
         } else if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT ) {
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT );
-        }    
+        }
         //get the time 23:59:59 in milliseconds
-        long duration = (((23*60)*60)+(59*60)+59)*1000;
-               
+        long duration = ( ( ( 23 * 60 ) * 60 ) + ( 59 * 60 ) + 59 ) * 1000;
+
         if ( startDate != null ) {
             fileUpload.setStartDate( new Timestamp( startDate.getTime() ) );
         }
         if ( endDate != null ) {
-        	Timestamp endTimeStamp = new Timestamp(endDate.getTime());
-        	//add the the duration(23:59:59 in milliseconds) to the current endDate timestamp and store it 
-            endTimeStamp.setTime(endTimeStamp.getTime()+duration);
-            fileUpload.setEndDate( endTimeStamp);          
+            Timestamp endTimeStamp = new Timestamp( endDate.getTime() );
+            //add the the duration(23:59:59 in milliseconds) to the current endDate timestamp and store it 
+            endTimeStamp.setTime( endTimeStamp.getTime() + duration );
+            fileUpload.setEndDate( endTimeStamp );
         }
         fileUpload.setProfileValue( entityId );
         fileUpload.setProfileLevel( entityType );
@@ -441,142 +446,143 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 .geSurveyResponseForCompanyId( entityId );
             int maxQuestions = 0;
 
-            for(SurveyResultsCompanyReport SurveyResultsCompanyReport: surveyResultsCompanyReportDao.fetchSurveyResultsCompanyReportByCompanyId(entityId,startDate,endDate)){
-                    List<Object> surveyResultsCompanyReportList = new ArrayList<>();
+            for ( SurveyResultsCompanyReport SurveyResultsCompanyReport : surveyResultsCompanyReportDao
+                .fetchSurveyResultsCompanyReportByCompanyId( entityId, startDate, endDate ) ) {
+                List<Object> surveyResultsCompanyReportList = new ArrayList<>();
 
-                    if ( SurveyResultsCompanyReport.getUserFirstName() == null ) {
-                        surveyResultsCompanyReportList.add( "" );
-                    } else {
-                        surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getUserFirstName() );
-                    }
+                if ( SurveyResultsCompanyReport.getUserFirstName() == null ) {
+                    surveyResultsCompanyReportList.add( "" );
+                } else {
+                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getUserFirstName() );
+                }
 
-                    if ( SurveyResultsCompanyReport.getUserLastName() == null ) {
-                        surveyResultsCompanyReportList.add( "" );
-                    } else {
-                        surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getUserLastName() );
-                    }
+                if ( SurveyResultsCompanyReport.getUserLastName() == null ) {
+                    surveyResultsCompanyReportList.add( "" );
+                } else {
+                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getUserLastName() );
+                }
 
-                    if ( SurveyResultsCompanyReport.getCustomerFirstName() == null ) {
-                        surveyResultsCompanyReportList.add( "" );
-                    } else {
-                        surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getCustomerFirstName() );
-                    }
+                if ( SurveyResultsCompanyReport.getCustomerFirstName() == null ) {
+                    surveyResultsCompanyReportList.add( "" );
+                } else {
+                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getCustomerFirstName() );
+                }
 
-                    if ( SurveyResultsCompanyReport.getCustomerLastName() == null ) {
-                        surveyResultsCompanyReportList.add( "" );
-                    } else {
-                        surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getCustomerLastName() );
-                    }
+                if ( SurveyResultsCompanyReport.getCustomerLastName() == null ) {
+                    surveyResultsCompanyReportList.add( "" );
+                } else {
+                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getCustomerLastName() );
+                }
 
-                    if ( SurveyResultsCompanyReport.getSurveySentDate() == null ) {
-                        surveyResultsCompanyReportList.add( "" );
-                    } else {
-                        surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getSurveySentDate() );
-                    }
+                if ( SurveyResultsCompanyReport.getSurveySentDate() == null ) {
+                    surveyResultsCompanyReportList.add( "" );
+                } else {
+                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getSurveySentDate() );
+                }
 
-                    if ( SurveyResultsCompanyReport.getSurveyCompletedDate() == null ) {
-                        surveyResultsCompanyReportList.add( "" );
-                    } else {
-                        surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getSurveyCompletedDate() );
-                    }
+                if ( SurveyResultsCompanyReport.getSurveyCompletedDate() == null ) {
+                    surveyResultsCompanyReportList.add( "" );
+                } else {
+                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getSurveyCompletedDate() );
+                }
 
-                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getTimeInterval() );
+                surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getTimeInterval() );
 
-                    if ( SurveyResultsCompanyReport.getSurveySource() == null ) {
-                        surveyResultsCompanyReportList.add( "" );
-                    } else {
-                        surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getSurveySource() );
-                    }
+                if ( SurveyResultsCompanyReport.getSurveySource() == null ) {
+                    surveyResultsCompanyReportList.add( "" );
+                } else {
+                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getSurveySource() );
+                }
 
-                    if ( SurveyResultsCompanyReport.getSurveySourceId() == null ) {
-                        surveyResultsCompanyReportList.add( "" );
-                    } else {
-                        surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getSurveySourceId() );
-                    }
+                if ( SurveyResultsCompanyReport.getSurveySourceId() == null ) {
+                    surveyResultsCompanyReportList.add( "" );
+                } else {
+                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getSurveySourceId() );
+                }
 
-                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getSurveyScore() );
+                surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getSurveyScore() );
 
-                    String surveyDetailsId = SurveyResultsCompanyReport.getSurveyDetailsId();
+                String surveyDetailsId = SurveyResultsCompanyReport.getSurveyDetailsId();
 
-                    int questionCounter = 0;
-                    if(surveyResponseMap.containsKey( surveyDetailsId  )){
+                int questionCounter = 0;
+                if ( surveyResponseMap.containsKey( surveyDetailsId ) ) {
 
-                        int surveyResponseSize = surveyResponseMap.get( surveyDetailsId ).size();
-                        if(surveyResponseSize > 0){
-                            questionCounter = surveyResponseSize;
-                            if(questionCounter > maxQuestions){
-                                maxQuestions = questionCounter;
-                            }
-                        }
-
-                        surveyResultsCompanyReportList.add(questionCounter);
-                        
-                        for(SurveyResponseTable surveyResponse: surveyResponseMap.get( surveyDetailsId )){
-                            if(surveyResponse.getAnswer() == null){
-                                surveyResultsCompanyReportList.add("");
-                            }else{
-                                surveyResultsCompanyReportList.add(surveyResponse.getAnswer());
-                            }
+                    int surveyResponseSize = surveyResponseMap.get( surveyDetailsId ).size();
+                    if ( surveyResponseSize > 0 ) {
+                        questionCounter = surveyResponseSize;
+                        if ( questionCounter > maxQuestions ) {
+                            maxQuestions = questionCounter;
                         }
                     }
-                    
-                    
-                    if(questionCounter==0){
-                        surveyResultsCompanyReportList.add("");
-                    }
 
-                    if ( SurveyResultsCompanyReport.getGateway() == null ) {
-                        surveyResultsCompanyReportList.add( "" );
-                    } else {
-                        surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getGateway() );
-                    }
+                    surveyResultsCompanyReportList.add( questionCounter );
 
-                    if ( SurveyResultsCompanyReport.getCustomerComments() == null ) {
-                        surveyResultsCompanyReportList.add( "" );
-                    } else {
-                        surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getCustomerComments() );
+                    for ( SurveyResponseTable surveyResponse : surveyResponseMap.get( surveyDetailsId ) ) {
+                        if ( surveyResponse.getAnswer() == null ) {
+                            surveyResultsCompanyReportList.add( "" );
+                        } else {
+                            surveyResultsCompanyReportList.add( surveyResponse.getAnswer() );
+                        }
                     }
+                }
 
-                    if ( SurveyResultsCompanyReport.getAgreedToShare() == null ) {
-                        surveyResultsCompanyReportList.add( "" );
-                    } else {
-                        surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getAgreedToShare() );
-                    }
 
-                    if ( SurveyResultsCompanyReport.getBranchName() == null ) {
-                        surveyResultsCompanyReportList.add( "" );
-                    } else {
-                        surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getBranchName() );
-                    }
+                if ( questionCounter == 0 ) {
+                    surveyResultsCompanyReportList.add( "" );
+                }
 
-                    if ( SurveyResultsCompanyReport.getClickTroughForCompany() == null ) {
-                        surveyResultsCompanyReportList.add( "" );
-                    } else {
-                        surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getClickTroughForCompany() );
-                    }
+                if ( SurveyResultsCompanyReport.getGateway() == null ) {
+                    surveyResultsCompanyReportList.add( "" );
+                } else {
+                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getGateway() );
+                }
 
-                    if ( SurveyResultsCompanyReport.getClickTroughForAgent() == null ) {
-                        surveyResultsCompanyReportList.add( "" );
-                    } else {
-                        surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getClickTroughForAgent() );
-                    }
+                if ( SurveyResultsCompanyReport.getCustomerComments() == null ) {
+                    surveyResultsCompanyReportList.add( "" );
+                } else {
+                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getCustomerComments() );
+                }
 
-                    if ( SurveyResultsCompanyReport.getClickTroughForRegion() == null ) {
-                        surveyResultsCompanyReportList.add( "" );
-                    } else {
-                        surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getClickTroughForRegion() );
-                    }
+                if ( SurveyResultsCompanyReport.getAgreedToShare() == null ) {
+                    surveyResultsCompanyReportList.add( "" );
+                } else {
+                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getAgreedToShare() );
+                }
 
-                    if ( SurveyResultsCompanyReport.getClickTroughForBranch() == null ) {
-                        surveyResultsCompanyReportList.add( "" );
-                    } else {
-                        surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getClickTroughForBranch() );
-                    }
+                if ( SurveyResultsCompanyReport.getBranchName() == null ) {
+                    surveyResultsCompanyReportList.add( "" );
+                } else {
+                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getBranchName() );
+                }
 
-                    
-                    surveyResultsCompany.add(surveyResultsCompanyReportList);
-                
-            } 
+                if ( SurveyResultsCompanyReport.getClickTroughForCompany() == null ) {
+                    surveyResultsCompanyReportList.add( "" );
+                } else {
+                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getClickTroughForCompany() );
+                }
+
+                if ( SurveyResultsCompanyReport.getClickTroughForAgent() == null ) {
+                    surveyResultsCompanyReportList.add( "" );
+                } else {
+                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getClickTroughForAgent() );
+                }
+
+                if ( SurveyResultsCompanyReport.getClickTroughForRegion() == null ) {
+                    surveyResultsCompanyReportList.add( "" );
+                } else {
+                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getClickTroughForRegion() );
+                }
+
+                if ( SurveyResultsCompanyReport.getClickTroughForBranch() == null ) {
+                    surveyResultsCompanyReportList.add( "" );
+                } else {
+                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getClickTroughForBranch() );
+                }
+
+
+                surveyResultsCompany.add( surveyResultsCompanyReportList );
+
+            }
             List<Object> maxQuestionList = new ArrayList<>();
             maxQuestionList.add( "maxQuestions" );
             maxQuestionList.add( maxQuestions );
@@ -815,19 +821,19 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 }
 
                 surveyTransactionReportList.add( surveyTransactionReport.getUserId() );
-                
+
                 int month = surveyTransactionReport.getMonth();
-                int length = Integer.valueOf(month).toString().length();
+                int length = Integer.valueOf( month ).toString().length();
                 String monthString = "";
-                if(length == 1){
-                	monthString = "0" + month;
-                }else{
-                	monthString = month+"";
+                if ( length == 1 ) {
+                    monthString = "0" + month;
+                } else {
+                    monthString = month + "";
                 }
-                
-                surveyTransactionReportList.add( surveyTransactionReport.getYear() + "_" +  monthString);
-                
-                if(surveyTransactionReport.getNmls() != null && !surveyTransactionReport.getNmls().isEmpty()){
+
+                surveyTransactionReportList.add( surveyTransactionReport.getYear() + "_" + monthString );
+
+                if ( surveyTransactionReport.getNmls() != null && !surveyTransactionReport.getNmls().isEmpty() ) {
                     surveyTransactionReportList.add( surveyTransactionReport.getNmls() );
                 } else {
                     surveyTransactionReportList.add( "" );
@@ -885,10 +891,11 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 }
 
                 surveyTransactionReportList.add( surveyTransactionReportRegion.getUserId() );
-                
-                surveyTransactionReportList.add( surveyTransactionReportRegion.getMonth() + " " +  surveyTransactionReportRegion.getYear());
-                
-                if(surveyTransactionReportRegion.getNmls() != null && !surveyTransactionReportRegion.getNmls().isEmpty()){
+
+                surveyTransactionReportList
+                    .add( surveyTransactionReportRegion.getMonth() + " " + surveyTransactionReportRegion.getYear() );
+
+                if ( surveyTransactionReportRegion.getNmls() != null && !surveyTransactionReportRegion.getNmls().isEmpty() ) {
                     surveyTransactionReportList.add( surveyTransactionReportRegion.getNmls() );
                 } else {
                     surveyTransactionReportList.add( "" );
@@ -950,10 +957,11 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 }
 
                 surveyTransactionReportList.add( surveyTransactionReportBranch.getUserId() );
-                
-                surveyTransactionReportList.add( surveyTransactionReportBranch.getMonth() + " " +  surveyTransactionReportBranch.getYear());
-                
-                if(surveyTransactionReportBranch.getNmls() != null && !surveyTransactionReportBranch.getNmls().isEmpty()){
+
+                surveyTransactionReportList
+                    .add( surveyTransactionReportBranch.getMonth() + " " + surveyTransactionReportBranch.getYear() );
+
+                if ( surveyTransactionReportBranch.getNmls() != null && !surveyTransactionReportBranch.getNmls().isEmpty() ) {
                     surveyTransactionReportList.add( surveyTransactionReportBranch.getNmls() );
                 } else {
                     surveyTransactionReportList.add( "" );
@@ -2957,34 +2965,35 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
 
     @Override
-    public boolean prepareAndSendMonthlyDigestMail( long companyId, String companyName, int monthUnderConcern, int year,
-        String recipientMailId ) throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException
+    public MonthlyDigestAggregate prepareMonthlyDigestMailData( long companyId, String companyName, int monthUnderConcern,
+        int year, String recipientMail ) throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException
     {
-        LOG.debug( "method prepareAndSendMonthlyDigestMail() started" );
+        LOG.debug( "method prepareMonthlyDigestMailData() started" );
 
         if ( companyId == 0 ) {
             LOG.error( "companyId cannot be zero" );
             throw new InvalidInputException( "Company Identifier can not be less than or equal to zero." );
+        } else if ( StringUtils.isEmpty( companyName ) ) {
+            LOG.error( "company name is not specified." );
+            throw new InvalidInputException( "company name is not specified." );
         } else if ( year == 0 ) {
             LOG.error( "year cannot be zero" );
             throw new InvalidInputException( "Year can not be less than or equal to zero." );
         } else if ( monthUnderConcern < 1 || monthUnderConcern > 12 ) {
             LOG.error( "current month should be in the range 1 - 12" );
             throw new InvalidInputException( "Current month should be in the range 1 - 12." );
-        } else if ( StringUtils.isEmpty( recipientMailId ) ) {
+        } else if ( StringUtils.isEmpty( recipientMail ) ) {
             LOG.error( "Recipient Email is not specified." );
             throw new InvalidInputException( "Recipient Email is not specified." );
         }
 
-        emailServices
-            .sendMonthlyDigestMail(
-                buildMonthlyDigestAggregate( companyId, companyName, monthUnderConcern, year, recipientMailId,
-                    buildOrderedMonthlyDigestList( getDigestDataForLastFourMonths( companyId, monthUnderConcern, year ),
-                        monthUnderConcern ),
-                    getTopTenUserRankingsThisMonthForACompany( companyId, monthUnderConcern, year ) ) );
+        MonthlyDigestAggregate digestAggregate = buildMonthlyDigestAggregate( companyId, companyName, monthUnderConcern, year,
+            recipientMail, buildOrderedMonthlyDigestList( getDigestDataForLastFourMonths( companyId, monthUnderConcern, year ),
+                monthUnderConcern ),
+            getTopTenUserRankingsThisMonthForACompany( companyId, monthUnderConcern, year ) );
 
-        LOG.debug( "method prepareAndSendMonthlyDigestMail() finished" );
-        return true;
+        LOG.debug( "method prepareMonthlyDigestMailData() finished" );
+        return digestAggregate;
     }
 
 
@@ -3273,6 +3282,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     }
 
 
+    @SuppressWarnings ( "unchecked")
     @Override
     public void startMonthlyDigestProcess()
     {
@@ -3282,46 +3292,58 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 CommonConstants.BATCH_TYPE_MONTHLY_DIGEST_STARTER, CommonConstants.BATCH_NAME_MONTHLY_DIGEST_STARTER );
 
             LOG.debug( "Starting startMonthlyDigestProcess" );
+            int startIndex = DIGEST_MAIL_START_INDEX;
+            int batchSize = DIGEST_MAIL_BATCH_SIZE;
+            List<CompanyDigestRequestData> digestRequestList = null;
 
-            // fetch a list company IDs who have enabled send monthly digest mail feature 
-            List<OrganizationUnitSettings> companies = organizationUnitSettingsDao.getCompaniesOptedForSendingMonthlyDigest();
+            do {
 
-            if ( companies != null ) {
-                for ( OrganizationUnitSettings company : companies ) {
-                    try {
 
-                        // get the company administrator for the company under concern
-                        User companyAdmin = userManagementService.getCompanyAdmin( company.getIden() );
+                // fetch a list of digest requests for companies who have enabled send monthly digest mail feature 
+                Response companyListResponse = ssApiBatchIntergrationBuilder.getIntegrationApi()
+                    .getCompaniesOptedForDigestMail( startIndex, batchSize );
 
-                        if ( companyAdmin == null ) {
-                            LOG.error( "Unable to find a company admin for company with ID: " + company.getIden() );
-                            throw new InvalidInputException(
-                                "Unable to find a company admin for company with ID: " + company.getIden() );
-                        }
+                String companyListString = StringEscapeUtils.unescapeJava( companyListResponse != null
+                    ? new String( ( (TypedByteArray) companyListResponse.getBody() ).getBytes() ) : null );
+
+
+                digestRequestList = (List<CompanyDigestRequestData>) ( new Gson().fromJson(
+                    StringUtils.strip( companyListString, "\"" ),
+                    new TypeToken<List<CompanyDigestRequestData>>() {}.getType() ) );
+
+                if ( digestRequestList != null ) {
+                    for ( CompanyDigestRequestData company : digestRequestList ) {
+
 
                         // create a Calendar instance with time zone and locale of the device
                         Calendar calendar = Calendar.getInstance();
 
-                        // start digest mail process for the previous month
-                        prepareAndSendMonthlyDigestMail( company.getIden(), company.getContact_details().getName(),
-                            calendar.get( Calendar.MONTH ) == 0 ? 12 : calendar.get( Calendar.MONTH ),
-                            calendar.get( Calendar.YEAR ), companyAdmin.getEmailId() );
+                        // get the digest aggregate object
+                        Response MDAResponse = ssApiBatchIntergrationBuilder.getIntegrationApi().buildMonthlyDigestAggregate(
+                            company.getCompanyId(), company.getCompanyName(), calendar.get( Calendar.MONTH ),
+                            calendar.get( Calendar.YEAR ), company.getRecipientMailId() );
+
+                        String MDAString = StringEscapeUtils.unescapeJava(
+                            MDAResponse != null ? new String( ( (TypedByteArray) MDAResponse.getBody() ).getBytes() ) : null );
+
+                        MonthlyDigestAggregate digestAggregate = (MonthlyDigestAggregate) ( new Gson().fromJson(
+                            StringUtils.strip( MDAString, "\"" ), new TypeToken<MonthlyDigestAggregate>() {}.getType() ) );
 
 
-                    } catch ( InvalidInputException wrongInput ) {
-                        LOG.error( "Unable to send monthly digest, cause: Invalid input, details: " + wrongInput.getMessage() );
+                        try {
+                            // send the email to the company administrator
+                            emailServices.sendMonthlyDigestMail( digestAggregate );
+                        } catch ( InvalidInputException | UndeliveredEmailException unableToSendDigestMail ) {
+                            LOG.error( "Unable to send digest mail for {}", company.getCompanyName() );
+                        }
 
-                    } catch ( NoRecordsFetchedException noDigestRecordsFound ) {
-                        LOG.error( "Unable to send monthly digest, cause: no digest entry found, details: "
-                            + noDigestRecordsFound.getMessage() );
-
-                    } catch ( UndeliveredEmailException unableToDeliverMail ) {
-                        LOG.error( "Unable to send monthly digest, cause: unable to send mail, details: "
-                            + unableToDeliverMail.getMessage() );
 
                     }
                 }
-            }
+
+                startIndex += batchSize;
+
+            } while ( digestRequestList != null && digestRequestList.size() >= batchSize );
 
             //updating last run time for batch in database
             batchTrackerService.updateLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_MONTHLY_DIGEST_STARTER );
@@ -3364,5 +3386,42 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         return true;
     }
 
+
+    @Override
+    public List<CompanyDigestRequestData> getCompaniesOptedForDigestMail( int startIndex, int batchSize )
+    {
+
+        LOG.debug( "method getCompaniesOptedForDigestMail started" );
+        List<CompanyDigestRequestData> digestRequestData = null;
+        List<OrganizationUnitSettings> companyList = organizationUnitSettingsDao
+            .getCompaniesOptedForSendingMonthlyDigest( startIndex, batchSize );
+
+        if ( companyList != null ) {
+
+            digestRequestData = new ArrayList<>();
+
+            for ( OrganizationUnitSettings companySettings : companyList ) {
+
+                CompanyDigestRequestData digestRequest = new CompanyDigestRequestData();
+                User companyAdmin = null;
+                try {
+                    companyAdmin = userManagementService.getCompanyAdmin( companySettings.getIden() );
+                } catch ( InvalidInputException error ) {
+                    LOG.error( "profile master error in getCompaniesOptedForDigestMail()" );
+                }
+
+                digestRequest.setCompanyId( companySettings.getIden() );
+                digestRequest.setCompanyName(
+                    companySettings.getContact_details() != null ? companySettings.getContact_details().getName() : null );
+
+                if ( companyAdmin != null ) {
+                    digestRequest.setRecipientMailId( companyAdmin.getEmailId() );
+                }
+
+                digestRequestData.add( digestRequest );
+            }
+        }
+        return digestRequestData;
+    }
 
 }

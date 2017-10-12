@@ -9,7 +9,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.CompanyDigestRequestData;
 import com.realtech.socialsurvey.core.entities.Digest;
+import com.realtech.socialsurvey.core.entities.MonthlyDigestAggregate;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RankingRequirements;
 import com.realtech.socialsurvey.core.entities.UserRankingPastMonthMain;
@@ -115,12 +117,14 @@ public interface ReportingDashboardManagement
     
     public Map<Integer, Digest> getDigestDataForLastFourMonths(long companyId, int monthUnderConcern, int year) throws InvalidInputException, NoRecordsFetchedException;
 
-    public boolean prepareAndSendMonthlyDigestMail( long companyId, String companyName, int monthUnderConcern, int year, String recipientMailId ) throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException;
+    public MonthlyDigestAggregate prepareMonthlyDigestMailData( long companyId, String companyName, int monthUnderConcern, int year, String recipientMail ) throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException;
 
     public List<UserRankingPastMonthMain> getTopTenUserRankingsThisMonthForACompany( long companyId, int monthUnderConcern, int year ) throws InvalidInputException;
 
     public void startMonthlyDigestProcess();
 
     public boolean updateSendDigestMailToggle( long companyId, boolean sendMonthlyDigestMail ) throws InvalidInputException;
+
+    public List<CompanyDigestRequestData> getCompaniesOptedForDigestMail( int startIndex, int batchSize );
 
 }

@@ -1017,7 +1017,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
      * Method to fetch the company ID list who have opted for monthly digest mail
      */
     @Override
-    public List<OrganizationUnitSettings> getCompaniesOptedForSendingMonthlyDigest()
+    public List<OrganizationUnitSettings> getCompaniesOptedForSendingMonthlyDigest( int startIndex, int batchSize )
     {
         LOG.debug( "Method getCompaniesOptedForSendingMonthlyDigest() started." );
 
@@ -1026,6 +1026,15 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         query.addCriteria( Criteria.where( KEY_STATUS )
             .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) ) );
         query.addCriteria( Criteria.where( KEY_SEND_MONTHLY_DIGEST_MAIL ).is( true ) );
+
+        if ( startIndex > -1 ) {
+            query.skip( startIndex );
+        }
+        if ( batchSize > -1 ) {
+            query.limit( batchSize );
+        }
+
+        query.with( new Sort( Sort.Direction.ASC, KEY_IDEN ) );
 
         LOG.debug( "Query: " + query.toString() );
         unitSettings = mongoTemplate.find( query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION );
