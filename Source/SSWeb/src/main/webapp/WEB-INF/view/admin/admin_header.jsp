@@ -81,6 +81,9 @@
 					<spring:message code="label.usermanagement.header.key" />
 				</div>
 				</c:if>
+				<div class="header-links-item" onclick="javascript:showMainContent('./showtransactionmonitorpage.do')">
+					<spring:message code="label.transaction.monitor.key"/>
+				</div>
 				<a href="j_spring_security_logout"><span class="header-links-item"><spring:message code="label.logout.key" /></span></a>
 			</div>
 		</div>
@@ -110,6 +113,12 @@
 				<div class="hdr-link-item hdr-link-active">
 					<a id="invite-link" href="javascript:showMainContent('./admindownloadreports.do')" onclick="showOverlay();"><spring:message code="label.downloadreport.header.key" /></a>
 				</div>
+				
+				<div class="hdr-link-item hdr-link-active">
+					<a id="invite-link" href="javascript:showMainContent('./showtransactionmonitorpage.do')" onclick="showOverlay();"><spring:message code="label.transaction.monitor.key" /></a>
+				</div>
+				
+				
 			</div>
 			<div id="header-menu-icn" class="header-menu-icn icn-menu hide float-right"></div>
 			<div id="header-user-info" class="header-user-info float-right clearfix">

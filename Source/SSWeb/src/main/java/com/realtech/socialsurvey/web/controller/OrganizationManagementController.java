@@ -81,6 +81,7 @@ import com.realtech.socialsurvey.core.services.payment.exception.PaymentExceptio
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionPastDueException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUpgradeUnsuccessfulException;
+import com.realtech.socialsurvey.core.services.reportingmanagement.ReportingDashboardManagement;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsLocker;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
@@ -160,6 +161,9 @@ public class OrganizationManagementController
 
     @Autowired
     private HierarchyStructureUploadService hierarchyStructureUploadService;
+    
+    @Autowired
+    private ReportingDashboardManagement  reportingDashboardManagement;
 
     @Value ( "${CDN_PATH}")
     private String endpoint;
@@ -797,6 +801,10 @@ public class OrganizationManagementController
                 model.addAttribute("sendEmailThrough",companySettings.getSendEmailThrough()); 
             }
 
+            // add send monthly digest email flag
+            if( CommonConstants.COMPANY_ID_COLUMN.equals( entityType ) ){
+                model.addAttribute( "sendMonthlyDigestMail", unitSettings.isSendMonthlyDigestMail() );
+            }
         } catch ( InvalidInputException | NoRecordsFetchedException e ) {
             LOG.error( "NonFatalException while fetching profile details. Reason :" + e.getMessage(), e );
             model.addAttribute( "message",
@@ -1657,6 +1665,37 @@ public class OrganizationManagementController
 
         LOG.info( "Method to update autopost link to user site for a survey finished" );
         return "Successfully updated autopost link to user site setting";
+    }
+    
+    /**
+     * method to update send digest mail toggle
+     * @param request
+     * @return
+     */
+    @RequestMapping ( value = "/updatesenddigestmailtoggle", method = RequestMethod.POST)
+    @ResponseBody
+    public String updateSendMonthlyDigestMailToggle( HttpServletRequest request )
+    {
+        LOG.info( "Method updateSendMonthlyDigestMailToggle started" );
+        HttpSession session = request.getSession();
+
+        if ( !CommonConstants.COMPANY_ID_COLUMN
+            .equals( (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN ) ) ) {
+            LOG.error( "This is a company level settings and can to be set at any other hierarchy." );
+            return "false";
+        }
+
+        long companyId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+
+        try {
+            return String.valueOf( reportingDashboardManagement.updateSendDigestMailToggle( companyId,
+                Boolean.parseBoolean( request.getParameter( "sendMonthlyDigestMail" ) ) ) );
+        } catch ( Exception error ) {
+            LOG.error(
+                "Exception occured in updateSendMonthlyDigestMailToggle() while updating send montlhy digest mail flag. Nested exception is ",
+                error );
+            return "false";
+        }
     }
 
 
