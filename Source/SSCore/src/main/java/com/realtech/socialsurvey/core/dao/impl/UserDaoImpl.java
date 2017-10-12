@@ -1,8 +1,10 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.Criteria;
@@ -495,6 +497,7 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
     }
 
     
+    @SuppressWarnings ( "unchecked")
     @Override
     public List<String> getRegisteredEmailsInOtherCompanies( Company company ) throws InvalidInputException{
         if ( company == null ) {
@@ -520,7 +523,32 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
     } catch ( HibernateException hibernateException ) {
         throw new DatabaseException( "Exception caught in getUsersForCompany() ", hibernateException );
     }
-    }   
+    } 
+    
+    
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public Map<Long,Long> getUsersCountForCompanies()
+    {
+        LOG.info( "Method getUsersCountForCompanies() started." );
+
+        Criteria criteria = getSession().createCriteria( User.class );
+        Criterion criterion = Restrictions.or( Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ),
+            Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED ) );
+        criteria.add( criterion );
+
+        criteria.setProjection( Projections.projectionList()
+            .add( Projections.groupProperty( CommonConstants.COMPANY + "." + CommonConstants.COMPANY_ID_COLUMN ) )
+            .add( Projections.rowCount() ) );
+        List<Object[]> companyUserCounts = criteria.list();
+        
+        Map<Long,Long> activeUserCountsMap = new HashMap<Long,Long>();
+        for ( Object[] activeUserCount : companyUserCounts ) {
+            activeUserCountsMap.put( (Long) activeUserCount[0], (Long) activeUserCount[1] );
+        }
+        LOG.info( "Method getUsersCountForCompanies() finished." );        
+        return activeUserCountsMap;
+    }
     
 }
 // JIRA SS-42 By RM-05 EOC

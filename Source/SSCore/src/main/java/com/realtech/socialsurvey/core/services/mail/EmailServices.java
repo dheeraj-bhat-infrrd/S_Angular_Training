@@ -494,4 +494,17 @@ public interface EmailServices
         throws InvalidInputException, UndeliveredEmailException;
     
     void sendMonthlyDigestMail(MonthlyDigestAggregate digestAggregate) throws InvalidInputException, UndeliveredEmailException;
+
+
+
+    void sendNoTransactionAlertMail( String recipientMailId, String mailBody ) throws InvalidInputException,
+        UndeliveredEmailException;
+
+
+    void sendHighVoulmeUnprocessedTransactionAlertMail( String recipientMailId, String mailBody ) throws InvalidInputException,
+        UndeliveredEmailException;
+
+
+    void sendLessVoulmeOfTransactionReceivedAlertMail( String recipientMailId, String mailBody ) throws InvalidInputException,
+        UndeliveredEmailException;
 }

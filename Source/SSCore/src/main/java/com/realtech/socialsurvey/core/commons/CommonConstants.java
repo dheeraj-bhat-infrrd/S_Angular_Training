@@ -1373,6 +1373,9 @@ public interface CommonConstants
     public static final String MONTH_VAL = "monthVal";
     public static final String YEAR_VAL = "yearVal";
     public static final String QUESTION_ID = "questionId";
+    
+    public static final String TRANSACTION_MONITOR_DATE_COLUMN = "transactionDate";
+    public static final String SURVEY_STATS_MONITOR_DATE_COLUMN = "statsDate";
 
     //Survey API survey status
     public static final String SURVEY_API_SURVEY_STATUS_COMPLETE = "complete";
