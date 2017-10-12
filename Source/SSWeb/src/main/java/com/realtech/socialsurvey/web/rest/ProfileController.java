@@ -707,8 +707,7 @@ public class ProfileController
         @QueryParam ( value = "maxScore") Double maxScore, @QueryParam ( value = "start") Integer start,
         @QueryParam ( value = "numRows") Integer numRows, @QueryParam ( value = "sortCriteria") String sortCriteria )
     {
-        LOG.info( "Service to fetch reviews of company called for companyId:" + companyId + " ,minScore:" + minScore
-            + " and maxscore:" + maxScore );
+        LOG.info( "Service to fetch reviews of company called for companyId: {} ,minScore: {} and maxscore: {}", companyId, minScore, maxScore );
         Response response = null;
         try {
             if ( companyId <= 0l ) {
