@@ -43,20 +43,20 @@
 <div class="col-lg-3 col-md-3 col-sm-3 rep-sps-scores">
 	<div class="rep-det-div">
 		<div class="float-left dash-sel-lbl rep-dash-sel-lbl-det">Detractors</div>
-		<div id="detractorsBar" class="float-left dash-sel-lbl"
-			style=" height:65%; background:#E8341F; margin:auto 2px;"></div>
+		<div id="detractorsBar" class="float-left dash-sel-lbl rep-dash-bar-margin"
+			style=" height:65%; background:#E8341F; "></div>
 		<div id="detractorsValue" class="float-left dash-sel-lbl" style="color: #E8341F; text-align:left; margin-left:5px"></div>
 	</div>
 	<div class="rep-det-div">
 		<div class="float-left dash-sel-lbl rep-dash-sel-lbl-pas">Passives</div>
-		<div id="passivesBar" class="float-left dash-sel-lbl"
-			style=" height:65%; background:#999999; margin:auto 2px"></div>
+		<div id="passivesBar" class="float-left dash-sel-lbl rep-dash-bar-margin"
+			style=" height:65%; background:#999999; "></div>
 		<div id="passivesValue" class="float-left dash-sel-lbl" style="color: #999999; text-align:left; margin-left:5px"></div>
 	</div>
 	<div class="rep-det-div">
 		<div class="float-left dash-sel-lbl rep-dash-lbl-sel-prom">Promoters</div>
-		<div id="promotersBar" class="float-left dash-sel-lbl"
-			style=" height:65%; background:#7ab400; margin:auto 2px"></div>
+		<div id="promotersBar" class="float-left dash-sel-lbl rep-dash-bar-margin"
+			style=" height:65%; background:#7ab400; "></div>
 		<div id="promotersValue" class="float-left dash-sel-lbl" style="color: #7ab400; text-align:left; margin-left:5px"></div>
 	</div>
 </div>
