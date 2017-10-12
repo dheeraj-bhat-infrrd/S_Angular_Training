@@ -175,7 +175,14 @@ public class AdminController
         return JspResolver.ADMIN_DOWNLOAD_REPORTS;
     }
 
+    @RequestMapping ( value = "/showtransactionmonitorpage")
+    public String showTransactionMonitorPage( Model model, HttpServletRequest request )
+    {
 
+        LOG.info( "Inside showTransactionMonitorPage() method in admin controller" );
+        return JspResolver.ADMIN_TRANSACTION_MONITOR;
+    }
+    
     @RequestMapping ( value = "/companyhierarchy")
     public String companyHierarchyView( Model model, HttpServletRequest request )
     {
