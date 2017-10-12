@@ -30,12 +30,16 @@ public class SurveyResultsCompanyReportDaoImpl extends GenericReportingDaoImpl<S
 	public List<SurveyResultsCompanyReport> fetchSurveyResultsCompanyReportByCompanyId(Long companyId,Timestamp startDate, Timestamp endDate) {
 		LOG.info( "method to fetch survey results company report based on companyId,fetchSurveyResultsCompanyReportByCompanyId() started" );
         Criteria criteria = getSession().createCriteria( SurveyResultsCompanyReport.class );
-        List<SurveyResultsCompanyReport> testSurveyResult;
+        
         try {
             criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
             criteria.add( Restrictions.eq( CommonConstants.SURVEY_RESULTS_IS_DELETED, false ) );
-
-            if(startDate != null && endDate != null){
+            
+            if(startDate != null && endDate == null){                    
+                criteria.add( Restrictions.ge( CommonConstants.SURVEY_RESULTS_COMPLETED_DATE, startDate) );
+            }else  if(startDate == null && endDate != null){
+                criteria.add( Restrictions.le( CommonConstants.SURVEY_RESULTS_COMPLETED_DATE, endDate) );
+            }else if(startDate != null && endDate != null){
             Criterion criterion = Restrictions.and(
                     Restrictions.ge( CommonConstants.SURVEY_RESULTS_COMPLETED_DATE, startDate),
                     Restrictions.le( CommonConstants.SURVEY_RESULTS_COMPLETED_DATE, endDate) );
