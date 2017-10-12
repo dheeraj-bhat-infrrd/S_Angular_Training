@@ -3,6 +3,14 @@
 var monthNamesList = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];	
 var overviewData=getOverviewData();
 var socialMediaList = new Array();
+var is_safari = navigator.userAgent.indexOf("Safari") > -1;
+
+function cssForSafari(){
+	if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1) {
+		is_safari = true;
+		$('.rep-dash-bar-margin').css('margin', 'auto 2px auto 10px');
+	}
+}
 
 function isEmpty(obj) {
     for(var key in obj) {
