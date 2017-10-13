@@ -5,32 +5,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Date;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
-import com.realtech.socialsurvey.api.exceptions.SSApiException;
 import com.realtech.socialsurvey.api.utils.RestUtils;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.CompanyDigestRequestData;
 import com.realtech.socialsurvey.core.entities.OverviewBranch;
 import com.realtech.socialsurvey.core.entities.OverviewCompany;
 import com.realtech.socialsurvey.core.entities.OverviewRegion;
 import com.realtech.socialsurvey.core.entities.OverviewUser;
-import com.realtech.socialsurvey.core.entities.OverviewUserMonth;
-import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.reportingmanagement.DashboardGraphManagement;
 import com.realtech.socialsurvey.core.services.reportingmanagement.OverviewManagement;
@@ -616,5 +606,32 @@ public class ReportingController
     	scoreStatsQuestion = reportingDashboardManagement.getScoreStatsForQuestion(entityId, entityType, currentMonth, currentYear);
     	json = new Gson().toJson(scoreStatsQuestion);
     	return json;
+    }
+    
+
+    @RequestMapping ( value = "/getcompaniesoptedfordigestmail", method = RequestMethod.GET)
+    @ApiOperation ( value = "Fetch the list of companies that have digest Mail enabled")
+    public String getCompaniesOptedForDigestMail( int startIndex, int batchSize )
+    {
+
+        LOGGER.info( "Fetching the list of companies that have digest Mail enabled" );
+
+        String json = null;
+        List<CompanyDigestRequestData> digestRequestData = new ArrayList<>();
+        digestRequestData = reportingDashboardManagement.getCompaniesOptedForDigestMail( startIndex, batchSize );
+        json = new Gson().toJson( digestRequestData );
+        return json;
+    }
+
+
+    @RequestMapping ( value = "/buildmonthlydigestaggregate", method = RequestMethod.GET)
+    @ApiOperation ( value = "Build the monthly digest aggregate for a company for a given month")
+    public String buildMonthlyDigestAggregate( long companyId, String companyName, int monthUnderConcern, int year,
+        String recipientMail ) throws NonFatalException
+    {
+
+        LOGGER.info( "Building the monthly digest aggregate for a company for a given month" );
+        return new Gson().toJson( reportingDashboardManagement.prepareMonthlyDigestMailData( companyId, companyName,
+            monthUnderConcern, year, recipientMail ) );
     }
 }

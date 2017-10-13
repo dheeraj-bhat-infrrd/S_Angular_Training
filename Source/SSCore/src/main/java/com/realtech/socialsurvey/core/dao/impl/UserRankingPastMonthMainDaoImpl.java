@@ -12,6 +12,7 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.UserRankingPastMonthMainDao;
@@ -119,6 +120,30 @@ public class UserRankingPastMonthMainDaoImpl extends GenericReportingDaoImpl<Use
         catch ( HibernateException hibernateException ) {
             LOG.error( "Exception caught in fetchUserRankingCountForPastMonthMain() ", hibernateException );
             throw new DatabaseException( "Exception caught in fetchUserRankingCountForPastMonthMain() ", hibernateException );
+        }
+    }
+    
+    @SuppressWarnings ( "unchecked")
+    @Override
+    @Transactional
+    public List<UserRankingPastMonthMain> fetchTopTenUserRankingsForACompany( long companyId, int monthUnderConcern, int year )
+    {
+        LOG.debug( "method fetchTopTenUserRankingsForACompany() running" );
+        try {
+            Criteria criteria = getSession().createCriteria( UserRankingPastMonthMain.class );
+
+            criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
+            criteria.add( Restrictions.eq( CommonConstants.LEADERBOARD_YEAR, year ) );
+            criteria.add( Restrictions.eq( CommonConstants.LEADERBOARD_MONTH, monthUnderConcern ) );
+
+            criteria.addOrder( Order.asc( CommonConstants.RANK ) );
+            criteria.setFirstResult( CommonConstants.INITIAL_INDEX );
+            criteria.setMaxResults( 10 );
+
+            return (List<UserRankingPastMonthMain>) criteria.list();
+        } catch ( HibernateException hibernateException ) {
+            LOG.error( "Exception caught in fetchTopTenUserRankingsForACompany() ", hibernateException );
+            throw new DatabaseException( "Exception caught in fetchTopTenUserRankingsForACompany() ", hibernateException );
         }
     }
 

@@ -28,6 +28,13 @@ var lastColNameForCount;
 var lastColValueForCount;
 var lastColNameForGraph;
 var lastColValueForGraph;
+var lastColNameForGraphTrans;
+var lastColValueForGraphTrans;
+var lastColNameForGraphProcSurvey;
+var lastColValueForGraphProcSurvey;
+
+var lastColNameForGraphActvUser;
+var lastColValueForGraphActvUser;
 
 // Variables for processing Edit profile
 var startIndex = 0;
@@ -553,10 +560,6 @@ function paintReportingDashboard(profileMasterId, newProfileName, newProfileValu
 	fetchReviewsOnDashboard(false);
 }
 
-function reportingSocialMediaButtons(data){
-	
-}
-
 function bindAutosuggestForIndividualRegionBranchSearch(elementId) {
 	// Bind keyup on search for region, branch, individual for dashboard
 	$('#' + elementId).on('keyup', function(e) {
@@ -921,7 +924,139 @@ function paintFixSocialMedia(data){
 	$('#overlay-main').show();
 }
 
+function bindSelectButtonsForTranStats(){
+	
+	$("#selection-list-transaction").unbind('change');
+	$("#selection-list-proc-survey").unbind('change');
+	$("#selection-list-actv-usr").unbind('change');
+	
+	
+	$("#transaction-count-days").unbind('change');
+	$("#proc-sur-count-days").unbind('change');
+	$("#actv-usr-count-days").unbind('change');
+	
+	
+	$("#selection-list-transaction").change(function() {
+		$('#trans-sel-item').val('');
+		$('.dsh-res-display').hide();
 
+		if ($("#selection-list-transaction").val() == 'companyId') {
+			$('#dsh-srch-survey-div').hide();
+			showTransactionStatisticsGraphically('companyId', newProfileValue);
+		} else if ($("#selection-list-transaction").val() == 'regionId') {
+			$('#dsh-srch-survey-div').hide();
+			showTransactionStatisticsGraphically('regionId', newProfileValue);
+		} else if ($("#selection-list-transaction").val() == 'branchId') {
+			$('#dsh-srch-survey-div').hide();
+			showTransactionStatisticsGraphically('branchId', newProfileValue);
+		} else {
+			$('#dsh-srch-survey-div').show();
+		}
+	});
+	
+	$("#selection-list-proc-survey").change(function() {
+		$('#proc-sur-sel-item').val('');
+		$('.dsh-res-display').hide();
+
+		if ($("#selection-list-proc-survey").val() == 'companyId') {
+			$('#proc-srch-survey-div').hide();
+			showProsSurveyStatisticsGraphically('companyId', newProfileValue);
+		} else if ($("#selection-list-proc-survey").val() == 'regionId') {
+			$('#proc-srch-survey-div').hide();
+			showProsSurveyStatisticsGraphically('regionId', newProfileValue);
+		} else if ($("#selection-list-proc-survey").val() == 'branchId') {
+			$('#proc-srch-survey-div').hide();
+			showProsSurveyStatisticsGraphically('branchId', newProfileValue);
+		} else {
+			$('#proc-srch-survey-div').show();
+		}
+	});
+	
+	$("#selection-list-actv-usr").change(function() {
+		$('#actv-usr-srch-div').val('');
+		$('.dsh-res-display').hide();
+
+		if ($("#selection-list-actv-usr").val() == 'companyId') {
+			$('#actv-usr-srch-div').hide();
+			showActiveUsersStatisticsGraphically('companyId', newProfileValue);
+		} else if ($("#selection-list-actv-usr").val() == 'regionId') {
+			$('#actv-usr-srch-div').hide();
+			showActiveUsersStatisticsGraphically('regionId', newProfileValue);
+		} else if ($("#selection-list-actv-usr").val() == 'branchId') {
+			$('#actv-usr-srch-div').hide();
+			showActiveUsersStatisticsGraphically('branchId', newProfileValue);
+		} else {
+			$('#actv-usr-srch-div').show();
+		}
+	});
+	
+	$("#transaction-count-days").change(function() {
+		var columnName = lastColNameForGraphTrans;
+		var columnValue = lastColValueForGraphTrans;
+		if ($('#trans-srch-survey-div').is(':visible')) {
+			if ($('#trans-sel-item').val() == '') {
+				$('#trans-sel-item').addClass("empty-field");
+				if ($('#selection-list-transaction').val() == "regionName") {
+					$('#overlay-toast').html("Please choose a valid Region Name");
+				} else if ($('#selection-list-transaction').val() == "branchName") {
+					$('#overlay-toast').html("Please choose a valid Office Name");
+				} else if ($('#selection-list-transaction').val() == "displayName") {
+					$('#overlay-toast').html("Please choose a valid User Name");
+				} else if ($('#selection-list-transaction').val() == "company") {
+					$('#overlay-toast').html("Please choose a valid Company Name");
+				}
+				
+				showToast();
+				return;
+			}
+		}
+		showTransactionStatisticsGraphically(columnName, columnValue);
+	});
+	
+	$("#proc-sur-count-days").change(function() {
+		var columnName = lastColNameForGraphProcSurvey;
+		var columnValue = lastColValueForGraphProcSurvey;
+		if ($('#proc-srch-survey-div').is(':visible')) {
+			if ($('#proc-sur-sel-item').val() == '') {
+				$('#proc-sur-sel-item').addClass("empty-field");
+				if ($('#selection-list-proc-survey').val() == "regionName") {
+					$('#overlay-toast').html("Please choose a valid Region Name");
+				} else if ($('#selection-list-proc-survey').val() == "branchName") {
+					$('#overlay-toast').html("Please choose a valid Office Name");
+				} else if ($('#selection-list-proc-survey').val() == "displayName") {
+					$('#overlay-toast').html("Please choose a valid User Name");
+				} else if ($('#selection-list-proc-survey').val() == "company") {
+					$('#overlay-toast').html("Please choose a valid Company Name");
+				}
+				showToast();
+				return;
+			}
+		}
+		showProsSurveyStatisticsGraphically(columnName, columnValue);
+	});
+	
+	$("#actv-usr-count-days").change(function() {
+		var columnName = lastColNameForGraphActvUser;
+		var columnValue = lastColValueForGraphActvUser;
+		if ($('#actv-usr-srch-div').is(':visible')) {
+			if ($('#actv-usr-sel-item').val() == '') {
+				$('#actv-usr-sel-item').addClass("empty-field");
+				if ($('#selection-list-actv-usr').val() == "regionName") {
+					$('#overlay-toast').html("Please choose a valid Region Name");
+				} else if ($('#selection-list-actv-usr').val() == "branchName") {
+					$('#overlay-toast').html("Please choose a valid Office Name");
+				} else if ($('#selection-list-actv-usr').val() == "displayName") {
+					$('#overlay-toast').html("Please choose a valid User Name");
+				} else if ($('#selection-list-actv-usr').val() == "company") {
+					$('#overlay-toast').html("Please choose a valid Company Name");
+				}
+				showToast();
+				return;
+			}
+		}
+		showActiveUsersStatisticsGraphically(columnName, columnValue);
+	});	
+}
 
 function bindSelectButtons(newProfileValue) {
 	$("#selection-list").unbind('change');
@@ -1327,6 +1462,7 @@ function showSurveyGraph(columnName, columnValue, numberOfDays) {
 			hideDashOverlay('#low-dash');
 		},
 		error : function(e) {
+			isSurveydetailsforgraph = false;
 			if (e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
@@ -1335,6 +1471,513 @@ function showSurveyGraph(columnName, columnValue, numberOfDays) {
 			showToast();
 		}
 	});
+}
+
+function showActiveUsersStatisticsGraphically(columnName, columnValue) {
+	var element = document.getElementById("proc-sur-count-days");
+	var numberOfDays = element.options[element.selectedIndex].value;
+	showDashOverlay('#low-actv-usr');
+	$('#actv-user-gph-item').html('');
+	showActvUserGraph(columnName, columnValue, numberOfDays);
+}
+
+function showActvUserGraph(columnName,companyId, numberOfDays) {
+	if (isSurveydetailsforgraph == true) {
+		return;
+	}
+	var payload = {
+		"companyId" : companyId,
+		"noOfDays" : numberOfDays
+	};
+	isSurveydetailsforgraph = true;
+	$.ajax({
+		url : "./getcompanyactiveusercountforpastndays.do",
+		type : "GET",
+		dataType : "JSON",
+		cache : false,
+		data : payload,
+		success : function(data) {
+			isSurveydetailsforgraph = false;
+			$('#actv-usr-sel-item').removeClass("empty-field");
+			graphData = data;
+			paintActvUserGraph();
+			hideDashOverlay('#low-actv-usr');
+		},
+		error : function(e) {
+			isSurveydetailsforgraph = false;
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			$('#overlay-toast').html(e.responseText);
+			showToast();
+		}
+	});
+}
+
+
+function paintActvUserGraph() {
+	if (graphData == undefined)
+		return;
+	console.log()
+	var allTimeslots = [];
+	var totalActiveUserCount = [];
+
+	var element = document.getElementById("proc-sur-count-days");
+	if (element == null) {
+		return;
+	}
+
+	var format = element.options[element.selectedIndex].value;
+	var type = '';
+	if (format == '10') {
+		type = 'Date';
+	} else if (format == '20') {
+		type = 'Date';
+	} else if (format == '30') {
+		type = 'Date';
+	}
+
+	var keys = getKeysFromGraphFormat(format);
+
+	for (var i = 0; i < keys.length; i++) {
+		if (format == '365') {
+			allTimeslots[i] = convertYearMonthKeyToDate(keys[i]);
+		} else if (format == '10' || format == '20' || format == '30') {
+			allTimeslots[i] = convertYearMonthDayKeyToDate(keys[i]);
+		}else {
+			allTimeslots[i] = convertYearWeekKeyToDate(keys[i]);
+		}
+		totalActiveUserCount[i] =  0;
+	}
+	
+	if(graphData != undefined){
+		for(var i in graphData ){
+			var graphDataEntity = graphData[i];
+			
+			var entityDate = graphDataEntity.statsDate;
+		    var formattedDate = new Date(Date.parse(entityDate));
+		    //get date similar to keys formay
+		    
+		    var month = formattedDate.getMonth() + 1;
+			var monthStr = "";
+			if (month < 10) {
+				monthStr = '0' + month.toString();
+				
+			}else{
+				monthStr = month.toString();
+			}
+			
+			var dayStr = "";
+			var day  = formattedDate.getDate();
+			if (day < 10) {
+				dayStr = '0' + day.toString();
+				
+			}else{
+				dayStr = day.toString();
+			}
+			
+			var keyFormattedDate = formattedDate.getFullYear().toString() + monthStr + dayStr;
+			if(keys.indexOf(keyFormattedDate)){
+				var index = keys.indexOf(keyFormattedDate);
+				totalActiveUserCount[index] =  graphDataEntity.noOfActiveUsers;
+			}
+		}
+	}
+	
+	var internalData = [];
+	var nestedInternalData = [];
+	nestedInternalData.push(type, 'Total Active Users');
+	internalData.push(nestedInternalData);
+	for (var itr = 0; itr < allTimeslots.length; itr++) {
+		nestedInternalData = [];
+		var curTotalActiveUserCount;
+
+		if (isNaN(parseInt(totalActiveUserCount[itr]))) {
+			curTotalActiveUserCount = 0;
+		} else {
+			curTotalActiveUserCount = parseInt(totalActiveUserCount[itr]);
+		}
+
+
+		nestedInternalData.push(allTimeslots[itr], curTotalActiveUserCount);
+		internalData.push(nestedInternalData);
+	}
+
+	var data = google.visualization.arrayToDataTable(internalData);
+	var options = {
+		chartArea : {
+			width : '90%',
+			height : '80%'
+		},
+		colors : [ 'rgb(0,174,239)'],
+		legend : {
+			position : 'none'
+		}
+	};
+
+	removeAllPreviousGraphToolTip();
+
+	var chart = new google.visualization.LineChart(document.getElementById('actv-user-gph-item'));
+	chart.draw(data, options);
+}
+
+function showProsSurveyStatisticsGraphically(columnName, columnValue) {
+	var element = document.getElementById("proc-sur-count-days");
+	var numberOfDays = element.options[element.selectedIndex].value;
+	showDashOverlay('#low-proc-sur');
+	$('#pro-survey-gph-item').html('');
+	showProcSurveyGraph(columnName, columnValue, numberOfDays);
+}
+
+
+function showProcSurveyGraph(columnName,companyId, numberOfDays) {
+	if (isSurveydetailsforgraph == true) {
+		return;
+	}
+	var payload = {
+		"companyId" : companyId,
+		"noOfDays" : numberOfDays
+	};
+	isSurveydetailsforgraph = true;
+	$.ajax({
+		url : "./getcompanysurveystatuscountforpastndays.do",
+		type : "GET",
+		dataType : "JSON",
+		cache : false,
+		data : payload,
+		success : function(data) {
+			isSurveydetailsforgraph = false;
+			$('#proc-sur-sel-item').removeClass("empty-field");
+			graphData = data;
+			paintProcSurveyGraph();
+			hideDashOverlay('#low-proc-sur');
+		},
+		error : function(e) {
+			isSurveydetailsforgraph = false;
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			$('#overlay-toast').html(e.responseText);
+			showToast();
+		}
+	});
+}
+
+function paintProcSurveyGraph() {
+	if (graphData == undefined)
+		return;
+	console.log()
+	var allTimeslots = [];
+	var totalReceivedTransactionsCount = [];
+	var completedTransactionCount = [];
+	var sentSurveyInvitationTransactionsCount = [];
+	var sentSurveyReminderTransactionsCount = [];
+
+	var element = document.getElementById("proc-sur-count-days");
+	if (element == null) {
+		return;
+	}
+
+	var format = element.options[element.selectedIndex].value;
+	var type = '';
+	if (format == '10') {
+		type = 'Date';
+	} else if (format == '20') {
+		type = 'Date';
+	} else if (format == '30') {
+		type = 'Date';
+	}
+
+	var keys = getKeysFromGraphFormat(format);
+
+	for (var i = 0; i < keys.length; i++) {
+		if (format == '365') {
+			allTimeslots[i] = convertYearMonthKeyToDate(keys[i]);
+		} else if (format == '10' || format == '20' || format == '30') {
+			allTimeslots[i] = convertYearMonthDayKeyToDate(keys[i]);
+		}else {
+			allTimeslots[i] = convertYearWeekKeyToDate(keys[i]);
+		}
+		totalReceivedTransactionsCount[i] =  0;
+		completedTransactionCount[i] =  0;
+		sentSurveyInvitationTransactionsCount[i] =  0;
+		sentSurveyReminderTransactionsCount[i] =  0;
+	}
+	
+	if(graphData != undefined){
+		for(var i in graphData ){
+			var graphDataEntity = graphData[i];
+			
+			var entityDate = graphDataEntity.transactionDate;
+		    var formattedDate = new Date(Date.parse(entityDate));
+		    //get date similar to keys formay
+		    
+		    var month = formattedDate.getMonth() + 1;
+			var monthStr = "";
+			if (month < 10) {
+				monthStr = '0' + month.toString();
+				
+			}else{
+				monthStr = month.toString();
+			}
+			
+			var dayStr = "";
+			var day  = formattedDate.getDate();
+			if (day < 10) {
+				dayStr = '0' + day.toString();
+				
+			}else{
+				dayStr = day.toString();
+			}
+			
+			var keyFormattedDate = formattedDate.getFullYear().toString() + monthStr + dayStr;
+			if(keys.indexOf(keyFormattedDate)){
+				var index = keys.indexOf(keyFormattedDate);
+				totalReceivedTransactionsCount[index] =  graphDataEntity.transactionReceivedCount;
+				completedTransactionCount[index] =  graphDataEntity.surveycompletedCount;
+				sentSurveyInvitationTransactionsCount[index] =  graphDataEntity.surveyInvitationSentCount;
+				sentSurveyReminderTransactionsCount[index] =  graphDataEntity.surveyReminderSentCount;
+			}
+		}
+	}
+	
+	var internalData = [];
+	var nestedInternalData = [];
+	nestedInternalData.push(type, 'Total Transactions', 'API Transactions', 'Encompass Transactions', 'FTP Transactions');
+	internalData.push(nestedInternalData);
+	for (var itr = 0; itr < allTimeslots.length; itr++) {
+		nestedInternalData = [];
+		var curTotalReceivedTransactionsCount;
+		var curCompletedTransactionCount;
+		var curSentSurveyInvitationTransactionsCount;
+		var curSentSurveyReminderTransactionsCount;
+
+		if (isNaN(parseInt(totalReceivedTransactionsCount[itr]))) {
+			curTotalReceivedTransactionsCount = 0;
+		} else {
+			curTotalReceivedTransactionsCount = parseInt(totalReceivedTransactionsCount[itr]);
+		}
+
+		if (isNaN(parseInt(completedTransactionCount[itr]))) {
+			curCompletedTransactionCount = 0;
+		} else {
+			curCompletedTransactionCount = parseInt(completedTransactionCount[itr]);
+		}
+
+		if (isNaN(parseInt(sentSurveyInvitationTransactionsCount[itr]))) {
+			curSentSurveyInvitationTransactionsCount = 0;
+		} else {
+			curSentSurveyInvitationTransactionsCount = parseInt(sentSurveyInvitationTransactionsCount[itr]);
+		}
+
+		if (isNaN(parseInt(sentSurveyReminderTransactionsCount[itr]))) {
+			curSentSurveyReminderTransactionsCount = 0;
+		} else {
+			curSentSurveyReminderTransactionsCount = parseInt(sentSurveyReminderTransactionsCount[itr]);
+		}
+
+		nestedInternalData.push(allTimeslots[itr], curTotalReceivedTransactionsCount, curCompletedTransactionCount, curSentSurveyInvitationTransactionsCount, curSentSurveyReminderTransactionsCount);
+		internalData.push(nestedInternalData);
+	}
+
+	var data = google.visualization.arrayToDataTable(internalData);
+	var options = {
+		chartArea : {
+			width : '90%',
+			height : '80%'
+		},
+		colors : [ 'rgb(28,242,0)', 'rgb(0,174,239)', 'rgb(255,242,0)', 'rgb(255,202,145)' ],
+		legend : {
+			position : 'none'
+		}
+	};
+
+	removeAllPreviousGraphToolTip();
+
+	var chart = new google.visualization.LineChart(document.getElementById('pro-survey-gph-item'));
+	chart.draw(data, options);
+}
+
+function showTransactionStatisticsGraphically(columnName, columnValue) {
+	var element = document.getElementById("transaction-count-days");
+	var numberOfDays = element.options[element.selectedIndex].value;
+	showDashOverlay('#low-trans');
+	$('#trans-gph-item').html('');
+	showTransactionGraph(columnName, columnValue, numberOfDays);
+}
+
+
+
+var isSurveydetailsforgraph = false;
+function showTransactionGraph(columnName,companyId, numberOfDays) {
+	if (isSurveydetailsforgraph == true) {
+		return;
+	}
+	var payload = {
+		"companyId" : companyId,
+		"noOfDays" : numberOfDays
+	};
+	isSurveydetailsforgraph = true;
+	$.ajax({
+		url : "./getcompanyinputtransactionsforpastndays.do",
+		type : "GET",
+		dataType : "JSON",
+		cache : false,
+		data : payload,
+		success : function(data) {
+			isSurveydetailsforgraph = false;
+			$('#trans-sel-item').removeClass("empty-field");
+			graphData = data;
+			paintTransactionGraph();
+			hideDashOverlay('#low-trans');
+		},
+		error : function(e) {
+			isSurveydetailsforgraph = false;
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			$('#overlay-toast').html(e.responseText);
+			showToast();
+		}
+	});
+}
+
+function paintTransactionGraph() {
+	if (graphData == undefined)
+		return;
+	console.log()
+	var allTimeslots = [];
+	var totalTransactionsCount = [];
+	var apiTransactionsCount = [];
+	var encompassTransactionsCount = [];
+	var ftpTransactionsCount = [];
+
+	var element = document.getElementById("transaction-count-days");
+	if (element == null) {
+		return;
+	}
+
+	var format = element.options[element.selectedIndex].value;
+	var type = '';
+	if (format == '10') {
+		type = 'Date';
+	} else if (format == '20') {
+		type = 'Date';
+	} else if (format == '30') {
+		type = 'Date';
+	}
+
+	var keys = getKeysFromGraphFormat(format);
+
+	for (var i = 0; i < keys.length; i++) {
+		if (format == '365') {
+			allTimeslots[i] = convertYearMonthKeyToDate(keys[i]);
+		} else if (format == '10' || format == '20' || format == '30') {
+			allTimeslots[i] = convertYearMonthDayKeyToDate(keys[i]);
+		}else {
+			allTimeslots[i] = convertYearWeekKeyToDate(keys[i]);
+		}
+			totalTransactionsCount[i] =  0;
+			apiTransactionsCount[i] =  0;
+			encompassTransactionsCount[i] =  0;
+			ftpTransactionsCount[i] =  0;
+	}
+	
+	if(graphData != undefined){
+		for(var i in graphData ){
+			var graphDataEntity = graphData[i];
+			
+			var entityDate = graphDataEntity.transactionDate;
+		    var formattedDate = new Date(Date.parse(entityDate));
+		    //get date similar to keys formay
+		    
+		    var month = formattedDate.getMonth() + 1;
+			var monthStr = "";
+			if (month < 10) {
+				monthStr = '0' + month.toString();
+				
+			}else{
+				monthStr = month.toString();
+			}
+			
+			var dayStr = "";
+			var day  = formattedDate.getDate();
+			if (day < 10) {
+				dayStr = '0' + day.toString();
+				
+			}else{
+				dayStr = day.toString();
+			}
+			
+			var keyFormattedDate = formattedDate.getFullYear().toString() + monthStr + dayStr;
+			if(keys.indexOf(keyFormattedDate)){
+				var index = keys.indexOf(keyFormattedDate);
+				totalTransactionsCount[index] =  graphDataEntity.totalTransactionsCount;
+				apiTransactionsCount[index] =  graphDataEntity.apiTransactionsCount;
+				encompassTransactionsCount[index] =  graphDataEntity.encompassTransactionsCount;
+				ftpTransactionsCount[index] =  graphDataEntity.ftpTransactionsCount;
+			}
+		}
+	}
+	
+	var internalData = [];
+	var nestedInternalData = [];
+	nestedInternalData.push(type, 'Total Transactions', 'API Transactions', 'Encompass Transactions', 'FTP Transactions');
+	internalData.push(nestedInternalData);
+	for (var itr = 0; itr < allTimeslots.length; itr++) {
+		nestedInternalData = [];
+		var curTotalTransactionsCount;
+		var curApiTransactionsCount;
+		var curEncompassTransactionsCount;
+		var curFtpTransactionsCount;
+
+		if (isNaN(parseInt(totalTransactionsCount[itr]))) {
+			curTotalTransactionsCount = 0;
+		} else {
+			curTotalTransactionsCount = parseInt(totalTransactionsCount[itr]);
+		}
+
+		if (isNaN(parseInt(apiTransactionsCount[itr]))) {
+			curApiTransactionsCount = 0;
+		} else {
+			curApiTransactionsCount = parseInt(apiTransactionsCount[itr]);
+		}
+
+		if (isNaN(parseInt(encompassTransactionsCount[itr]))) {
+			curEncompassTransactionsCount = 0;
+		} else {
+			curEncompassTransactionsCount = parseInt(encompassTransactionsCount[itr]);
+		}
+
+		if (isNaN(parseInt(ftpTransactionsCount[itr]))) {
+			curFtpTransactionsCount = 0;
+		} else {
+			curFtpTransactionsCount = parseInt(ftpTransactionsCount[itr]);
+		}
+
+		nestedInternalData.push(allTimeslots[itr], curTotalTransactionsCount, curApiTransactionsCount, curEncompassTransactionsCount, curFtpTransactionsCount);
+		internalData.push(nestedInternalData);
+	}
+
+	var data = google.visualization.arrayToDataTable(internalData);
+	var options = {
+		chartArea : {
+			width : '90%',
+			height : '80%'
+		},
+		colors : [ 'rgb(28,242,0)', 'rgb(0,174,239)', 'rgb(255,242,0)', 'rgb(255,202,145)' ],
+		legend : {
+			position : 'none'
+		}
+	};
+
+	removeAllPreviousGraphToolTip();
+
+	var chart = new google.visualization.LineChart(document.getElementById('trans-gph-item'));
+	chart.draw(data, options);
 }
 
 function paintSurveyGraph() {
@@ -1464,6 +2107,23 @@ function convertYearMonthKeyToDate(key) {
 	}).toString("MMM d, yyyy");
 }
 
+function convertYearMonthDayKeyToDate(key) {
+	var year = parseInt(key.substr(0, 4));
+	var monthStr = key.substr(4, 2);
+	var monthInt = parseInt(monthStr, "10"); // add base value
+	var monthNumber = monthInt - 1;
+
+	var dayStr = key.substr(6, 2);
+	var dayInt = parseInt(dayStr, "10"); // add base value
+	dayNumber = dayInt;
+	
+	return Date.today().set({
+		day : dayNumber,
+		month : monthNumber,
+		year : year
+	}).toString("MMM d, yyyy");
+}
+
 function getKeysFromGraphFormat(format) {
 	var firstDate;
 	var keys = [];
@@ -1486,7 +2146,41 @@ function getKeysFromGraphFormat(format) {
 
 		}
 
-	} else {
+	} else if(format == '10' || '20') {
+		firstDate = Date.today().add({
+			days : -parseInt(format)
+		});
+		var count = parseInt(format);
+		/*
+		 * var key = firstDate.getFullYear().toString() + (firstDate.getWeek()).toString(); keys.push(key);
+		 */
+		for (var i = 1; i <= count; i++) {
+			var date = firstDate.add({
+				days : 1
+			});
+			var month = date.getMonth() + 1;
+			var monthStr = "";
+			if (month < 10) {
+				monthStr = '0' + month.toString();
+				
+			}else{
+				monthStr = month.toString();
+			}
+			
+			var dayStr = "";
+			var day  = date.getDate();
+			if (day < 10) {
+				dayStr = '0' + day.toString();
+				
+			}else{
+				dayStr = day.toString();
+			}
+			
+			keys.push(date.getFullYear().toString() + monthStr + dayStr);
+			
+
+		}
+	}else {
 		firstDate = Date.today().add({
 			days : -parseInt(format)
 		});
@@ -1531,7 +2225,7 @@ $(document).mousedown(function(event) {
 // Being called from dashboard.jsp on key up event.
 function searchBranchRegionOrAgent(searchKeyword, flow) {
 	var e;
-	if (flow == 'icons') {
+	if (flow == 'icons'|| flow == 'transactions') {
 		e = document.getElementById("selection-list");
 	} else if (flow == 'graph') {
 		e = document.getElementById("graph-sel-list");
@@ -1575,6 +2269,30 @@ function searchBranchRegionOrAgent(searchKeyword, flow) {
 				$('#dsh-srch-report').removeClass('dsh-sb-dd');
 				$('#dsh-srch-report').hide();
 			}
+		}else if ( flow == 'transactions') {
+			$('#trans-srch-res').addClass('dsh-sb-dd');
+			$('#trans-srch-res').html(data).show().perfectScrollbar();
+			$('#trans-srch-res').perfectScrollbar('update');
+			if ($('#trans-srch-res').children('div.dsh-res-display').length <= 0) {
+				$('#trans-srch-res').removeClass('dsh-sb-dd');
+				$('#trans-srch-res').hide();
+			}
+		}else if ( flow == 'procSurvey') {
+			$('#proc-sur-srch-res').addClass('dsh-sb-dd');
+			$('#proc-sur-srch-res').html(data).show().perfectScrollbar();
+			$('#proc-sur-srch-res').perfectScrollbar('update');
+			if ($('#proc-sur-srch-res').children('div.dsh-res-display').length <= 0) {
+				$('#proc-sur-srch-res').removeClass('dsh-sb-dd');
+				$('#proc-sur-srch-res').hide();
+			}
+		}else if ( flow == 'actvUser') {
+			$('#actv-usr-srch-res').addClass('dsh-sb-dd');
+			$('#actv-usr-srch-res').html(data).show().perfectScrollbar();
+			$('#actv-usr-srch-res').perfectScrollbar('update');
+			if ($('#actv-usr-srch-res').children('div.dsh-res-display').length <= 0) {
+				$('#actv-usr-srch-res').removeClass('dsh-sb-dd');
+				$('#actv-usr-srch-res').hide();
+			}
 		}
 
 		$('.dsh-res-display').off('click');
@@ -1608,7 +2326,25 @@ function searchBranchRegionOrAgent(searchKeyword, flow) {
 				$('#admin-report-dwn').val($(this).html()).attr('data-prev-val', "");
 				$('#report-sel').attr('data-iden', columnName);
 				$('#report-sel').attr('data-idenVal', value);
+			} else if (flow == 'transactions') {
+				$('#trans-srch-res').removeClass('dsh-sb-dd');
+				$('#trans-sel-item').val($(this).html()).attr('data-prev-val', "");
+				lastColNameForGraphTrans = columnName;
+				lastColValueForGraphTrans = value;
+			} else if (flow == 'procSurvey') {
+				$('#proc-sur-srch-res').removeClass('dsh-sb-dd');
+				$('#proc-sur-sel-item').val($(this).html()).attr('data-prev-val', "");
+				lastColNameForGraphProcSurvey = columnName;
+				lastColValueForGraphProcSurvey = value;
+				showProsSurveyStatisticsGraphically(columnName, value);
+			}else if (flow == 'actvUser') {
+				$('#actv-usr-srch-res').removeClass('dsh-sb-dd');
+				$('#actv-usr-sel-item').val($(this).html()).attr('data-prev-val', "");
+				lastColNameForGraphActvUser = columnName;
+				lastColValueForGraphActvUser = value;
+				showActiveUsersStatisticsGraphically(columnName, value);
 			}
+			
 			$('.dsh-res-display').hide();
 		});
 		$('.dsh-res-display').off('mouseover');
@@ -1654,6 +2390,30 @@ function searchCompany(searchKeyword, flow) {
 				$('#hierarchy-srch-report').removeClass('dsh-sb-dd');
 				$('#hierarchy-srch-report').hide();
 			}
+		} else if (flow == 'transactions') {
+			$('#trans-srch-res').addClass('dsh-sb-dd');
+			$('#trans-srch-res').html(data).show().perfectScrollbar();
+			$('#trans-srch-res').perfectScrollbar('update');
+			if ($('#trans-srch-res').children('div.dsh-res-display').length <= 0) {
+				$('#trans-srch-res').removeClass('dsh-sb-dd');
+				$('#trans-srch-res').hide();
+			}
+		}else if ( flow == 'procSurvey') {
+			$('#proc-sur-srch-res').addClass('dsh-sb-dd');
+			$('#proc-sur-srch-res').html(data).show().perfectScrollbar();
+			$('#proc-sur-srch-res').perfectScrollbar('update');
+			if ($('#proc-sur-srch-res').children('div.dsh-res-display').length <= 0) {
+				$('#proc-sur-srch-res').removeClass('dsh-sb-dd');
+				$('#proc-sur-srch-res').hide();
+			}
+		}else if ( flow == 'actvUser') {
+			$('#actv-usr-srch-res').addClass('dsh-sb-dd');
+			$('#actv-usr-srch-res').html(data).show().perfectScrollbar();
+			$('#actv-usr-srch-res').perfectScrollbar('update');
+			if ($('#actv-usr-srch-res').children('div.dsh-res-display').length <= 0) {
+				$('#actv-usr-srch-res').removeClass('dsh-sb-dd');
+				$('#actv-usr-srch-res').hide();
+			}
 		}
 
 		$('.dsh-res-display').off('click');
@@ -1675,7 +2435,26 @@ function searchCompany(searchKeyword, flow) {
 				$('#hierarchy-report-down').val($(this).html()).attr('data-prev-val', "");
 				$('#hierarchy-report-down').attr('data-iden', columnName);
 				$('#hierarchy-report-down').attr('data-idenVal', value);
+			} else if (flow == 'transactions') {
+				$('#trans-srch-res').removeClass('dsh-sb-dd');
+				$('#trans-sel-item').val($(this).html()).attr('data-prev-val', "");
+				lastColNameForGraphProcSurvey = columnName;
+				lastColValueForGraphProcSurvey = value;
+				showTransactionStatisticsGraphically(columnName, value);
+			}else if (flow == 'procSurvey') {
+				$('#proc-sur-srch-res').removeClass('dsh-sb-dd');
+				$('#proc-sur-sel-item').val($(this).html()).attr('data-prev-val', "");
+				lastColNameForGraphProcSurvey = columnName;
+				lastColValueForGraphProcSurvey = value;
+				showProsSurveyStatisticsGraphically(columnName, value);
+			}else if (flow == 'actvUser') {
+				$('#actv-usr-srch-res').removeClass('dsh-sb-dd');
+				$('#actv-usr-sel-item').val($(this).html()).attr('data-prev-val', "");
+				lastColNameForGraphActvUser = columnName;
+				lastColValueForGraphActvUser = value;
+				showActiveUsersStatisticsGraphically(columnName, value);
 			}
+			
 			$('.dsh-res-display').hide();
 		});
 		$('.dsh-res-display').off('mouseover');
@@ -4585,6 +5364,22 @@ function updateAutoPostLinkToUserSiteSetting(isautopostlinktositeenabled, disabl
 	
 	callAjaxPostWithPayloadData("./updateautopostlinktousersiteforsurvey.do",function(data) {
 		if (data == "success") $('#overlay-toast').html("Content updated successfully");
+	}, payload, true, disableEle);
+	
+}
+
+function updateSendDigestMailSiteSetting(issenddigestmailenabled, disableEle) {
+	var payload = {
+		"sendMonthlyDigestMail" : issenddigestmailenabled
+	};
+	
+	callAjaxPostWithPayloadData("./updatesenddigestmailtoggle.do",function(data) {
+		if (data == "true") {
+			$('#overlay-toast').html("Send Monthly Digest Mail toggle Updated Sucessfully.");
+		} else {
+			$('#overlay-toast').html("Unable update send Monthly Digest Mail.");
+		}
+		showToast();
 	}, payload, true, disableEle);
 	
 }
@@ -10271,6 +11066,15 @@ $('body').on('click', '#alw-ptnr-srvy-chk-box', function() {
 	}
 });
 
+$('body').on('click', '#survey-mail-thrhld-chk-box', function() {
+	if ($('#survey-mail-thrhld-chk-box').hasClass('bd-check-img-checked')) {
+		$('#survey-mail-thrhld-chk-box').removeClass('bd-check-img-checked');
+		updateSendDigestMailSiteSetting(true, '#survey-mail-thrhld-chk-box');
+	} else {
+		$('#survey-mail-thrhld-chk-box').addClass('bd-check-img-checked');
+		updateSendDigestMailSiteSetting(false, '#survey-mail-thrhld-chk-box');
+	}
+});
 
 $('body').on('click', '#alw-ptnr-srvy-for-usr-chk-box', function(e) {
 	e.stopPropagation();
