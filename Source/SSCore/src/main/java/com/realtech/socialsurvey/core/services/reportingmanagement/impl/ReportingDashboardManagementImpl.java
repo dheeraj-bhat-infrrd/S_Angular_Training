@@ -2915,6 +2915,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
         LOG.debug( "method getDigestDataForLastFourMonths() started" );
         List<Digest> digestList = new ArrayList<>();
+        int monthSurplus = ( monthUnderConcern == 2 ? 1 : 2 );
 
         if ( companyId == 0 ) {
             LOG.error( "companyId cannot be zero" );
@@ -2933,16 +2934,16 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         } else {
             digestList.addAll( digestDao.fetchDigestDataForNMonthsInAYear( companyId, 1, monthUnderConcern, year ) );
             digestList.addAll( digestDao.fetchDigestDataForNMonthsInAYear( companyId,
-                12 - ( monthUnderConcern == 3 ? 0 : ( monthUnderConcern == 2 ? 1 : 2 ) ), 12, year - 1 ) );
+                12 - ( monthUnderConcern == 3 ? 0 : monthSurplus ), 12, year - 1 ) );
         }
 
-        if ( digestList.size() == 0 ) {
-            LOG.error( "No digest data found for company with ID: " + companyId );
+        if ( digestList.isEmpty() ) {
+            LOG.error( "No digest data found for company with ID: {}", companyId );
             throw new NoRecordsFetchedException( "No digest data found for company with ID: " + companyId );
         } else if ( digestList.size() > 4 ) {
             LOG.error(
-                "Digest for more than three months obtained, seems like there are more than one entry in the Digest table for a month for company with ID: "
-                    + companyId );
+                "Digest for more than three months obtained, seems like there are more than one entry in the Digest table for a month for company with ID: {}",
+                companyId );
             throw new DatabaseException(
                 "Digest for more than three months obtained, check for multiple entries for a month in digest table for company with ID: "
                     + companyId );
@@ -2999,7 +3000,6 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
     private MonthlyDigestAggregate buildMonthlyDigestAggregate( long companyId, String companyName, int monthUnderConcern,
         int year, String recipientMailId, List<Digest> digestList, List<UserRankingPastMonthMain> userRankingList )
-        throws InvalidInputException
     {
         LOG.debug( "method buildMonthlyDigestAggregate() started" );
 
@@ -3017,8 +3017,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         initializeAndPopulateDigestTemplateData( digestAggregate, digestList );
 
         // create and add the Digest Dependent Data in HTML format
-        constructAndPopulateChangeIndicatorIconsAndConclusionTextsForDigest( digestAggregate, digestList, companyId,
-            monthUnderConcern, year );
+        constructAndPopulateChangeIndicatorIconsAndConclusionTextsForDigest( digestAggregate, digestList );
 
         // create rows of users with their ranking in HTML format
         buildUserRankingRows( digestAggregate, userRankingList );
@@ -3112,7 +3111,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
 
     private void constructAndPopulateChangeIndicatorIconsAndConclusionTextsForDigest( MonthlyDigestAggregate digestAggregate,
-        List<Digest> digestList, long companyId, int monthUnderConcern, int year ) throws InvalidInputException
+        List<Digest> digestList )
     {
         // change indicators
         String increasedIndicatorIcon = "<div style=\"color: darkgreen; font-size: 16px; line-height: 30px;\">&#9650;</div>";
@@ -3187,15 +3186,18 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
 
         // building conclusion text for average rating score
-        digestAggregate.setAvgRatingTxt( "Your average score rating "
-            + ( avgScoreRating0 > avgScoreRating1 ? "has increased by " + "<b>" + ( avgScoreRating0 - avgScoreRating1 ) + "</b>"
-                : ( avgScoreRating0 == avgScoreRating1 ? "did not change"
-                    : "has dropped by " + "<b>" + ( avgScoreRating1 - avgScoreRating0 ) + "</b>" ) )
-            + " and your user count "
-            + ( userCount0 > userCount1 ? "has increased by " + "<b>" + ( userCount0 - userCount1 ) + "</b>"
-                : ( userCount0 == userCount1 ? "did not change"
-                    : "has dropped by " + "<b>" + ( userCount1 - userCount0 ) + "</b>" ) )
-            + " from last month." );
+        digestAggregate.setAvgRatingTxt(
+            "Your average score rating "
+                + ( avgScoreRating0 > avgScoreRating1
+                    ? "has increased by " + "<b>" + String.format( "%.2f", ( avgScoreRating0 - avgScoreRating1 ) ) + "</b>"
+                    : ( avgScoreRating0 == avgScoreRating1 ? "did not change"
+                        : "has dropped by " + "<b>" + String.format( "%.2f", ( avgScoreRating1 - avgScoreRating0 ) )
+                            + "</b>" ) )
+                + " and your user count "
+                + ( userCount0 > userCount1 ? "has increased by " + "<b>" + ( userCount0 - userCount1 ) + "</b>"
+                    : ( userCount0 == userCount1 ? "did not change"
+                        : "has dropped by " + "<b>" + ( userCount1 - userCount0 ) + "</b>" ) )
+                + " from last month." );
 
 
         // building conclusion text for survey completion rate
@@ -3215,8 +3217,9 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
         // building conclusion text for average rating score
         digestAggregate.setStatisfactionRatingTxt( "Your satisfaction rating "
-            + ( sps0 > sps1 ? "has increased by " + "<b>" + ( sps0 - sps1 ) + "</b>"
-                : ( sps0 == sps1 ? "did not change" : "has dropped by " + "<b>" + ( sps1 - sps0 ) + "</b>" ) )
+            + ( sps0 > sps1 ? "has increased by " + "<b>" + String.format( "%.2f", ( sps0 - sps1 ) ) + "</b>"
+                : ( sps0 == sps1 ? "did not change"
+                    : "has dropped by " + "<b>" + String.format( "%.2f", ( sps1 - sps0 ) ) + "</b>" ) )
             + " and your total review count " + ( totalCompletedReviews0 > totalCompletedReviews1
                 ? "has increased by " + "<b>" + ( totalCompletedReviews0 - totalCompletedReviews1 ) + "</b>"
                 : ( totalCompletedReviews0 == totalCompletedReviews1 ? "did not change"
@@ -3282,7 +3285,6 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     }
 
 
-    @SuppressWarnings ( "unchecked")
     @Override
     public void startMonthlyDigestProcess()
     {
@@ -3300,16 +3302,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
 
                 // fetch a list of digest requests for companies who have enabled send monthly digest mail feature 
-                Response companyListResponse = ssApiBatchIntergrationBuilder.getIntegrationApi()
-                    .getCompaniesOptedForDigestMail( startIndex, batchSize );
-
-                String companyListString = StringEscapeUtils.unescapeJava( companyListResponse != null
-                    ? new String( ( (TypedByteArray) companyListResponse.getBody() ).getBytes() ) : null );
-
-
-                digestRequestList = (List<CompanyDigestRequestData>) ( new Gson().fromJson(
-                    StringUtils.strip( companyListString, "\"" ),
-                    new TypeToken<List<CompanyDigestRequestData>>() {}.getType() ) );
+                digestRequestList = getCompanyRequestDataInBatch( startIndex, batchSize );
 
                 if ( digestRequestList != null ) {
                     for ( CompanyDigestRequestData company : digestRequestList ) {
@@ -3318,25 +3311,20 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                         // create a Calendar instance with time zone and locale of the device
                         Calendar calendar = Calendar.getInstance();
 
-                        // get the digest aggregate object
-                        Response MDAResponse = ssApiBatchIntergrationBuilder.getIntegrationApi().buildMonthlyDigestAggregate(
-                            company.getCompanyId(), company.getCompanyName(), calendar.get( Calendar.MONTH ),
-                            calendar.get( Calendar.YEAR ), company.getRecipientMailId() );
-
-                        String MDAString = StringEscapeUtils.unescapeJava(
-                            MDAResponse != null ? new String( ( (TypedByteArray) MDAResponse.getBody() ).getBytes() ) : null );
-
-                        MonthlyDigestAggregate digestAggregate = (MonthlyDigestAggregate) ( new Gson().fromJson(
-                            StringUtils.strip( MDAString, "\"" ), new TypeToken<MonthlyDigestAggregate>() {}.getType() ) );
-
-
                         try {
+
+                            // get the digest aggregate object
+                            MonthlyDigestAggregate digestAggregate = getMonthlyDigestAggregateForCompany( company,
+                                calendar.get( Calendar.MONTH ), calendar.get( Calendar.YEAR ) );
+
                             // send the email to the company administrator
                             emailServices.sendMonthlyDigestMail( digestAggregate );
-                        } catch ( InvalidInputException | UndeliveredEmailException unableToSendDigestMail ) {
-                            LOG.error( "Unable to send digest mail for {}", company.getCompanyName() );
-                        }
 
+                        } catch ( Exception unableToSendDigestMail ) {
+                            LOG.error( "Unable to send digest mail for {}", company.getCompanyName() );
+                            emailServices.sendDigestErrorMailForCompany( company.getCompanyName(),
+                                unableToSendDigestMail.getMessage() );
+                        }
 
                     }
                 }
@@ -3422,6 +3410,37 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             }
         }
         return digestRequestData;
+    }
+
+
+    @SuppressWarnings ( "unchecked")
+    private List<CompanyDigestRequestData> getCompanyRequestDataInBatch( int startIndex, int batchSize )
+    {
+        LOG.debug( "method getCompanyRequestDataInBatch() running" );
+        Response companyListResponse = ssApiBatchIntergrationBuilder.getIntegrationApi()
+            .getCompaniesOptedForDigestMail( startIndex, batchSize );
+
+        String companyListString = StringEscapeUtils.unescapeJava(
+            companyListResponse != null ? new String( ( (TypedByteArray) companyListResponse.getBody() ).getBytes() ) : null );
+
+        return (List<CompanyDigestRequestData>) ( new Gson().fromJson( StringUtils.strip( companyListString, "\"" ),
+            new TypeToken<List<CompanyDigestRequestData>>() {}.getType() ) );
+    }
+
+
+    private MonthlyDigestAggregate getMonthlyDigestAggregateForCompany( CompanyDigestRequestData company, int month, int year )
+    {
+        LOG.debug( "method getMonthlyDigestAggregateForCompany() running" );
+
+        Response response = ssApiBatchIntergrationBuilder.getIntegrationApi().buildMonthlyDigestAggregate(
+            company.getCompanyId(), company.getCompanyName(), month, year, company.getRecipientMailId() );
+
+        String responseString = StringEscapeUtils
+            .unescapeJava( response != null ? new String( ( (TypedByteArray) response.getBody() ).getBytes() ) : null );
+
+        return ( new Gson().fromJson( StringUtils.strip( responseString, "\"" ),
+            new TypeToken<MonthlyDigestAggregate>() {}.getType() ) );
+
     }
 
 }

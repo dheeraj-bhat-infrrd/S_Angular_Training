@@ -2481,6 +2481,10 @@ public class EmailServicesImpl implements EmailServices
             LOG.error( "sendMonthlyDigestMail(): Digest Aggregate object is null" );
             throw new InvalidInputException( "Data for the monthly digest/snapshot mail is missing." );
         }
+        if( digestAggregate.getCompanyId() < 1 ){
+            LOG.error( "Company ID must be greater that one for Monthly digest/snapshot mail " );
+            throw new InvalidInputException( "Company ID cannot be less than one for Monthly digest/snapshot mail." );
+        }
         if ( StringUtils.isEmpty( digestAggregate.getRecipientMailId() ) ) {
             LOG.error( "Recipient email Id is empty or null for Monthly digest/snapshot mail " );
             throw new InvalidInputException( "Recipient email Id is empty or null for Monthly digest/snapshot mail." );
@@ -2641,6 +2645,37 @@ public class EmailServicesImpl implements EmailServices
             false, false );
         LOG.debug( "Successfully sent Monthly digest/snapshot mail" );
 
+    }
+    
+    @Async
+    @Override
+    public void sendDigestErrorMailForCompany( String companyName, String stackTrace )
+        throws InvalidInputException, UndeliveredEmailException
+    {
+        LOG.debug( "sendDigestErrorMailForCompany() started" );
+        if ( StringUtils.isEmpty( companyName ) ) {
+            LOG.error( "Company Name is not Specified." );
+            throw new InvalidInputException( "Company Name is not Specified." );
+        } else if ( StringUtils.isEmpty( stackTrace ) ) {
+            LOG.error( "Reason for failure not Specified." );
+            throw new InvalidInputException( "Reason for failure not Specified." );
+        }
+
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( applicationAdminEmail );
+
+        FileContentReplacements messageSubjectReplacements = new FileContentReplacements();
+        messageSubjectReplacements
+            .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.DIGEST_ERROR_MAIL_SUBJECT );
+        messageSubjectReplacements.setReplacementArgs( Arrays.asList( companyName ) );
+
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        messageBodyReplacements
+            .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.DIGEST_ERROR_MAIL_BODY );
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, companyName, stackTrace ) );
+
+        LOG.debug( "sendDigestErrorMailForCompany() finishing" );
+        emailSender.sendEmailWithSubjectAndBodyReplacements( emailEntity, messageSubjectReplacements, messageBodyReplacements,
+            false, false );
     }
 
 }
