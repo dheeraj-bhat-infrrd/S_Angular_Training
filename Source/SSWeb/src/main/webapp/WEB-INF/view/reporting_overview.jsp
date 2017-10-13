@@ -79,11 +79,15 @@
 <script>
 $(window).resize(function(){
 	if($('#completion_chart_div').length>0){
-		drawCompletionRateGraph();
+		if($('#overview-tab').hasClass('active')){
+			drawCompletionRateGraph();
+		}	
 	}
 	
 	 if($('#chart_div').length>0){
-		 drawSpsStatsGraph();
+		 if($('#overview-tab').hasClass('active')){
+		 	drawSpsStatsGraph();
+		 }
 	 }
 });
 

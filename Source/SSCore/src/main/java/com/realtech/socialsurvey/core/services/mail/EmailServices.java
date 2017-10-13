@@ -176,8 +176,8 @@ public interface EmailServices
      * @throws InvalidInputException
      */
     public void sendSurveyCompletionMailToAdminsAndAgent( String agentName, String recipientName, String recipientMailId,
-        String surveyDetail, String customerName, String rating, String logoUrl, String agentProfileLink, String customerDetail )
-        throws InvalidInputException, UndeliveredEmailException;
+        String surveyDetail, String customerName, String rating, String logoUrl, String agentProfileLink,
+        String customerDetail ) throws InvalidInputException, UndeliveredEmailException;
 
 
     /**
@@ -370,8 +370,9 @@ public interface EmailServices
 
 
     //SS-1435: Send survey details too
-    void sendComplaintHandleMail( String recipientMailId, String customerName, String customerMailId, String agentName, String mood,
-        String rating, String surveySourceId, String surveyDetail ) throws InvalidInputException, UndeliveredEmailException;
+    void sendComplaintHandleMail( String recipientMailId, String customerName, String customerMailId, String agentName,
+        String mood, String rating, String surveySourceId, String surveyDetail )
+        throws InvalidInputException, UndeliveredEmailException;
 
 
     /**
@@ -387,7 +388,8 @@ public interface EmailServices
 
 
     void forwardCustomerReplyMail( String recipientMailId, String subject, String mailBody, String senderName,
-        String senderEmailAddress, String headers, String sendUsingDomain ) throws InvalidInputException, UndeliveredEmailException;
+        String senderEmailAddress, String headers, String sendUsingDomain )
+        throws InvalidInputException, UndeliveredEmailException;
 
 
     void sendReportBugMailToAdminForExceptionInBatch( String displayName, String batchName, String lastRunTime, String errorMsg,
@@ -492,17 +494,29 @@ public interface EmailServices
 
     void sendCancelSubscriptionRequestAlertMail( String recipientMailId, String displayName, String companyName )
         throws InvalidInputException, UndeliveredEmailException;
-    
-    void sendMonthlyDigestMail(MonthlyDigestAggregate digestAggregate) throws InvalidInputException, UndeliveredEmailException;
 
 
+    /**
+     * Send mail caught from web app
+     * @param recipientMailId
+     * @param stackTrace
+     * @throws InvalidInputException
+     * @throws UndeliveredEmailException
+     */
+    void sendWebExceptionEmail( String recipientMailId, String stackTrace )
+        throws InvalidInputException, UndeliveredEmailException;
 
-    void sendNoTransactionAlertMail( String recipientMailId, String mailBody ) throws InvalidInputException,
-        UndeliveredEmailException;
+
+    void sendMonthlyDigestMail( MonthlyDigestAggregate digestAggregate )
+        throws InvalidInputException, UndeliveredEmailException;
 
 
-    void sendHighVoulmeUnprocessedTransactionAlertMail( String recipientMailId, String mailBody ) throws InvalidInputException,
-        UndeliveredEmailException;
+    void sendNoTransactionAlertMail( String recipientMailId, String mailBody )
+        throws InvalidInputException, UndeliveredEmailException;
+
+
+    void sendHighVoulmeUnprocessedTransactionAlertMail( String recipientMailId, String mailBody )
+        throws InvalidInputException, UndeliveredEmailException;
 
 
     void sendLessVoulmeOfTransactionReceivedAlertMail( String recipientMailId, String mailBody ) throws InvalidInputException,
