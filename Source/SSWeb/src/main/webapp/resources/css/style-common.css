@@ -9701,7 +9701,6 @@ ul.accordion li>a:before {
     color: #666;
     text-align: left;
     top: 232px;
-    right: 114px;
     max-height: 400px;
     box-shadow: 3px 3px 30px #444;
 	}
@@ -9965,7 +9964,7 @@ img.lead-img {
 }
 
 .top-ten-ranks{
-	width: 100px;
+	width: 110px;
     margin: 0;
     margin-left: 75%;
 }

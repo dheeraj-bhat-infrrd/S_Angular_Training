@@ -1394,11 +1394,17 @@ function showHideRankPaginateBtns(startIndex,count){
 		if(!($('#lead-ranks-above').hasClass('hide'))){
 			$('#lead-ranks-above').addClass('hide');
 			$('#lead-ranks-above').removeClass('block-display');
-		}		
+		}
+		if(!($('#top-ten-ranks').hasClass('hide'))){
+			$('#top-ten-ranks').addClass('hide');
+			$('#top-ten-ranks').removeClass('block-display');
+		}	
 	}else{
 		$('#lead-ranks-above').removeClass('hide');
 		$('#lead-ranks-above').addClass('block-display');
-		
+		$('#top-ten-ranks').removeClass('hide');
+		$('#top-ten-ranks').addClass('block-display');
+
 	}
 	
 	if(count<11 || startIndex>count-10){
