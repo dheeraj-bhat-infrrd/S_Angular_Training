@@ -262,7 +262,7 @@ public class PaymentController {
 
 	}
 
-	@RequestMapping(value = "/paymentupgrade", method = RequestMethod.POST)
+	@RequestMapping(value = "/paymentupgrade", method = RequestMethod.GET)
 	@ResponseBody
 	public String paymentUpgrade(Model model, HttpServletRequest request) {
 		LOG.info("Payment controller called to upgrade payment method");
