@@ -371,4 +371,19 @@ public class Utils
         LOG.info( "Method to encrypt user id in mail, encryptUserEmailId ended" );
         return newEmailId;
     }
+    
+    public java.sql.Date getNDaysBackDate( int noOfDays){
+        LOG.debug( "method getNDaysBackDate started for noOfDays %s " + noOfDays );
+        Calendar time = Calendar.getInstance();
+        time.add( Calendar.DATE, -1 * noOfDays );
+        // strip the time component of start time
+        time.set( Calendar.HOUR_OF_DAY, 0 );
+        time.set( Calendar.MINUTE, 0 );
+        time.set( Calendar.SECOND, 0 );
+        time.set( Calendar.MILLISECOND, 0 );
+
+        java.sql.Date date = new java.sql.Date(  time.getTimeInMillis()  );   
+        LOG.debug( "method getNDaysBackDate finished for noOfDays %s " + noOfDays );
+        return date;
+    }
 }

@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,7 @@ import com.realtech.socialsurvey.core.entities.EmailEntity;
 import com.realtech.socialsurvey.core.entities.FileContentReplacements;
 import com.realtech.socialsurvey.core.entities.ForwardMailDetails;
 import com.realtech.socialsurvey.core.entities.MailContent;
+import com.realtech.socialsurvey.core.entities.MonthlyDigestAggregate;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Plan;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
@@ -80,6 +82,9 @@ public class EmailServicesImpl implements EmailServices
     @Value ( "${APPLICATION_LOGO_URL}")
     private String appLogoUrl;
 
+    @Value ( "${APPLICATION_NEW_LOGO_URL}")
+    private String appNewLogoUrl;
+
     @Value ( "${APPLICATION_ADMIN_EMAIL}")
     private String applicationAdminEmail;
 
@@ -88,6 +93,12 @@ public class EmailServicesImpl implements EmailServices
 
     @Value ( "${PARAM_ORDER_TAKE_SURVEY_REMINDER}")
     String paramOrderTakeSurveyReminder;
+    
+    @Value ( "${CURRENT_PROFILE}")
+    private String currentProfile;
+
+    @Value ( "${APPLICATION_WORD_PRESS_SITE_URL}")
+    private String applicationWordPressSite;
 
     @Autowired
     private UrlService urlService;
@@ -113,24 +124,23 @@ public class EmailServicesImpl implements EmailServices
     public void sendRegistrationInviteMail( String url, String recipientMailId, String firstName, String lastName )
         throws InvalidInputException, UndeliveredEmailException
     {
-        LOG.info( "Method for sending registration invite mail called with url : " + url + " firstName :" + firstName
-            + " and lastName : " + lastName );
+        LOG.info( "Method for sending registration invite mail called with url : %s firstName : %s and lastName : %s", url,  firstName, lastName);
         if ( url == null || url.isEmpty() ) {
-            LOG.error( "Url is empty or null for sending registration invite mail " );
-            throw new InvalidInputException( "Url is empty or null for sending registration invite mail " );
+            LOG.error( "Url in sendRegistrationInviteMail is empty or null." );
+            throw new InvalidInputException( "Url in sendRegistrationInviteMail is empty or null." );
         }
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
-            LOG.error( "Recipient email Id is empty or null for sending registration invite mail " );
-            throw new InvalidInputException( "Recipient email Id is empty or null for sending registration invite mail " );
+            LOG.error( "Recipient email Id in sendRegistrationInviteMail is empty or null." );
+            throw new InvalidInputException( "Recipient email Id in sendRegistrationInviteMail is empty or null." );
         }
         if ( firstName == null || firstName.isEmpty() ) {
-            LOG.error( "Firstname is empty or null for sending registration invite mail " );
-            throw new InvalidInputException( "Firstname is empty or null for sending registration invite mail " );
+            LOG.error( "Firstname is in sendRegistrationInviteMail empty or null." );
+            throw new InvalidInputException( "Firstname is in sendRegistrationInviteMail empty or null." );
         }
 
-        LOG.info( "Initiating URL Service to shorten the url " + url );
-        url = urlService.shortenUrl( url );
-        LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + url );
+        LOG.debug( "Initiating URL Service to shorten the url: %s", url );
+        String shortUrl = urlService.shortenUrl( url );
+        LOG.debug( "Finished calling URL Service to shorten the url in sendRegistrationInviteMail. Shortened URL : %s", shortUrl );
 
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
@@ -145,9 +155,9 @@ public class EmailServicesImpl implements EmailServices
         messageBodyReplacements.setFileName(
             EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.REGISTRATION_INVITATION_MAIL_BODY );
         messageBodyReplacements.setReplacementArgs(
-            Arrays.asList( appLogoUrl, fullName, url, url, url, recipientMailId, appBaseUrl, appBaseUrl ) );
+            Arrays.asList( appLogoUrl, fullName, shortUrl, shortUrl, shortUrl, recipientMailId, appBaseUrl, appBaseUrl ) );
 
-        LOG.debug( "Calling email sender to send mail" );
+        LOG.debug( "Sending mail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, true, false );
         LOG.info( "Successfully sent registration invite mail" );
     }
@@ -158,24 +168,23 @@ public class EmailServicesImpl implements EmailServices
     public void sendNewRegistrationInviteMail( String url, String recipientMailId, String firstName, String lastName,
         int planId ) throws InvalidInputException, UndeliveredEmailException
     {
-        LOG.info( "Method sendNewRegistrationInviteMail started for url : " + url + " firstName : " + firstName + " lastName : "
-            + lastName + " and planId : " + planId );
+        LOG.info( "Method sendNewRegistrationInviteMail started for url : %s firstName : %s lastName : %s and planId : %s", url, firstName, lastName, planId );
         if ( url == null || url.isEmpty() ) {
-            LOG.error( "Url is empty or null for sending registration invite mail " );
-            throw new InvalidInputException( "Url is empty or null for sending registration invite mail " );
+            LOG.error( "Url in sendNewRegistrationInviteMail is empty or null." );
+            throw new InvalidInputException( "Url in sendNewRegistrationInviteMail is empty or null." );
         }
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
-            LOG.error( "Recipient email Id is empty or null for sending registration invite mail " );
-            throw new InvalidInputException( "Recipient email Id is empty or null for sending registration invite mail " );
+            LOG.error( "Recipient email Id in sendNewRegistrationInviteMail is empty or null." );
+            throw new InvalidInputException( "Recipient email Id in sendNewRegistrationInviteMail is empty or null." );
         }
         if ( firstName == null || firstName.isEmpty() ) {
-            LOG.error( "Firstname is empty or null for sending registration invite mail " );
-            throw new InvalidInputException( "Firstname is empty or null for sending registration invite mail " );
+            LOG.error( "Firstname in sendNewRegistrationInviteMail is empty or null." );
+            throw new InvalidInputException( "Firstname in sendNewRegistrationInviteMail is empty or null." );
         }
 
-        LOG.info( "Initiating URL Service to shorten the url " + url );
-        url = urlService.shortenUrl( url );
-        LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + url );
+        LOG.debug( "Initiating URL Service to shorten the url %s", url );
+        String shortUrl = urlService.shortenUrl( url );
+        LOG.debug( "Finished calling URL Service to shorten the url in sendNewRegistrationInviteMail. Shortened URL : %s", shortUrl );
 
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
@@ -196,12 +205,10 @@ public class EmailServicesImpl implements EmailServices
                 EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.NEW_REGISTRATION_ENTERPRISE_MAIL_BODY );
         }
         messageBodyReplacements.setReplacementArgs(
-            Arrays.asList( appLogoUrl, fullName, url, url, url, recipientMailId, appBaseUrl, appBaseUrl ) );
+            Arrays.asList( appLogoUrl, fullName, shortUrl, shortUrl, shortUrl, recipientMailId, appBaseUrl, appBaseUrl ) );
 
-        LOG.debug( "Calling email sender to send mail" );
+        LOG.debug( "Sending mail in sendNewRegistrationInviteMail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, true, false );
-        LOG.info( "Method sendNewRegistrationInviteMail finished for url : " + url + " firstName : " + firstName
-            + " lastName : " + lastName + " and planId : " + planId );
     }
 
 
@@ -228,9 +235,8 @@ public class EmailServicesImpl implements EmailServices
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.COMPANY_REGISTRATION_STAGE_MAIL_SUBJECT;
 
-        if ( details == null ) {
-            details = "";
-        }
+        String modDetails = (details == null) ? "" : details;
+        
         String agentName = "";
         if ( firstName != null && !firstName.isEmpty() ) {
             agentName += firstName;
@@ -244,7 +250,7 @@ public class EmailServicesImpl implements EmailServices
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName(
             EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.COMPANY_REGISTRATION_STAGE_MAIL_BODY );
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, entityName, registrationStage, details ) );
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, entityName, registrationStage, modDetails ) );
         emailSender.sendEmailWithSubjectAndBodyReplacements( emailEntity, messageSubjectReplacements, messageBodyReplacements,
             isImmediate, false );
     }
@@ -272,7 +278,7 @@ public class EmailServicesImpl implements EmailServices
         messageBodyReplacements.setReplacementArgs(
             Arrays.asList( appLogoUrl, survey.getAgentName(), customerName, survey.getCustomerEmailId(), customerName ) );
 
-        LOG.debug( "Calling email sender to send mail" );
+        LOG.debug( "Sending mail for sendAgentSurveyReminderMail." );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );
         LOG.info( "Successfully sent registration invite mail" );
     }
@@ -291,24 +297,23 @@ public class EmailServicesImpl implements EmailServices
     public void sendResetPasswordEmail( String url, String recipientMailId, String name, String loginName )
         throws InvalidInputException, UndeliveredEmailException
     {
-        LOG.info( "Method to send Email to reset the password link with URL : " + url + "\t and Recipients Mail ID : "
-            + recipientMailId );
+        LOG.info( "Method to send Email to reset the password link with URL : %s \t and Recipients Mail ID : %s", url, recipientMailId );
         if ( url == null || url.isEmpty() ) {
-            LOG.error( "URL generated can not be null or empty" );
-            throw new InvalidInputException( "URL generated can not be null or empty" );
+            LOG.error( "URL in sendResetPasswordEmail can not be null or empty." );
+            throw new InvalidInputException( "URL in sendResetPasswordEmail can not be null or empty." );
         }
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
-            LOG.error( "Recipients Email Id can not be null or empty" );
-            throw new InvalidInputException( "Recipients Email Id can not be null or empty" );
+            LOG.error( "Recipients Email Id in sendResetPasswordEmail can not be null or empty." );
+            throw new InvalidInputException( "Recipients Email Id in sendResetPasswordEmail can not be null or empty." );
         }
         if ( name == null || name.isEmpty() ) {
-            LOG.error( "Recipients name can not be null or empty" );
-            throw new InvalidInputException( "Recipients name can not be null or empty" );
+            LOG.error( "Recipients name in sendResetPasswordEmail can not be null or empty" );
+            throw new InvalidInputException( "Recipients name in sendResetPasswordEmail can not be null or empty" );
         }
 
-        LOG.info( "Initiating URL Service to shorten the url " + url );
-        url = urlService.shortenUrl( url );
-        LOG.info( "Finished calling URL Service to shorten the url.Shortened URL : " + url );
+        LOG.debug( "Initiating URL Service to shorten the url %s", url );
+        String shortUrl = urlService.shortenUrl( url );
+        LOG.debug( "Finished calling URL Service to shorten the url in sendResetPasswordEmail. Shortened URL : %s", shortUrl );
 
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
@@ -318,11 +323,10 @@ public class EmailServicesImpl implements EmailServices
         messageBodyReplacements
             .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.RESET_PASSWORD_MAIL_BODY );
         messageBodyReplacements
-            .setReplacementArgs( Arrays.asList( appLogoUrl, name, loginName, url, url, url, appBaseUrl, appBaseUrl ) );
+            .setReplacementArgs( Arrays.asList( appLogoUrl, name, loginName, shortUrl, shortUrl, shortUrl, appBaseUrl, appBaseUrl ) );
 
-        LOG.debug( "Calling email sender to send mail" );
+        LOG.debug( "Sending mail in sendResetPasswordEmail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );
-        LOG.info( "Successfully sent reset password mail" );
     }
 
 
@@ -687,7 +691,7 @@ public class EmailServicesImpl implements EmailServices
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements
             .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.FATAL_EXCEPTION_MAIL_BODY );
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, stackTrace ) );
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, currentProfile, stackTrace ) );
 
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );
@@ -2376,8 +2380,289 @@ public class EmailServicesImpl implements EmailServices
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );
         LOG.info( "Successfully sent payment faield alert mail" );
     }
+    
+    @Async
+    @Override
+    public void sendWebExceptionEmail( String recipientMailId, String stackTrace )
+        throws InvalidInputException, UndeliveredEmailException
+    {
+        LOG.info( "Sending WebException email to the admin." );
+        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+            LOG.error( "Recipient email Id is empty or null for sending web exception mail " );
+            throw new InvalidInputException( "Recipient email Id is empty or null for sending web exception mail " );
+        }
+
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+        String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.WEB_EXCEPTION_MAIL_SUBJECT;
+
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        messageBodyReplacements
+            .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.FATAL_EXCEPTION_MAIL_BODY );
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, currentProfile, stackTrace ) );
+
+        LOG.debug( "Calling email sender to send mail" );
+        emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );
+        LOG.info( "Successfully sent web exception mail" );
+    }
+
+    @Async
+    @Override
+    public void sendNoTransactionAlertMail( String recipientMailId, String mailBody ) throws InvalidInputException, UndeliveredEmailException
+    {
+        LOG.info( "method sendNoTransactionAlertMail started" );
+        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+            LOG.error( "Recipient email Id is empty or null for sendNoTransactionAlertMail " );
+            throw new InvalidInputException( "Recipient email Id is empty or null for sendNoTransactionAlertMail " );
+        }
+        if ( mailBody == null || mailBody.isEmpty() ) {
+            LOG.error( "mailBody is empty or null for sendNoTransactionAlertMail " );
+            throw new InvalidInputException( "Recipient email Id is empty or null for sendNoTransactionAlertMail " );
+        }
+        
+
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+        String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.NO_TRANSACTION_RECEIVED_ALERT_MAIL_SUBJECT;
+
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        messageBodyReplacements.setFileName(
+            EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.NO_TRANSACTION_RECEIVED_ALERT_MAIL_BODY );
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, mailBody ) );
+
+        LOG.debug( "Calling email sender to send mail" );
+        emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );
+        LOG.info( "method sendNoTransactionAlertMail ended" );    
+    }
+    
+    @Async
+    @Override
+    public void sendHighVoulmeUnprocessedTransactionAlertMail( String recipientMailId, String mailBody ) throws InvalidInputException, UndeliveredEmailException
+    {
+        LOG.info( "method sendHighVoulmeUnprocessedTransactionAlertMail started" );
+        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+            LOG.error( "Recipient email Id is empty or null for sendNoTransactionAlertMail " );
+            throw new InvalidInputException( "Recipient email Id is empty or null for sendNoTransactionAlertMail " );
+        }
+        if ( mailBody == null || mailBody.isEmpty() ) {
+            LOG.error( "mailBody is empty or null for sendNoTransactionAlertMail " );
+            throw new InvalidInputException( "Recipient email Id is empty or null for sendNoTransactionAlertMail " );
+        }
+        
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+        String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.HIGH_VOLUME_UNPROCESSED_TRANSACTION_ALERT_MAIL_SUBJECT;
+
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        messageBodyReplacements.setFileName(
+            EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.HIGH_VOLUME_UNPROCESSED_TRANSACTION_ALERT_MAIL_BODY );
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, mailBody ) );
+
+        LOG.debug( "Calling email sender to send mail" );
+        emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );
+        LOG.info( "method sendHighVoulmeUnprocessedTransactionAlertMail ended" );    
+      }
+
+    
+    @Async
+    @Override
+    public void sendLessVoulmeOfTransactionReceivedAlertMail( String recipientMailId, String mailBody ) throws InvalidInputException, UndeliveredEmailException
+    {
+        LOG.info( "method sendLessVoulmeOfTransactionReceivedAlertMail started" );
+        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+            LOG.error( "Recipient email Id is empty or null for sendNoTransactionAlertMail " );
+            throw new InvalidInputException( "Recipient email Id is empty or null for sendNoTransactionAlertMail " );
+        }
+        if ( mailBody == null || mailBody.isEmpty() ) {
+            LOG.error( "mailBody is empty or null for sendNoTransactionAlertMail " );
+            throw new InvalidInputException( "Recipient email Id is empty or null for sendNoTransactionAlertMail " );
+        }
+        
+
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+        String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.LESS_VOLUME_OF_TRANSACTION_RECEIVED_ALERT_MAIL_SUBJECT;
+
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        messageBodyReplacements.setFileName(
+            EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.LESS_VOLUME_OF_TRANSACTION_RECEIVED_ALERT_MAIL_BODY );
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, mailBody ) );
+
+        LOG.debug( "Calling email sender to send mail" );
+        emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );
+        LOG.info( "method sendLessVoulmeOfTransactionReceivedAlertMail ended" );    
+      }
+
+    @Async
+    @Override
+    public void sendMonthlyDigestMail( MonthlyDigestAggregate digestAggregate )
+        throws InvalidInputException, UndeliveredEmailException
+    {
+        if ( digestAggregate == null ) {
+            LOG.error( "sendMonthlyDigestMail(): Digest Aggregate object is null" );
+            throw new InvalidInputException( "Data for the monthly digest/snapshot mail is missing." );
+        }
+        if ( StringUtils.isEmpty( digestAggregate.getRecipientMailId() ) ) {
+            LOG.error( "Recipient email Id is empty or null for Monthly digest/snapshot mail " );
+            throw new InvalidInputException( "Recipient email Id is empty or null for Monthly digest/snapshot mail." );
+        }
+
+        if ( digestAggregate.getDigestList() == null || digestAggregate.getDigestList().size() != 3 ) {
+            LOG.error( "Digest data for three months required." );
+            throw new InvalidInputException( "Digest data for three months required." );
+        }
+
+        if ( StringUtils.isEmpty( digestAggregate.getCompanyName() ) ) {
+            LOG.error( "Company name for the digest not specified." );
+            throw new InvalidInputException( "Company name for the digest not specified." );
+        }
+
+        if ( StringUtils.isEmpty( digestAggregate.getMonthUnderConcern() ) ) {
+            LOG.error( "Month for the digest not specified." );
+            throw new InvalidInputException( "Month for the digest not specified." );
+        }
+
+        if ( StringUtils.isEmpty( digestAggregate.getYearUnderConcern() ) ) {
+            LOG.error( "Year for the digest not specified." );
+            throw new InvalidInputException( "Year for the digest not specified." );
+        }
+
+        LOG.debug( "Sending Monthly digest/snapshot email to : " + digestAggregate.getRecipientMailId() );
+
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( digestAggregate.getRecipientMailId() );
+        String monthYearForDisplay = StringUtils.capitalize( digestAggregate.getMonthUnderConcern() ) + " "
+            + digestAggregate.getYearUnderConcern();
+        FileContentReplacements messageSubjectReplacements = new FileContentReplacements();
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        List<String> messageBodyReplacementsList = new ArrayList<>();
 
 
+        messageBodyReplacementsList.add( applicationWordPressSite );
+        messageBodyReplacementsList.add( appNewLogoUrl );
+        messageBodyReplacementsList.add( digestAggregate.getCompanyName() );
+        messageBodyReplacementsList.add( monthYearForDisplay );
+
+        // adding average rating score data
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getAverageScoreRatingIcon() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getAverageScoreRating() ) );
+        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getUserCount() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.upperCase( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getMonth() ) ) );
+
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getAverageScoreRatingIcon() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getAverageScoreRating() ) );
+        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getUserCount() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.upperCase( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getMonth() ) ) );
+
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getAverageScoreRatingIcon() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getAverageScoreRating() ) );
+        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getUserCount() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.upperCase( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getMonth() ) ) );
+
+        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getAvgRatingTxt() ) );
+
+
+        // adding survey completion rate data
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getSurveyCompletionRateIcon() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getSurveyCompletionRate() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getCompletedTransactions() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getTotalTransactions() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.upperCase( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getMonth() ) ) );
+
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getSurveyCompletionRateIcon() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getSurveyCompletionRate() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getCompletedTransactions() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getTotalTransactions() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.upperCase( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getMonth() ) ) );
+
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getSurveyCompletionRateIcon() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getSurveyCompletionRate() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getCompletedTransactions() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getTotalTransactions() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.upperCase( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getMonth() ) ) );
+
+        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getSurveyPercentageTxt() ) );
+
+
+        // adding satisfaction rating data
+        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getSpsIcon() ) );
+        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getSps() ) );
+        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getPromoters() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getDetractors() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getTotalCompletedReviews() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.upperCase( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getMonth() ) ) );
+
+        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getSpsIcon() ) );
+        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getSps() ) );
+        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getPromoters() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getDetractors() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getTotalCompletedReviews() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.upperCase( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getMonth() ) ) );
+
+        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getSpsIcon() ) );
+        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getSps() ) );
+        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getPromoters() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getDetractors() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getTotalCompletedReviews() ) );
+        messageBodyReplacementsList
+            .add( StringUtils.upperCase( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getMonth() ) ) );
+
+        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getStatisfactionRatingTxt() ) );
+
+
+        // top ten ranked users HTML
+        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getUserRankingHtmlRows() ) );
+
+        // email meta-data
+        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getRecipientMailId() ) );
+        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getRecipientMailId() ) );
+
+
+        messageSubjectReplacements
+            .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.DIGEST_MAIL_SUBJECT );
+        messageSubjectReplacements.setReplacementArgs( Arrays.asList( monthYearForDisplay ) );
+
+        messageBodyReplacements
+            .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.DIGEST_MAIL_BODY );
+        messageBodyReplacements.setReplacementArgs( messageBodyReplacementsList );
+
+        LOG.debug( "Calling email sender to send mail" );
+        emailSender.sendEmailWithSubjectAndBodyReplacements( emailEntity, messageSubjectReplacements, messageBodyReplacements,
+            false, false );
+        LOG.debug( "Successfully sent Monthly digest/snapshot mail" );
+
+    }
 
 }
 

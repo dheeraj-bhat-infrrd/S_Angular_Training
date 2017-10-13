@@ -72,6 +72,9 @@ public class OrganizationUnitSettings
     private RankingRequirements ranking_requirements;
     //are the 'Contact Us' emails routed to the company admin always?
     private boolean contactUsEmailsRoutedToCompanyAdmin;
+    
+    // flag that decides whether to send the monthly digest mail
+    private boolean sendMonthlyDigestMail;
 
     public boolean isSendEmailFromCompany()
     {
@@ -671,7 +674,19 @@ public class OrganizationUnitSettings
     }
 
 
-	@Override
+	public boolean isSendMonthlyDigestMail()
+    {
+        return sendMonthlyDigestMail;
+    }
+
+
+    public void setSendMonthlyDigestMail( boolean sendMonthlyDigestMail )
+    {
+        this.sendMonthlyDigestMail = sendMonthlyDigestMail;
+    }
+
+
+    @Override
     public String toString()
     {
         return "OrganizationUnitSettings [id=" + id + ", iden=" + iden + ", uniqueIdentifier=" + uniqueIdentifier
@@ -691,7 +706,9 @@ public class OrganizationUnitSettings
             + deletedSocialTokens + ", allowOverrideForSocialMedia=" + allowOverrideForSocialMedia + ", allowZillowAutoPost="
             + allowZillowAutoPost + ", status=" + status + ", hiddenSection=" + hiddenSection + ", sendEmailFromCompany="
             + sendEmailFromCompany + ", reviewSortCriteria=" + reviewSortCriteria + ", sendEmailThrough=" + sendEmailThrough
-            + ", vendasta_rm_settings=" + vendasta_rm_settings + ", rankingRequirements=" + ranking_requirements + "]";
+            + ", hideFromBreadCrumb=" + hideFromBreadCrumb + ", vendasta_rm_settings=" + vendasta_rm_settings
+            + ", ranking_requirements=" + ranking_requirements + ", contactUsEmailsRoutedToCompanyAdmin="
+            + contactUsEmailsRoutedToCompanyAdmin + ", sendMonthlyDigestMail=" + sendMonthlyDigestMail + "]";
     }
     
 }

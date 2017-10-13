@@ -949,7 +949,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
             query.addCriteria( Criteria.where( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) );
         }
-        // query.fields().exclude( "surveyResponse" );
+        query.fields().exclude( CommonConstants.SOCIAL_MEDIA_POST_RESPONSE_DETAILS_COLUMN );
         if ( startDate != null && endDate != null ) {
             query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate )
                 .andOperator( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ) );
