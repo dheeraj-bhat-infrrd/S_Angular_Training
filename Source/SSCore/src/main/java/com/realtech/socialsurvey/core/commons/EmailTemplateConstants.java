@@ -181,4 +181,6 @@ public final class EmailTemplateConstants {
     public static final String LESS_VOLUME_OF_TRANSACTION_RECEIVED_ALERT_MAIL_SUBJECT = "lessVoulmeOfTransactionReceivedAlertMailSubject.txt";
     public static final String LESS_VOLUME_OF_TRANSACTION_RECEIVED_ALERT_MAIL_BODY = "lessVoulmeOfTransactionReceivedAlertMailBody.html";
 
+    public static final String DIGEST_ERROR_MAIL_BODY = "DigestErrorMailBody.html";
+    public static final String DIGEST_ERROR_MAIL_SUBJECT = "DigestErrorMailSubject.txt";
 }

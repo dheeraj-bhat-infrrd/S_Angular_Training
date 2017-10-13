@@ -519,6 +519,10 @@ public interface EmailServices
         throws InvalidInputException, UndeliveredEmailException;
 
 
-    void sendLessVoulmeOfTransactionReceivedAlertMail( String recipientMailId, String mailBody )
+    void sendLessVoulmeOfTransactionReceivedAlertMail( String recipientMailId, String mailBody ) throws InvalidInputException,
+        UndeliveredEmailException;
+
+
+    void sendDigestErrorMailForCompany( String companyName, String stackTrace )
         throws InvalidInputException, UndeliveredEmailException;
 }

@@ -1,0 +1,1 @@
+Digest Mail Failure For Company: %s
