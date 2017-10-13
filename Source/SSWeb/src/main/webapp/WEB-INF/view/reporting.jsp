@@ -240,6 +240,8 @@
 			},500);
 		});
 		
+		cssForSafari();
+		
 		hideOverlay();
 	});
 </script>

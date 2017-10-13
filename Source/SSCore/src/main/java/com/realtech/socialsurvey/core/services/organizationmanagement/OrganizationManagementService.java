@@ -1490,4 +1490,13 @@ public interface OrganizationManagementService
 
     String getEncompassHostByVersion( String sdkVersion ) throws InvalidInputException;
 
+
+    List<Company> getAllActiveEnterpriseCompanies();
+
+
+    List<Company> getCompaniesByCompanyIds( Set<Long> companyIds );
+
+
+    Map<Long, Long> getUsersCountForCompanies();
+
 }
