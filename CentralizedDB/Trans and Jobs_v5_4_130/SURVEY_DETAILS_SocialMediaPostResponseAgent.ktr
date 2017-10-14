@@ -797,7 +797,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <commit>1000</commit>
+    <commit>10000</commit>
     <update_bypassed>N</update_bypassed>
     <lookup>
       <schema/>
@@ -826,21 +826,6 @@
         <update>N</update>
       </value>
       <value>
-        <name>ACCESS_TOKEN</name>
-        <rename>ACCESS_TOKEN</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>POST_DATE</name>
-        <rename>POST_DATE</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>RESPONSE_MESSAGE</name>
-        <rename>RESPONSE_MESSAGE</rename>
-        <update>Y</update>
-      </value>
-      <value>
         <name>SURVEY_DETAILS_ID</name>
         <rename>SURVEY_DETAILS_ID</rename>
         <update>N</update>
@@ -854,6 +839,21 @@
         <name>id</name>
         <rename>id</rename>
         <update>N</update>
+      </value>
+      <value>
+        <name>ACCESS_TOKEN</name>
+        <rename>ACCESS_TOKEN</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>POST_DATE</name>
+        <rename>POST_DATE</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>RESPONSE_MESSAGE</name>
+        <rename>RESPONSE_MESSAGE</rename>
+        <update>Y</update>
       </value>
     </lookup>
      <cluster_schema/>
@@ -915,6 +915,11 @@
         <update>N</update>
       </value>
       <value>
+        <name>SURVEY_DETAILS_ID</name>
+        <rename>SURVEY_DETAILS_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
         <name>ACCESS_TOKEN</name>
         <rename>ACCESS_TOKEN</rename>
         <update>Y</update>
@@ -933,11 +938,6 @@
         <name>RESPONSE_MESSAGE</name>
         <rename>RESPONSE_MESSAGE</rename>
         <update>Y</update>
-      </value>
-      <value>
-        <name>SURVEY_DETAILS_ID</name>
-        <rename>SURVEY_DETAILS_ID</rename>
-        <update>N</update>
       </value>
     </lookup>
      <cluster_schema/>
@@ -999,6 +999,11 @@
         <update>N</update>
       </value>
       <value>
+        <name>SURVEY_DETAILS_ID</name>
+        <rename>SURVEY_DETAILS_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
         <name>ACCESS_TOKEN</name>
         <rename>ACCESS_TOKEN</rename>
         <update>Y</update>
@@ -1012,11 +1017,6 @@
         <name>RESPONSE_MESSAGE</name>
         <rename>RESPONSE_MESSAGE</rename>
         <update>Y</update>
-      </value>
-      <value>
-        <name>SURVEY_DETAILS_ID</name>
-        <rename>SURVEY_DETAILS_ID</rename>
-        <update>N</update>
       </value>
     </lookup>
      <cluster_schema/>
