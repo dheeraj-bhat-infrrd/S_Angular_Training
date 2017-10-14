@@ -418,178 +418,25 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         return userAdoption;
 
     }
-
-
+    
     @Override
     @Transactional ( value = "transactionManagerForReporting")
-    public List<String> getSurveyResponseData( String surveyDetailsId )
-    {
-        List<String> surveyResponse = new ArrayList<>();
-        for ( SurveyResponseTable surveyResponseTable : surveyResponseTableDao
-            .fetchSurveyResponsesBySurveyDetailsId( surveyDetailsId ) ) {
-
-            surveyResponse.add( surveyResponseTable.getAnswer() );
-        }
-        return surveyResponse;
+    public int getMaxQuestionForSurveyCompanyReport( Long companyId, Timestamp startDate,
+        Timestamp endDate )
+    {    
+        LOG.info( "method getMaxQuestionForSurveyCompanyReport started for companyId: {}",companyId );
+        return surveyResponseTableDao.getMaxResponseForCompanyId( companyId, startDate, endDate );
     }
 
+    
 
     @Override
     @Transactional ( value = "transactionManagerForReporting")
-    public List<List<Object>> getSurveyResultsCompanyReport( Long entityId, String entityType, Timestamp startDate,
-        Timestamp endDate )
+    public Map<String,SurveyResultsCompanyReport> getSurveyResultsCompanyReport( Long companyId, Timestamp startDate,
+        Timestamp endDate , int startIndex , int batchSize)
     {
-
-        List<List<Object>> surveyResultsCompany = new ArrayList<>();
-        if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
-            Map<String, List<SurveyResponseTable>> surveyResponseMap = surveyResponseTableDao
-                .geSurveyResponseForCompanyId( entityId );
-            int maxQuestions = 0;
-
-            for ( SurveyResultsCompanyReport SurveyResultsCompanyReport : surveyResultsCompanyReportDao
-                .fetchSurveyResultsCompanyReportByCompanyId( entityId, startDate, endDate ) ) {
-                List<Object> surveyResultsCompanyReportList = new ArrayList<>();
-
-                if ( SurveyResultsCompanyReport.getUserFirstName() == null ) {
-                    surveyResultsCompanyReportList.add( "" );
-                } else {
-                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getUserFirstName() );
-                }
-
-                if ( SurveyResultsCompanyReport.getUserLastName() == null ) {
-                    surveyResultsCompanyReportList.add( "" );
-                } else {
-                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getUserLastName() );
-                }
-
-                if ( SurveyResultsCompanyReport.getCustomerFirstName() == null ) {
-                    surveyResultsCompanyReportList.add( "" );
-                } else {
-                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getCustomerFirstName() );
-                }
-
-                if ( SurveyResultsCompanyReport.getCustomerLastName() == null ) {
-                    surveyResultsCompanyReportList.add( "" );
-                } else {
-                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getCustomerLastName() );
-                }
-
-                if ( SurveyResultsCompanyReport.getSurveySentDate() == null ) {
-                    surveyResultsCompanyReportList.add( "" );
-                } else {
-                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getSurveySentDate() );
-                }
-
-                if ( SurveyResultsCompanyReport.getSurveyCompletedDate() == null ) {
-                    surveyResultsCompanyReportList.add( "" );
-                } else {
-                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getSurveyCompletedDate() );
-                }
-
-                surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getTimeInterval() );
-
-                if ( SurveyResultsCompanyReport.getSurveySource() == null ) {
-                    surveyResultsCompanyReportList.add( "" );
-                } else {
-                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getSurveySource() );
-                }
-
-                if ( SurveyResultsCompanyReport.getSurveySourceId() == null ) {
-                    surveyResultsCompanyReportList.add( "" );
-                } else {
-                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getSurveySourceId() );
-                }
-
-                surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getSurveyScore() );
-
-                String surveyDetailsId = SurveyResultsCompanyReport.getSurveyDetailsId();
-
-                int questionCounter = 0;
-                if ( surveyResponseMap.containsKey( surveyDetailsId ) ) {
-
-                    int surveyResponseSize = surveyResponseMap.get( surveyDetailsId ).size();
-                    if ( surveyResponseSize > 0 ) {
-                        questionCounter = surveyResponseSize;
-                        if ( questionCounter > maxQuestions ) {
-                            maxQuestions = questionCounter;
-                        }
-                    }
-
-                    surveyResultsCompanyReportList.add( questionCounter );
-
-                    for ( SurveyResponseTable surveyResponse : surveyResponseMap.get( surveyDetailsId ) ) {
-                        if ( surveyResponse.getAnswer() == null ) {
-                            surveyResultsCompanyReportList.add( "" );
-                        } else {
-                            surveyResultsCompanyReportList.add( surveyResponse.getAnswer() );
-                        }
-                    }
-                }
-
-
-                if ( questionCounter == 0 ) {
-                    surveyResultsCompanyReportList.add( "" );
-                }
-
-                if ( SurveyResultsCompanyReport.getGateway() == null ) {
-                    surveyResultsCompanyReportList.add( "" );
-                } else {
-                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getGateway() );
-                }
-
-                if ( SurveyResultsCompanyReport.getCustomerComments() == null ) {
-                    surveyResultsCompanyReportList.add( "" );
-                } else {
-                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getCustomerComments() );
-                }
-
-                if ( SurveyResultsCompanyReport.getAgreedToShare() == null ) {
-                    surveyResultsCompanyReportList.add( "" );
-                } else {
-                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getAgreedToShare() );
-                }
-
-                if ( SurveyResultsCompanyReport.getBranchName() == null ) {
-                    surveyResultsCompanyReportList.add( "" );
-                } else {
-                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getBranchName() );
-                }
-
-                if ( SurveyResultsCompanyReport.getClickTroughForCompany() == null ) {
-                    surveyResultsCompanyReportList.add( "" );
-                } else {
-                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getClickTroughForCompany() );
-                }
-
-                if ( SurveyResultsCompanyReport.getClickTroughForAgent() == null ) {
-                    surveyResultsCompanyReportList.add( "" );
-                } else {
-                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getClickTroughForAgent() );
-                }
-
-                if ( SurveyResultsCompanyReport.getClickTroughForRegion() == null ) {
-                    surveyResultsCompanyReportList.add( "" );
-                } else {
-                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getClickTroughForRegion() );
-                }
-
-                if ( SurveyResultsCompanyReport.getClickTroughForBranch() == null ) {
-                    surveyResultsCompanyReportList.add( "" );
-                } else {
-                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getClickTroughForBranch() );
-                }
-
-
-                surveyResultsCompany.add( surveyResultsCompanyReportList );
-
-            }
-            List<Object> maxQuestionList = new ArrayList<>();
-            maxQuestionList.add( "maxQuestions" );
-            maxQuestionList.add( maxQuestions );
-            surveyResultsCompany.add( maxQuestionList );
-        }
-
-        return surveyResultsCompany;
+        LOG.info( "method getSurveyResultsCompanyReport started for companyId: {} ",companyId );
+        return surveyResultsCompanyReportDao.getSurveyResultForCompanyId( companyId, startDate, endDate, startIndex, batchSize );
     }
 
 
@@ -1833,8 +1680,20 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     public XSSFWorkbook downloadSurveyResultsCompanyForReporting( long entityId, String entityType, Timestamp startDate,
         Timestamp endDate )
     {
-        Response response = ssApiBatchIntergrationBuilder.getIntegrationApi().getSurveyResultsCompany( entityId, entityType,
-            startDate, endDate );
+        int startIndex = 0;
+        int batchSize = 1;
+        int maxQuestion = 0;
+        Response maxQuestResponse = ssApiBatchIntergrationBuilder.getIntegrationApi().getCompanyMaxQuestion( entityId, startDate, endDate );
+        String maxQuestResponseString = maxQuestResponse != null ? new String( ( (TypedByteArray) maxQuestResponse.getBody() ).getBytes() ) : null;
+        if(maxQuestResponseString != null){
+            maxQuestResponseString = maxQuestResponseString.substring( 1, maxQuestResponseString.length() - 1 );
+            maxQuestResponseString = StringEscapeUtils.unescapeJava( maxQuestResponseString );
+            maxQuestion = Integer.valueOf( maxQuestResponseString );
+        }
+
+        //hardcoding startIndex and BatchSize
+        Response response = ssApiBatchIntergrationBuilder.getIntegrationApi().getSurveyResultsCompany( entityId,
+            startDate, endDate , 0 , 100 );
         String responseString = response != null ? new String( ( (TypedByteArray) response.getBody() ).getBytes() ) : null;
         //since the string has ""abc"" an extra quote
         responseString = responseString.substring( 1, responseString.length() - 1 );

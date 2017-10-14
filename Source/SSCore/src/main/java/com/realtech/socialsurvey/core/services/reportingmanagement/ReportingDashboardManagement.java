@@ -14,6 +14,7 @@ import com.realtech.socialsurvey.core.entities.Digest;
 import com.realtech.socialsurvey.core.entities.MonthlyDigestAggregate;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RankingRequirements;
+import com.realtech.socialsurvey.core.entities.SurveyResultsCompanyReport;
 import com.realtech.socialsurvey.core.entities.UserRankingPastMonthMain;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -44,13 +45,9 @@ public interface ReportingDashboardManagement
 
     String generateCompanyUserForReporting( Long entityId, String entityType, Long userId )
         throws UnsupportedEncodingException, NonFatalException;
-
-	List<List<Object>> getSurveyResultsCompanyReport(Long entityId, String EntityType,Timestamp startDate, Timestamp endDate);
 	
 	String generateSurveyResultsCompanyForReporting( Long entityId, String entityType, Long userId, Timestamp startDate, Timestamp endDate )
 		        throws UnsupportedEncodingException, NonFatalException;
-
-	List<String> getSurveyResponseData(String surveyDetailsId);
 
     List<List<Object>> getSurveyTransactionReport( Long entityId, String entityType, Timestamp startDate, Timestamp endDate );
 
@@ -126,5 +123,29 @@ public interface ReportingDashboardManagement
     public boolean updateSendDigestMailToggle( long companyId, boolean sendMonthlyDigestMail ) throws InvalidInputException;
 
     public List<CompanyDigestRequestData> getCompaniesOptedForDigestMail( int startIndex, int batchSize );
+
+    /**
+     * method to get maximum question number for company
+     * based on time frame
+     * @param entityId
+     * @param startDate
+     * @param endDate
+     * @return
+     */
+    public int getMaxQuestionForSurveyCompanyReport( Long entityId, Timestamp startDate, Timestamp endDate );
+
+    /**
+     * method to get the surveyResults from surveyResults table 
+     * based on batching 
+     * @param entityId
+     * @param startDate
+     * @param endDate
+     * @param startIndex
+     * @param batchSize
+     * @return
+     */
+    public Map<String, SurveyResultsCompanyReport> getSurveyResultsCompanyReport( Long entityId, Timestamp startDate, Timestamp endDate,
+        int startIndex, int batchSize );
+
 
 }
