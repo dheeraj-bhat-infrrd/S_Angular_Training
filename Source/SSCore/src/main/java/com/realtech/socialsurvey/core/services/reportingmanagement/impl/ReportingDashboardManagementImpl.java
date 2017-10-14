@@ -93,7 +93,6 @@ import com.realtech.socialsurvey.core.entities.ScoreStatsQuestionBranch;
 import com.realtech.socialsurvey.core.entities.ScoreStatsQuestionCompany;
 import com.realtech.socialsurvey.core.entities.ScoreStatsQuestionRegion;
 import com.realtech.socialsurvey.core.entities.ScoreStatsQuestionUser;
-import com.realtech.socialsurvey.core.entities.SurveyResponseTable;
 import com.realtech.socialsurvey.core.entities.SurveyResultsCompanyReport;
 import com.realtech.socialsurvey.core.entities.SurveyStatsReportBranch;
 import com.realtech.socialsurvey.core.entities.SurveyTransactionReport;
@@ -1683,34 +1682,54 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         int startIndex = 0;
         int batchSize = 1;
         int maxQuestion = 0;
+        int enterNext = 1;
         Response maxQuestResponse = ssApiBatchIntergrationBuilder.getIntegrationApi().getCompanyMaxQuestion( entityId, startDate, endDate );
         String maxQuestResponseString = maxQuestResponse != null ? new String( ( (TypedByteArray) maxQuestResponse.getBody() ).getBytes() ) : null;
         if(maxQuestResponseString != null){
-            maxQuestResponseString = maxQuestResponseString.substring( 1, maxQuestResponseString.length() - 1 );
-            maxQuestResponseString = StringEscapeUtils.unescapeJava( maxQuestResponseString );
             maxQuestion = Integer.valueOf( maxQuestResponseString );
         }
-
-        //hardcoding startIndex and BatchSize
-        Response response = ssApiBatchIntergrationBuilder.getIntegrationApi().getSurveyResultsCompany( entityId,
-            startDate, endDate , 0 , 100 );
-        String responseString = response != null ? new String( ( (TypedByteArray) response.getBody() ).getBytes() ) : null;
-        //since the string has ""abc"" an extra quote
-        responseString = responseString.substring( 1, responseString.length() - 1 );
-        //Escape characters
-        responseString = StringEscapeUtils.unescapeJava( responseString );
-        List<List<String>> surveyResultsCompanyReport = null;
-        Type listType = new TypeToken<List<List<String>>>() {}.getType();
-        surveyResultsCompanyReport = (List<List<String>>) ( new Gson().fromJson( responseString, listType ) );
+             
+        //write the excel header first 
         Map<Integer, List<Object>> data = workbookData
-            .getSurveyResultsCompanyReportToBeWrittenInSheet( surveyResultsCompanyReport );
+            .writeSurveyResultsCompanyReportHeader( maxQuestion );
+        Map<String,SurveyResultsCompanyReport> surveyResultsCompanyReport = getSurveyResultResponse( entityId, startDate, endDate, startIndex, batchSize );
+        //create workbook data
         XSSFWorkbook workbook = workbookOperations.createWorkbook( data );
+
+        //if data is not empty write into the workbook which was created 
+        while( !surveyResultsCompanyReport.isEmpty() && surveyResultsCompanyReport != null){
+            enterNext = data.size()+1;
+            data = workbookData
+                .getSurveyResultsCompanyReportToBeWrittenInSheet( surveyResultsCompanyReport , maxQuestion , enterNext);
+            //keep workbook open to write data if it's not null
+            //use the created workbook when writing the header ans rewrite the same 
+            workbook = workbookOperations.writeToWorkbook( data , workbook , enterNext );
+            surveyResultsCompanyReport = getSurveyResultResponse( entityId, startDate, endDate, startIndex, batchSize );
+
+        }
+        
         XSSFSheet sheet = workbook.getSheetAt( 0 );
         this.makeRowBold( workbook, sheet.getRow( 0 ) );
         return workbook;
 
     }
 
+    public Map<String,SurveyResultsCompanyReport> getSurveyResultResponse(Long companyId, Timestamp startDate , Timestamp endDate , int startIndex , int batchSize){
+        Response response = ssApiBatchIntergrationBuilder.getIntegrationApi().getSurveyResultsCompany( companyId,
+            startDate, endDate , startIndex , batchSize );
+        String responseString = response != null ? new String( ( (TypedByteArray) response.getBody() ).getBytes() ) : null;
+        Map<String,SurveyResultsCompanyReport> surveyResultsCompanyReport = null;
+        if(responseString != null){
+            //since the string has ""abc"" an extra quote
+            responseString = responseString.substring( 1, responseString.length() - 1 );
+            //Escape characters
+            responseString = StringEscapeUtils.unescapeJava( responseString );
+            Type listType = new TypeToken<Map<String,SurveyResultsCompanyReport>>() {}.getType();
+            surveyResultsCompanyReport = new Gson().fromJson( responseString, listType ) ;
+
+        }
+        return surveyResultsCompanyReport;
+    }
 
     @Override
     public String generateSurveyTransactionForReporting( Long entityId, String entityType, Long userId, Timestamp startDate,
