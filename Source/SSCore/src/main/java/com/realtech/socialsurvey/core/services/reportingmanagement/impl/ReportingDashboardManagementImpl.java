@@ -10,6 +10,7 @@ import java.lang.reflect.Type;
 import java.net.URLEncoder;
 import java.sql.Timestamp;
 import java.text.DateFormatSymbols;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -1664,7 +1665,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
     @Override
     public String generateSurveyResultsCompanyForReporting( Long entityId, String entityType, Long userId, Timestamp startDate,
-        Timestamp endDate ) throws UnsupportedEncodingException, NonFatalException
+        Timestamp endDate ) throws UnsupportedEncodingException, NonFatalException, ParseException
     {
         User user = userManagementService.getUserByUserId( userId );
         String fileName = "Survey_Results_Company_Report" + entityType + "-" + user.getFirstName() + "_" + user.getLastName()
@@ -1677,10 +1678,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
     @SuppressWarnings ( "unchecked")
     public XSSFWorkbook downloadSurveyResultsCompanyForReporting( long entityId, String entityType, Timestamp startDate,
-        Timestamp endDate )
+        Timestamp endDate ) throws ParseException
     {
         int startIndex = 0;
-        int batchSize = 1;
+        int batchSize = 2;
         int maxQuestion = 0;
         int enterNext = 1;
         Response maxQuestResponse = ssApiBatchIntergrationBuilder.getIntegrationApi().getCompanyMaxQuestion( entityId, startDate, endDate );
@@ -1698,12 +1699,14 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
         //if data is not empty write into the workbook which was created 
         while( !surveyResultsCompanyReport.isEmpty() && surveyResultsCompanyReport != null){
-            enterNext = data.size()+1;
+            enterNext = startIndex+1;
             data = workbookData
                 .getSurveyResultsCompanyReportToBeWrittenInSheet( surveyResultsCompanyReport , maxQuestion , enterNext);
             //keep workbook open to write data if it's not null
             //use the created workbook when writing the header ans rewrite the same 
             workbook = workbookOperations.writeToWorkbook( data , workbook , enterNext );
+            //calculate startIndex 
+            startIndex = startIndex + batchSize;
             surveyResultsCompanyReport = getSurveyResultResponse( entityId, startDate, endDate, startIndex, batchSize );
 
         }

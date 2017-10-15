@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -46,8 +47,19 @@ public interface ReportingDashboardManagement
     String generateCompanyUserForReporting( Long entityId, String entityType, Long userId )
         throws UnsupportedEncodingException, NonFatalException;
 	
-	String generateSurveyResultsCompanyForReporting( Long entityId, String entityType, Long userId, Timestamp startDate, Timestamp endDate )
-		        throws UnsupportedEncodingException, NonFatalException;
+	/**
+	 * @param entityId
+	 * @param entityType
+	 * @param userId
+	 * @param startDate
+	 * @param endDate
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 * @throws NonFatalException
+	 * @throws ParseException
+	 */
+	public String generateSurveyResultsCompanyForReporting( Long entityId, String entityType, Long userId, Timestamp startDate, Timestamp endDate )
+		        throws UnsupportedEncodingException, NonFatalException, ParseException;
 
     List<List<Object>> getSurveyTransactionReport( Long entityId, String entityType, Timestamp startDate, Timestamp endDate );
 

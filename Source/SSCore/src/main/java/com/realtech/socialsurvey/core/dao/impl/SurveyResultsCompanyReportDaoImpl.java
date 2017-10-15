@@ -129,13 +129,14 @@ public class SurveyResultsCompanyReportDaoImpl extends GenericReportingDaoImpl<S
 	                    surveyResultsCompanyReport.setSurveySource( String.valueOf( row[9] ) );
 	                    surveyResultsCompanyReport.setSurveySourceId( String.valueOf( row[10] ));
 	                    surveyResultsCompanyReport.setSurveyScore(((BigDecimal)( row[11])).doubleValue());
-	                    surveyResultsCompanyReport.setCustomerComments( String.valueOf( row[12] ) );
-	                    surveyResultsCompanyReport.setAgreedToShare(  String.valueOf( row[13] ) );
-	                    surveyResultsCompanyReport.setBranchName( String.valueOf( row[14] ) );
-	                    surveyResultsCompanyReport.setClickTroughForCompany( String.valueOf( row[15] ) );
-	                    surveyResultsCompanyReport.setClickTroughForAgent( String.valueOf( row[16] ) ); 
-	                    surveyResultsCompanyReport.setClickTroughForRegion( String.valueOf( row[17] ) );
-	                    surveyResultsCompanyReport.setClickTroughForBranch( String.valueOf( row[18] ) );             
+	                    surveyResultsCompanyReport.setGateway( String.valueOf( row[12] ));
+	                    surveyResultsCompanyReport.setCustomerComments( String.valueOf( row[13] ) );
+	                    surveyResultsCompanyReport.setAgreedToShare(  String.valueOf( row[14] ) );
+	                    surveyResultsCompanyReport.setBranchName( String.valueOf( row[15] ) );
+	                    surveyResultsCompanyReport.setClickTroughForCompany( String.valueOf( row[16] ) );
+	                    surveyResultsCompanyReport.setClickTroughForAgent( String.valueOf( row[17] ) ); 
+	                    surveyResultsCompanyReport.setClickTroughForRegion( String.valueOf( row[18] ) );
+	                    surveyResultsCompanyReport.setClickTroughForBranch( String.valueOf( row[19] ) );             
 	                }
 	                
 	                

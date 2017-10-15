@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.workbook.utils;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -752,41 +753,65 @@ public class WorkbookData
         
     }
     
-    public Map<Integer, List<Object>> getSurveyResultsCompanyReportToBeWrittenInSheet( Map<String, SurveyResultsCompanyReport> surveyResultsCompanyReport , int maxQuestions , int surveyDataCounter)
+    public Map<Integer, List<Object>> getSurveyResultsCompanyReportToBeWrittenInSheet( Map<String, SurveyResultsCompanyReport> surveyResultsCompanyReport , int maxQuestions , int surveyDataCounter) throws ParseException
     {
         Map<Integer, List<Object>>  surveyResultsCompanyData = new TreeMap<>();
         
         Integer surveyResultCompanyCounter = surveyDataCounter;
+        SimpleDateFormat date = new SimpleDateFormat( "yyyy-MM-dd hh:mm:ss.S" );
         
         List<Object> surveyResultsCompanyReportToPopulate = new ArrayList<>();
         for(Entry<String, SurveyResultsCompanyReport> row : surveyResultsCompanyReport.entrySet() ){
                 surveyResultsCompanyReportToPopulate.add(row.getValue().getUserFirstName());
                 surveyResultsCompanyReportToPopulate.add(row.getValue().getUserLastName());
                 surveyResultsCompanyReportToPopulate.add(row.getValue().getCustomerFirstName());
-                surveyResultsCompanyReportToPopulate.add(row.getValue().getCustomerLastName());         
-                if(row.getValue().getSurveySentDate() != null ){
-                    surveyResultsCompanyReportToPopulate.add(row.getValue().getSurveySentDate());
+                surveyResultsCompanyReportToPopulate.add(row.getValue().getCustomerLastName());
+                String sentDate = "";
+                if (row.getValue().getSurveySentDate()!=null){
+                    sentDate = row.getValue().getSurveySentDate().toString();
+                    surveyResultsCompanyReportToPopulate.add(date.parse( sentDate ));
                 }else{
-                    surveyResultsCompanyReportToPopulate.add(String.valueOf( "" ));
+                    surveyResultsCompanyReportToPopulate.add(sentDate);
                 }
-                if(row.getValue().getSurveyCompletedDate() != null){
-                    surveyResultsCompanyReportToPopulate.add(row.getValue().getSurveyCompletedDate());
+
+                String completedDate = "";
+                if (row.getValue().getSurveyCompletedDate()!=null){
+                    completedDate = row.getValue().getSurveyCompletedDate().toString();
+                    surveyResultsCompanyReportToPopulate.add(date.parse( completedDate ));
                 }else{
-                    surveyResultsCompanyReportToPopulate.add(String.valueOf( "" ));
-                }       
+                    surveyResultsCompanyReportToPopulate.add(completedDate);
+                }
+
+                    
+                    
                 surveyResultsCompanyReportToPopulate.add(row.getValue().getTimeInterval());
                 surveyResultsCompanyReportToPopulate.add(row.getValue().getSurveySource());
-                surveyResultsCompanyReportToPopulate.add(row.getValue().getSurveySourceId());
+                String surveySourceId = row.getValue().getSurveySourceId();
+                if(!surveySourceId.equals(null) && surveySourceId != null && !surveySourceId.equals("null")){
+                    surveyResultsCompanyReportToPopulate.add(surveySourceId);
+                }else{
+                    surveyResultsCompanyReportToPopulate.add(""); 
+                }
                 surveyResultsCompanyReportToPopulate.add(row.getValue().getSurveyScore());       
-                int responseNumber = row.getValue().getSurveyResponseList().size();             
+                int responseNumber = row.getValue().getSurveyResponseList().size();       
+                //where the answer is null
                 if(responseNumber > 0){
                     int iterateAns = 0;
-                    while ( iterateAns++ < responseNumber) 
-                        surveyResultsCompanyReportToPopulate.add(row.getValue().getSurveyResponseList().get( iterateAns ));
-                }else if(responseNumber < maxQuestions){
-                    int questionDiff = maxQuestions - responseNumber;
+                    while ( iterateAns < responseNumber) {
+                        String answer = row.getValue().getSurveyResponseList().get(iterateAns++).getAnswer();
+                        if(!answer.equals(null) && answer != null && !answer.equals("null")){
+                            surveyResultsCompanyReportToPopulate.add(answer);
+                        }else{
+                            surveyResultsCompanyReportToPopulate.add(""); 
+                        }
+                    }
+                        
+                }
+                //where the responses is lesser then the max Questions 
+                if(responseNumber < maxQuestions){
+                    int questionDiff = maxQuestions - responseNumber ;
                     for(int questionDiffLoop=0;questionDiffLoop < questionDiff;questionDiffLoop++){
-                        surveyResultsCompanyReportToPopulate.add(String.valueOf( "" ));
+                        surveyResultsCompanyReportToPopulate.add("");
                     }
                 }
                 surveyResultsCompanyReportToPopulate.add(row.getValue().getGateway());

@@ -82,7 +82,9 @@ public class WorkbookOperations
         XSSFSheet sheet = workbook.getSheetAt( 0 );
         //use style from the workbook
         CellStyle style = workbook.getCellStyleAt( (short) 0 );
-        // Iterate over data and write to sheet
+        //use the data format
+        XSSFDataFormat df = workbook.createDataFormat();
+        style.setDataFormat( df.getFormat( CommonConstants.DATE_FORMAT ) );        // Iterate over data and write to sheet
         Set<Integer> keyset = data.keySet();
         int rownum = enterAt;
         for ( Integer key : keyset ) {
