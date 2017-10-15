@@ -81,9 +81,8 @@ public class WorkbookOperations
         //USE THE SAME SHEET 
         XSSFSheet sheet = workbook.getSheetAt( 0 );
         //use style from the workbook
-        CellStyle style = workbook.getCellStyleAt( (short) 0 );
-        //use the data format
         XSSFDataFormat df = workbook.createDataFormat();
+        CellStyle style = workbook.createCellStyle();
         style.setDataFormat( df.getFormat( CommonConstants.DATE_FORMAT ) );        // Iterate over data and write to sheet
         Set<Integer> keyset = data.keySet();
         int rownum = enterAt;
