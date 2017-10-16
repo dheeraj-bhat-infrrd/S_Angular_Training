@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.web.controller;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 
@@ -708,29 +709,24 @@ public class ReportingWebController
         }
 
         HttpSession session = request.getSession( false );
-        long columnId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
-        String columnType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        long sessionColumnId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String sessionColumnType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
 
         AgentSettings agentSettings = userManagementService.getUserSettings( userId );
         Map<String, Long> hierarchyMap = null;
         hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( agentSettings );
-        long regionId = columnId;
-        long branchId = columnId;
-        if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) && !columnType.equals( CommonConstants.COMPANY_ID_COLUMN )
-            && !columnType.equals( CommonConstants.REGION_ID_COLUMN )
-            && !columnType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
-            regionId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
-            entityId = regionId;
-        } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN )
-            && !columnType.equals( CommonConstants.COMPANY_ID_COLUMN ) && !columnType.equals( CommonConstants.REGION_ID_COLUMN )
-            && !columnType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
-            branchId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
-            entityId = branchId;
+        
+        if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) && sessionColumnType.equals( CommonConstants.AGENT_ID_COLUMN )) {
+            entityId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
+            
+        } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) && sessionColumnType.equals( CommonConstants.AGENT_ID_COLUMN) ) {
+            entityId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );    
         }
 
-        if ( columnType.equals( CommonConstants.BRANCH_ID_COLUMN ) && entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
-            entityId = reportingDashboardManagement.getRegionIdFromBranchId( branchId );
+        if ( sessionColumnType.equals( CommonConstants.BRANCH_ID_COLUMN ) && entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+            entityId = reportingDashboardManagement.getRegionIdFromBranchId( sessionColumnId );
         }
+        
         switch ( timeFrame ) {
             case 1:
                 response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingRankCountForThisYear( userId, entityId,
@@ -810,28 +806,21 @@ public class ReportingWebController
         Long userId = user.getUserId();
 
         HttpSession session = request.getSession( false );
-        long columnId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
-        String columnType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        long sessionColumnId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String sessionColumnType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
 
         AgentSettings agentSettings = userManagementService.getUserSettings( userId );
         Map<String, Long> hierarchyMap = null;
         hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( agentSettings );
-        long regionId = columnId;
-        long branchId = columnId;
-        if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) && !columnType.equals( CommonConstants.COMPANY_ID_COLUMN )
-            && !columnType.equals( CommonConstants.REGION_ID_COLUMN )
-            && !columnType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
-            regionId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
-            entityId = regionId;
-        } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN )
-            && !columnType.equals( CommonConstants.COMPANY_ID_COLUMN ) && !columnType.equals( CommonConstants.REGION_ID_COLUMN )
-            && !columnType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
-            branchId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
-            entityId = branchId;
+       
+        if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) && sessionColumnType.equals( CommonConstants.AGENT_ID_COLUMN )) {
+            entityId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
+        } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) && sessionColumnType.equals( CommonConstants.AGENT_ID_COLUMN )) {
+            entityId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
         }
 
-        if ( columnType.equals( CommonConstants.BRANCH_ID_COLUMN ) && entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
-            entityId = reportingDashboardManagement.getRegionIdFromBranchId( branchId );
+        if ( sessionColumnType.equals( CommonConstants.BRANCH_ID_COLUMN ) && entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+            entityId = reportingDashboardManagement.getRegionIdFromBranchId( sessionColumnId );
         }
 
         switch ( timeFrame ) {
@@ -885,8 +874,9 @@ public class ReportingWebController
         int timeFrame = 1;
         long entityId = 0;
 
-        @SuppressWarnings ( "deprecation") int year = ( new Date() ).getYear();
-        @SuppressWarnings ( "deprecation") int month = ( new Date() ).getMonth() + 1;
+        int year = ( Calendar.getInstance() ).get(Calendar.YEAR);
+        int month = 0;
+        
         Response response = null;
 
         if ( startIndexStr != null && !startIndexStr.isEmpty() ) {
@@ -909,28 +899,25 @@ public class ReportingWebController
         Long userId = user.getUserId();
         HttpSession session = request.getSession( false );
 
-        long columnId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
-        String columnType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        long sessionColumnId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String sessionColumnType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
 
         AgentSettings agentSettings = userManagementService.getUserSettings( userId );
         Map<String, Long> hierarchyMap = null;
         hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( agentSettings );
-        long regionId = columnId;
-        long branchId = columnId;
-        if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) && !columnType.equals( CommonConstants.COMPANY_ID_COLUMN )
-            && !columnType.equals( CommonConstants.REGION_ID_COLUMN )
-            && !columnType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
-            regionId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
-            entityId = regionId;
-        } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN )
-            && !columnType.equals( CommonConstants.COMPANY_ID_COLUMN ) && !columnType.equals( CommonConstants.REGION_ID_COLUMN )
-            && !columnType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
-            branchId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
-            entityId = branchId;
+       
+        if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) && sessionColumnType.equals( CommonConstants.AGENT_ID_COLUMN)) {
+        	
+        	entityId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
+        	
+        } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) && sessionColumnType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+            
+        	entityId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
+        	
         }
 
-        if ( columnType.equals( CommonConstants.BRANCH_ID_COLUMN ) && entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
-            entityId = reportingDashboardManagement.getRegionIdFromBranchId( branchId );
+        if ( sessionColumnType.equals( CommonConstants.BRANCH_ID_COLUMN ) && entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+            entityId = reportingDashboardManagement.getRegionIdFromBranchId( sessionColumnId );
         }
 
         switch ( timeFrame ) {
