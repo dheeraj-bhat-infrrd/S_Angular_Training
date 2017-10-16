@@ -302,7 +302,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <commit>100</commit>
+    <commit>10000</commit>
     <update_bypassed>N</update_bypassed>
     <lookup>
       <schema/>
