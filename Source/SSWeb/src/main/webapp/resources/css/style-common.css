@@ -9680,6 +9680,7 @@ ul.accordion li>a:before {
 	.time-frame-sel{
 		height:90%; 
 		line-height:35px !important;
+		padding-right:30px;
 	}
 	
 	.time-frame-item{
@@ -9700,7 +9701,6 @@ ul.accordion li>a:before {
     color: #666;
     text-align: left;
     top: 232px;
-    right: 114px;
     max-height: 400px;
     box-shadow: 3px 3px 30px #444;
 	}
@@ -9964,7 +9964,7 @@ img.lead-img {
 }
 
 .top-ten-ranks{
-	width: 100px;
+	width: 110px;
     margin: 0;
     margin-left: 75%;
 }
@@ -10003,4 +10003,8 @@ img.lead-img {
 .lead-ranks-below-btn{
 	font-size: 14px;
     font-weight: bold !important;
+}
+
+.rep-dash-bar-margin{
+		margin:auto 2px;
 }

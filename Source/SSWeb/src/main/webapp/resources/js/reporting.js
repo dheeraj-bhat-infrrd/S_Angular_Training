@@ -3,6 +3,14 @@
 var monthNamesList = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];	
 var overviewData=getOverviewData();
 var socialMediaList = new Array();
+var is_safari = navigator.userAgent.indexOf("Safari") > -1;
+
+function cssForSafari(){
+	if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1) {
+		is_safari = true;
+		$('.rep-dash-bar-margin').css('margin', 'auto 2px auto 10px');
+	}
+}
 
 function isEmpty(obj) {
     for(var key in obj) {
@@ -1386,11 +1394,17 @@ function showHideRankPaginateBtns(startIndex,count){
 		if(!($('#lead-ranks-above').hasClass('hide'))){
 			$('#lead-ranks-above').addClass('hide');
 			$('#lead-ranks-above').removeClass('block-display');
-		}		
+		}
+		if(!($('#top-ten-ranks').hasClass('hide'))){
+			$('#top-ten-ranks').addClass('hide');
+			$('#top-ten-ranks').removeClass('block-display');
+		}	
 	}else{
 		$('#lead-ranks-above').removeClass('hide');
 		$('#lead-ranks-above').addClass('block-display');
-		
+		$('#top-ten-ranks').removeClass('hide');
+		$('#top-ten-ranks').addClass('block-display');
+
 	}
 	
 	if(count<11 || startIndex>count-10){

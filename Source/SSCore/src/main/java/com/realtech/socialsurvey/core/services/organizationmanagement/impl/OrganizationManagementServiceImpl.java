@@ -8228,4 +8228,37 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         return encompassSdkVersions.get(CommonConstants.INITIAL_INDEX).getHostName();
 
     }
+    
+    @Override
+    @Transactional
+    public List<Company> getAllActiveEnterpriseCompanies()
+    {
+        LOG.info( "Method getAllActiveCompaniesByAccountType started" );
+        List<Company> companies =  companyDao.getCompaniesByStatusAndAccountMasterId( CommonConstants.STATUS_ACTIVE, CommonConstants.ACCOUNTS_MASTER_ENTERPRISE );
+        LOG.info( "Method getAllActiveEnterpriseCompanies finisshed" );
+        return companies;
+
+    }
+    
+    @Override
+    @Transactional
+    public List<Company> getCompaniesByCompanyIds(Set<Long> companyIds)
+    {
+        LOG.info( "Method getCompaniesByCompanyIds started" );
+        List<Company> companies =companyDao.getCompanyListByIds( companyIds );
+        LOG.info( "Method getCompaniesByCompanyIds finisshed" );
+        return companies;
+
+    }
+    
+    
+    @Override
+    @Transactional
+    public Map<Long, Long> getUsersCountForCompanies()
+    {   
+        LOG.info( "Method getUsersCountForCompanies started" );
+        Map<Long, Long> companiesUserCount = userDao.getUsersCountForCompanies();
+        LOG.info( "Method getUsersCountForCompanies finisshed" );
+        return companiesUserCount;
+    }
 }

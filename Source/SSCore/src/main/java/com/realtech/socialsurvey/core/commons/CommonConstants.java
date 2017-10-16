@@ -235,6 +235,7 @@ public interface CommonConstants
     public static final String BATCH_TYPE_HIERARCHY_SETTINGS_CORRECTOR = "HierarchySettingsCorrector";
     public static final String BATCH_TYPE_ZILLOW_REVIEW_PROCESSOR_AND_AUTO_POSTER = "ZillowReviewProcessorAndAutoPoster";
     public static final String BATCH_TYPE_HIERARCHY_UPLOAD_PROCESSOR = "HierarchyUploadProcessor";
+    public static final String BATCH_TYPE_MONTHLY_DIGEST_STARTER = "MonthlyDigestStarter";
 
     //batch name constant for batch tracker
     public static final String BATCH_NAME_REVIEW_COUNT_UPDATER = "Agent's review count in solr updater";
@@ -261,6 +262,8 @@ public interface CommonConstants
     public static final String COMPANIES_BILLING_REPORT_GENERATOR = "Companies Billing Report Generator";
     public static final String BATCH_NAME_ZILLOW_REVIEW_PROCESSOR_AND_AUTO_POSTER = "Zillow review processor and auto poster";
     public static final String BATCH_NAME_HIERARCHY_UPLOAD_PROCESSOR = "Company Hierarchy Upload Processor";
+    public static final String BATCH_NAME_MONTHLY_DIGEST_STARTER = "Monthly digest process starter for companies";
+
 
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_BILLING_REPORT = "Billing report";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_USERS_REPORT = "Company user report";
@@ -1370,6 +1373,9 @@ public interface CommonConstants
     public static final String MONTH_VAL = "monthVal";
     public static final String YEAR_VAL = "yearVal";
     public static final String QUESTION_ID = "questionId";
+    
+    public static final String TRANSACTION_MONITOR_DATE_COLUMN = "transactionDate";
+    public static final String SURVEY_STATS_MONITOR_DATE_COLUMN = "statsDate";
 
     //Survey API survey status
     public static final String SURVEY_API_SURVEY_STATUS_COMPLETE = "complete";
@@ -1391,4 +1397,7 @@ public interface CommonConstants
     public static final String SQUARE_THUMBNAIL = "squareThumbnail";
     public static final String RECTANGULAR_THUMBNAIL = "rectangularThumbnail";
     
+    //Digest
+    public static final String MONTH = "month";
+    public static final String YEAR = "year";
 }

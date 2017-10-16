@@ -403,5 +403,37 @@ public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements Com
         return cpmanyiesById;
 
     }
+    
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public List<Company> getCompaniesByStatusAndAccountMasterId(int status , int accountMasterId){
+        LOG.info( "method getCompaniesByStatusAndAccountType started for status %s and accountType %s " );
+        Session session = sessionFactory.getCurrentSession();
+        
+        Criteria criteria = session.createCriteria( Company.class , "company");
+        criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN, status ) );
+        criteria.createAlias( "company.licenseDetails", "licenseDetail" );
+        criteria.add( Restrictions.eq( "licenseDetail.accountsMaster.accountsMasterId", accountMasterId ) );
+        List<Company> companies = criteria.list();
+        
+
+        LOG.info( "method getCompaniesByStatusAndAccountType finished for status %s and accountType %s " );
+        return companies;
+    }
+    
+    
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public List<Company> getCompanyListByIds(Set<Long> companyIds)
+    {
+        LOG.debug( "method getCompanyListByIds started " );
+        Session session = sessionFactory.getCurrentSession();
+        Criteria criteria = session.createCriteria( Company.class, "company" );
+        criteria.add( Restrictions.in( "companyId", companyIds ) );
+        List<Company> companies = criteria.list();
+        
+        LOG.debug( "method getCompanyListByIds started ended" );
+        return companies;
+
+    }
 }
-// JIRA SS-42 By RM-05 EOC

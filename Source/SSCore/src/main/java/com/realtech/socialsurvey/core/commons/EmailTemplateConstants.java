@@ -48,6 +48,9 @@ public final class EmailTemplateConstants {
 
 	public static final String FATAL_EXCEPTION_MAIL_BODY = "FatalExceptionMailBody.html";
 	public static final String FATAL_EXCEPTION_MAIL_SUBJECT = "FatalExceptionMailSubject.txt";
+	
+	public static final String WEB_EXCEPTION_MAIL_BODY = "FatalExceptionMailBody.html";
+    public static final String WEB_EXCEPTION_MAIL_SUBJECT = "WebExceptionMailSubject.txt";
 
 	public static final String MANUAL_REGISTRATION_MAIL_BODY = "ManualRegistrationBody.html";
 	public static final String MANUAL_REGISTRATION_MAIL_SUBJECT = "ManualRegistrationSubject.txt";
@@ -165,5 +168,19 @@ public final class EmailTemplateConstants {
     
     public static final String CANCEL_SUBSCRIPTION_REQUEST_ALERT_MAIL_SUBJECT = "CancelSubscriptionRequestAlertMailSubject.txt";
     public static final String CANCEL_SUBSCRIPTION_REQUEST_ALERT_MAIL_BODY = "CancelSubscriptionRequestAlertMailBody.html";
+    
+    public static final String DIGEST_MAIL_SUBJECT = "DigestMailSubject.txt";
+    public static final String DIGEST_MAIL_BODY = "DigestMailBody.html";
 
+    public static final String NO_TRANSACTION_RECEIVED_ALERT_MAIL_SUBJECT = "NoTransactionReceivedAlertMailSubject.txt";
+    public static final String NO_TRANSACTION_RECEIVED_ALERT_MAIL_BODY = "NoTransactionReceivedAlertMailBody.html";
+
+    public static final String HIGH_VOLUME_UNPROCESSED_TRANSACTION_ALERT_MAIL_SUBJECT = "highVoulmeUnprocessedTransactionAlertMailSubject.txt";
+    public static final String HIGH_VOLUME_UNPROCESSED_TRANSACTION_ALERT_MAIL_BODY = "highVoulmeUnprocessedTransactionAlertMailBody.html";
+    
+    public static final String LESS_VOLUME_OF_TRANSACTION_RECEIVED_ALERT_MAIL_SUBJECT = "lessVoulmeOfTransactionReceivedAlertMailSubject.txt";
+    public static final String LESS_VOLUME_OF_TRANSACTION_RECEIVED_ALERT_MAIL_BODY = "lessVoulmeOfTransactionReceivedAlertMailBody.html";
+
+    public static final String DIGEST_ERROR_MAIL_BODY = "DigestErrorMailBody.html";
+    public static final String DIGEST_ERROR_MAIL_SUBJECT = "DigestErrorMailSubject.txt";
 }
