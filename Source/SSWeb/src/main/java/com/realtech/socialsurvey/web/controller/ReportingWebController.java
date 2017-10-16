@@ -663,23 +663,25 @@ public class ReportingWebController
     }
 
 
-    private long getEntityIdFromAgentSettings( AgentSettings agentSettings, String entityType, String sessionColumnType,
+    private long getEntityIdFromAgentSettings( AgentSettings agentSettings, String entityType, long entityId, String sessionColumnType,
         long sessionColumnId ) throws InvalidInputException, ProfileNotFoundException
     {
         Map<String, Long> hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( agentSettings );
-        long entityId = 0l;
-
+        
+        long viewAsEntityId = entityId;
+        
         if ( entityType.equals( CommonConstants.REGION_ID_COLUMN )
             && sessionColumnType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
-            entityId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
+        	viewAsEntityId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
         } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN )
             && sessionColumnType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
-            entityId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
+        	viewAsEntityId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
         } else if ( sessionColumnType.equals( CommonConstants.BRANCH_ID_COLUMN )
             && entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
-            entityId = reportingDashboardManagement.getRegionIdFromBranchId( sessionColumnId );
+        	viewAsEntityId = reportingDashboardManagement.getRegionIdFromBranchId( sessionColumnId );
         }
-        return entityId;
+        
+        return viewAsEntityId;
     }
 
 
@@ -733,8 +735,8 @@ public class ReportingWebController
         String sessionColumnType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
 
         AgentSettings agentSettings = userManagementService.getUserSettings( userId );
-        entityId = ( entityType == CommonConstants.COMPANY_ID_COLUMN ) ? entityId
-            : getEntityIdFromAgentSettings( agentSettings, entityType, sessionColumnType, sessionColumnId );
+        entityId = ( entityType.equals(sessionColumnType) ) ? entityId
+            : getEntityIdFromAgentSettings( agentSettings, entityType,entityId, sessionColumnType, sessionColumnId );
 
         response = getUserRankingRankCount( timeFrame, userId, entityId, entityType, month, year, batchSize );
         return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
@@ -825,8 +827,8 @@ public class ReportingWebController
         String sessionColumnType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
 
         AgentSettings agentSettings = userManagementService.getUserSettings( userId );
-        entityId = ( entityType == CommonConstants.COMPANY_ID_COLUMN ) ? entityId
-            : getEntityIdFromAgentSettings( agentSettings, entityType, sessionColumnType, sessionColumnId );
+        entityId = (entityType.equals(sessionColumnType)) ? entityId
+            : getEntityIdFromAgentSettings( agentSettings, entityType,entityId, sessionColumnType, sessionColumnId );
 
         response = getUserRankingCount( timeFrame, entityId, entityType, month, year, batchSize );
 
@@ -914,8 +916,8 @@ public class ReportingWebController
         String sessionColumnType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
 
         AgentSettings agentSettings = userManagementService.getUserSettings( userId );
-        entityId = ( entityType == CommonConstants.COMPANY_ID_COLUMN ) ? entityId
-            : getEntityIdFromAgentSettings( agentSettings, entityType, sessionColumnType, sessionColumnId );
+        entityId = ( entityType.equals(sessionColumnType) ) ? entityId
+            : getEntityIdFromAgentSettings( agentSettings, entityType,entityId, sessionColumnType, sessionColumnId );
 
         response = getUserRankingList( timeFrame, entityId, entityType, monthStr, year, startIndex, batchSize );
 
