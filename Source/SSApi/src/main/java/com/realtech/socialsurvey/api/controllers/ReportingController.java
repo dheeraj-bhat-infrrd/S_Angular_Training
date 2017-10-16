@@ -256,7 +256,7 @@ public class ReportingController
     
     @RequestMapping( value = "/getmaxquestionforcompany", method= RequestMethod.GET)
     @ApiOperation( value = "Fetch Max Question For Company Report For Reporting")
-    public int getCompanyMaxQuestion(Long companyId, Timestamp startDate, Timestamp endDate) throws NonFatalException
+    public int getCompanyMaxQuestion(Long companyId, Timestamp startDate, Timestamp endDate) 
     {
         LOGGER.info( "Fetch Max Question For Company Report For Reporting");
         return reportingDashboardManagement.getMaxQuestionForSurveyCompanyReport( companyId, startDate, endDate );
@@ -264,7 +264,7 @@ public class ReportingController
     
     @RequestMapping( value = "/getsurveyresultscompanyreportsforreporting", method= RequestMethod.GET)
     @ApiOperation( value = "Fetch Survey Results Company Report For Reporting")
-    public String getSurveyResultsCompany(Long companyId, Timestamp startDate, Timestamp endDate , int startIndex , int batchSize) throws NonFatalException
+    public String getSurveyResultsCompany(Long companyId, Timestamp startDate, Timestamp endDate , int startIndex , int batchSize)
     {
         LOGGER.info( "Fetch Survey Results Company Report For Reporting");
         Map<String,SurveyResultsCompanyReport> surveyResultsCompanyList = reportingDashboardManagement.getSurveyResultsCompanyReport(companyId,startDate,endDate,startIndex,batchSize);
@@ -274,7 +274,7 @@ public class ReportingController
 
     @RequestMapping( value = "/getcompanyuserreportsforreporting", method = RequestMethod.GET)
     @ApiOperation ( value = "Fetch Company User Report For Reporting ")
-    public String getCompanyUserReport( Long entityId, String entityType ) throws NonFatalException 
+    public String getCompanyUserReport( Long entityId, String entityType ) 
     {
         LOGGER.info( "Fetch User Adoption Report For Reporting" );
         

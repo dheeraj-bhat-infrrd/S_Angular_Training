@@ -51,7 +51,7 @@ public class SurveyResultsCompanyReport implements Serializable {
 	private Timestamp surveyCompletedDate;
 
 	@Column(name = "TIME_INTERVAL")
-	private long timeInterval;
+	private Integer timeInterval;
 
 	@Column(name = "SURVEY_SOURCE")
 	private String surveySource;
@@ -93,7 +93,7 @@ public class SurveyResultsCompanyReport implements Serializable {
     private boolean isDeleted;
     
     @Transient
-    private List<SurveyResponseTable> SurveyResponseList;
+    private List<SurveyResponseTable> surveyResponseList;
   
 	public String getSurveyStatsReportId() {
 		return surveyStatsReportId;
@@ -175,11 +175,11 @@ public class SurveyResultsCompanyReport implements Serializable {
 		this.surveyCompletedDate = surveyCompletedDate;
 	}
 
-	public long getTimeInterval() {
+	public Integer getTimeInterval() {
 		return timeInterval;
 	}
 
-	public void setTimeInterval(long timeInterval) {
+	public void setTimeInterval(Integer timeInterval) {
 		this.timeInterval = timeInterval;
 	}
 
@@ -287,14 +287,15 @@ public class SurveyResultsCompanyReport implements Serializable {
 		this.isDeleted = isDeleted;
 	}
 
+   
     public List<SurveyResponseTable> getSurveyResponseList()
     {
-        return SurveyResponseList;
+        return surveyResponseList;
     }
 
     public void setSurveyResponseList( List<SurveyResponseTable> surveyResponseList )
     {
-        SurveyResponseList = surveyResponseList;
+        this.surveyResponseList = surveyResponseList;
     }
 
     @Override
@@ -309,7 +310,7 @@ public class SurveyResultsCompanyReport implements Serializable {
             + agreedToShare + ", branchName=" + branchName + ", clickTroughForCompany=" + clickTroughForCompany
             + ", clickTroughForAgent=" + clickTroughForAgent + ", clickTroughForRegion=" + clickTroughForRegion
             + ", clickTroughForBranch=" + clickTroughForBranch + ", reportModifiedOn=" + reportModifiedOn + ", isDeleted="
-            + isDeleted + ", SurveyResponseList=" + SurveyResponseList + "]";
+            + isDeleted + ", SurveyResponseList=" + surveyResponseList + "]";
     }
 
 	

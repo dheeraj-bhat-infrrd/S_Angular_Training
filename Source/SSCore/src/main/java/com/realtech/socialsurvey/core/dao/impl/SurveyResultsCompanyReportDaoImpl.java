@@ -69,7 +69,7 @@ public class SurveyResultsCompanyReportDaoImpl extends GenericReportingDaoImpl<S
 	    @Transactional(value = "transactionManagerForReporting")
 	    public Map<String, SurveyResultsCompanyReport> getSurveyResultForCompanyId( long companyId , Timestamp startDate , Timestamp endDate , int startIndex , int batchSize)
 	    {
-	        LOG.debug( "Method getSurveyResultForCompanyId started for CompanyId : " + companyId );
+	        LOG.debug( "Method getSurveyResultForCompanyId started for CompanyId : {}"  ,companyId );
 	        Query query = null ;
 	        try{
 	            if(startDate != null && endDate != null){
@@ -97,13 +97,13 @@ public class SurveyResultsCompanyReportDaoImpl extends GenericReportingDaoImpl<S
 	            query.setParameter( 0, companyId );
 	            LOG.debug( "QUERY : " + query.getQueryString() );
 	            List<Object[]> rows = (List<Object[]>) query.list();
-	            Map<String,SurveyResultsCompanyReport> surveyResultMap = new HashMap<String, SurveyResultsCompanyReport>();
+	            Map<String,SurveyResultsCompanyReport> surveyResultMap = new HashMap<>();
 	            
 	            //map the answer to the survey details id 
 	            for ( Object[] row : rows ) {
-	                SurveyResponseTable SurveyResponseTable = new SurveyResponseTable();
-	                SurveyResponseTable.setAnswer( String.valueOf( row[1] )  );
-	                List<SurveyResponseTable> surveyResponseList = new ArrayList<SurveyResponseTable>();
+	                SurveyResponseTable surveyResponseTable = new SurveyResponseTable();
+	                surveyResponseTable.setAnswer( String.valueOf( row[1] )  );
+	                List<SurveyResponseTable> surveyResponseList = new ArrayList<>();
 	                SurveyResultsCompanyReport surveyResultsCompanyReport = null;
 	                String surveyDetailsId = String.valueOf( row[0] );
 	                  
@@ -111,12 +111,12 @@ public class SurveyResultsCompanyReportDaoImpl extends GenericReportingDaoImpl<S
 	                if(surveyResultMap.get( surveyDetailsId ) != null){
 	                    surveyResultsCompanyReport = surveyResultMap.get( surveyDetailsId );
 	                    surveyResponseList = surveyResultsCompanyReport.getSurveyResponseList();
-	                    surveyResponseList.add( SurveyResponseTable );
+	                    surveyResponseList.add( surveyResponseTable );
 	                    surveyResultsCompanyReport.setSurveyResponseList( surveyResponseList );
 
 	                }else{
 	                    surveyResultsCompanyReport = new SurveyResultsCompanyReport();
-	                    surveyResponseList.add( SurveyResponseTable );
+	                    surveyResponseList.add( surveyResponseTable );
 	                    surveyResultsCompanyReport.setSurveyResponseList( surveyResponseList );
 	                    surveyResultsCompanyReport.setSurveyDetailsId( String.valueOf( row[0] ) );
 	                    surveyResultsCompanyReport.setUserFirstName( String.valueOf( row[2] ) );
