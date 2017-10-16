@@ -1681,7 +1681,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         Timestamp endDate ) throws ParseException
     {
         int startIndex = 0;
-        int batchSize = 2;
+        int batchSize = CommonConstants.BATCH_SIZE;
         int maxQuestion = 0;
         int enterNext = 1;
         Response maxQuestResponse = ssApiBatchIntergrationBuilder.getIntegrationApi().getCompanyMaxQuestion( entityId, startDate, endDate );
