@@ -137,6 +137,9 @@ public interface CommonConstants
 
     public static final int IS_PRIMARY_FALSE = 0;
     public static final int IS_PRIMARY_TRUE = 1;
+    
+    //Reporting batch size 
+    public static final int BATCH_SIZE = 5000;
 
     // Survey pre initiation deleted as part company deletion, status is set to 11.
     public static final int SURVEY_STATUS_PRE_INITIATED = 1;
