@@ -1380,28 +1380,28 @@
         <update>N</update>
       </value>
       <value>
+        <name>QUESTION_ID</name>
+        <rename>QUESTION_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>QUESTION</name>
+        <rename>QUESTION</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>QUESTION_TYPE</name>
+        <rename>QUESTION_TYPE</rename>
+        <update>Y</update>
+      </value>
+      <value>
         <name>ANSWER</name>
         <rename>ANSWER</rename>
         <update>Y</update>
       </value>
       <value>
-        <name>QUESTION</name>
-        <rename>QUESTION</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>QUESTION_TYPE</name>
-        <rename>QUESTION_TYPE</rename>
-        <update>N</update>
-      </value>
-      <value>
         <name>IS_USER_RANKING_QUESTION</name>
         <rename>IS_USER_RANKING_QUESTION</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>QUESTION_ID</name>
-        <rename>QUESTION_ID</rename>
         <update>Y</update>
       </value>
     </lookup>
