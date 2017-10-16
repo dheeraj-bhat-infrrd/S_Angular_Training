@@ -663,6 +663,26 @@ public class ReportingWebController
     }
 
 
+    private long getEntityIdFromAgentSettings( AgentSettings agentSettings, String entityType, String sessionColumnType,
+        long sessionColumnId ) throws InvalidInputException, ProfileNotFoundException
+    {
+        Map<String, Long> hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( agentSettings );
+        long entityId = 0l;
+
+        if ( entityType.equals( CommonConstants.REGION_ID_COLUMN )
+            && sessionColumnType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+            entityId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
+        } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN )
+            && sessionColumnType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+            entityId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
+        } else if ( sessionColumnType.equals( CommonConstants.BRANCH_ID_COLUMN )
+            && entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+            entityId = reportingDashboardManagement.getRegionIdFromBranchId( sessionColumnId );
+        }
+        return entityId;
+    }
+
+
     @ResponseBody
     @RequestMapping ( value = "/getuserrankingrankandcount", method = RequestMethod.GET)
     public String getUserRankingRankAndCount( Model model, HttpServletRequest request ) throws NonFatalException
@@ -713,20 +733,18 @@ public class ReportingWebController
         String sessionColumnType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
 
         AgentSettings agentSettings = userManagementService.getUserSettings( userId );
-        Map<String, Long> hierarchyMap = null;
-        hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( agentSettings );
-        
-        if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) && sessionColumnType.equals( CommonConstants.AGENT_ID_COLUMN )) {
-            entityId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
-            
-        } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) && sessionColumnType.equals( CommonConstants.AGENT_ID_COLUMN) ) {
-            entityId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );    
-        }
+        entityId = ( entityType == CommonConstants.COMPANY_ID_COLUMN ) ? entityId
+            : getEntityIdFromAgentSettings( agentSettings, entityType, sessionColumnType, sessionColumnId );
 
-        if ( sessionColumnType.equals( CommonConstants.BRANCH_ID_COLUMN ) && entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
-            entityId = reportingDashboardManagement.getRegionIdFromBranchId( sessionColumnId );
-        }
-        
+        response = getUserRankingRankCount( timeFrame, userId, entityId, entityType, month, year, batchSize );
+        return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+    }
+
+
+    private Response getUserRankingRankCount( int timeFrame, long userId, long entityId, String entityType, int month, int year,
+        int batchSize ) throws NonFatalException
+    {
+        Response response = null;
         switch ( timeFrame ) {
             case 1:
                 response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingRankCountForThisYear( userId, entityId,
@@ -751,10 +769,7 @@ public class ReportingWebController
             default:
                 throw new NonFatalException( "NonFatalException while getting User Ranking Count" );
         }
-
-        String responseString = null;
-        responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
-        return responseString;
+        return response;
     }
 
 
@@ -810,19 +825,19 @@ public class ReportingWebController
         String sessionColumnType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
 
         AgentSettings agentSettings = userManagementService.getUserSettings( userId );
-        Map<String, Long> hierarchyMap = null;
-        hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( agentSettings );
-       
-        if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) && sessionColumnType.equals( CommonConstants.AGENT_ID_COLUMN )) {
-            entityId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
-        } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) && sessionColumnType.equals( CommonConstants.AGENT_ID_COLUMN )) {
-            entityId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
-        }
+        entityId = ( entityType == CommonConstants.COMPANY_ID_COLUMN ) ? entityId
+            : getEntityIdFromAgentSettings( agentSettings, entityType, sessionColumnType, sessionColumnId );
 
-        if ( sessionColumnType.equals( CommonConstants.BRANCH_ID_COLUMN ) && entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
-            entityId = reportingDashboardManagement.getRegionIdFromBranchId( sessionColumnId );
-        }
+        response = getUserRankingCount( timeFrame, entityId, entityType, month, year, batchSize );
 
+        return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+    }
+
+
+    private Response getUserRankingCount( int timeFrame, long entityId, String entityType, int month, int year,
+        int batchSize ) throws NonFatalException
+    {
+        Response response = null;
         switch ( timeFrame ) {
             case 1:
                 response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingCountForThisYear( entityId, entityType,
@@ -847,10 +862,7 @@ public class ReportingWebController
             default:
                 throw new NonFatalException( "NonFatalException while getting User Ranking Count" );
         }
-
-        String responseString = null;
-        responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
-        return responseString;
+        return response;
     }
 
 
@@ -868,15 +880,14 @@ public class ReportingWebController
         String startIndexStr = request.getParameter( "startIndex" );
         String batchSizeStr = request.getParameter( BATCH_SIZE );
         String yearStr = request.getParameter( YEAR );
-        String monthStr = "";
+        String monthStr = request.getParameter( MONTH );
         int startIndex = 0;
         int batchSize = 11;
         int timeFrame = 1;
         long entityId = 0;
 
-        int year = ( Calendar.getInstance() ).get(Calendar.YEAR);
-        int month = 0;
-        
+        int year = ( Calendar.getInstance() ).get( Calendar.YEAR );
+
         Response response = null;
 
         if ( startIndexStr != null && !startIndexStr.isEmpty() ) {
@@ -903,31 +914,24 @@ public class ReportingWebController
         String sessionColumnType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
 
         AgentSettings agentSettings = userManagementService.getUserSettings( userId );
-        Map<String, Long> hierarchyMap = null;
-        hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( agentSettings );
-       
-        if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) && sessionColumnType.equals( CommonConstants.AGENT_ID_COLUMN)) {
-        	
-        	entityId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
-        	
-        } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) && sessionColumnType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
-            
-        	entityId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
-        	
-        }
+        entityId = ( entityType == CommonConstants.COMPANY_ID_COLUMN ) ? entityId
+            : getEntityIdFromAgentSettings( agentSettings, entityType, sessionColumnType, sessionColumnId );
 
-        if ( sessionColumnType.equals( CommonConstants.BRANCH_ID_COLUMN ) && entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
-            entityId = reportingDashboardManagement.getRegionIdFromBranchId( sessionColumnId );
-        }
+        response = getUserRankingList( timeFrame, entityId, entityType, monthStr, year, startIndex, batchSize );
 
+        return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+    }
+    
+    private Response getUserRankingList( int timeFrame, long entityId, String entityType, String monthStr, int year, int startIndex,
+        int batchSize ) throws NonFatalException{
+        Response response = null;
         switch ( timeFrame ) {
             case 1:
                 response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingForThisYear( entityId, entityType, year,
                     startIndex, batchSize );
                 break;
             case 2:
-                monthStr = request.getParameter( MONTH );
-                month = Integer.parseInt( monthStr );
+                int month = Integer.parseInt( monthStr );
                 response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingForThisMonth( entityId, entityType, month,
                     year, startIndex, batchSize );
                 break;
@@ -936,7 +940,6 @@ public class ReportingWebController
                     startIndex, batchSize );
                 break;
             case 4:
-                monthStr = request.getParameter( MONTH );
                 month = Integer.parseInt( monthStr );
                 response = ssApiIntergrationBuilder.getIntegrationApi().getUserRankingForPastMonth( entityId, entityType, month,
                     year, startIndex, batchSize );
@@ -948,11 +951,7 @@ public class ReportingWebController
             default:
                 throw new NonFatalException( "NonFatalException while choosing time frame for leaderboard" );
         }
-
-        String responseString = null;
-        responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
-        return responseString;
-
+        return response;
     }
 
 
