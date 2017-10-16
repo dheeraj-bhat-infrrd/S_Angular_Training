@@ -17,9 +17,7 @@
 
 --
 -- Table structure for table `company_avtive_users`
---
-
-use 
+-- 
 
 DROP TABLE IF EXISTS `company_avtive_users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -36,11 +34,6 @@ CREATE TABLE `company_avtive_users` (
 --
 -- Dumping data for table `company_avtive_users`
 --
-
-LOCK TABLES `company_avtive_users` WRITE;
-/*!40000 ALTER TABLE `company_avtive_users` DISABLE KEYS */;
-/*!40000 ALTER TABLE `company_avtive_users` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `company_source_count`
@@ -64,15 +57,6 @@ CREATE TABLE `company_source_count` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `company_source_count`
---
-
-LOCK TABLES `company_source_count` WRITE;
-/*!40000 ALTER TABLE `company_source_count` DISABLE KEYS */;
-INSERT INTO `company_source_count` VALUES ('3d8d30c5-9c41-11e7-b43b-d981e33dc632',0,'2017-09-18',1,0,0,0,0,0,NULL),('3d8d7ee6-9c41-11e7-b43b-d981e33dc632',7,'2017-09-18',0,1453,0,0,0,0,1460),('3d8dcd08-9c41-11e7-b43b-d981e33dc632',1246,'2017-09-18',7,0,0,0,0,0,7),('3d8e423b-9c41-11e7-b43b-d981e33dc632',1225,'2017-09-18',0,0,0,0,0,0,0),('3d8e694c-9c41-11e7-b43b-d981e33dc632',1241,'2017-09-18',0,0,0,0,0,0,0),('3d8e6951-9c41-11e7-b43b-d981e33dc632',1236,'2017-09-18',0,0,0,0,0,0,0),('3d8e69we-9c41-11e7-b43b-d981e33dc632',1246,'2017-09-19',0,4,0,0,0,0,4);
-/*!40000 ALTER TABLE `company_source_count` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `company_status_count`
@@ -99,15 +83,7 @@ CREATE TABLE `company_status_count` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `company_status_count`
---
 
-LOCK TABLES `company_status_count` WRITE;
-/*!40000 ALTER TABLE `company_status_count` DISABLE KEYS */;
-INSERT INTO `company_status_count` VALUES ('105d3138-9c57-11e7-b43b-d981e33dc632',0,'2017-09-18',0,1,0,0,0,0,1,0,0,0),('105d5849-9c57-11e7-b43b-d981e33dc632',7,'2017-09-18',5,1460,0,0,0,0,653,0,797,0),('105d7f5a-9c57-11e7-b43b-d981e33dc632',1225,'2017-09-18',2,2,0,0,0,0,0,0,0,0),('105da66b-9c57-11e7-b43b-d981e33dc632',1236,'2017-09-18',13,14,0,0,0,0,1,0,0,0),('105df48c-9c57-11e7-b43b-d981e33dc632',1241,'2017-09-18',2,2,0,0,0,0,0,0,0,0),('10cfc92d-9c57-11e7-b43b-d981e33dc632',1246,'2017-09-18',19,42,17,19,0,6,2,0,0,0);
-/*!40000 ALTER TABLE `company_status_count` ENABLE KEYS */;
-UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
