@@ -393,6 +393,16 @@
         <rename>MODIFIED_BY</rename>
         <update>Y</update>
       </value>
+      <value>
+        <name>CREATED_ON_EST</name>
+        <rename>CREATED_ON_EST</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>MODIFIED_ON_EST</name>
+        <rename>MODIFIED_ON_EST</rename>
+        <update>Y</update>
+      </value>
     </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>

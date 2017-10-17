@@ -1,9 +1,6 @@
 package com.realtech.socialsurvey.core.starter;
 
 import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 

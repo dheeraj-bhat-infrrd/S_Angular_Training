@@ -10,6 +10,7 @@ import java.lang.reflect.Type;
 import java.net.URLEncoder;
 import java.sql.Timestamp;
 import java.text.DateFormatSymbols;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -93,7 +94,6 @@ import com.realtech.socialsurvey.core.entities.ScoreStatsQuestionBranch;
 import com.realtech.socialsurvey.core.entities.ScoreStatsQuestionCompany;
 import com.realtech.socialsurvey.core.entities.ScoreStatsQuestionRegion;
 import com.realtech.socialsurvey.core.entities.ScoreStatsQuestionUser;
-import com.realtech.socialsurvey.core.entities.SurveyResponseTable;
 import com.realtech.socialsurvey.core.entities.SurveyResultsCompanyReport;
 import com.realtech.socialsurvey.core.entities.SurveyStatsReportBranch;
 import com.realtech.socialsurvey.core.entities.SurveyTransactionReport;
@@ -418,178 +418,25 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         return userAdoption;
 
     }
-
-
+    
     @Override
     @Transactional ( value = "transactionManagerForReporting")
-    public List<String> getSurveyResponseData( String surveyDetailsId )
-    {
-        List<String> surveyResponse = new ArrayList<>();
-        for ( SurveyResponseTable surveyResponseTable : surveyResponseTableDao
-            .fetchSurveyResponsesBySurveyDetailsId( surveyDetailsId ) ) {
-
-            surveyResponse.add( surveyResponseTable.getAnswer() );
-        }
-        return surveyResponse;
+    public int getMaxQuestionForSurveyCompanyReport( Long companyId, Timestamp startDate,
+        Timestamp endDate )
+    {    
+        LOG.info( "method getMaxQuestionForSurveyCompanyReport started for companyId: {}",companyId );
+        return surveyResponseTableDao.getMaxResponseForCompanyId( companyId, startDate, endDate );
     }
 
+    
 
     @Override
     @Transactional ( value = "transactionManagerForReporting")
-    public List<List<Object>> getSurveyResultsCompanyReport( Long entityId, String entityType, Timestamp startDate,
-        Timestamp endDate )
+    public Map<String,SurveyResultsCompanyReport> getSurveyResultsCompanyReport( Long companyId, Timestamp startDate,
+        Timestamp endDate , int startIndex , int batchSize)
     {
-
-        List<List<Object>> surveyResultsCompany = new ArrayList<>();
-        if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
-            Map<String, List<SurveyResponseTable>> surveyResponseMap = surveyResponseTableDao
-                .geSurveyResponseForCompanyId( entityId );
-            int maxQuestions = 0;
-
-            for ( SurveyResultsCompanyReport SurveyResultsCompanyReport : surveyResultsCompanyReportDao
-                .fetchSurveyResultsCompanyReportByCompanyId( entityId, startDate, endDate ) ) {
-                List<Object> surveyResultsCompanyReportList = new ArrayList<>();
-
-                if ( SurveyResultsCompanyReport.getUserFirstName() == null ) {
-                    surveyResultsCompanyReportList.add( "" );
-                } else {
-                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getUserFirstName() );
-                }
-
-                if ( SurveyResultsCompanyReport.getUserLastName() == null ) {
-                    surveyResultsCompanyReportList.add( "" );
-                } else {
-                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getUserLastName() );
-                }
-
-                if ( SurveyResultsCompanyReport.getCustomerFirstName() == null ) {
-                    surveyResultsCompanyReportList.add( "" );
-                } else {
-                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getCustomerFirstName() );
-                }
-
-                if ( SurveyResultsCompanyReport.getCustomerLastName() == null ) {
-                    surveyResultsCompanyReportList.add( "" );
-                } else {
-                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getCustomerLastName() );
-                }
-
-                if ( SurveyResultsCompanyReport.getSurveySentDate() == null ) {
-                    surveyResultsCompanyReportList.add( "" );
-                } else {
-                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getSurveySentDate() );
-                }
-
-                if ( SurveyResultsCompanyReport.getSurveyCompletedDate() == null ) {
-                    surveyResultsCompanyReportList.add( "" );
-                } else {
-                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getSurveyCompletedDate() );
-                }
-
-                surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getTimeInterval() );
-
-                if ( SurveyResultsCompanyReport.getSurveySource() == null ) {
-                    surveyResultsCompanyReportList.add( "" );
-                } else {
-                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getSurveySource() );
-                }
-
-                if ( SurveyResultsCompanyReport.getSurveySourceId() == null ) {
-                    surveyResultsCompanyReportList.add( "" );
-                } else {
-                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getSurveySourceId() );
-                }
-
-                surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getSurveyScore() );
-
-                String surveyDetailsId = SurveyResultsCompanyReport.getSurveyDetailsId();
-
-                int questionCounter = 0;
-                if ( surveyResponseMap.containsKey( surveyDetailsId ) ) {
-
-                    int surveyResponseSize = surveyResponseMap.get( surveyDetailsId ).size();
-                    if ( surveyResponseSize > 0 ) {
-                        questionCounter = surveyResponseSize;
-                        if ( questionCounter > maxQuestions ) {
-                            maxQuestions = questionCounter;
-                        }
-                    }
-
-                    surveyResultsCompanyReportList.add( questionCounter );
-
-                    for ( SurveyResponseTable surveyResponse : surveyResponseMap.get( surveyDetailsId ) ) {
-                        if ( surveyResponse.getAnswer() == null ) {
-                            surveyResultsCompanyReportList.add( "" );
-                        } else {
-                            surveyResultsCompanyReportList.add( surveyResponse.getAnswer() );
-                        }
-                    }
-                }
-
-
-                if ( questionCounter == 0 ) {
-                    surveyResultsCompanyReportList.add( "" );
-                }
-
-                if ( SurveyResultsCompanyReport.getGateway() == null ) {
-                    surveyResultsCompanyReportList.add( "" );
-                } else {
-                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getGateway() );
-                }
-
-                if ( SurveyResultsCompanyReport.getCustomerComments() == null ) {
-                    surveyResultsCompanyReportList.add( "" );
-                } else {
-                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getCustomerComments() );
-                }
-
-                if ( SurveyResultsCompanyReport.getAgreedToShare() == null ) {
-                    surveyResultsCompanyReportList.add( "" );
-                } else {
-                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getAgreedToShare() );
-                }
-
-                if ( SurveyResultsCompanyReport.getBranchName() == null ) {
-                    surveyResultsCompanyReportList.add( "" );
-                } else {
-                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getBranchName() );
-                }
-
-                if ( SurveyResultsCompanyReport.getClickTroughForCompany() == null ) {
-                    surveyResultsCompanyReportList.add( "" );
-                } else {
-                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getClickTroughForCompany() );
-                }
-
-                if ( SurveyResultsCompanyReport.getClickTroughForAgent() == null ) {
-                    surveyResultsCompanyReportList.add( "" );
-                } else {
-                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getClickTroughForAgent() );
-                }
-
-                if ( SurveyResultsCompanyReport.getClickTroughForRegion() == null ) {
-                    surveyResultsCompanyReportList.add( "" );
-                } else {
-                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getClickTroughForRegion() );
-                }
-
-                if ( SurveyResultsCompanyReport.getClickTroughForBranch() == null ) {
-                    surveyResultsCompanyReportList.add( "" );
-                } else {
-                    surveyResultsCompanyReportList.add( SurveyResultsCompanyReport.getClickTroughForBranch() );
-                }
-
-
-                surveyResultsCompany.add( surveyResultsCompanyReportList );
-
-            }
-            List<Object> maxQuestionList = new ArrayList<>();
-            maxQuestionList.add( "maxQuestions" );
-            maxQuestionList.add( maxQuestions );
-            surveyResultsCompany.add( maxQuestionList );
-        }
-
-        return surveyResultsCompany;
+        LOG.info( "method getSurveyResultsCompanyReport started for companyId: {} ",companyId );
+        return surveyResultsCompanyReportDao.getSurveyResultForCompanyId( companyId, startDate, endDate, startIndex, batchSize );
     }
 
 
@@ -1818,7 +1665,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
     @Override
     public String generateSurveyResultsCompanyForReporting( Long entityId, String entityType, Long userId, Timestamp startDate,
-        Timestamp endDate ) throws UnsupportedEncodingException, NonFatalException
+        Timestamp endDate ) throws UnsupportedEncodingException, NonFatalException, ParseException
     {
         User user = userManagementService.getUserByUserId( userId );
         String fileName = "Survey_Results_Company_Report" + entityType + "-" + user.getFirstName() + "_" + user.getLastName()
@@ -1831,27 +1678,61 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
     @SuppressWarnings ( "unchecked")
     public XSSFWorkbook downloadSurveyResultsCompanyForReporting( long entityId, String entityType, Timestamp startDate,
-        Timestamp endDate )
+        Timestamp endDate ) throws ParseException
     {
-        Response response = ssApiBatchIntergrationBuilder.getIntegrationApi().getSurveyResultsCompany( entityId, entityType,
-            startDate, endDate );
-        String responseString = response != null ? new String( ( (TypedByteArray) response.getBody() ).getBytes() ) : null;
-        //since the string has ""abc"" an extra quote
-        responseString = responseString.substring( 1, responseString.length() - 1 );
-        //Escape characters
-        responseString = StringEscapeUtils.unescapeJava( responseString );
-        List<List<String>> surveyResultsCompanyReport = null;
-        Type listType = new TypeToken<List<List<String>>>() {}.getType();
-        surveyResultsCompanyReport = (List<List<String>>) ( new Gson().fromJson( responseString, listType ) );
+        int startIndex = 0;
+        int batchSize = CommonConstants.BATCH_SIZE;
+        int maxQuestion = 0;
+        int enterNext = 1;
+        Response maxQuestResponse = ssApiBatchIntergrationBuilder.getIntegrationApi().getCompanyMaxQuestion( entityId, startDate, endDate );
+        String maxQuestResponseString = maxQuestResponse != null ? new String( ( (TypedByteArray) maxQuestResponse.getBody() ).getBytes() ) : null;
+        if(maxQuestResponseString != null){
+            maxQuestion = Integer.valueOf( maxQuestResponseString );
+        }
+             
+        //write the excel header first 
         Map<Integer, List<Object>> data = workbookData
-            .getSurveyResultsCompanyReportToBeWrittenInSheet( surveyResultsCompanyReport );
+            .writeSurveyResultsCompanyReportHeader( maxQuestion );
+        Map<String,SurveyResultsCompanyReport> surveyResultsCompanyReport = getSurveyResultResponse( entityId, startDate, endDate, startIndex, batchSize );
+        //create workbook data
         XSSFWorkbook workbook = workbookOperations.createWorkbook( data );
+
+        //if data is not empty write into the workbook which was created 
+        while( !surveyResultsCompanyReport.isEmpty() && surveyResultsCompanyReport != null){
+            enterNext = startIndex+1;
+            data = workbookData
+                .getSurveyResultsCompanyReportToBeWrittenInSheet( surveyResultsCompanyReport , maxQuestion , enterNext);
+            //keep workbook open to write data if it's not null
+            //use the created workbook when writing the header ans rewrite the same 
+            workbook = workbookOperations.writeToWorkbook( data , workbook , enterNext );
+            //calculate startIndex 
+            startIndex = startIndex + batchSize;
+            surveyResultsCompanyReport = getSurveyResultResponse( entityId, startDate, endDate, startIndex, batchSize );
+
+        }
+        
         XSSFSheet sheet = workbook.getSheetAt( 0 );
         this.makeRowBold( workbook, sheet.getRow( 0 ) );
         return workbook;
 
     }
 
+    public Map<String,SurveyResultsCompanyReport> getSurveyResultResponse(Long companyId, Timestamp startDate , Timestamp endDate , int startIndex , int batchSize){
+        Response response = ssApiBatchIntergrationBuilder.getIntegrationApi().getSurveyResultsCompany( companyId,
+            startDate, endDate , startIndex , batchSize );
+        String responseString = response != null ? new String( ( (TypedByteArray) response.getBody() ).getBytes() ) : null;
+        Map<String,SurveyResultsCompanyReport> surveyResultsCompanyReport = null;
+        if(responseString != null){
+            //since the string has ""abc"" an extra quote
+            responseString = responseString.substring( 1, responseString.length() - 1 );
+            //Escape characters
+            responseString = StringEscapeUtils.unescapeJava( responseString );
+            Type listType = new TypeToken<Map<String,SurveyResultsCompanyReport>>() {}.getType();
+            surveyResultsCompanyReport = new Gson().fromJson( responseString, listType ) ;
+
+        }
+        return surveyResultsCompanyReport;
+    }
 
     @Override
     public String generateSurveyTransactionForReporting( Long entityId, String entityType, Long userId, Timestamp startDate,
