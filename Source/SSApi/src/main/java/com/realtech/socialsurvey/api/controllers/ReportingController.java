@@ -14,13 +14,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
-import com.realtech.socialsurvey.api.utils.RestUtils;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.CompanyDigestRequestData;
 import com.realtech.socialsurvey.core.entities.OverviewBranch;
 import com.realtech.socialsurvey.core.entities.OverviewCompany;
 import com.realtech.socialsurvey.core.entities.OverviewRegion;
 import com.realtech.socialsurvey.core.entities.OverviewUser;
+import com.realtech.socialsurvey.core.entities.SurveyResultsCompanyReport;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.reportingmanagement.DashboardGraphManagement;
 import com.realtech.socialsurvey.core.services.reportingmanagement.OverviewManagement;
@@ -33,9 +33,6 @@ import com.wordnik.swagger.annotations.ApiOperation;
 public class ReportingController
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( ReportingController.class );
-
-    @Autowired
-    private RestUtils restUtils;
 
     @Autowired
     private DashboardGraphManagement dashboardGraphManagement;
@@ -72,6 +69,7 @@ public class ReportingController
 
     }
 
+    @SuppressWarnings ( "null")
     @RequestMapping( value = "/getspsfromoverview", method = RequestMethod.GET)
     @ApiOperation ( value = "Fetch Data for Overview ")
     public String getSpsStatsFromOverview( Long entityId, String entityType ) throws NonFatalException 
@@ -80,7 +78,6 @@ public class ReportingController
         
         String json = null;
         
-        List<Object> overview = new ArrayList<>();
         Map<String,Object> overview_map = new HashMap<String,Object>();
         if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN )) {
             OverviewUser overviewUser = overviewManagement.fetchOverviewUserDetails(entityId, entityType);
@@ -128,6 +125,7 @@ public class ReportingController
         return json; 
     }
     
+    @SuppressWarnings ( "null")
     @RequestMapping( value = "/getalltimefromoverview", method = RequestMethod.GET)
     @ApiOperation ( value = "Fetch Data for Overview ")
     public String getAllTimeDataOverview( Long entityId, String entityType ) throws NonFatalException 
@@ -136,7 +134,6 @@ public class ReportingController
         
         String json = null;
         
-        List<Object> overview = new ArrayList<>();
         Map<String,Object> overview_map = new HashMap<String,Object>();
         if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN )) {
             OverviewUser overviewUser = overviewManagement.fetchOverviewUserDetails(entityId, entityType); 
@@ -257,32 +254,27 @@ public class ReportingController
         return json;
     }
     
+    @RequestMapping( value = "/getmaxquestionforcompany", method= RequestMethod.GET)
+    @ApiOperation( value = "Fetch Max Question For Company Report For Reporting")
+    public int getCompanyMaxQuestion(Long companyId, Timestamp startDate, Timestamp endDate) 
+    {
+        LOGGER.info( "Fetch Max Question For Company Report For Reporting");
+        return reportingDashboardManagement.getMaxQuestionForSurveyCompanyReport( companyId, startDate, endDate );
+    }
+    
     @RequestMapping( value = "/getsurveyresultscompanyreportsforreporting", method= RequestMethod.GET)
     @ApiOperation( value = "Fetch Survey Results Company Report For Reporting")
-    public String getSurveyResultsCompany(Long entityId, String entityType, Timestamp startDate, Timestamp endDate) throws NonFatalException
+    public String getSurveyResultsCompany(Long companyId, Timestamp startDate, Timestamp endDate , int startIndex , int batchSize)
     {
         LOGGER.info( "Fetch Survey Results Company Report For Reporting");
-        String json = null;
-        List<List <Object>> surveyResultsCompanyList = reportingDashboardManagement.getSurveyResultsCompanyReport(entityId, entityType,startDate,endDate);
-        json = new Gson().toJson(surveyResultsCompanyList);
-        return json;
+        Map<String,SurveyResultsCompanyReport> surveyResultsCompanyList = reportingDashboardManagement.getSurveyResultsCompanyReport(companyId,startDate,endDate,startIndex,batchSize);
+        return new Gson().toJson(surveyResultsCompanyList);
     }
     
-    //Survey Response api for testing. Not being used anywhere else
-    @RequestMapping( value = "/getsurveyresponseforreporting", method= RequestMethod.GET)
-    @ApiOperation( value = "Fetch Survey Response For Reporting")
-    public String getSurveyResultsCompany(String surveyDetailsId) throws NonFatalException
-    {
-        LOGGER.info( "Fetch Survey Response For Reporting");
-        String json = null;
-        List<String> surveyResponseList = reportingDashboardManagement.getSurveyResponseData(surveyDetailsId);
-        json = new Gson().toJson(surveyResponseList);
-        return json;
-    }
-    
+
     @RequestMapping( value = "/getcompanyuserreportsforreporting", method = RequestMethod.GET)
     @ApiOperation ( value = "Fetch Company User Report For Reporting ")
-    public String getCompanyUserReport( Long entityId, String entityType ) throws NonFatalException 
+    public String getCompanyUserReport( Long entityId, String entityType ) 
     {
         LOGGER.info( "Fetch User Adoption Report For Reporting" );
         

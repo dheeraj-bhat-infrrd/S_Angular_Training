@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.entities;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
@@ -11,9 +12,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * Holds the company settings
  */
 @Document
-public class OrganizationUnitSettings
+public class OrganizationUnitSettings implements Serializable
 {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     @Id
     private String id;
     private long iden;

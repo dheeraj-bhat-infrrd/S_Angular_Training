@@ -2,19 +2,15 @@ package com.realtech.socialsurvey.core.entities;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name = "survey_results_company_report")
@@ -49,13 +45,13 @@ public class SurveyResultsCompanyReport implements Serializable {
 	private String customerLastName;
 
 	@Column(name = "SURVEY_SENT_DATE")
-	private Date surveySentDate;
+	private Timestamp surveySentDate;
 
 	@Column(name = "SURVEY_COMPLETED_DATE")
-	private Date surveyCompletedDate;
+	private Timestamp surveyCompletedDate;
 
 	@Column(name = "TIME_INTERVAL")
-	private long timeInterval;
+	private Integer timeInterval;
 
 	@Column(name = "SURVEY_SOURCE")
 	private String surveySource;
@@ -93,9 +89,11 @@ public class SurveyResultsCompanyReport implements Serializable {
 	@Column(name = "REPORT_MODIFIED_ON")
 	private Timestamp reportModifiedOn;
 	
-
     @Column(name = "IS_DELETED")
     private boolean isDeleted;
+    
+    @Transient
+    private List<SurveyResponseTable> surveyResponseList;
   
 	public String getSurveyStatsReportId() {
 		return surveyStatsReportId;
@@ -161,27 +159,27 @@ public class SurveyResultsCompanyReport implements Serializable {
 		this.customerLastName = customerLastName;
 	}
 
-	public Date getSurveySentDate() {
+	public Timestamp getSurveySentDate() {
 		return surveySentDate;
 	}
 
-	public void setSurveySentDate(Date surveySentDate) {
+	public void setSurveySentDate(Timestamp surveySentDate) {
 		this.surveySentDate = surveySentDate;
 	}
 
-	public Date getSurveyCompletedDate() {
+	public Timestamp getSurveyCompletedDate() {
 		return surveyCompletedDate;
 	}
 
-	public void setSurveyCompletedDate(Date surveyCompletedDate) {
+	public void setSurveyCompletedDate(Timestamp surveyCompletedDate) {
 		this.surveyCompletedDate = surveyCompletedDate;
 	}
 
-	public long getTimeInterval() {
+	public Integer getTimeInterval() {
 		return timeInterval;
 	}
 
-	public void setTimeInterval(long timeInterval) {
+	public void setTimeInterval(Integer timeInterval) {
 		this.timeInterval = timeInterval;
 	}
 
@@ -289,6 +287,17 @@ public class SurveyResultsCompanyReport implements Serializable {
 		this.isDeleted = isDeleted;
 	}
 
+   
+    public List<SurveyResponseTable> getSurveyResponseList()
+    {
+        return surveyResponseList;
+    }
+
+    public void setSurveyResponseList( List<SurveyResponseTable> surveyResponseList )
+    {
+        this.surveyResponseList = surveyResponseList;
+    }
+
     @Override
     public String toString()
     {
@@ -301,7 +310,7 @@ public class SurveyResultsCompanyReport implements Serializable {
             + agreedToShare + ", branchName=" + branchName + ", clickTroughForCompany=" + clickTroughForCompany
             + ", clickTroughForAgent=" + clickTroughForAgent + ", clickTroughForRegion=" + clickTroughForRegion
             + ", clickTroughForBranch=" + clickTroughForBranch + ", reportModifiedOn=" + reportModifiedOn + ", isDeleted="
-            + isDeleted + "]";
+            + isDeleted + ", SurveyResponseList=" + surveyResponseList + "]";
     }
 
 	
