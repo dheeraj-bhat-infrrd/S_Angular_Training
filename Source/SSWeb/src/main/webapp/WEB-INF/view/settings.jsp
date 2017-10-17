@@ -296,9 +296,9 @@ $(document).ready(function() {
 		$('#alw-ptnr-srvy-chk-box').addClass('bd-check-img-checked');
 	}
 	
-	/* if("${sendMonthlyDigestMail}" == "false" && "${isRealTechOrSSAdmin}" == "true"){
+	if("${sendMonthlyDigestMail}" == "false" && "${isRealTechOrSSAdmin}" == "true"){
 		$('#survey-mail-thrhld-chk-box').addClass('bd-check-img-checked');
-	} */
+	}
 	
 	var accountMasterId = "${accountMasterId}";
 	if (accountMasterId != 5) {
