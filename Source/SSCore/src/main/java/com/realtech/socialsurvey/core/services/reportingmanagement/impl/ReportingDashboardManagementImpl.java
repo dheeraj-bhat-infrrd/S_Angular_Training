@@ -1834,10 +1834,12 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             file = new File( fileDirectoryLocation + File.separator + fileName );
             if ( file.createNewFile() ) {
                 if ( LOG.isDebugEnabled() ) {
-                    LOG.debug( "File created at {}. File Name {}" + file.getAbsolutePath(), fileName );
+                    LOG.debug( "File created at {}. File Name {}", file.getAbsolutePath(), fileName );
                 }
                 fileOutput = new FileOutputStream( file );
+                LOG.debug( "Created file output stream to write into {}", fileName );
                 workbook.write( fileOutput );
+                LOG.debug( "Wrote into file {}", fileName );
                 excelCreated = true;
             } else {
                 excelCreated = false;
@@ -1851,6 +1853,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                     + URLEncoder.encode( fileName, "UTF-8" );
                 responseString = fileNameInS3;
                 LOG.debug( "returning the response string : {}", responseString );
+            }else{
+                LOG.warn( "Could not write into file {}", fileName );
             }
         } catch ( FileNotFoundException fe ) {
             LOG.error( "File not found exception while creating file {}", fileName, fe );
