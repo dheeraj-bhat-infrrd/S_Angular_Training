@@ -1745,7 +1745,7 @@ function paintProcSurveyGraph() {
 	
 	var internalData = [];
 	var nestedInternalData = [];
-	nestedInternalData.push(type, 'Total Transactions', 'API Transactions', 'Encompass Transactions', 'FTP Transactions');
+	nestedInternalData.push(type, 'Total Transactions', 'Completed Transactions', 'Sent Survey Invitations', 'Sent Survey Reminders');
 	internalData.push(nestedInternalData);
 	for (var itr = 0; itr < allTimeslots.length; itr++) {
 		nestedInternalData = [];
