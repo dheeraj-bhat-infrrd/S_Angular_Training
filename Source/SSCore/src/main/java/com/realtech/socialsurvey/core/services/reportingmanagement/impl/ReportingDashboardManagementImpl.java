@@ -1827,7 +1827,6 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             fileDirectoryLocation );
         boolean excelCreated = false;
         FileOutputStream fileOutput = null;
-        InputStream inputStream = null;
         File file = null;
         String responseString = null;
         try {
@@ -1869,9 +1868,6 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             try {
                 if ( fileOutput != null )
                     fileOutput.close();
-                if ( inputStream != null ) {
-                    inputStream.close();
-                }
             } catch ( IOException e ) {
                 LOG.error( "Exception caught while generating report " + fileName + ": " + e.getMessage() );
                 excelCreated = false;
