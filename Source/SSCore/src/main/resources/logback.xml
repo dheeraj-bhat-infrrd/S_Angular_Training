@@ -72,7 +72,7 @@ See here for more details: http://gordondickens.com/wordpress/2013/03/27/sawing-
 	
     <!-- <logger name="org.hibernate" level="debug"/> -->
    <!-- Uncomment and add your logger here: -->
-    <logger name="com.realtech.socialsurvey" level="DEBUG">
+    <logger name="com.realtech.socialsurvey" level="INFO">
         <appender-ref ref="logfile"/>        
     </logger>
     <logger name="org.hibernate.SQL">
@@ -81,7 +81,7 @@ See here for more details: http://gordondickens.com/wordpress/2013/03/27/sawing-
 	<logger name="com.realtech.socialsurvey.core.services.audit.impl" level="info" additivity="false">
 		<appender-ref ref="auditlog" />
 	</logger>
-    <root level="DEBUG">
+    <root level="INFO">
         <appender-ref ref="console"/>
     </root>
 </configuration>
