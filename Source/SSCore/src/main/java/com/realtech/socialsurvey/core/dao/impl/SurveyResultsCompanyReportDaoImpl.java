@@ -31,7 +31,7 @@ public class SurveyResultsCompanyReportDaoImpl extends GenericReportingDaoImpl<S
         "from (select srcr.SURVEY_DETAILS_ID,srcr.USER_FIRST_NAME,srcr.USER_LAST_NAME,srcr.CUSTOMER_FIRST_NAME,srcr.CUSTOMER_LAST_NAME,srcr.SURVEY_SENT_DATE,"+
         "srcr.SURVEY_COMPLETED_DATE,srcr.TIME_INTERVAL,srcr.SURVEY_SOURCE,srcr.SURVEY_SOURCE_ID,srcr.SURVEY_SCORE,srcr.GATEWAY,srcr.CUSTOMER_COMMENTS,"+
         "srcr.AGREED_TO_SHARE,srcr.BRANCH_NAME,srcr.CLICK_THROUGH_FOR_COMPANY,srcr.CLICK_THROUGH_FOR_AGENT,srcr.CLICK_THROUGH_FOR_REGION,srcr.CLICK_THROUGH_FOR_BRANCH "+
-        "from survey_results_company_report srcr where srcr.COMPANY_ID = ? limit ?,?) as ab "+
+        "from survey_results_company_report srcr where srcr.COMPANY_ID = ? and srcr.IS_DELETED = 0 limit ?,?) as ab "+
         "left outer join survey_response sr on ab.SURVEY_DETAILS_ID = sr.SURVEY_DETAILS_ID "+
         "order by sr.SURVEY_DETAILS_ID, sr.QUESTION_ID ";
     
@@ -41,7 +41,7 @@ public class SurveyResultsCompanyReportDaoImpl extends GenericReportingDaoImpl<S
         "ab.CLICK_THROUGH_FOR_BRANCH from (select "+ "srcr.SURVEY_DETAILS_ID,srcr.USER_FIRST_NAME,srcr.USER_LAST_NAME,srcr.CUSTOMER_FIRST_NAME,srcr.CUSTOMER_LAST_NAME,srcr.SURVEY_SENT_DATE,"+
         "srcr.SURVEY_COMPLETED_DATE,srcr.TIME_INTERVAL,srcr.SURVEY_SOURCE,srcr.SURVEY_SOURCE_ID,srcr.SURVEY_SCORE,srcr.GATEWAY,srcr.CUSTOMER_COMMENTS,"+
         "srcr.AGREED_TO_SHARE,srcr.BRANCH_NAME,srcr.CLICK_THROUGH_FOR_COMPANY,srcr.CLICK_THROUGH_FOR_AGENT,srcr.CLICK_THROUGH_FOR_REGION,srcr.CLICK_THROUGH_FOR_BRANCH "+ 
-        "from survey_results_company_report srcr where srcr.COMPANY_ID = ? and srcr.SURVEY_COMPLETED_DATE >= ? limit ?,?) as ab left outer join "+ 
+        "from survey_results_company_report srcr where srcr.COMPANY_ID = ? and srcr.SURVEY_COMPLETED_DATE >= ? and srcr.IS_DELETED = 0 limit ?,?) as ab left outer join "+ 
         "survey_response sr on ab.SURVEY_DETAILS_ID = sr.SURVEY_DETAILS_ID order by sr.SURVEY_DETAILS_ID, sr.QUESTION_ID";
 
     private static final String getSurveyResultsByEndDateQuery = "select ab.SURVEY_DETAILS_ID,sr.answer,ab.USER_FIRST_NAME,ab.USER_LAST_NAME,ab.CUSTOMER_FIRST_NAME,ab.CUSTOMER_LAST_NAME,"+
@@ -50,7 +50,7 @@ public class SurveyResultsCompanyReportDaoImpl extends GenericReportingDaoImpl<S
             "ab.CLICK_THROUGH_FOR_BRANCH from (select "+ "srcr.SURVEY_DETAILS_ID,srcr.USER_FIRST_NAME,srcr.USER_LAST_NAME,srcr.CUSTOMER_FIRST_NAME,srcr.CUSTOMER_LAST_NAME,srcr.SURVEY_SENT_DATE,"+
             "srcr.SURVEY_COMPLETED_DATE,srcr.TIME_INTERVAL,srcr.SURVEY_SOURCE,srcr.SURVEY_SOURCE_ID,srcr.SURVEY_SCORE,srcr.GATEWAY,srcr.CUSTOMER_COMMENTS,"+
             "srcr.AGREED_TO_SHARE,srcr.BRANCH_NAME,srcr.CLICK_THROUGH_FOR_COMPANY,srcr.CLICK_THROUGH_FOR_AGENT,srcr.CLICK_THROUGH_FOR_REGION,srcr.CLICK_THROUGH_FOR_BRANCH "+ 
-            "from survey_results_company_report srcr where srcr.COMPANY_ID = ? and srcr.SURVEY_COMPLETED_DATE <= ? limit ?,?) as ab left outer join "+ 
+            "from survey_results_company_report srcr where srcr.COMPANY_ID = ? and srcr.SURVEY_COMPLETED_DATE <= ? and srcr.IS_DELETED = 0 limit ?,?) as ab left outer join "+ 
             "survey_response sr on ab.SURVEY_DETAILS_ID = sr.SURVEY_DETAILS_ID order by sr.SURVEY_DETAILS_ID, sr.QUESTION_ID";
     
     private static final String getSurveyResultsByStartAndEndDateQuery = "select ab.SURVEY_DETAILS_ID,sr.answer,ab.USER_FIRST_NAME,ab.USER_LAST_NAME,ab.CUSTOMER_FIRST_NAME,ab.CUSTOMER_LAST_NAME,"+
@@ -59,7 +59,7 @@ public class SurveyResultsCompanyReportDaoImpl extends GenericReportingDaoImpl<S
         "ab.CLICK_THROUGH_FOR_BRANCH from (select "+ "srcr.SURVEY_DETAILS_ID,srcr.USER_FIRST_NAME,srcr.USER_LAST_NAME,srcr.CUSTOMER_FIRST_NAME,srcr.CUSTOMER_LAST_NAME,srcr.SURVEY_SENT_DATE,"+
         "srcr.SURVEY_COMPLETED_DATE,srcr.TIME_INTERVAL,srcr.SURVEY_SOURCE,srcr.SURVEY_SOURCE_ID,srcr.SURVEY_SCORE,srcr.GATEWAY,srcr.CUSTOMER_COMMENTS,"+
         "srcr.AGREED_TO_SHARE,srcr.BRANCH_NAME,srcr.CLICK_THROUGH_FOR_COMPANY,srcr.CLICK_THROUGH_FOR_AGENT,srcr.CLICK_THROUGH_FOR_REGION,srcr.CLICK_THROUGH_FOR_BRANCH "+ 
-        "from survey_results_company_report srcr where srcr.COMPANY_ID = ? and srcr.SURVEY_COMPLETED_DATE >= ? and srcr.SURVEY_COMPLETED_DATE <= ? limit ?,?) as ab left outer join "+ 
+        "from survey_results_company_report srcr where srcr.COMPANY_ID = ? and srcr.SURVEY_COMPLETED_DATE >= ? and srcr.SURVEY_COMPLETED_DATE <= ? and srcr.IS_DELETED = 0 limit ?,?) as ab left outer join "+ 
         "survey_response sr on ab.SURVEY_DETAILS_ID = sr.SURVEY_DETAILS_ID order by sr.SURVEY_DETAILS_ID, sr.QUESTION_ID";
 
 	
