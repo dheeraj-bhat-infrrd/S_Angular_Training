@@ -2917,7 +2917,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         digestAggregate.setDigestList( new ArrayList<DigestTemplateData>() );
 
         // start populating with appropriate data for the Digest template
-        initializeAndPopulateDigestTemplateData( digestAggregate, digestList );
+        initializeAndPopulateDigestTemplateData( digestAggregate, digestList, monthUnderConcern );
 
         // create and add the Digest Dependent Data in HTML format
         constructAndPopulateChangeIndicatorIconsAndConclusionTextsForDigest( digestAggregate, digestList );
@@ -2930,9 +2930,13 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     }
 
 
-    private void initializeAndPopulateDigestTemplateData( MonthlyDigestAggregate digestAggregate, List<Digest> digestList )
+    private void initializeAndPopulateDigestTemplateData( MonthlyDigestAggregate digestAggregate, List<Digest> digestList,
+        int monthUnderConcern )
     {
         if ( digestList != null && digestAggregate != null && digestList.get( 0 ) != null ) {
+
+            // get the month strings
+            List<String> months = buildMonthStringsForDigest( monthUnderConcern );
 
             // populate digest data for three months in total
             for ( int i = 0; i < 3; i++ ) {
@@ -2948,8 +2952,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 }
 
                 // populate DigestTemplateData with relevant values
-                templateData.setMonth( ( digest != null && digest.getMonth() > 0 && digest.getMonth() < 13 )
-                    ? new DateFormatSymbols().getMonths()[digest.getMonth() - 1] : CommonConstants.NOT_AVAILABLE );
+                templateData.setMonth( months.get( i ) );
                 templateData.setYear( ( digest != null && digest.getYear() != 0 ) ? String.valueOf( digest.getYear() )
                     : CommonConstants.NOT_AVAILABLE );
                 templateData.setAverageScoreRating(
@@ -2962,7 +2965,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 templateData.setTotalTransactions(
                     ( digest != null ) ? String.valueOf( digest.getTotalTransactions() ) : CommonConstants.NOT_AVAILABLE );
                 templateData.setSurveyCompletionRate( ( digest != null )
-                    ? String.format( "%.2f", digest.getSurveyCompletionRate() * 100 ) + "%" : CommonConstants.NOT_AVAILABLE );
+                    ? String.format( "%.2f", digest.getSurveyCompletionRate() ) + "%" : CommonConstants.NOT_AVAILABLE );
                 templateData.setSps(
                     ( digest != null ) ? String.valueOf( digest.getSps() > 0 ? "+" + digest.getSps() : digest.getSps() )
                         : CommonConstants.NOT_AVAILABLE );
@@ -3106,11 +3109,11 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         // building conclusion text for survey completion rate
         digestAggregate.setSurveyPercentageTxt( "Your survey completion rate "
             + ( surveyCompletionRate0 > surveyCompletionRate1
-                ? "has increased by " + "<b>" + String.format( "%.2f", ( surveyCompletionRate0 - surveyCompletionRate1 ) * 100 )
+                ? "has increased by " + "<b>" + String.format( "%.2f", ( surveyCompletionRate0 - surveyCompletionRate1 ) )
                     + "%</b>"
                 : ( surveyCompletionRate0 == surveyCompletionRate1 ? "did not change"
-                    : "has dropped by " + "<b>"
-                        + String.format( "%.2f", ( surveyCompletionRate1 - surveyCompletionRate0 ) * 100 ) + "%</b>" ) )
+                    : "has dropped by " + "<b>" + String.format( "%.2f", ( surveyCompletionRate1 - surveyCompletionRate0 ) )
+                        + "%</b>" ) )
             + " and your transaction count " + ( transcationCount0 > transcationCount1
                 ? "has increased by " + "<b>" + ( transcationCount0 - transcationCount1 ) + "</b>"
                 : ( transcationCount0 == transcationCount1 ? "did not change"
@@ -3178,12 +3181,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
     private String buildDisplayName( String firstName, String lastName )
     {
-        if ( StringUtils.isEmpty( firstName ) && StringUtils.isEmpty( lastName ) ) {
-            return CommonConstants.NOT_AVAILABLE;
+        if ( StringUtils.isNotEmpty( firstName ) ) {
+            return StringUtils.isNotEmpty( lastName ) ? firstName + " " + lastName : firstName;
         } else {
-            return StringUtils.isNotEmpty( firstName )
-                ? firstName + ( StringUtils.isNotEmpty( lastName ) ? " " + lastName : "" )
-                : ( StringUtils.isNotEmpty( lastName ) ? lastName : CommonConstants.NOT_AVAILABLE );
+            return StringUtils.isNotEmpty( lastName ) ? lastName : CommonConstants.NOT_AVAILABLE;
         }
     }
 
@@ -3344,6 +3345,26 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         return ( new Gson().fromJson( StringUtils.strip( responseString, "\"" ),
             new TypeToken<MonthlyDigestAggregate>() {}.getType() ) );
 
+    }
+
+
+    private List<String> buildMonthStringsForDigest( int monthUnderConcern )
+    {
+        List<String> monthStringsForDigest = new ArrayList<>( 3 );
+        if ( monthUnderConcern == 1 ) {
+            monthStringsForDigest.add( 0, new DateFormatSymbols().getMonths()[0] );
+            monthStringsForDigest.add( 1, new DateFormatSymbols().getMonths()[11] );
+            monthStringsForDigest.add( 2, new DateFormatSymbols().getMonths()[10] );
+        } else if ( monthUnderConcern == 2 ) {
+            monthStringsForDigest.add( 0, new DateFormatSymbols().getMonths()[1] );
+            monthStringsForDigest.add( 1, new DateFormatSymbols().getMonths()[0] );
+            monthStringsForDigest.add( 2, new DateFormatSymbols().getMonths()[11] );
+        } else {
+            monthStringsForDigest.add( 0, new DateFormatSymbols().getMonths()[monthUnderConcern - 1] );
+            monthStringsForDigest.add( 1, new DateFormatSymbols().getMonths()[monthUnderConcern - 2] );
+            monthStringsForDigest.add( 2, new DateFormatSymbols().getMonths()[monthUnderConcern - 3] );
+        }
+        return monthStringsForDigest;
     }
 
 }
