@@ -2438,8 +2438,8 @@ function searchCompany(searchKeyword, flow) {
 			} else if (flow == 'transactions') {
 				$('#trans-srch-res').removeClass('dsh-sb-dd');
 				$('#trans-sel-item').val($(this).html()).attr('data-prev-val', "");
-				lastColNameForGraphProcSurvey = columnName;
-				lastColValueForGraphProcSurvey = value;
+				lastColNameForGraphTrans = columnName;
+				lastColValueForGraphTrans = value;
 				showTransactionStatisticsGraphically(columnName, value);
 			}else if (flow == 'procSurvey') {
 				$('#proc-sur-srch-res').removeClass('dsh-sb-dd');
