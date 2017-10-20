@@ -76,33 +76,6 @@
   <notepads>
   </notepads>
   <connection>
-    <name>Local instance MySQL57</name>
-    <server>&#x24;&#x7b;mysql_host &#x7d;</server>
-    <type>MYSQL</type>
-    <access>Native</access>
-    <database>&#x24;&#x7b;mysql_schema_name &#x7d;</database>
-    <port>&#x24;&#x7b;mysql_port_no &#x7d;</port>
-    <username>&#x24;&#x7b;mysql_user_name&#x7d;</username>
-    <password>&#x24;&#x7b;mysql_password &#x7d;</password>
-    <servername/>
-    <data_tablespace/>
-    <index_tablespace/>
-    <attributes>
-      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
-      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
-      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
-      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
-      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;mysql_port_no &#x7d;</attribute></attribute>
-      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
-      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
-      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
-      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
-      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
-      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
-    </attributes>
-  </connection>
-  <connection>
     <name>SS_Centralized_Mysql_Conn</name>
     <server>&#x24;&#x7b;CENTRALIZED_MYSQL_HOST&#x7d;</server>
     <type>MYSQL</type>
@@ -115,39 +88,13 @@
     <data_tablespace/>
     <index_tablespace/>
     <attributes>
-      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCompression</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useServerPrepStmts</code><attribute>false</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
       <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;CENTRALIZED_MYSQL_PORT&#x7d;</attribute></attribute>
-      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
-      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
-      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
-      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
-      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
-      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
-    </attributes>
-  </connection>
-  <connection>
-    <name>SS_INFO_CONNECTION</name>
-    <server>&#x24;&#x7b;mysql_host&#x7d;</server>
-    <type>MYSQL</type>
-    <access>Native</access>
-    <database>&#x24;&#x7b;mysql_master_schema_name&#x7d;</database>
-    <port>&#x24;&#x7b;mysql_port_no&#x7d;</port>
-    <username>&#x24;&#x7b;mysql_user_name&#x7d;</username>
-    <password>&#x24;&#x7b;mysql_password&#x7d;</password>
-    <servername/>
-    <data_tablespace/>
-    <index_tablespace/>
-    <attributes>
-      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
-      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
-      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
-      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
-      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;mysql_port_no&#x7d;</attribute></attribute>
       <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
       <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
       <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
@@ -620,7 +567,7 @@
     <compare>
 <condition>
  <negated>N</negated>
- <leftvalue>MonthString_1</leftvalue>
+ <leftvalue>MONTH_Data</leftvalue>
  <function>&#x3c;</function>
  <rightvalue>PRESENT_MONTH_CHECK</rightvalue>
  </condition>
@@ -966,18 +913,6 @@
           <valuefield/>
         </field>
         <field>
-          <aggregate>YearString</aggregate>
-          <subject>YearString</subject>
-          <type>FIRST</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>MonthString</aggregate>
-          <subject>MonthString</subject>
-          <type>FIRST</type>
-          <valuefield/>
-        </field>
-        <field>
           <aggregate>EMAIL_ID</aggregate>
           <subject>EMAIL_ID</subject>
           <type>FIRST</type>
@@ -1055,18 +990,6 @@
         <field>
           <aggregate>PRESENT_MONTH</aggregate>
           <subject>PRESENT_MONTH</subject>
-          <type>FIRST</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>YearString</aggregate>
-          <subject>YearString</subject>
-          <type>FIRST</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>MonthString</aggregate>
-          <subject>MonthString</subject>
           <type>FIRST</type>
           <valuefield/>
         </field>
@@ -1176,15 +1099,15 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;function LastDayOfMonth&#x28;Year, Month&#x29; &#x7b;&#xd;&#xa;    return new Date&#x28; &#x28;new Date&#x28;Year, Month,1&#x29;&#x29;-1 &#x29;&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var YearString &#x3d; month_row.substring&#x28;0,4&#x29;&#x3b;&#xd;&#xa;var MonthString &#x3d; month_row.substring&#x28;5,7&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;var LastDayOfMonthString &#x3d; LastDayOfMonth&#x28;YearString, MonthString&#x29;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>YearString</name>
-        <rename>YearString</rename>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;function LastDayOfMonth&#x28;Year, Month&#x29; &#x7b;&#xd;&#xa;    return new Date&#x28; &#x28;new Date&#x28;Year, Month,1&#x29;&#x29;-1 &#x29;&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var Year_Data &#x3d; month_row.substring&#x28;0,4&#x29;&#x3b;&#xd;&#xa;var MONTH_DATA &#x3d; month_row.substring&#x28;5,7&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;var LastDayOfMonthString &#x3d; LastDayOfMonth&#x28;Year_Data ,  MONTH_DATA &#x29;&#xd;&#xa;&#xd;&#xa;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>Year_Data</name>
+        <rename>Year_Data</rename>
         <type>String</type>
         <length>-1</length>
         <precision>-1</precision>
         <replace>N</replace>
-      </field>      <field>        <name>MonthString</name>
-        <rename>MonthString</rename>
+      </field>      <field>        <name>MONTH_DATA</name>
+        <rename>MONTH_DATA</rename>
         <type>String</type>
         <length>-1</length>
         <precision>-1</precision>
@@ -1392,7 +1315,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var complete_percentage &#x3d; 0&#x3b;&#xd;&#xa;var total_sent &#x3d; Sent &#x2b; Completed&#xd;&#xa;if&#x28;total_sent &#x21;&#x3d; 0 &#x26;&#x26; total_sent  &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;		complete_percentage &#x3d; &#x28;Completed&#x2f;total_sent &#x29;&#x2a;100.00&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var AGENT_ID_temp &#x3d; 0&#xd;&#xa;&#xd;&#xa;if&#x28;AGENT_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	AGENT_ID_temp &#x3d; AGENT_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	AGENT_ID_temp  &#x3d; AGENT_ID_1&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var COMPANY_ID&#xd;&#xa;&#xd;&#xa;if&#x28;COMPANY_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	COMPANY_ID_temp &#x3d; COMPANY_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;COMPANY_ID_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	COMPANY_ID_temp  &#x3d; COMPANY_ID_1&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var first_name&#xd;&#xa;&#xd;&#xa;if&#x28;first_name &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  first_name &#x3d; first_name&#x3b;&#xd;&#xa;&#x7d;else if&#x28;first_name_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  first_name &#x3d; first_name_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var last_name&#xd;&#xa;&#xd;&#xa;if&#x28;last_name &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  last_name &#x3d; last_name&#x3b;&#xd;&#xa;&#x7d;else if&#x28;last_name_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  last_name &#x3d; last_name_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var MONTH_Data&#xd;&#xa;&#xd;&#xa;if&#x28;MONTH_Data&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa; MONTH_Data &#x3d; MONTH_Data&#x3b;&#xd;&#xa;&#x7d;else if&#x28;MONTH_DATA_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  MONTH_Data &#x3d;MONTH_DATA_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var Year_Data&#xd;&#xa;&#xd;&#xa;if&#x28;Year_Data &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa; Year_Data &#x3d; Year_Data&#x3b;&#xd;&#xa;&#x7d;else if&#x28;Year_Data_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  Year_Data &#x3d; Year_Data_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var days_of_registration&#xd;&#xa;&#xd;&#xa;if&#x28;days_of_registration &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa; days_of_registration &#x3d; days_of_registration&#x3b;&#xd;&#xa;&#x7d;else if&#x28;days_of_registration_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  days_of_registration &#x3d; days_of_registration_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var MonthString&#xd;&#xa;&#xd;&#xa;if&#x28;MonthString &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa; MonthString &#x3d; MonthString&#x3b;&#xd;&#xa;&#x7d;else if&#x28;MonthString_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  MonthString &#x3d; MonthString_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var YearString&#xd;&#xa;&#xd;&#xa;if&#x28;YearString &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;YearString &#x3d; YearString&#x3b;&#xd;&#xa;&#x7d;else if&#x28;YearString_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  YearString&#x3d; YearString_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var EMAIL_ID&#xd;&#xa;&#xd;&#xa;if&#x28;EMAIL_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;EMAIL_ID &#x3d; EMAIL_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;EMAIL_ID_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  EMAIL_ID&#x3d; EMAIL_ID_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var complete_percentage &#x3d; 0&#x3b;&#xd;&#xa;var total_sent &#x3d; Sent &#x2b; Completed&#xd;&#xa;if&#x28;total_sent &#x21;&#x3d; 0 &#x26;&#x26; total_sent  &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;		complete_percentage &#x3d; &#x28;Completed&#x2f;total_sent &#x29;&#x2a;100.00&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var AGENT_ID_temp &#x3d; 0&#xd;&#xa;&#xd;&#xa;if&#x28;AGENT_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	AGENT_ID_temp &#x3d; AGENT_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	AGENT_ID_temp  &#x3d; AGENT_ID_1&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var COMPANY_ID&#xd;&#xa;&#xd;&#xa;if&#x28;COMPANY_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	COMPANY_ID_temp &#x3d; COMPANY_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;COMPANY_ID_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	COMPANY_ID_temp  &#x3d; COMPANY_ID_1&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var first_name&#xd;&#xa;&#xd;&#xa;if&#x28;first_name &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  first_name &#x3d; first_name&#x3b;&#xd;&#xa;&#x7d;else if&#x28;first_name_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  first_name &#x3d; first_name_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var last_name&#xd;&#xa;&#xd;&#xa;if&#x28;last_name &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  last_name &#x3d; last_name&#x3b;&#xd;&#xa;&#x7d;else if&#x28;last_name_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  last_name &#x3d; last_name_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var MONTH_Data&#xd;&#xa;&#xd;&#xa;if&#x28;MONTH_Data&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa; MONTH_Data &#x3d; MONTH_Data&#x3b;&#xd;&#xa;&#x7d;else if&#x28;MONTH_DATA_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  MONTH_Data &#x3d;MONTH_DATA_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var Year_Data&#xd;&#xa;&#xd;&#xa;if&#x28;Year_Data &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa; Year_Data &#x3d; Year_Data&#x3b;&#xd;&#xa;&#x7d;else if&#x28;Year_Data_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  Year_Data &#x3d; Year_Data_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var days_of_registration&#xd;&#xa;&#xd;&#xa;if&#x28;days_of_registration &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa; days_of_registration &#x3d; days_of_registration&#x3b;&#xd;&#xa;&#x7d;else if&#x28;days_of_registration_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  days_of_registration &#x3d; days_of_registration_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var EMAIL_ID&#xd;&#xa;&#xd;&#xa;if&#x28;EMAIL_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;EMAIL_ID &#x3d; EMAIL_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;EMAIL_ID_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  EMAIL_ID&#x3d; EMAIL_ID_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>complete_percentage</name>
         <rename>complete_percentage</rename>
         <type>Number</type>
@@ -1443,18 +1366,6 @@
         <replace>Y</replace>
       </field>      <field>        <name>days_of_registration</name>
         <rename>days_of_registration</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>MonthString</name>
-        <rename>MonthString</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>YearString</name>
-        <rename>YearString</rename>
         <type>String</type>
         <length>-1</length>
         <precision>-1</precision>
@@ -1517,6 +1428,35 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>185</xloc>
       <yloc>24</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Multiway Merge Join</name>
+    <type>MultiwayMergeJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <join_type>FULL OUTER</join_type>
+    <step0>Sort rows 2</step0>
+    <step1>Sort rows 2 2</step1>
+    <step2>Sort rows 2 3</step2>
+    <number_input>3</number_input>
+    <keys>
+      <key>AGENT_ID_temp,MONTH_Data,Year_Data</key>
+      <key>AGENT_ID,MONTH_Data,Year_Data</key>
+      <key>AGENT_ID,MONTH_Data,Year_Data</key>
+    </keys>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1450</xloc>
+      <yloc>335</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1642,14 +1582,6 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
-      </field>      <field>        <name>MonthString</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>MonthString_1</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
       </field>      <field>        <name>PRESENT_MONTH</name>
         <rename/>
         <length>-2</length>
@@ -1675,14 +1607,6 @@
         <length>-2</length>
         <precision>-2</precision>
       </field>      <field>        <name>TRX_MONTH_2</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>YearString</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>YearString_1</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
@@ -1751,22 +1675,7 @@
         <length>-2</length>
         <precision>-2</precision>
       </field>        <select_unspecified>N</select_unspecified>
-      <meta>        <name>MonthString_1</name>
-        <rename>MonthString_1</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>complete_percentage</name>
+      <meta>        <name>complete_percentage</name>
         <rename>complete_percentage</rename>
         <type>Number</type>
         <length>-2</length>
@@ -2966,7 +2875,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  USER_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, FIRST_NAME&#xd;&#xa;, LAST_NAME&#xd;&#xa;,EMAIL_ID&#xd;&#xa;, CREATED_ON_EST&#xd;&#xa;, CREATED_ON&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;m&#x27;&#x29; AS MONTH_DATA&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;Y_&#x25;m&#x27;&#x29; AS TRX_MONTH&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;Y&#x27;&#x29; AS Year_Data&#xd;&#xa;FROM users&#xd;&#xa;where status in &#x28;1,2&#x29;&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  USER_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, FIRST_NAME&#xd;&#xa;, LAST_NAME&#xd;&#xa;,EMAIL_ID&#xd;&#xa;, CREATED_ON_EST&#xd;&#xa;, CREATED_ON&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;m&#x27;&#x29; AS USER_MONTH_DATA&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;Y_&#x25;m&#x27;&#x29; AS TRX_MONTH&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;Y&#x27;&#x29; AS USER_Year_Data&#xd;&#xa;FROM users&#xd;&#xa;where status in &#x28;1,2&#x29;&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -3091,7 +3000,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var  month_arr &#x3d; &#x5b;&#x5d;&#x3b;&#xd;&#xa;var Start_Month &#x3d; 01&#x3b;&#xd;&#xa;var End_Month &#x3d;  12  &#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;USER_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var index&#x3d;0&#x3b;&#xd;&#xa;   for&#x28;var year_val &#x3d; Year_Data  &#x3b;  year_val &#x3c;&#x3d;  PRESENT_YEAR &#x3b; year_val&#x2b;&#x2b;&#x29;&#x7b;&#xd;&#xa;	if&#x28; &#x28;PRESENT_YEAR - Year_Data&#x29; &#x3d;&#x3d;&#x3d; 0 &#x29;&#x7b;&#xd;&#xa;		Start_Month &#x3d; MONTH_DATA&#x3b;&#xd;&#xa;		End_Month &#x3d; PRESENT_MONTH&#x3b;&#xd;&#xa;	&#x7d;else if&#x28; &#x28;PRESENT_YEAR - Year_Data&#x29; &#x3e; 0 &#x29;&#x7b;&#xd;&#xa;		if&#x28;year_val &#x3e; Year_Data &#x26;&#x26; year_val  &#x3d;&#x3d; PRESENT_YEAR  &#x29;&#x7b;&#xd;&#xa;			Start_Month &#x3d; 01&#x3b;&#xd;&#xa;			End_Month &#x3d; PRESENT_MONTH &#x3b;&#xd;&#xa;		&#x7d;else if&#x28;year_val &#x3d;&#x3d;&#x3d; Year_Data &#x26;&#x26;  year_val &#x3c; PRESENT_YEAR &#x29;&#x7b;&#xd;&#xa;			Start_Month &#x3d; MONTH_DATA&#x3b;&#xd;&#xa;			End_Month &#x3d; 12&#x3b;&#xd;&#xa;		&#x7d;else if&#x28;year_val &#x3e; Year_Data &#x26;&#x26; year_val &#x3c; PRESENT_YEAR  &#x29;&#x7b;&#xd;&#xa;			Start_Month &#x3d; 01&#x3b;&#xd;&#xa;			End_Month &#x3d; 12&#x3b;&#xd;&#xa;		&#x7d;&#xd;&#xa;	&#x7d;&#xd;&#xa;	for&#x28;var month_val &#x3d; Start_Month  &#x3b;  month_val&#x3c;&#x3d; End_Month &#x3b; month_val&#x2b;&#x2b;&#x29;&#x7b;&#xd;&#xa;		if&#x28;month_val.toString&#x28;&#x29;.length &#x3c; 2&#x29;&#x7b;&#xd;&#xa;					 month_arr&#x5b;index&#x2b;&#x2b;&#x5d; &#x3d; year_val&#x2b;&#x22;_0&#x22;&#x2b;month_val&#x3b;&#xd;&#xa;		&#x7d;else&#x7b;&#xd;&#xa;					 month_arr&#x5b;index&#x2b;&#x2b;&#x5d; &#x3d; year_val&#x2b;&#x22;_&#x22;&#x2b;month_val&#x3b;&#xd;&#xa;		&#x7d;&#xd;&#xa;	&#x7d;&#xd;&#xa;	&#x7d;&#xd;&#xa;&#xd;&#xa;&#x7d;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var  month_arr &#x3d; &#x5b;&#x5d;&#x3b;&#xd;&#xa;var Start_Month &#x3d; 01&#x3b;&#xd;&#xa;var End_Month &#x3d;  12  &#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;USER_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var index&#x3d;0&#x3b;&#xd;&#xa;   for&#x28;var year_val &#x3d; USER_Year_Data  &#x3b;  year_val &#x3c;&#x3d;  PRESENT_YEAR &#x3b; year_val&#x2b;&#x2b;&#x29;&#x7b;&#xd;&#xa;	if&#x28; &#x28;PRESENT_YEAR - USER_Year_Data&#x29; &#x3d;&#x3d;&#x3d; 0 &#x29;&#x7b;&#xd;&#xa;		Start_Month &#x3d;USER_MONTH_DATA&#x3b;&#xd;&#xa;		End_Month &#x3d; PRESENT_MONTH&#x3b;&#xd;&#xa;	&#x7d;else if&#x28; &#x28;PRESENT_YEAR - USER_Year_Data&#x29; &#x3e; 0 &#x29;&#x7b;&#xd;&#xa;		if&#x28;year_val &#x3e; USER_Year_Data &#x26;&#x26; year_val  &#x3d;&#x3d; PRESENT_YEAR  &#x29;&#x7b;&#xd;&#xa;			Start_Month &#x3d; 01&#x3b;&#xd;&#xa;			End_Month &#x3d; PRESENT_MONTH &#x3b;&#xd;&#xa;		&#x7d;else if&#x28;year_val &#x3d;&#x3d;&#x3d; USER_Year_Data &#x26;&#x26;  year_val &#x3c; PRESENT_YEAR &#x29;&#x7b;&#xd;&#xa;			Start_Month &#x3d; USER_MONTH_DATA&#x3b;&#xd;&#xa;			End_Month &#x3d; 12&#x3b;&#xd;&#xa;		&#x7d;else if&#x28;year_val &#x3e; USER_Year_Data &#x26;&#x26; year_val &#x3c; PRESENT_YEAR  &#x29;&#x7b;&#xd;&#xa;			Start_Month &#x3d; 01&#x3b;&#xd;&#xa;			End_Month &#x3d; 12&#x3b;&#xd;&#xa;		&#x7d;&#xd;&#xa;	&#x7d;&#xd;&#xa;	for&#x28;var month_val &#x3d; Start_Month  &#x3b;  month_val&#x3c;&#x3d; End_Month &#x3b; month_val&#x2b;&#x2b;&#x29;&#x7b;&#xd;&#xa;		if&#x28;month_val.toString&#x28;&#x29;.length &#x3c; 2&#x29;&#x7b;&#xd;&#xa;					 month_arr&#x5b;index&#x2b;&#x2b;&#x5d; &#x3d; year_val&#x2b;&#x22;_0&#x22;&#x2b;month_val&#x3b;&#xd;&#xa;		&#x7d;else&#x7b;&#xd;&#xa;					 month_arr&#x5b;index&#x2b;&#x2b;&#x5d; &#x3d; year_val&#x2b;&#x22;_&#x22;&#x2b;month_val&#x3b;&#xd;&#xa;		&#x7d;&#xd;&#xa;	&#x7d;&#xd;&#xa;	&#x7d;&#xd;&#xa;&#xd;&#xa;&#x7d;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>month_arr</name>
         <rename>month_arr</rename>
         <type>String</type>
@@ -3312,35 +3221,6 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>1606</xloc>
       <yloc>633</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Multiway Merge Join</name>
-    <type>MultiwayMergeJoin</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <join_type>FULL OUTER</join_type>
-    <step0>Sort rows 2</step0>
-    <step1>Sort rows 2 2</step1>
-    <step2>Sort rows 2 3</step2>
-    <number_input>3</number_input>
-    <keys>
-      <key>AGENT_ID_temp,MONTH_Data,Year_Data</key>
-      <key>AGENT_ID,MONTH_Data,Year_Data</key>
-      <key>AGENT_ID,MONTH_Data,Year_Data</key>
-    </keys>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1450</xloc>
-      <yloc>335</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
