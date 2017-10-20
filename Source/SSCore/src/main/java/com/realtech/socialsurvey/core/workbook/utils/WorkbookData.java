@@ -68,6 +68,8 @@ public class WorkbookData
     public static final String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
     public static final String EXCEL_FILE_EXTENSION = ".xlsx";
     public static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat( CommonConstants.DATE_FORMAT );
+    public static final SimpleDateFormat REPORTING_DATE_FORMATTER = new SimpleDateFormat( CommonConstants.REPORTING_API_DATE_FORMAT );
+
 
     @Autowired
     private OrganizationManagementService organizationManagementService;
@@ -733,9 +735,9 @@ public class WorkbookData
             userAdoptionReportToPopulate.add(String.valueOf( row.get( 0 ) ));
             userAdoptionReportToPopulate.add(String.valueOf( row.get( 1 ) ));
             userAdoptionReportToPopulate.add(String.valueOf( row.get( 2 ) ));
-            userAdoptionReportToPopulate.add(String.valueOf( row.get( 3 ) ));
-            userAdoptionReportToPopulate.add(String.valueOf( row.get( 4 ) ));
-            userAdoptionReportToPopulate.add(String.valueOf( row.get( 5 ) ));
+            userAdoptionReportToPopulate.add(Integer.valueOf( row.get( 3 ) ));
+            userAdoptionReportToPopulate.add(Integer.valueOf( row.get( 4 ) ));
+            userAdoptionReportToPopulate.add(Double.valueOf( row.get( 5 ) ));
             userAdoptionData.put(++userAdoptionCounter ,userAdoptionReportToPopulate );
             userAdoptionReportToPopulate = new ArrayList<>();
             
@@ -865,6 +867,7 @@ public class WorkbookData
         
     }
     
+    @SuppressWarnings ( "deprecation")
     public Map<Integer, List<Object>> getCompanyUserReportToBeWrittenInSheet( List<List<String>> companyUser )
     {
      // This data needs to be written (List<Object>)
@@ -875,49 +878,87 @@ public class WorkbookData
         List<Object> surveyTransactionReportToPopulate = new ArrayList<>();
         
         for(List<String> row : companyUser ){
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 0 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 1 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 2 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 3 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 4 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 5 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 6 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 7 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 8 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 9 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 10 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 11 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 12 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 13 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 14 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 15 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 16 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 17 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 18 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 19 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 20 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 21 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 22 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 23 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 24 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 25 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 26 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 27 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 28 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 29 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 30 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 31 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 32 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 33 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 34 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 35 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 36 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 37 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 38 ) ));
+            try{
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 0 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 1 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 2 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 3 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 4 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 5 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 6 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 7 ) ));
+                if(!row.get(8).isEmpty()){
+                    surveyTransactionReportToPopulate.add(REPORTING_DATE_FORMATTER.parse(row.get( 8 ) ));
+                }
+                else{
+                    surveyTransactionReportToPopulate.add("");
+                }
+                
+                if(!row.get(9).isEmpty()){
+                    surveyTransactionReportToPopulate.add(REPORTING_DATE_FORMATTER.parse(row.get( 9 ) ));
+                }
+                else{
+                    surveyTransactionReportToPopulate.add("");
+                }
+                
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 10 ) ));
+                if(!row.get(11).isEmpty()){
+                    surveyTransactionReportToPopulate.add(REPORTING_DATE_FORMATTER.parse(row.get( 11 ) ));
+                }
+                else{
+                    surveyTransactionReportToPopulate.add("");
+                }           
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 12 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 13 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 14 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 15 ) ));
+                if(!row.get(16).isEmpty()){
+                    surveyTransactionReportToPopulate.add(REPORTING_DATE_FORMATTER.parse(row.get( 16 ) ));
+                }
+                else{
+                    surveyTransactionReportToPopulate.add("");
+                }
+             
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 17 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 18 ) ));
+                if(!row.get(19).isEmpty()){
+                    surveyTransactionReportToPopulate.add(REPORTING_DATE_FORMATTER.parse(row.get( 19 ) ));
+                }
+                else{
+                    surveyTransactionReportToPopulate.add("");
+                }
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 20 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 21 ) ));
+                if(!row.get(22).isEmpty()){
+                    surveyTransactionReportToPopulate.add(REPORTING_DATE_FORMATTER.parse(row.get( 22 ) ));
+                }
+                else{
+                    surveyTransactionReportToPopulate.add("");
+                }
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 23 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 24 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 25 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 26 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 27 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 28 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 29 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 30 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 31 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 32 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 33 ) ));
+                surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 34 ) ));
+                surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 35 ) ));
+                surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 36 ) ));
+                surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 37 ) ));
+                surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 38 ) ));
 
 
-            companyUserData.put(++companyUserCounter ,surveyTransactionReportToPopulate );
-            surveyTransactionReportToPopulate = new ArrayList<>();
+                companyUserData.put(++companyUserCounter ,surveyTransactionReportToPopulate );
+                surveyTransactionReportToPopulate = new ArrayList<>();
+            }catch ( ParseException e ) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
             
         }
         // Setting up user sheet headers
@@ -1019,31 +1060,31 @@ public class WorkbookData
                 
         for(List<String> row : surveyTransactionReport ){
             surveyTransactionReportToPopulate.add(String.valueOf( row.get( 0 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 1 ) ));
+            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 1 ) ));
             surveyTransactionReportToPopulate.add(String.valueOf( row.get( 2 ) ));
             surveyTransactionReportToPopulate.add(String.valueOf( row.get( 3 ) ));
             surveyTransactionReportToPopulate.add(String.valueOf( row.get( 4 ) ));
             surveyTransactionReportToPopulate.add(String.valueOf( row.get( 5 ) ));
             surveyTransactionReportToPopulate.add(String.valueOf( row.get( 6 ) ));
             surveyTransactionReportToPopulate.add(String.valueOf( row.get( 7 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 8 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 9 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 10 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 11 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 12 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 13 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 14 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 15 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 16 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 17 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 18 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 19 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 20 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 21 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 22 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 23 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 24 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 25 ) ));
+            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 8 ) ));
+            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 9 ) ));
+            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 10 ) ));
+            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 11 ) ));
+            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 12 ) ));
+            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 13 ) ));
+            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 14 ) ));
+            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 15 ) ));
+            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 16 ) ));
+            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 17 ) ));
+            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 18 ) ));
+            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 19 ) ));
+            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 20 ) ));
+            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 21 ) ));
+            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 22 ) ));
+            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 23 ) ));
+            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 24 ) ));
+            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 25 ) ));
 
 
             surveyTransactionData.put(++surveyTransactionCounter ,surveyTransactionReportToPopulate );
@@ -1100,15 +1141,15 @@ public class WorkbookData
             userRankingReportToPopulate.add(String.valueOf( row.get( 0 ) ));
             userRankingReportToPopulate.add(String.valueOf( row.get( 1 ) ));
             userRankingReportToPopulate.add(String.valueOf( row.get( 2 ) ));
-            userRankingReportToPopulate.add(String.valueOf( row.get( 3 ) ));
+            userRankingReportToPopulate.add(Integer.valueOf( row.get( 3 ) ));
             userRankingReportToPopulate.add(String.valueOf( row.get( 4 ) ));
             userRankingReportToPopulate.add(String.valueOf( row.get( 5 ) ));
             userRankingReportToPopulate.add(String.valueOf( row.get( 6 ) ));
             userRankingReportToPopulate.add(String.valueOf( row.get( 7 ) ));
-            userRankingReportToPopulate.add(String.valueOf( row.get( 8 ) ));
-            userRankingReportToPopulate.add(String.valueOf( row.get( 9 ) ));
-            userRankingReportToPopulate.add(String.valueOf( row.get( 10 ) ));
-            userRankingReportToPopulate.add(String.valueOf( row.get( 11 ) ));
+            userRankingReportToPopulate.add(Integer.valueOf( row.get( 8 ) ));
+            userRankingReportToPopulate.add(Double.valueOf( row.get( 9 ) ));
+            userRankingReportToPopulate.add(Double.valueOf( row.get( 10 ) ));
+            userRankingReportToPopulate.add(Double.valueOf( row.get( 11 ) ));
             userRankingReportToPopulate.add(String.valueOf( row.get( 12 ) ));
            
             userRankingData.put(++userRankingCounter ,userRankingReportToPopulate );
