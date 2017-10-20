@@ -44,7 +44,7 @@ public class SSApiBatchIntegrationBuilder implements InitializingBean
             .build();
         
         
-        RestAdapter apiAdaptor = new RestAdapter.Builder().setLogLevel( RestAdapter.LogLevel.FULL )
+        RestAdapter apiAdaptor = new RestAdapter.Builder().setLogLevel( RestAdapter.LogLevel.BASIC )
             .setErrorHandler( new SSApiBatchErrorHandler() )
             .setClient(new Ok3Client(okHttpClient))
             .setEndpoint( apiEndPoint ).build();

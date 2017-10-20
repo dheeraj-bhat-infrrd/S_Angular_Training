@@ -418,25 +418,25 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         return userAdoption;
 
     }
-    
+
+
     @Override
     @Transactional ( value = "transactionManagerForReporting")
-    public int getMaxQuestionForSurveyCompanyReport( Long companyId, Timestamp startDate,
-        Timestamp endDate )
-    {    
-        LOG.info( "method getMaxQuestionForSurveyCompanyReport started for companyId: {}",companyId );
+    public int getMaxQuestionForSurveyCompanyReport( Long companyId, Timestamp startDate, Timestamp endDate )
+    {
+        LOG.info( "method getMaxQuestionForSurveyCompanyReport started for companyId: {}", companyId );
         return surveyResponseTableDao.getMaxResponseForCompanyId( companyId, startDate, endDate );
     }
 
-    
 
     @Override
     @Transactional ( value = "transactionManagerForReporting")
-    public Map<String,SurveyResultsCompanyReport> getSurveyResultsCompanyReport( Long companyId, Timestamp startDate,
-        Timestamp endDate , int startIndex , int batchSize)
+    public Map<String, SurveyResultsCompanyReport> getSurveyResultsCompanyReport( Long companyId, Timestamp startDate,
+        Timestamp endDate, int startIndex, int batchSize )
     {
-        LOG.info( "method getSurveyResultsCompanyReport started for companyId: {} ",companyId );
-        return surveyResultsCompanyReportDao.getSurveyResultForCompanyId( companyId, startDate, endDate, startIndex, batchSize );
+        LOG.info( "method getSurveyResultsCompanyReport started for companyId: {} ", companyId );
+        return surveyResultsCompanyReportDao.getSurveyResultForCompanyId( companyId, startDate, endDate, startIndex,
+            batchSize );
     }
 
 
@@ -1667,16 +1667,19 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     public String generateSurveyResultsCompanyForReporting( Long entityId, String entityType, Long userId, Timestamp startDate,
         Timestamp endDate ) throws UnsupportedEncodingException, NonFatalException, ParseException
     {
+        LOG.info( "Generating survey results report for enitityId {}, entityType {}, userId {} startDate {}, endDate {}",
+            entityId, entityType, userId, startDate, endDate );
         User user = userManagementService.getUserByUserId( userId );
+        LOG.debug( "Found user {}", user );
         String fileName = "Survey_Results_Company_Report" + entityType + "-" + user.getFirstName() + "_" + user.getLastName()
             + "-" + ( Calendar.getInstance().getTimeInMillis() ) + CommonConstants.EXCEL_FILE_EXTENSION;
+        LOG.debug( "fileName {} ", fileName );
         XSSFWorkbook workbook = this.downloadSurveyResultsCompanyForReporting( entityId, entityType, startDate, endDate );
-        String LocationInS3 = this.createExcelFileAndSaveInAmazonS3( fileName, workbook );
-        return LocationInS3;
+        LOG.debug( "Writing {} number of records into file {}", workbook.getSheetAt( 0 ).getLastRowNum(), fileName );
+        return createExcelFileAndSaveInAmazonS3( fileName, workbook );
     }
 
 
-    @SuppressWarnings ( "unchecked")
     public XSSFWorkbook downloadSurveyResultsCompanyForReporting( long entityId, String entityType, Timestamp startDate,
         Timestamp endDate ) throws ParseException
     {
@@ -1684,55 +1687,62 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         int batchSize = CommonConstants.BATCH_SIZE;
         int maxQuestion = 0;
         int enterNext = 1;
-        Response maxQuestResponse = ssApiBatchIntergrationBuilder.getIntegrationApi().getCompanyMaxQuestion( entityId, startDate, endDate );
-        String maxQuestResponseString = maxQuestResponse != null ? new String( ( (TypedByteArray) maxQuestResponse.getBody() ).getBytes() ) : null;
-        if(maxQuestResponseString != null){
+        Response maxQuestResponse = ssApiBatchIntergrationBuilder.getIntegrationApi().getCompanyMaxQuestion( entityId,
+            startDate, endDate );
+        String maxQuestResponseString = maxQuestResponse != null
+            ? new String( ( (TypedByteArray) maxQuestResponse.getBody() ).getBytes() ) : null;
+        if ( maxQuestResponseString != null ) {
             maxQuestion = Integer.valueOf( maxQuestResponseString );
+            LOG.debug( "maxQuestion {}", maxQuestion );
         }
-             
+
         //write the excel header first 
-        Map<Integer, List<Object>> data = workbookData
-            .writeSurveyResultsCompanyReportHeader( maxQuestion );
-        Map<String,SurveyResultsCompanyReport> surveyResultsCompanyReport = getSurveyResultResponse( entityId, startDate, endDate, startIndex, batchSize );
+        Map<Integer, List<Object>> data = workbookData.writeSurveyResultsCompanyReportHeader( maxQuestion );
         //create workbook data
         XSSFWorkbook workbook = workbookOperations.createWorkbook( data );
 
-        //if data is not empty write into the workbook which was created 
-        while( !surveyResultsCompanyReport.isEmpty() && surveyResultsCompanyReport != null){
-            enterNext = startIndex+1;
-            data = workbookData
-                .getSurveyResultsCompanyReportToBeWrittenInSheet( surveyResultsCompanyReport , maxQuestion , enterNext);
-            //keep workbook open to write data if it's not null
-            //use the created workbook when writing the header ans rewrite the same 
-            workbook = workbookOperations.writeToWorkbook( data , workbook , enterNext );
-            //calculate startIndex 
-            startIndex = startIndex + batchSize;
+        Map<String, SurveyResultsCompanyReport> surveyResultsCompanyReport = null;
+        do {
             surveyResultsCompanyReport = getSurveyResultResponse( entityId, startDate, endDate, startIndex, batchSize );
+            if ( surveyResultsCompanyReport != null && !surveyResultsCompanyReport.isEmpty() ) {
+                enterNext = startIndex + 1;
+                data = workbookData.getSurveyResultsCompanyReportToBeWrittenInSheet( surveyResultsCompanyReport, maxQuestion,
+                    enterNext );
+                LOG.debug( "Got {} records starting at {} index", data.size(), enterNext );
+                //use the created workbook when writing the header ans rewrite the same 
+                workbook = workbookOperations.writeToWorkbook( data, workbook, enterNext );
+                //calculate startIndex 
+                startIndex = startIndex + batchSize;
+            }
+        } while ( surveyResultsCompanyReport != null && !surveyResultsCompanyReport.isEmpty()
+            && surveyResultsCompanyReport.size() >= batchSize );
 
-        }
-        
         XSSFSheet sheet = workbook.getSheetAt( 0 );
-        this.makeRowBold( workbook, sheet.getRow( 0 ) );
+        makeRowBold( workbook, sheet.getRow( 0 ) );
         return workbook;
 
     }
 
-    public Map<String,SurveyResultsCompanyReport> getSurveyResultResponse(Long companyId, Timestamp startDate , Timestamp endDate , int startIndex , int batchSize){
-        Response response = ssApiBatchIntergrationBuilder.getIntegrationApi().getSurveyResultsCompany( companyId,
-            startDate, endDate , startIndex , batchSize );
+
+    public Map<String, SurveyResultsCompanyReport> getSurveyResultResponse( Long companyId, Timestamp startDate,
+        Timestamp endDate, int startIndex, int batchSize )
+    {
+        Response response = ssApiBatchIntergrationBuilder.getIntegrationApi().getSurveyResultsCompany( companyId, startDate,
+            endDate, startIndex, batchSize );
         String responseString = response != null ? new String( ( (TypedByteArray) response.getBody() ).getBytes() ) : null;
-        Map<String,SurveyResultsCompanyReport> surveyResultsCompanyReport = null;
-        if(responseString != null){
+        Map<String, SurveyResultsCompanyReport> surveyResultsCompanyReport = null;
+        if ( responseString != null ) {
             //since the string has ""abc"" an extra quote
             responseString = responseString.substring( 1, responseString.length() - 1 );
             //Escape characters
             responseString = StringEscapeUtils.unescapeJava( responseString );
-            Type listType = new TypeToken<Map<String,SurveyResultsCompanyReport>>() {}.getType();
-            surveyResultsCompanyReport = new Gson().fromJson( responseString, listType ) ;
+            Type listType = new TypeToken<Map<String, SurveyResultsCompanyReport>>() {}.getType();
+            surveyResultsCompanyReport = new Gson().fromJson( responseString, listType );
 
         }
         return surveyResultsCompanyReport;
     }
+
 
     @Override
     public String generateSurveyTransactionForReporting( Long entityId, String entityType, Long userId, Timestamp startDate,
@@ -1813,45 +1823,57 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         throws NonFatalException, UnsupportedEncodingException
     {
         // Create file and write report into it
+        LOG.debug( "The function createExcelFileAndSaveInAmazonS3 has started for filename : {} on location {}", fileName,
+            fileDirectoryLocation );
         boolean excelCreated = false;
         FileOutputStream fileOutput = null;
-        InputStream inputStream = null;
         File file = null;
-        String filePath = null;
         String responseString = null;
         try {
             file = new File( fileDirectoryLocation + File.separator + fileName );
-            file.createNewFile();
-            fileOutput = new FileOutputStream( file );
-            workbook.write( fileOutput );
-            filePath = file.getPath();
-            excelCreated = true;
+            if ( file.createNewFile() ) {
+                if ( LOG.isDebugEnabled() ) {
+                    LOG.debug( "File created at {}. File Name {}", file.getAbsolutePath(), fileName );
+                }
+                fileOutput = new FileOutputStream( file );
+                LOG.debug( "Created file output stream to write into {}", fileName );
+                workbook.write( fileOutput );
+                LOG.debug( "Wrote into file {}", fileName );
+                excelCreated = true;
+            } else {
+                excelCreated = false;
+            }
+            LOG.debug( "Excel creation status {}", excelCreated );
+            // SAVE REPORT IN S3
+            if ( excelCreated ) {
+                fileUploadService.uploadReport( file, fileName );
+                LOG.debug( "fileUpload on s3 step is done for filename : {}", fileName );
+                String fileNameInS3 = endpoint + CommonConstants.FILE_SEPARATOR + reportBucket + CommonConstants.FILE_SEPARATOR
+                    + URLEncoder.encode( fileName, "UTF-8" );
+                responseString = fileNameInS3;
+                LOG.debug( "returning the response string : {}", responseString );
+            }else{
+                LOG.warn( "Could not write into file {}", fileName );
+            }
         } catch ( FileNotFoundException fe ) {
-            LOG.error( "Exception caught while generating report " + fileName + ": " + fe.getMessage() );
+            LOG.error( "File not found exception while creating file {}", fileName, fe );
             excelCreated = false;
         } catch ( IOException e ) {
-            LOG.error( "Exception caught while generating report " + fileName + ": " + e.getMessage() );
+            LOG.error( "IO  exception while creating file {}", fileName, e );
+            excelCreated = false;
+        } catch ( Throwable thrw ) {
+            LOG.error( "Throwable while creating file {}", fileName, thrw );
             excelCreated = false;
         } finally {
             try {
                 if ( fileOutput != null )
                     fileOutput.close();
-                if ( inputStream != null ) {
-                    inputStream.close();
-                }
             } catch ( IOException e ) {
                 LOG.error( "Exception caught while generating report " + fileName + ": " + e.getMessage() );
                 excelCreated = false;
             }
         }
-
-        // SAVE REPORT IN S3
-        if ( excelCreated ) {
-            fileUploadService.uploadReport( file, fileName );
-            String fileNameInS3 = endpoint + CommonConstants.FILE_SEPARATOR + reportBucket + CommonConstants.FILE_SEPARATOR
-                + URLEncoder.encode( fileName, "UTF-8" );
-            responseString = fileNameInS3;
-        }
+        LOG.debug( "The function createExcelFileAndSaveInAmazonS3 has ended for locationInS3 : {}", responseString );
         return responseString;
     }
 
