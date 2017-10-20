@@ -1355,6 +1355,7 @@ public interface CommonConstants
     public static final String REPORTING_SURVEY_TRANSACTION_REPORT = "Survey Transaction Report";
     public static final String REPORTING_USER_RANKING_MONTHLY_REPORT = "User Ranking Report For Month";
     public static final String REPORTING_USER_RANKING_YEARLY_REPORT = "User Ranking Report For Year";
+    public static final String REPORTING_API_DATE_FORMAT = "MMM dd, yyyy";
 
 
     

@@ -52,7 +52,7 @@ public class CompanyUserReport implements Serializable
     private String regionAdmin;
     
     @Column ( name = "ss_invite_sent_date")
-    private String ssInviteSentDate;
+    private Date ssInviteSentDate;
     
     @Column ( name = "email_verified")
     private String emailVerified;
@@ -260,12 +260,12 @@ public class CompanyUserReport implements Serializable
         this.regionAdmin = regionAdmin;
     }
 
-    public String getSsInviteSentDate()
+    public Date getSsInviteSentDate()
     {
         return ssInviteSentDate;
     }
 
-    public void setSsInviteSentDate( String ssInviteSentDate )
+    public void setSsInviteSentDate( Date ssInviteSentDate )
     {
         this.ssInviteSentDate = ssInviteSentDate;
     }
