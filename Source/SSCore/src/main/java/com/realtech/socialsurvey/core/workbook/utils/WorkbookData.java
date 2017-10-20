@@ -956,8 +956,7 @@ public class WorkbookData
                 companyUserData.put(++companyUserCounter ,surveyTransactionReportToPopulate );
                 surveyTransactionReportToPopulate = new ArrayList<>();
             }catch ( ParseException e ) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+               LOG.error( "Parse exception caught in getCompanyUserReportToBeWrittenInSheet {} ",e.getMessage() );
             }
             
         }
