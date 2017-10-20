@@ -490,7 +490,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 } else {
                     companyUserReportList.add( "" );
                 }
-                if ( companyUserReport.getSsInviteSentDate() != null && !companyUserReport.getSsInviteSentDate().isEmpty() ) {
+                if ( companyUserReport.getSsInviteSentDate() != null ) {
                     companyUserReportList.add( companyUserReport.getSsInviteSentDate() );
                 } else {
                     companyUserReportList.add( "" );
