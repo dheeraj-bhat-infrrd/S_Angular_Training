@@ -4670,7 +4670,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 surveyDetails.setSource( CommonConstants.SURVEY_SOURCE_ZILLOW );
                 surveyDetails.setSourceId( zillowProfileUrl );
                 surveyDetails.setCompleteProfileUrl( zillowProfileUrl );
-                surveyDetails.setModifiedOn( createdDate );
+                //ModifiedOn set to current date
+                Date currentDate = new Date(System.currentTimeMillis());
+                surveyDetails.setModifiedOn( currentDate );
                 surveyDetails.setCreatedOn( createdDate );
                 surveyDetails.setAgreedToShare( "true" );
                 surveyDetails.setAbusive( isAbusive );
