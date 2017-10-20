@@ -1698,7 +1698,6 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
         //write the excel header first 
         Map<Integer, List<Object>> data = workbookData.writeSurveyResultsCompanyReportHeader( maxQuestion );
-        
         //create workbook data
         XSSFWorkbook workbook = workbookOperations.createWorkbook( data );
 
@@ -1718,7 +1717,6 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         } while ( surveyResultsCompanyReport != null && !surveyResultsCompanyReport.isEmpty()
             && surveyResultsCompanyReport.size() >= batchSize );
 
-        
         XSSFSheet sheet = workbook.getSheetAt( 0 );
         makeRowBold( workbook, sheet.getRow( 0 ) );
         return workbook;
