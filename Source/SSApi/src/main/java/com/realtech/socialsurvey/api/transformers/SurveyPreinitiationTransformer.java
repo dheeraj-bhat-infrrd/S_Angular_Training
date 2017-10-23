@@ -64,57 +64,57 @@ public class SurveyPreinitiationTransformer implements Transformer<SurveyPutVO, 
 		}
 		
 		List<SurveyPreInitiation> surveyPreInitiations = new ArrayList<SurveyPreInitiation>();
-		SurveyPreInitiation surveyPreInitiation = new SurveyPreInitiation();
+		SurveyPreInitiation surveyPreInitiationBorrower = new SurveyPreInitiation();
 
-		surveyPreInitiation.setAgentEmailId(serviceProviderInfo.getServiceProviderEmail());
-		surveyPreInitiation.setAgentName(serviceProviderInfo.getServiceProviderName());
-		surveyPreInitiation.setCompanyId(companyId);
+		surveyPreInitiationBorrower.setAgentEmailId(serviceProviderInfo.getServiceProviderEmail());
+		surveyPreInitiationBorrower.setAgentName(serviceProviderInfo.getServiceProviderName());
+		surveyPreInitiationBorrower.setCompanyId(companyId);
 		 
-		surveyPreInitiation.setCustomerEmailId(transactionInfo.getCustomer1Email());
-		surveyPreInitiation.setCustomerFirstName(transactionInfo.getCustomer1FirstName());
-		surveyPreInitiation.setCustomerLastName(transactionInfo.getCustomer1LastName());
+		surveyPreInitiationBorrower.setCustomerEmailId(transactionInfo.getCustomer1Email());
+		surveyPreInitiationBorrower.setCustomerFirstName(transactionInfo.getCustomer1FirstName());
+		surveyPreInitiationBorrower.setCustomerLastName(transactionInfo.getCustomer1LastName());
 		 
-		surveyPreInitiation.setSurveySource("API");
-		surveyPreInitiation.setEngagementClosedTime(new Timestamp(date.getTime()));
-		surveyPreInitiation.setSurveySourceId(transactionInfo.getTransactionRef());
-		surveyPreInitiation.setCity(transactionInfo.getTransactionCity());
-		surveyPreInitiation.setState(transactionInfo.getTransactionState());
-        surveyPreInitiation.setTransactionType(transactionInfo.getTransactionType());
+		surveyPreInitiationBorrower.setSurveySource("API");
+		surveyPreInitiationBorrower.setEngagementClosedTime(new Timestamp(date.getTime()));
+		surveyPreInitiationBorrower.setSurveySourceId(transactionInfo.getTransactionRef());
+		surveyPreInitiationBorrower.setCity(transactionInfo.getTransactionCity());
+		surveyPreInitiationBorrower.setState(transactionInfo.getTransactionState());
+        surveyPreInitiationBorrower.setTransactionType(transactionInfo.getTransactionType());
 		 
-		surveyPreInitiation.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
-		surveyPreInitiation.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
-		surveyPreInitiation.setLastReminderTime( utils.convertEpochDateToTimestamp() );
-		surveyPreInitiation.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED );
-		surveyPreInitiations.add(surveyPreInitiation);
+		surveyPreInitiationBorrower.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
+		surveyPreInitiationBorrower.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+		surveyPreInitiationBorrower.setLastReminderTime( utils.convertEpochDateToTimestamp() );
+		surveyPreInitiationBorrower.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED );
+		surveyPreInitiations.add(surveyPreInitiationBorrower);
          
          // check if model contains two customer
         if(! StringUtils.isBlank(transactionInfo.getCustomer2Email()) && ! StringUtils.isBlank(transactionInfo.getCustomer2FirstName())){
-        	SurveyPreInitiation surveyPreInitiation2 = new SurveyPreInitiation();
-        	surveyPreInitiation2.setAgentEmailId(serviceProviderInfo.getServiceProviderEmail());
-        	surveyPreInitiation2.setAgentName(serviceProviderInfo.getServiceProviderName());
-    		surveyPreInitiation2.setCompanyId(companyId);
+        	SurveyPreInitiation surveyPreInitiationCoBorrower = new SurveyPreInitiation();
+        	surveyPreInitiationCoBorrower.setAgentEmailId(serviceProviderInfo.getServiceProviderEmail());
+        	surveyPreInitiationCoBorrower.setAgentName(serviceProviderInfo.getServiceProviderName());
+    		surveyPreInitiationCoBorrower.setCompanyId(companyId);
 
     		 
-        	surveyPreInitiation2.setCustomerEmailId(transactionInfo.getCustomer2Email());
-        	surveyPreInitiation2.setCustomerFirstName(transactionInfo.getCustomer2FirstName());
-        	surveyPreInitiation2.setCustomerLastName(transactionInfo.getCustomer2LastName());
+        	surveyPreInitiationCoBorrower.setCustomerEmailId(transactionInfo.getCustomer2Email());
+        	surveyPreInitiationCoBorrower.setCustomerFirstName(transactionInfo.getCustomer2FirstName());
+        	surveyPreInitiationCoBorrower.setCustomerLastName(transactionInfo.getCustomer2LastName());
     		 
-        	surveyPreInitiation2.setSurveySource("API");
-        	surveyPreInitiation2.setEngagementClosedTime(new Timestamp(date.getTime()));
-        	surveyPreInitiation2.setSurveySourceId(transactionInfo.getTransactionRef());
-        	surveyPreInitiation2.setCity(transactionInfo.getTransactionCity());
-        	surveyPreInitiation2.setState(transactionInfo.getTransactionState());
-        	surveyPreInitiation2.setTransactionType(transactionInfo.getTransactionType());
+        	surveyPreInitiationCoBorrower.setSurveySource("API");
+        	surveyPreInitiationCoBorrower.setEngagementClosedTime(new Timestamp(date.getTime()));
+        	surveyPreInitiationCoBorrower.setSurveySourceId(transactionInfo.getTransactionRef());
+        	surveyPreInitiationCoBorrower.setCity(transactionInfo.getTransactionCity());
+        	surveyPreInitiationCoBorrower.setState(transactionInfo.getTransactionState());
+        	surveyPreInitiationCoBorrower.setTransactionType(transactionInfo.getTransactionType());
     		 
-        	surveyPreInitiation2.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
-        	surveyPreInitiation2.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
-        	surveyPreInitiation2.setLastReminderTime( utils.convertEpochDateToTimestamp() );
-        	surveyPreInitiation2.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED );
+        	surveyPreInitiationCoBorrower.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
+        	surveyPreInitiationCoBorrower.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+        	surveyPreInitiationCoBorrower.setLastReminderTime( utils.convertEpochDateToTimestamp() );
+        	surveyPreInitiationCoBorrower.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED );
         	
         	if( transactionInfo.getCustomer1Email().equalsIgnoreCase( transactionInfo.getCustomer2Email()) ){
-                surveyPreInitiation2.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD );
+                surveyPreInitiationCoBorrower.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD );
         	}
-        	surveyPreInitiations.add( surveyPreInitiation2 );
+        	surveyPreInitiations.add( surveyPreInitiationCoBorrower );
          }
 
 		return surveyPreInitiations;
