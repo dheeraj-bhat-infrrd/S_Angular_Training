@@ -110,7 +110,11 @@ public class SurveyPreinitiationTransformer implements Transformer<SurveyPutVO, 
         	surveyPreInitiation2.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         	surveyPreInitiation2.setLastReminderTime( utils.convertEpochDateToTimestamp() );
         	surveyPreInitiation2.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED );
-        	surveyPreInitiations.add(surveyPreInitiation2);
+        	
+        	if( transactionInfo.getCustomer1Email().equalsIgnoreCase( transactionInfo.getCustomer2Email()) ){
+                surveyPreInitiation2.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD );
+        	}
+        	surveyPreInitiations.add( surveyPreInitiation2 );
          }
 
 		return surveyPreInitiations;
