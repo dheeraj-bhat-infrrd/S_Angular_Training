@@ -72,6 +72,9 @@ public class OverviewBranchMonth implements Serializable
 
     @Column ( name = "year")
     private int year;
+    
+    @Column ( name = "third_party")
+    private int thirdParty;
 
     public String getOverviewBranchMonthId()
     {
@@ -258,6 +261,17 @@ public class OverviewBranchMonth implements Serializable
         return serialVersionUID;
     }
 
+    
+    public int getThirdParty()
+    {
+        return thirdParty;
+    }
+
+    public void setThirdParty( int thirdParty )
+    {
+        this.thirdParty = thirdParty;
+    }
+
     @Override
     public String toString()
     {
@@ -266,7 +280,7 @@ public class OverviewBranchMonth implements Serializable
             + ", zillowReviews=" + zillowReviews + ", unprocessed=" + unprocessed + ", unassigned=" + unassigned
             + ", duplicate=" + duplicate + ", corrupted=" + corrupted + ", other=" + other + ", completePercentage="
             + completePercentage + ", incompletePercentage=" + incompletePercentage + ", rating=" + rating + ", totalReview="
-            + totalReview + ", month=" + month + ", year=" + year + "]";
+            + totalReview + ", month=" + month + ", year=" + year + ", thirdParty=" + thirdParty + "]";
     }
 
     
