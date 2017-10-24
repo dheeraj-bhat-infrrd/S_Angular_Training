@@ -106,6 +106,15 @@
 								</c:if>
 							</c:if>
 							
+							<c:if test="${ columnName == 'companyId' }">
+								<div class="float-left clear-both comp-mail-thrs-txt">Survey Completed Mail Threshold</div>
+								<div class="float-left">
+									<!-- set the minimum threshold for sending completed mail to administrators and agents -->
+									<input type="text" name="survey-mail-threshold" id="survey-mail-threshold" class="st-item-row-txt cursor-pointer dd-arrow-dn" autocomplete="off" value="${surveyCompletedMailThreshold}">
+									<div class="st-dd-wrapper hide" id="st-dd-wrapper-survey-mail-thrs"></div>
+								</div>
+							</c:if>
+							
 							<c:if test="${ isRealTechOrSSAdmin == true and columnName == 'companyId' }">
 							<div class="send-email-sel-col">
 								<div class="clearfix padding-bottom-twenty">
@@ -309,6 +318,7 @@ $(document).ready(function() {
 		$('#rating-min-post').on('click', function(){
 			$('#email-options').hide();
 			$('#sort-options').hide();
+			$('#st-dd-wrapper-survey-mail-thrs').hide();
 			$('#st-dd-wrapper-min-post').slideToggle(200);
 			$(document).mouseup(ratingMouseUp);
 		});
@@ -318,6 +328,7 @@ $(document).ready(function() {
 		$('#sort-criteria-sel').on('click', function(){
 			$('#email-options').hide();
 			$('#st-dd-wrapper-min-post').hide();
+			$('#st-dd-wrapper-survey-mail-thrs').hide();
 			$('#sort-options').slideToggle(200);
 			$(document).mouseup(sortCriteriaMouseUp);
 		});
@@ -327,8 +338,19 @@ $(document).ready(function() {
 		$('#email-sel').on('click', function(){
 			$('#sort-options').hide();
 			$('#st-dd-wrapper-min-post').hide();
+			$('#st-dd-wrapper-survey-mail-thrs').hide();
 			$('#email-options').slideToggle(200);
 			$(document).mouseup(emailCriteriaMouseUp);
+		});
+		
+		autoAppendSurveyMailDropdown('#st-dd-wrapper-survey-mail-thrs', "st-dd-item st-dd-item-survey-mail-thrs");
+		$('#survey-mail-threshold').off('click');
+		$('#survey-mail-threshold').on('click', function(){
+			$('#email-options').hide();
+			$('#sort-options').hide();
+			$('#st-dd-wrapper-min-post').hide();
+			$('#st-dd-wrapper-survey-mail-thrs').slideToggle(200);
+			$(document).mouseup(surveyMailThresholdMouseUp);
 		});
 		
 		setUpListenerForEmailOptionDropdown();
