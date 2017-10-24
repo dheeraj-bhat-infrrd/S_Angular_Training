@@ -383,9 +383,9 @@ $(document).on('click', '.restart-survey-mail-txt', function(e) {
 function confirmRetakeSurveyReminderMail(element) {
 
 	$('#overlay-header').html("Retake survey");
-	$('#overlay-text').html("This action will erase all the previous data of this survey and survey will be reset.");
-	$('#overlay-continue').html("Yes");
-	$('#overlay-cancel').html("No");
+	$('#overlay-text').html('<div style="text-align:left; display: grid;">Are you sure that you want to email a request to your customer to re-take this survey?<span style="margin-top:20px; text-align:left"><span style="font-weight:bold !important">Note:</span> You should have already spoken with the customer, resolved their concerns and obtained permission to send them a re-take link. Once the customer has retaken this survey it will be updated and the original comments removed.</span></div>');
+	$('#overlay-continue').html("Send");
+	$('#overlay-cancel').html("Cancel");
 	$('#overlay-continue').off();
 	$('#overlay-continue').click(function() {
 		retakeSurveyReminderMail(element);
@@ -1745,7 +1745,7 @@ function paintProcSurveyGraph() {
 	
 	var internalData = [];
 	var nestedInternalData = [];
-	nestedInternalData.push(type, 'Total Transactions', 'API Transactions', 'Encompass Transactions', 'FTP Transactions');
+	nestedInternalData.push(type, 'Total Transactions', 'Completed Transactions', 'Sent Survey Invitations', 'Sent Survey Reminders');
 	internalData.push(nestedInternalData);
 	for (var itr = 0; itr < allTimeslots.length; itr++) {
 		nestedInternalData = [];
@@ -2438,8 +2438,8 @@ function searchCompany(searchKeyword, flow) {
 			} else if (flow == 'transactions') {
 				$('#trans-srch-res').removeClass('dsh-sb-dd');
 				$('#trans-sel-item').val($(this).html()).attr('data-prev-val', "");
-				lastColNameForGraphProcSurvey = columnName;
-				lastColValueForGraphProcSurvey = value;
+				lastColNameForGraphTrans = columnName;
+				lastColValueForGraphTrans = value;
 				showTransactionStatisticsGraphically(columnName, value);
 			}else if (flow == 'procSurvey') {
 				$('#proc-sur-srch-res').removeClass('dsh-sb-dd');

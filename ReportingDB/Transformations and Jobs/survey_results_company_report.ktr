@@ -228,25 +228,83 @@
   <hop> <from>Sort company</from><to>Multiway Merge Join for report</to><enabled>Y</enabled> </hop>
   <hop> <from>ClickThrough Agent</from><to>Sort Agent</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort Agent</from><to>Multiway Merge Join for report</to><enabled>Y</enabled> </hop>
-  <hop> <from>Select for Report</from><to>Sort select report</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort select report</from><to>Merge Rows &#x28;diff&#x29;</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort Survey Results report</from><to>Merge Rows &#x28;diff&#x29;</to><enabled>Y</enabled> </hop>
-  <hop> <from>isDeleted js</from><to>Select for Report</to><enabled>Y</enabled> </hop>
-  <hop> <from>Survey Results Report</from><to>Select SurveyResultsCompanyReport</to><enabled>Y</enabled> </hop>
-  <hop> <from>Select SurveyResultsCompanyReport</from><to>Sort Survey Results report</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User_SurveyDetails</from><to>Sort user</to><enabled>Y</enabled> </hop>
   <hop> <from>Survey_Details_IP</from><to>Join User_SurveyDetails</to><enabled>Y</enabled> </hop>
   <hop> <from>Multiway Merge Join for report</from><to>isDeleted js</to><enabled>Y</enabled> </hop>
-  <hop> <from>Merge Rows &#x28;diff&#x29;</from><to>ReportId</to><enabled>Y</enabled> </hop>
   <hop> <from>Switch &#x2f; Case</from><to>isDeletedNew</to><enabled>Y</enabled> </hop>
   <hop> <from>isDeletedNew</from><to>Updated isDeleted</to><enabled>Y</enabled> </hop>
   <hop> <from>Switch &#x2f; Case</from><to>New row Input</to><enabled>Y</enabled> </hop>
-  <hop> <from>Updated isDeleted</from><to>Block this step until steps finish</to><enabled>Y</enabled> </hop>
   <hop> <from>Block this step until steps finish</from><to>Table output 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>ReportId</from><to>Modified Java Script Value</to><enabled>Y</enabled> </hop>
-  <hop> <from>Modified Java Script Value</from><to>Calculator</to><enabled>Y</enabled> </hop>
   <hop> <from>Calculator</from><to>Switch &#x2f; Case</to><enabled>Y</enabled> </hop>
+  <hop> <from>Merge Rows &#x28;diff&#x29;</from><to>ReportId</to><enabled>Y</enabled> </hop>
+  <hop> <from>ReportId</from><to>Modified Java Script Value</to><enabled>Y</enabled> </hop>
+  <hop> <from>isDeletedNew</from><to>Block this step until steps finish</to><enabled>Y</enabled> </hop>
+  <hop> <from>isDeleted js</from><to>Select values 3</to><enabled>Y</enabled> </hop>
+  <hop> <from>Select values 3</from><to>Sort select report</to><enabled>Y</enabled> </hop>
+  <hop> <from>Modified Java Script Value</from><to>If field value is null</to><enabled>Y</enabled> </hop>
+  <hop> <from>If field value is null</from><to>Calculator</to><enabled>Y</enabled> </hop>
+  <hop> <from>Survey Results Report</from><to>Sort rows</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows</from><to>Merge Rows &#x28;diff&#x29;</to><enabled>Y</enabled> </hop>
   </order>
+  <step>
+    <name>Block this step until steps finish</name>
+    <type>BlockUntilStepsFinish</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <steps>
+      <step>
+        <name>Updated isDeleted</name>
+        <CopyNr>0</CopyNr>
+        </step>
+      </steps>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1234</xloc>
+      <yloc>813</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Calculator</name>
+    <type>Calculator</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+       <calculation><field_name>TIME_INTERVAL</field_name>
+<calc_type>DATE_DIFF</calc_type>
+<field_a>SURVEY_COMPLETED_DATE</field_a>
+<field_b>SURVEY_SENT_DATE</field_b>
+<field_c/>
+<value_type>Integer</value_type>
+<value_length>-1</value_length>
+<value_precision>-1</value_precision>
+<remove>N</remove>
+<conversion_mask/>
+<decimal_symbol/>
+<grouping_symbol/>
+<currency_symbol/>
+</calculation>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1802</xloc>
+      <yloc>813</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
   <step>
     <name>ClickThrough Agent</name>
     <type>ScriptValueMod</type>
@@ -568,6 +626,52 @@
     </step>
 
   <step>
+    <name>If field value is null</name>
+    <type>IfNull</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <replaceAllByValue/>
+      <replaceAllMask/>
+      <selectFields>Y</selectFields>
+      <selectValuesType>N</selectValuesType>
+      <setEmptyStringAll>N</setEmptyStringAll>
+    <valuetypes>
+      </valuetypes>
+    <fields>
+      <field>
+        <name>AGENT_ID</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>COMPANY_ID</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>SURVEY_SCORE</name>
+        <value>0.0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1990</xloc>
+      <yloc>813</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
     <name>Join ClickThrough Company</name>
     <type>DBJoin</type>
     <description/>
@@ -580,7 +684,7 @@
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
-    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, ENTITY_TYPE&#xd;&#xa;, ENTITY_ID&#xd;&#xa;, SHARED_ON_FACEBOOK&#xd;&#xa;, SHARED_ON_LINKEDIN&#xd;&#xa;, SHARED_ON_TWITTER&#xd;&#xa;, SHARED_ON_SOCIAL_SURVEY&#xd;&#xa;FROM social_media_post_details&#xd;&#xa;WHERE SURVEY_DETAILS_ID&#x3d;&#x3f; AND ENTITY_TYPE&#x3d;&#x27;company&#x27; AND ENTITY_ID&#x3d;&#x3f;</sql>
+    <sql>SELECT&#xd;&#xa;  ENTITY_TYPE&#xd;&#xa;, ENTITY_ID&#xd;&#xa;, SHARED_ON_FACEBOOK&#xd;&#xa;, SHARED_ON_LINKEDIN&#xd;&#xa;, SHARED_ON_TWITTER&#xd;&#xa;, SHARED_ON_SOCIAL_SURVEY&#xd;&#xa;FROM social_media_post_details&#xd;&#xa;WHERE SURVEY_DETAILS_ID&#x3d;&#x3f; AND ENTITY_TYPE&#x3d;&#x27;company&#x27; AND ENTITY_ID&#x3d;&#x3f;</sql>
     <outer_join>Y</outer_join>
     <replace_vars>Y</replace_vars>
     <parameter>
@@ -614,7 +718,7 @@
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
-    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, ENTITY_TYPE&#xd;&#xa;, ENTITY_ID&#xd;&#xa;, SHARED_ON_FACEBOOK&#xd;&#xa;, SHARED_ON_LINKEDIN&#xd;&#xa;, SHARED_ON_TWITTER&#xd;&#xa;, SHARED_ON_SOCIAL_SURVEY&#xd;&#xa;FROM social_media_post_details&#xd;&#xa;WHERE SURVEY_DETAILS_ID&#x3d;&#x3f; AND ENTITY_TYPE&#x3d;&#x27;agent&#x27; AND ENTITY_ID&#x3d;&#x3f;</sql>
+    <sql>SELECT&#xd;&#xa;  ENTITY_TYPE&#xd;&#xa;, ENTITY_ID&#xd;&#xa;, SHARED_ON_FACEBOOK&#xd;&#xa;, SHARED_ON_LINKEDIN&#xd;&#xa;, SHARED_ON_TWITTER&#xd;&#xa;, SHARED_ON_SOCIAL_SURVEY&#xd;&#xa;FROM social_media_post_details&#xd;&#xa;WHERE SURVEY_DETAILS_ID&#x3d;&#x3f; AND ENTITY_TYPE&#x3d;&#x27;agent&#x27; AND ENTITY_ID&#x3d;&#x3f;</sql>
     <outer_join>Y</outer_join>
     <replace_vars>Y</replace_vars>
     <parameter>
@@ -648,7 +752,7 @@
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
-    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, ENTITY_TYPE&#xd;&#xa;, ENTITY_ID&#xd;&#xa;, SHARED_ON_FACEBOOK&#xd;&#xa;, SHARED_ON_LINKEDIN&#xd;&#xa;, SHARED_ON_TWITTER&#xd;&#xa;, SHARED_ON_SOCIAL_SURVEY&#xd;&#xa;FROM social_media_post_details&#xd;&#xa;WHERE SURVEY_DETAILS_ID&#x3d;&#x3f; AND ENTITY_TYPE&#x3d;&#x27;region&#x27; AND ENTITY_ID&#x3d;&#x3f;</sql>
+    <sql>SELECT&#xd;&#xa; ENTITY_TYPE&#xd;&#xa;, ENTITY_ID&#xd;&#xa;, SHARED_ON_FACEBOOK&#xd;&#xa;, SHARED_ON_LINKEDIN&#xd;&#xa;, SHARED_ON_TWITTER&#xd;&#xa;, SHARED_ON_SOCIAL_SURVEY&#xd;&#xa;FROM social_media_post_details&#xd;&#xa;WHERE SURVEY_DETAILS_ID&#x3d;&#x3f; AND ENTITY_TYPE&#x3d;&#x27;region&#x27; AND ENTITY_ID&#x3d;&#x3f;</sql>
     <outer_join>Y</outer_join>
     <replace_vars>Y</replace_vars>
     <parameter>
@@ -682,7 +786,7 @@
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
-    <sql>SELECT&#xd;&#xa;  SURVEY_PRE_INITIATION_ID&#xd;&#xa;, CREATED_ON_EST AS CREATED_ON&#xd;&#xa;FROM survey_pre_initiation&#xd;&#xa;WHERE SURVEY_PRE_INITIATION_ID&#x3d;&#x3f;</sql>
+    <sql>SELECT&#xd;&#xa;  SURVEY_PRE_INITIATION_ID&#xd;&#xa;, CREATED_ON_EST AS CREATED_ON&#xd;&#xa;FROM survey_pre_initiation&#xd;&#xa;WHERE SURVEY_PRE_INITIATION_ID&#x3d;&#x3f;&#xd;&#xa;and STATUS&#x3d;7</sql>
     <outer_join>Y</outer_join>
     <replace_vars>Y</replace_vars>
     <parameter>
@@ -703,7 +807,7 @@
     <name>Join User_SurveyDetails</name>
     <type>DBJoin</type>
     <description/>
-    <distribute>Y</distribute>
+    <distribute>N</distribute>
     <custom_distribution/>
     <copies>1</copies>
          <partitioning>
@@ -714,7 +818,7 @@
     <rowlimit>0</rowlimit>
     <sql>SELECT&#xd;&#xa;  USER_ID&#xd;&#xa;, FIRST_NAME&#xd;&#xa;, LAST_NAME&#xd;&#xa;FROM users&#xd;&#xa;WHERE USER_ID&#x3d;&#x3f;</sql>
     <outer_join>Y</outer_join>
-    <replace_vars>Y</replace_vars>
+    <replace_vars>N</replace_vars>
     <parameter>
       <field>
         <name>AGENT_ID</name>
@@ -742,7 +846,7 @@
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
-    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, ENTITY_TYPE&#xd;&#xa;, ENTITY_ID&#xd;&#xa;, SHARED_ON_FACEBOOK&#xd;&#xa;, SHARED_ON_LINKEDIN&#xd;&#xa;, SHARED_ON_TWITTER&#xd;&#xa;, SHARED_ON_SOCIAL_SURVEY&#xd;&#xa;FROM social_media_post_details&#xd;&#xa;WHERE SURVEY_DETAILS_ID&#x3d;&#x3f; AND ENTITY_TYPE&#x3d;&#x27;branch&#x27; AND ENTITY_ID&#x3d;&#x3f;</sql>
+    <sql>SELECT&#xd;&#xa;  ENTITY_TYPE&#xd;&#xa;, ENTITY_ID&#xd;&#xa;, SHARED_ON_FACEBOOK&#xd;&#xa;, SHARED_ON_LINKEDIN&#xd;&#xa;, SHARED_ON_TWITTER&#xd;&#xa;, SHARED_ON_SOCIAL_SURVEY&#xd;&#xa;FROM social_media_post_details&#xd;&#xa;WHERE SURVEY_DETAILS_ID&#x3d;&#x3f; AND ENTITY_TYPE&#x3d;&#x27;branch&#x27; AND ENTITY_ID&#x3d;&#x3f;</sql>
     <outer_join>Y</outer_join>
     <replace_vars>Y</replace_vars>
     <parameter>
@@ -767,7 +871,7 @@
     <name>Merge Rows &#x28;diff&#x29;</name>
     <type>MergeRows</type>
     <description/>
-    <distribute>Y</distribute>
+    <distribute>N</distribute>
     <custom_distribution/>
     <copies>1</copies>
          <partitioning>
@@ -780,17 +884,6 @@
       <key>IS_DELETED</key>
     </keys>
     <values>
-      <value>SURVEY_DETAILS_ID</value>
-      <value>AGENT_ID</value>
-      <value>CUSTOMER_FIRST_NAME</value>
-      <value>CUSTOMER_LAST_NAME</value>
-      <value>SURVEY_SOURCE</value>
-      <value>SURVEY_SOURCE_ID</value>
-      <value>GATEWAY</value>
-      <value>SURVEY_COMPLETED_DATE</value>
-      <value>AGREED_TO_SHARE</value>
-      <value>CUSTOMER_COMMENTS</value>
-      <value>SURVEY_SCORE</value>
       <value>USER_FIRST_NAME</value>
       <value>USER_LAST_NAME</value>
       <value>CLICK_THROUGH_FOR_BRANCH</value>
@@ -800,16 +893,29 @@
       <value>CLICK_THROUGH_FOR_COMPANY</value>
       <value>CLICK_THROUGH_FOR_AGENT</value>
       <value>IS_DELETED</value>
+      <value>SURVEY_DETAILS_ID</value>
+      <value>AGENT_ID</value>
+      <value>COMPANY_ID</value>
+      <value>CUSTOMER_FIRST_NAME</value>
+      <value>CUSTOMER_LAST_NAME</value>
+      <value>SURVEY_SOURCE</value>
+      <value>SURVEY_SOURCE_ID</value>
+      <value>GATEWAY</value>
+      <value>AGREED_TO_SHARE</value>
+      <value>CUSTOMER_COMMENTS</value>
+      <value>SURVEY_SCORE</value>
+      <value>SURVEY_COMPLETED_DATE</value>
+      <value>REPORT_MODIFIED_ON</value>
     </values>
 <flag_field>flagfield</flag_field>
-<reference>Sort Survey Results report</reference>
+<reference>Sort rows</reference>
 <compare>Sort select report</compare>
     <compare>
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>2249</xloc>
-      <yloc>561</yloc>
+      <xloc>2248</xloc>
+      <yloc>591</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -829,35 +935,17 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var isDeletedChanged &#x3d; false&#x3b;&#xd;&#xa;if&#x28;flagfield &#x3d;&#x3d; &#x27;changed&#x27;&#x29;&#xd;&#xa;&#x7b;&#xd;&#xa;	isDeletedChanged &#x3d;  true&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var companyIdIfNull  &#x3d;COMPANY_ID&#x3b;&#xd;&#xa;var agentIdIfNull &#x3d; AGENT_ID&#x3b;&#xd;&#xa;var scoreIfNull &#x3d; SURVEY_SCORE&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;companyIdIfNull &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	companyIdIfNull &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;agentIdIfNull &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	agentIdIfNull &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;scoreIfNull &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	scoreIfNull &#x3d; 0&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var isDeletedChanged &#x3d; false&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;flagfield &#x3d;&#x3d; &#x27;changed&#x27;&#x29;&#xd;&#xa;&#x7b;&#xd;&#xa;	isDeletedChanged &#x3d;  true&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>isDeletedChanged</name>
         <rename>isDeletedChanged</rename>
         <type>Boolean</type>
         <length>-1</length>
         <precision>-1</precision>
         <replace>N</replace>
-      </field>      <field>        <name>companyIdIfNull</name>
-        <rename>companyIdIfNull</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>      <field>        <name>agentIdIfNull</name>
-        <rename>agentIdIfNull</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>      <field>        <name>scoreIfNull</name>
-        <rename>scoreIfNull</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>2249</xloc>
-      <yloc>802</yloc>
+      <xloc>2248</xloc>
+      <yloc>813</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -866,7 +954,7 @@
     <name>Multiway Merge Join for report</name>
     <type>MultiwayMergeJoin</type>
     <description/>
-    <distribute>Y</distribute>
+    <distribute>N</distribute>
     <custom_distribution/>
     <copies>1</copies>
          <partitioning>
@@ -927,40 +1015,52 @@
     <return_field/>
     <fields>
         <field>
-          <column_name>AGENT_ID</column_name>
-          <stream_name>agentIdIfNull</stream_name>
+          <column_name>USER_FIRST_NAME</column_name>
+          <stream_name>USER_FIRST_NAME</stream_name>
         </field>
         <field>
-          <column_name>AGREED_TO_SHARE</column_name>
-          <stream_name>AGREED_TO_SHARE</stream_name>
-        </field>
-        <field>
-          <column_name>BRANCH_NAME</column_name>
-          <stream_name>BRANCH_NAME</stream_name>
-        </field>
-        <field>
-          <column_name>CLICK_THROUGH_FOR_AGENT</column_name>
-          <stream_name>CLICK_THROUGH_FOR_AGENT</stream_name>
+          <column_name>USER_LAST_NAME</column_name>
+          <stream_name>USER_LAST_NAME</stream_name>
         </field>
         <field>
           <column_name>CLICK_THROUGH_FOR_BRANCH</column_name>
           <stream_name>CLICK_THROUGH_FOR_BRANCH</stream_name>
         </field>
         <field>
-          <column_name>CLICK_THROUGH_FOR_COMPANY</column_name>
-          <stream_name>CLICK_THROUGH_FOR_COMPANY</stream_name>
+          <column_name>BRANCH_NAME</column_name>
+          <stream_name>BRANCH_NAME</stream_name>
+        </field>
+        <field>
+          <column_name>SURVEY_SENT_DATE</column_name>
+          <stream_name>SURVEY_SENT_DATE</stream_name>
         </field>
         <field>
           <column_name>CLICK_THROUGH_FOR_REGION</column_name>
           <stream_name>CLICK_THROUGH_FOR_REGION</stream_name>
         </field>
         <field>
-          <column_name>COMPANY_ID</column_name>
-          <stream_name>companyIdIfNull</stream_name>
+          <column_name>CLICK_THROUGH_FOR_COMPANY</column_name>
+          <stream_name>CLICK_THROUGH_FOR_COMPANY</stream_name>
         </field>
         <field>
-          <column_name>CUSTOMER_COMMENTS</column_name>
-          <stream_name>CUSTOMER_COMMENTS</stream_name>
+          <column_name>CLICK_THROUGH_FOR_AGENT</column_name>
+          <stream_name>CLICK_THROUGH_FOR_AGENT</stream_name>
+        </field>
+        <field>
+          <column_name>IS_DELETED</column_name>
+          <stream_name>isDeletedChanged</stream_name>
+        </field>
+        <field>
+          <column_name>SURVEY_DETAILS_ID</column_name>
+          <stream_name>SURVEY_DETAILS_ID</stream_name>
+        </field>
+        <field>
+          <column_name>AGENT_ID</column_name>
+          <stream_name>AGENT_ID</stream_name>
+        </field>
+        <field>
+          <column_name>COMPANY_ID</column_name>
+          <stream_name>COMPANY_ID</stream_name>
         </field>
         <field>
           <column_name>CUSTOMER_FIRST_NAME</column_name>
@@ -971,38 +1071,6 @@
           <stream_name>CUSTOMER_LAST_NAME</stream_name>
         </field>
         <field>
-          <column_name>GATEWAY</column_name>
-          <stream_name>GATEWAY</stream_name>
-        </field>
-        <field>
-          <column_name>IS_DELETED</column_name>
-          <stream_name>isDeletedChanged</stream_name>
-        </field>
-        <field>
-          <column_name>REPORT_MODIFIED_ON</column_name>
-          <stream_name>REPORT_MODIFIED_ON</stream_name>
-        </field>
-        <field>
-          <column_name>SURVEY_COMPLETED_DATE</column_name>
-          <stream_name>SURVEY_COMPLETED_DATE</stream_name>
-        </field>
-        <field>
-          <column_name>SURVEY_DETAILS_ID</column_name>
-          <stream_name>SURVEY_DETAILS_ID</stream_name>
-        </field>
-        <field>
-          <column_name>SURVEY_RESULTS_COMPANY_REPORT_ID</column_name>
-          <stream_name>SURVEY_RESULTS_COMPANY_REPORT_ID</stream_name>
-        </field>
-        <field>
-          <column_name>SURVEY_SCORE</column_name>
-          <stream_name>scoreIfNull</stream_name>
-        </field>
-        <field>
-          <column_name>SURVEY_SENT_DATE</column_name>
-          <stream_name>SURVEY_SENT_DATE</stream_name>
-        </field>
-        <field>
           <column_name>SURVEY_SOURCE</column_name>
           <stream_name>SURVEY_SOURCE</stream_name>
         </field>
@@ -1011,22 +1079,42 @@
           <stream_name>SURVEY_SOURCE_ID</stream_name>
         </field>
         <field>
-          <column_name>USER_FIRST_NAME</column_name>
-          <stream_name>USER_FIRST_NAME</stream_name>
+          <column_name>GATEWAY</column_name>
+          <stream_name>GATEWAY</stream_name>
         </field>
         <field>
-          <column_name>USER_LAST_NAME</column_name>
-          <stream_name>USER_LAST_NAME</stream_name>
+          <column_name>AGREED_TO_SHARE</column_name>
+          <stream_name>AGREED_TO_SHARE</stream_name>
+        </field>
+        <field>
+          <column_name>CUSTOMER_COMMENTS</column_name>
+          <stream_name>CUSTOMER_COMMENTS</stream_name>
+        </field>
+        <field>
+          <column_name>SURVEY_SCORE</column_name>
+          <stream_name>SURVEY_SCORE</stream_name>
+        </field>
+        <field>
+          <column_name>SURVEY_COMPLETED_DATE</column_name>
+          <stream_name>SURVEY_COMPLETED_DATE</stream_name>
+        </field>
+        <field>
+          <column_name>REPORT_MODIFIED_ON</column_name>
+          <stream_name>REPORT_MODIFIED_ON</stream_name>
+        </field>
+        <field>
+          <column_name>SURVEY_RESULTS_COMPANY_REPORT_ID</column_name>
+          <stream_name>SURVEY_RESULTS_COMPANY_REPORT_ID</stream_name>
         </field>
         <field>
           <column_name>TIME_INTERVAL</column_name>
-          <stream_name>timeInterval</stream_name>
+          <stream_name>TIME_INTERVAL</stream_name>
         </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1954</xloc>
-      <yloc>945</yloc>
+      <xloc>1669</xloc>
+      <yloc>954</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1050,343 +1138,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>2249</xloc>
-      <yloc>655</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Select SurveyResultsCompanyReport</name>
-    <type>SelectValues</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>        <select_unspecified>N</select_unspecified>
-      <meta>        <name>SURVEY_DETAILS_ID</name>
-        <rename>SURVEY_DETAILS_ID</rename>
-        <type>String</type>
-        <length>36</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>COMPANY_ID</name>
-        <rename>COMPANY_ID</rename>
-        <type>None</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>AGENT_ID</name>
-        <rename>AGENT_ID</rename>
-        <type>Integer</type>
-        <length>9</length>
-        <precision>0</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>USER_FIRST_NAME</name>
-        <rename>USER_FIRST_NAME</rename>
-        <type>String</type>
-        <length>36</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>USER_LAST_NAME</name>
-        <rename>USER_LAST_NAME</rename>
-        <type>String</type>
-        <length>36</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>CUSTOMER_FIRST_NAME</name>
-        <rename>CUSTOMER_FIRST_NAME</rename>
-        <type>String</type>
-        <length>36</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>CUSTOMER_LAST_NAME</name>
-        <rename>CUSTOMER_LAST_NAME</rename>
-        <type>String</type>
-        <length>36</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>SURVEY_SENT_DATE</name>
-        <rename>SURVEY_SENT_DATE</rename>
-        <type>Timestamp</type>
-        <length>0</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>SURVEY_COMPLETED_DATE</name>
-        <rename>SURVEY_COMPLETED_DATE</rename>
-        <type>Timestamp</type>
-        <length>0</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>SURVEY_SOURCE</name>
-        <rename>SURVEY_SOURCE</rename>
-        <type>String</type>
-        <length>45</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>SURVEY_SOURCE_ID</name>
-        <rename>SURVEY_SOURCE_ID</rename>
-        <type>String</type>
-        <length>21845</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>SURVEY_SCORE</name>
-        <rename>SURVEY_SCORE</rename>
-        <type>Integer</type>
-        <length>9</length>
-        <precision>0</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>GATEWAY</name>
-        <rename>GATEWAY</rename>
-        <type>String</type>
-        <length>45</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>CUSTOMER_COMMENTS</name>
-        <rename>CUSTOMER_COMMENTS</rename>
-        <type>String</type>
-        <length>21845</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>AGREED_TO_SHARE</name>
-        <rename>AGREED_TO_SHARE</rename>
-        <type>String</type>
-        <length>45</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>BRANCH_NAME</name>
-        <rename>BRANCH_NAME</rename>
-        <type>String</type>
-        <length>21845</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>CLICK_THROUGH_FOR_COMPANY</name>
-        <rename>CLICK_THROUGH_FOR_COMPANY</rename>
-        <type>String</type>
-        <length>21845</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>CLICK_THROUGH_FOR_AGENT</name>
-        <rename>CLICK_THROUGH_FOR_AGENT</rename>
-        <type>String</type>
-        <length>21845</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>CLICK_THROUGH_FOR_REGION</name>
-        <rename>CLICK_THROUGH_FOR_REGION</rename>
-        <type>String</type>
-        <length>21845</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>CLICK_THROUGH_FOR_BRANCH</name>
-        <rename>CLICK_THROUGH_FOR_BRANCH</rename>
-        <type>String</type>
-        <length>21845</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>IS_DELETED</name>
-        <rename>IS_DELETED</rename>
-        <type>Boolean</type>
-        <length>15</length>
-        <precision>0</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1758</xloc>
-      <yloc>561</yloc>
+      <xloc>2248</xloc>
+      <yloc>698</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1423,404 +1176,6 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>589</xloc>
       <yloc>233</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Select for Report</name>
-    <type>SelectValues</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>        <select_unspecified>N</select_unspecified>
-      <remove>        <name>AGENT_ID_1</name>
-      </remove>      <remove>        <name>AGENT_ID_2</name>
-      </remove>      <remove>        <name>AGENT_ID_3</name>
-      </remove>      <remove>        <name>AGENT_ID_4</name>
-      </remove>      <remove>        <name>AGENT_ID_5</name>
-      </remove>      <remove>        <name>AGREED_TO_SHARE_1</name>
-      </remove>      <remove>        <name>COMPANY_ID_1</name>
-      </remove>      <remove>        <name>COMPANY_ID_2</name>
-      </remove>      <remove>        <name>CUSTOMER_FIRST_NAME_1</name>
-      </remove>      <remove>        <name>CUSTOMER_LAST_NAME_1</name>
-      </remove>      <remove>        <name>ENTITY_ID</name>
-      </remove>      <remove>        <name>ENTITY_ID_1</name>
-      </remove>      <remove>        <name>ENTITY_TYPE</name>
-      </remove>      <remove>        <name>ENTITY_TYPE_1</name>
-      </remove>      <remove>        <name>MOOD_1</name>
-      </remove>      <remove>        <name>REVIEW_1</name>
-      </remove>      <remove>        <name>SCORE_1</name>
-      </remove>      <remove>        <name>SHARED_ON_FACEBOOK</name>
-      </remove>      <remove>        <name>SHARED_ON_FACEBOOK_1</name>
-      </remove>      <remove>        <name>SHARED_ON_LINKEDIN</name>
-      </remove>      <remove>        <name>SHARED_ON_LINKEDIN_1</name>
-      </remove>      <remove>        <name>SHARED_ON_SOCIAL_SURVEY</name>
-      </remove>      <remove>        <name>SHARED_ON_SOCIAL_SURVEY_1</name>
-      </remove>      <remove>        <name>SHARED_ON_TWITTER</name>
-      </remove>      <remove>        <name>SHARED_ON_TWITTER_1</name>
-      </remove>      <remove>        <name>SOURCE_1</name>
-      </remove>      <remove>        <name>SOURCE_ID_1</name>
-      </remove>      <remove>        <name>SURVEY_COMPLETED_DATE_EST_1</name>
-      </remove>      <remove>        <name>SURVEY_DETAILS_ID_1</name>
-      </remove>      <remove>        <name>SURVEY_DETAILS_ID_1_1</name>
-      </remove>      <remove>        <name>SURVEY_DETAILS_ID_1_2</name>
-      </remove>      <remove>        <name>SURVEY_DETAILS_ID_2</name>
-      </remove>      <remove>        <name>SURVEY_DETAILS_ID_3</name>
-      </remove>      <remove>        <name>SURVEY_DETAILS_ID_4</name>
-      </remove>      <remove>        <name>SURVEY_DETAILS_ID_5</name>
-      </remove>      <remove>        <name>SURVEY_PRE_INITIATION_ID</name>
-      </remove>      <remove>        <name>SURVEY_PRE_INTITIATION_ID</name>
-      </remove>      <remove>        <name>SURVEY_PRE_INTITIATION_ID_1</name>
-      </remove>      <remove>        <name>USER_ID</name>
-      </remove>      <remove>        <name>facebook</name>
-      </remove>      <remove>        <name>facebook_1</name>
-      </remove>      <remove>        <name>linkedIn</name>
-      </remove>      <remove>        <name>linkedIn_1</name>
-      </remove>      <remove>        <name>socialSurvey</name>
-      </remove>      <remove>        <name>socialSurvey_1</name>
-      </remove>      <remove>        <name>twitter</name>
-      </remove>      <remove>        <name>twitter_1</name>
-      </remove>      <remove>        <name>SURVEY_MODIFIED_ON_1</name>
-      </remove>      <meta>        <name>SURVEY_DETAILS_ID</name>
-        <rename>SURVEY_DETAILS_ID</rename>
-        <type>String</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>COMPANY_ID</name>
-        <rename>COMPANY_ID</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>AGENT_ID</name>
-        <rename>AGENT_ID</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>FIRST_NAME</name>
-        <rename>USER_FIRST_NAME</rename>
-        <type>String</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>LAST_NAME</name>
-        <rename>USER_LAST_NAME</rename>
-        <type>String</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>CUSTOMER_FIRST_NAME</name>
-        <rename>CUSTOMER_FIRST_NAME</rename>
-        <type>String</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>CUSTOMER_LAST_NAME</name>
-        <rename>CUSTOMER_LAST_NAME</rename>
-        <type>String</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>CREATED_ON</name>
-        <rename>SURVEY_SENT_DATE</rename>
-        <type>Timestamp</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>SURVEY_COMPLETED_DATE_EST</name>
-        <rename>SURVEY_COMPLETED_DATE</rename>
-        <type>Timestamp</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>SOURCE</name>
-        <rename>SURVEY_SOURCE</rename>
-        <type>String</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>SOURCE_ID</name>
-        <rename>SURVEY_SOURCE_ID</rename>
-        <type>String</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>SCORE</name>
-        <rename>SURVEY_SCORE</rename>
-        <type>Integer</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>MOOD</name>
-        <rename>GATEWAY</rename>
-        <type>String</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>REVIEW</name>
-        <rename>CUSTOMER_COMMENTS</rename>
-        <type>String</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>AGREED_TO_SHARE</name>
-        <rename>AGREED_TO_SHARE</rename>
-        <type>String</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>Branch Name</name>
-        <rename>BRANCH_NAME</rename>
-        <type>String</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>click_Through_For_Company</name>
-        <rename>CLICK_THROUGH_FOR_COMPANY</rename>
-        <type>String</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>click_Through_For_Agent</name>
-        <rename>CLICK_THROUGH_FOR_AGENT</rename>
-        <type>String</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>ClickThrough for Region</name>
-        <rename>CLICK_THROUGH_FOR_REGION</rename>
-        <type>String</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>ClickThrough for Branch</name>
-        <rename>CLICK_THROUGH_FOR_BRANCH</rename>
-        <type>String</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>isDeleted</name>
-        <rename>IS_DELETED</rename>
-        <type>Boolean</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>SURVEY_MODIFIED_ON</name>
-        <rename>REPORT_MODIFIED_ON</rename>
-        <type>Timestamp</type>
-        <length>-2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>2249</xloc>
-      <yloc>375</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1881,6 +1236,415 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>346</xloc>
       <yloc>467</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Select values 3</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>        <select_unspecified>N</select_unspecified>
+      <remove>        <name>SURVEY_DETAILS_ID</name>
+      </remove>      <remove>        <name>AGENT_ID</name>
+      </remove>      <remove>        <name>COMPANY_ID</name>
+      </remove>      <remove>        <name>SURVEY_PRE_INTITIATION_ID</name>
+      </remove>      <remove>        <name>CUSTOMER_FIRST_NAME</name>
+      </remove>      <remove>        <name>CUSTOMER_LAST_NAME</name>
+      </remove>      <remove>        <name>SOURCE</name>
+      </remove>      <remove>        <name>SOURCE_ID</name>
+      </remove>      <remove>        <name>MOOD</name>
+      </remove>      <remove>        <name>SURVEY_COMPLETED_DATE_EST</name>
+      </remove>      <remove>        <name>AGREED_TO_SHARE</name>
+      </remove>      <remove>        <name>REVIEW</name>
+      </remove>      <remove>        <name>SCORE</name>
+      </remove>      <remove>        <name>SURVEY_MODIFIED_ON</name>
+      </remove>      <remove>        <name>USER_ID</name>
+      </remove>      <remove>        <name>SURVEY_DETAILS_ID_1</name>
+      </remove>      <remove>        <name>AGENT_ID_1</name>
+      </remove>      <remove>        <name>SURVEY_DETAILS_ID_2</name>
+      </remove>      <remove>        <name>AGENT_ID_2</name>
+      </remove>      <remove>        <name>COMPANY_ID_1</name>
+      </remove>      <remove>        <name>SURVEY_PRE_INTITIATION_ID_1</name>
+      </remove>      <remove>        <name>CUSTOMER_FIRST_NAME_1</name>
+      </remove>      <remove>        <name>CUSTOMER_LAST_NAME_1</name>
+      </remove>      <remove>        <name>SOURCE_1</name>
+      </remove>      <remove>        <name>SOURCE_ID_1</name>
+      </remove>      <remove>        <name>MOOD_1</name>
+      </remove>      <remove>        <name>SURVEY_COMPLETED_DATE_EST_1</name>
+      </remove>      <remove>        <name>AGREED_TO_SHARE_1</name>
+      </remove>      <remove>        <name>REVIEW_1</name>
+      </remove>      <remove>        <name>SCORE_1</name>
+      </remove>      <remove>        <name>SURVEY_MODIFIED_ON_1</name>
+      </remove>      <remove>        <name>SURVEY_PRE_INITIATION_ID</name>
+      </remove>      <remove>        <name>SURVEY_DETAILS_ID_3</name>
+      </remove>      <remove>        <name>AGENT_ID_3</name>
+      </remove>      <remove>        <name>SURVEY_DETAILS_ID_4</name>
+      </remove>      <remove>        <name>COMPANY_ID_2</name>
+      </remove>      <remove>        <name>AGENT_ID_4</name>
+      </remove>      <remove>        <name>ENTITY_TYPE</name>
+      </remove>      <remove>        <name>ENTITY_ID</name>
+      </remove>      <remove>        <name>SHARED_ON_FACEBOOK</name>
+      </remove>      <remove>        <name>SHARED_ON_LINKEDIN</name>
+      </remove>      <remove>        <name>SHARED_ON_TWITTER</name>
+      </remove>      <remove>        <name>SHARED_ON_SOCIAL_SURVEY</name>
+      </remove>      <remove>        <name>facebook</name>
+      </remove>      <remove>        <name>linkedIn</name>
+      </remove>      <remove>        <name>twitter</name>
+      </remove>      <remove>        <name>socialSurvey</name>
+      </remove>      <remove>        <name>SURVEY_DETAILS_ID_5</name>
+      </remove>      <remove>        <name>AGENT_ID_5</name>
+      </remove>      <remove>        <name>ENTITY_TYPE_1</name>
+      </remove>      <remove>        <name>ENTITY_ID_1</name>
+      </remove>      <remove>        <name>SHARED_ON_FACEBOOK_1</name>
+      </remove>      <remove>        <name>SHARED_ON_LINKEDIN_1</name>
+      </remove>      <remove>        <name>SHARED_ON_TWITTER_1</name>
+      </remove>      <remove>        <name>SHARED_ON_SOCIAL_SURVEY_1</name>
+      </remove>      <remove>        <name>facebook_1</name>
+      </remove>      <remove>        <name>linkedIn_1</name>
+      </remove>      <remove>        <name>twitter_1</name>
+      </remove>      <remove>        <name>socialSurvey_1</name>
+      </remove>      <meta>        <name>FIRST_NAME</name>
+        <rename>USER_FIRST_NAME</rename>
+        <type>String</type>
+        <length>450</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>LAST_NAME</name>
+        <rename>USER_LAST_NAME</rename>
+        <type>String</type>
+        <length>450</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>ClickThrough for Branch</name>
+        <rename>CLICK_THROUGH_FOR_BRANCH</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>Branch Name</name>
+        <rename>BRANCH_NAME</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>CREATED_ON</name>
+        <rename>SURVEY_SENT_DATE</rename>
+        <type>Timestamp</type>
+        <length>450</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>ClickThrough for Region</name>
+        <rename>CLICK_THROUGH_FOR_REGION</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>click_Through_For_Company</name>
+        <rename>CLICK_THROUGH_FOR_COMPANY</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>click_Through_For_Agent</name>
+        <rename>CLICK_THROUGH_FOR_AGENT</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>isDeleted</name>
+        <rename>IS_DELETED</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>final_survey_details_id</name>
+        <rename>SURVEY_DETAILS_ID</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>final_agent_id</name>
+        <rename>AGENT_ID</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>0</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>final_company_id</name>
+        <rename>COMPANY_ID</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>0</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>final_customer_first_name</name>
+        <rename>CUSTOMER_FIRST_NAME</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>final_customer_last_name</name>
+        <rename>CUSTOMER_LAST_NAME</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>final_source</name>
+        <rename>SURVEY_SOURCE</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>final_source_id</name>
+        <rename>SURVEY_SOURCE_ID</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>final_mood</name>
+        <rename>GATEWAY</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>final_agreed_to_share</name>
+        <rename>AGREED_TO_SHARE</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>final_review</name>
+        <rename>CUSTOMER_COMMENTS</rename>
+        <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>final_score</name>
+        <rename>SURVEY_SCORE</rename>
+        <type>Number</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>final_survey_completed_date_est</name>
+        <rename>SURVEY_COMPLETED_DATE</rename>
+        <type>Timestamp</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>final_survey_modified_on</name>
+        <rename>REPORT_MODIFIED_ON</rename>
+        <type>Timestamp</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>2248</xloc>
+      <yloc>386</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1949,52 +1713,6 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>1833</xloc>
       <yloc>308</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Sort Survey Results report</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>SURVEY_DETAILS_ID</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>AGENT_ID</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>IS_DELETED</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>2041</xloc>
-      <yloc>561</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2317,7 +2035,7 @@
     <name>Sort select report</name>
     <type>SortRows</type>
     <description/>
-    <distribute>Y</distribute>
+    <distribute>N</distribute>
     <custom_distribution/>
     <copies>1</copies>
          <partitioning>
@@ -2353,8 +2071,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>2249</xloc>
-      <yloc>461</yloc>
+      <xloc>2248</xloc>
+      <yloc>480</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2397,7 +2115,7 @@
     <name>Sort user</name>
     <type>SortRows</type>
     <description/>
-    <distribute>Y</distribute>
+    <distribute>N</distribute>
     <custom_distribution/>
     <copies>1</copies>
          <partitioning>
@@ -2439,7 +2157,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, CUSTOMER_FIRST_NAME&#xd;&#xa;, CUSTOMER_LAST_NAME&#xd;&#xa;, SURVEY_SOURCE&#xd;&#xa;, SURVEY_SOURCE_ID&#xd;&#xa;, GATEWAY&#xd;&#xa;, SURVEY_COMPLETED_DATE&#xd;&#xa;, AGREED_TO_SHARE&#xd;&#xa;, CUSTOMER_COMMENTS&#xd;&#xa;, SURVEY_SCORE&#xd;&#xa;, REPORT_MODIFIED_ON&#xd;&#xa;, USER_FIRST_NAME&#xd;&#xa;, USER_LAST_NAME&#xd;&#xa;, CLICK_THROUGH_FOR_BRANCH&#xd;&#xa;, BRANCH_NAME&#xd;&#xa;, SURVEY_SENT_DATE&#xd;&#xa;, CLICK_THROUGH_FOR_REGION&#xd;&#xa;, CLICK_THROUGH_FOR_COMPANY&#xd;&#xa;, CLICK_THROUGH_FOR_AGENT&#xd;&#xa;, case when IS_DELETED &#x3c;&#x3e; 0 then true else false end IS_DELETED&#xd;&#xa;FROM survey_results_company_report&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  USER_FIRST_NAME&#xd;&#xa;, USER_LAST_NAME&#xd;&#xa;, CLICK_THROUGH_FOR_BRANCH&#xd;&#xa;, BRANCH_NAME&#xd;&#xa;, SURVEY_SENT_DATE&#xd;&#xa;, CLICK_THROUGH_FOR_REGION&#xd;&#xa;, CLICK_THROUGH_FOR_COMPANY&#xd;&#xa;, CLICK_THROUGH_FOR_AGENT&#xd;&#xa;, case when IS_DELETED &#x3c;&#x3e; 0 then true else false end IS_DELETED&#xd;&#xa;, SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, CUSTOMER_FIRST_NAME&#xd;&#xa;, CUSTOMER_LAST_NAME&#xd;&#xa;, SURVEY_SOURCE&#xd;&#xa;, SURVEY_SOURCE_ID&#xd;&#xa;, GATEWAY&#xd;&#xa;, AGREED_TO_SHARE&#xd;&#xa;, CUSTOMER_COMMENTS&#xd;&#xa;, SURVEY_SCORE&#xd;&#xa;, SURVEY_COMPLETED_DATE&#xd;&#xa;, REPORT_MODIFIED_ON&#xd;&#xa;FROM survey_results_company_report&#xd;&#xa;where IS_DELETED &#x3d; 0&#x3b;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -2447,8 +2165,8 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1477</xloc>
-      <yloc>561</yloc>
+      <xloc>1810</xloc>
+      <yloc>591</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2465,7 +2183,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, SURVEY_PRE_INTITIATION_ID&#xd;&#xa;, CUSTOMER_FIRST_NAME&#xd;&#xa;, CUSTOMER_LAST_NAME&#xd;&#xa;, SOURCE&#xd;&#xa;, SOURCE_ID&#xd;&#xa;, MOOD&#xd;&#xa;, SURVEY_COMPLETED_DATE_EST&#xd;&#xa;, AGREED_TO_SHARE&#xd;&#xa;, REVIEW&#xd;&#xa;, SCORE&#xd;&#xa;, MODIFIED_ON_EST AS SURVEY_MODIFIED_ON&#xd;&#xa;FROM survey_details&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, SURVEY_PRE_INTITIATION_ID&#xd;&#xa;, CUSTOMER_FIRST_NAME&#xd;&#xa;, CUSTOMER_LAST_NAME&#xd;&#xa;, SOURCE&#xd;&#xa;, SOURCE_ID&#xd;&#xa;, MOOD&#xd;&#xa;, SURVEY_COMPLETED_DATE_EST&#xd;&#xa;, AGREED_TO_SHARE&#xd;&#xa;, REVIEW&#xd;&#xa;, SCORE&#xd;&#xa;, MODIFIED_ON_EST AS SURVEY_MODIFIED_ON&#xd;&#xa;FROM survey_details&#xd;&#xa;WHERE STAGE &#x3d; -1 and COMPANY_ID &#x3c;&#x3e; 0&#x3b;&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -2503,8 +2221,8 @@
 <target_step>isDeletedNew</target_step>
 </case></cases>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1954</xloc>
-      <yloc>802</yloc>
+      <xloc>1669</xloc>
+      <yloc>813</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2539,40 +2257,48 @@
     <return_field/>
     <fields>
         <field>
-          <column_name>AGENT_ID</column_name>
-          <stream_name>agentIdIfNull</stream_name>
+          <column_name>USER_FIRST_NAME</column_name>
+          <stream_name>USER_FIRST_NAME</stream_name>
         </field>
         <field>
-          <column_name>AGREED_TO_SHARE</column_name>
-          <stream_name>AGREED_TO_SHARE</stream_name>
-        </field>
-        <field>
-          <column_name>BRANCH_NAME</column_name>
-          <stream_name>BRANCH_NAME</stream_name>
-        </field>
-        <field>
-          <column_name>CLICK_THROUGH_FOR_AGENT</column_name>
-          <stream_name>CLICK_THROUGH_FOR_AGENT</stream_name>
+          <column_name>USER_LAST_NAME</column_name>
+          <stream_name>USER_LAST_NAME</stream_name>
         </field>
         <field>
           <column_name>CLICK_THROUGH_FOR_BRANCH</column_name>
           <stream_name>CLICK_THROUGH_FOR_BRANCH</stream_name>
         </field>
         <field>
-          <column_name>CLICK_THROUGH_FOR_COMPANY</column_name>
-          <stream_name>CLICK_THROUGH_FOR_COMPANY</stream_name>
+          <column_name>BRANCH_NAME</column_name>
+          <stream_name>BRANCH_NAME</stream_name>
+        </field>
+        <field>
+          <column_name>SURVEY_SENT_DATE</column_name>
+          <stream_name>SURVEY_SENT_DATE</stream_name>
         </field>
         <field>
           <column_name>CLICK_THROUGH_FOR_REGION</column_name>
           <stream_name>CLICK_THROUGH_FOR_REGION</stream_name>
         </field>
         <field>
-          <column_name>COMPANY_ID</column_name>
-          <stream_name>companyIdIfNull</stream_name>
+          <column_name>CLICK_THROUGH_FOR_COMPANY</column_name>
+          <stream_name>CLICK_THROUGH_FOR_COMPANY</stream_name>
         </field>
         <field>
-          <column_name>CUSTOMER_COMMENTS</column_name>
-          <stream_name>CUSTOMER_COMMENTS</stream_name>
+          <column_name>CLICK_THROUGH_FOR_AGENT</column_name>
+          <stream_name>CLICK_THROUGH_FOR_AGENT</stream_name>
+        </field>
+        <field>
+          <column_name>SURVEY_DETAILS_ID</column_name>
+          <stream_name>SURVEY_DETAILS_ID</stream_name>
+        </field>
+        <field>
+          <column_name>AGENT_ID</column_name>
+          <stream_name>AGENT_ID</stream_name>
+        </field>
+        <field>
+          <column_name>COMPANY_ID</column_name>
+          <stream_name>COMPANY_ID</stream_name>
         </field>
         <field>
           <column_name>CUSTOMER_FIRST_NAME</column_name>
@@ -2583,38 +2309,6 @@
           <stream_name>CUSTOMER_LAST_NAME</stream_name>
         </field>
         <field>
-          <column_name>GATEWAY</column_name>
-          <stream_name>GATEWAY</stream_name>
-        </field>
-        <field>
-          <column_name>IS_DELETED</column_name>
-          <stream_name>isDeletedNewValue</stream_name>
-        </field>
-        <field>
-          <column_name>REPORT_MODIFIED_ON</column_name>
-          <stream_name>REPORT_MODIFIED_ON</stream_name>
-        </field>
-        <field>
-          <column_name>SURVEY_COMPLETED_DATE</column_name>
-          <stream_name>SURVEY_COMPLETED_DATE</stream_name>
-        </field>
-        <field>
-          <column_name>SURVEY_DETAILS_ID</column_name>
-          <stream_name>SURVEY_DETAILS_ID</stream_name>
-        </field>
-        <field>
-          <column_name>SURVEY_RESULTS_COMPANY_REPORT_ID</column_name>
-          <stream_name>SURVEY_RESULTS_COMPANY_REPORT_ID</stream_name>
-        </field>
-        <field>
-          <column_name>SURVEY_SCORE</column_name>
-          <stream_name>scoreIfNull</stream_name>
-        </field>
-        <field>
-          <column_name>SURVEY_SENT_DATE</column_name>
-          <stream_name>SURVEY_SENT_DATE</stream_name>
-        </field>
-        <field>
           <column_name>SURVEY_SOURCE</column_name>
           <stream_name>SURVEY_SOURCE</stream_name>
         </field>
@@ -2623,22 +2317,46 @@
           <stream_name>SURVEY_SOURCE_ID</stream_name>
         </field>
         <field>
-          <column_name>USER_FIRST_NAME</column_name>
-          <stream_name>USER_FIRST_NAME</stream_name>
+          <column_name>GATEWAY</column_name>
+          <stream_name>GATEWAY</stream_name>
         </field>
         <field>
-          <column_name>USER_LAST_NAME</column_name>
-          <stream_name>USER_LAST_NAME</stream_name>
+          <column_name>AGREED_TO_SHARE</column_name>
+          <stream_name>AGREED_TO_SHARE</stream_name>
+        </field>
+        <field>
+          <column_name>CUSTOMER_COMMENTS</column_name>
+          <stream_name>CUSTOMER_COMMENTS</stream_name>
+        </field>
+        <field>
+          <column_name>SURVEY_SCORE</column_name>
+          <stream_name>SURVEY_SCORE</stream_name>
+        </field>
+        <field>
+          <column_name>SURVEY_COMPLETED_DATE</column_name>
+          <stream_name>SURVEY_COMPLETED_DATE</stream_name>
+        </field>
+        <field>
+          <column_name>REPORT_MODIFIED_ON</column_name>
+          <stream_name>REPORT_MODIFIED_ON</stream_name>
+        </field>
+        <field>
+          <column_name>SURVEY_RESULTS_COMPANY_REPORT_ID</column_name>
+          <stream_name>SURVEY_RESULTS_COMPANY_REPORT_ID</stream_name>
         </field>
         <field>
           <column_name>TIME_INTERVAL</column_name>
-          <stream_name>timeInterval</stream_name>
+          <stream_name>TIME_INTERVAL</stream_name>
+        </field>
+        <field>
+          <column_name>IS_DELETED</column_name>
+          <stream_name>isDeletedNewValue</stream_name>
         </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1172</xloc>
-      <yloc>802</yloc>
+      <xloc>1028</xloc>
+      <yloc>813</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2688,8 +2406,8 @@
       </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1580</xloc>
-      <yloc>802</yloc>
+      <xloc>1237</xloc>
+      <yloc>980</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2758,7 +2476,7 @@
     <name>isDeleted js</name>
     <type>ScriptValueMod</type>
     <description/>
-    <distribute>Y</distribute>
+    <distribute>N</distribute>
     <custom_distribution/>
     <copies>1</copies>
          <partitioning>
@@ -2769,16 +2487,94 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var isDeleted &#x3d; false&#x3b;&#xd;&#xa;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var isDeleted &#x3d; false&#x3b;&#xd;&#xa;&#xd;&#xa;var final_survey_details_id &#x3d; 0&#x3b;&#xd;&#xa;var final_agent_id &#x3d; 0&#x3b;&#xd;&#xa;var final_company_id &#x3d; 0&#x3b;&#xd;&#xa;var final_customer_first_name&#x3d;&#x22;&#x22;&#x3b;&#xd;&#xa;var final_customer_last_name&#x3d;&#x22;&#x22;&#x3b;&#xd;&#xa;var final_source &#x3d; &#x22;&#x22;&#x3b;&#xd;&#xa;var final_source_id &#x3d; &#x22;&#x22;&#x3b;&#xd;&#xa;var final_mood &#x3d; &#x22;&#x22;&#x3b;&#xd;&#xa;var final_agreed_to_share &#x3d; &#x22;&#x22;&#x3b;&#xd;&#xa;var final_review &#x3d; &#x22;&#x22;&#x3b;&#xd;&#xa;var final_score &#x3d; 0&#x3b;&#xd;&#xa;var final_survey_completed_date_est &#x3d; &#x22;&#x22;&#x3b;&#xd;&#xa;var final_survey_modified_on &#x3d; &#x22;&#x22;&#x3b;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;SURVEY_DETAILS_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_survey_details_id &#x3d; SURVEY_DETAILS_ID&#x3b;&#xd;&#xa;&#x7d; else if&#x28;SURVEY_DETAILS_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_survey_details_id &#x3d; SURVEY_DETAILS_ID_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;SURVEY_DETAILS_ID_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_survey_details_id &#x3d; SURVEY_DETAILS_ID_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;SURVEY_DETAILS_ID_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_survey_details_id &#x3d; SURVEY_DETAILS_ID_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;SURVEY_DETAILS_ID_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_survey_details_id &#x3d; SURVEY_DETAILS_ID_4&#x3b;&#xd;&#xa;&#x7d; else if&#x28;SURVEY_DETAILS_ID_5 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_survey_details_id &#x3d; SURVEY_DETAILS_ID_5&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;AGENT_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID&#x3b;&#xd;&#xa;&#x7d; else if&#x28;USER_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; USER_ID&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID_4&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGENT_ID_5 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agent_id &#x3d; AGENT_ID_5&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;COMPANY_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_2&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;CUSTOMER_FIRST_NAME &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_customer_first_name&#x3d;CUSTOMER_FIRST_NAME&#x3b;&#xd;&#xa;&#x7d; else if&#x28;CUSTOMER_FIRST_NAME_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_customer_first_name&#x3d;CUSTOMER_FIRST_NAME_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;CUSTOMER_LAST_NAME &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_customer_last_name&#x3d;CUSTOMER_LAST_NAME&#x3b;&#xd;&#xa;&#x7d; else if&#x28;CUSTOMER_LAST_NAME_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_customer_last_name&#x3d;CUSTOMER_LAST_NAME_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;SOURCE &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_source &#x3d; SOURCE&#x3b;&#xd;&#xa;&#x7d; else if&#x28;SOURCE_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_source &#x3d; SOURCE_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;SOURCE_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_source_id &#x3d; SOURCE_ID&#x3b;&#xd;&#xa;&#x7d; else if&#x28;SOURCE_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_source_id &#x3d; SOURCE_ID_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;MOOD &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_mood &#x3d; MOOD&#x3b;&#xd;&#xa;&#x7d; else if&#x28;MOOD_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_mood &#x3d; MOOD_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;AGREED_TO_SHARE &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agreed_to_share &#x3d; AGREED_TO_SHARE&#x3b;&#xd;&#xa;&#x7d; else if&#x28;AGREED_TO_SHARE_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_agreed_to_share &#x3d; AGREED_TO_SHARE_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;REVIEW &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_review &#x3d; REVIEW&#x3b;&#xd;&#xa;&#x7d; else if&#x28;REVIEW_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_review &#x3d; REVIEW_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;SCORE &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_score &#x3d; SCORE&#x3b;&#xd;&#xa;&#x7d; else if&#x28;SCORE_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_score &#x3d; SCORE_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;SURVEY_COMPLETED_DATE_EST &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_survey_completed_date_est &#x3d; SURVEY_COMPLETED_DATE_EST&#x3b;&#xd;&#xa;&#x7d; else if&#x28;SURVEY_COMPLETED_DATE_EST_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_survey_completed_date_est &#x3d; SURVEY_COMPLETED_DATE_EST_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;SURVEY_MODIFIED_ON &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_survey_modified_on &#x3d; SURVEY_MODIFIED_ON&#x3b;&#xd;&#xa;&#x7d; else if&#x28;SURVEY_MODIFIED_ON_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_survey_modified_on &#x3d; SURVEY_MODIFIED_ON_1&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>isDeleted</name>
         <rename>isDeleted</rename>
         <type>Boolean</type>
         <length>-1</length>
         <precision>-1</precision>
         <replace>N</replace>
+      </field>      <field>        <name>final_survey_details_id</name>
+        <rename>final_survey_details_id</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>final_agent_id</name>
+        <rename>final_agent_id</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>final_company_id</name>
+        <rename>final_company_id</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>final_customer_first_name</name>
+        <rename>final_customer_first_name</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>final_customer_last_name</name>
+        <rename>final_customer_last_name</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>final_source</name>
+        <rename>final_source</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>final_source_id</name>
+        <rename>final_source_id</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>final_mood</name>
+        <rename>final_mood</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>final_agreed_to_share</name>
+        <rename>final_agreed_to_share</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>final_review</name>
+        <rename>final_review</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>final_score</name>
+        <rename>final_score</rename>
+        <type>Number</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>final_survey_completed_date_est</name>
+        <rename>final_survey_completed_date_est</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>final_survey_modified_on</name>
+        <rename>final_survey_modified_on</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>2249</xloc>
+      <xloc>2248</xloc>
       <yloc>275</yloc>
       <draw>Y</draw>
       </GUI>
@@ -2788,7 +2584,7 @@
     <name>isDeletedNew</name>
     <type>ScriptValueMod</type>
     <description/>
-    <distribute>Y</distribute>
+    <distribute>N</distribute>
     <custom_distribution/>
     <copies>1</copies>
          <partitioning>
@@ -2808,8 +2604,8 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1747</xloc>
-      <yloc>802</yloc>
+      <xloc>1462</xloc>
+      <yloc>813</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2851,8 +2647,8 @@
     </step>
 
   <step>
-    <name>Block this step until steps finish</name>
-    <type>BlockUntilStepsFinish</type>
+    <name>Sort rows</name>
+    <type>SortRows</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -2861,49 +2657,37 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <steps>
-      <step>
-        <name>Updated isDeleted</name>
-        <CopyNr>0</CopyNr>
-        </step>
-      </steps>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>SURVEY_DETAILS_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>AGENT_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>IS_DELETED</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1378</xloc>
-      <yloc>802</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Calculator</name>
-    <type>Calculator</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-       <calculation><field_name>timeInterval</field_name>
-<calc_type>DATE_DIFF</calc_type>
-<field_a>SURVEY_COMPLETED_DATE</field_a>
-<field_b>SURVEY_SENT_DATE</field_b>
-<field_c/>
-<value_type>Integer</value_type>
-<value_length>-1</value_length>
-<value_precision>-1</value_precision>
-<remove>N</remove>
-<conversion_mask/>
-<decimal_symbol/>
-<grouping_symbol/>
-<currency_symbol/>
-</calculation>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>2087</xloc>
-      <yloc>802</yloc>
+      <xloc>2038</xloc>
+      <yloc>591</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
