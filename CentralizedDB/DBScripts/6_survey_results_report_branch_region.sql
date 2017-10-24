@@ -6,7 +6,7 @@ DROP TABLE IF EXISTS `survey_results_report_branch`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `survey_results_report_branch` (
-  `SURVEY_RESULTS_REPORT_BRANCH_ID` varchar(36) NOT NULL,
+  `SURVEY_RESULTS_REPORT_BRANCH_ID` int(10) NOT NULL,
   `SURVEY_DETAILS_ID` varchar(36) DEFAULT NULL,
   `BRANCH_ID` int(10) DEFAULT NULL,
   `AGENT_ID` int(10) DEFAULT NULL,
@@ -41,7 +41,7 @@ DROP TABLE IF EXISTS `survey_results_report_region`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `survey_results_report_region` (
-  `SURVEY_RESULTS_REPORT_REGION_ID` varchar(36) NOT NULL,
+  `SURVEY_RESULTS_REPORT_REGION_ID` int(10) NOT NULL,
   `SURVEY_DETAILS_ID` varchar(36) DEFAULT NULL,
   `REGION_ID` int(10) DEFAULT NULL,
   `AGENT_ID` int(10) DEFAULT NULL,
