@@ -71,11 +71,17 @@ hr{
 			<div id="social-posts-lbl"><span class="trans-font-style">Social Posts</span></div>
 			<div id="social-posts-lbl-value"><span id="social-posts-lbl-span" class="trans-font-style"></span></div>
 		</div>
-		<div id="zillow-details" class="inline-flex-class" style="margin-bottom:85px;">
+		<div id="zillow-details" class="inline-flex-class">
 			<div class="processed-background-rect"></div>
 			<div id="zillow-lbl-rect" class="social-posts-lbl-rect-div hide" style="margin-left: -15px;"></div>
 			<div id="zillow-lbl"><span class="trans-font-style">Zillow Reviews</span></div>
 			<div id="zillow-lbl-value"><span id="zillow-lbl-span" class="trans-font-style"></span></div>
+		</div>
+		<div id="third-party-reviews" class="inline-flex-class" style="margin-bottom:75px;">
+			<div class="processed-background-rect"></div>
+			<div id="third-party-lbl-rect" class="social-posts-lbl-rect-div hide" style="margin-left: -15px;"></div>
+			<div id="third-party-lbl"><span class="trans-font-style">Third Party Reviews</span></div>
+			<div id="third-party-lbl-value"><span id="third-party-lbl-span" class="trans-font-style"></span></div>
 		</div>
 	</div>
 </div>
@@ -200,6 +206,7 @@ $(document).ready(function(){
 		$('#incompleted-lbl-rect').hide();
 		$('#social-posts-lbl-rect').hide();
 		$('#zillow-lbl-rect').hide();
+		$('#third-party-lbl-rect').hide();
 		$('#unassigned-lbl-rect').hide();
 		$('#duplicate-lbl-rect').hide();
 		$('#corrupted-lbl-rect').hide();
