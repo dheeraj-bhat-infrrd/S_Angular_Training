@@ -1,0 +1,12 @@
+ALTER TABLE overview_branch ADD COLUMN `third_party` INT(10) NULL DEFAULT 0 AFTER `total_reviews`;
+ALTER TABLE overview_branch_month ADD COLUMN `third_party` INT(10) NULL DEFAULT 0 AFTER `total_review`;
+ALTER TABLE overview_branch_year ADD COLUMN `third_party` INT(10) NULL DEFAULT 0 AFTER `total_review`;
+ALTER TABLE overview_company ADD COLUMN `third_party` INT(10) NULL DEFAULT 0 AFTER `total_reviews`;
+ALTER TABLE overview_company_month ADD COLUMN `third_party` INT(10) NULL DEFAULT 0 AFTER `total_review`;
+ALTER TABLE overview_company_year ADD COLUMN `third_party` INT(10) NULL DEFAULT 0 AFTER `total_review`;
+ALTER TABLE overview_region ADD COLUMN `third_party` INT(10) NULL DEFAULT 0 AFTER `total_reviews`;
+ALTER TABLE overview_region_month ADD COLUMN `third_party` INT(10) NULL DEFAULT 0 AFTER `total_review`;
+ALTER TABLE overview_region_year ADD COLUMN `third_party` INT(10) NULL DEFAULT 0 AFTER `total_review`;
+ALTER TABLE overview_user ADD COLUMN `third_party` INT(10) NULL DEFAULT 0 AFTER `total_reviews`;
+ALTER TABLE overview_user_month ADD COLUMN `third_party` INT(10) NULL DEFAULT 0 AFTER `total_review`;
+ALTER TABLE overview_user_year ADD COLUMN `third_party` INT(10) NULL DEFAULT 0 AFTER `total_review`;

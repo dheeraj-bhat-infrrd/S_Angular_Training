@@ -4,7 +4,6 @@ import org.hibernate.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.realtech.socialsurvey.core.dao.OverviewUserDao;
 import com.realtech.socialsurvey.core.entities.OverviewUser;
@@ -22,10 +21,10 @@ public class OverviewUserDaoImpl extends GenericReportingDaoImpl<OverviewUser, S
 
         Query query = getSession().createSQLQuery( "SELECT overview_user_id FROM overview_user WHERE user_id = :userId " );
         query.setParameter( "userId", userId  );
-        String OverviewUserId = (String) query.uniqueResult();
+        String overviewUserId = (String) query.uniqueResult();
         
         LOG.info( "Method to get OverviewUserId from UserId, getOverviewUserId() finished." );
-        return OverviewUserId;
+        return overviewUserId;
         
         
     }
