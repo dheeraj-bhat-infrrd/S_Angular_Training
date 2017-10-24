@@ -7,7 +7,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 
@@ -93,6 +92,9 @@ public class OverviewBranch implements Serializable
     @Column ( name = "unprocessed")
     private float unprocessed;
 
+    @Column ( name = "third_party")
+    private int thirdParty;
+    
     public String getOverviewBranchId()
     {
         return overviewBranchId;
@@ -338,6 +340,17 @@ public class OverviewBranch implements Serializable
         return serialVersionUID;
     }
 
+    
+    public int getThirdParty()
+    {
+        return thirdParty;
+    }
+
+    public void setThirdParty( int thirdParty )
+    {
+        this.thirdParty = thirdParty;
+    }
+
     @Override
     public String toString()
     {
@@ -349,7 +362,7 @@ public class OverviewBranch implements Serializable
             + ", totalSurveySent=" + totalSurveySent + ", completed=" + completed + ", socialPosts=" + socialPosts
             + ", zillowReviews=" + zillowReviews + ", totalReviews=" + totalReviews + ", rating=" + rating
             + ", completedPercentage=" + completedPercentage + ", incompletePercentage=" + incompletePercentage + ", processed="
-            + processed + ", unprocessed=" + unprocessed + "]";
+            + processed + ", unprocessed=" + unprocessed + ", thirdParty=" + thirdParty + "]";
     }
     
     
