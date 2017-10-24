@@ -106,8 +106,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>56</xloc>
-      <yloc>83</yloc>
+      <xloc>22</xloc>
+      <yloc>87</yloc>
       </entry>
     <entry>
       <name>survey_transaction_report_main</name>
@@ -139,8 +139,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>257</xloc>
-      <yloc>83</yloc>
+      <xloc>208</xloc>
+      <yloc>87</yloc>
       </entry>
     <entry>
       <name>survey_transaction_report_zillow</name>
@@ -172,8 +172,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>1398</xloc>
-      <yloc>83</yloc>
+      <xloc>824</xloc>
+      <yloc>266</yloc>
       </entry>
     <entry>
       <name>survey_transaction_report_3rdParty</name>
@@ -205,8 +205,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>1109</xloc>
-      <yloc>83</yloc>
+      <xloc>1148</xloc>
+      <yloc>266</yloc>
       </entry>
     <entry>
       <name>survey_transaction_report_unverified</name>
@@ -238,8 +238,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>809</xloc>
-      <yloc>83</yloc>
+      <xloc>1148</xloc>
+      <yloc>87</yloc>
       </entry>
     <entry>
       <name>survey_transaction_report_ss</name>
@@ -271,8 +271,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>525</xloc>
-      <yloc>83</yloc>
+      <xloc>519</xloc>
+      <yloc>87</yloc>
       </entry>
     <entry>
       <name>survey_transaction_report_main_names</name>
@@ -304,8 +304,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>1402</xloc>
-      <yloc>267</yloc>
+      <xloc>519</xloc>
+      <yloc>266</yloc>
       </entry>
     <entry>
       <name>survey_transaction_report_main_nmls</name>
@@ -337,8 +337,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>1079</xloc>
-      <yloc>267</yloc>
+      <xloc>208</xloc>
+      <yloc>266</yloc>
       </entry>
     <entry>
       <name>survey_transaction_report_branch</name>
@@ -370,8 +370,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>501</xloc>
-      <yloc>267</yloc>
+      <xloc>519</xloc>
+      <yloc>460</yloc>
       </entry>
     <entry>
       <name>survey_transaction_report_region</name>
@@ -403,8 +403,41 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>789</xloc>
-      <yloc>267</yloc>
+      <xloc>208</xloc>
+      <yloc>460</yloc>
+      </entry>
+    <entry>
+      <name>survey_transaction_report_verified</name>
+      <description/>
+      <type>TRANS</type>
+      <specification_method>filename</specification_method>
+      <trans_object_id/>
+      <filename>&#x24;&#x7b;Internal.Job.Filename.Directory&#x7d;&#x2f;survey_transaction_report_main_verified.ktr</filename>
+      <transname/>
+      <arg_from_previous>N</arg_from_previous>
+      <params_from_previous>N</params_from_previous>
+      <exec_per_row>N</exec_per_row>
+      <clear_rows>N</clear_rows>
+      <clear_files>N</clear_files>
+      <set_logfile>N</set_logfile>
+      <logfile/>
+      <logext/>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <loglevel>Basic</loglevel>
+      <cluster>N</cluster>
+      <slave_server_name/>
+      <set_append_logfile>N</set_append_logfile>
+      <wait_until_finished>Y</wait_until_finished>
+      <follow_abort_remote>N</follow_abort_remote>
+      <create_parent_folder>N</create_parent_folder>
+      <logging_remote_work>N</logging_remote_work>
+      <parameters>        <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>824</xloc>
+      <yloc>87</yloc>
       </entry>
   </entries>
   <hops>
@@ -420,15 +453,6 @@
     <hop>
       <from>survey_transaction_report_unverified</from>
       <to>survey_transaction_report_3rdParty</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>survey_transaction_report_ss</from>
-      <to>survey_transaction_report_unverified</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -483,6 +507,24 @@
     <hop>
       <from>survey_transaction_report_region</from>
       <to>survey_transaction_report_branch</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>survey_transaction_report_ss</from>
+      <to>survey_transaction_report_verified</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>survey_transaction_report_verified</from>
+      <to>survey_transaction_report_unverified</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>

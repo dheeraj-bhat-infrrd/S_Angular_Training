@@ -2541,6 +2541,9 @@ public class EmailServicesImpl implements EmailServices
         List<String> messageBodyReplacementsList = new ArrayList<>();
 
 
+        // user ranking display toggle
+        messageBodyReplacementsList.add( StringUtils.isEmpty( digestAggregate.getUserRankingHtmlRows() ) ? "display:none;" : "" );
+        
         messageBodyReplacementsList.add( applicationWordPressSite );
         messageBodyReplacementsList.add( appNewLogoUrl );
         messageBodyReplacementsList.add( digestAggregate.getCompanyName() );

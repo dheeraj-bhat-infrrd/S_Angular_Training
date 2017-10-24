@@ -727,8 +727,8 @@
 	<bean id="monthlydigeststartercron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="monthlydigeststarter" />
-		<property name="cronExpression" value="0 0 8 1 1/1 ? * ?" />
-		<!-- <property name="cronExpression" value="0 0/1 * 1/1 * ?" /> -->
+		<!--<property name="cronExpression" value="0 0 8 1 1/1 ? * ?" /> -->
+		<property name="cronExpression" value="0 0/1 * 1/1 * ?" />
 	</bean>
 
 	<bean id="transactionActivityMonitorCron"
@@ -772,7 +772,7 @@
 				<!-- <ref bean="hideUsersFromSearch" />	-->
 				<!-- <ref bean="surveysourceidupdater" /> -->
 				<!-- <ref bean="surveyquestionupdater" /> -->	
-				<!-- <ref bean="monthlydigeststarter" />	 -->
+				<!--  <ref bean="monthlydigeststarter" /> -->
 				<ref bean="transactionActivityMonitorJobDetail" />	
 			</list>
 		</property>
@@ -810,7 +810,7 @@
 				<!--  <ref bean="deleteUsedVendastaTicketscron" />-->	
 				<!-- <ref bean="surveysourceidupdatercron" /> -->
 				<!-- <ref bean="surveyquestionupdatercron" /> -->
-				<!-- <ref bean="monthlydigeststartercron" />	 -->
+				<!--  <ref bean="monthlydigeststartercron" /> -->
 				<ref bean="transactionActivityMonitorCron" />
 			</list>
 		</property>

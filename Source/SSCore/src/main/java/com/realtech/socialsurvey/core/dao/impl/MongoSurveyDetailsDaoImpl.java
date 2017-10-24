@@ -2934,7 +2934,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         
         // review date criteria
         if(startReviewDate != null)
-            query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startReviewDate ) );
+            query.addCriteria( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).gte( startReviewDate ) );
         
         // transaction date criteria
         if(startTransactionDate != null)
@@ -2996,7 +2996,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
         // review date criteria
         if(startReviewDate != null)
-            query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN).gte( startReviewDate ) );
+            query.addCriteria( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).gte( startReviewDate ) );
 
         //user id criteria
         if(userIds != null)
