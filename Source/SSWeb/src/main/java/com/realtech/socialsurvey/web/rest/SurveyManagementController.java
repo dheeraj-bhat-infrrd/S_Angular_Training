@@ -327,20 +327,30 @@ public class SurveyManagementController
 
                 // Generate the text for customer details in mail 
                 String customerDetail = generateCustomerTextForMail( customerFullName, customerEmail, survey.getSourceId() );
+                
+                // fetch the company settings
+                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(survey.getCompanyId());
+                
+                if (companySettings == null)
+                    throw new NonFatalException("Company settings cannot be found for id : " + survey.getCompanyId());
 
                 String surveyScore = String.valueOf( surveyHandler.getFormattedSurveyScore( survey.getScore() ) );
                 String agentName = ( agent.getLastName() != null && !agent.getLastName().isEmpty() )
                     ? ( agent.getFirstName() + " " + agent.getLastName() ) : agent.getFirstName();
-                for ( Entry<String, String> admin : emailIdsToSendMail.entrySet() ) {
-                    emailServices.sendSurveyCompletionMailToAdminsAndAgent( agentName, admin.getValue(), admin.getKey(),
-                        surveyDetail, customerName, surveyScore, logoUrl, agentSettings.getCompleteProfileUrl(),
-                        customerDetail );
+                
+                double surveyCompletionThreshold = 0.0d;
+                if( companySettings.getSurvey_settings() != null ){
+                    surveyCompletionThreshold = companySettings.getSurvey_settings().getSurveyCompletedMailThreshold();
                 }
-
-				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(survey.getCompanyId());
-
-				if (companySettings == null)
-					throw new NonFatalException("Company settings cannot be found for id : " + survey.getCompanyId());
+                
+                // check for survey completion mail threshold set for company 
+                if( surveyCompletionThreshold <= survey.getScore() ){    
+                    for ( Entry<String, String> admin : emailIdsToSendMail.entrySet() ) {
+                        emailServices.sendSurveyCompletionMailToAdminsAndAgent( agentName, admin.getValue(), admin.getKey(),
+                            surveyDetail, customerName, surveyScore, logoUrl, agentSettings.getCompleteProfileUrl(),
+                            customerDetail );
+                    }
+                }
 
 				if (companySettings.getSurvey_settings() != null && companySettings.getSurvey_settings().getComplaint_res_settings() != null) {
 					ComplaintResolutionSettings complaintRegistrationSettings = companySettings.getSurvey_settings().getComplaint_res_settings();

@@ -2735,6 +2735,14 @@ var emailCriteriaMouseUp = function (e){
 	$(document).unbind("mouseup",emailCriteriaMouseUp);
 };
 
+var surveyMailThresholdMouseUp = function (e){
+	var container = $('#st-dd-wrapper-survey-mail-thrs');
+	if (!container.is(e.target) && container.has(e.target).length == 0){
+		container.slideToggle(200);
+	}
+	$(document).unbind("mouseup",surveyMailThresholdMouseUp);
+};
+
 $(document).click(function(e) {
 	e.stopPropagation();
 	if ($('#da-dd-wrapper-profiles').css('display') == "block") {
@@ -5190,6 +5198,10 @@ function autoAppendRatingDropdown(ratingId, classes) {
 	autoAppendDropdown(ratingId, classes, 5, 0.5);
 }
 
+function autoAppendSurveyMailDropdown(ratingId, classes) {
+	autoAppendDropdown(ratingId, classes, 5, 0);
+}
+
 // Ratings Settings
 function autoAppendRatingDropdownComplaint(ratingId, classes, maxPoint, minPoint, diff) {
 	var value = diff;
@@ -5231,11 +5243,23 @@ function updateOtherSettingsCallBack(response) {
 }
 
 // Generic functions
+// NOTE: minVal value below 0.5 will not work
 function autoAppendDropdown(elementId, classes, maxVal, minVal) {
 	var value = 0;
+	var zeroMinVal = false;
+	
+	if( minVal == 0 ){	
+		minVal = 0.5;
+		zeroMinVal = true;
+	}
+	
 	while (maxVal - value >= minVal) {
 		$(elementId).append($('<div/>').addClass(classes).text(maxVal - value));
 		value += minVal;
+	}
+	
+	if( zeroMinVal ){
+		$(elementId).append($('<div/>').addClass(classes).text("0"));
 	}
 }
 
@@ -13132,3 +13156,19 @@ function hideTapedMessages(){
 	hideErrorInvalid();
 	hideInfoInvalid();
 }
+
+$('body').on('click', '.st-dd-item-survey-mail-thrs', function() {
+
+	$('#survey-mail-threshold').val($(this).html());
+	$('#st-dd-wrapper-survey-mail-thrs').slideToggle(200);
+	
+	var payload = {
+			"surveyCompletedMailThreshold" : $('#survey-mail-threshold').val()
+		};
+		
+	callAjaxPostWithPayloadData( "./updatesurveymailthreshold.do", function(data){
+				$('#overlay-toast').html(data);
+				showToast();
+			}, payload, false);
+});
+
