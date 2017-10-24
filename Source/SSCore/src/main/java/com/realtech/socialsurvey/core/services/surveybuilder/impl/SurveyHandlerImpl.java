@@ -4324,6 +4324,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             } 
 
             survey.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+            if( survey.getStatus() == CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD )
+                survey.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD );
+            else
             survey.setStatus( CommonConstants.SURVEY_STATUS_PRE_INITIATED );
         }
 

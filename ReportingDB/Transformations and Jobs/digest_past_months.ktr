@@ -159,8 +159,6 @@
   <hop> <from>Survey_Preinitiation ip</from><to>Filter rows</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter rows</from><to>Sort rows by companyId</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows by companyId</from><to>Memory Group by for sent count</to><enabled>Y</enabled> </hop>
-  <hop> <from>Survey_Details ip</from><to>Filter Completed</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter Completed</from><to>Sort rows by CompanyId 4</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows by CompanyId 4</from><to>Memory Group by for completed</to><enabled>Y</enabled> </hop>
   <hop> <from>Survey_Details ip</from><to>Filter Abusive</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter Abusive</from><to>Sort rows by companyId 3</to><enabled>Y</enabled> </hop>
@@ -185,6 +183,7 @@
   <hop> <from>Multiway Merge Join</from><to>Modified js Main_CompanyId</to><enabled>Y</enabled> </hop>
   <hop> <from>Database join for user count</from><to>Database join for Company</to><enabled>Y</enabled> </hop>
   <hop> <from>Database join for Company</from><to>UUID digest_past_months_id</to><enabled>Y</enabled> </hop>
+  <hop> <from>Survey_Details ip</from><to>Sort rows by CompanyId 4</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Database join for Company</name>
@@ -200,7 +199,7 @@
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
     <sql>Select COMPANY&#xd;&#xa;From company&#xd;&#xa;WHERE COMPANY_ID &#x3d; &#x3f;</sql>
-    <outer_join>Y</outer_join>
+    <outer_join>N</outer_join>
     <replace_vars>Y</replace_vars>
     <parameter>
       <field>
@@ -230,7 +229,7 @@
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
     <sql>SELECT count&#x28;USER_ID&#x29; as USER_COUNT&#xd;&#xa;from users &#xd;&#xa;where COMPANY_ID&#x3d;&#x3f;&#xd;&#xa;AND STATUS IN &#x28;1,2&#x29;&#x3b;</sql>
-    <outer_join>Y</outer_join>
+    <outer_join>N</outer_join>
     <replace_vars>Y</replace_vars>
     <parameter>
       <field>
@@ -371,20 +370,6 @@
    <function>&#x3d;</function>
    <rightvalue/>
    <value><name>constant</name><type>Integer</type><text>0</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>   </condition>
-  <condition>
-   <negated>N</negated>
-   <operator>AND</operator>
-   <leftvalue>SOURCE</leftvalue>
-   <function>&#x3c;&#x3e;</function>
-   <rightvalue/>
-   <value><name>constant</name><type>String</type><text>Zillow</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
-  <condition>
-   <negated>N</negated>
-   <operator>AND</operator>
-   <leftvalue>SOURCE</leftvalue>
-   <function>&#x3c;&#x3e;</function>
-   <rightvalue/>
-   <value><name>constant</name><type>String</type><text>3rd Party Review</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
   </conditions>
  </condition>
     </compare>
@@ -392,47 +377,6 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>203</xloc>
       <yloc>361</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Filter Completed</name>
-    <type>FilterRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<send_true_to>Sort rows by CompanyId 4</send_true_to>
-<send_false_to/>
-    <compare>
-<condition>
- <negated>N</negated>
- <conditions>
-  <condition>
-   <negated>N</negated>
-   <leftvalue>SOURCE</leftvalue>
-   <function>&#x3c;&#x3e;</function>
-   <rightvalue/>
-   <value><name>constant</name><type>String</type><text>Zillow</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
-  <condition>
-   <negated>N</negated>
-   <operator>AND</operator>
-   <leftvalue>SOURCE</leftvalue>
-   <function>&#x3c;&#x3e;</function>
-   <rightvalue/>
-   <value><name>constant</name><type>String</type><text>3rd Party Review</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
-  </conditions>
- </condition>
-    </compare>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>203</xloc>
-      <yloc>247</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -817,7 +761,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var sent_count &#x3d; sent_count&#x3b;&#xd;&#xa;&#xd;&#xa;sent_count &#x2b;&#x3d; total_completed&#x3b; &#xd;&#xa;&#xd;&#xa;var completion_percentage &#x3d; 0.0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;sent_count &#x21;&#x3d; null &#x26;&#x26; sent_count &#x21;&#x3d; 0 &#x26;&#x26; &#x21;isNaN&#x28;sent_count&#x29;&#x29;&#x7b;&#xd;&#xa;&#xd;&#xa;	completion_percentage &#x3d; total_completed &#x2f; sent_count &#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var sps_score &#x3d; 0&#x3b;&#xd;&#xa;var total_completed_survey_details &#x3d; total_promoters&#x2b;total_passives&#x2b;total_detractors&#x3b;&#xd;&#xa;&#xd;&#xa;sps_score &#x3d; &#x28; &#x28;total_promoters - total_detractors&#x29; &#x2f; total_completed_survey_details &#x29; &#x2a; 100&#x3b;&#xd;&#xa;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var sent_count &#x3d; sent_count&#x3b;&#xd;&#xa;&#xd;&#xa;sent_count &#x2b;&#x3d; total_completed&#x3b; &#xd;&#xa;&#xd;&#xa;var completion_percentage &#x3d; 0.0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;sent_count &#x21;&#x3d; null &#x26;&#x26; sent_count &#x21;&#x3d; 0 &#x26;&#x26; &#x21;isNaN&#x28;sent_count&#x29;&#x29;&#x7b;&#xd;&#xa;&#xd;&#xa;	completion_percentage &#x3d; &#x28;total_completed &#x2f; sent_count&#x29;&#x2a;100 &#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var sps_score &#x3d; 0&#x3b;&#xd;&#xa;var total_completed_survey_details &#x3d; total_promoters&#x2b;total_passives&#x2b;total_detractors&#x3b;&#xd;&#xa;&#xd;&#xa;sps_score &#x3d; &#x28; &#x28;total_promoters - total_detractors&#x29; &#x2f; total_completed_survey_details &#x29; &#x2a; 100&#x3b;&#xd;&#xa;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>sent_count</name>
         <rename>sent_count</rename>
         <type>Number</type>
@@ -1437,7 +1381,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  SURVEY_PRE_INITIATION_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, STATUS&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;Y_&#x25;m&#x27;&#x29; AS TRX_MONTH&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;m&#x27;&#x29; AS MONTH_Data&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;Y&#x27;&#x29; AS Year_Data&#xd;&#xa;FROM survey_pre_initiation&#xd;&#xa;WHERE SURVEY_SOURCE NOT IN&#x28;&#x22;Zillow&#x22; , &#x22;3rd Party Review&#x22; &#x29;</sql>
+    <sql>SELECT&#xd;&#xa;  SURVEY_PRE_INITIATION_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, STATUS&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;Y_&#x25;m&#x27;&#x29; AS TRX_MONTH&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;m&#x27;&#x29; AS MONTH_Data&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;Y&#x27;&#x29; AS Year_Data&#xd;&#xa;FROM survey_pre_initiation&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
