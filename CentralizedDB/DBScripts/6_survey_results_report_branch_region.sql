@@ -1,0 +1,69 @@
+--
+-- Table structure for table `survey_results_report_branch`
+--
+
+DROP TABLE IF EXISTS `survey_results_report_branch`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `survey_results_report_branch` (
+  `SURVEY_RESULTS_REPORT_BRANCH_ID` varchar(36) NOT NULL,
+  `SURVEY_DETAILS_ID` varchar(36) DEFAULT NULL,
+  `BRANCH_ID` int(10) DEFAULT NULL,
+  `AGENT_ID` int(10) DEFAULT NULL,
+  `USER_FIRST_NAME` varchar(450) DEFAULT NULL,
+  `USER_LAST_NAME` varchar(450) DEFAULT NULL,
+  `CUSTOMER_FIRST_NAME` varchar(450) DEFAULT NULL,
+  `CUSTOMER_LAST_NAME` varchar(450) DEFAULT NULL,
+  `SURVEY_SENT_DATE` datetime DEFAULT NULL,
+  `SURVEY_COMPLETED_DATE` datetime DEFAULT NULL,
+  `TIME_INTERVAL` int(10) DEFAULT NULL,
+  `SURVEY_SOURCE` varchar(450) DEFAULT NULL,
+  `SURVEY_SOURCE_ID` text,
+  `SURVEY_SCORE` decimal(10,2) DEFAULT NULL,
+  `GATEWAY` varchar(450) DEFAULT NULL,
+  `CUSTOMER_COMMENTS` text,
+  `AGREED_TO_SHARE` varchar(450) DEFAULT NULL,
+  `BRANCH_NAME` text,
+  `CLICK_THROUGH_FOR_COMPANY` text,
+  `CLICK_THROUGH_FOR_AGENT` text,
+  `CLICK_THROUGH_FOR_REGION` text,
+  `CLICK_THROUGH_FOR_BRANCH` text,
+  `REPORT_MODIFIED_ON` timestamp NULL DEFAULT NULL,
+  `IS_DELETED` tinyint(1) DEFAULT '0',
+  PRIMARY KEY (`SURVEY_RESULTS_REPORT_BRANCH_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `survey_results_report_region`
+--
+
+DROP TABLE IF EXISTS `survey_results_report_region`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `survey_results_report_region` (
+  `SURVEY_RESULTS_REPORT_REGION_ID` varchar(36) NOT NULL,
+  `SURVEY_DETAILS_ID` varchar(36) DEFAULT NULL,
+  `REGION_ID` int(10) DEFAULT NULL,
+  `AGENT_ID` int(10) DEFAULT NULL,
+  `USER_FIRST_NAME` varchar(450) DEFAULT NULL,
+  `USER_LAST_NAME` varchar(450) DEFAULT NULL,
+  `CUSTOMER_FIRST_NAME` varchar(450) DEFAULT NULL,
+  `CUSTOMER_LAST_NAME` varchar(450) DEFAULT NULL,
+  `SURVEY_SENT_DATE` datetime DEFAULT NULL,
+  `SURVEY_COMPLETED_DATE` datetime DEFAULT NULL,
+  `TIME_INTERVAL` int(10) DEFAULT NULL,
+  `SURVEY_SOURCE` varchar(450) DEFAULT NULL,
+  `SURVEY_SOURCE_ID` text,
+  `SURVEY_SCORE` decimal(10,2) DEFAULT NULL,
+  `GATEWAY` varchar(450) DEFAULT NULL,
+  `CUSTOMER_COMMENTS` text,
+  `AGREED_TO_SHARE` varchar(450) DEFAULT NULL,
+  `BRANCH_NAME` text,
+  `CLICK_THROUGH_FOR_COMPANY` text,
+  `CLICK_THROUGH_FOR_AGENT` text,
+  `CLICK_THROUGH_FOR_REGION` text,
+  `CLICK_THROUGH_FOR_BRANCH` text,
+  `REPORT_MODIFIED_ON` timestamp NULL DEFAULT NULL,
+  `IS_DELETED` tinyint(1) DEFAULT '0',
+  PRIMARY KEY (`SURVEY_RESULTS_REPORT_REGION_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
