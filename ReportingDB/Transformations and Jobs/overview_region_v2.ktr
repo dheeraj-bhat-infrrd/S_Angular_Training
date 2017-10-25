@@ -758,13 +758,13 @@
         <replace>N</replace>
       </field>      <field>        <name>MONTH_Data</name>
         <rename>MONTH_Data</rename>
-        <type>String</type>
+        <type>Integer</type>
         <length>-1</length>
         <precision>-1</precision>
         <replace>N</replace>
       </field>      <field>        <name>Year_Data</name>
         <rename>Year_Data</rename>
-        <type>String</type>
+        <type>Integer</type>
         <length>-1</length>
         <precision>-1</precision>
         <replace>N</replace>
@@ -847,6 +847,156 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>1289</xloc>
       <yloc>416</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Select values</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>        <select_unspecified>N</select_unspecified>
+      <meta>        <name>month</name>
+        <rename>month</rename>
+        <type>Integer</type>
+        <length>9</length>
+        <precision>0</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>year</name>
+        <rename>year</rename>
+        <type>Integer</type>
+        <length>9</length>
+        <precision>0</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>355</xloc>
+      <yloc>133</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Select values 2</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>        <select_unspecified>N</select_unspecified>
+      <meta>        <name>MONTH_Data</name>
+        <rename>MONTH_Data</rename>
+        <type>Integer</type>
+        <length>2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>Year_Data</name>
+        <rename>Year_Data</rename>
+        <type>Integer</type>
+        <length>4</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>340</xloc>
+      <yloc>284</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Select values 2 2</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>N</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>        <select_unspecified>N</select_unspecified>
+      <meta>        <name>MONTH_Data</name>
+        <rename>MONTH_Data</rename>
+        <type>Integer</type>
+        <length>2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>Year_Data</name>
+        <rename>Year_Data</rename>
+        <type>Integer</type>
+        <length>4</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>206</xloc>
+      <yloc>552</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1610,156 +1760,6 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>84</xloc>
       <yloc>48</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Select values</name>
-    <type>SelectValues</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>        <select_unspecified>N</select_unspecified>
-      <meta>        <name>month</name>
-        <rename>month</rename>
-        <type>Integer</type>
-        <length>9</length>
-        <precision>0</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>year</name>
-        <rename>year</rename>
-        <type>Integer</type>
-        <length>9</length>
-        <precision>0</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>355</xloc>
-      <yloc>133</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Select values 2</name>
-    <type>SelectValues</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>        <select_unspecified>N</select_unspecified>
-      <meta>        <name>MONTH_Data</name>
-        <rename>MONTH_Data</rename>
-        <type>Integer</type>
-        <length>2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>Year_Data</name>
-        <rename>Year_Data</rename>
-        <type>Integer</type>
-        <length>4</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>340</xloc>
-      <yloc>284</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Select values 2 2</name>
-    <type>SelectValues</type>
-    <description/>
-    <distribute>N</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>        <select_unspecified>N</select_unspecified>
-      <meta>        <name>MONTH_Data</name>
-        <rename>MONTH_Data</rename>
-        <type>Integer</type>
-        <length>2</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>      <meta>        <name>Year_Data</name>
-        <rename>Year_Data</rename>
-        <type>Integer</type>
-        <length>4</length>
-        <precision>-2</precision>
-        <conversion_mask/>
-        <date_format_lenient>false</date_format_lenient>
-        <date_format_locale/>
-        <date_format_timezone/>
-        <lenient_string_to_number>false</lenient_string_to_number>
-        <encoding/>
-        <decimal_symbol/>
-        <grouping_symbol/>
-        <currency_symbol/>
-        <storage_type/>
-      </meta>    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>206</xloc>
-      <yloc>552</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
