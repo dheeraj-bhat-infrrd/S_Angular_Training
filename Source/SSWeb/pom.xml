@@ -180,6 +180,14 @@
 			<version>1.8.0.1</version>
 			<scope>compile</scope>
 		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/com.twelvemonkeys.imageio/imageio-jpeg -->
+		<dependency>
+		    <groupId>com.twelvemonkeys.imageio</groupId>
+		    <artifactId>imageio-jpeg</artifactId>
+		    <version>3.3.2</version>
+		</dependency>
+		
 
 	</dependencies>
 
