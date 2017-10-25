@@ -107,7 +107,7 @@
 							</c:if>
 							
 							<c:if test="${ columnName == 'companyId' }">
-								<div class="float-left clear-both comp-mail-thrs-txt">Survey Completed Mail Threshold</div>
+								<div class="float-left clear-both comp-mail-thrs-txt"><spring:message code="label.agent.notify.threshold.key" /></div>
 								<div class="float-left">
 									<!-- set the minimum threshold for sending completed mail to administrators and agents -->
 									<input type="text" name="survey-mail-threshold" id="survey-mail-threshold" class="st-item-row-txt cursor-pointer dd-arrow-dn" autocomplete="off" value="${surveyCompletedMailThreshold}">
