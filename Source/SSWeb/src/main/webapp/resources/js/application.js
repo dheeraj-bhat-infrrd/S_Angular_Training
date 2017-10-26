@@ -383,9 +383,9 @@ $(document).on('click', '.restart-survey-mail-txt', function(e) {
 function confirmRetakeSurveyReminderMail(element) {
 
 	$('#overlay-header').html("Retake survey");
-	$('#overlay-text').html("This action will erase all the previous data of this survey and survey will be reset.");
-	$('#overlay-continue').html("Yes");
-	$('#overlay-cancel').html("No");
+	$('#overlay-text').html('<div style="text-align:left; display: grid;">Are you sure that you want to email a request to your customer to re-take this survey?<span style="margin-top:20px; text-align:left"><span style="font-weight:bold !important">Note:</span> You should have already spoken with the customer, resolved their concerns and obtained permission to send them a re-take link. Once the customer has retaken this survey it will be updated and the original comments removed.</span></div>');
+	$('#overlay-continue').html("Send");
+	$('#overlay-cancel').html("Cancel");
 	$('#overlay-continue').off();
 	$('#overlay-continue').click(function() {
 		retakeSurveyReminderMail(element);
@@ -2733,6 +2733,14 @@ var emailCriteriaMouseUp = function (e){
 		container.slideToggle(200);
 	}
 	$(document).unbind("mouseup",emailCriteriaMouseUp);
+};
+
+var surveyMailThresholdMouseUp = function (e){
+	var container = $('#st-dd-wrapper-survey-mail-thrs');
+	if (!container.is(e.target) && container.has(e.target).length == 0){
+		container.slideToggle(200);
+	}
+	$(document).unbind("mouseup",surveyMailThresholdMouseUp);
 };
 
 $(document).click(function(e) {
@@ -5190,6 +5198,10 @@ function autoAppendRatingDropdown(ratingId, classes) {
 	autoAppendDropdown(ratingId, classes, 5, 0.5);
 }
 
+function autoAppendSurveyMailDropdown(ratingId, classes) {
+	autoAppendDropdown(ratingId, classes, 5, 0);
+}
+
 // Ratings Settings
 function autoAppendRatingDropdownComplaint(ratingId, classes, maxPoint, minPoint, diff) {
 	var value = diff;
@@ -5231,11 +5243,23 @@ function updateOtherSettingsCallBack(response) {
 }
 
 // Generic functions
+// NOTE: minVal value below 0.5 will not work
 function autoAppendDropdown(elementId, classes, maxVal, minVal) {
 	var value = 0;
+	var zeroMinVal = false;
+	
+	if( minVal == 0 ){	
+		minVal = 0.5;
+		zeroMinVal = true;
+	}
+	
 	while (maxVal - value >= minVal) {
 		$(elementId).append($('<div/>').addClass(classes).text(maxVal - value));
 		value += minVal;
+	}
+	
+	if( zeroMinVal ){
+		$(elementId).append($('<div/>').addClass(classes).text("0"));
 	}
 }
 
@@ -13132,3 +13156,19 @@ function hideTapedMessages(){
 	hideErrorInvalid();
 	hideInfoInvalid();
 }
+
+$('body').on('click', '.st-dd-item-survey-mail-thrs', function() {
+
+	$('#survey-mail-threshold').val($(this).html());
+	$('#st-dd-wrapper-survey-mail-thrs').slideToggle(200);
+	
+	var payload = {
+			"surveyCompletedMailThreshold" : $('#survey-mail-threshold').val()
+		};
+		
+	callAjaxPostWithPayloadData( "./updatesurveymailthreshold.do", function(data){
+				$('#overlay-toast').html(data);
+				showToast();
+			}, payload, false);
+});
+

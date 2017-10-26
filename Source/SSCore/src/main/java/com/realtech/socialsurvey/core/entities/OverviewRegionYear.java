@@ -69,6 +69,9 @@ public class OverviewRegionYear implements Serializable
     @Column ( name = "year")
     private int year;
 
+    @Column ( name = "third_party")
+    private int thirdParty;
+    
     public String getOverviewRegionYearId()
     {
         return overviewRegionYearId;
@@ -244,6 +247,17 @@ public class OverviewRegionYear implements Serializable
         return serialVersionUID;
     }
 
+    
+    public int getThirdParty()
+    {
+        return thirdParty;
+    }
+
+    public void setThirdParty( int thirdParty )
+    {
+        this.thirdParty = thirdParty;
+    }
+
     @Override
     public String toString()
     {
@@ -252,7 +266,7 @@ public class OverviewRegionYear implements Serializable
             + ", zillowReviews=" + zillowReviews + ", unprocessed=" + unprocessed + ", unassigned=" + unassigned
             + ", duplicate=" + duplicate + ", corrupted=" + corrupted + ", other=" + other + ", completePercentage="
             + completePercentage + ", incompletePercentage=" + incompletePercentage + ", rating=" + rating + ", totalReview="
-            + totalReview + ", year=" + year + "]";
+            + totalReview + ", year=" + year + ", thirdParty=" + thirdParty + "]";
     }
 
 
