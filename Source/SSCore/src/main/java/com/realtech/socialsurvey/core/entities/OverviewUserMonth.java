@@ -67,6 +67,9 @@ public class OverviewUserMonth implements Serializable
     @Column ( name = "total_review")
     private int totalReview;
 
+    @Column ( name = "third_party")
+    private int thirdParty;
+    
     @Column ( name = "month")
     private int month;
 
@@ -253,6 +256,17 @@ public class OverviewUserMonth implements Serializable
         this.year = year;
     }
 
+    
+    public int getThirdParty()
+    {
+        return thirdParty;
+    }
+
+    public void setThirdParty( int thirdParty )
+    {
+        this.thirdParty = thirdParty;
+    }
+
     public static long getSerialversionuid()
     {
         return serialVersionUID;
@@ -266,7 +280,7 @@ public class OverviewUserMonth implements Serializable
             + ", zillowReviews=" + zillowReviews + ", unprocessed=" + unprocessed + ", unassigned=" + unassigned
             + ", duplicate=" + duplicate + ", corrupted=" + corrupted + ", other=" + other + ", completePercentage="
             + completePercentage + ", incompletePercentage=" + incompletePercentage + ", rating=" + rating + ", totalReview="
-            + totalReview + ", month=" + month + ", year=" + year + "]";
+            + totalReview + ", thirdParty=" + thirdParty + ", month=" + month + ", year=" + year + "]";
     }
 
     

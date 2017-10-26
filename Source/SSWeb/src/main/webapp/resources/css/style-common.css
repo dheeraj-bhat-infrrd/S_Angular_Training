@@ -9628,6 +9628,11 @@ ul.accordion li>a:before {
     margin-right: 65px;
 }
 
+#third-party-lbl{
+	margin-left: 15px;
+    margin-right: 32px;
+}
+
 #unassigned-lbl{
 	margin-left: 15px;
     margin-right: 99px;

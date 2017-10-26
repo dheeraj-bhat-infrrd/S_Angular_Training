@@ -26,6 +26,9 @@ public class SurveySettings {
 	private String sadTextComplete;
 	private ComplaintResolutionSettings complaint_res_settings;
 	
+    // threshold for sending survey completed mail to agents and admins
+    private double surveyCompletedMailThreshold;
+	
 	private int duplicateSurveyInterval;
 
 	public int getDuplicateSurveyInterval()
@@ -184,10 +187,30 @@ public class SurveySettings {
         this.complaint_res_settings = complaint_res_settings;
     }
 
+    
+    public double getSurveyCompletedMailThreshold()
+    {
+        return surveyCompletedMailThreshold;
+    }
+
+    public void setSurveyCompletedMailThreshold( double surveyCompletedMailThreshold )
+    {
+        this.surveyCompletedMailThreshold = surveyCompletedMailThreshold;
+    }
+
     @Override
-	public String toString() {
-		return "auto_post_score: " + auto_post_score + "\t show_survey_above_score: " + show_survey_above_score
-				+ "\t survey_reminder_interval_in_days: " + survey_reminder_interval_in_days + "\t max_number_of_survey_reminders: "
-				+ max_number_of_survey_reminders + "\t complaint_res_settings: " + complaint_res_settings;
-	}
+    public String toString()
+    {
+        return "SurveySettings [auto_post_score=" + auto_post_score + ", show_survey_above_score=" + show_survey_above_score
+            + ", survey_reminder_interval_in_days=" + survey_reminder_interval_in_days + ", max_number_of_survey_reminders="
+            + max_number_of_survey_reminders + ", isReminderDisabled=" + isReminderDisabled
+            + ", social_post_reminder_interval_in_days=" + social_post_reminder_interval_in_days
+            + ", max_number_of_social_pos_reminders=" + max_number_of_social_pos_reminders + ", isSocialPostReminderDisabled="
+            + isSocialPostReminderDisabled + ", autoPostEnabled=" + autoPostEnabled + ", autoPostLinkToUserSiteEnabled="
+            + autoPostLinkToUserSiteEnabled + ", happyText=" + happyText + ", neutralText=" + neutralText + ", sadText="
+            + sadText + ", happyTextComplete=" + happyTextComplete + ", neutralTextComplete=" + neutralTextComplete
+            + ", sadTextComplete=" + sadTextComplete + ", complaint_res_settings=" + complaint_res_settings
+            + ", surveyCompletedMailThreshold=" + surveyCompletedMailThreshold + ", duplicateSurveyInterval="
+            + duplicateSurveyInterval + "]";
+    }
 }

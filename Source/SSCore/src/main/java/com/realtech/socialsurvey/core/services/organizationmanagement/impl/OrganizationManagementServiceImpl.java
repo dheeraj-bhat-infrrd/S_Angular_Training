@@ -6994,7 +6994,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             for ( DisabledAccount account : disabledAccounts ) {
                 try {
                     Company company = account.getCompany();
-                    unsubscribeCompany( company );
+                    try {
+                        unsubscribeCompany( company );
+                    } catch ( SubscriptionCancellationUnsuccessfulException e ) {
+                        LOG.error( "The subscription has already been cancelled for company: {}",company.getCompanyId() );
+                    }
                     sendAccountDeletedNotificationMail( account );
                     purgeCompanyDetails( company );
                 } catch ( InvalidInputException e ) {

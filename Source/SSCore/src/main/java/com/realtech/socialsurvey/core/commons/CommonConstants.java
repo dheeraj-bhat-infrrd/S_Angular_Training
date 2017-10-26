@@ -1404,4 +1404,6 @@ public interface CommonConstants
     //Digest
     public static final String MONTH = "month";
     public static final String YEAR = "year";
+    
+    public static final String SURVEY_MAIL_THRESHOLD = "surveyCompletedMailThreshold";
 }
