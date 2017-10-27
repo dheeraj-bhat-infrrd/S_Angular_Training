@@ -1,11 +1,9 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
-import java.sql.Timestamp;
-import java.util.List;
+
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
-import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +12,6 @@ import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OverviewUserMonthDao;
 import com.realtech.socialsurvey.core.entities.OverviewUserMonth;
-import com.realtech.socialsurvey.core.entities.SurveyResultsCompanyReport;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 
 @Component

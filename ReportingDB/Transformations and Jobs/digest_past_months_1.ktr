@@ -160,16 +160,16 @@
   <hop> <from>jsArrays</from><to>jsGenerateRows</to><enabled>Y</enabled> </hop>
   <hop> <from>jsGenerateRows</from><to>Filter rows</to><enabled>Y</enabled> </hop>
   <hop> <from>Table input</from><to>Modified Java Script Value 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter rows</from><to>user count </to><enabled>Y</enabled> </hop>
-  <hop> <from>user count </from><to>Generate random value</to><enabled>Y</enabled> </hop>
   <hop> <from>Generate random value</from><to>Modified Java Script Value</to><enabled>Y</enabled> </hop>
   <hop> <from>digest input</from><to>Sort rows 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows 2</from><to>Merge Rows &#x28;diff&#x29;</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows</from><to>Merge Rows &#x28;diff&#x29;</to><enabled>Y</enabled> </hop>
-  <hop> <from>Modified Java Script Value</from><to>Select values</to><enabled>Y</enabled> </hop>
   <hop> <from>Select values</from><to>Sort rows</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Rows &#x28;diff&#x29;</from><to>Filter rows 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter rows 2</from><to>Table output</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter rows</from><to>Generate random value</to><enabled>Y</enabled> </hop>
+  <hop> <from>Modified Java Script Value</from><to>user count </to><enabled>Y</enabled> </hop>
+  <hop> <from>user count </from><to>Select values</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Filter rows</name>
@@ -182,7 +182,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-<send_true_to>user count </send_true_to>
+<send_true_to>Generate random value</send_true_to>
 <send_false_to/>
     <compare>
 <condition>
@@ -195,7 +195,7 @@
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>402</xloc>
-      <yloc>305</yloc>
+      <yloc>304</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -211,7 +211,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-<send_true_to/>
+<send_true_to>Table output</send_true_to>
 <send_false_to/>
     <compare>
 <condition>
@@ -248,8 +248,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>644</xloc>
-      <yloc>305</yloc>
+      <xloc>520</xloc>
+      <yloc>304</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -369,8 +369,8 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>796</xloc>
-      <yloc>305</yloc>
+      <xloc>652</xloc>
+      <yloc>304</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -578,7 +578,7 @@
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>984</xloc>
-      <yloc>305</yloc>
+      <yloc>304</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -862,7 +862,7 @@
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
-    <sql>SELECT count&#x28;USER_ID&#x29; as USER_COUNT&#xd;&#xa;from users &#xd;&#xa;where COMPANY_ID&#x3d;&#x3f;&#xd;&#xa;AND STATUS IN &#x28;1,2&#x29;&#x3b;</sql>
+    <sql>SELECT count&#x28;USER_ID&#x29; as USER_COUNT&#xd;&#xa;from users &#xd;&#xa;where COMPANY_ID&#x3d;&#x3f;&#xd;&#xa;AND &#x28;date_format&#x28;CREATED_ON_EST,&#x27;&#x25;m&#x27;&#x29; &#x3c;&#x3d; &#x3f; AND date_format&#x28;CREATED_ON_EST,&#x27;&#x25;Y&#x27;&#x29; &#x3c;&#x3d; &#x3f;&#x29;&#xd;&#xa;AND STATUS IN &#x28;1,2&#x29;&#x3b;</sql>
     <outer_join>N</outer_join>
     <replace_vars>Y</replace_vars>
     <parameter>
@@ -870,11 +870,19 @@
         <name>COMPANY_ID</name>
         <type>Integer</type>
       </field>
+      <field>
+        <name>MonthString</name>
+        <type>None</type>
+      </field>
+      <field>
+        <name>YearString</name>
+        <type>None</type>
+      </field>
     </parameter>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>542</xloc>
-      <yloc>305</yloc>
+      <xloc>777</xloc>
+      <yloc>304</yloc>
       <draw>Y</draw>
       </GUI>
     </step>

@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.net.URLEncoder;
@@ -127,7 +126,6 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.reportingmanagement.ReportingDashboardManagement;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
-//import com.realtech.socialsurvey.web.api.builder.SSApiIntergrationBuilder;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookData;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookOperations;
 
@@ -140,11 +138,14 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 {
     private static final Logger LOG = LoggerFactory.getLogger( ReportingDashboardManagementImpl.class );
 
+    public static final String COUNT = "Count";
+    public static final String STARTINDEX = "startIndex";
+
     @Autowired
     private FileUploadDao fileUploadDao;
 
     @Autowired
-    private SurveyStatsReportBranchDao SurveyStatsReportBranchDao;
+    private SurveyStatsReportBranchDao surveyStatsReportBranchDao;
 
     @Autowired
     private CompanyDao companyDao;
@@ -300,7 +301,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     @Override
     public void createEntryInFileUploadForReporting( int reportId, Date startDate, Date endDate, Long entityId,
         String entityType, Company company, Long adminUserId )
-        throws InvalidInputException, NoRecordsFetchedException, FileNotFoundException, IOException
+        throws InvalidInputException, NoRecordsFetchedException, IOException
     {
         //adding entry in the feild and set status to pending
         LOG.info( "method to insert data into the generateReportList and save in aws server" );
@@ -331,7 +332,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT );
         }
         //get the time 23:59:59 in milliseconds
-        long duration = ( ( ( 23 * 60 ) * 60 ) + ( 59 * 60 ) + 59 ) * 1000;
+        long duration = ( ( ( 23 * 60 ) * 60 ) + ( 59 * 60 ) + 59 ) * 1000l;
 
         if ( startDate != null ) {
             fileUpload.setStartDate( new Timestamp( startDate.getTime() ) );
@@ -361,7 +362,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
         List<List<Object>> surveyStats = new ArrayList<>();
 
-        for ( SurveyStatsReportBranch SurveyStatsReportCompany : SurveyStatsReportBranchDao.fetchSurveyStatsById( entityId,
+        for ( SurveyStatsReportBranch SurveyStatsReportCompany : surveyStatsReportBranchDao.fetchSurveyStatsById( entityId,
             entityType ) ) {
             List<Object> surveyStatsReportToPopulate = new ArrayList<>();
             surveyStatsReportToPopulate.add( SurveyStatsReportCompany.getId() );
@@ -670,12 +671,12 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 surveyTransactionReportList.add( surveyTransactionReport.getUserId() );
 
                 int month = surveyTransactionReport.getMonth();
-                int length = Integer.valueOf( month ).toString().length();
+                int length = Integer.toString( month ).length();
                 String monthString = "";
                 if ( length == 1 ) {
                     monthString = "0" + month;
                 } else {
-                    monthString = month + "";
+                    monthString = Integer.toString( month );
                 }
 
                 surveyTransactionReportList.add( surveyTransactionReport.getYear() + "_" + monthString );
@@ -870,7 +871,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     public List<List<Object>> getUserRankingReportForYear( Long entityId, String entityType, int year )
     {
         Calendar calender = Calendar.getInstance();
-        int this_year = calender.get( Calendar.YEAR );
+        int thisYear = calender.get( Calendar.YEAR );
         List<List<Object>> userRanking = new ArrayList<>();
 
         try {
@@ -891,7 +892,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                     branchNameMap.put( branch.getBranchId(), branch.getBranch() );
                 }
 
-                if ( year == this_year ) {
+                if ( year == thisYear ) {
                     for ( UserRankingThisYearMain userRankingThisYearMain : userRankingThisYearMainDao
                         .fetchUserRankingReportForThisYearMain( entityId, year ) ) {
                         List<Object> userRankingThisYearMainList = new ArrayList<>();
@@ -993,7 +994,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                     branchNameMap.put( branch.getBranchId(), branch.getBranch() );
                 }
 
-                if ( year == this_year ) {
+                if ( year == thisYear ) {
                     for ( UserRankingThisYearRegion userRankingThisYearRegion : userRankingThisYearRegionDao
                         .fetchUserRankinReportForThisYearRegion( entityId, year ) ) {
                         List<Object> userRankingThisYearRegionList = new ArrayList<>();
@@ -1085,7 +1086,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 Company company = companyDao.findById( Company.class, branch.getCompany().getCompanyId() );
                 Region region = regionDao.findById( Region.class, branch.getRegion().getRegionId() );
 
-                if ( year == this_year ) {
+                if ( year == thisYear ) {
                     for ( UserRankingThisYearBranch userRankingThisYearBranch : userRankingThisYearBranchDao
                         .fetchUserRankingReportForThisYearBranch( entityId, year ) ) {
                         List<Object> userRankingThisYearBranchList = new ArrayList<>();
@@ -1184,8 +1185,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     public List<List<Object>> getUserRankingReportForMonth( Long entityId, String entityType, int year, int month )
     {
         Calendar calender = Calendar.getInstance();
-        int this_year = calender.get( Calendar.YEAR );
-        int this_month = calender.get( Calendar.MONTH ) + 1;
+        int thisYear = calender.get( Calendar.YEAR );
+        int thisMonth = calender.get( Calendar.MONTH ) + 1;
 
         List<List<Object>> userRanking = new ArrayList<>();
 
@@ -1207,7 +1208,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                     branchNameMap.put( branch.getBranchId(), branch.getBranch() );
                 }
 
-                if ( month == this_month && year == this_year ) {
+                if ( month == thisMonth && year == thisYear ) {
                     for ( UserRankingThisMonthMain userRankingThisMonthMain : userRankingThisMonthMainDao
                         .fetchUserRankingReportForThisMonthMain( entityId, month, year ) ) {
                         List<Object> userRankingThisMonthMainList = new ArrayList<>();
@@ -1309,7 +1310,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                     branchNameMap.put( branch.getBranchId(), branch.getBranch() );
                 }
 
-                if ( month == this_month && year == this_year ) {
+                if ( month == thisMonth && year == thisYear ) {
                     for ( UserRankingThisMonthRegion userRankingThisMonthRegion : userRankingThisMonthRegionDao
                         .fetchUserRankingReportForThisMonthRegion( entityId, month, year ) ) {
                         List<Object> userRankingThisMonthRegionList = new ArrayList<>();
@@ -1401,7 +1402,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 Company company = companyDao.findById( Company.class, branch.getCompany().getCompanyId() );
                 Region region = regionDao.findById( Region.class, branch.getRegion().getRegionId() );
 
-                if ( month == this_month && year == this_year ) {
+                if ( month == thisMonth && year == thisYear ) {
                     for ( UserRankingThisMonthBranch userRankingThisMonthBranch : userRankingThisMonthBranchDao
                         .fetchUserRankingReportForThisMonthBranch( entityId, month, year ) ) {
                         List<Object> userRankingMonthYearBranchList = new ArrayList<>();
@@ -1538,9 +1539,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     @Override
     public Long getRecentActivityCount( Long entityId, String entityType )
     {
-        Long Count = null;
-        Count = fileUploadDao.getRecentActivityCountForReporting( entityId, entityType );
-        return Count;
+        return fileUploadDao.getRecentActivityCountForReporting( entityId, entityType );
 
     }
 
@@ -1565,30 +1564,29 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         String fileName = "Survey_Stats_Report-" + entityType + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
             + ( Calendar.getInstance().getTimeInMillis() ) + CommonConstants.EXCEL_FILE_EXTENSION;
         XSSFWorkbook workbook = this.downloadSurveyStatsForReporting( entityId, entityType );
-        String LocationInS3 = this.createExcelFileAndSaveInAmazonS3( fileName, workbook );
-        return LocationInS3;
+        return this.createExcelFileAndSaveInAmazonS3( fileName, workbook );
 
     }
 
 
-    @SuppressWarnings ( "unchecked")
     public XSSFWorkbook downloadSurveyStatsForReporting( long entityId, String entityType )
     {
         Response response = ssApiBatchIntergrationBuilder.getIntegrationApi().getReportingSurveyStatsReport( entityId,
             entityType );
         String responseString = response != null ? new String( ( (TypedByteArray) response.getBody() ).getBytes() ) : null;
-        //String responseString = "[[\"CompanyOnebranchone2017_06\",\"CompanyOne\",\"branchone\",\"2017_06\",6,0,0,0,0,0,0,0,6,0,6,0,100,0],[\"CompanyOnebranchtwo2017_06\",\"CompanyOne\",\"branchtwo\",\"2017_06\",6,0,0,0,0,0,0,0,6,0,6,0,100,0]]";
-        //since the string has ""abc"" an extra quote
-        responseString = responseString.substring( 1, responseString.length() - 1 );
-        //Escape characters
-        responseString = StringEscapeUtils.unescapeJava( responseString );
+        if ( responseString != null ) {
+            //since the string has ""abc"" an extra quote
+            responseString = responseString.substring( 1, responseString.length() - 1 );
+            //Escape characters
+            responseString = StringEscapeUtils.unescapeJava( responseString );
+        }
         List<List<String>> surveyStatsReport = null;
         Type listType = new TypeToken<List<List<String>>>() {}.getType();
-        surveyStatsReport = (List<List<String>>) ( new Gson().fromJson( responseString, listType ) );
+        surveyStatsReport = new Gson().fromJson( responseString, listType );
         Map<Integer, List<Object>> data = workbookData.getSurveyStatsReportToBeWrittenInSheet( surveyStatsReport );
         XSSFWorkbook workbook = workbookOperations.createWorkbook( data );
         XSSFSheet sheet = workbook.getSheetAt( 0 );
-        this.makeRowBold( workbook, sheet.getRow( 0 ) );
+        makeRowBold( workbook, sheet.getRow( 0 ) );
         return workbook;
 
     }
@@ -1603,28 +1601,26 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         String fileName = "Verified_Users_Report-" + entityType + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
             + ( Calendar.getInstance().getTimeInMillis() ) + CommonConstants.EXCEL_FILE_EXTENSION;
         XSSFWorkbook workbook = this.downloadUserAdoptionForReporting( entityId, entityType );
-        String LocationInS3 = this.createExcelFileAndSaveInAmazonS3( fileName, workbook );
-        return LocationInS3;
+        return this.createExcelFileAndSaveInAmazonS3( fileName, workbook );
 
     }
 
 
-    @SuppressWarnings ( "unchecked")
     public XSSFWorkbook downloadUserAdoptionForReporting( long entityId, String entityType )
     {
         Response response = ssApiBatchIntergrationBuilder.getIntegrationApi().getUserAdoption( entityId, entityType );
         String responseString = response != null ? new String( ( (TypedByteArray) response.getBody() ).getBytes() ) : null;
-        //String responseString = "[[\"CompanyOnebranchone2017_06\",\"CompanyOne\",\"branchone\",\"2017_06\",6,0,0,0,0,0,0,0,6,0,6,0,100,0],[\"CompanyOnebranchtwo2017_06\",\"CompanyOne\",\"branchtwo\",\"2017_06\",6,0,0,0,0,0,0,0,6,0,6,0,100,0]]";
-        //since the string has ""abc"" an extra quote
-        responseString = responseString.substring( 1, responseString.length() - 1 );
-        //Escape characters
-        responseString = StringEscapeUtils.unescapeJava( responseString );
+        if ( responseString != null ) {
+            //since the string has ""abc"" an extra quote
+            responseString = responseString.substring( 1, responseString.length() - 1 );
+            //Escape characters
+            responseString = StringEscapeUtils.unescapeJava( responseString );
+        }
         List<List<String>> userAdoptionReport = null;
         Type listType = new TypeToken<List<List<String>>>() {}.getType();
-        userAdoptionReport = (List<List<String>>) ( new Gson().fromJson( responseString, listType ) );
+        userAdoptionReport = new Gson().fromJson( responseString, listType );
         Map<Integer, List<Object>> data = workbookData.getUserAdoptionReportToBeWrittenInSheet( userAdoptionReport );
-        XSSFWorkbook workbook = workbookOperations.createWorkbook( data );
-        return workbook;
+        return workbookOperations.createWorkbook( data );
 
     }
 
@@ -1638,27 +1634,26 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         String fileName = "Company_User_Report" + entityType + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
             + ( Calendar.getInstance().getTimeInMillis() ) + CommonConstants.EXCEL_FILE_EXTENSION;
         XSSFWorkbook workbook = this.downloadCompanyUserForReporting( entityId, entityType );
-        String LocationInS3 = this.createExcelFileAndSaveInAmazonS3( fileName, workbook );
-        return LocationInS3;
+        return this.createExcelFileAndSaveInAmazonS3( fileName, workbook );
 
     }
 
 
-    @SuppressWarnings ( "unchecked")
     public XSSFWorkbook downloadCompanyUserForReporting( long entityId, String entityType )
     {
         Response response = ssApiBatchIntergrationBuilder.getIntegrationApi().getCompanyUserReport( entityId, entityType );
         String responseString = response != null ? new String( ( (TypedByteArray) response.getBody() ).getBytes() ) : null;
-        //since the string has ""abc"" an extra quote
-        responseString = responseString.substring( 1, responseString.length() - 1 );
-        //Escape characters
-        responseString = StringEscapeUtils.unescapeJava( responseString );
+        if ( responseString != null ) {
+            //since the string has ""abc"" an extra quote
+            responseString = responseString.substring( 1, responseString.length() - 1 );
+            //Escape characters
+            responseString = StringEscapeUtils.unescapeJava( responseString );
+        }
         List<List<String>> companyUserReport = null;
         Type listType = new TypeToken<List<List<String>>>() {}.getType();
-        companyUserReport = (List<List<String>>) ( new Gson().fromJson( responseString, listType ) );
+        companyUserReport = new Gson().fromJson( responseString, listType );
         Map<Integer, List<Object>> data = workbookData.getCompanyUserReportToBeWrittenInSheet( companyUserReport );
-        XSSFWorkbook workbook = workbookOperations.createWorkbook( data );
-        return workbook;
+        return workbookOperations.createWorkbook( data );
 
     }
 
@@ -1753,29 +1748,28 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         String fileName = "Survey_Transaction_Report" + entityType + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
             + ( Calendar.getInstance().getTimeInMillis() ) + CommonConstants.EXCEL_FILE_EXTENSION;
         XSSFWorkbook workbook = this.downloadSurveyTransactionForReporting( entityId, entityType, startDate, endDate );
-        String LocationInS3 = this.createExcelFileAndSaveInAmazonS3( fileName, workbook );
-        return LocationInS3;
+        return this.createExcelFileAndSaveInAmazonS3( fileName, workbook );
 
     }
 
 
-    @SuppressWarnings ( "unchecked")
     public XSSFWorkbook downloadSurveyTransactionForReporting( long entityId, String entityType, Timestamp startDate,
         Timestamp endDate )
     {
         Response response = ssApiBatchIntergrationBuilder.getIntegrationApi().getSurveyTransactionReport( entityId, entityType,
             startDate, endDate );
         String responseString = response != null ? new String( ( (TypedByteArray) response.getBody() ).getBytes() ) : null;
-        //since the string has ""abc"" an extra quote
-        responseString = responseString.substring( 1, responseString.length() - 1 );
-        //Escape characters
-        responseString = StringEscapeUtils.unescapeJava( responseString );
+        if ( responseString != null ) {
+            //since the string has ""abc"" an extra quote
+            responseString = responseString.substring( 1, responseString.length() - 1 );
+            //Escape characters
+            responseString = StringEscapeUtils.unescapeJava( responseString );
+        }
         List<List<String>> surveyTransactionReport = null;
         Type listType = new TypeToken<List<List<String>>>() {}.getType();
-        surveyTransactionReport = (List<List<String>>) ( new Gson().fromJson( responseString, listType ) );
+        surveyTransactionReport = new Gson().fromJson( responseString, listType );
         Map<Integer, List<Object>> data = workbookData.getSurveyTransactionReportToBeWrittenInSheet( surveyTransactionReport );
-        XSSFWorkbook workbook = workbookOperations.createWorkbook( data );
-        return workbook;
+        return workbookOperations.createWorkbook( data );
 
     }
 
@@ -1793,28 +1787,27 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         String fileName = "User_Ranking_Report" + entityType + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
             + ( Calendar.getInstance().getTimeInMillis() ) + CommonConstants.EXCEL_FILE_EXTENSION;
         XSSFWorkbook workbook = this.downloadUserRankingForReporting( entityId, entityType, year, month, type );
-        String LocationInS3 = this.createExcelFileAndSaveInAmazonS3( fileName, workbook );
-        return LocationInS3;
+        return this.createExcelFileAndSaveInAmazonS3( fileName, workbook );
 
     }
 
 
-    @SuppressWarnings ( "unchecked")
     public XSSFWorkbook downloadUserRankingForReporting( long entityId, String entityType, int year, int month, int type )
     {
         Response response = ssApiBatchIntergrationBuilder.getIntegrationApi().getUserRankingReport( entityId, entityType, year,
             month, type );
         String responseString = response != null ? new String( ( (TypedByteArray) response.getBody() ).getBytes() ) : null;
-        //since the string has ""abc"" an extra quote
-        responseString = responseString.substring( 1, responseString.length() - 1 );
-        //Escape characters
-        responseString = StringEscapeUtils.unescapeJava( responseString );
+        if ( responseString != null ) {
+            //since the string has ""abc"" an extra quote
+            responseString = responseString.substring( 1, responseString.length() - 1 );
+            //Escape characters
+            responseString = StringEscapeUtils.unescapeJava( responseString );
+        }
         List<List<String>> userRankingReport = null;
         Type listType = new TypeToken<List<List<String>>>() {}.getType();
-        userRankingReport = (List<List<String>>) ( new Gson().fromJson( responseString, listType ) );
+        userRankingReport = new Gson().fromJson( responseString, listType );
         Map<Integer, List<Object>> data = workbookData.getUserRankingReportToBeWrittenInSheet( userRankingReport );
-        XSSFWorkbook workbook = workbookOperations.createWorkbook( data );
-        return workbook;
+        return workbookOperations.createWorkbook( data );
 
     }
 
@@ -1852,7 +1845,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                     + URLEncoder.encode( fileName, "UTF-8" );
                 responseString = fileNameInS3;
                 LOG.debug( "returning the response string : {}", responseString );
-            }else{
+            } else {
                 LOG.warn( "Could not write into file {}", fileName );
             }
         } catch ( FileNotFoundException fe ) {
@@ -2218,395 +2211,393 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     @Override
     @Transactional ( value = "transactionManagerForReporting")
     public Map<String, Object> fetchRankingRankCountThisYear( long userId, long entityId, String entityType, int year,
-        int BatchSize ) throws NonFatalException
+        int batchSize ) throws NonFatalException
     {
-        Map<String, Object> RankingCountStartIndex = new HashMap<String, Object>();
+        Map<String, Object> rankingCountStartIndex = new HashMap<>();
         if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
-            RankingCountStartIndex.put( "Count",
+            rankingCountStartIndex.put( COUNT,
                 userRankingThisYearMainDao.fetchUserRankingCountForThisYearMain( entityId, year ) );
-            int Rank = userRankingThisYearMainDao.fetchUserRankingRankForThisYearMain( userId, entityId, year );
+            int rank = userRankingThisYearMainDao.fetchUserRankingRankForThisYearMain( userId, entityId, year );
             //get the mod to determine startIndex
             int startIndex = 0;
-            int mod = ( Rank % BatchSize );
-            int diff = ( BatchSize / 2 );
+            int mod = ( rank % batchSize );
+            int diff = ( batchSize / 2 );
 
-            if ( Rank >= ( BatchSize / 2 ) ) {
-                startIndex = Rank - diff;
+            if ( rank >= ( batchSize / 2 ) ) {
+                startIndex = rank - diff;
             } else {
-                startIndex = Rank - mod;
+                startIndex = rank - mod;
             }
-            RankingCountStartIndex.put( "startIndex", startIndex );
+            rankingCountStartIndex.put( STARTINDEX, startIndex );
 
         } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
-            RankingCountStartIndex.put( "Count",
+            rankingCountStartIndex.put( COUNT,
                 userRankingThisYearBranchDao.fetchUserRankingCountForThisYearBranch( entityId, year ) );
-            int Rank = userRankingThisYearBranchDao.fetchUserRankingRankForThisYearBranch( userId, entityId, year );
+            int rank = userRankingThisYearBranchDao.fetchUserRankingRankForThisYearBranch( userId, entityId, year );
             //get the mod to determine startIndex
             int startIndex = 0;
-            int mod = ( Rank % BatchSize );
-            int diff = ( BatchSize / 2 );
+            int mod = ( rank % batchSize );
+            int diff = ( batchSize / 2 );
 
-            if ( Rank >= ( BatchSize / 2 ) ) {
-                startIndex = Rank - diff;
+            if ( rank >= ( batchSize / 2 ) ) {
+                startIndex = rank - diff;
             } else {
-                startIndex = Rank - mod;
+                startIndex = rank - mod;
             }
-            RankingCountStartIndex.put( "startIndex", startIndex );
+            rankingCountStartIndex.put( STARTINDEX, startIndex );
 
         } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
-            RankingCountStartIndex.put( "Count",
+            rankingCountStartIndex.put( COUNT,
                 userRankingThisYearRegionDao.fetchUserRankingCountForThisYearRegion( entityId, year ) );
-            int Rank = userRankingThisYearRegionDao.fetchUserRankingRankForThisYearRegion( userId, entityId, year );
+            int rank = userRankingThisYearRegionDao.fetchUserRankingRankForThisYearRegion( userId, entityId, year );
             //get the mod to determine startIndex
             int startIndex = 0;
-            int mod = ( Rank % BatchSize );
-            int diff = ( BatchSize / 2 );
+            int mod = ( rank % batchSize );
+            int diff = ( batchSize / 2 );
 
-            if ( Rank >= ( BatchSize / 2 ) ) {
-                startIndex = Rank - diff;
+            if ( rank >= ( batchSize / 2 ) ) {
+                startIndex = rank - diff;
             } else {
-                startIndex = Rank - mod;
+                startIndex = rank - mod;
             }
-            RankingCountStartIndex.put( "startIndex", startIndex );
+            rankingCountStartIndex.put( STARTINDEX, startIndex );
 
         }
-        return RankingCountStartIndex;
+        return rankingCountStartIndex;
     }
 
 
     @Override
     @Transactional ( value = "transactionManagerForReporting")
     public Map<String, Object> fetchRankingRankCountThisMonth( long userId, long entityId, String entityType, int year,
-        int month, int BatchSize ) throws NonFatalException
+        int month, int batchSize ) throws NonFatalException
     {
-        Map<String, Object> RankingCountStartIndex = new HashMap<String, Object>();
+        Map<String, Object> rankingCountStartIndex = new HashMap<>();
         if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
-            RankingCountStartIndex.put( "Count",
+            rankingCountStartIndex.put( COUNT,
                 userRankingThisMonthMainDao.fetchUserRankingCountForThisMonthMain( entityId, year, month ) );
-            int Rank = userRankingThisMonthMainDao.fetchUserRankingRankForThisMonthMain( userId, entityId, year );
+            int rank = userRankingThisMonthMainDao.fetchUserRankingRankForThisMonthMain( userId, entityId, year );
             //get the mod to determine startIndex
             int startIndex = 0;
-            int mod = ( Rank % BatchSize );
-            int diff = ( BatchSize / 2 );
+            int mod = ( rank % batchSize );
+            int diff = ( batchSize / 2 );
 
-            if ( Rank >= ( BatchSize / 2 ) ) {
-                startIndex = Rank - diff;
+            if ( rank >= ( batchSize / 2 ) ) {
+                startIndex = rank - diff;
             } else {
-                startIndex = Rank - mod;
+                startIndex = rank - mod;
             }
-            RankingCountStartIndex.put( "startIndex", startIndex );
+            rankingCountStartIndex.put( STARTINDEX, startIndex );
 
         } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
-            RankingCountStartIndex.put( "Count",
+            rankingCountStartIndex.put( COUNT,
                 userRankingThisMonthBranchDao.fetchUserRankingCountForThisMonthBranch( entityId, month, year ) );
-            int Rank = userRankingThisMonthBranchDao.fetchUserRankingRankForThisMonthBranch( userId, entityId, year );
+            int rank = userRankingThisMonthBranchDao.fetchUserRankingRankForThisMonthBranch( userId, entityId, year );
             //get the mod to determine startIndex
             int startIndex = 0;
-            int mod = ( Rank % BatchSize );
-            int diff = ( BatchSize / 2 );
+            int mod = ( rank % batchSize );
+            int diff = ( batchSize / 2 );
 
-            if ( Rank >= ( BatchSize / 2 ) ) {
-                startIndex = Rank - diff;
+            if ( rank >= ( batchSize / 2 ) ) {
+                startIndex = rank - diff;
             } else {
-                startIndex = Rank - mod;
+                startIndex = rank - mod;
             }
-            RankingCountStartIndex.put( "startIndex", startIndex );
+            rankingCountStartIndex.put( STARTINDEX, startIndex );
 
         } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
-            RankingCountStartIndex.put( "Count",
+            rankingCountStartIndex.put( COUNT,
                 userRankingThisMonthRegionDao.fetchUserRankingCountForThisMonthRegion( entityId, month, year ) );
-            int Rank = userRankingThisMonthRegionDao.fetchUserRankingRankForThisMonthRegion( userId, entityId, year );
+            int rank = userRankingThisMonthRegionDao.fetchUserRankingRankForThisMonthRegion( userId, entityId, year );
             //get the mod to determine startIndex
             int startIndex = 0;
-            int mod = ( Rank % BatchSize );
-            int diff = ( BatchSize / 2 );
+            int mod = ( rank % batchSize );
+            int diff = ( batchSize / 2 );
 
-            if ( Rank >= ( BatchSize / 2 ) ) {
-                startIndex = Rank - diff;
+            if ( rank >= ( batchSize / 2 ) ) {
+                startIndex = rank - diff;
             } else {
-                startIndex = Rank - mod;
+                startIndex = rank - mod;
             }
-            RankingCountStartIndex.put( "startIndex", startIndex );
+            rankingCountStartIndex.put( STARTINDEX, startIndex );
         }
 
-        return RankingCountStartIndex;
+        return rankingCountStartIndex;
     }
 
 
     @Override
     @Transactional ( value = "transactionManagerForReporting")
     public Map<String, Object> fetchRankingRankCountPastYear( long userId, long entityId, String entityType, int year,
-        int BatchSize ) throws NonFatalException
+        int batchSize ) throws NonFatalException
     {
-        Map<String, Object> RankingCountStartIndex = new HashMap<String, Object>();
+        Map<String, Object> rankingCountStartIndex = new HashMap<>();
         if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
-            RankingCountStartIndex.put( "Count",
+            rankingCountStartIndex.put( COUNT,
                 userRankingPastYearMainDao.fetchUserRankingCountForPastYearMain( entityId, year ) );
-            int Rank = userRankingPastYearMainDao.fetchUserRankingRankForPastYearMain( userId, entityId, year );
+            int rank = userRankingPastYearMainDao.fetchUserRankingRankForPastYearMain( userId, entityId, year );
             //get the mod to determine startIndex
             int startIndex = 0;
-            int mod = ( Rank % BatchSize );
-            int diff = ( BatchSize / 2 );
+            int mod = ( rank % batchSize );
+            int diff = ( batchSize / 2 );
 
-            if ( Rank >= ( BatchSize / 2 ) ) {
-                startIndex = Rank - diff;
+            if ( rank >= ( batchSize / 2 ) ) {
+                startIndex = rank - diff;
             } else {
-                startIndex = Rank - mod;
+                startIndex = rank - mod;
             }
-            RankingCountStartIndex.put( "startIndex", startIndex );
+            rankingCountStartIndex.put( STARTINDEX, startIndex );
 
         } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
-            RankingCountStartIndex.put( "Count",
+            rankingCountStartIndex.put( COUNT,
                 userRankingPastYearBranchDao.fetchUserRankingCountForPastYearBranch( entityId, year ) );
-            int Rank = userRankingPastYearBranchDao.fetchUserRankingRankForPastYearBranch( userId, entityId, year );
+            int rank = userRankingPastYearBranchDao.fetchUserRankingRankForPastYearBranch( userId, entityId, year );
             //get the mod to determine startIndex
             int startIndex = 0;
-            int mod = ( Rank % BatchSize );
-            int diff = ( BatchSize / 2 );
+            int mod = ( rank % batchSize );
+            int diff = ( batchSize / 2 );
 
-            if ( Rank >= ( BatchSize / 2 ) ) {
-                startIndex = Rank - diff;
+            if ( rank >= ( batchSize / 2 ) ) {
+                startIndex = rank - diff;
             } else {
-                startIndex = Rank - mod;
+                startIndex = rank - mod;
             }
-            RankingCountStartIndex.put( "startIndex", startIndex );
+            rankingCountStartIndex.put( STARTINDEX, startIndex );
 
         } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
-            RankingCountStartIndex.put( "Count",
+            rankingCountStartIndex.put( COUNT,
                 userRankingPastYearRegionDao.fetchUserRankingCountForPastYearRegion( entityId, year ) );
-            int Rank = userRankingPastYearRegionDao.fetchUserRankingRankForPastYearRegion( userId, entityId, year );
+            int rank = userRankingPastYearRegionDao.fetchUserRankingRankForPastYearRegion( userId, entityId, year );
             //get the mod to determine startIndex
             int startIndex = 0;
-            int mod = ( Rank % BatchSize );
-            int diff = ( BatchSize / 2 );
+            int mod = ( rank % batchSize );
+            int diff = ( batchSize / 2 );
 
-            if ( Rank >= ( BatchSize / 2 ) ) {
-                startIndex = Rank - diff;
+            if ( rank >= ( batchSize / 2 ) ) {
+                startIndex = rank - diff;
             } else {
-                startIndex = Rank - mod;
+                startIndex = rank - mod;
             }
-            RankingCountStartIndex.put( "startIndex", startIndex );
+            rankingCountStartIndex.put( STARTINDEX, startIndex );
 
         }
-        return RankingCountStartIndex;
+        return rankingCountStartIndex;
     }
 
 
     @Override
     @Transactional ( value = "transactionManagerForReporting")
-    public Map<String, Object> fetchRankingRankCountPastYears( long userId, long entityId, String entityType, int BatchSize )
+    public Map<String, Object> fetchRankingRankCountPastYears( long userId, long entityId, String entityType, int batchSize )
         throws NonFatalException
     {
-        Map<String, Object> RankingCountStartIndex = new HashMap<String, Object>();
+        Map<String, Object> rankingCountStartIndex = new HashMap<>();
         if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
-            RankingCountStartIndex.put( "Count",
-                userRankingPastYearsMainDao.fetchUserRankingCountForPastYearsMain( entityId ) );
-            int Rank = userRankingPastYearsMainDao.fetchUserRankingRankForPastYearsMain( userId, entityId );
+            rankingCountStartIndex.put( COUNT, userRankingPastYearsMainDao.fetchUserRankingCountForPastYearsMain( entityId ) );
+            int rank = userRankingPastYearsMainDao.fetchUserRankingRankForPastYearsMain( userId, entityId );
             //get the mod to determine startIndex
             int startIndex = 0;
-            int mod = ( Rank % BatchSize );
-            int diff = ( BatchSize / 2 );
+            int mod = ( rank % batchSize );
+            int diff = ( batchSize / 2 );
 
-            if ( Rank >= ( BatchSize / 2 ) ) {
-                startIndex = Rank - diff;
+            if ( rank >= ( batchSize / 2 ) ) {
+                startIndex = rank - diff;
             } else {
-                startIndex = Rank - mod;
+                startIndex = rank - mod;
             }
-            RankingCountStartIndex.put( "startIndex", startIndex );
+            rankingCountStartIndex.put( STARTINDEX, startIndex );
 
         } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
-            RankingCountStartIndex.put( "Count",
+            rankingCountStartIndex.put( COUNT,
                 userRankingPastYearsBranchDao.fetchUserRankingCountForPastYearsBranch( entityId ) );
-            int Rank = userRankingPastYearsBranchDao.fetchUserRankingRankForPastYearsBranch( userId, entityId );
+            int rank = userRankingPastYearsBranchDao.fetchUserRankingRankForPastYearsBranch( userId, entityId );
             //get the mod to determine startIndex
             int startIndex = 0;
-            int mod = ( Rank % BatchSize );
-            int diff = ( BatchSize / 2 );
+            int mod = ( rank % batchSize );
+            int diff = ( batchSize / 2 );
 
-            if ( Rank >= ( BatchSize / 2 ) ) {
-                startIndex = Rank - diff;
+            if ( rank >= ( batchSize / 2 ) ) {
+                startIndex = rank - diff;
             } else {
-                startIndex = Rank - mod;
+                startIndex = rank - mod;
             }
-            RankingCountStartIndex.put( "startIndex", startIndex );
+            rankingCountStartIndex.put( STARTINDEX, startIndex );
 
         } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
-            RankingCountStartIndex.put( "Count",
+            rankingCountStartIndex.put( COUNT,
                 userRankingPastYearsRegionDao.fetchUserRankingCountForPastYearsRegion( entityId ) );
-            int Rank = userRankingPastYearsRegionDao.fetchUserRankingRankForPastYearsRegion( userId, entityId );
+            int rank = userRankingPastYearsRegionDao.fetchUserRankingRankForPastYearsRegion( userId, entityId );
             //get the mod to determine startIndex
             int startIndex = 0;
-            int mod = ( Rank % BatchSize );
-            int diff = ( BatchSize / 2 );
+            int mod = ( rank % batchSize );
+            int diff = ( batchSize / 2 );
 
-            if ( Rank >= ( BatchSize / 2 ) ) {
-                startIndex = Rank - diff;
+            if ( rank >= ( batchSize / 2 ) ) {
+                startIndex = rank - diff;
             } else {
-                startIndex = Rank - mod;
+                startIndex = rank - mod;
             }
-            RankingCountStartIndex.put( "startIndex", startIndex );
+            rankingCountStartIndex.put( STARTINDEX, startIndex );
 
         }
-        return RankingCountStartIndex;
+        return rankingCountStartIndex;
     }
 
 
     @Override
     @Transactional ( value = "transactionManagerForReporting")
     public Map<String, Object> fetchRankingRankCountPastMonth( long userId, long entityId, String entityType, int year,
-        int month, int BatchSize ) throws NonFatalException
+        int month, int batchSize ) throws NonFatalException
     {
-        Map<String, Object> RankingCountStartIndex = new HashMap<String, Object>();
+        Map<String, Object> rankingCountStartIndex = new HashMap<>();
         if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
-            RankingCountStartIndex.put( "Count",
+            rankingCountStartIndex.put( COUNT,
                 userRankingPastMonthMainDao.fetchUserRankingCountForPastMonthMain( entityId, year, month ) );
-            int Rank = userRankingPastMonthMainDao.fetchUserRankingRankForPastMonthMain( userId, entityId, year, month );
+            int rank = userRankingPastMonthMainDao.fetchUserRankingRankForPastMonthMain( userId, entityId, year, month );
             //get the mod to determine startIndex
             int startIndex = 0;
-            int mod = ( Rank % BatchSize );
-            int diff = ( BatchSize / 2 );
+            int mod = ( rank % batchSize );
+            int diff = ( batchSize / 2 );
 
-            if ( Rank >= ( BatchSize / 2 ) ) {
-                startIndex = Rank - diff;
+            if ( rank >= ( batchSize / 2 ) ) {
+                startIndex = rank - diff;
             } else {
-                startIndex = Rank - mod;
+                startIndex = rank - mod;
             }
 
-            RankingCountStartIndex.put( "startIndex", startIndex );
+            rankingCountStartIndex.put( STARTINDEX, startIndex );
 
         } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
-            RankingCountStartIndex.put( "Count",
+            rankingCountStartIndex.put( COUNT,
                 userRankingPastMonthBranchDao.fetchUserRankingCountForPastMonthBranch( entityId, month, year ) );
-            int Rank = userRankingPastMonthBranchDao.fetchUserRankingRankForPastMonthBranch( userId, entityId, year, month );
+            int rank = userRankingPastMonthBranchDao.fetchUserRankingRankForPastMonthBranch( userId, entityId, year, month );
             //get the mod to determine startIndex
             int startIndex = 0;
-            int mod = ( Rank % BatchSize );
-            int diff = ( BatchSize / 2 );
+            int mod = ( rank % batchSize );
+            int diff = ( batchSize / 2 );
 
-            if ( Rank >= ( BatchSize / 2 ) ) {
-                startIndex = Rank - diff;
+            if ( rank >= ( batchSize / 2 ) ) {
+                startIndex = rank - diff;
             } else {
-                startIndex = Rank - mod;
+                startIndex = rank - mod;
             }
-            RankingCountStartIndex.put( "startIndex", startIndex );
+            rankingCountStartIndex.put( STARTINDEX, startIndex );
 
         } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
-            RankingCountStartIndex.put( "Count",
+            rankingCountStartIndex.put( COUNT,
                 userRankingPastMonthRegionDao.fetchUserRankingCountForPastMonthRegion( entityId, month, year ) );
-            int Rank = userRankingPastMonthRegionDao.fetchUserRankingRankForPastMonthRegion( userId, entityId, year, month );
+            int rank = userRankingPastMonthRegionDao.fetchUserRankingRankForPastMonthRegion( userId, entityId, year, month );
             //get the mod to determine startIndex
             int startIndex = 0;
-            int mod = ( Rank % BatchSize );
-            int diff = ( BatchSize / 2 );
+            int mod = ( rank % batchSize );
+            int diff = ( batchSize / 2 );
 
-            if ( Rank >= ( BatchSize / 2 ) ) {
-                startIndex = Rank - diff;
+            if ( rank >= ( batchSize / 2 ) ) {
+                startIndex = rank - diff;
             } else {
-                startIndex = Rank - mod;
+                startIndex = rank - mod;
             }
-            RankingCountStartIndex.put( "startIndex", startIndex );
+            rankingCountStartIndex.put( STARTINDEX, startIndex );
         }
-        return RankingCountStartIndex;
+        return rankingCountStartIndex;
     }
 
 
     @Override
     @Transactional ( value = "transactionManagerForReporting")
-    public Map<String, Object> fetchRankingCountThisYear( long entityId, String entityType, int year, int BatchSize )
+    public Map<String, Object> fetchRankingCountThisYear( long entityId, String entityType, int year, int batchSize )
         throws NonFatalException
     {
-        Map<String, Object> RankingCountStartIndex = new HashMap<String, Object>();
+        Map<String, Object> rankingCountStartIndex = new HashMap<>();
         if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
-            RankingCountStartIndex.put( "Count",
+            rankingCountStartIndex.put( COUNT,
                 userRankingThisYearMainDao.fetchUserRankingCountForThisYearMain( entityId, year ) );
         } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
-            RankingCountStartIndex.put( "Count",
+            rankingCountStartIndex.put( COUNT,
                 userRankingThisYearBranchDao.fetchUserRankingCountForThisYearBranch( entityId, year ) );
         } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
-            RankingCountStartIndex.put( "Count",
+            rankingCountStartIndex.put( COUNT,
                 userRankingThisYearRegionDao.fetchUserRankingCountForThisYearRegion( entityId, year ) );
         }
-        return RankingCountStartIndex;
+        return rankingCountStartIndex;
     }
 
 
     @Override
     @Transactional ( value = "transactionManagerForReporting")
     public Map<String, Object> fetchRankingCountThisMonth( long entityId, String entityType, int year, int month,
-        int BatchSize ) throws NonFatalException
+        int batchSize ) throws NonFatalException
     {
-        Map<String, Object> RankingCountStartIndex = new HashMap<String, Object>();
+        Map<String, Object> rankingCountStartIndex = new HashMap<>();
         if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
-            RankingCountStartIndex.put( "Count",
+            rankingCountStartIndex.put( COUNT,
                 userRankingThisMonthMainDao.fetchUserRankingCountForThisMonthMain( entityId, year, month ) );
         } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
-            RankingCountStartIndex.put( "Count",
+            rankingCountStartIndex.put( COUNT,
                 userRankingThisMonthBranchDao.fetchUserRankingCountForThisMonthBranch( entityId, month, year ) );
         } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
-            RankingCountStartIndex.put( "Count",
+            rankingCountStartIndex.put( COUNT,
                 userRankingThisMonthRegionDao.fetchUserRankingCountForThisMonthRegion( entityId, month, year ) );
         }
-        return RankingCountStartIndex;
+        return rankingCountStartIndex;
     }
 
 
     @Override
     @Transactional ( value = "transactionManagerForReporting")
-    public Map<String, Object> fetchRankingCountPastYear( long entityId, String entityType, int year, int BatchSize )
+    public Map<String, Object> fetchRankingCountPastYear( long entityId, String entityType, int year, int batchSize )
         throws NonFatalException
     {
-        Map<String, Object> RankingCountStartIndex = new HashMap<String, Object>();
+        Map<String, Object> rankingCountStartIndex = new HashMap<>();
         if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
-            RankingCountStartIndex.put( "Count",
+            rankingCountStartIndex.put( COUNT,
                 userRankingPastYearMainDao.fetchUserRankingCountForPastYearMain( entityId, year ) );
         } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
-            RankingCountStartIndex.put( "Count",
+            rankingCountStartIndex.put( COUNT,
                 userRankingPastYearBranchDao.fetchUserRankingCountForPastYearBranch( entityId, year ) );
         } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
-            RankingCountStartIndex.put( "Count",
+            rankingCountStartIndex.put( COUNT,
                 userRankingPastYearRegionDao.fetchUserRankingCountForPastYearRegion( entityId, year ) );
         }
-        return RankingCountStartIndex;
+        return rankingCountStartIndex;
     }
 
 
     @Override
     @Transactional ( value = "transactionManagerForReporting")
     public Map<String, Object> fetchRankingCountPastMonth( long entityId, String entityType, int year, int month,
-        int BatchSize ) throws NonFatalException
+        int batchSize ) throws NonFatalException
     {
-        Map<String, Object> RankingCountStartIndex = new HashMap<String, Object>();
+        Map<String, Object> rankingCountStartIndex = new HashMap<>();
         if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
-            RankingCountStartIndex.put( "Count",
+            rankingCountStartIndex.put( COUNT,
                 userRankingPastMonthMainDao.fetchUserRankingCountForPastMonthMain( entityId, year, month ) );
         } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
-            RankingCountStartIndex.put( "Count",
+            rankingCountStartIndex.put( COUNT,
                 userRankingPastMonthBranchDao.fetchUserRankingCountForPastMonthBranch( entityId, month, year ) );
         } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
-            RankingCountStartIndex.put( "Count",
+            rankingCountStartIndex.put( COUNT,
                 userRankingPastMonthRegionDao.fetchUserRankingCountForPastMonthRegion( entityId, month, year ) );
         }
-        return RankingCountStartIndex;
+        return rankingCountStartIndex;
     }
 
 
     @Override
     @Transactional ( value = "transactionManagerForReporting")
-    public Map<String, Object> fetchRankingCountPastYears( long entityId, String entityType, int BatchSize )
+    public Map<String, Object> fetchRankingCountPastYears( long entityId, String entityType, int batchSize )
         throws NonFatalException
     {
-        Map<String, Object> RankingCountStartIndex = new HashMap<String, Object>();
+        Map<String, Object> rankingCountStartIndex = new HashMap<>();
         if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
-            RankingCountStartIndex.put( "Count",
-                userRankingPastYearsMainDao.fetchUserRankingCountForPastYearsMain( entityId ) );
+            rankingCountStartIndex.put( COUNT, userRankingPastYearsMainDao.fetchUserRankingCountForPastYearsMain( entityId ) );
         } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
-            RankingCountStartIndex.put( "Count",
+            rankingCountStartIndex.put( COUNT,
                 userRankingPastYearsBranchDao.fetchUserRankingCountForPastYearsBranch( entityId ) );
         } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
-            RankingCountStartIndex.put( "Count",
+            rankingCountStartIndex.put( COUNT,
                 userRankingPastYearsRegionDao.fetchUserRankingCountForPastYearsRegion( entityId ) );
         }
-        return RankingCountStartIndex;
+        return rankingCountStartIndex;
     }
 
 
@@ -2644,9 +2635,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     @Override
     public Long getRegionIdFromBranchId( long branchId )
     {
-
-        long regionId = branchDao.getRegionIdByBranchId( branchId );
-        return regionId;
+        return branchDao.getRegionIdByBranchId( branchId );
     }
 
 
@@ -2655,59 +2644,59 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     {
 
         List<List<Object>> scoreStatsForOverall = new ArrayList<>();
-        int start_month = 0;
-        int start_year = currentYear - 1;
+        int startMonth = 0;
+        int startYear = currentYear - 1;
         //current month is usually 
         //the graph shows 12 months in which the month 12 months back is +1 from current month except for when current month is dec
         if ( currentMonth < 12 ) {
-            start_month = currentMonth + 1;
+            startMonth = currentMonth + 1;
         } else if ( currentMonth == 12 ) {
-            start_month = 1;
+            startMonth = 1;
         }
         if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
 
             for ( ScoreStatsOverallCompany scoreStatsOverallCompany : scoreStatsOverallCompanyDao
-                .fetchScoreStatsOverallForCompany( entityId, start_month, start_year, currentMonth, currentYear ) ) {
+                .fetchScoreStatsOverallForCompany( entityId, startMonth, startYear, currentMonth, currentYear ) ) {
                 List<Object> scoreStatsOverallCompanyList = new ArrayList<>();
-                double average_score = scoreStatsOverallCompany.getAvgScore();
+                double averageScore = scoreStatsOverallCompany.getAvgScore();
                 scoreStatsOverallCompanyList
                     .add( scoreStatsOverallCompany.getMonthVal() + "/" + scoreStatsOverallCompany.getYearVal() );
-                scoreStatsOverallCompanyList.add( average_score );
+                scoreStatsOverallCompanyList.add( averageScore );
                 scoreStatsForOverall.add( scoreStatsOverallCompanyList );
             }
 
         } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
 
             for ( ScoreStatsOverallRegion scoreStatsOverallRegion : scoreStatsOverallRegionDao
-                .fetchScoreStatsOverallForRegion( entityId, start_month, start_year, currentMonth, currentYear ) ) {
+                .fetchScoreStatsOverallForRegion( entityId, startMonth, startYear, currentMonth, currentYear ) ) {
                 List<Object> scoreStatsOverallRegionList = new ArrayList<>();
-                double average_score = scoreStatsOverallRegion.getAvgScore();
+                double averageScore = scoreStatsOverallRegion.getAvgScore();
                 scoreStatsOverallRegionList
                     .add( scoreStatsOverallRegion.getMonthVal() + "/" + scoreStatsOverallRegion.getYearVal() );
-                scoreStatsOverallRegionList.add( average_score );
+                scoreStatsOverallRegionList.add( averageScore );
                 scoreStatsForOverall.add( scoreStatsOverallRegionList );
             }
 
         } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
 
             for ( ScoreStatsOverallBranch scoreStatsOverallBranch : scoreStatsOverallBranchDao
-                .fetchScoreStatsOverallForBranch( entityId, start_month, start_year, currentMonth, currentYear ) ) {
+                .fetchScoreStatsOverallForBranch( entityId, startMonth, startYear, currentMonth, currentYear ) ) {
                 List<Object> scoreStatsOverallBranchList = new ArrayList<>();
-                double average_score = scoreStatsOverallBranch.getAvgScore();
+                double averageScore = scoreStatsOverallBranch.getAvgScore();
                 scoreStatsOverallBranchList
                     .add( scoreStatsOverallBranch.getMonthVal() + "/" + scoreStatsOverallBranch.getYearVal() );
-                scoreStatsOverallBranchList.add( average_score );
+                scoreStatsOverallBranchList.add( averageScore );
                 scoreStatsForOverall.add( scoreStatsOverallBranchList );
             }
 
         } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
 
             for ( ScoreStatsOverallUser scoreStatsOverallUser : scoreStatsOverallUserDao
-                .fetchScoreStatsOverallForUser( entityId, start_month, start_year, currentMonth, currentYear ) ) {
+                .fetchScoreStatsOverallForUser( entityId, startMonth, startYear, currentMonth, currentYear ) ) {
                 List<Object> scoreStatsOverallUserList = new ArrayList<>();
-                double average_score = scoreStatsOverallUser.getAvgScore();
+                double averageScore = scoreStatsOverallUser.getAvgScore();
                 scoreStatsOverallUserList.add( scoreStatsOverallUser.getMonthVal() + "/" + scoreStatsOverallUser.getYearVal() );
-                scoreStatsOverallUserList.add( average_score );
+                scoreStatsOverallUserList.add( averageScore );
                 scoreStatsForOverall.add( scoreStatsOverallUserList );
             }
 
@@ -2722,65 +2711,65 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     {
 
         List<List<Object>> scoreStatsForQuestion = new ArrayList<>();
-        int start_month = 0;
-        int start_year = currentYear - 1;
+        int startMonth = 0;
+        int startYear = currentYear - 1;
         //current month is usually 
         //the graph shows 12 months in which the month 12 months back is +1 from current month except for when current month is dec
         if ( currentMonth < 12 ) {
-            start_month = currentMonth + 1;
+            startMonth = currentMonth + 1;
         } else if ( currentMonth == 12 ) {
-            start_month = 1;
+            startMonth = 1;
         }
 
         if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
             for ( ScoreStatsQuestionCompany scoreStatsQuestionCompany : scoreStatsQuestionCompanyDao
-                .fetchScoreStatsQuestionForCompany( entityId, start_month, start_year, currentMonth, currentYear ) ) {
+                .fetchScoreStatsQuestionForCompany( entityId, startMonth, startYear, currentMonth, currentYear ) ) {
                 List<Object> scoreStatsQuestionCompanyList = new ArrayList<>();
-                double average_score = scoreStatsQuestionCompany.getAvgScore();
+                double averageScore = scoreStatsQuestionCompany.getAvgScore();
                 scoreStatsQuestionCompanyList.add( scoreStatsQuestionCompany.getQuestionId() );
                 scoreStatsQuestionCompanyList.add( scoreStatsQuestionCompany.getQuestion() );
                 scoreStatsQuestionCompanyList
                     .add( scoreStatsQuestionCompany.getMonthVal() + "/" + scoreStatsQuestionCompany.getYearVal() );
-                scoreStatsQuestionCompanyList.add( average_score );
+                scoreStatsQuestionCompanyList.add( averageScore );
                 scoreStatsForQuestion.add( scoreStatsQuestionCompanyList );
             }
 
         } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
             for ( ScoreStatsQuestionRegion scoreStatsQuestionRegion : scoreStatsQuestionRegionDao
-                .fetchScoreStatsQuestionForRegion( entityId, start_month, start_year, currentMonth, currentYear ) ) {
+                .fetchScoreStatsQuestionForRegion( entityId, startMonth, startYear, currentMonth, currentYear ) ) {
                 List<Object> scoreStatsQuestionRegionList = new ArrayList<>();
-                double average_score = scoreStatsQuestionRegion.getAvgScore();
+                double averageScore = scoreStatsQuestionRegion.getAvgScore();
                 scoreStatsQuestionRegionList.add( scoreStatsQuestionRegion.getQuestionId() );
                 scoreStatsQuestionRegionList.add( scoreStatsQuestionRegion.getQuestion() );
                 scoreStatsQuestionRegionList
                     .add( scoreStatsQuestionRegion.getMonthVal() + "/" + scoreStatsQuestionRegion.getYearVal() );
-                scoreStatsQuestionRegionList.add( average_score );
+                scoreStatsQuestionRegionList.add( averageScore );
                 scoreStatsForQuestion.add( scoreStatsQuestionRegionList );
             }
 
         } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
             for ( ScoreStatsQuestionBranch scoreStatsQuestionBranch : scoreStatsQuestionBranchDao
-                .fetchScoreStatsQuestionForBranch( entityId, start_month, start_year, currentMonth, currentYear ) ) {
+                .fetchScoreStatsQuestionForBranch( entityId, startMonth, startYear, currentMonth, currentYear ) ) {
                 List<Object> scoreStatsQuestionBranchList = new ArrayList<>();
-                double average_score = scoreStatsQuestionBranch.getAvgScore();
+                double averageScore = scoreStatsQuestionBranch.getAvgScore();
                 scoreStatsQuestionBranchList.add( scoreStatsQuestionBranch.getQuestionId() );
                 scoreStatsQuestionBranchList.add( scoreStatsQuestionBranch.getQuestion() );
                 scoreStatsQuestionBranchList
                     .add( scoreStatsQuestionBranch.getMonthVal() + "/" + scoreStatsQuestionBranch.getYearVal() );
-                scoreStatsQuestionBranchList.add( average_score );
+                scoreStatsQuestionBranchList.add( averageScore );
                 scoreStatsForQuestion.add( scoreStatsQuestionBranchList );
             }
         } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
 
             for ( ScoreStatsQuestionUser scoreStatsQuestionUser : scoreStatsQuestionUserDao
-                .fetchScoreStatsQuestionForUser( entityId, start_month, start_year, currentMonth, currentYear ) ) {
+                .fetchScoreStatsQuestionForUser( entityId, startMonth, startYear, currentMonth, currentYear ) ) {
                 List<Object> scoreStatsQuestionUserList = new ArrayList<>();
-                double average_score = scoreStatsQuestionUser.getAvgScore();
+                double averageScore = scoreStatsQuestionUser.getAvgScore();
                 scoreStatsQuestionUserList.add( scoreStatsQuestionUser.getQuestionId() );
                 scoreStatsQuestionUserList.add( scoreStatsQuestionUser.getQuestion() );
                 scoreStatsQuestionUserList
                     .add( scoreStatsQuestionUser.getMonthVal() + "/" + scoreStatsQuestionUser.getYearVal() );
-                scoreStatsQuestionUserList.add( average_score );
+                scoreStatsQuestionUserList.add( averageScore );
                 scoreStatsForQuestion.add( scoreStatsQuestionUserList );
             }
 

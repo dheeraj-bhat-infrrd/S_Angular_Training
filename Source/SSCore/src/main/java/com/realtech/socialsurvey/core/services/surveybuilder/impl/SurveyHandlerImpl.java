@@ -3077,7 +3077,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         socialManagementService.postToSocialMedia( details.getAgentName(), agentProfileLink, details.getCustomerFirstName(),
             details.getCustomerLastName(), details.getAgentId(), details.getScore(), details.get_id(), details.getReview(),
             false, serverBaseUrl, true );
-        surveyDetailsDao.updateModifiedDateForSurvey( details.get_id(), surveyImportVO.getSurveyDate() );
+        Date currentDate = new Date(System.currentTimeMillis());
+        surveyDetailsDao.updateModifiedDateForSurvey( details.get_id(), currentDate );
         LOG.debug( "Method SurveyHandlerImpl.importSurveyVOToDBs finished" );
     }
 
