@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
@@ -53,6 +54,8 @@ import com.realtech.socialsurvey.core.dao.ScoreStatsQuestionRegionDao;
 import com.realtech.socialsurvey.core.dao.ScoreStatsQuestionUserDao;
 import com.realtech.socialsurvey.core.dao.SurveyResponseTableDao;
 import com.realtech.socialsurvey.core.dao.SurveyResultsCompanyReportDao;
+import com.realtech.socialsurvey.core.dao.SurveyResultsReportBranchDao;
+import com.realtech.socialsurvey.core.dao.SurveyResultsReportRegionDao;
 import com.realtech.socialsurvey.core.dao.SurveyStatsReportBranchDao;
 import com.realtech.socialsurvey.core.dao.SurveyTransactionReportBranchDao;
 import com.realtech.socialsurvey.core.dao.SurveyTransactionReportDao;
@@ -94,6 +97,9 @@ import com.realtech.socialsurvey.core.entities.ScoreStatsQuestionCompany;
 import com.realtech.socialsurvey.core.entities.ScoreStatsQuestionRegion;
 import com.realtech.socialsurvey.core.entities.ScoreStatsQuestionUser;
 import com.realtech.socialsurvey.core.entities.SurveyResultsCompanyReport;
+import com.realtech.socialsurvey.core.entities.SurveyResultsReportBranch;
+import com.realtech.socialsurvey.core.entities.SurveyResultsReportRegion;
+import com.realtech.socialsurvey.core.entities.SurveyResultsReportVO;
 import com.realtech.socialsurvey.core.entities.SurveyStatsReportBranch;
 import com.realtech.socialsurvey.core.entities.SurveyTransactionReport;
 import com.realtech.socialsurvey.core.entities.SurveyTransactionReportBranch;
@@ -170,6 +176,12 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
     @Autowired
     private SurveyResultsCompanyReportDao surveyResultsCompanyReportDao;
+    
+    @Autowired
+    private SurveyResultsReportRegionDao surveyResultsReportRegionDao;
+    
+    @Autowired
+    private SurveyResultsReportBranchDao surveyResultsReportBranchDao;
 
     @Autowired
     private SurveyResponseTableDao surveyResponseTableDao;
@@ -322,8 +334,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_VERIFIED_USERS_REPORT );
         } else if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT ) {
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT );
-        } else if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_COMPANY_REPORT ) {
-            fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_COMPANY_REPORT );
+        } else if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_REPORT ) {
+            fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_REPORT );
         } else if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT ) {
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT );
         } else if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT ) {
@@ -423,23 +435,134 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
     @Override
     @Transactional ( value = "transactionManagerForReporting")
-    public int getMaxQuestionForSurveyCompanyReport( Long companyId, Timestamp startDate, Timestamp endDate )
+    public int getMaxQuestionForSurveyResultsReport(String entityType, Long entityId, Timestamp startDate, Timestamp endDate )
     {
-        LOG.info( "method getMaxQuestionForSurveyCompanyReport started for companyId: {}", companyId );
-        return surveyResponseTableDao.getMaxResponseForCompanyId( companyId, startDate, endDate );
+        LOG.debug( "method getMaxQuestionForSurveyResultsReport started for entityId : {}", entityId );
+        
+        if(entityType.equals(CommonConstants.COMPANY_ID)){
+        	return surveyResponseTableDao.getMaxResponseForCompanyId( entityId, startDate, endDate );
+        } else if(entityType.equals(CommonConstants.REGION_ID)){
+        	return surveyResponseTableDao.getMaxResponseForRegionId( entityId, startDate, endDate );
+        } else if(entityType.equals(CommonConstants.BRANCH_ID)){
+        	return surveyResponseTableDao.getMaxResponseForBranchId( entityId, startDate, endDate );
+        } else if(entityType.equals(CommonConstants.AGENT_ID)){
+        	return surveyResponseTableDao.getMaxResponseForUserId( entityId, startDate, endDate );
+        }
+		return 0; 
+        
     }
-
-
+    
+    /**
+     * This method accepts SurveyResultsReport data with entity type 
+     * and assigns it to common VO for SurveyResultsReport. 
+     * 
+     * @param surveyResultsReportObject
+     * @param type
+     * @return
+     */
+    private Map<String, SurveyResultsReportVO> assignToVO(Map<String, ?> surveyResultsReportObject, String type){
+    	Map<String, SurveyResultsReportVO> surveyResultsReportVOMap = new HashMap<String, SurveyResultsReportVO>();
+    	SurveyResultsCompanyReport surveyResultsCompanyReport = null;
+    	SurveyResultsReportRegion surveyResultsReportRegion = null;
+    	SurveyResultsReportBranch surveyResultsReportBranch = null;
+    	for(Entry<String, ?> entry : surveyResultsReportObject.entrySet()){
+    		String surveyDetailsId = entry.getKey();
+    		SurveyResultsReportVO surveyResultsReportVO = new SurveyResultsReportVO();
+            if ( type.equals( CommonConstants.COMPANY_ID ) || type.equals( CommonConstants.AGENT_ID ) ) {
+                surveyResultsCompanyReport = (SurveyResultsCompanyReport) entry.getValue();
+                surveyResultsReportVO.setSurveyDetailsId( surveyResultsCompanyReport.getSurveyDetailsId() );
+                surveyResultsReportVO.setUserFirstName( surveyResultsCompanyReport.getUserFirstName() );
+                surveyResultsReportVO.setUserLastName( surveyResultsCompanyReport.getUserLastName() );
+                surveyResultsReportVO.setCustomerFirstName( surveyResultsCompanyReport.getCustomerFirstName() );
+                surveyResultsReportVO.setCustomerLastName( surveyResultsCompanyReport.getCustomerLastName() );
+                surveyResultsReportVO.setSurveySentDate( surveyResultsCompanyReport.getSurveySentDate() );
+                surveyResultsReportVO.setSurveyCompletedDate( surveyResultsCompanyReport.getSurveyCompletedDate() );
+                surveyResultsReportVO.setTimeInterval( surveyResultsCompanyReport.getTimeInterval() );
+                surveyResultsReportVO.setSurveySource( surveyResultsCompanyReport.getSurveySource() );
+                surveyResultsReportVO.setSurveySourceId( surveyResultsCompanyReport.getSurveySourceId() );
+                surveyResultsReportVO.setSurveyScore( surveyResultsCompanyReport.getSurveyScore() );
+                surveyResultsReportVO.setGateway( surveyResultsCompanyReport.getGateway() );
+                surveyResultsReportVO.setCustomerComments( surveyResultsCompanyReport.getCustomerComments() );
+                surveyResultsReportVO.setAgreedToShare( surveyResultsCompanyReport.getAgreedToShare() );
+                surveyResultsReportVO.setBranchName( surveyResultsCompanyReport.getBranchName() );
+                surveyResultsReportVO.setClickTroughForCompany( surveyResultsCompanyReport.getClickTroughForCompany() );
+                surveyResultsReportVO.setClickTroughForAgent( surveyResultsCompanyReport.getClickTroughForAgent() );
+                surveyResultsReportVO.setClickTroughForRegion( surveyResultsCompanyReport.getClickTroughForRegion() );
+                surveyResultsReportVO.setClickTroughForBranch( surveyResultsCompanyReport.getClickTroughForBranch() );
+            } else if (type.equals( CommonConstants.REGION_ID )) {
+                surveyResultsReportRegion = (SurveyResultsReportRegion) entry.getValue();
+                surveyResultsReportVO.setSurveyDetailsId( surveyResultsReportRegion.getSurveyDetailsId() );
+                surveyResultsReportVO.setUserFirstName( surveyResultsReportRegion.getUserFirstName() );
+                surveyResultsReportVO.setUserLastName( surveyResultsReportRegion.getUserLastName() );
+                surveyResultsReportVO.setCustomerFirstName( surveyResultsReportRegion.getCustomerFirstName() );
+                surveyResultsReportVO.setCustomerLastName( surveyResultsReportRegion.getCustomerLastName() );
+                surveyResultsReportVO.setSurveySentDate( surveyResultsReportRegion.getSurveySentDate() );
+                surveyResultsReportVO.setSurveyCompletedDate( surveyResultsReportRegion.getSurveyCompletedDate() );
+                surveyResultsReportVO.setTimeInterval( surveyResultsReportRegion.getTimeInterval() );
+                surveyResultsReportVO.setSurveySource( surveyResultsReportRegion.getSurveySource() );
+                surveyResultsReportVO.setSurveySourceId( surveyResultsReportRegion.getSurveySourceId() );
+                surveyResultsReportVO.setSurveyScore( surveyResultsReportRegion.getSurveyScore() );
+                surveyResultsReportVO.setGateway( surveyResultsReportRegion.getGateway() );
+                surveyResultsReportVO.setCustomerComments( surveyResultsReportRegion.getCustomerComments() );
+                surveyResultsReportVO.setAgreedToShare( surveyResultsReportRegion.getAgreedToShare() );
+                surveyResultsReportVO.setBranchName( surveyResultsReportRegion.getBranchName() );
+                surveyResultsReportVO.setClickTroughForCompany( surveyResultsReportRegion.getClickTroughForCompany() );
+                surveyResultsReportVO.setClickTroughForAgent( surveyResultsReportRegion.getClickTroughForAgent() );
+                surveyResultsReportVO.setClickTroughForRegion( surveyResultsReportRegion.getClickTroughForRegion() );
+                surveyResultsReportVO.setClickTroughForBranch( surveyResultsReportRegion.getClickTroughForBranch() );
+            } else if (type.equals( CommonConstants.BRANCH_ID )) {
+                surveyResultsReportBranch = (SurveyResultsReportBranch) entry.getValue();
+                surveyResultsReportVO.setSurveyDetailsId( surveyResultsReportBranch.getSurveyDetailsId() );
+                surveyResultsReportVO.setUserFirstName( surveyResultsReportBranch.getUserFirstName() );
+                surveyResultsReportVO.setUserLastName( surveyResultsReportBranch.getUserLastName() );
+                surveyResultsReportVO.setCustomerFirstName( surveyResultsReportBranch.getCustomerFirstName() );
+                surveyResultsReportVO.setCustomerLastName( surveyResultsReportBranch.getCustomerLastName() );
+                surveyResultsReportVO.setSurveySentDate( surveyResultsReportBranch.getSurveySentDate() );
+                surveyResultsReportVO.setSurveyCompletedDate( surveyResultsReportBranch.getSurveyCompletedDate() );
+                surveyResultsReportVO.setTimeInterval( surveyResultsReportBranch.getTimeInterval() );
+                surveyResultsReportVO.setSurveySource( surveyResultsReportBranch.getSurveySource() );
+                surveyResultsReportVO.setSurveySourceId( surveyResultsReportBranch.getSurveySourceId() );
+                surveyResultsReportVO.setSurveyScore( surveyResultsReportBranch.getSurveyScore() );
+                surveyResultsReportVO.setGateway( surveyResultsReportBranch.getGateway() );
+                surveyResultsReportVO.setCustomerComments( surveyResultsReportBranch.getCustomerComments() );
+                surveyResultsReportVO.setAgreedToShare( surveyResultsReportBranch.getAgreedToShare() );
+                surveyResultsReportVO.setBranchName( surveyResultsReportBranch.getBranchName() );
+                surveyResultsReportVO.setClickTroughForCompany( surveyResultsReportBranch.getClickTroughForCompany() );
+                surveyResultsReportVO.setClickTroughForAgent( surveyResultsReportBranch.getClickTroughForAgent() );
+                surveyResultsReportVO.setClickTroughForRegion( surveyResultsReportBranch.getClickTroughForRegion() );
+                surveyResultsReportVO.setClickTroughForBranch( surveyResultsReportBranch.getClickTroughForBranch() );
+            }            
+            surveyResultsReportVOMap.put( surveyDetailsId, surveyResultsReportVO );
+    	}
+    	return surveyResultsReportVOMap;
+    }
+    
     @Override
     @Transactional ( value = "transactionManagerForReporting")
-    public Map<String, SurveyResultsCompanyReport> getSurveyResultsCompanyReport( Long companyId, Timestamp startDate,
+    public Map<String, SurveyResultsReportVO> getSurveyResultsReport(String entityType, Long entityId, Timestamp startDate,
         Timestamp endDate, int startIndex, int batchSize )
     {
-        LOG.info( "method getSurveyResultsCompanyReport started for companyId: {} ", companyId );
-        return surveyResultsCompanyReportDao.getSurveyResultForCompanyId( companyId, startDate, endDate, startIndex,
-            batchSize );
+        LOG.debug( " getSurveyResultsReport method started for entityId : {} ", entityId );
+        Map<String, SurveyResultsReportVO> surveyResultsReportVO = null;
+        if(entityType.equals( CommonConstants.COMPANY_ID )){
+            Map<String, SurveyResultsCompanyReport>  surveyResultsCompanyReport = surveyResultsCompanyReportDao
+                .getSurveyResultForCompanyId( entityId, startDate, endDate, startIndex,batchSize );
+            surveyResultsReportVO = assignToVO(surveyResultsCompanyReport,entityType);
+        } else if(entityType.equals( CommonConstants.REGION_ID )) {
+            Map<String, SurveyResultsReportRegion>  surveyResultsReportRegion = surveyResultsReportRegionDao
+                .getSurveyResultForRegionId( entityId, startDate, endDate, startIndex,batchSize );
+            surveyResultsReportVO = assignToVO(surveyResultsReportRegion,entityType);
+        } else if(entityType.equals( CommonConstants.BRANCH_ID )) {
+            Map<String, SurveyResultsReportBranch>  surveyResultsReportBranch = surveyResultsReportBranchDao
+                .getSurveyResultForBranchId( entityId, startDate, endDate, startIndex,batchSize );
+            surveyResultsReportVO = assignToVO(surveyResultsReportBranch,entityType);
+        } else if(entityType.equals( CommonConstants.AGENT_ID )) {
+            Map<String, SurveyResultsCompanyReport>  surveyResultsReportUser = surveyResultsCompanyReportDao
+                .getSurveyResultForUserId( entityId, startDate, endDate, startIndex,batchSize );
+            surveyResultsReportVO = assignToVO(surveyResultsReportUser,entityType);
+        }   
+        return surveyResultsReportVO;
     }
-
 
     @Override
     @Transactional ( value = "transactionManagerForReporting")
@@ -1513,7 +1636,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 recentActivityList.add( CommonConstants.REPORTING_VERIFIED_USERS_REPORT );
             } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT ) {
                 recentActivityList.add( CommonConstants.REPORTING_COMPANY_USERS_REPORT );
-            } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_COMPANY_REPORT ) {
+            } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_REPORT ) {
                 recentActivityList.add( CommonConstants.REPORTING_SURVEY_REUSLTS_COMPANY_REPORT );
             } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT ) {
                 recentActivityList.add( CommonConstants.REPORTING_SURVEY_TRANSACTION_REPORT );
@@ -1659,30 +1782,30 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
 
     @Override
-    public String generateSurveyResultsCompanyForReporting( Long entityId, String entityType, Long userId, Timestamp startDate,
+    public String generateSurveyResultsReport( Long entityId, String entityType, Long userId, Timestamp startDate,
         Timestamp endDate ) throws UnsupportedEncodingException, NonFatalException, ParseException
     {
         LOG.info( "Generating survey results report for enitityId {}, entityType {}, userId {} startDate {}, endDate {}",
             entityId, entityType, userId, startDate, endDate );
         User user = userManagementService.getUserByUserId( userId );
         LOG.debug( "Found user {}", user );
-        String fileName = "Survey_Results_Company_Report" + entityType + "-" + user.getFirstName() + "_" + user.getLastName()
+        String fileName = "Survey_Results_Report_" + entityType + "-" + user.getFirstName() + "_" + user.getLastName()
             + "-" + ( Calendar.getInstance().getTimeInMillis() ) + CommonConstants.EXCEL_FILE_EXTENSION;
         LOG.debug( "fileName {} ", fileName );
-        XSSFWorkbook workbook = this.downloadSurveyResultsCompanyForReporting( entityId, entityType, startDate, endDate );
+        XSSFWorkbook workbook = this.downloadSurveyResultsReport( entityId, entityType, startDate, endDate );
         LOG.debug( "Writing {} number of records into file {}", workbook.getSheetAt( 0 ).getLastRowNum(), fileName );
         return createExcelFileAndSaveInAmazonS3( fileName, workbook );
     }
 
 
-    public XSSFWorkbook downloadSurveyResultsCompanyForReporting( long entityId, String entityType, Timestamp startDate,
+    public XSSFWorkbook downloadSurveyResultsReport( long entityId, String entityType, Timestamp startDate,
         Timestamp endDate ) throws ParseException
     {
         int startIndex = 0;
         int batchSize = CommonConstants.BATCH_SIZE;
         int maxQuestion = 0;
         int enterNext = 1;
-        Response maxQuestResponse = ssApiBatchIntergrationBuilder.getIntegrationApi().getCompanyMaxQuestion( entityId,
+        Response maxQuestResponse = ssApiBatchIntergrationBuilder.getIntegrationApi().getCompanyMaxQuestion(entityType, entityId,
             startDate, endDate );
         String maxQuestResponseString = maxQuestResponse != null
             ? new String( ( (TypedByteArray) maxQuestResponse.getBody() ).getBytes() ) : null;
@@ -1696,21 +1819,21 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         //create workbook data
         XSSFWorkbook workbook = workbookOperations.createWorkbook( data );
 
-        Map<String, SurveyResultsCompanyReport> surveyResultsCompanyReport = null;
+        Map<String, SurveyResultsReportVO> surveyResultsReportVO = null;
         do {
-            surveyResultsCompanyReport = getSurveyResultResponse( entityId, startDate, endDate, startIndex, batchSize );
-            if ( surveyResultsCompanyReport != null && !surveyResultsCompanyReport.isEmpty() ) {
+            surveyResultsReportVO = getSurveyResultResponse(entityType, entityId, startDate, endDate, startIndex, batchSize );
+            if ( surveyResultsReportVO != null && !surveyResultsReportVO.isEmpty() ) {
                 enterNext = startIndex + 1;
-                data = workbookData.getSurveyResultsCompanyReportToBeWrittenInSheet( surveyResultsCompanyReport, maxQuestion,
+                data = workbookData.getSurveyResultsReportToBeWrittenInSheet( surveyResultsReportVO, maxQuestion,
                     enterNext );
                 LOG.debug( "Got {} records starting at {} index", data.size(), enterNext );
-                //use the created workbook when writing the header ans rewrite the same 
+                //use the created workbook when writing the header answer rewrite the same. 
                 workbook = workbookOperations.writeToWorkbook( data, workbook, enterNext );
-                //calculate startIndex 
+                //calculate startIndex. 
                 startIndex = startIndex + batchSize;
             }
-        } while ( surveyResultsCompanyReport != null && !surveyResultsCompanyReport.isEmpty()
-            && surveyResultsCompanyReport.size() >= batchSize );
+        } while ( surveyResultsReportVO != null && !surveyResultsReportVO.isEmpty()
+            && surveyResultsReportVO.size() >= batchSize );
 
         XSSFSheet sheet = workbook.getSheetAt( 0 );
         makeRowBold( workbook, sheet.getRow( 0 ) );
@@ -1719,23 +1842,23 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     }
 
 
-    public Map<String, SurveyResultsCompanyReport> getSurveyResultResponse( Long companyId, Timestamp startDate,
+    public Map<String, SurveyResultsReportVO> getSurveyResultResponse(String entityType, Long companyId, Timestamp startDate,
         Timestamp endDate, int startIndex, int batchSize )
     {
-        Response response = ssApiBatchIntergrationBuilder.getIntegrationApi().getSurveyResultsCompany( companyId, startDate,
+        Response response = ssApiBatchIntergrationBuilder.getIntegrationApi().getSurveyResultsReport(entityType, companyId, startDate,
             endDate, startIndex, batchSize );
         String responseString = response != null ? new String( ( (TypedByteArray) response.getBody() ).getBytes() ) : null;
-        Map<String, SurveyResultsCompanyReport> surveyResultsCompanyReport = null;
+        Map<String, SurveyResultsReportVO> surveyResultsReportVO = null;
         if ( responseString != null ) {
             //since the string has ""abc"" an extra quote
             responseString = responseString.substring( 1, responseString.length() - 1 );
             //Escape characters
             responseString = StringEscapeUtils.unescapeJava( responseString );
-            Type listType = new TypeToken<Map<String, SurveyResultsCompanyReport>>() {}.getType();
-            surveyResultsCompanyReport = new Gson().fromJson( responseString, listType );
+            Type listType = new TypeToken<Map<String, SurveyResultsReportVO>>() {}.getType();
+            surveyResultsReportVO = new Gson().fromJson( responseString, listType );
 
         }
-        return surveyResultsCompanyReport;
+        return surveyResultsReportVO;
     }
 
 
