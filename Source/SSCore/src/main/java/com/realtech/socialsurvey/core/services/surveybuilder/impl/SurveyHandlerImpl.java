@@ -39,9 +39,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,7 +64,6 @@ import com.realtech.socialsurvey.core.entities.CRMInfo;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyIgnoredEmailMapping;
 import com.realtech.socialsurvey.core.entities.CompanyMediaPostDetails;
-import com.realtech.socialsurvey.core.entities.HierarchyRelocationTarget;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
@@ -3148,6 +3144,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     SurveyDetails importSurveyVOToMongo( SurveyImportVO surveyImportVO, SurveyPreInitiation surveyPreInitiation, User user,
         String source ) throws InvalidInputException, ProfileNotFoundException
     {
+        LOG.info( "Method importSurveyVOToMongo called." );
         SurveyDetails surveyDetails = new SurveyDetails();
         surveyDetails.setAgentId( user.getUserId() );
         String agentName = user.getFirstName();
@@ -3165,7 +3162,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyDetails.setRegionId( profile.get( CommonConstants.REGION_ID_COLUMN ) );
         surveyDetails.setStage( CommonConstants.SURVEY_STAGE_COMPLETE );
         surveyDetails.setReminderCount( 0 );
-        surveyDetails.setModifiedOn(  new Date(System.currentTimeMillis()) );
+        Date date = new Date(System.currentTimeMillis());
+        LOG.info( "Setting modified on to {}", date );
+        surveyDetails.setModifiedOn(  date );
+        LOG.info( "Completed process of setting modified on to {}", date );
         surveyDetails.setCreatedOn( surveyImportVO.getSurveyDate() );
         surveyDetails.setSurveyResponse( new ArrayList<SurveyResponse>() );
         surveyDetails.setCustRelationWithAgent( null );
