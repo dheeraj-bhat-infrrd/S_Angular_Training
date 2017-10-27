@@ -3077,8 +3077,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         socialManagementService.postToSocialMedia( details.getAgentName(), agentProfileLink, details.getCustomerFirstName(),
             details.getCustomerLastName(), details.getAgentId(), details.getScore(), details.get_id(), details.getReview(),
             false, serverBaseUrl, true );
-        Date currentDate = new Date(System.currentTimeMillis());
-        surveyDetailsDao.updateModifiedDateForSurvey( details.get_id(), currentDate );
+        //Date currentDate = new Date(System.currentTimeMillis());
+        //surveyDetailsDao.updateModifiedDateForSurvey( details.get_id(), currentDate );
         LOG.debug( "Method SurveyHandlerImpl.importSurveyVOToDBs finished" );
     }
 
@@ -3165,7 +3165,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyDetails.setRegionId( profile.get( CommonConstants.REGION_ID_COLUMN ) );
         surveyDetails.setStage( CommonConstants.SURVEY_STAGE_COMPLETE );
         surveyDetails.setReminderCount( 0 );
-        surveyDetails.setModifiedOn( surveyImportVO.getSurveyDate() );
+        surveyDetails.setModifiedOn(  new Date(System.currentTimeMillis()) );
         surveyDetails.setCreatedOn( surveyImportVO.getSurveyDate() );
         surveyDetails.setSurveyResponse( new ArrayList<SurveyResponse>() );
         surveyDetails.setCustRelationWithAgent( null );
