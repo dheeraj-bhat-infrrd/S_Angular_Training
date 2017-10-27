@@ -54,7 +54,7 @@
 								<option value=103 data-report="company-user">Company User</option>
 							</c:if>
 								<option value=105 data-report="survey-transaction-summary">Survey Transaction Summary</option>
-								<option value=104 data-report="survey-results">Survey Results</option>
+								<option value=104 data-report="survey-results">Survey Results Report</option>
 						</select>	
 					</div>
 					<div id="report-time-div" class="float-left board-div hide">
