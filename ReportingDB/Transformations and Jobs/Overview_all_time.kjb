@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job>
-  <name>SurveyResultsJob</name>
+  <name>Overview_all_time</name>
     <description/>
     <extended_description/>
     <job_version/>
   <directory>&#x2f;</directory>
   <created_user>-</created_user>
-  <created_date>2017&#x2f;10&#x2f;25 10&#x3a;42&#x3a;19.468</created_date>
+  <created_date>2017&#x2f;10&#x2f;23 11&#x3a;42&#x3a;45.113</created_date>
   <modified_user>-</modified_user>
-  <modified_date>2017&#x2f;10&#x2f;25 10&#x3a;42&#x3a;19.468</modified_date>
+  <modified_date>2017&#x2f;10&#x2f;23 11&#x3a;42&#x3a;45.113</modified_date>
     <parameters>
     </parameters>
   <connection>
@@ -31,6 +31,34 @@
       <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
       <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;CENTRALIZED_MYSQL_PORT&#x7d;</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <connection>
+    <name>SS_INFO_CONNECTION</name>
+    <server>&#x24;&#x7b;SS_MYSQL_HOST&#x7d;</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>&#x24;&#x7b;SS_MYSQL_SCHEMA&#x7d;</database>
+    <port>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</port>
+    <username>&#x24;&#x7b;SS_MYSQL_USER_NAME&#x7d;</username>
+    <password>&#x24;&#x7b;SS_MYSQL_PASSWORD&#x7d;</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCompression</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useServerPrepStmts</code><attribute>false</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</attribute></attribute>
       <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
       <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
       <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
@@ -78,16 +106,16 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>168</xloc>
-      <yloc>100</yloc>
+      <xloc>193</xloc>
+      <yloc>147</yloc>
       </entry>
     <entry>
-      <name>survey_results_company_report</name>
+      <name>overview_user</name>
       <description/>
       <type>TRANS</type>
       <specification_method>filename</specification_method>
       <trans_object_id/>
-      <filename>&#x24;&#x7b;Internal.Job.Filename.Directory&#x7d;&#x5c;survey_results_company_report.ktr</filename>
+      <filename>&#x24;&#x7b;Internal.Job.Filename.Directory&#x7d;&#x5c;overview_user_main.ktr</filename>
       <transname/>
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
@@ -111,34 +139,16 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>299</xloc>
-      <yloc>100</yloc>
+      <xloc>360</xloc>
+      <yloc>147</yloc>
       </entry>
     <entry>
-      <name>Truncate_survey_report_branch</name>
-      <description/>
-      <type>TRUNCATE_TABLES</type>
-      <connection>SS_Centralized_Mysql_Conn</connection>
-      <arg_from_previous>N</arg_from_previous>
-      <fields>
-        <field>
-          <name>survey_results_report_branch</name>
-          <schemaname/>
-        </field>
-      </fields>
-      <parallel>N</parallel>
-      <draw>Y</draw>
-      <nr>0</nr>
-      <xloc>514</xloc>
-      <yloc>100</yloc>
-      </entry>
-    <entry>
-      <name>branch_report</name>
+      <name>overview_branch</name>
       <description/>
       <type>TRANS</type>
       <specification_method>filename</specification_method>
       <trans_object_id/>
-      <filename>&#x24;&#x7b;Internal.Job.Filename.Directory&#x7d;&#x5c;survey_results_branch_report.ktr</filename>
+      <filename>&#x24;&#x7b;Internal.Job.Filename.Directory&#x7d;&#x2f;overview_branch_main.ktr</filename>
       <transname/>
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
@@ -162,34 +172,16 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>705</xloc>
-      <yloc>100</yloc>
+      <xloc>543</xloc>
+      <yloc>147</yloc>
       </entry>
     <entry>
-      <name>Truncate_survey_report_region</name>
-      <description/>
-      <type>TRUNCATE_TABLES</type>
-      <connection>SS_Centralized_Mysql_Conn</connection>
-      <arg_from_previous>N</arg_from_previous>
-      <fields>
-        <field>
-          <name>survey_results_report_region</name>
-          <schemaname/>
-        </field>
-      </fields>
-      <parallel>N</parallel>
-      <draw>Y</draw>
-      <nr>0</nr>
-      <xloc>705</xloc>
-      <yloc>195</yloc>
-      </entry>
-    <entry>
-      <name>region_report</name>
+      <name>overview_region</name>
       <description/>
       <type>TRANS</type>
       <specification_method>filename</specification_method>
       <trans_object_id/>
-      <filename>&#x24;&#x7b;Internal.Job.Filename.Directory&#x7d;&#x5c;survey_results_region_report.ktr</filename>
+      <filename>&#x24;&#x7b;Internal.Job.Filename.Directory&#x7d;&#x2f;overview_region_main.ktr</filename>
       <transname/>
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
@@ -213,16 +205,16 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>514</xloc>
-      <yloc>195</yloc>
+      <xloc>727</xloc>
+      <yloc>147</yloc>
       </entry>
     <entry>
-      <name>survey_results_region_2</name>
+      <name>overview_company</name>
       <description/>
       <type>TRANS</type>
       <specification_method>filename</specification_method>
       <trans_object_id/>
-      <filename>&#x24;&#x7b;Internal.Job.Filename.Directory&#x7d;&#x2f;survey_results_region_2.ktr</filename>
+      <filename>&#x24;&#x7b;Internal.Job.Filename.Directory&#x7d;&#x2f;overview_company_main.ktr</filename>
       <transname/>
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
@@ -246,14 +238,14 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>353</xloc>
-      <yloc>195</yloc>
+      <xloc>938</xloc>
+      <yloc>147</yloc>
       </entry>
   </entries>
   <hops>
     <hop>
       <from>START</from>
-      <to>survey_results_company_report</to>
+      <to>overview_user</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -261,8 +253,8 @@
       <unconditional>Y</unconditional>
     </hop>
     <hop>
-      <from>survey_results_company_report</from>
-      <to>Truncate_survey_report_branch</to>
+      <from>overview_user</from>
+      <to>overview_branch</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -270,8 +262,8 @@
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>Truncate_survey_report_branch</from>
-      <to>branch_report</to>
+      <from>overview_branch</from>
+      <to>overview_region</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -279,26 +271,8 @@
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>branch_report</from>
-      <to>Truncate_survey_report_region</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>Truncate_survey_report_region</from>
-      <to>region_report</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>region_report</from>
-      <to>survey_results_region_2</to>
+      <from>overview_region</from>
+      <to>overview_company</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>

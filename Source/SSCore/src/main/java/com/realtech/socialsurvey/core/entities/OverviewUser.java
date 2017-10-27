@@ -7,7 +7,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 /**
@@ -79,6 +78,9 @@ public class OverviewUser implements Serializable {
     
     @Column ( name = "total_reviews")
     private int totalReviews;
+    
+    @Column ( name = "third_party")
+    private int thirdParty;
     
     @Column ( name = "rating")
     private float rating;
@@ -334,6 +336,16 @@ public class OverviewUser implements Serializable {
     {
         this.unprocessed = unprocessed;
     }
+   
+    public int getThirdParty()
+    {
+        return thirdParty;
+    }
+
+    public void setThirdParty( int thirdParty )
+    {
+        this.thirdParty = thirdParty;
+    }
 
     public static long getSerialversionuid()
     {
@@ -349,9 +361,9 @@ public class OverviewUser implements Serializable {
             + ", promoterPercentage=" + promoterPercentage + ", totalCorrupted=" + totalCorrupted + ", unassigned=" + unassigned
             + ", totalDuplicate=" + totalDuplicate + ", totalArchieved=" + totalArchieved + ", incomplete=" + incomplete
             + ", totalSurveySent=" + totalSurveySent + ", completed=" + completed + ", socialPosts=" + socialPosts
-            + ", zillowReviews=" + zillowReviews + ", totalReviews=" + totalReviews + ", rating=" + rating
-            + ", completedPercentage=" + completedPercentage + ", incompletePercentage=" + incompletePercentage + ", processed="
-            + processed + ", unprocessed=" + unprocessed + "]";
+            + ", zillowReviews=" + zillowReviews + ", totalReviews=" + totalReviews + ", thirdParty=" + thirdParty + ", rating="
+            + rating + ", completedPercentage=" + completedPercentage + ", incompletePercentage=" + incompletePercentage
+            + ", processed=" + processed + ", unprocessed=" + unprocessed + "]";
     }
 
 
