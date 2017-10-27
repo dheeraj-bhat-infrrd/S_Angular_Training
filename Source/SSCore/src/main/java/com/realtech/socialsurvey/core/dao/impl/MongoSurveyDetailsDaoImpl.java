@@ -949,7 +949,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
             query.addCriteria( Criteria.where( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) );
         }
-        // query.fields().exclude( "surveyResponse" );
+        query.fields().exclude( CommonConstants.SOCIAL_MEDIA_POST_RESPONSE_DETAILS_COLUMN );
         if ( startDate != null && endDate != null ) {
             query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate )
                 .andOperator( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ) );
@@ -2934,7 +2934,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         
         // review date criteria
         if(startReviewDate != null)
-            query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startReviewDate ) );
+            query.addCriteria( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).gte( startReviewDate ) );
         
         // transaction date criteria
         if(startTransactionDate != null)
@@ -2996,7 +2996,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
         // review date criteria
         if(startReviewDate != null)
-            query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN).gte( startReviewDate ) );
+            query.addCriteria( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).gte( startReviewDate ) );
 
         //user id criteria
         if(userIds != null)

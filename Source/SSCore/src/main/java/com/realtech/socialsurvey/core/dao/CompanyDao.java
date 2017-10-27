@@ -38,4 +38,8 @@ public interface CompanyDao extends GenericDao<Company, Long> {
 
     Map<Long , Company> getCompaniesByIds( Set<Long> ids );
 
+    List<Company> getCompaniesByStatusAndAccountMasterId( int status, int accountMasterId );
+
+    List<Company> getCompanyListByIds( Set<Long> companyIds );
+
 }

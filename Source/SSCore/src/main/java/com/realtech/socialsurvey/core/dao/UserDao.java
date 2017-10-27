@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.dao;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.realtech.socialsurvey.core.entities.Company;
@@ -69,6 +70,9 @@ public interface UserDao extends GenericDao<User, Long>
     public User getActiveOrIncompleteUser( String userName ) throws NoRecordsFetchedException;
     
     public List<String> getRegisteredEmailsInOtherCompanies( Company company ) throws InvalidInputException;
+
+
+    public Map<Long, Long> getUsersCountForCompanies();
 
 
 }

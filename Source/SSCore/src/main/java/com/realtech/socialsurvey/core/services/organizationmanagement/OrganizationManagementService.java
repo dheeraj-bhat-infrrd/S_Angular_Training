@@ -20,6 +20,7 @@ import com.realtech.socialsurvey.core.entities.CollectionDotloopProfileMapping;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyHiddenNotification;
 import com.realtech.socialsurvey.core.entities.DisabledAccount;
+import com.realtech.socialsurvey.core.entities.EncompassSdkVersion;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
 import com.realtech.socialsurvey.core.entities.HierarchySettingsCompare;
 import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
@@ -1230,7 +1231,7 @@ public interface OrganizationManagementService
     Map<Long, String> getListOfUnprocessedImages( String collectionName, String imageType ) throws InvalidInputException;
 
 
-    void updateImageForOrganizationUnitSetting( long iden, String fileName, String collectionName, String imageType,
+    void updateImageForOrganizationUnitSetting( long iden, String fileName, String thumbnailFileName, String rectangularThumbnailFileName, String collectionName, String imageType,
         boolean flagValue, boolean isThumbnail ) throws InvalidInputException;
 
 
@@ -1482,5 +1483,20 @@ public interface OrganizationManagementService
 
 
     public void updateCompanyIdInMySQLForUser( User userToBeRelocated, Company targetCompany ) throws InvalidInputException;
+
+
+    public List<EncompassSdkVersion> getActiveEncompassSdkVersions();
+
+
+    String getEncompassHostByVersion( String sdkVersion ) throws InvalidInputException;
+
+
+    List<Company> getAllActiveEnterpriseCompanies();
+
+
+    List<Company> getCompaniesByCompanyIds( Set<Long> companyIds );
+
+
+    Map<Long, Long> getUsersCountForCompanies();
 
 }

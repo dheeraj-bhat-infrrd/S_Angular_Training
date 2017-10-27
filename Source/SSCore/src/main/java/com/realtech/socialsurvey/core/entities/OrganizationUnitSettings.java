@@ -1,5 +1,7 @@
 package com.realtech.socialsurvey.core.entities;
 
+import java.io.Serializable;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
@@ -10,9 +12,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * Holds the company settings
  */
 @Document
-public class OrganizationUnitSettings
+public class OrganizationUnitSettings implements Serializable
 {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     @Id
     private String id;
     private long iden;
@@ -47,6 +53,7 @@ public class OrganizationUnitSettings
     private String disclaimer;
     // image processing
     private String profileImageUrlThumbnail;
+    private String profileImageUrlRectangularThumbnail;
     private String logoThumbnail;
     private boolean isProfileImageProcessed;
     private boolean isLogoImageProcessed;
@@ -60,13 +67,19 @@ public class OrganizationUnitSettings
     private boolean sendEmailFromCompany;
     private String reviewSortCriteria;
     private String sendEmailThrough;
-    
+    public boolean hideFromBreadCrumb;
+
+
     // vendasta product details 
     private VendastaProductSettings vendasta_rm_settings;
     
+    //Reporting ranking requirements
+    private RankingRequirements ranking_requirements;
     //are the 'Contact Us' emails routed to the company admin always?
     private boolean contactUsEmailsRoutedToCompanyAdmin;
-
+    
+    // flag that decides whether to send the monthly digest mail
+    private boolean sendMonthlyDigestMail;
 
     public boolean isSendEmailFromCompany()
     {
@@ -621,7 +634,19 @@ public class OrganizationUnitSettings
     {
         this.sendEmailThrough = sendEmailThrough;
     }
+    
+    public RankingRequirements getRankingRequirements()
+    {
+        return ranking_requirements;
+    }
 
+
+    public void setRankingRequirements( RankingRequirements ranking_requirements )
+    {
+        this.ranking_requirements = ranking_requirements;
+    }
+
+	
     public boolean isContactUsEmailsRoutedToCompanyAdmin() {
 		return contactUsEmailsRoutedToCompanyAdmin;
 	}
@@ -630,19 +655,65 @@ public class OrganizationUnitSettings
 	public void setContactUsEmailsRoutedToCompanyAdmin( boolean contactUsEmailsRoutedToCompanyAdmin ) {
 		this.contactUsEmailsRoutedToCompanyAdmin = contactUsEmailsRoutedToCompanyAdmin;
 	}
+    
+    public boolean getHideFromBreadCrumb()
+    {
+        return hideFromBreadCrumb;
+    }
 
 
-	@Override
+    public void setHideFromBreadCrumb( boolean hideFromBreadCrumb )
+    {
+        this.hideFromBreadCrumb = hideFromBreadCrumb;
+    }
+    
+    public String getProfileImageUrlRectangularThumbnail()
+    {
+        return profileImageUrlRectangularThumbnail;
+    }
+
+
+    public void setProfileImageUrlRectangularThumbnail( String profileImageUrlRectangularThumbnail )
+    {
+        this.profileImageUrlRectangularThumbnail = profileImageUrlRectangularThumbnail;
+    }
+
+
+	public boolean isSendMonthlyDigestMail()
+    {
+        return sendMonthlyDigestMail;
+    }
+
+
+    public void setSendMonthlyDigestMail( boolean sendMonthlyDigestMail )
+    {
+        this.sendMonthlyDigestMail = sendMonthlyDigestMail;
+    }
+
+
+    @Override
     public String toString()
     {
-        return "OrganizationUnitSettings [id=" + id + ", iden=" + iden + ", profile_completion=" + profile_completion
-            + ", profileName=" + profileName + ", profileUrl=" + profileUrl + ", profileImageUrl=" + profileImageUrl + ", logo="
-            + logo + ", isLocationEnabled=" + isLocationEnabled + ", isAccountDisabled=" + isAccountDisabled
+        return "OrganizationUnitSettings [id=" + id + ", iden=" + iden + ", uniqueIdentifier=" + uniqueIdentifier
+            + ", profile_completion=" + profile_completion + ", profileName=" + profileName + ", profileUrl=" + profileUrl
+            + ", profileImageUrl=" + profileImageUrl + ", logo=" + logo + ", isLocationEnabled=" + isLocationEnabled
+            + ", isAccountDisabled=" + isAccountDisabled + ", isDefaultBySystem=" + isDefaultBySystem
+            + ", isSeoContentModified=" + isSeoContentModified + ", vendastaAccessible=" + vendastaAccessible
             + ", contact_details=" + contact_details + ", vertical=" + vertical + ", crm_info=" + crm_info + ", mail_content="
             + mail_content + ", licenses=" + licenses + ", associations=" + associations + ", achievements=" + achievements
             + ", survey_settings=" + survey_settings + ", socialMediaTokens=" + socialMediaTokens + ", lockSettings="
-            + lockSettings + ", disclaimer=" + disclaimer + ", createdBy=" + createdBy + ", modifiedBy=" + modifiedBy
-            + ", createdOn=" + createdOn + ", modifiedOn=" + modifiedOn + "]";
+            + lockSettings + ", linkedInProfileData=" + linkedInProfileData + ", createdBy=" + createdBy + ", modifiedBy="
+            + modifiedBy + ", createdOn=" + createdOn + ", modifiedOn=" + modifiedOn + ", completeProfileUrl="
+            + completeProfileUrl + ", profileStages=" + profileStages + ", disclaimer=" + disclaimer
+            + ", profileImageUrlThumbnail=" + profileImageUrlThumbnail + ", logoThumbnail=" + logoThumbnail
+            + ", isProfileImageProcessed=" + isProfileImageProcessed + ", isLogoImageProcessed=" + isLogoImageProcessed
+            + ", hideSectionsFromProfilePage=" + Arrays.toString( hideSectionsFromProfilePage ) + ", deletedSocialTokens="
+            + deletedSocialTokens + ", allowOverrideForSocialMedia=" + allowOverrideForSocialMedia + ", allowZillowAutoPost="
+            + allowZillowAutoPost + ", status=" + status + ", hiddenSection=" + hiddenSection + ", sendEmailFromCompany="
+            + sendEmailFromCompany + ", reviewSortCriteria=" + reviewSortCriteria + ", sendEmailThrough=" + sendEmailThrough
+            + ", hideFromBreadCrumb=" + hideFromBreadCrumb + ", vendasta_rm_settings=" + vendasta_rm_settings
+            + ", ranking_requirements=" + ranking_requirements + ", contactUsEmailsRoutedToCompanyAdmin="
+            + contactUsEmailsRoutedToCompanyAdmin + ", sendMonthlyDigestMail=" + sendMonthlyDigestMail + "]";
     }
     
 }

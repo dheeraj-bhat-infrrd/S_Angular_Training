@@ -1526,3 +1526,22 @@ span.footer-ul a:hover {
     font-family: 'opensanssemibold';
     text-align: center;
 }
+
+.hdr-container{
+	padding-left:0 !important;
+	padding-right:0 !important;
+}
+
+.comp-mail-thrs-txt {
+	margin-bottom: 20px;
+	display: flex;
+	font-family: opensanslight;
+	font-weight: bold !important;
+	justify-content: flex-start;
+	padding-top: 16px;
+	height: 50px;
+	line-height: 16px;
+	flex-direction: column;
+	text-align: left;
+	margin-right: 15px;
+}

@@ -1797,6 +1797,11 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         // Send reset password link to the user email ID
         emailServices.sendRegistrationCompletionEmail( url, emailId, name, profileName, loginName, holdSendingMail,
             hiddenSection );
+        
+        // if the email is supposed to be either sent immediately or by batch without holding it, then update the invite sent date for the user 
+        if( !holdSendingMail ){
+        updateLastInviteSentDateIfUserExistsInDB( emailId );
+        }
     }
 
 
@@ -1951,6 +1956,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         LOG.debug( "Calling email services to send registration invitation mail" );
         emailServices.sendRegistrationInviteMail( url, emailId, firstName, lastName );
+        
+        updateLastInviteSentDateIfUserExistsInDB( emailId );
 
         LOG.debug( "Method inviteUser finished successfully" );
     }
@@ -3712,6 +3719,38 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     }
 
 
+ // Method to return active agent with provided email and company
+    @Transactional
+    @Override
+    public User getActiveAgentByEmailAndCompany( long companyId, String emailId )
+        throws InvalidInputException, NoRecordsFetchedException
+    {
+        LOG.debug( "Method getActiveAgentByEmailAndCompany() called from UserManagementService" );
+
+        if ( emailId == null || emailId.isEmpty() ) {
+            throw new InvalidInputException( "Email id is null or empty in getUserByEmailAndCompany()" );
+        }
+
+        Company company = companyDao.findById( Company.class, companyId );
+        if ( company == null ) {
+            throw new NoRecordsFetchedException( "No company found with the id " + companyId );
+        }
+
+        User user = getUserByEmailAddress( emailId );
+        if ( user.getCompany().getCompanyId() != companyId ) {
+            throw new InvalidInputException( "The user is not part of the specified company" );
+        }
+        
+        List<UserProfile> userProfiles = user.getUserProfiles();
+        for(UserProfile profile : userProfiles){
+            if(profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID)
+                return user;
+        }
+        //if no agent profile found throw an exception
+        throw new NoRecordsFetchedException( "No agent found" );
+
+    }
+    
     /**
      *  Method to get a map of userId - review count given a list of userIds
      * @param userIds
@@ -4238,6 +4277,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     }
 
 
+    @SuppressWarnings ( "unchecked")
     private void sendCorruptDataFromCrmNotificationMail( Map<String, Object> corruptRecords )
     {
         List<SurveyPreInitiation> unavailableAgents = (List<SurveyPreInitiation>) corruptRecords.get( "unavailableAgents" );
@@ -4443,10 +4483,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 
                 LOG.info( "getting reminder information for company with id " + company.getCompanyId()  );
                 
-                Map<String, Integer> reminderMap = surveyHandler.getReminderInformationForCompany( company.getCompanyId() );
-                int reminderInterval = reminderMap.get( CommonConstants.SURVEY_REMINDER_INTERVAL );
-                int reminderCount = reminderMap.get( CommonConstants.SURVEY_REMINDER_COUNT );
-                LOG.info( "Reminder count for company: " + company.getCompanyId() + " is " + reminderCount );
+                Map<String, Object> reminderMap = surveyHandler.getReminderInformationForCompany( company.getCompanyId() );
+                int reminderInterval = (int) reminderMap.get( CommonConstants.SURVEY_REMINDER_INTERVAL );
+                int reminderCount = (int) reminderMap.get( CommonConstants.SURVEY_REMINDER_COUNT );
+                boolean isReminderDisabled = (boolean) reminderMap.get( CommonConstants.IS_SURVEY_REMINDER_DISABLED );
                 
                 //getting epoch date
                 SimpleDateFormat sdf = new SimpleDateFormat( "dd/MM/yyyy" );
@@ -4496,6 +4536,11 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                     }
                 }
                 
+                //Do not send reminder email if it is disabled for company
+                if(isReminderDisabled){
+                    LOG.info( "Auto Reminder is diabled for company : " + company.getCompanyId() );
+                    continue;
+                }
                 
                 //getting minLastReminderTime and maxLastReminderTime
                 long currentTime = System.currentTimeMillis();
@@ -4612,6 +4657,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         if ( user.getStatus() == CommonConstants.STATUS_INACTIVE ) {
             survey.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_CORRUPT_RECORD );
             survey.setErrorCode( SurveyErrorCode.USER_DELETED.name() );
+            survey.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
             surveyPreInitiationDao.update( survey );
             return true;
         }
@@ -4763,5 +4809,30 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
         userProfileDao.update( userProfile );
         LOG.info( "method updateUserProfileObject finished for User : " + userProfile.getAgentId() );
+    }
+    
+    /**
+     * method to update the last invitation sent date in users table in MySQL if the user entry exists.
+     *
+     * @param emailId
+     * @return
+     */
+    @Override
+    public void updateLastInviteSentDateIfUserExistsInDB( String emailId )
+    {
+        LOG.debug( "Method updateLastInviteSentDateIfUserExists started." );
+        try {
+            Map<String, Object> columns = new HashMap<>();
+            columns.put( "emailId", emailId );
+            List<User> usersWithTheGivenEmailId = userDao.findByKeyValue( User.class, columns );
+            if ( usersWithTheGivenEmailId != null && !usersWithTheGivenEmailId.isEmpty() ) {
+                usersWithTheGivenEmailId.get( CommonConstants.INITIAL_INDEX )
+                    .setLastInvitationSentDate( new Timestamp( System.currentTimeMillis() ) );
+                userDao.update( usersWithTheGivenEmailId.get( CommonConstants.INITIAL_INDEX ) );
+            }
+            LOG.debug( "Method updateLastInviteSentDateIfUserExists finished." );
+        } catch ( Exception databaseException ) {
+            LOG.error( "Exception caught while checking for email id in USERS table." );
+        }
     }
 }

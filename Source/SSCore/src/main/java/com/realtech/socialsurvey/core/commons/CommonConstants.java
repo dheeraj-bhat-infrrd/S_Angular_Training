@@ -129,9 +129,17 @@ public interface CommonConstants
     public static final String YES_STRING = "Y";
     public static final String NO_STRING = "N";
     public static final int DISABLED_ACCOUNT_PROCESSED = 2;
+    //Reporting status in file upload table 
+    public static final int STATUS_PENDING = 1;
+    public static final int STATUS_DONE = 0;
+    public static final int STATUS_FAIL = 4; // changing the status failed to 4 since the status under processing is 2
+    public static final int STATUS_DELETE = 3;
 
     public static final int IS_PRIMARY_FALSE = 0;
     public static final int IS_PRIMARY_TRUE = 1;
+    
+    //Reporting batch size 
+    public static final int BATCH_SIZE = 5000;
 
     // Survey pre initiation deleted as part company deletion, status is set to 11.
     public static final int SURVEY_STATUS_PRE_INITIATED = 1;
@@ -203,6 +211,9 @@ public interface CommonConstants
     public static final String HOLD_SENDING_EMAIL_COLUMN = "holdSendingMail";
     public static final String IS_PRIMARY_COLUMN = "isPrimary";
     public static final String SURVEY_LAST_REMINDER_TIME = "lastReminderTime";
+    public static final String PROFILE_VALUE_COLUMN = "profileValue";
+    public static final String PROFILE_LEVEL_COLUMN = "profileLevel";
+    public static final String ENCOMPASS_SDK_VERSION_COLUMN = "sdkVersion";
 
     //batch type constant for batch tracker
     public static final String BATCH_TYPE_REVIEW_COUNT_UPDATER = "reviewCountUpdater";
@@ -227,6 +238,7 @@ public interface CommonConstants
     public static final String BATCH_TYPE_HIERARCHY_SETTINGS_CORRECTOR = "HierarchySettingsCorrector";
     public static final String BATCH_TYPE_ZILLOW_REVIEW_PROCESSOR_AND_AUTO_POSTER = "ZillowReviewProcessorAndAutoPoster";
     public static final String BATCH_TYPE_HIERARCHY_UPLOAD_PROCESSOR = "HierarchyUploadProcessor";
+    public static final String BATCH_TYPE_MONTHLY_DIGEST_STARTER = "MonthlyDigestStarter";
 
     //batch name constant for batch tracker
     public static final String BATCH_NAME_REVIEW_COUNT_UPDATER = "Agent's review count in solr updater";
@@ -253,6 +265,8 @@ public interface CommonConstants
     public static final String COMPANIES_BILLING_REPORT_GENERATOR = "Companies Billing Report Generator";
     public static final String BATCH_NAME_ZILLOW_REVIEW_PROCESSOR_AND_AUTO_POSTER = "Zillow review processor and auto poster";
     public static final String BATCH_NAME_HIERARCHY_UPLOAD_PROCESSOR = "Company Hierarchy Upload Processor";
+    public static final String BATCH_NAME_MONTHLY_DIGEST_STARTER = "Monthly digest process starter for companies";
+
 
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_BILLING_REPORT = "Billing report";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_USERS_REPORT = "Company user report";
@@ -263,8 +277,17 @@ public interface CommonConstants
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_SOCIAL_MONITOR_REPORT = "Social monitor report";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_INCOMPLETE_SURVEY_REPORT = "Incomplete survey data report";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_USER_ADOPTION_REPORT = "User adoption report";
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_SURVEY_STATS_REPORT = "Survey stats report for reporting";
+  //Note -> the USER_ADOPTION_REPORT was renamed to VERIFIED_USERS_REPORT
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_VERIFIED_USERS_REPORT = "Verified users report for reporting";
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_COMPANY_USER_REPORT = "Company user report for reporting";
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_SURVEY_RESULTS_COMPANY_REPORT = "Survey results company report for reporting";
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_SURVEY_TRANSACTION_REPORT = "Survey transaction report for reporting";
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_USER_RANKING_MONTHLY_REPORT = "User ranking monthly report for reporting";
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_USER_RANKING_YEARLY_REPORT = "User ranking yearly report for reporting";
 
 
+    
     /**
      * Mongo entities and column name constants
      */
@@ -305,6 +328,7 @@ public interface CommonConstants
     public static final String AGREE_SHARE_COLUMN_TRUE = "true";
     public static final String AGREE_SHARE_COLUMN_FALSE = "false";
     public static final String PROFILE_IMAGE_THUMBNAIL_COLUMN = "profileImageUrlThumbnail";
+    public static final String PROFILE_IMAGE_RECTANGULAR_THUMBNAIL_COLUMN = "profileImageUrlRectangularThumbnail";
     public static final String LOGO_THUMBNAIL_COLUMN = "logoThumbnail";
     public static final String IS_PROFILE_IMAGE_PROCESSED_COLUMN = "isProfileImageProcessed";
     public static final String IS_LOGO_IMAGE_PROCESSED_COLUMN = "isLogoImageProcessed";
@@ -421,6 +445,7 @@ public interface CommonConstants
     public static final String POPUP_FLAG_IN_SESSION = "popupStatus";
     public static final String ACTIVE_SESSIONS_FOUND = "activeSessionFound";
     public static final String NO_GOOGLE_PLUS_FOUND = "nogoogleplusfound";
+    public static final String ENCOMPASS_VERSION_LIST = "encompassVersionList";
 
     public static final String BILLING_MODE_ATTRIBUTE_IN_SESSION = "billingMode";
 
@@ -430,6 +455,8 @@ public interface CommonConstants
     public static final String ENTITY_TYPE_COLUMN = "entityType";
 
     public static final String FILE_UPLOAD_TYPE_COLUMN = "uploadType";
+    
+    public static final String SHOW_ON_UI_COLUMN = "showOnUI";
 
     /**
      * Batch Constants
@@ -481,7 +508,7 @@ public interface CommonConstants
     public static final float DEFAULT_AUTOPOST_SCORE = 3.5f;
     public static final float DEFAULT_COMPLAINT_RES_SCORE = 2.5f;
     public static final int DEFAULT_REMINDERMAIL_INTERVAL = 3;
-    public static final int DEFAULT_MAX_REMINDER_COUNT = 1;
+    public static final int DEFAULT_MAX_REMINDER_COUNT = 3;
     public static final int DEFAULT_SOCIAL_POST_REMINDERMAIL_INTERVAL = 1;
     public static final int DEFAULT_MAX_SOCIAL_POST_REMINDER_COUNT = 1;
     public static final String USER_SELECTION_TYPE_SINGLE = "single";
@@ -868,6 +895,7 @@ public interface CommonConstants
 
     public static final String SURVEY_REMINDER_COUNT = "reminderCounts";
     public static final String SURVEY_REMINDER_INTERVAL = "reminderInterval";
+    public static final String IS_SURVEY_REMINDER_DISABLED = "isReminderDisabled";
 
     //Session variable
     public static final String REALTECH_USER_ID = "realTechAdminId";
@@ -936,7 +964,18 @@ public interface CommonConstants
     public static final int FILE_UPLOAD_SOCIAL_MONITOR_REPORT = 9;
     public static final int FILE_UPLOAD_INCOMPLETE_SURVEY_REPORT = 10;
     public static final int FILE_UPLOAD_USER_ADOPTION_REPORT = 11;
+    
+    //reporting file upload status 
+    public static final int FILE_UPLOAD_REPORTING_SURVEY_STATS_REPORT = 101;
+    //Note -> the USER_ADOPTION_REPORT was renamed to VERIFIED_USERS_REPORT
+    public static final int FILE_UPLOAD_REPORTING_VERIFIED_USERS_REPORT = 102;
+    public static final int FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT = 103;
+    public static final int FILE_UPLOAD_REPORTING_SURVEY_RESULTS_COMPANY_REPORT = 104;
+    public static final int FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT = 105;
+    public static final int FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT = 106;
+    public static final int FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT = 107;
 
+    
     public static final String AGENT_MEDIA_POST_DETAILS_COLUMN = "agentMediaPostDetails";
     public static final String BRANCH_MEDIA_POST_DETAILS_COLUMN = "branchMediaPostDetailsList";
     public static final String COMPANY_MEDIA_POST_DETAILS_COLUMN = "companyMediaPostDetails";
@@ -1307,11 +1346,64 @@ public interface CommonConstants
     public static final int SURVEY_API_DEFAUAT_BATCH_SIZE = 1000;
     public static final String SURVEY_API_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
     
+    //Reporting constants
+    public static final String REPORTING_SURVEY_STATS_REPORT = "Survey Stats Report";
+    //Note -> the USER_ADOPTION_REPORT was renamed to VERIFIED_USERS_REPORT
+    public static final String REPORTING_VERIFIED_USERS_REPORT = "Verified Users Report";
+    public static final String REPORTING_COMPANY_USERS_REPORT = "Company User Report";
+    public static final String REPORTING_SURVEY_REUSLTS_COMPANY_REPORT = "Survey Results Company Report";
+    public static final String REPORTING_SURVEY_TRANSACTION_REPORT = "Survey Transaction Report";
+    public static final String REPORTING_USER_RANKING_MONTHLY_REPORT = "User Ranking Report For Month";
+    public static final String REPORTING_USER_RANKING_YEARLY_REPORT = "User Ranking Report For Year";
+    public static final String REPORTING_API_DATE_FORMAT = "MMM dd, yyyy";
+
+
+    
+    public static final String SURVEY_DETAILS_ID_COLUMN="surveyDetailsId";
+    public static final String SURVEY_RESULTS_REPORT_MODIFIED_ON = "reportModifiedOn";
+    public static final String SURVEY_RESULTS_IS_DELETED = "isDeleted";
+    public static final String TRX_MONTH = "trxMonth";
+    public static final String SURVEY_RESULTS_COMPLETED_DATE = "surveyCompletedDate";
+    
+    public static final String THIS_MONTH="thisMonth";
+    public static final String THIS_YEAR="thisYear";
+    public static final String LEADERBOARD_YEAR="year";
+    public static final String LEADERBOARD_MONTH="month";
+    
+    public static final String RANK = "rank";
+    public static final String INTERNAL_BRANCH_RANK = "internalBranchRank";
+    public static final String INTERNAL_REGION_RANK = "internalRegionRank";
+	
+    public static final String MONTH_VAL = "monthVal";
+    public static final String YEAR_VAL = "yearVal";
+    public static final String QUESTION_ID = "questionId";
+    
+    public static final String TRANSACTION_MONITOR_DATE_COLUMN = "transactionDate";
+    public static final String SURVEY_STATS_MONITOR_DATE_COLUMN = "statsDate";
+
     //Survey API survey status
     public static final String SURVEY_API_SURVEY_STATUS_COMPLETE = "complete";
     public static final String SURVEY_API_SURVEY_STATUS_INCOMPLETE = "incomplete";
     public static final String SURVEY_API_SURVEY_STATUS_ALL = "all";
 
-    
     public static final String NOT_AVAILABLE = "N/A";
+
+    //Encompass test connection htt prequest initial
+    public static final String HTTP_REQUEST_URL_INITIAL = "http://";
+
+    //Ranking Requirements Defaults
+    public static final float MIN_COMPLETED_PERCENTAGE = 40.0f;
+    public static final int MIN_DAYS_OF_REGISTRATION = 90;
+    public static final int MIN_NO_OF_REVIEWS = 25;
+    public static final int MONTH_OFFSET = 3;
+    public static final int YEAR_OFFSET = -1;
+    
+    public static final String SQUARE_THUMBNAIL = "squareThumbnail";
+    public static final String RECTANGULAR_THUMBNAIL = "rectangularThumbnail";
+    
+    //Digest
+    public static final String MONTH = "month";
+    public static final String YEAR = "year";
+    
+    public static final String SURVEY_MAIL_THRESHOLD = "surveyCompletedMailThreshold";
 }

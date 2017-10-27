@@ -16,6 +16,7 @@ import java.util.Map.Entry;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.QueryParam;
+import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
@@ -181,9 +182,19 @@ public class SurveyManagementController
 		String question = request.getParameter("question");
 		String questionType = request.getParameter("questionType");
 		int stage = Integer.parseInt(request.getParameter("stage"));
+		int isUserRankingQuestionInt = Integer.parseInt(request.getParameter("isUserRankingQuestion"));
 		String surveyId = request.getParameter("surveyId");
 
-		surveyHandler.updateCustomerAnswersInSurvey(surveyId, question, questionType, answer, stage);
+		//encode question and response
+		question = new String( DatatypeConverter.parseBase64Binary(question) );
+		answer = new String( DatatypeConverter.parseBase64Binary(answer) );
+		
+		//get boolean value for isUserRankingQues
+		boolean isUserRankingQuestion = false;
+		if(isUserRankingQuestionInt == CommonConstants.QUESTION_RATING_VALUE_TRUE){
+		    isUserRankingQuestion = true;
+		}
+		surveyHandler.updateCustomerAnswersInSurvey(surveyId, question, questionType, answer, stage, isUserRankingQuestion);
 		LOG.info("Method storeSurveyAnswer() finished to store response of customer.");
 		return surveyHandler.getSwearWords();
 	}
@@ -316,20 +327,30 @@ public class SurveyManagementController
 
                 // Generate the text for customer details in mail 
                 String customerDetail = generateCustomerTextForMail( customerFullName, customerEmail, survey.getSourceId() );
+                
+                // fetch the company settings
+                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(survey.getCompanyId());
+                
+                if (companySettings == null)
+                    throw new NonFatalException("Company settings cannot be found for id : " + survey.getCompanyId());
 
                 String surveyScore = String.valueOf( surveyHandler.getFormattedSurveyScore( survey.getScore() ) );
                 String agentName = ( agent.getLastName() != null && !agent.getLastName().isEmpty() )
                     ? ( agent.getFirstName() + " " + agent.getLastName() ) : agent.getFirstName();
-                for ( Entry<String, String> admin : emailIdsToSendMail.entrySet() ) {
-                    emailServices.sendSurveyCompletionMailToAdminsAndAgent( agentName, admin.getValue(), admin.getKey(),
-                        surveyDetail, customerName, surveyScore, logoUrl, agentSettings.getCompleteProfileUrl(),
-                        customerDetail );
+                
+                double surveyCompletionThreshold = 0.0d;
+                if( companySettings.getSurvey_settings() != null ){
+                    surveyCompletionThreshold = companySettings.getSurvey_settings().getSurveyCompletedMailThreshold();
                 }
-
-				OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(survey.getCompanyId());
-
-				if (companySettings == null)
-					throw new NonFatalException("Company settings cannot be found for id : " + survey.getCompanyId());
+                
+                // check for survey completion mail threshold set for company 
+                if( surveyCompletionThreshold <= survey.getScore() ){    
+                    for ( Entry<String, String> admin : emailIdsToSendMail.entrySet() ) {
+                        emailServices.sendSurveyCompletionMailToAdminsAndAgent( agentName, admin.getValue(), admin.getKey(),
+                            surveyDetail, customerName, surveyScore, logoUrl, agentSettings.getCompleteProfileUrl(),
+                            customerDetail );
+                    }
+                }
 
 				if (companySettings.getSurvey_settings() != null && companySettings.getSurvey_settings().getComplaint_res_settings() != null) {
 					ComplaintResolutionSettings complaintRegistrationSettings = companySettings.getSurvey_settings().getComplaint_res_settings();
@@ -347,7 +368,7 @@ public class SurveyManagementController
 						if (survey.getCustomerLastName() != null)
 							displayName = displayName + " " + survey.getCustomerLastName();
 						emailServices.sendComplaintHandleMail( complaintRegistrationSettings.getMailId(), displayName,
-                            customerEmail, mood, surveyScore, survey.getSourceId(), surveyDetail );
+                            customerEmail, survey.getAgentName(), mood, surveyScore, survey.getSourceId(), surveyDetail );
 					}
 
 				}

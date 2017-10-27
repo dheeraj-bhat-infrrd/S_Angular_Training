@@ -155,6 +155,7 @@ public interface JspResolver
     public static final String ADMIN_ADD_SS_ADMIN = "admin/admin_add_ss_admin";
     public static final String ADMIN_SS_ADMIN_LIST = "admin/admin_ss_admin_list";
     public static final String ADMIN_DOWNLOAD_REPORTS = "admin/admin_download_reports";
+    public static final String ADMIN_TRANSACTION_MONITOR = "admin/admin_transaction_monitor";
 
 
     //config settngs
@@ -181,4 +182,13 @@ public interface JspResolver
 
     //vendasta 
     public static final String VENDASTA_SSO_ERROR = "vendastaError";
+    
+  //Reporting 
+    public static final String REPORTING_DASHBOARD = "reporting";
+    public static final String REPORTING_PROFILE = "reportingprofiledetails";
+    public static final String REPORTING_PROFILE_IMAGE = "reporting_profileimage";
+    public static final String REPORTS = "reporting_reports";
+    public static final String RANKING_SETTINGS = "ranking_settings";
+    public static final String LEADERBOARD_LIST= "leaderboard_list";
+    public static final String LEADERBOARD_PROFILE_IMAGE = "leaderboard_profile_image";
 }

@@ -59,7 +59,7 @@ public interface SurveyHandler
      * @param stage
      * @throws Exception
      */
-    public void updateCustomerAnswersInSurvey( String surveyId, String question, String questionType, String answer, int stage );
+    public void updateCustomerAnswersInSurvey( String surveyId, String question, String questionType, String answer, int stage, boolean isUserRankingQuestion );
 
 
     /*
@@ -157,7 +157,7 @@ public interface SurveyHandler
     public Map<String, Object> mapAgentsInSurveyPreInitiation();
 
 
-    public Map<String, Integer> getReminderInformationForCompany( long companyId );
+    public Map<String, Object> getReminderInformationForCompany( long companyId );
 
 
     public boolean checkSurveyReminderEligibility( long lastRemindedTime, long systemTime, int reminderInterval );
@@ -380,4 +380,7 @@ public interface SurveyHandler
 
 
     void disconnectAllSurveysFromWithUser( long agentId ) throws InvalidInputException;
+
+
+    List<SurveyPreInitiation> validatePreinitiatedRecord( List<SurveyPreInitiation> surveyPreInitiations ) throws InvalidInputException;
 }

@@ -39,6 +39,9 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import retrofit.client.Response;
+import retrofit.mime.TypedByteArray;
+
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -135,9 +138,6 @@ import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 
-import retrofit.client.Response;
-import retrofit.mime.TypedByteArray;
-
 
 @DependsOn ( "generic")
 @Component
@@ -228,7 +228,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     @Value ( "${ZILLOW_WEBSERVICE_ID}")
     private String zwsId;
-    
+
     @Value ( "${ZILLOW_PARTNER_ID}")
     private String zillowPartnerId;
 
@@ -265,7 +265,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     @Value ( "${ZILLOW_AGENT_API_ENDPOINT}")
     private String zillowAgentApiEndpoint;
-    
+
     @Value ( "${ZILLOW_LENDER_API_ENDPOINT}")
     private String zillowLenderApiEndpoint;
 
@@ -775,8 +775,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         LOG.debug( "Updating logo" );
         /*organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( MongoOrganizationUnitSettingDaoImpl.KEY_LOGO,
             logo, companySettings, collection );*/
-        organizationManagementService.updateImageForOrganizationUnitSetting( companySettings.getIden(), logo, collection,
-            CommonConstants.IMAGE_TYPE_LOGO, false, false );
+        organizationManagementService.updateImageForOrganizationUnitSetting( companySettings.getIden(), logo, null, null,
+            collection, CommonConstants.IMAGE_TYPE_LOGO, false, false );
         /*organizationUnitSettingsDao.updateImageForOrganizationUnitSetting( companySettings.getIden(), logo, collection,
             CommonConstants.IMAGE_TYPE_LOGO, false, false );*/
         LOG.debug( "Logo updated successfully" );
@@ -802,8 +802,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_IMAGE, image, companySettings, collection );*/
         /*organizationUnitSettingsDao.updateImageForOrganizationUnitSetting( companySettings.getIden(), image, collection,
             CommonConstants.IMAGE_TYPE_PROFILE, false, false );*/
-        organizationManagementService.updateImageForOrganizationUnitSetting( companySettings.getIden(), image, collection,
-            CommonConstants.IMAGE_TYPE_PROFILE, false, false );
+        organizationManagementService.updateImageForOrganizationUnitSetting( companySettings.getIden(), image, null, null,
+            collection, CommonConstants.IMAGE_TYPE_PROFILE, false, false );
         LOG.debug( "Image updated successfully" );
     }
 
@@ -1809,8 +1809,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         String profileLevel, boolean fetchAbusive, Date startDate, Date endDate, String sortCriteria )
         throws InvalidInputException
     {
-        LOG.debug( "Method getReviews called for iden:" + iden + " startScore:" + startScore + " limitScore:" + limitScore
-            + " startIndex:" + startIndex + " numOfRows:" + numOfRows + " profileLevel:" + profileLevel );
+        LOG.debug(
+            "Method getReviews called for iden: {} startScore: {} limitScore: {} startIndex: {}  numOfRows: {} profileLevel: {}",
+            iden, startScore, limitScore, startIndex, numOfRows, profileLevel );
         List<SurveyDetails> surveyDetails = null;
         if ( iden <= 0l ) {
             throw new InvalidInputException( "iden is invalid while fetching reviews" );
@@ -1861,11 +1862,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         Calendar calendar = Calendar.getInstance();
         if ( startDate != null ) {
-            calendar.setTime( startDate );            
+            calendar.setTime( startDate );
             calendar.set( Calendar.HOUR_OF_DAY, 0 );
             calendar.set( Calendar.MINUTE, 0 );
             calendar.set( Calendar.SECOND, 0 );
-            calendar.set( Calendar.MILLISECOND, 0 );     
+            calendar.set( Calendar.MILLISECOND, 0 );
             startDate = calendar.getTime();
         }
         if ( endDate != null ) {
@@ -2257,45 +2258,50 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             startTime = new Timestamp( startDate.getTime() );
         if ( endDate != null )
             endTime = new Timestamp( endDate.getTime() );
-        
+
         List<SurveyPreInitiation> surveys = null;
         if ( iden > 0l || ( agentIds != null && !agentIds.isEmpty() ) ) {
-             surveys = surveyPreInitiationDao.getIncompleteSurvey( startTime, endTime, startIndex,
-                numOfRows, agentIds, isCompanyAdmin, iden, realtechAdmin );
+            surveys = surveyPreInitiationDao.getIncompleteSurvey( startTime, endTime, startIndex, numOfRows, agentIds,
+                isCompanyAdmin, iden, realtechAdmin );
         }
-       
+
         return surveys;
     }
-    
+
+
     @Override
     @Transactional
-    public long getIncompleteSurveyCount(long iden, String profileLevel, Date startDate, Date endDate) throws InvalidInputException{
-    	LOG.debug("Getting incomplete survey count");
-    	long count = 0;
-    	if ( iden <= 0l ) {
+    public long getIncompleteSurveyCount( long iden, String profileLevel, Date startDate, Date endDate )
+        throws InvalidInputException
+    {
+        LOG.debug( "Getting incomplete survey count" );
+        long count = 0;
+        if ( iden <= 0l ) {
             throw new InvalidInputException( "iden is invalid while fetching incomplete reviews" );
         }
-    	long companyId = -1;
-    	long agentId = -1;
-    	Timestamp startTime = null;
+        long companyId = -1;
+        long agentId = -1;
+        Timestamp startTime = null;
         Timestamp endTime = null;
-    	Set<Long> agentIds = null;
-    	if(profileLevel.equalsIgnoreCase(CommonConstants.PROFILE_LEVEL_COMPANY)){
-    		companyId = iden;
-    	}else if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_INDIVIDUAL ) ) {
-    		agentId = iden;
-    	}else{
-    		agentIds = getAgentIdsByProfileLevel( profileLevel, iden );
-    	}
+        Set<Long> agentIds = null;
+        if ( profileLevel.equalsIgnoreCase( CommonConstants.PROFILE_LEVEL_COMPANY ) ) {
+            companyId = iden;
+        } else if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_INDIVIDUAL ) ) {
+            agentId = iden;
+        } else {
+            agentIds = getAgentIdsByProfileLevel( profileLevel, iden );
+        }
         if ( startDate != null )
             startTime = new Timestamp( startDate.getTime() );
         if ( endDate != null )
             endTime = new Timestamp( endDate.getTime() );
-        
+
         if ( companyId > 0l || agentId > 0l || ( agentIds != null && !agentIds.isEmpty() ) ) {
-            count = surveyPreInitiationDao.getIncompleteSurveyCount(companyId, agentId, new int[]{CommonConstants.SURVEY_STATUS_PRE_INITIATED, CommonConstants.SURVEY_STATUS_INITIATED}, startTime, endTime, agentIds);            
+            count = surveyPreInitiationDao.getIncompleteSurveyCount( companyId, agentId,
+                new int[] { CommonConstants.SURVEY_STATUS_PRE_INITIATED, CommonConstants.SURVEY_STATUS_INITIATED }, startTime,
+                endTime, agentIds );
         }
-    	return count;
+        return count;
     }
 
 
@@ -2357,8 +2363,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
      * @throws ProfileNotFoundException 
      */
     @Override
-    public void findProfileMailIdAndSendMail( String companyProfileName, String profileName, String message, String senderName, String senderMailId,
-        String profileType )
+    public void findProfileMailIdAndSendMail( String companyProfileName, String profileName, String message, String senderName,
+        String senderMailId, String profileType )
         throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException, ProfileNotFoundException
     {
         if ( companyProfileName == null || companyProfileName.isEmpty() ) {
@@ -2386,18 +2392,17 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             throw new InvalidInputException( "Contact Us : profileType parameter is empty or null!" );
         }
         OrganizationUnitSettings settings = null;
-        
+
         //Fetch the companysettings to first check if we have route all Contact Us emails to the Company Admin only
         LOG.debug( "Fetching the company settings from mongo for the company with profile name : " + companyProfileName );
-        OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName( companyProfileName,
-                CommonConstants.COMPANY_SETTINGS_COLLECTION );
+        OrganizationUnitSettings companySettings = organizationUnitSettingsDao
+            .fetchOrganizationUnitSettingsByProfileName( companyProfileName, CommonConstants.COMPANY_SETTINGS_COLLECTION );
         LOG.debug( "Settings fetched from mongo!" );
-        
-        if(companySettings.isContactUsEmailsRoutedToCompanyAdmin()){
-        	settings = companySettings;
-        }
-        else{
-        	if ( profileType.equals( CommonConstants.PROFILE_LEVEL_INDIVIDUAL ) ) {
+
+        if ( companySettings.isContactUsEmailsRoutedToCompanyAdmin() ) {
+            settings = companySettings;
+        } else {
+            if ( profileType.equals( CommonConstants.PROFILE_LEVEL_INDIVIDUAL ) ) {
                 LOG.debug( "Fetching the agent settings from mongo for the agent with profile name : " + profileName );
                 settings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName( profileName,
                     CommonConstants.AGENT_SETTINGS_COLLECTION );
@@ -2416,8 +2421,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                         if ( settings == null || settings.getContact_details() == null
                             || settings.getContact_details().getMail_ids() == null
                             || StringUtils.isEmpty( settings.getContact_details().getMail_ids().getWork() ) ) {
-                        	//Company settings are already fetched, re-use that
-                        	settings = companySettings;
+                            //Company settings are already fetched, re-use that
+                            settings = companySettings;
                         }
                     }
                 }
@@ -2436,8 +2441,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     if ( settings == null || settings.getContact_details() == null
                         || settings.getContact_details().getMail_ids() == null
                         || StringUtils.isEmpty( settings.getContact_details().getMail_ids().getWork() ) ) {
-                    	//Company settings are already fetched, re-use that
-                    	settings = companySettings;
+                        //Company settings are already fetched, re-use that
+                        settings = companySettings;
                     }
                 }
                 LOG.debug( "Settings fetched from mongo!" );
@@ -2448,12 +2453,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 if ( settings != null
                     && ( settings.getContact_details() == null || settings.getContact_details().getMail_ids() == null
                         || StringUtils.isEmpty( settings.getContact_details().getMail_ids().getWork() ) ) ) {
-                	//Company settings are already fetched, re-use that
-                	settings = companySettings;
+                    //Company settings are already fetched, re-use that
+                    settings = companySettings;
                 }
                 LOG.debug( "Settings fetched from mongo!" );
             } else if ( profileType.equals( CommonConstants.PROFILE_LEVEL_COMPANY ) ) {
-            	//Company settings are already fetched, re-use that
+                //Company settings are already fetched, re-use that
                 settings = companySettings;
             } else {
                 LOG.error( "Profile level not known:{}", profileType );
@@ -2467,9 +2472,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 settings.getContact_details().getName(), senderName, senderMailId, message );
             LOG.debug( "Contact us mail sent!" );
         } else {
-            LOG.error( "No records found for profile settings of profile name: {}, profile type: {} in mongo",profileName,profileType );
-            throw new NoRecordsFetchedException(
-            		"No records found for profile settings of profile name: " + profileName + ", profile type: " + profileType + " in mongo");
+            LOG.error( "No records found for profile settings of profile name: {}, profile type: {} in mongo", profileName,
+                profileType );
+            throw new NoRecordsFetchedException( "No records found for profile settings of profile name: " + profileName
+                + ", profile type: " + profileType + " in mongo" );
         }
     }
 
@@ -2807,7 +2813,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                         throw new InvalidInputException(
                             "The Review with ID : " + review.get_id() + "does not have any hierarchy ID set" );
                     }
-                    
+
                 }
                 if ( unitSetting != null ) {
                     profileUrl = (String) unitSetting.getProfileUrl();
@@ -2979,14 +2985,14 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( iden < 0 ) {
             throw new InvalidInputException( "Invalid value passed for iden of profile level." );
         }
-        
+
         Calendar calendar = Calendar.getInstance();
         if ( startDate != null ) {
-            calendar.setTime( startDate );            
+            calendar.setTime( startDate );
             calendar.set( Calendar.HOUR_OF_DAY, 0 );
             calendar.set( Calendar.MINUTE, 0 );
             calendar.set( Calendar.SECOND, 0 );
-            calendar.set( Calendar.MILLISECOND, 0 );     
+            calendar.set( Calendar.MILLISECOND, 0 );
             startDate = calendar.getTime();
         }
         if ( endDate != null ) {
@@ -2997,7 +3003,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             calendar.set( Calendar.MILLISECOND, 0 );
             endDate = calendar.getTime();
         }
-        
+
         Map<Long, AgentRankingReport> agentReportData = new HashMap<>();
         // Generate entries for all active users in the company
         initializeAgentReportData( agentReportData, columnName, iden );
@@ -3154,9 +3160,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     void updateCrumbListWithCompanyName( List<BreadCrumb> breadCrumbList, Company company ) throws InvalidInputException
     {
         BreadCrumb breadCrumb = new BreadCrumb();
+
+        OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( company.getCompanyId() );
         breadCrumb.setBreadCrumbProfile( company.getCompany() );
-        breadCrumb.setBreadCrumbUrl(
-            organizationManagementService.getCompanySettings( company.getCompanyId() ).getCompleteProfileUrl() );
+        breadCrumb.setBreadCrumbUrl( companySettings.getCompleteProfileUrl() );
+        breadCrumb.setHideFromBreadCrumb( companySettings.getHideFromBreadCrumb() );
         breadCrumbList.add( breadCrumb );
     }
 
@@ -3165,10 +3173,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         throws InvalidInputException, NoRecordsFetchedException
     {
         if ( branch.getIsDefaultBySystem() != CommonConstants.IS_DEFAULT_BY_SYSTEM_YES ) {
+            OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettings( branch.getBranchId() )
+                .getOrganizationUnitSettings();
             BreadCrumb breadCrumb = new BreadCrumb();
             breadCrumb.setBreadCrumbProfile( branch.getBranch() );
-            breadCrumb.setBreadCrumbUrl( organizationManagementService.getBranchSettings( branch.getBranchId() )
-                .getOrganizationUnitSettings().getCompleteProfileUrl() );
+            breadCrumb.setBreadCrumbUrl( branchSettings.getCompleteProfileUrl() );
+            breadCrumb.setHideFromBreadCrumb( branchSettings.getHideFromBreadCrumb() );
             breadCrumbList.add( breadCrumb );
         }
     }
@@ -3177,10 +3187,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     void updateCrumbListWithRegionName( List<BreadCrumb> breadCrumbList, Region region ) throws InvalidInputException
     {
         if ( region.getIsDefaultBySystem() != CommonConstants.IS_DEFAULT_BY_SYSTEM_YES ) {
+            OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( region.getRegionId() );
             BreadCrumb breadCrumb = new BreadCrumb();
             breadCrumb.setBreadCrumbProfile( region.getRegion() );
-            breadCrumb.setBreadCrumbUrl(
-                organizationManagementService.getRegionSettings( region.getRegionId() ).getCompleteProfileUrl() );
+            breadCrumb.setBreadCrumbUrl( regionSettings.getCompleteProfileUrl() );
+            breadCrumb.setHideFromBreadCrumb( regionSettings.getHideFromBreadCrumb() );
             breadCrumbList.add( breadCrumb );
         }
     }
@@ -4445,30 +4456,32 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     String zillowLenderId = zillowToken.getZillowLenderId();
                     LenderRef zillowLenderRef = zillowToken.getLenderRef();
                     Response response = null;
-                    
-                   // if nmls found, use it
-                    if(zillowLenderRef != null && zillowLenderRef.getNmlsId() != null) {
-                    	LOG.info( "NmlsId found for enity. So getting records from lender API using NmlsId id : " + zillowLenderRef.getNmlsId() + " and screen name : " + zillowScreenName );
-                    	FetchZillowReviewBodyByNMLS fetchZillowReviewBodyByNMLS = new FetchZillowReviewBodyByNMLS();                       
+
+                    // if nmls found, use it
+                    if ( zillowLenderRef != null && zillowLenderRef.getNmlsId() != null ) {
+                        LOG.info( "NmlsId found for enity. So getting records from lender API using NmlsId id : "
+                            + zillowLenderRef.getNmlsId() + " and screen name : " + zillowScreenName );
+                        FetchZillowReviewBodyByNMLS fetchZillowReviewBodyByNMLS = new FetchZillowReviewBodyByNMLS();
                         LenderRef lenderRef = new LenderRef();
-                        lenderRef.setNmlsId(zillowLenderRef.getNmlsId());
-                        fetchZillowReviewBodyByNMLS.setLenderRef(lenderRef);
+                        lenderRef.setNmlsId( zillowLenderRef.getNmlsId() );
+                        fetchZillowReviewBodyByNMLS.setLenderRef( lenderRef );
                         fetchZillowReviewBodyByNMLS.setPartnerId( zillowPartnerId );
-                        ZillowIntegrationLenderApi zillowIntegrationLenderApi = zillowIntegrationApiBuilder.getZillowIntegrationLenderApi();
+                        ZillowIntegrationLenderApi zillowIntegrationLenderApi = zillowIntegrationApiBuilder
+                            .getZillowIntegrationLenderApi();
                         response = zillowIntegrationLenderApi.fetchZillowReviewsByNMLS( fetchZillowReviewBodyByNMLS );
-                        
+
                         if ( response != null ) {
                             responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
                         }
-                        
+
                         //save to api call details
                         Gson gson = new Gson();
                         String requestBody = gson.toJson( fetchZillowReviewBodyByNMLS );
-                        
-                        LOG.info("NMLS id : " + zillowLenderRef.getNmlsId() + " Zillow Data: " + responseString);
-                        
-                        saveExternalAPICallDetailForZillowLender( requestBody ,  responseString);
-                        
+
+                        LOG.info( "NMLS id : " + zillowLenderRef.getNmlsId() + " Zillow Data: " + responseString );
+
+                        saveExternalAPICallDetailForZillowLender( requestBody, responseString );
+
                         if ( responseString != null ) {
                             Map<String, Object> map = null;
                             try {
@@ -4479,33 +4492,34 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                                 throw new UnavailableException( "Zillow reviews could not be fetched for " + profile.getIden()
                                     + " zillow account " + zillowScreenName );
                             }
-                            
+
                             if ( map != null ) {
                                 surveyDetailsList = buildSurveyDetailFromZillowLenderReviewMap( map );
                                 LOG.info( "no of records found from zillow is " + surveyDetailsList.size() );
-                                surveyDetailsList = fillSurveyDetailsFromReviewMap( surveyDetailsList, collectionName,
-                                       profile, companyId, fromBatch, fromPublicPage );
-                                
+                                surveyDetailsList = fillSurveyDetailsFromReviewMap( surveyDetailsList, collectionName, profile,
+                                    companyId, fromBatch, fromPublicPage );
+
                             }
                         }
-                    }
-                    else if( ! StringUtils.isEmpty( zillowLenderId ) ){
-                        LOG.info( "LendeId found for enity. So getting records from lender API using lender id : " + zillowLenderId + " and screen name : " + zillowScreenName );
+                    } else if ( !StringUtils.isEmpty( zillowLenderId ) ) {
+                        LOG.info( "LendeId found for enity. So getting records from lender API using lender id : "
+                            + zillowLenderId + " and screen name : " + zillowScreenName );
                         FetchZillowReviewBody fetchZillowReviewBody = new FetchZillowReviewBody();
-                        fetchZillowReviewBody.setLenderId( zillowLenderId );                       
+                        fetchZillowReviewBody.setLenderId( zillowLenderId );
                         fetchZillowReviewBody.setPartnerId( zillowPartnerId );
-                        ZillowIntegrationLenderApi zillowIntegrationLenderApi = zillowIntegrationApiBuilder.getZillowIntegrationLenderApi();
+                        ZillowIntegrationLenderApi zillowIntegrationLenderApi = zillowIntegrationApiBuilder
+                            .getZillowIntegrationLenderApi();
                         response = zillowIntegrationLenderApi.fetchZillowReviewsByLenderId( fetchZillowReviewBody );
-                        
+
                         if ( response != null ) {
                             responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
                         }
-                        
+
                         //save to api call details
                         Gson gson = new Gson();
                         String requestBody = gson.toJson( fetchZillowReviewBody );
-                        saveExternalAPICallDetailForZillowLender( requestBody ,  responseString);
-                        
+                        saveExternalAPICallDetailForZillowLender( requestBody, responseString );
+
                         if ( responseString != null ) {
                             Map<String, Object> map = null;
                             try {
@@ -4516,26 +4530,27 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                                 throw new UnavailableException( "Zillow reviews could not be fetched for " + profile.getIden()
                                     + " zillow account " + zillowScreenName );
                             }
-                            
+
                             if ( map != null ) {
                                 surveyDetailsList = buildSurveyDetailFromZillowLenderReviewMap( map );
                                 LOG.info( "no of records found from zillow is " + surveyDetailsList.size() );
-                                surveyDetailsList = fillSurveyDetailsFromReviewMap( surveyDetailsList, collectionName,
-                                       profile, companyId, fromBatch, fromPublicPage );
-                                
+                                surveyDetailsList = fillSurveyDetailsFromReviewMap( surveyDetailsList, collectionName, profile,
+                                    companyId, fromBatch, fromPublicPage );
+
                             }
-                        }    
-                    }
-                    else if ( ! StringUtils.isEmpty( zillowScreenName ) ) {
+                        }
+                    } else if ( !StringUtils.isEmpty( zillowScreenName ) ) {
                         try {
-                            LOG.info( "LendeId not found for enity. So getting records from screen API using  screen name : " + zillowScreenName );
+                            LOG.info( "LendeId not found for enity. So getting records from screen API using  screen name : "
+                                + zillowScreenName );
                             // Replace - with spaces in zillow screen name
                             zillowScreenName = zillowScreenName.replaceAll( "-", " " );
-                            ZillowIntegrationAgentApi zillowIntegrationAgentApi = zillowIntegrationApiBuilder.getZillowIntegrationAgentApi();
+                            ZillowIntegrationAgentApi zillowIntegrationAgentApi = zillowIntegrationApiBuilder
+                                .getZillowIntegrationAgentApi();
                             response = zillowIntegrationAgentApi.fetchZillowReviewsByScreennameWithMaxCount( zwsId,
                                 zillowScreenName );
-                            
-                            
+
+
                         } catch ( Exception e ) {
                             LOG.error( "Exception caught while fetching zillow reviews" + e.getMessage() );
                             reportBugOnZillowFetchFail( profile.getProfileName(), zillowScreenName, e );
@@ -4543,14 +4558,14 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                                 + " zillow account " + zillowScreenName );
                         }
 
-                        
+
                         if ( response != null ) {
                             responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
                         }
-                        
+
                         //save to api call details
-                        saveExternalAPICallDetailForZillowAgent( zillowScreenName ,  responseString);
-                        
+                        saveExternalAPICallDetailForZillowAgent( zillowScreenName, responseString );
+
                         if ( responseString != null ) {
                             Map<String, Object> map = null;
                             try {
@@ -4560,7 +4575,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                                         new Exception( (String) map.get( ZILLOW_JSON_TEXT_KEY ) ) );
                                     // return new ArrayList<SurveyDetails>();
                                 }
-                            } catch (  IOException e ) {
+                            } catch ( IOException e ) {
                                 LOG.error( "Exception caught while parsing zillow reviews" + e.getMessage() );
                                 reportBugOnZillowFetchFail( profile.getProfileName(), zillowScreenName, e );
                                 throw new UnavailableException( "Zillow reviews could not be fetched for " + profile.getIden()
@@ -4572,12 +4587,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                                 modifyZillowCallCount( map );
                                 surveyDetailsList = buildSurveyDetailFromZillowAgentReviewMap( map );
                                 LOG.info( "no of records found from zillow is " + surveyDetailsList.size() );
-                                surveyDetailsList = fillSurveyDetailsFromReviewMap( surveyDetailsList, collectionName,
-                                       profile, companyId, fromBatch, fromPublicPage );
-                                
+                                surveyDetailsList = fillSurveyDetailsFromReviewMap( surveyDetailsList, collectionName, profile,
+                                    companyId, fromBatch, fromPublicPage );
+
                             }
                         }
-                    
+
                     } else {
                         LOG.debug( "Old zillow url. Modify and get the proper screen name. But for now bypass and do nothing" );
                         // TODO: Convert to proper format from the old url format
@@ -4592,13 +4607,15 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         return surveyDetailsList;
     }
-    
+
+
     @Override
     @SuppressWarnings ( "unchecked")
-    public List<SurveyDetails> buildSurveyDetailFromZillowLenderReviewMap(Map<String, Object> map){
-        
+    public List<SurveyDetails> buildSurveyDetailFromZillowLenderReviewMap( Map<String, Object> map )
+    {
+
         List<SurveyDetails> surveyDetailsList = new ArrayList<SurveyDetails>();
-        
+
         List<HashMap<String, Object>> reviews = new ArrayList<HashMap<String, Object>>();
 
         reviews = (List<HashMap<String, Object>>) map.get( "reviews" );
@@ -4607,41 +4624,42 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 HashMap<String, Object> companyReviewee = (HashMap<String, Object>) review.get( "companyReviewee" );
                 HashMap<String, Object> individualReviewee = (HashMap<String, Object>) review.get( "individualReviewee" );
                 HashMap<String, Object> reviewerName = (HashMap<String, Object>) review.get( "reviewerName" );
-                HashMap<String, Object> reviewerNameIndividual =  (HashMap<String, Object>) reviewerName.get( "individualName" );
+                HashMap<String, Object> reviewerNameIndividual = (HashMap<String, Object>) reviewerName.get( "individualName" );
                 String customerFirstName = null;
-                if( reviewerNameIndividual != null &&  !reviewerNameIndividual.isEmpty()){
-                    customerFirstName = reviewerNameIndividual.get( "firstName" ) + " " + reviewerNameIndividual.get( "lastName" );
-                }else{
+                if ( reviewerNameIndividual != null && !reviewerNameIndividual.isEmpty() ) {
+                    customerFirstName = reviewerNameIndividual.get( "firstName" ) + " "
+                        + reviewerNameIndividual.get( "lastName" );
+                } else {
                     customerFirstName = (String) reviewerName.get( "screenName" );
                 }
-                
-                
+
+
                 String profileName = null;
                 String zillowProfileUrl = CommonConstants.ZILLOW_PROFILE_URL;
-                if(individualReviewee != null){
-                    profileName = (String) individualReviewee.get("screenName");
+                if ( individualReviewee != null ) {
+                    profileName = (String) individualReviewee.get( "screenName" );
 
                     //SS-1226 : Zillow reviews' social posts are displaying broken link 
                     //empty space replaced by %20 for FaceBook posts
-                    if(profileName != null && profileName.contains( " " )) {
+                    if ( profileName != null && profileName.contains( " " ) ) {
                         profileName = profileName.replace( " ", "%20" );
                     }
-                    
-                    zillowProfileUrl  += profileName;
+
+                    zillowProfileUrl += profileName;
                 }
-                
-                
+
+
                 String sourceId = (String) review.get( "reviewId" );
                 String reviewDescription = (String) review.get( "content" );
                 String summary = (String) review.get( "title" );
                 String createdDateStr = (String) review.get( "created" );
                 String dateOfServiceStr = (String) review.get( "dateOfService" );
                 String completeProfileUrl = (String) review.get( "reviewerLink" );
-                Double score =  ((Integer) review.get( "rating" )).doubleValue() ;
+                Double score = ( (Integer) review.get( "rating" ) ).doubleValue();
                 boolean isAbusive = false;
                 Date createdDate = convertStringToDateForZillowLenders( createdDateStr );
                 Date dateOfService = convertStringToDateForZillowLenders( dateOfServiceStr );
-                
+
                 SurveyDetails surveyDetails = new SurveyDetails();
                 surveyDetails.setCompleteProfileUrl( completeProfileUrl );
                 surveyDetails.setCustomerFirstName( customerFirstName );
@@ -4652,7 +4670,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 surveyDetails.setSource( CommonConstants.SURVEY_SOURCE_ZILLOW );
                 surveyDetails.setSourceId( zillowProfileUrl );
                 surveyDetails.setCompleteProfileUrl( zillowProfileUrl );
-                surveyDetails.setModifiedOn( createdDate );
+                //ModifiedOn set to current date
+                Date currentDate = new Date(System.currentTimeMillis());
+                surveyDetails.setModifiedOn( currentDate );
                 surveyDetails.setCreatedOn( createdDate );
                 surveyDetails.setAgreedToShare( "true" );
                 surveyDetails.setAbusive( isAbusive );
@@ -4661,31 +4681,31 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 surveyDetails.setSurveyCompletedDate( createdDate );
                 surveyDetails.setSurveyUpdatedDate( createdDate );
                 surveyDetails.setSurveyTransactionDate( dateOfService );
-                
+
                 // saving zillow review summary
                 surveyDetails.setSummary( summary );
-                
+
                 surveyDetailsList.add( surveyDetails );
             }
         }
-        
+
         return surveyDetailsList;
     }
-    
-    
+
+
     @Override
     @SuppressWarnings ( "unchecked")
-    public List<SurveyDetails> buildSurveyDetailFromZillowAgentReviewMap(Map<String, Object> map)
+    public List<SurveyDetails> buildSurveyDetailFromZillowAgentReviewMap( Map<String, Object> map )
     {
-        
+
         Map<String, Object> responseMap = new HashMap<String, Object>();
         Map<String, Object> resultMap = new HashMap<String, Object>();
         Map<String, Object> proReviews = new HashMap<String, Object>();
         Map<String, Object> proInfoMap = new HashMap<String, Object>();
         List<HashMap<String, Object>> reviews = new ArrayList<HashMap<String, Object>>();
-       
+
         List<SurveyDetails> surveyDetailsList = new ArrayList<SurveyDetails>();
-        
+
         String profileLink = null;
         responseMap = (HashMap<String, Object>) map.get( "response" );
         if ( responseMap != null ) {
@@ -4706,9 +4726,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                             String createdDate = (String) review.get( "reviewDate" );
                             String reviewerProfileUrl = (String) review.get( "reviewerLink" );
                             String customerFirstName = (String) review.get( "reviewer" );
-                            Double score = Double.valueOf( review.get( "rating" ).toString().length() > 0 ? (String) review.get( "rating" ) : "0" );
+                            Double score = Double.valueOf(
+                                review.get( "rating" ).toString().length() > 0 ? (String) review.get( "rating" ) : "0" );
                             boolean isAbusive = false;
-                            
+
                             SurveyDetails surveyDetails = new SurveyDetails();
                             surveyDetails.setCompleteProfileUrl( profileLink );
                             surveyDetails.setCustomerFirstName( customerFirstName );
@@ -4718,7 +4739,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                             surveyDetails.setScore( score );
                             surveyDetails.setSource( CommonConstants.SURVEY_SOURCE_ZILLOW );
                             surveyDetails.setSourceId( sourceId );
-                            surveyDetails.setModifiedOn( convertStringToDate( createdDate ) );
+                            //ModifiedOn set to current date
+                            Date currentDate = new Date(System.currentTimeMillis());
+                            surveyDetails.setModifiedOn( currentDate );
                             surveyDetails.setCreatedOn( convertStringToDate( createdDate ) );
                             surveyDetails.setAgreedToShare( "true" );
                             surveyDetails.setAbusive( isAbusive );
@@ -4730,26 +4753,28 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
                             // saving zillow review summary
                             surveyDetails.setSummary( summary );
-                            
+
                             surveyDetailsList.add( surveyDetails );
                         }
                     }
-                }  
-            } 
-        }   
-                    
-        
+                }
+            }
+        }
+
+
         return surveyDetailsList;
     }
-    
+
+
     /**
      * 
      * @param map
      */
     @Override
     @SuppressWarnings ( "unchecked")
-    public void modifyZillowCallCount(Map<String, Object> map){
-        
+    public void modifyZillowCallCount( Map<String, Object> map )
+    {
+
         Map<String, Object> messageMap = new HashMap<String, Object>();
         messageMap = (HashMap<String, Object>) map.get( "message" );
         String code = (String) messageMap.get( "code" );
@@ -4762,8 +4787,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     emailServices.sendZillowCallExceededMailToAdmin( count );
                     surveyDetailsDao.resetZillowCallCount();
                 } catch ( InvalidInputException e ) {
-                    LOG.error( "Sending the mail to the admin failed due to invalid input. Reason : ",
-                        e );
+                    LOG.error( "Sending the mail to the admin failed due to invalid input. Reason : ", e );
                 } catch ( UndeliveredEmailException e ) {
                     LOG.error( "The email failed to get delivered. Reason : ", e );
                 }
@@ -4777,21 +4801,23 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         }
 
     }
-    
+
+
     /**
      * 
      * @param zillowScreenName
      * @param responseString
      * @throws InvalidInputException
      */
-    private void saveExternalAPICallDetailForZillowAgent(String zillowScreenName , String responseString) throws InvalidInputException{
-        
+    private void saveExternalAPICallDetailForZillowAgent( String zillowScreenName, String responseString )
+        throws InvalidInputException
+    {
+
         ExternalAPICallDetails zillowAPICallDetails = new ExternalAPICallDetails();
         zillowAPICallDetails.setHttpMethod( CommonConstants.HTTP_METHOD_GET );
-        zillowAPICallDetails.setRequest( zillowAgentApiEndpoint + CommonConstants.ZILLOW_CALL_REQUEST + "&zws-id="
-            + zwsId + "&screenname=" + zillowScreenName );
+        zillowAPICallDetails.setRequest( zillowAgentApiEndpoint + CommonConstants.ZILLOW_CALL_REQUEST + "&zws-id=" + zwsId
+            + "&screenname=" + zillowScreenName );
 
-        
 
         zillowAPICallDetails.setResponse( responseString );
         zillowAPICallDetails.setRequestTime( new Date( System.currentTimeMillis() ) );
@@ -4799,26 +4825,30 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         //Store this record in mongo
         externalApiCallDetailsDao.insertApiCallDetails( zillowAPICallDetails );
     }
-    
+
+
     /**
     * 
     * @param zillowScreenName
     * @param responseString
     * @throws InvalidInputException
     */
-   private void saveExternalAPICallDetailForZillowLender(String requestBody , String responseString) throws InvalidInputException{
-       
-       ExternalAPICallDetails zillowAPICallDetails = new ExternalAPICallDetails();
-       zillowAPICallDetails.setHttpMethod( CommonConstants.HTTP_METHOD_POST );
-       zillowAPICallDetails.setRequest( zillowLenderApiEndpoint + "/getPublishedLenderReviews" );
-       zillowAPICallDetails.setRequestBody( requestBody );
-       
-       zillowAPICallDetails.setResponse( responseString );
-       zillowAPICallDetails.setRequestTime( new Date( System.currentTimeMillis() ) );
-       zillowAPICallDetails.setSource( CommonConstants.ZILLOW_SOCIAL_SITE );
-       //Store this record in mongo
-       externalApiCallDetailsDao.insertApiCallDetails( zillowAPICallDetails );
-   }
+    private void saveExternalAPICallDetailForZillowLender( String requestBody, String responseString )
+        throws InvalidInputException
+    {
+
+        ExternalAPICallDetails zillowAPICallDetails = new ExternalAPICallDetails();
+        zillowAPICallDetails.setHttpMethod( CommonConstants.HTTP_METHOD_POST );
+        zillowAPICallDetails.setRequest( zillowLenderApiEndpoint + "/getPublishedLenderReviews" );
+        zillowAPICallDetails.setRequestBody( requestBody );
+
+        zillowAPICallDetails.setResponse( responseString );
+        zillowAPICallDetails.setRequestTime( new Date( System.currentTimeMillis() ) );
+        zillowAPICallDetails.setSource( CommonConstants.ZILLOW_SOCIAL_SITE );
+        //Store this record in mongo
+        externalApiCallDetailsDao.insertApiCallDetails( zillowAPICallDetails );
+    }
+
 
     @Override
     public Date convertStringToDate( String dateString )
@@ -4833,8 +4863,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         }
         return date;
     }
-    
-    
+
+
     public Date convertStringToDateForZillowLenders( String dateString )
     {
 
@@ -4847,8 +4877,6 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         }
         return date;
     }
-    
-    
 
 
     @Override
@@ -5176,21 +5204,21 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         // LOG.debug( "Deleting existing reviews for profile type : " + idenColumnName + " and profile id : " + profile.getIden() );
         // surveyHandler.deleteExistingZillowSurveysByEntity( idenColumnName, profile.getIden() );
         // LOG.debug( "Deleted existing reviews for profile type : " + idenColumnName + " and profile id : " + profile.getIden() );
-        for (int i = 0; i < surveyDetailsList.size(); i++) {
+        for ( int i = 0; i < surveyDetailsList.size(); i++ ) {
             SurveyDetails surveyDetails = surveyDetailsList.get( i );
-            
+
             //            TODO -  need to remove this after fixing zillow issue
             //queries.put( CommonConstants.SURVEY_SOURCE_ID_COLUMN, sourceId );
             queries.put( CommonConstants.REVIEW_COLUMN, surveyDetails.getReview() );
-            
+
             if ( fromBatch ) {
                 utils.checkReviewForSwearWords( surveyDetails.getReview(), surveyHandler.getSwearList() );
             }
-            
-            LOG.info( "checking if survey already exist in database with review : " + surveyDetails.getReview());
+
+            LOG.info( "checking if survey already exist in database with review : " + surveyDetails.getReview() );
             SurveyDetails existingSurveyDetails = surveyDetailsDao.getZillowReviewByQueryMap( queries );
             if ( existingSurveyDetails == null ) {
-                LOG.info( "no survey found in database for current review");
+                LOG.info( "no survey found in database for current review" );
                 if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) ) {
                     surveyDetails.setCompanyId( profile.getIden() );
                 } else if ( collectionName
@@ -5226,9 +5254,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     }
                     surveyDetails.setCompanyId( companyId );
                 }
-                
-               
-                LOG.info( "saving survey to database");
+
+
+                LOG.info( "saving survey to database" );
                 surveyHandler.insertSurveyDetails( surveyDetails );
                 //update surveydetail in list
                 surveyDetailsList.set( i, surveyDetails );
@@ -5238,16 +5266,16 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 //    zillowReviewScoreTotal = surveyDetails.getScore();
                 // else
                 //    zillowReviewScoreTotal += surveyDetails.getScore();
-                
-                
-                
-            } else if ( ( existingSurveyDetails.getSummary() == null || existingSurveyDetails.getSummary().trim().length() == 0 )
+
+
+            } else if ( ( existingSurveyDetails.getSummary() == null
+                || existingSurveyDetails.getSummary().trim().length() == 0 )
                 && ( surveyDetails.getSummary() != null && surveyDetails.getSummary().length() > 0 ) ) {
-                LOG.info( "Existing survey found in database for current review");
+                LOG.info( "Existing survey found in database for current review" );
                 existingSurveyDetails.setSummary( surveyDetails.getSummary() );
                 existingSurveyDetails.setReview( surveyDetails.getReview() );
                 surveyHandler.updateZillowSummaryInExistingSurveyDetails( existingSurveyDetails );
-                
+
                 existingSurveyDetails.setSourceId( surveyDetails.getSourceId() );
                 surveyHandler.updateZillowSourceIdInExistingSurveyDetails( existingSurveyDetails );
                 //update surveydetail in list
@@ -5255,18 +5283,18 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 latestSurveyIdList.add( existingSurveyDetails.get_id() );
             } else if ( existingSurveyDetails.getSourceId() == null || existingSurveyDetails.getSourceId().isEmpty() ) {
 
-            }else if(existingSurveyDetails.getSurveyUpdatedDate() == null){
+            } else if ( existingSurveyDetails.getSurveyUpdatedDate() == null ) {
                 existingSurveyDetails.setSurveyUpdatedDate( existingSurveyDetails.getSurveyCompletedDate() );
                 surveyHandler.updateZillowSurveyUpdatedDateInExistingSurveyDetails( existingSurveyDetails );
             }
-            
+
             //SS-1214: handling Column 'ZILLOW_SURVEY_ID' cannot be null for the Table: ZILLOW_TEMP_POST
             //if survey is new, surveyDetails.get_id() will not be null, coz, a new data entry happened to SURVEY_DETAILS Mongo Collection
-            if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION )
-                && fromBatch && surveyDetails != null && surveyDetails.get_id() != null ) {
-                LOG.info("Saving review in temp table");
-                postToTempTable( collectionName, profile, surveyDetails );                
-            }                    
+            if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) && fromBatch
+                && surveyDetails != null && surveyDetails.get_id() != null ) {
+                LOG.info( "Saving review in temp table" );
+                postToTempTable( collectionName, profile, surveyDetails );
+            }
         }
         if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
             long reviewCount = getReviewsCount( profile.getIden(), -1, -1, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false,
@@ -5300,7 +5328,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
      * @param surveyDetails
      * @throws InvalidInputException
      */
-    void pushToZillowPostTemp( OrganizationUnitSettings profile, String collectionName, SurveyDetails surveyDetails ) throws InvalidInputException
+    void pushToZillowPostTemp( OrganizationUnitSettings profile, String collectionName, SurveyDetails surveyDetails )
+        throws InvalidInputException
     {
         if ( profile == null ) {
             throw new InvalidInputException( "Profile passed as argument in pushToZillowPostTemp cannot be null" );
@@ -5314,7 +5343,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( surveyDetails == null ) {
             throw new InvalidInputException( "Survey Details passed as argument in pushToZillowPostTemp cannot be null" );
         }
-        
+
 
         LOG.info( "Method called to push fetched Zillow Review into temp table,pushToZillowPostTemp started" );
         String columnName = null;
@@ -5570,8 +5599,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Override
     public String processSortCriteria( long companyId, String sortCriteria )
     {
-        if ( sortCriteria == null ) return CommonConstants.REVIEWS_SORT_CRITERIA_DATE;
-        switch ( sortCriteria ) {      
+        if ( sortCriteria == null )
+            return CommonConstants.REVIEWS_SORT_CRITERIA_DATE;
+        switch ( sortCriteria ) {
             case CommonConstants.REVIEWS_SORT_CRITERIA_DEFAULT: {
                 String sortSettings = null;
                 if ( companyId > 0 ) {
@@ -5583,16 +5613,56 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 }
                 if ( sortSettings != "default" ) {
                     return processSortCriteria( companyId, sortSettings );
-                }
-                else {
+                } else {
                     return CommonConstants.REVIEWS_SORT_CRITERIA_DATE;
                 }
             }
             case CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE:
-                
-            case CommonConstants.REVIEWS_SORT_CRITERIA_DATE: return sortCriteria;
-                
-            default: return CommonConstants.REVIEWS_SORT_CRITERIA_DATE;
+
+            case CommonConstants.REVIEWS_SORT_CRITERIA_DATE:
+                return sortCriteria;
+
+            default:
+                return CommonConstants.REVIEWS_SORT_CRITERIA_DATE;
         }
+    }
+
+
+    @Override
+    @SuppressWarnings ( "unchecked")
+    //method to return nmls_id
+    public Integer fetchAndSaveNmlsId( OrganizationUnitSettings profile, String collectionName, long companyId,
+        boolean fromBatch, boolean fromPublicPage ) throws InvalidInputException, UnavailableException
+    {
+        Integer nmlsId = null;
+        if ( profile == null )
+            throw new InvalidInputException( "Profile setting passed cannot be null" );
+        if ( collectionName == null || collectionName.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed cannot be null or empty" );
+        }
+        LOG.info( "Method to Fetch social feed for " + collectionName + " with iden: " + profile.getIden() + " started" );
+        List<SurveyDetails> surveyDetailsList = new ArrayList<SurveyDetails>();
+        if ( profile != null && profile.getSocialMediaTokens() != null ) {
+
+            SocialMediaTokens token = profile.getSocialMediaTokens();
+            if ( token != null ) {
+                if ( token.getZillowToken() != null ) {
+                    LOG.info( "Starting to fetch the feed." );
+
+                    ZillowToken zillowToken = token.getZillowToken();
+                    LenderRef zillowLenderRef = zillowToken.getLenderRef();
+
+                    // if nmls found, return it 
+                    if ( zillowLenderRef != null && zillowLenderRef.getNmlsId() != null ) {
+                        LOG.info( "NmlsId found for enity. So getting records from lender API using NmlsId id : "
+                            + zillowLenderRef.getNmlsId() );
+                        nmlsId = zillowLenderRef.getNmlsId();
+
+                    }
+                }
+            }
+        }
+        LOG.info( "NMLS id : " + nmlsId );
+        return nmlsId;
     }
 }

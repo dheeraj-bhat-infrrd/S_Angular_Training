@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.workbook.utils;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -8,6 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -43,6 +45,7 @@ import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionsMapping;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
+import com.realtech.socialsurvey.core.entities.SurveyResultsCompanyReport;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -65,6 +68,8 @@ public class WorkbookData
     public static final String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
     public static final String EXCEL_FILE_EXTENSION = ".xlsx";
     public static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat( CommonConstants.DATE_FORMAT );
+    public static final SimpleDateFormat REPORTING_DATE_FORMATTER = new SimpleDateFormat( CommonConstants.REPORTING_API_DATE_FORMAT );
+
 
     @Autowired
     private OrganizationManagementService organizationManagementService;
@@ -659,4 +664,519 @@ public class WorkbookData
         data.put( 1, companyDetailsToPopulate );
         return data;
     }
+    
+    public Map<Integer, List<Object>> getSurveyStatsReportToBeWrittenInSheet( List<List<String>> surveyStats )
+    {
+     // This data needs to be written (List<Object>)
+        Map<Integer, List<Object>> surveyStatsData = new TreeMap<>();
+        
+        Integer surveyStatsCounter = 1;
+        
+        List<Object> surveyStatsReportToPopulate = new ArrayList<>();
+        
+        for(List<String> row : surveyStats ){
+            surveyStatsReportToPopulate.add(String.valueOf( row.get( 0 ) ));
+            surveyStatsReportToPopulate.add(String.valueOf( row.get( 1 ) ));
+            surveyStatsReportToPopulate.add(String.valueOf( row.get( 2 ) ));
+            surveyStatsReportToPopulate.add(String.valueOf( row.get( 3 ) ));
+            surveyStatsReportToPopulate.add(Integer.valueOf( row.get( 4 ) ));
+            surveyStatsReportToPopulate.add(Integer.valueOf( row.get( 5 ) ));
+            surveyStatsReportToPopulate.add(Integer.valueOf( row.get( 6 ) ));
+            surveyStatsReportToPopulate.add(Integer.valueOf( row.get( 7 ) ));
+            surveyStatsReportToPopulate.add(Integer.valueOf( row.get( 8 ) ));
+            surveyStatsReportToPopulate.add(Integer.valueOf( row.get( 9 ) ));
+            surveyStatsReportToPopulate.add(Integer.valueOf( row.get( 10 ) ));
+            surveyStatsReportToPopulate.add(Integer.valueOf( row.get( 11 ) ));
+            surveyStatsReportToPopulate.add(Integer.valueOf( row.get( 12 ) ));
+            surveyStatsReportToPopulate.add(Integer.valueOf( row.get( 13 ) ));
+            surveyStatsReportToPopulate.add(Integer.valueOf( row.get( 14 ) ));
+            surveyStatsReportToPopulate.add(Integer.valueOf( row.get( 15 ) ));
+            surveyStatsReportToPopulate.add(Double.valueOf( row.get( 16 ) ));
+            surveyStatsReportToPopulate.add(Integer.valueOf( row.get( 17 ) ));
+            surveyStatsData.put(++surveyStatsCounter ,surveyStatsReportToPopulate );
+            surveyStatsReportToPopulate = new ArrayList<>();
+            
+        }
+        // Setting up user sheet headers
+        surveyStatsReportToPopulate.add( "ID" );
+        surveyStatsReportToPopulate.add( "COMPANY" );
+        surveyStatsReportToPopulate.add( "BRANCH" );
+        surveyStatsReportToPopulate.add( "MONTH" );
+        surveyStatsReportToPopulate.add( "TRX_RCVD" );
+        surveyStatsReportToPopulate.add( "PENDING" );
+        surveyStatsReportToPopulate.add( "DUPLICATES" );
+        surveyStatsReportToPopulate.add( "CORRUPTED" );
+        surveyStatsReportToPopulate.add( "ABUSIVE" );
+        surveyStatsReportToPopulate.add( "OLD RECORDS" );
+        surveyStatsReportToPopulate.add( "IGNORED" );
+        surveyStatsReportToPopulate.add( "MISMATCHED" );
+        surveyStatsReportToPopulate.add( "SURVEYS SENT" );
+        surveyStatsReportToPopulate.add( "SURVEYS CLICKED" );
+        surveyStatsReportToPopulate.add( "SURVEYS COMPLETED" );
+        surveyStatsReportToPopulate.add( "SURVEYS PARTIALLY COMPLETED" );
+        surveyStatsReportToPopulate.add( "COMPLETE PERCENTAGE" );
+        surveyStatsReportToPopulate.add( "DELTA" );
+        surveyStatsData.put( 1, surveyStatsReportToPopulate );
+        
+        return surveyStatsData;
+        
+    }
+    
+    public Map<Integer, List<Object>> getUserAdoptionReportToBeWrittenInSheet( List<List<String>> userAdoption )
+    {
+     // This data needs to be written (List<Object>)
+        Map<Integer, List<Object>>  userAdoptionData = new TreeMap<>();
+        
+        Integer userAdoptionCounter = 1;
+        
+        List<Object> userAdoptionReportToPopulate = new ArrayList<>();
+        
+        for(List<String> row : userAdoption ){
+            userAdoptionReportToPopulate.add(String.valueOf( row.get( 0 ) ));
+            userAdoptionReportToPopulate.add(String.valueOf( row.get( 1 ) ));
+            userAdoptionReportToPopulate.add(String.valueOf( row.get( 2 ) ));
+            userAdoptionReportToPopulate.add(Integer.valueOf( row.get( 3 ) ));
+            userAdoptionReportToPopulate.add(Integer.valueOf( row.get( 4 ) ));
+            userAdoptionReportToPopulate.add(Double.valueOf( row.get( 5 ) ));
+            userAdoptionData.put(++userAdoptionCounter ,userAdoptionReportToPopulate );
+            userAdoptionReportToPopulate = new ArrayList<>();
+            
+        }
+        // Setting up user sheet headers
+        userAdoptionReportToPopulate.add( "Company" );
+        userAdoptionReportToPopulate.add( "Region" );
+        userAdoptionReportToPopulate.add( "Branch" );
+        userAdoptionReportToPopulate.add( "Invited Users" );
+        userAdoptionReportToPopulate.add( "Verified Users" );
+        userAdoptionReportToPopulate.add( "Verified Percentage" );
+        userAdoptionData.put( 1, userAdoptionReportToPopulate );
+        
+        return userAdoptionData;
+        
+    }
+    
+    public Map<Integer, List<Object>> getSurveyResultsCompanyReportToBeWrittenInSheet( Map<String, SurveyResultsCompanyReport> surveyResultsCompanyReport , int maxQuestions , int surveyDataCounter) throws ParseException
+    {
+        Map<Integer, List<Object>>  surveyResultsCompanyData = new TreeMap<>();
+        
+        Integer surveyResultCompanyCounter = surveyDataCounter;
+        SimpleDateFormat date = new SimpleDateFormat( "yyyy-MM-dd hh:mm:ss.S" );
+        
+        List<Object> surveyResultsCompanyReportToPopulate = new ArrayList<>();
+        for(Entry<String, SurveyResultsCompanyReport> row : surveyResultsCompanyReport.entrySet() ){
+                surveyResultsCompanyReportToPopulate.add(row.getValue().getUserFirstName());
+                surveyResultsCompanyReportToPopulate.add(row.getValue().getUserLastName());
+                surveyResultsCompanyReportToPopulate.add(row.getValue().getCustomerFirstName());
+                surveyResultsCompanyReportToPopulate.add(row.getValue().getCustomerLastName());
+                String sentDate = "";
+                if (row.getValue().getSurveySentDate()!=null){
+                    sentDate = row.getValue().getSurveySentDate().toString();
+                    surveyResultsCompanyReportToPopulate.add(date.parse( sentDate ));
+                }else{
+                    surveyResultsCompanyReportToPopulate.add(sentDate);
+                }
+
+                String completedDate = "";
+                if (row.getValue().getSurveyCompletedDate()!=null){
+                    completedDate = row.getValue().getSurveyCompletedDate().toString();
+                    surveyResultsCompanyReportToPopulate.add(date.parse( completedDate ));
+                }else{
+                    surveyResultsCompanyReportToPopulate.add(completedDate);
+                }
+
+                    
+                    
+                surveyResultsCompanyReportToPopulate.add(row.getValue().getTimeInterval());
+                surveyResultsCompanyReportToPopulate.add(row.getValue().getSurveySource());
+                String surveySourceId = row.getValue().getSurveySourceId();
+                if(!surveySourceId.equals(null) && surveySourceId != null && !surveySourceId.equals("null")){
+                    surveyResultsCompanyReportToPopulate.add(surveySourceId);
+                }else{
+                    surveyResultsCompanyReportToPopulate.add(""); 
+                }
+                surveyResultsCompanyReportToPopulate.add(row.getValue().getSurveyScore());       
+                int responseNumber = row.getValue().getSurveyResponseList().size();       
+                //where the answer is null
+                if(responseNumber > 0){
+                    int iterateAns = 0;
+                    while ( iterateAns < responseNumber) {
+                        String answer = row.getValue().getSurveyResponseList().get(iterateAns++).getAnswer();
+                        if(!answer.equals(null) && answer != null && !answer.equals("null")){
+                            surveyResultsCompanyReportToPopulate.add(answer);
+                        }else{
+                            surveyResultsCompanyReportToPopulate.add(""); 
+                        }
+                    }
+                        
+                }
+                //where the responses is lesser then the max Questions 
+                if(responseNumber < maxQuestions){
+                    int questionDiff = maxQuestions - responseNumber ;
+                    for(int questionDiffLoop=0;questionDiffLoop < questionDiff;questionDiffLoop++){
+                        surveyResultsCompanyReportToPopulate.add("");
+                    }
+                }
+                surveyResultsCompanyReportToPopulate.add(row.getValue().getGateway());
+                surveyResultsCompanyReportToPopulate.add(row.getValue().getCustomerComments());
+                surveyResultsCompanyReportToPopulate.add(row.getValue().getAgreedToShare());
+                surveyResultsCompanyReportToPopulate.add(row.getValue().getBranchName());
+                surveyResultsCompanyReportToPopulate.add(row.getValue().getClickTroughForCompany());
+                surveyResultsCompanyReportToPopulate.add(row.getValue().getClickTroughForAgent());
+                surveyResultsCompanyReportToPopulate.add(row.getValue().getClickTroughForRegion());
+                surveyResultsCompanyReportToPopulate.add(row.getValue().getClickTroughForBranch());
+                
+                surveyResultsCompanyData.put(++surveyResultCompanyCounter ,surveyResultsCompanyReportToPopulate );
+                surveyResultsCompanyReportToPopulate = new ArrayList<>();
+            }         
+        return surveyResultsCompanyData;
+        
+    }
+    
+    public Map<Integer, List<Object>> writeSurveyResultsCompanyReportHeader( int maxQuestions )
+    {
+        Map<Integer, List<Object>>  surveyResultsCompanyData = new TreeMap<>();
+        List<Object> surveyResultsCompanyReportToPopulate = new ArrayList<>();    
+        // Setting up user sheet headers
+        surveyResultsCompanyReportToPopulate.add( "User First Name" );
+        surveyResultsCompanyReportToPopulate.add( "User Last Name" );
+        surveyResultsCompanyReportToPopulate.add( "Customer First Name" );
+        surveyResultsCompanyReportToPopulate.add( "Customer Last Name" );
+        surveyResultsCompanyReportToPopulate.add( "Survey Sent Date" );
+        surveyResultsCompanyReportToPopulate.add( "Survey Completed Date" );
+        surveyResultsCompanyReportToPopulate.add( "Time Interval" );
+        surveyResultsCompanyReportToPopulate.add( "Survey Source" );
+        surveyResultsCompanyReportToPopulate.add( "Survey Source ID" );
+        surveyResultsCompanyReportToPopulate.add( "Survey Score" );
+        for(int surveyQuestions=0; surveyQuestions<maxQuestions; surveyQuestions++){
+            surveyResultsCompanyReportToPopulate.add( "Q"+(surveyQuestions+1));
+        }
+        if(maxQuestions == 0){
+            surveyResultsCompanyReportToPopulate.add("Q1");
+        }
+        surveyResultsCompanyReportToPopulate.add( "Gateway");
+        surveyResultsCompanyReportToPopulate.add( "Customer Comments");
+        surveyResultsCompanyReportToPopulate.add( "Agreed To Share");
+        surveyResultsCompanyReportToPopulate.add( "Branch");
+        surveyResultsCompanyReportToPopulate.add( "Click Through for Company");
+        surveyResultsCompanyReportToPopulate.add( "Click Through for Agent");
+        surveyResultsCompanyReportToPopulate.add( "Click Through for Region");
+        surveyResultsCompanyReportToPopulate.add( "Click Through for Branch");
+        surveyResultsCompanyData.put( 1, surveyResultsCompanyReportToPopulate );
+        
+        return surveyResultsCompanyData;
+        
+    }
+    
+    @SuppressWarnings ( "deprecation")
+    public Map<Integer, List<Object>> getCompanyUserReportToBeWrittenInSheet( List<List<String>> companyUser )
+    {
+     // This data needs to be written (List<Object>)
+        Map<Integer, List<Object>>  companyUserData = new TreeMap<>();
+        
+        Integer companyUserCounter = 2;
+        
+        List<Object> surveyTransactionReportToPopulate = new ArrayList<>();
+        
+        for(List<String> row : companyUser ){
+            try{
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 0 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 1 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 2 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 3 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 4 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 5 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 6 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 7 ) ));
+                if(!row.get(8).isEmpty()){
+                    surveyTransactionReportToPopulate.add(REPORTING_DATE_FORMATTER.parse(row.get( 8 ) ));
+                }
+                else{
+                    surveyTransactionReportToPopulate.add("");
+                }
+                
+                if(!row.get(9).isEmpty()){
+                    surveyTransactionReportToPopulate.add(REPORTING_DATE_FORMATTER.parse(row.get( 9 ) ));
+                }
+                else{
+                    surveyTransactionReportToPopulate.add("");
+                }
+                
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 10 ) ));
+                if(!row.get(11).isEmpty()){
+                    surveyTransactionReportToPopulate.add(REPORTING_DATE_FORMATTER.parse(row.get( 11 ) ));
+                }
+                else{
+                    surveyTransactionReportToPopulate.add("");
+                }           
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 12 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 13 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 14 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 15 ) ));
+                if(!row.get(16).isEmpty()){
+                    surveyTransactionReportToPopulate.add(REPORTING_DATE_FORMATTER.parse(row.get( 16 ) ));
+                }
+                else{
+                    surveyTransactionReportToPopulate.add("");
+                }
+             
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 17 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 18 ) ));
+                if(!row.get(19).isEmpty()){
+                    surveyTransactionReportToPopulate.add(REPORTING_DATE_FORMATTER.parse(row.get( 19 ) ));
+                }
+                else{
+                    surveyTransactionReportToPopulate.add("");
+                }
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 20 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 21 ) ));
+                if(!row.get(22).isEmpty()){
+                    surveyTransactionReportToPopulate.add(REPORTING_DATE_FORMATTER.parse(row.get( 22 ) ));
+                }
+                else{
+                    surveyTransactionReportToPopulate.add("");
+                }
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 23 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 24 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 25 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 26 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 27 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 28 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 29 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 30 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 31 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 32 ) ));
+                surveyTransactionReportToPopulate.add(String.valueOf( row.get( 33 ) ));
+                surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 34 ) ));
+                surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 35 ) ));
+                surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 36 ) ));
+                surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 37 ) ));
+                surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 38 ) ));
+
+
+                companyUserData.put(++companyUserCounter ,surveyTransactionReportToPopulate );
+                surveyTransactionReportToPopulate = new ArrayList<>();
+            }catch ( ParseException e ) {
+               LOG.error( "Parse exception caught in getCompanyUserReportToBeWrittenInSheet {} ",e.getMessage() );
+            }
+            
+        }
+        // Setting up user sheet headers
+        surveyTransactionReportToPopulate.add("First Name");
+        surveyTransactionReportToPopulate.add("Last Name");
+        surveyTransactionReportToPopulate.add("Email");
+        surveyTransactionReportToPopulate.add("SocialSurvey Access Level");
+        surveyTransactionReportToPopulate.add("Office Assignment(s)");
+        surveyTransactionReportToPopulate.add("Region Assignment(s)");
+        surveyTransactionReportToPopulate.add("Office Admin Privilege(s)");
+        surveyTransactionReportToPopulate.add("Region Admin Privilege");
+        surveyTransactionReportToPopulate.add("SocialSurvey Invite sent");
+        surveyTransactionReportToPopulate.add("Date last invite sent");
+        surveyTransactionReportToPopulate.add("Profile Verified");
+        surveyTransactionReportToPopulate.add("Date of last log-in");
+        surveyTransactionReportToPopulate.add("Profile Complete");
+        surveyTransactionReportToPopulate.add("Socially Connected");
+        surveyTransactionReportToPopulate.add("Facebook");
+        surveyTransactionReportToPopulate.add("");
+        surveyTransactionReportToPopulate.add("");
+        surveyTransactionReportToPopulate.add("Twitter");
+        surveyTransactionReportToPopulate.add("");
+        surveyTransactionReportToPopulate.add("");
+        surveyTransactionReportToPopulate.add("Linkedin");
+        surveyTransactionReportToPopulate.add("");
+        surveyTransactionReportToPopulate.add("");
+        surveyTransactionReportToPopulate.add("Google");
+        surveyTransactionReportToPopulate.add("Zillow");
+        surveyTransactionReportToPopulate.add("Yelp");
+        surveyTransactionReportToPopulate.add("Realtor");
+        surveyTransactionReportToPopulate.add("Google Business");
+        surveyTransactionReportToPopulate.add("Lendingtree");
+        surveyTransactionReportToPopulate.add("Date Adoption completed");
+        surveyTransactionReportToPopulate.add("Date last survey sent");
+        surveyTransactionReportToPopulate.add("Date last survey posted");
+        surveyTransactionReportToPopulate.add("User Address");
+        surveyTransactionReportToPopulate.add("SocialSurvey Profile");
+        surveyTransactionReportToPopulate.add("Total Reviews");
+        surveyTransactionReportToPopulate.add("SocialSurvey Reviews");
+        surveyTransactionReportToPopulate.add("Zillow Reviews");
+        surveyTransactionReportToPopulate.add("Abusive Reviews");
+        surveyTransactionReportToPopulate.add("3rd Party Reviews");
+        companyUserData.put( 1, surveyTransactionReportToPopulate );
+        surveyTransactionReportToPopulate = new ArrayList<>();
+        
+        surveyTransactionReportToPopulate.add("");
+        surveyTransactionReportToPopulate.add("");
+        surveyTransactionReportToPopulate.add("");
+        surveyTransactionReportToPopulate.add("");
+        surveyTransactionReportToPopulate.add("");
+        surveyTransactionReportToPopulate.add("");
+        surveyTransactionReportToPopulate.add("");
+        surveyTransactionReportToPopulate.add("");
+        surveyTransactionReportToPopulate.add("");
+        surveyTransactionReportToPopulate.add("");
+        surveyTransactionReportToPopulate.add("(1=Green, 2=Red)");
+        surveyTransactionReportToPopulate.add("");
+        surveyTransactionReportToPopulate.add("(Photo, Company Logo, Title, Location, Industry, Licenses, Disclaimer, About)");
+        surveyTransactionReportToPopulate.add("");
+        surveyTransactionReportToPopulate.add("Date connection established");
+        surveyTransactionReportToPopulate.add("Connection Status");
+        surveyTransactionReportToPopulate.add("Date of last post");
+        surveyTransactionReportToPopulate.add("Date connection established");
+        surveyTransactionReportToPopulate.add("Connection Status");
+        surveyTransactionReportToPopulate.add("Date of last post");
+        surveyTransactionReportToPopulate.add("Date connection established");
+        surveyTransactionReportToPopulate.add("Connection Status");
+        surveyTransactionReportToPopulate.add("Date of last post");
+        surveyTransactionReportToPopulate.add("");
+        surveyTransactionReportToPopulate.add("");
+        surveyTransactionReportToPopulate.add("");
+        surveyTransactionReportToPopulate.add("");
+        surveyTransactionReportToPopulate.add("");
+        surveyTransactionReportToPopulate.add("");
+        surveyTransactionReportToPopulate.add("");
+        surveyTransactionReportToPopulate.add("");
+        surveyTransactionReportToPopulate.add("");
+        surveyTransactionReportToPopulate.add("");
+        surveyTransactionReportToPopulate.add("");
+        surveyTransactionReportToPopulate.add("(SS + Zillow + 3rd Party Reviews)");
+        surveyTransactionReportToPopulate.add("");
+        surveyTransactionReportToPopulate.add("");
+        surveyTransactionReportToPopulate.add("");
+        surveyTransactionReportToPopulate.add("");
+        companyUserData.put( 2, surveyTransactionReportToPopulate );
+        
+        return companyUserData;
+        
+    }
+    
+    public Map<Integer, List<Object>> getSurveyTransactionReportToBeWrittenInSheet( List<List<String>> surveyTransactionReport )
+    {
+     // This data needs to be written (List<Object>)
+        Map<Integer, List<Object>>  surveyTransactionData = new TreeMap<>();
+        
+        Integer surveyTransactionCounter = 1;
+        
+        List<Object> surveyTransactionReportToPopulate = new ArrayList<>();
+                
+        for(List<String> row : surveyTransactionReport ){
+            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 0 ) ));
+            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 1 ) ));
+            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 2 ) ));
+            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 3 ) ));
+            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 4 ) ));
+            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 5 ) ));
+            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 6 ) ));
+            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 7 ) ));
+            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 8 ) ));
+            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 9 ) ));
+            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 10 ) ));
+            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 11 ) ));
+            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 12 ) ));
+            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 13 ) ));
+            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 14 ) ));
+            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 15 ) ));
+            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 16 ) ));
+            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 17 ) ));
+            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 18 ) ));
+            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 19 ) ));
+            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 20 ) ));
+            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 21 ) ));
+            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 22 ) ));
+            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 23 ) ));
+            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 24 ) ));
+            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 25 ) ));
+
+
+            surveyTransactionData.put(++surveyTransactionCounter ,surveyTransactionReportToPopulate );
+            surveyTransactionReportToPopulate = new ArrayList<>();
+            
+        }
+       
+        // Setting up user sheet headers
+        surveyTransactionReportToPopulate.add( "Name" );
+        surveyTransactionReportToPopulate.add( "User ID" );
+        surveyTransactionReportToPopulate.add( "TRX_MONTH" );
+        surveyTransactionReportToPopulate.add( "NMLS" );
+        surveyTransactionReportToPopulate.add( "License ID" );
+        surveyTransactionReportToPopulate.add( "Company Name" );
+        surveyTransactionReportToPopulate.add( "Region Name" );
+        surveyTransactionReportToPopulate.add( "Branch Name" );
+        surveyTransactionReportToPopulate.add( "Total number of reviews [Zillow + Social Survey]" );
+        surveyTransactionReportToPopulate.add( "Total number of Zillow Reviews" );
+        surveyTransactionReportToPopulate.add( "Total number of 3rd party reviews" );
+        surveyTransactionReportToPopulate.add( "Total number of verified customer reviews");
+        surveyTransactionReportToPopulate.add( "Total number of unverified customer reviews");
+        surveyTransactionReportToPopulate.add( "Total number of Social Survey Reviews");
+        surveyTransactionReportToPopulate.add( "Total number of Abusive Reviews");
+        surveyTransactionReportToPopulate.add( "Total number of Retake Reviews");
+        surveyTransactionReportToPopulate.add( "Total number of Retake Completed");
+        surveyTransactionReportToPopulate.add( "Transaction Received by Source");
+        surveyTransactionReportToPopulate.add( "Transaction Sent (0,1,2,7)");
+        surveyTransactionReportToPopulate.add( "Transaction Unprocessable (3,5,8,9,10)" );
+        surveyTransactionReportToPopulate.add( "Transaction Clicked [2,7]" );
+        surveyTransactionReportToPopulate.add( "Transaction Completed [7]" );
+        surveyTransactionReportToPopulate.add( "Transaction Partially Completed" );
+        surveyTransactionReportToPopulate.add( "Transaction Unopened [1]" );
+        surveyTransactionReportToPopulate.add( "Transaction Duplicates [5]" );
+        surveyTransactionReportToPopulate.add( "Transaction Mismatched [3]" );
+        surveyTransactionReportToPopulate.add( "Transaction Unassigned [10]" );
+
+
+        surveyTransactionData.put( 1, surveyTransactionReportToPopulate );
+        
+        return surveyTransactionData;
+        
+    }
+    
+    public Map<Integer, List<Object>> getUserRankingReportToBeWrittenInSheet( List<List<String>> userRankingReport )
+    {
+     // This data needs to be written (List<Object>)
+        Map<Integer, List<Object>>  userRankingData = new TreeMap<>();
+        
+        Integer userRankingCounter = 1;
+        
+        List<Object> userRankingReportToPopulate = new ArrayList<>();
+                
+        for(List<String> row : userRankingReport ){
+            userRankingReportToPopulate.add(String.valueOf( row.get( 0 ) ));
+            userRankingReportToPopulate.add(String.valueOf( row.get( 1 ) ));
+            userRankingReportToPopulate.add(String.valueOf( row.get( 2 ) ));
+            userRankingReportToPopulate.add(Integer.valueOf( row.get( 3 ) ));
+            userRankingReportToPopulate.add(String.valueOf( row.get( 4 ) ));
+            userRankingReportToPopulate.add(String.valueOf( row.get( 5 ) ));
+            userRankingReportToPopulate.add(String.valueOf( row.get( 6 ) ));
+            userRankingReportToPopulate.add(String.valueOf( row.get( 7 ) ));
+            userRankingReportToPopulate.add(Integer.valueOf( row.get( 8 ) ));
+            userRankingReportToPopulate.add(Double.valueOf( row.get( 9 ) ));
+            userRankingReportToPopulate.add(Double.valueOf( row.get( 10 ) ));
+            userRankingReportToPopulate.add(Double.valueOf( row.get( 11 ) ));
+            userRankingReportToPopulate.add(String.valueOf( row.get( 12 ) ));
+           
+            userRankingData.put(++userRankingCounter ,userRankingReportToPopulate );
+            userRankingReportToPopulate = new ArrayList<>();
+            
+        }
+       
+        // Setting up user sheet headers
+        userRankingReportToPopulate.add( "First Name" );
+        userRankingReportToPopulate.add( "Last Name" );
+        userRankingReportToPopulate.add( "Email Address" );
+        userRankingReportToPopulate.add( "User ID " );
+        userRankingReportToPopulate.add( "NMLS " );
+        userRankingReportToPopulate.add( "Company Name" );
+        userRankingReportToPopulate.add( "Region Name" );
+        userRankingReportToPopulate.add( "Branch Name" );
+        userRankingReportToPopulate.add( "Total number of reviews [Zillow + Social Survey]" );
+        userRankingReportToPopulate.add( "Average Score of Reviews [Average of Social Reviews" );
+        userRankingReportToPopulate.add( "Rank Score" );
+        userRankingReportToPopulate.add( "SPS Score");
+        userRankingReportToPopulate.add( "Position in the Company");
+       
+
+        userRankingData.put( 1, userRankingReportToPopulate );
+        
+        return userRankingData;
+        
+    }
+    
+    
 }

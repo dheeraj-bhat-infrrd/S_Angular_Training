@@ -107,8 +107,9 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_VENDASTA_RM_SETTINGS = "vendasta_rm_settings";
     public static final String KEY_REVIEW_SORT_CRITERIA = "reviewSortCriteria";
     public static final String KEY_SEND_EMAIL_THROUGH = "sendEmailThrough";
+    public static final String KEY_RANKING_REQUIREMENTS = "ranking_requirements";
     public static final String KEY_ALLOW_PARTNER_SURVEY = "allowPartnerSurvey";
-
+    public static final String KEY_SEND_MONTHLY_DIGEST_MAIL = "sendMonthlyDigestMail";
 
 
     @Value ( "${CDN_PATH}")
@@ -235,7 +236,9 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
             + " wtih value: " + updatedRecord );
         Query query = new Query();
         query.addCriteria( Criteria.where( "_id" ).is( unitSettings.getId() ) );
-        Update update = new Update().set( keyToUpdate, updatedRecord );
+        Update update = new Update();
+        update.set( keyToUpdate, updatedRecord );
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, System.currentTimeMillis() );
         LOG.debug( "Updating the unit settings" );
         mongoTemplate.updateFirst( query, update, OrganizationUnitSettings.class, collectionName );
         LOG.debug( "Updated the unit setting" );
@@ -846,12 +849,12 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 
 
     @Override
-    public void updateImageForOrganizationUnitSetting( long iden, String fileName, String collectionName, String imageType,
+    public void updateImageForOrganizationUnitSetting( long iden, String imgFileName,  String imgThumbnailFileName, String rectangularThumbnailFileName, String collectionName, String imageType,
         boolean flagValue, boolean isThumbnail ) throws InvalidInputException
     {
         LOG.debug( "Updating thumbnail image details for collection : " + collectionName + " ID: " + iden + " imageType : "
-            + imageType + " with filename : " + fileName );
-        if ( iden <= 0l || fileName == null || fileName.isEmpty() || collectionName == null || collectionName.isEmpty()
+            + imageType + " with filename : " + imgFileName );
+        if ( iden <= 0l ||  collectionName == null || collectionName.isEmpty()
             || imageType == null || imageType.isEmpty() ) {
             throw new InvalidInputException( "Invalid input provided to the method updateImage" );
         }
@@ -862,18 +865,19 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         //If the image you're updating isn't a thumbnail, set the same value for the image column and it's thumbnail column
         if ( imageType == CommonConstants.IMAGE_TYPE_PROFILE ) {
             if ( isThumbnail ) {
-                update.set( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, fileName );
+                update.set( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, imgThumbnailFileName );
+                update.set( CommonConstants.PROFILE_IMAGE_RECTANGULAR_THUMBNAIL_COLUMN, rectangularThumbnailFileName );
             } else {
-                update.set( CommonConstants.PROFILE_IMAGE_URL_SOLR, fileName );
-                update.set( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, fileName );
+                update.set( CommonConstants.PROFILE_IMAGE_URL_SOLR, imgFileName );
+                update.set( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, imgFileName );
             }
             update.set( CommonConstants.IS_PROFILE_IMAGE_PROCESSED_COLUMN, flagValue );
         } else if ( imageType == CommonConstants.IMAGE_TYPE_LOGO ) {
             if ( isThumbnail ) {
-                update.set( CommonConstants.LOGO_THUMBNAIL_COLUMN, fileName );
+                update.set( CommonConstants.LOGO_THUMBNAIL_COLUMN, imgThumbnailFileName );
             } else {
-                update.set( CommonConstants.LOGO_COLUMN, fileName );
-                update.set( CommonConstants.LOGO_THUMBNAIL_COLUMN, fileName );
+                update.set( CommonConstants.LOGO_COLUMN, imgFileName );
+                update.set( CommonConstants.LOGO_THUMBNAIL_COLUMN, imgFileName );
             }
             update.set( CommonConstants.IS_LOGO_IMAGE_PROCESSED_COLUMN, flagValue );
         } else {
@@ -1007,5 +1011,34 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
             }
         }
         return entityIds;
+    }
+    
+    /**
+     * Method to fetch the company ID list who have opted for monthly digest mail
+     */
+    @Override
+    public List<OrganizationUnitSettings> getCompaniesOptedForSendingMonthlyDigest( int startIndex, int batchSize )
+    {
+        LOG.debug( "Method getCompaniesOptedForSendingMonthlyDigest() started." );
+
+        List<OrganizationUnitSettings> unitSettings = null;
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_STATUS )
+            .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) ) );
+        query.addCriteria( Criteria.where( KEY_SEND_MONTHLY_DIGEST_MAIL ).is( true ) );
+
+        if ( startIndex > -1 ) {
+            query.skip( startIndex );
+        }
+        if ( batchSize > -1 ) {
+            query.limit( batchSize );
+        }
+
+        query.with( new Sort( Sort.Direction.ASC, KEY_IDEN ) );
+
+        LOG.debug( "Query: " + query.toString() );
+        unitSettings = mongoTemplate.find( query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION );
+        LOG.debug( "Method getCompaniesOptedForSendingMonthlyDigest() finished." );
+        return unitSettings;
     }
 }

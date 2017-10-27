@@ -81,6 +81,7 @@ import com.realtech.socialsurvey.core.services.payment.exception.PaymentExceptio
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionPastDueException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUpgradeUnsuccessfulException;
+import com.realtech.socialsurvey.core.services.reportingmanagement.ReportingDashboardManagement;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsLocker;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
@@ -160,6 +161,9 @@ public class OrganizationManagementController
 
     @Autowired
     private HierarchyStructureUploadService hierarchyStructureUploadService;
+    
+    @Autowired
+    private ReportingDashboardManagement  reportingDashboardManagement;
 
     @Value ( "${CDN_PATH}")
     private String endpoint;
@@ -638,6 +642,9 @@ public class OrganizationManagementController
                 unitSettings = userManagementService.getUserSettings( user.getUserId() );
             }
             model.addAttribute( CommonConstants.USER_APP_SETTINGS, unitSettings );
+            
+            
+            model.addAttribute( CommonConstants.ENCOMPASS_VERSION_LIST, organizationManagementService.getActiveEncompassSdkVersions() );
 
             //REALTECH_USER_ID is set only for real tech and SS admin
             boolean isRealTechOrSSAdmin = false;
@@ -779,7 +786,7 @@ public class OrganizationManagementController
             }
 
             //enocode before sending to UI
-            encodeSurveySettings( surveySettings );
+            encodeSurveySettings( unitSettings.getSurvey_settings() );
             session.setAttribute( CommonConstants.USER_ACCOUNT_SETTINGS, unitSettings );
             
             //get default setting and store in model
@@ -794,6 +801,19 @@ public class OrganizationManagementController
                 model.addAttribute("sendEmailThrough",companySettings.getSendEmailThrough()); 
             }
 
+            
+         // adding the survey completion mail threshold
+            if ( companySettings.getSurvey_settings() != null ) {
+                model.addAttribute( CommonConstants.SURVEY_MAIL_THRESHOLD,
+                    companySettings.getSurvey_settings().getSurveyCompletedMailThreshold() );
+            } else {
+                model.addAttribute( CommonConstants.SURVEY_MAIL_THRESHOLD, 0.0d );
+            }
+            
+            // add send monthly digest email flag
+            if( CommonConstants.COMPANY_ID_COLUMN.equals( entityType ) ){
+                model.addAttribute( "sendMonthlyDigestMail", unitSettings.isSendMonthlyDigestMail() );
+            }
         } catch ( InvalidInputException | NoRecordsFetchedException e ) {
             LOG.error( "NonFatalException while fetching profile details. Reason :" + e.getMessage(), e );
             model.addAttribute( "message",
@@ -832,6 +852,8 @@ public class OrganizationManagementController
         String sellerAgentEmail = request.getParameter( "seller-agnt-email" );
         String sellerAgentName = request.getParameter( "seller-agnt-name" );
         
+        String version = request.getParameter( "sdk-version-selection-list" );
+        
         Map<String, Object> responseMap = new HashMap<String, Object>();
         String message;
         boolean status = true;
@@ -851,6 +873,11 @@ public class OrganizationManagementController
                 LOG.info( "Field Id is empty" );
                 encompassFieldId = CommonConstants.ENCOMPASS_DEFAULT_FEILD_ID;
             }
+            
+            if ( version == null || version.isEmpty() ) {
+                throw new InvalidInputException( "version can not be empty" );
+            }
+            
             if ( state == null || state.isEmpty() || state.equals( CommonConstants.CRM_INFO_DRY_RUN_STATE ) ) {
                 state = CommonConstants.CRM_INFO_DRY_RUN_STATE;
             } else {
@@ -877,6 +904,7 @@ public class OrganizationManagementController
             encompassCrmInfo.setCrm_fieldId( encompassFieldId );
             encompassCrmInfo.setCrm_password( cipherPassword );
             encompassCrmInfo.setUrl( encompassUrl );
+            encompassCrmInfo.setVersion( version );
             
             //check if it's need to update real state agent detail
             if( !StringUtils.isEmpty( buyerAgentEmail ) ||  !StringUtils.isEmpty( buyerAgentName ) || !StringUtils.isEmpty( sellerAgentEmail ) || !StringUtils.isEmpty( sellerAgentName ))
@@ -1647,6 +1675,37 @@ public class OrganizationManagementController
         LOG.info( "Method to update autopost link to user site for a survey finished" );
         return "Successfully updated autopost link to user site setting";
     }
+    
+    /**
+     * method to update send digest mail toggle
+     * @param request
+     * @return
+     */
+    @RequestMapping ( value = "/updatesenddigestmailtoggle", method = RequestMethod.POST)
+    @ResponseBody
+    public String updateSendMonthlyDigestMailToggle( HttpServletRequest request )
+    {
+        LOG.info( "Method updateSendMonthlyDigestMailToggle started" );
+        HttpSession session = request.getSession();
+
+        if ( !CommonConstants.COMPANY_ID_COLUMN
+            .equals( (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN ) ) ) {
+            LOG.error( "This is a company level settings and can to be set at any other hierarchy." );
+            return "false";
+        }
+
+        long companyId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+
+        try {
+            return String.valueOf( reportingDashboardManagement.updateSendDigestMailToggle( companyId,
+                Boolean.parseBoolean( request.getParameter( "sendMonthlyDigestMail" ) ) ) );
+        } catch ( Exception error ) {
+            LOG.error(
+                "Exception occured in updateSendMonthlyDigestMailToggle() while updating send montlhy digest mail flag. Nested exception is ",
+                error );
+            return "false";
+        }
+    }
 
 
     /**
@@ -1683,6 +1742,22 @@ public class OrganizationManagementController
                 }
                 LOG.info( "Updating Survey Settings Reminder Interval" );
                 message = messageUtils.getDisplayMessage( DisplayMessageConstants.SURVEY_REMINDER_INTERVAL_UPDATE_SUCCESSFUL,
+                    DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+            }
+            
+            else if ( mailCategory != null && mailCategory.equals( "max-reminder-count" ) ) {
+                int maxReminderCount = Integer.parseInt( request.getParameter( "max-reminder-count" ) );
+                if ( maxReminderCount == 0 ) {
+                    LOG.warn( "Reminder Count is 0." );
+                    throw new InvalidInputException( "Reminder Count is 0.", DisplayMessageConstants.GENERAL_ERROR );
+                }
+
+                originalSurveySettings = companySettings.getSurvey_settings();
+                if ( originalSurveySettings != null ) {
+                    originalSurveySettings.setMax_number_of_survey_reminders( maxReminderCount );
+                }
+                LOG.info( "Updating Survey Settings Reminder Count" );
+                message = messageUtils.getDisplayMessage( DisplayMessageConstants.SURVEY_REMINDER_COUNT_UPDATE_SUCCESSFUL,
                     DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
             }
 
@@ -2244,6 +2319,9 @@ public class OrganizationManagementController
                 throw new InvalidInputException( "Null or empty value found in storeTextForFlow() for mood." );
             }
 
+            //decode text
+            text = new String( DatatypeConverter.parseBase64Binary(text) );
+            
             OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
 
             SurveySettings surveySettings = companySettings.getSurvey_settings();
@@ -3732,6 +3810,84 @@ public class OrganizationManagementController
         if(surveySettings.getNeutralTextComplete() != null)
             surveySettings.setNeutralTextComplete(DatatypeConverter.printBase64Binary(surveySettings.getNeutralTextComplete().getBytes()));
         
+    }
+    
+    
+    @RequestMapping ( value = "/updatemanualsurveyremindercount", method = RequestMethod.POST)
+    @ResponseBody
+    public String updateSurveyReminderCount( HttpServletRequest request )
+    {
+        LOG.info( "Method to updateSurveyReminderCount started" );
+        HttpSession session = request.getSession();
+        long companyId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        int maxSurveyReminderCount;
+        try {
+            String maxSurveyReminderCountStr = request.getParameter( "surveyReminderCount" );
+            maxSurveyReminderCount = Integer.parseInt( maxSurveyReminderCountStr );
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
+            if(companySettings == null)
+                throw new InvalidInputException("No settings fould for company with id " + companyId);
+
+            SurveySettings surveySettings = companySettings.getSurvey_settings();
+            surveySettings.setMax_number_of_survey_reminders( maxSurveyReminderCount );
+            if ( organizationManagementService.updateScoreForSurvey(
+                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, surveySettings ) ) {
+                companySettings.setSurvey_settings( surveySettings );
+                LOG.info( "Updated Survey Settings" );
+            }
+
+        } catch ( Exception error ) {
+            LOG.error(
+                "Exception occured in updateAutoPostLinkToUserSiteForSurvey() while updating whether to enable autopost link to company site or not. Nested exception is ",
+                error );
+            return error.getMessage();
+        }
+
+        LOG.info( "Method to updateSurveyReminderCount finished" );
+        return "Successfully updated the max survey reminder count";
+    }
+    
+    @RequestMapping ( value = "/updatesurveymailthreshold", method = RequestMethod.POST)
+    @ResponseBody
+    public String updateSurveyMailThreshold( HttpServletRequest request )
+    {
+        LOG.info( "Method to updateSurveyMailThreshold started" );
+        HttpSession session = request.getSession();
+        long companyId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        double surveyCompletedMailThreshold;
+        
+        try {
+            
+            if( CommonConstants.COMPANY_ID.equals( entityType ) ){
+                
+                String surveyCompletedMailThresholdStr = request.getParameter( "surveyCompletedMailThreshold" );
+                surveyCompletedMailThreshold = Double.parseDouble( surveyCompletedMailThresholdStr );
+                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
+
+                if(companySettings == null){
+                    throw new InvalidInputException("No settings fould for company with id " + companyId);
+                }
+                
+                SurveySettings surveySettings = companySettings.getSurvey_settings();
+                surveySettings.setSurveyCompletedMailThreshold( surveyCompletedMailThreshold );
+                
+                organizationManagementService.updateSurveySettings( companySettings, surveySettings );
+                
+            } else {
+                LOG.error( "Profile specified is invalid." );
+                throw new InvalidInputException( "Please provide a valid profile level." );
+            }
+            
+            LOG.info( "Method to updateSurveyMailThreshold finished" );
+            return "Successfully updated the Survey Mail Threshold.";
+
+        } catch ( Exception error ) {
+            LOG.error(
+                "Exception occured in updateSurveyMailThreshold() while updating survey completion threshold. Nested exception is ",
+                error );
+            return "Unable To Update Survey Mail Threshold.";
+        }
     }
 }
 // JIRA: SS-24 BY RM02 EOC

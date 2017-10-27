@@ -2,16 +2,19 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<c:if test="${not empty surveyDetail && not empty surveyDetail.questions}">
-	<c:set value="${fn:length(surveyDetail.questions)}" var="length" />
-	<c:set value="${surveyDetail.status}" var="status" />
-	<c:set value="1" var="count" scope="page" />
+<c:if test="${not empty surveyDetail }">
+	<c:if test="${ not empty surveyDetail.questions}">
+		<c:set value="${fn:length(surveyDetail.questions)}" var="length" />
+		<c:set value="${surveyDetail.status}" var="status" />
+		<c:set value="1" var="count" scope="page" />
+	</c:if>
+	<c:set value="${surveyDetail.countOfRatingQuestions}" var="ratingQuestionCount" scope="page" />
 </c:if>
 
 <c:choose>
 	<c:when test="${not empty surveyDetail}">
 		<c:forEach var="surveyQuestion" items="${surveyDetail.questions}">
-			<div class="bd-srv-tbl-row clearfix bd-srv-tbl-row-${surveyQuestion.questionId}" data-questionid="${surveyQuestion.questionId}">
+			<div class="bd-srv-tbl-row clearfix bd-srv-tbl-row-${surveyQuestion.questionId}" data-questionid="${surveyQuestion.questionId}" data-rating-question="${surveyQuestion.isRatingQuestion}">
 				<div class="float-left srv-tbl-num"><span>${surveyQuestion.questionOrder}</span></div>
 				
 				<!-- setting icon for question type-->
@@ -62,6 +65,9 @@
 <script>
 $(document).ready(function() {
 	var status = "${status}";
+	if( '${ratingQuestionCount}' != undefined ){
+		ratingQuestionCount = '${ratingQuestionCount}';
+	}
 	if (status != "") {
 		setTimeout(function() {
 			showError(status);

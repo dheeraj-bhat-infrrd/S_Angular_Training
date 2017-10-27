@@ -76,6 +76,7 @@ import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.CrmBatchTracker;
 import com.realtech.socialsurvey.core.entities.DisabledAccount;
 import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
+import com.realtech.socialsurvey.core.entities.EncompassSdkVersion;
 import com.realtech.socialsurvey.core.entities.Event;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
@@ -91,6 +92,7 @@ import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
+import com.realtech.socialsurvey.core.entities.RankingRequirements;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.RegistrationStage;
@@ -202,6 +204,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Autowired
     private GenericDao<ZipCodeLookup, Integer> zipCodeLookupDao;
 
+    @Autowired
+    private GenericDao<EncompassSdkVersion, Long> encompassSdkVersionDao;
+    
     @Autowired
     private DisabledAccountDao disabledAccountDao;
 
@@ -696,6 +701,16 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         companySettings.setSurvey_settings( surveySettings );
 
+        //set Ranking Settings
+        RankingRequirements rankingRequirements = new RankingRequirements();
+        rankingRequirements.setMinCompletedPercentage(CommonConstants.MIN_COMPLETED_PERCENTAGE);
+        rankingRequirements.setMinDaysOfRegistration(CommonConstants.MIN_DAYS_OF_REGISTRATION);
+        rankingRequirements.setMinNoOfReviews(CommonConstants.MIN_NO_OF_REVIEWS);
+        rankingRequirements.setMonthOffset(CommonConstants.MONTH_OFFSET);
+        rankingRequirements.setYearOffset(CommonConstants.YEAR_OFFSET);
+        
+        companySettings.setRankingRequirements(rankingRequirements);
+        
         // set seo content flag
         companySettings.setSeoContentModified( true );
 
@@ -5953,21 +5968,23 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      */
     @Override
     @Transactional
-    public void updateImageForOrganizationUnitSetting( long iden, String fileName, String collectionName, String imageType,
+    public void updateImageForOrganizationUnitSetting( long iden, String imgFileName, String thumbnailFileName, String rectangularThumbnailFileName,  String collectionName, String imageType,
         boolean flagValue, boolean isThumbnail ) throws InvalidInputException
     {
         LOG.debug( "Method updateImageForOrganizationUnitSetting called" );
         LOG.debug( "updating mongodb" );
-        organizationUnitSettingsDao.updateImageForOrganizationUnitSetting( iden, fileName, collectionName, imageType, flagValue,
+        organizationUnitSettingsDao.updateImageForOrganizationUnitSetting( iden, imgFileName, thumbnailFileName, rectangularThumbnailFileName, collectionName, imageType, flagValue,
             isThumbnail );
         LOG.debug( "updated mongodb" );
         if ( imageType == CommonConstants.IMAGE_TYPE_PROFILE ) {
             LOG.debug( "updating solr" );
             Map<String, Object> updateMap = new HashMap<String, Object>();
-            updateMap.put( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, fileName );
             if ( !( isThumbnail ) ) {
-                updateMap.put( CommonConstants.PROFILE_IMAGE_URL_SOLR, fileName );
+                updateMap.put( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, imgFileName );
+                updateMap.put( CommonConstants.PROFILE_IMAGE_URL_SOLR, imgFileName );
                 updateMap.put( CommonConstants.IS_PROFILE_IMAGE_SET_SOLR, true );
+            }else{
+                updateMap.put( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, thumbnailFileName );
             }
             try {
                 solrSearchService.editUserInSolrWithMultipleValues( iden, updateMap );
@@ -6977,7 +6994,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             for ( DisabledAccount account : disabledAccounts ) {
                 try {
                     Company company = account.getCompany();
-                    unsubscribeCompany( company );
+                    try {
+                        unsubscribeCompany( company );
+                    } catch ( SubscriptionCancellationUnsuccessfulException e ) {
+                        LOG.error( "The subscription has already been cancelled for company: {}",company.getCompanyId() );
+                    }
                     sendAccountDeletedNotificationMail( account );
                     purgeCompanyDetails( company );
                 } catch ( InvalidInputException e ) {
@@ -7549,12 +7570,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             Map<Long, String> images = null;
             // get unprocessed company profile images
             images = getUnprocessedProfileImages( CommonConstants.COMPANY_SETTINGS_COLLECTION );
-            String fileName = null;
+            Map<String, String> processedImgs = null;
             if ( images != null ) {
                 for ( long id : images.keySet() ) {
                     try {
-                        fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_PROFILE );
-                        updateImage( id, fileName, CommonConstants.COMPANY_SETTINGS_COLLECTION,
+                        processedImgs = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_PROFILE );
+                        updateImage( id, processedImgs.get(CommonConstants.SQUARE_THUMBNAIL),  processedImgs.get(CommonConstants.RECTANGULAR_THUMBNAIL), CommonConstants.COMPANY_SETTINGS_COLLECTION,
                             CommonConstants.IMAGE_TYPE_PROFILE );
 
                     } catch ( Exception e ) {
@@ -7581,8 +7602,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             if ( images != null ) {
                 for ( long id : images.keySet() ) {
                     try {
-                        fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_PROFILE );
-                        updateImage( id, fileName, CommonConstants.REGION_SETTINGS_COLLECTION,
+                        processedImgs = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_PROFILE );
+                        updateImage( id, processedImgs.get(CommonConstants.SQUARE_THUMBNAIL),  processedImgs.get(CommonConstants.RECTANGULAR_THUMBNAIL), CommonConstants.REGION_SETTINGS_COLLECTION,
                             CommonConstants.IMAGE_TYPE_PROFILE );
                     } catch ( Exception e ) {
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
@@ -7608,8 +7629,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             if ( images != null ) {
                 for ( long id : images.keySet() ) {
                     try {
-                        fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_PROFILE );
-                        updateImage( id, fileName, CommonConstants.BRANCH_SETTINGS_COLLECTION,
+                        processedImgs = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_PROFILE );
+                        updateImage( id,  processedImgs.get(CommonConstants.SQUARE_THUMBNAIL),  processedImgs.get(CommonConstants.RECTANGULAR_THUMBNAIL), CommonConstants.BRANCH_SETTINGS_COLLECTION,
                             CommonConstants.IMAGE_TYPE_PROFILE );
                     } catch ( Exception e ) {
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
@@ -7636,8 +7657,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             if ( images != null ) {
                 for ( long id : images.keySet() ) {
                     try {
-                        fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_PROFILE );
-                        updateImage( id, fileName, CommonConstants.AGENT_SETTINGS_COLLECTION,
+                        processedImgs = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_PROFILE );
+                        updateImage( id,  processedImgs.get(CommonConstants.SQUARE_THUMBNAIL),  processedImgs.get(CommonConstants.RECTANGULAR_THUMBNAIL), CommonConstants.AGENT_SETTINGS_COLLECTION,
                             CommonConstants.IMAGE_TYPE_PROFILE );
                     } catch ( Exception e ) {
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
@@ -7663,8 +7684,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             if ( images != null ) {
                 for ( long id : images.keySet() ) {
                     try {
-                        fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_LOGO );
-                        updateImage( id, fileName, CommonConstants.COMPANY_SETTINGS_COLLECTION,
+                        processedImgs = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_LOGO );
+                        updateImage( id,  processedImgs.get(CommonConstants.SQUARE_THUMBNAIL),  processedImgs.get(CommonConstants.RECTANGULAR_THUMBNAIL), CommonConstants.COMPANY_SETTINGS_COLLECTION,
                             CommonConstants.IMAGE_TYPE_LOGO );
                     } catch ( Exception e ) {
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
@@ -7685,8 +7706,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             if ( images != null ) {
                 for ( long id : images.keySet() ) {
                     try {
-                        fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_LOGO );
-                        updateImage( id, fileName, CommonConstants.REGION_SETTINGS_COLLECTION,
+                        processedImgs = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_LOGO );
+                        updateImage( id,  processedImgs.get(CommonConstants.SQUARE_THUMBNAIL),  processedImgs.get(CommonConstants.RECTANGULAR_THUMBNAIL), CommonConstants.REGION_SETTINGS_COLLECTION,
                             CommonConstants.IMAGE_TYPE_LOGO );
                     } catch ( Exception e ) {
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
@@ -7707,8 +7728,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             if ( images != null ) {
                 for ( long id : images.keySet() ) {
                     try {
-                        fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_LOGO );
-                        updateImage( id, fileName, CommonConstants.BRANCH_SETTINGS_COLLECTION,
+                        processedImgs = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_LOGO );
+                        updateImage( id, processedImgs.get(CommonConstants.SQUARE_THUMBNAIL),  processedImgs.get(CommonConstants.RECTANGULAR_THUMBNAIL), CommonConstants.BRANCH_SETTINGS_COLLECTION,
                             CommonConstants.IMAGE_TYPE_LOGO );
                     } catch ( Exception e ) {
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
@@ -7730,8 +7751,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             if ( images != null ) {
                 for ( long id : images.keySet() ) {
                     try {
-                        fileName = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_LOGO );
-                        updateImage( id, fileName, CommonConstants.AGENT_SETTINGS_COLLECTION, CommonConstants.IMAGE_TYPE_LOGO );
+                        processedImgs = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_LOGO );
+                        updateImage( id, processedImgs.get(CommonConstants.SQUARE_THUMBNAIL),  processedImgs.get(CommonConstants.RECTANGULAR_THUMBNAIL), CommonConstants.AGENT_SETTINGS_COLLECTION, CommonConstants.IMAGE_TYPE_LOGO );
                     } catch ( Exception e ) {
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
                         try {
@@ -7840,10 +7861,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
 
-    private void updateImage( long iden, String fileName, String collectionName, String imageType ) throws InvalidInputException
+    private void updateImage( long iden, String imgThumbnailFileName, String rectangularThumbnailFileName, String collectionName, String imageType ) throws InvalidInputException
     {
         LOG.debug( "Method updateImage started" );
-        updateImageForOrganizationUnitSetting( iden, fileName, collectionName, imageType, true, true );
+        updateImageForOrganizationUnitSetting( iden, null, imgThumbnailFileName, rectangularThumbnailFileName, collectionName, imageType, true, true );
         LOG.debug( "Method updateImage finished" );
     }
 
@@ -8181,5 +8202,67 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         }
         LOG.info( "Method updateCompanyIdInMySQLForUser finished" );
+    }
+    
+    
+    @Override
+    public List<EncompassSdkVersion> getActiveEncompassSdkVersions()
+    {
+        LOG.info( "Method getActiveEncompassSdkVersions started" );
+        Map<String, Object> queries = new HashMap<String, Object>();
+        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+        List<EncompassSdkVersion> encompassSdkVersions =  encompassSdkVersionDao.findByKeyValue( EncompassSdkVersion.class, queries );
+        LOG.info( "Method getActiveEncompassSdkVersions finisshed" );
+        return encompassSdkVersions;
+
+    }
+    
+    @Override
+    public String getEncompassHostByVersion(String sdkVersion) throws InvalidInputException
+    {
+        LOG.info( "Method getActiveEncompassSdkVersions started" );
+        Map<String, Object> queries = new HashMap<String, Object>();
+        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+        queries.put( CommonConstants.ENCOMPASS_SDK_VERSION_COLUMN, sdkVersion );
+        List<EncompassSdkVersion> encompassSdkVersions =  encompassSdkVersionDao.findByKeyValue( EncompassSdkVersion.class, queries );
+        if(encompassSdkVersions == null || encompassSdkVersions.size() == 0){
+            throw new InvalidInputException("Unsupported Encompass Version");
+        }
+        LOG.info( "Method getActiveEncompassSdkVersions finisshed" );
+        return encompassSdkVersions.get(CommonConstants.INITIAL_INDEX).getHostName();
+
+    }
+    
+    @Override
+    @Transactional
+    public List<Company> getAllActiveEnterpriseCompanies()
+    {
+        LOG.info( "Method getAllActiveCompaniesByAccountType started" );
+        List<Company> companies =  companyDao.getCompaniesByStatusAndAccountMasterId( CommonConstants.STATUS_ACTIVE, CommonConstants.ACCOUNTS_MASTER_ENTERPRISE );
+        LOG.info( "Method getAllActiveEnterpriseCompanies finisshed" );
+        return companies;
+
+    }
+    
+    @Override
+    @Transactional
+    public List<Company> getCompaniesByCompanyIds(Set<Long> companyIds)
+    {
+        LOG.info( "Method getCompaniesByCompanyIds started" );
+        List<Company> companies =companyDao.getCompanyListByIds( companyIds );
+        LOG.info( "Method getCompaniesByCompanyIds finisshed" );
+        return companies;
+
+    }
+    
+    
+    @Override
+    @Transactional
+    public Map<Long, Long> getUsersCountForCompanies()
+    {   
+        LOG.info( "Method getUsersCountForCompanies started" );
+        Map<Long, Long> companiesUserCount = userDao.getUsersCountForCompanies();
+        LOG.info( "Method getUsersCountForCompanies finisshed" );
+        return companiesUserCount;
     }
 }
