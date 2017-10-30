@@ -100,5 +100,11 @@ public interface ActivityManagementService
      */
     public List<CompanyActiveUsersStats> getCompanyActiveUserCountForPastDay();
 
+    /**
+     * 
+     * @return List of String
+     */
+    public List<String> getTransactionMonitorMailList();
+
 
 }

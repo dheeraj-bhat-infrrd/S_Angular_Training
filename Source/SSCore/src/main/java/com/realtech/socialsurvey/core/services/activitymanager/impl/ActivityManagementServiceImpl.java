@@ -354,10 +354,10 @@ public class ActivityManagementServiceImpl implements ActivityManagementService
         return companyActiveUsersStatsList;
     }
     
-    
-    private List<String> getTransactionMonitorMailList()
+    @Override
+    public List<String> getTransactionMonitorMailList()
     {
-        String transactionMailRecipient[] =  transactionMonitorSupportEmail.split( "," );
+        String[] transactionMailRecipient =  transactionMonitorSupportEmail.split( "," );
         List<String> transactionMailList = new ArrayList<>();
         for(String recipient : transactionMailRecipient)
         {
