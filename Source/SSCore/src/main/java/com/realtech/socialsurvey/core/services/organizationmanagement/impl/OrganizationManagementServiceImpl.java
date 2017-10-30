@@ -37,9 +37,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -150,14 +147,6 @@ import com.realtech.socialsurvey.core.utils.ZipCodeExclusionStrategy;
 import com.realtech.socialsurvey.core.utils.images.ImageProcessor;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookData;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookOperations;
-
-import facebook4j.Facebook;
-import facebook4j.FacebookException;
-import facebook4j.FacebookFactory;
-import facebook4j.Post;
-import facebook4j.Reading;
-import facebook4j.ResponseList;
-import facebook4j.auth.AccessToken;
 
 
 @DependsOn ( "generic")
@@ -7914,10 +7903,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         return new ArrayList<String>( socialMedias );
     }
 
-    public List<Long> fetchEntityIdsWithHiddenAttribute( String CollectionName )
-    {
-        return organizationUnitSettingsDao.fetchEntityIdsWithHiddenAttribute( CollectionName );
-    }
 
 
     @Override
@@ -8265,4 +8250,33 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.info( "Method getUsersCountForCompanies finisshed" );
         return companiesUserCount;
     }
+    
+    @Override
+    @Transactional
+    public List<Long> getHiddenPublicPageCompanyIds()
+    {
+        return organizationUnitSettingsDao.getHiddenPublicPagesEntityIds( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+    }
+    
+    @Override
+    @Transactional
+    public List<Long> getHiddenPublicPageRegionIds()
+    {
+        return organizationUnitSettingsDao.getHiddenPublicPagesEntityIds( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+    }
+    
+    @Override
+    @Transactional
+    public List<Long> getHiddenPublicPageBranchIds()
+    {
+        return organizationUnitSettingsDao.getHiddenPublicPagesEntityIds( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+    }
+    
+    @Override
+    @Transactional
+    public List<Long> getHiddenPublicPageUserIds()
+    {
+        return organizationUnitSettingsDao.getHiddenPublicPagesEntityIds( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+    }
+
 }
