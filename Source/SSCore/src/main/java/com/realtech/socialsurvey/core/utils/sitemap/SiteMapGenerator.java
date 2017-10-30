@@ -1,5 +1,7 @@
 package com.realtech.socialsurvey.core.utils.sitemap;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 
 
@@ -57,6 +60,9 @@ public class SiteMapGenerator implements Runnable
     @Autowired
     private UserManagementService userManagementService;
 
+    @Autowired
+    private OrganizationManagementService organizationManagementService;
+    
     @Value ( "${COMPANY_SITEMAP_PATH}")
     private String companySiteMapPath;
 
@@ -94,6 +100,9 @@ public class SiteMapGenerator implements Runnable
                     companyFetcher.setCollectionName( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
                     companyFetcher.setChangeFrequency( HOURLY_FREQUENCY );
                     companyFetcher.setPriority( COMPANY_PRIORITY );
+                    List<Long> excludedCompanyIds = organizationManagementService.getHiddenPublicPageCompanyIds();
+                    companyFetcher.setExcludedEntityIds( excludedCompanyIds );
+                    
                     SiteMapWriter siteMapWriter = new SiteMapWriter( companySiteMapPath, companyFetcher );
                     siteMapWriter.writeSiteMap();
                 }
@@ -105,6 +114,9 @@ public class SiteMapGenerator implements Runnable
                     regionFetcher.setCollectionName( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
                     regionFetcher.setChangeFrequency( HOURLY_FREQUENCY );
                     regionFetcher.setPriority( REGION_PRIORITY );
+                    List<Long> excludedRegionIds = organizationManagementService.getHiddenPublicPageRegionIds();
+                    regionFetcher.setExcludedEntityIds( excludedRegionIds );
+                    
                     SiteMapWriter siteMapWriter = new SiteMapWriter( regionSiteMapPath, regionFetcher );
                     siteMapWriter.writeSiteMap();
                 }
@@ -116,6 +128,9 @@ public class SiteMapGenerator implements Runnable
                     branchFetcher.setCollectionName( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
                     branchFetcher.setChangeFrequency( HOURLY_FREQUENCY );
                     branchFetcher.setPriority( BRANCH_PRIORITY );
+                    List<Long> excludedBranchIds = organizationManagementService.getHiddenPublicPageBranchIds();
+                    branchFetcher.setExcludedEntityIds( excludedBranchIds );
+                    
                     SiteMapWriter siteMapWriter = new SiteMapWriter( branchSiteMapPath, branchFetcher );
                     siteMapWriter.writeSiteMap();
                 }
@@ -127,7 +142,11 @@ public class SiteMapGenerator implements Runnable
                     agentFetcher.setCollectionName( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
                     agentFetcher.setChangeFrequency( HOURLY_FREQUENCY );
                     agentFetcher.setPriority( USERS_PRIORITY );
-                    agentFetcher.setExcludedEntityIds( userManagementService.getExcludedUserIds() );
+                    
+                    List<Long> excludedUserIds = organizationManagementService.getHiddenPublicPageUserIds();
+                    excludedUserIds.addAll( userManagementService.getExcludedUserIds() );
+                    agentFetcher.setExcludedEntityIds( excludedUserIds );
+                    
                     SiteMapWriter siteMapWriter = new SiteMapWriter( individualSiteMapPath, agentFetcher );
                     siteMapWriter.writeSiteMap();
                 }
