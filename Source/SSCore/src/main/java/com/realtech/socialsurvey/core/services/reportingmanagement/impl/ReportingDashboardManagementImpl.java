@@ -489,6 +489,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 surveyResultsReportVO.setClickTroughForAgent( surveyResultsCompanyReport.getClickTroughForAgent() );
                 surveyResultsReportVO.setClickTroughForRegion( surveyResultsCompanyReport.getClickTroughForRegion() );
                 surveyResultsReportVO.setClickTroughForBranch( surveyResultsCompanyReport.getClickTroughForBranch() );
+                surveyResultsReportVO.setSurveyResponseList( surveyResultsCompanyReport.getSurveyResponseList() );
             } else if (type.equals( CommonConstants.REGION_ID )) {
                 surveyResultsReportRegion = (SurveyResultsReportRegion) entry.getValue();
                 surveyResultsReportVO.setSurveyDetailsId( surveyResultsReportRegion.getSurveyDetailsId() );
@@ -510,6 +511,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 surveyResultsReportVO.setClickTroughForAgent( surveyResultsReportRegion.getClickTroughForAgent() );
                 surveyResultsReportVO.setClickTroughForRegion( surveyResultsReportRegion.getClickTroughForRegion() );
                 surveyResultsReportVO.setClickTroughForBranch( surveyResultsReportRegion.getClickTroughForBranch() );
+                surveyResultsReportVO.setSurveyResponseList( surveyResultsReportRegion.getSurveyResponseList() );
             } else if (type.equals( CommonConstants.BRANCH_ID )) {
                 surveyResultsReportBranch = (SurveyResultsReportBranch) entry.getValue();
                 surveyResultsReportVO.setSurveyDetailsId( surveyResultsReportBranch.getSurveyDetailsId() );
@@ -531,6 +533,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 surveyResultsReportVO.setClickTroughForAgent( surveyResultsReportBranch.getClickTroughForAgent() );
                 surveyResultsReportVO.setClickTroughForRegion( surveyResultsReportBranch.getClickTroughForRegion() );
                 surveyResultsReportVO.setClickTroughForBranch( surveyResultsReportBranch.getClickTroughForBranch() );
+                surveyResultsReportVO.setSurveyResponseList( surveyResultsReportBranch.getSurveyResponseList() );
             }            
             surveyResultsReportVOMap.put( surveyDetailsId, surveyResultsReportVO );
     	}
