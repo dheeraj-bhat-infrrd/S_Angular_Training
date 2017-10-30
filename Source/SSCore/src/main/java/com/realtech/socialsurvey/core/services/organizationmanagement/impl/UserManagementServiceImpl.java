@@ -4693,8 +4693,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public List<Long> getExcludedUserIds()
     {
         List<Long> userIds = new ArrayList<Long>();
-        List<Long> companyIdsWithHiddenAttribute = organizationUnitSettingsDao
-            .fetchEntityIdsWithHiddenAttribute( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        List<Long> companyIdsWithHiddenAttribute = organizationUnitSettingsDao.fetchCompanyIdsWithHiddenSection();
         List<User> users = userDao.findByColumnForMultipleValues( User.class, "company.companyId",
             companyIdsWithHiddenAttribute );
         if ( users != null && !users.isEmpty() ) {
