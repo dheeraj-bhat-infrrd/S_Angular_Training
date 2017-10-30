@@ -110,6 +110,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_RANKING_REQUIREMENTS = "ranking_requirements";
     public static final String KEY_ALLOW_PARTNER_SURVEY = "allowPartnerSurvey";
     public static final String KEY_SEND_MONTHLY_DIGEST_MAIL = "sendMonthlyDigestMail";
+    public static final String KEY_HIDE_PUBLIC_PAGE = "hidePublicPage";
+
 
 
     @Value ( "${CDN_PATH}")
@@ -996,7 +998,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 
 
     @Override
-    public List<Long> fetchEntityIdsWithHiddenAttribute( String collection )
+    public List<Long> fetchCompanyIdsWithHiddenSection()
     {
         List<Long> entityIds = new ArrayList<Long>();
         Query query = new Query();
@@ -1004,7 +1006,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         query.addCriteria( Criteria.where( KEY_STATUS )
             .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) ) );
         query.addCriteria( Criteria.where( KEY_HIDDEN_SECTION ).is( true ) );
-        List<OrganizationUnitSettings> settings = mongoTemplate.find( query, OrganizationUnitSettings.class, collection );
+        List<OrganizationUnitSettings> settings = mongoTemplate.find( query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION );
         if ( settings != null && !settings.isEmpty() ) {
             for ( OrganizationUnitSettings setting : settings ) {
                 entityIds.add( setting.getIden() );
@@ -1040,5 +1042,33 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         unitSettings = mongoTemplate.find( query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION );
         LOG.debug( "Method getCompaniesOptedForSendingMonthlyDigest() finished." );
         return unitSettings;
+    }
+    
+    
+    @Override
+    public List<Long> getHiddenPublicPagesEntityIds( String collection )
+    {
+        LOG.debug( "method getHiddenPublicPagesEntityIds started for collection {} " , collection );
+        
+        List<Long> entityIds = new ArrayList<Long>();
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_DEFAULT_BY_SYSTEM ).is( false ) );
+        query.addCriteria( Criteria.where( KEY_STATUS )
+            .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) ) );
+        query.addCriteria( Criteria.where( KEY_HIDE_PUBLIC_PAGE ).is( true ) );
+        
+        query.fields().include( KEY_IDEN );
+        
+        List<OrganizationUnitSettings> settings = mongoTemplate.find( query, OrganizationUnitSettings.class, collection );
+        if ( settings != null && !settings.isEmpty() ) {
+            for ( OrganizationUnitSettings setting : settings ) {
+                entityIds.add( setting.getIden() );
+            }
+        }
+        
+        LOG.debug( "method getHiddenPublicPagesEntityIds finished for collection {} " , collection );
+        return entityIds;
+    
+        
     }
 }

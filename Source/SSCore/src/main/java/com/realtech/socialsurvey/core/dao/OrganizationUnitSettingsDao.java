@@ -269,8 +269,11 @@ public interface OrganizationUnitSettingsDao
     public List<OrganizationUnitSettings> fetchUnitSettingsForSocialMediaTokens( String collectionName );
 
 
-    public List<Long> fetchEntityIdsWithHiddenAttribute( String collection );
+    public List<Long> fetchCompanyIdsWithHiddenSection();
 
 
     public List<OrganizationUnitSettings> getCompaniesOptedForSendingMonthlyDigest(int startIndex, int batchSize);
+
+
+    List<Long> getHiddenPublicPagesEntityIds( String collection );
 }
