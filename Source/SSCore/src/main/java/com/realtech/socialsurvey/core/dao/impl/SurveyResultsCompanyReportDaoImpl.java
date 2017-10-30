@@ -29,7 +29,7 @@ public class SurveyResultsCompanyReportDaoImpl extends GenericReportingDaoImpl<S
 	 * survey response so the surveys like zillow who dont have a response are
 	 * not missed
 	 */
-	private static final String getSurveyResultAllTImeByCompanyIdQuery = "select ab.SURVEY_DETAILS_ID,sr.answer,ab.USER_FIRST_NAME,ab.USER_LAST_NAME,ab.CUSTOMER_FIRST_NAME,ab.CUSTOMER_LAST_NAME,ab.SURVEY_SENT_DATE,"
+	private static final String GET_SURVEY_RESULT_ALL_TIME_BY_COMPANY_ID_QUERY = "select ab.SURVEY_DETAILS_ID,sr.answer,ab.USER_FIRST_NAME,ab.USER_LAST_NAME,ab.CUSTOMER_FIRST_NAME,ab.CUSTOMER_LAST_NAME,ab.SURVEY_SENT_DATE,"
 			+ "ab.SURVEY_COMPLETED_DATE,ab.TIME_INTERVAL,ab.SURVEY_SOURCE,ab.SURVEY_SOURCE_ID,ab.SURVEY_SCORE,ab.GATEWAY,ab.CUSTOMER_COMMENTS,"
 			+ "ab.AGREED_TO_SHARE,ab.BRANCH_NAME,ab.CLICK_THROUGH_FOR_COMPANY,ab.CLICK_THROUGH_FOR_AGENT,ab.CLICK_THROUGH_FOR_REGION,ab.CLICK_THROUGH_FOR_BRANCH "
 			+ "from (select srcr.SURVEY_DETAILS_ID,srcr.USER_FIRST_NAME,srcr.USER_LAST_NAME,srcr.CUSTOMER_FIRST_NAME,srcr.CUSTOMER_LAST_NAME,srcr.SURVEY_SENT_DATE,"
@@ -39,7 +39,7 @@ public class SurveyResultsCompanyReportDaoImpl extends GenericReportingDaoImpl<S
 			+ "left outer join survey_response sr on ab.SURVEY_DETAILS_ID = sr.SURVEY_DETAILS_ID "
 			+ "order by sr.SURVEY_DETAILS_ID, sr.QUESTION_ID ";
 
-	private static final String getSurveyResultsByStartDateQuery = "select ab.SURVEY_DETAILS_ID,sr.answer,ab.USER_FIRST_NAME,ab.USER_LAST_NAME,ab.CUSTOMER_FIRST_NAME,ab.CUSTOMER_LAST_NAME,"
+	private static final String GET_SURVEY_RESULTS_BY_START_DATE_QUERY = "select ab.SURVEY_DETAILS_ID,sr.answer,ab.USER_FIRST_NAME,ab.USER_LAST_NAME,ab.CUSTOMER_FIRST_NAME,ab.CUSTOMER_LAST_NAME,"
 			+ "ab.SURVEY_SENT_DATE,ab.SURVEY_COMPLETED_DATE,ab.TIME_INTERVAL,ab.SURVEY_SOURCE,ab.SURVEY_SOURCE_ID,ab.SURVEY_SCORE,ab.GATEWAY,"
 			+ "ab.CUSTOMER_COMMENTS,ab.AGREED_TO_SHARE,ab.BRANCH_NAME,ab.CLICK_THROUGH_FOR_COMPANY,ab.CLICK_THROUGH_FOR_AGENT,ab.CLICK_THROUGH_FOR_REGION,"
 			+ "ab.CLICK_THROUGH_FOR_BRANCH from (select "
@@ -49,7 +49,7 @@ public class SurveyResultsCompanyReportDaoImpl extends GenericReportingDaoImpl<S
 			+ "from survey_results_company_report srcr where srcr.COMPANY_ID = ? and srcr.SURVEY_COMPLETED_DATE >= ? and srcr.IS_DELETED = 0 limit ?,?) as ab left outer join "
 			+ "survey_response sr on ab.SURVEY_DETAILS_ID = sr.SURVEY_DETAILS_ID order by sr.SURVEY_DETAILS_ID, sr.QUESTION_ID";
 
-	private static final String getSurveyResultsByEndDateQuery = "select ab.SURVEY_DETAILS_ID,sr.answer,ab.USER_FIRST_NAME,ab.USER_LAST_NAME,ab.CUSTOMER_FIRST_NAME,ab.CUSTOMER_LAST_NAME,"
+	private static final String GET_SURVEY_RESULTS_BY_END_DATE_QUERY = "select ab.SURVEY_DETAILS_ID,sr.answer,ab.USER_FIRST_NAME,ab.USER_LAST_NAME,ab.CUSTOMER_FIRST_NAME,ab.CUSTOMER_LAST_NAME,"
 			+ "ab.SURVEY_SENT_DATE,ab.SURVEY_COMPLETED_DATE,ab.TIME_INTERVAL,ab.SURVEY_SOURCE,ab.SURVEY_SOURCE_ID,ab.SURVEY_SCORE,ab.GATEWAY,"
 			+ "ab.CUSTOMER_COMMENTS,ab.AGREED_TO_SHARE,ab.BRANCH_NAME,ab.CLICK_THROUGH_FOR_COMPANY,ab.CLICK_THROUGH_FOR_AGENT,ab.CLICK_THROUGH_FOR_REGION,"
 			+ "ab.CLICK_THROUGH_FOR_BRANCH from (select "
@@ -59,7 +59,7 @@ public class SurveyResultsCompanyReportDaoImpl extends GenericReportingDaoImpl<S
 			+ "from survey_results_company_report srcr where srcr.COMPANY_ID = ? and srcr.SURVEY_COMPLETED_DATE <= ? and srcr.IS_DELETED = 0 limit ?,?) as ab left outer join "
 			+ "survey_response sr on ab.SURVEY_DETAILS_ID = sr.SURVEY_DETAILS_ID order by sr.SURVEY_DETAILS_ID, sr.QUESTION_ID";
 
-	private static final String getSurveyResultsByStartAndEndDateQuery = "select ab.SURVEY_DETAILS_ID,sr.answer,ab.USER_FIRST_NAME,ab.USER_LAST_NAME,ab.CUSTOMER_FIRST_NAME,ab.CUSTOMER_LAST_NAME,"
+	private static final String GET_SURVEY_RESULTS_BY_START_AND_END_DATE_QUERY = "select ab.SURVEY_DETAILS_ID,sr.answer,ab.USER_FIRST_NAME,ab.USER_LAST_NAME,ab.CUSTOMER_FIRST_NAME,ab.CUSTOMER_LAST_NAME,"
 			+ "ab.SURVEY_SENT_DATE,ab.SURVEY_COMPLETED_DATE,ab.TIME_INTERVAL,ab.SURVEY_SOURCE,ab.SURVEY_SOURCE_ID,ab.SURVEY_SCORE,ab.GATEWAY,"
 			+ "ab.CUSTOMER_COMMENTS,ab.AGREED_TO_SHARE,ab.BRANCH_NAME,ab.CLICK_THROUGH_FOR_COMPANY,ab.CLICK_THROUGH_FOR_AGENT,ab.CLICK_THROUGH_FOR_REGION,"
 			+ "ab.CLICK_THROUGH_FOR_BRANCH from (select "
@@ -69,7 +69,7 @@ public class SurveyResultsCompanyReportDaoImpl extends GenericReportingDaoImpl<S
 			+ "from survey_results_company_report srcr where srcr.COMPANY_ID = ? and srcr.SURVEY_COMPLETED_DATE >= ? and srcr.SURVEY_COMPLETED_DATE <= ? and srcr.IS_DELETED = 0 limit ?,?) as ab left outer join "
 			+ "survey_response sr on ab.SURVEY_DETAILS_ID = sr.SURVEY_DETAILS_ID order by sr.SURVEY_DETAILS_ID, sr.QUESTION_ID";
 
-	private static final String getSurveyResultAllTImeByUserIdQuery = "select ab.SURVEY_DETAILS_ID,sr.answer,ab.USER_FIRST_NAME,ab.USER_LAST_NAME,ab.CUSTOMER_FIRST_NAME,ab.CUSTOMER_LAST_NAME,ab.SURVEY_SENT_DATE,"
+	private static final String GET_SURVEY_RESULT_ALL_TIME_BY_USER_ID_QUERY = "select ab.SURVEY_DETAILS_ID,sr.answer,ab.USER_FIRST_NAME,ab.USER_LAST_NAME,ab.CUSTOMER_FIRST_NAME,ab.CUSTOMER_LAST_NAME,ab.SURVEY_SENT_DATE,"
 			+ "ab.SURVEY_COMPLETED_DATE,ab.TIME_INTERVAL,ab.SURVEY_SOURCE,ab.SURVEY_SOURCE_ID,ab.SURVEY_SCORE,ab.GATEWAY,ab.CUSTOMER_COMMENTS,"
 			+ "ab.AGREED_TO_SHARE,ab.BRANCH_NAME,ab.CLICK_THROUGH_FOR_COMPANY,ab.CLICK_THROUGH_FOR_AGENT,ab.CLICK_THROUGH_FOR_REGION,ab.CLICK_THROUGH_FOR_BRANCH "
 			+ "from (select srcr.SURVEY_DETAILS_ID,srcr.USER_FIRST_NAME,srcr.USER_LAST_NAME,srcr.CUSTOMER_FIRST_NAME,srcr.CUSTOMER_LAST_NAME,srcr.SURVEY_SENT_DATE,"
@@ -79,7 +79,7 @@ public class SurveyResultsCompanyReportDaoImpl extends GenericReportingDaoImpl<S
 			+ "left outer join survey_response sr on ab.SURVEY_DETAILS_ID = sr.SURVEY_DETAILS_ID "
 			+ "order by sr.SURVEY_DETAILS_ID, sr.QUESTION_ID ";
 
-	private static final String getSurveyResultsUserByStartDateQuery = "select ab.SURVEY_DETAILS_ID,sr.answer,ab.USER_FIRST_NAME,ab.USER_LAST_NAME,ab.CUSTOMER_FIRST_NAME,ab.CUSTOMER_LAST_NAME,"
+	private static final String GET_SURVEY_RESULTS_USER_BY_START_DATE_QUERY = "select ab.SURVEY_DETAILS_ID,sr.answer,ab.USER_FIRST_NAME,ab.USER_LAST_NAME,ab.CUSTOMER_FIRST_NAME,ab.CUSTOMER_LAST_NAME,"
 			+ "ab.SURVEY_SENT_DATE,ab.SURVEY_COMPLETED_DATE,ab.TIME_INTERVAL,ab.SURVEY_SOURCE,ab.SURVEY_SOURCE_ID,ab.SURVEY_SCORE,ab.GATEWAY,"
 			+ "ab.CUSTOMER_COMMENTS,ab.AGREED_TO_SHARE,ab.BRANCH_NAME,ab.CLICK_THROUGH_FOR_COMPANY,ab.CLICK_THROUGH_FOR_AGENT,ab.CLICK_THROUGH_FOR_REGION,"
 			+ "ab.CLICK_THROUGH_FOR_BRANCH from (select "
@@ -89,7 +89,7 @@ public class SurveyResultsCompanyReportDaoImpl extends GenericReportingDaoImpl<S
 			+ "from survey_results_company_report srcr where srcr.AGENT_ID = ? and srcr.SURVEY_COMPLETED_DATE >= ? and srcr.IS_DELETED = 0 limit ?,?) as ab left outer join "
 			+ "survey_response sr on ab.SURVEY_DETAILS_ID = sr.SURVEY_DETAILS_ID order by sr.SURVEY_DETAILS_ID, sr.QUESTION_ID";
 
-	private static final String getSurveyResultsUserByEndDateQuery = "select ab.SURVEY_DETAILS_ID,sr.answer,ab.USER_FIRST_NAME,ab.USER_LAST_NAME,ab.CUSTOMER_FIRST_NAME,ab.CUSTOMER_LAST_NAME,"
+	private static final String GET_SURVEY_RESULTS_USER_BY_END_DATE_QUERY = "select ab.SURVEY_DETAILS_ID,sr.answer,ab.USER_FIRST_NAME,ab.USER_LAST_NAME,ab.CUSTOMER_FIRST_NAME,ab.CUSTOMER_LAST_NAME,"
 			+ "ab.SURVEY_SENT_DATE,ab.SURVEY_COMPLETED_DATE,ab.TIME_INTERVAL,ab.SURVEY_SOURCE,ab.SURVEY_SOURCE_ID,ab.SURVEY_SCORE,ab.GATEWAY,"
 			+ "ab.CUSTOMER_COMMENTS,ab.AGREED_TO_SHARE,ab.BRANCH_NAME,ab.CLICK_THROUGH_FOR_COMPANY,ab.CLICK_THROUGH_FOR_AGENT,ab.CLICK_THROUGH_FOR_REGION,"
 			+ "ab.CLICK_THROUGH_FOR_BRANCH from (select "
@@ -99,7 +99,7 @@ public class SurveyResultsCompanyReportDaoImpl extends GenericReportingDaoImpl<S
 			+ "from survey_results_company_report srcr where srcr.AGENT_ID = ? and srcr.SURVEY_COMPLETED_DATE <= ? and srcr.IS_DELETED = 0 limit ?,?) as ab left outer join "
 			+ "survey_response sr on ab.SURVEY_DETAILS_ID = sr.SURVEY_DETAILS_ID order by sr.SURVEY_DETAILS_ID, sr.QUESTION_ID";
 
-	private static final String getSurveyResultsUserByStartAndEndDateQuery = "select ab.SURVEY_DETAILS_ID,sr.answer,ab.USER_FIRST_NAME,ab.USER_LAST_NAME,ab.CUSTOMER_FIRST_NAME,ab.CUSTOMER_LAST_NAME,"
+	private static final String GET_SURVEY_RESULTS_USER_BY_START_AND_END_DATE_QUERY = "select ab.SURVEY_DETAILS_ID,sr.answer,ab.USER_FIRST_NAME,ab.USER_LAST_NAME,ab.CUSTOMER_FIRST_NAME,ab.CUSTOMER_LAST_NAME,"
 			+ "ab.SURVEY_SENT_DATE,ab.SURVEY_COMPLETED_DATE,ab.TIME_INTERVAL,ab.SURVEY_SOURCE,ab.SURVEY_SOURCE_ID,ab.SURVEY_SCORE,ab.GATEWAY,"
 			+ "ab.CUSTOMER_COMMENTS,ab.AGREED_TO_SHARE,ab.BRANCH_NAME,ab.CLICK_THROUGH_FOR_COMPANY,ab.CLICK_THROUGH_FOR_AGENT,ab.CLICK_THROUGH_FOR_REGION,"
 			+ "ab.CLICK_THROUGH_FOR_BRANCH from (select "
@@ -118,23 +118,23 @@ public class SurveyResultsCompanyReportDaoImpl extends GenericReportingDaoImpl<S
 		Query query = null;
 		try {
 			if (startDate != null && endDate != null) {
-				query = getSession().createSQLQuery(getSurveyResultsByStartAndEndDateQuery);
+				query = getSession().createSQLQuery(GET_SURVEY_RESULTS_BY_START_AND_END_DATE_QUERY);
 				query.setParameter(1, startDate);
 				query.setParameter(2, endDate);
 				query.setParameter(3, startIndex);
 				query.setParameter(4, batchSize);
 			} else if (startDate != null && endDate == null) {
-				query = getSession().createSQLQuery(getSurveyResultsByStartDateQuery);
+				query = getSession().createSQLQuery(GET_SURVEY_RESULTS_BY_START_DATE_QUERY);
 				query.setParameter(1, startDate);
 				query.setParameter(2, startIndex);
 				query.setParameter(3, batchSize);
 			} else if (startDate == null && endDate != null) {
-				query = getSession().createSQLQuery(getSurveyResultsByEndDateQuery);
+				query = getSession().createSQLQuery(GET_SURVEY_RESULTS_BY_END_DATE_QUERY);
 				query.setParameter(1, endDate);
 				query.setParameter(2, startIndex);
 				query.setParameter(3, batchSize);
 			} else if (startDate == null && endDate == null) {
-				query = getSession().createSQLQuery(getSurveyResultAllTImeByCompanyIdQuery);
+				query = getSession().createSQLQuery(GET_SURVEY_RESULT_ALL_TIME_BY_COMPANY_ID_QUERY);
 				query.setParameter(1, startIndex);
 				query.setParameter(2, batchSize);
 			}
@@ -201,23 +201,23 @@ public class SurveyResultsCompanyReportDaoImpl extends GenericReportingDaoImpl<S
 		Query query = null;
 		try {
 			if (startDate != null && endDate != null) {
-				query = getSession().createSQLQuery(getSurveyResultsUserByStartAndEndDateQuery);
+				query = getSession().createSQLQuery(GET_SURVEY_RESULTS_USER_BY_START_AND_END_DATE_QUERY);
 				query.setParameter(1, startDate);
 				query.setParameter(2, endDate);
 				query.setParameter(3, startIndex);
 				query.setParameter(4, batchSize);
 			} else if (startDate != null && endDate == null) {
-				query = getSession().createSQLQuery(getSurveyResultsUserByStartDateQuery);
+				query = getSession().createSQLQuery(GET_SURVEY_RESULTS_USER_BY_START_DATE_QUERY);
 				query.setParameter(1, startDate);
 				query.setParameter(2, startIndex);
 				query.setParameter(3, batchSize);
 			} else if (startDate == null && endDate != null) {
-				query = getSession().createSQLQuery(getSurveyResultsUserByEndDateQuery);
+				query = getSession().createSQLQuery(GET_SURVEY_RESULTS_USER_BY_END_DATE_QUERY);
 				query.setParameter(1, endDate);
 				query.setParameter(2, startIndex);
 				query.setParameter(3, batchSize);
 			} else if (startDate == null && endDate == null) {
-				query = getSession().createSQLQuery(getSurveyResultAllTImeByUserIdQuery);
+				query = getSession().createSQLQuery(GET_SURVEY_RESULT_ALL_TIME_BY_USER_ID_QUERY);
 				query.setParameter(1, startIndex);
 				query.setParameter(2, batchSize);
 			}

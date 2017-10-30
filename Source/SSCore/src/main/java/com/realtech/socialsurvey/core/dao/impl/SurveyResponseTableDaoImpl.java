@@ -61,16 +61,16 @@ public class SurveyResponseTableDaoImpl extends GenericReportingDaoImpl<SurveyRe
 	//For Branch
 	
 	private static final String GET_ALL_TIME_MAX_RESPONSE_BRANCH = "select count(sr.QUESTION_ID) as qno from "+
-		    "urvey_results_report_branch src inner join survey_response sr on src.SURVEY_DETAILS_ID=sr.SURVEY_DETAILS_ID "+
+		    "survey_results_report_branch src inner join survey_response sr on src.SURVEY_DETAILS_ID=sr.SURVEY_DETAILS_ID "+
 		    "where src.BRANCH_ID = ? "+
 		    "group by sr.SURVEY_DETAILS_ID order by qno desc limit 1";
 	private static final String GET_MAX_RESPONSE_BY_START_DATE_BRANCH = "select count(sr.QUESTION_ID) as qno from "+
-		    "urvey_results_report_branch src inner join survey_response sr on src.SURVEY_DETAILS_ID=sr.SURVEY_DETAILS_ID "+
+		    "survey_results_report_branch src inner join survey_response sr on src.SURVEY_DETAILS_ID=sr.SURVEY_DETAILS_ID "+
 		    "where src.BRANCH_ID = ? and src.SURVEY_COMPLETED_DATE >= ? "+
 		    "group by sr.SURVEY_DETAILS_ID order by qno desc limit 1";
 		
 	private static final String GET_MAX_RESPONSE_BY_END_DATE_BRANCH = "select count(sr.QUESTION_ID) as qno from "+
-		    "urvey_results_report_branch src inner join survey_response sr on src.SURVEY_DETAILS_ID=sr.SURVEY_DETAILS_ID "+
+		    "survey_results_report_branch src inner join survey_response sr on src.SURVEY_DETAILS_ID=sr.SURVEY_DETAILS_ID "+
 		    "where src.BRANCH_ID = ? and src.SURVEY_COMPLETED_DATE <= ? "+
 		    "group by sr.SURVEY_DETAILS_ID order by qno desc limit 1";
 		
@@ -79,26 +79,25 @@ public class SurveyResponseTableDaoImpl extends GenericReportingDaoImpl<SurveyRe
 		    "where src.BRANCH_ID = ? and src.SURVEY_COMPLETED_DATE >= ? and src.SURVEY_COMPLETED_DATE <= ? "+
 		    "group by sr.SURVEY_DETAILS_ID order by qno desc limit 1";
 		
-	//For User
-		
-	private static final String GET_ALL_TIME_MAX_RESPONSE_USER = "select count(sr.QUESTION_ID) as qno from "+
-			    "survey_results_company_report src inner join survey_response sr on src.SURVEY_DETAILS_ID=sr.SURVEY_DETAILS_ID "+
-			    "where src.AGENT_ID = ? "+
-			    "group by sr.SURVEY_DETAILS_ID order by qno desc limit 1";
-	private static final String GET_MAX_RESPONSE_BY_START_DATE_USER = "select count(sr.QUESTION_ID) as qno from "+
-			    "survey_results_company_report src inner join survey_response sr on src.SURVEY_DETAILS_ID=sr.SURVEY_DETAILS_ID "+
-			    "where src.AGENT_ID = ? and src.SURVEY_COMPLETED_DATE >= ? "+
-			    "group by sr.SURVEY_DETAILS_ID order by qno desc limit 1";
-			
-	private static final String GET_MAX_RESPONSE_BY_END_DATE_USER = "select count(sr.QUESTION_ID) as qno from "+
-			    "survey_results_company_report src inner join survey_response sr on src.SURVEY_DETAILS_ID=sr.SURVEY_DETAILS_ID "+
-			    "where src.AGENT_ID = ? and src.SURVEY_COMPLETED_DATE <= ? "+
-			    "group by sr.SURVEY_DETAILS_ID order by qno desc limit 1";
-			
-	private static final String GET_MAX_RESPONSE_BY_START_AND_END_DATE_USER = "select count(sr.QUESTION_ID) as qno from "+
-			    "survey_results_company_report src inner join survey_response sr on src.SURVEY_DETAILS_ID=sr.SURVEY_DETAILS_ID "+
-			    "where src.AGENT_ID = ? and src.SURVEY_COMPLETED_DATE >= ? and src.SURVEY_COMPLETED_DATE <= ? "+
-			    "group by sr.SURVEY_DETAILS_ID order by qno desc limit 1";
+    //For User
+
+    private static final String GET_ALL_TIME_MAX_RESPONSE_USER = "select count(sr.QUESTION_ID) as qno from "
+        + "survey_results_company_report src inner join survey_response sr on src.SURVEY_DETAILS_ID=sr.SURVEY_DETAILS_ID "
+        + "where src.AGENT_ID = ? " + "group by sr.SURVEY_DETAILS_ID order by qno desc limit 1";
+    private static final String GET_MAX_RESPONSE_BY_START_DATE_USER = "select count(sr.QUESTION_ID) as qno from "
+        + "survey_results_company_report src inner join survey_response sr on src.SURVEY_DETAILS_ID=sr.SURVEY_DETAILS_ID "
+        + "where src.AGENT_ID = ? and src.SURVEY_COMPLETED_DATE >= ? "
+        + "group by sr.SURVEY_DETAILS_ID order by qno desc limit 1";
+
+    private static final String GET_MAX_RESPONSE_BY_END_DATE_USER = "select count(sr.QUESTION_ID) as qno from "
+        + "survey_results_company_report src inner join survey_response sr on src.SURVEY_DETAILS_ID=sr.SURVEY_DETAILS_ID "
+        + "where src.AGENT_ID = ? and src.SURVEY_COMPLETED_DATE <= ? "
+        + "group by sr.SURVEY_DETAILS_ID order by qno desc limit 1";
+
+    private static final String GET_MAX_RESPONSE_BY_START_AND_END_DATE_USER = "select count(sr.QUESTION_ID) as qno from "
+        + "survey_results_company_report src inner join survey_response sr on src.SURVEY_DETAILS_ID=sr.SURVEY_DETAILS_ID "
+        + "where src.AGENT_ID = ? and src.SURVEY_COMPLETED_DATE >= ? and src.SURVEY_COMPLETED_DATE <= ? "
+        + "group by sr.SURVEY_DETAILS_ID order by qno desc limit 1";
     @Override
     @Transactional(value = "transactionManagerForReporting")
     public int getMaxResponseForCompanyId(long companyId , Timestamp startDate , Timestamp endDate )
@@ -121,7 +120,12 @@ public class SurveyResponseTableDaoImpl extends GenericReportingDaoImpl<SurveyRe
             }
             query.setParameter( 0, companyId );
             LOG.debug( "QUERY : " + query.getQueryString() );
-            return ( (BigInteger) query.uniqueResult() ).intValue();
+            BigInteger maxQuestion = (BigInteger) query.uniqueResult();
+            if(maxQuestion != null){
+                return maxQuestion.intValue();
+            } else {
+                return 0;
+            }
         } catch ( Exception hibernateException ) {
             LOG.error( "Exception caught in getMaxResponseForCompanyId() ", hibernateException );
             throw new DatabaseException( "Exception caught in getMaxResponseForCompanyId() ", hibernateException );
@@ -148,7 +152,12 @@ public class SurveyResponseTableDaoImpl extends GenericReportingDaoImpl<SurveyRe
             }
             query.setParameter( 0, regionId );
             LOG.debug( "QUERY : " + query.getQueryString() );
-            return ( (BigInteger) query.uniqueResult() ).intValue();
+            BigInteger maxQuestion = (BigInteger) query.uniqueResult();
+            if(maxQuestion != null){
+                return maxQuestion.intValue();
+            } else {
+                return 0;
+            }
         } catch ( Exception hibernateException ) {
             LOG.error( "Exception caught in getMaxResponseForCompanyId() ", hibernateException );
             throw new DatabaseException( "Exception caught in getMaxResponseForCompanyId() ", hibernateException );
@@ -175,7 +184,12 @@ public class SurveyResponseTableDaoImpl extends GenericReportingDaoImpl<SurveyRe
             }
             query.setParameter( 0, branchId );
             LOG.debug( "QUERY : " + query.getQueryString() );
-            return ( (BigInteger) query.uniqueResult() ).intValue();
+            BigInteger maxQuestion = (BigInteger) query.uniqueResult();
+            if(maxQuestion != null){
+                return maxQuestion.intValue();
+            } else {
+                return 0;
+            }
         } catch ( Exception hibernateException ) {
             LOG.error( "Exception caught in getMaxResponseForCompanyId() ", hibernateException );
             throw new DatabaseException( "Exception caught in getMaxResponseForCompanyId() ", hibernateException );
@@ -202,12 +216,15 @@ public class SurveyResponseTableDaoImpl extends GenericReportingDaoImpl<SurveyRe
             }
             query.setParameter( 0, userId );
             LOG.debug( "QUERY : " + query.getQueryString() );
-            return ( (BigInteger) query.uniqueResult() ).intValue();
+            BigInteger maxQuestion = (BigInteger) query.uniqueResult();
+            if(maxQuestion != null){
+                return maxQuestion.intValue();
+            } else {
+                return 0;
+            }
         } catch ( Exception hibernateException ) {
             LOG.error( "Exception caught in getMaxResponseForUserId() ", hibernateException );
             throw new DatabaseException( "Exception caught in getMaxResponseForUserId() ", hibernateException );
         }
 	}
-	
- 
 }
