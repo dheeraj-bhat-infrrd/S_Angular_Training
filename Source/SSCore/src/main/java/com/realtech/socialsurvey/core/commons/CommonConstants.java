@@ -970,7 +970,7 @@ public interface CommonConstants
     //Note -> the USER_ADOPTION_REPORT was renamed to VERIFIED_USERS_REPORT
     public static final int FILE_UPLOAD_REPORTING_VERIFIED_USERS_REPORT = 102;
     public static final int FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT = 103;
-    public static final int FILE_UPLOAD_REPORTING_SURVEY_RESULTS_COMPANY_REPORT = 104;
+    public static final int FILE_UPLOAD_REPORTING_SURVEY_RESULTS_REPORT = 104;
     public static final int FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT = 105;
     public static final int FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT = 106;
     public static final int FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT = 107;
@@ -1351,7 +1351,7 @@ public interface CommonConstants
     //Note -> the USER_ADOPTION_REPORT was renamed to VERIFIED_USERS_REPORT
     public static final String REPORTING_VERIFIED_USERS_REPORT = "Verified Users Report";
     public static final String REPORTING_COMPANY_USERS_REPORT = "Company User Report";
-    public static final String REPORTING_SURVEY_REUSLTS_COMPANY_REPORT = "Survey Results Company Report";
+    public static final String REPORTING_SURVEY_REUSLTS_COMPANY_REPORT = "Survey Results Report";
     public static final String REPORTING_SURVEY_TRANSACTION_REPORT = "Survey Transaction Report";
     public static final String REPORTING_USER_RANKING_MONTHLY_REPORT = "User Ranking Report For Month";
     public static final String REPORTING_USER_RANKING_YEARLY_REPORT = "User Ranking Report For Year";
