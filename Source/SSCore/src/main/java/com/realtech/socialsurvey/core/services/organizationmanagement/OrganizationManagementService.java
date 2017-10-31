@@ -1,3 +1,4 @@
+
 package com.realtech.socialsurvey.core.services.organizationmanagement;
 
 import java.io.IOException;
@@ -1427,14 +1428,6 @@ public interface OrganizationManagementService
         throws InvalidInputException, NoRecordsFetchedException;
 
 
-    /**
-     * 
-     * @param CollectionName
-     * @return
-     */
-    public List<Long> fetchEntityIdsWithHiddenAttribute( String CollectionName );
-
-
     public List<CompanyHiddenNotification> getCompaniesWithHiddenSectionEnabled();
 
 
@@ -1498,5 +1491,17 @@ public interface OrganizationManagementService
 
 
     Map<Long, Long> getUsersCountForCompanies();
+
+
+    public List<Long> getHiddenPublicPageCompanyIds();
+
+
+    public List<Long> getHiddenPublicPageRegionIds();
+
+
+    public List<Long> getHiddenPublicPageBranchIds();
+
+
+    public List<Long> getHiddenPublicPageUserIds();
 
 }
