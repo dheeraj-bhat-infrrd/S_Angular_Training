@@ -14,8 +14,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
@@ -43,6 +45,8 @@ import com.realtech.socialsurvey.core.dao.DigestDao;
 import com.realtech.socialsurvey.core.dao.FileUploadDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.RegionDao;
+import com.realtech.socialsurvey.core.dao.ReportingSurveyPreInititationDao;
+import com.realtech.socialsurvey.core.dao.ReportingUserProfileDao;
 import com.realtech.socialsurvey.core.dao.ScoreStatsOverallBranchDao;
 import com.realtech.socialsurvey.core.dao.ScoreStatsOverallCompanyDao;
 import com.realtech.socialsurvey.core.dao.ScoreStatsOverallRegionDao;
@@ -85,6 +89,7 @@ import com.realtech.socialsurvey.core.entities.MonthlyDigestAggregate;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RankingRequirements;
 import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.ReportingSurveyPreInititation;
 import com.realtech.socialsurvey.core.entities.ScoreStatsOverallBranch;
 import com.realtech.socialsurvey.core.entities.ScoreStatsOverallCompany;
 import com.realtech.socialsurvey.core.entities.ScoreStatsOverallRegion;
@@ -276,7 +281,12 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
     @Autowired
     private OrganizationManagementService organizationManagementService;
+    
+    @Autowired
+    private ReportingSurveyPreInititationDao reportingSurveyPreInititationDao;
 
+    @Autowired
+    private ReportingUserProfileDao reportingUserProfileDao;
 
     @Value ( "${FILE_DIRECTORY_LOCATION}")
     private String fileDirectoryLocation;
@@ -3355,5 +3365,65 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         }
         return monthStringsForDigest;
     }
+    
+    /**
+     * Method to fetch reviews based on the profile level specified, iden is one of
+     * agentId/branchId/regionId or companyId based on the profile level
+     */
+    @Override
+    @Transactional
+    public List<ReportingSurveyPreInititation> getIncompleteSurvey( long entityId, String entityType, Date startDate, Date endDate ,  int startIndex,
+        int batchSize) throws InvalidInputException
+    {
+        LOG.debug( "Method getIncompleteSurvey() called for entityId: {}  ,entityType: {} ,startDate: {} ,endDate: {} ,startIndex: {}  ,batchSize: {} ",entityId,entityType
+            ,startDate,endDate,startIndex,batchSize);
+        //check if its a valid entity id
+        if ( entityId <= 0l ) {
+            throw new InvalidInputException( "entityId is invalid while fetching incomplete reviews" );
+        }
+        boolean isCompanyAdmin = false;
+        Set<Long> agentIds = new HashSet<>();
+        if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID ) ) {
+            isCompanyAdmin = true;
+        } else {
+            agentIds = getAgentIdsByProfileLevel( entityType, entityId );
+        }
+        Timestamp startTime = null;
+        Timestamp endTime = null;
+        if ( startDate != null )
+            startTime = new Timestamp( startDate.getTime() );
+        if ( endDate != null )
+            endTime = new Timestamp( endDate.getTime() );
+
+        List<ReportingSurveyPreInititation> surveys = null;
+        if ( entityId > 0l || ( agentIds != null && !agentIds.isEmpty() ) ) {
+            surveys = reportingSurveyPreInititationDao.getIncompleteSurveyForReporting( startTime, endTime, startIndex, batchSize, agentIds,
+                isCompanyAdmin, entityId );
+        }
+
+        return surveys;
+    }
+    
+    Set<Long> getAgentIdsByProfileLevel( String entityType, long entityId ) throws InvalidInputException
+    {
+        if ( entityType == null || entityType.isEmpty() ) {
+            throw new InvalidInputException( "profile level is null or empty while getting agents" );
+        }
+        Set<Long> userIds = new HashSet<>();
+        switch ( entityType ) {
+            case CommonConstants.REGION_ID:
+                userIds = reportingUserProfileDao.findUserIdsByRegion( entityId );
+                return userIds;
+            case CommonConstants.BRANCH_ID:
+                userIds = reportingUserProfileDao.findUserIdsByBranch( entityId );
+                return userIds;
+            case CommonConstants.AGENT_ID:
+                userIds.add( entityId );
+                return userIds;
+            default:
+                throw new InvalidInputException( "Invalid profile level while getting iden column name" );
+        }
+    }
+
 
 }

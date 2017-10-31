@@ -1406,4 +1406,6 @@ public interface CommonConstants
     public static final String YEAR = "year";
     
     public static final String SURVEY_MAIL_THRESHOLD = "surveyCompletedMailThreshold";
+    //Reporting requirements
+    public static final String CREATED_ON_EST = "createdOnEst";
 }
