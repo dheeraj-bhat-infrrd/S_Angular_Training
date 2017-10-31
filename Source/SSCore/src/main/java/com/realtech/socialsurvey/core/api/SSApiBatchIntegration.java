@@ -22,13 +22,13 @@ public interface SSApiBatchIntegration
     Response getCompanyUserReport( @Query ( "entityId") Long entityId, @Query ( "entityType") String entityType );
 
 
-    @GET ( "/v1/getsurveyresultscompanyreportsforreporting")
-    Response getSurveyResultsCompany( @Query ( "companyId") Long companyId,
+    @GET ( "/v1/getsurveyresultsreport")
+    Response getSurveyResultsReport(@Query("entityType") String entityType, @Query ( "entityId") Long entityId,
         @Query ( "startDate") Timestamp startDate, @Query ( "endDate") Timestamp endDate , @Query ( "startIndex") int startIndex ,
         @Query ( "batchSize") int batchSize );
     
     @GET ( "/v1/getmaxquestionforcompany")
-    Response getCompanyMaxQuestion( @Query ( "companyId") Long entityId,
+    Response getCompanyMaxQuestion(@Query("entityType") String entityType, @Query ( "entityId") Long entityId,
         @Query ( "startDate") Timestamp startDate, @Query ( "endDate") Timestamp endDate );
 
 

@@ -63,11 +63,12 @@ public class OrganizationUnitSettings implements Serializable
     private boolean allowZillowAutoPost;
     // status of the record, A for active and D for deleted
     private String status;
-    private boolean hiddenSection;
+    private boolean hiddenSection; // to hide public page of all the users of a company
     private boolean sendEmailFromCompany;
     private String reviewSortCriteria;
     private String sendEmailThrough;
-    public boolean hideFromBreadCrumb;
+    private boolean hideFromBreadCrumb;
+    private boolean hidePublicPage; //to hide entity form public page and sitemap
 
 
     // vendasta product details 
@@ -688,6 +689,18 @@ public class OrganizationUnitSettings implements Serializable
     public void setSendMonthlyDigestMail( boolean sendMonthlyDigestMail )
     {
         this.sendMonthlyDigestMail = sendMonthlyDigestMail;
+    }
+
+
+    public boolean isHidePublicPage()
+    {
+        return hidePublicPage;
+    }
+
+
+    public void setHidePublicPage( boolean hidePublicPage )
+    {
+        this.hidePublicPage = hidePublicPage;
     }
 
 

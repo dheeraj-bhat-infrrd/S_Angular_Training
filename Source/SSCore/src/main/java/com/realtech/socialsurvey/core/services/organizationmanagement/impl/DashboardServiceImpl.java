@@ -749,7 +749,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         uploadTypeList.add( CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_STATS_REPORT);
         uploadTypeList.add( CommonConstants.FILE_UPLOAD_REPORTING_VERIFIED_USERS_REPORT );
         uploadTypeList.add( CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT );
-        uploadTypeList.add( CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_COMPANY_REPORT );
+        uploadTypeList.add( CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_REPORT );
         uploadTypeList.add( CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT);
         uploadTypeList.add( CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT);
         uploadTypeList.add( CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT);

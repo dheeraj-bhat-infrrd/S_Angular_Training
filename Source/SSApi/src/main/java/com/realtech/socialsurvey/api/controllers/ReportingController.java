@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.entities.CompanyDigestRequestData;
-import com.realtech.socialsurvey.core.entities.SurveyResultsCompanyReport;
+import com.realtech.socialsurvey.core.entities.SurveyResultsReportVO;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.reportingmanagement.DashboardGraphManagement;
 import com.realtech.socialsurvey.core.services.reportingmanagement.OverviewManagement;
@@ -126,25 +126,22 @@ public class ReportingController
         return json;
     }
 
-
-    @RequestMapping ( value = "/getmaxquestionforcompany", method = RequestMethod.GET)
-    @ApiOperation ( value = "Fetch Max Question For Company Report For Reporting")
-    public int getCompanyMaxQuestion( Long companyId, Timestamp startDate, Timestamp endDate )
+    
+    @RequestMapping( value = "/getmaxquestionforcompany", method= RequestMethod.GET)
+    @ApiOperation( value = "Fetch Max Question For Company Report For Reporting")
+    public int getCompanyMaxQuestion(String entityType,Long entityId, Timestamp startDate, Timestamp endDate) 
     {
-        LOGGER.info( "Fetch Max Question For Company Report For Reporting" );
-        return reportingDashboardManagement.getMaxQuestionForSurveyCompanyReport( companyId, startDate, endDate );
+        LOGGER.info( "Fetch Max Question For Company Report For Reporting");
+        return reportingDashboardManagement.getMaxQuestionForSurveyResultsReport(entityType, entityId, startDate, endDate );
     }
-
-
-    @RequestMapping ( value = "/getsurveyresultscompanyreportsforreporting", method = RequestMethod.GET)
-    @ApiOperation ( value = "Fetch Survey Results Company Report For Reporting")
-    public String getSurveyResultsCompany( Long companyId, Timestamp startDate, Timestamp endDate, int startIndex,
-        int batchSize )
+    
+    @RequestMapping( value = "/getsurveyresultsreport", method= RequestMethod.GET)
+    @ApiOperation( value = "Fetch Survey Results Report For Entity Type.")
+    public String getSurveyResultsReport(String entityType, Long entityId, Timestamp startDate, Timestamp endDate , int startIndex , int batchSize)
     {
-        LOGGER.info( "Fetch Survey Results Company Report For Reporting" );
-        Map<String, SurveyResultsCompanyReport> surveyResultsCompanyList = reportingDashboardManagement
-            .getSurveyResultsCompanyReport( companyId, startDate, endDate, startIndex, batchSize );
-        return new Gson().toJson( surveyResultsCompanyList );
+        LOGGER.info( "Fetch Survey Results Report For Entity Type.");
+        Map<String,SurveyResultsReportVO> surveyResultsReportList = reportingDashboardManagement.getSurveyResultsReport(entityType,entityId,startDate,endDate,startIndex,batchSize);
+        return new Gson().toJson(surveyResultsReportList);
     }
 
 
