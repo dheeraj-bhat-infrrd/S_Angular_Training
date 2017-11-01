@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -1715,7 +1716,7 @@ public class OrganizationManagementController
      * @param request
      * @return
      */
-    @RequestMapping ( value = "/updatesurveyremindersettings", method = RequestMethod.POST)
+    @RequestMapping ( value = "/updatesurveyremindersettings", method = RequestMethod.GET)
     @ResponseBody
     public String updateSurveyReminderSettings( Model model, HttpServletRequest request )
     {

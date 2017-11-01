@@ -5183,9 +5183,9 @@ function autoAppendReminderDropdown(reminderId, reminderDefault) {
 	autoAppendDropdown(reminderId, 15, 1);
 }
 
-function updateReminderSettings(formid) {
+function updateReminderSettings(payload) {
 	var url = "./updatesurveyremindersettings.do";
-	callAjaxFormSubmit(url, updateReminderSettingsCallBack, formid);
+	callAjaxGetWithPayloadData(url, updateReminderSettingsCallBack, payload);
 }
 
 function updateReminderSettingsCallBack(response) {
