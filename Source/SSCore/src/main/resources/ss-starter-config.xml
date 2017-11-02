@@ -734,7 +734,7 @@
 	<bean id="transactionActivityMonitorCron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="transactionActivityMonitorJobDetail" />
-		<property name="cronExpression" value="0 0/10 * 1/1 * ?" />
+		<property name="cronExpression" value="0 20 00 * * ?" />
 	</bean>
 	
 
