@@ -15,6 +15,7 @@ import com.realtech.socialsurvey.core.entities.Digest;
 import com.realtech.socialsurvey.core.entities.MonthlyDigestAggregate;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RankingRequirements;
+import com.realtech.socialsurvey.core.entities.ReportingSurveyPreInititation;
 import com.realtech.socialsurvey.core.entities.SurveyResultsCompanyReport;
 import com.realtech.socialsurvey.core.entities.UserRankingPastMonthMain;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -158,6 +159,20 @@ public interface ReportingDashboardManagement
      */
     public Map<String, SurveyResultsCompanyReport> getSurveyResultsCompanyReport( Long entityId, Timestamp startDate, Timestamp endDate,
         int startIndex, int batchSize );
+
+    /**
+     * 
+     * @param entityId
+     * @param entityType
+     * @param startDate
+     * @param endDate
+     * @param startIndex
+     * @param batchSize
+     * @return
+     * @throws InvalidInputException
+     */
+    public List<ReportingSurveyPreInititation> getIncompleteSurvey( long entityId, String entityType, Date startDate, Date endDate,
+        int startIndex, int batchSize ) throws InvalidInputException;
 
 
 }
