@@ -39,8 +39,8 @@
 					<div class="float-left dash-sel-lbl">Duration</div>
 					<select id="transaction-count-days" class="float-left dash-sel-item">
 						<option value="10">10 Days</option>
+						<option value="15">15 Days</option>
 						<option value="20">20 Days</option>
-						<option value="30">30 Days</option>
 					</select>
 				</div>
 			</div>
@@ -92,8 +92,8 @@
 					<div class="float-left dash-sel-lbl">Duration</div>
 					<select id="proc-sur-count-days" class="float-left dash-sel-item">
 						<option value="10">10 Days</option>
+						<option value="15">15 Days</option>
 						<option value="20">20 Days</option>
-						<option value="30">30 Days</option>
 					</select>
 				</div>
 			</div>
@@ -146,8 +146,8 @@
 					<div class="float-left dash-sel-lbl">Duration</div>
 					<select id="actv-usr-count-days" class="float-left dash-sel-item">
 						<option value="10">10 Days</option>
+						<option value="15">15 Days</option>
 						<option value="20">20 Days</option>
-						<option value="30">30 Days</option>
 					</select>
 				</div>
 			</div>
