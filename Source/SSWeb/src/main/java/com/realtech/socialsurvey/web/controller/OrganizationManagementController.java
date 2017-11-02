@@ -3311,7 +3311,7 @@ public class OrganizationManagementController
 
 
             try {
-                User existingUser = userManagementService.getUserByEmailAddress( emailAddress );
+                User existingUser = userManagementService.getUserByEmailAndCompany( sessionHelper.getCurrentUser().getCompany().getCompanyId() , emailAddress );
                 if ( existingUser != null )
                     throw new UserAlreadyExistsException(
                         "The email addresss " + emailAddress + " is already present in our database." );
