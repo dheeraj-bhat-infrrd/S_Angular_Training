@@ -46,15 +46,15 @@
 					<div class="dash-btn-dl-sd-admin report-selector" >
 						<select id="generate-survey-reports" class="float-left dash-download-sel-item report-selector-choice">
 							<c:if test="${profilemasterid != 4}">
-								<option value=101 data-report="survey-stats">Survey Statistics</option>
-								<option value=102 data-report="user-adoption"><spring:message code="label.reports.verfied.users.report.key" /></option>
-								<option value=106 data-report="user-ranking">User Ranking</option>
-							</c:if>
-							<c:if test="${profilemasterid == 1}"> 
-								<option value=103 data-report="company-user">Company User</option>
-							</c:if>
-								<option value=105 data-report="survey-transaction-summary">Survey Transaction Summary</option>
-								<option value=104 data-report="survey-results">Survey Results Report</option>
+ 								<option value=<spring:message code="label.survey.stats.report.value" /> data-report="survey-stats"><spring:message code="label.survey.stats.report.key" /></option>
+ 								<option value=<spring:message code="label.verified.users.report.value" /> data-report="verified-users"><spring:message code="label.reports.verfied.users.report.key" /></option>
+ 								<option value=<spring:message code="label.user.ranking.report.value" /> data-report="user-ranking"><spring:message code="label.user.ranking.report.key" /></option>
+  							</c:if>
+  							<c:if test="${profilemasterid == 1}"> 
+ 								<option value=<spring:message code="label.company.user.report.value" /> data-report="company-user"><spring:message code="label.company.user.report.key" /></option>
+  								<option value=<spring:message code="label.survey.results.report.value" /> data-report="survey-results"><spring:message code="label.survey.results.report.key" /></option>
+  							</c:if>
+ 								<option value=<spring:message code="label.survey.transaction.report.value" /> data-report="survey-transaction-summary"><spring:message code="label.survey.transaction.report.key" /></option>
 						</select>	
 					</div>
 					<div id="report-time-div" class="float-left board-div hide">

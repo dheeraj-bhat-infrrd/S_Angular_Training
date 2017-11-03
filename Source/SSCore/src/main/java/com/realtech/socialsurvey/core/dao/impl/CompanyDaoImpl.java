@@ -92,6 +92,7 @@ public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements Com
         Session session = sessionFactory.getCurrentSession();
         Criteria criteria = session.createCriteria( Company.class );
         criteria.add( Restrictions.like( "company", namePattern, MatchMode.START ) );
+        criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ) );
         return criteria.list();
     }
 

@@ -1543,7 +1543,7 @@ function paintActvUserGraph() {
 	for (var i = 0; i < keys.length; i++) {
 		if (format == '365') {
 			allTimeslots[i] = convertYearMonthKeyToDate(keys[i]);
-		} else if (format == '10' || format == '20' || format == '30') {
+		} else if (format == '10' || format == '20') {
 			allTimeslots[i] = convertYearMonthDayKeyToDate(keys[i]);
 		}else {
 			allTimeslots[i] = convertYearWeekKeyToDate(keys[i]);
@@ -1695,7 +1695,7 @@ function paintProcSurveyGraph() {
 	for (var i = 0; i < keys.length; i++) {
 		if (format == '365') {
 			allTimeslots[i] = convertYearMonthKeyToDate(keys[i]);
-		} else if (format == '10' || format == '20' || format == '30') {
+		} else if (format == '10' || format == '20' ) {
 			allTimeslots[i] = convertYearMonthDayKeyToDate(keys[i]);
 		}else {
 			allTimeslots[i] = convertYearWeekKeyToDate(keys[i]);
@@ -1875,7 +1875,7 @@ function paintTransactionGraph() {
 	for (var i = 0; i < keys.length; i++) {
 		if (format == '365') {
 			allTimeslots[i] = convertYearMonthKeyToDate(keys[i]);
-		} else if (format == '10' || format == '20' || format == '30') {
+		} else if (format == '10' || format == '20' ) {
 			allTimeslots[i] = convertYearMonthDayKeyToDate(keys[i]);
 		}else {
 			allTimeslots[i] = convertYearWeekKeyToDate(keys[i]);
@@ -2146,7 +2146,7 @@ function getKeysFromGraphFormat(format) {
 
 		}
 
-	} else if(format == '10' || '20') {
+	} else if(format == '10' || format == '15' || format == '20') {
 		firstDate = Date.today().add({
 			days : -parseInt(format)
 		});
