@@ -137,6 +137,9 @@ public class PrepareBillingReport implements Runnable
                            locationInS3 = reportingDashboardManagement.generateUserRankingForReporting( fileUpload.getProfileValue(), fileUpload.getProfileLevel(),
                                fileUpload.getAdminUserId(),fileUpload.getStartDate() , type);
 
+                      } else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_INCOMPLETE_SURVEY_REPORT){
+                          locationInS3 = reportingDashboardManagement.generateIncompleteSurveyResultsReport( fileUpload.getProfileValue(), fileUpload.getProfileLevel(),
+                              fileUpload.getAdminUserId(),fileUpload.getStartDate(),fileUpload.getEndDate());
                       }
                         
                         // update the status to be processed
@@ -144,7 +147,8 @@ public class PrepareBillingReport implements Runnable
                         fileUpload.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
                         if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_STATS_REPORT || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_VERIFIED_USERS_REPORT 
                             || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_REPORT || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT
-                            || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT){
+                            || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT
+                            || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_INCOMPLETE_SURVEY_REPORT){
                             fileUpload.setFileName( locationInS3 );
                         }
                         csvUploadService.updateFileUploadRecord( fileUpload );
