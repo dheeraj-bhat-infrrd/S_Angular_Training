@@ -2777,9 +2777,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     + organizationUnitSettings.getCompleteProfileUrl();
                 break;
             case CommonConstants.FACEBOOK_LABEL:
-                url += "https://www.facebook.com/dialog/feed?app_id=" + fbAppId + "&link="
-                    + organizationUnitSettings.getCompleteProfileUrl() + "&description=" + reviewText
-                    + ".&redirect_uri=https://www.facebook.com";
+                url += "https://www.facebook.com/dialog/share?app_id=" + fbAppId + "&href="
+                    + organizationUnitSettings.getCompleteProfileUrl() + "&quote=" + reviewText
+                    + "&redirect_uri=https://www.facebook.com";
                 break;
         }
 

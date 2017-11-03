@@ -69,6 +69,9 @@ public class OverviewUserYear implements Serializable
     @Column ( name = "year")
     private int year;
 
+    @Column ( name = "third_party")
+    private int thirdParty;
+    
     public String getOverviewUserYearId()
     {
         return overviewUserYearId;
@@ -243,6 +246,18 @@ public class OverviewUserYear implements Serializable
     {
         return serialVersionUID;
     }
+    
+    
+
+    public int getThirdParty()
+    {
+        return thirdParty;
+    }
+
+    public void setThirdParty( int thirdParty )
+    {
+        this.thirdParty = thirdParty;
+    }
 
     @Override
     public String toString()
@@ -252,7 +267,7 @@ public class OverviewUserYear implements Serializable
             + zillowReviews + ", unprocessed=" + unprocessed + ", unassigned=" + unassigned + ", duplicate=" + duplicate
             + ", corrupted=" + corrupted + ", other=" + other + ", completePercentage=" + completePercentage
             + ", incompletePercentage=" + incompletePercentage + ", rating=" + rating + ", totalReview=" + totalReview
-            + ", year=" + year + "]";
+            + ", year=" + year + ", thirdParty=" + thirdParty + "]";
     }
     
     

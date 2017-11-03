@@ -801,6 +801,15 @@ public class OrganizationManagementController
                 model.addAttribute("sendEmailThrough",companySettings.getSendEmailThrough()); 
             }
 
+            
+         // adding the survey completion mail threshold
+            if ( companySettings.getSurvey_settings() != null ) {
+                model.addAttribute( CommonConstants.SURVEY_MAIL_THRESHOLD,
+                    companySettings.getSurvey_settings().getSurveyCompletedMailThreshold() );
+            } else {
+                model.addAttribute( CommonConstants.SURVEY_MAIL_THRESHOLD, 0.0d );
+            }
+            
             // add send monthly digest email flag
             if( CommonConstants.COMPANY_ID_COLUMN.equals( entityType ) ){
                 model.addAttribute( "sendMonthlyDigestMail", unitSettings.isSendMonthlyDigestMail() );
@@ -3302,7 +3311,7 @@ public class OrganizationManagementController
 
 
             try {
-                User existingUser = userManagementService.getUserByEmailAddress( emailAddress );
+                User existingUser = userManagementService.getUserByEmailAndCompany( sessionHelper.getCurrentUser().getCompany().getCompanyId() , emailAddress );
                 if ( existingUser != null )
                     throw new UserAlreadyExistsException(
                         "The email addresss " + emailAddress + " is already present in our database." );
@@ -3836,6 +3845,49 @@ public class OrganizationManagementController
 
         LOG.info( "Method to updateSurveyReminderCount finished" );
         return "Successfully updated the max survey reminder count";
+    }
+    
+    @RequestMapping ( value = "/updatesurveymailthreshold", method = RequestMethod.POST)
+    @ResponseBody
+    public String updateSurveyMailThreshold( HttpServletRequest request )
+    {
+        LOG.info( "Method to updateSurveyMailThreshold started" );
+        HttpSession session = request.getSession();
+        long companyId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        double surveyCompletedMailThreshold;
+        
+        try {
+            
+            if( CommonConstants.COMPANY_ID.equals( entityType ) ){
+                
+                String surveyCompletedMailThresholdStr = request.getParameter( "surveyCompletedMailThreshold" );
+                surveyCompletedMailThreshold = Double.parseDouble( surveyCompletedMailThresholdStr );
+                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
+
+                if(companySettings == null){
+                    throw new InvalidInputException("No settings fould for company with id " + companyId);
+                }
+                
+                SurveySettings surveySettings = companySettings.getSurvey_settings();
+                surveySettings.setSurveyCompletedMailThreshold( surveyCompletedMailThreshold );
+                
+                organizationManagementService.updateSurveySettings( companySettings, surveySettings );
+                
+            } else {
+                LOG.error( "Profile specified is invalid." );
+                throw new InvalidInputException( "Please provide a valid profile level." );
+            }
+            
+            LOG.info( "Method to updateSurveyMailThreshold finished" );
+            return "Successfully updated the Survey Mail Threshold.";
+
+        } catch ( Exception error ) {
+            LOG.error(
+                "Exception occured in updateSurveyMailThreshold() while updating survey completion threshold. Nested exception is ",
+                error );
+            return "Unable To Update Survey Mail Threshold.";
+        }
     }
 }
 // JIRA: SS-24 BY RM02 EOC

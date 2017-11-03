@@ -1004,9 +1004,8 @@
 												<div class="float-left clearfix ppl-share-social ">
 													<span id="fb_${loop.index}"
 														class="float-left ppl-share-icns icn-fb-rev"
-														title="Facebook"
-														onclick="getImageandCaptionProfile(${loop.index});"
-														data-link="https://www.facebook.com/dialog/feed?${reviewItem.faceBookShareUrl}&link=${fn:replace(reviewItem.completeProfileUrl, 'localhost', '127.0.0.1')}&description=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${reviewItem.agentName} at SocialSurvey -${fn:escapeXml(reviewItem.review)} .&redirect_uri=https://www.facebook.com"></span>
+														title="Facebook" 
+														data-link="https://www.facebook.com/dialog/share?${reviewItem.faceBookShareUrl}&href=${fn:replace(reviewItem.completeProfileUrl, 'localhost', '127.0.0.1')}&quote=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${reviewItem.agentName} at SocialSurvey -${fn:escapeXml(reviewItem.review)}&redirect_uri=https://www.facebook.com"></span>
 
 													<c:choose>
 														<c:when test="${fn:length(reviewItem.review) > 109}">

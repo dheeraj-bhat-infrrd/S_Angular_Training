@@ -2408,10 +2408,10 @@ public class EmailServicesImpl implements EmailServices
 
     @Async
     @Override
-    public void sendNoTransactionAlertMail( String recipientMailId, String mailBody ) throws InvalidInputException, UndeliveredEmailException
+    public void sendNoTransactionAlertMail( List<String> recipientMailIds, String mailBody ) throws InvalidInputException, UndeliveredEmailException
     {
         LOG.info( "method sendNoTransactionAlertMail started" );
-        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+        if ( recipientMailIds == null || recipientMailIds.isEmpty() ) {
             LOG.error( "Recipient email Id is empty or null for sendNoTransactionAlertMail " );
             throw new InvalidInputException( "Recipient email Id is empty or null for sendNoTransactionAlertMail " );
         }
@@ -2421,7 +2421,7 @@ public class EmailServicesImpl implements EmailServices
         }
         
 
-        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailIds );
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.NO_TRANSACTION_RECEIVED_ALERT_MAIL_SUBJECT;
 
@@ -2437,19 +2437,19 @@ public class EmailServicesImpl implements EmailServices
     
     @Async
     @Override
-    public void sendHighVoulmeUnprocessedTransactionAlertMail( String recipientMailId, String mailBody ) throws InvalidInputException, UndeliveredEmailException
+    public void sendHighVoulmeUnprocessedTransactionAlertMail( List<String> recipientMailIds, String mailBody ) throws InvalidInputException, UndeliveredEmailException
     {
         LOG.info( "method sendHighVoulmeUnprocessedTransactionAlertMail started" );
-        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
-            LOG.error( "Recipient email Id is empty or null for sendNoTransactionAlertMail " );
-            throw new InvalidInputException( "Recipient email Id is empty or null for sendNoTransactionAlertMail " );
+        if ( recipientMailIds == null || recipientMailIds.isEmpty() ) {
+            LOG.error( "Recipient email Id is empty or null for sendHighVoulmeUnprocessedTransactionAlertMail " );
+            throw new InvalidInputException( "Recipient email Id is empty or null for sendHighVoulmeUnprocessedTransactionAlertMail " );
         }
         if ( mailBody == null || mailBody.isEmpty() ) {
-            LOG.error( "mailBody is empty or null for sendNoTransactionAlertMail " );
-            throw new InvalidInputException( "Recipient email Id is empty or null for sendNoTransactionAlertMail " );
+            LOG.error( "mailBody is empty or null for sendHighVoulmeUnprocessedTransactionAlertMail " );
+            throw new InvalidInputException( "Recipient email Id is empty or null for sendHighVoulmeUnprocessedTransactionAlertMail " );
         }
         
-        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailIds );
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.HIGH_VOLUME_UNPROCESSED_TRANSACTION_ALERT_MAIL_SUBJECT;
 
@@ -2466,20 +2466,20 @@ public class EmailServicesImpl implements EmailServices
     
     @Async
     @Override
-    public void sendLessVoulmeOfTransactionReceivedAlertMail( String recipientMailId, String mailBody ) throws InvalidInputException, UndeliveredEmailException
+    public void sendLessVoulmeOfTransactionReceivedAlertMail( List<String> recipientMailIds, String mailBody ) throws InvalidInputException, UndeliveredEmailException
     {
         LOG.info( "method sendLessVoulmeOfTransactionReceivedAlertMail started" );
-        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
-            LOG.error( "Recipient email Id is empty or null for sendNoTransactionAlertMail " );
-            throw new InvalidInputException( "Recipient email Id is empty or null for sendNoTransactionAlertMail " );
+        if ( recipientMailIds == null || recipientMailIds.isEmpty() ) {
+            LOG.error( "Recipient email Id is empty or null for sendLessVoulmeOfTransactionReceivedAlertMail " );
+            throw new InvalidInputException( "Recipient email Id is empty or null for sendLessVoulmeOfTransactionReceivedAlertMail " );
         }
         if ( mailBody == null || mailBody.isEmpty() ) {
-            LOG.error( "mailBody is empty or null for sendNoTransactionAlertMail " );
-            throw new InvalidInputException( "Recipient email Id is empty or null for sendNoTransactionAlertMail " );
+            LOG.error( "mailBody is empty or null for sendLessVoulmeOfTransactionReceivedAlertMail " );
+            throw new InvalidInputException( "Mail body is empty or null for sendLessVoulmeOfTransactionReceivedAlertMail " );
         }
         
 
-        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailIds );
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.LESS_VOLUME_OF_TRANSACTION_RECEIVED_ALERT_MAIL_SUBJECT;
 
