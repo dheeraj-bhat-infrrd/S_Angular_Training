@@ -117,8 +117,8 @@ public class PrepareBillingReport implements Runnable
                         } else if (fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT){
                             locationInS3 = reportingDashboardManagement.generateCompanyUserForReporting( fileUpload.getProfileValue(), fileUpload.getProfileLevel(),
                                 fileUpload.getAdminUserId() );
-                        } else if (fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_COMPANY_REPORT){
-                        	locationInS3 = reportingDashboardManagement.generateSurveyResultsCompanyForReporting( fileUpload.getProfileValue(), fileUpload.getProfileLevel(),
+                        } else if (fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_REPORT){
+                        	locationInS3 = reportingDashboardManagement.generateSurveyResultsReport( fileUpload.getProfileValue(), fileUpload.getProfileLevel(),
                                     fileUpload.getAdminUserId(),fileUpload.getStartDate(),fileUpload.getEndDate());
                          
                         }else if (fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT){
@@ -137,14 +137,18 @@ public class PrepareBillingReport implements Runnable
                            locationInS3 = reportingDashboardManagement.generateUserRankingForReporting( fileUpload.getProfileValue(), fileUpload.getProfileLevel(),
                                fileUpload.getAdminUserId(),fileUpload.getStartDate() , type);
 
+                      } else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_INCOMPLETE_SURVEY_REPORT){
+                          locationInS3 = reportingDashboardManagement.generateIncompleteSurveyResultsReport( fileUpload.getProfileValue(), fileUpload.getProfileLevel(),
+                              fileUpload.getAdminUserId(),fileUpload.getStartDate(),fileUpload.getEndDate());
                       }
                         
                         // update the status to be processed
                         fileUpload.setStatus( CommonConstants.STATUS_DONE );
                         fileUpload.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
                         if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_STATS_REPORT || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_VERIFIED_USERS_REPORT 
-                            || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_COMPANY_REPORT || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT
-                            || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT){
+                            || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_REPORT || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT
+                            || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT
+                            || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_INCOMPLETE_SURVEY_REPORT){
                             fileUpload.setFileName( locationInS3 );
                         }
                         csvUploadService.updateFileUploadRecord( fileUpload );
@@ -182,7 +186,7 @@ public class PrepareBillingReport implements Runnable
                                 reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_VERIFIED_USERS_REPORT;
                             } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT ){
                                 reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_COMPANY_USER_REPORT;
-                            }else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_COMPANY_REPORT){
+                            }else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_REPORT){
                                 reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_SURVEY_RESULTS_COMPANY_REPORT;
                             }else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT){
                                 reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_USER_RANKING_MONTHLY_REPORT;

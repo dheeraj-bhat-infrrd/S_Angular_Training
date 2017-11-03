@@ -15,8 +15,8 @@ import com.realtech.socialsurvey.core.entities.Digest;
 import com.realtech.socialsurvey.core.entities.MonthlyDigestAggregate;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RankingRequirements;
+import com.realtech.socialsurvey.core.entities.SurveyResultsReportVO;
 import com.realtech.socialsurvey.core.entities.ReportingSurveyPreInititation;
-import com.realtech.socialsurvey.core.entities.SurveyResultsCompanyReport;
 import com.realtech.socialsurvey.core.entities.UserRankingPastMonthMain;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -59,7 +59,7 @@ public interface ReportingDashboardManagement
 	 * @throws NonFatalException
 	 * @throws ParseException
 	 */
-	public String generateSurveyResultsCompanyForReporting( Long entityId, String entityType, Long userId, Timestamp startDate, Timestamp endDate )
+	public String generateSurveyResultsReport( Long entityId, String entityType, Long userId, Timestamp startDate, Timestamp endDate )
 		        throws UnsupportedEncodingException, NonFatalException, ParseException;
 
     List<List<Object>> getSurveyTransactionReport( Long entityId, String entityType, Timestamp startDate, Timestamp endDate );
@@ -145,11 +145,12 @@ public interface ReportingDashboardManagement
      * @param endDate
      * @return
      */
-    public int getMaxQuestionForSurveyCompanyReport( Long entityId, Timestamp startDate, Timestamp endDate );
+    public int getMaxQuestionForSurveyResultsReport(String entityType, Long entityId, Timestamp startDate, Timestamp endDate );
 
     /**
-     * method to get the surveyResults from surveyResults table 
-     * based on batching 
+     * This is the service class method for SurveyResultsReport.
+     * This method calls the respective DAO for each report and returns a generic class.
+     * @param entityType
      * @param entityId
      * @param startDate
      * @param endDate
@@ -157,8 +158,8 @@ public interface ReportingDashboardManagement
      * @param batchSize
      * @return
      */
-    public Map<String, SurveyResultsCompanyReport> getSurveyResultsCompanyReport( Long entityId, Timestamp startDate, Timestamp endDate,
-        int startIndex, int batchSize );
+    public Map<String, SurveyResultsReportVO> getSurveyResultsReport( String entityType, Long entityId, Timestamp startDate,
+        Timestamp endDate, int startIndex, int batchSize );
 
     /**
      * 
@@ -174,5 +175,15 @@ public interface ReportingDashboardManagement
     public List<ReportingSurveyPreInititation> getIncompleteSurvey( long entityId, String entityType, Date startDate, Date endDate,
         int startIndex, int batchSize ) throws InvalidInputException;
 
-
+   /**
+     * Method to generate incomplete survey results report.
+     * @param profileValue
+     * @param profileLevel
+     * @param adminUserId
+     * @param startDate
+     * @param endDate
+     * @return
+     */
+    public String generateIncompleteSurveyResultsReport( Long entityId, String entityType, Long userId, Timestamp startDate, Timestamp endDate )
+        throws UnsupportedEncodingException, NonFatalException, ParseException;
 }

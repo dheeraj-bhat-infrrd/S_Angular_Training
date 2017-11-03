@@ -1,11 +1,8 @@
 package com.realtech.socialsurvey.core.dao;
 
 import java.sql.Timestamp;
-import java.util.List;
-import java.util.Map;
 
 import com.realtech.socialsurvey.core.entities.SurveyResponseTable;
-import com.realtech.socialsurvey.core.entities.SurveyResultsCompanyReport;
 
 
 /**
@@ -21,5 +18,29 @@ public interface SurveyResponseTableDao extends GenericReportingDao<SurveyRespon
      * @return
      */
     public int getMaxResponseForCompanyId( long companyId, Timestamp startDate, Timestamp endDate );
+
+	/**
+	 * @param regionId
+	 * @param startDate
+	 * @param endDate
+	 * @return
+	 */
+	public int getMaxResponseForRegionId(Long regionId, Timestamp startDate, Timestamp endDate);
+
+	/**
+	 * @param branchId
+	 * @param startDate
+	 * @param endDate
+	 * @return
+	 */
+	public int getMaxResponseForBranchId(Long branchId, Timestamp startDate, Timestamp endDate);
+
+	/**
+	 * @param userId
+	 * @param startDate
+	 * @param endDate
+	 * @return
+	 */
+	public int getMaxResponseForUserId(Long userId, Timestamp startDate, Timestamp endDate);
 
 }

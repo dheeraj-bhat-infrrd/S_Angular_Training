@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 
 @Entity
@@ -93,16 +94,22 @@ public class ReportingSurveyPreInititation implements Serializable
     private String transactionType;
 
     @Column ( name = "CREATED_ON_EST")
-    private Timestamp createdOnEst;
+    private String createdOnEst;
 
     @Column ( name = "MODIFIED_ON_EST")
-    private Timestamp modifiedOnEst;
+    private String modifiedOnEst;
 
     @Column ( name = "ENGAGEMENT_CLOSED_TIME_EST")
     private Timestamp engagementClosedTimeEst;
 
     @Column ( name = "LAST_REMINDER_TIME_EST")
-    private Timestamp lastReminderTimeEst;
+    private String lastReminderTimeEst;
+    
+    @Transient
+    private String agentFirstName;
+    
+    @Transient
+    private String agentLastName;
 
 
     public long getSurveyPreIntitiationId()
@@ -393,25 +400,25 @@ public class ReportingSurveyPreInititation implements Serializable
     }
 
 
-    public Timestamp getCreatedOnEst()
+    public String getCreatedOnEst()
     {
         return createdOnEst;
     }
 
 
-    public void setCreatedOnEst( Timestamp createdOnEst )
+    public void setCreatedOnEst( String createdOnEst )
     {
         this.createdOnEst = createdOnEst;
     }
 
 
-    public Timestamp getModifiedOnEst()
+    public String getModifiedOnEst()
     {
         return modifiedOnEst;
     }
 
 
-    public void setModifiedOnEst( Timestamp modifiedOnEst )
+    public void setModifiedOnEst( String modifiedOnEst )
     {
         this.modifiedOnEst = modifiedOnEst;
     }
@@ -429,17 +436,40 @@ public class ReportingSurveyPreInititation implements Serializable
     }
 
 
-    public Timestamp getLastReminderTimeEst()
+    public String getLastReminderTimeEst()
     {
         return lastReminderTimeEst;
     }
 
 
-    public void setLastReminderTimeEst( Timestamp lastReminderTimeEst )
+    public void setLastReminderTimeEst( String lastReminderTimeEst )
     {
         this.lastReminderTimeEst = lastReminderTimeEst;
     }
 
+
+    public String getAgentFirstName()
+    {
+        return agentFirstName;
+    }
+
+
+    public void setAgentFirstName( String agentFirstName )
+    {
+        this.agentFirstName = agentFirstName;
+    }
+
+
+    public String getAgentLastName()
+    {
+        return agentLastName;
+    }
+
+
+    public void setAgentLastName( String agentLastName )
+    {
+        this.agentLastName = agentLastName;
+    }
 
     @Override
     public String toString()
@@ -454,8 +484,7 @@ public class ReportingSurveyPreInititation implements Serializable
             + ", branchCollectionId=" + branchCollectionId + ", collectionName=" + collectionName + ", errorCode=" + errorCode
             + ", state=" + state + ", city=" + city + ", transactionType=" + transactionType + ", createdOnEst=" + createdOnEst
             + ", modifiedOnEst=" + modifiedOnEst + ", engagementClosedTimeEst=" + engagementClosedTimeEst
-            + ", lastReminderTimeEst=" + lastReminderTimeEst + "]";
+            + ", lastReminderTimeEst=" + lastReminderTimeEst + ", agentFirstName=" + agentFirstName + ", agentLastName="
+            + agentLastName + "]";
     }
-
-
 }

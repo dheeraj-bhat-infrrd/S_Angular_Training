@@ -4488,11 +4488,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 int reminderCount = (int) reminderMap.get( CommonConstants.SURVEY_REMINDER_COUNT );
                 boolean isReminderDisabled = (boolean) reminderMap.get( CommonConstants.IS_SURVEY_REMINDER_DISABLED );
                 
-                if(isReminderDisabled){
-                    LOG.info( "Auto Reminder is diabled for company : " + company.getCompanyId() );
-                    continue;
-                }
-                
                 //getting epoch date
                 SimpleDateFormat sdf = new SimpleDateFormat( "dd/MM/yyyy" );
                 Date epochReminderDate = sdf.parse( CommonConstants.EPOCH_REMINDER_TIME );
@@ -4541,6 +4536,11 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                     }
                 }
                 
+                //Do not send reminder email if it is disabled for company
+                if(isReminderDisabled){
+                    LOG.info( "Auto Reminder is diabled for company : " + company.getCompanyId() );
+                    continue;
+                }
                 
                 //getting minLastReminderTime and maxLastReminderTime
                 long currentTime = System.currentTimeMillis();
@@ -4693,8 +4693,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public List<Long> getExcludedUserIds()
     {
         List<Long> userIds = new ArrayList<Long>();
-        List<Long> companyIdsWithHiddenAttribute = organizationUnitSettingsDao
-            .fetchEntityIdsWithHiddenAttribute( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        List<Long> companyIdsWithHiddenAttribute = organizationUnitSettingsDao.fetchCompanyIdsWithHiddenSection();
         List<User> users = userDao.findByColumnForMultipleValues( User.class, "company.companyId",
             companyIdsWithHiddenAttribute );
         if ( users != null && !users.isEmpty() ) {
