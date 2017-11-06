@@ -1072,5 +1072,4 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     
         
     }
-
 }
