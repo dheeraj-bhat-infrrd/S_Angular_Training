@@ -1,6 +1,5 @@
 package com.realtech.socialsurvey.core.entities;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -9,86 +8,48 @@ import java.util.List;
  */
 public class RegionUploadVO
 {
-
+    // region information ( 10 fields )
     private long regionId;
-    private boolean isRegionIdModified;
-    private List<LongUploadHistory> regionIdHistory;
-    private String sourceRegionId;
-    private boolean isSourceRegionIdModified;
-    private boolean isSourceRegionIdGenerated;
-    private List<StringUploadHistory> sourceRegionIdHistory;
     private String regionName;
-    private boolean isRegionNameModified;
-    private List<StringUploadHistory> regionNameHistory;
     private String regionAddress1;
-    private boolean isRegionAddress1Modified;
-    private List<StringUploadHistory> regionAddress1History;
     private String regionAddress2;
-    private boolean isRegionAddress2Modified;
-    private List<StringUploadHistory> regionAddress2History;
     private String regionCountry;
-    private boolean isRegionCountryModified;
-    private List<StringUploadHistory> regionCountryHistory;
     private String regionCountryCode;
-    private boolean isRegionCountryCodeModified;
-    private List<StringUploadHistory> regionCountryCodeHistory;
     private String regionState;
-    private boolean isRegionStateModified;
-    private List<StringUploadHistory> regionStateHistory;
     private String regionCity;
-    private boolean isRegionCityModified;
-    private List<StringUploadHistory> regionCityHistory;
     private String regionZipcode;
-    private boolean isRegionZipcodeModified;
+
+    private String sourceRegionId;
+
+
+    //~~~~~~ meta data on region Upload Value Object : BEGIN ~~~~~~~
+
+    // previous values of  region information ( 9 fields )
+    private List<StringUploadHistory> regionNameHistory;
+    private List<StringUploadHistory> regionAddress1History;
+    private List<StringUploadHistory> regionAddress2History;
+    private List<StringUploadHistory> regionCountryHistory;
+    private List<StringUploadHistory> regionCountryCodeHistory;
+    private List<StringUploadHistory> regionStateHistory;
+    private List<StringUploadHistory> regionCityHistory;
     private List<StringUploadHistory> regionZipcodeHistory;
-    private boolean isAddressSet;
+
+    // region entity specific meta data
     private boolean isRegionAdded;
     private boolean isRegionModified;
+    private boolean isRegionProcessed;
+
+    // object( Upload Value Object ) specific meta data
     private boolean isErrorRecord;
-    private boolean isDeletedRecord;
-    private int rowNum;
     private boolean isWarningRecord;
-    private List<String> validationErrors = new ArrayList<String>();
-    private List<String> validationWarnings = new ArrayList<String>();
-    private boolean isInAppendMode;
+
+    // upload specific meta data
+    private int rowNum;
+
+    //~~~~~ meta data on region Upload Value Object : END ~~~~~~~
 
 
-    public boolean isInAppendMode()
-    {
-        return isInAppendMode;
-    }
-
-
-    public void setInAppendMode( boolean isInAppendMode )
-    {
-        this.isInAppendMode = isInAppendMode;
-    }
-
-
-    public boolean isWarningRecord()
-    {
-        return isWarningRecord;
-    }
-
-
-    public void setWarningRecord( boolean isWarningRecord )
-    {
-        this.isWarningRecord = isWarningRecord;
-    }
-
-
-    public int getRowNum()
-    {
-        return rowNum;
-    }
-
-
-    public void setRowNum( int rowNum )
-    {
-        this.rowNum = rowNum;
-    }
-
-
+    // Setters and getters : BEGIN
     public long getRegionId()
     {
         return regionId;
@@ -98,78 +59,6 @@ public class RegionUploadVO
     public void setRegionId( long regionId )
     {
         this.regionId = regionId;
-    }
-
-
-    public boolean isRegionIdModified()
-    {
-        return isRegionIdModified;
-    }
-
-
-    public void setRegionIdModified( boolean isRegionIdModified )
-    {
-        this.isRegionIdModified = isRegionIdModified;
-    }
-
-
-    public List<LongUploadHistory> getRegionIdHistory()
-    {
-        return regionIdHistory;
-    }
-
-
-    public void setRegionIdHistory( List<LongUploadHistory> regionIdHistory )
-    {
-        this.regionIdHistory = regionIdHistory;
-    }
-
-
-    public String getSourceRegionId()
-    {
-        return sourceRegionId;
-    }
-
-
-    public void setSourceRegionId( String sourceRegionId )
-    {
-        this.sourceRegionId = sourceRegionId;
-    }
-
-
-    public boolean isSourceRegionIdModified()
-    {
-        return isSourceRegionIdModified;
-    }
-
-
-    public void setSourceRegionIdModified( boolean isSourceRegionIdModified )
-    {
-        this.isSourceRegionIdModified = isSourceRegionIdModified;
-    }
-
-
-    public boolean isSourceRegionIdGenerated()
-    {
-        return isSourceRegionIdGenerated;
-    }
-
-
-    public void setSourceRegionIdGenerated( boolean isSourceRegionIdGenerated )
-    {
-        this.isSourceRegionIdGenerated = isSourceRegionIdGenerated;
-    }
-
-
-    public List<StringUploadHistory> getSourceRegionIdHistory()
-    {
-        return sourceRegionIdHistory;
-    }
-
-
-    public void setSourceRegionIdHistory( List<StringUploadHistory> sourceRegionIdHistory )
-    {
-        this.sourceRegionIdHistory = sourceRegionIdHistory;
     }
 
 
@@ -185,30 +74,6 @@ public class RegionUploadVO
     }
 
 
-    public boolean isRegionNameModified()
-    {
-        return isRegionNameModified;
-    }
-
-
-    public void setRegionNameModified( boolean isRegionNameModified )
-    {
-        this.isRegionNameModified = isRegionNameModified;
-    }
-
-
-    public List<StringUploadHistory> getRegionNameHistory()
-    {
-        return regionNameHistory;
-    }
-
-
-    public void setRegionNameHistory( List<StringUploadHistory> regionNameHistory )
-    {
-        this.regionNameHistory = regionNameHistory;
-    }
-
-
     public String getRegionAddress1()
     {
         return regionAddress1;
@@ -218,30 +83,6 @@ public class RegionUploadVO
     public void setRegionAddress1( String regionAddress1 )
     {
         this.regionAddress1 = regionAddress1;
-    }
-
-
-    public boolean isRegionAddress1Modified()
-    {
-        return isRegionAddress1Modified;
-    }
-
-
-    public void setRegionAddress1Modified( boolean isRegionAddress1Modified )
-    {
-        this.isRegionAddress1Modified = isRegionAddress1Modified;
-    }
-
-
-    public List<StringUploadHistory> getRegionAddress1History()
-    {
-        return regionAddress1History;
-    }
-
-
-    public void setRegionAddress1History( List<StringUploadHistory> regionAddress1History )
-    {
-        this.regionAddress1History = regionAddress1History;
     }
 
 
@@ -257,30 +98,6 @@ public class RegionUploadVO
     }
 
 
-    public boolean isRegionAddress2Modified()
-    {
-        return isRegionAddress2Modified;
-    }
-
-
-    public void setRegionAddress2Modified( boolean isRegionAddress2Modified )
-    {
-        this.isRegionAddress2Modified = isRegionAddress2Modified;
-    }
-
-
-    public List<StringUploadHistory> getRegionAddress2History()
-    {
-        return regionAddress2History;
-    }
-
-
-    public void setRegionAddress2History( List<StringUploadHistory> regionAddress2History )
-    {
-        this.regionAddress2History = regionAddress2History;
-    }
-
-
     public String getRegionCountry()
     {
         return regionCountry;
@@ -290,30 +107,6 @@ public class RegionUploadVO
     public void setRegionCountry( String regionCountry )
     {
         this.regionCountry = regionCountry;
-    }
-
-
-    public boolean isRegionCountryModified()
-    {
-        return isRegionCountryModified;
-    }
-
-
-    public void setRegionCountryModified( boolean isRegionCountryModified )
-    {
-        this.isRegionCountryModified = isRegionCountryModified;
-    }
-
-
-    public List<StringUploadHistory> getRegionCountryHistory()
-    {
-        return regionCountryHistory;
-    }
-
-
-    public void setRegionCountryHistory( List<StringUploadHistory> regionCountryHistory )
-    {
-        this.regionCountryHistory = regionCountryHistory;
     }
 
 
@@ -329,30 +122,6 @@ public class RegionUploadVO
     }
 
 
-    public boolean isRegionCountryCodeModified()
-    {
-        return isRegionCountryCodeModified;
-    }
-
-
-    public void setRegionCountryCodeModified( boolean isRegionCountryCodeModified )
-    {
-        this.isRegionCountryCodeModified = isRegionCountryCodeModified;
-    }
-
-
-    public List<StringUploadHistory> getRegionCountryCodeHistory()
-    {
-        return regionCountryCodeHistory;
-    }
-
-
-    public void setRegionCountryCodeHistory( List<StringUploadHistory> regionCountryCodeHistory )
-    {
-        this.regionCountryCodeHistory = regionCountryCodeHistory;
-    }
-
-
     public String getRegionState()
     {
         return regionState;
@@ -362,30 +131,6 @@ public class RegionUploadVO
     public void setRegionState( String regionState )
     {
         this.regionState = regionState;
-    }
-
-
-    public boolean isRegionStateModified()
-    {
-        return isRegionStateModified;
-    }
-
-
-    public void setRegionStateModified( boolean isRegionStateModified )
-    {
-        this.isRegionStateModified = isRegionStateModified;
-    }
-
-
-    public List<StringUploadHistory> getRegionStateHistory()
-    {
-        return regionStateHistory;
-    }
-
-
-    public void setRegionStateHistory( List<StringUploadHistory> regionStateHistory )
-    {
-        this.regionStateHistory = regionStateHistory;
     }
 
 
@@ -401,15 +146,99 @@ public class RegionUploadVO
     }
 
 
-    public boolean isRegionCityModified()
+    public String getRegionZipcode()
     {
-        return isRegionCityModified;
+        return regionZipcode;
     }
 
 
-    public void setRegionCityModified( boolean isRegionCityModified )
+    public void setRegionZipcode( String regionZipcode )
     {
-        this.isRegionCityModified = isRegionCityModified;
+        this.regionZipcode = regionZipcode;
+    }
+
+
+    public String getSourceRegionId()
+    {
+        return sourceRegionId;
+    }
+
+
+    public void setSourceRegionId( String sourceRegionId )
+    {
+        this.sourceRegionId = sourceRegionId;
+    }
+
+
+    public List<StringUploadHistory> getRegionNameHistory()
+    {
+        return regionNameHistory;
+    }
+
+
+    public void setRegionNameHistory( List<StringUploadHistory> regionNameHistory )
+    {
+        this.regionNameHistory = regionNameHistory;
+    }
+
+
+    public List<StringUploadHistory> getRegionAddress1History()
+    {
+        return regionAddress1History;
+    }
+
+
+    public void setRegionAddress1History( List<StringUploadHistory> regionAddress1History )
+    {
+        this.regionAddress1History = regionAddress1History;
+    }
+
+
+    public List<StringUploadHistory> getRegionAddress2History()
+    {
+        return regionAddress2History;
+    }
+
+
+    public void setRegionAddress2History( List<StringUploadHistory> regionAddress2History )
+    {
+        this.regionAddress2History = regionAddress2History;
+    }
+
+
+    public List<StringUploadHistory> getRegionCountryHistory()
+    {
+        return regionCountryHistory;
+    }
+
+
+    public void setRegionCountryHistory( List<StringUploadHistory> regionCountryHistory )
+    {
+        this.regionCountryHistory = regionCountryHistory;
+    }
+
+
+    public List<StringUploadHistory> getRegionCountryCodeHistory()
+    {
+        return regionCountryCodeHistory;
+    }
+
+
+    public void setRegionCountryCodeHistory( List<StringUploadHistory> regionCountryCodeHistory )
+    {
+        this.regionCountryCodeHistory = regionCountryCodeHistory;
+    }
+
+
+    public List<StringUploadHistory> getRegionStateHistory()
+    {
+        return regionStateHistory;
+    }
+
+
+    public void setRegionStateHistory( List<StringUploadHistory> regionStateHistory )
+    {
+        this.regionStateHistory = regionStateHistory;
     }
 
 
@@ -425,30 +254,6 @@ public class RegionUploadVO
     }
 
 
-    public String getRegionZipcode()
-    {
-        return regionZipcode;
-    }
-
-
-    public void setRegionZipcode( String regionZipcode )
-    {
-        this.regionZipcode = regionZipcode;
-    }
-
-
-    public boolean isRegionZipcodeModified()
-    {
-        return isRegionZipcodeModified;
-    }
-
-
-    public void setRegionZipcodeModified( boolean isRegionZipcodeModified )
-    {
-        this.isRegionZipcodeModified = isRegionZipcodeModified;
-    }
-
-
     public List<StringUploadHistory> getRegionZipcodeHistory()
     {
         return regionZipcodeHistory;
@@ -458,18 +263,6 @@ public class RegionUploadVO
     public void setRegionZipcodeHistory( List<StringUploadHistory> regionZipcodeHistory )
     {
         this.regionZipcodeHistory = regionZipcodeHistory;
-    }
-
-
-    public boolean isAddressSet()
-    {
-        return isAddressSet;
-    }
-
-
-    public void setAddressSet( boolean isAddressSet )
-    {
-        this.isAddressSet = isAddressSet;
     }
 
 
@@ -497,6 +290,18 @@ public class RegionUploadVO
     }
 
 
+    public boolean isRegionProcessed()
+    {
+        return isRegionProcessed;
+    }
+
+
+    public void setRegionProcessed( boolean isRegionProcessed )
+    {
+        this.isRegionProcessed = isRegionProcessed;
+    }
+
+
     public boolean isErrorRecord()
     {
         return isErrorRecord;
@@ -509,42 +314,32 @@ public class RegionUploadVO
     }
 
 
-    public boolean isDeletedRecord()
+    public boolean isWarningRecord()
     {
-        return isDeletedRecord;
+        return isWarningRecord;
     }
 
 
-    public void setDeletedRecord( boolean isDeletedRecord )
+    public void setWarningRecord( boolean isWarningRecord )
     {
-        this.isDeletedRecord = isDeletedRecord;
+        this.isWarningRecord = isWarningRecord;
     }
 
 
-    public List<String> getValidationErrors()
+    public int getRowNum()
     {
-        return validationErrors;
+        return rowNum;
     }
 
 
-    public void setValidationErrors( List<String> validationErrors )
+    public void setRowNum( int rowNum )
     {
-        this.validationErrors = validationErrors;
+        this.rowNum = rowNum;
     }
+    // Setters and getters : END
 
 
-    public List<String> getValidationWarnings()
-    {
-        return validationWarnings;
-    }
-
-
-    public void setValidationWarnings( List<String> validationWarnings )
-    {
-        this.validationWarnings = validationWarnings;
-    }
-
-
+    // priority on source Id and then internal Id
     @Override
     public boolean equals( Object uploadVo )
     {
