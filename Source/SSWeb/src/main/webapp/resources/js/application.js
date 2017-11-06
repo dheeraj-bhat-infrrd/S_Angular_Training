@@ -1543,7 +1543,7 @@ function paintActvUserGraph() {
 	for (var i = 0; i < keys.length; i++) {
 		if (format == '365') {
 			allTimeslots[i] = convertYearMonthKeyToDate(keys[i]);
-		} else if (format == '10' || format == '20' || format == '30') {
+		} else if (format == '10' || format == '20') {
 			allTimeslots[i] = convertYearMonthDayKeyToDate(keys[i]);
 		}else {
 			allTimeslots[i] = convertYearWeekKeyToDate(keys[i]);
@@ -1695,7 +1695,7 @@ function paintProcSurveyGraph() {
 	for (var i = 0; i < keys.length; i++) {
 		if (format == '365') {
 			allTimeslots[i] = convertYearMonthKeyToDate(keys[i]);
-		} else if (format == '10' || format == '20' || format == '30') {
+		} else if (format == '10' || format == '20' ) {
 			allTimeslots[i] = convertYearMonthDayKeyToDate(keys[i]);
 		}else {
 			allTimeslots[i] = convertYearWeekKeyToDate(keys[i]);
@@ -1875,7 +1875,7 @@ function paintTransactionGraph() {
 	for (var i = 0; i < keys.length; i++) {
 		if (format == '365') {
 			allTimeslots[i] = convertYearMonthKeyToDate(keys[i]);
-		} else if (format == '10' || format == '20' || format == '30') {
+		} else if (format == '10' || format == '20' ) {
 			allTimeslots[i] = convertYearMonthDayKeyToDate(keys[i]);
 		}else {
 			allTimeslots[i] = convertYearWeekKeyToDate(keys[i]);
@@ -2146,7 +2146,7 @@ function getKeysFromGraphFormat(format) {
 
 		}
 
-	} else if(format == '10' || '20') {
+	} else if(format == '10' || format == '15' || format == '20') {
 		firstDate = Date.today().add({
 			days : -parseInt(format)
 		});
@@ -7105,7 +7105,7 @@ function showMasterQuestionPage() {
 		}
 		
 		var fmt_rating = Number(rating).toFixed(1);
-		$('#linkedin-btn').attr("href", "https://www.linkedin.com/shareArticle?mini=true&url=" + agentFullProfileLink + "/" + surveyId + "&title=&summary=" + fmt_rating + "-star response from " + firstName + " " + lastName + " for " + agentName + " at SocialSurvey - " + feedback + ".&source=");
+		$('#linkedin-btn').attr("href", "https://www.linkedin.com/shareArticle?mini=true&url=" + agentFullProfileLink + "/" + surveyId + "&title=&summary=" + fmt_rating + "-star response from " + firstName + " " + getInitials( lastName ) + " for " + agentName + " at SocialSurvey - " + feedback + ".&source=");
 		var twitterFeedback = feedback;
 		if (twitterFeedback.length > 109) {
 			twitterFeedback = twitterFeedback.substring(0, 70);
@@ -7113,8 +7113,8 @@ function showMasterQuestionPage() {
 		} else {
 			twitterFeedback = feedback;
 		}
-		$('#twitter-btn').attr("href", "https://twitter.com/intent/tweet?text=" + fmt_rating + "-star response from " + firstName + " " + lastName + " for " + agentName + " at SocialSurvey - " + twitterFeedback + "&url='" + agentFullProfileLink + "'");
-		$('#fb-btn').attr("href", "https://www.facebook.com/dialog/share?app_id=" + fb_app_id + "&link=" + agentFullProfileLink + "&description=" + fmt_rating + "-star response from " + firstName + " " + lastName + " for " + agentName + " at SocialSurvey - " + feedback + ".&redirect_uri=https://www.facebook.com");
+		$('#twitter-btn').attr("href", "https://twitter.com/intent/tweet?text=" + fmt_rating + "-star response from " + firstName + " " + getInitials( lastName ) + " for " + agentName + " at SocialSurvey - " + twitterFeedback + "&url='" + agentFullProfileLink + "'");
+		$('#fb-btn').attr("href", "https://www.facebook.com/dialog/share?app_id=" + fb_app_id + "&href=" + agentFullProfileLink + "&quote=" + fmt_rating + "-star response from " + firstName + " " + getInitials( lastName ) + " for " + agentName + " at SocialSurvey - " + feedback + "&redirect_uri=https://www.facebook.com");
 
 		$('#content-head').html('Survey Completed');
 		if (mood == 'Great')
@@ -11197,6 +11197,7 @@ function showOrHideVendastaProductSettings(flag)
 	}	
 }
 
+//NOTE: picture and caption are deprecated for facebook, facebook no longer supports "picture" and "caption" parameters
 // Dashboard fb and twitter share
 function getDashboardImageandCaption(loop) {
 	var name = "";
@@ -12959,7 +12960,7 @@ function paintReviews(result, isRequestFromDashBoard) {
 		reviewsHtml += '		<div class="float-left blue-text ppl-share-shr-txt">Share</div>';
 		reviewsHtml += '		<div class="float-left icn-share icn-plus-open"></div>';
 		reviewsHtml += '		<div class="float-left clearfix ppl-share-social hide">';
-		reviewsHtml += '			<span id ="fb_' + i + '"class="float-left ppl-share-icns icn-fb icn-fb-pp" onclick="getImageandCaption(' + i + ');" title="Facebook" data-link="https://www.facebook.com/dialog/share?' + reviewItem.faceBookShareUrl + '&link=' + reviewItem.completeProfileUrl.replace("localhost", "127.0.0.1") + '&description=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + ' .&redirect_uri=https://www.facebook.com"></span>';
+		reviewsHtml += '			<span id ="fb_' + i + '"class="float-left ppl-share-icns icn-fb icn-fb-pp" title="Facebook" data-link="https://www.facebook.com/dialog/share?' + reviewItem.faceBookShareUrl + '&href=' + reviewItem.completeProfileUrl.replace("localhost", "127.0.0.1") + '&quote=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '&redirect_uri=https://www.facebook.com"></span>';
 		reviewsHtml += '            <input type="hidden" id="twttxt_' + i + '" class ="twitterText_loop" value ="' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '"/></input>';
 		reviewsHtml += '			<span id ="twitt_' + i + '" class="float-left ppl-share-icns icn-twit icn-twit-pp" onclick="twitterFn(' + i + ');" title="Twitter" data-link="https://twitter.com/intent/tweet?text=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + ' &url=' + reviewItem.completeProfileUrl + '"></span>';
 		reviewsHtml += '			<span class="float-left ppl-share-icns icn-lin icn-lin-pp" title="LinkedIn" data-link="https://www.linkedin.com/shareArticle?mini=true&url=' + reviewItem.completeProfileUrl + '/' + reviewItem._id + '&title=&summary=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '&source="></span>';
@@ -13171,4 +13172,13 @@ $('body').on('click', '.st-dd-item-survey-mail-thrs', function() {
 				showToast();
 			}, payload, false);
 });
+
+function getInitials( name ){
+    if( name != undefined && name != "" ){
+        return name.charAt(0).toUpperCase();
+    } else {
+        return "";
+    }
+}
+
 

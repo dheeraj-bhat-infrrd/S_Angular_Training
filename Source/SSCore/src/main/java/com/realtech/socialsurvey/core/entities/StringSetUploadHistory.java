@@ -1,33 +1,33 @@
 package com.realtech.socialsurvey.core.entities;
 
 import java.util.Date;
+import java.util.Set;
 
 
-public class StringUploadHistory
+public class StringSetUploadHistory
 {
-
-    private String value;
+    private Set<String> value;
     private Date time;
 
 
-    public StringUploadHistory()
+    public StringSetUploadHistory()
     {}
 
 
-    public StringUploadHistory( String value, Date time )
+    public StringSetUploadHistory( Set<String> history, Date date )
     {
-        this.value = value;
-        this.time = time;
+        this.value = history;
+        this.time = date;
     }
 
 
-    public String getValue()
+    public Set<String> getValue()
     {
         return value;
     }
 
 
-    public void setValue( String value )
+    public void setValue( Set<String> value )
     {
         this.value = value;
     }

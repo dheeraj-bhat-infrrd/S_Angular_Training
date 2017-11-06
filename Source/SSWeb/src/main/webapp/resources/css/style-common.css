@@ -9871,6 +9871,10 @@ ul.accordion li>a:before {
     border-radius: 4px;
 }
 
+.warn-toggle {
+	margin-left: 40px;
+}
+
 /*leaderboard*/
 .board-selector{
 	float: right;
