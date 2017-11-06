@@ -1715,7 +1715,7 @@ public class OrganizationManagementController
      * @param request
      * @return
      */
-    @RequestMapping ( value = "/updatesurveyremindersettings", method = RequestMethod.GET)
+    @RequestMapping ( value = "/updatesurveyremindersettings", method = RequestMethod.POST)
     @ResponseBody
     public String updateSurveyReminderSettings( Model model, HttpServletRequest request )
     {
