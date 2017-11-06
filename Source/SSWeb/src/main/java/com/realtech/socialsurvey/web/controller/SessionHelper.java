@@ -701,4 +701,18 @@ public class SessionHelper {
 		    session.setAttribute( CommonConstants.VENDASTA_ACCESS, unitSettings.isVendastaAccessible() );
 		}
 	}
+
+    public void refreshSession( HttpSession session, User user ) throws NonFatalException
+    {
+        LOG.info( "Fetching the user's canonical settings and setting it in session" );
+
+        // get the user's canonical settings
+        getCanonicalSettings( session );
+        
+        // Set the session variables
+        setSettingVariablesInSession( session );
+        
+        // process user assignments
+        processAssignments( session, user );        
+    }
 }
