@@ -36,6 +36,9 @@
 		<c:if test="${not empty contact_details.city }">
 			<c:set var="city" value="${contact_details.city}"></c:set>
 		</c:if>
+		<c:if test="${not empty contact_details.firstName && profileLevel == 'INDIVIDUAL'}">
+			<c:set var="agentFirstName" value="${contact_details.firstName}"></c:set>
+		</c:if>
 	</c:if>
 	<c:if test="${empty vertical && not empty profile.vertical}">
 		<c:set var="vertical" value="${profile.vertical}"></c:set>
@@ -134,6 +137,20 @@
 </c:if>
 </head>
 <body>
+	<c:if test="${not empty reviewAggregate}">
+		<c:choose>
+			<c:when test="${ reviewAggregate.surveyIdValid }">
+			<c:set value="true" var="popup" ></c:set>
+				<div id="single-review-page" class="overlay-login overlay-single-review">
+					<button type="button" class="close dismiss-single-review-popup" id="dismiss-single-review-popup">&times;</button>
+					<jsp:include page="single_review_page.jsp"></jsp:include>
+				</div>
+			</c:when>
+			<c:otherwise>
+			
+			</c:otherwise>
+		</c:choose>
+	</c:if>
 	<div id="contact-us-pu-wrapper" class="bd-srv-pu hide">
 		<div class="container cntct-us-container">
 			<div class="contact-us-pu">

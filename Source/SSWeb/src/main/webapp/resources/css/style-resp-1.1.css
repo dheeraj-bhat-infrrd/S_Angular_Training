@@ -393,6 +393,116 @@
 	.comp-mail-thrs-txt {
 		margin-right: 4px;
 	}	
+	
+	/*Single review Page */
+	.dismiss-single-review-popup{
+	z-index: 1000;
+	position: absolute;
+    color: black;
+    opacity: 1;
+    margin-right: 15px;
+    margin-top: 25px;
+    font-size: xx-large;
+    right: 0;
+	}
+	
+	.single-review-popup-wrapper {
+    top: 0;
+    width: 100%;
+    margin: 0 auto 20px;
+    background: #fff;
+    border-radius: 0;
+	}
+
+	.single-review-popup-hdr-wrapper {
+   	height: 90px;
+    padding-left: 50px;
+    background: #f2f2f2;
+    padding-top: 20px;
+	}
+	
+	.sr-prof-pic-circle {
+    position: absolute;
+    width: 50px;
+    left: 0;
+    height: 50px;
+    border-radius: 50%;
+    background: #fff;
+	}
+	
+	.sr-popup-hdr-details {
+    display: grid;
+    margin-left: 20px;
+    margin-top: 5px;
+	}
+	
+	.single-review-popup-body-wrapper{
+	display: flex;
+    flex-direction: column;
+    margin-top: 15px;
+	}
+	
+	.sr-review-details {
+	width: 100%;
+    order: 2;
+    display: grid;
+    padding: 5px;
+    padding-top: 25px;
+    margin-left: 25px;
+    padding-bottom: 15px;
+    float: right;
+	}
+	
+	.sr-reviewed-by {
+    font-weight: bold !important;
+    margin-bottom: 20px;
+	}
+	
+	.sr-margin-bottom-50 {
+    margin-bottom: 40px;
+	}
+	
+	.sr-review-content {
+	width: 100%;
+    order: 1;
+    padding: 5px;
+    border-left: 1px solid #d6d5d5;
+    margin-top: 0px;
+    display: grid;
+    padding-top: 25px;
+    float: right;
+    padding-right: 45px;
+    padding-left: 30px;
+	}
+	
+	.sr-ppl-content {
+    clear: both;
+    font-weight: bold !important;
+    font-size: 18px;
+    line-height: unset;
+	}
+	
+	.sr-wc-btn-row {
+    height: 70px;
+    background: #f2f2f2;
+    line-height: 40px;
+    padding: 0 10px;
+    margin-top: 40px;
+	}
+	
+	.sr-report-review {
+    margin-left: 30px;
+    margin-top: 20px;
+	}
+	
+	.sr-wc-dash-btn {
+	margin-top: 15px;
+    margin-left: auto;
+    width: 170px;
+    float: none;
+    position: absolute;
+    right: 0;
+	}
 }
 
 

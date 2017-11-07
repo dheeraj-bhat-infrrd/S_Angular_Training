@@ -36,6 +36,9 @@
 		<c:if test="${not empty contact_details.mail_ids }">
 			<c:set var="workEmail" value="${contact_details.mail_ids.work}"></c:set>
 		</c:if>
+		<c:if test="${not empty contact_details.firstName && profileLevel == 'INDIVIDUAL'}">
+			<c:set var="agentFirstName" value="${contact_details.firstName}"></c:set>
+		</c:if>
 	</c:if>
 	<c:if test="${not empty profile.vertical}">
 		<c:set var="vertical" value="${profile.vertical}"></c:set>
@@ -127,6 +130,21 @@
 	<div id="toast-container" class="toast-container">
 		<span id="overlay-toast" class="overlay-toast"></span>
 	</div>
+	<c:if test="${not empty reviewAggregate}">
+		<c:choose>
+			<c:when test="${ reviewAggregate.surveyIdValid }">
+			<c:set value="true" var="popup" ></c:set>
+				<div id="single-review-page" class="overlay-login overlay-single-review">
+					<button type="button" class="close dismiss-single-review-popup" id="dismiss-single-review-popup">&times;</button>
+					<jsp:include page="single_review_page.jsp"></jsp:include>
+				</div>
+			</c:when>
+			<c:otherwise>
+			
+			</c:otherwise>
+		</c:choose>
+	</c:if>
+	
 	<div id="report-abuse-overlay" class="overlay-main hide">
 		<div id="report-abuse-pop-up" class="overlay-disable-wrapper">
 			<div id="overlay-header" class="ol-header">
@@ -770,6 +788,18 @@
 		var reviewsSortBy = "${reviewSortCriteria}";
 		var showAllReviews = false;
 		$(document).ready(function() {
+			
+			if( '${popup}' == "true" && !$('body').hasClass("overflow-hidden-important") ){
+			 	$('body').addClass("overflow-hidden-important");
+			}
+			
+			 $('body').on('click','#dismiss-single-review-popup',function(e){
+				 $('#single-review-page').addClass('hide');
+				 if( $('body').hasClass("overflow-hidden-important") ){
+				 	$('body').removeClass("overflow-hidden-important");
+				 }
+			 });
+			
 			if ($('#social-token-container').children('.social-item-icon').length == 0) {
 				$('#social-token-container').remove();
 			} else {
