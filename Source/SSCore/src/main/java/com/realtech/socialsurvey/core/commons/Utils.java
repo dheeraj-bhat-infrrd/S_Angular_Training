@@ -8,7 +8,6 @@ import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.text.DateFormat;
@@ -372,22 +371,6 @@ public class Utils
         LOG.info( "Method to encrypt user id in mail, encryptUserEmailId ended" );
         return newEmailId;
     }
-    
-    /**
-     * method to convert to char set ISO 8859-1 and then encode it using UTF-8
-     * returns null if it fails to convert
-     * @param input
-     * @return
-     */
-    public String convert_ISO_8859_1_To_UTF_8_Encoding( String input )
-    {
-        try {
-            return input != null ? new String( input.getBytes( Charset.forName( "ISO-8859-1" ) ), "UTF-8" ) : null;
-        } catch ( UnsupportedEncodingException unableToParseString ) {
-            return null;
-        }
-    }
-    
     
     public java.sql.Date getNDaysBackDate( int noOfDays){
         LOG.debug( "method getNDaysBackDate started for noOfDays %s " + noOfDays );

@@ -36,7 +36,7 @@ public class CompanySurveyStatusStatsDaoImpl extends GenericReportingDaoImpl<Com
         Map<Long, Long> companySentSurveyCountsMap= new HashMap<Long, Long>();
         
         Criteria criteria = getSession().createCriteria( CompanySurveyStatusStats.class );
-        criteria.add( Restrictions.ge( CommonConstants.TRANSACTION_MONITOR_DATE_COLUMN, surveySentDate ) );
+        criteria.add( Restrictions.ge( CommonConstants.SURVEY_STATS_MONITOR_DATE_COLUMN, surveySentDate ) );
         criteria.setProjection( Projections.projectionList().add(Projections.groupProperty("companyId")).add(  Projections.sum("surveyInvitationSentCount") ) );
         List<Object[]> companySentSurveyCountsList = criteria.list();
         for(Object[] companySentSurveyCount : companySentSurveyCountsList){

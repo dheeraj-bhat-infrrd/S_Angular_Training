@@ -1,45 +1,72 @@
 package com.realtech.socialsurvey.core.entities;
 
+import java.util.List;
+
+
 /**
  * User upload validation object. Holds the snapshot of the uploaded file 
  *
  */
 public class UploadValidation
 {
+    private int numberOfRegionsAdded;
+    private int numberOfRegionsModified;
+    private int numberOfRegionsDeleted;
+    private int numberOfBranchesAdded;
+    private int numberOfBranchesModified;
+    private int numberOfBranchesDeleted;
+    private int numberOfUsersAdded;
+    private int numberOfUsersModified;
+    private int numberOfUsersDeleted;
 
-    // hierarchy data 
+    private List<String> regionValidationErrors;
+    private List<String> branchValidationErrors;
+    private List<String> userValidationErrors;
+
+    private List<String> regionValidationWarnings;
+    private List<String> branchValidationWarnings;
+    private List<String> userValidationWarnings;
+
+    private boolean isRegionHeadersInvalid;
+    private boolean isBranchHeadersInvalid;
+    private boolean isUserHeadersInvalid;
+
     private HierarchyUpload upload;
 
-    // flags used in upload verification: BEGIN
-    private int numberOfRegionsAdded;
-    private int numberOfBranchesAdded;
-    private int numberOfUsersAdded;
 
-    private int numberOfRegionsModified;
-    private int numberOfBranchesModified;
-    private int numberOfUsersModified;
-
-    private int numberOfBranchesDeleted;
-    private int numberOfUsersDeleted;
-    private int numberOfRegionsDeleted;
-
-    private boolean hasRegionValidationErrors;
-    private boolean hasBranchValidationErrors;
-    private boolean hasUserValidationErrors;
-
-    private boolean hasRegionValidationWarnings;
-    private boolean hasBranchValidationWarnings;
-    private boolean hasUserValidationWarnings;
-    // flags used in upload verification: END
-    public HierarchyUpload getUpload()
+    public boolean isRegionHeadersInvalid()
     {
-        return upload;
+        return isRegionHeadersInvalid;
     }
 
 
-    public void setUpload( HierarchyUpload upload )
+    public void setRegionHeadersInvalid( boolean isRegionHeadersInvalid )
     {
-        this.upload = upload;
+        this.isRegionHeadersInvalid = isRegionHeadersInvalid;
+    }
+
+
+    public boolean isBranchHeadersInvalid()
+    {
+        return isBranchHeadersInvalid;
+    }
+
+
+    public void setBranchHeadersInvalid( boolean isBranchHeadersInvalid )
+    {
+        this.isBranchHeadersInvalid = isBranchHeadersInvalid;
+    }
+
+
+    public boolean isUserHeadersInvalid()
+    {
+        return isUserHeadersInvalid;
+    }
+
+
+    public void setUserHeadersInvalid( boolean isUserHeadersInvalid )
+    {
+        this.isUserHeadersInvalid = isUserHeadersInvalid;
     }
 
 
@@ -55,30 +82,6 @@ public class UploadValidation
     }
 
 
-    public int getNumberOfBranchesAdded()
-    {
-        return numberOfBranchesAdded;
-    }
-
-
-    public void setNumberOfBranchesAdded( int numberOfBranchesAdded )
-    {
-        this.numberOfBranchesAdded = numberOfBranchesAdded;
-    }
-
-
-    public int getNumberOfUsersAdded()
-    {
-        return numberOfUsersAdded;
-    }
-
-
-    public void setNumberOfUsersAdded( int numberOfUsersAdded )
-    {
-        this.numberOfUsersAdded = numberOfUsersAdded;
-    }
-
-
     public int getNumberOfRegionsModified()
     {
         return numberOfRegionsModified;
@@ -88,54 +91,6 @@ public class UploadValidation
     public void setNumberOfRegionsModified( int numberOfRegionsModified )
     {
         this.numberOfRegionsModified = numberOfRegionsModified;
-    }
-
-
-    public int getNumberOfBranchesModified()
-    {
-        return numberOfBranchesModified;
-    }
-
-
-    public void setNumberOfBranchesModified( int numberOfBranchesModified )
-    {
-        this.numberOfBranchesModified = numberOfBranchesModified;
-    }
-
-
-    public int getNumberOfUsersModified()
-    {
-        return numberOfUsersModified;
-    }
-
-
-    public void setNumberOfUsersModified( int numberOfUsersModified )
-    {
-        this.numberOfUsersModified = numberOfUsersModified;
-    }
-
-
-    public int getNumberOfBranchesDeleted()
-    {
-        return numberOfBranchesDeleted;
-    }
-
-
-    public void setNumberOfBranchesDeleted( int numberOfBranchesDeleted )
-    {
-        this.numberOfBranchesDeleted = numberOfBranchesDeleted;
-    }
-
-
-    public int getNumberOfUsersDeleted()
-    {
-        return numberOfUsersDeleted;
-    }
-
-
-    public void setNumberOfUsersDeleted( int numberOfUsersDeleted )
-    {
-        this.numberOfUsersDeleted = numberOfUsersDeleted;
     }
 
 
@@ -151,75 +106,160 @@ public class UploadValidation
     }
 
 
-    public boolean hasRegionValidationErrors()
+    public int getNumberOfBranchesAdded()
     {
-        return hasRegionValidationErrors;
+        return numberOfBranchesAdded;
     }
 
 
-    public void setRegionValidationErrors( boolean hasRegionValidationErrors )
+    public void setNumberOfBranchesAdded( int numberOfBranchesAdded )
     {
-        this.hasRegionValidationErrors = hasRegionValidationErrors;
+        this.numberOfBranchesAdded = numberOfBranchesAdded;
     }
 
 
-    public boolean hasBranchValidationErrors()
+    public int getNumberOfBranchesModified()
     {
-        return hasBranchValidationErrors;
+        return numberOfBranchesModified;
     }
 
 
-    public void setBranchValidationErrors( boolean hasBranchValidationErrors )
+    public void setNumberOfBranchesModified( int numberOfBranchesModified )
     {
-        this.hasBranchValidationErrors = hasBranchValidationErrors;
+        this.numberOfBranchesModified = numberOfBranchesModified;
     }
 
 
-    public boolean hasUserValidationErrors()
+    public int getNumberOfBranchesDeleted()
     {
-        return hasUserValidationErrors;
+        return numberOfBranchesDeleted;
     }
 
 
-    public void setUserValidationErrors( boolean hasUserValidationErrors )
+    public void setNumberOfBranchesDeleted( int numberOfBranchesDeleted )
     {
-        this.hasUserValidationErrors = hasUserValidationErrors;
+        this.numberOfBranchesDeleted = numberOfBranchesDeleted;
     }
 
 
-    public boolean hasRegionValidationWarnings()
+    public int getNumberOfUsersAdded()
     {
-        return hasRegionValidationWarnings;
+        return numberOfUsersAdded;
     }
 
 
-    public void setRegionValidationWarnings( boolean hasRegionValidationWarnings )
+    public void setNumberOfUsersAdded( int numberOfUsersAdded )
     {
-        this.hasRegionValidationWarnings = hasRegionValidationWarnings;
+        this.numberOfUsersAdded = numberOfUsersAdded;
     }
 
 
-    public boolean hasBranchValidationWarnings()
+    public int getNumberOfUsersModified()
     {
-        return hasBranchValidationWarnings;
+        return numberOfUsersModified;
     }
 
 
-    public void setBranchValidationWarnings( boolean hasBranchValidationWarnings )
+    public int getNumberOfUsersDeleted()
     {
-        this.hasBranchValidationWarnings = hasBranchValidationWarnings;
+        return numberOfUsersDeleted;
     }
 
 
-    public boolean hasUserValidationWarnings()
+    public void setNumberOfUsersDeleted( int numberOfUsersDeleted )
     {
-        return hasUserValidationWarnings;
+        this.numberOfUsersDeleted = numberOfUsersDeleted;
     }
 
 
-    public void setUserValidationWarnings( boolean hasUserValidationWarnings )
+    public void setNumberOfUsersModified( int numberOfUsersModified )
     {
-        this.hasUserValidationWarnings = hasUserValidationWarnings;
+        this.numberOfUsersModified = numberOfUsersModified;
     }
+
+
+    public List<String> getRegionValidationErrors()
+    {
+        return regionValidationErrors;
+    }
+
+
+    public void setRegionValidationErrors( List<String> regionValidationErrors )
+    {
+        this.regionValidationErrors = regionValidationErrors;
+    }
+
+
+    public List<String> getBranchValidationErrors()
+    {
+        return branchValidationErrors;
+    }
+
+
+    public void setBranchValidationErrors( List<String> branchValidationErrors )
+    {
+        this.branchValidationErrors = branchValidationErrors;
+    }
+
+
+    public List<String> getUserValidationErrors()
+    {
+        return userValidationErrors;
+    }
+
+
+    public void setUserValidationErrors( List<String> userValidationErrors )
+    {
+        this.userValidationErrors = userValidationErrors;
+    }
+
+
+    public List<String> getRegionValidationWarnings()
+    {
+        return regionValidationWarnings;
+    }
+
+
+    public void setRegionValidationWarnings( List<String> regionValidationWarnings )
+    {
+        this.regionValidationWarnings = regionValidationWarnings;
+    }
+
+
+    public List<String> getBranchValidationWarnings()
+    {
+        return branchValidationWarnings;
+    }
+
+
+    public void setBranchValidationWarnings( List<String> branchValidationWarnings )
+    {
+        this.branchValidationWarnings = branchValidationWarnings;
+    }
+
+
+    public List<String> getUserValidationWarnings()
+    {
+        return userValidationWarnings;
+    }
+
+
+    public void setUserValidationWarnings( List<String> userValidationWarnings )
+    {
+        this.userValidationWarnings = userValidationWarnings;
+    }
+
+
+    public HierarchyUpload getUpload()
+    {
+        return upload;
+    }
+
+
+    public void setUpload( HierarchyUpload upload )
+    {
+        this.upload = upload;
+    }
+
 
 }

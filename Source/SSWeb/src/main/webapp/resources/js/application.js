@@ -1543,7 +1543,7 @@ function paintActvUserGraph() {
 	for (var i = 0; i < keys.length; i++) {
 		if (format == '365') {
 			allTimeslots[i] = convertYearMonthKeyToDate(keys[i]);
-		} else if (format == '10' || format == '20') {
+		} else if (format == '10' || format == '20' || format == '30') {
 			allTimeslots[i] = convertYearMonthDayKeyToDate(keys[i]);
 		}else {
 			allTimeslots[i] = convertYearWeekKeyToDate(keys[i]);
@@ -1695,7 +1695,7 @@ function paintProcSurveyGraph() {
 	for (var i = 0; i < keys.length; i++) {
 		if (format == '365') {
 			allTimeslots[i] = convertYearMonthKeyToDate(keys[i]);
-		} else if (format == '10' || format == '20' ) {
+		} else if (format == '10' || format == '20' || format == '30') {
 			allTimeslots[i] = convertYearMonthDayKeyToDate(keys[i]);
 		}else {
 			allTimeslots[i] = convertYearWeekKeyToDate(keys[i]);
@@ -1875,7 +1875,7 @@ function paintTransactionGraph() {
 	for (var i = 0; i < keys.length; i++) {
 		if (format == '365') {
 			allTimeslots[i] = convertYearMonthKeyToDate(keys[i]);
-		} else if (format == '10' || format == '20' ) {
+		} else if (format == '10' || format == '20' || format == '30') {
 			allTimeslots[i] = convertYearMonthDayKeyToDate(keys[i]);
 		}else {
 			allTimeslots[i] = convertYearWeekKeyToDate(keys[i]);
@@ -2146,7 +2146,7 @@ function getKeysFromGraphFormat(format) {
 
 		}
 
-	} else if(format == '10' || format == '15' || format == '20') {
+	} else if(format == '10' || '20') {
 		firstDate = Date.today().add({
 			days : -parseInt(format)
 		});
@@ -5183,9 +5183,9 @@ function autoAppendReminderDropdown(reminderId, reminderDefault) {
 	autoAppendDropdown(reminderId, 15, 1);
 }
 
-function updateReminderSettings(formid) {
+function updateReminderSettings(payload) {
 	var url = "./updatesurveyremindersettings.do";
-	callAjaxFormSubmit(url, updateReminderSettingsCallBack, formid);
+	callAjaxPostWithPayloadData(url, updateReminderSettingsCallBack, payload);
 }
 
 function updateReminderSettingsCallBack(response) {
@@ -11197,7 +11197,6 @@ function showOrHideVendastaProductSettings(flag)
 	}	
 }
 
-//NOTE: picture and caption are deprecated for facebook, facebook no longer supports "picture" and "caption" parameters
 // Dashboard fb and twitter share
 function getDashboardImageandCaption(loop) {
 	var name = "";
@@ -12960,7 +12959,7 @@ function paintReviews(result, isRequestFromDashBoard) {
 		reviewsHtml += '		<div class="float-left blue-text ppl-share-shr-txt">Share</div>';
 		reviewsHtml += '		<div class="float-left icn-share icn-plus-open"></div>';
 		reviewsHtml += '		<div class="float-left clearfix ppl-share-social hide">';
-		reviewsHtml += '			<span id ="fb_' + i + '"class="float-left ppl-share-icns icn-fb icn-fb-pp" title="Facebook" data-link="https://www.facebook.com/dialog/share?' + reviewItem.faceBookShareUrl + '&href=' + reviewItem.completeProfileUrl.replace("localhost", "127.0.0.1") + '&quote=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '&redirect_uri=https://www.facebook.com"></span>';
+		reviewsHtml += '			<span id ="fb_' + i + '"class="float-left ppl-share-icns icn-fb icn-fb-pp" onclick="getImageandCaption(' + i + ');" title="Facebook" data-link="https://www.facebook.com/dialog/share?' + reviewItem.faceBookShareUrl + '&link=' + reviewItem.completeProfileUrl.replace("localhost", "127.0.0.1") + '&description=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + ' .&redirect_uri=https://www.facebook.com"></span>';
 		reviewsHtml += '            <input type="hidden" id="twttxt_' + i + '" class ="twitterText_loop" value ="' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '"/></input>';
 		reviewsHtml += '			<span id ="twitt_' + i + '" class="float-left ppl-share-icns icn-twit icn-twit-pp" onclick="twitterFn(' + i + ');" title="Twitter" data-link="https://twitter.com/intent/tweet?text=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + ' &url=' + reviewItem.completeProfileUrl + '"></span>';
 		reviewsHtml += '			<span class="float-left ppl-share-icns icn-lin icn-lin-pp" title="LinkedIn" data-link="https://www.linkedin.com/shareArticle?mini=true&url=' + reviewItem.completeProfileUrl + '/' + reviewItem._id + '&title=&summary=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '&source="></span>';

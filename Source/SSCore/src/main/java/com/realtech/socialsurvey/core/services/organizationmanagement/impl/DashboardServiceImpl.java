@@ -50,7 +50,7 @@ import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.FeedStatus;
 import com.realtech.socialsurvey.core.entities.FileUpload;
-import com.realtech.socialsurvey.core.entities.HierarchyUploadAggregate;
+import com.realtech.socialsurvey.core.entities.HierarchyUpload;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SocialPost;
@@ -200,10 +200,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         //JIRA SS-1350 begin
         long incompleteSurveyCount = 0;
         if ( companyId > 0l || agentId > 0l || ( agentIds != null && !agentIds.isEmpty() ) ) {
-            incompleteSurveyCount = surveyPreInitiationDao.getIncompleteSurveyCount( companyId,
-                agentId, new int[] { CommonConstants.STATUS_SURVEYPREINITIATION_DELETED,
-                    CommonConstants.SURVEY_STATUS_PRE_INITIATED, CommonConstants.SURVEY_STATUS_INITIATED },
-                startDate, endDate, agentIds );
+            incompleteSurveyCount = surveyPreInitiationDao.getIncompleteSurveyCount( companyId, agentId,
+            		new int[]{CommonConstants.STATUS_SURVEYPREINITIATION_DELETED, CommonConstants.SURVEY_STATUS_PRE_INITIATED, CommonConstants.SURVEY_STATUS_INITIATED}, startDate, endDate, agentIds );
         }
         //JIRA SS-1350 end
         LOG.debug( "Completed survey: " + completedSurveyCount );
@@ -262,10 +260,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         //JIRA SS-1350 begin
         long incompleteSurveyCount = 0;
         if ( companyId > 0l || agentId > 0l || ( agentIds != null && !agentIds.isEmpty() ) ) {
-            incompleteSurveyCount = surveyPreInitiationDao.getIncompleteSurveyCount( companyId,
-                agentId, new int[] { CommonConstants.STATUS_SURVEYPREINITIATION_DELETED,
-                    CommonConstants.SURVEY_STATUS_PRE_INITIATED, CommonConstants.SURVEY_STATUS_INITIATED },
-                startDate, endDate, agentIds );
+            incompleteSurveyCount = surveyPreInitiationDao.getIncompleteSurveyCount( companyId, agentId,
+            		new int[]{CommonConstants.STATUS_SURVEYPREINITIATION_DELETED, CommonConstants.SURVEY_STATUS_PRE_INITIATED, CommonConstants.SURVEY_STATUS_INITIATED}, startDate, endDate, agentIds );
         }
         //JIRA SS-1350 end
         LOG.debug( "Completed survey: " + completedSurveyCount );
@@ -556,15 +552,15 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         } else if ( columnName.equals( "branchId" ) ) {
             agentIds = userProfileDao.findUserIdsByBranch( columnValue );
         }
-
-
-        Map<Integer, Integer> incompleteSurveys = new HashMap<Integer, Integer>();
+        
+        
+        Map<Integer, Integer> incompleteSurveys =  new HashMap<Integer, Integer>();
         if ( companyId > 0l || agentId > 0l || ( agentIds != null && !agentIds.isEmpty() ) ) {
             incompleteSurveys = surveyPreInitiationDao.getIncompletSurveyAggregationCount( companyId, agentId,
                 CommonConstants.STATUS_ACTIVE, startDate, endDate, agentIds, criteria );
             LOG.debug( "Aggregating completed and incomplete surveys" );
         }
-
+       
         Map<Integer, Integer> allSurveysSent = aggregateAllSurveysSent( incompleteSurveys, completedSurveyToBeProcessed );
 
         LOG.debug( "Getting clicked surveys" );
@@ -825,8 +821,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         }
 
         Company company = companyDao.findById( Company.class, companyId );
-        HierarchyUploadAggregate hierarchyAggregate = hierarchyDownloadService.fetchUpdatedHierarchyUploadStructure( company );
-        return hierarchyDownloadService.generateHierarchyDownloadReport( hierarchyAggregate.getHierarchyUpload(), company );
+        HierarchyUpload hierarchyUpload = hierarchyDownloadService.fetchUpdatedHierarchyStructure( company );
+        return hierarchyDownloadService.generateHierarchyDownloadReport( hierarchyUpload, company );
     }
 
 
@@ -1776,19 +1772,19 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         boolean fetchAbusive = false;
         List<SurveyDetails> surveyDetails = new ArrayList<>();
         List<SurveyDetails> surveyDetailsBatch = new ArrayList<>();
-
+        
         final int batch = 1000;
         int start = 0;
-
-        do {
-            surveyDetailsBatch = profileManagementService.getReviewsForReports( profileValue, -1, -1, start, batch,
-                profileLevel, fetchAbusive, startDate, endDate, null );
+        
+        do{
+            surveyDetailsBatch = profileManagementService.getReviewsForReports( profileValue, -1, -1, start, batch, profileLevel, fetchAbusive,
+                startDate, endDate, null );
             surveyDetails.addAll( surveyDetailsBatch );
             start += batch;
-
-        } while ( surveyDetailsBatch.size() == batch );
-
-
+            
+        }while(surveyDetailsBatch.size() == batch);
+        
+           
         User user = userDao.findById( User.class, userId );
         String fileName = "Survey_Results-" + profileLevel + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
             + ( new Timestamp( date.getTime() ) ) + CommonConstants.EXCEL_FILE_EXTENSION;

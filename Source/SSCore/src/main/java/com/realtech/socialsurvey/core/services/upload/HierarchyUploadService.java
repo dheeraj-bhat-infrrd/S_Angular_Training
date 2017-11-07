@@ -1,37 +1,31 @@
 package com.realtech.socialsurvey.core.services.upload;
 
-import java.util.Date;
-import java.util.List;
-
 import org.springframework.stereotype.Component;
 
-import com.realtech.socialsurvey.core.entities.ParsedHierarchyUpload;
-import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.UploadValidation;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
-
 
 @Component
 public interface HierarchyUploadService
 {
-
-    public boolean processHierarchyUploadXlsx( ParsedHierarchyUpload parsedHierarchyUpload ) throws InvalidInputException;
-
-
-    public List<ParsedHierarchyUpload> findInitiatedHierarchyUploads() throws NoRecordsFetchedException;
-
-
-    public ParsedHierarchyUpload insertUploadHierarchyXlsxDetails( User user, String fileLocalName, String uploadedFileName,
-        Date uploadedDate, boolean isInAppendMode ) throws InvalidInputException;
-
-
-    public boolean updateStatusForParsedHierarchyUpload( long companyId, int hierarchyUploadStatusInitiated )
+    /**
+     * Validates the user uploaded file for hierarchy upload
+     * @param company
+     * @param fileName
+     * @return
+     * @throws InvalidInputException
+     */
+    public UploadValidation validateUserUploadFile( Company company, String fileName, boolean isAppend )
         throws InvalidInputException;
 
-
-    public ParsedHierarchyUpload getParsedHierarchyUpload( long companyId )
-        throws NoRecordsFetchedException, InvalidInputException;
-
-
-    public boolean reinsertParsedHierarchyUpload( ParsedHierarchyUpload upload ) throws InvalidInputException;
+    /**
+     * Validate hierarchy upload when modified in the UI
+     * @param company
+     * @param newUploadValidation
+     * @return
+     * @throws InvalidInputException
+     */
+    public UploadValidation validateHierarchyUploadJson( Company company, UploadValidation newUploadValidation, boolean isAppend )
+        throws InvalidInputException;
 }

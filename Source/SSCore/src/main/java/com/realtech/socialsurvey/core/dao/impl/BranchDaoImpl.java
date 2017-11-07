@@ -118,8 +118,6 @@ public class BranchDaoImpl extends GenericDaoImpl<Branch, Long> implements Branc
                             Branch branch = branchIdObjMap.get( branchSettings.getIden() );
                             branch.setAddress1( branchSettings.getContact_details().getAddress1() );
                             branch.setAddress2( branchSettings.getContact_details().getAddress2() );
-                            branch.setCountry( branchSettings.getContact_details().getCountry() );
-                            branch.setCountryCode( branchSettings.getContact_details().getCountryCode() );
                             branch.setCity( branchSettings.getContact_details().getCity() );
                             branch.setState( branchSettings.getContact_details().getState() );
                             branch.setZipcode( branchSettings.getContact_details().getZipcode() );

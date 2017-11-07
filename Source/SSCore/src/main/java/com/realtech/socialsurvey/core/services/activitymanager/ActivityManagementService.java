@@ -33,7 +33,7 @@ public interface ActivityManagementService
      * 
      * @param companyIds
      */
-    public void sendHighNotProcessedTransactionAlertMailForCompanies( List<Long> companyIdsToSendAlert, List<Company> allActiveCompanies );
+    public void sendHighNotProcessedTransactionAlertMailForCompanies( List<Long> companyIds );
 
     
     /**
@@ -48,7 +48,7 @@ public interface ActivityManagementService
      * 
      * @param companies
      */
-    public void sendNoTransactionAlertMailForCompanies( List<Company> companies, int noOfDays );
+    public void sendNoTransactionAlertMailForCompanies( List<Company> companies );
 
     /**
      * 
@@ -62,7 +62,8 @@ public interface ActivityManagementService
      * @param companyActiveUserCounts
      * @param companySurveyStatsCountsMap
      */
-    public void validateAndSentLessSurveysAlert( List<CompanyActiveUsersStats> companyActiveUserCounts, Map<Long, Long> companySurveyStatsCountsMap );
+    public void validateAndSentLessSurveysAlert( List<Company> allCompanies, Map<Long, Long> companyActiveUserCounts,
+        Map<Long, Long> companySurveyStatsCountsMap );
 
     /**
      * 
@@ -93,18 +94,6 @@ public interface ActivityManagementService
      */
     public List<CompanyActiveUsersStats> getActiveUserCountStatsForCompanyForPastNDays( long companyId, int noOfDays )
         throws InvalidInputException;
-
-    /**
-     * 
-     * @return
-     */
-    public List<CompanyActiveUsersStats> getCompanyActiveUserCountForPastDay();
-
-    /**
-     * 
-     * @return List of String
-     */
-    public List<String> getTransactionMonitorMailList();
 
 
 }

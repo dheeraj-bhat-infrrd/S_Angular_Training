@@ -1,11 +1,18 @@
 package com.realtech.socialsurvey.core.services.upload.impl;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.slf4j.Logger;
@@ -13,8 +20,15 @@ import org.slf4j.LoggerFactory;
 
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.UserDao;
+import com.realtech.socialsurvey.core.entities.BranchUploadVO;
+import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.HierarchyUpload;
+import com.realtech.socialsurvey.core.entities.RegionUploadVO;
+import com.realtech.socialsurvey.core.entities.UploadValidation;
+import com.realtech.socialsurvey.core.entities.UserUploadVO;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.upload.HierarchyDownloadService;
-import com.realtech.socialsurvey.core.workbook.utils.WorkbookOperations;
+import com.realtech.socialsurvey.core.services.upload.UploadValidationService;
 
 
 public class HierarchyUploadServiceImplTest
@@ -29,15 +43,14 @@ public class HierarchyUploadServiceImplTest
     @Mock
     private Utils utils;
 
+    @Mock
+    private UploadValidationService uploadValidationService;
 
     @Mock
     private HierarchyDownloadService hierarchyDownloadService;
 
     @Mock
     private UserDao userDao;
-
-    @Mock
-    private WorkbookOperations workbookOperations;
 
 
     @BeforeClass
@@ -62,27 +75,27 @@ public class HierarchyUploadServiceImplTest
     {}
 
 
-    /* @Test ( expected = InvalidInputException.class)
+    @Test ( expected = InvalidInputException.class)
     public void testValidateUserUploadFileIfCompanyInvalidFileNameInvalid() throws InvalidInputException
     {
-        //hierarchyUploadServiceImpl.validateUserUploadFile( null, null, false );
+        hierarchyUploadServiceImpl.validateUserUploadFile( null, null, false );
     }
-    
-    
+
+
     @Test ( expected = InvalidInputException.class)
     public void testValidateUserUploadFileIfCompanyInvalidFileNameValid() throws InvalidInputException
     {
-        //hierarchyUploadServiceImpl.validateUserUploadFile( null, "src/test/resources/testCSV.xlsx", false );
-    }*/
+        hierarchyUploadServiceImpl.validateUserUploadFile( null, "src/test/resources/testCSV.xlsx", false );
+    }
 
 
-    /*  @Test
+    @Test
     public void testValidateUserUploadFileIfCompanyValidFileNameValid() throws InvalidInputException
     {
         Company company = new Company();
         company.setCompany( "Raremile" );
-        //File file = new File( "." );
-        //Mockito.when( hierarchyDownloadService.fetchUpdatedHierarchyStructure( company ) ).thenReturn( getHierarchyUpload() );
+        File file = new File( "." );
+        Mockito.when( hierarchyDownloadService.fetchUpdatedHierarchyStructure( company ) ).thenReturn( getHierarchyUpload() );
         UploadValidation validationObj = hierarchyUploadServiceImpl.validateUserUploadFile( company,
             "file:///" + file.getAbsolutePath() + "/src/test/resources/testCSV.xlsx", false );
         Assert.assertNotNull( validationObj );
@@ -91,9 +104,9 @@ public class HierarchyUploadServiceImplTest
         Assert.assertEquals( 78, validationObj.getUpload().getBranches().size() );
         Assert.assertEquals( 50, validationObj.getUpload().getUsers().size() );
     }
-    */
 
-    /*  @Test
+
+    @Test
     public void testValidateUserUploadFileForSnapshotData() throws InvalidInputException
     {
         Company company = new Company();
@@ -128,7 +141,7 @@ public class HierarchyUploadServiceImplTest
         Assert.assertNotNull( validationObj );
         Assert.assertEquals( 1, validationObj.getNumberOfUsersDeleted() );
     }
-    
+
     private HierarchyUpload getHierarchyUpload_deletedUser()
     {
         HierarchyUpload upload = new HierarchyUpload();
@@ -176,8 +189,8 @@ public class HierarchyUploadServiceImplTest
         upload.setUsers( users );
         return upload;
     }
-    
-    
+
+
     private UserUploadVO getUser( String userId, String name, String email, String regionId, String branchId,
         List<String> regionAdmin, List<String> branchAdmin, int rowNum )
     {
@@ -187,13 +200,13 @@ public class HierarchyUploadServiceImplTest
         user.setEmailId( email );
         user.setSourceRegionId( regionId );
         user.setSourceBranchId( branchId );
-        //user.setAssignedBranchesAdmin( branchAdmin );
-        //user.setAssignedRegionsAdmin( regionAdmin );
+        user.setAssignedBranchesAdmin( branchAdmin );
+        user.setAssignedRegionsAdmin( regionAdmin );
         user.setRowNum( rowNum );
         return user;
     }
-    
-    
+
+
     private BranchUploadVO getBranch( String branchId, String name, String regionId, boolean isAddressSet, String city,
         String state, String zip, int rowNum )
     {
@@ -208,8 +221,8 @@ public class HierarchyUploadServiceImplTest
         branch.setSourceRegionId( regionId );
         return branch;
     }
-    
-    
+
+
     private RegionUploadVO getRegion( String regionId, String name, String address1, String address2, String city,
         String country, String state, String zip, int rowNum )
     {
@@ -226,11 +239,11 @@ public class HierarchyUploadServiceImplTest
         return region;
     }
     
-    
+
     @Test ( expected = InvalidInputException.class)
     public void validateHierarchyUploadJsonTestInvalidNewUpload() throws InvalidInputException
     {
         hierarchyUploadServiceImpl.validateHierarchyUploadJson( new Company(), null, false );
     }
-    */
+
 }

@@ -189,6 +189,19 @@
 		<property name="durability" value="true" />
 	</bean>
 
+	<!-- Setting file upload job detail -->
+	<bean id="fileuploadjobdetail"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass"
+			value="com.realtech.socialsurvey.core.starter.CSVHierarchyUploader" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="uploadHandler" value-ref="uploadHandler" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
+
 	<!-- Setting hierarchy upload job detail -->
 	<bean id="hierarchyuploadjobdetail"
 		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
@@ -608,6 +621,14 @@
 		<property name="cronExpression" value="0 45 7 * * ?" />
 	</bean>
 
+	<!-- setting cron for file upload -->
+	<bean id="fileuploadcron"
+		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="fileuploadjobdetail" />
+		<property name="repeatCount" value="0" />
+		<property name="startDelay" value="2000" />
+	</bean>
+
 	<!-- setting cron for hierarchy upload -->
 	<bean id="hierarchyuploadcron"
 		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
@@ -731,6 +752,7 @@
 				<ref bean="accountdeactivatorjobdetail" />
 				<ref bean="deactivatedaccountpurgerjobdetail" />
 				<ref bean="imageloaderjobdetail" />
+				<ref bean="fileuploadjobdetail" />
 				<ref bean="hierarchyuploadjobdetail" />
 				<ref bean="billingreportjobdetail" />
 				<ref bean="dotloopjobdetail" />
@@ -750,7 +772,7 @@
 				<!-- <ref bean="hideUsersFromSearch" />	-->
 				<!-- <ref bean="surveysourceidupdater" /> -->
 				<!-- <ref bean="surveyquestionupdater" /> -->	
-				<!-- <ref bean="monthlydigeststarter" /> -->
+				<ref bean="monthlydigeststarter" />
 				<ref bean="transactionActivityMonitorJobDetail" />	
 			</list>
 		</property>
@@ -768,6 +790,7 @@
 				<ref bean="deactivatedaccountpurgercron" />
 				<ref bean="crmdataagentidmappercron" />
 				<ref bean="imageloadercron" />
+				<ref bean="fileuploadcron" />
 				<ref bean="hierarchyuploadcron" />
 				<ref bean="billingreportcron" />
 				<ref bean="dotloopcron" />
@@ -787,7 +810,7 @@
 				<!--  <ref bean="deleteUsedVendastaTicketscron" />-->	
 				<!-- <ref bean="surveysourceidupdatercron" /> -->
 				<!-- <ref bean="surveyquestionupdatercron" /> -->
-				<!-- <ref bean="monthlydigeststartercron" /> -->
+				<ref bean="monthlydigeststartercron" />
 				<ref bean="transactionActivityMonitorCron" />
 			</list>
 		</property>
@@ -889,6 +912,9 @@
 
 	<!-- Posts to wall -->
 	<bean id="postToWall" class="com.realtech.socialsurvey.core.utils.mongo.PostToWall" />
+
+	<!-- CSV Upload reader -->
+	<bean id="uploadHandler" class="com.realtech.socialsurvey.core.handler.CSVUploadHandler" />
 
 	<!-- Hierarchy Upload handler -->
 	<bean id="hierarchyUploadHandler"

@@ -1,1 +1,1 @@
-Alert !! No transactions received
+No transactions received

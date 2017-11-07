@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.CompanyActiveUsersStatsDao;
 import com.realtech.socialsurvey.core.dao.CompanySurveyStatusStatsDao;
@@ -62,40 +61,31 @@ public class ActivityManagementServiceImpl implements ActivityManagementService
     @Value ( "${APPLICATION_SUPPORT_EMAIL}")
     private String applicationSupportEmail;
     
-    @Value ( "${TRANSACTION_MONITOR_SUPPORT_EMAIL}")
-    private String transactionMonitorSupportEmail;
-    
     /**
      * 
      */
     @Override
-    public void sendHighNotProcessedTransactionAlertMailForCompanies(List<Long> companyIdsToSendAlert, List<Company> allActiveCompanies)
+    public void sendHighNotProcessedTransactionAlertMailForCompanies(List<Long> companyIds)
     {
         
-        LOG.info( "method sendHighNotProcessedTransactionAlertMailForCompanies started" );
+        LOG.debug( "method sendHighNotProcessedTransactionAlertMailForCompanies started" );
 
+        List<Company> companies = organizationManagementService.getCompaniesByCompanyIds( new HashSet<Long>(companyIds));
         String mailBody = "";
         
         int i = 0;
-        for(Company company :  allActiveCompanies){
-            //check if we need to send alert mail for this company
-            if(companyIdsToSendAlert.contains( company.getCompanyId() )){
-                i++;
-                mailBody +=  (i + ". " + " " + company.getCompany() + " with id "  + company.getCompanyId()  + " have more than 50% unprocessed transactions for previous day." );             
-                mailBody += "<br>";
-            }
-            
+        for(Company company :  companies){
+            mailBody +=  (i + ". " + company.getCompanyId() + " " + company.getCompany() + " . SocialSurvey has not received any transaction details since " );             
+            mailBody += "</br>";
         }
         
         
         try {
-            //send mail if there is atleast one company with high not processed transactions
-            if(i > 0 )
-                emailServices.sendHighVoulmeUnprocessedTransactionAlertMail( getTransactionMonitorMailList(), mailBody );
+            emailServices.sendHighVoulmeUnprocessedTransactionAlertMail( applicationSupportEmail, mailBody );
         } catch ( InvalidInputException | UndeliveredEmailException e ) {
-           LOG.error( "Error while sending highNotProcessed alert email " , e );
+           LOG.error( "Error while sending highNotProcessed aler email " ); e.printStackTrace();
         }
-        LOG.info( "method sendHighNotProcessedTransactionAlertMailForCompanies ended" );
+        LOG.debug( "method sendHighNotProcessedTransactionAlertMailForCompanies ended" );
     }
     
     /**
@@ -128,32 +118,26 @@ public class ActivityManagementServiceImpl implements ActivityManagementService
      * @param companies
      */
     @Override
-    public void sendNoTransactionAlertMailForCompanies(List<Company> companies , int noOfDays)
+    public void sendNoTransactionAlertMailForCompanies(List<Company> companies)
     {
         
-        LOG.info( "method sendNoTransactionAlertMailForCompanies started" );
+        LOG.debug( "method sendNoTransactionAlertMailForCompanies started" );
         String mailBody = "";
-        
-        Calendar calendar = Calendar.getInstance();
-        calendar.add( Calendar.DATE, -(noOfDays) ); // subtract the no of days
-        Date nDaysBackDate = new Date( calendar.getTimeInMillis() );
         
         int i = 0;
         for(Company company :  companies){
             i++;
-            mailBody +=  (i + ". " + " " + company.getCompany() + " with id " + company.getCompanyId()  + " SocialSurvey has not received any transaction details since " + nDaysBackDate);             
-            mailBody += "<br>"  ;
+            mailBody +=  (i + ". " + company.getCompanyId() + " " + company.getCompany() + " . SocialSurvey has not received any transaction details since " );             
+            mailBody += "</br>";
         }
         
         
         try {
-            //send mail if there is at least one company with no transactions
-            if(i >0 )
-                emailServices.sendNoTransactionAlertMail( getTransactionMonitorMailList(), mailBody );
+            emailServices.sendNoTransactionAlertMail( applicationSupportEmail, mailBody );
         } catch ( InvalidInputException | UndeliveredEmailException e ) {
-           LOG.error( "Error while sending highNotProcessed aler email ", e );
+           LOG.error( "Error while sending highNotProcessed aler email " ); e.printStackTrace();
         }
-        LOG.info( "method sendNoTransactionAlertMailForCompanies ended" );
+        LOG.debug( "method sendNoTransactionAlertMailForCompanies ended" );
     }
     
     /**
@@ -162,15 +146,15 @@ public class ActivityManagementServiceImpl implements ActivityManagementService
     @Override
     public List<CompanySurveyStatusStats> getSurveyStatusStatsForPastDay()
     {
-        LOG.info( "method getSurveyStatusStatsForPastDay started" );
+        LOG.debug( "method getSurveyStatusStatsForPastDay started" );
         
         Calendar calendar = Calendar.getInstance();
         calendar.add( Calendar.DATE, -1 );
         Date yesterDayDate = new Date( calendar.getTimeInMillis() );
         
-        List<CompanySurveyStatusStats> companySurveyStatusStatsList = companySurveyStatusStatsDao.findByColumn(CompanySurveyStatusStats.class, CommonConstants.TRANSACTION_MONITOR_DATE_COLUMN, yesterDayDate );
+        List<CompanySurveyStatusStats> companySurveyStatusStatsList = companySurveyStatusStatsDao.findByColumn(CompanySurveyStatusStats.class, "statsDate", yesterDayDate );
         
-        LOG.info( "method getSurveyStatusStatsForPastDay ended" );
+        LOG.debug( "method getSurveyStatusStatsForPastDay ended" );
         return companySurveyStatusStatsList;
     }
     
@@ -182,7 +166,7 @@ public class ActivityManagementServiceImpl implements ActivityManagementService
     public List<Long> validateSurveyStatsForCompanies(List<CompanySurveyStatusStats> companySurveyStatusStatsList)
     {
         
-        LOG.info( "method validateSurveyStatsForCompanies started" );
+        LOG.debug( "method validateSurveyStatsForCompanies started" );
         List<Long> companyIds = new ArrayList<Long>();
         for(CompanySurveyStatusStats companySurveyStatusStats :  companySurveyStatusStatsList){
             int transactionReceivedCount = companySurveyStatusStats.getTransactionReceivedCount();
@@ -194,7 +178,7 @@ public class ActivityManagementServiceImpl implements ActivityManagementService
             }                     
         }
         
-        LOG.info( "method validateSurveyStatsForCompanies ended" );
+        LOG.debug( "method validateSurveyStatsForCompanies ended" );
         return companyIds;
     }
 
@@ -204,7 +188,7 @@ public class ActivityManagementServiceImpl implements ActivityManagementService
     @Override
     public Map<Long, Long> getSurveyStatusStatsForPastOneMonth()
     {
-        LOG.info( "method getSurveyStatusStatsForPastOneMonth started" );
+        LOG.debug( "method getSurveyStatusStatsForPastOneMonth started" );
         
         Calendar calendar = Calendar.getInstance();
         calendar.add( Calendar.DATE, -30 );
@@ -212,35 +196,34 @@ public class ActivityManagementServiceImpl implements ActivityManagementService
         
         Map<Long, Long> companySurveyStatsCountsMap  = companySurveyStatusStatsDao.getSentSurveyCountForCompaniesAfterSentDate( oneMonthBackDate );
         
-        LOG.info( "method getSurveyStatusStatsForPastOneMonth ended" );
+        LOG.debug( "method getSurveyStatusStatsForPastOneMonth ended" );
         return companySurveyStatsCountsMap;
     }
 
     @Override
-    public void validateAndSentLessSurveysAlert( List<CompanyActiveUsersStats> companyActiveUserCounts, Map<Long, Long> companySurveyStatsCountsMap )
+    public void validateAndSentLessSurveysAlert( List<Company> allCompanies, Map<Long, Long> companyActiveUserCounts,
+        Map<Long, Long> companySurveyStatsCountsMap )
     {
-        LOG.info( "method validateAndSentLessSurveysAlert started" );
+        LOG.debug( "method validateAndSentLessSurveysAlert started" );
         String mailBody = "";
 
         int i = 0;
-        for(CompanyActiveUsersStats companyActiveUsersStats : companyActiveUserCounts){
-            Long surveyCount = companySurveyStatsCountsMap.get( companyActiveUsersStats.getCompanyId() );
-            Integer userCount = companyActiveUsersStats.getNoOfActiveUsers();
-            if(surveyCount != null && userCount!= null &&  (surveyCount/2) < userCount ){
+        for(Company company : allCompanies){
+            Long surveyCount = companySurveyStatsCountsMap.get( company.getCompanyId() );
+            Long userCount = companyActiveUserCounts.get( company.getCompanyId() );
+            if(surveyCount != null && userCount!= null &&  (surveyCount/2) < userCount){
                 i++;
-                mailBody +=  (i + ". " + "Company with id "  + companyActiveUsersStats.getCompanyId() + "  sent us  " + surveyCount + " transactions for total of " + userCount + " Users in past one month." );             
-                mailBody += "<br>";
+                mailBody +=  (i + ". " + company.getCompanyId() + " " + company.getCompany() + "  sent us  " + surveyCount + " transactions for total of " + userCount + " Users." );             
+                mailBody += "</br>";
             }
         }
         
         try {
-            //send mail only if there is at least one company with less survey transactions
-            if(i > 0)
-                emailServices.sendLessVoulmeOfTransactionReceivedAlertMail( getTransactionMonitorMailList(), mailBody );
+            emailServices.sendLessVoulmeOfTransactionReceivedAlertMail( applicationSupportEmail, mailBody );
         } catch ( InvalidInputException | UndeliveredEmailException e ) {
-            LOG.error( "Error while sending less survey alert email." , e );
-}
-        LOG.info( "method validateAndSentLessSurveysAlert ended" ); 
+            e.printStackTrace();
+        }
+        LOG.debug( "method validateAndSentLessSurveysAlert ended" ); 
     }
     
     /**
@@ -254,10 +237,10 @@ public class ActivityManagementServiceImpl implements ActivityManagementService
     public List<CompanyTransactionsSourceStats> getTransactionsCountForCompanyForPastNDays(long companyId, int noOfDays) throws InvalidInputException
     {
         
-        LOG.info( "method getTransactionsCountForCompanyForPastNDays started for companyId {} and noOfDays {}" , companyId , noOfDays );
+        LOG.debug( "method getTransactionsCountForCompanyForPastNDays started for companyId %s and noOfDays %s" , companyId , noOfDays );
         
         if(companyId <= 0l){
-            LOG.error("Invalid companyId is passed : {} " , companyId );
+            LOG.error("Invalid companyId is passed : %s " + companyId );
             throw new InvalidInputException("Passed parameter companyId is invalid ");
         }
         
@@ -270,7 +253,7 @@ public class ActivityManagementServiceImpl implements ActivityManagementService
         
         List<CompanyTransactionsSourceStats> companyTransactionsStats = companyTransactionsSourceStatsDao.getTransactionsCountForCompanyForPastNDays( companyId, startDate, endDate );
 
-        LOG.info( "method getTransactionsCountForCompanyForPastNDays finished for companyId %s and noOfDays %s" , companyId , noOfDays );
+        LOG.debug( "method getTransactionsCountForCompanyForPastNDays finished for companyId %s and noOfDays %s" , companyId , noOfDays );
         return companyTransactionsStats;
     }
     
@@ -286,10 +269,10 @@ public class ActivityManagementServiceImpl implements ActivityManagementService
     public List<CompanySurveyStatusStats> getSurveyStatusStatsForCompanyForPastNDays(long companyId, int noOfDays) throws InvalidInputException
     {
         
-        LOG.info( "method getSurveyStatusStatsForCompanyForPastNDays started for companyId %s and noOfDays %s" , companyId , noOfDays );
+        LOG.debug( "method getSurveyStatusStatsForCompanyForPastNDays started for companyId %s and noOfDays %s" , companyId , noOfDays );
         
         if(companyId <= 0l){
-            LOG.error("Invalid companyId is passed : {} " , companyId );
+            LOG.error("Invalid companyId is passed : %s " + companyId );
             throw new InvalidInputException("Passed parameter companyId is invalid ");
         }
         
@@ -302,7 +285,7 @@ public class ActivityManagementServiceImpl implements ActivityManagementService
         
         List<CompanySurveyStatusStats> companySurveyStats = companySurveyStatusStatsDao.getSurveyStatusCountForCompanyForPastNDays( companyId, startDate, endDate );
 
-        LOG.info( "method getSurveyStatusStatsForCompanyForPastNDays finished for companyId {} and noOfDays {}" , companyId , noOfDays );
+        LOG.debug( "method getSurveyStatusStatsForCompanyForPastNDays finished for companyId %s and noOfDays %s" , companyId , noOfDays );
         return companySurveyStats;
     }
     
@@ -315,10 +298,10 @@ public class ActivityManagementServiceImpl implements ActivityManagementService
     public List<CompanyActiveUsersStats> getActiveUserCountStatsForCompanyForPastNDays(long companyId, int noOfDays) throws InvalidInputException
     {
         
-        LOG.info( "method getActiveUserCountStatsForCompanyForPastNDays started for companyId {} and noOfDays {}" , companyId , noOfDays );
+        LOG.debug( "method getActiveUserCountStatsForCompanyForPastNDays started for companyId %s and noOfDays %s" , companyId , noOfDays );
         
         if(companyId <= 0l){
-            LOG.error("Invalid companyId is passed : {} " , companyId );
+            LOG.error("Invalid companyId is passed : %s " + companyId );
             throw new InvalidInputException("Passed parameter companyId is invalid ");
         }
         
@@ -331,39 +314,7 @@ public class ActivityManagementServiceImpl implements ActivityManagementService
         
         List<CompanyActiveUsersStats> companyActiveUsersStats = companyActiveUsersStatsDao.getActiveUsersCountStatsForCompanyForPastNDays( companyId, startDate, endDate );
 
-        LOG.info( "method getActiveUserCountStatsForCompanyForPastNDays finished for companyId {} and noOfDays {}" , companyId , noOfDays );
+        LOG.debug( "method getActiveUserCountStatsForCompanyForPastNDays finished for companyId %s and noOfDays %s" , companyId , noOfDays );
         return companyActiveUsersStats;
-    }
-    
-    /**
-     * 
-     * @return
-     */
-    @Override
-    public List<CompanyActiveUsersStats> getCompanyActiveUserCountForPastDay()
-    {
-        LOG.info( "method getCompanyActiveUserCountForPastDay started" );
-        
-        Calendar calendar = Calendar.getInstance();
-        calendar.add( Calendar.DATE, -1 );
-        Date yesterDayDate = new Date( calendar.getTimeInMillis() );
-        
-        List<CompanyActiveUsersStats> companyActiveUsersStatsList = companyActiveUsersStatsDao.findByColumn(CompanyActiveUsersStats.class, CommonConstants.SURVEY_STATS_MONITOR_DATE_COLUMN, yesterDayDate );
-        
-        LOG.info( "method getCompanyActiveUserCountForPastDay ended" );
-        return companyActiveUsersStatsList;
-    }
-    
-    @Override
-    public List<String> getTransactionMonitorMailList()
-    {
-        String[] transactionMailRecipient =  transactionMonitorSupportEmail.split( "," );
-        List<String> transactionMailList = new ArrayList<>();
-        for(String recipient : transactionMailRecipient)
-        {
-            transactionMailList.add( recipient );
-        }
-        return transactionMailList;
-        
     }
 }
