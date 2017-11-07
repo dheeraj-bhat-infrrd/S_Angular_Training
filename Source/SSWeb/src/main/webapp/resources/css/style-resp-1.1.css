@@ -505,7 +505,17 @@
     width: 170px;
     float: none;
     position: absolute;
-    right: 0;
+    right: 5px;
+	}
+	
+	.sr-wc-sub-send-btn{
+	  	width: auto;
+  		padding: 0 3px;
+  		margin-left:0;
+	}
+	
+	.sr-wc-btn-col {
+		padding:0;
 	}
 }
 
