@@ -1,14 +1,18 @@
 package com.realtech.socialsurvey.core.entities;
 
-/**
- * User upload validation object. Holds the snapshot of the uploaded file 
- *
- */
-public class UploadValidation
-{
+import java.util.Map;
 
-    // hierarchy data 
-    private HierarchyUpload upload;
+
+public class HierarchyVerificationResponse
+{
+    // reference to the upload data in mongoDB generated for the purpose of verification
+    private String hierarchyIntermediateId;
+
+    // hierarchy data
+    private Map<String, RegionUploadVO> regions;
+    private Map<String, BranchUploadVO> branches;
+    private Map<String, UserUploadVO> users;
+
 
     // flags used in upload verification: BEGIN
     private int numberOfRegionsAdded;
@@ -31,21 +35,59 @@ public class UploadValidation
     private boolean hasBranchValidationWarnings;
     private boolean hasUserValidationWarnings;
     // flags used in upload verification: END
-    public HierarchyUpload getUpload()
-    {
-        return upload;
-    }
-
-
-    public void setUpload( HierarchyUpload upload )
-    {
-        this.upload = upload;
-    }
 
 
     public int getNumberOfRegionsAdded()
     {
         return numberOfRegionsAdded;
+    }
+
+
+    public String getHierarchyIntermediateId()
+    {
+        return hierarchyIntermediateId;
+    }
+
+
+    public void setHierarchyIntermediateId( String hierarchyIntermediateId )
+    {
+        this.hierarchyIntermediateId = hierarchyIntermediateId;
+    }
+
+
+    public Map<String, RegionUploadVO> getRegions()
+    {
+        return regions;
+    }
+
+
+    public void setRegions( Map<String, RegionUploadVO> regions )
+    {
+        this.regions = regions;
+    }
+
+
+    public Map<String, BranchUploadVO> getBranches()
+    {
+        return branches;
+    }
+
+
+    public void setBranches( Map<String, BranchUploadVO> branches )
+    {
+        this.branches = branches;
+    }
+
+
+    public Map<String, UserUploadVO> getUsers()
+    {
+        return users;
+    }
+
+
+    public void setUsers( Map<String, UserUploadVO> users )
+    {
+        this.users = users;
     }
 
 
@@ -151,75 +193,74 @@ public class UploadValidation
     }
 
 
-    public boolean hasRegionValidationErrors()
+    public boolean isHasRegionValidationErrors()
     {
         return hasRegionValidationErrors;
     }
 
 
-    public void setRegionValidationErrors( boolean hasRegionValidationErrors )
+    public void setHasRegionValidationErrors( boolean hasRegionValidationErrors )
     {
         this.hasRegionValidationErrors = hasRegionValidationErrors;
     }
 
 
-    public boolean hasBranchValidationErrors()
+    public boolean isHasBranchValidationErrors()
     {
         return hasBranchValidationErrors;
     }
 
 
-    public void setBranchValidationErrors( boolean hasBranchValidationErrors )
+    public void setHasBranchValidationErrors( boolean hasBranchValidationErrors )
     {
         this.hasBranchValidationErrors = hasBranchValidationErrors;
     }
 
 
-    public boolean hasUserValidationErrors()
+    public boolean isHasUserValidationErrors()
     {
         return hasUserValidationErrors;
     }
 
 
-    public void setUserValidationErrors( boolean hasUserValidationErrors )
+    public void setHasUserValidationErrors( boolean hasUserValidationErrors )
     {
         this.hasUserValidationErrors = hasUserValidationErrors;
     }
 
 
-    public boolean hasRegionValidationWarnings()
+    public boolean isHasRegionValidationWarnings()
     {
         return hasRegionValidationWarnings;
     }
 
 
-    public void setRegionValidationWarnings( boolean hasRegionValidationWarnings )
+    public void setHasRegionValidationWarnings( boolean hasRegionValidationWarnings )
     {
         this.hasRegionValidationWarnings = hasRegionValidationWarnings;
     }
 
 
-    public boolean hasBranchValidationWarnings()
+    public boolean isHasBranchValidationWarnings()
     {
         return hasBranchValidationWarnings;
     }
 
 
-    public void setBranchValidationWarnings( boolean hasBranchValidationWarnings )
+    public void setHasBranchValidationWarnings( boolean hasBranchValidationWarnings )
     {
         this.hasBranchValidationWarnings = hasBranchValidationWarnings;
     }
 
 
-    public boolean hasUserValidationWarnings()
+    public boolean isHasUserValidationWarnings()
     {
         return hasUserValidationWarnings;
     }
 
 
-    public void setUserValidationWarnings( boolean hasUserValidationWarnings )
+    public void setHasUserValidationWarnings( boolean hasUserValidationWarnings )
     {
         this.hasUserValidationWarnings = hasUserValidationWarnings;
     }
-
 }

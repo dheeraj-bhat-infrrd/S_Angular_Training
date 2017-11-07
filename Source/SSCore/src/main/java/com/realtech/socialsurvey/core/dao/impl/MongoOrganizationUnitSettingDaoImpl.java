@@ -167,7 +167,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_IDENTIFIER ).in( identifiers ) );
         query.fields().exclude( KEY_LINKEDIN_PROFILEDATA );
-        List<OrganizationUnitSettings> settingsList = mongoTemplate.find( query, OrganizationUnitSettings.class, collectionName );
+        List<OrganizationUnitSettings> settingsList = mongoTemplate.find( query, OrganizationUnitSettings.class,
+            collectionName );
         for ( OrganizationUnitSettings settings : settingsList ) {
             setCompleteUrlForSettings( settings, collectionName );
         }
@@ -266,8 +267,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     @Override
     public void updateParticularKeyAgentSettings( String keyToUpdate, Object updatedRecord, AgentSettings agentSettings )
     {
-        LOG.debug( "Updating unit setting in AGENT_SETTINGS with " + agentSettings + " for key: " + keyToUpdate + " wtih value: "
-            + updatedRecord );
+        LOG.debug( "Updating unit setting in AGENT_SETTINGS with " + agentSettings + " for key: " + keyToUpdate
+            + " wtih value: " + updatedRecord );
         Query query = new Query();
         query.addCriteria( Criteria.where( "_id" ).is( agentSettings.getId() ) );
         Update update = new Update().set( keyToUpdate, updatedRecord );
@@ -711,13 +712,13 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
             LOG.debug( "state is not present to fetch encompass info list." );
             throw new InvalidInputException( "state is not present to fetch encompass info list." );
         }
-        
+
 
         if ( encompassVersion == null || encompassVersion.isEmpty() ) {
             LOG.debug( " encompass version is not present to fetch encompass info list." );
             throw new InvalidInputException( "encompass version is not present to fetch encompass info list." );
-        } 
-        
+        }
+
         List<OrganizationUnitSettings> organizationUnitsSettingsList = null;
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_CRM_INFO ).exists( true ).and( KEY_CRM_INFO_SOURCE )
@@ -820,7 +821,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
             query
                 /*.addCriteria( Criteria.where( CommonConstants.PROFILE_IMAGE_URL_SOLR )
                     .regex( StringEscapeUtils.escapeJava( amazonEndPoint ) + ".*" ) )*/
-            .addCriteria( Criteria.where( CommonConstants.PROFILE_IMAGE_URL_SOLR ).ne( null ) )
+                .addCriteria( Criteria.where( CommonConstants.PROFILE_IMAGE_URL_SOLR ).ne( null ) )
                 .addCriteria( Criteria.where( CommonConstants.IS_PROFILE_IMAGE_PROCESSED_COLUMN ).is( false ) );
         } else if ( imageType.equals( CommonConstants.IMAGE_TYPE_LOGO ) ) {
             query
@@ -990,8 +991,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
             .include( KEY_CONTACT_DETAILS ).exclude( "_id" );
 
         settings = mongoTemplate.find( query, OrganizationUnitSettings.class, collectionName );
-        LOG.debug( "Fetched " + ( settings != null ? settings.size() : "none" ) + " unit settings with social media tokens from "
-            + collectionName );
+        LOG.debug( "Fetched " + ( settings != null ? settings.size() : "none" )
+            + " unit settings with social media tokens from " + collectionName );
 
         return settings;
     }

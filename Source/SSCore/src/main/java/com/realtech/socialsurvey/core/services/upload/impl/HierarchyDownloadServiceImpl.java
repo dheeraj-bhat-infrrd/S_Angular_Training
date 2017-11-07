@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.services.upload.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -9,6 +10,7 @@ import java.util.TreeMap;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -21,28 +23,27 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.common.collect.HashBiMap;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
-import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.HierarchyUploadDao;
+import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.RegionDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
-import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchUploadVO;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.HierarchyUpload;
+import com.realtech.socialsurvey.core.entities.HierarchyUploadAggregate;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionUploadVO;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserUploadVO;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
-import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.upload.HierarchyDownloadService;
 
 
@@ -55,7 +56,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
     private HierarchyUploadDao hierarchyUploadDao;
 
     @Autowired
-    private OrganizationManagementService organizationManagementService;
+    private OrganizationUnitSettingsDao organizationUnitSettingsDao;
 
     private static int BATCH_SIZE = 50;
 
@@ -65,9 +66,6 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
     @Resource
     @Qualifier ( "branch")
     private BranchDao branchDao;
-
-    @Autowired
-    private CompanyDao companyDao;
 
     @Autowired
     private UserDao userDao;
@@ -87,405 +85,688 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
 
 
     /**
-     * Method to update company hierarchy structure in mongo
+     * Method to update company hierarchy structure in mongoDB
      * @param company
-     * @return
+     * @return HierarchyUploadAggregate
      * @throws InvalidInputException
      */
     @Override
     @Transactional
-    public HierarchyUpload fetchUpdatedHierarchyStructure( Company company ) throws InvalidInputException
+    public HierarchyUploadAggregate fetchUpdatedHierarchyUploadStructure( Company company ) throws InvalidInputException
     {
-        LOG.debug( "Method updateHierarchyStructure started for company : " + company.getCompany() );
+        LOG.debug( "Method fetchUpdatedHierarchyUploadStructure started for company : " + company.getCompany() );
+
+        // updating of hierarchy upload is done to retain the old source Id values and field histories
+        // while generating new ones for new entities added for the company from the UI 
+
         /* 
-         * 1. fetch from mongo (oldHierarchyStructure)
-         * 2. If empty go to step 5
-         * 3. create current hierarchy upload object that reflects the current hierarchy structure.
-         * 4. compare and update oldHierarchyStructure and currentHierarchyStructure)
+         * 1. fetch from mongoDB Hierarchy upload collection (oldHierarchyStructure)
+         * 2. build the current hierarchy structure 
+         * 3. update the current entities with sourceId, histories and other necessary data from the old hierarchy structure
+         * 4. remove the old structure from mongoDB and insert the new HierarchyUpload structure
          */
+
+        // step 1
         HierarchyUpload oldHierarchyUpload = hierarchyUploadDao.getHierarchyUploadByCompany( company.getCompanyId() );
-        // Generate new hierarchyupload
-        HierarchyUpload currentHierarchyUpload = generateCurrentHierarchyStructure( company, oldHierarchyUpload );
-        if ( oldHierarchyUpload != null ) {
-            currentHierarchyUpload = aggregateHierarchyStructure( oldHierarchyUpload, currentHierarchyUpload );
-        } else {
-            // set all source ids generated to true
-            currentHierarchyUpload = setSourceIdsGeneratedToTrue( currentHierarchyUpload );
-        }
-        hierarchyUploadDao.saveHierarchyUploadObject( currentHierarchyUpload );
-        LOG.debug( "Method updateHierarchyStructure finished for company : " + company.getCompany() );
-        return currentHierarchyUpload;
+
+        // steps 2 and 3
+        HierarchyUploadAggregate hierarchyUploadAggregate = generateUpdatedHierarchyStructure( company, oldHierarchyUpload );
+
+        // step 4
+        hierarchyUploadDao.reinsertHierarchyUploadObjectForACompany( hierarchyUploadAggregate.getHierarchyUpload() );
+
+        LOG.debug( "Method fetchUpdatedHierarchyUploadStructure finished for company : " + company.getCompany() );
+        return hierarchyUploadAggregate;
     }
 
 
     /**
-     * Method to set source ids generated to true for newly generated records
-     * @param upload
-     * @return
-     */
-    HierarchyUpload setSourceIdsGeneratedToTrue( HierarchyUpload upload )
-    {
-        LOG.debug( "Method setSourceIdsGeneratedToTrue() started." );
-
-        // set region source ids generated to true
-        List<RegionUploadVO> regions = upload.getRegions();
-        if ( regions != null && !regions.isEmpty() ) {
-            for ( RegionUploadVO region : regions ) {
-                region.setSourceRegionIdGenerated( true );
-            }
-        }
-        upload.setRegions( regions );
-
-        // set branch source ids generated to true
-        List<BranchUploadVO> branches = upload.getBranches();
-        if ( branches != null && !branches.isEmpty() ) {
-            for ( BranchUploadVO branch : branches ) {
-                branch.setSourceBranchIdGenerated( true );
-            }
-        }
-        upload.setBranches( branches );
-
-        // set user source ids generated to true
-        List<UserUploadVO> users = upload.getUsers();
-        if ( users != null && !users.isEmpty() ) {
-            for ( UserUploadVO user : users ) {
-                user.setSourceUserIdGenerated( true );
-            }
-        }
-        upload.setUsers( users );
-
-        LOG.debug( "Method setSourceIdsGeneratedToTrue() finished." );
-        return upload;
-    }
-
-
-    /**
-     * Method to aggregate hierarchy structure
+     * Method to generate the updated company hierarchy structure using the old one in mongoDB
+     * @param company
      * @param oldHierarchyUpload
-     * @param currentHierarchyUpload
+     * @param doGenerateSourceIdMaps 
      * @return
      * @throws InvalidInputException 
      */
-    public HierarchyUpload aggregateHierarchyStructure( HierarchyUpload oldHierarchyUpload,
-        HierarchyUpload currentHierarchyUpload ) throws InvalidInputException
+    public HierarchyUploadAggregate generateUpdatedHierarchyStructure( Company company, HierarchyUpload oldHierarchyUpload )
+        throws InvalidInputException
     {
-        LOG.debug( "Method to aggregate hierarchy structure started" );
-        if ( oldHierarchyUpload == null ) {
-            throw new InvalidInputException( "OldHierarchyUpload object is empty" );
+        LOG.debug( "Method generateUpdatedHierarchyStructure started for company : " + company.getCompany() );
+
+        // in order to build the updated hierarchy Upload( HU ) object,
+        // create a new HU object, add all the regions, branches and users for the company present currently active.
+        // for all the entities present in the old hierarchy structure if sourceId, field histories, etc are found,
+        // then update the newly added entity with these values while adding the entities to the new HU object.
+
+        /* 
+         * 1. create new HU object and set the company ID for the HU
+         * 2. parse all the old hierarchy entities and build the HierarchyUploadAggregate object
+         * 3. while parsing new entities, region, branch or user ( in that order ),
+         *      a. check if the old hierarchy upload has data on the entity
+         *      b. update the new entity with mapping and history present in the old data
+         * 4. set all the data generated to the new HU object   
+         */
+
+
+        // creating new instances of HierarchyUpload and HierarchyUploadAggregate objects
+        HierarchyUpload newHierarchyUpload = new HierarchyUpload();
+        HierarchyUploadAggregate hierarchyAggregate = new HierarchyUploadAggregate();
+
+        // setting the company identifier for the aggregate object
+        hierarchyAggregate.setCompany( company );
+
+        if ( oldHierarchyUpload != null ) {
+
+            // creating region, branches and user maps for old hierarchy upload data : BEGIN
+            if ( oldHierarchyUpload.getRegions() != null && !oldHierarchyUpload.getRegions().isEmpty() ) {
+                hierarchyAggregate.setOldRegionUploadVOMap( new HashMap<Long, RegionUploadVO>() );
+                hierarchyAggregate.setOldRegionSourceMapping( HashBiMap.create( new HashMap<String, Long>() ) );
+                for ( RegionUploadVO region : oldHierarchyUpload.getRegions() ) {
+                    hierarchyAggregate.getOldRegionUploadVOMap().put( region.getRegionId(), region );
+                    hierarchyAggregate.getOldRegionSourceMapping().forcePut( region.getSourceRegionId(), region.getRegionId() );
+                }
+            }
+
+            if ( oldHierarchyUpload.getBranches() != null && !oldHierarchyUpload.getBranches().isEmpty() ) {
+                hierarchyAggregate.setOldBranchUploadVOMap( new HashMap<Long, BranchUploadVO>() );
+                hierarchyAggregate.setOldBranchSourceMapping( HashBiMap.create( new HashMap<String, Long>() ) );
+                for ( BranchUploadVO branch : oldHierarchyUpload.getBranches() ) {
+                    hierarchyAggregate.getOldBranchUploadVOMap().put( branch.getBranchId(), branch );
+                    hierarchyAggregate.getOldBranchSourceMapping().forcePut( branch.getSourceBranchId(), branch.getBranchId() );
+                }
+            }
+
+            if ( oldHierarchyUpload.getUsers() != null && !oldHierarchyUpload.getUsers().isEmpty() ) {
+                hierarchyAggregate.setOldUserUploadVOMap( new HashMap<Long, UserUploadVO>() );
+                hierarchyAggregate.setOldUserSourceMapping( HashBiMap.create( new HashMap<String, Long>() ) );
+                for ( UserUploadVO user : oldHierarchyUpload.getUsers() ) {
+                    hierarchyAggregate.getOldUserUploadVOMap().put( user.getUserId(), user );
+                    hierarchyAggregate.getOldUserSourceMapping().forcePut( user.getSourceUserId(), user.getUserId() );
+                }
+            }
+            // creating region, branches and user maps for old hierarchy upload data : END
         }
-        if ( currentHierarchyUpload == null ) {
-            throw new InvalidInputException( "CurrentHierarchyUpload object is empty" );
+
+
+        // building and adding hierarchy data using old hierarchy object to the aggregate object : BEGIN
+        buildAndAddRegionsAndRegionSourceMappingForCompany( hierarchyAggregate );
+        buildAndAddBranchesAndBranchSourceMappingForCompany( hierarchyAggregate );
+        buildAndAddUsersAndUserSourceMappingForCompany( hierarchyAggregate );
+        // building and adding hierarchy data using old hierarchy object to the aggregate object : END
+
+
+        // set the new hierarchy data produced : BEGIN
+        // setting company identifier for the new upload object
+        newHierarchyUpload.setCompanyId( company.getCompanyId() );
+
+        // setting region, branch, user value objects  
+        if ( hierarchyAggregate.getNewRegionUploadVOMap() != null ) {
+            newHierarchyUpload
+                .setRegions( new ArrayList<RegionUploadVO>( hierarchyAggregate.getNewRegionUploadVOMap().values() ) );
         }
 
-        HierarchyUpload newHierarchyUpload = oldHierarchyUpload;
+        if ( hierarchyAggregate.getNewBranchUploadVOMap() != null ) {
+            newHierarchyUpload
+                .setBranches( new ArrayList<BranchUploadVO>( hierarchyAggregate.getNewBranchUploadVOMap().values() ) );
+        }
 
-        //First aggregate the region, branch and user source mappings
-        aggregateSourceMaps( oldHierarchyUpload, currentHierarchyUpload, newHierarchyUpload );
+        if ( hierarchyAggregate.getNewUserUploadVOMap() != null ) {
+            newHierarchyUpload.setUsers( new ArrayList<UserUploadVO>( hierarchyAggregate.getNewUserUploadVOMap().values() ) );
+        }
 
-        //Compare and aggregate regions
-        aggregateRegionsStructure( oldHierarchyUpload.getRegions(), currentHierarchyUpload.getRegions(), newHierarchyUpload );
+        // set the new hierarchy data produced : END
 
-        //Compare and aggregate branches
-        aggregateBranchesStructure( oldHierarchyUpload.getBranches(), currentHierarchyUpload.getBranches(), newHierarchyUpload );
+        // add the new upload reference
+        hierarchyAggregate.setHierarchyUpload( newHierarchyUpload );
 
-
-        //Compare and aggregate users
-        aggregateUsersStructure( oldHierarchyUpload.getUsers(), currentHierarchyUpload.getUsers(), newHierarchyUpload );
-
-        LOG.debug( "Method to aggregate hierarchy structure finished" );
-        return newHierarchyUpload;
-    }
-
-
-    public void aggregateSourceMaps( HierarchyUpload oldHierarchyUpload, HierarchyUpload currentHierarchyUpload,
-        HierarchyUpload newHierarchyUpload )
-    {
-        //Regions
-        Map<String, Long> oldMap = oldHierarchyUpload.getRegionSourceMapping();
-        Map<String, Long> newMap = currentHierarchyUpload.getRegionSourceMapping();
-        newMap.putAll( oldMap );
-        newHierarchyUpload.setRegionSourceMapping( newMap );
-
-        //Branches
-        oldMap = oldHierarchyUpload.getBranchSourceMapping();
-        newMap = currentHierarchyUpload.getBranchSourceMapping();
-        newMap.putAll( oldMap );
-        newHierarchyUpload.setBranchSourceMapping( newMap );
-
-        //Users
-        oldMap = oldHierarchyUpload.getUserSourceMapping();
-        newMap = currentHierarchyUpload.getUserSourceMapping();
-        newMap.putAll( oldMap );
-        newHierarchyUpload.setUserSourceMapping( newMap );
+        LOG.debug( "Method generateUpdatedHierarchyStructure finished for company : " + company.getCompany() );
+        return hierarchyAggregate;
     }
 
 
     /**
-     * Method to aggregate Users structure
-     * @param oldUsers
-     * @param currentUsers
-     * @param newHierarchyUpload
+     *  method to build and add the necessary mappings and value objects for regions
+     * @param hierarchyAggregate
+     * @throws InvalidInputException
      */
-    public void aggregateUsersStructure( List<UserUploadVO> oldUsers, List<UserUploadVO> currentUsers,
-        HierarchyUpload newHierarchyUpload )
+    private void buildAndAddRegionsAndRegionSourceMappingForCompany( HierarchyUploadAggregate hierarchyAggregate )
+        throws InvalidInputException
     {
-        LOG.debug( "Method to aggregate users structure started" );
-        List<UserUploadVO> newUsers = new ArrayList<UserUploadVO>();
+        LOG.debug( "Method buildAndAddRegionsAndRegionSourceMappingForCompany started for company with ID: "
+            + hierarchyAggregate.getCompany().getCompanyId() );
 
-        Map<Long, UserUploadVO> oldUsersMap = new HashMap<Long, UserUploadVO>();
-        //Get map from UserUploadVO
-        for ( UserUploadVO userUploadVO : oldUsers ) {
-            oldUsersMap.put( userUploadVO.getUserId(), userUploadVO );
-        }
+        int start = 0;
+        List<Long> batchRegionIdList = null;
 
-        /*
-         * Things to check
-         * 1. user addition
-         * 2. user deletion
-         */
+        // build and add hierarchy data in batches for the non-default regions currently active in the company
+        // NOTE: data is obtained from mongoDB only ( REGION SETTINGS - Collection )
+        do {
+            batchRegionIdList = regionDao.getRegionIdsUnderCompany( hierarchyAggregate.getCompany().getCompanyId(), start,
+                BATCH_SIZE );
 
+            // utilizing region setting list and building the region mappings and Value Object list
+            if ( batchRegionIdList != null && batchRegionIdList.size() > 0 ) {
 
-        Map<Long, String> revMap = new HashMap<Long, String>();
-        for ( String key : newHierarchyUpload.getUserSourceMapping().keySet() ) {
-            revMap.put( newHierarchyUpload.getUserSourceMapping().get( key ), key );
-        }
-
-        Map<String, Long> regionMapping = newHierarchyUpload.getRegionSourceMapping();
-
-        Map<Long, String> mappedRegion = new HashMap<Long, String>();
-        for ( String key : regionMapping.keySet() ) {
-            mappedRegion.put( regionMapping.get( key ), key );
-        }
-
-        Map<String, Long> branchMapping = newHierarchyUpload.getBranchSourceMapping();
-
-        Map<Long, String> mappedBranch = new HashMap<Long, String>();
-        for ( String key : branchMapping.keySet() ) {
-            mappedBranch.put( branchMapping.get( key ), key );
-        }
-
-        Map<String, Long> userMapping = newHierarchyUpload.getUserSourceMapping();
-
-        //Iterate through new list
-        for ( UserUploadVO currentUser : currentUsers ) {
-            UserUploadVO oldUser = oldUsersMap.get( currentUser.getUserId() );
-            //If oldUser does not exist, then the currentUser is a new user
-            if ( oldUser == null ) {
-                currentUser.setSourceUserIdGenerated( true );
-                newUsers.add( currentUser );
-                //Add new users' sourceIds in the hierarchyupload
-                userMapping.put( revMap.get( currentUser.getUserId() ), currentUser.getUserId() );
-            } else {
-                //Superimpose current on old and store in new list
-                UserUploadVO amalgamatedUser = oldUser;
-                //set sourceRegionId
-                amalgamatedUser.setSourceRegionId( mappedRegion.get( amalgamatedUser.getRegionId() ) );
-
-                //set sourceBranchId
-                amalgamatedUser.setSourceBranchId( mappedBranch.get( amalgamatedUser.getBranchId() ) );
-
-                amalgamatedUser.setFirstName( currentUser.getFirstName() );
-                amalgamatedUser.setLastName( currentUser.getLastName() );
-                amalgamatedUser.setTitle( currentUser.getTitle() );
-                amalgamatedUser.setBranchId( currentUser.getBranchId() );
-                amalgamatedUser.setRegionId( currentUser.getRegionId() );
-                amalgamatedUser.setAgent( currentUser.isAgent() );
-                amalgamatedUser.setEmailId( currentUser.getEmailId() );
-                amalgamatedUser.setBelongsToCompany( currentUser.isBelongsToCompany() );
-                amalgamatedUser.setBranchAdmin( currentUser.isBranchAdmin() );
-                amalgamatedUser.setPhoneNumber( currentUser.getPhoneNumber() );
-                amalgamatedUser.setWebsiteUrl( currentUser.getWebsiteUrl() );
-                amalgamatedUser.setLicense( currentUser.getLicense() );
-                amalgamatedUser.setLegalDisclaimer( currentUser.getLegalDisclaimer() );
-                amalgamatedUser.setAboutMeDescription( currentUser.getAboutMeDescription() );
-                amalgamatedUser.setUserPhotoUrl( currentUser.getUserPhotoUrl() );
-                amalgamatedUser.setAssignedBranches( currentUser.getAssignedBranches() );
-                amalgamatedUser.setAssignedBranchesAdmin( currentUser.getAssignedBranchesAdmin() );
-                amalgamatedUser.setAssignedRegions( currentUser.getAssignedRegions() );
-                amalgamatedUser.setAssignedRegionsAdmin( currentUser.getAssignedRegionsAdmin() );
-                amalgamatedUser.setUserVerified( currentUser.isUserVerified() );
-                newUsers.add( amalgamatedUser );
-
-                //Delete object entry from oldUsers
-                oldUsers.remove( oldUser );
+                buildAndAddRegionsAndRegionSourceMappingInBatch(
+                    organizationUnitSettingsDao.fetchOrganizationUnitSettingsForMultipleIds(
+                        new HashSet<Long>( batchRegionIdList ), CommonConstants.REGION_SETTINGS_COLLECTION ),
+                    hierarchyAggregate );
             }
-        }
 
-        if ( !( oldUsers.isEmpty() ) ) {
-            //The remaining users are the ones that have been deleted
-            //don't add these to the new list
-            //Remove deleted users' sourceIds in the hierarchyupload map
-            for ( UserUploadVO userUploadVO : oldUsers ) {
-                userMapping.remove( userUploadVO.getSourceUserId() );
-            }
-            LOG.debug( "Some users have been deleted recently" );
-        }
+            start += BATCH_SIZE;
+        } while ( batchRegionIdList != null && batchRegionIdList.size() == BATCH_SIZE );
 
-        newHierarchyUpload.setUserSourceMapping( userMapping );
-
-        newHierarchyUpload.setUsers( newUsers );
-        LOG.debug( "Method to aggregate users structure finished" );
+        LOG.debug( "Method buildAndAddRegionsAndRegionSourceMappingForCompany finished for company with ID: "
+            + hierarchyAggregate.getCompany().getCompanyId() );
     }
 
 
     /**
-     * Method to aggregate branches structure
-     * @param oldBranches
-     * @param currentBranches
-     * @return
+     * method to build and add the necessary mappings and value objects for branches
+     * @param hierarchyAggregate
+     * @throws InvalidInputException
      */
-    public void aggregateBranchesStructure( List<BranchUploadVO> oldBranches, List<BranchUploadVO> currentBranches,
-        HierarchyUpload newHierarchyUpload )
+    private void buildAndAddBranchesAndBranchSourceMappingForCompany( HierarchyUploadAggregate hierarchyAggregate )
+        throws InvalidInputException
     {
-        LOG.debug( "Method to aggregate branches structure started" );
-        List<BranchUploadVO> newBranches = new ArrayList<BranchUploadVO>();
+        LOG.debug( "Method buildAndAddBranchesAndBranchSourceMappingForCompany started for company with ID: "
+            + hierarchyAggregate.getCompany().getCompanyId() );
 
-        Map<Long, BranchUploadVO> oldBranchesMap = new HashMap<Long, BranchUploadVO>();
-        //Get map from BranchUploadVO
-        for ( BranchUploadVO branchUploadVO : oldBranches ) {
-            oldBranchesMap.put( branchUploadVO.getBranchId(), branchUploadVO );
-        }
+        int start = 0;
+        List<Branch> batchBranchesList = null;
 
-        Map<Long, String> revMap = new HashMap<Long, String>();
-        for ( String key : newHierarchyUpload.getBranchSourceMapping().keySet() ) {
-            revMap.put( newHierarchyUpload.getBranchSourceMapping().get( key ), key );
-        }
+        // build and add hierarchy data in batches for the non-default branches currently active in the company
+        // NOTE: data is obtained from MySQL database ( ss_user ) and mongoDB ( BRANCH SETTINGS - Collection )
+        do {
 
+            // amalgamated data from both MySQL and MongoDB
+            batchBranchesList = branchDao.getBranchesForCompany( hierarchyAggregate.getCompany().getCompanyId(),
+                CommonConstants.NO, start, BATCH_SIZE );
 
-        /*
-         * Things to check
-         * 1. branch addition
-         * 2. branch deletion
-         */
+            // utilizing branch object list and building the branch mappings and Value Object list
+            if ( batchBranchesList != null && batchBranchesList.size() > 0 ) {
 
-        Map<String, Long> regionMapping = newHierarchyUpload.getRegionSourceMapping();
-        Map<Long, String> mappedRegion = new HashMap<Long, String>();
-        for ( String key : regionMapping.keySet() ) {
-            mappedRegion.put( regionMapping.get( key ), key );
-        }
-
-        Map<String, Long> branchMapping = newHierarchyUpload.getBranchSourceMapping();
-
-        //Iterate through new list
-        for ( BranchUploadVO currentBranch : currentBranches ) {
-            BranchUploadVO oldBranch = oldBranchesMap.get( currentBranch.getBranchId() );
-            //If oldBranch does not exist, then the currentBranch is a newly added branch
-            if ( oldBranch == null ) {
-                currentBranch.setSourceBranchIdGenerated( true );
-                newBranches.add( currentBranch );
-                //Add new branches' sourceIds in the hierarchyupload
-                branchMapping.put( revMap.get( currentBranch.getBranchId() ), currentBranch.getBranchId() );
-
-            } else {
-                //Superimpose current on old and store in new list
-                BranchUploadVO amalgamatedBranch = oldBranch;
-                amalgamatedBranch.setRegionId( currentBranch.getRegionId() );
-                amalgamatedBranch.setBranchName( currentBranch.getBranchName() );
-                amalgamatedBranch.setBranchAddress1( currentBranch.getBranchAddress1() );
-                amalgamatedBranch.setBranchAddress2( currentBranch.getBranchAddress2() );
-                amalgamatedBranch.setBranchCountry( currentBranch.getBranchCountry() );
-                amalgamatedBranch.setBranchCountryCode( currentBranch.getBranchCountryCode() );
-                amalgamatedBranch.setBranchCity( currentBranch.getBranchCity() );
-                amalgamatedBranch.setBranchZipcode( currentBranch.getBranchZipcode() );
-
-                //set sourceRegionId
-                amalgamatedBranch.setSourceRegionId( mappedRegion.get( amalgamatedBranch.getRegionId() ) );
-
-                newBranches.add( amalgamatedBranch );
-
-                //Delete object entry from oldRegions
-                oldBranches.remove( oldBranch );
+                buildAndAddBranchesAndBranchSourceMappingInBatch( batchBranchesList, hierarchyAggregate );
             }
-        }
 
-        if ( !( oldBranches.isEmpty() ) ) {
-            //The remaining branches are the ones that have been deleted
-            //don't add these to the new list
-            //Remove deleted branches' sourceIds in the hierarchyupload map
-            for ( BranchUploadVO branchUploadVO : oldBranches ) {
-                regionMapping.remove( branchUploadVO.getSourceBranchId() );
-            }
-            LOG.debug( "Some branches have been deleted recently" );
-        }
+            start += BATCH_SIZE;
+        } while ( batchBranchesList != null && batchBranchesList.size() == BATCH_SIZE );
 
-        newHierarchyUpload.setBranches( newBranches );
-        newHierarchyUpload.setBranchSourceMapping( branchMapping );
-        LOG.debug( "Method to aggregate branches structure finished" );
+
+        LOG.debug( "Method buildAndAddBranchesAndBranchSourceMappingForCompany finished for company with ID: "
+            + hierarchyAggregate.getCompany().getCompanyId() );
     }
 
 
     /**
-     * Method to aggregate region structure
-     * @param oldRegions
-     * @param currentRegions
-     * @return
+     * method to build and add the necessary mappings and value objects for users
+     * @param hierarchyAggregate
+     * @throws InvalidInputException
      */
-    public void aggregateRegionsStructure( List<RegionUploadVO> oldRegions, List<RegionUploadVO> currentRegions,
-        HierarchyUpload newHierarchyUpload )
+    private void buildAndAddUsersAndUserSourceMappingForCompany( HierarchyUploadAggregate hierarchyAggregate )
+        throws InvalidInputException
     {
-        LOG.debug( "Method to aggregate regions structure started" );
-        List<RegionUploadVO> newRegions = new ArrayList<RegionUploadVO>();
+        LOG.debug( "Method buildAndAddUsersAndUserSourceMappingForCompany started for company with ID: "
+            + hierarchyAggregate.getCompany().getCompanyId() );
 
-        Map<Long, RegionUploadVO> oldRegionsMap = new HashMap<Long, RegionUploadVO>();
-        //Get map from RegionUploadVO
-        for ( RegionUploadVO regionUploadVO : oldRegions ) {
-            oldRegionsMap.put( regionUploadVO.getRegionId(), regionUploadVO );
+        int start = 0;
+        List<User> batchUsersList = null;
+
+        // build and add hierarchy data in batches for the users in the company
+        // NOTE: data is obtained from MySQL database ( ss_user ) and mongoDB ( AGENT SETTINGS - Collection )
+
+        /* Data Set needed
+         * 1. User object from USERS table
+         * 2. UserProfile object from USER_PROFILE table
+         * 3. Agent Settings Documents from mongoDB
+         * */
+
+        do {
+
+            List<Long> batchUserIds = null;
+            Map<Long, List<UserProfile>> batchUserAndProfileMap = null;
+            batchUsersList = userDao.getUsersForCompany( hierarchyAggregate.getCompany(), start, BATCH_SIZE );
+
+            if ( batchUsersList != null && batchUsersList.size() > 0 ) {
+
+                // creating batch user List of identifiers
+                batchUserIds = new ArrayList<>();
+                for ( User user : batchUsersList )
+                    batchUserIds.add( user.getUserId() );
+
+                // obtaining user profile map for the current batch of users using custom HQL query
+                batchUserAndProfileMap = userProfileDao.getUserProfilesForUsers( batchUserIds );
+
+                // obtaining agent settings map for the current batch of users
+                Map<Long, OrganizationUnitSettings> agentSettingsMap = buildOrganizationUnitSettingsIDMap( batchUserIds );
+
+                // utilizing user object list, user profile map, agent setting map and building the user mappings and Value Object list
+                buildAndAddUsersAndUserSourceMappingInBatch( batchUsersList, batchUserAndProfileMap, agentSettingsMap,
+                    hierarchyAggregate );
+
+            }
+
+            start += BATCH_SIZE;
+        } while ( batchUsersList != null && batchUsersList.size() == BATCH_SIZE );
+
+        LOG.debug( "Method buildAndAddUsersAndUserSourceMappingForCompany finished for company with ID: "
+            + hierarchyAggregate.getCompany().getCompanyId() );
+    }
+
+
+    /**
+     * method to add mapping and VO for regions
+     * @param regionSettingsList
+     * @param hierarchyAggregate
+     * @throws InvalidInputException
+     */
+    private void buildAndAddRegionsAndRegionSourceMappingInBatch( List<OrganizationUnitSettings> regionSettingsList,
+        HierarchyUploadAggregate hierarchyAggregate ) throws InvalidInputException
+    {
+        LOG.debug( "Method buildAndAddRegionsAndRegionSourceMappingInBatch started" );
+
+        if ( regionSettingsList == null || regionSettingsList.isEmpty() ) {
+            throw new InvalidInputException( "region settings list for the current batch is non-existent" );
         }
 
-        Map<Long, String> revMap = new HashMap<Long, String>();
-        for ( String key : newHierarchyUpload.getRegionSourceMapping().keySet() ) {
-            revMap.put( newHierarchyUpload.getRegionSourceMapping().get( key ), key );
+
+        // setting up the new mapping and VO containers
+        if ( hierarchyAggregate.getNewRegionSourceMapping() == null ) {
+            hierarchyAggregate.setNewRegionSourceMapping( HashBiMap.create( new HashMap<String, Long>() ) );
         }
 
-        /*
-         * Things to check
-         * 1. region addition
-         * 2. region deletion
-         */
+        if ( hierarchyAggregate.getNewRegionUploadVOMap() == null ) {
+            hierarchyAggregate.setNewRegionUploadVOMap( new HashMap<Long, RegionUploadVO>() );
+        }
 
-        Map<String, Long> regionMapping = newHierarchyUpload.getRegionSourceMapping();
+        hierarchyAggregate.setRegionUploadVOMap( new HashMap<String, RegionUploadVO>() );
+        hierarchyAggregate.setRegionNameMap( new HashMap<String, String>() );
 
-        //Iterate through new list
-        for ( RegionUploadVO currentRegion : currentRegions ) {
-            RegionUploadVO oldRegion = oldRegionsMap.get( currentRegion.getRegionId() );
-            //If oldRegion does not exist, then the currentRegion is a newly added region
-            if ( oldRegion == null ) {
-                currentRegion.setSourceRegionIdGenerated( true );
-                newRegions.add( currentRegion );
-                //Add new regions' sourceIds in the hierarchyupload map
-                regionMapping.put( revMap.get( currentRegion.getRegionId() ), currentRegion.getRegionId() );
+        // processing all the regions in the current batch
+        for ( OrganizationUnitSettings regionSettings : regionSettingsList ) {
 
+            String sourceId = "";
+            RegionUploadVO oldRegionVO = null;
+            RegionUploadVO regionUploadVO = new RegionUploadVO();
+
+            // initializing old region VO
+            if ( hierarchyAggregate.getOldRegionUploadVOMap() != null
+                && hierarchyAggregate.getOldRegionUploadVOMap().containsKey( regionSettings.getIden() ) ) {
+                oldRegionVO = hierarchyAggregate.getOldRegionUploadVOMap().get( regionSettings.getIden() );
+            }
+
+            // processing source id for the current region
+            // if the old hierarchy data has a source id then retain it else generate new
+            if ( hierarchyAggregate.getOldRegionSourceMapping() != null
+                && hierarchyAggregate.getOldRegionSourceMapping().containsValue( regionSettings.getIden() ) ) {
+                sourceId = hierarchyAggregate.getOldRegionSourceMapping().inverse().get( regionSettings.getIden() );
             } else {
-                //Superimpose current on old and store in new list
-                RegionUploadVO amalgamatedRegion = oldRegion;
-                amalgamatedRegion.setRegionName( currentRegion.getRegionName() );
-                amalgamatedRegion.setRegionAddress1( currentRegion.getRegionAddress1() );
-                amalgamatedRegion.setRegionAddress2( currentRegion.getRegionAddress2() );
-                amalgamatedRegion.setRegionCountry( currentRegion.getRegionCountry() );
-                amalgamatedRegion.setRegionCountryCode( currentRegion.getRegionCountryCode() );
-                amalgamatedRegion.setRegionCity( currentRegion.getRegionCity() );
-                amalgamatedRegion.setRegionState( currentRegion.getRegionState() );
-                amalgamatedRegion.setRegionZipcode( currentRegion.getRegionZipcode() );
-                newRegions.add( amalgamatedRegion );
-
-                //Delete object entry from oldRegions
-                oldRegions.remove( oldRegion );
+                sourceId = generateSourceId( TYPE_REGION, regionSettings.getIden() );
             }
+
+
+            // fill up the region VO
+            regionUploadVO.setSourceRegionId( sourceId );
+            regionUploadVO.setRegionId( regionSettings.getIden() );
+
+            if ( regionSettings.getContact_details() != null ) {
+
+                regionUploadVO.setRegionName( StringUtils.defaultString( regionSettings.getContact_details().getName() ) );
+                regionUploadVO
+                    .setRegionAddress1( StringUtils.defaultString( regionSettings.getContact_details().getAddress1() ) );
+                regionUploadVO
+                    .setRegionAddress2( StringUtils.defaultString( regionSettings.getContact_details().getAddress2() ) );
+                regionUploadVO
+                    .setRegionCountry( StringUtils.defaultString( regionSettings.getContact_details().getCountry() ) );
+                regionUploadVO
+                    .setRegionCountryCode( StringUtils.defaultString( regionSettings.getContact_details().getCountryCode() ) );
+                regionUploadVO
+                    .setRegionCountryCode( StringUtils.defaultString( regionSettings.getContact_details().getCountryCode() ) );
+                regionUploadVO.setRegionState( StringUtils.defaultString( regionSettings.getContact_details().getState() ) );
+                regionUploadVO.setRegionCity( StringUtils.defaultString( regionSettings.getContact_details().getCity() ) );
+                regionUploadVO
+                    .setRegionZipcode( StringUtils.defaultString( regionSettings.getContact_details().getZipcode() ) );
+            }
+
+
+            // load the histories into the new VO from the old VO
+            if ( oldRegionVO != null ) {
+                regionUploadVO.setRegionNameHistory(
+                    oldRegionVO.getRegionNameHistory() != null ? oldRegionVO.getRegionNameHistory() : null );
+                regionUploadVO.setRegionAddress1History(
+                    oldRegionVO.getRegionAddress1History() != null ? oldRegionVO.getRegionAddress1History() : null );
+                regionUploadVO.setRegionAddress2History(
+                    oldRegionVO.getRegionAddress2History() != null ? oldRegionVO.getRegionAddress2History() : null );
+                regionUploadVO.setRegionCountryHistory(
+                    oldRegionVO.getRegionCountryHistory() != null ? oldRegionVO.getRegionCountryHistory() : null );
+                regionUploadVO.setRegionCountryCodeHistory(
+                    oldRegionVO.getRegionCountryCodeHistory() != null ? oldRegionVO.getRegionCountryCodeHistory() : null );
+                regionUploadVO.setRegionStateHistory(
+                    oldRegionVO.getRegionStateHistory() != null ? oldRegionVO.getRegionStateHistory() : null );
+                regionUploadVO.setRegionCityHistory(
+                    oldRegionVO.getRegionCityHistory() != null ? oldRegionVO.getRegionCityHistory() : null );
+                regionUploadVO.setRegionZipcodeHistory(
+                    oldRegionVO.getRegionZipcodeHistory() != null ? oldRegionVO.getRegionZipcodeHistory() : null );
+            }
+
+            // finally add the mapping and new VO to the hierarchy containers
+            // add to SourceId Map
+            hierarchyAggregate.getRegionUploadVOMap().put( regionUploadVO.getSourceRegionId(), regionUploadVO );
+
+            // name map
+            hierarchyAggregate.getRegionNameMap().put( regionUploadVO.getSourceRegionId(), regionUploadVO.getRegionName() );
+
+            // add to internal Id Map
+            hierarchyAggregate.getNewRegionSourceMapping().put( regionUploadVO.getSourceRegionId(),
+                regionUploadVO.getRegionId() );
+
+            // internal id map
+            hierarchyAggregate.getNewRegionUploadVOMap().put( regionUploadVO.getRegionId(), regionUploadVO );
+
         }
 
-        if ( !( oldRegions.isEmpty() ) ) {
-            //The remaining regions are the ones that have been deleted
-            //don't add these to the new list
-            //Remove deleted regions' sourceIds in the hierarchyupload map
-            for ( RegionUploadVO regionUploadVO : oldRegions ) {
-                regionMapping.remove( regionUploadVO.getSourceRegionId() );
-            }
-            LOG.debug( "Some regions have been deleted recently" );
+
+        LOG.debug( "Method buildAndAddRegionsAndRegionSourceMappingInBatch finished" );
+    }
+
+
+    /**
+     * method to add mapping and VO for branches
+     * @param batchBranchesList
+     * @param hierarchyAggregate
+     * @throws InvalidInputException
+     */
+    private void buildAndAddBranchesAndBranchSourceMappingInBatch( List<Branch> batchBranchesList,
+        HierarchyUploadAggregate hierarchyAggregate ) throws InvalidInputException
+    {
+        LOG.debug( "Method buildAndAddBranchesAndBranchSourceMappingInBatch started" );
+        if ( batchBranchesList == null ) {
+            throw new InvalidInputException( "branch list for the current batch is non-existent" );
         }
 
-        newHierarchyUpload.setRegions( newRegions );
-        newHierarchyUpload.setRegionSourceMapping( regionMapping );
-        LOG.debug( "Method to aggregate regions structure finished" );
+
+        // setting up the new mapping and VO containers
+        if ( hierarchyAggregate.getNewBranchSourceMapping() == null ) {
+            hierarchyAggregate.setNewBranchSourceMapping( HashBiMap.create( new HashMap<String, Long>() ) );
+        }
+
+        if ( hierarchyAggregate.getNewBranchUploadVOMap() == null ) {
+            hierarchyAggregate.setNewBranchUploadVOMap( new HashMap<Long, BranchUploadVO>() );
+        }
+
+        hierarchyAggregate.setBranchUploadVOMap( new HashMap<String, BranchUploadVO>() );
+        hierarchyAggregate.setBranchNameMap( new HashMap<String, String>() );
+
+        // processing all the branches in the current batch
+        for ( Branch branch : batchBranchesList ) {
+
+            String sourceId = "";
+            BranchUploadVO oldBranchVO = null;
+            BranchUploadVO branchUploadVO = new BranchUploadVO();
+
+
+            // processing source id for the current branch
+            // if the old hierarchy data has a source id then retain it else generate new
+            if ( hierarchyAggregate.getOldBranchSourceMapping() != null
+                && hierarchyAggregate.getOldBranchSourceMapping().containsValue( branch.getBranchId() ) ) {
+                sourceId = hierarchyAggregate.getOldBranchSourceMapping().inverse().get( branch.getBranchId() );
+            } else {
+                sourceId = generateSourceId( TYPE_BRANCH, branch.getBranchId() );
+            }
+
+
+            // initializing old branch VO
+            if ( hierarchyAggregate.getOldBranchUploadVOMap() != null
+                && hierarchyAggregate.getOldBranchUploadVOMap().containsKey( branch.getBranchId() ) ) {
+                oldBranchVO = hierarchyAggregate.getOldBranchUploadVOMap().get( branch.getBranchId() );
+            }
+
+
+            // fill up the branch VO
+            branchUploadVO.setSourceBranchId( sourceId );
+            branchUploadVO.setBranchId( branch.getBranchId() );
+            branchUploadVO.setRegionId( branch.getRegion().getRegionId() );
+            branchUploadVO.setBranchName( StringUtils.defaultString( branch.getBranch() ) );
+            branchUploadVO.setBranchAddress1( StringUtils.defaultString( branch.getAddress1() ) );
+            branchUploadVO.setBranchAddress2( StringUtils.defaultString( branch.getAddress2() ) );
+            branchUploadVO.setBranchCountry( StringUtils.defaultString( branch.getCountry() ) );
+            branchUploadVO.setBranchCountryCode( StringUtils.defaultString( branch.getCountryCode() ) );
+            branchUploadVO.setBranchState( StringUtils.defaultString( branch.getState() ) );
+            branchUploadVO.setBranchCity( StringUtils.defaultString( branch.getCity() ) );
+            branchUploadVO.setBranchZipcode( StringUtils.defaultString( branch.getZipcode() ) );
+
+            if ( hierarchyAggregate.getNewRegionUploadVOMap() != null
+                && hierarchyAggregate.getNewRegionUploadVOMap().containsKey( branchUploadVO.getRegionId() ) ) {
+                branchUploadVO.setSourceRegionId(
+                    hierarchyAggregate.getNewRegionUploadVOMap().get( branchUploadVO.getRegionId() ).getSourceRegionId() );
+            }
+
+
+            // load the histories into the new VO from the old VO
+            if ( oldBranchVO != null ) {
+                branchUploadVO
+                    .setRegionIdHistory( oldBranchVO.getRegionIdHistory() != null ? oldBranchVO.getRegionIdHistory() : null );
+                branchUploadVO.setBranchNameHistory(
+                    oldBranchVO.getBranchNameHistory() != null ? oldBranchVO.getBranchNameHistory() : null );
+                branchUploadVO.setBranchAddress1History(
+                    oldBranchVO.getBranchAddress1History() != null ? oldBranchVO.getBranchAddress1History() : null );
+                branchUploadVO.setBranchAddress2History(
+                    oldBranchVO.getBranchAddress2History() != null ? oldBranchVO.getBranchAddress2History() : null );
+                branchUploadVO.setBranchCountryHistory(
+                    oldBranchVO.getBranchCountryHistory() != null ? oldBranchVO.getBranchCountryHistory() : null );
+                branchUploadVO.setBranchCountryCodeHistory(
+                    oldBranchVO.getBranchCountryCodeHistory() != null ? oldBranchVO.getBranchCountryCodeHistory() : null );
+                branchUploadVO.setBranchStateHistory(
+                    oldBranchVO.getBranchStateHistory() != null ? oldBranchVO.getBranchStateHistory() : null );
+                branchUploadVO.setBranchCityHistory(
+                    oldBranchVO.getBranchCityHistory() != null ? oldBranchVO.getBranchCityHistory() : null );
+                branchUploadVO.setBranchZipcodeHistory(
+                    oldBranchVO.getBranchZipcodeHistory() != null ? oldBranchVO.getBranchZipcodeHistory() : null );
+                branchUploadVO.setSourceRegionIdHistory(
+                    oldBranchVO.getSourceRegionIdHistory() != null ? oldBranchVO.getSourceRegionIdHistory() : null );
+            }
+
+            // finally add the mapping and new VO to the new hierarchy containers
+            // add to soruceId Maps
+            hierarchyAggregate.getBranchUploadVOMap().put( branchUploadVO.getSourceBranchId(), branchUploadVO );
+
+            // name map
+            hierarchyAggregate.getBranchNameMap().put( branchUploadVO.getSourceBranchId(), branchUploadVO.getBranchName() );
+
+            // add to internal and source Id Map
+            hierarchyAggregate.getNewBranchSourceMapping().put( branchUploadVO.getSourceBranchId(),
+                branchUploadVO.getBranchId() );
+
+            // internal id map
+            hierarchyAggregate.getNewBranchUploadVOMap().put( branchUploadVO.getBranchId(), branchUploadVO );
+
+        }
+
+        LOG.debug( "Method buildAndAddBranchesAndBranchSourceMappingInBatch finished" );
+
+    }
+
+
+    /**
+     * method to add mapping and VO for users
+     * @param batchUsersList
+     * @param batchUserAndProfileMap
+     * @param agentSettingsMap
+     * @param hierarchyAggregate
+     * @throws InvalidInputException
+     */
+    private void buildAndAddUsersAndUserSourceMappingInBatch( List<User> batchUsersList,
+        Map<Long, List<UserProfile>> batchUserAndProfileMap, Map<Long, OrganizationUnitSettings> agentSettingsMap,
+        HierarchyUploadAggregate hierarchyAggregate ) throws InvalidInputException
+    {
+        LOG.debug( "Method buildAndAddUsersAndUserSourceMappingInBatch started" );
+
+        if ( batchUsersList == null ) {
+            throw new InvalidInputException( "user list for the current batch is non-existent" );
+        }
+
+
+        // setting up the new mapping and VO containers
+        if ( hierarchyAggregate.getNewUserSourceMapping() == null ) {
+            hierarchyAggregate.setNewUserSourceMapping( HashBiMap.create( new HashMap<String, Long>() ) );
+        }
+
+        if ( hierarchyAggregate.getNewUserUploadVOMap() == null ) {
+            hierarchyAggregate.setNewUserUploadVOMap( new HashMap<Long, UserUploadVO>() );
+        }
+
+        hierarchyAggregate.setUserUploadVOMap( new HashMap<String, UserUploadVO>() );
+
+
+        // processing all the users in the current batch
+        for ( User user : batchUsersList ) {
+
+            String sourceId = "";
+            UserUploadVO oldUserVO = null;
+            UserUploadVO userUploadVO = new UserUploadVO();
+            Set<String> assignedBranchSourceIds = new HashSet<String>();
+            Set<String> assignedRegionSourceIds = new HashSet<String>();
+            Set<String> assignedBranchesAdmin = new HashSet<String>();
+            Set<String> assignedRegionsAdmin = new HashSet<String>();
+
+
+            // obtaining old VO, list of user profiles and agent settings for the current user
+            if ( hierarchyAggregate.getOldUserUploadVOMap() != null
+                && hierarchyAggregate.getOldUserUploadVOMap().containsKey( user.getUserId() ) )
+                oldUserVO = hierarchyAggregate.getOldUserUploadVOMap().get( user.getUserId() );
+
+            List<UserProfile> userProfiles = batchUserAndProfileMap.get( user.getUserId() );
+            OrganizationUnitSettings agentSettings = agentSettingsMap.get( user.getUserId() );
+
+
+            // processing source id for the current user
+            // if the old hierarchy data has a source id then retain it else generate new
+            if ( hierarchyAggregate.getOldUserSourceMapping() != null
+                && hierarchyAggregate.getOldUserSourceMapping().containsValue( user.getUserId() ) ) {
+                sourceId = hierarchyAggregate.getOldUserSourceMapping().inverse().get( user.getUserId() );
+            } else {
+                sourceId = generateSourceId( TYPE_USER, user.getUserId() );
+            }
+
+
+            // populating the agent and administrator assignments lists for region and branches using the list of user profiles
+            for ( UserProfile userProfile : userProfiles ) {
+                if ( userProfile.getStatus() == CommonConstants.STATUS_ACTIVE ) {
+
+                    if ( hierarchyAggregate.getNewBranchUploadVOMap() != null
+                        && hierarchyAggregate.getNewBranchUploadVOMap().containsKey( userProfile.getBranchId() ) ) {
+
+                        BranchUploadVO branchVO = hierarchyAggregate.getNewBranchUploadVOMap().get( userProfile.getBranchId() );
+
+                        switch ( userProfile.getProfilesMaster().getProfileId() ) {
+
+                            case CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID:
+                                assignedBranchSourceIds.add( branchVO.getSourceBranchId() );
+                                break;
+                            case CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID:
+                                assignedBranchesAdmin.add( branchVO.getSourceBranchId() );
+                        }
+
+                    } else if ( hierarchyAggregate.getNewRegionUploadVOMap() != null
+                        && hierarchyAggregate.getNewRegionUploadVOMap().containsKey( userProfile.getRegionId() ) ) {
+
+                        RegionUploadVO regionVO = hierarchyAggregate.getNewRegionUploadVOMap().get( userProfile.getRegionId() );
+
+                        switch ( userProfile.getProfilesMaster().getProfileId() ) {
+
+                            case CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID:
+                                assignedRegionSourceIds.add( regionVO.getSourceRegionId() );
+                                break;
+                            case CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID:
+                                assignedRegionsAdmin.add( regionVO.getSourceRegionId() );
+                        }
+                    }
+
+                }
+            }
+
+
+            // fill up the user VO
+            userUploadVO.setSourceUserId( sourceId );
+            userUploadVO.setUserId( user.getUserId() );
+            userUploadVO.setFirstName( StringUtils.defaultString( user.getFirstName() ) );
+            userUploadVO.setLastName( StringUtils.defaultString( user.getLastName() ) );
+
+            if ( agentSettings.getContact_details() != null ) {
+
+                userUploadVO.setTitle( StringUtils.defaultString( agentSettings.getContact_details().getTitle() ) );
+                userUploadVO.setEmailId( CommonConstants.YES_STRING.equals( maskEmail )
+                    ? utils.unmaskEmailAddress( user.getEmailId() ) : user.getEmailId() );
+                userUploadVO
+                    .setAboutMeDescription( StringUtils.defaultString( agentSettings.getContact_details().getAbout_me() ) );
+
+
+                if ( agentSettings.getContact_details().getContact_numbers() != null )
+                    userUploadVO.setPhoneNumber(
+                        StringUtils.defaultString( agentSettings.getContact_details().getContact_numbers().getWork() ) );
+
+                if ( agentSettings.getContact_details().getWeb_addresses() != null )
+                    userUploadVO.setWebsiteUrl(
+                        StringUtils.defaultString( agentSettings.getContact_details().getWeb_addresses().getWork() ) );
+
+            }
+
+            if ( agentSettings.getLicenses() != null && agentSettings.getLicenses().getAuthorized_in() != null )
+                userUploadVO.setLicense( StringUtils.defaultString( agentSettings.getLicenses().getAuthorized_in().get( 0 ) ) );
+
+            userUploadVO.setLegalDisclaimer( StringUtils.defaultString( agentSettings.getDisclaimer() ) );
+            userUploadVO.setUserPhotoUrl( StringUtils.defaultString( agentSettings.getProfileImageUrl() ) );
+            userUploadVO.setAssignedBranches( assignedBranchSourceIds );
+            userUploadVO.setAssignedRegions( assignedRegionSourceIds );
+            userUploadVO.setAssignedBranchesAdmin( assignedBranchesAdmin );
+            userUploadVO.setAssignedRegionsAdmin( assignedRegionsAdmin );
+            userUploadVO.setUserVerified( user.getStatus() == CommonConstants.STATUS_NOT_VERIFIED ? false : true );
+
+
+            // load the histories into the new VO from the old VO
+            if ( oldUserVO != null ) {
+                userUploadVO.setFirstNameHistory( oldUserVO.getFirstNameHistory() );
+                userUploadVO.setLastNameHistory( oldUserVO.getLastNameHistory() );
+                userUploadVO.setTitleHistory( oldUserVO.getTitleHistory() );
+                userUploadVO.setEmailIdHistory( oldUserVO.getEmailIdHistory() );
+                userUploadVO.setPhoneNumberHistory( oldUserVO.getPhoneNumberHistory() );
+                userUploadVO.setWebsiteUrlHistory( oldUserVO.getWebsiteUrlHistory() );
+                userUploadVO.setLicenseHistory( oldUserVO.getLicenseHistory() );
+                userUploadVO.setLegalDisclaimerHistory( oldUserVO.getLegalDisclaimerHistory() );
+                userUploadVO.setAboutMeDescriptionHistory( oldUserVO.getAboutMeDescriptionHistory() );
+                userUploadVO.setUserPhotoUrlHistory( oldUserVO.getUserPhotoUrlHistory() );
+                userUploadVO.setAssignedBranchesHistory( oldUserVO.getAssignedBranchesHistory() );
+                userUploadVO.setAssignedBranchesAdminHistory( oldUserVO.getAssignedBranchesAdminHistory() );
+                userUploadVO.setAssignedRegionsHistory( oldUserVO.getAssignedRegionsHistory() );
+                userUploadVO.setAssignedRegionsAdminHistory( oldUserVO.getAssignedRegionsAdminHistory() );
+            }
+
+            // finally add the mapping and new VO to the new hierarchy containers                
+            // add to soruceId Map
+            hierarchyAggregate.getUserUploadVOMap().put( userUploadVO.getSourceUserId(), userUploadVO );
+
+            // add to internal and source Id Map
+            hierarchyAggregate.getNewUserSourceMapping().put( userUploadVO.getSourceUserId(), user.getUserId() );
+
+            // internal Id map
+            hierarchyAggregate.getNewUserUploadVOMap().put( userUploadVO.getUserId(), userUploadVO );
+
+        }
+
+        LOG.debug( "Method buildAndAddUsersAndUserSourceMappingInBatch finished" );
+
+    }
+
+
+    private Map<Long, OrganizationUnitSettings> buildOrganizationUnitSettingsIDMap( List<Long> batchUserIds )
+    {
+        Map<Long, OrganizationUnitSettings> agentSettingsMap = new HashMap<>();
+        for ( OrganizationUnitSettings unitSettings : organizationUnitSettingsDao.fetchOrganizationUnitSettingsForMultipleIds(
+            new HashSet<>( batchUserIds ), CommonConstants.AGENT_SETTINGS_COLLECTION ) ) {
+            agentSettingsMap.put( unitSettings.getIden(), unitSettings );
+        }
+
+        return agentSettingsMap;
     }
 
 
@@ -493,503 +774,6 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
     {
         return entityType + Integer.toHexString( String.valueOf( System.currentTimeMillis() ).hashCode() )
             + Integer.toHexString( String.valueOf( iden ).hashCode() );
-    }
-
-
-    /**
-     * Method to generate current hierarchy structure for a company
-     * @param company
-     * @return
-     * @throws InvalidInputException 
-     */
-    public HierarchyUpload generateCurrentHierarchyStructure( Company company, HierarchyUpload oldHierarchyUpload )
-        throws InvalidInputException
-    {
-        LOG.info( "Method to generate current hierarchy structure for company : " + company.getCompany() + " started" );
-
-        HierarchyUpload hierarchyUpload = new HierarchyUpload();
-
-        //Set company Id
-        hierarchyUpload.setCompanyId( company.getCompanyId() );
-
-        //Set RegionVOs
-        List<RegionUploadVO> regions = generateRegionUploadVOsForCompany( company, oldHierarchyUpload, hierarchyUpload );
-        hierarchyUpload.setRegions( regions );
-
-        //Generate map of regionVOs
-        Map<Long, RegionUploadVO> regionMap = new HashMap<Long, RegionUploadVO>();
-        for ( RegionUploadVO regionUploadVO : regions ) {
-            regionMap.put( regionUploadVO.getRegionId(), regionUploadVO );
-        }
-
-        //Set BranchVOs
-        List<BranchUploadVO> branches = generateBranchUploadVOsForCompany( company, oldHierarchyUpload, hierarchyUpload,
-            regionMap );
-        hierarchyUpload.setBranches( branches );
-
-        //Set UserVOs
-
-        //Generate map of branchVOs
-        Map<Long, BranchUploadVO> branchMap = new HashMap<Long, BranchUploadVO>();
-        for ( BranchUploadVO branchUploadVO : branches ) {
-            branchMap.put( branchUploadVO.getBranchId(), branchUploadVO );
-        }
-
-        List<UserUploadVO> users = generateUserUploadVOsForCompany( company, regionMap, branchMap, oldHierarchyUpload,
-            hierarchyUpload );
-        hierarchyUpload.setUsers( users );
-
-        LOG.info( "Method to generate current hierarchy structure for company : " + company.getCompany() + " finished" );
-        return hierarchyUpload;
-    }
-
-
-    /**
-     * Method to generate UserUploadVOs for a company
-     * @param company
-     * @return
-     * @throws InvalidInputException
-     */
-    public List<UserUploadVO> generateUserUploadVOsForCompany( Company company, Map<Long, RegionUploadVO> regionMap,
-        Map<Long, BranchUploadVO> branchMap, HierarchyUpload oldHierarchyUpload, HierarchyUpload currentHierarchyUpload )
-        throws InvalidInputException
-    {
-        LOG.debug( "Method to generate user upload VOs for company : " + company.getCompany() + " started" );
-        List<UserUploadVO> userVOs = new ArrayList<UserUploadVO>();
-
-        Map<Long, String> oldSourceMap = null;
-        if ( oldHierarchyUpload != null && oldHierarchyUpload.getUserSourceMapping() != null ) {
-            oldSourceMap = new HashMap<Long, String>();
-            for ( String key : oldHierarchyUpload.getUserSourceMapping().keySet() ) {
-                oldSourceMap.put( oldHierarchyUpload.getUserSourceMapping().get( key ), key );
-            }
-        }
-        Map<String, Long> newSourceMap = currentHierarchyUpload.getUserSourceMapping();
-        if ( newSourceMap == null ) {
-            newSourceMap = new HashMap<String, Long>();
-        }
-
-        int start = 0;
-        List<User> batchUserList = new ArrayList<User>();
-        Map<Long, List<UserProfile>> batchUserAndProfileMap;
-        List<Long> batchUserIds;
-        do {
-            batchUserList = userDao.getUsersForCompany( company, start, BATCH_SIZE );
-            batchUserIds = new ArrayList<Long>();
-            if ( batchUserList != null && batchUserList.size() > 0 ) {
-                for ( User user : batchUserList ) {
-                    batchUserIds.add( user.getUserId() );
-                }
-                //get profiles for users
-                batchUserAndProfileMap = userProfileDao.getUserProfilesForUsers( batchUserIds );
-                //add batch profiles to profile list
-                for ( User user : batchUserList ) {
-                    UserUploadVO userUploadVO = generateUserUploadVOForUser( user, regionMap, branchMap, oldSourceMap,
-                        newSourceMap, batchUserAndProfileMap );
-                    userVOs.add( userUploadVO );
-                }
-            }
-            start += BATCH_SIZE;
-        } while ( batchUserList != null && batchUserList.size() == BATCH_SIZE );
-        currentHierarchyUpload.setUserSourceMapping( newSourceMap );
-
-        LOG.debug( "Method to generate user upload VOs for company : " + company.getCompany() + " finished" );
-        return userVOs;
-    }
-
-
-    /**
-     * Method to get user upload VO for user
-     * @param user
-     * @return
-     * @throws InvalidInputException
-     */
-    public UserUploadVO generateUserUploadVOForUser( User user, Map<Long, RegionUploadVO> regionMap,
-        Map<Long, BranchUploadVO> branchMap, Map<Long, String> oldSourceMap, Map<String, Long> newSourceMap,
-        Map<Long, List<UserProfile>> userAndProfileMap ) throws InvalidInputException
-    {
-        if ( user == null ) {
-            throw new InvalidInputException( "User is null" );
-        }
-        LOG.debug( "Method to get user upload VO for user : " + user.getUsername() + " started" );
-
-        //Get userSettings
-        AgentSettings agentSettings;
-        try {
-            agentSettings = organizationManagementService.getAgentSettings( user.getUserId() );
-        } catch ( NoRecordsFetchedException e ) {
-            throw new InvalidInputException( "Agent Setting null for userId : " + user.getUserId() );
-        }
-
-        UserUploadVO userUploadVO = new UserUploadVO();
-        userUploadVO.setUserId( user.getUserId() );
-        userUploadVO.setFirstName( user.getFirstName() );
-        if ( user.getLastName() != null && !( user.getLastName().isEmpty() ) ) {
-            userUploadVO.setLastName( user.getLastName() );
-        }
-
-        userUploadVO.setBelongsToCompany( true );
-
-        //Get list of branchIds, list of regionIds and isAgent
-        List<UserProfile> userProfiles = userAndProfileMap.get( user.getUserId() );
-        List<String> assignedBranchSourceIds = new ArrayList<String>();
-        List<String> assignedRegionSourceIds = new ArrayList<String>();
-        List<String> assignedBranchesAdmin = new ArrayList<String>();
-        List<String> assignedRegionsAdmin = new ArrayList<String>();
-
-        if ( oldSourceMap == null || oldSourceMap.isEmpty() || !( oldSourceMap.containsKey( userUploadVO.getUserId() ) ) ) {
-            String sourceId = generateSourceId( TYPE_USER, user.getUserId() );
-            userUploadVO.setSourceUserId( sourceId );
-            newSourceMap.put( sourceId, userUploadVO.getUserId() );
-        } else {
-            userUploadVO.setSourceUserId( oldSourceMap.get( userUploadVO.getUserId() ) );
-        }
-        for ( UserProfile userProfile : userProfiles ) {
-            if ( userProfile.getStatus() == CommonConstants.STATUS_ACTIVE ) {
-                if ( branchMap.containsKey( userProfile.getBranchId() ) ) {
-                    BranchUploadVO branchUpload = branchMap.get( userProfile.getBranchId() );
-                    if ( !branchUpload.getBranchName().equalsIgnoreCase( CommonConstants.DEFAULT_BRANCH_NAME ) ) {
-
-                        if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
-                            userUploadVO.setAgent( true );
-
-                            //Add sourceId to list
-                            assignedBranchSourceIds.add( branchMap.get( userProfile.getBranchId() ).getSourceBranchId() );
-                        }
-
-
-                        if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
-                            userUploadVO.setBranchAdmin( true );
-                            assignedBranchesAdmin.add( branchMap.get( userProfile.getBranchId() ).getSourceBranchId() );
-                        }
-                    }
-                }
-                if ( regionMap.containsKey( userProfile.getRegionId() ) ) {
-                    RegionUploadVO regionUpload = regionMap.get( userProfile.getRegionId() );
-
-                    if ( !regionUpload.getRegionName().equalsIgnoreCase( CommonConstants.DEFAULT_REGION_NAME ) ) {
-                        if ( !branchMap.containsKey( userProfile.getBranchId() ) ) {
-
-                            if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
-                                userUploadVO.setAgent( true );
-
-                                //Add sourceID to list
-                                assignedRegionSourceIds.add( regionUpload.getSourceRegionId() );
-                            }
-
-                            if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
-                                userUploadVO.setRegionAdmin( true );
-                                assignedRegionsAdmin.add( regionUpload.getSourceRegionId() );
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-
-        if ( agentSettings.getContact_details() != null ) {
-            if ( agentSettings.getContact_details().getTitle() != null
-                && !( agentSettings.getContact_details().getTitle().isEmpty() ) ) {
-                userUploadVO.setTitle( agentSettings.getContact_details().getTitle() );
-            }
-
-            if ( CommonConstants.YES_STRING.equals( maskEmail ) ) {
-                userUploadVO.setEmailId( utils.unmaskEmailAddress( user.getEmailId() ) );
-            } else {
-                userUploadVO.setEmailId( user.getEmailId() );
-            }
-
-            if ( agentSettings.getContact_details().getContact_numbers() != null
-                && agentSettings.getContact_details().getContact_numbers().getWork() != null
-                && !( agentSettings.getContact_details().getContact_numbers().getWork().isEmpty() ) ) {
-                userUploadVO.setPhoneNumber( agentSettings.getContact_details().getContact_numbers().getWork() );
-            }
-            if ( agentSettings.getContact_details().getWeb_addresses() != null
-                && agentSettings.getContact_details().getWeb_addresses().getWork() != null
-                && !( agentSettings.getContact_details().getWeb_addresses().getWork().isEmpty() ) ) {
-                userUploadVO.setWebsiteUrl( agentSettings.getContact_details().getWeb_addresses().getWork() );
-            }
-            if ( agentSettings.getContact_details().getAbout_me() != null
-                && !( agentSettings.getContact_details().getAbout_me().isEmpty() ) ) {
-                userUploadVO.setAboutMeDescription( agentSettings.getContact_details().getAbout_me() );
-            }
-        }
-        if ( agentSettings.getLicenses() != null && agentSettings.getLicenses().getAuthorized_in() != null
-            && !agentSettings.getLicenses().getAuthorized_in().isEmpty() ) {
-            userUploadVO.setLicense( agentSettings.getLicenses().getAuthorized_in().get( 0 ) );
-        }
-        if ( agentSettings.getDisclaimer() != null && !( agentSettings.getDisclaimer().isEmpty() ) ) {
-            userUploadVO.setLegalDisclaimer( agentSettings.getDisclaimer() );
-        }
-        if ( agentSettings.getProfileImageUrl() != null && !( agentSettings.getProfileImageUrl().isEmpty() ) ) {
-            userUploadVO.setUserPhotoUrl( agentSettings.getProfileImageUrl() );
-        }
-        userUploadVO.setAssignedBranches( assignedBranchSourceIds );
-        userUploadVO.setAssignedRegions( assignedRegionSourceIds );
-        userUploadVO.setAssignedBranchesAdmin( assignedBranchesAdmin );
-        userUploadVO.setAssignedRegionsAdmin( assignedRegionsAdmin );
-
-        //set the is verified column
-        if ( user.getStatus() == CommonConstants.STATUS_NOT_VERIFIED ) {
-            userUploadVO.setUserVerified( false );
-        } else {
-            userUploadVO.setUserVerified( true );
-        }
-
-        LOG.debug( "Method to get user upload VO for user : " + user.getUsername() + " finished" );
-        return userUploadVO;
-    }
-
-
-    /**
-     * Method to generate BranchUploadVOs for a company
-     * @param company
-     * @return
-     * @throws InvalidInputException
-     */
-    public List<BranchUploadVO> generateBranchUploadVOsForCompany( Company company, HierarchyUpload oldHierarchyUpload,
-        HierarchyUpload currentHierarchyUpload, Map<Long, RegionUploadVO> regionMap ) throws InvalidInputException
-    {
-
-        LOG.debug( "Method to generate branch upload VOs for company : " + company.getCompany() + " started" );
-        List<BranchUploadVO> branchVOs = new ArrayList<BranchUploadVO>();
-
-        Map<Long, String> oldSourceMap = null;
-        if ( oldHierarchyUpload != null && oldHierarchyUpload.getBranchSourceMapping() != null ) {
-            oldSourceMap = new HashMap<Long, String>();
-            for ( String key : oldHierarchyUpload.getBranchSourceMapping().keySet() ) {
-                oldSourceMap.put( oldHierarchyUpload.getBranchSourceMapping().get( key ), key );
-            }
-        }
-        Map<String, Long> newSourceMap = currentHierarchyUpload.getBranchSourceMapping();
-        if ( newSourceMap == null ) {
-            newSourceMap = new HashMap<String, Long>();
-        }
-
-
-        int start = 0;
-        List<Branch> batchBranchList = new ArrayList<Branch>();
-        do {
-            batchBranchList = branchDao.getBranchesForCompany( company.getCompanyId(), CommonConstants.NO, start, BATCH_SIZE );
-            if ( batchBranchList != null && batchBranchList.size() > 0 )
-                for ( Branch branch : batchBranchList ) {
-                    if ( branch.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_YES ) {
-                        continue;
-                    }
-                    BranchUploadVO branchUploadVO = generateBranchUploadVOForBranch( branch, oldSourceMap, newSourceMap,
-                        regionMap );
-                    branchVOs.add( branchUploadVO );
-                }
-            start += BATCH_SIZE;
-        } while ( batchBranchList != null && batchBranchList.size() == BATCH_SIZE );
-        currentHierarchyUpload.setBranchSourceMapping( newSourceMap );
-
-        LOG.debug( "Method to generate branch upload VOs for company : " + company.getCompany() + " finished" );
-        return branchVOs;
-    }
-
-
-    /**
-     * Method to get BranchUploadVO for branch
-     * @param branch
-     * @return
-     * @throws InvalidInputException
-     */
-    public BranchUploadVO generateBranchUploadVOForBranch( Branch branch, Map<Long, String> oldSourceMap,
-        Map<String, Long> newSourceMap, Map<Long, RegionUploadVO> regionMap ) throws InvalidInputException
-    {
-        if ( branch == null ) {
-            throw new InvalidInputException( "Branch is null" );
-        }
-        LOG.debug( "Method to get branch upload VO for branch : " + branch.getBranch() + " started" );
-
-        //Get branchSettings
-        OrganizationUnitSettings branchSettings;
-        try {
-            branchSettings = organizationManagementService.getBranchSettingsDefault( branch.getBranchId() );
-        } catch ( NoRecordsFetchedException e ) {
-            throw new InvalidInputException( "Branch settings is null for branch : " + branch.getBranchId() );
-        }
-
-        BranchUploadVO branchUploadVO = new BranchUploadVO();
-
-        branchUploadVO.setBranchId( branch.getBranchId() );
-        branchUploadVO.setRegionId( branch.getRegion().getRegionId() );
-        branchUploadVO.setBranchName( branch.getBranch() );
-        branchUploadVO.setAssignedRegionName( branch.getRegion().getRegion() );
-
-        if ( branchSettings.getContact_details() != null ) {
-            if ( branchSettings.getContact_details().getAddress1() != null
-                && !( branchSettings.getContact_details().getAddress1().isEmpty() ) ) {
-                branchUploadVO.setBranchAddress1( branchSettings.getContact_details().getAddress1() );
-            }
-            if ( branchSettings.getContact_details().getAddress2() != null
-                && !( branchSettings.getContact_details().getAddress2().isEmpty() ) ) {
-                branchUploadVO.setBranchAddress2( branchSettings.getContact_details().getAddress2() );
-            }
-            if ( branchSettings.getContact_details().getCountry() != null
-                && !( branchSettings.getContact_details().getCountry().isEmpty() ) ) {
-                branchUploadVO.setBranchCountry( branchSettings.getContact_details().getCountry() );
-            }
-            if ( branchSettings.getContact_details().getCountryCode() != null
-                && !( branchSettings.getContact_details().getCountryCode().isEmpty() ) ) {
-                branchUploadVO.setBranchCountryCode( branchSettings.getContact_details().getCountryCode() );
-            }
-            if ( branchSettings.getContact_details().getState() != null
-                && !( branchSettings.getContact_details().getState().isEmpty() ) ) {
-                branchUploadVO.setBranchState( branchSettings.getContact_details().getState() );
-            }
-            if ( branchSettings.getContact_details().getCity() != null
-                && !( branchSettings.getContact_details().getCity().isEmpty() ) ) {
-                branchUploadVO.setBranchCity( branchSettings.getContact_details().getCity() );
-            }
-            if ( branchSettings.getContact_details().getZipcode() != null
-                && !( branchSettings.getContact_details().getZipcode().isEmpty() ) ) {
-                branchUploadVO.setBranchZipcode( branchSettings.getContact_details().getZipcode() );
-            }
-            if ( oldSourceMap == null || oldSourceMap.isEmpty() || !( oldSourceMap.containsKey( branchUploadVO.getBranchId() ) ) ) {
-                String sourceId = generateSourceId( TYPE_BRANCH, branch.getBranchId() );
-                branchUploadVO.setSourceBranchId( sourceId );
-                newSourceMap.put( sourceId, branchUploadVO.getBranchId() );
-            } else {
-                branchUploadVO.setSourceBranchId( oldSourceMap.get( branchUploadVO.getBranchId() ) );
-            }
-            if ( regionMap != null && regionMap.containsKey( branchUploadVO.getRegionId() ) ) {
-                branchUploadVO.setSourceRegionId( regionMap.get( branchUploadVO.getRegionId() ).getSourceRegionId() );
-            }
-        }
-
-
-        LOG.debug( "Method to get branch upload VO for branch : " + branch.getBranch() + " finished" );
-        return branchUploadVO;
-    }
-
-
-    /**
-     * Method to generate RegionUploadVOs for a company
-     * @param company
-     * @return
-     * @throws InvalidInputException 
-     */
-    @Transactional
-    public List<RegionUploadVO> generateRegionUploadVOsForCompany( Company company, HierarchyUpload oldHierarchyUpload,
-        HierarchyUpload currentHierarchyUpload ) throws InvalidInputException
-    {
-        LOG.debug( "Method to generate region upload VOs for comapny : " + company.getCompany() + " started" );
-        List<RegionUploadVO> regionVOs = new ArrayList<RegionUploadVO>();
-
-        //if oldHierarchyUpload is not null, generate a revMap and send it in getRegionUploadVOForRegion
-
-        int start = 0;
-        List<Region> batchRegionList = new ArrayList<Region>();
-        Map<Long, String> oldSourceMap = null;
-        if ( oldHierarchyUpload != null && oldHierarchyUpload.getRegionSourceMapping() != null ) {
-            oldSourceMap = new HashMap<Long, String>();
-            for ( String key : oldHierarchyUpload.getRegionSourceMapping().keySet() ) {
-                oldSourceMap.put( oldHierarchyUpload.getRegionSourceMapping().get( key ), key );
-            }
-        }
-        Map<String, Long> newSourceMap = currentHierarchyUpload.getRegionSourceMapping();
-        if ( newSourceMap == null ) {
-            newSourceMap = new HashMap<String, Long>();
-        }
-        do {
-            batchRegionList = regionDao.getRegionsForCompany( company.getCompanyId(), start, BATCH_SIZE );
-            if ( batchRegionList != null && batchRegionList.size() > 0 )
-                for ( Region region : batchRegionList ) {
-                    if ( region.getIsDefaultBySystem() == CommonConstants.IS_DEFAULT_BY_SYSTEM_YES ) {
-                        continue;
-                    }
-                    RegionUploadVO regionUploadVO = getRegionUploadVOForRegion( region, oldSourceMap, newSourceMap );
-                    regionVOs.add( regionUploadVO );
-                }
-            start += BATCH_SIZE;
-        } while ( batchRegionList != null && batchRegionList.size() == BATCH_SIZE );
-        currentHierarchyUpload.setRegionSourceMapping( newSourceMap );
-
-        LOG.debug( "Method to generate region upload VOs for comapny : " + company.getCompany() + " finished" );
-        return regionVOs;
-    }
-
-
-    /**
-     * Method to get RegionUploadVO for a region
-     * @param region
-     * @return
-     * @throws InvalidInputException 
-     */
-    public RegionUploadVO getRegionUploadVOForRegion( Region region, Map<Long, String> oldSourceMap,
-        Map<String, Long> newSourceMap ) throws InvalidInputException
-    {
-        if ( region == null ) {
-            throw new InvalidInputException( "Region is null" );
-        }
-        LOG.debug( "Method to get region upload VO for region : " + region.getRegion() + " started" );
-
-        //Get regionSettings
-        OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( region.getRegionId() );
-        if ( regionSettings == null ) {
-            throw new InvalidInputException( "Region settings is null" );
-        }
-
-
-        RegionUploadVO regionUploadVO = new RegionUploadVO();
-        regionUploadVO.setRegionId( region.getRegionId() );
-        regionUploadVO.setRegionName( region.getRegion() );
-        if ( regionSettings.getContact_details() != null ) {
-            if ( regionSettings.getContact_details().getAddress1() != null
-                && !( regionSettings.getContact_details().getAddress1().isEmpty() ) ) {
-                regionUploadVO.setRegionAddress1( regionSettings.getContact_details().getAddress1() );
-            }
-
-            if ( regionSettings.getContact_details().getAddress2() != null
-                && !( regionSettings.getContact_details().getAddress2().isEmpty() ) ) {
-                regionUploadVO.setRegionAddress2( regionSettings.getContact_details().getAddress2() );
-            }
-
-            if ( regionSettings.getContact_details().getCountry() != null
-                && !( regionSettings.getContact_details().getCountry().isEmpty() ) ) {
-                regionUploadVO.setRegionCountry( regionSettings.getContact_details().getCountry() );
-            }
-
-            if ( regionSettings.getContact_details().getCountryCode() != null
-                && !( regionSettings.getContact_details().getCountryCode().isEmpty() ) ) {
-                regionUploadVO.setRegionCountryCode( regionSettings.getContact_details().getCountryCode() );
-            }
-
-            if ( regionSettings.getContact_details().getCountryCode() != null
-                && !( regionSettings.getContact_details().getCountryCode().isEmpty() ) ) {
-                regionUploadVO.setRegionCountryCode( regionSettings.getContact_details().getCountryCode() );
-            }
-
-            if ( regionSettings.getContact_details().getState() != null
-                && !( regionSettings.getContact_details().getState().isEmpty() ) ) {
-                regionUploadVO.setRegionState( regionSettings.getContact_details().getState() );
-            }
-
-            if ( regionSettings.getContact_details().getCity() != null
-                && !( regionSettings.getContact_details().getCity().isEmpty() ) ) {
-                regionUploadVO.setRegionCity( regionSettings.getContact_details().getCity() );
-            }
-
-            if ( regionSettings.getContact_details().getZipcode() != null
-                && !( regionSettings.getContact_details().getZipcode().isEmpty() ) ) {
-                regionUploadVO.setRegionZipcode( regionSettings.getContact_details().getZipcode() );
-            }
-            if ( oldSourceMap == null || oldSourceMap.isEmpty() || !( oldSourceMap.containsKey( regionUploadVO.getRegionId() ) ) ) {
-                String sourceId = generateSourceId( TYPE_REGION, region.getRegionId() );
-                regionUploadVO.setSourceRegionId( sourceId );
-                newSourceMap.put( sourceId, regionUploadVO.getRegionId() );
-            } else {
-                regionUploadVO.setSourceRegionId( oldSourceMap.get( regionUploadVO.getRegionId() ) );
-            }
-
-
-        }
-
-        LOG.debug( "Method to get region upload VO for region : " + region.getRegion() + " finished" );
-        return regionUploadVO;
     }
 
 
@@ -1047,6 +831,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
                 // col 12 - legal disclaimer
                 // col 13 - photo - profile image url
                 // col 14 - about me
+                // col 15 - send email ( empty )
                 userReportToPopulate.add( user.getSourceUserId() );
                 userReportToPopulate.add( user.getFirstName() );
                 if ( user.getLastName() != null && !user.getLastName().trim().equalsIgnoreCase( "" )
@@ -1073,7 +858,8 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
                 }
 
                 if ( user.getAssignedBranchesAdmin() != null && !( user.getAssignedBranchesAdmin().isEmpty() ) ) {
-                    userReportToPopulate.add( user.getAssignedBranchesAdmin().toString().replace( "[", "" ).replace( "]", "" ) );
+                    userReportToPopulate
+                        .add( user.getAssignedBranchesAdmin().toString().replace( "[", "" ).replace( "]", "" ) );
                 } else {
                     userReportToPopulate.add( "" );
                 }
@@ -1143,6 +929,7 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
         userReportToPopulate.add( CommonConstants.CHR_USERS_LEGAL_DISCLAIMER );
         userReportToPopulate.add( CommonConstants.CHR_USERS_PHOTO );
         userReportToPopulate.add( CommonConstants.CHR_USERS_ABOUT_ME_DESCRIPTION );
+        userReportToPopulate.add( CommonConstants.CHR_USERS_SEND_EMAIL );
 
         usersData.put( 1, userReportToPopulate );
 
