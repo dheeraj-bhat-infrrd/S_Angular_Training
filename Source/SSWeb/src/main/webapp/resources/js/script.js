@@ -3181,8 +3181,7 @@ var hierarchyUpload = {
 			hierarchyUpload.uploadType = $(this).data('type');
 		});
 		
-		$('body').on('click', '#warn-toggle-chk-box', function(e) {
-			e.stopPropagation();
+		$('#warn-toggle-chk-box').unbind('click').bind('click', function(e) {
 			$('#warn-toggle-chk-box').toggleClass('bd-check-img-checked');
 		});
 

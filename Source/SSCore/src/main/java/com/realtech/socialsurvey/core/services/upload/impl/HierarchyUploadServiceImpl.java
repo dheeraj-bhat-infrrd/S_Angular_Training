@@ -1093,7 +1093,9 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                                 .setNumberOfBranchesModified( parsedHierarchyUpload.getNumberOfBranchesModified() + 1 );
 
                             // update ID
-                            branch.setBranchId( processedBranch.getBranchId() );
+                            if ( branch.isBranchAdded() || branch.isBranchModified() ) {
+                                branch.setBranchId( processedBranch.getBranchId() );
+                            }
                         }
 
 
@@ -1107,6 +1109,9 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     }
                 }
             } catch ( Exception errorWhileParsingOneOfTheBranches ) {
+
+                LOG.error( "error while importing branches, reason: {}", errorWhileParsingOneOfTheBranches.getMessage(),
+                    errorWhileParsingOneOfTheBranches );
 
                 if ( parsedHierarchyUpload.getBranchErrors() == null ) {
                     parsedHierarchyUpload.setBranchErrors( new ArrayList<String>() );
@@ -1272,7 +1277,9 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                         }
 
                         // update id
-                        region.setRegionId( processedRegion.getRegionId() );
+                        if( region.isRegionAdded() || region.isRegionModified() ){
+                            region.setRegionId( processedRegion.getRegionId() );
+                        }
 
                     } else {
                         if ( !parsedHierarchyUpload.isInAppendMode() ) {
@@ -1283,6 +1290,9 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     }
                 }
             } catch ( Exception errorWhileParsingOneOfTheRegions ) {
+
+                LOG.error( "error while importing regions, reason {}", errorWhileParsingOneOfTheRegions.getMessage(),
+                    errorWhileParsingOneOfTheRegions );
 
                 if ( parsedHierarchyUpload.getRegionErrors() == null ) {
                     parsedHierarchyUpload.setRegionErrors( new ArrayList<String>() );
