@@ -1034,7 +1034,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
             }
 
-            if ( userUploadVO.getUserPhotoUrl() != null ) {
+            if ( userUploadVO.getUserPhotoUrl() != null && !userUploadVO.getUserPhotoUrl().isEmpty() ) {
                 updateProfileImageForAgent( userUploadVO.getUserPhotoUrl(), agentSettings );
             }
         }
@@ -1093,7 +1093,9 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                                 .setNumberOfBranchesModified( parsedHierarchyUpload.getNumberOfBranchesModified() + 1 );
 
                             // update ID
-                            branch.setBranchId( processedBranch.getBranchId() );
+                            if ( branch.isBranchAdded() || branch.isBranchModified() ) {
+                                branch.setBranchId( processedBranch.getBranchId() );
+                            }
                         }
 
 
@@ -1107,6 +1109,9 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     }
                 }
             } catch ( Exception errorWhileParsingOneOfTheBranches ) {
+
+                LOG.error( "error while importing branches, reason: {}", errorWhileParsingOneOfTheBranches.getMessage(),
+                    errorWhileParsingOneOfTheBranches );
 
                 if ( parsedHierarchyUpload.getBranchErrors() == null ) {
                     parsedHierarchyUpload.setBranchErrors( new ArrayList<String>() );
@@ -1272,7 +1277,9 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                         }
 
                         // update id
-                        region.setRegionId( processedRegion.getRegionId() );
+                        if ( region.isRegionAdded() || region.isRegionModified() ) {
+                            region.setRegionId( processedRegion.getRegionId() );
+                        }
 
                     } else {
                         if ( !parsedHierarchyUpload.isInAppendMode() ) {
@@ -1283,6 +1290,9 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     }
                 }
             } catch ( Exception errorWhileParsingOneOfTheRegions ) {
+
+                LOG.error( "error while importing regions, reason {}", errorWhileParsingOneOfTheRegions.getMessage(),
+                    errorWhileParsingOneOfTheRegions );
 
                 if ( parsedHierarchyUpload.getRegionErrors() == null ) {
                     parsedHierarchyUpload.setRegionErrors( new ArrayList<String>() );
@@ -1682,6 +1692,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
         String userWebsite, String userLicenses, String userLegalDisclaimer, String userPhotoProfileURL, String userAboutMe,
         boolean userSendEmail )
     {
+        boolean isAssignmentModified = false;
         if ( !StringUtils.equals( userFirstName, currentUserVO.getFirstName() ) && !StringUtils.isEmpty( userFirstName ) ) {
 
             if ( currentUserVO.getFirstNameHistory() == null )
@@ -1831,6 +1842,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 currentUserVO.setUserModified( true );
             }
 
+            isAssignmentModified = true;
+
             // checking for invalid assignments
             for ( String sourceBranchId : userBranchIdSet ) {
                 if ( hierarchyIntermediate.getBranches() != null
@@ -1880,6 +1893,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             if ( !currentUserVO.isUserAdded() ) {
                 currentUserVO.setUserModified( true );
             }
+
+            isAssignmentModified = true;
 
             // checking for invalid assignments
             for ( String sourceRegionId : userRegionIdSet ) {
@@ -1931,6 +1946,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 currentUserVO.setUserModified( true );
             }
 
+            isAssignmentModified = true;
+
             // checking for invalid assignments
             for ( String sourceRegionIdAdmin : userRegionIdAdminSet ) {
                 if ( hierarchyIntermediate.getRegions() != null
@@ -1981,6 +1998,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 currentUserVO.setUserModified( true );
             }
 
+            isAssignmentModified = true;
+
             // checking for invalid assignments
             for ( String sourceBranchIdAdmin : userBranchIdAdminSet ) {
                 if ( hierarchyIntermediate.getBranches() != null
@@ -2004,7 +2023,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
         }
 
         if ( currentUserVO.getAssignedBranches().isEmpty() && currentUserVO.getAssignedRegions().isEmpty()
-            && currentUserVO.getAssignedBranchesAdmin().isEmpty() && currentUserVO.getAssignedRegionsAdmin().isEmpty() ) {
+            && currentUserVO.getAssignedBranchesAdmin().isEmpty() && currentUserVO.getAssignedRegionsAdmin().isEmpty()
+            && ( currentUserVO.isUserAdded() || isAssignmentModified ) ) {
 
             // default company assignment
             parsedHierarchyUpload.getUserValidationWarnings().add( "Row: " + currentUserVO.getRowNum()
@@ -2162,7 +2182,10 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 if ( hierarchyIntermediate.getBranches() == null ) {
                     hierarchyIntermediate.setBranches( new HashMap<String, BranchUploadVO>() );
                 }
-                hierarchyIntermediate.setBranchNameMap( new HashMap<String, String>() );
+
+                if ( hierarchyIntermediate.getBranchNameMap() == null ) {
+                    hierarchyIntermediate.setBranchNameMap( new HashMap<String, String>() );
+                }
             }
 
             while ( branchesIterator.hasNext() ) {
@@ -2337,6 +2360,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
         BranchUploadVO currentBranchVO, String branchName, String sourceRegionId, String branchAddress1, String branchAddress2,
         String branchCity, String branchState, String branchZipCode )
     {
+        boolean isAssignmentModified = false;
         if ( !StringUtils.equals( branchName, currentBranchVO.getBranchName() ) && !StringUtils.isEmpty( branchName ) ) {
 
             if ( currentBranchVO.getBranchNameHistory() == null )
@@ -2354,19 +2378,22 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 currentBranchVO.setBranchModified( true );
 
             // check for name duplication
-            String branchSourceIdWithExistingName = "";
-            if ( StringUtils
-                .isNotEmpty( ( branchSourceIdWithExistingName = containsStringValue( hierarchyIntermediate.getBranchNameMap(),
-                    branchName ) ) ) ) {
+            String branchSourceIdWithExistingName = containsStringValue( hierarchyIntermediate.getBranchNameMap(), branchName );
+            if ( StringUtils.isNotEmpty( branchSourceIdWithExistingName ) ) {
 
                 BranchUploadVO branch = hierarchyIntermediate.getBranches().get( branchSourceIdWithExistingName );
-                if ( branch.isBranchProcessed() ) {
+                if ( branch.isBranchProcessed() && branch.isBranchAdded() ) {
                     parsedHierarchyUpload.getBranchValidationWarnings()
                         .add( "A Branch with the same already exists at : " + branch.getRowNum() );
-                } else {
+                } else if ( branch.isBranchProcessed() && !branch.isBranchAdded() ) {
                     parsedHierarchyUpload.getBranchValidationWarnings().add(
                         "Row: " + currentBranchVO.getRowNum() + ", A Branch with the same already exists in the company." );
                 }
+
+                branch.setWarningRecord( true );
+            } else {
+                hierarchyIntermediate.getBranchNameMap().put( currentBranchVO.getSourceBranchId(),
+                    currentBranchVO.getBranchName() );
             }
 
         } else if ( StringUtils.isEmpty( branchName ) ) {
@@ -2396,6 +2423,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             if ( !currentBranchVO.isBranchAdded() )
                 currentBranchVO.setBranchModified( true );
 
+            isAssignmentModified = true;
+
             // check for valid region assignment
             if ( hierarchyIntermediate.getRegions().containsKey( sourceRegionId ) ) {
 
@@ -2406,7 +2435,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 }
             }
 
-        } else if ( StringUtils.isEmpty( sourceRegionId ) ) {
+        } else if ( StringUtils.isEmpty( sourceRegionId ) && ( currentBranchVO.isBranchAdded() || isAssignmentModified ) ) {
 
             // set warning for the branch          
             parsedHierarchyUpload.getBranchValidationWarnings().add( "Row: " + currentBranchVO.getRowNum()
@@ -2542,7 +2571,10 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 if ( hierarchyIntermediate.getRegions() == null ) {
                     hierarchyIntermediate.setRegions( new HashMap<String, RegionUploadVO>() );
                 }
-                hierarchyIntermediate.setRegionNameMap( new HashMap<String, String>() );
+
+                if ( hierarchyIntermediate.getRegionNameMap() == null ) {
+                    hierarchyIntermediate.setRegionNameMap( new HashMap<String, String>() );
+                }
             }
 
             while ( regionsIterator.hasNext() ) {
@@ -2660,7 +2692,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 }
 
                 if ( sourceIdDuplicate != 0 ) {
-                    parsedHierarchyUpload.getRegionValidationWarnings().add( "Row: " + currentRegionVO.getRowNum()
+                    parsedHierarchyUpload.getRegionErrors().add( "Row: " + currentRegionVO.getRowNum()
                         + " This source ID is a Duplicate, has already been parsed  at row : " + sourceIdDuplicate );
                     currentRegionVO.setErrorRecord( true );
                 }
@@ -2729,18 +2761,23 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 currentRegionVO.setRegionModified( true );
 
             // check for name duplication
-            String regionSourceIdWithExistingName = "";
-            if ( StringUtils
-                .isNotEmpty( ( regionSourceIdWithExistingName = containsStringValue( hierarchyIntermediate.getRegionNameMap(),
-                    regionName ) ) ) ) {
+            String regionSourceIdWithExistingName = containsStringValue( hierarchyIntermediate.getRegionNameMap(), regionName );
+
+            if ( StringUtils.isNotEmpty( regionSourceIdWithExistingName ) ) {
+
                 RegionUploadVO region = hierarchyIntermediate.getRegions().get( regionSourceIdWithExistingName );
-                if ( region.isRegionProcessed() ) {
+                if ( region.isRegionProcessed() && region.isRegionAdded() ) {
                     parsedHierarchyUpload.getRegionValidationWarnings()
-                        .add( "A Branch with the same already exists at Row: " + region.getRowNum() );
-                } else {
+                        .add( "A Region with the same already exists at Row: " + region.getRowNum() );
+                } else if ( region.isRegionProcessed() && !region.isRegionAdded() ) {
                     parsedHierarchyUpload.getRegionValidationWarnings().add(
-                        "Row: " + currentRegionVO.getRowNum() + ", A Branch with the same already exists in the company." );
+                        "Row: " + currentRegionVO.getRowNum() + ", A Region with the same already exists in the company." );
                 }
+
+                currentRegionVO.setWarningRecord( true );
+            } else {
+                hierarchyIntermediate.getRegionNameMap().put( currentRegionVO.getSourceRegionId(),
+                    currentRegionVO.getRegionName() );
             }
 
         } else if ( StringUtils.isEmpty( regionName ) ) {

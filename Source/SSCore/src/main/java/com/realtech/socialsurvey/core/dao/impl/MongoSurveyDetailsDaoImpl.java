@@ -1758,7 +1758,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         Query query = new Query();
 
         query.addCriteria( new Criteria().andOperator( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ),
-            Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( cutOffCompletionDate ).lt( cutOffDate ),
+            Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).gte( cutOffCompletionDate ).lt( cutOffDate ),
             Criteria.where( CommonConstants.LAST_REMINDER_FOR_SOCIAL_POST ).exists( false ),
             Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ),
             Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( false ),
