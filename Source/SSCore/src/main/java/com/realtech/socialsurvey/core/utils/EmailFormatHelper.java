@@ -200,7 +200,6 @@ public class EmailFormatHelper
         String company_linkedin_link = null;
         String company_google_plus_link = null;
         String company_google_review_link = null;
-        String company_yelp_link = null;
         String company_zillow_link = null;
         String company_lending_tree_link = null;
         String company_realtor_com_link = null;
@@ -210,7 +209,6 @@ public class EmailFormatHelper
         String linkedin_link = null;
         String google_plus_link = null;
         String google_review_link = null;
-        String yelp_link = null;
         String zillow_link = null;
         String lending_tree_link = null;
         String realtor_com_link = null;
@@ -276,8 +274,6 @@ public class EmailFormatHelper
                     google_plus_link = socialMediaTokens.getGoogleToken().getProfileLink();
                 if ( socialMediaTokens.getGoogleBusinessToken() != null )
                     google_review_link = socialMediaTokens.getGoogleBusinessToken().getGoogleBusinessLink();
-                if ( socialMediaTokens.getYelpToken() != null )
-                    yelp_link = socialMediaTokens.getYelpToken().getYelpPageLink();
                 if ( socialMediaTokens.getZillowToken() != null )
                     zillow_link = socialMediaTokens.getZillowToken().getZillowProfileLink();
                 if ( socialMediaTokens.getLendingTreeToken() != null )
@@ -299,8 +295,6 @@ public class EmailFormatHelper
                     company_google_plus_link = socialMediaTokens.getGoogleToken().getProfileLink();
                 if ( socialMediaTokens.getGoogleBusinessToken() != null )
                     company_google_review_link = socialMediaTokens.getGoogleBusinessToken().getGoogleBusinessLink();
-                if ( socialMediaTokens.getYelpToken() != null )
-                    company_yelp_link = socialMediaTokens.getYelpToken().getYelpPageLink();
                 if ( socialMediaTokens.getZillowToken() != null )
                     company_zillow_link = socialMediaTokens.getZillowToken().getZillowProfileLink();
                 if ( socialMediaTokens.getLendingTreeToken() != null )
@@ -319,7 +313,6 @@ public class EmailFormatHelper
         content = content.replace( "[linkedin_link]", processUrl( linkedin_link ) );
         content = content.replace( "[google_plus_link]", processUrl( google_plus_link ) );
         content = content.replace( "[google_review_link]", processUrl( google_review_link ) );
-        content = content.replace( "[yelp_link]", processUrl( yelp_link ) );
         content = content.replace( "[zillow_link]", processUrl( zillow_link ) );
         content = content.replace( "[lending_tree_link]", processUrl( lending_tree_link ) );
         content = content.replace( "[realtor_com_link]", processUrl( realtor_com_link ) );
@@ -328,7 +321,6 @@ public class EmailFormatHelper
         content = content.replace( "[company_linkedin_link]", processUrl( company_linkedin_link ) );
         content = content.replace( "[company_google_plus_link]", processUrl( company_google_plus_link ) );
         content = content.replace( "[company_google_review_link]", processUrl( company_google_review_link ) );
-        content = content.replace( "[company_yelp_link]", processUrl( company_yelp_link ) );
         content = content.replace( "[company_zillow_link]", processUrl( company_zillow_link ) );
         content = content.replace( "[company_lending_tree_link]", processUrl( company_lending_tree_link ) );
         content = content.replace( "[company_realtor_com_link]", processUrl( company_realtor_com_link ) );
@@ -391,7 +383,6 @@ public class EmailFormatHelper
         String company_linkedin_link = null;
         String company_google_plus_link = null;
         String company_google_review_link = null;
-        String company_yelp_link = null;
         String company_zillow_link = null;
         String company_lending_tree_link = null;
         String company_realtor_com_link = null;
@@ -401,7 +392,6 @@ public class EmailFormatHelper
         String linkedin_link = null;
         String google_plus_link = null;
         String google_review_link = null;
-        String yelp_link = null;
         String zillow_link = null;
         String lending_tree_link = null;
         String realtor_com_link = null;
@@ -432,8 +422,6 @@ public class EmailFormatHelper
                     google_plus_link = socialMediaTokens.getGoogleToken().getProfileLink();
                 if ( socialMediaTokens.getGoogleBusinessToken() != null )
                     google_review_link = socialMediaTokens.getGoogleBusinessToken().getGoogleBusinessLink();
-                if ( socialMediaTokens.getYelpToken() != null )
-                    yelp_link = socialMediaTokens.getYelpToken().getYelpPageLink();
                 if ( socialMediaTokens.getZillowToken() != null )
                     zillow_link = socialMediaTokens.getZillowToken().getZillowProfileLink();
                 if ( socialMediaTokens.getLendingTreeToken() != null )
@@ -455,8 +443,6 @@ public class EmailFormatHelper
                     company_google_plus_link = socialMediaTokens.getGoogleToken().getProfileLink();
                 if ( socialMediaTokens.getGoogleBusinessToken() != null )
                     company_google_review_link = socialMediaTokens.getGoogleBusinessToken().getGoogleBusinessLink();
-                if ( socialMediaTokens.getYelpToken() != null )
-                    company_yelp_link = socialMediaTokens.getYelpToken().getYelpPageLink();
                 if ( socialMediaTokens.getZillowToken() != null )
                     company_zillow_link = socialMediaTokens.getZillowToken().getZillowProfileLink();
                 if ( socialMediaTokens.getLendingTreeToken() != null )
@@ -473,7 +459,6 @@ public class EmailFormatHelper
         content = StringUtils.replace( content, "[linkedin_link]", processUrl( linkedin_link ) );
         content = StringUtils.replace( content, "[google_plus_link]", processUrl( google_plus_link ) );
         content = StringUtils.replace( content, "[google_review_link]", processUrl( google_review_link ) );
-        content = StringUtils.replace( content, "[yelp_link]", processUrl( yelp_link ) );
         content = StringUtils.replace( content, "[zillow_link]", processUrl( zillow_link ) );
         content = StringUtils.replace( content, "[lending_tree_link]", processUrl( lending_tree_link ) );
         content = StringUtils.replace( content, "[realtor_com_link]", processUrl( realtor_com_link ) );
@@ -482,7 +467,6 @@ public class EmailFormatHelper
         content = StringUtils.replace( content, "[company_linkedin_link]", processUrl( company_linkedin_link ) );
         content = StringUtils.replace( content, "[company_google_plus_link]", processUrl( company_google_plus_link ) );
         content = StringUtils.replace( content, "[company_google_review_link]", processUrl( company_google_review_link ) );
-        content = StringUtils.replace( content, "[company_yelp_link]", processUrl( company_yelp_link ) );
         content = StringUtils.replace( content, "[company_zillow_link]", processUrl( company_zillow_link ) );
         content = StringUtils.replace( content, "[company_lending_tree_link]", processUrl( company_lending_tree_link ) );
         content = StringUtils.replace( content, "[company_realtor_com_link]", processUrl( company_realtor_com_link ) );

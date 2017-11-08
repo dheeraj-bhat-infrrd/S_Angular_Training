@@ -6682,11 +6682,12 @@ function paintSurveyPage(jsonData) {
 	// }
 	$('#google-btn').attr("href", "https://plus.google.com/share?url=" + agentFullProfileLink);
 
-	if (yelpEnabled) {
+	//SS-1452 remove yelp from all the pages
+	/*if (yelpEnabled) {
 		$('#ylp-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.yelpLink));
 	} else {
 		$('#ylp-btn').remove();
-	}
+	}*/
 
 	if (zillowEnabled) {
 		$('#zillow-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.zillowLink));
