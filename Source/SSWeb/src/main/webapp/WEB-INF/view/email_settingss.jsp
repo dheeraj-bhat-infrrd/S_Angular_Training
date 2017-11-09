@@ -122,9 +122,6 @@
 										<span class="legend">[company_google_review_link]</span>
 									</div>
 									<div class="legend-wrapper">
-										<span class="legend">[company_yelp_link]</span>
-									</div>
-									<div class="legend-wrapper">
 										<span class="legend">[company_zillow_link]</span>
 									</div>
 									<div class="legend-wrapper">
@@ -149,9 +146,6 @@
 										<span class="legend">[google_review_link]</span>
 									</div>
 									<div class="legend-wrapper">
-										<span class="legend">[yelp_link]</span>
-									</div>
-									<div class="legend-wrapper">
 										<span class="legend">[zillow_link]</span>
 									</div>
 									<div class="legend-wrapper">
@@ -168,7 +162,6 @@
 									<div class="legend-wrapper" title="Company LinkedIn Link">Company LinkedIn Link</div>
 									<div class="legend-wrapper" title="Company Google+ Link">Company Google+ Link</div>
 									<div class="legend-wrapper" title="Company Google Business Rate & Review Link">Company Google Business Rate & Review Link</div>
-									<div class="legend-wrapper" title="Company Yelp Link">Company Yelp Link</div>
 									<div class="legend-wrapper" title="Company Zillow Link">Company Zillow Link</div>
 									<div class="legend-wrapper" title="Company Lending Tree Link">Company Lending Tree Link</div>
 									<div class="legend-wrapper" title="Company Realtor.com Profile Link">Company Realtor.com Profile Link</div>
@@ -177,7 +170,6 @@
 									<div class="legend-wrapper" title="LinkedIn Link">LinkedIn Link</div>
 									<div class="legend-wrapper" title="Google+ Link">Google+ Link</div>
 									<div class="legend-wrapper" title="Google Business Rate & Review Link">Google Business Rate & Review Link</div>
-									<div class="legend-wrapper" title="Yelp Link">Yelp Link</div>
 									<div class="legend-wrapper" title="Zillow Link">Zillow Link</div>
 									<div class="legend-wrapper" title="Lending Tree Link">Lending Tree Link</div>
 									<div class="legend-wrapper" title="Realtor.com Profile Link">Realtor.com Profile Link</div>
@@ -808,7 +800,11 @@
 		$('#reminder-interval').change(function() {
 			$('#mailcategory').val('reminder-interval');
 			if (validateReminderInterval('reminder-interval')) {
-				updateReminderSettings("mail-body-settings-form");
+				var paylaod = {
+						"mailcategory" : "reminder-interval",
+						"reminder-interval" : $('#reminder-interval').val()
+				}
+				updateReminderSettings(paylaod);
 			}
 		});
 
@@ -817,7 +813,11 @@
 		$('#max-reminder-count').change(function() {
 			$('#mailcategory').val('max-reminder-count');
 			if (validateReminderInterval('max-reminder-count')) {
-				updateReminderSettings("mail-body-settings-form");
+				var paylaod = {
+						"mailcategory" : "max-reminder-count",
+						"max-reminder-count" : $('#max-reminder-count').val()
+				}
+				updateReminderSettings(paylaod);
 			}
 		});
 
@@ -830,7 +830,12 @@
 			$(this).hide();
 
 			$('#reminder-interval').removeAttr("disabled");
-			updateReminderSettings("mail-body-settings-form");
+			
+			var paylaod = {
+					"mailcategory" : "reminder-needed",
+					"reminder-needed-hidden" : $('#reminder-needed-hidden').val()
+			}
+			updateReminderSettings(paylaod);
 		});
 		$('#st-reminder-off').click(function() {
 			$('#mailcategory').val('reminder-needed');
@@ -840,14 +845,22 @@
 			$(this).hide();
 
 			$('#reminder-interval').attr("disabled", true);
-			updateReminderSettings("mail-body-settings-form");
+			var paylaod = {
+					"mailcategory" : "reminder-needed",
+					"reminder-needed-hidden" : $('#reminder-needed-hidden').val()
+			}
+			updateReminderSettings(paylaod);
 		});
 
 		//for social post reminder
 		$('#post-reminder-interval').change(function() {
 			$('#mailcategory').val('post-reminder-interval');
 			if (validateReminderInterval('post-reminder-interval')) {
-				updateReminderSettings("mail-body-settings-form");
+				var paylaod = {
+						"mailcategory" : "post-reminder-interval",
+						"post-reminder-interval" : $('#post-reminder-interval').val()
+				}
+				updateReminderSettings(paylaod);
 			}
 		});
 
@@ -859,7 +872,11 @@
 			$(this).hide();
 
 			$('#post-reminder-interval').removeAttr("disabled");
-			updateReminderSettings("mail-body-settings-form");
+			var paylaod = {
+					"mailcategory" : "post-reminder-needed",
+					"post-reminder-needed-hidden" : $('#post-reminder-needed-hidden').val()
+			}
+			updateReminderSettings(paylaod);
 		});
 		$('#post-reminder-off').click(function() {
 			$('#mailcategory').val('post-reminder-needed');
@@ -869,7 +886,11 @@
 			$(this).hide();
 
 			$('#post-reminder-interval').attr("disabled", true);
-			updateReminderSettings("mail-body-settings-form");
+			var paylaod = {
+					"mailcategory" : "post-reminder-needed",
+					"post-reminder-needed-hidden" : $('#post-reminder-needed-hidden').val()
+			}
+			updateReminderSettings(paylaod);
 		});
 
 	});

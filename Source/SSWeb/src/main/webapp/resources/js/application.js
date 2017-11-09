@@ -1543,7 +1543,7 @@ function paintActvUserGraph() {
 	for (var i = 0; i < keys.length; i++) {
 		if (format == '365') {
 			allTimeslots[i] = convertYearMonthKeyToDate(keys[i]);
-		} else if (format == '10' || format == '20' || format == '30') {
+		} else if (format == '10' || format == '20') {
 			allTimeslots[i] = convertYearMonthDayKeyToDate(keys[i]);
 		}else {
 			allTimeslots[i] = convertYearWeekKeyToDate(keys[i]);
@@ -1695,7 +1695,7 @@ function paintProcSurveyGraph() {
 	for (var i = 0; i < keys.length; i++) {
 		if (format == '365') {
 			allTimeslots[i] = convertYearMonthKeyToDate(keys[i]);
-		} else if (format == '10' || format == '20' || format == '30') {
+		} else if (format == '10' || format == '20' ) {
 			allTimeslots[i] = convertYearMonthDayKeyToDate(keys[i]);
 		}else {
 			allTimeslots[i] = convertYearWeekKeyToDate(keys[i]);
@@ -1875,7 +1875,7 @@ function paintTransactionGraph() {
 	for (var i = 0; i < keys.length; i++) {
 		if (format == '365') {
 			allTimeslots[i] = convertYearMonthKeyToDate(keys[i]);
-		} else if (format == '10' || format == '20' || format == '30') {
+		} else if (format == '10' || format == '20' ) {
 			allTimeslots[i] = convertYearMonthDayKeyToDate(keys[i]);
 		}else {
 			allTimeslots[i] = convertYearWeekKeyToDate(keys[i]);
@@ -2146,7 +2146,7 @@ function getKeysFromGraphFormat(format) {
 
 		}
 
-	} else if(format == '10' || '20') {
+	} else if(format == '10' || format == '15' || format == '20') {
 		firstDate = Date.today().add({
 			days : -parseInt(format)
 		});
@@ -5183,9 +5183,9 @@ function autoAppendReminderDropdown(reminderId, reminderDefault) {
 	autoAppendDropdown(reminderId, 15, 1);
 }
 
-function updateReminderSettings(formid) {
+function updateReminderSettings(payload) {
 	var url = "./updatesurveyremindersettings.do";
-	callAjaxFormSubmit(url, updateReminderSettingsCallBack, formid);
+	callAjaxPostWithPayloadData(url, updateReminderSettingsCallBack, payload);
 }
 
 function updateReminderSettingsCallBack(response) {
@@ -6682,11 +6682,12 @@ function paintSurveyPage(jsonData) {
 	// }
 	$('#google-btn').attr("href", "https://plus.google.com/share?url=" + agentFullProfileLink);
 
-	if (yelpEnabled) {
+	//SS-1452 remove yelp from all the pages
+	/*if (yelpEnabled) {
 		$('#ylp-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.yelpLink));
 	} else {
 		$('#ylp-btn').remove();
-	}
+	}*/
 
 	if (zillowEnabled) {
 		$('#zillow-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.zillowLink));
@@ -7105,7 +7106,7 @@ function showMasterQuestionPage() {
 		}
 		
 		var fmt_rating = Number(rating).toFixed(1);
-		$('#linkedin-btn').attr("href", "https://www.linkedin.com/shareArticle?mini=true&url=" + agentFullProfileLink + "/" + surveyId + "&title=&summary=" + fmt_rating + "-star response from " + firstName + " " + lastName + " for " + agentName + " at SocialSurvey - " + feedback + ".&source=");
+		$('#linkedin-btn').attr("href", "https://www.linkedin.com/shareArticle?mini=true&url=" + agentFullProfileLink + "/" + surveyId + "&title=&summary=" + fmt_rating + "-star response from " + firstName + " " + getInitials( lastName ) + " for " + agentName + " at SocialSurvey - " + feedback + ".&source=");
 		var twitterFeedback = feedback;
 		if (twitterFeedback.length > 109) {
 			twitterFeedback = twitterFeedback.substring(0, 70);
@@ -7113,8 +7114,8 @@ function showMasterQuestionPage() {
 		} else {
 			twitterFeedback = feedback;
 		}
-		$('#twitter-btn').attr("href", "https://twitter.com/intent/tweet?text=" + fmt_rating + "-star response from " + firstName + " " + lastName + " for " + agentName + " at SocialSurvey - " + twitterFeedback + "&url='" + agentFullProfileLink + "'");
-		$('#fb-btn').attr("href", "https://www.facebook.com/dialog/share?app_id=" + fb_app_id + "&href=" + agentFullProfileLink + "&quote=" + fmt_rating + "-star response from " + firstName + " " + lastName + " for " + agentName + " at SocialSurvey - " + feedback + "&redirect_uri=https://www.facebook.com");
+		$('#twitter-btn').attr("href", "https://twitter.com/intent/tweet?text=" + fmt_rating + "-star response from " + firstName + " " + getInitials( lastName ) + " for " + agentName + " at SocialSurvey - " + twitterFeedback + "&url='" + agentFullProfileLink + "'");
+		$('#fb-btn').attr("href", "https://www.facebook.com/dialog/share?app_id=" + fb_app_id + "&href=" + agentFullProfileLink + "&quote=" + fmt_rating + "-star response from " + firstName + " " + getInitials( lastName ) + " for " + agentName + " at SocialSurvey - " + feedback + "&redirect_uri=https://www.facebook.com");
 
 		$('#content-head').html('Survey Completed');
 		if (mood == 'Great')
@@ -13172,4 +13173,13 @@ $('body').on('click', '.st-dd-item-survey-mail-thrs', function() {
 				showToast();
 			}, payload, false);
 });
+
+function getInitials( name ){
+    if( name != undefined && name != "" ){
+        return name.charAt(0).toUpperCase();
+    } else {
+        return "";
+    }
+}
+
 

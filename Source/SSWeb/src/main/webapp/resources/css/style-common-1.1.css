@@ -1643,6 +1643,52 @@ span.footer-ul a:hover {
 	padding-right:0 !important;
 }
 
+.last-run-info {
+	margin-bottom: 20px;
+    margin-left: 40px;
+    text-align: left;
+    line-height: 20px !important;
+    margin-right: 30px;
+    font-size: 14px;
+    margin-top: 20px;
+}
+
+.uploaded-file-info {
+	text-align: center;
+	line-height: 20px !important;
+	font-size: 14px;
+}
+
+.hierarchy-upload-add-stat  {
+	background-color: mediumseagreen;
+    color: white;
+    width: 15%;
+    margin: 5px;
+    border-radius: 3px;
+    padding-left: 5px;
+    min-width: 100px;
+}
+
+.hierarchy-upload-modify-stat  {
+	background-color: cornflowerblue;
+    color: white;
+    width: 15%;
+    margin: 5px;
+    border-radius: 3px;
+    padding-left: 5px;
+    min-width: 100px;
+}
+
+.hierarchy-upload-delete-stat  {
+	background-color: palevioletred;
+    color: white;
+    width: 15%;
+    margin: 5px;
+    border-radius: 3px;
+    padding-left: 5px;
+    min-width: 100px;
+}
+
 .comp-mail-thrs-txt {
 	margin-bottom: 20px;
 	display: flex;

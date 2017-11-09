@@ -390,6 +390,10 @@
     .email-resp-margin {
 		margin-left: 0px;
 	}
+	.warn-resp {
+	float: none;
+	}
+
 	.comp-mail-thrs-txt {
 		margin-right: 4px;
 	}	
@@ -909,6 +913,10 @@
 	}
 	.cust-resp-txt {
 	width: 200px;
+	border-right: 0px;
+	}
+	
+	.warn-resp {
 	border-right: 0px;
 	}
 	.email-sel-item-resp {
