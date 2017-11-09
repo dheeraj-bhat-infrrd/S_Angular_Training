@@ -37,7 +37,7 @@
 		 <c:set value="${agentProfile.contact_details.firstName}" var = "agentFirstNameValue"></c:set>
 
 
-		
+		<div id="sr-review-info" data-customeremail="${singleReviewItem.customerEmail}" data-agentid="${singleReviewItem.agentId}" data-cust-first-name="${singleReviewItem.customerFirstName}" data-cust-last-name="${singleReviewItem.customerLastName}" data-agent-name="${singleReviewItem.agentName}" data-review="${singleReviewItem.review}" data-survey-mongo-id="${singleReviewItem._id}"></div>
 		<div id="single-review-popup" class="single-review-popup-wrapper">
 			<div class="single-review-popup-hdr-wrapper clearfix">
 				<c:if test="${not empty agentProfile.profileImageUrlThumbnail && not empty fn:trim(agentProfile.profileImageUrlThumbnail)}">
@@ -145,14 +145,14 @@
 				<div class="float-left sr-report-review" id="report-review-wrapper">
 					<div class="float-left dash-flag-retake ">
 						<div class="clearfix">
-							<div class="icn-flag float-left report-abuse-txt cursor-pointer " title="Report"></div>
+							<div class="icn-flag float-left report-abuse-txt sr-prof-report-abuse-txt cursor-pointer " title="Report"></div>
 						</div>
 					</div>
 					<span class="sr-report-review-span">report this review</span>
 				</div>
 				<c:if test="${ not empty agentFirstNameValue }">
-					<div class="wc-btn-col float-left clearfix sr-wc-dash-btn">
-						<div id="single-review-contact-btn" class="wc-sub-send-btn float-left wc-final-submit">
+					<div class="sr-wc-btn-col float-left clearfix sr-wc-dash-btn">
+						<div id="single-review-contact-btn" class="sr-wc-sub-send-btn float-left wc-final-submit">
 							<span class="capitalize">Contact ${agentFirstNameValue}</span>
 						</div>
 					</div>

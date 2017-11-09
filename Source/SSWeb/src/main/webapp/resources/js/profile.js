@@ -998,6 +998,46 @@ $(document).on('click', '.prof-report-abuse-txt', function(e) {
 	});
 });
 
+$(document).on('click', '.sr-prof-report-abuse-txt', function(e) {
+	e.stopPropagation();
+	var reviewElement = $('#sr-review-info');
+	var payload = {
+		"customerEmail" : reviewElement.attr('data-customeremail'),
+		"agentId" : reviewElement.attr('data-agentid'),
+		"firstName" : reviewElement.attr('data-cust-first-name'),
+		"lastName" : reviewElement.attr('data-cust-last-name'),
+		"agentName" : reviewElement.attr('data-agent-name'),
+		"review" : reviewElement.attr('data-review'),
+		"surveyMongoId" : reviewElement.attr('data-survey-mongo-id')
+	};
+	
+	$("#report-abuse-txtbox").val('');
+	$('#report-abuse-cus-name').val('');
+	$('#report-abuse-cus-email').val('');
+	
+	// Unbind click events for button
+	$('.rpa-cancel-btn').off('click');
+	$('.rpa-report-btn').off('click');
+	
+	$('#report-abuse-overlay').show();
+	$('.rpa-cancel-btn').on('click', function() {
+		$('#report-abuse-overlay').hide();
+	});
+	$('.rpa-report-btn').on('click', function() {
+		var reportText = $("#report-abuse-txtbox").val();
+		var cusName = $('#report-abuse-cus-name').val();
+		var cusEmail = $('#report-abuse-cus-email').val();
+		
+		if (validateReportAbuseForm(reportText, cusName, cusEmail)) {
+			showOverlay();
+			payload.reportText = reportText;
+			payload.reporterName = cusName;
+			payload.reporterEmail = cusEmail;
+			confirmReportAbuse(payload);
+		}
+	});
+});
+
 $(document).on('click',  function(e){
 	
 	if($('#report-abuse-overlay' ).is(':visible')){
