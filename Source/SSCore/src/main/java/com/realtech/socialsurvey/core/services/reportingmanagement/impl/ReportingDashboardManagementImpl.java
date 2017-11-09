@@ -39,6 +39,7 @@ import com.realtech.socialsurvey.core.api.builder.SSApiBatchIntegrationBuilder;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
+import com.realtech.socialsurvey.core.dao.CompanyDetailsReportDao;
 import com.realtech.socialsurvey.core.dao.CompanyUserReportDao;
 import com.realtech.socialsurvey.core.dao.DigestDao;
 import com.realtech.socialsurvey.core.dao.FileUploadDao;
@@ -61,6 +62,7 @@ import com.realtech.socialsurvey.core.dao.SurveyTransactionReportBranchDao;
 import com.realtech.socialsurvey.core.dao.SurveyTransactionReportDao;
 import com.realtech.socialsurvey.core.dao.SurveyTransactionReportRegionDao;
 import com.realtech.socialsurvey.core.dao.UserAdoptionReportDao;
+import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserRankingPastMonthBranchDao;
 import com.realtech.socialsurvey.core.dao.UserRankingPastMonthMainDao;
 import com.realtech.socialsurvey.core.dao.UserRankingPastMonthRegionDao;
@@ -79,6 +81,7 @@ import com.realtech.socialsurvey.core.dao.UserRankingThisYearRegionDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.CompanyDetailsReport;
 import com.realtech.socialsurvey.core.entities.CompanyDigestRequestData;
 import com.realtech.socialsurvey.core.entities.CompanyUserReport;
 import com.realtech.socialsurvey.core.entities.Digest;
@@ -195,6 +198,12 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
     @Autowired
     private RegionDao regionDao;
+    
+    @Autowired
+    private UserDao userDao;
+    
+    @Autowired
+    private CompanyDetailsReportDao companyDetailsReportDao;
 
     @Autowired
     private SSApiBatchIntegrationBuilder ssApiBatchIntergrationBuilder;
@@ -3482,4 +3491,76 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         return monthStringsForDigest;
     }
 
+	@Override
+	@Transactional ( value = "transactionManagerForReporting")
+	public List<CompanyDetailsReport> getCompanyDetailsReport( Long entityId, int startIndex,
+			int batchSize) {
+		User user = userDao.findById(User.class, entityId);
+		List<CompanyDetailsReport> companyDetailsReportData = null;
+		if (user != null && user.isSuperAdmin()) {
+			companyDetailsReportData = companyDetailsReportDao.getCompanyDetailsReportData(startIndex, batchSize);
+		}
+		return companyDetailsReportData;
+	}
+
+
+	@Override
+	public String generateCompanyDetailsReport(long entityId, String entityType) throws UnsupportedEncodingException, NonFatalException {
+		LOG.info( "Generating company details report for enitityId {}, entityType {}",entityId, entityType);
+	        String fileName = "Company_Details_Report" + "-" + ( Calendar.getInstance().getTimeInMillis() ) 
+	        		+ CommonConstants.EXCEL_FILE_EXTENSION;
+	        LOG.debug( "fileName {} ", fileName );
+	        XSSFWorkbook workbook = this.downloadCompanyDetailsReport( entityId, entityType );
+	        LOG.debug( "Writing {} number of records into file {}", workbook.getSheetAt( 0 ).getLastRowNum(), fileName );
+	        return createExcelFileAndSaveInAmazonS3( fileName, workbook );
+	}
+
+
+	private XSSFWorkbook downloadCompanyDetailsReport(long entityId, String entityType) {
+		int startIndex = 0;
+        int batchSize = CommonConstants.BATCH_SIZE;
+        int enterNext = 1;
+
+        //write the excel header first 
+        Map<Integer, List<Object>> data = workbookData.writeCompanyDetailsReportHeader();
+        //create workbook data
+        XSSFWorkbook workbook = workbookOperations.createWorkbook( data );
+
+        List<CompanyDetailsReport> companyDetailsReportList = null;
+        do {
+        	companyDetailsReportList = getCompanyDetailsResponse(entityType, entityId, startIndex, batchSize );
+            if ( companyDetailsReportList != null && !companyDetailsReportList.isEmpty() ) {
+                enterNext = startIndex + 1;
+                data = workbookData.getCompanyDetailsReportToBeWrittenInSheet( companyDetailsReportList,enterNext );
+                LOG.debug( "Got {} records starting at {} index", data.size(), enterNext );
+                //use the created workbook when writing the header answer rewrite the same. 
+                workbook = workbookOperations.writeToWorkbook( data, workbook, enterNext );
+                //calculate startIndex. 
+                startIndex = startIndex + batchSize;
+            }
+        } while ( companyDetailsReportList != null && !companyDetailsReportList.isEmpty()
+            && companyDetailsReportList.size() >= batchSize );
+
+        XSSFSheet sheet = workbook.getSheetAt( 0 );
+        makeRowBold( workbook, sheet.getRow( 0 ) );
+        return workbook;
+	}
+
+
+	private List<CompanyDetailsReport> getCompanyDetailsResponse(String entityType, long entityId, int startIndex,
+			int batchSize) {
+		Response response = ssApiBatchIntergrationBuilder.getIntegrationApi().getCompanyDetailsReport(entityType, entityId, startIndex, batchSize );
+	        String responseString = response != null ? new String( ( (TypedByteArray) response.getBody() ).getBytes() ) : null;
+	        List<CompanyDetailsReport> companyDetailsReportList = null;
+	        if ( responseString != null ) {
+	            //since the string has ""abc"" an extra quote
+	            responseString = responseString.substring( 1, responseString.length() - 1 );
+	            //Escape characters
+	            responseString = StringEscapeUtils.unescapeJava( responseString );
+	            Type listType = new TypeToken<List<CompanyDetailsReport>>() {}.getType();
+	            companyDetailsReportList = new Gson().fromJson( responseString, listType );
+
+	        }
+	        return companyDetailsReportList;
+	}
 }

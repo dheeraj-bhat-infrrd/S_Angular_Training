@@ -56,4 +56,9 @@ public interface SSApiBatchIntegration
         @Query ( "monthUnderConcern") int monthUnderConcern, @Query ( "year") int year,
         @Query ( "recipientMail") String recipientMail );
 
+
+    @GET ( "/v1/getcompanydetailsreport")
+	Response getCompanyDetailsReport( @Query("entityType") String entityType, @Query("entityId") Long entityId,
+			@Query("startIndex") int startIndex, @Query("batchSize") int batchSize);
+
 }
