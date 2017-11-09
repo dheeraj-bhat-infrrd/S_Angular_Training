@@ -22,18 +22,23 @@ public class ReportingSurveyPreInititationDaoImpl extends GenericReportingDaoImp
 
     private static final String MAIN_SELECT_QUERY = "select u.FIRST_NAME,u.LAST_NAME,u.EMAIL_ID,spi.CUSTOMER_FIRST_NAME,"
         + "spi.CUSTOMER_LAST_NAME,spi.CUSTOMER_EMAIL_ID,spi.SURVEY_SOURCE_ID,spi.SURVEY_SOURCE,spi.CREATED_ON_EST,"
-        + "spi.REMINDER_COUNTS,spi.LAST_REMINDER_TIME_EST from survey_pre_initiation spi inner join user_profile up "
-        + "on spi.AGENT_ID = up.AGENT_ID inner join users u on up.AGENT_ID = u.USER_ID "
-        + "where spi.STATUS in (1,2) :entityIdCondition :dateCondition limit :startIndex , :batchSize";
+        + "spi.REMINDER_COUNTS,spi.LAST_REMINDER_TIME_EST from survey_pre_initiation spi inner join "
+        + "(select distinct USER_ID :entityTypeId from USER_PROFILE) up "
+        + "on spi.AGENT_ID = up.USER_ID inner join users u on up.USER_ID = u.USER_ID "
+        + "where spi.STATUS in (0,1,2) :entityIdCondition :dateCondition limit :startIndex , :batchSize";
     //entityId condition Strings 
     private static final String COMPANY_ID_CONDITION = " and up.COMPANY_ID= :entityId";
     private static final String REGION_ID_CONDITION = " and up.REGION_ID= :entityId";
     private static final String BRANCH_ID_CONDITION = " and up.BRANCH_ID= :entityId";
-    private static final String AGENT_ID_CONDITION = " and up.AGENT_ID= :entityId";
+    private static final String AGENT_ID_CONDITION = " and up.USER_ID= :entityId";
     //Date condition strings
     private static final String START_DATE_CONDITION = " and spi.CREATED_ON_EST >= :startDate";
     private static final String END_DATE_CONDITION = " and spi.CREATED_ON_EST <= :endDate";
     private static final String START_AND_END_DATE_CONDITION = " and spi.CREATED_ON_EST >= :startDate and spi.CREATED_ON_EST <= :endDate";
+    //Entity ID based on Entity type
+    private static final String COMPANY_ID = " ,COMPANY_ID ";
+    private static final String BRANCH_ID = " ,BRANCH_ID ";
+    private static final String REGION_ID = " ,REGION_ID ";
 
 
     @SuppressWarnings ( "unchecked")
@@ -112,10 +117,13 @@ public class ReportingSurveyPreInititationDaoImpl extends GenericReportingDaoImp
 
         if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
             queryString = MAIN_SELECT_QUERY.replace( ":entityIdCondition", COMPANY_ID_CONDITION );
+            queryString = queryString.replace( ":entityTypeId", COMPANY_ID );
         } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
             queryString = MAIN_SELECT_QUERY.replace( ":entityIdCondition", REGION_ID_CONDITION );
+            queryString = queryString.replace( ":entityTypeId", REGION_ID );
         } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
             queryString = MAIN_SELECT_QUERY.replace( ":entityIdCondition", BRANCH_ID_CONDITION );
+            queryString = queryString.replace( ":entityTypeId", BRANCH_ID );
         } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
             queryString = MAIN_SELECT_QUERY.replace( ":entityIdCondition", AGENT_ID_CONDITION );
         }

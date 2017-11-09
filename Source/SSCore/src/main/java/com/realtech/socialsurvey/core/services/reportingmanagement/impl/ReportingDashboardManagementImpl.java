@@ -3566,7 +3566,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     public List<ReportingSurveyPreInititation> getIncompleteSurvey( long entityId, String entityType, Date startDate,
         Date endDate, int startIndex, int batchSize ) throws InvalidInputException
     {
-        LOG.debug(
+        LOG.info(
             "Method getIncompleteSurvey() called for entityId: {}  ,entityType: {} ,startDate: {} ,endDate: {} ,startIndex: {}  ,batchSize: {} ",
             entityId, entityType, startDate, endDate, startIndex, batchSize );
         //check if its a valid entity id
