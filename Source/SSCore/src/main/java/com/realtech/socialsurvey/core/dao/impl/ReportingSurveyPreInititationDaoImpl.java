@@ -23,7 +23,7 @@ public class ReportingSurveyPreInititationDaoImpl extends GenericReportingDaoImp
     private static final String MAIN_SELECT_QUERY = "select u.FIRST_NAME,u.LAST_NAME,u.EMAIL_ID,spi.CUSTOMER_FIRST_NAME,"
         + "spi.CUSTOMER_LAST_NAME,spi.CUSTOMER_EMAIL_ID,spi.SURVEY_SOURCE_ID,spi.SURVEY_SOURCE,spi.CREATED_ON_EST,"
         + "spi.REMINDER_COUNTS,spi.LAST_REMINDER_TIME_EST from survey_pre_initiation spi inner join "
-        + "(select distinct USER_ID :entityTypeId from USER_PROFILE) up "
+        + "(select distinct USER_ID :entityTypeId from user_profile) up "
         + "on spi.AGENT_ID = up.USER_ID inner join users u on up.USER_ID = u.USER_ID "
         + "where spi.STATUS in (0,1,2) :entityIdCondition :dateCondition limit :startIndex , :batchSize";
     //entityId condition Strings 
