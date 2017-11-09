@@ -1,6 +1,5 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -35,7 +34,8 @@ public class FileUploadDaoImpl extends GenericDaoImpl<FileUpload, Long> implemen
             criteria.add( Restrictions.eq( CommonConstants.SHOW_ON_UI_COLUMN , true ) );
             criteria.add( Restrictions.in( CommonConstants.FILE_UPLOAD_TYPE_COLUMN, Arrays.asList(
                 CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_STATS_REPORT, CommonConstants.FILE_UPLOAD_REPORTING_VERIFIED_USERS_REPORT , CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT, CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_REPORT
-                ,CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT,CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT,CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT) ) );
+                ,CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT,CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT,CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT
+                ,CommonConstants.FILE_UPLOAD_REPORTING_INCOMPLETE_SURVEY_REPORT) ) );
             if ( startIndex > -1 ) {
                 criteria.setFirstResult( startIndex );
             }
@@ -61,7 +61,8 @@ public class FileUploadDaoImpl extends GenericDaoImpl<FileUpload, Long> implemen
             criteria.add( Restrictions.eq( CommonConstants.SHOW_ON_UI_COLUMN , true ) );
             criteria.add( Restrictions.in( CommonConstants.FILE_UPLOAD_TYPE_COLUMN, Arrays.asList(
                 CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_STATS_REPORT, CommonConstants.FILE_UPLOAD_REPORTING_VERIFIED_USERS_REPORT , CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT, CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_REPORT
-                ,CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT,CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT,CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT) ) );
+                ,CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT,CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT,CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT
+                ,CommonConstants.FILE_UPLOAD_REPORTING_INCOMPLETE_SURVEY_REPORT) ) );
             criteria.setProjection( Projections.rowCount() );
             Long count = (Long) criteria.uniqueResult();
             LOG.info( "Method getRecentActivityCountForReporting() finished." );
