@@ -36,6 +36,7 @@ import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.CompanyDetailsReport;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SocialPost;
@@ -1177,6 +1178,69 @@ public class WorkbookData
         return userRankingData;
         
     }
-    
-    
+
+
+	/**
+	 * Writes the header for company details report.
+	 * @return
+	 */
+	public Map<Integer, List<Object>> writeCompanyDetailsReportHeader() {
+		Map<Integer, List<Object>>  companyDetailsData = new TreeMap<>();
+        List<Object> companyDetailsReportToPopulate = new ArrayList<>();    
+        // Setting up user sheet headers
+        companyDetailsReportToPopulate.add( "Company Name" );
+        companyDetailsReportToPopulate.add( "User Count" );
+        companyDetailsReportToPopulate.add( "Verified" );
+        companyDetailsReportToPopulate.add( "Verified %" );
+        companyDetailsReportToPopulate.add( "# of Regions" );
+        companyDetailsReportToPopulate.add( "# of Locations" );
+        companyDetailsReportToPopulate.add( "Completion rate %" );
+        companyDetailsReportToPopulate.add( "Verified GMB" );
+        companyDetailsReportToPopulate.add( "Missing GMB" );
+        companyDetailsReportToPopulate.add( "Mismatches" );
+        companyDetailsReportToPopulate.add( "Missing Photos");
+        companyDetailsReportToPopulate.add( "Missing URLs");
+        companyDetailsReportToPopulate.add( "Facebook Connects");
+        companyDetailsReportToPopulate.add( "Twitter Connects");
+        companyDetailsReportToPopulate.add( "LinkedIn Connects");
+        companyDetailsData.put( 1, companyDetailsReportToPopulate );
+        
+        return companyDetailsData;
+	}
+
+
+	/**
+	 * Writes the company details report data to excel.
+	 * @param companyDetailsReportList
+	 * @param enterNext
+	 * @return
+	 */
+	public Map<Integer, List<Object>> getCompanyDetailsReportToBeWrittenInSheet(
+			List<CompanyDetailsReport> companyDetailsReportList, int enterNext) {
+		Map<Integer, List<Object>> companyDetailsData = new TreeMap<>();
+		List<Object> companyDetailsReportToPopulate = null;
+		for(CompanyDetailsReport companyDetailsReportData : companyDetailsReportList){
+			companyDetailsReportToPopulate = new ArrayList<>();
+			// Set data to list.
+			companyDetailsReportToPopulate.add(companyDetailsReportData.getCompanyName());
+			companyDetailsReportToPopulate.add(companyDetailsReportData.getUserCount());
+			companyDetailsReportToPopulate.add(companyDetailsReportData.getVerifiedUserCount());
+			companyDetailsReportToPopulate.add(companyDetailsReportData.getVerifiedPercent());
+			companyDetailsReportToPopulate.add(companyDetailsReportData.getRegionCount());
+			companyDetailsReportToPopulate.add(companyDetailsReportData.getBranchCount());
+			companyDetailsReportToPopulate.add(companyDetailsReportData.getCompletionRate());
+			companyDetailsReportToPopulate.add(companyDetailsReportData.getVerifiedGmb());
+			companyDetailsReportToPopulate.add(companyDetailsReportData.getMissingGmb());
+			companyDetailsReportToPopulate.add(companyDetailsReportData.getMismatchCount());
+			companyDetailsReportToPopulate.add(companyDetailsReportData.getMissingPhotoCount());
+			companyDetailsReportToPopulate.add(companyDetailsReportData.getMissingURLCount());
+			companyDetailsReportToPopulate.add(companyDetailsReportData.getFacebookConnectionCount());
+			companyDetailsReportToPopulate.add(companyDetailsReportData.getTwitterConnectionCount());
+			companyDetailsReportToPopulate.add(companyDetailsReportData.getLinkedinConnectionCount());
+			// Set the list to the map.
+			companyDetailsData.put(enterNext, companyDetailsReportToPopulate);
+			enterNext++;
+		}
+		return companyDetailsData;
+	}
 }

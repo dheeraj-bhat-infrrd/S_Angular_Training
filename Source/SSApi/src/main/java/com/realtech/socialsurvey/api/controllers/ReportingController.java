@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
+import com.realtech.socialsurvey.core.entities.CompanyDetailsReport;
 import com.realtech.socialsurvey.core.entities.CompanyDigestRequestData;
 import com.realtech.socialsurvey.core.entities.SurveyResultsReportVO;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -548,4 +549,13 @@ public class ReportingController
         return new Gson().toJson( reportingDashboardManagement.prepareMonthlyDigestMailData( companyId, companyName,
             monthUnderConcern, year, recipientMail ) );
     }
+
+	@RequestMapping(value = "/getcompanydetailsreport", method = RequestMethod.GET)
+	@ApiOperation(value = "Social Survey Admin level report to fetch Company Details for all companies.")
+	public String getCompanyDetailsReport(String entityType, Long entityId, int startIndex, int batchSize) {
+		LOGGER.info("Social Survey Admin level report to fetch Company Details for all companies.");
+		List<CompanyDetailsReport> companyDetailsReportList = reportingDashboardManagement
+				.getCompanyDetailsReport(entityId, startIndex, batchSize);
+		return new Gson().toJson(companyDetailsReportList);
+	}
 }
