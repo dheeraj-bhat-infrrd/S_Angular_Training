@@ -1406,10 +1406,7 @@ public class SurveyManagementController
 	@ResponseBody
 	@RequestMapping(value = "/restartsurvey")
 	public void restartSurvey(HttpServletRequest request) {
-		String agentIdStr = request.getParameter("agentId");
-		String customerEmail = request.getParameter("customerEmail");
-		String firstName = request.getParameter("firstName");
-		String lastName = request.getParameter("lastName");
+		
 		String surveyId = request.getParameter("surveyId");
 
 		try {
@@ -1418,17 +1415,15 @@ public class SurveyManagementController
 				throw new InvalidInputException("Passed parameter survey id is null or empty");
 			}
 
-			if (agentIdStr == null || agentIdStr.isEmpty()) {
-				throw new InvalidInputException("Invalid value (Null/Empty) found for agentId.");
-			}
-			long agentId = Long.parseLong(agentIdStr);
+			
 			surveyHandler.changeStatusOfSurvey(surveyId, true);
 			SurveyDetails survey = surveyHandler.getSurveyDetails(surveyId);
+			long agentId = survey.getAgentId();
 			User user = userManagementService.getUserByUserId(agentId);
 			Map<String, String> urlParams = urlGenerator.decryptUrl(survey.getUrl());
 			urlParams.put(CommonConstants.URL_PARAM_RETAKE_SURVEY, "true");
 			String updatedUrl = urlGenerator.generateUrl(urlParams, getApplicationBaseUrl() + CommonConstants.SHOW_SURVEY_PAGE_FOR_URL);
-			surveyHandler.sendSurveyRestartMail(firstName, lastName, customerEmail, survey.getCustRelationWithAgent(), user, updatedUrl);
+			surveyHandler.sendSurveyRestartMail(survey.getCustomerFirstName(), survey.getCustomerLastName(), survey.getCustomerEmail(), survey.getCustRelationWithAgent(), user, updatedUrl);
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonfatalException caught in makeSurveyEditable(). Nested exception is ", e);
