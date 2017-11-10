@@ -375,9 +375,6 @@ $(document).on('click', '.restart-survey-mail-txt', function(e) {
 	e.stopPropagation();
 	confirmRetakeSurveyReminderMail(this);
 
-	/*
-	 * var firstName = $(this).parent().parent().parent().parent().attr('data-firstname'); var lastName = $(this).parent().parent().parent().parent().attr('data-lastname'); var agentName = $(this).parent().parent().parent().parent().attr('data-agentname'); var customerEmail = $(this).parent().parent().parent().parent().attr('data-customeremail'); var agentId = $(this).parent().parent().parent().parent().attr('data-agentid'); var payload = { "customerEmail" : customerEmail, "agentId" : agentId, "firstName" : firstName, "lastName" : lastName, "agentName" : agentName }; callAjaxGetWithPayloadData('./restartsurvey.do', '', payload, true); $('#overlay-toast').html('Mail sent to '+firstName +' '+' to retake the survey for you.'); showToast();
-	 */
 });
 
 function confirmRetakeSurveyReminderMail(element) {
@@ -396,44 +393,25 @@ function confirmRetakeSurveyReminderMail(element) {
 }
 
 function retakeSurveyReminderMail(element) {
-	var firstName = $(element).parent().parent().parent().parent().attr('data-firstname');
-	var lastName = $(element).parent().parent().parent().parent().attr('data-lastname');
-	var agentName = $(element).parent().parent().parent().parent().attr('data-agentname');
-	var customerEmail = $(element).parent().parent().parent().parent().attr('data-customeremail');
-	var agentId = $(element).parent().parent().parent().parent().attr('data-agentid');
 	var surveyId = $(element).parent().parent().parent().parent().attr('survey-mongo-id');
 
 	var payload = {
-		"customerEmail" : customerEmail,
-		"agentId" : agentId,
-		"firstName" : firstName,
-		"lastName" : lastName,
-		"agentName" : agentName,
 		"surveyId" : surveyId
 	};
 
 	callAjaxGetWithPayloadData('./restartsurvey.do', function() {
-		$('#overlay-toast').html('Mail sent to ' + firstName + ' ' + ' to retake the survey for you.');
+		$('#overlay-toast').html('Mail sent to customer to retake the survey for you.');
 		showToast();
 		$('#overlay-cancel').click();
 		getIncompleteSurveyCount(colName, colValue);
 	}, payload, true);
 }
 
-/*
- * $(document).on('click', '.report-abuse-txt', function(e) { disableBodyScroll(); e.stopPropagation(); var reviewElement = $(this).parent().parent().parent().parent(); var payload = { "customerEmail" : reviewElement.attr('data-customeremail'), "agentId" : reviewElement.attr('data-agentid'), "firstName" : reviewElement.attr('data-cust-first-name'), "lastName" : reviewElement.attr('data-cust-last-name'), "agentName" : reviewElement.attr('data-agent-name'), "review" : reviewElement.attr('data-review'), "surveyMongoId" : reviewElement.attr('survey-mongo-id') }; $("#report-abuse-txtbox").val(''); // Unbind click events for button $('.rpa-cancel-btn').off('click'); $('.rpa-report-btn').off('click'); //disableBodyScroll(); $('#report-abuse-overlay').show(); $('.rpa-cancel-btn').on('click', function() { $('#report-abuse-overlay').hide(); enableBodyScroll(); });
- */
 $(document).on('click', '.report-abuse-txt', function(e) {
 	disableBodyScroll();
 	e.stopPropagation();
 	var reviewElement = $(this).closest('.dsh-review-cont');
 	var payload = {
-		"customerEmail" : reviewElement.attr('data-customeremail'),
-		"agentId" : reviewElement.attr('data-agentid'),
-		"firstName" : reviewElement.attr('data-firstname'),
-		"lastName" : reviewElement.attr('data-lastname'),
-		"agentName" : reviewElement.attr('data-agentname'),
-		"review" : reviewElement.attr('data-review'),
 		"surveyMongoId" : reviewElement.attr('survey-mongo-id')
 	};
 	var r = reviewElement.attr('data-firstname');
@@ -7591,13 +7569,6 @@ $(document).on('blur', '.prof-edditable-sin', function() {
 
 });
 
-/*
- * $(document).on('click', '.fb-shr', function() { var firstName = $(this).parent().parent().parent().attr('data-firstname'); var lastName = $(this).parent().parent().parent().attr('data-lastname'); var agentName = $(this).parent().parent().parent().attr('data-agentname'); var review = $(this).parent().parent().parent().attr('data-review'); var score = $(this).parent().parent().parent().attr('data-score'); shareOnFacebook(firstName, lastName, agentName, review, score); });
- * 
- * $(document).on('click', '.twt-shr', function() { var firstName = $(this).parent().parent().parent().attr('data-firstname'); var lastName = $(this).parent().parent().parent().attr('data-lastname'); var agentName = $(this).parent().parent().parent().attr('data-agentname'); var review = $(this).parent().parent().parent().attr('data-review'); var score = $(this).parent().parent().parent().attr('data-score'); shareOnTwitter(firstName, lastName, agentName, review, score); });
- * 
- * $(document).on('click', '.lnkdn-shr', function() { var firstName = $(this).parent().parent().parent().attr('data-firstname'); var lastName = $(this).parent().parent().parent().attr('data-lastname'); var agentName = $(this).parent().parent().parent().attr('data-agentname'); var review = $(this).parent().parent().parent().attr('data-review'); var score = $(this).parent().parent().parent().attr('data-score'); shareOnLinkedin(firstName, lastName, agentName, review, score); });
- */
 
 // On hover for lock icons
 $(document).on('mouseover', '#prof-logo-container', function(e) {
@@ -12911,7 +12882,7 @@ function paintReviews(result, isRequestFromDashBoard) {
 		if (custNameArray[1] != undefined && custNameArray[1].trim() != "") {
 			custDispName += ' ' + custNameArray[1].substr(0, 1).toUpperCase() + '.';
 		}
-		reviewsHtml = reviewsHtml + '<div class="' + lastItemClass + '" data-cust-first-name=' + encodeURIComponent(reviewItem.customerFirstName) + ' data-cust-last-name=' + encodeURIComponent(reviewItem.customerLastName) + ' data-agent-name=' + encodeURIComponent(reviewItem.agentName) + ' data-rating=' + reviewItem.score + ' data-review="' + encodeURIComponent(reviewItem.review) + '" data-customeremail="' + reviewItem.customerEmail + '" data-agentid="' + reviewItem.agentId + '" survey-mongo-id="' + reviewItem._id + '">';
+		reviewsHtml = reviewsHtml + '<div class="' + lastItemClass + '" data-cust-first-name=' + encodeURIComponent(reviewItem.customerFirstName) + ' data-rating=' + reviewItem.score + ' data-review="' + encodeURIComponent(reviewItem.review)  + '" data-agentid="' + reviewItem.agentId + '" survey-mongo-id="' + reviewItem._id + '">';
 		reviewsHtml += '	<div class="ppl-header-wrapper clearfix">';
 		reviewsHtml += '		<div class="float-left ppl-header-left">';
 		reviewsHtml += '			<div class="ppl-head-1">' + custDispName + '</div>';
