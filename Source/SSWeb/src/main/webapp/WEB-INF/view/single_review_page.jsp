@@ -41,9 +41,9 @@
 		<div id="single-review-popup" class="single-review-popup-wrapper">
 			<div class="single-review-popup-hdr-wrapper clearfix">
 				<c:if test="${not empty agentProfile.profileImageUrlThumbnail && not empty fn:trim(agentProfile.profileImageUrlThumbnail)}">
-					<div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+					<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" style="padding-right: 0%;">
 						<div class="sr-prof-pic-circle">
-							<img class="prof-image prof-image-edit pos-relative rep-prof-pic" src="${agentProfile.profileImageUrlThumbnail}"></img>
+							<img class="agent-prof-image prof-image-edit" src="${agentProfile.profileImageUrlThumbnail}"></img>
 						</div>
 					</div>
 				</c:if>

@@ -2770,6 +2770,11 @@
 	.reporting-trans-details{
 		width:100%;
 	}
+	
+	.sr-popup-hdr-details {
+	display: grid;
+	padding-left: 7%;
+	}
 }
 
 @media(max-width: 330px){

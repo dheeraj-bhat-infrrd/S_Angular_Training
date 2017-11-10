@@ -753,17 +753,15 @@ input#find-pro-submit{
 }
 
 .single-review-popup-hdr-wrapper{
-	height: 105px;
-    padding-left: 50px;
     background: #f2f2f2;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
+    padding: 2.5% 2.5% 2.5% 2.5%;
 }
 
 .sr-popup-hdr-details{
 	display: grid;
-    margin-left: 20px;
-    margin-top: 5px;
+	padding-left: 0%;
 }
 
 .sr-review-details{
@@ -813,11 +811,8 @@ input#find-pro-submit{
 }
 
 .sr-prof-pic-circle {
-	position: absolute;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: #fff;
+	width: 50px;
+	margin: 0 auto;
 }
 
 .sr-wc-btn-row{
@@ -1721,4 +1716,11 @@ span.footer-ul a:hover {
 
 .overflow-hidden-important {
 	overflow: hidden !important;
+}
+
+.agent-prof-image{
+	border-radius: 50%;
+    background: #f1f1f1;
+    width: 50px;
+	background-size: contain !important;
 }

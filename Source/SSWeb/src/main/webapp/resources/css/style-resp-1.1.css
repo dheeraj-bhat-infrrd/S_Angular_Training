@@ -404,8 +404,8 @@
 	position: absolute;
     color: black;
     opacity: 1;
-    margin-right: 15px;
-    margin-top: 25px;
+    margin-right: 6%;
+    margin-top: 5%;
     font-size: xx-large;
     right: 0;
 	}
@@ -417,27 +417,10 @@
     background: #fff;
     border-radius: 0;
 	}
-
-	.single-review-popup-hdr-wrapper {
-   	height: 90px;
-    padding-left: 50px;
-    background: #f2f2f2;
-    padding-top: 20px;
-	}
-	
-	.sr-prof-pic-circle {
-    position: absolute;
-    width: 50px;
-    left: 0;
-    height: 50px;
-    border-radius: 50%;
-    background: #fff;
-	}
 	
 	.sr-popup-hdr-details {
-    display: grid;
-    margin-left: 20px;
-    margin-top: 5px;
+	display: grid;
+	padding-left: 5%;
 	}
 	
 	.single-review-popup-body-wrapper{
