@@ -126,6 +126,7 @@ public class ReportingSurveyPreInititationDaoImpl extends GenericReportingDaoImp
             queryString = queryString.replace( ":entityTypeId", BRANCH_ID );
         } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
             queryString = MAIN_SELECT_QUERY.replace( ":entityIdCondition", AGENT_ID_CONDITION );
+            queryString = queryString.replace( ":entityTypeId", " " );
         }
 
         //Set start and end Date value as per the condition.
