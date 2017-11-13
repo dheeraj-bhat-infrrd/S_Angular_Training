@@ -38,6 +38,7 @@ import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
+import com.realtech.socialsurvey.core.entities.ReportingSurveyPreInititation;
 import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.Survey;
 import com.realtech.socialsurvey.core.entities.SurveyCompanyMapping;
@@ -1177,6 +1178,53 @@ public class WorkbookData
         return userRankingData;
         
     }
-    
-    
+
+
+    public Map<Integer, List<Object>> writeIncompleteSurveyResultsCompanyReportHeader()
+    {
+        Map<Integer, List<Object>> incompleteSurveyResultsReportData = new TreeMap<Integer, List<Object>>();
+        List<Object> incompleteSurveyResultsReportToPopulate = new ArrayList<Object>();
+        // Setting up user sheet headers
+        incompleteSurveyResultsReportToPopulate.add( "Agent First Name" );
+        incompleteSurveyResultsReportToPopulate.add( "Agent Last Name" );
+        incompleteSurveyResultsReportToPopulate.add( "Agent Email Address" );
+        incompleteSurveyResultsReportToPopulate.add( "Customer First Name" );
+        incompleteSurveyResultsReportToPopulate.add( "Customer Last Name" );
+        incompleteSurveyResultsReportToPopulate.add( "Customer Email Address" );
+        incompleteSurveyResultsReportToPopulate.add( "Survey Source ID" );
+        incompleteSurveyResultsReportToPopulate.add( "Survey Source" );
+        incompleteSurveyResultsReportToPopulate.add( "Date Survey Sent" );
+        incompleteSurveyResultsReportToPopulate.add( "No of Reminders Sent" );
+        incompleteSurveyResultsReportToPopulate.add( "Date Last Reminder Sent" );
+        incompleteSurveyResultsReportData.put( 1, incompleteSurveyResultsReportToPopulate );
+        return incompleteSurveyResultsReportData;
+    }
+
+
+    public Map<Integer, List<Object>> getIncompleteSurveyResultsReportToBeWrittenInSheet(
+        List<ReportingSurveyPreInititation> incompleteSurvey, int dataCounter )
+    {
+        Map<Integer, List<Object>> incompleteSurveyData = new TreeMap<>();
+
+        Integer incompleteSurveyCounter = dataCounter;
+        List<Object> incompleteSurveyResultsReportToPopulate = null;
+
+        for ( ReportingSurveyPreInititation incompleteReportData : incompleteSurvey ) {
+            incompleteSurveyResultsReportToPopulate = new ArrayList<Object>();
+            incompleteSurveyResultsReportToPopulate.add( incompleteReportData.getAgentFirstName() );
+            incompleteSurveyResultsReportToPopulate.add( incompleteReportData.getAgentLastName() );
+            incompleteSurveyResultsReportToPopulate.add( incompleteReportData.getAgentEmailId() );
+            incompleteSurveyResultsReportToPopulate.add( incompleteReportData.getCustomerFirstName() );
+            incompleteSurveyResultsReportToPopulate.add( incompleteReportData.getCustomerLastName() );
+            incompleteSurveyResultsReportToPopulate.add( incompleteReportData.getCustomerEmailId() );
+            incompleteSurveyResultsReportToPopulate.add( incompleteReportData.getSurveySourceId() );
+            incompleteSurveyResultsReportToPopulate.add( incompleteReportData.getSurveySource() );
+            incompleteSurveyResultsReportToPopulate.add( incompleteReportData.getCreatedOnEst() );
+            incompleteSurveyResultsReportToPopulate.add( incompleteReportData.getReminderCounts() );
+            incompleteSurveyResultsReportToPopulate.add( incompleteReportData.getLastReminderTimeEst() );
+            incompleteSurveyData.put( incompleteSurveyCounter, incompleteSurveyResultsReportToPopulate );
+            incompleteSurveyCounter++;
+        }
+        return incompleteSurveyData;
+    }
 }

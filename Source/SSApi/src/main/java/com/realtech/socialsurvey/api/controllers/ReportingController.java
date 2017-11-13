@@ -548,4 +548,15 @@ public class ReportingController
         return new Gson().toJson( reportingDashboardManagement.prepareMonthlyDigestMailData( companyId, companyName,
             monthUnderConcern, year, recipientMail ) );
     }
+    
+    @RequestMapping ( value = "/getincompletesurveys", method = RequestMethod.GET)
+    @ApiOperation ( value = "get incomplete surveys")
+    public String getIncompleteSurveys( Long entityId, String entityType, Timestamp startDate, Timestamp endDate,
+        int startIndex , int batchSize ) throws NonFatalException
+    {
+
+        LOGGER.info( "Fetching list of incomplete surveys for entityType : {} , entityId : {}",entityType,entityId );
+        return new Gson().toJson( reportingDashboardManagement.getIncompleteSurvey( entityId, entityType,
+            startDate, endDate, startIndex, batchSize ) );
+    }
 }
