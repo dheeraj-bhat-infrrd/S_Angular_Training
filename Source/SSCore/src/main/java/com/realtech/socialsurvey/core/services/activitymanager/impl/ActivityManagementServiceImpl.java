@@ -3,8 +3,6 @@ package com.realtech.socialsurvey.core.services.activitymanager.impl;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +27,6 @@ import com.realtech.socialsurvey.core.services.activitymanager.ActivityManagemen
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
-import com.realtech.socialsurvey.core.vo.TransactionMonitorGraphDataVO;
 
 /**
  * 
@@ -368,43 +365,6 @@ public class ActivityManagementServiceImpl implements ActivityManagementService
         }
         return transactionMailList;
         
-    }
-    
-    /**
-     * 
-     */
-    @Override
-    @Transactional
-    public List<TransactionMonitorGraphDataVO> getTransactionsMonitorUIdata(long companyId, int noOfDays) throws InvalidInputException
-    {
-        
-        LOG.info( "method getTransactionsMonitorUIdata started for companyId {} and noOfDays {}" , companyId , noOfDays );
-        
-        Date startDate = null;       
-        Date endDate = null;
-        if ( noOfDays >= 0 ) {
-            startDate = utils.getNDaysBackDate( noOfDays );
-            endDate = new Date( System.currentTimeMillis() );
-        }
-        
-        List<CompanyTransactionsSourceStats> companyTransactionsStats;
-        if(companyId <= 0){
-            companyTransactionsStats  = companyTransactionsSourceStatsDao.getOverallTransactionsCountForPastNDays(  startDate, endDate );            
-        }else{
-            companyTransactionsStats = companyTransactionsSourceStatsDao.getTransactionsCountForCompanyForPastNDays( companyId, startDate, endDate );      
-        }
-        
-        List<CompanySurveyStatusStats> companySurveyStats = null;
-        if(companyId <= 0){
-            companySurveyStats = companySurveyStatusStatsDao.getOverallSurveyCountForPastNDays( startDate, endDate );
-        }else{
-            companySurveyStats = companySurveyStatusStatsDao.getSurveyStatusCountForCompanyForPastNDays( companyId, startDate, endDate );                        
-        }
-        
-        List<TransactionMonitorGraphDataVO> transactionMonitorGraphDataVOs = null;
-
-        LOG.info( "method getTransactionsCountForCompanyForPastNDays finished for companyId %s and noOfDays %s" , companyId , noOfDays );
-        return transactionMonitorGraphDataVOs;
     }
     
 }

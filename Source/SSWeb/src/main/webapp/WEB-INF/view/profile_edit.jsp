@@ -41,6 +41,7 @@
 	<c:set value="${socialMediaTokens.lendingTreeToken}" var="lendingTreeToken"></c:set>
 	<c:set value="${socialMediaTokens.realtorToken}" var="realtorToken"></c:set>
 	<c:set value="${socialMediaTokens.googleBusinessToken}" var="googleBusinessToken"></c:set>
+	<c:set value="${socialMediaTokens.facebookPixelToken}" var="facebookPixelToken"></c:set>
 </c:if>
 <c:choose>
 	<c:when test="${columnName == 'companyId'}">
@@ -173,6 +174,7 @@
 							<div id="icn-zillow" class="float-left social-item-icon icn-zillow" data-source="zillow" title="Zillow" data-link="${zillowLink}" onclick="openAuthPageZillow(event,'.icn-zillow');"></div>
 							<div id="icn-lendingtree" class="float-left social-item-icon icn-lendingtree" data-source="lendingtree" data-link="${lendingTreeToken.lendingTreeProfileLink}" title="LendingTree"></div>
 							<div id="icn-realtor" class="float-left social-item-icon icn-realtor" data-source="realtor" data-link="${realtorToken.realtorProfileLink}" title="Realtor"></div>
+							<div id="icn-fb-pxl" class="float-left social-item-icon icn-fb-pxl" data-source="facebookPixel" data-link="${facebookPixelToken.pixelId}" title="Facebook pixel"></div>
 							<input id="social-token-text" type="text" class="social-token-text hide" placeholder='<spring:message code="label.socialpage.placeholder.key"/>'>
 						</div>
 					</c:if>
@@ -498,6 +500,7 @@ $(document).ready(function() {
 			$(this).addClass('icn-social-add');
 		}
 	});
+	
 	// Fetch and paint Reviews
 	$(window).off('scroll');
 	$(window).scroll(function() {

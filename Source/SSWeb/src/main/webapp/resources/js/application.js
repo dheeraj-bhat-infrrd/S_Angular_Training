@@ -8847,6 +8847,7 @@ $('body').on('click', '#prof-edit-social-link .icn-lendingtree', function(e) {
 	$('#social-token-text').val(link);
 });
 
+
 function updateLendingTreeLink(link) {
 	var payload = {
 		"lendingTreeLink" : link
@@ -8856,6 +8857,31 @@ function updateLendingTreeLink(link) {
 		showProfileLinkInEditProfilePage("lendingtree", link);
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
+		showToast();
+	}
+}
+
+//Update Social links - facebook pixel
+$('body').on('click', '#prof-edit-social-link .icn-fb-pxl', function(e) {
+	e.stopPropagation();
+	$('#social-token-text').show();
+	var link = $(this).attr("data-link");
+	$('#social-token-text').attr({
+		"placeholder" : "Add Facebook pixel id",
+		"onblur" : "updateFacebookPixelId(this.value);$('#social-token-text').hide();"
+	});
+	$('#social-token-text').val(link);
+});
+
+function updateFacebookPixelId(pixelId) {
+	var payload = {
+		"pixelId" : pixelId
+	};
+	if (pixelId != undefined && pixelId != '') {
+		callAjaxPostWithPayloadData("./updatefacebookpixelid.do", callBackUpdateSocialLink, payload, true);
+		showProfileLinkInEditProfilePage("pixelId", pixelId);
+	} else {
+		$('#overlay-toast').html("Enter a valid id");
 		showToast();
 	}
 }

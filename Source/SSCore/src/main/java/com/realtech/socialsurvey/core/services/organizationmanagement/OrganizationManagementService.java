@@ -1504,10 +1504,12 @@ public interface OrganizationManagementService
 
     public List<Long> getHiddenPublicPageUserIds();
 
-
     public List<OrganizationUnitSettings> getCompaniesForTransactionMonitor();
 
 
     void updateTransactionMonitorSettingForCompany( long companyId, boolean includeForTransactionMonitor );
+
+    public String getFacebookPixelImageTagsFromHierarchy( OrganizationUnitSettings companySettings,
+        OrganizationUnitSettings regionSettings, OrganizationUnitSettings branchSetting, OrganizationUnitSettings unitSettings );
 
 }

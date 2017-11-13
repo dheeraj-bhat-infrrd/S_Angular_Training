@@ -2027,6 +2027,10 @@ button.paypal.is-active {
 	background: url(../images/fax.png) no-repeat center;
 }
 
+.icn-fb-pxl {
+	background: url(../csssprites/icons_social.png) no-repeat -400px 0;
+}
+
 .icn-fb {
 	background: url(../csssprites/icons_social.png) no-repeat 0 0;
 }
@@ -4051,8 +4055,8 @@ img.prof-image {
 .social-token-text {
 	position: absolute;
 	z-index: 9999999999999;
-	top: 63px;
-	left: -30px;
+	top: 45px;
+	left: 120px;
 	height: 40px;
 	width: 260px;
 	padding: 0 10px;
@@ -7671,6 +7675,10 @@ tr.u-tbl-header td {
 	background-position: -200px 3px;
 }
 
+.social-item-icon.icn-fb-pxl {
+	background-position: -400px 3px;
+}
+
 .icn-social-add.icn-fb {
 	background-position: 0 -38px;
 }
@@ -7703,6 +7711,9 @@ tr.u-tbl-header td {
 	background-position: -200px -38px;
 }
 .icn-social-add.icn-google-business{
+	background-position: -400px -38px;
+}
+.icn-social-add.icn-fb-pxl{
 	background-position: -400px -38px;
 }
 

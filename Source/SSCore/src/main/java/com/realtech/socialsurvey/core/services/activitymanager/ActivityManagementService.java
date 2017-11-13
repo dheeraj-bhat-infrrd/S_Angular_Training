@@ -107,15 +107,4 @@ public interface ActivityManagementService
      */
     public List<String> getTransactionMonitorMailList();
 
-    /**
-     * 
-     * @param companyId
-     * @param noOfDays
-     * @return
-     * @throws InvalidInputException
-     */
-    public List<TransactionMonitorGraphDataVO> getTransactionsMonitorUIdata( long companyId, int noOfDays )
-        throws InvalidInputException;
-
-
 }

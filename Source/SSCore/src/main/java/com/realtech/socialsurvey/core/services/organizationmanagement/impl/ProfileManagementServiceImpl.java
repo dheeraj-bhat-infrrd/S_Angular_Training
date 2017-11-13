@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.text.DateFormat;
+import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -73,6 +74,7 @@ import com.realtech.socialsurvey.core.entities.CompanyProfileData;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.ExternalAPICallDetails;
+import com.realtech.socialsurvey.core.entities.FacebookPixelToken;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
 import com.realtech.socialsurvey.core.entities.GoogleBusinessToken;
 import com.realtech.socialsurvey.core.entities.GoogleToken;
@@ -202,6 +204,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     @Autowired
     private SocialManagementService socialManagementService;
+    
     @Autowired
     private SolrSearchService solrSearchService;
 
@@ -275,6 +278,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Value ( "${CDN_PATH}")
     private String cdnUrl;
 
+    @Value ( "${FACEBOOK_PIXEL_IMAGE_TAG}" )
+    private String fbPixelImageTag;
+    
     @Autowired
     private ExternalApiCallDetailsDao externalApiCallDetailsDao;
 
@@ -5664,5 +5670,99 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         }
         LOG.info( "NMLS id : " + nmlsId );
         return nmlsId;
+    }
+    
+    /**
+     * 
+     * @param entityType
+     * @param entityId
+     * @param pixcelId
+     * @param userSettings
+     * @throws NonFatalException
+     */
+    @Override
+    public void updateFacebookPixelId(String entityType, long entityId, String pixelId , UserSettings userSettings) throws NonFatalException{
+        
+        SocialMediaTokens socialMediaTokens;
+        
+        if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( entityId );
+            if ( companySettings == null ) {
+                throw new InvalidInputException( "No company settings found in current session" );
+            }
+            socialMediaTokens = companySettings.getSocialMediaTokens();
+            socialMediaTokens = updateFacebookPixelIdInMediaTokens( pixelId, socialMediaTokens, companySettings.getProfileName() );
+            updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, socialMediaTokens );
+            
+            companySettings.setSocialMediaTokens( socialMediaTokens );
+            userSettings.setCompanySettings( companySettings );
+            
+        } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+            OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
+            if ( regionSettings == null ) {
+                throw new InvalidInputException( "No Region settings found in current session" );
+            }
+            socialMediaTokens = regionSettings.getSocialMediaTokens();
+            socialMediaTokens = updateFacebookPixelIdInMediaTokens( pixelId, socialMediaTokens, regionSettings.getProfileName() );
+            updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, socialMediaTokens );
+            
+            regionSettings.setSocialMediaTokens( socialMediaTokens );
+            userSettings.getRegionSettings().put( entityId, regionSettings );
+
+        } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+            OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
+            if ( branchSettings == null ) {
+                throw new InvalidInputException( "No Branch settings found in current session" );
+            }
+            socialMediaTokens = branchSettings.getSocialMediaTokens();
+            socialMediaTokens = updateFacebookPixelIdInMediaTokens( pixelId, socialMediaTokens, branchSettings.getProfileName() );
+            updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, socialMediaTokens );
+            
+            branchSettings.setSocialMediaTokens( socialMediaTokens );
+            userSettings.getRegionSettings().put( entityId, branchSettings );
+           
+        } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+            AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
+            if ( agentSettings == null ) {
+                throw new InvalidInputException( "No Agent settings found in current session" );
+            }
+            socialMediaTokens = agentSettings.getSocialMediaTokens();
+            socialMediaTokens = updateFacebookPixelIdInMediaTokens( pixelId, socialMediaTokens, agentSettings.getProfileName() );
+            updateSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,  agentSettings, socialMediaTokens );
+            
+            agentSettings.setSocialMediaTokens( socialMediaTokens );
+            userSettings.setAgentSettings( agentSettings );
+        } else {
+            throw new InvalidInputException( "Invalid input exception occurred in updating lendingTree token.",
+                DisplayMessageConstants.GENERAL_ERROR );
+        }
+
+
+        //Update social connection history
+        socialManagementService.updateSocialConnectionsHistory( entityType, entityId, socialMediaTokens,
+            CommonConstants.FACEBOOK_PIXEL_ID, CommonConstants.SOCIAL_MEDIA_CONNECTED );
+
+        LOG.info( "facebookPixelId updated successfully" );
+
+    }
+    
+    private SocialMediaTokens updateFacebookPixelIdInMediaTokens( String pixelId, SocialMediaTokens socialMediaTokens, String profileName )
+    {
+        LOG.debug( "Method updateFacebookPixelIdInMediaTokens() called" );
+        if ( socialMediaTokens == null ) {
+            LOG.debug( "No social media token in profile added" );
+            socialMediaTokens = new SocialMediaTokens();
+        }
+        if ( socialMediaTokens.getFacebookPixelToken() == null ) {
+            socialMediaTokens.setFacebookPixelToken( new FacebookPixelToken() );
+        }
+
+        FacebookPixelToken facebookPixelToken = socialMediaTokens.getFacebookPixelToken();
+        facebookPixelToken.setPixelId( pixelId );
+        String fbPixelImageTagWithId = MessageFormat.format( fbPixelImageTag, pixelId, profileName );
+        facebookPixelToken.setPixelImgTag( fbPixelImageTagWithId );
+        socialMediaTokens.setFacebookPixelToken( facebookPixelToken );
+        LOG.debug( "Method updateFacebookPixelIdInMediaTokens() finished" );
+        return socialMediaTokens;
     }
 }

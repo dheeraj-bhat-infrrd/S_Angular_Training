@@ -432,6 +432,7 @@ public interface CommonConstants
     public static final String ZILLOW_SOCIAL_SITE = "zillow";
     public static final String YELP_SOCIAL_SITE = "yelp";
     public static final String LENDINGTREE_SOCIAL_SITE = "lendingtree";
+    public static final String FACEBOOK_PIXEL_ID = "facebookPixelId";
     public static final String REALTOR_SOCIAL_SITE = "realtor";
     public static final String GOOGLE_BUSINESS_SOCIAL_SITE = "google business";
     public static final String GOOGLE_SOCIAL_SITE = "google";
