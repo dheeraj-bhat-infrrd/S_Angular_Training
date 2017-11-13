@@ -8,6 +8,7 @@ import com.realtech.socialsurvey.core.entities.CompanyActiveUsersStats;
 import com.realtech.socialsurvey.core.entities.CompanySurveyStatusStats;
 import com.realtech.socialsurvey.core.entities.CompanyTransactionsSourceStats;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.vo.TransactionMonitorGraphDataVO;
 
 /**
  * 
@@ -105,6 +106,16 @@ public interface ActivityManagementService
      * @return List of String
      */
     public List<String> getTransactionMonitorMailList();
+
+    /**
+     * 
+     * @param companyId
+     * @param noOfDays
+     * @return
+     * @throws InvalidInputException
+     */
+    public List<TransactionMonitorGraphDataVO> getTransactionsMonitorUIdata( long companyId, int noOfDays )
+        throws InvalidInputException;
 
 
 }

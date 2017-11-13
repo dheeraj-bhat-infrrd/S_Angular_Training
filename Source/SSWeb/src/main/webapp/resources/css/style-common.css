@@ -4914,6 +4914,12 @@ img.prof-image {
 	width: 750px;
 }
 
+.trans-gph-item {
+	position: relative;
+	height: 290px;
+	width: 1350px;
+}
+
 .util-graph-wrapper {
 	position: relative;
 }
@@ -4934,6 +4940,26 @@ img.prof-image {
 	font-size: 13px;
 	width: 205px;
 	text-align: right;
+}
+/*transaction monitor legend colors*/
+.trans-monitor-lgn-col-blk{
+	background-color : rgb(0, 0, 0);
+}
+
+.trans-monitor-lgn-col-red{
+	background-color : rgb(255, 0, 0);
+}
+
+.trans-monitor-lgn-col-blue{
+	background-color : rgb(0, 135, 255);
+}
+
+.trans-monitor-lgn-col-gray{
+	background-color : rgb(169,169,169);
+}
+
+.trans-monitor-lgn-col-grn{
+	background-color : rgb(0, 255, 0);
 }
 
 .lgn-col-grn {
@@ -10016,4 +10042,42 @@ img.lead-img {
 
 .rep-dash-bar-margin{
 		margin:auto 2px;
+}
+
+/* transaction monitor styles */
+.trans-monitor-graph{
+	width:90%;
+}
+
+.trans-monitor-graph-container{
+	border: 1px solid #dcdcdc;
+    box-shadow: 4px 4px 15px 0px #dcdcdc;
+    margin-top: 10px;
+}
+
+.trans-monitor-graph-legend{
+	position:initial;
+	margin-top:50px;
+	width: auto;
+    display: -webkit-box;	
+}
+
+.trans-monitor-util-gph-item {
+	position: relative;
+	height: 290px;
+	width: 100%;
+}
+
+.trans-monitor-legend-item-first{
+	margin-left:22%;
+		
+}
+
+.trans-monitor-legend-text-style{
+	color:black;
+	font-weight:bold !important
+}
+
+.trans-monitor-legend-item{
+	margin-left:50px;
 }

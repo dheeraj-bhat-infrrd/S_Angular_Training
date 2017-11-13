@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.services.activitymanager.impl;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,7 @@ import com.realtech.socialsurvey.core.services.activitymanager.ActivityManagemen
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.vo.TransactionMonitorGraphDataVO;
 
 /**
  * 
@@ -256,11 +258,6 @@ public class ActivityManagementServiceImpl implements ActivityManagementService
         
         LOG.info( "method getTransactionsCountForCompanyForPastNDays started for companyId {} and noOfDays {}" , companyId , noOfDays );
         
-        if(companyId <= 0l){
-            LOG.error("Invalid companyId is passed : {} " , companyId );
-            throw new InvalidInputException("Passed parameter companyId is invalid ");
-        }
-        
         Date startDate = null;       
         Date endDate = null;
         if ( noOfDays >= 0 ) {
@@ -268,7 +265,12 @@ public class ActivityManagementServiceImpl implements ActivityManagementService
             endDate = new Date( System.currentTimeMillis() );
         }
         
-        List<CompanyTransactionsSourceStats> companyTransactionsStats = companyTransactionsSourceStatsDao.getTransactionsCountForCompanyForPastNDays( companyId, startDate, endDate );
+        List<CompanyTransactionsSourceStats> companyTransactionsStats;
+        if(companyId <= 0){
+            companyTransactionsStats  = companyTransactionsSourceStatsDao.getOverallTransactionsCountForPastNDays(  startDate, endDate );            
+        }else{
+            companyTransactionsStats = companyTransactionsSourceStatsDao.getTransactionsCountForCompanyForPastNDays( companyId, startDate, endDate );      
+        }
 
         LOG.info( "method getTransactionsCountForCompanyForPastNDays finished for companyId %s and noOfDays %s" , companyId , noOfDays );
         return companyTransactionsStats;
@@ -287,11 +289,7 @@ public class ActivityManagementServiceImpl implements ActivityManagementService
     {
         
         LOG.info( "method getSurveyStatusStatsForCompanyForPastNDays started for companyId %s and noOfDays %s" , companyId , noOfDays );
-        
-        if(companyId <= 0l){
-            LOG.error("Invalid companyId is passed : {} " , companyId );
-            throw new InvalidInputException("Passed parameter companyId is invalid ");
-        }
+       
         
         Date startDate = null;       
         Date endDate = null;
@@ -300,8 +298,13 @@ public class ActivityManagementServiceImpl implements ActivityManagementService
             endDate = new Date( System.currentTimeMillis() );
         }
         
-        List<CompanySurveyStatusStats> companySurveyStats = companySurveyStatusStatsDao.getSurveyStatusCountForCompanyForPastNDays( companyId, startDate, endDate );
-
+        List<CompanySurveyStatusStats> companySurveyStats = null;
+        if(companyId <= 0){
+            companySurveyStats = companySurveyStatusStatsDao.getOverallSurveyCountForPastNDays( startDate, endDate );
+        }else{
+            companySurveyStats = companySurveyStatusStatsDao.getSurveyStatusCountForCompanyForPastNDays( companyId, startDate, endDate );                        
+        }
+        
         LOG.info( "method getSurveyStatusStatsForCompanyForPastNDays finished for companyId {} and noOfDays {}" , companyId , noOfDays );
         return companySurveyStats;
     }
@@ -366,4 +369,42 @@ public class ActivityManagementServiceImpl implements ActivityManagementService
         return transactionMailList;
         
     }
+    
+    /**
+     * 
+     */
+    @Override
+    @Transactional
+    public List<TransactionMonitorGraphDataVO> getTransactionsMonitorUIdata(long companyId, int noOfDays) throws InvalidInputException
+    {
+        
+        LOG.info( "method getTransactionsMonitorUIdata started for companyId {} and noOfDays {}" , companyId , noOfDays );
+        
+        Date startDate = null;       
+        Date endDate = null;
+        if ( noOfDays >= 0 ) {
+            startDate = utils.getNDaysBackDate( noOfDays );
+            endDate = new Date( System.currentTimeMillis() );
+        }
+        
+        List<CompanyTransactionsSourceStats> companyTransactionsStats;
+        if(companyId <= 0){
+            companyTransactionsStats  = companyTransactionsSourceStatsDao.getOverallTransactionsCountForPastNDays(  startDate, endDate );            
+        }else{
+            companyTransactionsStats = companyTransactionsSourceStatsDao.getTransactionsCountForCompanyForPastNDays( companyId, startDate, endDate );      
+        }
+        
+        List<CompanySurveyStatusStats> companySurveyStats = null;
+        if(companyId <= 0){
+            companySurveyStats = companySurveyStatusStatsDao.getOverallSurveyCountForPastNDays( startDate, endDate );
+        }else{
+            companySurveyStats = companySurveyStatusStatsDao.getSurveyStatusCountForCompanyForPastNDays( companyId, startDate, endDate );                        
+        }
+        
+        List<TransactionMonitorGraphDataVO> transactionMonitorGraphDataVOs = null;
+
+        LOG.info( "method getTransactionsCountForCompanyForPastNDays finished for companyId %s and noOfDays %s" , companyId , noOfDays );
+        return transactionMonitorGraphDataVOs;
+    }
+    
 }

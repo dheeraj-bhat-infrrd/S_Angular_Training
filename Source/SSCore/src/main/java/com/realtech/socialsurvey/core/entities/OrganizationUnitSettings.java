@@ -69,6 +69,8 @@ public class OrganizationUnitSettings implements Serializable
     private String sendEmailThrough;
     private boolean hideFromBreadCrumb;
     private boolean hidePublicPage; //to hide entity form public page and sitemap
+    
+    private boolean includeForTransactionMonitor;
 
 
     // vendasta product details 
@@ -701,6 +703,18 @@ public class OrganizationUnitSettings implements Serializable
     public void setHidePublicPage( boolean hidePublicPage )
     {
         this.hidePublicPage = hidePublicPage;
+    }
+
+
+    public boolean getIncludeForTransactionMonitor()
+    {
+        return includeForTransactionMonitor;
+    }
+
+
+    public void setIncludeForTransactionMonitor( boolean includeForTransactionMonitor )
+    {
+        this.includeForTransactionMonitor = includeForTransactionMonitor;
     }
 
 

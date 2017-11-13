@@ -8278,5 +8278,17 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     {
         return organizationUnitSettingsDao.getHiddenPublicPagesEntityIds( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
     }
+    
 
+    @Transactional
+    @Override
+    public List<OrganizationUnitSettings> getCompaniesForTransactionMonitor()
+    {
+        return organizationUnitSettingsDao.getCompaniesForTransactionMonitor();
+    }
+
+    @Override
+    public void updateTransactionMonitorSettingForCompany(long companyId, boolean includeForTransactionMonitor){
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden( MongoOrganizationUnitSettingDaoImpl.KEY_INCLUDE_FOR_TRANSACTION_MONITOR, includeForTransactionMonitor, companyId , MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+    }
 }

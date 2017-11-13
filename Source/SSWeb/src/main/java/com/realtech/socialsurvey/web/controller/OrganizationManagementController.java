@@ -43,6 +43,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AccountsMaster;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ComplaintResolutionSettings;
 import com.realtech.socialsurvey.core.entities.DisplayMessage;
 import com.realtech.socialsurvey.core.entities.DotLoopCrmInfo;
@@ -762,6 +763,7 @@ public class OrganizationManagementController
                 allowPartnerSurvey = unitSettings.getCrm_info().isAllowPartnerSurvey();
 
             model.addAttribute( "allowPartnerSurvey", allowPartnerSurvey );
+            model.addAttribute( "includeForTransactionMonitor", unitSettings.getIncludeForTransactionMonitor() );
 
 
             OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
@@ -3816,6 +3818,49 @@ public class OrganizationManagementController
                 error );
             return "Unable To Update Survey Mail Threshold.";
         }
+    }
+    
+    @ResponseBody
+    @RequestMapping ( value = "/getcompaniesfortransactionmonitor", method = RequestMethod.GET)
+    public String getCompaniesForTransactionMonitor()
+    {
+        LOG.info( "Method  getCompaniesForTransactionMonitor started" );   
+        List<OrganizationUnitSettings> companyList =  organizationManagementService.getCompaniesForTransactionMonitor();
+        LOG.info( "Method getCompaniesForTransactionMonitor() finished" );
+        return new Gson().toJson( companyList );
+    }
+
+    
+    @RequestMapping ( value = "/updatetransactionmonitorsettingforcompany", method = RequestMethod.GET)
+    @ResponseBody
+    public String updateTransactionMonitorSettingForCompany( HttpServletRequest request )
+    {
+        LOG.info( "Method to update updateTransactionMonitorSettingForCompany started" );
+
+        try {
+
+            HttpSession session = request.getSession();
+            long companyId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+
+            String updateTransactionMonitorSettingStr = request.getParameter( "updateTransactionMonitorSetting" );
+
+            boolean updateTransactionMonitorSetting = Boolean.parseBoolean( updateTransactionMonitorSettingStr );
+
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
+            if(companySettings == null){
+                throw new InvalidInputException("Wrong input passed. No company found for given id");
+            }
+           
+            organizationManagementService.updateTransactionMonitorSettingForCompany( companyId, updateTransactionMonitorSetting );
+
+
+        } catch ( Exception error ) {
+            LOG.error( "Exception occured in updateTransactionMonitorSettingForCompany(). Nested exception is ", error );
+            return error.getMessage();
+        }
+
+        LOG.info( "Method to update allow partner survey finished" );
+        return "success";
     }
 }
 // JIRA: SS-24 BY RM02 EOC
