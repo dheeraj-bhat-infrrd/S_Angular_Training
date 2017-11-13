@@ -1922,10 +1922,6 @@ public class DashboardController
     @RequestMapping ( value = "/restartsurvey")
     public void restartSurvey( HttpServletRequest request )
     {
-        String agentIdStr = request.getParameter( "agentId" );
-        String customerEmail = request.getParameter( "customerEmail" );
-        String firstName = request.getParameter( "firstName" );
-        String lastName = request.getParameter( "lastName" );
         String surveyId = request.getParameter( "surveyId" );
         try {
 
@@ -1933,18 +1929,15 @@ public class DashboardController
                 throw new InvalidInputException( "Passed parameter survey id is null or empty" );
             }
 
-            if ( agentIdStr == null || agentIdStr.isEmpty() ) {
-                throw new InvalidInputException( "Invalid value (Null/Empty) found for agentId." );
-            }
-            long agentId = Long.parseLong( agentIdStr );
             surveyHandler.changeStatusOfSurvey( surveyId, true );
             SurveyDetails survey = surveyHandler.getSurveyDetails( surveyId );
+            long agentId = survey.getAgentId();
             User user = userManagementService.getUserByUserId( agentId );
             Map<String, String> urlParams = urlGenerator.decryptUrl( survey.getUrl() );
             urlParams.put( CommonConstants.URL_PARAM_RETAKE_SURVEY, "true" );
             String updatedUrl = urlGenerator.generateUrl( urlParams,
                 surveyHandler.getApplicationBaseUrl() + CommonConstants.SHOW_SURVEY_PAGE_FOR_URL );
-            surveyHandler.sendSurveyRestartMail( firstName, lastName, customerEmail, survey.getCustRelationWithAgent(), user,
+            surveyHandler.sendSurveyRestartMail( survey.getCustomerFirstName(), survey.getCustomerLastName(), survey.getCustomerEmail(), survey.getCustRelationWithAgent(), user,
                 updatedUrl );
         } catch ( NonFatalException e ) {
             LOG.error( "NonfatalException caught in makeSurveyEditable(). Nested exception is ", e );
@@ -1957,22 +1950,11 @@ public class DashboardController
     @ResponseBody
     @RequestMapping ( value = "/reportabuse")
     public String reportAbuse( HttpServletRequest request )
-    {
-        String customerEmail = request.getParameter( "customerEmail" );
-        String firstName = request.getParameter( "firstName" );
-        String lastName = request.getParameter( "lastName" );
-        String review = request.getParameter( "review" );
-        String reason = request.getParameter( "reportText" );
+    {   String reason = request.getParameter( "reportText" );
         String surveyMongoId = request.getParameter( "surveyMongoId" );
 
         try {
-            long agentId = 0;
             try {
-                String agentIdStr = request.getParameter( "agentId" );
-                if ( agentIdStr == null || agentIdStr.isEmpty() ) {
-                    throw new InvalidInputException( "Invalid value (Null/Empty) found for agentId." );
-                }
-                agentId = Long.parseLong( agentIdStr );
             } catch ( NumberFormatException e ) {
                 LOG.error( "NumberFormatException caught in reportAbuse() while converting agentId." );
                 throw e;
@@ -1981,28 +1963,18 @@ public class DashboardController
             if ( surveyMongoId == null || surveyMongoId.isEmpty() ) {
                 throw new InvalidInputException( "Invalid value (Null/Empty) found for surveyMongoId." );
             }
+            
+            SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( surveyMongoId );
 
-            String customerName = firstName + " " + lastName;
-            if ( firstName == null || firstName.isEmpty() ) {
-                User user = sessionHelper.getCurrentUser();
-                customerName = user.getFirstName() + " " + user.getLastName();
-            }
-
-            String agentName = "";
-            try {
-                agentName = solrSearchService.getUserDisplayNameById( agentId );
-            } catch ( SolrException e ) {
-                LOG.info( "Solr Exception occured while fetching agent name. Nested exception is ", e );
-                throw e;
-            }
-
+            String customerName = surveyDetails.getCustomerFirstName() + " " + surveyDetails.getCustomerLastName();
+          
             //make survey as abusive
-            surveyHandler.updateSurveyAsAbusive( surveyMongoId, customerEmail, customerName );
+            surveyHandler.updateSurveyAsAbusive( surveyMongoId, surveyDetails.getCustomerEmail(), customerName );
 
             // Calling email services method to send mail to the Application
             // level admin.
-            emailServices.sendReportAbuseMail( applicationSupportEmail, applicationAdminName, agentName,
-                customerName.replaceAll( "null", "" ), customerEmail, review, reason, null, null );
+            emailServices.sendReportAbuseMail( applicationSupportEmail, applicationAdminName, surveyDetails.getAgentName(),
+                customerName.replaceAll( "null", "" ), surveyDetails.getCustomerEmail(), surveyDetails.getReview(), reason, null, null );
         } catch ( NonFatalException e ) {
             LOG.error( "NonfatalException caught in reportAbuse(). Nested exception is ", e );
             return CommonConstants.ERROR;

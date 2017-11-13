@@ -166,6 +166,7 @@
 				<value>com.realtech.socialsurvey.core.entities.SurveyResultsReportBranch</value>
 				<value>com.realtech.socialsurvey.core.entities.SurveyResultsReportRegion</value>
 				<value>com.realtech.socialsurvey.core.entities.CompanyDetailsReport</value>
+				<value>com.realtech.socialsurvey.core.entities.ReportingSurveyPreInititation</value>
 			</list>
 		</property>
 	</bean>
