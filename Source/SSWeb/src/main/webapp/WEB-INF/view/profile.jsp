@@ -447,6 +447,12 @@
 										title="LinkedIn"></div>
 								</c:if>
 								<c:if
+									test="${not empty profile.socialMediaTokens.googleBusinessToken && not empty profile.socialMediaTokens.googleBusinessToken.googleBusinessLink}">
+									<div id="icn-google-business" class="float-left social-item-icon icn-google-business"
+										data-link="${profile.socialMediaTokens.googleBusinessToken.googleBusinessLink}"
+										title="Google Business Rate &amp; Review Link"></div>
+								</c:if>				
+								<c:if
 									test="${not empty profile.socialMediaTokens.googleToken && not empty profile.socialMediaTokens.googleToken.profileLink}">
 									<div id="icn-gplus"
 										class="float-left social-item-icon icn-gplus"

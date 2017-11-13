@@ -1481,16 +1481,16 @@ public interface OrganizationManagementService
     public List<EncompassSdkVersion> getActiveEncompassSdkVersions();
 
 
-    String getEncompassHostByVersion( String sdkVersion ) throws InvalidInputException;
+    public String getEncompassHostByVersion( String sdkVersion ) throws InvalidInputException;
 
 
-    List<Company> getAllActiveEnterpriseCompanies();
+    public List<Company> getAllActiveEnterpriseCompanies();
 
 
-    List<Company> getCompaniesByCompanyIds( Set<Long> companyIds );
+    public List<Company> getCompaniesByCompanyIds( Set<Long> companyIds );
 
 
-    Map<Long, Long> getUsersCountForCompanies();
+    public Map<Long, Long> getUsersCountForCompanies();
 
 
     public List<Long> getHiddenPublicPageCompanyIds();
@@ -1503,5 +1503,13 @@ public interface OrganizationManagementService
 
 
     public List<Long> getHiddenPublicPageUserIds();
+
+    public List<OrganizationUnitSettings> getCompaniesForTransactionMonitor();
+
+
+    void updateTransactionMonitorSettingForCompany( long companyId, boolean includeForTransactionMonitor );
+
+    public String getFacebookPixelImageTagsFromHierarchy( OrganizationUnitSettings companySettings,
+        OrganizationUnitSettings regionSettings, OrganizationUnitSettings branchSetting, OrganizationUnitSettings unitSettings );
 
 }

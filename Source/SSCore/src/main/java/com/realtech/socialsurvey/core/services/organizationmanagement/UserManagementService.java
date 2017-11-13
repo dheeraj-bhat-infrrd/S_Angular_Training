@@ -640,7 +640,7 @@ public interface UserManagementService
     public void updateLastInviteSentDateIfUserExistsInDB( String emailId );
 
     
-    User getActiveAgentByEmailAndCompany( long companyId, String emailId ) throws InvalidInputException,
+    public User getActiveAgentByEmailAndCompany( long companyId, String emailId ) throws InvalidInputException,
         NoRecordsFetchedException;
 
 }
