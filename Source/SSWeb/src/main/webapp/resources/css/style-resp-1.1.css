@@ -418,6 +418,13 @@
     border-radius: 0;
 	}
 	
+	.single-review-popup-hdr-wrapper{
+    background: #f2f2f2;
+    padding: 2.5% 2.5% 2.5% 2.5%;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+}
+	
 	.sr-popup-hdr-details {
 	display: grid;
 	padding-left: 5%;
@@ -447,6 +454,7 @@
 	
 	.sr-margin-bottom-50 {
     margin-bottom: 40px;
+    width: 90%;
 	}
 	
 	.sr-review-content {
@@ -458,7 +466,7 @@
     display: grid;
     padding-top: 25px;
     float: right;
-    padding-right: 45px;
+    padding-right: 30px;
     padding-left: 30px;
 	}
 	
@@ -469,36 +477,16 @@
     line-height: unset;
 	}
 	
-	.sr-wc-btn-row {
-    height: 70px;
-    background: #f2f2f2;
-    line-height: 40px;
-    padding: 0 10px;
-    margin-top: 40px;
-	}
-	
 	.sr-report-review {
-    margin-left: 30px;
-    margin-top: 20px;
-	}
-	
-	.sr-wc-dash-btn {
-	margin-top: 15px;
-    margin-left: auto;
-    width: 170px;
-    float: none;
-    position: absolute;
-    right: 5px;
-	}
-	
-	.sr-wc-sub-send-btn{
-	  	width: auto;
-  		padding: 0 3px;
-  		margin-left:0;
+	    width: 170px;
+    	padding-left: 5%;
 	}
 	
 	.sr-wc-btn-col {
-		padding:0;
+	margin-right: 6%;
+    margin-top: 0.8%;
+    float: right !important;
+	margin-left: 0% !important;
 	}
 }
 

@@ -139,6 +139,7 @@
                               <br><span><a class="view-zillow-link" href="${singleReviewItem.sourceId}"  target="_blank">View on zillow</a></span>
                         </c:if>
 					</div>
+					
 				</div>
 			</div>
 			<div class="clearfix sr-wc-btn-row">
@@ -151,7 +152,7 @@
 					<span class="sr-report-review-span">report this review</span>
 				</div>
 				<c:if test="${ not empty agentFirstNameValue }">
-					<div class="sr-wc-btn-col float-left clearfix sr-wc-dash-btn">
+					<div class="sr-wc-btn-col float-left">
 						<div id="single-review-contact-btn" class="sr-wc-sub-send-btn float-left wc-final-submit">
 							<span class="capitalize">Contact ${agentFirstNameValue}</span>
 						</div>

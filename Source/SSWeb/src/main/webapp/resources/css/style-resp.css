@@ -2772,8 +2772,18 @@
 	}
 	
 	.sr-popup-hdr-details {
-	display: grid;
-	padding-left: 7%;
+	display: grid !important;
+	padding-left: 7% !important;
+	}
+	
+	.sr-wc-btn-col {
+    margin-right: 5% !important;
+    margin-top: 0.8% !important;
+	}
+	
+	.sr-report-review {
+    width: 150px !important;
+    padding-left: 3% !important;
 	}
 }
 
