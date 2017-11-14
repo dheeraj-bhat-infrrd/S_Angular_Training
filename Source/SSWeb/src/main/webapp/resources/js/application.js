@@ -1677,7 +1677,7 @@ function showProcSurveyGraph(columnName,companyId, numberOfDays, companyDetails,
 				
 				showProcSurveyGraph("company", companyDetails[currentId].iden, 14, companyDetails, currentId);
 				
-			}, 60000);
+			}, 30000);
 		},
 		error : function(e) {
 			isSurveydetailsforgraph = false;
@@ -1712,6 +1712,8 @@ function paintProcSurveyGraph() {
 	var type = 'Date';
 
 	var keys = getKeysFromGraphFormat(format);
+	//remove today's date
+	keys.pop();
 
 	for (var i = 0; i < keys.length; i++) {
 		allTimeslots[i] = convertYearMonthDayKeyToMonthDay(keys[i]);		
@@ -1749,7 +1751,7 @@ function paintProcSurveyGraph() {
 			}
 			
 			var keyFormattedDate = formattedDate.getFullYear().toString() + monthStr + dayStr;
-			if(keys.indexOf(keyFormattedDate)){
+			if(keys.indexOf(keyFormattedDate) > -1){
 				var index = keys.indexOf(keyFormattedDate);
 				totalReceivedTransactionsCount[index] =  graphDataEntity.transactionReceivedCount;
 				completedTransactionCount[index] =  graphDataEntity.surveycompletedCount;
@@ -1891,7 +1893,9 @@ function paintOverallSurveyGraph() {
 	
 
 	var keys = getKeysFromGraphFormat(format);
-
+	//remove today's date
+	keys.pop();
+	
 	for (var i = 0; i < keys.length; i++) {
 		allTimeslots[i] = convertYearMonthDayKeyToMonthDay(keys[i]);
 		totalReceivedTransactionsCount[i] =  0;
@@ -1928,7 +1932,7 @@ function paintOverallSurveyGraph() {
 			}
 			
 			var keyFormattedDate = formattedDate.getFullYear().toString() + monthStr + dayStr;
-			if(keys.indexOf(keyFormattedDate)){
+			if(keys.indexOf(keyFormattedDate) > -1){
 				var index = keys.indexOf(keyFormattedDate);
 				totalReceivedTransactionsCount[index] =  graphDataEntity.transactionReceivedCount;
 				completedTransactionCount[index] =  graphDataEntity.surveycompletedCount;
