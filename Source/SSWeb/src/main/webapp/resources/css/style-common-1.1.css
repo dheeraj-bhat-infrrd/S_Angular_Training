@@ -773,7 +773,8 @@ input#find-pro-submit{
 
 .sr-reviewed-by{
 	font-weight: bold !important;
-    margin-bottom: 30px;	
+    margin-bottom: 30px;
+    word-wrap: break-word;	
 }
 
 .sr-margin-bottom-50{
@@ -838,6 +839,10 @@ input#find-pro-submit{
 
 .sr-wc-btn-col {
     margin-left: 15%;
+}
+
+.sr-wc-btn-col-zillow {
+	    margin-left: 40%;
 }
 
 .sr-wc-sub-send-btn {

@@ -488,6 +488,10 @@
     float: right !important;
 	margin-left: 0% !important;
 	}
+	
+	.sr-wc-btn-col-zillow {
+		margin: 1% 30%;
+	}
 }
 
 

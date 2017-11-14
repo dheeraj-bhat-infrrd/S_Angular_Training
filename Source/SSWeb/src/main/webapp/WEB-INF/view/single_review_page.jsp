@@ -10,7 +10,15 @@
 	
 		<c:set value="${ reviewAggregate.review }" var = "singleReviewItem"></c:set>
 		
-		<c:set value="${ singleReviewItem.customerFirstName } ${ singleReviewItem.customerLastName }" var="customerName"></c:set>
+		<c:if test="${ not empty singleReviewItem.customerLastName }">
+			<c:set value="${ singleReviewItem.customerFirstName } ${ singleReviewItem.customerLastName }" var="customerName"></c:set>
+		</c:if>
+		
+		<c:if test="${ empty singleReviewItem.customerLastName }">
+			<c:set value="${ singleReviewItem.customerFirstName }" var="customerName"></c:set>
+		</c:if>
+		
+		
 		<c:set value="${fn:split(customerName, ' ')}" var="nameArray"></c:set>
 		
 		<c:choose>
@@ -91,11 +99,11 @@
 					<div>Share this Review</div>
 					<div class="ppl-share-wrapper clearfix share-plus-height" >
 						<div class="float-left clearfix ppl-share-social ">
-							<span id ="fb_" class="float-left ppl-share-icns icn-fb-rev icn-fb-pp" title="Facebook" ></span>
+							<span id ="fb_" class="float-left ppl-share-icns sr-icn-fb-rev icn-fb-pp" title="Facebook" ></span>
 							<input type="hidden" id="twttxt_" class ="twitterText_loop" /></input>
-							<span id ="twitt_" class="float-left ppl-share-icns icn-twit-rev icn-twit-pp" title="Twitter"></span>
-							<span class="float-left ppl-share-icns icn-lin-rev icn-lin-pp" title="LinkedIn"></span>
-							<span class="float-left" title="Google+"> <button class="g-interactivepost float-left ppl-share-icns icn-gplus-rev"> <span class="icon">&nbsp;</span> <span class="label">share</span> </button> </span>
+							<span id ="twitt_" class="float-left ppl-share-icns sr-icn-twit-rev icn-twit-pp" title="Twitter"></span>
+							<span class="float-left ppl-share-icns sr-icn-lin-rev icn-lin-pp" title="LinkedIn"></span>
+							<span class="float-left" title="Google+"> <button class="g-interactivepost float-left ppl-share-icns sr-icn-gplus-rev"></button> </span>
 						</div>
 					</div>		
 				</div>
@@ -143,20 +151,33 @@
 				</div>
 			</div>
 			<div class="clearfix sr-wc-btn-row">
-				<div class="float-left sr-report-review" id="report-review-wrapper">
-					<div class="float-left dash-flag-retake ">
-						<div class="clearfix">
-							<div class="icn-flag float-left report-abuse-txt sr-prof-report-abuse-txt cursor-pointer " title="Report"></div>
+				<c:if test="${singleReviewItem.source != 'Zillow' }">
+					<div class="float-left sr-report-review" id="report-review-wrapper">
+						<div class="float-left dash-flag-retake ">
+							<div class="clearfix">
+								<div class="sr-icn-flag float-left report-abuse-txt sr-prof-report-abuse-txt cursor-pointer " title="Report"></div>
+							</div>
 						</div>
+						<span class="sr-report-review-span">report this review</span>
 					</div>
-					<span class="sr-report-review-span">report this review</span>
-				</div>
+				</c:if>
 				<c:if test="${ not empty agentFirstNameValue }">
-					<div class="sr-wc-btn-col float-left">
-						<div id="single-review-contact-btn" class="sr-wc-sub-send-btn float-left wc-final-submit">
-							<span class="capitalize">Contact ${agentFirstNameValue}</span>
-						</div>
-					</div>
+					<c:choose>
+						<c:when test="${singleReviewItem.source != 'Zillow' }">
+							<div class="sr-wc-btn-col float-left">
+								<div id="single-review-contact-btn" class="sr-wc-sub-send-btn float-left wc-final-submit">
+									<span class="capitalize">Contact ${agentFirstNameValue}</span>
+								</div>
+							</div>
+						</c:when>
+						<c:otherwise>
+							<div class="sr-wc-btn-col-zillow float-left">
+								<div id="single-review-contact-btn" class="sr-wc-sub-send-btn float-left wc-final-submit">
+									<span class="capitalize">Contact ${agentFirstNameValue}</span>
+								</div>
+							</div>
+						</c:otherwise>
+					</c:choose>
 				</c:if>
 			</div>
 		</div>

@@ -799,6 +799,8 @@
 				 	$('body').removeClass("overflow-hidden-important");
 				 }
 			 });
+			 
+			setUpPopupDismissListeners();
 			
 			if ($('#social-token-container').children('.social-item-icon').length == 0) {
 				$('#social-token-container').remove();
@@ -839,7 +841,9 @@
 				gaLabel = 'company';
 				gaName = companyProfileName;
 			}
-
+			
+			setUpReviewPopupListener();
+			
 			$(window).resize(adjustImage);
 
 			//update google analytics
@@ -855,6 +859,7 @@
 					'eventValue' : gaName
 				});
 			}, 5000);
+			
 		});
 	</script>
 </body>

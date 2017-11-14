@@ -744,7 +744,7 @@ function paintReviews(result){
 		}
 		
 		reviewsHtml = reviewsHtml +
-			'<div class="' + lastItemClass + '" data-cust-first-name=' + encodeURIComponent(reviewItem.customerFirstName)
+			'<div class="' + lastItemClass + ' cursor-pointer' + '" data-cust-first-name=' + encodeURIComponent(reviewItem.customerFirstName)
 				+ ' data-cust-last-name=' + encodeURIComponent(reviewItem.customerLastName) + ' data-agent-name=' + encodeURIComponent(reviewItem.agentName)
 				+ ' data-rating=' + reviewItem.score + ' data-review="' + escapeHtml(reviewItem.review) + '" data-customeremail="'
 				+ reviewItem.customerEmail + '" data-agentid="' + reviewItem.agentId + '" survey-mongo-id="' + reviewItem._id + '">';
@@ -923,7 +923,8 @@ function stringEscape(str) {
 
 //invokes the google plus js that binds the click events to the popup
 function gplusInvoke() {
-      $('.g-interactivepost').on('click', function(){
+      $('.g-interactivepost').on('click', function(e){
+    	  e.stopPropagation();
         var post = $(this).attr('data-prefilltext');
         $(this).attr('data-prefilltext', decodeURIComponent(post));
       });
@@ -948,11 +949,13 @@ $(document).on('mouseleave','.ppl-review-item-last',function(e){
 });*/
 
 
-$(document).on('click','.review-more-button',function(){
+$(document).on('click','.review-more-button',function(e){
+	e.stopPropagation();
 	$(this).parent().find('.review-less-text').hide();
 	$(this).parent().find('.review-complete-txt').show();
 	$(this).hide();
 });
+
 $(document).on('click', '#report-abuse-pop-up', function(e){
 	e.stopPropagation();
 });
@@ -2067,7 +2070,8 @@ $('#prof-review-item').on('click', '.icn-remove', function(){
     $(this).parent().find('.icn-plus-open').show();
 });
 
-$('#prof-review-item').on('click', '.ppl-share-icns', function() {
+$('#prof-review-item').on('click', '.ppl-share-icns', function(e) {
+	e.stopPropagation();
 	var link = $(this).attr('data-link');
 	var title = $(this).attr('title');
 	if (link == undefined || link == "") {
@@ -2099,6 +2103,52 @@ function fetchGoogleMapApi(callBackFunction) {
 		},
 		error : function(e) {
 			redirectErrorpage();
+		}
+	});
+}
+
+function setUpReviewPopupListener(){
+	$(document).on('click','.ppl-review-item, .ppl-review-item-last',function(event){
+		
+		// exceptions
+		if( $('.view-zillow-link').is( event.target ) ){
+			return;
+		}
+		
+		event.stopPropagation();
+		var reviewSurveyId = $(this).attr('survey-mongo-id');
+		if( reviewSurveyId != undefined && reviewSurveyId != "" ){
+			loadIndividualReviewPageInPublicProfile( reviewSurveyId );
+		}
+	});
+}
+
+function loadIndividualReviewPageInPublicProfile( mongoSurveyId ){
+	if( mongoSurveyId != undefined || mongoSurveyId != "" ){
+		if( window.location.href[ window.location.href.length - 1 ] == '/' ){
+			window.location.href = window.location.href + mongoSurveyId;
+		} else {
+			window.location.href = window.location.href + '/' + mongoSurveyId;
+		}
+	}
+}
+
+function setUpPopupDismissListeners(){
+	$(document).keyup(function(e) {
+		if( !$('#single-review-page').hasClass('hide') ){
+		  if ( e.keyCode === 27 ) {
+			  $('#dismiss-single-review-popup').trigger('click');
+		  }
+		}
+	});
+
+	$(document).mouseup(function(e) {
+		if( !$('#single-review-page').hasClass('hide') ){
+			var target = e.target;
+			var container = $('#single-review-popup');
+		  if ( !container.is(target) && container.parent().is( target ) && container.has(target).length == 0 ) {
+			  $('#dismiss-single-review-popup').trigger('click');
+		  }
 		}
 	});
 }
