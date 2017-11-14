@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.QueryParam;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
@@ -5515,6 +5516,43 @@ public class ProfileManagementController
         }
         return response;
 
+    }
+    
+    
+    @RequestMapping ( value = "/updatefacebookpixelid", method = RequestMethod.POST)
+    public String updateFacebookPixelId( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method updateFacebookPixelId() called from ProfileManagementController" );
+        HttpSession session = request.getSession( false );
+
+        try {
+            UserSettings userSettings = (UserSettings) session
+                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
+                .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
+            long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+            String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+            if ( userSettings == null || profileSettings == null || entityType == null ) {
+                throw new InvalidInputException( "No user settings found in session", DisplayMessageConstants.GENERAL_ERROR );
+            }
+
+            String pixelId = request.getParameter( "pixelId" );
+            if ( StringUtils.isEmpty( pixelId ) ) {
+                  throw new InvalidInputException( "pixelId passed was null or empty", DisplayMessageConstants.GENERAL_ERROR );
+             }
+            
+            profileManagementService.updateFacebookPixelId( entityType,  entityId,  pixelId, userSettings );
+
+            model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.FACEBOOK_PIXEL_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
+        } catch ( NonFatalException nonFatalException ) {
+            LOG.error( "NonFatalException while updating ZillowLink in profile. Reason :" + nonFatalException.getMessage(),
+                nonFatalException );
+            model.addAttribute( "message", messageUtils.getDisplayMessage(
+                DisplayMessageConstants.LENDINGTREE_TOKEN_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE ) );
+        }
+
+        LOG.info( "Method updateLendingTreeLink() finished from ProfileManagementController" );
+        return JspResolver.MESSAGE_HEADER;
     }
 
 }

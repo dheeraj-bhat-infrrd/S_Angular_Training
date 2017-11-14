@@ -750,7 +750,7 @@
 				<!-- <ref bean="hideUsersFromSearch" />	-->
 				<!-- <ref bean="surveysourceidupdater" /> -->
 				<!-- <ref bean="surveyquestionupdater" /> -->	
-				<!-- <ref bean="monthlydigeststarter" /> -->
+				<ref bean="monthlydigeststarter" />
 				<ref bean="transactionActivityMonitorJobDetail" />	
 			</list>
 		</property>
@@ -787,7 +787,7 @@
 				<!--  <ref bean="deleteUsedVendastaTicketscron" />-->	
 				<!-- <ref bean="surveysourceidupdatercron" /> -->
 				<!-- <ref bean="surveyquestionupdatercron" /> -->
-				<!-- <ref bean="monthlydigeststartercron" /> -->
+				<ref bean="monthlydigeststartercron" />
 				<ref bean="transactionActivityMonitorCron" />
 			</list>
 		</property>

@@ -111,6 +111,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_ALLOW_PARTNER_SURVEY = "allowPartnerSurvey";
     public static final String KEY_SEND_MONTHLY_DIGEST_MAIL = "sendMonthlyDigestMail";
     public static final String KEY_HIDE_PUBLIC_PAGE = "hidePublicPage";
+    public static final String KEY_INCLUDE_FOR_TRANSACTION_MONITOR = "includeForTransactionMonitor";
 
 
 
@@ -1069,6 +1070,25 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         
         LOG.debug( "method getHiddenPublicPagesEntityIds finished for collection {} " , collection );
         return entityIds;
+    
+        
+    }
+    
+    @Override
+    public List<OrganizationUnitSettings> getCompaniesForTransactionMonitor()
+    {
+        LOG.debug( "method getCompaniesForTransactionMonitor started ");
+        
+        Query query = new Query();
+        query.fields().include( KEY_IDEN ).include( KEY_CONTACT_DETAILS );
+        query.addCriteria( Criteria.where( KEY_STATUS )
+            .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) ) );
+        query.addCriteria( Criteria.where( KEY_INCLUDE_FOR_TRANSACTION_MONITOR ).is( true ) );
+                
+        List<OrganizationUnitSettings> settings = mongoTemplate.find( query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION );
+        
+        LOG.debug( "method getCompaniesForTransactionMonitor finished ");
+        return settings;
     
         
     }
