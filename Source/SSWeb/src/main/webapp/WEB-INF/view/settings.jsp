@@ -94,6 +94,13 @@
 									<div class="float-left customized-settings-child cust-resp-txt">Allow partner survey</div>
 								</c:if>
 								
+								<!-- transaction monitor settings -->
+								<c:if test="${ isRealTechOrSSAdmin == true and columnName == 'companyId' }">
+									<div id="incld-fr-trans-mntr-chk-box" class="float-left bd-check-img clear-both"></div>
+									<input type="hidden" id="incld-fr-trans-mntr-cb" name="includeForTransactionMonitor" value="${includeForTransactionMonitor}">
+									<div class="float-left customized-settings-child cust-resp-txt">Include for transaction monitor</div>
+								</c:if>
+								
 								<c:if test="${ columnName != 'agentId' and accountMasterId != 1 }">
 									<div id="vndsta-access-chk-box" class="float-left bd-check-img clear-both"></div>
 									<input type="hidden" id="vndsta-access-cb" name="vendastaaccess" value="${vendastaAccess}">

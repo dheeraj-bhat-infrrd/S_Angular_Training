@@ -213,6 +213,7 @@ public interface CommonConstants
     public static final String PROFILE_VALUE_COLUMN = "profileValue";
     public static final String PROFILE_LEVEL_COLUMN = "profileLevel";
     public static final String ENCOMPASS_SDK_VERSION_COLUMN = "sdkVersion";
+    public static final String INCLUDE_IN_TRANSACTION_MONITOR = "includeInTransactionMonitor";
 
     //batch type constant for batch tracker
     public static final String BATCH_TYPE_REVIEW_COUNT_UPDATER = "reviewCountUpdater";
@@ -431,6 +432,7 @@ public interface CommonConstants
     public static final String ZILLOW_SOCIAL_SITE = "zillow";
     public static final String YELP_SOCIAL_SITE = "yelp";
     public static final String LENDINGTREE_SOCIAL_SITE = "lendingtree";
+    public static final String FACEBOOK_PIXEL_ID = "facebookPixelId";
     public static final String REALTOR_SOCIAL_SITE = "realtor";
     public static final String GOOGLE_BUSINESS_SOCIAL_SITE = "google business";
     public static final String GOOGLE_SOCIAL_SITE = "google";

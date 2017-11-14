@@ -683,4 +683,8 @@ public interface ProfileManagementService
     public Integer fetchAndSaveNmlsId( OrganizationUnitSettings profile, String collectionName, long companyId,
         boolean fromBatch, boolean fromPublicPage ) throws InvalidInputException, UnavailableException;
 
+
+    public void updateFacebookPixelId( String entityType, long entityId, String pixelId, UserSettings userSettings )
+        throws NonFatalException;
+
 }

@@ -275,5 +275,11 @@ public interface OrganizationUnitSettingsDao
     public List<OrganizationUnitSettings> getCompaniesOptedForSendingMonthlyDigest(int startIndex, int batchSize);
 
 
-    List<Long> getHiddenPublicPagesEntityIds( String collection );
+    public List<Long> getHiddenPublicPagesEntityIds( String collection );
+
+    /**
+     * 
+     * @return
+     */
+    public List<OrganizationUnitSettings> getCompaniesForTransactionMonitor();
 }
