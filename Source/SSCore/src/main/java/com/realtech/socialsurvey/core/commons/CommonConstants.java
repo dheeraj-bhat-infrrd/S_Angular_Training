@@ -975,6 +975,7 @@ public interface CommonConstants
     public static final int FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT = 106;
     public static final int FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT = 107;
     public static final int FILE_UPLOAD_REPORTING_COMPANY_DETAILS_REPORT = 109;
+    public static final int FILE_UPLOAD_REPORTING_INCOMPLETE_SURVEY_REPORT = 108;
 
     
     public static final String AGENT_MEDIA_POST_DETAILS_COLUMN = "agentMediaPostDetails";
@@ -1368,10 +1369,11 @@ public interface CommonConstants
     //Note -> the USER_ADOPTION_REPORT was renamed to VERIFIED_USERS_REPORT
     public static final String REPORTING_VERIFIED_USERS_REPORT = "Verified Users Report";
     public static final String REPORTING_COMPANY_USERS_REPORT = "Company User Report";
-    public static final String REPORTING_SURVEY_REUSLTS_COMPANY_REPORT = "Survey Results Report";
+    public static final String REPORTING_SURVEY_RESULTS_COMPANY_REPORT = "Survey Results Report";
     public static final String REPORTING_SURVEY_TRANSACTION_REPORT = "Survey Transaction Report";
     public static final String REPORTING_USER_RANKING_MONTHLY_REPORT = "User Ranking Report For Month";
     public static final String REPORTING_USER_RANKING_YEARLY_REPORT = "User Ranking Report For Year";
+    public static final String REPORTING_INCOMPLETE_SURVEY_REPORT = "Incomplete Survey Results Report";
     public static final String REPORTING_API_DATE_FORMAT = "MMM dd, yyyy";
 
 

@@ -16,5 +16,5 @@ CREATE TABLE `company_details_report` (
   `facebook_connection_count` int(11) DEFAULT NULL,
   `twitter_connection_count` int(11) DEFAULT NULL,
   `linkedin_connection_count` int(11) DEFAULT NULL,
-  PRIMARY KEY (`company_details_id`)
+  PRIMARY KEY (`company_details_report_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

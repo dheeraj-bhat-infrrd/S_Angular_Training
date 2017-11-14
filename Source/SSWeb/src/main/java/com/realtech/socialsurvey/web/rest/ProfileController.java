@@ -1885,47 +1885,28 @@ public class ProfileController
     @RequestMapping ( value = "/surveyreportabuse")
     public String reportAbuse( HttpServletRequest request )
     {
-        String customerEmail = request.getParameter( "customerEmail" );
-        String firstName = request.getParameter( "firstName" );
-        String lastName = request.getParameter( "lastName" );
-        String review = request.getParameter( "review" );
         String reason = request.getParameter( "reportText" );
         String reporterName = request.getParameter( "reporterName" );
         String reporterEmail = request.getParameter( "reporterEmail" );
         String surveyMongoId = request.getParameter( "surveyMongoId" );
 
         try {
-            long agentId = 0;
-            try {
-                String agentIdStr = request.getParameter( "agentId" );
-                if ( agentIdStr == null || agentIdStr.isEmpty() ) {
-                    throw new InvalidInputException( "Invalid value (Null/Empty) found for agentId." );
-                }
-                agentId = Long.parseLong( agentIdStr );
-            } catch ( NumberFormatException e ) {
-                LOG.error( "NumberFormatException caught in reportAbuse() while converting agentId." );
-                throw e;
-            }
-
-            if ( surveyMongoId == null || surveyMongoId.isEmpty() ) {
+             if ( surveyMongoId == null || surveyMongoId.isEmpty() ) {
                 throw new InvalidInputException( "Invalid value (Null/Empty) found for surveyMongoId." );
             }
-
-            String customerName = firstName + " " + lastName;
-            String agentName = "";
-            try {
-                agentName = solrSearchService.getUserDisplayNameById( agentId );
-            } catch ( SolrException e ) {
-                LOG.info( "Solr Exception occured while fetching agent name. Nested exception is ", e );
-                throw e;
+            
+            SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( surveyMongoId );
+            if ( surveyDetails == null ) {
+                throw new InvalidInputException( "Invalid value. No survey found for surveyMongoId." );
             }
-
+            
             //make survey as abusive
             surveyHandler.updateSurveyAsAbusive( surveyMongoId, reporterEmail, reporterName );
 
+            String customerName = surveyDetails.getCustomerFirstName() + surveyDetails.getCustomerLastName();
             // Calling email services method to send mail to the Application level admin.
-            emailServices.sendReportAbuseMail( applicationAdminEmail, applicationAdminName, agentName,
-                customerName.replaceAll( "null", "" ), customerEmail, review, reason, reporterName, reporterEmail );
+            emailServices.sendReportAbuseMail( applicationAdminEmail, applicationAdminName, surveyDetails.getAgentName(),
+                customerName.replaceAll( "null", "" ), surveyDetails.getCustomerEmail(), surveyDetails.getReview(), reason, reporterName, reporterEmail );
 
             // Calling email services method to send mail to the reporter
             emailServices.sendSurveyReportMail( reporterEmail, reporterName, reason );
