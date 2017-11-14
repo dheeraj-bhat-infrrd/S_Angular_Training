@@ -5,7 +5,7 @@ DROP TABLE IF EXISTS digest;
 CREATE TABLE `digest` (
   `digest_id` varchar(45) NOT NULL,
   `company_id` int(11) unsigned DEFAULT NULL,
-  `company_name` varchar(45) DEFAULT NULL,
+  `company_name` varchar(250) DEFAULT NULL,
   `month` int(10) DEFAULT NULL,
   `year` int(10) DEFAULT NULL,
   `average_score_rating` decimal(10,2) DEFAULT NULL,
