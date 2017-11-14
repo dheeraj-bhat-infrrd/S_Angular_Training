@@ -94,16 +94,23 @@
 									<div class="float-left customized-settings-child cust-resp-txt">Allow partner survey</div>
 								</c:if>
 								
+								<!-- transaction monitor settings -->
+								<c:if test="${ isRealTechOrSSAdmin == true and columnName == 'companyId' }">
+									<div id="incld-fr-trans-mntr-chk-box" class="float-left bd-check-img clear-both"></div>
+									<input type="hidden" id="incld-fr-trans-mntr-cb" name="includeForTransactionMonitor" value="${includeForTransactionMonitor}">
+									<div class="float-left customized-settings-child cust-resp-txt">Include for transaction monitor</div>
+								</c:if>
+								
 								<c:if test="${ columnName != 'agentId' and accountMasterId != 1 }">
 									<div id="vndsta-access-chk-box" class="float-left bd-check-img clear-both"></div>
 									<input type="hidden" id="vndsta-access-cb" name="vendastaaccess" value="${vendastaAccess}">
 									<div class="float-left listing-access-txt cust-resp-txt" style="margin-bottom:0px;">Allow access to Listings Manager</div>
 								</c:if>
-								<!-- <c:if test="${ columnName == 'companyId' }">
+								<c:if test="${ columnName == 'companyId' }">
 									<div id="survey-mail-thrhld-chk-box" class="float-left bd-check-img clear-both"></div>
 									<input type="hidden" id="survey-mail-thrhld-cb" name="surveymailthrhld" value="${sendMonthlyDigestMail}">
 									<div class="float-left listing-access-txt cust-resp-txt">Send Monthly Digest Mail</div>
-								</c:if> -->
+								</c:if>
 							</c:if>
 							
 							<c:if test="${ columnName == 'companyId' }">
@@ -305,9 +312,9 @@ $(document).ready(function() {
 		$('#alw-ptnr-srvy-chk-box').addClass('bd-check-img-checked');
 	}
 	
-	/* if("${sendMonthlyDigestMail}" == "false" && "${isRealTechOrSSAdmin}" == "true"){
+	if("${sendMonthlyDigestMail}" == "false" && "${isRealTechOrSSAdmin}" == "true"){
 		$('#survey-mail-thrhld-chk-box').addClass('bd-check-img-checked');
-	} */
+	}
 	
 	var accountMasterId = "${accountMasterId}";
 	if (accountMasterId != 5) {

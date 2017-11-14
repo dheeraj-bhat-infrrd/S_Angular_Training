@@ -24,4 +24,6 @@ public interface CompanyTransactionsSourceStatsDao extends GenericReportingDao<C
     public List<CompanyTransactionsSourceStats> getTransactionsCountForCompanyForPastNDays( long companyId, Date startDate,
         Date endDate );
 
+    public List<CompanyTransactionsSourceStats> getOverallTransactionsCountForPastNDays( Date startDate, Date endDate );
+
 }

@@ -744,10 +744,7 @@ function paintReviews(result){
 		}
 		
 		reviewsHtml = reviewsHtml +
-			'<div class="' + lastItemClass + '" data-cust-first-name=' + encodeURIComponent(reviewItem.customerFirstName)
-				+ ' data-cust-last-name=' + encodeURIComponent(reviewItem.customerLastName) + ' data-agent-name=' + encodeURIComponent(reviewItem.agentName)
-				+ ' data-rating=' + reviewItem.score + ' data-review="' + escapeHtml(reviewItem.review) + '" data-customeremail="'
-				+ reviewItem.customerEmail + '" data-agentid="' + reviewItem.agentId + '" survey-mongo-id="' + reviewItem._id + '">';
+			'<div class="' + lastItemClass + ' data-rating=' + reviewItem.score + ' data-review="' + escapeHtml(reviewItem.review) + '" data-agentid="' + reviewItem.agentId + '" survey-mongo-id="' + reviewItem._id + '">';
 		reviewsHtml += '	<div class="ppl-header-wrapper clearfix">';
 		reviewsHtml += '    	<div class="float-left ppl-header-right">';
 		reviewsHtml += '    	    <div class="st-rating-wrapper maring-0 clearfix review-ratings" data-source="'+reviewItem.source+'" data-rating="'+reviewItem.score+'"></div>';
@@ -962,12 +959,6 @@ $(document).on('click', '.prof-report-abuse-txt', function(e) {
 	e.stopPropagation();
 	var reviewElement = $(this).parent().parent();
 	var payload = {
-		"customerEmail" : reviewElement.attr('data-customeremail'),
-		"agentId" : reviewElement.attr('data-agentid'),
-		"firstName" : reviewElement.attr('data-cust-first-name'),
-		"lastName" : reviewElement.attr('data-cust-last-name'),
-		"agentName" : reviewElement.attr('data-agent-name'),
-		"review" : reviewElement.attr('data-review'),
 		"surveyMongoId" : reviewElement.attr('survey-mongo-id')
 	};
 	
