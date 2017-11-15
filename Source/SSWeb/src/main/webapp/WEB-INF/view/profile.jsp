@@ -131,18 +131,22 @@
 		<span id="overlay-toast" class="overlay-toast"></span>
 	</div>
 	<c:if test="${not empty reviewAggregate}">
-		<c:choose>
-			<c:when test="${ reviewAggregate.surveyIdValid }">
-			<c:set value="true" var="popup" ></c:set>
-				<div id="single-review-page" class="overlay-login overlay-single-review">
-					<button type="button" class="close dismiss-single-review-popup" id="dismiss-single-review-popup">&times;</button>
-					<jsp:include page="single_review_page.jsp"></jsp:include>
-				</div>
-			</c:when>
-			<c:otherwise>
-			
-			</c:otherwise>
-		</c:choose>
+		<c:set value="true" var="popup" ></c:set>
+		<div id="single-review-page" class="overlay-login overlay-single-review">
+			<button type="button" class="close dismiss-single-review-popup" id="dismiss-single-review-popup">&times;</button>
+			<c:choose>
+				<c:when test="${ reviewAggregate.surveyIdValid }">
+						<jsp:include page="single_review_page.jsp"></jsp:include>
+				</c:when>
+				<c:otherwise>
+						<div id="single-review-popup" class="single-review-popup-wrapper">
+							<div class="invalid-message-div">
+								<span>${reviewAggregate.invalidMessage}</span>
+							</div>
+						</div>
+				</c:otherwise>
+			</c:choose>	
+		</div>
 	</c:if>
 	
 	<div id="report-abuse-overlay" class="overlay-main hide">
@@ -786,6 +790,7 @@
 	<script>
 		var hiddenSection = "${profile.hiddenSection}";
 		var reviewsSortBy = "${reviewSortCriteria}";
+		var pageUrl = "${pageUrl}";
 		var showAllReviews = false;
 		$(document).ready(function() {
 			
@@ -794,11 +799,24 @@
 			}
 			
 			 $('body').on('click','#dismiss-single-review-popup',function(e){
+				 
+				 // just to make sure the page is scrollable after the dissmissal of pop-up 
 				 $('#single-review-page').addClass('hide');
 				 if( $('body').hasClass("overflow-hidden-important") ){
 				 	$('body').removeClass("overflow-hidden-important");
 				 }
-			 });
+				 
+				 if( pageUrl != undefined && pageUrl != "" ){
+					 window.location.href = pageUrl;
+				 }
+			 });	 
+			 
+			 $('#single-review-contact-btn').on('click', function(e){
+				 e.stopPropagation();
+				 if( $(this).data('contact-link') != "" ){
+					 window.location.href = $(this).data('contact-link');
+				 }
+			 })
 			 
 			setUpPopupDismissListeners();
 			

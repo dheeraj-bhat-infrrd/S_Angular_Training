@@ -5716,9 +5716,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         LOG.debug( "method buildPublicProfileAggregate started for profile: {}", profileAggregate.getProfileName() );
 
-        Map<String, String> profileLevelData = getEntityAndCollectionDataByProfileLevel( profileAggregate.getProfileLevel() );
+        Map<String, String> profileLevelData = buildBasicProfileLevelData( profileAggregate );
         String entityId = profileLevelData.get( CommonConstants.ENTITY_ID_COLUMN );
         String collectionUnderConcern = profileLevelData.get( CommonConstants.COLLECTION_TYPE );
+
 
         Map<String, OrganizationUnitSettings> profileHierarchyMap = generateProfileHierarchyMap( profileAggregate );
 
@@ -5755,11 +5756,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         removeTokensFromProfile( profileUnderConcern );
 
         // populate profile aggregate
-        profileAggregate.setCompanyProfileName( profileAggregate.getCompanyProfileName() );
+        profileAggregate.setProfileUrl( profileLevelData.get( CommonConstants.PROFILE_URL ) );
         profileAggregate.setFindAProCompanyProfileName( companyProfile.getProfileName() );
         profileAggregate.setProfile( profileUnderConcern );
-        profileAggregate.setProfileLevel( profileAggregate.getProfileLevel() );
-        profileAggregate.setProfileName( profileAggregate.getProfileName() );
         profileAggregate.setProfileJson( new Gson().toJson(
             profileUnderConcern instanceof AgentSettings ? (AgentSettings) profileUnderConcern : profileUnderConcern ) );
         profileAggregate
@@ -6077,30 +6076,41 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private Map<String, String> getEntityAndCollectionDataByProfileLevel( String profileLevel ) throws InvalidInputException
+    private Map<String, String> buildBasicProfileLevelData( PublicProfileAggregate profileAggregate )
+        throws InvalidInputException
     {
         LOG.debug( "method getEntityAndCollectionDataByProfileLevel() running" );
         Map<String, String> profileLevelData = new HashMap<>();
+
+        String profileLevel = profileAggregate.getProfileLevel();
+        String baseProfileUrl = applicationBaseUrl + "pages/";
 
         if ( CommonConstants.PROFILE_LEVEL_COMPANY.equals( profileLevel ) ) {
             profileLevelData.put( CommonConstants.ENTITY_ID_COLUMN, CommonConstants.COMPANY_ID );
             profileLevelData.put( CommonConstants.COLLECTION_TYPE,
                 MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+            profileLevelData.put( CommonConstants.PROFILE_URL,
+                baseProfileUrl + CommonConstants.COMPANY + "/" + profileAggregate.getCompanyProfileName() );
 
         } else if ( CommonConstants.PROFILE_LEVEL_REGION.equals( profileLevel ) ) {
             profileLevelData.put( CommonConstants.ENTITY_ID_COLUMN, CommonConstants.REGION_ID );
             profileLevelData.put( CommonConstants.COLLECTION_TYPE,
                 MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+            profileLevelData.put( CommonConstants.PROFILE_URL, baseProfileUrl + CommonConstants.REGION_COLUMN + "/"
+                + profileAggregate.getCompanyProfileName() + "/" + profileAggregate.getProfileName() );
 
         } else if ( CommonConstants.PROFILE_LEVEL_BRANCH.equals( profileLevel ) ) {
             profileLevelData.put( CommonConstants.ENTITY_ID_COLUMN, CommonConstants.BRANCH_ID );
             profileLevelData.put( CommonConstants.COLLECTION_TYPE,
                 MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+            profileLevelData.put( CommonConstants.PROFILE_URL, baseProfileUrl + CommonConstants.OFFICE + "/"
+                + profileAggregate.getCompanyProfileName() + "/" + profileAggregate.getProfileName() );
 
         } else if ( CommonConstants.PROFILE_LEVEL_INDIVIDUAL.equals( profileLevel ) ) {
             profileLevelData.put( CommonConstants.ENTITY_ID_COLUMN, CommonConstants.AGENT_ID );
             profileLevelData.put( CommonConstants.COLLECTION_TYPE,
                 MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+            profileLevelData.put( CommonConstants.PROFILE_URL, baseProfileUrl + profileAggregate.getProfileName() );
 
         } else {
             LOG.error( "Invalid profile level in getEntityAndCollectionDataByProfileLevel()" );

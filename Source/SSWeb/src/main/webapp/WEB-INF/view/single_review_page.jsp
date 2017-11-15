@@ -97,7 +97,7 @@
                         </c:choose>
 					</div>
 					<div>Share this Review</div>
-					<div class="ppl-share-wrapper clearfix share-plus-height" >
+					<div class="ppl-share-wrapper clearfix share-plus-height sr-share-wrapper" >
 						<div class="float-left clearfix ppl-share-social ">
 							<span id ="fb_" class="float-left ppl-share-icns sr-icn-fb-rev icn-fb-pp" title="Facebook" ></span>
 							<input type="hidden" id="twttxt_" class ="twitterText_loop" /></input>
@@ -165,14 +165,14 @@
 					<c:choose>
 						<c:when test="${singleReviewItem.source != 'Zillow' }">
 							<div class="sr-wc-btn-col float-left">
-								<div id="single-review-contact-btn" class="sr-wc-sub-send-btn float-left wc-final-submit">
+								<div id="single-review-contact-btn" data-contact-link="${agentProfile.completeProfileUrl}" class="sr-wc-sub-send-btn float-left wc-final-submit">
 									<span class="capitalize">Contact ${agentFirstNameValue}</span>
 								</div>
 							</div>
 						</c:when>
 						<c:otherwise>
 							<div class="sr-wc-btn-col-zillow float-left">
-								<div id="single-review-contact-btn" class="sr-wc-sub-send-btn float-left wc-final-submit">
+								<div id="single-review-contact-btn" data-contact-link="${agentProfile.completeProfileUrl}" class="sr-wc-sub-send-btn float-left wc-final-submit">
 									<span class="capitalize">Contact ${agentFirstNameValue}</span>
 								</div>
 							</div>

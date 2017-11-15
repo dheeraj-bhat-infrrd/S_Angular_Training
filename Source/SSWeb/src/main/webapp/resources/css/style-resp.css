@@ -665,6 +665,9 @@
     .ppl-share-wrapper{
         line-height: 30px;
     }
+    .sr-share-wrapper {
+		margin-bottom: 5%;
+	}
     
     .float-left.icn-share.icn-plus-open{
         background-size: 24px;

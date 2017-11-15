@@ -10,6 +10,7 @@ import java.util.Map;
  */
 public class PublicProfileAggregate
 {
+    private String profileUrl;
     private Map<String, Long> hierarchyMap;
     private OrganizationUnitSettings profile;
     private String profileLevel;
@@ -28,6 +29,18 @@ public class PublicProfileAggregate
     private String completeBranchProfileUrl;
     private IndividualReviewAggregate reviewAggregate;
     private String surveyId;
+
+
+    public String getProfileUrl()
+    {
+        return profileUrl;
+    }
+
+
+    public void setProfileUrl( String profileUrl )
+    {
+        this.profileUrl = profileUrl;
+    }
 
 
     public Map<String, Long> getHierarchyMap()
@@ -249,9 +262,9 @@ public class PublicProfileAggregate
     @Override
     public String toString()
     {
-        return "PublicProfileAggregate [hierarchyMap=" + hierarchyMap + ", profile=" + profile + ", profileLevel="
-            + profileLevel + ", profileName=" + profileName + ", averageRating=" + averageRating + ", reviewCount="
-            + reviewCount + ", profileJson=" + profileJson + ", reviews=" + reviews + ", companyProfileName="
+        return "PublicProfileAggregate [profileUrl=" + profileUrl + ", hierarchyMap=" + hierarchyMap + ", profile=" + profile
+            + ", profileLevel=" + profileLevel + ", profileName=" + profileName + ", averageRating=" + averageRating
+            + ", reviewCount=" + reviewCount + ", profileJson=" + profileJson + ", reviews=" + reviews + ", companyProfileName="
             + companyProfileName + ", findAProCompanyProfileName=" + findAProCompanyProfileName + ", reviewSortCriteria="
             + reviewSortCriteria + ", isAgent=" + isAgent + ", hiddenSection=" + hiddenSection + ", completeCompanyProfileUrl="
             + completeCompanyProfileUrl + ", completeRegionProfileUrl=" + completeRegionProfileUrl

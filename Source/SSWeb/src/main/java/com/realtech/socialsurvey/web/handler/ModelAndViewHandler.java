@@ -61,6 +61,8 @@ public class ModelAndViewHandler
 
     private static final String REVIEW_AGGREGATE = "reviewAggregate";
 
+    private static final String PROFILE_URL = "pageUrl";
+
     @Autowired
     private BotRequestUtils botRequestUtils;
 
@@ -85,6 +87,7 @@ public class ModelAndViewHandler
         model.addAttribute( PROFILE_LEVEL, profileAggregate.getProfileLevel() );
         model.addAttribute( FIND_A_PRO_COMPANY_PROFILE_NAME, profileAggregate.getFindAProCompanyProfileName() );
         model.addAttribute( COMPANY_PROFILE_NAME, profileAggregate.getCompanyProfileName() );
+        model.addAttribute( PROFILE_URL, profileAggregate.getProfileUrl() );
 
         if ( CommonConstants.PROFILE_LEVEL_REGION.equals( profileAggregate.getProfileLevel() ) ) {
             model.addAttribute( REGION_PROFILE_NAME, profileAggregate.getProfileName() );

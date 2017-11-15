@@ -2246,6 +2246,10 @@ button.paypal.is-active {
 	/* opacity:0.1; */
 }
 
+.sr-share-wrapper {
+	margin-bottom: 10%;
+}
+
 .icn-rem-size {
 	background-size: 26px;
 }

@@ -1727,3 +1727,10 @@ span.footer-ul a:hover {
     width: 50px;
 	background-size: contain !important;
 }
+
+.invalid-message-div {
+	text-align: center;
+    padding: 10%;
+    font-size: x-large;
+    font-size: -webkit-x-large;
+}
