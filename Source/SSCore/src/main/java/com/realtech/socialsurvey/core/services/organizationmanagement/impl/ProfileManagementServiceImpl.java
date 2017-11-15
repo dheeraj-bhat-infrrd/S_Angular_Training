@@ -26,6 +26,7 @@ import javax.imageio.ImageIO;
 import javax.servlet.UnavailableException;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hibernate.HibernateException;
@@ -5783,6 +5784,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 
     private IndividualReviewAggregate buildReviewAggregate( PublicProfileAggregate profileAggregate )
+        throws InvalidInputException
     {
         LOG.debug( "method individualReviewAggregate() started." );
 
@@ -5800,6 +5802,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 
     private IndividualReviewAggregate validateAndProcessSurveyId( PublicProfileAggregate profileAggregate )
+        throws InvalidInputException
     {
         SurveyDetails review = null;
         AgentSettings agentSettings = null;
@@ -5845,9 +5848,23 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             }
         }
 
+        // set sourceID
+        if ( CommonConstants.SURVEY_SOURCE_ZILLOW.equalsIgnoreCase( review.getSource() )
+            && StringUtils.isEmpty( review.getSourceId() ) ) {
+            review.setSourceId( review.getCompleteProfileUrl() );
+        }
+
+        //This is added to get the agent's APP ID and profile URL 
+        //DO NOT REMOVE!
+        setAgentProfileUrlForReview( Arrays.asList( review ) );
+
+        // escape all the double quotes
+        review.setReview( StringEscapeUtils.escapeJava( review.getReview() ) );
+
         reviewAggregate.setSurveyIdValid( true );
         reviewAggregate.setAgentSettings( agentSettings );
         reviewAggregate.setReview( review );
+        reviewAggregate.setReviewJson( new Gson().toJson( review ) );
         return reviewAggregate;
 
     }

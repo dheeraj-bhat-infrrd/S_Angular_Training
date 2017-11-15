@@ -5,6 +5,7 @@ public class IndividualReviewAggregate
     private boolean surveyIdValid;
     private String invalidMessage;
     private SurveyDetails review;
+    private String reviewJson;
     private AgentSettings agentSettings;
 
 
@@ -44,6 +45,18 @@ public class IndividualReviewAggregate
     }
 
 
+    public String getReviewJson()
+    {
+        return reviewJson;
+    }
+
+
+    public void setReviewJson( String reviewJson )
+    {
+        this.reviewJson = reviewJson;
+    }
+
+
     public AgentSettings getAgentSettings()
     {
         return agentSettings;
@@ -59,7 +72,7 @@ public class IndividualReviewAggregate
     @Override
     public String toString()
     {
-        return "IndividualReviewAggregate [isSurveyIdValid=" + surveyIdValid + ", invalidMessage=" + invalidMessage
-            + ", review=" + review + ", agentSettings=" + agentSettings + "]";
+        return "IndividualReviewAggregate [surveyIdValid=" + surveyIdValid + ", invalidMessage=" + invalidMessage + ", review="
+            + review + ", reviewJson=" + reviewJson + ", agentSettings=" + agentSettings + "]";
     }
 }

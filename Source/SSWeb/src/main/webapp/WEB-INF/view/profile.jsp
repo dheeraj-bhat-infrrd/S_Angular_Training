@@ -793,9 +793,12 @@
 		var pageUrl = "${pageUrl}";
 		var showAllReviews = false;
 		$(document).ready(function() {
-			
+						
 			if( '${popup}' == "true" && !$('body').hasClass("overflow-hidden-important") ){
 			 	$('body').addClass("overflow-hidden-important");
+			 	
+			 	// post icons
+				buildReviewPopupShareData( ${reviewAggregate.reviewJson} );
 			}
 			
 			 $('body').on('click','#dismiss-single-review-popup',function(e){

@@ -23,7 +23,7 @@
 		
 		<c:choose>
 			<c:when test="${ not empty nameArray[1] }">
-				<c:set value="${ nameArray[0] } ${ nameArray[1].substring( 0, 1 ).toUpperCase() }." var="customerDisplayName"></c:set>
+				<c:set value="${ nameArray[0] } ${ nameArray[1].substring( 0, 1 ).toUpperCase() }" var="customerDisplayName"></c:set>
 			</c:when>
 			<c:otherwise>
 				<c:set value="${ nameArray[0] }" var="customerDisplayName"></c:set>
@@ -62,7 +62,7 @@
 			</div>
 			<div class="single-review-popup-body-wrapper clearfix">
 				<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 sr-review-details">
-					<span class="sr-reviewed-by">Reviewed By ${customerName}.</span>
+					<span class="sr-reviewed-by">Reviewed By ${customerDisplayName}.</span>
 					<div class="sr-margin-bottom-50">
 						<span>Wrote on </span> 
 						<c:choose>
@@ -98,12 +98,8 @@
 					</div>
 					<div>Share this Review</div>
 					<div class="ppl-share-wrapper clearfix share-plus-height sr-share-wrapper" >
-						<div class="float-left clearfix ppl-share-social ">
-							<span id ="fb_" class="float-left ppl-share-icns sr-icn-fb-rev icn-fb-pp" title="Facebook" ></span>
-							<input type="hidden" id="twttxt_" class ="twitterText_loop" /></input>
-							<span id ="twitt_" class="float-left ppl-share-icns sr-icn-twit-rev icn-twit-pp" title="Twitter"></span>
-							<span class="float-left ppl-share-icns sr-icn-lin-rev icn-lin-pp" title="LinkedIn"></span>
-							<span class="float-left" title="Google+"> <button class="g-interactivepost float-left ppl-share-icns sr-icn-gplus-rev"></button> </span>
+						<!-- social post populated from java script -->
+						<div class="float-left clearfix ppl-share-social sr-share-social">
 						</div>
 					</div>		
 				</div>

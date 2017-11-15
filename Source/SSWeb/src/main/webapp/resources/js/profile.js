@@ -2080,6 +2080,16 @@ $('#prof-review-item').on('click', '.ppl-share-icns', function(e) {
 	window.open(link, 'Post to ' + title, 'width=800,height=600,scrollbars=yes');
 });
 
+$('.sr-share-wrapper').on('click', '.ppl-share-icns', function(e) {
+	e.stopPropagation();
+	var link = $(this).attr('data-link');
+	var title = $(this).attr('title');
+	if (link == undefined || link == "") {
+		return false;
+	}
+	window.open(link, 'Post to ' + title, 'width=800,height=600,scrollbars=yes');
+});
+
 /**
  * JS functions to fetch API Key for google maps
  * 
@@ -2151,4 +2161,71 @@ function setUpPopupDismissListeners(){
 		  }
 		}
 	});
+}
+
+
+function buildReviewPopupShareData( reviewItem ){
+	
+	if( reviewItem == undefined || reviewItem == "" ){
+		return;
+	}
+	
+	var profileUrl = window.location.href;
+	var scoreFixVal = 1;
+	
+	var custDispName = reviewItem.customerFirstName.trim();
+	if(reviewItem.customerLastName != undefined && reviewItem.customerLastName.trim() != ""){
+		custDispName += ' '+reviewItem.customerLastName.substr(0,1).toUpperCase()+'.';
+	}
+	
+	var socialPostHtml = "";
+	
+	// build share URL for facebook
+	//$('#fb_post').data( 'link', 'https://www.facebook.com/dialog/share?' + reviewItem.faceBookShareUrl + '&href=' +profileUrl.replace("localhost","127.0.0.1")+ '&quote=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '&redirect_uri=https://www.facebook.com' );
+	
+	//$('#twttxt_post').val( reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) );
+	//$('#twitt_post').data( 'link', 'https://twitter.com/intent/tweet?text=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + ' &url='+ profileUrl );
+	
+	
+	// linkedIn
+	//$('#linkedin_post').data( 'link', 'https://www.linkedin.com/shareArticle?mini=true&url=' + profileUrl + '/' + reviewItem._id + '&title=&summary=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) +' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '&reviewid=' + reviewItem._id + '&source=' );
+	
+	// google plus
+	//$('#gplus_post').data( 'contenturl', profileUrl );
+	//$('#gplus_post').data( 'clientid', reviewItem.googleApi ); 
+	//$('#gplus_post').data( 'cookiepolicy', "single_host_origin" );
+	//$('#gplus_post').data( 'prefilltext', reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + stringEscape(custDispName) + ' for ' + stringEscape(reviewItem.agentName) + ' at SocialSurvey - ' + stringEscape(reviewItem.review) );
+	//$('#gplus_post').data( 'calltoactionlabel',"USE");
+	//$('#gplus_post').data( 'data-calltoactionurl', profileUrl );
+	
+	socialPostHtml += '         <span id ="fb_post" class="float-left ppl-share-icns sr-icn-fb-rev icn-fb-pp" title="Facebook" data-link="https://www.facebook.com/dialog/share?' + reviewItem.faceBookShareUrl + '&href=' +profileUrl.replace("localhost","127.0.0.1")+ '&quote=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '&redirect_uri=https://www.facebook.com"></span>';
+	socialPostHtml += '         <input type="hidden" id="twttxt_post" class ="twitterText_loop" value ="' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '"/></input>';
+	socialPostHtml += '			<span id ="twitt_post" class="float-left ppl-share-icns sr-icn-twit-rev icn-twit-pp" onclick="processTwitterTextForSingleReview();" title="Twitter" data-link="https://twitter.com/intent/tweet?text=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + ' &url='+ profileUrl +'"></span>';	
+	socialPostHtml += '			<span class="float-left ppl-share-icns sr-icn-lin-rev icn-lin-pp" title="LinkedIn" data-link="https://www.linkedin.com/shareArticle?mini=true&url=' + profileUrl + '/' + reviewItem._id + '&title=&summary=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) +' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '&reviewid=' + reviewItem._id + '&source="></span>';
+	socialPostHtml += '			<span class="float-left" title="Google+"> <button class="g-interactivepost float-left ppl-share-icns sr-icn-gplus-rev" data-contenturl="' + profileUrl + '" data-clientid="' + reviewItem.googleApi + '"data-cookiepolicy="single_host_origin" data-prefilltext="' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + stringEscape(custDispName) + ' for ' + stringEscape(reviewItem.agentName) + ' at SocialSurvey - ' + stringEscape(reviewItem.review) + '" data-calltoactionlabel="USE"'+''+'data-calltoactionurl=" ' + profileUrl + '"> </button> </span>';
+	
+	$('.sr-share-social').html( socialPostHtml );
+}
+
+function processTwitterTextForSingleReview(){
+	
+    var twitLink = $("#twitt_post").data('link');
+    var String = twitLink.substring(twitLink.indexOf("=") + 1, twitLink
+        .lastIndexOf("&"));
+    var twitText = $("#twttxt_post").val();
+    twitText = decodeURIComponent(twitText);
+    var length = twitText.length;
+    if (length > 109) {
+
+        var twittStrnDot = "...";
+        var substringed = twitText.substring(0, 105);
+        var finalString = substringed.concat(twittStrnDot);
+        finalString = encodeURIComponent(finalString);
+        $("#twttxt_post").val(finalString);
+        twitLink = twitLink.replace(String, finalString);
+        if (document.getElementById('twitt_post') != null) {
+            document.getElementById('twitt_post').setAttribute('data-link',
+                twitLink);
+        }
+    }
 }
