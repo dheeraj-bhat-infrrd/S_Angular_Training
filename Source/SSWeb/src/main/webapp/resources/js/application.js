@@ -8881,11 +8881,13 @@ function updateFacebookPixelId(pixelId) {
 	var payload = {
 		"pixelId" : pixelId
 	};
-	if (pixelId != undefined && pixelId != '') {
+	var parsedPixelId = parseInt(pixelId, 10);
+	var isPixelIdInt = parsedPixelId == pixelId;
+	if (pixelId != undefined && pixelId != '' && isPixelIdInt ) {
 		callAjaxPostWithPayloadData("./updatefacebookpixelid.do", callBackUpdateSocialLink, payload, true);
-		showProfileLinkInEditProfilePage("pixelId", pixelId);
+		showProfileLinkInEditProfilePage("facebookPixel", pixelId);
 	} else {
-		$('#overlay-toast').html("Enter a valid id");
+		$('#overlay-toast').html("Enter a valid pixel id");
 		showToast();
 	}
 }
