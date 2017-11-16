@@ -83,11 +83,24 @@
 			</div>
 		</div>
 	</div>
+	<div class="dash-container container">
+  <div class="dash-sub-head float-left">Account Statistics Report</div>
+		<div class="dash-stats-wrapper bord-bot-dc clearfix">
+          
+            <div id="acc-stats-report-div" class="float-left clearfix">
+				<div id="acc-stats-rep-bnt" class="float-left admin-btn-dl-br float-none" style="margin-left:30px;">
+					<div id="acc-stats-gen-rep" class="admin-br-dwnld-btn acc-stats-rep-btn-enabled">Generate Report</div>
+				</div>
+				<a id="account-stats-status-link" class='txt-bold acc-stats-rep-link'></a>	
+			</div>
+		</div>
+	</div>
 </div>
 <script>
 $(document).ready(function(){
 	colName = "superAdmin";
 	bindAutosuggestForCompanySearch('admin-report-down');
 	bindAutosuggestForCompanySearch('hierarchy-report-down');
+	getAccStatsReportStatus();
 });
 </script>
