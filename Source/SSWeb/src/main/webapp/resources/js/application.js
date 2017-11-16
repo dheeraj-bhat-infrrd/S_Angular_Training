@@ -13468,4 +13468,17 @@ function getInitials( name ){
     }
 }
 
+function getPlaceIds(query){
+	var key="AIzaSyAy49K94uo1F2PGylIPcsTEpTCtsDEnK48"
+	var url="https://maps.googleapis.com/maps/api/place/textsearch/json";//?query="+query+"&key="+key;
+	payload={
+		"query":query,
+		"key":key
+	};
+	
+	callAjaxGetWithPayloadData(url, function(data) {
+		console.log(data);
+		console.log(JSON.parse(data));
+	}, payload, true);
+}
 
