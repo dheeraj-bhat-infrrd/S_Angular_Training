@@ -798,7 +798,10 @@
 			 	$('body').addClass("overflow-hidden-important");
 			 	
 			 	// post icons
-				buildReviewPopupShareData( ${reviewAggregate.reviewJson} );
+			 	if( "${reviewAggregate.reviewJson}" != "" ){
+			 		var singleReviewObject = ${reviewAggregate.reviewJson};
+					buildReviewPopupShareData( singleReviewObject );
+			 	}
 			}
 			
 			 $('body').on('click','#dismiss-single-review-popup',function(e){

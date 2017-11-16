@@ -138,18 +138,22 @@
 </head>
 <body>
 	<c:if test="${not empty reviewAggregate}">
-		<c:choose>
-			<c:when test="${ reviewAggregate.surveyIdValid }">
-			<c:set value="true" var="popup" ></c:set>
-				<div id="single-review-page" class="overlay-login overlay-single-review">
-					<button type="button" class="close dismiss-single-review-popup" id="dismiss-single-review-popup">&times;</button>
-					<jsp:include page="single_review_page.jsp"></jsp:include>
-				</div>
-			</c:when>
-			<c:otherwise>
-			
-			</c:otherwise>
-		</c:choose>
+		<c:set value="true" var="popup" ></c:set>
+		<div id="single-review-page" class="overlay-login overlay-single-review">
+			<button type="button" class="close dismiss-single-review-popup" id="dismiss-single-review-popup">&times;</button>
+			<c:choose>
+				<c:when test="${ reviewAggregate.surveyIdValid }">
+						<jsp:include page="single_review_page.jsp"></jsp:include>
+				</c:when>
+				<c:otherwise>
+						<div id="single-review-popup" class="single-review-popup-wrapper">
+							<div class="invalid-message-div">
+								<span>${reviewAggregate.invalidMessage}</span>
+							</div>
+						</div>
+				</c:otherwise>
+			</c:choose>	
+		</div>
 	</c:if>
 	<div id="contact-us-pu-wrapper" class="bd-srv-pu hide">
 		<div class="container cntct-us-container">
