@@ -203,6 +203,14 @@ public interface ReportingDashboardManagement
      * @param endDate
      * @return
      */
-    public String generateIncompleteSurveyResultsReport( Long entityId, String entityType, Long userId, Timestamp startDate, Timestamp endDate )
-        throws UnsupportedEncodingException, NonFatalException, ParseException;
+	public String generateIncompleteSurveyResultsReport(Long entityId, String entityType, Long userId,
+			Timestamp startDate, Timestamp endDate)
+			throws UnsupportedEncodingException, NonFatalException, ParseException;
+
+	/**
+	 * This method returns the latest record for account statistics report in file upload.
+	 * @param reportId
+	 * @return
+	 */
+	public Object getAccountStatisticsRecentActivity(Long reportId);
 }

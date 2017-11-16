@@ -357,6 +357,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT );
         } else if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_INCOMPLETE_SURVEY_REPORT ) {
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_INCOMPLETE_SURVEY_REPORT );
+        } else if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_DETAILS_REPORT ) {
+            fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_DETAILS_REPORT );
         }
         //get the time 23:59:59 in milliseconds
         long duration = ( ( ( 23 * 60 ) * 60 ) + ( 59 * 60 ) + 59 ) * 1000l;
@@ -1676,6 +1678,15 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         }
         return recentActivity;
 
+    }
+    
+    @Override
+    public Object getAccountStatisticsRecentActivity(Long reportId){
+    	FileUpload fileUpload = null;
+    	if(reportId == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_DETAILS_REPORT){
+    		fileUpload = fileUploadDao.getLatestActivityForReporting(reportId);
+    	}
+    	return fileUpload;
     }
 
 
