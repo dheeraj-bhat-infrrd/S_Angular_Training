@@ -113,6 +113,18 @@ public class ReportingController
         json = new Gson().toJson( recentActivityList );
         return json;
     }
+    
+    @RequestMapping ( value = "/getaccountstatisticsreportstatus", method = RequestMethod.GET)
+    @ApiOperation ( value = "Fetch latest record for account statistics report. ")
+    public String getAccountStatisticsRecentActivity( Long reportId ) throws NonFatalException
+    {
+        LOGGER.info( "Fetching latest record for account statistics report." );
+
+        String json = null;
+        Object accountStatisticsStatus = reportingDashboardManagement.getAccountStatisticsRecentActivity( reportId );
+        json = new Gson().toJson( accountStatisticsStatus );
+        return json;
+    }
 
 
     @RequestMapping ( value = "/getuseradoptionreportsforreporting", method = RequestMethod.GET)
