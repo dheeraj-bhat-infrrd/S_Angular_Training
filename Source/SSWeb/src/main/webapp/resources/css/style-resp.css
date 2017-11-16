@@ -1056,6 +1056,47 @@
         margin: 15px auto 0;
     }
     
+    /*gmb styles*/
+    .overlay-gmb-popop {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    z-index: 9999;
+    min-height: 480px;
+    padding-bottom: 100px;
+    background: linear-gradient(rgb(0, 0, 0), rgba(0, 0, 0, 0.52));
+	}
+	
+	.gmb-popup-wrapper {
+    position: relative;
+    top:0;
+        width: 100%;
+   margin: 0 auto 20px;
+    background: #fff;
+    border-radius: 8px;
+	}
+	
+	.gmb-popup-body-wrapper {
+   	padding: 20px 0 20px 5px;
+	}
+	
+	.gmb-address-span {
+    width: 80px;
+	}
+	
+	.dismiss-gmb-popup {
+    float: right;
+    color: black;
+    opacity: 1;
+    margin-right: 10px;
+    margin-top: 5px;
+    font-size: x-large;
+    z-index: 1111111;
+    position: relative;
+	}
+	
     .util-gph-legend {
         position: static;
         top: 200px;
@@ -2231,6 +2272,47 @@
     	width: 100%;
     }
     
+    /*gmb styles*/
+    .overlay-gmb-popop {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    z-index: 9999;
+    min-height: 480px;
+    padding-bottom: 100px;
+    background: linear-gradient(rgb(0, 0, 0), rgba(0, 0, 0, 0.52));
+	}
+	
+	.gmb-popup-wrapper {
+    position: relative;
+    top:0;
+        width: 100%;
+   margin: 0 auto 20px;
+    background: #fff;
+    border-radius: 8px;
+	}
+	
+	.gmb-popup-body-wrapper {
+   	padding: 20px 0 20px 5px;
+	}
+	
+	.gmb-address-span {
+    width: 80px;
+	}
+	
+	.dismiss-gmb-popup {
+    float: right;
+    color: black;
+    opacity: 1;
+    margin-right: 10px;
+    margin-top: 5px;
+    font-size: x-large;
+    z-index: 1111111;
+    position: relative;
+	}
+	
     .dash-sel-wrapper,.setting-sel-wrapper {
         width: 50%;
         float: left;
@@ -2675,6 +2757,47 @@
         width: 600px;
     }
     
+    /*gmb styles*/
+    .overlay-gmb-popop {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    z-index: 9999;
+    min-height: 480px;
+    padding-bottom: 100px;
+    background: linear-gradient(rgb(0, 0, 0), rgba(0, 0, 0, 0.52));
+	}
+	
+	.gmb-popup-wrapper {
+    position: relative;
+    top:0;
+        width: 100%;
+   margin: 0 auto 20px;
+    background: #fff;
+    border-radius: 8px;
+	}
+	
+	.gmb-popup-body-wrapper {
+   	padding: 20px 0 20px 5px;
+	}
+	
+	.gmb-address-span {
+    width: 80px;
+	}
+	
+	.dismiss-gmb-popup {
+    float: right;
+    color: black;
+    opacity: 1;
+    margin-right: 10px;
+    margin-top: 5px;
+    font-size: x-large;
+    z-index: 1111111;
+    position: relative;
+	}
+	
     .stats-left {
         width: 330px;
     }

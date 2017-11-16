@@ -92,48 +92,69 @@
 		<c:set value="${profileSettings.hobbies}" var="hobbies"></c:set>
 	</c:if>
 </c:if>
+<input id="gmb-data" data-companyName="${companyName}" data-city="${gmbCity}" data-state="${gmbState}" data-country="${gmbCountry}" type="hidden"/>
+<div id="gmb-map" style="height:1px; width:1px"></div>
 <div id="prof-message-header" class="hide"></div>
-<div id="overlay-gmb-popup" class="overlay-login overlay-gmb-popop">
+<div id="overlay-gmb-popup" class="overlay-login overlay-gmb-popop hide">
 	<button type="button" class="close dismiss-gmb-popup" id="dismiss-gmb-popup">&times;</button>
 	<div id="gmb-popup" class="gmb-popup-wrapper">
-		<div class="gmb-popup-hdr-wrapper clearfix">
-			Google Business Authentication
+		<div class="gmb-popup-hdr-wrapper clearfix" style="height: 60px;">
+			<div class="gmb-dash-sub-head">Google Business Authentication</div>
 		</div>
 		<div class="gmb-popup-body-wrapper clearfix gmb-grid">
-			<div id="placeIdSelector">
-				<div class="radio gmb-radio">
-					<label><input type="radio" name="placeId" value="place1" checked>
+			<div class="gmb-dash-sub-head">Suggestions</div>
+			<span id="zero-suggestions-gmb" class="gmb-span zero-sug-gmb hide">No suggestions found for your address</span>
+			<div id="placeIdSelector" class="place-id-selector-gmb">
+				<div id="gmb-radio-1" class="radio gmb-radio hide">
+					<label><input id="placeId1" type="radio" name="placeId" value="" checked>
 						<span class="gmb-grid">
-							<span class="gmb-inline-flex"><span class="gmb-span gmb-address-span">Address : </span>American Financial Network Inc. 1030 W Manchester Blvd Suite A, Inglewood, CA 90301, United States</span>
-							<span><span class="gmb-span">PlaceID : </span>ChIJLfiR-iO3woARmrP6eX-aUVM</span>
+							<span class="gmb-inline-flex"><span class="gmb-span gmb-address-span">Address : </span><span id="gmb-address1" ></span></span>
+							<span><span class="gmb-span">PlaceID : </span><span id="gmb-placeId1" ></span></span>
 						</span>	
 					</label>
 				</div>
-				<div class="radio gmb-radio">
-					<label><input type="radio" name="placeId" value="place2" checked>
+				<div id="gmb-radio-2" class="radio gmb-radio hide">
+					<label><input id="placeId2" type="radio" name="placeId" value="" >
 						<span class="gmb-grid">
-							<span class="gmb-inline-flex"><span class="gmb-span gmb-address-span">Address : </span>American Financial Network Inc. 1030 W Manchester Blvd Suite A, Inglewood, CA 90301, United States</span>
-							<span><span class="gmb-span">PlaceID : </span>ChIJLfiR-iO3woARmrP6eX-aUVM</span>
+							<span class="gmb-inline-flex"><span class="gmb-span gmb-address-span">Address : </span><span id="gmb-address2" ></span></span>
+							<span><span class="gmb-span">PlaceID : </span><span id="gmb-placeId2" ></span></span>
 						</span>	
-					</label>				
+					</label>
 				</div>
-				<div class="radio gmb-radio">
-					<label><input type="radio" name="placeId" value="place3" checked>
+				<div id="gmb-radio-3" class="radio gmb-radio hide">
+					<label><input id="placeId3" type="radio" name="placeId" value="" >
 						<span class="gmb-grid">
-							<span class="gmb-inline-flex"><span class="gmb-span gmb-address-span">Address : </span>American Financial Network Inc. 1030 W Manchester Blvd Suite A, Inglewood, CA 90301, United States</span>
-							<span><span class="gmb-span">PlaceID : </span>ChIJLfiR-iO3woARmrP6eX-aUVM</span>
+							<span class="gmb-inline-flex"><span class="gmb-span gmb-address-span">Address : </span><span id="gmb-address3" ></span></span>
+							<span><span class="gmb-span">PlaceID : </span><span id="gmb-placeId3" ></span></span>
 						</span>	
-					</label>				
+					</label>
+				</div>
+				<div id="gmb-radio-4" class="radio gmb-radio hide">
+					<label><input id="placeId4" type="radio" name="placeId" value="" >
+						<span class="gmb-grid">
+							<span class="gmb-inline-flex"><span class="gmb-span gmb-address-span">Address : </span><span id="gmb-address4" ></span></span>
+							<span><span class="gmb-span">PlaceID : </span><span id="gmb-placeId4" ></span></span>
+						</span>	
+					</label>
+				</div>
+				<div id="gmb-radio-5" class="radio gmb-radio hide">
+					<label><input id="placeId5" type="radio" name="placeId" value="" >
+						<span class="gmb-grid">
+							<span class="gmb-inline-flex"><span class="gmb-span gmb-address-span">Address : </span><span id="gmb-address5"></span></span>
+								<span><span class="gmb-span">PlaceID : </span><span id="gmb-placeId5"></span></span>
+						</span>	
+					</label>
 				</div>
 				<div class="radio gmb-radio">
 					<label><input type="radio" name="placeId" value="customPlace" style="top:8px"><input id="gmb-placeId" style="position:initial" type="text" class="social-token-text" placeholder='PlaceId'></label>
 				</div>
 			</div>
-			<span class="gmb-span">PlaceID Selected : <span id="gmb-placeId-selected" class="gmb-span">place1</span></span>
-			<span class="gmb-span" style="margin-top:10px;">Link :<span id="gmb-url-placeId"></span></span>
+			<span class="gmb-span">PlaceID Selected : <span id="gmb-placeId-selected"></span></span>
+			<span class="gmb-span" style="margin-top:10px;">Selected Link :<span id="gmb-url-placeId"></span></span>
+			<span class="gmb-span" style="margin-top:20px;">Connected Link :<span id="gmb-connected-placeId" class="gmb-span"></span></span>
 		</div>
 		<div class="clearfix gmb-wc-btn-row">
-			
+			<div id="gmb-add-link" class="gmb-wc-sub-send-btn wc-final-submit">Add Link</div>
 		</div>
 	</div>
 </div>
@@ -556,40 +577,7 @@ $(document).ready(function() {
 		fetchReviewsEditProfileScroll();
 	});
 	
-	 $('body').on('click','#dismiss-gmb-popup',function(e){
-		 $('#overlay-gmb-popup').addClass('hide');
-		 if( $('body').hasClass("overflow-hidden-important") ){
-		 	$('body').removeClass("overflow-hidden-important");
-		 }
-	 });
-	 
-	$('#gmb-placeId-selected').html('place1');
-	$('#gmb-url-placeId').html("https://search.google.com/local/writereview?placeid=place1");
-	
-	$('#placeIdSelector input').on('change',function(){
-		var placeId = $('input[name=placeId]:checked', '#placeIdSelector').val();
-		if(placeId!='customPlace'){
-			$('#gmb-placeId-selected').html(placeId);
-			$('#gmb-url-placeId').html("https://search.google.com/local/writereview?placeid="+placeId);
-		}else{
-			placeId = $('#gmb-placeId').val();
-			if(placeId != '' && placeId!=null){
-				$('#gmb-placeId-selected').html(placeId);
-				$('#gmb-url-placeId').html("https://search.google.com/local/writereview?placeid="+placeId);	
-			}
-		}
-	});
-	
-	$('#gmb-placeId').onblur=function(){
-		var placeId = $('input[name=placeId]:checked', '#placeIdSelector').val();
-		if(placeId=='customPlace'){
-			placeId = $('#gmb-placeId').val();
-			$('#gmb-placeId-selected').html(placeId);
-			$('#gmb-url-placeId').html("https://search.google.com/local/writereview?placeid="+placeId);
-		}
-	}
-	
-	var contactDetails = '${contactdetail}';
+	/* var contactDetails = '${contactdetail}';
 	var companyName = "${companyName}";
 	
 	var city = '';
@@ -603,7 +591,8 @@ $(document).ready(function() {
 	countryCode = '${gmbCountryCode}';
 	
 	var query = companyName + '+in+' + city+','+state+','+country; 
-	getPlaceIds(query);
+	getPlaceIds(query);	 */
+
 	//attachPostsScrollEvent();
 });
 </script>

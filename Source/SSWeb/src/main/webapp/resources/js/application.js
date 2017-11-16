@@ -8162,6 +8162,13 @@ function callBackEditAddressDetails(data) {
 
 		delay(function() {
 			payload = $('#prof-edit-address-form').serialize();
+			
+			//data attr for gmb connection
+			var contactDetailsObj = unserializeFormData(payload);
+			$('#gmb-data').attr('data-city',contactDetailsObj.city);
+			$('#gmb-data').attr('data-state',contactDetailsObj.state);
+			$('#gmb-data').attr('data-country',contactDetailsObj.country);
+			
 			callAjaxPostWithPayloadData("./updateprofileaddress.do", callBackUpdateAddressDetails, payload, true);
 		}, 0);
 
@@ -8171,6 +8178,18 @@ function callBackEditAddressDetails(data) {
 	$('.overlay-disable-wrapper').addClass('pu_arrow_rt');
 	disableBodyScroll();
 	$('body').scrollTop('0');
+}
+
+function unserializeFormData(data) {
+    var objs = [], temp;
+    var temps = data.split('&');
+
+    for(var i = 0; i < temps.length; i++){
+        temp = temps[i].split('=');
+        objs.push(temp[0]);
+        objs[temp[0]] = temp[1]; 
+    }
+    return objs; 
 }
 
 // Function to update events on edit profile page
@@ -8899,13 +8918,87 @@ $('body').on('click', '#prof-edit-social-link .icn-realtor', function(e) {
 
 $('body').on('click', '#prof-edit-social-link .icn-google-business', function(e) {
 	e.stopPropagation();
-    $('#social-token-text').show();
+    $('#overlay-gmb-popup').removeClass('hide');
+    
+    var connectedLink = $(this).attr("data-link");
+    if(connectedLink=='' || connectedLink==null || connectedLink==undefined || connectedLink.length==0){
+    	connectedLink = 'No connections found'
+    }
+    
+    $('#gmb-connected-placeId').html(connectedLink);
+    for(var i=1;i<=5;i++){
+    	if(!($('#gmb-radio-'+i).hasClass('hide'))){
+    		$('#gmb-radio-'+i).addClass('hide');
+    	}	
+    }
+    
+    var companyName = '';
+	var city = '';
+	var state = '';
+	var country = '';
+		
+	city = $('#gmb-data').attr('data-city');
+	if(city!='' && city!=undefined && city!=null){
+		city=city+', '
+	}
+	state = $('#gmb-data').attr('data-state');
+	if(state!='' && state!=undefined && state!=null){
+		state=state+', '
+	}
+	country = $('#gmb-data').attr('data-country');
+	companyName = $('#gmb-data').attr('data-companyName');
+	
+	var query = companyName + '+in+' + city+state+country; 
+	getPlaceIds(query);
+	
+	$('body').on('click','#dismiss-gmb-popup',function(e){
+		 $('#overlay-gmb-popup').addClass('hide');
+		 if( $('body').hasClass("overflow-hidden-important") ){
+		 	$('body').removeClass("overflow-hidden-important");
+		 }
+	 });
+
+	$('#placeIdSelector input').on('change',function(){
+		var placeId = $('input[name=placeId]:checked', '#placeIdSelector').val();
+		if(placeId!='customPlace'){
+			$('#gmb-placeId-selected').html(placeId);
+			$('#gmb-url-placeId').html("https://search.google.com/local/writereview?placeid="+placeId);
+		}else{
+			placeId = $('#gmb-placeId').val();
+			if(placeId != '' && placeId!=null){
+				$('#gmb-placeId-selected').html(placeId);
+				$('#gmb-url-placeId').html("https://search.google.com/local/writereview?placeid="+placeId);	
+			}
+		}
+	});
+	
+	$('#gmb-placeId').onblur=function(){
+		var placeId = $('input[name=placeId]:checked', '#placeIdSelector').val();
+		if(placeId=='customPlace'){
+			placeId = $('#gmb-placeId').val();
+			$('#gmb-placeId-selected').html(placeId);
+			$('#gmb-url-placeId').html("https://search.google.com/local/writereview?placeid="+placeId);
+		}
+	}
+	
+	$('body').on('click','#gmb-add-link',function(){
+		var placeId = $('#gmb-placeId-selected').html();
+		
+		var link = "" 
+		if(placeId!='' && placeId!=undefined && placeId!=null){
+			link = "https://search.google.com/local/writereview?placeid="+placeId;
+		}	
+		
+		updateGoogleBusinessLink(link);
+		$('#overlay-gmb-popup').addClass('hide');	
+	});
+    /*$('#social-token-text').show();
     var link = $(this).attr("data-link");
     $('#social-token-text').attr({
         "placeholder" : "Add Google Business link",
         "onblur" : "updateGoogleBusinessLink(this.value);$('#social-token-text').hide();"
     });
-    $('#social-token-text').val(link);
+    $('#social-token-text').val(link);*/
 
 });
 
@@ -13468,17 +13561,87 @@ function getInitials( name ){
     }
 }
 
+var map;
+var service;
+var gmbQuery;
 function getPlaceIds(query){
-	var key="AIzaSyAy49K94uo1F2PGylIPcsTEpTCtsDEnK48"
-	var url="https://maps.googleapis.com/maps/api/place/textsearch/json";//?query="+query+"&key="+key;
+	/*var key="AIzaSyAy49K94uo1F2PGylIPcsTEpTCtsDEnK48"
+	var url="https://maps.googleapis.com/maps/api/place/textsearch/json?query="+query+"&key="+key;
 	payload={
 		"query":query,
 		"key":key
 	};
 	
-	callAjaxGetWithPayloadData(url, function(data) {
-		console.log(data);
-		console.log(JSON.parse(data));
-	}, payload, true);
+	$.ajax({
+		url : url,
+		type : "GET",
+		dataType : "jsonp",
+		cache : false,
+		success : function(data) {
+			console.log(data);
+			//console.log(JSON.parse(data));
+		},
+		error : function(e) {
+			isSurveydetailsforgraph = false;
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			$('#overlay-toast').html(e.responseText);
+			showToast();
+		}
+	});*/
+	gmbQuery=query;
+	initializeGmb();
+	
 }
 
+function initializeGmb() {
+	  var place = new google.maps.LatLng(36.778259,-119.417931);
+	  
+	  map = new google.maps.Map(document.getElementById('gmb-map'), {
+	      center: place,
+	      zoom: 0
+	    });
+	  	var searchQuery = gmbQuery;
+	  var request = {
+	    query: searchQuery
+	  };
+
+	  service = new google.maps.places.PlacesService(map);
+	  service.textSearch(request, callback);
+	}
+
+	function callback(results, status) {
+		var index=1;
+	  if (status == google.maps.places.PlacesServiceStatus.OK) {
+		
+		if(!($('#zero-suggestions-gmb').hasClass('hide'))){
+			$('#zero-suggestions-gmb').addClass('hide');
+		}
+		
+	    for (var i = 0; i < results.length && index<6; i++) {
+	      var place = results[i];
+	      if(i==0){
+	    	  $('#gmb-radio-'+index).removeClass('hide');
+	    	  $('#placeId'+index).attr('value',place.place_id);
+	    	  $('#gmb-address'+index).html(place.name+', '+place.formatted_address);
+	    	  $('#gmb-placeId'+index++).html(place.place_id);
+	    	  $('#gmb-placeId-selected').html(place.place_id);
+	    	  $('#gmb-url-placeId').html("https://search.google.com/local/writereview?placeid="+place.place_id);
+	      }else{
+	    	  $('#gmb-radio-'+index).removeClass('hide');
+	    	  $('#placeId'+index).attr('value',place.place_id);
+	    	  $('#gmb-address'+index).html(place.name+', '+place.formatted_address);
+	    	  $('#gmb-placeId'+index++).html(place.place_id);
+	      }
+	      
+	    }
+	  }else{
+		  if($('#zero-suggestions-gmb').hasClass('hide')){
+			  $('#zero-suggestions-gmb').removeClass('hide');
+		  }
+	  }
+	  
+	}
+	
