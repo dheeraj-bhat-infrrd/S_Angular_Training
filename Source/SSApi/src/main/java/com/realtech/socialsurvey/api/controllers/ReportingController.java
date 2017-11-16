@@ -15,6 +15,7 @@ import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.entities.CompanyDetailsReport;
 import com.realtech.socialsurvey.core.entities.CompanyDigestRequestData;
 import com.realtech.socialsurvey.core.entities.SurveyResultsReportVO;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.reportingmanagement.DashboardGraphManagement;
 import com.realtech.socialsurvey.core.services.reportingmanagement.OverviewManagement;
@@ -564,7 +565,7 @@ public class ReportingController
 
 	@RequestMapping(value = "/getcompanydetailsreport", method = RequestMethod.GET)
 	@ApiOperation(value = "Social Survey Admin level report to fetch Company Details for all companies.")
-	public String getCompanyDetailsReport(String entityType, Long entityId, int startIndex, int batchSize) {
+	public String getCompanyDetailsReport(String entityType, Long entityId, int startIndex, int batchSize) throws InvalidInputException {
 		LOGGER.info("Social Survey Admin level report to fetch Company Details for all companies.");
 		List<CompanyDetailsReport> companyDetailsReportList = reportingDashboardManagement
 				.getCompanyDetailsReport(entityId, startIndex, batchSize);

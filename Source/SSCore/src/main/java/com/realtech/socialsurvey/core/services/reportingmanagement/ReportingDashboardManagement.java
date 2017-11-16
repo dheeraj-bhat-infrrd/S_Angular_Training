@@ -170,8 +170,9 @@ public interface ReportingDashboardManagement
 	 * @param startIndex
 	 * @param batchSize
 	 * @return List of CompanyDetailsReport.
+	 * @throws InvalidInputException 
 	 */
-	public List<CompanyDetailsReport> getCompanyDetailsReport(Long entityId, int startIndex, int batchSize);
+	public List<CompanyDetailsReport> getCompanyDetailsReport(Long entityId, int startIndex, int batchSize) throws InvalidInputException;
 
 	/**
 	 * @param profileValue
