@@ -10866,8 +10866,15 @@ $(document).on('click', '.wc-review-rmv-icn', function() {
 		$('#wc-review-table').perfectScrollbar('update');
 	}, 1000);
 });
+
+
+$(document).on('click', '#wc-send-survey-upload-csv', function() {
+	$('.welcome-popup-body-wrapper').hide();
+	$('.wc-btn-row').hide();
+	
+});
+
 var surveysent=false;
-var alreadysentsurvey=false;
 $(document).on('click', '#wc-send-survey', function() {
 	var allowrequest = true;
 	var receiversList = [];
@@ -10878,50 +10885,14 @@ $(document).on('click', '#wc-send-survey', function() {
 	var idx = 0;
 	var agentname = "";
 	var myself = false;
-	var end = false;
-	if(surveysent || alreadysentsurvey){
+	
+	if(surveysent ){
 		return;
 	}
-	$('#wc-review-table-inner').children().each(function() {
-		if (!$(this).hasClass('wc-review-hdr')) {
-			$(this).children().each(function() {
-				$(this).find(':nth-child(1)').removeClass("error-survey");
-				$(this).find(':nth-child(2)').addClass("hidden");
-			});
-		}
-	});
-	$('#wc-review-table-inner').children().each(function() {
-		if (!$(this).hasClass('wc-review-hdr')) {
-			$(this).children().each(function() {
-				if (!$(this).hasClass('last')) {
-					var input = $(this).children(":input").val();
-					if (input != "") {
-						end = true;
-					}
-				}
-			});
-		}
-	});
-	if (!end) {
-		$('#wc-review-table-inner').children().each(function() {
-			if (!$(this).hasClass('wc-review-hdr')) {
-				$(this).children().each(function() {
-					if ($(this).hasClass('survey-user')) {
-						$(this).find(':nth-child(1)').addClass("error-survey");
-						$(this).find(':nth-child(2)').html("User is required.").removeClass("hidden");
-						allowrequest = false;
-					} else if ($(this).hasClass('survey-fname')) {
-						$(this).find(':nth-child(1)').addClass("error-survey");
-						$(this).find(':nth-child(2)').html("Firstname is required.").removeClass("hidden");
-						allowrequest = false;
-					} else if ($(this).hasClass('survey-email')) {
-						$(this).find(':nth-child(1)').addClass("error-survey");
-						$(this).find(':nth-child(2)').html("Email is required.").removeClass("hidden");
-						allowrequest = false;
-					}
-				});
-			}
-		});
+	
+	
+	if ( !removeErrorMessagesAndDetermineIfRequiredDataIsPresent() ) {
+		allowrequest = checkIfRequestCanBeMadeAndDisplayErrorMessagesIfNeeded();
 	}
 
 	$('#wc-review-table-inner').children().each(function() {
@@ -11094,10 +11065,6 @@ $(document).on('click', '#wc-send-survey', function() {
 	var surveyed = [];
 	var alreadysureyed = false;
 	if (allowrequest) {
-		if(alreadysentsurvey){
-			return;
-		}
-		alreadysentsurvey=true;
 		callAjaxPostWithPayloadData("./getalreadysurveyedemailids.do", function(data) {
 			var alreadySurveyedEmails = $.parseJSON(data);
 			// To check if the email had already surveyed
@@ -11125,7 +11092,6 @@ $(document).on('click', '#wc-send-survey', function() {
 
 			} else {
 				$('#send-survey-dash').removeClass("hide");
-				alreadysentsurvey=false;
 				if(surveysent){
 					return;
 				}
@@ -11162,6 +11128,52 @@ $(document).on('click', '#wc-send-survey', function() {
 		}, payload, true);
 	}
 });
+
+
+function checkIfRequestCanBeMadeAndDisplayErrorMessagesIfNeeded(){
+	var allowrequest = true;
+	$('#wc-review-table-inner').children().each(function() {
+		if (!$(this).hasClass('wc-review-hdr')) {
+			$(this).children().each(function() {
+				if ($(this).hasClass('survey-user')) {
+					$(this).find(':nth-child(1)').addClass("error-survey");
+					$(this).find(':nth-child(2)').html("User is required.").removeClass("hidden");
+					allowrequest = false;
+				} else if ($(this).hasClass('survey-fname')) {
+					$(this).find(':nth-child(1)').addClass("error-survey");
+					$(this).find(':nth-child(2)').html("Firstname is required.").removeClass("hidden");
+					allowrequest = false;
+				} else if ($(this).hasClass('survey-email')) {
+					$(this).find(':nth-child(1)').addClass("error-survey");
+					$(this).find(':nth-child(2)').html("Email is required.").removeClass("hidden");
+					allowrequest = false;
+				}
+			});
+		}
+	});
+	return allowrequest;
+}
+
+function removeErrorMessagesAndDetermineIfRequiredDataIsPresent(){
+	
+	var end = false;
+	$('#wc-review-table-inner').children().each(function() {
+		if (!$(this).hasClass('wc-review-hdr')) {
+			$(this).children().each(function() {
+				$(this).find(':nth-child(1)').removeClass("error-survey");
+				$(this).find(':nth-child(2)').addClass("hidden");
+				if (!$(this).hasClass('last')) {
+					var input = $(this).children(":input").val();
+					if (input != "") {
+						end = true;
+					}
+				}
+			});
+		}
+	});
+	return end;
+}
+
 
 $(document).on('click', '#wc-skip-send-survey', function() {
 	$('#overlay-send-survey').hide();
@@ -13475,3 +13487,105 @@ function getInitials( name ){
 }
 
 
+// survey csv file functions
+
+$(document).on('change', '.survey-csv-file-input', function(){
+	$("#upload-email-invalid").hide();
+	processAndValidateCsvForm( true );
+});
+
+$(document).on('click','#wc-send-survey-upload-cancel',function(event){
+	$(".wc-btn-row").show();
+	$(".welcome-popup-body-wrapper").show();
+	$(".survey-upload-csv").hide();
+});
+
+$(document).on('click','#wc-send-survey-upload-confirm',function(event){
+	$('#send-survey-csv-dash').removeClass("hide");
+	if( !processAndValidateCsvForm( false ) ){
+		hideOverlay();
+		return;
+	}
+
+	var formData = new FormData();
+	formData.append("file", $('#survey-file-intake').prop("files")[0]);
+	formData.append("filename", $('#survey-file-intake').prop("files")[0].name);
+	formData.append( "uploaderEmail", $('#survey-uploader-email').val() );
+	formData.append("hierarchyType",$('#hierarchyType').val() );
+	formData.append("hierarchyValue",$('#hierarchyValue').val() );
+	callAjaxPOSTWithTextData("./savesurveycsvfile.do", function(callbackData){
+		$('#send-survey-csv-dash').addClass("hide");
+		var response = JSON.parse(callbackData);
+		$("#overlay-toast").html(response.message);
+		showToast();
+		
+	}, true, formData);
+});
+
+$(document).on('click','#wc-send-survey-upload-csv',function(event){
+	$(".wc-btn-row").hide();
+	$(".welcome-popup-body-wrapper").hide();
+	$(".survey-upload-csv").show();
+});
+
+function csvFileValidate(inputFileElement, whileUploading) {
+	
+	$('.display-load').hide();
+	
+	if( whileUploading ){
+		$('.survey-csv-file-info').hide();
+	}
+
+	if ($(inputFileElement).attr("type") == "file") {
+		var fileName = $(inputFileElement).val();
+		if (fileName.length > 0) {
+			if (fileName.substr(fileName.length - 4, 4).toLowerCase() == ".csv") {
+								
+				var fileAddress = $(inputFileElement).val().split('\\');
+				$('#survey-csv-file-name').text(fileAddress[fileAddress.length - 1]);
+				$('.survey-csv-file-info').show();
+				return true;
+			}
+		} else {
+			$('.display-load').show();
+			$(inputFileElement).val = "";
+			return false;
+		}
+	} else {
+		$('.display-load').show();
+		return false;
+	}
+}
+
+function uploaderEmailValidate(){
+	return ( $('#survey-uploader-email').val() == undefined ||  $('#survey-uploader-email').val() == '' ) ? false : true;
+}
+
+function processAndValidateCsvForm(whileUploading){
+	
+	$("#upload-email-invalid").hide();
+	
+	if( !csvFileValidate("#survey-file-intake") )
+	{
+		if( !$("#wc-send-survey-upload-confirm").hasClass('disable') ){
+			$("#wc-send-survey-upload-confirm").addClass('disable');
+		}
+		$('.display-load').show();
+		$('.survey-csv-file-info').hide();
+		$("#overlay-toast").html("Please select a valid csv file");
+		showToast();
+		return false;
+	} else if( !uploaderEmailValidate() && !whileUploading){
+		$("#upload-email-invalid").show();
+		return false;
+	} else {
+		if( $("#wc-send-survey-upload-confirm").hasClass('disable') ){
+			$("#wc-send-survey-upload-confirm").removeClass('disable');
+		}
+		return true;
+	}
+}
+
+$(document).on('click', '#survey-uploader-email', function(){
+	$("#upload-email-invalid").hide();
+})

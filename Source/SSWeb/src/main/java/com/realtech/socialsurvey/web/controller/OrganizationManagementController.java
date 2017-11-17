@@ -2974,6 +2974,66 @@ public class OrganizationManagementController
         return new Gson().toJson( responseMap );
     }
 
+    @ResponseBody
+    @RequestMapping ( value = "/savesurveycsvfile", method = RequestMethod.POST)
+    public String saveSurveyCsvFile( Model model, @RequestParam ( "file") MultipartFile file,
+        @RequestParam ( "filename") String fileName, @RequestParam ( "uploaderEmail") String uploaderEmail,
+        HttpServletRequest request )
+    {
+        LOG.debug( "Saving the csv survey info file" );
+
+        boolean status = false;
+        Object message = null;
+        try {
+            String hierarchyType = request.getParameter( "hierarchyType" );
+            long hierarchyId = 0l;
+
+            if ( file == null || file.isEmpty() )
+                throw new InvalidInputException( "Please provide a valid CSV file." );
+
+            if ( StringUtils.isEmpty( fileName ) )
+                throw new InvalidInputException( "Please provide a valid CSV file name." );
+
+            if ( StringUtils.isEmpty( uploaderEmail ) && organizationManagementService.validateEmail( uploaderEmail.trim() ) )
+                throw new InvalidInputException( "Please provide a valid uploader email for csv upload." );
+
+            if ( StringUtils.isEmpty( hierarchyType ) )
+                throw new InvalidInputException( "Please provide a valid hiearchyType." );
+
+            if ( !StringUtils.isEmpty( request.getParameter( "hierarchyValue" ) ) ) {
+                try {
+                    hierarchyId = Long.parseLong( request.getParameter( "hierarchyValue" ) );
+                } catch ( NumberFormatException unableToFormatId ) {
+                    throw new InvalidInputException( "please provide a valid hierarchy Identifier." );
+                }
+            } else {
+                throw new InvalidInputException( "Please provide a hiearchy Identifier." );
+            }
+
+            if ( !surveyHandler.isFileAlreadyUploaded( fileName, uploaderEmail ) ) {
+                status = surveyHandler.createEntryForSurveyUploadWithCsv( hierarchyType, file, fileName, hierarchyId,
+                    sessionHelper.getCurrentUser(), uploaderEmail );
+                message = "CSV file uploaded successfully.";
+            } else {
+                message = "CSV file: " + fileName + " is already uploaded using the provided email.";
+            }
+
+
+        } catch ( InvalidInputException expectedError ) {
+            status = false;
+            message = expectedError.getMessage();
+        } catch ( Exception unhandledError ) {
+            status = false;
+            message = "Sorry, Unable to upload csv, Please try again.";
+        }
+
+        Map<String, Object> responseMap = new HashMap<String, Object>();
+        responseMap.put( "status", status );
+        responseMap.put( "message", message );
+        return new Gson().toJson( responseMap );
+    }
+
+
 
     @ResponseBody
     @RequestMapping ( value = "/starthierarchyxlsxfileupload", method = RequestMethod.POST)

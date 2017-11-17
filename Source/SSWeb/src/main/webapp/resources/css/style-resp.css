@@ -1813,6 +1813,14 @@
 	padding-left: 40px;
 	}
 	
+	.survey-csv-buttons-resp {
+		width: 150px;
+	}
+	.survey-csv-send-btn-resp {
+		margin-top: 15px;
+		margin-left: 0px;
+	}
+	
 	/* reporting */
 	
 	.rep-disclaimer{
@@ -2458,6 +2466,10 @@
    }
    .admin-sel-item{
     width:200px;
+   }
+   
+   .survey-csv-send-btn-resp {
+   	width: 94px;
    }
 
    /*=========new_registration====================*/
