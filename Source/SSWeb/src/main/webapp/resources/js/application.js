@@ -1677,7 +1677,7 @@ function showProcSurveyGraph(columnName,companyId, numberOfDays, companyDetails,
 				
 				showProcSurveyGraph("company", companyDetails[currentId].iden, 14, companyDetails, currentId);
 				
-			}, 60000);
+			}, 30000);
 		},
 		error : function(e) {
 			isSurveydetailsforgraph = false;
@@ -1712,6 +1712,8 @@ function paintProcSurveyGraph() {
 	var type = 'Date';
 
 	var keys = getKeysFromGraphFormat(format);
+	//remove today's date
+	keys.pop();
 
 	for (var i = 0; i < keys.length; i++) {
 		allTimeslots[i] = convertYearMonthDayKeyToMonthDay(keys[i]);		
@@ -1749,7 +1751,7 @@ function paintProcSurveyGraph() {
 			}
 			
 			var keyFormattedDate = formattedDate.getFullYear().toString() + monthStr + dayStr;
-			if(keys.indexOf(keyFormattedDate)){
+			if(keys.indexOf(keyFormattedDate) > -1){
 				var index = keys.indexOf(keyFormattedDate);
 				totalReceivedTransactionsCount[index] =  graphDataEntity.transactionReceivedCount;
 				completedTransactionCount[index] =  graphDataEntity.surveycompletedCount;
@@ -1891,7 +1893,9 @@ function paintOverallSurveyGraph() {
 	
 
 	var keys = getKeysFromGraphFormat(format);
-
+	//remove today's date
+	keys.pop();
+	
 	for (var i = 0; i < keys.length; i++) {
 		allTimeslots[i] = convertYearMonthDayKeyToMonthDay(keys[i]);
 		totalReceivedTransactionsCount[i] =  0;
@@ -1928,7 +1932,7 @@ function paintOverallSurveyGraph() {
 			}
 			
 			var keyFormattedDate = formattedDate.getFullYear().toString() + monthStr + dayStr;
-			if(keys.indexOf(keyFormattedDate)){
+			if(keys.indexOf(keyFormattedDate) > -1){
 				var index = keys.indexOf(keyFormattedDate);
 				totalReceivedTransactionsCount[index] =  graphDataEntity.transactionReceivedCount;
 				completedTransactionCount[index] =  graphDataEntity.surveycompletedCount;
@@ -7236,16 +7240,9 @@ function showFeedbackPage(mood) {
 		}
 		rating = currResponse / (counter);
 		rating = parseFloat(rating).toFixed(3);
-		if ((rating >= autoPostScore)) {
-			$("#pst-srvy-div").show();
-			if ((Boolean(autoPost) == false)) {
-				$('#shr-pst-cb').val('false');
-				$('#shr-post-chk-box').addClass('bd-check-img-checked');
-			} else {
-				$('#shr-pst-cb').val('true');
-				$('#shr-post-chk-box').removeClass('bd-check-img-checked');
-			}
-		}
+		$("#pst-srvy-div").show();
+		$('#shr-pst-cb').val('true');
+		$('#shr-post-chk-box').removeClass('bd-check-img-checked');
 		break;
 	case "OK":
 		question = neutralText;
@@ -7336,7 +7333,7 @@ function showMasterQuestionPage() {
 		}
 
 		var onlyPostToSocialSurvey = true;
-		if ($('#shr-post-chk-box').hasClass('bd-check-img-checked') == false && (rating >= autoPostScore) && (Boolean(autoPost) == true)) {
+		if ($('#shr-post-chk-box').hasClass('bd-check-img-checked') == false ) {
 			if (isAbusive == false) {
 				onlyPostToSocialSurvey = false;
 			}
@@ -8877,11 +8874,13 @@ function updateFacebookPixelId(pixelId) {
 	var payload = {
 		"pixelId" : pixelId
 	};
-	if (pixelId != undefined && pixelId != '') {
+	var parsedPixelId = parseInt(pixelId, 10);
+	var isPixelIdInt = parsedPixelId == pixelId;
+	if (pixelId != undefined && pixelId != '' && isPixelIdInt ) {
 		callAjaxPostWithPayloadData("./updatefacebookpixelid.do", callBackUpdateSocialLink, payload, true);
-		showProfileLinkInEditProfilePage("pixelId", pixelId);
+		showProfileLinkInEditProfilePage("facebookPixel", pixelId);
 	} else {
-		$('#overlay-toast').html("Enter a valid id");
+		$('#overlay-toast').html("Enter a valid pixel id");
 		showToast();
 	}
 }

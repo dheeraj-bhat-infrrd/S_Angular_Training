@@ -2818,9 +2818,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     public Boolean canPostOnSocialMedia( OrganizationUnitSettings unitSetting, Double rating )
     {
         boolean canPost = false;
-        if ( unitSetting != null ) {
-            if ( unitSetting.getSurvey_settings() != null ) {
-                if ( unitSetting.getSurvey_settings().getAuto_post_score() <= rating ) {
+        
+        if (  unitSetting != null  && unitSetting.getSurvey_settings() != null ) {
+                if ( unitSetting.getSurvey_settings().isAutoPostEnabled() && unitSetting.getSurvey_settings().getAuto_post_score() <= rating ) {
                     canPost = true;
                 }
             } else {
@@ -2829,12 +2829,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
                 }
             }
-        } else {
-            if ( CommonConstants.DEFAULT_AUTOPOST_SCORE <= rating ) {
-                canPost = true;
-
-            }
-        }
+         
         return canPost;
     }
 
