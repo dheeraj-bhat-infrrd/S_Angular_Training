@@ -1581,6 +1581,10 @@ public class SurveyManagementController
 			surveyAndStage.put("autopostEnabled", surveySettings.isAutoPostEnabled());
 		}
 
+		//get Facebook pixel detail
+		String facebookPixelTag = organizationManagementService.getFacebookPixelImageTagsFromHierarchy( companySettings, regionSettings, bSetting, unitSettings );
+		surveyAndStage.put("facebookPixelTag", facebookPixelTag);
+		
 		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
 		Map<String, String> surveyMap = emailFormatHelper.fetchSurveySourceId(user.getUserId(), survey.getCustomerEmail(),
 				dateFormat.format(new Date()));
@@ -1588,7 +1592,9 @@ public class SurveyManagementController
 			LOG.info("Setting company specific values for surveyAndStage started");
 			SurveySettings surveySettings = companySettings.getSurvey_settings();
 			if (StringUtils.isNotEmpty(surveySettings.getHappyText())) {
-				surveyAndStage.put("happyText", surveyHandler.replaceGatewayQuestionText(surveySettings.getHappyText(), unitSettings, user,
+			    //add Facebook pixel tag in happy text 
+			    String happyText = surveySettings.getHappyText() + facebookPixelTag;
+				surveyAndStage.put("happyText", surveyHandler.replaceGatewayQuestionText(happyText, unitSettings, user,
 						companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
 				isHappyTextSet = true;
 			}
@@ -1626,7 +1632,9 @@ public class SurveyManagementController
 			LOG.info("Setting default values for surveyAndStage started");
 			SurveySettings defaultSurveySettings = organizationManagementService.retrieveDefaultSurveyProperties();
 			if (!isHappyTextSet) {
-				surveyAndStage.put("happyText", surveyHandler.replaceGatewayQuestionText(defaultSurveySettings.getHappyText(), unitSettings, user,
+			  //add Facebook pixel tag in happy text 
+                String happyText = defaultSurveySettings.getHappyText() + facebookPixelTag;
+				surveyAndStage.put("happyText", surveyHandler.replaceGatewayQuestionText(happyText, unitSettings, user,
 						companySettings, survey, logo, mapPrimaryHierarchy, regionSettings, bSetting, surveyMap));
 			}
 			if (!isNeutralTextSet) {

@@ -29,4 +29,7 @@ public interface HierarchyUploadDao
 
     public HierarchyUpload getHierarchyUploadByCompany( long companyId ) throws InvalidInputException;
 
+
+    public ParsedHierarchyUpload findParsedHierarchyUpload( String mongoId ) throws InvalidInputException, NoRecordsFetchedException;
+
 }
