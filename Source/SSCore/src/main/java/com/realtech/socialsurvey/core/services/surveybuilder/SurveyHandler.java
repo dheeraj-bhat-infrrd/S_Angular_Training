@@ -92,7 +92,7 @@ public interface SurveyHandler
     public void markSurveyAsSent( SurveyPreInitiation surveyPreInitiation );
 
 
-    public Map<String, String> getEmailIdsOfAdminsInHierarchy( long agentId ) throws InvalidInputException;
+    public Map<String, Map<String, String>> getEmailIdsOfAdminsInHierarchy( long agentId ) throws InvalidInputException;
 
 
     public List<SurveyPreInitiation> getIncompleteSurveyForReminderEmail( Company company, Date minLastReminderDate , Date maxLastReminderDate, int maxReminderCount );
@@ -383,4 +383,17 @@ public interface SurveyHandler
 
 
     List<SurveyPreInitiation> validatePreinitiatedRecord( List<SurveyPreInitiation> surveyPreInitiations ) throws InvalidInputException;
+    
+    /**
+     * method to build survey completion threshold Map
+     * @param survey
+     * @return Map
+     * @throws InvalidInputException 
+     * @throws NoRecordsFetchedException 
+     */
+    public Map<String, Double> buildSurveyCompletionThresholdMap( SurveyDetails survey ) throws InvalidInputException, NoRecordsFetchedException;
+
+
+    public Map<String, String> buildPreferredAdminEmailListForSurvey( SurveyDetails survey, double companyThreshold,
+        double regionThreshold, double branchThreshold ) throws InvalidInputException;
 }

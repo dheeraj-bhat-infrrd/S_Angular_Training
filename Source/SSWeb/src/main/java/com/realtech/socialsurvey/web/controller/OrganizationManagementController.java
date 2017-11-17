@@ -43,7 +43,6 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AccountsMaster;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
-import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ComplaintResolutionSettings;
 import com.realtech.socialsurvey.core.entities.DisplayMessage;
 import com.realtech.socialsurvey.core.entities.DotLoopCrmInfo;
@@ -803,11 +802,9 @@ public class OrganizationManagementController
 
             
          // adding the survey completion mail threshold
-            if ( companySettings.getSurvey_settings() != null ) {
+            if ( unitSettings.getSurvey_settings() != null ) {
                 model.addAttribute( CommonConstants.SURVEY_MAIL_THRESHOLD,
-                    companySettings.getSurvey_settings().getSurveyCompletedMailThreshold() );
-            } else {
-                model.addAttribute( CommonConstants.SURVEY_MAIL_THRESHOLD, 0.0d );
+                    unitSettings.getSurvey_settings().getSurveyCompletedMailThreshold() );
             }
             
             // add send monthly digest email flag
@@ -3783,30 +3780,44 @@ public class OrganizationManagementController
     {
         LOG.info( "Method to updateSurveyMailThreshold started" );
         HttpSession session = request.getSession();
-        long companyId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
         double surveyCompletedMailThreshold;
-        
+        OrganizationUnitSettings unitSettings = null;
+        String collectionName = null;
+
         try {
-            
-            if( CommonConstants.COMPANY_ID.equals( entityType ) ){
-                
+
+            if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
+                unitSettings = organizationManagementService.getCompanySettings( entityId );
+            } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+                collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
+                unitSettings = organizationManagementService.getRegionSettings( entityId );
+            } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+                collectionName = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
+                unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
+            } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+                collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
+                unitSettings = userManagementService.getUserSettings( entityId );
+            }
+
+            if ( unitSettings != null ) {
+
                 String surveyCompletedMailThresholdStr = request.getParameter( "surveyCompletedMailThreshold" );
                 surveyCompletedMailThreshold = Double.parseDouble( surveyCompletedMailThresholdStr );
-                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
-
-                if(companySettings == null){
-                    throw new InvalidInputException("No settings fould for company with id " + companyId);
+                SurveySettings surveySettings = unitSettings.getSurvey_settings();
+                
+                if ( surveySettings == null ) {
+                    surveySettings = new SurveySettings();
                 }
                 
-                SurveySettings surveySettings = companySettings.getSurvey_settings();
                 surveySettings.setSurveyCompletedMailThreshold( surveyCompletedMailThreshold );
-                
-                organizationManagementService.updateSurveySettings( companySettings, surveySettings );
-                
+                organizationManagementService.updateScoreForSurvey( collectionName, unitSettings, surveySettings );
+
             } else {
-                LOG.error( "Profile specified is invalid." );
-                throw new InvalidInputException( "Please provide a valid profile level." );
+                LOG.error( "settings not found for the current session." );
+                throw new InvalidInputException( "settings not found for the current session." );
             }
             
             LOG.info( "Method to updateSurveyMailThreshold finished" );
