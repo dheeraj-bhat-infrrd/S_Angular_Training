@@ -593,6 +593,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     }
 
 
+    @SuppressWarnings ( "unchecked")
     @Override
     public Map<Long, List<UserProfile>> getUserProfilesForUsers( List<Long> userIds )
     {

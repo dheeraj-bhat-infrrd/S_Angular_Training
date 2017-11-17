@@ -35,9 +35,7 @@
 				<c:set value="${ nameArray[0] }" var="customerDisplayName"></c:set>
 			</c:otherwise>
 		</c:choose>
-		<div data-firstname="${feedback.customerFirstName}" data-lastname="${feedback.customerLastName}"
-			data-agentid="${feedback.agentId}" data-agentname="${feedback.agentName}" data-customeremail="${feedback.customerEmail}"
-			data-review="${fn:escapeXml(feedback.review)}" data-score="${feedback.score}" survey-mongo-id="${feedback._id}" class="ppl-review-item dsh-review-cont hide">
+		<div data-agentid="${feedback.agentId}" data-review="${fn:escapeXml(feedback.review)}" data-score="${feedback.score}" survey-mongo-id="${feedback._id}" class="ppl-review-item dsh-review-cont hide">
 			<div class="ppl-header-wrapper clearfix">
 			<div class="float-left ppl-header-right">
 					<div class="st-rating-wrapper maring-0 clearfix review-ratings float-right" data-modified="false" data-rating="${feedback.score}" data-source="${feedback.source }">

@@ -25,7 +25,7 @@ public interface CommonConstants
     public static final String SENDGRID_SENDER_SOCIALSURVEYME_PASSWORD = "SENDGRID_SENDER_SOCIALSURVEYME_PASSWORD";
     public static final String SENDGRID_SENDER_SOCIALSURVEYME_NAME = "SENDGRID_SENDER_SOCIALSURVEYME_NAME";
     public static final String SEND_EMAIL_THROUGH_SOCIALSURVEY_ME = "socialsurvey.me";
-    
+
     //email settings for socialsurvey.us
     public static final String SENDGRID_SENDER_SOCIALSURVEYUS_USERNAME = "SENDGRID_SENDER_SOCIALSURVEYUS_USERNAME";
     public static final String SENDGRID_SENDER_SOCIALSURVEYUS_PASSWORD = "SENDGRID_SENDER_SOCIALSURVEYUS_PASSWORD";
@@ -154,13 +154,12 @@ public interface CommonConstants
     public static final int STATUS_SURVEYPREINITIATION_DELETED = 0;
     public static final int STATUS_SURVEYPREINITIATION_MISMATCH_RECORD = 10;
     public static final int STATUS_SURVEYPREINITIATION_SURVEY_NOT_ALLOWED = 11;
-    
+
     public static final int SURVEY_PARTICIPANT_TYPE_BORROWER = 1;
     public static final int SURVEY_PARTICIPANT_TYPE_COBORROWER = 2;
     public static final int SURVEY_PARTICIPANT_TYPE_BUYER_AGENT = 3;
     public static final int SURVEY_PARTICIPANT_TYPE_SELLER_AGENT = 4;
-    
-    
+
 
     /**
      * Hibernate entities and column name constants
@@ -214,6 +213,7 @@ public interface CommonConstants
     public static final String PROFILE_VALUE_COLUMN = "profileValue";
     public static final String PROFILE_LEVEL_COLUMN = "profileLevel";
     public static final String ENCOMPASS_SDK_VERSION_COLUMN = "sdkVersion";
+    public static final String INCLUDE_IN_TRANSACTION_MONITOR = "includeInTransactionMonitor";
 
     //batch type constant for batch tracker
     public static final String BATCH_TYPE_REVIEW_COUNT_UPDATER = "reviewCountUpdater";
@@ -396,7 +396,7 @@ public interface CommonConstants
     public static final String CITY = "city";
     public static final String CRM_SOURCE = "crm_source";
     public static final String VERTICAL = "vertical";
-   
+
     // JIRA - SS-536: Added for manual registration via invite
     public static final String BILLING_MODE_COLUMN = "billingMode";
     public static final String VERTICAL_COLUMN = "verticalsMaster";
@@ -417,7 +417,7 @@ public interface CommonConstants
     public static final String COMPLAIN_REG_SETTINGS = "complaintRegSettings";
     public static final String ERROR = "error";
     public static final String ZILLOW_PROFILE_ERROR = "zillow-error";
-    public static final String ZILLOW_NMLS_REQUIRED_ERROR ="zillow-nmls-required-error";
+    public static final String ZILLOW_NMLS_REQUIRED_ERROR = "zillow-nmls-required-error";
     public static final String MESSAGE = "message";
     public static final String EMAIL_TYPE = "emailtype";
     public static final String EMAIL_TYPE_WORK = "work";
@@ -432,6 +432,7 @@ public interface CommonConstants
     public static final String ZILLOW_SOCIAL_SITE = "zillow";
     public static final String YELP_SOCIAL_SITE = "yelp";
     public static final String LENDINGTREE_SOCIAL_SITE = "lendingtree";
+    public static final String FACEBOOK_PIXEL_ID = "facebookPixelId";
     public static final String REALTOR_SOCIAL_SITE = "realtor";
     public static final String GOOGLE_BUSINESS_SOCIAL_SITE = "google business";
     public static final String GOOGLE_SOCIAL_SITE = "google";
@@ -761,6 +762,7 @@ public interface CommonConstants
     public static final String SOCIAL_POST_COLLECTION = "SOCIAL_POST";
     public static final String SOCIAL_HISTORY_COLLECTION = "SOCIAL_CONNECTION_HISTORY";
     public static final String UPLOAD_HIERARCHY_DETAILS_COLLECTION = "UPLOAD_HIERARCHY_DETAILS";
+    public static final String TEMP_HIERARCHY_UPLOAD_COLLECTION = "TEMP_HIERARCHY_UPLOAD";
 
     /*
      * Mongo social post Source
@@ -909,7 +911,7 @@ public interface CommonConstants
     public static final String PATTERN_LAST = "patternLast";
 
     public static final String SURVEY_SOURCE_ZILLOW = "Zillow";
-    
+
     //Excel constants
     public final String EXCEL_FORMAT = "application/vnd.ms-excel";
     public final String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
@@ -974,6 +976,7 @@ public interface CommonConstants
     public static final int FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT = 105;
     public static final int FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT = 106;
     public static final int FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT = 107;
+    public static final int FILE_UPLOAD_REPORTING_INCOMPLETE_SURVEY_REPORT = 108;
 
     
     public static final String AGENT_MEDIA_POST_DETAILS_COLUMN = "agentMediaPostDetails";
@@ -1135,6 +1138,7 @@ public interface CommonConstants
     public static final String CHR_USERS_LEGAL_DISCLAIMER = "Legal Disclaimer";
     public static final String CHR_USERS_PHOTO = "Photo";
     public static final String CHR_USERS_ABOUT_ME_DESCRIPTION = "About Me Description";
+    public static final String CHR_USERS_SEND_EMAIL = "Send Email";
     public static final String CHR_USERS_USER_ID_DESC = "Unique ID used for record updates.";
     public static final String CHR_USERS_TITLE_DESC = "Title to be displayed.";
     public static final String CHR_USERS_OFFICE_ASSIGNMENTS_DESC = "List each Office ID from the Offices sheet.";
@@ -1208,8 +1212,8 @@ public interface CommonConstants
 
     public static final String ZILLOW_PROFILE_URL = "http://zillow.com/profile/";
     public static final String ZILLOW_LENDER_PROFILE_URL = "http://zillow.com/lender-profile/";
-    
-    public static final List<String> ZILLOW_LENDING_VERTICALS = new ArrayList<String>(Arrays.asList("Mortgage"));
+
+    public static final List<String> ZILLOW_LENDING_VERTICALS = new ArrayList<String>( Arrays.asList( "Mortgage" ) );
 
     // Zillow Temp Post Table column names
     public static final String ZILLOW_REVIEW_URL_COLUMN = "zillowReviewUrl";
@@ -1345,16 +1349,32 @@ public interface CommonConstants
     public static final String SURVEY_API_REQUEST_PARAMETER_AUTHORIZATION = "Authorization";
     public static final int SURVEY_API_DEFAUAT_BATCH_SIZE = 1000;
     public static final String SURVEY_API_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+
+    // upload related constants
+    public static final String DUPLICATE_SOURCE_ID_SUBSTRING = "_duplicate_";
+    public static final String PARSED_HIERARCHY_UPLOAD_COLLECTION = "PARSED_HIERARCHY_UPLOAD";
+
+    // upload related status v2.0
+    public static final int HIERARCHY_UPLOAD_STATUS_NEW_ENTRY = -1;
+    public static final int HIERARCHY_UPLOAD_STATUS_INITIATED = 0;
+    public static final int HIERARCHY_UPLOAD_STATUS_VERIFING = 1;
+    public static final int HIERARCHY_UPLOAD_STATUS_VERIFIED_WITH_GENERAL_ERRORS = 2;
+    public static final int HIERARCHY_UPLOAD_STATUS_VERIFIED_WITH_ERRORS_OR_WARNINGS = 3;
+    public static final int HIERARCHY_UPLOAD_STATUS_IMPORTING = 4;
+    public static final int HIERARCHY_UPLOAD_STATUS_IMPORTED_WITH_ERRORS = 5;
+    public static final int HIERARCHY_UPLOAD_STATUS_IMPORTED = 6;
+    public static final int HIERARCHY_UPLOAD_STATUS_UNSCHEDULED_ABORT = 7;
     
     //Reporting constants
     public static final String REPORTING_SURVEY_STATS_REPORT = "Survey Stats Report";
     //Note -> the USER_ADOPTION_REPORT was renamed to VERIFIED_USERS_REPORT
     public static final String REPORTING_VERIFIED_USERS_REPORT = "Verified Users Report";
     public static final String REPORTING_COMPANY_USERS_REPORT = "Company User Report";
-    public static final String REPORTING_SURVEY_REUSLTS_COMPANY_REPORT = "Survey Results Report";
+    public static final String REPORTING_SURVEY_RESULTS_COMPANY_REPORT = "Survey Results Report";
     public static final String REPORTING_SURVEY_TRANSACTION_REPORT = "Survey Transaction Report";
     public static final String REPORTING_USER_RANKING_MONTHLY_REPORT = "User Ranking Report For Month";
     public static final String REPORTING_USER_RANKING_YEARLY_REPORT = "User Ranking Report For Year";
+    public static final String REPORTING_INCOMPLETE_SURVEY_REPORT = "Incomplete Survey Results Report";
     public static final String REPORTING_API_DATE_FORMAT = "MMM dd, yyyy";
 
 
@@ -1386,6 +1406,7 @@ public interface CommonConstants
     public static final String SURVEY_API_SURVEY_STATUS_INCOMPLETE = "incomplete";
     public static final String SURVEY_API_SURVEY_STATUS_ALL = "all";
 
+
     public static final String NOT_AVAILABLE = "N/A";
 
     //Encompass test connection htt prequest initial
@@ -1398,6 +1419,7 @@ public interface CommonConstants
     public static final int MONTH_OFFSET = 3;
     public static final int YEAR_OFFSET = -1;
     
+
     public static final String SQUARE_THUMBNAIL = "squareThumbnail";
     public static final String RECTANGULAR_THUMBNAIL = "rectangularThumbnail";
     

@@ -14,4 +14,6 @@ public interface CompanySurveyStatusStatsDao extends GenericReportingDao<Company
     public List<CompanySurveyStatusStats> getSurveyStatusCountForCompanyForPastNDays( long companyId, Date startDate,
         Date endDate );
 
+    public List<CompanySurveyStatusStats> getOverallSurveyCountForPastNDays( Date startDate, Date endDate );
+
 }

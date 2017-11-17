@@ -19,7 +19,7 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.DashboardService;
 import com.realtech.socialsurvey.core.services.reportingmanagement.ReportingDashboardManagement;
 import com.realtech.socialsurvey.core.services.reports.BillingReportsService;
-import com.realtech.socialsurvey.core.services.upload.CsvUploadService;
+import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 
 
 @Component
@@ -31,9 +31,6 @@ public class PrepareBillingReport implements Runnable
     private DashboardService dashboardService;
 
     @Autowired
-    private CsvUploadService csvUploadService;
-
-    @Autowired
     private BillingReportsService billingReportsService;
 
     @Autowired
@@ -41,6 +38,9 @@ public class PrepareBillingReport implements Runnable
     
     @Autowired
     private ReportingDashboardManagement reportingDashboardManagement;
+
+    @Autowired
+    private FileUploadService fileUploadService;
 
 
     @Override
@@ -62,7 +62,7 @@ public class PrepareBillingReport implements Runnable
                         // update the status to be processing
                         fileUpload.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
                         fileUpload.setStatus( CommonConstants.STATUS_UNDER_PROCESSING );
-                        csvUploadService.updateFileUploadRecord( fileUpload );
+                        fileUploadService.updateFileUploadRecord( fileUpload );
 
                         if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_BILLING_REPORT ) {
                             // prepare and send the billing report to admin
@@ -137,6 +137,9 @@ public class PrepareBillingReport implements Runnable
                            locationInS3 = reportingDashboardManagement.generateUserRankingForReporting( fileUpload.getProfileValue(), fileUpload.getProfileLevel(),
                                fileUpload.getAdminUserId(),fileUpload.getStartDate() , type);
 
+                      } else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_INCOMPLETE_SURVEY_REPORT){
+                          locationInS3 = reportingDashboardManagement.generateIncompleteSurveyResultsReport( fileUpload.getProfileValue(), fileUpload.getProfileLevel(),
+                              fileUpload.getAdminUserId(),fileUpload.getStartDate(),fileUpload.getEndDate());
                       }
                         
                         // update the status to be processed
@@ -144,10 +147,11 @@ public class PrepareBillingReport implements Runnable
                         fileUpload.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
                         if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_STATS_REPORT || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_VERIFIED_USERS_REPORT 
                             || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_REPORT || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT
-                            || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT){
+                            || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT
+                            || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_INCOMPLETE_SURVEY_REPORT){
                             fileUpload.setFileName( locationInS3 );
                         }
-                        csvUploadService.updateFileUploadRecord( fileUpload );
+                        fileUploadService.updateFileUploadRecord( fileUpload );
                     } catch ( Exception e ) {
                         LOG.error( "Error in generating billing report generator ", e );
                         
@@ -155,7 +159,7 @@ public class PrepareBillingReport implements Runnable
                             // update the status to be processed
                             fileUpload.setStatus( CommonConstants.STATUS_FAIL );
                             fileUpload.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
-                            csvUploadService.updateFileUploadRecord( fileUpload );
+                            fileUploadService.updateFileUploadRecord( fileUpload );
                             String reportType = null;
                             if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_BILLING_REPORT ) {
                                 reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_BILLING_REPORT;

@@ -115,6 +115,8 @@ public class RegionDaoImpl extends GenericDaoImpl<Region, Long> implements Regio
                         Region region = regionIdObjMap.get( regionSettings.getIden() );
                         region.setAddress1( regionSettings.getContact_details().getAddress1() );
                         region.setAddress2( regionSettings.getContact_details().getAddress2() );
+                        region.setCountry( regionSettings.getContact_details().getCountry() );
+                        region.setCountryCode( regionSettings.getContact_details().getCountryCode() );
                         region.setCity( regionSettings.getContact_details().getCity() );
                         region.setState( regionSettings.getContact_details().getState() );
                         region.setZipcode( regionSettings.getContact_details().getZipcode() );

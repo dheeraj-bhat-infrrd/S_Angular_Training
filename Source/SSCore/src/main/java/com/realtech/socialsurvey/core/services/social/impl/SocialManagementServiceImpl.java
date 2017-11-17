@@ -1977,6 +1977,12 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     && !( mediaTokens.getGoogleBusinessToken().getGoogleBusinessLink().isEmpty() ) )
                     socialUpdateAction.setLink( mediaTokens.getGoogleBusinessToken().getGoogleBusinessLink() );
                 break;
+            case CommonConstants.FACEBOOK_PIXEL_ID:
+                if ( ( mediaTokens.getFacebookPixelToken() != null )
+                    && ( mediaTokens.getFacebookPixelToken().getPixelId() != null )
+                    && !( mediaTokens.getFacebookPixelToken().getPixelId().isEmpty() ) )
+                    socialUpdateAction.setLink( mediaTokens.getFacebookPixelToken().getPixelId() );
+                break;    
 
             default:
                 throw new InvalidInputException( "Invalid social media token entered" );
@@ -2523,10 +2529,11 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                             .append( "<a " + STYLE_ATTR + " href=" + socialSitesWithSettings.get( CommonConstants.ZILLOW_LABEL )
                                 + ">" + CommonConstants.ZILLOW_LABEL + "</a>" );
                     }
-                    if ( socialSitesWithSettings.get( CommonConstants.YELP_LABEL ) != null ) {
+                    // SS-1452 remove yelp from emails
+                    /*if ( socialSitesWithSettings.get( CommonConstants.YELP_LABEL ) != null ) {
                         links.append( "<a " + STYLE_ATTR + " href=" + socialSitesWithSettings.get( CommonConstants.YELP_LABEL )
                             + ">" + CommonConstants.YELP_LABEL + "</a>" );
-                    }
+                    }*/
                     if ( socialSitesWithSettings.get( CommonConstants.GOOGLE_PLUS_LABEL ) != null ) {
                         links.append(
                             "<a " + STYLE_ATTR + " href=" + socialSitesWithSettings.get( CommonConstants.GOOGLE_PLUS_LABEL )

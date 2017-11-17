@@ -75,12 +75,12 @@
 	
 	<div style="display:none;">
 		<form id="survey-form">
-			<input type="text" name="agentId" value="${agentId}">
-			<input type="text" name="agentName" value="${agentName}">
-			<input type="text" name="firstName" value="${firstName}">
-			<input type="text" name="lastName" value="${lastName}">
-			<input type="text" name="customerEmail" value="${customerEmail}">
-			<input type="text" name="relationship" value="${relation}">
+			<input type="text" name="agentId" value="${agentId}" hidden>
+			<input type="text" name="agentName" value="${agentName}" hidden>
+			<input type="text" name="firstName" value="${firstName}" hidden>
+			<input type="text" name="lastName" value="${lastName}" hidden>
+			<input type="text" name="customerEmail" value="${customerEmail}" hidden>
+			<input type="text" name="relationship" value="${relation}" hidden>
 		</form>
 	</div>
 	<script
@@ -133,7 +133,6 @@
 		function retakeSurveyLink(){
 			var payload = $('#survey-form').serialize();
 			$.ajax({
-				// url : window.location.origin + "/rest/survey/restartsurvey",
 				url : getLocationOrigin() + "/rest/survey/restartsurvey",
 				data : payload,
 				type : "GET",

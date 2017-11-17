@@ -375,9 +375,6 @@ $(document).on('click', '.restart-survey-mail-txt', function(e) {
 	e.stopPropagation();
 	confirmRetakeSurveyReminderMail(this);
 
-	/*
-	 * var firstName = $(this).parent().parent().parent().parent().attr('data-firstname'); var lastName = $(this).parent().parent().parent().parent().attr('data-lastname'); var agentName = $(this).parent().parent().parent().parent().attr('data-agentname'); var customerEmail = $(this).parent().parent().parent().parent().attr('data-customeremail'); var agentId = $(this).parent().parent().parent().parent().attr('data-agentid'); var payload = { "customerEmail" : customerEmail, "agentId" : agentId, "firstName" : firstName, "lastName" : lastName, "agentName" : agentName }; callAjaxGetWithPayloadData('./restartsurvey.do', '', payload, true); $('#overlay-toast').html('Mail sent to '+firstName +' '+' to retake the survey for you.'); showToast();
-	 */
 });
 
 function confirmRetakeSurveyReminderMail(element) {
@@ -396,44 +393,25 @@ function confirmRetakeSurveyReminderMail(element) {
 }
 
 function retakeSurveyReminderMail(element) {
-	var firstName = $(element).parent().parent().parent().parent().attr('data-firstname');
-	var lastName = $(element).parent().parent().parent().parent().attr('data-lastname');
-	var agentName = $(element).parent().parent().parent().parent().attr('data-agentname');
-	var customerEmail = $(element).parent().parent().parent().parent().attr('data-customeremail');
-	var agentId = $(element).parent().parent().parent().parent().attr('data-agentid');
 	var surveyId = $(element).parent().parent().parent().parent().attr('survey-mongo-id');
 
 	var payload = {
-		"customerEmail" : customerEmail,
-		"agentId" : agentId,
-		"firstName" : firstName,
-		"lastName" : lastName,
-		"agentName" : agentName,
 		"surveyId" : surveyId
 	};
 
 	callAjaxGetWithPayloadData('./restartsurvey.do', function() {
-		$('#overlay-toast').html('Mail sent to ' + firstName + ' ' + ' to retake the survey for you.');
+		$('#overlay-toast').html('Mail sent to customer to retake the survey for you.');
 		showToast();
 		$('#overlay-cancel').click();
 		getIncompleteSurveyCount(colName, colValue);
 	}, payload, true);
 }
 
-/*
- * $(document).on('click', '.report-abuse-txt', function(e) { disableBodyScroll(); e.stopPropagation(); var reviewElement = $(this).parent().parent().parent().parent(); var payload = { "customerEmail" : reviewElement.attr('data-customeremail'), "agentId" : reviewElement.attr('data-agentid'), "firstName" : reviewElement.attr('data-cust-first-name'), "lastName" : reviewElement.attr('data-cust-last-name'), "agentName" : reviewElement.attr('data-agent-name'), "review" : reviewElement.attr('data-review'), "surveyMongoId" : reviewElement.attr('survey-mongo-id') }; $("#report-abuse-txtbox").val(''); // Unbind click events for button $('.rpa-cancel-btn').off('click'); $('.rpa-report-btn').off('click'); //disableBodyScroll(); $('#report-abuse-overlay').show(); $('.rpa-cancel-btn').on('click', function() { $('#report-abuse-overlay').hide(); enableBodyScroll(); });
- */
 $(document).on('click', '.report-abuse-txt', function(e) {
 	disableBodyScroll();
 	e.stopPropagation();
 	var reviewElement = $(this).closest('.dsh-review-cont');
 	var payload = {
-		"customerEmail" : reviewElement.attr('data-customeremail'),
-		"agentId" : reviewElement.attr('data-agentid'),
-		"firstName" : reviewElement.attr('data-firstname'),
-		"lastName" : reviewElement.attr('data-lastname'),
-		"agentName" : reviewElement.attr('data-agentname'),
-		"review" : reviewElement.attr('data-review'),
 		"surveyMongoId" : reviewElement.attr('survey-mongo-id')
 	};
 	var r = reviewElement.attr('data-firstname');
@@ -1630,8 +1608,44 @@ function showProsSurveyStatisticsGraphically(columnName, columnValue) {
 	showProcSurveyGraph(columnName, columnValue, numberOfDays);
 }
 
+var isGettingCompaniesForTransactionMonitor = false;
 
-function showProcSurveyGraph(columnName,companyId, numberOfDays) {
+function getCompaniesForTransactionMonitor(){
+	var companyDetails;
+	
+	if (isGettingCompaniesForTransactionMonitor == true) {
+		return;
+	}
+	
+	isGettingCompaniesForTransactionMonitor = true;
+	
+	$.ajax({
+		url : "./getcompaniesfortransactionmonitor.do",
+		type : "GET",
+		dataType : "JSON",
+		cache : false,
+		success : function(data){
+			
+			isGettingCompaniesForTransactionMonitor = false;
+			companyDetails = data;
+		},
+		complete: function(){
+			showProcSurveyGraph("company", companyDetails[0].iden, 14, companyDetails,0);
+			
+		},
+		error : function(e){
+			isGettingCompaniesForTransactionMonitor = false;
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			$('#overlay-toast').html(e.responseText);
+			showToast();
+		}
+	});
+}
+function showProcSurveyGraph(columnName,companyId, numberOfDays, companyDetails,currentId) {
+	
 	if (isSurveydetailsforgraph == true) {
 		return;
 	}
@@ -1647,11 +1661,23 @@ function showProcSurveyGraph(columnName,companyId, numberOfDays) {
 		cache : false,
 		data : payload,
 		success : function(data) {
+			
 			isSurveydetailsforgraph = false;
 			$('#proc-sur-sel-item').removeClass("empty-field");
 			graphData = data;
+			$('#proc-trans-header').html(companyDetails[currentId].contact_details.name);
 			paintProcSurveyGraph();
 			hideDashOverlay('#low-proc-sur');
+		},
+		complete: function(){
+			
+			setTimeout(function(){
+				currentId++;
+				if( currentId == companyDetails.length ) currentId = 0;
+				
+				showProcSurveyGraph("company", companyDetails[currentId].iden, 14, companyDetails, currentId);
+				
+			}, 30000);
 		},
 		error : function(e) {
 			isSurveydetailsforgraph = false;
@@ -1674,36 +1700,28 @@ function paintProcSurveyGraph() {
 	var completedTransactionCount = [];
 	var sentSurveyInvitationTransactionsCount = [];
 	var sentSurveyReminderTransactionsCount = [];
-
+	var unprocessedTransactionsCount = [];
+	
 	var element = document.getElementById("proc-sur-count-days");
-	if (element == null) {
-		return;
+	
+	var format = 14;
+	if (element != null) {
+		format = element.options[element.selectedIndex].value;
 	}
-
-	var format = element.options[element.selectedIndex].value;
-	var type = '';
-	if (format == '10') {
-		type = 'Date';
-	} else if (format == '20') {
-		type = 'Date';
-	} else if (format == '30') {
-		type = 'Date';
-	}
+	
+	var type = 'Date';
 
 	var keys = getKeysFromGraphFormat(format);
+	//remove today's date
+	keys.pop();
 
 	for (var i = 0; i < keys.length; i++) {
-		if (format == '365') {
-			allTimeslots[i] = convertYearMonthKeyToDate(keys[i]);
-		} else if (format == '10' || format == '20' ) {
-			allTimeslots[i] = convertYearMonthDayKeyToDate(keys[i]);
-		}else {
-			allTimeslots[i] = convertYearWeekKeyToDate(keys[i]);
-		}
+		allTimeslots[i] = convertYearMonthDayKeyToMonthDay(keys[i]);		
 		totalReceivedTransactionsCount[i] =  0;
 		completedTransactionCount[i] =  0;
 		sentSurveyInvitationTransactionsCount[i] =  0;
 		sentSurveyReminderTransactionsCount[i] =  0;
+		unprocessedTransactionsCount[i]=0;
 	}
 	
 	if(graphData != undefined){
@@ -1733,19 +1751,20 @@ function paintProcSurveyGraph() {
 			}
 			
 			var keyFormattedDate = formattedDate.getFullYear().toString() + monthStr + dayStr;
-			if(keys.indexOf(keyFormattedDate)){
+			if(keys.indexOf(keyFormattedDate) > -1){
 				var index = keys.indexOf(keyFormattedDate);
 				totalReceivedTransactionsCount[index] =  graphDataEntity.transactionReceivedCount;
 				completedTransactionCount[index] =  graphDataEntity.surveycompletedCount;
 				sentSurveyInvitationTransactionsCount[index] =  graphDataEntity.surveyInvitationSentCount;
 				sentSurveyReminderTransactionsCount[index] =  graphDataEntity.surveyReminderSentCount;
+				unprocessedTransactionsCount[index] = graphDataEntity.transactionReceivedCount - graphDataEntity.surveyInvitationSentCount;
 			}
 		}
 	}
 	
 	var internalData = [];
 	var nestedInternalData = [];
-	nestedInternalData.push(type, 'Total Transactions', 'Completed Transactions', 'Sent Survey Invitations', 'Sent Survey Reminders');
+	nestedInternalData.push(type, 'Total', 'Unprocessed', 'Invitations', 'Reminders','Completed');
 	internalData.push(nestedInternalData);
 	for (var itr = 0; itr < allTimeslots.length; itr++) {
 		nestedInternalData = [];
@@ -1753,6 +1772,7 @@ function paintProcSurveyGraph() {
 		var curCompletedTransactionCount;
 		var curSentSurveyInvitationTransactionsCount;
 		var curSentSurveyReminderTransactionsCount;
+		var curUnprocessedTransactionsCount;
 
 		if (isNaN(parseInt(totalReceivedTransactionsCount[itr]))) {
 			curTotalReceivedTransactionsCount = 0;
@@ -1777,8 +1797,14 @@ function paintProcSurveyGraph() {
 		} else {
 			curSentSurveyReminderTransactionsCount = parseInt(sentSurveyReminderTransactionsCount[itr]);
 		}
+		
+		if (isNaN(parseInt(unprocessedTransactionsCount[itr]))) {
+			curUnprocessedTransactionsCount = 0;
+		} else {
+			curUnprocessedTransactionsCount = parseInt(unprocessedTransactionsCount[itr]);
+		}
 
-		nestedInternalData.push(allTimeslots[itr], curTotalReceivedTransactionsCount, curCompletedTransactionCount, curSentSurveyInvitationTransactionsCount, curSentSurveyReminderTransactionsCount);
+		nestedInternalData.push(allTimeslots[itr], curTotalReceivedTransactionsCount, curUnprocessedTransactionsCount, curSentSurveyInvitationTransactionsCount, curSentSurveyReminderTransactionsCount, curCompletedTransactionCount);
 		internalData.push(nestedInternalData);
 	}
 
@@ -1788,15 +1814,203 @@ function paintProcSurveyGraph() {
 			width : '90%',
 			height : '80%'
 		},
-		colors : [ 'rgb(28,242,0)', 'rgb(0,174,239)', 'rgb(255,242,0)', 'rgb(255,202,145)' ],
+		colors : [ 'rgb(0, 0, 0)','rgb(255, 0, 0)' , 'rgb(0, 135, 255)', 'rgb(169,169,169)','rgb(0, 255, 0)' ],
 		legend : {
 			position : 'none'
+		},
+		vAxis : { 
+			baselineColor : 'rgb(238,238,238)',
+			gridlines : { color : 'rgb(238,238,238)'},
+			viewWindow: {
+		        min: 0
+		    }
 		}
+		
 	};
 
 	removeAllPreviousGraphToolTip();
 
 	var chart = new google.visualization.LineChart(document.getElementById('pro-survey-gph-item'));
+	chart.draw(data, options);
+}
+
+var isSurveyDetailForOverallGraph=false;
+function showOverallSurveyGraph(columnName,companyId, numberOfDays) {
+	
+	if (isSurveyDetailForOverallGraph == true) {
+		return;
+	}
+	var payload = {
+		"companyId" : companyId,
+		"noOfDays" : numberOfDays
+	};
+	isSurveyDetailForOverallGraph = true;
+	$.ajax({
+		url : "./getcompanysurveystatuscountforpastndays.do",
+		type : "GET",
+		dataType : "JSON",
+		cache : false,
+		data : payload,
+		success : function(data) {
+			
+			isSurveyDetailForOverallGraph = false;
+			$('#proc-sur-sel-item').removeClass("empty-field");
+			graphData = data;
+			paintOverallSurveyGraph();
+			hideDashOverlay('#low-trans');
+		},
+		error : function(e) {
+			isSurveyDetailForOverallGraph = false;
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			$('#overlay-toast').html(e.responseText);
+			showToast();
+		}
+	});
+}
+function paintOverallSurveyGraph() {
+	if (graphData == undefined)
+		return;
+	console.log()
+	var allTimeslots = [];
+	var totalReceivedTransactionsCount = [];
+	var completedTransactionCount = [];
+	var sentSurveyInvitationTransactionsCount = [];
+	var sentSurveyReminderTransactionsCount = [];
+	var unprocessedTransactionsCount = [];
+
+	var element = document.getElementById("proc-sur-count-days");
+	
+	var format = 14;
+	if (element != null) {
+		format = element.options[element.selectedIndex].value;
+	}
+
+	
+	var type = 'Date';
+	
+
+	var keys = getKeysFromGraphFormat(format);
+	//remove today's date
+	keys.pop();
+	
+	for (var i = 0; i < keys.length; i++) {
+		allTimeslots[i] = convertYearMonthDayKeyToMonthDay(keys[i]);
+		totalReceivedTransactionsCount[i] =  0;
+		completedTransactionCount[i] =  0;
+		sentSurveyInvitationTransactionsCount[i] =  0;
+		sentSurveyReminderTransactionsCount[i] =  0;
+		unprocessedTransactionsCount[i] = 0;
+	}
+	
+	if(graphData != undefined){
+		for(var i in graphData ){
+			var graphDataEntity = graphData[i];
+			
+			var entityDate = graphDataEntity.transactionDate;
+		    var formattedDate = new Date(Date.parse(entityDate));
+		    //get date similar to keys formay
+		    
+		    var month = formattedDate.getMonth() + 1;
+			var monthStr = "";
+			if (month < 10) {
+				monthStr = '0' + month.toString();
+				
+			}else{
+				monthStr = month.toString();
+			}
+			
+			var dayStr = "";
+			var day  = formattedDate.getDate();
+			if (day < 10) {
+				dayStr = '0' + day.toString();
+				
+			}else{
+				dayStr = day.toString();
+			}
+			
+			var keyFormattedDate = formattedDate.getFullYear().toString() + monthStr + dayStr;
+			if(keys.indexOf(keyFormattedDate) > -1){
+				var index = keys.indexOf(keyFormattedDate);
+				totalReceivedTransactionsCount[index] =  graphDataEntity.transactionReceivedCount;
+				completedTransactionCount[index] =  graphDataEntity.surveycompletedCount;
+				sentSurveyInvitationTransactionsCount[index] =  graphDataEntity.surveyInvitationSentCount;
+				sentSurveyReminderTransactionsCount[index] =  graphDataEntity.surveyReminderSentCount;
+				unprocessedTransactionsCount[index] = graphDataEntity.transactionReceivedCount - graphDataEntity.surveyInvitationSentCount;
+			}
+		}
+	}
+	
+	var internalData = [];
+	var nestedInternalData = [];
+	nestedInternalData.push(type, 'Total', 'Unprocessed', 'Invitations', 'Reminders', 'Completed');
+	internalData.push(nestedInternalData);
+	for (var itr = 0; itr < allTimeslots.length; itr++) {
+		nestedInternalData = [];
+		var curTotalReceivedTransactionsCount;
+		var curCompletedTransactionCount;
+		var curSentSurveyInvitationTransactionsCount;
+		var curSentSurveyReminderTransactionsCount;
+		var curUnprocessedTransactionsCount;
+
+		if (isNaN(parseInt(totalReceivedTransactionsCount[itr]))) {
+			curTotalReceivedTransactionsCount = 0;
+		} else {
+			curTotalReceivedTransactionsCount = parseInt(totalReceivedTransactionsCount[itr]);
+		}
+
+		if (isNaN(parseInt(completedTransactionCount[itr]))) {
+			curCompletedTransactionCount = 0;
+		} else {
+			curCompletedTransactionCount = parseInt(completedTransactionCount[itr]);
+		}
+
+		if (isNaN(parseInt(sentSurveyInvitationTransactionsCount[itr]))) {
+			curSentSurveyInvitationTransactionsCount = 0;
+		} else {
+			curSentSurveyInvitationTransactionsCount = parseInt(sentSurveyInvitationTransactionsCount[itr]);
+		}
+
+		if (isNaN(parseInt(sentSurveyReminderTransactionsCount[itr]))) {
+			curSentSurveyReminderTransactionsCount = 0;
+		} else {
+			curSentSurveyReminderTransactionsCount = parseInt(sentSurveyReminderTransactionsCount[itr]);
+		}
+		
+		if (isNaN(parseInt(unprocessedTransactionsCount[itr]))) {
+			curUnprocessedTransactionsCount = 0;
+		} else {
+			curUnprocessedTransactionsCount = parseInt(unprocessedTransactionsCount[itr]);
+		}
+
+		nestedInternalData.push(allTimeslots[itr], curTotalReceivedTransactionsCount,curUnprocessedTransactionsCount , curSentSurveyInvitationTransactionsCount, curSentSurveyReminderTransactionsCount,curCompletedTransactionCount);
+		internalData.push(nestedInternalData);
+	}
+
+	var data = google.visualization.arrayToDataTable(internalData);
+	var options = {
+		chartArea : {
+			width : '90%',
+			height : '80%'
+		},
+		colors : [ 'rgb(0, 0, 0)','rgb(255, 0, 0)', 'rgb(0, 135, 255)', 'rgb(169,169,169)', 'rgb(0, 255, 0)'],
+		legend : {
+			position : 'none'
+		},
+		vAxis : { 
+			baselineColor : 'rgb(238,238,238)',
+			gridlines : { color : 'rgb(238,238,238)'},
+			viewWindow: {
+		        min: 0
+		    }
+		}
+	};
+
+	removeAllPreviousGraphToolTip();
+
+	var chart = new google.visualization.LineChart(document.getElementById('trans-gph-item'));
 	chart.draw(data, options);
 }
 
@@ -1807,8 +2021,6 @@ function showTransactionStatisticsGraphically(columnName, columnValue) {
 	$('#trans-gph-item').html('');
 	showTransactionGraph(columnName, columnValue, numberOfDays);
 }
-
-
 
 var isSurveydetailsforgraph = false;
 function showTransactionGraph(columnName,companyId, numberOfDays) {
@@ -1855,12 +2067,12 @@ function paintTransactionGraph() {
 	var encompassTransactionsCount = [];
 	var ftpTransactionsCount = [];
 
+	var format = 10;
 	var element = document.getElementById("transaction-count-days");
-	if (element == null) {
-		return;
+	if (element != null) {
+		format = element.options[element.selectedIndex].value;
 	}
 
-	var format = element.options[element.selectedIndex].value;
 	var type = '';
 	if (format == '10') {
 		type = 'Date';
@@ -2124,6 +2336,35 @@ function convertYearMonthDayKeyToDate(key) {
 	}).toString("MMM d, yyyy");
 }
 
+function convertYearMonthKeyToMonthDay(key) {
+	var year = parseInt(key.substr(0, 4));
+	var monthStr = key.substr(4, key.length);
+	var monthInt = parseInt(monthStr, "10"); // add base value
+	var monthNumber = monthInt - 1;
+	return Date.today().set({
+		day : 1,
+		month : monthNumber,
+		year : year
+	}).toString("MMM d");
+}
+
+function convertYearMonthDayKeyToMonthDay(key) {
+	var year = parseInt(key.substr(0, 4));
+	var monthStr = key.substr(4, 2);
+	var monthInt = parseInt(monthStr, "10"); // add base value
+	var monthNumber = monthInt - 1;
+
+	var dayStr = key.substr(6, 2);
+	var dayInt = parseInt(dayStr, "10"); // add base value
+	dayNumber = dayInt;
+	
+	return Date.today().set({
+		day : dayNumber,
+		month : monthNumber,
+		year : year
+	}).toString("MMM d");
+}
+
 function getKeysFromGraphFormat(format) {
 	var firstDate;
 	var keys = [];
@@ -2146,7 +2387,7 @@ function getKeysFromGraphFormat(format) {
 
 		}
 
-	} else if(format == '10' || format == '15' || format == '20') {
+	} else if(format == '7' || format == '14' || format == '21'  || format == '28') {
 		firstDate = Date.today().add({
 			days : -parseInt(format)
 		});
@@ -5183,9 +5424,9 @@ function autoAppendReminderDropdown(reminderId, reminderDefault) {
 	autoAppendDropdown(reminderId, 15, 1);
 }
 
-function updateReminderSettings(formid) {
+function updateReminderSettings(payload) {
 	var url = "./updatesurveyremindersettings.do";
-	callAjaxFormSubmit(url, updateReminderSettingsCallBack, formid);
+	callAjaxPostWithPayloadData(url, updateReminderSettingsCallBack, payload);
 }
 
 function updateReminderSettingsCallBack(response) {
@@ -5431,6 +5672,28 @@ function updateAllowPartnerSurveySettingForCompany(allowPartnerSurvey, disableEl
 			}	
 			else{
 				$('#alw-ptnr-srvy-chk-box').addClass('bd-check-img-checked');
+			}
+			$('#overlay-toast').html("Content updated successfully");
+		}else{
+			$('#overlay-toast').html(data);
+		}
+		showToast();
+	}, payload, true, disableEle);
+	
+}
+
+function updateUpdateTransactionMonitorForCompany(updateTransactionMonitorSetting, disableEle) {
+	var payload = {
+		"updateTransactionMonitorSetting" : updateTransactionMonitorSetting
+	};
+	
+	callAjaxGetWithPayloadData("./updatetransactionmonitorsettingforcompany.do",function(data) {
+		if (data == "success"){
+			if ($('#incld-fr-trans-mntr-chk-box').hasClass('bd-check-img-checked')) {
+				$('#incld-fr-trans-mntr-chk-box').removeClass('bd-check-img-checked');
+			}	
+			else{
+				$('#incld-fr-trans-mntr-chk-box').addClass('bd-check-img-checked');
 			}
 			$('#overlay-toast').html("Content updated successfully");
 		}else{
@@ -6682,11 +6945,12 @@ function paintSurveyPage(jsonData) {
 	// }
 	$('#google-btn').attr("href", "https://plus.google.com/share?url=" + agentFullProfileLink);
 
-	if (yelpEnabled) {
+	//SS-1452 remove yelp from all the pages
+	/*if (yelpEnabled) {
 		$('#ylp-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.yelpLink));
 	} else {
 		$('#ylp-btn').remove();
-	}
+	}*/
 
 	if (zillowEnabled) {
 		$('#zillow-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.zillowLink));
@@ -6976,16 +7240,9 @@ function showFeedbackPage(mood) {
 		}
 		rating = currResponse / (counter);
 		rating = parseFloat(rating).toFixed(3);
-		if ((rating >= autoPostScore)) {
-			$("#pst-srvy-div").show();
-			if ((Boolean(autoPost) == false)) {
-				$('#shr-pst-cb').val('false');
-				$('#shr-post-chk-box').addClass('bd-check-img-checked');
-			} else {
-				$('#shr-pst-cb').val('true');
-				$('#shr-post-chk-box').removeClass('bd-check-img-checked');
-			}
-		}
+		$("#pst-srvy-div").show();
+		$('#shr-pst-cb').val('true');
+		$('#shr-post-chk-box').removeClass('bd-check-img-checked');
 		break;
 	case "OK":
 		question = neutralText;
@@ -7076,7 +7333,7 @@ function showMasterQuestionPage() {
 		}
 
 		var onlyPostToSocialSurvey = true;
-		if ($('#shr-post-chk-box').hasClass('bd-check-img-checked') == false && (rating >= autoPostScore) && (Boolean(autoPost) == true)) {
+		if ($('#shr-post-chk-box').hasClass('bd-check-img-checked') == false ) {
 			if (isAbusive == false) {
 				onlyPostToSocialSurvey = false;
 			}
@@ -7105,7 +7362,7 @@ function showMasterQuestionPage() {
 		}
 		
 		var fmt_rating = Number(rating).toFixed(1);
-		$('#linkedin-btn').attr("href", "https://www.linkedin.com/shareArticle?mini=true&url=" + agentFullProfileLink + "/" + surveyId + "&title=&summary=" + fmt_rating + "-star response from " + firstName + " " + lastName + " for " + agentName + " at SocialSurvey - " + feedback + ".&source=");
+		$('#linkedin-btn').attr("href", "https://www.linkedin.com/shareArticle?mini=true&url=" + agentFullProfileLink + "/" + surveyId + "&title=&summary=" + fmt_rating + "-star response from " + firstName + " " + getInitials( lastName ) + " for " + agentName + " at SocialSurvey - " + feedback + ".&source=");
 		var twitterFeedback = feedback;
 		if (twitterFeedback.length > 109) {
 			twitterFeedback = twitterFeedback.substring(0, 70);
@@ -7113,8 +7370,8 @@ function showMasterQuestionPage() {
 		} else {
 			twitterFeedback = feedback;
 		}
-		$('#twitter-btn').attr("href", "https://twitter.com/intent/tweet?text=" + fmt_rating + "-star response from " + firstName + " " + lastName + " for " + agentName + " at SocialSurvey - " + twitterFeedback + "&url='" + agentFullProfileLink + "'");
-		$('#fb-btn').attr("href", "https://www.facebook.com/dialog/share?app_id=" + fb_app_id + "&href=" + agentFullProfileLink + "&quote=" + fmt_rating + "-star response from " + firstName + " " + lastName + " for " + agentName + " at SocialSurvey - " + feedback + "&redirect_uri=https://www.facebook.com");
+		$('#twitter-btn').attr("href", "https://twitter.com/intent/tweet?text=" + fmt_rating + "-star response from " + firstName + " " + getInitials( lastName ) + " for " + agentName + " at SocialSurvey - " + twitterFeedback + "&url='" + agentFullProfileLink + "'");
+		$('#fb-btn').attr("href", "https://www.facebook.com/dialog/share?app_id=" + fb_app_id + "&href=" + agentFullProfileLink + "&quote=" + fmt_rating + "-star response from " + firstName + " " + getInitials( lastName ) + " for " + agentName + " at SocialSurvey - " + feedback + "&redirect_uri=https://www.facebook.com");
 
 		$('#content-head').html('Survey Completed');
 		if (mood == 'Great')
@@ -7590,13 +7847,6 @@ $(document).on('blur', '.prof-edditable-sin', function() {
 
 });
 
-/*
- * $(document).on('click', '.fb-shr', function() { var firstName = $(this).parent().parent().parent().attr('data-firstname'); var lastName = $(this).parent().parent().parent().attr('data-lastname'); var agentName = $(this).parent().parent().parent().attr('data-agentname'); var review = $(this).parent().parent().parent().attr('data-review'); var score = $(this).parent().parent().parent().attr('data-score'); shareOnFacebook(firstName, lastName, agentName, review, score); });
- * 
- * $(document).on('click', '.twt-shr', function() { var firstName = $(this).parent().parent().parent().attr('data-firstname'); var lastName = $(this).parent().parent().parent().attr('data-lastname'); var agentName = $(this).parent().parent().parent().attr('data-agentname'); var review = $(this).parent().parent().parent().attr('data-review'); var score = $(this).parent().parent().parent().attr('data-score'); shareOnTwitter(firstName, lastName, agentName, review, score); });
- * 
- * $(document).on('click', '.lnkdn-shr', function() { var firstName = $(this).parent().parent().parent().attr('data-firstname'); var lastName = $(this).parent().parent().parent().attr('data-lastname'); var agentName = $(this).parent().parent().parent().attr('data-agentname'); var review = $(this).parent().parent().parent().attr('data-review'); var score = $(this).parent().parent().parent().attr('data-score'); shareOnLinkedin(firstName, lastName, agentName, review, score); });
- */
 
 // On hover for lock icons
 $(document).on('mouseover', '#prof-logo-container', function(e) {
@@ -8594,6 +8844,7 @@ $('body').on('click', '#prof-edit-social-link .icn-lendingtree', function(e) {
 	$('#social-token-text').val(link);
 });
 
+
 function updateLendingTreeLink(link) {
 	var payload = {
 		"lendingTreeLink" : link
@@ -8603,6 +8854,33 @@ function updateLendingTreeLink(link) {
 		showProfileLinkInEditProfilePage("lendingtree", link);
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
+		showToast();
+	}
+}
+
+//Update Social links - facebook pixel
+$('body').on('click', '#prof-edit-social-link .icn-fb-pxl', function(e) {
+	e.stopPropagation();
+	$('#social-token-text').show();
+	var link = $(this).attr("data-link");
+	$('#social-token-text').attr({
+		"placeholder" : "Add Facebook pixel id",
+		"onblur" : "updateFacebookPixelId(this.value);$('#social-token-text').hide();"
+	});
+	$('#social-token-text').val(link);
+});
+
+function updateFacebookPixelId(pixelId) {
+	var payload = {
+		"pixelId" : pixelId
+	};
+	var parsedPixelId = parseInt(pixelId, 10);
+	var isPixelIdInt = parsedPixelId == pixelId;
+	if (pixelId != undefined && pixelId != '' && isPixelIdInt ) {
+		callAjaxPostWithPayloadData("./updatefacebookpixelid.do", callBackUpdateSocialLink, payload, true);
+		showProfileLinkInEditProfilePage("facebookPixel", pixelId);
+	} else {
+		$('#overlay-toast').html("Enter a valid pixel id");
 		showToast();
 	}
 }
@@ -11090,6 +11368,14 @@ $('body').on('click', '#alw-ptnr-srvy-chk-box', function() {
 	}
 });
 
+$('body').on('click', '#incld-fr-trans-mntr-chk-box', function() {
+	if ($('#incld-fr-trans-mntr-chk-box').hasClass('bd-check-img-checked')) {
+		updateUpdateTransactionMonitorForCompany(true, '#incld-fr-trans-mntr-chk-box');
+	} else {
+		updateUpdateTransactionMonitorForCompany(false, '#incld-fr-trans-mntr-chk-box');
+	}
+});
+
 $('body').on('click', '#survey-mail-thrhld-chk-box', function() {
 	if ($('#survey-mail-thrhld-chk-box').hasClass('bd-check-img-checked')) {
 		$('#survey-mail-thrhld-chk-box').removeClass('bd-check-img-checked');
@@ -12910,7 +13196,7 @@ function paintReviews(result, isRequestFromDashBoard) {
 		if (custNameArray[1] != undefined && custNameArray[1].trim() != "") {
 			custDispName += ' ' + custNameArray[1].substr(0, 1).toUpperCase() + '.';
 		}
-		reviewsHtml = reviewsHtml + '<div class="' + lastItemClass + '" data-cust-first-name=' + encodeURIComponent(reviewItem.customerFirstName) + ' data-cust-last-name=' + encodeURIComponent(reviewItem.customerLastName) + ' data-agent-name=' + encodeURIComponent(reviewItem.agentName) + ' data-rating=' + reviewItem.score + ' data-review="' + encodeURIComponent(reviewItem.review) + '" data-customeremail="' + reviewItem.customerEmail + '" data-agentid="' + reviewItem.agentId + '" survey-mongo-id="' + reviewItem._id + '">';
+		reviewsHtml = reviewsHtml + '<div class="' + lastItemClass + '" data-cust-first-name=' + encodeURIComponent(reviewItem.customerFirstName) + ' data-rating=' + reviewItem.score + ' data-review="' + encodeURIComponent(reviewItem.review)  + '" data-agentid="' + reviewItem.agentId + '" survey-mongo-id="' + reviewItem._id + '">';
 		reviewsHtml += '	<div class="ppl-header-wrapper clearfix">';
 		reviewsHtml += '		<div class="float-left ppl-header-left">';
 		reviewsHtml += '			<div class="ppl-head-1">' + custDispName + '</div>';
@@ -13172,4 +13458,13 @@ $('body').on('click', '.st-dd-item-survey-mail-thrs', function() {
 				showToast();
 			}, payload, false);
 });
+
+function getInitials( name ){
+    if( name != undefined && name != "" ){
+        return name.charAt(0).toUpperCase();
+    } else {
+        return "";
+    }
+}
+
 

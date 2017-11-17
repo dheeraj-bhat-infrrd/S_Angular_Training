@@ -8278,5 +8278,57 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     {
         return organizationUnitSettingsDao.getHiddenPublicPagesEntityIds( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
     }
+    
 
+    @Transactional
+    @Override
+    public List<OrganizationUnitSettings> getCompaniesForTransactionMonitor()
+    {
+        return organizationUnitSettingsDao.getCompaniesForTransactionMonitor();
+    }
+
+    @Override
+    public void updateTransactionMonitorSettingForCompany( long companyId, boolean includeForTransactionMonitor )
+    {
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden(
+            MongoOrganizationUnitSettingDaoImpl.KEY_INCLUDE_FOR_TRANSACTION_MONITOR, includeForTransactionMonitor, companyId,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+    }
+        /**
+     * 
+     * @param companySettings
+     * @param regionSettings
+     * @param branchSetting
+     * @param unitSettings
+     * @return
+     */
+    @Override
+    public String getFacebookPixelImageTagsFromHierarchy( OrganizationUnitSettings companySettings,
+        OrganizationUnitSettings regionSettings, OrganizationUnitSettings branchSetting, OrganizationUnitSettings unitSettings )
+    {
+
+        String facebookPixelTag = "";
+
+        if ( companySettings != null && companySettings.getSocialMediaTokens() != null
+            && companySettings.getSocialMediaTokens().getFacebookPixelToken() != null )
+            if ( !StringUtils.isEmpty( companySettings.getSocialMediaTokens().getFacebookPixelToken().getPixelImgTag() ) )
+                facebookPixelTag += companySettings.getSocialMediaTokens().getFacebookPixelToken().getPixelImgTag();
+
+        if ( regionSettings != null && regionSettings.getSocialMediaTokens() != null
+            && regionSettings.getSocialMediaTokens().getFacebookPixelToken() != null )
+            if ( !StringUtils.isEmpty( regionSettings.getSocialMediaTokens().getFacebookPixelToken().getPixelImgTag() ) )
+                facebookPixelTag += regionSettings.getSocialMediaTokens().getFacebookPixelToken().getPixelImgTag();
+
+        if ( branchSetting != null && branchSetting.getSocialMediaTokens() != null
+            && branchSetting.getSocialMediaTokens().getFacebookPixelToken() != null )
+            if ( !StringUtils.isEmpty( branchSetting.getSocialMediaTokens().getFacebookPixelToken().getPixelImgTag() ) )
+                facebookPixelTag += branchSetting.getSocialMediaTokens().getFacebookPixelToken().getPixelImgTag();
+
+        if ( unitSettings != null &&   unitSettings.getSocialMediaTokens() != null
+            && unitSettings.getSocialMediaTokens().getFacebookPixelToken() != null )
+            if ( !StringUtils.isEmpty( unitSettings.getSocialMediaTokens().getFacebookPixelToken().getPixelImgTag() ) )
+                facebookPixelTag += unitSettings.getSocialMediaTokens().getFacebookPixelToken().getPixelImgTag();
+
+        return facebookPixelTag;
+    }
 }

@@ -499,6 +499,7 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
     
     @SuppressWarnings ( "unchecked")
     @Override
+    @Transactional
     public List<String> getRegisteredEmailsInOtherCompanies( Company company ) throws InvalidInputException{
         if ( company == null ) {
             throw new InvalidInputException( "Invalid company id passed in getAgentIdsUnderCompany method" );
