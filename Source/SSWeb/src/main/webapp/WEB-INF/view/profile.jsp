@@ -62,7 +62,7 @@
 <meta http-equiv="cache-control" content="max-age=0" />
 <meta http-equiv="cache-control" content="no-cache" />
 <meta http-equiv="expires" content="0" />
-<meta property=”og:image” content=”${profile.profileImageUrlThumbnail}” />
+<meta property="og:image" content="${profile.profileImageUrlThumbnail}" />
 <link rel="shortcut icon" href="/favicon.ico" sizes="16x16">
 <link rel="stylesheet"
 	href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
