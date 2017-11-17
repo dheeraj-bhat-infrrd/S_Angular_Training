@@ -113,7 +113,7 @@
 								</c:if>
 							</c:if>
 							
-							<c:if test="${ columnName == 'companyId' }">
+                            <c:if test="${ not empty companyAdminSwitchId or isRealTechOrSSAdmin == true or user.isOwner == 1 }">
 								<div class="float-left clear-both comp-mail-thrs-txt"><spring:message code="label.agent.notify.threshold.key" /></div>
 								<div class="float-left">
 									<!-- set the minimum threshold for sending completed mail to administrators and agents -->
