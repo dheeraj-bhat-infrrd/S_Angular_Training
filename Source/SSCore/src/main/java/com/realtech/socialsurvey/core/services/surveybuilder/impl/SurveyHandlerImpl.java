@@ -556,15 +556,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     /*
-     * Method to get list of all the admins' emailIds, an agent comes under. Later on these emailIds
-     * are used for sending emails in case of any sad review for the agent.
+     * Method to get list of all the administrator emailIds, an agent comes under.
      */
     @Transactional
     @Override
-    public Map<String, String> getEmailIdsOfAdminsInHierarchy( long agentId ) throws InvalidInputException
+    public Map<String, Map<String, String>> getEmailIdsOfAdminsInHierarchy( long agentId ) throws InvalidInputException
     {
-        Map<String, String> emailIdsOfAdmins = new HashMap<String, String>();
-        List<UserProfile> admins = new ArrayList<>();
+        Map<String, Map<String, String>> adminsHierarchyMap = new HashMap<>();
+        Map<String, List<UserProfile>> adminMap = new HashMap<>();
         User agent = userDao.findById( User.class, agentId );
         Map<String, Object> queries = new HashMap<>();
         queries.put( CommonConstants.USER_COLUMN, agent );
@@ -578,29 +577,49 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             queries.put( CommonConstants.PROFILE_MASTER_COLUMN,
                 userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) );
             queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
-            admins.addAll( userProfileDao.findByKeyValue( UserProfile.class, queries ) );
+            adminMap.put( CommonConstants.BRANCH_ID_COLUMN, userProfileDao.findByKeyValue( UserProfile.class, queries ) );
             queries.clear();
             queries.put( CommonConstants.REGION_ID_COLUMN, agentProfile.getRegionId() );
             queries.put( CommonConstants.PROFILE_MASTER_COLUMN,
                 userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) );
             queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
-            admins.addAll( userProfileDao.findByKeyValue( UserProfile.class, queries ) );
+            adminMap.put( CommonConstants.REGION_ID_COLUMN, userProfileDao.findByKeyValue( UserProfile.class, queries ) );
             queries.clear();
             if ( agentProfile.getCompany() != null ) {
                 queries.put( CommonConstants.COMPANY_COLUMN, agentProfile.getCompany() );
                 queries.put( CommonConstants.PROFILE_MASTER_COLUMN,
                     userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID ) );
                 queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
-                admins.addAll( userProfileDao.findByKeyValue( UserProfile.class, queries ) );
+                adminMap.put( CommonConstants.COMPANY_COLUMN, userProfileDao.findByKeyValue( UserProfile.class, queries ) );
             }
         }
-        for ( UserProfile admin : admins ) {
-            String name = admin.getUser().getFirstName();
-            if ( admin.getUser().getLastName() != null )
-                name += " " + admin.getUser().getLastName();
-            emailIdsOfAdmins.put( admin.getEmailId(), name );
+
+        adminsHierarchyMap.put( CommonConstants.BRANCH_ID_COLUMN,
+            processAdminListForAHierarchy( adminMap.get( CommonConstants.BRANCH_ID_COLUMN ) ) );
+        adminsHierarchyMap.put( CommonConstants.REGION_ID_COLUMN,
+            processAdminListForAHierarchy( adminMap.get( CommonConstants.REGION_ID_COLUMN ) ) );
+        adminsHierarchyMap.put( CommonConstants.COMPANY_COLUMN,
+            processAdminListForAHierarchy( adminMap.get( CommonConstants.COMPANY_COLUMN ) ) );
+
+        return adminsHierarchyMap;
+    }
+
+
+    private Map<String, String> processAdminListForAHierarchy( List<UserProfile> admins )
+    {
+
+        if ( admins == null || admins.isEmpty() ) {
+            return null;
+        } else {
+            Map<String, String> adminHierarchyMap = new HashMap<>();
+            for ( UserProfile admin : admins ) {
+                String name = admin.getUser().getFirstName();
+                if ( admin.getUser().getLastName() != null )
+                    name += " " + admin.getUser().getLastName();
+                adminHierarchyMap.put( admin.getEmailId(), name );
+            }
+            return adminHierarchyMap;
         }
-        return emailIdsOfAdmins;
     }
 
 
@@ -4398,6 +4417,110 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         LOG.debug( "Method getDuplicateSurveyIntervalForCompany finished for company " + companyId );
         return duplicateSurveyInterval;
 
+    }
+    
+    
+    /**
+     * method to build survey completion threshold Map
+     * @param survey
+     * @return Map
+     * @throws InvalidInputException 
+     * @throws NoRecordsFetchedException 
+     */
+    @Override
+    public Map<String, Double> buildSurveyCompletionThresholdMap( SurveyDetails survey )
+        throws InvalidInputException, NoRecordsFetchedException
+    {
+        if ( survey == null || StringUtils.isEmpty( survey.get_id() ) ) {
+            throw new InvalidInputException(
+                "method checkAndSendSurveyCompletedMailToAdminsAndAgent(): Survey details are not specifed." );
+        }
+
+        LOG.debug( "checking agent notification threshold for survey with ID: {}", survey.get_id() );
+        OrganizationUnitSettings companySettings = null;
+        OrganizationUnitSettings regionSettings = null;
+        OrganizationUnitSettings branchSettings = null;
+        OrganizationUnitSettings agentSettings = null;
+
+        double surveyCompletionThresholdForAgent = 0.0d;
+        double surveyCompletionThresholdForBranch = 0.0d;
+        double surveyCompletionThresholdForRegion = 0.0d;
+        double surveyCompletionThresholdForCompany = 0.0d;
+
+        Map<String, Double> surveyCompletionThresholdMap = new HashMap<>();
+
+
+        if ( survey.getAgentId() > 0 ) {
+            agentSettings = organizationManagementService.getAgentSettings( survey.getAgentId() );
+        }
+        if ( survey.getBranchId() != 0 ) {
+            // WARNING: doesn't contain region data for the branch, use "getBranchSettings()" if needed
+            branchSettings = organizationManagementService.getBranchSettingsDefault( survey.getBranchId() );
+        }
+        if ( survey.getRegionId() != 0 ) {
+            regionSettings = organizationManagementService.getRegionSettings( survey.getRegionId() );
+        }
+        if ( survey.getCompanyId() != 0 ) {
+            companySettings = organizationManagementService.getCompanySettings( survey.getCompanyId() );
+        }
+
+
+        if ( agentSettings != null && agentSettings.getSurvey_settings() != null ) {
+            surveyCompletionThresholdForAgent = agentSettings.getSurvey_settings().getSurveyCompletedMailThreshold();
+        }
+        if ( branchSettings != null && branchSettings.getSurvey_settings() != null ) {
+            surveyCompletionThresholdForBranch = branchSettings.getSurvey_settings().getSurveyCompletedMailThreshold();
+        }
+        if ( regionSettings != null && regionSettings.getSurvey_settings() != null ) {
+            surveyCompletionThresholdForRegion = regionSettings.getSurvey_settings().getSurveyCompletedMailThreshold();
+        }
+        if ( companySettings != null && companySettings.getSurvey_settings() != null ) {
+            surveyCompletionThresholdForCompany = companySettings.getSurvey_settings().getSurveyCompletedMailThreshold();
+        }
+
+        surveyCompletionThresholdMap.put( CommonConstants.AGENT_ID_COLUMN, surveyCompletionThresholdForAgent );
+        surveyCompletionThresholdMap.put( CommonConstants.BRANCH_ID_COLUMN, surveyCompletionThresholdForBranch );
+        surveyCompletionThresholdMap.put( CommonConstants.REGION_ID_COLUMN, surveyCompletionThresholdForRegion );
+        surveyCompletionThresholdMap.put( CommonConstants.COMPANY_ID_COLUMN, surveyCompletionThresholdForCompany );
+
+        LOG.debug( "method checkAndSendSurveyCompletedMailToAdminsAndAgent() finished for survey with Id: {}",
+            survey.get_id() );
+        return surveyCompletionThresholdMap;
+    }
+
+
+    @Override
+    public Map<String, String> buildPreferredAdminEmailListForSurvey( SurveyDetails survey, double companyThreshold,
+        double regionThreshold, double branchThreshold ) throws InvalidInputException
+    {
+        if ( survey == null || StringUtils.isEmpty( survey.get_id() ) ) {
+            throw new InvalidInputException(
+                "method buildPreferredAdminEmailListForSurvey(): Survey details are not specifed." );
+        }
+
+        LOG.debug( "loading email IDs for survey with ID: {}", survey.get_id() );
+        Map<String, String> emailMap = new HashMap<>();
+
+        // get the email Map for every hierarchy
+        Map<String, Map<String, String>> adminMap = getEmailIdsOfAdminsInHierarchy( survey.getAgentId() );
+
+        //  process branch administrators
+        if ( branchThreshold <= survey.getScore() && adminMap.get( CommonConstants.BRANCH_ID_COLUMN ) != null ) {
+            emailMap.putAll( adminMap.get( CommonConstants.BRANCH_ID_COLUMN ) );
+        }
+
+        //  process region administrators
+        if ( regionThreshold <= survey.getScore() && adminMap.get( CommonConstants.REGION_ID_COLUMN ) != null ) {
+            emailMap.putAll( adminMap.get( CommonConstants.REGION_ID_COLUMN ) );
+        }
+
+        //  process company administrators
+        if ( companyThreshold <= survey.getScore() && adminMap.get( CommonConstants.COMPANY_ID_COLUMN ) != null ) {
+            emailMap.putAll( adminMap.get( CommonConstants.COMPANY_ID_COLUMN ) );
+        }
+
+        LOG.debug( "method buildPreferredAdminEmailListForSurvey() finished for survey with ID: {}", survey.get_id() );
+        return emailMap;
     }
 
 }

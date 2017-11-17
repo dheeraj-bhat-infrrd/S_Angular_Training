@@ -113,14 +113,12 @@
 								</c:if>
 							</c:if>
 							
-							<c:if test="${ columnName == 'companyId' }">
-								<div class="float-left clear-both comp-mail-thrs-txt"><spring:message code="label.agent.notify.threshold.key" /></div>
-								<div class="float-left">
-									<!-- set the minimum threshold for sending completed mail to administrators and agents -->
-									<input type="text" name="survey-mail-threshold" id="survey-mail-threshold" class="st-item-row-txt cursor-pointer dd-arrow-dn" autocomplete="off" value="${surveyCompletedMailThreshold}">
-									<div class="st-dd-wrapper hide" id="st-dd-wrapper-survey-mail-thrs"></div>
-								</div>
-							</c:if>
+							<div class="float-left clear-both comp-mail-thrs-txt"><spring:message code="label.agent.notify.threshold.key" /></div>
+							<div class="float-left">
+								<!-- set the minimum threshold for sending completed mail to administrators and agents -->
+								<input type="text" name="survey-mail-threshold" id="survey-mail-threshold" class="st-item-row-txt cursor-pointer dd-arrow-dn" autocomplete="off" value="${surveyCompletedMailThreshold}">
+								<div class="st-dd-wrapper hide" id="st-dd-wrapper-survey-mail-thrs"></div>
+							</div>
 							
 							<c:if test="${ isRealTechOrSSAdmin == true and columnName == 'companyId' }">
 							<div class="send-email-sel-col">
