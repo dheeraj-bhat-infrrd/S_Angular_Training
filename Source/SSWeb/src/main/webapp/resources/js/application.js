@@ -13467,4 +13467,66 @@ function getInitials( name ){
     }
 }
 
+function downloadAccountStatsReport(){
+	
+	callAjaxPOST('./downloadaccountstatisticsreport.do', function(data){
+		$('#overlay-toast').html(data);
+		showToast();
+		getAccStatsReportStatus();
+	}, false);
+}
 
+function getAccStatsReportStatus(){
+	callAjaxGET('./getaccountstatisticsreportstatus.do', function(data){
+		var reportDetails = JSON.parse(JSON.parse(data));
+		
+		if(reportDetails.status == 1 || reportDetails.status == 2){
+			if($('#acc-stats-gen-rep').hasClass('acc-stats-rep-btn-enabled')){
+				$('#acc-stats-gen-rep').removeClass('acc-stats-rep-btn-enabled');
+			}
+
+			$('#acc-stats-rep-bnt').css('pointer-events','none');
+			$('#acc-stats-gen-rep').addClass('acc-stats-rep-btn-disabled');
+			
+			if($('#account-stats-status-link').hasClass('download-acc-stats-rep')){
+				$('#account-stats-status-link').removeClass('download-acc-stats-rep')
+			}
+			$('#account-stats-status-link').addClass('pending-acc-stats-rep')
+			$('#account-stats-status-link').html('Report Pending');
+			$('#account-stats-status-link').removeAttr('href');
+			$('#account-stats-status-link').css('pointer-events','none');
+		}else if(reportDetails.status  == 0){
+			if($('#acc-stats-gen-rep').hasClass('acc-stats-rep-btn-disabled')){
+				$('#acc-stats-gen-rep').removeClass('acc-stats-rep-btn-disabled');
+			}
+			$('#acc-stats-rep-bnt').css('pointer-events','auto');
+			$('#acc-stats-gen-rep').addClass('acc-stats-rep-btn-enabled');
+			
+			if($('#account-stats-status-link').hasClass('pending-acc-stats-rep')){
+				$('#account-stats-status-link').removeClass('pending-acc-stats-rep');
+			}
+			$('#account-stats-status-link').addClass('download-acc-stats-rep')
+			$('#account-stats-status-link').html('Download the report');
+			$('#account-stats-status-link').attr('href',reportDetails.fileName);
+			$('#account-stats-status-link').css('pointer-events','auto');
+		}else if(reportDetails.status == 4){
+			if($('#acc-stats-gen-rep').hasClass('acc-stats-rep-btn-disabled')){
+				$('#acc-stats-gen-rep').removeClass('acc-stats-rep-btn-disabled');
+			}
+			$('#acc-stats-rep-bnt').css('pointer-events','auto');
+			$('#acc-stats-gen-rep').addClass('acc-stats-rep-btn-enabled');
+			
+			if($('#account-stats-status-link').hasClass('download-acc-stats-rep')){
+				$('#account-stats-status-link').removeClass('download-acc-stats-rep')
+			}
+			$('#account-stats-status-link').addClass('pending-acc-stats-rep')
+			$('#account-stats-status-link').html('Report Generation Failed. Please Try Again.');
+			$('#account-stats-status-link').removeAttr('href');
+			$('#account-stats-status-link').css('pointer-events','none');
+		}
+	}, false);
+}
+
+$(document).on('click','#acc-stats-rep-bnt',function(){
+	downloadAccountStatsReport();
+});

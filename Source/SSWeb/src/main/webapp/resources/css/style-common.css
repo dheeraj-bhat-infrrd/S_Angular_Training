@@ -4704,6 +4704,47 @@ img.prof-image {
 	text-transform: initial;
 }
 
+.acc-stats-rep-btn-enabled{
+	cursor: pointer;
+}
+
+.acc-stats-rep-btn-disabled {
+    cursor: not-allowed;
+    background: lightgray;
+}
+
+.download-acc-stats-rep{
+	color: #009fe0;
+    font-size: 13px;
+    cursor:pointer;
+}
+
+.download-acc-stats-rep:hover{
+	color: #009fe0;
+    font-size: 13px;
+}
+
+.pending-acc-stats-rep{
+	color: #969595;
+    font-size: 13px;
+}
+
+.acc-stats-rep-link{
+	margin-top: 6px;
+    position: absolute;
+    margin-left: 30px;
+}
+
+.pending-acc-stats-rep:hover{
+	color: #969595;
+	text-decoration:none !important;
+}
+.acc-stats-rep-btn-disabled{
+	cursor: not-allowed;
+    background: #bdb9b9;
+    color: whitesmoke;
+}
+
 .dash-btn-dl-sd-admin {
 	float: right;
 	margin-right: 10px;
