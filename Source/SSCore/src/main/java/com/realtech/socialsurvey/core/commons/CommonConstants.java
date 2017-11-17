@@ -239,6 +239,7 @@ public interface CommonConstants
     public static final String BATCH_TYPE_ZILLOW_REVIEW_PROCESSOR_AND_AUTO_POSTER = "ZillowReviewProcessorAndAutoPoster";
     public static final String BATCH_TYPE_HIERARCHY_UPLOAD_PROCESSOR = "HierarchyUploadProcessor";
     public static final String BATCH_TYPE_MONTHLY_DIGEST_STARTER = "MonthlyDigestStarter";
+    public static final String BATCH_TYPE_SURVEY_CSV_UPLOAD_PROCESSOR = "SurveyCsvUploadProcessor";
 
     //batch name constant for batch tracker
     public static final String BATCH_NAME_REVIEW_COUNT_UPDATER = "Agent's review count in solr updater";
@@ -266,6 +267,7 @@ public interface CommonConstants
     public static final String BATCH_NAME_ZILLOW_REVIEW_PROCESSOR_AND_AUTO_POSTER = "Zillow review processor and auto poster";
     public static final String BATCH_NAME_HIERARCHY_UPLOAD_PROCESSOR = "Company Hierarchy Upload Processor";
     public static final String BATCH_NAME_MONTHLY_DIGEST_STARTER = "Monthly digest process starter for companies";
+    public static final String BATCH_NAME_SURVEY_CSV_UPLOAD_PROCESSOR = "Survey CSV file Upload Processor";
 
 
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_BILLING_REPORT = "Billing report";
@@ -763,6 +765,7 @@ public interface CommonConstants
     public static final String SOCIAL_HISTORY_COLLECTION = "SOCIAL_CONNECTION_HISTORY";
     public static final String UPLOAD_HIERARCHY_DETAILS_COLLECTION = "UPLOAD_HIERARCHY_DETAILS";
     public static final String TEMP_HIERARCHY_UPLOAD_COLLECTION = "TEMP_HIERARCHY_UPLOAD";
+    public static final String SURVEY_CSV_UPLOAD_COLLECTION = "SURVEY_CSV_UPLOAD";
 
     /*
      * Mongo social post Source

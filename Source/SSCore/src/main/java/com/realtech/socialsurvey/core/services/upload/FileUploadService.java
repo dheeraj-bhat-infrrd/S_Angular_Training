@@ -88,4 +88,6 @@ public interface FileUploadService
 
     public void updateFileUploadRecord( FileUpload fileUpload ) throws InvalidInputException;
 
+    
+    public String uploadFileAtSurveyCsvBucket( MultipartFile tempFile, String fileName ) throws NonFatalException;
 }

@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
@@ -712,6 +713,7 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
     // Method to get list of incomplete surveys to display in Dash board and profile page.
     @SuppressWarnings ( "unchecked")
     @Override
+    @Transactional
     public List<SurveyPreInitiation> getSurveyByAgentIdAndCustomeEmailForPastNDays( long agentId, String customerEmail,
         int noOfDays ) throws DatabaseException
     {
