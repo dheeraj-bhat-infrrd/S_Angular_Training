@@ -355,19 +355,13 @@ public class SurveyManagementController
                 String agentName = ( agent.getLastName() != null && !agent.getLastName().isEmpty() )
                     ? ( agent.getFirstName() + " " + agent.getLastName() ) : agent.getFirstName();
                 
-                double surveyCompletionThreshold = 0.0d;
-                if( companySettings.getSurvey_settings() != null ){
-                    surveyCompletionThreshold = companySettings.getSurvey_settings().getSurveyCompletedMailThreshold();
+  
+                for ( Entry<String, String> admin : emailIdsToSendMail.entrySet() ) {
+                    emailServices.sendSurveyCompletionMailToAdminsAndAgent( agentName, admin.getValue(), admin.getKey(),
+                        surveyDetail, customerName, surveyScore, logoUrl, agentSettings.getCompleteProfileUrl(),
+                        customerDetail );
                 }
                 
-                // check for survey completion mail threshold set for company 
-                if( surveyCompletionThreshold <= survey.getScore() ){    
-                    for ( Entry<String, String> admin : emailIdsToSendMail.entrySet() ) {
-                        emailServices.sendSurveyCompletionMailToAdminsAndAgent( agentName, admin.getValue(), admin.getKey(),
-                            surveyDetail, customerName, surveyScore, logoUrl, agentSettings.getCompleteProfileUrl(),
-                            customerDetail );
-                    }
-                }
 
 				if (companySettings.getSurvey_settings() != null && companySettings.getSurvey_settings().getComplaint_res_settings() != null) {
 					ComplaintResolutionSettings complaintRegistrationSettings = companySettings.getSurvey_settings().getComplaint_res_settings();
