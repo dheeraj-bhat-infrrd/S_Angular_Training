@@ -7240,16 +7240,9 @@ function showFeedbackPage(mood) {
 		}
 		rating = currResponse / (counter);
 		rating = parseFloat(rating).toFixed(3);
-		if ((rating >= autoPostScore)) {
-			$("#pst-srvy-div").show();
-			if ((Boolean(autoPost) == false)) {
-				$('#shr-pst-cb').val('false');
-				$('#shr-post-chk-box').addClass('bd-check-img-checked');
-			} else {
-				$('#shr-pst-cb').val('true');
-				$('#shr-post-chk-box').removeClass('bd-check-img-checked');
-			}
-		}
+		$("#pst-srvy-div").show();
+		$('#shr-pst-cb').val('true');
+		$('#shr-post-chk-box').removeClass('bd-check-img-checked');
 		break;
 	case "OK":
 		question = neutralText;
@@ -7340,7 +7333,7 @@ function showMasterQuestionPage() {
 		}
 
 		var onlyPostToSocialSurvey = true;
-		if ($('#shr-post-chk-box').hasClass('bd-check-img-checked') == false && (rating >= autoPostScore) && (Boolean(autoPost) == true)) {
+		if ($('#shr-post-chk-box').hasClass('bd-check-img-checked') == false ) {
 			if (isAbusive == false) {
 				onlyPostToSocialSurvey = false;
 			}
