@@ -76,6 +76,12 @@
 		   		<div id="wc-send-survey-upload-confirm" class=" float-left survey-csv-button disable">confirm</div>
 				<div id="wc-send-survey-upload-cancel" class=" float-left survey-csv-button">cancel</div>
 			</div>
+		</div>
+		<div class="clearfix">
+			<div class="survey-csv-template cursor-pointer">
+				<input type="hidden" id="template-url" value="${templateUrl}"/>
+				<span>download Template</span>
+			</div>
 		</div>	
 	</div>
 </div>
@@ -103,5 +109,10 @@
 		$('#wc-review-table').perfectScrollbar('update');
 
 		$("#wc-send-survey-upload-comfirm").addClass('disable');
+		
+		$('.survey-csv-template').on('click',function(e){
+			e.stopPropagation();
+			window.open($("#template-url").val(),"_blank");
+		});
 	});
 </script>

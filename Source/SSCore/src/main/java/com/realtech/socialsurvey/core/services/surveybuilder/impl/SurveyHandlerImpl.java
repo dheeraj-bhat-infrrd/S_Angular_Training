@@ -283,6 +283,16 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     private static final int SURVEY_CSV_CUSTOMER_EMAIL_NAME_INDEX_FOR_ADMIN = 3;
 
     private static final int SURVEY_CSV_AGENT_EMAIL_INDEX_FOR_ADMIN = 0;
+    
+    private static final String AGENT_EMAIL = "Agent Email";
+    private static final String CUSTOMER_FIRST_NAME = "Customer First Name";
+    private static final String CUSTOMER_LAST_NAME = "Customer Last Name";
+    private static final String CUSTOMER_EMAIL = "Customer Email";
+    
+    private static final List<String> AGENT_HEADER = Arrays.asList( CUSTOMER_FIRST_NAME, CUSTOMER_LAST_NAME, CUSTOMER_EMAIL );
+    private static final List<String> ADMIN_HEADER = Arrays.asList( AGENT_EMAIL, CUSTOMER_FIRST_NAME, CUSTOMER_LAST_NAME, CUSTOMER_EMAIL );
+
+    
 
 
     /**
@@ -4375,6 +4385,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         performSurveyIntervalCheck( survey );
 
 
+        // set the agent ID
+        survey.setAgentId( user.getUserId() );
+
         // set up survey pre-initiation object for further processing
         if ( StringUtils.isEmpty( survey.getAgentName() ) ) {
             survey.setAgentName( user.getFirstName() + user.getLastName() == null ? "" : " " + user.getLastName() );
@@ -4523,7 +4536,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         if ( incompleteSurveyCustomers != null && incompleteSurveyCustomers.size() > 0 ) {
             LOG.error( "Survey request already sent" );
             throw new InvalidInputException( "Can not process the record. A survey request for customer "
-                + survey.getCustomerFirstName() + " has already received." );
+                + survey.getCustomerFirstName() + " has already been received." );
         }
 
     }
@@ -4727,6 +4740,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         List<String> results = null;
         User agent = null;
         Map<String, Set<String>> processedSurveyEmails = null;
+        boolean isFromAgentPopup = CommonConstants.AGENT_ID.equals( csvInfo.getHierarchyType() );
 
         if ( csvData != null && csvData.size() > 0 ) {
 
@@ -4734,15 +4748,22 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             processedSurveyEmails = new HashMap<>();
             results = new ArrayList<>();
 
-            if ( CommonConstants.AGENT_ID.equals( csvInfo.getHierarchyType() ) ) {
+            if ( isFromAgentPopup ) {
                 try {
                     agent = userManagementService.getUserByUserId( csvInfo.getHierarchyId() );
                 } catch ( InvalidInputException userNotFound ) {
-                    LOG.equals( "No agent found for the given upload." );
+                    LOG.error( "No agent found for the given upload." );
                     throw new InvalidInputException( "No agent found for the given upload." );
                 }
             }
 
+            if( validateHeader( csvData.get( 1 ), isFromAgentPopup ? AGENT_HEADER : ADMIN_HEADER ) ){
+                LOG.debug( "Header validated." );
+                csvData.remove( 1 );
+            } else {
+                LOG.error( "Invalid header" );
+                throw new InvalidInputException( "Invalid Header." );
+            }
 
             // iterate over each row of CSV,validate and process the corresponding Survey Pre-Initiation Object
             for ( Entry<Integer, List<String>> entry : csvData.entrySet() ) {
@@ -4759,7 +4780,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
                     // parse required values
                     try {
-                        if ( CommonConstants.AGENT_ID.equals( csvInfo.getHierarchyType() ) ) {
+                        if ( isFromAgentPopup ) {
 
                             agentEmail = agent.getEmailId();
 
@@ -4801,7 +4822,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
                     // depending on the hierarchy at which the file was uploaded, start the survey process
-                    if ( CommonConstants.AGENT_ID.equals( csvInfo.getHierarchyType() )
+                    if ( isFromAgentPopup
                         || isConformingToGivenHierarchy( survey, csvInfo.getHierarchyId(), csvInfo.getHierarchyType() ) ) {
                         saveSurveyPreInitiationObject( survey );
 
@@ -4833,6 +4854,31 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             }
         }
         return results;
+    }
+
+
+    private boolean validateHeader( List<String> header, List<String> standardHeader ) throws InvalidInputException
+    {
+        LOG.debug( "validateHeader() started." );
+        if( header == null || header.size() < standardHeader.size() ){
+            return false;
+        }
+        
+        try{
+            int counter;
+            for( counter = 0; counter < standardHeader.size(); counter++ ){
+                if( !StringUtils.equalsIgnoreCase( standardHeader.get( counter ), header.get( counter ) ) ){
+                    return false;
+                }
+            }
+        } catch( IndexOutOfBoundsException headerError ){
+            LOG.error( "Header does not have enough values." );
+            throw new InvalidInputException( "Header does not have enough values." );
+        }
+        
+        
+        LOG.debug( "validateHeader() finished." );
+        return true;
     }
 
 

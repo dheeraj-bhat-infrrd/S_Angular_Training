@@ -89,6 +89,12 @@
 				<div id="wc-send-survey-upload-cancel" class=" float-left survey-csv-button">cancel</div>
 			</div>
 		</div>	
+		<div class="clearfix">
+			<div class="survey-csv-template cursor-pointer">
+				<input type="hidden" id="template-url" value="${templateUrl}"/>
+				<span>download Template</span>
+			</div>
+		</div>
 	</div>
 </div>
 <script>
@@ -110,6 +116,11 @@ $(document).ready(function(){
 		} else {
 			$.cookie("doNotShowPopup", "false");
 		}
+	});
+	
+	$('.survey-csv-template').on('click',function(e){
+		e.stopPropagation();
+		window.open($("#template-url").val(),"_blank");
 	});
 });
 </script>

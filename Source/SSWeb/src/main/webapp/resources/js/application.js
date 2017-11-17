@@ -13503,6 +13503,10 @@ $(document).on('click','#wc-send-survey-upload-cancel',function(event){
 $(document).on('click','#wc-send-survey-upload-confirm',function(event){
 	$('#send-survey-csv-dash').removeClass("hide");
 	if( !processAndValidateCsvForm( false ) ){
+		
+		if( !$('#send-survey-csv-dash').hasClass("hide") ){
+			$('#send-survey-csv-dash').addClass("hide");
+		}
 		hideOverlay();
 		return;
 	}
