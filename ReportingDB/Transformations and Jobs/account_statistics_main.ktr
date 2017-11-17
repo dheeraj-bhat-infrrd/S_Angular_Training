@@ -227,7 +227,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  BRANCH_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;FROM branch&#xd;&#xa;where IS_DEFAULT_BY_SYSTEM &#x3d; 0&#xd;&#xa;order by COMPANY_ID</sql>
+    <sql>SELECT&#xd;&#xa;  BRANCH_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;FROM branch&#xd;&#xa;where IS_DEFAULT_BY_SYSTEM &#x3d; 0 &#xd;&#xa;and STATUS &#x3d; 1&#xd;&#xa;order by COMPANY_ID</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -253,7 +253,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  COMPANY_ID&#xd;&#xa;, COMPANY&#xd;&#xa;FROM company where COMPANY_ID &#x21;&#x3d; 1&#xd;&#xa;order by COMPANY_ID</sql>
+    <sql>SELECT&#xd;&#xa;  COMPANY_ID&#xd;&#xa;, COMPANY&#xd;&#xa;FROM company where COMPANY_ID &#x21;&#x3d; 1 and STATUS &#x3d; 1&#xd;&#xa;order by COMPANY_ID</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -894,7 +894,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  REGION_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;FROM region&#xd;&#xa;where IS_DEFAULT_BY_SYSTEM &#x3d; 0&#xd;&#xa;order by COMPANY_ID&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  REGION_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;FROM region&#xd;&#xa;where IS_DEFAULT_BY_SYSTEM &#x3d; 0&#xd;&#xa;and STATUS &#x3d; 1&#xd;&#xa;order by COMPANY_ID&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>

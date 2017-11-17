@@ -3580,10 +3580,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 	@Override
 	@Transactional ( value = "transactionManagerForReporting")
 	public List<CompanyDetailsReport> getCompanyDetailsReport( Long entityId, int startIndex,
-			int batchSize) {
+			int batchSize) throws InvalidInputException {
 		User user = userDao.findById(User.class, entityId);
 		List<CompanyDetailsReport> companyDetailsReportData = null;
-		if (user != null && user.isSuperAdmin()) {
+		if (user != null && (user.isSuperAdmin() || userManagementService.isUserSocialSurveyAdmin(entityId))) {
 			companyDetailsReportData = companyDetailsReportDao.getCompanyDetailsReportData(startIndex, batchSize);
 		}
 		return companyDetailsReportData;
@@ -3592,8 +3592,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
 	@Override
 	public String generateCompanyDetailsReport(long entityId, String entityType) throws UnsupportedEncodingException, NonFatalException {
-		LOG.info( "Generating company details report for enitityId {}, entityType {}",entityId, entityType);
-	        String fileName = "Company_Details_Report" + "-" + ( Calendar.getInstance().getTimeInMillis() ) 
+		LOG.info( "Generating account statistics report for enitityId {}, entityType {}",entityId, entityType);
+	        String fileName = "Account_Statistics_Report" + "-" + ( Calendar.getInstance().getTimeInMillis() ) 
 	        		+ CommonConstants.EXCEL_FILE_EXTENSION;
 	        LOG.debug( "fileName {} ", fileName );
 	        XSSFWorkbook workbook = this.downloadCompanyDetailsReport( entityId, entityType );
