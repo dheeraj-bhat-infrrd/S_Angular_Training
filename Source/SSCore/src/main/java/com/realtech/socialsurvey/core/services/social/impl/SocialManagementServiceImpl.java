@@ -601,7 +601,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                         String profileUrl = "";
                         if ( surveyId != null && !surveyId.isEmpty() ) {
                             profileUrl = surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
-                                + agentSettings.getProfileUrl() + "/" + String.valueOf( surveyId );
+                                + agentSettings.getProfileUrl() + "/" + surveyId;
                         } else {
                             profileUrl = surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
                                 + agentSettings.getProfileUrl();
@@ -1136,7 +1136,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     @Override
     public void postToFacebookForHierarchy( String facebookMessage, double rating, String serverBaseUrl, int accountMasterId,
         SocialMediaPostDetails socialMediaPostDetails, SocialMediaPostResponseDetails socialMediaPostResponseDetails,
-        boolean isZillow, boolean isAgentsHidden ) throws InvalidInputException, NoRecordsFetchedException
+        boolean isZillow, boolean isAgentsHidden, String surveyId ) throws InvalidInputException, NoRecordsFetchedException
     {
 
         LOG.debug( "Method postToFacebookForHierarchy() started" );
@@ -1164,14 +1164,14 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         AgentSettings agentSettings = userManagementService.getUserSettings( agentId );
 
         // get profile url
-        String profileurl = agentSettings.getCompleteProfileUrl();
+        String profileurl = agentSettings.getCompleteProfileUrl() + ( StringUtils.isNotEmpty( surveyId ) ? "/" + surveyId : "" );
         // if company is hidden than show the url of the entity where user is
         // assigned
         if ( isAgentsHidden ) {
             String priamryProfileUrl = getProfileUrlOfPrimaryEntityOfAgent(
                 socialMediaPostDetails.getAgentMediaPostDetails().getAgentId() );
             if ( !StringUtils.isBlank( priamryProfileUrl ) )
-                profileurl = priamryProfileUrl;
+                profileurl = priamryProfileUrl + ( StringUtils.isNotEmpty( surveyId ) ? "/" + surveyId : "" );
         }
 
         // Post for agent
@@ -1184,7 +1184,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                         postToFacebookForAHierarchy( companyId, agentId, profileurl, facebookMessage, updatedFacebookMessage,
                             rating, serverBaseUrl, agentSettings, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
                             socialMediaPostDetails.getAgentMediaPostDetails(), agentMediaPostResponseDetails, isZillow,
-                            isAgentsHidden );
+                            isAgentsHidden, surveyId );
                     }
                 }
             }
@@ -1203,7 +1203,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                             rating, serverBaseUrl, companySetting,
                             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
                             socialMediaPostDetails.getCompanyMediaPostDetails(), companyMediaPostResponseDetails, isZillow,
-                            isAgentsHidden );
+                            isAgentsHidden, surveyId );
                     }
                 }
             }
@@ -1222,7 +1222,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                             postToFacebookForAHierarchy( companyId, agentId, profileurl, facebookMessage,
                                 updatedFacebookMessage, rating, serverBaseUrl, setting,
                                 MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionMediaPostDetails,
-                                regionMediaPostResponseDetails, isZillow, isAgentsHidden );
+                                regionMediaPostResponseDetails, isZillow, isAgentsHidden, surveyId );
                         }
                     }
 
@@ -1243,7 +1243,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                             postToFacebookForAHierarchy( companyId, agentId, profileurl, facebookMessage,
                                 updatedFacebookMessage, rating, serverBaseUrl, setting,
                                 MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchMediaPostDetails,
-                                branchMediaPostResponseDetails, isZillow, isAgentsHidden );
+                                branchMediaPostResponseDetails, isZillow, isAgentsHidden, surveyId );
                         }
                     }
                 }
@@ -1274,7 +1274,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     void postToFacebookForAHierarchy( long companyId, long agentId, String profileUrl, String facebookMessage,
         String updatedFacebookMessage, double rating, String serverBaseUrl, OrganizationUnitSettings setting,
         String collectionType, MediaPostDetails mediaPostDetails, EntityMediaPostResponseDetails mediaPostResponseDetails,
-        boolean isZillow, boolean isAgentsHidden ) throws InvalidInputException
+        boolean isZillow, boolean isAgentsHidden, String surveyId ) throws InvalidInputException
     {
         try {
 
@@ -1283,7 +1283,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     String profileUrlWithMessage = getClientCompanyProfileUrlForAgentToPostInSocialMedia( agentId, setting,
                         collectionType );
                     if ( profileUrlWithMessage == null || profileUrlWithMessage.isEmpty() ) {
-                        profileUrlWithMessage = setting.getCompleteProfileUrl() + "/";
+                        profileUrlWithMessage = setting.getCompleteProfileUrl() + ( StringUtils.isNotEmpty( surveyId ) ? "/" + surveyId : "" ) + "/.";
                     } else {
                         profileUrlWithMessage = profileUrlWithMessage + ".";
                     }
@@ -1459,7 +1459,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     String profileUrlWithMessage = getClientCompanyProfileUrlForAgentToPostInSocialMedia(
                         agentSettings.getIden(), setting, collectionName );
                     if ( profileUrlWithMessage == null || profileUrlWithMessage.isEmpty() ) {
-                        profileUrlWithMessage = setting.getCompleteProfileUrl() + "/.";
+                        profileUrlWithMessage = setting.getCompleteProfileUrl() + ( StringUtils.isNotEmpty( surveyId ) ? "/" + surveyId : "" ) + "/.";
                     } else {
                         profileUrlWithMessage = profileUrlWithMessage + ".";
                     }
@@ -1806,18 +1806,18 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             if ( !isAbusive && !onlyPostToSocialSurvey ) {
                 // Facebook message
                 String facebookMessage = buildFacebookAutoPostMessage( customerDisplayName, agentName, rating, feedback,
-                    surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink + "/",
+                    surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink + "/" + surveyId,
                     false );
 
                 postToFacebookForHierarchy( facebookMessage, rating, serverBaseUrl, accountMasterId, socialMediaPostDetails,
-                    socialMediaPostResponseDetails, false, isCompanyAgentHidden );
+                    socialMediaPostResponseDetails, false, isCompanyAgentHidden, surveyId );
 
                 // LinkedIn message
                 String linkedinMessage = buildLinkedInAutoPostMessage( customerDisplayName, agentName, rating, feedback,
                     surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink, false );
 
                 String linkedinProfileUrl = surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
-                    + agentProfileLink;
+                    + agentProfileLink + "/" + surveyId;
                 String linkedinMessageFeedback = "From : " + customerDisplayName + " - " + feedback;
 
                 postToLinkedInForHierarchy( linkedinMessage, rating, linkedinProfileUrl, linkedinMessageFeedback,
@@ -1830,7 +1830,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
                 if ( profileUrlWithMessage == null || profileUrlWithMessage.isEmpty() ) {
                     profileUrlWithMessage = surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
-                        + agentProfileLink;
+                        + agentProfileLink + "/" + surveyId;
                 }
                 String twitterMessage = buildTwitterAutoPostMessage( customerDisplayName, agentName, rating, feedback,
                     profileUrlWithMessage, false );
@@ -3242,7 +3242,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
                 postToFacebookForHierarchy( facebookMessage, zillowTempPost.getZillowReviewRating(),
                     zillowTempPost.getZillowReviewUrl(), accountMasterId, socialMediaPostDetails,
-                    socialMediaPostResponseDetails, true, isCompanyAgentHidden );
+                    socialMediaPostResponseDetails, true, isCompanyAgentHidden, surveyDetails.get_id() );
 
                 // LinkedIn Message
                 String linkedinMessage = buildLinkedInAutoPostMessage( customerDisplayName, agentName, rating, feedback,
