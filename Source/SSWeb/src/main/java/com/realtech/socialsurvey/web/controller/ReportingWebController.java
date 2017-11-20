@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -480,6 +481,32 @@ public class ReportingWebController
         return message;
 
     }
+    
+	@ResponseBody
+	@RequestMapping(value = "/downloadaccountstatisticsreport", method = RequestMethod.POST)
+	public String saveAccountStatisticsDataToFileUpload(Model model, HttpServletRequest request,
+			HttpServletResponse response)
+			throws InvalidInputException, NoRecordsFetchedException, FileNotFoundException, IOException {
+		LOG.info("Creating entry to file upload for account statistics report.");
+		String message = "";
+		User user = sessionHelper.getCurrentUser();
+		Long adminUserid = user.getUserId();
+		int reportId = CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_DETAILS_REPORT;
+		reportingDashboardManagement.createEntryInFileUploadForReporting(reportId, null, null, adminUserid,
+				CommonConstants.AGENT_ID_COLUMN, user.getCompany(), adminUserid);
+		message = "The report is being generated";
+		return message;
+	}
+	@ResponseBody
+	@RequestMapping(value = "/getaccountstatisticsreportstatus", method = RequestMethod.GET)
+	public String getAccountStatisticsReportStatus(Model model, HttpServletRequest request ){
+		LOG.info( "Fetching latest status for account statistics report." );
+        HttpSession session = request.getSession( false );
+
+        long reportId = CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_DETAILS_REPORT;
+        Response response = ssApiIntergrationBuilder.getIntegrationApi().getAccountStatisticsRecentActivity( reportId );
+        return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+	}
 
 
     /*

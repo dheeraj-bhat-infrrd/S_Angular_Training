@@ -214,6 +214,12 @@ public class SocialManagementController
 
     @Value ( "${ZILLOW_WEBSERVICE_ID}")
     private String zillowWebserviceId;
+    
+    @Value ( "${SURVEY_CSV_UPLOAD_AGENT_TEMPLATE}")
+    private Object surveyCsvAgentTemplate;
+
+    @Value ( "${SURVEY_CSV_UPLOAD_ADMIN_TEMPLATE}")
+    private Object surveyCsvAdminTemplate;
 
     @Autowired
     private SurveyHandler surveyHandler;
@@ -1694,8 +1700,10 @@ public class SocialManagementController
 
 
     @RequestMapping ( value = "/sendsurveyinvitation")
-    public String sendSurveyInvite()
+    public String sendSurveyInvite( Model model )
     {
+        model.addAttribute( "templateUrl", surveyCsvAgentTemplate );
+
         LOG.info( "Method sendSurveyInvite() called from SocialManagementController" );
         return JspResolver.HEADER_SURVEY_INVITE;
     }
@@ -1745,6 +1753,7 @@ public class SocialManagementController
         LOG.info( "Method sendSurveyInvite() called from SocialManagementController" );
         model.addAttribute( "columnName", request.getParameter( "columnName" ) );
         model.addAttribute( "columnValue", request.getParameter( "columnValue" ) );
+        model.addAttribute( "templateUrl", surveyCsvAdminTemplate );
         return JspResolver.HEADER_SURVEY_INVITE_ADMIN;
     }
     
