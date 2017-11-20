@@ -552,6 +552,7 @@ public class DashboardController
             }
             model.addAttribute( "reviews", surveyDetails );
             model.addAttribute( "hiddenSection", hiddenSection );
+            model.addAttribute( "startIndex", startIndex );
         } catch ( NonFatalException e ) {
             LOG.error( "Non fatal exception caught in getReviews() while fetching reviews. Nested exception is ", e );
             model.addAttribute( "message", e.getMessage() );

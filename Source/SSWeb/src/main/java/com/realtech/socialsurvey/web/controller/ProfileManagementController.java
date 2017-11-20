@@ -4278,7 +4278,7 @@ public class ProfileManagementController
     {
         LOG.info( "Method findAProfile called." );
 
-        boolean isBotRequest = botRequestUtils.checkBotRequest( request );
+        boolean isBotRequest = botRequestUtils.checkBotRequest( request.getHeader( BotRequestUtils.USER_AGENT_HEADER ) );
 
         String patternFirst = request.getParameter( "find-pro-first-name" );
         String patternLast = request.getParameter( "find-pro-last-name" );
@@ -4434,7 +4434,7 @@ public class ProfileManagementController
             + " and searchCriteria:" + searchCriteria );
         DisplayMessage message = null;
 
-        boolean isBotRequest = botRequestUtils.checkBotRequest( request );
+        boolean isBotRequest = botRequestUtils.checkBotRequest( request.getHeader( BotRequestUtils.USER_AGENT_HEADER ) );
 
         try {
             if ( profileLevel == null || profileLevel.isEmpty() ) {
@@ -4876,6 +4876,7 @@ public class ProfileManagementController
 
             model.addAttribute( "reviews", reviewItems );
             model.addAttribute( "hiddenSection", hiddenSection );
+            model.addAttribute( "startIndex", startIndex );
         } catch ( InvalidInputException e ) {
             throw new InternalServerException(
                 new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_COMPANY_REVIEWS_FETCH_FAILURE,

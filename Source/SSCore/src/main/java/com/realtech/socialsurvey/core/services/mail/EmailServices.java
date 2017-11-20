@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.realtech.socialsurvey.core.entities.MonthlyDigestAggregate;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.SurveyCsvInfo;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -525,4 +526,13 @@ public interface EmailServices
 
     void sendDigestErrorMailForCompany( String companyName, String stackTrace )
         throws InvalidInputException, UndeliveredEmailException;
+    
+    public void sendEmailToAdminForUnsuccessfulSurveyCsvUpload( SurveyCsvInfo csvInfo, String errorMessage ) throws InvalidInputException, UndeliveredEmailException;
+
+
+    public void sendEmailToUploaderForUnsuccessfulSurveyCsvUpload( SurveyCsvInfo csvInfo, String message )
+        throws InvalidInputException, UndeliveredEmailException;
+
+
+    public void sendEmailToUploaderForSuccessfulSurveyCsvUpload( SurveyCsvInfo csvInfo, String results ) throws InvalidInputException, UndeliveredEmailException;
 }

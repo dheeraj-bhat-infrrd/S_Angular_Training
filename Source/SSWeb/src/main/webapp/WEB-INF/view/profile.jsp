@@ -36,6 +36,9 @@
 		<c:if test="${not empty contact_details.mail_ids }">
 			<c:set var="workEmail" value="${contact_details.mail_ids.work}"></c:set>
 		</c:if>
+		<c:if test="${not empty contact_details.firstName && profileLevel == 'INDIVIDUAL'}">
+			<c:set var="agentFirstName" value="${contact_details.firstName}"></c:set>
+		</c:if>
 	</c:if>
 	<c:if test="${not empty profile.vertical}">
 		<c:set var="vertical" value="${profile.vertical}"></c:set>
@@ -62,7 +65,7 @@
 <meta http-equiv="cache-control" content="max-age=0" />
 <meta http-equiv="cache-control" content="no-cache" />
 <meta http-equiv="expires" content="0" />
-<meta property=”og:image” content=”${profile.profileImageUrlThumbnail}” />
+<meta property="og:image" content="${profile.profileImageUrlThumbnail}" />
 <link rel="shortcut icon" href="/favicon.ico" sizes="16x16">
 <link rel="stylesheet"
 	href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
@@ -81,6 +84,15 @@
 		test="${not empty profile.contact_details && not empty profile.contact_details.name }">
 		<c:set var="profName" value="${profile.contact_details.name }"></c:set>
 	</c:if>
+	<c:if test="${not empty title }">
+		<c:set var="includeTitle" value=" ${firstName} is the ${title} of ${companyName}."></c:set>
+	</c:if>
+	<c:if test="${not empty location }">
+		<c:set var="includeLocation" value=" in ${location}"></c:set>
+	</c:if>
+	<c:if test="${not empty city or not empty state or not empty country }">
+		<c:set var="includeLoc" value=" in ${city} ${state} ${country}"></c:set>
+	</c:if>
 	<c:choose>
 		<c:when test="${not empty profName}">
 			<c:choose>
@@ -89,14 +101,14 @@
 					<meta name="keywords"
 						content="${profName}, ${title}, ${companyName}, ${location}, ${vertical}, professional, online, reputation, social, survey, reviews, rating">
 					<meta name="description"
-						content="Reviews for ${profName}. ${firstName} has ${reviewsCount} reviews. ${firstName} is a ${vertical} professional in ${location}. ${firstName} is the ${title} of ${companyName}.">
+						content="${firstName} has ${reviewsCount} reviews. ${firstName} is a ${vertical} professional${includeLocation}.${includeTitle}">
 				</c:when>
 				<c:otherwise>
 					<title>${profName} ${vertical} Reviews | SocialSurvey.me</title>
 					<meta name="keywords"
 						content="${profName}, ${vertical}, professional, online, reputation, social, survey, reviews, rating">
 					<meta name="description"
-						content="Reviews for ${profName}. ${profName} has ${reviewsCount} reviews. ${profName} is a ${vertical} company in ${city} ${state} ${country}.">
+						content="${profName} has ${reviewsCount} reviews. ${profName} is a ${vertical} company${includeLoc}.">
 				</c:otherwise>
 			</c:choose>
 		</c:when>
@@ -127,6 +139,25 @@
 	<div id="toast-container" class="toast-container">
 		<span id="overlay-toast" class="overlay-toast"></span>
 	</div>
+	<c:if test="${not empty reviewAggregate}">
+		<c:set value="true" var="popup" ></c:set>
+		<div id="single-review-page" class="overlay-login overlay-single-review">
+			<button type="button" class="close dismiss-single-review-popup" id="dismiss-single-review-popup">&times;</button>
+			<c:choose>
+				<c:when test="${ reviewAggregate.surveyIdValid }">
+						<jsp:include page="single_review_page.jsp"></jsp:include>
+				</c:when>
+				<c:otherwise>
+						<div id="single-review-popup" class="single-review-popup-wrapper">
+							<div class="invalid-message-div">
+								<span>${reviewAggregate.invalidMessage}</span>
+							</div>
+						</div>
+				</c:otherwise>
+			</c:choose>	
+		</div>
+	</c:if>
+	
 	<div id="report-abuse-overlay" class="overlay-main hide">
 		<div id="report-abuse-pop-up" class="overlay-disable-wrapper">
 			<div id="overlay-header" class="ol-header">
@@ -774,8 +805,39 @@
 	<script>
 		var hiddenSection = "${profile.hiddenSection}";
 		var reviewsSortBy = "${reviewSortCriteria}";
+		var pageUrl = "${pageUrl}";
 		var showAllReviews = false;
 		$(document).ready(function() {
+						
+			if( '${popup}' == "true" && !$('body').hasClass("overflow-hidden-important") ){
+			 	$('body').addClass("overflow-hidden-important");
+			 	
+			 	// post icons
+				buildReviewPopupShareData();
+			}
+			
+			 $('body').on('click','#dismiss-single-review-popup',function(e){
+				 
+				 // just to make sure the page is scrollable after the dissmissal of pop-up 
+				 $('#single-review-page').addClass('hide');
+				 if( $('body').hasClass("overflow-hidden-important") ){
+				 	$('body').removeClass("overflow-hidden-important");
+				 }
+				 
+				 if( pageUrl != undefined && pageUrl != "" ){
+					 window.location.href = pageUrl;
+				 }
+			 });	 
+			 
+			 $('#single-review-contact-btn').on('click', function(e){
+				 e.stopPropagation();
+				 if( $(this).data('contact-link') != "" ){
+					 window.location.href = $(this).data('contact-link');
+				 }
+			 })
+			 
+			setUpPopupDismissListeners();
+			
 			if ($('#social-token-container').children('.social-item-icon').length == 0) {
 				$('#social-token-container').remove();
 			} else {
@@ -815,7 +877,9 @@
 				gaLabel = 'company';
 				gaName = companyProfileName;
 			}
-
+			
+			setUpReviewPopupListener();
+			
 			$(window).resize(adjustImage);
 
 			//update google analytics
@@ -831,6 +895,7 @@
 					'eventValue' : gaName
 				});
 			}, 5000);
+			
 		});
 	</script>
 </body>

@@ -6934,6 +6934,7 @@ function paintSurveyPage(jsonData) {
 	agentFullProfileLink = jsonData.responseJSON.agentFullProfileLink;
 	fb_app_id = jsonData.responseJSON.fbAppId;
 	google_plus_app_id = jsonData.responseJSON.googlePlusAppId;
+	surveyId = jsonData.responseJSON.surveyId;
 
 	// If social token availiable populate the links
 	// if (googleEnabled) {
@@ -6943,7 +6944,7 @@ function paintSurveyPage(jsonData) {
 	// } else {
 	// $('#ggl-btn').remove();
 	// }
-	$('#google-btn').attr("href", "https://plus.google.com/share?url=" + agentFullProfileLink);
+	$('#google-btn').attr("href", "https://plus.google.com/share?url=" + agentFullProfileLink + "/" + surveyId );
 
 	//SS-1452 remove yelp from all the pages
 	/*if (yelpEnabled) {
@@ -7240,16 +7241,9 @@ function showFeedbackPage(mood) {
 		}
 		rating = currResponse / (counter);
 		rating = parseFloat(rating).toFixed(3);
-		if ((rating >= autoPostScore)) {
-			$("#pst-srvy-div").show();
-			if ((Boolean(autoPost) == false)) {
-				$('#shr-pst-cb').val('false');
-				$('#shr-post-chk-box').addClass('bd-check-img-checked');
-			} else {
-				$('#shr-pst-cb').val('true');
-				$('#shr-post-chk-box').removeClass('bd-check-img-checked');
-			}
-		}
+		$("#pst-srvy-div").show();
+		$('#shr-pst-cb').val('true');
+		$('#shr-post-chk-box').removeClass('bd-check-img-checked');
 		break;
 	case "OK":
 		question = neutralText;
@@ -7340,7 +7334,7 @@ function showMasterQuestionPage() {
 		}
 
 		var onlyPostToSocialSurvey = true;
-		if ($('#shr-post-chk-box').hasClass('bd-check-img-checked') == false && (rating >= autoPostScore) && (Boolean(autoPost) == true)) {
+		if ($('#shr-post-chk-box').hasClass('bd-check-img-checked') == false ) {
 			if (isAbusive == false) {
 				onlyPostToSocialSurvey = false;
 			}
@@ -7365,20 +7359,20 @@ function showMasterQuestionPage() {
 		$("div[data-ques-type]").hide();
 		$("div[data-ques-type='error']").show();
 		if(!hiddenSection){
-			$('#profile-link').html('View ' + agentName + '\'s profile at <a href="' + agentFullProfileLink + '" target="_blank">' + agentFullProfileLink + '</a>');
+			$('#profile-link').html('View ' + agentName + '\'s profile at <a href="' + agentFullProfileLink + "/" + surveyId + '" target="_blank">' + agentFullProfileLink + '</a>');
 		}
 		
 		var fmt_rating = Number(rating).toFixed(1);
 		$('#linkedin-btn').attr("href", "https://www.linkedin.com/shareArticle?mini=true&url=" + agentFullProfileLink + "/" + surveyId + "&title=&summary=" + fmt_rating + "-star response from " + firstName + " " + getInitials( lastName ) + " for " + agentName + " at SocialSurvey - " + feedback + ".&source=");
 		var twitterFeedback = feedback;
-		if (twitterFeedback.length > 109) {
-			twitterFeedback = twitterFeedback.substring(0, 70);
+		if (twitterFeedback.length > 180) {
+			twitterFeedback = twitterFeedback.substring(0, 176);
 			twitterFeedback = twitterFeedback + "...";
 		} else {
 			twitterFeedback = feedback;
 		}
-		$('#twitter-btn').attr("href", "https://twitter.com/intent/tweet?text=" + fmt_rating + "-star response from " + firstName + " " + getInitials( lastName ) + " for " + agentName + " at SocialSurvey - " + twitterFeedback + "&url='" + agentFullProfileLink + "'");
-		$('#fb-btn').attr("href", "https://www.facebook.com/dialog/share?app_id=" + fb_app_id + "&href=" + agentFullProfileLink + "&quote=" + fmt_rating + "-star response from " + firstName + " " + getInitials( lastName ) + " for " + agentName + " at SocialSurvey - " + feedback + "&redirect_uri=https://www.facebook.com");
+		$('#twitter-btn').attr("href", "https://twitter.com/intent/tweet?text=" + fmt_rating + "-star response from " + firstName + " " + getInitials( lastName ) + " for " + agentName + " at SocialSurvey - " + twitterFeedback + "&url='" + agentFullProfileLink+ "/" + surveyId + "'");
+		$('#fb-btn').attr("href", "https://www.facebook.com/dialog/share?app_id=" + fb_app_id + "&href=" + agentFullProfileLink + "/" + surveyId + "&quote=" + fmt_rating + "-star response from " + firstName + " " + getInitials( lastName ) + " for " + agentName + " at SocialSurvey - " + feedback + "&redirect_uri=https://www.facebook.com");
 
 		$('#content-head').html('Survey Completed');
 		if (mood == 'Great')
@@ -8881,11 +8875,13 @@ function updateFacebookPixelId(pixelId) {
 	var payload = {
 		"pixelId" : pixelId
 	};
-	if (pixelId != undefined && pixelId != '') {
+	var parsedPixelId = parseInt(pixelId, 10);
+	var isPixelIdInt = parsedPixelId == pixelId;
+	if (pixelId != undefined && pixelId != '' && isPixelIdInt ) {
 		callAjaxPostWithPayloadData("./updatefacebookpixelid.do", callBackUpdateSocialLink, payload, true);
-		showProfileLinkInEditProfilePage("pixelId", pixelId);
+		showProfileLinkInEditProfilePage("facebookPixel", pixelId);
 	} else {
-		$('#overlay-toast').html("Enter a valid id");
+		$('#overlay-toast').html("Enter a valid pixel id");
 		showToast();
 	}
 }
@@ -10864,8 +10860,9 @@ $(document).on('click', '.wc-review-rmv-icn', function() {
 		$('#wc-review-table').perfectScrollbar('update');
 	}, 1000);
 });
+
+
 var surveysent=false;
-var alreadysentsurvey=false;
 $(document).on('click', '#wc-send-survey', function() {
 	var allowrequest = true;
 	var receiversList = [];
@@ -10876,50 +10873,14 @@ $(document).on('click', '#wc-send-survey', function() {
 	var idx = 0;
 	var agentname = "";
 	var myself = false;
-	var end = false;
-	if(surveysent || alreadysentsurvey){
+	
+	if(surveysent ){
 		return;
 	}
-	$('#wc-review-table-inner').children().each(function() {
-		if (!$(this).hasClass('wc-review-hdr')) {
-			$(this).children().each(function() {
-				$(this).find(':nth-child(1)').removeClass("error-survey");
-				$(this).find(':nth-child(2)').addClass("hidden");
-			});
-		}
-	});
-	$('#wc-review-table-inner').children().each(function() {
-		if (!$(this).hasClass('wc-review-hdr')) {
-			$(this).children().each(function() {
-				if (!$(this).hasClass('last')) {
-					var input = $(this).children(":input").val();
-					if (input != "") {
-						end = true;
-					}
-				}
-			});
-		}
-	});
-	if (!end) {
-		$('#wc-review-table-inner').children().each(function() {
-			if (!$(this).hasClass('wc-review-hdr')) {
-				$(this).children().each(function() {
-					if ($(this).hasClass('survey-user')) {
-						$(this).find(':nth-child(1)').addClass("error-survey");
-						$(this).find(':nth-child(2)').html("User is required.").removeClass("hidden");
-						allowrequest = false;
-					} else if ($(this).hasClass('survey-fname')) {
-						$(this).find(':nth-child(1)').addClass("error-survey");
-						$(this).find(':nth-child(2)').html("Firstname is required.").removeClass("hidden");
-						allowrequest = false;
-					} else if ($(this).hasClass('survey-email')) {
-						$(this).find(':nth-child(1)').addClass("error-survey");
-						$(this).find(':nth-child(2)').html("Email is required.").removeClass("hidden");
-						allowrequest = false;
-					}
-				});
-			}
-		});
+	
+	
+	if ( !removeErrorMessagesAndDetermineIfRequiredDataIsPresent() ) {
+		allowrequest = checkIfRequestCanBeMadeAndDisplayErrorMessagesIfNeeded();
 	}
 
 	$('#wc-review-table-inner').children().each(function() {
@@ -11092,10 +11053,6 @@ $(document).on('click', '#wc-send-survey', function() {
 	var surveyed = [];
 	var alreadysureyed = false;
 	if (allowrequest) {
-		if(alreadysentsurvey){
-			return;
-		}
-		alreadysentsurvey=true;
 		callAjaxPostWithPayloadData("./getalreadysurveyedemailids.do", function(data) {
 			var alreadySurveyedEmails = $.parseJSON(data);
 			// To check if the email had already surveyed
@@ -11123,7 +11080,6 @@ $(document).on('click', '#wc-send-survey', function() {
 
 			} else {
 				$('#send-survey-dash').removeClass("hide");
-				alreadysentsurvey=false;
 				if(surveysent){
 					return;
 				}
@@ -11160,6 +11116,52 @@ $(document).on('click', '#wc-send-survey', function() {
 		}, payload, true);
 	}
 });
+
+
+function checkIfRequestCanBeMadeAndDisplayErrorMessagesIfNeeded(){
+	var allowrequest = true;
+	$('#wc-review-table-inner').children().each(function() {
+		if (!$(this).hasClass('wc-review-hdr')) {
+			$(this).children().each(function() {
+				if ($(this).hasClass('survey-user')) {
+					$(this).find(':nth-child(1)').addClass("error-survey");
+					$(this).find(':nth-child(2)').html("User is required.").removeClass("hidden");
+					allowrequest = false;
+				} else if ($(this).hasClass('survey-fname')) {
+					$(this).find(':nth-child(1)').addClass("error-survey");
+					$(this).find(':nth-child(2)').html("Firstname is required.").removeClass("hidden");
+					allowrequest = false;
+				} else if ($(this).hasClass('survey-email')) {
+					$(this).find(':nth-child(1)').addClass("error-survey");
+					$(this).find(':nth-child(2)').html("Email is required.").removeClass("hidden");
+					allowrequest = false;
+				}
+			});
+		}
+	});
+	return allowrequest;
+}
+
+function removeErrorMessagesAndDetermineIfRequiredDataIsPresent(){
+	
+	var end = false;
+	$('#wc-review-table-inner').children().each(function() {
+		if (!$(this).hasClass('wc-review-hdr')) {
+			$(this).children().each(function() {
+				$(this).find(':nth-child(1)').removeClass("error-survey");
+				$(this).find(':nth-child(2)').addClass("hidden");
+				if (!$(this).hasClass('last')) {
+					var input = $(this).children(":input").val();
+					if (input != "") {
+						end = true;
+					}
+				}
+			});
+		}
+	});
+	return end;
+}
+
 
 $(document).on('click', '#wc-skip-send-survey', function() {
 	$('#overlay-send-survey').hide();
@@ -11532,10 +11534,10 @@ function twitterDashboardFn(loop, twitterElement) {
 	}
 
 	var length = twitText.length;
-	if (length > 109) {
+	if (length > 180) {
 		var arr = twitLink.split('');
 		var twittStrnDot = "...";
-		var substringed = twitText.substring(0, 105);
+		var substringed = twitText.substring(0, 176);
 		var finalString = substringed.concat(twittStrnDot);
 		if ($("#" + twitId) != undefined) {
 			$("#" + twitId).val(finalString);
@@ -11556,10 +11558,10 @@ function twitterProfileFn(loop, twitterElement) {
 	var twitId = 'twttxt_' + loop;
 	var twitText = $("#" + twitId).val();
 	var length = twitText.length;
-	if (length > 109) {
+	if (length > 180) {
 		var arr = twitLink.split('');
 		var twittStrnDot = "...";
-		var substringed = twitText.substring(0, 105);
+		var substringed = twitText.substring(0, 176);
 		var finalString = substringed.concat(twittStrnDot);
 		$("#" + twitId).val(finalString);
 		twitLink = twitLink.replace(String, finalString);
@@ -13251,11 +13253,11 @@ function paintReviews(result, isRequestFromDashBoard) {
 		reviewsHtml += '		<div class="float-left blue-text ppl-share-shr-txt">Share</div>';
 		reviewsHtml += '		<div class="float-left icn-share icn-plus-open"></div>';
 		reviewsHtml += '		<div class="float-left clearfix ppl-share-social hide">';
-		reviewsHtml += '			<span id ="fb_' + i + '"class="float-left ppl-share-icns icn-fb icn-fb-pp" title="Facebook" data-link="https://www.facebook.com/dialog/share?' + reviewItem.faceBookShareUrl + '&href=' + reviewItem.completeProfileUrl.replace("localhost", "127.0.0.1") + '&quote=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '&redirect_uri=https://www.facebook.com"></span>';
+		reviewsHtml += '			<span id ="fb_' + i + '"class="float-left ppl-share-icns icn-fb icn-fb-pp" title="Facebook" data-link="https://www.facebook.com/dialog/share?' + reviewItem.faceBookShareUrl + '&href=' + reviewItem.completeProfileUrl.replace("localhost", "127.0.0.1") + '/' + reviewItem._id + '&quote=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '&redirect_uri=https://www.facebook.com"></span>';
 		reviewsHtml += '            <input type="hidden" id="twttxt_' + i + '" class ="twitterText_loop" value ="' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '"/></input>';
-		reviewsHtml += '			<span id ="twitt_' + i + '" class="float-left ppl-share-icns icn-twit icn-twit-pp" onclick="twitterFn(' + i + ');" title="Twitter" data-link="https://twitter.com/intent/tweet?text=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + ' &url=' + reviewItem.completeProfileUrl + '"></span>';
+		reviewsHtml += '			<span id ="twitt_' + i + '" class="float-left ppl-share-icns icn-twit icn-twit-pp" onclick="twitterFn(' + i + ');" title="Twitter" data-link="https://twitter.com/intent/tweet?text=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + ' &url=' + reviewItem.completeProfileUrl + '/' + reviewItem._id + '"></span>';
 		reviewsHtml += '			<span class="float-left ppl-share-icns icn-lin icn-lin-pp" title="LinkedIn" data-link="https://www.linkedin.com/shareArticle?mini=true&url=' + reviewItem.completeProfileUrl + '/' + reviewItem._id + '&title=&summary=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '&source="></span>';
-		reviewsHtml += '			<span class="float-left" title="Google+"> <button class="g-interactivepost float-left ppl-share-icns icn-gplus" data-contenturl="' + reviewItem.completeProfileUrl + '" data-clientid="' + reviewItem.googleApi + '"data-cookiepolicy="single_host_origin" data-prefilltext="' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '" data-calltoactionlabel="USE"' + '' + 'data-calltoactionurl=" ' + reviewItem.completeProfileUrl + '"> <span class="icon">&nbsp;</span> <span class="label">share</span> </button> </span>';
+		reviewsHtml += '			<span class="float-left" title="Google+"> <button class="g-interactivepost float-left ppl-share-icns icn-gplus" data-contenturl="' + reviewItem.completeProfileUrl + '/' + reviewItem._id + '" data-clientid="' + reviewItem.googleApi + '"data-cookiepolicy="single_host_origin" data-prefilltext="' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '" data-calltoactionlabel="USE"' + '' + 'data-calltoactionurl=" ' + reviewItem.completeProfileUrl + '/' + reviewItem._id + '"> <span class="icon">&nbsp;</span> <span class="label">share</span> </button> </span>';
 		reviewsHtml += '		</div>';
 		reviewsHtml += '		<div class="float-right" style="margin: 0 -5px;">';
 		if (reviewItem.source != "Zillow")
@@ -13472,4 +13474,197 @@ function getInitials( name ){
     }
 }
 
+function copyIndividualReviewUrlToClipboard(loop){
+	var message = "";
+	try{
+		var temp = document.createElement( "input" );
+		temp.setAttribute("value",$('#permalink_url_' + loop).val());
+		document.body.appendChild( temp );
+		temp.select();
+		var success = document.execCommand("copy");
+		document.body.removeChild( temp );
+		if( success ){
+			message = "Review URL copied to clipboard.";
+		} else {
+			message = "Unable to copy to clipboard.";
+		}
+		
+	} catch(error){
+		message = "Unable to access clipboard."
+	}
+	
+	$('#overlay-toast').html(message);
+	showToast();
+}
 
+function downloadAccountStatsReport(){
+	
+	callAjaxPOST('./downloadaccountstatisticsreport.do', function(data){
+		$('#overlay-toast').html(data);
+		showToast();
+		getAccStatsReportStatus();
+	}, false);
+}
+
+function getAccStatsReportStatus(){
+	callAjaxGET('./getaccountstatisticsreportstatus.do', function(data){
+		var reportDetails = JSON.parse(JSON.parse(data));
+		
+		if(reportDetails.status == 1 || reportDetails.status == 2){
+			if($('#acc-stats-gen-rep').hasClass('acc-stats-rep-btn-enabled')){
+				$('#acc-stats-gen-rep').removeClass('acc-stats-rep-btn-enabled');
+			}
+
+			$('#acc-stats-rep-bnt').css('pointer-events','none');
+			$('#acc-stats-gen-rep').addClass('acc-stats-rep-btn-disabled');
+			
+			if($('#account-stats-status-link').hasClass('download-acc-stats-rep')){
+				$('#account-stats-status-link').removeClass('download-acc-stats-rep')
+			}
+			$('#account-stats-status-link').addClass('pending-acc-stats-rep')
+			$('#account-stats-status-link').html('Report Pending');
+			$('#account-stats-status-link').removeAttr('href');
+			$('#account-stats-status-link').css('pointer-events','none');
+		}else if(reportDetails.status  == 0){
+			if($('#acc-stats-gen-rep').hasClass('acc-stats-rep-btn-disabled')){
+				$('#acc-stats-gen-rep').removeClass('acc-stats-rep-btn-disabled');
+			}
+			$('#acc-stats-rep-bnt').css('pointer-events','auto');
+			$('#acc-stats-gen-rep').addClass('acc-stats-rep-btn-enabled');
+			
+			if($('#account-stats-status-link').hasClass('pending-acc-stats-rep')){
+				$('#account-stats-status-link').removeClass('pending-acc-stats-rep');
+			}
+			$('#account-stats-status-link').addClass('download-acc-stats-rep')
+			$('#account-stats-status-link').html('Download the report');
+			$('#account-stats-status-link').attr('href',reportDetails.fileName);
+			$('#account-stats-status-link').css('pointer-events','auto');
+		}else if(reportDetails.status == 4){
+			if($('#acc-stats-gen-rep').hasClass('acc-stats-rep-btn-disabled')){
+				$('#acc-stats-gen-rep').removeClass('acc-stats-rep-btn-disabled');
+			}
+			$('#acc-stats-rep-bnt').css('pointer-events','auto');
+			$('#acc-stats-gen-rep').addClass('acc-stats-rep-btn-enabled');
+			
+			if($('#account-stats-status-link').hasClass('download-acc-stats-rep')){
+				$('#account-stats-status-link').removeClass('download-acc-stats-rep')
+			}
+			$('#account-stats-status-link').addClass('pending-acc-stats-rep')
+			$('#account-stats-status-link').html('Report Generation Failed. Please Try Again.');
+			$('#account-stats-status-link').removeAttr('href');
+			$('#account-stats-status-link').css('pointer-events','none');
+		}
+	}, false);
+}
+
+$(document).on('click','#acc-stats-rep-bnt',function(){
+	downloadAccountStatsReport();
+});
+
+
+// survey csv file functions
+
+$(document).on('change', '.survey-csv-file-input', function(){
+	$("#upload-email-invalid").hide();
+	processAndValidateCsvForm( true );
+});
+
+$(document).on('click','#wc-send-survey-upload-cancel',function(event){
+	$(".wc-btn-row").show();
+	$(".welcome-popup-body-wrapper").show();
+	$(".survey-upload-csv").hide();
+});
+
+$(document).on('click','#wc-send-survey-upload-confirm',function(event){
+	$('#send-survey-csv-dash').removeClass("hide");
+	if( !processAndValidateCsvForm( false ) ){
+		
+		if( !$('#send-survey-csv-dash').hasClass("hide") ){
+			$('#send-survey-csv-dash').addClass("hide");
+		}
+		hideOverlay();
+		return;
+	}
+
+	var formData = new FormData();
+	formData.append("file", $('#survey-file-intake').prop("files")[0]);
+	formData.append("filename", $('#survey-file-intake').prop("files")[0].name);
+	formData.append( "uploaderEmail", $('#survey-uploader-email').val() );
+	formData.append("hierarchyType",$('#hierarchyType').val() );
+	formData.append("hierarchyValue",$('#hierarchyValue').val() );
+	callAjaxPOSTWithTextData("./savesurveycsvfile.do", function(callbackData){
+		$('#send-survey-csv-dash').addClass("hide");
+		var response = JSON.parse(callbackData);
+		$("#overlay-toast").html(response.message);
+		showToast();
+		
+	}, true, formData);
+});
+
+$(document).on('click','#wc-send-survey-upload-csv',function(event){
+	$(".wc-btn-row").hide();
+	$(".welcome-popup-body-wrapper").hide();
+	$(".survey-upload-csv").show();
+});
+
+function csvFileValidate(inputFileElement, whileUploading) {
+	
+	$('.display-load').hide();
+	
+	if( whileUploading ){
+		$('.survey-csv-file-info').hide();
+	}
+
+	if ($(inputFileElement).attr("type") == "file") {
+		var fileName = $(inputFileElement).val();
+		if (fileName.length > 0) {
+			if (fileName.substr(fileName.length - 4, 4).toLowerCase() == ".csv") {
+								
+				var fileAddress = $(inputFileElement).val().split('\\');
+				$('#survey-csv-file-name').text(fileAddress[fileAddress.length - 1]);
+				$('.survey-csv-file-info').show();
+				return true;
+			}
+		} else {
+			$('.display-load').show();
+			$(inputFileElement).val = "";
+			return false;
+		}
+	} else {
+		$('.display-load').show();
+		return false;
+	}
+}
+
+function uploaderEmailValidate(){
+	return ( $('#survey-uploader-email').val() == undefined ||  $('#survey-uploader-email').val() == '' ) ? false : true;
+}
+
+function processAndValidateCsvForm(whileUploading){
+	
+	$("#upload-email-invalid").hide();
+	
+	if( !csvFileValidate("#survey-file-intake") )
+	{
+		if( !$("#wc-send-survey-upload-confirm").hasClass('disable') ){
+			$("#wc-send-survey-upload-confirm").addClass('disable');
+		}
+		$('.display-load').show();
+		$('.survey-csv-file-info').hide();
+		$("#overlay-toast").html("Please select a valid csv file");
+		showToast();
+		return false;
+	} else if( !uploaderEmailValidate() && !whileUploading){
+		$("#upload-email-invalid").show();
+		return false;
+	} else {
+		if( $("#wc-send-survey-upload-confirm").hasClass('disable') ){
+			$("#wc-send-survey-upload-confirm").removeClass('disable');
+		}
+		return true;
+	}
+}
+
+$(document).on('click', '#survey-uploader-email', function(){
+	$("#upload-email-invalid").hide();
+})
