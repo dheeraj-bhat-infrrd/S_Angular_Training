@@ -5805,7 +5805,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         throws InvalidInputException
     {
         SurveyDetails review = null;
-        AgentSettings agentSettings = null;
+        OrganizationUnitSettings unitSettings = null;
 
         IndividualReviewAggregate reviewAggregate = new IndividualReviewAggregate();
 
@@ -5826,26 +5826,20 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             return reviewAggregate;
         }
 
-        // get the agent settings
-        long agentId = review.getAgentId();
+        // get the unit settings
+        try {
+            unitSettings = fetchAppropriateUnitSettings( review );
 
-        if ( CommonConstants.PROFILE_LEVEL_INDIVIDUAL.equals( profileAggregate.getProfileLevel() ) ) {
-            agentSettings = (AgentSettings) profileAggregate.getProfile();
-        } else {
-            try {
-                agentSettings = organizationManagementService.getAgentSettings( agentId );
-
-            } catch ( NoRecordsFetchedException error ) {
-                LOG.error( "NoRecordsFetchedException: unable to fetch agentSettings for Id: {}", agentId, error );
-                reviewAggregate.setSurveyIdValid( false );
-                reviewAggregate.setInvalidMessage( "Review under concern is not related any agent." );
-                return reviewAggregate;
-            } catch ( InvalidInputException error ) {
-                LOG.error( "InvalidInputException: unable to fetch agentSettings for Id: {}", agentId, error );
-                reviewAggregate.setSurveyIdValid( false );
-                reviewAggregate.setInvalidMessage( "Unable to come up with agent information." );
-                return reviewAggregate;
-            }
+        } catch ( NoRecordsFetchedException error ) {
+            LOG.error( "NoRecordsFetchedException: unable to fetch settings.", error );
+            reviewAggregate.setSurveyIdValid( false );
+            reviewAggregate.setInvalidMessage( "Review under concern is not related any hierarchy." );
+            return reviewAggregate;
+        } catch ( InvalidInputException error ) {
+            LOG.error( "InvalidInputException: unable to fetch settings.", error );
+            reviewAggregate.setSurveyIdValid( false );
+            reviewAggregate.setInvalidMessage( "Unable to come up with hierarchy information." );
+            return reviewAggregate;
         }
 
         // set sourceID
@@ -5858,15 +5852,29 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         //DO NOT REMOVE!
         setAgentProfileUrlForReview( Arrays.asList( review ) );
 
-        // escape all the double quotes
-        review.setReview( StringEscapeUtils.escapeJava( review.getReview() ) );
-
         reviewAggregate.setSurveyIdValid( true );
-        reviewAggregate.setAgentSettings( agentSettings );
+        reviewAggregate.setUnitSettings( unitSettings );
         reviewAggregate.setReview( review );
-        reviewAggregate.setReviewJson( new Gson().toJson( review ) );
         return reviewAggregate;
 
+    }
+
+
+    private OrganizationUnitSettings fetchAppropriateUnitSettings( SurveyDetails review )
+        throws InvalidInputException, NoRecordsFetchedException
+    {
+        LOG.debug( "fetching appropriate unit settings." );
+        if ( review.getAgentId() > 0 ) {
+            return organizationManagementService.getAgentSettings( review.getAgentId() );
+        } else if ( review.getBranchId() > 0 ) {
+            return organizationManagementService.getBranchSettingsDefault( review.getBranchId() );
+        } else if ( review.getRegionId() > 0 ) {
+            return organizationManagementService.getRegionSettings( review.getRegionId() );
+        } else if ( review.getCompanyId() > 0 ) {
+            return organizationManagementService.getCompanySettings( review.getCompanyId() );
+        } else {
+            throw new InvalidInputException( "Unable to find a hierarchy associated with the review." );
+        }
     }
 
 

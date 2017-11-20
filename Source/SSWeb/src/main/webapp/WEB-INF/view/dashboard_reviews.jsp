@@ -204,28 +204,32 @@
 
 			<div class="ppl-share-wrapper clearfix share-plus-height" >
 				<div class="float-left clearfix ppl-share-social hide" style="display: block;">
-				
-					<span id ="fb_${loop.index}"class="float-left ppl-share-icns icn-fb-rev" title="Facebook" data-link="https://www.facebook.com/dialog/share?${feedback.faceBookShareUrl}&href=${fn:replace(feedback.completeProfileUrl, 'localhost', '127.0.0.1')}&quote=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${feedback.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${feedback.agentName} at SocialSurvey - ${fn:escapeXml(feedback.review)}&redirect_uri=https://www.facebook.com"></span>
+					<c:if test="${not empty feedback.agentName}">
+						<c:set var="includeAgentName" value="for ${feedback.agentName} "></c:set>
+					</c:if>
+					<span id ="fb_${loop.index}"class="float-left ppl-share-icns icn-fb-rev" title="Facebook" data-link="https://www.facebook.com/dialog/share?${feedback.faceBookShareUrl}&href=${fn:replace(feedback.completeProfileUrl, 'localhost', '127.0.0.1')}/${feedback._id}&quote=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${feedback.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } ${includeAgentName}at SocialSurvey - ${fn:escapeXml(feedback.review)}&redirect_uri=https://www.facebook.com"></span>
 					
-					<input type="hidden" id="twttxt_${loop.index}" class ="twitterText_loop" value ="<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${feedback.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${feedback.agentName} at SocialSurvey - ${fn:escapeXml(feedback.review)}"/>
-					<span class="float-left ppl-share-icns icn-twit-rev" id ="twitt_${loop.index}" onclick="twitterDashboardFn(${loop.index},this);" data-link="https://twitter.com/intent/tweet?text=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${feedback.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${feedback.agentName} at SocialSurvey - ${fn:escapeXml(feedback.review)}&url=${feedback.completeProfileUrl}"></span>
+					<input type="hidden" id="twttxt_${loop.index}" class ="twitterText_loop" value ="<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${feedback.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } ${includeAgentName}at SocialSurvey - ${fn:escapeXml(feedback.review)}"/>
+					<span class="float-left ppl-share-icns icn-twit-rev" id ="twitt_${loop.index}" onclick="twitterDashboardFn(${loop.index},this);" data-link="https://twitter.com/intent/tweet?text=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${feedback.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } ${includeAgentName}at SocialSurvey - ${fn:escapeXml(feedback.review)}&url=${feedback.completeProfileUrl}/${feedback._id}"></span>
 					 <span
 						class="float-left ppl-share-icns icn-lin-rev" title="LinkedIn"
-						data-link="https://www.linkedin.com/shareArticle?mini=true&url=${feedback.completeProfileUrl}/${feedback._id}&title=&summary=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${feedback.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${feedback.agentName} at SocialSurvey - ${fn:escapeXml(feedback.review)}&reviewid=${feedback._id}&source="></span>
+						data-link="https://www.linkedin.com/shareArticle?mini=true&url=${feedback.completeProfileUrl}/${feedback._id}&title=&summary=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${feedback.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } ${includeAgentName}at SocialSurvey - ${fn:escapeXml(feedback.review)}&reviewid=${feedback._id}&source="></span>
                        <span class="float-left" title="Google+">
                        <button 
                            class="g-interactivepost float-left ppl-share-icns icn-gplus-rev"
-                           data-contenturl="${feedback.completeProfileUrl}"
+                           data-contenturl="${feedback.completeProfileUrl}/${feedback._id}"
                            data-clientid="${feedback.googleApi}"
                            data-cookiepolicy="single_host_origin"
-                           data-prefilltext="<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${feedback.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${feedback.agentName} at SocialSurvey - ${fn:escapeXml(feedback.review)}"
+                           data-prefilltext="<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${feedback.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } ${includeAgentName}at SocialSurvey - ${fn:escapeXml(feedback.review)}"
                            data-calltoactionlabel="USE"
                            data-calltoactionurl="${feedback.completeProfileUrl}">
                           <span class="icon">&nbsp;</span>
                           <span class="label">share</span>
                       </button>
                        </span>
-                       
+                       <span class="float-left ppl-share-icns permalink icn-permalink-rev" title="Permalink" onclick="copyIndividualReviewUrlToClipboard(${loop.index})">
+                       	<input id="permalink_url_${loop.index}" type="hidden" value="${feedback.completeProfileUrl}/${feedback._id}"/>
+                   		</span>
 				</div>
 				<c:if test="${feedback.source != 'Zillow'}">
 				<div class="float-right dash-flag-retake">

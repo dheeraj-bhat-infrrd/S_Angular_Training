@@ -2000,6 +2000,9 @@ button.paypal.is-active {
 .ppl-review-item:hover .retake-icn  { 
 	background:url(../images/ss-icon-small-circle-retake.png) no-repeat;
 	}
+.ppl-review-item:hover .icn-permalink-rev {
+	background: url(../images/permalink.png) no-repeat center;
+	}	
 	
 /*last review*/
 .ppl-review-item-last:hover .icn-fb-rev{ 
@@ -2019,6 +2022,9 @@ button.paypal.is-active {
 	}
 .ppl-review-item-last:hover .retake-icn  { 
 	background:url(../images/ss-icon-small-circle-retake.png) no-repeat;
+	}
+.ppl-review-item-last:hover .icn-permalink-rev {
+	background: url(../images/permalink.png) no-repeat center;
 	}	
 	
 
@@ -2166,6 +2172,10 @@ button.paypal.is-active {
 .icn-gplus-rev {
 	background: url(../images/ss-icon-grey-small-gplus.png) no-repeat;
 	border: 0px;
+}
+
+.icn-permalink-rev {
+	background: url(../images/permalink_grey.png) no-repeat center;
 }
 
 .icn-tweet {

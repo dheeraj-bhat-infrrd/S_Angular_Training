@@ -99,6 +99,15 @@
 	<c:if test="${not empty profile.completeProfileUrl }">
 		<link rel="canonical" href="${profile.completeProfileUrl}">
 	</c:if>
+	<c:if test="${not empty title }">
+		<c:set var="includeTitle" value=" ${firstName} is the ${title} of ${companyName}."></c:set>
+	</c:if>
+	<c:if test="${not empty location }">
+		<c:set var="includeLocation" value=" in ${location}"></c:set>
+	</c:if>
+	<c:if test="${not empty city or not empty state or not empty country }">
+		<c:set var="includeLoc" value=" in ${city} ${state} ${country}"></c:set>
+	</c:if>
 	<c:choose>
 		<c:when test="${not empty profName}">
 			<c:choose>
@@ -107,14 +116,14 @@
 					<meta name="keywords"
 						content="${profName}, ${title }, ${companyName }, ${location }, ${vertical }, professional, online, reputation, social, survey, reviews, rating">
 					<meta name="description"
-						content="Reviews for ${profName}. ${firstName} has ${reviewsCount} reviews. ${firstName} is a ${vertical} professional in ${location}. ${firstName} is the ${title} of ${companyName}.">
+						content="Reviews for ${profName}. ${firstName} has ${reviewsCount} reviews. ${firstName} is a ${vertical} professional${includeLocation}.${includeTitle}">
 				</c:when>
 				<c:otherwise>
 					<title>${profName} ${vertical} Reviews | SocialSurvey.me</title>
 					<meta name="keywords"
 						content="${profName}, ${vertical}, professional, online, reputation, social, survey, reviews, rating">
 					<meta name="description"
-						content="Reviews for ${profName}. ${profName} has ${reviewsCount} reviews. ${profName} is a ${vertical} company in ${city} ${state} ${country}.">
+						content="Reviews for ${profName}. ${profName} has ${reviewsCount} reviews. ${profName} is a ${vertical} company${includeLoc}.">
 				</c:otherwise>
 			</c:choose>
 		</c:when>
@@ -1023,15 +1032,18 @@
 									</div> -->
 											<div class="ppl-share-wrapper clearfix share-plus-height">
 												<div class="float-left clearfix ppl-share-social ">
+													<c:if test="${not empty reviewItem.agentName}">
+														<c:set var="includeAgentName" value="for ${reviewItem.agentName} "></c:set>
+													</c:if>
 													<span id="fb_${loop.index}"
 														class="float-left ppl-share-icns icn-fb-rev"
 														title="Facebook" 
-														data-link="https://www.facebook.com/dialog/share?${reviewItem.faceBookShareUrl}&href=${fn:replace(reviewItem.completeProfileUrl, 'localhost', '127.0.0.1')}&quote=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${reviewItem.agentName} at SocialSurvey -${fn:escapeXml(reviewItem.review)}&redirect_uri=https://www.facebook.com"></span>
+														data-link="https://www.facebook.com/dialog/share?${reviewItem.faceBookShareUrl}&href=${fn:replace(reviewItem.completeProfileUrl, 'localhost', '127.0.0.1')}/${reviewItem._id}&quote=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } ${includeAgentName}at SocialSurvey -${fn:escapeXml(reviewItem.review)}&redirect_uri=https://www.facebook.com"></span>
 
 													<c:choose>
-														<c:when test="${fn:length(reviewItem.review) > 109}">
+														<c:when test="${fn:length(reviewItem.review) > 180}">
 															<c:set var="twitterReview"
-																value="${fn:substring(reviewItem.review,0,105)}..."></c:set>
+																value="${fn:substring(reviewItem.review,0,176)}..."></c:set>
 														</c:when>
 														<c:otherwise>
 															<c:set var="twitterReview" value="${reviewItem.review}"></c:set>
@@ -1039,21 +1051,21 @@
 													</c:choose>
 													<input type="hidden" id="twttxt_${loop.index}"
 														class="twitterText_loop"
-														value="<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${reviewItem.agentName} at SocialSurvey - ${fn:escapeXml(twitterReview)}" />
+														value="<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } ${includeAgentName}at SocialSurvey - ${fn:escapeXml(twitterReview)}" />
 
 													<span class="float-left ppl-share-icns icn-twit-rev"
 														id="twitt_${loop.index}"
 														onclick="twitterProfileFn(${loop.index},this);"
-														data-link="https://twitter.com/intent/tweet?text=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${reviewItem.agentName} at SocialSurvey - ${fn:escapeXml(twitterReview)}&url=${reviewItem.completeProfileUrl}"></span>
+														data-link="https://twitter.com/intent/tweet?text=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } ${includeAgentName}at SocialSurvey - ${fn:escapeXml(twitterReview)}&url=${reviewItem.completeProfileUrl}/${reviewItem._id}"></span>
 													<span class="float-left ppl-share-icns icn-lin-rev"
-														title="LinkedIn" data-link="https://www.linkedin.com/shareArticle?mini=true&url=${reviewItem.completeProfileUrl}/${reviewItem._id}&title=&summary=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${reviewItem.agentName} at SocialSurvey - ${fn:escapeXml(reviewItem.review)} + &source="></span>
+														title="LinkedIn" data-link="https://www.linkedin.com/shareArticle?mini=true&url=${reviewItem.completeProfileUrl}/${reviewItem._id}&title=&summary=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } ${includeAgentName}at SocialSurvey - ${fn:escapeXml(reviewItem.review)} + &source="></span>
 													<span class="float-left" title="Google+">
 														<button
 															class="g-interactivepost float-left ppl-share-icns icn-gplus-rev"
-															data-contenturl="${reviewItem.completeProfileUrl}"
+															data-contenturl="${reviewItem.completeProfileUrl}/${reviewItem._id}"
 															data-clientid="${reviewItem.googleApi}"
 															data-cookiepolicy="single_host_origin"
-															data-prefilltext="<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${reviewItem.agentName} at SocialSurvey - ${fn:escapeXml(reviewItem.review)}"
+															data-prefilltext="<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } ${includeAgentName}at SocialSurvey - ${fn:escapeXml(reviewItem.review)}"
 															data-calltoactionlabel="USE"
 															data-calltoactionurl="${reviewItem.completeProfileUrl}">
 															<span class="icon">&nbsp;</span> <span class="label">share</span>

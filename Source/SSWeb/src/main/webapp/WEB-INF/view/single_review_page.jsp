@@ -31,33 +31,33 @@
 		</c:choose>
 		
 		<c:set value="${fn:escapeXml(singleReviewItem.review)}" var="singleReview"></c:set>
-		<c:set value="${ reviewAggregate.agentSettings }" var="agentProfile"></c:set>
+		<c:set value="${ reviewAggregate.unitSettings }" var="unitProfile"></c:set>
 
-		 <c:set value="${agentProfile.contact_details.name}" var = "agentName"></c:set>
-		 <c:if test="${profile.hiddenSection}">
-			 <c:set var="agentName" value="${singleReviewItem.agentName}" />
-			 <c:set var="agentNameTokens" value="${fn:split(agentName, ' ')}" />
-			 <c:set var="agentName" value="${agentNameTokens[0]}" />
-			 <c:if test="${not empty agentNameTokens[1]}">
-			 	<c:set var="agentName" value="${agentName } ${fn:substring(agentNameTokens[1], 0, 1)}" />
+		 <c:set value="${unitProfile.contact_details.name}" var = "unitName"></c:set>
+		 <c:if test="${profile.hiddenSection and not empty singleReviewItem.agentName}">
+			 <c:set var="unitName" value="${singleReviewItem.agentName}" />
+			 <c:set var="unitNameTokens" value="${fn:split(unitName, ' ')}" />
+			 <c:set var="unitName" value="${unitNameTokens[0]}" />
+			 <c:if test="${not empty unitNameTokens[1]}">
+			 	<c:set var="unitName" value="${unitName } ${fn:substring(unitNameTokens[1], 0, 1)}" />
 			 </c:if>
 		 </c:if>
-		 <c:set value="${agentProfile.contact_details.firstName}" var = "agentFirstNameValue"></c:set>
+		 <c:set value="${unitProfile.contact_details.firstName}" var = "agentFirstNameValue"></c:set>
 
 
-		<div id="sr-review-info" data-customeremail="${singleReviewItem.customerEmail}" data-agentid="${singleReviewItem.agentId}" data-cust-first-name="${singleReviewItem.customerFirstName}" data-cust-last-name="${singleReviewItem.customerLastName}" data-agent-name="${singleReviewItem.agentName}" data-review="${singleReviewItem.review}" data-survey-mongo-id="${singleReviewItem._id}"></div>
+		<div id="sr-review-info" data-customeremail="${singleReviewItem.customerEmail}" data-agentid="${singleReviewItem.agentId}" data-cust-first-name="${singleReviewItem.customerFirstName}" data-cust-last-name="${singleReviewItem.customerLastName}" data-agent-name="${singleReviewItem.agentName}" data-review="${singleReviewItem.review}" data-survey-mongo-id="${singleReviewItem._id}" data-score="${singleReviewItem.score}" data-facebookshareurl="${singleReviewItem.faceBookShareUrl}" data-googleapi="${singleReviewItem.googleApi}"></div>
 		<div id="single-review-popup" class="single-review-popup-wrapper">
 			<div class="single-review-popup-hdr-wrapper clearfix">
-				<c:if test="${not empty agentProfile.profileImageUrlThumbnail && not empty fn:trim(agentProfile.profileImageUrlThumbnail)}">
+				<c:if test="${not empty unitProfile.profileImageUrlThumbnail && not empty fn:trim(unitProfile.profileImageUrlThumbnail)}">
 					<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" style="padding-right: 0%;">
 						<div class="sr-prof-pic-circle">
-							<img class="agent-prof-image prof-image-edit" src="${agentProfile.profileImageUrlThumbnail}"></img>
+							<img class="agent-prof-image prof-image-edit" src="${unitProfile.profileImageUrlThumbnail}"></img>
 						</div>
 					</div>
 				</c:if>
 				<div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 sr-popup-hdr-details">
-					<span style="font-weight:bold !important; line-height:25px" class="capitalize">${agentName}</span>
-					<span>${agentProfile.contact_details.title}</span>
+					<span style="font-weight:bold !important; line-height:25px" class="capitalize">${unitName}</span>
+					<span>${unitProfile.contact_details.title}</span>
 				</div>
 			</div>
 			<div class="single-review-popup-body-wrapper clearfix">
@@ -161,14 +161,14 @@
 					<c:choose>
 						<c:when test="${singleReviewItem.source != 'Zillow' }">
 							<div class="sr-wc-btn-col float-left">
-								<div id="single-review-contact-btn" data-contact-link="${agentProfile.completeProfileUrl}" class="sr-wc-sub-send-btn float-left wc-final-submit">
+								<div id="single-review-contact-btn" data-contact-link="${unitProfile.completeProfileUrl}" class="sr-wc-sub-send-btn float-left wc-final-submit">
 									<span class="capitalize">Contact ${agentFirstNameValue}</span>
 								</div>
 							</div>
 						</c:when>
 						<c:otherwise>
 							<div class="sr-wc-btn-col-zillow float-left">
-								<div id="single-review-contact-btn" data-contact-link="${agentProfile.completeProfileUrl}" class="sr-wc-sub-send-btn float-left wc-final-submit">
+								<div id="single-review-contact-btn" data-contact-link="${unitProfile.completeProfileUrl}" class="sr-wc-sub-send-btn float-left wc-final-submit">
 									<span class="capitalize">Contact ${agentFirstNameValue}</span>
 								</div>
 							</div>

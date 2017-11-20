@@ -1734,3 +1734,11 @@ span.footer-ul a:hover {
     font-size: x-large;
     font-size: -webkit-x-large;
 }
+
+.permalink {
+    margin: 0%;
+    padding: 0%;
+    width: 25px;
+    height: 25px;
+    margin-left: -3px;
+}

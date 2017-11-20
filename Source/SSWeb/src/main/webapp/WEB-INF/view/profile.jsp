@@ -84,6 +84,15 @@
 		test="${not empty profile.contact_details && not empty profile.contact_details.name }">
 		<c:set var="profName" value="${profile.contact_details.name }"></c:set>
 	</c:if>
+	<c:if test="${not empty title }">
+		<c:set var="includeTitle" value=" ${firstName} is the ${title} of ${companyName}."></c:set>
+	</c:if>
+	<c:if test="${not empty location }">
+		<c:set var="includeLocation" value=" in ${location}"></c:set>
+	</c:if>
+	<c:if test="${not empty city or not empty state or not empty country }">
+		<c:set var="includeLoc" value=" in ${city} ${state} ${country}"></c:set>
+	</c:if>
 	<c:choose>
 		<c:when test="${not empty profName}">
 			<c:choose>
@@ -92,14 +101,14 @@
 					<meta name="keywords"
 						content="${profName}, ${title}, ${companyName}, ${location}, ${vertical}, professional, online, reputation, social, survey, reviews, rating">
 					<meta name="description"
-						content="Reviews for ${profName}. ${firstName} has ${reviewsCount} reviews. ${firstName} is a ${vertical} professional in ${location}. ${firstName} is the ${title} of ${companyName}.">
+						content="${firstName} has ${reviewsCount} reviews. ${firstName} is a ${vertical} professional${includeLocation}.${includeTitle}">
 				</c:when>
 				<c:otherwise>
 					<title>${profName} ${vertical} Reviews | SocialSurvey.me</title>
 					<meta name="keywords"
 						content="${profName}, ${vertical}, professional, online, reputation, social, survey, reviews, rating">
 					<meta name="description"
-						content="Reviews for ${profName}. ${profName} has ${reviewsCount} reviews. ${profName} is a ${vertical} company in ${city} ${state} ${country}.">
+						content="${profName} has ${reviewsCount} reviews. ${profName} is a ${vertical} company${includeLoc}.">
 				</c:otherwise>
 			</c:choose>
 		</c:when>
@@ -798,10 +807,7 @@
 			 	$('body').addClass("overflow-hidden-important");
 			 	
 			 	// post icons
-			 	if( "${reviewAggregate.reviewJson}" != "" ){
-			 		var singleReviewObject = ${reviewAggregate.reviewJson};
-					buildReviewPopupShareData( singleReviewObject );
-			 	}
+				buildReviewPopupShareData();
 			}
 			
 			 $('body').on('click','#dismiss-single-review-popup',function(e){
