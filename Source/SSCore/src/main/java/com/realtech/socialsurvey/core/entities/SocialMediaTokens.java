@@ -13,7 +13,7 @@ public class SocialMediaTokens
     private LendingTreeToken lendingTreeToken;
     private RealtorToken realtorToken;
     private GoogleBusinessToken googleBusinessToken;
-
+    private FacebookPixelToken facebookPixelToken;
 
     public GoogleBusinessToken getGoogleBusinessToken()
     {
@@ -132,6 +132,18 @@ public class SocialMediaTokens
     public void setRealtorToken( RealtorToken realtorToken )
     {
         this.realtorToken = realtorToken;
+    }
+
+
+    public FacebookPixelToken getFacebookPixelToken()
+    {
+        return facebookPixelToken;
+    }
+
+
+    public void setFacebookPixelToken( FacebookPixelToken facebookPixelToken )
+    {
+        this.facebookPixelToken = facebookPixelToken;
     }
 
 

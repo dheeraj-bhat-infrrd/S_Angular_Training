@@ -375,9 +375,6 @@ $(document).on('click', '.restart-survey-mail-txt', function(e) {
 	e.stopPropagation();
 	confirmRetakeSurveyReminderMail(this);
 
-	/*
-	 * var firstName = $(this).parent().parent().parent().parent().attr('data-firstname'); var lastName = $(this).parent().parent().parent().parent().attr('data-lastname'); var agentName = $(this).parent().parent().parent().parent().attr('data-agentname'); var customerEmail = $(this).parent().parent().parent().parent().attr('data-customeremail'); var agentId = $(this).parent().parent().parent().parent().attr('data-agentid'); var payload = { "customerEmail" : customerEmail, "agentId" : agentId, "firstName" : firstName, "lastName" : lastName, "agentName" : agentName }; callAjaxGetWithPayloadData('./restartsurvey.do', '', payload, true); $('#overlay-toast').html('Mail sent to '+firstName +' '+' to retake the survey for you.'); showToast();
-	 */
 });
 
 function confirmRetakeSurveyReminderMail(element) {
@@ -396,44 +393,25 @@ function confirmRetakeSurveyReminderMail(element) {
 }
 
 function retakeSurveyReminderMail(element) {
-	var firstName = $(element).parent().parent().parent().parent().attr('data-firstname');
-	var lastName = $(element).parent().parent().parent().parent().attr('data-lastname');
-	var agentName = $(element).parent().parent().parent().parent().attr('data-agentname');
-	var customerEmail = $(element).parent().parent().parent().parent().attr('data-customeremail');
-	var agentId = $(element).parent().parent().parent().parent().attr('data-agentid');
 	var surveyId = $(element).parent().parent().parent().parent().attr('survey-mongo-id');
 
 	var payload = {
-		"customerEmail" : customerEmail,
-		"agentId" : agentId,
-		"firstName" : firstName,
-		"lastName" : lastName,
-		"agentName" : agentName,
 		"surveyId" : surveyId
 	};
 
 	callAjaxGetWithPayloadData('./restartsurvey.do', function() {
-		$('#overlay-toast').html('Mail sent to ' + firstName + ' ' + ' to retake the survey for you.');
+		$('#overlay-toast').html('Mail sent to customer to retake the survey for you.');
 		showToast();
 		$('#overlay-cancel').click();
 		getIncompleteSurveyCount(colName, colValue);
 	}, payload, true);
 }
 
-/*
- * $(document).on('click', '.report-abuse-txt', function(e) { disableBodyScroll(); e.stopPropagation(); var reviewElement = $(this).parent().parent().parent().parent(); var payload = { "customerEmail" : reviewElement.attr('data-customeremail'), "agentId" : reviewElement.attr('data-agentid'), "firstName" : reviewElement.attr('data-cust-first-name'), "lastName" : reviewElement.attr('data-cust-last-name'), "agentName" : reviewElement.attr('data-agent-name'), "review" : reviewElement.attr('data-review'), "surveyMongoId" : reviewElement.attr('survey-mongo-id') }; $("#report-abuse-txtbox").val(''); // Unbind click events for button $('.rpa-cancel-btn').off('click'); $('.rpa-report-btn').off('click'); //disableBodyScroll(); $('#report-abuse-overlay').show(); $('.rpa-cancel-btn').on('click', function() { $('#report-abuse-overlay').hide(); enableBodyScroll(); });
- */
 $(document).on('click', '.report-abuse-txt', function(e) {
 	disableBodyScroll();
 	e.stopPropagation();
 	var reviewElement = $(this).closest('.dsh-review-cont');
 	var payload = {
-		"customerEmail" : reviewElement.attr('data-customeremail'),
-		"agentId" : reviewElement.attr('data-agentid'),
-		"firstName" : reviewElement.attr('data-firstname'),
-		"lastName" : reviewElement.attr('data-lastname'),
-		"agentName" : reviewElement.attr('data-agentname'),
-		"review" : reviewElement.attr('data-review'),
 		"surveyMongoId" : reviewElement.attr('survey-mongo-id')
 	};
 	var r = reviewElement.attr('data-firstname');
@@ -1630,8 +1608,44 @@ function showProsSurveyStatisticsGraphically(columnName, columnValue) {
 	showProcSurveyGraph(columnName, columnValue, numberOfDays);
 }
 
+var isGettingCompaniesForTransactionMonitor = false;
 
-function showProcSurveyGraph(columnName,companyId, numberOfDays) {
+function getCompaniesForTransactionMonitor(){
+	var companyDetails;
+	
+	if (isGettingCompaniesForTransactionMonitor == true) {
+		return;
+	}
+	
+	isGettingCompaniesForTransactionMonitor = true;
+	
+	$.ajax({
+		url : "./getcompaniesfortransactionmonitor.do",
+		type : "GET",
+		dataType : "JSON",
+		cache : false,
+		success : function(data){
+			
+			isGettingCompaniesForTransactionMonitor = false;
+			companyDetails = data;
+		},
+		complete: function(){
+			showProcSurveyGraph("company", companyDetails[0].iden, 14, companyDetails,0);
+			
+		},
+		error : function(e){
+			isGettingCompaniesForTransactionMonitor = false;
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			$('#overlay-toast').html(e.responseText);
+			showToast();
+		}
+	});
+}
+function showProcSurveyGraph(columnName,companyId, numberOfDays, companyDetails,currentId) {
+	
 	if (isSurveydetailsforgraph == true) {
 		return;
 	}
@@ -1647,11 +1661,23 @@ function showProcSurveyGraph(columnName,companyId, numberOfDays) {
 		cache : false,
 		data : payload,
 		success : function(data) {
+			
 			isSurveydetailsforgraph = false;
 			$('#proc-sur-sel-item').removeClass("empty-field");
 			graphData = data;
+			$('#proc-trans-header').html(companyDetails[currentId].contact_details.name);
 			paintProcSurveyGraph();
 			hideDashOverlay('#low-proc-sur');
+		},
+		complete: function(){
+			
+			setTimeout(function(){
+				currentId++;
+				if( currentId == companyDetails.length ) currentId = 0;
+				
+				showProcSurveyGraph("company", companyDetails[currentId].iden, 14, companyDetails, currentId);
+				
+			}, 30000);
 		},
 		error : function(e) {
 			isSurveydetailsforgraph = false;
@@ -1674,36 +1700,28 @@ function paintProcSurveyGraph() {
 	var completedTransactionCount = [];
 	var sentSurveyInvitationTransactionsCount = [];
 	var sentSurveyReminderTransactionsCount = [];
-
+	var unprocessedTransactionsCount = [];
+	
 	var element = document.getElementById("proc-sur-count-days");
-	if (element == null) {
-		return;
+	
+	var format = 14;
+	if (element != null) {
+		format = element.options[element.selectedIndex].value;
 	}
-
-	var format = element.options[element.selectedIndex].value;
-	var type = '';
-	if (format == '10') {
-		type = 'Date';
-	} else if (format == '20') {
-		type = 'Date';
-	} else if (format == '30') {
-		type = 'Date';
-	}
+	
+	var type = 'Date';
 
 	var keys = getKeysFromGraphFormat(format);
+	//remove today's date
+	keys.pop();
 
 	for (var i = 0; i < keys.length; i++) {
-		if (format == '365') {
-			allTimeslots[i] = convertYearMonthKeyToDate(keys[i]);
-		} else if (format == '10' || format == '20' ) {
-			allTimeslots[i] = convertYearMonthDayKeyToDate(keys[i]);
-		}else {
-			allTimeslots[i] = convertYearWeekKeyToDate(keys[i]);
-		}
+		allTimeslots[i] = convertYearMonthDayKeyToMonthDay(keys[i]);		
 		totalReceivedTransactionsCount[i] =  0;
 		completedTransactionCount[i] =  0;
 		sentSurveyInvitationTransactionsCount[i] =  0;
 		sentSurveyReminderTransactionsCount[i] =  0;
+		unprocessedTransactionsCount[i]=0;
 	}
 	
 	if(graphData != undefined){
@@ -1733,19 +1751,20 @@ function paintProcSurveyGraph() {
 			}
 			
 			var keyFormattedDate = formattedDate.getFullYear().toString() + monthStr + dayStr;
-			if(keys.indexOf(keyFormattedDate)){
+			if(keys.indexOf(keyFormattedDate) > -1){
 				var index = keys.indexOf(keyFormattedDate);
 				totalReceivedTransactionsCount[index] =  graphDataEntity.transactionReceivedCount;
 				completedTransactionCount[index] =  graphDataEntity.surveycompletedCount;
 				sentSurveyInvitationTransactionsCount[index] =  graphDataEntity.surveyInvitationSentCount;
 				sentSurveyReminderTransactionsCount[index] =  graphDataEntity.surveyReminderSentCount;
+				unprocessedTransactionsCount[index] = graphDataEntity.transactionReceivedCount - graphDataEntity.surveyInvitationSentCount;
 			}
 		}
 	}
 	
 	var internalData = [];
 	var nestedInternalData = [];
-	nestedInternalData.push(type, 'Total Transactions', 'Completed Transactions', 'Sent Survey Invitations', 'Sent Survey Reminders');
+	nestedInternalData.push(type, 'Total', 'Unprocessed', 'Invitations', 'Reminders','Completed');
 	internalData.push(nestedInternalData);
 	for (var itr = 0; itr < allTimeslots.length; itr++) {
 		nestedInternalData = [];
@@ -1753,6 +1772,7 @@ function paintProcSurveyGraph() {
 		var curCompletedTransactionCount;
 		var curSentSurveyInvitationTransactionsCount;
 		var curSentSurveyReminderTransactionsCount;
+		var curUnprocessedTransactionsCount;
 
 		if (isNaN(parseInt(totalReceivedTransactionsCount[itr]))) {
 			curTotalReceivedTransactionsCount = 0;
@@ -1777,8 +1797,14 @@ function paintProcSurveyGraph() {
 		} else {
 			curSentSurveyReminderTransactionsCount = parseInt(sentSurveyReminderTransactionsCount[itr]);
 		}
+		
+		if (isNaN(parseInt(unprocessedTransactionsCount[itr]))) {
+			curUnprocessedTransactionsCount = 0;
+		} else {
+			curUnprocessedTransactionsCount = parseInt(unprocessedTransactionsCount[itr]);
+		}
 
-		nestedInternalData.push(allTimeslots[itr], curTotalReceivedTransactionsCount, curCompletedTransactionCount, curSentSurveyInvitationTransactionsCount, curSentSurveyReminderTransactionsCount);
+		nestedInternalData.push(allTimeslots[itr], curTotalReceivedTransactionsCount, curUnprocessedTransactionsCount, curSentSurveyInvitationTransactionsCount, curSentSurveyReminderTransactionsCount, curCompletedTransactionCount);
 		internalData.push(nestedInternalData);
 	}
 
@@ -1788,15 +1814,203 @@ function paintProcSurveyGraph() {
 			width : '90%',
 			height : '80%'
 		},
-		colors : [ 'rgb(28,242,0)', 'rgb(0,174,239)', 'rgb(255,242,0)', 'rgb(255,202,145)' ],
+		colors : [ 'rgb(0, 0, 0)','rgb(255, 0, 0)' , 'rgb(0, 135, 255)', 'rgb(169,169,169)','rgb(0, 255, 0)' ],
 		legend : {
 			position : 'none'
+		},
+		vAxis : { 
+			baselineColor : 'rgb(238,238,238)',
+			gridlines : { color : 'rgb(238,238,238)'},
+			viewWindow: {
+		        min: 0
+		    }
 		}
+		
 	};
 
 	removeAllPreviousGraphToolTip();
 
 	var chart = new google.visualization.LineChart(document.getElementById('pro-survey-gph-item'));
+	chart.draw(data, options);
+}
+
+var isSurveyDetailForOverallGraph=false;
+function showOverallSurveyGraph(columnName,companyId, numberOfDays) {
+	
+	if (isSurveyDetailForOverallGraph == true) {
+		return;
+	}
+	var payload = {
+		"companyId" : companyId,
+		"noOfDays" : numberOfDays
+	};
+	isSurveyDetailForOverallGraph = true;
+	$.ajax({
+		url : "./getcompanysurveystatuscountforpastndays.do",
+		type : "GET",
+		dataType : "JSON",
+		cache : false,
+		data : payload,
+		success : function(data) {
+			
+			isSurveyDetailForOverallGraph = false;
+			$('#proc-sur-sel-item').removeClass("empty-field");
+			graphData = data;
+			paintOverallSurveyGraph();
+			hideDashOverlay('#low-trans');
+		},
+		error : function(e) {
+			isSurveyDetailForOverallGraph = false;
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			$('#overlay-toast').html(e.responseText);
+			showToast();
+		}
+	});
+}
+function paintOverallSurveyGraph() {
+	if (graphData == undefined)
+		return;
+	console.log()
+	var allTimeslots = [];
+	var totalReceivedTransactionsCount = [];
+	var completedTransactionCount = [];
+	var sentSurveyInvitationTransactionsCount = [];
+	var sentSurveyReminderTransactionsCount = [];
+	var unprocessedTransactionsCount = [];
+
+	var element = document.getElementById("proc-sur-count-days");
+	
+	var format = 14;
+	if (element != null) {
+		format = element.options[element.selectedIndex].value;
+	}
+
+	
+	var type = 'Date';
+	
+
+	var keys = getKeysFromGraphFormat(format);
+	//remove today's date
+	keys.pop();
+	
+	for (var i = 0; i < keys.length; i++) {
+		allTimeslots[i] = convertYearMonthDayKeyToMonthDay(keys[i]);
+		totalReceivedTransactionsCount[i] =  0;
+		completedTransactionCount[i] =  0;
+		sentSurveyInvitationTransactionsCount[i] =  0;
+		sentSurveyReminderTransactionsCount[i] =  0;
+		unprocessedTransactionsCount[i] = 0;
+	}
+	
+	if(graphData != undefined){
+		for(var i in graphData ){
+			var graphDataEntity = graphData[i];
+			
+			var entityDate = graphDataEntity.transactionDate;
+		    var formattedDate = new Date(Date.parse(entityDate));
+		    //get date similar to keys formay
+		    
+		    var month = formattedDate.getMonth() + 1;
+			var monthStr = "";
+			if (month < 10) {
+				monthStr = '0' + month.toString();
+				
+			}else{
+				monthStr = month.toString();
+			}
+			
+			var dayStr = "";
+			var day  = formattedDate.getDate();
+			if (day < 10) {
+				dayStr = '0' + day.toString();
+				
+			}else{
+				dayStr = day.toString();
+			}
+			
+			var keyFormattedDate = formattedDate.getFullYear().toString() + monthStr + dayStr;
+			if(keys.indexOf(keyFormattedDate) > -1){
+				var index = keys.indexOf(keyFormattedDate);
+				totalReceivedTransactionsCount[index] =  graphDataEntity.transactionReceivedCount;
+				completedTransactionCount[index] =  graphDataEntity.surveycompletedCount;
+				sentSurveyInvitationTransactionsCount[index] =  graphDataEntity.surveyInvitationSentCount;
+				sentSurveyReminderTransactionsCount[index] =  graphDataEntity.surveyReminderSentCount;
+				unprocessedTransactionsCount[index] = graphDataEntity.transactionReceivedCount - graphDataEntity.surveyInvitationSentCount;
+			}
+		}
+	}
+	
+	var internalData = [];
+	var nestedInternalData = [];
+	nestedInternalData.push(type, 'Total', 'Unprocessed', 'Invitations', 'Reminders', 'Completed');
+	internalData.push(nestedInternalData);
+	for (var itr = 0; itr < allTimeslots.length; itr++) {
+		nestedInternalData = [];
+		var curTotalReceivedTransactionsCount;
+		var curCompletedTransactionCount;
+		var curSentSurveyInvitationTransactionsCount;
+		var curSentSurveyReminderTransactionsCount;
+		var curUnprocessedTransactionsCount;
+
+		if (isNaN(parseInt(totalReceivedTransactionsCount[itr]))) {
+			curTotalReceivedTransactionsCount = 0;
+		} else {
+			curTotalReceivedTransactionsCount = parseInt(totalReceivedTransactionsCount[itr]);
+		}
+
+		if (isNaN(parseInt(completedTransactionCount[itr]))) {
+			curCompletedTransactionCount = 0;
+		} else {
+			curCompletedTransactionCount = parseInt(completedTransactionCount[itr]);
+		}
+
+		if (isNaN(parseInt(sentSurveyInvitationTransactionsCount[itr]))) {
+			curSentSurveyInvitationTransactionsCount = 0;
+		} else {
+			curSentSurveyInvitationTransactionsCount = parseInt(sentSurveyInvitationTransactionsCount[itr]);
+		}
+
+		if (isNaN(parseInt(sentSurveyReminderTransactionsCount[itr]))) {
+			curSentSurveyReminderTransactionsCount = 0;
+		} else {
+			curSentSurveyReminderTransactionsCount = parseInt(sentSurveyReminderTransactionsCount[itr]);
+		}
+		
+		if (isNaN(parseInt(unprocessedTransactionsCount[itr]))) {
+			curUnprocessedTransactionsCount = 0;
+		} else {
+			curUnprocessedTransactionsCount = parseInt(unprocessedTransactionsCount[itr]);
+		}
+
+		nestedInternalData.push(allTimeslots[itr], curTotalReceivedTransactionsCount,curUnprocessedTransactionsCount , curSentSurveyInvitationTransactionsCount, curSentSurveyReminderTransactionsCount,curCompletedTransactionCount);
+		internalData.push(nestedInternalData);
+	}
+
+	var data = google.visualization.arrayToDataTable(internalData);
+	var options = {
+		chartArea : {
+			width : '90%',
+			height : '80%'
+		},
+		colors : [ 'rgb(0, 0, 0)','rgb(255, 0, 0)', 'rgb(0, 135, 255)', 'rgb(169,169,169)', 'rgb(0, 255, 0)'],
+		legend : {
+			position : 'none'
+		},
+		vAxis : { 
+			baselineColor : 'rgb(238,238,238)',
+			gridlines : { color : 'rgb(238,238,238)'},
+			viewWindow: {
+		        min: 0
+		    }
+		}
+	};
+
+	removeAllPreviousGraphToolTip();
+
+	var chart = new google.visualization.LineChart(document.getElementById('trans-gph-item'));
 	chart.draw(data, options);
 }
 
@@ -1807,8 +2021,6 @@ function showTransactionStatisticsGraphically(columnName, columnValue) {
 	$('#trans-gph-item').html('');
 	showTransactionGraph(columnName, columnValue, numberOfDays);
 }
-
-
 
 var isSurveydetailsforgraph = false;
 function showTransactionGraph(columnName,companyId, numberOfDays) {
@@ -1855,12 +2067,12 @@ function paintTransactionGraph() {
 	var encompassTransactionsCount = [];
 	var ftpTransactionsCount = [];
 
+	var format = 10;
 	var element = document.getElementById("transaction-count-days");
-	if (element == null) {
-		return;
+	if (element != null) {
+		format = element.options[element.selectedIndex].value;
 	}
 
-	var format = element.options[element.selectedIndex].value;
 	var type = '';
 	if (format == '10') {
 		type = 'Date';
@@ -2124,6 +2336,35 @@ function convertYearMonthDayKeyToDate(key) {
 	}).toString("MMM d, yyyy");
 }
 
+function convertYearMonthKeyToMonthDay(key) {
+	var year = parseInt(key.substr(0, 4));
+	var monthStr = key.substr(4, key.length);
+	var monthInt = parseInt(monthStr, "10"); // add base value
+	var monthNumber = monthInt - 1;
+	return Date.today().set({
+		day : 1,
+		month : monthNumber,
+		year : year
+	}).toString("MMM d");
+}
+
+function convertYearMonthDayKeyToMonthDay(key) {
+	var year = parseInt(key.substr(0, 4));
+	var monthStr = key.substr(4, 2);
+	var monthInt = parseInt(monthStr, "10"); // add base value
+	var monthNumber = monthInt - 1;
+
+	var dayStr = key.substr(6, 2);
+	var dayInt = parseInt(dayStr, "10"); // add base value
+	dayNumber = dayInt;
+	
+	return Date.today().set({
+		day : dayNumber,
+		month : monthNumber,
+		year : year
+	}).toString("MMM d");
+}
+
 function getKeysFromGraphFormat(format) {
 	var firstDate;
 	var keys = [];
@@ -2146,7 +2387,7 @@ function getKeysFromGraphFormat(format) {
 
 		}
 
-	} else if(format == '10' || format == '15' || format == '20') {
+	} else if(format == '7' || format == '14' || format == '21'  || format == '28') {
 		firstDate = Date.today().add({
 			days : -parseInt(format)
 		});
@@ -5441,6 +5682,28 @@ function updateAllowPartnerSurveySettingForCompany(allowPartnerSurvey, disableEl
 	
 }
 
+function updateUpdateTransactionMonitorForCompany(updateTransactionMonitorSetting, disableEle) {
+	var payload = {
+		"updateTransactionMonitorSetting" : updateTransactionMonitorSetting
+	};
+	
+	callAjaxGetWithPayloadData("./updatetransactionmonitorsettingforcompany.do",function(data) {
+		if (data == "success"){
+			if ($('#incld-fr-trans-mntr-chk-box').hasClass('bd-check-img-checked')) {
+				$('#incld-fr-trans-mntr-chk-box').removeClass('bd-check-img-checked');
+			}	
+			else{
+				$('#incld-fr-trans-mntr-chk-box').addClass('bd-check-img-checked');
+			}
+			$('#overlay-toast').html("Content updated successfully");
+		}else{
+			$('#overlay-toast').html(data);
+		}
+		showToast();
+	}, payload, true, disableEle);
+	
+}
+
 
 function resetTextForMoodFlow(mood, resetId) {
 	var payload = {
@@ -6978,16 +7241,9 @@ function showFeedbackPage(mood) {
 		}
 		rating = currResponse / (counter);
 		rating = parseFloat(rating).toFixed(3);
-		if ((rating >= autoPostScore)) {
-			$("#pst-srvy-div").show();
-			if ((Boolean(autoPost) == false)) {
-				$('#shr-pst-cb').val('false');
-				$('#shr-post-chk-box').addClass('bd-check-img-checked');
-			} else {
-				$('#shr-pst-cb').val('true');
-				$('#shr-post-chk-box').removeClass('bd-check-img-checked');
-			}
-		}
+		$("#pst-srvy-div").show();
+		$('#shr-pst-cb').val('true');
+		$('#shr-post-chk-box').removeClass('bd-check-img-checked');
 		break;
 	case "OK":
 		question = neutralText;
@@ -7078,7 +7334,7 @@ function showMasterQuestionPage() {
 		}
 
 		var onlyPostToSocialSurvey = true;
-		if ($('#shr-post-chk-box').hasClass('bd-check-img-checked') == false && (rating >= autoPostScore) && (Boolean(autoPost) == true)) {
+		if ($('#shr-post-chk-box').hasClass('bd-check-img-checked') == false ) {
 			if (isAbusive == false) {
 				onlyPostToSocialSurvey = false;
 			}
@@ -7592,13 +7848,6 @@ $(document).on('blur', '.prof-edditable-sin', function() {
 
 });
 
-/*
- * $(document).on('click', '.fb-shr', function() { var firstName = $(this).parent().parent().parent().attr('data-firstname'); var lastName = $(this).parent().parent().parent().attr('data-lastname'); var agentName = $(this).parent().parent().parent().attr('data-agentname'); var review = $(this).parent().parent().parent().attr('data-review'); var score = $(this).parent().parent().parent().attr('data-score'); shareOnFacebook(firstName, lastName, agentName, review, score); });
- * 
- * $(document).on('click', '.twt-shr', function() { var firstName = $(this).parent().parent().parent().attr('data-firstname'); var lastName = $(this).parent().parent().parent().attr('data-lastname'); var agentName = $(this).parent().parent().parent().attr('data-agentname'); var review = $(this).parent().parent().parent().attr('data-review'); var score = $(this).parent().parent().parent().attr('data-score'); shareOnTwitter(firstName, lastName, agentName, review, score); });
- * 
- * $(document).on('click', '.lnkdn-shr', function() { var firstName = $(this).parent().parent().parent().attr('data-firstname'); var lastName = $(this).parent().parent().parent().attr('data-lastname'); var agentName = $(this).parent().parent().parent().attr('data-agentname'); var review = $(this).parent().parent().parent().attr('data-review'); var score = $(this).parent().parent().parent().attr('data-score'); shareOnLinkedin(firstName, lastName, agentName, review, score); });
- */
 
 // On hover for lock icons
 $(document).on('mouseover', '#prof-logo-container', function(e) {
@@ -8596,6 +8845,7 @@ $('body').on('click', '#prof-edit-social-link .icn-lendingtree', function(e) {
 	$('#social-token-text').val(link);
 });
 
+
 function updateLendingTreeLink(link) {
 	var payload = {
 		"lendingTreeLink" : link
@@ -8605,6 +8855,33 @@ function updateLendingTreeLink(link) {
 		showProfileLinkInEditProfilePage("lendingtree", link);
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
+		showToast();
+	}
+}
+
+//Update Social links - facebook pixel
+$('body').on('click', '#prof-edit-social-link .icn-fb-pxl', function(e) {
+	e.stopPropagation();
+	$('#social-token-text').show();
+	var link = $(this).attr("data-link");
+	$('#social-token-text').attr({
+		"placeholder" : "Add Facebook pixel id",
+		"onblur" : "updateFacebookPixelId(this.value);$('#social-token-text').hide();"
+	});
+	$('#social-token-text').val(link);
+});
+
+function updateFacebookPixelId(pixelId) {
+	var payload = {
+		"pixelId" : pixelId
+	};
+	var parsedPixelId = parseInt(pixelId, 10);
+	var isPixelIdInt = parsedPixelId == pixelId;
+	if (pixelId != undefined && pixelId != '' && isPixelIdInt ) {
+		callAjaxPostWithPayloadData("./updatefacebookpixelid.do", callBackUpdateSocialLink, payload, true);
+		showProfileLinkInEditProfilePage("facebookPixel", pixelId);
+	} else {
+		$('#overlay-toast').html("Enter a valid pixel id");
 		showToast();
 	}
 }
@@ -10583,8 +10860,9 @@ $(document).on('click', '.wc-review-rmv-icn', function() {
 		$('#wc-review-table').perfectScrollbar('update');
 	}, 1000);
 });
+
+
 var surveysent=false;
-var alreadysentsurvey=false;
 $(document).on('click', '#wc-send-survey', function() {
 	var allowrequest = true;
 	var receiversList = [];
@@ -10595,50 +10873,14 @@ $(document).on('click', '#wc-send-survey', function() {
 	var idx = 0;
 	var agentname = "";
 	var myself = false;
-	var end = false;
-	if(surveysent || alreadysentsurvey){
+	
+	if(surveysent ){
 		return;
 	}
-	$('#wc-review-table-inner').children().each(function() {
-		if (!$(this).hasClass('wc-review-hdr')) {
-			$(this).children().each(function() {
-				$(this).find(':nth-child(1)').removeClass("error-survey");
-				$(this).find(':nth-child(2)').addClass("hidden");
-			});
-		}
-	});
-	$('#wc-review-table-inner').children().each(function() {
-		if (!$(this).hasClass('wc-review-hdr')) {
-			$(this).children().each(function() {
-				if (!$(this).hasClass('last')) {
-					var input = $(this).children(":input").val();
-					if (input != "") {
-						end = true;
-					}
-				}
-			});
-		}
-	});
-	if (!end) {
-		$('#wc-review-table-inner').children().each(function() {
-			if (!$(this).hasClass('wc-review-hdr')) {
-				$(this).children().each(function() {
-					if ($(this).hasClass('survey-user')) {
-						$(this).find(':nth-child(1)').addClass("error-survey");
-						$(this).find(':nth-child(2)').html("User is required.").removeClass("hidden");
-						allowrequest = false;
-					} else if ($(this).hasClass('survey-fname')) {
-						$(this).find(':nth-child(1)').addClass("error-survey");
-						$(this).find(':nth-child(2)').html("Firstname is required.").removeClass("hidden");
-						allowrequest = false;
-					} else if ($(this).hasClass('survey-email')) {
-						$(this).find(':nth-child(1)').addClass("error-survey");
-						$(this).find(':nth-child(2)').html("Email is required.").removeClass("hidden");
-						allowrequest = false;
-					}
-				});
-			}
-		});
+	
+	
+	if ( !removeErrorMessagesAndDetermineIfRequiredDataIsPresent() ) {
+		allowrequest = checkIfRequestCanBeMadeAndDisplayErrorMessagesIfNeeded();
 	}
 
 	$('#wc-review-table-inner').children().each(function() {
@@ -10811,10 +11053,6 @@ $(document).on('click', '#wc-send-survey', function() {
 	var surveyed = [];
 	var alreadysureyed = false;
 	if (allowrequest) {
-		if(alreadysentsurvey){
-			return;
-		}
-		alreadysentsurvey=true;
 		callAjaxPostWithPayloadData("./getalreadysurveyedemailids.do", function(data) {
 			var alreadySurveyedEmails = $.parseJSON(data);
 			// To check if the email had already surveyed
@@ -10842,7 +11080,6 @@ $(document).on('click', '#wc-send-survey', function() {
 
 			} else {
 				$('#send-survey-dash').removeClass("hide");
-				alreadysentsurvey=false;
 				if(surveysent){
 					return;
 				}
@@ -10879,6 +11116,52 @@ $(document).on('click', '#wc-send-survey', function() {
 		}, payload, true);
 	}
 });
+
+
+function checkIfRequestCanBeMadeAndDisplayErrorMessagesIfNeeded(){
+	var allowrequest = true;
+	$('#wc-review-table-inner').children().each(function() {
+		if (!$(this).hasClass('wc-review-hdr')) {
+			$(this).children().each(function() {
+				if ($(this).hasClass('survey-user')) {
+					$(this).find(':nth-child(1)').addClass("error-survey");
+					$(this).find(':nth-child(2)').html("User is required.").removeClass("hidden");
+					allowrequest = false;
+				} else if ($(this).hasClass('survey-fname')) {
+					$(this).find(':nth-child(1)').addClass("error-survey");
+					$(this).find(':nth-child(2)').html("Firstname is required.").removeClass("hidden");
+					allowrequest = false;
+				} else if ($(this).hasClass('survey-email')) {
+					$(this).find(':nth-child(1)').addClass("error-survey");
+					$(this).find(':nth-child(2)').html("Email is required.").removeClass("hidden");
+					allowrequest = false;
+				}
+			});
+		}
+	});
+	return allowrequest;
+}
+
+function removeErrorMessagesAndDetermineIfRequiredDataIsPresent(){
+	
+	var end = false;
+	$('#wc-review-table-inner').children().each(function() {
+		if (!$(this).hasClass('wc-review-hdr')) {
+			$(this).children().each(function() {
+				$(this).find(':nth-child(1)').removeClass("error-survey");
+				$(this).find(':nth-child(2)').addClass("hidden");
+				if (!$(this).hasClass('last')) {
+					var input = $(this).children(":input").val();
+					if (input != "") {
+						end = true;
+					}
+				}
+			});
+		}
+	});
+	return end;
+}
+
 
 $(document).on('click', '#wc-skip-send-survey', function() {
 	$('#overlay-send-survey').hide();
@@ -11089,6 +11372,14 @@ $('body').on('click', '#alw-ptnr-srvy-chk-box', function() {
 		updateAllowPartnerSurveySettingForCompany(true, '#alw-ptnr-srvy-chk-box');
 	} else {
 		updateAllowPartnerSurveySettingForCompany(false, '#alw-ptnr-srvy-chk-box');
+	}
+});
+
+$('body').on('click', '#incld-fr-trans-mntr-chk-box', function() {
+	if ($('#incld-fr-trans-mntr-chk-box').hasClass('bd-check-img-checked')) {
+		updateUpdateTransactionMonitorForCompany(true, '#incld-fr-trans-mntr-chk-box');
+	} else {
+		updateUpdateTransactionMonitorForCompany(false, '#incld-fr-trans-mntr-chk-box');
 	}
 });
 
@@ -12912,7 +13203,7 @@ function paintReviews(result, isRequestFromDashBoard) {
 		if (custNameArray[1] != undefined && custNameArray[1].trim() != "") {
 			custDispName += ' ' + custNameArray[1].substr(0, 1).toUpperCase() + '.';
 		}
-		reviewsHtml = reviewsHtml + '<div class="' + lastItemClass + '" data-cust-first-name=' + encodeURIComponent(reviewItem.customerFirstName) + ' data-cust-last-name=' + encodeURIComponent(reviewItem.customerLastName) + ' data-agent-name=' + encodeURIComponent(reviewItem.agentName) + ' data-rating=' + reviewItem.score + ' data-review="' + encodeURIComponent(reviewItem.review) + '" data-customeremail="' + reviewItem.customerEmail + '" data-agentid="' + reviewItem.agentId + '" survey-mongo-id="' + reviewItem._id + '">';
+		reviewsHtml = reviewsHtml + '<div class="' + lastItemClass + '" data-cust-first-name=' + encodeURIComponent(reviewItem.customerFirstName) + ' data-rating=' + reviewItem.score + ' data-review="' + encodeURIComponent(reviewItem.review)  + '" data-agentid="' + reviewItem.agentId + '" survey-mongo-id="' + reviewItem._id + '">';
 		reviewsHtml += '	<div class="ppl-header-wrapper clearfix">';
 		reviewsHtml += '		<div class="float-left ppl-header-left">';
 		reviewsHtml += '			<div class="ppl-head-1">' + custDispName + '</div>';
@@ -13206,3 +13497,174 @@ function copyIndividualReviewUrlToClipboard(loop){
 	showToast();
 }
 
+function downloadAccountStatsReport(){
+	
+	callAjaxPOST('./downloadaccountstatisticsreport.do', function(data){
+		$('#overlay-toast').html(data);
+		showToast();
+		getAccStatsReportStatus();
+	}, false);
+}
+
+function getAccStatsReportStatus(){
+	callAjaxGET('./getaccountstatisticsreportstatus.do', function(data){
+		var reportDetails = JSON.parse(JSON.parse(data));
+		
+		if(reportDetails.status == 1 || reportDetails.status == 2){
+			if($('#acc-stats-gen-rep').hasClass('acc-stats-rep-btn-enabled')){
+				$('#acc-stats-gen-rep').removeClass('acc-stats-rep-btn-enabled');
+			}
+
+			$('#acc-stats-rep-bnt').css('pointer-events','none');
+			$('#acc-stats-gen-rep').addClass('acc-stats-rep-btn-disabled');
+			
+			if($('#account-stats-status-link').hasClass('download-acc-stats-rep')){
+				$('#account-stats-status-link').removeClass('download-acc-stats-rep')
+			}
+			$('#account-stats-status-link').addClass('pending-acc-stats-rep')
+			$('#account-stats-status-link').html('Report Pending');
+			$('#account-stats-status-link').removeAttr('href');
+			$('#account-stats-status-link').css('pointer-events','none');
+		}else if(reportDetails.status  == 0){
+			if($('#acc-stats-gen-rep').hasClass('acc-stats-rep-btn-disabled')){
+				$('#acc-stats-gen-rep').removeClass('acc-stats-rep-btn-disabled');
+			}
+			$('#acc-stats-rep-bnt').css('pointer-events','auto');
+			$('#acc-stats-gen-rep').addClass('acc-stats-rep-btn-enabled');
+			
+			if($('#account-stats-status-link').hasClass('pending-acc-stats-rep')){
+				$('#account-stats-status-link').removeClass('pending-acc-stats-rep');
+			}
+			$('#account-stats-status-link').addClass('download-acc-stats-rep')
+			$('#account-stats-status-link').html('Download the report');
+			$('#account-stats-status-link').attr('href',reportDetails.fileName);
+			$('#account-stats-status-link').css('pointer-events','auto');
+		}else if(reportDetails.status == 4){
+			if($('#acc-stats-gen-rep').hasClass('acc-stats-rep-btn-disabled')){
+				$('#acc-stats-gen-rep').removeClass('acc-stats-rep-btn-disabled');
+			}
+			$('#acc-stats-rep-bnt').css('pointer-events','auto');
+			$('#acc-stats-gen-rep').addClass('acc-stats-rep-btn-enabled');
+			
+			if($('#account-stats-status-link').hasClass('download-acc-stats-rep')){
+				$('#account-stats-status-link').removeClass('download-acc-stats-rep')
+			}
+			$('#account-stats-status-link').addClass('pending-acc-stats-rep')
+			$('#account-stats-status-link').html('Report Generation Failed. Please Try Again.');
+			$('#account-stats-status-link').removeAttr('href');
+			$('#account-stats-status-link').css('pointer-events','none');
+		}
+	}, false);
+}
+
+$(document).on('click','#acc-stats-rep-bnt',function(){
+	downloadAccountStatsReport();
+});
+
+
+// survey csv file functions
+
+$(document).on('change', '.survey-csv-file-input', function(){
+	$("#upload-email-invalid").hide();
+	processAndValidateCsvForm( true );
+});
+
+$(document).on('click','#wc-send-survey-upload-cancel',function(event){
+	$(".wc-btn-row").show();
+	$(".welcome-popup-body-wrapper").show();
+	$(".survey-upload-csv").hide();
+});
+
+$(document).on('click','#wc-send-survey-upload-confirm',function(event){
+	$('#send-survey-csv-dash').removeClass("hide");
+	if( !processAndValidateCsvForm( false ) ){
+		
+		if( !$('#send-survey-csv-dash').hasClass("hide") ){
+			$('#send-survey-csv-dash').addClass("hide");
+		}
+		hideOverlay();
+		return;
+	}
+
+	var formData = new FormData();
+	formData.append("file", $('#survey-file-intake').prop("files")[0]);
+	formData.append("filename", $('#survey-file-intake').prop("files")[0].name);
+	formData.append( "uploaderEmail", $('#survey-uploader-email').val() );
+	formData.append("hierarchyType",$('#hierarchyType').val() );
+	formData.append("hierarchyValue",$('#hierarchyValue').val() );
+	callAjaxPOSTWithTextData("./savesurveycsvfile.do", function(callbackData){
+		$('#send-survey-csv-dash').addClass("hide");
+		var response = JSON.parse(callbackData);
+		$("#overlay-toast").html(response.message);
+		showToast();
+		
+	}, true, formData);
+});
+
+$(document).on('click','#wc-send-survey-upload-csv',function(event){
+	$(".wc-btn-row").hide();
+	$(".welcome-popup-body-wrapper").hide();
+	$(".survey-upload-csv").show();
+});
+
+function csvFileValidate(inputFileElement, whileUploading) {
+	
+	$('.display-load').hide();
+	
+	if( whileUploading ){
+		$('.survey-csv-file-info').hide();
+	}
+
+	if ($(inputFileElement).attr("type") == "file") {
+		var fileName = $(inputFileElement).val();
+		if (fileName.length > 0) {
+			if (fileName.substr(fileName.length - 4, 4).toLowerCase() == ".csv") {
+								
+				var fileAddress = $(inputFileElement).val().split('\\');
+				$('#survey-csv-file-name').text(fileAddress[fileAddress.length - 1]);
+				$('.survey-csv-file-info').show();
+				return true;
+			}
+		} else {
+			$('.display-load').show();
+			$(inputFileElement).val = "";
+			return false;
+		}
+	} else {
+		$('.display-load').show();
+		return false;
+	}
+}
+
+function uploaderEmailValidate(){
+	return ( $('#survey-uploader-email').val() == undefined ||  $('#survey-uploader-email').val() == '' ) ? false : true;
+}
+
+function processAndValidateCsvForm(whileUploading){
+	
+	$("#upload-email-invalid").hide();
+	
+	if( !csvFileValidate("#survey-file-intake") )
+	{
+		if( !$("#wc-send-survey-upload-confirm").hasClass('disable') ){
+			$("#wc-send-survey-upload-confirm").addClass('disable');
+		}
+		$('.display-load').show();
+		$('.survey-csv-file-info').hide();
+		$("#overlay-toast").html("Please select a valid csv file");
+		showToast();
+		return false;
+	} else if( !uploaderEmailValidate() && !whileUploading){
+		$("#upload-email-invalid").show();
+		return false;
+	} else {
+		if( $("#wc-send-survey-upload-confirm").hasClass('disable') ){
+			$("#wc-send-survey-upload-confirm").removeClass('disable');
+		}
+		return true;
+	}
+}
+
+$(document).on('click', '#survey-uploader-email', function(){
+	$("#upload-email-invalid").hide();
+})

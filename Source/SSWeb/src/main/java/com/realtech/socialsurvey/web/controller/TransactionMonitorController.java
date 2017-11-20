@@ -171,4 +171,49 @@ public class TransactionMonitorController
             return gson.toJson( responseMap );
         }
     }
+    
+    
+    
+    /**
+     * 
+     * @param model
+     * @param request
+     * @return
+     */
+    @RequestMapping ( value = "/gettransactionmonitordata")
+    @ResponseBody
+    public String getTransactionMonitorData( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method getTransactionMonitorData started." );
+
+        String companyIdStr = request.getParameter( "companyId" );
+        String noOfDaysStr = request.getParameter( "noOfDays" );
+        Long companyId;
+        Integer noOfDays;
+        Gson gson = new Gson();
+        try {
+            try {
+                companyId = Long.parseLong( companyIdStr );
+            } catch ( NumberFormatException e ) {
+                throw new InvalidInputException( "Wrong company id passed " );
+            }
+
+            try {
+                noOfDays = Integer.parseInt( noOfDaysStr );
+            } catch ( NumberFormatException e ) {
+                throw new InvalidInputException( "Wrong company id passed " );
+            }
+
+            List<CompanyActiveUsersStats> companyActiveUserCountStats = activityManagementService
+                .getActiveUserCountStatsForCompanyForPastNDays( companyId, noOfDays );
+
+            LOG.info( "Method getActiveUserCountsForCompanyForPastNDays finished." );
+            return gson.toJson( companyActiveUserCountStats );
+        } catch ( NonFatalException e ) {
+            LOG.error( "Error in getActiveUserCountsForCompanyForPastNDays ", e );
+            Map<String, Object> responseMap = new HashMap<String, Object>();
+            responseMap.put( "responseText", e.getMessage() );
+            return gson.toJson( responseMap );
+        }
+    }
 }

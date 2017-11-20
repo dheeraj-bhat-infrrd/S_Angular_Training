@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.services.upload.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -70,6 +71,9 @@ public class CloudUploadServiceImpl implements FileUploadService
 
     @Value ( "${AMAZON_BUCKET}")
     private String bucket;
+
+    @Value ( "${AMAZON_SURVEY_CSV_BUCKET}")
+    private String amazonSurveyCsvBucket;
 
     @Value ( "${AMAZON_ENV_PREFIX}")
     private String envPrefix;
@@ -332,5 +336,40 @@ public class CloudUploadServiceImpl implements FileUploadService
         }
         fileUploadDao.update( fileUpload );
     }
+    
+    
+    /*
+     * method to upload a csv file filled with customer details and return the URI
+     * 
+     * @param MultiPartFile
+     * @param String
+     * @return String
+     */
+    @Override
+    public String uploadFileAtSurveyCsvBucket( MultipartFile file, String fileName ) throws NonFatalException
+    {
+        LOG.debug( "Method uploadFileAtSurveyCsvBucket called" );
+
+        if ( !file.isEmpty() ) {
+            try {
+                File convFile = new File( URLEncoder.encode( fileName, "UTF-8" ) );
+                file.transferTo( convFile );
+
+                // uploading in social survey's application bucket, inside "amazonSurveyCsvBucket" folder
+                uploadFile( convFile, fileName, bucket + CommonConstants.FILE_SEPARATOR + amazonSurveyCsvBucket, false );
+
+                return endpoint + CommonConstants.FILE_SEPARATOR + bucket + CommonConstants.FILE_SEPARATOR
+                    + amazonSurveyCsvBucket + CommonConstants.FILE_SEPARATOR + URLEncoder.encode( fileName, "UTF-8" );
+
+            } catch ( IOException e ) {
+                LOG.error( "IOException occured while reading file. Reason : " + e.getMessage(), e );
+                throw new FatalException( "IOException occured while reading file. Reason : " + e.getMessage(), e );
+            }
+        } else {
+            LOG.error( "Method fuploadFileAtSurveyCsvBucket failed to upload" );
+            throw new InvalidInputException( "Upload failed: because the file with name " + fileName + " was empty" );
+        }
+    }
+
 
 }

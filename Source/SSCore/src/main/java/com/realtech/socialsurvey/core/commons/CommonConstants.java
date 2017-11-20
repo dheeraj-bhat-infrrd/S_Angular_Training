@@ -213,6 +213,7 @@ public interface CommonConstants
     public static final String PROFILE_VALUE_COLUMN = "profileValue";
     public static final String PROFILE_LEVEL_COLUMN = "profileLevel";
     public static final String ENCOMPASS_SDK_VERSION_COLUMN = "sdkVersion";
+    public static final String INCLUDE_IN_TRANSACTION_MONITOR = "includeInTransactionMonitor";
 
     //batch type constant for batch tracker
     public static final String BATCH_TYPE_REVIEW_COUNT_UPDATER = "reviewCountUpdater";
@@ -238,6 +239,7 @@ public interface CommonConstants
     public static final String BATCH_TYPE_ZILLOW_REVIEW_PROCESSOR_AND_AUTO_POSTER = "ZillowReviewProcessorAndAutoPoster";
     public static final String BATCH_TYPE_HIERARCHY_UPLOAD_PROCESSOR = "HierarchyUploadProcessor";
     public static final String BATCH_TYPE_MONTHLY_DIGEST_STARTER = "MonthlyDigestStarter";
+    public static final String BATCH_TYPE_SURVEY_CSV_UPLOAD_PROCESSOR = "SurveyCsvUploadProcessor";
 
     //batch name constant for batch tracker
     public static final String BATCH_NAME_REVIEW_COUNT_UPDATER = "Agent's review count in solr updater";
@@ -265,6 +267,7 @@ public interface CommonConstants
     public static final String BATCH_NAME_ZILLOW_REVIEW_PROCESSOR_AND_AUTO_POSTER = "Zillow review processor and auto poster";
     public static final String BATCH_NAME_HIERARCHY_UPLOAD_PROCESSOR = "Company Hierarchy Upload Processor";
     public static final String BATCH_NAME_MONTHLY_DIGEST_STARTER = "Monthly digest process starter for companies";
+    public static final String BATCH_NAME_SURVEY_CSV_UPLOAD_PROCESSOR = "Survey CSV file Upload Processor";
 
 
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_BILLING_REPORT = "Billing report";
@@ -431,6 +434,7 @@ public interface CommonConstants
     public static final String ZILLOW_SOCIAL_SITE = "zillow";
     public static final String YELP_SOCIAL_SITE = "yelp";
     public static final String LENDINGTREE_SOCIAL_SITE = "lendingtree";
+    public static final String FACEBOOK_PIXEL_ID = "facebookPixelId";
     public static final String REALTOR_SOCIAL_SITE = "realtor";
     public static final String GOOGLE_BUSINESS_SOCIAL_SITE = "google business";
     public static final String GOOGLE_SOCIAL_SITE = "google";
@@ -761,6 +765,7 @@ public interface CommonConstants
     public static final String SOCIAL_HISTORY_COLLECTION = "SOCIAL_CONNECTION_HISTORY";
     public static final String UPLOAD_HIERARCHY_DETAILS_COLLECTION = "UPLOAD_HIERARCHY_DETAILS";
     public static final String TEMP_HIERARCHY_UPLOAD_COLLECTION = "TEMP_HIERARCHY_UPLOAD";
+    public static final String SURVEY_CSV_UPLOAD_COLLECTION = "SURVEY_CSV_UPLOAD";
 
     /*
      * Mongo social post Source
@@ -974,6 +979,8 @@ public interface CommonConstants
     public static final int FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT = 105;
     public static final int FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT = 106;
     public static final int FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT = 107;
+    public static final int FILE_UPLOAD_REPORTING_COMPANY_DETAILS_REPORT = 109;
+    public static final int FILE_UPLOAD_REPORTING_INCOMPLETE_SURVEY_REPORT = 108;
 
     
     public static final String AGENT_MEDIA_POST_DETAILS_COLUMN = "agentMediaPostDetails";
@@ -1367,10 +1374,11 @@ public interface CommonConstants
     //Note -> the USER_ADOPTION_REPORT was renamed to VERIFIED_USERS_REPORT
     public static final String REPORTING_VERIFIED_USERS_REPORT = "Verified Users Report";
     public static final String REPORTING_COMPANY_USERS_REPORT = "Company User Report";
-    public static final String REPORTING_SURVEY_REUSLTS_COMPANY_REPORT = "Survey Results Report";
+    public static final String REPORTING_SURVEY_RESULTS_COMPANY_REPORT = "Survey Results Report";
     public static final String REPORTING_SURVEY_TRANSACTION_REPORT = "Survey Transaction Report";
     public static final String REPORTING_USER_RANKING_MONTHLY_REPORT = "User Ranking Report For Month";
     public static final String REPORTING_USER_RANKING_YEARLY_REPORT = "User Ranking Report For Year";
+    public static final String REPORTING_INCOMPLETE_SURVEY_REPORT = "Incomplete Survey Results Report";
     public static final String REPORTING_API_DATE_FORMAT = "MMM dd, yyyy";
 
 

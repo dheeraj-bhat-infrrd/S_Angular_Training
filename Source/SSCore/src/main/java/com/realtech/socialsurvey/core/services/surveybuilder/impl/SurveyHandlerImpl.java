@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -20,6 +21,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
@@ -41,6 +43,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -48,6 +51,7 @@ import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.dao.SurveyCsvUploadDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
@@ -69,6 +73,7 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
+import com.realtech.socialsurvey.core.entities.SurveyCsvInfo;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyImportVO;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
@@ -83,6 +88,7 @@ import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.generator.UrlService;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
@@ -96,6 +102,8 @@ import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
+import com.realtech.socialsurvey.core.services.upload.FileUploadService;
+import com.realtech.socialsurvey.core.utils.CsvUtils;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.FileOperations;
 import com.realtech.socialsurvey.core.vo.SurveysAndReviewsVO;
@@ -115,6 +123,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     @Autowired
     private SurveyDetailsDao surveyDetailsDao;
+
+    @Autowired
+    private SurveyCsvUploadDao surveyCsvUploadDao;
 
     @Autowired
     private UserDao userDao;
@@ -145,6 +156,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     @Autowired
     private ProfileManagementService profileManagementService;
+
+    @Autowired
+    private BatchTrackerService batchTrackerService;
 
     @Autowired
     private EmailServices emailServices;
@@ -237,6 +251,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Autowired
     private GenericDao<CompanyIgnoredEmailMapping, Long> companyIgnoredEmailMappingDao;
 
+    @Autowired
+    private CsvUtils csvUtils;
+
+    @Autowired
+    private FileUploadService fileUploadService;
+
     private static final int USER_EMAIL_ID_INDEX = 3;
     private static final int SURVEY_SOURCE_ID_INDEX = 2;
     private static final int CUSTOMER_FIRSTNAME_INDEX = 4;
@@ -248,6 +268,31 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     private static final int CITY_INDEX = 9;
     private static final int STATE_INDEX = 10;
     private static final String DEFAULT_CUSTOMER_EMAIL_ID_FOR_3RD_PARTY = "none@socialsurvey.com";
+
+    private static final int STATUS_UPLOADER_EMAIL_INVALID = 2;
+    private static final int STATUS_CSV_UPLOAD_INCOMPLETE = 3;
+    private static final int STATUS_CSV_UPLOAD_COMPLETE = 4;
+
+    private static final int SURVEY_CSV_CUSTOMER_FIRST_NAME_INDEX_FOR_AGENT = 0;
+    private static final int SURVEY_CSV_CUSTOMER_FIRST_NAME_INDEX_FOR_ADMIN = 1;
+
+    private static final int SURVEY_CSV_CUSTOMER_LAST_NAME_INDEX_FOR_AGENT = 1;
+    private static final int SURVEY_CSV_CUSTOMER_LAST_NAME_INDEX_FOR_ADMIN = 2;
+
+    private static final int SURVEY_CSV_CUSTOMER_EMAIL_INDEX_FOR_AGENT = 2;
+    private static final int SURVEY_CSV_CUSTOMER_EMAIL_NAME_INDEX_FOR_ADMIN = 3;
+
+    private static final int SURVEY_CSV_AGENT_EMAIL_INDEX_FOR_ADMIN = 0;
+    
+    private static final String AGENT_EMAIL = "Agent Email";
+    private static final String CUSTOMER_FIRST_NAME = "Customer First Name";
+    private static final String CUSTOMER_LAST_NAME = "Customer Last Name";
+    private static final String CUSTOMER_EMAIL = "Customer Email";
+    
+    private static final List<String> AGENT_HEADER = Arrays.asList( CUSTOMER_FIRST_NAME, CUSTOMER_LAST_NAME, CUSTOMER_EMAIL );
+    private static final List<String> ADMIN_HEADER = Arrays.asList( AGENT_EMAIL, CUSTOMER_FIRST_NAME, CUSTOMER_LAST_NAME, CUSTOMER_EMAIL );
+
+    
 
 
     /**
@@ -556,15 +601,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     /*
-     * Method to get list of all the admins' emailIds, an agent comes under. Later on these emailIds
-     * are used for sending emails in case of any sad review for the agent.
+     * Method to get list of all the administrator emailIds, an agent comes under.
      */
     @Transactional
     @Override
-    public Map<String, String> getEmailIdsOfAdminsInHierarchy( long agentId ) throws InvalidInputException
+    public Map<String, Map<String, String>> getEmailIdsOfAdminsInHierarchy( long agentId ) throws InvalidInputException
     {
-        Map<String, String> emailIdsOfAdmins = new HashMap<String, String>();
-        List<UserProfile> admins = new ArrayList<>();
+        Map<String, Map<String, String>> adminsHierarchyMap = new HashMap<>();
+        Map<String, List<UserProfile>> adminMap = new HashMap<>();
         User agent = userDao.findById( User.class, agentId );
         Map<String, Object> queries = new HashMap<>();
         queries.put( CommonConstants.USER_COLUMN, agent );
@@ -578,29 +622,49 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             queries.put( CommonConstants.PROFILE_MASTER_COLUMN,
                 userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) );
             queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
-            admins.addAll( userProfileDao.findByKeyValue( UserProfile.class, queries ) );
+            adminMap.put( CommonConstants.BRANCH_ID_COLUMN, userProfileDao.findByKeyValue( UserProfile.class, queries ) );
             queries.clear();
             queries.put( CommonConstants.REGION_ID_COLUMN, agentProfile.getRegionId() );
             queries.put( CommonConstants.PROFILE_MASTER_COLUMN,
                 userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) );
             queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
-            admins.addAll( userProfileDao.findByKeyValue( UserProfile.class, queries ) );
+            adminMap.put( CommonConstants.REGION_ID_COLUMN, userProfileDao.findByKeyValue( UserProfile.class, queries ) );
             queries.clear();
             if ( agentProfile.getCompany() != null ) {
                 queries.put( CommonConstants.COMPANY_COLUMN, agentProfile.getCompany() );
                 queries.put( CommonConstants.PROFILE_MASTER_COLUMN,
                     userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID ) );
                 queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
-                admins.addAll( userProfileDao.findByKeyValue( UserProfile.class, queries ) );
+                adminMap.put( CommonConstants.COMPANY_ID_COLUMN, userProfileDao.findByKeyValue( UserProfile.class, queries ) );
             }
         }
-        for ( UserProfile admin : admins ) {
-            String name = admin.getUser().getFirstName();
-            if ( admin.getUser().getLastName() != null )
-                name += " " + admin.getUser().getLastName();
-            emailIdsOfAdmins.put( admin.getEmailId(), name );
+
+        adminsHierarchyMap.put( CommonConstants.BRANCH_ID_COLUMN,
+            processAdminListForAHierarchy( adminMap.get( CommonConstants.BRANCH_ID_COLUMN ) ) );
+        adminsHierarchyMap.put( CommonConstants.REGION_ID_COLUMN,
+            processAdminListForAHierarchy( adminMap.get( CommonConstants.REGION_ID_COLUMN ) ) );
+        adminsHierarchyMap.put( CommonConstants.COMPANY_ID_COLUMN,
+            processAdminListForAHierarchy( adminMap.get( CommonConstants.COMPANY_ID_COLUMN ) ) );
+
+        return adminsHierarchyMap;
+    }
+
+
+    private Map<String, String> processAdminListForAHierarchy( List<UserProfile> admins )
+    {
+
+        if ( admins == null || admins.isEmpty() ) {
+            return null;
+        } else {
+            Map<String, String> adminHierarchyMap = new HashMap<>();
+            for ( UserProfile admin : admins ) {
+                String name = admin.getUser().getFirstName();
+                if ( admin.getUser().getLastName() != null )
+                    name += " " + admin.getUser().getLastName();
+                adminHierarchyMap.put( admin.getEmailId(), name );
+            }
+            return adminHierarchyMap;
         }
-        return emailIdsOfAdmins;
     }
 
 
@@ -2818,9 +2882,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     public Boolean canPostOnSocialMedia( OrganizationUnitSettings unitSetting, Double rating )
     {
         boolean canPost = false;
-        if ( unitSetting != null ) {
-            if ( unitSetting.getSurvey_settings() != null ) {
-                if ( unitSetting.getSurvey_settings().getAuto_post_score() <= rating ) {
+        
+        if (  unitSetting != null  && unitSetting.getSurvey_settings() != null ) {
+                if ( unitSetting.getSurvey_settings().isAutoPostEnabled() && unitSetting.getSurvey_settings().getAuto_post_score() <= rating ) {
                     canPost = true;
                 }
             } else {
@@ -2829,12 +2893,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
                 }
             }
-        } else {
-            if ( CommonConstants.DEFAULT_AUTOPOST_SCORE <= rating ) {
-                canPost = true;
-
-            }
-        }
+         
         return canPost;
     }
 
@@ -4295,83 +4354,205 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         LOG.debug( "Method processPreinitiatedRecord validatePreinitiatedRecord started " );
 
-
         for ( SurveyPreInitiation survey : surveyPreInitiations ) {
-
-            User user = null;
-            try {
-                user = userManagementService.getActiveAgentByEmailAndCompany( survey.getCompanyId(), survey.getAgentEmailId() );
-                survey.setAgentId( user.getUserId() );
-            } catch ( InvalidInputException | NoRecordsFetchedException e ) {
-                LOG.error( "No user found in database for the email id: " + survey.getAgentEmailId() + " and company id : "
-                    + survey.getCompanyId() );
-                throw new InvalidInputException(
-                    "Can not process the record. No service provider found with email address :  " + survey.getAgentEmailId() );
-            }
-
-            // check if survey has already been sent to the email id
-            int duplicateSurveyInterval = getDuplicateSurveyIntervalForCompany( user.getCompany().getCompanyId() );
-            List<SurveyPreInitiation> incompleteSurveyCustomers = null;
-            if ( duplicateSurveyInterval > 0 ) {
-                incompleteSurveyCustomers = surveyPreInitiationDao.getSurveyByAgentIdAndCustomeEmailForPastNDays(
-                    user.getUserId(), survey.getCustomerEmailId(), duplicateSurveyInterval );
-            } else {
-                incompleteSurveyCustomers = surveyPreInitiationDao.getSurveyByAgentIdAndCustomeEmail( user.getUserId(),
-                    survey.getCustomerEmailId() );
-            }
-
-            //get valid survey intervals
-            Timestamp engagementClosedTime = survey.getEngagementClosedTime();
-            Calendar calendar = Calendar.getInstance();
-            calendar.add( Calendar.DATE, -validSurveyInterval );
-            Date date = calendar.getTime();
-
-            if ( StringUtils.isEmpty( survey.getCustomerEmailId() )
-                || !organizationManagementService.validateEmail( survey.getCustomerEmailId() ) ) {
-                LOG.warn( "Invalid Customer Email Id " );
-                throw new InvalidInputException(
-                    "Can not process the record. Invalid Customer email id : " + survey.getCustomerEmailId() + "" );
-            } else if ( incompleteSurveyCustomers != null && incompleteSurveyCustomers.size() > 0 ) {
-                LOG.warn( "Survey request already sent" );
-                throw new InvalidInputException( "Can not process the record. A survey request for customer "
-                    + survey.getCustomerFirstName() + " has already received." );
-            } else if ( engagementClosedTime.before( date ) ) {
-                LOG.debug( "An old record found : " + survey.getSurveyPreIntitiationId() );
-                throw new InvalidInputException( "Can not process the record. Request for customer "
-                    + survey.getCustomerFirstName() + " is older than " + validSurveyInterval + " days." );
-            } else if ( isEmailIsIgnoredEmail( survey.getAgentEmailId(), survey.getCompanyId() ) ) {
-                LOG.error( "no agent found with this email id and its an ignored record" );
-                throw new InvalidInputException(
-                    "Can not process the record. No service provider found with email address :  " + survey.getAgentEmailId() );
-            } else if ( survey.getAgentEmailId() == null || survey.getAgentEmailId().isEmpty() ) {
-                LOG.error( "Agent email not found , invalid survey " + survey.getSurveyPreIntitiationId() );
-                throw new InvalidInputException( "Can not process the record.  service provider email id is missing" );
-            } else if ( ( survey.getCustomerFirstName() == null || survey.getCustomerFirstName().isEmpty() )
-                && ( survey.getCustomerLastName() == null || survey.getCustomerLastName().isEmpty() ) ) {
-                LOG.error(
-                    "No Name found for customer, hence this is an invalid survey " + survey.getSurveyPreIntitiationId() );
-                throw new InvalidInputException( "Can not process the record. Customer Name is missing" );
-            } else if ( survey.getCustomerEmailId() == null || survey.getCustomerEmailId().isEmpty() ) {
-                LOG.error( "No customer email id found, invalid survey " + survey.getSurveyPreIntitiationId() );
-                throw new InvalidInputException( "Can not process the record. Customer Email id is missing" );
-            } else if ( user.getCompany() == null ) {
-                LOG.error( "Agent doesnt have an company associated with it " );
-                throw new InvalidInputException(
-                    "Can not process the record. No service provider found with email address :  " + survey.getAgentEmailId() );
-            } else if ( user.getCompany().getCompanyId() != survey.getCompanyId() ) {
-                throw new InvalidInputException(
-                    "Can not process the record. No service provider found with email address :  " + survey.getAgentEmailId() );
-            }
-
-            survey.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
-            if ( survey.getStatus() == CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD )
-                survey.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD );
-            else
-                survey.setStatus( CommonConstants.SURVEY_STATUS_PRE_INITIATED );
+            // validate, verify, cross-verify and setup the survey pre-initiation object
+            validateAndProcessSurveyPreInitiation( survey );
         }
 
         LOG.debug( "Method processPreinitiatedRecord validatePreinitiatedRecord finished " );
         return surveyPreInitiations;
+    }
+
+
+
+    @Override
+    public boolean isFileAlreadyUploaded( String fileName, String uploaderEmail )
+    {
+        LOG.debug( "method isFileAlreadyUploaded called" );
+        return surveyCsvUploadDao.doesFileUploadExist( fileName, uploaderEmail );
+    }
+    
+
+
+    /**
+     * @param survey
+     * @throws InvalidInputException
+     */
+    public void validateAndProcessSurveyPreInitiation( SurveyPreInitiation survey ) throws InvalidInputException
+    {
+        // null and syntax checks
+        checkForSyntaxInSurveyPreInitiationData( survey );
+
+        // obtain user object from MySQL
+        User user = obtainUserObjectFromSurveyPreInitiation( survey );
+
+
+        // Cross check identifiers obtained from different sources
+        crossCheckAndVerifySurveyPreInitiationDataUsingDifferentSources( survey, user );
+
+
+        // check if survey has already been sent to the given email id within the time of discourse
+        checkForAlreadyExistingSurvey( survey, user );
+
+
+        // check if the engagement time was within the valid survey interval
+        performSurveyIntervalCheck( survey );
+
+
+        // set the agent ID
+        survey.setAgentId( user.getUserId() );
+
+        // set up survey pre-initiation object for further processing
+        if ( StringUtils.isEmpty( survey.getAgentName() ) ) {
+            survey.setAgentName( user.getFirstName() + user.getLastName() == null ? "" : " " + user.getLastName() );
+        }
+        
+        if ( survey.getStatus() == CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD )
+            survey.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD );
+        else
+            survey.setStatus( CommonConstants.SURVEY_STATUS_PRE_INITIATED );
+        survey.setStatus( CommonConstants.SURVEY_STATUS_PRE_INITIATED );
+
+    }
+
+
+    /**
+     * @param survey
+     * @throws InvalidInputException
+     */
+    private void checkForSyntaxInSurveyPreInitiationData( SurveyPreInitiation survey ) throws InvalidInputException
+    {
+
+        // Null checks 
+
+        if ( StringUtils.isEmpty( survey.getAgentEmailId() ) ) {
+            LOG.error( "Agent email not found , invalid survey " + survey.getSurveyPreIntitiationId() );
+            throw new InvalidInputException( "Can not process the record.  service provider email id is missing" );
+        }
+
+        if ( StringUtils.isEmpty( survey.getCustomerFirstName() ) ) {
+            LOG.error(
+                "No first name found for customer, hence this is an invalid survey " + survey.getSurveyPreIntitiationId() );
+            throw new InvalidInputException( "Can not process the record. Customer First Name is missing" );
+        }
+
+        if ( StringUtils.isEmpty( survey.getCustomerEmailId() ) ) {
+            LOG.error( "No customer email id found, invalid survey " + survey.getSurveyPreIntitiationId() );
+            throw new InvalidInputException( "Can not process the record. Customer Email id is missing" );
+        }
+
+
+        // email syntax checks
+        if ( !organizationManagementService.validateEmail( survey.getAgentEmailId() ) ) {
+            LOG.error( "Invalid Agent Email Id " );
+            throw new InvalidInputException(
+                "Can not process the record. Invalid Agent email id : " + survey.getAgentEmailId() + "" );
+        }
+
+        if ( !organizationManagementService.validateEmail( survey.getCustomerEmailId() ) ) {
+            LOG.error( "Invalid Customer Email Id " );
+            throw new InvalidInputException(
+                "Can not process the record. Invalid Customer email id : " + survey.getCustomerEmailId() + "" );
+        }
+
+    }
+
+
+    /**
+     * @param survey
+     * @return
+     * @throws InvalidInputException
+     */
+    private User obtainUserObjectFromSurveyPreInitiation( SurveyPreInitiation survey ) throws InvalidInputException
+    {
+        try {
+
+            return userManagementService.getActiveAgentByEmailAndCompany( survey.getCompanyId(), survey.getAgentEmailId() );
+
+        } catch ( InvalidInputException | NoRecordsFetchedException e ) {
+            LOG.error( "No user found in database for the email id: " + survey.getAgentEmailId() + " and company id : "
+                + survey.getCompanyId() );
+            throw new InvalidInputException(
+                "Can not process the record. No service provider found with email address :  " + survey.getAgentEmailId() );
+        }
+    }
+
+
+    /**
+     * @param survey
+     * @param user
+     * @throws InvalidInputException
+     */
+    private void crossCheckAndVerifySurveyPreInitiationDataUsingDifferentSources( SurveyPreInitiation survey, User user )
+        throws InvalidInputException
+    {
+        if ( user.getCompany() == null ) {
+            LOG.error( "Agent doesnt have an company associated with it " );
+            throw new InvalidInputException(
+                "Can not process the record. No service provider found with email address :  " + survey.getAgentEmailId() );
+        } else if ( user.getCompany().getCompanyId() != survey.getCompanyId() ) {
+            throw new InvalidInputException(
+                "Can not process the record. No service provider found with email address :  " + survey.getAgentEmailId() );
+        }
+
+
+        // check for ignored agent email mapping
+        if ( isEmailIsIgnoredEmail( survey.getAgentEmailId(), survey.getCompanyId() ) ) {
+            LOG.error( "no agent found with this email id and its an ignored record" );
+            throw new InvalidInputException(
+                "Can not process the record. No service provider found with email address :  " + survey.getAgentEmailId() );
+        }
+
+    }
+
+
+    /**
+     * @param survey
+     * @throws InvalidInputException
+     */
+    private void performSurveyIntervalCheck( SurveyPreInitiation survey ) throws InvalidInputException
+    {
+        //get valid survey intervals
+        Calendar calendar = Calendar.getInstance();
+        calendar.add( Calendar.DATE, -validSurveyInterval );
+        Date date = calendar.getTime();
+
+        if ( survey.getEngagementClosedTime() == null ) {
+            LOG.error( "No transaction date found " + survey.getSurveyPreIntitiationId() );
+            throw new InvalidInputException( "Can not process the record. No transaction date found." );
+        } else if ( survey.getEngagementClosedTime().before( date ) ) {
+            LOG.error( "An old record found : " + survey.getSurveyPreIntitiationId() );
+            throw new InvalidInputException( "Can not process the record. Request for customer " + survey.getCustomerFirstName()
+                + " is older than " + validSurveyInterval + " days." );
+        }
+    }
+
+
+    /**
+     * @param survey
+     * @param user
+     * @throws InvalidInputException
+     */
+    private void checkForAlreadyExistingSurvey( SurveyPreInitiation survey, User user ) throws InvalidInputException
+    {
+        int duplicateSurveyInterval = getDuplicateSurveyIntervalForCompany( user.getCompany().getCompanyId() );
+        List<SurveyPreInitiation> incompleteSurveyCustomers = null;
+
+        // get incomplete survey depending on the survey re-take interval
+        if ( duplicateSurveyInterval > 0 ) {
+            incompleteSurveyCustomers = surveyPreInitiationDao.getSurveyByAgentIdAndCustomeEmailForPastNDays( user.getUserId(),
+                survey.getCustomerEmailId(), duplicateSurveyInterval );
+        } else {
+            incompleteSurveyCustomers = surveyPreInitiationDao.getSurveyByAgentIdAndCustomeEmail( user.getUserId(),
+                survey.getCustomerEmailId() );
+        }
+
+        if ( incompleteSurveyCustomers != null && incompleteSurveyCustomers.size() > 0 ) {
+            LOG.error( "Survey request already sent" );
+            throw new InvalidInputException( "Can not process the record. A survey request for customer "
+                + survey.getCustomerFirstName() + " has already been received." );
+        }
+
     }
 
 
@@ -4399,5 +4580,517 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         return duplicateSurveyInterval;
 
     }
+    
+    
+    /**
+     * method to build survey completion threshold Map
+     * @param survey
+     * @return Map
+     * @throws InvalidInputException 
+     * @throws NoRecordsFetchedException 
+     */
+    @Override
+    public Map<String, Double> buildSurveyCompletionThresholdMap( SurveyDetails survey )
+        throws InvalidInputException, NoRecordsFetchedException
+    {
+        if ( survey == null || StringUtils.isEmpty( survey.get_id() ) ) {
+            throw new InvalidInputException(
+                "method checkAndSendSurveyCompletedMailToAdminsAndAgent(): Survey details are not specifed." );
+        }
 
+        LOG.debug( "checking agent notification threshold for survey with ID: {}", survey.get_id() );
+        OrganizationUnitSettings companySettings = null;
+        OrganizationUnitSettings regionSettings = null;
+        OrganizationUnitSettings branchSettings = null;
+        OrganizationUnitSettings agentSettings = null;
+
+        double surveyCompletionThresholdForAgent = 0.0d;
+        double surveyCompletionThresholdForBranch = 0.0d;
+        double surveyCompletionThresholdForRegion = 0.0d;
+        double surveyCompletionThresholdForCompany = 0.0d;
+
+        Map<String, Double> surveyCompletionThresholdMap = new HashMap<>();
+
+
+        if ( survey.getAgentId() > 0 ) {
+            agentSettings = organizationManagementService.getAgentSettings( survey.getAgentId() );
+        }
+        if ( survey.getBranchId() != 0 ) {
+            // WARNING: doesn't contain region data for the branch, use "getBranchSettings()" if needed
+            branchSettings = organizationManagementService.getBranchSettingsDefault( survey.getBranchId() );
+        }
+        if ( survey.getRegionId() != 0 ) {
+            regionSettings = organizationManagementService.getRegionSettings( survey.getRegionId() );
+        }
+        if ( survey.getCompanyId() != 0 ) {
+            companySettings = organizationManagementService.getCompanySettings( survey.getCompanyId() );
+        }
+
+
+        if ( agentSettings != null && agentSettings.getSurvey_settings() != null ) {
+            surveyCompletionThresholdForAgent = agentSettings.getSurvey_settings().getSurveyCompletedMailThreshold();
+        }
+        if ( branchSettings != null && branchSettings.getSurvey_settings() != null ) {
+            surveyCompletionThresholdForBranch = branchSettings.getSurvey_settings().getSurveyCompletedMailThreshold();
+        }
+        if ( regionSettings != null && regionSettings.getSurvey_settings() != null ) {
+            surveyCompletionThresholdForRegion = regionSettings.getSurvey_settings().getSurveyCompletedMailThreshold();
+        }
+        if ( companySettings != null && companySettings.getSurvey_settings() != null ) {
+            surveyCompletionThresholdForCompany = companySettings.getSurvey_settings().getSurveyCompletedMailThreshold();
+        }
+
+        surveyCompletionThresholdMap.put( CommonConstants.AGENT_ID_COLUMN, surveyCompletionThresholdForAgent );
+        surveyCompletionThresholdMap.put( CommonConstants.BRANCH_ID_COLUMN, surveyCompletionThresholdForBranch );
+        surveyCompletionThresholdMap.put( CommonConstants.REGION_ID_COLUMN, surveyCompletionThresholdForRegion );
+        surveyCompletionThresholdMap.put( CommonConstants.COMPANY_ID_COLUMN, surveyCompletionThresholdForCompany );
+
+        LOG.debug( "method checkAndSendSurveyCompletedMailToAdminsAndAgent() finished for survey with Id: {}",
+            survey.get_id() );
+        return surveyCompletionThresholdMap;
+    }
+
+
+    @Override
+    public Map<String, String> buildPreferredAdminEmailListForSurvey( SurveyDetails survey, double companyThreshold,
+        double regionThreshold, double branchThreshold ) throws InvalidInputException
+    {
+        if ( survey == null || StringUtils.isEmpty( survey.get_id() ) ) {
+            throw new InvalidInputException(
+                "method buildPreferredAdminEmailListForSurvey(): Survey details are not specifed." );
+        }
+
+        LOG.debug( "loading email IDs for survey with ID: {}", survey.get_id() );
+        Map<String, String> emailMap = new HashMap<>();
+
+        // get the email Map for every hierarchy
+        Map<String, Map<String, String>> adminMap = getEmailIdsOfAdminsInHierarchy( survey.getAgentId() );
+
+        //  process branch administrators
+        if ( branchThreshold <= survey.getScore() && adminMap.get( CommonConstants.BRANCH_ID_COLUMN ) != null ) {
+            emailMap.putAll( adminMap.get( CommonConstants.BRANCH_ID_COLUMN ) );
+        }
+
+        //  process region administrators
+        if ( regionThreshold <= survey.getScore() && adminMap.get( CommonConstants.REGION_ID_COLUMN ) != null ) {
+            emailMap.putAll( adminMap.get( CommonConstants.REGION_ID_COLUMN ) );
+        }
+
+        //  process company administrators
+        if ( companyThreshold <= survey.getScore() && adminMap.get( CommonConstants.COMPANY_ID_COLUMN ) != null ) {
+            emailMap.putAll( adminMap.get( CommonConstants.COMPANY_ID_COLUMN ) );
+        }
+
+        LOG.debug( "method buildPreferredAdminEmailListForSurvey() finished for survey with ID: {}", survey.get_id() );
+        return emailMap;
+    }
+
+    @Override
+    public boolean createEntryForSurveyUploadWithCsv( String hierarchyType, MultipartFile tempFile, String fileName,
+        long hierarchyId, User user, String uploaderEmail ) throws NonFatalException, UnsupportedEncodingException
+    {
+        LOG.debug( "createEntryForSurveyUploadWithCsv started for user with Id: " + user.getUserId() );
+        String stamp = "";
+
+        if ( hierarchyId <= 0 ) {
+            throw new InvalidInputException( "Please provide a valid hierarchy Identifier." );
+        }
+
+        if ( Arrays.asList( CommonConstants.REGION_ID, CommonConstants.COMPANY_ID, CommonConstants.BRANCH_ID )
+            .contains( StringUtils.defaultString( hierarchyType ) ) ) {
+            stamp = "SURVEY_CSV_UPLOAD_ADMIN_";
+        } else if ( CommonConstants.AGENT_ID.equals( StringUtils.defaultString( hierarchyType ) ) ) {
+            stamp = "SURVEY_CSV_UPLOAD_AGENT_";
+        } else {
+            throw new InvalidInputException( "Please provide a valid hierarchy type." );
+        }
+
+        // Set the new filename
+        String savedFileName = stamp + user.getUserId() + "_" + new Date( System.currentTimeMillis() ).toString() + ".csv";
+
+        String fileUrl = fileUploadService.uploadFileAtSurveyCsvBucket( tempFile, savedFileName );
+
+        SurveyCsvInfo csvInfo = new SurveyCsvInfo();
+        csvInfo.setFileName( fileName );
+        csvInfo.setFileUrl( fileUrl );
+        csvInfo.setHierarchyType( hierarchyType );
+        csvInfo.setHierarchyId( hierarchyId );
+        csvInfo.setUploadedDate( new Date() );
+        csvInfo.setInitiatedUserId( user.getUserId() );
+        csvInfo.setCompanyId( user.getCompany().getCompanyId() );
+        csvInfo.setUploaderEmail( uploaderEmail );
+        csvInfo.setStatus( CommonConstants.STATUS_ACTIVE );
+
+        surveyCsvUploadDao.createEntryForSurveyCsvUpload( csvInfo );
+        LOG.debug( "createEntryForSurveyUploadWithCsv completed for user with Id: " + user.getUserId() );
+        return true;
+    }
+
+
+    @Override
+    public void processActiveSurveyCsvUploads()
+    {
+        LOG.debug( "method processActiveSurveyCsvUploads started" );
+
+        try {
+
+            // update last start time
+            batchTrackerService.getLastRunEndTimeAndUpdateLastStartTimeByBatchType(
+                CommonConstants.BATCH_TYPE_ACCOUNT_DEACTIVATOR, CommonConstants.BATCH_NAME_SURVEY_CSV_UPLOAD_PROCESSOR );
+
+            // get the list of active CSV uploads
+            List<SurveyCsvInfo> surveyCsvUploads = surveyCsvUploadDao.getActiveSurveyCsvUploads();
+
+            // check if there are active uploads pending, if not, terminate the method 
+            if ( surveyCsvUploads == null || surveyCsvUploads.size() == 0 ) {
+                LOG.debug( "method processActiveSurveyCsvUploads terminated due to non-existent upload requests." );
+                return;
+            }
+
+            for ( SurveyCsvInfo csvInfo : surveyCsvUploads ) {
+
+
+                //check for valid uploaded email and e-mail social survey administrator if invalid.
+                if ( StringUtils.isEmpty( csvInfo.getUploaderEmail() )
+                    || !organizationManagementService.validateEmail( csvInfo.getUploaderEmail() ) ) {
+
+                    LOG.error( "Uploader Email is Invalid." );
+
+                    // set the status for the upload
+                    surveyCsvUploadDao.updateStatusForSurveyCsvUpload( csvInfo.get_id(), STATUS_UPLOADER_EMAIL_INVALID );
+
+                    // send mail to administrator indicating that uploaded email is not present or valid.
+                    emailServices.sendEmailToAdminForUnsuccessfulSurveyCsvUpload( csvInfo,
+                        "Can't process CSV file, reason: Uploader Email is Invalid." );
+                    continue;
+                }
+
+
+                try {
+
+                    // perform null and other necessary checks
+                    performPreliminaryChecks( csvInfo );
+
+                    // process the CSV file for the active upload if generic errors aren't encountered
+                    Map<Integer, List<String>> csvData = csvUtils.readFromCsv( csvInfo.getFileUrl() );
+
+                    // each row in the CSV file is to be processed and results are to be mailed. 
+                    List<String> results = processSurveyCsvData( csvInfo, csvData );
+
+                    // email the results of CSV upload process to the concerned party
+                    emailServices.sendEmailToUploaderForSuccessfulSurveyCsvUpload( csvInfo, htmlReady( results ) );
+
+                    // update the database with latest details
+                    csvInfo.setStatus( STATUS_CSV_UPLOAD_COMPLETE );
+                    csvInfo.setCsvUploadCompletedDate( new Date() );
+                    surveyCsvUploadDao.updateSurveyCsvUpload( csvInfo );
+
+
+                } catch ( InvalidInputException | IOException expectedGenericException ) {
+
+                    LOG.error( "Generic exception encountered for csv upload with ID: " + csvInfo.get_id() );
+
+                    // set the status for the upload
+                    surveyCsvUploadDao.updateStatusForSurveyCsvUpload( csvInfo.get_id(), STATUS_CSV_UPLOAD_INCOMPLETE );
+
+                    // send unsuccessful mail to the uploaded email
+                    emailServices.sendEmailToUploaderForUnsuccessfulSurveyCsvUpload( csvInfo,
+                        expectedGenericException.getMessage() );
+                }
+            }
+
+            //updating last run time for batch in database
+            batchTrackerService.updateLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_SURVEY_CSV_UPLOAD_PROCESSOR );
+            LOG.debug( "method processActiveSurveyCsvUploads finished" );
+
+        } catch ( Exception unforseenError ) {
+            try {
+                LOG.error( "Error in processActiveSurveyCsvUploads", unforseenError );
+                //update batch tracker with error message
+                batchTrackerService.updateErrorForBatchTrackerByBatchType(
+                    CommonConstants.BATCH_TYPE_SURVEY_CSV_UPLOAD_PROCESSOR, unforseenError.getMessage() );
+                //send report bug mail to admin
+                batchTrackerService.sendMailToAdminRegardingBatchError( CommonConstants.BATCH_NAME_SURVEY_CSV_UPLOAD_PROCESSOR,
+                    System.currentTimeMillis(), unforseenError );
+            } catch ( NoRecordsFetchedException | InvalidInputException unableToUpdateBatchTracker ) {
+                LOG.error( "Error while updating error message in processActiveSurveyCsvUploads " );
+            } catch ( UndeliveredEmailException unableToSendEmail ) {
+                LOG.error( "Error while sending report excption mail to admin " );
+            }
+        }
+    }
+
+
+    /**
+     * @param csvInfo
+     * @throws InvalidInputException
+     */
+    private void performPreliminaryChecks( SurveyCsvInfo csvInfo ) throws InvalidInputException
+    {
+        // null checks
+        if ( StringUtils.isEmpty( csvInfo.getHierarchyType() )
+            || !Arrays.asList( CommonConstants.COMPANY_ID, CommonConstants.REGION_ID, CommonConstants.BRANCH_ID,
+                CommonConstants.AGENT_ID ).contains( csvInfo.getHierarchyType() )
+            || csvInfo.getHierarchyId() <= 0 || csvInfo.getCompanyId() <= 0 ) {
+            LOG.error( "Hierarchy details are missing." );
+            throw new InvalidInputException( "Can't process CSV file, reason: Hierarchy details are missing or Invalid" );
+        }
+
+        if ( StringUtils.isEmpty( csvInfo.getFileUrl() ) ) {
+            LOG.error( "CSV file details are missing." );
+            throw new InvalidInputException( "Can't process CSV file, reason: CSV file details are missing." );
+        }
+
+    }
+
+
+    /**
+     * method to process each row from CSV file and start survey process for verified rows
+     * @param csvInfo
+     * @param csvData
+     * @return Map<Integer, List<String>>
+     */
+    private List<String> processSurveyCsvData( SurveyCsvInfo csvInfo, Map<Integer, List<String>> csvData )
+        throws InvalidInputException
+    {
+        LOG.debug( "Method processSurveyCsvData called for upload with Id:" + csvInfo.get_id() );
+
+        List<String> results = null;
+        User agent = null;
+        Map<String, Set<String>> processedSurveyEmails = null;
+        boolean isFromAgentPopup = CommonConstants.AGENT_ID.equals( csvInfo.getHierarchyType() );
+
+        if ( csvData != null && csvData.size() > 0 ) {
+
+            // initialize required data sets
+            processedSurveyEmails = new HashMap<>();
+            results = new ArrayList<>();
+
+            if ( isFromAgentPopup ) {
+                try {
+                    agent = userManagementService.getUserByUserId( csvInfo.getHierarchyId() );
+                } catch ( InvalidInputException userNotFound ) {
+                    LOG.error( "No agent found for the given upload." );
+                    throw new InvalidInputException( "No agent found for the given upload." );
+                }
+            }
+
+            if( validateHeader( csvData.get( 1 ), isFromAgentPopup ? AGENT_HEADER : ADMIN_HEADER ) ){
+                LOG.debug( "Header validated." );
+                csvData.remove( 1 );
+            } else {
+                LOG.error( "Invalid header" );
+                throw new InvalidInputException( "Invalid Header." );
+            }
+
+            // iterate over each row of CSV,validate and process the corresponding Survey Pre-Initiation Object
+            for ( Entry<Integer, List<String>> entry : csvData.entrySet() ) {
+
+                // customer details
+                String customerFirstName = "";
+                String customerLastName = "";
+                String customerEmail = "";
+
+                // agent Email
+                String agentEmail = "";
+
+                try {
+
+                    // parse required values
+                    try {
+                        if ( isFromAgentPopup ) {
+
+                            agentEmail = agent.getEmailId();
+
+                            customerFirstName = entry.getValue().get( SURVEY_CSV_CUSTOMER_FIRST_NAME_INDEX_FOR_AGENT );
+                            customerLastName = entry.getValue().get( SURVEY_CSV_CUSTOMER_LAST_NAME_INDEX_FOR_AGENT );
+                            customerEmail = entry.getValue().get( SURVEY_CSV_CUSTOMER_EMAIL_INDEX_FOR_AGENT );
+
+                        } else {
+
+                            agentEmail = entry.getValue().get( SURVEY_CSV_AGENT_EMAIL_INDEX_FOR_ADMIN );
+                            customerFirstName = entry.getValue().get( SURVEY_CSV_CUSTOMER_FIRST_NAME_INDEX_FOR_ADMIN );
+                            customerLastName = entry.getValue().get( SURVEY_CSV_CUSTOMER_LAST_NAME_INDEX_FOR_ADMIN );
+                            customerEmail = entry.getValue().get( SURVEY_CSV_CUSTOMER_EMAIL_NAME_INDEX_FOR_ADMIN );
+
+                        }
+                    } catch ( NullPointerException | IndexOutOfBoundsException unableToParseRow ) {
+                        LOG.error( "Record under concern does not have the required data." );
+                        throw new InvalidInputException(
+                            "The Record under concern does not point to the required data in order." );
+                    }
+
+
+                    // check if the agent customer pair is already processed
+                    if ( processedSurveyEmails.containsKey( agentEmail )
+                        && processedSurveyEmails.get( agentEmail ).contains( customerEmail ) ) {
+                        LOG.error( "Record under concern is a duplicate of agent-customer pair processed before in the list." );
+                        throw new InvalidInputException(
+                            "The Record under concern is a duplicate of agent-customer pair processed before in the list." );
+                    }
+
+
+                    // construct survey pre-initiation object from the extracted row
+                    SurveyPreInitiation survey = buildSurveyPreInitiationFromCsvRecord( csvInfo.getCompanyId(), agentEmail,
+                        customerFirstName, customerLastName, customerEmail, csvInfo.getUploadedDate() );
+
+
+                    // perform all the necessary checks for the SPI object 
+                    validateAndProcessSurveyPreInitiation( survey );
+
+
+                    // depending on the hierarchy at which the file was uploaded, start the survey process
+                    if ( isFromAgentPopup
+                        || isConformingToGivenHierarchy( survey, csvInfo.getHierarchyId(), csvInfo.getHierarchyType() ) ) {
+                        saveSurveyPreInitiationObject( survey );
+
+                        // add the success result to the result map
+                        results.add( "row " + entry.getKey() + ": OK, Record processed successfully" );
+
+                        // add to the list of processed records
+                        if ( processedSurveyEmails.containsKey( agentEmail ) ) {
+                            processedSurveyEmails.get( agentEmail ).add( customerEmail );
+                        } else {
+                            Set<String> customerSet = new HashSet<>(); 
+                            customerSet.add( customerEmail );
+                            processedSurveyEmails.put( agentEmail, customerSet );
+                        }
+
+                    } else {
+                        LOG.error( "record under concern has the agent who does not belong to the uploaded hierarchy" );
+                        throw new InvalidInputException(
+                            "The Record under concern has the agent who does not belong to the uploaded hierarchy." );
+                    }
+
+
+                } catch ( InvalidInputException rowException ) {
+                    LOG.error( "Can't process the row further." );
+
+                    // add the failed result to the result map
+                    results.add( "row " + entry.getKey() + ": Failed, " + rowException.getMessage() );
+                }
+            }
+        }
+        return results;
+    }
+
+
+    private boolean validateHeader( List<String> header, List<String> standardHeader ) throws InvalidInputException
+    {
+        LOG.debug( "validateHeader() started." );
+        if( header == null || header.size() < standardHeader.size() ){
+            return false;
+        }
+        
+        try{
+            int counter;
+            for( counter = 0; counter < standardHeader.size(); counter++ ){
+                if( !StringUtils.equalsIgnoreCase( standardHeader.get( counter ), header.get( counter ) ) ){
+                    return false;
+                }
+            }
+        } catch( IndexOutOfBoundsException headerError ){
+            LOG.error( "Header does not have enough values." );
+            throw new InvalidInputException( "Header does not have enough values." );
+        }
+        
+        
+        LOG.debug( "validateHeader() finished." );
+        return true;
+    }
+
+
+    /**
+     * @param companyId
+     * @param agentEmail
+     * @param customerFirstName
+     * @param customerLastName
+     * @param customerEmail
+     * @param uploadedDate
+     * @return
+     */
+    private SurveyPreInitiation buildSurveyPreInitiationFromCsvRecord( long companyId, String agentEmail,
+        String customerFirstName, String customerLastName, String customerEmail, Date uploadedDate )
+    {
+        LOG.debug( "method buildSurveyPreInitiationFromCsvRecord called" );
+        SurveyPreInitiation surveyPreInitiation = new SurveyPreInitiation();
+        surveyPreInitiation.setAgentEmailId( agentEmail );
+        surveyPreInitiation.setCompanyId( companyId );
+
+        surveyPreInitiation.setCustomerEmailId( customerEmail );
+        surveyPreInitiation.setCustomerFirstName( customerFirstName );
+        surveyPreInitiation.setCustomerLastName( customerLastName );
+
+        surveyPreInitiation.setSurveySource( "CSV_UPLOAD" );
+        surveyPreInitiation.setEngagementClosedTime( new Timestamp( uploadedDate.getTime() ) );
+
+        surveyPreInitiation.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
+        surveyPreInitiation.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+        surveyPreInitiation.setLastReminderTime( utils.convertEpochDateToTimestamp() );
+        surveyPreInitiation.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED );
+        return surveyPreInitiation;
+
+    }
+
+
+    /**
+     * @param survey
+     * @param hierarchyId
+     * @param hierarchyType
+     * @return
+     * @throws InvalidInputException 
+     */
+    private boolean isConformingToGivenHierarchy( SurveyPreInitiation survey, long hierarchyId, String hierarchyType ) throws InvalidInputException
+    {
+        LOG.debug( "method isConformingToGivenHierarchy called" );
+        Map<String, Object> queries = new HashMap<>();
+
+        // add the user Id
+        queries.put( CommonConstants.USER_COLUMN, userManagementService.getUserByUserId( survey.getAgentId() ) );
+
+
+        if ( CommonConstants.COMPANY_ID.equals( hierarchyType ) ) {
+            // if an agent profile exists under any region or branch then the survey is qualified.
+            queries.put( CommonConstants.COMPANY_COLUMN, userManagementService.getCompanyById( hierarchyId ) );
+        } else {
+            queries.put( hierarchyType, hierarchyId );
+        }
+
+        // check if the user is an agent under the hierarchy
+        try {
+            queries.put( CommonConstants.PROFILE_MASTER_COLUMN,
+                userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) );
+        } catch ( InvalidInputException error ) {
+            LOG.error( "Unable to determine profiile master ID" );
+            return false;
+        }
+
+        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+        List<UserProfile> agentProfiles = userProfileDao.findByKeyValue( UserProfile.class, queries );
+
+        if ( agentProfiles != null && agentProfiles.size() > 0 ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    /**
+     * @param results
+     * @return
+     */
+    private String htmlReady( List<String> results )
+    {
+        StringBuilder resultString = null;
+        if ( results != null && results.size() > 0 ) {
+            resultString = new StringBuilder( "<br/>" );
+            for ( String rowResult : results ) {
+                resultString.append( rowResult ).append( "<br/>" );
+            }
+        } else {
+            resultString = new StringBuilder( "No records found." );
+        }
+        return resultString.toString();
+    }
 }

@@ -762,6 +762,7 @@ public class OrganizationManagementController
                 allowPartnerSurvey = unitSettings.getCrm_info().isAllowPartnerSurvey();
 
             model.addAttribute( "allowPartnerSurvey", allowPartnerSurvey );
+            model.addAttribute( "includeForTransactionMonitor", unitSettings.getIncludeForTransactionMonitor() );
 
 
             OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
@@ -801,11 +802,9 @@ public class OrganizationManagementController
 
             
          // adding the survey completion mail threshold
-            if ( companySettings.getSurvey_settings() != null ) {
+            if ( unitSettings.getSurvey_settings() != null ) {
                 model.addAttribute( CommonConstants.SURVEY_MAIL_THRESHOLD,
-                    companySettings.getSurvey_settings().getSurveyCompletedMailThreshold() );
-            } else {
-                model.addAttribute( CommonConstants.SURVEY_MAIL_THRESHOLD, 0.0d );
+                    unitSettings.getSurvey_settings().getSurveyCompletedMailThreshold() );
             }
             
             // add send monthly digest email flag
@@ -2972,6 +2971,66 @@ public class OrganizationManagementController
         return new Gson().toJson( responseMap );
     }
 
+    @ResponseBody
+    @RequestMapping ( value = "/savesurveycsvfile", method = RequestMethod.POST)
+    public String saveSurveyCsvFile( Model model, @RequestParam ( "file") MultipartFile file,
+        @RequestParam ( "filename") String fileName, @RequestParam ( "uploaderEmail") String uploaderEmail,
+        HttpServletRequest request )
+    {
+        LOG.debug( "Saving the csv survey info file" );
+
+        boolean status = false;
+        Object message = null;
+        try {
+            String hierarchyType = request.getParameter( "hierarchyType" );
+            long hierarchyId = 0l;
+
+            if ( file == null || file.isEmpty() )
+                throw new InvalidInputException( "Please provide a valid CSV file." );
+
+            if ( StringUtils.isEmpty( fileName ) )
+                throw new InvalidInputException( "Please provide a valid CSV file name." );
+
+            if ( StringUtils.isEmpty( uploaderEmail ) && organizationManagementService.validateEmail( uploaderEmail.trim() ) )
+                throw new InvalidInputException( "Please provide a valid uploader email for csv upload." );
+
+            if ( StringUtils.isEmpty( hierarchyType ) )
+                throw new InvalidInputException( "Please provide a valid hiearchyType." );
+
+            if ( !StringUtils.isEmpty( request.getParameter( "hierarchyValue" ) ) ) {
+                try {
+                    hierarchyId = Long.parseLong( request.getParameter( "hierarchyValue" ) );
+                } catch ( NumberFormatException unableToFormatId ) {
+                    throw new InvalidInputException( "please provide a valid hierarchy Identifier." );
+                }
+            } else {
+                throw new InvalidInputException( "Please provide a hiearchy Identifier." );
+            }
+
+            if ( !surveyHandler.isFileAlreadyUploaded( fileName, uploaderEmail ) ) {
+                status = surveyHandler.createEntryForSurveyUploadWithCsv( hierarchyType, file, fileName, hierarchyId,
+                    sessionHelper.getCurrentUser(), uploaderEmail );
+                message = "CSV file uploaded successfully.";
+            } else {
+                message = "CSV file: " + fileName + " is already uploaded using the provided email.";
+            }
+
+
+        } catch ( InvalidInputException expectedError ) {
+            status = false;
+            message = expectedError.getMessage();
+        } catch ( Exception unhandledError ) {
+            status = false;
+            message = "Sorry, Unable to upload csv, Please try again.";
+        }
+
+        Map<String, Object> responseMap = new HashMap<String, Object>();
+        responseMap.put( "status", status );
+        responseMap.put( "message", message );
+        return new Gson().toJson( responseMap );
+    }
+
+
 
     @ResponseBody
     @RequestMapping ( value = "/starthierarchyxlsxfileupload", method = RequestMethod.POST)
@@ -3781,30 +3840,44 @@ public class OrganizationManagementController
     {
         LOG.info( "Method to updateSurveyMailThreshold started" );
         HttpSession session = request.getSession();
-        long companyId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
         double surveyCompletedMailThreshold;
-        
+        OrganizationUnitSettings unitSettings = null;
+        String collectionName = null;
+
         try {
-            
-            if( CommonConstants.COMPANY_ID.equals( entityType ) ){
-                
+
+            if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
+                unitSettings = organizationManagementService.getCompanySettings( entityId );
+            } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+                collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
+                unitSettings = organizationManagementService.getRegionSettings( entityId );
+            } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+                collectionName = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
+                unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
+            } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+                collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
+                unitSettings = userManagementService.getUserSettings( entityId );
+            }
+
+            if ( unitSettings != null ) {
+
                 String surveyCompletedMailThresholdStr = request.getParameter( "surveyCompletedMailThreshold" );
                 surveyCompletedMailThreshold = Double.parseDouble( surveyCompletedMailThresholdStr );
-                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
-
-                if(companySettings == null){
-                    throw new InvalidInputException("No settings fould for company with id " + companyId);
+                SurveySettings surveySettings = unitSettings.getSurvey_settings();
+                
+                if ( surveySettings == null ) {
+                    surveySettings = new SurveySettings();
                 }
                 
-                SurveySettings surveySettings = companySettings.getSurvey_settings();
                 surveySettings.setSurveyCompletedMailThreshold( surveyCompletedMailThreshold );
-                
-                organizationManagementService.updateSurveySettings( companySettings, surveySettings );
-                
+                organizationManagementService.updateScoreForSurvey( collectionName, unitSettings, surveySettings );
+
             } else {
-                LOG.error( "Profile specified is invalid." );
-                throw new InvalidInputException( "Please provide a valid profile level." );
+                LOG.error( "settings not found for the current session." );
+                throw new InvalidInputException( "settings not found for the current session." );
             }
             
             LOG.info( "Method to updateSurveyMailThreshold finished" );
@@ -3816,6 +3889,49 @@ public class OrganizationManagementController
                 error );
             return "Unable To Update Survey Mail Threshold.";
         }
+    }
+    
+    @ResponseBody
+    @RequestMapping ( value = "/getcompaniesfortransactionmonitor", method = RequestMethod.GET)
+    public String getCompaniesForTransactionMonitor()
+    {
+        LOG.info( "Method  getCompaniesForTransactionMonitor started" );   
+        List<OrganizationUnitSettings> companyList =  organizationManagementService.getCompaniesForTransactionMonitor();
+        LOG.info( "Method getCompaniesForTransactionMonitor() finished" );
+        return new Gson().toJson( companyList );
+    }
+
+    
+    @RequestMapping ( value = "/updatetransactionmonitorsettingforcompany", method = RequestMethod.GET)
+    @ResponseBody
+    public String updateTransactionMonitorSettingForCompany( HttpServletRequest request )
+    {
+        LOG.info( "Method to update updateTransactionMonitorSettingForCompany started" );
+
+        try {
+
+            HttpSession session = request.getSession();
+            long companyId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+
+            String updateTransactionMonitorSettingStr = request.getParameter( "updateTransactionMonitorSetting" );
+
+            boolean updateTransactionMonitorSetting = Boolean.parseBoolean( updateTransactionMonitorSettingStr );
+
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
+            if(companySettings == null){
+                throw new InvalidInputException("Wrong input passed. No company found for given id");
+            }
+           
+            organizationManagementService.updateTransactionMonitorSettingForCompany( companyId, updateTransactionMonitorSetting );
+
+
+        } catch ( Exception error ) {
+            LOG.error( "Exception occured in updateTransactionMonitorSettingForCompany(). Nested exception is ", error );
+            return error.getMessage();
+        }
+
+        LOG.info( "Method to update allow partner survey finished" );
+        return "success";
     }
 }
 // JIRA: SS-24 BY RM02 EOC

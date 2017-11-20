@@ -36,8 +36,10 @@ import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.CompanyDetailsReport;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
+import com.realtech.socialsurvey.core.entities.ReportingSurveyPreInititation;
 import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.Survey;
 import com.realtech.socialsurvey.core.entities.SurveyCompanyMapping;
@@ -1177,6 +1179,117 @@ public class WorkbookData
         return userRankingData;
         
     }
-    
-    
+
+
+	/**
+	 * Writes the header for company details report.
+	 * @return
+	 */
+	public Map<Integer, List<Object>> writeCompanyDetailsReportHeader() {
+		Map<Integer, List<Object>>  companyDetailsData = new TreeMap<>();
+        List<Object> companyDetailsReportToPopulate = new ArrayList<>();    
+        // Setting up user sheet headers
+        companyDetailsReportToPopulate.add( "Company Name" );
+        companyDetailsReportToPopulate.add( "User Count" );
+        companyDetailsReportToPopulate.add( "Verified" );
+        companyDetailsReportToPopulate.add( "Verified %" );
+        companyDetailsReportToPopulate.add( "# of Regions" );
+        companyDetailsReportToPopulate.add( "# of Locations" );
+        companyDetailsReportToPopulate.add( "Completion rate %" );
+        companyDetailsReportToPopulate.add( "Verified GMB" );
+        companyDetailsReportToPopulate.add( "Missing GMB" );
+        companyDetailsReportToPopulate.add( "Mismatches" );
+        companyDetailsReportToPopulate.add( "Missing Photos");
+        companyDetailsReportToPopulate.add( "Missing URLs");
+        companyDetailsReportToPopulate.add( "Facebook Connects");
+        companyDetailsReportToPopulate.add( "Twitter Connects");
+        companyDetailsReportToPopulate.add( "LinkedIn Connects");
+        companyDetailsData.put( 1, companyDetailsReportToPopulate );
+        
+        return companyDetailsData;
+	}
+
+
+	/**
+	 * Writes the company details report data to excel.
+	 * @param companyDetailsReportList
+	 * @param enterNext
+	 * @return
+	 */
+	public Map<Integer, List<Object>> getCompanyDetailsReportToBeWrittenInSheet(
+			List<CompanyDetailsReport> companyDetailsReportList, int enterNext) {
+		Map<Integer, List<Object>> companyDetailsData = new TreeMap<>();
+		List<Object> companyDetailsReportToPopulate = null;
+		for(CompanyDetailsReport companyDetailsReportData : companyDetailsReportList){
+			companyDetailsReportToPopulate = new ArrayList<>();
+			// Set data to list.
+			companyDetailsReportToPopulate.add(companyDetailsReportData.getCompanyName());
+			companyDetailsReportToPopulate.add(companyDetailsReportData.getUserCount());
+			companyDetailsReportToPopulate.add(companyDetailsReportData.getVerifiedUserCount());
+			companyDetailsReportToPopulate.add(companyDetailsReportData.getVerifiedPercent());
+			companyDetailsReportToPopulate.add(companyDetailsReportData.getRegionCount());
+			companyDetailsReportToPopulate.add(companyDetailsReportData.getBranchCount());
+			companyDetailsReportToPopulate.add(companyDetailsReportData.getCompletionRate());
+			companyDetailsReportToPopulate.add(companyDetailsReportData.getVerifiedGmb());
+			companyDetailsReportToPopulate.add(companyDetailsReportData.getMissingGmb());
+			companyDetailsReportToPopulate.add(companyDetailsReportData.getMismatchCount());
+			companyDetailsReportToPopulate.add(companyDetailsReportData.getMissingPhotoCount());
+			companyDetailsReportToPopulate.add(companyDetailsReportData.getMissingURLCount());
+			companyDetailsReportToPopulate.add(companyDetailsReportData.getFacebookConnectionCount());
+			companyDetailsReportToPopulate.add(companyDetailsReportData.getTwitterConnectionCount());
+			companyDetailsReportToPopulate.add(companyDetailsReportData.getLinkedinConnectionCount());
+			// Set the list to the map.
+			companyDetailsData.put(enterNext, companyDetailsReportToPopulate);
+			enterNext++;
+		}
+		return companyDetailsData;
+	}
+
+    public Map<Integer, List<Object>> writeIncompleteSurveyResultsCompanyReportHeader()
+    {
+        Map<Integer, List<Object>> incompleteSurveyResultsReportData = new TreeMap<Integer, List<Object>>();
+        List<Object> incompleteSurveyResultsReportToPopulate = new ArrayList<Object>();
+        // Setting up user sheet headers
+        incompleteSurveyResultsReportToPopulate.add( "Agent First Name" );
+        incompleteSurveyResultsReportToPopulate.add( "Agent Last Name" );
+        incompleteSurveyResultsReportToPopulate.add( "Agent Email Address" );
+        incompleteSurveyResultsReportToPopulate.add( "Customer First Name" );
+        incompleteSurveyResultsReportToPopulate.add( "Customer Last Name" );
+        incompleteSurveyResultsReportToPopulate.add( "Customer Email Address" );
+        incompleteSurveyResultsReportToPopulate.add( "Survey Source ID" );
+        incompleteSurveyResultsReportToPopulate.add( "Survey Source" );
+        incompleteSurveyResultsReportToPopulate.add( "Date Survey Sent" );
+        incompleteSurveyResultsReportToPopulate.add( "No of Reminders Sent" );
+        incompleteSurveyResultsReportToPopulate.add( "Date Last Reminder Sent" );
+        incompleteSurveyResultsReportData.put( 1, incompleteSurveyResultsReportToPopulate );
+        return incompleteSurveyResultsReportData;
+    }
+
+
+    public Map<Integer, List<Object>> getIncompleteSurveyResultsReportToBeWrittenInSheet(
+        List<ReportingSurveyPreInititation> incompleteSurvey, int dataCounter )
+    {
+        Map<Integer, List<Object>> incompleteSurveyData = new TreeMap<>();
+
+        Integer incompleteSurveyCounter = dataCounter;
+        List<Object> incompleteSurveyResultsReportToPopulate = null;
+
+        for ( ReportingSurveyPreInititation incompleteReportData : incompleteSurvey ) {
+            incompleteSurveyResultsReportToPopulate = new ArrayList<Object>();
+            incompleteSurveyResultsReportToPopulate.add( incompleteReportData.getAgentFirstName() );
+            incompleteSurveyResultsReportToPopulate.add( incompleteReportData.getAgentLastName() );
+            incompleteSurveyResultsReportToPopulate.add( incompleteReportData.getAgentEmailId() );
+            incompleteSurveyResultsReportToPopulate.add( incompleteReportData.getCustomerFirstName() );
+            incompleteSurveyResultsReportToPopulate.add( incompleteReportData.getCustomerLastName() );
+            incompleteSurveyResultsReportToPopulate.add( incompleteReportData.getCustomerEmailId() );
+            incompleteSurveyResultsReportToPopulate.add( incompleteReportData.getSurveySourceId() );
+            incompleteSurveyResultsReportToPopulate.add( incompleteReportData.getSurveySource() );
+            incompleteSurveyResultsReportToPopulate.add( incompleteReportData.getCreatedOnEst() );
+            incompleteSurveyResultsReportToPopulate.add( incompleteReportData.getReminderCounts() );
+            incompleteSurveyResultsReportToPopulate.add( incompleteReportData.getLastReminderTimeEst() );
+            incompleteSurveyData.put( incompleteSurveyCounter, incompleteSurveyResultsReportToPopulate );
+            incompleteSurveyCounter++;
+        }
+        return incompleteSurveyData;
+    }
 }

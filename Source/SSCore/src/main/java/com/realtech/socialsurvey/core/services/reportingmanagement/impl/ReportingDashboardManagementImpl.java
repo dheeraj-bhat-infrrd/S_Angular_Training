@@ -39,11 +39,13 @@ import com.realtech.socialsurvey.core.api.builder.SSApiBatchIntegrationBuilder;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
+import com.realtech.socialsurvey.core.dao.CompanyDetailsReportDao;
 import com.realtech.socialsurvey.core.dao.CompanyUserReportDao;
 import com.realtech.socialsurvey.core.dao.DigestDao;
 import com.realtech.socialsurvey.core.dao.FileUploadDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.RegionDao;
+import com.realtech.socialsurvey.core.dao.ReportingSurveyPreInititationDao;
 import com.realtech.socialsurvey.core.dao.ScoreStatsOverallBranchDao;
 import com.realtech.socialsurvey.core.dao.ScoreStatsOverallCompanyDao;
 import com.realtech.socialsurvey.core.dao.ScoreStatsOverallRegionDao;
@@ -61,6 +63,7 @@ import com.realtech.socialsurvey.core.dao.SurveyTransactionReportBranchDao;
 import com.realtech.socialsurvey.core.dao.SurveyTransactionReportDao;
 import com.realtech.socialsurvey.core.dao.SurveyTransactionReportRegionDao;
 import com.realtech.socialsurvey.core.dao.UserAdoptionReportDao;
+import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserRankingPastMonthBranchDao;
 import com.realtech.socialsurvey.core.dao.UserRankingPastMonthMainDao;
 import com.realtech.socialsurvey.core.dao.UserRankingPastMonthRegionDao;
@@ -79,6 +82,7 @@ import com.realtech.socialsurvey.core.dao.UserRankingThisYearRegionDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.CompanyDetailsReport;
 import com.realtech.socialsurvey.core.entities.CompanyDigestRequestData;
 import com.realtech.socialsurvey.core.entities.CompanyUserReport;
 import com.realtech.socialsurvey.core.entities.Digest;
@@ -88,6 +92,7 @@ import com.realtech.socialsurvey.core.entities.MonthlyDigestAggregate;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RankingRequirements;
 import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.ReportingSurveyPreInititation;
 import com.realtech.socialsurvey.core.entities.ScoreStatsOverallBranch;
 import com.realtech.socialsurvey.core.entities.ScoreStatsOverallCompany;
 import com.realtech.socialsurvey.core.entities.ScoreStatsOverallRegion;
@@ -195,6 +200,12 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
     @Autowired
     private RegionDao regionDao;
+    
+    @Autowired
+    private UserDao userDao;
+    
+    @Autowired
+    private CompanyDetailsReportDao companyDetailsReportDao;
 
     @Autowired
     private SSApiBatchIntegrationBuilder ssApiBatchIntergrationBuilder;
@@ -288,7 +299,9 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
     @Autowired
     private OrganizationManagementService organizationManagementService;
-
+    
+    @Autowired
+    private ReportingSurveyPreInititationDao reportingSurveyPreInititationDao;
 
     @Value ( "${FILE_DIRECTORY_LOCATION}")
     private String fileDirectoryLocation;
@@ -342,6 +355,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT );
         } else if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT ) {
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT );
+        } else if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_INCOMPLETE_SURVEY_REPORT ) {
+            fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_INCOMPLETE_SURVEY_REPORT );
+        } else if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_DETAILS_REPORT ) {
+            fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_DETAILS_REPORT );
         }
         //get the time 23:59:59 in milliseconds
         long duration = ( ( ( 23 * 60 ) * 60 ) + ( 59 * 60 ) + 59 ) * 1000l;
@@ -1640,13 +1657,15 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT ) {
                 recentActivityList.add( CommonConstants.REPORTING_COMPANY_USERS_REPORT );
             } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_REPORT ) {
-                recentActivityList.add( CommonConstants.REPORTING_SURVEY_REUSLTS_COMPANY_REPORT );
+                recentActivityList.add( CommonConstants.REPORTING_SURVEY_RESULTS_COMPANY_REPORT );
             } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT ) {
                 recentActivityList.add( CommonConstants.REPORTING_SURVEY_TRANSACTION_REPORT );
             } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT ) {
                 recentActivityList.add( CommonConstants.REPORTING_USER_RANKING_MONTHLY_REPORT );
             } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT ) {
                 recentActivityList.add( CommonConstants.REPORTING_USER_RANKING_YEARLY_REPORT );
+            }else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_INCOMPLETE_SURVEY_REPORT ) {
+                recentActivityList.add( CommonConstants.REPORTING_INCOMPLETE_SURVEY_REPORT );
             }
             recentActivityList.add( fileUpload.getStartDate() );
             recentActivityList.add( fileUpload.getEndDate() );
@@ -1659,6 +1678,15 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         }
         return recentActivity;
 
+    }
+    
+    @Override
+    public Object getAccountStatisticsRecentActivity(Long reportId){
+    	FileUpload fileUpload = null;
+    	if(reportId == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_DETAILS_REPORT){
+    		fileUpload = fileUploadDao.getLatestActivityForReporting(reportId);
+    	}
+    	return fileUpload;
     }
 
 
@@ -1862,6 +1890,72 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
         }
         return surveyResultsReportVO;
+    }
+    
+    @Override
+    public String generateIncompleteSurveyResultsReport( Long entityId, String entityType, Long userId, Timestamp startDate, Timestamp endDate )
+        throws UnsupportedEncodingException, NonFatalException, ParseException{
+        LOG.info( "Generating incomplete survey results report for enitityId {}, entityType {}, userId {} startDate {}, endDate {}",
+            entityId, entityType, userId, startDate, endDate );
+        User user = userManagementService.getUserByUserId( userId );
+        LOG.debug( "Found user {}", user );
+        String fileName = "Incomplete_Survey_Results_Report_" + entityType + "-" + user.getFirstName() + "_" + user.getLastName()
+            + "-" + ( Calendar.getInstance().getTimeInMillis() ) + CommonConstants.EXCEL_FILE_EXTENSION;
+        LOG.debug( "fileName {} ", fileName );
+        XSSFWorkbook workbook = this.downloadIncompleteSurveyResultsReport( entityId, entityType, startDate, endDate );
+        LOG.debug( "Writing {} number of records into file {}", workbook.getSheetAt( 0 ).getLastRowNum(), fileName );
+        return createExcelFileAndSaveInAmazonS3( fileName, workbook );
+    }
+    
+    private XSSFWorkbook downloadIncompleteSurveyResultsReport( long entityId, String entityType, Timestamp startDate,
+        Timestamp endDate ) throws ParseException
+    {
+        int startIndex = 0;
+        int batchSize = CommonConstants.BATCH_SIZE;
+        int enterNext = 1;
+
+        //write the excel header first 
+        Map<Integer, List<Object>> data = workbookData.writeIncompleteSurveyResultsCompanyReportHeader();
+        //create workbook data
+        XSSFWorkbook workbook = workbookOperations.createWorkbook( data );
+
+        List<ReportingSurveyPreInititation> incompleteSurvey = null;
+        do {
+            incompleteSurvey = getIncompleteSurveyResultResponse(entityType, entityId, startDate, endDate, startIndex, batchSize );
+            if ( incompleteSurvey != null && !incompleteSurvey.isEmpty() ) {
+                enterNext = startIndex + 1;
+                data = workbookData.getIncompleteSurveyResultsReportToBeWrittenInSheet( incompleteSurvey, enterNext );
+                LOG.debug( "Got {} records starting at {} index", data.size(), enterNext );
+                //use the created workbook when writing the header answer rewrite the same. 
+                workbook = workbookOperations.writeToWorkbook( data, workbook, enterNext );
+                //calculate startIndex. 
+                startIndex = startIndex + batchSize;
+            }
+        } while ( incompleteSurvey != null && !incompleteSurvey.isEmpty()
+            && incompleteSurvey.size() >= batchSize );
+
+        XSSFSheet sheet = workbook.getSheetAt( 0 );
+        makeRowBold( workbook, sheet.getRow( 0 ) );
+        return workbook;
+
+    }
+    
+    private List<ReportingSurveyPreInititation> getIncompleteSurveyResultResponse(String entityType, Long companyId, Timestamp startDate,
+        Timestamp endDate, int startIndex, int batchSize )
+    {
+        Response response = ssApiBatchIntergrationBuilder.getIntegrationApi().getIncompleteSurveyResultsReport( companyId, entityType, startDate,
+            endDate, startIndex, batchSize );
+        String responseString = response != null ? new String( ( (TypedByteArray) response.getBody() ).getBytes() ) : null;
+        List<ReportingSurveyPreInititation> incompleteSurvey = null;
+        if ( responseString != null ) {
+            //since the string has ""abc"" an extra quote
+            responseString = responseString.substring( 1, responseString.length() - 1 );
+            //Escape characters
+            responseString = StringEscapeUtils.unescapeJava( responseString );
+            Type listType = new TypeToken<List<ReportingSurveyPreInititation>>() {}.getType();
+            incompleteSurvey = new Gson().fromJson( responseString, listType );
+        }
+        return incompleteSurvey;
     }
 
 
@@ -3481,5 +3575,103 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         }
         return monthStringsForDigest;
     }
+    
 
+	@Override
+	@Transactional ( value = "transactionManagerForReporting")
+	public List<CompanyDetailsReport> getCompanyDetailsReport( Long entityId, int startIndex,
+			int batchSize) throws InvalidInputException {
+		User user = userDao.findById(User.class, entityId);
+		List<CompanyDetailsReport> companyDetailsReportData = null;
+		if (user != null && (user.isSuperAdmin() || userManagementService.isUserSocialSurveyAdmin(entityId))) {
+			companyDetailsReportData = companyDetailsReportDao.getCompanyDetailsReportData(startIndex, batchSize);
+		}
+		return companyDetailsReportData;
+	}
+
+
+	@Override
+	public String generateCompanyDetailsReport(long entityId, String entityType) throws UnsupportedEncodingException, NonFatalException {
+		LOG.info( "Generating account statistics report for enitityId {}, entityType {}",entityId, entityType);
+	        String fileName = "Account_Statistics_Report" + "-" + ( Calendar.getInstance().getTimeInMillis() ) 
+	        		+ CommonConstants.EXCEL_FILE_EXTENSION;
+	        LOG.debug( "fileName {} ", fileName );
+	        XSSFWorkbook workbook = this.downloadCompanyDetailsReport( entityId, entityType );
+	        LOG.debug( "Writing {} number of records into file {}", workbook.getSheetAt( 0 ).getLastRowNum(), fileName );
+	        return createExcelFileAndSaveInAmazonS3( fileName, workbook );
+	}
+
+
+	private XSSFWorkbook downloadCompanyDetailsReport(long entityId, String entityType) {
+		int startIndex = 0;
+        int batchSize = CommonConstants.BATCH_SIZE;
+        int enterNext = 1;
+
+        //write the excel header first 
+        Map<Integer, List<Object>> data = workbookData.writeCompanyDetailsReportHeader();
+        //create workbook data
+        XSSFWorkbook workbook = workbookOperations.createWorkbook( data );
+
+        List<CompanyDetailsReport> companyDetailsReportList = null;
+        do {
+        	companyDetailsReportList = getCompanyDetailsResponse(entityType, entityId, startIndex, batchSize );
+            if ( companyDetailsReportList != null && !companyDetailsReportList.isEmpty() ) {
+                enterNext = startIndex + 1;
+                data = workbookData.getCompanyDetailsReportToBeWrittenInSheet( companyDetailsReportList,enterNext );
+                LOG.debug( "Got {} records starting at {} index", data.size(), enterNext );
+                //use the created workbook when writing the header answer rewrite the same. 
+                workbook = workbookOperations.writeToWorkbook( data, workbook, enterNext );
+                //calculate startIndex. 
+                startIndex = startIndex + batchSize;
+            }
+        } while ( companyDetailsReportList != null && !companyDetailsReportList.isEmpty()
+            && companyDetailsReportList.size() >= batchSize );
+
+        XSSFSheet sheet = workbook.getSheetAt( 0 );
+        makeRowBold( workbook, sheet.getRow( 0 ) );
+        return workbook;
+	}
+
+
+	private List<CompanyDetailsReport> getCompanyDetailsResponse(String entityType, long entityId, int startIndex,
+			int batchSize) {
+		Response response = ssApiBatchIntergrationBuilder.getIntegrationApi().getCompanyDetailsReport(entityType, entityId, startIndex, batchSize );
+	        String responseString = response != null ? new String( ( (TypedByteArray) response.getBody() ).getBytes() ) : null;
+	        List<CompanyDetailsReport> companyDetailsReportList = null;
+	        if ( responseString != null ) {
+	            //since the string has ""abc"" an extra quote
+	            responseString = responseString.substring( 1, responseString.length() - 1 );
+	            //Escape characters
+	            responseString = StringEscapeUtils.unescapeJava( responseString );
+	            Type listType = new TypeToken<List<CompanyDetailsReport>>() {}.getType();
+	            companyDetailsReportList = new Gson().fromJson( responseString, listType );
+
+	        }
+	        return companyDetailsReportList;
+	}
+    /**
+     * Method to fetch reviews based on the profile level specified, iden is one of
+     * agentId/branchId/regionId or companyId based on the profile level
+     */
+    @Override
+    @Transactional
+    public List<ReportingSurveyPreInititation> getIncompleteSurvey( long entityId, String entityType, Date startDate,
+        Date endDate, int startIndex, int batchSize ) throws InvalidInputException
+    {
+        LOG.info(
+            "Method getIncompleteSurvey() called for entityId: {}  ,entityType: {} ,startDate: {} ,endDate: {} ,startIndex: {}  ,batchSize: {} ",
+            entityId, entityType, startDate, endDate, startIndex, batchSize );
+        //check if its a valid entity id
+        if ( entityId <= 0l ) {
+            throw new InvalidInputException( "entityId is invalid while fetching incomplete reviews" );
+        }
+        Timestamp startTime = null;
+        Timestamp endTime = null;
+        if ( startDate != null )
+            startTime = new Timestamp( startDate.getTime() );
+        if ( endDate != null )
+            endTime = new Timestamp( endDate.getTime() );
+        return reportingSurveyPreInititationDao.getIncompleteSurveyForReporting( entityType, entityId, startTime, endTime,
+            startIndex, batchSize );
+    }
 }

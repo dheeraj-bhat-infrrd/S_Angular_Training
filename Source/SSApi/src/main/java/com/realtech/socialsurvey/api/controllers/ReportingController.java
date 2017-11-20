@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
+import com.realtech.socialsurvey.core.entities.CompanyDetailsReport;
 import com.realtech.socialsurvey.core.entities.CompanyDigestRequestData;
 import com.realtech.socialsurvey.core.entities.SurveyResultsReportVO;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.reportingmanagement.DashboardGraphManagement;
 import com.realtech.socialsurvey.core.services.reportingmanagement.OverviewManagement;
@@ -110,6 +112,18 @@ public class ReportingController
         List<List<Object>> recentActivityList = reportingDashboardManagement.getRecentActivityList( entityId, entityType,
             startIndex, batchSize );
         json = new Gson().toJson( recentActivityList );
+        return json;
+    }
+    
+    @RequestMapping ( value = "/getaccountstatisticsreportstatus", method = RequestMethod.GET)
+    @ApiOperation ( value = "Fetch latest record for account statistics report. ")
+    public String getAccountStatisticsRecentActivity( Long reportId ) throws NonFatalException
+    {
+        LOGGER.info( "Fetching latest record for account statistics report." );
+
+        String json = null;
+        Object accountStatisticsStatus = reportingDashboardManagement.getAccountStatisticsRecentActivity( reportId );
+        json = new Gson().toJson( accountStatisticsStatus );
         return json;
     }
 
@@ -547,5 +561,25 @@ public class ReportingController
         LOGGER.info( "Building the monthly digest aggregate for a company for a given month" );
         return new Gson().toJson( reportingDashboardManagement.prepareMonthlyDigestMailData( companyId, companyName,
             monthUnderConcern, year, recipientMail ) );
+    }
+
+	@RequestMapping(value = "/getcompanydetailsreport", method = RequestMethod.GET)
+	@ApiOperation(value = "Social Survey Admin level report to fetch Company Details for all companies.")
+	public String getCompanyDetailsReport(String entityType, Long entityId, int startIndex, int batchSize) throws InvalidInputException {
+		LOGGER.info("Social Survey Admin level report to fetch Company Details for all companies.");
+		List<CompanyDetailsReport> companyDetailsReportList = reportingDashboardManagement
+				.getCompanyDetailsReport(entityId, startIndex, batchSize);
+		return new Gson().toJson(companyDetailsReportList);
+	}
+    
+    @RequestMapping ( value = "/getincompletesurveys", method = RequestMethod.GET)
+    @ApiOperation ( value = "get incomplete surveys")
+    public String getIncompleteSurveys( Long entityId, String entityType, Timestamp startDate, Timestamp endDate,
+        int startIndex , int batchSize ) throws NonFatalException
+    {
+
+        LOGGER.info( "Fetching list of incomplete surveys for entityType : {} , entityId : {}",entityType,entityId );
+        return new Gson().toJson( reportingDashboardManagement.getIncompleteSurvey( entityId, entityType,
+            startDate, endDate, startIndex, batchSize ) );
     }
 }

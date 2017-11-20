@@ -1742,3 +1742,14 @@ span.footer-ul a:hover {
     height: 25px;
     margin-left: -3px;
 }
+
+.survey-csv-template {
+    text-align: center;
+    width: 150px;
+    margin: 0.5% auto;
+    background-color: #009FE0;
+    color: #fff;
+    padding: 0.1% 0%;
+    border-radius: 3px;
+    margin-top: 7%;
+}

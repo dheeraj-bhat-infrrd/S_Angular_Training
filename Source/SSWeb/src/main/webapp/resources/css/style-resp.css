@@ -1039,6 +1039,26 @@
         float: none !important;
         margin: 15px auto 0;
     }
+    
+    .trans-monitor-graph-legend{
+    	display:block;
+    }
+    
+    .trans-monitor-legend-item-first{
+	margin-left:0;	
+	}
+
+	.trans-monitor-legend-item{
+	margin-left:0;
+	}
+    .trans-monitor-util-gph-item{
+        margin-left: 0;
+        width: 90%;
+        overflow: hidden;
+        float: none !important;
+        margin: 15px auto 0;
+    }
+    
     .util-gph-legend {
         position: static;
         top: 200px;
@@ -1796,6 +1816,14 @@
 	padding-left: 40px;
 	}
 	
+	.survey-csv-buttons-resp {
+		width: 150px;
+	}
+	.survey-csv-send-btn-resp {
+		margin-top: 15px;
+		margin-left: 0px;
+	}
+	
 	/* reporting */
 	
 	.rep-disclaimer{
@@ -2197,6 +2225,23 @@
     .util-gph-item{
         width: 100%;
     }
+    
+    .trans-monitor-graph-legend{
+    	display:block;
+    }
+    
+    .trans-monitor-legend-item-first{
+	margin-left:0;	
+	}
+
+	.trans-monitor-legend-item{
+	margin-left:0;
+	}
+	
+    .trans-monitor-util-gph-item{
+    	width: 100%;
+    }
+    
     .dash-sel-wrapper,.setting-sel-wrapper {
         width: 50%;
         float: left;
@@ -2425,6 +2470,10 @@
    .admin-sel-item{
     width:200px;
    }
+   
+   .survey-csv-send-btn-resp {
+   	width: 94px;
+   }
 
    /*=========new_registration====================*/
    #reg-left-view{
@@ -2636,6 +2685,11 @@
     .util-gph-item{
         width: 600px;
     }
+    
+    .trans-util-gph-item{
+        width: 600px;
+    }
+    
     .stats-left {
         width: 330px;
     }

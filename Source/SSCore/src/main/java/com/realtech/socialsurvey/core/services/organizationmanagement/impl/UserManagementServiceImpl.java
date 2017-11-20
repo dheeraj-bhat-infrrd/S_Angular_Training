@@ -4834,4 +4834,5 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             LOG.error( "Exception caught while checking for email id in USERS table." );
         }
     }
+    
 }

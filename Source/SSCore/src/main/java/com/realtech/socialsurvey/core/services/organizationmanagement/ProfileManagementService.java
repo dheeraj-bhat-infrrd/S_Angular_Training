@@ -701,4 +701,7 @@ public interface ProfileManagementService
 
     public boolean isCaptchaForContactUsMailProcessed( String remoteAddr, String parameter ) throws InvalidInputException;
 
+    public void updateFacebookPixelId( String entityType, long entityId, String pixelId, UserSettings userSettings )
+        throws NonFatalException;
+
 }

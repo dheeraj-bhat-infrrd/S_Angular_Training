@@ -65,7 +65,7 @@
 <meta http-equiv="cache-control" content="max-age=0" />
 <meta http-equiv="cache-control" content="no-cache" />
 <meta http-equiv="expires" content="0" />
-<meta property=”og:image” content=”${profile.profileImageUrlThumbnail}” />
+<meta property="og:image" content="${profile.profileImageUrlThumbnail}" />
 <link rel="shortcut icon" href="/favicon.ico" sizes="16x16">
 <link rel="stylesheet"
 	href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
@@ -477,6 +477,12 @@
 										data-link="${profile.socialMediaTokens.linkedInToken.linkedInPageLink}"
 										title="LinkedIn"></div>
 								</c:if>
+								<c:if
+									test="${not empty profile.socialMediaTokens.googleBusinessToken && not empty profile.socialMediaTokens.googleBusinessToken.googleBusinessLink}">
+									<div id="icn-google-business" class="float-left social-item-icon icn-google-business"
+										data-link="${profile.socialMediaTokens.googleBusinessToken.googleBusinessLink}"
+										title="Google Business Rate &amp; Review Link"></div>
+								</c:if>				
 								<c:if
 									test="${not empty profile.socialMediaTokens.googleToken && not empty profile.socialMediaTokens.googleToken.profileLink}">
 									<div id="icn-gplus"

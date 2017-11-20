@@ -39,10 +39,9 @@
 
 </c:choose>
         <c:set value="${fn:escapeXml(reviewItem.review)}" var="review"></c:set>
-		<div data-firstname="${reviewItem.customerFirstName}"
-			data-lastname="${reviewItem.customerLastName}" data-agentid="${reviewItem.agentId}" survey-mongo-id="${reviewItem._id}"
-			data-review="${fn:escapeXml(reviewItem.review)}" data-score="${reviewItem.score}" data-customeremail="${reviewItem.customerEmail}"
-			data-agentname="${reviewItem.agentName}" class="ppl-review-item dsh-review-cont hide">
+		<div data-agentid="${reviewItem.agentId}" survey-mongo-id="${reviewItem._id}"
+			data-review="${fn:escapeXml(reviewItem.review)}" data-score="${reviewItem.score}" 
+			 class="ppl-review-item dsh-review-cont hide">
 
 			<div class="ppl-header-wrapper clearfix">
 			<div class="float-left ppl-header-right">
