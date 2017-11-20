@@ -2010,6 +2010,9 @@ button.paypal.is-active {
 .ppl-review-item:hover .retake-icn  { 
 	background:url(../images/ss-icon-small-circle-retake.png) no-repeat;
 	}
+.ppl-review-item:hover .icn-permalink-rev {
+	background: url(../images/permalink.png) no-repeat center;
+	}	
 	
 /*last review*/
 .ppl-review-item-last:hover .icn-fb-rev{ 
@@ -2029,6 +2032,9 @@ button.paypal.is-active {
 	}
 .ppl-review-item-last:hover .retake-icn  { 
 	background:url(../images/ss-icon-small-circle-retake.png) no-repeat;
+	}
+.ppl-review-item-last:hover .icn-permalink-rev {
+	background: url(../images/permalink.png) no-repeat center;
 	}	
 	
 
@@ -2048,10 +2054,18 @@ button.paypal.is-active {
 	background: url(../images/greyfb.png) no-repeat;
 }
 
+.sr-icn-fb-rev {
+	background: url(../images/greyfb.png) no-repeat;
+}
+
 .icn-twit {
 	background: url(../csssprites/icons_social.png) no-repeat -350px 0;
 }
 .icn-twit-rev {
+	background: url(../images/ss-icon-grey-small-twitter.png) no-repeat;
+}
+
+.sr-icn-twit-rev {
 	background: url(../images/ss-icon-grey-small-twitter.png) no-repeat;
 }
 
@@ -2062,6 +2076,15 @@ button.paypal.is-active {
 	background: url(../images/ss-icon-grey-small-linkedin.png) no-repeat;
 }
 
+.sr-icn-lin-rev {
+	background: url(../images/ss-icon-grey-small-linkedin.png) no-repeat;
+}
+
+
+.sr-icn-gplus-rev {
+	background: url(../images/ss-icon-grey-small-gplus.png) no-repeat;
+	border: 0px;
+}
 
 .icn-ss {
 	background: url(../csssprites/smileys.png) no-repeat -138px -19px;
@@ -2082,6 +2105,48 @@ button.paypal.is-active {
 .icn-realtor {
 	background: url(../csssprites/icons_social.png) no-repeat -200px 0;
 }
+
+.sr-icn-fb-rev:hover { 
+	background:url(../images/colfb.png) no-repeat;
+	-ms-transform: scale(1.2, 1.2);
+    -webkit-transform: scale(1.2, 1.2);
+    transform: scale(1.2, 1.2);
+    transition: 0.3s ease-out;
+}
+
+.sr-icn-twit-rev:hover { 
+	background:url(../images/ss-icon-small-twitter.png) no-repeat;
+	-ms-transform: scale(1.2, 1.2);
+    -webkit-transform: scale(1.2, 1.2);
+    transform: scale(1.2, 1.2);
+    transition: 0.3s ease-out;
+}
+
+.sr-icn-lin-rev:hover { 
+	background:url(../images/ss-icon-small-linkedin.png) no-repeat;
+	-ms-transform: scale(1.2, 1.2);
+    -webkit-transform: scale(1.2, 1.2);
+    transform: scale(1.2, 1.2);
+    transition: 0.3s ease-out;
+	
+}
+
+.sr-icn-gplus-rev:hover { 
+	background:url(../images/ss-icon-small-gplus.png) no-repeat;
+	-ms-transform: scale(1.2, 1.2);
+    -webkit-transform: scale(1.2, 1.2);
+    transform: scale(1.2, 1.2);
+    transition: 0.3s ease-out;
+}
+
+.sr-icn-flag:hover {
+	background:url(../images/ss-icon-small-circle-flag.png) no-repeat;
+	-ms-transform: scale(1.2, 1.2);
+    -webkit-transform: scale(1.2, 1.2);
+    transform: scale(1.2, 1.2);
+    transition: 0.3s ease-out;
+}
+	
 .social-item-icon.icn-google-business {
  background-position: -400px 3px;
 }
@@ -2090,6 +2155,13 @@ button.paypal.is-active {
 	background: url(../csssprites/icons_social_20160622.png) no-repeat -400px 3px;
 }
 .icn-flag {
+	background: url(../images/ss-icon-small-grey-circle-flag.png) no-repeat;
+	margin-top: 3px;
+    height: 20px;
+    width: 20px;
+}
+
+.sr-icn-flag {
 	background: url(../images/ss-icon-small-grey-circle-flag.png) no-repeat;
 	margin-top: 3px;
     height: 20px;
@@ -2114,6 +2186,10 @@ button.paypal.is-active {
 .icn-gplus-rev {
 	background: url(../images/ss-icon-grey-small-gplus.png) no-repeat;
 	border: 0px;
+}
+
+.icn-permalink-rev {
+	background: url(../images/permalink_grey.png) no-repeat center;
 }
 
 .icn-tweet {
@@ -2192,6 +2268,10 @@ button.paypal.is-active {
 	margin: 5px 0 5px 0;
 	line-height: 36px;
 	/* opacity:0.1; */
+}
+
+.sr-share-wrapper {
+	margin-bottom: 10%;
 }
 
 .icn-rem-size {
