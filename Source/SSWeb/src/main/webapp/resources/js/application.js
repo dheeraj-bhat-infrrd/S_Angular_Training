@@ -13187,7 +13187,7 @@ function copyIndividualReviewUrlToClipboard(loop){
 	var message = "";
 	try{
 		var temp = document.createElement( "input" );
-		temp.setAttribute("value",$('#permalink-url-' + loop).val())
+		temp.setAttribute("value",$('#permalink_url_' + loop).val());
 		document.body.appendChild( temp );
 		temp.select();
 		var success = document.execCommand("copy");

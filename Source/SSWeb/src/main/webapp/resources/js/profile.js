@@ -722,6 +722,8 @@ function paintReviews(result){
 		if(reviewItem.source == "Zillow") {
 			date = Date.parse(reviewItem.createdOn);
 		}
+		profileUrl = buildPublicProfileUrl();
+		profileUrl = profileUrl + "/" + reviewItem._id;
 		var lastItemClass = "ppl-review-item";
 		if (i == resultSize - 1) {
 			lastItemClass = "ppl-review-item-last";
