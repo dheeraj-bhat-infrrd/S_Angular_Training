@@ -3,8 +3,9 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<c:set var="start" value='${startIndex}'></c:set>
 <c:if test="${not empty reviews}">
-	<c:forEach var="reviewItem" varStatus="loop" items="${reviews}">
+	<c:forEach var="reviewItem" varStatus="loop" begin='${startIndex}' items="${reviews}">
 		<c:set value = "#.#" var = "scoreformat"></c:set>
 		<c:set
 			value="${ reviewItem.customerFirstName } ${ reviewItem.customerLastName }"
@@ -225,8 +226,8 @@
 							<span class="icon">&nbsp;</span> <span class="label">share</span>
 						</button>
 					</span>
-					<span class="float-left ppl-share-icns permalink icn-permalink-rev" title="Permalink" onclick="copyIndividualReviewUrlToClipboard(${loop.index})">
-                       	<input id="permalink_url_${loop.index}" type="hidden" value="${reviewItem.completeProfileUrl}/${reviewItem._id}"/>
+					<span class="float-left ppl-share-icns permalink icn-permalink-rev" title="Permalink" onclick="copyIndividualReviewUrlToClipboard(${start})">
+                       	<input id="permalink_url_${start}" type="hidden" value="${reviewItem.completeProfileUrl}/${reviewItem._id}"/>
                     </span>
 				</div>
 				<div class="float-right dash-flag-retake ">
@@ -237,6 +238,7 @@
 				</div>
 			</div>
 		</div>
+		<c:set var="start" value="${start + 1}"/>
 	</c:forEach>
 </c:if>
 <script type="text/javascript" src="//apis.google.com/js/client:plusone.js" async="async"></script>

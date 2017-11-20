@@ -18,6 +18,7 @@
 		<c:set value="4" var="profilemasterid"></c:set>
 	</c:when>
 </c:choose>
+<c:set var="start" value='${startIndex}'></c:set>
 <c:if test="${not empty reviews}">
 	<c:forEach var="feedback" varStatus="loop" items="${reviews}">
 		<c:set value="#.#" var="scoreformat"></c:set>
@@ -227,8 +228,8 @@
                           <span class="label">share</span>
                       </button>
                        </span>
-                       <span class="float-left ppl-share-icns permalink icn-permalink-rev" title="Permalink" onclick="copyIndividualReviewUrlToClipboard(${loop.index})">
-                       	<input id="permalink_url_${loop.index}" type="hidden" value="${feedback.completeProfileUrl}/${feedback._id}"/>
+                       <span class="float-left ppl-share-icns permalink icn-permalink-rev" title="Permalink" onclick="copyIndividualReviewUrlToClipboard(${start})">
+                       	<input id="permalink_url_${start}" type="hidden" value="${feedback.completeProfileUrl}/${feedback._id}"/>
                    		</span>
 				</div>
 				<c:if test="${feedback.source != 'Zillow'}">
@@ -253,6 +254,7 @@
 			</div>
 			
 		</div>
+		<c:set var="start" value="${start + 1}"/>
 	</c:forEach>
 </c:if>
 <script type="text/javascript" src="//apis.google.com/js/client:plusone.js" async="async"></script>

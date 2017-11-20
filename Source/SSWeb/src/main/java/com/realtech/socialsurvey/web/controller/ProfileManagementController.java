@@ -4875,6 +4875,7 @@ public class ProfileManagementController
 
             model.addAttribute( "reviews", reviewItems );
             model.addAttribute( "hiddenSection", hiddenSection );
+            model.addAttribute( "startIndex", startIndex );
         } catch ( InvalidInputException e ) {
             throw new InternalServerException(
                 new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_COMPANY_REVIEWS_FETCH_FAILURE,
