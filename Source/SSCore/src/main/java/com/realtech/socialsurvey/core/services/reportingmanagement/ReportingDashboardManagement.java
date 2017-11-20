@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.CompanyDetailsReport;
 import com.realtech.socialsurvey.core.entities.CompanyDigestRequestData;
 import com.realtech.socialsurvey.core.entities.Digest;
 import com.realtech.socialsurvey.core.entities.MonthlyDigestAggregate;
@@ -161,6 +162,25 @@ public interface ReportingDashboardManagement
     public Map<String, SurveyResultsReportVO> getSurveyResultsReport( String entityType, Long entityId, Timestamp startDate,
         Timestamp endDate, int startIndex, int batchSize );
 
+	/**
+	 * This method validates the entityType and entityId for social survey admin
+	 * and then generates the Company Details Report.
+	 * 
+	 * @param entityId
+	 * @param startIndex
+	 * @param batchSize
+	 * @return List of CompanyDetailsReport.
+	 * @throws InvalidInputException 
+	 */
+	public List<CompanyDetailsReport> getCompanyDetailsReport(Long entityId, int startIndex, int batchSize) throws InvalidInputException;
+
+	/**
+	 * @param profileValue
+	 * @param profileLevel
+	 * @return
+	 */
+	public String generateCompanyDetailsReport(long profileValue, String profileLevel)throws UnsupportedEncodingException, NonFatalException;
+
     /**
      * 
      * @param entityId
@@ -184,6 +204,15 @@ public interface ReportingDashboardManagement
      * @param endDate
      * @return
      */
+
     public String generateIncompleteSurveyResultsReport( Long entityId, String entityType, Long userId, Timestamp startDate, Timestamp endDate )
         throws UnsupportedEncodingException, NonFatalException, ParseException;
+
+	/**
+	 * This method returns the latest record for account statistics report in file upload.
+	 * @param reportId
+	 * @return
+	 */
+	public Object getAccountStatisticsRecentActivity(Long reportId);
+
 }
