@@ -87,7 +87,7 @@ public class FileUploadDaoImpl extends GenericDaoImpl<FileUpload, Long> implemen
     	criteria.setMaxResults(1);
     	criteria.addOrder(Order.desc(CommonConstants.CREATED_ON));
     	List<FileUpload> resultList = criteria.list();
-    	if(resultList != null){
+    	if(resultList != null && resultList.size() > 0){
     		return resultList.get(0);
     	}
     	return null;
