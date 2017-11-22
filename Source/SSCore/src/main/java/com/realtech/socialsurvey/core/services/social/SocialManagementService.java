@@ -177,7 +177,7 @@ public interface SocialManagementService
 
     void postToFacebookForHierarchy( String facebookMessage, double rating, String serverBaseUrl, int accountMasterId,
         SocialMediaPostDetails socialMediaPostDetails, SocialMediaPostResponseDetails socialMediaPostResponseDetails,
-        boolean isZillow, boolean isAgentsHidden ) throws InvalidInputException, NoRecordsFetchedException;
+        boolean isZillow, boolean isAgentsHidden, String surveyId ) throws InvalidInputException, NoRecordsFetchedException;
 
 
     void postToLinkedInForHierarchy( String linkedinMessage, double rating, String linkedinProfileUrl,

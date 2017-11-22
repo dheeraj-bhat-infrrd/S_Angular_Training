@@ -24,7 +24,7 @@ public class SurveyStatsReportRegionDaoImpl extends GenericReportingDaoImpl<Surv
     @Override
     public List<SurveyStatsReportRegion> fetchRegionSurveyStatsById( Long regionId , String startTrxMonth , String endTrxMonth )
     {
-        LOG.info( "Method to fetch all the survey stats,fetchRegionSurveyStatsById() started." );
+        LOG.debug( "Method to fetch all the survey stats,fetchRegionSurveyStatsById() started." );
         Criteria criteria = getSession().createCriteria( SurveyStatsReportRegion.class );
         try {
             criteria.add( Restrictions.eq( CommonConstants.REGION_ID_COLUMN, regionId ) );
@@ -35,7 +35,7 @@ public class SurveyStatsReportRegionDaoImpl extends GenericReportingDaoImpl<Surv
             throw new DatabaseException( "Exception caught in fetchRegionSurveyStatsById() ", hibernateException );
         }
 
-        LOG.info( "Method to fetch all the users by email id, fetchRegionSurveyStatsById() finished." );
+        LOG.debug( "Method to fetch all the users by email id, fetchRegionSurveyStatsById() finished." );
 
         return (List<SurveyStatsReportRegion>) criteria.list();
     }

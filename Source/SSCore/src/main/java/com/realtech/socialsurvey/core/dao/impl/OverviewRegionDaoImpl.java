@@ -18,19 +18,22 @@ public class OverviewRegionDaoImpl extends GenericReportingDaoImpl<OverviewRegio
     @Override
     public String getOverviewRegionId( Long regionId )
     {
-        LOG.info("Method to get OverviewRegionId from RegionId, getOverviewRegionId() started." );
+        LOG.debug("Method to get OverviewRegionId from RegionId, getOverviewRegionId() started." );
 
         Query query = getSession().createSQLQuery( "SELECT overview_region_id FROM overview_region WHERE region_id = :regionId " );
         query.setParameter( "regionId", regionId  );
         String OverviewRegionId = (String) query.uniqueResult();
         
-        LOG.info( "Method to get OverviewRegionId from RegionId, getOverviewRegionId() finished." );
+        LOG.debug( "Method to get OverviewRegionId from RegionId, getOverviewRegionId() finished." );
         return OverviewRegionId;
     }
 
     @Override
     public OverviewRegion findOverviewRegion( Class<OverviewRegion> entityClass, String overviewRegionId )throws IllegalArgumentException
     {
+    	LOG.debug("Method to get Overview Region from RegionId, findOverviewRegion() started." );
+    	
+    	LOG.debug("Method to get Overview Region from RegionId, findOverviewRegion() finished." );
         return super.findById( entityClass, overviewRegionId );
     }
 

@@ -200,10 +200,11 @@ public class ProfileManagementController
                 if ( entityIdStr != null && !entityIdStr.equals( "" ) ) {
                     entityId = Long.parseLong( entityIdStr );
                 } else {
+                    LOG.warn( "Number Format Exception" );
                     throw new NumberFormatException();
                 }
             } catch ( NumberFormatException e ) {
-                LOG.error( "Number format exception occurred while parsing the entity id. Reason :" + e.getMessage(), e );
+                LOG.error( "Number format exception occurred while parsing the entity id. Reason:", e);
             }
         }
 
@@ -225,7 +226,7 @@ public class ProfileManagementController
         try {
             Map<String, Long> hierarchyDetails = profileManagementService.getHierarchyDetailsByEntity( entityType, entityId );
             if ( hierarchyDetails == null ) {
-                LOG.error( "Unable to fetch primary profile for this user " );
+                LOG.warn( "Unable to fetch primary profile for this user " );
                 throw new FatalException(
                     "Unable to fetch primary profile for type : " + entityType + " and ID : " + entityId );
             }
@@ -234,10 +235,9 @@ public class ProfileManagementController
             companyId = hierarchyDetails.get( CommonConstants.COMPANY_ID_COLUMN );
             agentId = hierarchyDetails.get( CommonConstants.AGENT_ID_COLUMN );
             settingsDetailsList = settingsManager.getScoreForCompleteHeirarchy( companyId, branchId, regionId );
-            LOG.debug( "Company ID : " + companyId + " Region ID : " + regionId + " Branch ID : " + branchId + " Agent ID : "
-                + agentId );
+            LOG.debug( "Company ID : {} Region ID : {} Branch ID : {} Agent ID : {} ",companyId, regionId, branchId, agentId );
         } catch ( InvalidInputException e ) {
-            LOG.error( "InvalidInputException while showing profile page. Reason :" + e.getMessage(), e );
+            LOG.error( "InvalidInputException while showing profile page. Reason:", e );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
         } catch ( ProfileNotFoundException e ) {
@@ -269,6 +269,7 @@ public class ProfileManagementController
                 allowOverrideForSocialMedia = companyProfile.isAllowOverrideForSocialMedia();
                 model.addAttribute( "reviewsCount", reviewsCount );
             } catch ( InvalidInputException e ) {
+                LOG.error( "Error occured while fetching company profile", e );
                 throw new InternalServerException(
                     new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_COMPANY_PROFILE_SERVICE_FAILURE,
                         CommonConstants.SERVICE_CODE_COMPANY_PROFILE, "Error occured while fetching company profile" ),
@@ -295,10 +296,11 @@ public class ProfileManagementController
                     map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.REGION_ID,
                         regionProfile.getIden() );
                     if ( map == null ) {
-                        LOG.error( "Unable to fetch primary profile for this user " );
-                        throw new FatalException( "Unable to fetch primary profile this user " + regionProfile.getIden() );
+                        LOG.warn( "Unable to fetch primary profile for this user " );
+                        throw new FatalException( "Unable to fetch primary profile this user" + regionProfile.getIden() );
                     }
                 } catch ( InvalidSettingsStateException e ) {
+                    LOG.error( "Error occured while fetching region profile", e );
                     throw new InternalServerException(
                         new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE,
                             CommonConstants.SERVICE_CODE_REGION_PROFILE, "Error occured while fetching region profile" ),
@@ -328,6 +330,7 @@ public class ProfileManagementController
                     CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_REGION, false, false );
                 model.addAttribute( "reviewsCount", reviewsCount );
             } catch ( InvalidInputException e ) {
+                LOG.error("Error occured while fetching region profile", e);
                 throw new InternalServerException(
                     new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE,
                         CommonConstants.SERVICE_CODE_REGION_PROFILE, "Error occured while fetching region profile" ),
@@ -360,11 +363,12 @@ public class ProfileManagementController
                     map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.BRANCH_ID_COLUMN,
                         branchProfile.getIden() );
                     if ( map == null ) {
-                        LOG.error( "Unable to fetch primary profile for this user " );
+                        LOG.warn( "Unable to fetch primary profile for this user " );
                         throw new FatalException( "Unable to fetch primary profile this user " + branchProfile.getIden() );
                     }
 
                 } catch ( InvalidSettingsStateException e ) {
+                    LOG.error( "Error occured while fetching branch profile", e );
                     throw new InternalServerException(
                         new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_BRANCH_PROFILE_SERVICE_FAILURE,
                             CommonConstants.SERVICE_CODE_BRANCH_PROFILE, "Error occured while fetching branch profile" ),
@@ -392,12 +396,13 @@ public class ProfileManagementController
                     CommonConstants.MAX_RATING_SCORE, CommonConstants.PROFILE_LEVEL_BRANCH, false, false );
                 model.addAttribute( "reviewsCount", reviewsCount );
             } catch ( InvalidInputException e ) {
+                LOG.error( "Error occured while fetching branch profile", e );
                 throw new InternalServerException(
                     new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_BRANCH_PROFILE_SERVICE_FAILURE,
                         CommonConstants.SERVICE_CODE_BRANCH_PROFILE, "Error occured while fetching branch profile" ),
                     e.getMessage() );
             } catch ( NoRecordsFetchedException e ) {
-                LOG.error( "NoRecordsFetchedException: message : " + e.getMessage(), e );
+                LOG.error( "NoRecordsFetchedException: message :", e );
             }
             profileSettings = branchProfile;
             model.addAttribute( "companyProfileName", companyProfile.getProfileName() );
@@ -429,19 +434,19 @@ public class ProfileManagementController
                     map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID_COLUMN,
                         individualProfile.getIden() );
                     if ( map == null ) {
-                        LOG.error( "Unable to fetch primary profile for this user " );
+                        LOG.warn( "Unable to fetch primary profile for this user " );
                         throw new FatalException( "Unable to fetch primary profile this user " + branchProfile.getIden() );
                     }
 
                 } catch ( InvalidSettingsStateException e ) {
-                    LOG.error( "Error occured while fetching branch profile" + e.getMessage() );
+                    LOG.error( "Error occured while fetching branch profile", e );
                 } catch ( ProfileNotFoundException e ) {
                     LOG.error( "No profile found for the user " );
                     return JspResolver.NO_PROFILES_FOUND;
                 }
 
                 if ( map == null ) {
-                    LOG.error( "Unable to fetch primary profile for this user " );
+                    LOG.warn( "Unable to fetch primary profile for this user " );
                     throw new FatalException( "Unable to fetch primary profile this user " + individualProfile.getIden() );
                 }
 
@@ -465,13 +470,13 @@ public class ProfileManagementController
 
                 profileSettings = individualProfile;
             } catch ( InvalidInputException e ) {
-                LOG.error( "InvalidInputException: message : " + e.getMessage(), e );
+                LOG.error( "InvalidInputException: message:", e );
                 model.addAttribute( "message",
                     messageUtils.getDisplayMessage( DisplayMessageConstants.INVALID_INDIVIDUAL_PROFILENAME,
                         DisplayMessageType.ERROR_MESSAGE ).getMessage() );
                 return JspResolver.NOT_FOUND_PAGE;
             } catch ( NoRecordsFetchedException e ) {
-                LOG.error( "NoRecordsFetchedException: message : " + e.getMessage(), e );
+                LOG.error( "NoRecordsFetchedException: message:", e );
             }
 
         }
@@ -529,6 +534,7 @@ public class ProfileManagementController
         boolean isWorkEmailSetByEntity;
 
         if ( entitySetting == null ) {
+            LOG.warn( "Passed entity setting is null" );
             throw new InvalidInputException( "Passed entity setting is null" );
         }
 
@@ -587,6 +593,7 @@ public class ProfileManagementController
                 }
                 response = new Gson().toJson( verticalsMap );
             } catch ( InvalidInputException e ) {
+                LOG.error( "Some error occurred while fetching verticals master", e );
                 throw new NonFatalException( "Some error occurred while fetching verticals master", e );
             }
         } catch ( NonFatalException e ) {
@@ -679,6 +686,7 @@ public class ProfileManagementController
             String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
             LockSettings parentLock = (LockSettings) session.getAttribute( CommonConstants.PARENT_LOCK );
             if ( userSettings == null || profileSettings == null || entityType == null ) {
+                LOG.warn( "No user settings found in session" );
                 throw new InvalidInputException( "No user settings found in session" );
             }
 
@@ -686,6 +694,7 @@ public class ProfileManagementController
             String fieldId = request.getParameter( "id" );
             boolean fieldState = Boolean.parseBoolean( request.getParameter( "state" ) );
             if ( fieldId == null || fieldId.isEmpty() ) {
+                LOG.warn( "Name passed can not be null or empty" );
                 throw new InvalidInputException( "Name passed can not be null or empty",
                     DisplayMessageConstants.GENERAL_ERROR );
             }
@@ -747,6 +756,7 @@ public class ProfileManagementController
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
                 if ( regionSettings == null ) {
+                    LOG.warn( "No Region settings found in current session" );
                     throw new InvalidInputException( "No Region settings found in current session" );
                 }
                 lockSettings = regionSettings.getLockSettings();
@@ -799,6 +809,7 @@ public class ProfileManagementController
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
                 if ( branchSettings == null ) {
+                    LOG.warn( "No Branch settings found in current session" );
                     throw new InvalidInputException( "No Branch settings found in current session" );
                 }
                 lockSettings = branchSettings.getLockSettings();
@@ -850,6 +861,7 @@ public class ProfileManagementController
                     userManagementService.updateBranch( branch );
                 }
             } else {
+                LOG.warn( "Invalid input exception occurred in editing LockSettings." );
                 throw new InvalidInputException( "Invalid input exception occurred in editing LockSettings.",
                     DisplayMessageConstants.GENERAL_ERROR );
             }
@@ -860,8 +872,7 @@ public class ProfileManagementController
             model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.LOCK_UPDATE_SUCCESSFUL,
                 DisplayMessageType.SUCCESS_MESSAGE ) );
         } catch ( NonFatalException nonFatalException ) {
-            LOG.error( "NonFatalException while editing LockSettings. Reason :" + nonFatalException.getMessage(),
-                nonFatalException );
+            LOG.error( "NonFatalException while editing LockSettings. Reason :", nonFatalException );
             model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.LOCK_UPDATE_UNSUCCESSFUL,
                 DisplayMessageType.ERROR_MESSAGE ) );
         }
@@ -948,17 +959,20 @@ public class ProfileManagementController
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
             String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
             if ( userSettings == null || profileSettings == null || entityType == null ) {
+                LOG.warn( "No user settings found in session" );
                 throw new InvalidInputException( "No user settings found in session" );
             }
 
             String aboutMe = request.getParameter( "aboutMe" );
             if ( aboutMe == null || aboutMe.isEmpty() ) {
+                LOG.warn( "About me can not be null or empty" );
                 throw new InvalidInputException( "About me can not be null or empty", DisplayMessageConstants.GENERAL_ERROR );
             }
 
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
                 OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
                 if ( companySettings == null ) {
+                    LOG.warn( "No company settings found in current session" );
                     throw new InvalidInputException( "No company settings found in current session" );
                 }
                 contactDetailsSettings = companySettings.getContact_details();
@@ -975,6 +989,7 @@ public class ProfileManagementController
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
                 if ( regionSettings == null ) {
+                    LOG.warn( "No Region settings found in current session" );
                     throw new InvalidInputException( "No Region settings found in current session" );
                 }
                 contactDetailsSettings = regionSettings.getContact_details();
@@ -991,6 +1006,7 @@ public class ProfileManagementController
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
                 if ( branchSettings == null ) {
+                    LOG.warn( "No Branch settings found in current session" );
                     throw new InvalidInputException( "No Branch settings found in current session" );
                 }
                 contactDetailsSettings = branchSettings.getContact_details();
@@ -1007,6 +1023,7 @@ public class ProfileManagementController
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
                 if ( agentSettings == null ) {
+                    LOG.warn( "No Agent settings found in current session" );
                     throw new InvalidInputException( "No Agent settings found in current session" );
                 }
                 contactDetailsSettings = agentSettings.getContact_details();
@@ -1019,6 +1036,7 @@ public class ProfileManagementController
                 // Modify Agent details in Solr
                 solrSearchService.editUserInSolr( agentSettings.getIden(), CommonConstants.ABOUT_ME_SOLR, aboutMe );
             } else {
+                LOG.warn( "Error occurred while updating About me." );
                 throw new InvalidInputException( "Error occurred while updating About me.",
                     DisplayMessageConstants.GENERAL_ERROR );
             }
@@ -1029,8 +1047,7 @@ public class ProfileManagementController
             model.addAttribute( "message", messageUtils.getDisplayMessage(
                 DisplayMessageConstants.ABOUT_ME_DETAILS_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
         } catch ( NonFatalException nonFatalException ) {
-            LOG.error( "NonFatalException while updating about me details. Reason :" + nonFatalException.getMessage(),
-                nonFatalException );
+            LOG.error( "NonFatalException while updating about me details. Reason:", nonFatalException );
             model.addAttribute( "message", messageUtils.getDisplayMessage(
                 DisplayMessageConstants.ABOUT_ME_DETAILS_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE ) );
         }
@@ -1074,12 +1091,14 @@ public class ProfileManagementController
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
             String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
             if ( userSettings == null || profileSettings == null || entityType == null ) {
+                LOG.warn( "No user settings found in session" );
                 throw new InvalidInputException( "No user settings found in session" );
             }
 
             // Get the profile address parameters
             String name = request.getParameter( "profName" );
             if ( name == null || name.isEmpty() ) {
+                LOG.warn( "Name passed can not be null or empty" );
                 throw new InvalidInputException( "Name passed can not be null or empty",
                     DisplayMessageConstants.GENERAL_ERROR );
             }
@@ -1108,6 +1127,7 @@ public class ProfileManagementController
             if ( accountType.getValue() == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
                 OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
                 if ( companySettings == null ) {
+                    LOG.warn( "No company settings found in current session" );
                     throw new InvalidInputException( "No company settings found in current session" );
                 }
 
@@ -1120,6 +1140,7 @@ public class ProfileManagementController
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
                 OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
                 if ( companySettings == null ) {
+                    LOG.warn( "No company settings found in current session" );
                     throw new InvalidInputException( "No company settings found in current session" );
                 }
                 contactDetailsSettings = companySettings.getContact_details();
@@ -1143,6 +1164,7 @@ public class ProfileManagementController
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
                 if ( regionSettings == null ) {
+                    LOG.warn( "No Region settings found in current session" );
                     throw new InvalidInputException( "No Region settings found in current session" );
                 }
                 contactDetailsSettings = regionSettings.getContact_details();
@@ -1160,9 +1182,9 @@ public class ProfileManagementController
                 List<Region> regions = organizationManagementService.getRegionsForRegionIds( regionIds );
                 if ( regions != null && regions.size() == 1 ) {
                     Region region = regions.get( 0 );
-                    LOG.info( "Updating region details in solr for region id : " + regionSettings.getIden() );
+                    LOG.info( "Updating region details in solr for region id : {}", regionSettings.getIden() );
                     solrSearchService.addOrUpdateRegionToSolr( region );
-                    LOG.info( "Updated region details in solr for region id : " + regionSettings.getIden() );
+                    LOG.info( "Updated region details in solr for region id : {}", regionSettings.getIden() );
                 }
                 //JIRA SS-1439 Fix END
 
@@ -1170,6 +1192,7 @@ public class ProfileManagementController
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
                 if ( branchSettings == null ) {
+                    LOG.warn( "No Branch settings found in current session" );
                     throw new InvalidInputException( "No Branch settings found in current session" );
                 }
                 contactDetailsSettings = branchSettings.getContact_details();
@@ -1187,9 +1210,9 @@ public class ProfileManagementController
                 List<Branch> branches = organizationManagementService.getBranchesForBranchIds( branchIds );
                 if ( branches != null && branches.size() == 1 ) {
                     Branch branch = branches.get( 0 );
-                    LOG.info( "Updating branch details in solr for branch id : " + branchSettings.getIden() );
+                    LOG.info( "Updating branch details in solr for branch id : {}", branchSettings.getIden() );
                     solrSearchService.addOrUpdateBranchToSolr( branch );
-                    LOG.info( "Updated branch details in solr for branch id : " + branchSettings.getIden() );
+                    LOG.info( "Updated branch details in solr for branch id : {}", branchSettings.getIden() );
                 }
                 //JIRA SS-1439 Fix END
 
@@ -1197,6 +1220,7 @@ public class ProfileManagementController
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
                 if ( agentSettings == null ) {
+                    LOG.warn( "No Agent settings found in current session" );
                     throw new InvalidInputException( "No Agent settings found in current session" );
                 }
                 contactDetailsSettings = agentSettings.getContact_details();
@@ -1214,16 +1238,6 @@ public class ProfileManagementController
                 contactDetailsSettings = profileManagementService.updateAgentContactDetails(
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings );
                 agentSettings.setContact_details( contactDetailsSettings );
-
-                // update user name; not needed as we are updating the user's first name and last name below
-                // profileManagementService.updateIndividualName( user.getUserId(), agentSettings.getIden(), name );
-
-                /*
-                 * agentSettings.setVertical(vertical);
-                 * profileManagementService.
-                 * updateVertical(MongoOrganizationUnitSettingDaoImpl
-                 * .AGENT_SETTINGS_COLLECTION, agentSettings, vertical);
-                 */
 
                 userSettings.setAgentSettings( agentSettings );
 
@@ -1247,6 +1261,7 @@ public class ProfileManagementController
                 user.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
                 userManagementService.updateUser( user, userMap );
             } else {
+                LOG.warn( "Invalid input exception occurred in upadting Basic details." );
                 throw new InvalidInputException( "Invalid input exception occurred in upadting Basic details.",
                     DisplayMessageConstants.GENERAL_ERROR );
             }
@@ -1260,8 +1275,7 @@ public class ProfileManagementController
             model.addAttribute( "message", messageUtils.getDisplayMessage(
                 DisplayMessageConstants.BASIC_DETAILS_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
         } catch ( NonFatalException nonFatalException ) {
-            LOG.error( "NonFatalException while updating profile basic details. Reason :" + nonFatalException.getMessage(),
-                nonFatalException );
+            LOG.error( "NonFatalException while updating profile basic details. Reason :", nonFatalException );
             model.addAttribute( "message", messageUtils.getDisplayMessage(
                 DisplayMessageConstants.BASIC_DETAILS_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE ) );
         }
@@ -1307,6 +1321,7 @@ public class ProfileManagementController
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
             String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
             if ( userSettings == null || profileSettings == null || entityType == null ) {
+                LOG.warn( "No user settings found in session" );
                 throw new InvalidInputException( "No user settings found in session" );
             }
 
@@ -1319,14 +1334,17 @@ public class ProfileManagementController
             String countryCode = request.getParameter( CommonConstants.COUNTRY_CODE );
             String zipcode = request.getParameter( CommonConstants.ZIPCODE );
             if ( address1 == null || address1.isEmpty() ) {
+                LOG.warn( "Address 1 passed can not be null or empty" );
                 throw new InvalidInputException( "Address 1 passed can not be null or empty",
                     DisplayMessageConstants.GENERAL_ERROR );
             }
             if ( country == null || country.isEmpty() ) {
+                LOG.warn( "country passed can not be null or empty" );
                 throw new InvalidInputException( "country passed can not be null or empty",
                     DisplayMessageConstants.GENERAL_ERROR );
             }
             if ( zipcode == null || zipcode.isEmpty() ) {
+                LOG.warn( "zipcode passed can not be null or empty" );
                 throw new InvalidInputException( "zipcode passed can not be null or empty",
                     DisplayMessageConstants.GENERAL_ERROR );
             }
@@ -1334,6 +1352,7 @@ public class ProfileManagementController
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
                 OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
                 if ( companySettings == null ) {
+                    LOG.warn( "No company settings found in current session" );
                     throw new InvalidInputException( "No company settings found in current session" );
                 }
                 contactDetailsSettings = companySettings.getContact_details();
@@ -1351,6 +1370,7 @@ public class ProfileManagementController
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
                 if ( regionSettings == null ) {
+                    LOG.warn( "No Region settings found in current session" );
                     throw new InvalidInputException( "No Region settings found in current session" );
                 }
                 contactDetailsSettings = regionSettings.getContact_details();
@@ -1369,6 +1389,7 @@ public class ProfileManagementController
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
                 if ( branchSettings == null ) {
+                    LOG.warn( "No Branch settings found in current session" );
                     throw new InvalidInputException( "No Branch settings found in current session" );
                 }
                 contactDetailsSettings = branchSettings.getContact_details();
@@ -1386,6 +1407,7 @@ public class ProfileManagementController
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
                 if ( agentSettings == null ) {
+                    LOG.warn( "No Agent settings found in current session" );
                     throw new InvalidInputException( "No Agent settings found in current session" );
                 }
                 contactDetailsSettings = agentSettings.getContact_details();
@@ -1396,6 +1418,7 @@ public class ProfileManagementController
                 agentSettings.setContact_details( contactDetailsSettings );
                 userSettings.setAgentSettings( agentSettings );
             } else {
+                LOG.warn( "Invalid input exception occurred in editing Address details." );
                 throw new InvalidInputException( "Invalid input exception occurred in editing Address details.",
                     DisplayMessageConstants.GENERAL_ERROR );
             }
@@ -1406,8 +1429,7 @@ public class ProfileManagementController
             model.addAttribute( "message", messageUtils.getDisplayMessage(
                 DisplayMessageConstants.PROFILE_ADDRESSES_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
         } catch ( NonFatalException nonFatalException ) {
-            LOG.error( "NonFatalException while updating profile address details. Reason :" + nonFatalException.getMessage(),
-                nonFatalException );
+            LOG.error( "NonFatalException while updating profile address details. Reason :",nonFatalException );
             model.addAttribute( "message", messageUtils.getDisplayMessage(
                 DisplayMessageConstants.PROFILE_ADDRESSES_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE ) );
         }
@@ -1451,6 +1473,7 @@ public class ProfileManagementController
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
             String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
             if ( userSettings == null || profileSettings == null || entityType == null ) {
+                LOG.warn( "No user settings found in session" );
                 throw new InvalidInputException( "No user settings found in session" );
             }
 
@@ -1463,26 +1486,31 @@ public class ProfileManagementController
             String zipcode = request.getParameter( "zipcode" );
             String companyContactNo = request.getParameter( "contactno" );
             if ( address1 == null || address1.isEmpty() ) {
+                LOG.warn( "Address is null or empty while adding company information" );
                 throw new InvalidInputException( "Address is null or empty while adding company information",
                     DisplayMessageConstants.INVALID_ADDRESS );
             }
 
             if ( country == null || country.isEmpty() ) {
+                LOG.warn( "Country is null or empty while adding company information" );
                 throw new InvalidInputException( "Country is null or empty while adding company information",
                     DisplayMessageConstants.INVALID_COUNTRY );
             }
 
             if ( countryCode == null || countryCode.isEmpty() ) {
+                LOG.warn( "Country code is null or empty while adding company information" );
                 throw new InvalidInputException( "Country code is null or empty while adding company information",
                     DisplayMessageConstants.INVALID_COUNTRY );
             }
 
             if ( zipcode == null || zipcode.isEmpty() ) {
+                LOG.warn( "Zipcode is not valid while adding company information" );
                 throw new InvalidInputException( "Zipcode is not valid while adding company information",
                     DisplayMessageConstants.INVALID_ZIPCODE );
             }
 
             if ( companyContactNo == null || companyContactNo.isEmpty() ) {
+                LOG.warn( "Company contact number is not valid while adding company information" );
                 throw new InvalidInputException( "Company contact number is not valid while adding company information",
                     DisplayMessageConstants.INVALID_COMPANY_PHONEN0 );
             }
@@ -1490,6 +1518,7 @@ public class ProfileManagementController
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
                 OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
                 if ( companySettings == null ) {
+                    LOG.warn( "No company settings found in current session" );
                     throw new InvalidInputException( "No company settings found in current session" );
                 }
                 contactDetailsSettings = companySettings.getContact_details();
@@ -1502,6 +1531,7 @@ public class ProfileManagementController
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
                 if ( regionSettings == null ) {
+                    LOG.warn( "No Region settings found in current session" );
                     throw new InvalidInputException( "No Region settings found in current session" );
                 }
                 contactDetailsSettings = regionSettings.getContact_details();
@@ -1514,6 +1544,7 @@ public class ProfileManagementController
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
                 if ( branchSettings == null ) {
+                    LOG.warn( "No Branch settings found in current session" );
                     throw new InvalidInputException( "No Branch settings found in current session" );
                 }
                 contactDetailsSettings = branchSettings.getContact_details();
@@ -1526,6 +1557,7 @@ public class ProfileManagementController
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
                 if ( agentSettings == null ) {
+                    LOG.warn( "No Agent settings found in current session" );
                     throw new InvalidInputException( "No Agent settings found in current session" );
                 }
                 contactDetailsSettings = agentSettings.getContact_details();
@@ -1536,6 +1568,7 @@ public class ProfileManagementController
                 agentSettings.setContact_details( contactDetailsSettings );
                 userSettings.setAgentSettings( agentSettings );
             } else {
+                LOG.warn( "Invalid input exception occurred in editing Address details." );
                 throw new InvalidInputException( "Invalid input exception occurred in editing Address details.",
                     DisplayMessageConstants.GENERAL_ERROR );
             }
@@ -1546,8 +1579,7 @@ public class ProfileManagementController
             model.addAttribute( "message", messageUtils.getDisplayMessage(
                 DisplayMessageConstants.PROFILE_ADDRESSES_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
         } catch ( NonFatalException nonFatalException ) {
-            LOG.error( "NonFatalException while updating profile address details. Reason :" + nonFatalException.getMessage(),
-                nonFatalException );
+            LOG.error( "NonFatalException while updating profile address details. Reason :", nonFatalException );
             model.addAttribute( "message", messageUtils.getDisplayMessage(
                 DisplayMessageConstants.PROFILE_ADDRESSES_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE ) );
         }
@@ -1596,6 +1628,7 @@ public class ProfileManagementController
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
             String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
             if ( userSettings == null || profileSettings == null || entityType == null ) {
+                LOG.warn( "No user settings found in session" );
                 throw new InvalidInputException( "No user settings found in session" );
             }
 
@@ -4278,7 +4311,7 @@ public class ProfileManagementController
     {
         LOG.info( "Method findAProfile called." );
 
-        boolean isBotRequest = botRequestUtils.checkBotRequest( request );
+        boolean isBotRequest = botRequestUtils.checkBotRequest( request.getHeader( BotRequestUtils.USER_AGENT_HEADER ) );
 
         String patternFirst = request.getParameter( "find-pro-first-name" );
         String patternLast = request.getParameter( "find-pro-last-name" );
@@ -4434,7 +4467,7 @@ public class ProfileManagementController
             + " and searchCriteria:" + searchCriteria );
         DisplayMessage message = null;
 
-        boolean isBotRequest = botRequestUtils.checkBotRequest( request );
+        boolean isBotRequest = botRequestUtils.checkBotRequest( request.getHeader( BotRequestUtils.USER_AGENT_HEADER ) );
 
         try {
             if ( profileLevel == null || profileLevel.isEmpty() ) {
@@ -4876,7 +4909,9 @@ public class ProfileManagementController
 
             model.addAttribute( "reviews", reviewItems );
             model.addAttribute( "hiddenSection", hiddenSection );
+            model.addAttribute( "startIndex", startIndex );
         } catch ( InvalidInputException e ) {
+            LOG.warn( "Something went wrong while fetching reviews  {}",e  );
             throw new InternalServerException(
                 new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_COMPANY_REVIEWS_FETCH_FAILURE,
                     CommonConstants.SERVICE_CODE_COMPANY_REVIEWS, "Something went wrong while fetching reviews" ),
@@ -4900,6 +4935,7 @@ public class ProfileManagementController
         try {
             String entityType = (String) request.getSession( false ).getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
             if ( entityType == null ) {
+                LOG.warn( "No user settings found in session" );
                 throw new InvalidInputException( "No user settings found in session", DisplayMessageConstants.GENERAL_ERROR );
             }
 
@@ -4914,7 +4950,7 @@ public class ProfileManagementController
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
                 long companyId = Long.parseLong( request.getParameter( "companyId" ) );
                 if ( companyId == 0l ) {
-                    LOG.error( "Invalid companyId passed in method fetchReviews()." );
+                    LOG.warn( "Invalid companyId passed in method fetchReviews()." );
                     throw new InvalidInputException( "Invalid companyId passed in method fetchReviews()." );
                 }
 
@@ -4923,7 +4959,7 @@ public class ProfileManagementController
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 long regionId = Long.parseLong( request.getParameter( "regionId" ) );
                 if ( regionId == 0l ) {
-                    LOG.error( "Invalid regionId passed in method fetchReviews()." );
+                    LOG.warn( "Invalid regionId passed in method fetchReviews()." );
                     throw new InvalidInputException( "Invalid regionId passed in method fetchReviews()." );
                 }
 
@@ -4932,7 +4968,7 @@ public class ProfileManagementController
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 long branchId = Long.parseLong( request.getParameter( "branchId" ) );
                 if ( branchId == 0l ) {
-                    LOG.error( "Invalid branchId passed in method fetchReviews()." );
+                    LOG.warn( "Invalid branchId passed in method fetchReviews()." );
                     throw new InvalidInputException( "Invalid branchId passed in method fetchReviews()." );
                 }
 
@@ -4941,7 +4977,7 @@ public class ProfileManagementController
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 long agentId = Long.parseLong( request.getParameter( "agentId" ) );
                 if ( agentId == 0l ) {
-                    LOG.error( "Invalid agentId passed in method fetchReviews()." );
+                    LOG.warn( "Invalid agentId passed in method fetchReviews()." );
                     throw new InvalidInputException( "Invalid agentId passed in method fetchReviews()." );
                 }
 
@@ -4949,6 +4985,7 @@ public class ProfileManagementController
                     CommonConstants.PROFILE_LEVEL_INDIVIDUAL, fetchAbusive, notRecommended );
             }
         } catch ( InvalidInputException e ) {
+            LOG.warn( "Something went wrong while fetching reviews" );
             throw new InternalServerException(
                 new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_REVIEWS_COUNT_FETCH_FAILURE,
                     CommonConstants.SERVICE_CODE_COMPANY_REVIEWS, "Something went wrong while fetching reviews" ),
@@ -4971,13 +5008,14 @@ public class ProfileManagementController
         try {
             String entityType = (String) request.getSession( false ).getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
             if ( entityType == null ) {
+                LOG.warn( "No user settings found in session" );
                 throw new InvalidInputException( "No user settings found in session", DisplayMessageConstants.GENERAL_ERROR );
             }
 
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
                 long companyId = Long.parseLong( request.getParameter( "companyId" ) );
                 if ( companyId == 0l ) {
-                    LOG.error( "Invalid companyId passed in method fetchReviews()." );
+                    LOG.warn( "Invalid companyId passed in method fetchReviews()." );
                     throw new InvalidInputException( "Invalid companyId passed in method fetchReviews()." );
                 }
 
@@ -5517,8 +5555,8 @@ public class ProfileManagementController
         return response;
 
     }
-    
-    
+
+
     @RequestMapping ( value = "/updatefacebookpixelid", method = RequestMethod.POST)
     public String updateFacebookPixelId( Model model, HttpServletRequest request )
     {
@@ -5538,12 +5576,13 @@ public class ProfileManagementController
 
             String pixelId = request.getParameter( "pixelId" );
             if ( StringUtils.isEmpty( pixelId ) ) {
-                  throw new InvalidInputException( "pixelId passed was null or empty", DisplayMessageConstants.GENERAL_ERROR );
-             }
-            
-            profileManagementService.updateFacebookPixelId( entityType,  entityId,  pixelId, userSettings );
+                throw new InvalidInputException( "pixelId passed was null or empty", DisplayMessageConstants.GENERAL_ERROR );
+            }
 
-            model.addAttribute( "message", messageUtils.getDisplayMessage( DisplayMessageConstants.FACEBOOK_PIXEL_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
+            profileManagementService.updateFacebookPixelId( entityType, entityId, pixelId, userSettings );
+
+            model.addAttribute( "message", messageUtils.getDisplayMessage(
+                DisplayMessageConstants.FACEBOOK_PIXEL_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
         } catch ( NonFatalException nonFatalException ) {
             LOG.error( "NonFatalException while updating ZillowLink in profile. Reason :" + nonFatalException.getMessage(),
                 nonFatalException );
