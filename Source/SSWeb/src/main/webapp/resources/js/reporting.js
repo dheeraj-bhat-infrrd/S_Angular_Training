@@ -293,7 +293,7 @@ function drawSpsStatsGraph(){
 														spsScore = ((promoters - detractors)*100)/totalTransactions;
 													}
 													
-													spsChartData[i][4] = spsScore.toFixed(2);
+													spsChartData[i][4] = 'SPS: ' + spsScore.toFixed(2);
 												}
 
 												var data = google.visualization
