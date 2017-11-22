@@ -104,11 +104,18 @@ public class OverviewManagementImpl implements OverviewManagement
     @Override
     public OverviewUser fetchOverviewUserDetails( long entityId, String entityType ) throws NonFatalException
     {
+    	LOG.debug("Method fetchOverviewUserDetails() Started for user {} ",entityId);
+    	
+    	LOG.debug( "Calling method for fetching overViewUserId for user {}",entityId );
         String overviewUserId = overviewUserDao.getOverviewUserId( entityId );
+        
         OverviewUser overviewUser = null;
         if ( overviewUserId != null ) {
+        	LOG.debug( "Calling method for finding Overview User for the overviewUserId: {}",overviewUserId);
             overviewUser = overviewUserDao.findOverviewUser( OverviewUser.class, overviewUserId );
         }
+        
+        LOG.debug("Method fetchOverviewUserDetails() Finished for user {} ",entityId);
         return overviewUser;
     }
 
@@ -116,13 +123,18 @@ public class OverviewManagementImpl implements OverviewManagement
     @Override
     public OverviewBranch fetchOverviewBranchDetails( long entityId, String entityType ) throws NonFatalException
     {
+    	LOG.debug("Method fetchOverviewBranchDetails() Started for branch {} ",entityId);
 
-
+    	LOG.debug( "Calling method for fetching overViewBranchId for branch {}",entityId);
         String overviewBranchId = overviewBranchDao.getOverviewBranchId( entityId );
+        
         OverviewBranch overviewBranch = null;
         if ( overviewBranchId != null ) {
+        	LOG.debug( "Calling method for finding Overview branch for the overviewBranchId: {} ",overviewBranchId);
             overviewBranch = overviewBranchDao.findOverviewBranch( OverviewBranch.class, overviewBranchId );
         }
+        
+        LOG.debug("Method fetchOverviewBranchDetails() Finished for branch {} ",entityId);
         return overviewBranch;
 
     }
@@ -131,11 +143,18 @@ public class OverviewManagementImpl implements OverviewManagement
     @Override
     public OverviewRegion fetchOverviewRegionDetails( long entityId, String entityType ) throws NonFatalException
     {
+    	LOG.debug("Method fetchOverviewRegionDetails() Started for region {} ",entityId);
+    	
+    	LOG.debug( "Calling method for fetching overViewRegionId for region {}",entityId);
         String overviewRegionId = overviewRegionDao.getOverviewRegionId( entityId );
+        
         OverviewRegion overviewRegion = null;
         if ( overviewRegionId != null ) {
+        	LOG.debug( "Calling method for finding Overview Region for the overviewRegionId: {}",overviewRegionId);
             overviewRegion = overviewRegionDao.findOverviewRegion( OverviewRegion.class, overviewRegionId );
         }
+        
+        LOG.debug("Method fetchOverviewRegionDetails() finished for region {} ",entityId);
         return overviewRegion;
     }
 
@@ -143,12 +162,18 @@ public class OverviewManagementImpl implements OverviewManagement
     @Override
     public OverviewCompany fetchOverviewCompanyDetails( long entityId, String entityType ) throws NonFatalException
     {
+    	LOG.debug("Method fetchOverviewCompanyDetails() Started for company {}",entityId);
+    	
+    	LOG.debug( "Calling method for fetching overViewCompanyId for company {}",entityId);
         String overviewCompanyId = overviewCompanyDao.getOverviewCompanyId( entityId );
+        
         OverviewCompany overviewCompany = null;
         if ( overviewCompanyId != null ) {
+        	LOG.debug( "Calling method for finding Overview Company for the overviewCompanyId: {}",overviewCompanyId);
             overviewCompany = overviewCompanyDao.findOverviewCompany( OverviewCompany.class, overviewCompanyId );
         }
 
+        LOG.debug("Method fetchOverviewCompanyDetails() finished for company {}",entityId);
         return overviewCompany;
     }
 
@@ -157,7 +182,7 @@ public class OverviewManagementImpl implements OverviewManagement
     @Transactional ( value = "transactionManagerForReporting")
     public Map<String, Object> fetchAllTimeOverview( long entityId, String entityType ) throws NonFatalException
     {
-        LOG.info( "Method to fetchAllTimeOverview for entityId : {} , entityType : {} started", entityId,
+        LOG.debug( "Method to fetchAllTimeOverview for entityId : {} , entityType : {} started", entityId,
             entityType );
         Map<String, Object> overviewMap = new HashMap<>();
         if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
@@ -238,7 +263,7 @@ public class OverviewManagementImpl implements OverviewManagement
 
             }
         }
-        LOG.info( "Method to fetchAllTimeOverview for entityId : {} , entityType : {} ended", entityId,
+        LOG.debug( "Method to fetchAllTimeOverview for entityId : {} , entityType : {} ended", entityId,
             entityType );
 
         return overviewMap;
@@ -252,7 +277,9 @@ public class OverviewManagementImpl implements OverviewManagement
         LOG.info( "Method to fetchSpsAllTime for entityId : {} , entityType : {} started", entityId,
             entityType );
         Map<String, Object> overviewMap = new HashMap<>();
+        
         if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+        	LOG.debug( "Calling method for fetching Overview details for userId {}",entityId );
             OverviewUser overviewUser = fetchOverviewUserDetails( entityId, entityType );
             if ( overviewUser != null ) {
                 overviewMap.put( SPSSCORE, overviewUser.getSpsScore() );
@@ -263,6 +290,7 @@ public class OverviewManagementImpl implements OverviewManagement
 
 
         } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+        	LOG.debug( "Calling method for fetching Overview details for branchId {}",entityId );
             OverviewBranch overviewBranch = fetchOverviewBranchDetails( entityId, entityType );
             if ( overviewBranch != null ) {
                 overviewMap.put( SPSSCORE, overviewBranch.getSpsScore() );
@@ -273,6 +301,7 @@ public class OverviewManagementImpl implements OverviewManagement
 
 
         } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+        	LOG.debug( "Calling method for fetching Overview details for regionId {}",entityId );
             OverviewRegion overviewRegion = fetchOverviewRegionDetails( entityId, entityType );
             if ( overviewRegion != null ) {
                 overviewMap.put( SPSSCORE, overviewRegion.getSpsScore() );
@@ -282,6 +311,7 @@ public class OverviewManagementImpl implements OverviewManagement
             }
 
         } else if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+        	LOG.debug( "Calling method for fetching Overview details for companyId {}",entityId );
             OverviewCompany overviewCompany = fetchOverviewCompanyDetails( entityId, entityType );
             if ( overviewCompany != null ) {
                 overviewMap.put( SPSSCORE, overviewCompany.getSpsScore() );

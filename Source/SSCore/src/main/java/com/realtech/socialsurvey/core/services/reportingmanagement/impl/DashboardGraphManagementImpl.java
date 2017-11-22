@@ -43,7 +43,7 @@ public class DashboardGraphManagementImpl implements DashboardGraphManagement
   
     @Override
     public List<List<Object>> getSpsStatsGraph(Long entityId , String entityType){
-        LOG.info("getSpsStatsGraphCompany has started");
+        LOG.info("Method for getting SPS stats for SPS stats graph, getSpsStatsGraph() has started");
         //List<List<SurveyStatsReportCompany>> SurveyStats = SurveyStatsReportCompanyDao.fetchCompanySurveyStatsById(companyId );
         List<List<Object>> spsStats = new ArrayList<>();
         Calendar calender = Calendar.getInstance();
@@ -51,8 +51,10 @@ public class DashboardGraphManagementImpl implements DashboardGraphManagement
         String endTrxMonth = new SimpleDateFormat("yyyy_MM").format(calender.getTime()); //example passes 2016_07
         calender.add(Calendar.MONTH, -6); 
         String startTrxMonth = new SimpleDateFormat("yyyy_MM").format(calender.getTime()); //example passes 2016_01
+        
         if(entityType.equals( CommonConstants.COMPANY_ID_COLUMN )){
-            for(SurveyStatsReportCompany SurveyStatsReportCompany : SurveyStatsReportCompanyDao.fetchCompanySurveyStatsById(entityId, startTrxMonth, endTrxMonth ) ){
+        	LOG.debug( "Calling method for fetching SPS stats for company {}",entityId );
+        	for(SurveyStatsReportCompany SurveyStatsReportCompany : SurveyStatsReportCompanyDao.fetchCompanySurveyStatsById(entityId, startTrxMonth, endTrxMonth ) ){
                 List<Object> list = new ArrayList<>();
                 list.add( SurveyStatsReportCompany.getYear() );
                 list.add( SurveyStatsReportCompany.getMonth() );
@@ -62,6 +64,7 @@ public class DashboardGraphManagementImpl implements DashboardGraphManagement
                 spsStats.add( list );
             }
         }else if(entityType.equals( CommonConstants.REGION_ID_COLUMN )){
+        	LOG.debug( "Calling method for fetching SPS stats for region {}",entityId );
             for(SurveyStatsReportRegion SurveyStatsReportRegion : SurveyStatsReportRegionDao.fetchRegionSurveyStatsById(entityId, startTrxMonth, endTrxMonth) ){
                 List<Object> list = new ArrayList<>();
                 list.add( SurveyStatsReportRegion.getYear() );
@@ -72,6 +75,7 @@ public class DashboardGraphManagementImpl implements DashboardGraphManagement
                 spsStats.add( list );
             }
         }else if(entityType.equals( CommonConstants.BRANCH_ID_COLUMN )){
+        	LOG.debug( "Calling method for fetching SPS stats for branch {}",entityId );
             for(SurveyStatsReportBranch SurveyStatsReportBranch : SurveyStatsReportBranchDao.fetchBranchSurveyStatsById(entityId, startTrxMonth, endTrxMonth ) ){
                 List<Object> list = new ArrayList<>();
                 list.add( SurveyStatsReportBranch.getYear() );
@@ -82,6 +86,7 @@ public class DashboardGraphManagementImpl implements DashboardGraphManagement
                 spsStats.add( list );
             }
         }else if(entityType.equals( CommonConstants.AGENT_ID_COLUMN )){
+        	LOG.debug( "Calling method for fetching SPS stats for user {}",entityId );
             for(SurveyStatsReportUser SurveyStatsReportUser : SurveyStatsReportUserDao.fetchUserSurveyStatsById( entityId, startTrxMonth, endTrxMonth ) ){
                 List<Object> list = new ArrayList<>();
                 list.add( SurveyStatsReportUser.getYear() );
@@ -92,13 +97,15 @@ public class DashboardGraphManagementImpl implements DashboardGraphManagement
                 spsStats.add( list );
             }
         }
+        
+        LOG.info("Method for getting SPS stats for SPS stats graph, getSpsStatsGraph() has finished");
         return spsStats;
     }
     
     @Override
     public List<List<Object>> getCompletionRate(Long entityId , String entityType){
-        LOG.info("getSpsStatsGraphCompany has started");
-        //List<List<SurveyStatsReportCompany>> SurveyStats = SurveyStatsReportCompanyDao.fetchCompanySurveyStatsById(companyId );
+        LOG.info("Method for getting completion Rate for Completion Rate graph, getCompletionRate() has started");
+
         List<List<Object>> completionRate = new ArrayList<>();
         Calendar calender = Calendar.getInstance();
         calender.getTime();
@@ -107,6 +114,7 @@ public class DashboardGraphManagementImpl implements DashboardGraphManagement
         String startTrxMonth = new SimpleDateFormat("yyyy_MM").format(calender.getTime()); //example passes 2016_01
 
         if(entityType.equals( CommonConstants.COMPANY_ID_COLUMN )){
+        	LOG.debug( "Calling method for fetching Completion Rate for company {}",entityId );
             for(SurveyStatsReportCompany SurveyStatsReportCompany : SurveyStatsReportCompanyDao.fetchCompanySurveyStatsById(entityId, startTrxMonth, endTrxMonth ) ){
                 List<Object> list = new ArrayList<>();
                 list.add( SurveyStatsReportCompany.getYear() );
@@ -116,6 +124,7 @@ public class DashboardGraphManagementImpl implements DashboardGraphManagement
                 completionRate.add( list );
             }
         }else if(entityType.equals( CommonConstants.REGION_ID_COLUMN )){
+        	LOG.debug( "Calling method for fetching Completion Rate for region {}",entityId );
             for(SurveyStatsReportRegion SurveyStatsReportRegion : SurveyStatsReportRegionDao.fetchRegionSurveyStatsById(entityId, startTrxMonth, endTrxMonth) ){
                 List<Object> list = new ArrayList<>();
                 list.add( SurveyStatsReportRegion.getYear() );
@@ -125,6 +134,7 @@ public class DashboardGraphManagementImpl implements DashboardGraphManagement
                 completionRate.add( list );
             }
         }else if(entityType.equals( CommonConstants.BRANCH_ID_COLUMN )){
+        	LOG.debug( "Calling method for fetching Completion Rate for branch {}",entityId );
             for(SurveyStatsReportBranch SurveyStatsReportBranch : SurveyStatsReportBranchDao.fetchBranchSurveyStatsById(entityId, startTrxMonth, endTrxMonth ) ){
                 List<Object> list = new ArrayList<>();
                 list.add( SurveyStatsReportBranch.getYear() );
@@ -134,6 +144,7 @@ public class DashboardGraphManagementImpl implements DashboardGraphManagement
                 completionRate.add( list );
             }
         }else if(entityType.equals( CommonConstants.AGENT_ID_COLUMN )){
+        	LOG.debug( "Calling method for fetching Completion Rate for user {}",entityId );
             for(SurveyStatsReportUser SurveyStatsReportUser : SurveyStatsReportUserDao.fetchUserSurveyStatsById( entityId, startTrxMonth, endTrxMonth ) ){
                 List<Object> list = new ArrayList<>();
                 list.add( SurveyStatsReportUser.getYear() );
@@ -143,6 +154,9 @@ public class DashboardGraphManagementImpl implements DashboardGraphManagement
                 completionRate.add( list );
             }
         }
+        
+        LOG.info("Method for getting completion Rate for Completion Rate graph, getCompletionRate() has finished");
+
         return completionRate;
     }
 }

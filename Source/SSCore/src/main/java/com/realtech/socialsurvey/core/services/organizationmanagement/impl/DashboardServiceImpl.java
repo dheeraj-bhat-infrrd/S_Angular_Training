@@ -218,12 +218,14 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         throws InvalidInputException
     {
         LOG.info(
-            "Get all survey count for " + columnName + " and value " + columnValue + " with number of days: " + numberOfDays );
+            "Get all survey count for {} and value {} with number of days: {}", columnName, columnValue, numberOfDays );
 
         if ( columnName == null || columnName.isEmpty() ) {
+            LOG.warn( "Wrong input parameter : passed input parameter column name is null or empty" );
             throw new InvalidInputException( "Wrong input parameter : passed input parameter column name is null or empty" );
         }
         if ( columnValue <= 0l ) {
+            LOG.warn( "Wrong input parameter : passed input parameter column value is invalid" );
             throw new InvalidInputException( "Wrong input parameter : passed input parameter column value is invalid" );
         }
 
@@ -268,8 +270,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                 startDate, endDate, agentIds );
         }
         //JIRA SS-1350 end
-        LOG.debug( "Completed survey: " + completedSurveyCount );
-        LOG.debug( "Incomplete survey: " + incompleteSurveyCount );
+        LOG.debug( "Completed survey: {}" , completedSurveyCount );
+        LOG.debug( "Incomplete survey: {}" , incompleteSurveyCount );
         return completedSurveyCount + incompleteSurveyCount;
     }
 
@@ -277,13 +279,14 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     @Override
     public long getCompleteSurveyCount( String columnName, long columnValue, int numberOfDays ) throws InvalidInputException
     {
-        LOG.info( "Get completed survey count for " + columnName + " and value " + columnValue + " with number of days: "
-            + numberOfDays );
+        LOG.info( "Get completed survey count for {} and value {} with number of days: {}", columnName, columnValue, numberOfDays );
 
         if ( columnName == null || columnName.isEmpty() ) {
+            LOG.warn( "Wrong input parameter : passed input parameter column name is null or empty" );
             throw new InvalidInputException( "Wrong input parameter : passed input parameter column name is null or empty" );
         }
         if ( columnValue <= 0l ) {
+            LOG.warn( "Wrong input parameter : passed input parameter column value is invalid" );
             throw new InvalidInputException( "Wrong input parameter : passed input parameter column value is invalid" );
         }
 
@@ -327,9 +330,11 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         throws InvalidInputException
     {
         if ( columnName == null || columnName.isEmpty() ) {
+            LOG.warn( "Wrong input parameter : passed input parameter column name is null or empty" );
             throw new InvalidInputException( "Wrong input parameter : passed input parameter column name is null or empty" );
         }
         if ( columnValue <= 0l ) {
+            LOG.warn( "Wrong input parameter : passed input parameter column value is invalid" );
             throw new InvalidInputException( "Wrong input parameter : passed input parameter column value is invalid" );
         }
 
@@ -342,9 +347,11 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         throws InvalidInputException
     {
         if ( columnName == null || columnName.isEmpty() ) {
+            LOG.warn( "Wrong input parameter : passed input parameter column name is null or empty" );
             throw new InvalidInputException( "Wrong input parameter : passed input parameter column name is null or empty" );
         }
         if ( columnValue <= 0l ) {
+            LOG.warn( "Wrong input parameter : passed input parameter column value is invalid" );
             throw new InvalidInputException( "Wrong input parameter : passed input parameter column value is invalid" );
         }
 
@@ -357,9 +364,11 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         throws InvalidInputException
     {
         if ( columnName == null || columnName.isEmpty() ) {
+            LOG.warn( "Wrong input parameter : passed input parameter column name is null or empty" );
             throw new InvalidInputException( "Wrong input parameter : passed input parameter column name is null or empty" );
         }
         if ( columnValue <= 0l ) {
+            LOG.warn( "Wrong input parameter : passed input parameter column value is invalid" );
             throw new InvalidInputException( "Wrong input parameter : passed input parameter column value is invalid" );
         }
 
@@ -372,9 +381,11 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         throws InvalidInputException
     {
         if ( columnName == null || columnName.isEmpty() ) {
+            LOG.warn( "Wrong input parameter : passed input parameter column name is null or empty" );
             throw new InvalidInputException( "Wrong input parameter : passed input parameter column name is null or empty" );
         }
         if ( columnValue <= 0l ) {
+            LOG.warn( "Wrong input parameter : passed input parameter column name is null or empty" );
             throw new InvalidInputException( "Wrong input parameter : passed input parameter column value is invalid" );
         }
         return surveyDetailsDao.getRatingForPastNdays( columnName, columnValue, numberOfDays, false, realtechAdmin, false, 0,
@@ -386,18 +397,22 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     public int getProfileCompletionPercentage( User user, String columnName, long columnValue,
         OrganizationUnitSettings organizationUnitSettings ) throws InvalidInputException
     {
-        LOG.info( "Method to calculate profile completion percentage started." );
+        LOG.debug( "Method to calculate profile completion percentage started" );
 
         if ( columnName == null || columnName.isEmpty() ) {
+            LOG.warn( "Wrong input parameter : passed input parameter column name is null or empty" );
             throw new InvalidInputException( "Wrong input parameter : passed input parameter column name is null or empty" );
         }
         if ( columnValue <= 0l ) {
+            LOG.warn( "Wrong input parameter : passed input parameter column value is invalid" );
             throw new InvalidInputException( "Wrong input parameter : passed input parameter column value is invalid" );
         }
         if ( user == null ) {
+            LOG.warn( "Wrong input parameter : passed input parameter user is null" );
             throw new InvalidInputException( "Wrong input parameter : passed input parameter user is null" );
         }
         if ( organizationUnitSettings == null ) {
+            LOG.warn( "Wrong input parameter : passed input parameter organizationUnitSettings is null" );
             throw new InvalidInputException(
                 "Wrong input parameter : passed input parameter organizationUnitSettings is null" );
         }
@@ -432,11 +447,11 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
             if ( organizationUnitSettings.getContact_details().getTitle() != null )
                 currentWeight += weightageColumns.get( "title" );
         }
-        LOG.info( "Method to calculate profile completion percentage finished." );
+        LOG.debug( "Method to calculate profile completion percentage finished" );
         try {
             return (int) Math.round( currentWeight * 100 / totalWeight );
         } catch ( ArithmeticException e ) {
-            LOG.error( "Exception caught in getProfileCompletionPercentage(). Nested exception is ", e );
+            LOG.error( "Exception caught in getProfileCompletionPercentage()", e );
             return 0;
         }
     }
@@ -462,8 +477,9 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     public int getBadges( double surveyScore, int surveyCount, int socialPosts, int profileCompleteness )
         throws InvalidInputException
     {
-        LOG.info( "Method to calculate number of badges started." );
+        LOG.debug( "Method to calculate number of badges started" );
         if ( surveyScore < 0 || surveyCount < 0 || socialPosts < 0 || profileCompleteness < 0 ) {
+            LOG.warn( "Invalid input parameter : should not be less than zero" );
             throw new InvalidInputException( "Invalid input parameter : should not be less than zero" );
         }
 
@@ -484,7 +500,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
             badges = 2;
         else
             badges = 3;
-        LOG.info( "Method to calculate number of badges finished." );
+        LOG.debug( "Method to calculate number of badges finished." );
         return badges;
     }
 
@@ -494,13 +510,14 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     public Map<String, Map<Integer, Integer>> getSurveyDetailsForGraph( String columnName, long columnValue, int numberOfDays,
         boolean realtechAdmin ) throws ParseException, InvalidInputException
     {
-        LOG.info( "Getting survey details for graph for " + columnName + " with value " + columnValue + " for number of days "
-            + numberOfDays + ". Reatech admin flag: " + realtechAdmin );
+        LOG.info( "Getting survey details for graph for {} with value {} for number of days {}. Reatech admin flag: {}", columnName, columnValue, numberOfDays, realtechAdmin );
 
         if ( columnName == null || columnName.isEmpty() ) {
+            LOG.warn( "Wrong input parameter : passed input parameter column name is null or empty" );
             throw new InvalidInputException( "Wrong input parameter : passed input parameter column name is null or empty" );
         }
         if ( columnValue <= 0l ) {
+            LOG.warn( "Wrong input parameter : passed input parameter column value is invalid" );
             throw new InvalidInputException( "Wrong input parameter : passed input parameter column value is invalid" );
         }
 
@@ -835,13 +852,14 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     public long getZillowImportCount( String columnName, long columnValue, int numberOfDays ) throws InvalidInputException
     {
 
-        LOG.info( "Get completed survey count for " + columnName + " and value " + columnValue + " with number of days: "
-            + numberOfDays );
+        LOG.info( "Get completed survey count for {} and value {} with number of days: {}", columnName, columnValue, numberOfDays );
 
         if ( columnName == null || columnName.isEmpty() ) {
+            LOG.warn( "Wrong input parameter : passed input parameter column name is null or empty" );
             throw new InvalidInputException( "Wrong input parameter : passed input parameter column name is null or empty" );
         }
         if ( columnValue <= 0l ) {
+            LOG.warn( "Wrong input parameter : passed input parameter column value is invalid" );
             throw new InvalidInputException( "Wrong input parameter : passed input parameter column value is invalid" );
         }
 
@@ -868,12 +886,13 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
     @Override
     public long get3rdPartyImportCount( String columnName, long columnValue, int numberOfDays ) throws InvalidInputException
     {
-        LOG.info( "Get get3rdPartyImportCount for " + columnName + " and value " + columnValue + " with number of days: "
-            + numberOfDays );
+        LOG.info( "Get get3rdPartyImportCount for {} and value {} with number of days: {}", columnName, columnValue,  numberOfDays );
         if ( columnName == null || columnName.isEmpty() ) {
+            LOG.warn( "Wrong input parameter : passed input parameter column name is null or empty" );
             throw new InvalidInputException( "Wrong input parameter : passed input parameter column name is null or empty" );
         }
         if ( columnValue <= 0l ) {
+            LOG.warn( "Wrong input parameter : passed input parameter column value is invalid" );
             throw new InvalidInputException( "Wrong input parameter : passed input parameter column value is invalid" );
         }
         Calendar startTime = Calendar.getInstance();

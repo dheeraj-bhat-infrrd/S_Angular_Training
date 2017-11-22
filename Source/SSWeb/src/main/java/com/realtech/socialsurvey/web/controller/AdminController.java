@@ -106,6 +106,7 @@ public class AdminController
     @RequestMapping ( value = "/deletecompany")
     public @ResponseBody String deleteCompanyInformation( @RequestParam long companyId )
     {
+        LOG.info( "Inside deleteCompanyInformation() method in admin controller" );
         Company company = organizationManagementService.getCompanyById( companyId );
         String message = CommonConstants.SUCCESS_ATTRIBUTE;
 
@@ -126,7 +127,7 @@ public class AdminController
                     }
 
                 } catch ( InvalidInputException | SubscriptionCancellationUnsuccessfulException e ) {
-                    LOG.error( "Exception Caught " + e.getMessage() );
+                    LOG.error( "Exception Caught {}", e.getMessage() );
                     message = CommonConstants.ERROR;
                 }
 
@@ -136,9 +137,13 @@ public class AdminController
                 try {
                     organizationManagementService.purgeCompany( company );
                 } catch ( InvalidInputException e ) {
-                    LOG.error( "An error occurred while purging company : " + companyId + ". Reason : ", e );
+                    if(LOG.isErrorEnabled()){
+                        LOG.error( "An error occurred while purging company : {}",companyId, e );
+                    }
                 } catch ( SolrException e ) {
-                    LOG.error( "An error occurred while purging company : " + companyId + ". Reason : ", e );
+                    if(LOG.isErrorEnabled()){
+                        LOG.error( "An error occurred while purging company : {}",companyId, e );
+                    }
                 }
 
             }
@@ -152,8 +157,6 @@ public class AdminController
     {
 
         LOG.info( "Inside adminHierarchyPage() method in admin controller" );
-        /*List<OrganizationUnitSettings> companies = organizationManagementService.getAllActiveCompaniesFromMongo();
-        model.addAttribute("companyList", companies);*/
         return JspResolver.ADMIN_HIERARCHY_VIEW;
     }
 
@@ -233,7 +236,7 @@ public class AdminController
                         }
                     }
                 }
-                LOG.error( "No records found for company branch or region, reason : " + e.getMessage() );
+                LOG.warn( "No records found for company branch or region. Reason: {}", e.getMessage() );
                 model.addAttribute( "message",
                     messageUtils
                         .getDisplayMessage( DisplayMessageConstants.COMPANY_NOT_REGISTERD, DisplayMessageType.SUCCESS_MESSAGE )
@@ -242,29 +245,12 @@ public class AdminController
                 return JspResolver.ADMIN_COMPANY_NOT_REGISTERED;
             }
             model.addAttribute( "companyObj", company );
-
-            //add profile image url
-            /*for(RegionFromSearch region : regions){
-                OrganizationUnitSettings regionSetting =  organizationManagementService.getRegionSettings( region.getRegionId() );
-                region.setProfileImageUrl( regionSetting.getProfileImageUrl() );
-            }
-            
-            for(BranchFromSearch branch : branches){
-                OrganizationUnitSettings branchSetting =  organizationManagementService.getBranchSettingsDefault( branch.getBranchId() );
-                branch.setProfileImageUrl( branchSetting.getProfileImageUrl() );
-            }
-            
-            for(UserFromSearch user : users){
-                OrganizationUnitSettings userSetting =  organizationManagementService.getAgentSettings( user.getUserId() );
-                user.setProfileImageUrl( userSetting.getProfileImageUrl() );
-            }*/
-
             model.addAttribute( "regions", regions );
             model.addAttribute( "branches", branches );
             model.addAttribute( "individuals", users );
 
         } catch ( NonFatalException e ) {
-            LOG.error( "NonFatalException while fetching hierarchy view list main page Reason : " + e.getMessage(), e );
+            LOG.error( "NonFatalException while fetching hierarchy view list main page", e );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
@@ -323,7 +309,7 @@ public class AdminController
             model.addAttribute( "companyStatus", companyStatus );
 
         } catch ( NonFatalException e ) {
-            LOG.error( "NonFatalException while fetching hierarchy view list main page Reason : " + e.getMessage(), e );
+            LOG.error( "NonFatalException while fetching hierarchy view list main page.", e );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
@@ -352,7 +338,7 @@ public class AdminController
             model.addAttribute( "regions", regions );
 
         } catch ( NonFatalException e ) {
-            LOG.error( "NonFatalException while fetching hierarchy view list main page Reason : " + e.getMessage(), e );
+            LOG.error( "NonFatalException while fetching hierarchy view list main page.", e );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
@@ -380,7 +366,7 @@ public class AdminController
             model.addAttribute( "branches", branches );
 
         } catch ( NonFatalException e ) {
-            LOG.error( "NonFatalException while fetching hierarchy view list main page Reason : " + e.getMessage(), e );
+            LOG.error( "NonFatalException while fetching hierarchy view list main page. ", e );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
@@ -408,7 +394,7 @@ public class AdminController
             model.addAttribute( "users", usersList );
 
         } catch ( NonFatalException e ) {
-            LOG.error( "NonFatalException while fetching hierarchy view list main page Reason : " + e.getMessage(), e );
+            LOG.error( "NonFatalException while fetching hierarchy view list main page.", e );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
@@ -434,24 +420,24 @@ public class AdminController
                     "Error while parsing regionId in fetchHierarchyViewBranches.Reason : " + e.getMessage(),
                     DisplayMessageConstants.GENERAL_ERROR, e );
             }
-            LOG.debug( "Fetching branches for region id : " + regionId );
+            LOG.debug( "Fetching branches for region id : {}", regionId );
             branches = organizationManagementService.getBranchesByRegionId( regionId );
 
             Set<Long> regionIds = new HashSet<Long>();
             regionIds.add( regionId );
-            LOG.debug( "Fetching users under region:" + regionId );
+            LOG.debug( "Fetching users under region:{}", regionId );
             List<UserFromSearch> users = organizationManagementService.getUsersUnderRegionFromSolr( regionIds, start, rows );
 
             model.addAttribute( "branches", branches );
             model.addAttribute( "individuals", users );
             model.addAttribute( "regionId", regionId );
         } catch ( NonFatalException e ) {
-            LOG.error( "NonFatalException while fetching branches in a region . Reason : " + e.getMessage(), e );
+            LOG.error( "NonFatalException while fetching branches in a region.", e );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
         }
-        LOG.info( "Method fetchHierarchyViewBranches finished in controller. Returning : " + branches );
+        LOG.info( "Method fetchHierarchyViewBranches finished in controller. Returning : {}", branches );
         return JspResolver.ADMIN_REGION_HIERARCHY;
     }
 
@@ -477,7 +463,7 @@ public class AdminController
             Collection<UserFromSearch> usersResult = solrSearchService.searchUsersByIden( branchId,
                 CommonConstants.BRANCHES_SOLR, false, start, userCount );
             String usersJson = new Gson().toJson( usersResult );
-            LOG.debug( "Solr result returned for users of branch is:" + usersJson );
+            LOG.debug( "Solr result returned for users of branch is:{}", usersJson );
             /**
              * convert users to Object
              */
@@ -488,7 +474,7 @@ public class AdminController
             model.addAttribute( "branchId", branchId );
             model.addAttribute( "regionId", strRegionId );
         } catch ( NonFatalException e ) {
-            LOG.error( "NonFatalException while fetching users in a branch . Reason : " + e.getMessage(), e );
+            LOG.error( "NonFatalException while fetching users in a branch.", e );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
@@ -542,7 +528,7 @@ public class AdminController
             sessionHelper.loginAdminAs( newUser.getLoginName(), CommonConstants.BYPASS_PWD );
 
         } catch ( NonFatalException e ) {
-            LOG.error( "NonFatalException occurred in loginAdminAsUser(), reason : " + e.getMessage() );
+            LOG.error( "NonFatalException occurred in loginAdminAsUser().",e);
         }
         return "success";
     }
@@ -579,7 +565,7 @@ public class AdminController
             }
             sessionHelper.loginAdminAs( adminUser.getLoginName(), CommonConstants.BYPASS_PWD );
         } catch ( NonFatalException e ) {
-            LOG.error( "Exception occurred in switchToAdminUser() method , reason : " + e.getMessage() );
+            LOG.error( "Exception occurred in switchToAdminUser() method.", e );
             return "failure";
         }
         return "success";
@@ -717,7 +703,7 @@ public class AdminController
                 .getDisplayMessage( DisplayMessageConstants.SUCCESSFULLY_CREATED_SS_ADMIN, DisplayMessageType.SUCCESS_MESSAGE )
                 .getMessage();
         } catch ( NonFatalException e ) {
-            LOG.error( "NonFatalException while adding a social survey admin. Reason : " + e.getMessage(), e );
+            LOG.error( "NonFatalException while adding a social survey admin.", e );
             isCreated = false;
             message = e.getMessage();
         }
@@ -743,7 +729,7 @@ public class AdminController
 
             User admin = sessionHelper.getCurrentUser();
             if ( admin == null ) {
-                LOG.error( "No user found in session" );
+                LOG.warn( "No user found in session" );
                 throw new InvalidInputException( "No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION );
             }
 
@@ -754,7 +740,7 @@ public class AdminController
 
 
         } catch ( NonFatalException nonFatalException ) {
-            LOG.error( "NonFatalException while searching for user id. Reason : " + nonFatalException.getStackTrace(),
+            LOG.error( "NonFatalException while searching for user id" ,
                 nonFatalException );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
@@ -783,7 +769,7 @@ public class AdminController
             }
             User admin = sessionHelper.getCurrentUser();
             if ( admin == null ) {
-                LOG.error( "No user found in session" );
+                LOG.warn( "No user found in session" );
                 throw new InvalidInputException( "No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION );
             }
 
@@ -791,7 +777,7 @@ public class AdminController
 
 
         } catch ( NonFatalException nonFatalException ) {
-            LOG.error( "NonFatalException while searching for user id. Reason : " + nonFatalException.getStackTrace(),
+            LOG.error( "NonFatalException while searching for user id",
                 nonFatalException );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
@@ -882,8 +868,7 @@ public class AdminController
             LOG.info( "Method to get updateUserApiKeyStatus() ended." );
 
         } catch ( NonFatalException nonFatalException ) {
-            LOG.error( "NonFatalException while updateUserApiKeyStatus. Reason : " + nonFatalException.getStackTrace(),
-                nonFatalException );
+            LOG.error( "NonFatalException while updateUserApiKeyStatus.", nonFatalException );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;

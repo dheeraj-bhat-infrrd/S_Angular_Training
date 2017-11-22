@@ -1,13 +1,11 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +14,6 @@ import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.ScoreStatsQuestionBranchDao;
 import com.realtech.socialsurvey.core.entities.ScoreStatsQuestionBranch;
-import com.realtech.socialsurvey.core.entities.ScoreStatsQuestionCompany;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 
 @Component
@@ -24,9 +21,10 @@ public class ScoreStatsQuestionBranchDaoImpl extends GenericReportingDaoImpl<Sco
 
 	private static final Logger LOG = LoggerFactory.getLogger( ScoreStatsQuestionBranchDaoImpl.class );
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<ScoreStatsQuestionBranch> fetchScoreStatsQuestionForBranch(Long branchId , int startMonth, int startYear , int endMonth , int endYear) {
-		LOG.info( "Method to fetch all the score stats question for branch,fetchScoreStatsQuestionForBranch() started." );
+		LOG.debug( "Method to fetch all the score stats question for branch,fetchScoreStatsQuestionForBranch() started." );
         Criteria criteria = getSession().createCriteria( ScoreStatsQuestionBranch.class );
         try {
             criteria.add( Restrictions.eq( CommonConstants.BRANCH_ID_COLUMN, branchId ) );
@@ -45,11 +43,11 @@ public class ScoreStatsQuestionBranchDaoImpl extends GenericReportingDaoImpl<Sco
             criteria.addOrder( Order.asc( CommonConstants.YEAR_VAL ) );
             criteria.addOrder( Order.asc( CommonConstants.MONTH_VAL ) );
             
-            LOG.info( "Method to fetch all the score stats question for branch,fetchScoreStatsQuestionForBranch() finished." );
+            LOG.debug( "Method to fetch all the score stats question for branch,fetchScoreStatsQuestionForBranch() finished." );
 
             return (List<ScoreStatsQuestionBranch>) criteria.list();
         } catch ( HibernateException hibernateException ) {
-            LOG.error( "Exception caught in fetchScoreStatsQuestionForBranch() ", hibernateException );
+            LOG.warn( "Exception caught in fetchScoreStatsQuestionForBranch() ", hibernateException );
             throw new DatabaseException( "Exception caught in fetchScoreStatsQuestionForBranch() ", hibernateException );
         }
 
