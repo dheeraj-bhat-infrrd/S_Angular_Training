@@ -2269,14 +2269,3 @@ function processTwitterTextForSingleReview(){
 }
 
 
-function copyIndividualReviewUrlToClipboard(loop){
-	
-	var message;
-	if(loop == -1 ){
-		message = $('#permalink_url_btn').val();
-	} else{ 
-		message = $('#permalink_url_' + loop).val();
-	}
-	copyToClipboard( message, "Review URL copied to clipboard.", "Unable to copy to clipboard.");	
-}
-
