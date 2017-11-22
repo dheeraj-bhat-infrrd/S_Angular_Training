@@ -635,7 +635,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 queries.put( CommonConstants.PROFILE_MASTER_COLUMN,
                     userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID ) );
                 queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
-                adminMap.put( CommonConstants.COMPANY_COLUMN, userProfileDao.findByKeyValue( UserProfile.class, queries ) );
+                adminMap.put( CommonConstants.COMPANY_ID_COLUMN, userProfileDao.findByKeyValue( UserProfile.class, queries ) );
             }
         }
 
@@ -643,8 +643,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             processAdminListForAHierarchy( adminMap.get( CommonConstants.BRANCH_ID_COLUMN ) ) );
         adminsHierarchyMap.put( CommonConstants.REGION_ID_COLUMN,
             processAdminListForAHierarchy( adminMap.get( CommonConstants.REGION_ID_COLUMN ) ) );
-        adminsHierarchyMap.put( CommonConstants.COMPANY_COLUMN,
-            processAdminListForAHierarchy( adminMap.get( CommonConstants.COMPANY_COLUMN ) ) );
+        adminsHierarchyMap.put( CommonConstants.COMPANY_ID_COLUMN,
+            processAdminListForAHierarchy( adminMap.get( CommonConstants.COMPANY_ID_COLUMN ) ) );
 
         return adminsHierarchyMap;
     }

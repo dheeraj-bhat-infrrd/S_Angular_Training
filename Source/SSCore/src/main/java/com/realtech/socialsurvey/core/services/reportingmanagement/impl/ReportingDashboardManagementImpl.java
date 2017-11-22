@@ -2109,6 +2109,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     public List<List<Object>> getUserRankingThisYear( String entityType, Long entityId, int year, int startIndex,
         int batchSize )
     {
+        LOG.info( "function to getUserRankingThisYear based on entityType: {} , entityId: {} started ",entityType,entityId );
         List<List<Object>> userRanking = new ArrayList<>();
 
         if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
@@ -2166,6 +2167,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 userRanking.add( userRankingThisYearBranchList );
             }
         }
+        LOG.info( "function to getUserRankingThisYear based on ended");
+
         return userRanking;
     }
 
@@ -2929,7 +2932,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     @Override
     public List<List<Object>> getScoreStatsForQuestion( Long entityId, String entityType, int currentMonth, int currentYear )
     {
-
+    	LOG.debug("Service method call for get score stats for questions.");
         List<List<Object>> scoreStatsForQuestion = new ArrayList<>();
         int startMonth = 0;
         int startYear = currentYear - 1;
@@ -2992,9 +2995,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 scoreStatsQuestionUserList.add( averageScore );
                 scoreStatsForQuestion.add( scoreStatsQuestionUserList );
             }
-
         }
-
         return scoreStatsForQuestion;
     }
 

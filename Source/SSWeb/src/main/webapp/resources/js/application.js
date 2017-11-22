@@ -6934,6 +6934,7 @@ function paintSurveyPage(jsonData) {
 	agentFullProfileLink = jsonData.responseJSON.agentFullProfileLink;
 	fb_app_id = jsonData.responseJSON.fbAppId;
 	google_plus_app_id = jsonData.responseJSON.googlePlusAppId;
+	surveyId = jsonData.responseJSON.surveyId;
 
 	// If social token availiable populate the links
 	// if (googleEnabled) {
@@ -6943,7 +6944,7 @@ function paintSurveyPage(jsonData) {
 	// } else {
 	// $('#ggl-btn').remove();
 	// }
-	$('#google-btn').attr("href", "https://plus.google.com/share?url=" + agentFullProfileLink);
+	$('#google-btn').attr("href", "https://plus.google.com/share?url=" + agentFullProfileLink + "/" + surveyId );
 
 	//SS-1452 remove yelp from all the pages
 	/*if (yelpEnabled) {
@@ -7358,20 +7359,20 @@ function showMasterQuestionPage() {
 		$("div[data-ques-type]").hide();
 		$("div[data-ques-type='error']").show();
 		if(!hiddenSection){
-			$('#profile-link').html('View ' + agentName + '\'s profile at <a href="' + agentFullProfileLink + '" target="_blank">' + agentFullProfileLink + '</a>');
+			$('#profile-link').html('View ' + agentName + '\'s profile at <a href="' + agentFullProfileLink + "/" + surveyId + '" target="_blank">' + agentFullProfileLink + '</a>');
 		}
 		
 		var fmt_rating = Number(rating).toFixed(1);
 		$('#linkedin-btn').attr("href", "https://www.linkedin.com/shareArticle?mini=true&url=" + agentFullProfileLink + "/" + surveyId + "&title=&summary=" + fmt_rating + "-star response from " + firstName + " " + getInitials( lastName ) + " for " + agentName + " at SocialSurvey - " + feedback + ".&source=");
 		var twitterFeedback = feedback;
-		if (twitterFeedback.length > 109) {
-			twitterFeedback = twitterFeedback.substring(0, 70);
+		if (twitterFeedback.length > 180) {
+			twitterFeedback = twitterFeedback.substring(0, 176);
 			twitterFeedback = twitterFeedback + "...";
 		} else {
 			twitterFeedback = feedback;
 		}
-		$('#twitter-btn').attr("href", "https://twitter.com/intent/tweet?text=" + fmt_rating + "-star response from " + firstName + " " + getInitials( lastName ) + " for " + agentName + " at SocialSurvey - " + twitterFeedback + "&url='" + agentFullProfileLink + "'");
-		$('#fb-btn').attr("href", "https://www.facebook.com/dialog/share?app_id=" + fb_app_id + "&href=" + agentFullProfileLink + "&quote=" + fmt_rating + "-star response from " + firstName + " " + getInitials( lastName ) + " for " + agentName + " at SocialSurvey - " + feedback + "&redirect_uri=https://www.facebook.com");
+		$('#twitter-btn').attr("href", "https://twitter.com/intent/tweet?text=" + fmt_rating + "-star response from " + firstName + " " + getInitials( lastName ) + " for " + agentName + " at SocialSurvey - " + twitterFeedback + "&url='" + agentFullProfileLink+ "/" + surveyId + "'");
+		$('#fb-btn').attr("href", "https://www.facebook.com/dialog/share?app_id=" + fb_app_id + "&href=" + agentFullProfileLink + "/" + surveyId + "&quote=" + fmt_rating + "-star response from " + firstName + " " + getInitials( lastName ) + " for " + agentName + " at SocialSurvey - " + feedback + "&redirect_uri=https://www.facebook.com");
 
 		$('#content-head').html('Survey Completed');
 		if (mood == 'Great')
@@ -8288,6 +8289,12 @@ $(document).on('blur', '#prof-basic-container input', function() {
 });
 
 function callBackUpdateBasicDetails(data) {
+	var profileMasterId = $('#gmb-data').attr('data-profile-master-id');
+	if(profileMasterId == 1){
+		var companyName = $('#prof-name').val().trim();
+		$('#gmb-data').attr('data-companyName',companyName);
+	}
+	
 	$('#prof-all-lock').val('locked');
 	$('#prof-message-header').html(data);
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
@@ -11626,10 +11633,10 @@ function twitterDashboardFn(loop, twitterElement) {
 	}
 
 	var length = twitText.length;
-	if (length > 109) {
+	if (length > 180) {
 		var arr = twitLink.split('');
 		var twittStrnDot = "...";
-		var substringed = twitText.substring(0, 105);
+		var substringed = twitText.substring(0, 176);
 		var finalString = substringed.concat(twittStrnDot);
 		if ($("#" + twitId) != undefined) {
 			$("#" + twitId).val(finalString);
@@ -11650,10 +11657,10 @@ function twitterProfileFn(loop, twitterElement) {
 	var twitId = 'twttxt_' + loop;
 	var twitText = $("#" + twitId).val();
 	var length = twitText.length;
-	if (length > 109) {
+	if (length > 180) {
 		var arr = twitLink.split('');
 		var twittStrnDot = "...";
-		var substringed = twitText.substring(0, 105);
+		var substringed = twitText.substring(0, 176);
 		var finalString = substringed.concat(twittStrnDot);
 		$("#" + twitId).val(finalString);
 		twitLink = twitLink.replace(String, finalString);
@@ -13345,11 +13352,11 @@ function paintReviews(result, isRequestFromDashBoard) {
 		reviewsHtml += '		<div class="float-left blue-text ppl-share-shr-txt">Share</div>';
 		reviewsHtml += '		<div class="float-left icn-share icn-plus-open"></div>';
 		reviewsHtml += '		<div class="float-left clearfix ppl-share-social hide">';
-		reviewsHtml += '			<span id ="fb_' + i + '"class="float-left ppl-share-icns icn-fb icn-fb-pp" title="Facebook" data-link="https://www.facebook.com/dialog/share?' + reviewItem.faceBookShareUrl + '&href=' + reviewItem.completeProfileUrl.replace("localhost", "127.0.0.1") + '&quote=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '&redirect_uri=https://www.facebook.com"></span>';
+		reviewsHtml += '			<span id ="fb_' + i + '"class="float-left ppl-share-icns icn-fb icn-fb-pp" title="Facebook" data-link="https://www.facebook.com/dialog/share?' + reviewItem.faceBookShareUrl + '&href=' + reviewItem.completeProfileUrl.replace("localhost", "127.0.0.1") + '/' + reviewItem._id + '&quote=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '&redirect_uri=https://www.facebook.com"></span>';
 		reviewsHtml += '            <input type="hidden" id="twttxt_' + i + '" class ="twitterText_loop" value ="' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '"/></input>';
-		reviewsHtml += '			<span id ="twitt_' + i + '" class="float-left ppl-share-icns icn-twit icn-twit-pp" onclick="twitterFn(' + i + ');" title="Twitter" data-link="https://twitter.com/intent/tweet?text=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + ' &url=' + reviewItem.completeProfileUrl + '"></span>';
+		reviewsHtml += '			<span id ="twitt_' + i + '" class="float-left ppl-share-icns icn-twit icn-twit-pp" onclick="twitterFn(' + i + ');" title="Twitter" data-link="https://twitter.com/intent/tweet?text=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + ' &url=' + reviewItem.completeProfileUrl + '/' + reviewItem._id + '"></span>';
 		reviewsHtml += '			<span class="float-left ppl-share-icns icn-lin icn-lin-pp" title="LinkedIn" data-link="https://www.linkedin.com/shareArticle?mini=true&url=' + reviewItem.completeProfileUrl + '/' + reviewItem._id + '&title=&summary=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '&source="></span>';
-		reviewsHtml += '			<span class="float-left" title="Google+"> <button class="g-interactivepost float-left ppl-share-icns icn-gplus" data-contenturl="' + reviewItem.completeProfileUrl + '" data-clientid="' + reviewItem.googleApi + '"data-cookiepolicy="single_host_origin" data-prefilltext="' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '" data-calltoactionlabel="USE"' + '' + 'data-calltoactionurl=" ' + reviewItem.completeProfileUrl + '"> <span class="icon">&nbsp;</span> <span class="label">share</span> </button> </span>';
+		reviewsHtml += '			<span class="float-left" title="Google+"> <button class="g-interactivepost float-left ppl-share-icns icn-gplus" data-contenturl="' + reviewItem.completeProfileUrl + '/' + reviewItem._id + '" data-clientid="' + reviewItem.googleApi + '"data-cookiepolicy="single_host_origin" data-prefilltext="' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '" data-calltoactionlabel="USE"' + '' + 'data-calltoactionurl=" ' + reviewItem.completeProfileUrl + '/' + reviewItem._id + '"> <span class="icon">&nbsp;</span> <span class="label">share</span> </button> </span>';
 		reviewsHtml += '		</div>';
 		reviewsHtml += '		<div class="float-right" style="margin: 0 -5px;">';
 		if (reviewItem.source != "Zillow")
@@ -13566,90 +13573,29 @@ function getInitials( name ){
     }
 }
 
-var map;
-var service;
-var gmbQuery;
-function getPlaceIds(query){
-	/*var key="AIzaSyAy49K94uo1F2PGylIPcsTEpTCtsDEnK48"
-	var url="https://maps.googleapis.com/maps/api/place/textsearch/json?query="+query+"&key="+key;
-	payload={
-		"query":query,
-		"key":key
-	};
-	
-	$.ajax({
-		url : url,
-		type : "GET",
-		dataType : "jsonp",
-		cache : false,
-		success : function(data) {
-			console.log(data);
-			//console.log(JSON.parse(data));
-		},
-		error : function(e) {
-			isSurveydetailsforgraph = false;
-			if (e.status == 504) {
-				redirectToLoginPageOnSessionTimeOut(e.status);
-				return;
-			}
-			$('#overlay-toast').html(e.responseText);
-			showToast();
+function copyIndividualReviewUrlToClipboard(loop){
+	var message = "";
+	try{
+		var temp = document.createElement( "input" );
+		temp.setAttribute("value",$('#permalink_url_' + loop).val());
+		document.body.appendChild( temp );
+		temp.select();
+		var success = document.execCommand("copy");
+		document.body.removeChild( temp );
+		if( success ){
+			message = "Review URL copied to clipboard.";
+		} else {
+			message = "Unable to copy to clipboard.";
 		}
-	});*/
-	gmbQuery=query;
-	initializeGmb();
+		
+	} catch(error){
+		message = "Unable to access clipboard."
+	}
 	
+	$('#overlay-toast').html(message);
+	showToast();
 }
 
-function initializeGmb() {
-	  var place = new google.maps.LatLng(36.778259,-119.417931);
-	  
-	  map = new google.maps.Map(document.getElementById('gmb-map'), {
-	      center: place,
-	      zoom: 0
-	    });
-	  	var searchQuery = gmbQuery;
-	  var request = {
-	    query: searchQuery
-	  };
-
-	  service = new google.maps.places.PlacesService(map);
-	  service.textSearch(request, callback);
-	}
-
-	function callback(results, status) {
-		var index=1;
-	  if (status == google.maps.places.PlacesServiceStatus.OK) {
-		
-		if(!($('#zero-suggestions-gmb').hasClass('hide'))){
-			$('#zero-suggestions-gmb').addClass('hide');
-		}
-		
-	    for (var i = 0; i < results.length && index<6; i++) {
-	      var place = results[i];
-	      if(i==0){
-	    	  $('#gmb-radio-'+index).removeClass('hide');
-	    	  $('#placeId'+index).attr('value',place.place_id);
-	    	  $('#gmb-address'+index).html(place.name+', '+place.formatted_address);
-	    	  $('#gmb-placeId'+index++).html(place.place_id);
-	    	  $('#gmb-placeId-selected').html(place.place_id);
-	    	  $('#gmb-url-placeId').html("https://search.google.com/local/writereview?placeid="+place.place_id);
-	      }else{
-	    	  $('#gmb-radio-'+index).removeClass('hide');
-	    	  $('#placeId'+index).attr('value',place.place_id);
-	    	  $('#gmb-address'+index).html(place.name+', '+place.formatted_address);
-	    	  $('#gmb-placeId'+index++).html(place.place_id);
-	      }
-	      
-	    }
-	  }else{
-		  if($('#zero-suggestions-gmb').hasClass('hide')){
-			  $('#zero-suggestions-gmb').removeClass('hide');
-		  }
-	  }
-	  
-	}
-	
 function downloadAccountStatsReport(){
 	
 	callAjaxPOST('./downloadaccountstatisticsreport.do', function(data){
@@ -13821,3 +13767,88 @@ function processAndValidateCsvForm(whileUploading){
 $(document).on('click', '#survey-uploader-email', function(){
 	$("#upload-email-invalid").hide();
 })
+
+var map;
+var service;
+var gmbQuery;
+function getPlaceIds(query){
+	/*var key="AIzaSyAy49K94uo1F2PGylIPcsTEpTCtsDEnK48"
+	var url="https://maps.googleapis.com/maps/api/place/textsearch/json?query="+query+"&key="+key;
+	payload={
+		"query":query,
+		"key":key
+	};
+	
+	$.ajax({
+		url : url,
+		type : "GET",
+		dataType : "jsonp",
+		cache : false,
+		success : function(data) {
+			console.log(data);
+			//console.log(JSON.parse(data));
+		},
+		error : function(e) {
+			isSurveydetailsforgraph = false;
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			$('#overlay-toast').html(e.responseText);
+			showToast();
+		}
+	});*/
+	gmbQuery=query;
+	initializeGmb();
+	
+}
+
+function initializeGmb() {
+	  var place = new google.maps.LatLng(36.778259,-119.417931);
+	  
+	  map = new google.maps.Map(document.getElementById('gmb-map'), {
+	      center: place,
+	      zoom: 0
+	    });
+	  	var searchQuery = gmbQuery;
+	  var request = {
+	    query: searchQuery
+	  };
+
+	  service = new google.maps.places.PlacesService(map);
+	  service.textSearch(request, callback);
+	}
+
+	function callback(results, status) {
+		var index=1;
+	  if (status == google.maps.places.PlacesServiceStatus.OK) {
+		
+		if(!($('#zero-suggestions-gmb').hasClass('hide'))){
+			$('#zero-suggestions-gmb').addClass('hide');
+		}
+		
+	    for (var i = 0; i < results.length && index<6; i++) {
+	      var place = results[i];
+	      if(i==0){
+	    	  $('#gmb-radio-'+index).removeClass('hide');
+	    	  $('#placeId'+index).attr('value',place.place_id);
+	    	  $('#gmb-address'+index).html(place.name+', '+place.formatted_address);
+	    	  $('#gmb-placeId'+index++).html(place.place_id);
+	    	  $('#gmb-placeId-selected').html(place.place_id);
+	    	  $('#gmb-url-placeId').html("https://search.google.com/local/writereview?placeid="+place.place_id);
+	      }else{
+	    	  $('#gmb-radio-'+index).removeClass('hide');
+	    	  $('#placeId'+index).attr('value',place.place_id);
+	    	  $('#gmb-address'+index).html(place.name+', '+place.formatted_address);
+	    	  $('#gmb-placeId'+index++).html(place.place_id);
+	      }
+	      
+	    }
+	  }else{
+		  if($('#zero-suggestions-gmb').hasClass('hide')){
+			  $('#zero-suggestions-gmb').removeClass('hide');
+		  }
+	  }
+	  
+	}
+	

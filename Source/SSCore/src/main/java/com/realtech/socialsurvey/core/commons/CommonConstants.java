@@ -1432,4 +1432,18 @@ public interface CommonConstants
     public static final String YEAR = "year";
     
     public static final String SURVEY_MAIL_THRESHOLD = "surveyCompletedMailThreshold";
+
+    public static final String REDIRECT = "redirect:/";
+
+    public static final String COLLECTION_TYPE = "collectionType";
+
+    public static final String AGENT_COLUMN = "agent";
+    
+    public static final String PROFILE_URL = "profileUrl";
+    
+    public static final String OFFICE = "office";
+
+    public static final String GOOGLE_CAPTCHA_RESPONSE = "g-recaptcha-response";
+
+    public static final String INVALID_CAPTCHA = "invalidCaptcha";
 }

@@ -111,12 +111,15 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
             emailEntity.setSenderName( defaultSendName );
         }
         if ( emailEntity.getRecipients() == null || emailEntity.getRecipients().isEmpty() ) {
+        	LOG.warn("No recipients to send mail.");
             throw new InvalidInputException( "No recipients to send mail" );
         }
         if ( emailEntity.getBody() == null || emailEntity.getBody().isEmpty() ) {
+        	LOG.warn("Email body is blank.");
             throw new InvalidInputException( "Email body is blank." );
         }
         if ( emailEntity.getSubject() == null || emailEntity.getSubject().isEmpty() ) {
+        	LOG.warn("Email subject is blank.");
             throw new InvalidInputException( "Email subject is blank." );
         }
         //setting default if null and actual value if it exists in mongo
@@ -132,7 +135,7 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
         }
         List<String> recipients = emailEntity.getRecipients();
         if ( recipients == null || recipients.isEmpty() ) {
-            LOG.error( "Recipient list is empty for sending mail" );
+            LOG.warn( "Recipient list is empty for sending mail" );
             throw new InvalidInputException( "Recipient list is empty for sending mail" );
         }
 
@@ -167,7 +170,7 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
                         email.addAttachment( entry.getKey(), inputStream );
 
                     } catch ( IOException e ) {
-                        LOG.error( "Exception caught " + e.getMessage() );
+                        LOG.error( "Exception caught ",e );
                     } finally {
                         if ( file != null ) {
                             if ( file.exists() ) {
@@ -178,7 +181,7 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
                             try {
                                 fileInputStream.close();
                             } catch ( IOException e ) {
-                                LOG.error( "Exception caught " + e.getMessage() );
+                                LOG.error( "Exception caught ",e );
                             }
                         }
                     }
@@ -188,7 +191,7 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
 
         Response response = null;
         try {
-            LOG.debug( "About to send mail. " + emailEntity.toString() );
+            LOG.debug( "About to send mail. {}", emailEntity.toString() );
             //sets credentials according to account selected
             if(sendEmailThrough.equals( CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_US )){
                 response = sendGrid2.send( email );
@@ -196,16 +199,16 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
                 response = sendGrid1.send( email );
             }
            
-            LOG.debug( "Sent the mail. " + emailEntity.toString() );
+            LOG.debug( "Sent the mail. {}",emailEntity.toString() );
         } catch ( SendGridException e ) {
-            LOG.error( "Exception while sending the mail. " + emailEntity.toString(), e );
+            LOG.error( "Exception while sending the mail. {}", e );
             mailSent = false;
         }
 
         if ( response.getStatus() ) {
-            LOG.debug( "Mail sent successfully to " + emailEntity.toString() );
+            LOG.debug( "Mail sent successfully to {}", emailEntity.toString() );
         } else {
-            LOG.error( "Could not send mail to " + emailEntity.toString() + ". Reason: " + response.getMessage() );
+            LOG.warn( "Could not send mail to {}. Reason: {}",emailEntity.toString(),response.getMessage() );
             mailSent = false;
         }
         return mailSent;
@@ -214,12 +217,13 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
 
     void saveEmail( EmailEntity emailEntity, boolean holdSendingMail ) throws InvalidInputException, UndeliveredEmailException
     {
-        LOG.debug( "Sending mail: " + emailEntity.toString() );
+        LOG.debug( "Sending mail: {}", emailEntity.toString() );
         if ( emailEntity.getRecipients() == null || emailEntity.getRecipients().isEmpty() ) {
+        	LOG.warn("No recipients to send mail.");
             throw new InvalidInputException( "No recipients to send mail" );
         }
         if ( emailEntity.getSenderEmailId() == null || emailEntity.getSenderEmailId().isEmpty() ) {
-            LOG.debug( "Setting default from email id" );
+            LOG.debug( "Setting default from email id." );
             emailEntity.setSenderEmailId( defaultFromAddress );
         }
         if ( emailEntity.getSenderName() == null || emailEntity.getSenderName().isEmpty() ) {
@@ -227,9 +231,11 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
             emailEntity.setSenderName( defaultSendName );
         }
         if ( emailEntity.getBody() == null || emailEntity.getBody().isEmpty() ) {
+        	LOG.warn("Email body is blank.");
             throw new InvalidInputException( "Email body is blank." );
         }
         if ( emailEntity.getSubject() == null || emailEntity.getSubject().isEmpty() ) {
+        	LOG.warn("Email subject is blank.");
             throw new InvalidInputException( "Email subject is blank." );
         }
 
@@ -238,7 +244,7 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
         try {
             emailBinaryObject = utils.serializeObject( emailEntity );
         } catch ( IOException ie ) {
-            LOG.error( "Exception caught " + ie.getMessage() );
+            LOG.error( "Exception caught ",ie );
         }
         if(holdSendingMail){
         	emailObject.setHoldSendingMail(CommonConstants.YES);
@@ -270,15 +276,17 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
         FileContentReplacements messageBodyReplacements, boolean isImmediate, boolean holdSendingMail, boolean sendMailToSalesLead ) throws InvalidInputException,
         UndeliveredEmailException
     {
-        LOG.info( "Method sendEmailWithBodyReplacements called for emailEntity : " + emailEntity + " subjectFileName : "
-            + subjectFileName + " and messageBodyReplacements : " + messageBodyReplacements );
+        LOG.debug( "Method sendEmailWithBodyReplacements called for emailEntity : {} subjectFileName : {} and messageBodyReplacements : {}"
+        		,emailEntity,subjectFileName,messageBodyReplacements  );
 
         // check if mail needs to be sent
         if ( sendMail.equals( CommonConstants.YES_STRING ) ) {
             if ( subjectFileName == null || subjectFileName.isEmpty() ) {
+            	LOG.warn("Subject file name is null for sending mail.");
                 throw new InvalidInputException( "Subject file name is null for sending mail" );
             }
             if ( messageBodyReplacements == null ) {
+            	LOG.warn("Email body file name  and replacements are null for sending mail.");
                 throw new InvalidInputException( "Email body file name  and replacements are null for sending mail" );
             }
 
@@ -304,7 +312,7 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
 
         }
 
-        LOG.info( "Method sendEmailWithBodyReplacements completed successfully" );
+        LOG.debug( "Method sendEmailWithBodyReplacements completed successfully" );
     }
 
 
@@ -379,7 +387,7 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
     @Override
     public void saveEmailInDb( EmailObject emailObject )
     {
-        LOG.info( "Saving Email Object " );
+        LOG.debug( "Saving Email Object " );
         emailDao.saveEmailObjectInDB( emailObject );
 
     }
