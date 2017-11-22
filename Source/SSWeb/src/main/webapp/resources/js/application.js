@@ -8289,6 +8289,12 @@ $(document).on('blur', '#prof-basic-container input', function() {
 });
 
 function callBackUpdateBasicDetails(data) {
+	var profileMasterId = $('#gmb-data').attr('data-profile-master-id');
+	if(profileMasterId == 1){
+		var companyName = $('#prof-name').val().trim();
+		$('#gmb-data').attr('data-companyName',companyName);
+	}
+	
 	$('#prof-all-lock').val('locked');
 	$('#prof-message-header').html(data);
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
