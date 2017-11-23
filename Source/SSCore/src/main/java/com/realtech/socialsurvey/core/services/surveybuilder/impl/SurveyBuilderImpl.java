@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +17,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
-import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.Survey;
@@ -64,12 +65,6 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 	@Autowired
 	private GenericDao<SurveyVerticalMapping, Long> surveyVerticalMappingDao;
 	
-	@Autowired
-	private GenericDao<VerticalsMaster, Integer> verticalsMasterDao;
-
-	@Autowired
-	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
-
 	@Value("${GATEWAY_QUESTION}")
 	private String gatewayQuestion;
 	
@@ -905,6 +900,81 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		
 		LOG.debug("Method checkIfSurveyIsDefaultAndClone completed!");
 		return oldToNewMapping;
+	}
+	
+	public long createSurveyQuestionForExistingSurvey(SurveyQuestionDetails questionDetails, String isUserRankingStr,
+			String isNPSStr, List<String> strAnswers) throws InvalidInputException, NoRecordsFetchedException {
+		LOG.debug("Service method to create the question object to add to existing survey.");
+
+		boolean isUserRanking = false;
+		boolean isNPS = false;
+		
+		User user = new User();
+		user.setUserId(questionDetails.getUserId());
+		Company company = new Company();
+		VerticalsMaster verticalMaster = new VerticalsMaster();
+		verticalMaster.setVerticalsMasterId(questionDetails.getVerticalId());
+		company.setCompanyId(questionDetails.getCompanyId());
+		company.setVerticalsMaster(verticalMaster);
+		user.setCompany(company);
+		
+		String questionType = questionDetails.getQuestionType();
+		if (!StringUtils.isEmpty(isUserRankingStr)) {
+			isUserRanking = Boolean.parseBoolean(isUserRankingStr);
+		}
+		if (!StringUtils.isEmpty(isNPSStr)) {
+			isNPS = Boolean.parseBoolean(isNPSStr);
+		}
+
+		// Check if survey is default one and clone it
+		checkIfSurveyIsDefaultAndClone(user);
+		// Getting the survey for user
+		Survey survey = checkForExistingSurvey(user);
+		if (survey == null) {
+			survey = createNewSurvey(user);
+		}
+
+		if (questionType.indexOf(CommonConstants.QUESTION_RATING) != -1) {
+			questionDetails.setIsRatingQuestion(CommonConstants.QUESTION_RATING_VALUE_TRUE);
+			// will be user ranking ques only if it is a rating ques
+			if (isUserRanking) {
+				questionDetails.setIsUserRankingQuestion(CommonConstants.QUESTION_RATING_VALUE_TRUE);
+
+			} else {
+				questionDetails.setIsUserRankingQuestion(CommonConstants.QUESTION_RATING_VALUE_FALSE);
+			}
+			if (questionType.indexOf(CommonConstants.QUESTION_0to10) != -1 && isNPS) {
+				questionDetails.setIsNPSQuestion(CommonConstants.QUESTION_NPS_FLAG_TRUE);
+			} else {
+				questionDetails.setIsNPSQuestion(CommonConstants.QUESTION_NPS_FLAG_FALSE);
+			}
+		} else {
+			questionDetails.setIsRatingQuestion(CommonConstants.QUESTION_RATING_VALUE_FALSE);
+		}
+		if (questionType.indexOf(CommonConstants.QUESTION_MULTIPLE_CHOICE) != -1) {
+			List<SurveyAnswerOptions> answers = new ArrayList<SurveyAnswerOptions>();
+			//List<String> strAnswers = Arrays.asList(uiAnswers);
+
+			SurveyAnswerOptions surveyAnswerOptions;
+			int answerOrder = 1;
+			for (String answerStr : strAnswers) {
+				if (!answerStr.equals("")) {
+					surveyAnswerOptions = new SurveyAnswerOptions();
+					surveyAnswerOptions.setAnswerText(answerStr);
+					surveyAnswerOptions.setAnswerOrder(answerOrder);
+					answers.add(surveyAnswerOptions);
+
+					answerOrder++;
+				}
+			}
+			if (answerOrder <= 2) {
+				LOG.error("Atleast enter two options");
+				throw new InvalidInputException("Atleast enter two options");
+			}
+			questionDetails.setAnswers(answers);
+		}
+		long surveyQuestionMappingId = addQuestionToExistingSurvey(user, survey, questionDetails);
+		return surveyQuestionMappingId;
 	}
 }
 

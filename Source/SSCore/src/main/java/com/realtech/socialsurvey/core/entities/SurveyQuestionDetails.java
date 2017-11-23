@@ -1,12 +1,18 @@
 package com.realtech.socialsurvey.core.entities;
 
+import java.io.Serializable;
 import java.util.List;
 
 /*
  * This is a POJO class containing all the details of questions and answers related to a survey.
  */
-public class SurveyQuestionDetails {
+public class SurveyQuestionDetails implements Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	private long questionId;
 	private String question;
 	private List<SurveyAnswerOptions> answers;
@@ -15,6 +21,14 @@ public class SurveyQuestionDetails {
 	private int isUserRankingQuestion;
 	private int questionOrder;
 	private String customerResponse;
+	//Extra fields added for NPS and migrating to API call.
+	private boolean isNPSQuestion;
+	private long userId;
+	private long companyId;
+	private int verticalId;
+	private String isUserRankingStr;
+	private String isNPSStr;
+	private List<String> answerStr;
 
 	public long getQuestionId() {
 		return questionId;
@@ -81,4 +95,72 @@ public class SurveyQuestionDetails {
 	public void setCustomerResponse(String customerResponse) {
 		this.customerResponse = customerResponse;
 	}
+
+	public boolean getIsNPSQuestion() {
+		return isNPSQuestion;
+	}
+
+	public void setIsNPSQuestion(boolean isNPSQuestion) {
+		this.isNPSQuestion = isNPSQuestion;
+	}
+
+	public String getIsUserRankingStr() {
+		return isUserRankingStr;
+	}
+
+	public void setIsUserRankingStr(String isUserRankingStr) {
+		this.isUserRankingStr = isUserRankingStr;
+	}
+
+	public String getIsNPSStr() {
+		return isNPSStr;
+	}
+
+	public void setIsNPSStr(String isNPSStr) {
+		this.isNPSStr = isNPSStr;
+	}
+
+	public List<String> getAnswerStr() {
+		return answerStr;
+	}
+
+	public void setAnswerStr(List<String> answerStr) {
+		this.answerStr = answerStr;
+	}
+
+	public long getUserId() {
+		return userId;
+	}
+
+	public void setUserId(long userId) {
+		this.userId = userId;
+	}
+
+	public long getCompanyId() {
+		return companyId;
+	}
+
+	public void setCompanyId(long companyId) {
+		this.companyId = companyId;
+	}
+
+	public int getVerticalId() {
+		return verticalId;
+	}
+
+	public void setVerticalId(int verticalId) {
+		this.verticalId = verticalId;
+	}
+
+	@Override
+	public String toString() {
+		return "SurveyQuestionDetails [questionId=" + questionId + ", question=" + question + ", answers=" + answers
+				+ ", questionType=" + questionType + ", isRatingQuestion=" + isRatingQuestion
+				+ ", isUserRankingQuestion=" + isUserRankingQuestion + ", questionOrder=" + questionOrder
+				+ ", customerResponse=" + customerResponse + ", isNPSQuestion=" + isNPSQuestion + ", userId=" + userId
+				+ ", companyId=" + companyId + ", verticalId=" + verticalId + ", isUserRankingStr=" + isUserRankingStr
+				+ ", isNPSStr=" + isNPSStr + ", answerStr=" + answerStr + "]";
+	}
+
+	
 }

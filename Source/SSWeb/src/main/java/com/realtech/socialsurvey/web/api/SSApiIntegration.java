@@ -1,5 +1,7 @@
 package com.realtech.socialsurvey.web.api;
 
+
+import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
 import com.realtech.socialsurvey.web.api.entities.AccountRegistrationAPIRequest;
 import com.realtech.socialsurvey.web.api.entities.CaptchaAPIRequest;
 import com.realtech.socialsurvey.web.api.entities.VendastaRmCreateRequest;
@@ -185,4 +187,8 @@ public interface SSApiIntegration
     @GET("/v1/getscorestatsquestion")
     Response getScoreStatsQuestion(@Query ("entityId") Long entityId, @Query ("entityType") String entityType, @Query ("currentMonth") int currentMonth, @Query ("currentYear") int currentYear);
     //reporting:END
+
+
+    @POST("/v2/addquestiontosurvey")
+	Response addQuestionToExistingSurvey(@Body SurveyQuestionDetails questionDetails);
 }
