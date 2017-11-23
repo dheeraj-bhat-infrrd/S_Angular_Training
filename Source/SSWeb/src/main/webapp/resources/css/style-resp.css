@@ -665,6 +665,9 @@
     .ppl-share-wrapper{
         line-height: 30px;
     }
+    .sr-share-wrapper {
+		margin-bottom: 5%;
+	}
     
     .float-left.icn-share.icn-plus-open{
         background-size: 24px;
@@ -2823,6 +2826,25 @@
 	
 	.reporting-trans-details{
 		width:100%;
+	}
+	
+	.sr-popup-hdr-details {
+	display: grid !important;
+	padding-left: 7% !important;
+	}
+	
+	.sr-wc-btn-col {
+    margin-right: 5% !important;
+    margin-top: 0.8% !important;
+	}
+	
+	.sr-wc-btn-col-zillow {
+		margin: 1% 28% !important;
+	}
+	
+	.sr-report-review {
+    width: 150px !important;
+    padding-left: 3% !important;
 	}
 }
 

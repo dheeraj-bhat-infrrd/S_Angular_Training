@@ -271,9 +271,8 @@ function drawSpsStatsGraph(){
 													spsChartData[k] = new Array(
 															4);
 												}
-												spsChartData[0] = [ 'SPS',
-														'Detractors',
-														'Passives', 'Promoters' ];
+												spsChartData[0] = [ 'SPS','Detractors',
+														'Passives','Promoters',{ role: 'annotation' } ];
 
 												for (var i = 1; i <= chartData.length; i++) {
 													var monthName = monthNamesList[(chartData[i - 1][1]) - 1];
@@ -285,6 +284,16 @@ function drawSpsStatsGraph(){
 													spsChartData[i][1] = chartData[i - 1][2];
 													spsChartData[i][2] = chartData[i - 1][3];
 													spsChartData[i][3] = chartData[i - 1][4];
+													
+													var totalTransactions = chartData[i - 1][2] + chartData[i - 1][3] + chartData[i - 1][4];
+													var promoters = chartData[i - 1][4];
+													var detractors = chartData[i - 1][2];
+													var spsScore = 0;
+													if(totalTransactions != 0 && totalTransactions != undefined && totalTransactions != null){
+														spsScore = ((promoters - detractors)*100)/totalTransactions;
+													}
+													
+													spsChartData[i][4] = 'SPS: ' + spsScore.toFixed(2);
 												}
 
 												var data = google.visualization
@@ -301,6 +310,18 @@ function drawSpsStatsGraph(){
 															count : 14
 														}
 													},
+													annotations: {
+														   alwaysOutside:true,
+														   style: 'point',
+														          highContrast: 'true',
+														          textStyle: {
+														            align: 'center !important',
+														            fontSize:13,
+														            color:'#000000',
+														            bold: 'true'
+														          },
+														          stem:{length:2}
+															},
 													colors : [ '#E8341F',
 															'#999999',
 															'#7ab400' ]

@@ -40,9 +40,8 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import retrofit.client.Response;
-import retrofit.mime.TypedByteArray;
-
+import com.amazonaws.util.json.JSONException;
+import com.amazonaws.util.json.JSONObject;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -78,6 +77,7 @@ import com.realtech.socialsurvey.core.entities.FacebookPixelToken;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
 import com.realtech.socialsurvey.core.entities.GoogleBusinessToken;
 import com.realtech.socialsurvey.core.entities.GoogleToken;
+import com.realtech.socialsurvey.core.entities.IndividualReviewAggregate;
 import com.realtech.socialsurvey.core.entities.LenderRef;
 import com.realtech.socialsurvey.core.entities.LendingTreeToken;
 import com.realtech.socialsurvey.core.entities.Licenses;
@@ -90,6 +90,7 @@ import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.MiscValues;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileStage;
+import com.realtech.socialsurvey.core.entities.PublicProfileAggregate;
 import com.realtech.socialsurvey.core.entities.RealtorToken;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SettingsDetails;
@@ -112,14 +113,17 @@ import com.realtech.socialsurvey.core.entities.ZillowToken;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
+import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.exception.ProfileRedirectionException;
 import com.realtech.socialsurvey.core.integration.zillow.FetchZillowReviewBody;
 import com.realtech.socialsurvey.core.integration.zillow.FetchZillowReviewBodyByNMLS;
 import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationAgentApi;
 import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationLenderApi;
 import com.realtech.socialsurvey.core.integration.zillow.ZillowIntergrationApiBuilder;
+import com.realtech.socialsurvey.core.services.authentication.CaptchaValidation;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
@@ -139,6 +143,9 @@ import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
+
+import retrofit.client.Response;
+import retrofit.mime.TypedByteArray;
 
 
 @DependsOn ( "generic")
@@ -204,7 +211,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     @Autowired
     private SocialManagementService socialManagementService;
-    
+
     @Autowired
     private SolrSearchService solrSearchService;
 
@@ -229,6 +236,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Autowired
     private SurveyHandler surveyHandler;
 
+    @Autowired
+    private EmailFormatHelper emailFormatHelper;
+
+    @Resource
+    @Qualifier ( "nocaptcha")
+    private CaptchaValidation captchaValidation;
+
     @Value ( "${ZILLOW_WEBSERVICE_ID}")
     private String zwsId;
 
@@ -250,8 +264,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Value ( "${APPLICATION_ADMIN_EMAIL}")
     private String applicationAdminEmail;
 
-    @Autowired
-    private EmailFormatHelper emailFormatHelper;
+    @Value ( "${VALIDATE_CAPTCHA}")
+    private String validateCaptcha;
+
+    @Value ( "${CAPTCHA_SECRET}")
+    private String captchaSecretKey;
 
     //    @Autowired
     //    private ZillowUpdateService zillowUpdateService;
@@ -278,9 +295,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Value ( "${CDN_PATH}")
     private String cdnUrl;
 
-    @Value ( "${FACEBOOK_PIXEL_IMAGE_TAG}" )
+    @Value ( "${FACEBOOK_PIXEL_IMAGE_TAG}")
     private String fbPixelImageTag;
-    
+
     @Autowired
     private ExternalApiCallDetailsDao externalApiCallDetailsDao;
 
@@ -1820,6 +1837,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             iden, startScore, limitScore, startIndex, numOfRows, profileLevel );
         List<SurveyDetails> surveyDetails = null;
         if ( iden <= 0l ) {
+            LOG.warn( "iden is invalid while fetching reviews" );
             throw new InvalidInputException( "iden is invalid while fetching reviews" );
         }
 
@@ -1916,8 +1934,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public double getAverageRatings( long iden, String profileLevel, boolean aggregateAbusive, boolean includeZillow,
         long zillowTotalScore, long zillowReviewCount ) throws InvalidInputException
     {
-        LOG.debug( "Method getAverageRatings called for iden :" + iden + " profilelevel:" + profileLevel );
+        LOG.debug( "Method getAverageRatings called for iden : {} profilelevel: {}", iden, profileLevel );
         if ( iden <= 0l ) {
+            LOG.warn( "iden is invalid for getting average rating os a company" );
             throw new InvalidInputException( "iden is invalid for getting average rating os a company" );
         }
         String idenColumnName = getIdenColumnNameFromProfileLevel( profileLevel );
@@ -1927,7 +1946,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         //get formatted survey score using rating format  
         averageRating = surveyHandler.getFormattedSurveyScore( averageRating );
 
-        LOG.debug( "Method getAverageRatings executed successfully.Returning: " + averageRating );
+        LOG.debug( "Method getAverageRatings executed successfully.Returning: {}", averageRating );
         return averageRating;
     }
 
@@ -1941,9 +1960,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
      */
     String getIdenColumnNameFromProfileLevel( String profileLevel ) throws InvalidInputException
     {
-        LOG.debug( "Getting iden column name for profile level:" + profileLevel );
+        LOG.debug( "Getting iden column name for profile level: {}", profileLevel );
         String idenColumnName = null;
         if ( profileLevel == null || profileLevel.isEmpty() ) {
+            LOG.warn( "profile level is null or empty while getting iden column name" );
             throw new InvalidInputException( "profile level is null or empty while getting iden column name" );
         }
         switch ( profileLevel ) {
@@ -1962,9 +1982,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             case CommonConstants.PROFILE_LEVEL_REALTECH_ADMIN:
                 break;
             default:
+                LOG.warn( "Invalid profile level while getting iden column name" );
                 throw new InvalidInputException( "Invalid profile level while getting iden column name" );
         }
-        LOG.debug( "Returning column name:" + idenColumnName + " for profile level:" + profileLevel );
+        LOG.debug( "Returning column name: {} for profile level {} profileLevel", idenColumnName, profileLevel );
         return idenColumnName;
     }
 
@@ -1986,16 +2007,17 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public long getReviewsCount( long iden, double minScore, double maxScore, String profileLevel, boolean fetchAbusive,
         boolean notRecommended, boolean includeZillow, long zillowReviewCount ) throws InvalidInputException
     {
-        LOG.debug( "Method getReviewsCount called for iden:" + iden + " minscore:" + minScore + " maxscore:" + maxScore
-            + " profilelevel:" + profileLevel );
+        LOG.debug( "Method getReviewsCount called for iden: {}  minscore: {}  maxscore: {}  profilelevel: {}", iden, minScore,
+            maxScore, profileLevel );
         if ( iden <= 0l ) {
+            LOG.warn( "Iden is invalid for getting reviews count" );
             throw new InvalidInputException( "Iden is invalid for getting reviews count" );
         }
         long reviewsCount = 0;
         String idenColumnName = getIdenColumnNameFromProfileLevel( profileLevel );
         reviewsCount = surveyDetailsDao.getFeedBacksCount( idenColumnName, iden, minScore, maxScore, fetchAbusive,
             notRecommended, includeZillow, zillowReviewCount );
-        LOG.debug( "Method getReviewsCount executed successfully. Returning reviewsCount:" + reviewsCount );
+        LOG.debug( "Method getReviewsCount executed successfully. Returning reviewsCount: {}", reviewsCount );
         return reviewsCount;
     }
 
@@ -2246,9 +2268,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public List<SurveyPreInitiation> getIncompleteSurvey( long iden, double startScore, double limitScore, int startIndex,
         int numOfRows, String profileLevel, Date startDate, Date endDate, boolean realtechAdmin ) throws InvalidInputException
     {
-        LOG.debug( "Method getIncompleteSurvey() called for iden:" + iden + " startScore:" + startScore + " limitScore:"
-            + limitScore + " startIndex:" + startIndex + " numOfRows:" + numOfRows + " profileLevel:" + profileLevel );
+        LOG.debug( "Method getIncompleteSurvey() called for iden: {} startScore: {} limitScore:{} startIndex: {} numOfRows: {} profileLevel: {}", iden, startScore, limitScore, startIndex, numOfRows, profileLevel );
         if ( iden <= 0l ) {
+            LOG.warn( "iden is invalid while fetching incomplete reviews" );
             throw new InvalidInputException( "iden is invalid while fetching incomplete reviews" );
         }
         boolean isCompanyAdmin = false;
@@ -2280,9 +2302,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public long getIncompleteSurveyCount( long iden, String profileLevel, Date startDate, Date endDate )
         throws InvalidInputException
     {
-        LOG.debug( "Getting incomplete survey count" );
+        LOG.debug( "Getting incomplete survey count." );
         long count = 0;
         if ( iden <= 0l ) {
+        	LOG.warn("iden is invalid while fetching incomplete reviews.");
             throw new InvalidInputException( "iden is invalid while fetching incomplete reviews" );
         }
         long companyId = -1;
@@ -2795,6 +2818,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                             CommonConstants.COMPANY_SETTINGS_COLLECTION );
                         baseProfileUrl = applicationBaseUrl + CommonConstants.COMPANY_PROFILE_FIXED_URL;
                     } else {
+                        LOG.warn( "The zillow review with ID : {} does not have any hierarchy ID set", review.get_id() );
                         throw new InvalidInputException(
                             "The zillow review with ID : " + review.get_id() + "does not have any hierarchy ID set" );
                     }
@@ -2816,6 +2840,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                             CommonConstants.COMPANY_SETTINGS_COLLECTION );
                         baseProfileUrl = applicationBaseUrl + CommonConstants.COMPANY_PROFILE_FIXED_URL;
                     } else {
+                        LOG.warn( "The Review with ID : {} does not have any hierarchy ID set", review.get_id() );
                         throw new InvalidInputException(
                             "The Review with ID : " + review.get_id() + "does not have any hierarchy ID set" );
                     }
@@ -2827,6 +2852,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     review.setGoogleApi( googleApiKey );
                     review.setFaceBookShareUrl( facebookShareUrl );
                 } else {
+                    LOG.warn( "An agent with ID : {} does not exist", review.getAgentId() );
                     throw new InvalidInputException( "An agent with ID : " + review.getAgentId() + " does not exist" );
                 }
 
@@ -2877,6 +2903,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     Set<Long> getAgentIdsByProfileLevel( String profileLevel, long iden ) throws InvalidInputException
     {
         if ( profileLevel == null || profileLevel.isEmpty() ) {
+        	LOG.warn("profile level is null or empty while getting agents.");
             throw new InvalidInputException( "profile level is null or empty while getting agents" );
         }
         Set<Long> userIds = new HashSet<>();
@@ -2891,6 +2918,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 userIds.add( iden );
                 return userIds;
             default:
+            	LOG.warn("Invalid profile level while getting iden column name.");
                 throw new InvalidInputException( "Invalid profile level while getting iden column name" );
         }
     }
@@ -4677,7 +4705,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 surveyDetails.setSourceId( zillowProfileUrl );
                 surveyDetails.setCompleteProfileUrl( zillowProfileUrl );
                 //ModifiedOn set to current date
-                Date currentDate = new Date(System.currentTimeMillis());
+                Date currentDate = new Date( System.currentTimeMillis() );
                 surveyDetails.setModifiedOn( currentDate );
                 surveyDetails.setCreatedOn( createdDate );
                 surveyDetails.setAgreedToShare( "true" );
@@ -4746,7 +4774,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                             surveyDetails.setSource( CommonConstants.SURVEY_SOURCE_ZILLOW );
                             surveyDetails.setSourceId( sourceId );
                             //ModifiedOn set to current date
-                            Date currentDate = new Date(System.currentTimeMillis());
+                            Date currentDate = new Date( System.currentTimeMillis() );
                             surveyDetails.setModifiedOn( currentDate );
                             surveyDetails.setCreatedOn( convertStringToDate( createdDate ) );
                             surveyDetails.setAgreedToShare( "true" );
@@ -5614,7 +5642,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     try {
                         sortSettings = organizationManagementService.getCompanySettings( companyId ).getReviewSortCriteria();
                     } catch ( InvalidInputException error ) {
-                        LOG.error( "company not found, choosing alternate sort criteria" );
+                        LOG.error( "company not found, choosing alternate sort criteria {}",error );
                     }
                 }
                 if ( sortSettings != "default" ) {
@@ -5671,6 +5699,620 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         LOG.info( "NMLS id : " + nmlsId );
         return nmlsId;
     }
+
+
+    @Override
+    public String buildJsonMessageWithStatus( int status, String message )
+    {
+
+        JSONObject jsonMessage = new JSONObject();
+        String jsonString = null;
+        LOG.debug( "Building json response" );
+        try {
+            jsonMessage.put( CommonConstants.SUCCESS_ATTRIBUTE, status );
+            jsonMessage.put( CommonConstants.MESSAGE, message );
+
+            jsonString = jsonMessage.toString();
+            LOG.debug( "Returning json response : {}", jsonString );
+            return jsonString;
+
+        } catch ( JSONException e ) {
+            LOG.error( "Exception occured while building json response : {}", e.getMessage(), e );
+            return "Exception occured while building json response : " + e.getMessage();
+        }
+    }
+
+
+    @Override
+    public PublicProfileAggregate buildPublicProfileAggregate( PublicProfileAggregate profileAggregate, boolean isBotRequest )
+        throws InvalidInputException, ProfileNotFoundException, InvalidSettingsStateException, NoRecordsFetchedException,
+        ProfileRedirectionException
+    {
+        // null and empty checks
+        profileInputChecks( profileAggregate );
+
+        LOG.debug( "method buildPublicProfileAggregate started for profile: {}", profileAggregate.getProfileName() );
+
+        Map<String, String> profileLevelData = buildBasicProfileLevelData( profileAggregate );
+        String entityId = profileLevelData.get( CommonConstants.ENTITY_ID_COLUMN );
+        String collectionUnderConcern = profileLevelData.get( CommonConstants.COLLECTION_TYPE );
+
+
+        Map<String, OrganizationUnitSettings> profileHierarchyMap = generateProfileHierarchyMap( profileAggregate );
+
+        OrganizationUnitSettings companyProfile = profileHierarchyMap.get( CommonConstants.PROFILE_LEVEL_COMPANY );
+        OrganizationUnitSettings regionProfile = profileHierarchyMap.get( CommonConstants.PROFILE_LEVEL_REGION );
+        OrganizationUnitSettings branchProfile = profileHierarchyMap.get( CommonConstants.PROFILE_LEVEL_BRANCH );
+        AgentSettings individualProfile = (AgentSettings) profileHierarchyMap.get( CommonConstants.PROFILE_LEVEL_INDIVIDUAL );
+        OrganizationUnitSettings profileUnderConcern = profileHierarchyMap.get( profileAggregate.getProfileLevel() );
+
+        // redirection checks while agent profile 
+        checkForProfileRedirection( profileAggregate );
+
+        Map<SettingsForApplication, OrganizationUnit> map = getPrimaryHierarchyByEntity( entityId,
+            profileUnderConcern.getIden() );
+
+        //  migrating the hideSectionsFromProfilePage value from company to profile under concern
+        profileUnderConcern.setHideSectionsFromProfilePage( companyProfile.getHideSectionsFromProfilePage() );
+        profileUnderConcern.setHiddenSection( companyProfile.isHiddenSection() );
+
+        profileUnderConcern = fillUnitSettings( profileUnderConcern, collectionUnderConcern, companyProfile, regionProfile,
+            branchProfile, individualProfile, map, true );
+
+        // aggregated disclaimer
+        if ( ( CommonConstants.REGION_ID.equals( entityId ) || CommonConstants.BRANCH_ID.equals( entityId ) ) ) {
+            String disclaimer = aggregateDisclaimer( profileUnderConcern, entityId );
+            if ( StringUtils.isNotEmpty( disclaimer ) )
+                profileUnderConcern.setDisclaimer( disclaimer );
+        }
+
+        //remove sensitive info from profile JSON from company profile 
+        removeTokensFromProfile( companyProfile );
+
+        //remove sensitive info from profile JSON from profile under concern
+        removeTokensFromProfile( profileUnderConcern );
+
+        // populate profile aggregate
+        profileAggregate.setProfileUrl( profileLevelData.get( CommonConstants.PROFILE_URL ) );
+        profileAggregate.setFindAProCompanyProfileName( companyProfile.getProfileName() );
+        profileAggregate.setProfile( profileUnderConcern );
+        profileAggregate.setProfileJson( new Gson().toJson(
+            profileUnderConcern instanceof AgentSettings ? (AgentSettings) profileUnderConcern : profileUnderConcern ) );
+        profileAggregate
+            .setReviewSortCriteria( processSortCriteria( companyProfile.getIden(), companyProfile.getReviewSortCriteria() ) );
+        profileAggregate.setAverageRating(
+            getAverageRatings( profileUnderConcern.getIden(), profileAggregate.getProfileLevel(), false, false, 0, 0 ) );
+        profileAggregate.setReviewCount( getReviewsCount( profileUnderConcern.getIden(), -1, -1,
+            profileAggregate.getProfileLevel(), false, false, false, 0 ) );
+        profileAggregate.setReviews( isBotRequest
+            ? getReviews( profileUnderConcern.getIden(), -1, -1, -1, CommonConstants.USER_AGENT_NUMBER_REVIEWS,
+                profileAggregate.getProfileLevel(), false, null, null, processSortCriteria( companyProfile.getIden(), null ) )
+            : null );
+
+        // NOTE: It was decided not to show Social posts on the UI. So not fetching anymore.
+
+        // build the individual review aggregate
+        profileAggregate.setReviewAggregate( buildReviewAggregate( profileAggregate ) );
+
+        LOG.debug( "method buildPublicProfileAggregate finished for profile: {}", profileAggregate.getProfileName() );
+        return profileAggregate;
+    }
+
+
+    private IndividualReviewAggregate buildReviewAggregate( PublicProfileAggregate profileAggregate )
+        throws InvalidInputException
+    {
+        LOG.debug( "method individualReviewAggregate() started." );
+
+        if ( StringUtils.isEmpty( profileAggregate.getSurveyId() ) ) {
+            return null;
+        }
+
+        // get the review under concern
+        IndividualReviewAggregate reviewAggregate = validateAndProcessSurveyId( profileAggregate );
+
+
+        LOG.debug( "method individualReviewAggregate() finished." );
+        return reviewAggregate;
+    }
+
+
+    private IndividualReviewAggregate validateAndProcessSurveyId( PublicProfileAggregate profileAggregate )
+        throws InvalidInputException
+    {
+        SurveyDetails review = null;
+        OrganizationUnitSettings unitSettings = null;
+
+        IndividualReviewAggregate reviewAggregate = new IndividualReviewAggregate();
+
+        // get the review
+        review = surveyHandler.getSurveyDetails( profileAggregate.getSurveyId() );
+
+        if ( review == null ) {
+            reviewAggregate.setSurveyIdValid( false );
+            reviewAggregate.setInvalidMessage( "Review under concern was not found." );
+            return reviewAggregate;
+        }
+
+
+        // check if the review belongs to the hierarchy under concern
+        if ( !doesReviewConformToProfileLevel( profileAggregate, review ) ) {
+            reviewAggregate.setSurveyIdValid( false );
+            reviewAggregate.setInvalidMessage( "Review under concern doesn't belong to the underlying profile." );
+            return reviewAggregate;
+        }
+
+        // get the unit settings
+        try {
+            unitSettings = fetchAppropriateUnitSettings( review );
+
+        } catch ( NoRecordsFetchedException error ) {
+            LOG.error( "NoRecordsFetchedException: unable to fetch settings.", error );
+            reviewAggregate.setSurveyIdValid( false );
+            reviewAggregate.setInvalidMessage( "Review under concern is not related any hierarchy." );
+            return reviewAggregate;
+        } catch ( InvalidInputException error ) {
+            LOG.error( "InvalidInputException: unable to fetch settings.", error );
+            reviewAggregate.setSurveyIdValid( false );
+            reviewAggregate.setInvalidMessage( "Unable to come up with hierarchy information." );
+            return reviewAggregate;
+        }
+
+        // set sourceID
+        if ( CommonConstants.SURVEY_SOURCE_ZILLOW.equalsIgnoreCase( review.getSource() )
+            && StringUtils.isEmpty( review.getSourceId() ) ) {
+            review.setSourceId( review.getCompleteProfileUrl() );
+        }
+
+        //This is added to get the agent's APP ID and profile URL 
+        //DO NOT REMOVE!
+        setAgentProfileUrlForReview( Arrays.asList( review ) );
+
+        reviewAggregate.setSurveyIdValid( true );
+        reviewAggregate.setUnitSettings( unitSettings );
+        reviewAggregate.setReview( review );
+        return reviewAggregate;
+
+    }
+
+
+    private OrganizationUnitSettings fetchAppropriateUnitSettings( SurveyDetails review )
+        throws InvalidInputException, NoRecordsFetchedException
+    {
+        LOG.debug( "fetching appropriate unit settings." );
+        if ( review.getAgentId() > 0 ) {
+            return organizationManagementService.getAgentSettings( review.getAgentId() );
+        } else if ( review.getBranchId() > 0 ) {
+            return organizationManagementService.getBranchSettingsDefault( review.getBranchId() );
+        } else if ( review.getRegionId() > 0 ) {
+            return organizationManagementService.getRegionSettings( review.getRegionId() );
+        } else if ( review.getCompanyId() > 0 ) {
+            return organizationManagementService.getCompanySettings( review.getCompanyId() );
+        } else {
+            throw new InvalidInputException( "Unable to find a hierarchy associated with the review." );
+        }
+    }
+
+
+    private boolean doesReviewConformToProfileLevel( PublicProfileAggregate profileAggregate, SurveyDetails review )
+    {
+        if ( CommonConstants.PROFILE_LEVEL_INDIVIDUAL.equals( profileAggregate.getProfileLevel() ) ) {
+            return review.getAgentId() == profileAggregate.getProfile().getIden() ? true : false;
+        } else if ( CommonConstants.PROFILE_LEVEL_BRANCH.equals( profileAggregate.getProfileLevel() ) ) {
+            return review.getBranchId() == profileAggregate.getProfile().getIden() ? true : false;
+        } else if ( CommonConstants.PROFILE_LEVEL_REGION.equals( profileAggregate.getProfileLevel() ) ) {
+            return review.getRegionId() == profileAggregate.getProfile().getIden() ? true : false;
+        } else if ( CommonConstants.PROFILE_LEVEL_COMPANY.equals( profileAggregate.getProfileLevel() ) ) {
+            return review.getCompanyId() == profileAggregate.getProfile().getIden() ? true : false;
+        } else {
+            return false;
+        }
+    }
+
+
+    private void checkForProfileRedirection( PublicProfileAggregate profileAggregate ) throws ProfileRedirectionException
+    {
+        if ( CommonConstants.PROFILE_LEVEL_INDIVIDUAL.equals( profileAggregate.getProfileLevel() ) ) {
+            if ( !profileAggregate.isAgent() ) {
+                LOG.error( "The profile provided indicates that the user is not an agent." );
+                throw new ProfileRedirectionException( "The profile provided indicates that the user is not an agent." );
+            } else if ( profileAggregate.isHiddenSection() ) {
+                LOG.error( "The company settings indicate that hidden flag is set" );
+                throw new ProfileRedirectionException( "The profile to be displayed is hidden indicated by company settings." );
+            }
+        }
+    }
+
+
+    private Map<String, OrganizationUnitSettings> generateProfileHierarchyMap( PublicProfileAggregate profileAggregate )
+        throws ProfileNotFoundException, InvalidInputException, NoRecordsFetchedException
+    {
+        LOG.debug( "method generateProfileHierarchyMap() running." );
+        OrganizationUnitSettings companyProfile = null;
+        OrganizationUnitSettings regionProfile = null;
+        OrganizationUnitSettings branchProfile = null;
+        AgentSettings individualProfile = null;
+
+        Map<String, OrganizationUnitSettings> agentHierarchyMap = null;
+
+        Map<String, OrganizationUnitSettings> profileHierarchyMap = new HashMap<>();
+        Map<String, Long> idHierarchyMap = new HashMap<>();
+
+        /* fetch the necessary profiles */
+
+        // fetch profile agent profile
+        if ( CommonConstants.PROFILE_LEVEL_INDIVIDUAL.equals( profileAggregate.getProfileLevel() ) ) {
+
+            agentHierarchyMap = buildAgentProfileMap( profileAggregate );
+
+            companyProfile = agentHierarchyMap.get( CommonConstants.PROFILE_LEVEL_COMPANY );
+            regionProfile = agentHierarchyMap.get( CommonConstants.PROFILE_LEVEL_REGION );
+            branchProfile = agentHierarchyMap.get( CommonConstants.PROFILE_LEVEL_BRANCH );
+            individualProfile = (AgentSettings) agentHierarchyMap.get( CommonConstants.PROFILE_LEVEL_INDIVIDUAL );
+        }
+
+        else {
+
+            // company profile
+            companyProfile = getCompanyProfileByProfileName( profileAggregate.getCompanyProfileName() );
+
+            boolean doCheckForIncompleteProfile = CommonConstants.PROFILE_LEVEL_COMPANY
+                .equals( profileAggregate.getProfileLevel() );
+            boolean isProfilePageHidden = ( doCheckForIncompleteProfile && companyProfile != null
+                && companyProfile.isHidePublicPage() );
+
+            hierarchySettingsValidityCheck( companyProfile, CommonConstants.COMPANY_COLUMN, profileAggregate.getProfileName(),
+                doCheckForIncompleteProfile, isProfilePageHidden );
+
+            // region profile
+            if ( CommonConstants.PROFILE_LEVEL_REGION.equals( profileAggregate.getProfileLevel() ) ) {
+
+                regionProfile = getRegionSettingsByProfileName( profileAggregate.getCompanyProfileName(),
+                    profileAggregate.getProfileName() );
+                hierarchySettingsValidityCheck( regionProfile, CommonConstants.REGION_COLUMN, profileAggregate.getProfileName(),
+                    true, regionProfile.isHidePublicPage() );
+
+            } else if ( CommonConstants.PROFILE_LEVEL_BRANCH.equals( profileAggregate.getProfileLevel() ) ) {
+
+                // branch profile
+                branchProfile = getBranchSettingsByProfileName( profileAggregate.getCompanyProfileName(),
+                    profileAggregate.getProfileName() );
+                hierarchySettingsValidityCheck( branchProfile, CommonConstants.BRANCH_NAME_COLUMN,
+                    profileAggregate.getProfileName(), true, branchProfile.isHidePublicPage() );
+
+                // region for branch profile
+                regionProfile = getRegionProfileByBranch( branchProfile );
+                hierarchySettingsValidityCheck( regionProfile, CommonConstants.REGION_COLUMN, profileAggregate.getProfileName(),
+                    false, false );
+            }
+        }
+
+        // set the complete profile URLs of hierarchies
+        profileAggregate.setCompleteCompanyProfileUrl( companyProfile.getCompleteProfileUrl() );
+        idHierarchyMap.put( CommonConstants.COMPANY_ID_COLUMN, companyProfile.getIden() );
+
+        if ( regionProfile != null ) {
+            profileAggregate.setCompleteRegionProfileUrl( regionProfile.getCompleteProfileUrl() );
+            idHierarchyMap.put( CommonConstants.REGION_ID_COLUMN, regionProfile.getIden() );
+        }
+
+        if ( branchProfile != null ) {
+            profileAggregate.setCompleteBranchProfileUrl( branchProfile.getCompleteProfileUrl() );
+            idHierarchyMap.put( CommonConstants.BRANCH_ID_COLUMN, branchProfile.getIden() );
+        }
+
+        // IDs required for profile redirection
+        profileAggregate.setHierarchyMap( idHierarchyMap );
+
+        profileHierarchyMap.put( CommonConstants.PROFILE_LEVEL_INDIVIDUAL, individualProfile );
+        profileHierarchyMap.put( CommonConstants.PROFILE_LEVEL_BRANCH, branchProfile );
+        profileHierarchyMap.put( CommonConstants.PROFILE_LEVEL_REGION, regionProfile );
+        profileHierarchyMap.put( CommonConstants.PROFILE_LEVEL_COMPANY, companyProfile );
+
+        return profileHierarchyMap;
+
+    }
+
+
+    private void hierarchySettingsValidityCheck( OrganizationUnitSettings profile, String profileType,
+        String profileUnderConcern, boolean checkForIncompleteProfile, boolean isPublicPageHidden )
+        throws ProfileNotFoundException
+    {
+        LOG.debug( "method hierarchySettingsValidityCheck() running" );
+
+        boolean isProfileNull = ( profile == null );
+        boolean isProfileStatusNotNull = !isProfileNull && ( profile.getStatus() != null );
+        boolean isProfileDeleted = isProfileStatusNotNull
+            && profile.getStatus().equalsIgnoreCase( CommonConstants.STATUS_DELETED_MONGO );
+        boolean isProfileIncomplete = isProfileStatusNotNull
+            && profile.getStatus().equalsIgnoreCase( CommonConstants.STATUS_INCOMPLETE_MONGO );
+
+        if ( isProfileNull
+            || ( isProfileStatusNotNull && ( isProfileDeleted || ( checkForIncompleteProfile && isProfileIncomplete ) ) )
+            || isPublicPageHidden ) {
+            LOG.error( "No settings found for {} while fetching profile: {}", profileType, profileUnderConcern );
+            throw new ProfileNotFoundException( "No settings found for a hierarchy while fetching profile under concern." );
+        }
+    }
+
+
+    private Map<String, OrganizationUnitSettings> buildAgentProfileMap( PublicProfileAggregate profileAggregate )
+        throws ProfileNotFoundException, InvalidInputException, NoRecordsFetchedException
+    {
+        LOG.debug( "method buildAgentProfileMap() started" );
+        Map<String, OrganizationUnitSettings> profileHierarchyMap = new HashMap<>();
+        OrganizationUnitSettings companyProfile = null;
+        OrganizationUnitSettings regionProfile = null;
+        OrganizationUnitSettings branchProfile = null;
+        AgentSettings individualProfile = null;
+
+
+        // get the user composite object
+        UserCompositeEntity userCompositeObject = getCompositeUserObjectByProfileName( profileAggregate.getProfileName(),
+            true );
+
+        // individual profile
+        individualProfile = userCompositeObject.getAgentSettings();
+        User user = userCompositeObject.getUser();
+
+        hierarchySettingsValidityCheck( individualProfile, CommonConstants.AGENT_COLUMN, profileAggregate.getProfileName(),
+            false, individualProfile.isHidePublicPage() );
+
+        // get other hierarchy settings
+        Map<String, Long> agentHierarchyMap = getPrimaryHierarchyByAgentProfile( individualProfile );
+        LOG.debug( "Got the primary hierarchy." );
+
+        if ( agentHierarchyMap == null ) {
+            LOG.error( "Unable to fetch primary profile for this user while parsing agent profile page" );
+            throw new FatalException( "Unable to fetch primary profile for this user " + individualProfile.getIden() );
+        }
+
+        companyProfile = organizationManagementService.getCompanySettings( user.getCompany().getCompanyId() );
+        hierarchySettingsValidityCheck( companyProfile, CommonConstants.COMPANY_COLUMN, profileAggregate.getProfileName(),
+            false, false );
+
+        // set the company profile name
+        profileAggregate.setCompanyProfileName( StringUtils.lowerCase( companyProfile.getProfileName() ) );
+
+        LOG.debug( "Company ID : {} Region ID : {} Branch ID : {}", agentHierarchyMap.get( CommonConstants.COMPANY_ID_COLUMN ),
+            agentHierarchyMap.get( CommonConstants.REGION_ID_COLUMN ),
+            agentHierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN ) );
+
+        regionProfile = organizationManagementService
+            .getRegionSettings( agentHierarchyMap.get( CommonConstants.REGION_ID_COLUMN ) );
+        hierarchySettingsValidityCheck( regionProfile, CommonConstants.REGION_COLUMN, profileAggregate.getProfileName(), false,
+            false );
+
+        branchProfile = organizationManagementService
+            .getBranchSettingsDefault( agentHierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN ) );
+        hierarchySettingsValidityCheck( branchProfile, CommonConstants.BRANCH_NAME_COLUMN, profileAggregate.getProfileName(),
+            false, false );
+
+        // set agent and company related flags
+        profileAggregate.setAgent( isAgent( user ) );
+        profileAggregate.setHiddenSection( companyProfile.isHiddenSection() );
+
+
+        //set vertical name from the company
+        individualProfile.setVertical( user.getCompany().getVerticalsMaster().getVerticalName() );
+
+        //Aggregate agent details
+        individualProfile = (AgentSettings) aggregateAgentDetails( user, individualProfile,
+            individualProfile.getLockSettings() == null ? new LockSettings() : individualProfile.getLockSettings() );
+
+
+        //set survey settings in individual profile
+        if ( individualProfile.getSurvey_settings() == null ) {
+            individualProfile.setSurvey_settings( companyProfile.getSurvey_settings() );
+        }
+
+        profileHierarchyMap.put( CommonConstants.PROFILE_LEVEL_INDIVIDUAL, individualProfile );
+        profileHierarchyMap.put( CommonConstants.PROFILE_LEVEL_BRANCH, branchProfile );
+        profileHierarchyMap.put( CommonConstants.PROFILE_LEVEL_REGION, regionProfile );
+        profileHierarchyMap.put( CommonConstants.PROFILE_LEVEL_COMPANY, companyProfile );
+
+        LOG.debug( "method buildAgentProfileMap() finished" );
+        return profileHierarchyMap;
+
+    }
+
+
+    private Map<String, String> buildBasicProfileLevelData( PublicProfileAggregate profileAggregate )
+        throws InvalidInputException
+    {
+        LOG.debug( "method getEntityAndCollectionDataByProfileLevel() running" );
+        Map<String, String> profileLevelData = new HashMap<>();
+
+        String profileLevel = profileAggregate.getProfileLevel();
+        String baseProfileUrl = applicationBaseUrl + "pages/";
+
+        if ( CommonConstants.PROFILE_LEVEL_COMPANY.equals( profileLevel ) ) {
+            profileLevelData.put( CommonConstants.ENTITY_ID_COLUMN, CommonConstants.COMPANY_ID );
+            profileLevelData.put( CommonConstants.COLLECTION_TYPE,
+                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+            profileLevelData.put( CommonConstants.PROFILE_URL,
+                baseProfileUrl + CommonConstants.COMPANY + "/" + profileAggregate.getCompanyProfileName() );
+
+        } else if ( CommonConstants.PROFILE_LEVEL_REGION.equals( profileLevel ) ) {
+            profileLevelData.put( CommonConstants.ENTITY_ID_COLUMN, CommonConstants.REGION_ID );
+            profileLevelData.put( CommonConstants.COLLECTION_TYPE,
+                MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+            profileLevelData.put( CommonConstants.PROFILE_URL, baseProfileUrl + CommonConstants.REGION_COLUMN + "/"
+                + profileAggregate.getCompanyProfileName() + "/" + profileAggregate.getProfileName() );
+
+        } else if ( CommonConstants.PROFILE_LEVEL_BRANCH.equals( profileLevel ) ) {
+            profileLevelData.put( CommonConstants.ENTITY_ID_COLUMN, CommonConstants.BRANCH_ID );
+            profileLevelData.put( CommonConstants.COLLECTION_TYPE,
+                MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+            profileLevelData.put( CommonConstants.PROFILE_URL, baseProfileUrl + CommonConstants.OFFICE + "/"
+                + profileAggregate.getCompanyProfileName() + "/" + profileAggregate.getProfileName() );
+
+        } else if ( CommonConstants.PROFILE_LEVEL_INDIVIDUAL.equals( profileLevel ) ) {
+            profileLevelData.put( CommonConstants.ENTITY_ID_COLUMN, CommonConstants.AGENT_ID );
+            profileLevelData.put( CommonConstants.COLLECTION_TYPE,
+                MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+            profileLevelData.put( CommonConstants.PROFILE_URL, baseProfileUrl + profileAggregate.getProfileName() );
+
+        } else {
+            LOG.error( "Invalid profile level in getEntityAndCollectionDataByProfileLevel()" );
+            throw new InvalidInputException( "Please provide a valid profile level." );
+        }
+        return profileLevelData;
+    }
+
+
+    private void profileInputChecks( PublicProfileAggregate profileAggregate ) throws InvalidInputException
+    {
+        LOG.debug( "method profileInputCheck() running" );
+
+        if ( profileAggregate == null ) {
+            LOG.error( "Basic profile information is not present." );
+            throw new InvalidInputException( "Not enough profile information in profile aggregate." );
+        }
+
+        // null and empty checks on profile name and level
+        if ( StringUtils.isEmpty( profileAggregate.getProfileLevel() )
+            || StringUtils.isEmpty( profileAggregate.getProfileName() ) ) {
+            LOG.error( "Not enough profile information to build from profile aggregate." );
+            throw new InvalidInputException( "Not enough profile information to build from profile aggregate." );
+        }
+
+        // validate profile level value
+        if ( !Arrays
+            .asList( CommonConstants.PROFILE_LEVEL_COMPANY, CommonConstants.PROFILE_LEVEL_BRANCH,
+                CommonConstants.PROFILE_LEVEL_REGION, CommonConstants.PROFILE_LEVEL_INDIVIDUAL )
+            .contains( profileAggregate.getProfileLevel() ) ) {
+            LOG.error( "Invalid profile level" );
+            throw new InvalidInputException( "Please specify a valid profile level." );
+        }
+
+        // resolve company profile name necessity
+        if ( StringUtils.isEmpty( profileAggregate.getCompanyProfileName() )
+            && !CommonConstants.PROFILE_LEVEL_INDIVIDUAL.equals( profileAggregate.getProfileLevel() ) ) {
+            LOG.error( "Company profile name is Necessary." );
+            throw new InvalidInputException( "Please provide a valid company profile name." );
+        }
+
+    }
+
+
+    @Override
+    public boolean isAgent( User user ) throws InvalidInputException
+    {
+        if ( user == null ) {
+            LOG.error( "User cannot be null." );
+            throw new InvalidInputException( "User object not specified" );
+        }
+
+        LOG.debug( "method isAgent() started for user {}", user.getUserId() );
+
+        List<UserProfile> userProfiles = user.getUserProfiles();
+
+        if ( userProfiles == null || userProfiles.isEmpty() ) {
+            LOG.warn( "Invalid individual profile." );
+            return false;
+        }
+
+        for ( UserProfile profile : user.getUserProfiles() ) {
+            if ( CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID == profile.getProfilesMaster().getProfileId() ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    @Override
+    public String publicProfileRedirection( PublicProfileAggregate profileAggregate )
+        throws ProfileNotFoundException, InvalidInputException
+    {
+        LOG.debug( "method publicProfileRedirection() started." );
+        if ( profileAggregate == null || profileAggregate.getHierarchyMap() == null ) {
+            LOG.error( "Profile data is not specified." );
+            throw new ProfileNotFoundException( "Profile data is not specified." );
+        }
+
+        if ( StringUtils.isEmpty( profileAggregate.getCompleteCompanyProfileUrl() ) ) {
+            LOG.error( "company profile URL not specified." );
+            throw new InvalidInputException( "company profile URL not specified." );
+        }
+
+        if ( StringUtils.isEmpty( profileAggregate.getProfileName() ) ) {
+            LOG.error( "profile name is not specified." );
+            throw new InvalidInputException( "profile name is not specified." );
+        }
+
+        String redirectionUrl = "";
+
+        if ( !profileAggregate.isAgent() ) {
+
+            LOG.debug( "The user with profile name: {} is not an agent.", profileAggregate.getProfileName() );
+            LOG.info( "Service to redirect to company profile page executed" );
+            redirectionUrl = profileAggregate.getCompleteCompanyProfileUrl();
+
+        } else if ( profileAggregate.isHiddenSection() ) {
+
+            LOG.debug( "The profile with name: {} is not visible as hidden section flag is set.",
+                profileAggregate.getProfileName() );
+            redirectionUrl = determineProfileAlternate( profileAggregate );
+
+        } else {
+            redirectionUrl = profileAggregate.getCompleteCompanyProfileUrl();
+        }
+
+        // add the surveyId at the if present
+        redirectionUrl += ( StringUtils.isNotEmpty( profileAggregate.getSurveyId() ) ? ( "/" + profileAggregate.getSurveyId() )
+            : "" );
+
+        LOG.debug( "method publicProfileRedirection() finished." );
+        return redirectionUrl;
+    }
+
+
+    private String determineProfileAlternate( PublicProfileAggregate profileAggregate ) throws InvalidInputException
+    {
+        long regionId = profileAggregate.getHierarchyMap().get( CommonConstants.REGION_ID_COLUMN );
+        long branchId = profileAggregate.getHierarchyMap().get( CommonConstants.BRANCH_ID_COLUMN );
+
+        Branch branch = userManagementService.getBranchById( branchId );
+
+        if ( branch == null || branch.getIsDefaultBySystem() == 1 ) {
+            Region region = userManagementService.getRegionById( regionId );
+            if ( region == null || region.getIsDefaultBySystem() == 1 ) {
+
+                LOG.info( "Service to redirect to company profile page executed" );
+                return profileAggregate.getCompleteCompanyProfileUrl();
+            } else {
+                if ( StringUtils.isEmpty( profileAggregate.getCompleteRegionProfileUrl() ) ) {
+                    throw new InvalidInputException( "Region profile URL is not specified" );
+                } else {
+                    LOG.info( "Service to redirect to region profile page executed" );
+                    return profileAggregate.getCompleteRegionProfileUrl();
+                }
+            }
+        } else {
+            if ( StringUtils.isEmpty( profileAggregate.getCompleteBranchProfileUrl() ) ) {
+                throw new InvalidInputException( "Branch profile URL is not specified" );
+            } else {
+                LOG.info( "Service to redirect to branch profile page executed" );
+                return profileAggregate.getCompleteBranchProfileUrl();
+            }
+        }
+    }
+
+
+    @Override
+    public boolean isCaptchaForContactUsMailProcessed( String remoteAddress, String captchaResponse )
+        throws InvalidInputException
+    {
+        LOG.debug( "method isCaptchaForContactUsMailProcessed() running" );
+        if ( validateCaptcha.equals( CommonConstants.YES_STRING ) ) {
+            return captchaValidation.isCaptchaValid( remoteAddress, captchaSecretKey, captchaResponse );
+        } else {
+            return true;
+        }
+    }
+    
     
     /**
      * 
@@ -5681,31 +6323,37 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
      * @throws NonFatalException
      */
     @Override
-    public void updateFacebookPixelId(String entityType, long entityId, String pixelId , UserSettings userSettings) throws NonFatalException{
-        
+    public void updateFacebookPixelId( String entityType, long entityId, String pixelId, UserSettings userSettings )
+        throws NonFatalException
+    {
+
         SocialMediaTokens socialMediaTokens;
-        
+
         if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
             OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( entityId );
             if ( companySettings == null ) {
                 throw new InvalidInputException( "No company settings found in current session" );
             }
             socialMediaTokens = companySettings.getSocialMediaTokens();
-            socialMediaTokens = updateFacebookPixelIdInMediaTokens( pixelId, socialMediaTokens, companySettings.getProfileName() );
-            updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, socialMediaTokens );
-            
+            socialMediaTokens = updateFacebookPixelIdInMediaTokens( pixelId, socialMediaTokens,
+                companySettings.getProfileName() );
+            updateSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings,
+                socialMediaTokens );
+
             companySettings.setSocialMediaTokens( socialMediaTokens );
             userSettings.setCompanySettings( companySettings );
-            
+
         } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
             OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
             if ( regionSettings == null ) {
                 throw new InvalidInputException( "No Region settings found in current session" );
             }
             socialMediaTokens = regionSettings.getSocialMediaTokens();
-            socialMediaTokens = updateFacebookPixelIdInMediaTokens( pixelId, socialMediaTokens, regionSettings.getProfileName() );
-            updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, socialMediaTokens );
-            
+            socialMediaTokens = updateFacebookPixelIdInMediaTokens( pixelId, socialMediaTokens,
+                regionSettings.getProfileName() );
+            updateSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings,
+                socialMediaTokens );
+
             regionSettings.setSocialMediaTokens( socialMediaTokens );
             userSettings.getRegionSettings().put( entityId, regionSettings );
 
@@ -5715,21 +6363,25 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 throw new InvalidInputException( "No Branch settings found in current session" );
             }
             socialMediaTokens = branchSettings.getSocialMediaTokens();
-            socialMediaTokens = updateFacebookPixelIdInMediaTokens( pixelId, socialMediaTokens, branchSettings.getProfileName() );
-            updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, socialMediaTokens );
-            
+            socialMediaTokens = updateFacebookPixelIdInMediaTokens( pixelId, socialMediaTokens,
+                branchSettings.getProfileName() );
+            updateSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings,
+                socialMediaTokens );
+
             branchSettings.setSocialMediaTokens( socialMediaTokens );
             userSettings.getRegionSettings().put( entityId, branchSettings );
-           
+
         } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
             AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
             if ( agentSettings == null ) {
                 throw new InvalidInputException( "No Agent settings found in current session" );
             }
             socialMediaTokens = agentSettings.getSocialMediaTokens();
-            socialMediaTokens = updateFacebookPixelIdInMediaTokens( pixelId, socialMediaTokens, agentSettings.getProfileName() );
-            updateSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,  agentSettings, socialMediaTokens );
-            
+            socialMediaTokens = updateFacebookPixelIdInMediaTokens( pixelId, socialMediaTokens,
+                agentSettings.getProfileName() );
+            updateSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
+                socialMediaTokens );
+
             agentSettings.setSocialMediaTokens( socialMediaTokens );
             userSettings.setAgentSettings( agentSettings );
         } else {
@@ -5745,8 +6397,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         LOG.info( "facebookPixelId updated successfully" );
 
     }
-    
-    private SocialMediaTokens updateFacebookPixelIdInMediaTokens( String pixelId, SocialMediaTokens socialMediaTokens, String profileName )
+
+
+    private SocialMediaTokens updateFacebookPixelIdInMediaTokens( String pixelId, SocialMediaTokens socialMediaTokens,
+        String profileName )
     {
         LOG.debug( "Method updateFacebookPixelIdInMediaTokens() called" );
         if ( socialMediaTokens == null ) {

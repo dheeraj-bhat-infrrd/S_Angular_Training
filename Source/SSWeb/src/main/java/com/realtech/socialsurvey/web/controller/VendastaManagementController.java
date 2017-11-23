@@ -198,13 +198,14 @@ public class VendastaManagementController
     @ResponseBody
     public String isVendastaAccessible( Model model, HttpServletRequest request )
     {
+        LOG.info( "Checking if vendesta is accessible for this session" );
         HttpSession session = request.getSession( false );
 
         String vendastaAccess = null;
         if ( session != null && session.getAttribute( CommonConstants.VENDASTA_ACCESS ) != null ) {
             vendastaAccess = String.valueOf( session.getAttribute( CommonConstants.VENDASTA_ACCESS ) );
         }
-
+        LOG.debug( "vendastaAccess {}", vendastaAccess );
         if ( vendastaAccess != null ) {
             return vendastaAccess;
         } else {

@@ -50,48 +50,42 @@ import com.realtech.socialsurvey.core.exception.UserSessionInvalidateException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
-import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.utils.FileOperations;
-import com.realtech.socialsurvey.core.utils.PropertyFileReader;
 import com.realtech.socialsurvey.web.common.JspResolver;
 import com.realtech.socialsurvey.web.security.UserAuthProvider;
+
 
 /**
  * Manipulates the values in session
  */
 @Component
-public class SessionHelper {
+public class SessionHelper
+{
 
-	private static final Logger LOG = LoggerFactory.getLogger(SessionHelper.class);
+    private static final Logger LOG = LoggerFactory.getLogger( SessionHelper.class );
 
-	@Autowired
-	private FileOperations fileOperations;
+    @Autowired
+    private FileOperations fileOperations;
 
-	@Autowired
-	private UserManagementService userManagementService;
+    @Autowired
+    private UserManagementService userManagementService;
 
-	@Autowired
-	private OrganizationManagementService organizationManagementService;
+    @Autowired
+    private OrganizationManagementService organizationManagementService;
 
-	@Autowired
-	private PropertyFileReader propertyFileReader;
+    @Autowired
+    private UserAuthProvider userAuthProvider;
 
-	@Autowired
-	private UserAuthProvider userAuthProvider;
+    @Autowired
+    private UserDetailsService userDetailsService;
 
-	@Autowired
-	private UserDetailsService userDetailsService;
+    @Autowired
+    private EmailFormatHelper emailFormatHelper;
 
-	@Autowired
-	private EncryptionHelper encryptionHelper;
+    @Value ( "${APPLICATION_LOGO_URL}")
+    private String applicationLogoUrl;
 
-	@Autowired
-	private EmailFormatHelper emailFormatHelper;
-
-	@Value("${APPLICATION_LOGO_URL}")
-	private String applicationLogoUrl;
-	
-	@Value ( "${PARAM_ORDER_TAKE_SURVEY}")
+    @Value ( "${PARAM_ORDER_TAKE_SURVEY}")
     String paramOrderTakeSurvey;
     @Value ( "${PARAM_ORDER_TAKE_SURVEY_CUSTOMER}")
     String paramOrderTakeSurveyCustomer;
@@ -108,611 +102,639 @@ public class SessionHelper {
     @Value ( "${PARAM_ORDER_SURVEY_COMPLETION_UNPLEASANT_MAIL}")
     String paramOrderSurveyCompletionUnpleasantMail;
 
-	@Transactional
-	public void getCanonicalSettings(HttpSession session) throws InvalidInputException, NoRecordsFetchedException {
-		LOG.info("Getting canonical settings");
-		User user = getCurrentUser();
-		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
-		LOG.info("Getting settings for " + user.toString() + " for account type " + accountType);
-		UserSettings userSettings = userManagementService.getCanonicalUserSettings(user, accountType);
-		session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
-		LOG.info("Set the settings in session");
-	}
 
-	public void setSettingVariablesInSession(HttpSession session) {
-		LOG.info("Settings related session values being set.");
-		UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-		if (session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION) != null) {
-			// setting the logo name
-			setLogo(session, userSettings);
-			setProfileImage(session, userSettings);
-			// check for the mail content
-			setMailContent(session, userSettings);
-			// set the highest role from the user's profiles
-			setHighestRole(session, getCurrentUser());
-		}
-	}
+    @Transactional
+    public void getCanonicalSettings( HttpSession session ) throws InvalidInputException, NoRecordsFetchedException
+    {
+        LOG.debug( "Getting canonical settings" );
+        User user = getCurrentUser();
+        AccountType accountType = (AccountType) session.getAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION );
+        LOG.debug( "Getting settings for {} for account type {}", user, accountType );
+        UserSettings userSettings = userManagementService.getCanonicalUserSettings( user, accountType );
+        session.setAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings );
+        LOG.debug( "Set the settings in session" );
+    }
 
-	// JIRA SS-97 by RM-06 : BOC
-	public void setLogoInSession(HttpSession session, UserSettings userSettings) {
-		LOG.info("Setting logo in session");
-		setLogo(session, userSettings);
-		LOG.info("Logo successfully updated in session");
-	}
 
-	public void setProfileImageInSession(HttpSession session, UserSettings userSettings) {
-		LOG.info("Setting logo in session");
-		setProfileImage(session, userSettings);
-		LOG.info("Logo successfully updated in session");
-	}
+    public void setSettingVariablesInSession( HttpSession session )
+    {
+        LOG.debug( "Settings related session values being set." );
+        UserSettings userSettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+        if ( session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION ) != null ) {
+            // setting the logo name
+            setLogo( session, userSettings );
+            setProfileImage( session, userSettings );
+            // check for the mail content
+            setMailContent( session, userSettings );
+            // set the highest role from the user's profiles
+            setHighestRole( session, getCurrentUser() );
+        }
+    }
 
-	// JIRA SS-97 by RM-06 : EOC
 
-	private void setLogo(HttpSession session, UserSettings userSettings)
-	{
-		LOG.debug( "Setting logo name in the session" );
-		// check if company has a logo
-		//JIRA SS-1363 begin
-		/*if (userSettings.getCompanySettings() != null && userSettings.getCompanySettings().getLogoThumbnail() != null) {
-			LOG.debug("Settings logo image from company settings");
-			String logoUrl = userSettings.getCompanySettings().getLogoThumbnail();
-			session.setAttribute(CommonConstants.LOGO_DISPLAY_IN_SESSION, logoUrl);
-		}*/
-		//In case of individual accounts, give priority to agentSettings before companySettings
-		if ( userSettings.getAgentSettings() != null && userSettings.getAgentSettings().getLogo() != null ) {
-			String logoUrl = userSettings.getAgentSettings().getLogo();
-			session.setAttribute( CommonConstants.LOGO_DISPLAY_IN_SESSION, logoUrl );
-		} else if ( userSettings.getCompanySettings() != null && userSettings.getCompanySettings().getLogo() != null ) {
-			LOG.debug( "Settings logo image from company settings" );
-			String logoUrl = userSettings.getCompanySettings().getLogo();
-			session.setAttribute( CommonConstants.LOGO_DISPLAY_IN_SESSION, logoUrl );
-		}
-		//JIRA SS-1363 end
-		else {
-			LOG.debug( "Could not find logo settings in company. Checking in lower heirarchy." );
-			// TODO: Check the lower level hierarchy for logo
-		}
-	}
+    // JIRA SS-97 by RM-06 : BOC
+    public void setLogoInSession( HttpSession session, UserSettings userSettings )
+    {
+        LOG.debug( "Setting logo in session" );
+        setLogo( session, userSettings );
+        LOG.debug( "Logo successfully updated in session" );
+    }
 
-	private void setProfileImage(HttpSession session, UserSettings userSettings) {
-		LOG.debug("Setting profile image name in the session");
-		// check if company has a logo
-		if (userSettings.getCompanySettings() != null && userSettings.getCompanySettings().getProfileImageUrlThumbnail() != null) {
-			LOG.debug("Settings profile image from company settings");
-			String imageUrl = userSettings.getCompanySettings().getProfileImageUrlThumbnail();
-			session.setAttribute(CommonConstants.IMAGE_DISPLAY_IN_SESSION, imageUrl);
-		}
-		else {
-			LOG.debug("Could not find profile image settings in company. Checking in lower heirarchy.");
-			// TODO: Check the lower level hierarchy for logo
-		}
-	}
 
-	public void setMailContent(HttpSession session, UserSettings userSettings) {
-		LOG.debug("Setting mail content in the session");
-		String body = null;
-		FileContentReplacements replacements = new FileContentReplacements();
-		replacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_PARTICIPATION_MAIL_BODY);
+    public void setProfileImageInSession( HttpSession session, UserSettings userSettings )
+    {
+        LOG.debug( "Setting logo in session" );
+        setProfileImage( session, userSettings );
+        LOG.debug( "Logo successfully updated in session" );
+    }
 
-		if (userSettings.getCompanySettings().getMail_content() == null) {
-			LOG.debug("Setting default survey participation mail body.");
 
-			try {
-				List<String> paramOrder = new ArrayList<String>(Arrays.asList(paramOrderSurveyParticipation.split(",")));
-				body = fileOperations.replaceFileContents(replacements);
-				body = emailFormatHelper.replaceEmailBodyWithParams(body, paramOrder);
-				/*body = body.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);*/
-				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, body);
-				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_SUBJECT_IN_SESSION, CommonConstants.SURVEY_MAIL_SUBJECT
-						+ "[AgentName]");
+    // JIRA SS-97 by RM-06 : EOC
 
-				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, body);
-				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_SUBJECT_IN_SESSION, CommonConstants.SURVEY_MAIL_SUBJECT
-						+ "[AgentName]");
-			}
-			catch (InvalidInputException e) {
-				LOG.warn("Could not set mail content for survey participation");
-			}
-		}
-		else {
-			LOG.debug("Company already has mail body settings. Hence, setting the same");
+    private void setLogo( HttpSession session, UserSettings userSettings )
+    {
+        LOG.debug( "Setting logo name in the session" );
+        // check if company has a logo
+        //JIRA SS-1363 begin
+        //In case of individual accounts, give priority to agentSettings before companySettings
+        if ( userSettings.getAgentSettings() != null && userSettings.getAgentSettings().getLogo() != null ) {
+            String logoUrl = userSettings.getAgentSettings().getLogo();
+            session.setAttribute( CommonConstants.LOGO_DISPLAY_IN_SESSION, logoUrl );
+        } else if ( userSettings.getCompanySettings() != null && userSettings.getCompanySettings().getLogo() != null ) {
+            LOG.debug( "Settings logo image from company settings" );
+            String logoUrl = userSettings.getCompanySettings().getLogo();
+            session.setAttribute( CommonConstants.LOGO_DISPLAY_IN_SESSION, logoUrl );
+        }
+        //JIRA SS-1363 end
+        else {
+            LOG.debug( "Could not find logo settings in company. Checking in lower heirarchy." );
+            // TODO: Check the lower level hierarchy for logo
+        }
+    }
 
-			MailContentSettings mailSettings = userSettings.getCompanySettings().getMail_content();
-			if (userSettings.getCompanySettings().getMail_content().getTake_survey_mail() != null) {
-				MailContent mailContent = mailSettings.getTake_survey_mail();
-				String mailBody = emailFormatHelper.replaceEmailBodyWithParams(mailContent.getMail_body(), mailContent.getParam_order());
-				/*mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);*/
-				mailSettings.getTake_survey_mail().setMail_body(mailBody);
-				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, mailBody);
-				String remainderSubject = CommonConstants.SURVEY_MAIL_SUBJECT + "[AgentName]";
-				if (mailContent.getMail_subject() != null) {
-					remainderSubject = mailContent.getMail_subject();
-				}
-				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_SUBJECT_IN_SESSION, remainderSubject);
-			}
-			else {
-				try {
-					List<String> paramOrder = new ArrayList<String>(Arrays.asList(paramOrderTakeSurvey.split(",")));
-					replacements = new FileContentReplacements();
-					replacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_INVITATION_MAIL_BODY);
-					body = fileOperations.replaceFileContents(replacements);
-					body = emailFormatHelper.replaceEmailBodyWithParams(body, paramOrder);
-					/*body = body.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);*/
-					session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, body);
-					session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_SUBJECT_IN_SESSION, CommonConstants.SURVEY_MAIL_SUBJECT
-							+ "[AgentName]");
-				}
-				catch (InvalidInputException e) {
-					LOG.warn("Could not set mail content for survey participation");
-				}
-			}
 
-			//survey reminder mail
-			if (userSettings.getCompanySettings().getMail_content().getTake_survey_reminder_mail() != null) {
-				MailContent mailContent = mailSettings.getTake_survey_reminder_mail();
-				String mailBody = emailFormatHelper.replaceEmailBodyWithParams(mailContent.getMail_body(), mailContent.getParam_order());
-				/*mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);*/
-				mailSettings.getTake_survey_reminder_mail().setMail_body(mailBody);
-				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, mailBody);
-				String remainderSubject = CommonConstants.REMINDER_MAIL_SUBJECT;
-				if (mailContent.getMail_subject() != null) {
-					remainderSubject = mailContent.getMail_subject();
-				}
-				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_SUBJECT_IN_SESSION, remainderSubject);
-			}
-			else {
-				try {
-					List<String> paramOrder = new ArrayList<String>(Arrays.asList(paramOrderTakeSurveyReminder.split(",")));
-					replacements = new FileContentReplacements();
-					replacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_REMINDER_MAIL_BODY);
-					body = fileOperations.replaceFileContents(replacements);
-					body = emailFormatHelper.replaceEmailBodyWithParams(body, paramOrder);
-					/*body = body.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);*/
-					session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, body);
-					session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_SUBJECT_IN_SESSION, CommonConstants.REMINDER_MAIL_SUBJECT);
-				}
-				catch (InvalidInputException e) {
-					LOG.warn("Could not set mail content for survey participation reminder");
-				}
-			}
-			
-			// incomplete survey reminder mail
-			if (userSettings.getCompanySettings().getMail_content().getRestart_survey_mail() != null) {
-				MailContent mailContent = mailSettings.getRestart_survey_mail();
-				String mailBody = emailFormatHelper.replaceEmailBodyWithParams(mailContent.getMail_body(), mailContent.getParam_order());
-				/*mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);*/
-				mailSettings.getRestart_survey_mail().setMail_body(mailBody);
-				session.setAttribute(CommonConstants.RESTART_SURVEY_MAIL_BODY_IN_SESSION, mailBody);
-				String incompleteSurveyReminderMailSubject = CommonConstants.RESTART_SURVEY_MAIL_SUBJECT;
-				if (mailContent.getMail_subject() != null) {
-					incompleteSurveyReminderMailSubject = mailContent.getMail_subject();
-				}
-				session.setAttribute(CommonConstants.RESTART_SURVEY_MAIL_SUBJECT_IN_SESSION, incompleteSurveyReminderMailSubject);
-			}
-			else {
-				try {
-					List<String> paramOrder = new ArrayList<String>(Arrays.asList(paramOrderIncompleteSurveyReminder.split(",")));
-					replacements = new FileContentReplacements();
-					replacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_RESTART_MAIL_BODY);
-					body = fileOperations.replaceFileContents(replacements);
-					body = emailFormatHelper.replaceEmailBodyWithParams(body, paramOrder);
-					/*body = body.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);*/
-					session.setAttribute(CommonConstants.RESTART_SURVEY_MAIL_BODY_IN_SESSION, body);
-					session.setAttribute(CommonConstants.RESTART_SURVEY_MAIL_SUBJECT_IN_SESSION, CommonConstants.RESTART_SURVEY_MAIL_SUBJECT);
-				}
-				catch (InvalidInputException e) {
-					LOG.warn("Could not set mail content for incomplete survey reminder");
-				}
-			}
-			
-			//survey completion mail
-			if (userSettings.getCompanySettings().getMail_content().getSurvey_completion_mail() != null) {
-				MailContent mailContent = mailSettings.getSurvey_completion_mail();
-				String mailBody = emailFormatHelper.replaceEmailBodyWithParams(mailContent.getMail_body(), mailContent.getParam_order());
-				/*mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);*/
-				mailSettings.getSurvey_completion_mail().setMail_body(mailBody);
-				session.setAttribute(CommonConstants.SURVEY_COMPLETION_MAIL_BODY_IN_SESSION, mailBody);
-				String surveyCompletionMailSubject = CommonConstants.SURVEY_COMPLETION_MAIL_SUBJECT;
-				if (mailContent.getMail_subject() != null) {
-					surveyCompletionMailSubject = mailContent.getMail_subject();
-				}
-				session.setAttribute(CommonConstants.SURVEY_COMPLETION_MAIL_SUBJECT_IN_SESSION, surveyCompletionMailSubject);
-			}
-			else {
-				try {
-					List<String> paramOrder = new ArrayList<String>(Arrays.asList(paramOrderSurveyCompletionMail.split(",")));
-					replacements = new FileContentReplacements();
-					replacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_COMPLETION_MAIL_BODY);
-					body = fileOperations.replaceFileContents(replacements);
-					body = emailFormatHelper.replaceEmailBodyWithParams(body, paramOrder);
-					/*body = body.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);*/
-					session.setAttribute(CommonConstants.SURVEY_COMPLETION_MAIL_BODY_IN_SESSION, body);
-					session.setAttribute(CommonConstants.SURVEY_COMPLETION_MAIL_SUBJECT_IN_SESSION, CommonConstants.SURVEY_COMPLETION_MAIL_SUBJECT);
-				}
-				catch (InvalidInputException e) {
-					LOG.warn("Could not set mail content for survey completion mail");
-				}
-			}
-			
-			//social post reminder mail
-			if (userSettings.getCompanySettings().getMail_content().getSocial_post_reminder_mail() != null) {
-				MailContent mailContent = mailSettings.getSocial_post_reminder_mail();
-				String mailBody = emailFormatHelper.replaceEmailBodyWithParams(mailContent.getMail_body(), mailContent.getParam_order());
-				/*mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);*/
-				mailSettings.getSocial_post_reminder_mail().setMail_body(mailBody);
-				session.setAttribute(CommonConstants.SOCIAL_POST_REMINDER_MAIL_BODY_IN_SESSION, mailBody);
-				String socialPostReminderMailSubject = CommonConstants.SOCIAL_POST_REMINDER_MAIL_SUBJECT;
-				if (mailContent.getMail_subject() != null) {
-					socialPostReminderMailSubject = mailContent.getMail_subject();
-				}
-				session.setAttribute(CommonConstants.SOCIAL_POST_REMINDER_MAIL_SUBJECT_IN_SESSION, socialPostReminderMailSubject);
-			}
-			else {
-				try {
-					List<String> paramOrder = new ArrayList<String>(Arrays.asList(paramOrderSocialPostReminder.split(",")));
-					replacements = new FileContentReplacements();
-					replacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SOCIALPOST_REMINDER_MAIL_BODY);
-					body = fileOperations.replaceFileContents(replacements);
-					body = emailFormatHelper.replaceEmailBodyWithParams(body, paramOrder);
-					/*body = body.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);*/
-					session.setAttribute(CommonConstants.SOCIAL_POST_REMINDER_MAIL_BODY_IN_SESSION, body);
-					session.setAttribute(CommonConstants.SOCIAL_POST_REMINDER_MAIL_SUBJECT_IN_SESSION, CommonConstants.SOCIAL_POST_REMINDER_MAIL_SUBJECT);
-				}
-				catch (InvalidInputException e) {
-					LOG.warn("Could not set mail content for social post reminder reminder");
-				}
-			}
-			
-			//survey completion unpleasant mail
-            if (userSettings.getCompanySettings().getMail_content().getSurvey_completion_unpleasant_mail() != null) {
-                MailContent mailContent = mailSettings.getSurvey_completion_unpleasant_mail();
-                String mailBody = emailFormatHelper.replaceEmailBodyWithParams(mailContent.getMail_body(), mailContent.getParam_order());
-                /*mailBody = mailBody.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);*/
-                mailSettings.getSurvey_completion_unpleasant_mail().setMail_body(mailBody);
-                session.setAttribute(CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_IN_SESSION, mailBody);
-                String surveyCompletionMailSubject = CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_SUBJECT;
-                if (mailContent.getMail_subject() != null) {
+    private void setProfileImage( HttpSession session, UserSettings userSettings )
+    {
+        LOG.debug( "Setting profile image name in the session" );
+        // check if company has a logo
+        if ( userSettings.getCompanySettings() != null
+            && userSettings.getCompanySettings().getProfileImageUrlThumbnail() != null ) {
+            LOG.debug( "Settings profile image from company settings" );
+            String imageUrl = userSettings.getCompanySettings().getProfileImageUrlThumbnail();
+            session.setAttribute( CommonConstants.IMAGE_DISPLAY_IN_SESSION, imageUrl );
+        } else {
+            LOG.debug( "Could not find profile image settings in company. Checking in lower heirarchy." );
+            // TODO: Check the lower level hierarchy for logo
+        }
+    }
+
+
+    public void setMailContent( HttpSession session, UserSettings userSettings )
+    {
+        LOG.debug( "Setting mail content in the session" );
+        String body = null;
+        FileContentReplacements replacements = new FileContentReplacements();
+        replacements.setFileName(
+            EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_PARTICIPATION_MAIL_BODY );
+
+        if ( userSettings.getCompanySettings().getMail_content() == null ) {
+            LOG.debug( "Setting default survey participation mail body." );
+
+            try {
+                List<String> paramOrder = new ArrayList<String>( Arrays.asList( paramOrderSurveyParticipation.split( "," ) ) );
+                body = fileOperations.replaceFileContents( replacements );
+                body = emailFormatHelper.replaceEmailBodyWithParams( body, paramOrder );
+                session.setAttribute( CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, body );
+                session.setAttribute( CommonConstants.SURVEY_PARTICIPATION_MAIL_SUBJECT_IN_SESSION,
+                    CommonConstants.SURVEY_MAIL_SUBJECT + "[AgentName]" );
+
+                session.setAttribute( CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, body );
+                session.setAttribute( CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_SUBJECT_IN_SESSION,
+                    CommonConstants.SURVEY_MAIL_SUBJECT + "[AgentName]" );
+            } catch ( InvalidInputException e ) {
+                LOG.warn( "Could not set mail content for survey participation" );
+            }
+        } else {
+            LOG.debug( "Company already has mail body settings. Hence, setting the same" );
+
+            MailContentSettings mailSettings = userSettings.getCompanySettings().getMail_content();
+            if ( userSettings.getCompanySettings().getMail_content().getTake_survey_mail() != null ) {
+                MailContent mailContent = mailSettings.getTake_survey_mail();
+                String mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailContent.getMail_body(),
+                    mailContent.getParam_order() );
+                mailSettings.getTake_survey_mail().setMail_body( mailBody );
+                session.setAttribute( CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, mailBody );
+                String remainderSubject = CommonConstants.SURVEY_MAIL_SUBJECT + "[AgentName]";
+                if ( mailContent.getMail_subject() != null ) {
+                    remainderSubject = mailContent.getMail_subject();
+                }
+                session.setAttribute( CommonConstants.SURVEY_PARTICIPATION_MAIL_SUBJECT_IN_SESSION, remainderSubject );
+            } else {
+                try {
+                    List<String> paramOrder = new ArrayList<String>( Arrays.asList( paramOrderTakeSurvey.split( "," ) ) );
+                    replacements = new FileContentReplacements();
+                    replacements.setFileName(
+                        EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_INVITATION_MAIL_BODY );
+                    body = fileOperations.replaceFileContents( replacements );
+                    body = emailFormatHelper.replaceEmailBodyWithParams( body, paramOrder );
+                    session.setAttribute( CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, body );
+                    session.setAttribute( CommonConstants.SURVEY_PARTICIPATION_MAIL_SUBJECT_IN_SESSION,
+                        CommonConstants.SURVEY_MAIL_SUBJECT + "[AgentName]" );
+                } catch ( InvalidInputException e ) {
+                    LOG.warn( "Could not set mail content for survey participation" );
+                }
+            }
+
+            //survey reminder mail
+            if ( userSettings.getCompanySettings().getMail_content().getTake_survey_reminder_mail() != null ) {
+                MailContent mailContent = mailSettings.getTake_survey_reminder_mail();
+                String mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailContent.getMail_body(),
+                    mailContent.getParam_order() );
+                mailSettings.getTake_survey_reminder_mail().setMail_body( mailBody );
+                session.setAttribute( CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, mailBody );
+                String remainderSubject = CommonConstants.REMINDER_MAIL_SUBJECT;
+                if ( mailContent.getMail_subject() != null ) {
+                    remainderSubject = mailContent.getMail_subject();
+                }
+                session.setAttribute( CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_SUBJECT_IN_SESSION, remainderSubject );
+            } else {
+                try {
+                    List<String> paramOrder = new ArrayList<String>(
+                        Arrays.asList( paramOrderTakeSurveyReminder.split( "," ) ) );
+                    replacements = new FileContentReplacements();
+                    replacements.setFileName(
+                        EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_REMINDER_MAIL_BODY );
+                    body = fileOperations.replaceFileContents( replacements );
+                    body = emailFormatHelper.replaceEmailBodyWithParams( body, paramOrder );
+                    session.setAttribute( CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, body );
+                    session.setAttribute( CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_SUBJECT_IN_SESSION,
+                        CommonConstants.REMINDER_MAIL_SUBJECT );
+                } catch ( InvalidInputException e ) {
+                    LOG.warn( "Could not set mail content for survey participation reminder" );
+                }
+            }
+
+            // incomplete survey reminder mail
+            if ( userSettings.getCompanySettings().getMail_content().getRestart_survey_mail() != null ) {
+                MailContent mailContent = mailSettings.getRestart_survey_mail();
+                String mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailContent.getMail_body(),
+                    mailContent.getParam_order() );
+                mailSettings.getRestart_survey_mail().setMail_body( mailBody );
+                session.setAttribute( CommonConstants.RESTART_SURVEY_MAIL_BODY_IN_SESSION, mailBody );
+                String incompleteSurveyReminderMailSubject = CommonConstants.RESTART_SURVEY_MAIL_SUBJECT;
+                if ( mailContent.getMail_subject() != null ) {
+                    incompleteSurveyReminderMailSubject = mailContent.getMail_subject();
+                }
+                session.setAttribute( CommonConstants.RESTART_SURVEY_MAIL_SUBJECT_IN_SESSION,
+                    incompleteSurveyReminderMailSubject );
+            } else {
+                try {
+                    List<String> paramOrder = new ArrayList<String>(
+                        Arrays.asList( paramOrderIncompleteSurveyReminder.split( "," ) ) );
+                    replacements = new FileContentReplacements();
+                    replacements.setFileName(
+                        EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_RESTART_MAIL_BODY );
+                    body = fileOperations.replaceFileContents( replacements );
+                    body = emailFormatHelper.replaceEmailBodyWithParams( body, paramOrder );
+                    session.setAttribute( CommonConstants.RESTART_SURVEY_MAIL_BODY_IN_SESSION, body );
+                    session.setAttribute( CommonConstants.RESTART_SURVEY_MAIL_SUBJECT_IN_SESSION,
+                        CommonConstants.RESTART_SURVEY_MAIL_SUBJECT );
+                } catch ( InvalidInputException e ) {
+                    LOG.warn( "Could not set mail content for incomplete survey reminder" );
+                }
+            }
+
+            //survey completion mail
+            if ( userSettings.getCompanySettings().getMail_content().getSurvey_completion_mail() != null ) {
+                MailContent mailContent = mailSettings.getSurvey_completion_mail();
+                String mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailContent.getMail_body(),
+                    mailContent.getParam_order() );
+                mailSettings.getSurvey_completion_mail().setMail_body( mailBody );
+                session.setAttribute( CommonConstants.SURVEY_COMPLETION_MAIL_BODY_IN_SESSION, mailBody );
+                String surveyCompletionMailSubject = CommonConstants.SURVEY_COMPLETION_MAIL_SUBJECT;
+                if ( mailContent.getMail_subject() != null ) {
                     surveyCompletionMailSubject = mailContent.getMail_subject();
                 }
-                session.setAttribute(CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_SUBJECT_IN_SESSION, surveyCompletionMailSubject);
-            }
-            else {
+                session.setAttribute( CommonConstants.SURVEY_COMPLETION_MAIL_SUBJECT_IN_SESSION, surveyCompletionMailSubject );
+            } else {
                 try {
-                    List<String> paramOrder = new ArrayList<String>(Arrays.asList(paramOrderSurveyCompletionUnpleasantMail.split(",")));
+                    List<String> paramOrder = new ArrayList<String>(
+                        Arrays.asList( paramOrderSurveyCompletionMail.split( "," ) ) );
                     replacements = new FileContentReplacements();
-                    replacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY);
-                    body = fileOperations.replaceFileContents(replacements);
-                    body = emailFormatHelper.replaceEmailBodyWithParams(body, paramOrder);
-                    /*body = body.replaceAll("\\[LogoUrl\\]", applicationLogoUrl);*/
-                    session.setAttribute(CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_IN_SESSION, body);
-                    session.setAttribute(CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_SUBJECT_IN_SESSION, CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_SUBJECT);
-                }
-                catch (InvalidInputException e) {
-                    LOG.warn("Could not set mail content for survey completion mail");
+                    replacements.setFileName(
+                        EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_COMPLETION_MAIL_BODY );
+                    body = fileOperations.replaceFileContents( replacements );
+                    body = emailFormatHelper.replaceEmailBodyWithParams( body, paramOrder );
+                    session.setAttribute( CommonConstants.SURVEY_COMPLETION_MAIL_BODY_IN_SESSION, body );
+                    session.setAttribute( CommonConstants.SURVEY_COMPLETION_MAIL_SUBJECT_IN_SESSION,
+                        CommonConstants.SURVEY_COMPLETION_MAIL_SUBJECT );
+                } catch ( InvalidInputException e ) {
+                    LOG.warn( "Could not set mail content for survey completion mail" );
                 }
             }
-		}
-	}
 
-	private void setHighestRole(HttpSession session, User user) {
-		LOG.debug("Checking the highest role");
-		List<UserProfile> userProfiles = user.getUserProfiles();
-		if (userProfiles != null) {
-			// sort the user profiles
-			Collections.sort(userProfiles, new UserProfileComparator());
-			// get the first one. that one will be the highest
-			session.setAttribute(CommonConstants.HIGHEST_ROLE_ID_IN_SESSION, userProfiles.get(0).getProfilesMaster().getProfileId());
-		}
-	}
+            //social post reminder mail
+            if ( userSettings.getCompanySettings().getMail_content().getSocial_post_reminder_mail() != null ) {
+                MailContent mailContent = mailSettings.getSocial_post_reminder_mail();
+                String mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailContent.getMail_body(),
+                    mailContent.getParam_order() );
+                mailSettings.getSocial_post_reminder_mail().setMail_body( mailBody );
+                session.setAttribute( CommonConstants.SOCIAL_POST_REMINDER_MAIL_BODY_IN_SESSION, mailBody );
+                String socialPostReminderMailSubject = CommonConstants.SOCIAL_POST_REMINDER_MAIL_SUBJECT;
+                if ( mailContent.getMail_subject() != null ) {
+                    socialPostReminderMailSubject = mailContent.getMail_subject();
+                }
+                session.setAttribute( CommonConstants.SOCIAL_POST_REMINDER_MAIL_SUBJECT_IN_SESSION,
+                    socialPostReminderMailSubject );
+            } else {
+                try {
+                    List<String> paramOrder = new ArrayList<String>(
+                        Arrays.asList( paramOrderSocialPostReminder.split( "," ) ) );
+                    replacements = new FileContentReplacements();
+                    replacements.setFileName(
+                        EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SOCIALPOST_REMINDER_MAIL_BODY );
+                    body = fileOperations.replaceFileContents( replacements );
+                    body = emailFormatHelper.replaceEmailBodyWithParams( body, paramOrder );
+                    session.setAttribute( CommonConstants.SOCIAL_POST_REMINDER_MAIL_BODY_IN_SESSION, body );
+                    session.setAttribute( CommonConstants.SOCIAL_POST_REMINDER_MAIL_SUBJECT_IN_SESSION,
+                        CommonConstants.SOCIAL_POST_REMINDER_MAIL_SUBJECT );
+                } catch ( InvalidInputException e ) {
+                    LOG.warn( "Could not set mail content for social post reminder reminder" );
+                }
+            }
 
-	/**
-	 * Method to add new user into Principal
-	 * 
-	 * @param emailId
-	 * @param password
-	 * @return
-	 */
-	public void loginOnRegistration(String username, String password) {
-		LOG.debug("Adding newly registered user to session");
-		try {
-			UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-			UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities());
-			userAuthProvider.authenticate(auth);
+            //survey completion unpleasant mail
+            if ( userSettings.getCompanySettings().getMail_content().getSurvey_completion_unpleasant_mail() != null ) {
+                MailContent mailContent = mailSettings.getSurvey_completion_unpleasant_mail();
+                String mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailContent.getMail_body(),
+                    mailContent.getParam_order() );
+                mailSettings.getSurvey_completion_unpleasant_mail().setMail_body( mailBody );
+                session.setAttribute( CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_IN_SESSION, mailBody );
+                String surveyCompletionMailSubject = CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_SUBJECT;
+                if ( mailContent.getMail_subject() != null ) {
+                    surveyCompletionMailSubject = mailContent.getMail_subject();
+                }
+                session.setAttribute( CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_SUBJECT_IN_SESSION,
+                    surveyCompletionMailSubject );
+            } else {
+                try {
+                    List<String> paramOrder = new ArrayList<String>(
+                        Arrays.asList( paramOrderSurveyCompletionUnpleasantMail.split( "," ) ) );
+                    replacements = new FileContentReplacements();
+                    replacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+                        + EmailTemplateConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY );
+                    body = fileOperations.replaceFileContents( replacements );
+                    body = emailFormatHelper.replaceEmailBodyWithParams( body, paramOrder );
+                    session.setAttribute( CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY_IN_SESSION, body );
+                    session.setAttribute( CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_SUBJECT_IN_SESSION,
+                        CommonConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_SUBJECT );
+                } catch ( InvalidInputException e ) {
+                    LOG.warn( "Could not set mail content for survey completion mail" );
+                }
+            }
+        }
+    }
 
-			if (auth.isAuthenticated()) {
-				SecurityContextHolder.getContext().setAuthentication(auth);
-			}
 
-			if (getCurrentUser() == null) {
-				throw new NullPointerException();
-			}
-		}
-		catch (Exception e) {
-			SecurityContextHolder.getContext().setAuthentication(null);
-			LOG.error("Problem authenticating user" + username, e);
-		}
-	}
+    private void setHighestRole( HttpSession session, User user )
+    {
+        LOG.debug( "Checking the highest role" );
+        List<UserProfile> userProfiles = user.getUserProfiles();
+        if ( userProfiles != null ) {
+            // sort the user profiles
+            Collections.sort( userProfiles, new UserProfileComparator() );
+            // get the first one. that one will be the highest
+            session.setAttribute( CommonConstants.HIGHEST_ROLE_ID_IN_SESSION,
+                userProfiles.get( 0 ).getProfilesMaster().getProfileId() );
+        }
+    }
 
-	/**
-	 * Method loginAdminAs to login admin as user
-	 * 
-	 * @param username
-	 * @param password
-	 */
-	public void loginAdminAs(String username, String password) {
-		LOG.debug("Adding newly registered user to session");
-		try {
-			UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-			UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities());
-			userAuthProvider.authenticate(auth);
 
-			if (auth.isAuthenticated()) {
-				SecurityContextHolder.getContext().setAuthentication(auth);
-			}
+    /**
+     * Method to add new user into Principal
+     * 
+     * @param emailId
+     * @param password
+     * @return
+     */
+    public void loginOnRegistration( String username, String password )
+    {
+        LOG.debug( "Adding newly registered user to session" );
+        try {
+            UserDetails userDetails = userDetailsService.loadUserByUsername( username );
+            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken( userDetails, password,
+                userDetails.getAuthorities() );
+            userAuthProvider.authenticate( auth );
 
-			if (getCurrentUser() == null) {
-				throw new NullPointerException();
-			}
-		}
-		catch (Exception e) {
-			SecurityContextHolder.getContext().setAuthentication(null);
-			LOG.error("Problem authenticating user" + username, e);
-		}
-	}
+            if ( auth.isAuthenticated() ) {
+                SecurityContextHolder.getContext().setAuthentication( auth );
+            }
 
-	/**
-	 * Method to get active user from Principal
-	 * 
-	 * @return User
-	 */
-	public User getCurrentUser() {
-		final Object sessionUser = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		User user = null;
-		if (sessionUser instanceof User) {
-			user = (User) sessionUser;
-		}
+            if ( getCurrentUser() == null ) {
+                throw new NullPointerException();
+            }
+        } catch ( Exception e ) {
+            SecurityContextHolder.getContext().setAuthentication( null );
+            LOG.error( "Problem authenticating user {}", username, e );
+        }
+    }
 
-		if (user == null) {
-			throw new UserSessionInvalidateException("User session is no longer available.");
-		}
-		return user;
-	}
 
-	// Redirects user to Landing Page if session is active
-	public void redirectToUserSessionIfExists(HttpServletResponse response) {
-		LOG.debug("Checking for state of principal session");
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (!(auth instanceof AnonymousAuthenticationToken)) {
-			try {
-				response.sendRedirect("./" + JspResolver.USER_LOGIN + ".do");
-			}
-			catch (IOException e) {
-				LOG.error("IOException while redirecting logged in user. Reason : " + e.getMessage(), e);
-			}
-		}
-	}
+    /**
+     * Method loginAdminAs to login admin as user
+     * 
+     * @param username
+     * @param password
+     */
+    public void loginAdminAs( String username, String password )
+    {
+        LOG.debug( "Adding newly registered user to session" );
+        try {
+            UserDetails userDetails = userDetailsService.loadUserByUsername( username );
+            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken( userDetails, password,
+                userDetails.getAuthorities() );
+            userAuthProvider.authenticate( auth );
 
-	// Redirects user to Landing Page and requests user to logout from previous session if active
-	public boolean isUserActiveSessionExists() {
-		LOG.debug("Checking for state of principal session");
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (!(auth instanceof AnonymousAuthenticationToken)) {
-			return true;
-		}
-		return false;
-	}
+            if ( auth.isAuthenticated() ) {
+                SecurityContextHolder.getContext().setAuthentication( auth );
+            }
 
-	@SuppressWarnings("unchecked")
-	public UserHierarchyAssignments processAssignments(HttpSession session, User user) throws NonFatalException {
-		LOG.info("Method processAssignments() called from SessionHelper");
-		UserHierarchyAssignments assignments = new UserHierarchyAssignments();
-		Map<Long, String> regionsMap = new LinkedHashMap<>();
-		Map<Long, String> branchesMap = new LinkedHashMap<>();
+            if ( getCurrentUser() == null ) {
+                throw new NullPointerException();
+            }
+        } catch ( Exception e ) {
+            SecurityContextHolder.getContext().setAuthentication( null );
+            LOG.error( "Problem authenticating user {}", username, e );
+        }
+    }
 
-		user = userManagementService.getUserByUserId(user.getUserId());
-		userManagementService.setProfilesOfUser(user);
-		Company company = user.getCompany();
-		
-		// For individual account type
-		AccountType accountType = null;
-		List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
-		if (licenseDetails != null && !licenseDetails.isEmpty()) {
-			LicenseDetail licenseDetail = licenseDetails.get(0);
-			accountType = AccountType.getAccountType(licenseDetail.getAccountsMaster().getAccountsMasterId());
-		}
-		if (accountType.getValue() == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
-			Map<Long, String> agents = new HashMap<Long, String>();
-			agents.put(user.getUserId(), CommonConstants.PROFILE_AGENT_VIEW);
-			assignments.setAgents(agents);
-			
-			session.setAttribute(CommonConstants.ENTITY_ID_COLUMN, user.getUserId());
-			session.setAttribute(CommonConstants.ENTITY_NAME_COLUMN, CommonConstants.PROFILE_AGENT_VIEW);
-			session.setAttribute(CommonConstants.ENTITY_TYPE_COLUMN, CommonConstants.AGENT_ID_COLUMN);
-			session.setAttribute(CommonConstants.USER_ASSIGNMENTS, assignments);
-			session.setAttribute( MongoOrganizationUnitSettingDaoImpl.KEY_VENDASTA_ACCESS, false );
-			return assignments;
-		}
 
-		// Fetch regions data for company
-		List<Region> regions = organizationManagementService.getAllRegionsForCompanyWithProjections(company);
-		if (regions != null && !regions.isEmpty()) {
-			for (Region region : regions) {
-				regionsMap.put(region.getRegionId(), region.getRegion());
-			}
-		}
+    /**
+     * Method to get active user from Principal
+     * 
+     * @return User
+     */
+    public User getCurrentUser()
+    {
+        LOG.debug( "Getting current user" );
+        final Object sessionUser = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = null;
+        if ( sessionUser instanceof User ) {
+            user = (User) sessionUser;
+        }
 
-		// Fetch branches data for company
-		List<Branch> branches = organizationManagementService.getAllBranchesForCompanyWithProjections(company);
-		if (branches != null && !branches.isEmpty()) {
-			for (Branch branch : branches) {
-				branchesMap.put(branch.getBranchId(), branch.getBranch());
-			}
-		}
+        if ( user == null ) {
+            LOG.warn( "User session is no longer available." );
+            throw new UserSessionInvalidateException( "User session is no longer available." );
+        }
+        return user;
+    }
 
-		if (user.isCompanyAdmin()) {
-			Map<Long, String> companies = new HashMap<Long, String>();
-			companies.put(company.getCompanyId(), company.getCompany());
-			assignments.setCompanies(companies);
 
-			assignments.setRegions(regionsMap);
-			assignments.setBranches(branchesMap);
-		}
+    // Redirects user to Landing Page if session is active
+    public void redirectToUserSessionIfExists( HttpServletResponse response )
+    {
+        LOG.debug( "Checking for state of principal session" );
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if ( !( auth instanceof AnonymousAuthenticationToken ) ) {
+            try {
+                response.sendRedirect( "./" + JspResolver.USER_LOGIN + ".do" );
+            } catch ( IOException e ) {
+                LOG.error( "IOException while redirecting logged in user. ", e );
+            }
+        }
+    }
 
-		if (user.isRegionAdmin()) {
-			Map<Long, String> regionsMapUser = assignments.getRegions();
-			if (regionsMapUser == null) {
-				regionsMapUser = new HashMap<Long, String>();
-			}
 
-			Map<Long, String> branchesMapUser = assignments.getBranches();
-			if (branchesMapUser == null) {
-				branchesMapUser = new HashMap<Long, String>();
-			}
+    // Redirects user to Landing Page and requests user to logout from previous session if active
+    public boolean isUserActiveSessionExists()
+    {
+        LOG.debug( "Checking for state of principal session" );
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if ( !( auth instanceof AnonymousAuthenticationToken ) ) {
+            return true;
+        }
+        return false;
+    }
 
-			for (UserProfile userProfile : user.getUserProfiles()) {
 
-				// fetching for all regions
-				if (userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
-					if (userProfile.getRegionId() > 0l) {
-						long regionId = userProfile.getRegionId();
-						String regionName = regionsMap.get(regionId);
-						if (regionName != null) {
-							regionsMapUser.put(regionId, regionName);
-						}
+    @SuppressWarnings ( "unchecked")
+    public UserHierarchyAssignments processAssignments( HttpSession session, User user ) throws NonFatalException
+    {
+        LOG.debug( "Method processAssignments() called from SessionHelper" );
+        UserHierarchyAssignments assignments = new UserHierarchyAssignments();
+        Map<Long, String> regionsMap = new LinkedHashMap<>();
+        Map<Long, String> branchesMap = new LinkedHashMap<>();
 
-						// Fetching branches inside the region
-						List<Branch> branchesInRegion = organizationManagementService.getAllBranchesInRegionWithProjections(regionId);
-						if (branchesInRegion != null && !branchesInRegion.isEmpty()) {
-							for (Branch branch : branchesInRegion) {
-								branchesMapUser.put(branch.getBranchId(), branch.getBranch());
-							}
-						}
-					}
-				}
-			}
+        user = userManagementService.getUserByUserId( user.getUserId() );
+        userManagementService.setProfilesOfUser( user );
+        Company company = user.getCompany();
 
-			assignments.setRegions(regionsMapUser);
-			assignments.setBranches(branchesMapUser);
-		}
-		if (user.isBranchAdmin()) {
-			Map<Long, String> regionsMapUser = assignments.getRegions();
-			if (regionsMapUser == null) {
-				regionsMapUser = new HashMap<Long, String>();
-			}
+        // For individual account type
+        AccountType accountType = null;
+        List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
+        if ( licenseDetails != null && !licenseDetails.isEmpty() ) {
+            LicenseDetail licenseDetail = licenseDetails.get( 0 );
+            accountType = AccountType.getAccountType( licenseDetail.getAccountsMaster().getAccountsMasterId() );
+        }
+        if ( accountType.getValue() == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
+            Map<Long, String> agents = new HashMap<Long, String>();
+            agents.put( user.getUserId(), CommonConstants.PROFILE_AGENT_VIEW );
+            assignments.setAgents( agents );
 
-			Map<Long, String> branchesMapUser = assignments.getBranches();
-			if (branchesMapUser == null) {
-				branchesMapUser = new HashMap<Long, String>();
-			}
+            session.setAttribute( CommonConstants.ENTITY_ID_COLUMN, user.getUserId() );
+            session.setAttribute( CommonConstants.ENTITY_NAME_COLUMN, CommonConstants.PROFILE_AGENT_VIEW );
+            session.setAttribute( CommonConstants.ENTITY_TYPE_COLUMN, CommonConstants.AGENT_ID_COLUMN );
+            session.setAttribute( CommonConstants.USER_ASSIGNMENTS, assignments );
+            session.setAttribute( MongoOrganizationUnitSettingDaoImpl.KEY_VENDASTA_ACCESS, false );
+            return assignments;
+        }
 
-			for (UserProfile userProfile : user.getUserProfiles()) {
-				if (userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
-					if (userProfile.getBranchId() > 0l) {
-						long branchId = userProfile.getBranchId();
-						String branchName = branchesMap.get(branchId);
-						if (branchName != null) {
-							branchesMapUser.put(branchId, branchName);
-						}
-					}
-				}
-			}
+        // Fetch regions data for company
+        List<Region> regions = organizationManagementService.getAllRegionsForCompanyWithProjections( company );
+        if ( regions != null && !regions.isEmpty() ) {
+            for ( Region region : regions ) {
+                regionsMap.put( region.getRegionId(), region.getRegion() );
+            }
+        }
 
-			assignments.setRegions(regionsMapUser);
-			assignments.setBranches(branchesMapUser);
-		}
-		
-		if (user.isAgent()) {
-			Map<Long, String> agents = new HashMap<Long, String>();
-			agents.put(user.getUserId(), CommonConstants.PROFILE_AGENT_VIEW);
-			assignments.setAgents(agents);
-			
-			session.setAttribute(CommonConstants.ENTITY_ID_COLUMN, user.getUserId());
-			session.setAttribute(CommonConstants.ENTITY_NAME_COLUMN, CommonConstants.PROFILE_AGENT_VIEW);
-			session.setAttribute(CommonConstants.ENTITY_TYPE_COLUMN, CommonConstants.AGENT_ID_COLUMN);
-			
-	        OrganizationUnitSettings agentSettings = organizationManagementService.getAgentSettings( user.getUserId() );             
-	        session.setAttribute(CommonConstants.VENDASTA_ACCESS, agentSettings.isVendastaAccessible() ); 
-		}
-		else if (user.isCompanyAdmin()) {
-			session.setAttribute(CommonConstants.ENTITY_ID_COLUMN, company.getCompanyId());
-			session.setAttribute(CommonConstants.ENTITY_NAME_COLUMN, company.getCompany());
-			session.setAttribute(CommonConstants.ENTITY_TYPE_COLUMN, CommonConstants.COMPANY_ID_COLUMN);
-			
-			OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( company.getCompanyId() );
-	        session.setAttribute(CommonConstants.VENDASTA_ACCESS, companySettings.isVendastaAccessible() ); 
-		}
-		else if (assignments.getRegions() != null && !assignments.getRegions().isEmpty()) {
-			Map.Entry<String, String> entry = (Map.Entry<String, String>) assignments.getRegions().entrySet().toArray()[0];
-			session.setAttribute(CommonConstants.ENTITY_ID_COLUMN, entry.getKey());
-			session.setAttribute(CommonConstants.ENTITY_NAME_COLUMN, entry.getValue());
-			session.setAttribute(CommonConstants.ENTITY_TYPE_COLUMN, CommonConstants.REGION_ID_COLUMN);
-			
-			String regionId = String.valueOf( entry.getKey());
-			OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( Long.parseLong(regionId) );
-	        session.setAttribute(CommonConstants.VENDASTA_ACCESS, regionSettings.isVendastaAccessible() ); 
-		}
-		else if (assignments.getBranches() != null && !assignments.getBranches().isEmpty()) {
-			Map.Entry<String, String> entry = (Map.Entry<String, String>) assignments.getBranches().entrySet().toArray()[0];
-			session.setAttribute(CommonConstants.ENTITY_ID_COLUMN, entry.getKey());
-			session.setAttribute(CommonConstants.ENTITY_NAME_COLUMN, entry.getValue());
-			session.setAttribute(CommonConstants.ENTITY_TYPE_COLUMN, CommonConstants.BRANCH_ID_COLUMN);
-			
-			String branchId = String.valueOf( entry.getKey());
-	        BranchSettings branchSettings = organizationManagementService.getBranchSettings( Long.parseLong( branchId ) );
-	        session.setAttribute(CommonConstants.VENDASTA_ACCESS, branchSettings.getOrganizationUnitSettings().isVendastaAccessible() ); 
-		}
-		session.setAttribute(CommonConstants.USER_ASSIGNMENTS, assignments);
+        // Fetch branches data for company
+        List<Branch> branches = organizationManagementService.getAllBranchesForCompanyWithProjections( company );
+        if ( branches != null && !branches.isEmpty() ) {
+            for ( Branch branch : branches ) {
+                branchesMap.put( branch.getBranchId(), branch.getBranch() );
+            }
+        }
 
-		LOG.info("Method processAssignments() finished from SessionHelper");
-		return assignments;
-	}
+        if ( user.isCompanyAdmin() ) {
+            Map<Long, String> companies = new HashMap<Long, String>();
+            companies.put( company.getCompanyId(), company.getCompany() );
+            assignments.setCompanies( companies );
 
-	public void updateSelectedProfile(HttpSession session, long entityId, String entityType) {
-		String entityName = "";
-		OrganizationUnitSettings unitSettings = null;
-		UserHierarchyAssignments assignments = (UserHierarchyAssignments) session.getAttribute(CommonConstants.USER_ASSIGNMENTS);
-		
-		try{
-    		if (entityType.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-    			entityName = assignments.getCompanies().get(entityId);
-    			unitSettings = organizationManagementService.getCompanySettings( entityId );
-    		}
-    		else if (entityType.equals(CommonConstants.REGION_ID_COLUMN)) {
-    			entityName = assignments.getRegions().get(entityId);
-    	        unitSettings = organizationManagementService.getRegionSettings( entityId );
-    
-    		}
-    		else if (entityType.equals(CommonConstants.BRANCH_ID_COLUMN)) {
-    			entityName = assignments.getBranches().get(entityId);
-    	        unitSettings = organizationManagementService.getBranchSettings( entityId ).getOrganizationUnitSettings();
-    		}
-    		else if (entityType.equals(CommonConstants.AGENT_ID_COLUMN)) {
-    			entityName = assignments.getAgents().get(entityId);
-    	        unitSettings = organizationManagementService.getAgentSettings( entityId );
-    		}
-		}catch( Exception error ){
-		      session.setAttribute( CommonConstants.VENDASTA_ACCESS, false );
-		}
+            assignments.setRegions( regionsMap );
+            assignments.setBranches( branchesMap );
+        }
 
-		session.setAttribute(CommonConstants.ENTITY_TYPE_COLUMN, entityType);
-		session.setAttribute(CommonConstants.ENTITY_ID_COLUMN, entityId);
-		session.setAttribute(CommonConstants.ENTITY_NAME_COLUMN, entityName);
-		if( unitSettings != null ){
-		    session.setAttribute( CommonConstants.VENDASTA_ACCESS, unitSettings.isVendastaAccessible() );
-		}
-	}
+        if ( user.isRegionAdmin() ) {
+            Map<Long, String> regionsMapUser = assignments.getRegions();
+            if ( regionsMapUser == null ) {
+                regionsMapUser = new HashMap<Long, String>();
+            }
+
+            Map<Long, String> branchesMapUser = assignments.getBranches();
+            if ( branchesMapUser == null ) {
+                branchesMapUser = new HashMap<Long, String>();
+            }
+
+            for ( UserProfile userProfile : user.getUserProfiles() ) {
+
+                // fetching for all regions
+                if ( userProfile.getProfilesMaster()
+                    .getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
+                    if ( userProfile.getRegionId() > 0l ) {
+                        long regionId = userProfile.getRegionId();
+                        String regionName = regionsMap.get( regionId );
+                        if ( regionName != null ) {
+                            regionsMapUser.put( regionId, regionName );
+                        }
+
+                        // Fetching branches inside the region
+                        List<Branch> branchesInRegion = organizationManagementService
+                            .getAllBranchesInRegionWithProjections( regionId );
+                        if ( branchesInRegion != null && !branchesInRegion.isEmpty() ) {
+                            for ( Branch branch : branchesInRegion ) {
+                                branchesMapUser.put( branch.getBranchId(), branch.getBranch() );
+                            }
+                        }
+                    }
+                }
+            }
+
+            assignments.setRegions( regionsMapUser );
+            assignments.setBranches( branchesMapUser );
+        }
+        if ( user.isBranchAdmin() ) {
+            Map<Long, String> regionsMapUser = assignments.getRegions();
+            if ( regionsMapUser == null ) {
+                regionsMapUser = new HashMap<Long, String>();
+            }
+
+            Map<Long, String> branchesMapUser = assignments.getBranches();
+            if ( branchesMapUser == null ) {
+                branchesMapUser = new HashMap<Long, String>();
+            }
+
+            for ( UserProfile userProfile : user.getUserProfiles() ) {
+                if ( userProfile.getProfilesMaster()
+                    .getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
+                    if ( userProfile.getBranchId() > 0l ) {
+                        long branchId = userProfile.getBranchId();
+                        String branchName = branchesMap.get( branchId );
+                        if ( branchName != null ) {
+                            branchesMapUser.put( branchId, branchName );
+                        }
+                    }
+                }
+            }
+
+            assignments.setRegions( regionsMapUser );
+            assignments.setBranches( branchesMapUser );
+        }
+
+        if ( user.isAgent() ) {
+            Map<Long, String> agents = new HashMap<Long, String>();
+            agents.put( user.getUserId(), CommonConstants.PROFILE_AGENT_VIEW );
+            assignments.setAgents( agents );
+
+            session.setAttribute( CommonConstants.ENTITY_ID_COLUMN, user.getUserId() );
+            session.setAttribute( CommonConstants.ENTITY_NAME_COLUMN, CommonConstants.PROFILE_AGENT_VIEW );
+            session.setAttribute( CommonConstants.ENTITY_TYPE_COLUMN, CommonConstants.AGENT_ID_COLUMN );
+
+            OrganizationUnitSettings agentSettings = organizationManagementService.getAgentSettings( user.getUserId() );
+            session.setAttribute( CommonConstants.VENDASTA_ACCESS, agentSettings.isVendastaAccessible() );
+        } else if ( user.isCompanyAdmin() ) {
+            session.setAttribute( CommonConstants.ENTITY_ID_COLUMN, company.getCompanyId() );
+            session.setAttribute( CommonConstants.ENTITY_NAME_COLUMN, company.getCompany() );
+            session.setAttribute( CommonConstants.ENTITY_TYPE_COLUMN, CommonConstants.COMPANY_ID_COLUMN );
+
+            OrganizationUnitSettings companySettings = organizationManagementService
+                .getCompanySettings( company.getCompanyId() );
+            session.setAttribute( CommonConstants.VENDASTA_ACCESS, companySettings.isVendastaAccessible() );
+        } else if ( assignments.getRegions() != null && !assignments.getRegions().isEmpty() ) {
+            Map.Entry<String, String> entry = (Map.Entry<String, String>) assignments.getRegions().entrySet().toArray()[0];
+            session.setAttribute( CommonConstants.ENTITY_ID_COLUMN, entry.getKey() );
+            session.setAttribute( CommonConstants.ENTITY_NAME_COLUMN, entry.getValue() );
+            session.setAttribute( CommonConstants.ENTITY_TYPE_COLUMN, CommonConstants.REGION_ID_COLUMN );
+
+            String regionId = String.valueOf( entry.getKey() );
+            OrganizationUnitSettings regionSettings = organizationManagementService
+                .getRegionSettings( Long.parseLong( regionId ) );
+            session.setAttribute( CommonConstants.VENDASTA_ACCESS, regionSettings.isVendastaAccessible() );
+        } else if ( assignments.getBranches() != null && !assignments.getBranches().isEmpty() ) {
+            Map.Entry<String, String> entry = (Map.Entry<String, String>) assignments.getBranches().entrySet().toArray()[0];
+            session.setAttribute( CommonConstants.ENTITY_ID_COLUMN, entry.getKey() );
+            session.setAttribute( CommonConstants.ENTITY_NAME_COLUMN, entry.getValue() );
+            session.setAttribute( CommonConstants.ENTITY_TYPE_COLUMN, CommonConstants.BRANCH_ID_COLUMN );
+
+            String branchId = String.valueOf( entry.getKey() );
+            BranchSettings branchSettings = organizationManagementService.getBranchSettings( Long.parseLong( branchId ) );
+            session.setAttribute( CommonConstants.VENDASTA_ACCESS,
+                branchSettings.getOrganizationUnitSettings().isVendastaAccessible() );
+        }
+        session.setAttribute( CommonConstants.USER_ASSIGNMENTS, assignments );
+
+        LOG.debug( "Method processAssignments() finished from SessionHelper" );
+        return assignments;
+    }
+
+
+    public void updateSelectedProfile( HttpSession session, long entityId, String entityType )
+    {
+        LOG.debug( "Update selected profile entity id {}, entity type {}", entityId, entityType );
+        String entityName = "";
+        OrganizationUnitSettings unitSettings = null;
+        UserHierarchyAssignments assignments = (UserHierarchyAssignments) session
+            .getAttribute( CommonConstants.USER_ASSIGNMENTS );
+
+        try {
+            if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                entityName = assignments.getCompanies().get( entityId );
+                unitSettings = organizationManagementService.getCompanySettings( entityId );
+            } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+                entityName = assignments.getRegions().get( entityId );
+                unitSettings = organizationManagementService.getRegionSettings( entityId );
+
+            } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+                entityName = assignments.getBranches().get( entityId );
+                unitSettings = organizationManagementService.getBranchSettings( entityId ).getOrganizationUnitSettings();
+            } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+                entityName = assignments.getAgents().get( entityId );
+                unitSettings = organizationManagementService.getAgentSettings( entityId );
+            }
+        } catch ( Exception error ) {
+            session.setAttribute( CommonConstants.VENDASTA_ACCESS, false );
+        }
+
+        session.setAttribute( CommonConstants.ENTITY_TYPE_COLUMN, entityType );
+        session.setAttribute( CommonConstants.ENTITY_ID_COLUMN, entityId );
+        session.setAttribute( CommonConstants.ENTITY_NAME_COLUMN, entityName );
+        if ( unitSettings != null ) {
+            session.setAttribute( CommonConstants.VENDASTA_ACCESS, unitSettings.isVendastaAccessible() );
+        }
+    }
+
 
     public void refreshSession( HttpSession session, User user ) throws NonFatalException
     {
-        LOG.info( "Fetching the user's canonical settings and setting it in session" );
+        LOG.debug( "Fetching the user's canonical settings and setting it in session" );
 
         // get the user's canonical settings
         getCanonicalSettings( session );
-        
+
         // Set the session variables
         setSettingVariablesInSession( session );
-        
+
         // process user assignments
-        processAssignments( session, user );        
+        processAssignments( session, user );
     }
 }
