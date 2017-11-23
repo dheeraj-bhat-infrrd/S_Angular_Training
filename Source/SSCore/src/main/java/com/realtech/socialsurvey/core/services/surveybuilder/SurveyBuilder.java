@@ -195,6 +195,8 @@ public interface SurveyBuilder {
 	 * @throws NoRecordsFetchedException 
 	 * @throws InvalidInputException 
 	 */
-	public long createSurveyQuestionForExistingSurvey(SurveyQuestionDetails questionDetails, String isUserRankingStr,
-			String isNPSStr, List<String> answers) throws InvalidInputException, NoRecordsFetchedException;
+	public long createSurveyQuestionForExistingSurvey(SurveyQuestionDetails questionDetails) 
+			throws InvalidInputException, NoRecordsFetchedException;
+
+	public void updateSurveyQuestionAndAnswer(SurveyQuestionDetails questionDetails) throws InvalidInputException, NoRecordsFetchedException;
 }

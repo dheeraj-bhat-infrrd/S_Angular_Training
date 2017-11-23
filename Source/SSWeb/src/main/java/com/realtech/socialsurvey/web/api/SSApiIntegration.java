@@ -188,7 +188,10 @@ public interface SSApiIntegration
     Response getScoreStatsQuestion(@Query ("entityId") Long entityId, @Query ("entityType") String entityType, @Query ("currentMonth") int currentMonth, @Query ("currentYear") int currentYear);
     //reporting:END
 
-
+    
     @POST("/v2/addquestiontosurvey")
 	Response addQuestionToExistingSurvey(@Body SurveyQuestionDetails questionDetails);
+
+    @POST("/v2/updatesurveyquestion")
+	Response updateQuestionFromExistingSurvey(@Body SurveyQuestionDetails questionDetails);
 }
