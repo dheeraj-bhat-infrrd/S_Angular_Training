@@ -94,19 +94,23 @@ public class ProfileCompletionList {
 	 */
 	public List<ProfileStage> getProfileCompletionList(List<ProfileStage> curProfileStages) {
 
-		LOG.debug("Method getProfileCompletionList started for profile stages : " + curProfileStages);
+		LOG.debug("Method getProfileCompletionList started for profile stages : {}", curProfileStages);
 
 		List<ProfileStage> profilestages = new ArrayList<ProfileStage>();
 		for (ProfileStage profileStage : curProfileStages) {
 			if (profileStage.getStatus() == CommonConstants.STATUS_ACTIVE) {
-				LOG.debug("Profile stage " + profileStage.getProfileStageKey() + " completed with status " + profileStage.getStatus());
+				if(LOG.isDebugEnabled()){
+					LOG.debug("Profile stage {} completed with status {}",profileStage.getProfileStageKey(),profileStage.getStatus());
+				}
 				profilestages.add(profileStage);
 			}
 			else {
-				LOG.debug("Profile stage " + profileStage.getProfileStageKey() + " completed with status " + profileStage.getStatus());
+				if(LOG.isDebugEnabled()){
+					LOG.debug("Profile stage {} completed with status {}",profileStage.getProfileStageKey(),profileStage.getStatus());
+				}
 			}
 		}
-		LOG.debug("Method getProfileCompletionList ended with filtered profile stages : " + profilestages);
+		LOG.debug("Method getProfileCompletionList ended with filtered profile stages : {}", profilestages);
 		return profilestages;
 	}
 }

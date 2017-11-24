@@ -1799,7 +1799,7 @@ public class EmailServicesImpl implements EmailServices
      */
     private EmailEntity prepareEmailEntityForSendingEmail( List<String> recipients )
     {
-        LOG.debug( "Preparing email entity for registration invitation for recipientMailId " + recipients );
+        LOG.debug( "Preparing email entity for registration invitation for recipientMailId {}", recipients );
 
         EmailEntity emailEntity = new EmailEntity();
         emailEntity.setRecipients( recipients );
@@ -1945,11 +1945,11 @@ public class EmailServicesImpl implements EmailServices
     {
         LOG.info( "Method sendReportBugMailToAdmin() started." );
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
-            LOG.error( "Recipient email Id is empty or null for sending sending report bug  mail " );
+            LOG.warn( "Recipient email Id is empty or null for sending sending report bug  mail. " );
             throw new InvalidInputException( "Recipient email Id is empty or null for sending report bug  mail " );
         }
 
-        LOG.info( "Saving EmailEntity with recipient mail id : " + recipientMailId );
+        LOG.debug( "Saving EmailEntity with recipient mail id : {}", recipientMailId );
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
 
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
@@ -1961,7 +1961,7 @@ public class EmailServicesImpl implements EmailServices
 
         messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, displayName, errorMsg ) );
 
-        LOG.info( "Calling email sender to send mail" );
+        LOG.debug( "Calling email sender to send mail." );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );
 
         LOG.info( "Method sendReportBugMailToAdmin() finished." );

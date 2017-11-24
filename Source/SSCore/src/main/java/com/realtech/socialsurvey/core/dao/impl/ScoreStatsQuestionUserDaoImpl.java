@@ -1,13 +1,11 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +13,6 @@ import org.springframework.stereotype.Component;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.ScoreStatsQuestionUserDao;
-import com.realtech.socialsurvey.core.entities.ScoreStatsQuestionCompany;
 import com.realtech.socialsurvey.core.entities.ScoreStatsQuestionUser;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 
@@ -24,9 +21,10 @@ public class ScoreStatsQuestionUserDaoImpl extends GenericReportingDaoImpl<Score
 
 	private static final Logger LOG = LoggerFactory.getLogger( ScoreStatsQuestionUserDaoImpl.class );
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<ScoreStatsQuestionUser> fetchScoreStatsQuestionForUser(Long userId , int startMonth, int startYear , int endMonth , int endYear) {
-		LOG.info( "Method to fetch all the score stats question for user,fetchScoreStatsQuestionForUser() started." );
+		LOG.debug( "Method to fetch all the score stats question for user,fetchScoreStatsQuestionForUser() started." );
         Criteria criteria = getSession().createCriteria( ScoreStatsQuestionUser.class );
         try {
             criteria.add( Restrictions.eq( CommonConstants.USER_ID, userId ) );
@@ -45,11 +43,11 @@ public class ScoreStatsQuestionUserDaoImpl extends GenericReportingDaoImpl<Score
             criteria.addOrder( Order.asc( CommonConstants.YEAR_VAL ) );
             criteria.addOrder( Order.asc( CommonConstants.MONTH_VAL ) );
             
-            LOG.info( "Method to fetch all the score stats question for user,fetchScoreStatsQuestionForUser() finished." );
+            LOG.debug( "Method to fetch all the score stats question for user,fetchScoreStatsQuestionForUser() finished." );
 
             return (List<ScoreStatsQuestionUser>) criteria.list();
         } catch ( HibernateException hibernateException ) {
-            LOG.error( "Exception caught in fetchScoreStatsQuestionForUser() ", hibernateException );
+            LOG.warn( "Exception caught in fetchScoreStatsQuestionForUser() ", hibernateException );
             throw new DatabaseException( "Exception caught in fetchScoreStatsQuestionForUser() ", hibernateException );
         }
 

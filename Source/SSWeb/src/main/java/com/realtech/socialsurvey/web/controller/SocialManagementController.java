@@ -333,7 +333,7 @@ public class SocialManagementController
                 String linkedInAuth = socialManagementService.getLinkedinAuthUrl( serverBaseUrl + linkedinRedirectUri );
                 model.addAttribute( CommonConstants.SOCIAL_AUTH_URL, linkedInAuth );
 
-                LOG.info( "Returning the linkedin authorizationurl : " + linkedInAuth );
+                LOG.info( "Returning the linkedin authorizationurl : {}", linkedInAuth );
                 break;
 
             // Building Google authUrl
@@ -349,7 +349,8 @@ public class SocialManagementController
 
                 model.addAttribute( CommonConstants.SOCIAL_AUTH_URL, googleAuth.toString() );
 
-                LOG.info( "Returning the google authorizationurl : " + googleAuth.toString() );
+                if(LOG.isInfoEnabled())
+                    LOG.info( "Returning the google authorizationurl : {}", googleAuth.toString() );
                 break;
 
             case "zillow":
@@ -415,7 +416,7 @@ public class SocialManagementController
             // On auth error
             String errorCode = request.getParameter( "error" );
             if ( errorCode != null ) {
-                LOG.error( "Error code : " + errorCode );
+                LOG.error( "Error code : {}", errorCode );
                 model.addAttribute( CommonConstants.ERROR, CommonConstants.YES );
                 return JspResolver.SOCIAL_AUTH_MESSAGE;
             }
@@ -431,7 +432,7 @@ public class SocialManagementController
                     requestUtils.getRequestServerName( request ) + facebookRedirectUri );
                 facebook4j.User fbUser = facebook.getUser( facebook.getId() );
                 if ( user != null ) {
-                    profileLink = facebookUri +  facebook.getId() ; //fbUser.getLink().toString();
+                    profileLink = facebookUri +  facebook.getId() ; 
                     FacebookPage personalUserAccount = new FacebookPage();
                     personalUserAccount.setAccessToken( accessToken.getToken() );
                     personalUserAccount.setName( fbUser.getName() );
@@ -439,7 +440,7 @@ public class SocialManagementController
                     facebookPages.add( personalUserAccount );
                 }
             } catch ( FacebookException e ) {
-                LOG.error( "Error while creating access token for facebook: " + e.getLocalizedMessage(), e );
+                LOG.error( "Error while creating access token for facebook: " , e );
             }
             boolean updated = false;
 
@@ -455,16 +456,8 @@ public class SocialManagementController
                 mediaTokens = companySettings.getSocialMediaTokens();
                 mediaTokens = socialManagementService.updateFacebookToken( accessToken, mediaTokens, profileLink );
                 facebookPages.addAll( mediaTokens.getFacebookToken().getFacebookPages() );
-                /*mediaTokens = socialManagementService.updateSocialMediaTokens(
-                    MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, mediaTokens );*/
                 companySettings.setSocialMediaTokens( mediaTokens );
-                /*for ( ProfileStage stage : companySettings.getProfileStages() ) {
-                    if ( stage.getProfileStageKey().equalsIgnoreCase( "FACEBOOK_PRF" ) ) {
-                        stage.setStatus( CommonConstants.STATUS_INACTIVE );
-                    }
-                }
-                profileManagementService.updateProfileStages( companySettings.getProfileStages(), companySettings,
-                    MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );*/
+    
                 userSettings.setCompanySettings( companySettings );
                 String mediaTokensStr = new Gson().toJson( mediaTokens, SocialMediaTokens.class );
                 model.addAttribute( "mediaTokens", mediaTokensStr );
@@ -472,21 +465,13 @@ public class SocialManagementController
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
                 if ( regionSettings == null ) {
+                    LOG.warn( "No Region settings found in current session" );
                     throw new InvalidInputException( "No Region settings found in current session" );
                 }
                 mediaTokens = regionSettings.getSocialMediaTokens();
                 mediaTokens = socialManagementService.updateFacebookToken( accessToken, mediaTokens, profileLink );
                 facebookPages.addAll( mediaTokens.getFacebookToken().getFacebookPages() );
-                /*mediaTokens = socialManagementService.updateSocialMediaTokens(
-                    MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, mediaTokens );*/
-                regionSettings.setSocialMediaTokens( mediaTokens );
-                /*for ( ProfileStage stage : regionSettings.getProfileStages() ) {
-                    if ( stage.getProfileStageKey().equalsIgnoreCase( "FACEBOOK_PRF" ) ) {
-                        stage.setStatus( CommonConstants.STATUS_INACTIVE );
-                    }
-                }
-                profileManagementService.updateProfileStages( regionSettings.getProfileStages(), regionSettings,
-                    MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );*/
+                 regionSettings.setSocialMediaTokens( mediaTokens );
                 userSettings.getRegionSettings().put( entityId, regionSettings );
                 String mediaTokensStr = new Gson().toJson( mediaTokens, SocialMediaTokens.class );
                 model.addAttribute( "mediaTokens", mediaTokensStr );
@@ -494,21 +479,13 @@ public class SocialManagementController
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
                 if ( branchSettings == null ) {
+                    LOG.warn( "No Branch settings found in current session" );
                     throw new InvalidInputException( "No Branch settings found in current session" );
                 }
                 mediaTokens = branchSettings.getSocialMediaTokens();
                 mediaTokens = socialManagementService.updateFacebookToken( accessToken, mediaTokens, profileLink );
                 facebookPages.addAll( mediaTokens.getFacebookToken().getFacebookPages() );
-                /*mediaTokens = socialManagementService.updateSocialMediaTokens(
-                    MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, mediaTokens );*/
                 branchSettings.setSocialMediaTokens( mediaTokens );
-                /*for ( ProfileStage stage : branchSettings.getProfileStages() ) {
-                    if ( stage.getProfileStageKey().equalsIgnoreCase( "FACEBOOK_PRF" ) ) {
-                        stage.setStatus( CommonConstants.STATUS_INACTIVE );
-                    }
-                }
-                profileManagementService.updateProfileStages( branchSettings.getProfileStages(), branchSettings,
-                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );*/
                 userSettings.getBranchSettings().put( entityId, branchSettings );
                 String mediaTokensStr = new Gson().toJson( mediaTokens, SocialMediaTokens.class );
                 model.addAttribute( "mediaTokens", mediaTokensStr );
@@ -517,27 +494,21 @@ public class SocialManagementController
                 || accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
                 AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
                 if ( agentSettings == null ) {
+                    LOG.warn( "No Agent settings found in current session" );
                     throw new InvalidInputException( "No Agent settings found in current session" );
                 }
 
                 mediaTokens = agentSettings.getSocialMediaTokens();
                 mediaTokens = socialManagementService.updateFacebookToken( accessToken, mediaTokens, profileLink );
                 facebookPages.addAll( mediaTokens.getFacebookToken().getFacebookPages() );
-                //mediaTokens = socialManagementService.updateAgentSocialMediaTokens( agentSettings, mediaTokens );
                 agentSettings.setSocialMediaTokens( mediaTokens );
-                /*for ( ProfileStage stage : agentSettings.getProfileStages() ) {
-                    if ( stage.getProfileStageKey().equalsIgnoreCase( "FACEBOOK_PRF" ) ) {
-                        stage.setStatus( CommonConstants.STATUS_INACTIVE );
-                    }
-                }
-                profileManagementService.updateProfileStages( agentSettings.getProfileStages(), agentSettings,
-                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );*/
                 userSettings.setAgentSettings( agentSettings );
                 String mediaTokensStr = new Gson().toJson( mediaTokens, SocialMediaTokens.class );
                 model.addAttribute( "mediaTokens", mediaTokensStr );
                 updated = true;
             }
             if ( !updated ) {
+                LOG.warn( "Invalid input exception occurred while creating access token for facebook" );
                 throw new InvalidInputException( "Invalid input exception occurred while creating access token for facebook",
                     DisplayMessageConstants.GENERAL_ERROR );
             }
@@ -548,7 +519,7 @@ public class SocialManagementController
             
         } catch ( Exception e ) {
             session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
-            LOG.error( "Exception while getting facebook access token. Reason : " + e.getMessage(), e );
+            LOG.error( "Exception while getting facebook access token. Reason : " , e );
             return JspResolver.SOCIAL_AUTH_MESSAGE;
         }
 
@@ -715,9 +686,9 @@ public class SocialManagementController
             socialManagementService.updateSocialConnectionsHistory( entityType, entityId, mediaTokens,
                 CommonConstants.FACEBOOK_SOCIAL_SITE, CommonConstants.SOCIAL_MEDIA_CONNECTED );
         } catch ( InvalidInputException | NoRecordsFetchedException e ) {
-            LOG.error( "Error while saving access token for facebook to post: " + e.getLocalizedMessage(), e );
+            LOG.error( "Error while saving access token for facebook to post: ", e );
         } catch ( NonFatalException e ) {
-            LOG.error( "Error setting settings value. Reason : " + e.getLocalizedMessage(), e );
+            LOG.error( "Error setting settings value. Reason : ", e );
         }
 
         model.addAttribute( "socialNetwork", "facebook" );
@@ -755,13 +726,14 @@ public class SocialManagementController
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
             String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
             if ( userSettings == null || entityType == null ) {
+                LOG.warn( "No user settings found in session" );
                 throw new InvalidInputException( "No user settings found in session" );
             }
 
             // On auth error
             String errorCode = request.getParameter( "oauth_problem" );
             if ( errorCode != null ) {
-                LOG.error( "Error code : " + errorCode );
+                LOG.error( "Error code : {}", errorCode );
                 model.addAttribute( CommonConstants.ERROR, CommonConstants.YES );
                 return JspResolver.SOCIAL_AUTH_MESSAGE;
             }
@@ -821,6 +793,7 @@ public class SocialManagementController
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
                 if ( regionSettings == null ) {
+                    LOG.warn( "No Region settings found in current session" );
                     throw new InvalidInputException( "No Region settings found in current session" );
                 }
                 mediaTokens = regionSettings.getSocialMediaTokens();
@@ -847,6 +820,7 @@ public class SocialManagementController
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
                 if ( branchSettings == null ) {
+                    LOG.warn( "No Branch settings found in current session" );
                     throw new InvalidInputException( "No Branch settings found in current session" );
                 }
                 mediaTokens = branchSettings.getSocialMediaTokens();
@@ -874,6 +848,7 @@ public class SocialManagementController
                 || accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
                 AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
                 if ( agentSettings == null ) {
+                    LOG.warn( "No Agent settings found in current session" );
                     throw new InvalidInputException( "No Agent settings found in current session" );
                 }
 
@@ -981,7 +956,7 @@ public class SocialManagementController
             // On auth error
             String errorCode = request.getParameter( "error" );
             if ( errorCode != null ) {
-                LOG.error( "Error code : " + errorCode );
+                LOG.error( "Error code : {}", errorCode );
                 model.addAttribute( CommonConstants.ERROR, CommonConstants.YES );
                 return JspResolver.SOCIAL_AUTH_MESSAGE;
             }
@@ -1020,6 +995,7 @@ public class SocialManagementController
                 OrganizationUnitSettings companySettings = organizationManagementService
                     .getCompanySettings( user.getCompany().getCompanyId() );
                 if ( companySettings == null ) {
+                    LOG.warn( "No company settings found in current session" );
                     throw new InvalidInputException( "No company settings found in current session" );
                 }
                 mediaTokens = companySettings.getSocialMediaTokens();
@@ -1047,6 +1023,7 @@ public class SocialManagementController
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
                 if ( regionSettings == null ) {
+                    LOG.warn( "No Region settings found in current session" );
                     throw new InvalidInputException( "No Region settings found in current session" );
                 }
                 mediaTokens = regionSettings.getSocialMediaTokens();
@@ -1074,6 +1051,7 @@ public class SocialManagementController
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
                 if ( branchSettings == null ) {
+                    LOG.warn( "No Branch settings found in current session" );
                     throw new InvalidInputException( "No Branch settings found in current session" );
                 }
                 mediaTokens = branchSettings.getSocialMediaTokens();
@@ -1101,6 +1079,7 @@ public class SocialManagementController
                 || accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
                 AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
                 if ( agentSettings == null ) {
+                    LOG.warn( "No Agent settings found in current session" );
                     throw new InvalidInputException( "No Agent settings found in current session" );
                 }
 
@@ -1147,7 +1126,7 @@ public class SocialManagementController
             socialManagementService.updateSocialConnectionsHistory( entityType, entityId, mediaTokens,
                 CommonConstants.LINKEDIN_SOCIAL_SITE, CommonConstants.SOCIAL_MEDIA_CONNECTED );
         } catch ( Exception e ) {
-            LOG.error( "Exception while getting linkedin access token. Reason : " + e.getMessage(), e );
+            LOG.error( "Exception while getting linkedin access token. Reason : ", e );
             return JspResolver.SOCIAL_AUTH_MESSAGE;
         }
 
@@ -1195,7 +1174,7 @@ public class SocialManagementController
             // On auth error
             String errorCode = request.getParameter( "error" );
             if ( errorCode != null ) {
-                LOG.error( "Error code : " + errorCode );
+                LOG.error( "Error code : {}", errorCode );
                 model.addAttribute( CommonConstants.ERROR, CommonConstants.YES );
                 return JspResolver.SOCIAL_AUTH_MESSAGE;
             }
@@ -1221,7 +1200,7 @@ public class SocialManagementController
                 refreshToken = (String) tokenData.get( "refresh_token" );
                 expiresIn = (String) tokenData.get( "expires_in" );                
             }
-            LOG.debug( "Google access token: " + accessToken + ", Refresh Token: " + refreshToken + ", Expires In: " + expiresIn );
+            LOG.debug( "Google access token: {}, Refresh Token: {}, Expires In: {}",accessToken, refreshToken, expiresIn );
 
             HttpClient httpclient = HttpClientBuilder.create().build();
             HttpGet httpGet = new HttpGet( googleProfileUri + accessToken );
@@ -1231,7 +1210,7 @@ public class SocialManagementController
             String profileLink = null;
             if ( profileData != null ) {
                 if(profileData.get( "link" ) == null){
-                    LOG.debug( "Google Plus account is not exist for the entity " + entityType + " with id : " + entityId );
+                    LOG.debug( "Google Plus account is not exist for the entity {} with id : {}", entityType, entityId );
                     session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
                     model.addAttribute( CommonConstants.NO_GOOGLE_PLUS_FOUND, CommonConstants.YES );
                     return JspResolver.SOCIAL_AUTH_MESSAGE;
@@ -1247,6 +1226,7 @@ public class SocialManagementController
                 OrganizationUnitSettings companySettings = organizationManagementService
                     .getCompanySettings( user.getCompany().getCompanyId() );
                 if ( companySettings == null ) {
+                    LOG.warn( "No company settings found in current session" );
                     throw new InvalidInputException( "No company settings found in current session" );
                 }
                 mediaTokens = companySettings.getSocialMediaTokens();
@@ -1273,6 +1253,7 @@ public class SocialManagementController
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
                 if ( regionSettings == null ) {
+                    LOG.warn( "No Region settings found in current session" );
                     throw new InvalidInputException( "No Region settings found in current session" );
                 }
                 mediaTokens = regionSettings.getSocialMediaTokens();
@@ -1300,6 +1281,7 @@ public class SocialManagementController
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
                 if ( branchSettings == null ) {
+                    LOG.warn( "No Branch settings found in current session" );
                     throw new InvalidInputException( "No Branch settings found in current session" );
                 }
                 mediaTokens = branchSettings.getSocialMediaTokens();
@@ -1345,6 +1327,7 @@ public class SocialManagementController
                 updated = true;
             }
             if ( !updated ) {
+                LOG.warn( "Invalid input exception occurred while creating access token for google" );
                 throw new InvalidInputException( "Invalid input exception occurred while creating access token for google",
                     DisplayMessageConstants.GENERAL_ERROR );
             }
@@ -1354,7 +1337,7 @@ public class SocialManagementController
                 CommonConstants.GOOGLE_SOCIAL_SITE, CommonConstants.SOCIAL_MEDIA_CONNECTED );
         } catch ( Exception e ) {
             session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
-            LOG.error( "Exception while getting google access token. Reason : " + e.getMessage(), e );
+            LOG.error( "Exception while getting google access token. Reason : ", e );
             return JspResolver.SOCIAL_AUTH_MESSAGE;
         }
 
@@ -1453,9 +1436,7 @@ public class SocialManagementController
                 e );
             return e.getMessage();
         }
-        /*if ( rating % 1 == 0 ) {
-            ratingFormat = CommonConstants.SOCIAL_RANKING_WHOLE_FORMAT;
-        }*/
+       
 
         User user = sessionHelper.getCurrentUser();
         List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser( user.getUserId() );
@@ -1535,9 +1516,7 @@ public class SocialManagementController
             String custDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail( custFirstName, custLastName );
             List<OrganizationUnitSettings> settings = socialManagementService
                 .getBranchAndRegionSettingsForUser( user.getUserId() );
-            /*String twitterMessage = rating + "-Star Survey Response from " + custDisplayName + " for " + agentName
-                + " on @SocialSurveyMe - view at " + applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL
-                + agentProfileLink;*/
+            
             String twitterMessage = String.format( CommonConstants.TWITTER_MESSAGE,
                 surveyHandler.getFormattedSurveyScore( rating ), custDisplayName, agentName, "@SocialSurveyMe" )
                 + applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
@@ -1549,7 +1528,7 @@ public class SocialManagementController
                         if ( !socialManagementService.tweet( setting, twitterMessage, user.getCompany().getCompanyId() ) )
                             twitterNotSetup = false;
                 } catch ( TwitterException e ) {
-                    LOG.error(
+                    LOG.warn(
                         "TwitterException caught in postToTwitter() while trying to post to twitter. Nested excption is ", e );
                     throw new NonFatalException(
                         "TwitterException caught in postToTwitter() while trying to post to twitter in postToTwitter(). Nested exception is ",
@@ -1631,9 +1610,7 @@ public class SocialManagementController
     public String linkedInDataImport( HttpServletRequest request, Model model )
     {
         LOG.info( "Method linkedInDataImport() called from SocialManagementController" );
-        /*String facebookProfileUrl = "";
-        String twitterProfileUrl = "";
-        String googleProfileUrl = "";*/
+        
         String linkedinProfileUrl = "";
         try {
             sessionHelper.getCanonicalSettings( request.getSession( false ) );
@@ -1646,18 +1623,7 @@ public class SocialManagementController
         UserSettings usersettings = (UserSettings) session.getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
         if ( usersettings != null && usersettings.getAgentSettings() != null
             && usersettings.getAgentSettings().getSocialMediaTokens() != null ) {
-            /*if(usersettings.getAgentSettings().getSocialMediaTokens().getFacebookToken()!=null
-            	&& usersettings.getAgentSettings().getSocialMediaTokens().getFacebookToken().getFacebookPageLink()!=null){
-            	facebookProfileUrl = usersettings.getAgentSettings().getSocialMediaTokens().getFacebookToken().getFacebookPageLink();
-            }
-            if(usersettings.getAgentSettings().getSocialMediaTokens().getFacebookToken()!=null
-            	&& usersettings.getAgentSettings().getSocialMediaTokens().getTwitterToken().getTwitterPageLink()!=null){
-            	twitterProfileUrl = usersettings.getAgentSettings().getSocialMediaTokens().getTwitterToken().getTwitterPageLink();
-            }
-            if(usersettings.getAgentSettings().getSocialMediaTokens().getGoogleToken()!=null
-            		&& usersettings.getAgentSettings().getSocialMediaTokens().getGoogleToken().getProfileLink()!=null){
-            		googleProfileUrl = usersettings.getAgentSettings().getSocialMediaTokens().getGoogleToken().getProfileLink();
-            }*/
+      
             if ( usersettings.getAgentSettings().getSocialMediaTokens().getLinkedInToken() != null
                 && usersettings.getAgentSettings().getSocialMediaTokens().getLinkedInToken().getLinkedInPageLink() != null ) {
                 linkedinProfileUrl = usersettings.getAgentSettings().getSocialMediaTokens().getLinkedInToken()
@@ -1665,9 +1631,7 @@ public class SocialManagementController
             }
         }
         model.addAttribute( "linkedinProfileUrl", linkedinProfileUrl );
-        /*model.addAttribute("facebookProfileUrl", facebookProfileUrl);
-        model.addAttribute("twitterProfileUrl", twitterProfileUrl);
-        model.addAttribute("googleProfileUrl", googleProfileUrl);*/
+        
         return JspResolver.LINKEDIN_IMPORT;
     }
 
@@ -1684,6 +1648,7 @@ public class SocialManagementController
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
             String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
             if ( entityType == null ) {
+                LOG.warn( "No user settings found in session" );
                 throw new InvalidInputException( "No user settings found in session" );
             }
             agentSettings = userManagementService.getUserSettings( entityId );
@@ -1810,7 +1775,7 @@ public class SocialManagementController
         retrofit.client.Response response = null;
         String screenName = null;
         if(nmlsId != null) {
-        	LOG.info( "NmlsId found for enity. So getting records from lender API using NmlsId id : " + nmlsId + " and screen name : " + zillowScreenName );
+        	LOG.info( "NmlsId found for enity. So getting records from lender API using NmlsId id : {} and screen name : {}", nmlsId, zillowScreenName );
         	FetchZillowReviewBodyByNMLS fetchZillowReviewBodyByNMLS = new FetchZillowReviewBodyByNMLS();                       
             LenderRef lenderRef = new LenderRef();
             lenderRef.setNmlsId(nmlsId);
@@ -1832,7 +1797,8 @@ public class SocialManagementController
                             if ( map != null ) {
                             	List<SurveyDetails> surveyDetailsList = new ArrayList<SurveyDetails>();
                                 surveyDetailsList = profileManagementService.buildSurveyDetailFromZillowLenderReviewMap( map );
-                                LOG.info( "no of records found from zillow is " + surveyDetailsList.size() );
+                                if(LOG.isDebugEnabled())
+                                    LOG.debug( "no of records found from zillow is {}", surveyDetailsList.size() );
                                 if(surveyDetailsList != null && surveyDetailsList.size() > 0) {
                                 	List<HashMap<String, Object>> reviews = new ArrayList<HashMap<String, Object>>();
                                 	reviews = (List<HashMap<String, Object>>) map.get( "reviews" );
@@ -1851,7 +1817,7 @@ public class SocialManagementController
                                 }
                             }
                         } catch ( IOException e ) {
-                            LOG.error( "Exception caught while parsing zillow reviews" + e.getMessage() );
+                            LOG.warn( "Exception caught while parsing zillow reviews {}", e.getMessage() );
                             throw new UnavailableException( "Zillow reviews could not be fetched for  nmls: " + nmlsId );
                         }
 	                }
@@ -1866,14 +1832,7 @@ public class SocialManagementController
         session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
         model.addAttribute( CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES );
         model.addAttribute( "socialNetwork", "zillow" );
-        
-       /* if(profileSettings.getSocialMediaTokens() == null) {
-        	SocialMediaTokens socialMediaToken = new SocialMediaTokens();
-        	ZillowToken zillowTokenNew = new ZillowToken();
-        	socialMediaToken.setZillowToken(zillowTokenNew);
-        	List<>
-        	profileSettingssetSocialMediaTokens(socialMediaTokens);
-        }*/
+       
         
         profileSettings.getSocialMediaTokens().getZillowToken().setZillowScreenName(screenName);
         
@@ -1930,6 +1889,7 @@ public class SocialManagementController
             String collectionName = "";
 
             if ( userSettings == null || entityType == null || profileSettings == null ) {
+                LOG.warn( "No user settings found in session" );
                 throw new InvalidInputException( "No user settings found in session" );
             }
             
@@ -1938,13 +1898,14 @@ public class SocialManagementController
 
             // if user has changed his Zillow account, then delete existing Zillow reviews
             if ( checkZillowAccountChanged( profileSettings, zillowScreenName ) ) {
-                LOG.debug( "Deleting zillow feed for agent ID : " + profileSettings.getIden() );
+                if(LOG.isDebugEnabled())
+                    LOG.debug( "Deleting zillow feed for agent ID : {}", profileSettings.getIden() );
                 surveyHandler.deleteExistingZillowSurveysByEntity( entityType, profileSettings.getIden() );
             }
 
             String errorCode = request.getParameter( "error" );
             if ( errorCode != null ) {
-                LOG.error( "Error code : " + errorCode );
+                LOG.error( "Error code : {}", errorCode );
                 model.addAttribute( CommonConstants.ERROR, CommonConstants.YES );
                 return JspResolver.SOCIAL_AUTH_MESSAGE;
             }
@@ -2018,7 +1979,7 @@ public class SocialManagementController
                                    nmlsId = new Integer(NMLSNumber);
                                } catch (Exception ex) {
                                    //for invalid number, no need to store NMLSID to DB, only screen name and link will be added.
-                                   LOG.info( "Zillow exception : " + ex );
+                                   LOG.info( "Zillow exception : {}", ex );
                                }
                            }
                        }
@@ -2057,16 +2018,7 @@ public class SocialManagementController
                 if ( company != null ) {
                     settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.ZILLOW,
                         CommonConstants.SET_SETTINGS );
-                    // Commented as Zillow reviews are saved in Social Survey database, SS-307
-                    // Set IS_ZILLOW_CONNECTED to true
-                    // company.setIsZillowConnected( CommonConstants.ZILLOW_CONNECTED );
-                    // if ( zillowReviewCount == 0 ) {
-                    //    company.setZillowAverageScore( 0.0 );
-                    //    company.setZillowReviewCount( 0 );
-                    // } else {
-                    //    company.setZillowAverageScore( zillowTotalScore / zillowReviewCount );
-                    //    company.setZillowReviewCount( zillowReviewCount );
-                    // }
+                    
                     userManagementService.updateCompany( company );
                 }
                 for ( ProfileStage stage : companySettings.getProfileStages() ) {
@@ -2083,6 +2035,7 @@ public class SocialManagementController
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
                 if ( regionSettings == null ) {
+                    LOG.warn( "No Region settings found in current session" );
                     throw new InvalidInputException( "No Region settings found in current session" );
                 }
                 mediaTokens = regionSettings.getSocialMediaTokens();
@@ -2096,16 +2049,7 @@ public class SocialManagementController
                 if ( region != null ) {
                     settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.ZILLOW,
                         CommonConstants.SET_SETTINGS );
-                    // Commented as Zillow reviews are saved in Social Survey database, SS-307
-                    // Set IS_ZILLOW_CONNECTED to true
-                    // region.setIsZillowConnected( CommonConstants.ZILLOW_CONNECTED );
-                    // if ( zillowReviewCount == 0 ) {
-                    //    region.setZillowAverageScore( 0.0 );
-                    //    region.setZillowReviewCount( 0 );
-                    // } else {
-                    //    region.setZillowAverageScore( zillowTotalScore / zillowReviewCount );
-                    //    region.setZillowReviewCount( zillowReviewCount );
-                    // }
+                    
                     userManagementService.updateRegion( region );
                 }
                 for ( ProfileStage stage : regionSettings.getProfileStages() ) {
@@ -2135,16 +2079,7 @@ public class SocialManagementController
                 if ( branch != null ) {
                     settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.ZILLOW,
                         CommonConstants.SET_SETTINGS );
-                    // Commented as Zillow reviews are saved in Social Survey database, SS-307
-                    // Set IS_ZILLOW_CONNECTED to true
-                    // branch.setIsZillowConnected( CommonConstants.ZILLOW_CONNECTED );
-                    // if ( zillowReviewCount == 0 ) {
-                    //    branch.setZillowAverageScore( 0.0 );
-                    //    branch.setZillowReviewCount( 0 );
-                    // } else {
-                    //    branch.setZillowAverageScore( zillowTotalScore / zillowReviewCount );
-                    //    branch.setZillowReviewCount( zillowReviewCount );
-                    // }
+                    
                     userManagementService.updateBranch( branch );
                 }
                 for ( ProfileStage stage : branchSettings.getProfileStages() ) {
@@ -2161,6 +2096,7 @@ public class SocialManagementController
                 || accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
                 AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
                 if ( agentSettings == null ) {
+                    LOG.warn( "No Agent settings found in current session" );
                     throw new InvalidInputException( "No Agent settings found in current session" );
                 }
                 mediaTokens = agentSettings.getSocialMediaTokens();
@@ -2170,16 +2106,7 @@ public class SocialManagementController
                 agentSettings.setSocialMediaTokens( mediaTokens );
                 User agent = userManagementService.getUserByUserId( agentSettings.getIden() );
                 if ( agent != null ) {
-                    // Commented as Zillow reviews are saved in Social Survey database, SS-307
-                    // Set IS_ZILLOW_CONNECTED to true
-                    // agent.setIsZillowConnected( CommonConstants.ZILLOW_CONNECTED );
-                    // if ( zillowReviewCount == 0 ) {
-                    //    agent.setZillowAverageScore( 0.0 );
-                    //    agent.setZillowReviewCount( 0 );
-                    // } else {
-                    //    agent.setZillowAverageScore( zillowTotalScore / zillowReviewCount );
-                    //    agent.setZillowReviewCount( zillowReviewCount );
-                    // }
+                    
                     userManagementService.updateUser( agent );
 
                     // updating solr review count for user
@@ -2200,6 +2127,7 @@ public class SocialManagementController
                 updated = true;
             }
             if ( !updated ) {
+                LOG.warn( "Invalid input exception occurred while creating access token for zillow" );
                 throw new InvalidInputException( "Invalid input exception occurred while creating access token for zillow",
                     DisplayMessageConstants.GENERAL_ERROR );
             }
@@ -2208,9 +2136,7 @@ public class SocialManagementController
             socialManagementService.updateSocialConnectionsHistory( entityType, entityId, mediaTokens,
                 CommonConstants.ZILLOW_SOCIAL_SITE, CommonConstants.SOCIAL_MEDIA_CONNECTED );
         } catch ( Exception e ) {
-            /*session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
-            model.addAttribute( CommonConstants.ERROR, CommonConstants.YES );*/
-            LOG.error( "Exception while setting zillow profile link. Reason : " + e.getMessage(), e );
+             LOG.error( "Exception while setting zillow profile link. Reason : " , e );
             return CommonConstants.ERROR;
         }
 
@@ -2245,22 +2171,7 @@ public class SocialManagementController
             profileSettings = (OrganizationUnitSettings) session.getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
         }
         
-        //If Company Vertical is Lending means vertical=Real Estate, NMLS is required
-        /*if(CommonConstants.ZILLOW_LENDING_VERTICALS.contains(profileSettings.getVertical())) {
-        	//if NMLS id is passed            
-            if ( nmlsId != null ) {
-            	//fetch profile name by calling Zillow (if review present, then only will be available)
-            	//if review present fetch reviews to get the screen name,
-            	//if no review present, ask for screen name from user (by poping up)
-            } else {
-            	//model.addAttribute( "Error", "NMLS is required" );
-            	//return CommonConstants.ERROR;
-            	return CommonConstants.ZILLOW_NMLS_REQUIRED_ERROR;
-            }
-        } else {
-        	//for other NMLS is not required
-        }*/
-        
+    
         
         
         if ( zillowScreenName == null || zillowScreenName.equals("") ) {
@@ -2283,18 +2194,17 @@ public class SocialManagementController
                 
                 //decode the zillow url
                 zillowScreenName = java.net.URLDecoder.decode(zillowScreenName, "UTF-8");
-                //zillowProfileMapType = java.net.URLDecoder.decode(zillowProfileMapType, "UTF-8");
-
+               
                 
                 // if user has changed his Zillow account, then delete existing Zillow reviews
                 if ( checkZillowAccountChanged( profileSettings, zillowScreenName ) ) {
-                    LOG.debug( "Deleting zillow feed for agent ID : " + profileSettings.getIden() );
+                    LOG.debug( "Deleting zillow feed for agent ID : {}", profileSettings.getIden() );
                     surveyHandler.deleteExistingZillowSurveysByEntity( entityType, profileSettings.getIden() );
                 }
 
                 String errorCode = request.getParameter( "error" );
                 if ( errorCode != null ) {
-                    LOG.error( "Error code : " + errorCode );
+                    LOG.error( "Error code : {}", errorCode );
                     model.addAttribute( CommonConstants.ERROR, CommonConstants.YES );
                     return JspResolver.SOCIAL_AUTH_MESSAGE;
                 }
@@ -2386,6 +2296,7 @@ public class SocialManagementController
                     OrganizationUnitSettings companySettings = organizationManagementService
                         .getCompanySettings( user.getCompany().getCompanyId() );
                     if ( companySettings == null ) {
+                        LOG.warn( "No company settings found in current session" );
                         throw new InvalidInputException( "No company settings found in current session" );
                     }
                     mediaTokens = companySettings.getSocialMediaTokens();
@@ -2399,16 +2310,7 @@ public class SocialManagementController
                     if ( company != null ) {
                         settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.ZILLOW,
                             CommonConstants.SET_SETTINGS );
-                        // Commented as Zillow reviews are saved in Social Survey database, SS-307
-                        // Set IS_ZILLOW_CONNECTED to true
-                        // company.setIsZillowConnected( CommonConstants.ZILLOW_CONNECTED );
-                        // if ( zillowReviewCount == 0 ) {
-                        //    company.setZillowAverageScore( 0.0 );
-                        //    company.setZillowReviewCount( 0 );
-                        // } else {
-                        //    company.setZillowAverageScore( zillowTotalScore / zillowReviewCount );
-                        //    company.setZillowReviewCount( zillowReviewCount );
-                        // }
+                       
                         userManagementService.updateCompany( company );
                     }
                     for ( ProfileStage stage : companySettings.getProfileStages() ) {
@@ -2438,16 +2340,7 @@ public class SocialManagementController
                     if ( region != null ) {
                         settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.ZILLOW,
                             CommonConstants.SET_SETTINGS );
-                        // Commented as Zillow reviews are saved in Social Survey database, SS-307
-                        // Set IS_ZILLOW_CONNECTED to true
-                        // region.setIsZillowConnected( CommonConstants.ZILLOW_CONNECTED );
-                        // if ( zillowReviewCount == 0 ) {
-                        //    region.setZillowAverageScore( 0.0 );
-                        //    region.setZillowReviewCount( 0 );
-                        // } else {
-                        //    region.setZillowAverageScore( zillowTotalScore / zillowReviewCount );
-                        //    region.setZillowReviewCount( zillowReviewCount );
-                        // }
+                        
                         userManagementService.updateRegion( region );
                     }
                     for ( ProfileStage stage : regionSettings.getProfileStages() ) {
@@ -2464,6 +2357,7 @@ public class SocialManagementController
                     OrganizationUnitSettings branchSettings = organizationManagementService
                         .getBranchSettingsDefault( entityId );
                     if ( branchSettings == null ) {
+                        LOG.warn( "No Branch settings found in current session" );
                         throw new InvalidInputException( "No Branch settings found in current session" );
                     }
                     mediaTokens = branchSettings.getSocialMediaTokens();
@@ -2477,16 +2371,7 @@ public class SocialManagementController
                     if ( branch != null ) {
                         settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.ZILLOW,
                             CommonConstants.SET_SETTINGS );
-                        // Commented as Zillow reviews are saved in Social Survey database, SS-307
-                        // Set IS_ZILLOW_CONNECTED to true
-                        // branch.setIsZillowConnected( CommonConstants.ZILLOW_CONNECTED );
-                        // if ( zillowReviewCount == 0 ) {
-                        //    branch.setZillowAverageScore( 0.0 );
-                        //    branch.setZillowReviewCount( 0 );
-                        // } else {
-                        //    branch.setZillowAverageScore( zillowTotalScore / zillowReviewCount );
-                        //    branch.setZillowReviewCount( zillowReviewCount );
-                        // }
+                        
                         userManagementService.updateBranch( branch );
                     }
                     for ( ProfileStage stage : branchSettings.getProfileStages() ) {
@@ -2503,6 +2388,7 @@ public class SocialManagementController
                     || accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
                     AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
                     if ( agentSettings == null ) {
+                        LOG.warn( "No Agent settings found in current session" );
                         throw new InvalidInputException( "No Agent settings found in current session" );
                     }
                     mediaTokens = agentSettings.getSocialMediaTokens();
@@ -2512,16 +2398,7 @@ public class SocialManagementController
                     agentSettings.setSocialMediaTokens( mediaTokens );
                     User agent = userManagementService.getUserByUserId( agentSettings.getIden() );
                     if ( agent != null ) {
-                        // Commented as Zillow reviews are saved in Social Survey database, SS-307
-                        // Set IS_ZILLOW_CONNECTED to true
-                        // agent.setIsZillowConnected( CommonConstants.ZILLOW_CONNECTED );
-                        // if ( zillowReviewCount == 0 ) {
-                        //    agent.setZillowAverageScore( 0.0 );
-                        //    agent.setZillowReviewCount( 0 );
-                        // } else {
-                        //    agent.setZillowAverageScore( zillowTotalScore / zillowReviewCount );
-                        //    agent.setZillowReviewCount( zillowReviewCount );
-                        // }
+                        
                         userManagementService.updateUser( agent );
 
                         // updating solr review count for user
@@ -2550,9 +2427,7 @@ public class SocialManagementController
                 socialManagementService.updateSocialConnectionsHistory( entityType, entityId, mediaTokens,
                     CommonConstants.ZILLOW_SOCIAL_SITE, CommonConstants.SOCIAL_MEDIA_CONNECTED );
             } catch ( Exception e ) {
-                /*session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
-                model.addAttribute( CommonConstants.ERROR, CommonConstants.YES );*/
-                LOG.error( "Exception while setting zillow profile link. Reason : " + e.getMessage(), e );
+                LOG.error( "Exception while setting zillow profile link. Reason : " , e );
                 return CommonConstants.ERROR;
             }
 
@@ -2627,7 +2502,6 @@ public class SocialManagementController
     public String disconnectZillow( HttpServletRequest request )
     {
         String socialMedia =  CommonConstants.ZILLOW_SOCIAL_SITE;
-        //String removeFeedStr = request.getParameter( "removeFeed" );
         String keepOrDeleteReview = request.getParameter( "keepOrDeleteReview" );
         boolean removeFeed = true;
         
@@ -2642,9 +2516,11 @@ public class SocialManagementController
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
             String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
             if ( userSettings == null || entityType == null ) {
+                LOG.warn( "No user settings found in session" );
                 throw new InvalidInputException( "No user settings found in session" );
             }
             if ( socialMedia == null || socialMedia.isEmpty() ) {
+                LOG.warn( "Social media can not be null or empty" );
                 throw new InvalidInputException( "Social media can not be null or empty" );
             }
             
@@ -2666,13 +2542,7 @@ public class SocialManagementController
                 Company company = userManagementService.getCompanyById( entityId );
                 if ( company != null ) {
                     settingsSetter.setSettingsValueForCompany( company, settings, unset );
-                    // Commented as Zillow reviews are saved in Social Survey database, SS-307
-                    // Set IS_ZILLOW_CONNECTED to false
-                    // if ( isZillow ) {
-                    //    company.setIsZillowConnected( CommonConstants.ZILLOW_DISCONNECTED );
-                    //    company.setZillowAverageScore( 0.0 );
-                    //    company.setZillowReviewCount( 0 );
-                    // }
+                    
                     userManagementService.updateCompany( company );
                 }
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
@@ -2751,7 +2621,8 @@ public class SocialManagementController
         if(unitSettings != null 
             && ( unitSettings.getSocialMediaTokens() == null 
             || unitSettings.getSocialMediaTokens().getZillowToken() == null )) {
-            return false;//"no-zillow";
+            return false; 
+            //"no-zillow"
         } else {
             return true;
         }
@@ -2827,13 +2698,7 @@ public class SocialManagementController
                 Company company = userManagementService.getCompanyById( entityId );
                 if ( company != null ) {
                     settingsSetter.setSettingsValueForCompany( company, settings, unset );
-                    // Commented as Zillow reviews are saved in Social Survey database, SS-307
-                    // Set IS_ZILLOW_CONNECTED to false
-                    // if ( isZillow ) {
-                    //    company.setIsZillowConnected( CommonConstants.ZILLOW_DISCONNECTED );
-                    //    company.setZillowAverageScore( 0.0 );
-                    //    company.setZillowReviewCount( 0 );
-                    // }
+                    
                     userManagementService.updateCompany( company );
                 }
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
@@ -2890,11 +2755,7 @@ public class SocialManagementController
 
             // Set IS_ZILLOW_CONNECTED to false
             if ( isZillow ) {
-                //    User agent = userManagementService.getUserByUserId( unitSettings.getIden() );
-                //    agent.setIsZillowConnected( CommonConstants.ZILLOW_DISCONNECTED );
-                //    agent.setZillowAverageScore( 0.0 );
-                //    agent.setZillowReviewCount( 0 );
-                //    userManagementService.updateUser( agent );
+               
                 long reviewCount = profileManagementService.getReviewsCount( entityId, -1, -1,
                     CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, false );
                 solrSearchService.editUserInSolr( entityId, CommonConstants.REVIEW_COUNT_SOLR, String.valueOf( reviewCount ) );
@@ -3021,7 +2882,7 @@ public class SocialManagementController
         //Validate user
         try {
             if ( user == null ) {
-                LOG.error( "No user found in session" );
+                LOG.warn( "No user found in session" );
                 throw new InvalidInputException( "No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION );
             }
             if ( user.getStatus() != CommonConstants.STATUS_ACTIVE ) {
@@ -3030,8 +2891,7 @@ public class SocialManagementController
                     DisplayMessageConstants.USER_MANAGEMENT_NOT_AUTHORIZED, DisplayMessageType.ERROR_MESSAGE ) );
             }
         } catch ( NonFatalException nonFatalException ) {
-            LOG.error( "NonFatalException in while showing social monitor. Reason : " + nonFatalException.getMessage(),
-                nonFatalException );
+            LOG.error( "NonFatalException in while showing social monitor. Reason : ",nonFatalException );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
         }
@@ -3091,7 +2951,7 @@ public class SocialManagementController
             long entityId = Long.parseLong( request.getParameter( "entityId" ) );
             try {
                 if ( startIndexStr == null || startIndexStr.isEmpty() ) {
-                    LOG.error( "Invalid value found in startIndex. It cannot be null or empty." );
+                    LOG.warn( "Invalid value found in startIndex. It cannot be null or empty." );
                     throw new InvalidInputException( "Invalid value found in startIndex. It cannot be null or empty." );
                 }
                 if ( batchSizeStr == null || batchSizeStr.isEmpty() ) {
@@ -3102,7 +2962,7 @@ public class SocialManagementController
                 startIndex = Integer.parseInt( startIndexStr );
                 batchSize = Integer.parseInt( batchSizeStr );
             } catch ( NumberFormatException e ) {
-                LOG.error( "NumberFormatException while finding social posts. Reason : " + e.getMessage(), e );
+                LOG.warn( "NumberFormatException while finding social posts. Reason : " , e );
                 throw new NonFatalException( "NumberFormatException while searching for social posts", e );
             }
             String searchQuery = request.getParameter( "searchQuery" );
@@ -3114,7 +2974,7 @@ public class SocialManagementController
             }
             User admin = sessionHelper.getCurrentUser();
             if ( admin == null ) {
-                LOG.error( "No user found in session" );
+                LOG.warn( "No user found in session" );
                 throw new InvalidInputException( "No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION );
             }
 
@@ -3193,13 +3053,12 @@ public class SocialManagementController
                 posts = new Gson().toJson( socialMonitorData );
 
             } catch ( MalformedURLException e ) {
-                LOG.error( "MalformedURLException while searching for social posts. Reason : " + e.getMessage(), e );
+                LOG.warn( "MalformedURLException while searching for social posts. Reason : ", e );
                 throw new NonFatalException( "MalformedURLException while searching for social posts.",
                     DisplayMessageConstants.GENERAL_ERROR, e );
             }
         } catch ( NonFatalException nonFatalException ) {
-            LOG.error( "NonFatalException while searching for social posts. Reason : " + nonFatalException.getStackTrace(),
-                nonFatalException );
+            LOG.error( "NonFatalException while searching for social posts. Reason : ",nonFatalException );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
@@ -3217,7 +3076,7 @@ public class SocialManagementController
             || profileSettings.getSocialMediaTokens().getZillowToken() == null
             || profileSettings.getSocialMediaTokens().getZillowToken().getZillowScreenName() == null ) {
             LOG.error(
-                "zillow settings missing in profile id : " + profileSettings.getIden() + " in checkZillowAccountChanged()" );
+                "zillow settings missing in profile id : {} in checkZillowAccountChanged()",profileSettings.getIden() );
             return false;
         }
         if ( zillowScreenName == null || zillowScreenName.isEmpty() ) {
@@ -3246,7 +3105,7 @@ public class SocialManagementController
         //Validate user
         try {
             if ( user == null ) {
-                LOG.error( "No user found in session" );
+                LOG.warn( "No user found in session" );
                 throw new InvalidInputException( "No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION );
             }
             if ( user.getStatus() != CommonConstants.STATUS_ACTIVE ) {
