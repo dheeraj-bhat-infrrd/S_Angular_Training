@@ -375,5 +375,33 @@ public class SurveyApiV2Controller
 			throw new SSApiException("NoRecordsFetchedException caught while adding new question to existing survey.",e);			
 		}
     	return "SUCCESS";
+    } 
+    
+    @RequestMapping ( value = "/updatesurveyresponse", method = RequestMethod.GET)
+    @ApiOperation ( value = "Update Survey Response And Get Swear words")
+    public String updateSurveyResponse( String surveyId, String question, String questionType, String answer, int stage,
+        boolean isUserRankingQuestion, boolean isNpsQuestion  ){
+        LOGGER.info("Method updateSurveyResponse() started to store response of customer.");
+        surveyHandler.updateCustomerAnswersInSurvey(surveyId, question, questionType, answer, stage, isUserRankingQuestion, isNpsQuestion);
+        LOGGER.info("Method updateSurveyResponse() to store response of customer finished successfully");
+        return "Survey response updated successfully";
     }
+    
+    @RequestMapping ( value = "/updatescore", method = RequestMethod.GET)
+    @ApiOperation ( value = "Get Survey Transaction")
+    public String updateScore(String surveyId,String mood,String feedback,boolean isAbusive,String agreedToShare){
+        LOGGER.info("Method storeScore() started to store score of survey");
+        surveyHandler.updateGatewayQuestionResponseAndScore(surveyId, mood, feedback, isAbusive, agreedToShare);
+        LOGGER.info("Method storeScore() to store score of survey finished successfully");
+        return "Gateway and score updated successfully";
+    }
+    
+    @RequestMapping ( value = "/getswearwords",method = RequestMethod.GET)
+    @ApiOperation ( value = "Get Swear Words" )
+    public String getSwearWordsList(){
+        LOGGER.info("Method getSwearWordsList() started to send swear word list");
+        return surveyHandler.getSwearWords() ;
+    }
+
+   
 }

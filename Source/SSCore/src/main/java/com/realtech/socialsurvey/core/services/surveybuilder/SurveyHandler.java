@@ -4,17 +4,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.solr.client.solrj.SolrServerException;
 
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
-import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.BulkSurveyDetail;
 import com.realtech.socialsurvey.core.entities.Company;
-import com.realtech.socialsurvey.core.entities.HierarchyRelocationTarget;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyImportVO;
@@ -50,17 +46,18 @@ public interface SurveyHandler
      * branchId, String customerEmail, int reminderCount) throws InvalidInputException,
      * SolrException, NoRecordsFetchedException, SolrServerException;
      */
-    /*
-     * Method to update answers to all the questions and current stage in MongoDB.
-     * @param agentId
-     * @param customerEmail
+
+    /**
+     * @param surveyId
      * @param question
+     * @param questionType
      * @param answer
      * @param stage
-     * @throws Exception
+     * @param isUserRankingQuestion
+     * @param isNpsQuestion
      */
-    public void updateCustomerAnswersInSurvey( String surveyId, String question, String questionType, String answer, int stage, boolean isUserRankingQuestion );
-
+    void updateCustomerAnswersInSurvey( String surveyId, String question, String questionType, String answer, int stage,
+        boolean isUserRankingQuestion, boolean isNpsQuestion );
 
     /*
      * Method to update customer review and final score on the basis of rating questions in
@@ -383,4 +380,6 @@ public interface SurveyHandler
 
 
     List<SurveyPreInitiation> validatePreinitiatedRecord( List<SurveyPreInitiation> surveyPreInitiations ) throws InvalidInputException;
+
+
 }
