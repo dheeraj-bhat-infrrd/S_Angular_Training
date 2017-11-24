@@ -610,6 +610,7 @@ public class RegistrationController
 			if (userManagementService.userExists(emailId)) {
 				redirectAttributes.addFlashAttribute("message", "The Email address is already taken");
 				redirectAttributes.addFlashAttribute("status", DisplayMessageType.ERROR_MESSAGE);
+				redirectAttributes.addFlashAttribute("isDirectRegistration", false);
 				return "redirect:/" + JspResolver.LOGIN + ".do";
 			}
 		}
