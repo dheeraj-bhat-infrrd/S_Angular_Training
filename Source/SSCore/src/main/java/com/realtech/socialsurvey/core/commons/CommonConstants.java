@@ -663,8 +663,6 @@ public interface CommonConstants
     public static final String QUESTION_MULTIPLE_CHOICE = "mcq";
     public static final String QUESTION_RATING = "range";
     public static final String QUESTION_0to10 = "0to10";
-    public static final boolean QUESTION_NPS_FLAG_TRUE = true;
-    public static final boolean QUESTION_NPS_FLAG_FALSE = false;
     public static final int QUESTION_RATING_VALUE_TRUE = 1;
     public static final int QUESTION_RATING_VALUE_FALSE = 0;
     public static final int SURVEY_STAGE_COMPLETE = -1;

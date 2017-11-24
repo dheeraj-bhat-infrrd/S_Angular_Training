@@ -48,7 +48,6 @@ import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.vo.SurveysAndReviewsVO;
 import com.wordnik.swagger.annotations.ApiOperation;
 
-import retrofit.http.Body;
 
 
 @RestController
@@ -349,12 +348,9 @@ public class SurveyApiV2Controller
     @ApiOperation ( value = "Add question to existing survey.")
 	public String addQuestionToExistingSurvey(@RequestBody SurveyQuestionDetails questionDetails) throws SSApiException {
     	LOGGER.info("API call for add question to existing survey.");
-    	List<String> answers = questionDetails.getAnswerStr();
-    	String isUserRankingStr = questionDetails.getIsUserRankingStr();
-    	String isNPSStr = questionDetails.getIsNPSStr();
     	long questionId = 0;
 		try {
-			questionId = surveyBuilder.createSurveyQuestionForExistingSurvey(questionDetails,isUserRankingStr,isNPSStr,answers);
+			questionId = surveyBuilder.createSurveyQuestionForExistingSurvey(questionDetails);
 		} catch (InvalidInputException ie) {
 			LOGGER.error("Invalid input exception caught while adding question to existing survey.",ie);
 			throw new SSApiException("Invalid input exception caught while adding question to existing survey.",ie);
@@ -364,4 +360,20 @@ public class SurveyApiV2Controller
 		}
 		return Long.toString(questionId);
 	}
+    
+    @RequestMapping ( value = "/updatesurveyquestion", method = RequestMethod.POST)
+    @ApiOperation ( value = "update existing survey question.")
+	public String updateQuestionFromExistingSurvey(@RequestBody SurveyQuestionDetails questionDetails) throws SSApiException {
+    	LOGGER.info("API call for update question of existing survey.");
+		try {
+			surveyBuilder.updateSurveyQuestionAndAnswer(questionDetails);
+		} catch (InvalidInputException ie) {
+			LOGGER.error("Invalid input exception caught while updating question to existing survey.",ie);
+			throw new SSApiException("Invalid input exception caught while adding question to existing survey.",ie);
+		}catch(NoRecordsFetchedException e){
+			LOGGER.error("NoRecordsFetchedException caught while adding new question to existing survey.",e);
+			throw new SSApiException("NoRecordsFetchedException caught while adding new question to existing survey.",e);			
+		}
+    	return "SUCCESS";
+    }
 }

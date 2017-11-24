@@ -22,7 +22,7 @@ public class SurveyQuestionDetails implements Serializable{
 	private int questionOrder;
 	private String customerResponse;
 	//Extra fields added for NPS and migrating to API call.
-	private boolean isNPSQuestion;
+	private int isNPSQuestion;
 	private long userId;
 	private long companyId;
 	private int verticalId;
@@ -96,11 +96,11 @@ public class SurveyQuestionDetails implements Serializable{
 		this.customerResponse = customerResponse;
 	}
 
-	public boolean getIsNPSQuestion() {
+	public int getIsNPSQuestion() {
 		return isNPSQuestion;
 	}
 
-	public void setIsNPSQuestion(boolean isNPSQuestion) {
+	public void setIsNPSQuestion(int isNPSQuestion) {
 		this.isNPSQuestion = isNPSQuestion;
 	}
 
