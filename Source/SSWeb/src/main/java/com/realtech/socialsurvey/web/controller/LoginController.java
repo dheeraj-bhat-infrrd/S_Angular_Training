@@ -138,7 +138,7 @@ public class LoginController
 
 
     @RequestMapping ( value = "/login")
-    public String initLoginPage( Model model, @RequestParam ( value = STATUS_PARAM, required = false) String status,
+    public String initLoginPage( HttpServletRequest request, Model model, @RequestParam ( value = STATUS_PARAM, required = false) String status,
         RedirectAttributes redirectAttributes )
     {
         LOG.info( "Inside initLoginPage() of LoginController" );
@@ -148,7 +148,8 @@ public class LoginController
             LOG.info( "Existing Active Session detected" );
 
             redirectAttributes.addFlashAttribute( CommonConstants.ACTIVE_SESSIONS_FOUND, "true" );
-            return "redirect:/" + JspResolver.USER_LOGIN + ".do";
+            redirectAttributes.addFlashAttribute( "isDirectRegistration", request.getParameter( "isDirectRegistration" ) );
+            return "redirect:/" + JspResolver.USER_LOGIN + ".do?bm=I";
         }
 
         if ( status != null ) {
@@ -248,7 +249,7 @@ public class LoginController
             // Setting the direct registration flag
             isDirectRegistration = request.getParameter( "isDirectRegistration" );
             // handle direct registration, if the user has incomplete
-            // registration for manual invite. in that cas bm will be set as I
+            // registration for manual invite. in that case bm will be set as I
             if ( request.getParameter( "bm" ) != null && request.getParameter( "bm" ).equals( "I" ) ) {
                 isDirectRegistration = "false";
             }
@@ -350,6 +351,7 @@ public class LoginController
                 }
 
                 redirectAttributes.addFlashAttribute( "verticals", verticalsMasters );
+                redirectAttributes.addFlashAttribute( "isDirectRegistration", isDirectRegistration );
                 return "redirect:/" + JspResolver.COMPANY_INFORMATION_PAGE + ".do";
             } else {
                 LOG.debug( "Company profile complete, check any of the user profiles is entered" );
