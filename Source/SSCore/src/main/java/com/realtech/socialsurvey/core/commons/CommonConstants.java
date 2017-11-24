@@ -345,6 +345,8 @@ public interface CommonConstants
     public static final String ACCOUNT_DISABLE_DATE_COLUMN = "disableDate";
     public static final String IS_FORCE_DELETE_COLUMN = "isForceDelete";
     public static final String SURVEY_LAST_ABUSE_REPORTED_DATE = "lastAbuseReportedDate";
+    public static final String NPS_SCORE_COLUMN = "npsScore";
+
     
 
     /**

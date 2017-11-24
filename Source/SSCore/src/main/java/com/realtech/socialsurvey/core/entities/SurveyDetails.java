@@ -55,6 +55,7 @@ public class SurveyDetails
     
     private long surveyPreIntitiationId;
     private boolean retakeSurvey;
+    private int npsScore = -1;
     
     private Date surveySentDate;
     private Date surveyCompletedDate;
@@ -746,5 +747,18 @@ public class SurveyDetails
     {
         this.lastAbuseReportedDate = lastAbuseReportedDate;
     }
+
+
+    public int getNpsScore()
+    {
+        return npsScore;
+    }
+
+
+    public void setNpsScore( int npsScore )
+    {
+        this.npsScore = npsScore;
+    }
 	
+    
 }
