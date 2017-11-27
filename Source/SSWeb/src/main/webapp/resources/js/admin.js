@@ -33,9 +33,7 @@ $(document).on('click','#dsh-ind-report-dwn-btn',function(e){
 $(document).on('keyup','#hr-comp-sel',function(e){
 	if(e.which == 13) {
 		var key = $(this).val();
-		//update filter drop down
-		$('#com-type-filter').val('all');
-		
+				
 		var srchType = $('#hr-comp-sel').attr("srch-type");
 		
 		if(srchType == "company")
@@ -51,8 +49,6 @@ $(document).on('keyup','#hr-comp-sel',function(e){
 
 $(document).on('click','#hr-comp-icn',function(e){
 	var key = $('#hr-comp-sel').val();
-	//update filter drop down
-	$('#com-type-filter').val('all');
 	
 	var srchType = $('#hr-comp-sel').attr("srch-type");
 	if(srchType == "company")
