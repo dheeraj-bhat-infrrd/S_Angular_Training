@@ -397,6 +397,101 @@
 	.comp-mail-thrs-txt {
 		margin-right: 4px;
 	}	
+	
+	/*Single review Page */
+	.dismiss-single-review-popup{
+	z-index: 1000;
+	position: absolute;
+    color: black;
+    opacity: 1;
+    margin-right: 6%;
+    margin-top: 5%;
+    font-size: xx-large;
+    right: 0;
+	}
+	
+	.single-review-popup-wrapper {
+    top: 0;
+    width: 100%;
+    margin: 0 auto 20px;
+    background: #fff;
+    border-radius: 0;
+	}
+	
+	.single-review-popup-hdr-wrapper{
+    background: #f2f2f2;
+    padding: 2.5% 2.5% 2.5% 2.5%;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+}
+	
+	.sr-popup-hdr-details {
+	display: grid;
+	padding-left: 5%;
+	}
+	
+	.single-review-popup-body-wrapper{
+	display: flex;
+    flex-direction: column;
+    margin-top: 15px;
+	}
+	
+	.sr-review-details {
+	width: 100%;
+    order: 2;
+    display: grid;
+    padding: 5px;
+    padding-top: 25px;
+    margin-left: 25px;
+    padding-bottom: 15px;
+    float: right;
+	}
+	
+	.sr-reviewed-by {
+    font-weight: bold !important;
+    margin-bottom: 20px;
+	}
+	
+	.sr-margin-bottom-50 {
+    margin-bottom: 40px;
+    width: 90%;
+	}
+	
+	.sr-review-content {
+	width: 100%;
+    order: 1;
+    padding: 5px;
+    border-left: 1px solid #d6d5d5;
+    margin-top: 0px;
+    display: grid;
+    padding-top: 25px;
+    float: right;
+    padding-right: 30px;
+    padding-left: 30px;
+	}
+	
+	.sr-ppl-content {
+    clear: both;
+    font-weight: bold !important;
+    font-size: 18px;
+    line-height: unset;
+	}
+	
+	.sr-report-review {
+	    width: 170px;
+    	padding-left: 5%;
+	}
+	
+	.sr-wc-btn-col {
+	margin-right: 6%;
+    margin-top: 0.8%;
+    float: right !important;
+	margin-left: 0% !important;
+	}
+	
+	.sr-wc-btn-col-zillow {
+		margin: 1% 30%;
+	}
 }
 
 

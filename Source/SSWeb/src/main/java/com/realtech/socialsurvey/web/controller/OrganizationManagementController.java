@@ -43,7 +43,6 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AccountsMaster;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
-import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ComplaintResolutionSettings;
 import com.realtech.socialsurvey.core.entities.DisplayMessage;
 import com.realtech.socialsurvey.core.entities.DotLoopCrmInfo;
@@ -230,7 +229,7 @@ public class OrganizationManagementController
             message = messageUtils.getDisplayMessage( "LOGO_UPLOAD_SUCCESSFUL", DisplayMessageType.SUCCESS_MESSAGE )
                 .getMessage();
         } catch ( NonFatalException e ) {
-            LOG.error( "NonFatalException while uploading Logo. Reason :" + e.getMessage(), e );
+            LOG.error( "NonFatalException while uploading Logo.", e );
             message = e.getMessage();
         }
         return message;
@@ -247,7 +246,7 @@ public class OrganizationManagementController
     @RequestMapping ( value = "/addcompanyinformation", method = RequestMethod.POST)
     public String addCompanyInformation( HttpServletRequest request, RedirectAttributes redirectAttributes )
     {
-        LOG.info( "Method addCompanyInformation of UserManagementController called" );
+        LOG.info( "Method addCompanyInformation of OrganizationManagementController called" );
         String companyName = request.getParameter( "company" );
         String address1 = request.getParameter( "address1" );
         String address2 = request.getParameter( "address2" );
@@ -354,30 +353,15 @@ public class OrganizationManagementController
             LOG.debug( "Updating profile completion stage" );
             userManagementService.updateProfileCompletionStage( user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
                 CommonConstants.ADD_ACCOUNT_TYPE_STAGE );
-
-            /*String details = "First Name : " + user.getFirstName() + "<br/>" + "Last Name : " + user.getLastName() + "<br/>"
-                + "Email Address : " + user.getEmailId() + "<br/>" + "Company Name : " + companyName + "<br/>" + "Address1 : "
-                + address1 + "<br/>" + "Address2 : " + address2 + "<br/>" + "Country : " + country + "<br/>" + "Zipcode : "
-                + zipCode + "<br/>" + "State : " + state + "<br/>" + "City : " + city + "<br/>" + "Contact Info : "
-                + companyContactNo + "<br/>" + "Vertical : " + vertical;
-            ;
-            try {
-                emailServices.sendCompanyRegistrationStageMail( salesLeadEmail,
-                    CommonConstants.COMPANY_REGISTRATION_STAGE_PAYMENT_PENDING, companyName, details, true );
-            } catch ( InvalidInputException e ) {
-                e.printStackTrace();
-            } catch ( UndeliveredEmailException e ) {
-                e.printStackTrace();
-            }*/
         } catch ( NonFatalException e ) {
-            LOG.error( "NonFatalException while adding company information. Reason :" + e.getMessage(), e );
+            LOG.error( "NonFatalException while adding company information. Reason :", e );
             redirectAttributes.addFlashAttribute( "status", DisplayMessageType.ERROR_MESSAGE );
             redirectAttributes.addFlashAttribute( "message",
                 messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
             return "redirect:/" + JspResolver.COMPANY_INFORMATION_PAGE + ".do";
         }
 
-        LOG.info( "Method addCompanyInformation of UserManagementController completed successfully" );
+        LOG.info( "Method addCompanyInformation of OrganizationManagementController completed successfully" );
         return "redirect:/" + JspResolver.ACCOUNT_TYPE_SELECTION_PAGE + ".do";
     }
 
@@ -385,7 +369,7 @@ public class OrganizationManagementController
     @RequestMapping ( value = "/selectaccounttype")
     public String initSelectAccountTypePage()
     {
-        LOG.info( "SelectAccountType Page started" );
+        LOG.info( "SelectAccountType Page initSelectAccountTypePage() function started" );
         return JspResolver.ACCOUNT_TYPE_SELECTION;
     }
 
@@ -402,39 +386,45 @@ public class OrganizationManagementController
     private void validateCompanyInfoParams( String companyName, String address, String country, String countryCode,
         String zipCode, String companyContactNo, String vertical ) throws InvalidInputException
     {
-        LOG.debug( "Method validateCompanyInfoParams called  for companyName : " + companyName + " address : " + address
-            + " zipCode : " + zipCode + " companyContactNo : " + companyContactNo );
+        LOG.debug( "Method validateCompanyInfoParams called  for companyName : {}, address : {}, zipCode : {}, companyContactNo : {} " ,companyName,address,zipCode,companyContactNo );
 
         if ( companyName == null || companyName.isEmpty() || companyName.contains( "\"" ) ) {
+            LOG.warn( "Method validateCompanyInfoParams is throwing an InvalidInputException for invalid company name" );
             throw new InvalidInputException( "Company name is null or empty while adding company information",
                 DisplayMessageConstants.INVALID_COMPANY_NAME );
         }
         if ( address == null || address.isEmpty() ) {
+            LOG.warn( "Method validateCompanyInfoParams is throwing an InvalidInputException for invalid address" );
             throw new InvalidInputException( "Address is null or empty while adding company information",
                 DisplayMessageConstants.INVALID_ADDRESS );
         }
 
         if ( country == null || country.isEmpty() ) {
+            LOG.warn( "Method validateCompanyInfoParams is throwing an InvalidInputException for invalid country" );
             throw new InvalidInputException( "Country is null or empty while adding company information",
                 DisplayMessageConstants.INVALID_COUNTRY );
         }
 
         if ( countryCode == null || countryCode.isEmpty() ) {
+            LOG.warn( "Method validateCompanyInfoParams is throwing an InvalidInputException for invalid country code" );
             throw new InvalidInputException( "Country code is null or empty while adding company information",
                 DisplayMessageConstants.INVALID_COUNTRY );
         }
 
         if ( zipCode == null || zipCode.isEmpty() ) {
+            LOG.warn( "Method validateCompanyInfoParams is throwing an InvalidInputException for invalid zipCode" );
             throw new InvalidInputException( "Zipcode is not valid while adding company information",
                 DisplayMessageConstants.INVALID_ZIPCODE );
         }
 
         if ( companyContactNo == null || companyContactNo.isEmpty() ) {
+            LOG.warn( "Method validateCompanyInfoParams is throwing an InvalidInputException for invalid companyContactNo" );
             throw new InvalidInputException( "Company contact number is not valid while adding company information",
                 DisplayMessageConstants.INVALID_COMPANY_PHONEN0 );
         }
 
         if ( vertical == null || vertical.isEmpty() ) {
+            LOG.warn( "Method validateCompanyInfoParams is throwing an InvalidInputException for invalid vertical" );
             throw new InvalidInputException( "Vertical selected is not valid", DisplayMessageConstants.INVALID_VERTICAL );
         }
         LOG.debug( "Returning from validateCompanyInfoParams after validating parameters" );
@@ -450,7 +440,7 @@ public class OrganizationManagementController
      */
     private String getCompleteAddress( String address1, String address2 )
     {
-        LOG.debug( "Getting complete address for address1 : " + address1 + " and address2 : " + address2 );
+        LOG.debug( "Getting complete address for address1 : {} and address2 : {}",address1,address2 );
         String address = address1;
         /**
          * if address line 2 is present, append it to address1 else the complete address is address1
@@ -458,7 +448,7 @@ public class OrganizationManagementController
         if ( address1 != null && !address1.isEmpty() && address2 != null && !address2.isEmpty() ) {
             address = address1 + " " + address2;
         }
-        LOG.debug( "Returning complete address" + address );
+        LOG.debug( "Returning complete address : ",address );
         return address;
     }
 
@@ -473,11 +463,12 @@ public class OrganizationManagementController
     @RequestMapping ( value = "/addaccounttype", method = RequestMethod.POST)
     public String addAccountType( Model model, HttpServletRequest request, HttpServletResponse response )
     {
-        LOG.info( "Method addAccountType of UserManagementController called" );
+        LOG.info( "Method addAccountType of OrganizationManagementController called" );
         String strAccountType = request.getParameter( "accounttype" );
         String returnPage = null;
         try {
             if ( strAccountType == null || strAccountType.isEmpty() ) {
+                LOG.warn( "Method addAccountType is throwing an InvalidInputException for invalid strAccountType" );
                 throw new InvalidInputException( "Accounttype is null for adding account type",
                     DisplayMessageConstants.INVALID_ADDRESS );
             }
@@ -526,17 +517,17 @@ public class OrganizationManagementController
                 model.addAttribute( "message", messageUtils.getDisplayMessage(
                     DisplayMessageConstants.ACCOUNT_TYPE_SELECTION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
 
-                LOG.info( "Method addAccountType of UserManagementController completed successfully" );
+                LOG.info( "Method addAccountType of OrganizationManagementController completed successfully" );
                 returnPage = JspResolver.PAYMENT;
             }
             unlockIndividualAccountLogoSettings( user, Integer.parseInt( strAccountType ) );
         } catch ( NonFatalException e ) {
-            LOG.error( "NonfatalException while adding account type. Reason: " + e.getMessage(), e );
+            LOG.error( "NonfatalException while adding account type. Reason: ", e );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
         }
-
+        LOG.info( "Method addAccountType of OrganizationManagementController completed successfully" );
         return returnPage;
     }
 
@@ -544,8 +535,7 @@ public class OrganizationManagementController
     // Check if the account type is individual. If so, check if the logo is set. If so, unlock it
     private void unlockIndividualAccountLogoSettings( User user, int accountType ) throws NonFatalException
     {
-        LOG.debug( "Unlocking the logo for individual account" );
-        LOG.debug( "Checking if the account type is individual" );
+        LOG.debug( "Unlocking the logo for individual account and Checking if the account type is individual" );
         if ( accountType == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
             LOG.debug( "Check if logo is set" );
             if ( settingsSetter.isSettingsValueSet( OrganizationUnit.COMPANY,
@@ -582,6 +572,7 @@ public class OrganizationManagementController
     {
         LOG.info( "Method showWidget of OrganizationManagementController called" );
         model.addAttribute( "applicationBaseUrl", applicationBaseUrl );
+        LOG.info( "Method showWidget of OrganizationManagementController completed successfully" );
         return JspResolver.SHOW_WIDGET;
     }
 
@@ -605,6 +596,7 @@ public class OrganizationManagementController
             try {
                 mappings = organizationManagementService.getCrmMapping( user );
             } catch ( InvalidInputException e ) {
+                LOG.warn( "Method showAppSettings is throwing an InvalidInputException cause exception occured while fetching vertical crm mappings",e );
                 throw new InvalidInputException( "Exception occured while fetching vertical crm mappings", e.getMessage(), e );
             }
             long entityId = 0;
@@ -619,7 +611,7 @@ public class OrganizationManagementController
                         throw new NumberFormatException();
                     }
                 } catch ( NumberFormatException e ) {
-                    LOG.error( "Number format exception occurred while parsing the entity id. Reason :" + e.getMessage(), e );
+                    LOG.error( "Number format exception occurred while parsing the entity id. Reason : ", e );
                 }
             }
 
@@ -654,12 +646,13 @@ public class OrganizationManagementController
 
 
         } catch ( NonFatalException e ) {
-            LOG.error( "NonfatalException while showing app settings. Reason: " + e.getMessage(), e );
+            LOG.error( "NonfatalException while showing app settings. Reason: ", e );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
         }
         model.addAttribute( "crmMappings", mappings );
+        LOG.info( "Method showAppSettings of OrganizationManagementController completed successfully" );
 
         return JspResolver.APP_SETTINGS;
     }
@@ -675,7 +668,7 @@ public class OrganizationManagementController
     @RequestMapping ( value = "/showcompanysettings", method = RequestMethod.GET)
     public String showCompanySettings( Model model, HttpServletRequest request )
     {
-        LOG.info( "Method showCompanySettings of UserManagementController called" );
+        LOG.info( "Method showCompanySettings of OrganizationManagementController called" );
         HttpSession session = request.getSession( false );
         User user = sessionHelper.getCurrentUser();
 
@@ -693,7 +686,7 @@ public class OrganizationManagementController
                     throw new NumberFormatException();
                 }
             } catch ( NumberFormatException e ) {
-                LOG.error( "Number format exception occurred while parsing the entity id. Reason :" + e.getMessage(), e );
+                LOG.error( "Number format exception occurred while parsing the entity id. Reason : ", e );
             }
         }
         String collectionName = "";
@@ -803,11 +796,9 @@ public class OrganizationManagementController
 
             
          // adding the survey completion mail threshold
-            if ( companySettings.getSurvey_settings() != null ) {
+            if ( unitSettings.getSurvey_settings() != null ) {
                 model.addAttribute( CommonConstants.SURVEY_MAIL_THRESHOLD,
-                    companySettings.getSurvey_settings().getSurveyCompletedMailThreshold() );
-            } else {
-                model.addAttribute( CommonConstants.SURVEY_MAIL_THRESHOLD, 0.0d );
+                    unitSettings.getSurvey_settings().getSurveyCompletedMailThreshold() );
             }
             
             // add send monthly digest email flag
@@ -815,11 +806,12 @@ public class OrganizationManagementController
                 model.addAttribute( "sendMonthlyDigestMail", unitSettings.isSendMonthlyDigestMail() );
             }
         } catch ( InvalidInputException | NoRecordsFetchedException e ) {
-            LOG.error( "NonFatalException while fetching profile details. Reason :" + e.getMessage(), e );
+            LOG.error( "NonFatalException while fetching profile details. Reason : ", e );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( DisplayMessageConstants.GENERAL_ERROR, DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
         }
+        LOG.info( "Method showCompanySettings of OrganizationManagementController completed successfully" );
 
         return JspResolver.EDIT_SETTINGS;
     }
@@ -861,20 +853,24 @@ public class OrganizationManagementController
         try {
 
             if ( encompassUsername == null || encompassUsername.isEmpty() ) {
+                LOG.warn( "Method saveEncompassDetails is throwing an InvalidInputException since user name can not be empty" );
                 throw new InvalidInputException( "User name can not be empty" );
             }
             if ( encompassPassword == null || encompassPassword.isEmpty() ) {
+                LOG.warn( "Method saveEncompassDetails is throwing an InvalidInputException since password can not be empty" );
                 throw new InvalidInputException( "Password can not be empty" );
             }
             if ( encompassUrl == null || encompassUrl.isEmpty() ) {
+                LOG.warn( "Method saveEncompassDetails is throwing an InvalidInputException since url can not be empty" );
                 throw new InvalidInputException( "Url can not be empty" );
             }
             if ( encompassFieldId == null || encompassFieldId.isEmpty() ) {
-                LOG.info( "Field Id is empty" );
+                LOG.debug( "Field Id is empty" );
                 encompassFieldId = CommonConstants.ENCOMPASS_DEFAULT_FEILD_ID;
             }
 
             if ( version == null || version.isEmpty() ) {
+                LOG.warn( "Method saveEncompassDetails is throwing an InvalidInputException since version can not be empty" );
                 throw new InvalidInputException( "version can not be empty" );
             }
 
@@ -939,13 +935,14 @@ public class OrganizationManagementController
             message = messageUtils.getDisplayMessage( DisplayMessageConstants.ENCOMPASS_DATA_UPDATE_SUCCESSFUL,
                 DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
         } catch ( NonFatalException e ) {
-            LOG.error( "NonFatalException while testing encompass detials. Reason : " + e.getMessage(), e );
+            LOG.error( "NonFatalException while testing encompass detials. Reason : ", e );
             status = false;
             message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
         }
         responseMap.put( "status", status );
         responseMap.put( "message", message );
         String response = new Gson().toJson( responseMap );
+        LOG.info( "Saving encompass details completed successfully" );
         return response;
     }
 
@@ -984,9 +981,10 @@ public class OrganizationManagementController
                 .getDisplayMessage( DisplayMessageConstants.ENCOMPASS_ENABLE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE )
                 .getMessage();
         } catch ( NonFatalException e ) {
-            LOG.error( "NonFatalException while saving encompass detials. Reason : " + e.getMessage(), e );
+            LOG.error( "NonFatalException while saving encompass detials. Reason : ", e );
             message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
         }
+        LOG.info( "Updating encompass details to 'Enabled' completed successfully" );
         return message;
     }
 
@@ -1022,9 +1020,10 @@ public class OrganizationManagementController
                 .getDisplayMessage( DisplayMessageConstants.ENCOMPASS_DISABLE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE )
                 .getMessage();
         } catch ( NonFatalException e ) {
-            LOG.error( "NonFatalException while disabling encompass. Reason : " + e.getMessage(), e );
+            LOG.error( "NonFatalException while disabling encompass. Reason : ", e );
             message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
         }
+        LOG.info( "Updating encompass details to 'Disabled' completed successfully" );
         return message;
     }
 
@@ -1066,9 +1065,10 @@ public class OrganizationManagementController
             message = messageUtils.getDisplayMessage( DisplayMessageConstants.ENCOMPASS_GENERATE_REPORT_SUCCESSFUL,
                 DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
         } catch ( NonFatalException e ) {
-            LOG.error( "NonFatalException while enabling report generation for encompass. Reason : " + e.getMessage(), e );
+            LOG.error( "NonFatalException while enabling report generation for encompass. Reason : ", e );
             message = e.getMessage();
         }
+        LOG.info( "Enabling report generation for encompass details completed successfully" );
         return message;
     }
 
@@ -1095,12 +1095,14 @@ public class OrganizationManagementController
                 DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
         } catch ( NonFatalException e ) {
             if ( request.getAttribute( "saveencompassdetails" ) != null ) {
+                LOG.warn( "Method testEncompassConnection is thorwing a NonFatalException : ",e );
                 throw e;
             } else {
-                LOG.error( "NonFatalException while testing encompass detials. Reason : " + e.getMessage(), e );
+                LOG.error( "NonFatalException while testing encompass detials. Reason : ", e );
             }
             message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
         }
+        LOG.info( "Testing connections completed successfully" );
         return message;
     }
 
@@ -2974,6 +2976,66 @@ public class OrganizationManagementController
         return new Gson().toJson( responseMap );
     }
 
+    @ResponseBody
+    @RequestMapping ( value = "/savesurveycsvfile", method = RequestMethod.POST)
+    public String saveSurveyCsvFile( Model model, @RequestParam ( "file") MultipartFile file,
+        @RequestParam ( "filename") String fileName, @RequestParam ( "uploaderEmail") String uploaderEmail,
+        HttpServletRequest request )
+    {
+        LOG.debug( "Saving the csv survey info file" );
+
+        boolean status = false;
+        Object message = null;
+        try {
+            String hierarchyType = request.getParameter( "hierarchyType" );
+            long hierarchyId = 0l;
+
+            if ( file == null || file.isEmpty() )
+                throw new InvalidInputException( "Please provide a valid CSV file." );
+
+            if ( StringUtils.isEmpty( fileName ) )
+                throw new InvalidInputException( "Please provide a valid CSV file name." );
+
+            if ( StringUtils.isEmpty( uploaderEmail ) && organizationManagementService.validateEmail( uploaderEmail.trim() ) )
+                throw new InvalidInputException( "Please provide a valid uploader email for csv upload." );
+
+            if ( StringUtils.isEmpty( hierarchyType ) )
+                throw new InvalidInputException( "Please provide a valid hiearchyType." );
+
+            if ( !StringUtils.isEmpty( request.getParameter( "hierarchyValue" ) ) ) {
+                try {
+                    hierarchyId = Long.parseLong( request.getParameter( "hierarchyValue" ) );
+                } catch ( NumberFormatException unableToFormatId ) {
+                    throw new InvalidInputException( "please provide a valid hierarchy Identifier." );
+                }
+            } else {
+                throw new InvalidInputException( "Please provide a hiearchy Identifier." );
+            }
+
+            if ( !surveyHandler.isFileAlreadyUploaded( fileName, uploaderEmail ) ) {
+                status = surveyHandler.createEntryForSurveyUploadWithCsv( hierarchyType, file, fileName, hierarchyId,
+                    sessionHelper.getCurrentUser(), uploaderEmail );
+                message = "CSV file uploaded successfully.";
+            } else {
+                message = "CSV file: " + fileName + " is already uploaded using the provided email.";
+            }
+
+
+        } catch ( InvalidInputException expectedError ) {
+            status = false;
+            message = expectedError.getMessage();
+        } catch ( Exception unhandledError ) {
+            status = false;
+            message = "Sorry, Unable to upload csv, Please try again.";
+        }
+
+        Map<String, Object> responseMap = new HashMap<String, Object>();
+        responseMap.put( "status", status );
+        responseMap.put( "message", message );
+        return new Gson().toJson( responseMap );
+    }
+
+
 
     @ResponseBody
     @RequestMapping ( value = "/starthierarchyxlsxfileupload", method = RequestMethod.POST)
@@ -3783,30 +3845,44 @@ public class OrganizationManagementController
     {
         LOG.info( "Method to updateSurveyMailThreshold started" );
         HttpSession session = request.getSession();
-        long companyId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
         double surveyCompletedMailThreshold;
-        
+        OrganizationUnitSettings unitSettings = null;
+        String collectionName = null;
+
         try {
-            
-            if( CommonConstants.COMPANY_ID.equals( entityType ) ){
-                
+
+            if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
+                unitSettings = organizationManagementService.getCompanySettings( entityId );
+            } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+                collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
+                unitSettings = organizationManagementService.getRegionSettings( entityId );
+            } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+                collectionName = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
+                unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
+            } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+                collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
+                unitSettings = userManagementService.getUserSettings( entityId );
+            }
+
+            if ( unitSettings != null ) {
+
                 String surveyCompletedMailThresholdStr = request.getParameter( "surveyCompletedMailThreshold" );
                 surveyCompletedMailThreshold = Double.parseDouble( surveyCompletedMailThresholdStr );
-                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
-
-                if(companySettings == null){
-                    throw new InvalidInputException("No settings fould for company with id " + companyId);
+                SurveySettings surveySettings = unitSettings.getSurvey_settings();
+                
+                if ( surveySettings == null ) {
+                    surveySettings = new SurveySettings();
                 }
                 
-                SurveySettings surveySettings = companySettings.getSurvey_settings();
                 surveySettings.setSurveyCompletedMailThreshold( surveyCompletedMailThreshold );
-                
-                organizationManagementService.updateSurveySettings( companySettings, surveySettings );
-                
+                organizationManagementService.updateScoreForSurvey( collectionName, unitSettings, surveySettings );
+
             } else {
-                LOG.error( "Profile specified is invalid." );
-                throw new InvalidInputException( "Please provide a valid profile level." );
+                LOG.error( "settings not found for the current session." );
+                throw new InvalidInputException( "settings not found for the current session." );
             }
             
             LOG.info( "Method to updateSurveyMailThreshold finished" );

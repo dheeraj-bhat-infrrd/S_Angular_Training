@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.HierarchyUploadDao;
@@ -108,6 +109,38 @@ public class MongoHierarchyUploadDaoImpl implements HierarchyUploadDao
         query.addCriteria( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( parsedHierarchyUpload.getCompanyId() ) );
         mongoTemplate.remove( query, ParsedHierarchyUpload.class, CommonConstants.PARSED_HIERARCHY_UPLOAD_COLLECTION );
         mongoTemplate.insert( parsedHierarchyUpload, CommonConstants.PARSED_HIERARCHY_UPLOAD_COLLECTION );
+    }
+    
+    /**
+     * Method to update ParsedHierarchyUpload object into a specific collection
+     * @param hierarchyIntermediate
+     * @param collectionName
+     * @throws InvalidInputException
+     * @throws NoRecordsFetchedException 
+     */
+    @Override
+    public synchronized ParsedHierarchyUpload findParsedHierarchyUpload( String mongoId )
+        throws InvalidInputException, NoRecordsFetchedException
+    {
+        LOG.debug( "method findParsedHierarchyUpload running" );
+        if ( StringUtils.isEmpty( mongoId ) ) {
+            LOG.error( "The ParsedHierarchyUpload Id is not specified." );
+            throw new InvalidInputException( "The ParsedHierarchyUpload object is not specified." );
+        }
+
+        //Delete previous instance
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( mongoId ) );
+        ParsedHierarchyUpload parsedHierarchyUpload = mongoTemplate.findOne( query, ParsedHierarchyUpload.class,
+            CommonConstants.PARSED_HIERARCHY_UPLOAD_COLLECTION );
+
+        if ( parsedHierarchyUpload == null ) {
+            LOG.error( "Unable to find parsed hierarchy upload object with ID: {}", mongoId );
+            throw new NoRecordsFetchedException( "Unable to find parsed hierarchy upload object with ID: " + mongoId );
+        }
+
+        return parsedHierarchyUpload;
+
     }
 
 

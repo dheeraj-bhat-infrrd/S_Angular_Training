@@ -361,9 +361,9 @@ public class SurveyApiV2Controller
 		return Long.toString(questionId);
 	}
     
-    @RequestMapping ( value = "/updatesurveyquestion", method = RequestMethod.POST)
+    @RequestMapping ( value = "/updatesurveyquestion", method = RequestMethod.PUT)
     @ApiOperation ( value = "update existing survey question.")
-	public String updateQuestionFromExistingSurvey(@RequestBody SurveyQuestionDetails questionDetails) throws SSApiException {
+	public String updateQuestionInExistingSurvey(@RequestBody SurveyQuestionDetails questionDetails) throws SSApiException {
     	LOGGER.info("API call for update question of existing survey.");
 		try {
 			surveyBuilder.updateSurveyQuestionAndAnswer(questionDetails);
@@ -371,8 +371,24 @@ public class SurveyApiV2Controller
 			LOGGER.error("Invalid input exception caught while updating question to existing survey.",ie);
 			throw new SSApiException("Invalid input exception caught while adding question to existing survey.",ie);
 		}catch(NoRecordsFetchedException e){
-			LOGGER.error("NoRecordsFetchedException caught while adding new question to existing survey.",e);
-			throw new SSApiException("NoRecordsFetchedException caught while adding new question to existing survey.",e);			
+			LOGGER.error("NoRecordsFetchedException caught while updating question in existing survey.",e);
+			throw new SSApiException("NoRecordsFetchedException caught while updating question in existing survey.",e);			
+		}
+    	return "SUCCESS";
+    }
+    
+    @RequestMapping ( value = "/removesurveyquestion", method = RequestMethod.DELETE)
+    @ApiOperation ( value = "remove question from survey question.")
+	public String removeQuestionFromExistingSurvey(long userId, long surveyQuestionId) throws SSApiException {
+    	LOGGER.info("API call to remove question from existing survey.");
+		try {
+			surveyBuilder.removeQuestionFromSurvey(userId,surveyQuestionId);
+		} catch (InvalidInputException ie) {
+			LOGGER.error("Invalid input exception caught while removing question from existing survey.",ie);
+			throw new SSApiException("Invalid input exception caught while removing question from existing survey.",ie);
+		}catch(NoRecordsFetchedException e){
+			LOGGER.error("NoRecordsFetchedException caught while removing question from existing survey.",e);
+			throw new SSApiException("NoRecordsFetchedException caught while removing question from existing survey.",e);			
 		}
     	return "SUCCESS";
     } 

@@ -283,6 +283,7 @@ public class SurveyManagementController
 			}
 			Map<String, String> emailIdsToSendMail = new HashMap<>();
 			SolrDocument solrDocument = null;
+	        SurveyDetails survey = surveyHandler.getSurveyDetails(surveyId);
 
 			try {
 				solrDocument = solrSearchService.getUserByUniqueId(agentId);
@@ -291,20 +292,36 @@ public class SurveyManagementController
 				LOG.error("SolrException occurred in storeFeedback() while fetching email id of agent. NEsted exception is ", e);
 			}
 
-			if (solrDocument != null && !solrDocument.isEmpty()) {
-				emailIdsToSendMail.put(solrDocument.get(CommonConstants.USER_EMAIL_ID_SOLR).toString(),
-						solrDocument.get(CommonConstants.USER_DISPLAY_NAME_SOLR).toString());
-			}
+			//SS-1436
+            Map<String, Double> surveyMailThreshold = surveyHandler.buildSurveyCompletionThresholdMap( survey );
 
-			String moodsToSendMail = surveyHandler.getMoodsToSendMail();
-			if (!moodsToSendMail.isEmpty() && moodsToSendMail != null) {
-				List<String> moods = new ArrayList<>(Arrays.asList(moodsToSendMail.split(",")));
-				if (moods.contains(mood)) {
-					emailIdsToSendMail.putAll(surveyHandler.getEmailIdsOfAdminsInHierarchy(agentId));
-				}
-			}
+            double agentThreshold = ( surveyMailThreshold != null
+                && surveyMailThreshold.get( CommonConstants.AGENT_ID_COLUMN ) != null )
+                    ? surveyMailThreshold.get( CommonConstants.AGENT_ID_COLUMN ) : 0.0d;
 
-			SurveyDetails survey = surveyHandler.getSurveyDetails(surveyId);
+            if ( solrDocument != null && !solrDocument.isEmpty() && surveyMailThreshold != null
+                && agentThreshold <= survey.getScore() ) {
+                emailIdsToSendMail.put( solrDocument.get( CommonConstants.USER_EMAIL_ID_SOLR ).toString(),
+                    solrDocument.get( CommonConstants.USER_DISPLAY_NAME_SOLR ).toString() );
+            }
+
+            String moodsToSendMail = surveyHandler.getMoodsToSendMail();
+            if ( !moodsToSendMail.isEmpty() && moodsToSendMail != null ) {
+                List<String> moods = new ArrayList<>( Arrays.asList( moodsToSendMail.split( "," ) ) );
+                if ( moods.contains( mood ) ) {
+
+                    // SS-1436
+                    // check if "Agent Notification Threshold" is enabled for a hierarchy
+                    emailIdsToSendMail.putAll( surveyHandler.buildPreferredAdminEmailListForSurvey( survey,
+                        surveyMailThreshold.get( CommonConstants.COMPANY_ID_COLUMN ) != null
+                            ? surveyMailThreshold.get( CommonConstants.COMPANY_ID_COLUMN ) : 0.0d,
+                        surveyMailThreshold.get( CommonConstants.REGION_ID_COLUMN ) != null
+                            ? surveyMailThreshold.get( CommonConstants.REGION_ID_COLUMN ) : 0.0d,
+                        surveyMailThreshold.get( CommonConstants.BRANCH_ID_COLUMN ) != null
+                            ? surveyMailThreshold.get( CommonConstants.BRANCH_ID_COLUMN ) : 0.0d ) );
+                }
+            }
+
 			// Sending email to the customer telling about successful completion
 			// of survey.
 			try {
@@ -366,19 +383,13 @@ public class SurveyManagementController
                 String agentName = ( agent.getLastName() != null && !agent.getLastName().isEmpty() )
                     ? ( agent.getFirstName() + " " + agent.getLastName() ) : agent.getFirstName();
                 
-                double surveyCompletionThreshold = 0.0d;
-                if( companySettings.getSurvey_settings() != null ){
-                    surveyCompletionThreshold = companySettings.getSurvey_settings().getSurveyCompletedMailThreshold();
+  
+                for ( Entry<String, String> admin : emailIdsToSendMail.entrySet() ) {
+                    emailServices.sendSurveyCompletionMailToAdminsAndAgent( agentName, admin.getValue(), admin.getKey(),
+                        surveyDetail, customerName, surveyScore, logoUrl, agentSettings.getCompleteProfileUrl(),
+                        customerDetail );
                 }
                 
-                // check for survey completion mail threshold set for company 
-                if( surveyCompletionThreshold <= survey.getScore() ){    
-                    for ( Entry<String, String> admin : emailIdsToSendMail.entrySet() ) {
-                        emailServices.sendSurveyCompletionMailToAdminsAndAgent( agentName, admin.getValue(), admin.getKey(),
-                            surveyDetail, customerName, surveyScore, logoUrl, agentSettings.getCompleteProfileUrl(),
-                            customerDetail );
-                    }
-                }
 
 				if (companySettings.getSurvey_settings() != null && companySettings.getSurvey_settings().getComplaint_res_settings() != null) {
 					ComplaintResolutionSettings complaintRegistrationSettings = companySettings.getSurvey_settings().getComplaint_res_settings();

@@ -188,12 +188,15 @@ public interface SSApiIntegration
     
     @GET("/v1/getscorestatsquestion")
     Response getScoreStatsQuestion(@Query ("entityId") Long entityId, @Query ("entityType") String entityType, @Query ("currentMonth") int currentMonth, @Query ("currentYear") int currentYear);
+    
+    @GET("/v1/getaccountstatisticsreportstatus")
+	Response getAccountStatisticsRecentActivity(@Query("reportId") Long reportId);
     //reporting:END
     
     @POST("/v2/addquestiontosurvey")
 	Response addQuestionToExistingSurvey(@Body SurveyQuestionDetails questionDetails);
 
-    @POST("/v2/updatesurveyquestion")
+    @PUT("/v2/updatesurveyquestion")
 	Response updateQuestionFromExistingSurvey(@Body SurveyQuestionDetails questionDetails);
     
     //survey api's 
@@ -207,4 +210,7 @@ public interface SSApiIntegration
     
     @GET("/v2/swearwords")
     Response getSwearWordsList();
+
+    @DELETE("/v2/removesurveyquestion")
+	Response removeQuestionFromSurvey(@Query("userId") long userId,@Query("surveyQuestionId") long surveyQuestionId);
 }

@@ -6,67 +6,88 @@ import java.util.List;
 
 public class SurveyDetails
 {
+    private String _id;
+   
+    //agent details
     private long agentId;
     private String agentName;
-    private int reminderCount;
-    private int socialPostsReminder;
+    private String agentEmailId;
+
+    //entity ids
+    private long companyId;
+    private long regionId;
+    private long branchId;    
+
+    //customer details
     private String customerFirstName;
     private String customerLastName;
     private String customerEmail;
-    private long companyId;
-    private long regionId;
-    private long branchId;
+    
+    //transaction details
+    private long surveyPreIntitiationId;
+    private String initiatedBy;
+    private String custRelationWithAgent;
+    private String surveyGeoLocation;
+    private String surveyType;
+    private String city;
+    private String state;
+    private String source;
+    private String sourceId;
+    private Date surveyTransactionDate;
+    
+    //review details
     private int stage;
     private double score;
     private String review;
     private String mood;
-    private Date createdOn;
-    private Date modifiedOn;
-    private List<String> sharedOn;
-    private String custRelationWithAgent;
-    private String initiatedBy;
-    private Date lastReminderForIncompleteSurvey;
-    private List<Date> remindersForIncompleteSurveys;
-    private Date lastReminderForSocialPost;
-    private List<Date> remindersForSocialPosts;
-    private String url;
+    private String summary;
     private List<SurveyResponse> surveyResponse;
-    private boolean editable;
+    private String url;
     private String completeProfileUrl;
+
+    //social media details
+    private String agreedToShare;
+    private List<String> sharedOn;
     private String yelpProfileUrl;
     private String zillowProfileUrl;
     private String lendingTreeProfileUrl;
     private String realtorProfileUrl;
     private String googleBusinessProfileUrl;
-    private String source;
-    private String sourceId;
-    private String agreedToShare;
     private String googleApi;
     private String faceBookShareUrl;
-    private boolean isAbusive;
-    private String _id;
     private SocialMediaPostDetails socialMediaPostDetails;
-    private boolean underResolution;
-    private boolean isAbuseRepByUser;
-    private Date lastAbuseReportedDate;
     private SocialMediaPostResponseDetails socialMediaPostResponseDetails;
-    private boolean showSurveyOnUI;
-    private String summary;
-    
-    private long surveyPreIntitiationId;
-    private boolean retakeSurvey;
-    private int npsScore = -1;
-    
+
+    //reminder details
+    private int reminderCount;
+    private Date lastReminderForIncompleteSurvey;
+    private List<Date> remindersForIncompleteSurveys;
+    private int socialPostsReminder;
+    private Date lastReminderForSocialPost;
+    private List<Date> remindersForSocialPosts;
+
+    //dates
     private Date surveySentDate;
     private Date surveyCompletedDate;
     private Date surveyUpdatedDate;
-    private Date surveyTransactionDate;
-    private String surveyGeoLocation;
-    private String surveyType;
-    private String city;
-    private String state;
+    private Date createdOn;
+    private Date modifiedOn;
     
-    private String agentEmailId;
+    //
+    private boolean showSurveyOnUI;
+    private boolean editable;
+    private boolean underResolution;
+    
+    //abusive details
+    private boolean isAbusive;
+    private boolean isAbuseRepByUser;
+    private Date lastAbuseReportedDate;
+    
+    //retake details
+    private boolean retakeSurvey;
+    
+    //NPS details
+    private int npsScore = -1;
         
     public String getAgentEmailId()
     {

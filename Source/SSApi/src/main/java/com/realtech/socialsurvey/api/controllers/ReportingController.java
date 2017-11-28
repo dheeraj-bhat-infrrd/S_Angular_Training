@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
+import com.realtech.socialsurvey.core.entities.CompanyDetailsReport;
 import com.realtech.socialsurvey.core.entities.CompanyDigestRequestData;
 import com.realtech.socialsurvey.core.entities.SurveyResultsReportVO;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.reportingmanagement.DashboardGraphManagement;
 import com.realtech.socialsurvey.core.services.reportingmanagement.OverviewManagement;
@@ -41,9 +43,10 @@ public class ReportingController
     @ApiOperation ( value = "Fetch Data for Completion Rate Graph")
     public String getReportingCompletionRateApi( Long entityId, String entityType ) 
     {
-        LOGGER.info( "Fetching Completion Rate Graph" );
+        LOGGER.info( "Fetching Completion Rate Graph for entityType :{} and entityId : {}",entityType,entityId );
 
         String json = null;
+        
         List<List<Object>> completionRate = dashboardGraphManagement.getCompletionRate( entityId, entityType );
         json = new Gson().toJson( completionRate );
         return json;
@@ -55,7 +58,7 @@ public class ReportingController
     @ApiOperation ( value = "Fetch Data for Survey Stats Graph")
     public String getReportingSpsStats( Long entityId, String entityType ) 
     {
-        LOGGER.info( "Fetching Survey Stats Graph" );
+    	LOGGER.info( "Fetching SPS stats Graph for entityType :{} and entityId : {}",entityType,entityId );
 
         String json = null;
         List<List<Object>> spsStats = dashboardGraphManagement.getSpsStatsGraph( entityId, entityType );
@@ -69,7 +72,7 @@ public class ReportingController
     @ApiOperation ( value = "Fetch Data for Overview ")
     public String getSpsStatsFromOverview( Long entityId, String entityType ) throws NonFatalException
     {
-        LOGGER.info( "Fetching sps for overview" );
+        LOGGER.info( "Fetching sps for overview for entityType : {} and entityId: {}",entityType,entityId );
 
         Map<String, Object> overviewMap = overviewManagement.fetchSpsAllTime( entityId, entityType );
         return new Gson().toJson( overviewMap );
@@ -110,6 +113,18 @@ public class ReportingController
         List<List<Object>> recentActivityList = reportingDashboardManagement.getRecentActivityList( entityId, entityType,
             startIndex, batchSize );
         json = new Gson().toJson( recentActivityList );
+        return json;
+    }
+    
+    @RequestMapping ( value = "/getaccountstatisticsreportstatus", method = RequestMethod.GET)
+    @ApiOperation ( value = "Fetch latest record for account statistics report. ")
+    public String getAccountStatisticsRecentActivity( Long reportId ) throws NonFatalException
+    {
+        LOGGER.info( "Fetching latest record for account statistics report." );
+
+        String json = null;
+        Object accountStatisticsStatus = reportingDashboardManagement.getAccountStatisticsRecentActivity( reportId );
+        json = new Gson().toJson( accountStatisticsStatus );
         return json;
     }
 
@@ -223,7 +238,7 @@ public class ReportingController
     public String getUserRankingForThisYear( Long entityId, String entityType, int year, int startIndex, int batchSize )
       
     {
-        LOGGER.info( "Fetching User Ranking for this year" );
+        LOGGER.info( "Fetching User Ranking for this year started" );
 
         String json = null;
 
@@ -233,6 +248,8 @@ public class ReportingController
             batchSize );
 
         json = new Gson().toJson( userRankingList );
+
+        LOGGER.info( "Fetching User Ranking for this year ended" );
 
         return json;
     }
@@ -410,7 +427,7 @@ public class ReportingController
     public String getUserRankingCountForThisYear( Long entityId, String entityType, int year, int batchSize )
         throws NonFatalException
     {
-        LOGGER.info( "Fetching User Ranking Count For this year" );
+        LOGGER.info( "Fetching User Ranking Count For this year." );
 
         String json = null;
         Map<String, Object> rankingCountStartIndex;
@@ -512,7 +529,7 @@ public class ReportingController
     public String getScoreStatsQuestion( Long entityId, String entityType, int currentMonth, int currentYear )
     {
 
-        LOGGER.info( "Fetching Score Stats Question" );
+        LOGGER.debug( "Fetching Score Stats for Questions." );
 
         String json = null;
         List<List<Object>> scoreStatsQuestion ;
@@ -548,6 +565,15 @@ public class ReportingController
         return new Gson().toJson( reportingDashboardManagement.prepareMonthlyDigestMailData( companyId, companyName,
             monthUnderConcern, year, recipientMail ) );
     }
+
+	@RequestMapping(value = "/getcompanydetailsreport", method = RequestMethod.GET)
+	@ApiOperation(value = "Social Survey Admin level report to fetch Company Details for all companies.")
+	public String getCompanyDetailsReport(String entityType, Long entityId, int startIndex, int batchSize) throws InvalidInputException {
+		LOGGER.info("Social Survey Admin level report to fetch Company Details for all companies.");
+		List<CompanyDetailsReport> companyDetailsReportList = reportingDashboardManagement
+				.getCompanyDetailsReport(entityId, startIndex, batchSize);
+		return new Gson().toJson(companyDetailsReportList);
+	}
     
     @RequestMapping ( value = "/getincompletesurveys", method = RequestMethod.GET)
     @ApiOperation ( value = "get incomplete surveys")
