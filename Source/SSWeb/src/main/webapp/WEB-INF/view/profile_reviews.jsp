@@ -5,7 +5,7 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <c:set var="start" value='${startIndex}'></c:set>
 <c:if test="${not empty reviews}">
-	<c:forEach var="reviewItem" varStatus="loop" begin='${startIndex}' items="${reviews}">
+	<c:forEach var="reviewItem" varStatus="loop" items="${reviews}">
 		<c:set value = "#.#" var = "scoreformat"></c:set>
 		<c:set
 			value="${ reviewItem.customerFirstName } ${ reviewItem.customerLastName }"

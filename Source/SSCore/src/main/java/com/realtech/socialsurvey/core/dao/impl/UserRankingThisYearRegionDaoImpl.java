@@ -15,9 +15,6 @@ import org.springframework.stereotype.Component;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.UserRankingThisYearRegionDao;
-import com.realtech.socialsurvey.core.entities.SurveyResultsCompanyReport;
-import com.realtech.socialsurvey.core.entities.UserRankingThisMonthRegion;
-import com.realtech.socialsurvey.core.entities.UserRankingThisYearBranch;
 import com.realtech.socialsurvey.core.entities.UserRankingThisYearRegion;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 
@@ -33,7 +30,7 @@ public class UserRankingThisYearRegionDaoImpl extends GenericReportingDaoImpl<Us
 	
 	@Override
     public List<UserRankingThisYearRegion> fetchUserRankingWithProfileForThisYearRegion(Long regionId, int year , int startIndex , int batchSize) {
-        LOG.info( "method to fetch user ranking region list for this year, fetchUserRankingWithProfileForThisYearRegion() started" );
+        LOG.debug( "method to fetch user ranking region list for this year, fetchUserRankingWithProfileForThisYearRegion() started" );
         Criteria criteria = getSession().createCriteria( UserRankingThisYearRegion.class );
         List<UserRankingThisYearRegion> userRankingList = new ArrayList<>();
 
@@ -66,11 +63,11 @@ public class UserRankingThisYearRegionDaoImpl extends GenericReportingDaoImpl<Us
             }
             }
         catch ( HibernateException hibernateException ) {
-            LOG.error( "Exception caught in fetchUserRankingWithProfileForThisYearRegion() ", hibernateException );
+            LOG.error( "Exception caught in fetchUserRankingWithProfileForThisYearRegion() : {}", hibernateException );
             throw new DatabaseException( "Exception caught in fetchUserRankingWithProfileForThisYearRegion() ", hibernateException );
         }
 
-        LOG.info( "method to fetch user ranking region list for this year, fetchUserRankingWithProfileForThisYearRegion() finished." );
+        LOG.debug( "method to fetch user ranking region list for this year, fetchUserRankingWithProfileForThisYearRegion() finished." );
         return userRankingList;
     }
 	
@@ -104,18 +101,18 @@ public class UserRankingThisYearRegionDaoImpl extends GenericReportingDaoImpl<Us
 
 	@Override
 	public long fetchUserRankingCountForThisYearRegion(Long regionId, int year) {
-		LOG.info( "method to fetch user ranking Region count for this year, fetchUserRankingCountForThisYearRegion() started" );
+		LOG.debug( "method to fetch user ranking Region count for this year, fetchUserRankingCountForThisYearRegion() started" );
         Criteria criteria = getSession().createCriteria( UserRankingThisYearRegion.class );
         try {
             criteria.add( Restrictions.eq( CommonConstants.REGION_ID_COLUMN, regionId ) );
             criteria.add( Restrictions.eq( CommonConstants.THIS_YEAR, year ) );    
             criteria.setProjection( Projections.rowCount() );
             Long count = (Long) criteria.uniqueResult();
-            LOG.info( "method to fetch user ranking Region count for this year, fetchUserRankingCountForThisYearRegion() finished." );
+            LOG.debug( "method to fetch user ranking Region count for this year, fetchUserRankingCountForThisYearRegion() finished." );
             return count.longValue();
             }
         catch ( HibernateException hibernateException ) {
-            LOG.error( "Exception caught in fetchUserRankingCountForThisYearRegion() ", hibernateException );
+            LOG.warn( "Exception caught in fetchUserRankingCountForThisYearRegion() ", hibernateException );
             throw new DatabaseException( "Exception caught in fetchUserRankingCountForThisYearRegion() ", hibernateException );
         }
 	}

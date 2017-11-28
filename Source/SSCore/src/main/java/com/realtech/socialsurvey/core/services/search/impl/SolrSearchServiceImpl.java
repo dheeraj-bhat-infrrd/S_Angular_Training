@@ -788,8 +788,9 @@ public class SolrSearchServiceImpl implements SolrSearchService
     public long countUsersByCompany( long companyId, int startIndex, int noOfRows )
         throws InvalidInputException, SolrException, MalformedURLException
     {
-        LOG.info( "Method countUsersByCompany() called for company id : " + companyId );
+        LOG.info( "Method countUsersByCompany() called for company id : {}", companyId );
         if ( companyId <= 0l ) {
+            LOG.warn( "Pattern is null or empty while searching for Users" );
             throw new InvalidInputException( "Pattern is null or empty while searching for Users" );
         }
 
@@ -807,13 +808,13 @@ public class SolrSearchServiceImpl implements SolrSearchService
             response = solrServer.query( solrQuery );
 
             resultsCount = response.getResults().getNumFound();
-            LOG.debug( "User search result count is : " + resultsCount );
+            LOG.debug( "User search result count is : {}", resultsCount );
         } catch ( SolrServerException e ) {
-            LOG.error( "SolrServerException while performing User search" );
+            LOG.warn( "SolrServerException while performing User search" );
             throw new SolrException( "Exception while performing search for user. Reason : " + e.getMessage(), e );
         }
 
-        LOG.info( "Method countUsersByCompany() finished for company id : " + companyId );
+        LOG.info( "Method countUsersByCompany() finished for company id : {}" , companyId );
         return resultsCount;
     }
 
@@ -1576,16 +1577,19 @@ public class SolrSearchServiceImpl implements SolrSearchService
         throws InvalidInputException, SolrException, MalformedURLException
     {
         if ( entityId <= 0l ) {
+            LOG.warn( "Pattern is null or empty while fetching social posts" );
             throw new InvalidInputException( "Pattern is null or empty while fetching social posts" );
         }
         if ( entityType == null || entityType.isEmpty() ) {
+            LOG.warn( "Invalid input parameter : passed entityType is null or invalid" );
             throw new InvalidInputException( "Invalid input parameter : passed entityType is null or invalid" );
         }
         if ( searchQuery == null ) {
+            LOG.warn( "Invalid input parameter : passed searchQuery is null" );
             throw new InvalidInputException( "Invalid input parameter : passed searchQuery is null" );
         }
 
-        LOG.info( "Method searchPostText() called for entity id : " + entityId + " and entity type : " + entityType );
+        LOG.info( "Method searchPostText() called for entity id : {} and entity type : {}", entityId, entityType );
         SolrDocumentList results = null;
         try {
             SolrServer solrServer = new HttpSolrServer( solrSocialPostUrl );
@@ -1595,16 +1599,18 @@ public class SolrSearchServiceImpl implements SolrSearchService
             solrQuery.setStart( startIndex );
             solrQuery.setRows( noOfRows );
             solrQuery.addSort( CommonConstants.TIME_IN_MILLIS_SOLR, ORDER.desc );
-            LOG.debug( "Solr Search Query : " + solrQuery.getQuery() );
+            if(LOG.isDebugEnabled())
+                LOG.debug( "Solr Search Query : {}", solrQuery.getQuery() );
             LOG.debug( "Querying solr for searching social posts" );
             results = solrServer.query( solrQuery ).getResults();
-            LOG.debug( "Number of matches found : " + results.getNumFound() );
+            if(LOG.isDebugEnabled())
+                LOG.debug( "Number of matches found : {}", results.getNumFound() );
         } catch ( SolrServerException e ) {
-            LOG.error( "SolrServerException while fetching social posts" );
-            throw new SolrException( "Exception while fetching social posts. Reason : " + e.getMessage(), e );
+            LOG.warn( "SolrServerException while fetching social posts" );
+            throw new SolrException( "Exception while fetching social posts. Reason : " , e );
         }
 
-        LOG.info( "Method searchPostText() finished for entity id : " + entityId + " and entity type : " + entityType );
+        LOG.info( "Method searchPostText() finished for entity id : {} and entity type : {}" ,entityId, entityType );
         return results;
     }
 
@@ -2416,6 +2422,7 @@ public class SolrSearchServiceImpl implements SolrSearchService
         LOG.info( "Method getSocialPostsFromSolrDocuments() started" );
 
         if ( documentList == null ) {
+            LOG.warn( "Invalid parameter passed : passed parameter documentList is null" );
             throw new InvalidInputException( "Invalid parameter passed : passed parameter documentList is null" );
         }
 

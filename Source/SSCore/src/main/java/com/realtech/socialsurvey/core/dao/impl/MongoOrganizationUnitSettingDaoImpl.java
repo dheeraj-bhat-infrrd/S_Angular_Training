@@ -150,7 +150,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     @Override
     public OrganizationUnitSettings fetchOrganizationUnitSettingsById( long identifier, String collectionName )
     {
-        LOG.debug( "Fetch organization unit settings from " + collectionName + " for id: " + identifier );
+        LOG.debug( "Fetch organization unit settings from {} for id: {}" , collectionName, identifier );
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_IDENTIFIER ).is( identifier ) );
         query.fields().exclude( KEY_LINKEDIN_PROFILEDATA );
@@ -180,7 +180,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     @Override
     public AgentSettings fetchAgentSettingsById( long identifier )
     {
-        LOG.debug( "Fetch agent settings from for id: " + identifier );
+        LOG.debug( "Fetch agent settings from Mongo for id: {}", identifier );
         AgentSettings settings = mongoTemplate.findOne( new BasicQuery( new BasicDBObject( KEY_IDENTIFIER, identifier ) ),
             AgentSettings.class, AGENT_SETTINGS_COLLECTION );
         setCompleteUrlForSettings( settings, CommonConstants.AGENT_SETTINGS_COLLECTION );

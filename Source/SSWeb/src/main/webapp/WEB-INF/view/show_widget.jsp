@@ -50,7 +50,7 @@
 					</div>
 					<div class="ol-btn-wrapper widget-copy widget-btn-cpy" >
 						<div id="overlay-continue" class="ol-btn cursor-pointer"
-							onclick="javascript:copyToClipboard('widget-code-area')">Copy
+							onclick="javascript:copyWidgetToClipboard('widget-code-area')">Copy
 							to clipboard</div>
 					</div>
 				</div>
@@ -92,7 +92,7 @@
 
 
 	$('#overlay-continue').click(function() {
-		copyToClipboard("widget-code-area");
+		copyWidgetToClipboard("widget-code-area");
 		$('#overlay-continue').unbind('click');
 	});
 </script>

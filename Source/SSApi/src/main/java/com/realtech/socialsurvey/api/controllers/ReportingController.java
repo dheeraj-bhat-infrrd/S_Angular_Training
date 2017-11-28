@@ -43,9 +43,10 @@ public class ReportingController
     @ApiOperation ( value = "Fetch Data for Completion Rate Graph")
     public String getReportingCompletionRateApi( Long entityId, String entityType ) 
     {
-        LOGGER.info( "Fetching Completion Rate Graph" );
+        LOGGER.info( "Fetching Completion Rate Graph for entityType :{} and entityId : {}",entityType,entityId );
 
         String json = null;
+        
         List<List<Object>> completionRate = dashboardGraphManagement.getCompletionRate( entityId, entityType );
         json = new Gson().toJson( completionRate );
         return json;
@@ -57,7 +58,7 @@ public class ReportingController
     @ApiOperation ( value = "Fetch Data for Survey Stats Graph")
     public String getReportingSpsStats( Long entityId, String entityType ) 
     {
-        LOGGER.info( "Fetching Survey Stats Graph" );
+    	LOGGER.info( "Fetching SPS stats Graph for entityType :{} and entityId : {}",entityType,entityId );
 
         String json = null;
         List<List<Object>> spsStats = dashboardGraphManagement.getSpsStatsGraph( entityId, entityType );
@@ -71,7 +72,7 @@ public class ReportingController
     @ApiOperation ( value = "Fetch Data for Overview ")
     public String getSpsStatsFromOverview( Long entityId, String entityType ) throws NonFatalException
     {
-        LOGGER.info( "Fetching sps for overview" );
+        LOGGER.info( "Fetching sps for overview for entityType : {} and entityId: {}",entityType,entityId );
 
         Map<String, Object> overviewMap = overviewManagement.fetchSpsAllTime( entityId, entityType );
         return new Gson().toJson( overviewMap );
@@ -237,7 +238,7 @@ public class ReportingController
     public String getUserRankingForThisYear( Long entityId, String entityType, int year, int startIndex, int batchSize )
       
     {
-        LOGGER.info( "Fetching User Ranking for this year" );
+        LOGGER.info( "Fetching User Ranking for this year started" );
 
         String json = null;
 
@@ -247,6 +248,8 @@ public class ReportingController
             batchSize );
 
         json = new Gson().toJson( userRankingList );
+
+        LOGGER.info( "Fetching User Ranking for this year ended" );
 
         return json;
     }
@@ -424,7 +427,7 @@ public class ReportingController
     public String getUserRankingCountForThisYear( Long entityId, String entityType, int year, int batchSize )
         throws NonFatalException
     {
-        LOGGER.info( "Fetching User Ranking Count For this year" );
+        LOGGER.info( "Fetching User Ranking Count For this year." );
 
         String json = null;
         Map<String, Object> rankingCountStartIndex;
@@ -526,7 +529,7 @@ public class ReportingController
     public String getScoreStatsQuestion( Long entityId, String entityType, int currentMonth, int currentYear )
     {
 
-        LOGGER.info( "Fetching Score Stats Question" );
+        LOGGER.debug( "Fetching Score Stats for Questions." );
 
         String json = null;
         List<List<Object>> scoreStatsQuestion ;
