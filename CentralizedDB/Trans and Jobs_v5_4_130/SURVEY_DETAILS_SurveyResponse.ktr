@@ -485,6 +485,19 @@
         <trim_type>none</trim_type>
         <repeat>N</repeat>
       </field>
+      <field>
+        <name>isNpsQuestion</name>
+        <path>&#x24;..isNpsQuestion</path>
+        <type>Boolean</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
     </fields>
     <limit>0</limit>
     <IsInFields>Y</IsInFields>
@@ -646,6 +659,7 @@
       <value>QUESTION_TYPE</value>
       <value>IS_USER_RANKING_QUESTION</value>
       <value>QUESTION_ID</value>
+      <value>IS_NPS_QUESTION</value>
     </values>
 <flag_field>ResponseFlag</flag_field>
 <reference>Sort input</reference>
@@ -678,7 +692,7 @@
     <fields_name/>
     <collection>SURVEY_DETAILS</collection>
     <json_field_name>json</json_field_name>
-    <json_query>&#x7b;&#x24;query&#x3a; &#x7b;&#x22;modifiedOn&#x22; &#x3a; &#x7b;&#x24;gte&#x3a;&#x7b;&#x24;date&#x3a;&#x24;&#x7b;modifiedOnSurveyDetails&#x7d;&#x7d;&#x7d;&#x7d; &#x7d;</json_query>
+    <json_query/>
     <auth_user/>
     <auth_password>Encrypted </auth_password>
     <auth_kerberos>N</auth_kerberos>
@@ -708,7 +722,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  SURVEY_RESPONSE_ID&#xd;&#xa;, SURVEY_DETAILS_ID&#xd;&#xa;, ANSWER&#xd;&#xa;, QUESTION&#xd;&#xa;, QUESTION_TYPE&#xd;&#xa;, case when IS_USER_RANKING_QUESTION &#x3c;&#x3e; 1 then false else true end as IS_USER_RANKING_QUESTION &#xd;&#xa;, QUESTION_ID&#xd;&#xa;FROM survey_response&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  SURVEY_RESPONSE_ID&#xd;&#xa;, SURVEY_DETAILS_ID&#xd;&#xa;, ANSWER&#xd;&#xa;, QUESTION&#xd;&#xa;, QUESTION_TYPE&#xd;&#xa;, case when IS_USER_RANKING_QUESTION &#x3c;&#x3e; 1 then false else true end as IS_USER_RANKING_QUESTION &#xd;&#xa;, QUESTION_ID&#xd;&#xa;, IS_NPS_QUESTION&#xd;&#xa;FROM survey_response&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -761,6 +775,10 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
+      </field>      <field>        <name>isNpsQuestion</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
       </field>        <select_unspecified>N</select_unspecified>
       <meta>        <name>isUserRankingQuestion</name>
         <rename>IS_USER_RANKING_QUESTION</rename>
@@ -779,6 +797,21 @@
         <storage_type/>
       </meta>      <meta>        <name>companyId</name>
         <rename>COMPANY_ID</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>isNpsQuestion</name>
+        <rename>IS_NPS_QUESTION</rename>
         <type>Integer</type>
         <length>-2</length>
         <precision>-2</precision>
@@ -943,6 +976,10 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
+      </field>      <field>        <name>IS_NPS_QUESTION</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
       </field>        <select_unspecified>N</select_unspecified>
       <remove>        <name>COMPANY_ID</name>
       </remove>      <remove>        <name>SURVEY_QUESTIONS_ID</name>
@@ -1065,6 +1102,21 @@
         <type>Integer</type>
         <length>9</length>
         <precision>0</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>IS_NPS_QUESTION</name>
+        <rename>IS_NPS_QUESTION</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
         <conversion_mask/>
         <date_format_lenient>false</date_format_lenient>
         <date_format_locale/>
@@ -1402,6 +1454,11 @@
       <value>
         <name>IS_USER_RANKING_QUESTION</name>
         <rename>IS_USER_RANKING_QUESTION</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>IS_NPS_QUESTION</name>
+        <rename>IS_NPS_QUESTION</rename>
         <update>Y</update>
       </value>
     </lookup>
