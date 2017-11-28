@@ -669,6 +669,7 @@ public interface CommonConstants
     public static final String QUESTION_0to10 = "0to10";
     public static final int QUESTION_RATING_VALUE_TRUE = 1;
     public static final int QUESTION_RATING_VALUE_FALSE = 0;
+    public static final boolean QUESTION_VALUE_TRUE = true;
     public static final int SURVEY_STAGE_COMPLETE = -1;
     public static final String SURVEY_CUSTOMER_MOOD_SAD = "sad";
 
