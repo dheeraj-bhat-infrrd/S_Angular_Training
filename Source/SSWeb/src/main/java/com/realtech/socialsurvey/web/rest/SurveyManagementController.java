@@ -188,7 +188,7 @@ public class SurveyManagementController
 		int isUserRankingQuestionInt = Integer.parseInt(request.getParameter("isUserRankingQuestion"));
 		String surveyId = request.getParameter("surveyId");
 		//add a request parameter to check if the question is set to nps or not 
-		int isNpsQuestionInt = 1;
+		int isNpsQuestionInt = Integer.parseInt(request.getParameter("isNPSQuestion"));
 
 		//encode question and response
 		question = new String( DatatypeConverter.parseBase64Binary(question) );

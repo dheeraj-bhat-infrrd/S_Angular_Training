@@ -7135,6 +7135,7 @@ function storeCustomerAnswer(customerResponse) {
 		"question" : encodedQuestion,
 		"questionType" : questionDetails.questionType,
 		"isUserRankingQuestion" : questionDetails.isUserRankingQuestion,
+		"isNPSQuestion" : questionDetails.isNPSQuestion,
 		"stage" : qno + 1,
 		"surveyId" : surveyId
 	};
