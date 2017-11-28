@@ -324,6 +324,11 @@
         <rename>IS_USER_RANKING_QUESTION</rename>
         <update>Y</update>
       </value>
+      <value>
+        <name>IS_NPS_QUESTION</name>
+        <rename>IS_NPS_QUESTION</rename>
+        <update>Y</update>
+      </value>
     </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -345,7 +350,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_INFO_CONNECTION</connection>
-    <sql>SELECT&#xd;&#xa;  SURVEY_QUESTIONS_MAPPING_ID&#xd;&#xa;, SURVEY_ID&#xd;&#xa;, SURVEY_QUESTIONS_ID&#xd;&#xa;, QUESTION_ORDER&#xd;&#xa;, IS_RATING_QUESTION&#xd;&#xa;, IS_USER_RANKING_QUESTION&#xd;&#xa;, STATUS&#xd;&#xa;, CREATED_ON&#xd;&#xa;, CREATED_BY&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;, MODIFIED_BY&#xd;&#xa;FROM SURVEY_QUESTIONS_MAPPING&#xd;&#xa;WHERE MODIFIED_ON &#x3e;&#x3d; &#x27;&#x24;&#x7b;lastModifiedTime&#x7d;&#x27;</sql>
+    <sql>SELECT&#xd;&#xa;  SURVEY_QUESTIONS_MAPPING_ID&#xd;&#xa;, SURVEY_ID&#xd;&#xa;, SURVEY_QUESTIONS_ID&#xd;&#xa;, QUESTION_ORDER&#xd;&#xa;, IS_RATING_QUESTION&#xd;&#xa;, IS_USER_RANKING_QUESTION&#xd;&#xa;, IS_NPS_QUESTION&#xd;&#xa;, STATUS&#xd;&#xa;, CREATED_ON&#xd;&#xa;, CREATED_BY&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;, MODIFIED_BY&#xd;&#xa;FROM SURVEY_QUESTIONS_MAPPING&#xd;&#xa;WHERE MODIFIED_ON &#x3e;&#x3d; &#x27;&#x24;&#x7b;lastModifiedTime&#x7d;&#x27;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
