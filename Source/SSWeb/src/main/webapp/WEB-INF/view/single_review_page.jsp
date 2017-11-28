@@ -98,7 +98,7 @@
 					</div>
 					<div>Share this Review</div>
 					<div class="ppl-share-wrapper clearfix share-plus-height sr-share-wrapper" >
-						<!-- social post populated from java script -->
+						<!-- social media share links populated from java script -->
 						<div class="float-left clearfix ppl-share-social sr-share-social">
 						</div>
 					</div>		

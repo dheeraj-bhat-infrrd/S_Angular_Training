@@ -84,10 +84,10 @@
 		test="${not empty profile.contact_details && not empty profile.contact_details.name }">
 		<c:set var="profName" value="${profile.contact_details.name }"></c:set>
 	</c:if>
-	<c:if test="${not empty title }">
+	<c:if test="${not empty title and title != ''}">
 		<c:set var="includeTitle" value=" ${firstName} is the ${title} of ${companyName}."></c:set>
 	</c:if>
-	<c:if test="${not empty location }">
+	<c:if test="${not empty location and location != '' }">
 		<c:set var="includeLocation" value=" in ${location}"></c:set>
 	</c:if>
 	<c:if test="${not empty city or not empty state or not empty country }">
