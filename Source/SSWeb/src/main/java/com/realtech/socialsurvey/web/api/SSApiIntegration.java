@@ -1,6 +1,8 @@
 package com.realtech.socialsurvey.web.api;
 
 
+import org.springframework.web.bind.annotation.PathVariable;
+
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
 import com.realtech.socialsurvey.web.api.entities.AccountRegistrationAPIRequest;
 import com.realtech.socialsurvey.web.api.entities.CaptchaAPIRequest;
@@ -195,14 +197,14 @@ public interface SSApiIntegration
 	Response updateQuestionFromExistingSurvey(@Body SurveyQuestionDetails questionDetails);
     
     //survey api's 
-    @GET("/v2/updatesurveyresponse")
-    Response updateSurveyResponse(@Query ("surveyId") String surveyId, @Query ("question") String question, @Query ("questionType") String questionType, @Query ("answer") String answer, @Query ("stage") int stage,
+    @POST("/v2/surveys/{surveyId}/response")
+    Response updateSurveyResponse(@PathVariable ("surveyId") String surveyId, @Query ("question") String question, @Query ("questionType") String questionType, @Query ("answer") String answer, @Query ("stage") int stage,
         @Query ("isUserRankingQuestion") boolean isUserRankingQuestion, @Query ("isNpsQuestion") boolean isNpsQuestion  );
     
-    @GET("/v2/updatescore")
-    Response updateScore(@Query ("surveyId") String surveyId, @Query ("mood") String mood, @Query ("feedback") String feedback,
+    @POST("/v2/surveys/{surveyId}/score")
+    Response updateScore(@PathVariable ("surveyId") String surveyId, @Query ("mood") String mood, @Query ("feedback") String feedback,
         @Query ("isAbusive") boolean isAbusive, @Query ("agreedToShare") String agreedToShare  );
     
-    @GET("/v2/getswearwords")
+    @GET("/v2/swearwords")
     Response getSwearWordsList();
 }
