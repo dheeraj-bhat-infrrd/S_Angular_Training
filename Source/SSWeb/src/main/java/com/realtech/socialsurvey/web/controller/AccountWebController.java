@@ -183,6 +183,7 @@ public class AccountWebController
     @ResponseBody
     public String getCompanyProfile( @QueryParam ( "companyId") String companyId )
     {
+        LOG.info( "Fetching company profile" );
         String responseString = null;
         SSApiIntegration api = apiBuilder.getIntegrationApi();
         Response response = api.getCompanyProfile( companyId );
@@ -196,6 +197,7 @@ public class AccountWebController
     public String updateCompanyProfile( @QueryParam ( "companyId") String companyId, @QueryParam ( "userId") String userId,
         @QueryParam ( "stage") String stage, @RequestBody CompanyProfile companyProfile )
     {
+        LOG.info( "updating company profile" );
         String responseString = null;
         SSApiIntegration api = apiBuilder.getIntegrationApi();
         Response response = api.updateCompanyProfile( companyProfile, companyId, userId );
@@ -212,6 +214,7 @@ public class AccountWebController
     @ResponseBody
     public String getVerticals()
     {
+        LOG.info( "Fetching verticals" );
         String responseString = null;
         SSApiIntegration api = apiBuilder.getIntegrationApi();
         Response response = api.getVerticals();
@@ -224,6 +227,7 @@ public class AccountWebController
     @ResponseBody
     public String getPaymentPlans()
     {
+        LOG.info( "Fetching payment plans" );
         String responseString = null;
         SSApiIntegration api = apiBuilder.getIntegrationApi();
         Response response = api.getPaymentPlans();
@@ -236,6 +240,7 @@ public class AccountWebController
     @ResponseBody
     public String getUsStates()
     {
+        LOG.info( "Fetching states for US" );
         String responseString = null;
         SSApiIntegration api = apiBuilder.getIntegrationApi();
         Response response = api.getUsStates();
@@ -248,6 +253,7 @@ public class AccountWebController
     @ResponseBody
     public String getCompanyStage( @QueryParam ( "companyId") String companyId )
     {
+        LOG.info( "Fetching company stage" );
         String responseString = null;
         SSApiIntegration api = apiBuilder.getIntegrationApi();
         Response response = api.getCompanyStage( companyId );
@@ -270,6 +276,7 @@ public class AccountWebController
     @ResponseBody
     public String generateHierarchy( @QueryParam ( "companyId") String companyId )
     {
+        LOG.info( "Generating hierarchy for company" );
         String responseString = null;
         SSApiIntegration api = apiBuilder.getIntegrationApi();
         Response response = api.generateDefaultHierarchy( companyId );
@@ -283,6 +290,7 @@ public class AccountWebController
     public String uploadCompanyLogo( @QueryParam ( "companyId") String companyId, @QueryParam ( "userId") String userId,
         MultipartHttpServletRequest request ) throws InvalidInputException
     {
+        LOG.info( "Uploading company logo" );
         String responseString = null;
         SSApiIntegration api = apiBuilder.getIntegrationApi();
         Iterator<String> itr = request.getFileNames();
@@ -303,6 +311,7 @@ public class AccountWebController
     @ResponseBody
     public String removeCompanyLogo( @QueryParam ( "companyId") String companyId, @QueryParam ( "userId") String userId )
     {
+        LOG.info( "Removing company logo" );
         String responseString = null;
         SSApiIntegration api = apiBuilder.getIntegrationApi();
         Response response = api.removeCompanyLogo( companyId, userId );
@@ -316,6 +325,7 @@ public class AccountWebController
     public String makePayment( @QueryParam ( "companyId") String companyId, @QueryParam ( "planId") String planId,
         @RequestBody com.realtech.socialsurvey.web.entities.Payment payment )
     {
+        LOG.info( "making payment for company" );
         String responseString = null;
         SSApiIntegration api = apiBuilder.getIntegrationApi();
         Response response = api.makePayment( companyId, planId, payment );
@@ -339,6 +349,7 @@ public class AccountWebController
     public String newLoginAs( @QueryParam ( "userId") String userId, @QueryParam ( "planId") String planId,
         RedirectAttributes redirectAttributes, HttpServletRequest request ) throws NumberFormatException, InvalidInputException
     {
+        LOG.info( "New login for a user" );
         long userIdLong = Long.parseLong( userId );
         User user = userManagementService.getUserByUserId( userIdLong );
         if ( user.getCompany().getRegistrationStage().equalsIgnoreCase( RegistrationStage.PAYMENT.getCode() )
@@ -362,7 +373,7 @@ public class AccountWebController
     public String initiateLinkedInConnection( @RequestBody String id,
         @PathVariable ( "organizationunit") String organizationunit, HttpServletRequest request ) throws JsonProcessingException
     {
-        LOG.debug( "Creating linkedin url" );
+        LOG.info( "Creating linkedin url" );
         String serverBaseUrl = requestUtils.getRequestServerName( request );
         StringBuilder linkedInAuth = new StringBuilder( linkedinAuthUri ).append( "?response_type=" ).append( "code" )
             .append( "&client_id=" ).append( linkedInApiKey ).append( "&redirect_uri=" ).append( serverBaseUrl )
@@ -370,7 +381,7 @@ public class AccountWebController
             .append( "&state=" ).append( "SOCIALSURVEY" ).append( "&scope=" ).append( linkedinScope );
         ObjectMapper mapper = new ObjectMapper();
         String jsonStr = mapper.writeValueAsString( linkedInAuth.toString() );
-        LOG.debug( "LinkedIn Auth URL: " + jsonStr );
+        LOG.debug( "LinkedIn Auth URL: {}", jsonStr );
         return jsonStr;
     }
 
@@ -391,11 +402,11 @@ public class AccountWebController
                 sId = params[1];
             }
         }
-        LOG.debug( "Unit: " + unit + " and id: " + sId );
+        LOG.debug( "Unit: {} and id: {}",unit, sId );
         // check if there is error
         String errorCode = request.getParameter( "error" );
         if ( errorCode != null ) {
-            LOG.error( "Error code : " + errorCode );
+            LOG.warn( "Error code : {}", errorCode );
             response = errorCode;
         } else {
             try {
@@ -403,6 +414,7 @@ public class AccountWebController
                     LOG.debug( "Authentication successful." );
                     // Getting Oauth access token for LinkedIn
                     String oauthCode = request.getParameter( "code" );
+                    String url = requestUtils.getRequestServerName( request ) + linkedinRedirectUri;
                     List<NameValuePair> params = new ArrayList<NameValuePair>( 5 );
                     params.add( new BasicNameValuePair( "grant_type", "authorization_code" ) );
                     params.add( new BasicNameValuePair( "code", oauthCode ) );
@@ -410,12 +422,11 @@ public class AccountWebController
                         requestUtils.getRequestServerName( request ) + linkedinRedirectUri + "?unit-id=" + unit_id ) );
                     params.add( new BasicNameValuePair( "client_id", linkedInApiKey ) );
                     params.add( new BasicNameValuePair( "client_secret", linkedInApiSecret ) );
-                    LOG.debug( "oauthCode in param " + oauthCode );
-                    LOG.debug( "redirect in param " + requestUtils.getRequestServerName( request ) + linkedinRedirectUri
-                        + "?unit-id=" + unit_id );
-                    LOG.debug( "linkedInApiKey in param " + linkedInApiKey );
-                    LOG.debug( "linkedInApiSecret in param " + linkedInApiSecret );
-                    LOG.debug( "linkedinAccessUri " + linkedinAccessUri );
+                    LOG.debug( "oauthCode in param {}", oauthCode );
+                    LOG.debug( "redirect in param {}?unit-id={}",url , unit_id );
+                    LOG.debug( "linkedInApiKey in param {}", linkedInApiKey );
+                    LOG.debug( "linkedInApiSecret in param {}", linkedInApiSecret );
+                    LOG.debug( "linkedinAccessUri {}", linkedinAccessUri );
 
                     // fetching access token
                     HttpClient httpclient = HttpClientBuilder.create().build();
@@ -474,11 +485,11 @@ public class AccountWebController
                         response = "ok";
                     }
                 } else {
-                    LOG.error( "Expecting id and unit from linkedin." );
+                    LOG.warn( "Expecting id and unit from linkedin" );
                     throw new SSAPIException( "Could not fetch LinkedIn profile. Could not pass parameters " );
                 }
             } catch ( IOException ioe ) {
-                LOG.error( "Found exception while accessing profile data " + ioe.getMessage(), ioe );
+                LOG.warn( "Found exception while accessing profile data {}", ioe.getMessage(), ioe );
                 throw new SSAPIException( "Could not fetch LinkedIn profile. Reason: " + ioe.getMessage() );
             }
         }

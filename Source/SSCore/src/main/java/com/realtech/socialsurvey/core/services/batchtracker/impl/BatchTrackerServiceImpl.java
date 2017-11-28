@@ -102,20 +102,22 @@ public class BatchTrackerServiceImpl implements BatchTrackerService
     @Transactional
     public long getLastRunEndTimeByBatchType( String batchType ) throws NoRecordsFetchedException, InvalidInputException
     {
-        LOG.debug( "method getLastRunEndTimeByBatchType() started for batch type : " + batchType );
+        LOG.debug( "method getLastRunEndTimeByBatchType() started for batch type : {}", batchType );
         if ( batchType == null || batchType.isEmpty() ) {
+            LOG.warn( "passed parameter batchtype is incorrect" );
             throw new InvalidInputException( "passed parameter batchtype is incorrect" );
         }
         List<BatchTracker> batchTrackerList = batchTrackerDao.findByColumn( BatchTracker.class,
             CommonConstants.BATCH_TYPE_COLUMN, batchType );
 
         if ( batchTrackerList == null || batchTrackerList.isEmpty() ) {
+            LOG.warn( "No record Fatched For batch type : {}", batchType );
             throw new NoRecordsFetchedException( "No record Fatched For batch type : " + batchType );
         }
         BatchTracker batchTracker = batchTrackerList.get( CommonConstants.INITIAL_INDEX );
         long lastEndTime = batchTracker.getLastEndTime().getTime();
 
-        LOG.debug( "method getLastRunEndTimeByBatchType() ended for batch type : " + batchType );
+        LOG.debug( "method getLastRunEndTimeByBatchType() ended for batch type : {}", batchType );
         return lastEndTime;
 
     }

@@ -78,4 +78,18 @@ public class FileUploadDaoImpl extends GenericDaoImpl<FileUpload, Long> implemen
     public void changeShowOnUiStatus( FileUpload fileUpload ){
         super.update( fileUpload );
     }
+    
+    @SuppressWarnings("unchecked")
+    @Override
+	public FileUpload getLatestActivityForReporting( Long entityId ){
+    	Criteria criteria = getSession().createCriteria(FileUpload.class);
+    	criteria.add( Restrictions.eq( CommonConstants.FILE_UPLOAD_TYPE_COLUMN , CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_DETAILS_REPORT ) );
+    	criteria.setMaxResults(1);
+    	criteria.addOrder(Order.desc(CommonConstants.CREATED_ON));
+    	List<FileUpload> resultList = criteria.list();
+    	if(resultList != null && resultList.size() > 0){
+    		return resultList.get(0);
+    	}
+    	return null;
+    }
 }

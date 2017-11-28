@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
@@ -263,7 +264,7 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
     public long getIncompleteSurveyCount( long companyId, long agentId, int[] status, Timestamp startDate, Timestamp endDate,
         Set<Long> agentIds )
     {
-        LOG.info( "getting incomplete survey count" );
+        LOG.debug( "getting incomplete survey count" );
         StringBuilder queryBuilder = new StringBuilder( "SELECT COUNT(*) AS COUNT FROM SURVEY_PRE_INITIATION WHERE " );
         boolean whereFlag = false; // used if where is
         if ( companyId > 0l ) {
@@ -347,12 +348,11 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
     public Map<Integer, Integer> getIncompletSurveyAggregationCount( long companyId, long agentId, int status,
         Timestamp startDate, Timestamp endDate, Set<Long> agentIds, String aggregateBy ) throws InvalidInputException
     {
-        LOG.info( "Getting incomplete survey aggregated count for company id : " + companyId + " \t status: " + status
-            + "\t startDate " + startDate + "\t end date: " + endDate + "\t aggregatedBy: " + aggregateBy );
+        LOG.debug( "Getting incomplete survey aggregated count for company id : {} \t status: {} \t startDate {} \t end date: {} \t aggregatedBy: {}" , companyId, status, startDate, endDate, aggregateBy );
         Map<Integer, Integer> aggregateResult = null;
         StringBuilder queryBuilder = new StringBuilder();
         if ( aggregateBy == null || aggregateBy.isEmpty() ) {
-            LOG.error( "Aggregate by is null" );
+            LOG.warn( "Aggregate by is null" );
             throw new InvalidInputException( "Aggregate by is null" );
         }
         boolean whereFlag = false; // used if where is 
@@ -433,7 +433,7 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
             query.setParameterList( "agentIds", agentIds );
         }
         
-        LOG.info( "query for get incompleted survey for garph is :" + query.toString() + " , " + query );
+        LOG.debug( "query for get incompleted survey for garph is : {}", query.toString() );
 
         
         @SuppressWarnings ( "unchecked") List<Object[]> results = query.list();
@@ -642,7 +642,7 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         }
         LOG.info( "Method to update updateAgentIdOfPreInitiatedSurveys started." );
         String queryStr = "UPDATE SURVEY_PRE_INITIATION SET STATUS = "
-            + CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED + ", MODIFIED_ON=? WHERE AGENT_EMAILID = ? AND STATUS IN ("
+            + CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED + ", MODIFIED_ON=? WHERE LCASE(AGENT_EMAILID) = LCASE(?) AND STATUS IN ("
             + CommonConstants.STATUS_SURVEYPREINITIATION_MISMATCH_RECORD + ", "
             + CommonConstants.STATUS_SURVEYPREINITIATION_IGNORED_RECORD + ") ";
         Query query = getSession().createSQLQuery( queryStr );
@@ -712,6 +712,7 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
     // Method to get list of incomplete surveys to display in Dash board and profile page.
     @SuppressWarnings ( "unchecked")
     @Override
+    @Transactional
     public List<SurveyPreInitiation> getSurveyByAgentIdAndCustomeEmailForPastNDays( long agentId, String customerEmail,
         int noOfDays ) throws DatabaseException
     {

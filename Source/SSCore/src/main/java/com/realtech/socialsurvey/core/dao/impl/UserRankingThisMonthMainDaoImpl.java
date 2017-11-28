@@ -103,7 +103,7 @@ public class UserRankingThisMonthMainDaoImpl extends GenericReportingDaoImpl<Use
     
     @Override
     public long fetchUserRankingCountForThisMonthMain(Long companyId, int year , int month) {
-        LOG.info( "method to fetch user ranking Main count for this month, fetchUserRankingCountForThisMonthMain() started" );
+        LOG.debug( "method to fetch user ranking Main count for this month, fetchUserRankingCountForThisMonthMain() started" );
         Criteria criteria = getSession().createCriteria( UserRankingThisMonthMain.class );
         try {
             criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
@@ -111,11 +111,11 @@ public class UserRankingThisMonthMainDaoImpl extends GenericReportingDaoImpl<Use
             criteria.add( Restrictions.eq( CommonConstants.THIS_MONTH, month ) );
             criteria.setProjection( Projections.rowCount() );
             Long count = (Long) criteria.uniqueResult();
-            LOG.info( "method to fetch user ranking main count for this month, fetchUserRankingCountForThisMonthMain() finished." );
+            LOG.debug( "method to fetch user ranking main count for this month, fetchUserRankingCountForThisMonthMain() finished." );
             return count.longValue();
             }
         catch ( HibernateException hibernateException ) {
-            LOG.error( "Exception caught in fetchUserRankingCountForThisMonthMain() ", hibernateException );
+            LOG.warn( "Exception caught in fetchUserRankingCountForThisMonthMain() ", hibernateException );
             throw new DatabaseException( "Exception caught in fetchUserRankingCountForThisMonthMain() ", hibernateException );
         }
 

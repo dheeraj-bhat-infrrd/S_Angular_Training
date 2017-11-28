@@ -13,4 +13,11 @@ public interface FileUploadDao extends GenericDao<FileUpload, Long>
 
     void changeShowOnUiStatus( FileUpload fileUpload );
 
+	/**
+	 * Dao method to get the latest activity of entity type.
+	 * @param entityId
+	 * @return
+	 */
+	FileUpload getLatestActivityForReporting(Long entityId);
+
 }

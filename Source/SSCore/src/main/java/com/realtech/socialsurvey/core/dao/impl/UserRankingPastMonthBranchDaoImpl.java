@@ -106,7 +106,7 @@ public class UserRankingPastMonthBranchDaoImpl extends GenericReportingDaoImpl<U
 
 	@Override
 	public long fetchUserRankingCountForPastMonthBranch(Long branchId, int month, int year) {
-		LOG.info( "method to fetch user ranking Branch count for past month, fetchUserRankingCountForPastMonthBranch() started" );
+		LOG.debug( "method to fetch user ranking Branch count for past month, fetchUserRankingCountForPastMonthBranch() started" );
         Criteria criteria = getSession().createCriteria( UserRankingPastMonthBranch.class );
         try {
             criteria.add( Restrictions.eq( CommonConstants.BRANCH_ID_COLUMN, branchId ) );
@@ -114,11 +114,11 @@ public class UserRankingPastMonthBranchDaoImpl extends GenericReportingDaoImpl<U
             criteria.add( Restrictions.eq( CommonConstants.LEADERBOARD_MONTH, month ) ); 
             criteria.setProjection( Projections.rowCount() );
             Long count = (Long) criteria.uniqueResult();
-            LOG.info( "method to fetch user ranking Branch count for past month, fetchUserRankingCountForPastMonthBranch() finished." );
+            LOG.debug( "method to fetch user ranking Branch count for past month, fetchUserRankingCountForPastMonthBranch() finished." );
             return count.longValue();
             }
         catch ( HibernateException hibernateException ) {
-            LOG.error( "Exception caught in fetchUserRankingCountForPastMonthBranch() ", hibernateException );
+            LOG.warn( "Exception caught in fetchUserRankingCountForPastMonthBranch() ", hibernateException );
             throw new DatabaseException( "Exception caught in fetchUserRankingCountForPastMonthBranch() ", hibernateException );
         }
 	}

@@ -101,18 +101,18 @@ public class UserRankingPastYearBranchDaoImpl extends GenericReportingDaoImpl<Us
 
 	@Override
 	public long fetchUserRankingCountForPastYearBranch(Long branchId, int year) {
-		 LOG.info( "method to fetch user ranking Branch count for past year, fetchUserRankingCountForPastYearBranch() started" );
+		 LOG.debug( "method to fetch user ranking Branch count for past year, fetchUserRankingCountForPastYearBranch() started" );
 	        Criteria criteria = getSession().createCriteria( UserRankingPastYearBranch.class );
 	        try {
 	            criteria.add( Restrictions.eq( CommonConstants.BRANCH_ID_COLUMN, branchId ) );
 	            criteria.add( Restrictions.eq( CommonConstants.LEADERBOARD_YEAR, year ) ); 
 	            criteria.setProjection( Projections.rowCount() );
 	            Long count = (Long) criteria.uniqueResult();
-	            LOG.info( "method to fetch user ranking Branch count for past year, fetchUserRankingCountForPastYearBranch() finished." );
+	            LOG.debug( "method to fetch user ranking Branch count for past year, fetchUserRankingCountForPastYearBranch() finished." );
 	            return count.longValue();
 	            }
 	        catch ( HibernateException hibernateException ) {
-	            LOG.error( "Exception caught in fetchUserRankingCountForPastYearBranch() ", hibernateException );
+	            LOG.warn( "Exception caught in fetchUserRankingCountForPastYearBranch() ", hibernateException );
 	            throw new DatabaseException( "Exception caught in fetchUserRankingCountForPastYearBranch() ", hibernateException );
 	        }  
 	}

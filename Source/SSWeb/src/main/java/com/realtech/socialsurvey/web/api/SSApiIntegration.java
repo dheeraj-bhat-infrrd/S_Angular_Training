@@ -207,4 +207,7 @@ public interface SSApiIntegration
     
     @GET("/v2/swearwords")
     Response getSwearWordsList();
+
+    @GET("/v1/getaccountstatisticsreportstatus")
+	Response getAccountStatisticsRecentActivity(@Query("reportId") Long reportId);
 }

@@ -26,7 +26,7 @@ public class SurveyStatsReportUserDaoImpl extends GenericReportingDaoImpl<Survey
     @Override
     public List<SurveyStatsReportUser> fetchUserSurveyStatsById( Long userId , String startTrxMonth , String endTrxMonth  )
     {
-        LOG.info( "Method to fetch all the survey stats,fetchUserSurveyStatsById() started." );
+        LOG.debug( "Method to fetch all the survey stats,fetchUserSurveyStatsById() started." );
         Criteria criteria = getSession().createCriteria( SurveyStatsReportUser.class );
         criteria.add( Restrictions.gt( CommonConstants.TRX_MONTH, startTrxMonth ) );
         criteria.add( Restrictions.le( CommonConstants.TRX_MONTH, endTrxMonth ) );
@@ -38,7 +38,7 @@ public class SurveyStatsReportUserDaoImpl extends GenericReportingDaoImpl<Survey
         }
 
         List<SurveyStatsReportUser> demo = (List<SurveyStatsReportUser>) criteria.list();
-        LOG.info( "Method to fetch all the users by email id, fetchUserSurveyStatsById() finished."+demo+criteria );
+        LOG.debug( "Method to fetch all the users by email id, fetchUserSurveyStatsById() finished." );
 
         return (List<SurveyStatsReportUser>) criteria.list();
     }

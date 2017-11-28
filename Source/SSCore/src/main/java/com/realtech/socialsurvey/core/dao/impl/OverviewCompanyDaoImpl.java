@@ -18,19 +18,22 @@ public class OverviewCompanyDaoImpl extends GenericReportingDaoImpl<OverviewComp
     @Override
     public String getOverviewCompanyId( Long companyid )
     {
-        LOG.info("Method to get OverviewCompanyId from CompanyId, getOverviewCompanyId() started." );
+        LOG.debug("Method to get OverviewCompanyId from CompanyId, getOverviewCompanyId() started." );
 
         Query query = getSession().createSQLQuery( "SELECT overview_company_id FROM overview_company WHERE company_id = :companyId " );
         query.setParameter( "companyId", companyid  );
         String OverviewCompanyId = (String) query.uniqueResult();
         
-        LOG.info("Method to get OverviewCompanyId from CompanyId, getOverviewCompanyId() finished." );
+        LOG.debug("Method to get OverviewCompanyId from CompanyId, getOverviewCompanyId() finished." );
         return OverviewCompanyId;
     }
 
     @Override
     public OverviewCompany findOverviewCompany( Class<OverviewCompany> entityClass, String overviewCompanyid )throws IllegalArgumentException
     {
+    	LOG.debug("Method to get Overview Company from overviewCompanyId, getOverviewCompanyId() started." );
+    	
+    	LOG.debug("Method to get Overview Company from overviewCompanyId, getOverviewCompanyId() finished." );
         return super.findById( entityClass, overviewCompanyid );
     }
 
