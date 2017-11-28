@@ -112,6 +112,9 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_SEND_MONTHLY_DIGEST_MAIL = "sendMonthlyDigestMail";
     public static final String KEY_HIDE_PUBLIC_PAGE = "hidePublicPage";
     public static final String KEY_INCLUDE_FOR_TRANSACTION_MONITOR = "includeForTransactionMonitor";
+    public static final String KEY_ENTITY_ALERT_DETAILS = "entityAlertDetails";
+    public static final String KEY_IS_ERROR_ALERT = "isErrorAlert";
+    public static final String KEY_IS_WARNING_ALERT_= "isWarningAlert";
 
 
 
@@ -1091,5 +1094,23 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         return settings;
     
         
+    }
+    
+    @Override
+    public List<OrganizationUnitSettings> fetchCompaniesByAlertType( String alertType )
+    {
+        Query query = new Query();
+
+        if(alertType.equalsIgnoreCase( CommonConstants.ALERT_TYPE_ERROR )){
+            query.addCriteria( Criteria.where( KEY_ENTITY_ALERT_DETAILS + "." + KEY_IS_ERROR_ALERT ).is( true ));
+
+        }else if(alertType.equalsIgnoreCase( CommonConstants.ALERT_TYPE_ERROR )){
+            query.addCriteria( Criteria.where( KEY_ENTITY_ALERT_DETAILS + "." + KEY_IS_WARNING_ALERT_ ).is( true ));
+        }
+        
+        
+        List<OrganizationUnitSettings> settingsList = mongoTemplate.find( query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION );
+        
+        return settingsList;
     }
 }

@@ -106,5 +106,15 @@ public interface ActivityManagementService
      * @return List of String
      */
     public List<String> getTransactionMonitorMailList();
+    
+    /**
+     * 
+     * @param noOfDays
+     * @param alertType
+     * @return
+     * @throws InvalidInputException
+     */
+    public List<TransactionMonitorGraphDataVO> getTransactionsStatsByDaysAndAlertType( int noOfDays, String alertType )
+        throws InvalidInputException;
 
 }

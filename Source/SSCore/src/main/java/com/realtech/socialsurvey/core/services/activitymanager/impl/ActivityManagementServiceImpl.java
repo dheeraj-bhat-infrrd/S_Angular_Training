@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.services.activitymanager.impl;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,11 +23,14 @@ import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyActiveUsersStats;
 import com.realtech.socialsurvey.core.entities.CompanySurveyStatusStats;
 import com.realtech.socialsurvey.core.entities.CompanyTransactionsSourceStats;
+import com.realtech.socialsurvey.core.entities.EntityAlertDetails;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.activitymanager.ActivityManagementService;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.vo.TransactionMonitorGraphDataVO;
 
 /**
  * 
@@ -365,6 +369,58 @@ public class ActivityManagementServiceImpl implements ActivityManagementService
         }
         return transactionMailList;
         
+    }
+    
+    /**
+     * 
+     * @param companyId
+     * @param noOfDays
+     * @return
+     * @throws InvalidInputException
+     */
+    @Override
+    @Transactional
+    public List<TransactionMonitorGraphDataVO> getTransactionsStatsByDaysAndAlertType( int noOfDays, String alertType) throws InvalidInputException
+    {
+        
+        LOG.info( "method getTransactionsStatsByDaysAndAlertType started for alertType %s and noOfDays %s" , alertType , noOfDays );       
+        
+        Date startDate = null;       
+        Date endDate = null;
+        if ( noOfDays >= 0 ) {
+            startDate = utils.getNDaysBackDate( noOfDays );
+            endDate = new Date( System.currentTimeMillis() );
+        }
+        
+        //get companies from mongo based on alert type
+        List<OrganizationUnitSettings> companyList = organizationManagementService.getCompaniesByAlertType( alertType );
+        
+        //get companyId list
+        List<Long> companyIdList = new ArrayList<Long>();
+        for(OrganizationUnitSettings company : companyList){
+            EntityAlertDetails alertDetails = company.getEntityAlertDetails();
+            companyIdList.add( company.getIden() );
+        }
+        
+        //get all monitored data for given companies from sql
+       Map<Long , List<CompanySurveyStatusStats>> companyIdSurveyStatsMap = companySurveyStatusStatsDao.getSurveyStatusCountForCompaniesForPastNDays( companyIdList, startDate, endDate );                        
+        
+        //fill stats data to vo
+       List<TransactionMonitorGraphDataVO> transactionMonitorGraphDataVOs = new ArrayList<TransactionMonitorGraphDataVO>();
+       for(OrganizationUnitSettings company : companyList){
+           TransactionMonitorGraphDataVO monitorGraphDataVO = new TransactionMonitorGraphDataVO();
+           monitorGraphDataVO.setCompanyId( company.getIden() );
+           monitorGraphDataVO.setEntityAlertDetails( company.getEntityAlertDetails() );
+           monitorGraphDataVO.setCompanySurveyStatusStatslist( companyIdSurveyStatsMap.get(  company.getIden()  ) );
+           if(company.getContact_details() != null)
+               monitorGraphDataVO.setCompanyName( company.getContact_details().getName() );
+           
+           transactionMonitorGraphDataVOs.add( monitorGraphDataVO );
+        }
+        
+        
+        LOG.info( "method getTransactionsStatsByDaysAndAlertType finished for alertType {} and noOfDays {}" , alertType , noOfDays );
+        return transactionMonitorGraphDataVOs;
     }
     
 }

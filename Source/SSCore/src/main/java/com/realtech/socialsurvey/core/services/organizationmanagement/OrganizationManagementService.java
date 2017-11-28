@@ -1512,4 +1512,7 @@ public interface OrganizationManagementService
     public String getFacebookPixelImageTagsFromHierarchy( OrganizationUnitSettings companySettings,
         OrganizationUnitSettings regionSettings, OrganizationUnitSettings branchSetting, OrganizationUnitSettings unitSettings );
 
+
+    public List<OrganizationUnitSettings> getCompaniesByAlertType( String alertType );
+
 }
