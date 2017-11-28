@@ -451,6 +451,7 @@ function proRatingPattern(rating, ratingParent, isOverallRating, source) {
 	
 };
 $(document).on('click','.verified-badge',function(e){
+	e.stopPropagation();
 	window.open("https://socialsurvey.zendesk.com/hc/en-us/articles/216454118-Added-Verified-Customer-badge");
 });
 

@@ -239,6 +239,7 @@ public interface CommonConstants
     public static final String BATCH_TYPE_ZILLOW_REVIEW_PROCESSOR_AND_AUTO_POSTER = "ZillowReviewProcessorAndAutoPoster";
     public static final String BATCH_TYPE_HIERARCHY_UPLOAD_PROCESSOR = "HierarchyUploadProcessor";
     public static final String BATCH_TYPE_MONTHLY_DIGEST_STARTER = "MonthlyDigestStarter";
+    public static final String BATCH_TYPE_SURVEY_CSV_UPLOAD_PROCESSOR = "SurveyCsvUploadProcessor";
 
     //batch name constant for batch tracker
     public static final String BATCH_NAME_REVIEW_COUNT_UPDATER = "Agent's review count in solr updater";
@@ -266,6 +267,7 @@ public interface CommonConstants
     public static final String BATCH_NAME_ZILLOW_REVIEW_PROCESSOR_AND_AUTO_POSTER = "Zillow review processor and auto poster";
     public static final String BATCH_NAME_HIERARCHY_UPLOAD_PROCESSOR = "Company Hierarchy Upload Processor";
     public static final String BATCH_NAME_MONTHLY_DIGEST_STARTER = "Monthly digest process starter for companies";
+    public static final String BATCH_NAME_SURVEY_CSV_UPLOAD_PROCESSOR = "Survey CSV file Upload Processor";
 
 
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_BILLING_REPORT = "Billing report";
@@ -667,6 +669,7 @@ public interface CommonConstants
     public static final String QUESTION_0to10 = "0to10";
     public static final int QUESTION_RATING_VALUE_TRUE = 1;
     public static final int QUESTION_RATING_VALUE_FALSE = 0;
+    public static final boolean QUESTION_VALUE_TRUE = true;
     public static final int SURVEY_STAGE_COMPLETE = -1;
     public static final String SURVEY_CUSTOMER_MOOD_SAD = "sad";
 
@@ -766,6 +769,7 @@ public interface CommonConstants
     public static final String SOCIAL_HISTORY_COLLECTION = "SOCIAL_CONNECTION_HISTORY";
     public static final String UPLOAD_HIERARCHY_DETAILS_COLLECTION = "UPLOAD_HIERARCHY_DETAILS";
     public static final String TEMP_HIERARCHY_UPLOAD_COLLECTION = "TEMP_HIERARCHY_UPLOAD";
+    public static final String SURVEY_CSV_UPLOAD_COLLECTION = "SURVEY_CSV_UPLOAD";
 
     /*
      * Mongo social post Source
@@ -979,6 +983,7 @@ public interface CommonConstants
     public static final int FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT = 105;
     public static final int FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT = 106;
     public static final int FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT = 107;
+    public static final int FILE_UPLOAD_REPORTING_COMPANY_DETAILS_REPORT = 109;
     public static final int FILE_UPLOAD_REPORTING_INCOMPLETE_SURVEY_REPORT = 108;
 
     
@@ -1281,7 +1286,7 @@ public interface CommonConstants
 
     //Company registration stage
     public static final String COMPANY_REGISTRATION_STAGE_STARTED = "The registration has been initiated";
-    public static final String COMPANY_REGISTRATION_STAGE_COMPLETE = "The registrtion has been completed successfully";
+    public static final String COMPANY_REGISTRATION_STAGE_COMPLETE = "The registration has been completed successfully";
     public static final String COMPANY_REGISTRATION_STAGE_PAYMENT_PENDING = "The registration has been initiated, but no payment has been made";
 
     public static final String ENCOMPASS_CONNECTION = "ENCOMPASS_CONNECTION";
@@ -1431,4 +1436,18 @@ public interface CommonConstants
     public static final String YEAR = "year";
     
     public static final String SURVEY_MAIL_THRESHOLD = "surveyCompletedMailThreshold";
+
+    public static final String REDIRECT = "redirect:/";
+
+    public static final String COLLECTION_TYPE = "collectionType";
+
+    public static final String AGENT_COLUMN = "agent";
+    
+    public static final String PROFILE_URL = "profileUrl";
+    
+    public static final String OFFICE = "office";
+
+    public static final String GOOGLE_CAPTCHA_RESPONSE = "g-recaptcha-response";
+
+    public static final String INVALID_CAPTCHA = "invalidCaptcha";
 }

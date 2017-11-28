@@ -107,7 +107,6 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 	}
 
 	@Override
-	@Transactional
 	public Survey checkForExistingSurvey(User user) throws InvalidInputException {
 		LOG.debug("Method checkForExistingSurvey() started.");
 		if (user == null) {
@@ -133,7 +132,6 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 	}
 
 	@Override
-	@Transactional
 	public Survey createNewSurvey(User user) throws InvalidInputException {
 		LOG.debug("Method createNewSurvey() started.");
 		if (user == null) {
@@ -224,7 +222,6 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 	}
 
 	@Override
-	@Transactional
 	public long countActiveQuestionsInSurvey(Survey survey) throws InvalidInputException {
 		LOG.debug("Method countQuestionsInSurvey() started.");
 		if (survey == null) {
@@ -263,7 +260,6 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 	}
 
 	@Override
-	@Transactional
 	public long addQuestionToExistingSurvey(User user, Survey survey, SurveyQuestionDetails surveyQuestionDetails) throws InvalidInputException {
 		LOG.debug("Method addQuestionToExistingSurvey() started.");
 		if (user == null) {
@@ -560,7 +556,6 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 	}
 
 	@Override
-	@Transactional
 	public void updateQuestionAndAnswers(User user, long questionId, SurveyQuestionDetails surveyQuestionDetails) throws InvalidInputException {
 		LOG.info("Method updateQuestionAndAnswers() started.");
 		if (user == null) {
@@ -670,15 +665,14 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 	}
 
 	@Override
-	@Transactional
 	public void deactivateQuestionSurveyMapping(User user, long surveyQuestionId) throws InvalidInputException {
-		LOG.info("Method deactivateQuestionSurveyMapping() started.");
-		if (user == null) {
-			LOG.error("Invalid argument passed. Either user or surveyQuestion is null in method deactivateQuestionSurveyMapping.");
+		LOG.debug("Method deactivateQuestionSurveyMapping() started.");
+		if (user == null || surveyQuestionId < 1) {
+			LOG.warn("Invalid argument passed. Either user or surveyQuestion is null in method deactivateQuestionSurveyMapping.");
 			throw new InvalidInputException(
 					"Invalid argument passed. Either user or surveyQuestion is null in method deactivateQuestionSurveyMapping.");
 		}
-		SurveyQuestionsMapping surveyQuestionsMapping = surveyQuestionsMappingDao.findById(SurveyQuestionsMapping.class, surveyQuestionId);
+		SurveyQuestionsMapping surveyQuestionsMapping = surveyQuestionsMappingDao.findById(SurveyQuestionsMapping.class, Long.valueOf(surveyQuestionId));
 		surveyQuestionsMapping.setStatus(CommonConstants.STATUS_INACTIVE);
 
 		surveyQuestionsMappingDao.save(surveyQuestionsMapping);
@@ -840,7 +834,6 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 	 * @throws InvalidInputException
 	 * @throws NoRecordsFetchedException
 	 */
-	@Transactional
 	@Override
 	public Map<Long, Long> checkIfSurveyIsDefaultAndClone(User user) throws InvalidInputException, NoRecordsFetchedException {
 		LOG.debug("checkIfSurveyIsDefaultAndClone called");
@@ -897,21 +890,14 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		LOG.debug("Method checkIfSurveyIsDefaultAndClone completed!");
 		return oldToNewMapping;
 	}
-	
-	public long createSurveyQuestionForExistingSurvey(SurveyQuestionDetails questionDetails) 
+
+	@Override
+	@Transactional
+	public long createSurveyQuestionForExistingSurvey(SurveyQuestionDetails questionDetails)
 			throws InvalidInputException, NoRecordsFetchedException {
 		LOG.debug("Service method to create the question object to add to existing survey.");
-		User user = new User();
-		user.setUserId(questionDetails.getUserId());
-		Company company = new Company();
-		VerticalsMaster verticalMaster = new VerticalsMaster();
-		verticalMaster.setVerticalsMasterId(questionDetails.getVerticalId());
-		company.setCompanyId(questionDetails.getCompanyId());
-		company.setVerticalsMaster(verticalMaster);
-		user.setCompany(company);
-		// Check if survey is default one and clone it
+		User user = getUserFromQuestionDetails(questionDetails);
 		checkIfSurveyIsDefaultAndClone(user);
-		// Getting the survey for user
 		Survey survey = checkForExistingSurvey(user);
 		if (survey == null) {
 			survey = createNewSurvey(user);
@@ -924,32 +910,50 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 	}
 
 	@Override
-	public void updateSurveyQuestionAndAnswer(SurveyQuestionDetails questionDetails) throws InvalidInputException, NoRecordsFetchedException {
-		LOG.debug("Service method to update existing survey.");
-		User user = new User();
-		user.setUserId(questionDetails.getUserId());
-		Company company = new Company();
-		VerticalsMaster verticalMaster = new VerticalsMaster();
-		verticalMaster.setVerticalsMasterId(questionDetails.getVerticalId());
-		company.setCompanyId(questionDetails.getCompanyId());
-		company.setVerticalsMaster(verticalMaster);
-		user.setCompany(company);
-
-		// Check if survey is default one and clone it
+	@Transactional
+	public void updateSurveyQuestionAndAnswer(SurveyQuestionDetails questionDetails)
+			throws InvalidInputException, NoRecordsFetchedException {
+		LOG.debug("Service method to update question in existing survey.");
+		User user = getUserFromQuestionDetails(questionDetails);
 		Map<Long, Long> oldToNewQuestionMap = checkIfSurveyIsDefaultAndClone(user);
 		long surveyQuestionId;
 		if (oldToNewQuestionMap != null) {
 			surveyQuestionId = oldToNewQuestionMap.get(questionDetails.getQuestionId());
-			if(LOG.isDebugEnabled())
-			LOG.debug(" Mapping question id : {} to : {}",surveyQuestionId,oldToNewQuestionMap.get(surveyQuestionId));
-		}
-		else {
+			if (LOG.isDebugEnabled())
+				LOG.debug(" Mapping question id : {} to : {}", surveyQuestionId,
+						oldToNewQuestionMap.get(surveyQuestionId));
+		} else {
 			surveyQuestionId = questionDetails.getQuestionId();
 		}
 		questionDetails = setNPSRankingAnswer(questionDetails);
 		updateQuestionAndAnswers(user, surveyQuestionId, questionDetails);
 	}
 
+	@Override
+	@Transactional
+	public void removeQuestionFromSurvey(long userId, long surveyQuestionIdUI)
+			throws InvalidInputException, NoRecordsFetchedException {
+		LOG.debug("Service method to remove question from existing survey.");
+		User user = userDao.findById(User.class, userId);
+		Map<Long, Long> oldToNewQuestionMap = checkIfSurveyIsDefaultAndClone(user);
+		long surveyQuestionId;
+		if (oldToNewQuestionMap != null) {
+			surveyQuestionId = oldToNewQuestionMap.get(surveyQuestionIdUI);
+			LOG.debug(" Mapping question id : {} to : {}", surveyQuestionIdUI, oldToNewQuestionMap.get(surveyQuestionIdUI));
+		} else {
+			surveyQuestionId = surveyQuestionIdUI;
+		}
+		deactivateQuestionSurveyMapping(user, surveyQuestionId);
+	}
+
+	/**
+	 * This method sets the NPS flag, User ranking flag and Answers to the
+	 * question based on question type condition.
+	 * 
+	 * @param questionDetails
+	 * @return questionDetails
+	 * @throws InvalidInputException
+	 */
 	private SurveyQuestionDetails setNPSRankingAnswer(SurveyQuestionDetails questionDetails)
 			throws InvalidInputException {
 		LOG.debug("Method to set NPS, User Ranking flag and Answers based on question type.");
@@ -958,7 +962,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 			questionDetails.setIsRatingQuestion(CommonConstants.QUESTION_RATING_VALUE_TRUE);
 			// will be user ranking question only if it is a rating question.
 			if (!StringUtils.isEmpty(questionDetails.getIsUserRankingStr()) && questionDetails.getIsUserRankingStr()
-					.equals(Integer.toString(CommonConstants.QUESTION_RATING_VALUE_TRUE))) {
+					.equals(Boolean.toString(CommonConstants.QUESTION_VALUE_TRUE))) {
 				questionDetails.setIsUserRankingQuestion(CommonConstants.QUESTION_RATING_VALUE_TRUE);
 
 			} else {
@@ -968,7 +972,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 			// NPS.
 			if (!StringUtils.isEmpty(questionDetails.getIsNPSStr())
 					&& questionType.indexOf(CommonConstants.QUESTION_0to10) != -1 && questionDetails.getIsNPSStr()
-							.equals(Integer.toString(CommonConstants.QUESTION_RATING_VALUE_TRUE))) {
+							.equals(Boolean.toString(CommonConstants.QUESTION_VALUE_TRUE))) {
 				questionDetails.setIsNPSQuestion(CommonConstants.QUESTION_RATING_VALUE_TRUE);
 			} else {
 				questionDetails.setIsNPSQuestion(CommonConstants.QUESTION_RATING_VALUE_FALSE);
@@ -999,6 +1003,23 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		}
 		return questionDetails;
 	}
-}
 
+	/**
+	 * This method returns the user object after setting the details received
+	 * from question details object from client side.
+	 * @param questionDetails
+	 * @return user
+	 */
+	private User getUserFromQuestionDetails(SurveyQuestionDetails questionDetails) {
+		User user = new User();
+		user.setUserId(questionDetails.getUserId());
+		Company company = new Company();
+		VerticalsMaster verticalMaster = new VerticalsMaster();
+		verticalMaster.setVerticalsMasterId(questionDetails.getVerticalId());
+		company.setCompanyId(questionDetails.getCompanyId());
+		company.setVerticalsMaster(verticalMaster);
+		user.setCompany(company);
+		return user;
+	}
+}
 // JIRA: SS-32: By RM05: EOC

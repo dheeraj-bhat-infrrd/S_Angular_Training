@@ -71,19 +71,19 @@ public class FileUploadServiceImpl implements FileUploadService
                 stream = new BufferedOutputStream( new FileOutputStream( serverFile ) );
                 stream.write( bytes );
 
-                LOG.debug( "Server File Location=" + serverFile.getAbsolutePath() );
+                LOG.debug( "Server File Location={}", serverFile.getAbsolutePath() );
                 LOG.info( "Method imageUploadHandler inside ImageUploadServiceImpl completed successfully" );
                 return logoNameHash + logoFormat;
             } catch ( IOException e ) {
-                LOG.error( "IOException occured while reading file. Reason : " + e.getMessage(), e );
-                throw new FatalException( "IOException occured while reading file. Reason : " + e.getMessage(), e );
+                LOG.error( "IOException occured while reading file.",  e );
+                throw new FatalException( "IOException occured while reading file.", e );
             } finally {
                 try {
                     if ( stream != null ) {
                         stream.close();
                     }
                 } catch ( IOException e ) {
-                    LOG.error( "IOException occured while closing the BufferedOutputStream. Reason : " + e.getMessage(), e );
+                    LOG.error( "IOException occured while closing the BufferedOutputStream.", e );
                 }
             }
         } else {
@@ -161,5 +161,13 @@ public class FileUploadServiceImpl implements FileUploadService
     {
         // TODO Auto-generated method stub
 
+    }
+
+
+    @Override
+    public String uploadFileAtSurveyCsvBucket( MultipartFile tempFile, String fileName ) throws NonFatalException
+    {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

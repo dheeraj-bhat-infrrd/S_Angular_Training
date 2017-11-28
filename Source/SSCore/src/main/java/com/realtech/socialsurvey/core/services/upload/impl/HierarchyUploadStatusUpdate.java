@@ -26,6 +26,11 @@ public class HierarchyUploadStatusUpdate
         try {
             while ( upload.getStatus() == CommonConstants.HIERARCHY_UPLOAD_STATUS_IMPORTING
                 || upload.getStatus() == CommonConstants.HIERARCHY_UPLOAD_STATUS_VERIFING ) {
+
+                if ( hierarchyUploadDao.findParsedHierarchyUpload( upload.get_id() ) == null ) {
+                    break;
+                }
+
                 hierarchyUploadDao.reinsertParsedHierarchyUpload( upload );
                 LOG.debug( "updateParsedHierarchyUpload thread called." );
                 Thread.sleep( interval );

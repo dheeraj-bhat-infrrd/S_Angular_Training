@@ -1345,7 +1345,7 @@ function drawLeaderboardTableStructure(userRankingList,userId,profileMasterId){
 				if(userRankingList[i][0] == userId  && profileMasterId == 4){
 					tableData += '<tr class="u-tbl-row leaderboard-row selected-row " >';
 					$('#rank-span').html(userRankingList[i][1]);
-					$('#user-score-span').html(userRankingList[i][4]);
+					$('#user-score-span').html(userRankingList[i][6]);
 				}else{
 					tableData+='<tr class="u-tbl-row leaderboard-row">';
 				}

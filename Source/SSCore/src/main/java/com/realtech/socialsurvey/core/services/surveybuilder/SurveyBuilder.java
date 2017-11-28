@@ -199,4 +199,8 @@ public interface SurveyBuilder {
 			throws InvalidInputException, NoRecordsFetchedException;
 
 	public void updateSurveyQuestionAndAnswer(SurveyQuestionDetails questionDetails) throws InvalidInputException, NoRecordsFetchedException;
+
+	//public void removeQuestionFromSurvey(SurveyQuestionDetails questionDetails) throws InvalidInputException, NoRecordsFetchedException;
+
+	public void removeQuestionFromSurvey(long userId, long surveyQuestionId) throws InvalidInputException, NoRecordsFetchedException;
 }

@@ -103,18 +103,18 @@ public class UserRankingPastYearMainDaoImpl extends GenericReportingDaoImpl<User
     
     @Override
     public long fetchUserRankingCountForPastYearMain(Long companyId, int year ) {
-        LOG.info( "method to fetch user ranking Main count for past year, fetchUserRankingCountForPastYearMain() started" );
+        LOG.debug( "method to fetch user ranking Main count for past year, fetchUserRankingCountForPastYearMain() started" );
         Criteria criteria = getSession().createCriteria( UserRankingPastYearMain.class );
         try {
             criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
             criteria.add( Restrictions.eq( CommonConstants.LEADERBOARD_YEAR, year ) ); 
             criteria.setProjection( Projections.rowCount() );
             Long count = (Long) criteria.uniqueResult();
-            LOG.info( "method to fetch user ranking main count for past year, fetchUserRankingCountForPastYearMain() finished." );
+            LOG.debug( "method to fetch user ranking main count for past year, fetchUserRankingCountForPastYearMain() finished." );
             return count.longValue();
             }
         catch ( HibernateException hibernateException ) {
-            LOG.error( "Exception caught in fetchUserRankingCountForPastYearMain() ", hibernateException );
+            LOG.warn( "Exception caught in fetchUserRankingCountForPastYearMain() ", hibernateException );
             throw new DatabaseException( "Exception caught in fetchUserRankingCountForPastYearMain() ", hibernateException );
         }  
     }

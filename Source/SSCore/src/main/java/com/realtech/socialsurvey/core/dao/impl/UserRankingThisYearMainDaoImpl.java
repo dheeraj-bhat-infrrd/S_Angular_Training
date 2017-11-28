@@ -1,9 +1,7 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -17,7 +15,6 @@ import org.springframework.stereotype.Component;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.UserRankingThisYearMainDao;
-import com.realtech.socialsurvey.core.entities.SurveyResponseTable;
 import com.realtech.socialsurvey.core.entities.UserRankingThisYearMain;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 
@@ -33,7 +30,7 @@ public class UserRankingThisYearMainDaoImpl extends GenericReportingDaoImpl<User
 	
 	@Override
     public List<UserRankingThisYearMain> fetchUserRankingWithProfileForThisYearMain(Long companyId, int year , int startIndex , int batchSize) {
-        LOG.info( "method to fetch user ranking Main list for this year, fetchUserRankingWithProfileForThisYearMain() started" );
+        LOG.debug( "method to fetch user ranking Main list for this year, fetchUserRankingWithProfileForThisYearMain() started" );
         Criteria criteria = getSession().createCriteria( UserRankingThisYearMain.class );
         List<UserRankingThisYearMain> userRankingList = new ArrayList<>();
 
@@ -66,11 +63,11 @@ public class UserRankingThisYearMainDaoImpl extends GenericReportingDaoImpl<User
             }
             }
         catch ( HibernateException hibernateException ) {
-            LOG.error( "Exception caught in fetchUserRankingWithProfileForThisYearMain() ", hibernateException );
+            LOG.error( "Exception caught in fetchUserRankingWithProfileForThisYearMain(): {}", hibernateException );
             throw new DatabaseException( "Exception caught in fetchUserRankingWithProfileForThisYearMain() ", hibernateException );
         }
 
-        LOG.info( "method to fetch user ranking main list for this year, fetchUserRankingWithProfileForThisYearMain() finished." );
+        LOG.debug( "method to fetch user ranking main list for this year, fetchUserRankingWithProfileForThisYearMain() finished." );
         return userRankingList;
     }
     
@@ -106,18 +103,18 @@ public class UserRankingThisYearMainDaoImpl extends GenericReportingDaoImpl<User
 	
 	@Override
     public long fetchUserRankingCountForThisYearMain(Long companyId, int year) {
-        LOG.info( "method to fetch user ranking Main count for this year, fetchUserRankingCountForThisYearMain() started" );
+        LOG.debug( "method to fetch user ranking Main count for this year, fetchUserRankingCountForThisYearMain() started" );
         Criteria criteria = getSession().createCriteria( UserRankingThisYearMain.class );
         try {
             criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
             criteria.add( Restrictions.eq( CommonConstants.THIS_YEAR, year ) );    
             criteria.setProjection( Projections.rowCount() );
             Long count = (Long) criteria.uniqueResult();
-            LOG.info( "method to fetch user ranking main count for this year, fetchUserRankingCountForThisYearMain() finished." );
+            LOG.debug( "method to fetch user ranking main count for this year, fetchUserRankingCountForThisYearMain() finished." );
             return count.longValue();
             }
         catch ( HibernateException hibernateException ) {
-            LOG.error( "Exception caught in fetchUserRankingCountForThisYearMain() ", hibernateException );
+            LOG.warn( "Exception caught in fetchUserRankingCountForThisYearMain() ", hibernateException );
             throw new DatabaseException( "Exception caught in fetchUserRankingCountForThisYearMain() ", hibernateException );
         }  
     }

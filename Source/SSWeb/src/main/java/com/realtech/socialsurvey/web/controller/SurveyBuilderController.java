@@ -123,52 +123,27 @@ public class SurveyBuilderController {
 	@RequestMapping(value = "/addquestiontosurvey", method = RequestMethod.POST)
 	public String addQuestionToExistingSurvey(Model model, HttpServletRequest request) {
 		LOG.info("Method addQuestionToExistingSurvey of SurveyBuilderController called");
-		User user = sessionHelper.getCurrentUser();
 		Map<String, String> statusMap = new HashMap<String, String>();
 		String message = "";
 		String statusJson = "";
-
-		String isUserRankingStr = request.getParameter("user-ranking-ques");
-		String isNPSStr = request.getParameter("nps-ques");
-		//Created VO and added required fields.
-		SurveyQuestionDetails questionDetails = new SurveyQuestionDetails();
-		questionDetails.setUserId(user.getUserId());
-		questionDetails.setCompanyId(user.getCompany().getCompanyId());
-		questionDetails.setVerticalId(user.getCompany().getVerticalsMaster().getVerticalsMasterId());
-		// Order of question
-		String order = request.getParameter("order");
-		// Creating new SurveyQuestionDetails from form
-		String questionType = request.getParameter("sb-question-type-" + order);
-
-		questionDetails.setQuestion(request.getParameter("sb-question-txt-" + order));
-		questionDetails.setQuestionType(questionType);
-		List<String> answers = Arrays.asList(request.getParameterValues("sb-answers-" + order + "[]"));
-
-		questionDetails.setIsNPSStr(isNPSStr);
-		questionDetails.setIsUserRankingStr(isUserRankingStr);
-		questionDetails.setAnswerStr(answers);
-		Response response = null; 
-		try{
-			response = ssApiIntergrationBuilder.getIntegrationApi()
-					.addQuestionToExistingSurvey(questionDetails);
-			if(response.getStatus() == 200) {
-				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTION_MAPPING_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
-						.getMessage();
-				String questionId = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
-				statusMap.put("questionId", questionId);
-				statusMap.put("status", CommonConstants.SUCCESS_ATTRIBUTE);
-			} 
+		SurveyQuestionDetails questionDetails = createQuestionDetailsFromRequest(request);
+		Response response = null;
+		try {
+			response = ssApiIntergrationBuilder.getIntegrationApi().addQuestionToExistingSurvey(questionDetails);
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTION_MAPPING_SUCCESSFUL,
+					DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+			String questionId = new String(((TypedByteArray) response.getBody()).getBytes());
+			statusMap.put("questionId", questionId);
+			statusMap.put("status", CommonConstants.SUCCESS_ATTRIBUTE);
 		} catch (Exception e) {
-			LOG.error("API call exception", e);
+			LOG.error("Exception occured in SS-API while adding new survey question.", e);
 			message = messageUtils.getDisplayMessage(e.getMessage(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 			statusMap.put("status", CommonConstants.ERROR);
 		}
-		
 		statusMap.put("message", message);
 		statusJson = new Gson().toJson(statusMap);
 		return statusJson;
 	}
-	
 
 	/**
 	 * Method to update question from existing survey
@@ -181,47 +156,21 @@ public class SurveyBuilderController {
 	@RequestMapping(value = "/updatequestionfromsurvey", method = RequestMethod.POST)
 	public String updateQuestionFromExistingSurvey(Model model, HttpServletRequest request) {
 		LOG.info("Method updateQuestionFromExistingSurvey of SurveyBuilderController called");
-		User user = sessionHelper.getCurrentUser();
 		Map<String, String> statusMap = new HashMap<String, String>();
 		String message = "";
 		String statusJson = "";
-
-		String isUserRankingStr = request.getParameter("user-ranking-ques");
-		String isNPSStr = request.getParameter("nps-ques");
-		//Created VO and added required fields.
-		SurveyQuestionDetails questionDetails = new SurveyQuestionDetails();
-		questionDetails.setUserId(user.getUserId());
-		questionDetails.setCompanyId(user.getCompany().getCompanyId());
-		questionDetails.setVerticalId(user.getCompany().getVerticalsMaster().getVerticalsMasterId());
-		// Order of question
-		String order = request.getParameter("order");
-		// Creating new SurveyQuestionDetails from form
-		String questionType = request.getParameter("sb-question-type-" + order);
-
-		questionDetails.setQuestion(request.getParameter("sb-question-txt-" + order));
-		questionDetails.setQuestionType(questionType);
-		questionDetails.setQuestionId(Long.parseLong(request.getParameter("questionId")));
-		List<String> answers = Arrays.asList(request.getParameterValues("sb-answers-" + order + "[]"));
-
-		questionDetails.setIsNPSStr(isNPSStr);
-		questionDetails.setIsUserRankingStr(isUserRankingStr);
-		questionDetails.setAnswerStr(answers);
-		Response response = null; 
+		SurveyQuestionDetails questionDetails = createQuestionDetailsFromRequest(request);
 		try {
-			response = ssApiIntergrationBuilder.getIntegrationApi().updateQuestionFromExistingSurvey(questionDetails);
-			if (response.getStatus() == 200) {
-				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTION_MODIFY_SUCCESSFUL,
-						DisplayMessageType.SUCCESS_MESSAGE).getMessage();
-				statusMap.put("status", CommonConstants.SUCCESS_ATTRIBUTE);
-				LOG.info("Method updateQuestionFromExistingSurvey of SurveyBuilderController finished successfully");
-			}
-		}
-		catch (Exception e) {
+			ssApiIntergrationBuilder.getIntegrationApi().updateQuestionFromExistingSurvey(questionDetails);
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTION_MODIFY_SUCCESSFUL,
+					DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+			statusMap.put("status", CommonConstants.SUCCESS_ATTRIBUTE);
+			LOG.info("Method updateQuestionFromExistingSurvey of SurveyBuilderController finished successfully");
+		} catch (Exception e) {
 			LOG.error("Exception occured in SS-API while updating survey question.", e);
 			message = messageUtils.getDisplayMessage(e.getMessage(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 			statusMap.put("status", CommonConstants.ERROR);
 		}
-
 		statusMap.put("message", message);
 		statusJson = new Gson().toJson(statusMap);
 		return statusJson;
@@ -238,85 +187,47 @@ public class SurveyBuilderController {
 	@RequestMapping(value = "/removequestionfromsurvey", method = RequestMethod.POST)
 	public String removeQuestionFromExistingSurvey(Model model, HttpServletRequest request) {
 		LOG.info("Method removequestionfromsurvey of SurveyBuilderController called");
-		User user = sessionHelper.getCurrentUser();
 		String message = "";
-
+		long surveyQuestionId = Long.parseLong(request.getParameter("questionId"));
+		long userId = sessionHelper.getCurrentUser().getUserId();
 		try {
-			// Check if default survey is mapped and clone it
-			Map<Long, Long> oldToNewQuestionMap = surveyBuilder.checkIfSurveyIsDefaultAndClone(user);
-
-			long surveyQuestionId;
-			if (oldToNewQuestionMap != null) {
-				surveyQuestionId = oldToNewQuestionMap.get(Long.parseLong(request.getParameter("questionId")));
-				LOG.info(" Mapping question id : " + surveyQuestionId + " to : " + oldToNewQuestionMap.get(surveyQuestionId));
-			}
-			else {
-				surveyQuestionId = Long.parseLong(request.getParameter("questionId"));
-			}
-
-			surveyBuilder.deactivateQuestionSurveyMapping(user, surveyQuestionId);
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTION_DISABLE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
-					.getMessage();
+			ssApiIntergrationBuilder.getIntegrationApi().removeQuestionFromSurvey(userId,surveyQuestionId);
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTION_DISABLE_SUCCESSFUL,
+					DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 			LOG.info("Method removequestionfromsurvey of SurveyBuilderController finished successfully");
-		}
-		catch (NumberFormatException e) {
-			LOG.error("NumberFormatException while disabling question. Reason:" + e.getMessage(), e);
+		} catch (Exception e) {
+			LOG.error("Exception in SS-API while removing question from survey.", e);
 			message = messageUtils.getDisplayMessage(e.getMessage(), DisplayMessageType.ERROR_MESSAGE).getMessage();
-		}
-		catch (InvalidInputException e) {
-			LOG.error("InvalidInputException while disabling Question from Survey: " + e.getMessage(), e);
-			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
-		}
-		catch (NoRecordsFetchedException e) {
-			LOG.error("NoRecordsFetchedException while adding Question to Survey: " + e.getMessage(), e);
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.NO_SURVEY_FOUND, DisplayMessageType.ERROR_MESSAGE).getMessage();
 		}
 		return message;
 	}
 
-	/**
-	 * Method to deactivate questions from existing survey
-	 * 
-	 * @param model
-	 * @param request
-	 * @return
-	 */
-	@ResponseBody
-	@RequestMapping(value = "/removequestionsfromsurvey", method = RequestMethod.POST)
-	public String removeQuestionsFromExistingSurvey(Model model, HttpServletRequest request) {
-		LOG.info("Method removequestionfromsurvey of SurveyBuilderController called");
+	private SurveyQuestionDetails createQuestionDetailsFromRequest(HttpServletRequest request) {
+		LOG.debug("Method to create SurveyQuestionDetails object called.");
 		User user = sessionHelper.getCurrentUser();
-		String message = "";
-
-		try {
-			// Check if default survey is mapped and clone it
-			Map<Long, Long> oldToNewQuestionMap = surveyBuilder.checkIfSurveyIsDefaultAndClone(user);
-
-			String questionIdsStr = request.getParameter("questionIds");
-			List<String> surveyQuestionIdStrs = Arrays.asList(questionIdsStr.split(","));
-
-			for (String questionIdStr : surveyQuestionIdStrs) {
-				if (oldToNewQuestionMap != null) {
-					LOG.info(" Mapping question id : " + questionIdStr + " to : " + oldToNewQuestionMap.get(Long.parseLong(questionIdStr)));
-					surveyBuilder.deactivateQuestionSurveyMapping(user, oldToNewQuestionMap.get(Long.parseLong(questionIdStr)));
-				}
-				else {
-					surveyBuilder.deactivateQuestionSurveyMapping(user, Long.parseLong(questionIdStr));
-				}
-			}
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTIONS_DISABLE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
-					.getMessage();
-			LOG.info("Method removequestionfromsurvey of SurveyBuilderController finished successfully");
+		String isUserRankingStr = request.getParameter("user-ranking-ques");
+		String isNPSStr = request.getParameter("nps-ques");
+		// Created VO and added required fields.
+		SurveyQuestionDetails questionDetails = new SurveyQuestionDetails();
+		questionDetails.setUserId(user.getUserId());
+		questionDetails.setCompanyId(user.getCompany().getCompanyId());
+		questionDetails.setVerticalId(user.getCompany().getVerticalsMaster().getVerticalsMasterId());
+		String order = request.getParameter("order");
+		String questionType = request.getParameter("sb-question-type-" + order);
+		questionDetails.setQuestion(request.getParameter("sb-question-txt-" + order));
+		questionDetails.setQuestionType(questionType);
+		String[] answerArr = request.getParameterValues("sb-answers-" + order + "[]");
+		if(answerArr != null && answerArr.length > 0){
+			questionDetails.setAnswerStr(Arrays.asList(answerArr));
 		}
-		catch (InvalidInputException e) {
-			LOG.error("InvalidInputException while disabling Questions from Survey: " + e.getMessage(), e);
-			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+		questionDetails.setIsNPSStr(isNPSStr);
+		questionDetails.setIsUserRankingStr(isUserRankingStr);
+		String questionId = request.getParameter("questionId");
+		if(questionId != null){
+			questionDetails.setQuestionId(Long.parseLong(questionId));
 		}
-		catch (NoRecordsFetchedException e) {
-			LOG.error("NoRecordsFetchedException while adding Question to Survey: " + e.getMessage(), e);
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.NO_SURVEY_FOUND, DisplayMessageType.ERROR_MESSAGE).getMessage();
-		}
-		return message;
+		
+		return questionDetails;
 	}
 
 	/**
