@@ -13623,3 +13623,222 @@ function processAndValidateCsvForm(whileUploading){
 $(document).on('click', '#survey-uploader-email', function(){
 	$("#upload-email-invalid").hide();
 })
+
+/*transaction monitor*/
+var sysOptions = {
+		chartArea : {
+			width : '80%',
+			height : '80%'
+		},
+		colors : [ '#cdcdcd','#812ebf'],
+		legend : {
+			position : 'none'
+		},
+		vAxis : { 
+			baselineColor : 'rgb(238,238,238)',
+			gridlines : { color : 'rgb(238,238,238)'},
+			viewWindow: {
+		        min: 0
+		    }
+		}
+};
+
+var dangerOptions = {
+		chartArea : {
+			width : '95%',
+			height : '95%'
+		},
+		colors : [ '#cdcdcd','#ff2424'],
+		legend : {
+			position : 'none'
+		},
+		vAxis : { 
+			baselineColor : 'rgb(238,238,238)',
+			gridlines : { color : 'rgb(238,238,238)'},
+			viewWindow: {
+		        min: 0
+		    }
+		}
+};
+
+var warnOptions = {
+		chartArea : {
+			width : '95%',
+			height : '95%'
+		},
+		colors : [ '#cdcdcd','#ffb524'],
+		legend : {
+			position : 'none'
+		},
+		vAxis : { 
+			baselineColor : 'rgb(238,238,238)',
+			gridlines : { color : 'rgb(238,238,238)'},
+			viewWindow: {
+		        min: 0
+		    }
+		}
+};
+
+var grayOptions = {
+		chartArea : {
+			width : '95%',
+			height : '95%'
+		},
+		colors : [ '#cdcdcd','#cdcdcd'],
+		legend : {
+			position : 'none'
+		},
+		vAxis : { 
+			baselineColor : 'rgb(238,238,238)',
+			gridlines : { color : 'rgb(238,238,238)'},
+			viewWindow: {
+		        min: 0
+		    }
+		}
+};
+
+var normalOptions = {
+		chartArea : {
+			width : '95%',
+			height : '95%'
+		},
+		colors : [ '#cdcdcd','#4583cd'],
+		legend : {
+			position : 'none'
+		},
+		vAxis : { 
+			baselineColor : 'rgb(238,238,238)',
+			gridlines : { color : 'rgb(238,238,238)'},
+			viewWindow: {
+		        min: 0
+		    }
+		}
+};
+
+function paintTransactionMonitorGraph(graphData,graphDivId) {
+	if (graphData == undefined)
+		return;
+	
+	var allTimeslots = [];
+	var totalReceivedTransactionsCount = [];
+	var completedTransactionCount = [];
+	var sentSurveyInvitationTransactionsCount = [];
+	var sentSurveyReminderTransactionsCount = [];
+	var unprocessedTransactionsCount = [];
+
+	var element = document.getElementById("proc-sur-count-days");
+	
+	var format = 14;
+	if (element != null) {
+		format = element.options[element.selectedIndex].value;
+	}
+
+	
+	var type = 'Date';
+	
+
+	var keys = getKeysFromGraphFormat(format);
+	//remove today's date
+	keys.pop();
+	
+	for (var i = 0; i < keys.length; i++) {
+		allTimeslots[i] = convertYearMonthDayKeyToMonthDay(keys[i]);
+		totalReceivedTransactionsCount[i] =  0;
+		completedTransactionCount[i] =  0;
+		sentSurveyInvitationTransactionsCount[i] =  0;
+		sentSurveyReminderTransactionsCount[i] =  0;
+		unprocessedTransactionsCount[i] = 0;
+	}
+	
+	if(graphData != undefined){
+		for(var i in graphData ){
+			var graphDataEntity = graphData[i];
+			
+			var entityDate = graphDataEntity.transactionDate;
+		    var formattedDate = new Date(Date.parse(entityDate));
+		    //get date similar to keys formay
+		    
+		    var month = formattedDate.getMonth() + 1;
+			var monthStr = "";
+			if (month < 10) {
+				monthStr = '0' + month.toString();
+				
+			}else{
+				monthStr = month.toString();
+			}
+			
+			var dayStr = "";
+			var day  = formattedDate.getDate();
+			if (day < 10) {
+				dayStr = '0' + day.toString();
+				
+			}else{
+				dayStr = day.toString();
+			}
+			
+			var keyFormattedDate = formattedDate.getFullYear().toString() + monthStr + dayStr;
+			if(keys.indexOf(keyFormattedDate) > -1){
+				var index = keys.indexOf(keyFormattedDate);
+				totalReceivedTransactionsCount[index] =  graphDataEntity.transactionReceivedCount;
+				completedTransactionCount[index] =  graphDataEntity.surveycompletedCount;
+				sentSurveyInvitationTransactionsCount[index] =  graphDataEntity.surveyInvitationSentCount;
+				sentSurveyReminderTransactionsCount[index] =  graphDataEntity.surveyReminderSentCount;
+				unprocessedTransactionsCount[index] = graphDataEntity.transactionReceivedCount - graphDataEntity.surveyInvitationSentCount;
+			}
+		}
+	}
+	
+	var internalData = [];
+	var nestedInternalData = [];
+	nestedInternalData.push(type, 'PreviousWeek', 'CurrentWeek');
+	internalData.push(nestedInternalData);
+	for (var itr = 0; itr < allTimeslots.length; itr++) {
+		nestedInternalData = [];
+		var curTotalReceivedTransactionsCount;
+		var curCompletedTransactionCount;
+		var curSentSurveyInvitationTransactionsCount;
+		var curSentSurveyReminderTransactionsCount;
+		var curUnprocessedTransactionsCount;
+
+		if (isNaN(parseInt(totalReceivedTransactionsCount[itr]))) {
+			curTotalReceivedTransactionsCount = 0;
+		} else {
+			curTotalReceivedTransactionsCount = parseInt(totalReceivedTransactionsCount[itr]);
+		}
+
+		if (isNaN(parseInt(completedTransactionCount[itr]))) {
+			curCompletedTransactionCount = 0;
+		} else {
+			curCompletedTransactionCount = parseInt(completedTransactionCount[itr]);
+		}
+
+		if (isNaN(parseInt(sentSurveyInvitationTransactionsCount[itr]))) {
+			curSentSurveyInvitationTransactionsCount = 0;
+		} else {
+			curSentSurveyInvitationTransactionsCount = parseInt(sentSurveyInvitationTransactionsCount[itr]);
+		}
+
+		if (isNaN(parseInt(sentSurveyReminderTransactionsCount[itr]))) {
+			curSentSurveyReminderTransactionsCount = 0;
+		} else {
+			curSentSurveyReminderTransactionsCount = parseInt(sentSurveyReminderTransactionsCount[itr]);
+		}
+		
+		if (isNaN(parseInt(unprocessedTransactionsCount[itr]))) {
+			curUnprocessedTransactionsCount = 0;
+		} else {
+			curUnprocessedTransactionsCount = parseInt(unprocessedTransactionsCount[itr]);
+		}
+
+		nestedInternalData.push(allTimeslots[itr], curTotalReceivedTransactionsCount,curSentSurveyInvitationTransactionsCount);
+		internalData.push(nestedInternalData);
+	}
+
+	var data = google.visualization.arrayToDataTable(internalData);
+	var options = sysOptions;
+
+	removeAllPreviousGraphToolTip();
+
+	var chart = new google.visualization.LineChart(document.getElementById(graphDivId));
+	chart.draw(data, options);
+}
