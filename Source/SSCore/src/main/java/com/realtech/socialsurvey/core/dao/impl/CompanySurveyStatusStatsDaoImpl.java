@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.CompanySurveyStatusStatsDao;
 import com.realtech.socialsurvey.core.entities.CompanySurveyStatusStats;
-import com.realtech.socialsurvey.core.entities.CompanyTransactionsSourceStats;
 
 /**
  * 
@@ -116,4 +115,37 @@ public class CompanySurveyStatusStatsDaoImpl extends GenericReportingDaoImpl<Com
         return companySurveyStatusStatsList;
     }
 
+    
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public Map<Long , List<CompanySurveyStatusStats>> getSurveyStatusCountForCompaniesForPastNDays( List<Long> companyIds, Date startDate,
+        Date endDate )
+    {
+        LOG.info( "method getSurveyStatusCountForCompanyForPastNDays started for companyId " + companyIds );
+       
+        Criteria criteria = getSession().createCriteria( CompanySurveyStatusStats.class );
+        criteria.add( Restrictions.in( CommonConstants.COMPANY_ID_COLUMN, companyIds ) );
+        
+        if(startDate != null){
+            criteria.add( Restrictions.ge( CommonConstants.TRANSACTION_MONITOR_DATE_COLUMN, startDate ) );            
+        }
+        
+        if(endDate != null){
+            criteria.add( Restrictions.le( CommonConstants.TRANSACTION_MONITOR_DATE_COLUMN, endDate ) );            
+        }
+        List<CompanySurveyStatusStats> companySurveyCountsList = criteria.list();
+
+        //fill stats data to company map
+        Map<Long , List<CompanySurveyStatusStats>> companiesSurveyStatsMap = new HashMap<Long, List<CompanySurveyStatusStats>>();
+        for(CompanySurveyStatusStats companySurveyStats : companySurveyCountsList){
+            List<CompanySurveyStatusStats> existingSurveyStatsList = companiesSurveyStatsMap.get(  companySurveyStats.getCompanyId()  );
+            if(existingSurveyStatsList == null)
+                existingSurveyStatsList = new ArrayList<CompanySurveyStatusStats>();
+            existingSurveyStatsList.add( companySurveyStats );
+            companiesSurveyStatsMap.put( companySurveyStats.getCompanyId(), existingSurveyStatsList );
+        }
+        
+        LOG.info( "method getSurveyStatusCountForCompanyForPastNDays finished for companyId " + companyIds );
+        return companiesSurveyStatsMap;
+    }
 }

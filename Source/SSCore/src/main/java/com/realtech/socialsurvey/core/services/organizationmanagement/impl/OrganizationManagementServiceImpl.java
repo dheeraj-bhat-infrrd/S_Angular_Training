@@ -8297,7 +8297,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             MongoOrganizationUnitSettingDaoImpl.KEY_INCLUDE_FOR_TRANSACTION_MONITOR, includeForTransactionMonitor, companyId,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
     }
-        /**
+        
+    /**
      * 
      * @param companySettings
      * @param regionSettings
@@ -8333,5 +8334,16 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 facebookPixelTag += unitSettings.getSocialMediaTokens().getFacebookPixelToken().getPixelImgTag();
 
         return facebookPixelTag;
+    }
+    
+    /**
+     * 
+     * @param alertType
+     * @return
+     */
+    @Override
+    public List<OrganizationUnitSettings> getCompaniesByAlertType(String alertType)
+    {
+        return organizationUnitSettingsDao.fetchCompaniesByAlertType( alertType );   
     }
 }

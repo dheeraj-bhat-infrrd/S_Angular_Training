@@ -347,6 +347,7 @@ public interface CommonConstants
     public static final String ACCOUNT_DISABLE_DATE_COLUMN = "disableDate";
     public static final String IS_FORCE_DELETE_COLUMN = "isForceDelete";
     public static final String SURVEY_LAST_ABUSE_REPORTED_DATE = "lastAbuseReportedDate";
+    public static final String ENTITY_ALERT_DETAILS_COLUMN = "entityAlertDetails";
     
 
     /**
@@ -1446,4 +1447,10 @@ public interface CommonConstants
     public static final String GOOGLE_CAPTCHA_RESPONSE = "g-recaptcha-response";
 
     public static final String INVALID_CAPTCHA = "invalidCaptcha";
+    
+    //trnsaction monitor alert type
+    public static final String ALERT_TYPE_ERROR = "error";    
+    public static final String ALERT_TYPE_WARNING = "warning"; 
+ 
+
 }

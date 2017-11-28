@@ -72,7 +72,6 @@ public class OrganizationUnitSettings implements Serializable
     
     private boolean includeForTransactionMonitor;
 
-
     // vendasta product details 
     private VendastaProductSettings vendasta_rm_settings;
     
@@ -84,6 +83,9 @@ public class OrganizationUnitSettings implements Serializable
     // flag that decides whether to send the monthly digest mail
     private boolean sendMonthlyDigestMail;
 
+    //alert details
+    private EntityAlertDetails entityAlertDetails;
+    
     public boolean isSendEmailFromCompany()
     {
         return sendEmailFromCompany;
@@ -715,6 +717,18 @@ public class OrganizationUnitSettings implements Serializable
     public void setIncludeForTransactionMonitor( boolean includeForTransactionMonitor )
     {
         this.includeForTransactionMonitor = includeForTransactionMonitor;
+    }
+
+
+    public EntityAlertDetails getEntityAlertDetails()
+    {
+        return entityAlertDetails;
+    }
+
+
+    public void setEntityAlertDetails( EntityAlertDetails entityAlertDetails )
+    {
+        this.entityAlertDetails = entityAlertDetails;
     }
 
 
