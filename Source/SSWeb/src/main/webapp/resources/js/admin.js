@@ -33,7 +33,7 @@ $(document).on('click','#dsh-ind-report-dwn-btn',function(e){
 $(document).on('keyup','#hr-comp-sel',function(e){
 	if(e.which == 13) {
 		var key = $(this).val();
-				
+		
 		var srchType = $('#hr-comp-sel').attr("srch-type");
 		
 		if(srchType == "company")
