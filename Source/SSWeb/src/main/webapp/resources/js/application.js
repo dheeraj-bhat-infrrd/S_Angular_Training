@@ -10125,7 +10125,7 @@ function callBackShowWidget(data) {
 	createWidgetPopup(header, data);
 
 	$('#overlay-continue').click(function() {
-		copyToClipboard("widget-code-area");
+		copyWidgetToClipboard("widget-code-area");
 		$('#overlay-continue').unbind('click');
 	});
 
@@ -10144,33 +10144,11 @@ function createWidgetPopup(header, body) {
 	$('#overlay-main').show();
 }
 
-function copyToClipboard(elementId) {
-
-	// Create a "hidden" input
-	var aux = document.createElement("input");
-
-	// Assign it the value of the specified element
+function copyWidgetToClipboard(elementId) {
 	var encoded = document.getElementById(elementId).innerHTML;
-	var decoded = $("<div/>").html(encoded).text();
-	aux.setAttribute("value", decoded);
-
-	// Append it to the body
-	document.body.appendChild(aux);
-
-	// Highlight its content
-	aux.select();
-
-	// Copy the highlighted text
-	document.execCommand("copy");
-
-	// Remove it from the body
-	document.body.removeChild(aux);
-
-	// Show toast
-	$('#overlay-toast').html("Copied to clipboard");
-	showToast();
-
+	copyToClipboard( encoded, "Copied to clipboard", "Unable to copy to clicboard" );
 }
+
 /**
  * Warning popup
  * 
@@ -13472,29 +13450,6 @@ function getInitials( name ){
     } else {
         return "";
     }
-}
-
-function copyIndividualReviewUrlToClipboard(loop){
-	var message = "";
-	try{
-		var temp = document.createElement( "input" );
-		temp.setAttribute("value",$('#permalink_url_' + loop).val());
-		document.body.appendChild( temp );
-		temp.select();
-		var success = document.execCommand("copy");
-		document.body.removeChild( temp );
-		if( success ){
-			message = "Review URL copied to clipboard.";
-		} else {
-			message = "Unable to copy to clipboard.";
-		}
-		
-	} catch(error){
-		message = "Unable to access clipboard."
-	}
-	
-	$('#overlay-toast').html(message);
-	showToast();
 }
 
 function downloadAccountStatsReport(){
