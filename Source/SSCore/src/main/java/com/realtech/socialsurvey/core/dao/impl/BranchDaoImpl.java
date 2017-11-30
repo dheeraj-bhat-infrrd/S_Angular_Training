@@ -236,11 +236,11 @@ public class BranchDaoImpl extends GenericDaoImpl<Branch, Long> implements Branc
 
 	@Override
 	public long getRegionIdByBranchId(long branchId) {
-		LOG.info( "method to fetch regionId from branchId getRegionIdByBranchId() started" );
+		LOG.debug( "Method to fetch regionId from branchId getRegionIdByBranchId() started." );
 		Query query = getSession().createSQLQuery( "SELECT region_id FROM BRANCH WHERE branch_id = :branchId " );
         query.setParameter( "branchId", branchId  );
         long regionId = (int) query.uniqueResult();
-        LOG.info( "method to fetch regionId from branchId getRegionIdByBranchId() finished" );
+        LOG.debug( "Method to fetch regionId from branchId getRegionIdByBranchId() finished." );
         return regionId;
 	}
     

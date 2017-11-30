@@ -133,7 +133,7 @@ public class UserManagementController
 
         try {
             if ( user == null ) {
-                LOG.error( "No user found in session" );
+                LOG.warn( "No user found in session" );
                 throw new InvalidInputException( "No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION );
             }
             if ( user.getStatus() != CommonConstants.STATUS_ACTIVE ) {
@@ -147,12 +147,11 @@ public class UserManagementController
                 long usersCount = solrSearchService.countUsersByCompany( companyId, 0, SOLR_BATCH_SIZE );
                 session.setAttribute( "usersCount", usersCount );
             } catch ( MalformedURLException e ) {
-                LOG.error( "MalformedURLException while fetching users count. Reason : " + e.getMessage(), e );
+                LOG.warn( "MalformedURLException while fetching users count. " , e );
                 throw new NonFatalException( "MalformedURLException while fetching users count", e );
             }
         } catch ( NonFatalException nonFatalException ) {
-            LOG.error( "NonFatalException in while inviting new user. Reason : " + nonFatalException.getMessage(),
-                nonFatalException );
+            LOG.error( "NonFatalException in while inviting new user", nonFatalException );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
         }
@@ -166,12 +165,12 @@ public class UserManagementController
     @RequestMapping ( value = "/invitenewuser", method = RequestMethod.POST)
     public String inviteNewUser( Model model, HttpServletRequest request ) throws NumberFormatException, JSONException
     {
-        LOG.info( "Method to add a new user by existing admin called." );
+        LOG.info( "Method to add a new user by existing admin, inviteNewUser() called." );
         HttpSession session = request.getSession( false );
         User admin = sessionHelper.getCurrentUser();
         try {
             if ( admin == null ) {
-                LOG.error( "No user found in session" );
+                LOG.warn( "No user found in session" );
                 throw new InvalidInputException( "No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION );
             }
             String firstName = request.getParameter( CommonConstants.FIRST_NAME );
@@ -180,15 +179,15 @@ public class UserManagementController
 
             // form parameter validations for inviting new user
             if ( firstName == null || firstName.isEmpty() || !firstName.matches( CommonConstants.FIRST_NAME_REGEX ) ) {
-                LOG.error( "First name invalid" );
+                LOG.warn( "First name invalid" );
                 throw new InvalidInputException( "First name invalid", DisplayMessageConstants.INVALID_FIRSTNAME );
             }
             if ( lastName != null && !lastName.isEmpty() && !lastName.matches( CommonConstants.LAST_NAME_REGEX ) ) {
-                LOG.error( "Last name invalid" );
+                LOG.warn( "Last name invalid" );
                 throw new InvalidInputException( "Last name invalid", DisplayMessageConstants.INVALID_LASTNAME );
             }
             if ( emailId == null || emailId.isEmpty() || !organizationManagementService.validateEmail( emailId ) ) {
-                LOG.error( "EmailId not valid" );
+                LOG.warn( "EmailId not valid" );
                 throw new InvalidInputException( "EmailId not valid", DisplayMessageConstants.INVALID_EMAILID );
             }
             AccountType accountType = (AccountType) session.getAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION );
@@ -197,11 +196,11 @@ public class UserManagementController
                 if ( userManagementService.isUserAdditionAllowed( admin ) ) {
                     try {
                         user = userManagementService.getUserByEmailAddress( emailId );
-                        LOG.debug( "User already exists in the company with the email id : " + emailId );
+                        LOG.warn( "User already exists in the company with the email id : " + emailId );
                         model.addAttribute( "existingUserId", user.getUserId() );
                         throw new UserAlreadyExistsException( "User already exists with the email id : " + emailId );
                     } catch ( NoRecordsFetchedException noRecordsFetchedException ) {
-                        LOG.debug( "No records exist with the email id passed, inviting the new user" );
+                        LOG.error( "No records exist with the email id passed, inviting the new user", noRecordsFetchedException);
                         user = userManagementService.inviteUser( admin, firstName, lastName, emailId );
                         String profileName = userManagementService.getUserSettings( user.getUserId() ).getProfileName();
                         userManagementService.sendRegistrationCompletionLink( emailId, firstName, lastName,
@@ -218,30 +217,32 @@ public class UserManagementController
                         }
                     }
                 } else {
+                	LOG.warn("Limit for maximum users has already reached.");
                     throw new InvalidInputException( "Limit for maximum users has already reached.",
                         DisplayMessageConstants.MAX_USERS_LIMIT_REACHED );
                 }
             } catch ( InvalidInputException e ) {
-                LOG.error( "NonFatalException in inviteNewUser() while inviting new user. Reason : " + e.getMessage(), e );
+                LOG.error( "NonFatalException in inviteNewUser() while inviting new user. Reason : ", e );
                 model.addAttribute( "message",
                     messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
                 return JspResolver.MESSAGE_HEADER;
             } catch ( UndeliveredEmailException e ) {
+            	LOG.warn( "UndeliveredEmailException in inviteNewUser() while inviting new user. Reason : ", e );
                 throw new UndeliveredEmailException( e.getMessage(), DisplayMessageConstants.REGISTRATION_INVITE_GENERAL_ERROR,
                     e );
             } catch ( UserAlreadyExistsException e ) {
+            	LOG.warn( "UserAlreadyExistsException in inviteNewUser() while inviting new user. Reason : ", e );
                 throw new UserAlreadyExistsException( e.getMessage(), DisplayMessageConstants.EMAILID_ALREADY_TAKEN, e );
             }
             model.addAttribute( "userId", user.getUserId() );
             model.addAttribute( "message", messageUtils.getDisplayMessage(
                 DisplayMessageConstants.REGISTRATION_INVITE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
         } catch ( NonFatalException nonFatalException ) {
-            LOG.error( "NonFatalException in while inviting new user. Reason : " + nonFatalException.getMessage(),
-                nonFatalException );
+            LOG.error( "NonFatalException in while inviting new user. Reason : ", nonFatalException );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
         }
-        LOG.info( "Method to add a new user by existing admin finished." );
+        LOG.info( "Method to add a new user by existing admin, inviteNewUser() finished." );
         return JspResolver.USER_ID_ON_INVITE;
     }
 
@@ -258,14 +259,14 @@ public class UserManagementController
             HttpSession session = request.getSession( false );
             User admin = sessionHelper.getCurrentUser();
             if ( admin == null ) {
-                LOG.error( "No user found in session" );
+                LOG.warn( "No user found in session" );
                 throw new InvalidInputException( "No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION );
             }
             AccountType accountType = (AccountType) session.getAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION );
             int accountTypeVal = accountType.getValue();
             model.addAttribute( "accounttypeval", accountTypeVal );
             if ( userIdStr == null ) {
-                LOG.error( "Invalid user id passed in method findUserByUserId()." );
+                LOG.warn( "Invalid user id passed in method findUserByUserId()." );
                 throw new InvalidInputException( "Invalid user id passed in method findUserByUserId()." );
             } else if ( userIdStr.isEmpty() ) {
                 return JspResolver.USER_DETAILS;
@@ -274,7 +275,7 @@ public class UserManagementController
             try {
                 userId = Long.parseLong( userIdStr );
             } catch ( NumberFormatException e ) {
-                LOG.error( "Number format exception while parsing user Id", e );
+                LOG.warn( "Number format exception while parsing user Id", e );
                 throw new NonFatalException( "Number format execption while parsing user id",
                     DisplayMessageConstants.GENERAL_ERROR, e );
             }
@@ -284,13 +285,12 @@ public class UserManagementController
                 // Adding assigned branches to the model attribute as assignedBranches
                 model.addAttribute( "assignedBranches", branches );
             } catch ( NoRecordsFetchedException e ) {
-                LOG.trace( "No branch attched with the user " + userId );
+                LOG.error( "No branch attched with the user " + userId );
             }
             model.addAttribute( "searchedUser", user );
 
         } catch ( NonFatalException nonFatalException ) {
-            LOG.error( "NonFatalException while searching for user id. Reason : " + nonFatalException.getMessage(),
-                nonFatalException );
+            LOG.error( "NonFatalException while searching for user id. Reason : ", nonFatalException );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
@@ -308,7 +308,7 @@ public class UserManagementController
     @RequestMapping ( value = "/findusersforcompany", method = RequestMethod.GET)
     public String findUsersForCompany( Model model, HttpServletRequest request )
     {
-        LOG.info( "Method to fetch user by user, findUserByUserId() started." );
+        LOG.info( "Method to fetch user by company, findUsersForCompany() started." );
         int startIndex = 0;
         int batchSize = 0;
 
@@ -317,24 +317,24 @@ public class UserManagementController
             String batchSizeStr = request.getParameter( "batchSize" );
             try {
                 if ( startIndexStr == null || startIndexStr.isEmpty() ) {
-                    LOG.error( "Invalid value found in startIndex. It cannot be null or empty." );
+                    LOG.warn( "Invalid value found in startIndex. It cannot be null or empty." );
                     throw new InvalidInputException( "Invalid value found in startIndex. It cannot be null or empty." );
                 }
                 if ( batchSizeStr == null || batchSizeStr.isEmpty() ) {
-                    LOG.error( "Invalid value found in batchSizeStr. It cannot be null or empty." );
+                    LOG.warn( "Invalid value found in batchSizeStr. It cannot be null or empty." );
                     batchSize = SOLR_BATCH_SIZE;
                 }
 
                 startIndex = Integer.parseInt( startIndexStr );
                 batchSize = Integer.parseInt( batchSizeStr );
             } catch ( NumberFormatException e ) {
-                LOG.error( "NumberFormatException while searching for user id. Reason : " + e.getMessage(), e );
+               LOG.warn( "NumberFormatException while searching for user id. Reason : ", e );
                 throw new NonFatalException( "NumberFormatException while searching for user id", e );
             }
 
             User admin = sessionHelper.getCurrentUser();
             if ( admin == null ) {
-                LOG.error( "No user found in session" );
+                LOG.warn( "No user found in session" );
                 throw new InvalidInputException( "No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION );
             }
 
@@ -345,7 +345,7 @@ public class UserManagementController
                 Type searchedUser = new TypeToken<UserFromSearch>() {}.getType();
                 adminUser = new Gson().fromJson( adminUserDoc.toString(), searchedUser );
             } catch ( SolrException e ) {
-                LOG.error( "SolrException while searching for user id. Reason : " + e.getMessage(), e );
+                LOG.warn( "SolrException while searching for user id", e );
                 throw new NonFatalException( "SolrException while searching for user id.", e );
             }
 
@@ -367,8 +367,7 @@ public class UserManagementController
                 model.addAttribute( "numFound", userManagementService.getUsersUnderBranchAdminCount( admin ) );
             }
         } catch ( NonFatalException nonFatalException ) {
-            LOG.error( "NonFatalException while searching for user id. Reason : " + nonFatalException.getStackTrace(),
-                nonFatalException );
+            LOG.error( "NonFatalException while searching for user id. Reason : " , nonFatalException );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
@@ -386,14 +385,14 @@ public class UserManagementController
     @RequestMapping ( value = "/finduserbyemail", method = RequestMethod.GET)
     public String findUserByEmail( Model model, HttpServletRequest request )
     {
-        LOG.info( "Method to find users by email id called." );
+        LOG.info( "Method to find users by email id, findUserByEmail() called." );
         String users = "";
         int startIndex = 0;
         int batchSize = 0;
         try {
             String searchKey = request.getParameter( "searchKey" );
             if ( searchKey == null ) {
-                LOG.error( "Invalid search key passed in method findUserByEmail()." );
+                LOG.warn( "Invalid search key passed in method findUserByEmail()." );
                 throw new InvalidInputException( "Invalid searchKey passed in method findUserByEmail()." );
             }
 
@@ -403,12 +402,12 @@ public class UserManagementController
                 startIndex = Integer.parseInt( startIndexStr );
                 batchSize = Integer.parseInt( batchSizeStr );
             } catch ( NumberFormatException e ) {
-                LOG.error( "NumberFormatException while searching for user id. Reason : " + e.getMessage(), e );
+                LOG.warn( "NumberFormatException while searching for user id. Reason : ", e );
             }
 
             User user = sessionHelper.getCurrentUser();
             if ( user == null ) {
-                LOG.error( "No user found in current session in findUserByEmail()." );
+                LOG.warn( "No user found in current session in findUserByEmail()." );
                 throw new InvalidInputException( "No user found in current session in findUserByEmail()." );
             }
 
@@ -416,23 +415,23 @@ public class UserManagementController
                 SolrDocumentList usersResult = solrSearchService.searchUsersByLoginNameOrName( searchKey,
                     user.getCompany().getCompanyId(), startIndex, batchSize );
                 users = new Gson().toJson( solrSearchService.getUsersWithMetaDataFromSolrDocuments( usersResult ) );
-                LOG.trace( "User search result is : " + usersResult );
+                LOG.debug( "User search result is : " + usersResult );
                 model.addAttribute( "numFound", usersResult.getNumFound() );
             } catch ( InvalidInputException invalidInputException ) {
+            	 LOG.warn( "InvalidInputException while searching for user id. Reason : ", invalidInputException );
                 throw new InvalidInputException( invalidInputException.getMessage(), invalidInputException );
             } catch ( MalformedURLException e ) {
-                LOG.error( "Error occured while searching for email id in findUserByEmail(). Reason is ", e );
+                LOG.warn( "Error occured while searching for email id in findUserByEmail(). Reason is ", e );
                 throw new NonFatalException( "Error occured while searching for email id in findUserByEmail(). Reason is ", e );
             }
         } catch ( NonFatalException nonFatalException ) {
-            LOG.error( "NonFatalException while searching for user by email id id. Reason : " + nonFatalException.getMessage(),
-                nonFatalException );
+            LOG.error( "NonFatalException while searching for user by email id id. Reason : ", nonFatalException );
             ErrorResponse errorResponse = new ErrorResponse();
             errorResponse.setErrCode( ErrorCodes.REQUEST_FAILED );
             errorResponse.setErrMessage( ErrorMessages.REQUEST_FAILED );
             return JSONUtil.toJSON( errorResponse );
         }
-        LOG.info( "Method to find users by email id finished." );
+        LOG.info( "Method to find users by email id, findUserByEmail() finished." );
         return users;
     }
 
@@ -440,13 +439,14 @@ public class UserManagementController
     @RequestMapping ( value = "/findusers", method = RequestMethod.GET)
     public String findUsersByEmailIdAndRedirectToPage( Model model, HttpServletRequest request )
     {
-        LOG.info( "Finding users and redirecting to search page" );
+        LOG.info( "Method for Finding users and redirecting to search page, findUsersByEmailIdAndRedirectToPage() started" );
 
         try {
             String users = findUserByEmail( model, request );
 
             User admin = sessionHelper.getCurrentUser();
             if ( admin == null ) {
+            	LOG.warn("No user found in session");
                 throw new InvalidInputException( "No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION );
             }
 
@@ -459,12 +459,13 @@ public class UserManagementController
                 Type searchedUser = new TypeToken<UserFromSearch>() {}.getType();
                 adminUser = new Gson().fromJson( adminUserDoc.toString(), searchedUser );
             } catch ( SolrException e ) {
+            	LOG.warn("SolrException while searching for user id.Reason:",e);
                 throw new NonFatalException( "SolrException while searching for user id.Reason:" + e.getMessage(),
                     DisplayMessageConstants.GENERAL_ERROR, e );
             }
             Type searchedUsersList = new TypeToken<List<UserFromSearch>>() {}.getType();
             List<UserFromSearch> usersList = new Gson().fromJson( users, searchedUsersList );
-            LOG.debug( "Users List in findusers: " + users );
+            LOG.debug( "Users List in findusers:{} ", users );
 
             /**
              * checking the edit capabilities of user
@@ -475,11 +476,14 @@ public class UserManagementController
         } catch (
 
         NonFatalException e ) {
-            LOG.error( "NonFatalException in findusers. Reason : " + e.getMessage(), e );
+            LOG.error( "NonFatalException in findusers. Reason : ", e );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
         }
+        
+        LOG.info( "Method for Finding users and redirecting to search page, findUsersByEmailIdAndRedirectToPage() Finished" );
+
         return JspResolver.USER_LIST_FOR_MANAGEMENT;
     }
 
@@ -487,7 +491,7 @@ public class UserManagementController
     @RequestMapping ( value = "/findusersunderadmin", method = RequestMethod.GET)
     public String findUsersUnderAdminAndRedirectToPage( Model model, HttpServletRequest request ) throws NonFatalException
     {
-        LOG.info( "Finding users under admin and redirecting to search page" );
+        LOG.info( "Method for Finding users under admin and redirecting to search page, findUsersUnderAdminAndRedirectToPage() started" );
         int startIndex = 0;
         int batchSize = 0;
 
@@ -496,7 +500,7 @@ public class UserManagementController
 
             String searchKey = request.getParameter( "searchKey" );
             if ( searchKey == null ) {
-                LOG.error( "Invalid search key passed in method findUserByEmail()." );
+                LOG.warn( "Invalid search key passed in method findUserByEmail()." );
                 throw new InvalidInputException( "Invalid searchKey passed in method findUserByEmail()." );
             }
 
@@ -506,11 +510,12 @@ public class UserManagementController
                 startIndex = Integer.parseInt( startIndexStr );
                 batchSize = Integer.parseInt( batchSizeStr );
             } catch ( NumberFormatException e ) {
-                LOG.error( "NumberFormatException while parsing the start index or batch size. Reason : " + e.getMessage(), e );
+                LOG.warn( "NumberFormatException while parsing the start index or batch size. Reason : ", e );
             }
 
             User admin = sessionHelper.getCurrentUser();
             if ( admin == null ) {
+            	LOG.warn("No user found in session");
                 throw new InvalidInputException( "No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION );
             }
 
@@ -523,6 +528,7 @@ public class UserManagementController
                 Type searchedUser = new TypeToken<UserFromSearch>() {}.getType();
                 adminUser = new Gson().fromJson( adminUserDoc.toString(), searchedUser );
             } catch ( SolrException e ) {
+            	LOG.warn("SolrException while searching for user id. Reason:",e);
                 throw new NonFatalException( "SolrException while searching for user id.Reason:" + e.getMessage(),
                     DisplayMessageConstants.GENERAL_ERROR, e );
             }
@@ -535,18 +541,20 @@ public class UserManagementController
                 model.addAttribute( "numFound", userIdList.getNumFound() );
                 model.addAttribute( "userslist", usersList );
             } else {
-                LOG.error( "No users found under the admin id : " + admin.getUserId() );
+                LOG.warn( "No users found under the admin id : " + admin.getUserId() );
             }
         } catch ( NonFatalException e ) {
-            LOG.error( "NonFatalException in findusers. Reason : " + e.getMessage(), e );
+            LOG.error( "NonFatalException in findusers. Reason : ", e );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
         } catch ( MalformedURLException e ) {
-            LOG.error( "Error occured while searching for users in findUsersUnderAdminAndRedirectToPage(). Reason is ", e );
+            LOG.warn( "Error occured while searching for users in findUsersUnderAdminAndRedirectToPage(). Reason is ", e );
             throw new NonFatalException(
                 "Error occured while searching for users in findUsersUnderAdminAndRedirectToPage(). Reason is ", e );
         }
+        
+        LOG.info( "Method for Finding users under admin and redirecting to search page, findUsersUnderAdminAndRedirectToPage() finished" );
         return JspResolver.USER_LIST_FOR_MANAGEMENT;
     }
 
@@ -558,7 +566,7 @@ public class UserManagementController
     @RequestMapping ( value = "/removeexistinguser", method = RequestMethod.POST)
     public String removeExistingUser( Model model, HttpServletRequest request )
     {
-        LOG.info( "Method to deactivate an existing user called." );
+        LOG.info( "Method to deactivate an existing user, removeExistingUser() called." );
         Map<String, String> statusMap = new HashMap<String, String>();
         String message = "";
         long userIdToRemove = 0;
@@ -567,13 +575,13 @@ public class UserManagementController
             try {
                 userIdToRemove = Long.parseLong( request.getParameter( "userIdToRemove" ) );
             } catch ( NumberFormatException e ) {
-                LOG.error( "Number format exception while parsing user Id", e );
+                LOG.warn( "Number format exception while parsing user Id", e );
                 throw new NonFatalException( "Number format execption while parsing user id",
                     DisplayMessageConstants.GENERAL_ERROR, e );
             }
 
             if ( userIdToRemove < 0 ) {
-                LOG.error( "Invalid user Id found to remove in removeExistingUser()." );
+                LOG.warn( "Invalid user Id found to remove in removeExistingUser()." );
                 throw new InvalidInputException( "Invalid user Id found to remove in removeExistingUser().",
                     DisplayMessageConstants.NO_USER_IN_SESSION );
             }
@@ -581,7 +589,7 @@ public class UserManagementController
             User loggedInUser = sessionHelper.getCurrentUser();
             User userToRemove = findUserById( userIdToRemove );
             if ( loggedInUser == null ) {
-                LOG.error( "No user found in current session in removeExistingUser()." );
+                LOG.warn( "No user found in current session in removeExistingUser()." );
                 throw new InvalidInputException( "No user found in current session in removeExistingUser()." );
             }
 
@@ -593,6 +601,7 @@ public class UserManagementController
                     statusMap.put( "status", CommonConstants.ERROR );
                 }
             } catch ( InvalidInputException e ) {
+                LOG.warn( "InvalidInputException found in removeExistingUser()",e );
                 throw new InvalidInputException( e.getMessage(), DisplayMessageConstants.REGISTRATION_INVITE_GENERAL_ERROR, e );
             }
 
@@ -601,13 +610,13 @@ public class UserManagementController
                 .getMessage();
             statusMap.put( "status", CommonConstants.SUCCESS_ATTRIBUTE );
         } catch ( NonFatalException nonFatalException ) {
-            LOG.error( "NonFatalException while removing user. Reason : " + nonFatalException.getMessage(), nonFatalException );
+            LOG.error( "NonFatalException while removing user. Reason : ", nonFatalException );
             statusMap.put( "status", CommonConstants.ERROR );
             message = messageUtils.getDisplayMessage( nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE )
                 .getMessage();
         }
 
-        LOG.info( "Method to remove an existing user finished." );
+        LOG.info( "Method to remove an existing user, removeExistingUser() finished." );
         statusMap.put( "message", message );
 
         return new Gson().toJson( statusMap );
@@ -620,7 +629,7 @@ public class UserManagementController
         try {
             user = userManagementService.getUserByUserId( userId );
         } catch ( InvalidInputException ie ) {
-            LOG.error( "Exception caught " + ie.getMessage() );
+            LOG.warn( "Exception caught ", ie );
         }
         return user;
     }

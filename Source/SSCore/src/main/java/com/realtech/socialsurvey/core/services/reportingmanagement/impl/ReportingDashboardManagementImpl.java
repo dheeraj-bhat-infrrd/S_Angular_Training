@@ -318,6 +318,13 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     @Value ( "${APPLICATION_BASE_URL}")
     private String applicationBaseUrl;
 
+    
+    @Value("${SEND_DIGEST_TO_APPLICATION_ADMIN_ONLY}")
+    private String sendDigestToApplicationAdminOnly;
+    
+    @Value ( "${APPLICATION_ADMIN_EMAIL}")
+    private String applicationAdminEmail;
+    
     public static final int DIGEST_MAIL_START_INDEX = 0;
 
     public static final int DIGEST_MAIL_BATCH_SIZE = 50;
@@ -2109,6 +2116,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     public List<List<Object>> getUserRankingThisYear( String entityType, Long entityId, int year, int startIndex,
         int batchSize )
     {
+        LOG.info( "function to getUserRankingThisYear based on entityType: {} , entityId: {} started ",entityType,entityId );
         List<List<Object>> userRanking = new ArrayList<>();
 
         if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
@@ -2166,6 +2174,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 userRanking.add( userRankingThisYearBranchList );
             }
         }
+        LOG.info( "function to getUserRankingThisYear based on ended");
+
         return userRanking;
     }
 
@@ -2929,7 +2939,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     @Override
     public List<List<Object>> getScoreStatsForQuestion( Long entityId, String entityType, int currentMonth, int currentYear )
     {
-
+    	LOG.debug("Service method call for get score stats for questions.");
         List<List<Object>> scoreStatsForQuestion = new ArrayList<>();
         int startMonth = 0;
         int startYear = currentYear - 1;
@@ -2992,9 +3002,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 scoreStatsQuestionUserList.add( averageScore );
                 scoreStatsForQuestion.add( scoreStatsQuestionUserList );
             }
-
         }
-
         return scoreStatsForQuestion;
     }
 
@@ -3410,26 +3418,33 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             int startIndex = DIGEST_MAIL_START_INDEX;
             int batchSize = DIGEST_MAIL_BATCH_SIZE;
             List<CompanyDigestRequestData> digestRequestList = null;
+            
+            // create a Calendar instance with time zone and locale of the device
+            Calendar calendar = Calendar.getInstance();
+            
+            // set month and year
+            int month = calendar.get( Calendar.MONTH );
+            int year = calendar.get( Calendar.YEAR );
 
             do {
 
-
                 // fetch a list of digest requests for companies who have enabled send monthly digest mail feature 
                 digestRequestList = getCompanyRequestDataInBatch( startIndex, batchSize );
-
+                
                 if ( digestRequestList != null ) {
                     for ( CompanyDigestRequestData company : digestRequestList ) {
-
-
-                        // create a Calendar instance with time zone and locale of the device
-                        Calendar calendar = Calendar.getInstance();
 
                         try {
 
                             // get the digest aggregate object
-                            MonthlyDigestAggregate digestAggregate = getMonthlyDigestAggregateForCompany( company,
-                                calendar.get( Calendar.MONTH ), calendar.get( Calendar.YEAR ) );
+                            MonthlyDigestAggregate digestAggregate = getMonthlyDigestAggregateForCompany( company, month, year );
 
+                            // check for send digest to administrator switch
+                            if( CommonConstants.YES_STRING.equals( sendDigestToApplicationAdminOnly ) && digestAggregate != null ){
+                                digestAggregate.setRecipientMailId( applicationAdminEmail );
+                            }
+                            
+                            
                             // send the email to the company administrator
                             emailServices.sendMonthlyDigestMail( digestAggregate );
 

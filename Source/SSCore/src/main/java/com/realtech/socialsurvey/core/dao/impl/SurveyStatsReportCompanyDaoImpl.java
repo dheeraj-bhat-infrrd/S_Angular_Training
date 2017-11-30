@@ -29,7 +29,7 @@ public class SurveyStatsReportCompanyDaoImpl extends GenericReportingDaoImpl<Sur
     @Override
     public List<SurveyStatsReportCompany> fetchCompanySurveyStatsById( Long companyId , String startTrxMonth , String endTrxMonth )
     {
-        LOG.info( "Method to fetch all the survey stats,fetchCompanySurveyStatsById() started." );
+        LOG.debug( "Method to fetch all the survey stats,fetchCompanySurveyStatsById() started." );
         Criteria criteria = getSession().createCriteria( SurveyStatsReportCompany.class );
         try {
             criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
@@ -40,7 +40,7 @@ public class SurveyStatsReportCompanyDaoImpl extends GenericReportingDaoImpl<Sur
             throw new DatabaseException( "Exception caught in fetchCompanySurveyStatsById() ", hibernateException );
         }
 
-        LOG.info( "Method to fetch all the users by email id, fetchCompanySurveyStatsById() finished." );
+        LOG.debug( "Method to fetch all the users by email id, fetchCompanySurveyStatsById() finished." );
 
         return (List<SurveyStatsReportCompany>) criteria.list();
     }

@@ -27,7 +27,6 @@ import javax.imageio.ImageIO;
 import javax.servlet.UnavailableException;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hibernate.HibernateException;
@@ -212,7 +211,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
     @Autowired
     private SocialManagementService socialManagementService;
-    
+
     @Autowired
     private SolrSearchService solrSearchService;
 
@@ -296,9 +295,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     @Value ( "${CDN_PATH}")
     private String cdnUrl;
 
-    @Value ( "${FACEBOOK_PIXEL_IMAGE_TAG}" )
+    @Value ( "${FACEBOOK_PIXEL_IMAGE_TAG}")
     private String fbPixelImageTag;
-    
+
     @Autowired
     private ExternalApiCallDetailsDao externalApiCallDetailsDao;
 
@@ -1838,6 +1837,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             iden, startScore, limitScore, startIndex, numOfRows, profileLevel );
         List<SurveyDetails> surveyDetails = null;
         if ( iden <= 0l ) {
+            LOG.warn( "iden is invalid while fetching reviews" );
             throw new InvalidInputException( "iden is invalid while fetching reviews" );
         }
 
@@ -1934,8 +1934,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public double getAverageRatings( long iden, String profileLevel, boolean aggregateAbusive, boolean includeZillow,
         long zillowTotalScore, long zillowReviewCount ) throws InvalidInputException
     {
-        LOG.debug( "Method getAverageRatings called for iden :" + iden + " profilelevel:" + profileLevel );
+        LOG.debug( "Method getAverageRatings called for iden : {} profilelevel: {}", iden, profileLevel );
         if ( iden <= 0l ) {
+            LOG.warn( "iden is invalid for getting average rating os a company" );
             throw new InvalidInputException( "iden is invalid for getting average rating os a company" );
         }
         String idenColumnName = getIdenColumnNameFromProfileLevel( profileLevel );
@@ -1945,7 +1946,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         //get formatted survey score using rating format  
         averageRating = surveyHandler.getFormattedSurveyScore( averageRating );
 
-        LOG.debug( "Method getAverageRatings executed successfully.Returning: " + averageRating );
+        LOG.debug( "Method getAverageRatings executed successfully.Returning: {}", averageRating );
         return averageRating;
     }
 
@@ -1959,9 +1960,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
      */
     String getIdenColumnNameFromProfileLevel( String profileLevel ) throws InvalidInputException
     {
-        LOG.debug( "Getting iden column name for profile level:" + profileLevel );
+        LOG.debug( "Getting iden column name for profile level: {}", profileLevel );
         String idenColumnName = null;
         if ( profileLevel == null || profileLevel.isEmpty() ) {
+            LOG.warn( "profile level is null or empty while getting iden column name" );
             throw new InvalidInputException( "profile level is null or empty while getting iden column name" );
         }
         switch ( profileLevel ) {
@@ -1980,9 +1982,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             case CommonConstants.PROFILE_LEVEL_REALTECH_ADMIN:
                 break;
             default:
+                LOG.warn( "Invalid profile level while getting iden column name" );
                 throw new InvalidInputException( "Invalid profile level while getting iden column name" );
         }
-        LOG.debug( "Returning column name:" + idenColumnName + " for profile level:" + profileLevel );
+        LOG.debug( "Returning column name: {} for profile level {} profileLevel", idenColumnName, profileLevel );
         return idenColumnName;
     }
 
@@ -2004,16 +2007,17 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public long getReviewsCount( long iden, double minScore, double maxScore, String profileLevel, boolean fetchAbusive,
         boolean notRecommended, boolean includeZillow, long zillowReviewCount ) throws InvalidInputException
     {
-        LOG.debug( "Method getReviewsCount called for iden:" + iden + " minscore:" + minScore + " maxscore:" + maxScore
-            + " profilelevel:" + profileLevel );
+        LOG.debug( "Method getReviewsCount called for iden: {}  minscore: {}  maxscore: {}  profilelevel: {}", iden, minScore,
+            maxScore, profileLevel );
         if ( iden <= 0l ) {
+            LOG.warn( "Iden is invalid for getting reviews count" );
             throw new InvalidInputException( "Iden is invalid for getting reviews count" );
         }
         long reviewsCount = 0;
         String idenColumnName = getIdenColumnNameFromProfileLevel( profileLevel );
         reviewsCount = surveyDetailsDao.getFeedBacksCount( idenColumnName, iden, minScore, maxScore, fetchAbusive,
             notRecommended, includeZillow, zillowReviewCount );
-        LOG.debug( "Method getReviewsCount executed successfully. Returning reviewsCount:" + reviewsCount );
+        LOG.debug( "Method getReviewsCount executed successfully. Returning reviewsCount: {}", reviewsCount );
         return reviewsCount;
     }
 
@@ -2264,9 +2268,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public List<SurveyPreInitiation> getIncompleteSurvey( long iden, double startScore, double limitScore, int startIndex,
         int numOfRows, String profileLevel, Date startDate, Date endDate, boolean realtechAdmin ) throws InvalidInputException
     {
-        LOG.debug( "Method getIncompleteSurvey() called for iden:" + iden + " startScore:" + startScore + " limitScore:"
-            + limitScore + " startIndex:" + startIndex + " numOfRows:" + numOfRows + " profileLevel:" + profileLevel );
+        LOG.debug( "Method getIncompleteSurvey() called for iden: {} startScore: {} limitScore:{} startIndex: {} numOfRows: {} profileLevel: {}", iden, startScore, limitScore, startIndex, numOfRows, profileLevel );
         if ( iden <= 0l ) {
+            LOG.warn( "iden is invalid while fetching incomplete reviews" );
             throw new InvalidInputException( "iden is invalid while fetching incomplete reviews" );
         }
         boolean isCompanyAdmin = false;
@@ -2298,9 +2302,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public long getIncompleteSurveyCount( long iden, String profileLevel, Date startDate, Date endDate )
         throws InvalidInputException
     {
-        LOG.debug( "Getting incomplete survey count" );
+        LOG.debug( "Getting incomplete survey count." );
         long count = 0;
         if ( iden <= 0l ) {
+        	LOG.warn("iden is invalid while fetching incomplete reviews.");
             throw new InvalidInputException( "iden is invalid while fetching incomplete reviews" );
         }
         long companyId = -1;
@@ -2813,6 +2818,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                             CommonConstants.COMPANY_SETTINGS_COLLECTION );
                         baseProfileUrl = applicationBaseUrl + CommonConstants.COMPANY_PROFILE_FIXED_URL;
                     } else {
+                        LOG.warn( "The zillow review with ID : {} does not have any hierarchy ID set", review.get_id() );
                         throw new InvalidInputException(
                             "The zillow review with ID : " + review.get_id() + "does not have any hierarchy ID set" );
                     }
@@ -2834,6 +2840,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                             CommonConstants.COMPANY_SETTINGS_COLLECTION );
                         baseProfileUrl = applicationBaseUrl + CommonConstants.COMPANY_PROFILE_FIXED_URL;
                     } else {
+                        LOG.warn( "The Review with ID : {} does not have any hierarchy ID set", review.get_id() );
                         throw new InvalidInputException(
                             "The Review with ID : " + review.get_id() + "does not have any hierarchy ID set" );
                     }
@@ -2845,6 +2852,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     review.setGoogleApi( googleApiKey );
                     review.setFaceBookShareUrl( facebookShareUrl );
                 } else {
+                    LOG.warn( "An agent with ID : {} does not exist", review.getAgentId() );
                     throw new InvalidInputException( "An agent with ID : " + review.getAgentId() + " does not exist" );
                 }
 
@@ -2895,6 +2903,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     Set<Long> getAgentIdsByProfileLevel( String profileLevel, long iden ) throws InvalidInputException
     {
         if ( profileLevel == null || profileLevel.isEmpty() ) {
+        	LOG.warn("profile level is null or empty while getting agents.");
             throw new InvalidInputException( "profile level is null or empty while getting agents" );
         }
         Set<Long> userIds = new HashSet<>();
@@ -2909,6 +2918,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 userIds.add( iden );
                 return userIds;
             default:
+            	LOG.warn("Invalid profile level while getting iden column name.");
                 throw new InvalidInputException( "Invalid profile level while getting iden column name" );
         }
     }
@@ -5632,7 +5642,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     try {
                         sortSettings = organizationManagementService.getCompanySettings( companyId ).getReviewSortCriteria();
                     } catch ( InvalidInputException error ) {
-                        LOG.error( "company not found, choosing alternate sort criteria" );
+                        LOG.error( "company not found, choosing alternate sort criteria {}",error );
                     }
                 }
                 if ( sortSettings != "default" ) {
@@ -6313,31 +6323,37 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
      * @throws NonFatalException
      */
     @Override
-    public void updateFacebookPixelId(String entityType, long entityId, String pixelId , UserSettings userSettings) throws NonFatalException{
-        
+    public void updateFacebookPixelId( String entityType, long entityId, String pixelId, UserSettings userSettings )
+        throws NonFatalException
+    {
+
         SocialMediaTokens socialMediaTokens;
-        
+
         if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
             OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( entityId );
             if ( companySettings == null ) {
                 throw new InvalidInputException( "No company settings found in current session" );
             }
             socialMediaTokens = companySettings.getSocialMediaTokens();
-            socialMediaTokens = updateFacebookPixelIdInMediaTokens( pixelId, socialMediaTokens, companySettings.getProfileName() );
-            updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, socialMediaTokens );
-            
+            socialMediaTokens = updateFacebookPixelIdInMediaTokens( pixelId, socialMediaTokens,
+                companySettings.getProfileName() );
+            updateSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings,
+                socialMediaTokens );
+
             companySettings.setSocialMediaTokens( socialMediaTokens );
             userSettings.setCompanySettings( companySettings );
-            
+
         } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
             OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
             if ( regionSettings == null ) {
                 throw new InvalidInputException( "No Region settings found in current session" );
             }
             socialMediaTokens = regionSettings.getSocialMediaTokens();
-            socialMediaTokens = updateFacebookPixelIdInMediaTokens( pixelId, socialMediaTokens, regionSettings.getProfileName() );
-            updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, socialMediaTokens );
-            
+            socialMediaTokens = updateFacebookPixelIdInMediaTokens( pixelId, socialMediaTokens,
+                regionSettings.getProfileName() );
+            updateSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings,
+                socialMediaTokens );
+
             regionSettings.setSocialMediaTokens( socialMediaTokens );
             userSettings.getRegionSettings().put( entityId, regionSettings );
 
@@ -6347,21 +6363,25 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 throw new InvalidInputException( "No Branch settings found in current session" );
             }
             socialMediaTokens = branchSettings.getSocialMediaTokens();
-            socialMediaTokens = updateFacebookPixelIdInMediaTokens( pixelId, socialMediaTokens, branchSettings.getProfileName() );
-            updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, socialMediaTokens );
-            
+            socialMediaTokens = updateFacebookPixelIdInMediaTokens( pixelId, socialMediaTokens,
+                branchSettings.getProfileName() );
+            updateSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings,
+                socialMediaTokens );
+
             branchSettings.setSocialMediaTokens( socialMediaTokens );
             userSettings.getRegionSettings().put( entityId, branchSettings );
-           
+
         } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
             AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
             if ( agentSettings == null ) {
                 throw new InvalidInputException( "No Agent settings found in current session" );
             }
             socialMediaTokens = agentSettings.getSocialMediaTokens();
-            socialMediaTokens = updateFacebookPixelIdInMediaTokens( pixelId, socialMediaTokens, agentSettings.getProfileName() );
-            updateSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,  agentSettings, socialMediaTokens );
-            
+            socialMediaTokens = updateFacebookPixelIdInMediaTokens( pixelId, socialMediaTokens,
+                agentSettings.getProfileName() );
+            updateSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
+                socialMediaTokens );
+
             agentSettings.setSocialMediaTokens( socialMediaTokens );
             userSettings.setAgentSettings( agentSettings );
         } else {
@@ -6377,8 +6397,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         LOG.info( "facebookPixelId updated successfully" );
 
     }
-    
-    private SocialMediaTokens updateFacebookPixelIdInMediaTokens( String pixelId, SocialMediaTokens socialMediaTokens, String profileName )
+
+
+    private SocialMediaTokens updateFacebookPixelIdInMediaTokens( String pixelId, SocialMediaTokens socialMediaTokens,
+        String profileName )
     {
         LOG.debug( "Method updateFacebookPixelIdInMediaTokens() called" );
         if ( socialMediaTokens == null ) {

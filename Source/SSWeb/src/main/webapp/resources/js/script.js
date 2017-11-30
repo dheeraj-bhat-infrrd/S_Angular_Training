@@ -3875,3 +3875,70 @@ function removeMessageHeaders(){
 	$('#err-nw-wrapper').slideUp(200);
 	$('#err-nw-wrapper').slideUp(200);
 }
+
+
+function copyToClipboard(clipboardMessage, successMessage, errorMessage ) {
+
+	if( clipboardMessage == undefined || clipboardMessage == "" ){
+		$('#overlay-toast').html("clipboard message not specified");
+		showToast();
+		return;
+	}
+	
+	var success = false;
+	try{
+		
+		// make it html safe
+		var decoded = $("<div/>").html(clipboardMessage).text();
+
+		// Create a "hidden" input
+		var aux = document.createElement("input");
+
+		// Assign it with parsed value
+		aux.setAttribute("value", decoded);
+
+		// Append it to the body
+		document.body.appendChild(aux);
+
+		// Highlight its content
+		aux.select();
+
+		// Copy the highlighted text
+		success = document.execCommand("copy");
+
+		// Remove it from the body
+		document.body.removeChild(aux);
+		
+	} catch( error ){
+		
+		// display error message
+		console.log( error.message );
+		$('#overlay-toast').html("Unable to access clipboard");
+		showToast();
+	}
+	
+	// Show toast
+	if( success ){
+		if( successMessage != undefined && successMessage != "" ){
+			$('#overlay-toast').html(successMessage);
+			showToast();
+		}
+	} else {
+		if( errorMessage != undefined && errorMessage != "" ){
+			$('#overlay-toast').html(errorMessage);
+			showToast();
+		}
+	}
+}
+
+
+function copyIndividualReviewUrlToClipboard(loop){
+	
+	var message;
+	if(loop == -1 ){
+		message = $('#permalink_url_btn').val();
+	} else{ 
+		message = $('#permalink_url_' + loop).val();
+	}
+	copyToClipboard( message, "Review URL copied to clipboard.", "Unable to copy to clipboard.");	
+}

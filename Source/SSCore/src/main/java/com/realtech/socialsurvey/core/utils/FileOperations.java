@@ -31,10 +31,10 @@ public final class FileOperations {
 	 */
 	public String getContentFromFile(String fileName) throws InvalidInputException {
 		if (fileName == null || fileName.isEmpty()) {
-			LOG.error("filename is null or empty while getting content from file");
+			LOG.warn("filename is null or empty while getting content from file");
 			throw new InvalidInputException("File name is null or empty while getting contents from file");
 		}
-		LOG.debug("Getting content from file : " + fileName);
+		LOG.debug("Getting content from file : {}", fileName);
 		StringBuilder fileContentSb = new StringBuilder();
 		String strLine = "";
 		String content = null;
@@ -53,10 +53,10 @@ public final class FileOperations {
 			content = fileContentSb.toString();
 		}
 		catch (IOException e) {
-			LOG.error("IOException occured while reading file.Reason : " + e.getMessage(), e);
-			throw new FatalException("IOException occured while reading file.Reason : " + e.getMessage(), e);
+			LOG.error("IOException occured while reading file. Reason : " , e);
+			throw new FatalException("IOException occured while reading file. Reason : ", e);
 		}
-		LOG.debug("File reading complete.Returning : " + content);
+		LOG.debug("File reading complete.Returning : {}", content);
 		return content;
 
 	}
@@ -70,12 +70,16 @@ public final class FileOperations {
 	 */
 	public String replaceFileContents(FileContentReplacements fileContentReplacements) throws InvalidInputException {
 		if (fileContentReplacements == null) {
+			LOG.warn("File and contents to replace are null while replacing file contents.");
 			throw new InvalidInputException("file and contents to replace are null while replacing file contents");
 		}
-		LOG.debug("Method replaceFileContents called for : " + fileContentReplacements.getFileName());
+		if(LOG.isDebugEnabled()){
+			LOG.debug("Method replaceFileContents called for : {}", fileContentReplacements.getFileName());
+		}
 		
 		String fileContent = getContentFromFile(fileContentReplacements.getFileName());
 		if (fileContent == null) {
+			LOG.warn("Content not found for file : {}", fileContentReplacements.getFileName());
 			throw new InvalidInputException("Content not found for file : " + fileContentReplacements.getFileName());
 		}
 		

@@ -2146,6 +2146,14 @@ button.paypal.is-active {
     transform: scale(1.2, 1.2);
     transition: 0.3s ease-out;
 }
+
+.sr-icn-permalink-rev:hover {
+	background: url(../images/permalink.png) no-repeat center;
+	-ms-transform: scale(1.2, 1.2);
+    -webkit-transform: scale(1.2, 1.2);
+    transform: scale(1.2, 1.2);
+    transition: 0.3s ease-out;
+}
 	
 .social-item-icon.icn-google-business {
  background-position: -400px 3px;
@@ -2189,6 +2197,10 @@ button.paypal.is-active {
 }
 
 .icn-permalink-rev {
+	background: url(../images/permalink_grey.png) no-repeat center;
+}
+
+.sr-icn-permalink-rev {
 	background: url(../images/permalink_grey.png) no-repeat center;
 }
 

@@ -877,9 +877,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( user == null ) {
             throw new InvalidInputException( "User is not set" );
         }
-        LOG.debug( "Get company settings for the user: " + user.toString() );
+        if(LOG.isDebugEnabled()) {
+            LOG.debug( "Get company settings for the user: {}" , user.toString() );
+        }
         // get the company id
         if ( user.getCompany() == null ) {
+            LOG.warn( "User object is partially set. Could not find the comany details" );
             throw new InvalidInputException( "User object is partially set. Could not find the comany details" );
         }
         long companyId = user.getCompany().getCompanyId();
@@ -911,7 +914,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     public OrganizationUnitSettings getCompanySettings( long companyId ) throws InvalidInputException
     {
 
-        LOG.debug( "Get company settings for the companyId: " + companyId );
+        LOG.debug( "Get company settings for the companyId: {} " , companyId );
 
         OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
@@ -999,7 +1002,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     {
         OrganizationUnitSettings regionSettings = null;
         if ( regionId <= 0l ) {
-            throw new InvalidInputException( "Invalid region id. :" + regionId );
+            LOG.warn( "Invalid region id. : {}" , regionId );
+            throw new InvalidInputException( "Invalid region id. : " + regionId ) ;
         }
         LOG.debug( "Get the region settings for region id: " + regionId );
         regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( regionId,
@@ -1070,9 +1074,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         OrganizationUnitSettings organizationUnitSettings = null;
         BranchSettings branchSettings = null;
         if ( branchId <= 0l ) {
+            LOG.warn( "Invalid branch id. : {}", branchId );
             throw new InvalidInputException( "Invalid branch id. :" + branchId );
         }
-        LOG.debug( "Get the branch settings for branch id: " + branchId );
+        LOG.debug( "Get the branch settings for branch id: {}" , branchId );
         organizationUnitSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( branchId,
             MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
 
@@ -1082,7 +1087,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 profileCompletionList.getProfileCompletionList( organizationUnitSettings.getProfileStages() ) );
         }
 
-        LOG.debug( "Successfully fetched the branch settings for branch id: " + branchId + " returning : " + branchSettings );
+        LOG.debug( "Successfully fetched the branch settings for branch id: {} returning : {}", branchId, branchSettings );
         return organizationUnitSettings;
     }
 
