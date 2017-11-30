@@ -128,7 +128,8 @@ public class GlobalErrorController
         LOG.info( "Sending failure mail to recpient : {}", webExceptionReportingEmailAddress );
         String stackTrace = ExceptionUtils.getFullStackTrace( thrw );
         try {
-            emailServices.sendWebExceptionEmail( webExceptionReportingEmailAddress, stackTrace );
+            //emailServices.sendWebExceptionEmail( webExceptionReportingEmailAddress, stackTrace );
+            LOG.error("==============> Unhandled Exception <==============", thrw);
             LOG.debug( "Failure mail sent to admin." );
         } catch ( InvalidInputException | UndeliveredEmailException e1 ) {
             LOG.error(
