@@ -11,6 +11,62 @@
   <modified_date>2017&#x2f;10&#x2f;05 16&#x3a;49&#x3a;17.392</modified_date>
     <parameters>
     </parameters>
+  <connection>
+    <name>SS_Centralized_Mysql_Conn</name>
+    <server>&#x24;&#x7b;CENTRALIZED_MYSQL_HOST&#x7d;</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>&#x24;&#x7b;CENTRALIZED_MYSQL_SCHEMA&#x7d;</database>
+    <port>&#x24;&#x7b;CENTRALIZED_MYSQL_PORT&#x7d;</port>
+    <username>&#x24;&#x7b;CENTRALIZED_MYSQL_USER_NAME&#x7d;</username>
+    <password>&#x24;&#x7b;CENTRALIZED_MYSQL_PASSWORD&#x7d;</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCompression</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useServerPrepStmts</code><attribute>false</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;CENTRALIZED_MYSQL_PORT&#x7d;</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
+  <connection>
+    <name>SS_INFO_CONNECTION</name>
+    <server>&#x24;&#x7b;SS_MYSQL_HOST&#x7d;</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>&#x24;&#x7b;SS_MYSQL_SCHEMA&#x7d;</database>
+    <port>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</port>
+    <username>&#x24;&#x7b;SS_MYSQL_USER_NAME&#x7d;</username>
+    <password>&#x24;&#x7b;SS_MYSQL_PASSWORD&#x7d;</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCompression</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useServerPrepStmts</code><attribute>false</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
     <slaveservers>
     </slaveservers>
 <job-log-table><connection/>
@@ -63,8 +119,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>166</xloc>
-      <yloc>147</yloc>
+      <xloc>264</xloc>
+      <yloc>141</yloc>
       </entry>
     <entry>
       <name>survey_stats_report_user</name>
@@ -96,8 +152,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>428</xloc>
-      <yloc>147</yloc>
+      <xloc>813</xloc>
+      <yloc>141</yloc>
       </entry>
     <entry>
       <name>survey_stats_report_region</name>
@@ -129,8 +185,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>677</xloc>
-      <yloc>147</yloc>
+      <xloc>1094</xloc>
+      <yloc>303</yloc>
       </entry>
     <entry>
       <name>survey_stats_report_company</name>
@@ -162,8 +218,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>927</xloc>
-      <yloc>147</yloc>
+      <xloc>541</xloc>
+      <yloc>303</yloc>
       </entry>
     <entry>
       <name>START</name>
@@ -182,13 +238,163 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>73</xloc>
-      <yloc>105</yloc>
+      <xloc>65</xloc>
+      <yloc>141</yloc>
+      </entry>
+    <entry>
+      <name>Survey_Stats_Report_Main_NPS</name>
+      <description/>
+      <type>TRANS</type>
+      <specification_method>filename</specification_method>
+      <trans_object_id/>
+      <filename>&#x24;&#x7b;Internal.Job.Filename.Directory&#x7d;&#x2f;Survey_Stats_Report_Main_NPS.ktr</filename>
+      <transname/>
+      <arg_from_previous>N</arg_from_previous>
+      <params_from_previous>N</params_from_previous>
+      <exec_per_row>N</exec_per_row>
+      <clear_rows>N</clear_rows>
+      <clear_files>N</clear_files>
+      <set_logfile>N</set_logfile>
+      <logfile/>
+      <logext/>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <loglevel>Basic</loglevel>
+      <cluster>N</cluster>
+      <slave_server_name/>
+      <set_append_logfile>N</set_append_logfile>
+      <wait_until_finished>Y</wait_until_finished>
+      <follow_abort_remote>N</follow_abort_remote>
+      <create_parent_folder>N</create_parent_folder>
+      <logging_remote_work>N</logging_remote_work>
+      <parameters>        <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>541</xloc>
+      <yloc>141</yloc>
+      </entry>
+    <entry>
+      <name>Survey_Stats_Report_User_NPS</name>
+      <description/>
+      <type>TRANS</type>
+      <specification_method>filename</specification_method>
+      <trans_object_id/>
+      <filename>&#x24;&#x7b;Internal.Job.Filename.Directory&#x7d;&#x2f;Survey_Stats_Report_User_NPS.ktr</filename>
+      <transname/>
+      <arg_from_previous>N</arg_from_previous>
+      <params_from_previous>N</params_from_previous>
+      <exec_per_row>N</exec_per_row>
+      <clear_rows>N</clear_rows>
+      <clear_files>N</clear_files>
+      <set_logfile>N</set_logfile>
+      <logfile/>
+      <logext/>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <loglevel>Basic</loglevel>
+      <cluster>N</cluster>
+      <slave_server_name/>
+      <set_append_logfile>N</set_append_logfile>
+      <wait_until_finished>Y</wait_until_finished>
+      <follow_abort_remote>N</follow_abort_remote>
+      <create_parent_folder>N</create_parent_folder>
+      <logging_remote_work>N</logging_remote_work>
+      <parameters>        <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>1094</xloc>
+      <yloc>141</yloc>
+      </entry>
+    <entry>
+      <name>Survey_Stats_Report_Region_NPS</name>
+      <description/>
+      <type>TRANS</type>
+      <specification_method>filename</specification_method>
+      <trans_object_id/>
+      <filename>&#x24;&#x7b;Internal.Job.Filename.Directory&#x7d;&#x2f;Survey_Stats_Report_Region_NPS.ktr</filename>
+      <transname/>
+      <arg_from_previous>N</arg_from_previous>
+      <params_from_previous>N</params_from_previous>
+      <exec_per_row>N</exec_per_row>
+      <clear_rows>N</clear_rows>
+      <clear_files>N</clear_files>
+      <set_logfile>N</set_logfile>
+      <logfile/>
+      <logext/>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <loglevel>Basic</loglevel>
+      <cluster>N</cluster>
+      <slave_server_name/>
+      <set_append_logfile>N</set_append_logfile>
+      <wait_until_finished>Y</wait_until_finished>
+      <follow_abort_remote>N</follow_abort_remote>
+      <create_parent_folder>N</create_parent_folder>
+      <logging_remote_work>N</logging_remote_work>
+      <parameters>        <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>813</xloc>
+      <yloc>303</yloc>
+      </entry>
+    <entry>
+      <name>Survey_Stats_Report_Company_NPS</name>
+      <description/>
+      <type>TRANS</type>
+      <specification_method>filename</specification_method>
+      <trans_object_id/>
+      <filename>&#x24;&#x7b;Internal.Job.Filename.Directory&#x7d;&#x2f;Survey_Stats_Report_Company_NPS.ktr</filename>
+      <transname/>
+      <arg_from_previous>N</arg_from_previous>
+      <params_from_previous>N</params_from_previous>
+      <exec_per_row>N</exec_per_row>
+      <clear_rows>N</clear_rows>
+      <clear_files>N</clear_files>
+      <set_logfile>N</set_logfile>
+      <logfile/>
+      <logext/>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <loglevel>Basic</loglevel>
+      <cluster>N</cluster>
+      <slave_server_name/>
+      <set_append_logfile>N</set_append_logfile>
+      <wait_until_finished>Y</wait_until_finished>
+      <follow_abort_remote>N</follow_abort_remote>
+      <create_parent_folder>N</create_parent_folder>
+      <logging_remote_work>N</logging_remote_work>
+      <parameters>        <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>264</xloc>
+      <yloc>303</yloc>
       </entry>
   </entries>
   <hops>
     <hop>
+      <from>START</from>
+      <to>survey_stats_report_main</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>Y</unconditional>
+    </hop>
+    <hop>
       <from>survey_stats_report_main</from>
+      <to>Survey_Stats_Report_Main_NPS</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Survey_Stats_Report_Main_NPS</from>
       <to>survey_stats_report_user</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
@@ -198,6 +404,15 @@
     </hop>
     <hop>
       <from>survey_stats_report_user</from>
+      <to>Survey_Stats_Report_User_NPS</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Survey_Stats_Report_User_NPS</from>
       <to>survey_stats_report_region</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
@@ -207,6 +422,15 @@
     </hop>
     <hop>
       <from>survey_stats_report_region</from>
+      <to>Survey_Stats_Report_Region_NPS</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Survey_Stats_Report_Region_NPS</from>
       <to>survey_stats_report_company</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
@@ -215,13 +439,13 @@
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>START</from>
-      <to>survey_stats_report_main</to>
+      <from>survey_stats_report_company</from>
+      <to>Survey_Stats_Report_Company_NPS</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
       <evaluation>Y</evaluation>
-      <unconditional>Y</unconditional>
+      <unconditional>N</unconditional>
     </hop>
   </hops>
   <notepads>
