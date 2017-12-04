@@ -27,7 +27,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.realtech.socialsurvey.api.exceptions.SSApiException;
 import com.realtech.socialsurvey.api.models.SurveyPutVO;
+import com.realtech.socialsurvey.api.models.v2.IncompeteSurveyGetVO;
+import com.realtech.socialsurvey.api.models.v2.SurveyCountVO;
 import com.realtech.socialsurvey.api.models.v2.SurveyGetV2VO;
+import com.realtech.socialsurvey.api.transformers.IncompleteSurveyVOTransformer;
 import com.realtech.socialsurvey.api.transformers.SurveyPreinitiationTransformer;
 import com.realtech.socialsurvey.api.transformers.SurveyV2Transformer;
 import com.realtech.socialsurvey.api.transformers.SurveysAndReviewsV2VOTransformer;
@@ -55,6 +58,9 @@ public class SurveyApiV2Controller
 
     @Autowired
     private SurveysAndReviewsV2VOTransformer surveysAndReviewsV2VOTransformer;
+    
+    @Autowired
+    private IncompleteSurveyVOTransformer incompleteSurveyVOTransformer;  
 
     @Autowired
     private SurveyHandler surveyHandler;
@@ -194,10 +200,11 @@ public class SurveyApiV2Controller
         String state = request.getParameter( "state" );
         String userEmailAddress = request.getParameter( "user" );
         String includeManagedTeamStr = request.getParameter( "includeManagedTeam" );
+        String isAlteredStr = request.getParameter( "isAltered" );
 
         Set<String> inputRequestParameters = request.getParameterMap().keySet();
         List<String> fixReqParameters = Arrays.asList( "count", "start", "status", "startSurveyId", "startReviewDateTime",
-            "startTransactionDateTime", "state", "user", "includeManagedTeam" );
+            "startTransactionDateTime", "state", "user", "includeManagedTeam", "isAltered" );
         for ( String currParameter : inputRequestParameters ) {
             if ( !fixReqParameters.contains( currParameter ) ) {
                 return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST,
@@ -236,6 +243,18 @@ public class SurveyApiV2Controller
                 request, companyId );
         }
 
+        boolean isAltered = false;
+        if ( isAlteredStr != null ) {
+            try {
+            	isAltered = Boolean.parseBoolean(isAlteredStr);
+            } catch ( NumberFormatException e ) {
+                return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "Passed isAltered start is invalid. Valid value is true", null, null,
+                    request, companyId );
+            }
+        }
+
+        
+        
         if ( state != null ) {
             if ( CommonConstants.SURVEY_MOOD_GREAT.equalsIgnoreCase( state ) ) {
                 state = CommonConstants.SURVEY_MOOD_GREAT;
@@ -323,7 +342,7 @@ public class SurveyApiV2Controller
 
         //get data from database
         SurveysAndReviewsVO surveysAndReviewsVO = surveyHandler.getSurveysByFilterCriteria( status, state, startSurveyID,
-            startReviewDate, startTransactionDate, userIds, start, count, companyId );
+            startReviewDate, startTransactionDate, userIds, isAltered , start, count, companyId );
 
         //create vo object
         List<SurveyGetV2VO> surveyVOs = surveysAndReviewsV2VOTransformer
@@ -333,4 +352,299 @@ public class SurveyApiV2Controller
         return restUtils.getRestResponseEntity( HttpStatus.OK, "Request Successfully processed", "surveys", surveyVOs, request,
             companyId );
     }
+    
+    
+    
+    @RequestMapping ( value = "/surveycount", method = RequestMethod.GET)
+    @ApiOperation ( value = "Get Survey Transactions Count")
+    public ResponseEntity<?> getSurveyTransactionsCouunt( HttpServletRequest request ) throws SSApiException
+    {
+        LOGGER.info( "SurveyApiController.getSurveyTransactionsCouunt started" );
+
+        //authorize request
+        String authorizationHeader = request.getHeader( CommonConstants.SURVEY_API_REQUEST_PARAMETER_AUTHORIZATION );
+        long companyId = 0;
+        SimpleDateFormat sdf = new SimpleDateFormat( CommonConstants.SURVEY_API_DATE_FORMAT );
+        sdf.setLenient(false);
+        try {
+            companyId = adminAuthenticationService.validateAuthHeader( authorizationHeader );
+        } catch ( AuthorizationException e1 ) {
+            return restUtils.getRestResponseEntity( HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", null, null, request, companyId );
+        }
+
+        //parse request parameters from request
+        String status = request.getParameter( "status" );
+        String startSurveyIDStr = request.getParameter( "startSurveyId" );
+        String startReviewDateStr = request.getParameter( "startReviewDateTime" );
+        String startTransactionDateStr = request.getParameter( "startTransactionDateTime" );
+        String state = request.getParameter( "state" );
+        String userEmailAddress = request.getParameter( "user" );
+        String includeManagedTeamStr = request.getParameter( "includeManagedTeam" );
+        String isAlteredStr = request.getParameter( "isAltered" );
+
+        Set<String> inputRequestParameters = request.getParameterMap().keySet();
+        List<String> fixReqParameters = Arrays.asList( "status", "startSurveyId", "startReviewDateTime",
+            "startTransactionDateTime", "state", "user", "includeManagedTeam", "isAltered" );
+        for ( String currParameter : inputRequestParameters ) {
+            if ( !fixReqParameters.contains( currParameter ) ) {
+                return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST,
+                    "Unsupported filter parameter : " + currParameter, null, null, request, companyId );
+            }
+        }
+
+        if ( status == null ) {
+            status = CommonConstants.SURVEY_API_SURVEY_STATUS_ALL;
+        } else if ( !status.equalsIgnoreCase( CommonConstants.SURVEY_API_SURVEY_STATUS_COMPLETE ) && !status.equalsIgnoreCase( CommonConstants.SURVEY_API_SURVEY_STATUS_INCOMPLETE ) ) {
+            return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "Passed parameter status is invalid", null, null,
+                request, companyId );
+        }
+
+        boolean isAltered = false;
+        if ( isAlteredStr != null ) {
+            try {
+            	isAltered = Boolean.parseBoolean(isAlteredStr);
+            } catch ( NumberFormatException e ) {
+                return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "Passed isAltered start is invalid. Valid value is true or false", null, null,
+                    request, companyId );
+            }
+        }
+
+        
+        
+        if ( state != null ) {
+            if ( CommonConstants.SURVEY_MOOD_GREAT.equalsIgnoreCase( state ) ) {
+                state = CommonConstants.SURVEY_MOOD_GREAT;
+            } else if ( CommonConstants.SURVEY_MOOD_OK.equalsIgnoreCase( state ) ) {
+                state = CommonConstants.SURVEY_MOOD_OK;
+            } else if ( CommonConstants.SURVEY_MOOD_UNPLEASANT.equalsIgnoreCase( state ) ) {
+                state = CommonConstants.SURVEY_MOOD_UNPLEASANT;
+            } else {
+                return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "Passed parameter state is invalid", null, null,
+                    request, companyId );
+            }
+        }
+
+        Long startSurveyID = null;
+        if ( !StringUtils.isEmpty( startSurveyIDStr ) ) {
+            try {
+                startSurveyID = Long.parseLong( startSurveyIDStr );
+            } catch ( NumberFormatException e ) {
+                return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "Passed parameter startSurveyID is invalid",
+                    null, null, request, companyId );
+            }
+        }
+
+        Date startReviewDate = null;
+        if ( startReviewDateStr != null && !startReviewDateStr.isEmpty() ) {
+            try {
+                startReviewDate = sdf.parse( startReviewDateStr );
+            } catch ( ParseException e ) {
+                return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST,
+                    "Passed parameter startReviewDateTime is invalid", null, null, request, companyId );
+            }
+        }
+
+        //startTransactionDate
+        Date startTransactionDate = null;
+        if ( startTransactionDateStr != null && !startTransactionDateStr.isEmpty() ) {
+            try {
+                startTransactionDate = sdf.parse( startTransactionDateStr );
+            } catch ( ParseException e ) {
+                return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST,
+                    "Passed parameter startTransactionDateTime is invalid", null, null, request, companyId );
+            }
+        }
+
+
+        //includeManagedTeam
+        Boolean includeManagedTeam = null;
+        if ( !StringUtils.isEmpty( includeManagedTeamStr ) ) {
+            try {
+                includeManagedTeam = Boolean.parseBoolean( includeManagedTeamStr );
+            } catch ( NumberFormatException e ) {
+                return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST,
+                    "Passed parameter includeManagedTeam is invalid", null, null, request, companyId );
+            }
+
+            if ( StringUtils.isEmpty( userEmailAddress ) ) {
+                return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST,
+                    "Passed parameter userEmailAddress can not be empty if includeManagedTeam is used ", null, null, request,
+                    companyId );
+            }
+        }
+
+        //get user
+        List<Long> userIds = null;
+        if ( !StringUtils.isEmpty( userEmailAddress ) ) {
+            try {
+                User user = userManagementService.getUserByEmailAndCompany(companyId, userEmailAddress);
+                userIds = new ArrayList<Long>();
+                userIds.add( user.getUserId() );
+
+                //if includeManagedTeam is present than get all the users under the given user 
+                if ( includeManagedTeam != null && includeManagedTeam == true ) {
+                    Set<Long> agentIds = userManagementService.getUserIdsUnderAdmin( user );
+                    userIds.addAll( agentIds );
+                }
+
+            } catch ( InvalidInputException e ) {
+                return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST,
+                    "Passed parameter user " + userEmailAddress + " is invalid", null, null, request, companyId );
+            } catch (NoRecordsFetchedException e) {
+            	return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "User not registered or you do not have access to this account.",
+                        null, null, request , companyId  );
+			}
+        }
+
+        //get data from database
+       Integer surveyCount = surveyHandler.getSurveysCountByFilterCriteria( status, state, startSurveyID,
+            startReviewDate, startTransactionDate, userIds, isAltered, companyId );
+      
+       Float surveyAvgScore = surveyHandler.getSurveysAvgScoreByFilterCriteria( state, startSurveyID,
+               startReviewDate, startTransactionDate, userIds, isAltered, companyId );
+
+        //create vo object
+       	SurveyCountVO surveyCountVO = new SurveyCountVO();
+       	surveyCountVO.setNoOfReviews(surveyCount);
+       	surveyCountVO.setAvgScore(surveyAvgScore);
+        LOGGER.info( "SurveyApiController.getSurveyTransactionsCouunt completed successfully" );
+
+        return restUtils.getRestResponseEntity( HttpStatus.OK, "Request Successfully processed", "surveyStats", surveyCountVO, request,
+            companyId );
+    }
+    
+    
+    @RequestMapping ( value = "/incompletesurveys", method = RequestMethod.GET)
+    @ApiOperation ( value = "Get Survey Transactions")
+    public ResponseEntity<?> getIncompleteSurveyTransactions( HttpServletRequest request ) throws SSApiException
+    {
+        LOGGER.info( "SurveyApiController.getIncompleteSurveyTransactions started" );
+
+        //authorize request
+        String authorizationHeader = request.getHeader( CommonConstants.SURVEY_API_REQUEST_PARAMETER_AUTHORIZATION );
+        long companyId = 0;
+        SimpleDateFormat sdf = new SimpleDateFormat( CommonConstants.SURVEY_API_DATE_FORMAT );
+        sdf.setLenient(false);
+        try {
+            companyId = adminAuthenticationService.validateAuthHeader( authorizationHeader );
+        } catch ( AuthorizationException e1 ) {
+            return restUtils.getRestResponseEntity( HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", null, null, request, companyId );
+        }
+
+        //parse request parameters from request
+        String countStr = request.getParameter( "count" );
+        String startStr = request.getParameter( "start" );
+        String startSurveyIDStr = request.getParameter( "startSurveyId" );
+        String startTransactionDateStr = request.getParameter( "startTransactionDateTime" );
+        String userEmailAddress = request.getParameter( "user" );
+        String includeManagedTeamStr = request.getParameter( "includeManagedTeam" );
+
+        Set<String> inputRequestParameters = request.getParameterMap().keySet();
+        List<String> fixReqParameters = Arrays.asList( "count", "start", "status", "startSurveyId",
+            "startTransactionDateTime", "user", "includeManagedTeam" );
+        for ( String currParameter : inputRequestParameters ) {
+            if ( !fixReqParameters.contains( currParameter ) ) {
+                return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST,
+                    "Unsupported filter parameter : " + currParameter, null, null, request, companyId );
+            }
+        }
+
+        int count = CommonConstants.SURVEY_API_DEFAUAT_BATCH_SIZE;
+        int start = 0;
+        if ( countStr != null ) {
+            try {
+                count = Integer.parseInt( countStr );
+                // default count is 1000
+                if ( count > CommonConstants.SURVEY_API_DEFAUAT_BATCH_SIZE ) {
+                    count = CommonConstants.SURVEY_API_DEFAUAT_BATCH_SIZE;
+                }
+            } catch ( NumberFormatException e ) {
+                return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "Passed parameter count is invalid", null, null,
+                    request, companyId );
+            }
+        }
+
+        if ( startStr != null ) {
+            try {
+                start = Integer.parseInt( startStr );
+            } catch ( NumberFormatException e ) {
+                return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "Passed parameter start is invalid", null, null,
+                    request, companyId );
+            }
+        }
+
+        Long startSurveyID = null;
+        if ( !StringUtils.isEmpty( startSurveyIDStr ) ) {
+            try {
+                startSurveyID = Long.parseLong( startSurveyIDStr );
+            } catch ( NumberFormatException e ) {
+                return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "Passed parameter startSurveyID is invalid",
+                    null, null, request, companyId );
+            }
+        }
+
+        //startTransactionDate
+        Date startTransactionDate = null;
+        if ( startTransactionDateStr != null && !startTransactionDateStr.isEmpty() ) {
+            try {
+                startTransactionDate = sdf.parse( startTransactionDateStr );
+            } catch ( ParseException e ) {
+                return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST,
+                    "Passed parameter startTransactionDateTime is invalid", null, null, request, companyId );
+            }
+        }
+
+
+        //includeManagedTeam
+        Boolean includeManagedTeam = null;
+        if ( !StringUtils.isEmpty( includeManagedTeamStr ) ) {
+            try {
+                includeManagedTeam = Boolean.parseBoolean( includeManagedTeamStr );
+            } catch ( NumberFormatException e ) {
+                return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST,
+                    "Passed parameter includeManagedTeam is invalid", null, null, request, companyId );
+            }
+
+            if ( StringUtils.isEmpty( userEmailAddress ) ) {
+                return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST,
+                    "Passed parameter userEmailAddress can not be empty if includeManagedTeam is used ", null, null, request,
+                    companyId );
+            }
+        }
+
+        //get user
+        List<Long> userIds = null;
+        if ( !StringUtils.isEmpty( userEmailAddress ) ) {
+            try {
+                User user = userManagementService.getUserByEmailAndCompany(companyId, userEmailAddress);
+                userIds = new ArrayList<Long>();
+                userIds.add( user.getUserId() );
+
+                //if includeManagedTeam is present than get all the users under the given user 
+                if ( includeManagedTeam != null && includeManagedTeam == true ) {
+                    Set<Long> agentIds = userManagementService.getUserIdsUnderAdmin( user );
+                    userIds.addAll( agentIds );
+                }
+
+            } catch ( InvalidInputException e ) {
+                return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST,
+                    "Passed parameter user " + userEmailAddress + " is invalid", null, null, request, companyId );
+            } catch (NoRecordsFetchedException e) {
+            	return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, "User not registered or you do not have access to this account.",
+                        null, null, request , companyId  );
+			}
+        }
+
+        //get data from database
+        SurveysAndReviewsVO surveysAndReviewsVO = surveyHandler.getIncompelteSurveysByFilterCriteria( startSurveyID, startTransactionDate, userIds , start, count, companyId );
+
+        //create vo object
+        List<IncompeteSurveyGetVO> incompleteSurveyVOs = incompleteSurveyVOTransformer.transformDomainObjectToApiResponse(surveysAndReviewsVO);
+        LOGGER.info( "SurveyApiController.getIncompleteSurveyTransactions completed successfully" );
+
+        return restUtils.getRestResponseEntity( HttpStatus.OK, "Request Successfully processed", "surveys", incompleteSurveyVOs, request,
+            companyId );
+    }
+    
 }
+
