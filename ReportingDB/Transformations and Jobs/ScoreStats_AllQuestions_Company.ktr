@@ -102,67 +102,14 @@
       <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
     </attributes>
   </connection>
-  <connection>
-    <name>SS_INFO_CONNECTION</name>
-    <server>&#x24;&#x7b;SS_MYSQL_HOST&#x7d;</server>
-    <type>MYSQL</type>
-    <access>Native</access>
-    <database>&#x24;&#x7b;SS_MYSQL_SCHEMA&#x7d;</database>
-    <port>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</port>
-    <username>&#x24;&#x7b;SS_MYSQL_USER_NAME&#x7d;</username>
-    <password>&#x24;&#x7b;SS_MYSQL_PASSWORD&#x7d;</password>
-    <servername/>
-    <data_tablespace/>
-    <index_tablespace/>
-    <attributes>
-      <attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useCompression</code><attribute>true</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useServerPrepStmts</code><attribute>false</attribute></attribute>
-      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
-      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
-      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
-      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</attribute></attribute>
-      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
-      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
-      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
-      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
-      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
-      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
-    </attributes>
-  </connection>
   <order>
-  <hop> <from>Filter 1</from><to>Sort 1</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter 2</from><to>Sort 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter 3</from><to>Sort 3</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter 4</from><to>Sort 4</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter 5</from><to>Sort 5</to><enabled>Y</enabled> </hop>
-  <hop> <from>Group 4</from><to>Sort qsn 4</to><enabled>Y</enabled> </hop>
-  <hop> <from>Group by 1</from><to>Sort qsn 1</to><enabled>Y</enabled> </hop>
-  <hop> <from>Group by 2</from><to>Sort qsn 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>Group by 3</from><to>Sort qsn 3</to><enabled>Y</enabled> </hop>
-  <hop> <from>Group by 5</from><to>Sort qsn 5</to><enabled>Y</enabled> </hop>
-  <hop> <from>Merge Join</from><to>Filter 1</to><enabled>Y</enabled> </hop>
-  <hop> <from>Merge Join</from><to>Filter 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>Merge Join</from><to>Filter 3</to><enabled>Y</enabled> </hop>
-  <hop> <from>Merge Join</from><to>Filter 4</to><enabled>Y</enabled> </hop>
-  <hop> <from>Merge Join</from><to>Filter 5</to><enabled>Y</enabled> </hop>
-  <hop> <from>Modified Java Script Value</from><to>ScoreStats Id</to><enabled>Y</enabled> </hop>
-  <hop> <from>Multiway Merge Join</from><to>Modified Java Script Value</to><enabled>Y</enabled> </hop>
-  <hop> <from>ScoreStats Id</from><to>If field value is null</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort 1</from><to>Group by 1</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort 2</from><to>Group by 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort 3</from><to>Group by 3</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort 4</from><to>Group 4</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort 5</from><to>Group by 5</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort qsn 1</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort qsn 2</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort qsn 3</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort qsn 4</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort qsn 5</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>SurveyDetails Input</from><to>Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>SurveyResponse Input</from><to>Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>If field value is null</from><to>Calculate Average</to><enabled>Y</enabled> </hop>
-  <hop> <from>Calculate Average</from><to>Insert &#x2f; Update All Questions Users</to><enabled>Y</enabled> </hop>
+  <hop> <from>Calculate Average</from><to>Insert &#x2f; Update</to><enabled>Y</enabled> </hop>
+  <hop> <from>Generate random value</from><to>Calculate Average</to><enabled>Y</enabled> </hop>
+  <hop> <from>Memory Group by</from><to>Generate random value</to><enabled>Y</enabled> </hop>
+  <hop> <from>Merge Join</from><to>Sort Company id</to><enabled>Y</enabled> </hop>
+  <hop> <from>ScoreStats AllQuestions User</from><to>Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort Company id</from><to>Memory Group by</to><enabled>Y</enabled> </hop>
+  <hop> <from>UserProfile</from><to>Merge Join</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Calculate Average</name>
@@ -179,741 +126,23 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var avg_score &#x3d; 0.00&#x3b;&#xd;&#xa;var total_counts &#x3d; five_star_count &#x2b; four_star_count &#x2b; three_star_count &#x2b; two_star_count &#x2b; one_star_count&#x3b;&#xd;&#xa;&#xd;&#xa;if &#x28; total_counts &#x3e; 0 &#x29; &#x7b;&#xd;&#xa;	avg_score &#x3d; &#x28;&#x28;5&#x2a;five_star_count&#x29; &#x2b; &#x28;4&#x2a;four_star_count&#x29; &#x2b; &#x28;3&#x2a;three_star_count&#x29; &#x2b; &#x28;2&#x2a;two_star_count&#x29; &#x2b; &#x28;1&#x2a;one_star_count&#x29;&#x29;&#x2f;total_counts&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>avg_score</name>
-        <rename>avg_score</rename>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var avg_score_cal &#x3d; 0.00&#x3b;&#xd;&#xa;&#xd;&#xa;if &#x28; count&#x3e; 0 &#x29; &#x7b;&#xd;&#xa; 	avg_score_cal &#x3d; sum_count &#x2f; count&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>avg_score_cal</name>
+        <rename>avg_score_cal</rename>
         <type>Number</type>
         <length>16</length>
         <precision>2</precision>
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1053</xloc>
-      <yloc>1017</yloc>
+      <xloc>1006</xloc>
+      <yloc>188</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Filter 1</name>
-    <type>FilterRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<send_true_to/>
-<send_false_to/>
-    <compare>
-<condition>
- <negated>N</negated>
- <leftvalue>ANSWER</leftvalue>
- <function>&#x3d;</function>
- <rightvalue/>
- <value><name>constant</name><type>Integer</type><text>1</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;</mask></value> </condition>
-    </compare>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>794</xloc>
-      <yloc>346</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Filter 2</name>
-    <type>FilterRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<send_true_to/>
-<send_false_to/>
-    <compare>
-<condition>
- <negated>N</negated>
- <leftvalue>ANSWER</leftvalue>
- <function>&#x3d;</function>
- <rightvalue/>
- <value><name>constant</name><type>Integer</type><text>2</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;</mask></value> </condition>
-    </compare>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>660</xloc>
-      <yloc>346</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Filter 3</name>
-    <type>FilterRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<send_true_to>Sort 3</send_true_to>
-<send_false_to/>
-    <compare>
-<condition>
- <negated>N</negated>
- <leftvalue>ANSWER</leftvalue>
- <function>&#x3d;</function>
- <rightvalue/>
- <value><name>constant</name><type>Integer</type><text>3</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;</mask></value> </condition>
-    </compare>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>512</xloc>
-      <yloc>346</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Filter 4</name>
-    <type>FilterRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<send_true_to>Sort 4</send_true_to>
-<send_false_to/>
-    <compare>
-<condition>
- <negated>N</negated>
- <leftvalue>ANSWER</leftvalue>
- <function>&#x3d;</function>
- <rightvalue/>
- <value><name>constant</name><type>Integer</type><text>4</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;</mask></value> </condition>
-    </compare>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>383</xloc>
-      <yloc>346</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Filter 5</name>
-    <type>FilterRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<send_true_to>Sort 5</send_true_to>
-<send_false_to/>
-    <compare>
-<condition>
- <negated>N</negated>
- <leftvalue>ANSWER</leftvalue>
- <function>&#x3d;</function>
- <rightvalue/>
- <value><name>constant</name><type>Integer</type><text>5</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;</mask></value> </condition>
-    </compare>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>269</xloc>
-      <yloc>346</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Group 4</name>
-    <type>GroupBy</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <all_rows>N</all_rows>
-      <ignore_aggregate>N</ignore_aggregate>
-      <field_ignore/>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>grp</prefix>
-      <add_linenr>N</add_linenr>
-      <linenr_fieldname/>
-      <give_back_row>N</give_back_row>
-      <group>
-        <field>
-          <name>COMPANY_ID</name>
-        </field>
-        <field>
-          <name>TRX_MONTH</name>
-        </field>
-        <field>
-          <name>QUESTION_ID</name>
-        </field>
-      </group>
-      <fields>
-        <field>
-          <aggregate>four_star_count</aggregate>
-          <subject>SURVEY_RESPONSE_ID</subject>
-          <type>COUNT_DISTINCT</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>MONTH_Data</aggregate>
-          <subject>MONTH_Data</subject>
-          <type>FIRST</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>Year_Data</aggregate>
-          <subject>Year_Data</subject>
-          <type>FIRST</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>QUESTION</aggregate>
-          <subject>QUESTION</subject>
-          <type>FIRST</type>
-          <valuefield/>
-        </field>
-      </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>378</xloc>
-      <yloc>578</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Group by 1</name>
-    <type>GroupBy</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <all_rows>N</all_rows>
-      <ignore_aggregate>N</ignore_aggregate>
-      <field_ignore/>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>grp</prefix>
-      <add_linenr>N</add_linenr>
-      <linenr_fieldname/>
-      <give_back_row>N</give_back_row>
-      <group>
-        <field>
-          <name>COMPANY_ID</name>
-        </field>
-        <field>
-          <name>TRX_MONTH</name>
-        </field>
-        <field>
-          <name>QUESTION_ID</name>
-        </field>
-      </group>
-      <fields>
-        <field>
-          <aggregate>one_star_count</aggregate>
-          <subject>SURVEY_RESPONSE_ID</subject>
-          <type>COUNT_DISTINCT</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>MONTH_Data</aggregate>
-          <subject>MONTH_Data</subject>
-          <type>FIRST</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>Year_Data</aggregate>
-          <subject>Year_Data</subject>
-          <type>FIRST</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>QUESTION</aggregate>
-          <subject>QUESTION</subject>
-          <type>FIRST</type>
-          <valuefield/>
-        </field>
-      </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>794</xloc>
-      <yloc>578</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Group by 2</name>
-    <type>GroupBy</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <all_rows>N</all_rows>
-      <ignore_aggregate>N</ignore_aggregate>
-      <field_ignore/>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>grp</prefix>
-      <add_linenr>N</add_linenr>
-      <linenr_fieldname/>
-      <give_back_row>N</give_back_row>
-      <group>
-        <field>
-          <name>COMPANY_ID</name>
-        </field>
-        <field>
-          <name>TRX_MONTH</name>
-        </field>
-        <field>
-          <name>QUESTION_ID</name>
-        </field>
-      </group>
-      <fields>
-        <field>
-          <aggregate>two_star_count</aggregate>
-          <subject>SURVEY_RESPONSE_ID</subject>
-          <type>COUNT_DISTINCT</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>MONTH_Data</aggregate>
-          <subject>MONTH_Data</subject>
-          <type>FIRST</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>Year_Data</aggregate>
-          <subject>Year_Data</subject>
-          <type>FIRST</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>QUESTION</aggregate>
-          <subject>QUESTION</subject>
-          <type>FIRST</type>
-          <valuefield/>
-        </field>
-      </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>660</xloc>
-      <yloc>578</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Group by 3</name>
-    <type>GroupBy</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <all_rows>N</all_rows>
-      <ignore_aggregate>N</ignore_aggregate>
-      <field_ignore/>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>grp</prefix>
-      <add_linenr>N</add_linenr>
-      <linenr_fieldname/>
-      <give_back_row>N</give_back_row>
-      <group>
-        <field>
-          <name>COMPANY_ID</name>
-        </field>
-        <field>
-          <name>TRX_MONTH</name>
-        </field>
-        <field>
-          <name>QUESTION_ID</name>
-        </field>
-      </group>
-      <fields>
-        <field>
-          <aggregate>three_star_count</aggregate>
-          <subject>SURVEY_RESPONSE_ID</subject>
-          <type>COUNT_DISTINCT</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>MONTH_Data</aggregate>
-          <subject>MONTH_Data</subject>
-          <type>FIRST</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>Year_Data</aggregate>
-          <subject>Year_Data</subject>
-          <type>FIRST</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>QUESTION</aggregate>
-          <subject>QUESTION</subject>
-          <type>FIRST</type>
-          <valuefield/>
-        </field>
-      </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>512</xloc>
-      <yloc>578</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Group by 5</name>
-    <type>GroupBy</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <all_rows>N</all_rows>
-      <ignore_aggregate>N</ignore_aggregate>
-      <field_ignore/>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>grp</prefix>
-      <add_linenr>N</add_linenr>
-      <linenr_fieldname/>
-      <give_back_row>N</give_back_row>
-      <group>
-        <field>
-          <name>COMPANY_ID</name>
-        </field>
-        <field>
-          <name>TRX_MONTH</name>
-        </field>
-        <field>
-          <name>QUESTION_ID</name>
-        </field>
-      </group>
-      <fields>
-        <field>
-          <aggregate>five_star_count</aggregate>
-          <subject>SURVEY_RESPONSE_ID</subject>
-          <type>COUNT_DISTINCT</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>MONTH_Data</aggregate>
-          <subject>MONTH_Data</subject>
-          <type>FIRST</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>Year_Data</aggregate>
-          <subject>Year_Data</subject>
-          <type>FIRST</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>QUESTION</aggregate>
-          <subject>QUESTION</subject>
-          <type>FIRST</type>
-          <valuefield/>
-        </field>
-      </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>264</xloc>
-      <yloc>578</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>If field value is null</name>
-    <type>IfNull</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <replaceAllByValue>0</replaceAllByValue>
-      <replaceAllMask/>
-      <selectFields>N</selectFields>
-      <selectValuesType>N</selectValuesType>
-      <setEmptyStringAll>N</setEmptyStringAll>
-    <valuetypes>
-      </valuetypes>
-    <fields>
-      </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>856</xloc>
-      <yloc>1017</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Insert &#x2f; Update All Questions Users</name>
-    <type>InsertUpdate</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <commit>10000</commit>
-    <update_bypassed>N</update_bypassed>
-    <lookup>
-      <schema/>
-      <table>score_stats_question_company</table>
-      <key>
-        <name>final_company_id</name>
-        <field>company_id</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-      </key>
-      <key>
-        <name>final_month_data</name>
-        <field>month_val</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-      </key>
-      <key>
-        <name>final_year_data</name>
-        <field>year_val</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-      </key>
-      <key>
-        <name>final_question_id</name>
-        <field>question_id</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-      </key>
-      <value>
-        <name>score_stats_question_company_id</name>
-        <rename>score_stats_question_company_id</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>company_id</name>
-        <rename>final_company_id</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>month_val</name>
-        <rename>final_month_data</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>year_val</name>
-        <rename>final_year_data</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>question_id</name>
-        <rename>final_question_id</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>question</name>
-        <rename>final_question_text</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>five_star</name>
-        <rename>five_star_count</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>four_star</name>
-        <rename>four_star_count</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>three_star</name>
-        <rename>three_star_count</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>two_star</name>
-        <rename>two_star_count</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>one_star</name>
-        <rename>one_star_count</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>avg_score</name>
-        <rename>avg_score</rename>
-        <update>Y</update>
-      </value>
-    </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1297</xloc>
-      <yloc>1017</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Merge Join</name>
-    <type>MergeJoin</type>
-    <description/>
-    <distribute>N</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<join_type>INNER</join_type>
-<step1>SurveyDetails Input</step1>
-<step2>SurveyResponse Input</step2>
-    <keys_1>
-      <key>SURVEY_DETAILS_ID</key>
-    </keys_1>
-    <keys_2>
-      <key>SURVEY_DETAILS_ID</key>
-    </keys_2>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>512</xloc>
-      <yloc>233</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Modified Java Script Value</name>
-    <type>ScriptValueMod</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var final_company_id &#x3d; 0&#x3b;&#xd;&#xa;var final_month_data &#x3d; 0&#x3b;&#xd;&#xa;var final_year_data &#x3d; 0&#x3b;&#xd;&#xa;var final_question_id &#x3d; 0&#x3b;&#xd;&#xa;var final_question_text &#x3d; &#x22;&#x22;&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;COMPANY_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;COMPANY_ID_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_4&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;MONTH_Data &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_month_data &#x3d; MONTH_Data&#x3b;&#xd;&#xa;&#x7d; else if&#x28;MONTH_Data_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_month_data &#x3d; MONTH_Data_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;MONTH_Data_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_month_data &#x3d; MONTH_Data_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;MONTH_Data_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_month_data &#x3d; MONTH_Data_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;MONTH_Data_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_month_data &#x3d; MONTH_Data_4&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;Year_Data &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_year_data &#x3d; Year_Data&#x3b;&#xd;&#xa;&#x7d; else if&#x28;Year_Data_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_year_data &#x3d; Year_Data_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;Year_Data_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_year_data &#x3d; Year_Data_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;Year_Data_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_year_data &#x3d; Year_Data_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;Year_Data_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_year_data &#x3d; Year_Data_4&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;QUESTION &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_question_text &#x3d; QUESTION&#x3b;&#xd;&#xa;&#x7d; else if&#x28;QUESTION_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_question_text &#x3d; QUESTION_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;QUESTION_2&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_question_text &#x3d; QUESTION_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;QUESTION_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_question_text &#x3d; QUESTION_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;QUESTION_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_question_text &#x3d; QUESTION_4&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;QUESTION_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_question_id &#x3d; QUESTION_ID&#x3b;&#xd;&#xa;&#x7d; else if&#x28;QUESTION_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_question_id &#x3d; QUESTION_ID_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;QUESTION_ID_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_question_id &#x3d; QUESTION_ID_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;QUESTION_ID_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_question_id &#x3d; QUESTION_ID_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;QUESTION_ID_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_question_id &#x3d; QUESTION_ID_4&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>final_company_id</name>
-        <rename>final_company_id</rename>
-        <type>Integer</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>      <field>        <name>final_month_data</name>
-        <rename>final_month_data</rename>
-        <type>Integer</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>      <field>        <name>final_year_data</name>
-        <rename>final_year_data</rename>
-        <type>Integer</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>      <field>        <name>final_question_id</name>
-        <rename>final_question_id</rename>
-        <type>Integer</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>      <field>        <name>final_question_text</name>
-        <rename>final_question_text</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>512</xloc>
-      <yloc>1017</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Multiway Merge Join</name>
-    <type>MultiwayMergeJoin</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <join_type>FULL OUTER</join_type>
-    <step0>Sort qsn 5</step0>
-    <step1>Sort qsn 4</step1>
-    <step2>Sort qsn 3</step2>
-    <step3>Sort qsn 2</step3>
-    <step4>Sort qsn 1</step4>
-    <number_input>5</number_input>
-    <keys>
-      <key>COMPANY_ID,QUESTION_ID</key>
-      <key>COMPANY_ID,QUESTION_ID</key>
-      <key>COMPANY_ID,QUESTION_ID</key>
-      <key>COMPANY_ID,QUESTION_ID</key>
-      <key>COMPANY_ID,QUESTION_ID</key>
-    </keys>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>512</xloc>
-      <yloc>886</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>ScoreStats Id</name>
+    <name>Generate random value</name>
     <type>RandomValue</type>
     <description/>
     <distribute>Y</distribute>
@@ -931,15 +160,15 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>690</xloc>
-      <yloc>1017</yloc>
+      <xloc>793</xloc>
+      <yloc>188</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Sort 1</name>
-    <type>SortRows</type>
+    <name>Insert &#x2f; Update</name>
+    <type>InsertUpdate</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -948,44 +177,93 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <commit>10000</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>score_stats_question_company</table>
+      <key>
         <name>COMPANY_ID</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>TRX_MONTH</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>QUESTION_ID</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
+        <field>company_id</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>month_val</name>
+        <field>month_val</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>year_val</name>
+        <field>year_val</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>question_id</name>
+        <field>question_id</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>month_val</name>
+        <rename>month_val</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>year_val</name>
+        <rename>year_val</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>question_id</name>
+        <rename>question_id</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>company_id</name>
+        <rename>COMPANY_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>score_stats_question_company_id</name>
+        <rename>score_stats_question_company_id</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>question</name>
+        <rename>question</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>sum</name>
+        <rename>sum_count</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>count</name>
+        <rename>count</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>avg_score</name>
+        <rename>avg_score_cal</rename>
+        <update>Y</update>
+      </value>
+    </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>794</xloc>
-      <yloc>470</yloc>
+      <xloc>1181</xloc>
+      <yloc>188</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Sort 2</name>
-    <type>SortRows</type>
+    <name>Memory Group by</name>
+    <type>MemoryGroupBy</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -994,44 +272,52 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>COMPANY_ID</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>TRX_MONTH</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>QUESTION_ID</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
+      <give_back_row>N</give_back_row>
+      <group>
+        <field>
+          <name>COMPANY_ID</name>
+        </field>
+        <field>
+          <name>month_val</name>
+        </field>
+        <field>
+          <name>year_val</name>
+        </field>
+        <field>
+          <name>question_id</name>
+        </field>
+      </group>
+      <fields>
+        <field>
+          <aggregate>question</aggregate>
+          <subject>question</subject>
+          <type>FIRST</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>sum_count</aggregate>
+          <subject>sum</subject>
+          <type>SUM</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>count</aggregate>
+          <subject>count</subject>
+          <type>COUNT_ANY</type>
+          <valuefield/>
+        </field>
+      </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>660</xloc>
-      <yloc>470</yloc>
+      <xloc>607</xloc>
+      <yloc>188</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Sort 3</name>
-    <type>SortRows</type>
+    <name>Merge Join</name>
+    <type>MergeJoin</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -1040,335 +326,25 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>COMPANY_ID</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>TRX_MONTH</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>QUESTION_ID</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>512</xloc>
-      <yloc>470</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Sort 4</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>COMPANY_ID</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>TRX_MONTH</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>QUESTION_ID</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>380</xloc>
-      <yloc>470</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Sort 5</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>COMPANY_ID</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>TRX_MONTH</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>QUESTION_ID</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
+<join_type>INNER</join_type>
+<step1>UserProfile</step1>
+<step2>ScoreStats AllQuestions User</step2>
+    <keys_1>
+      <key>USER_ID</key>
+    </keys_1>
+    <keys_2>
+      <key>user_id</key>
+    </keys_2>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>266</xloc>
-      <yloc>470</yloc>
+      <yloc>188</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Sort qsn 1</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>COMPANY_ID</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>QUESTION_ID</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>794</xloc>
-      <yloc>717</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Sort qsn 2</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>COMPANY_ID</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>QUESTION_ID</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>660</xloc>
-      <yloc>717</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Sort qsn 3</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>COMPANY_ID</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>QUESTION_ID</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>512</xloc>
-      <yloc>717</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Sort qsn 4</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>COMPANY_ID</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>QUESTION_ID</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>378</xloc>
-      <yloc>717</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Sort qsn 5</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>COMPANY_ID</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>QUESTION_ID</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>261</xloc>
-      <yloc>717</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>SurveyDetails Input</name>
+    <name>ScoreStats AllQuestions User</name>
     <type>TableInput</type>
     <description/>
     <distribute>Y</distribute>
@@ -1379,7 +355,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, AGENT_NAME&#xd;&#xa;, BRANCH_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, REGION_ID&#xd;&#xa;, SURVEY_PRE_INTITIATION_ID&#xd;&#xa;, CUSTOMER_EMAIL&#xd;&#xa;, CUSTOMER_FIRST_NAME&#xd;&#xa;, CUSTOMER_LAST_NAME&#xd;&#xa;, CREATED_ON&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;, SOURCE&#xd;&#xa;, SOURCE_ID&#xd;&#xa;, STAGE&#xd;&#xa;, STATE&#xd;&#xa;, MOOD&#xd;&#xa;, SURVEY_CLICKED&#xd;&#xa;, SURVEY_COMPLETED_DATE&#xd;&#xa;, SURVEY_TRANSACTION_DATE&#xd;&#xa;, SURVEY_UPDATED_DATE&#xd;&#xa;, AGREED_TO_SHARE&#xd;&#xa;, CITY&#xd;&#xa;, COMPLETE_PROFILE_URL&#xd;&#xa;, EDITABLE&#xd;&#xa;, IS_ABUSE_REP_BY_USER&#xd;&#xa;, IS_ABUSIVE&#xd;&#xa;, LAST_REMINDER_FOR_SOCIAL_POST&#xd;&#xa;, REMINDER_COUNT&#xd;&#xa;, REMINDERS_FOR_SOCIAL_POSTS&#xd;&#xa;, RETAKE_SURVEY&#xd;&#xa;, REVIEW&#xd;&#xa;, SCORE&#xd;&#xa;, SHOW_SURVEY_ON_UI&#xd;&#xa;, SOCIAL_POSTS_REMINDER&#xd;&#xa;, SUMMARY&#xd;&#xa;, UNDER_RESOLUTION&#xd;&#xa;, URL&#xd;&#xa;, CREATED_ON_EST&#xd;&#xa;, MODIFIED_ON_EST&#xd;&#xa;, SURVEY_COMPLETED_DATE_EST&#xd;&#xa;, SURVEY_TRANSACTION_DATE_EST&#xd;&#xa;, SURVEY_UPDATED_DATE_EST&#xd;&#xa;, LAST_REMINDER_FOR_SOCIAL_POST_EST&#xd;&#xa;, date_format&#x28;SURVEY_COMPLETED_DATE_EST,&#x27;&#x25;Y_&#x25;m&#x27;&#x29; AS TRX_MONTH&#xd;&#xa;, date_format&#x28;SURVEY_COMPLETED_DATE_EST,&#x27;&#x25;m&#x27;&#x29; AS MONTH_Data&#xd;&#xa;, date_format&#x28;SURVEY_COMPLETED_DATE_EST,&#x27;&#x25;Y&#x27;&#x29; AS Year_Data&#xd;&#xa;FROM survey_details where month&#x28;SURVEY_COMPLETED_DATE_EST&#x29; &#x3d; month&#x28;subdate&#x28;current_date,1&#x29;&#x29; and year&#x28;SURVEY_COMPLETED_DATE_EST&#x29; &#x3d; year&#x28;subdate&#x28;current_date,1&#x29;&#x29; &#xd;&#xa;order by SURVEY_DETAILS_ID&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  score_stats_question_user_id&#xd;&#xa;, user_id&#xd;&#xa;, question_id&#xd;&#xa;, question&#xd;&#xa;, sum&#xd;&#xa;, count&#xd;&#xa;, avg_score&#xd;&#xa;, month_val&#xd;&#xa;, year_val&#xd;&#xa;FROM score_stats_question_user&#xd;&#xa;where month_val &#x3d; month&#x28;subdate&#x28;current_date,1&#x29;&#x29; and year_val &#x3d; year&#x28;subdate&#x28;current_date,1&#x29;&#x29; &#xd;&#xa;order by user_id</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -1387,14 +363,66 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>794</xloc>
-      <yloc>55</yloc>
+      <xloc>99</xloc>
+      <yloc>263</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>SurveyResponse Input</name>
+    <name>Sort Company id</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>COMPANY_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>month_val</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>year_val</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>question_id</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>423</xloc>
+      <yloc>188</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>UserProfile</name>
     <type>TableInput</type>
     <description/>
     <distribute>Y</distribute>
@@ -1405,7 +433,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  SURVEY_RESPONSE_ID&#xd;&#xa;, SURVEY_DETAILS_ID&#xd;&#xa;, ANSWER&#xd;&#xa;, QUESTION_ID&#xd;&#xa;, QUESTION&#xd;&#xa;, QUESTION_TYPE&#xd;&#xa;, IS_USER_RANKING_QUESTION&#xd;&#xa;FROM survey_response where QUESTION_TYPE like &#x27;&#x25;range&#x25;&#x27;&#xd;&#xa;order by SURVEY_DETAILS_ID&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  distinct USER_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;FROM user_profile &#xd;&#xa;order by  USER_ID&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -1413,8 +441,8 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>269</xloc>
-      <yloc>55</yloc>
+      <xloc>99</xloc>
+      <yloc>105</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
