@@ -120,7 +120,7 @@ public interface SurveyHandler
     public String getSurveyUrl( long agentId, String customerEmail, String baseUrl ) throws InvalidInputException;
 
 
-    public void changeStatusOfSurvey( String surveyId, boolean editable );
+    public void markSurveyAsRetake( String surveyId, boolean editable );
 
 
     public void storeSPIandSendSurveyInvitationMail( String custFirstName, String custLastName, String custEmail,

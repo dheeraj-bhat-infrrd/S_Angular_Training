@@ -3379,5 +3379,23 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
         LOG.debug( "Method updateRegionIdForAllSurveysOfBranch() finished for branchId + " + branchId );
     }
+    
+    @Override
+    public void updateSurveyDetailsForRetake( SurveyDetails surveyDetails )
+    {
+        LOG.debug( "Method insertSurveyDetails() to insert details of survey started." );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyDetails.get_id() ) );
 
+        Update update = new Update();
+        update.set( CommonConstants.RETAKE_SURVEY_COLUMN, surveyDetails.isRetakeSurvey());
+        update.set( CommonConstants.NO_OF_RETAKE_COLUMN, surveyDetails.getNoOfRetake() );
+        update.set( CommonConstants.LAST_RETAKE_REQUEST_DATE_COLUMN, surveyDetails.getLastRetakeRequestDate());
+        update.set( CommonConstants.RETAKE_SURVEY_HISTORY_COLUMN, surveyDetails.getRetakeSurveyHistory());
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
+        mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
+        LOG.debug( "Method insertSurveyDetails() to insert details of survey finished." );
+    }
+    
+    
 }

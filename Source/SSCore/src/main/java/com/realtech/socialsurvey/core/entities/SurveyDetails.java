@@ -85,8 +85,9 @@ public class SurveyDetails
     
     //retake details
     private boolean retakeSurvey;
-
-    
+    private int noOfRetake;
+    private Date lastRetakeRequestDate;
+    private List<RetakeSurveyHistory> retakeSurveyHistory; 
     
         
     public String getAgentEmailId()
@@ -767,6 +768,42 @@ public class SurveyDetails
     public void setLastAbuseReportedDate( Date lastAbuseReportedDate )
     {
         this.lastAbuseReportedDate = lastAbuseReportedDate;
+    }
+
+
+    public int getNoOfRetake()
+    {
+        return noOfRetake;
+    }
+
+
+    public void setNoOfRetake( int noOfRetake )
+    {
+        this.noOfRetake = noOfRetake;
+    }
+
+
+    public Date getLastRetakeRequestDate()
+    {
+        return lastRetakeRequestDate;
+    }
+
+
+    public void setLastRetakeRequestDate( Date lastRetakeRequestDate )
+    {
+        this.lastRetakeRequestDate = lastRetakeRequestDate;
+    }
+
+
+    public List<RetakeSurveyHistory> getRetakeSurveyHistory()
+    {
+        return retakeSurveyHistory;
+    }
+
+
+    public void setRetakeSurveyHistory( List<RetakeSurveyHistory> retakeSurveyHistory )
+    {
+        this.retakeSurveyHistory = retakeSurveyHistory;
     }
 	
 }

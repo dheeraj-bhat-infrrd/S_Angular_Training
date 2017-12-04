@@ -72,6 +72,7 @@ import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
+import com.realtech.socialsurvey.core.entities.RetakeSurveyHistory;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SurveyCsvInfo;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
@@ -862,10 +863,31 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     @Override
-    public void changeStatusOfSurvey( String surveyId, boolean editable )
+    public void markSurveyAsRetake( String surveyId, boolean editable )
     {
         LOG.debug( "Method to update status of survey in SurveyDetails collection, changeStatusOfSurvey() started." );
-        surveyDetailsDao.changeStatusOfSurvey( surveyId, editable );
+        SurveyDetails surveyDetails = surveyDetailsDao.getSurveyBySurveyMongoId( surveyId );
+        
+        surveyDetails.setStage( 0 );
+        surveyDetails.setNoOfRetake( surveyDetails.getNoOfRetake() + 1 );
+        surveyDetails.setLastRetakeRequestDate( new Date ( System.currentTimeMillis() ) );
+        
+        RetakeSurveyHistory retakeSurveyHistory = new RetakeSurveyHistory();
+        retakeSurveyHistory.setCompleteProfileUrl( surveyDetails.getCompleteProfileUrl() );
+        retakeSurveyHistory.setMood( surveyDetails.getMood() );
+        retakeSurveyHistory.setReview( surveyDetails.getReview() );
+        retakeSurveyHistory.setScore( surveyDetails.getScore() );
+        retakeSurveyHistory.setSocialMediaPostDetails( surveyDetails.getSocialMediaPostDetails() );
+        retakeSurveyHistory.setSummary( surveyDetails.getSummary() );
+        retakeSurveyHistory.setSurveyResponse( surveyDetails.getSurveyResponse() );
+        retakeSurveyHistory.setUrl( surveyDetails.getUrl() );
+        List<RetakeSurveyHistory> retakeSurveyHistories =  surveyDetails.getRetakeSurveyHistory();
+        if(retakeSurveyHistories == null)
+            retakeSurveyHistories = new ArrayList<RetakeSurveyHistory>();
+        retakeSurveyHistories.add( retakeSurveyHistory );
+        surveyDetails.setRetakeSurveyHistory( retakeSurveyHistories );
+        
+        surveyDetailsDao.updateSurveyDetailsForRetake( surveyDetails );
         LOG.debug( "Method to update status of survey in SurveyDetails collection, changeStatusOfSurvey() finished." );
     }
 

@@ -1427,7 +1427,7 @@ public class SurveyManagementController
 			}
 
 			
-			surveyHandler.changeStatusOfSurvey(surveyId, true);
+			surveyHandler.markSurveyAsRetake(surveyId, true);
 			SurveyDetails survey = surveyHandler.getSurveyDetails(surveyId);
 			long agentId = survey.getAgentId();
 			User user = userManagementService.getUserByUserId(agentId);
@@ -1457,7 +1457,7 @@ public class SurveyManagementController
 				throw new InvalidInputException("Invalid value (Null/Empty) found for agentId.");
 			}
 			long agentId = Long.parseLong(agentIdStr);
-			surveyHandler.changeStatusOfSurvey(surveyId, true);
+			surveyHandler.markSurveyAsRetake(surveyId, true);
 			SurveyDetails survey = surveyHandler.getSurveyDetails(surveyId);
 			User user = userManagementService.getUserByUserId(agentId);
 			Map<String, String> urlParams = urlGenerator.decryptUrl(survey.getUrl());
