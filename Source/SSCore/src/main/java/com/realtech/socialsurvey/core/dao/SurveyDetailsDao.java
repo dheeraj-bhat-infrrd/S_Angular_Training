@@ -294,7 +294,7 @@ public interface SurveyDetailsDao
      * @param stage
      * @return
      */
-    public List<SurveyDetails> getFilteredSurveys( int start, int batchSize, long companyId  , String status , String mood , Long startSurveyID , Date startReviewDate , Date startTransactionDate , List<Long> userIds );
+    public List<SurveyDetails> getFilteredSurveys( int start, int batchSize, long companyId  , String status , String mood , Long startSurveyID , Date startReviewDate , Date startTransactionDate , List<Long> userIds,  boolean isRetaken );
 
     /**
      * 
@@ -302,7 +302,7 @@ public interface SurveyDetailsDao
      * @param status
      * @return
      */
-    public Long getFilteredSurveyCount( long companyId , String status , String mood ,  Long startSurveyID, Date startReviewDate , Date startTransactionDate , List<Long> userIds );
+    public Long getFilteredSurveyCount( long companyId , String status , String mood ,  Long startSurveyID, Date startReviewDate , Date startTransactionDate , List<Long> userIds, boolean isRetaken );
 
 
     void insertApiRequestDetails( ApiRequestDetails apiRequestDetails );
@@ -363,5 +363,8 @@ public interface SurveyDetailsDao
 
 
     void updateSurveyDetailsForRetake( SurveyDetails surveyDetails );
+
+    public Float getFilteredSurveyAvgScore( long companyId, String mood, Long startSurveyID, Date startReviewDate,
+        Date startTransactionDate, List<Long> userIds, boolean isRetaken );
 
 }
