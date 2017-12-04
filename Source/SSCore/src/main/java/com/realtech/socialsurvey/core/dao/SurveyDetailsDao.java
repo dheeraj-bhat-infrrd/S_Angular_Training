@@ -361,4 +361,7 @@ public interface SurveyDetailsDao
 
     void updateRegionIdForAllSurveysOfBranch( long branchId, long regionId );
 
+
+    void updateSurveyDetailsForRetake( SurveyDetails surveyDetails );
+
 }
