@@ -386,6 +386,22 @@ public class ReportingWebController
 
     }
 
+    @ResponseBody
+    @RequestMapping ( value = "/reporting/npsgraph", method = RequestMethod.GET)
+    public String fetchNpsStats( Model model, HttpServletRequest request )
+    {
+        LOG.info( " Method for Fetching NPS stats Graph started" );
+        HttpSession session = request.getSession( false );
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+
+        LOG.debug( "Getting NPS stats for entityType:{} with entityId: {}", entityType, entityId );
+        Response response = ssApiIntergrationBuilder.getIntegrationApi().getReportingNpsStats( entityId, entityType );
+
+        LOG.info( " Method for Fetching NPS stats Graph Finished" );
+        return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+
+    }
 
     @ResponseBody
     @RequestMapping ( value = "/fetchreportingcompletionrate", method = RequestMethod.GET)

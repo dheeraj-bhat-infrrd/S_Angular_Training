@@ -213,4 +213,7 @@ public interface SSApiIntegration
 
     @DELETE("/v2/removesurveyquestion")
 	Response removeQuestionFromSurvey(@Query("userId") long userId,@Query("surveyQuestionId") long surveyQuestionId);
+    
+    @GET ( "/v1/npsstats" )
+    Response getReportingNpsStats(@Query ("entityId") Long entityId , @Query ("entityType") String entityType);
 }

@@ -103,6 +103,66 @@ public class DashboardGraphManagementImpl implements DashboardGraphManagement
     }
     
     @Override
+    public List<List<Object>> getNpsStatsGraph(Long entityId , String entityType){
+        LOG.info("Method for getting NPS stats for NPS stats graph, getNpsStatsGraph() has started");
+        List<List<Object>> npsStats = new ArrayList<>();
+        Calendar calender = Calendar.getInstance();
+        calender.getTime();
+        String endTrxMonth = new SimpleDateFormat("yyyy_MM").format(calender.getTime()); //example passes 2016_07
+        calender.add(Calendar.MONTH, -6); 
+        String startTrxMonth = new SimpleDateFormat("yyyy_MM").format(calender.getTime()); //example passes 2016_01
+        
+        if(entityType.equals( CommonConstants.COMPANY_ID_COLUMN )){
+            LOG.debug( "Calling method for fetching NPS stats for company {}",entityId );
+            for(SurveyStatsReportCompany SurveyStatsReportCompany : SurveyStatsReportCompanyDao.fetchCompanySurveyStatsById(entityId, startTrxMonth, endTrxMonth ) ){
+                List<Object> list = new ArrayList<>();
+                list.add( SurveyStatsReportCompany.getYear() );
+                list.add( SurveyStatsReportCompany.getMonth() );
+                list.add( SurveyStatsReportCompany.getNpsDetractors() );
+                list.add( SurveyStatsReportCompany.getNpsPassives() );
+                list.add( SurveyStatsReportCompany.getNpsPromoters() );            
+                npsStats.add( list );
+            }
+        }else if(entityType.equals( CommonConstants.REGION_ID_COLUMN )){
+            LOG.debug( "Calling method for fetching NPS stats for region {}",entityId );
+            for(SurveyStatsReportRegion SurveyStatsReportRegion : SurveyStatsReportRegionDao.fetchRegionSurveyStatsById(entityId, startTrxMonth, endTrxMonth) ){
+                List<Object> list = new ArrayList<>();
+                list.add( SurveyStatsReportRegion.getYear() );
+                list.add( SurveyStatsReportRegion.getMonth() );
+                list.add( SurveyStatsReportRegion.getNpsDetractors() );
+                list.add( SurveyStatsReportRegion.getNpsPassives() );
+                list.add( SurveyStatsReportRegion.getNpsPromoters() );            
+                npsStats.add( list );
+            }
+        }else if(entityType.equals( CommonConstants.BRANCH_ID_COLUMN )){
+            LOG.debug( "Calling method for fetching NPS stats for branch {}",entityId );
+            for(SurveyStatsReportBranch SurveyStatsReportBranch : SurveyStatsReportBranchDao.fetchBranchSurveyStatsById(entityId, startTrxMonth, endTrxMonth ) ){
+                List<Object> list = new ArrayList<>();
+                list.add( SurveyStatsReportBranch.getYear() );
+                list.add( SurveyStatsReportBranch.getMonth() );
+                list.add( SurveyStatsReportBranch.getNpsDetractors() );
+                list.add( SurveyStatsReportBranch.getNpsPassives() );
+                list.add( SurveyStatsReportBranch.getNpsPromoters() );            
+                npsStats.add( list );
+            }
+        }else if(entityType.equals( CommonConstants.AGENT_ID_COLUMN )){
+            LOG.debug( "Calling method for fetching NPS stats for user {}",entityId );
+            for(SurveyStatsReportUser SurveyStatsReportUser : SurveyStatsReportUserDao.fetchUserSurveyStatsById( entityId, startTrxMonth, endTrxMonth ) ){
+                List<Object> list = new ArrayList<>();
+                list.add( SurveyStatsReportUser.getYear() );
+                list.add( SurveyStatsReportUser.getMonth() );
+                list.add( SurveyStatsReportUser.getNpsDetractors() );
+                list.add( SurveyStatsReportUser.getNpsPassives() );
+                list.add( SurveyStatsReportUser.getNpsPromoters() );   
+                npsStats.add( list );
+            }
+        }
+        
+        LOG.info("Method for getting NPS stats for NPS stats graph, getNpsStatsGraph() has finished");
+        return npsStats;
+    }
+    
+    @Override
     public List<List<Object>> getCompletionRate(Long entityId , String entityType){
         LOG.info("Method for getting completion Rate for Completion Rate graph, getCompletionRate() has started");
 

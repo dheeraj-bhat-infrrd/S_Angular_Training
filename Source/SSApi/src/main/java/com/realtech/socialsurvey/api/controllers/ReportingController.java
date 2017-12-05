@@ -66,6 +66,19 @@ public class ReportingController
         return json;
 
     }
+    
+    @RequestMapping ( value = "/npsstats", method = RequestMethod.GET)
+    @ApiOperation ( value = "Fetch Data for nps Graph")
+    public String getReportingNpsStats( Long entityId, String entityType ) 
+    {
+        LOGGER.info( "Fetching NPS stats Graph for entityType :{} and entityId : {}",entityType,entityId );
+
+        String json = null;
+        List<List<Object>> npsStats = dashboardGraphManagement.getNpsStatsGraph( entityId, entityType );
+        json = new Gson().toJson( npsStats );
+        return json;
+
+    }
 
 
     @RequestMapping ( value = "/getspsfromoverview", method = RequestMethod.GET)
