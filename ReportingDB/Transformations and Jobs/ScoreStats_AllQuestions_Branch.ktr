@@ -112,6 +112,36 @@
   <hop> <from>Calculate Average</from><to>Insert &#x2f; Update</to><enabled>Y</enabled> </hop>
   </order>
   <step>
+    <name>Calculate Average</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var avg_score_cal &#x3d; 0.00&#x3b;&#xd;&#xa;&#xd;&#xa;if &#x28; count&#x3e; 0 &#x29; &#x7b;&#xd;&#xa; 	avg_score_cal &#x3d; sum_count &#x2f; count&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>avg_score_cal</name>
+        <rename>avg_score_cal</rename>
+        <type>Number</type>
+        <length>16</length>
+        <precision>2</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>927</xloc>
+      <yloc>143</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
     <name>Generate random value</name>
     <type>RandomValue</type>
     <description/>
@@ -273,7 +303,7 @@
         <field>
           <aggregate>count</aggregate>
           <subject>count</subject>
-          <type>COUNT_ANY</type>
+          <type>SUM</type>
           <valuefield/>
         </field>
       </fields>
@@ -413,36 +443,6 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>217</xloc>
       <yloc>63</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Calculate Average</name>
-    <type>ScriptValueMod</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var avg_score_cal &#x3d; 0.00&#x3b;&#xd;&#xa;&#xd;&#xa;if &#x28; count&#x3e; 0 &#x29; &#x7b;&#xd;&#xa; 	avg_score_cal &#x3d; sum_count &#x2f; count&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>avg_score_cal</name>
-        <rename>avg_score_cal</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>N</replace>
-      </field>    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>927</xloc>
-      <yloc>143</yloc>
       <draw>Y</draw>
       </GUI>
     </step>

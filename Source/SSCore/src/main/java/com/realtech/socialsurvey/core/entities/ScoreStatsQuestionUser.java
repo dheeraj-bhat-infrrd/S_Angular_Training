@@ -27,20 +27,11 @@ public class ScoreStatsQuestionUser {
     @Column ( name = "question")
     private String question;
     
-    @Column ( name = "five_star")
-    private int fiveStar;
+    @Column ( name = "sum")
+    private float sum;
     
-    @Column ( name = "four_star")
-    private int fourStar;
-    
-    @Column ( name = "three_star")
-    private int threeStar;
-    
-    @Column ( name = "two_star")
-    private int twoStar;
-    
-    @Column ( name = "one_star")
-    private int oneStar;
+    @Column ( name = "count")
+    private int count;
     
     @Column ( name = "month_val")
     private int monthVal;
@@ -83,46 +74,6 @@ public class ScoreStatsQuestionUser {
 		this.question = question;
 	}
 
-	public int getFiveStar() {
-		return fiveStar;
-	}
-
-	public void setFiveStar(int fiveStar) {
-		this.fiveStar = fiveStar;
-	}
-
-	public int getFourStar() {
-		return fourStar;
-	}
-
-	public void setFourStar(int fourStar) {
-		this.fourStar = fourStar;
-	}
-
-	public int getThreeStar() {
-		return threeStar;
-	}
-
-	public void setThreeStar(int threeStar) {
-		this.threeStar = threeStar;
-	}
-
-	public int getTwoStar() {
-		return twoStar;
-	}
-
-	public void setTwoStar(int twoStar) {
-		this.twoStar = twoStar;
-	}
-
-	public int getOneStar() {
-		return oneStar;
-	}
-
-	public void setOneStar(int oneStar) {
-		this.oneStar = oneStar;
-	}
-
 	public int getMonthVal() {
 		return monthVal;
 	}
@@ -147,12 +98,38 @@ public class ScoreStatsQuestionUser {
 		this.avgScore = avgScore;
 	}
 
-	@Override
-	public String toString() {
-		return "ScoreStatsQuestionUser [scoreStatsQuestionUserId=" + scoreStatsQuestionUserId + ", userId=" + userId
-				+ ", questionId=" + questionId + ", question=" + question + ", fiveStar=" + fiveStar + ", fourStar="
-				+ fourStar + ", threeStar=" + threeStar + ", twoStar=" + twoStar + ", oneStar=" + oneStar
-				+ ", monthVal=" + monthVal + ", yearVal=" + yearVal + ", avgScore=" + avgScore + "]";
-	}
+	
+	public float getSum()
+    {
+        return sum;
+    }
+
+    public void setSum( float sum )
+    {
+        this.sum = sum;
+    }
+
+    public int getCount()
+    {
+        return count;
+    }
+
+    public void setCount( int count )
+    {
+        this.count = count;
+    }
+
+    public static long getSerialversionuid()
+    {
+        return serialVersionUID;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "ScoreStatsQuestionUser [scoreStatsQuestionUserId=" + scoreStatsQuestionUserId + ", userId=" + userId
+            + ", questionId=" + questionId + ", question=" + question + ", sum=" + sum + ", count=" + count + ", monthVal="
+            + monthVal + ", yearVal=" + yearVal + ", avgScore=" + avgScore + "]";
+    }
 
 }

@@ -303,7 +303,7 @@
         <field>
           <aggregate>count</aggregate>
           <subject>count</subject>
-          <type>COUNT_ANY</type>
+          <type>SUM</type>
           <valuefield/>
         </field>
       </fields>
