@@ -2324,7 +2324,7 @@ public class EmailServicesImpl implements EmailServices
     
     @Async
     @Override
-    public void sendPaymentFailedAlertEmail( String recipientMailId, String displayName, String companyName )
+    public void sendPaymentRetriesFailedAlertEmailToAdmin( String recipientMailId, String displayName, String companyName, long companyId  )
         throws InvalidInputException, UndeliveredEmailException
     {
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
@@ -2345,13 +2345,43 @@ public class EmailServicesImpl implements EmailServices
         messageBodyReplacements
             .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.PAYMENT_RETRIES_FAILED_MAIL_BODY );
         messageBodyReplacements
-            .setReplacementArgs( Arrays.asList( appLogoUrl, displayName, companyName ) );
+            .setReplacementArgs( Arrays.asList( appLogoUrl, displayName, companyName, Long.toString( companyId )  ) );
+
+        LOG.debug( "Calling email sender to send mail" );
+        emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );
+        LOG.info( "Successfully sent payment retry failed alert mail" );
+    }
+    
+    
+    @Async
+    @Override
+    public void sendPaymentFailedAlertEmailToAdmin( String recipientMailId, String displayName, String companyName , long companyId )
+        throws InvalidInputException, UndeliveredEmailException
+    {
+        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+            LOG.error( "Recipient email Id is empty or null for sending retries  mail " );
+            throw new InvalidInputException( "Recipient email Id is empty or null for sending payment faield alert mail " );
+        }
+        if ( displayName == null || displayName.isEmpty() ) {
+            LOG.error( "displayName parameter is empty or null for sending retry  mail " );
+            throw new InvalidInputException( "displayName parameter is empty or null for sending payment faield alert mail " );
+        }
+
+        LOG.info( "Sending payment faield alert email to : " + recipientMailId );
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+        String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.PAYMENT_FAILED_MAIL_SUBJECT;
+
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        messageBodyReplacements
+            .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.PAYMENT_FAILED_MAIL_BODY );
+        messageBodyReplacements
+            .setReplacementArgs( Arrays.asList( appLogoUrl, displayName, companyName, Long.toString( companyId )  ) );
 
         LOG.debug( "Calling email sender to send mail" );
         emailSender.sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );
         LOG.info( "Successfully sent payment faield alert mail" );
     }
-    
     
     
     @Async
