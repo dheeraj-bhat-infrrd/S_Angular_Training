@@ -10301,3 +10301,108 @@ img.lead-img {
 .trans-monitor-legend-item{
 	margin-left:50px;
 }
+
+/* nps question styles */
+
+.span-1to10{
+	display: inline-block;
+    width: 8%;
+    font-weight: bold !important;
+    font-size: 16px;
+}
+
+.container-1to10 {
+    width: 400px;
+    height: 40px;
+    padding: 9px 0;
+    display: inline-block;
+    margin: 0 auto;
+}
+
+.inner-container-1to10{
+	border: 1px solid #e0e0e0;
+    border-radius: 15px;
+    background-color: #fff;
+}
+
+.radio-container{
+	display: inline-block;
+    margin: 35px auto;	
+}
+
+.sq-1to10-range{
+	width: 500px;
+    height: 150px;
+    margin: 0 auto;
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    background-color: #f5f6f8;
+}
+
+.sq-1to10-range-val{
+	width: 400px;
+    margin: 0 auto;
+    display: inline-block;
+    padding: 0 10px 0 15px;
+    color: black;
+    font-weight: bold !important;
+}
+
+.radio-1to10{
+	float: left;
+    width: 10%;
+    display: inline-block;
+}
+
+.radio-div{
+	width:30px;
+	height:30px;
+	display:inline-block;
+	float:left;
+	margin-left:5px;
+}
+
+.radio-outer{
+	height:20px;
+	width:20px;
+	border:1px solid #21beef;
+	border-radius:100%;
+	margin:0 auto;
+	cursor: pointer;
+}
+
+.radio-outer-gray{
+	height:20px;
+	width:20px;
+	border:1px solid #909090;
+	border-radius:100%;
+	margin:0 auto;
+	cursor: pointer;
+}
+
+.radio-inner{
+	height:10px;
+	width:10px;
+	background-color:#21beef;
+	border-radius:100%;
+	margin:4px auto;
+}
+
+.sq-range-1to10-input{
+	width: 45%;
+    height: 30px;
+    border: 1px solid #D7D7D7;
+    background-color: #FCFCFC;
+    border-radius: 3px;
+    padding: 0 10px;
+}
+
+.text-align-right{
+	text-align:right;
+	text-align:-webkit-right;
+}
+
+.edit-survey-radio-container{
+	margin: 25px auto; 
+	display: grid;
+}
