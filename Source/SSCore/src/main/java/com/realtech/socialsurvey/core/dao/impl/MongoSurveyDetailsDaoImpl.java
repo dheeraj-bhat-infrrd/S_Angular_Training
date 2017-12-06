@@ -2909,7 +2909,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
      */
     @Override
     public List<SurveyDetails> getFilteredSurveys( int start, int batchSize, long companyId, String status, String mood,
-        Long startSurveyID, Date startReviewDate, Date startTransactionDate, List<Long> userIds )
+        Long startSurveyID, Date startReviewDate, Date startTransactionDate, List<Long> userIds, boolean isRetaken )
     {
         LOG.debug( "Method getSurveyByStartIndexAndStatus() started." );
 
@@ -2950,6 +2950,10 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         //user id criteria
         if ( userIds != null )
             query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).in( userIds ) );
+        
+        //add retake survey acriteria
+        if ( isRetaken )
+            query.addCriteria( Criteria.where( CommonConstants.RETAKE_SURVEY_COLUMN ).is( true ) );
 
         //get the oldest record
         query.with( new Sort( Sort.Direction.DESC, CommonConstants.MODIFIED_ON_COLUMN ) );
@@ -2969,7 +2973,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
     @Override
     public Long getFilteredSurveyCount( long companyId, String status, String mood, Long startSurveyID, Date startReviewDate,
-        Date startTransactionDate, List<Long> userIds )
+        Date startTransactionDate, List<Long> userIds, boolean isRetaken )
     {
         LOG.debug( "Method to get count of total number of surveys completed so far, getCompletedSurveyCount() started." );
 
@@ -3010,11 +3014,79 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         if ( userIds != null )
             query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).in( userIds ) );
 
+        //add retake survey acriteria
+        if ( isRetaken )
+            query.addCriteria( Criteria.where( CommonConstants.RETAKE_SURVEY_COLUMN ).is( true ) );
+        
         LOG.debug( "Method to get count of total number of surveys completed so far, getCompletedSurveyCount() finished." );
         return mongoTemplate.count( query, SURVEY_DETAILS_COLLECTION );
 
     }
 
+    
+    @Override
+    public Float getFilteredSurveyAvgScore( long companyId,  String mood, Long startSurveyID, Date startReviewDate,
+        Date startTransactionDate, List<Long> userIds, boolean isRetaken )
+    {
+        LOG.debug( "Method to avg score of surveys, getFilteredSurveyAvgScore() started." );
+
+        
+        BasicDBList pipeline = new BasicDBList();
+        //match for non abusive reviews
+        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.COMPANY_ID_COLUMN , companyId ) ) );
+
+        // add status criteria
+        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.STAGE_COLUMN ,  CommonConstants.SURVEY_STAGE_COMPLETE  ) ) );
+        
+        //add mood criteria
+        if ( !StringUtils.isEmpty( mood ) ) {
+            pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.MOOD_COLUMN , mood ) ) );
+        }
+
+        //add survey id criteria
+        if ( startSurveyID != null && startSurveyID > 0l )
+            pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.SURVEY_PREINITIATION_ID_COLUMN,  new BasicDBObject( "$gte" , startSurveyID ) )) );
+
+        // transaction date criteria
+        if ( startTransactionDate != null )
+            pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.SURVEY_TRANSACTION_DATE_COLUMN,  new BasicDBObject( "$gte" , startTransactionDate ) )) );
+
+        // review date criteria
+        if ( startReviewDate != null )
+            pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN,  new BasicDBObject( "$gte" , startReviewDate ) )) );
+
+        //user id criteria
+        if ( userIds != null )
+            pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.AGENT_ID_COLUMN,  new BasicDBObject( "$in" , userIds ) )) );
+
+        //add retake survey acriteria
+        if ( isRetaken )
+            pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.RETAKE_SURVEY_COLUMN , true ) ) );
+        
+        
+        // grouping
+        pipeline.add( new BasicDBObject( "$group",  new BasicDBObject( "_id", null ).append( "score", new BasicDBObject( "$avg",  "$score"  ) ) ) );
+        BasicDBObject aggregationObject = new BasicDBObject( "aggregate", SURVEY_DETAILS_COLLECTION ).append( "pipeline",
+            pipeline );
+        
+        CommandResult aggregateResult = mongoTemplate.executeCommand( aggregationObject );
+        float avgScore = 0;
+        List<BasicDBObject> aggregatedData = null;
+        if ( aggregateResult.containsField( "result" ) ) {
+            aggregatedData = (List<BasicDBObject>) aggregateResult.get( "result" );
+            if ( aggregatedData.size() > 0 ) {
+                for ( BasicDBObject data : aggregatedData ) {
+                     avgScore = Float.parseFloat( data.get( "score" ).toString() ) ;
+                }
+            }
+        }
+        
+       
+                
+        LOG.debug( "Method to avg score of surveys, getFilteredSurveyAvgScore() finished." );
+        return avgScore;
+
+    }
 
     @Override
     public void insertApiRequestDetails( ApiRequestDetails apiRequestDetails )
@@ -3379,5 +3451,23 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
         LOG.debug( "Method updateRegionIdForAllSurveysOfBranch() finished for branchId + " + branchId );
     }
+    
+    @Override
+    public void updateSurveyDetailsForRetake( SurveyDetails surveyDetails )
+    {
+        LOG.debug( "Method insertSurveyDetails() to insert details of survey started." );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyDetails.get_id() ) );
 
+        Update update = new Update();
+        update.set( CommonConstants.RETAKE_SURVEY_COLUMN, surveyDetails.isRetakeSurvey());
+        update.set( CommonConstants.NO_OF_RETAKE_COLUMN, surveyDetails.getNoOfRetake() );
+        update.set( CommonConstants.LAST_RETAKE_REQUEST_DATE_COLUMN, surveyDetails.getLastRetakeRequestDate());
+        update.set( CommonConstants.RETAKE_SURVEY_HISTORY_COLUMN, surveyDetails.getRetakeSurveyHistory());
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
+        mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
+        LOG.debug( "Method insertSurveyDetails() to insert details of survey finished." );
+    }
+    
+    
 }
