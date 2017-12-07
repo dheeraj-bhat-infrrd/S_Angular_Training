@@ -2735,6 +2735,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                     } else {
                         LOG.debug( "This doesnt contain a first name and last name" );
                         firstName = emailId.substring( 0, emailId.indexOf( "@" ) );
+                        lastName = "";
                     }
 
                 }
