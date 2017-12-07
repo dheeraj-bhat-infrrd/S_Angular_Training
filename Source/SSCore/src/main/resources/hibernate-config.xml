@@ -58,6 +58,7 @@
 				<value>com.realtech.socialsurvey.core.entities.SurveyQuestionsAnswerOption</value>
 				<value>com.realtech.socialsurvey.core.entities.SurveyQuestionsMapping</value>
 				<value>com.realtech.socialsurvey.core.entities.SurveyVerticalMapping</value>
+				<value>com.realtech.socialsurvey.core.entities.Survey0To10Questions</value>
 				<value>com.realtech.socialsurvey.core.entities.User</value>
 				<value>com.realtech.socialsurvey.core.entities.UserInvite</value>
 				<value>com.realtech.socialsurvey.core.entities.UserProfile</value>
