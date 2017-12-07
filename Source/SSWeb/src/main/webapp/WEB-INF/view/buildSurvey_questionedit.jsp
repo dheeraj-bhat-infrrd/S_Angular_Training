@@ -7,6 +7,7 @@
 </c:if>
 
 <c:set value="${surveyQuestion.isUserRankingQuestion }" var="isUserRankingQuestion" />
+<c:set value="${surveyQuestion.isUserRankingQuestion }" var="isNpsQuestion" />
 
 <c:set value="false" var="isUserRankingQuestionVal" />
 <c:if test="${isUserRankingQuestion == 1}">
@@ -32,23 +33,84 @@
 						<c:choose>
 							<c:when test="${questionType == 'sb-range-smiles' || questionType == 'sb-range-star' || questionType == 'sb-range-scale'}">
 								<div data-id="sb-range" class="bd-tab-rat float-left bd-ans-tab-item bd-ans-tab-sel"><spring:message code="label.rating.key" /></div>
+								<div data-id="sb-range-0to10" class="bd-tab-rad float-left bd-ans-tab-item"><spring:message code="label.rating.0to10.key" /></div>
 								<div data-id="sb-sel-desc" class="bd-tab-com float-left bd-ans-tab-item"><spring:message code="label.comment.key" /></div>
 								<div data-id="sb-sel-mcq" class="bd-tab-mcq float-left bd-ans-tab-item"><spring:message code="label.multiplechoice.key" /></div>
 							</c:when>
 							<c:when test="${questionType == 'sb-sel-mcq'}">
 								<div data-id="sb-range" class="bd-tab-rat float-left bd-ans-tab-item"><spring:message code="label.rating.key" /></div>
+								<div data-id="sb-range-0to10" class="bd-tab-rad float-left bd-ans-tab-item"><spring:message code="label.rating.0to10.key" /></div>
 								<div data-id="sb-sel-desc" class="bd-tab-com float-left bd-ans-tab-item"><spring:message code="label.comment.key" /></div>
 								<div data-id="sb-sel-mcq" class="bd-tab-mcq float-left bd-ans-tab-item bd-ans-tab-sel"><spring:message code="label.multiplechoice.key" /></div>
 							</c:when>
 							<c:when test="${questionType == 'sb-sel-desc'}">
 								<div data-id="sb-range" class="bd-tab-rat float-left bd-ans-tab-item"><spring:message code="label.rating.key" /></div>
+								<div data-id="sb-range-0to10" class="bd-tab-rad float-left bd-ans-tab-item"><spring:message code="label.rating.0to10.key" /></div>
 								<div data-id="sb-sel-desc" class="bd-tab-com float-left bd-ans-tab-item bd-ans-tab-sel"><spring:message code="label.comment.key" /></div>
+								<div data-id="sb-sel-mcq" class="bd-tab-mcq float-left bd-ans-tab-item"><spring:message code="label.multiplechoice.key" /></div>
+							</c:when>
+							<c:when test="${questionType == 'sb-range-0to10'}">
+								<div data-id="sb-range" class="bd-tab-rat float-left bd-ans-tab-item"><spring:message code="label.rating.key" /></div>
+								<div data-id="sb-range-0to10" class="bd-tab-rad float-left bd-ans-tab-item bd-ans-tab-sel"><spring:message code="label.rating.0to10.key" /></div>
+								<div data-id="sb-sel-desc" class="bd-tab-com float-left bd-ans-tab-item"><spring:message code="label.comment.key" /></div>
 								<div data-id="sb-sel-mcq" class="bd-tab-mcq float-left bd-ans-tab-item"><spring:message code="label.multiplechoice.key" /></div>
 							</c:when>
 						</c:choose>
 					</div>
 				</div>
 				
+				<c:set var="radioClass" scope="page" value=""/>
+				<c:if test="${questionType != 'sb-range-0to10'}">
+					<c:set var="radioClass" scope="page" value="hide"/>
+				</c:if>
+
+				<div class="bd-ans-type-radio bd-ans-type-item ${radioClass}">
+					<div class="bd-and-tier2"><spring:message code="label.customer.customize.descriptions.key" /></div>
+					<div class="clearfix bd-ans-type bd-ans-type-radio-adj">
+						<div id="sq-radio-1to10-edit" class="sq-1to10-range" style="height:160px" selected-rating-radio="">
+							<div class="edit-survey-radio-container">
+								<div class="container-1to10 inner-container-1to10">
+									<c:forEach begin="0" end="10" varStatus="loop">
+										<c:choose>
+											<c:when test="${loop.index == 0}">
+												<div class="radio-div" style="margin-left: 10px">
+													<div class="radio-outer-gray sq-radio"></div>
+												</div>
+											</c:when>
+											<c:otherwise>
+												<div class="radio-div">
+													<div class="radio-outer-gray sq-radio"></div>
+												</div>
+											</c:otherwise>
+										</c:choose>
+									</c:forEach>
+								</div>
+								<div class="container-1to10">
+									<c:forEach begin="0" end="10" varStatus="numLoop">
+										<div class="span-1to10" style="text-align:right">${numLoop.index}</div>
+									</c:forEach>
+								</div>
+								<div class="sq-1to10-range-val">
+									<input name="sq-range-1to10-customize" class="float-left sq-range-1to10-input" value="Not at all likely">
+									<input name="sq-range-1to10-customize" class="float-right sq-range-1to10-input text-align-right" value="Very Likely">
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="bd-q-pu-done-wrapper bd-q-pu-done-wrapper-override clearfix">
+						<div id="user-ranking-chkbox-wrapper-edit" class="clearfix" style="width: 200px;">
+							<div id="user-ranking-chkbox-edit" class='float-left user-ranking-chkbox bd-check-img <c:if test="${ isUserRankingQuestion == 0}">bd-check-img-checked</c:if>'></div>
+							<input type="hidden" id="user-ranking-ques-edit" name="user-ranking-ques" value=${ isUserRankingQuestionVal }>
+							<div class="float-left  listing-access-txt cursor-pointer">Considered for User Ranking</div>
+						</div>
+						<div id="avg-score-chkbox-wrapper-edit" class="clearfix" style="width: 210px;"> 
+							<div id="avg-score-chkbox-edit" class='float-left avg-score-chkbox bd-check-img <c:if test="${ isNpsQuestion == 0}">bd-check-img-checked</c:if>'></div>
+							<input type="hidden" id="avg-score-ques-edit" name="avg-score-ques" value=${ isNpsQuestion }>
+							<div class="float-left listing-access-txt cursor-pointer">Considered for Average Score</div>
+						</div>
+  					</div>
+				</div>
+
 				<c:set var="ratingclass" scope="page" value=""/>
 				<c:if test="${questionType != 'sb-range-smiles' && questionType != 'sb-range-star' && questionType != 'sb-range-scale'}">
 					<c:set var="ratingclass" scope="page" value="hide"/>
@@ -117,6 +179,7 @@
 				<c:if test="${questionType != 'sb-sel-mcq'}">
 					<c:set var="mcqclass" scope="page" value="hide"/>
 				</c:if>
+				
 				<div class="bd-ans-type-mcq bd-ans-type-item ${mcqclass}">
 					<div class="bd-and-tier2"><spring:message code="label.customer.answerfrom.key" /></div>
 					<div class="clearfix bd-ans-type bd-ans-type-mcq-adj">

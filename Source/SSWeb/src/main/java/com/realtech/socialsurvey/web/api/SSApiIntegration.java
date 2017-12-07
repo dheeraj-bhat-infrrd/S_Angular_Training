@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.web.api;
 
 
-import org.springframework.web.bind.annotation.PathVariable;
 
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
 import com.realtech.socialsurvey.web.api.entities.AccountRegistrationAPIRequest;
@@ -201,11 +200,11 @@ public interface SSApiIntegration
     
     //survey api's 
     @POST("/v2/surveys/{surveyId}/response")
-    Response updateSurveyResponse(@PathVariable ("surveyId") String surveyId, @Query ("question") String question, @Query ("questionType") String questionType, @Query ("answer") String answer, @Query ("stage") int stage,
+    Response updateSurveyResponse(@Path ("surveyId") String surveyId, @Query ("question") String question, @Query ("questionType") String questionType, @Query ("answer") String answer, @Query ("stage") int stage,
         @Query ("isUserRankingQuestion") boolean isUserRankingQuestion, @Query ("isNpsQuestion") boolean isNpsQuestion  );
     
     @POST("/v2/surveys/{surveyId}/score")
-    Response updateScore(@PathVariable ("surveyId") String surveyId, @Query ("mood") String mood, @Query ("feedback") String feedback,
+    Response updateScore(@Path ("surveyId") String surveyId, @Query ("mood") String mood, @Query ("feedback") String feedback,
         @Query ("isAbusive") boolean isAbusive, @Query ("agreedToShare") String agreedToShare  );
     
     @GET("/v2/swearwords")
