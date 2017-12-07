@@ -2911,7 +2911,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
      * Method to fetch survey details on the basis of agentId and customer email.
      */
     @Override
-    public List<SurveyDetails> getFilteredSurveys( int start, int batchSize, long companyId, String status, String mood,
+    public List<SurveyDetails> getFilteredSurveys( int start, int batchSize, long companyId, String mood,
         Long startSurveyID, Date startReviewDate, Date startTransactionDate, List<Long> userIds, boolean isRetaken )
     {
         LOG.debug( "Method getSurveyByStartIndexAndStatus() started." );
@@ -2922,15 +2922,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
 
         // add status criteria
-        if ( status != null ) {
-            if ( status.equals( CommonConstants.SURVEY_API_SURVEY_STATUS_COMPLETE ) ) {
-                query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
-            } else if ( status.equals( CommonConstants.SURVEY_API_SURVEY_STATUS_INCOMPLETE ) ) {
-                query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).ne( CommonConstants.SURVEY_STAGE_COMPLETE ) );
-            } else if ( status.equals( CommonConstants.SURVEY_API_SURVEY_STATUS_ALL ) ) {
-
-            }
-        }
+        query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
+        
 
         //add mood criteria
         if ( !StringUtils.isEmpty( mood ) ) {
@@ -2975,7 +2968,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
 
     @Override
-    public Long getFilteredSurveyCount( long companyId, String status, String mood, Long startSurveyID, Date startReviewDate,
+    public Long getFilteredSurveyCount( long companyId, String mood, Long startSurveyID, Date startReviewDate,
         Date startTransactionDate, List<Long> userIds, boolean isRetaken )
     {
         LOG.debug( "Method to get count of total number of surveys completed so far, getCompletedSurveyCount() started." );
@@ -2986,15 +2979,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
 
         // add status criteria
-        if ( status != null ) {
-            if ( status.equals( CommonConstants.SURVEY_API_SURVEY_STATUS_COMPLETE ) ) {
-                query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
-            } else if ( status.equals( CommonConstants.SURVEY_API_SURVEY_STATUS_INCOMPLETE ) ) {
-                query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).ne( CommonConstants.SURVEY_STAGE_COMPLETE ) );
-            } else if ( status.equals( CommonConstants.SURVEY_API_SURVEY_STATUS_ALL ) ) {
-
-            }
-        }
+        query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
+        
 
         //add mood criteria
         if ( !StringUtils.isEmpty( mood ) ) {

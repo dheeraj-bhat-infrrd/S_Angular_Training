@@ -3896,13 +3896,13 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      */
     @Override
     @Transactional
-    public SurveysAndReviewsVO getSurveysByFilterCriteria( String status, String mood, Long startSurveyID, Date startReviewDate,
+    public SurveysAndReviewsVO getSurveysByFilterCriteria( String mood, Long startSurveyID, Date startReviewDate,
         Date startTransactionDate, List<Long> userIds, boolean isRetaken, int startIndex, int count, long companyId )
     {
         LOG.debug( "method getSurveysByStatus started for companyId " + companyId );
 
         //get mongo survey count
-        int mongoSurveyCount = getMongoSurveyCountForCompanyBySurveyStatus( companyId, status, mood, startSurveyID, startReviewDate,
+        int mongoSurveyCount = getMongoSurveyCountForCompanyBySurveyStatus( companyId, mood, startSurveyID, startReviewDate,
             startTransactionDate, userIds, isRetaken );
         int endIndex = startIndex + count;
 
@@ -3917,7 +3917,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         //get survey from mongo
         List<SurveyDetails> surveyDetails = null;
         if ( mongoBatch > 0 )
-            surveyDetails = getSurveysForCompanyBySurveyStatus( companyId, status, monogStartIndex, mongoBatch, mood,
+            surveyDetails = getSurveysForCompanyBySurveyStatus( companyId, monogStartIndex, mongoBatch, mood,
                 startSurveyID, startReviewDate, startTransactionDate, userIds, isRetaken );
         else
             surveyDetails = new ArrayList<SurveyDetails>();
@@ -3981,10 +3981,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     
     @Override
     @Transactional
-    public Integer getSurveysCountByFilterCriteria( String status, String mood, Long startSurveyID, Date startReviewDate,
+    public Integer getSurveysCountByFilterCriteria( String mood, Long startSurveyID, Date startReviewDate,
         Date startTransactionDate, List<Long> userIds, boolean isRetaken, long companyId )
     {
-        return getMongoSurveyCountForCompanyBySurveyStatus( companyId, status, mood, startSurveyID, startReviewDate,
+        return getMongoSurveyCountForCompanyBySurveyStatus( companyId, mood, startSurveyID, startReviewDate,
             startTransactionDate, userIds, isRetaken );
         
     }
@@ -4012,15 +4012,15 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      * @param userIds
      * @return
      */
-    private int getMongoSurveyCountForCompanyBySurveyStatus( long companyId, String status, String mood, Long startSurveyID,
+    private int getMongoSurveyCountForCompanyBySurveyStatus( long companyId, String mood, Long startSurveyID,
         Date startReviewDate, Date startTransactionDate, List<Long> userIds , boolean isRetaken )
     {
-        LOG.debug( "method getSurveyCountForCompanyBySurveyStatus started for companyId %s , status %s ", companyId, status );
+        LOG.debug( "method getSurveyCountForCompanyBySurveyStatus started for companyId %s ", companyId );
 
-        long mongoSurveyCount = surveyDetailsDao.getFilteredSurveyCount( companyId, status, mood, startSurveyID,
+        long mongoSurveyCount = surveyDetailsDao.getFilteredSurveyCount( companyId, mood, startSurveyID,
             startReviewDate, startTransactionDate, userIds, isRetaken );
 
-        LOG.debug( "method getSurveyCountForCompanyBySurveyStatus ended for companyId %s , status %s ", companyId, status );
+        LOG.debug( "method getSurveyCountForCompanyBySurveyStatus ended for companyId %s ", companyId );
 
         return (int) mongoSurveyCount;
     }
@@ -4034,18 +4034,18 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      * @param batchSize
      * @return
      */
-    private List<SurveyDetails> getSurveysForCompanyBySurveyStatus( long companyId, String status, int start, int batchSize,
+    private List<SurveyDetails> getSurveysForCompanyBySurveyStatus( long companyId, int start, int batchSize,
         String mood, Long startSurveyID, Date startReviewDate, Date startTransactionDate, List<Long> userIds , boolean isRetaken )
     {
         LOG.debug(
-            "method getSurveysForCompanyBySurveyStatus started for companyId %s , startIndex %s , batchSize %s , status %s ",
-            companyId, start, batchSize, status );
-        List<SurveyDetails> surveyDetails = surveyDetailsDao.getFilteredSurveys( start, batchSize, companyId, status, mood,
+            "method getSurveysForCompanyBySurveyStatus started for companyId %s , startIndex %s , batchSize %s ",
+            companyId, start, batchSize );
+        List<SurveyDetails> surveyDetails = surveyDetailsDao.getFilteredSurveys( start, batchSize, companyId, mood,
             startSurveyID, startReviewDate, startTransactionDate, userIds, isRetaken );
 
         LOG.debug(
-            "method getSurveysForCompanyBySurveyStatus ended for companyId %s , startIndex %s , batchSize %s , status %s ",
-            companyId, start, batchSize, status );
+            "method getSurveysForCompanyBySurveyStatus ended for companyId %s , startIndex %s , batchSize %s  ",
+            companyId, start, batchSize );
         return surveyDetails;
     }
 

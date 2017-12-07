@@ -198,7 +198,7 @@ public class SurveyApiController
         }
 
         //get data from database
-        SurveysAndReviewsVO surveysAndReviewsVO = surveyHandler.getSurveysByFilterCriteria( status, null, null, null, null,
+        SurveysAndReviewsVO surveysAndReviewsVO = surveyHandler.getSurveysByFilterCriteria( null, null, null, null,
             null, false, start, count, companyId );
 
         //create vo object
