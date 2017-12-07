@@ -63,6 +63,10 @@ public class OverviewManagementImpl implements OverviewManagement
     private static final String DETRACTORPERCENTAGE = "DetractorPercentage";
     private static final String PASSIVESPERCENTAGE = "PassivesPercentage";
     private static final String PROMOTERPERCENTAGE = "PromoterPercentage";
+    private static final String NPS_SCORE = "NpsScore";
+    private static final String NPS_DETRACTORPERCENTAGE = "NpsDetractorPercentage";
+    private static final String NPS_PASSIVESPERCENTAGE = "NpsPassivesPercentage";
+    private static final String NPS_PROMOTERPERCENTAGE = "NpsPromoterPercentage";
 
     @Autowired
     private OverviewUserDao overviewUserDao;
@@ -274,7 +278,7 @@ public class OverviewManagementImpl implements OverviewManagement
     @Transactional ( value = "transactionManagerForReporting")
     public Map<String, Object> fetchSpsAllTime( long entityId, String entityType ) throws NonFatalException
     {
-        LOG.info( "Method to fetchSpsAllTime for entityId : {} , entityType : {} started", entityId,
+        LOG.info( "Method to fetchSpsAllTime and npsAllTime for entityId : {} , entityType : {} started", entityId,
             entityType );
         Map<String, Object> overviewMap = new HashMap<>();
         
@@ -286,6 +290,10 @@ public class OverviewManagementImpl implements OverviewManagement
                 overviewMap.put( DETRACTORPERCENTAGE, overviewUser.getDetractorPercentage() );
                 overviewMap.put( PASSIVESPERCENTAGE, overviewUser.getPassivesPercentage() );
                 overviewMap.put( PROMOTERPERCENTAGE, overviewUser.getPromoterPercentage() );
+                overviewMap.put( NPS_SCORE, overviewUser.getNpsScore() );
+                overviewMap.put( NPS_DETRACTORPERCENTAGE, overviewUser.getNpsDetractorPercentage() );
+                overviewMap.put( NPS_PASSIVESPERCENTAGE, overviewUser.getNpsPassivesPercentage() );
+                overviewMap.put( NPS_PROMOTERPERCENTAGE, overviewUser.getNpsPromoterPercentage() );
             }
 
 
@@ -297,6 +305,10 @@ public class OverviewManagementImpl implements OverviewManagement
                 overviewMap.put( DETRACTORPERCENTAGE, overviewBranch.getDetractorPercentage() );
                 overviewMap.put( PASSIVESPERCENTAGE, overviewBranch.getPassivesPercentage() );
                 overviewMap.put( PROMOTERPERCENTAGE, overviewBranch.getPromoterPercentage() );
+                overviewMap.put( NPS_SCORE, overviewBranch.getNpsScore() );
+                overviewMap.put( NPS_DETRACTORPERCENTAGE, overviewBranch.getNpsDetractorPercentage() );
+                overviewMap.put( NPS_PASSIVESPERCENTAGE, overviewBranch.getNpsPassivesPercentage() );
+                overviewMap.put( NPS_PROMOTERPERCENTAGE, overviewBranch.getNpsPromoterPercentage() );
             }
 
 
@@ -308,6 +320,10 @@ public class OverviewManagementImpl implements OverviewManagement
                 overviewMap.put( DETRACTORPERCENTAGE, overviewRegion.getDetractorPercentage() );
                 overviewMap.put( PASSIVESPERCENTAGE, overviewRegion.getPassivesPercentage() );
                 overviewMap.put( PROMOTERPERCENTAGE, overviewRegion.getPromoterPercentage() );
+                overviewMap.put( NPS_SCORE, overviewRegion.getNpsScore() );
+                overviewMap.put( NPS_DETRACTORPERCENTAGE, overviewRegion.getNpsDetractorPercentage() );
+                overviewMap.put( NPS_PASSIVESPERCENTAGE, overviewRegion.getNpsPassivesPercentage() );
+                overviewMap.put( NPS_PROMOTERPERCENTAGE, overviewRegion.getNpsPromoterPercentage() );
             }
 
         } else if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
@@ -318,15 +334,19 @@ public class OverviewManagementImpl implements OverviewManagement
                 overviewMap.put( DETRACTORPERCENTAGE, overviewCompany.getDetractorPercentage() );
                 overviewMap.put( PASSIVESPERCENTAGE, overviewCompany.getPassivesPercentage() );
                 overviewMap.put( PROMOTERPERCENTAGE, overviewCompany.getPromoterPercentage() );
+                overviewMap.put( NPS_SCORE, overviewCompany.getNpsScore() );
+                overviewMap.put( NPS_DETRACTORPERCENTAGE, overviewCompany.getNpsDetractorPercentage() );
+                overviewMap.put( NPS_PASSIVESPERCENTAGE, overviewCompany.getNpsPassivesPercentage() );
+                overviewMap.put( NPS_PROMOTERPERCENTAGE, overviewCompany.getNpsPromoterPercentage() );
             }
 
         }
-        LOG.info( "Method to fetchSpsAllTime for entityId : {} , entityType : {} ended", entityId,
+        LOG.info( "Method to fetchSpsAllTime and npsAllTime for entityId : {} , entityType : {} ended", entityId,
             entityType );
         return overviewMap;
 
     }
-
+    
     @Override
     @Transactional ( value = "transactionManagerForReporting")
     public Map<String, Object> fetchOverviewDetailsBasedOnMonth( long entityId, String entityType, int month, int year )

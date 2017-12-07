@@ -100,6 +100,15 @@ public class SurveyStatsReportRegion
     
     @Column( name = "company_name")
     private String companyName;
+    
+    @Column( name = "nps_detractors")
+    private long npsDetractors;
+    
+    @Column( name = "nps_passives")
+    private long npsPassives;
+    
+    @Column( name = "nps_promoters") 
+    private long npsPromoters;
 
     @Column( name = "incomplete")
     private long incomplete;
@@ -392,6 +401,38 @@ public class SurveyStatsReportRegion
     {
         this.incomplete = incomplete;
     }
+    
+    
+
+    public long getNpsDetractors()
+    {
+        return npsDetractors;
+    }
+
+    public void setNpsDetractors( long npsDetractors )
+    {
+        this.npsDetractors = npsDetractors;
+    }
+
+    public long getNpsPassives()
+    {
+        return npsPassives;
+    }
+
+    public void setNpsPassives( long npsPassives )
+    {
+        this.npsPassives = npsPassives;
+    }
+
+    public long getNpsPromoters()
+    {
+        return npsPromoters;
+    }
+
+    public void setNpsPromoters( long npsPromoters )
+    {
+        this.npsPromoters = npsPromoters;
+    }
 
     public static long getSerialversionuid()
     {
@@ -399,13 +440,17 @@ public class SurveyStatsReportRegion
     }
 
     @Override
-    public String toString() {
-        return "SurveyStatsReportBranch [surveyStatsReportId=" + surveyStatsReportId + ", id=" + id + ", companyId=" + companyId + ", regionId=" + regionId
-                + ", trxMonth=" + trxMonth + ", trxRcvd=" + trxRcvd + ", pending=" + pending + ", duplicates=" + duplicates + ", corrupted=" +  corrupted + ", abusive=" + abusive +", "
-                + "oldRecords=" + oldRecords + ", ignored=" + ignored + ", mismatched=" + mismatched + ", sentCount=" +
-                sentCount + ", clickedCount=" +clickedCount + ", completed=" +completed + ", partiallyCompleted=" +partiallyCompleted + ", completePercentage=" +
-                completePercentage +", delta=" +delta +", created_date=" +created_date +", year=" +year +", month=" +month+", avgRating=" +avgRating+", detractors=" +detractors+", passives=" +passives+
-                ", promoters=" +promoters+", regionName=" +regionName+", companyName=" +companyName+", incomplete=" +incomplete+"]";
+    public String toString()
+    {
+        return "SurveyStatsReportRegion [surveyStatsReportId=" + surveyStatsReportId + ", id=" + id + ", companyId=" + companyId
+            + ", regionId=" + regionId + ", trxMonth=" + trxMonth + ", trxRcvd=" + trxRcvd + ", pending=" + pending
+            + ", duplicates=" + duplicates + ", corrupted=" + corrupted + ", abusive=" + abusive + ", oldRecords=" + oldRecords
+            + ", ignored=" + ignored + ", mismatched=" + mismatched + ", sentCount=" + sentCount + ", clickedCount="
+            + clickedCount + ", completed=" + completed + ", partiallyCompleted=" + partiallyCompleted + ", completePercentage="
+            + completePercentage + ", delta=" + delta + ", created_date=" + created_date + ", year=" + year + ", month=" + month
+            + ", avgRating=" + avgRating + ", detractors=" + detractors + ", passives=" + passives + ", promoters=" + promoters
+            + ", regionName=" + regionName + ", companyName=" + companyName + ", npsDetractors=" + npsDetractors
+            + ", npsPassives=" + npsPassives + ", npsPromoters=" + npsPromoters + ", incomplete=" + incomplete + "]";
     }
     
 
