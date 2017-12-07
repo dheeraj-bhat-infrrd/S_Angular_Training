@@ -15,6 +15,7 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.bson.types.ObjectId;
+import org.hibernate.engine.jdbc.internal.DDLFormatterImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -946,7 +947,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         /**
          * fetching only completed surveys
          */
-        query.addCriteria( Criteria.where( CommonConstants.REVIEW_COLUMN ).exists( true ).nin( "" ) );
+        //query.addCriteria( Criteria.where( CommonConstants.REVIEW_COLUMN ).exists( true ).nin( "" ) );
+        query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
+        
         if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
             query.addCriteria( Criteria.where( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) );
         }
@@ -3460,6 +3463,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyDetails.get_id() ) );
 
         Update update = new Update();
+        update.set( CommonConstants.STAGE_COLUMN, surveyDetails.getStage());
+        update.set( CommonConstants.REVIEW_COLUMN , surveyDetails.getReview() );
         update.set( CommonConstants.RETAKE_SURVEY_COLUMN, surveyDetails.isRetakeSurvey());
         update.set( CommonConstants.NO_OF_RETAKE_COLUMN, surveyDetails.getNoOfRetake() );
         update.set( CommonConstants.LAST_RETAKE_REQUEST_DATE_COLUMN, surveyDetails.getLastRetakeRequestDate());
