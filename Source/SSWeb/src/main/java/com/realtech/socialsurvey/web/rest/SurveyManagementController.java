@@ -189,7 +189,9 @@ public class SurveyManagementController
 		String surveyId = request.getParameter("surveyId");
 		//add a request parameter to check if the question is set to nps or not 
 		int isNpsQuestionInt = Integer.parseInt(request.getParameter("isNPSQuestion"));
-
+		//int considerForScoreInt = Integer.parseInt(request.getParameter("considerForScore"));
+	    int considerForScoreInt = 0;
+		int questionId = Integer.parseInt( request.getParameter("questionId") );
 		//encode question and response
 		question = new String( DatatypeConverter.parseBase64Binary(question) );
 		answer = new String( DatatypeConverter.parseBase64Binary(answer) );
@@ -203,11 +205,16 @@ public class SurveyManagementController
 		if(isNpsQuestionInt == CommonConstants.QUESTION_RATING_VALUE_TRUE){
 		    isNpsQuestion = true;
 		}
+		
+		boolean considerForScore = false;
+        if(considerForScoreInt == CommonConstants.QUESTION_RATING_VALUE_TRUE){
+            considerForScore = true;
+        }
 		/*surveyHandler.updateCustomerAnswersInSurvey(surveyId, question, questionType, answer, stage, isUserRankingQuestion, isNpsQuestion);
 		LOG.info("Method storeSurveyAnswer() finished to store response of customer.");
 		return surveyHandler.getSwearWords();*/
 		try{
-		      response = ssApiIntergrationBuilder.getIntegrationApi().updateSurveyResponse( surveyId, question, questionType, answer, stage, isUserRankingQuestion, isNpsQuestion );
+		      response = ssApiIntergrationBuilder.getIntegrationApi().updateSurveyResponse( surveyId, question, questionType, answer, stage, isUserRankingQuestion, isNpsQuestion, questionId, considerForScore );
 		}catch(Exception e){
 		    LOG.error( "Method store survey answer has an exception in api : ",e );
 		}

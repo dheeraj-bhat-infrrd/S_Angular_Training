@@ -421,7 +421,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      */
     @Override
     public void updateCustomerAnswersInSurvey( String surveyId, String question, String questionType, String answer, int stage,
-        boolean isUserRankingQuestion, boolean isNpsQuestion )
+        boolean isUserRankingQuestion, boolean isNpsQuestion, int questionId, boolean considerForScore )
     {
         LOG.info(
             "Method to update answers provided by customer in SURVEY_DETAILS, updateCustomerAnswersInSurvey() started." );
@@ -431,6 +431,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyResponse.setQuestionType( questionType );
         surveyResponse.setIsUserRankingQuestion( isUserRankingQuestion );
         surveyResponse.setIsNpsQuestion( isNpsQuestion );
+        surveyResponse.setQuestionId( questionId );
+        surveyResponse.setConsiderForScore( considerForScore );
         surveyDetailsDao.updateCustomerResponse( surveyId, surveyResponse, stage );
         LOG.info(
             "Method to update answers provided by customer in SURVEY_DETAILS, updateCustomerAnswersInSurvey() finished." );

@@ -201,7 +201,7 @@ public interface SSApiIntegration
     //survey api's 
     @POST("/v2/surveys/{surveyId}/response")
     Response updateSurveyResponse(@Path ("surveyId") String surveyId, @Query ("question") String question, @Query ("questionType") String questionType, @Query ("answer") String answer, @Query ("stage") int stage,
-        @Query ("isUserRankingQuestion") boolean isUserRankingQuestion, @Query ("isNpsQuestion") boolean isNpsQuestion  );
+        @Query ("isUserRankingQuestion") boolean isUserRankingQuestion, @Query ("isNpsQuestion") boolean isNpsQuestion, @Query ("questionId") int questionId, @Query ("considerForScore") boolean considerForScore  );
     
     @POST("/v2/surveys/{surveyId}/score")
     Response updateScore(@Path ("surveyId") String surveyId, @Query ("mood") String mood, @Query ("feedback") String feedback,

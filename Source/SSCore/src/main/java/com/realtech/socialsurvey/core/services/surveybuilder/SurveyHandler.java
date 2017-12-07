@@ -57,9 +57,11 @@ public interface SurveyHandler
      * @param stage
      * @param isUserRankingQuestion
      * @param isNpsQuestion
+     * @param questionId
+     * @param considerForScore
      */
     void updateCustomerAnswersInSurvey( String surveyId, String question, String questionType, String answer, int stage,
-        boolean isUserRankingQuestion, boolean isNpsQuestion );
+        boolean isUserRankingQuestion, boolean isNpsQuestion, int questionId, boolean considerForScore );
 
     /*
      * Method to update customer review and final score on the basis of rating questions in
@@ -406,5 +408,7 @@ public interface SurveyHandler
 
 
     public boolean isFileAlreadyUploaded( String fileName, String uploaderEmail );
+
+
 
 }
