@@ -1372,7 +1372,7 @@ function drawLeaderboardTableStructure(userRankingList,userId,profileMasterId){
 				if(userRankingList[i][0] == userId  && profileMasterId == 4){
 					nonRankedTableData += '<tr class="u-tbl-row leaderboard-row selected-row " >';
 					$('#rank-span').html('NR');
-					$('#user-score-span').html(userRankingList[i][4]);
+					$('#user-score-span').html(userRankingList[i][6]);
 				}else{
 					nonRankedTableData+='<tr class="u-tbl-row leaderboard-row">';
 				}

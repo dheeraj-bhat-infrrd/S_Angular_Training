@@ -17,13 +17,13 @@ public class OverviewUserDaoImpl extends GenericReportingDaoImpl<OverviewUser, S
     @Override
     public String getOverviewUserId( Long userId )
     {
-        LOG.info("Method to get OverviewUserId from UserId, getOverviewUserId() started." );
+        LOG.debug("Method to get OverviewUserId from UserId, getOverviewUserId() started." );
 
         Query query = getSession().createSQLQuery( "SELECT overview_user_id FROM overview_user WHERE user_id = :userId " );
         query.setParameter( "userId", userId  );
         String overviewUserId = (String) query.uniqueResult();
         
-        LOG.info( "Method to get OverviewUserId from UserId, getOverviewUserId() finished." );
+        LOG.debug( "Method to get OverviewUserId from UserId, getOverviewUserId() finished." );
         return overviewUserId;
         
         
@@ -31,6 +31,9 @@ public class OverviewUserDaoImpl extends GenericReportingDaoImpl<OverviewUser, S
     @Override
     public OverviewUser findOverviewUser( Class<OverviewUser> entityClass, String overviewUserId )throws IllegalArgumentException
     {
+    	LOG.debug("Method to get Overview User from overviewUserId, findOverviewUser() started" );
+    	
+    	LOG.debug("Method to get Overview User from overviewUserId, findOverviewUser() finished" );
         return super.findById( entityClass, overviewUserId );
     }
 }

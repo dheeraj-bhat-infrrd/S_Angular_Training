@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.realtech.socialsurvey.core.entities.MonthlyDigestAggregate;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.SurveyCsvInfo;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -488,7 +489,7 @@ public interface EmailServices
         String appLoginUrl, String socialMediaType ) throws InvalidInputException, UndeliveredEmailException;
 
 
-    void sendPaymentFailedAlertEmail( String recipientMailId, String displayName, String companyName )
+    void sendPaymentRetriesFailedAlertEmailToAdmin( String recipientMailId, String displayName, String companyName, long companyId  )
         throws InvalidInputException, UndeliveredEmailException;
 
 
@@ -496,6 +497,8 @@ public interface EmailServices
         throws InvalidInputException, UndeliveredEmailException;
 
 
+    void sendPaymentFailedAlertEmailToAdmin( String recipientMailId, String displayName, String companyName,  long companyId  )
+        throws InvalidInputException, UndeliveredEmailException;
     /**
      * Send mail caught from web app
      * @param recipientMailId
@@ -525,4 +528,13 @@ public interface EmailServices
 
     void sendDigestErrorMailForCompany( String companyName, String stackTrace )
         throws InvalidInputException, UndeliveredEmailException;
+    
+    public void sendEmailToAdminForUnsuccessfulSurveyCsvUpload( SurveyCsvInfo csvInfo, String errorMessage ) throws InvalidInputException, UndeliveredEmailException;
+
+
+    public void sendEmailToUploaderForUnsuccessfulSurveyCsvUpload( SurveyCsvInfo csvInfo, String message )
+        throws InvalidInputException, UndeliveredEmailException;
+
+
+    public void sendEmailToUploaderForSuccessfulSurveyCsvUpload( SurveyCsvInfo csvInfo, String results ) throws InvalidInputException, UndeliveredEmailException;
 }

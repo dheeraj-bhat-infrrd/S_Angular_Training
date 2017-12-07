@@ -185,4 +185,7 @@ public interface SSApiIntegration
     @GET("/v1/getscorestatsquestion")
     Response getScoreStatsQuestion(@Query ("entityId") Long entityId, @Query ("entityType") String entityType, @Query ("currentMonth") int currentMonth, @Query ("currentYear") int currentYear);
     //reporting:END
+
+    @GET("/v1/getaccountstatisticsreportstatus")
+	Response getAccountStatisticsRecentActivity(@Query("reportId") Long reportId);
 }

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.realtech.socialsurvey.api.models.v2.ReviewV2VO;
@@ -18,7 +17,6 @@ import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.utils.CommonUtils;
 
 
@@ -26,8 +24,6 @@ import com.realtech.socialsurvey.core.utils.CommonUtils;
 public class SurveyV2Transformer implements Transformer<SurveyGetV2VO, SurveyDetails, SurveyGetV2VO>
 {
 
-    @Autowired
-    UserManagementService userManagementService;
 
 
     @Override

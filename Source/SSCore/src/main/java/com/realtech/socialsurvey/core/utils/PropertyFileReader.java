@@ -42,7 +42,7 @@ public final class PropertyFileReader {
 			if (key == null || key.isEmpty()) {
 				throw new InvalidInputException("Key is null or empty while fetching property value");
 			}
-			LOG.debug("Getting property for  key : " + key + " from property file " + propertyFileName);
+			LOG.debug("Getting property for  key : {} from property file {}",key, propertyFileName);
 
 			if (propertyMap.get(propertyFileName) == null) {
 				loadPropertyFile(propertyFileName);
@@ -52,11 +52,11 @@ public final class PropertyFileReader {
 				throw new InvalidInputException("No value found in property file " + propertyFileName + " for key : " + key);
 			}
 
-			LOG.debug("Successfully fetched property value for key : " + key + " from property file " + propertyFileName);
+			LOG.debug("Successfully fetched property value for key : {} from property file {}",key, propertyFileName);
 			return properties.getProperty(key);
 		}
 		catch (NonFatalException e) {
-			LOG.error("Exception occured while reading properties.Reason : " + e.getMessage(), e);
+			LOG.error("Exception occured while reading properties.", e);
 			return null;
 		}
 	}

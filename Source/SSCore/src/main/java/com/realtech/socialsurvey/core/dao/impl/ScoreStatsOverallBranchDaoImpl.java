@@ -21,9 +21,10 @@ public class ScoreStatsOverallBranchDaoImpl extends GenericReportingDaoImpl<Scor
 
 	private static final Logger LOG = LoggerFactory.getLogger( ScoreStatsOverallBranchDaoImpl.class );
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<ScoreStatsOverallBranch> fetchScoreStatsOverallForBranch(Long branchId, int startMonth, int startYear , int endMonth , int endYear) {
-		LOG.info( "Method to fetch all the score stats overall for branch,fetchScoreStatsOverallForBranch() started." );
+		LOG.debug( "Method to fetch all the score stats overall for branch,fetchScoreStatsOverallForBranch() started." );
         Criteria criteria = getSession().createCriteria( ScoreStatsOverallBranch.class );
         try {
             criteria.add( Restrictions.eq( CommonConstants.BRANCH_ID_COLUMN, branchId) );
@@ -39,11 +40,11 @@ public class ScoreStatsOverallBranchDaoImpl extends GenericReportingDaoImpl<Scor
             }            
             criteria.addOrder( Order.asc( CommonConstants.YEAR_VAL ) );
             criteria.addOrder( Order.asc( CommonConstants.MONTH_VAL ) );
-            LOG.info( "Method to fetch all the score stats overall for branch,fetchScoreStatsOverallForBranch() finished." );
+            LOG.debug( "Method to fetch all the score stats overall for branch,fetchScoreStatsOverallForBranch() finished." );
 
             return (List<ScoreStatsOverallBranch>) criteria.list();
         } catch ( HibernateException hibernateException ) {
-            LOG.error( "Exception caught in fetchScoreStatsOverallForBranch() ", hibernateException );
+            LOG.warn( "Exception caught in fetchScoreStatsOverallForBranch() ", hibernateException );
             throw new DatabaseException( "Exception caught in fetchScoreStatsOverallForBranch() ", hibernateException );
         }
 

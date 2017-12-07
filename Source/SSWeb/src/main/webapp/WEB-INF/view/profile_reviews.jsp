@@ -3,6 +3,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<c:set var="start" value='${startIndex}'></c:set>
 <c:if test="${not empty reviews}">
 	<c:forEach var="reviewItem" varStatus="loop" items="${reviews}">
 		<c:set value = "#.#" var = "scoreformat"></c:set>
@@ -192,35 +193,41 @@
 			</c:choose>
 			<div class="ppl-share-wrapper clearfix share-plus-height" >
 				<div class="float-left clearfix ppl-share-social ">
+				<c:if test="${not empty reviewItem.agentName}">
+					<c:set var="includeAgentName" value="for ${reviewItem.agentName} "></c:set>
+				</c:if>
 					<span id = "fb_${loop.index}"class="float-left ppl-share-icns icn-fb-rev" title="Facebook" 
-						data-link="https://www.facebook.com/dialog/share?${reviewItem.faceBookShareUrl}&href=${fn:replace(reviewItem.completeProfileUrl, 'localhost', '127.0.0.1')}&quote=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${reviewItem.agentName} at SocialSurvey -${fn:escapeXml(reviewItem.review)}&redirect_uri=https://www.facebook.com"></span>
+						data-link="https://www.facebook.com/dialog/share?${reviewItem.faceBookShareUrl}&href=${fn:replace(reviewItem.completeProfileUrl, 'localhost', '127.0.0.1')}/${reviewItem._id}&quote=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } ${includeAgentName}at SocialSurvey -${fn:escapeXml(reviewItem.review)}&redirect_uri=https://www.facebook.com"></span>
 					
                             <c:choose>
-                                <c:when test="${fn:length(reviewItem.review) > 109}">
-                                    <c:set var="twitterReview" value="${fn:substring(reviewItem.review,0,105)}..."></c:set>
+                                <c:when test="${fn:length(reviewItem.review) > 180}">
+                                    <c:set var="twitterReview" value="${fn:substring(reviewItem.review,0,176)}..."></c:set>
                                 </c:when>
                                 <c:otherwise>
                                     <c:set var="twitterReview" value="${reviewItem.review}"></c:set>
                                 </c:otherwise>
                             </c:choose>
-					        <input type="hidden" id="twttxt_${loop.index}" class ="twitterText_loop" value ="<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${reviewItem.agentName} at SocialSurvey - ${fn:escapeXml(twitterReview)}"/>
+					        <input type="hidden" id="twttxt_${loop.index}" class ="twitterText_loop" value ="<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } ${includeAgentName}at SocialSurvey - ${fn:escapeXml(twitterReview)}"/>
 
-						    <span class="float-left ppl-share-icns icn-twit-rev" id ="twitt_${loop.index}" onclick="twitterProfileFn(${loop.index},this);" data-link="https://twitter.com/intent/tweet?text=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${reviewItem.agentName} at SocialSurvey - ${fn:escapeXml(twitterReview)}&url=${reviewItem.completeProfileUrl}"></span>
+						    <span class="float-left ppl-share-icns icn-twit-rev" id ="twitt_${loop.index}" onclick="twitterProfileFn(${loop.index},this);" data-link="https://twitter.com/intent/tweet?text=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } ${includeAgentName}at SocialSurvey - ${fn:escapeXml(twitterReview)}&url=${reviewItem.completeProfileUrl}/${reviewItem._id}"></span>
 						 <span
 						class="float-left ppl-share-icns icn-lin-rev" title="LinkedIn"
-						data-link="https://www.linkedin.com/shareArticle?mini=true&url=${reviewItem.completeProfileUrl}/${reviewItem._id}&title=&summary=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${reviewItem.agentName} at SocialSurvey - ${fn:escapeXml(reviewItem.review)}&reviewid=${reviewItem._id}&source="></span>
+						data-link="https://www.linkedin.com/shareArticle?mini=true&url=${reviewItem.completeProfileUrl}/${reviewItem._id}&title=&summary=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } ${includeAgentName}at SocialSurvey - ${fn:escapeXml(reviewItem.review)}&reviewid=${reviewItem._id}&source="></span>
 					<span class="float-left" title="Google+">
 						<button
 							class="g-interactivepost float-left ppl-share-icns icn-gplus-rev"
-							data-contenturl="${reviewItem.completeProfileUrl}"
+							data-contenturl="${reviewItem.completeProfileUrl}/${reviewItem._id}"
 							data-clientid="${reviewItem.googleApi}"
 							data-cookiepolicy="single_host_origin"
-							data-prefilltext="<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } for ${reviewItem.agentName} at SocialSurvey - ${fn:escapeXml(reviewItem.review)}"
+							data-prefilltext="<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${reviewItem.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } ${includeAgentName}at SocialSurvey - ${fn:escapeXml(reviewItem.review)}"
 							data-calltoactionlabel="USE"
 							data-calltoactionurl="${reviewItem.completeProfileUrl}">
 							<span class="icon">&nbsp;</span> <span class="label">share</span>
 						</button>
 					</span>
+					<span class="float-left ppl-share-icns permalink icn-permalink-rev" title="Permalink" onclick="copyIndividualReviewUrlToClipboard(${start})">
+                       	<input id="permalink_url_${start}" type="hidden" value="${reviewItem.completeProfileUrl}/${reviewItem._id}"/>
+                    </span>
 				</div>
 				<div class="float-right dash-flag-retake ">
 					<div class="clearfix">
@@ -230,6 +237,7 @@
 				</div>
 			</div>
 		</div>
+		<c:set var="start" value="${start + 1}"/>
 	</c:forEach>
 </c:if>
 <script type="text/javascript" src="//apis.google.com/js/client:plusone.js" async="async"></script>

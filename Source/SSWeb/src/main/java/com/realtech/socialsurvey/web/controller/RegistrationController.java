@@ -120,7 +120,7 @@ public class RegistrationController
 		try {
 			LOG.debug("Validating form elements");
 			userManagementService.validateFormParametersForInvitation(firstName, lastName, emailId);
-			LOG.debug("Form parameters validation passed for firstName: " + firstName + " lastName : " + lastName + " and emailID : " + emailId);
+			LOG.debug("Form parameters validation passed for firstName: {}, lastName : {} and emailID : {}",firstName,lastName, emailId);
 
 			// validate captcha
 			// TODO remove comment when captcha validation is needed
@@ -150,7 +150,7 @@ public class RegistrationController
 					messageUtils.getDisplayMessage(DisplayMessageConstants.REGISTRATION_INVITE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException e) {
-			LOG.error("NonFatalException while sending registration invite. Reason : " + e.getMessage(), e);
+			LOG.error("NonFatalException while sending registration invite.", e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
 		return JspResolver.MESSAGE_HEADER;
@@ -168,7 +168,7 @@ public class RegistrationController
 	@RequestMapping(value = "/showregistrationpage")
 	public String showRegistrationPage(@RequestParam("q") String encryptedUrlParams, HttpServletRequest request, Model model,
 			RedirectAttributes redirectAttributes) {
-		LOG.info("Method showRegistrationPage of Registration Controller called with encryptedUrl : " + encryptedUrlParams);
+		LOG.info("Method showRegistrationPage of Registration Controller called with encryptedUrl : {}", encryptedUrlParams);
 
 		// Check for existing session
 		if (sessionHelper.isUserActiveSessionExists()) {
@@ -212,7 +212,7 @@ public class RegistrationController
 				invitedUser = userManagementService.getUserByEmail(emailAddress);
 			}
 			catch (NoRecordsFetchedException e) {
-				LOG.warn("NonFatalException while showing registration page. Reason : " + e.getMessage(), e);
+				LOG.warn("NonFatalException while showing registration page.", e);
 			}
 
 			if (invitedUser != null) {
@@ -272,7 +272,7 @@ public class RegistrationController
 			}
 		}
 		catch (NonFatalException e) {
-			LOG.error("NonFatalException while showing registration page. Reason : " + e.getMessage(), e);
+			LOG.error("NonFatalException while showing registration page.", e);
 			redirectAttributes.addFlashAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			return "redirect:/" + JspResolver.LOGIN + ".do";
 		}
@@ -308,7 +308,7 @@ public class RegistrationController
 		try {
 			if (validateCaptcha.equals(CommonConstants.YES_STRING)) {
 				if (!captchaValidation.isCaptchaValid(request.getRemoteAddr(), captchaSecretKey, request.getParameter("g-recaptcha-response"))) {
-					LOG.error("Captcha Validation failed!");
+					LOG.warn("Captcha Validation failed!");
 					throw new InvalidInputException("Captcha Validation failed!", DisplayMessageConstants.INVALID_CAPTCHA);
 				}
 				LOG.debug("Captcha validation complete!");
@@ -359,7 +359,7 @@ public class RegistrationController
 			redirectAttributes.addFlashAttribute("emailid", emailId);
 		}
 		catch (NonFatalException e) {
-			LOG.error("NonFatalException while showing registration page. Reason : " + e.getMessage(), e);
+			LOG.error("NonFatalException while showing registration page.", e);
 			redirectAttributes.addFlashAttribute("status", DisplayMessageType.ERROR_MESSAGE);
 			redirectAttributes.addFlashAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			redirectAttributes.addFlashAttribute("firstname", firstName);
@@ -384,7 +384,7 @@ public class RegistrationController
 		try {
 			LOG.debug("Validating form elements");
 			userManagementService.validateFormParametersForInvitation(firstName, lastName, emailId);
-			LOG.debug("Form parameters validation passed for firstName: " + firstName + " lastName: " + lastName + " and emailID: " + emailId);
+			LOG.debug("Form parameters validation passed for firstName: {}, lastName: {} and emailID: {}",firstName, lastName, emailId);
 			// check if email id already exists
 			if (userManagementService.userExists(emailId.trim())) {
 				LOG.warn(emailId + " is already present");
@@ -449,7 +449,7 @@ public class RegistrationController
 			 * user else send a registration invite on the changed emailId
 			 */
 			try {
-				LOG.debug("Registering user with emailId : " + emailId);
+				LOG.debug("Registering user with emailId : {}", emailId);
 				User user = userManagementService.addCorporateAdmin(firstName, lastName, emailId, confirmPassword, isDirectRegistration);
 
 				// if referral is present then add it to the mapping with user
@@ -483,7 +483,7 @@ public class RegistrationController
 			redirectAttributes.addFlashAttribute("uniqueIdentifier", uniqueIdentifier);
 		}
 		catch (NonFatalException e) {
-			LOG.error("NonFatalException while registering user. Reason : " + e.getMessage(), e);
+			LOG.error("NonFatalException while registering user.", e);
 			redirectAttributes.addFlashAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			redirectAttributes.addFlashAttribute("firstname", firstName);
 			redirectAttributes.addFlashAttribute("lastname", lastName);
@@ -514,7 +514,7 @@ public class RegistrationController
 			verticalsMasters = organizationManagementService.getAllVerticalsMaster();
 		}
 		catch (InvalidInputException e) {
-			LOG.error("InvalidInputException while getting vertical user. Reason : " + e.getMessage(), e);
+			LOG.error("InvalidInputException while getting vertical user.", e);
 		}
 		model.addAttribute("verticals", verticalsMasters);
 
@@ -539,12 +539,12 @@ public class RegistrationController
 					messageUtils.getDisplayMessage(DisplayMessageConstants.EMAIL_VERIFICATION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (InvalidInputException e) {
-			LOG.error("InvalidInputException while verifying account. Reason : " + e.getMessage(), e);
+			LOG.error("InvalidInputException while verifying account.", e);
 			model.addAttribute("message",
 					messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_VERIFICATION_URL, DisplayMessageType.ERROR_MESSAGE));
 		}
 		catch (SolrException e) {
-			LOG.error("SolrException while verifying account. Reason : " + e.getMessage(), e);
+			LOG.error("SolrException while verifying account.", e);
 			model.addAttribute("message", messageUtils.getDisplayMessage("SolrException", DisplayMessageType.ERROR_MESSAGE));
 		}
 		LOG.info("Method to verify account finished");
@@ -610,6 +610,7 @@ public class RegistrationController
 			if (userManagementService.userExists(emailId)) {
 				redirectAttributes.addFlashAttribute("message", "The Email address is already taken");
 				redirectAttributes.addFlashAttribute("status", DisplayMessageType.ERROR_MESSAGE);
+				redirectAttributes.addFlashAttribute("isDirectRegistration", false);
 				return "redirect:/" + JspResolver.LOGIN + ".do";
 			}
 		}
@@ -632,7 +633,7 @@ public class RegistrationController
         @RequestParam ( "specified-emailId") String specifiedEmailId )
     {
         String emailId = ( specifiedEmailId != null && !specifiedEmailId.isEmpty() )? specifiedEmailId : customerEmailId;
-        LOG.info( "Creating invitation url for " + firstName + " " + lastName + " and email " + emailId );
+        LOG.info( "Creating invitation url for {}, {} and email {}", firstName , lastName,  emailId );
         String result = null;
 
         try {

@@ -57,7 +57,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     public void deactivateAllUserProfilesForUser( User admin, User userToBeDeactivated, int status )
     {
 
-        LOG.debug( "Method deactivateUserProfileByUser called to deactivate user : " + userToBeDeactivated.getFirstName() );
+        LOG.debug( "Method deactivateUserProfileByUser called to deactivate user : {}", userToBeDeactivated.getFirstName() );
         Query query = getSession().getNamedQuery( "UserProfile.updateProfileByUser" );
         // Setting status for user profile as inactive.
         query.setParameter( 0, status );
@@ -65,7 +65,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
         query.setParameter( 2, new Timestamp( System.currentTimeMillis() ) );
         query.setParameter( 3, userToBeDeactivated );
         query.executeUpdate();
-        LOG.debug( "Method deactivateUserProfileByUser called to deactivate user : " + userToBeDeactivated.getFirstName() );
+        LOG.debug( "Method deactivateUserProfileByUser called to deactivate user : {}", userToBeDeactivated.getFirstName() );
 
     }
 
@@ -237,7 +237,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     @Transactional
     public Map<String, Long> findPrimaryUserProfileByAgentId( long entityId )
     {
-        LOG.debug( "Method findPrimaryUserProfileByAgentId() called for agent id : " + entityId );
+        LOG.debug( "Method findPrimaryUserProfileByAgentId() called for agent id : {}", entityId );
         Map<String, Long> hierarchyMap = new HashMap<String, Long>();
         String hqlQuery = "select u.company.companyId, u.regionId, u.branchId, u.agentId from UserProfile u where u.agentId=? AND u.isPrimary = ?";
         Query query = getSession().createQuery( hqlQuery );
@@ -258,10 +258,10 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     @Override
     public Set<Long> findUserIdsByBranch( long branchId )
     {
-        LOG.debug( "Method call started for findUserIdsByBranch for branch : " + branchId );
+        LOG.debug( "Method call started for findUserIdsByBranch for branch : {}", branchId );
         Set<Long> userIds = new HashSet<Long>();
 
-        LOG.debug( "Fetching users for branch : " + branchId );
+        LOG.debug( "Fetching users for branch : {}", branchId );
         Query query = getSession().createSQLQuery( "SELECT USER_ID FROM USER_PROFILE WHERE STATUS = ? and BRANCH_ID = ?" );
         query.setParameter( 0, CommonConstants.STATUS_ACTIVE );
         query.setParameter( 1, branchId );
@@ -271,8 +271,10 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
             userIds.add( Long.valueOf( row.intValue() ) );
         }
 
-        LOG.debug( "Fetched " + userIds.size() + " users for branch : " + branchId );
-        LOG.debug( "Method call ended for findUserIdsByBranch for branch : " + branchId );
+        if(LOG.isDebugEnabled()){
+        	LOG.debug( "Fetched {} users for branch : {}",userIds.size(),branchId );
+        }
+        LOG.debug( "Method call ended for findUserIdsByBranch for branch : {}",branchId );
         return userIds;
     }
 
@@ -280,10 +282,10 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     @Override
     public Set<Long> findUserIdsByRegion( long regionId )
     {
-        LOG.debug( "Method call started for findUserIdsByRegion for region : " + regionId );
+        LOG.debug( "Method call started for findUserIdsByRegion for region : {}", regionId );
         Set<Long> userIds = new HashSet<Long>();
 
-        LOG.debug( "Fetching users for region : " + regionId );
+        LOG.debug( "Fetching users for region : {}", regionId );
         Query query = getSession().createSQLQuery( "SELECT USER_ID FROM USER_PROFILE WHERE STATUS = ? and REGION_ID = ?" );
         query.setParameter( 0, CommonConstants.STATUS_ACTIVE );
         query.setParameter( 1, regionId );
@@ -293,8 +295,10 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
             userIds.add( Long.valueOf( row.intValue() ) );
         }
 
-        LOG.debug( "Fetched " + userIds.size() + " users for region : " + regionId );
-        LOG.debug( "Method call ended for findUserIdsByRegion for region : " + regionId );
+        if(LOG.isDebugEnabled()){
+        	LOG.debug( "Fetched {} users for region : {}",userIds.size(),regionId );
+        }
+        LOG.debug( "Method call ended for findUserIdsByRegion for region : {}", regionId );
         return userIds;
     }
 
@@ -303,14 +307,14 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     @Transactional
     public int getUsersUnderBranchAdminCount( User user )
     {
-        LOG.debug( "Method call started for getUsersUnderBranchAdminCount for branch admin id : " + user.getUserId() );
+        LOG.debug( "Method call started for getUsersUnderBranchAdminCount for branch admin id : {}", user.getUserId() );
         Query query = getSession().createSQLQuery( "SELECT COUNT(*) FROM ( " + branchUserSearchQuery + " ) as subQuery" );
         query.setParameter( 0, user.getUserId() );
         query.setParameter( 1, CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID );
         query.setParameter( 2, user.getCompany().getCompanyId() );
         query.setParameter( 3, CommonConstants.STATUS_INACTIVE );
 
-        LOG.debug( "Method call ended for getUsersUnderBranchAdminCount for branch admin id : " + user.getUserId() );
+        LOG.debug( "Method call ended for getUsersUnderBranchAdminCount for branch admin id : {}", user.getUserId() );
         return ( (BigInteger) query.uniqueResult() ).intValue();
     }
 
@@ -319,14 +323,14 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     @Transactional
     public int getUsersUnderRegionAdminCount( User user )
     {
-        LOG.debug( "Method call started for getUsersUnderRegionAdminCount for region admin id : " + user.getUserId() );
+        LOG.debug( "Method call started for getUsersUnderRegionAdminCount for region admin id : {}" , user.getUserId() );
         Query query = getSession().createSQLQuery( "SELECT COUNT(*) FROM ( " + regionUserSearchQuery + " ) as subQuery" );
         query.setParameter( 0, user.getUserId() );
         query.setParameter( 1, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID );
         query.setParameter( 2, user.getCompany().getCompanyId() );
         query.setParameter( 3, CommonConstants.STATUS_INACTIVE );
 
-        LOG.debug( "Method call ended for getUsersUnderRegionAdminCount for region admin id : " + user.getUserId() );
+        LOG.debug( "Method call ended for getUsersUnderRegionAdminCount for region admin id : {}" , user.getUserId() );
         return ( (BigInteger) query.uniqueResult() ).intValue();
     }
 
@@ -335,14 +339,14 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     @Transactional
     public int getUsersUnderCompanyAdminCount( User user )
     {
-        LOG.debug( "Method call started for getUsersUnderCompanyAdminCount for company admin id : " + user.getUserId() );
+        LOG.debug( "Method call started for getUsersUnderCompanyAdminCount for company admin id : {}", user.getUserId() );
         Query query = getSession().createSQLQuery( "SELECT COUNT(*) FROM ( " + companyUserSearchQuery + " ) as subQuery" );
         query.setParameter( 0, user.getUserId() );
         query.setParameter( 1, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID );
         query.setParameter( 2, user.getCompany().getCompanyId() );
         query.setParameter( 3, CommonConstants.STATUS_INACTIVE );
 
-        LOG.debug( "Method call ended for getUsersUnderCompanyAdminCount for company admin id : " + user.getUserId() );
+        LOG.debug( "Method call ended for getUsersUnderCompanyAdminCount for company admin id : {}",  user.getUserId() );
         return ( (BigInteger) query.uniqueResult() ).intValue();
     }
 
@@ -352,7 +356,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     public List<UserFromSearch> findUsersUnderBranchAdmin( User user, int startIndex, int batchSize )
     {
         List<UserFromSearch> userList = new ArrayList<UserFromSearch>();
-        LOG.debug( "Method call started for findUsersUnderBranchAdmin for branch admin id : " + user.getUserId() );
+        LOG.debug( "Method call started for findUsersUnderBranchAdmin for branch admin id : {}", user.getUserId() );
         Query query = getSession().createSQLQuery( branchUserSearchQuery );
         query.setParameter( 0, user.getUserId() );
         query.setParameter( 1, CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID );
@@ -369,7 +373,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 
         userList = buildUserFromSearch( rows );
 
-        LOG.debug( "Method call ended for findUsersUnderBranchAdmin for branch admin id : " + user.getUserId() );
+        LOG.debug( "Method call ended for findUsersUnderBranchAdmin for branch admin id : {}", user.getUserId() );
         return userList;
     }
 
@@ -379,7 +383,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     public List<UserFromSearch> findUsersUnderRegionAdmin( User admin, int startIndex, int batchSize )
     {
         List<UserFromSearch> userList = new ArrayList<UserFromSearch>();
-        LOG.debug( "Method call started for findUsersUnderRegionAdmin for region admin id : " + admin.getUserId() );
+        LOG.debug( "Method call started for findUsersUnderRegionAdmin for region admin id : {}", admin.getUserId() );
         Query query = getSession().createSQLQuery( regionUserSearchQuery );
 
         query.setParameter( 0, admin.getUserId() );
@@ -397,7 +401,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 
         userList = buildUserFromSearch( rows );
 
-        LOG.debug( "Method call ended for findUsersUnderRegionAdmin for region admin id : " + admin.getUserId() );
+        LOG.debug( "Method call ended for findUsersUnderRegionAdmin for region admin id : {}", admin.getUserId() );
         return userList;
     }
 
@@ -407,7 +411,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
     public List<UserFromSearch> findUsersUnderCompanyAdmin( User admin, int startIndex, int batchSize )
     {
         List<UserFromSearch> userList = new ArrayList<UserFromSearch>();
-        LOG.debug( "Method call started for findUsersUnderCompanyAdmin for company admin id : " + admin.getUserId() );
+        LOG.debug( "Method call started for findUsersUnderCompanyAdmin for company admin id : {}" , admin.getUserId() );
         Query query = getSession().createSQLQuery( companyUserSearchQuery );
 
         query.setParameter( 0, admin.getUserId() );
@@ -424,7 +428,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
         List<Object[]> rows = (List<Object[]>) query.list();
 
         userList = buildUserFromSearch( rows );
-        LOG.debug( "Method call ended for findUsersUnderCompanyAdmin for company admin id : " + admin.getUserId() );
+        LOG.debug( "Method call ended for findUsersUnderCompanyAdmin for company admin id : {}", admin.getUserId() );
         return userList;
     }
 

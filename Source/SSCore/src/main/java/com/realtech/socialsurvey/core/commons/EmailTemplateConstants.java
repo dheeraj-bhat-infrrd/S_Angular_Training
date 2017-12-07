@@ -166,6 +166,9 @@ public final class EmailTemplateConstants {
     public static final String PAYMENT_RETRIES_FAILED_MAIL_SUBJECT = "PaymentRetriesFailedAlertMailSubject.txt";
     public static final String PAYMENT_RETRIES_FAILED_MAIL_BODY = "PaymentRetriesFailedAlertMailBody.html";
     
+    public static final String PAYMENT_FAILED_MAIL_SUBJECT = "PaymentFailedAlertMailSubject.txt";
+    public static final String PAYMENT_FAILED_MAIL_BODY = "PaymentFailedAlertMailBody.html";
+    
     public static final String CANCEL_SUBSCRIPTION_REQUEST_ALERT_MAIL_SUBJECT = "CancelSubscriptionRequestAlertMailSubject.txt";
     public static final String CANCEL_SUBSCRIPTION_REQUEST_ALERT_MAIL_BODY = "CancelSubscriptionRequestAlertMailBody.html";
     
@@ -181,6 +184,15 @@ public final class EmailTemplateConstants {
     public static final String LESS_VOLUME_OF_TRANSACTION_RECEIVED_ALERT_MAIL_SUBJECT = "lessVoulmeOfTransactionReceivedAlertMailSubject.txt";
     public static final String LESS_VOLUME_OF_TRANSACTION_RECEIVED_ALERT_MAIL_BODY = "lessVoulmeOfTransactionReceivedAlertMailBody.html";
 
+    public static final String SURVEY_CSV_UPLOAD_UNSUCCESSFUL_ADMIN_SUBJECT = "SurveyCsvUploadUnsuccessfulAdmin.txt";
+    public static final String SURVEY_CSV_UPLOAD_UNSUCCESSFUL_ADMIN_BODY = "SurveyCsvUploadUnsuccessfulAdmin.html";
+    
+    public static final String SURVEY_CSV_UPLOAD_UNSUCCESSFUL_AGENT_SUBJECT = "SurveyCsvUploadUnsuccessful.txt";
+    public static final String SURVEY_CSV_UPLOAD_UNSUCCESSFUL_AGENT_BODY = "SurveyCsvUploadUnsuccessful.html";
+    
+    public static final String SURVEY_CSV_UPLOAD_SUCCESSFUL_SUBJECT = "SurveyCsvUploadFeedback.txt";
+    public static final String SURVEY_CSV_UPLOAD_SUCCESSFUL_BODY = "SurveyCsvUploadFeedback.html";
+    
     public static final String DIGEST_ERROR_MAIL_BODY = "DigestErrorMailBody.html";
     public static final String DIGEST_ERROR_MAIL_SUBJECT = "DigestErrorMailSubject.txt";
 }
