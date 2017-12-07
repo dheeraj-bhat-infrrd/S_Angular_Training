@@ -6889,6 +6889,16 @@ tr.u-tbl-header td {
 	margin-top: 10px;
 }
 
+.bd-q-pu-txt-nps {
+	padding: 0 40px 0 10px;
+	border: 1px solid #3E9DCB;
+	height: 40px;
+	border-radius: 2px;
+	display: block;
+	width: 100%;
+	margin-top: 10px;
+}
+
 .bd-q-pu-txt-edit {
 	padding: 0 10px 0 10px;
 	border: 1px solid #3E9DCB;
@@ -6936,7 +6946,7 @@ tr.u-tbl-header td {
 	margin-right: 50px;
 }
 
-.bd-q-btn-done ,#email-map-cancel,#email-map-add,#email-map-save{
+.bd-q-btn-done ,#email-map-cancel,#email-map-add,#email-map-save,.bd-nps-btn-done{
 	background-color: #3E9DCB;
 	color: #fff;
 	width: 120px;

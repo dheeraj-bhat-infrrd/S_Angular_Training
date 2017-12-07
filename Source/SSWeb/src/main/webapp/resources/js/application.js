@@ -3296,6 +3296,11 @@ $(document).on('click', '.bd-tab-rad', function() {
 	$(this).addClass('bd-ans-tab-sel');
 	$(this).parent().parent().parent().find('.bd-ans-type-item').hide();
 	$(this).parent().parent().parent().find('.bd-ans-type-radio').show();
+	
+	var quesNum = $(this).closest('form').data('quesnum');
+	$(this).closest('form').find('input[name="sb-question-type-' + quesNum + '"]').val($(this).data('id'));
+	showStatus('#bs-question-' + quesNum, 'Edited');
+	$('#bs-question-' + quesNum).attr('data-status', 'edited');
 });
 
 $(document).on('click', '.bd-tab-mcq', function() {
@@ -3438,6 +3443,14 @@ $(document).on("focus", '.bd-q-pu-txt', function() {
 			}, 'bs-question-' + quesOrder, '');
 		}
 	}
+});
+
+$(document).on("input",'#sb-nps-question-txt',function(){
+	$('#nps-add-edit').show();
+});
+
+$(document).on("click",'.bd-nps-btn-done',function(){
+	$('#nps-add-edit').hide();
 });
 
 $(document).on("input", '.bd-q-pu-txt', function() {
@@ -7161,13 +7174,15 @@ function storeCustomerAnswer(customerResponse) {
 	var encodedCustomerResponse = window.btoa( unescape( encodeURIComponent( customerResponse ) ) );
 	var encodedQuestion =  window.btoa( unescape( encodeURIComponent( questionDetails.question ) ) );
 	var payload = {
-		"answer" : encodedCustomerResponse,
-		"question" : encodedQuestion,
-		"questionType" : questionDetails.questionType,
-		"isUserRankingQuestion" : questionDetails.isUserRankingQuestion,
-		"isNPSQuestion" : questionDetails.isNPSQuestion,
-		"stage" : qno + 1,
-		"surveyId" : surveyId
+			  "answer" : encodedCustomerResponse,
+			  "question" : encodedQuestion,
+			  "questionType" : questionDetails.questionType,
+			  "isUserRankingQuestion" : questionDetails.isUserRankingQuestion,
+			  "isNPSQuestion" : questionDetails.isNPSQuestion,
+			  "stage" : qno + 1,
+			  "surveyId" : surveyId,
+			  "considerForScore": questionDetails.considerForScore,
+			  "questionId" : questionDetails.questionId
 	};
 	showOverlay();
 	questionDetails.customerResponse = customerResponse;
