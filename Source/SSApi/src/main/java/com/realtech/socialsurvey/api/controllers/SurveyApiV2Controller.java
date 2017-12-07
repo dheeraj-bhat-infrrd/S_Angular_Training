@@ -341,7 +341,7 @@ public class SurveyApiV2Controller
         }
 
         //get data from database
-        SurveysAndReviewsVO surveysAndReviewsVO = surveyHandler.getSurveysByFilterCriteria( status, state, startSurveyID,
+        SurveysAndReviewsVO surveysAndReviewsVO = surveyHandler.getSurveysByFilterCriteria( state, startSurveyID,
             startReviewDate, startTransactionDate, userIds, isAltered , start, count, companyId );
 
         //create vo object
@@ -497,7 +497,7 @@ public class SurveyApiV2Controller
         }
 
         //get data from database
-       Integer surveyCount = surveyHandler.getSurveysCountByFilterCriteria( status, state, startSurveyID,
+       Integer surveyCount = surveyHandler.getSurveysCountByFilterCriteria( state, startSurveyID,
             startReviewDate, startTransactionDate, userIds, isAltered, companyId );
       
        Float surveyAvgScore = surveyHandler.getSurveysAvgScoreByFilterCriteria( state, startSurveyID,
