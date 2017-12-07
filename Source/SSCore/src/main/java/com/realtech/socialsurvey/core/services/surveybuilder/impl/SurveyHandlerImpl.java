@@ -869,6 +869,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         SurveyDetails surveyDetails = surveyDetailsDao.getSurveyBySurveyMongoId( surveyId );
         
         surveyDetails.setStage( 0 );
+        surveyDetails.setReview( null );
         surveyDetails.setNoOfRetake( surveyDetails.getNoOfRetake() + 1 );
         surveyDetails.setLastRetakeRequestDate( new Date ( System.currentTimeMillis() ) );
         
