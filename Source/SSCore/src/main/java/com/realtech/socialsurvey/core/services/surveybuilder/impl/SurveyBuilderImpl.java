@@ -20,6 +20,7 @@ import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.Survey;
+import com.realtech.socialsurvey.core.entities.Survey0To10Questions;
 import com.realtech.socialsurvey.core.entities.SurveyAnswerOptions;
 import com.realtech.socialsurvey.core.entities.SurveyCompanyMapping;
 import com.realtech.socialsurvey.core.entities.SurveyQuestion;
@@ -55,6 +56,9 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 
 	@Autowired
 	private GenericDao<SurveyQuestionsAnswerOption, Long> surveyQuestionsAnswerOptionDao;
+	
+	@Autowired
+	private GenericDao<Survey0To10Questions, Long> survey0To10QuestionsDao;
 
 	@Autowired
 	private GenericDao<SurveyQuestionsMapping, Long> surveyQuestionsMappingDao;
@@ -281,7 +285,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		}
 
 		SurveyQuestion surveyQuestion = addNewQuestionsAndAnswers(user, survey, surveyQuestionDetails.getQuestion(),
-				surveyQuestionDetails.getQuestionType(), surveyQuestionDetails.getAnswers());
+				surveyQuestionDetails.getQuestionType(), surveyQuestionDetails.getAnswers(), surveyQuestionDetails.getIsNPSQuestion(), surveyQuestionDetails.getConsiderForScore(), surveyQuestionDetails.getNotAtAllLikely(), surveyQuestionDetails.getVeryLikely() );
 		long surveyQuestionMappingId = mapQuestionToSurvey(user, surveyQuestionDetails, surveyQuestion, survey, CommonConstants.STATUS_ACTIVE);
 		LOG.debug("Method addQuestionToExistingSurvey() finished.");
 		
@@ -329,7 +333,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 	/**
 	 * Method to store questions as well as all the answers for each question.
 	 */
-	private SurveyQuestion addNewQuestionsAndAnswers(User user, Survey survey, String question, String questionType, List<SurveyAnswerOptions> answers) {
+	private SurveyQuestion addNewQuestionsAndAnswers(User user, Survey survey, String question, String questionType, List<SurveyAnswerOptions> answers, int isNPSQuestion, int considerForScore, String notAtAllLikely, String veryLikely) {
 		LOG.debug("Method addNewQuestionsAndAnswers() started.");
 		SurveyQuestion surveyQuestion = null;
 
@@ -341,6 +345,11 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 				if (answers != null && !answers.isEmpty() && answers.size() >= 2) {
 					addAnswersToQuestion(user, surveyQuestion, answers);
 				}
+			}
+			
+			//Save answers if question type is 0-10 range
+			if(questionType.indexOf(CommonConstants.SB_RANGE_QUESTION_0to10) != -1){
+			    addAnswersTo0To10Question(user, surveyQuestion, isNPSQuestion, considerForScore, notAtAllLikely, veryLikely);
 			}
 		}
 		LOG.debug("Method addNewQuestionsAndAnswers() finished");
@@ -393,6 +402,29 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		}
 		LOG.debug("Method addAnswersToQuestion() finished.");
 	}
+	
+	/**
+	 * Method to insert into survey 0to10 table
+	 */
+	private void addAnswersTo0To10Question(User user, SurveyQuestion surveyQuestion, int isNPSQuestion, int considerForScore, String notAtAllLikely, String veryLikely) {
+	    LOG.debug("Method addAnswersTo0To10Question() started.");
+	    Survey0To10Questions survey0To10Questions = new Survey0To10Questions();
+	    survey0To10Questions.setSurveyQuestion( surveyQuestion );
+	    survey0To10Questions.setConsiderForScore( considerForScore );;
+	    survey0To10Questions.setIsNPSQuestion( isNPSQuestion );
+	    survey0To10Questions.setNotAtAllLikely( notAtAllLikely );
+	    survey0To10Questions.setVeryLikely( veryLikely );
+	    survey0To10Questions.setStatus( CommonConstants.STATUS_ACTIVE );
+	    survey0To10Questions.setCreatedBy(String.valueOf(user.getUserId()));
+	    survey0To10Questions.setModifiedBy(String.valueOf(user.getUserId()));
+	    survey0To10Questions.setCreatedOn(new Timestamp(System.currentTimeMillis()));
+	    survey0To10Questions.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+	    
+	    survey0To10QuestionsDao.save( survey0To10Questions );
+	    survey0To10QuestionsDao.flush();
+	    
+	    LOG.debug( "Method addAnswersTo0To10Question() finished." );
+	}
 
 	/**
 	 * Creates a new entry for new survey question mapping into database.
@@ -402,7 +434,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		SurveyQuestionsMapping surveyQuestionsMapping = new SurveyQuestionsMapping();
 		surveyQuestionsMapping.setIsRatingQuestion(surveyQuestionDetails.getIsRatingQuestion());
         surveyQuestionsMapping.setIsUserRankingQuestion( surveyQuestionDetails.getIsUserRankingQuestion() );
-        surveyQuestionsMapping.setIsNPSQuestion(surveyQuestionDetails.getIsNPSQuestion());
+        //surveyQuestionsMapping.setIsNPSQuestion(surveyQuestionDetails.getIsNPSQuestion());
 		surveyQuestionsMapping.setQuestionOrder(surveyQuestionDetails.getQuestionOrder());
 		surveyQuestionsMapping.setSurveyQuestion(surveyQuestion);
 		surveyQuestionsMapping.setStatus(status);
@@ -601,13 +633,18 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 					modifyAnswersToQuestion(user, surveyQuestion, answers);
 				}
 			}
-			surveyQuestionDao.saveOrUpdate(surveyQuestion);
-			surveyQuestionDao.flush();
+			
+			//Save answers if question type is 0-10 range
+            if(questionType.indexOf(CommonConstants.SB_RANGE_QUESTION_0to10) != -1) {
+                modify0To10Answers(user, surveyQuestion, questionDetails.getNotAtAllLikely(), questionDetails.getVeryLikely(), questionDetails.getIsNPSQuestion(), questionDetails.getConsiderForScore(), questionType);
+            }
+            surveyQuestionDao.saveOrUpdate(surveyQuestion);
+            surveyQuestionDao.flush();
 			
 			// updating question rating status and NPS flag.
 			mapping.setIsRatingQuestion(questionDetails.getIsRatingQuestion());
 	        mapping.setIsUserRankingQuestion(questionDetails.getIsUserRankingQuestion());
-	        mapping.setIsNPSQuestion(questionDetails.getIsNPSQuestion());
+	        //mapping.setIsNPSQuestion(questionDetails.getIsNPSQuestion());
 			surveyQuestionsMappingDao.saveOrUpdate(mapping);
 			surveyQuestionsMappingDao.flush();
 		}
@@ -663,6 +700,31 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		}
 		LOG.debug("Method modifyAnswersToQuestion() finished.");
 	}
+	
+	/**
+	 * Method to modify 0-10 range questions
+	 */
+	private void modify0To10Answers(User user, SurveyQuestion surveyQuestion, String notAtAllLikely, String veryLikely, int isNPSQuestion, int considerForScore, String questionType) {
+        LOG.debug("Method modify0To10Answers() started.");
+        
+        List<Survey0To10Questions> survey0To10Questions = survey0To10QuestionsDao.findByColumn( Survey0To10Questions.class, "surveyQuestion" , surveyQuestion);
+        
+        survey0To10Questions.get( CommonConstants.INITIAL_INDEX ).setSurveyQuestion( surveyQuestion );
+        survey0To10Questions.get( CommonConstants.INITIAL_INDEX ).setNotAtAllLikely( notAtAllLikely );
+        survey0To10Questions.get( CommonConstants.INITIAL_INDEX ).setVeryLikely( veryLikely );
+        survey0To10Questions.get( CommonConstants.INITIAL_INDEX ).setModifiedBy( String.valueOf(user.getUserId()) );
+        survey0To10Questions.get( CommonConstants.INITIAL_INDEX ).setModifiedOn( new Timestamp(System.currentTimeMillis()) );
+        survey0To10Questions.get( CommonConstants.INITIAL_INDEX ).setIsNPSQuestion( isNPSQuestion );
+        survey0To10Questions.get( CommonConstants.INITIAL_INDEX ).setConsiderForScore( considerForScore );
+        survey0To10Questions.get( CommonConstants.INITIAL_INDEX ).setStatus( CommonConstants.STATUS_ACTIVE ); 
+        survey0To10Questions.get( CommonConstants.INITIAL_INDEX ).setCreatedBy( String.valueOf(user.getUserId()) );
+        survey0To10Questions.get( CommonConstants.INITIAL_INDEX ).setCreatedOn( new Timestamp(System.currentTimeMillis()) );
+ 
+        survey0To10QuestionsDao.update( survey0To10Questions.get( CommonConstants.INITIAL_INDEX ) );
+        survey0To10QuestionsDao.flush();
+        LOG.debug( "Method modifyAnswersToQuestion() finished." );
+	}
+        
 
 	@Override
 	public void deactivateQuestionSurveyMapping(User user, long surveyQuestionId) throws InvalidInputException {
@@ -971,8 +1033,8 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 			// If 0to10 star question and NPS flag is set true, then mark as
 			// NPS.
 			if (!StringUtils.isEmpty(questionDetails.getIsNPSStr())
-					&& questionType.indexOf(CommonConstants.QUESTION_0to10) != -1 && questionDetails.getIsNPSStr()
-							.equals(Boolean.toString(CommonConstants.QUESTION_VALUE_TRUE))) {
+					&& questionType.indexOf(CommonConstants.SB_RANGE_QUESTION_0to10) != -1 && questionDetails.getIsNPSStr()
+							.equals(Boolean.toString(CommonConstants.QUESTION_VALUE_TRUE)) && questionDetails.getIsNPSQuestion() == 1) {
 				questionDetails.setIsNPSQuestion(CommonConstants.QUESTION_RATING_VALUE_TRUE);
 			} else {
 				questionDetails.setIsNPSQuestion(CommonConstants.QUESTION_RATING_VALUE_FALSE);
