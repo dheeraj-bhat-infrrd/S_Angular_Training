@@ -189,8 +189,7 @@ public class SurveyManagementController
 		String surveyId = request.getParameter("surveyId");
 		//add a request parameter to check if the question is set to nps or not 
 		int isNpsQuestionInt = Integer.parseInt(request.getParameter("isNPSQuestion"));
-		//int considerForScoreInt = Integer.parseInt(request.getParameter("considerForScore"));
-	    int considerForScoreInt = 0;
+		int considerForScoreInt = Integer.parseInt(request.getParameter("considerForScore"));
 		int questionId = Integer.parseInt( request.getParameter("questionId") );
 		//encode question and response
 		question = new String( DatatypeConverter.parseBase64Binary(question) );
