@@ -396,9 +396,9 @@ public class SurveyApiV2Controller
     @RequestMapping ( value = "/surveys/{surveyId}/response", method = RequestMethod.POST)
     @ApiOperation ( value = "Update Survey Response And Get Swear words")
     public String updateSurveyResponse( @PathVariable ( "surveyId") String surveyId, String question, String questionType, String answer, int stage,
-        boolean isUserRankingQuestion, boolean isNpsQuestion  ){
+        boolean isUserRankingQuestion, boolean isNpsQuestion , int questionId , boolean considerForScore ){
         LOGGER.info("Method updateSurveyResponse() started to store response of customer.");
-        surveyHandler.updateCustomerAnswersInSurvey(surveyId, question, questionType, answer, stage, isUserRankingQuestion, isNpsQuestion);
+        surveyHandler.updateCustomerAnswersInSurvey(surveyId, question, questionType, answer, stage, isUserRankingQuestion, isNpsQuestion, questionId, considerForScore);
         LOGGER.info("Method updateSurveyResponse() to store response of customer finished successfully");
         return "Survey response updated successfully";
     }
