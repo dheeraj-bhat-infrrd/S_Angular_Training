@@ -15,6 +15,7 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.bson.types.ObjectId;
+import org.hibernate.engine.jdbc.internal.DDLFormatterImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -946,7 +947,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         /**
          * fetching only completed surveys
          */
-        query.addCriteria( Criteria.where( CommonConstants.REVIEW_COLUMN ).exists( true ).nin( "" ) );
+        //query.addCriteria( Criteria.where( CommonConstants.REVIEW_COLUMN ).exists( true ).nin( "" ) );
+        query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
+        
         if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
             query.addCriteria( Criteria.where( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) );
         }
@@ -2908,7 +2911,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
      * Method to fetch survey details on the basis of agentId and customer email.
      */
     @Override
-    public List<SurveyDetails> getFilteredSurveys( int start, int batchSize, long companyId, String status, String mood,
+    public List<SurveyDetails> getFilteredSurveys( int start, int batchSize, long companyId, String mood,
         Long startSurveyID, Date startReviewDate, Date startTransactionDate, List<Long> userIds, boolean isRetaken )
     {
         LOG.debug( "Method getSurveyByStartIndexAndStatus() started." );
@@ -2919,15 +2922,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
 
         // add status criteria
-        if ( status != null ) {
-            if ( status.equals( CommonConstants.SURVEY_API_SURVEY_STATUS_COMPLETE ) ) {
-                query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
-            } else if ( status.equals( CommonConstants.SURVEY_API_SURVEY_STATUS_INCOMPLETE ) ) {
-                query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).ne( CommonConstants.SURVEY_STAGE_COMPLETE ) );
-            } else if ( status.equals( CommonConstants.SURVEY_API_SURVEY_STATUS_ALL ) ) {
-
-            }
-        }
+        query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
+        
 
         //add mood criteria
         if ( !StringUtils.isEmpty( mood ) ) {
@@ -2972,7 +2968,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
 
     @Override
-    public Long getFilteredSurveyCount( long companyId, String status, String mood, Long startSurveyID, Date startReviewDate,
+    public Long getFilteredSurveyCount( long companyId, String mood, Long startSurveyID, Date startReviewDate,
         Date startTransactionDate, List<Long> userIds, boolean isRetaken )
     {
         LOG.debug( "Method to get count of total number of surveys completed so far, getCompletedSurveyCount() started." );
@@ -2983,15 +2979,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
 
         // add status criteria
-        if ( status != null ) {
-            if ( status.equals( CommonConstants.SURVEY_API_SURVEY_STATUS_COMPLETE ) ) {
-                query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
-            } else if ( status.equals( CommonConstants.SURVEY_API_SURVEY_STATUS_INCOMPLETE ) ) {
-                query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).ne( CommonConstants.SURVEY_STAGE_COMPLETE ) );
-            } else if ( status.equals( CommonConstants.SURVEY_API_SURVEY_STATUS_ALL ) ) {
-
-            }
-        }
+        query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
+        
 
         //add mood criteria
         if ( !StringUtils.isEmpty( mood ) ) {
@@ -3460,6 +3449,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyDetails.get_id() ) );
 
         Update update = new Update();
+        update.set( CommonConstants.STAGE_COLUMN, surveyDetails.getStage());
+        update.set( CommonConstants.REVIEW_COLUMN , surveyDetails.getReview() );
         update.set( CommonConstants.RETAKE_SURVEY_COLUMN, surveyDetails.isRetakeSurvey());
         update.set( CommonConstants.NO_OF_RETAKE_COLUMN, surveyDetails.getNoOfRetake() );
         update.set( CommonConstants.LAST_RETAKE_REQUEST_DATE_COLUMN, surveyDetails.getLastRetakeRequestDate());

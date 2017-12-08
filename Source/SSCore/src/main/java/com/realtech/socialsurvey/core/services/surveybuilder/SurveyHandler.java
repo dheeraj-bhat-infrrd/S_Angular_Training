@@ -350,7 +350,7 @@ public interface SurveyHandler
     SurveyDetails getSurveyBySurveyPreIntitiationId( long surveyPreIntitiationId );
 
 
-    SurveysAndReviewsVO getSurveysByFilterCriteria( String status, String mood , Long startSurveyID, Date startReviewDate , Date startTransactionDate , List<Long> userIds , boolean isRetaken,  int startIndex, int count , long companyId);
+    SurveysAndReviewsVO getSurveysByFilterCriteria( String mood , Long startSurveyID, Date startReviewDate , Date startTransactionDate , List<Long> userIds , boolean isRetaken,  int startIndex, int count , long companyId);
 
 
     public void prepareAndSendInvitationMail( SurveyPreInitiation survey ) throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException;
@@ -408,7 +408,7 @@ public interface SurveyHandler
     public boolean isFileAlreadyUploaded( String fileName, String uploaderEmail );
 
 
-    public Integer getSurveysCountByFilterCriteria( String status, String mood, Long startSurveyID, Date startReviewDate,
+    public Integer getSurveysCountByFilterCriteria( String mood, Long startSurveyID, Date startReviewDate,
         Date startTransactionDate, List<Long> userIds, boolean isRetaken, long companyId );
 
 
