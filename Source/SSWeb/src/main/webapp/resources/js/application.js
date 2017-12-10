@@ -3233,7 +3233,72 @@ function bindEditSurveyEvents() {
 			loadActiveSurveyQuestions();
 		});
 	});
+
+	$('.bd-nps-btn-done').on('click', function(e) {
+		e.stopPropagation();
+		var npsQuestion = $('#sb-nps-question-txt').val();
+		var editedStatus;
+		
+		var count=1;
+		while (count <= currentQues) {
+			if ($('#nps-question-form').attr('data-status') == 'edited') {
+				editedStatus = true;
+				break;
+			} else {
+				editedStatus = false;
+			}
+			count++;
+		}
+		
+		
+		createPopupConfirm("Unsaved changes detected", "Do you want to save your changes ?", "Save", "Cancel");
+
+		$('#overlay-continue').off('click');
+		$('#overlay-continue').on('click', function() {
+				
+			if(editedStatus==false){
+				if(npsQuestion == '' || npsQuestion == null || npsQuestion == undefined){
+					$("#overlay-toast").html('Please finish adding the Question');
+					showToast();
+				}else{
+					var url = "./addquestiontosurvey.do?order=" + count;
+					callAjaxFormSubmit(url, function(data) {
+						var map = $.parseJSON(data);
+						$("#overlay-toast").html(map.message);
+						showToast();
+
+						if (map.status == "success") {
+							$('#nps-question-form').attr('data-quesref', map.questionId);
+							revertQuestionOverlay();
+						} else {
+							$('#nps-question-form').attr('data-state', 'new');
+							$('#nps-question-form').attr('data-status', 'edited');
+						}
+					}, 'nps-question-form', '#overlay-continue');
+				}
+			}
+			
+			count++;
+
+			$('#overlay-continue').unbind('click');
+			$('#overlay-cancel').unbind('click');
+			overlayRevert();
+			setTimeout(function() {
+				loadActiveSurveyQuestions();
+			}, 2000);
+		});
+		$('#overlay-cancel').click(function() {
+			$('#overlay-continue').unbind('click');
+			$('#overlay-cancel').unbind('click');
+			overlayRevert();
+
+			revertQuestionOverlay();
+			loadActiveSurveyQuestions();
+		});
+	});
 }
+
+
 
 function revertQuestionOverlay() {
 	var url = "./revertquestionoverlay.do";
@@ -3253,6 +3318,7 @@ $(document).on('click', '.bd-q-pu-close', function() {
 
 $(document).on('input', '.bd-q-pu-txt-edit', function() {
 	var quesNum = $(this).closest('form').data('quesnum');
+	$('#nps-ques-edit').val(false);
 	$('#bs-question-edit-' + quesNum).attr('data-status', 'edited');
 	showStatus('#bs-question-edit-' + quesNum, 'Edited');
 });
@@ -3385,6 +3451,117 @@ $(document).on('click', '#user-ranking-chkbox-wrapper-new', function() {
 	}
 });
 
+$(document).on('click', '#user-ranking-chkbox-nps-wrapper', function() {
+	if ($('#user-ranking-nps-chkbox').hasClass('bd-check-img-checked')) {		
+		$('#user-ranking-nps-chkbox').removeClass('bd-check-img-checked');
+		 $('#user-ranking-nps-ques').val(true);
+	} else {		
+		$('#user-ranking-nps-chkbox').addClass('bd-check-img-checked')
+		 $('#user-ranking-nps-ques').val(false);
+	}
+});
+
+$(document).on('click', '#user-ranking-chkbox-wrapper-nps', function() {
+	if ($('#user-ranking-chkbox-nps').hasClass('bd-check-img-checked')) {		
+		$('#user-ranking-chkbox-nps').removeClass('bd-check-img-checked');
+		 $('#user-ranking-ques-nps').val(true);
+	} else {		
+		$('#user-ranking-chkbox-nps').addClass('bd-check-img-checked')
+		 $('#user-ranking-ques-nps').val(false);
+	}
+});
+
+$(document).on('click', '#user-ranking-chkbox-wrapper-edit-nps', function() {
+	if ($('#user-ranking-chkbox-edit-nps').hasClass('bd-check-img-checked')) {		
+		$('#user-ranking-chkbox-edit-nps').removeClass('bd-check-img-checked');
+		 $('#user-ranking-ques-edit-nps').val(true);
+	} else {		
+		$('#user-ranking-chkbox-edit-nps').addClass('bd-check-img-checked')
+		 $('#user-ranking-ques-edit-nps').val(false);
+	}
+});
+
+$(document).on('click', '#user-ranking-chkbox-wrapper-overlay', function() {
+	if ($('#user-ranking-chkbox-overlay-nps').hasClass('bd-check-img-checked')) {		
+		$('#user-ranking-chkbox-overlay-nps').removeClass('bd-check-img-checked');
+		 $('#user-ranking-ques-overlay-nps').val(true);
+	} else {		
+		$('#user-ranking-chkbox-overlay-nps').addClass('bd-check-img-checked')
+		 $('#user-ranking-ques-overlay-nps').val(false);
+	}
+});
+
+$(document).on('click', '#user-ranking-chkbox-wrapper-new-nps', function() {
+	if ($('#user-ranking-chkbox-new-nps').hasClass('bd-check-img-checked')) {		
+		$('#user-ranking-chkbox-new-nps').removeClass('bd-check-img-checked');
+		 $('#user-ranking-ques-new-nps').val(true);
+	} else {		
+		$('#user-ranking-chkbox-new-nps').addClass('bd-check-img-checked')
+		 $('#user-ranking-ques-new-nps').val(false);
+	}
+});
+
+$(document).on('click', '#avg-score-chkbox-wrapper-new', function() {
+	if ($('#avg-score-chkbox-new').hasClass('bd-check-img-checked')) {		
+		$('#avg-score-chkbox-new').removeClass('bd-check-img-checked');
+		 $('#avg-score-ques-new').val(true);
+	} else {		
+		$('#avg-score-chkbox-new').addClass('bd-check-img-checked')
+		 $('#avg-score-ques-new').val(false);
+	}
+});
+
+$(document).on('click', '#avg-score-chkbox-wrapper-overlay', function() {
+	if ($('#avg-score-chkbox-overlay').hasClass('bd-check-img-checked')) {		
+		$('#avg-score-chkbox-overlay').removeClass('bd-check-img-checked');
+		 $('#avg-score-ques-overlay').val(true);
+	} else {		
+		$('#avg-score-chkbox-overlay').addClass('bd-check-img-checked')
+		 $('#avg-score-ques-overlay').val(false);
+	}
+});
+
+$(document).on('click', '#avg-score-chkbox-wrapper-edit', function() {
+	if ($('#avg-score-chkbox-edit').hasClass('bd-check-img-checked')) {		
+		$('#avg-score-chkbox-edit').removeClass('bd-check-img-checked');
+		 $('#avg-score-ques-edit').val(true);
+	} else {		
+		$('#avg-score-chkbox-edit').addClass('bd-check-img-checked')
+		 $('#avg-score-ques-edit').val(false);
+	}
+});
+
+$(document).on('click', '#avg-score-chkbox-wrapper', function() {
+	if ($('#avg-score-chkbox').hasClass('bd-check-img-checked')) {		
+		$('#avg-score-chkbox').removeClass('bd-check-img-checked');
+		 $('#avg-score-ques').val(true);
+	} else {		
+		$('#avg-score-chkbox').addClass('bd-check-img-checked')
+		 $('#avg-score-ques').val(false);
+	}
+});
+
+$(document).on('click', '#avg-score-chkbox-wrapper-nps', function() {
+	if ($('#avg-score-chkbox-nps').hasClass('bd-check-img-checked')) {		
+		$('#avg-score-chkbox-nps').removeClass('bd-check-img-checked');
+		 $('#avg-score-ques-nps').val(true);
+	} else {		
+		$('#avg-score-chkbox-nps').addClass('bd-check-img-checked')
+		 $('#avg-score-ques-nps').val(false);
+	}
+});
+
+$(document).on('click', '#nps-chkbox-wrapper', function() {
+	if ($('#nps-chkbox').hasClass('bd-check-img-checked')) {		
+		$('#nps-add-edit').show();
+		$('#nps-chkbox').removeClass('bd-check-img-checked');
+		$('#nps-ques').val(true);
+	} else {		
+		$('#nps-chkbox').addClass('bd-check-img-checked');
+		 $('#nps-ques').val(false);
+		$('#nps-add-edit').hide();
+	}
+});
 
 // Submit previous question
 var currentQues = 1;
@@ -3445,15 +3622,18 @@ $(document).on("focus", '.bd-q-pu-txt', function() {
 	}
 });
 
-$(document).on("input",'#sb-nps-question-txt',function(){
-	$('#nps-add-edit').show();
-});
-
-$(document).on("click",'.bd-nps-btn-done',function(){
-	$('#nps-add-edit').hide();
+$(document).on("focus",'#sb-nps-question-txt',function(){
+	
+	if(!$('#nps-ques').val()){
+		$("#overlay-toast").html('NPS is disabled. Please Enable to add/edit nps question');
+		showToast();
+	}
+	
 });
 
 $(document).on("input", '.bd-q-pu-txt', function() {
+	$('#nps-ques-new').val(false);
+	$('#nps-ques-overlay').val(false);
 	var quesPresent = $(this).closest('form').data('quesnum');
 
 	// Setting status

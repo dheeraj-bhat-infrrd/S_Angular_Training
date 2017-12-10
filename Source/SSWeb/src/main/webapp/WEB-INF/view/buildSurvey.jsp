@@ -93,22 +93,25 @@
 												</c:forEach>
 											</div>
 											<div class="sq-1to10-range-val">
-												<input name="sq-range-1to10-customize" class="float-left sq-range-1to10-input" value="Not at all likely"> 
-												<input name="sq-range-1to10-customize" class="float-right sq-range-1to10-input text-align-right" value="Very Likely">
+												<input id="sq-not-very-likely" name="notVeryLikely" class="float-left sq-range-1to10-input sq-not-very-likely" value="Not at all likely">
+												<input id="sq-very-likely" name="veryLikely" class="float-right sq-range-1to10-input text-align-right sq-very-likely" value="Very Likely">
 											</div>
 										</div>
 									</div>
 								</div>
 								<div class="bd-q-pu-done-wrapper bd-q-pu-done-wrapper-override clearfix">
-									<div id="user-ranking-chkbox-wrapper-new" class="clearfix" style="width: 200px;">
-										<div id="user-ranking-chkbox-new" class="float-left user-ranking-chkbox bd-check-img"></div>
-										<input type="hidden" id="user-ranking-ques-new" name="user-ranking-ques" value=true>
+									<div id="user-ranking-chkbox-nps-wrapper" class="clearfix" style="width: 200px;">
+										<div id="user-ranking-nps-chkbox" class="float-left user-ranking-chkbox bd-check-img"></div>
+										<input type="hidden" id="user-ranking-nps-ques" name="user-ranking-ques" value=true>
 										<div class="float-left  listing-access-txt cursor-pointer">Consider for User Ranking</div>
 									</div>
-									<div id="avg-score-chkbox-wrapper-new" class="clearfix" style="width: 210px;">
-										<div id="avg-score-chkbox-new" class="float-left avg-score bd-check-img"></div>
-										<input type="hidden" id="avg-score-ques-new" name="avg-score-ques" value=true>
+									<div id="avg-score-chkbox-wrapper" class="clearfix" style="width: 210px;">
+										<div id="avg-score-chkbox" class="float-left avg-score bd-check-img"></div>
+										<input type="hidden" id="avg-score-ques" name="considerForScore" value=true>
 										<div class="float-left  listing-access-txt cursor-pointer">Consider for Average Score</div>
+									</div>
+									<div id="nps-chkbox-wrapper-1" class="clearfix">
+										<input type="hidden" id="nps-ques-1" name="nps-ques" value=false>
 									</div>
 								</div>
 							</div>
@@ -190,11 +193,11 @@
 			<div id="btn-add-question" class="float-right bd-svry-right"><spring:message code="label.addnewquestion.key" /></div>
 		</div>
 	</div>
-	<div class="bd-srv-q-tbl" style="display:grid">
+	<div id="npsQuestion" data-quesref="" class="bd-srv-q-tbl" style="display:grid">
 		<div class="bd-srv-tbl-header">
 			<spring:message code="label.build.nps.question.key" />
 		</div>
-
+		<form id="nps-question-form" data-quesnum="1" data-quesref="" data-state="new" data-status="new">
 		<div class="bd-q-pu-header clearfix">
 			<div class="float-left bd-q-pu-header-lft">Enter/Edit Your NPS Questions Here</div>
 		</div>
@@ -204,6 +207,11 @@
 				<input id="sb-nps-question-txt" name="sb-nps-question-txt" class="bd-q-pu-txt-nps">
 				<div class="bd-q-pu-close hide"></div>
 			</div>
+		</div>
+		<div id="nps-chkbox-wrapper" class="clearfix" style="width: 210px;">
+			<div id="nps-chkbox" class="float-left avg-score bd-check-img bd-check-img-checked"></div>
+			<input type="hidden" id="nps-ques" name="nps-ques" value=false>
+			<div class="float-left  listing-access-txt cursor-pointer">Enable NPS Question</div>
 		</div>
 		
 		<div id="nps-add-edit" class="bd-ans-type-radio bd-ans-type-item hide">
@@ -233,8 +241,8 @@
 							</c:forEach>
 						</div>
 						<div class="sq-1to10-range-val">
-							<input name="sq-range-1to10-customize" class="float-left sq-range-1to10-input" value="Not at all likely"> 
-							<input name="sq-range-1to10-customize" class="float-right sq-range-1to10-input text-align-right" value="Very Likely">
+							<input id="sq-not-very-likely-nps" name="notVeryLikely" class="float-left sq-range-1to10-input sq-not-very-likely" value="Not at all likely">
+							<input id="sq-very-likely-nps" name="veryLikely" class="float-right sq-range-1to10-input text-align-right sq-very-likely" value="Very Likely">
 						</div>
 					</div>
 				</div>
@@ -243,12 +251,12 @@
 				class="bd-q-pu-done-wrapper bd-q-pu-done-wrapper-override clearfix">
 				<div id="user-ranking-chkbox-wrapper-nps" class="clearfix" style="width: 200px;">
 					<div id="user-ranking-chkbox-nps" class="float-left user-ranking-chkbox bd-check-img"></div>
-					<input type="hidden" id="user-ranking-ques-nps" name="user-ranking-ques-nps" value=true>
+					<input type="hidden" id="user-ranking-ques-nps" name="user-ranking-ques" value=true>
 					<div class="float-left  listing-access-txt cursor-pointer">Consider for User Ranking</div>
 				</div>
-				<div id="avg-score-chkbox-wrapper-new" class="clearfix" style="width: 210px;">
+				<div id="avg-score-chkbox-wrapper-nps" class="clearfix" style="width: 210px;">
 					<div id="avg-score-chkbox-nps" class="float-left avg-score bd-check-img"></div>
-					<input type="hidden" id="avg-score-ques-nps" name="avg-score-ques-nps" value=true>
+					<input type="hidden" id="avg-score-ques-nps" name="considerForScore" value=true>
 					<div class="float-left  listing-access-txt cursor-pointer">Consider for Average Score</div>
 				</div>
 			</div>
@@ -256,6 +264,7 @@
 				<div class="bd-nps-btn-done float-left"><spring:message code="label.done.key" /></div>
 			</div>
 		</div>
+		</form>
 	</div>
 </div>
 <script>
