@@ -874,6 +874,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
             } else {
                 update.set( CommonConstants.PROFILE_IMAGE_URL_SOLR, imgFileName );
                 update.set( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, imgFileName );
+                update.set( CommonConstants.PROFILE_IMAGE_RECTANGULAR_THUMBNAIL_COLUMN, imgFileName );
             }
             update.set( CommonConstants.IS_PROFILE_IMAGE_PROCESSED_COLUMN, flagValue );
         } else if ( imageType == CommonConstants.IMAGE_TYPE_LOGO ) {
