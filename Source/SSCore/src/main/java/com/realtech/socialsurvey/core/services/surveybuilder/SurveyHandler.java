@@ -1,20 +1,19 @@
 package com.realtech.socialsurvey.core.services.surveybuilder;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.solr.client.solrj.SolrServerException;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
-import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.BulkSurveyDetail;
 import com.realtech.socialsurvey.core.entities.Company;
-import com.realtech.socialsurvey.core.entities.HierarchyRelocationTarget;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SocialMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyImportVO;
@@ -92,7 +91,7 @@ public interface SurveyHandler
     public void markSurveyAsSent( SurveyPreInitiation surveyPreInitiation );
 
 
-    public Map<String, String> getEmailIdsOfAdminsInHierarchy( long agentId ) throws InvalidInputException;
+    public Map<String, Map<String, String>> getEmailIdsOfAdminsInHierarchy( long agentId ) throws InvalidInputException;
 
 
     public List<SurveyPreInitiation> getIncompleteSurveyForReminderEmail( Company company, Date minLastReminderDate , Date maxLastReminderDate, int maxReminderCount );
@@ -121,7 +120,7 @@ public interface SurveyHandler
     public String getSurveyUrl( long agentId, String customerEmail, String baseUrl ) throws InvalidInputException;
 
 
-    public void changeStatusOfSurvey( String surveyId, boolean editable );
+    public void markSurveyAsRetake( String surveyId, boolean editable );
 
 
     public void storeSPIandSendSurveyInvitationMail( String custFirstName, String custLastName, String custEmail,
@@ -351,7 +350,7 @@ public interface SurveyHandler
     SurveyDetails getSurveyBySurveyPreIntitiationId( long surveyPreIntitiationId );
 
 
-    SurveysAndReviewsVO getSurveysByFilterCriteria( String status, String mood , Long startSurveyID, Date startReviewDate , Date startTransactionDate , List<Long> userIds ,  int startIndex, int count , long companyId);
+    SurveysAndReviewsVO getSurveysByFilterCriteria( String mood , Long startSurveyID, Date startReviewDate , Date startTransactionDate , List<Long> userIds , boolean isRetaken,  int startIndex, int count , long companyId);
 
 
     public void prepareAndSendInvitationMail( SurveyPreInitiation survey ) throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException;
@@ -383,4 +382,41 @@ public interface SurveyHandler
 
 
     List<SurveyPreInitiation> validatePreinitiatedRecord( List<SurveyPreInitiation> surveyPreInitiations ) throws InvalidInputException;
+    
+    /**
+     * method to build survey completion threshold Map
+     * @param survey
+     * @return Map
+     * @throws InvalidInputException 
+     * @throws NoRecordsFetchedException 
+     */
+    public Map<String, Double> buildSurveyCompletionThresholdMap( SurveyDetails survey ) throws InvalidInputException, NoRecordsFetchedException;
+
+
+    public Map<String, String> buildPreferredAdminEmailListForSurvey( SurveyDetails survey, double companyThreshold,
+        double regionThreshold, double branchThreshold ) throws InvalidInputException;
+
+
+
+    public boolean createEntryForSurveyUploadWithCsv( String hierarchyType, MultipartFile tempFile, String fileName, long hierarchyId,
+        User user, String uploaderEmail ) throws NonFatalException, UnsupportedEncodingException;
+
+
+    public void processActiveSurveyCsvUploads();
+
+
+    public boolean isFileAlreadyUploaded( String fileName, String uploaderEmail );
+
+
+    public Integer getSurveysCountByFilterCriteria( String mood, Long startSurveyID, Date startReviewDate,
+        Date startTransactionDate, List<Long> userIds, boolean isRetaken, long companyId );
+
+
+    public Float getSurveysAvgScoreByFilterCriteria( String mood, Long startSurveyID, Date startReviewDate,
+        Date startTransactionDate, List<Long> userIds, boolean isRetaken, long companyId );
+
+
+    public SurveysAndReviewsVO getIncompelteSurveysByFilterCriteria( Long startSurveyID, Date startTransactionDate,
+        List<Long> userIds, int startIndex, int count, long companyId );
+
 }

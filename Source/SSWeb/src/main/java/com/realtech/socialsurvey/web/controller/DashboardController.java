@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +32,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileStage;
@@ -43,9 +41,6 @@ import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyRecipient;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
-import com.realtech.socialsurvey.core.enums.OrganizationUnit;
-import com.realtech.socialsurvey.core.enums.SettingsForApplication;
-import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -59,8 +54,6 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.SurveyPreI
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.reports.AdminReports;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
-import com.realtech.socialsurvey.core.services.search.exception.SolrException;
-import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.services.surveybuilder.impl.DuplicateSurveyRequestException;
 import com.realtech.socialsurvey.core.services.surveybuilder.impl.SelfSurveyInitiationException;
@@ -140,6 +133,7 @@ public class DashboardController
         HttpSession session = request.getSession( false );
         User user = sessionHelper.getCurrentUser();
         if ( user == null ) {
+        	LOG.warn("NonFatalException while logging in.");
             throw new NonFatalException( "NonFatalException while logging in. " );
         }
 
@@ -215,7 +209,7 @@ public class DashboardController
                 hiddenSection = settings.isHiddenSection();
             }
         } catch ( InvalidInputException e ) {
-            LOG.error( "fetching hiddensction varibale value failed." + e );
+            LOG.error( "fetching hiddensction varibale value failed." , e );
         }
         return String.valueOf( hiddenSection );
     }
@@ -254,7 +248,7 @@ public class DashboardController
                     columnValue = Long.parseLong( request.getParameter( "columnValue" ) );
                 } catch ( NumberFormatException e ) {
                     LOG.error(
-                        "NumberFormatException caught in getProfileDetails() while converting columnValue for regionId/branchId/agentId." );
+                        "NumberFormatException caught in getProfileDetails() while converting columnValue for regionId/branchId/agentId", e );
                     throw e;
                 }
 
@@ -272,7 +266,7 @@ public class DashboardController
                     columnValue = Long.parseLong( request.getParameter( "columnValue" ) );
                 } catch ( NumberFormatException e ) {
                     LOG.error(
-                        "NumberFormatException caught in getProfileDetails() while converting columnValue for regionId/branchId/agentId." );
+                        "NumberFormatException caught in getProfileDetails() while converting columnValue for regionId/branchId/agentId", e );
                     throw e;
                 }
 
@@ -320,25 +314,25 @@ public class DashboardController
                     numberOfDays = Integer.parseInt( request.getParameter( "numberOfDays" ) );
                 }
             } catch ( NumberFormatException e ) {
-                LOG.error( "NumberFormatException caught in getProfileDetails() while converting numberOfDays." );
+                LOG.error( "NumberFormatException caught in getProfileDetails() while converting numberOfDays", e );
                 throw e;
             }
 
             if ( realtechAdmin ) {
                 columnName = null;
             }
-            LOG.debug( "Getting the survey score." );
+            LOG.debug( "Getting the survey score" );
             double surveyScore = dashboardService.getSurveyScore( columnName, columnValue, numberOfDays, realtechAdmin );
             //get formatted survey score using rating format  
             surveyScore = surveyHandler.getFormattedSurveyScore( surveyScore );
-            LOG.debug( "Getting the sent surveys count." );
+            LOG.debug( "Getting the sent surveys count" );
             int sentSurveyCount = (int) dashboardService.getAllSurveyCount( columnName, columnValue, numberOfDays );
-            LOG.debug( "Getting the social posts count with hierarchy." );
+            LOG.debug( "Getting the social posts count with hierarchy" );
             int socialPostsCount = (int) dashboardService.getSocialPostsForPastNdaysWithHierarchy( columnName, columnValue,
                 numberOfDays );
             int profileCompleteness = 0;
             if ( !realtechAdmin ) {
-                LOG.debug( "Getting profile completeness." );
+                LOG.debug( "Getting profile completeness" );
                 profileCompleteness = dashboardService.getProfileCompletionPercentage( user, columnName, columnValue,
                     unitSettings );
             }
@@ -357,7 +351,7 @@ public class DashboardController
             }
 
             model.addAttribute( "profileCompleteness", profileCompleteness );
-            LOG.debug( "Getting the badges." );
+            LOG.debug( "Getting the badges" );
             model.addAttribute( "badges",
                 dashboardService.getBadges( surveyScore, sentSurveyCount, socialPostsCount, profileCompleteness ) );
 
@@ -367,7 +361,7 @@ public class DashboardController
             LOG.info( "Method to get profile of company/region/branch/agent getProfileDetails() finished" );
             return JspResolver.DASHBOARD_PROFILEDETAIL;
         } catch ( InvalidInputException | NoRecordsFetchedException e ) {
-            LOG.error( "NonFatalException while fetching profile details. Reason :" + e.getMessage(), e );
+            LOG.error( "NonFatalException while fetching profile details", e );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( DisplayMessageConstants.GENERAL_ERROR, DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
@@ -393,7 +387,8 @@ public class DashboardController
             columnValue = Long.parseLong( columnValueStr );
         } catch ( NumberFormatException e ) {
             LOG.error(
-                "NumberFormatException caught in getSurveyCount() while converting columnValue for regionId/branchId/agentId." );
+                "NumberFormatException caught in getSurveyCount() while converting columnValue for regionId/branchId/agentId.",
+                e );
             throw e;
         }
 
@@ -407,7 +402,7 @@ public class DashboardController
                 numberOfDays = Integer.parseInt( request.getParameter( "numberOfDays" ) );
             }
         } catch ( NumberFormatException e ) {
-            LOG.error( "NumberFormatException caught in getSurveyCount() while converting numberOfDays." );
+            LOG.error( "NumberFormatException caught in getSurveyCount() while converting numberOfDays.", e );
             throw e;
         }
 
@@ -425,7 +420,7 @@ public class DashboardController
             model.addAttribute( "importedFrom3rdParty",
                 dashboardService.get3rdPartyImportCount( columnName, columnValue, numberOfDays ) );
         } catch ( InvalidInputException e ) {
-            LOG.error( "Error: " + e.getMessage(), e );
+            LOG.error( "Found InvalidInputException.", e );
 
         }
 
@@ -448,7 +443,7 @@ public class DashboardController
         try {
             String columnName = request.getParameter( "columnName" );
             if ( !realtechAdmin && ( columnName == null || columnName.isEmpty() ) ) {
-                LOG.error( "Null/Empty value found for field columnName." );
+                LOG.warn( "Null/Empty value found for field columnName." );
                 throw new NonFatalException( "Null/Empty value found for field columnName." );
             }
 
@@ -458,7 +453,7 @@ public class DashboardController
                 columnValue = Long.parseLong( columnValueStr );
             } catch ( NumberFormatException e ) {
                 LOG.error(
-                    "NumberFormatException in getSurveyCountForCompany() while converting columnValue for regionId/branchId/agentId." );
+                    "NumberFormatException in getSurveyCountForCompany() while converting columnValue for regionId/branchId/agentId.", e );
                 throw e;
             }
 
@@ -468,7 +463,7 @@ public class DashboardController
                     numberOfDays = Integer.parseInt( request.getParameter( "numberOfDays" ) );
                 }
             } catch ( NumberFormatException e ) {
-                LOG.error( "NumberFormatException caught in getSurveyCount() while converting numberOfDays." );
+                LOG.error( "NumberFormatException caught in getSurveyCount() while converting numberOfDays.", e );
                 throw e;
             }
 
@@ -512,7 +507,7 @@ public class DashboardController
 
             String columnName = request.getParameter( "columnName" );
             if ( columnName == null || columnName.isEmpty() ) {
-                LOG.error( "Invalid value (null/empty) passed for profile level." );
+                LOG.warn( "Invalid value (null/empty) passed for profile level." );
                 throw new InvalidInputException( "Invalid value (null/empty) passed for profile level." );
             }
             String profileLevel = getProfileLevel( columnName );
@@ -547,11 +542,12 @@ public class DashboardController
                     hiddenSection = settings.isHiddenSection();
                 }
             } catch ( InvalidInputException e ) {
-                LOG.error( "InvalidInputException caught in getReviews() while fetching reviews. Nested exception is ", e );
+                LOG.warn( "InvalidInputException caught in getReviews() while fetching reviews. Nested exception is ", e );
                 throw e;
             }
             model.addAttribute( "reviews", surveyDetails );
             model.addAttribute( "hiddenSection", hiddenSection );
+            model.addAttribute( "startIndex", startIndex );
         } catch ( NonFatalException e ) {
             LOG.error( "Non fatal exception caught in getReviews() while fetching reviews. Nested exception is ", e );
             model.addAttribute( "message", e.getMessage() );
@@ -633,7 +629,7 @@ public class DashboardController
         try {
             String columnName = request.getParameter( "columnName" );
             if ( columnName == null || columnName.isEmpty() ) {
-                LOG.error( "Invalid value (null/empty) passed for profile level." );
+                LOG.warn( "Invalid value (null/empty) passed for profile level." );
                 throw new InvalidInputException( "Invalid value (null/empty) passed for profile level." );
             }
 
@@ -752,6 +748,7 @@ public class DashboardController
                     incompleteSurveyId = Long.parseLong( incompleteSurveyIdStr );
                     incompleteSurveyIds.add( incompleteSurveyId );
                 } catch ( NumberFormatException e ) {
+                	LOG.error("Number format exception occured while parsing incomplet survey id : {}",incompleteSurveyIdStr,e);
                     throw new NonFatalException(
                         "Number format exception occured while parsing incomplet survey id : " + incompleteSurveyIdStr, e );
                 }
@@ -764,7 +761,7 @@ public class DashboardController
 
         } catch ( NonFatalException nonFatalException ) {
             LOG.error(
-                "Nonfatal exception occured in method cancelSurveyReminder, reason : " + nonFatalException.getMessage() );
+                "Nonfatal exception occured in method cancelSurveyReminder, reason : ",nonFatalException );
             return CommonConstants.ERROR;
         }
         return CommonConstants.SUCCESS_ATTRIBUTE;
@@ -778,7 +775,7 @@ public class DashboardController
     @RequestMapping ( value = "/fetchdashboardincompletesurveycount")
     public String getIncompleteSurveyCount( Model model, HttpServletRequest request )
     {
-        LOG.info( "Method to get reviews of company, region, branch, agent getReviews() started." );
+        LOG.info( "Method to get the incomplete survey counts for all time. " );
         long count = 0l;
         User user = sessionHelper.getCurrentUser();
 
@@ -788,8 +785,6 @@ public class DashboardController
             LOG.error( "Non fatal exception caught in getReviews() while fetching reviews. Nested exception is ", e );
             return e.getMessage();
         }
-
-        LOG.info( "Method to get reviews of company, region, branch, agent getReviews() finished." );
         return String.valueOf( count );
     }
 
@@ -816,7 +811,7 @@ public class DashboardController
         try {
             String columnName = request.getParameter( "columnName" );
             if ( columnName == null || columnName.isEmpty() ) {
-                LOG.error( "Invalid value (null/empty) passed for profile level." );
+                LOG.warn( "Invalid value (null/empty) passed for profile level." );
                 throw new InvalidInputException( "Invalid value (null/empty) passed for profile level." );
             }
 
@@ -844,7 +839,7 @@ public class DashboardController
             } else {
                 String columnValue = request.getParameter( "columnValue" );
                 if ( columnValue == null || columnValue.isEmpty() ) {
-                    LOG.error( "Null or empty value passed for Region/BranchId. Please pass valid value." );
+                    LOG.warn( "Null or empty value passed for Region/BranchId. Please pass valid value." );
                     throw new InvalidInputException(
                         "Null or empty value passed for Region/BranchId. Please pass valid value." );
                 }
@@ -875,14 +870,15 @@ public class DashboardController
         return new Gson().toJson( solrDocuments );
     }
 
+
     // fetch the count of incomplete survey
     private long fetchIncompleteSurveyCountForDashboardAllTime(HttpServletRequest request, User user) throws InvalidInputException{
-    	LOG.debug("Fetching incomplete survey count");
+    	LOG.debug("Fetching incomplete survey count.");
     	long count = 0;
     	String columnName = request.getParameter( "columnName" );
         if ( columnName == null || columnName.isEmpty() ) {
-            LOG.error( "Invalid value (null/empty) passed for profile level." );
-            throw new InvalidInputException( "Invalid value (null/empty) passed for profile level." );
+            LOG.warn( " Invalid value (null/empty) passed for columnName. " );
+            throw new InvalidInputException( "Invalid value (null/empty) passed for columnName." );
         }
         String profileLevel = getProfileLevel( columnName );
 
@@ -897,22 +893,23 @@ public class DashboardController
                 try {
                     iden = Long.parseLong( columnValue );
                 } catch ( NumberFormatException e ) {
-                    LOG.error( "NumberFormatException caught while parsing columnValue in getReviews(). Nested exception is ",
+                    LOG.error( "NumberFormatException caught while parsing columnValue in fetchIncompleteSurveyCountForDashboardAllTime(). Nested exception is ",
                         e );
                     throw e;
                 }
             }
         }
-        
+
         try {
-            count = profileManagementService.getIncompleteSurveyCount(iden, profileLevel, null, null);
+            count = profileManagementService.getIncompleteSurveyCount( iden, profileLevel, null, null );
         } catch ( InvalidInputException e ) {
-            LOG.error( "InvalidInputException caught in getReviews() while fetching reviews. Nested exception is ", e );
+            LOG.error( "InvalidInputException caught in fetchIncompleteSurveyCountForDashboardAllTime() while fetching reviews. Nested exception is ", e );
             throw e;
         }
-        
-    	return count;
+
+        return count;
     }
+
 
     /*
      * Fetches incomplete surveys based upon the criteria. Criteria can be
@@ -940,13 +937,14 @@ public class DashboardController
             try {
                 batchSize = Integer.parseInt( batchSizeStr );
             } catch ( NumberFormatException e ) {
+                LOG.error( "NumberFormatException while parsing {}", batchSize, e );
                 throw new InvalidInputException( "Invalid batch size passed" );
             }
         }
 
         String columnName = request.getParameter( "columnName" );
         if ( !realtechAdmin && ( columnName == null || columnName.isEmpty() ) ) {
-            LOG.error( "Invalid value (null/empty) passed for profile level." );
+            LOG.warn( "Invalid value (null/empty) passed for profile level." );
             throw new InvalidInputException( "Invalid value (null/empty) passed for profile level." );
         }
         String profileLevel = getProfileLevel( columnName );
@@ -999,7 +997,7 @@ public class DashboardController
 
             String searchColumn = request.getParameter( "searchColumn" );
             if ( searchColumn == null || searchColumn.isEmpty() ) {
-                LOG.error( "Invalid value (null/empty) passed for search criteria." );
+                LOG.warn( "Invalid value (null/empty) passed for search criteria." );
                 throw new InvalidInputException( "Invalid value (null/empty) passed for search criteria." );
             }
             model.addAttribute( "searchColumn", searchColumn );
@@ -1009,12 +1007,12 @@ public class DashboardController
 
             if ( !isRealTechOrSSAdmin ) {
                 if ( columnName == null || columnName.isEmpty() ) {
-                    LOG.error( "Invalid value (null/empty) passed for profile level." );
+                    LOG.warn( "Invalid value (null/empty) passed for profile level." );
                     throw new InvalidInputException( "Invalid value (null/empty) passed for profile level." );
                 }
 
                 if ( columnValueStr == null || columnValueStr.isEmpty() ) {
-                    LOG.error( "Invalid value (null/empty) passed for Region/branch Id." );
+                    LOG.warn( "Invalid value (null/empty) passed for Region/branch Id." );
                     throw new InvalidInputException( "Invalid value (null/empty) passed for Region/branch Id." );
                 }
             }
@@ -1096,12 +1094,12 @@ public class DashboardController
         LOG.info( "Method to send email to remind customer for survey sendReminderMailForSurvey() started." );
 
         Map<String, String> response = new HashMap<String, String>();
-        
+
         try {
             String surveyPreInitiationIdStr = request.getParameter( "surveyPreInitiationId" );
 
             if ( surveyPreInitiationIdStr == null || surveyPreInitiationIdStr.isEmpty() ) {
-                LOG.error( "Invalid value (null/empty) passed for surveyPreInitiationIdStr." );
+                LOG.warn( "Invalid value (null/empty) passed for surveyPreInitiationIdStr." );
                 throw new InvalidInputException( "Invalid value (null/empty) passed for surveyPreInitiationIdStr." );
             }
 
@@ -1109,45 +1107,54 @@ public class DashboardController
             try {
                 surveyPreInitiationId = Integer.parseInt( surveyPreInitiationIdStr );
             } catch ( NumberFormatException e ) {
-                throw new InvalidInputException( "Invalid surveyPreInitiationIdStr passed", e.getMessage(), e );
+            	LOG.error("Invalid surveyPreInitiationIdStr passed",e);
+                throw new InvalidInputException( "Invalid surveyPreInitiationIdStr passed", e );
             }
             SurveyPreInitiation survey = surveyHandler.getPreInitiatedSurveyById( surveyPreInitiationId );
 
-            if ( survey == null ){
+            if ( survey == null ) {
+            	LOG.warn("Invalid surveyPreInitiationIdStr passed");
                 throw new InvalidInputException( "Invalid surveyPreInitiationIdStr passed" );
             }
-            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( survey.getCompanyId() );
-            if(companySettings == null)
-               throw new InvalidInputException( "No company settings found" );
-            
-            
+            OrganizationUnitSettings companySettings = organizationManagementService
+                .getCompanySettings( survey.getCompanyId() );
+            if ( companySettings == null ){
+            	LOG.warn("No company settings found.");
+            	throw new InvalidInputException( "No company settings found" );
+            }
+                
+
+
             int maxReminderCount = CommonConstants.DEFAULT_MAX_REMINDER_COUNT;
-            if(companySettings.getSurvey_settings() != null && companySettings.getSurvey_settings().getMax_number_of_survey_reminders() > 0){
+            if ( companySettings.getSurvey_settings() != null
+                && companySettings.getSurvey_settings().getMax_number_of_survey_reminders() > 0 ) {
                 maxReminderCount = companySettings.getSurvey_settings().getMax_number_of_survey_reminders();
             }
-            
+
             //check if max survey reminder has been reached
-            if(survey.getReminderCounts() >= maxReminderCount){
-                response.put("success" ,  "Cannot send the reminder email to " +  survey.getCustomerEmailId() + ". No more reminders are allowed." );
+            if ( survey.getReminderCounts() >= maxReminderCount ) {
+                response.put( "success",
+                    "Cannot send the reminder email to " + survey.getCustomerEmailId() + ". No more reminders are allowed." );
                 return new Gson().toJson( response );
             }
-            
+
             Calendar yesterDayDate = Calendar.getInstance();
             yesterDayDate.add( Calendar.DATE, -1 );
-            if(survey.getLastReminderTime().after(  yesterDayDate.getTime() )  ){
-                response.put("success" ,  "Cannot send the reminder email to " +  survey.getCustomerEmailId() + ". You have sent a reminder in last 24 hrs");
+            if ( survey.getLastReminderTime().after( yesterDayDate.getTime() ) ) {
+                response.put( "success", "Cannot send the reminder email to " + survey.getCustomerEmailId()
+                    + ". You have sent a reminder in last 24 hrs" );
                 return new Gson().toJson( response );
             }
-            
+
             surveyHandler.sendSurveyReminderEmail( survey );
             // Increasing value of reminder count by 1.
             surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), true );
-            
-            response.put("success" ,  "Reminder mail sent successfully to " + survey.getCustomerEmailId()   );
-            
+
+            response.put( "success", "Reminder mail sent successfully to " + survey.getCustomerEmailId() );
+
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException caught in sendReminderMailForSurvey() while sending mail. Nested exception is ", e );
-            response.put("errMsg" , e.getMessage());
+            response.put( "errMsg", e.getMessage() );
         }
 
         LOG.info( "Method to send email to remind customer for survey sendReminderMailForSurvey() finished." );
@@ -1172,7 +1179,7 @@ public class DashboardController
         String[] surveysSelectedArray = surveysSelectedStr.split( "," );
         Map<String, String> response = new HashMap<String, String>();
         String responseMsg = "";
-        
+
         try {
             for ( String incompleteSurveyIdStr : surveysSelectedArray ) {
                 try {
@@ -1180,53 +1187,60 @@ public class DashboardController
                     try {
                         surveyPreInitiationId = Integer.parseInt( incompleteSurveyIdStr );
                     } catch ( NumberFormatException e ) {
-                        throw new InvalidInputException( "Invalid surveyPreInitiationIdStr passed", e.getMessage(), e );
+                    	LOG.error("Invalid surveyPreInitiationIdStr passed",e);
+                        throw new InvalidInputException( "Invalid surveyPreInitiationIdStr passed", e );
                     }
                     SurveyPreInitiation survey = surveyHandler.getPreInitiatedSurveyById( surveyPreInitiationId );
 
-                    if ( survey == null ){
+                    if ( survey == null ) {
+                    	LOG.warn("Invalid surveyPreInitiationIdStr passed");
                         throw new InvalidInputException( "Invalid surveyPreInitiationIdStr passed" );
                     }
-                    OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( survey.getCompanyId() );
-                    if(companySettings == null)
-                       throw new InvalidInputException( "No company settings found" );
-                    
-                    
+                    OrganizationUnitSettings companySettings = organizationManagementService
+                        .getCompanySettings( survey.getCompanyId() );
+                    if ( companySettings == null ){
+                    	LOG.warn("No company settings found");
+                    	throw new InvalidInputException( "No company settings found" );
+                    }
+
                     int maxReminderCount = CommonConstants.DEFAULT_MAX_REMINDER_COUNT;
-                    if(companySettings.getSurvey_settings() != null && companySettings.getSurvey_settings().getMax_number_of_survey_reminders() > 0){
+                    if ( companySettings.getSurvey_settings() != null
+                        && companySettings.getSurvey_settings().getMax_number_of_survey_reminders() > 0 ) {
                         maxReminderCount = companySettings.getSurvey_settings().getMax_number_of_survey_reminders();
                     }
-                    
+
                     //check if max survey reminder has been reached
-                    if(survey.getReminderCounts() >= maxReminderCount){
-                        responseMsg +=  "Cannot send the reminder email to " +  survey.getCustomerEmailId() + ". No more reminders are allowed. ";
+                    if ( survey.getReminderCounts() >= maxReminderCount ) {
+                        responseMsg += "Cannot send the reminder email to " + survey.getCustomerEmailId()
+                            + ". No more reminders are allowed. ";
                         continue;
                     }
-                    
+
                     Calendar yesterDayDate = Calendar.getInstance();
                     yesterDayDate.add( Calendar.DATE, -1 );
-                    if(survey.getLastReminderTime().after(  yesterDayDate.getTime() )  ){
-                        responseMsg += "Cannot send the reminder email to " +  survey.getCustomerEmailId() + ". You have sent a reminder in last 24 hrs. ";
+                    if ( survey.getLastReminderTime().after( yesterDayDate.getTime() ) ) {
+                        responseMsg += "Cannot send the reminder email to " + survey.getCustomerEmailId()
+                            + ". You have sent a reminder in last 24 hrs. ";
                         continue;
                     }
-                    
+
                     surveyHandler.sendSurveyReminderEmail( survey );
                     // Increasing value of reminder count by 1.
                     surveyHandler.updateReminderCount( survey.getSurveyPreIntitiationId(), true );
                     responseMsg += "Reminder mail sent successfully to " + survey.getCustomerEmailId();
-                    
+
                     responseMsg += "\n";
-                    
+
                 } catch ( NumberFormatException e ) {
+                	LOG.error("Number format exception occured while parsing incomplete survey id : "+incompleteSurveyIdStr,e);
                     throw new NonFatalException(
                         "Number format exception occured while parsing incomplete survey id : " + incompleteSurveyIdStr, e );
                 }
             }
-            response.put("success" , responseMsg );
+            response.put( "success", responseMsg );
         } catch ( NonFatalException nonFatalException ) {
-            LOG.error( "Nonfatal exception occured in method sendMultipleSurveyReminders, reason : "
-                + nonFatalException.getMessage() );
-            response.put("errMsg" , nonFatalException.getMessage());
+            LOG.error( "Nonfatal exception occured in method sendMultipleSurveyReminders, reason : ", nonFatalException );
+            response.put( "errMsg", nonFatalException.getMessage() );
         }
         return new Gson().toJson( response );
     }
@@ -1257,7 +1271,7 @@ public class DashboardController
 
             String columnName = request.getParameter( "columnName" );
             if ( columnName == null || columnName.isEmpty() ) {
-                LOG.error( "Invalid value (null/empty) passed for profile level." );
+                LOG.warn( "Invalid value (null/empty) passed for profile level." );
                 throw new InvalidInputException( "Invalid value (null/empty) passed for profile level." );
             }
 
@@ -1337,7 +1351,7 @@ public class DashboardController
 
             String columnName = request.getParameter( "columnName" );
             if ( !isRealTechOrSSAdmin && ( columnName == null || columnName.isEmpty() ) ) {
-                LOG.error( "Invalid value (null/empty) passed for profile level." );
+                LOG.warn( "Invalid value (null/empty) passed for profile level." );
                 throw new InvalidInputException( "Invalid value (null/empty) passed for profile level." );
             }
 
@@ -1432,7 +1446,7 @@ public class DashboardController
 
             String columnName = request.getParameter( "columnName" );
             if ( !isRealTechOrSSAdmin && ( columnName == null || columnName.isEmpty() ) ) {
-                LOG.error( "Invalid value (null/empty) passed for profile level." );
+                LOG.warn( "Invalid value (null/empty) passed for profile level." );
                 throw new InvalidInputException( "Invalid value (null/empty) passed for profile level." );
             }
 
@@ -1516,7 +1530,7 @@ public class DashboardController
 
             String columnName = request.getParameter( "columnName" );
             if ( !isRealTechOrSSAdmin && ( columnName == null || columnName.isEmpty() ) ) {
-                LOG.error( "Invalid value (null/empty) passed for profile level." );
+                LOG.warn( "Invalid value (null/empty) passed for profile level." );
                 throw new InvalidInputException( "Invalid value (null/empty) passed for profile level." );
             }
 
@@ -1586,7 +1600,6 @@ public class DashboardController
         String custFirstName = request.getParameter( "firstName" );
         String custLastName = request.getParameter( "lastName" );
         String custEmail = request.getParameter( "email" );
-        String custRelationWithAgent = request.getParameter( "relation" );
         User user = sessionHelper.getCurrentUser();
         String errorMsg = null;
         try {
@@ -1689,21 +1702,16 @@ public class DashboardController
             // String columnName = request.getParameter("columnName");
             try {
                 if ( payload == null ) {
+                	LOG.warn("SurveyRecipients passed was null or empty");
                     throw new InvalidInputException( "SurveyRecipients passed was null or empty" );
                 }
                 surveyRecipients = new ObjectMapper().readValue( payload,
                     TypeFactory.defaultInstance().constructCollectionType( List.class, SurveyRecipient.class ) );
             } catch ( IOException ioException ) {
+            	LOG.error("Error occurred while parsing the Json.",ioException);
                 throw new NonFatalException( "Error occurred while parsing the Json.", DisplayMessageConstants.GENERAL_ERROR,
                     ioException );
             }
-            /*
-             * if (columnName != null) { String profileLevel =
-             * getProfileLevel(columnName); if
-             * (profileLevel.equalsIgnoreCase(CommonConstants
-             * .PROFILE_LEVEL_INDIVIDUAL)) { agentId = user.getUserId(); } }
-             * else { agentId = user.getUserId(); }
-             */
             if ( source.equalsIgnoreCase( CommonConstants.SURVEY_REQUEST_AGENT ) ) {
                 agentId = user.getUserId();
             }
@@ -1716,6 +1724,7 @@ public class DashboardController
                             .equalsIgnoreCase( surveyRecipients.get( j ).getEmailId() ) ) {
                             if ( surveyRecipients.get( i ).getAgentEmailId()
                                 .equalsIgnoreCase( surveyRecipients.get( j ).getAgentEmailId() ) ) {
+                            	LOG.warn("Can't enter same email address multiple times for same user");
                                 throw new InvalidInputException(
                                     "Can't enter same email address multiple times for same user" );
                             }
@@ -1733,6 +1742,7 @@ public class DashboardController
                     } else if ( recipient.getAgentId() != 0 ) {
                         currentAgentId = recipient.getAgentId();
                     } else {
+                    	LOG.warn("Agent id can not be null.");
                         throw new InvalidInputException( "Agent id can not be null" );
                     }
 
@@ -1764,6 +1774,7 @@ public class DashboardController
                     errorMsg += duplicateSurveyErrorMsg;
                 }
                 if ( !errorMsg.isEmpty() ) {
+                	LOG.warn("NonFatalException occurred while sending surveys");
                     throw new NonFatalException( "NonFatalException occurred while sending surveys" );
                 }
             }
@@ -1802,7 +1813,7 @@ public class DashboardController
                 stages = new ArrayList<>( userManagementService.getUserSettings( columnValue ).getProfileStages() );
             }
         } catch ( InvalidInputException | NoRecordsFetchedException e ) {
-            LOG.error( "NonFatalException while fetching badge details. Reason :" + e.getMessage(), e );
+            LOG.error( "NonFatalException while fetching badge details." , e );
         }
         Collections.sort( stages );
         for ( int index = stages.size() - 1; index >= 0; index-- ) {
@@ -1842,7 +1853,7 @@ public class DashboardController
                 settings = userManagementService.getUserSettings( columnValue );
             }
         } catch ( InvalidInputException | NoRecordsFetchedException e ) {
-            LOG.error( "NonFatalException while fetching badge details. Reason :" + e.getMessage(), e );
+            LOG.error( "NonFatalException while fetching badge details. Reason :", e );
         }
 
 
@@ -1850,7 +1861,7 @@ public class DashboardController
         try {
             socialMedias = organizationManagementService.getExpiredSocailMedia( columnName, columnValue );
         } catch ( InvalidInputException | NoRecordsFetchedException e ) {
-            LOG.error( "NonFatalException while fetching badge details. Reason :" + e.getMessage(), e );
+            LOG.error( "NonFatalException while fetching badge details. Reason :", e );
         }
 
 
@@ -1866,7 +1877,7 @@ public class DashboardController
 
     private String getProfileLevel( String columnName )
     {
-        LOG.debug( "Method to return profile level based upon column to be queried started." );
+        LOG.debug( "Method to return profile level based upon column to be queried started. Column Name: {}", columnName );
         String profileLevel = "";
         switch ( columnName ) {
             case CommonConstants.COMPANY_ID_COLUMN:
@@ -1903,7 +1914,7 @@ public class DashboardController
                 throw new NumberFormatException();
             }
         } catch ( NumberFormatException e ) {
-            LOG.error( "Number format exception occurred while parsing the entity id. Reason :" + e.getMessage(), e );
+            LOG.error( "Number format exception occurred while parsing the entity id. Reason :", e );
         }
 
         String entityType = request.getParameter( "entityType" );
@@ -1929,7 +1940,7 @@ public class DashboardController
                 throw new InvalidInputException( "Passed parameter survey id is null or empty" );
             }
 
-            surveyHandler.changeStatusOfSurvey( surveyId, true );
+            surveyHandler.markSurveyAsRetake( surveyId, true );
             SurveyDetails survey = surveyHandler.getSurveyDetails( surveyId );
             long agentId = survey.getAgentId();
             User user = userManagementService.getUserByUserId( agentId );
@@ -1937,8 +1948,8 @@ public class DashboardController
             urlParams.put( CommonConstants.URL_PARAM_RETAKE_SURVEY, "true" );
             String updatedUrl = urlGenerator.generateUrl( urlParams,
                 surveyHandler.getApplicationBaseUrl() + CommonConstants.SHOW_SURVEY_PAGE_FOR_URL );
-            surveyHandler.sendSurveyRestartMail( survey.getCustomerFirstName(), survey.getCustomerLastName(), survey.getCustomerEmail(), survey.getCustRelationWithAgent(), user,
-                updatedUrl );
+            surveyHandler.sendSurveyRestartMail( survey.getCustomerFirstName(), survey.getCustomerLastName(),
+                survey.getCustomerEmail(), survey.getCustRelationWithAgent(), user, updatedUrl );
         } catch ( NonFatalException e ) {
             LOG.error( "NonfatalException caught in makeSurveyEditable(). Nested exception is ", e );
         }
@@ -1950,31 +1961,34 @@ public class DashboardController
     @ResponseBody
     @RequestMapping ( value = "/reportabuse")
     public String reportAbuse( HttpServletRequest request )
-    {   String reason = request.getParameter( "reportText" );
+    {
+        String reason = request.getParameter( "reportText" );
         String surveyMongoId = request.getParameter( "surveyMongoId" );
 
         try {
             try {
             } catch ( NumberFormatException e ) {
-                LOG.error( "NumberFormatException caught in reportAbuse() while converting agentId." );
+                LOG.error( "NumberFormatException caught in reportAbuse() while converting agentId.",e );
                 throw e;
             }
 
             if ( surveyMongoId == null || surveyMongoId.isEmpty() ) {
+            	LOG.warn("Invalid value (Null/Empty) found for surveyMongoId.");
                 throw new InvalidInputException( "Invalid value (Null/Empty) found for surveyMongoId." );
             }
-            
+
             SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( surveyMongoId );
 
             String customerName = surveyDetails.getCustomerFirstName() + " " + surveyDetails.getCustomerLastName();
-          
+
             //make survey as abusive
             surveyHandler.updateSurveyAsAbusive( surveyMongoId, surveyDetails.getCustomerEmail(), customerName );
 
             // Calling email services method to send mail to the Application
             // level admin.
             emailServices.sendReportAbuseMail( applicationSupportEmail, applicationAdminName, surveyDetails.getAgentName(),
-                customerName.replaceAll( "null", "" ), surveyDetails.getCustomerEmail(), surveyDetails.getReview(), reason, null, null );
+                customerName.replaceAll( "null", "" ), surveyDetails.getCustomerEmail(), surveyDetails.getReview(), reason,
+                null, null );
         } catch ( NonFatalException e ) {
             LOG.error( "NonfatalException caught in reportAbuse(). Nested exception is ", e );
             return CommonConstants.ERROR;
@@ -2037,7 +2051,7 @@ public class DashboardController
 
             String columnName = request.getParameter( "columnName" );
             if ( columnName == null || columnName.isEmpty() ) {
-                LOG.error( "Invalid value (null/empty) passed for column name." );
+                LOG.warn( "Invalid value (null/empty) passed for column name." );
                 throw new InvalidInputException( "Invalid value (null/empty) passed for column name." );
             }
 
@@ -2088,7 +2102,7 @@ public class DashboardController
             //Check if a request already exists
             try {
                 List<FileUpload> fileUpload = dashboardService.getActiveBillingReports();
-                LOG.info( "A request already exists for getting the billing report." );
+                LOG.debug( "A request already exists for getting the billing report." );
 
                 message = "A request already exists for getting the billing report.";
                 if ( fileUpload != null && fileUpload.size() > 0 )
@@ -2099,7 +2113,7 @@ public class DashboardController
 
             } catch ( NoRecordsFetchedException e ) {
                 //Request doesn't already exist. Create one.
-                LOG.info( "There is no existing request for getting the billing report" );
+                LOG.error( "There is no existing request for getting the billing report" );
 
                 //Get value from Mail ID column
                 String mailId = request.getParameter( "mailid" );
@@ -2134,6 +2148,7 @@ public class DashboardController
                 try {
                     startDate = new SimpleDateFormat( CommonConstants.DATE_FORMAT ).parse( startDateStr );
                 } catch ( ParseException e ) {
+                	LOG.error("ParseException caught in getCompanyRegistrationReport() while parsing startDate. Nested exception is ",e);
                     throw new InvalidInputException(
                         "ParseException caught in getCompanyRegistrationReport() while parsing startDate. Nested exception is ",
                         e );
@@ -2146,6 +2161,7 @@ public class DashboardController
                 try {
                     endDate = new SimpleDateFormat( CommonConstants.DATE_FORMAT ).parse( endDateStr );
                 } catch ( ParseException e ) {
+                	LOG.error("ParseException caught in getCompanyRegistrationReport() while parsing startDate. Nested exception is ",e);
                     throw new InvalidInputException(
                         "ParseException caught in getCompanyRegistrationReport() while parsing startDate. Nested exception is ",
                         e );

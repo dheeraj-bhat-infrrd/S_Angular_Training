@@ -477,6 +477,19 @@
 	</bean>
 	
 
+	<!-- Survey Csv Upload job detail -->
+	<bean id="surveycsvuploadjobdetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass" value="com.realtech.socialsurvey.core.starter.SurveyCsvUploadProcessor" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="surveyHandler" value-ref="surveyHandler" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean> 
+	
+	
+	
 	<!-- setting cron for Review Count Updater -->
 	<bean id="solrreviewcounterupdatercron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
@@ -716,6 +729,15 @@
 	</bean>
 	
 
+	<!-- survey csv upload cron -->
+	<bean id="surveycsvuploadcron"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="surveycsvuploadjobdetail" />
+		<property name="cronExpression" value="0 0/1 * 1/1 * ? *" />
+	</bean>
+	
+	
+
 	<!-- Scheduler factory -->
 	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
 		<property name="jobDetails">
@@ -751,6 +773,7 @@
 				<!-- <ref bean="surveyquestionupdater" /> -->	
 				<ref bean="monthlydigeststarter" />
 				<ref bean="transactionActivityMonitorJobDetail" />	
+				<ref bean="surveycsvuploadjobdetail" />
 			</list>
 		</property>
 
@@ -788,6 +811,7 @@
 				<!-- <ref bean="surveyquestionupdatercron" /> -->
 				<ref bean="monthlydigeststartercron" />
 				<ref bean="transactionActivityMonitorCron" />
+				<ref bean="surveycsvuploadcron" />
 			</list>
 		</property>
 		<property name="quartzProperties">

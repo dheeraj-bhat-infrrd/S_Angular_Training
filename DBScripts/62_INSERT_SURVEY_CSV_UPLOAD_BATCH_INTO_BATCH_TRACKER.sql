@@ -1,0 +1,1 @@
+INSERT INTO `ss_user`.`batch_tracker` (`BATCH_TYPE`, `BATCH_NAME`, `CREATED_ON`, `MODIFIED_ON`, `MODIFIED_BY`) VALUES ('SurveyCsvUploadProcessor', 'Survey CSV file Upload Processor', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ADMIN');

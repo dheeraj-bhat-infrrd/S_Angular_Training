@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -144,6 +145,7 @@ public class ReportingWebController
 
     private boolean isIndividualAccount( User user )
     {
+        LOG.debug( "Checking if individual account." );
         return ( user.getCompany() != null && user.getCompany().getLicenseDetails() != null
             && !user.getCompany().getLicenseDetails().isEmpty()
             && user.getCompany().getLicenseDetails().get( 0 ).getAccountsMaster() != null
@@ -154,6 +156,7 @@ public class ReportingWebController
 
     private String getProfileName( String entityType, long entityId, User user ) throws InvalidInputException, SolrException
     {
+        LOG.debug( "Getting profile name for entityType {}, entityId {} and user {}", entityType, entityId, user );
         String profileName = null;
         switch ( entityType ) {
             case CommonConstants.COMPANY_ID_COLUMN:
@@ -172,6 +175,7 @@ public class ReportingWebController
                 profileName = "";
                 break;
         }
+        LOG.trace( "Returning profile name {}", profileName );
         return profileName;
     }
 
@@ -201,6 +205,7 @@ public class ReportingWebController
                         Map<SettingsForApplication, OrganizationUnit> settingsMap = profileManagementService
                             .getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID_COLUMN, agentId );
                         if ( settingsMap == null ) {
+                            LOG.warn( "Could not fetch settings for agent: {}", agentId );
                             throw new InvalidInputException( "Could not fetch settings for agent: " + agentId );
                         }
                         individualProfile = profileManagementService.fillUnitSettings( individualProfile,
@@ -294,6 +299,7 @@ public class ReportingWebController
 
         //Get the hierarchy details associated with the current profile get all the id's like companyId, regionId , branchId
         try {
+            LOG.debug( "Getting hierarchy details for entityType {} and entityId {}", entityType, entityId );
             Map<String, Long> hierarchyDetails = profileManagementService.getHierarchyDetailsByEntity( entityType, entityId );
             branchId = hierarchyDetails.get( CommonConstants.BRANCH_ID_COLUMN );
             regionId = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );
@@ -307,6 +313,8 @@ public class ReportingWebController
             return JspResolver.NO_PROFILES_FOUND;
         }
 
+        LOG.debug( "Getting organization unit settings for companyId {}, regionId {}, branchId {}, agentId {} and user {}",
+            companyId, regionId, branchId, agentId, user );
         try {
             profileSettings = getOrganizationUnitSettings( companyId, regionId, branchId, agentId, user );
         } catch ( InvalidInputException | NoRecordsFetchedException e ) {
@@ -332,13 +340,16 @@ public class ReportingWebController
     @RequestMapping ( value = "/fetchspsfromreportingoverview", method = RequestMethod.GET)
     public String reportingOverviewSpsStats( Model model, HttpServletRequest request )
     {
-        LOG.info( "Reporting Dashboard Page started" );
+        LOG.info( "Method to fetch Sps from Reporting Overview,  reportingOverviewSpsStats Started" );
         HttpSession session = request.getSession( false );
 
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+
         LOG.debug( "Getting Overview SPS stats for entityType:{} with entityId: {}", entityType, entityId );
         Response response = ssApiIntergrationBuilder.getIntegrationApi().getSpsStatsFromOverview( entityId, entityType );
+
+        LOG.info( "Method to fetch Sps from Reporting Overview,  reportingOverviewSpsStats Finished" );
         return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
 
     }
@@ -348,7 +359,7 @@ public class ReportingWebController
     @RequestMapping ( value = "/fetchalltimefromreportingoverview", method = RequestMethod.GET)
     public String reportingOverviewAllTimeStats( Model model, HttpServletRequest request )
     {
-        LOG.info( "Reporting Dashboard Page started" );
+        LOG.info( "Reporting overview for all time stats started." );
         HttpSession session = request.getSession( false );
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
@@ -362,12 +373,15 @@ public class ReportingWebController
     @RequestMapping ( value = "/fetchreportingspsstats", method = RequestMethod.GET)
     public String fetchSpsStats( Model model, HttpServletRequest request )
     {
-        LOG.info( "Fetching Sps Stats Graph" );
+        LOG.info( " Method for Fetching SPS stats Graph started" );
         HttpSession session = request.getSession( false );
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+
         LOG.debug( "Getting SPS stats for entityType:{} with entityId: {}", entityType, entityId );
         Response response = ssApiIntergrationBuilder.getIntegrationApi().getReportingSpsStats( entityId, entityType );
+
+        LOG.info( " Method for Fetching SPS stats Graph Finished" );
         return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
 
     }
@@ -377,12 +391,16 @@ public class ReportingWebController
     @RequestMapping ( value = "/fetchreportingcompletionrate", method = RequestMethod.GET)
     public String fetchCompletionRate( Model model, HttpServletRequest request )
     {
-        LOG.info( "Fetching Completion Rate Graph" );
+        LOG.info( " Method for Fetching Completion Rate Graph started" );
+
         HttpSession session = request.getSession( false );
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+
         LOG.debug( "Getting completion rate for entityType:{} with entityId: {}", entityType, entityId );
         Response response = ssApiIntergrationBuilder.getIntegrationApi().getReportingCompletionRateApi( entityId, entityType );
+
+        LOG.info( " Method for Fetching Completion Rate Graph Finished" );
         return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
 
     }
@@ -434,6 +452,7 @@ public class ReportingWebController
         if ( sYear != null && !sYear.isEmpty() ) {
             year = Integer.valueOf( sYear );
         } else {
+            LOG.warn( "Year not present in criteria." );
             throw new InvalidInputException( "Year not present in criteria." );
         }
         LOG.debug( "Getting year data overview for entityType:{} with entityId: {} and year {}", entityType, entityId, year );
@@ -474,11 +493,45 @@ public class ReportingWebController
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
         Company company = user.getCompany();
+        LOG.debug(
+            "Creating entry in file upload for reportId {} with start date {} and end date {} for entity id {}, entity type {}",
+            reportId, startDate, endDate, entityId, entityType );
         reportingDashboardManagement.createEntryInFileUploadForReporting( reportId, startDate, endDate, entityId, entityType,
             company, adminUserid );
         message = "The report is being generated";
         return message;
 
+    }
+
+
+    @ResponseBody
+    @RequestMapping ( value = "/downloadaccountstatisticsreport", method = RequestMethod.POST)
+    public String saveAccountStatisticsDataToFileUpload( Model model, HttpServletRequest request, HttpServletResponse response )
+        throws InvalidInputException, NoRecordsFetchedException, FileNotFoundException, IOException
+    {
+        LOG.info( "Creating entry to file upload for account statistics report." );
+        String message = "";
+        User user = sessionHelper.getCurrentUser();
+        Long adminUserid = user.getUserId();
+        int reportId = CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_DETAILS_REPORT;
+        LOG.debug( "Creating entry in file upload for report id {}", reportId );
+        reportingDashboardManagement.createEntryInFileUploadForReporting( reportId, null, null, adminUserid,
+            CommonConstants.AGENT_ID_COLUMN, user.getCompany(), adminUserid );
+        message = "The report is being generated";
+        return message;
+    }
+
+
+    @ResponseBody
+    @RequestMapping ( value = "/getaccountstatisticsreportstatus", method = RequestMethod.GET)
+    public String getAccountStatisticsReportStatus( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Fetching latest status for account statistics report." );
+
+        long reportId = CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_DETAILS_REPORT;
+        LOG.trace( "getting account statistics from api" );
+        Response response = ssApiIntergrationBuilder.getIntegrationApi().getAccountStatisticsRecentActivity( reportId );
+        return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
     }
 
 
@@ -489,7 +542,7 @@ public class ReportingWebController
     @RequestMapping ( value = "/fetchrecentactivitiescount")
     public String getIncompleteSurveyCount( Model model, HttpServletRequest request )
     {
-        LOG.info( "Method to get recent activities of reports" );
+        LOG.info( "Method to get incomplete survey count." );
         HttpSession session = request.getSession( false );
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
@@ -519,6 +572,8 @@ public class ReportingWebController
         }
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        LOG.debug( "Getting recent activity for entity id {}, entity type {}, startIndex {} and barch size {}", entityId,
+            entityType, startIndex, batchSize );
         Response response = ssApiIntergrationBuilder.getIntegrationApi().getRecentActivity( entityId, entityType, startIndex,
             batchSize );
         return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
@@ -532,7 +587,7 @@ public class ReportingWebController
     {
         String message = "The row is deleted from the recentActivity and will not be displayed again";
         try {
-            LOG.info( "Fetching Recent Activity Graph" );
+            LOG.info( "deleting from recent activity." );
             long fileUploadId = 0;
             String fileUploadIdStr = request.getParameter( "fileUploadId" );
             if ( fileUploadIdStr != null && !fileUploadIdStr.isEmpty() ) {
@@ -540,6 +595,7 @@ public class ReportingWebController
             } else {
                 message = "The row Id was null or an empty string";
             }
+            LOG.debug( "Deleting {}", fileUploadId );
             reportingDashboardManagement.deleteRecentActivity( fileUploadId );
             return message;
         } catch ( Exception e ) {
@@ -663,24 +719,27 @@ public class ReportingWebController
     }
 
 
-    private long getEntityIdFromAgentSettings( AgentSettings agentSettings, String entityType, long entityId, String sessionColumnType,
-        long sessionColumnId ) throws InvalidInputException, ProfileNotFoundException
+    private long getEntityIdFromAgentSettings( AgentSettings agentSettings, String entityType, long entityId,
+        String sessionColumnType, long sessionColumnId ) throws InvalidInputException, ProfileNotFoundException
     {
+        LOG.debug(
+            "Getting enity id from agent settings. Entity type {}, entity id {}, session column type {}, session column id {}",
+            entityType, entityId, sessionColumnType, sessionColumnId );
         Map<String, Long> hierarchyMap = profileManagementService.getPrimaryHierarchyByAgentProfile( agentSettings );
-        
+
         long viewAsEntityId = entityId;
-        
+
         if ( entityType.equals( CommonConstants.REGION_ID_COLUMN )
             && sessionColumnType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
-        	viewAsEntityId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
+            viewAsEntityId = hierarchyMap.get( CommonConstants.REGION_ID_COLUMN );
         } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN )
             && sessionColumnType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
-        	viewAsEntityId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
+            viewAsEntityId = hierarchyMap.get( CommonConstants.BRANCH_ID_COLUMN );
         } else if ( sessionColumnType.equals( CommonConstants.BRANCH_ID_COLUMN )
             && entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
-        	viewAsEntityId = reportingDashboardManagement.getRegionIdFromBranchId( sessionColumnId );
+            viewAsEntityId = reportingDashboardManagement.getRegionIdFromBranchId( sessionColumnId );
         }
-        
+
         return viewAsEntityId;
     }
 
@@ -709,7 +768,7 @@ public class ReportingWebController
             batchSize = Integer.parseInt( batchSizeStr );
         }
         if ( ( entityType == null || entityType.isEmpty() ) ) {
-            LOG.error( "Entity type is blank fir user ranking and count." );
+            LOG.warn( "Entity type is blank fir user ranking and count." );
             throw new InvalidInputException( "Entity type is blank fir user ranking and count." );
         }
         if ( timeFrameStr != null && !timeFrameStr.isEmpty() ) {
@@ -735,8 +794,8 @@ public class ReportingWebController
         String sessionColumnType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
 
         AgentSettings agentSettings = userManagementService.getUserSettings( userId );
-        entityId = ( entityType.equals(sessionColumnType) ) ? entityId
-            : getEntityIdFromAgentSettings( agentSettings, entityType,entityId, sessionColumnType, sessionColumnId );
+        entityId = ( entityType.equals( sessionColumnType ) ) ? entityId
+            : getEntityIdFromAgentSettings( agentSettings, entityType, entityId, sessionColumnType, sessionColumnId );
 
         response = getUserRankingRankCount( timeFrame, userId, entityId, entityType, month, year, batchSize );
         return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
@@ -746,6 +805,9 @@ public class ReportingWebController
     private Response getUserRankingRankCount( int timeFrame, long userId, long entityId, String entityType, int month, int year,
         int batchSize ) throws NonFatalException
     {
+        LOG.debug(
+            "Getting user ranking rank count. Time frame {}, user id {}, entity type {}, month {}, year {}, batch size {}",
+            timeFrame, userId, entityId, entityType, month, year, batchSize );
         Response response = null;
         switch ( timeFrame ) {
             case 1:
@@ -769,7 +831,8 @@ public class ReportingWebController
                     entityType, batchSize );
                 break;
             default:
-                throw new NonFatalException( "NonFatalException while getting User Ranking Count" );
+                LOG.warn( "Invalid timeframe {}", timeFrame );
+                throw new NonFatalException( "Invalid timeframe " + timeFrame );
         }
         return response;
     }
@@ -779,9 +842,8 @@ public class ReportingWebController
     @RequestMapping ( value = "/getuserrankingcount", method = RequestMethod.GET)
     public String getUserRankingCount( Model model, HttpServletRequest request ) throws NonFatalException
     {
-        LOG.info( "Get User Ranking Rank " );
+        LOG.info( "Method to get User Ranking Count. " );
 
-        LOG.info( "Method to get reviews of company, region, branch, agent getReviews() started." );
         Integer batchSize = 0;
         int timeFrame = 1;
         Long entityId = (long) 0;
@@ -798,7 +860,7 @@ public class ReportingWebController
             batchSize = Integer.parseInt( batchSizeStr );
         }
         if ( ( entityType == null || entityType.isEmpty() ) ) {
-            LOG.error( "Invalid value (null/empty) passed for profile level." );
+            LOG.warn( "Invalid value (null/empty) passed for profile level." );
             throw new InvalidInputException( "Invalid value (null/empty) passed for entityType" );
         }
         if ( timeFrameStr != null && !timeFrameStr.isEmpty() ) {
@@ -808,7 +870,9 @@ public class ReportingWebController
             try {
                 entityId = Long.parseLong( entityIdStr );
             } catch ( NumberFormatException e ) {
-                LOG.error( "NumberFormatException caught while parsing columnValue in getReviews(). Nested exception is ", e );
+                LOG.error(
+                    "NumberFormatException caught while parsing columnValue in getUserRankingCount(). Nested exception is ",
+                    e );
                 throw e;
             }
         }
@@ -827,8 +891,8 @@ public class ReportingWebController
         String sessionColumnType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
 
         AgentSettings agentSettings = userManagementService.getUserSettings( userId );
-        entityId = (entityType.equals(sessionColumnType)) ? entityId
-            : getEntityIdFromAgentSettings( agentSettings, entityType,entityId, sessionColumnType, sessionColumnId );
+        entityId = ( entityType.equals( sessionColumnType ) ) ? entityId
+            : getEntityIdFromAgentSettings( agentSettings, entityType, entityId, sessionColumnType, sessionColumnId );
 
         response = getUserRankingCount( timeFrame, entityId, entityType, month, year, batchSize );
 
@@ -836,9 +900,11 @@ public class ReportingWebController
     }
 
 
-    private Response getUserRankingCount( int timeFrame, long entityId, String entityType, int month, int year,
-        int batchSize ) throws NonFatalException
+    private Response getUserRankingCount( int timeFrame, long entityId, String entityType, int month, int year, int batchSize )
+        throws NonFatalException
     {
+        LOG.debug( "Get user ranking count. Time frame {}, entity id {}, entity type {}, month {}, year {}, batch size {}",
+            timeFrame, entityId, entityType, month, year, batchSize );
         Response response = null;
         switch ( timeFrame ) {
             case 1:
@@ -862,7 +928,8 @@ public class ReportingWebController
                     batchSize );
                 break;
             default:
-                throw new NonFatalException( "NonFatalException while getting User Ranking Count" );
+                LOG.warn( "Invalid timeframe {}", timeFrame );
+                throw new NonFatalException( "Invalid timeframe " + timeFrame );
         }
         return response;
     }
@@ -872,9 +939,7 @@ public class ReportingWebController
     @RequestMapping ( value = "/getuserranking", method = RequestMethod.GET)
     public String getUserRanking( Model model, HttpServletRequest request ) throws NonFatalException
     {
-        LOG.info( "Get User Ranking for this year" );
-
-        LOG.info( "Method to get reviews of company, region, branch, agent getReviews() started." );
+        LOG.info( "Method TO Get User Ranking started" );
 
         String entityType = request.getParameter( CommonConstants.ENTITY_TYPE_COLUMN );
         String entityIdStr = request.getParameter( CommonConstants.ENTITY_ID_COLUMN );
@@ -916,16 +981,22 @@ public class ReportingWebController
         String sessionColumnType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
 
         AgentSettings agentSettings = userManagementService.getUserSettings( userId );
-        entityId = ( entityType.equals(sessionColumnType) ) ? entityId
-            : getEntityIdFromAgentSettings( agentSettings, entityType,entityId, sessionColumnType, sessionColumnId );
+        entityId = ( entityType.equals( sessionColumnType ) ) ? entityId
+            : getEntityIdFromAgentSettings( agentSettings, entityType, entityId, sessionColumnType, sessionColumnId );
 
         response = getUserRankingList( timeFrame, entityId, entityType, monthStr, year, startIndex, batchSize );
+        LOG.info( "Method TO Get User Ranking ended " );
 
         return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
     }
-    
-    private Response getUserRankingList( int timeFrame, long entityId, String entityType, String monthStr, int year, int startIndex,
-        int batchSize ) throws NonFatalException{
+
+
+    private Response getUserRankingList( int timeFrame, long entityId, String entityType, String monthStr, int year,
+        int startIndex, int batchSize ) throws NonFatalException
+    {
+        LOG.debug(
+            "Method to Get User Ranking List based on time frame started for entityType : {} , entityId : {} , timeFrame : {}",
+            entityType, entityId, timeFrame );
         Response response = null;
         switch ( timeFrame ) {
             case 1:
@@ -951,8 +1022,12 @@ public class ReportingWebController
                     startIndex, batchSize );
                 break;
             default:
-                throw new NonFatalException( "NonFatalException while choosing time frame for leaderboard" );
+                LOG.warn( "Invalid timeframe {}", timeFrame );
+                throw new NonFatalException( "Invalid timeframe " + timeFrame );
         }
+        LOG.debug(
+            "Method TO Get User Ranking List based on time frame ended for entityType : {} , entityId : {} , timeFrame : {}",
+            entityType, entityId, timeFrame );
         return response;
     }
 
@@ -961,9 +1036,6 @@ public class ReportingWebController
     @RequestMapping ( value = "/getoverallscorestats", method = RequestMethod.GET)
     public String getOverallScoreStats( Model model, HttpServletRequest request ) throws NonFatalException
     {
-
-        LOG.info( "Get Overall Score Stats " );
-
         LOG.info( "Method to get overall score stats getOverallScoreStats() started." );
         Long entityId = 0l;
         int currentYear = 0;
@@ -1008,10 +1080,7 @@ public class ReportingWebController
     @RequestMapping ( value = "/getquestionscorestats", method = RequestMethod.GET)
     public String getQuestionScoreStats( Model model, HttpServletRequest request ) throws NonFatalException
     {
-
-        LOG.info( "Get Overall Score Stats " );
-
-        LOG.info( "Method to get overall score stats getOverallScoreStats() started." );
+        LOG.info( "Method to get score stats for questions started." );
         Long entityId = 0l;
         int currentYear = 0;
         int currentMonth = 0;
@@ -1022,7 +1091,7 @@ public class ReportingWebController
         Response response = null;
 
         if ( ( entityType == null || entityType.isEmpty() ) ) {
-            LOG.error( "Invalid value (null/empty) passed for entityType." );
+            LOG.warn( "Invalid value (null/empty) passed for entityType." );
             throw new InvalidInputException( "Invalid value (null/empty) passed for entityType." );
         }
 
@@ -1030,7 +1099,7 @@ public class ReportingWebController
             try {
                 entityId = Long.parseLong( entityIdStr );
             } catch ( NumberFormatException e ) {
-                LOG.error( "NumberFormatException caught while parsing entityId in getReviews(). Nested exception is ", e );
+                LOG.warn( "NumberFormatException caught while parsing entityId in getReviews(). Nested exception is ", e );
                 throw e;
             }
         }
@@ -1044,7 +1113,7 @@ public class ReportingWebController
         response = ssApiIntergrationBuilder.getIntegrationApi().getScoreStatsQuestion( entityId, entityType, currentMonth,
             currentYear );
 
-        LOG.info( "Method to get overall score stats getOverallScoreStats() finished." );
+        LOG.info( "Method to get score stats for questions finished." );
         String responseString = null;
         responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
         return responseString;

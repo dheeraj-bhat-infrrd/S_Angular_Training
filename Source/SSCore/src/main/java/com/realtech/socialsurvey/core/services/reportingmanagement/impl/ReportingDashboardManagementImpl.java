@@ -39,6 +39,7 @@ import com.realtech.socialsurvey.core.api.builder.SSApiBatchIntegrationBuilder;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
+import com.realtech.socialsurvey.core.dao.CompanyDetailsReportDao;
 import com.realtech.socialsurvey.core.dao.CompanyUserReportDao;
 import com.realtech.socialsurvey.core.dao.DigestDao;
 import com.realtech.socialsurvey.core.dao.FileUploadDao;
@@ -62,6 +63,7 @@ import com.realtech.socialsurvey.core.dao.SurveyTransactionReportBranchDao;
 import com.realtech.socialsurvey.core.dao.SurveyTransactionReportDao;
 import com.realtech.socialsurvey.core.dao.SurveyTransactionReportRegionDao;
 import com.realtech.socialsurvey.core.dao.UserAdoptionReportDao;
+import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserRankingPastMonthBranchDao;
 import com.realtech.socialsurvey.core.dao.UserRankingPastMonthMainDao;
 import com.realtech.socialsurvey.core.dao.UserRankingPastMonthRegionDao;
@@ -80,6 +82,7 @@ import com.realtech.socialsurvey.core.dao.UserRankingThisYearRegionDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.CompanyDetailsReport;
 import com.realtech.socialsurvey.core.entities.CompanyDigestRequestData;
 import com.realtech.socialsurvey.core.entities.CompanyUserReport;
 import com.realtech.socialsurvey.core.entities.Digest;
@@ -197,6 +200,12 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
     @Autowired
     private RegionDao regionDao;
+    
+    @Autowired
+    private UserDao userDao;
+    
+    @Autowired
+    private CompanyDetailsReportDao companyDetailsReportDao;
 
     @Autowired
     private SSApiBatchIntegrationBuilder ssApiBatchIntergrationBuilder;
@@ -309,6 +318,13 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     @Value ( "${APPLICATION_BASE_URL}")
     private String applicationBaseUrl;
 
+    
+    @Value("${SEND_DIGEST_TO_APPLICATION_ADMIN_ONLY}")
+    private String sendDigestToApplicationAdminOnly;
+    
+    @Value ( "${APPLICATION_ADMIN_EMAIL}")
+    private String applicationAdminEmail;
+    
     public static final int DIGEST_MAIL_START_INDEX = 0;
 
     public static final int DIGEST_MAIL_BATCH_SIZE = 50;
@@ -348,6 +364,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT );
         } else if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_INCOMPLETE_SURVEY_REPORT ) {
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_INCOMPLETE_SURVEY_REPORT );
+        } else if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_DETAILS_REPORT ) {
+            fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_DETAILS_REPORT );
         }
         //get the time 23:59:59 in milliseconds
         long duration = ( ( ( 23 * 60 ) * 60 ) + ( 59 * 60 ) + 59 ) * 1000l;
@@ -678,7 +696,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                     companyUserReportList.add( "" );
                 }
                 if ( companyUserReport.getLastPostDateTwitter() != null ) {
-                    companyUserReportList.add( companyUserReport.getLastPostDateFb() );
+                    companyUserReportList.add( companyUserReport.getLastPostDateTwitter() );
                 } else {
                     companyUserReportList.add( "" );
                 }
@@ -1668,6 +1686,15 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         return recentActivity;
 
     }
+    
+    @Override
+    public Object getAccountStatisticsRecentActivity(Long reportId){
+    	FileUpload fileUpload = null;
+    	if(reportId == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_DETAILS_REPORT){
+    		fileUpload = fileUploadDao.getLatestActivityForReporting(reportId);
+    	}
+    	return fileUpload;
+    }
 
 
     @Override
@@ -2089,6 +2116,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     public List<List<Object>> getUserRankingThisYear( String entityType, Long entityId, int year, int startIndex,
         int batchSize )
     {
+        LOG.info( "function to getUserRankingThisYear based on entityType: {} , entityId: {} started ",entityType,entityId );
         List<List<Object>> userRanking = new ArrayList<>();
 
         if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
@@ -2146,6 +2174,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 userRanking.add( userRankingThisYearBranchList );
             }
         }
+        LOG.info( "function to getUserRankingThisYear based on ended");
+
         return userRanking;
     }
 
@@ -2909,7 +2939,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     @Override
     public List<List<Object>> getScoreStatsForQuestion( Long entityId, String entityType, int currentMonth, int currentYear )
     {
-
+    	LOG.debug("Service method call for get score stats for questions.");
         List<List<Object>> scoreStatsForQuestion = new ArrayList<>();
         int startMonth = 0;
         int startYear = currentYear - 1;
@@ -2972,9 +3002,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 scoreStatsQuestionUserList.add( averageScore );
                 scoreStatsForQuestion.add( scoreStatsQuestionUserList );
             }
-
         }
-
         return scoreStatsForQuestion;
     }
 
@@ -3390,26 +3418,33 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             int startIndex = DIGEST_MAIL_START_INDEX;
             int batchSize = DIGEST_MAIL_BATCH_SIZE;
             List<CompanyDigestRequestData> digestRequestList = null;
+            
+            // create a Calendar instance with time zone and locale of the device
+            Calendar calendar = Calendar.getInstance();
+            
+            // set month and year
+            int month = calendar.get( Calendar.MONTH );
+            int year = calendar.get( Calendar.YEAR );
 
             do {
 
-
                 // fetch a list of digest requests for companies who have enabled send monthly digest mail feature 
                 digestRequestList = getCompanyRequestDataInBatch( startIndex, batchSize );
-
+                
                 if ( digestRequestList != null ) {
                     for ( CompanyDigestRequestData company : digestRequestList ) {
-
-
-                        // create a Calendar instance with time zone and locale of the device
-                        Calendar calendar = Calendar.getInstance();
 
                         try {
 
                             // get the digest aggregate object
-                            MonthlyDigestAggregate digestAggregate = getMonthlyDigestAggregateForCompany( company,
-                                calendar.get( Calendar.MONTH ), calendar.get( Calendar.YEAR ) );
+                            MonthlyDigestAggregate digestAggregate = getMonthlyDigestAggregateForCompany( company, month, year );
 
+                            // check for send digest to administrator switch
+                            if( CommonConstants.YES_STRING.equals( sendDigestToApplicationAdminOnly ) && digestAggregate != null ){
+                                digestAggregate.setRecipientMailId( applicationAdminEmail );
+                            }
+                            
+                            
                             // send the email to the company administrator
                             emailServices.sendMonthlyDigestMail( digestAggregate );
 
@@ -3557,6 +3592,78 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     }
     
 
+	@Override
+	@Transactional ( value = "transactionManagerForReporting")
+	public List<CompanyDetailsReport> getCompanyDetailsReport( Long entityId, int startIndex,
+			int batchSize) throws InvalidInputException {
+		User user = userDao.findById(User.class, entityId);
+		List<CompanyDetailsReport> companyDetailsReportData = null;
+		if (user != null && (user.isSuperAdmin() || userManagementService.isUserSocialSurveyAdmin(entityId))) {
+			companyDetailsReportData = companyDetailsReportDao.getCompanyDetailsReportData(startIndex, batchSize);
+		}
+		return companyDetailsReportData;
+	}
+
+
+	@Override
+	public String generateCompanyDetailsReport(long entityId, String entityType) throws UnsupportedEncodingException, NonFatalException {
+		LOG.info( "Generating account statistics report for enitityId {}, entityType {}",entityId, entityType);
+	        String fileName = "Account_Statistics_Report" + "-" + ( Calendar.getInstance().getTimeInMillis() ) 
+	        		+ CommonConstants.EXCEL_FILE_EXTENSION;
+	        LOG.debug( "fileName {} ", fileName );
+	        XSSFWorkbook workbook = this.downloadCompanyDetailsReport( entityId, entityType );
+	        LOG.debug( "Writing {} number of records into file {}", workbook.getSheetAt( 0 ).getLastRowNum(), fileName );
+	        return createExcelFileAndSaveInAmazonS3( fileName, workbook );
+	}
+
+
+	private XSSFWorkbook downloadCompanyDetailsReport(long entityId, String entityType) {
+		int startIndex = 0;
+        int batchSize = CommonConstants.BATCH_SIZE;
+        int enterNext = 1;
+
+        //write the excel header first 
+        Map<Integer, List<Object>> data = workbookData.writeCompanyDetailsReportHeader();
+        //create workbook data
+        XSSFWorkbook workbook = workbookOperations.createWorkbook( data );
+
+        List<CompanyDetailsReport> companyDetailsReportList = null;
+        do {
+        	companyDetailsReportList = getCompanyDetailsResponse(entityType, entityId, startIndex, batchSize );
+            if ( companyDetailsReportList != null && !companyDetailsReportList.isEmpty() ) {
+                enterNext = startIndex + 1;
+                data = workbookData.getCompanyDetailsReportToBeWrittenInSheet( companyDetailsReportList,enterNext );
+                LOG.debug( "Got {} records starting at {} index", data.size(), enterNext );
+                //use the created workbook when writing the header answer rewrite the same. 
+                workbook = workbookOperations.writeToWorkbook( data, workbook, enterNext );
+                //calculate startIndex. 
+                startIndex = startIndex + batchSize;
+            }
+        } while ( companyDetailsReportList != null && !companyDetailsReportList.isEmpty()
+            && companyDetailsReportList.size() >= batchSize );
+
+        XSSFSheet sheet = workbook.getSheetAt( 0 );
+        makeRowBold( workbook, sheet.getRow( 0 ) );
+        return workbook;
+	}
+
+
+	private List<CompanyDetailsReport> getCompanyDetailsResponse(String entityType, long entityId, int startIndex,
+			int batchSize) {
+		Response response = ssApiBatchIntergrationBuilder.getIntegrationApi().getCompanyDetailsReport(entityType, entityId, startIndex, batchSize );
+	        String responseString = response != null ? new String( ( (TypedByteArray) response.getBody() ).getBytes() ) : null;
+	        List<CompanyDetailsReport> companyDetailsReportList = null;
+	        if ( responseString != null ) {
+	            //since the string has ""abc"" an extra quote
+	            responseString = responseString.substring( 1, responseString.length() - 1 );
+	            //Escape characters
+	            responseString = StringEscapeUtils.unescapeJava( responseString );
+	            Type listType = new TypeToken<List<CompanyDetailsReport>>() {}.getType();
+	            companyDetailsReportList = new Gson().fromJson( responseString, listType );
+
+	        }
+	        return companyDetailsReportList;
+	}
     /**
      * Method to fetch reviews based on the profile level specified, iden is one of
      * agentId/branchId/regionId or companyId based on the profile level

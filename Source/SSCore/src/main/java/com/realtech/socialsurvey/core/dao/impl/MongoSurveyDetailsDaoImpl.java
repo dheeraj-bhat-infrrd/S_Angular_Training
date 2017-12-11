@@ -15,6 +15,7 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.bson.types.ObjectId;
+import org.hibernate.engine.jdbc.internal.DDLFormatterImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -231,7 +232,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         update.set( CommonConstants.IS_ABUSIVE_COLUMN, isAbusive );
         update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
         SurveyDetails details = getSurveyBySurveyMongoId( surveyId );
-        if( details != null && details.getSurveyCompletedDate() != null ){
+        if ( details != null && details.getSurveyCompletedDate() != null ) {
             update.set( CommonConstants.SURVEY_UPDATED_DATE_COLUMN, new Date() );
         } else {
             Date date = new Date();
@@ -566,8 +567,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     public double getRatingForPastNdays( String columnName, long columnValue, int noOfDays, boolean aggregateAbusive,
         boolean realtechAdmin, boolean includeZillow, long zillowReviewCount, double zillowTotalReviewScore )
     {
-        LOG.debug( "Method getRatingOfAgentForPastNdays(), to calculate rating of agent started for columnName: " + columnName
-            + " columnValue:" + columnValue + " noOfDays:" + noOfDays + " aggregateAbusive:" + aggregateAbusive );
+        LOG.debug(
+            "Method getRatingOfAgentForPastNdays(), to calculate rating of agent started for columnName: {} columnValue: {} noOfDays: {} aggregateAbusive: {}",
+            columnName, columnValue, noOfDays, aggregateAbusive );
         Date startDate = null;
         /**
          * if days is not set, take the start date as 1 jan 1970
@@ -668,7 +670,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         AggregationResults<SurveyDetails> result = mongoTemplate.aggregate( aggregation, SURVEY_DETAILS_COLLECTION,
             SurveyDetails.class );
         long reviewsCount = mongoTemplate.count( query, SURVEY_DETAILS_COLLECTION );
-        LOG.debug( "Count of aggregated results :" + reviewsCount );
+        LOG.debug( "Count of aggregated results : {}", reviewsCount );
         double rating = 0;
         if ( result != null && reviewsCount > 0 ) {
             List<DBObject> basicDBObject = (List<DBObject>) result.getRawResults().get( "result" );
@@ -945,7 +947,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         /**
          * fetching only completed surveys
          */
-        query.addCriteria( Criteria.where( CommonConstants.REVIEW_COLUMN ).exists( true ).nin( "" ) );
+        //query.addCriteria( Criteria.where( CommonConstants.REVIEW_COLUMN ).exists( true ).nin( "" ) );
+        query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
+        
         if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
             query.addCriteria( Criteria.where( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) );
         }
@@ -972,8 +976,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         //    query
         //        .addCriteria( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).ne( CommonConstants.SURVEY_SOURCE_ZILLOW ) );
         // }
-        
-        if( sortCriteria != null && sortCriteria.equals( CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE ) ){
+
+        if ( sortCriteria != null && sortCriteria.equals( CommonConstants.REVIEWS_SORT_CRITERIA_FEATURE ) ) {
             if ( startScore > -1 && limitScore > -1 ) {
                 query.addCriteria( new Criteria().andOperator( Criteria.where( CommonConstants.SCORE_COLUMN ).gte( startScore ),
                     Criteria.where( CommonConstants.SCORE_COLUMN ).lte( limitScore ) ) );
@@ -1066,8 +1070,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     public long getFeedBacksCount( String columnName, long columnValue, double startScore, double limitScore,
         boolean fetchAbusive, boolean notRecommended, boolean includeZillow, long zillowReviewCount )
     {
-        LOG.debug( "Method getFeedBacksCount started for columnName:" + columnName + " columnValue:" + columnValue
-            + " startScore:" + startScore + " limitScore:" + limitScore + " and fetchAbusive:" + fetchAbusive );
+        LOG.debug(
+            "Method getFeedBacksCount started for columnName: {} columnValue: {} startScore {} limitScore: {} and fetchAbusive: {}",
+            columnName, columnValue, startScore, limitScore, fetchAbusive );
         Query query = new Query();
         if ( columnName != null ) {
             query.addCriteria( Criteria.where( columnName ).is( columnValue ) );
@@ -1075,7 +1080,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         /**
          * fetching only completed surveys
          */
-        if( notRecommended ){
+        if ( notRecommended ) {
             query.addCriteria( Criteria.where( CommonConstants.REVIEW_COLUMN ).exists( true ).nin( "" ) );
         } else {
             query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
@@ -1110,7 +1115,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             // get zillow review count based on column name
             feedBackCount += zillowReviewCount;
         }
-        LOG.debug( "Method getFeedBacksCount executed successfully.Returning feedBackCount:" + feedBackCount );
+        LOG.debug( "Method getFeedBacksCount executed successfully.Returning feedBackCount: {}", feedBackCount );
         return feedBackCount;
     }
 
@@ -1222,8 +1227,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     public long getCompletedSurveyCountForStatistics( String organizationUnitColumn, long organizationUnitColumnValue,
         Timestamp startDate, Timestamp endDate, boolean filterAbusive ) throws InvalidInputException
     {
-        LOG.debug(
-            "Getting completed survey count for " + organizationUnitColumn + " with value " + organizationUnitColumnValue );
+        LOG.debug( "Getting completed survey count for {} with value {}", organizationUnitColumn, organizationUnitColumnValue );
         if ( organizationUnitColumn == null || organizationUnitColumn.isEmpty() ) {
             LOG.warn( "organizationUnitColumn is empty" );
             throw new InvalidInputException( "organizationUnitColumn is empty" );
@@ -1255,9 +1259,11 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate )
                 .andOperator( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ) );
         }
-        LOG.debug( "Query: " + query.toString() );
+        if(LOG.isDebugEnabled()) {
+            LOG.debug( "Query: {}" , query.toString() );
+        }
         long count = mongoTemplate.count( query, SURVEY_DETAILS_COLLECTION );
-        LOG.debug( "Found " + count + " completed surveys" );
+        LOG.debug( "Found {} completed surveys", count );
         return count;
     }
 
@@ -1267,7 +1273,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         Timestamp endDate, boolean filterAbusive ) throws InvalidInputException
     {
         LOG.debug(
-            "Getting completed survey count for " + organizationUnitColumn + " with value " + organizationUnitColumnValue );
+            "Getting completed survey count for {} with value {}" , organizationUnitColumn,  organizationUnitColumnValue );
         if ( organizationUnitColumn == null || organizationUnitColumn.isEmpty() ) {
             LOG.warn( "organizationUnitColumn is empty" );
             throw new InvalidInputException( "organizationUnitColumn is empty" );
@@ -1298,9 +1304,11 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate )
                 .andOperator( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ) );
         }
-        LOG.debug( "Query: " + query.toString() );
+        if(LOG.isDebugEnabled()) {
+            LOG.debug( "Query: {}" , query.toString() );
+        }
         long count = mongoTemplate.count( query, SURVEY_DETAILS_COLLECTION );
-        LOG.debug( "Found " + count + " completed surveys" );
+        LOG.debug( "Found {} completed surveys",count );
         return count;
     }
 
@@ -1310,7 +1318,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         Timestamp endDate, boolean filterAbusive ) throws InvalidInputException
     {
         LOG.debug(
-            "Getting get3rdPartyImportCount for " + organizationUnitColumn + " with value " + organizationUnitColumnValue );
+            "Getting get3rdPartyImportCount for {} with value {}" , organizationUnitColumn, organizationUnitColumnValue );
         if ( organizationUnitColumn == null || organizationUnitColumn.isEmpty() ) {
             LOG.warn( "organizationUnitColumn is empty" );
             throw new InvalidInputException( "organizationUnitColumn is empty" );
@@ -1342,9 +1350,11 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate )
                 .andOperator( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ) );
         }
-        LOG.debug( "Query: " + query.toString() );
+        if(LOG.isDebugEnabled()) {
+            LOG.debug( "Query: {}" , query.toString() );
+        }
         long count = mongoTemplate.count( query, SURVEY_DETAILS_COLLECTION );
-        LOG.debug( "Found " + count + " get3rdParty surveys" );
+        LOG.debug( "Found {} get3rdParty surveys", count );
         return count;
     }
 
@@ -1356,14 +1366,12 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         throws InvalidInputException
     {
         Map<Integer, Integer> aggregatedResult = null;
-        LOG.debug( "Aggregating completed surveys. Input organizationUnitColumn: " + organizationUnitColumn
-            + " \t organizationUnitColumnValue: " + organizationUnitColumnValue + " \t startDate: " + startDate
-            + " \t endDate: " + endDate + " \t aggregateBy: " + aggregateBy );
+        LOG.debug( "Aggregating completed surveys. Input organizationUnitColumn: {} \t organizationUnitColumnValue: {} \t startDate: {} \t endDate: {} \t aggregateBy: {}", organizationUnitColumn, organizationUnitColumnValue, startDate, endDate, aggregateBy );
         if ( aggregateBy == null || aggregateBy.isEmpty() ) {
-            LOG.debug( "aggregate by field is empty" );
+            LOG.warn( "aggregate by field is empty" );
             throw new InvalidInputException( "aggregate by field is empty" );
         }
-        LOG.debug( "Getting the result aggregated by " + aggregateBy );
+        LOG.debug( "Getting the result aggregated by {}" , aggregateBy );
         // DONT MODIFY IF YOU DONT KNOW WHAT YOU ARE DOING
         // Using BasicDBObject for aggregation
         BasicDBList pipeline = new BasicDBList();
@@ -1416,8 +1424,11 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             new BasicDBObject( "_id", "$groupCol" ).append( "count", new BasicDBObject( "$sum", 1 ) ) ) );
         BasicDBObject aggregationObject = new BasicDBObject( "aggregate", SURVEY_DETAILS_COLLECTION ).append( "pipeline",
             pipeline );
-
-        LOG.info( "aggregation for get completed survey for garph is :" + aggregationObject.toString() + " , " + aggregationObject );
+        
+        if(LOG.isDebugEnabled()) {
+            LOG.debug(
+                "aggregation for get completed survey for garph is :{} , {}", aggregationObject.toString(), aggregationObject );
+        }
         CommandResult aggregateResult = mongoTemplate.executeCommand( aggregationObject );
 
         List<BasicDBObject> aggregatedData = null;
@@ -1443,14 +1454,12 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         throws InvalidInputException
     {
         Map<Integer, Integer> aggregatedResult = null;
-        LOG.debug( "Aggregating clicked surveys. Input organizationUnitColumn: " + organizationUnitColumn
-            + " \t organizationUnitColumnValue: " + organizationUnitColumnValue + " \t startDate: " + startDate
-            + " \t endDate: " + endDate + " \t aggregateBy: " + aggregateBy );
+        LOG.debug( "Aggregating clicked surveys. Input organizationUnitColumn: {} \t organizationUnitColumnValue: {} \t startDate: {} \t endDate: {} \t aggregateBy: {}" , organizationUnitColumn, organizationUnitColumnValue, startDate, endDate, aggregateBy  );
         if ( aggregateBy == null || aggregateBy.isEmpty() ) {
-            LOG.debug( "aggregate by field is empty" );
+            LOG.warn( "aggregate by field is empty" );
             throw new InvalidInputException( "aggregate by field is empty" );
         }
-        LOG.debug( "Getting the result aggregated by " + aggregateBy );
+        LOG.debug( "Getting the result aggregated by {}" , aggregateBy );
         // DONT MODIFY IF YOU DONT KNOW WHAT YOU ARE DOING
         // Using BasicDBObject for aggregation
         BasicDBList pipeline = new BasicDBList();
@@ -1531,14 +1540,12 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         throws InvalidInputException
     {
         Map<Integer, Integer> aggregatedResult = null;
-        LOG.debug( "Aggregating completed surveys. Input organizationUnitColumn: " + organizationUnitColumn
-            + " \t organizationUnitColumnValue: " + organizationUnitColumnValue + " \t startDate: " + startDate
-            + " \t endDate: " + endDate + " \t aggregateBy: " + aggregateBy );
+        LOG.debug( "Aggregating completed surveys. Input organizationUnitColumn: {} \t organizationUnitColumnValue: {} \t startDate: {} \t endDate: {}  \t aggregateBy: {}" , organizationUnitColumn, organizationUnitColumnValue, startDate, endDate, aggregateBy );
         if ( aggregateBy == null || aggregateBy.isEmpty() ) {
-            LOG.debug( "aggregate by field is empty" );
+            LOG.warn( "aggregate by field is empty" );
             throw new InvalidInputException( "aggregate by field is empty" );
         }
-        LOG.debug( "Getting the result aggregated by " + aggregateBy );
+        LOG.debug( "Getting the result aggregated by {}", aggregateBy );
         // DONT MODIFY IF YOU DONT KNOW WHAT YOU ARE DOING
         // Using BasicDBObject for aggregation
         BasicDBList pipeline = new BasicDBList();
@@ -2053,7 +2060,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             }
         }
 
-        LOG.info( "aggregation to get complete survey count for user ranking report is : "  + aggregation );
+        LOG.info( "aggregation to get complete survey count for user ranking report is : " + aggregation );
         AggregationResults<SurveyDetails> result = mongoTemplate.aggregate( aggregation, SURVEY_DETAILS_COLLECTION,
             SurveyDetails.class );
 
@@ -2492,7 +2499,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         Query query = new Query( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( true ) );
         query.addCriteria( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ) );
         long count = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION ).size();
-        LOG.debug( "Method getSurveysUnderResolutionCount() to get count of surveys marked as abusive for a company finished." );
+        LOG.debug(
+            "Method getSurveysUnderResolutionCount() to get count of surveys marked as abusive for a company finished." );
         return count;
     }
 
@@ -2827,12 +2835,12 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         Query query = new Query();
         query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyMongoId ) );
         Update update = new Update();
-        update.set( CommonConstants.SURVEY_SOURCE_ID_COLUMN, surveyDetails.getSourceId());
+        update.set( CommonConstants.SURVEY_SOURCE_ID_COLUMN, surveyDetails.getSourceId() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.info( "Method updateZillowSourceIdInExistingSurveyDetails finished." );
     }
-    
-    
+
+
     @Override
     public void updateZillowSurveyUpdatedDateInExistingSurveyDetails( SurveyDetails surveyDetails )
     {
@@ -2841,11 +2849,12 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         Query query = new Query();
         query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyMongoId ) );
         Update update = new Update();
-        update.set( CommonConstants.SURVEY_UPDATED_DATE_COLUMN, surveyDetails.getSurveyUpdatedDate());
+        update.set( CommonConstants.SURVEY_UPDATED_DATE_COLUMN, surveyDetails.getSurveyUpdatedDate() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.info( "Method updateZillowSurveyUpdatedDateInExistingSurveyDetails finished." );
     }
-    
+
+
     /**
      * 
      * @param companyId
@@ -2902,47 +2911,45 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
      * Method to fetch survey details on the basis of agentId and customer email.
      */
     @Override
-    public List<SurveyDetails> getFilteredSurveys( int start, int batchSize, long companyId , String status, String mood , Long startSurveyID , Date startReviewDate , Date startTransactionDate , List<Long> userIds )
+    public List<SurveyDetails> getFilteredSurveys( int start, int batchSize, long companyId, String mood,
+        Long startSurveyID, Date startReviewDate, Date startTransactionDate, List<Long> userIds, boolean isRetaken )
     {
         LOG.debug( "Method getSurveyByStartIndexAndStatus() started." );
-        
+
         Query query = new Query();
         //add company id criteria
         query.addCriteria( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ) );
 
-        
+
         // add status criteria
-        if(status != null){
-            if ( status.equals( CommonConstants.SURVEY_API_SURVEY_STATUS_COMPLETE ) ) {
-                query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ));
-            } else if ( status.equals( CommonConstants.SURVEY_API_SURVEY_STATUS_INCOMPLETE ) ) {
-                query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).ne( CommonConstants.SURVEY_STAGE_COMPLETE ) );
-            } else if ( status.equals( CommonConstants.SURVEY_API_SURVEY_STATUS_ALL ) ) {
-
-            }
-        }
+        query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
         
+
         //add mood criteria
-        if( ! StringUtils.isEmpty( mood )){
-            query.addCriteria( Criteria.where( CommonConstants.MOOD_COLUMN ).is( mood ));
+        if ( !StringUtils.isEmpty( mood ) ) {
+            query.addCriteria( Criteria.where( CommonConstants.MOOD_COLUMN ).is( mood ) );
         }
-        
-        //add survey id criteria
-        if(startSurveyID != null && startSurveyID > 0l)
-            query.addCriteria( Criteria.where( CommonConstants.SURVEY_PREINITIATION_ID_COLUMN).gte( startSurveyID));
 
-        
+        //add survey id criteria
+        if ( startSurveyID != null && startSurveyID > 0l )
+            query.addCriteria( Criteria.where( CommonConstants.SURVEY_PREINITIATION_ID_COLUMN ).gte( startSurveyID ) );
+
+
         // review date criteria
-        if(startReviewDate != null)
+        if ( startReviewDate != null )
             query.addCriteria( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).gte( startReviewDate ) );
-        
+
         // transaction date criteria
-        if(startTransactionDate != null)
+        if ( startTransactionDate != null )
             query.addCriteria( Criteria.where( CommonConstants.SURVEY_TRANSACTION_DATE_COLUMN ).gte( startTransactionDate ) );
-        
+
         //user id criteria
-        if(userIds != null)
-            query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).in( userIds));
+        if ( userIds != null )
+            query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).in( userIds ) );
+        
+        //add retake survey acriteria
+        if ( isRetaken )
+            query.addCriteria( Criteria.where( CommonConstants.RETAKE_SURVEY_COLUMN ).is( true ) );
 
         //get the oldest record
         query.with( new Sort( Sort.Direction.DESC, CommonConstants.MODIFIED_ON_COLUMN ) );
@@ -2961,53 +2968,114 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
 
     @Override
-    public Long getFilteredSurveyCount( long companyId  , String status  , String mood,  Long startSurveyID, Date startReviewDate , Date startTransactionDate ,List<Long> userIds )
+    public Long getFilteredSurveyCount( long companyId, String mood, Long startSurveyID, Date startReviewDate,
+        Date startTransactionDate, List<Long> userIds, boolean isRetaken )
     {
         LOG.debug( "Method to get count of total number of surveys completed so far, getCompletedSurveyCount() started." );
 
-        Query query = new Query( );
+        Query query = new Query();
         //add company id criteria
         query.addCriteria( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ) );
 
-        
-        // add status criteria
-        if(status != null){
-            if ( status.equals( CommonConstants.SURVEY_API_SURVEY_STATUS_COMPLETE ) ) {
-                query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ));
-            } else if ( status.equals( CommonConstants.SURVEY_API_SURVEY_STATUS_INCOMPLETE ) ) {
-                query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).ne( CommonConstants.SURVEY_STAGE_COMPLETE ) );
-            } else if ( status.equals( CommonConstants.SURVEY_API_SURVEY_STATUS_ALL ) ) {
 
-            }
-        }
-                
-        //add mood criteria
-        if( ! StringUtils.isEmpty( mood )){
-            query.addCriteria( Criteria.where( CommonConstants.MOOD_COLUMN ).is( mood ));
-        }
+        // add status criteria
+        query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
         
+
+        //add mood criteria
+        if ( !StringUtils.isEmpty( mood ) ) {
+            query.addCriteria( Criteria.where( CommonConstants.MOOD_COLUMN ).is( mood ) );
+        }
+
         //add survey id criteria
-        if(startSurveyID != null && startSurveyID > 0l)
-            query.addCriteria( Criteria.where( CommonConstants.SURVEY_PREINITIATION_ID_COLUMN).gte( startSurveyID));
+        if ( startSurveyID != null && startSurveyID > 0l )
+            query.addCriteria( Criteria.where( CommonConstants.SURVEY_PREINITIATION_ID_COLUMN ).gte( startSurveyID ) );
 
         // transaction date criteria
-        if(startTransactionDate != null)
+        if ( startTransactionDate != null )
             query.addCriteria( Criteria.where( CommonConstants.SURVEY_TRANSACTION_DATE_COLUMN ).gte( startTransactionDate ) );
 
         // review date criteria
-        if(startReviewDate != null)
+        if ( startReviewDate != null )
             query.addCriteria( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).gte( startReviewDate ) );
 
         //user id criteria
-        if(userIds != null)
-            query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).in( userIds));
+        if ( userIds != null )
+            query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).in( userIds ) );
+
+        //add retake survey acriteria
+        if ( isRetaken )
+            query.addCriteria( Criteria.where( CommonConstants.RETAKE_SURVEY_COLUMN ).is( true ) );
         
         LOG.debug( "Method to get count of total number of surveys completed so far, getCompletedSurveyCount() finished." );
         return mongoTemplate.count( query, SURVEY_DETAILS_COLLECTION );
 
     }
 
+    
+    @Override
+    public Float getFilteredSurveyAvgScore( long companyId,  String mood, Long startSurveyID, Date startReviewDate,
+        Date startTransactionDate, List<Long> userIds, boolean isRetaken )
+    {
+        LOG.debug( "Method to avg score of surveys, getFilteredSurveyAvgScore() started." );
 
+        
+        BasicDBList pipeline = new BasicDBList();
+        //match for non abusive reviews
+        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.COMPANY_ID_COLUMN , companyId ) ) );
+
+        // add status criteria
+        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.STAGE_COLUMN ,  CommonConstants.SURVEY_STAGE_COMPLETE  ) ) );
+        
+        //add mood criteria
+        if ( !StringUtils.isEmpty( mood ) ) {
+            pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.MOOD_COLUMN , mood ) ) );
+        }
+
+        //add survey id criteria
+        if ( startSurveyID != null && startSurveyID > 0l )
+            pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.SURVEY_PREINITIATION_ID_COLUMN,  new BasicDBObject( "$gte" , startSurveyID ) )) );
+
+        // transaction date criteria
+        if ( startTransactionDate != null )
+            pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.SURVEY_TRANSACTION_DATE_COLUMN,  new BasicDBObject( "$gte" , startTransactionDate ) )) );
+
+        // review date criteria
+        if ( startReviewDate != null )
+            pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN,  new BasicDBObject( "$gte" , startReviewDate ) )) );
+
+        //user id criteria
+        if ( userIds != null )
+            pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.AGENT_ID_COLUMN,  new BasicDBObject( "$in" , userIds ) )) );
+
+        //add retake survey acriteria
+        if ( isRetaken )
+            pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.RETAKE_SURVEY_COLUMN , true ) ) );
+        
+        
+        // grouping
+        pipeline.add( new BasicDBObject( "$group",  new BasicDBObject( "_id", null ).append( "score", new BasicDBObject( "$avg",  "$score"  ) ) ) );
+        BasicDBObject aggregationObject = new BasicDBObject( "aggregate", SURVEY_DETAILS_COLLECTION ).append( "pipeline",
+            pipeline );
+        
+        CommandResult aggregateResult = mongoTemplate.executeCommand( aggregationObject );
+        float avgScore = 0;
+        List<BasicDBObject> aggregatedData = null;
+        if ( aggregateResult.containsField( "result" ) ) {
+            aggregatedData = (List<BasicDBObject>) aggregateResult.get( "result" );
+            if ( aggregatedData.size() > 0 ) {
+                for ( BasicDBObject data : aggregatedData ) {
+                     avgScore = Float.parseFloat( data.get( "score" ).toString() ) ;
+                }
+            }
+        }
+        
+       
+                
+        LOG.debug( "Method to avg score of surveys, getFilteredSurveyAvgScore() finished." );
+        return avgScore;
+
+    }
 
     @Override
     public void insertApiRequestDetails( ApiRequestDetails apiRequestDetails )
@@ -3157,9 +3225,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         if ( rows > -1 ) {
             query.limit( rows );
         }
-        query.addCriteria( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN )
-            .nin( Arrays.asList( "Zillow" ) ) );
-       // query.addCriteria( Criteria.where( CommonConstants.SURVEY_SOURCE_ID_COLUMN ).is( null ) );
+        query.addCriteria( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).nin( Arrays.asList( "Zillow" ) ) );
+        // query.addCriteria( Criteria.where( CommonConstants.SURVEY_SOURCE_ID_COLUMN ).is( null ) );
         List<SurveyDetails> surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
 
         return surveys;
@@ -3176,9 +3243,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         update.set( CommonConstants.SURVEY_SOURCE_ID_COLUMN, survey.getSourceId() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
     }
-    
-    
-    
+
+
     @Override
     public void updateTransactionDateInExistingSurveyDetails( SurveyDetails surveyDetails )
     {
@@ -3187,116 +3253,135 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         Query query = new Query();
         query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyMongoId ) );
         Update update = new Update();
-        update.set( CommonConstants.SURVEY_TRANSACTION_DATE_COLUMN, surveyDetails.getSurveyTransactionDate());
+        update.set( CommonConstants.SURVEY_TRANSACTION_DATE_COLUMN, surveyDetails.getSurveyTransactionDate() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.info( "Method updateTransactionDateInExistingSurveyDetails finished." );
     }
-    
-    
+
+
     @Override
-    public void updateBranchIdRegionIdForAllSurveysOfAgent( long agentId , long branchId , long regionId )
+    public void updateBranchIdRegionIdForAllSurveysOfAgent( long agentId, long branchId, long regionId )
     {
         LOG.debug( "Method updateBranchIdRegionIdForAllSurveysOfAgent() started for agentId + " + agentId );
         Query query = new Query();
-        
+
         //update branch id , region id
         query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( agentId ) );
         Update update = new Update();
         update.set( CommonConstants.BRANCH_ID_COLUMN, branchId );
         update.set( CommonConstants.REGION_ID_COLUMN, regionId );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
-        
+
         //update branch media post details
         query = new Query();
-        query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN).is( agentId ) );
-        query.addCriteria( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN).exists( true ) );
-        query.addCriteria( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "."
-            + CommonConstants.BRANCH_MEDIA_POST_DETAILS_COLUMN ).exists( true ) );
-        query.addCriteria( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "."
-            + CommonConstants.BRANCH_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.SHARED_ON_COLUMN ).exists( true ) );        
+        query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( agentId ) );
+        query.addCriteria( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN ).exists( true ) );
+        query.addCriteria( Criteria
+            .where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.BRANCH_MEDIA_POST_DETAILS_COLUMN )
+            .exists( true ) );
+        query
+            .addCriteria( Criteria
+                .where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "."
+                    + CommonConstants.BRANCH_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.SHARED_ON_COLUMN )
+                .exists( true ) );
         update = new Update();
-        update.set( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "."
-            + CommonConstants.BRANCH_MEDIA_POST_DETAILS_COLUMN + ".0." + CommonConstants.BRANCH_ID_COLUMN , branchId );
+        update.set( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.BRANCH_MEDIA_POST_DETAILS_COLUMN
+            + ".0." + CommonConstants.BRANCH_ID_COLUMN, branchId );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
-        
+
         //update region media post details
         query = new Query();
-        query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN).is( agentId ) );
-        query.addCriteria( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN).exists( true ) );
-        query.addCriteria( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "."
-            + CommonConstants.REGION_MEDIA_POST_DETAILS_COLUMN ).exists( true ) );
-        query.addCriteria( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "."
-            + CommonConstants.REGION_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.SHARED_ON_COLUMN ).exists( true ) );        
+        query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( agentId ) );
+        query.addCriteria( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN ).exists( true ) );
+        query.addCriteria( Criteria
+            .where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.REGION_MEDIA_POST_DETAILS_COLUMN )
+            .exists( true ) );
+        query
+            .addCriteria( Criteria
+                .where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "."
+                    + CommonConstants.REGION_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.SHARED_ON_COLUMN )
+                .exists( true ) );
         update = new Update();
-        update.set( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "."
-            + CommonConstants.REGION_MEDIA_POST_DETAILS_COLUMN + ".0." + CommonConstants.REGION_ID_COLUMN , regionId );
+        update.set( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.REGION_MEDIA_POST_DETAILS_COLUMN
+            + ".0." + CommonConstants.REGION_ID_COLUMN, regionId );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
-        
-        
-        
+
+
         LOG.debug( "Method updateBranchIdRegionIdForAllSurveysOfAgent() finished for agentId + " + agentId );
     }
 
+
     @Override
-    public void moveSurveysAlongWithUser( long agentId , long branchId, long regionId , long companyId )
+    public void moveSurveysAlongWithUser( long agentId, long branchId, long regionId, long companyId )
     {
         LOG.info( "Method moveSurveysAlongWithUser() startedfor user  " + agentId );
         Query query = new Query();
- 
+
         //update branch id , region id, company id
         query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( agentId ) );
         Update update = new Update();
-        update.set( CommonConstants.BRANCH_ID_COLUMN, branchId);
-        update.set( CommonConstants.REGION_ID_COLUMN, regionId);
-        update.set( CommonConstants.COMPANY_ID_COLUMN, companyId);
+        update.set( CommonConstants.BRANCH_ID_COLUMN, branchId );
+        update.set( CommonConstants.REGION_ID_COLUMN, regionId );
+        update.set( CommonConstants.COMPANY_ID_COLUMN, companyId );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
-        
-      //update branch media post details
+
+        //update branch media post details
         query = new Query();
-        query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN).is( agentId ) );
-        query.addCriteria( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN).exists( true ) );
-        query.addCriteria( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "."
-            + CommonConstants.BRANCH_MEDIA_POST_DETAILS_COLUMN ).exists( true ) );
-        query.addCriteria( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "."
-            + CommonConstants.BRANCH_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.SHARED_ON_COLUMN ).exists( true ) );        
+        query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( agentId ) );
+        query.addCriteria( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN ).exists( true ) );
+        query.addCriteria( Criteria
+            .where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.BRANCH_MEDIA_POST_DETAILS_COLUMN )
+            .exists( true ) );
+        query
+            .addCriteria( Criteria
+                .where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "."
+                    + CommonConstants.BRANCH_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.SHARED_ON_COLUMN )
+                .exists( true ) );
         update = new Update();
-        update.set( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "."
-            + CommonConstants.BRANCH_MEDIA_POST_DETAILS_COLUMN + ".0." + CommonConstants.BRANCH_ID_COLUMN , branchId );
+        update.set( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.BRANCH_MEDIA_POST_DETAILS_COLUMN
+            + ".0." + CommonConstants.BRANCH_ID_COLUMN, branchId );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
-        
+
         //update region media post details
         query = new Query();
-        query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN).is( agentId ) );
-        query.addCriteria( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN).exists( true ) );
-        query.addCriteria( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "."
-            + CommonConstants.REGION_MEDIA_POST_DETAILS_COLUMN ).exists( true ) );
-        query.addCriteria( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "."
-            + CommonConstants.REGION_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.SHARED_ON_COLUMN ).exists( true ) );        
+        query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( agentId ) );
+        query.addCriteria( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN ).exists( true ) );
+        query.addCriteria( Criteria
+            .where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.REGION_MEDIA_POST_DETAILS_COLUMN )
+            .exists( true ) );
+        query
+            .addCriteria( Criteria
+                .where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "."
+                    + CommonConstants.REGION_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.SHARED_ON_COLUMN )
+                .exists( true ) );
         update = new Update();
-        update.set( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "."
-            + CommonConstants.REGION_MEDIA_POST_DETAILS_COLUMN + ".0." + CommonConstants.REGION_ID_COLUMN , regionId );
+        update.set( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.REGION_MEDIA_POST_DETAILS_COLUMN
+            + ".0." + CommonConstants.REGION_ID_COLUMN, regionId );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
-        
-        
-      //update company media post details
+
+
+        //update company media post details
         query = new Query();
-        query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN).is( agentId ) );
-        query.addCriteria( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN).exists( true ) );
-        query.addCriteria( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "."
-            + CommonConstants.COMPANY_MEDIA_POST_DETAILS_COLUMN ).exists( true ) );
-        query.addCriteria( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "."
-            + CommonConstants.COMPANY_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.SHARED_ON_COLUMN ).exists( true ) );        
+        query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( agentId ) );
+        query.addCriteria( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN ).exists( true ) );
+        query.addCriteria( Criteria
+            .where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.COMPANY_MEDIA_POST_DETAILS_COLUMN )
+            .exists( true ) );
+        query
+            .addCriteria( Criteria
+                .where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "."
+                    + CommonConstants.COMPANY_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.SHARED_ON_COLUMN )
+                .exists( true ) );
         update = new Update();
-        update.set( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "."
-            + CommonConstants.COMPANY_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.COMPANY_ID_COLUMN , regionId );
+        update.set( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.COMPANY_MEDIA_POST_DETAILS_COLUMN
+            + "." + CommonConstants.COMPANY_ID_COLUMN, regionId );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
-        
-        
-        
+
+
         LOG.info( "Method moveSurveysAlongWithUser finished." );
     }
-    
-    
+
+
     @Override
     public void updateAgentIdInSurveyDetail( SurveyDetails surveyDetails )
     {
@@ -3310,7 +3395,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.debug( "Method updateAgentIdInSurveyDetail() to update agentId of survey finished." );
     }
-    
+
+
     @Override
     public void disconnectSurveysFromWithUser( long agentId )
     {
@@ -3318,36 +3404,61 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         Query query = new Query();
         query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( agentId ) );
         Update update = new Update();
-        update.set( CommonConstants.AGENT_ID_COLUMN, 0l);
+        update.set( CommonConstants.AGENT_ID_COLUMN, 0l );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.info( "Method moveSurveysAlongWithUser finished." );
     }
 
+
     @Override
-    public void updateRegionIdForAllSurveysOfBranch( long branchId , long regionId )
+    public void updateRegionIdForAllSurveysOfBranch( long branchId, long regionId )
     {
         LOG.debug( "Method updateRegionIdForAllSurveysOfBranch() started for branchId + " + branchId );
         Query query = new Query();
-        query.addCriteria( Criteria.where( CommonConstants.BRANCH_ID_COLUMN).is( branchId ) );
+        query.addCriteria( Criteria.where( CommonConstants.BRANCH_ID_COLUMN ).is( branchId ) );
         Update update = new Update();
         update.set( CommonConstants.REGION_ID_COLUMN, regionId );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
-        
-        
-         query = new Query();
-        query.addCriteria( Criteria.where( CommonConstants.BRANCH_ID_COLUMN).is( branchId ) );
-        query.addCriteria( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN).exists( true ) );
-        query.addCriteria( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "."
-            + CommonConstants.REGION_MEDIA_POST_DETAILS_COLUMN ).exists( true ) );
-        query.addCriteria( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "."
-            + CommonConstants.REGION_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.SHARED_ON_COLUMN ).exists( true ) );
-        
+
+
+        query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.BRANCH_ID_COLUMN ).is( branchId ) );
+        query.addCriteria( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN ).exists( true ) );
+        query.addCriteria( Criteria
+            .where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.REGION_MEDIA_POST_DETAILS_COLUMN )
+            .exists( true ) );
+        query
+            .addCriteria( Criteria
+                .where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "."
+                    + CommonConstants.REGION_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.SHARED_ON_COLUMN )
+                .exists( true ) );
+
         update = new Update();
-        update.set( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "."
-            + CommonConstants.REGION_MEDIA_POST_DETAILS_COLUMN + ".0." + CommonConstants.REGION_ID_COLUMN , regionId );
+        update.set( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.REGION_MEDIA_POST_DETAILS_COLUMN
+            + ".0." + CommonConstants.REGION_ID_COLUMN, regionId );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
-        
+
         LOG.debug( "Method updateRegionIdForAllSurveysOfBranch() finished for branchId + " + branchId );
     }
+    
+    @Override
+    public void updateSurveyDetailsForRetake( SurveyDetails surveyDetails )
+    {
+        LOG.debug( "Method insertSurveyDetails() to insert details of survey started." );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyDetails.get_id() ) );
+
+        Update update = new Update();
+        update.set( CommonConstants.STAGE_COLUMN, surveyDetails.getStage());
+        update.set( CommonConstants.REVIEW_COLUMN , surveyDetails.getReview() );
+        update.set( CommonConstants.RETAKE_SURVEY_COLUMN, surveyDetails.isRetakeSurvey());
+        update.set( CommonConstants.NO_OF_RETAKE_COLUMN, surveyDetails.getNoOfRetake() );
+        update.set( CommonConstants.LAST_RETAKE_REQUEST_DATE_COLUMN, surveyDetails.getLastRetakeRequestDate());
+        update.set( CommonConstants.RETAKE_SURVEY_HISTORY_COLUMN, surveyDetails.getRetakeSurveyHistory());
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
+        mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
+        LOG.debug( "Method insertSurveyDetails() to insert details of survey finished." );
+    }
+    
     
 }

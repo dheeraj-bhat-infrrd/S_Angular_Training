@@ -17,19 +17,22 @@ public class OverviewBranchDaoImpl extends GenericReportingDaoImpl<OverviewBranc
     @Override
     public String getOverviewBranchId( Long branchid )
     {
-        LOG.info("Method to get OverviewBranchId from branchid, getOverviewBranchId() started." );
+        LOG.debug("Method to get OverviewBranchId from branchid, getOverviewBranchId() started." );
 
         Query query = getSession().createSQLQuery( "SELECT overview_branch_id FROM overview_branch WHERE branch_id = :branchid " );
         query.setParameter( "branchid", branchid  );
         String OverviewBranchId = (String) query.uniqueResult();
         
-        LOG.info( "Method to get OverviewBranchId from branchid, getOverviewBranchId() finished." );
+        LOG.debug( "Method to get OverviewBranchId from branchid, getOverviewBranchId() finished." );
         return OverviewBranchId;
     }
 
     @Override
     public OverviewBranch findOverviewBranch( Class<OverviewBranch> entityClass, String overviewBranchid )throws IllegalArgumentException
     {
+    	LOG.debug("Method to get Overview Branch from branchid, findOverviewBranch() started." );
+    	
+    	LOG.debug("Method to get Overview Branch from branchid, findOverviewBranch() finished." );
         return super.findById( entityClass, overviewBranchid );
     }
 

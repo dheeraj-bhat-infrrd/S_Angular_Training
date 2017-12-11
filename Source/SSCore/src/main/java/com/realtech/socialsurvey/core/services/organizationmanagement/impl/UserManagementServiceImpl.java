@@ -1086,13 +1086,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     public User getUserObjByUserId( long userId ) throws InvalidInputException
     {
-        LOG.debug( "Method to find user on the basis of user id started for user id " + userId );
+        LOG.debug( "Method to find user on the basis of user id started for user id {}" , userId );
         User user = null;
         user = userDao.findById( User.class, userId );
         if ( user == null ) {
             throw new InvalidInputException( "User not found for userId:" + userId );
         }
-        LOG.debug( "Method to find user on the basis of user id finished for user id " + userId );
+        LOG.debug( "Method to find user on the basis of user id finished for user id {}", userId );
         return user;
     }
 
@@ -2292,9 +2292,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     public AgentSettings getUserSettings( long agentId ) throws InvalidInputException
     {
-        LOG.debug( "Getting agent settings for agent id: " + agentId );
+        LOG.debug( "Getting agent settings for agent id: {}", agentId );
         if ( agentId <= 0l ) {
-            throw new InvalidInputException( "Invalid agent id for fetching user settings" );
+        	LOG.warn("Invalid agent id for fetching user settings.");
+            throw new InvalidInputException( "Invalid agent id for fetching user settings." );
         }
         AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById( agentId );
         if ( agentSettings != null && agentSettings.getProfileStages() != null ) {
@@ -2880,7 +2881,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public List<UserFromSearch> checkUserCanEdit( User admin, UserFromSearch adminFromSearch, List<UserFromSearch> users )
         throws InvalidInputException
     {
-        LOG.debug( "Method checkUserCanEdit called for admin:" + admin + " and adminUser:" + adminFromSearch );
+        LOG.debug( "Method checkUserCanEdit called for admin:{} and adminUser:{}" ,admin, adminFromSearch );
         /**
          * Company admin : able to edit any user and himself
          */
@@ -3337,11 +3338,11 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Transactional
     private void makeAProfileAsPrimaryOfAUser( long userId ) throws InvalidInputException, ProfileNotFoundException
     {
-        LOG.debug( "method makeAProfileAsPrimaryOfAUser started with userid : " + userId );
+        LOG.debug( "method makeAProfileAsPrimaryOfAUser started with userid : {}", userId );
         User user = userDao.findById( User.class, userId );
         if ( user == null ) {
-            LOG.error( "User Is passed was null" );
-            throw new InvalidInputException( "Passed User id is null" );
+            LOG.warn( "User Id passed was null" );
+            throw new InvalidInputException( "Passed User id is null." );
         }
 
         String errorMessage = "No primary user profile found for user " + user.getFirstName() + user.getLastName()
@@ -3349,13 +3350,14 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         try {
             emailServices.sendReportBugMailToAdmin( applicationAdminName, errorMessage, applicationAdminEmail );
         } catch ( UndeliveredEmailException e ) {
-            LOG.error( "error while sending report bug mail to admin ", e );
+            LOG.error( "error while sending report bug mail to admin. ", e );
         }
 
         //List<UserProfile> userProfileList = userProfileDao.findByColumn(UserProfile.class, CommonConstants.USER_COLUMN, user);
         List<UserProfile> userProfileList = user.getUserProfiles();
         if ( userProfileList == null || userProfileList.isEmpty() ) {
-            throw new ProfileNotFoundException( "No profile found for user with id : " + user.getUserId() );
+        	LOG.warn("No profile found for user with id : {}",user.getUserId());
+            throw new ProfileNotFoundException( "No profile found for user with id : "+ user.getUserId() );
         }
 
 
@@ -3402,11 +3404,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         profileToMakePrimary.setIsPrimary( CommonConstants.IS_PRIMARY_TRUE );
         userProfileDao.update( profileToMakePrimary );
-        LOG.debug( "marked a profile with profile id " + profileToMakePrimary.getUserProfileId()
-            + "  as primary for user with user id " + user.getUserId() );
-
-        LOG.debug( "method makeAProfileAsPrimaryOfAUser ended for user with userid : " + user.getUserId() );
-
+        if(LOG.isDebugEnabled()){
+        	LOG.debug( "marked a profile with profile id {} as primary for user with user id {}",profileToMakePrimary.getUserProfileId(),user.getUserId() );
+        }    
+        LOG.debug( "method makeAProfileAsPrimaryOfAUser ended for user with userid : {}", user.getUserId() );
     }
 
 
@@ -3488,16 +3489,16 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public Map<String, Long> getPrimaryUserProfileByAgentId( long entityId )
         throws InvalidInputException, ProfileNotFoundException
     {
-        LOG.debug( "method getPrimaryUserProfileByAgentId started with user id " + entityId );
+        LOG.debug( "method getPrimaryUserProfileByAgentId started with user id {}", entityId );
         Map<String, Long> userProfileDetailMap = userProfileDao.findPrimaryUserProfileByAgentId( entityId );
         if ( userProfileDetailMap == null || userProfileDetailMap.isEmpty() ) {
-            LOG.warn( "No primary profile found for the user with id " + entityId );
+            LOG.warn( "No primary profile found for the user with id {}", entityId );
             makeAProfileAsPrimaryOfAUser( entityId );
             // after making a profile primary, again fetch the data
             userProfileDetailMap = userProfileDao.findPrimaryUserProfileByAgentId( entityId );
         }
 
-        LOG.debug( "method getPrimaryUserProfileByAgentId ended with user id " + entityId );
+        LOG.debug( "method getPrimaryUserProfileByAgentId ended with user id {}", entityId );
         return userProfileDetailMap;
     }
 
@@ -3917,7 +3918,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public void deleteSSAdmin( User admin, long ssAdminId ) throws InvalidInputException
     {
 
-        LOG.debug( "Method to deleteSSAdmin user " + ssAdminId + " called." );
+        LOG.debug( "Method to deleteSSAdmin user {} called.", ssAdminId );
         User userToBeDeactivated = userDao.findById( User.class, ssAdminId );
         if ( admin == null ) {
             throw new InvalidInputException( "Passed parameter admin is null" );
@@ -3941,7 +3942,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         userToBeDeactivated.setModifiedBy( String.valueOf( admin.getUserId() ) );
         userToBeDeactivated.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
 
-        LOG.debug( "Deactivating user " + userToBeDeactivated.getFirstName() );
+        LOG.debug( "Deactivating user {}", userToBeDeactivated.getFirstName() );
         userDao.update( userToBeDeactivated );
     }
 

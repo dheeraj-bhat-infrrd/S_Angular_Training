@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -44,6 +45,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.OrganizationUnitSettingsComparator;
 import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
@@ -877,9 +879,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( user == null ) {
             throw new InvalidInputException( "User is not set" );
         }
-        LOG.debug( "Get company settings for the user: " + user.toString() );
+        if(LOG.isDebugEnabled()) {
+            LOG.debug( "Get company settings for the user: {}" , user.toString() );
+        }
         // get the company id
         if ( user.getCompany() == null ) {
+            LOG.warn( "User object is partially set. Could not find the comany details" );
             throw new InvalidInputException( "User object is partially set. Could not find the comany details" );
         }
         long companyId = user.getCompany().getCompanyId();
@@ -911,7 +916,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     public OrganizationUnitSettings getCompanySettings( long companyId ) throws InvalidInputException
     {
 
-        LOG.debug( "Get company settings for the companyId: " + companyId );
+        LOG.debug( "Get company settings for the companyId: {} " , companyId );
 
         OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
@@ -999,7 +1004,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     {
         OrganizationUnitSettings regionSettings = null;
         if ( regionId <= 0l ) {
-            throw new InvalidInputException( "Invalid region id. :" + regionId );
+            LOG.warn( "Invalid region id. : {}" , regionId );
+            throw new InvalidInputException( "Invalid region id. : " + regionId ) ;
         }
         LOG.debug( "Get the region settings for region id: " + regionId );
         regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( regionId,
@@ -1070,9 +1076,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         OrganizationUnitSettings organizationUnitSettings = null;
         BranchSettings branchSettings = null;
         if ( branchId <= 0l ) {
+            LOG.warn( "Invalid branch id. : {}", branchId );
             throw new InvalidInputException( "Invalid branch id. :" + branchId );
         }
-        LOG.debug( "Get the branch settings for branch id: " + branchId );
+        LOG.debug( "Get the branch settings for branch id: {}" , branchId );
         organizationUnitSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( branchId,
             MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
 
@@ -1082,7 +1089,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 profileCompletionList.getProfileCompletionList( organizationUnitSettings.getProfileStages() ) );
         }
 
-        LOG.debug( "Successfully fetched the branch settings for branch id: " + branchId + " returning : " + branchSettings );
+        LOG.debug( "Successfully fetched the branch settings for branch id: {} returning : {}", branchId, branchSettings );
         return organizationUnitSettings;
     }
 
@@ -2728,6 +2735,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                     } else {
                         LOG.debug( "This doesnt contain a first name and last name" );
                         firstName = emailId.substring( 0, emailId.indexOf( "@" ) );
+                        lastName = "";
                     }
 
                 }
@@ -2793,12 +2801,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Override
     public Boolean validateEmail( String emailId ) throws InvalidInputException
     {
-        boolean validEmail = true;
         LOG.debug( "Method validateAndParseEmailIds called" );
         Pattern pattern = Pattern.compile( CommonConstants.EMAIL_REGEX, Pattern.CASE_INSENSITIVE );
         Matcher matcher = pattern.matcher( emailId );
-        validEmail = matcher.matches();
-        return validEmail;
+        return matcher.matches();
     }
 
 
@@ -5599,7 +5605,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         companyIds.addAll( companyIdList );
 
         List<OrganizationUnitSettings> unitSettings = organizationUnitSettingsDao.getCompanyListByIds( companyIds );
-        //Collections.sort( unitSettings, new OrganizationUnitSettingsComparator() );
+        Collections.sort( unitSettings, new OrganizationUnitSettingsComparator() ); 
         return unitSettings;
     }
 
