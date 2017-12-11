@@ -91,24 +91,27 @@
 									</c:forEach>
 								</div>
 								<div class="sq-1to10-range-val">
-									<input name="sq-range-1to10-customize" class="float-left sq-range-1to10-input" value="Not at all likely">
-									<input name="sq-range-1to10-customize" class="float-right sq-range-1to10-input text-align-right" value="Very Likely">
+									<input id="sq-not-very-likely-edit" name="notVeryLikely" class="float-left sq-range-1to10-input sq-not-very-likely" value="Not at all likely">
+									<input id="sq-very-likely-edit" name="veryLikely" class="float-right sq-range-1to10-input text-align-right sq-very-likely" value="Very Likely">
 								</div>
 							</div>
 						</div>
 					</div>
 					<div class="bd-q-pu-done-wrapper bd-q-pu-done-wrapper-override clearfix">
-						<div id="user-ranking-chkbox-wrapper-edit" class="clearfix" style="width: 200px;">
-							<div id="user-ranking-chkbox-edit" class='float-left user-ranking-chkbox bd-check-img <c:if test="${ isUserRankingQuestion == 0}">bd-check-img-checked</c:if>'></div>
-							<input type="hidden" id="user-ranking-ques-edit" name="user-ranking-ques" value=${ isUserRankingQuestionVal }>
+						<div id="user-ranking-chkbox-wrapper-edit-nps" class="clearfix" style="width: 200px;">
+							<div id="user-ranking-chkbox-edit-nps" class='float-left user-ranking-chkbox bd-check-img <c:if test="${ isUserRankingQuestion == 0}">bd-check-img-checked</c:if>'></div>
+							<input type="hidden" id="user-ranking-ques-edit-nps" name="user-ranking-ques" value=${ isUserRankingQuestionVal }>
 							<div class="float-left  listing-access-txt cursor-pointer">Considered for User Ranking</div>
 						</div>
 						<div id="avg-score-chkbox-wrapper-edit" class="clearfix" style="width: 210px;"> 
 							<div id="avg-score-chkbox-edit" class='float-left avg-score-chkbox bd-check-img <c:if test="${ isNpsQuestion == 0}">bd-check-img-checked</c:if>'></div>
-							<input type="hidden" id="avg-score-ques-edit" name="avg-score-ques" value=${ isNpsQuestion }>
+							<input type="hidden" id="avg-score-ques-edit" name="considerForScore" value=${ isNpsQuestion }>
 							<div class="float-left listing-access-txt cursor-pointer">Considered for Average Score</div>
 						</div>
-  					</div>
+						<div id="nps-chkbox-wrapper-edit" class="clearfix">
+							<input type="hidden" id="nps-ques-edit" name="nps-ques" value=false>
+						</div>
+					</div>
 				</div>
 
 				<c:set var="ratingclass" scope="page" value=""/>

@@ -84,22 +84,25 @@
 									</c:forEach>
 								</div>
 								<div class="sq-1to10-range-val">
-									<input name="sq-range-1to10-customize" class="float-left sq-range-1to10-input" value="Not at all likely">
-									<input name="sq-range-1to10-customize" class="float-right sq-range-1to10-input text-align-right" value="Very Likely">
+									<input id="sq-not-very-likely-new" name="notVeryLikely" class="float-left sq-range-1to10-input sq-not-very-likely" value="Not at all likely">
+									<input id="sq-very-likely-new" name="veryLikely" class="float-right sq-range-1to10-input text-align-right sq-very-likely" value="Very Likely">
 								</div>
 							</div>
 						</div>
 					</div>
 					<div class="bd-q-pu-done-wrapper bd-q-pu-done-wrapper-override clearfix">
-						<div id="user-ranking-chkbox-wrapper-new" class="clearfix" style="width: 200px;">
-							<div id="user-ranking-chkbox-new" class="float-left user-ranking-chkbox bd-check-img"></div>
-							<input type="hidden" id="user-ranking-ques-new" name="user-ranking-ques" value=true>
+						<div id="user-ranking-chkbox-wrapper-new-nps" class="clearfix" style="width: 200px;">
+							<div id="user-ranking-chkbox-new-nps" class="float-left user-ranking-chkbox bd-check-img"></div>
+							<input type="hidden" id="user-ranking-ques-new-nps" name="user-ranking-ques" value=true>
 							<div class="float-left  listing-access-txt cursor-pointer">Consider for User Ranking</div>
 						</div>
 						<div id="avg-score-chkbox-wrapper-new" class="clearfix" style="width: 210px;">
 							<div id="avg-score-chkbox-new" class="float-left avg-score bd-check-img"></div>
-							<input type="hidden" id="avg-score-ques-new" name="avg-score-ques" value=true>
+							<input type="hidden" id="avg-score-ques-new" name="considerForScore" value=true>
 							<div class="float-left  listing-access-txt cursor-pointer">Consider for Average Score</div>
+						</div>
+						<div id="nps-chkbox-wrapper-new" class="clearfix">
+							<input type="hidden" id="nps-ques-new" name="nps-ques" value=false>
 						</div>
   					</div>
 				</div>
