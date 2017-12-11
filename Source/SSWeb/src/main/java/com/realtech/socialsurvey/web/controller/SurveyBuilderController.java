@@ -232,10 +232,16 @@ public class SurveyBuilderController {
 		    questionDetails.setConsiderForScore( Integer.parseInt( considerForScore ) );
 		}
 		if( isNPSStr!= null){
-		    questionDetails.setIsNPSQuestion( Integer.parseInt( isNPSStr ) );
+		    if(isNPSStr.equalsIgnoreCase( "true" ))
+		        questionDetails.setIsNPSQuestion( CommonConstants.YES );
+		    else
+	            questionDetails.setIsNPSQuestion( CommonConstants.NO );
 		}
 		if(isUserRankingStr != null){
-		    questionDetails.setIsUserRankingQuestion( Integer.parseInt( isUserRankingStr ) );
+		    if(isUserRankingStr.equalsIgnoreCase( "true" ))
+		         questionDetails.setIsUserRankingQuestion( CommonConstants.YES );
+		    else
+		        questionDetails.setIsUserRankingQuestion( CommonConstants.NO );
 		}
 		questionDetails.setNotAtAllLikely( notAtAllLikely );
 		questionDetails.setVeryLikely( veryLikely );
