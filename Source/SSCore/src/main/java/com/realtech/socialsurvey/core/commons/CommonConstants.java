@@ -3,7 +3,10 @@ package com.realtech.socialsurvey.core.commons;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+
+import com.realtech.socialsurvey.core.entities.RetakeSurveyHistory;
 
 
 /**
@@ -339,7 +342,6 @@ public interface CommonConstants
     public static final String SHOW_SURVEY_ON_UI_COLUMN = "showSurveyOnUI";
     public static final String SUMMARY_COLUMN = "summary";
     public static final String REVIEW_COLUMN = "review";
-    public static final String RETAKE_SURVEY_COLUMN = "retakeSurvey";
     public static final String USER_ENCRYPTED_ID = "userEncryptedId";
     public static final String SURVEY_COMPLETED_DATE_COLUMN = "surveyCompletedDate";
     public static final String SURVEY_UPDATED_DATE_COLUMN = "surveyUpdatedDate";
@@ -349,6 +351,10 @@ public interface CommonConstants
     public static final String SURVEY_LAST_ABUSE_REPORTED_DATE = "lastAbuseReportedDate";
     public static final String NPS_SCORE_COLUMN = "npsScore";
 
+    public static final String RETAKE_SURVEY_COLUMN = "retakeSurvey";
+    public static final String NO_OF_RETAKE_COLUMN = "noOfRetake";
+    public static final String LAST_RETAKE_REQUEST_DATE_COLUMN = "lastRetakeRequestDate";
+    public static final String RETAKE_SURVEY_HISTORY_COLUMN = "retakeSurveyHistory";
     
 
     /**

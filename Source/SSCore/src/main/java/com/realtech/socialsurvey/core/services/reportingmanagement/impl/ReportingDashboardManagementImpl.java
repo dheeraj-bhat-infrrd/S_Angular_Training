@@ -318,6 +318,13 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     @Value ( "${APPLICATION_BASE_URL}")
     private String applicationBaseUrl;
 
+    
+    @Value("${SEND_DIGEST_TO_APPLICATION_ADMIN_ONLY}")
+    private String sendDigestToApplicationAdminOnly;
+    
+    @Value ( "${APPLICATION_ADMIN_EMAIL}")
+    private String applicationAdminEmail;
+    
     public static final int DIGEST_MAIL_START_INDEX = 0;
 
     public static final int DIGEST_MAIL_BATCH_SIZE = 50;
@@ -689,7 +696,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                     companyUserReportList.add( "" );
                 }
                 if ( companyUserReport.getLastPostDateTwitter() != null ) {
-                    companyUserReportList.add( companyUserReport.getLastPostDateFb() );
+                    companyUserReportList.add( companyUserReport.getLastPostDateTwitter() );
                 } else {
                     companyUserReportList.add( "" );
                 }
@@ -3411,26 +3418,33 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             int startIndex = DIGEST_MAIL_START_INDEX;
             int batchSize = DIGEST_MAIL_BATCH_SIZE;
             List<CompanyDigestRequestData> digestRequestList = null;
+            
+            // create a Calendar instance with time zone and locale of the device
+            Calendar calendar = Calendar.getInstance();
+            
+            // set month and year
+            int month = calendar.get( Calendar.MONTH );
+            int year = calendar.get( Calendar.YEAR );
 
             do {
 
-
                 // fetch a list of digest requests for companies who have enabled send monthly digest mail feature 
                 digestRequestList = getCompanyRequestDataInBatch( startIndex, batchSize );
-
+                
                 if ( digestRequestList != null ) {
                     for ( CompanyDigestRequestData company : digestRequestList ) {
-
-
-                        // create a Calendar instance with time zone and locale of the device
-                        Calendar calendar = Calendar.getInstance();
 
                         try {
 
                             // get the digest aggregate object
-                            MonthlyDigestAggregate digestAggregate = getMonthlyDigestAggregateForCompany( company,
-                                calendar.get( Calendar.MONTH ), calendar.get( Calendar.YEAR ) );
+                            MonthlyDigestAggregate digestAggregate = getMonthlyDigestAggregateForCompany( company, month, year );
 
+                            // check for send digest to administrator switch
+                            if( CommonConstants.YES_STRING.equals( sendDigestToApplicationAdminOnly ) && digestAggregate != null ){
+                                digestAggregate.setRecipientMailId( applicationAdminEmail );
+                            }
+                            
+                            
                             // send the email to the company administrator
                             emailServices.sendMonthlyDigestMail( digestAggregate );
 
