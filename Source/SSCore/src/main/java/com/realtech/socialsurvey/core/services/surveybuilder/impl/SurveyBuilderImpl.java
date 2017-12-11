@@ -564,7 +564,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		for (SurveyQuestionsMapping surveyQuestionsMapping : surveyQuestionsMappings) {
 			surveyQuestionDetails = new SurveyQuestionDetails();
 			SurveyQuestion surveyQuestion = surveyQuestionsMapping.getSurveyQuestion();
-			List<Survey0To10Questions> survey0To10Questions = survey0To10QuestionsDao.findByColumn( Survey0To10Questions.class, "surveyQuestion", surveyQuestion );
+			Survey0To10Questions survey0To10Questions = surveyQuestionsMapping.getSurveyQuestion().getSurvey0To10Questions();
 
 			surveyQuestionDetails.setQuestionId(surveyQuestionsMapping.getSurveyQuestionsMappingId());
 			surveyQuestionDetails.setQuestion(surveyQuestionsMapping.getSurveyQuestion().getSurveyQuestion());
@@ -573,10 +573,10 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 			surveyQuestionDetails.setIsRatingQuestion(surveyQuestionsMapping.getIsRatingQuestion());
             surveyQuestionDetails.setIsUserRankingQuestion( surveyQuestionsMapping.getIsUserRankingQuestion() );
             if(surveyQuestionDetails.getQuestionType().equalsIgnoreCase( "sb-range-0to10" )){
-                surveyQuestionDetails.setIsNPSQuestion( survey0To10Questions.get( CommonConstants.INITIAL_INDEX ).getIsNPSQuestion() );
-                surveyQuestionDetails.setConsiderForScore( survey0To10Questions.get( CommonConstants.INITIAL_INDEX ).getConsiderForScore() );
-                surveyQuestionDetails.setNotAtAllLikely( survey0To10Questions.get( CommonConstants.INITIAL_INDEX ).getNotAtAllLikely() );
-                surveyQuestionDetails.setVeryLikely( survey0To10Questions.get( CommonConstants.INITIAL_INDEX ).getVeryLikely() );
+                surveyQuestionDetails.setIsNPSQuestion( survey0To10Questions.getIsNPSQuestion() );
+                surveyQuestionDetails.setConsiderForScore( survey0To10Questions.getConsiderForScore() );
+                surveyQuestionDetails.setNotAtAllLikely( survey0To10Questions.getNotAtAllLikely() );
+                surveyQuestionDetails.setVeryLikely( survey0To10Questions.getVeryLikely() );
             }
 
 			// For each answer
