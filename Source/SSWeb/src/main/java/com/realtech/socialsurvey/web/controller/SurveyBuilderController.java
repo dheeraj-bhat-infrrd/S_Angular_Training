@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.Survey0To10Questions;
 import com.realtech.socialsurvey.core.entities.SurveyAnswerOptions;
 import com.realtech.socialsurvey.core.entities.SurveyDetail;
 import com.realtech.socialsurvey.core.entities.SurveyQuestion;
@@ -207,6 +208,9 @@ public class SurveyBuilderController {
 		User user = sessionHelper.getCurrentUser();
 		String isUserRankingStr = request.getParameter("user-ranking-ques");
 		String isNPSStr = request.getParameter("nps-ques");
+		String notAtAllLikely = request.getParameter( "notVeryLikely" );
+		String veryLikely = request.getParameter( "veryLikely" );
+		String considerForScore = request.getParameter( "considerForScore" );	  
 		// Created VO and added required fields.
 		SurveyQuestionDetails questionDetails = new SurveyQuestionDetails();
 		questionDetails.setUserId(user.getUserId());
@@ -220,12 +224,21 @@ public class SurveyBuilderController {
 		if(answerArr != null && answerArr.length > 0){
 			questionDetails.setAnswerStr(Arrays.asList(answerArr));
 		}
-		questionDetails.setIsNPSStr(isNPSStr);
-		questionDetails.setIsUserRankingStr(isUserRankingStr);
 		String questionId = request.getParameter("questionId");
 		if(questionId != null){
 			questionDetails.setQuestionId(Long.parseLong(questionId));
 		}
+		if(considerForScore != null){
+		    questionDetails.setConsiderForScore( Integer.parseInt( considerForScore ) );
+		}
+		if( isNPSStr!= null){
+		    questionDetails.setIsNPSQuestion( Integer.parseInt( isNPSStr ) );
+		}
+		if(isUserRankingStr != null){
+		    questionDetails.setIsUserRankingQuestion( Integer.parseInt( isUserRankingStr ) );
+		}
+		questionDetails.setNotAtAllLikely( notAtAllLikely );
+		questionDetails.setVeryLikely( veryLikely );
 		
 		return questionDetails;
 	}

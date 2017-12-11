@@ -61,7 +61,7 @@ public class Survey0To10Questions implements Serializable
     private int status;
     
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="SURVEY_QUESTIONS_MAPPING_ID")
+    @JoinColumn(name="SURVEY_QUESTIONS_ID")
     private SurveyQuestion surveyQuestion;
 
     public long getSurvey0To10Id()

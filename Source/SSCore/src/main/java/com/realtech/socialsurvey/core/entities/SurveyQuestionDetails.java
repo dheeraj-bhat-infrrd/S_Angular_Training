@@ -26,8 +26,6 @@ public class SurveyQuestionDetails implements Serializable{
 	private long userId;
 	private long companyId;
 	private int verticalId;
-	private String isUserRankingStr;
-	private String isNPSStr;
 	private List<String> answerStr;
 	private int considerForScore;
 	private String notAtAllLikely;
@@ -107,22 +105,6 @@ public class SurveyQuestionDetails implements Serializable{
 		this.isNPSQuestion = isNPSQuestion;
 	}
 
-	public String getIsUserRankingStr() {
-		return isUserRankingStr;
-	}
-
-	public void setIsUserRankingStr(String isUserRankingStr) {
-		this.isUserRankingStr = isUserRankingStr;
-	}
-
-	public String getIsNPSStr() {
-		return isNPSStr;
-	}
-
-	public void setIsNPSStr(String isNPSStr) {
-		this.isNPSStr = isNPSStr;
-	}
-
 	public List<String> getAnswerStr() {
 		return answerStr;
 	}
@@ -188,13 +170,13 @@ public class SurveyQuestionDetails implements Serializable{
     @Override
     public String toString()
     {
-        return "SurveyQuestionDetails [questionId=" + questionId + ", question=" + question + ", answers=" + answers
-            + ", questionType=" + questionType + ", isRatingQuestion=" + isRatingQuestion + ", isUserRankingQuestion="
-            + isUserRankingQuestion + ", questionOrder=" + questionOrder + ", customerResponse=" + customerResponse
-            + ", isNPSQuestion=" + isNPSQuestion + ", userId=" + userId + ", companyId=" + companyId + ", verticalId="
-            + verticalId + ", isUserRankingStr=" + isUserRankingStr + ", isNPSStr=" + isNPSStr + ", answerStr=" + answerStr
-            + ", considerForScore=" + considerForScore + ", notAtAllLikely=" + notAtAllLikely + ", veryLikely=" + veryLikely
-            + "]";
+        return "SurveyQuestionDetails [questionId=" + questionId + ", question="
+            + question + ", answers=" + answers + ", questionType=" + questionType + ", isRatingQuestion=" + isRatingQuestion
+            + ", isUserRankingQuestion=" + isUserRankingQuestion + ", questionOrder=" + questionOrder + ", customerResponse="
+            + customerResponse + ", isNPSQuestion=" + isNPSQuestion + ", userId=" + userId + ", companyId=" + companyId
+            + ", verticalId=" + verticalId + ", answerStr=" + answerStr + ", considerForScore=" + considerForScore
+            + ", notAtAllLikely=" + notAtAllLikely + ", veryLikely=" + veryLikely + "]";
     }
+
     
 }

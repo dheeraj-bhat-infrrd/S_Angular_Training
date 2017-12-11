@@ -673,7 +673,6 @@ public interface CommonConstants
     public static final String QUESTION_MULTIPLE_CHOICE = "mcq";
     public static final String QUESTION_RATING = "range";
     public static final String QUESTION_0to10 = "0to10";
-    public static final String SB_RANGE_QUESTION_0to10 = "sb-range-0to10";
     public static final int QUESTION_RATING_VALUE_TRUE = 1;
     public static final int QUESTION_RATING_VALUE_FALSE = 0;
     public static final boolean QUESTION_VALUE_TRUE = true;
