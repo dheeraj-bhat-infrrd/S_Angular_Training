@@ -696,7 +696,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                     companyUserReportList.add( "" );
                 }
                 if ( companyUserReport.getLastPostDateTwitter() != null ) {
-                    companyUserReportList.add( companyUserReport.getLastPostDateFb() );
+                    companyUserReportList.add( companyUserReport.getLastPostDateTwitter() );
                 } else {
                     companyUserReportList.add( "" );
                 }

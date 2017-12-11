@@ -38,16 +38,20 @@ public class SurveysAndReviewsV2VOTransformer
 
         List<SurveyGetV2VO> surveyVOs = new ArrayList<SurveyGetV2VO>();
 
-        for ( Entry<SurveyDetails, SurveyPreInitiation> entry : d.getInitiatedSurveys().entrySet() ) {
-            SurveyGetV2VO surveyVO = surveyTransformer.transformDomainObjectToApiResponse( entry.getKey(), entry.getValue() );
-            surveyVOs.add( surveyVO );
+        if(d.getInitiatedSurveys() != null && !d.getInitiatedSurveys().isEmpty()){
+        	for ( Entry<SurveyDetails, SurveyPreInitiation> entry : d.getInitiatedSurveys().entrySet() ) {
+                SurveyGetV2VO surveyVO = surveyTransformer.transformDomainObjectToApiResponse( entry.getKey(), entry.getValue() );
+                surveyVOs.add( surveyVO );
+            }
         }
-
-        for ( SurveyPreInitiation surveyPreInitiation : d.getPreInitiatedSurveys() ) {
-            SurveyGetV2VO surveyVO = surveyTransformer.transformDomainObjectToApiResponse( null, surveyPreInitiation );
-            surveyVOs.add( surveyVO );
-        }
-
+        
+       /* if(d.getPreInitiatedSurveys() != null && ! d.getPreInitiatedSurveys().isEmpty()){
+        	for ( SurveyPreInitiation surveyPreInitiation : d.getPreInitiatedSurveys() ) {
+                SurveyGetV2VO surveyVO = surveyTransformer.transformDomainObjectToApiResponse( null, surveyPreInitiation );
+                surveyVOs.add( surveyVO );
+            }
+        }*/
+        
         return surveyVOs;
     }
 

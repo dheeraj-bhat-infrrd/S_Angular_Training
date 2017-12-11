@@ -489,7 +489,7 @@ public interface EmailServices
         String appLoginUrl, String socialMediaType ) throws InvalidInputException, UndeliveredEmailException;
 
 
-    void sendPaymentFailedAlertEmail( String recipientMailId, String displayName, String companyName )
+    void sendPaymentRetriesFailedAlertEmailToAdmin( String recipientMailId, String displayName, String companyName, long companyId  )
         throws InvalidInputException, UndeliveredEmailException;
 
 
@@ -497,6 +497,8 @@ public interface EmailServices
         throws InvalidInputException, UndeliveredEmailException;
 
 
+    void sendPaymentFailedAlertEmailToAdmin( String recipientMailId, String displayName, String companyName,  long companyId  )
+        throws InvalidInputException, UndeliveredEmailException;
     /**
      * Send mail caught from web app
      * @param recipientMailId
