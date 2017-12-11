@@ -349,13 +349,21 @@ public class SurveyBuilderController {
 			long questionMappingId = Long.parseLong(request.getParameter("questionId"));
 			SurveyQuestionsMapping questionsMapping = surveyBuilder.getSurveyQuestionFromMapping(questionMappingId);
 			SurveyQuestion question = questionsMapping.getSurveyQuestion();
+			Survey0To10Questions survey0To10Questions = question.getSurvey0To10Questions();
 			
 			surveyQuestion.setQuestionId(questionMappingId);
 			surveyQuestion.setQuestion(question.getSurveyQuestion());
 			surveyQuestion.setQuestionType(question.getSurveyQuestionsCode());
 			surveyQuestion.setIsUserRankingQuestion( questionsMapping.getIsUserRankingQuestion() );
             surveyQuestion.setIsRatingQuestion( questionsMapping.getIsRatingQuestion() );
-			
+            
+            if(surveyQuestion.getQuestionType().equalsIgnoreCase( "sb-range-0to10" )){
+                surveyQuestion.setIsNPSQuestion( survey0To10Questions.getIsNPSQuestion() );
+                surveyQuestion.setConsiderForScore( survey0To10Questions.getConsiderForScore() );
+                surveyQuestion.setNotAtAllLikely( survey0To10Questions.getNotAtAllLikely() );
+                surveyQuestion.setVeryLikely( survey0To10Questions.getVeryLikely() );
+            }
+            
 			// For each answer
 			SurveyAnswerOptions surveyAnswerOptions = null;
 			List<SurveyAnswerOptions> answerOptionsToQuestion = new ArrayList<SurveyAnswerOptions>();
