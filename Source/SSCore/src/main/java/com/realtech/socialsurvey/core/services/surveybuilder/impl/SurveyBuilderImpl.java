@@ -62,6 +62,9 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 
 	@Autowired
 	private GenericDao<SurveyQuestionsMapping, Long> surveyQuestionsMappingDao;
+	
+	@Autowired
+    private GenericDao<SurveyQuestionDetails, Long> surveyQuestionDetailsDao;
 
 	@Autowired
 	private GenericDao<SurveyCompanyMapping, Long> surveyCompanyMappingDao;
@@ -348,7 +351,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 			}
 			
 			//Save answers if question type is 0-10 range
-			if(questionType.indexOf(CommonConstants.SB_RANGE_QUESTION_0to10) != -1){
+			if(questionType.indexOf(CommonConstants.QUESTION_0to10) != -1){
 			    addAnswersTo0To10Question(user, surveyQuestion, isNPSQuestion, considerForScore, notAtAllLikely, veryLikely);
 			}
 		}
@@ -551,7 +554,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 			LOG.error("No question mapped for the survey mapped to provided user.");
 			throw new InvalidInputException("No question mapped for the survey mapped to provided user.");
 		}
-
+		
 		List<SurveyQuestionDetails> surveyQuestionDetailsList = new ArrayList<>();
 		SurveyQuestionDetails surveyQuestionDetails = null;
 		List<SurveyAnswerOptions> answerOptionsToQuestion = null;
@@ -560,6 +563,8 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		// For each question
 		for (SurveyQuestionsMapping surveyQuestionsMapping : surveyQuestionsMappings) {
 			surveyQuestionDetails = new SurveyQuestionDetails();
+			SurveyQuestion surveyQuestion = surveyQuestionsMapping.getSurveyQuestion();
+			List<Survey0To10Questions> survey0To10Questions = survey0To10QuestionsDao.findByColumn( Survey0To10Questions.class, "surveyQuestion", surveyQuestion );
 
 			surveyQuestionDetails.setQuestionId(surveyQuestionsMapping.getSurveyQuestionsMappingId());
 			surveyQuestionDetails.setQuestion(surveyQuestionsMapping.getSurveyQuestion().getSurveyQuestion());
@@ -567,6 +572,12 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 			surveyQuestionDetails.setQuestionOrder(surveyQuestionsMapping.getQuestionOrder());
 			surveyQuestionDetails.setIsRatingQuestion(surveyQuestionsMapping.getIsRatingQuestion());
             surveyQuestionDetails.setIsUserRankingQuestion( surveyQuestionsMapping.getIsUserRankingQuestion() );
+            if(surveyQuestionDetails.getQuestionType().equalsIgnoreCase( "sb-range-0to10" )){
+                surveyQuestionDetails.setIsNPSQuestion( survey0To10Questions.get( CommonConstants.INITIAL_INDEX ).getIsNPSQuestion() );
+                surveyQuestionDetails.setConsiderForScore( survey0To10Questions.get( CommonConstants.INITIAL_INDEX ).getConsiderForScore() );
+                surveyQuestionDetails.setNotAtAllLikely( survey0To10Questions.get( CommonConstants.INITIAL_INDEX ).getNotAtAllLikely() );
+                surveyQuestionDetails.setVeryLikely( survey0To10Questions.get( CommonConstants.INITIAL_INDEX ).getVeryLikely() );
+            }
 
 			// For each answer
 			answerOptionsToQuestion = new ArrayList<SurveyAnswerOptions>();
@@ -635,7 +646,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 			}
 			
 			//Save answers if question type is 0-10 range
-            if(questionType.indexOf(CommonConstants.SB_RANGE_QUESTION_0to10) != -1) {
+            if(questionType.indexOf(CommonConstants.QUESTION_0to10) != -1) {
                 modify0To10Answers(user, surveyQuestion, questionDetails.getNotAtAllLikely(), questionDetails.getVeryLikely(), questionDetails.getIsNPSQuestion(), questionDetails.getConsiderForScore(), questionType);
             }
             surveyQuestionDao.saveOrUpdate(surveyQuestion);
@@ -717,8 +728,6 @@ public class SurveyBuilderImpl implements SurveyBuilder {
         survey0To10Questions.get( CommonConstants.INITIAL_INDEX ).setIsNPSQuestion( isNPSQuestion );
         survey0To10Questions.get( CommonConstants.INITIAL_INDEX ).setConsiderForScore( considerForScore );
         survey0To10Questions.get( CommonConstants.INITIAL_INDEX ).setStatus( CommonConstants.STATUS_ACTIVE ); 
-        survey0To10Questions.get( CommonConstants.INITIAL_INDEX ).setCreatedBy( String.valueOf(user.getUserId()) );
-        survey0To10Questions.get( CommonConstants.INITIAL_INDEX ).setCreatedOn( new Timestamp(System.currentTimeMillis()) );
  
         survey0To10QuestionsDao.update( survey0To10Questions.get( CommonConstants.INITIAL_INDEX ) );
         survey0To10QuestionsDao.flush();
@@ -1023,18 +1032,10 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		if (questionType.indexOf(CommonConstants.QUESTION_RATING) != -1) {
 			questionDetails.setIsRatingQuestion(CommonConstants.QUESTION_RATING_VALUE_TRUE);
 			// will be user ranking question only if it is a rating question.
-			if (!StringUtils.isEmpty(questionDetails.getIsUserRankingStr()) && questionDetails.getIsUserRankingStr()
-					.equals(Boolean.toString(CommonConstants.QUESTION_VALUE_TRUE))) {
-				questionDetails.setIsUserRankingQuestion(CommonConstants.QUESTION_RATING_VALUE_TRUE);
-
-			} else {
-				questionDetails.setIsUserRankingQuestion(CommonConstants.QUESTION_RATING_VALUE_FALSE);
-			}
+			questionDetails.setIsUserRankingQuestion( questionDetails.getIsUserRankingQuestion() );
 			// If 0to10 star question and NPS flag is set true, then mark as
 			// NPS.
-			if (!StringUtils.isEmpty(questionDetails.getIsNPSStr())
-					&& questionType.indexOf(CommonConstants.SB_RANGE_QUESTION_0to10) != -1 && questionDetails.getIsNPSStr()
-							.equals(Boolean.toString(CommonConstants.QUESTION_VALUE_TRUE)) && questionDetails.getIsNPSQuestion() == 1) {
+			if (questionType.indexOf(CommonConstants.QUESTION_0to10) != -1 && questionDetails.getIsNPSQuestion() == 1) {
 				questionDetails.setIsNPSQuestion(CommonConstants.QUESTION_RATING_VALUE_TRUE);
 			} else {
 				questionDetails.setIsNPSQuestion(CommonConstants.QUESTION_RATING_VALUE_FALSE);
