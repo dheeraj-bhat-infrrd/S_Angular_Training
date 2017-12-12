@@ -131,6 +131,14 @@ var classificationsList = [];
 
 var ratingQuestionCount= 0;
 
+var npsQuestionText = '';
+var veryLikelyText = '';
+var notVeryLikelyText = '';
+var npsOrder = 999;
+
+var defaultNpsQuestion = 'Default NPS Question';
+var defaultNotVeryLikely = 'Not Very Likely';
+var defaultVeryLikely = 'Very Likely';
 /**
  * js functions for landing page
  */
@@ -3237,9 +3245,12 @@ function bindEditSurveyEvents() {
 	$('.bd-nps-btn-done').on('click', function(e) {
 		e.stopPropagation();
 		var npsQuestion = $('#sb-nps-question-txt').val();
-		var editedStatus;
+		var editedStatus=false;
 		
-		var count=1;
+		if ($('#nps-question-form').attr('data-status') == 'edited') {
+			editedStatus=true;
+		}
+		/*var count=1;
 		while (count <= currentQues) {
 			if ($('#nps-question-form').attr('data-status') == 'edited') {
 				editedStatus = true;
@@ -3248,37 +3259,67 @@ function bindEditSurveyEvents() {
 				editedStatus = false;
 			}
 			count++;
-		}
+		}*/
 		
+		if (editedStatus == false) {
+			revertQuestionOverlay();
+			setTimeout(function() {
+				loadActiveSurveyQuestions();
+			}, 2000);
+			return;
+		}
 		
 		createPopupConfirm("Unsaved changes detected", "Do you want to save your changes ?", "Save", "Cancel");
 
 		$('#overlay-continue').off('click');
 		$('#overlay-continue').on('click', function() {
 				
-			if(editedStatus==false){
+				npsQuestion = $('#sb-nps-question-txt').val();
 				if(npsQuestion == '' || npsQuestion == null || npsQuestion == undefined){
 					$("#overlay-toast").html('Please finish adding the Question');
 					showToast();
+					return;
 				}else{
-					var url = "./addquestiontosurvey.do?order=" + count;
-					callAjaxFormSubmit(url, function(data) {
-						var map = $.parseJSON(data);
-						$("#overlay-toast").html(map.message);
-						showToast();
+					if ($('#nps-question-form').attr('data-state') == 'new' && $('#nps-question-form').attr('data-status') == 'edited') {
+						
+						var url = "./addquestiontosurvey.do?order="+ npsOrder;
+						callAjaxFormSubmit(url, function(data) {
+							var map = $.parseJSON(data);
+							$("#overlay-toast").html(map.message);
+							showToast();
 
-						if (map.status == "success") {
-							$('#nps-question-form').attr('data-quesref', map.questionId);
-							revertQuestionOverlay();
-						} else {
-							$('#nps-question-form').attr('data-state', 'new');
-							$('#nps-question-form').attr('data-status', 'edited');
-						}
-					}, 'nps-question-form', '#overlay-continue');
+							if (map.status == "success") {
+								$('#nps-question-form').attr('data-quesref', map.questionId);
+								revertQuestionOverlay();
+							} else {
+								$('#nps-question-form').attr('data-state', 'new');
+								$('#nps-question-form').attr('data-status', 'edited');
+								$("#overlay-toast").html("Retry Saving NPS Question");
+								showToast();
+							}
+						}, 'nps-question-form', '#overlay-continue');
+						
+					}else if ($('#nps-question-form').attr('data-state') == 'editable' && $('#nps-question-form').attr('data-status') == 'edited'){
+						
+						var questionId = $('#nps-question-form').attr('data-quesref');
+						var url = "./updatequestionfromsurvey.do?order=" + npsOrder + "&questionId=" + questionId;
+						callAjaxFormSubmit(url, function(data) {
+							var map = $.parseJSON(data);
+							$("#overlay-toast").html(map.message);
+							showToast();
+
+							if (map.status == "success") {
+								revertQuestionOverlay();
+								$('#nps-question-form').attr('data-status', 'new');
+							} else {
+								$('#nps-question-form').attr('data-status', 'edited');
+								$("#overlay-toast").html("Retry Saving NPS Question");
+								showToast();
+							}
+						}, 'nps-question-form', '#overlay-continue');
+					}
 				}
-			}
 			
-			count++;
 
 			$('#overlay-continue').unbind('click');
 			$('#overlay-cancel').unbind('click');
@@ -3551,15 +3592,30 @@ $(document).on('click', '#avg-score-chkbox-wrapper-nps', function() {
 	}
 });
 
-$(document).on('click', '#nps-chkbox-wrapper', function() {
+$(document).on('click', '#nps-chkbox-wrapper', function(e) {
 	if ($('#nps-chkbox').hasClass('bd-check-img-checked')) {		
 		$('#nps-add-edit').show();
 		$('#nps-chkbox').removeClass('bd-check-img-checked');
 		$('#nps-ques').val(true);
 	} else {		
-		$('#nps-chkbox').addClass('bd-check-img-checked');
-		 $('#nps-ques').val(false);
-		$('#nps-add-edit').hide();
+		e.stopPropagation();
+		var questionId = $('#nps-question-form').attr('data-quesref');
+		
+		var url = "./removequestionfromsurvey.do?questionId=" + questionId;
+
+		callAjaxPOST(url, function(){
+			$('#nps-chkbox').addClass('bd-check-img-checked');
+			$('#nps-ques').val(false);
+			$('#nps-add-edit').hide();
+			$("#overlay-toast").html('Enable NPS Question to add/edit the NPS question');
+			$('#nps-question-form').attr('data-state','new');
+			$('#nps-question-form').attr('data-status','new');
+			$('#sb-nps-question-txt').val(defaultNpsQuestion);
+			$('#sq-not-very-likely-nps').val(defaultNotVeryLikely);
+			$('#sq-very-likely-nps').val(defaultVeryLikely);
+			showToast('error');
+		}, true);
+		
 	}
 });
 
@@ -3623,13 +3679,35 @@ $(document).on("focus", '.bd-q-pu-txt', function() {
 });
 
 $(document).on("focus",'#sb-nps-question-txt',function(){
-	
-	if(!$('#nps-ques').val()){
-		$("#overlay-toast").html('NPS is disabled. Please Enable to add/edit nps question');
-		showToast();
-	}
-	
+	npsQuestionText = $('#sb-nps-question-txt').val();
 });
+
+$(document).on("focus",'#sq-not-very-likely-nps',function(){
+	notVeryLikelyText = $('#sq-not-very-likely-nps').val();
+});
+
+$(document).on("focus",'#sq-very-likely-nps',function(){
+	veryLikelyText = $('#sq-very-likely-nps').val();
+});
+
+$(document).on("blur",'#sb-nps-question-txt',function(){
+	if(npsQuestionText != $('#sb-nps-question-txt').val()){
+		$('#nps-question-form').attr('data-status', 'edited');
+	}
+});
+
+$(document).on("blur",'#sq-not-very-likely-nps',function(){
+	if(notVeryLikelyText != $('#sq-not-very-likely-nps').val()){
+		$('#nps-question-form').attr('data-status', 'edited');
+	}	
+});
+
+$(document).on("blur",'#sq-very-likely-nps',function(){
+	if(veryLikelyText != $('#sq-very-likely-nps').val()){
+		$('#nps-question-form').attr('data-status', 'edited');
+	}
+});
+
 
 $(document).on("input", '.bd-q-pu-txt', function() {
 	$('#nps-ques-new').val(false);
@@ -7353,6 +7431,12 @@ function storeCustomerAnswer(customerResponse) {
 	//encode question and response
 	var encodedCustomerResponse = window.btoa( unescape( encodeURIComponent( customerResponse ) ) );
 	var encodedQuestion =  window.btoa( unescape( encodeURIComponent( questionDetails.question ) ) );
+	
+	var considerForScore = questionDetails.considerForScore;
+	if(questionDetails.questionType != 'sb-range-0to10'){
+		considerForScore = true;
+	}
+	
 	var payload = {
 			  "answer" : encodedCustomerResponse,
 			  "question" : encodedQuestion,
@@ -7361,7 +7445,7 @@ function storeCustomerAnswer(customerResponse) {
 			  "isNPSQuestion" : questionDetails.isNPSQuestion,
 			  "stage" : qno + 1,
 			  "surveyId" : surveyId,
-			  "considerForScore": questionDetails.considerForScore,
+			  "considerForScore": considerForScore,
 			  "questionId" : questionDetails.questionId
 	};
 	showOverlay();
