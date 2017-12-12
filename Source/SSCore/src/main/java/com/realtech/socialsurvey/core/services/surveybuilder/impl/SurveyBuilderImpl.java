@@ -975,7 +975,11 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		}
 		questionDetails = setNPSRankingAnswer(questionDetails);
 		int maxQuestion = (int) countActiveQuestionsInSurvey(survey);
-		questionDetails.setQuestionOrder(maxQuestion + 1);
+		if(questionDetails.getIsNPSQuestion() == 1){
+		      questionDetails.setQuestionOrder(999);
+		}else{
+		       questionDetails.setQuestionOrder(maxQuestion + 1); 
+		}
 		long surveyQuestionMappingId = addQuestionToExistingSurvey(user, survey, questionDetails);
 		return surveyQuestionMappingId;
 	}
