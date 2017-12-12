@@ -134,7 +134,7 @@ var ratingQuestionCount= 0;
 var npsQuestionText = '';
 var veryLikelyText = '';
 var notVeryLikelyText = '';
-var npsOrder = 99;
+var npsOrder = 999;
 
 var defaultNpsQuestion = 'Default NPS Question';
 var defaultNotVeryLikely = 'Not Very Likely';

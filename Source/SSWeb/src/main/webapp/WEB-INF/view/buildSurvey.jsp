@@ -210,8 +210,8 @@
 			</div>
 			<div class="col-xs-10 col-sm-10 col-md-10 col-lg-10" style="margin:0 auto">
 				<div class="bd-q-pu-txt-wrapper pos-relative">
-					<input type="hidden" id="sb-nps-question" name="sb-question-type-99" value="sb-range-0to10"/> 
-					<input id="sb-nps-question-txt" name="sb-question-txt-99" class="bd-q-pu-txt-nps" value="<spring:message code="label.default.nps.question.key" />">
+					<input type="hidden" id="sb-nps-question" name="sb-question-type-999" value="sb-range-0to10"/> 
+					<input id="sb-nps-question-txt" name="sb-question-txt-999" class="bd-q-pu-txt-nps" value="<spring:message code="label.default.nps.question.key" />">
 					<div class="bd-q-pu-close hide"></div>
 				</div>
 			</div>

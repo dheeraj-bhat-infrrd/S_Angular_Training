@@ -414,9 +414,8 @@ function drawNpsStatsGraph(entityId,entityType){
 													npsChartData[k] = new Array(
 															4);
 												}
-												npsChartData[0] = [ 'SPS',
-														'Detractors',
-														'Passives', 'Promoters' ];
+												npsChartData[0] = [ 'NPS','Detractors',
+														'Passives', 'Promoters',{ role: 'annotation' } ];
 
 												for (var i = 1; i <= chartData.length; i++) {
 													var monthName = monthNamesList[(chartData[i - 1][1]) - 1];
@@ -428,6 +427,16 @@ function drawNpsStatsGraph(entityId,entityType){
 													npsChartData[i][1] = chartData[i - 1][2];
 													npsChartData[i][2] = chartData[i - 1][3];
 													npsChartData[i][3] = chartData[i - 1][4];
+													
+													var totalTransactions = chartData[i - 1][2] + chartData[i - 1][3] + chartData[i - 1][4];
+													var promoters = chartData[i - 1][4];
+													var detractors = chartData[i - 1][2];
+													var npsScore = 0;
+													if(totalTransactions != 0 && totalTransactions != undefined && totalTransactions != null){
+														npsScore = ((promoters - detractors)*100)/totalTransactions;
+													}
+													
+													npsChartData[i][4] = 'NPS: ' + npsScore.toFixed(2);
 												}
 
 												var data = google.visualization
@@ -444,6 +453,18 @@ function drawNpsStatsGraph(entityId,entityType){
 															count : 14
 														}
 													},
+													annotations: {
+														   alwaysOutside:true,
+														   style: 'point',
+														          highContrast: 'true',
+														          textStyle: {
+														            align: 'center !important',
+														            fontSize:13,
+														            color:'#000000',
+														            bold: 'true'
+														          },
+														          stem:{length:2}
+															},
 													colors : [ '#E8341F',
 															'#999999',
 															'#7ab400' ]
