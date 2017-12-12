@@ -7357,6 +7357,8 @@ function paintSurveyPageFromJson() {
 	} else if (questionType == "sb-range-0to10"){
 		$("#ques-text-1to10").html(question)
 		$("div[data-ques-type='sb-range-0to10']").show();
+		$('#notAtAllLikelyDiv').html(questionDetails.notAtAllLikely);
+		$('#veryLikelyDiv').html(questionDetails.veryLikely);
 		if (questionDetails.customerResponse != undefined && !isNaN(parseInt(questionDetails.customerResponse))) {
 			var ratingVal = parseInt(questionDetails.customerResponse);
 			$('.sq-radio').each(function() {
@@ -7956,6 +7958,8 @@ $('.sq-np-item-next').click(function() {
 			$('#radio-'+ratingVal).children().show();
 			$('#sq-radio-1to10').attr('selected-rating-radio',ratingVal);
 		}
+		$('#notAtAllLikelyDiv').html(questionDetails.notAtAllLikely);
+		$('#veryLikelyDiv').html(questionDetails.veryLikely);
 	}
 
 });
@@ -8016,6 +8020,8 @@ $('.sq-np-item-prev').click(function() {
 			$('#radio-'+ratingVal).children().show();
 			$('#sq-radio-1to10').attr('selected-rating-radio',ratingVal);
 		}
+		$('#notAtAllLikelyDiv').html(questionDetails.notAtAllLikely);
+		$('#veryLikelyDiv').html(questionDetails.veryLikely);
 	}
 	
 	$("#next-star").removeClass("btn-com-disabled");
