@@ -2195,6 +2195,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 userManagementService.updateUser( user, iden, true );
 
                 updateIndividualEmail( iden, emailVerified );
+                
+                //update the corrupted record for newly registered user's email id
+                surveyPreInitiationDao.updateAgentIdOfPreInitiatedSurveysByAgentEmailAddress( user, user.getLoginName() );
 
                 // Fix for JIRA: SS-1358 - Updating email address should update SOLR records as well
                 // BEGIN
