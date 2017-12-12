@@ -229,7 +229,10 @@ public class SurveyBuilderController {
 			questionDetails.setQuestionId(Long.parseLong(questionId));
 		}
 		if(considerForScore != null){
-		    questionDetails.setConsiderForScore( Integer.parseInt( considerForScore ) );
+			if(considerForScore.equalsIgnoreCase("true"))
+				questionDetails.setConsiderForScore( CommonConstants.YES );
+			else
+				questionDetails.setConsiderForScore( CommonConstants.NO );
 		}
 		if( isNPSStr!= null){
 		    if(isNPSStr.equalsIgnoreCase( "true" ))
@@ -331,6 +334,7 @@ public class SurveyBuilderController {
 			surveyDetail.setStatus(status);
 
 			model.addAttribute("surveyDetail", surveyDetail);
+			model.addAttribute("surveyQuestionsJson", new Gson().toJson(surveyDetail));
 			LOG.info("Method getSurveyDetails of SurveyBuilderController finished successfully");
 		}
 		catch (InvalidInputException e) {

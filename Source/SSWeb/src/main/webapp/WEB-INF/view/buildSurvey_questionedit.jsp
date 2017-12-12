@@ -7,11 +7,18 @@
 </c:if>
 
 <c:set value="${surveyQuestion.isUserRankingQuestion }" var="isUserRankingQuestion" />
-<c:set value="${surveyQuestion.isUserRankingQuestion }" var="isNpsQuestion" />
+<c:set value="${surveyQuestion.considerForScore }" var="considerForScore" />
+<c:set value="${surveyQuestion.notAtAllLikely }" var="notVeryLikely" />
+<c:set value="${surveyQuestion.veryLikely }" var="veryLikely" />
 
 <c:set value="false" var="isUserRankingQuestionVal" />
 <c:if test="${isUserRankingQuestion == 1}">
 	<c:set value="true" var="isUserRankingQuestionVal" />
+</c:if>
+
+<c:set value="false" var="considerForScoreVal" />
+<c:if test="${considerForScore == 1}">
+	<c:set value="true" var="considerForScoreVal" />
 </c:if>
 
 
@@ -91,8 +98,8 @@
 									</c:forEach>
 								</div>
 								<div class="sq-1to10-range-val">
-									<input id="sq-not-very-likely-edit" name="notVeryLikely" class="float-left sq-range-1to10-input sq-not-very-likely" value="Not at all likely">
-									<input id="sq-very-likely-edit" name="veryLikely" class="float-right sq-range-1to10-input text-align-right sq-very-likely" value="Very Likely">
+									<input id="sq-not-very-likely-edit" name="notVeryLikely" class="float-left sq-range-1to10-input sq-not-very-likely" value="${notVeryLikely}">
+									<input id="sq-very-likely-edit" name="veryLikely" class="float-right sq-range-1to10-input text-align-right sq-very-likely" value="${veryLikely}">
 								</div>
 							</div>
 						</div>
@@ -104,8 +111,8 @@
 							<div class="float-left  listing-access-txt cursor-pointer">Considered for User Ranking</div>
 						</div>
 						<div id="avg-score-chkbox-wrapper-edit" class="clearfix" style="width: 210px;"> 
-							<div id="avg-score-chkbox-edit" class='float-left avg-score-chkbox bd-check-img <c:if test="${ isNpsQuestion == 0}">bd-check-img-checked</c:if>'></div>
-							<input type="hidden" id="avg-score-ques-edit" name="considerForScore" value=${ isNpsQuestion }>
+							<div id="avg-score-chkbox-edit" class='float-left avg-score-chkbox bd-check-img <c:if test="${ considerForScore == 0}">bd-check-img-checked</c:if>'></div>
+							<input type="hidden" id="avg-score-ques-edit" name="considerForScore" value=${ considerForScoreVal }>
 							<div class="float-left listing-access-txt cursor-pointer">Considered for Average Score</div>
 						</div>
 						<div id="nps-chkbox-wrapper-edit" class="clearfix">
