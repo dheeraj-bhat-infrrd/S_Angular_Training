@@ -3464,6 +3464,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
         Update update = new Update();
         update.set( CommonConstants.STAGE_COLUMN, surveyDetails.getStage());
+        update.set( CommonConstants.NPS_SCORE_COLUMN, surveyDetails.getNpsScore() );
         update.set( CommonConstants.REVIEW_COLUMN , surveyDetails.getReview() );
         update.set( CommonConstants.RETAKE_SURVEY_COLUMN, surveyDetails.isRetakeSurvey());
         update.set( CommonConstants.NO_OF_RETAKE_COLUMN, surveyDetails.getNoOfRetake() );

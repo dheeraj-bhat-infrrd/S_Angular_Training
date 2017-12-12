@@ -7434,7 +7434,7 @@ function storeCustomerAnswer(customerResponse) {
 	
 	var considerForScore = questionDetails.considerForScore;
 	if(questionDetails.questionType != 'sb-range-0to10'){
-		considerForScore = true;
+		considerForScore = 1;
 	}
 	
 	var payload = {
