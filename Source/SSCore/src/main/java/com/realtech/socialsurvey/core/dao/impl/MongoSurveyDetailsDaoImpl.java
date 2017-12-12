@@ -274,11 +274,13 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
                 && ( response.getAnswer() != null && !response.getAnswer().isEmpty() )) {
                 //check if question type is 0to10 and divide answer by 2
                 if(response.getQuestionType().equals( ratingType.get( 3 ))){
-                    int npsAnswer = Integer.parseInt( response.getAnswer() );
-                    answer += (double) npsAnswer/2;
-                    //check if isNpsQuestion ans set npsScore
-                    if(response.getIsNpsQuestion()){
-                        update.set( CommonConstants.NPS_SCORE_COLUMN, response.getAnswer() );
+                    if(response.isConsiderForScore()){
+                        int npsAnswer = Integer.parseInt( response.getAnswer() );
+                        answer += (double) npsAnswer/2;
+                        //check if isNpsQuestion ans set npsScore
+                        if(response.getIsNpsQuestion()){
+                            update.set( CommonConstants.NPS_SCORE_COLUMN, response.getAnswer() );
+                        }
                     }
                 }else{
                     answer += Integer.parseInt( response.getAnswer() );
