@@ -976,7 +976,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		questionDetails = setNPSRankingAnswer(questionDetails);
 		int maxQuestion = (int) countActiveQuestionsInSurvey(survey);
 		if(questionDetails.getIsNPSQuestion() == 1){
-		      questionDetails.setQuestionOrder(99);
+		      questionDetails.setQuestionOrder(999);
 		}else{
 		       questionDetails.setQuestionOrder(maxQuestion + 1); 
 		}
