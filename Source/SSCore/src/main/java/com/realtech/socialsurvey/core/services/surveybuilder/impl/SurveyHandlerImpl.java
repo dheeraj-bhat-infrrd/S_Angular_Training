@@ -877,6 +877,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyDetails.setReview( null );
         surveyDetails.setNoOfRetake( surveyDetails.getNoOfRetake() + 1 );
         surveyDetails.setLastRetakeRequestDate( new Date ( System.currentTimeMillis() ) );
+        surveyDetails.setNpsScore( -1 );
         
         RetakeSurveyHistory retakeSurveyHistory = new RetakeSurveyHistory();
         retakeSurveyHistory.setCompleteProfileUrl( surveyDetails.getCompleteProfileUrl() );
