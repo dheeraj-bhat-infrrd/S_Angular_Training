@@ -178,8 +178,8 @@
 								</c:forEach>
 							</div>
 							<div class="sq-1to10-range-val">
-                                <div style="float:left">Not at all likely</div>
-    							<div style="float:right;">Very Likely</div>
+                                <div id="notAtAllLikelyDiv" style="float:left">Not at all likely</div>
+    							<div id="veryLikelyDiv" style="float:right;">Very Likely</div>
 							</div>
 						</div>
 					</div>
