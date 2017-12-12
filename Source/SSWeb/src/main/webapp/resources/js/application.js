@@ -7431,6 +7431,12 @@ function storeCustomerAnswer(customerResponse) {
 	//encode question and response
 	var encodedCustomerResponse = window.btoa( unescape( encodeURIComponent( customerResponse ) ) );
 	var encodedQuestion =  window.btoa( unescape( encodeURIComponent( questionDetails.question ) ) );
+	
+	var considerForScore = questionDetails.considerForScore;
+	if(questionDetails.questionType != 'sb-range-0to10'){
+		considerForScore = true;
+	}
+	
 	var payload = {
 			  "answer" : encodedCustomerResponse,
 			  "question" : encodedQuestion,
@@ -7439,7 +7445,7 @@ function storeCustomerAnswer(customerResponse) {
 			  "isNPSQuestion" : questionDetails.isNPSQuestion,
 			  "stage" : qno + 1,
 			  "surveyId" : surveyId,
-			  "considerForScore": questionDetails.considerForScore,
+			  "considerForScore": considerForScore,
 			  "questionId" : questionDetails.questionId
 	};
 	showOverlay();
