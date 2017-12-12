@@ -277,15 +277,16 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
                     if(response.isConsiderForScore()){
                         int npsAnswer = Integer.parseInt( response.getAnswer() );
                         answer += (double) npsAnswer/2;
-                        //check if isNpsQuestion ans set npsScore
-                        if(response.getIsNpsQuestion()){
-                            update.set( CommonConstants.NPS_SCORE_COLUMN, response.getAnswer() );
-                        }
+                        noOfResponse++;
+                    }
+                    //check if isNpsQuestion ans set npsScore
+                    if(response.getIsNpsQuestion()){
+                        update.set( CommonConstants.NPS_SCORE_COLUMN, response.getAnswer() );
                     }
                 }else{
                     answer += Integer.parseInt( response.getAnswer() );
+                    noOfResponse++;
                 }
-                noOfResponse++;
             }
         }
         update.set( CommonConstants.SCORE_COLUMN, Math.round( answer / noOfResponse * 1000.0 ) / 1000.0 );
