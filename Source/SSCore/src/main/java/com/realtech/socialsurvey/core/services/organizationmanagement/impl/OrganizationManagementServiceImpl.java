@@ -5605,7 +5605,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         companyIds.addAll( companyIdList );
 
         List<OrganizationUnitSettings> unitSettings = organizationUnitSettingsDao.getCompanyListByIds( companyIds );
-        Collections.sort( unitSettings, new OrganizationUnitSettingsComparator() ); 
+        //Collections.sort( unitSettings, new OrganizationUnitSettingsComparator() ); 
         return unitSettings;
     }
 
@@ -8336,5 +8336,49 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 facebookPixelTag += unitSettings.getSocialMediaTokens().getFacebookPixelToken().getPixelImgTag();
 
         return facebookPixelTag;
+    }
+    
+    @Override
+    public boolean updateDigestRecipients( OrganizationUnitSettings unitSettings, Set<String> emails, String collectionType )
+        throws InvalidInputException
+    {
+        if ( unitSettings == null ) {
+            LOG.warn( "settings are not specified" );
+            throw new InvalidInputException( "settings cannot be null." );
+        } else if ( StringUtils.isEmpty( collectionType ) ) {
+            LOG.warn( "target collection is not specified" );
+            throw new InvalidInputException( "target collection name cannot be null." );
+        }
+
+        LOG.debug( "Updating unitSettings: {} with digest recipients: {}", unitSettings, emails );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_DIGEST_RECIPIENTS, emails, unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        LOG.debug( "Updated the record successfully" );
+
+        return true;
+    }
+
+
+    @Override
+    public Set<String> parseEmailsList( String emailsStr )
+    {
+        LOG.debug( "method parseEmailsList() running" );
+        Set<String> emailList = null;
+
+        if ( emailsStr == null ) {
+            return emailList;
+        }
+
+        emailList = new HashSet<>();
+
+        for ( String email : StringUtils.deleteWhitespace( emailsStr ).split( "," ) ) {
+            if ( !StringUtils.isEmpty( email ) ) {
+                emailList.add( email );
+            }
+        }
+
+        return emailList;
     }
 }
