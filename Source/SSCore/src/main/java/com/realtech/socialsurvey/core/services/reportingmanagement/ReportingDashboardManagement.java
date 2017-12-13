@@ -14,6 +14,8 @@ import com.realtech.socialsurvey.core.entities.CompanyDetailsReport;
 import com.realtech.socialsurvey.core.entities.CompanyDigestRequestData;
 import com.realtech.socialsurvey.core.entities.Digest;
 import com.realtech.socialsurvey.core.entities.MonthlyDigestAggregate;
+import com.realtech.socialsurvey.core.entities.NpsReportMonth;
+import com.realtech.socialsurvey.core.entities.NpsReportWeek;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RankingRequirements;
 import com.realtech.socialsurvey.core.entities.SurveyResultsReportVO;
@@ -214,4 +216,26 @@ public interface ReportingDashboardManagement
 	 * @return
 	 */
 	public Object getAccountStatisticsRecentActivity(Long reportId);
+	
+	/**
+	 * Method to get nps report for a week
+	 * @param companyId
+	 * @param week
+	 * @param year
+	 * @return
+	 * @throws InvalidInputException 
+	 */
+	public List<NpsReportWeek> getNpsReportForAWeek(long companyId, int week, int year) throws InvalidInputException;
+	
+	/**
+	 * Method to get nps report for a month
+	 * @param companyId
+	 * @param month
+	 * @param year
+	 * @return
+	 * @throws InvalidInputException 
+	 */
+	public List<NpsReportMonth> getNpsReportForAMonth(long companyId, int month, int year) throws InvalidInputException;
+	
+	
 }

@@ -7,13 +7,18 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
+import com.realtech.socialsurvey.core.dao.NpsReportMonthDao;
+import com.realtech.socialsurvey.core.dao.NpsReportWeekDao;
+import com.realtech.socialsurvey.core.dao.impl.NpsReportWeekDaoImpl;
 import com.realtech.socialsurvey.core.entities.CompanyDetailsReport;
 import com.realtech.socialsurvey.core.entities.CompanyDigestRequestData;
+import com.realtech.socialsurvey.core.entities.NpsReportWeek;
 import com.realtech.socialsurvey.core.entities.SurveyResultsReportVO;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -579,23 +584,45 @@ public class ReportingController
             monthUnderConcern, year, recipientMail ) );
     }
 
-	@RequestMapping(value = "/getcompanydetailsreport", method = RequestMethod.GET)
-	@ApiOperation(value = "Social Survey Admin level report to fetch Company Details for all companies.")
-	public String getCompanyDetailsReport(String entityType, Long entityId, int startIndex, int batchSize) throws InvalidInputException {
-		LOGGER.info("Social Survey Admin level report to fetch Company Details for all companies.");
-		List<CompanyDetailsReport> companyDetailsReportList = reportingDashboardManagement
-				.getCompanyDetailsReport(entityId, startIndex, batchSize);
-		return new Gson().toJson(companyDetailsReportList);
-	}
-    
+
+    @RequestMapping ( value = "/getcompanydetailsreport", method = RequestMethod.GET)
+    @ApiOperation ( value = "Social Survey Admin level report to fetch Company Details for all companies.")
+    public String getCompanyDetailsReport( String entityType, Long entityId, int startIndex, int batchSize )
+        throws InvalidInputException
+    {
+        LOGGER.info( "Social Survey Admin level report to fetch Company Details for all companies." );
+        List<CompanyDetailsReport> companyDetailsReportList = reportingDashboardManagement.getCompanyDetailsReport( entityId,
+            startIndex, batchSize );
+        return new Gson().toJson( companyDetailsReportList );
+    }
+
+
     @RequestMapping ( value = "/getincompletesurveys", method = RequestMethod.GET)
     @ApiOperation ( value = "get incomplete surveys")
     public String getIncompleteSurveys( Long entityId, String entityType, Timestamp startDate, Timestamp endDate,
-        int startIndex , int batchSize ) throws NonFatalException
+        int startIndex, int batchSize ) throws NonFatalException
     {
 
-        LOGGER.info( "Fetching list of incomplete surveys for entityType : {} , entityId : {}",entityType,entityId );
-        return new Gson().toJson( reportingDashboardManagement.getIncompleteSurvey( entityId, entityType,
-            startDate, endDate, startIndex, batchSize ) );
+        LOGGER.info( "Fetching list of incomplete surveys for entityType : {} , entityId : {}", entityType, entityId );
+        return new Gson().toJson( reportingDashboardManagement.getIncompleteSurvey( entityId, entityType, startDate, endDate,
+            startIndex, batchSize ) );
+    }
+
+    @RequestMapping ( value = "/nps/{week}/week", method = RequestMethod.GET)
+    @ApiOperation ( value = "get nps report for a week")
+    public String getNpsReportForWeek( @PathVariable ( "week") int week, long companyId, int year ) throws InvalidInputException
+    {
+        LOGGER.info( "Fetching nps report for week {} for company {}", week, companyId );
+        return new Gson().toJson( reportingDashboardManagement.getNpsReportForAWeek( companyId, week, year ) );
+    }
+
+
+    @RequestMapping ( value = "/nps/{month}/month", method = RequestMethod.GET)
+    @ApiOperation ( value = "get nps report for a month")
+    public String getNpsReportForMonth( @PathVariable ( "month") int month, long companyId, int year )
+        throws InvalidInputException
+    {
+        LOGGER.info( "Fetching nps report for month {} for company {}", month, companyId );
+        return new Gson().toJson( reportingDashboardManagement.getNpsReportForAMonth( companyId, month, year ));
     }
 }
