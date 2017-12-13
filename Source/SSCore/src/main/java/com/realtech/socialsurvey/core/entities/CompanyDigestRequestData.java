@@ -1,10 +1,15 @@
 package com.realtech.socialsurvey.core.entities;
 
-public class CompanyDigestRequestData
+import java.io.Serializable;
+import java.util.Set;
+
+
+public class CompanyDigestRequestData implements Serializable
 {
+    private static final long serialVersionUID = 1L;
     private long companyId;
     private String companyName;
-    private String recipientMailId;
+    private Set<String> recipientMailIds;
 
 
     public long getCompanyId()
@@ -31,16 +36,22 @@ public class CompanyDigestRequestData
     }
 
 
-    public String getRecipientMailId()
+    public Set<String> getRecipientMailIds()
     {
-        return recipientMailId;
+        return recipientMailIds;
     }
 
 
-    public void setRecipientMailId( String recipientMailId )
+    public void setRecipientMailIds( Set<String> recipientMailIds )
     {
-        this.recipientMailId = recipientMailId;
+        this.recipientMailIds = recipientMailIds;
     }
 
 
+    @Override
+    public String toString()
+    {
+        return "CompanyDigestRequestData [companyId=" + companyId + ", companyName=" + companyName + ", recipientMailIds="
+            + recipientMailIds + "]";
+    }
 }

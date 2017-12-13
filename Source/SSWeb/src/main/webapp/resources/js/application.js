@@ -11470,6 +11470,26 @@ $('body').on('click', '#survey-mail-thrhld-chk-box', function() {
 	}
 });
 
+$('body').on('blur', '#digest-recipients', function() {
+	
+	// format email IDs
+	var emails = $("#digest-recipients").val();
+	
+	if( emails == undefined ){
+		return;
+	}
+	
+	var payload = {
+		"emails" : emails
+	};
+	
+	callAjaxPostWithPayloadData("./updatedigestrecipients.do", function(data) {
+		$('#overlay-toast').html(data);
+		showToast();
+	}, payload, true);
+	
+});
+
 $('body').on('click', '#alw-ptnr-srvy-for-usr-chk-box', function(e) {
 	e.stopPropagation();
 	
