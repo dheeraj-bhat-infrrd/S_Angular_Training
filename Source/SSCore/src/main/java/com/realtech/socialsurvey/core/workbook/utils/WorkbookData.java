@@ -202,7 +202,7 @@ public class WorkbookData
         for ( SocialPost post : socialPosts ) {
             if ( post.getSource() != null && !post.getSource().isEmpty() ) {
                 socialPostsToPopulate.add( post.getPostText() );
-                socialPostsToPopulate.add( new Date( post.getTimeInMillis() ) );
+                socialPostsToPopulate.add( DATE_FORMATTER.format( new Date( post.getTimeInMillis() ) ) );
                 socialPostsToPopulate.add( post.getSource() );
                 try {
                     if ( post.getAgentId() > 0 ) {
@@ -319,8 +319,8 @@ public class WorkbookData
                 surveyDetailsToPopulate.add( agentName.substring( agentName.lastIndexOf( ' ' ) + 1 ) );
                 surveyDetailsToPopulate.add( survey.getCustomerFirstName() );
                 surveyDetailsToPopulate.add( survey.getCustomerLastName() );
-                surveyDetailsToPopulate.add( survey.getCreatedOn() );
-                surveyDetailsToPopulate.add( survey.getModifiedOn() );
+                surveyDetailsToPopulate.add( DATE_FORMATTER.format( survey.getCreatedOn() ) );
+                surveyDetailsToPopulate.add( DATE_FORMATTER.format( survey.getModifiedOn() ) );
                 surveyDetailsToPopulate.add( Days
                     .daysBetween( new DateTime( survey.getCreatedOn() ), new DateTime( survey.getModifiedOn() ) ).getDays() );
                 if ( survey.getSource() != null && !survey.getSource().isEmpty() ) {
@@ -464,8 +464,8 @@ public class WorkbookData
                     }
                     surveyDetailsToPopulate.add( survey.getCustomerFirstName() );
                     surveyDetailsToPopulate.add( "" );
-                    surveyDetailsToPopulate.add( survey.getCreatedOn() );
-                    surveyDetailsToPopulate.add( survey.getModifiedOn() );
+                    surveyDetailsToPopulate.add( DATE_FORMATTER.format( survey.getCreatedOn() ) );
+                    surveyDetailsToPopulate.add( DATE_FORMATTER.format( survey.getModifiedOn() ) );
                     surveyDetailsToPopulate
                         .add( Days.daysBetween( new DateTime( survey.getCreatedOn() ), new DateTime( survey.getModifiedOn() ) )
                             .getDays() );
@@ -571,7 +571,7 @@ public class WorkbookData
             surveyDetailsToPopulate.add( agentDetail.getAgentLastName() );
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis( agentDetail.getRegistrationDate() );
-            surveyDetailsToPopulate.add( calendar.getTime() );
+            surveyDetailsToPopulate.add( DATE_FORMATTER.format( calendar.getTime() ) );
             surveyDetailsToPopulate.add( agentDetail.getAverageScore() );
             surveyDetailsToPopulate.add( agentDetail.getCompletedSurveys() );
             surveyDetailsToPopulate.add( agentDetail.getIncompleteSurveys() );
