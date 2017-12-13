@@ -5605,7 +5605,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         companyIds.addAll( companyIdList );
 
         List<OrganizationUnitSettings> unitSettings = organizationUnitSettingsDao.getCompanyListByIds( companyIds );
-        Collections.sort( unitSettings, new OrganizationUnitSettingsComparator() ); 
+        //Collections.sort( unitSettings, new OrganizationUnitSettingsComparator() ); 
         return unitSettings;
     }
 
