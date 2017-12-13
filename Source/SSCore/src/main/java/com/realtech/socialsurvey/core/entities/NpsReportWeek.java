@@ -52,13 +52,13 @@ public class NpsReportWeek implements Serializable
     private String branchName;
 
     @Column ( name = "nps")
-    private Double nps;
+    private double nps;
 
     @Column ( name = "previous_week_nps")
     private Double previousWeekNps;
 
     @Column ( name = "nps_delta")
-    private Double npsDelta;
+    private double npsDelta;
 
     @Column ( name = "responders")
     private int responders;
@@ -184,13 +184,13 @@ public class NpsReportWeek implements Serializable
     }
 
 
-    public Double getNps()
+    public double getNps()
     {
         return nps;
     }
 
 
-    public void setNps( Double nps )
+    public void setNps( double nps )
     {
         this.nps = nps;
     }
@@ -208,13 +208,13 @@ public class NpsReportWeek implements Serializable
     }
 
 
-    public Double getNpsDelta()
+    public double getNpsDelta()
     {
         return npsDelta;
     }
 
 
-    public void setNpsDelta( Double npsDelta )
+    public void setNpsDelta( double npsDelta )
     {
         this.npsDelta = npsDelta;
     }

@@ -3711,7 +3711,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         if ( companyId <= 0 ) {
             LOG.warn( "company Identifier can not be null" );
             throw new InvalidInputException( "company ID is null." );
-        } else if ( week < 0 || week > 52 ) {
+        } else if ( week < 1 || week > 53 ) {
             LOG.warn( "week not in range" );
             throw new InvalidInputException( "week not in range" );
         }
