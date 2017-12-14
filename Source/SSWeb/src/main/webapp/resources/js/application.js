@@ -13977,9 +13977,6 @@ function setPastCurGraphData(graphData){
 			}
 		}
 	}
-	console.log(pastWeekData);
-	console.log(currentWeekData);
-	
 }
 
 function paintTransactionMonitorGraph(graphData) {
@@ -14094,6 +14091,8 @@ function paintTransactionMonitorGraph(graphData) {
 	remindersData.push(nestedInternalRemindersData);
 	unprocessedData.push(nestedInternalUnprocessedData);
 	
+	var xAxisTimeSlots = formatAllTimeSlots(allTimeslots);
+	
 	for (var itr = 0; itr < allTimeslots.length; itr++) {
 		nestedInternalAutomatedData = [];
 		nestedInternalSentData = [];
@@ -14112,7 +14111,7 @@ function paintTransactionMonitorGraph(graphData) {
 		var prevSentInvitationCount;
 		var prevReminderSentCount;
 		var prevUnprocessedTransactionsCount;
-
+		
 		if (isNaN(parseInt(currentWeekAutomatedTransactions[itr]))) {
 			curAutomatedTransactionCount = 0;
 		} else {
@@ -14173,11 +14172,11 @@ function paintTransactionMonitorGraph(graphData) {
 			prevUnprocessedTransactionsCount = parseInt(pastWeekUnprocessedTransactions[itr]);
 		}
 
-		nestedInternalAutomatedData.push(allTimeslots[itr], prevAutomatedTransactionCount,'Previous Week: '+prevAutomatedTransactionCount,curAutomatedTransactionCount);
-		nestedInternalSentData.push(allTimeslots[itr], prevSentInvitationCount, 'Previous Week: '+prevSentInvitationCount, curSentInvitationCount);
-		nestedInternalCompletedData.push(allTimeslots[itr], prevCompletedTransactionCount, 'Previous Week: '+prevCompletedTransactionCount, curCompletedTransactionCount);
-		nestedInternalRemindersData.push(allTimeslots[itr], prevReminderSentCount, 'Previous Week: '+prevReminderSentCount,curReminderSentCount);
-		nestedInternalUnprocessedData.push(allTimeslots[itr], prevUnprocessedTransactionsCount, 'Previous Week: '+prevUnprocessedTransactionsCount, curUnprocessedTransactionsCount);
+		nestedInternalAutomatedData.push(xAxisTimeSlots[itr], prevAutomatedTransactionCount,'Previous Week: '+prevAutomatedTransactionCount,curAutomatedTransactionCount);
+		nestedInternalSentData.push(xAxisTimeSlots[itr], prevSentInvitationCount, 'Previous Week: '+prevSentInvitationCount, curSentInvitationCount);
+		nestedInternalCompletedData.push(xAxisTimeSlots[itr], prevCompletedTransactionCount, 'Previous Week: '+prevCompletedTransactionCount, curCompletedTransactionCount);
+		nestedInternalRemindersData.push(xAxisTimeSlots[itr], prevReminderSentCount, 'Previous Week: '+prevReminderSentCount,curReminderSentCount);
+		nestedInternalUnprocessedData.push(xAxisTimeSlots[itr], prevUnprocessedTransactionsCount, 'Previous Week: '+prevUnprocessedTransactionsCount, curUnprocessedTransactionsCount);
 		
 		automatedData.push(nestedInternalAutomatedData);
 		sentData.push(nestedInternalSentData);
@@ -14239,25 +14238,25 @@ function drawTransGraphContainer(companyId,alert,type,alertType){
 		$('#trans-graph-container-'+companyId).attr('id','trans-graph-container-'+alertType+'-'+companyId);
 		$('#trans-graph-container-'+alertType+'-'+companyId).append(dangerGraphContainer);
 		$('#trans-graph').attr('id','trans-graph-danger-'+alertType+'-'+companyId);
-		drawTypeSpanText(type,'trans-graph-danger-'+alertType+'-'+companyId);
+		return drawTypeSpanText(type,'trans-graph-danger-'+alertType+'-'+companyId);
 		
 	}else if(alert == 'warn'){
 		$('#trans-graph-container-'+companyId).attr('id','trans-graph-container-'+alertType+'-'+companyId);
 		$('#trans-graph-container-'+alertType+'-'+companyId).append(warnGraphContainer);
 		$('#trans-graph').attr('id','trans-graph-warn-'+alertType+'-'+companyId);
-		drawTypeSpanText(type,'trans-graph-warn-'+alertType+'-'+companyId);
+		return drawTypeSpanText(type,'trans-graph-warn-'+alertType+'-'+companyId);
 		
 	}else if(alert == 'gray'){
 		$('#trans-graph-container-'+companyId).attr('id','trans-graph-container-'+alertType+'-'+companyId);
 		$('#trans-graph-container-'+alertType+'-'+companyId).append(grayGraphContainer);
 		$('#trans-graph').attr('id','trans-graph-gray-'+alertType+'-'+companyId);
-		drawTypeSpanText(type,'trans-graph-gray-'+alertType+'-'+companyId);
+		return drawTypeSpanText(type,'trans-graph-gray-'+alertType+'-'+companyId);
 		
 	}else if(alert == 'normal'){
 		$('#trans-graph-container-'+companyId).attr('id','trans-graph-container-'+alertType+'-'+companyId);
 		$('#trans-graph-container-'+alertType+'-'+companyId).append(normalGraphContainer);
 		$('#trans-graph').attr('id','trans-graph-normal-'+alertType+'-'+companyId);
-		drawTypeSpanText(type,'trans-graph-normal-'+alertType+'-'+companyId);
+		return drawTypeSpanText(type,'trans-graph-normal-'+alertType+'-'+companyId);
 		
 	}
 	
@@ -14266,19 +14265,24 @@ function drawTransGraphContainer(companyId,alert,type,alertType){
 function drawTypeSpanText(type,graphId){
 	if(type == autoType){
 		$('#'+graphId).attr('id',graphId+'-auto');
-		$('#'+graphId+'-auto').siblings('.trans-monitor-graph-span').html(automatedTransText)
+		$('#'+graphId+'-auto').siblings('.trans-monitor-graph-span').html(automatedTransText);
+		return graphId+'-auto';
 	}else if(type == inviType){
 		$('#'+graphId).attr('id',graphId+'-invi');
-		$('#'+graphId+'-invi').siblings('.trans-monitor-graph-span').html(inviteSentText)
+		$('#'+graphId+'-invi').siblings('.trans-monitor-graph-span').html(inviteSentText);
+		return graphId+'-invi';
 	}else if(type == remType){
 		$('#'+graphId).attr('id',graphId+'-rem');
-		$('#'+graphId+'-rem').siblings('.trans-monitor-graph-span').html(reminderSentText)
+		$('#'+graphId+'-rem').siblings('.trans-monitor-graph-span').html(reminderSentText);
+		return graphId+'-rem';
 	}else if(type == compType){
 		$('#'+graphId).attr('id',graphId+'-comp');
-		$('#'+graphId+'-comp').siblings('.trans-monitor-graph-span').html(completedTransText)
+		$('#'+graphId+'-comp').siblings('.trans-monitor-graph-span').html(completedTransText);
+		return graphId+'-comp';
 	}else if(type == unproType){
 		$('#'+graphId).attr('id',graphId+'-unpro');
-		$('#'+graphId+'-unpro').siblings('.trans-monitor-graph-span').html(unprocessedTransText)
+		$('#'+graphId+'-unpro').siblings('.trans-monitor-graph-span').html(unprocessedTransText);
+		return graphId+'-unpro';
 	}
 }
 
@@ -14286,6 +14290,9 @@ var transactionMonitorData;
 var isFetchingTransactionData=false;
 var hasFetchedWarningData = false;
 var hasFetchedNormalData = false;
+var pastWeekTransData = new Array();
+var curWeekTransData = new Array();
+
 function getTransactionMonitorData(alertType,noOfDays) {
 	
 	if (isFetchingTransactionData == true) {
@@ -14387,14 +14394,26 @@ function drawTransMonDangerGraphs(transactionMonitorData){
 		
 		drawTransGraphWrapper(companyId, 'danger', companyName);
 		
-		drawTransGraphContainer(companyId, autoStatus, autoType,'error');
-		drawTransGraphContainer(companyId, inviStatus, inviType,'error');
-		drawTransGraphContainer(companyId, remStatus, remType,'error');
-		drawTransGraphContainer(companyId, unproStatus, unproType,'error');
-		drawTransGraphContainer(companyId, compStatus, compType,'error');
-		
-		setTransactionMonitorGraphData(transData);
+		var autoGraphId = drawTransGraphContainer(companyId, autoStatus, autoType,'error');
+		var inviGraphId = drawTransGraphContainer(companyId, inviStatus, inviType,'error');
+		var remGraphId = drawTransGraphContainer(companyId, remStatus, remType,'error');
+		var unproGraphId = drawTransGraphContainer(companyId, unproStatus, unproType,'error');
+		var compGraphId= drawTransGraphContainer(companyId, compStatus, compType,'error');
+		var graphDetails = {
+				"autoGraphId": autoGraphId,
+				"autoStatus": autoStatus,
+				"inviGraphId": inviGraphId,
+				"inviStatus": inviStatus,
+				"remGraphId": remGraphId,
+				"remStatus": remStatus,
+				"unproGraphId": unproGraphId,
+				"unproStatus": unproStatus,
+				"compGraphId": compGraphId,
+				"compStatus": compStatus
+		}
+		drawAlertTypeGraphs(transData,graphDetails);
 	}
+	/*setPastAndCurWeekDataForTransactionMonitor(transactionMonitorData[0].companySurveyStatusStatslist);*/
 }
 
 function drawTransMonWarnGraphs(transactionMonitorData){
@@ -14442,11 +14461,25 @@ function drawTransMonWarnGraphs(transactionMonitorData){
 		
 		drawTransGraphWrapper(companyId, 'warn', companyName);
 		
-		drawTransGraphContainer(companyId, autoStatus, autoType,'warning');
-		drawTransGraphContainer(companyId, inviStatus, inviType,'warning');
-		drawTransGraphContainer(companyId, remStatus, remType,'warning');
-		drawTransGraphContainer(companyId, unproStatus, unproType,'warning');
-		drawTransGraphContainer(companyId, compStatus, compType,'warning');
+		var autoGraphId = drawTransGraphContainer(companyId, autoStatus, autoType,'warning');
+		var inviGraphId = drawTransGraphContainer(companyId, inviStatus, inviType,'warning');
+		var remGraphId = drawTransGraphContainer(companyId, remStatus, remType,'warning');
+		var unproGraphId = drawTransGraphContainer(companyId, unproStatus, unproType,'warning');
+		var compGraphId = drawTransGraphContainer(companyId, compStatus, compType,'warning');
+		
+		var graphDetails = {
+				"autoGraphId": autoGraphId,
+				"autoStatus": autoStatus,
+				"inviGraphId": inviGraphId,
+				"inviStatus": inviStatus,
+				"remGraphId": remGraphId,
+				"remStatus": remStatus,
+				"unproGraphId": unproGraphId,
+				"unproStatus": unproStatus,
+				"compGraphId": compGraphId,
+				"compStatus": compStatus
+		}
+		drawAlertTypeGraphs(transData,graphDetails);
 	}
 }
 
@@ -14495,20 +14528,470 @@ function drawTransMonNormalGraphs(transactionMonitorData){
 		
 		drawTransGraphWrapper(companyId, 'normal', companyName);
 		
-		drawTransGraphContainer(companyId, autoStatus, autoType,'normals');
-		drawTransGraphContainer(companyId, inviStatus, inviType,'normals');
-		drawTransGraphContainer(companyId, remStatus, remType,'normals');
-		drawTransGraphContainer(companyId, unproStatus, unproType,'normals');
-		drawTransGraphContainer(companyId, compStatus, compType,'normals');
+		var autoGraphId = drawTransGraphContainer(companyId, autoStatus, autoType,'normals');
+		var inviGraphId = drawTransGraphContainer(companyId, inviStatus, inviType,'normals');
+		var remGraphId = drawTransGraphContainer(companyId, remStatus, remType,'normals');
+		var unproGraphId = drawTransGraphContainer(companyId, unproStatus, unproType,'normals');
+		var compGraphId = drawTransGraphContainer(companyId, compStatus, compType,'normals');
+		
+		var graphDetails = {
+				"autoGraphId": autoGraphId,
+				"autoStatus": autoStatus,
+				"inviGraphId": inviGraphId,
+				"inviStatus": inviStatus,
+				"remGraphId": remGraphId,
+				"remStatus": remStatus,
+				"unproGraphId": unproGraphId,
+				"unproStatus": unproStatus,
+				"compGraphId": compGraphId,
+				"compStatus": compStatus
+		}
+		drawAlertTypeGraphs(transData,graphDetails);
 	}
 }
 
-function setTransactionMonitorGraphData(transData){
+function setEmptyPastAndCurWeekDataForTransactionMonitor(companyId){
+	var emptySlotGraphData = {
+			"dailySurveyStatusStatsId": "abcd",
+            "companyId": companyId,
+            "transactionDate": "",
+            "surveyInvitationSentCount": 0,
+            "transactionReceivedCount": 0,
+            "surveycompletedCount": 0,
+            "surveyReminderSentCount": 0,
+            "corruptedCount": 0,
+            "duplicateCount": 0,
+            "oldRecordCount": 0,
+            "ignoredCount": 0,
+            "mismatchedCount": 0,
+            "notAllowedCount": 0
+	}
 	
-	var transDataList = transData.companySurveyStatusStatslist;
+	for(var i=0;i<7;i++){
+		pastWeekTransData[i]= new emptySlotDataConstructor(emptySlotGraphData);
+		curWeekTransData[i]= new emptySlotDataConstructor(emptySlotGraphData);
+	}
+}
+
+function setPastAndCurWeekDataForTransactionMonitor(graphData){
+	var emptySlotGraphData = {
+			 "dailySurveyStatusStatsId": "e",
+             "companyId": 3,
+             "transactionDate": "",
+             "surveyInvitationSentCount": 0,
+             "transactionReceivedCount": 0,
+             "surveycompletedCount": 0,
+             "surveyReminderSentCount": 0,
+             "corruptedCount": 0,
+             "duplicateCount": 0,
+             "oldRecordCount": 0,
+             "ignoredCount": 0,
+             "mismatchedCount": 0,
+             "notAllowedCount": 0
+	}
+	var companyId = graphData[0].companyId;
+	emptySlotGraphData.companyId = companyId;
 	
-	if(transDataList != undefined && transDataList != null){
+	var allTimeSlots = new Array();
+	var graphTimeSlots = new Array();
+	var emptyGraphTimeSlots = new Array();
+	
+	var format = 14;
+	var type = 'Date';
+	var keys = getKeysFromGraphFormat(format);
+	for(var i=0;i<keys.length;i++){
+		allTimeSlots[i] = convertYearMonthDayKeyToMonthDay(keys[i]);
+		emptyGraphTimeSlots[i]=convertYearMonthDayKeyToMonthDayYear(keys[i]);
+	}
+	
+	for(var i=0;i<graphData.length;i++){
+		var j=0;
+		var hasSlotDate = false;
+		var entityDate = graphData[i].transactionDate;
+		
+		var formattedDate = new Date(Date.parse(entityDate));
+	    //get date similar to keys formay
+	    
+	    var month = formattedDate.getMonth() + 1;
+		var monthStr = "";
+		if (month < 10) {
+			monthStr = '0' + month.toString();
+		}else{
+			monthStr = month.toString();
+		}
+		
+		var dayStr = "";
+		var day  = formattedDate.getDate();
+		if (day < 10) {
+			dayStr = '0' + day.toString();
+		}else{
+			dayStr = day.toString();
+		}
+		
+		var keyFormattedDate = formattedDate.getFullYear().toString() + monthStr + dayStr;
+		var graphDate = convertYearMonthDayKeyToMonthDay(keyFormattedDate);
+		graphTimeSlots[i]= graphDate;
 		
 	}
 	
+	var k=0;
+	for(var i=0;i<allTimeSlots.length;i++){
+		var j=0;
+		hasSlotDate = false;
+		while(j<graphTimeSlots.length){
+			if(allTimeSlots[i]==graphTimeSlots[j]){
+				hasSlotDate = true;
+				j++;
+				break;
+			}else{
+				j++;
+			}
+		}
+
+		emptySlotGraphData.transactionDate = emptyGraphTimeSlots[i];
+		if(hasSlotDate){
+			if(i<7){
+				pastWeekTransData[i] = graphData[k++];
+			}else{
+				curWeekTransData[i-7] = graphData[k++];
+			}
+		}else{
+			if(i<7){
+				pastWeekTransData[i] = new emptySlotDataConstructor(emptySlotGraphData);
+			}else{
+				curWeekTransData[i-7] = new emptySlotDataConstructor(emptySlotGraphData);
+			}
+		}
+	}
+}
+
+function drawAlertTypeGraphs(transactionMonitorData,graphDetails){
+	
+	var transData = transactionMonitorData.companySurveyStatusStatslist;
+	var isEmptyData = false;
+	
+	var allTimeslots = new Array();
+	pastWeekTransData = new Array();
+	curWeekTransData = new Array();
+	
+	var pastWeekAutomatedTransactions = new Array();
+	var pastWeekInvitationsSent = new Array();
+	var pastWeekUnprocessedTransactions = new Array();
+	var pastWeekRemindersSent = new Array();
+	var pastWeekCompletedTransactions = new Array();
+	
+	var currentWeekAutomatedTransactions = new Array();
+	var currentWeekInvitationsSent = new Array();
+	var currentWeekUnprocessedTransactions = new Array();
+	var currentWeekRemindersSent = new Array();
+	var currentWeekCompletedTransactions = new Array();
+	
+	var format = 7;
+	var type = 'Date';
+	var keys = getKeysFromGraphFormat(format);
+	
+	
+	for(var i=0;i<keys.length;i++){
+		allTimeslots[i] = convertYearMonthDayKeyToMonthDay(keys[i]);
+		pastWeekAutomatedTransactions[i] = 0;
+		pastWeekInvitationsSent[i] = 0;
+		pastWeekUnprocessedTransactions[i] = 0;
+		pastWeekRemindersSent[i] = 0;
+		pastWeekCompletedTransactions[i] = 0;
+			
+		currentWeekAutomatedTransactions[i] = 0;
+		currentWeekInvitationsSent[i] = 0;
+		currentWeekUnprocessedTransactions[i] = 0;
+		currentWeekRemindersSent[i] = 0;
+		currentWeekCompletedTransactions[i] = 0;
+	}
+	
+	if(transData == undefined){
+		setEmptyPastAndCurWeekDataForTransactionMonitor(transactionMonitorData.companyId);
+		isEmptyData = true;
+	}else{
+		setPastAndCurWeekDataForTransactionMonitor(transData);
+	}
+		
+	for(var i=0;i<curWeekTransData.length;i++){
+			
+			var currentWeekDataEntity = curWeekTransData[i];
+			var pastWeekDataEntity = pastWeekTransData[i];
+			
+			var entityDate = currentWeekDataEntity.transactionDate;
+			
+			var formattedDate = new Date(Date.parse(entityDate));
+		    //get date similar to keys formay
+		    
+		    var month = formattedDate.getMonth() + 1;
+			var monthStr = "";
+			if (month < 10) {
+				monthStr = '0' + month.toString();
+			}else{
+				monthStr = month.toString();
+			}
+			
+			var dayStr = "";
+			var day  = formattedDate.getDate();
+			if (day < 10) {
+				dayStr = '0' + day.toString();
+			}else{
+				dayStr = day.toString();
+			}
+			
+			var keyFormattedDate = formattedDate.getFullYear().toString() + monthStr + dayStr;
+			
+			if(keys.indexOf(keyFormattedDate) > -1){
+				var index = keys.indexOf(keyFormattedDate);
+				
+				pastWeekAutomatedTransactions[index] = pastWeekDataEntity.transactionReceivedCount;
+				pastWeekCompletedTransactions[index] =  pastWeekDataEntity.surveycompletedCount;
+				pastWeekInvitationsSent[index] =  pastWeekDataEntity.surveyInvitationSentCount;
+				pastWeekRemindersSent[index] =  pastWeekDataEntity.surveyReminderSentCount;
+				pastWeekUnprocessedTransactions[index] = pastWeekDataEntity.transactionReceivedCount - pastWeekDataEntity.surveyInvitationSentCount;
+			
+				currentWeekAutomatedTransactions[index] = currentWeekDataEntity.transactionReceivedCount;
+				currentWeekCompletedTransactions[index] =  currentWeekDataEntity.surveycompletedCount;
+				currentWeekInvitationsSent[index] =  currentWeekDataEntity.surveyInvitationSentCount;
+				currentWeekRemindersSent[index] =  currentWeekDataEntity.surveyReminderSentCount;
+				currentWeekUnprocessedTransactions[index] = currentWeekDataEntity.transactionReceivedCount - currentWeekDataEntity.surveyInvitationSentCount;
+			}
+	}
+
+	var automatedData= [];
+	var sentData = [];
+	var completedData = [];
+	var remindersData = [];
+	var unprocessedData = [];
+	
+	var nestedInternalAutomatedData = [];
+	var nestedInternalSentData = [];
+	var nestedInternalCompletedData = [];
+	var nestedInternalRemindersData = [];
+	var nestedInternalUnprocessedData = [];
+	
+	nestedInternalAutomatedData.push(type, 'PreviousWeek',{type: 'string', role: 'tooltip'}, 'CurrentWeek');
+	nestedInternalSentData.push(type, 'PreviousWeek',{type: 'string', role: 'tooltip'}, 'CurrentWeek');
+	nestedInternalCompletedData.push(type, 'PreviousWeek',{type: 'string', role: 'tooltip'}, 'CurrentWeek');
+	nestedInternalRemindersData.push(type, 'PreviousWeek',{type: 'string', role: 'tooltip'}, 'CurrentWeek');
+	nestedInternalUnprocessedData.push(type, 'PreviousWeek',{type: 'string', role: 'tooltip'}, 'CurrentWeek');
+	
+	automatedData.push(nestedInternalAutomatedData);
+	sentData.push(nestedInternalSentData);
+	completedData.push(nestedInternalCompletedData);
+	remindersData.push(nestedInternalRemindersData);
+	unprocessedData.push(nestedInternalUnprocessedData);
+	
+	var xAxisTimeSlots = formatAllTimeSlots(allTimeslots);
+	for (var itr = 0; itr < allTimeslots.length; itr++) {
+		nestedInternalAutomatedData = [];
+		nestedInternalSentData = [];
+		nestedInternalCompletedData = [];
+		nestedInternalRemindersData = [];
+		nestedInternalUnprocessedData = [];
+		
+		var curAutomatedTransactionCount;
+		var curCompletedTransactionCount;
+		var curSentInvitationCount;
+		var curReminderSentCount;
+		var curUnprocessedTransactionsCount;
+		
+		var prevAutomatedTransactionCount;
+		var prevCompletedTransactionCount;
+		var prevSentInvitationCount;
+		var prevReminderSentCount;
+		var prevUnprocessedTransactionsCount;
+
+		if (isNaN(parseInt(currentWeekAutomatedTransactions[itr]))) {
+			curAutomatedTransactionCount = 0;
+		} else {
+			curAutomatedTransactionCount = parseInt(currentWeekAutomatedTransactions[itr]);
+		}
+		
+		if (isNaN(parseInt(pastWeekAutomatedTransactions[itr]))) {
+			prevAutomatedTransactionCount = 0;
+		} else {
+			prevAutomatedTransactionCount = parseInt(pastWeekAutomatedTransactions[itr]);
+		}
+
+		if (isNaN(parseInt(currentWeekInvitationsSent[itr]))) {
+			curSentInvitationCount = 0;
+		} else {
+			curSentInvitationCount = parseInt(currentWeekInvitationsSent[itr]);
+		}
+		
+		if (isNaN(parseInt(pastWeekInvitationsSent[itr]))) {
+			prevSentInvitationCount = 0;
+		} else {
+			prevSentInvitationCount = parseInt(pastWeekInvitationsSent[itr]);
+		}
+		
+		if (isNaN(parseInt(currentWeekRemindersSent[itr]))) {
+			curReminderSentCount = 0;
+		} else {
+			curReminderSentCount = parseInt(currentWeekRemindersSent[itr]);
+		}
+		
+		if (isNaN(parseInt(pastWeekRemindersSent[itr]))) {
+			prevReminderSentCount = 0;
+		} else {
+			prevReminderSentCount = parseInt(pastWeekRemindersSent[itr]);
+		}
+		
+		if (isNaN(parseInt(currentWeekCompletedTransactions[itr]))) {
+			curCompletedTransactionCount = 0;
+		} else {
+			curCompletedTransactionCount = parseInt(currentWeekCompletedTransactions[itr]);
+		}
+		
+		if (isNaN(parseInt(pastWeekCompletedTransactions[itr]))) {
+			prevCompletedTransactionCount = 0;
+		} else {
+			prevCompletedTransactionCount = parseInt(pastWeekCompletedTransactions[itr]);
+		}
+		
+		if (isNaN(parseInt(currentWeekUnprocessedTransactions[itr]))) {
+			curUnprocessedTransactionsCount = 0;
+		} else {
+			curUnprocessedTransactionsCount = parseInt(currentWeekUnprocessedTransactions[itr]);
+		}
+		
+		if (isNaN(parseInt(pastWeekUnprocessedTransactions[itr]))) {
+			prevUnprocessedTransactionsCount = 0;
+		} else {
+			prevUnprocessedTransactionsCount = parseInt(pastWeekUnprocessedTransactions[itr]);
+		}
+		
+		nestedInternalAutomatedData.push(xAxisTimeSlots[itr], prevAutomatedTransactionCount,'Previous Week: '+prevAutomatedTransactionCount,curAutomatedTransactionCount);
+		nestedInternalSentData.push(xAxisTimeSlots[itr], prevSentInvitationCount, 'Previous Week: '+prevSentInvitationCount, curSentInvitationCount);
+		nestedInternalCompletedData.push(xAxisTimeSlots[itr], prevCompletedTransactionCount, 'Previous Week: '+prevCompletedTransactionCount, curCompletedTransactionCount);
+		nestedInternalRemindersData.push(xAxisTimeSlots[itr], prevReminderSentCount, 'Previous Week: '+prevReminderSentCount,curReminderSentCount);
+		nestedInternalUnprocessedData.push(xAxisTimeSlots[itr], prevUnprocessedTransactionsCount, 'Previous Week: '+prevUnprocessedTransactionsCount, curUnprocessedTransactionsCount);
+		
+		automatedData.push(nestedInternalAutomatedData);
+		sentData.push(nestedInternalSentData);
+		remindersData.push(nestedInternalRemindersData);
+		completedData.push(nestedInternalCompletedData);
+		unprocessedData.push(nestedInternalUnprocessedData);
+	}
+	
+	var transGraphOption = getTransMonGraphOptions('gray');
+	
+	if(isEmptyData){
+		modifyGraphContainerToGray('#'+graphDetails.autoGraphId);
+		modifyGraphContainerToGray('#'+graphDetails.inviGraphId);
+		modifyGraphContainerToGray('#'+graphDetails.remGraphId);
+		modifyGraphContainerToGray('#'+graphDetails.unproGraphId);
+		modifyGraphContainerToGray('#'+graphDetails.compGraphId);
+		
+		drawTransactionMonitorGraphs(automatedData, transGraphOption, graphDetails.autoGraphId);
+		drawTransactionMonitorGraphs(sentData, transGraphOption, graphDetails.inviGraphId);
+		drawTransactionMonitorGraphs(remindersData, transGraphOption, graphDetails.remGraphId);
+		drawTransactionMonitorGraphs(unprocessedData, transGraphOption, graphDetails.unproGraphId);
+		drawTransactionMonitorGraphs(completedData, transGraphOption, graphDetails.compGraphId);
+	}else{
+		
+		if(isTransGraphEmpty(automatedData)){
+			modifyGraphContainerToGray('#'+graphDetails.autoGraphId);
+			transGraphOption = getTransMonGraphOptions('gray');
+		}else{
+			transGraphOption = getTransMonGraphOptions(graphDetails.autoStatus);
+		}		
+		drawTransactionMonitorGraphs(automatedData, transGraphOption, graphDetails.autoGraphId);
+		
+		if(isTransGraphEmpty(sentData)){
+			modifyGraphContainerToGray('#'+graphDetails.inviGraphId);
+			transGraphOption = getTransMonGraphOptions('gray');
+		}else{
+			transGraphOption = getTransMonGraphOptions(graphDetails.inviStatus);
+		}
+		drawTransactionMonitorGraphs(sentData, transGraphOption, graphDetails.inviGraphId);
+		
+		if(isTransGraphEmpty(remindersData)){
+			modifyGraphContainerToGray('#'+graphDetails.remGraphId);
+			transGraphOption = getTransMonGraphOptions('gray');
+		}else{
+			transGraphOption = getTransMonGraphOptions(graphDetails.remStatus);
+		}
+		drawTransactionMonitorGraphs(remindersData, transGraphOption, graphDetails.remGraphId);
+		
+		if(isTransGraphEmpty(unprocessedData)){
+			modifyGraphContainerToGray('#'+graphDetails.unproGraphId);
+			transGraphOption = getTransMonGraphOptions('gray');
+		}else{
+			transGraphOption = getTransMonGraphOptions(graphDetails.unproStatus);
+		}
+		drawTransactionMonitorGraphs(unprocessedData, transGraphOption, graphDetails.unproGraphId);
+		
+		if(isTransGraphEmpty(completedData)){
+			modifyGraphContainerToGray('#'+graphDetails.compGraphId);
+			transGraphOption = getTransMonGraphOptions('gray');
+		}else{
+			transGraphOption = getTransMonGraphOptions(graphDetails.compStatus);
+		}
+		drawTransactionMonitorGraphs(completedData, transGraphOption, graphDetails.compGraphId);
+	}
+}
+
+function getTransMonGraphOptions(alert){
+	if(alert == 'danger'){
+		return dangerOptions;
+	}else if(alert == 'warn'){
+		return warnOptions;
+	}else if(alert == 'gray'){
+		return grayOptions;
+	}else if(alert == 'normal'){
+		return normalOptions;
+	}
+}
+
+function modifyGraphContainerToGray(id){
+	
+	if($(id).parent().hasClass('trans-monitor-graph-col-danger')){
+		$(id).parent().removeClass('trans-monitor-graph-col-danger');
+	}
+	if($(id).parent().hasClass('trans-monitor-graph-col-warn')){
+		$(id).parent().removeClass('trans-monitor-graph-col-warn');
+	}
+	if($(id).parent().hasClass('trans-monitor-graph-col-normal')){
+		$(id).parent().removeClass('trans-monitor-graph-col-normal');
+	}
+	
+	$(id).parent().addClass('trans-monitor-graph-col-gray');
+}
+
+function isTransGraphEmpty(graphDataArray){
+	var isGraphEmpty = true;
+	for(var i=0;i<graphDataArray.length;i++){
+		if(graphDataArray[i][1]>0 || graphDataArray[i][3]>0){
+			isGraphEmpty =false;
+			break;
+		}
+	}
+	
+	return isGraphEmpty;
+}
+
+function formatAllTimeSlots(dates){
+	var monthText = dates[0].match(/[a-zA-Z]*/);
+	monthText = monthText?monthText[0]:null;
+	var xAxisData = new Array();
+	var index = 0;
+	for(i=0;i<dates.length;i++){
+		if(i==0){
+	  	xAxisData[i] = dates[i];
+	  }else{
+	  	var nextMonth = dates[i].match(/[a-zA-Z]*/);
+	    nextMonth = nextMonth?nextMonth[0]:null;
+	    if(monthText == nextMonth){
+	    var d = parseInt(dates[i].replace ( /[^\d.]/g, '' ));
+	      xAxisData[i]=d;
+	    }else{
+	    	xAxisData[i] = dates[i];
+	      nextMonth = dates[i].match(/[a-zA-Z]*/);
+	     monthText = nextMonth?nextMonth[0]:null;
+	    }
+	  }
+	}
+	return xAxisData;
 }
