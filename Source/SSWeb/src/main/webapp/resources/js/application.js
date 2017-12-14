@@ -14322,10 +14322,10 @@ function getTransactionMonitorData(alertType,noOfDays) {
 				getTransactionMonitorData('warning',14);
 			}
 			
-			/*if(alertType == 'warning' && hasFetchedNormalData == false){
+			if(alertType == 'warning' && hasFetchedNormalData == false){
 				hasFetchedNormalData = true;
 				getTransactionMonitorData('normal',14);
-			}*/
+			}
 		},
 		error : function(e) {
 			isFetchingTransactionData = false;
@@ -14365,15 +14365,15 @@ function drawTransMonDangerGraphs(transactionMonitorData){
 		var currentErrorAlerts = transData.entityAlertDetails.currentErrorAlerts;
 		
 		for(var j=0;j<currentWarningAlerts.length;j++){
-			if(currentWarningAlerts[j] == 'lessTransactionInPastDays'){
+			if(currentWarningAlerts[j].toUpperCase() == ('lessTransactionInPastDays').toUpperCase() || currentWarningAlerts[j].toUpperCase() == ('lessTransactionInPastWeek').toUpperCase()){
 				autoStatus = 'warn';
-			}else if(currentWarningAlerts[j] == 'lessInvitationInPastDays'){
+			}else if(currentWarningAlerts[j].toUpperCase() == ('lessInvitationInPastDays').toUpperCase() || currentWarningAlerts[j].toUpperCase() == ('lessInvitationInPastWeek').toUpperCase()){
 				inviStatus = 'warn';
-			}else if(currentWarningAlerts[j] == 'moreReminderInPastDays'){
+			}else if(currentWarningAlerts[j].toUpperCase() == ('moreReminderInPastDays').toUpperCase() || currentWarningAlerts[j].toUpperCase() == ('moreReminderInPastWeek').toUpperCase()){
 				remStatus = 'warn';
-			}else if(currentWarningAlerts[j] == 'lessSurveyCompletedInPastDays'){
+			}else if(currentWarningAlerts[j].toUpperCase() == ('lessSurveyCompletedInPastDays').toUpperCase() || currentWarningAlerts[j].toUpperCase() == ('lessSurveyCompletedInPastWeek').toUpperCase()){
 				compStatus = 'warn';
-			}else if(currentWarningAlerts[j] == 'moreSurveyUnprocessedInPastDays'){
+			}else if(currentWarningAlerts[j].toUpperCase() == ('moreSurveyUnprocessedInPastDays').toUpperCase() || currentWarningAlerts[j].toUpperCase() == ('moreSurveyUnprocessedInPastWeek').toUpperCase()){
 				unproStatus = 'warn';
 			}
 		}
