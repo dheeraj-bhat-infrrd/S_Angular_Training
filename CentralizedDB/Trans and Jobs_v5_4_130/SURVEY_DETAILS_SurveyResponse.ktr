@@ -149,34 +149,6 @@
       <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
     </attributes>
   </connection>
-  <connection>
-    <name>SS_INFO_CONNECTION</name>
-    <server>&#x24;&#x7b;SS_MYSQL_HOST&#x7d;</server>
-    <type>MYSQL</type>
-    <access>Native</access>
-    <database>&#x24;&#x7b;SS_MYSQL_SCHEMA&#x7d;</database>
-    <port>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</port>
-    <username>&#x24;&#x7b;SS_MYSQL_USER_NAME&#x7d;</username>
-    <password>&#x24;&#x7b;SS_MYSQL_PASSWORD&#x7d;</password>
-    <servername/>
-    <data_tablespace/>
-    <index_tablespace/>
-    <attributes>
-      <attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useCompression</code><attribute>true</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useServerPrepStmts</code><attribute>false</attribute></attribute>
-      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
-      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
-      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
-      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</attribute></attribute>
-      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
-      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
-      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
-      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
-      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
-      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
-    </attributes>
-  </connection>
   <order>
   <hop> <from>UUID_SURVEY_RESPONSE_ID</from><to>null_check</to><enabled>Y</enabled> </hop>
   <hop> <from>Response input</from><to>Sort input</to><enabled>Y</enabled> </hop>
@@ -498,6 +470,32 @@
         <trim_type>none</trim_type>
         <repeat>N</repeat>
       </field>
+      <field>
+        <name>considerForScore</name>
+        <path>&#x24;..considerForScore</path>
+        <type>Boolean</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>questionId</name>
+        <path>&#x24;..questionId</path>
+        <type>None</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
     </fields>
     <limit>0</limit>
     <IsInFields>Y</IsInFields>
@@ -534,7 +532,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var final_question_id &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;SURVEY_QUESTIONS_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_question_id &#x3d; SURVEY_QUESTIONS_ID_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;SURVEY_QUESTIONS_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_question_id &#x3d; SURVEY_QUESTIONS_ID&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var final_question_id &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;RESPONSE_QUESTION_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_question_id &#x3d; RESPONSE_QUESTION_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;SURVEY_QUESTIONS_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_question_id &#x3d; SURVEY_QUESTIONS_ID_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;SURVEY_QUESTIONS_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_question_id &#x3d; SURVEY_QUESTIONS_ID&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>final_question_id</name>
         <rename>final_question_id</rename>
         <type>Integer</type>
@@ -660,6 +658,7 @@
       <value>IS_USER_RANKING_QUESTION</value>
       <value>QUESTION_ID</value>
       <value>IS_NPS_QUESTION</value>
+      <value>CONSIDER_FOR_SCORE</value>
     </values>
 <flag_field>ResponseFlag</flag_field>
 <reference>Sort input</reference>
@@ -692,7 +691,7 @@
     <fields_name/>
     <collection>SURVEY_DETAILS</collection>
     <json_field_name>json</json_field_name>
-    <json_query>&#x7b;&#x24;query&#x3a; &#x7b;&#x22;modifiedOn&#x22; &#x3a; &#x7b;&#x24;gte&#x3a;&#x7b;&#x24;date&#x3a;&#x24;&#x7b;modifiedOnSurveyDetails&#x7d;&#x7d;&#x7d;&#x7d; &#x7d;</json_query>
+    <json_query/>
     <auth_user/>
     <auth_password>Encrypted </auth_password>
     <auth_kerberos>N</auth_kerberos>
@@ -722,7 +721,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  SURVEY_RESPONSE_ID&#xd;&#xa;, SURVEY_DETAILS_ID&#xd;&#xa;, ANSWER&#xd;&#xa;, QUESTION&#xd;&#xa;, QUESTION_TYPE&#xd;&#xa;, case when IS_USER_RANKING_QUESTION &#x3c;&#x3e; 1 then false else true end as IS_USER_RANKING_QUESTION &#xd;&#xa;, QUESTION_ID&#xd;&#xa;, IS_NPS_QUESTION&#xd;&#xa;FROM survey_response&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  SURVEY_RESPONSE_ID&#xd;&#xa;, SURVEY_DETAILS_ID&#xd;&#xa;, ANSWER&#xd;&#xa;, QUESTION&#xd;&#xa;, QUESTION_TYPE&#xd;&#xa;, case when IS_USER_RANKING_QUESTION &#x3c;&#x3e; 1 then false else true end as IS_USER_RANKING_QUESTION &#xd;&#xa;, QUESTION_ID&#xd;&#xa;, IS_NPS_QUESTION&#xd;&#xa;,CONSIDER_FOR_SCORE&#xd;&#xa;FROM survey_response&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -777,6 +776,14 @@
         <precision>-2</precision>
       </field>      <field>        <name>isNpsQuestion</name>
         <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>considerForScore</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>questionId</name>
+        <rename>RESPONSE_QUESTION_ID</rename>
         <length>-2</length>
         <precision>-2</precision>
       </field>        <select_unspecified>N</select_unspecified>
@@ -868,7 +875,19 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
-      </field>      <field>        <name>COMPANY_ID</name>
+      </field>      <field>        <name>final_question_id</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>IS_NPS_QUESTION</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>considerForScore</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>RESPONSE_QUESTION_ID</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
@@ -877,6 +896,10 @@
         <length>-2</length>
         <precision>-2</precision>
       </field>      <field>        <name>SURVEY_QUESTION</name>
+        <rename/>
+        <length>-2</length>
+        <precision>-2</precision>
+      </field>      <field>        <name>COMPANY_ID</name>
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
@@ -972,14 +995,6 @@
         <rename/>
         <length>-2</length>
         <precision>-2</precision>
-      </field>      <field>        <name>final_question_id</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>IS_NPS_QUESTION</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
       </field>        <select_unspecified>N</select_unspecified>
       <remove>        <name>COMPANY_ID</name>
       </remove>      <remove>        <name>SURVEY_QUESTIONS_ID</name>
@@ -1007,6 +1022,7 @@
       </remove>      <remove>        <name>MODIFIED_BY_1</name>
       </remove>      <remove>        <name>CREATED_ON_EST_1</name>
       </remove>      <remove>        <name>MODIFIED_ON_EST_1</name>
+      </remove>      <remove>        <name>RESPONSE_QUESTION_ID</name>
       </remove>      <meta>        <name>SURVEY_RESPONSE_ID</name>
         <rename>SURVEY_RESPONSE_ID</rename>
         <type>None</type>
@@ -1114,6 +1130,21 @@
         <storage_type/>
       </meta>      <meta>        <name>IS_NPS_QUESTION</name>
         <rename>IS_NPS_QUESTION</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>considerForScore</name>
+        <rename>CONSIDER_FOR_SCORE</rename>
         <type>Integer</type>
         <length>-2</length>
         <precision>-2</precision>
@@ -1459,6 +1490,11 @@
       <value>
         <name>IS_NPS_QUESTION</name>
         <rename>IS_NPS_QUESTION</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>CONSIDER_FOR_SCORE</name>
+        <rename>CONSIDER_FOR_SCORE</rename>
         <update>Y</update>
       </value>
     </lookup>
