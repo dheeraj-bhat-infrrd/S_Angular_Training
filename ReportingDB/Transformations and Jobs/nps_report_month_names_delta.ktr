@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>nps_report_month</name>
+    <name>nps_report_month_names_delta</name>
     <description/>
     <extended_description/>
     <trans_version/>
@@ -66,9 +66,9 @@
     <clusterschemas>
     </clusterschemas>
   <created_user>-</created_user>
-  <created_date>2017&#x2f;12&#x2f;12 15&#x3a;42&#x3a;37.705</created_date>
+  <created_date>2017&#x2f;12&#x2f;13 14&#x3a;34&#x3a;26.912</created_date>
   <modified_user>-</modified_user>
-  <modified_date>2017&#x2f;12&#x2f;12 15&#x3a;42&#x3a;37.705</modified_date>
+  <modified_date>2017&#x2f;12&#x2f;13 14&#x3a;34&#x3a;26.912</modified_date>
     <key_for_session_key>H4sIAAAAAAAAAAMAAAAAAAAAAAA&#x3d;</key_for_session_key>
     <is_key_private>N</is_key_private>
   </info>
@@ -131,20 +131,21 @@
     </attributes>
   </connection>
   <order>
-  <hop> <from>User Profile Input</from><to>Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort rows</from><to>Memory Group by</to><enabled>Y</enabled> </hop>
-  <hop> <from>Memory Group by</from><to>Calculate NPS</to><enabled>Y</enabled> </hop>
-  <hop> <from>Calculate NPS</from><to>Generate random value</to><enabled>Y</enabled> </hop>
-  <hop> <from>Generate random value</from><to>nps_report_month output</to><enabled>Y</enabled> </hop>
-  <hop> <from>Branch Input</from><to>Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Merge Join</from><to>Sort rows 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort rows 2</from><to>Merge Join 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>nps_report_user_month input</from><to>Merge Join 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>Merge Join 2</from><to>Sort rows</to><enabled>Y</enabled> </hop>
+  <hop> <from>nps_report_month input</from><to>Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>branch input</from><to>Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Merge Join</from><to>Sort rows</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows</from><to>Merge Join 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>region input</from><to>Merge Join 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows 2</from><to>Merge Join 2 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>company input</from><to>Merge Join 2 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>Merge Join 2</from><to>Sort rows 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>Calculator Delta</from><to>Update nps_report_month</to><enabled>Y</enabled> </hop>
+  <hop> <from>Merge Join 2 2</from><to>If field value is null</to><enabled>Y</enabled> </hop>
+  <hop> <from>If field value is null</from><to>Calculator Delta</to><enabled>Y</enabled> </hop>
   </order>
   <step>
-    <name>Memory Group by</name>
-    <type>MemoryGroupBy</type>
+    <name>Calculator Delta</name>
+    <type>Calculator</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -153,72 +154,24 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-      <give_back_row>N</give_back_row>
-      <group>
-        <field>
-          <name>BRANCH_ID</name>
-        </field>
-        <field>
-          <name>month</name>
-        </field>
-        <field>
-          <name>year</name>
-        </field>
-      </group>
-      <fields>
-        <field>
-          <aggregate>detractors</aggregate>
-          <subject>detractors</subject>
-          <type>SUM</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>passives</aggregate>
-          <subject>passives</subject>
-          <type>SUM</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>promotors</aggregate>
-          <subject>promotors</subject>
-          <type>SUM</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>responders</aggregate>
-          <subject>responders</subject>
-          <type>SUM</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>sum</aggregate>
-          <subject>sum</subject>
-          <type>SUM</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>sent</aggregate>
-          <subject>sent</subject>
-          <type>SUM</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>REGION_ID</aggregate>
-          <subject>REGION_ID</subject>
-          <type>FIRST</type>
-          <valuefield/>
-        </field>
-        <field>
-          <aggregate>COMPANY_ID</aggregate>
-          <subject>COMPANY_ID</subject>
-          <type>FIRST</type>
-          <valuefield/>
-        </field>
-      </fields>
+       <calculation><field_name>delta</field_name>
+<calc_type>SUBTRACT</calc_type>
+<field_a>nps</field_a>
+<field_b>previous_month_nps</field_b>
+<field_c/>
+<value_type>None</value_type>
+<value_length>-1</value_length>
+<value_precision>-1</value_precision>
+<remove>N</remove>
+<conversion_mask/>
+<decimal_symbol/>
+<grouping_symbol/>
+<currency_symbol/>
+</calculation>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>777</xloc>
-      <yloc>96</yloc>
+      <xloc>1040</xloc>
+      <yloc>306</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -234,19 +187,75 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-<join_type>INNER</join_type>
-<step1>User Profile Input</step1>
-<step2>Branch Input</step2>
+<join_type>LEFT OUTER</join_type>
+<step1>nps_report_month input</step1>
+<step2>branch input</step2>
     <keys_1>
-      <key>BRANCH_ID</key>
+      <key>branch_id</key>
     </keys_1>
     <keys_2>
       <key>BRANCH_ID</key>
     </keys_2>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>228</xloc>
-      <yloc>96</yloc>
+      <xloc>305</xloc>
+      <yloc>187</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Merge Join 2</name>
+    <type>MergeJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<join_type>LEFT OUTER</join_type>
+<step1>Sort rows</step1>
+<step2>region input</step2>
+    <keys_1>
+      <key>region_id</key>
+    </keys_1>
+    <keys_2>
+      <key>REGION_ID</key>
+    </keys_2>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>568</xloc>
+      <yloc>187</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Merge Join 2 2</name>
+    <type>MergeJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<join_type>LEFT OUTER</join_type>
+<step1>Sort rows 2</step1>
+<step2>company input</step2>
+    <keys_1>
+      <key>company_id</key>
+    </keys_1>
+    <keys_2>
+      <key>COMPANY_ID</key>
+    </keys_2>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>834</xloc>
+      <yloc>187</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -271,19 +280,7 @@
       <unique_rows>N</unique_rows>
     <fields>
       <field>
-        <name>BRANCH_ID</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>month</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>year</name>
+        <name>region_id</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -291,251 +288,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>627</xloc>
-      <yloc>96</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>User Profile Input</name>
-    <type>TableInput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  distinct USER_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, REGION_ID&#xd;&#xa;, BRANCH_ID&#xd;&#xa;FROM user_profile&#xd;&#xa;order by BRANCH_ID&#x3b;&#xd;&#xa;</sql>
-    <limit>0</limit>
-    <lookup/>
-    <execute_each_row>N</execute_each_row>
-    <variables_active>N</variables_active>
-    <lazy_conversion_active>N</lazy_conversion_active>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>59</xloc>
-      <yloc>96</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>nps_report_user_month input</name>
-    <type>TableInput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  nps_report_user_month_id&#xd;&#xa;, user_id&#xd;&#xa;, month&#xd;&#xa;, year&#xd;&#xa;, sent&#xd;&#xa;, responders&#xd;&#xa;, promotors&#xd;&#xa;, detractors&#xd;&#xa;, passives&#xd;&#xa;, sum&#xd;&#xa;FROM nps_report_user_month&#xd;&#xa;order by user_id</sql>
-    <limit>0</limit>
-    <lookup/>
-    <execute_each_row>N</execute_each_row>
-    <variables_active>N</variables_active>
-    <lazy_conversion_active>N</lazy_conversion_active>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>486</xloc>
-      <yloc>249</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Calculate NPS</name>
-    <type>ScriptValueMod</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;if&#x28;responders &#x3e; 0&#x29;&#x7b;&#xd;&#xa;	&#xd;&#xa;	var NPS &#x3d; &#x28;&#x28;promotors-detractors&#x29;&#x2f;responders&#x29;&#x2a;100.00&#x3b;&#xd;&#xa;	var detractor_percent &#x3d; &#x28;detractors&#x2f;responders&#x29;&#x2a;100.00&#x3b;&#xd;&#xa;	var promoter_percent &#x3d; &#x28;promotors&#x2f;responders&#x29;&#x2a;100.00&#x3b;&#xd;&#xa;	var avg_nps_rating &#x3d; sum&#x2f;responders&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28;sent &#x3e; 0&#x29;&#x7b;&#xd;&#xa;	var response_percent &#x3d; &#x28;responders&#x2f;sent&#x29;&#x2a;100.00&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>NPS</name>
-        <rename>NPS</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>N</replace>
-      </field>      <field>        <name>detractor_percent</name>
-        <rename>detractor_percent</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>N</replace>
-      </field>      <field>        <name>promoter_percent</name>
-        <rename>promoter_percent</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>N</replace>
-      </field>      <field>        <name>avg_nps_rating</name>
-        <rename>avg_nps_rating</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>N</replace>
-      </field>      <field>        <name>response_percent</name>
-        <rename>response_percent</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
-        <replace>N</replace>
-      </field>    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>942</xloc>
-      <yloc>96</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>nps_report_month output</name>
-    <type>TableOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <schema/>
-    <table>nps_report_month</table>
-    <commit>10000</commit>
-    <truncate>Y</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>N</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-        <field>
-          <column_name>branch_id</column_name>
-          <stream_name>BRANCH_ID</stream_name>
-        </field>
-        <field>
-          <column_name>month</column_name>
-          <stream_name>month</stream_name>
-        </field>
-        <field>
-          <column_name>year</column_name>
-          <stream_name>year</stream_name>
-        </field>
-        <field>
-          <column_name>responders</column_name>
-          <stream_name>responders</stream_name>
-        </field>
-        <field>
-          <column_name>region_id</column_name>
-          <stream_name>REGION_ID</stream_name>
-        </field>
-        <field>
-          <column_name>company_id</column_name>
-          <stream_name>COMPANY_ID</stream_name>
-        </field>
-        <field>
-          <column_name>nps</column_name>
-          <stream_name>NPS</stream_name>
-        </field>
-        <field>
-          <column_name>avg_nps_rating</column_name>
-          <stream_name>avg_nps_rating</stream_name>
-        </field>
-        <field>
-          <column_name>response_percent</column_name>
-          <stream_name>response_percent</stream_name>
-        </field>
-        <field>
-          <column_name>detractors_percent</column_name>
-          <stream_name>detractor_percent</stream_name>
-        </field>
-        <field>
-          <column_name>promotors_percent</column_name>
-          <stream_name>promoter_percent</stream_name>
-        </field>
-        <field>
-          <column_name>nps_report_month_id</column_name>
-          <stream_name>nps_report_month_id</stream_name>
-        </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1136</xloc>
-      <yloc>249</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Generate random value</name>
-    <type>RandomValue</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>
-      <field>
-        <name>nps_report_month_id</name>
-        <type>random uuid</type>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1136</xloc>
-      <yloc>96</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Branch Input</name>
-    <type>TableInput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  BRANCH_ID&#xd;&#xa;, IS_DEFAULT_BY_SYSTEM&#xd;&#xa;FROM branch&#xd;&#xa;where IS_DEFAULT_BY_SYSTEM &#x3d; 0&#xd;&#xa;order by branch_id&#x3b;</sql>
-    <limit>0</limit>
-    <lookup/>
-    <execute_each_row>N</execute_each_row>
-    <variables_active>N</variables_active>
-    <lazy_conversion_active>N</lazy_conversion_active>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>228</xloc>
-      <yloc>249</yloc>
+      <xloc>424</xloc>
+      <yloc>187</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -560,7 +314,7 @@
       <unique_rows>N</unique_rows>
     <fields>
       <field>
-        <name>USER_ID</name>
+        <name>company_id</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -568,15 +322,15 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>353</xloc>
-      <yloc>96</yloc>
+      <xloc>690</xloc>
+      <yloc>187</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Merge Join 2</name>
-    <type>MergeJoin</type>
+    <name>Update nps_report_month</name>
+    <type>Update</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -585,19 +339,204 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-<join_type>INNER</join_type>
-<step1>Sort rows 2</step1>
-<step2>nps_report_user_month input</step2>
-    <keys_1>
-      <key>USER_ID</key>
-    </keys_1>
-    <keys_2>
-      <key>user_id</key>
-    </keys_2>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <skip_lookup>N</skip_lookup>
+    <commit>1000</commit>
+    <use_batch>N</use_batch>
+    <error_ignored>N</error_ignored>
+    <ignore_flag_field/>
+    <lookup>
+      <schema/>
+      <table>nps_report_month</table>
+      <key>
+        <name>company_id</name>
+        <field>company_id</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+        </key>
+      <key>
+        <name>region_id</name>
+        <field>region_id</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+        </key>
+      <key>
+        <name>branch_id</name>
+        <field>branch_id</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+        </key>
+      <key>
+        <name>month</name>
+        <field>month</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+        </key>
+      <key>
+        <name>year</name>
+        <field>year</field>
+        <condition>&#x3d;</condition>
+        <name2/>
+        </key>
+      <value>
+        <name>company_name</name>
+        <rename>COMPANY</rename>
+        </value>
+      <value>
+        <name>branch_name</name>
+        <rename>BRANCH</rename>
+        </value>
+      <value>
+        <name>region_name</name>
+        <rename>REGION</rename>
+        </value>
+      <value>
+        <name>nps_delta</name>
+        <rename>delta</rename>
+        </value>
+      </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>486</xloc>
-      <yloc>96</yloc>
+      <xloc>834</xloc>
+      <yloc>306</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>branch input</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <sql>SELECT&#xd;&#xa;  BRANCH_ID&#xd;&#xa;, IF&#x28;IS_DEFAULT_BY_SYSTEM &#x3d; 1,&#x27;&#x27;, BRANCH&#x29; as BRANCH&#xd;&#xa;FROM branch&#xd;&#xa;order by BRANCH_ID&#xd;&#xa;</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>305</xloc>
+      <yloc>54</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>company input</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <sql>SELECT&#xd;&#xa;  COMPANY_ID&#xd;&#xa;, COMPANY&#xd;&#xa;FROM company&#xd;&#xa;order by COMPANY_ID</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>834</xloc>
+      <yloc>54</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>nps_report_month input</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <sql>SELECT&#xd;&#xa;  company_id&#xd;&#xa;, region_id&#xd;&#xa;, branch_id&#xd;&#xa;, nps&#xd;&#xa;, previous_month_nps&#xd;&#xa;, month&#xd;&#xa;, year&#xd;&#xa;FROM nps_report_month&#xd;&#xa;order by branch_id&#xd;&#xa;</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>125</xloc>
+      <yloc>187</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>region input</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <sql>SELECT&#xd;&#xa;  REGION_ID&#xd;&#xa;, IF&#x28;IS_DEFAULT_BY_SYSTEM &#x3d; 1,&#x27;&#x27;, REGION&#x29; as REGION&#xd;&#xa;FROM region&#xd;&#xa;order by REGION_ID</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>568</xloc>
+      <yloc>54</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>If field value is null</name>
+    <type>IfNull</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <replaceAllByValue/>
+      <replaceAllMask/>
+      <selectFields>Y</selectFields>
+      <selectValuesType>N</selectValuesType>
+      <setEmptyStringAll>N</setEmptyStringAll>
+    <valuetypes>
+      </valuetypes>
+    <fields>
+      <field>
+        <name>previous_month_nps</name>
+        <value>0.0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1040</xloc>
+      <yloc>187</yloc>
       <draw>Y</draw>
       </GUI>
     </step>

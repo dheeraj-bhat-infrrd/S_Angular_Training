@@ -134,7 +134,7 @@
   <hop> <from>survey_details_input</from><to>Filter rows</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows 2</from><to>group NPS</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter rows</from><to>Sort rows 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>Generate random value</from><to>nps_report_user_month input</to><enabled>Y</enabled> </hop>
+  <hop> <from>Generate random value</from><to>nps_report_user_month output</to><enabled>Y</enabled> </hop>
   <hop> <from>survey_stats_report_user</from><to>Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows 3</from><to>Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Join</from><to>calculate NPS</to><enabled>Y</enabled> </hop>
@@ -401,7 +401,7 @@
     </step>
 
   <step>
-    <name>nps_report_user_month input</name>
+    <name>nps_report_user_month output</name>
     <type>TableOutput</type>
     <description/>
     <distribute>Y</distribute>
@@ -465,36 +465,14 @@
           <column_name>passives</column_name>
           <stream_name>nps_passives</stream_name>
         </field>
+        <field>
+          <column_name>sent</column_name>
+          <stream_name>sent_count</stream_name>
+        </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>105</xloc>
-      <yloc>195</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>survey_stats_report_user</name>
-    <type>TableInput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  user_id&#xd;&#xa;, year&#xd;&#xa;, month&#xd;&#xa;, nps_detractors&#xd;&#xa;, nps_passives&#xd;&#xa;, nps_promoters&#xd;&#xa;FROM survey_stats_report_user&#xd;&#xa;order by user_id,month,year&#x3b;&#xd;&#xa;</sql>
-    <limit>0</limit>
-    <lookup/>
-    <execute_each_row>N</execute_each_row>
-    <variables_active>N</variables_active>
-    <lazy_conversion_active>N</lazy_conversion_active>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>847</xloc>
       <yloc>195</yloc>
       <draw>Y</draw>
       </GUI>
@@ -522,6 +500,32 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>105</xloc>
       <yloc>55</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>survey_stats_report_user</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <sql>SELECT&#xd;&#xa;  user_id&#xd;&#xa;, year&#xd;&#xa;, month&#xd;&#xa;, sent_count&#xd;&#xa;, nps_detractors&#xd;&#xa;, nps_passives&#xd;&#xa;, nps_promoters&#xd;&#xa;FROM survey_stats_report_user&#xd;&#xa;order by user_id,month,year&#x3b;&#xd;&#xa;</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>847</xloc>
+      <yloc>195</yloc>
       <draw>Y</draw>
       </GUI>
     </step>

@@ -1,7 +1,6 @@
 --
 -- Table structure for table `SURVEY_0TO10_QUESTIONS`
 --
-use ss_centralized_mongodb;
 DROP TABLE IF EXISTS `SURVEY_0TO10_QUESTIONS`;
 
 CREATE TABLE `SURVEY_0TO10_QUESTIONS` (

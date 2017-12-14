@@ -119,8 +119,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>264</xloc>
-      <yloc>141</yloc>
+      <xloc>768</xloc>
+      <yloc>137</yloc>
       </entry>
     <entry>
       <name>survey_stats_report_user</name>
@@ -152,8 +152,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>813</xloc>
-      <yloc>141</yloc>
+      <xloc>225</xloc>
+      <yloc>137</yloc>
       </entry>
     <entry>
       <name>survey_stats_report_region</name>
@@ -185,8 +185,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>1094</xloc>
-      <yloc>303</yloc>
+      <xloc>1035</xloc>
+      <yloc>299</yloc>
       </entry>
     <entry>
       <name>survey_stats_report_company</name>
@@ -218,8 +218,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>541</xloc>
-      <yloc>303</yloc>
+      <xloc>500</xloc>
+      <yloc>299</yloc>
       </entry>
     <entry>
       <name>START</name>
@@ -239,7 +239,7 @@
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>65</xloc>
-      <yloc>141</yloc>
+      <yloc>137</yloc>
       </entry>
     <entry>
       <name>Survey_Stats_Report_Main_NPS</name>
@@ -271,8 +271,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>541</xloc>
-      <yloc>141</yloc>
+      <xloc>1035</xloc>
+      <yloc>137</yloc>
       </entry>
     <entry>
       <name>Survey_Stats_Report_User_NPS</name>
@@ -304,8 +304,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>1094</xloc>
-      <yloc>141</yloc>
+      <xloc>500</xloc>
+      <yloc>137</yloc>
       </entry>
     <entry>
       <name>Survey_Stats_Report_Region_NPS</name>
@@ -337,8 +337,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>813</xloc>
-      <yloc>303</yloc>
+      <xloc>768</xloc>
+      <yloc>299</yloc>
       </entry>
     <entry>
       <name>Survey_Stats_Report_Company_NPS</name>
@@ -370,37 +370,19 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>264</xloc>
-      <yloc>303</yloc>
+      <xloc>225</xloc>
+      <yloc>299</yloc>
       </entry>
   </entries>
   <hops>
     <hop>
       <from>START</from>
-      <to>survey_stats_report_main</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>Y</unconditional>
-    </hop>
-    <hop>
-      <from>survey_stats_report_main</from>
-      <to>Survey_Stats_Report_Main_NPS</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>Survey_Stats_Report_Main_NPS</from>
       <to>survey_stats_report_user</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
       <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
+      <unconditional>Y</unconditional>
     </hop>
     <hop>
       <from>survey_stats_report_user</from>
@@ -413,6 +395,24 @@
     </hop>
     <hop>
       <from>Survey_Stats_Report_User_NPS</from>
+      <to>survey_stats_report_main</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>survey_stats_report_main</from>
+      <to>Survey_Stats_Report_Main_NPS</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Survey_Stats_Report_Main_NPS</from>
       <to>survey_stats_report_region</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
