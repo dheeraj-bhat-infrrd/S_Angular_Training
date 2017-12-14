@@ -6924,7 +6924,7 @@ tr.u-tbl-header td {
 	
 }
 
-.bd-q-pu-done-wrapper {
+.bd-q-pu-done-wrapper,.bd-nps-checkbox-wrapper {
 	line-height: 40px;
 	width: 120px;
 	margin: 10px auto 0;

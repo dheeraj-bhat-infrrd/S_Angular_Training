@@ -1343,7 +1343,7 @@
         font-size: 12px;
         margin-top: 5px;
     }
-    .bd-q-pu-done-wrapper{
+    .bd-q-pu-done-wrapper,.bd-nps-checkbox-wrapper{
         margin: 10px auto 0;
     }
     .bd-q-btn-cancel{

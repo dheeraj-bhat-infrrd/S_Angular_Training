@@ -3262,6 +3262,8 @@ function bindEditSurveyEvents() {
 		}*/
 		
 		if (editedStatus == false) {
+			$("#overlay-toast").html('No changes detected. Retry Editing Question.');
+			showToast();
 			revertQuestionOverlay();
 			setTimeout(function() {
 				loadActiveSurveyQuestions();
@@ -3290,6 +3292,8 @@ function bindEditSurveyEvents() {
 
 							if (map.status == "success") {
 								$('#nps-question-form').attr('data-quesref', map.questionId);
+								$("#overlay-toast").html("Successfully added NPS Question");
+								showToast();
 								revertQuestionOverlay();
 							} else {
 								$('#nps-question-form').attr('data-state', 'new');
@@ -3309,8 +3313,10 @@ function bindEditSurveyEvents() {
 							showToast();
 
 							if (map.status == "success") {
-								revertQuestionOverlay();
 								$('#nps-question-form').attr('data-status', 'new');
+								$("#overlay-toast").html("Successfully edited NPS Question");
+								showToast();
+								revertQuestionOverlay();
 							} else {
 								$('#nps-question-form').attr('data-status', 'edited');
 								$("#overlay-toast").html("Retry Saving NPS Question");
@@ -3510,6 +3516,7 @@ $(document).on('click', '#user-ranking-chkbox-wrapper-nps', function() {
 		$('#user-ranking-chkbox-nps').addClass('bd-check-img-checked')
 		 $('#user-ranking-ques-nps').val(false);
 	}
+	$('#nps-question-form').attr('data-status','edited');
 });
 
 $(document).on('click', '#user-ranking-chkbox-wrapper-edit-nps', function() {
@@ -3590,6 +3597,7 @@ $(document).on('click', '#avg-score-chkbox-wrapper-nps', function() {
 		$('#avg-score-chkbox-nps').addClass('bd-check-img-checked')
 		 $('#avg-score-ques-nps').val(false);
 	}
+	$('#nps-question-form').attr('data-status','edited');
 });
 
 $(document).on('click', '#nps-chkbox-wrapper', function(e) {
