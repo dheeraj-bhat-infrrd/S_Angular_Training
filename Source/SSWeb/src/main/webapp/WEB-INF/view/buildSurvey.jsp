@@ -247,8 +247,7 @@
 					</div>
 				</div>
 			</div>
-			<div
-				class="bd-q-pu-done-wrapper bd-q-pu-done-wrapper-override clearfix">
+			<div class="bd-nps-checkbox-wrapper bd-q-pu-done-wrapper-override clearfix">
 				<div id="user-ranking-chkbox-wrapper-nps" class="clearfix" style="width: 200px;">
 					<div id="user-ranking-chkbox-nps" class="float-left user-ranking-chkbox bd-check-img"></div>
 					<input type="hidden" id="user-ranking-ques-nps" name="user-ranking-ques" value=true>
@@ -260,7 +259,7 @@
 					<div class="float-left  listing-access-txt cursor-pointer">Consider for Average Score</div>
 				</div>
 			</div>
-			<div class="bd-q-pu-done-wrapper clearfix">
+			<div class="bd-nps-checkbox-wrapper clearfix">
 				<div class="bd-nps-btn-done float-left"><spring:message code="label.done.key" /></div>
 			</div>
 		</div>
