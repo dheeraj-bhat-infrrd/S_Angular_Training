@@ -4,11 +4,13 @@ CREATE TABLE `nps_report_user_week` (
   `user_id` int(11) DEFAULT NULL,
   `week` int(11) DEFAULT NULL,
   `year` int(11) DEFAULT NULL,
+  `sent` int(11) DEFAULT NULL,
   `responders` int(11) DEFAULT NULL,
   `promotors` int(11) DEFAULT NULL,
   `detractors` int(11) DEFAULT NULL,
   `passives` int(11) DEFAULT NULL,
   `sum` int(11) DEFAULT NULL,
+  `first_day_of_week` date DEFAULT NULL,
   PRIMARY KEY (`nps_report_user_week_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -19,6 +21,7 @@ CREATE TABLE `nps_report_user_month` (
   `user_id` int(11) DEFAULT NULL,
   `month` int(11) DEFAULT NULL,
   `year` int(11) DEFAULT NULL,
+  `sent` int(11) DEFAULT NULL,
   `responders` int(11) DEFAULT NULL,
   `promotors` int(11) DEFAULT NULL,
   `detractors` int(11) DEFAULT NULL,
@@ -45,8 +48,8 @@ CREATE TABLE `nps_report_month` (
   `responders` int(11) DEFAULT NULL,
   `response_percent` decimal(16,2) DEFAULT NULL,
   `avg_nps_rating` decimal(16,2) DEFAULT NULL,
-  `promotors` decimal(16,2) DEFAULT NULL,
-  `detractors` decimal(16,2) DEFAULT NULL,
+  `promotors_percent` decimal(16,2) DEFAULT NULL,
+  `detractors_percent` decimal(16,2) DEFAULT NULL,
   PRIMARY KEY (`nps_report_month_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -63,12 +66,13 @@ CREATE TABLE `nps_report_week` (
   `branch_id` int(11) DEFAULT NULL,
   `branch_name` varchar(450) DEFAULT NULL,
   `nps` decimal(16,2) DEFAULT NULL,
-  `previous_month_nps` decimal(16,2) DEFAULT NULL,
+  `previous_week_nps` decimal(16,2) DEFAULT NULL,
   `nps_delta` decimal(16,2) DEFAULT NULL,
   `responders` int(11) DEFAULT NULL,
   `response_percent` decimal(16,2) DEFAULT NULL,
   `avg_nps_rating` decimal(16,2) DEFAULT NULL,
-  `promotors` decimal(16,2) DEFAULT NULL,
-  `detractors` decimal(16,2) DEFAULT NULL,
+  `promotors_percent` decimal(16,2) DEFAULT NULL,
+  `detractors_percent` decimal(16,2) DEFAULT NULL,
+  `first_day_of_week` date DEFAULT NULL,
   PRIMARY KEY (`nps_report_week_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
