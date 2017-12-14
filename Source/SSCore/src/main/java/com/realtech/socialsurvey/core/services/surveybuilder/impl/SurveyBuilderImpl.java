@@ -719,17 +719,21 @@ public class SurveyBuilderImpl implements SurveyBuilder {
         LOG.debug("Method modify0To10Answers() started.");
         
         Survey0To10Questions survey0To10Questions = surveyQuestion.getSurvey0To10Questions();
-               
+        if(survey0To10Questions == null){   
+            survey0To10Questions = new Survey0To10Questions();
+            survey0To10Questions.setCreatedBy( String.valueOf(user.getUserId()) );
+            survey0To10Questions.setCreatedOn( new Timestamp(System.currentTimeMillis()) );
+        }
         survey0To10Questions.setSurveyQuestion( surveyQuestion );
+        survey0To10Questions.setConsiderForScore( considerForScore );
+        survey0To10Questions.setIsNPSQuestion( isNPSQuestion );
         survey0To10Questions.setNotAtAllLikely( notAtAllLikely );
         survey0To10Questions.setVeryLikely( veryLikely );
         survey0To10Questions.setModifiedBy( String.valueOf(user.getUserId()) );
         survey0To10Questions.setModifiedOn( new Timestamp(System.currentTimeMillis()) );
-        survey0To10Questions.setIsNPSQuestion( isNPSQuestion );
-        survey0To10Questions.setConsiderForScore( considerForScore );
-        survey0To10Questions.setStatus( CommonConstants.STATUS_ACTIVE ); 
+        survey0To10Questions.setStatus( CommonConstants.STATUS_ACTIVE );     
  
-        survey0To10QuestionsDao.update( survey0To10Questions );
+        survey0To10QuestionsDao.saveOrUpdate( survey0To10Questions );
         survey0To10QuestionsDao.flush();
         LOG.debug( "Method modifyAnswersToQuestion() finished." );
 	}
