@@ -52,6 +52,7 @@
   							</c:if>
   							<c:if test="${profilemasterid == 1}"> 
  								<option value=<spring:message code="label.company.user.report.value" /> data-report="company-user"><spring:message code="label.company.user.report.key" /></option>
+ 								<option value=<spring:message code="label.nps.report.value" /> data-report="nps-report"><spring:message code="label.nps.report.key" /></option>
   							</c:if>
   								<option value=<spring:message code="label.survey.results.report.value" /> data-report="survey-results"><spring:message code="label.survey.results.report.key" /></option>
  								<option value=<spring:message code="label.survey.transaction.report.value" /> data-report="survey-transaction-summary"><spring:message code="label.survey.transaction.report.key" /></option>
@@ -65,6 +66,12 @@
 								<option value=2 data-report="thisMonth">This Month</option>
 								<option value=3 data-report="lastYear">Last Year</option>
 								<option value=4 data-report="lastMonth">Last Month</option>
+							</select>	
+						</div>
+					</div>
+					<div id="nps-report-time-div" class="float-left board-div hide">
+						<div class="dash-btn-dl-sd-admin time-selector" style="width:200px; margin-top:-5px">
+							<select id="nps-report-time-selector" class="float-left dash-download-sel-item board-selector-choice" style="width:100%">
 							</select>	
 						</div>
 					</div>
