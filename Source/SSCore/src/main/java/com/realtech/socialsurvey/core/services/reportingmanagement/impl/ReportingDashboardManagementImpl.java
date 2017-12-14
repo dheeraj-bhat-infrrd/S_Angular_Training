@@ -43,6 +43,8 @@ import com.realtech.socialsurvey.core.dao.CompanyDetailsReportDao;
 import com.realtech.socialsurvey.core.dao.CompanyUserReportDao;
 import com.realtech.socialsurvey.core.dao.DigestDao;
 import com.realtech.socialsurvey.core.dao.FileUploadDao;
+import com.realtech.socialsurvey.core.dao.NpsReportMonthDao;
+import com.realtech.socialsurvey.core.dao.NpsReportWeekDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.RegionDao;
 import com.realtech.socialsurvey.core.dao.ReportingSurveyPreInititationDao;
@@ -89,6 +91,8 @@ import com.realtech.socialsurvey.core.entities.Digest;
 import com.realtech.socialsurvey.core.entities.DigestTemplateData;
 import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.MonthlyDigestAggregate;
+import com.realtech.socialsurvey.core.entities.NpsReportMonth;
+import com.realtech.socialsurvey.core.entities.NpsReportWeek;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RankingRequirements;
 import com.realtech.socialsurvey.core.entities.Region;
@@ -299,9 +303,15 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
     @Autowired
     private OrganizationManagementService organizationManagementService;
-    
+
     @Autowired
     private ReportingSurveyPreInititationDao reportingSurveyPreInititationDao;
+
+    @Autowired
+    private NpsReportWeekDao npsReportWeekDao;
+
+    @Autowired
+    private NpsReportMonthDao npsReportMonthDao;
 
     @Value ( "${FILE_DIRECTORY_LOCATION}")
     private String fileDirectoryLocation;
@@ -3688,5 +3698,55 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             endTime = new Timestamp( endDate.getTime() );
         return reportingSurveyPreInititationDao.getIncompleteSurveyForReporting( entityType, entityId, startTime, endTime,
             startIndex, batchSize );
+    }
+
+
+    @Override
+    @Transactional
+    public List<NpsReportWeek> getNpsReportForAWeek( long companyId, int week, int year ) throws InvalidInputException
+    {
+        LOG.debug( "Started fetching NPS report for a week" );
+        List<NpsReportWeek> npsReportForWeekList = new ArrayList<>();
+        
+        if ( companyId <= 0 ) {
+            LOG.warn( "company Identifier can not be null" );
+            throw new InvalidInputException( "company ID is null." );
+        } else if ( week < 1 || week > 53 ) {
+            LOG.warn( "week not in range" );
+            throw new InvalidInputException( "week not in range" );
+        }
+        if ( year <= 0 ) {
+            LOG.warn( "year not in range" );
+            throw new InvalidInputException( "year not in range" );
+        }
+
+        npsReportForWeekList = npsReportWeekDao.fetchNpsReportWeek( companyId, week, year );
+        LOG.debug( "Finished fetching NPS report for a week" );
+        return npsReportForWeekList;
+    }
+
+
+    @Override
+    @Transactional
+    public List<NpsReportMonth> getNpsReportForAMonth( long companyId, int month, int year ) throws InvalidInputException
+    {
+        LOG.debug( "Started fetching NPS report for a month" );
+        List<NpsReportMonth> npsReportForMonthList = new ArrayList<>();
+        
+        if ( companyId <= 0 ) {
+            LOG.warn( "company Identifier can not be null" );
+            throw new InvalidInputException( "company ID is null." );
+        } else if ( month <= 0 || month > 12 ) {
+            LOG.warn( "month not in range" );
+            throw new InvalidInputException( "month not in range" );
+        }
+        if ( year <= 0 ) {
+            LOG.warn( "year not in range" );
+            throw new InvalidInputException( "year not in range" );
+        }
+
+        npsReportForMonthList = npsReportMonthDao.fetchNpsReportMonth( companyId, month, year );
+        LOG.debug( "Finished fetching NPS report for a week" );
+        return npsReportForMonthList;
     }
 }

@@ -168,6 +168,8 @@
 				<value>com.realtech.socialsurvey.core.entities.SurveyResultsReportRegion</value>
 				<value>com.realtech.socialsurvey.core.entities.CompanyDetailsReport</value>
 				<value>com.realtech.socialsurvey.core.entities.ReportingSurveyPreInititation</value>
+				<value>com.realtech.socialsurvey.core.entities.NpsReportWeek</value>
+				<value>com.realtech.socialsurvey.core.entities.NpsReportMonth</value>
 			</list>
 		</property>
 	</bean>
