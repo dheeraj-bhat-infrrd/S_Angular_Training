@@ -120,7 +120,7 @@ public interface SurveyHandler
     public String getSurveyUrl( long agentId, String customerEmail, String baseUrl ) throws InvalidInputException;
 
 
-    public void changeStatusOfSurvey( String surveyId, boolean editable );
+    public void markSurveyAsRetake( String surveyId, boolean editable );
 
 
     public void storeSPIandSendSurveyInvitationMail( String custFirstName, String custLastName, String custEmail,
@@ -350,7 +350,7 @@ public interface SurveyHandler
     SurveyDetails getSurveyBySurveyPreIntitiationId( long surveyPreIntitiationId );
 
 
-    SurveysAndReviewsVO getSurveysByFilterCriteria( String status, String mood , Long startSurveyID, Date startReviewDate , Date startTransactionDate , List<Long> userIds ,  int startIndex, int count , long companyId);
+    SurveysAndReviewsVO getSurveysByFilterCriteria( String mood , Long startSurveyID, Date startReviewDate , Date startTransactionDate , List<Long> userIds , boolean isRetaken,  int startIndex, int count , long companyId);
 
 
     public void prepareAndSendInvitationMail( SurveyPreInitiation survey ) throws InvalidInputException, UndeliveredEmailException, ProfileNotFoundException;
@@ -406,5 +406,17 @@ public interface SurveyHandler
 
 
     public boolean isFileAlreadyUploaded( String fileName, String uploaderEmail );
+
+
+    public Integer getSurveysCountByFilterCriteria( String mood, Long startSurveyID, Date startReviewDate,
+        Date startTransactionDate, List<Long> userIds, boolean isRetaken, long companyId );
+
+
+    public Float getSurveysAvgScoreByFilterCriteria( String mood, Long startSurveyID, Date startReviewDate,
+        Date startTransactionDate, List<Long> userIds, boolean isRetaken, long companyId );
+
+
+    public SurveysAndReviewsVO getIncompelteSurveysByFilterCriteria( Long startSurveyID, Date startTransactionDate,
+        List<Long> userIds, int startIndex, int count, long companyId );
 
 }

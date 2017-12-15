@@ -11,12 +11,15 @@ import java.sql.Timestamp;
 import java.text.DateFormatSymbols;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
@@ -203,10 +206,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
     @Autowired
     private RegionDao regionDao;
-    
+
     @Autowired
     private UserDao userDao;
-    
+
     @Autowired
     private CompanyDetailsReportDao companyDetailsReportDao;
 
@@ -303,7 +306,6 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     @Autowired
     private OrganizationManagementService organizationManagementService;
 
-    
     @Autowired
     private ReportingSurveyPreInititationDao reportingSurveyPreInititationDao;
 
@@ -324,6 +326,12 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
     @Value ( "${TRANSACTION_MONITOR_SUPPORT_EMAIL}")
     private String transactionMonitorSupportEmail;
+
+    @Value ( "${SEND_DIGEST_TO_APPLICATION_ADMIN_ONLY}")
+    private String sendDigestToApplicationAdminOnly;
+
+    @Value ( "${APPLICATION_ADMIN_EMAIL}")
+    private String applicationAdminEmail;
 
     public static final int DIGEST_MAIL_START_INDEX = 0;
 
@@ -702,7 +710,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                     companyUserReportList.add( "" );
                 }
                 if ( companyUserReport.getLastPostDateTwitter() != null ) {
-                    companyUserReportList.add( companyUserReport.getLastPostDateFb() );
+                    companyUserReportList.add( companyUserReport.getLastPostDateTwitter() );
                 } else {
                     companyUserReportList.add( "" );
                 }
@@ -1677,7 +1685,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 recentActivityList.add( CommonConstants.REPORTING_USER_RANKING_MONTHLY_REPORT );
             } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT ) {
                 recentActivityList.add( CommonConstants.REPORTING_USER_RANKING_YEARLY_REPORT );
-            }else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_INCOMPLETE_SURVEY_REPORT ) {
+            } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_INCOMPLETE_SURVEY_REPORT ) {
                 recentActivityList.add( CommonConstants.REPORTING_INCOMPLETE_SURVEY_REPORT );
             }
             recentActivityList.add( fileUpload.getStartDate() );
@@ -1692,14 +1700,16 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         return recentActivity;
 
     }
-    
+
+
     @Override
-    public Object getAccountStatisticsRecentActivity(Long reportId){
-    	FileUpload fileUpload = null;
-    	if(reportId == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_DETAILS_REPORT){
-    		fileUpload = fileUploadDao.getLatestActivityForReporting(reportId);
-    	}
-    	return fileUpload;
+    public Object getAccountStatisticsRecentActivity( Long reportId )
+    {
+        FileUpload fileUpload = null;
+        if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_DETAILS_REPORT ) {
+            fileUpload = fileUploadDao.getLatestActivityForReporting( reportId );
+        }
+        return fileUpload;
     }
 
 
@@ -1903,22 +1913,26 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         }
         return surveyResultsReportVO;
     }
-    
+
+
     @Override
-    public String generateIncompleteSurveyResultsReport( Long entityId, String entityType, Long userId, Timestamp startDate, Timestamp endDate )
-        throws UnsupportedEncodingException, NonFatalException, ParseException{
-        LOG.info( "Generating incomplete survey results report for enitityId {}, entityType {}, userId {} startDate {}, endDate {}",
+    public String generateIncompleteSurveyResultsReport( Long entityId, String entityType, Long userId, Timestamp startDate,
+        Timestamp endDate ) throws UnsupportedEncodingException, NonFatalException, ParseException
+    {
+        LOG.info(
+            "Generating incomplete survey results report for enitityId {}, entityType {}, userId {} startDate {}, endDate {}",
             entityId, entityType, userId, startDate, endDate );
         User user = userManagementService.getUserByUserId( userId );
         LOG.debug( "Found user {}", user );
-        String fileName = "Incomplete_Survey_Results_Report_" + entityType + "-" + user.getFirstName() + "_" + user.getLastName()
-            + "-" + ( Calendar.getInstance().getTimeInMillis() ) + CommonConstants.EXCEL_FILE_EXTENSION;
+        String fileName = "Incomplete_Survey_Results_Report_" + entityType + "-" + user.getFirstName() + "_"
+            + user.getLastName() + "-" + ( Calendar.getInstance().getTimeInMillis() ) + CommonConstants.EXCEL_FILE_EXTENSION;
         LOG.debug( "fileName {} ", fileName );
         XSSFWorkbook workbook = this.downloadIncompleteSurveyResultsReport( entityId, entityType, startDate, endDate );
         LOG.debug( "Writing {} number of records into file {}", workbook.getSheetAt( 0 ).getLastRowNum(), fileName );
         return createExcelFileAndSaveInAmazonS3( fileName, workbook );
     }
-    
+
+
     private XSSFWorkbook downloadIncompleteSurveyResultsReport( long entityId, String entityType, Timestamp startDate,
         Timestamp endDate ) throws ParseException
     {
@@ -1933,7 +1947,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
         List<ReportingSurveyPreInititation> incompleteSurvey = null;
         do {
-            incompleteSurvey = getIncompleteSurveyResultResponse(entityType, entityId, startDate, endDate, startIndex, batchSize );
+            incompleteSurvey = getIncompleteSurveyResultResponse( entityType, entityId, startDate, endDate, startIndex,
+                batchSize );
             if ( incompleteSurvey != null && !incompleteSurvey.isEmpty() ) {
                 enterNext = startIndex + 1;
                 data = workbookData.getIncompleteSurveyResultsReportToBeWrittenInSheet( incompleteSurvey, enterNext );
@@ -1943,20 +1958,20 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 //calculate startIndex. 
                 startIndex = startIndex + batchSize;
             }
-        } while ( incompleteSurvey != null && !incompleteSurvey.isEmpty()
-            && incompleteSurvey.size() >= batchSize );
+        } while ( incompleteSurvey != null && !incompleteSurvey.isEmpty() && incompleteSurvey.size() >= batchSize );
 
         XSSFSheet sheet = workbook.getSheetAt( 0 );
         makeRowBold( workbook, sheet.getRow( 0 ) );
         return workbook;
 
     }
-    
-    private List<ReportingSurveyPreInititation> getIncompleteSurveyResultResponse(String entityType, Long companyId, Timestamp startDate,
-        Timestamp endDate, int startIndex, int batchSize )
+
+
+    private List<ReportingSurveyPreInititation> getIncompleteSurveyResultResponse( String entityType, Long companyId,
+        Timestamp startDate, Timestamp endDate, int startIndex, int batchSize )
     {
-        Response response = ssApiBatchIntergrationBuilder.getIntegrationApi().getIncompleteSurveyResultsReport( companyId, entityType, startDate,
-            endDate, startIndex, batchSize );
+        Response response = ssApiBatchIntergrationBuilder.getIntegrationApi().getIncompleteSurveyResultsReport( companyId,
+            entityType, startDate, endDate, startIndex, batchSize );
         String responseString = response != null ? new String( ( (TypedByteArray) response.getBody() ).getBytes() ) : null;
         List<ReportingSurveyPreInititation> incompleteSurvey = null;
         if ( responseString != null ) {
@@ -2121,7 +2136,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     public List<List<Object>> getUserRankingThisYear( String entityType, Long entityId, int year, int startIndex,
         int batchSize )
     {
-        LOG.info( "function to getUserRankingThisYear based on entityType: {} , entityId: {} started ",entityType,entityId );
+        LOG.info( "function to getUserRankingThisYear based on entityType: {} , entityId: {} started ", entityType, entityId );
         List<List<Object>> userRanking = new ArrayList<>();
 
         if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
@@ -2179,7 +2194,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 userRanking.add( userRankingThisYearBranchList );
             }
         }
-        LOG.info( "function to getUserRankingThisYear based on ended");
+        LOG.info( "function to getUserRankingThisYear based on ended" );
 
         return userRanking;
     }
@@ -2944,7 +2959,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     @Override
     public List<List<Object>> getScoreStatsForQuestion( Long entityId, String entityType, int currentMonth, int currentYear )
     {
-    	LOG.debug("Service method call for get score stats for questions.");
+        LOG.debug( "Service method call for get score stats for questions." );
         List<List<Object>> scoreStatsForQuestion = new ArrayList<>();
         int startMonth = 0;
         int startYear = currentYear - 1;
@@ -3092,7 +3107,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
     @Override
     public MonthlyDigestAggregate prepareMonthlyDigestMailData( long companyId, String companyName, int monthUnderConcern,
-        int year, String recipientMail ) throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException
+        int year ) throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException
     {
         LOG.debug( "method prepareMonthlyDigestMailData() started" );
 
@@ -3108,13 +3123,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         } else if ( monthUnderConcern < 1 || monthUnderConcern > 12 ) {
             LOG.error( "current month should be in the range 1 - 12" );
             throw new InvalidInputException( "Current month should be in the range 1 - 12." );
-        } else if ( StringUtils.isEmpty( recipientMail ) ) {
-            LOG.error( "Recipient Email is not specified." );
-            throw new InvalidInputException( "Recipient Email is not specified." );
         }
 
         MonthlyDigestAggregate digestAggregate = buildMonthlyDigestAggregate( companyId, companyName, monthUnderConcern, year,
-            recipientMail, buildOrderedMonthlyDigestList( getDigestDataForLastFourMonths( companyId, monthUnderConcern, year ),
+            buildOrderedMonthlyDigestList( getDigestDataForLastFourMonths( companyId, monthUnderConcern, year ),
                 monthUnderConcern ),
             getTopTenUserRankingsThisMonthForACompany( companyId, monthUnderConcern, year ) );
 
@@ -3124,7 +3136,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
 
     private MonthlyDigestAggregate buildMonthlyDigestAggregate( long companyId, String companyName, int monthUnderConcern,
-        int year, String recipientMailId, List<Digest> digestList, List<UserRankingPastMonthMain> userRankingList )
+        int year, List<Digest> digestList, List<UserRankingPastMonthMain> userRankingList )
     {
         LOG.debug( "method buildMonthlyDigestAggregate() started" );
 
@@ -3133,7 +3145,6 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         digestAggregate.setCompanyName( companyName );
         digestAggregate.setMonthUnderConcern( new DateFormatSymbols().getMonths()[monthUnderConcern - 1] );
         digestAggregate.setYearUnderConcern( String.valueOf( year ) );
-        digestAggregate.setRecipientMailId( recipientMailId );
 
         // initialize digestTemplate list
         digestAggregate.setDigestList( new ArrayList<DigestTemplateData>() );
@@ -3424,8 +3435,14 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             int batchSize = DIGEST_MAIL_BATCH_SIZE;
             List<CompanyDigestRequestData> digestRequestList = null;
 
-            do {
+            // create a Calendar instance with time zone and locale of the device
+            Calendar calendar = Calendar.getInstance();
 
+            // set month and year
+            int month = calendar.get( Calendar.MONTH );
+            int year = calendar.get( Calendar.YEAR );
+
+            do {
 
                 // fetch a list of digest requests for companies who have enabled send monthly digest mail feature 
                 digestRequestList = getCompanyRequestDataInBatch( startIndex, batchSize );
@@ -3433,15 +3450,26 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 if ( digestRequestList != null ) {
                     for ( CompanyDigestRequestData company : digestRequestList ) {
 
-
-                        // create a Calendar instance with time zone and locale of the device
-                        Calendar calendar = Calendar.getInstance();
-
                         try {
 
                             // get the digest aggregate object
-                            MonthlyDigestAggregate digestAggregate = getMonthlyDigestAggregateForCompany( company,
-                                calendar.get( Calendar.MONTH ), calendar.get( Calendar.YEAR ) );
+                            MonthlyDigestAggregate digestAggregate = getMonthlyDigestAggregateForCompany( company, month,
+                                year );
+
+
+                            // manage recipients
+                            if ( digestAggregate != null ) {
+
+                                // check for send digest to administrator switch
+                                if ( CommonConstants.YES_STRING.equals( sendDigestToApplicationAdminOnly ) ) {
+                                    digestAggregate.setRecipientMailIds( new HashSet<String>() );
+                                    digestAggregate.getRecipientMailIds().add( applicationAdminEmail );
+                                } else if ( company.getRecipientMailIds() != null
+                                    && !company.getRecipientMailIds().isEmpty() ) {
+                                    digestAggregate.setRecipientMailIds( company.getRecipientMailIds() );
+                                }
+                            }
+
 
                             // send the email to the company administrator
                             emailServices.sendMonthlyDigestMail( digestAggregate );
@@ -3515,24 +3543,38 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             digestRequestData = new ArrayList<>();
 
             for ( OrganizationUnitSettings companySettings : companyList ) {
-
-                CompanyDigestRequestData digestRequest = new CompanyDigestRequestData();
+                
                 User companyAdmin = null;
-                try {
-                    companyAdmin = userManagementService.getCompanyAdmin( companySettings.getIden() );
-                } catch ( InvalidInputException error ) {
-                    LOG.error( "profile master error in getCompaniesOptedForDigestMail()" );
+
+                if( companySettings.isSendMonthlyDigestMail() ){
+                    try {
+                        companyAdmin = userManagementService.getCompanyAdmin( companySettings.getIden() );
+                    } catch ( InvalidInputException error ) {
+                        LOG.error( "profile master error in getCompaniesOptedForDigestMail()" );
+                    }
                 }
 
-                digestRequest.setCompanyId( companySettings.getIden() );
-                digestRequest.setCompanyName(
-                    companySettings.getContact_details() != null ? companySettings.getContact_details().getName() : null );
-
-                if ( companyAdmin != null ) {
-                    digestRequest.setRecipientMailId( companyAdmin.getEmailId() );
+                
+                Set<String> digestRecipients = new HashSet<>();
+                
+                if ( companyAdmin != null ) {                    
+                    digestRecipients.add( companyAdmin.getEmailId() );
+                } 
+                
+                if( companySettings.getDigestRecipients() != null ){
+                    digestRecipients.addAll( companySettings.getDigestRecipients() );
                 }
+                
+                if( !digestRecipients.isEmpty() ){
+                    CompanyDigestRequestData digestRequest = new CompanyDigestRequestData();
+                    
+                    digestRequest.setCompanyId( companySettings.getIden() );
+                    digestRequest.setCompanyName(
+                        companySettings.getContact_details() != null ? companySettings.getContact_details().getName() : null );
 
-                digestRequestData.add( digestRequest );
+                    digestRequest.setRecipientMailIds( digestRecipients );
+                    digestRequestData.add( digestRequest ); 
+                }
             }
         }
         return digestRequestData;
@@ -3558,8 +3600,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     {
         LOG.debug( "method getMonthlyDigestAggregateForCompany() running" );
 
-        Response response = ssApiBatchIntergrationBuilder.getIntegrationApi().buildMonthlyDigestAggregate(
-            company.getCompanyId(), company.getCompanyName(), month, year, company.getRecipientMailId() );
+        Response response = ssApiBatchIntergrationBuilder.getIntegrationApi()
+            .buildMonthlyDigestAggregate( company.getCompanyId(), company.getCompanyName(), month, year );
 
         String responseString = StringEscapeUtils
             .unescapeJava( response != null ? new String( ( (TypedByteArray) response.getBody() ).getBytes() ) : null );
@@ -3641,8 +3683,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         return (List<CompanyView>) ( new Gson().fromJson( StringUtils.strip( companiesListString, "\"" ),
             new TypeToken<List<CompanyView>>() {}.getType() ) );
     }
-
-
+    
     @Override
     public void getCompaniesWithHighNotProcessedTransactions()
     {
@@ -3790,33 +3831,34 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     }
 
 
-	@Override
-	@Transactional ( value = "transactionManagerForReporting")
-	public List<CompanyDetailsReport> getCompanyDetailsReport( Long entityId, int startIndex,
-			int batchSize) throws InvalidInputException {
-		User user = userDao.findById(User.class, entityId);
-		List<CompanyDetailsReport> companyDetailsReportData = null;
-		if (user != null && (user.isSuperAdmin() || userManagementService.isUserSocialSurveyAdmin(entityId))) {
-			companyDetailsReportData = companyDetailsReportDao.getCompanyDetailsReportData(startIndex, batchSize);
-		}
-		return companyDetailsReportData;
-	}
+    @Transactional ( value = "transactionManagerForReporting")
+    public List<CompanyDetailsReport> getCompanyDetailsReport( Long entityId, int startIndex, int batchSize )
+        throws InvalidInputException
+    {
+        User user = userDao.findById( User.class, entityId );
+        List<CompanyDetailsReport> companyDetailsReportData = null;
+        if ( user != null && ( user.isSuperAdmin() || userManagementService.isUserSocialSurveyAdmin( entityId ) ) ) {
+            companyDetailsReportData = companyDetailsReportDao.getCompanyDetailsReportData( startIndex, batchSize );
+        }
+        return companyDetailsReportData;
+    }
+    
+    public String generateCompanyDetailsReport( long entityId, String entityType )
+        throws UnsupportedEncodingException, NonFatalException
+    {
+        LOG.info( "Generating account statistics report for enitityId {}, entityType {}", entityId, entityType );
+        String fileName = "Account_Statistics_Report" + "-" + ( Calendar.getInstance().getTimeInMillis() )
+            + CommonConstants.EXCEL_FILE_EXTENSION;
+        LOG.debug( "fileName {} ", fileName );
+        XSSFWorkbook workbook = this.downloadCompanyDetailsReport( entityId, entityType );
+        LOG.debug( "Writing {} number of records into file {}", workbook.getSheetAt( 0 ).getLastRowNum(), fileName );
+        return createExcelFileAndSaveInAmazonS3( fileName, workbook );
+    }
 
 
-	@Override
-	public String generateCompanyDetailsReport(long entityId, String entityType) throws UnsupportedEncodingException, NonFatalException {
-		LOG.info( "Generating account statistics report for enitityId {}, entityType {}",entityId, entityType);
-	        String fileName = "Account_Statistics_Report" + "-" + ( Calendar.getInstance().getTimeInMillis() ) 
-	        		+ CommonConstants.EXCEL_FILE_EXTENSION;
-	        LOG.debug( "fileName {} ", fileName );
-	        XSSFWorkbook workbook = this.downloadCompanyDetailsReport( entityId, entityType );
-	        LOG.debug( "Writing {} number of records into file {}", workbook.getSheetAt( 0 ).getLastRowNum(), fileName );
-	        return createExcelFileAndSaveInAmazonS3( fileName, workbook );
-	}
-
-
-	private XSSFWorkbook downloadCompanyDetailsReport(long entityId, String entityType) {
-		int startIndex = 0;
+    private XSSFWorkbook downloadCompanyDetailsReport( long entityId, String entityType )
+    {
+        int startIndex = 0;
         int batchSize = CommonConstants.BATCH_SIZE;
         int enterNext = 1;
 
@@ -3827,10 +3869,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
         List<CompanyDetailsReport> companyDetailsReportList = null;
         do {
-        	companyDetailsReportList = getCompanyDetailsResponse(entityType, entityId, startIndex, batchSize );
+            companyDetailsReportList = getCompanyDetailsResponse( entityType, entityId, startIndex, batchSize );
             if ( companyDetailsReportList != null && !companyDetailsReportList.isEmpty() ) {
                 enterNext = startIndex + 1;
-                data = workbookData.getCompanyDetailsReportToBeWrittenInSheet( companyDetailsReportList,enterNext );
+                data = workbookData.getCompanyDetailsReportToBeWrittenInSheet( companyDetailsReportList, enterNext );
                 LOG.debug( "Got {} records starting at {} index", data.size(), enterNext );
                 //use the created workbook when writing the header answer rewrite the same. 
                 workbook = workbookOperations.writeToWorkbook( data, workbook, enterNext );
@@ -3843,25 +3885,29 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         XSSFSheet sheet = workbook.getSheetAt( 0 );
         makeRowBold( workbook, sheet.getRow( 0 ) );
         return workbook;
-	}
+    }
 
 
-	private List<CompanyDetailsReport> getCompanyDetailsResponse(String entityType, long entityId, int startIndex,
-			int batchSize) {
-		Response response = ssApiBatchIntergrationBuilder.getIntegrationApi().getCompanyDetailsReport(entityType, entityId, startIndex, batchSize );
-	        String responseString = response != null ? new String( ( (TypedByteArray) response.getBody() ).getBytes() ) : null;
-	        List<CompanyDetailsReport> companyDetailsReportList = null;
-	        if ( responseString != null ) {
-	            //since the string has ""abc"" an extra quote
-	            responseString = responseString.substring( 1, responseString.length() - 1 );
-	            //Escape characters
-	            responseString = StringEscapeUtils.unescapeJava( responseString );
-	            Type listType = new TypeToken<List<CompanyDetailsReport>>() {}.getType();
-	            companyDetailsReportList = new Gson().fromJson( responseString, listType );
+    private List<CompanyDetailsReport> getCompanyDetailsResponse( String entityType, long entityId, int startIndex,
+        int batchSize )
+    {
+        Response response = ssApiBatchIntergrationBuilder.getIntegrationApi().getCompanyDetailsReport( entityType, entityId,
+            startIndex, batchSize );
+        String responseString = response != null ? new String( ( (TypedByteArray) response.getBody() ).getBytes() ) : null;
+        List<CompanyDetailsReport> companyDetailsReportList = null;
+        if ( responseString != null ) {
+            //since the string has ""abc"" an extra quote
+            responseString = responseString.substring( 1, responseString.length() - 1 );
+            //Escape characters
+            responseString = StringEscapeUtils.unescapeJava( responseString );
+            Type listType = new TypeToken<List<CompanyDetailsReport>>() {}.getType();
+            companyDetailsReportList = new Gson().fromJson( responseString, listType );
 
-	        }
-	        return companyDetailsReportList;
-	}
+        }
+        return companyDetailsReportList;
+    }
+
+
     /**
      * Method to fetch reviews based on the profile level specified, iden is one of
      * agentId/branchId/regionId or companyId based on the profile level

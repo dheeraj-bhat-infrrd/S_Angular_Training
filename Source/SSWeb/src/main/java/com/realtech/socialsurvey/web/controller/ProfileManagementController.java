@@ -460,7 +460,7 @@ public class ProfileManagementController
 
                 String json = new Gson().toJson( individualProfile );
                 model.addAttribute( "profileJson", json );
-
+                model.addAttribute( "companyProfileName", companyProfile.getProfileName() );
                 double averageRating = profileManagementService.getAverageRatings( agentId,
                     CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false );
                 model.addAttribute( "averageRating", averageRating );
