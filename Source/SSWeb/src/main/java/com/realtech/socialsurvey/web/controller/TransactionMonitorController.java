@@ -242,7 +242,7 @@ public class TransactionMonitorController
 
         try {
             
-            if(! StringUtils.equalsIgnoreCase( alertType, CommonConstants.ALERT_TYPE_ERROR ) && ! StringUtils.equalsIgnoreCase( alertType, CommonConstants.ALERT_TYPE_WARNING))
+            if(! StringUtils.equalsIgnoreCase( alertType, CommonConstants.ALERT_TYPE_ERROR ) && ! StringUtils.equalsIgnoreCase( alertType, CommonConstants.ALERT_TYPE_WARNING) && StringUtils.equalsIgnoreCase( alertType, CommonConstants.ALERT_TYPE_NORMAL ))
             {
                 throw new InvalidInputException( "Wrong alert type passed " );                
             }  

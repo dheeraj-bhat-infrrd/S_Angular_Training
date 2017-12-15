@@ -2420,7 +2420,7 @@ public class EmailServicesImpl implements EmailServices
         }
         if ( mailBody == null || mailBody.isEmpty() ) {
             LOG.error( "mailBody is empty or null for sendNoTransactionAlertMail " );
-            throw new InvalidInputException( "Recipient email Id is empty or null for sendNoTransactionAlertMail " );
+            throw new InvalidInputException( "mailBody is empty or null for sendNoTransactionAlertMail " );
         }
         
 

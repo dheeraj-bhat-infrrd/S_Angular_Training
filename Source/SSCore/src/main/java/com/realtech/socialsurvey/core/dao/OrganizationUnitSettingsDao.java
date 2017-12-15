@@ -288,5 +288,5 @@ public interface OrganizationUnitSettingsDao
      * @param alertType
      * @return
      */
-    public List<OrganizationUnitSettings> fetchCompaniesByAlertType( String alertType );
+    public List<OrganizationUnitSettings> fetchCompaniesByAlertType( String alertType , List<Long> companyIds );
 }

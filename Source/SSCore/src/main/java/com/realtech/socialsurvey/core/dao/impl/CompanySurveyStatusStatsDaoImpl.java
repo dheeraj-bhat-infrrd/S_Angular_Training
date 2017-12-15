@@ -148,4 +148,57 @@ public class CompanySurveyStatusStatsDaoImpl extends GenericReportingDaoImpl<Com
         LOG.info( "method getSurveyStatusCountForCompanyForPastNDays finished for companyId " + companyIds );
         return companiesSurveyStatsMap;
     }
+    
+    
+    @Override
+    @SuppressWarnings ( "unchecked")
+    public Map<Long, Long> getTotalTransactionCountForCompaniesAfterSentDate( Date surveySentDate )
+    {
+        LOG.info( "method getTotalTransactionCountForCompaniesAfterSentDate started for surveySentDate " + surveySentDate );
+        Map<Long, Long> companySentSurveyCountsMap= new HashMap<Long, Long>();
+        
+        Criteria criteria = getSession().createCriteria( CompanySurveyStatusStats.class );
+        criteria.add( Restrictions.ge( CommonConstants.TRANSACTION_MONITOR_DATE_COLUMN, surveySentDate ) );
+        criteria.setProjection( Projections.projectionList().add(Projections.groupProperty("companyId")).add(  Projections.sum("transactionReceivedCount") ) );
+        List<Object[]> companySentSurveyCountsList = criteria.list();
+        for(Object[] companySentSurveyCount : companySentSurveyCountsList){
+            companySentSurveyCountsMap.put( (Long) companySentSurveyCount[0] , (Long) companySentSurveyCount[1] );
+        }
+        
+        LOG.info( "method getTotalTransactionCountForCompaniesAfterSentDate finished for  surveySentDate " + surveySentDate );
+        return companySentSurveyCountsMap;
+
+    }
+    
+    
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public Map<Long , List<CompanySurveyStatusStats>> getSurveyStatusCountForAllCompaniesForPastNDays( Date startDate, Date endDate )
+    {
+        LOG.info( "method getSurveyStatusCountForAllCompaniesForPastNDays started" );
+       
+        Criteria criteria = getSession().createCriteria( CompanySurveyStatusStats.class );
+        
+        if(startDate != null){
+            criteria.add( Restrictions.ge( CommonConstants.TRANSACTION_MONITOR_DATE_COLUMN, startDate ) );            
+        }
+        
+        if(endDate != null){
+            criteria.add( Restrictions.le( CommonConstants.TRANSACTION_MONITOR_DATE_COLUMN, endDate ) );            
+        }
+        List<CompanySurveyStatusStats> companySurveyCountsList = criteria.list();
+
+        //fill stats data to company map
+        Map<Long , List<CompanySurveyStatusStats>> companiesSurveyStatsMap = new HashMap<Long, List<CompanySurveyStatusStats>>();
+        for(CompanySurveyStatusStats companySurveyStats : companySurveyCountsList){
+            List<CompanySurveyStatusStats> existingSurveyStatsList = companiesSurveyStatsMap.get(  companySurveyStats.getCompanyId()  );
+            if(existingSurveyStatsList == null)
+                existingSurveyStatsList = new ArrayList<CompanySurveyStatusStats>();
+            existingSurveyStatsList.add( companySurveyStats );
+            companiesSurveyStatsMap.put( companySurveyStats.getCompanyId(), existingSurveyStatsList );
+        }
+        
+        LOG.info( "method getSurveyStatusCountForAllCompaniesForPastNDays finished" );
+        return companiesSurveyStatsMap;
+    }
 }
