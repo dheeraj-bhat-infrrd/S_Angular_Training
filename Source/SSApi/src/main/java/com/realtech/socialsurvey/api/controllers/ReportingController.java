@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import retrofit.client.Response;
+import retrofit.http.GET;
+
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.entities.CompanyDetailsReport;
 import com.realtech.socialsurvey.core.entities.CompanyDigestRequestData;
@@ -585,4 +588,51 @@ public class ReportingController
         return new Gson().toJson( reportingDashboardManagement.getIncompleteSurvey( entityId, entityType,
             startDate, endDate, startIndex, batchSize ) );
     }
+    
+    @RequestMapping ( value = "/gettotaltransactioncountforpastndays", method = RequestMethod.GET)
+    @ApiOperation ( value = "Fetch the transaction counts for companies for  past n days ")
+    public String getTotalTransactionCountForPastNDays()
+    {
+        LOGGER.info( "Fetch total survey counts for companies for the n days" );
+        Map<Long, Long> companySurveyStatsCountsMap = activityManagementService.getTotalTransactionCountForPast3DaysForCompanies();
+        return new Gson().toJson( companySurveyStatsCountsMap );
+    }
+
+    @RequestMapping ( value = "/gettransactioncountforpreviousday", method = RequestMethod.GET)
+    @ApiOperation ( value = "Fetch the transaction counts for companies for  previous day")
+    public String getTransactionCountForPreviousDay()
+    {
+        LOGGER.info( "Fetch total survey counts for companies for the n days" );
+        Map<Long, Long> companySurveyStatsCountsMap = activityManagementService.getTransactionCountForPreviousDay();
+        return new Gson().toJson( companySurveyStatsCountsMap );
+    }
+    
+    
+    @RequestMapping ( value = "/getsendsurveycountforpreviousday", method = RequestMethod.GET)
+    @ApiOperation ( value = "Fetch the transaction counts for companies for previous days ")
+    public String getSendSurveyCountForPreviousDay()
+    {
+        LOGGER.info( "Fetch sent survey counts for companies for previous days" );
+        Map<Long, Long> companySurveyStatsCountsMap = activityManagementService.getSendSurveyCountForPreviousDay();
+        return new Gson().toJson( companySurveyStatsCountsMap );
+    }
+    
+    @RequestMapping ( value = "/getsurvestatsforpast7daysforallcompanies", method = RequestMethod.GET)
+    @ApiOperation ( value = "Fetch  survey stats for companies for past 7 days")
+    public String getSurveStatsForPast7daysForAllCompanies()
+    {
+        LOGGER.info( "Fetch  survey stats for companies for past 7 days" );
+        Map<Long, List<CompanySurveyStatusStats>> companySurveyStatsMap = activityManagementService.getSurveStatsForPast7daysForAllCompanies();
+        return new Gson().toJson( companySurveyStatsMap );
+    }
+    
+    @RequestMapping ( value = "/getsurvestatsforlasttoLatweekforallcompanies", method = RequestMethod.GET)
+    @ApiOperation ( value = "Fetch  survey stats for companies for last to last week")
+    public String getSurveStatsForLastToLatWeekForAllCompanies()
+    {
+        LOGGER.info( "Fetch  survey stats for companies for last to last week" );
+        Map<Long, List<CompanySurveyStatusStats>> companySurveyStatsMap = activityManagementService.getSurveStatsForLastToLatWeekForAllCompanies();
+        return new Gson().toJson( companySurveyStatsMap );
+    }
+    
 }

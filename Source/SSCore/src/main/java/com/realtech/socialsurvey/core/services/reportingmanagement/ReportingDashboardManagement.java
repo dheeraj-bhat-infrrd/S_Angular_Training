@@ -214,4 +214,7 @@ public interface ReportingDashboardManagement
 	 * @return
 	 */
 	public Object getAccountStatisticsRecentActivity(Long reportId);
+
+
+    void updateTransactionMonitorAlertsForCompanies() throws InvalidInputException;
 }

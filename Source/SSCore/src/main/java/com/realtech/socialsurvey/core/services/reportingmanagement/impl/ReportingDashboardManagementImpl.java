@@ -3675,4 +3675,147 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         return reportingSurveyPreInititationDao.getIncompleteSurveyForReporting( entityType, entityId, startTime, endTime,
             startIndex, batchSize );
     }
+    
+    @Override
+    public void updateTransactionMonitorAlertsForCompanies() throws InvalidInputException
+    {
+        LOG.debug( "Started updateTransactionMonitorAlertsForCompanies" );
+
+        //Method to call the api
+        Map<Long, List<CompanySurveyStatusStats>> surveStatsForPast7daysForAllCompanies = getSurveStatsForPast7daysForAllCompanies();
+        Map<Long, List<CompanySurveyStatusStats>> surveStatsForLastToLatWeekForAllCompanies = getSurveStatsForLastToLatWeekForAllCompanies();
+        
+        Map<Long, Long> transacionCountForPastNDays = getTotalTransactionCountForPastNDays();       
+        Map<Long, Long> transacionCountForPreviousDay = getTransactionCountForPreviousDay();
+        Map<Long, Long> sentSurveyCountForPreviousDay = getSendSurveyCountForPreviousDay();
+        
+        
+        List<Company> companies =  organizationManagementService.getAllActiveEnterpriseCompanies();
+        for(Company company : companies){
+            long companyId =  company.getCompanyId() ;
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(companyId);
+            
+            List<CompanySurveyStatusStats> surveStatsForPast7days = surveStatsForPast7daysForAllCompanies.get( companyId );
+            List<CompanySurveyStatusStats> surveStatsForLastToLatWeek = surveStatsForLastToLatWeekForAllCompanies.get( companyId);
+            
+            
+            //check if lessTransactionInPastDays is true
+            boolean isZeroIncomingTransactionInPastThreeDays = false;
+            if(transacionCountForPastNDays.get( companyId ) == null || transacionCountForPastNDays.get( companyId ) == 0){
+                isZeroIncomingTransactionInPastThreeDays = true;
+            }
+            
+            //check if isLessInvitationSentInPastSevenDays is true
+            boolean isLessInvitationSentInPastSevenDays = false;
+            if(getSentSurveyCountFromList(surveStatsForLastToLatWeek) < getSentSurveyCountFromList(surveStatsForLastToLatWeek) / 2){
+                isLessInvitationSentInPastSevenDays = true;
+            }
+            
+            //check if isMoreReminderSentInPastSevenDays is true
+            boolean isMoreReminderSentInPastSevenDays = false; 
+            if(getSentSurveyReminderCountFromList(surveStatsForLastToLatWeek) < getSentSurveyReminderCountFromList(surveStatsForLastToLatWeek) / 2){
+                isMoreReminderSentInPastSevenDays = true;
+            }
+            
+            //check if isZeroIncomingTransactionInPastOneDay is true
+            boolean isZeroIncomingTransactionInPastOneDay = false;
+            if(transacionCountForPreviousDay.get( companyId ) == null || transacionCountForPreviousDay.get( companyId ) == 0){
+                isZeroIncomingTransactionInPastOneDay = true;
+            }
+        }
+        
+        
+
+        LOG.info( "method updateTransactionMonitorAlertsForCompanies ended" );
+
+
+    }
+    
+    @SuppressWarnings ( "unchecked")
+    private Map<Long, Long> getTotalTransactionCountForPastNDays()
+    {
+        LOG.debug( "getTotalTransactionCountForPastNDays() started" );
+        Response companiesListResponse = ssApiBatchIntergrationBuilder.getIntegrationApi().getTotalTransactionCountForPastNDays();
+
+        String companiesListString = StringEscapeUtils.unescapeJava( companiesListResponse != null
+            ? new String( ( (TypedByteArray) companiesListResponse.getBody() ).getBytes() ) : null );
+
+        return (Map<Long, Long>) ( new Gson().fromJson( StringUtils.strip( companiesListString, "\"" ),
+            new TypeToken<List<Long>>() {}.getType() ) );
+    }
+    
+    @SuppressWarnings ( "unchecked")
+    private Map<Long, Long> getTransactionCountForPreviousDay()
+    {
+        LOG.debug( "getTransactionCountForPreviousDay() started" );
+        Response companiesListResponse = ssApiBatchIntergrationBuilder.getIntegrationApi().getTransactionCountForPreviousDay();
+
+        String companiesListString = StringEscapeUtils.unescapeJava( companiesListResponse != null
+            ? new String( ( (TypedByteArray) companiesListResponse.getBody() ).getBytes() ) : null );
+
+        return (Map<Long, Long>) ( new Gson().fromJson( StringUtils.strip( companiesListString, "\"" ),
+            new TypeToken<List<Long>>() {}.getType() ) );
+    }
+    
+    @SuppressWarnings ( "unchecked")
+    private Map<Long, Long> getSendSurveyCountForPreviousDay()
+    {
+        LOG.debug( "getSendSurveyCountForPreviousDay() started" );
+        Response companiesListResponse = ssApiBatchIntergrationBuilder.getIntegrationApi().getSendSurveyCountForPreviousDay();
+
+        String companiesListString = StringEscapeUtils.unescapeJava( companiesListResponse != null
+            ? new String( ( (TypedByteArray) companiesListResponse.getBody() ).getBytes() ) : null );
+
+        return (Map<Long, Long>) ( new Gson().fromJson( StringUtils.strip( companiesListString, "\"" ),
+            new TypeToken<List<Long>>() {}.getType() ) );
+    }
+    
+    @SuppressWarnings ( "unchecked")
+    private Map<Long, List<CompanySurveyStatusStats>> getSurveStatsForPast7daysForAllCompanies()
+    {
+        LOG.debug( "getSendSurveyCountForPreviousDay() started" );
+        Response companiesListResponse = ssApiBatchIntergrationBuilder.getIntegrationApi().getSurveStatsForPast7daysForAllCompanies();
+
+        String companiesListString = StringEscapeUtils.unescapeJava( companiesListResponse != null
+            ? new String( ( (TypedByteArray) companiesListResponse.getBody() ).getBytes() ) : null );
+
+        return (Map<Long, List<CompanySurveyStatusStats>>) ( new Gson().fromJson( StringUtils.strip( companiesListString, "\"" ),
+            new TypeToken<List<Long>>() {}.getType() ) );
+    }
+    
+    @SuppressWarnings ( "unchecked")
+    private Map<Long, List<CompanySurveyStatusStats>> getSurveStatsForLastToLatWeekForAllCompanies()
+    {
+        LOG.debug( "getSendSurveyCountForPreviousDay() started" );
+        Response companiesListResponse = ssApiBatchIntergrationBuilder.getIntegrationApi().getSurveStatsForLastToLatWeekForAllCompanies();
+
+        String companiesListString = StringEscapeUtils.unescapeJava( companiesListResponse != null
+            ? new String( ( (TypedByteArray) companiesListResponse.getBody() ).getBytes() ) : null );
+
+        return (Map<Long, List<CompanySurveyStatusStats>>) ( new Gson().fromJson( StringUtils.strip( companiesListString, "\"" ),
+            new TypeToken<List<Long>>() {}.getType() ) );
+    }
+    
+    
+    private int getSentSurveyCountFromList(List<CompanySurveyStatusStats> companySurveyStatusStatsList)
+    {
+        int sentSurveyCount = 0;
+        if(companySurveyStatusStatsList != null){
+            for(CompanySurveyStatusStats companySurveyStatusStats : companySurveyStatusStatsList){
+                sentSurveyCount += companySurveyStatusStats.getSurveyInvitationSentCount();
+            }
+        }
+        return sentSurveyCount;
+    }
+    
+    private int getSentSurveyReminderCountFromList(List<CompanySurveyStatusStats> companySurveyStatusStatsList)
+    {
+        int sentSurveyReminderCount = 0;
+        if(companySurveyStatusStatsList != null){
+            for(CompanySurveyStatusStats companySurveyStatusStats : companySurveyStatusStatsList){
+                sentSurveyReminderCount += companySurveyStatusStats.getSurveyReminderSentCount();
+            }
+        }
+        return sentSurveyReminderCount;
+    }
 }

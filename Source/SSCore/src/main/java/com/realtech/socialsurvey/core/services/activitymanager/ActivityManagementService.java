@@ -3,7 +3,6 @@ package com.realtech.socialsurvey.core.services.activitymanager;
 import java.util.List;
 import java.util.Map;
 
-import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyActiveUsersStats;
 import com.realtech.socialsurvey.core.entities.CompanySurveyStatusStats;
 import com.realtech.socialsurvey.core.entities.CompanyTransactionsSourceStats;
@@ -116,5 +115,28 @@ public interface ActivityManagementService
      */
     public List<TransactionMonitorGraphDataVO> getTransactionsStatsByDaysAndAlertType( int noOfDays, String alertType )
         throws InvalidInputException;
+
+
+    /**
+     * 
+     * @param noOfDays
+     * @return
+     */
+    public Map<Long, Long> getTotalTransactionCountForPast3DaysForCompanies();
+
+
+    public Map<Long, Long> getTransactionCountForPreviousDay();
+
+
+    public Map<Long, Long> getSendSurveyCountForPreviousDay();
+
+
+    public Map<Long, Long> getSendSurveyCountForPast7Days();
+
+
+    Map<Long, List<CompanySurveyStatusStats>> getSurveStatsForPast7daysForAllCompanies();
+
+
+    Map<Long, List<CompanySurveyStatusStats>> getSurveStatsForLastToLatWeekForAllCompanies();
 
 }

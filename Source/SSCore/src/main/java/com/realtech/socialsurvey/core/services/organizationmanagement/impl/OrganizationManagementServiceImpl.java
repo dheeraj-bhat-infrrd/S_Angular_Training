@@ -8311,6 +8311,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         OrganizationUnitSettings regionSettings, OrganizationUnitSettings branchSetting, OrganizationUnitSettings unitSettings )
     {
 
+        LOG.debug( "method  getFacebookPixelImageTagsFromHierarchy started");
         String facebookPixelTag = "";
 
         if ( companySettings != null && companySettings.getSocialMediaTokens() != null
@@ -8332,7 +8333,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             && unitSettings.getSocialMediaTokens().getFacebookPixelToken() != null )
             if ( !StringUtils.isEmpty( unitSettings.getSocialMediaTokens().getFacebookPixelToken().getPixelImgTag() ) )
                 facebookPixelTag += unitSettings.getSocialMediaTokens().getFacebookPixelToken().getPixelImgTag();
-
+        
+        LOG.debug( "the fenerated facebook pixel tag is : {}", facebookPixelTag );
+        LOG.debug( "method  getFacebookPixelImageTagsFromHierarchy finished");
         return facebookPixelTag;
     }
     
@@ -8344,6 +8347,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Override
     public List<OrganizationUnitSettings> getCompaniesByAlertType(String alertType)
     {
-        return organizationUnitSettingsDao.fetchCompaniesByAlertType( alertType );   
+        LOG.debug( "method getCompaniesByAlertType started for alertType {}" , alertType );
+        List<Company> companies =  getAllActiveEnterpriseCompanies();
+        List<Long> companyIds = new ArrayList<Long>();
+        
+        for(Company company : companies)
+            companyIds.add( company.getCompanyId() );
+        
+        LOG.debug( "method getCompaniesByAlertType finished for alertType {}" , alertType );
+        return organizationUnitSettingsDao.fetchCompaniesByAlertType( alertType, companyIds );   
     }
 }

@@ -3,7 +3,6 @@ package com.realtech.socialsurvey.core.services.activitymanager.impl;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +22,7 @@ import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyActiveUsersStats;
 import com.realtech.socialsurvey.core.entities.CompanySurveyStatusStats;
 import com.realtech.socialsurvey.core.entities.CompanyTransactionsSourceStats;
+import com.realtech.socialsurvey.core.entities.CompanyView;
 import com.realtech.socialsurvey.core.entities.EntityAlertDetails;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -398,7 +398,6 @@ public class ActivityManagementServiceImpl implements ActivityManagementService
         //get companyId list
         List<Long> companyIdList = new ArrayList<Long>();
         for(OrganizationUnitSettings company : companyList){
-            EntityAlertDetails alertDetails = company.getEntityAlertDetails();
             companyIdList.add( company.getIden() );
         }
         
@@ -423,4 +422,112 @@ public class ActivityManagementServiceImpl implements ActivityManagementService
         return transactionMonitorGraphDataVOs;
     }
     
+    /**
+     * 
+     */
+    @Override
+    @Transactional
+    public Map<Long, Long> getTotalTransactionCountForPast3DaysForCompanies()
+    {
+        LOG.info( "method getTotalTransactionCountForPastNDaysForCompanies started" );
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add( Calendar.DATE, - 3 );
+        Date oneMonthBackDate = new Date( calendar.getTimeInMillis() );
+
+        Map<Long, Long> companySurveyStatsCountsMap = companySurveyStatusStatsDao
+            .getTotalTransactionCountForCompaniesAfterSentDate( oneMonthBackDate );
+
+        LOG.info( "method getTotalTransactionCountForPastNDaysForCompanies ended" );
+        return companySurveyStatsCountsMap;
+    }
+    
+    
+    /**
+     * 
+     */
+    @Override
+    @Transactional
+    public Map<Long, Long> getTransactionCountForPreviousDay()
+    {
+        LOG.info( "method getTransactionCountForPreviousDay started" );
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add( Calendar.DATE, - 1 );
+        Date prevoiusDayDate = new Date( calendar.getTimeInMillis() );
+
+        Map<Long, Long> companySurveyStatsCountsMap = companySurveyStatusStatsDao
+            .getTotalTransactionCountForCompaniesAfterSentDate( prevoiusDayDate );
+
+        LOG.info( "method getTransactionCountForPreviousDay ended" );
+        return companySurveyStatsCountsMap;
+    }
+    
+    @Override
+    @Transactional
+    public Map<Long, Long> getSendSurveyCountForPast7Days()
+    {
+        LOG.info( "method getSendSurveyCountForPreviousDay started" );
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add( Calendar.DATE, - 7 );
+        Date sevenDaysBackDate = new Date( calendar.getTimeInMillis() );
+
+        Map<Long, Long> companySurveyStatsCountsMap = companySurveyStatusStatsDao
+            .getSentSurveyCountForCompaniesAfterSentDate( sevenDaysBackDate );
+        LOG.info( "method getSendSurveyCountForPreviousDay ended" );
+        return companySurveyStatsCountsMap;
+    }
+    
+    @Override
+    @Transactional
+    public Map<Long, Long> getSendSurveyCountForPreviousDay()
+    {
+        LOG.info( "method getSendSurveyCountForPreviousDay started" );
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add( Calendar.DATE, - 1 );
+        Date prevoiusDayDate = new Date( calendar.getTimeInMillis() );
+
+        Map<Long, Long> companySurveyStatsCountsMap = companySurveyStatusStatsDao
+            .getSentSurveyCountForCompaniesAfterSentDate( prevoiusDayDate );
+        LOG.info( "method getSendSurveyCountForPreviousDay ended" );
+        return companySurveyStatsCountsMap;
+    }
+    
+    @Override
+    @Transactional
+    public Map<Long, List<CompanySurveyStatusStats>> getSurveStatsForPast7daysForAllCompanies()
+    {
+        LOG.info( "method getSendSurveyCountForPreviousDay started" );
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add( Calendar.DATE, - 7 );
+        Date sevenDaysBackDate = new Date( calendar.getTimeInMillis() );
+
+        Map<Long, List<CompanySurveyStatusStats>> companySurveyStatsMap = companySurveyStatusStatsDao.getSurveyStatusCountForAllCompaniesForPastNDays( sevenDaysBackDate, null );
+        LOG.info( "method getSendSurveyCountForPreviousDay ended" );
+        return companySurveyStatsMap;
+    }
+    
+    
+    @Override
+    @Transactional
+    public Map<Long, List<CompanySurveyStatusStats>> getSurveStatsForLastToLatWeekForAllCompanies()
+    {
+        LOG.info( "method getSurveStatsForLastToLatWeekForAllCompanies started" );
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add( Calendar.DATE, - 14 );
+        Date startDate = new Date( calendar.getTimeInMillis() );
+        
+        Calendar calendar1 = Calendar.getInstance();
+        calendar1.add( Calendar.DATE, - 7 );
+        Date endDate = new Date( calendar.getTimeInMillis() );
+
+        Map<Long, List<CompanySurveyStatusStats>> companySurveyStatsMap = companySurveyStatusStatsDao.getSurveyStatusCountForAllCompaniesForPastNDays( startDate, endDate );
+        LOG.info( "method getSurveStatsForLastToLatWeekForAllCompanies ended" );
+        return companySurveyStatsMap;
+    }
+      
 }

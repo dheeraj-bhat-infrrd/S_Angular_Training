@@ -66,4 +66,39 @@ public interface SSApiBatchIntegration
 	Response getCompanyDetailsReport( @Query("entityType") String entityType, @Query("entityId") Long entityId,
 			@Query("startIndex") int startIndex, @Query("batchSize") int batchSize);
 
+
+    @GET ( "/v1/getallactiveenterprisecompanies")
+    Response getAllActiveEnterpriseCompanies();
+
+
+    @GET ( "/v1/getcompanieswithnotransactioninpastndays")
+    Response getCompaniesWithNoTransactionInPastNDays( @Query ( "noOfDays") int noOfDays );
+
+
+    @GET ( "/v1/validatesurveystatsforcompanies")
+    Response validateSurveyStatsForCompanies();
+
+
+    @GET ( "/v1/getsurveystatusstatsforpastonemonth")
+    Response getSurveyStatusStatsForPastOneMonth();
+
+
+    @GET ( "/v1/getcompanyactiveusercountforpastday")
+    Response getCompanyActiveUserCountForPastDay();
+
+    @GET ( "/v1/gettotaltransactioncountforpastndays")
+    Response getTotalTransactionCountForPastNDays();
+ 
+    @GET ( "/v1/gettransactioncountforpreviousday")
+    Response getTransactionCountForPreviousDay();
+ 
+    @GET ( "/v1/getsendsurveycountforpreviousday")
+    Response getSendSurveyCountForPreviousDay();
+ 
+    @GET ( "/v1/getsurvestatsforpast7daysforallcompanies")
+    Response getSurveStatsForPast7daysForAllCompanies();
+    
+    @GET ( "/v1/getsurvestatsforlasttoLatweekforallcompanies")
+    Response getSurveStatsForLastToLatWeekForAllCompanies();
+    
 }

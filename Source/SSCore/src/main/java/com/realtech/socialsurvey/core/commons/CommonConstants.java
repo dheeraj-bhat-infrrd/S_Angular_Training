@@ -1450,7 +1450,8 @@ public interface CommonConstants
     
     //trnsaction monitor alert type
     public static final String ALERT_TYPE_ERROR = "error";    
-    public static final String ALERT_TYPE_WARNING = "warning"; 
+    public static final String ALERT_TYPE_WARNING = "warning";
+    public static final String ALERT_TYPE_NORMAL = "normal"; 
  
 
 }
