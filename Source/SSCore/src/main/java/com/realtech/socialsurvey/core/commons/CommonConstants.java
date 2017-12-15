@@ -1399,6 +1399,7 @@ public interface CommonConstants
     public static final String THIS_YEAR="thisYear";
     public static final String LEADERBOARD_YEAR="year";
     public static final String LEADERBOARD_MONTH="month";
+    public static final String IS_ELIGIBLE = "isEligible";
     
     public static final String RANK = "rank";
     public static final String INTERNAL_BRANCH_RANK = "internalBranchRank";

@@ -41,12 +41,12 @@ public class ReportingController
 
     @RequestMapping ( value = "/getcompletionrate", method = RequestMethod.GET)
     @ApiOperation ( value = "Fetch Data for Completion Rate Graph")
-    public String getReportingCompletionRateApi( Long entityId, String entityType ) 
+    public String getReportingCompletionRateApi( Long entityId, String entityType )
     {
-        LOGGER.info( "Fetching Completion Rate Graph for entityType :{} and entityId : {}",entityType,entityId );
+        LOGGER.info( "Fetching Completion Rate Graph for entityType :{} and entityId : {}", entityType, entityId );
 
         String json = null;
-        
+
         List<List<Object>> completionRate = dashboardGraphManagement.getCompletionRate( entityId, entityType );
         json = new Gson().toJson( completionRate );
         return json;
@@ -56,9 +56,9 @@ public class ReportingController
 
     @RequestMapping ( value = "/getspsstats", method = RequestMethod.GET)
     @ApiOperation ( value = "Fetch Data for Survey Stats Graph")
-    public String getReportingSpsStats( Long entityId, String entityType ) 
+    public String getReportingSpsStats( Long entityId, String entityType )
     {
-    	LOGGER.info( "Fetching SPS stats Graph for entityType :{} and entityId : {}",entityType,entityId );
+        LOGGER.info( "Fetching SPS stats Graph for entityType :{} and entityId : {}", entityType, entityId );
 
         String json = null;
         List<List<Object>> spsStats = dashboardGraphManagement.getSpsStatsGraph( entityId, entityType );
@@ -72,7 +72,7 @@ public class ReportingController
     @ApiOperation ( value = "Fetch Data for Overview ")
     public String getSpsStatsFromOverview( Long entityId, String entityType ) throws NonFatalException
     {
-        LOGGER.info( "Fetching sps for overview for entityType : {} and entityId: {}",entityType,entityId );
+        LOGGER.info( "Fetching sps for overview for entityType : {} and entityId: {}", entityType, entityId );
 
         Map<String, Object> overviewMap = overviewManagement.fetchSpsAllTime( entityId, entityType );
         return new Gson().toJson( overviewMap );
@@ -92,7 +92,7 @@ public class ReportingController
 
     @RequestMapping ( value = "/getsurveystatsreport", method = RequestMethod.GET)
     @ApiOperation ( value = "Fetch Data for Survey Stats Reporting ")
-    public String getReportingSurveyStatsReport( Long entityId, String entityType ) 
+    public String getReportingSurveyStatsReport( Long entityId, String entityType )
     {
         LOGGER.info( "Fetching Survey Stats Graph" );
 
@@ -115,7 +115,8 @@ public class ReportingController
         json = new Gson().toJson( recentActivityList );
         return json;
     }
-    
+
+
     @RequestMapping ( value = "/getaccountstatisticsreportstatus", method = RequestMethod.GET)
     @ApiOperation ( value = "Fetch latest record for account statistics report. ")
     public String getAccountStatisticsRecentActivity( Long reportId ) throws NonFatalException
@@ -131,7 +132,7 @@ public class ReportingController
 
     @RequestMapping ( value = "/getuseradoptionreportsforreporting", method = RequestMethod.GET)
     @ApiOperation ( value = "Fetch User Adoption Report For Reporting ")
-    public String getUserAdoption( Long entityId, String entityType ) 
+    public String getUserAdoption( Long entityId, String entityType )
     {
         LOGGER.info( "Fetch User Adoption Report For Reporting" );
 
@@ -141,22 +142,25 @@ public class ReportingController
         return json;
     }
 
-    
-    @RequestMapping( value = "/getmaxquestionforcompany", method= RequestMethod.GET)
-    @ApiOperation( value = "Fetch Max Question For Company Report For Reporting")
-    public int getCompanyMaxQuestion(String entityType,Long entityId, Timestamp startDate, Timestamp endDate) 
+
+    @RequestMapping ( value = "/getmaxquestionforcompany", method = RequestMethod.GET)
+    @ApiOperation ( value = "Fetch Max Question For Company Report For Reporting")
+    public int getCompanyMaxQuestion( String entityType, Long entityId, Timestamp startDate, Timestamp endDate )
     {
-        LOGGER.info( "Fetch Max Question For Company Report For Reporting");
-        return reportingDashboardManagement.getMaxQuestionForSurveyResultsReport(entityType, entityId, startDate, endDate );
+        LOGGER.info( "Fetch Max Question For Company Report For Reporting" );
+        return reportingDashboardManagement.getMaxQuestionForSurveyResultsReport( entityType, entityId, startDate, endDate );
     }
-    
-    @RequestMapping( value = "/getsurveyresultsreport", method= RequestMethod.GET)
-    @ApiOperation( value = "Fetch Survey Results Report For Entity Type.")
-    public String getSurveyResultsReport(String entityType, Long entityId, Timestamp startDate, Timestamp endDate , int startIndex , int batchSize)
+
+
+    @RequestMapping ( value = "/getsurveyresultsreport", method = RequestMethod.GET)
+    @ApiOperation ( value = "Fetch Survey Results Report For Entity Type.")
+    public String getSurveyResultsReport( String entityType, Long entityId, Timestamp startDate, Timestamp endDate,
+        int startIndex, int batchSize )
     {
-        LOGGER.info( "Fetch Survey Results Report For Entity Type.");
-        Map<String,SurveyResultsReportVO> surveyResultsReportList = reportingDashboardManagement.getSurveyResultsReport(entityType,entityId,startDate,endDate,startIndex,batchSize);
-        return new Gson().toJson(surveyResultsReportList);
+        LOGGER.info( "Fetch Survey Results Report For Entity Type." );
+        Map<String, SurveyResultsReportVO> surveyResultsReportList = reportingDashboardManagement
+            .getSurveyResultsReport( entityType, entityId, startDate, endDate, startIndex, batchSize );
+        return new Gson().toJson( surveyResultsReportList );
     }
 
 
@@ -176,7 +180,7 @@ public class ReportingController
     @RequestMapping ( value = "/getsurveytransactionreportforreporting", method = RequestMethod.GET)
     @ApiOperation ( value = "Fetch Survey Transaction Report For Reporting ")
     public String getSurveyTransactionReport( Long entityId, String entityType, Timestamp startDate, Timestamp endDate )
-        
+
     {
         LOGGER.info( "Fetch Survey Transaction Report For Reporting" );
 
@@ -191,7 +195,7 @@ public class ReportingController
     @RequestMapping ( value = "/getuserrankingreportforreporting", method = RequestMethod.GET)
     @ApiOperation ( value = "Fetch User Ranking Report For Reporting ")
     public String getUserRankingReport( Long entityId, String entityType, int year, int month, int type )
-        
+
     {
         LOGGER.info( "Fetch Survey Transaction Report For Reporting" );
 
@@ -236,7 +240,7 @@ public class ReportingController
     @RequestMapping ( value = "/getuserrankingforthisyear")
     @ApiOperation ( value = "Fetch User Ranking for this year")
     public String getUserRankingForThisYear( Long entityId, String entityType, int year, int startIndex, int batchSize )
-      
+
     {
         LOGGER.info( "Fetching User Ranking for this year started" );
 
@@ -283,7 +287,7 @@ public class ReportingController
 
         String json = null;
 
-        List<List<Object>> userRankingList ;
+        List<List<Object>> userRankingList;
 
         userRankingList = reportingDashboardManagement.getUserRankingPastYear( entityType, entityId, year, startIndex,
             batchSize );
@@ -297,7 +301,7 @@ public class ReportingController
     @RequestMapping ( value = "/getuserrankingforpastmonth")
     @ApiOperation ( value = "Fetch User Ranking for this year")
     public String getUserRankingForPastMonth( Long entityId, String entityType, int month, int year, int startIndex,
-        int batchSize ) 
+        int batchSize )
     {
         LOGGER.info( "Fetching User Ranking for past month" );
 
@@ -322,7 +326,7 @@ public class ReportingController
 
         String json = null;
 
-        List<List<Object>> userRankingList ;
+        List<List<Object>> userRankingList;
 
         userRankingList = reportingDashboardManagement.getUserRankingPastYears( entityType, entityId, startIndex, batchSize );
 
@@ -448,7 +452,7 @@ public class ReportingController
         LOGGER.info( "Fetching User Ranking Count For this month" );
 
         String json = null;
-        Map<String, Object> rankingCountStartIndex ;
+        Map<String, Object> rankingCountStartIndex;
         rankingCountStartIndex = reportingDashboardManagement.fetchRankingCountThisMonth( entityId, entityType, year, month,
             batchSize );
         json = new Gson().toJson( rankingCountStartIndex );
@@ -501,7 +505,8 @@ public class ReportingController
         LOGGER.info( "Fetching User Ranking Count For past years" );
 
         String json = null;
-        Map<String, Object> rankingCountStartIndex = reportingDashboardManagement.fetchRankingCountPastYears( entityId, entityType, batchSize );
+        Map<String, Object> rankingCountStartIndex = reportingDashboardManagement.fetchRankingCountPastYears( entityId,
+            entityType, batchSize );
         json = new Gson().toJson( rankingCountStartIndex );
 
         return json;
@@ -517,8 +522,8 @@ public class ReportingController
         LOGGER.info( "Fetching Score Stats Overall" );
 
         String json = null;
-        List<List<Object>> scoreStatsOverall = reportingDashboardManagement.getScoreStatsForOverall( entityId, entityType, currentMonth,
-            currentYear );
+        List<List<Object>> scoreStatsOverall = reportingDashboardManagement.getScoreStatsForOverall( entityId, entityType,
+            currentMonth, currentYear );
         json = new Gson().toJson( scoreStatsOverall );
         return json;
     }
@@ -532,7 +537,7 @@ public class ReportingController
         LOGGER.debug( "Fetching Score Stats for Questions." );
 
         String json = null;
-        List<List<Object>> scoreStatsQuestion ;
+        List<List<Object>> scoreStatsQuestion;
         scoreStatsQuestion = reportingDashboardManagement.getScoreStatsForQuestion( entityId, entityType, currentMonth,
             currentYear );
         json = new Gson().toJson( scoreStatsQuestion );
@@ -557,32 +562,36 @@ public class ReportingController
 
     @RequestMapping ( value = "/buildmonthlydigestaggregate", method = RequestMethod.GET)
     @ApiOperation ( value = "Build the monthly digest aggregate for a company for a given month")
-    public String buildMonthlyDigestAggregate( long companyId, String companyName, int monthUnderConcern, int year,
-        String recipientMail ) throws NonFatalException
+    public String buildMonthlyDigestAggregate( long companyId, String companyName, int monthUnderConcern, int year )
+        throws NonFatalException
     {
 
         LOGGER.info( "Building the monthly digest aggregate for a company for a given month" );
         return new Gson().toJson( reportingDashboardManagement.prepareMonthlyDigestMailData( companyId, companyName,
-            monthUnderConcern, year, recipientMail ) );
+            monthUnderConcern, year ) );
     }
 
-	@RequestMapping(value = "/getcompanydetailsreport", method = RequestMethod.GET)
-	@ApiOperation(value = "Social Survey Admin level report to fetch Company Details for all companies.")
-	public String getCompanyDetailsReport(String entityType, Long entityId, int startIndex, int batchSize) throws InvalidInputException {
-		LOGGER.info("Social Survey Admin level report to fetch Company Details for all companies.");
-		List<CompanyDetailsReport> companyDetailsReportList = reportingDashboardManagement
-				.getCompanyDetailsReport(entityId, startIndex, batchSize);
-		return new Gson().toJson(companyDetailsReportList);
-	}
-    
+
+    @RequestMapping ( value = "/getcompanydetailsreport", method = RequestMethod.GET)
+    @ApiOperation ( value = "Social Survey Admin level report to fetch Company Details for all companies.")
+    public String getCompanyDetailsReport( String entityType, Long entityId, int startIndex, int batchSize )
+        throws InvalidInputException
+    {
+        LOGGER.info( "Social Survey Admin level report to fetch Company Details for all companies." );
+        List<CompanyDetailsReport> companyDetailsReportList = reportingDashboardManagement.getCompanyDetailsReport( entityId,
+            startIndex, batchSize );
+        return new Gson().toJson( companyDetailsReportList );
+    }
+
+
     @RequestMapping ( value = "/getincompletesurveys", method = RequestMethod.GET)
     @ApiOperation ( value = "get incomplete surveys")
     public String getIncompleteSurveys( Long entityId, String entityType, Timestamp startDate, Timestamp endDate,
-        int startIndex , int batchSize ) throws NonFatalException
+        int startIndex, int batchSize ) throws NonFatalException
     {
 
-        LOGGER.info( "Fetching list of incomplete surveys for entityType : {} , entityId : {}",entityType,entityId );
-        return new Gson().toJson( reportingDashboardManagement.getIncompleteSurvey( entityId, entityType,
-            startDate, endDate, startIndex, batchSize ) );
+        LOGGER.info( "Fetching list of incomplete surveys for entityType : {} , entityId : {}", entityType, entityId );
+        return new Gson().toJson( reportingDashboardManagement.getIncompleteSurvey( entityId, entityType, startDate, endDate,
+            startIndex, batchSize ) );
     }
 }
