@@ -96,7 +96,7 @@ public class OverviewBranch implements Serializable
     private int thirdParty;
     
     @Column ( name = "nps_score")
-    private float npsScore;
+    private Double npsScore;
 
     @Column ( name = "nps_detractors")
     private int npsDetractors;
@@ -373,12 +373,12 @@ public class OverviewBranch implements Serializable
     }
 
     
-    public float getNpsScore()
+    public Double getNpsScore()
     {
         return npsScore;
     }
 
-    public void setNpsScore( float npsScore )
+    public void setNpsScore( Double npsScore )
     {
         this.npsScore = npsScore;
     }

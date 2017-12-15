@@ -98,7 +98,7 @@ public class OverviewUser implements Serializable {
     private int unprocessed;
     
     @Column ( name = "nps_score")
-    private float npsScore;
+    private Double npsScore;
 
     @Column ( name = "nps_detractors")
     private int npsDetractors;
@@ -369,12 +369,12 @@ public class OverviewUser implements Serializable {
     }
 
     
-    public float getNpsScore()
+    public Double getNpsScore()
     {
         return npsScore;
     }
 
-    public void setNpsScore( float npsScore )
+    public void setNpsScore( Double npsScore )
     {
         this.npsScore = npsScore;
     }
