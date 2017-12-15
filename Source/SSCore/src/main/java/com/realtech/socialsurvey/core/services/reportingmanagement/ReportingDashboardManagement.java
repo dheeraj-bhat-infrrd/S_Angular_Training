@@ -161,6 +161,7 @@ public interface ReportingDashboardManagement
     String generateUserRankingForReporting( Long entityId, String entityType, Long userId, Timestamp startDate, int type )
         throws UnsupportedEncodingException, NonFatalException;
 
+    public MonthlyDigestAggregate prepareMonthlyDigestMailData( long companyId, String companyName, int monthUnderConcern, int year ) throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException;
 
     List<List<Object>> getScoreStatsForOverall( Long entityId, String entityType, int currentMonth, int currentYear );
 
@@ -170,11 +171,6 @@ public interface ReportingDashboardManagement
 
     public Map<Integer, Digest> getDigestDataForLastFourMonths( long companyId, int monthUnderConcern, int year )
         throws InvalidInputException, NoRecordsFetchedException;
-
-
-    public MonthlyDigestAggregate prepareMonthlyDigestMailData( long companyId, String companyName, int monthUnderConcern,
-        int year, String recipientMail ) throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException;
-
 
     public List<UserRankingPastMonthMain> getTopTenUserRankingsThisMonthForACompany( long companyId, int monthUnderConcern,
         int year ) throws InvalidInputException;
@@ -232,7 +228,7 @@ public interface ReportingDashboardManagement
 	 * @return
 	 */
 	public String generateCompanyDetailsReport(long profileValue, String profileLevel)throws UnsupportedEncodingException, NonFatalException;
-	
+
 
     public void getCompaniesWithNotransactions();
 
@@ -269,9 +265,9 @@ public interface ReportingDashboardManagement
      * @param endDate
      * @return
      */
-	public String generateIncompleteSurveyResultsReport(Long entityId, String entityType, Long userId,
-			Timestamp startDate, Timestamp endDate)
-			throws UnsupportedEncodingException, NonFatalException, ParseException;
+
+    public String generateIncompleteSurveyResultsReport( Long entityId, String entityType, Long userId, Timestamp startDate, Timestamp endDate )
+        throws UnsupportedEncodingException, NonFatalException, ParseException;
 
 	/**
 	 * This method returns the latest record for account statistics report in file upload.
@@ -279,7 +275,6 @@ public interface ReportingDashboardManagement
 	 * @return
 	 */
 	public Object getAccountStatisticsRecentActivity(Long reportId);
-
 
     void updateTransactionMonitorAlertsForCompanies() throws InvalidInputException;
 }

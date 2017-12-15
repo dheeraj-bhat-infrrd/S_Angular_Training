@@ -1782,6 +1782,9 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean
             //update payment failed
             licenseDetail.setPaymentRetries( licenseDetail.getPaymentRetries() + 1 );
             licenseDetailDao.update( licenseDetail );
+            //send mail to application support email
+            emailServices.sendPaymentFailedAlertEmailToAdmin( applicationSupportEmail, applicationAdminName, licenseDetail.getCompany().getCompany() , licenseDetail.getCompany().getCompanyId() );
+
             
         } else if ( notificationType == CommonConstants.SUBSCRIPTION_CHARGED_SUCCESSFULLY ) {
             LOG.debug( "Sending charge successful mail" );
@@ -1804,7 +1807,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean
                 emailServices.sendRetryExhaustedEmail( user.getEmailId(), user.getFirstName() + " " + user.getLastName(),
                     user.getLoginName() );
                 //send mail to application support email
-                emailServices.sendPaymentFailedAlertEmail( applicationSupportEmail, applicationAdminName, licenseDetail.getCompany().getCompany() );
+                emailServices.sendPaymentRetriesFailedAlertEmailToAdmin( applicationSupportEmail, applicationAdminName, licenseDetail.getCompany().getCompany() , licenseDetail.getCompany().getCompanyId());
             }           
            
         }

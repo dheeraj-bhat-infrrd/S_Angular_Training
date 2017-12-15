@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -44,6 +45,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.OrganizationUnitSettingsComparator;
 import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
@@ -2733,6 +2735,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                     } else {
                         LOG.debug( "This doesnt contain a first name and last name" );
                         firstName = emailId.substring( 0, emailId.indexOf( "@" ) );
+                        lastName = "";
                     }
 
                 }
@@ -5603,7 +5606,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         companyIds.addAll( companyIdList );
 
         List<OrganizationUnitSettings> unitSettings = organizationUnitSettingsDao.getCompanyListByIds( companyIds );
-        //Collections.sort( unitSettings, new OrganizationUnitSettingsComparator() );
+        //Collections.sort( unitSettings, new OrganizationUnitSettingsComparator() ); 
         return unitSettings;
     }
 
@@ -8393,6 +8396,50 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.debug( "the fenerated facebook pixel tag is : {}", facebookPixelTag );
         LOG.debug( "method  getFacebookPixelImageTagsFromHierarchy finished");
         return facebookPixelTag;
+    }
+
+    @Override
+    public boolean updateDigestRecipients( OrganizationUnitSettings unitSettings, Set<String> emails, String collectionType )
+        throws InvalidInputException
+    {
+        if ( unitSettings == null ) {
+            LOG.warn( "settings are not specified" );
+            throw new InvalidInputException( "settings cannot be null." );
+        } else if ( StringUtils.isEmpty( collectionType ) ) {
+            LOG.warn( "target collection is not specified" );
+            throw new InvalidInputException( "target collection name cannot be null." );
+        }
+
+        LOG.debug( "Updating unitSettings: {} with digest recipients: {}", unitSettings, emails );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_DIGEST_RECIPIENTS, emails, unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        LOG.debug( "Updated the record successfully" );
+
+        return true;
+    }
+
+
+    @Override
+    public Set<String> parseEmailsList( String emailsStr )
+    {
+        LOG.debug( "method parseEmailsList() running" );
+        Set<String> emailList = null;
+
+        if ( emailsStr == null ) {
+            return emailList;
+        }
+
+        emailList = new HashSet<>();
+
+        for ( String email : StringUtils.deleteWhitespace( emailsStr ).split( "," ) ) {
+            if ( !StringUtils.isEmpty( email ) ) {
+                emailList.add( email );
+            }
+        }
+
+        return emailList;
     }
     
     /**

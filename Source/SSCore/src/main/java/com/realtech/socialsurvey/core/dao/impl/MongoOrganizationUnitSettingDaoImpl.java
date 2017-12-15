@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.dao.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -112,11 +113,10 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_SEND_MONTHLY_DIGEST_MAIL = "sendMonthlyDigestMail";
     public static final String KEY_HIDE_PUBLIC_PAGE = "hidePublicPage";
     public static final String KEY_INCLUDE_FOR_TRANSACTION_MONITOR = "includeForTransactionMonitor";
+    public static final String KEY_DIGEST_RECIPIENTS = "digestRecipients";
     public static final String KEY_ENTITY_ALERT_DETAILS = "entityAlertDetails";
     public static final String KEY_IS_ERROR_ALERT = "isErrorAlert";
     public static final String KEY_IS_WARNING_ALERT_= "isWarningAlert";
-
-
 
     @Value ( "${CDN_PATH}")
     private String amazonEndPoint;
@@ -877,6 +877,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
             } else {
                 update.set( CommonConstants.PROFILE_IMAGE_URL_SOLR, imgFileName );
                 update.set( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, imgFileName );
+                update.set( CommonConstants.PROFILE_IMAGE_RECTANGULAR_THUMBNAIL_COLUMN, imgFileName );
             }
             update.set( CommonConstants.IS_PROFILE_IMAGE_PROCESSED_COLUMN, flagValue );
         } else if ( imageType == CommonConstants.IMAGE_TYPE_LOGO ) {
@@ -1032,7 +1033,9 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_STATUS )
             .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) ) );
-        query.addCriteria( Criteria.where( KEY_SEND_MONTHLY_DIGEST_MAIL ).is( true ) );
+        query.addCriteria(
+            new Criteria().orOperator( Criteria.where( KEY_SEND_MONTHLY_DIGEST_MAIL ).is( true ),Criteria.where( KEY_DIGEST_RECIPIENTS )
+                .exists( true ).andOperator( Criteria.where( KEY_DIGEST_RECIPIENTS ).ne( Collections.emptySet() ) ) ) );
 
         if ( startIndex > -1 ) {
             query.skip( startIndex );

@@ -1940,7 +1940,7 @@ public class DashboardController
                 throw new InvalidInputException( "Passed parameter survey id is null or empty" );
             }
 
-            surveyHandler.changeStatusOfSurvey( surveyId, true );
+            surveyHandler.markSurveyAsRetake( surveyId, true );
             SurveyDetails survey = surveyHandler.getSurveyDetails( surveyId );
             long agentId = survey.getAgentId();
             User user = userManagementService.getUserByUserId( agentId );
