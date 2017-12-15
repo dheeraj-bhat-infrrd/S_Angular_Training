@@ -1356,17 +1356,20 @@ $(document).on('change', '#generate-survey-reports', function() {
 });
 
 function setNpsTimeFrames(){
-	var initialOptions = '<option value=1 data-report="thisWeek">This Week</option>'
-		   +'<option value=2 data-report="lastWeek">Last Week</option>'
-		   +'<option value=3 data-report="thisMonth">This Month</option>'
-		   +'<option value=4 data-report="lastMonth">Last Month</option>';
-
-	$('#nps-report-time-selector').html(initialOptions);
-
 	var currentDate = new Date();
 	var currentMonth = currentDate.getMonth()+1;
 	var currentYear = currentDate.getFullYear();
+	var lastMonth = (currentMonth-1)==0?12:currentMonth-1;
+	var lastYear = currentYear-1;
+	
+	var initialOptions = '<option value=1 data-report="thisWeek">This Week</option>'
+		   +'<option value=2 data-report="lastWeek">Last Week</option>'
+		   +'<option value=3 data-report="'+(currentMonth+'/01/'+currentYear)+'">This Month</option>'
+		   +'<option value=4 data-report="'+(lastMonth+'/01/'+lastYear)+'">Last Month</option>';
 
+	$('#nps-report-time-selector').html(initialOptions);
+
+	
 	var monthStr = new Array();
 	monthStr[0] = ""
 		monthStr[1] = "Jan";
@@ -1388,44 +1391,44 @@ function setNpsTimeFrames(){
 	if(currentMonth == 1){
 		lastMonth = 12;
 		lastYear = currentYear-1;
-		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + (monthStr[11]+lastYear) + '">' + (monthStr[11]+' '+lastYear)+'</option>');
-		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + (monthStr[10]+lastYear) + '">' + (monthStr[10]+' '+lastYear)+'</option>');
-		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + (monthStr[9]+lastYear) + '">' + (monthStr[9]+' '+lastYear)+'</option>');
-		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + (monthStr[8]+lastYear) + '">' + (monthStr[8]+' '+lastYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('11/01/'+lastYear) + '">' + (monthStr[11]+' '+lastYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('10/01/'+lastYear) + '">' + (monthStr[10]+' '+lastYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('9/01/'+lastYear) + '">' + (monthStr[9]+' '+lastYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('8/01'+lastYear) + '">' + (monthStr[8]+' '+lastYear)+'</option>');
 	}else if(currentMonth == 2){
 		lastMonth = 12;
 		lastYear = currentYear-1;
-		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + (monthStr[12]+lastYear) + '">' + (monthStr[12]+' '+lastYear)+'</option>');
-		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + (monthStr[11-1]+lastYear) + '">' + (monthStr[11]+' '+lastYear)+'</option>');
-		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + (monthStr[10-2]+lastYear) + '">' + (monthStr[10]+' '+lastYear)+'</option>');
-		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + (monthStr[9-3]+lastYear) + '">' + (monthStr[9]+' '+lastYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('12/01/'+lastYear) + '">' + (monthStr[12]+' '+lastYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('11/01/'+lastYear) + '">' + (monthStr[11]+' '+lastYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('10/01/'+lastYear) + '">' + (monthStr[10]+' '+lastYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('9/01/'+lastYear) + '">' + (monthStr[9]+' '+lastYear)+'</option>');
 	}else if(currentMonth == 3){
 		lastMonth = 12;
 		lastYear = currentYear-1;
-		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + (monthStr[1]+currentYear) + '">' + (monthStr[1]+' '+currentYear)+'</option>');
-		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + (monthStr[12]+lastYear) + '">' + (monthStr[12]+' '+lastYear)+'</option>');
-		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + (monthStr[11]+lastYear) + '">' + (monthStr[11]+' '+lastYear)+'</option>');
-		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + (monthStr[10]+lastYear) + '">' + (monthStr[10]+' '+lastYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('1/01/'+currentYear) + '">' + (monthStr[1]+' '+currentYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('12/01/'+lastYear) + '">' + (monthStr[12]+' '+lastYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('11/01/'+lastYear) + '">' + (monthStr[11]+' '+lastYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('10/01/'+lastYear) + '">' + (monthStr[10]+' '+lastYear)+'</option>');
 	}else if(currentMonth == 4){
 		lastMonth = 12;
 		lastYear = currentYear-1;
-		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + (monthStr[2]+currentYear) + '">' + (monthStr[2]+' '+currentYear)+'</option>');
-		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + (monthStr[1]+currentYear) + '">' + (monthStr[1]+' '+currentYear)+'</option>');
-		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + (monthStr[12]+lastYear) + '">' + (monthStr[12]+' '+lastYear)+'</option>');
-		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + (monthStr[11]+lastYear) + '">' + (monthStr[11]+' '+lastYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('2/01/'+currentYear) + '">' + (monthStr[2]+' '+currentYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('1/01/'+currentYear) + '">' + (monthStr[1]+' '+currentYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('12/01/'+lastYear) + '">' + (monthStr[12]+' '+lastYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('11/01/'+lastYear) + '">' + (monthStr[11]+' '+lastYear)+'</option>');
 	}else if(currentMonth == 5){
 		lastMonth = 12;
 		lastYear = currentYear-1;
-		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + (monthStr[3]+currentYear) + '">' + (monthStr[3]+' '+currentYear)+'</option>');
-		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + (monthStr[2]+currentYear) + '">' + (monthStr[2]+' '+currentYear)+'</option>');
-		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + (monthStr[1]+currentYear) + '">' + (monthStr[1]+' '+currentYear)+'</option>');
-		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + (monthStr[12]+lastYear) + '">' + (monthStr[12]+' '+lastYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('3/01/'+currentYear) + '">' + (monthStr[3]+' '+currentYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('2/01/'+currentYear) + '">' + (monthStr[2]+' '+currentYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('1/01/'+currentYear) + '">' + (monthStr[1]+' '+currentYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('12/01/'+lastYear) + '">' + (monthStr[12]+' '+lastYear)+'</option>');
 	}else{
 		var thisMonth = currentMonth-2;
-		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + (monthStr[thisMonth]+currentYear) + '">' + (monthStr[thisMonth]+' '+currentYear)+'</option>');
-		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + (monthStr[thisMonth-1]+currentYear) + '">' + (monthStr[thisMonth-1]+' '+currentYear)+'</option>');
-		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + (monthStr[thisMonth-2]+currentYear) + '">' + (monthStr[thisMonth-2]+' '+currentYear)+'</option>');
-		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + (monthStr[thisMonth-3]+currentYear) + '">' + (monthStr[thisMonth-3]+' '+currentYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + (thisMonth+'/01/'+currentYear) + '">' + (monthStr[thisMonth]+' '+currentYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ((thisMonth-1)+'/01/'+currentYear) + '">' + (monthStr[thisMonth-1]+' '+currentYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ((thisMonth-2)+'/01/'+currentYear) + '">' + (monthStr[thisMonth-2]+' '+currentYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ((thisMonth-3)+'/01/'+currentYear) + '">' + (monthStr[thisMonth-3]+' '+currentYear)+'</option>');
 	}
 }
 
@@ -1458,12 +1461,48 @@ function getTimeFrameForUserRankingReport(){
 	return dateTimeFrame;
 }
 
+function getStartAndEndDateForNps(npsTimeFrame){
+	var currentDate = new Date;
+	var currentMonth = currentDate.getMonth()+1;
+	var currentYear = currentDate.getFullYear();
+	var npsDates = new Object();
+	npsDates.endDate = "";
+	var curr = new Date;
+	var firstDayOfWeek = curr.getDate() - curr.getDay();
+	firstDayOfWeek = firstDayOfWeek + 1
+	
+	if(npsTimeFrame == 1){
+		var thisMonday = new Date(curr.setDate(firstDayOfWeek));
+		var thisMondayDay = thisMonday.getDate();
+		if(thisMondayDay < 10){
+			thisMondayDay = '0'+thisMondayDay;
+		}
+		var thisMondayMonth = thisMonday.getMonth();
+		var thisMondayYear = thisMonday.getFullYear();
+		npsDates.startDate = thisMondayMonth+'/'+thisMondayDay+'/'+thisMondayYear;
+	}else if(npsTimeFrame == 2){
+		var thisMonday = new Date(curr.setDate(firstDayOfWeek-7));
+		var thisMondayDay = thisMonday.getDate();
+		if(thisMondayDay < 10){
+			thisMondayDay = '0'+thisMondayDay;
+		}
+		var thisMondayMonth = thisMonday.getMonth();
+		var thisMondayYear = thisMonday.getFullYear();
+		npsDates.startDate = thisMondayMonth+'/'+thisMondayDay+'/'+thisMondayYear;
+	}else{
+		npsDates.startDate = $("#nps-report-time-selector option[value="+npsTimeFrame+"]").attr('data-report');
+	}
+	
+	return npsDates;
+}
+
 $(document).on('click', '#reports-generate-report-btn', function(e) {
 	var selectedValue = $('#generate-survey-reports').val();
 	var key = parseInt(selectedValue);
 	var startDate = $('#dsh-start-date').val();
 	var endDate = $("#dsh-end-date").val();
-	
+	var npsTimeFrame = parseInt($('#nps-report-time-selector').val());
+
 	if(key == 106){
 		startDate = getTimeFrameForUserRankingReport();
 		var timeFrameStr = $('#report-time-selector').val();
@@ -1482,14 +1521,24 @@ $(document).on('click', '#reports-generate-report-btn', function(e) {
 		
 	}
 	
-	var npsTimeFrame = parseInt($('#nps-report-time-selector').val());
+	var npsDates = new Object();
+	if(key == 110){
+		if(npsTimeFrame == 1 || npsTimeFrame == 2){
+			key = 110;
+		}else{
+			key = 111;
+		}
+		npsDates = getStartAndEndDateForNps(npsTimeFrame);
+		startDate = npsDates.startDate;
+		endDate = npsDates.endDate;
+	}
+	
 	var success = false;
 	var messageToDisplay;
 	var payload = {
 			"startDate" : startDate,
 			"endDate" : endDate,
-			"reportId" : key,
-			"npsTimeFrame" : npsTimeFrame
+			"reportId" : key
 		};
 	
 	showOverlay();
