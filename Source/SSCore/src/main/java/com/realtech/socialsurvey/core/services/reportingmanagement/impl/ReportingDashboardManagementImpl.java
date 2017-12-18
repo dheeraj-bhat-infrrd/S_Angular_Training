@@ -10,7 +10,6 @@ import java.net.URLEncoder;
 import java.sql.Timestamp;
 import java.text.DateFormatSymbols;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -23,7 +22,9 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
@@ -3809,7 +3810,35 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 data = workbookData.getNpsReportMonthToBeWrittenInSheet( data, npsReportMonthList);   
             }
             workBook = workbookOperations.createWorkbook( data );
+            workBook = formatForNPSReportMonth(workBook,npsReportMonthList);
         }
         return workBook;
     }
+
+
+	private XSSFWorkbook formatForNPSReportMonth(XSSFWorkbook workBook, List<NpsReportMonth> npsReportMonthList) {
+		
+		int rownum = 1;
+		XSSFFont font = workBook.createFont();
+		font.setBold(true);
+		
+		for(NpsReportMonth npsReportMonth : npsReportMonthList) {
+            if(npsReportMonth.getBranchId() == 0 && npsReportMonth.getRegionId() == 0){
+            	CellStyle style = workBook.getSheetAt(0).getRow(0).getRowStyle();
+            	style.setAlignment(CellStyle.ALIGN_CENTER);
+            	style.setFillBackgroundColor(IndexedColors.BLUE.index);
+            	style.setFont(font);
+            }
+            else if(npsReportMonth.getBranchId() == 0 && npsReportMonth.getRegionId() > 0){
+                CellStyle style = workBook.getSheetAt(0).getRow(rownum).getRowStyle();
+                style.setFont(font);
+            }
+            rownum ++;
+		}
+		
+		
+		
+		
+		return workBook;
+	}
 }

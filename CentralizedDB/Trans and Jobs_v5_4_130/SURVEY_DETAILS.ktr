@@ -1088,7 +1088,7 @@
 
         <field_path>&#x24;.npsScore</field_path>
 
-        <field_type/>
+        <field_type>String</field_type>
 
       </mongo_field>
     </mongo_fields>     <cluster_schema/>
