@@ -608,21 +608,20 @@ public class ReportingController
             startIndex, batchSize ) );
     }
 
-    @RequestMapping ( value = "/nps/{week}/week", method = RequestMethod.GET)
-    @ApiOperation ( value = "get nps report for a week")
-    public String getNpsReportForWeek( @PathVariable ( "week") int week, long companyId, int year ) throws InvalidInputException
+    @RequestMapping ( value = "/nps/week/month", method = RequestMethod.GET)
+    @ApiOperation ( value = "get nps report for a week or month")
+    public String getNpsReportForWeekOrMonth( int week, int month, long companyId, int year, int type ) throws InvalidInputException
     {
-        LOGGER.info( "Fetching nps report for week {} for company {}", week, companyId );
-        return new Gson().toJson( reportingDashboardManagement.getNpsReportForAWeek( companyId, week, year ) );
+        String json = null;
+        if(type == 1){
+            LOGGER.info( "Fetching nps report for week {} for company {}", week, companyId );
+            json = new Gson().toJson( reportingDashboardManagement.getNpsReportForAWeek( companyId, week, year ) );
+        }
+        else if(type == 2){
+            LOGGER.info( "Fetching nps report for month {} for company {}", month, companyId );
+            json = new Gson().toJson( reportingDashboardManagement.getNpsReportForAMonth( companyId, month, year ) );
+        }
+        return json;
     }
-
-
-    @RequestMapping ( value = "/nps/{month}/month", method = RequestMethod.GET)
-    @ApiOperation ( value = "get nps report for a month")
-    public String getNpsReportForMonth( @PathVariable ( "month") int month, long companyId, int year )
-        throws InvalidInputException
-    {
-        LOGGER.info( "Fetching nps report for month {} for company {}", month, companyId );
-        return new Gson().toJson( reportingDashboardManagement.getNpsReportForAMonth( companyId, month, year ));
-    }
+    
 }
