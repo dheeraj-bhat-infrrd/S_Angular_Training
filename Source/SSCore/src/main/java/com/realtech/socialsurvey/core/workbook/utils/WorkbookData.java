@@ -1303,16 +1303,16 @@ public class WorkbookData
         for(NpsReportWeek npsReportWeek : npsReportWeekList) {
             npsWeeklyReportToPopulate = new ArrayList<Object>();
             if(npsReportWeek.getBranchId() == 0 && npsReportWeek.getRegionId() == 0){
-                npsWeeklyReportToPopulate.add( npsReportWeek.getCompanyId() );
                 npsWeeklyReportToPopulate.add( npsReportWeek.getCompanyName() );
+                npsWeeklyReportToPopulate.add( npsReportWeek.getCompanyId() );
             }
             else if(npsReportWeek.getBranchId() == 0 && npsReportWeek.getRegionId() > 0){
-                npsWeeklyReportToPopulate.add( npsReportWeek.getRegionId() );
                 npsWeeklyReportToPopulate.add( npsReportWeek.getRegionName() );
+                npsWeeklyReportToPopulate.add( npsReportWeek.getRegionId() );
             }
             else if(npsReportWeek.getBranchId() > 0 ){
-                npsWeeklyReportToPopulate.add( npsReportWeek.getBranchId() );
                 npsWeeklyReportToPopulate.add( npsReportWeek.getBranchName() );
+                npsWeeklyReportToPopulate.add( npsReportWeek.getBranchId() );
             }
             npsWeeklyReportToPopulate.add( npsReportWeek.getNps() );
             npsWeeklyReportToPopulate.add( npsReportWeek.getPreviousWeekNps() );
@@ -1337,16 +1337,16 @@ public class WorkbookData
         for(NpsReportMonth npsReportMonth : npsReportMonthList) {
             npsMonthlyReportToPopulate = new ArrayList<Object>();
             if(npsReportMonth.getBranchId() == 0 && npsReportMonth.getRegionId() == 0){
-                npsMonthlyReportToPopulate.add( npsReportMonth.getCompanyId() );
                 npsMonthlyReportToPopulate.add( npsReportMonth.getCompanyName() );
+                npsMonthlyReportToPopulate.add( npsReportMonth.getCompanyId() );
             }
             else if(npsReportMonth.getBranchId() == 0 && npsReportMonth.getRegionId() > 0){
-                npsMonthlyReportToPopulate.add( npsReportMonth.getRegionId() );
                 npsMonthlyReportToPopulate.add( npsReportMonth.getRegionName() );
+                npsMonthlyReportToPopulate.add( npsReportMonth.getRegionId() );
             }
             else if(npsReportMonth.getBranchId() > 0){
-                npsMonthlyReportToPopulate.add( npsReportMonth.getBranchId() );
                 npsMonthlyReportToPopulate.add( npsReportMonth.getBranchName() );
+                npsMonthlyReportToPopulate.add( npsReportMonth.getBranchId() );
             }
             npsMonthlyReportToPopulate.add( npsReportMonth.getNps() );
             npsMonthlyReportToPopulate.add( npsReportMonth.getPreviousMonthNps() );
