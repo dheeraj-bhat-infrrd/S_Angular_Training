@@ -143,7 +143,15 @@ public class PrepareBillingReport implements Runnable
                       } else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_INCOMPLETE_SURVEY_REPORT){
                           locationInS3 = reportingDashboardManagement.generateIncompleteSurveyResultsReport( fileUpload.getProfileValue(), fileUpload.getProfileLevel(),
                               fileUpload.getAdminUserId(),fileUpload.getStartDate(),fileUpload.getEndDate());
+                      } else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_NPS_WEEK_REPORT){
+                          int type = 1;
+                          locationInS3 = reportingDashboardManagement.generateNpsReportForWeekOrMonth( fileUpload.getProfileValue(), fileUpload.getProfileLevel(), fileUpload.getStartDate(), type);
+                      } else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_NPS_MONTH_REPORT){
+                          int type = 2;
+                          locationInS3 = reportingDashboardManagement.generateNpsReportForWeekOrMonth( fileUpload.getProfileValue(), fileUpload.getProfileLevel(),
+                              fileUpload.getStartDate(), type);
                       }
+                      
                         
                         // update the status to be processed
                         fileUpload.setStatus( CommonConstants.STATUS_DONE );
@@ -152,7 +160,7 @@ public class PrepareBillingReport implements Runnable
                             || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_USERS_REPORT || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_RESULTS_REPORT || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT
                             || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT
                             || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_INCOMPLETE_SURVEY_REPORT
-                            || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_DETAILS_REPORT){
+                            || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_DETAILS_REPORT || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_NPS_WEEK_REPORT || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_NPS_MONTH_REPORT){
                             fileUpload.setFileName( locationInS3 );
                         }
                         fileUploadService.updateFileUploadRecord( fileUpload );
@@ -196,7 +204,12 @@ public class PrepareBillingReport implements Runnable
                                 reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_USER_RANKING_MONTHLY_REPORT;
                             }else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT){
                                 reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_USER_RANKING_YEARLY_REPORT;
+                            }else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_NPS_WEEK_REPORT){
+                                reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_NPS_WEEK_REPORT;
+                            }else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_NPS_MONTH_REPORT){
+                                reportType = CommonConstants.BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_NPS_MONTH_REPORT;
                             }
+                            
                             String batchName = CommonConstants.BATCH_NAME_FILE_UPLOAD_REPORTS_GENERATOR + " For " + reportType;
                             batchTrackerService.sendMailToAdminRegardingBatchError( batchName, System.currentTimeMillis(), e );
                             

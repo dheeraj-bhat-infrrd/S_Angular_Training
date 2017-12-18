@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
@@ -85,7 +86,9 @@ public class ReportingWebController
     private SSApiIntergrationBuilder ssApiIntergrationBuilder;
 
     private ReportingDashboardManagement reportingDashboardManagement;
-
+    
+    @Autowired
+    private Utils utils;
 
     @Autowired
     public void setSessionHelper( SessionHelper sessionHelper )
@@ -509,6 +512,7 @@ public class ReportingWebController
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
         Company company = user.getCompany();
+        String npsTimeFrame = request.getParameter( "npsTimeFrame" );
         LOG.debug(
             "Creating entry in file upload for reportId {} with start date {} and end date {} for entity id {}, entity type {}",
             reportId, startDate, endDate, entityId, entityType );

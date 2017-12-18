@@ -1361,11 +1361,12 @@ function setNpsTimeFrames(){
 	var currentYear = currentDate.getFullYear();
 	var lastMonth = (currentMonth-1)==0?12:currentMonth-1;
 	var lastYear = currentYear-1;
+	var lastMonthYear = lastMonth == 12 ? currentYear-1 : currentYear;
 	
 	var initialOptions = '<option value=1 data-report="thisWeek">This Week</option>'
 		   +'<option value=2 data-report="lastWeek">Last Week</option>'
 		   +'<option value=3 data-report="'+(currentMonth+'/01/'+currentYear)+'">This Month</option>'
-		   +'<option value=4 data-report="'+(lastMonth+'/01/'+lastYear)+'">Last Month</option>';
+		   +'<option value=4 data-report="'+(lastMonth+'/01/'+lastMonthYear)+'">Last Month</option>';
 
 	$('#nps-report-time-selector').html(initialOptions);
 
@@ -1477,7 +1478,7 @@ function getStartAndEndDateForNps(npsTimeFrame){
 		if(thisMondayDay < 10){
 			thisMondayDay = '0'+thisMondayDay;
 		}
-		var thisMondayMonth = thisMonday.getMonth();
+		var thisMondayMonth = thisMonday.getMonth() + 1;
 		var thisMondayYear = thisMonday.getFullYear();
 		npsDates.startDate = thisMondayMonth+'/'+thisMondayDay+'/'+thisMondayYear;
 	}else if(npsTimeFrame == 2){
@@ -1486,7 +1487,7 @@ function getStartAndEndDateForNps(npsTimeFrame){
 		if(thisMondayDay < 10){
 			thisMondayDay = '0'+thisMondayDay;
 		}
-		var thisMondayMonth = thisMonday.getMonth();
+		var thisMondayMonth = thisMonday.getMonth() + 1;
 		var thisMondayYear = thisMonday.getFullYear();
 		npsDates.startDate = thisMondayMonth+'/'+thisMondayDay+'/'+thisMondayYear;
 	}else{

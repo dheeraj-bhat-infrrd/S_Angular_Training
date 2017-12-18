@@ -35,9 +35,9 @@ public class NpsReportWeekDaoImpl extends GenericReportingDaoImpl<NpsReportWeek,
             criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID, companyId ) );
             criteria.add( Restrictions.eq( CommonConstants.AGGREGATE_BY_WEEK, week ) );
             criteria.add( Restrictions.eq( CommonConstants.AGGREGATE_BY_YEAR, year ) );
-            criteria.addOrder( Order.asc( "companyName" ) );
-            criteria.addOrder( Order.asc( "regionName" ) );
-            criteria.addOrder( Order.asc( "branchName" ) );
+            criteria.addOrder( Order.asc( "companyId" ) );
+            criteria.addOrder( Order.asc( "regionId" ) );
+            criteria.addOrder( Order.asc( "branchId" ) );
             return (List<NpsReportWeek>) criteria.list();
         } catch ( HibernateException hibernateException ) {
             LOG.error( "Exception caught in fetchNpsReportWeek() ", hibernateException );

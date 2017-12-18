@@ -10,6 +10,7 @@ import java.net.URLEncoder;
 import java.sql.Timestamp;
 import java.text.DateFormatSymbols;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -376,7 +377,12 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_INCOMPLETE_SURVEY_REPORT );
         } else if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_DETAILS_REPORT ) {
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_DETAILS_REPORT );
+        } else if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_NPS_WEEK_REPORT ) {
+            fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_NPS_WEEK_REPORT );
+        } else if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_NPS_MONTH_REPORT ) {
+            fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_NPS_MONTH_REPORT );
         }
+        
         //get the time 23:59:59 in milliseconds
         long duration = ( ( ( 23 * 60 ) * 60 ) + ( 59 * 60 ) + 59 ) * 1000l;
 
@@ -1681,9 +1687,13 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 recentActivityList.add( CommonConstants.REPORTING_USER_RANKING_MONTHLY_REPORT );
             } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT ) {
                 recentActivityList.add( CommonConstants.REPORTING_USER_RANKING_YEARLY_REPORT );
-            }else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_INCOMPLETE_SURVEY_REPORT ) {
+            } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_INCOMPLETE_SURVEY_REPORT ) {
                 recentActivityList.add( CommonConstants.REPORTING_INCOMPLETE_SURVEY_REPORT );
+            } else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_NPS_WEEK_REPORT 
+                || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_NPS_MONTH_REPORT){
+                recentActivityList.add( CommonConstants.REPORTING_NPS_REPORT );
             }
+            
             recentActivityList.add( fileUpload.getStartDate() );
             recentActivityList.add( fileUpload.getEndDate() );
             recentActivityList.add( user.getFirstName() );
@@ -3748,5 +3758,58 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         npsReportForMonthList = npsReportMonthDao.fetchNpsReportMonth( companyId, month, year );
         LOG.debug( "Finished fetching NPS report for a week" );
         return npsReportForMonthList;
+    }
+
+
+    @Override
+    @Transactional
+    public String generateNpsReportForWeekOrMonth( long profileValue, String profileLevel, Timestamp startDate, int type ) throws ParseException, UnsupportedEncodingException, NonFatalException
+    {
+        if(!profileLevel.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) || profileValue <= 0 ){
+            LOG.warn( "ProfileValue or profileLevel is not valid" );
+            throw new InvalidInputException("ProfileValue or profileLevel is not valid");
+        }
+        LOG.info( "Generating NPS report for profileValue {}, profileLevel {}",profileValue, profileLevel);
+        String fileName = "NPS_Report" + "-" + ( Calendar.getInstance().getTimeInMillis() ) 
+                + CommonConstants.EXCEL_FILE_EXTENSION;
+        LOG.debug( "fileName {} ", fileName );
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(startDate);
+        int week = calendar.get(Calendar.WEEK_OF_YEAR);
+        int month = calendar.get( Calendar.MONTH) + 1;
+        int year = calendar.get(Calendar.YEAR);
+        XSSFWorkbook workbook = this.downloadNPSReport( profileValue, profileLevel, year, month, week, type );
+        if(LOG.isDebugEnabled() && workbook != null && workbook.getSheetAt( 0 ) != null)
+            LOG.debug( "Writing {} number of records into file {}", workbook.getSheetAt( 0 ).getLastRowNum(), fileName );
+        return createExcelFileAndSaveInAmazonS3( fileName, workbook );
+    }
+    
+
+    public XSSFWorkbook downloadNPSReport(long profileValue, String profileLevel, int year, int month, int week, int type )
+    {
+        Map<Integer, List<Object>> data = workbookData.writeNPSWeekReportHeader(type);
+        XSSFWorkbook workBook = null;
+        Response response = ssApiBatchIntergrationBuilder.getIntegrationApi().getNpsReportForWeekOrMonth( week, month, profileValue, year, type );
+        String responseString = response != null ? new String( ( (TypedByteArray) response.getBody() ).getBytes() ) : null;
+        if ( responseString != null ) {
+            //since the string has ""abc"" an extra quote
+            responseString = responseString.substring( 1, responseString.length() - 1 );
+            //Escape characters
+            responseString = StringEscapeUtils.unescapeJava( responseString );
+            List<NpsReportWeek> npsReportWeekList = null;
+            List<NpsReportMonth> npsReportMonthList = null;
+            if(type == CommonConstants.NPS_REPORT_TYPE_WEEK){
+                Type listType = new TypeToken<List<NpsReportWeek>>() {}.getType();
+                npsReportWeekList = new Gson().fromJson( responseString, listType );
+                data = workbookData.getNpsReportWeekToBeWrittenInSheet( data, npsReportWeekList );   
+            }
+            else if(type == CommonConstants.NPS_REPORT_TYPE_MONTH){
+                Type listType = new TypeToken<List<NpsReportMonth>>() {}.getType();
+                npsReportMonthList = new Gson().fromJson( responseString, listType );
+                data = workbookData.getNpsReportMonthToBeWrittenInSheet( data, npsReportMonthList);   
+            }
+            workBook = workbookOperations.createWorkbook( data );
+        }
+        return workBook;
     }
 }

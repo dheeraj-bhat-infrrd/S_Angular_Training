@@ -237,5 +237,17 @@ public interface ReportingDashboardManagement
 	 */
 	public List<NpsReportMonth> getNpsReportForAMonth(long companyId, int month, int year) throws InvalidInputException;
 	
+	/**
+	 * Method to generate nps report for a week or month
+	 * @param profileValue
+	 * @param profileLevel
+	 * @param startDate
+	 * @param type
+	 * @return
+	 * @throws NonFatalException 
+	 * @throws UnsupportedEncodingException 
+	 */
+	public String generateNpsReportForWeekOrMonth(long profileValue, String profileLevel, Timestamp startDate, int type)throws ParseException, UnsupportedEncodingException, NonFatalException;
+	
 	
 }

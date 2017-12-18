@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 
 import retrofit.client.Response;
 import retrofit.http.GET;
+import retrofit.http.Path;
 import retrofit.http.Query;
 
 
@@ -65,5 +66,9 @@ public interface SSApiBatchIntegration
     @GET ( "/v1/getcompanydetailsreport")
 	Response getCompanyDetailsReport( @Query("entityType") String entityType, @Query("entityId") Long entityId,
 			@Query("startIndex") int startIndex, @Query("batchSize") int batchSize);
+    
+    @GET ( "/v1/nps/week/month")
+    Response getNpsReportForWeekOrMonth( @Query("week") int week, @Query("month") int month, @Query("companyId") long companyId, @Query("year") int year, @Query("type") int type );
+    
 
 }
