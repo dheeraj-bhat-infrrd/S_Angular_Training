@@ -23,4 +23,6 @@ public interface CompanySurveyStatusStatsDao extends GenericReportingDao<Company
 
     Map<Long, List<CompanySurveyStatusStats>> getSurveyStatusCountForAllCompaniesForPastNDays( Date startDate, Date endDate );
 
+    Map<Long, Long> getCompletedCountForCompaniesAfterSentDate( Date surveySentDate );
+
 }

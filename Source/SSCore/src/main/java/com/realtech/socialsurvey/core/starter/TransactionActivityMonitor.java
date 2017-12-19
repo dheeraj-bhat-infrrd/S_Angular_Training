@@ -30,6 +30,7 @@ public class TransactionActivityMonitor extends QuartzJobBean
             reportingDashboardManagement.getCompaniesWithNotransactions();
             reportingDashboardManagement.getCompaniesWithHighNotProcessedTransactions();
             reportingDashboardManagement.getCompaniesWithLowVolumeOfTransactions();
+            reportingDashboardManagement.updateTransactionMonitorAlertsForCompanies();
         } catch ( Throwable thrw ) {
             LOG.error( "Transaction monitor exception", thrw );
         }

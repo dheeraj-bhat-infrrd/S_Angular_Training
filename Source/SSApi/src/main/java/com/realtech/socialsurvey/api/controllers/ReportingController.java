@@ -701,6 +701,7 @@ public class ReportingController
     {
         LOGGER.info( "Fetch  survey stats for companies for past 7 days" );
         Map<Long, List<CompanySurveyStatusStats>> companySurveyStatsMap = activityManagementService.getSurveStatsForPast7daysForAllCompanies();
+        LOGGER.info( "Fetch  survey stats for companies for past 7 days result is "  + companySurveyStatsMap );
         return new Gson().toJson( companySurveyStatsMap );
     }
     
@@ -711,6 +712,15 @@ public class ReportingController
         LOGGER.info( "Fetch  survey stats for companies for last to last week" );
         Map<Long, List<CompanySurveyStatusStats>> companySurveyStatsMap = activityManagementService.getSurveStatsForLastToLatWeekForAllCompanies();
         return new Gson().toJson( companySurveyStatsMap );
+    }
+    
+    @RequestMapping ( value = "/getcompletedsurveycountforpastndays", method = RequestMethod.GET)
+    @ApiOperation ( value = "Fetch the transaction counts for companies for  past n days ")
+    public String getCompletedSurveyCountForpastNDays()
+    {
+        LOGGER.info( "Fetch total survey counts for companies for the n days" );
+        Map<Long, Long> companySurveyStatsCountsMap = activityManagementService.getCompletedSurveyCountForPast3DaysForCompanies();
+        return new Gson().toJson( companySurveyStatsCountsMap );
     }
     
 }

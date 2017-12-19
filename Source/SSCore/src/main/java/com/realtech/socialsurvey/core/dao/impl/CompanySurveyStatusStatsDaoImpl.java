@@ -124,7 +124,6 @@ public class CompanySurveyStatusStatsDaoImpl extends GenericReportingDaoImpl<Com
         LOG.info( "method getSurveyStatusCountForCompanyForPastNDays started for companyId " + companyIds );
        
         Criteria criteria = getSession().createCriteria( CompanySurveyStatusStats.class );
-        criteria.add( Restrictions.in( CommonConstants.COMPANY_ID_COLUMN, companyIds ) );
         
         if(startDate != null){
             criteria.add( Restrictions.ge( CommonConstants.TRANSACTION_MONITOR_DATE_COLUMN, startDate ) );            
@@ -133,6 +132,10 @@ public class CompanySurveyStatusStatsDaoImpl extends GenericReportingDaoImpl<Com
         if(endDate != null){
             criteria.add( Restrictions.le( CommonConstants.TRANSACTION_MONITOR_DATE_COLUMN, endDate ) );            
         }
+        
+        criteria.add( Restrictions.in( CommonConstants.COMPANY_ID_COLUMN, companyIds ) );
+
+        
         List<CompanySurveyStatusStats> companySurveyCountsList = criteria.list();
 
         //fill stats data to company map
@@ -200,5 +203,25 @@ public class CompanySurveyStatusStatsDaoImpl extends GenericReportingDaoImpl<Com
         
         LOG.info( "method getSurveyStatusCountForAllCompaniesForPastNDays finished" );
         return companiesSurveyStatsMap;
+    }
+    
+    @Override
+    @SuppressWarnings ( "unchecked")
+    public Map<Long, Long> getCompletedCountForCompaniesAfterSentDate( Date surveySentDate )
+    {
+        LOG.info( "method getCompletedCountForCompaniesAfterSentDate started for surveySentDate " + surveySentDate );
+        Map<Long, Long> companyCompletedSurveyCountsMap= new HashMap<Long, Long>();
+        
+        Criteria criteria = getSession().createCriteria( CompanySurveyStatusStats.class );
+        criteria.add( Restrictions.ge( CommonConstants.TRANSACTION_MONITOR_DATE_COLUMN, surveySentDate ) );
+        criteria.setProjection( Projections.projectionList().add(Projections.groupProperty("companyId")).add(  Projections.sum("surveycompletedCount") ) );
+        List<Object[]> companyCompletedSurveyCountList = criteria.list();
+        for(Object[] companyCompletedSurveyCount : companyCompletedSurveyCountList){
+            companyCompletedSurveyCountsMap.put( (Long) companyCompletedSurveyCount[0] , (Long) companyCompletedSurveyCount[1] );
+        }
+        
+        LOG.info( "method getCompletedCountForCompaniesAfterSentDate finished for  surveySentDate " + surveySentDate );
+        return companyCompletedSurveyCountsMap;
+
     }
 }
