@@ -18,13 +18,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
@@ -2131,6 +2131,20 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             row.getCell( i ).setCellStyle( style );//Set the sty;e
         }
     }
+    //Make row bold and blue for NPS report
+    public static void makeRowBoldAndBlue( XSSFWorkbook wb, Row row )
+    {
+        CellStyle style = wb.createCellStyle();//Create style
+        Font font = wb.createFont();//Create font
+        font.setBoldweight( Font.BOLDWEIGHT_BOLD );//Make font bold
+        style.setFillForegroundColor(IndexedColors.BLUE.index);
+        style.setFillPattern(CellStyle.SOLID_FOREGROUND);
+        style.setFont( font );//set it to bold
+
+        for ( int i = 0; i < row.getLastCellNum(); i++ ) {//For each cell in the row 
+            row.getCell( i ).setCellStyle( style );//Set the sty;e
+        }
+    }
 
 
     @Override
@@ -3802,43 +3816,55 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             if(type == CommonConstants.NPS_REPORT_TYPE_WEEK){
                 Type listType = new TypeToken<List<NpsReportWeek>>() {}.getType();
                 npsReportWeekList = new Gson().fromJson( responseString, listType );
-                data = workbookData.getNpsReportWeekToBeWrittenInSheet( data, npsReportWeekList );   
+                data = workbookData.getNpsReportWeekToBeWrittenInSheet( data, npsReportWeekList );
+                workBook = workbookOperations.createWorkbook( data );
+                workBook = formatForNPSReportWeek(workBook,npsReportWeekList);
             }
             else if(type == CommonConstants.NPS_REPORT_TYPE_MONTH){
                 Type listType = new TypeToken<List<NpsReportMonth>>() {}.getType();
                 npsReportMonthList = new Gson().fromJson( responseString, listType );
-                data = workbookData.getNpsReportMonthToBeWrittenInSheet( data, npsReportMonthList);   
+                data = workbookData.getNpsReportMonthToBeWrittenInSheet( data, npsReportMonthList);
+                workBook = workbookOperations.createWorkbook( data );
+                workBook = formatForNPSReportMonth(workBook,npsReportMonthList);
             }
-            workBook = workbookOperations.createWorkbook( data );
-            workBook = formatForNPSReportMonth(workBook,npsReportMonthList);
+            
         }
         return workBook;
     }
 
-
 	private XSSFWorkbook formatForNPSReportMonth(XSSFWorkbook workBook, List<NpsReportMonth> npsReportMonthList) {
-		
+		makeRowBoldAndBlue(workBook, workBook.getSheetAt(0).getRow(0));
+		makeRowBoldAndBlue(workBook, workBook.getSheetAt(0).getRow(1));
 		int rownum = 1;
-		XSSFFont font = workBook.createFont();
-		font.setBold(true);
-		
-		for(NpsReportMonth npsReportMonth : npsReportMonthList) {
-            if(npsReportMonth.getBranchId() == 0 && npsReportMonth.getRegionId() == 0){
-            	CellStyle style = workBook.getSheetAt(0).getRow(0).getRowStyle();
-            	style.setAlignment(CellStyle.ALIGN_CENTER);
-            	style.setFillBackgroundColor(IndexedColors.BLUE.index);
-            	style.setFont(font);
-            }
-            else if(npsReportMonth.getBranchId() == 0 && npsReportMonth.getRegionId() > 0){
-                CellStyle style = workBook.getSheetAt(0).getRow(rownum).getRowStyle();
-                style.setFont(font);
-            }
-            rownum ++;
+
+		for (NpsReportMonth npsReportMonth : npsReportMonthList) {
+			if (npsReportMonth.getBranchId() == 0 && npsReportMonth.getRegionId() == 0) {
+				CellStyle style = workBook.createCellStyle();
+				style.setAlignment(CellStyle.ALIGN_CENTER);
+				style.setFillBackgroundColor(IndexedColors.BLUE.index);
+			} else if (npsReportMonth.getBranchId() == 0 && npsReportMonth.getRegionId() > 0) {
+				makeRowBold(workBook, workBook.getSheetAt(0).getRow(rownum));
+			}
+			rownum++;
 		}
-		
-		
-		
-		
+		return workBook;
+	}
+
+	private XSSFWorkbook formatForNPSReportWeek(XSSFWorkbook workBook, List<NpsReportWeek> npsReportWeekList) {
+		makeRowBoldAndBlue(workBook, workBook.getSheetAt(0).getRow(0));
+		makeRowBoldAndBlue(workBook, workBook.getSheetAt(0).getRow(1));
+		int rownum = 1;
+
+		for (NpsReportWeek npsReportWeek : npsReportWeekList) {
+			if (npsReportWeek.getBranchId() == 0 && npsReportWeek.getRegionId() == 0) {
+				CellStyle style = workBook.createCellStyle();
+				style.setAlignment(CellStyle.ALIGN_CENTER);
+				style.setFillBackgroundColor(IndexedColors.BLUE.index);
+			} else if (npsReportWeek.getBranchId() == 0 && npsReportWeek.getRegionId() > 0) {
+				makeRowBold(workBook, workBook.getSheetAt(0).getRow(rownum));
+			}
+			rownum++;
+		}
 		return workBook;
 	}
 }
