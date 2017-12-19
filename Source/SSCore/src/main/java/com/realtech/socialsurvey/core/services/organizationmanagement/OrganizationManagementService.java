@@ -1512,4 +1512,10 @@ public interface OrganizationManagementService
     public String getFacebookPixelImageTagsFromHierarchy( OrganizationUnitSettings companySettings,
         OrganizationUnitSettings regionSettings, OrganizationUnitSettings branchSetting, OrganizationUnitSettings unitSettings );
 
+
+    public Set<String> parseEmailsList( String emailsStr );
+
+
+    public boolean updateDigestRecipients( OrganizationUnitSettings unitSettings, Set<String> emails, String collectionType )
+        throws InvalidInputException;
 }

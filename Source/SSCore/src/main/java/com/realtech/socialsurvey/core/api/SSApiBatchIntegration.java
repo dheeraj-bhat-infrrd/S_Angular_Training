@@ -58,8 +58,7 @@ public interface SSApiBatchIntegration
 
     @GET ( "/v1/buildmonthlydigestaggregate")
     Response buildMonthlyDigestAggregate( @Query ( "companyId") long companyId, @Query ( "companyName") String companyName,
-        @Query ( "monthUnderConcern") int monthUnderConcern, @Query ( "year") int year,
-        @Query ( "recipientMail") String recipientMail );
+        @Query ( "monthUnderConcern") int monthUnderConcern, @Query ( "year") int year );
 
 
     @GET ( "/v1/getcompanydetailsreport")

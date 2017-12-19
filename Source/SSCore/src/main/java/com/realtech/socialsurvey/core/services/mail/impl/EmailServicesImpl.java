@@ -2531,42 +2531,15 @@ public class EmailServicesImpl implements EmailServices
     public void sendMonthlyDigestMail( MonthlyDigestAggregate digestAggregate )
         throws InvalidInputException, UndeliveredEmailException
     {
-        if ( digestAggregate == null ) {
-            LOG.error( "sendMonthlyDigestMail(): Digest Aggregate object is null" );
-            throw new InvalidInputException( "Data for the monthly digest/snapshot mail is missing." );
-        }
-        if( digestAggregate.getCompanyId() < 1 ){
-            LOG.error( "Company ID must be greater that one for Monthly digest/snapshot mail " );
-            throw new InvalidInputException( "Company ID cannot be less than one for Monthly digest/snapshot mail." );
-        }
-        if ( StringUtils.isEmpty( digestAggregate.getRecipientMailId() ) ) {
-            LOG.error( "Recipient email Id is empty or null for Monthly digest/snapshot mail " );
-            throw new InvalidInputException( "Recipient email Id is empty or null for Monthly digest/snapshot mail." );
-        }
+        LOG.info( "method sendMonthlyDigestMail() started" );
+        validateDigestAggregate( digestAggregate );
 
-        if ( digestAggregate.getDigestList() == null || digestAggregate.getDigestList().size() != 3 ) {
-            LOG.error( "Digest data for three months required." );
-            throw new InvalidInputException( "Digest data for three months required." );
-        }
+        String emails = StringUtils.join( digestAggregate.getRecipientMailIds(), "," );
+        LOG.debug( "Sending Monthly digest/snapshot email to : {}", emails );
 
-        if ( StringUtils.isEmpty( digestAggregate.getCompanyName() ) ) {
-            LOG.error( "Company name for the digest not specified." );
-            throw new InvalidInputException( "Company name for the digest not specified." );
-        }
 
-        if ( StringUtils.isEmpty( digestAggregate.getMonthUnderConcern() ) ) {
-            LOG.error( "Month for the digest not specified." );
-            throw new InvalidInputException( "Month for the digest not specified." );
-        }
-
-        if ( StringUtils.isEmpty( digestAggregate.getYearUnderConcern() ) ) {
-            LOG.error( "Year for the digest not specified." );
-            throw new InvalidInputException( "Year for the digest not specified." );
-        }
-
-        LOG.debug( "Sending Monthly digest/snapshot email to : " + digestAggregate.getRecipientMailId() );
-
-        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( digestAggregate.getRecipientMailId() );
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail(
+            new ArrayList<String>( digestAggregate.getRecipientMailIds() ) );
         String monthYearForDisplay = StringUtils.capitalize( digestAggregate.getMonthUnderConcern() ) + " "
             + digestAggregate.getYearUnderConcern();
         FileContentReplacements messageSubjectReplacements = new FileContentReplacements();
@@ -2574,9 +2547,20 @@ public class EmailServicesImpl implements EmailServices
         List<String> messageBodyReplacementsList = new ArrayList<>();
 
 
+        // setup message and body replacements
+        messageSubjectReplacements
+            .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.DIGEST_MAIL_SUBJECT );
+        messageSubjectReplacements.setReplacementArgs( Arrays.asList( monthYearForDisplay ) );
+
+        messageBodyReplacements
+            .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.DIGEST_MAIL_BODY );
+        messageBodyReplacements.setReplacementArgs( messageBodyReplacementsList );
+
+
         // user ranking display toggle
-        messageBodyReplacementsList.add( StringUtils.isEmpty( digestAggregate.getUserRankingHtmlRows() ) ? "display:none;" : "" );
-        
+        messageBodyReplacementsList
+            .add( StringUtils.isEmpty( digestAggregate.getUserRankingHtmlRows() ) ? "display:none;" : "" );
+
         messageBodyReplacementsList.add( applicationWordPressSite );
         messageBodyReplacementsList.add( appNewLogoUrl );
         messageBodyReplacementsList.add( digestAggregate.getCompanyName() );
@@ -2684,25 +2668,66 @@ public class EmailServicesImpl implements EmailServices
         // top ten ranked users HTML
         messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getUserRankingHtmlRows() ) );
 
-        // email meta-data
-        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getRecipientMailId() ) );
-        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getRecipientMailId() ) );
 
+        for ( String email : digestAggregate.getRecipientMailIds() ) {
+            if ( StringUtils.isNotEmpty( email ) ) {
+                // email meta-data
+                messageBodyReplacementsList.add( StringUtils.defaultString( email ) );
+                messageBodyReplacementsList.add( StringUtils.defaultString( email ) );
 
-        messageSubjectReplacements
-            .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.DIGEST_MAIL_SUBJECT );
-        messageSubjectReplacements.setReplacementArgs( Arrays.asList( monthYearForDisplay ) );
+                LOG.debug( "Calling email sender to send digest mail to {}", email );
+                emailSender.sendEmailWithSubjectAndBodyReplacements( emailEntity, messageSubjectReplacements,
+                    messageBodyReplacements, false, false );
 
-        messageBodyReplacements
-            .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.DIGEST_MAIL_BODY );
-        messageBodyReplacements.setReplacementArgs( messageBodyReplacementsList );
-
-        LOG.debug( "Calling email sender to send mail" );
-        emailSender.sendEmailWithSubjectAndBodyReplacements( emailEntity, messageSubjectReplacements, messageBodyReplacements,
-            false, false );
+                // remove email from body replacements list
+                messageBodyReplacementsList.remove( messageBodyReplacementsList.size() - 1 );
+                messageBodyReplacementsList.remove( messageBodyReplacementsList.size() - 1 );
+            } else {
+                LOG.warn( "Unable to send digest email to {}", email );
+            }
+        }
         LOG.debug( "Successfully sent Monthly digest/snapshot mail" );
 
     }
+
+
+    private void validateDigestAggregate( MonthlyDigestAggregate digestAggregate ) throws InvalidInputException
+    {
+        if ( digestAggregate == null ) {
+            LOG.error( "sendMonthlyDigestMail(): Digest Aggregate object is null" );
+            throw new InvalidInputException( "Data for the monthly digest/snapshot mail is missing." );
+        }
+        if ( digestAggregate.getCompanyId() < 1 ) {
+            LOG.error( "Company ID must be greater that one for Monthly digest/snapshot mail " );
+            throw new InvalidInputException( "Company ID cannot be less than one for Monthly digest/snapshot mail." );
+        }
+        if ( digestAggregate.getRecipientMailIds() == null || digestAggregate.getRecipientMailIds().isEmpty() ) {
+            LOG.error( "Recipient email Id list is empty or null for Monthly digest/snapshot mail " );
+            throw new InvalidInputException( "Recipient email Id list is empty or null for Monthly digest/snapshot mail." );
+        }
+
+        if ( digestAggregate.getDigestList() == null || digestAggregate.getDigestList().size() != 3 ) {
+            LOG.error( "Digest data for three months required." );
+            throw new InvalidInputException( "Digest data for three months required." );
+        }
+
+        if ( StringUtils.isEmpty( digestAggregate.getCompanyName() ) ) {
+            LOG.error( "Company name for the digest not specified." );
+            throw new InvalidInputException( "Company name for the digest not specified." );
+        }
+
+        if ( StringUtils.isEmpty( digestAggregate.getMonthUnderConcern() ) ) {
+            LOG.error( "Month for the digest not specified." );
+            throw new InvalidInputException( "Month for the digest not specified." );
+        }
+
+        if ( StringUtils.isEmpty( digestAggregate.getYearUnderConcern() ) ) {
+            LOG.error( "Year for the digest not specified." );
+            throw new InvalidInputException( "Year for the digest not specified." );
+        }
+
+    }
+
     
     @Async
     @Override

@@ -128,7 +128,7 @@ public interface ReportingDashboardManagement
     
     public Map<Integer, Digest> getDigestDataForLastFourMonths(long companyId, int monthUnderConcern, int year) throws InvalidInputException, NoRecordsFetchedException;
 
-    public MonthlyDigestAggregate prepareMonthlyDigestMailData( long companyId, String companyName, int monthUnderConcern, int year, String recipientMail ) throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException;
+    public MonthlyDigestAggregate prepareMonthlyDigestMailData( long companyId, String companyName, int monthUnderConcern, int year ) throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException;
 
     public List<UserRankingPastMonthMain> getTopTenUserRankingsThisMonthForACompany( long companyId, int monthUnderConcern, int year ) throws InvalidInputException;
 
