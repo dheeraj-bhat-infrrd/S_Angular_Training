@@ -107,4 +107,7 @@ public interface SSApiBatchIntegration
     @GET ( "/v1/getsurvestatsforlasttoLatweekforallcompanies")
     Response getSurveStatsForLastToLatWeekForAllCompanies();
     
+    @GET ( "/v1/getcompletedsurveycountforpastndays")
+    Response getCompletedSurveyCountForPastNDays();
+    
 }

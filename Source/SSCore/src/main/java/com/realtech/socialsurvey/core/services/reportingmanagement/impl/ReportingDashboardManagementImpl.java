@@ -93,6 +93,7 @@ import com.realtech.socialsurvey.core.entities.CompanyUserReport;
 import com.realtech.socialsurvey.core.entities.CompanyView;
 import com.realtech.socialsurvey.core.entities.Digest;
 import com.realtech.socialsurvey.core.entities.DigestTemplateData;
+import com.realtech.socialsurvey.core.entities.EntityAlertDetails;
 import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.MonthlyDigestAggregate;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -132,6 +133,8 @@ import com.realtech.socialsurvey.core.entities.UserRankingThisMonthRegion;
 import com.realtech.socialsurvey.core.entities.UserRankingThisYearBranch;
 import com.realtech.socialsurvey.core.entities.UserRankingThisYearMain;
 import com.realtech.socialsurvey.core.entities.UserRankingThisYearRegion;
+import com.realtech.socialsurvey.core.enums.EntityErrorAlertType;
+import com.realtech.socialsurvey.core.enums.EntityWarningAlertType;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -3946,6 +3949,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         Map<Long, Long> transacionCountForPastNDays = getTotalTransactionCountForPastNDays();       
         Map<Long, Long> transacionCountForPreviousDay = getTransactionCountForPreviousDay();
         Map<Long, Long> sentSurveyCountForPreviousDay = getSendSurveyCountForPreviousDay();
+        Map<Long, Long> completedSurveyCountForPastNDays = getCompletedSurveyCountForPastNDays();
         
         
         List<Company> companies =  organizationManagementService.getAllActiveEnterpriseCompanies();
@@ -3965,13 +3969,13 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             
             //check if isLessInvitationSentInPastSevenDays is true
             boolean isLessInvitationSentInPastSevenDays = false;
-            if(getSentSurveyCountFromList(surveStatsForLastToLatWeek) < getSentSurveyCountFromList(surveStatsForLastToLatWeek) / 2){
+            if(getSentSurveyCountFromList(surveStatsForLastToLatWeek) <= getSentSurveyCountFromList(surveStatsForLastToLatWeek) / 2){
                 isLessInvitationSentInPastSevenDays = true;
             }
             
             //check if isMoreReminderSentInPastSevenDays is true
             boolean isMoreReminderSentInPastSevenDays = false; 
-            if(getSentSurveyReminderCountFromList(surveStatsForLastToLatWeek) < getSentSurveyReminderCountFromList(surveStatsForLastToLatWeek) / 2){
+            if(getSentSurveyReminderCountFromList(surveStatsForLastToLatWeek) >= getSentSurveyReminderCountFromList(surveStatsForLastToLatWeek) * 2){
                 isMoreReminderSentInPastSevenDays = true;
             }
             
@@ -3980,8 +3984,74 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             if(transacionCountForPreviousDay.get( companyId ) == null || transacionCountForPreviousDay.get( companyId ) == 0){
                 isZeroIncomingTransactionInPastOneDay = true;
             }
+
+            //check if isLessIncomingTransactionInPastSevenDays is true
+            boolean isLessIncomingTransactionInPastSevenDays = false;
+            if(getTransactionReceivedCountFromList(surveStatsForLastToLatWeek) <= getTransactionReceivedCountFromList(surveStatsForLastToLatWeek) / 2){
+                isLessIncomingTransactionInPastSevenDays = true;
+            }
+            
+            
+            //check if isLessIncomingTransactionInPastSevenDays is true
+            boolean isLessInvitationSentInPastSevenDaysWarning = false;
+            if(getSentSurveyCountFromList(surveStatsForLastToLatWeek) <= (getSentSurveyCountFromList(surveStatsForLastToLatWeek)* 3 / 4)){
+                isLessInvitationSentInPastSevenDaysWarning = true;
+            }
+            
+            
+          //check if isMoreReminderSentInPastSevenDays is true
+            boolean isMoreReminderSentInPastSevenDaysWarning = false; 
+            if(getSentSurveyReminderCountFromList(surveStatsForLastToLatWeek) >= (getSentSurveyReminderCountFromList(surveStatsForLastToLatWeek) * 3 / 2) ){
+                isMoreReminderSentInPastSevenDays = true;
+            }
+            
+            //check if isNoSurveyCompletedInPastThreeDays is true
+            boolean isNoSurveyCompletedInPastThreeDays = false; 
+            if(completedSurveyCountForPastNDays.get( companyId ) == null || completedSurveyCountForPastNDays.get( companyId ) == 0){
+                isNoSurveyCompletedInPastThreeDays = true;
+            }
+            
+            EntityAlertDetails entityAlertDetails =  companySettings.getEntityAlertDetails();
+            if(entityAlertDetails == null)
+                entityAlertDetails = new EntityAlertDetails();
+            
+            List<String> currentErrorAlerts = new ArrayList<>();
+            if(isZeroIncomingTransactionInPastThreeDays)
+                currentErrorAlerts.add( EntityErrorAlertType.LESS_TRANSACTION_IN_PAST_DAYS.getAlertType() );
+            if(isZeroIncomingTransactionInPastThreeDays)
+                currentErrorAlerts.add( EntityErrorAlertType.LESS_TRANSACTION_IN_PAST_DAYS.getAlertType() );
+            if(isZeroIncomingTransactionInPastThreeDays)
+                currentErrorAlerts.add( EntityErrorAlertType.LESS_TRANSACTION_IN_PAST_DAYS.getAlertType() );
+            
+            entityAlertDetails.setCurrentErrorAlerts( currentErrorAlerts );
+            if(currentErrorAlerts.size() > 0)
+                entityAlertDetails.setErrorAlert(true);
+            else
+                entityAlertDetails.setErrorAlert(false);
+            
+            
+            List<String> currentWarningAlerts = new ArrayList<>();
+            if(isZeroIncomingTransactionInPastOneDay)
+                currentWarningAlerts.add( EntityWarningAlertType.LESS_TRANSACTION_IN_PAST_DAYS.getAlertType() );
+            if(isLessIncomingTransactionInPastSevenDays)
+                currentWarningAlerts.add( EntityWarningAlertType.LESS_TRANSACTION_IN_PAST_WEEK.getAlertType() );
+            if(isLessInvitationSentInPastSevenDaysWarning)
+                currentWarningAlerts.add( EntityWarningAlertType.LESS_INVITATION_IN_PAST_WEEK.getAlertType() );
+            if(isMoreReminderSentInPastSevenDaysWarning)
+                currentWarningAlerts.add( EntityWarningAlertType.MORE_REMINDER_IN_PAST_WEEK.getAlertType() );
+            if(isNoSurveyCompletedInPastThreeDays)
+                currentWarningAlerts.add( EntityWarningAlertType.LESS_SURVEY_COMPLETED_IN_PAST_DAYS.getAlertType() );
+            
+            entityAlertDetails.setCurrentWarningAlerts( currentWarningAlerts );
+            if(currentWarningAlerts.size() > 0)
+                entityAlertDetails.setWarningAlert(true);
+            else
+                entityAlertDetails.setWarningAlert(false);
+            
+            companySettings.setEntityAlertDetails( entityAlertDetails );
+            organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden( MongoOrganizationUnitSettingDaoImpl.KEY_ENTITY_ALERT_DETAILS, entityAlertDetails, companyId, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
         }
-        
         
 
         LOG.info( "method updateTransactionMonitorAlertsForCompanies ended" );
@@ -3999,7 +4069,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             ? new String( ( (TypedByteArray) companiesListResponse.getBody() ).getBytes() ) : null );
 
         return (Map<Long, Long>) ( new Gson().fromJson( StringUtils.strip( companiesListString, "\"" ),
-            new TypeToken<List<Long>>() {}.getType() ) );
+            new TypeToken<Map<Long, Long>>() {}.getType() ) );
     }
     
     @SuppressWarnings ( "unchecked")
@@ -4012,7 +4082,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             ? new String( ( (TypedByteArray) companiesListResponse.getBody() ).getBytes() ) : null );
 
         return (Map<Long, Long>) ( new Gson().fromJson( StringUtils.strip( companiesListString, "\"" ),
-            new TypeToken<List<Long>>() {}.getType() ) );
+            new TypeToken<Map<Long, Long>>() {}.getType() ) );
     }
     
     @SuppressWarnings ( "unchecked")
@@ -4025,7 +4095,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             ? new String( ( (TypedByteArray) companiesListResponse.getBody() ).getBytes() ) : null );
 
         return (Map<Long, Long>) ( new Gson().fromJson( StringUtils.strip( companiesListString, "\"" ),
-            new TypeToken<List<Long>>() {}.getType() ) );
+            new TypeToken<Map<Long, Long>>() {}.getType() ) );
     }
     
     @SuppressWarnings ( "unchecked")
@@ -4038,7 +4108,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             ? new String( ( (TypedByteArray) companiesListResponse.getBody() ).getBytes() ) : null );
 
         return (Map<Long, List<CompanySurveyStatusStats>>) ( new Gson().fromJson( StringUtils.strip( companiesListString, "\"" ),
-            new TypeToken<List<Long>>() {}.getType() ) );
+            new TypeToken<Map<Long, List<CompanySurveyStatusStats>>>() {}.getType() ) );
     }
     
     @SuppressWarnings ( "unchecked")
@@ -4051,9 +4121,21 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             ? new String( ( (TypedByteArray) companiesListResponse.getBody() ).getBytes() ) : null );
 
         return (Map<Long, List<CompanySurveyStatusStats>>) ( new Gson().fromJson( StringUtils.strip( companiesListString, "\"" ),
-            new TypeToken<List<Long>>() {}.getType() ) );
+            new TypeToken<Map<Long, List<CompanySurveyStatusStats>>>() {}.getType() ) );
     }
-    
+
+    @SuppressWarnings ( "unchecked")
+    private Map<Long, Long> getCompletedSurveyCountForPastNDays()
+    {
+        LOG.debug( "getSendSurveyCountForPreviousDay() started" );
+        Response companiesListResponse = ssApiBatchIntergrationBuilder.getIntegrationApi().getCompletedSurveyCountForPastNDays();
+
+        String companiesListString = StringEscapeUtils.unescapeJava( companiesListResponse != null
+            ? new String( ( (TypedByteArray) companiesListResponse.getBody() ).getBytes() ) : null );
+
+        return (Map<Long, Long>) ( new Gson().fromJson( StringUtils.strip( companiesListString, "\"" ),
+            new TypeToken<Map<Long, Long>>() {}.getType() ) );
+    }
     
     private int getSentSurveyCountFromList(List<CompanySurveyStatusStats> companySurveyStatusStatsList)
     {
@@ -4075,5 +4157,16 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             }
         }
         return sentSurveyReminderCount;
+    }
+    
+    private int getTransactionReceivedCountFromList(List<CompanySurveyStatusStats> companySurveyStatusStatsList)
+    {
+        int totalTransactionReceivedCount = 0;
+        if(companySurveyStatusStatsList != null){
+            for(CompanySurveyStatusStats companySurveyStatusStats : companySurveyStatusStatsList){
+                totalTransactionReceivedCount += companySurveyStatusStats.getTransactionReceivedCount();
+            }
+        }
+        return totalTransactionReceivedCount;
     }
 }

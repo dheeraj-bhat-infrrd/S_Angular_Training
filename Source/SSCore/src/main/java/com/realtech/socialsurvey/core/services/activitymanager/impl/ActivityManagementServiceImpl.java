@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.services.activitymanager.impl;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,9 +23,7 @@ import com.realtech.socialsurvey.core.entities.CompanyActiveUsersStats;
 import com.realtech.socialsurvey.core.entities.CompanySurveyStatusStats;
 import com.realtech.socialsurvey.core.entities.CompanyTransactionsSourceStats;
 import com.realtech.socialsurvey.core.entities.CompanyView;
-import com.realtech.socialsurvey.core.entities.EntityAlertDetails;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.CompanyView;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.activitymanager.ActivityManagementService;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
@@ -336,7 +335,9 @@ public class ActivityManagementServiceImpl implements ActivityManagementService
         }
         
         //get all monitored data for given companies from sql
-       Map<Long , List<CompanySurveyStatusStats>> companyIdSurveyStatsMap = companySurveyStatusStatsDao.getSurveyStatusCountForCompaniesForPastNDays( companyIdList, startDate, endDate );                        
+       Map<Long , List<CompanySurveyStatusStats>> companyIdSurveyStatsMap = new HashMap<Long, List<CompanySurveyStatusStats>>();
+       if( ! companyIdList.isEmpty())
+           companyIdSurveyStatsMap = companySurveyStatusStatsDao.getSurveyStatusCountForCompaniesForPastNDays( companyIdList, startDate, endDate );                        
         
         //fill stats data to vo
        List<TransactionMonitorGraphDataVO> transactionMonitorGraphDataVOs = new ArrayList<TransactionMonitorGraphDataVO>();
@@ -464,4 +465,23 @@ public class ActivityManagementServiceImpl implements ActivityManagementService
         return companySurveyStatsMap;
     }
       
+    /**
+     * 
+     */
+    @Override
+    @Transactional
+    public Map<Long, Long> getCompletedSurveyCountForPast3DaysForCompanies()
+    {
+        LOG.info( "method getCompletedSurveyCountForPast3DaysForCompanies started" );
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add( Calendar.DATE, - 3 );
+        Date oneMonthBackDate = new Date( calendar.getTimeInMillis() );
+
+        Map<Long, Long> companySurveyCompletedCountsMap = companySurveyStatusStatsDao
+            .getCompletedCountForCompaniesAfterSentDate( oneMonthBackDate );
+
+        LOG.info( "method getCompletedSurveyCountForPast3DaysForCompanies ended" );
+        return companySurveyCompletedCountsMap;
+    }
 }

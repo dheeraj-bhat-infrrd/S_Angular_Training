@@ -127,4 +127,7 @@ public interface ActivityManagementService
 
     Map<Long, List<CompanySurveyStatusStats>> getSurveStatsForLastToLatWeekForAllCompanies();
 
+
+    Map<Long, Long> getCompletedSurveyCountForPast3DaysForCompanies();
+
 }
