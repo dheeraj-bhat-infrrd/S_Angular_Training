@@ -10089,6 +10089,7 @@ ul.accordion li>a:before {
 	display: -webkit-box;
 	display: inline-flex; 
 	margin-top: 10px;
+	height:35px;
 }
 
 .rep-fb-btn{
