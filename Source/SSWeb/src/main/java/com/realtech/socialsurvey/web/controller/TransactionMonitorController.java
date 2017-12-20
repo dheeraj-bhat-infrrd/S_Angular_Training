@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,12 +16,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.CompanyActiveUsersStats;
 import com.realtech.socialsurvey.core.entities.CompanySurveyStatusStats;
 import com.realtech.socialsurvey.core.entities.CompanyTransactionsSourceStats;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.activitymanager.ActivityManagementService;
+import com.realtech.socialsurvey.core.vo.TransactionMonitorGraphDataVO;
 
 
 /**
@@ -216,4 +219,51 @@ public class TransactionMonitorController
             return gson.toJson( responseMap );
         }
     }
+    
+  
+
+    /**
+     * 
+     * @param model
+     * @param request
+     * @return
+     */
+    @RequestMapping ( value = "/gettrnsactionmonitordatabydaysandalerttype")
+    @ResponseBody
+    public String getTrnsactionMonitorDataByDaysAndAlertType( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method getTrnsactionMonitorDataByDaysAndAlertType started." );
+
+        String noOfDaysStr = request.getParameter( "noOfDays" );
+        String alertType = request.getParameter( "alertType" );
+
+        Integer noOfDays;
+        Gson gson = new Gson();
+
+        try {
+            
+            if(! StringUtils.equalsIgnoreCase( alertType, CommonConstants.ALERT_TYPE_ERROR ) && ! StringUtils.equalsIgnoreCase( alertType, CommonConstants.ALERT_TYPE_WARNING) && !StringUtils.equalsIgnoreCase( alertType, CommonConstants.ALERT_TYPE_NORMAL ))
+            {
+                throw new InvalidInputException( "Wrong alert type passed " );                
+            }  
+            
+            try {
+                noOfDays = Integer.parseInt( noOfDaysStr );
+            } catch ( NumberFormatException e ) {
+                throw new InvalidInputException( "Wrong no of days passed " );
+            }
+
+            List<TransactionMonitorGraphDataVO> companySurveyStats = activityManagementService
+                .getTransactionsStatsByDaysAndAlertType( noOfDays , alertType );
+
+            LOG.info( "Method getTrnsactionMonitorDataByDaysAndAlertType finished." );
+            return gson.toJson( companySurveyStats );
+        } catch ( NonFatalException e ) {
+            LOG.error( "Error in getTrnsactionMonitorDataByDaysAndAlertType ", e );
+            Map<String, Object> responseMap = new HashMap<String, Object>();
+            responseMap.put( "responseText", e.getMessage() );
+            return gson.toJson( responseMap );
+        }
+    }
+    
 }

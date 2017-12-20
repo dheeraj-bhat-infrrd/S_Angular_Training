@@ -1,15 +1,17 @@
 package com.realtech.socialsurvey.core.entities;
 
+import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 
 
-public class MonthlyDigestAggregate
+public class MonthlyDigestAggregate implements Serializable
 {
-
+    private static final long serialVersionUID = 1L;
     private long companyId;
     private String companyName;
-    private String recipientMailId;
-    private String MonthUnderConcern;
+    private Set<String> recipientMailIds;
+    private String monthUnderConcern;
     private String yearUnderConcern;
     private List<DigestTemplateData> digestList;
     private String avgRatingTxt;
@@ -44,27 +46,27 @@ public class MonthlyDigestAggregate
     }
 
 
-    public String getRecipientMailId()
+    public Set<String> getRecipientMailIds()
     {
-        return recipientMailId;
+        return recipientMailIds;
     }
 
 
-    public void setRecipientMailId( String recipientMailId )
+    public void setRecipientMailIds( Set<String> recipientMailIds )
     {
-        this.recipientMailId = recipientMailId;
+        this.recipientMailIds = recipientMailIds;
     }
 
 
     public String getMonthUnderConcern()
     {
-        return MonthUnderConcern;
+        return this.monthUnderConcern;
     }
 
 
     public void setMonthUnderConcern( String monthUnderConcern )
     {
-        MonthUnderConcern = monthUnderConcern;
+        this.monthUnderConcern = monthUnderConcern;
     }
 
 
@@ -139,5 +141,14 @@ public class MonthlyDigestAggregate
         this.userRankingHtmlRows = userRankingHtmlRows;
     }
 
+
+    @Override
+    public String toString()
+    {
+        return "MonthlyDigestAggregate [companyId=" + companyId + ", companyName=" + companyName + ", recipientMailIds="
+            + recipientMailIds + ", monthUnderConcern=" + monthUnderConcern + ", yearUnderConcern=" + yearUnderConcern
+            + ", digestList=" + digestList + ", avgRatingTxt=" + avgRatingTxt + ", surveyPercentageTxt=" + surveyPercentageTxt
+            + ", statisfactionRatingTxt=" + statisfactionRatingTxt + ", userRankingHtmlRows=" + userRankingHtmlRows + "]";
+    }
 }
 

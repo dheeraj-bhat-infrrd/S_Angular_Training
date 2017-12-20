@@ -282,4 +282,11 @@ public interface OrganizationUnitSettingsDao
      * @return
      */
     public List<OrganizationUnitSettings> getCompaniesForTransactionMonitor();
+
+    /**
+     * 
+     * @param alertType
+     * @return
+     */
+    public List<OrganizationUnitSettings> fetchCompaniesByAlertType( String alertType , List<Long> companyIds );
 }

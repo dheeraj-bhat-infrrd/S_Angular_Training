@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.entities;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -69,20 +70,22 @@ public class OrganizationUnitSettings implements Serializable
     private String sendEmailThrough;
     private boolean hideFromBreadCrumb;
     private boolean hidePublicPage; //to hide entity form public page and sitemap
-    
+    private Set<String> digestRecipients;
     private boolean includeForTransactionMonitor;
-
 
     // vendasta product details 
     private VendastaProductSettings vendasta_rm_settings;
-    
+
     //Reporting ranking requirements
     private RankingRequirements ranking_requirements;
     //are the 'Contact Us' emails routed to the company admin always?
     private boolean contactUsEmailsRoutedToCompanyAdmin;
-    
+
     // flag that decides whether to send the monthly digest mail
     private boolean sendMonthlyDigestMail;
+
+    //alert details
+    private EntityAlertDetails entityAlertDetails;
 
     public boolean isSendEmailFromCompany()
     {
@@ -238,8 +241,8 @@ public class OrganizationUnitSettings implements Serializable
     {
         this.isSeoContentModified = isSeoContentModified;
     }
-    
-    
+
+
     public boolean isVendastaAccessible()
     {
         return vendastaAccessible;
@@ -605,6 +608,7 @@ public class OrganizationUnitSettings implements Serializable
         this.allowZillowAutoPost = allowZillowAutoPost;
     }
 
+
     public VendastaProductSettings getVendasta_rm_settings()
     {
         return vendasta_rm_settings;
@@ -615,8 +619,8 @@ public class OrganizationUnitSettings implements Serializable
     {
         this.vendasta_rm_settings = vendasta_rm_settings;
     }
-    
-    
+
+
     public String getReviewSortCriteria()
     {
         return reviewSortCriteria;
@@ -627,17 +631,20 @@ public class OrganizationUnitSettings implements Serializable
     {
         this.reviewSortCriteria = reviewSortCriteria;
     }
-    
+
+
     public String getSendEmailThrough()
     {
         return sendEmailThrough;
     }
-    
-    public void setSendEmailThrough ( String sendEmailThrough )
+
+
+    public void setSendEmailThrough( String sendEmailThrough )
     {
         this.sendEmailThrough = sendEmailThrough;
     }
-    
+
+
     public RankingRequirements getRankingRequirements()
     {
         return ranking_requirements;
@@ -649,16 +656,19 @@ public class OrganizationUnitSettings implements Serializable
         this.ranking_requirements = ranking_requirements;
     }
 
-	
-    public boolean isContactUsEmailsRoutedToCompanyAdmin() {
-		return contactUsEmailsRoutedToCompanyAdmin;
-	}
+
+    public boolean isContactUsEmailsRoutedToCompanyAdmin()
+    {
+        return contactUsEmailsRoutedToCompanyAdmin;
+    }
 
 
-	public void setContactUsEmailsRoutedToCompanyAdmin( boolean contactUsEmailsRoutedToCompanyAdmin ) {
-		this.contactUsEmailsRoutedToCompanyAdmin = contactUsEmailsRoutedToCompanyAdmin;
-	}
-    
+    public void setContactUsEmailsRoutedToCompanyAdmin( boolean contactUsEmailsRoutedToCompanyAdmin )
+    {
+        this.contactUsEmailsRoutedToCompanyAdmin = contactUsEmailsRoutedToCompanyAdmin;
+    }
+
+
     public boolean getHideFromBreadCrumb()
     {
         return hideFromBreadCrumb;
@@ -669,7 +679,8 @@ public class OrganizationUnitSettings implements Serializable
     {
         this.hideFromBreadCrumb = hideFromBreadCrumb;
     }
-    
+
+
     public String getProfileImageUrlRectangularThumbnail()
     {
         return profileImageUrlRectangularThumbnail;
@@ -682,7 +693,7 @@ public class OrganizationUnitSettings implements Serializable
     }
 
 
-	public boolean isSendMonthlyDigestMail()
+    public boolean isSendMonthlyDigestMail()
     {
         return sendMonthlyDigestMail;
     }
@@ -706,6 +717,18 @@ public class OrganizationUnitSettings implements Serializable
     }
 
 
+    public Set<String> getDigestRecipients()
+    {
+        return digestRecipients;
+    }
+
+
+    public void setDigestRecipients( Set<String> digestRecipients )
+    {
+        this.digestRecipients = digestRecipients;
+    }
+
+
     public boolean getIncludeForTransactionMonitor()
     {
         return includeForTransactionMonitor;
@@ -715,6 +738,18 @@ public class OrganizationUnitSettings implements Serializable
     public void setIncludeForTransactionMonitor( boolean includeForTransactionMonitor )
     {
         this.includeForTransactionMonitor = includeForTransactionMonitor;
+    }
+
+
+    public EntityAlertDetails getEntityAlertDetails()
+    {
+        return entityAlertDetails;
+    }
+
+
+    public void setEntityAlertDetails( EntityAlertDetails entityAlertDetails )
+    {
+        this.entityAlertDetails = entityAlertDetails;
     }
 
 
@@ -732,15 +767,17 @@ public class OrganizationUnitSettings implements Serializable
             + lockSettings + ", linkedInProfileData=" + linkedInProfileData + ", createdBy=" + createdBy + ", modifiedBy="
             + modifiedBy + ", createdOn=" + createdOn + ", modifiedOn=" + modifiedOn + ", completeProfileUrl="
             + completeProfileUrl + ", profileStages=" + profileStages + ", disclaimer=" + disclaimer
-            + ", profileImageUrlThumbnail=" + profileImageUrlThumbnail + ", logoThumbnail=" + logoThumbnail
-            + ", isProfileImageProcessed=" + isProfileImageProcessed + ", isLogoImageProcessed=" + isLogoImageProcessed
-            + ", hideSectionsFromProfilePage=" + Arrays.toString( hideSectionsFromProfilePage ) + ", deletedSocialTokens="
-            + deletedSocialTokens + ", allowOverrideForSocialMedia=" + allowOverrideForSocialMedia + ", allowZillowAutoPost="
-            + allowZillowAutoPost + ", status=" + status + ", hiddenSection=" + hiddenSection + ", sendEmailFromCompany="
-            + sendEmailFromCompany + ", reviewSortCriteria=" + reviewSortCriteria + ", sendEmailThrough=" + sendEmailThrough
-            + ", hideFromBreadCrumb=" + hideFromBreadCrumb + ", vendasta_rm_settings=" + vendasta_rm_settings
-            + ", ranking_requirements=" + ranking_requirements + ", contactUsEmailsRoutedToCompanyAdmin="
+            + ", profileImageUrlThumbnail=" + profileImageUrlThumbnail + ", profileImageUrlRectangularThumbnail="
+            + profileImageUrlRectangularThumbnail + ", logoThumbnail=" + logoThumbnail + ", isProfileImageProcessed="
+            + isProfileImageProcessed + ", isLogoImageProcessed=" + isLogoImageProcessed + ", hideSectionsFromProfilePage="
+            + Arrays.toString( hideSectionsFromProfilePage ) + ", deletedSocialTokens=" + deletedSocialTokens
+            + ", allowOverrideForSocialMedia=" + allowOverrideForSocialMedia + ", allowZillowAutoPost=" + allowZillowAutoPost
+            + ", status=" + status + ", hiddenSection=" + hiddenSection + ", sendEmailFromCompany=" + sendEmailFromCompany
+            + ", reviewSortCriteria=" + reviewSortCriteria + ", sendEmailThrough=" + sendEmailThrough + ", hideFromBreadCrumb="
+            + hideFromBreadCrumb + ", hidePublicPage=" + hidePublicPage + ", digestRecipients=" + digestRecipients
+            + ", includeForTransactionMonitor=" + includeForTransactionMonitor + ", vendasta_rm_settings="
+            + vendasta_rm_settings + ", ranking_requirements=" + ranking_requirements + ", contactUsEmailsRoutedToCompanyAdmin="
             + contactUsEmailsRoutedToCompanyAdmin + ", sendMonthlyDigestMail=" + sendMonthlyDigestMail + "]";
     }
-    
+
 }
