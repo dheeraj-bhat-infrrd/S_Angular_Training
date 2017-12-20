@@ -1888,6 +1888,7 @@
 	.rep-det-div{
 	margin-left: 18%;
     width: 100%;
+    height:35px;
 	}
 	
 	#reportingDashTabs,#overview-tab,#overviewSuccess,#spsGaugeSuccess{

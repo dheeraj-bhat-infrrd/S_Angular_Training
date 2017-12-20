@@ -86,10 +86,14 @@ import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoIm
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyDetailsReport;
+import com.realtech.socialsurvey.core.entities.CompanyActiveUsersStats;
 import com.realtech.socialsurvey.core.entities.CompanyDigestRequestData;
+import com.realtech.socialsurvey.core.entities.CompanySurveyStatusStats;
 import com.realtech.socialsurvey.core.entities.CompanyUserReport;
+import com.realtech.socialsurvey.core.entities.CompanyView;
 import com.realtech.socialsurvey.core.entities.Digest;
 import com.realtech.socialsurvey.core.entities.DigestTemplateData;
+import com.realtech.socialsurvey.core.entities.EntityAlertDetails;
 import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.MonthlyDigestAggregate;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -129,6 +133,8 @@ import com.realtech.socialsurvey.core.entities.UserRankingThisMonthRegion;
 import com.realtech.socialsurvey.core.entities.UserRankingThisYearBranch;
 import com.realtech.socialsurvey.core.entities.UserRankingThisYearMain;
 import com.realtech.socialsurvey.core.entities.UserRankingThisYearRegion;
+import com.realtech.socialsurvey.core.enums.EntityErrorAlertType;
+import com.realtech.socialsurvey.core.enums.EntityWarningAlertType;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -321,6 +327,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     @Value ( "${APPLICATION_BASE_URL}")
     private String applicationBaseUrl;
 
+    @Value ( "${TRANSACTION_MONITOR_SUPPORT_EMAIL}")
+    private String transactionMonitorSupportEmail;
 
     @Value ( "${SEND_DIGEST_TO_APPLICATION_ADMIN_ONLY}")
     private String sendDigestToApplicationAdminOnly;
@@ -331,6 +339,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     public static final int DIGEST_MAIL_START_INDEX = 0;
 
     public static final int DIGEST_MAIL_BATCH_SIZE = 50;
+
+    public static final int NUMBER_OF_DAYS = 3;
 
 
     @Override
@@ -3626,6 +3636,204 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
 
     @Override
+    public void getCompaniesWithNotransactions()
+    {
+        LOG.info( "Started transactionMonitorForCompaniesWithNotransactions" );
+        int noOfDays = NUMBER_OF_DAYS;
+
+        //Method to call the api
+        List<CompanyView> companiesWithNoTransactions = getCompaniesWithNoTransactionInPastNDaysInBatch( noOfDays );
+
+        LOG.info( "sendNoTransactionAlertMailForCompanies" );
+        String mailBody = "";
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add( Calendar.DATE, -( NUMBER_OF_DAYS ) ); // subtract the no of days
+        Date nDaysBackDate = new Date( calendar.getTimeInMillis() );
+
+        int i = 0;
+        for ( CompanyView company : companiesWithNoTransactions ) {
+            i++;
+            mailBody += ( i + ". " + " " + company.getCompany() + " with id " + company.getCompanyId()
+                + " SocialSurvey has not received any transaction details since " + nDaysBackDate );
+            mailBody += "<br>";
+        }
+
+
+        try {
+            //send mail if there is at least one company with no transactions
+            if ( i > 0 )
+                emailServices.sendNoTransactionAlertMail( getTransactionMonitorMailList(), mailBody );
+        } catch ( InvalidInputException | UndeliveredEmailException e ) {
+            LOG.error( "Error while sending highNotProcessed aler email ", e );
+        }
+        LOG.info( "sendNoTransactionAlertMailForCompanies ended" );
+
+
+    }
+
+
+    @SuppressWarnings ( "unchecked")
+    private List<CompanyView> getCompaniesWithNoTransactionInPastNDaysInBatch( int noOfDays )
+    {
+        LOG.debug( "getCompaniesWithNoTransactionInPastNDaysInBatch() started" );
+        Response companiesListResponse = ssApiBatchIntergrationBuilder.getIntegrationApi()
+            .getCompaniesWithNoTransactionInPastNDays( noOfDays );
+
+        String companiesListString = StringEscapeUtils.unescapeJava( companiesListResponse != null
+            ? new String( ( (TypedByteArray) companiesListResponse.getBody() ).getBytes() ) : null );
+
+        return (List<CompanyView>) ( new Gson().fromJson( StringUtils.strip( companiesListString, "\"" ),
+            new TypeToken<List<CompanyView>>() {}.getType() ) );
+    }
+    
+    @Override
+    public void getCompaniesWithHighNotProcessedTransactions()
+    {
+        LOG.debug( "Started transactionMonitorForCompaniesWithHighNotProcessedTransactions" );
+
+        //Method to call the api
+        List<Long> companyIdsForLessSurveyAlerts = validatesurveystatsforcompaniesInBatch();
+        List<CompanyView> allActiveCompanies = getAllActiveEnterpriseCompaniesInBatch();
+
+        LOG.info( "sendHighNotProcessedTransactionAlertMailForCompanies" );
+
+        String mailBody = "";
+
+        int i = 0;
+        for ( CompanyView company : allActiveCompanies ) {
+            //check if we need to send alert mail for this company
+            if ( companyIdsForLessSurveyAlerts.contains( company.getCompanyId() ) ) {
+                i++;
+                mailBody += ( i + ". " + " " + company.getCompany() + " with id " + company.getCompanyId()
+                    + " have more than 50% unprocessed transactions for previous day." );
+                mailBody += "<br>";
+            }
+
+        }
+
+
+        try {
+            //send mail if there is atleast one company with high not processed transactions
+            if ( i > 0 )
+                emailServices.sendHighVoulmeUnprocessedTransactionAlertMail( getTransactionMonitorMailList(), mailBody );
+        } catch ( InvalidInputException | UndeliveredEmailException e ) {
+            LOG.error( "Error while sending highNotProcessed alert email ", e );
+        }
+        LOG.info( "method sendHighNotProcessedTransactionAlertMailForCompanies ended" );
+
+
+    }
+
+
+    @SuppressWarnings ( "unchecked")
+    private List<Long> validatesurveystatsforcompaniesInBatch()
+    {
+        LOG.debug( "validatesurveystatsforcompaniesInBatch() started" );
+        Response companiesListResponse = ssApiBatchIntergrationBuilder.getIntegrationApi().validateSurveyStatsForCompanies();
+
+        String companiesListString = StringEscapeUtils.unescapeJava( companiesListResponse != null
+            ? new String( ( (TypedByteArray) companiesListResponse.getBody() ).getBytes() ) : null );
+
+        return (List<Long>) ( new Gson().fromJson( StringUtils.strip( companiesListString, "\"" ),
+            new TypeToken<List<Long>>() {}.getType() ) );
+    }
+
+
+    @SuppressWarnings ( "unchecked")
+    private List<CompanyView> getAllActiveEnterpriseCompaniesInBatch()
+    {
+        LOG.debug( "getAllActiveEnterpriseCompaniesInBatch() started" );
+        Response companiesListResponse = ssApiBatchIntergrationBuilder.getIntegrationApi().getAllActiveEnterpriseCompanies();
+
+        String companiesListString = StringEscapeUtils.unescapeJava( companiesListResponse != null
+            ? new String( ( (TypedByteArray) companiesListResponse.getBody() ).getBytes() ) : null );
+
+
+        return (List<CompanyView>) ( new Gson().fromJson( StringUtils.strip( companiesListString, "\"" ),
+            new TypeToken<List<CompanyView>>() {}.getType() ) );
+    }
+
+
+    @Override
+    public void getCompaniesWithLowVolumeOfTransactions()
+    {
+        LOG.debug( "Started transactionMonitorForCompaniesWithLowVolumeOfTransactions" );
+
+        //Method to call the api
+        Map<Long, Long> companySurveyStatsCountsMap = getSurveyStatusStatsForPastOneMonthInBatch();
+        List<CompanyActiveUsersStats> companyActiveUserCounts = getCompanyActiveUserCountForPastDayInBatch();
+
+        LOG.info( "validateAndSentLessSurveysAlert" );
+        String mailBody = "";
+
+        int i = 0;
+        for ( CompanyActiveUsersStats companyActiveUsersStats : companyActiveUserCounts ) {
+            Long surveyCount = companySurveyStatsCountsMap.get( companyActiveUsersStats.getCompanyId() );
+            Integer userCount = companyActiveUsersStats.getNoOfActiveUsers();
+            if ( surveyCount != null && userCount != null && ( surveyCount / 2 ) < userCount ) {
+                i++;
+                mailBody += ( i + ". " + "Company with id " + companyActiveUsersStats.getCompanyId() + "  sent us  "
+                    + surveyCount + " transactions for total of " + userCount + " Users in past one month." );
+                mailBody += "<br>";
+            }
+        }
+
+        try {
+            //send mail only if there is at least one company with less survey transactions
+            if ( i > 0 )
+                emailServices.sendLessVoulmeOfTransactionReceivedAlertMail( getTransactionMonitorMailList(), mailBody );
+        } catch ( InvalidInputException | UndeliveredEmailException e ) {
+            LOG.error( "Error while sending less survey alert email.", e );
+        }
+        LOG.info( "validateAndSentLessSurveysAlert ended" );
+
+
+    }
+
+
+    @SuppressWarnings ( "unchecked")
+    private Map<Long, Long> getSurveyStatusStatsForPastOneMonthInBatch()
+    {
+        LOG.debug( "getSurveyStatusStatsForPastOneMonthInBatch() started" );
+        Response companiesListResponse = ssApiBatchIntergrationBuilder.getIntegrationApi()
+            .getSurveyStatusStatsForPastOneMonth();
+
+        String companiesListString = StringEscapeUtils.unescapeJava( companiesListResponse != null
+            ? new String( ( (TypedByteArray) companiesListResponse.getBody() ).getBytes() ) : null );
+
+        return (Map<Long, Long>) ( new Gson().fromJson( StringUtils.strip( companiesListString, "\"" ),
+            new TypeToken<Map<Long, Long>>() {}.getType() ) );
+    }
+
+
+    @SuppressWarnings ( "unchecked")
+    private List<CompanyActiveUsersStats> getCompanyActiveUserCountForPastDayInBatch()
+    {
+        LOG.debug( "getCompanyActiveUserCountForPastDayInBatch() started" );
+        Response usersListResponse = ssApiBatchIntergrationBuilder.getIntegrationApi().getCompanyActiveUserCountForPastDay();
+
+        String usersListString = StringEscapeUtils.unescapeJava(
+            usersListResponse != null ? new String( ( (TypedByteArray) usersListResponse.getBody() ).getBytes() ) : null );
+
+        return (List<CompanyActiveUsersStats>) ( new Gson().fromJson( StringUtils.strip( usersListString, "\"" ),
+            new TypeToken<List<CompanyActiveUsersStats>>() {}.getType() ) );
+    }
+
+
+    @Override
+    public List<String> getTransactionMonitorMailList()
+    {
+        String[] transactionMailRecipient = transactionMonitorSupportEmail.split( "," );
+        List<String> transactionMailList = new ArrayList<>();
+        for ( String recipient : transactionMailRecipient ) {
+            transactionMailList.add( recipient );
+        }
+        return transactionMailList;
+
+    }
+
+
     @Transactional ( value = "transactionManagerForReporting")
     public List<CompanyDetailsReport> getCompanyDetailsReport( Long entityId, int startIndex, int batchSize )
         throws InvalidInputException
@@ -3637,9 +3845,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         }
         return companyDetailsReportData;
     }
-
-
-    @Override
+    
     public String generateCompanyDetailsReport( long entityId, String entityType )
         throws UnsupportedEncodingException, NonFatalException
     {
@@ -3729,5 +3935,238 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             endTime = new Timestamp( endDate.getTime() );
         return reportingSurveyPreInititationDao.getIncompleteSurveyForReporting( entityType, entityId, startTime, endTime,
             startIndex, batchSize );
+    }
+    
+    @Override
+    public void updateTransactionMonitorAlertsForCompanies() throws InvalidInputException
+    {
+        LOG.debug( "Started updateTransactionMonitorAlertsForCompanies" );
+
+        //Method to call the api
+        Map<Long, List<CompanySurveyStatusStats>> surveStatsForPast7daysForAllCompanies = getSurveStatsForPast7daysForAllCompanies();
+        Map<Long, List<CompanySurveyStatusStats>> surveStatsForLastToLatWeekForAllCompanies = getSurveStatsForLastToLatWeekForAllCompanies();
+        
+        Map<Long, Long> transacionCountForPastNDays = getTotalTransactionCountForPastNDays();       
+        Map<Long, Long> transacionCountForPreviousDay = getTransactionCountForPreviousDay();
+        Map<Long, Long> sentSurveyCountForPreviousDay = getSendSurveyCountForPreviousDay();
+        Map<Long, Long> completedSurveyCountForPastNDays = getCompletedSurveyCountForPastNDays();
+        
+        
+        List<Company> companies =  organizationManagementService.getAllActiveEnterpriseCompanies();
+        for(Company company : companies){
+            long companyId =  company.getCompanyId() ;
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(companyId);
+            
+            List<CompanySurveyStatusStats> surveStatsForPast7days = surveStatsForPast7daysForAllCompanies.get( companyId );
+            List<CompanySurveyStatusStats> surveStatsForLastToLatWeek = surveStatsForLastToLatWeekForAllCompanies.get( companyId);
+            
+            
+            //check if lessTransactionInPastDays is true
+            boolean isZeroIncomingTransactionInPastThreeDays = false;
+            if(transacionCountForPastNDays.get( companyId ) == null || transacionCountForPastNDays.get( companyId ) == 0){
+                isZeroIncomingTransactionInPastThreeDays = true;
+            }
+            
+            //check if isLessInvitationSentInPastSevenDays is true
+            boolean isLessInvitationSentInPastSevenDays = false;
+            if(getSentSurveyCountFromList(surveStatsForLastToLatWeek) <= getSentSurveyCountFromList(surveStatsForLastToLatWeek) / 2){
+                isLessInvitationSentInPastSevenDays = true;
+            }
+            
+            //check if isMoreReminderSentInPastSevenDays is true
+            boolean isMoreReminderSentInPastSevenDays = false; 
+            if(getSentSurveyReminderCountFromList(surveStatsForLastToLatWeek) >= getSentSurveyReminderCountFromList(surveStatsForLastToLatWeek) * 2){
+                isMoreReminderSentInPastSevenDays = true;
+            }
+            
+            //check if isZeroIncomingTransactionInPastOneDay is true
+            boolean isZeroIncomingTransactionInPastOneDay = false;
+            if(transacionCountForPreviousDay.get( companyId ) == null || transacionCountForPreviousDay.get( companyId ) == 0){
+                isZeroIncomingTransactionInPastOneDay = true;
+            }
+
+            //check if isLessIncomingTransactionInPastSevenDays is true
+            boolean isLessIncomingTransactionInPastSevenDays = false;
+            if(getTransactionReceivedCountFromList(surveStatsForLastToLatWeek) <= getTransactionReceivedCountFromList(surveStatsForLastToLatWeek) / 2){
+                isLessIncomingTransactionInPastSevenDays = true;
+            }
+            
+            
+            //check if isLessIncomingTransactionInPastSevenDays is true
+            boolean isLessInvitationSentInPastSevenDaysWarning = false;
+            if(getSentSurveyCountFromList(surveStatsForLastToLatWeek) <= (getSentSurveyCountFromList(surveStatsForLastToLatWeek)* 3 / 4)){
+                isLessInvitationSentInPastSevenDaysWarning = true;
+            }
+            
+            
+          //check if isMoreReminderSentInPastSevenDays is true
+            boolean isMoreReminderSentInPastSevenDaysWarning = false; 
+            if(getSentSurveyReminderCountFromList(surveStatsForLastToLatWeek) >= (getSentSurveyReminderCountFromList(surveStatsForLastToLatWeek) * 3 / 2) ){
+                isMoreReminderSentInPastSevenDays = true;
+            }
+            
+            //check if isNoSurveyCompletedInPastThreeDays is true
+            boolean isNoSurveyCompletedInPastThreeDays = false; 
+            if(completedSurveyCountForPastNDays.get( companyId ) == null || completedSurveyCountForPastNDays.get( companyId ) == 0){
+                isNoSurveyCompletedInPastThreeDays = true;
+            }
+            
+            EntityAlertDetails entityAlertDetails =  companySettings.getEntityAlertDetails();
+            if(entityAlertDetails == null)
+                entityAlertDetails = new EntityAlertDetails();
+            
+            List<String> currentErrorAlerts = new ArrayList<>();
+            if(isZeroIncomingTransactionInPastThreeDays)
+                currentErrorAlerts.add( EntityErrorAlertType.LESS_TRANSACTION_IN_PAST_DAYS.getAlertType() );
+            if(isZeroIncomingTransactionInPastThreeDays)
+                currentErrorAlerts.add( EntityErrorAlertType.LESS_TRANSACTION_IN_PAST_DAYS.getAlertType() );
+            if(isZeroIncomingTransactionInPastThreeDays)
+                currentErrorAlerts.add( EntityErrorAlertType.LESS_TRANSACTION_IN_PAST_DAYS.getAlertType() );
+            
+            entityAlertDetails.setCurrentErrorAlerts( currentErrorAlerts );
+            if(currentErrorAlerts.size() > 0)
+                entityAlertDetails.setErrorAlert(true);
+            else
+                entityAlertDetails.setErrorAlert(false);
+            
+            
+            List<String> currentWarningAlerts = new ArrayList<>();
+            if(isZeroIncomingTransactionInPastOneDay)
+                currentWarningAlerts.add( EntityWarningAlertType.LESS_TRANSACTION_IN_PAST_DAYS.getAlertType() );
+            if(isLessIncomingTransactionInPastSevenDays)
+                currentWarningAlerts.add( EntityWarningAlertType.LESS_TRANSACTION_IN_PAST_WEEK.getAlertType() );
+            if(isLessInvitationSentInPastSevenDaysWarning)
+                currentWarningAlerts.add( EntityWarningAlertType.LESS_INVITATION_IN_PAST_WEEK.getAlertType() );
+            if(isMoreReminderSentInPastSevenDaysWarning)
+                currentWarningAlerts.add( EntityWarningAlertType.MORE_REMINDER_IN_PAST_WEEK.getAlertType() );
+            if(isNoSurveyCompletedInPastThreeDays)
+                currentWarningAlerts.add( EntityWarningAlertType.LESS_SURVEY_COMPLETED_IN_PAST_DAYS.getAlertType() );
+            
+            entityAlertDetails.setCurrentWarningAlerts( currentWarningAlerts );
+            if(currentWarningAlerts.size() > 0)
+                entityAlertDetails.setWarningAlert(true);
+            else
+                entityAlertDetails.setWarningAlert(false);
+            
+            companySettings.setEntityAlertDetails( entityAlertDetails );
+            organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden( MongoOrganizationUnitSettingDaoImpl.KEY_ENTITY_ALERT_DETAILS, entityAlertDetails, companyId, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        }
+        
+
+        LOG.info( "method updateTransactionMonitorAlertsForCompanies ended" );
+
+
+    }
+    
+    @SuppressWarnings ( "unchecked")
+    private Map<Long, Long> getTotalTransactionCountForPastNDays()
+    {
+        LOG.debug( "getTotalTransactionCountForPastNDays() started" );
+        Response companiesListResponse = ssApiBatchIntergrationBuilder.getIntegrationApi().getTotalTransactionCountForPastNDays();
+
+        String companiesListString = StringEscapeUtils.unescapeJava( companiesListResponse != null
+            ? new String( ( (TypedByteArray) companiesListResponse.getBody() ).getBytes() ) : null );
+
+        return (Map<Long, Long>) ( new Gson().fromJson( StringUtils.strip( companiesListString, "\"" ),
+            new TypeToken<Map<Long, Long>>() {}.getType() ) );
+    }
+    
+    @SuppressWarnings ( "unchecked")
+    private Map<Long, Long> getTransactionCountForPreviousDay()
+    {
+        LOG.debug( "getTransactionCountForPreviousDay() started" );
+        Response companiesListResponse = ssApiBatchIntergrationBuilder.getIntegrationApi().getTransactionCountForPreviousDay();
+
+        String companiesListString = StringEscapeUtils.unescapeJava( companiesListResponse != null
+            ? new String( ( (TypedByteArray) companiesListResponse.getBody() ).getBytes() ) : null );
+
+        return (Map<Long, Long>) ( new Gson().fromJson( StringUtils.strip( companiesListString, "\"" ),
+            new TypeToken<Map<Long, Long>>() {}.getType() ) );
+    }
+    
+    @SuppressWarnings ( "unchecked")
+    private Map<Long, Long> getSendSurveyCountForPreviousDay()
+    {
+        LOG.debug( "getSendSurveyCountForPreviousDay() started" );
+        Response companiesListResponse = ssApiBatchIntergrationBuilder.getIntegrationApi().getSendSurveyCountForPreviousDay();
+
+        String companiesListString = StringEscapeUtils.unescapeJava( companiesListResponse != null
+            ? new String( ( (TypedByteArray) companiesListResponse.getBody() ).getBytes() ) : null );
+
+        return (Map<Long, Long>) ( new Gson().fromJson( StringUtils.strip( companiesListString, "\"" ),
+            new TypeToken<Map<Long, Long>>() {}.getType() ) );
+    }
+    
+    @SuppressWarnings ( "unchecked")
+    private Map<Long, List<CompanySurveyStatusStats>> getSurveStatsForPast7daysForAllCompanies()
+    {
+        LOG.debug( "getSendSurveyCountForPreviousDay() started" );
+        Response companiesListResponse = ssApiBatchIntergrationBuilder.getIntegrationApi().getSurveStatsForPast7daysForAllCompanies();
+
+        String companiesListString = StringEscapeUtils.unescapeJava( companiesListResponse != null
+            ? new String( ( (TypedByteArray) companiesListResponse.getBody() ).getBytes() ) : null );
+
+        return (Map<Long, List<CompanySurveyStatusStats>>) ( new Gson().fromJson( StringUtils.strip( companiesListString, "\"" ),
+            new TypeToken<Map<Long, List<CompanySurveyStatusStats>>>() {}.getType() ) );
+    }
+    
+    @SuppressWarnings ( "unchecked")
+    private Map<Long, List<CompanySurveyStatusStats>> getSurveStatsForLastToLatWeekForAllCompanies()
+    {
+        LOG.debug( "getSendSurveyCountForPreviousDay() started" );
+        Response companiesListResponse = ssApiBatchIntergrationBuilder.getIntegrationApi().getSurveStatsForLastToLatWeekForAllCompanies();
+
+        String companiesListString = StringEscapeUtils.unescapeJava( companiesListResponse != null
+            ? new String( ( (TypedByteArray) companiesListResponse.getBody() ).getBytes() ) : null );
+
+        return (Map<Long, List<CompanySurveyStatusStats>>) ( new Gson().fromJson( StringUtils.strip( companiesListString, "\"" ),
+            new TypeToken<Map<Long, List<CompanySurveyStatusStats>>>() {}.getType() ) );
+    }
+
+    @SuppressWarnings ( "unchecked")
+    private Map<Long, Long> getCompletedSurveyCountForPastNDays()
+    {
+        LOG.debug( "getSendSurveyCountForPreviousDay() started" );
+        Response companiesListResponse = ssApiBatchIntergrationBuilder.getIntegrationApi().getCompletedSurveyCountForPastNDays();
+
+        String companiesListString = StringEscapeUtils.unescapeJava( companiesListResponse != null
+            ? new String( ( (TypedByteArray) companiesListResponse.getBody() ).getBytes() ) : null );
+
+        return (Map<Long, Long>) ( new Gson().fromJson( StringUtils.strip( companiesListString, "\"" ),
+            new TypeToken<Map<Long, Long>>() {}.getType() ) );
+    }
+    
+    private int getSentSurveyCountFromList(List<CompanySurveyStatusStats> companySurveyStatusStatsList)
+    {
+        int sentSurveyCount = 0;
+        if(companySurveyStatusStatsList != null){
+            for(CompanySurveyStatusStats companySurveyStatusStats : companySurveyStatusStatsList){
+                sentSurveyCount += companySurveyStatusStats.getSurveyInvitationSentCount();
+            }
+        }
+        return sentSurveyCount;
+    }
+    
+    private int getSentSurveyReminderCountFromList(List<CompanySurveyStatusStats> companySurveyStatusStatsList)
+    {
+        int sentSurveyReminderCount = 0;
+        if(companySurveyStatusStatsList != null){
+            for(CompanySurveyStatusStats companySurveyStatusStats : companySurveyStatusStatsList){
+                sentSurveyReminderCount += companySurveyStatusStats.getSurveyReminderSentCount();
+            }
+        }
+        return sentSurveyReminderCount;
+    }
+    
+    private int getTransactionReceivedCountFromList(List<CompanySurveyStatusStats> companySurveyStatusStatsList)
+    {
+        int totalTransactionReceivedCount = 0;
+        if(companySurveyStatusStatsList != null){
+            for(CompanySurveyStatusStats companySurveyStatusStats : companySurveyStatusStatsList){
+                totalTransactionReceivedCount += companySurveyStatusStats.getTransactionReceivedCount();
+            }
+        }
+        return totalTransactionReceivedCount;
     }
 }

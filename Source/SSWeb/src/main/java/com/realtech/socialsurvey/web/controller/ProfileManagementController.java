@@ -4884,33 +4884,41 @@ public class ProfileManagementController
             int startIndex = Integer.parseInt( request.getParameter( "startIndex" ) );
             int numRows = Integer.parseInt( request.getParameter( "numOfRows" ) );
             boolean hiddenSection = Boolean.parseBoolean( request.getParameter( "hiddenSection" ) );
-
+            OrganizationUnitSettings unitSettings = null;  
             long companyId = user.getCompany().getCompanyId();
+            
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
                 reviewItems = profileManagementService.getReviews( companyId, minScore, maxScore, startIndex, numRows,
                     CommonConstants.PROFILE_LEVEL_COMPANY, fetchAbusive, null, null,
                     profileManagementService.processSortCriteria( companyId, null ) );
+                unitSettings = organizationManagementService.getCompanySettings( entityId );
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 reviewItems = profileManagementService.getReviews( entityId, minScore, maxScore, startIndex, numRows,
                     CommonConstants.PROFILE_LEVEL_REGION, fetchAbusive, null, null,
                     profileManagementService.processSortCriteria( companyId, null ) );
+                unitSettings = organizationManagementService.getRegionSettings( entityId );
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 reviewItems = profileManagementService.getReviews( entityId, minScore, maxScore, startIndex, numRows,
                     CommonConstants.PROFILE_LEVEL_BRANCH, fetchAbusive, null, null,
                     profileManagementService.processSortCriteria( companyId, null ) );
+                unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 reviewItems = profileManagementService.getReviews( user.getUserId(), minScore, maxScore, startIndex, numRows,
                     CommonConstants.PROFILE_LEVEL_INDIVIDUAL, fetchAbusive, null, null,
                     profileManagementService.processSortCriteria( companyId, null ) );
+                unitSettings = organizationManagementService.getAgentSettings( entityId );
+            } else {
+                throw new InvalidInputException( "Invalid profile level." );
             }
 
             // Setting agent's profile URL in each of the review.
             profileManagementService.setAgentProfileUrlForReview( reviewItems );
-
+            
+            model.addAttribute( "profileUrl", unitSettings.getCompleteProfileUrl() );
             model.addAttribute( "reviews", reviewItems );
             model.addAttribute( "hiddenSection", hiddenSection );
             model.addAttribute( "startIndex", startIndex );
-        } catch ( InvalidInputException e ) {
+        } catch ( InvalidInputException | NoRecordsFetchedException e ) {
             LOG.warn( "Something went wrong while fetching reviews  {}",e  );
             throw new InternalServerException(
                 new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_COMPANY_REVIEWS_FETCH_FAILURE,

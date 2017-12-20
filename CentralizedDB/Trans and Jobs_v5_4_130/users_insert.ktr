@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>users</name>
+    <name>users_insert</name>
     <description/>
     <extended_description/>
     <trans_version/>
@@ -66,10 +66,10 @@
     <clusterschemas>
     </clusterschemas>
   <created_user>-</created_user>
-  <created_date>2017&#x2f;10&#x2f;12 12&#x3a;13&#x3a;23.725</created_date>
+  <created_date>2017&#x2f;12&#x2f;13 17&#x3a;31&#x3a;41.001</created_date>
   <modified_user>-</modified_user>
-  <modified_date>2017&#x2f;10&#x2f;12 12&#x3a;13&#x3a;23.725</modified_date>
-    <key_for_session_key>H4sIAAAAAAAAAAMAAAAAAAAAAAA&#x3d;</key_for_session_key>
+  <modified_date>2017&#x2f;12&#x2f;13 17&#x3a;31&#x3a;41.001</modified_date>
+    <key_for_session_key/>
     <is_key_private>N</is_key_private>
   </info>
   <notepads>
@@ -131,8 +131,9 @@
     </attributes>
   </connection>
   <order>
-  <hop> <from>Table input</from><to>Convert to EST</to><enabled>Y</enabled> </hop>
-  <hop> <from>Convert to EST</from><to>Update Users</to><enabled>Y</enabled> </hop>
+  <hop> <from>Users input</from><to>Convert to EST</to><enabled>Y</enabled> </hop>
+  <hop> <from>Convert to EST</from><to>Users Output</to><enabled>Y</enabled> </hop>
+  <hop> <from>Users Output</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Convert to EST</name>
@@ -170,14 +171,14 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>268</xloc>
-      <yloc>127</yloc>
+      <xloc>335</xloc>
+      <yloc>191</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Table input</name>
+    <name>Users input</name>
     <type>TableInput</type>
     <description/>
     <distribute>Y</distribute>
@@ -188,7 +189,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_INFO_CONNECTION</connection>
-    <sql>SELECT&#xd;&#xa;  USER_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, LOGIN_NAME&#xd;&#xa;, LOGIN_PASSWORD&#xd;&#xa;, EMAIL_ID&#xd;&#xa;, FIRST_NAME&#xd;&#xa;, LAST_NAME&#xd;&#xa;, SOURCE&#xd;&#xa;, SOURCE_USER_ID&#xd;&#xa;, IS_ATLEAST_ONE_USERPROFILE_COMPLETE&#xd;&#xa;, IS_OWNER&#xd;&#xa;, STATUS&#xd;&#xa;, LAST_LOGIN&#xd;&#xa;, NUM_OF_LOGINS&#xd;&#xa;, SUPER_ADMIN&#xd;&#xa;, IS_ZILLOW_CONNECTED&#xd;&#xa;, ZILLOW_REVIEW_COUNT&#xd;&#xa;, ZILLOW_AVERAGE_SCORE&#xd;&#xa;, CREATED_ON&#xd;&#xa;, CREATED_BY&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;, MODIFIED_BY&#xd;&#xa;, REGISTRATION_STAGE&#xd;&#xa;, FORCE_PASSWORD&#xd;&#xa;FROM USERS&#xd;&#xa;WHERE MODIFIED_ON &#x3e;&#x3d; &#x27;&#x24;&#x7b;lastModifiedTime&#x7d;&#x27;&#x3b;</sql>
+    <sql>SELECT&#xd;&#xa;  USER_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, LOGIN_NAME&#xd;&#xa;, LOGIN_PASSWORD&#xd;&#xa;, EMAIL_ID&#xd;&#xa;, FIRST_NAME&#xd;&#xa;, LAST_NAME&#xd;&#xa;, SOURCE&#xd;&#xa;, SOURCE_USER_ID&#xd;&#xa;, IS_ATLEAST_ONE_USERPROFILE_COMPLETE&#xd;&#xa;, IS_OWNER&#xd;&#xa;, STATUS&#xd;&#xa;, LAST_LOGIN&#xd;&#xa;, NUM_OF_LOGINS&#xd;&#xa;, SUPER_ADMIN&#xd;&#xa;, IS_ZILLOW_CONNECTED&#xd;&#xa;, ZILLOW_REVIEW_COUNT&#xd;&#xa;, ZILLOW_AVERAGE_SCORE&#xd;&#xa;, CREATED_ON&#xd;&#xa;, CREATED_BY&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;, MODIFIED_BY&#xd;&#xa;, REGISTRATION_STAGE&#xd;&#xa;, FORCE_PASSWORD&#xd;&#xa;FROM USERS&#xd;&#xa;WHERE CREATED_ON &#x3e;&#x3d; &#x27;&#x24;&#x7b;lastModifiedTime&#x7d;&#x27;&#x3b;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -196,15 +197,15 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>115</xloc>
-      <yloc>127</yloc>
+      <xloc>182</xloc>
+      <yloc>191</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Update Users</name>
-    <type>Update</type>
+    <name>Users Output</name>
+    <type>TableOutput</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -214,138 +215,164 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <skip_lookup>N</skip_lookup>
+    <schema/>
+    <table>users</table>
     <commit>10000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
     <use_batch>N</use_batch>
-    <error_ignored>Y</error_ignored>
-    <ignore_flag_field/>
-    <lookup>
-      <schema/>
-      <table>users</table>
-      <key>
-        <name>USER_ID</name>
-        <field>USER_ID</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-        </key>
-      <value>
-        <name>COMPANY_ID</name>
-        <rename>COMPANY_ID</rename>
-        </value>
-      <value>
-        <name>LOGIN_NAME</name>
-        <rename>LOGIN_NAME</rename>
-        </value>
-      <value>
-        <name>LOGIN_PASSWORD</name>
-        <rename>LOGIN_PASSWORD</rename>
-        </value>
-      <value>
-        <name>EMAIL_ID</name>
-        <rename>EMAIL_ID</rename>
-        </value>
-      <value>
-        <name>FIRST_NAME</name>
-        <rename>FIRST_NAME</rename>
-        </value>
-      <value>
-        <name>LAST_NAME</name>
-        <rename>LAST_NAME</rename>
-        </value>
-      <value>
-        <name>SOURCE</name>
-        <rename>SOURCE</rename>
-        </value>
-      <value>
-        <name>SOURCE_USER_ID</name>
-        <rename>SOURCE_USER_ID</rename>
-        </value>
-      <value>
-        <name>IS_ATLEAST_ONE_USERPROFILE_COMPLETE</name>
-        <rename>IS_ATLEAST_ONE_USERPROFILE_COMPLETE</rename>
-        </value>
-      <value>
-        <name>IS_OWNER</name>
-        <rename>IS_OWNER</rename>
-        </value>
-      <value>
-        <name>STATUS</name>
-        <rename>STATUS</rename>
-        </value>
-      <value>
-        <name>LAST_LOGIN</name>
-        <rename>LAST_LOGIN</rename>
-        </value>
-      <value>
-        <name>NUM_OF_LOGINS</name>
-        <rename>NUM_OF_LOGINS</rename>
-        </value>
-      <value>
-        <name>SUPER_ADMIN</name>
-        <rename>SUPER_ADMIN</rename>
-        </value>
-      <value>
-        <name>IS_ZILLOW_CONNECTED</name>
-        <rename>IS_ZILLOW_CONNECTED</rename>
-        </value>
-      <value>
-        <name>ZILLOW_REVIEW_COUNT</name>
-        <rename>ZILLOW_REVIEW_COUNT</rename>
-        </value>
-      <value>
-        <name>ZILLOW_AVERAGE_SCORE</name>
-        <rename>ZILLOW_AVERAGE_SCORE</rename>
-        </value>
-      <value>
-        <name>CREATED_ON</name>
-        <rename>CREATED_ON</rename>
-        </value>
-      <value>
-        <name>CREATED_BY</name>
-        <rename>CREATED_BY</rename>
-        </value>
-      <value>
-        <name>MODIFIED_ON</name>
-        <rename>MODIFIED_ON</rename>
-        </value>
-      <value>
-        <name>MODIFIED_BY</name>
-        <rename>MODIFIED_BY</rename>
-        </value>
-      <value>
-        <name>REGISTRATION_STAGE</name>
-        <rename>REGISTRATION_STAGE</rename>
-        </value>
-      <value>
-        <name>FORCE_PASSWORD</name>
-        <rename>FORCE_PASSWORD</rename>
-        </value>
-      <value>
-        <name>CREATED_ON_EST</name>
-        <rename>CREATED_ON_EST</rename>
-        </value>
-      <value>
-        <name>MODIFIED_ON_EST</name>
-        <rename>MODIFIED_ON_EST</rename>
-        </value>
-      <value>
-        <name>LAST_LOGIN_EST</name>
-        <rename>LAST_LOGIN_EST</rename>
-        </value>
-      </lookup>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields>
+        <field>
+          <column_name>USER_ID</column_name>
+          <stream_name>USER_ID</stream_name>
+        </field>
+        <field>
+          <column_name>COMPANY_ID</column_name>
+          <stream_name>COMPANY_ID</stream_name>
+        </field>
+        <field>
+          <column_name>LOGIN_NAME</column_name>
+          <stream_name>LOGIN_NAME</stream_name>
+        </field>
+        <field>
+          <column_name>LOGIN_PASSWORD</column_name>
+          <stream_name>LOGIN_PASSWORD</stream_name>
+        </field>
+        <field>
+          <column_name>EMAIL_ID</column_name>
+          <stream_name>EMAIL_ID</stream_name>
+        </field>
+        <field>
+          <column_name>FIRST_NAME</column_name>
+          <stream_name>FIRST_NAME</stream_name>
+        </field>
+        <field>
+          <column_name>LAST_NAME</column_name>
+          <stream_name>LAST_NAME</stream_name>
+        </field>
+        <field>
+          <column_name>SOURCE</column_name>
+          <stream_name>SOURCE</stream_name>
+        </field>
+        <field>
+          <column_name>SOURCE_USER_ID</column_name>
+          <stream_name>SOURCE_USER_ID</stream_name>
+        </field>
+        <field>
+          <column_name>IS_ATLEAST_ONE_USERPROFILE_COMPLETE</column_name>
+          <stream_name>IS_ATLEAST_ONE_USERPROFILE_COMPLETE</stream_name>
+        </field>
+        <field>
+          <column_name>IS_OWNER</column_name>
+          <stream_name>IS_OWNER</stream_name>
+        </field>
+        <field>
+          <column_name>STATUS</column_name>
+          <stream_name>STATUS</stream_name>
+        </field>
+        <field>
+          <column_name>LAST_LOGIN</column_name>
+          <stream_name>LAST_LOGIN</stream_name>
+        </field>
+        <field>
+          <column_name>NUM_OF_LOGINS</column_name>
+          <stream_name>NUM_OF_LOGINS</stream_name>
+        </field>
+        <field>
+          <column_name>SUPER_ADMIN</column_name>
+          <stream_name>SUPER_ADMIN</stream_name>
+        </field>
+        <field>
+          <column_name>IS_ZILLOW_CONNECTED</column_name>
+          <stream_name>IS_ZILLOW_CONNECTED</stream_name>
+        </field>
+        <field>
+          <column_name>ZILLOW_REVIEW_COUNT</column_name>
+          <stream_name>ZILLOW_REVIEW_COUNT</stream_name>
+        </field>
+        <field>
+          <column_name>ZILLOW_AVERAGE_SCORE</column_name>
+          <stream_name>ZILLOW_AVERAGE_SCORE</stream_name>
+        </field>
+        <field>
+          <column_name>CREATED_ON</column_name>
+          <stream_name>CREATED_ON</stream_name>
+        </field>
+        <field>
+          <column_name>CREATED_BY</column_name>
+          <stream_name>CREATED_BY</stream_name>
+        </field>
+        <field>
+          <column_name>MODIFIED_ON</column_name>
+          <stream_name>MODIFIED_ON</stream_name>
+        </field>
+        <field>
+          <column_name>MODIFIED_BY</column_name>
+          <stream_name>MODIFIED_BY</stream_name>
+        </field>
+        <field>
+          <column_name>REGISTRATION_STAGE</column_name>
+          <stream_name>REGISTRATION_STAGE</stream_name>
+        </field>
+        <field>
+          <column_name>FORCE_PASSWORD</column_name>
+          <stream_name>FORCE_PASSWORD</stream_name>
+        </field>
+        <field>
+          <column_name>CREATED_ON_EST</column_name>
+          <stream_name>CREATED_ON_EST</stream_name>
+        </field>
+        <field>
+          <column_name>MODIFIED_ON_EST</column_name>
+          <stream_name>MODIFIED_ON_EST</stream_name>
+        </field>
+        <field>
+          <column_name>LAST_LOGIN_EST</column_name>
+          <stream_name>LAST_LOGIN_EST</stream_name>
+        </field>
+    </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>422</xloc>
-      <yloc>127</yloc>
+      <xloc>487</xloc>
+      <yloc>191</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Dummy &#x28;do nothing&#x29;</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>648</xloc>
+      <yloc>191</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step_error_handling>
       <error>
-        <source_step>Update Users</source_step>
+        <source_step>Users Output</source_step>
         <target_step>Dummy &#x28;do nothing&#x29;</target_step>
-        <is_enabled>N</is_enabled>
+        <is_enabled>Y</is_enabled>
         <nr_valuename/>
         <descriptions_valuename/>
         <fields_valuename/>

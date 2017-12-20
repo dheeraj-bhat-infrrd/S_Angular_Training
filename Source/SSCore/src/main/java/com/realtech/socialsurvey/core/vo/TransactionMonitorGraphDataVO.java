@@ -1,22 +1,20 @@
 package com.realtech.socialsurvey.core.vo;
 
-import java.sql.Date;
+import java.util.List;
+
+import com.realtech.socialsurvey.core.entities.CompanySurveyStatusStats;
+import com.realtech.socialsurvey.core.entities.EntityAlertDetails;
 
 public class TransactionMonitorGraphDataVO
 {
     private long companyId;
     
-    private int totalTransactionsCount;
+    private String companyName;
     
-    private int surveyInvitationSentCount;
+    private EntityAlertDetails entityAlertDetails;
     
-    private long surveyReminderSentCount;
-    
-    private  int surveycompletedCount;
+    private List<CompanySurveyStatusStats> companySurveyStatusStatslist;
 
-    private Date transactionDate;
-
-    
     public long getCompanyId()
     {
         return companyId;
@@ -27,53 +25,34 @@ public class TransactionMonitorGraphDataVO
         this.companyId = companyId;
     }
 
-    public int getTotalTransactionsCount()
+    public String getCompanyName()
     {
-        return totalTransactionsCount;
+        return companyName;
     }
 
-    public void setTotalTransactionsCount( int totalTransactionsCount )
+    public void setCompanyName( String companyName )
     {
-        this.totalTransactionsCount = totalTransactionsCount;
+        this.companyName = companyName;
     }
 
-    public int getSurveyInvitationSentCount()
+    public EntityAlertDetails getEntityAlertDetails()
     {
-        return surveyInvitationSentCount;
+        return entityAlertDetails;
     }
 
-    public void setSurveyInvitationSentCount( int surveyInvitationSentCount )
+    public void setEntityAlertDetails( EntityAlertDetails entityAlertDetails )
     {
-        this.surveyInvitationSentCount = surveyInvitationSentCount;
+        this.entityAlertDetails = entityAlertDetails;
+    }
+    
+    public List<CompanySurveyStatusStats> getCompanySurveyStatusStatslist()
+    {
+        return companySurveyStatusStatslist;
     }
 
-    public long getSurveyReminderSentCount()
+    public void setCompanySurveyStatusStatslist( List<CompanySurveyStatusStats> companySurveyStatusStatslist )
     {
-        return surveyReminderSentCount;
+        this.companySurveyStatusStatslist = companySurveyStatusStatslist;
     }
 
-    public void setSurveyReminderSentCount( long surveyReminderSentCount )
-    {
-        this.surveyReminderSentCount = surveyReminderSentCount;
-    }
-
-    public int getSurveycompletedCount()
-    {
-        return surveycompletedCount;
-    }
-
-    public void setSurveycompletedCount( int surveycompletedCount )
-    {
-        this.surveycompletedCount = surveycompletedCount;
-    }
-
-    public Date getTransactionDate()
-    {
-        return transactionDate;
-    }
-
-    public void setTransactionDate( Date transactionDate )
-    {
-        this.transactionDate = transactionDate;
-    }
 }
