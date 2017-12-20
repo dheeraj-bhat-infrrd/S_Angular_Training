@@ -5522,6 +5522,22 @@ select.rfr_txt_fld, select.rfr_input_fld {
 	border: 1px dashed #ccc;
 }
 
+.sr-comp-default-img {
+	content: url(../images/place-holder-Company.png);
+}
+
+.sr-reg-default-img {
+	content: url(../images/place-holder-Region.png);
+}
+
+.sr-off-default-img {
+	content: url(../images/place-holder-Office.png);
+}
+
+.sr-ind-default-img {
+	content: url(../images/person.png);
+}
+
 .bd-lt-l1 {
 	border-left: 5px solid #6296D9;
 }
