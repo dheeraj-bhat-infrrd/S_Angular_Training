@@ -50,6 +50,7 @@ import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.organizationmanagement.DashboardService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.SurveyPreInitiationService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.reports.AdminReports;
@@ -506,28 +507,35 @@ public class DashboardController
             int batchSize = Integer.parseInt( batchSizeStr );
 
             String columnName = request.getParameter( "columnName" );
+            String columnValue = request.getParameter( "columnValue" );
+            long iden = 0;
+
             if ( columnName == null || columnName.isEmpty() ) {
                 LOG.warn( "Invalid value (null/empty) passed for profile level." );
                 throw new InvalidInputException( "Invalid value (null/empty) passed for profile level." );
             }
-            String profileLevel = getProfileLevel( columnName );
 
-            long iden = 0;
+            try {
+                iden = Long.parseLong( columnValue );
+            } catch ( NumberFormatException e ) {
+                LOG.error(
+                    "NumberFormatException caught while parsing columnValue in getReviews(). Nested exception is ", e );
+                throw e;
+            }
+            
+            String profileLevel = getProfileLevel( columnName );
+            OrganizationUnitSettings unitSettings = null;
+            
             if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_COMPANY ) ) {
-                iden = user.getCompany().getCompanyId();
+                unitSettings = organizationManagementService.getCompanySettings( iden );
             } else if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_INDIVIDUAL ) ) {
-                iden = user.getUserId();
+                unitSettings  = organizationManagementService.getAgentSettings( iden );          
+            } else if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_REGION ) ) {
+                unitSettings = organizationManagementService.getRegionSettings( iden );
+            } else if ( profileLevel.equals( CommonConstants.PROFILE_LEVEL_BRANCH ) ){
+                unitSettings = organizationManagementService.getBranchSettingsDefault( iden );
             } else {
-                String columnValue = request.getParameter( "columnValue" );
-                if ( columnValue != null && !columnValue.isEmpty() ) {
-                    try {
-                        iden = Long.parseLong( columnValue );
-                    } catch ( NumberFormatException e ) {
-                        LOG.error(
-                            "NumberFormatException caught while parsing columnValue in getReviews(). Nested exception is ", e );
-                        throw e;
-                    }
-                }
+                throw new InvalidInputException( "Invalid profile level." );
             }
 
             boolean hiddenSection = false;
@@ -545,6 +553,8 @@ public class DashboardController
                 LOG.warn( "InvalidInputException caught in getReviews() while fetching reviews. Nested exception is ", e );
                 throw e;
             }
+            
+            model.addAttribute( "profileUrl", unitSettings.getCompleteProfileUrl() );
             model.addAttribute( "reviews", surveyDetails );
             model.addAttribute( "hiddenSection", hiddenSection );
             model.addAttribute( "startIndex", startIndex );

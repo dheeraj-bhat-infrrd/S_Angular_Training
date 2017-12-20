@@ -114,8 +114,9 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_HIDE_PUBLIC_PAGE = "hidePublicPage";
     public static final String KEY_INCLUDE_FOR_TRANSACTION_MONITOR = "includeForTransactionMonitor";
     public static final String KEY_DIGEST_RECIPIENTS = "digestRecipients";
-
-
+    public static final String KEY_ENTITY_ALERT_DETAILS = "entityAlertDetails";
+    public static final String KEY_IS_ERROR_ALERT = "isErrorAlert";
+    public static final String KEY_IS_WARNING_ALERT_= "isWarningAlert";
 
     @Value ( "${CDN_PATH}")
     private String amazonEndPoint;
@@ -1096,5 +1097,30 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         return settings;
     
         
+    }
+    
+    @Override
+    public List<OrganizationUnitSettings> fetchCompaniesByAlertType( String alertType, List<Long> companyIds )
+    {
+        LOG.info( "method fetchCompaniesByAlertType started for alertType {} and companyIds {}", alertType, companyIds );
+        Query query = new Query();
+        query.addCriteria( Criteria.where(  KEY_IDEN).in( companyIds ));
+
+        if(alertType.equalsIgnoreCase( CommonConstants.ALERT_TYPE_ERROR )){
+            query.addCriteria( Criteria.where( KEY_ENTITY_ALERT_DETAILS + "." + KEY_IS_ERROR_ALERT ).is( true ));
+
+        }else if(alertType.equalsIgnoreCase( CommonConstants.ALERT_TYPE_WARNING )){
+            query.addCriteria( Criteria.where( KEY_ENTITY_ALERT_DETAILS + "." + KEY_IS_WARNING_ALERT_ ).is( true ));
+        }else if(alertType.equalsIgnoreCase( CommonConstants.ALERT_TYPE_NORMAL )){
+            query.addCriteria( Criteria.where( KEY_ENTITY_ALERT_DETAILS + "." + KEY_IS_ERROR_ALERT ).is( false ));
+            query.addCriteria( Criteria.where( KEY_ENTITY_ALERT_DETAILS + "." + KEY_IS_WARNING_ALERT_ ).is( false ));
+        }
+        
+        
+        
+        List<OrganizationUnitSettings> settingsList = mongoTemplate.find( query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION );
+        LOG.info( "method fetchCompaniesByAlertType finished for alertType {} and companyIds {}", alertType, companyIds );
+       
+        return settingsList;
     }
 }

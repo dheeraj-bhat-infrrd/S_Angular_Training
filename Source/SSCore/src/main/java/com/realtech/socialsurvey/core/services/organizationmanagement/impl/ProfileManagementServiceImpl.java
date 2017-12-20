@@ -2271,7 +2271,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     public List<SurveyPreInitiation> getIncompleteSurvey( long iden, double startScore, double limitScore, int startIndex,
         int numOfRows, String profileLevel, Date startDate, Date endDate, boolean realtechAdmin ) throws InvalidInputException
     {
-        LOG.debug( "Method getIncompleteSurvey() called for iden: {} startScore: {} limitScore:{} startIndex: {} numOfRows: {} profileLevel: {}", iden, startScore, limitScore, startIndex, numOfRows, profileLevel );
+        LOG.debug(
+            "Method getIncompleteSurvey() called for iden: {} startScore: {} limitScore:{} startIndex: {} numOfRows: {} profileLevel: {}",
+            iden, startScore, limitScore, startIndex, numOfRows, profileLevel );
         if ( iden <= 0l ) {
             LOG.warn( "iden is invalid while fetching incomplete reviews" );
             throw new InvalidInputException( "iden is invalid while fetching incomplete reviews" );
@@ -2308,7 +2310,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         LOG.debug( "Getting incomplete survey count." );
         long count = 0;
         if ( iden <= 0l ) {
-        	LOG.warn("iden is invalid while fetching incomplete reviews.");
+            LOG.warn( "iden is invalid while fetching incomplete reviews." );
             throw new InvalidInputException( "iden is invalid while fetching incomplete reviews" );
         }
         long companyId = -1;
@@ -2906,7 +2908,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     Set<Long> getAgentIdsByProfileLevel( String profileLevel, long iden ) throws InvalidInputException
     {
         if ( profileLevel == null || profileLevel.isEmpty() ) {
-        	LOG.warn("profile level is null or empty while getting agents.");
+            LOG.warn( "profile level is null or empty while getting agents." );
             throw new InvalidInputException( "profile level is null or empty while getting agents" );
         }
         Set<Long> userIds = new HashSet<>();
@@ -2921,7 +2923,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 userIds.add( iden );
                 return userIds;
             default:
-            	LOG.warn("Invalid profile level while getting iden column name.");
+                LOG.warn( "Invalid profile level while getting iden column name." );
                 throw new InvalidInputException( "Invalid profile level while getting iden column name" );
         }
     }
@@ -5645,7 +5647,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     try {
                         sortSettings = organizationManagementService.getCompanySettings( companyId ).getReviewSortCriteria();
                     } catch ( InvalidInputException error ) {
-                        LOG.error( "company not found, choosing alternate sort criteria {}",error );
+                        LOG.error( "company not found, choosing alternate sort criteria {}", error );
                     }
                 }
                 if ( sortSettings != "default" ) {
@@ -5847,7 +5849,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         // get the unit settings
         try {
-            unitSettings = fetchAppropriateUnitSettings( review );
+            unitSettings = fetchAppropriateUnitSettings( reviewAggregate, review );
+            buildTitle( unitSettings );
 
         } catch ( NoRecordsFetchedException error ) {
             LOG.error( "NoRecordsFetchedException: unable to fetch settings.", error );
@@ -5879,17 +5882,65 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
-    private OrganizationUnitSettings fetchAppropriateUnitSettings( SurveyDetails review )
+    private void buildTitle( OrganizationUnitSettings unitSettings )
+    {
+        LOG.debug( "buildTitle() started" );
+
+        if ( unitSettings == null || unitSettings.getContact_details() == null
+            || StringUtils.isNotEmpty( unitSettings.getContact_details().getTitle() ) ) {
+            return;
+        }
+
+
+        String location = unitSettings.getContact_details().getLocation();
+        String vertical = unitSettings.getVertical();
+
+        unitSettings.getContact_details().setTitle( vertical
+            + ( StringUtils.isNotEmpty( location ) ? ", " + location : buildLocation( unitSettings.getContact_details() ) ) );
+    }
+
+
+    private String buildLocation( ContactDetailsSettings contactDetails )
+    {
+        if ( contactDetails == null ) {
+            return "";
+        } else {
+
+            List<String> locationList = new ArrayList<>();
+
+            if ( StringUtils.isNotEmpty( contactDetails.getCity() ) ) {
+                locationList.add( contactDetails.getCity() );
+            }
+
+            if ( StringUtils.isNotEmpty( contactDetails.getState() ) ) {
+                locationList.add( contactDetails.getState() );
+            }
+
+            if ( StringUtils.isNotEmpty( contactDetails.getCountry() ) ) {
+                locationList.add( contactDetails.getCountry() );
+            }
+
+            return locationList.isEmpty() ? "" : ( ", " + StringUtils.join( locationList, ", " ) );
+
+        }
+    }
+
+
+    private OrganizationUnitSettings fetchAppropriateUnitSettings( IndividualReviewAggregate reviewAggregate, SurveyDetails review )
         throws InvalidInputException, NoRecordsFetchedException
     {
         LOG.debug( "fetching appropriate unit settings." );
         if ( review.getAgentId() > 0 ) {
+            reviewAggregate.setProfileLevel( CommonConstants.PROFILE_LEVEL_INDIVIDUAL );
             return organizationManagementService.getAgentSettings( review.getAgentId() );
         } else if ( review.getBranchId() > 0 ) {
+            reviewAggregate.setProfileLevel( CommonConstants.PROFILE_LEVEL_BRANCH );
             return organizationManagementService.getBranchSettingsDefault( review.getBranchId() );
         } else if ( review.getRegionId() > 0 ) {
+            reviewAggregate.setProfileLevel( CommonConstants.PROFILE_LEVEL_REGION );
             return organizationManagementService.getRegionSettings( review.getRegionId() );
         } else if ( review.getCompanyId() > 0 ) {
+            reviewAggregate.setProfileLevel( CommonConstants.PROFILE_LEVEL_COMPANY );
             return organizationManagementService.getCompanySettings( review.getCompanyId() );
         } else {
             throw new InvalidInputException( "Unable to find a hierarchy associated with the review." );
@@ -6315,8 +6366,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             return true;
         }
     }
-    
-    
+
+
     /**
      * 
      * @param entityType
