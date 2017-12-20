@@ -10095,6 +10095,7 @@ ul.accordion li>a:before {
 	display: -webkit-box;
 	display: inline-flex; 
 	margin-top: 10px;
+	height:35px;
 }
 
 .rep-fb-btn{
@@ -10316,4 +10317,154 @@ img.lead-img {
 
 .trans-monitor-legend-item{
 	margin-left:50px;
+}
+
+.trans-monitor-dash-container{
+	width: 100%;
+    margin-bottom: 10px;
+    padding-right: 10px;
+    padding-left: 10px;
+}
+
+.trans-monitor-wrapper{
+	padding: 0 0 10px;
+    border-radius: 5px;
+    border: 1px solid #dcdcdc;
+    box-shadow: 4px 4px 15px 0px #dcdcdc;
+    margin-top: 10px;
+}
+
+.trans-monitor-sub-header-sys{
+	height: 50px;
+    top: 0;
+    background-color: rgba(129, 46, 191, 0.20);
+    padding: 15px;
+}
+
+.trans-monitor-sub-header-danger{
+	height: 50px;
+    top: 0;
+    background-color: rgba(255, 0, 0, 0.16);
+    padding: 15px;
+}
+
+.trans-monitor-sub-header-warn{
+	height: 50px;
+    top: 0;
+    background-color: rgba(255, 181, 36, 0.27);
+    padding: 15px;
+}
+
+.trans-monitor-sub-header-gray{
+	height: 50px;
+    top: 0;
+    background-color: rgba(205, 205, 205, 0.36);
+    padding: 15px;
+}
+
+.trans-monitor-sub-header-normal{
+	height: 50px;
+    top: 0;
+    background-color: rgba(69, 131, 205, 0.20);
+    padding: 15px;
+}
+
+.trans-monitor-sub-header-box-sys{
+	height: 20px;
+    width: 20px;
+    float: left;
+    margin-right: 15px;
+    background-color: #812ebf;
+}
+
+.trans-monitor-sub-header-box-danger{
+	height: 20px;
+    width: 20px;
+    float: left;
+    margin-right: 15px;
+    background-color: #ff2424;
+}
+
+.trans-monitor-sub-header-box-warn{
+	height: 20px;
+    width: 20px;
+    float: left;
+    margin-right: 15px;
+    background-color: #ffb524;
+}
+
+.trans-monitor-sub-header-box-gray{
+	height: 20px;
+    width: 20px;
+    float: left;
+    margin-right: 15px;
+    background-color: #cdcdcd;
+}
+
+.trans-monitor-sub-header-box-normal{
+	height: 20px;
+    width: 20px;
+    float: left;
+    margin-right: 15px;
+    background-color: #4583cd;
+}
+
+.trans-monitor-sub-header-span{
+	font-size: 18px;
+    font-weight: bold !important;
+    line-height: 18px;
+}
+
+.trans-monitor-graphs-wrapper{
+	padding: 10px;
+	display: -webkit-box;
+}
+
+.trans-monitor-graph-col-sys{
+	width: 20%;
+    border-left: 3px solid #812ebf;
+    padding: 0;
+    height: 200px;
+}
+
+.trans-monitor-graph-col-danger{
+	width: 20%;
+    border-left: 3px solid #ff2424;
+    padding: 0;
+    height: 200px;
+}
+
+.trans-monitor-graph-col-warn{
+	width: 20%;
+    border-left: 3px solid #ffb524;
+    padding: 0;
+    height: 200px;
+}
+
+.trans-monitor-graph-col-gray{
+	width: 20%;
+    border-left: 3px solid #cdcdcd;
+    padding: 0;
+    height: 200px;
+}
+
+.trans-monitor-graph-col-normal{
+	width: 20%;
+   	border-left: 3px solid #4583cd;
+    padding: 0;
+    height: 200px;
+}
+
+.trans-monitor-graph-span{
+	margin-left: 10px;
+    margin-bottom: 10px;
+    font-size: 13px;
+    font-weight: bold !important;
+}
+
+.trans-monitor-graph-div{
+	width: 100%;
+    height: 170px;
+    margin: 0 auto;
+    margin-top: 10px;
 }

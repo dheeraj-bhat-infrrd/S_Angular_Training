@@ -1,22 +1,36 @@
 package com.realtech.socialsurvey.api.controllers;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import retrofit.client.Response;
+import retrofit.http.GET;
 
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.entities.CompanyDetailsReport;
+import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.CompanyActiveUsersStats;
 import com.realtech.socialsurvey.core.entities.CompanyDigestRequestData;
+import com.realtech.socialsurvey.core.entities.CompanySurveyStatusStats;
+import com.realtech.socialsurvey.core.entities.CompanyView;
 import com.realtech.socialsurvey.core.entities.SurveyResultsReportVO;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.services.activitymanager.ActivityManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.reportingmanagement.DashboardGraphManagement;
 import com.realtech.socialsurvey.core.services.reportingmanagement.OverviewManagement;
 import com.realtech.socialsurvey.core.services.reportingmanagement.ReportingDashboardManagement;
@@ -37,6 +51,12 @@ public class ReportingController
 
     @Autowired
     private OverviewManagement overviewManagement;
+
+    @Autowired
+    private OrganizationManagementService organizationManagementService;
+
+    @Autowired
+    private ActivityManagementService activityManagementService;
 
 
     @RequestMapping ( value = "/getcompletionrate", method = RequestMethod.GET)
@@ -567,11 +587,9 @@ public class ReportingController
     {
 
         LOGGER.info( "Building the monthly digest aggregate for a company for a given month" );
-        return new Gson().toJson( reportingDashboardManagement.prepareMonthlyDigestMailData( companyId, companyName,
-            monthUnderConcern, year ) );
+        return new Gson().toJson( reportingDashboardManagement.prepareMonthlyDigestMailData( companyId, companyName, monthUnderConcern, year ) );
     }
-
-
+    
     @RequestMapping ( value = "/getcompanydetailsreport", method = RequestMethod.GET)
     @ApiOperation ( value = "Social Survey Admin level report to fetch Company Details for all companies.")
     public String getCompanyDetailsReport( String entityType, Long entityId, int startIndex, int batchSize )
@@ -584,6 +602,60 @@ public class ReportingController
     }
 
 
+    @RequestMapping ( value = "/getallactiveenterprisecompanies", method = RequestMethod.GET)
+    @ApiOperation ( value = "Fetch the list of active enterprise companies")
+    public String getAllActiveEnterpriseCompanies()
+    {
+        LOGGER.info( "Fetching the list of active enterprise companies" );
+        List<CompanyView> allActiveCompanies = organizationManagementService.getAllActiveEnterpriseCompanyViews();
+        return new Gson().toJson( allActiveCompanies );
+    }
+
+
+    @RequestMapping ( value = "/getcompanieswithnotransactioninpastndays", method = RequestMethod.GET)
+    @ApiOperation ( value = "Fetch the list of active enterprise companies with no transactions in past N days")
+    public String getCompaniesWithNoTransactionInPastNDays( int noOfDays )
+    {
+        LOGGER.info( "Fetching the list of active enterprise companies with no transactions in past N days" );
+        List<CompanyView> allActiveCompanies = organizationManagementService.getAllActiveEnterpriseCompanyViews();
+        List<CompanyView> companiesWithNoTransactions = activityManagementService
+            .getCompaniesWithNoTransactionInPastNDays( allActiveCompanies, noOfDays );
+        return new Gson().toJson( companiesWithNoTransactions );
+    }
+
+
+    @RequestMapping ( value = "/validatesurveystatsforcompanies", method = RequestMethod.GET)
+    @ApiOperation ( value = "Fetch the company ids with low sent surveys ")
+    public String validateSurveyStatsForCompanies()
+    {
+        LOGGER.info( "Fetching the company ids with low sent surveys" );
+        List<CompanySurveyStatusStats> companySurveyStatusStatsList = activityManagementService
+            .getSurveyStatusStatsForPastDay();
+        List<Long> companyIdsForLessSurveyAlerts = activityManagementService
+            .validateSurveyStatsForCompanies( companySurveyStatusStatsList );
+        return new Gson().toJson( companyIdsForLessSurveyAlerts );
+    }
+
+
+    @RequestMapping ( value = "/getsurveystatusstatsforpastonemonth", method = RequestMethod.GET)
+    @ApiOperation ( value = "Fetch the survey stats for companies for the past month ")
+    public String getSurveyStatusStatsForPastOneMonth()
+    {
+        LOGGER.info( "Fetch the survey stats for companies for the past month" );
+        Map<Long, Long> companySurveyStatsCountsMap = activityManagementService.getSurveyStatusStatsForPastOneMonth();
+        return new Gson().toJson( companySurveyStatsCountsMap );
+    }
+
+
+    @RequestMapping ( value = "/getcompanyactiveusercountforpastday", method = RequestMethod.GET)
+    @ApiOperation ( value = "Fetch the number of active users for a company for past day ")
+    public String getCompanyActiveUserCountForPastDay()
+    {
+        LOGGER.info( "Fetching the number of active users for a company for past day" );
+        List<CompanyActiveUsersStats> companyActiveUserCounts = activityManagementService.getCompanyActiveUserCountForPastDay();
+        return new Gson().toJson( companyActiveUserCounts );
+    }
+
     @RequestMapping ( value = "/getincompletesurveys", method = RequestMethod.GET)
     @ApiOperation ( value = "get incomplete surveys")
     public String getIncompleteSurveys( Long entityId, String entityType, Timestamp startDate, Timestamp endDate,
@@ -594,4 +666,61 @@ public class ReportingController
         return new Gson().toJson( reportingDashboardManagement.getIncompleteSurvey( entityId, entityType, startDate, endDate,
             startIndex, batchSize ) );
     }
+    
+    @RequestMapping ( value = "/gettotaltransactioncountforpastndays", method = RequestMethod.GET)
+    @ApiOperation ( value = "Fetch the transaction counts for companies for  past n days ")
+    public String getTotalTransactionCountForPastNDays()
+    {
+        LOGGER.info( "Fetch total survey counts for companies for the n days" );
+        Map<Long, Long> companySurveyStatsCountsMap = activityManagementService.getTotalTransactionCountForPast3DaysForCompanies();
+        return new Gson().toJson( companySurveyStatsCountsMap );
+    }
+
+    @RequestMapping ( value = "/gettransactioncountforpreviousday", method = RequestMethod.GET)
+    @ApiOperation ( value = "Fetch the transaction counts for companies for  previous day")
+    public String getTransactionCountForPreviousDay()
+    {
+        LOGGER.info( "Fetch total survey counts for companies for the n days" );
+        Map<Long, Long> companySurveyStatsCountsMap = activityManagementService.getTransactionCountForPreviousDay();
+        return new Gson().toJson( companySurveyStatsCountsMap );
+    }
+    
+    
+    @RequestMapping ( value = "/getsendsurveycountforpreviousday", method = RequestMethod.GET)
+    @ApiOperation ( value = "Fetch the transaction counts for companies for previous days ")
+    public String getSendSurveyCountForPreviousDay()
+    {
+        LOGGER.info( "Fetch sent survey counts for companies for previous days" );
+        Map<Long, Long> companySurveyStatsCountsMap = activityManagementService.getSendSurveyCountForPreviousDay();
+        return new Gson().toJson( companySurveyStatsCountsMap );
+    }
+    
+    @RequestMapping ( value = "/getsurvestatsforpast7daysforallcompanies", method = RequestMethod.GET)
+    @ApiOperation ( value = "Fetch  survey stats for companies for past 7 days")
+    public String getSurveStatsForPast7daysForAllCompanies()
+    {
+        LOGGER.info( "Fetch  survey stats for companies for past 7 days" );
+        Map<Long, List<CompanySurveyStatusStats>> companySurveyStatsMap = activityManagementService.getSurveStatsForPast7daysForAllCompanies();
+        LOGGER.info( "Fetch  survey stats for companies for past 7 days result is "  + companySurveyStatsMap );
+        return new Gson().toJson( companySurveyStatsMap );
+    }
+    
+    @RequestMapping ( value = "/getsurvestatsforlasttoLatweekforallcompanies", method = RequestMethod.GET)
+    @ApiOperation ( value = "Fetch  survey stats for companies for last to last week")
+    public String getSurveStatsForLastToLatWeekForAllCompanies()
+    {
+        LOGGER.info( "Fetch  survey stats for companies for last to last week" );
+        Map<Long, List<CompanySurveyStatusStats>> companySurveyStatsMap = activityManagementService.getSurveStatsForLastToLatWeekForAllCompanies();
+        return new Gson().toJson( companySurveyStatsMap );
+    }
+    
+    @RequestMapping ( value = "/getcompletedsurveycountforpastndays", method = RequestMethod.GET)
+    @ApiOperation ( value = "Fetch the transaction counts for companies for  past n days ")
+    public String getCompletedSurveyCountForpastNDays()
+    {
+        LOGGER.info( "Fetch total survey counts for companies for the n days" );
+        Map<Long, Long> companySurveyStatsCountsMap = activityManagementService.getCompletedSurveyCountForPast3DaysForCompanies();
+        return new Gson().toJson( companySurveyStatsCountsMap );
+    }
+    
 }
