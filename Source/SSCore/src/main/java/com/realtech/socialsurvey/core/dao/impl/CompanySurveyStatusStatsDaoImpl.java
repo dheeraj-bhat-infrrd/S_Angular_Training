@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.Criteria;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -134,7 +135,8 @@ public class CompanySurveyStatusStatsDaoImpl extends GenericReportingDaoImpl<Com
         }
         
         criteria.add( Restrictions.in( CommonConstants.COMPANY_ID_COLUMN, companyIds ) );
-
+        
+        criteria.addOrder( Order.asc( CommonConstants.TRANSACTION_MONITOR_DATE_COLUMN ) );
         
         List<CompanySurveyStatusStats> companySurveyCountsList = criteria.list();
 
