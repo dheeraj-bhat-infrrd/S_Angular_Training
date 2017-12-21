@@ -135,7 +135,8 @@ public class UserRankingPastMonthMainDaoImpl extends GenericReportingDaoImpl<Use
             criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
             criteria.add( Restrictions.eq( CommonConstants.LEADERBOARD_YEAR, year ) );
             criteria.add( Restrictions.eq( CommonConstants.LEADERBOARD_MONTH, monthUnderConcern ) );
-
+            criteria.add( Restrictions.eq( CommonConstants.IS_ELIGIBLE, CommonConstants.ONE ) );
+            
             criteria.addOrder( Order.asc( CommonConstants.RANK ) );
             criteria.setFirstResult( CommonConstants.INITIAL_INDEX );
             criteria.setMaxResults( 10 );

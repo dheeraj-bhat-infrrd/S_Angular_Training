@@ -3,12 +3,13 @@ package com.realtech.socialsurvey.core.services.activitymanager;
 import java.util.List;
 import java.util.Map;
 
-import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyActiveUsersStats;
 import com.realtech.socialsurvey.core.entities.CompanySurveyStatusStats;
 import com.realtech.socialsurvey.core.entities.CompanyTransactionsSourceStats;
+import com.realtech.socialsurvey.core.entities.CompanyView;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.vo.TransactionMonitorGraphDataVO;
+
 
 /**
  * 
@@ -24,32 +25,22 @@ public interface ActivityManagementService
      */
     public List<CompanySurveyStatusStats> getSurveyStatusStatsForPastDay();
 
+
     /**
      * 
      * @param companySurveyStatusStatsList
      */
     public List<Long> validateSurveyStatsForCompanies( List<CompanySurveyStatusStats> companySurveyStatusStatsList );
 
-    /**
-     * 
-     * @param companyIds
-     */
-    public void sendHighNotProcessedTransactionAlertMailForCompanies( List<Long> companyIdsToSendAlert, List<Company> allActiveCompanies );
 
-    
     /**
      * 
      * @param companyId
      * @param noOfDays
      * @return
      */
-    public List<Company> getCompaniesWithNoTransactionInPastNDays(List<Company> companies, int noOfDays );
+    public List<CompanyView> getCompaniesWithNoTransactionInPastNDays( List<CompanyView> allCompanies, int noOfDays );
 
-    /**
-     * 
-     * @param companies
-     */
-    public void sendNoTransactionAlertMailForCompanies( List<Company> companies, int noOfDays );
 
     /**
      * 
@@ -57,13 +48,6 @@ public interface ActivityManagementService
      */
     public Map<Long, Long> getSurveyStatusStatsForPastOneMonth();
 
-    /**
-     * 
-     * @param allCompanies
-     * @param companyActiveUserCounts
-     * @param companySurveyStatsCountsMap
-     */
-    public void validateAndSentLessSurveysAlert( List<CompanyActiveUsersStats> companyActiveUserCounts, Map<Long, Long> companySurveyStatsCountsMap );
 
     /**
      * 
@@ -75,6 +59,7 @@ public interface ActivityManagementService
     public List<CompanyTransactionsSourceStats> getTransactionsCountForCompanyForPastNDays( long companyId, int noOfDays )
         throws InvalidInputException;
 
+
     /**
      * 
      * @param companyId
@@ -85,6 +70,7 @@ public interface ActivityManagementService
     public List<CompanySurveyStatusStats> getSurveyStatusStatsForCompanyForPastNDays( long companyId, int noOfDays )
         throws InvalidInputException;
 
+
     /**
      * 
      * @param companyId
@@ -94,6 +80,7 @@ public interface ActivityManagementService
      */
     public List<CompanyActiveUsersStats> getActiveUserCountStatsForCompanyForPastNDays( long companyId, int noOfDays )
         throws InvalidInputException;
+
 
     /**
      * 
@@ -106,5 +93,41 @@ public interface ActivityManagementService
      * @return List of String
      */
     public List<String> getTransactionMonitorMailList();
+    
+    /**
+     * 
+     * @param noOfDays
+     * @param alertType
+     * @return
+     * @throws InvalidInputException
+     */
+    public List<TransactionMonitorGraphDataVO> getTransactionsStatsByDaysAndAlertType( int noOfDays, String alertType )
+        throws InvalidInputException;
+
+
+    /**
+     * 
+     * @param noOfDays
+     * @return
+     */
+    public Map<Long, Long> getTotalTransactionCountForPast3DaysForCompanies();
+
+
+    public Map<Long, Long> getTransactionCountForPreviousDay();
+
+
+    public Map<Long, Long> getSendSurveyCountForPreviousDay();
+
+
+    public Map<Long, Long> getSendSurveyCountForPast7Days();
+
+
+    Map<Long, List<CompanySurveyStatusStats>> getSurveStatsForPast7daysForAllCompanies();
+
+
+    Map<Long, List<CompanySurveyStatusStats>> getSurveStatsForLastToLatWeekForAllCompanies();
+
+
+    Map<Long, Long> getCompletedSurveyCountForPast3DaysForCompanies();
 
 }

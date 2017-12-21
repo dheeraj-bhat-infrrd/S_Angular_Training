@@ -20,6 +20,7 @@ import com.realtech.socialsurvey.core.entities.CRMInfo;
 import com.realtech.socialsurvey.core.entities.CollectionDotloopProfileMapping;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyHiddenNotification;
+import com.realtech.socialsurvey.core.entities.CompanyView;
 import com.realtech.socialsurvey.core.entities.DisabledAccount;
 import com.realtech.socialsurvey.core.entities.EncompassSdkVersion;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
@@ -1232,8 +1233,9 @@ public interface OrganizationManagementService
     Map<Long, String> getListOfUnprocessedImages( String collectionName, String imageType ) throws InvalidInputException;
 
 
-    void updateImageForOrganizationUnitSetting( long iden, String fileName, String thumbnailFileName, String rectangularThumbnailFileName, String collectionName, String imageType,
-        boolean flagValue, boolean isThumbnail ) throws InvalidInputException;
+    void updateImageForOrganizationUnitSetting( long iden, String fileName, String thumbnailFileName,
+        String rectangularThumbnailFileName, String collectionName, String imageType, boolean flagValue, boolean isThumbnail )
+        throws InvalidInputException;
 
 
     public List<Region> getRegionsForCompany( long companyId ) throws InvalidInputException, ProfileNotFoundException;
@@ -1375,7 +1377,6 @@ public interface OrganizationManagementService
         int branchId );
 
 
-
     /**
      * Returns agent social media tokens
      * @param iden
@@ -1445,8 +1446,8 @@ public interface OrganizationManagementService
 
     public void updateSortCriteriaForCompany( OrganizationUnitSettings companySettings, String sortCriteria )
         throws InvalidInputException;
-    
-   
+
+
     void updateSendEmailThroughForCompany( OrganizationUnitSettings companySettings, String sendEmailThrough )
         throws InvalidInputException;
 
@@ -1458,7 +1459,8 @@ public interface OrganizationManagementService
         throws NonFatalException;
 
 
-    void processDeactivateCompany( Company company, long userId ) throws InvalidInputException, SolrException, NonFatalException;
+    void processDeactivateCompany( Company company, long userId )
+        throws InvalidInputException, SolrException, NonFatalException;
 
 
     void updateAllowPartnerSurveyForAllUsers( Set<Long> userIds, boolean allowPartnerSurvey ) throws InvalidInputException;
@@ -1468,6 +1470,7 @@ public interface OrganizationManagementService
 
 
     boolean isPartnerSurveyAllowedForComapny( long companyId );
+
 
     void updateSurveyAssignments( User user, List<UserProfile> userProfileList, long oldUserProfileId );
 
@@ -1504,6 +1507,9 @@ public interface OrganizationManagementService
 
     public List<Long> getHiddenPublicPageUserIds();
 
+
+    public List<CompanyView> getAllActiveEnterpriseCompanyViews();
+
     public List<OrganizationUnitSettings> getCompaniesForTransactionMonitor();
 
 
@@ -1512,4 +1518,10 @@ public interface OrganizationManagementService
     public String getFacebookPixelImageTagsFromHierarchy( OrganizationUnitSettings companySettings,
         OrganizationUnitSettings regionSettings, OrganizationUnitSettings branchSetting, OrganizationUnitSettings unitSettings );
 
+    public Set<String> parseEmailsList( String emailsStr );
+
+    public boolean updateDigestRecipients( OrganizationUnitSettings unitSettings, Set<String> emails, String collectionType )
+        throws InvalidInputException;
+
+    public List<OrganizationUnitSettings> getCompaniesByAlertType( String alertType );
 }

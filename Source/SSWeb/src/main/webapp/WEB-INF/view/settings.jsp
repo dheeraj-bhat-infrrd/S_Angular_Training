@@ -79,9 +79,9 @@
 									</div>
 								</div>
 							</c:if>	
-							<c:if test="${ isRealTechOrSSAdmin == 'true' and columnName != 'agentId' }">
+							<c:if test="${ columnName != 'agentId' }">
 								<div id="customized-setting-div" class="st-score-rt-top" style="">Customized Feature Settings:</div>						
-								<c:if test="${ columnName == 'companyId' }">
+								<c:if test="${ isRealTechOrSSAdmin == true and columnName == 'companyId' }">
 									<div id="atpst-lnk-usr-ste-chk-box" class="float-left bd-check-img"></div>
 									<input type="hidden" id="at-pst-lnk-usr-ste-cb" name="autopostlinktousersite" value="${autoPostLinkToUserSite}">
 									<div class="float-left customized-settings-child cust-resp-txt">Allow autopost link to the user's website</div>
@@ -101,7 +101,7 @@
 									<div class="float-left customized-settings-child cust-resp-txt">Include for transaction monitor</div>
 								</c:if>
 								
-								<c:if test="${ columnName != 'agentId' and accountMasterId != 1 }">
+								<c:if test="${ isRealTechOrSSAdmin == 'true' and columnName != 'agentId' and accountMasterId != 1 }">
 									<div id="vndsta-access-chk-box" class="float-left bd-check-img clear-both"></div>
 									<input type="hidden" id="vndsta-access-cb" name="vendastaaccess" value="${vendastaAccess}">
 									<div class="float-left listing-access-txt cust-resp-txt" style="margin-bottom:0px;">Allow access to Listings Manager</div>
@@ -110,6 +110,7 @@
 									<div id="survey-mail-thrhld-chk-box" class="float-left bd-check-img clear-both"></div>
 									<input type="hidden" id="survey-mail-thrhld-cb" name="surveymailthrhld" value="${sendMonthlyDigestMail}">
 									<div class="float-left listing-access-txt cust-resp-txt">Send Monthly Digest Mail</div>
+									<textarea id="digest-recipients" class="dig-recp" placeholder="<spring:message code="label.placehoder.digest.emails.key" />" autocorrect="off" autocomplete="off" autocapitalize="off" spellcheck="false">${digestRecipients}</textarea>
 								</c:if>
 							</c:if>
 							
