@@ -469,8 +469,7 @@
 			value="com.realtech.socialsurvey.core.starter.TransactionActivityMonitor" />
 		<property name="jobDataAsMap">
 			<map>
-				<entry key="activityManagementService" value-ref="activityManagementService" />
-				<entry key="organizationManagementService" value-ref="organizationManagementService" />
+				<entry key="reportingDashboardManagement" value-ref="reportingDashboardManagement" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -719,13 +718,13 @@
 	<bean id="monthlydigeststartercron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="monthlydigeststarter" />
-		<property name="cronExpression" value="0 0 8 1 1/1 ?" />
+        <property name="cronExpression" value="0 0 8 1 1/1 ?" />
 	</bean>
 
 	<bean id="transactionActivityMonitorCron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="transactionActivityMonitorJobDetail" />
-		<property name="cronExpression" value="0 20 00 * * ?" />
+		<property name="cronExpression" value="0 32 15 * * ?" />
 	</bean>
 	
 

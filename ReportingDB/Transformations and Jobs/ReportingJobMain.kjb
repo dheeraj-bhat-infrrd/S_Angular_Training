@@ -134,7 +134,7 @@
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>270</xloc>
-      <yloc>87</yloc>
+      <yloc>91</yloc>
       </entry>
     <entry>
       <name>User Adoption</name>
@@ -142,7 +142,7 @@
       <type>TRANS</type>
       <specification_method>filename</specification_method>
       <trans_object_id/>
-      <filename>&#x24;&#x7b;Internal.Job.Filename.Directory&#x7d;&#x2f;User_Adoption_sql.ktr</filename>
+      <filename>&#x24;&#x7b;Internal.Job.Filename.Directory&#x7d;&#x2f;Survey_Stats_Report_Main.ktr</filename>
       <transname/>
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
@@ -167,7 +167,7 @@
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>270</xloc>
-      <yloc>421</yloc>
+      <yloc>245</yloc>
       </entry>
     <entry>
       <name>company user report&#x28;2&#x29;</name>
@@ -199,8 +199,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>1248</xloc>
-      <yloc>246</yloc>
+      <xloc>504</xloc>
+      <yloc>245</yloc>
       </entry>
     <entry>
       <name>User Ranking This Month</name>
@@ -231,8 +231,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>997</xloc>
-      <yloc>246</yloc>
+      <xloc>1183</xloc>
+      <yloc>91</yloc>
       </entry>
     <entry>
       <name>User Ranking This Year</name>
@@ -263,8 +263,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>761</xloc>
-      <yloc>246</yloc>
+      <xloc>1183</xloc>
+      <yloc>245</yloc>
       </entry>
     <entry>
       <name>Score Stats</name>
@@ -295,8 +295,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>511</xloc>
-      <yloc>246</yloc>
+      <xloc>987</xloc>
+      <yloc>245</yloc>
       </entry>
     <entry>
       <name>Survey Transaction Report</name>
@@ -327,40 +327,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>1248</xloc>
-      <yloc>87</yloc>
-      </entry>
-    <entry>
-      <name>CompanyTransactionMonitor</name>
-      <description/>
-      <type>JOB</type>
-      <specification_method>filename</specification_method>
-      <job_object_id/>
-      <filename>&#x24;&#x7b;Internal.Job.Filename.Directory&#x7d;&#x2f;CompanyTransactionMonitorJob.kjb</filename>
-      <jobname/>
-      <arg_from_previous>N</arg_from_previous>
-      <params_from_previous>N</params_from_previous>
-      <exec_per_row>N</exec_per_row>
-      <set_logfile>N</set_logfile>
-      <logfile/>
-      <logext/>
-      <add_date>N</add_date>
-      <add_time>N</add_time>
-      <loglevel>Nothing</loglevel>
-      <slave_server_name/>
-      <wait_until_finished>Y</wait_until_finished>
-      <follow_abort_remote>N</follow_abort_remote>
-      <expand_remote_job>N</expand_remote_job>
-      <create_parent_folder>N</create_parent_folder>
-      <pass_export>N</pass_export>
-      <force_separate_logging>N</force_separate_logging>
-      <parameters>        <pass_all_parameters>Y</pass_all_parameters>
-      </parameters>      <set_append_logfile>N</set_append_logfile>
-      <parallel>N</parallel>
-      <draw>Y</draw>
-      <nr>0</nr>
-      <xloc>270</xloc>
-      <yloc>246</yloc>
+      <xloc>746</xloc>
+      <yloc>245</yloc>
       </entry>
     <entry>
       <name>Overview_main</name>
@@ -391,8 +359,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>511</xloc>
-      <yloc>87</yloc>
+      <xloc>504</xloc>
+      <yloc>91</yloc>
       </entry>
     <entry>
       <name>account_statistics_job</name>
@@ -423,8 +391,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>511</xloc>
-      <yloc>421</yloc>
+      <xloc>270</xloc>
+      <yloc>393</yloc>
       </entry>
     <entry>
       <name>SurveyResultsJob</name>
@@ -455,8 +423,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>761</xloc>
-      <yloc>421</yloc>
+      <xloc>504</xloc>
+      <yloc>393</yloc>
       </entry>
     <entry>
       <name>SurveyStatsJobMain</name>
@@ -487,8 +455,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>761</xloc>
-      <yloc>87</yloc>
+      <xloc>746</xloc>
+      <yloc>91</yloc>
       </entry>
     <entry>
       <name>NPS_Report</name>
@@ -519,55 +487,19 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>997</xloc>
-      <yloc>87</yloc>
+      <xloc>987</xloc>
+      <yloc>91</yloc>
       </entry>
   </entries>
   <hops>
     <hop>
-      <from>User Ranking This Month</from>
-      <to>User Ranking This Year</to>
+      <from>START</from>
+      <to>Overview_main</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
       <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>company user report&#x28;2&#x29;</from>
-      <to>User Ranking This Month</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>User Ranking This Year</from>
-      <to>Score Stats</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>Score Stats</from>
-      <to>CompanyTransactionMonitor</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>CompanyTransactionMonitor</from>
-      <to>User Adoption</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
+      <unconditional>Y</unconditional>
     </hop>
     <hop>
       <from>START</from>
@@ -579,8 +511,17 @@
       <unconditional>Y</unconditional>
     </hop>
     <hop>
-      <from>Survey Transaction Report</from>
-      <to>company user report&#x28;2&#x29;</to>
+      <from>Overview_main</from>
+      <to>SurveyStatsJobMain</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>SurveyStatsJobMain</from>
+      <to>NPS_Report</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -606,26 +547,53 @@
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>Overview_main</from>
-      <to>SurveyStatsJobMain</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>SurveyStatsJobMain</from>
-      <to>NPS_Report</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
       <from>NPS_Report</from>
+      <to>User Ranking This Month</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>User Ranking This Month</from>
+      <to>User Ranking This Year</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>User Ranking This Year</from>
+      <to>Score Stats</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Score Stats</from>
       <to>Survey Transaction Report</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Survey Transaction Report</from>
+      <to>company user report&#x28;2&#x29;</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>company user report&#x28;2&#x29;</from>
+      <to>User Adoption</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>

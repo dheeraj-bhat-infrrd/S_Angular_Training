@@ -350,12 +350,11 @@ public interface CommonConstants
     public static final String IS_FORCE_DELETE_COLUMN = "isForceDelete";
     public static final String SURVEY_LAST_ABUSE_REPORTED_DATE = "lastAbuseReportedDate";
     public static final String NPS_SCORE_COLUMN = "npsScore";
-
+    public static final String ENTITY_ALERT_DETAILS_COLUMN = "entityAlertDetails";
     public static final String RETAKE_SURVEY_COLUMN = "retakeSurvey";
     public static final String NO_OF_RETAKE_COLUMN = "noOfRetake";
     public static final String LAST_RETAKE_REQUEST_DATE_COLUMN = "lastRetakeRequestDate";
-    public static final String RETAKE_SURVEY_HISTORY_COLUMN = "retakeSurveyHistory";
-    
+    public static final String RETAKE_SURVEY_HISTORY_COLUMN = "retakeSurveyHistory";    
 
     /**
      * Constants to be used in code for referencing variables(i.e in maps or session attributes)
@@ -1409,6 +1408,7 @@ public interface CommonConstants
     public static final String THIS_YEAR="thisYear";
     public static final String LEADERBOARD_YEAR="year";
     public static final String LEADERBOARD_MONTH="month";
+    public static final String IS_ELIGIBLE = "isEligible";
     
     public static final String RANK = "rank";
     public static final String INTERNAL_BRANCH_RANK = "internalBranchRank";
@@ -1462,4 +1462,11 @@ public interface CommonConstants
     public static final String GOOGLE_CAPTCHA_RESPONSE = "g-recaptcha-response";
 
     public static final String INVALID_CAPTCHA = "invalidCaptcha";
+    
+    //trnsaction monitor alert type
+    public static final String ALERT_TYPE_ERROR = "error";    
+    public static final String ALERT_TYPE_WARNING = "warning";
+    public static final String ALERT_TYPE_NORMAL = "normal"; 
+ 
+
 }

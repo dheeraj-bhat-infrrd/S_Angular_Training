@@ -749,6 +749,13 @@ public class OrganizationManagementController
             model.addAttribute( "autoPostEnabled", false );
             model.addAttribute( "autoPostLinkToUserSite", false );
             model.addAttribute( "vendastaAccess", unitSettings.isVendastaAccessible() );
+            
+            // prepare digest recipients String
+            String digestRecipients = "";
+            if( unitSettings.getDigestRecipients() != null ){
+                digestRecipients = StringUtils.join( unitSettings.getDigestRecipients(), ",\n" );
+            }
+            model.addAttribute( "digestRecipients", digestRecipients );
 
             //set allow parter survey
             boolean allowPartnerSurvey = false;
@@ -2359,7 +2366,7 @@ public class OrganizationManagementController
         return status;
     }
 
-
+    
     /**
      * This controller is called to revert text to be displayed to a customer after choosing the
      * flow(happy/neutral/sad).
@@ -3938,5 +3945,53 @@ public class OrganizationManagementController
         LOG.info( "Method to update allow partner survey finished" );
         return "success";
     }
+    
+    
+    /**
+     * This controller is called to store e-mails set for digest
+     * 
+     * @param request
+     * @param model
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping ( value = "/updatedigestrecipients", method = RequestMethod.POST)
+    public String updateDigestRecipients( HttpServletRequest request, Model model )
+    {
+        LOG.info( "Method updateDigestRecipients() started." );
+        User user = sessionHelper.getCurrentUser();
+        String status = "";
+
+        try {
+
+            String emailsStr = request.getParameter( "emails" );
+            if ( emailsStr == null ) {
+                LOG.warn( "Null or empty value found in updateDigestRecipients() for emails." );
+                status = "Unable to get email data";
+            } else {
+
+                Set<String> emailList = organizationManagementService.parseEmailsList( emailsStr );
+                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
+
+                organizationManagementService.updateDigestRecipients( companySettings, emailList,
+                    MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+                
+                if ( emailList == null || emailList.isEmpty() ) {
+                    status = "Additional digest recipients removed!";
+                } else {
+                    status = "Digest recipient List updated successfully!";
+                }
+
+            }
+
+        } catch ( NonFatalException e ) {
+            LOG.error( "Non fatal exception caught in updateDigestRecipients(). Nested exception is ", e );
+            status = "Unable to update digest recipients";
+        }
+
+        LOG.info( "Method updateDigestRecipients() finished." );
+        return status;
+    }
+
 }
 // JIRA: SS-24 BY RM02 EOC

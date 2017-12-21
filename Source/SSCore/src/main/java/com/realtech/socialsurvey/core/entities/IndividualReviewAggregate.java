@@ -6,6 +6,7 @@ public class IndividualReviewAggregate
     private String invalidMessage;
     private SurveyDetails review;
     private OrganizationUnitSettings unitSettings;
+    private String profileLevel;
 
 
     public boolean getSurveyIdValid()
@@ -56,10 +57,22 @@ public class IndividualReviewAggregate
     }
 
 
+    public String getProfileLevel()
+    {
+        return profileLevel;
+    }
+
+
+    public void setProfileLevel( String profileLevel )
+    {
+        this.profileLevel = profileLevel;
+    }
+
+
     @Override
     public String toString()
     {
         return "IndividualReviewAggregate [surveyIdValid=" + surveyIdValid + ", invalidMessage=" + invalidMessage + ", review="
-            + review + ", unitSettings=" + unitSettings + "]";
+            + review + ", unitSettings=" + unitSettings + ", profileLevel=" + profileLevel + "]";
     }
 }
