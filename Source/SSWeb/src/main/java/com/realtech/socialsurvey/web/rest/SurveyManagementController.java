@@ -84,13 +84,14 @@ import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.core.utils.UrlValidationHelper;
+import com.realtech.socialsurvey.web.api.builder.SSApiIntergrationBuilder;
 import com.realtech.socialsurvey.web.common.ErrorCodes;
 import com.realtech.socialsurvey.web.common.ErrorResponse;
 import com.realtech.socialsurvey.web.common.JspResolver;
-import com.realtech.socialsurvey.web.controller.SessionHelper;
 import com.realtech.socialsurvey.web.util.RequestUtils;
 
 import facebook4j.FacebookException;
+import retrofit.client.Response;
 import twitter4j.TwitterException;
 
 // JIRA SS-119 by RM-05 : BOC
@@ -140,8 +141,6 @@ public class SurveyManagementController
 	@Autowired
 	private ProfileManagementService profileManagementService;
 
-	@Autowired
-	private SessionHelper sessionHelper;
 
 	@Resource
 	@Qualifier("nocaptcha")
@@ -171,20 +170,27 @@ public class SurveyManagementController
 	@Value("${GOOGLE_API_KEY}")
 	private String googlePlusId;
 
+	@Autowired
+    private SSApiIntergrationBuilder ssApiIntergrationBuilder;
+
 	/*
 	 * Method to store answer to the current question of the survey.
 	 */
 	@ResponseBody
-	@RequestMapping(value = "/data/storeAnswer")
-	public String storeSurveyAnswer(HttpServletRequest request) {
+	@RequestMapping(value = "/data/storeAnswer" , method = RequestMethod.GET)
+	public Response storeSurveyAnswer(HttpServletRequest request) {
 		LOG.info("Method storeSurveyAnswer() started to store response of customer.");
+		Response response = null;
 		String answer = request.getParameter("answer");
 		String question = request.getParameter("question");
 		String questionType = request.getParameter("questionType");
 		int stage = Integer.parseInt(request.getParameter("stage"));
 		int isUserRankingQuestionInt = Integer.parseInt(request.getParameter("isUserRankingQuestion"));
 		String surveyId = request.getParameter("surveyId");
-
+		//add a request parameter to check if the question is set to nps or not 
+		int isNpsQuestionInt = Integer.parseInt(request.getParameter("isNPSQuestion"));
+		int considerForScoreInt = Integer.parseInt(request.getParameter("considerForScore"));
+		int questionId = Integer.parseInt( request.getParameter("questionId") );
 		//encode question and response
 		question = new String( DatatypeConverter.parseBase64Binary(question) );
 		answer = new String( DatatypeConverter.parseBase64Binary(answer) );
@@ -194,10 +200,36 @@ public class SurveyManagementController
 		if(isUserRankingQuestionInt == CommonConstants.QUESTION_RATING_VALUE_TRUE){
 		    isUserRankingQuestion = true;
 		}
-		surveyHandler.updateCustomerAnswersInSurvey(surveyId, question, questionType, answer, stage, isUserRankingQuestion);
+		boolean isNpsQuestion = false;
+		if(isNpsQuestionInt == CommonConstants.QUESTION_RATING_VALUE_TRUE){
+		    isNpsQuestion = true;
+		}
+		
+		boolean considerForScore = false;
+        if(considerForScoreInt == CommonConstants.QUESTION_RATING_VALUE_TRUE){
+            considerForScore = true;
+        }
+		/*surveyHandler.updateCustomerAnswersInSurvey(surveyId, question, questionType, answer, stage, isUserRankingQuestion, isNpsQuestion);
 		LOG.info("Method storeSurveyAnswer() finished to store response of customer.");
-		return surveyHandler.getSwearWords();
+		return surveyHandler.getSwearWords();*/
+		try{
+		      response = ssApiIntergrationBuilder.getIntegrationApi().updateSurveyResponse( surveyId, question, questionType, answer, stage, isUserRankingQuestion, isNpsQuestion, questionId, considerForScore );
+		}catch(Exception e){
+		    LOG.error( "Method store survey answer has an exception in api : ",e );
+		}
+		return response;
 	}
+	
+	/*
+     * Method to store answer to the current question of the survey.
+     */
+    @ResponseBody
+    @RequestMapping(value = "/data/getSwearWords" , method = RequestMethod.GET)
+    public Response getSwearList() {
+        LOG.info( "Method to get swear list started" );
+        return ssApiIntergrationBuilder.getIntegrationApi().getSwearWordsList();
+
+    }
 
 	/*
 	 * Method to store final feedback of the survey from customer.
@@ -241,8 +273,10 @@ public class SurveyManagementController
 			}
 
 			boolean isAbusive = Boolean.parseBoolean(request.getParameter("isAbusive"));
-			surveyHandler.updateGatewayQuestionResponseAndScore(surveyId, mood, feedback, isAbusive, agreedToShare);
-			surveyHandler.increaseSurveyCountForAgent(agentId);
+			//update gateway question response and score 
+	        Response response = ssApiIntergrationBuilder.getIntegrationApi().updateScore(surveyId, mood, feedback, isAbusive, agreedToShare);
+	        /*  surveyHandler.updateGatewayQuestionResponseAndScore(surveyId, mood, feedback, isAbusive, agreedToShare);*/	
+	        surveyHandler.increaseSurveyCountForAgent(agentId);
 			SurveyDetails surveyDetails = surveyHandler.getSurveyDetails(surveyId);
 			SurveyPreInitiation surveyPreInitiation = surveyHandler.getPreInitiatedSurvey(surveyDetails.getSurveyPreIntitiationId());
 			surveyHandler.deleteSurveyPreInitiationDetailsPermanently(surveyPreInitiation);

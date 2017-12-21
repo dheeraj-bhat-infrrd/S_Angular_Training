@@ -1,5 +1,8 @@
 package com.realtech.socialsurvey.web.api;
 
+
+
+import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
 import com.realtech.socialsurvey.web.api.entities.AccountRegistrationAPIRequest;
 import com.realtech.socialsurvey.web.api.entities.CaptchaAPIRequest;
 import com.realtech.socialsurvey.web.api.entities.VendastaRmCreateRequest;
@@ -184,8 +187,32 @@ public interface SSApiIntegration
     
     @GET("/v1/getscorestatsquestion")
     Response getScoreStatsQuestion(@Query ("entityId") Long entityId, @Query ("entityType") String entityType, @Query ("currentMonth") int currentMonth, @Query ("currentYear") int currentYear);
-    //reporting:END
-
+    
     @GET("/v1/getaccountstatisticsreportstatus")
 	Response getAccountStatisticsRecentActivity(@Query("reportId") Long reportId);
+    //reporting:END
+    
+    @POST("/v2/addquestiontosurvey")
+	Response addQuestionToExistingSurvey(@Body SurveyQuestionDetails questionDetails);
+
+    @PUT("/v2/updatesurveyquestion")
+	Response updateQuestionFromExistingSurvey(@Body SurveyQuestionDetails questionDetails);
+    
+    //survey api's 
+    @POST("/v2/surveys/{surveyId}/response")
+    Response updateSurveyResponse(@Path ("surveyId") String surveyId, @Query ("question") String question, @Query ("questionType") String questionType, @Query ("answer") String answer, @Query ("stage") int stage,
+        @Query ("isUserRankingQuestion") boolean isUserRankingQuestion, @Query ("isNpsQuestion") boolean isNpsQuestion, @Query ("questionId") int questionId, @Query ("considerForScore") boolean considerForScore  );
+    
+    @POST("/v2/surveys/{surveyId}/score")
+    Response updateScore(@Path ("surveyId") String surveyId, @Query ("mood") String mood, @Query ("feedback") String feedback,
+        @Query ("isAbusive") boolean isAbusive, @Query ("agreedToShare") String agreedToShare  );
+    
+    @GET("/v2/swearwords")
+    Response getSwearWordsList();
+
+    @DELETE("/v2/removesurveyquestion")
+	Response removeQuestionFromSurvey(@Query("userId") long userId,@Query("surveyQuestionId") long surveyQuestionId);
+    
+    @GET ( "/v1/npsstats" )
+    Response getReportingNpsStats(@Query ("entityId") Long entityId , @Query ("entityType") String entityType);
 }

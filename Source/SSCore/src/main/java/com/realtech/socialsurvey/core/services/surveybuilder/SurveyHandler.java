@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.solr.client.solrj.SolrServerException;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
@@ -49,17 +48,20 @@ public interface SurveyHandler
      * branchId, String customerEmail, int reminderCount) throws InvalidInputException,
      * SolrException, NoRecordsFetchedException, SolrServerException;
      */
-    /*
-     * Method to update answers to all the questions and current stage in MongoDB.
-     * @param agentId
-     * @param customerEmail
+
+    /**
+     * @param surveyId
      * @param question
+     * @param questionType
      * @param answer
      * @param stage
-     * @throws Exception
+     * @param isUserRankingQuestion
+     * @param isNpsQuestion
+     * @param questionId
+     * @param considerForScore
      */
-    public void updateCustomerAnswersInSurvey( String surveyId, String question, String questionType, String answer, int stage, boolean isUserRankingQuestion );
-
+    void updateCustomerAnswersInSurvey( String surveyId, String question, String questionType, String answer, int stage,
+        boolean isUserRankingQuestion, boolean isNpsQuestion, int questionId, boolean considerForScore );
 
     /*
      * Method to update customer review and final score on the basis of rating questions in

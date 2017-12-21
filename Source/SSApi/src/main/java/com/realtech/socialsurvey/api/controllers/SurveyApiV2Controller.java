@@ -38,6 +38,7 @@ import com.realtech.socialsurvey.api.utils.RestUtils;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
+import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.AuthorizationException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -45,9 +46,11 @@ import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.admin.AdminAuthenticationService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.vo.SurveysAndReviewsVO;
 import com.wordnik.swagger.annotations.ApiOperation;
+
 
 
 @RestController
@@ -79,9 +82,16 @@ public class SurveyApiV2Controller
 
     @Autowired
     private SurveyV2Transformer surveyV2Transformer;
+    
+    private SurveyBuilder surveyBuilder;
+
+    @Autowired
+	public void setSurveyBuilder(SurveyBuilder surveyBuilder) {
+		this.surveyBuilder = surveyBuilder;
+	}
 
 
-    @RequestMapping ( value = "/surveys", method = RequestMethod.PUT)
+	@RequestMapping ( value = "/surveys", method = RequestMethod.PUT)
     @ApiOperation ( value = "Post Survey Transaction")
     public ResponseEntity<?> postSurveyTransaction( @Valid @RequestBody SurveyPutVO surveyModel, HttpServletRequest request )
         throws SSApiException
@@ -353,8 +363,82 @@ public class SurveyApiV2Controller
             companyId );
     }
     
+    @RequestMapping ( value = "/addquestiontosurvey", method = RequestMethod.POST)
+    @ApiOperation ( value = "Add question to existing survey.")
+	public String addQuestionToExistingSurvey(@RequestBody SurveyQuestionDetails questionDetails) throws SSApiException {
+    	LOGGER.info("API call for add question to existing survey.");
+    	long questionId = 0;
+		try {
+			questionId = surveyBuilder.createSurveyQuestionForExistingSurvey(questionDetails);
+		} catch (InvalidInputException ie) {
+			LOGGER.error("Invalid input exception caught while adding question to existing survey.",ie);
+			throw new SSApiException("Invalid input exception caught while adding question to existing survey.",ie);
+		}catch(NoRecordsFetchedException e){
+			LOGGER.error("NoRecordsFetchedException caught while adding new question to existing survey.",e);
+			throw new SSApiException("NoRecordsFetchedException caught while adding new question to existing survey.",e);			
+		}
+		return Long.toString(questionId);
+	}
     
+    @RequestMapping ( value = "/updatesurveyquestion", method = RequestMethod.PUT)
+    @ApiOperation ( value = "update existing survey question.")
+	public String updateQuestionInExistingSurvey(@RequestBody SurveyQuestionDetails questionDetails) throws SSApiException {
+    	LOGGER.info("API call for update question of existing survey.");
+		try {
+			surveyBuilder.updateSurveyQuestionAndAnswer(questionDetails);
+		} catch (InvalidInputException ie) {
+			LOGGER.error("Invalid input exception caught while updating question to existing survey.",ie);
+			throw new SSApiException("Invalid input exception caught while adding question to existing survey.",ie);
+		}catch(NoRecordsFetchedException e){
+			LOGGER.error("NoRecordsFetchedException caught while updating question in existing survey.",e);
+			throw new SSApiException("NoRecordsFetchedException caught while updating question in existing survey.",e);			
+		}
+    	return "SUCCESS";
+    }
     
+    @RequestMapping ( value = "/removesurveyquestion", method = RequestMethod.DELETE)
+    @ApiOperation ( value = "remove question from survey question.")
+	public String removeQuestionFromExistingSurvey(long userId, long surveyQuestionId) throws SSApiException {
+    	LOGGER.info("API call to remove question from existing survey.");
+		try {
+			surveyBuilder.removeQuestionFromSurvey(userId,surveyQuestionId);
+		} catch (InvalidInputException ie) {
+			LOGGER.error("Invalid input exception caught while removing question from existing survey.",ie);
+			throw new SSApiException("Invalid input exception caught while removing question from existing survey.",ie);
+		}catch(NoRecordsFetchedException e){
+			LOGGER.error("NoRecordsFetchedException caught while removing question from existing survey.",e);
+			throw new SSApiException("NoRecordsFetchedException caught while removing question from existing survey.",e);			
+		}
+    	return "SUCCESS";
+    } 
+    
+    @RequestMapping ( value = "/surveys/{surveyId}/response", method = RequestMethod.POST)
+    @ApiOperation ( value = "Update Survey Response And Get Swear words")
+    public String updateSurveyResponse( @PathVariable ( "surveyId") String surveyId, String question, String questionType, String answer, int stage,
+        boolean isUserRankingQuestion, boolean isNpsQuestion , int questionId , boolean considerForScore ){
+        LOGGER.info("Method updateSurveyResponse() started to store response of customer.");
+        surveyHandler.updateCustomerAnswersInSurvey(surveyId, question, questionType, answer, stage, isUserRankingQuestion, isNpsQuestion, questionId, considerForScore);
+        LOGGER.info("Method updateSurveyResponse() to store response of customer finished successfully");
+        return "Survey response updated successfully";
+    }
+    
+    @RequestMapping ( value = "/surveys/{surveyId}/score", method = RequestMethod.POST)
+    @ApiOperation ( value = "Get Survey Transaction")
+    public String updateScore(@PathVariable ( "surveyId") String surveyId,String mood,String feedback,boolean isAbusive,String agreedToShare){
+        LOGGER.info("Method storeScore() started to store score of survey");
+        surveyHandler.updateGatewayQuestionResponseAndScore(surveyId, mood, feedback, isAbusive, agreedToShare);
+        LOGGER.info("Method storeScore() to store score of survey finished successfully");
+        return "Gateway and score updated successfully";
+    }
+    
+    @RequestMapping ( value = "/swearwords",method = RequestMethod.GET)
+    @ApiOperation ( value = "Get Swear Words" )
+    public String getSwearWordsList(){
+        LOGGER.info("Method getSwearWordsList() started to send swear word list");
+        return surveyHandler.getSwearWords() ;
+    }
+
+   
     @RequestMapping ( value = "/surveycount", method = RequestMethod.GET)
     @ApiOperation ( value = "Get Survey Transactions Count")
     public ResponseEntity<?> getSurveyTransactionsCouunt( HttpServletRequest request ) throws SSApiException

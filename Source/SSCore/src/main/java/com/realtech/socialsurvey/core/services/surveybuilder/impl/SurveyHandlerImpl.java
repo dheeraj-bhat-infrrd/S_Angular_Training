@@ -410,28 +410,32 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     }
 
 
-    /*
-     * Method to update answers to all the questions and current stage in MongoDB.
-     * @param agentId
-     * @param customerEmail
+
+    /**
+     * @param surveyId
      * @param question
+     * @param questionType
      * @param answer
      * @param stage
-     * @throws Exception
+     * @param isUserRankingQuestion
+     * @param isNpsQuestion
      */
     @Override
     public void updateCustomerAnswersInSurvey( String surveyId, String question, String questionType, String answer, int stage,
-        boolean isUserRankingQuestion )
+        boolean isUserRankingQuestion, boolean isNpsQuestion, int questionId, boolean considerForScore )
     {
-        LOG.debug(
+        LOG.info(
             "Method to update answers provided by customer in SURVEY_DETAILS, updateCustomerAnswersInSurvey() started." );
         SurveyResponse surveyResponse = new SurveyResponse();
         surveyResponse.setAnswer( answer );
         surveyResponse.setQuestion( question );
         surveyResponse.setQuestionType( questionType );
         surveyResponse.setIsUserRankingQuestion( isUserRankingQuestion );
+        surveyResponse.setIsNpsQuestion( isNpsQuestion );
+        surveyResponse.setQuestionId( questionId );
+        surveyResponse.setConsiderForScore( considerForScore );
         surveyDetailsDao.updateCustomerResponse( surveyId, surveyResponse, stage );
-        LOG.debug(
+        LOG.info(
             "Method to update answers provided by customer in SURVEY_DETAILS, updateCustomerAnswersInSurvey() finished." );
     }
 
@@ -444,11 +448,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     public void updateGatewayQuestionResponseAndScore( String surveyId, String mood, String review, boolean isAbusive,
         String agreedToShare )
     {
-        LOG.debug(
+        LOG.info(
             "Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS, updateCustomerAnswersInSurvey() started." );
         surveyDetailsDao.updateFinalScore( surveyId );
         surveyDetailsDao.updateGatewayAnswer( surveyId, mood, review, isAbusive, agreedToShare );
-        LOG.debug(
+        LOG.info(
             "Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS, updateCustomerAnswersInSurvey() finished." );
     }
 
@@ -573,6 +577,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Override
     public String getSwearWords()
     {
+        LOG.info("Method to get swear words is implemented");
         return SWEAR_WORDS;
     }
 
@@ -872,6 +877,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyDetails.setReview( null );
         surveyDetails.setNoOfRetake( surveyDetails.getNoOfRetake() + 1 );
         surveyDetails.setLastRetakeRequestDate( new Date ( System.currentTimeMillis() ) );
+        surveyDetails.setNpsScore( -1 );
         
         RetakeSurveyHistory retakeSurveyHistory = new RetakeSurveyHistory();
         retakeSurveyHistory.setCompleteProfileUrl( surveyDetails.getCompleteProfileUrl() );
