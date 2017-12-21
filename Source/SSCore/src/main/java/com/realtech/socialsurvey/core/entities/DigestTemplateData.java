@@ -1,7 +1,11 @@
 package com.realtech.socialsurvey.core.entities;
 
-public class DigestTemplateData
+import java.io.Serializable;
+
+
+public class DigestTemplateData implements Serializable
 {
+    private static final long serialVersionUID = 1L;
     private String month;
     private String year;
     private String averageScoreRating;
@@ -196,6 +200,18 @@ public class DigestTemplateData
     public void setSpsIcon( String spsIcon )
     {
         this.spsIcon = spsIcon;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return "DigestTemplateData [month=" + month + ", year=" + year + ", averageScoreRating=" + averageScoreRating
+            + ", userCount=" + userCount + ", totalTransactions=" + totalTransactions + ", completedTransactions="
+            + completedTransactions + ", surveyCompletionRate=" + surveyCompletionRate + ", sps=" + sps + ", promoters="
+            + promoters + ", detractors=" + detractors + ", passives=" + passives + ", totalCompletedReviews="
+            + totalCompletedReviews + ", averageScoreRatingIcon=" + averageScoreRatingIcon + ", surveyCompletionRateIcon="
+            + surveyCompletionRateIcon + ", spsIcon=" + spsIcon + "]";
     }
 
 }

@@ -3,10 +3,8 @@ package com.realtech.socialsurvey.core.commons;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
-import com.realtech.socialsurvey.core.entities.RetakeSurveyHistory;
 
 
 /**
@@ -290,6 +288,8 @@ public interface CommonConstants
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_SURVEY_TRANSACTION_REPORT = "Survey transaction report for reporting";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_USER_RANKING_MONTHLY_REPORT = "User ranking monthly report for reporting";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_USER_RANKING_YEARLY_REPORT = "User ranking yearly report for reporting";
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_NPS_WEEK_REPORT = "NPS weekly report for reporting";
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_NPS_MONTH_REPORT = "NPS monthly report for reporting";
 
 
     
@@ -349,11 +349,12 @@ public interface CommonConstants
     public static final String ACCOUNT_DISABLE_DATE_COLUMN = "disableDate";
     public static final String IS_FORCE_DELETE_COLUMN = "isForceDelete";
     public static final String SURVEY_LAST_ABUSE_REPORTED_DATE = "lastAbuseReportedDate";
+    public static final String NPS_SCORE_COLUMN = "npsScore";
+    public static final String ENTITY_ALERT_DETAILS_COLUMN = "entityAlertDetails";
     public static final String RETAKE_SURVEY_COLUMN = "retakeSurvey";
     public static final String NO_OF_RETAKE_COLUMN = "noOfRetake";
     public static final String LAST_RETAKE_REQUEST_DATE_COLUMN = "lastRetakeRequestDate";
-    public static final String RETAKE_SURVEY_HISTORY_COLUMN = "retakeSurveyHistory";
-    
+    public static final String RETAKE_SURVEY_HISTORY_COLUMN = "retakeSurveyHistory";    
 
     /**
      * Constants to be used in code for referencing variables(i.e in maps or session attributes)
@@ -670,8 +671,10 @@ public interface CommonConstants
     // Survey Constants
     public static final String QUESTION_MULTIPLE_CHOICE = "mcq";
     public static final String QUESTION_RATING = "range";
+    public static final String QUESTION_0to10 = "0to10";
     public static final int QUESTION_RATING_VALUE_TRUE = 1;
     public static final int QUESTION_RATING_VALUE_FALSE = 0;
+    public static final boolean QUESTION_VALUE_TRUE = true;
     public static final int SURVEY_STAGE_COMPLETE = -1;
     public static final String SURVEY_CUSTOMER_MOOD_SAD = "sad";
 
@@ -985,9 +988,14 @@ public interface CommonConstants
     public static final int FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT = 105;
     public static final int FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT = 106;
     public static final int FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT = 107;
-    public static final int FILE_UPLOAD_REPORTING_COMPANY_DETAILS_REPORT = 109;
     public static final int FILE_UPLOAD_REPORTING_INCOMPLETE_SURVEY_REPORT = 108;
+    public static final int FILE_UPLOAD_REPORTING_COMPANY_DETAILS_REPORT = 109;
+    public static final int FILE_UPLOAD_REPORTING_NPS_WEEK_REPORT = 110;
+    public static final int FILE_UPLOAD_REPORTING_NPS_MONTH_REPORT = 111;
+    public static final int NPS_REPORT_TYPE_WEEK = 1;
+    public static final int NPS_REPORT_TYPE_MONTH = 2;
 
+    
     
     public static final String AGENT_MEDIA_POST_DETAILS_COLUMN = "agentMediaPostDetails";
     public static final String BRANCH_MEDIA_POST_DETAILS_COLUMN = "branchMediaPostDetailsList";
@@ -1385,6 +1393,7 @@ public interface CommonConstants
     public static final String REPORTING_USER_RANKING_MONTHLY_REPORT = "User Ranking Report For Month";
     public static final String REPORTING_USER_RANKING_YEARLY_REPORT = "User Ranking Report For Year";
     public static final String REPORTING_INCOMPLETE_SURVEY_REPORT = "Incomplete Survey Results Report";
+    public static final String REPORTING_NPS_REPORT = "NPS Report";
     public static final String REPORTING_API_DATE_FORMAT = "MMM dd, yyyy";
 
 
@@ -1399,6 +1408,7 @@ public interface CommonConstants
     public static final String THIS_YEAR="thisYear";
     public static final String LEADERBOARD_YEAR="year";
     public static final String LEADERBOARD_MONTH="month";
+    public static final String IS_ELIGIBLE = "isEligible";
     
     public static final String RANK = "rank";
     public static final String INTERNAL_BRANCH_RANK = "internalBranchRank";
@@ -1452,4 +1462,11 @@ public interface CommonConstants
     public static final String GOOGLE_CAPTCHA_RESPONSE = "g-recaptcha-response";
 
     public static final String INVALID_CAPTCHA = "invalidCaptcha";
+    
+    //trnsaction monitor alert type
+    public static final String ALERT_TYPE_ERROR = "error";    
+    public static final String ALERT_TYPE_WARNING = "warning";
+    public static final String ALERT_TYPE_NORMAL = "normal"; 
+ 
+
 }

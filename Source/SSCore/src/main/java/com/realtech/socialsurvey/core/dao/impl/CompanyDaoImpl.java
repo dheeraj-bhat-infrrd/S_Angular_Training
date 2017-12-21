@@ -110,10 +110,12 @@ public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements Com
         boolean inCompleteCompany , Timestamp startDate )
     {
         Criteria criteria = getSession().createCriteria( Company.class );
-        Disjunction or = Restrictions.disjunction();
-        or.add( Restrictions.ilike( "company", namePattern, MatchMode.START ) );
-        or.add( Restrictions.ilike( "company", "% "+namePattern+"%" ) );
-        criteria.add(or);
+        if ( namePattern != null && namePattern != "" ) {
+            Disjunction or = Restrictions.disjunction();
+            or.add( Restrictions.ilike( "company", namePattern, MatchMode.START ) );
+            or.add( Restrictions.ilike( "company", "% " + namePattern + "%" ) );
+            criteria.add( or );
+        }
         
         if(startDate != null)
             criteria.add( Restrictions.ge( "createdOn", startDate ) );
@@ -136,7 +138,7 @@ public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements Com
             }
         }
         criteria.setProjection(Projections.property("companyId"));
-        criteria.addOrder( Order.asc( "company" ).ignoreCase() );
+        //criteria.addOrder( Order.asc( "company" ) );
         return criteria.list();
     }
 

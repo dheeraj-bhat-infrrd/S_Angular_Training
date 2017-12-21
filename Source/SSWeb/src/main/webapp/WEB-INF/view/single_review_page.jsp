@@ -7,7 +7,20 @@
 
 <c:if test="${not empty reviewAggregate}">
 	<c:if test="${reviewAggregate.surveyIdValid}">
-	
+		<c:choose>
+			<c:when test="${reviewAggregate.profileLevel == 'COMPANY'}">
+				<c:set value="sr-comp-default-img" var="defaultimageclass"></c:set>
+			</c:when>
+			<c:when test="${reviewAggregate.profileLevel == 'REGION'}">
+				<c:set value="sr-reg-default-img" var="defaultimageclass"></c:set>
+			</c:when>
+			<c:when test="${reviewAggregate.profileLevel == 'BRANCH'}">
+				<c:set value="sr-off-default-img" var="defaultimageclass"></c:set>
+			</c:when>
+			<c:when test="${reviewAggregate.profileLevel == 'INDIVIDUAL'}">
+				<c:set value="sr-ind-default-img" var="defaultimageclass"></c:set>
+			</c:when>
+		</c:choose>
 		<c:set value="${ reviewAggregate.review }" var = "singleReviewItem"></c:set>
 		
 		<c:if test="${ not empty singleReviewItem.customerLastName }">

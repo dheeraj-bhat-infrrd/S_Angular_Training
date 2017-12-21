@@ -131,6 +131,90 @@ var classificationsList = [];
 
 var ratingQuestionCount= 0;
 
+var npsQuestionText = '';
+var veryLikelyText = '';
+var notVeryLikelyText = '';
+var npsOrder = 999;
+
+var defaultNpsQuestion = 'Default NPS Question';
+var defaultNotVeryLikely = 'Not Very Likely';
+var defaultVeryLikely = 'Very Likely';
+
+//variables for transaction monitor
+var sysAutoTransGraphId = 'sys-auto-trans-graph';
+var sysCompTransGraphId = 'sys-sur-comp-graph';
+var sysInvSentGraphId = 'sys-invite-sent-graph';
+var sysRemSentGraphId = 'sys-rem-sent-graph';
+var sysUnproTransGraphId = 'sys-unpro-trans-graph';
+
+var dangerGraphWrapper = '<div class="dash-stats-wrapper bord-bot-dc clearfix trans-monitor-wrapper">'
+						+'<div class="trans-monitor-sub-header-danger">'
+						+'<div class="trans-monitor-sub-header-box-danger"></div>'
+						+'<span id="trans-wrapper-header-span-danger" class="trans-monitor-sub-header-span"></span>'
+						+'</div>'
+						+'<div id="trans-graph-container" class="trans-monitor-graphs-wrapper"></div></div>';
+
+var warnGraphWrapper = '<div class="dash-stats-wrapper bord-bot-dc clearfix trans-monitor-wrapper">'
+						+'<div class="trans-monitor-sub-header-warn">'
+						+'<div class="trans-monitor-sub-header-box-warn"></div>'
+						+'<span id="trans-wrapper-header-span-warn" class="trans-monitor-sub-header-span"></span>'
+						+'</div>'
+						+'<div id="trans-graph-container" class="trans-monitor-graphs-wrapper"></div></div>';
+
+var grayGraphWrapper = '<div class="dash-stats-wrapper bord-bot-dc clearfix trans-monitor-wrapper">'
+					  +'<div class="trans-monitor-sub-header-gray">'
+					  +'<div class="trans-monitor-sub-header-box-gray"></div>'
+					  +'<span id="trans-wrapper-header-span-gray" class="trans-monitor-sub-header-span"></span>'
+					  +'</div>'
+					  +'<div id="trans-graph-container" class="trans-monitor-graphs-wrapper"></div></div>';
+
+var normalGraphWrapper = '<div class="dash-stats-wrapper bord-bot-dc clearfix trans-monitor-wrapper">'
+	  					+'<div class="trans-monitor-sub-header-normal">'
+	  					+'<div class="trans-monitor-sub-header-box-normal"></div>'
+	  					+'<span id="trans-wrapper-header-span-normal" class="trans-monitor-sub-header-span"></span>'
+	  					+'</div>'
+	  					+'<div id="trans-graph-container" class="trans-monitor-graphs-wrapper"></div></div>';
+
+var dangerGraphContainer = '<div class="trans-monitor-graph-col-danger">'
+						  +'<span class="trans-monitor-graph-span"></span>'
+						  +'<div id="trans-graph" class="trans-monitor-graph-div"></div></div>';
+
+var warnGraphContainer = '<div class="trans-monitor-graph-col-warn">'
+	  					+'<span class="trans-monitor-graph-span"></span>'
+	  					+'<div id="trans-graph" class="trans-monitor-graph-div"></div></div>';
+
+var grayGraphContainer = '<div class="trans-monitor-graph-col-gray">'
+	  					+'<span class="trans-monitor-graph-span"></span>'
+	  					+'<div id="trans-graph" class="trans-monitor-graph-div"></div></div>';
+
+var normalGraphContainer = '<div class="trans-monitor-graph-col-normal">'
+	  					  +'<span class="trans-monitor-graph-span"></span>'
+	  					  +'<div id="trans-graph" class="trans-monitor-graph-div"></div></div>';
+
+var automatedTransText = 'Automated Transactions';
+var inviteSentText = 'Invitations-sent';
+var reminderSentText = 'Reminders Sent';
+var completedTransText = 'Surveys Completed';
+var unprocessedTransText = 'Unprocessed Transactions';
+
+var autoType = 1;
+var inviType = 2;
+var remType = 3;
+var compType = 4;
+var unproType = 5;
+
+var pastWeekTransMonAutoGraphData = new Array();
+var pastWeekTransMonInviGraphData = new Array();
+var pastWeekTransMonRemGraphData = new Array();
+var pastWeekTransMonCompGraphData = new Array();
+var pastWeekTransMonUnproGraphData = new Array();
+
+var curWeekTransMonAutoGraphData = new Array();
+var curWeekTransMonInviGraphData = new Array();
+var curWeekTransMonRemGraphData = new Array();
+var curWeekTransMonCompGraphData = new Array();
+var curWeekTransMonUnproGraphData = new Array();
+
 /**
  * js functions for landing page
  */
@@ -2365,6 +2449,23 @@ function convertYearMonthDayKeyToMonthDay(key) {
 	}).toString("MMM d");
 }
 
+function convertYearMonthDayKeyToMonthDayYear(key) {
+	var year = parseInt(key.substr(0, 4));
+	var monthStr = key.substr(4, 2);
+	var monthInt = parseInt(monthStr, "10"); // add base value
+	var monthNumber = monthInt - 1;
+
+	var dayStr = key.substr(6, 2);
+	var dayInt = parseInt(dayStr, "10"); // add base value
+	dayNumber = dayInt;
+	
+	return Date.today().set({
+		day : dayNumber,
+		month : monthNumber,
+		year : year
+	}).toString("MMM d, yyyy")
+}
+
 function getKeysFromGraphFormat(format) {
 	var firstDate;
 	var keys = [];
@@ -2396,9 +2497,7 @@ function getKeysFromGraphFormat(format) {
 		 * var key = firstDate.getFullYear().toString() + (firstDate.getWeek()).toString(); keys.push(key);
 		 */
 		for (var i = 1; i <= count; i++) {
-			var date = firstDate.add({
-				days : 1
-			});
+			var date = firstDate;
 			var month = date.getMonth() + 1;
 			var monthStr = "";
 			if (month < 10) {
@@ -2419,6 +2518,9 @@ function getKeysFromGraphFormat(format) {
 			
 			keys.push(date.getFullYear().toString() + monthStr + dayStr);
 			
+			date = firstDate.add({
+				days : 1
+			});
 
 		}
 	}else {
@@ -3233,7 +3335,111 @@ function bindEditSurveyEvents() {
 			loadActiveSurveyQuestions();
 		});
 	});
+
+	$('.bd-nps-btn-done').on('click', function(e) {
+		e.stopPropagation();
+		var npsQuestion = $('#sb-nps-question-txt').val();
+		var editedStatus=false;
+		
+		if ($('#nps-question-form').attr('data-status') == 'edited') {
+			editedStatus=true;
+		}
+		/*var count=1;
+		while (count <= currentQues) {
+			if ($('#nps-question-form').attr('data-status') == 'edited') {
+				editedStatus = true;
+				break;
+			} else {
+				editedStatus = false;
+			}
+			count++;
+		}*/
+		
+		if (editedStatus == false) {
+			$("#overlay-toast").html('No changes detected. Retry Editing Question.');
+			showToast();
+			revertQuestionOverlay();
+			setTimeout(function() {
+				loadActiveSurveyQuestions();
+			}, 2000);
+			return;
+		}
+		
+		createPopupConfirm("Unsaved changes detected", "Do you want to save your changes ?", "Save", "Cancel");
+
+		$('#overlay-continue').off('click');
+		$('#overlay-continue').on('click', function() {
+				
+				npsQuestion = $('#sb-nps-question-txt').val();
+				if(npsQuestion == '' || npsQuestion == null || npsQuestion == undefined){
+					$("#overlay-toast").html('Please finish adding the Question');
+					showToast();
+					return;
+				}else{
+					if ($('#nps-question-form').attr('data-state') == 'new' && $('#nps-question-form').attr('data-status') == 'edited') {
+						
+						var url = "./addquestiontosurvey.do?order="+ npsOrder;
+						callAjaxFormSubmit(url, function(data) {
+							var map = $.parseJSON(data);
+							$("#overlay-toast").html(map.message);
+							showToast();
+
+							if (map.status == "success") {
+								$('#nps-question-form').attr('data-quesref', map.questionId);
+								$("#overlay-toast").html("Successfully added NPS Question");
+								showToast();
+								revertQuestionOverlay();
+							} else {
+								$('#nps-question-form').attr('data-state', 'new');
+								$('#nps-question-form').attr('data-status', 'edited');
+								$("#overlay-toast").html("Retry Saving NPS Question");
+								showToast();
+							}
+						}, 'nps-question-form', '#overlay-continue');
+						
+					}else if ($('#nps-question-form').attr('data-state') == 'editable' && $('#nps-question-form').attr('data-status') == 'edited'){
+						
+						var questionId = $('#nps-question-form').attr('data-quesref');
+						var url = "./updatequestionfromsurvey.do?order=" + npsOrder + "&questionId=" + questionId;
+						callAjaxFormSubmit(url, function(data) {
+							var map = $.parseJSON(data);
+							$("#overlay-toast").html(map.message);
+							showToast();
+
+							if (map.status == "success") {
+								$('#nps-question-form').attr('data-status', 'new');
+								$("#overlay-toast").html("Successfully edited NPS Question");
+								showToast();
+								revertQuestionOverlay();
+							} else {
+								$('#nps-question-form').attr('data-status', 'edited');
+								$("#overlay-toast").html("Retry Saving NPS Question");
+								showToast();
+							}
+						}, 'nps-question-form', '#overlay-continue');
+					}
+				}
+			
+
+			$('#overlay-continue').unbind('click');
+			$('#overlay-cancel').unbind('click');
+			overlayRevert();
+			setTimeout(function() {
+				loadActiveSurveyQuestions();
+			}, 2000);
+		});
+		$('#overlay-cancel').click(function() {
+			$('#overlay-continue').unbind('click');
+			$('#overlay-cancel').unbind('click');
+			overlayRevert();
+
+			revertQuestionOverlay();
+			loadActiveSurveyQuestions();
+		});
+	});
 }
+
+
 
 function revertQuestionOverlay() {
 	var url = "./revertquestionoverlay.do";
@@ -3253,6 +3459,7 @@ $(document).on('click', '.bd-q-pu-close', function() {
 
 $(document).on('input', '.bd-q-pu-txt-edit', function() {
 	var quesNum = $(this).closest('form').data('quesnum');
+	$('#nps-ques-edit').val(false);
 	$('#bs-question-edit-' + quesNum).attr('data-status', 'edited');
 	showStatus('#bs-question-edit-' + quesNum, 'Edited');
 });
@@ -3289,6 +3496,18 @@ $(document).on('click', '.bd-tab-rat', function() {
 	$(this).addClass('bd-ans-tab-sel');
 	$(this).parent().parent().parent().find('.bd-ans-type-item').hide();
 	$(this).parent().parent().parent().find('.bd-ans-type-rating').show();
+});
+
+$(document).on('click', '.bd-tab-rad', function() {
+	$(this).parent().find('.bd-ans-tab-item').removeClass('bd-ans-tab-sel');
+	$(this).addClass('bd-ans-tab-sel');
+	$(this).parent().parent().parent().find('.bd-ans-type-item').hide();
+	$(this).parent().parent().parent().find('.bd-ans-type-radio').show();
+	
+	var quesNum = $(this).closest('form').data('quesnum');
+	$(this).closest('form').find('input[name="sb-question-type-' + quesNum + '"]').val($(this).data('id'));
+	showStatus('#bs-question-' + quesNum, 'Edited');
+	$('#bs-question-' + quesNum).attr('data-status', 'edited');
 });
 
 $(document).on('click', '.bd-tab-mcq', function() {
@@ -3373,6 +3592,137 @@ $(document).on('click', '#user-ranking-chkbox-wrapper-new', function() {
 	}
 });
 
+$(document).on('click', '#user-ranking-chkbox-nps-wrapper', function() {
+	if ($('#user-ranking-nps-chkbox').hasClass('bd-check-img-checked')) {		
+		$('#user-ranking-nps-chkbox').removeClass('bd-check-img-checked');
+		 $('#user-ranking-nps-ques').val(true);
+	} else {		
+		$('#user-ranking-nps-chkbox').addClass('bd-check-img-checked')
+		 $('#user-ranking-nps-ques').val(false);
+	}
+});
+
+$(document).on('click', '#user-ranking-chkbox-wrapper-nps', function() {
+	if ($('#user-ranking-chkbox-nps').hasClass('bd-check-img-checked')) {		
+		$('#user-ranking-chkbox-nps').removeClass('bd-check-img-checked');
+		 $('#user-ranking-ques-nps').val(true);
+	} else {		
+		$('#user-ranking-chkbox-nps').addClass('bd-check-img-checked')
+		 $('#user-ranking-ques-nps').val(false);
+	}
+	$('#nps-question-form').attr('data-status','edited');
+});
+
+$(document).on('click', '#user-ranking-chkbox-wrapper-edit-nps', function() {
+	if ($('#user-ranking-chkbox-edit-nps').hasClass('bd-check-img-checked')) {		
+		$('#user-ranking-chkbox-edit-nps').removeClass('bd-check-img-checked');
+		 $('#user-ranking-ques-edit-nps').val(true);
+	} else {		
+		$('#user-ranking-chkbox-edit-nps').addClass('bd-check-img-checked')
+		 $('#user-ranking-ques-edit-nps').val(false);
+	}
+});
+
+$(document).on('click', '#user-ranking-chkbox-wrapper-overlay', function() {
+	if ($('#user-ranking-chkbox-overlay-nps').hasClass('bd-check-img-checked')) {		
+		$('#user-ranking-chkbox-overlay-nps').removeClass('bd-check-img-checked');
+		 $('#user-ranking-ques-overlay-nps').val(true);
+	} else {		
+		$('#user-ranking-chkbox-overlay-nps').addClass('bd-check-img-checked')
+		 $('#user-ranking-ques-overlay-nps').val(false);
+	}
+});
+
+$(document).on('click', '#user-ranking-chkbox-wrapper-new-nps', function() {
+	if ($('#user-ranking-chkbox-new-nps').hasClass('bd-check-img-checked')) {		
+		$('#user-ranking-chkbox-new-nps').removeClass('bd-check-img-checked');
+		 $('#user-ranking-ques-new-nps').val(true);
+	} else {		
+		$('#user-ranking-chkbox-new-nps').addClass('bd-check-img-checked')
+		 $('#user-ranking-ques-new-nps').val(false);
+	}
+});
+
+$(document).on('click', '#avg-score-chkbox-wrapper-new', function() {
+	if ($('#avg-score-chkbox-new').hasClass('bd-check-img-checked')) {		
+		$('#avg-score-chkbox-new').removeClass('bd-check-img-checked');
+		 $('#avg-score-ques-new').val(true);
+	} else {		
+		$('#avg-score-chkbox-new').addClass('bd-check-img-checked')
+		 $('#avg-score-ques-new').val(false);
+	}
+});
+
+$(document).on('click', '#avg-score-chkbox-wrapper-overlay', function() {
+	if ($('#avg-score-chkbox-overlay').hasClass('bd-check-img-checked')) {		
+		$('#avg-score-chkbox-overlay').removeClass('bd-check-img-checked');
+		 $('#avg-score-ques-overlay').val(true);
+	} else {		
+		$('#avg-score-chkbox-overlay').addClass('bd-check-img-checked')
+		 $('#avg-score-ques-overlay').val(false);
+	}
+});
+
+$(document).on('click', '#avg-score-chkbox-wrapper-edit', function() {
+	if ($('#avg-score-chkbox-edit').hasClass('bd-check-img-checked')) {		
+		$('#avg-score-chkbox-edit').removeClass('bd-check-img-checked');
+		 $('#avg-score-ques-edit').val(true);
+	} else {		
+		$('#avg-score-chkbox-edit').addClass('bd-check-img-checked')
+		 $('#avg-score-ques-edit').val(false);
+	}
+});
+
+$(document).on('click', '#avg-score-chkbox-wrapper', function() {
+	if ($('#avg-score-chkbox').hasClass('bd-check-img-checked')) {		
+		$('#avg-score-chkbox').removeClass('bd-check-img-checked');
+		 $('#avg-score-ques').val(true);
+	} else {		
+		$('#avg-score-chkbox').addClass('bd-check-img-checked')
+		 $('#avg-score-ques').val(false);
+	}
+});
+
+$(document).on('click', '#avg-score-chkbox-wrapper-nps', function() {
+	if ($('#avg-score-chkbox-nps').hasClass('bd-check-img-checked')) {		
+		$('#avg-score-chkbox-nps').removeClass('bd-check-img-checked');
+		 $('#avg-score-ques-nps').val(true);
+	} else {		
+		$('#avg-score-chkbox-nps').addClass('bd-check-img-checked')
+		 $('#avg-score-ques-nps').val(false);
+	}
+	$('#nps-question-form').attr('data-status','edited');
+});
+
+$(document).on('click', '#nps-chkbox-wrapper', function(e) {
+	if ($('#nps-chkbox').hasClass('bd-check-img-checked')) {		
+		$('#nps-add-edit').show();
+		$('#nps-chkbox').removeClass('bd-check-img-checked');
+		$('#nps-question-form').attr('data-state','new');
+		$('#nps-question-form').attr('data-status','edited');
+		$('#nps-ques').val(true);
+	} else {		
+		e.stopPropagation();
+		var questionId = $('#nps-question-form').attr('data-quesref');
+		$('#nps-chkbox').addClass('bd-check-img-checked');
+		$('#nps-ques').val(false);
+		$('#nps-add-edit').hide();
+		
+		if($('#nps-question-form').attr('data-state') != 'new'){
+			var url = "./removequestionfromsurvey.do?questionId=" + questionId;
+
+			callAjaxPOST(url, function(){
+				$("#overlay-toast").html('Enable NPS Question to add/edit the NPS question');
+				$('#nps-question-form').attr('data-state','new');
+				$('#nps-question-form').attr('data-status','new');
+				$('#sb-nps-question-txt').val(defaultNpsQuestion);
+				$('#sq-not-very-likely-nps').val(defaultNotVeryLikely);
+				$('#sq-very-likely-nps').val(defaultVeryLikely);
+				showToast('error');
+			}, true);
+		}		
+	}
+});
 
 // Submit previous question
 var currentQues = 1;
@@ -3433,7 +3783,35 @@ $(document).on("focus", '.bd-q-pu-txt', function() {
 	}
 });
 
+$(document).on("focus",'#sb-nps-question-txt',function(){
+	npsQuestionText = $('#sb-nps-question-txt').val();
+	$('#nps-question-form').attr('data-status', 'edited');
+});
+
+$(document).on("focus",'#sq-not-very-likely-nps',function(){
+	notVeryLikelyText = $('#sq-not-very-likely-nps').val();
+});
+
+$(document).on("focus",'#sq-very-likely-nps',function(){
+	veryLikelyText = $('#sq-very-likely-nps').val();
+});
+
+$(document).on("blur",'#sq-not-very-likely-nps',function(){
+	if(notVeryLikelyText != $('#sq-not-very-likely-nps').val()){
+		$('#nps-question-form').attr('data-status', 'edited');
+	}	
+});
+
+$(document).on("blur",'#sq-very-likely-nps',function(){
+	if(veryLikelyText != $('#sq-very-likely-nps').val()){
+		$('#nps-question-form').attr('data-status', 'edited');
+	}
+});
+
+
 $(document).on("input", '.bd-q-pu-txt', function() {
+	$('#nps-ques-new').val(false);
+	$('#nps-ques-overlay').val(false);
 	var quesPresent = $(this).closest('form').data('quesnum');
 
 	// Setting status
@@ -7018,6 +7396,7 @@ function paintSurveyPageFromJson() {
 		$("#next-star").addClass("btn-com-disabled");
 		$("#next-smile").addClass("btn-com-disabled");
 		$("#next-scale").addClass("btn-com-disabled");
+		$("#next-radio").addClass("btn-com-disabled");
 	}
 	if (questionType == "sb-range-star") {
 		$("div[data-ques-type='stars']").show();
@@ -7075,12 +7454,29 @@ function paintSurveyPageFromJson() {
 		$('#text-box-disclaimer').hide();
 		$("#smiles-final").show();
 		$("#ques-text-textarea").html(question);
+	} else if (questionType == "sb-range-0to10"){
+		$("#ques-text-1to10").html(question)
+		$("div[data-ques-type='sb-range-0to10']").show();
+		$('#notAtAllLikelyDiv').html(questionDetails.notAtAllLikely);
+		$('#veryLikelyDiv').html(questionDetails.veryLikely);
+		if (questionDetails.customerResponse != undefined && !isNaN(parseInt(questionDetails.customerResponse))) {
+			var ratingVal = parseInt(questionDetails.customerResponse);
+			$('.sq-radio').each(function() {
+			    $(this).removeClass('radio-outer-gray');
+			    $(this).children().hide();
+			    $(this).addClass('radio-outer');
+			});
+			$('#radio-'+ratingVal).children().show();
+			$('#sq-radio-1to10').attr('selected-rating-radio',ratingVal);
+			$("#next-radio").removeClass("btn-com-disabled");
+		}
 	}
 	togglePrevAndNext();
 	if (qno == questions.length - 1) {
 		$("#next-mcq").addClass("btn-com-disabled");
 		$("#next-smile").addClass("btn-com-disabled");
 		$("#next-star").addClass("btn-com-disabled");
+		$("#next-radio").addClass("btn-com-disabled");
 		$("#next-textarea-smiley").addClass("btn-com-disabled");
 		$("#skip-ques-mcq").hide();
 	}
@@ -7103,12 +7499,14 @@ function togglePrevAndNext() {
 		$("#prev-smile").addClass("btn-com-disabled");
 		$("#prev-scale").addClass("btn-com-disabled");
 		$("#prev-mcq").addClass("btn-com-disabled");
+		$("#prev-radio").addClass("btn-com-disabled");
 		$("#prev-textarea-smiley").addClass("btn-com-disabled");
 	} else {
 		$("#prev-star").removeClass("btn-com-disabled");
 		$("#prev-smile").removeClass("btn-com-disabled");
 		$("#prev-scale").removeClass("btn-com-disabled");
 		$("#prev-mcq").removeClass("btn-com-disabled");
+		$("#prev-radio").removeClass("btn-com-disabled");
 		$("#prev-textarea-smiley").removeClass("btn-com-disabled");
 	}
 }
@@ -7135,13 +7533,22 @@ function storeCustomerAnswer(customerResponse) {
 	//encode question and response
 	var encodedCustomerResponse = window.btoa( unescape( encodeURIComponent( customerResponse ) ) );
 	var encodedQuestion =  window.btoa( unescape( encodeURIComponent( questionDetails.question ) ) );
+	
+	var considerForScore = questionDetails.considerForScore;
+	if(questionDetails.questionType != 'sb-range-0to10'){
+		considerForScore = 1;
+	}
+	
 	var payload = {
-		"answer" : encodedCustomerResponse,
-		"question" : encodedQuestion,
-		"questionType" : questionDetails.questionType,
-		"isUserRankingQuestion" : questionDetails.isUserRankingQuestion,
-		"stage" : qno + 1,
-		"surveyId" : surveyId
+			  "answer" : encodedCustomerResponse,
+			  "question" : encodedQuestion,
+			  "questionType" : questionDetails.questionType,
+			  "isUserRankingQuestion" : questionDetails.isUserRankingQuestion,
+			  "isNPSQuestion" : questionDetails.isNPSQuestion,
+			  "stage" : qno + 1,
+			  "surveyId" : surveyId,
+			  "considerForScore": considerForScore,
+			  "questionId" : questionDetails.questionId
 	};
 	showOverlay();
 	questionDetails.customerResponse = customerResponse;
@@ -7587,9 +7994,23 @@ $('.sq-np-item-next').click(function() {
 			showMasterQuestionPage();
 		}
 		return;
-	}
+	} else if (questionDetails.questionType == "sb-range-0to10"){
+		if ($('#next-radio').hasClass("btn-com-disabled")) {
+			$('#overlay-toast').html('Please answer the question. You can not skip a rating question.');
+			showToast();
+			return;
+		}
+		var ratingVal = parseInt($('#sq-radio-1to10').attr('selected-rating-radio'));
+		storeCustomerAnswer(ratingVal);
+	} 
+	
 	$(".sq-star").removeClass('sq-full-star');
 	$(".sq-smile").removeClass('sq-full-smile');
+	$('.sq-radio').each(function() {
+	    $(this).removeClass('radio-outer');
+	    $(this).children().hide();
+	    $(this).addClass('radio-outer-gray');
+	});
 	qno++;
 	paintSurveyPageFromJson();
 
@@ -7624,6 +8045,21 @@ $('.sq-np-item-next').click(function() {
 	if (questionDetails.questionType == "sb-sel-mcq") {
 		if (questionDetails.customerResponse == undefined || questionDetails.customerResponse == "")
 			customerResponse = "";
+	}
+	
+	if(questionDetails.questionType == "sb-range-0to10"){
+		var ratingVal = parseInt(questionDetails.customerResponse);
+		if(!isNaN(ratingVal)){
+			$('.sq-radio').each(function() {
+			    $(this).removeClass('radio-outer-gray');
+			    $(this).children().hide();
+			    $(this).addClass('radio-outer');
+			});
+			$('#radio-'+ratingVal).children().show();
+			$('#sq-radio-1to10').attr('selected-rating-radio',ratingVal);
+		}
+		$('#notAtAllLikelyDiv').html(questionDetails.notAtAllLikely);
+		$('#veryLikelyDiv').html(questionDetails.veryLikely);
 	}
 
 });
@@ -7672,10 +8108,40 @@ $('.sq-np-item-prev').click(function() {
 			$("#text-area").val(val);
 		}
 	}
+	
+	if(questionDetails.questionType == "sb-range-0to10"){
+		var ratingVal = parseInt(questionDetails.customerResponse);
+		if(!isNaN(ratingVal)){
+			$('.sq-radio').each(function() {
+			    $(this).removeClass('radio-outer-gray');
+			    $(this).children().hide();
+			    $(this).addClass('radio-outer');
+			});
+			$('#radio-'+ratingVal).children().show();
+			$('#sq-radio-1to10').attr('selected-rating-radio',ratingVal);
+		}
+		$('#notAtAllLikelyDiv').html(questionDetails.notAtAllLikely);
+		$('#veryLikelyDiv').html(questionDetails.veryLikely);
+	}
+	
 	$("#next-star").removeClass("btn-com-disabled");
 	$("#next-smile").removeClass("btn-com-disabled");
 	$("#next-scale").removeClass("btn-com-disabled");
+	$("#next-radio").removeClass("btn-com-disabled");
 	$("#next-textarea-smiley").removeClass("btn-com-disabled");
+});
+
+$('.sq-radio').click(function(){
+	$('.sq-radio').each(function() {
+	    $(this).removeClass('radio-outer-gray');
+	    $(this).children().hide();
+	    $(this).addClass('radio-outer');
+	});
+	$(this).children().show();
+	$('#sq-radio-1to10').attr('selected-rating-radio',$(this).attr('id').split('-').pop());
+	if (qno != questions.length - 1) {
+		$("#next-radio").removeClass("btn-com-disabled");
+	}
 });
 
 /* Click event on grey smile. */
@@ -8160,6 +8626,13 @@ function callBackEditAddressDetails(data) {
 
 		delay(function() {
 			payload = $('#prof-edit-address-form').serialize();
+			
+			//data attr for gmb connection
+			var contactDetailsObj = unserializeFormData(payload);
+			$('#gmb-data').attr('data-city',contactDetailsObj.city);
+			$('#gmb-data').attr('data-state',contactDetailsObj.state);
+			$('#gmb-data').attr('data-country',contactDetailsObj.country);
+			
 			callAjaxPostWithPayloadData("./updateprofileaddress.do", callBackUpdateAddressDetails, payload, true);
 		}, 0);
 
@@ -8169,6 +8642,18 @@ function callBackEditAddressDetails(data) {
 	$('.overlay-disable-wrapper').addClass('pu_arrow_rt');
 	disableBodyScroll();
 	$('body').scrollTop('0');
+}
+
+function unserializeFormData(data) {
+    var objs = [], temp;
+    var temps = data.split('&');
+
+    for(var i = 0; i < temps.length; i++){
+        temp = temps[i].split('=');
+        objs.push(temp[0]);
+        objs[temp[0]] = temp[1]; 
+    }
+    return objs; 
 }
 
 // Function to update events on edit profile page
@@ -8270,6 +8755,12 @@ $(document).on('blur', '#prof-basic-container input', function() {
 });
 
 function callBackUpdateBasicDetails(data) {
+	var profileMasterId = $('#gmb-data').attr('data-profile-master-id');
+	if(profileMasterId == 1){
+		var companyName = $('#prof-name').val().trim();
+		$('#gmb-data').attr('data-companyName',companyName);
+	}
+	
 	$('#prof-all-lock').val('locked');
 	$('#prof-message-header').html(data);
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
@@ -8899,13 +9390,87 @@ $('body').on('click', '#prof-edit-social-link .icn-realtor', function(e) {
 
 $('body').on('click', '#prof-edit-social-link .icn-google-business', function(e) {
 	e.stopPropagation();
-    $('#social-token-text').show();
+    $('#overlay-gmb-popup').removeClass('hide');
+    
+    var connectedLink = $(this).attr("data-link");
+    if(connectedLink=='' || connectedLink==null || connectedLink==undefined || connectedLink.length==0){
+    	connectedLink = 'No connections found'
+    }
+    
+    $('#gmb-connected-placeId').html(connectedLink);
+    for(var i=1;i<=5;i++){
+    	if(!($('#gmb-radio-'+i).hasClass('hide'))){
+    		$('#gmb-radio-'+i).addClass('hide');
+    	}	
+    }
+    
+    var companyName = '';
+	var city = '';
+	var state = '';
+	var country = '';
+		
+	city = $('#gmb-data').attr('data-city');
+	if(city!='' && city!=undefined && city!=null){
+		city=city+', '
+	}
+	state = $('#gmb-data').attr('data-state');
+	if(state!='' && state!=undefined && state!=null){
+		state=state+', '
+	}
+	country = $('#gmb-data').attr('data-country');
+	companyName = $('#gmb-data').attr('data-companyName');
+	
+	var query = companyName + '+in+' + city+state+country; 
+	getPlaceIds(query);
+	
+	$('body').on('click','#dismiss-gmb-popup',function(e){
+		 $('#overlay-gmb-popup').addClass('hide');
+		 if( $('body').hasClass("overflow-hidden-important") ){
+		 	$('body').removeClass("overflow-hidden-important");
+		 }
+	 });
+
+	$('#placeIdSelector input').on('change',function(){
+		var placeId = $('input[name=placeId]:checked', '#placeIdSelector').val();
+		if(placeId!='customPlace'){
+			$('#gmb-placeId-selected').html(placeId);
+			$('#gmb-url-placeId').html("https://search.google.com/local/writereview?placeid="+placeId);
+		}else{
+			placeId = $('#gmb-placeId').val();
+			if(placeId != '' && placeId!=null){
+				$('#gmb-placeId-selected').html(placeId);
+				$('#gmb-url-placeId').html("https://search.google.com/local/writereview?placeid="+placeId);	
+			}
+		}
+	});
+	
+	$('#gmb-placeId').onblur=function(){
+		var placeId = $('input[name=placeId]:checked', '#placeIdSelector').val();
+		if(placeId=='customPlace'){
+			placeId = $('#gmb-placeId').val();
+			$('#gmb-placeId-selected').html(placeId);
+			$('#gmb-url-placeId').html("https://search.google.com/local/writereview?placeid="+placeId);
+		}
+	}
+	
+	$('body').on('click','#gmb-add-link',function(){
+		var placeId = $('#gmb-placeId-selected').html();
+		
+		var link = "" 
+		if(placeId!='' && placeId!=undefined && placeId!=null){
+			link = "https://search.google.com/local/writereview?placeid="+placeId;
+		}	
+		
+		updateGoogleBusinessLink(link);
+		$('#overlay-gmb-popup').addClass('hide');	
+	});
+    /*$('#social-token-text').show();
     var link = $(this).attr("data-link");
     $('#social-token-text').attr({
         "placeholder" : "Add Google Business link",
         "onblur" : "updateGoogleBusinessLink(this.value);$('#social-token-text').hide();"
     });
-    $('#social-token-text').val(link);
+    $('#social-token-text').val(link);*/
 
 });
 
@@ -11371,6 +11936,26 @@ $('body').on('click', '#survey-mail-thrhld-chk-box', function() {
 	}
 });
 
+$('body').on('blur', '#digest-recipients', function() {
+	
+	// format email IDs
+	var emails = $("#digest-recipients").val();
+	
+	if( emails == undefined ){
+		return;
+	}
+	
+	var payload = {
+		"emails" : emails
+	};
+	
+	callAjaxPostWithPayloadData("./updatedigestrecipients.do", function(data) {
+		$('#overlay-toast').html(data);
+		showToast();
+	}, payload, true);
+	
+});
+
 $('body').on('click', '#alw-ptnr-srvy-for-usr-chk-box', function(e) {
 	e.stopPropagation();
 	
@@ -13622,4 +14207,1364 @@ function processAndValidateCsvForm(whileUploading){
 
 $(document).on('click', '#survey-uploader-email', function(){
 	$("#upload-email-invalid").hide();
-})
+});
+
+//google my business apis
+var map;
+var service;
+var gmbQuery;
+function getPlaceIds(query){
+	/*var key="AIzaSyAy49K94uo1F2PGylIPcsTEpTCtsDEnK48"
+	var url="https://maps.googleapis.com/maps/api/place/textsearch/json?query="+query+"&key="+key;
+	payload={
+		"query":query,
+		"key":key
+	};
+	
+	$.ajax({
+		url : url,
+		type : "GET",
+		dataType : "jsonp",
+		cache : false,
+		success : function(data) {
+			console.log(data);
+			//console.log(JSON.parse(data));
+		},
+		error : function(e) {
+			isSurveydetailsforgraph = false;
+
+	});*/
+	gmbQuery=query;
+	initializeGmb();
+	
+}
+
+function initializeGmb() {
+	  var place = new google.maps.LatLng(36.778259,-119.417931);
+	  
+	  map = new google.maps.Map(document.getElementById('gmb-map'), {
+	      center: place,
+	      zoom: 0
+	    });
+	  	var searchQuery = gmbQuery;
+	  var request = {
+	    query: searchQuery
+	  };
+
+	  service = new google.maps.places.PlacesService(map);
+	  service.textSearch(request, callback);
+	}
+
+	function callback(results, status) {
+		var index=1;
+	  if (status == google.maps.places.PlacesServiceStatus.OK) {
+		
+		if(!($('#zero-suggestions-gmb').hasClass('hide'))){
+			$('#zero-suggestions-gmb').addClass('hide');
+		}
+		
+	    for (var i = 0; i < results.length && index<6; i++) {
+	      var place = results[i];
+	      if(i==0){
+	    	  $('#gmb-radio-'+index).removeClass('hide');
+	    	  $('#placeId'+index).attr('value',place.place_id);
+	    	  $('#gmb-address'+index).html(place.name+', '+place.formatted_address);
+	    	  $('#gmb-placeId'+index++).html(place.place_id);
+	    	  $('#gmb-placeId-selected').html(place.place_id);
+	    	  $('#gmb-url-placeId').html("https://search.google.com/local/writereview?placeid="+place.place_id);
+	      }else{
+	    	  $('#gmb-radio-'+index).removeClass('hide');
+	    	  $('#placeId'+index).attr('value',place.place_id);
+	    	  $('#gmb-address'+index).html(place.name+', '+place.formatted_address);
+	    	  $('#gmb-placeId'+index++).html(place.place_id);
+	      }
+	      
+	    }
+	  }else{
+		  if($('#zero-suggestions-gmb').hasClass('hide')){
+			  $('#zero-suggestions-gmb').removeClass('hide');
+		  }
+	  }
+	  
+	}
+
+
+/*transaction monitor*/
+var sysOptions = {
+		chartArea : {
+			width : '80%',
+			height : '75%'
+		},
+		colors : [ '#cdcdcd','#812ebf'],
+		legend : {
+			position : 'none'
+		},
+		vAxis : { 
+			baselineColor : 'rgb(238,238,238)',
+			gridlines : { color : 'rgb(238,238,238)',count:3},
+			viewWindow: {
+		        min: 0
+		    }
+		},
+		hAxis: {
+			 slantedText: false,
+			 gridlines : {count:8},
+           textStyle: { fontSize: 8 }
+       },
+       pointSize: 5
+};
+
+var dangerOptions = {
+		chartArea : {
+			width : '80%',
+			height : '75%'
+		},
+		colors : [ '#cdcdcd','#ff2424'],
+		legend : {
+			position : 'none'
+		},
+		vAxis : { 
+			baselineColor : 'rgb(238,238,238)',
+			gridlines : { color : 'rgb(238,238,238)',count:3},
+			viewWindow: {
+		        min: 0
+		    }
+		},
+		hAxis: {
+			 slantedText: false,
+			 gridlines : {count:8},
+	           textStyle: { fontSize: 8 }
+	       },
+	       pointSize: 5
+};
+
+var warnOptions = {
+		chartArea : {
+			width : '80%',
+			height : '75%'
+		},
+		colors : [ '#cdcdcd','#ffb524'],
+		legend : {
+			position : 'none'
+		},
+		vAxis : { 
+			baselineColor : 'rgb(238,238,238)',
+			gridlines : { color : 'rgb(238,238,238)',count:3},
+			viewWindow: {
+		        min: 0
+		    }
+		},
+		hAxis: {
+			 slantedText: false,
+             textStyle: { fontSize: 8 },
+             gridlines : {count:8}
+       },
+       pointSize: 5
+};
+
+var grayOptions = {
+		chartArea : {
+			width : '80%',
+			height : '75%'
+		},
+		colors : [ 'transparent','transparent'],
+		legend : {
+			position : 'none'
+		},
+		vAxis : { 
+			baselineColor : 'rgb(238,238,238)',
+			gridlines : { color : 'rgb(238,238,238)',count:3},
+			viewWindow: {
+		        min: 0
+		    }
+		},
+		hAxis: {
+			 slantedText: false,
+           textStyle: { fontSize: 8 },
+		 gridlines : {count:8}
+       },
+       pointSize: 5
+};
+
+var normalOptions = {
+		chartArea : {
+			width : '80%',
+			height : '75%'
+		},
+		colors : [ '#cdcdcd','#4583cd'],
+		legend : {
+			position : 'none'
+		},
+		vAxis : { 
+			baselineColor : 'rgb(238,238,238)',
+			gridlines : { color : 'rgb(238,238,238)',count:3},
+			viewWindow: {
+		        min: 0
+		    }
+		},
+		hAxis: {
+			 slantedText: false,
+			 gridlines : {count:8},
+            textStyle: { fontSize: 8 }
+        },
+        pointSize: 5
+};
+
+var isSystemTransactionGraph=false;
+function showSystemSurveyGraph(companyId, numberOfDays) {
+	
+	if (isSystemTransactionGraph == true) {
+		return;
+	}
+	
+	var payload = {
+		"companyId" : companyId,
+		"noOfDays" : numberOfDays
+	};
+	isSystemTransactionGraph = true;
+	$.ajax({
+		url : "./getcompanysurveystatuscountforpastndays.do",
+		type : "GET",
+		dataType : "JSON",
+		cache : false,
+		data : payload,
+		success : function(data) {
+			isSystemTransactionGraph = false;
+			graphData = data;
+			paintTransactionMonitorGraph(graphData);
+		},
+		error : function(e) {
+			isSystemTransactionGraph = false;
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			$('#overlay-toast').html(e.responseText);
+			showToast();
+		}
+	});
+}
+
+function emptySlotDataConstructor(emptySlotDataObject){
+	this.companyId = emptySlotDataObject.companyId;
+	this.transactionDate = emptySlotDataObject.transactionDate;
+	this.surveyInvitationSentCount = emptySlotDataObject.surveyInvitationSentCount;
+	this.transactionReceivedCount = emptySlotDataObject.transactionReceivedCount;
+	this.surveycompletedCount = emptySlotDataObject.surveycompletedCount;
+	this.surveyReminderSentCount = emptySlotDataObject.surveyReminderSentCount;
+	this.corruptedCount = emptySlotDataObject.corruptedCount;
+	this.duplicateCount = emptySlotDataObject.duplicateCount;
+	this.oldRecordCount = emptySlotDataObject.oldRecordCount;
+	this.ignoredCount = emptySlotDataObject.ignoredCount;
+	this.mismatchedCount = emptySlotDataObject.mismatchedCount;
+	this.notAllowedCount = emptySlotDataObject.notAllowedCount;
+}
+var pastWeekData = new Array();
+var currentWeekData = new Array();
+
+function setPastCurGraphData(graphData){
+	
+	var emptySlotGraphData = {
+			 "companyId": 0,
+		     "transactionDate": "Nov 30, 2017",
+		     "surveyInvitationSentCount": 0,
+		     "transactionReceivedCount": 0,
+		     "surveycompletedCount": 0,
+		     "surveyReminderSentCount": 0,
+		     "corruptedCount": 0,
+		     "duplicateCount": 0,
+		     "oldRecordCount": 0,
+		     "ignoredCount": 0,
+		     "mismatchedCount": 0,
+		     "notAllowedCount": 0
+	}
+	
+	var allTimeSlots = new Array();
+	var graphTimeSlots = new Array();
+	var emptyGraphTimeSlots = new Array();
+	
+	var format = 14;
+	var type = 'Date';
+	var keys = getKeysFromGraphFormat(format);
+	for(var i=0;i<keys.length;i++){
+		allTimeSlots[i] = convertYearMonthDayKeyToMonthDay(keys[i]);
+		emptyGraphTimeSlots[i]=convertYearMonthDayKeyToMonthDayYear(keys[i]);
+	}
+	
+	for(var i=0;i<graphData.length;i++){
+		var j=0;
+		var hasSlotDate = false;
+		var entityDate = graphData[i].transactionDate;
+		
+		var formattedDate = new Date(Date.parse(entityDate));
+	    //get date similar to keys formay
+	    
+	    var month = formattedDate.getMonth() + 1;
+		var monthStr = "";
+		if (month < 10) {
+			monthStr = '0' + month.toString();
+		}else{
+			monthStr = month.toString();
+		}
+		
+		var dayStr = "";
+		var day  = formattedDate.getDate();
+		if (day < 10) {
+			dayStr = '0' + day.toString();
+		}else{
+			dayStr = day.toString();
+		}
+		
+		var keyFormattedDate = formattedDate.getFullYear().toString() + monthStr + dayStr;
+		var graphDate = convertYearMonthDayKeyToMonthDay(keyFormattedDate);
+		graphTimeSlots[i]= graphDate;
+		
+	}
+	
+	var k=0;
+	for(var i=0;i<allTimeSlots.length;i++){
+		var j=0;
+		hasSlotDate = false;
+		while(j<graphTimeSlots.length){
+			if(allTimeSlots[i]==graphTimeSlots[j]){
+				hasSlotDate = true;
+				j++;
+				break;
+			}else{
+				j++;
+			}
+		}
+
+		emptySlotGraphData.transactionDate = emptyGraphTimeSlots[i];
+		if(hasSlotDate){
+			if(i<7){
+				pastWeekData[i] = graphData[k++];
+			}else{
+				currentWeekData[i-7] = graphData[k++];
+			}
+		}else{
+			if(i<7){
+				pastWeekData[i] = new emptySlotDataConstructor(emptySlotGraphData);
+			}else{
+				currentWeekData[i-7] = new emptySlotDataConstructor(emptySlotGraphData);
+			}
+		}
+	}
+}
+
+function paintTransactionMonitorGraph(graphData) {
+	
+	if (graphData == undefined)
+		return;
+	
+	pastWeekData = new Array();
+	currentWeekData = new Array();
+	var allTimeslots = new Array();
+	
+	var pastWeekAutomatedTransactions = new Array();
+	var pastWeekInvitationsSent = new Array();
+	var pastWeekUnprocessedTransactions = new Array();
+	var pastWeekRemindersSent = new Array();
+	var pastWeekCompletedTransactions = new Array();
+	
+	var currentWeekAutomatedTransactions = new Array();
+	var currentWeekInvitationsSent = new Array();
+	var currentWeekUnprocessedTransactions = new Array();
+	var currentWeekRemindersSent = new Array();
+	var currentWeekCompletedTransactions = new Array();
+	
+	var format = 7;
+	var type = 'Date';
+	var keys = getKeysFromGraphFormat(format);
+	
+	
+	for(var i=0;i<keys.length;i++){
+		allTimeslots[i] = convertYearMonthDayKeyToMonthDay(keys[i]);
+		pastWeekAutomatedTransactions[i] = 0;
+		pastWeekInvitationsSent[i] = 0;
+		pastWeekUnprocessedTransactions[i] = 0;
+		pastWeekRemindersSent[i] = 0;
+		pastWeekCompletedTransactions[i] = 0;
+			
+		currentWeekAutomatedTransactions[i] = 0;
+		currentWeekInvitationsSent[i] = 0;
+		currentWeekUnprocessedTransactions[i] = 0;
+		currentWeekRemindersSent[i] = 0;
+		currentWeekCompletedTransactions[i] = 0;
+	}
+	
+	setPastCurGraphData(graphData);
+	
+	if(graphData != undefined){
+		for(i=0;i<currentWeekData.length;i++){
+			var currentWeekDataEntity = currentWeekData[i];
+			var pastWeekDataEntity = pastWeekData[i];
+			
+			var entityDate = currentWeekDataEntity.transactionDate;
+			
+			var formattedDate = new Date(Date.parse(entityDate));
+		    //get date similar to keys formay
+		    
+		    var month = formattedDate.getMonth() + 1;
+			var monthStr = "";
+			if (month < 10) {
+				monthStr = '0' + month.toString();
+			}else{
+				monthStr = month.toString();
+			}
+			
+			var dayStr = "";
+			var day  = formattedDate.getDate();
+			if (day < 10) {
+				dayStr = '0' + day.toString();
+			}else{
+				dayStr = day.toString();
+			}
+			
+			var keyFormattedDate = formattedDate.getFullYear().toString() + monthStr + dayStr;
+			if(keys.indexOf(keyFormattedDate) > -1){
+				var index = keys.indexOf(keyFormattedDate);
+				
+				pastWeekAutomatedTransactions[index] = pastWeekDataEntity.transactionReceivedCount;
+				pastWeekCompletedTransactions[index] =  pastWeekDataEntity.surveycompletedCount;
+				pastWeekInvitationsSent[index] =  pastWeekDataEntity.surveyInvitationSentCount;
+				pastWeekRemindersSent[index] =  pastWeekDataEntity.surveyReminderSentCount;
+				pastWeekUnprocessedTransactions[index] = pastWeekDataEntity.transactionReceivedCount - pastWeekDataEntity.surveyInvitationSentCount;
+			
+				currentWeekAutomatedTransactions[index] = currentWeekDataEntity.transactionReceivedCount;
+				currentWeekCompletedTransactions[index] =  currentWeekDataEntity.surveycompletedCount;
+				currentWeekInvitationsSent[index] =  currentWeekDataEntity.surveyInvitationSentCount;
+				currentWeekRemindersSent[index] =  currentWeekDataEntity.surveyReminderSentCount;
+				currentWeekUnprocessedTransactions[index] = currentWeekDataEntity.transactionReceivedCount - currentWeekDataEntity.surveyInvitationSentCount;
+			}
+		}
+	}
+	
+	var automatedData= [];
+	var sentData = [];
+	var completedData = [];
+	var remindersData = [];
+	var unprocessedData = [];
+	
+	var nestedInternalAutomatedData = [];
+	var nestedInternalSentData = [];
+	var nestedInternalCompletedData = [];
+	var nestedInternalRemindersData = [];
+	var nestedInternalUnprocessedData = [];
+	
+	nestedInternalAutomatedData.push(type, 'PreviousWeek',{type: 'string', role: 'tooltip'}, 'CurrentWeek');
+	nestedInternalSentData.push(type, 'PreviousWeek',{type: 'string', role: 'tooltip'}, 'CurrentWeek');
+	nestedInternalCompletedData.push(type, 'PreviousWeek',{type: 'string', role: 'tooltip'}, 'CurrentWeek');
+	nestedInternalRemindersData.push(type, 'PreviousWeek',{type: 'string', role: 'tooltip'}, 'CurrentWeek');
+	nestedInternalUnprocessedData.push(type, 'PreviousWeek',{type: 'string', role: 'tooltip'}, 'CurrentWeek');
+	
+	automatedData.push(nestedInternalAutomatedData);
+	sentData.push(nestedInternalSentData);
+	completedData.push(nestedInternalCompletedData);
+	remindersData.push(nestedInternalRemindersData);
+	unprocessedData.push(nestedInternalUnprocessedData);
+	
+	var xAxisTimeSlots = formatAllTimeSlots(allTimeslots);
+	
+	for (var itr = 0; itr < allTimeslots.length; itr++) {
+		nestedInternalAutomatedData = [];
+		nestedInternalSentData = [];
+		nestedInternalCompletedData = [];
+		nestedInternalRemindersData = [];
+		nestedInternalUnprocessedData = [];
+		
+		var curAutomatedTransactionCount;
+		var curCompletedTransactionCount;
+		var curSentInvitationCount;
+		var curReminderSentCount;
+		var curUnprocessedTransactionsCount;
+		
+		var prevAutomatedTransactionCount;
+		var prevCompletedTransactionCount;
+		var prevSentInvitationCount;
+		var prevReminderSentCount;
+		var prevUnprocessedTransactionsCount;
+		
+		if (isNaN(parseInt(currentWeekAutomatedTransactions[itr]))) {
+			curAutomatedTransactionCount = 0;
+		} else {
+			curAutomatedTransactionCount = parseInt(currentWeekAutomatedTransactions[itr]);
+		}
+		
+		if (isNaN(parseInt(pastWeekAutomatedTransactions[itr]))) {
+			prevAutomatedTransactionCount = 0;
+		} else {
+			prevAutomatedTransactionCount = parseInt(pastWeekAutomatedTransactions[itr]);
+		}
+
+		if (isNaN(parseInt(currentWeekInvitationsSent[itr]))) {
+			curSentInvitationCount = 0;
+		} else {
+			curSentInvitationCount = parseInt(currentWeekInvitationsSent[itr]);
+		}
+		
+		if (isNaN(parseInt(pastWeekInvitationsSent[itr]))) {
+			prevSentInvitationCount = 0;
+		} else {
+			prevSentInvitationCount = parseInt(pastWeekInvitationsSent[itr]);
+		}
+		
+		if (isNaN(parseInt(currentWeekRemindersSent[itr]))) {
+			curReminderSentCount = 0;
+		} else {
+			curReminderSentCount = parseInt(currentWeekRemindersSent[itr]);
+		}
+		
+		if (isNaN(parseInt(pastWeekRemindersSent[itr]))) {
+			prevReminderSentCount = 0;
+		} else {
+			prevReminderSentCount = parseInt(pastWeekRemindersSent[itr]);
+		}
+		
+		if (isNaN(parseInt(currentWeekCompletedTransactions[itr]))) {
+			curCompletedTransactionCount = 0;
+		} else {
+			curCompletedTransactionCount = parseInt(currentWeekCompletedTransactions[itr]);
+		}
+		
+		if (isNaN(parseInt(pastWeekCompletedTransactions[itr]))) {
+			prevCompletedTransactionCount = 0;
+		} else {
+			prevCompletedTransactionCount = parseInt(pastWeekCompletedTransactions[itr]);
+		}
+		
+		if (isNaN(parseInt(currentWeekUnprocessedTransactions[itr]))) {
+			curUnprocessedTransactionsCount = 0;
+		} else {
+			curUnprocessedTransactionsCount = parseInt(currentWeekUnprocessedTransactions[itr]);
+		}
+		
+		if (isNaN(parseInt(pastWeekUnprocessedTransactions[itr]))) {
+			prevUnprocessedTransactionsCount = 0;
+		} else {
+			prevUnprocessedTransactionsCount = parseInt(pastWeekUnprocessedTransactions[itr]);
+		}
+
+		nestedInternalAutomatedData.push(xAxisTimeSlots[itr], prevAutomatedTransactionCount,'Previous Week: '+prevAutomatedTransactionCount,curAutomatedTransactionCount);
+		nestedInternalSentData.push(xAxisTimeSlots[itr], prevSentInvitationCount, 'Previous Week: '+prevSentInvitationCount, curSentInvitationCount);
+		nestedInternalCompletedData.push(xAxisTimeSlots[itr], prevCompletedTransactionCount, 'Previous Week: '+prevCompletedTransactionCount, curCompletedTransactionCount);
+		nestedInternalRemindersData.push(xAxisTimeSlots[itr], prevReminderSentCount, 'Previous Week: '+prevReminderSentCount,curReminderSentCount);
+		nestedInternalUnprocessedData.push(xAxisTimeSlots[itr], prevUnprocessedTransactionsCount, 'Previous Week: '+prevUnprocessedTransactionsCount, curUnprocessedTransactionsCount);
+		
+		automatedData.push(nestedInternalAutomatedData);
+		sentData.push(nestedInternalSentData);
+		remindersData.push(nestedInternalRemindersData);
+		completedData.push(nestedInternalCompletedData);
+		unprocessedData.push(nestedInternalUnprocessedData);
+	}
+
+	drawTransactionMonitorGraphs(automatedData, sysOptions, sysAutoTransGraphId);
+	drawTransactionMonitorGraphs(completedData, sysOptions, sysCompTransGraphId);
+	drawTransactionMonitorGraphs(sentData, sysOptions, sysInvSentGraphId);
+	drawTransactionMonitorGraphs(remindersData, sysOptions, sysRemSentGraphId);
+	drawTransactionMonitorGraphs(unprocessedData, sysOptions, sysUnproTransGraphId);
+	
+}
+
+function drawTransactionMonitorGraphs(graphData,options,graphDiv){
+	var data = google.visualization.arrayToDataTable(graphData);
+	
+	removeAllPreviousGraphToolTip();
+	
+	var chart = new google.visualization.LineChart(document.getElementById(graphDiv));
+	chart.draw(data, options);
+	
+}
+
+function drawTransGraphWrapper(companyId,alert,companyName){
+	
+	if(alert == 'danger'){
+		$('#transaction-monitor-graph-container').append(dangerGraphWrapper);
+		$('#trans-wrapper-header-span-danger').attr('id','trans-wrapper-header-span-danger-'+companyId);
+		$('#trans-wrapper-header-span-danger-'+companyId).html(companyName);
+		$('#trans-graph-container').attr('id','trans-graph-container-'+companyId);
+		
+	}else if(alert == 'warn'){
+		$('#transaction-monitor-graph-container').append(warnGraphWrapper);
+		$('#trans-wrapper-header-span-warn').attr('id','trans-wrapper-header-span-warn-'+companyId);
+		$('#trans-wrapper-header-span-warn-'+companyId).html(companyName);
+		$('#trans-graph-container').attr('id','trans-graph-container-'+companyId);
+		
+	}else if(alert == 'gray'){
+		$('#transaction-monitor-graph-container').append(grayGraphWrapper);
+		$('#trans-wrapper-header-span-gray').attr('id','trans-wrapper-header-span-gray-'+companyId);
+		$('#trans-wrapper-header-span-gray-'+companyId).html(companyName);
+		$('#trans-graph-container').attr('id','trans-graph-container-'+companyId);
+		
+	}else if(alert == 'normal'){
+		$('#transaction-monitor-graph-container').append(normalGraphWrapper);
+		$('#trans-wrapper-header-span-normal').attr('id','trans-wrapper-header-span-normal-'+companyId);
+		$('#trans-wrapper-header-span-normal-'+companyId).html(companyName);
+		$('#trans-graph-container').attr('id','trans-graph-container-'+companyId);
+		
+	}
+}
+
+function drawTransGraphContainer(companyId,alert,type,alertType){
+	
+	if(alert == 'danger'){
+		$('#trans-graph-container-'+companyId).attr('id','trans-graph-container-'+alertType+'-'+companyId);
+		$('#trans-graph-container-'+alertType+'-'+companyId).append(dangerGraphContainer);
+		$('#trans-graph').attr('id','trans-graph-danger-'+alertType+'-'+companyId);
+		return drawTypeSpanText(type,'trans-graph-danger-'+alertType+'-'+companyId);
+		
+	}else if(alert == 'warn'){
+		$('#trans-graph-container-'+companyId).attr('id','trans-graph-container-'+alertType+'-'+companyId);
+		$('#trans-graph-container-'+alertType+'-'+companyId).append(warnGraphContainer);
+		$('#trans-graph').attr('id','trans-graph-warn-'+alertType+'-'+companyId);
+		return drawTypeSpanText(type,'trans-graph-warn-'+alertType+'-'+companyId);
+		
+	}else if(alert == 'gray'){
+		$('#trans-graph-container-'+companyId).attr('id','trans-graph-container-'+alertType+'-'+companyId);
+		$('#trans-graph-container-'+alertType+'-'+companyId).append(grayGraphContainer);
+		$('#trans-graph').attr('id','trans-graph-gray-'+alertType+'-'+companyId);
+		return drawTypeSpanText(type,'trans-graph-gray-'+alertType+'-'+companyId);
+		
+	}else if(alert == 'normal'){
+		$('#trans-graph-container-'+companyId).attr('id','trans-graph-container-'+alertType+'-'+companyId);
+		$('#trans-graph-container-'+alertType+'-'+companyId).append(normalGraphContainer);
+		$('#trans-graph').attr('id','trans-graph-normal-'+alertType+'-'+companyId);
+		return drawTypeSpanText(type,'trans-graph-normal-'+alertType+'-'+companyId);
+		
+	}
+	
+}
+
+function drawTypeSpanText(type,graphId){
+	if(type == autoType){
+		$('#'+graphId).attr('id',graphId+'-auto');
+		$('#'+graphId+'-auto').siblings('.trans-monitor-graph-span').html(automatedTransText);
+		return graphId+'-auto';
+	}else if(type == inviType){
+		$('#'+graphId).attr('id',graphId+'-invi');
+		$('#'+graphId+'-invi').siblings('.trans-monitor-graph-span').html(inviteSentText);
+		return graphId+'-invi';
+	}else if(type == remType){
+		$('#'+graphId).attr('id',graphId+'-rem');
+		$('#'+graphId+'-rem').siblings('.trans-monitor-graph-span').html(reminderSentText);
+		return graphId+'-rem';
+	}else if(type == compType){
+		$('#'+graphId).attr('id',graphId+'-comp');
+		$('#'+graphId+'-comp').siblings('.trans-monitor-graph-span').html(completedTransText);
+		return graphId+'-comp';
+	}else if(type == unproType){
+		$('#'+graphId).attr('id',graphId+'-unpro');
+		$('#'+graphId+'-unpro').siblings('.trans-monitor-graph-span').html(unprocessedTransText);
+		return graphId+'-unpro';
+	}
+}
+
+var transactionMonitorData;
+var isFetchingTransactionData=false;
+var hasFetchedWarningData = false;
+var hasFetchedNormalData = false;
+var pastWeekTransData = new Array();
+var curWeekTransData = new Array();
+
+function getTransactionMonitorData(alertType,noOfDays) {
+	
+	if (isFetchingTransactionData == true) {
+		return;
+	}
+	
+	var payload = {
+		"alertType" : alertType,
+		"noOfDays" : noOfDays
+	};
+	
+	isFetchingTransactionData = true;
+	$.ajax({
+		url : "./gettrnsactionmonitordatabydaysandalerttype.do",
+		type : "GET",
+		dataType : "JSON",
+		cache : false,
+		data : payload,
+		success : function(data) {
+			isFetchingTransactionData = false;
+			transactionMonitorData = data;
+			drawTransactionMonitorAlertGraphs(alertType,transactionMonitorData);
+		},
+		complete : function(){
+			if(hasFetchedWarningData == false){
+				hasFetchedWarningData = true;
+				getTransactionMonitorData('warning',14);
+			}
+			
+			if(alertType == 'warning' && hasFetchedNormalData == false){
+				hasFetchedNormalData = true;
+				getTransactionMonitorData('normal',14);
+			}
+		},
+		error : function(e) {
+			isFetchingTransactionData = false;
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			$('#overlay-toast').html(e.responseText);
+			showToast();
+		}
+	});
+}
+
+function drawTransactionMonitorAlertGraphs(alertType,transactionMonitorData){
+	if(alertType == 'error'){
+		drawTransMonDangerGraphs(transactionMonitorData);
+	}else if(alertType == 'warning'){
+		drawTransMonWarnGraphs(transactionMonitorData);
+	}else if(alertType == 'normal'){
+		drawTransMonNormalGraphs(transactionMonitorData);
+	}
+}
+
+function drawTransMonDangerGraphs(transactionMonitorData){
+	for(var i=0;i<transactionMonitorData.length;i++){
+		
+		var transData = transactionMonitorData[i];
+		var companyId = transData.companyId;
+		var companyName = transData.companyName;
+		
+		var autoStatus = 'normal';
+		var inviStatus = 'normal';
+		var remStatus = 'normal';
+		var unproStatus = 'normal';
+		var compStatus = 'normal';
+		var currentWarningAlerts = transData.entityAlertDetails.currentWarningAlerts;
+		var currentErrorAlerts = transData.entityAlertDetails.currentErrorAlerts;
+		
+		for(var j=0;j<currentWarningAlerts.length;j++){
+			if(currentWarningAlerts[j].toUpperCase() == ('lessTransactionInPastDays').toUpperCase() || currentWarningAlerts[j].toUpperCase() == ('lessTransactionInPastWeek').toUpperCase()){
+				autoStatus = 'warn';
+			}else if(currentWarningAlerts[j].toUpperCase() == ('lessInvitationInPastDays').toUpperCase() || currentWarningAlerts[j].toUpperCase() == ('lessInvitationInPastWeek').toUpperCase()){
+				inviStatus = 'warn';
+			}else if(currentWarningAlerts[j].toUpperCase() == ('moreReminderInPastDays').toUpperCase() || currentWarningAlerts[j].toUpperCase() == ('moreReminderInPastWeek').toUpperCase()){
+				remStatus = 'warn';
+			}else if(currentWarningAlerts[j].toUpperCase() == ('lessSurveyCompletedInPastDays').toUpperCase() || currentWarningAlerts[j].toUpperCase() == ('lessSurveyCompletedInPastWeek').toUpperCase()){
+				compStatus = 'warn';
+			}else if(currentWarningAlerts[j].toUpperCase() == ('moreSurveyUnprocessedInPastDays').toUpperCase() || currentWarningAlerts[j].toUpperCase() == ('moreSurveyUnprocessedInPastWeek').toUpperCase()){
+				unproStatus = 'warn';
+			}
+		}
+
+		for(var j=0;j<currentErrorAlerts.length;j++){
+			if(currentErrorAlerts[j] == 'lessTransactionInPastDays'){
+				autoStatus = 'danger';
+			}else if(currentErrorAlerts[j] == 'lessInvitationInPastDays'){
+				inviStatus = 'danger';
+			}else if(currentErrorAlerts[j] == 'moreReminderInPastDays'){
+				remStatus = 'danger';
+			}else if(currentErrorAlerts[j] == 'lessSurveyCompletedInPastDays'){
+				compStatus = 'danger';
+			}else if(currentErrorAlerts[j] == 'moreSurveyUnprocessedInPastDays'){
+				unproStatus = 'danger';
+			}
+		}
+		
+		drawTransGraphWrapper(companyId, 'danger', companyName);
+		
+		var autoGraphId = drawTransGraphContainer(companyId, autoStatus, autoType,'error');
+		var inviGraphId = drawTransGraphContainer(companyId, inviStatus, inviType,'error');
+		var remGraphId = drawTransGraphContainer(companyId, remStatus, remType,'error');
+		var unproGraphId = drawTransGraphContainer(companyId, unproStatus, unproType,'error');
+		var compGraphId= drawTransGraphContainer(companyId, compStatus, compType,'error');
+		var graphDetails = {
+				"autoGraphId": autoGraphId,
+				"autoStatus": autoStatus,
+				"inviGraphId": inviGraphId,
+				"inviStatus": inviStatus,
+				"remGraphId": remGraphId,
+				"remStatus": remStatus,
+				"unproGraphId": unproGraphId,
+				"unproStatus": unproStatus,
+				"compGraphId": compGraphId,
+				"compStatus": compStatus
+		}
+		drawAlertTypeGraphs(transData,graphDetails);
+	}
+	/*setPastAndCurWeekDataForTransactionMonitor(transactionMonitorData[0].companySurveyStatusStatslist);*/
+}
+
+function drawTransMonWarnGraphs(transactionMonitorData){
+	for(var i=0;i<transactionMonitorData.length;i++){
+		
+		var transData = transactionMonitorData[i];
+		var companyId = transData.companyId;
+		var companyName = transData.companyName;
+		
+		var autoStatus = 'normal';
+		var inviStatus = 'normal';
+		var remStatus = 'normal';
+		var unproStatus = 'normal';
+		var compStatus = 'normal';
+		var currentWarningAlerts = transData.entityAlertDetails.currentWarningAlerts;
+		var currentErrorAlerts = transData.entityAlertDetails.currentErrorAlerts;
+		
+		for(var j=0;j<currentWarningAlerts.length;j++){
+			if(currentWarningAlerts[j] == 'lessTransactionInPastDays'){
+				autoStatus = 'warn';
+			}else if(currentWarningAlerts[j] == 'lessInvitationInPastDays'){
+				inviStatus = 'warn';
+			}else if(currentWarningAlerts[j] == 'moreReminderInPastDays'){
+				remStatus = 'warn';
+			}else if(currentWarningAlerts[j] == 'lessSurveyCompletedInPastDays'){
+				compStatus = 'warn';
+			}else if(currentWarningAlerts[j] == 'moreSurveyUnprocessedInPastDays'){
+				unproStatus = 'warn';
+			}
+		}
+
+		for(var j=0;j<currentErrorAlerts.length;j++){
+			if(currentErrorAlerts[j] == 'lessTransactionInPastDays'){
+				autoStatus = 'danger';
+			}else if(currentErrorAlerts[j] == 'lessInvitationInPastDays'){
+				inviStatus = 'danger';
+			}else if(currentErrorAlerts[j] == 'moreReminderInPastDays'){
+				remStatus = 'danger';
+			}else if(currentErrorAlerts[j] == 'lessSurveyCompletedInPastDays'){
+				compStatus = 'danger';
+			}else if(currentErrorAlerts[j] == 'moreSurveyUnprocessedInPastDays'){
+				unproStatus = 'danger';
+			}
+		}
+		
+		drawTransGraphWrapper(companyId, 'warn', companyName);
+		
+		var autoGraphId = drawTransGraphContainer(companyId, autoStatus, autoType,'warning');
+		var inviGraphId = drawTransGraphContainer(companyId, inviStatus, inviType,'warning');
+		var remGraphId = drawTransGraphContainer(companyId, remStatus, remType,'warning');
+		var unproGraphId = drawTransGraphContainer(companyId, unproStatus, unproType,'warning');
+		var compGraphId = drawTransGraphContainer(companyId, compStatus, compType,'warning');
+		
+		var graphDetails = {
+				"autoGraphId": autoGraphId,
+				"autoStatus": autoStatus,
+				"inviGraphId": inviGraphId,
+				"inviStatus": inviStatus,
+				"remGraphId": remGraphId,
+				"remStatus": remStatus,
+				"unproGraphId": unproGraphId,
+				"unproStatus": unproStatus,
+				"compGraphId": compGraphId,
+				"compStatus": compStatus
+		}
+		drawAlertTypeGraphs(transData,graphDetails);
+	}
+}
+
+function drawTransMonNormalGraphs(transactionMonitorData){
+	for(var i=0;i<transactionMonitorData.length;i++){
+		
+		var transData = transactionMonitorData[i];
+		var companyId = transData.companyId;
+		var companyName = transData.companyName;
+		
+		var autoStatus = 'normal';
+		var inviStatus = 'normal';
+		var remStatus = 'normal';
+		var unproStatus = 'normal';
+		var compStatus = 'normal';
+		var currentWarningAlerts = transData.entityAlertDetails.currentWarningAlerts;
+		var currentErrorAlerts = transData.entityAlertDetails.currentErrorAlerts;
+		
+		for(var j=0;j<currentWarningAlerts.length;j++){
+			if(currentWarningAlerts[j] == 'lessTransactionInPastDays'){
+				autoStatus = 'warn';
+			}else if(currentWarningAlerts[j] == 'lessInvitationInPastDays'){
+				inviStatus = 'warn';
+			}else if(currentWarningAlerts[j] == 'moreReminderInPastDays'){
+				remStatus = 'warn';
+			}else if(currentWarningAlerts[j] == 'lessSurveyCompletedInPastDays'){
+				compStatus = 'warn';
+			}else if(currentWarningAlerts[j] == 'moreSurveyUnprocessedInPastDays'){
+				unproStatus = 'warn';
+			}
+		}
+
+		for(var j=0;j<currentErrorAlerts.length;j++){
+			if(currentErrorAlerts[j] == 'lessTransactionInPastDays'){
+				autoStatus = 'danger';
+			}else if(currentErrorAlerts[j] == 'lessInvitationInPastDays'){
+				inviStatus = 'danger';
+			}else if(currentErrorAlerts[j] == 'moreReminderInPastDays'){
+				remStatus = 'danger';
+			}else if(currentErrorAlerts[j] == 'lessSurveyCompletedInPastDays'){
+				compStatus = 'danger';
+			}else if(currentErrorAlerts[j] == 'moreSurveyUnprocessedInPastDays'){
+				unproStatus = 'danger';
+			}
+		}
+		
+		drawTransGraphWrapper(companyId, 'normal', companyName);
+		
+		var autoGraphId = drawTransGraphContainer(companyId, autoStatus, autoType,'normals');
+		var inviGraphId = drawTransGraphContainer(companyId, inviStatus, inviType,'normals');
+		var remGraphId = drawTransGraphContainer(companyId, remStatus, remType,'normals');
+		var unproGraphId = drawTransGraphContainer(companyId, unproStatus, unproType,'normals');
+		var compGraphId = drawTransGraphContainer(companyId, compStatus, compType,'normals');
+		
+		var graphDetails = {
+				"autoGraphId": autoGraphId,
+				"autoStatus": autoStatus,
+				"inviGraphId": inviGraphId,
+				"inviStatus": inviStatus,
+				"remGraphId": remGraphId,
+				"remStatus": remStatus,
+				"unproGraphId": unproGraphId,
+				"unproStatus": unproStatus,
+				"compGraphId": compGraphId,
+				"compStatus": compStatus
+		}
+		drawAlertTypeGraphs(transData,graphDetails);
+	}
+}
+
+function setEmptyPastAndCurWeekDataForTransactionMonitor(companyId){
+	var emptySlotGraphData = {
+			"dailySurveyStatusStatsId": "abcd",
+            "companyId": companyId,
+            "transactionDate": "",
+            "surveyInvitationSentCount": 0,
+            "transactionReceivedCount": 0,
+            "surveycompletedCount": 0,
+            "surveyReminderSentCount": 0,
+            "corruptedCount": 0,
+            "duplicateCount": 0,
+            "oldRecordCount": 0,
+            "ignoredCount": 0,
+            "mismatchedCount": 0,
+            "notAllowedCount": 0
+	}
+	
+	for(var i=0;i<7;i++){
+		pastWeekTransData[i]= new emptySlotDataConstructor(emptySlotGraphData);
+		curWeekTransData[i]= new emptySlotDataConstructor(emptySlotGraphData);
+	}
+}
+
+function setPastAndCurWeekDataForTransactionMonitor(graphData){
+	var emptySlotGraphData = {
+			 "dailySurveyStatusStatsId": "e",
+             "companyId": 3,
+             "transactionDate": "",
+             "surveyInvitationSentCount": 0,
+             "transactionReceivedCount": 0,
+             "surveycompletedCount": 0,
+             "surveyReminderSentCount": 0,
+             "corruptedCount": 0,
+             "duplicateCount": 0,
+             "oldRecordCount": 0,
+             "ignoredCount": 0,
+             "mismatchedCount": 0,
+             "notAllowedCount": 0
+	}
+	var companyId = graphData[0].companyId;
+	emptySlotGraphData.companyId = companyId;
+	
+	var allTimeSlots = new Array();
+	var graphTimeSlots = new Array();
+	var emptyGraphTimeSlots = new Array();
+	
+	var format = 14;
+	var type = 'Date';
+	var keys = getKeysFromGraphFormat(format);
+	for(var i=0;i<keys.length;i++){
+		allTimeSlots[i] = convertYearMonthDayKeyToMonthDay(keys[i]);
+		emptyGraphTimeSlots[i]=convertYearMonthDayKeyToMonthDayYear(keys[i]);
+	}
+	
+	for(var i=0;i<graphData.length;i++){
+		var j=0;
+		var hasSlotDate = false;
+		var entityDate = graphData[i].transactionDate;
+		
+		var formattedDate = new Date(Date.parse(entityDate));
+	    //get date similar to keys formay
+	    
+	    var month = formattedDate.getMonth() + 1;
+		var monthStr = "";
+		if (month < 10) {
+			monthStr = '0' + month.toString();
+		}else{
+			monthStr = month.toString();
+		}
+		
+		var dayStr = "";
+		var day  = formattedDate.getDate();
+		if (day < 10) {
+			dayStr = '0' + day.toString();
+		}else{
+			dayStr = day.toString();
+		}
+		
+		var keyFormattedDate = formattedDate.getFullYear().toString() + monthStr + dayStr;
+		var graphDate = convertYearMonthDayKeyToMonthDay(keyFormattedDate);
+		graphTimeSlots[i]= graphDate;
+		
+	}
+	
+	var k=0;
+	for(var i=0;i<allTimeSlots.length;i++){
+		var j=0;
+		hasSlotDate = false;
+		while(j<graphTimeSlots.length){
+			if(allTimeSlots[i]==graphTimeSlots[j]){
+				hasSlotDate = true;
+				j++;
+				break;
+			}else{
+				j++;
+			}
+		}
+
+		emptySlotGraphData.transactionDate = emptyGraphTimeSlots[i];
+		if(hasSlotDate){
+			if(i<7){
+				pastWeekTransData[i] = graphData[k++];
+			}else{
+				curWeekTransData[i-7] = graphData[k++];
+			}
+		}else{
+			if(i<7){
+				pastWeekTransData[i] = new emptySlotDataConstructor(emptySlotGraphData);
+			}else{
+				curWeekTransData[i-7] = new emptySlotDataConstructor(emptySlotGraphData);
+			}
+		}
+	}
+}
+
+function drawAlertTypeGraphs(transactionMonitorData,graphDetails){
+	
+	var transData = transactionMonitorData.companySurveyStatusStatslist;
+	var isEmptyData = false;
+	
+	var allTimeslots = new Array();
+	pastWeekTransData = new Array();
+	curWeekTransData = new Array();
+	
+	var pastWeekAutomatedTransactions = new Array();
+	var pastWeekInvitationsSent = new Array();
+	var pastWeekUnprocessedTransactions = new Array();
+	var pastWeekRemindersSent = new Array();
+	var pastWeekCompletedTransactions = new Array();
+	
+	var currentWeekAutomatedTransactions = new Array();
+	var currentWeekInvitationsSent = new Array();
+	var currentWeekUnprocessedTransactions = new Array();
+	var currentWeekRemindersSent = new Array();
+	var currentWeekCompletedTransactions = new Array();
+	
+	var format = 7;
+	var type = 'Date';
+	var keys = getKeysFromGraphFormat(format);
+	
+	
+	for(var i=0;i<keys.length;i++){
+		allTimeslots[i] = convertYearMonthDayKeyToMonthDay(keys[i]);
+		pastWeekAutomatedTransactions[i] = 0;
+		pastWeekInvitationsSent[i] = 0;
+		pastWeekUnprocessedTransactions[i] = 0;
+		pastWeekRemindersSent[i] = 0;
+		pastWeekCompletedTransactions[i] = 0;
+			
+		currentWeekAutomatedTransactions[i] = 0;
+		currentWeekInvitationsSent[i] = 0;
+		currentWeekUnprocessedTransactions[i] = 0;
+		currentWeekRemindersSent[i] = 0;
+		currentWeekCompletedTransactions[i] = 0;
+	}
+	
+	if(transData == undefined){
+		setEmptyPastAndCurWeekDataForTransactionMonitor(transactionMonitorData.companyId);
+		isEmptyData = true;
+	}else{
+		setPastAndCurWeekDataForTransactionMonitor(transData);
+	}
+		
+	for(var i=0;i<curWeekTransData.length;i++){
+			
+			var currentWeekDataEntity = curWeekTransData[i];
+			var pastWeekDataEntity = pastWeekTransData[i];
+			
+			var entityDate = currentWeekDataEntity.transactionDate;
+			
+			var formattedDate = new Date(Date.parse(entityDate));
+		    //get date similar to keys formay
+		    
+		    var month = formattedDate.getMonth() + 1;
+			var monthStr = "";
+			if (month < 10) {
+				monthStr = '0' + month.toString();
+			}else{
+				monthStr = month.toString();
+			}
+			
+			var dayStr = "";
+			var day  = formattedDate.getDate();
+			if (day < 10) {
+				dayStr = '0' + day.toString();
+			}else{
+				dayStr = day.toString();
+			}
+			
+			var keyFormattedDate = formattedDate.getFullYear().toString() + monthStr + dayStr;
+			
+			if(keys.indexOf(keyFormattedDate) > -1){
+				var index = keys.indexOf(keyFormattedDate);
+				
+				pastWeekAutomatedTransactions[index] = pastWeekDataEntity.transactionReceivedCount;
+				pastWeekCompletedTransactions[index] =  pastWeekDataEntity.surveycompletedCount;
+				pastWeekInvitationsSent[index] =  pastWeekDataEntity.surveyInvitationSentCount;
+				pastWeekRemindersSent[index] =  pastWeekDataEntity.surveyReminderSentCount;
+				pastWeekUnprocessedTransactions[index] = pastWeekDataEntity.transactionReceivedCount - pastWeekDataEntity.surveyInvitationSentCount;
+			
+				currentWeekAutomatedTransactions[index] = currentWeekDataEntity.transactionReceivedCount;
+				currentWeekCompletedTransactions[index] =  currentWeekDataEntity.surveycompletedCount;
+				currentWeekInvitationsSent[index] =  currentWeekDataEntity.surveyInvitationSentCount;
+				currentWeekRemindersSent[index] =  currentWeekDataEntity.surveyReminderSentCount;
+				currentWeekUnprocessedTransactions[index] = currentWeekDataEntity.transactionReceivedCount - currentWeekDataEntity.surveyInvitationSentCount;
+			}
+	}
+
+	var automatedData= [];
+	var sentData = [];
+	var completedData = [];
+	var remindersData = [];
+	var unprocessedData = [];
+	
+	var nestedInternalAutomatedData = [];
+	var nestedInternalSentData = [];
+	var nestedInternalCompletedData = [];
+	var nestedInternalRemindersData = [];
+	var nestedInternalUnprocessedData = [];
+	
+	nestedInternalAutomatedData.push(type, 'PreviousWeek',{type: 'string', role: 'tooltip'}, 'CurrentWeek');
+	nestedInternalSentData.push(type, 'PreviousWeek',{type: 'string', role: 'tooltip'}, 'CurrentWeek');
+	nestedInternalCompletedData.push(type, 'PreviousWeek',{type: 'string', role: 'tooltip'}, 'CurrentWeek');
+	nestedInternalRemindersData.push(type, 'PreviousWeek',{type: 'string', role: 'tooltip'}, 'CurrentWeek');
+	nestedInternalUnprocessedData.push(type, 'PreviousWeek',{type: 'string', role: 'tooltip'}, 'CurrentWeek');
+	
+	automatedData.push(nestedInternalAutomatedData);
+	sentData.push(nestedInternalSentData);
+	completedData.push(nestedInternalCompletedData);
+	remindersData.push(nestedInternalRemindersData);
+	unprocessedData.push(nestedInternalUnprocessedData);
+	
+	var xAxisTimeSlots = formatAllTimeSlots(allTimeslots);
+	for (var itr = 0; itr < allTimeslots.length; itr++) {
+		nestedInternalAutomatedData = [];
+		nestedInternalSentData = [];
+		nestedInternalCompletedData = [];
+		nestedInternalRemindersData = [];
+		nestedInternalUnprocessedData = [];
+		
+		var curAutomatedTransactionCount;
+		var curCompletedTransactionCount;
+		var curSentInvitationCount;
+		var curReminderSentCount;
+		var curUnprocessedTransactionsCount;
+		
+		var prevAutomatedTransactionCount;
+		var prevCompletedTransactionCount;
+		var prevSentInvitationCount;
+		var prevReminderSentCount;
+		var prevUnprocessedTransactionsCount;
+
+		if (isNaN(parseInt(currentWeekAutomatedTransactions[itr]))) {
+			curAutomatedTransactionCount = 0;
+		} else {
+			curAutomatedTransactionCount = parseInt(currentWeekAutomatedTransactions[itr]);
+		}
+		
+		if (isNaN(parseInt(pastWeekAutomatedTransactions[itr]))) {
+			prevAutomatedTransactionCount = 0;
+		} else {
+			prevAutomatedTransactionCount = parseInt(pastWeekAutomatedTransactions[itr]);
+		}
+
+		if (isNaN(parseInt(currentWeekInvitationsSent[itr]))) {
+			curSentInvitationCount = 0;
+		} else {
+			curSentInvitationCount = parseInt(currentWeekInvitationsSent[itr]);
+		}
+		
+		if (isNaN(parseInt(pastWeekInvitationsSent[itr]))) {
+			prevSentInvitationCount = 0;
+		} else {
+			prevSentInvitationCount = parseInt(pastWeekInvitationsSent[itr]);
+		}
+		
+		if (isNaN(parseInt(currentWeekRemindersSent[itr]))) {
+			curReminderSentCount = 0;
+		} else {
+			curReminderSentCount = parseInt(currentWeekRemindersSent[itr]);
+		}
+		
+		if (isNaN(parseInt(pastWeekRemindersSent[itr]))) {
+			prevReminderSentCount = 0;
+		} else {
+			prevReminderSentCount = parseInt(pastWeekRemindersSent[itr]);
+		}
+		
+		if (isNaN(parseInt(currentWeekCompletedTransactions[itr]))) {
+			curCompletedTransactionCount = 0;
+		} else {
+			curCompletedTransactionCount = parseInt(currentWeekCompletedTransactions[itr]);
+		}
+		
+		if (isNaN(parseInt(pastWeekCompletedTransactions[itr]))) {
+			prevCompletedTransactionCount = 0;
+		} else {
+			prevCompletedTransactionCount = parseInt(pastWeekCompletedTransactions[itr]);
+		}
+		
+		if (isNaN(parseInt(currentWeekUnprocessedTransactions[itr]))) {
+			curUnprocessedTransactionsCount = 0;
+		} else {
+			curUnprocessedTransactionsCount = parseInt(currentWeekUnprocessedTransactions[itr]);
+		}
+		
+		if (isNaN(parseInt(pastWeekUnprocessedTransactions[itr]))) {
+			prevUnprocessedTransactionsCount = 0;
+		} else {
+			prevUnprocessedTransactionsCount = parseInt(pastWeekUnprocessedTransactions[itr]);
+		}
+		
+		nestedInternalAutomatedData.push(xAxisTimeSlots[itr], prevAutomatedTransactionCount,'Previous Week: '+prevAutomatedTransactionCount,curAutomatedTransactionCount);
+		nestedInternalSentData.push(xAxisTimeSlots[itr], prevSentInvitationCount, 'Previous Week: '+prevSentInvitationCount, curSentInvitationCount);
+		nestedInternalCompletedData.push(xAxisTimeSlots[itr], prevCompletedTransactionCount, 'Previous Week: '+prevCompletedTransactionCount, curCompletedTransactionCount);
+		nestedInternalRemindersData.push(xAxisTimeSlots[itr], prevReminderSentCount, 'Previous Week: '+prevReminderSentCount,curReminderSentCount);
+		nestedInternalUnprocessedData.push(xAxisTimeSlots[itr], prevUnprocessedTransactionsCount, 'Previous Week: '+prevUnprocessedTransactionsCount, curUnprocessedTransactionsCount);
+		
+		automatedData.push(nestedInternalAutomatedData);
+		sentData.push(nestedInternalSentData);
+		remindersData.push(nestedInternalRemindersData);
+		completedData.push(nestedInternalCompletedData);
+		unprocessedData.push(nestedInternalUnprocessedData);
+	}
+	
+	var transGraphOption = getTransMonGraphOptions('gray');
+	
+	if(isEmptyData){
+		modifyGraphContainerToGray('#'+graphDetails.autoGraphId);
+		modifyGraphContainerToGray('#'+graphDetails.inviGraphId);
+		modifyGraphContainerToGray('#'+graphDetails.remGraphId);
+		modifyGraphContainerToGray('#'+graphDetails.unproGraphId);
+		modifyGraphContainerToGray('#'+graphDetails.compGraphId);
+		
+		drawTransactionMonitorGraphs(automatedData, transGraphOption, graphDetails.autoGraphId);
+		drawTransactionMonitorGraphs(sentData, transGraphOption, graphDetails.inviGraphId);
+		drawTransactionMonitorGraphs(remindersData, transGraphOption, graphDetails.remGraphId);
+		drawTransactionMonitorGraphs(unprocessedData, transGraphOption, graphDetails.unproGraphId);
+		drawTransactionMonitorGraphs(completedData, transGraphOption, graphDetails.compGraphId);
+	}else{
+		
+		if(isTransGraphEmpty(automatedData)){
+			modifyGraphContainerToGray('#'+graphDetails.autoGraphId);
+			transGraphOption = getTransMonGraphOptions('gray');
+		}else{
+			transGraphOption = getTransMonGraphOptions(graphDetails.autoStatus);
+		}		
+		drawTransactionMonitorGraphs(automatedData, transGraphOption, graphDetails.autoGraphId);
+		
+		if(isTransGraphEmpty(sentData)){
+			modifyGraphContainerToGray('#'+graphDetails.inviGraphId);
+			transGraphOption = getTransMonGraphOptions('gray');
+		}else{
+			transGraphOption = getTransMonGraphOptions(graphDetails.inviStatus);
+		}
+		drawTransactionMonitorGraphs(sentData, transGraphOption, graphDetails.inviGraphId);
+		
+		if(isTransGraphEmpty(remindersData)){
+			modifyGraphContainerToGray('#'+graphDetails.remGraphId);
+			transGraphOption = getTransMonGraphOptions('gray');
+		}else{
+			transGraphOption = getTransMonGraphOptions(graphDetails.remStatus);
+		}
+		drawTransactionMonitorGraphs(remindersData, transGraphOption, graphDetails.remGraphId);
+		
+		if(isTransGraphEmpty(unprocessedData)){
+			modifyGraphContainerToGray('#'+graphDetails.unproGraphId);
+			transGraphOption = getTransMonGraphOptions('gray');
+		}else{
+			transGraphOption = getTransMonGraphOptions(graphDetails.unproStatus);
+		}
+		drawTransactionMonitorGraphs(unprocessedData, transGraphOption, graphDetails.unproGraphId);
+		
+		if(isTransGraphEmpty(completedData)){
+			modifyGraphContainerToGray('#'+graphDetails.compGraphId);
+			transGraphOption = getTransMonGraphOptions('gray');
+		}else{
+			transGraphOption = getTransMonGraphOptions(graphDetails.compStatus);
+		}
+		drawTransactionMonitorGraphs(completedData, transGraphOption, graphDetails.compGraphId);
+	}
+}
+
+function getTransMonGraphOptions(alert){
+	if(alert == 'danger'){
+		return dangerOptions;
+	}else if(alert == 'warn'){
+		return warnOptions;
+	}else if(alert == 'gray'){
+		return grayOptions;
+	}else if(alert == 'normal'){
+		return normalOptions;
+	}
+}
+
+function modifyGraphContainerToGray(id){
+	
+	if($(id).parent().hasClass('trans-monitor-graph-col-danger')){
+		$(id).parent().removeClass('trans-monitor-graph-col-danger');
+	}
+	if($(id).parent().hasClass('trans-monitor-graph-col-warn')){
+		$(id).parent().removeClass('trans-monitor-graph-col-warn');
+	}
+	if($(id).parent().hasClass('trans-monitor-graph-col-normal')){
+		$(id).parent().removeClass('trans-monitor-graph-col-normal');
+	}
+	
+	$(id).parent().addClass('trans-monitor-graph-col-gray');
+}
+
+function isTransGraphEmpty(graphDataArray){
+	var isGraphEmpty = true;
+	for(var i=0;i<graphDataArray.length;i++){
+		if(graphDataArray[i][1]>0 || graphDataArray[i][3]>0){
+			isGraphEmpty =false;
+			break;
+		}
+	}
+	
+	return isGraphEmpty;
+}
+
+function formatAllTimeSlots(dates){
+	var monthText = dates[0].match(/[a-zA-Z]*/);
+	monthText = monthText?monthText[0]:null;
+	var xAxisData = new Array();
+	var index = 0;
+	for(i=0;i<dates.length;i++){
+		if(i==0){
+	  	xAxisData[i] = dates[i];
+	  }else{
+	  	var nextMonth = dates[i].match(/[a-zA-Z]*/);
+	    nextMonth = nextMonth?nextMonth[0]:null;
+	    if(monthText == nextMonth){
+	    var d = parseInt(dates[i].replace ( /[^\d.]/g, '' ));
+	      xAxisData[i]=d;
+	    }else{
+	    	xAxisData[i] = dates[i];
+	      nextMonth = dates[i].match(/[a-zA-Z]*/);
+	     monthText = nextMonth?nextMonth[0]:null;
+	    }
+	  }
+	}
+	return xAxisData;
+}

@@ -711,8 +711,11 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
 
             }
 
-            if ( agentSettings.getLicenses() != null && agentSettings.getLicenses().getAuthorized_in() != null )
+            if ( agentSettings.getLicenses() != null && agentSettings.getLicenses().getAuthorized_in() != null &&  agentSettings.getLicenses().getAuthorized_in().size() > 0 )
                 userUploadVO.setLicense( StringUtils.defaultString( agentSettings.getLicenses().getAuthorized_in().get( 0 ) ) );
+            else{
+                userUploadVO.setLicense("");
+            }
 
             userUploadVO.setLegalDisclaimer( StringUtils.defaultString( agentSettings.getDisclaimer() ) );
             userUploadVO.setUserPhotoUrl( StringUtils.defaultString( agentSettings.getProfileImageUrl() ) );
@@ -756,7 +759,6 @@ public class HierarchyDownloadServiceImpl implements HierarchyDownloadService
         LOG.debug( "Method buildAndAddUsersAndUserSourceMappingInBatch finished" );
 
     }
-
 
     private Map<Long, OrganizationUnitSettings> buildOrganizationUnitSettingsIDMap( List<Long> batchUserIds )
     {

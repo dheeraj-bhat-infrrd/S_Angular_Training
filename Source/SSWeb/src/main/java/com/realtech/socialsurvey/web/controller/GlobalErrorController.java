@@ -125,15 +125,16 @@ public class GlobalErrorController
     @ExceptionHandler ( value = Throwable.class)
     public void throwExceptions( Throwable thrw ) throws Throwable
     {
-        LOG.info( "Sending failure mail to recpient : {}", webExceptionReportingEmailAddress );
+        LOG.error("==============> Unhandled Exception <==============", thrw);
+        /*LOG.info( "Sending failure mail to recpient : {}", webExceptionReportingEmailAddress );
         String stackTrace = ExceptionUtils.getFullStackTrace( thrw );
         try {
-            emailServices.sendWebExceptionEmail( webExceptionReportingEmailAddress, stackTrace );
+            //emailServices.sendWebExceptionEmail( webExceptionReportingEmailAddress, stackTrace );
             LOG.debug( "Failure mail sent to admin." );
         } catch ( InvalidInputException | UndeliveredEmailException e1 ) {
             LOG.error(
                 "CustomItemProcessor : Exception caught when sending Fatal Exception mail. Message : {}", e1.getMessage() );
-        }
+        }*/
         throw thrw;
     }
 

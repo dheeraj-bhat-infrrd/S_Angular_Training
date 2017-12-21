@@ -70,6 +70,7 @@ import com.realtech.socialsurvey.core.entities.CRMInfo;
 import com.realtech.socialsurvey.core.entities.CollectionDotloopProfileMapping;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyHiddenNotification;
+import com.realtech.socialsurvey.core.entities.CompanyView;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.CrmBatchTracker;
@@ -197,7 +198,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Autowired
     private GenericDao<EncompassSdkVersion, Long> encompassSdkVersionDao;
-    
+
     @Autowired
     private DisabledAccountDao disabledAccountDao;
 
@@ -231,7 +232,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Autowired
     private UsercountModificationNotificationDao usercountModificationNotificationDao;
-    
+
     @Autowired
     private SurveyDetailsDao surveyDetailsDao;
 
@@ -296,13 +297,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Value ( "${ACCOUNT_PERM_DELETE_SPAN}")
     String accountPermDeleteSpan;
 
-    
+
     @Value ( "${APPLICATION_SUPPORT_EMAIL}")
     private String applicationSupportEmail;
 
     @Value ( "${APPLICATION_SUPPORT_NAME}")
     private String applicationSupportName;
-    
+
     @Value ( "${CDN_PATH}")
     String cdnPath;
 
@@ -694,14 +695,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         //set Ranking Settings
         RankingRequirements rankingRequirements = new RankingRequirements();
-        rankingRequirements.setMinCompletedPercentage(CommonConstants.MIN_COMPLETED_PERCENTAGE);
-        rankingRequirements.setMinDaysOfRegistration(CommonConstants.MIN_DAYS_OF_REGISTRATION);
-        rankingRequirements.setMinNoOfReviews(CommonConstants.MIN_NO_OF_REVIEWS);
-        rankingRequirements.setMonthOffset(CommonConstants.MONTH_OFFSET);
-        rankingRequirements.setYearOffset(CommonConstants.YEAR_OFFSET);
-        
-        companySettings.setRankingRequirements(rankingRequirements);
-        
+        rankingRequirements.setMinCompletedPercentage( CommonConstants.MIN_COMPLETED_PERCENTAGE );
+        rankingRequirements.setMinDaysOfRegistration( CommonConstants.MIN_DAYS_OF_REGISTRATION );
+        rankingRequirements.setMinNoOfReviews( CommonConstants.MIN_NO_OF_REVIEWS );
+        rankingRequirements.setMonthOffset( CommonConstants.MONTH_OFFSET );
+        rankingRequirements.setYearOffset( CommonConstants.YEAR_OFFSET );
+
+        companySettings.setRankingRequirements( rankingRequirements );
+
         // set seo content flag
         companySettings.setSeoContentModified( true );
 
@@ -1574,19 +1575,20 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         DisabledAccount disabledAccount = null;
         if ( disabledAccounts != null && disabledAccounts.size() > 0 ) {
             LOG.debug( "Found existing entry in the database." );
-             disabledAccount = disabledAccounts.get( CommonConstants.INITIAL_INDEX );
+            disabledAccount = disabledAccounts.get( CommonConstants.INITIAL_INDEX );
             LOG.debug( "Updating the Disabled Account entity to the database" );
 
         } else {
             LOG.debug( "Preparing the DisabledAccount entity to be saved in the database." );
-             disabledAccount = new DisabledAccount();
+            disabledAccount = new DisabledAccount();
             disabledAccount.setCompany( company );
-            disabledAccount.setCreatedBy( userId == CommonConstants.REALTECH_ADMIN_ID ? CommonConstants.ADMIN_USER_NAME : String.valueOf( userId ) );
-            disabledAccount.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );            
+            disabledAccount.setCreatedBy(
+                userId == CommonConstants.REALTECH_ADMIN_ID ? CommonConstants.ADMIN_USER_NAME : String.valueOf( userId ) );
+            disabledAccount.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
             LOG.debug( "Adding the Disabled Account entity to the database" );
         }
-        
-        
+
+
         disabledAccount.setLicenseDetail( licenseDetail );
         disabledAccount.setStatus( CommonConstants.STATUS_ACTIVE );
 
@@ -1596,10 +1598,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         } else {
             disabledAccount.setForceDelete( false );
             if ( licenseDetail.getPaymentMode().equals( CommonConstants.BILLING_MODE_AUTO ) ) {
-                disabledAccount
-                    .setDisableDate( gateway.getDateForCompanyDeactivation( licenseDetail.getSubscriptionId() ) );
+                disabledAccount.setDisableDate( gateway.getDateForCompanyDeactivation( licenseDetail.getSubscriptionId() ) );
             } else {
-                disabledAccount.setDisableDate( new Timestamp(System.currentTimeMillis()) );
+                disabledAccount.setDisableDate( new Timestamp( System.currentTimeMillis() ) );
             }
         }
         disabledAccount.setModifiedBy(
@@ -1646,19 +1647,18 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.debug( "Record successfully deleted from the database!" );
     }
 
-    
-    
+
     @Override
     @Transactional
     public void markDisabledAccountAsProcessed( Company company ) throws InvalidInputException
     {
-        if (  company == null ) {
+        if ( company == null ) {
             LOG.error( "addDisabledAccount : Invalid companyId has been given." );
             throw new InvalidInputException( "addDisabledAccount : Invalid companyId has been given." );
         }
-        
+
         LOG.debug( "Marking the Disabled Account as processed for company id : " + company.getCompanyId() );
-        
+
         List<DisabledAccount> disabledAccounts = null;
 
         // Fetching the disabled account entity for the company
@@ -1668,14 +1668,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
         disabledAccounts = disabledAccountDao.findByKeyValue( DisabledAccount.class, queries );
 
-        if ( disabledAccounts != null && ! disabledAccounts.isEmpty() ) {
+        if ( disabledAccounts != null && !disabledAccounts.isEmpty() ) {
             DisabledAccount disabledAccount = disabledAccounts.get( CommonConstants.INITIAL_INDEX );
             disabledAccount.setStatus( CommonConstants.DISABLED_ACCOUNT_PROCESSED );
             LOG.debug( "Marking the disabled account record with id : " + disabledAccount.getId() + " as processed" );
             // Perform soft delete of the record in the database
             disabledAccountDao.update( disabledAccount );
         }
-        
+
         LOG.debug( "Record successfully marked As Processed!" );
     }
 
@@ -2979,10 +2979,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         //check if new profile will be primary or not
         int isPrimary = checkWillNewProfileBePrimary( userProfileNew, userProfiles );
         userProfileNew.setIsPrimary( isPrimary );
-        
+
         //move reviews
-        if(userProfileNew.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID){
-            surveyDetailsDao.updateBranchIdRegionIdForAllSurveysOfAgent( assigneeUser.getUserId(), defaultBranch.getBranchId(), regionId );            
+        if ( userProfileNew.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+            surveyDetailsDao.updateBranchIdRegionIdForAllSurveysOfAgent( assigneeUser.getUserId(), defaultBranch.getBranchId(),
+                regionId );
         }
 
         // Remove if the profile from list
@@ -3153,11 +3154,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         userProfileNew.setIsPrimary( isPrimary );
 
         //move reviews
-        if(userProfileNew.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID){
-            surveyDetailsDao.updateBranchIdRegionIdForAllSurveysOfAgent( assigneeUser.getUserId(), branchId, regionId );            
+        if ( userProfileNew.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+            surveyDetailsDao.updateBranchIdRegionIdForAllSurveysOfAgent( assigneeUser.getUserId(), branchId, regionId );
         }
-        
-        
+
+
         // Remove if the profile from list
         if ( indexToRemove != -1 ) {
             userProfiles.remove( indexToRemove );
@@ -4851,7 +4852,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
                 //update survey details
                 surveyDetailsDao.updateRegionIdForAllSurveysOfBranch( branchId, region.getRegionId() );
-                
+
                 //Get and update user
                 SolrDocumentList users = null;
                 int pageNo = 1;
@@ -5605,7 +5606,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         companyIds.addAll( companyIdList );
 
         List<OrganizationUnitSettings> unitSettings = organizationUnitSettingsDao.getCompanyListByIds( companyIds );
-        Collections.sort( unitSettings, new OrganizationUnitSettingsComparator() ); 
+        //Collections.sort( unitSettings, new OrganizationUnitSettingsComparator() ); 
         return unitSettings;
     }
 
@@ -5963,13 +5964,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      */
     @Override
     @Transactional
-    public void updateImageForOrganizationUnitSetting( long iden, String imgFileName, String thumbnailFileName, String rectangularThumbnailFileName,  String collectionName, String imageType,
-        boolean flagValue, boolean isThumbnail ) throws InvalidInputException
+    public void updateImageForOrganizationUnitSetting( long iden, String imgFileName, String thumbnailFileName,
+        String rectangularThumbnailFileName, String collectionName, String imageType, boolean flagValue, boolean isThumbnail )
+        throws InvalidInputException
     {
         LOG.debug( "Method updateImageForOrganizationUnitSetting called" );
         LOG.debug( "updating mongodb" );
-        organizationUnitSettingsDao.updateImageForOrganizationUnitSetting( iden, imgFileName, thumbnailFileName, rectangularThumbnailFileName, collectionName, imageType, flagValue,
-            isThumbnail );
+        organizationUnitSettingsDao.updateImageForOrganizationUnitSetting( iden, imgFileName, thumbnailFileName,
+            rectangularThumbnailFileName, collectionName, imageType, flagValue, isThumbnail );
         LOG.debug( "updated mongodb" );
         if ( imageType == CommonConstants.IMAGE_TYPE_PROFILE ) {
             LOG.debug( "updating solr" );
@@ -5978,7 +5980,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 updateMap.put( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, imgFileName );
                 updateMap.put( CommonConstants.PROFILE_IMAGE_URL_SOLR, imgFileName );
                 updateMap.put( CommonConstants.IS_PROFILE_IMAGE_SET_SOLR, true );
-            }else{
+            } else {
                 updateMap.put( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, thumbnailFileName );
             }
             try {
@@ -6992,7 +6994,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                     try {
                         unsubscribeCompany( company );
                     } catch ( SubscriptionCancellationUnsuccessfulException e ) {
-                        LOG.error( "The subscription has already been cancelled for company: {}",company.getCompanyId() );
+                        LOG.error( "The subscription has already been cancelled for company: {}", company.getCompanyId() );
                     }
                     sendAccountDeletedNotificationMail( account );
                     purgeCompanyDetails( company );
@@ -7064,7 +7066,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
 
-
     @Override
     public void updateUserEncryptedIdOfSetting( AgentSettings agentSettings, String userEncryptedId )
     {
@@ -7088,7 +7089,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             for ( DisabledAccount account : disabledAccounts ) {
                 Company company = account.getCompany();
                 purgeCompanyDetails( company );
-               
+
             }
 
             //updating last run time for batch in database
@@ -7570,8 +7571,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 for ( long id : images.keySet() ) {
                     try {
                         processedImgs = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_PROFILE );
-                        updateImage( id, processedImgs.get(CommonConstants.SQUARE_THUMBNAIL),  processedImgs.get(CommonConstants.RECTANGULAR_THUMBNAIL), CommonConstants.COMPANY_SETTINGS_COLLECTION,
-                            CommonConstants.IMAGE_TYPE_PROFILE );
+                        updateImage( id, processedImgs.get( CommonConstants.SQUARE_THUMBNAIL ),
+                            processedImgs.get( CommonConstants.RECTANGULAR_THUMBNAIL ),
+                            CommonConstants.COMPANY_SETTINGS_COLLECTION, CommonConstants.IMAGE_TYPE_PROFILE );
 
                     } catch ( Exception e ) {
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
@@ -7598,8 +7600,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 for ( long id : images.keySet() ) {
                     try {
                         processedImgs = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_PROFILE );
-                        updateImage( id, processedImgs.get(CommonConstants.SQUARE_THUMBNAIL),  processedImgs.get(CommonConstants.RECTANGULAR_THUMBNAIL), CommonConstants.REGION_SETTINGS_COLLECTION,
-                            CommonConstants.IMAGE_TYPE_PROFILE );
+                        updateImage( id, processedImgs.get( CommonConstants.SQUARE_THUMBNAIL ),
+                            processedImgs.get( CommonConstants.RECTANGULAR_THUMBNAIL ),
+                            CommonConstants.REGION_SETTINGS_COLLECTION, CommonConstants.IMAGE_TYPE_PROFILE );
                     } catch ( Exception e ) {
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
                         try {
@@ -7625,8 +7628,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 for ( long id : images.keySet() ) {
                     try {
                         processedImgs = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_PROFILE );
-                        updateImage( id,  processedImgs.get(CommonConstants.SQUARE_THUMBNAIL),  processedImgs.get(CommonConstants.RECTANGULAR_THUMBNAIL), CommonConstants.BRANCH_SETTINGS_COLLECTION,
-                            CommonConstants.IMAGE_TYPE_PROFILE );
+                        updateImage( id, processedImgs.get( CommonConstants.SQUARE_THUMBNAIL ),
+                            processedImgs.get( CommonConstants.RECTANGULAR_THUMBNAIL ),
+                            CommonConstants.BRANCH_SETTINGS_COLLECTION, CommonConstants.IMAGE_TYPE_PROFILE );
                     } catch ( Exception e ) {
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
                         try {
@@ -7653,8 +7657,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 for ( long id : images.keySet() ) {
                     try {
                         processedImgs = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_PROFILE );
-                        updateImage( id,  processedImgs.get(CommonConstants.SQUARE_THUMBNAIL),  processedImgs.get(CommonConstants.RECTANGULAR_THUMBNAIL), CommonConstants.AGENT_SETTINGS_COLLECTION,
-                            CommonConstants.IMAGE_TYPE_PROFILE );
+                        updateImage( id, processedImgs.get( CommonConstants.SQUARE_THUMBNAIL ),
+                            processedImgs.get( CommonConstants.RECTANGULAR_THUMBNAIL ),
+                            CommonConstants.AGENT_SETTINGS_COLLECTION, CommonConstants.IMAGE_TYPE_PROFILE );
                     } catch ( Exception e ) {
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
                         try {
@@ -7680,8 +7685,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 for ( long id : images.keySet() ) {
                     try {
                         processedImgs = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_LOGO );
-                        updateImage( id,  processedImgs.get(CommonConstants.SQUARE_THUMBNAIL),  processedImgs.get(CommonConstants.RECTANGULAR_THUMBNAIL), CommonConstants.COMPANY_SETTINGS_COLLECTION,
-                            CommonConstants.IMAGE_TYPE_LOGO );
+                        updateImage( id, processedImgs.get( CommonConstants.SQUARE_THUMBNAIL ),
+                            processedImgs.get( CommonConstants.RECTANGULAR_THUMBNAIL ),
+                            CommonConstants.COMPANY_SETTINGS_COLLECTION, CommonConstants.IMAGE_TYPE_LOGO );
                     } catch ( Exception e ) {
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
                         try {
@@ -7702,8 +7708,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 for ( long id : images.keySet() ) {
                     try {
                         processedImgs = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_LOGO );
-                        updateImage( id,  processedImgs.get(CommonConstants.SQUARE_THUMBNAIL),  processedImgs.get(CommonConstants.RECTANGULAR_THUMBNAIL), CommonConstants.REGION_SETTINGS_COLLECTION,
-                            CommonConstants.IMAGE_TYPE_LOGO );
+                        updateImage( id, processedImgs.get( CommonConstants.SQUARE_THUMBNAIL ),
+                            processedImgs.get( CommonConstants.RECTANGULAR_THUMBNAIL ),
+                            CommonConstants.REGION_SETTINGS_COLLECTION, CommonConstants.IMAGE_TYPE_LOGO );
                     } catch ( Exception e ) {
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
                         try {
@@ -7724,8 +7731,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 for ( long id : images.keySet() ) {
                     try {
                         processedImgs = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_LOGO );
-                        updateImage( id, processedImgs.get(CommonConstants.SQUARE_THUMBNAIL),  processedImgs.get(CommonConstants.RECTANGULAR_THUMBNAIL), CommonConstants.BRANCH_SETTINGS_COLLECTION,
-                            CommonConstants.IMAGE_TYPE_LOGO );
+                        updateImage( id, processedImgs.get( CommonConstants.SQUARE_THUMBNAIL ),
+                            processedImgs.get( CommonConstants.RECTANGULAR_THUMBNAIL ),
+                            CommonConstants.BRANCH_SETTINGS_COLLECTION, CommonConstants.IMAGE_TYPE_LOGO );
                     } catch ( Exception e ) {
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
                         try {
@@ -7747,7 +7755,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 for ( long id : images.keySet() ) {
                     try {
                         processedImgs = imageProcessor.processImage( images.get( id ), CommonConstants.IMAGE_TYPE_LOGO );
-                        updateImage( id, processedImgs.get(CommonConstants.SQUARE_THUMBNAIL),  processedImgs.get(CommonConstants.RECTANGULAR_THUMBNAIL), CommonConstants.AGENT_SETTINGS_COLLECTION, CommonConstants.IMAGE_TYPE_LOGO );
+                        updateImage( id, processedImgs.get( CommonConstants.SQUARE_THUMBNAIL ),
+                            processedImgs.get( CommonConstants.RECTANGULAR_THUMBNAIL ),
+                            CommonConstants.AGENT_SETTINGS_COLLECTION, CommonConstants.IMAGE_TYPE_LOGO );
                     } catch ( Exception e ) {
                         LOG.error( "Skipping... Could not process image: " + id + " : " + images.get( id ), e );
                         try {
@@ -7856,10 +7866,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
 
-    private void updateImage( long iden, String imgThumbnailFileName, String rectangularThumbnailFileName, String collectionName, String imageType ) throws InvalidInputException
+    private void updateImage( long iden, String imgThumbnailFileName, String rectangularThumbnailFileName,
+        String collectionName, String imageType ) throws InvalidInputException
     {
         LOG.debug( "Method updateImage started" );
-        updateImageForOrganizationUnitSetting( iden, null, imgThumbnailFileName, rectangularThumbnailFileName, collectionName, imageType, true, true );
+        updateImageForOrganizationUnitSetting( iden, null, imgThumbnailFileName, rectangularThumbnailFileName, collectionName,
+            imageType, true, true );
         LOG.debug( "Method updateImage finished" );
     }
 
@@ -7889,9 +7901,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             && settings.getSocialMediaTokens().getFacebookToken() != null ) {
             FacebookToken facebookToken = settings.getSocialMediaTokens().getFacebookToken();
             if ( facebookToken.getFacebookAccessTokenExpiresOn() != 0L ) {
-                if ( socialManagementService.checkFacebookTokenExpiry( facebookToken )  ) {
+                if ( socialManagementService.checkFacebookTokenExpiry( facebookToken ) ) {
                     //check if token is still expired
-                    socialMedias.add( CommonConstants.FACEBOOK_SOCIAL_SITE ); 
+                    socialMedias.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
                 }
             }
         }
@@ -7908,7 +7920,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.debug( "method getExpiredSocailMedia ended" );
         return new ArrayList<String>( socialMedias );
     }
-
 
 
     @Override
@@ -7987,7 +7998,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
         LOG.info( "method unsubscribeCompany finished" );
     }
-    
+
+
     @Override
     public void updateSortCriteriaForCompany( OrganizationUnitSettings companySettings, String sortCriteria )
         throws InvalidInputException
@@ -8004,7 +8016,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         LOG.debug( "Updated the isAccountDisabled successfully" );
     }
-    
+
+
     //JIRA SS-975
     @Override
     public void updateSendEmailThroughForCompany( OrganizationUnitSettings companySettings, String sendEmailThrough )
@@ -8022,9 +8035,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         LOG.debug( "Updated the sendemailthrough successfully" );
     }
-    
+
     //END JIRA SS-975
-    
+
 
     /**
      * 
@@ -8034,9 +8047,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @throws NonFatalException
      */
     @Override
-    public void processCancelSubscriptionRequest( OrganizationUnitSettings companySettings, boolean isAccountDisabled , long userId) throws NonFatalException{
-        
-        LOG.info( "processCancelSubscriptionRequest companySettings: " + companySettings + " with AccountDisabled: " + isAccountDisabled + " started");
+    public void processCancelSubscriptionRequest( OrganizationUnitSettings companySettings, boolean isAccountDisabled,
+        long userId ) throws NonFatalException
+    {
+
+        LOG.info( "processCancelSubscriptionRequest companySettings: " + companySettings + " with AccountDisabled: "
+            + isAccountDisabled + " started" );
         try {
             //Set isAccountDisabled in mongo
             organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
@@ -8047,30 +8063,33 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             if ( isAccountDisabled ) {
                 addDisabledAccount( companySettings.getIden(), false, userId );
                 //send mail to support admin
-                emailServices.sendCancelSubscriptionRequestAlertMail( applicationSupportEmail, applicationSupportName, companySettings.getContact_details().getName() );
+                emailServices.sendCancelSubscriptionRequestAlertMail( applicationSupportEmail, applicationSupportName,
+                    companySettings.getContact_details().getName() );
             } else {
                 inactiveDisabledAccount( companySettings.getIden() );
             }
         } catch ( InvalidInputException | NoRecordsFetchedException | PaymentException e ) {
-            LOG.error( "Error while processing cancel subscription for  company " + companySettings.getIden() ,e );
-           throw new NonFatalException("Error while processing cancel subscription");
+            LOG.error( "Error while processing cancel subscription for  company " + companySettings.getIden(), e );
+            throw new NonFatalException( "Error while processing cancel subscription" );
         }
-        
-        LOG.info( "processCancelSubscriptionRequest companySettings: " + companySettings + " with AccountDisabled: " + isAccountDisabled + " finished");
+
+        LOG.info( "processCancelSubscriptionRequest companySettings: " + companySettings + " with AccountDisabled: "
+            + isAccountDisabled + " finished" );
     }
-    
+
+
     /**
      * 
      * @param company
      * @throws NonFatalException 
      */
     @Override
-    public void processDeactivateCompany(Company company, long userId) throws NonFatalException
+    public void processDeactivateCompany( Company company, long userId ) throws NonFatalException
     {
-        
-        LOG.info( "processDeactivateCompany company: " + company.getCompanyId() + " started");
+
+        LOG.info( "processDeactivateCompany company: " + company.getCompanyId() + " started" );
         company.setStatus( CommonConstants.STATUS_INACTIVE );
-        try{
+        try {
             //adding entry to disable account
             DisabledAccount account = addDisabledAccount( company.getCompanyId(), true, userId );
             //updating company in mysql
@@ -8080,17 +8099,17 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             //Deactivate company in solr
             deleteCompanyFromSolr( company );
             //unsubscribeCompany
-            unsubscribeCompany(  company );
+            unsubscribeCompany( company );
             //send mail
             sendAccountDeletedNotificationMail( account );
         } catch ( InvalidInputException | NoRecordsFetchedException | PaymentException e ) {
-            LOG.error( "Error while Deativating company " + company.getCompanyId() ,e );
-            throw new NonFatalException("Error while processing Deactivate Company");
-         }
-        LOG.info( "processDeactivateCompany company: " + company.getCompanyId() + " finished");
+            LOG.error( "Error while Deativating company " + company.getCompanyId(), e );
+            throw new NonFatalException( "Error while processing Deactivate Company" );
+        }
+        LOG.info( "processDeactivateCompany company: " + company.getCompanyId() + " finished" );
     }
-    
-    
+
+
     @Override
     public void updateAllowPartnerSurveyForAllUsers( Set<Long> userIds, boolean allowPartnerSurvey )
         throws InvalidInputException
@@ -8102,50 +8121,56 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.info( "Updating AllowPartnerSurvey for users with allowPartnerSurvey value : " + allowPartnerSurvey );
         List<Object> userIdList = new ArrayList<Object>();
         userIdList.addAll( userIds );
-        
-        organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByInCriteria( MongoOrganizationUnitSettingDaoImpl.KEY_ALLOW_PARTNER_SURVEY, 
-            allowPartnerSurvey, MongoOrganizationUnitSettingDaoImpl.KEY_IDEN, userIdList, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+
+        organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByInCriteria(
+            MongoOrganizationUnitSettingDaoImpl.KEY_ALLOW_PARTNER_SURVEY, allowPartnerSurvey,
+            MongoOrganizationUnitSettingDaoImpl.KEY_IDEN, userIdList,
+            MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
 
         LOG.info( "Updated the AllowPartnerSurvey for users successfully" );
     }
-    
-    
+
+
     @Override
     public void updatellowPartnerSurveyForUser( AgentSettings agentSettings, boolean allowPartnerSurvey )
     {
         LOG.debug( "Inside method updatellowPartnerSurveyForUser for user : " + agentSettings.getIden() );
-        organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_ALLOW_PARTNER_SURVEY,
-            allowPartnerSurvey, agentSettings );
+        organizationUnitSettingsDao.updateParticularKeyAgentSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_ALLOW_PARTNER_SURVEY, allowPartnerSurvey, agentSettings );
     }
-    
-    
+
+
     @Override
     public boolean isPartnerSurveyAllowedForComapny( long companyId )
     {
         LOG.debug( "Inside method isPartnerSurveyAllowedForComapny for company : " + companyId );
-        OrganizationUnitSettings companySettings =  organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
-        if(companySettings != null){
-            if(companySettings.getCrm_info() != null){
-                if(companySettings.getCrm_info().isAllowPartnerSurvey())
+        OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        if ( companySettings != null ) {
+            if ( companySettings.getCrm_info() != null ) {
+                if ( companySettings.getCrm_info().isAllowPartnerSurvey() )
                     return true;
             }
         }
         return false;
     }
-        
-    public void updateSurveyAssignments( User user, List<UserProfile> userProfileList , long oldUserProfileId )
+
+
+    public void updateSurveyAssignments( User user, List<UserProfile> userProfileList, long oldUserProfileId )
     {
         LOG.debug( "Method updateBranchIdRegionIdForAllSurveysOfAgent() started for agentId + " + user.getUserId() );
-        for(UserProfile profile : userProfileList){
-            if(profile.getUserProfileId() != oldUserProfileId){
-                if(profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID){
-                    surveyDetailsDao.updateBranchIdRegionIdForAllSurveysOfAgent( user.getUserId(), profile.getBranchId(), profile.getRegionId() );
+        for ( UserProfile profile : userProfileList ) {
+            if ( profile.getUserProfileId() != oldUserProfileId ) {
+                if ( profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+                    surveyDetailsDao.updateBranchIdRegionIdForAllSurveysOfAgent( user.getUserId(), profile.getBranchId(),
+                        profile.getRegionId() );
                     break;
                 }
             }
         }
-        LOG.debug( "Method updateBranchIdRegionIdForAllSurveysOfAgent() finished for agentId + " +  user.getUserId() );
+        LOG.debug( "Method updateBranchIdRegionIdForAllSurveysOfAgent() finished for agentId + " + user.getUserId() );
     }
+
 
     @Override
     public List<User> getUsersUnderBranch( Branch branch ) throws InvalidInputException
@@ -8194,95 +8219,126 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
         LOG.info( "Method updateCompanyIdInMySQLForUser finished" );
     }
-    
-    
+
+
     @Override
     public List<EncompassSdkVersion> getActiveEncompassSdkVersions()
     {
         LOG.info( "Method getActiveEncompassSdkVersions started" );
         Map<String, Object> queries = new HashMap<String, Object>();
         queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
-        List<EncompassSdkVersion> encompassSdkVersions =  encompassSdkVersionDao.findByKeyValue( EncompassSdkVersion.class, queries );
+        List<EncompassSdkVersion> encompassSdkVersions = encompassSdkVersionDao.findByKeyValue( EncompassSdkVersion.class,
+            queries );
         LOG.info( "Method getActiveEncompassSdkVersions finisshed" );
         return encompassSdkVersions;
 
     }
-    
+
+
     @Override
-    public String getEncompassHostByVersion(String sdkVersion) throws InvalidInputException
+    public String getEncompassHostByVersion( String sdkVersion ) throws InvalidInputException
     {
         LOG.info( "Method getActiveEncompassSdkVersions started" );
         Map<String, Object> queries = new HashMap<String, Object>();
         queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
         queries.put( CommonConstants.ENCOMPASS_SDK_VERSION_COLUMN, sdkVersion );
-        List<EncompassSdkVersion> encompassSdkVersions =  encompassSdkVersionDao.findByKeyValue( EncompassSdkVersion.class, queries );
-        if(encompassSdkVersions == null || encompassSdkVersions.size() == 0){
-            throw new InvalidInputException("Unsupported Encompass Version");
+        List<EncompassSdkVersion> encompassSdkVersions = encompassSdkVersionDao.findByKeyValue( EncompassSdkVersion.class,
+            queries );
+        if ( encompassSdkVersions == null || encompassSdkVersions.size() == 0 ) {
+            throw new InvalidInputException( "Unsupported Encompass Version" );
         }
         LOG.info( "Method getActiveEncompassSdkVersions finisshed" );
-        return encompassSdkVersions.get(CommonConstants.INITIAL_INDEX).getHostName();
+        return encompassSdkVersions.get( CommonConstants.INITIAL_INDEX ).getHostName();
 
     }
-    
+
+
+    @Override
+    @Transactional
+    public List<CompanyView> getAllActiveEnterpriseCompanyViews()
+    {
+        List<Company> allCompanies = getAllActiveEnterpriseCompanies();
+        List<CompanyView> allCompanyViews = new ArrayList<>();
+        for ( Company company : allCompanies ) {
+            CompanyView companyView = new CompanyView();
+            companyView.setCompanyId( company.getCompanyId() );
+            companyView.setCompany( company.getCompany() );
+            allCompanyViews.add( companyView );
+        }
+        return allCompanyViews;
+
+    }
+
+
     @Override
     @Transactional
     public List<Company> getAllActiveEnterpriseCompanies()
     {
         LOG.info( "Method getAllActiveCompaniesByAccountType started" );
-        List<Company> companies =  companyDao.getCompaniesByStatusAndAccountMasterId( CommonConstants.STATUS_ACTIVE, CommonConstants.ACCOUNTS_MASTER_ENTERPRISE );
+        List<Company> companies = companyDao.getCompaniesByStatusAndAccountMasterId( CommonConstants.STATUS_ACTIVE,
+            CommonConstants.ACCOUNTS_MASTER_ENTERPRISE );
         LOG.info( "Method getAllActiveEnterpriseCompanies finisshed" );
         return companies;
 
     }
-    
+
+
     @Override
     @Transactional
-    public List<Company> getCompaniesByCompanyIds(Set<Long> companyIds)
+    public List<Company> getCompaniesByCompanyIds( Set<Long> companyIds )
     {
         LOG.info( "Method getCompaniesByCompanyIds started" );
-        List<Company> companies =companyDao.getCompanyListByIds( companyIds );
+        List<Company> companies = companyDao.getCompanyListByIds( companyIds );
         LOG.info( "Method getCompaniesByCompanyIds finisshed" );
         return companies;
 
     }
-    
-    
+
+
     @Override
     @Transactional
     public Map<Long, Long> getUsersCountForCompanies()
-    {   
+    {
         LOG.info( "Method getUsersCountForCompanies started" );
         Map<Long, Long> companiesUserCount = userDao.getUsersCountForCompanies();
         LOG.info( "Method getUsersCountForCompanies finisshed" );
         return companiesUserCount;
     }
-    
+
+
     @Override
     @Transactional
     public List<Long> getHiddenPublicPageCompanyIds()
     {
-        return organizationUnitSettingsDao.getHiddenPublicPagesEntityIds( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        return organizationUnitSettingsDao
+            .getHiddenPublicPagesEntityIds( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
     }
-    
+
+
     @Override
     @Transactional
     public List<Long> getHiddenPublicPageRegionIds()
     {
-        return organizationUnitSettingsDao.getHiddenPublicPagesEntityIds( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+        return organizationUnitSettingsDao
+            .getHiddenPublicPagesEntityIds( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
     }
-    
+
+
     @Override
     @Transactional
     public List<Long> getHiddenPublicPageBranchIds()
     {
-        return organizationUnitSettingsDao.getHiddenPublicPagesEntityIds( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+        return organizationUnitSettingsDao
+            .getHiddenPublicPagesEntityIds( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
     }
-    
+
+
     @Override
     @Transactional
     public List<Long> getHiddenPublicPageUserIds()
     {
-        return organizationUnitSettingsDao.getHiddenPublicPagesEntityIds( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+        return organizationUnitSettingsDao
+            .getHiddenPublicPagesEntityIds( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
     }
     
 
@@ -8300,7 +8356,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             MongoOrganizationUnitSettingDaoImpl.KEY_INCLUDE_FOR_TRANSACTION_MONITOR, includeForTransactionMonitor, companyId,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
     }
-        /**
+        
+    /**
      * 
      * @param companySettings
      * @param regionSettings
@@ -8313,6 +8370,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         OrganizationUnitSettings regionSettings, OrganizationUnitSettings branchSetting, OrganizationUnitSettings unitSettings )
     {
 
+        LOG.debug( "method  getFacebookPixelImageTagsFromHierarchy started");
         String facebookPixelTag = "";
 
         if ( companySettings != null && companySettings.getSocialMediaTokens() != null
@@ -8334,7 +8392,72 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             && unitSettings.getSocialMediaTokens().getFacebookPixelToken() != null )
             if ( !StringUtils.isEmpty( unitSettings.getSocialMediaTokens().getFacebookPixelToken().getPixelImgTag() ) )
                 facebookPixelTag += unitSettings.getSocialMediaTokens().getFacebookPixelToken().getPixelImgTag();
-
+        
+        LOG.debug( "the fenerated facebook pixel tag is : {}", facebookPixelTag );
+        LOG.debug( "method  getFacebookPixelImageTagsFromHierarchy finished");
         return facebookPixelTag;
+    }
+
+    @Override
+    public boolean updateDigestRecipients( OrganizationUnitSettings unitSettings, Set<String> emails, String collectionType )
+        throws InvalidInputException
+    {
+        if ( unitSettings == null ) {
+            LOG.warn( "settings are not specified" );
+            throw new InvalidInputException( "settings cannot be null." );
+        } else if ( StringUtils.isEmpty( collectionType ) ) {
+            LOG.warn( "target collection is not specified" );
+            throw new InvalidInputException( "target collection name cannot be null." );
+        }
+
+        LOG.debug( "Updating unitSettings: {} with digest recipients: {}", unitSettings, emails );
+
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_DIGEST_RECIPIENTS, emails, unitSettings,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        LOG.debug( "Updated the record successfully" );
+
+        return true;
+    }
+
+
+    @Override
+    public Set<String> parseEmailsList( String emailsStr )
+    {
+        LOG.debug( "method parseEmailsList() running" );
+        Set<String> emailList = null;
+
+        if ( emailsStr == null ) {
+            return emailList;
+        }
+
+        emailList = new HashSet<>();
+
+        for ( String email : StringUtils.deleteWhitespace( emailsStr ).split( "," ) ) {
+            if ( !StringUtils.isEmpty( email ) ) {
+                emailList.add( email );
+            }
+        }
+
+        return emailList;
+    }
+    
+    /**
+     * 
+     * @param alertType
+     * @return
+     */
+    @Override
+    public List<OrganizationUnitSettings> getCompaniesByAlertType(String alertType)
+    {
+        LOG.debug( "method getCompaniesByAlertType started for alertType {}" , alertType );
+        List<Company> companies =  getAllActiveEnterpriseCompanies();
+        List<Long> companyIds = new ArrayList<Long>();
+        
+        for(Company company : companies)
+            companyIds.add( company.getCompanyId() );
+        
+        LOG.debug( "method getCompaniesByAlertType finished for alertType {}" , alertType );
+        return organizationUnitSettingsDao.fetchCompaniesByAlertType( alertType, companyIds );   
     }
 }

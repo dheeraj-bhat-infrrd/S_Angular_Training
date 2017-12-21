@@ -27,7 +27,7 @@
 		<property name="hibernateProperties">
 			<props>
 				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
-				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.show_sql">false</prop>
 				<prop key="hibernate.enable_lazy_load_no_trans">true</prop>
 				<!-- Configurations specific to c3p0 connection pooling -->
 
@@ -58,6 +58,7 @@
 				<value>com.realtech.socialsurvey.core.entities.SurveyQuestionsAnswerOption</value>
 				<value>com.realtech.socialsurvey.core.entities.SurveyQuestionsMapping</value>
 				<value>com.realtech.socialsurvey.core.entities.SurveyVerticalMapping</value>
+				<value>com.realtech.socialsurvey.core.entities.Survey0To10Questions</value>
 				<value>com.realtech.socialsurvey.core.entities.User</value>
 				<value>com.realtech.socialsurvey.core.entities.UserInvite</value>
 				<value>com.realtech.socialsurvey.core.entities.UserProfile</value>
@@ -99,7 +100,7 @@
 		<property name="hibernateProperties">
 			<props>
 				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
-				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.show_sql">false</prop>
 				<prop key="hibernate.enable_lazy_load_no_trans">true</prop>
 				<!-- Configurations specific to c3p0 connection pooling -->
 
@@ -167,6 +168,8 @@
 				<value>com.realtech.socialsurvey.core.entities.SurveyResultsReportRegion</value>
 				<value>com.realtech.socialsurvey.core.entities.CompanyDetailsReport</value>
 				<value>com.realtech.socialsurvey.core.entities.ReportingSurveyPreInititation</value>
+				<value>com.realtech.socialsurvey.core.entities.NpsReportWeek</value>
+				<value>com.realtech.socialsurvey.core.entities.NpsReportMonth</value>
 			</list>
 		</property>
 	</bean>
