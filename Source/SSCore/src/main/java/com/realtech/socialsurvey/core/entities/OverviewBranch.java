@@ -95,6 +95,27 @@ public class OverviewBranch implements Serializable
     @Column ( name = "third_party")
     private int thirdParty;
     
+    @Column ( name = "nps_score")
+    private Double npsScore;
+
+    @Column ( name = "nps_detractors")
+    private int npsDetractors;
+
+    @Column ( name = "nps_detractors_percentage")
+    private float npsDetractorPercentage;
+
+    @Column ( name = "nps_passives")
+    private int npsPassives;
+
+    @Column ( name = "nps_passives_percentage")
+    private float npsPassivesPercentage;
+
+    @Column ( name = "nps_promoters")
+    private int npsPromoters;
+
+    @Column ( name = "nps_promoter_percentage")
+    private float npsPromoterPercentage;
+    
     public String getOverviewBranchId()
     {
         return overviewBranchId;
@@ -351,6 +372,77 @@ public class OverviewBranch implements Serializable
         this.thirdParty = thirdParty;
     }
 
+    
+    public Double getNpsScore()
+    {
+        return npsScore;
+    }
+
+    public void setNpsScore( Double npsScore )
+    {
+        this.npsScore = npsScore;
+    }
+
+    public int getNpsDetractors()
+    {
+        return npsDetractors;
+    }
+
+    public void setNpsDetractors( int npsDetractors )
+    {
+        this.npsDetractors = npsDetractors;
+    }
+
+    public float getNpsDetractorPercentage()
+    {
+        return npsDetractorPercentage;
+    }
+
+    public void setNpsDetractorPercentage( float npsDetractorPercentage )
+    {
+        this.npsDetractorPercentage = npsDetractorPercentage;
+    }
+
+    public int getNpsPassives()
+    {
+        return npsPassives;
+    }
+
+    public void setNpsPassives( int npsPassives )
+    {
+        this.npsPassives = npsPassives;
+    }
+
+    public float getNpsPassivesPercentage()
+    {
+        return npsPassivesPercentage;
+    }
+
+    public void setNpsPassivesPercentage( float npsPassivesPercentage )
+    {
+        this.npsPassivesPercentage = npsPassivesPercentage;
+    }
+
+    public int getNpsPromoters()
+    {
+        return npsPromoters;
+    }
+
+    public void setNpsPromoters( int npsPromoters )
+    {
+        this.npsPromoters = npsPromoters;
+    }
+
+    public float getNpsPromoterPercentage()
+    {
+        return npsPromoterPercentage;
+    }
+
+    public void setNpsPromoterPercentage( float npsPromoterPercentage )
+    {
+        this.npsPromoterPercentage = npsPromoterPercentage;
+    }
+
     @Override
     public String toString()
     {
@@ -362,7 +454,10 @@ public class OverviewBranch implements Serializable
             + ", totalSurveySent=" + totalSurveySent + ", completed=" + completed + ", socialPosts=" + socialPosts
             + ", zillowReviews=" + zillowReviews + ", totalReviews=" + totalReviews + ", rating=" + rating
             + ", completedPercentage=" + completedPercentage + ", incompletePercentage=" + incompletePercentage + ", processed="
-            + processed + ", unprocessed=" + unprocessed + ", thirdParty=" + thirdParty + "]";
+            + processed + ", unprocessed=" + unprocessed + ", thirdParty=" + thirdParty + ", npsScore=" + npsScore
+            + ", npsDetractors=" + npsDetractors + ", npsDetractorPercentage=" + npsDetractorPercentage + ", npsPassives="
+            + npsPassives + ", npsPassivesPercentage=" + npsPassivesPercentage + ", npsPromoters=" + npsPromoters
+            + ", npsPromoterPercentage=" + npsPromoterPercentage + "]";
     }
     
     

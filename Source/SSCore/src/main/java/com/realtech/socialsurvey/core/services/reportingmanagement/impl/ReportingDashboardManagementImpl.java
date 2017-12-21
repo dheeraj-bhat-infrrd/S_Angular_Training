@@ -21,10 +21,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -46,6 +48,8 @@ import com.realtech.socialsurvey.core.dao.CompanyDetailsReportDao;
 import com.realtech.socialsurvey.core.dao.CompanyUserReportDao;
 import com.realtech.socialsurvey.core.dao.DigestDao;
 import com.realtech.socialsurvey.core.dao.FileUploadDao;
+import com.realtech.socialsurvey.core.dao.NpsReportMonthDao;
+import com.realtech.socialsurvey.core.dao.NpsReportWeekDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.RegionDao;
 import com.realtech.socialsurvey.core.dao.ReportingSurveyPreInititationDao;
@@ -96,6 +100,8 @@ import com.realtech.socialsurvey.core.entities.DigestTemplateData;
 import com.realtech.socialsurvey.core.entities.EntityAlertDetails;
 import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.MonthlyDigestAggregate;
+import com.realtech.socialsurvey.core.entities.NpsReportMonth;
+import com.realtech.socialsurvey.core.entities.NpsReportWeek;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RankingRequirements;
 import com.realtech.socialsurvey.core.entities.Region;
@@ -312,6 +318,12 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     @Autowired
     private ReportingSurveyPreInititationDao reportingSurveyPreInititationDao;
 
+    @Autowired
+    private NpsReportWeekDao npsReportWeekDao;
+
+    @Autowired
+    private NpsReportMonthDao npsReportMonthDao;
+
     @Value ( "${FILE_DIRECTORY_LOCATION}")
     private String fileDirectoryLocation;
 
@@ -379,7 +391,12 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_INCOMPLETE_SURVEY_REPORT );
         } else if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_DETAILS_REPORT ) {
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_DETAILS_REPORT );
+        } else if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_NPS_WEEK_REPORT ) {
+            fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_NPS_WEEK_REPORT );
+        } else if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_NPS_MONTH_REPORT ) {
+            fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_NPS_MONTH_REPORT );
         }
+        
         //get the time 23:59:59 in milliseconds
         long duration = ( ( ( 23 * 60 ) * 60 ) + ( 59 * 60 ) + 59 ) * 1000l;
 
@@ -1690,7 +1707,11 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 recentActivityList.add( CommonConstants.REPORTING_USER_RANKING_YEARLY_REPORT );
             } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_INCOMPLETE_SURVEY_REPORT ) {
                 recentActivityList.add( CommonConstants.REPORTING_INCOMPLETE_SURVEY_REPORT );
+            } else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_NPS_WEEK_REPORT 
+                || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_NPS_MONTH_REPORT){
+                recentActivityList.add( CommonConstants.REPORTING_NPS_REPORT );
             }
+            
             recentActivityList.add( fileUpload.getStartDate() );
             recentActivityList.add( fileUpload.getEndDate() );
             recentActivityList.add( user.getFirstName() );
@@ -2127,6 +2148,20 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         CellStyle style = wb.createCellStyle();//Create style
         Font font = wb.createFont();//Create font
         font.setBoldweight( Font.BOLDWEIGHT_BOLD );//Make font bold
+        style.setFont( font );//set it to bold
+
+        for ( int i = 0; i < row.getLastCellNum(); i++ ) {//For each cell in the row 
+            row.getCell( i ).setCellStyle( style );//Set the sty;e
+        }
+    }
+    //Make row bold and blue for NPS report
+    public static void makeRowBoldAndBlue( XSSFWorkbook wb, Row row )
+    {
+        CellStyle style = wb.createCellStyle();//Create style
+        Font font = wb.createFont();//Create font
+        font.setBoldweight( Font.BOLDWEIGHT_BOLD );//Make font bold
+        style.setFillForegroundColor(IndexedColors.BLUE.index);
+        style.setFillPattern(CellStyle.SOLID_FOREGROUND);
         style.setFont( font );//set it to bold
 
         for ( int i = 0; i < row.getLastCellNum(); i++ ) {//For each cell in the row 
@@ -3936,6 +3971,148 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         return reportingSurveyPreInititationDao.getIncompleteSurveyForReporting( entityType, entityId, startTime, endTime,
             startIndex, batchSize );
     }
+
+    @Override
+    @Transactional
+    public List<NpsReportWeek> getNpsReportForAWeek( long companyId, int week, int year ) throws InvalidInputException
+    {
+        LOG.debug( "Started fetching NPS report for a week" );
+        List<NpsReportWeek> npsReportForWeekList = new ArrayList<>();
+        
+        if ( companyId <= 0 ) {
+            LOG.warn( "company Identifier can not be null" );
+            throw new InvalidInputException( "company ID is null." );
+        } else if ( week < 1 || week > 53 ) {
+            LOG.warn( "week not in range" );
+            throw new InvalidInputException( "week not in range" );
+        }
+        if ( year <= 0 ) {
+            LOG.warn( "year not in range" );
+            throw new InvalidInputException( "year not in range" );
+        }
+
+        npsReportForWeekList = npsReportWeekDao.fetchNpsReportWeek( companyId, week, year );
+        LOG.debug( "Finished fetching NPS report for a week" );
+        return npsReportForWeekList;
+    }
+
+
+    @Override
+    @Transactional
+    public List<NpsReportMonth> getNpsReportForAMonth( long companyId, int month, int year ) throws InvalidInputException
+    {
+        LOG.debug( "Started fetching NPS report for a month" );
+        List<NpsReportMonth> npsReportForMonthList = new ArrayList<>();
+        
+        if ( companyId <= 0 ) {
+            LOG.warn( "company Identifier can not be null" );
+            throw new InvalidInputException( "company ID is null." );
+        } else if ( month <= 0 || month > 12 ) {
+            LOG.warn( "month not in range" );
+            throw new InvalidInputException( "month not in range" );
+        }
+        if ( year <= 0 ) {
+            LOG.warn( "year not in range" );
+            throw new InvalidInputException( "year not in range" );
+        }
+
+        npsReportForMonthList = npsReportMonthDao.fetchNpsReportMonth( companyId, month, year );
+        LOG.debug( "Finished fetching NPS report for a week" );
+        return npsReportForMonthList;
+    }
+
+
+    @Override
+    @Transactional
+    public String generateNpsReportForWeekOrMonth( long profileValue, String profileLevel, Timestamp startDate, int type ) throws ParseException, UnsupportedEncodingException, NonFatalException
+    {
+        if(!profileLevel.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) || profileValue <= 0 ){
+            LOG.warn( "ProfileValue or profileLevel is not valid" );
+            throw new InvalidInputException("ProfileValue or profileLevel is not valid");
+        }
+        LOG.info( "Generating NPS report for profileValue {}, profileLevel {}",profileValue, profileLevel);
+        String fileName = "NPS_Report" + "-" + ( Calendar.getInstance().getTimeInMillis() ) 
+                + CommonConstants.EXCEL_FILE_EXTENSION;
+        LOG.debug( "fileName {} ", fileName );
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(startDate);
+        int week = calendar.get(Calendar.WEEK_OF_YEAR);
+        int month = calendar.get( Calendar.MONTH) + 1;
+        int year = calendar.get(Calendar.YEAR);
+        XSSFWorkbook workbook = this.downloadNPSReport( profileValue, profileLevel, year, month, week, type );
+        if(LOG.isDebugEnabled() && workbook != null && workbook.getSheetAt( 0 ) != null)
+            LOG.debug( "Writing {} number of records into file {}", workbook.getSheetAt( 0 ).getLastRowNum(), fileName );
+        return createExcelFileAndSaveInAmazonS3( fileName, workbook );
+    }
+    
+
+    public XSSFWorkbook downloadNPSReport(long profileValue, String profileLevel, int year, int month, int week, int type )
+    {
+        Map<Integer, List<Object>> data = workbookData.writeNPSWeekReportHeader(type);
+        XSSFWorkbook workBook = null;
+        Response response = ssApiBatchIntergrationBuilder.getIntegrationApi().getNpsReportForWeekOrMonth( week, month, profileValue, year, type );
+        String responseString = response != null ? new String( ( (TypedByteArray) response.getBody() ).getBytes() ) : null;
+        if ( responseString != null ) {
+            //since the string has ""abc"" an extra quote
+            responseString = responseString.substring( 1, responseString.length() - 1 );
+            //Escape characters
+            responseString = StringEscapeUtils.unescapeJava( responseString );
+            List<NpsReportWeek> npsReportWeekList = null;
+            List<NpsReportMonth> npsReportMonthList = null;
+            if(type == CommonConstants.NPS_REPORT_TYPE_WEEK){
+                Type listType = new TypeToken<List<NpsReportWeek>>() {}.getType();
+                npsReportWeekList = new Gson().fromJson( responseString, listType );
+                data = workbookData.getNpsReportWeekToBeWrittenInSheet( data, npsReportWeekList );
+                workBook = workbookOperations.createWorkbook( data );
+                workBook = formatForNPSReportWeek(workBook,npsReportWeekList);
+            }
+            else if(type == CommonConstants.NPS_REPORT_TYPE_MONTH){
+                Type listType = new TypeToken<List<NpsReportMonth>>() {}.getType();
+                npsReportMonthList = new Gson().fromJson( responseString, listType );
+                data = workbookData.getNpsReportMonthToBeWrittenInSheet( data, npsReportMonthList);
+                workBook = workbookOperations.createWorkbook( data );
+                workBook = formatForNPSReportMonth(workBook,npsReportMonthList);
+            }
+            
+        }
+        return workBook;
+    }
+
+	private XSSFWorkbook formatForNPSReportMonth(XSSFWorkbook workBook, List<NpsReportMonth> npsReportMonthList) {
+		makeRowBoldAndBlue(workBook, workBook.getSheetAt(0).getRow(0));
+		makeRowBoldAndBlue(workBook, workBook.getSheetAt(0).getRow(1));
+		int rownum = 1;
+
+		for (NpsReportMonth npsReportMonth : npsReportMonthList) {
+			if (npsReportMonth.getBranchId() == 0 && npsReportMonth.getRegionId() == 0) {
+				CellStyle style = workBook.createCellStyle();
+				style.setAlignment(CellStyle.ALIGN_CENTER);
+				style.setFillBackgroundColor(IndexedColors.BLUE.index);
+			} else if (npsReportMonth.getBranchId() == 0 && npsReportMonth.getRegionId() > 0) {
+				makeRowBold(workBook, workBook.getSheetAt(0).getRow(rownum));
+			}
+			rownum++;
+		}
+		return workBook;
+	}
+
+	private XSSFWorkbook formatForNPSReportWeek(XSSFWorkbook workBook, List<NpsReportWeek> npsReportWeekList) {
+		makeRowBoldAndBlue(workBook, workBook.getSheetAt(0).getRow(0));
+		makeRowBoldAndBlue(workBook, workBook.getSheetAt(0).getRow(1));
+		int rownum = 1;
+
+		for (NpsReportWeek npsReportWeek : npsReportWeekList) {
+			if (npsReportWeek.getBranchId() == 0 && npsReportWeek.getRegionId() == 0) {
+				CellStyle style = workBook.createCellStyle();
+				style.setAlignment(CellStyle.ALIGN_CENTER);
+				style.setFillBackgroundColor(IndexedColors.BLUE.index);
+			} else if (npsReportWeek.getBranchId() == 0 && npsReportWeek.getRegionId() > 0) {
+				makeRowBold(workBook, workBook.getSheetAt(0).getRow(rownum));
+			}
+			rownum++;
+		}
+		return workBook;
+	}
     
     @Override
     public void updateTransactionMonitorAlertsForCompanies() throws InvalidInputException

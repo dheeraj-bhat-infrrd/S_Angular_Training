@@ -37,6 +37,8 @@ import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyDetailsReport;
+import com.realtech.socialsurvey.core.entities.NpsReportMonth;
+import com.realtech.socialsurvey.core.entities.NpsReportWeek;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.ReportingSurveyPreInititation;
@@ -1291,5 +1293,96 @@ public class WorkbookData
             incompleteSurveyCounter++;
         }
         return incompleteSurveyData;
+    }
+    
+    public Map<Integer, List<Object>> getNpsReportWeekToBeWrittenInSheet(
+        Map<Integer, List<Object>> data, List<NpsReportWeek> npsReportWeekList )
+    {
+        Integer npsReportWeekCounter = 2;
+        List<Object> npsWeeklyReportToPopulate = null;
+        for(NpsReportWeek npsReportWeek : npsReportWeekList) {
+            npsWeeklyReportToPopulate = new ArrayList<Object>();
+            if(npsReportWeek.getBranchId() == 0 && npsReportWeek.getRegionId() == 0){
+                npsWeeklyReportToPopulate.add( npsReportWeek.getCompanyName() );
+                npsWeeklyReportToPopulate.add( npsReportWeek.getCompanyId() );
+            }
+            else if(npsReportWeek.getBranchId() == 0 && npsReportWeek.getRegionId() > 0){
+                npsWeeklyReportToPopulate.add( npsReportWeek.getRegionName() );
+                npsWeeklyReportToPopulate.add( npsReportWeek.getRegionId() );
+            }
+            else if(npsReportWeek.getBranchId() > 0 ){
+                npsWeeklyReportToPopulate.add( npsReportWeek.getBranchName() );
+                npsWeeklyReportToPopulate.add( npsReportWeek.getBranchId() );
+            }
+            npsWeeklyReportToPopulate.add( npsReportWeek.getNps() );
+            npsWeeklyReportToPopulate.add( npsReportWeek.getPreviousWeekNps() );
+            npsWeeklyReportToPopulate.add( npsReportWeek.getNpsDelta() );
+            npsWeeklyReportToPopulate.add( npsReportWeek.getResponders() );
+            npsWeeklyReportToPopulate.add( npsReportWeek.getResponsePercent() );
+            npsWeeklyReportToPopulate.add( npsReportWeek.getAvgNpsRating() );
+            npsWeeklyReportToPopulate.add( npsReportWeek.getPromotorsPercent() );
+            npsWeeklyReportToPopulate.add( npsReportWeek.getDetractorsPercent() );
+            data.put( npsReportWeekCounter, npsWeeklyReportToPopulate );
+            npsReportWeekCounter++;
+        }
+        return data;
+        
+    }
+    
+    public Map<Integer, List<Object>> getNpsReportMonthToBeWrittenInSheet(
+        Map<Integer, List<Object>> data, List<NpsReportMonth> npsReportMonthList )
+    {
+        Integer npsReportMonthCounter = 2;
+        List<Object> npsMonthlyReportToPopulate = null;
+        for(NpsReportMonth npsReportMonth : npsReportMonthList) {
+            npsMonthlyReportToPopulate = new ArrayList<Object>();
+            if(npsReportMonth.getBranchId() == 0 && npsReportMonth.getRegionId() == 0){
+                npsMonthlyReportToPopulate.add( npsReportMonth.getCompanyName() );
+                npsMonthlyReportToPopulate.add( npsReportMonth.getCompanyId() );
+            }
+            else if(npsReportMonth.getBranchId() == 0 && npsReportMonth.getRegionId() > 0){
+                npsMonthlyReportToPopulate.add( npsReportMonth.getRegionName() );
+                npsMonthlyReportToPopulate.add( npsReportMonth.getRegionId() );
+            }
+            else if(npsReportMonth.getBranchId() > 0){
+                npsMonthlyReportToPopulate.add( npsReportMonth.getBranchName() );
+                npsMonthlyReportToPopulate.add( npsReportMonth.getBranchId() );
+            }
+            npsMonthlyReportToPopulate.add( npsReportMonth.getNps() );
+            npsMonthlyReportToPopulate.add( npsReportMonth.getPreviousMonthNps() );
+            npsMonthlyReportToPopulate.add( npsReportMonth.getNpsDelta() );
+            npsMonthlyReportToPopulate.add( npsReportMonth.getResponders() );
+            npsMonthlyReportToPopulate.add( npsReportMonth.getResponsePercent() );
+            npsMonthlyReportToPopulate.add( npsReportMonth.getAvgNpsRating() );
+            npsMonthlyReportToPopulate.add( npsReportMonth.getPromotorsPercent() );
+            npsMonthlyReportToPopulate.add( npsReportMonth.getDetractorsPercent() );
+            data.put( npsReportMonthCounter, npsMonthlyReportToPopulate );
+            npsReportMonthCounter++;
+        }
+        return data;
+        
+    }
+    
+    public Map<Integer, List<Object>> writeNPSWeekReportHeader(int type)
+    {
+        Map<Integer, List<Object>> npsWeekReportData = new TreeMap<Integer, List<Object>>();
+        List<Object> npsWeekReportDataToPopulate = new ArrayList<Object>();
+        // Setting up user sheet headers
+        npsWeekReportDataToPopulate.add( "Company/Region/Station" );
+        npsWeekReportDataToPopulate.add( "Id" );
+        npsWeekReportDataToPopulate.add( "NPS" );
+        if(type == 1){
+            npsWeekReportDataToPopulate.add( "Previous Week NPS" );
+        } else if(type == 2){
+            npsWeekReportDataToPopulate.add( "Previous Month NPS" );
+        }
+        npsWeekReportDataToPopulate.add( "NPS Score Δ" );
+        npsWeekReportDataToPopulate.add( "Responders" );
+        npsWeekReportDataToPopulate.add( "Response %" );
+        npsWeekReportDataToPopulate.add( "Avg. NPS Rating" );
+        npsWeekReportDataToPopulate.add( "Promotors" );
+        npsWeekReportDataToPopulate.add( "Detractors" );
+        npsWeekReportData.put( 1, npsWeekReportDataToPopulate );
+        return npsWeekReportData;
     }
 }

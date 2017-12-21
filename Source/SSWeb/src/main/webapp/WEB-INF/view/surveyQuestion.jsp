@@ -140,6 +140,55 @@
 					</div>
 				</div>
 
+				<!-- Div for 1-10 rating questions -->
+				<div data-ques-type="sb-range-0to10" class="sq-quest-item hide">
+					<div class="sq-main-txt"></div>
+					<div class="sq-ques">
+						<i><span id="ques-text-1to10" class="sq-ques-txt"></span></i>
+					</div>
+					<div class="sq-bord-bot-sm"></div>
+					<div id="sq-radio-1to10" class="sq-1to10-range" selected-rating-radio="">
+						<div class="radio-container">
+							<div class="container-1to10 inner-container-1to10">
+								<c:forEach begin="0" end="10" varStatus="loop">
+    								<%-- <div class="radio-1to10">
+  										<input type="radio" name="sb-range-0to10"><label></label>
+									</div> --%>
+									<c:choose>
+										<c:when test="${loop.index == 0}">
+											<div class="radio-div" style="margin-left:10px">
+												<div class="radio-outer-gray sq-radio" id="radio-${loop.index}">
+													<div class="radio-inner hide"></div>
+												</div>
+											</div>
+										</c:when>
+										<c:otherwise>
+											<div class="radio-div">
+												<div class="radio-outer-gray sq-radio" id="radio-${loop.index}">
+													<div class="radio-inner hide"></div>
+												</div>
+											</div>
+										</c:otherwise>
+									</c:choose>
+								</c:forEach>
+							</div>
+							<div class="container-1to10">
+								<c:forEach begin="0" end="10" varStatus="numLoop">
+									<div class="span-1to10">${numLoop.index}</div>
+								</c:forEach>
+							</div>
+							<div class="sq-1to10-range-val">
+                                <div id="notAtAllLikelyDiv" style="float:left">Not at all likely</div>
+    							<div id="veryLikelyDiv" style="float:right;">Very Likely</div>
+							</div>
+						</div>
+					</div>
+					<div class="sq-np-wrapper clearfix">
+						<div id="prev-radio" class="float-left sq-np-item sq-np-item-prev btn-com"><spring:message code="label.prev.btn.key"/></div>
+						<div id="next-radio" class="float-left sq-np-item sq-np-item-next btn-com"><spring:message code="label.nxt.btn.key"/></div>
+					</div>
+				</div>
+				
 				<!-- For text area -->
 				<div data-ques-type="smiley-text-final" class="sq-quest-item hide">
 					<!-- <div class="sq-top-img"></div> -->
