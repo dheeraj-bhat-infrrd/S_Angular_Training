@@ -4080,7 +4080,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
 	private XSSFWorkbook formatForNPSReportMonth(XSSFWorkbook workBook, List<NpsReportMonth> npsReportMonthList) {
 		makeRowBoldAndBlue(workBook, workBook.getSheetAt(0).getRow(0));
-		if(workBook.getSheetAt(0).getRow(1) == null || workBook.getSheetAt(1).getRow(1) == null){
+		if(workBook.getSheetAt(0).getRow(1) == null || workBook.getSheetAt(0).getRow(1) == null){
 			return workBook;
 		}
 		makeRowBoldAndBlue(workBook, workBook.getSheetAt(0).getRow(1));
@@ -4101,7 +4101,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
 	private XSSFWorkbook formatForNPSReportWeek(XSSFWorkbook workBook, List<NpsReportWeek> npsReportWeekList) {
 		makeRowBoldAndBlue(workBook, workBook.getSheetAt(0).getRow(0));
-		if(workBook.getSheetAt(0).getRow(1) == null || workBook.getSheetAt(1).getRow(1) == null){
+		if(workBook.getSheetAt(0).getRow(1) == null || workBook.getSheetAt(0).getRow(1) == null){
 			return workBook;
 		}
 		makeRowBoldAndBlue(workBook, workBook.getSheetAt(0).getRow(1));
