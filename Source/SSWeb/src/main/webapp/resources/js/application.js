@@ -3595,10 +3595,10 @@ $(document).on('click', '#user-ranking-chkbox-wrapper-new', function() {
 $(document).on('click', '#user-ranking-chkbox-nps-wrapper', function() {
 	if ($('#user-ranking-nps-chkbox').hasClass('bd-check-img-checked')) {		
 		$('#user-ranking-nps-chkbox').removeClass('bd-check-img-checked');
-		 $('#user-ranking-nps-ques').val(true);
+		 $('#user-ranking-ques').val(true);
 	} else {		
 		$('#user-ranking-nps-chkbox').addClass('bd-check-img-checked')
-		 $('#user-ranking-nps-ques').val(false);
+		 $('#user-ranking-ques').val(false);
 	}
 });
 
@@ -3616,30 +3616,30 @@ $(document).on('click', '#user-ranking-chkbox-wrapper-nps', function() {
 $(document).on('click', '#user-ranking-chkbox-wrapper-edit-nps', function() {
 	if ($('#user-ranking-chkbox-edit-nps').hasClass('bd-check-img-checked')) {		
 		$('#user-ranking-chkbox-edit-nps').removeClass('bd-check-img-checked');
-		 $('#user-ranking-ques-edit-nps').val(true);
+		 $('#user-ranking-ques-edit').val(true);
 	} else {		
 		$('#user-ranking-chkbox-edit-nps').addClass('bd-check-img-checked')
-		 $('#user-ranking-ques-edit-nps').val(false);
+		 $('#user-ranking-ques-edit').val(false);
 	}
 });
 
-$(document).on('click', '#user-ranking-chkbox-wrapper-overlay', function() {
+$(document).on('click', '#user-ranking-chkbox-wrapper-overlay-nps', function() {
 	if ($('#user-ranking-chkbox-overlay-nps').hasClass('bd-check-img-checked')) {		
 		$('#user-ranking-chkbox-overlay-nps').removeClass('bd-check-img-checked');
-		 $('#user-ranking-ques-overlay-nps').val(true);
+		 $('#user-ranking-ques-overlay').val(true);
 	} else {		
 		$('#user-ranking-chkbox-overlay-nps').addClass('bd-check-img-checked')
-		 $('#user-ranking-ques-overlay-nps').val(false);
+		 $('#user-ranking-ques-overlay').val(false);
 	}
 });
 
 $(document).on('click', '#user-ranking-chkbox-wrapper-new-nps', function() {
 	if ($('#user-ranking-chkbox-new-nps').hasClass('bd-check-img-checked')) {		
 		$('#user-ranking-chkbox-new-nps').removeClass('bd-check-img-checked');
-		 $('#user-ranking-ques-new-nps').val(true);
+		 $('#user-ranking-ques-new').val(true);
 	} else {		
 		$('#user-ranking-chkbox-new-nps').addClass('bd-check-img-checked')
-		 $('#user-ranking-ques-new-nps').val(false);
+		 $('#user-ranking-ques-new').val(false);
 	}
 });
 

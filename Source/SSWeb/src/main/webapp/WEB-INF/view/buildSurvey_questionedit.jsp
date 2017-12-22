@@ -16,7 +16,7 @@
 	<c:set value="true" var="isUserRankingQuestionVal" />
 </c:if>
 
-<c:set value="false" var="considerForScoreVal" />
+<c:set value="true" var="considerForScoreVal" />
 <c:if test="${considerForScore == 1}">
 	<c:set value="true" var="considerForScoreVal" />
 </c:if>
@@ -107,7 +107,6 @@
 					<div class="bd-q-pu-done-wrapper bd-q-pu-done-wrapper-override clearfix">
 						<div id="user-ranking-chkbox-wrapper-edit-nps" class="clearfix" style="width: 200px;">
 							<div id="user-ranking-chkbox-edit-nps" class='float-left user-ranking-chkbox bd-check-img <c:if test="${ isUserRankingQuestion == 0}">bd-check-img-checked</c:if>'></div>
-							<input type="hidden" id="user-ranking-ques-edit-nps" name="user-ranking-ques" value=${ isUserRankingQuestionVal }>
 							<div class="float-left  listing-access-txt cursor-pointer">Considered for User Ranking</div>
 						</div>
 						<div id="avg-score-chkbox-wrapper-edit" class="clearfix" style="width: 210px;"> 
