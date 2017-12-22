@@ -1707,9 +1707,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 recentActivityList.add( CommonConstants.REPORTING_USER_RANKING_YEARLY_REPORT );
             } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_INCOMPLETE_SURVEY_REPORT ) {
                 recentActivityList.add( CommonConstants.REPORTING_INCOMPLETE_SURVEY_REPORT );
-            } else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_NPS_WEEK_REPORT 
-                || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_NPS_MONTH_REPORT){
-                recentActivityList.add( CommonConstants.REPORTING_NPS_REPORT );
+            } else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_NPS_WEEK_REPORT ) { 
+                recentActivityList.add( CommonConstants.REPORTING_NPS_REPORT_FOR_WEEK );
+            } else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_NPS_MONTH_REPORT) {
+                recentActivityList.add( CommonConstants.REPORTING_NPS_REPORT_FOR_MONTH );
             }
             
             recentActivityList.add( fileUpload.getStartDate() );
