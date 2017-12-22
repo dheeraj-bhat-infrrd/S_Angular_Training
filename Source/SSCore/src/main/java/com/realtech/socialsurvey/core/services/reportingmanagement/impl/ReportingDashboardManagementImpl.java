@@ -2161,7 +2161,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         CellStyle style = wb.createCellStyle();//Create style
         Font font = wb.createFont();//Create font
         font.setBoldweight( Font.BOLDWEIGHT_BOLD );//Make font bold
-        style.setFillForegroundColor(IndexedColors.BLUE.index);
+        style.setFillForegroundColor(IndexedColors.LIGHT_BLUE.index);
         style.setFillPattern(CellStyle.SOLID_FOREGROUND);
         style.setFont( font );//set it to bold
 
@@ -4081,6 +4081,9 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
 	private XSSFWorkbook formatForNPSReportMonth(XSSFWorkbook workBook, List<NpsReportMonth> npsReportMonthList) {
 		makeRowBoldAndBlue(workBook, workBook.getSheetAt(0).getRow(0));
+		if(workBook.getSheetAt(0).getRow(1) == null || workBook.getSheetAt(1).getRow(1) == null){
+			return workBook;
+		}
 		makeRowBoldAndBlue(workBook, workBook.getSheetAt(0).getRow(1));
 		int rownum = 1;
 
@@ -4088,7 +4091,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 			if (npsReportMonth.getBranchId() == 0 && npsReportMonth.getRegionId() == 0) {
 				CellStyle style = workBook.createCellStyle();
 				style.setAlignment(CellStyle.ALIGN_CENTER);
-				style.setFillBackgroundColor(IndexedColors.BLUE.index);
+				style.setFillBackgroundColor(IndexedColors.AQUA.index);
 			} else if (npsReportMonth.getBranchId() == 0 && npsReportMonth.getRegionId() > 0) {
 				makeRowBold(workBook, workBook.getSheetAt(0).getRow(rownum));
 			}
@@ -4099,6 +4102,9 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
 	private XSSFWorkbook formatForNPSReportWeek(XSSFWorkbook workBook, List<NpsReportWeek> npsReportWeekList) {
 		makeRowBoldAndBlue(workBook, workBook.getSheetAt(0).getRow(0));
+		if(workBook.getSheetAt(0).getRow(1) == null || workBook.getSheetAt(1).getRow(1) == null){
+			return workBook;
+		}
 		makeRowBoldAndBlue(workBook, workBook.getSheetAt(0).getRow(1));
 		int rownum = 1;
 
@@ -4106,7 +4112,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 			if (npsReportWeek.getBranchId() == 0 && npsReportWeek.getRegionId() == 0) {
 				CellStyle style = workBook.createCellStyle();
 				style.setAlignment(CellStyle.ALIGN_CENTER);
-				style.setFillBackgroundColor(IndexedColors.BLUE.index);
+				style.setFillBackgroundColor(IndexedColors.AQUA.index);
 			} else if (npsReportWeek.getBranchId() == 0 && npsReportWeek.getRegionId() > 0) {
 				makeRowBold(workBook, workBook.getSheetAt(0).getRow(rownum));
 			}
