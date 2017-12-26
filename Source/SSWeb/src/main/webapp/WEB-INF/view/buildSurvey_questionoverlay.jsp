@@ -117,7 +117,6 @@
 					<div class="bd-q-pu-done-wrapper bd-q-pu-done-wrapper-override clearfix">
 						<div id="user-ranking-chkbox-wrapper-overlay-nps" class="clearfix" style="width: 200px;">
 							<div id="user-ranking-chkbox-overlay-nps" class="float-left user-ranking-chkbox bd-check-img"></div>
-							<input type="hidden" id="user-ranking-ques-overlay-nps" name="user-ranking-ques" value=true>
 							<div class="float-left  listing-access-txt cursor-pointer">Consider for User Ranking</div>
 						</div>
 						<div id="avg-score-chkbox-wrapper-overlay" class="clearfix" style="width: 210px;">
