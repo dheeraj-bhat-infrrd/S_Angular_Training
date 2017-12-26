@@ -104,6 +104,16 @@ public class SurveyResultsReportBranch implements Serializable {
     
     @Transient
     private List<SurveyResponseTable> surveyResponseList;
+    
+    //SS-1505 ADD FEILDS
+    @Column(name = "PARTICIPANT_TYPE")
+    private String participantType;
+    
+    @Column(name = "AGENT_EMAILID")
+    private String agentEmailId;
+    
+    @Column(name = "CUSTOMER_EMAIL_ID")
+    private String customerEmailId;
 
 	public String getSurveyResultsReportBranchId() {
 		return surveyResultsReportBranchId;
@@ -305,19 +315,50 @@ public class SurveyResultsReportBranch implements Serializable {
 		this.surveyResponseList = surveyResponseList;
 	}
 
-	@Override
-	public String toString() {
-		return "SurveyResultsReportBranch [surveyResultsReportBranchId=" + surveyResultsReportBranchId
-				+ ", surveyDetailsId=" + surveyDetailsId + ", branchId=" + branchId + ", agentId=" + agentId
-				+ ", userFirstName=" + userFirstName + ", userLastName=" + userLastName + ", customerFirstName="
-				+ customerFirstName + ", customerLastName=" + customerLastName + ", surveySentDate=" + surveySentDate
-				+ ", surveyCompletedDate=" + surveyCompletedDate + ", timeInterval=" + timeInterval + ", surveySource="
-				+ surveySource + ", surveySourceId=" + surveySourceId + ", surveyScore=" + surveyScore + ", gateway="
-				+ gateway + ", customerComments=" + customerComments + ", agreedToShare=" + agreedToShare
-				+ ", branchName=" + branchName + ", clickTroughForCompany=" + clickTroughForCompany
-				+ ", clickTroughForAgent=" + clickTroughForAgent + ", clickTroughForRegion=" + clickTroughForRegion
-				+ ", clickTroughForBranch=" + clickTroughForBranch + ", reportModifiedOn=" + reportModifiedOn
-				+ ", isDeleted=" + isDeleted + ", surveyResponseList=" + surveyResponseList + "]";
-	}
+	public String getParticipantType()
+    {
+        return participantType;
+    }
+
+    public void setParticipantType( String participantType )
+    {
+        this.participantType = participantType;
+    }
+
+    public String getAgentEmailId()
+    {
+        return agentEmailId;
+    }
+
+    public void setAgentEmailId( String agentEmailId )
+    {
+        this.agentEmailId = agentEmailId;
+    }
+
+    public String getCustomerEmailId()
+    {
+        return customerEmailId;
+    }
+
+    public void setCustomerEmailId( String customerEmailId )
+    {
+        this.customerEmailId = customerEmailId;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "SurveyResultsReportBranch [surveyResultsReportBranchId=" + surveyResultsReportBranchId + ", surveyDetailsId="
+            + surveyDetailsId + ", branchId=" + branchId + ", agentId=" + agentId + ", userFirstName=" + userFirstName
+            + ", userLastName=" + userLastName + ", customerFirstName=" + customerFirstName + ", customerLastName="
+            + customerLastName + ", surveySentDate=" + surveySentDate + ", surveyCompletedDate=" + surveyCompletedDate
+            + ", timeInterval=" + timeInterval + ", surveySource=" + surveySource + ", surveySourceId=" + surveySourceId
+            + ", surveyScore=" + surveyScore + ", gateway=" + gateway + ", customerComments=" + customerComments
+            + ", agreedToShare=" + agreedToShare + ", branchName=" + branchName + ", clickTroughForCompany="
+            + clickTroughForCompany + ", clickTroughForAgent=" + clickTroughForAgent + ", clickTroughForRegion="
+            + clickTroughForRegion + ", clickTroughForBranch=" + clickTroughForBranch + ", reportModifiedOn=" + reportModifiedOn
+            + ", isDeleted=" + isDeleted + ", surveyResponseList=" + surveyResponseList + ", participantType=" + participantType
+            + ", agentEmailId=" + agentEmailId + ", customerEmailId=" + customerEmailId + "]";
+    }
 	
 }
