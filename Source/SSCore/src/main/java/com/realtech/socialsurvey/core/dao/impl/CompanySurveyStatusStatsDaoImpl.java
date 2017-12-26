@@ -136,8 +136,6 @@ public class CompanySurveyStatusStatsDaoImpl extends GenericReportingDaoImpl<Com
         
         criteria.add( Restrictions.in( CommonConstants.COMPANY_ID_COLUMN, companyIds ) );
         
-        criteria.addOrder( Order.asc( CommonConstants.TRANSACTION_MONITOR_DATE_COLUMN ) );
-        
         List<CompanySurveyStatusStats> companySurveyCountsList = criteria.list();
 
         //fill stats data to company map

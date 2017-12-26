@@ -14884,7 +14884,6 @@ function setPastAndCurWeekDataForTransactionMonitor(graphData){
 		while(j<graphTimeSlots.length){
 			if(allTimeSlots[i]==graphTimeSlots[j]){
 				hasSlotDate = true;
-				j++;
 				break;
 			}else{
 				j++;
@@ -14894,9 +14893,9 @@ function setPastAndCurWeekDataForTransactionMonitor(graphData){
 		emptySlotGraphData.transactionDate = emptyGraphTimeSlots[i];
 		if(hasSlotDate){
 			if(i<7){
-				pastWeekTransData[i] = graphData[k++];
+				pastWeekTransData[i] = graphData[j];
 			}else{
-				curWeekTransData[i-7] = graphData[k++];
+				curWeekTransData[i-7] = graphData[j];
 			}
 		}else{
 			if(i<7){
