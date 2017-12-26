@@ -1653,8 +1653,10 @@ function findReportWeek(startDate){
 	
 	if(dayDiff <= 7){
 		weekName="This Week";
-	}else{
+	}else if(dayDiff <=14){
 		weekName="Last Week";
+	}else{
+		weekName ="Past Week"
 	}
 	return weekName;	
 }
