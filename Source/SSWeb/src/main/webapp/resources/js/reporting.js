@@ -1609,11 +1609,11 @@ function drawRecentActivity(start,batchSize,tableHeader){
 		tableData += "<tr id='recent-activity-row"+i+"' class=\"u-tbl-row user-row \">"
 			+"<td class=\"v-tbl-recent-activity fetch-name hide\">"+i+"</td>"
 			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold tbl-black-text\">"+recentActivityList[i][0]+"</td>"
-			+"<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-blue-text\">"+recentActivityList[i][1]+"</td>"
+			+"<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-blue-text\">"+recentActivityList[i][1]+"</td>";
 			if(recentActivityList[i][1] == 'NPS Report for Week'){
-				tableData += "<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-black-text \">"+findReportWeek(startDate)+"</td>"
+				tableData += "<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-black-text \">"+findReportWeek(startDate)+"</td>";
 			}else{
-				tableData += "<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-black-text "+(startDate==null?("\">"+"All Time till date "):("\">"+(endDate==null?monthStartDate:startDate)))+(endDate==null?" ":" - "+endDate)+"</td>"
+				tableData += "<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-black-text "+(startDate==null?("\">"+"All Time till date "):("\">"+(endDate==null?monthStartDate:startDate)))+(endDate==null?" ":" - "+endDate)+"</td>";
 			}
 		tableData +="<td class=\"v-tbl-recent-activity fetch-name txt-bold tbl-black-text\">"+recentActivityList[i][4]+" "+recentActivityList[i][5]+"</td>";
 		
