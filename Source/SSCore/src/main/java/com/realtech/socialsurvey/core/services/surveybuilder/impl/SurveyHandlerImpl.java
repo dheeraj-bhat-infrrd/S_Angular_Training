@@ -894,6 +894,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         retakeSurveyHistories.add( retakeSurveyHistory );
         surveyDetails.setRetakeSurveyHistory( retakeSurveyHistories );
         
+        surveyDetails.setStage( 0 );
+        surveyDetails.setReview( null );
+        surveyDetails.setNoOfRetake( surveyDetails.getNoOfRetake() + 1 );
+        surveyDetails.setLastRetakeRequestDate( new Date ( System.currentTimeMillis() ) );
+        
         surveyDetailsDao.updateSurveyDetailsForRetake( surveyDetails );
         LOG.debug( "Method to update status of survey in SurveyDetails collection, changeStatusOfSurvey() finished." );
     }

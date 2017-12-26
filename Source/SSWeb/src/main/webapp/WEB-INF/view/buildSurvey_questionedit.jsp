@@ -17,10 +17,9 @@
 </c:if>
 
 <c:set value="true" var="considerForScoreVal" />
-<c:if test="${considerForScore == 1}">
-	<c:set value="true" var="considerForScoreVal" />
+<c:if test="${considerForScore == 0}">
+	<c:set value="false" var="considerForScoreVal" />
 </c:if>
-
 
 <div class="sb-edit-q-wrapper">
 	<form id="bs-question-edit-${surveyQuestion.questionId}" data-quesnum="${surveyQuestion.questionId}">

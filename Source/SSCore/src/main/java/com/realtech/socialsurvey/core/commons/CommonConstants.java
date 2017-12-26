@@ -1395,6 +1395,7 @@ public interface CommonConstants
     public static final String REPORTING_INCOMPLETE_SURVEY_REPORT = "Incomplete Survey Results Report";
     public static final String REPORTING_NPS_REPORT_FOR_WEEK = "NPS Report for Week";
     public static final String REPORTING_NPS_REPORT_FOR_MONTH = "NPS Report for Month";
+    public static final String REPORTING_NPS_REPORT = "NPS Report";
     public static final String REPORTING_API_DATE_FORMAT = "MMM dd, yyyy";
 
 
