@@ -53,7 +53,7 @@
   							<c:if test="${profilemasterid == 1}"> 
  								<option value=<spring:message code="label.company.user.report.value" /> data-report="company-user"><spring:message code="label.company.user.report.key" /></option>
 <%--  							<option value=<spring:message code="label.nps.report.value" /> data-report="nps-report"><spring:message code="label.nps.report.key" /></option> --%>
-  							</c:if>
+							</c:if>
   								<option value=<spring:message code="label.survey.results.report.value" /> data-report="survey-results"><spring:message code="label.survey.results.report.key" /></option>
  								<option value=<spring:message code="label.survey.transaction.report.value" /> data-report="survey-transaction-summary"><spring:message code="label.survey.transaction.report.key" /></option>
  								<option value=<spring:message code="label.incomplete.survey.report.value" /> data-report="incomplete-survey-report"><spring:message code="label.incomplete.survey.report.key" /></option>
