@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -4120,7 +4119,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 		}
 		return workBook;
 	}
-    
+
     @Override
     public void updateTransactionMonitorAlertsForCompanies() throws InvalidInputException
     {
