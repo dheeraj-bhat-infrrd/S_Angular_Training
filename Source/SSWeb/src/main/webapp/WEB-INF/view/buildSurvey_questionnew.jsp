@@ -19,6 +19,7 @@
 				<div class="bd-ans-header clearfix">
 					<div class="bd-ans-hd-container clearfix float-left">
 						<div data-id="sb-range" class="bd-tab-rat float-left bd-ans-tab-item bd-ans-tab-sel"><spring:message code="label.rating.key" /></div>
+						<div data-id="sb-range-0to10" class="bd-tab-rad float-left bd-ans-tab-item"><spring:message code="label.rating.0to10.key" /></div>
 						<div data-id="sb-sel-desc" class="bd-tab-com float-left bd-ans-tab-item"><spring:message code="label.comment.key" /></div>
 						<div data-id="sb-sel-mcq" class="bd-tab-mcq float-left bd-ans-tab-item"><spring:message code="label.multiplechoice.key" /></div>
 					</div>
@@ -51,10 +52,60 @@
 							<div id="user-ranking-chkbox-new" class="float-left user-ranking-chkbox bd-check-img"></div>
 							<input type="hidden" id="user-ranking-ques-new" name="user-ranking-ques" value=true>
 							<div class="float-left  listing-access-txt cursor-pointer">Consider for User Ranking</div>
-							</div>
+						</div>
   					</div>
 					
 				</div>
+				
+				<div class="bd-ans-type-radio bd-ans-type-item hide">
+					<div class="bd-and-tier2"><spring:message code="label.customer.customize.descriptions.key" /></div>
+					<div class="clearfix bd-ans-type bd-ans-type-radio-adj">
+						<div id="sq-radio-1to10-new" class="sq-1to10-range" style="height:160px" selected-rating-radio="">
+							<div class="edit-survey-radio-container">
+								<div class="container-1to10 inner-container-1to10">
+									<c:forEach begin="0" end="10" varStatus="loop">
+										<c:choose>
+											<c:when test="${loop.index == 0}">
+												<div class="radio-div" style="margin-left: 10px">
+													<div class="radio-outer-gray sq-radio"></div>
+												</div>
+											</c:when>
+											<c:otherwise>
+												<div class="radio-div">
+													<div class="radio-outer-gray sq-radio"></div>
+												</div>
+											</c:otherwise>
+										</c:choose>
+									</c:forEach>
+								</div>
+								<div class="container-1to10">
+									<c:forEach begin="0" end="10" varStatus="numLoop">
+										<div class="span-1to10" style="text-align:right">${numLoop.index}</div>
+									</c:forEach>
+								</div>
+								<div class="sq-1to10-range-val">
+									<input id="sq-not-very-likely-new" name="notVeryLikely" class="float-left sq-range-1to10-input sq-not-very-likely" value="Not at all likely">
+									<input id="sq-very-likely-new" name="veryLikely" class="float-right sq-range-1to10-input text-align-right sq-very-likely" value="Very Likely">
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="bd-q-pu-done-wrapper bd-q-pu-done-wrapper-override clearfix">
+						<div id="user-ranking-chkbox-wrapper-new-nps" class="clearfix" style="width: 200px;">
+							<div id="user-ranking-chkbox-new-nps" class="float-left user-ranking-chkbox bd-check-img"></div>
+							<div class="float-left  listing-access-txt cursor-pointer">Consider for User Ranking</div>
+						</div>
+						<div id="avg-score-chkbox-wrapper-new" class="clearfix" style="width: 210px;">
+							<div id="avg-score-chkbox-new" class="float-left avg-score bd-check-img"></div>
+							<input type="hidden" id="avg-score-ques-new" name="considerForScore" value=true>
+							<div class="float-left  listing-access-txt cursor-pointer">Consider for Average Score</div>
+						</div>
+						<div id="nps-chkbox-wrapper-new" class="clearfix">
+							<input type="hidden" id="nps-ques-new" name="nps-ques" value=false>
+						</div>
+  					</div>
+				</div>
+				
 				<div id="" class="bd-ans-type-mcq bd-ans-type-item hide">
 					<div class="bd-and-tier2"><spring:message code="label.customer.answerfrom.key" /></div>
 					<div class="clearfix bd-ans-type bd-ans-type-mcq-adj">

@@ -184,4 +184,23 @@ public interface SurveyBuilder {
 	 * @throws NoRecordsFetchedException
 	 */
 	public Map<Long, Long> checkIfSurveyIsDefaultAndClone(User user) throws InvalidInputException, NoRecordsFetchedException;
+
+	/**
+	 * Method creates the question object to be added to the survey.
+	 * @param questionDetails
+	 * @param isUserRankingStr
+	 * @param isNPSStr
+	 * @param answers 
+	 * @return
+	 * @throws NoRecordsFetchedException 
+	 * @throws InvalidInputException 
+	 */
+	public long createSurveyQuestionForExistingSurvey(SurveyQuestionDetails questionDetails) 
+			throws InvalidInputException, NoRecordsFetchedException;
+
+	public void updateSurveyQuestionAndAnswer(SurveyQuestionDetails questionDetails) throws InvalidInputException, NoRecordsFetchedException;
+
+	//public void removeQuestionFromSurvey(SurveyQuestionDetails questionDetails) throws InvalidInputException, NoRecordsFetchedException;
+
+	public void removeQuestionFromSurvey(long userId, long surveyQuestionId) throws InvalidInputException, NoRecordsFetchedException;
 }

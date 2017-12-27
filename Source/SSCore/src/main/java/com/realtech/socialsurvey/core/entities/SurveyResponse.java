@@ -6,6 +6,9 @@ public class SurveyResponse {
 	private String questionType;
 	private String answer;
 	private boolean isUserRankingQuestion;
+	private boolean isNpsQuestion;
+	private int questionId;
+	private boolean considerForScore;
 	
 	public String getQuestion() {
 		return question;
@@ -33,4 +36,30 @@ public class SurveyResponse {
     {
         this.isUserRankingQuestion = isUserRankingQuestion;
     }
+    public boolean getIsNpsQuestion()
+    {
+        return isNpsQuestion;
+    }
+    public void setIsNpsQuestion( boolean isNpsQuestion )
+    {
+        this.isNpsQuestion = isNpsQuestion;
+    }
+    public int getQuestionId()
+    {
+        return questionId;
+    }
+    public void setQuestionId( int questionId )
+    {
+        this.questionId = questionId;
+    }
+    public boolean isConsiderForScore()
+    {
+        return considerForScore;
+    }
+    public void setConsiderForScore( boolean considerForScore )
+    {
+        this.considerForScore = considerForScore;
+    }
+    
+    
 }

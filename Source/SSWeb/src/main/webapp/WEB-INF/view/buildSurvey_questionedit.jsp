@@ -7,12 +7,19 @@
 </c:if>
 
 <c:set value="${surveyQuestion.isUserRankingQuestion }" var="isUserRankingQuestion" />
+<c:set value="${surveyQuestion.considerForScore }" var="considerForScore" />
+<c:set value="${surveyQuestion.notAtAllLikely }" var="notVeryLikely" />
+<c:set value="${surveyQuestion.veryLikely }" var="veryLikely" />
 
 <c:set value="false" var="isUserRankingQuestionVal" />
 <c:if test="${isUserRankingQuestion == 1}">
 	<c:set value="true" var="isUserRankingQuestionVal" />
 </c:if>
 
+<c:set value="true" var="considerForScoreVal" />
+<c:if test="${considerForScore == 0}">
+	<c:set value="false" var="considerForScoreVal" />
+</c:if>
 
 <div class="sb-edit-q-wrapper">
 	<form id="bs-question-edit-${surveyQuestion.questionId}" data-quesnum="${surveyQuestion.questionId}">
@@ -32,23 +39,86 @@
 						<c:choose>
 							<c:when test="${questionType == 'sb-range-smiles' || questionType == 'sb-range-star' || questionType == 'sb-range-scale'}">
 								<div data-id="sb-range" class="bd-tab-rat float-left bd-ans-tab-item bd-ans-tab-sel"><spring:message code="label.rating.key" /></div>
+								<div data-id="sb-range-0to10" class="bd-tab-rad float-left bd-ans-tab-item"><spring:message code="label.rating.0to10.key" /></div>
 								<div data-id="sb-sel-desc" class="bd-tab-com float-left bd-ans-tab-item"><spring:message code="label.comment.key" /></div>
 								<div data-id="sb-sel-mcq" class="bd-tab-mcq float-left bd-ans-tab-item"><spring:message code="label.multiplechoice.key" /></div>
 							</c:when>
 							<c:when test="${questionType == 'sb-sel-mcq'}">
 								<div data-id="sb-range" class="bd-tab-rat float-left bd-ans-tab-item"><spring:message code="label.rating.key" /></div>
+								<div data-id="sb-range-0to10" class="bd-tab-rad float-left bd-ans-tab-item"><spring:message code="label.rating.0to10.key" /></div>
 								<div data-id="sb-sel-desc" class="bd-tab-com float-left bd-ans-tab-item"><spring:message code="label.comment.key" /></div>
 								<div data-id="sb-sel-mcq" class="bd-tab-mcq float-left bd-ans-tab-item bd-ans-tab-sel"><spring:message code="label.multiplechoice.key" /></div>
 							</c:when>
 							<c:when test="${questionType == 'sb-sel-desc'}">
 								<div data-id="sb-range" class="bd-tab-rat float-left bd-ans-tab-item"><spring:message code="label.rating.key" /></div>
+								<div data-id="sb-range-0to10" class="bd-tab-rad float-left bd-ans-tab-item"><spring:message code="label.rating.0to10.key" /></div>
 								<div data-id="sb-sel-desc" class="bd-tab-com float-left bd-ans-tab-item bd-ans-tab-sel"><spring:message code="label.comment.key" /></div>
+								<div data-id="sb-sel-mcq" class="bd-tab-mcq float-left bd-ans-tab-item"><spring:message code="label.multiplechoice.key" /></div>
+							</c:when>
+							<c:when test="${questionType == 'sb-range-0to10'}">
+								<div data-id="sb-range" class="bd-tab-rat float-left bd-ans-tab-item"><spring:message code="label.rating.key" /></div>
+								<div data-id="sb-range-0to10" class="bd-tab-rad float-left bd-ans-tab-item bd-ans-tab-sel"><spring:message code="label.rating.0to10.key" /></div>
+								<div data-id="sb-sel-desc" class="bd-tab-com float-left bd-ans-tab-item"><spring:message code="label.comment.key" /></div>
 								<div data-id="sb-sel-mcq" class="bd-tab-mcq float-left bd-ans-tab-item"><spring:message code="label.multiplechoice.key" /></div>
 							</c:when>
 						</c:choose>
 					</div>
 				</div>
 				
+				<c:set var="radioClass" scope="page" value=""/>
+				<c:if test="${questionType != 'sb-range-0to10'}">
+					<c:set var="radioClass" scope="page" value="hide"/>
+				</c:if>
+
+				<div class="bd-ans-type-radio bd-ans-type-item ${radioClass}">
+					<div class="bd-and-tier2"><spring:message code="label.customer.customize.descriptions.key" /></div>
+					<div class="clearfix bd-ans-type bd-ans-type-radio-adj">
+						<div id="sq-radio-1to10-edit" class="sq-1to10-range" style="height:160px" selected-rating-radio="">
+							<div class="edit-survey-radio-container">
+								<div class="container-1to10 inner-container-1to10">
+									<c:forEach begin="0" end="10" varStatus="loop">
+										<c:choose>
+											<c:when test="${loop.index == 0}">
+												<div class="radio-div" style="margin-left: 10px">
+													<div class="radio-outer-gray sq-radio"></div>
+												</div>
+											</c:when>
+											<c:otherwise>
+												<div class="radio-div">
+													<div class="radio-outer-gray sq-radio"></div>
+												</div>
+											</c:otherwise>
+										</c:choose>
+									</c:forEach>
+								</div>
+								<div class="container-1to10">
+									<c:forEach begin="0" end="10" varStatus="numLoop">
+										<div class="span-1to10" style="text-align:right">${numLoop.index}</div>
+									</c:forEach>
+								</div>
+								<div class="sq-1to10-range-val">
+									<input id="sq-not-very-likely-edit" name="notVeryLikely" class="float-left sq-range-1to10-input sq-not-very-likely" value="${notVeryLikely}">
+									<input id="sq-very-likely-edit" name="veryLikely" class="float-right sq-range-1to10-input text-align-right sq-very-likely" value="${veryLikely}">
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="bd-q-pu-done-wrapper bd-q-pu-done-wrapper-override clearfix">
+						<div id="user-ranking-chkbox-wrapper-edit-nps" class="clearfix" style="width: 200px;">
+							<div id="user-ranking-chkbox-edit-nps" class='float-left user-ranking-chkbox bd-check-img <c:if test="${ isUserRankingQuestion == 0}">bd-check-img-checked</c:if>'></div>
+							<div class="float-left  listing-access-txt cursor-pointer">Considered for User Ranking</div>
+						</div>
+						<div id="avg-score-chkbox-wrapper-edit" class="clearfix" style="width: 210px;"> 
+							<div id="avg-score-chkbox-edit" class='float-left avg-score-chkbox bd-check-img <c:if test="${ considerForScore == 0}">bd-check-img-checked</c:if>'></div>
+							<input type="hidden" id="avg-score-ques-edit" name="considerForScore" value=${ considerForScoreVal }>
+							<div class="float-left listing-access-txt cursor-pointer">Considered for Average Score</div>
+						</div>
+						<div id="nps-chkbox-wrapper-edit" class="clearfix">
+							<input type="hidden" id="nps-ques-edit" name="nps-ques" value=false>
+						</div>
+					</div>
+				</div>
+
 				<c:set var="ratingclass" scope="page" value=""/>
 				<c:if test="${questionType != 'sb-range-smiles' && questionType != 'sb-range-star' && questionType != 'sb-range-scale'}">
 					<c:set var="ratingclass" scope="page" value="hide"/>
@@ -117,6 +187,7 @@
 				<c:if test="${questionType != 'sb-sel-mcq'}">
 					<c:set var="mcqclass" scope="page" value="hide"/>
 				</c:if>
+				
 				<div class="bd-ans-type-mcq bd-ans-type-item ${mcqclass}">
 					<div class="bd-and-tier2"><spring:message code="label.customer.answerfrom.key" /></div>
 					<div class="clearfix bd-ans-type bd-ans-type-mcq-adj">

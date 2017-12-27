@@ -2781,11 +2781,11 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 break;
             case CommonConstants.TWITTER_LABEL:
                 url += "https://twitter.com/intent/tweet?text=" + reviewText + ".&url="
-                    + organizationUnitSettings.getCompleteProfileUrl();
+                    + organizationUnitSettings.getCompleteProfileUrl() + "/" + survey.get_id();
                 break;
             case CommonConstants.FACEBOOK_LABEL:
                 url += "https://www.facebook.com/dialog/share?app_id=" + fbAppId + "&href="
-                    + organizationUnitSettings.getCompleteProfileUrl() + "&quote=" + reviewText
+                    + organizationUnitSettings.getCompleteProfileUrl() + "/" + survey.get_id() + "&quote=" + reviewText
                     + "&redirect_uri=https://www.facebook.com";
                 break;
         }
