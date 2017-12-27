@@ -348,6 +348,149 @@ function drawSpsStatsGraph(){
 	}
 }
 
+function drawNpsStatsGraph(entityId,entityType){
+	showDashOverlay('#nps-dash');
+	var chartData;
+	google.charts.load('current', {	packages : [ 'corechart', 'bar' ]});
+	google.charts.setOnLoadCallback(drawNpsStacked);
+	
+	function drawEmptyNpsChart(){
+		var npsChartData = [
+							[ 'NPS', 'Detractors','Passives','Promoters' ],
+							[ '', 0, 0, 0 ] ];
+
+					var data = google.visualization
+							.arrayToDataTable(npsChartData);
+
+					var options = {
+						legend : {
+							position : 'none'
+						},
+						isStacked : true,
+						vAxis : {
+							minValue : 0,
+							maxValue : 10,
+							gridlines : {
+								count : 5
+							}
+						},
+						colors : [ '#E8341F',
+								'#999999', '#7ab400' ]
+					};
+
+					var chart = new google.visualization.ColumnChart(
+							document
+									.getElementById('nps_chart_div'));
+					chart.draw(data, options);
+	}
+	
+	function drawNpsStacked() {
+		
+		var currentDate = new Date();
+		var currentYear = currentDate.getFullYear();
+		var currentMonth = currentDate.getMonth()+1;
+		
+		var payload = {
+				"entityId" : entityId,
+				"entityType" : entityType,
+				"currentMonth" : currentMonth,
+				"currentYear" : currentYear
+		}
+		$.ajax({
+					url : "/reporting/npsgraph.do",
+					type : "GET",
+					data : payload,
+					cache : false,
+					dataType : "json",
+					success : function(response) {
+											chartData = JSON.parse(response);
+
+											if (chartData.length == 0 || chartData == null) {
+												drawEmptyNpsChart();
+											} else {
+												var npsChartData = new Array(
+														chartData.length + 1);
+												for (var k = 0; k <= chartData.length; k++) {
+													npsChartData[k] = new Array(
+															4);
+												}
+												npsChartData[0] = [ 'NPS','Detractors',
+														'Passives', 'Promoters',{ role: 'annotation' } ];
+
+												for (var i = 1; i <= chartData.length; i++) {
+													var monthName = monthNamesList[(chartData[i - 1][1]) - 1];
+													var yearStr = (chartData[i-1][0]).toString();
+													var yearValue = yearStr.match(/.{1,2}/g)[1];
+													npsChartData[i][0] = monthName
+															+ " "
+															+ yearValue;
+													npsChartData[i][1] = chartData[i - 1][2];
+													npsChartData[i][2] = chartData[i - 1][3];
+													npsChartData[i][3] = chartData[i - 1][4];
+													
+													var totalTransactions = chartData[i - 1][2] + chartData[i - 1][3] + chartData[i - 1][4];
+													var promoters = chartData[i - 1][4];
+													var detractors = chartData[i - 1][2];
+													var npsScore = 0;
+													if(totalTransactions != 0 && totalTransactions != undefined && totalTransactions != null){
+														npsScore = ((promoters - detractors)*100)/totalTransactions;
+													}
+													
+													npsChartData[i][4] = 'NPS: ' + npsScore.toFixed(2);
+												}
+
+												var data = google.visualization
+														.arrayToDataTable(npsChartData);
+
+												var options = {
+													legend : {
+														position : 'none'
+													},
+													isStacked : true,
+													chartArea:{width:'85%'},
+													vAxis : {
+														gridlines : {
+															count : 14
+														}
+													},
+													annotations: {
+														   alwaysOutside:true,
+														   style: 'point',
+														          highContrast: 'true',
+														          textStyle: {
+														            align: 'center !important',
+														            fontSize:13,
+														            color:'#000000',
+														            bold: 'true'
+														          },
+														          stem:{length:2}
+															},
+													colors : [ '#E8341F',
+															'#999999',
+															'#7ab400' ]
+												};
+
+												var chart = new google.visualization.ColumnChart(
+														document
+																.getElementById('nps_chart_div'));
+												chart.draw(data, options);
+											}
+					},
+					complete:function(){
+						hideDashOverlay('#nps-dash');
+					},
+					error : function(e) {
+						if (e.status == 504) {
+							redirectToLoginPageOnSessionTimeOut(e.status);
+							return;
+						}
+						drawEmptyChart();
+						hideDashOverlay('#nps-dash')
+					}
+				});
+	}
+}
+
 function drawCompletionRateGraph(){
 	showDashOverlay('#completion-graph-dash');
 	google.charts.load('current', {'packages':['corechart']});
@@ -780,6 +923,171 @@ function getTimeFrameValue(){
 	}
 }
 
+function drawNpsGauge(){
+	
+	if(overviewData != null && !isEmpty(overviewData)){
+		var detractorEndAngle;
+		var passivesEndAngle;
+		var promotersEndAngle;
+		var detractorStartAngle;
+		var passivesStartAngle;
+		var promotersStartAngle;
+		var gaugeStartAngle = 250;
+		var gaugeEndAngle = 110;
+
+			function npsPolarToCartesian(centerX, centerY, radius, angleInDegrees) {
+				var angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
+
+				return {
+					x : centerX + (radius * Math.cos(angleInRadians)),
+					y : centerY + (radius * Math.sin(angleInRadians))
+				};
+			}
+
+			function npsDescribeArc(x, y, radius, startAngle, endAngle) {
+
+				var start = npsPolarToCartesian(x, y, radius, endAngle);
+				var end = npsPolarToCartesian(x, y, radius, startAngle);
+
+				var largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
+
+				var d = [ "M", start.x, start.y, "A", radius, radius, 0, largeArcFlag,
+						0, end.x, end.y ].join(" ");
+
+				return d;
+			}
+			
+			function getNpsGaugeEndAngles(){
+						
+				var npsScore = overviewData.NpsScore;
+				
+				if(overviewData != null && !isEmpty(overviewData)){
+					
+					$('#npsScorebox').html(npsScore);
+					var detractors = overviewData.NpsDetractorPercentage;
+					var passives =   overviewData.NpsPassivesPercentage;
+					var promoters =  overviewData.NpsPromoterPercentage;
+					var totalDegree = (360-gaugeStartAngle)+gaugeEndAngle;
+					var degRequired = 0;
+				
+				//Detractor Start And End Angles
+				detractorStartAngle = gaugeStartAngle;
+				if(detractors == 0){
+					detractorEndAngle = detractorStartAngle;
+				}else if(detractors == 50){
+					detractorEndAngle = 0;
+				}else{
+					degRequired = (detractors/100)*totalDegree;
+					detractorEndAngle = (detractorStartAngle + degRequired)%360;
+				}
+				
+				if(detractors > 50){
+					document.getElementById("nps-arc1").setAttribute("d", npsDescribeArc(150, 150, 55, detractorStartAngle, 0));
+					document.getElementById("nps-arc4").setAttribute("d", npsDescribeArc(150, 150, 55, 0, detractorEndAngle));
+				}else{
+					document.getElementById("nps-arc1").setAttribute("d", npsDescribeArc(150, 150, 55, detractorStartAngle, detractorEndAngle));
+				}
+				
+				//Passives Start and End Angles
+				if(detractors==0){
+					passivesStartAngle = gaugeStartAngle;
+				}else{
+					passivesStartAngle = detractorEndAngle + 2;
+				}
+				
+				if(passives == 0){
+					passivesEndAngle = passivesStartAngle;
+				}else{
+					degRequired = (passives/100)*totalDegree;
+					passivesEndAngle = (passivesStartAngle + degRequired)%360;
+				}
+				
+				if(passivesStartAngle >= gaugeStartAngle){
+					if(passivesEndAngle >= gaugeStartAngle){
+						document.getElementById("nps-arc2").setAttribute("d", npsDescribeArc(150, 150, 55, passivesStartAngle, passivesEndAngle));
+					}else{
+						document.getElementById("nps-arc2").setAttribute("d", npsDescribeArc(150, 150, 55, passivesStartAngle, 0));
+						document.getElementById("nps-arc5").setAttribute("d", npsDescribeArc(150, 150, 55, 0, passivesEndAngle));
+					}
+				}else{
+					document.getElementById("nps-arc5").setAttribute("d", npsDescribeArc(150, 150, 55, passivesStartAngle, passivesEndAngle));
+				}
+				
+				//Promoters Start and End Angles
+				promotersEndAngle =  gaugeEndAngle;
+				
+				if(promoters == 0){
+					promotersStartAngle = promotersEndAngle;
+				}else if(detractors == 0 && passives == 0){
+					promotersStartAngle = gaugeStartAngle;
+				}else{
+					promotersStartAngle = passivesEndAngle +2;
+				}
+				
+				if(promotersStartAngle >= gaugeStartAngle){
+					if(promotersEndAngle >= gaugeStartAngle){
+						document.getElementById("nps-arc3").setAttribute("d", npsDescribeArc(150, 150, 55, promotersStartAngle, promotersEndAngle));
+					}else{
+						document.getElementById("nps-arc3").setAttribute("d", npsDescribeArc(150, 150, 55, promotersStartAngle, 0));
+						document.getElementById("nps-arc6").setAttribute("d", npsDescribeArc(150, 150, 55, 0, promotersEndAngle));
+					}
+				}else{
+					document.getElementById("nps-arc6").setAttribute("d", npsDescribeArc(150, 150, 55, promotersStartAngle, promotersEndAngle));
+				}
+			}
+		}
+
+			$(document).ready(function() {
+				var npsScore = overviewData.npsScore;
+				
+				
+				var marginLeft = parseInt($("#nps-metre-needle").css("margin-left"));
+				var marginTop = parseInt($("#nps-metre-needle").css("margin-top"));
+			
+				var needleDegree;
+				var marginNeedle = Math.abs(npsScore - 20)/2;
+				
+				if(npsScore < 0){
+					
+						needleDegree = 360-(Math.abs(npsScore)*1.1);
+						if(npsScore < -87){
+							$("#nps-metre-needle").css("margin-left",marginLeft-marginNeedle+12+'px');
+						}else{
+							$("#nps-metre-needle").css("margin-left",marginLeft-marginNeedle-5+'px');
+						}
+						$("#nps-metre-needle").css("margin-top",marginTop+marginNeedle-20+'px');
+						
+				}else if(npsScore > 15){
+					
+					needleDegree = Math.abs(npsScore)*1.1;
+					if(npsScore > 87){
+						$("#nps-metre-needle").css("margin-left",marginLeft+marginNeedle-20+'px');
+					}else{
+						$("#nps-metre-needle").css("margin-left",marginLeft+marginNeedle+'px');
+					}
+					$("#nps-metre-needle").css("margin-top",marginTop+marginNeedle+'px');
+					
+				}else if(npsScore > 7 && npsScore <=15){
+					
+					needleDegree = Math.abs(npsScore)*1.1;
+					$("#nps-metre-needle").css("margin-left",marginLeft-5+'px');
+					
+				}else if(npsScore == 0 || (npsScore > 0 && npsScore <= 7)){
+					needleDegree = Math.abs(npsScore)*1.1;
+					$("#nps-metre-needle").css("margin-left",marginLeft-8+'px');
+				}
+				
+				$('#nps-metre-needle').css({'transform':'rotate(' + needleDegree + 'deg)'});
+					
+				getNpsGaugeEndAngles();
+				
+				//document.getElementById("arc1").setAttribute("d", describeArc(150, 150, 70, detractorStartAngle, detractorEndAngle));
+				//document.getElementById("arc2").setAttribute("d", describeArc(150, 150, 70, passivesStartAngle, passivesEndAngle));
+				//document.getElementById("arc3").setAttribute("d", describeArc(150, 150, 70, promotersStartAngle, promotersEndAngle));
+			});
+		}
+}
+
 function drawSpsGauge(){
 	
 	if(overviewData != null && !isEmpty(overviewData)){
@@ -947,11 +1255,21 @@ function drawSpsGauge(){
 
 function drawOverviewPage(){
 	
+	var detractors; 
+	var passives;
+	var promoters;
+	var npsDetractors;
+	var npsPassives;
+	var npsPromoters;
+	
 	if(overviewData != null && !isEmpty(overviewData)){
 		
-		var detractors = overviewData.DetractorPercentage;
-		var passives =   overviewData.PassivesPercentage;
-		var promoters =  overviewData.PromoterPercentage;
+		detractors = overviewData.DetractorPercentage;
+		passives =   overviewData.PassivesPercentage;
+		promoters =  overviewData.PromoterPercentage;
+		npsDetractors = overviewData.NpsDetractorPercentage;
+		npsPassives =   overviewData.NpsPassivesPercentage;
+		npsPromoters =  overviewData.NpsPromoterPercentage;
 		
 			//spsGauge checks
 			if(detractors == 0 && promoters == 0 && passives == 0){
@@ -969,10 +1287,30 @@ function drawOverviewPage(){
 			$('#passivesValue').html(passives+'%');
 			$('#promotersBar').css('width',promoters+'%');
 			$('#promotersValue').html(promoters+'%');	
+		
+			if(npsDetractors == 0 && npsPassives == 0 && npsPromoters == 0){
+				$('#nps-row').hide();
+				$('#npsGaugeSuccess').hide();
+				$('#npsGaugeFailure').show();
+			}else{
+				$('#nps-row').show();
+				$('#npsGaugeFailure').hide();
+				$('#npsGaugeSuccess').show();
+			}
+			
+			//detractors,passives and promoters bar and values assignment
+			$('#npsDetractorsBar').css('width',npsDetractors+'%');
+			$('#npsDetractorsValue').html(npsDetractors+'%');
+			$('#npsPassivesBar').css('width',npsPassives+'%');
+			$('#npsPassivesValue').html(npsPassives+'%');
+			$('#npsPromotersBar').css('width',npsPromoters+'%');
+			$('#npsPromotersValue').html(npsPromoters+'%');
+			
+			
 	}else{
-			var detractors = 0;
-			var passives =   0;
-			var promoters =  0;
+			detractors = 0;
+			passives =   0;
+			promoters =  0;
 		
 			$('#spsGaugeSuccess').hide();
 			$('#spsGaugeFailure').show();
@@ -983,7 +1321,10 @@ function drawOverviewPage(){
 			$('#passivesBar').css('width',passives+'%');
 			$('#passivesValue').html(passives+'%');
 			$('#promotersBar').css('width',promoters+'%');
-			$('#promotersValue').html(promoters+'%');	
+			$('#promotersValue').html(promoters+'%');
+			
+			$('#nps-row').hide();
+			
 	}
 }
 
@@ -994,7 +1335,7 @@ $(document).on('change', '#generate-survey-reports', function() {
 	
 	var selectedVal = $('#generate-survey-reports').val();
 	var key = parseInt(selectedVal);
-	if(key == 101 || key == 102 || key == 103 || key == 106){
+	if(key == 101 || key == 102 || key == 103 || key == 106 || key == 110){
 		$('#date-pickers').hide();
 	}else{
 		$('#date-pickers').show();
@@ -1005,7 +1346,92 @@ $(document).on('change', '#generate-survey-reports', function() {
 	}else{
 		$('#report-time-div').addClass('hide');
 	}
+	
+	if(key == 110){
+		$('#nps-report-time-div').removeClass('hide');
+		setNpsTimeFrames();
+	}else{
+		$('#nps-report-time-div').addClass('hide');
+	}
 });
+
+function setNpsTimeFrames(){
+	var currentDate = new Date();
+	var currentMonth = currentDate.getMonth()+1;
+	var currentYear = currentDate.getFullYear();
+	var lastMonth = (currentMonth-1)==0?12:currentMonth-1;
+	var lastYear = currentYear-1;
+	var lastMonthYear = lastMonth == 12 ? currentYear-1 : currentYear;
+	
+	var initialOptions = '<option value=1 data-report="thisWeek">This Week</option>'
+		   +'<option value=2 data-report="lastWeek">Last Week</option>'
+		   +'<option value=3 data-report="'+(currentMonth+'/01/'+currentYear)+'">This Month</option>'
+		   +'<option value=4 data-report="'+(lastMonth+'/01/'+lastMonthYear)+'">Last Month</option>';
+
+	$('#nps-report-time-selector').html(initialOptions);
+
+	
+	var monthStr = new Array();
+	monthStr[0] = ""
+		monthStr[1] = "Jan";
+	monthStr[2] = "Feb";
+	monthStr[3] = "Mar";
+	monthStr[4] = "Apr";
+	monthStr[5] = "May";
+	monthStr[6] = "Jun";
+	monthStr[7] = "Jul";
+	monthStr[8] = "Aug";
+	monthStr[9] = "Sep";
+	monthStr[10] = "Oct";
+	monthStr[11] = "Nov";
+	monthStr[12] = "Dec";
+
+	var lastMonth;
+	var lastYear;
+	var index = 5;
+	if(currentMonth == 1){
+		lastMonth = 12;
+		lastYear = currentYear-1;
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('11/01/'+lastYear) + '">' + (monthStr[11]+' '+lastYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('10/01/'+lastYear) + '">' + (monthStr[10]+' '+lastYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('9/01/'+lastYear) + '">' + (monthStr[9]+' '+lastYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('8/01'+lastYear) + '">' + (monthStr[8]+' '+lastYear)+'</option>');
+	}else if(currentMonth == 2){
+		lastMonth = 12;
+		lastYear = currentYear-1;
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('12/01/'+lastYear) + '">' + (monthStr[12]+' '+lastYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('11/01/'+lastYear) + '">' + (monthStr[11]+' '+lastYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('10/01/'+lastYear) + '">' + (monthStr[10]+' '+lastYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('9/01/'+lastYear) + '">' + (monthStr[9]+' '+lastYear)+'</option>');
+	}else if(currentMonth == 3){
+		lastMonth = 12;
+		lastYear = currentYear-1;
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('1/01/'+currentYear) + '">' + (monthStr[1]+' '+currentYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('12/01/'+lastYear) + '">' + (monthStr[12]+' '+lastYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('11/01/'+lastYear) + '">' + (monthStr[11]+' '+lastYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('10/01/'+lastYear) + '">' + (monthStr[10]+' '+lastYear)+'</option>');
+	}else if(currentMonth == 4){
+		lastMonth = 12;
+		lastYear = currentYear-1;
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('2/01/'+currentYear) + '">' + (monthStr[2]+' '+currentYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('1/01/'+currentYear) + '">' + (monthStr[1]+' '+currentYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('12/01/'+lastYear) + '">' + (monthStr[12]+' '+lastYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('11/01/'+lastYear) + '">' + (monthStr[11]+' '+lastYear)+'</option>');
+	}else if(currentMonth == 5){
+		lastMonth = 12;
+		lastYear = currentYear-1;
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('3/01/'+currentYear) + '">' + (monthStr[3]+' '+currentYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('2/01/'+currentYear) + '">' + (monthStr[2]+' '+currentYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('1/01/'+currentYear) + '">' + (monthStr[1]+' '+currentYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ('12/01/'+lastYear) + '">' + (monthStr[12]+' '+lastYear)+'</option>');
+	}else{
+		var thisMonth = currentMonth-2;
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + (thisMonth+'/01/'+currentYear) + '">' + (monthStr[thisMonth]+' '+currentYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ((thisMonth-1)+'/01/'+currentYear) + '">' + (monthStr[thisMonth-1]+' '+currentYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ((thisMonth-2)+'/01/'+currentYear) + '">' + (monthStr[thisMonth-2]+' '+currentYear)+'</option>');
+		$('#nps-report-time-selector').append('<option value='+ (index++) + ' data-report="' + ((thisMonth-3)+'/01/'+currentYear) + '">' + (monthStr[thisMonth-3]+' '+currentYear)+'</option>');
+	}
+}
 
 function getTimeFrameForUserRankingReport(){
 	var currentDate = new Date();
@@ -1036,12 +1462,48 @@ function getTimeFrameForUserRankingReport(){
 	return dateTimeFrame;
 }
 
+function getStartAndEndDateForNps(npsTimeFrame){
+	var currentDate = new Date;
+	var currentMonth = currentDate.getMonth()+1;
+	var currentYear = currentDate.getFullYear();
+	var npsDates = new Object();
+	npsDates.endDate = "";
+	var curr = new Date;
+	var firstDayOfWeek = curr.getDate() - curr.getDay();
+	firstDayOfWeek = firstDayOfWeek + 1
+	
+	if(npsTimeFrame == 1){
+		var thisMonday = new Date(curr.setDate(firstDayOfWeek));
+		var thisMondayDay = thisMonday.getDate();
+		if(thisMondayDay < 10){
+			thisMondayDay = '0'+thisMondayDay;
+		}
+		var thisMondayMonth = thisMonday.getMonth() + 1;
+		var thisMondayYear = thisMonday.getFullYear();
+		npsDates.startDate = thisMondayMonth+'/'+thisMondayDay+'/'+thisMondayYear;
+	}else if(npsTimeFrame == 2){
+		var thisMonday = new Date(curr.setDate(firstDayOfWeek-7));
+		var thisMondayDay = thisMonday.getDate();
+		if(thisMondayDay < 10){
+			thisMondayDay = '0'+thisMondayDay;
+		}
+		var thisMondayMonth = thisMonday.getMonth() + 1;
+		var thisMondayYear = thisMonday.getFullYear();
+		npsDates.startDate = thisMondayMonth+'/'+thisMondayDay+'/'+thisMondayYear;
+	}else{
+		npsDates.startDate = $("#nps-report-time-selector option[value="+npsTimeFrame+"]").attr('data-report');
+	}
+	
+	return npsDates;
+}
+
 $(document).on('click', '#reports-generate-report-btn', function(e) {
 	var selectedValue = $('#generate-survey-reports').val();
 	var key = parseInt(selectedValue);
 	var startDate = $('#dsh-start-date').val();
 	var endDate = $("#dsh-end-date").val();
-	
+	var npsTimeFrame = parseInt($('#nps-report-time-selector').val());
+
 	if(key == 106){
 		startDate = getTimeFrameForUserRankingReport();
 		var timeFrameStr = $('#report-time-selector').val();
@@ -1060,6 +1522,18 @@ $(document).on('click', '#reports-generate-report-btn', function(e) {
 		
 	}
 	
+	var npsDates = new Object();
+	if(key == 110){
+		if(npsTimeFrame == 1 || npsTimeFrame == 2){
+			key = 110;
+		}else{
+			key = 111;
+		}
+		npsDates = getStartAndEndDateForNps(npsTimeFrame);
+		startDate = npsDates.startDate;
+		endDate = npsDates.endDate;
+	}
+	
 	var success = false;
 	var messageToDisplay;
 	var payload = {
@@ -1070,8 +1544,9 @@ $(document).on('click', '#reports-generate-report-btn', function(e) {
 	
 	showOverlay();
 		$.ajax({
-			url : "./savereportingdata.do?startDate="+payload.startDate+"&endDate="+payload.endDate+"&reportId="+payload.reportId,
+			url : "./savereportingdata.do",
 			type : "POST",
+			data: payload,
 			dataType:"TEXT",
 			async:false,
 			success : function(data) {
@@ -1134,9 +1609,13 @@ function drawRecentActivity(start,batchSize,tableHeader){
 		tableData += "<tr id='recent-activity-row"+i+"' class=\"u-tbl-row user-row \">"
 			+"<td class=\"v-tbl-recent-activity fetch-name hide\">"+i+"</td>"
 			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold tbl-black-text\">"+recentActivityList[i][0]+"</td>"
-			+"<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-blue-text\">"+recentActivityList[i][1]+"</td>"
-			+"<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-black-text "+(startDate==null?("\">"+"All Time till date "):("\">"+(endDate==null?monthStartDate:startDate)))+(endDate==null?" ":" - "+endDate)+"</td>"
-			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold tbl-black-text\">"+recentActivityList[i][4]+" "+recentActivityList[i][5]+"</td>";
+			+"<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-blue-text\">"+recentActivityList[i][1]+"</td>";
+			if(recentActivityList[i][1] == 'NPS Report for Week'){
+				tableData += "<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-black-text \">"+findReportWeek(startDate)+"</td>";
+			}else{
+				tableData += "<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-black-text "+(startDate==null?("\">"+"All Time till date "):("\">"+(endDate==null?monthStartDate:startDate)))+(endDate==null?" ":" - "+endDate)+"</td>";
+			}
+		tableData +="<td class=\"v-tbl-recent-activity fetch-name txt-bold tbl-black-text\">"+recentActivityList[i][4]+" "+recentActivityList[i][5]+"</td>";
 		
 		if(recentActivityList[i][6]==0){	
 		tableData +="<td class=\"v-tbl-recent-activity fetch-name txt-bold \" style='font-size:13px !important;'><a id=\"downloadLink"+i+"\"class='txt-bold tbl-blue-text downloadLink cursor-pointer'>"+statusString+"</a></td>"
@@ -1162,6 +1641,24 @@ function drawRecentActivity(start,batchSize,tableHeader){
 		$('#recent-activity-list-table').html(tableHeaderData+tableData+"</table>");
 	}
 	
+}
+
+function findReportWeek(startDate){
+	var currentDate = new Date();
+	var currentDay = currentDate.getDate();
+	var startDateDay = parseInt(startDate.split(" ")[1].split(",")[0]);
+	var weekName;
+	
+	var dayDiff = currentDay - startDateDay;
+	
+	if(dayDiff <= 7){
+		weekName="This Week";
+	}else if(dayDiff <=14){
+		weekName="Last Week";
+	}else{
+		weekName ="Past Week"
+	}
+	return weekName;	
 }
 
 function getDateFromDateTime(dateTime){
