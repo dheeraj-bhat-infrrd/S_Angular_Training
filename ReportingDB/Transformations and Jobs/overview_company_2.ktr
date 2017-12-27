@@ -188,7 +188,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;if&#x28;total_shared_on&#x3d;&#x3d; null&#x29;var  total_shared_on &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;corrupted &#x3d;&#x3d; null&#x29;var corrupted&#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_mismatched_count &#x3d;&#x3d; null&#x29;var total_mismatched_count &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;duplicate &#x3d;&#x3d; null&#x29;var duplicate&#x3d; 0&#x3b;&#xd;&#xa;if&#x28;incomplete&#x3d;&#x3d; null&#x29;var incomplete &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;completed &#x3d;&#x3d; null&#x29;var completed &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;extra_zillow &#x3d;&#x3d; null&#x29;var extra_zillow &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_reviews &#x3d;&#x3d; null&#x29;var total_reviews &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;rating_count &#x3d;&#x3d; null&#x29;var rating_count &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;processed &#x3d;&#x3d; null&#x29;var processed&#x3d; 0&#x3b;&#xd;&#xa;if&#x28;unprocessed&#x3d;&#x3d; null&#x29;var unprocessed&#x3d; 0&#x3b;&#xd;&#xa;if&#x28;rating &#x3d;&#x3d; null&#x29;var rating &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;complete_percentage &#x3d;&#x3d; null&#x29; var complete_percentage &#x3d; 0.00&#x3b;&#xd;&#xa;if&#x28;incomplete_percentage &#x3d;&#x3d; null&#x29; var incomplete_percentage &#x3d; 0.00&#x3b;&#xd;&#xa;if&#x28;other &#x3d;&#x3d; null&#x29; var other &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;third_party &#x3d;&#x3d; null&#x29; var third_party &#x3d; 0&#x3b;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;if&#x28;total_shared_on&#x3d;&#x3d; null&#x29;var  total_shared_on &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;corrupted &#x3d;&#x3d; null&#x29;var corrupted&#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_mismatched_count &#x3d;&#x3d; null&#x29;var total_mismatched_count &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;duplicate &#x3d;&#x3d; null&#x29;var duplicate&#x3d; 0&#x3b;&#xd;&#xa;if&#x28;incomplete&#x3d;&#x3d; null&#x29;var incomplete &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;completed &#x3d;&#x3d; null&#x29;var completed &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;extra_zillow &#x3d;&#x3d; null&#x29;var extra_zillow &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_reviews &#x3d;&#x3d; null&#x29;var total_reviews &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;rating_count &#x3d;&#x3d; null&#x29;var rating_count &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;processed &#x3d;&#x3d; null&#x29;var processed&#x3d; 0&#x3b;&#xd;&#xa;if&#x28;unprocessed&#x3d;&#x3d; null&#x29;var unprocessed&#x3d; 0&#x3b;&#xd;&#xa;if&#x28;rating &#x3d;&#x3d; null&#x29;var rating &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;complete_percentage &#x3d;&#x3d; null&#x29; var complete_percentage &#x3d; 0.00&#x3b;&#xd;&#xa;if&#x28;incomplete_percentage &#x3d;&#x3d; null&#x29; var incomplete_percentage &#x3d; 0.00&#x3b;&#xd;&#xa;if&#x28;other &#x3d;&#x3d; null&#x29; var other &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;third_party &#x3d;&#x3d; null&#x29; var third_party &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;user_count &#x3d;&#x3d; null&#x29; var user_count &#x3d; 0&#x3b;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>total_shared_on</name>
         <rename>total_shared_on</rename>
         <type>String</type>
@@ -285,6 +285,12 @@
         <length>-1</length>
         <precision>-1</precision>
         <replace>Y</replace>
+      </field>      <field>        <name>user_count</name>
+        <rename>user_count</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>1346</xloc>
@@ -1789,6 +1795,10 @@
         <field>
           <column_name>third_party</column_name>
           <stream_name>third_party</stream_name>
+        </field>
+        <field>
+          <column_name>user_count</column_name>
+          <stream_name>user_count</stream_name>
         </field>
     </fields>
      <cluster_schema/>
