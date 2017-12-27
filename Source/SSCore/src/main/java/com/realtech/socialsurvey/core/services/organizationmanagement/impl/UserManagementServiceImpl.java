@@ -742,6 +742,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         //Set the status of all user profiles for that user as 1
         userProfileDao.activateAllUserProfilesForUser( user );
 
+        //update the mismatched record for  restored user's email id
+        surveyPreInitiationDao.updateAgentIdOfPreInitiatedSurveysByAgentEmailAddress( user, user.getLoginName() );
+        
         //Restore mapped emailIds if possible
         List<UserEmailMapping> userEmailMappings = userEmailMappingDao.findByColumn( UserEmailMapping.class,
             CommonConstants.USER_COLUMN, user );
