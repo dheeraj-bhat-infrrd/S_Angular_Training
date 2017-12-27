@@ -241,7 +241,9 @@ public interface CommonConstants
     public static final String BATCH_TYPE_HIERARCHY_UPLOAD_PROCESSOR = "HierarchyUploadProcessor";
     public static final String BATCH_TYPE_MONTHLY_DIGEST_STARTER = "MonthlyDigestStarter";
     public static final String BATCH_TYPE_SURVEY_CSV_UPLOAD_PROCESSOR = "SurveyCsvUploadProcessor";
+    public static final String BATCH_TYPE_TRANSACTION_ACTIVITY_MONITOR = "transactionActivityMonitor";
 
+    
     //batch name constant for batch tracker
     public static final String BATCH_NAME_REVIEW_COUNT_UPDATER = "Agent's review count in solr updater";
     public static final String BATCH_NAME_SOCIAL_MONITOR_LAST_BUILD = "Social Post Import In Solr";
@@ -269,6 +271,7 @@ public interface CommonConstants
     public static final String BATCH_NAME_HIERARCHY_UPLOAD_PROCESSOR = "Company Hierarchy Upload Processor";
     public static final String BATCH_NAME_MONTHLY_DIGEST_STARTER = "Monthly digest process starter for companies";
     public static final String BATCH_NAME_SURVEY_CSV_UPLOAD_PROCESSOR = "Survey CSV file Upload Processor";
+    public static final String BATCH_NAME_TRANSACTION_ACTIVITY_MONITOR = "Transaction Activity Monitor";
 
 
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_BILLING_REPORT = "Billing report";
@@ -1393,6 +1396,8 @@ public interface CommonConstants
     public static final String REPORTING_USER_RANKING_MONTHLY_REPORT = "User Ranking Report For Month";
     public static final String REPORTING_USER_RANKING_YEARLY_REPORT = "User Ranking Report For Year";
     public static final String REPORTING_INCOMPLETE_SURVEY_REPORT = "Incomplete Survey Results Report";
+    public static final String REPORTING_NPS_REPORT_FOR_WEEK = "NPS Report for Week";
+    public static final String REPORTING_NPS_REPORT_FOR_MONTH = "NPS Report for Month";
     public static final String REPORTING_NPS_REPORT = "NPS Report";
     public static final String REPORTING_API_DATE_FORMAT = "MMM dd, yyyy";
 
@@ -1469,4 +1474,8 @@ public interface CommonConstants
     public static final String ALERT_TYPE_NORMAL = "normal"; 
  
 
+    //JobLogDetails
+    public static final String JOB_LOG_ID = "jobLogId";
+    public static final String STATUS_DUMMY = "Dummy";
+    public static final String STATUS_FINISHED = "Finished";
 }

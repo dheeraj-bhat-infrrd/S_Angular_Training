@@ -240,12 +240,16 @@ public class SurveyBuilderController {
 		    else
 	            questionDetails.setIsNPSQuestion( CommonConstants.NO );
 		}
-		if(isUserRankingStr != null){
-		    if(isUserRankingStr.equalsIgnoreCase( "true" ))
-		         questionDetails.setIsUserRankingQuestion( CommonConstants.YES );
-		    else
-		        questionDetails.setIsUserRankingQuestion( CommonConstants.NO );
-		}
+        if ( isUserRankingStr != null ) {
+            if ( questionDetails.getQuestionType().indexOf( CommonConstants.QUESTION_RATING ) != -1 ) {
+                if ( isUserRankingStr.equalsIgnoreCase( "true" ) )
+                    questionDetails.setIsUserRankingQuestion( CommonConstants.YES );
+                else
+                    questionDetails.setIsUserRankingQuestion( CommonConstants.NO );
+            } else {
+                questionDetails.setIsUserRankingQuestion( CommonConstants.NO );
+            }
+        }
 		questionDetails.setNotAtAllLikely( notAtAllLikely );
 		questionDetails.setVeryLikely( veryLikely );
 		
