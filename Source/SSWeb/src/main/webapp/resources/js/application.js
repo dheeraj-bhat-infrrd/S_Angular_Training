@@ -14039,6 +14039,8 @@ var normalOptions = {
 var isSystemTransactionGraph=false;
 function showSystemSurveyGraph(companyId, numberOfDays) {
 	
+	showOverlay();
+	
 	if (isSystemTransactionGraph == true) {
 		return;
 	}
@@ -14055,6 +14057,7 @@ function showSystemSurveyGraph(companyId, numberOfDays) {
 		cache : false,
 		data : payload,
 		success : function(data) {
+			showOverlay();
 			isSystemTransactionGraph = false;
 			graphData = data;
 			paintTransactionMonitorGraph(graphData);
@@ -14384,12 +14387,47 @@ function paintTransactionMonitorGraph(graphData) {
 		unprocessedData.push(nestedInternalUnprocessedData);
 	}
 
-	drawTransactionMonitorGraphs(automatedData, sysOptions, sysAutoTransGraphId);
-	drawTransactionMonitorGraphs(completedData, sysOptions, sysCompTransGraphId);
-	drawTransactionMonitorGraphs(sentData, sysOptions, sysInvSentGraphId);
-	drawTransactionMonitorGraphs(remindersData, sysOptions, sysRemSentGraphId);
-	drawTransactionMonitorGraphs(unprocessedData, sysOptions, sysUnproTransGraphId);
+	if(isSystemTransMonGraphEmpty(automatedData)){
+		drawTransactionMonitorGraphs(automatedData, grayOptions, sysAutoTransGraphId);
+	}else{
+		drawTransactionMonitorGraphs(automatedData, sysOptions, sysAutoTransGraphId);
+	}
 	
+	if(isSystemTransMonGraphEmpty(completedData)){
+		drawTransactionMonitorGraphs(completedData, grayOptions, sysCompTransGraphId);
+	}else{
+		drawTransactionMonitorGraphs(completedData, sysOptions, sysCompTransGraphId);
+	}
+	
+	if(isSystemTransMonGraphEmpty(sentData)){
+		drawTransactionMonitorGraphs(sentData, grayOptions, sysInvSentGraphId);
+	}else{
+		drawTransactionMonitorGraphs(sentData, sysOptions, sysInvSentGraphId);
+	}
+	
+	if(isSystemTransMonGraphEmpty(remindersData)){
+		drawTransactionMonitorGraphs(remindersData, grayOptions, sysRemSentGraphId);
+	}else{
+		drawTransactionMonitorGraphs(remindersData, sysOptions, sysRemSentGraphId);
+	}
+	
+	if(isSystemTransMonGraphEmpty(unprocessedData)){
+		drawTransactionMonitorGraphs(unprocessedData, grayOptions, sysUnproTransGraphId);
+	}else{
+		drawTransactionMonitorGraphs(unprocessedData, sysOptions, sysUnproTransGraphId);
+	}
+	
+}
+
+function isSystemTransMonGraphEmpty(graphData){
+	var isEmpty = true;
+	for(var i=0;i<graphData.length;i++){
+		if(graphData[i][1]>0 || graphData[i][3]>0){
+			isEmpty = false;
+			break;
+		}
+	}
+	return isEmpty;
 }
 
 function drawTransactionMonitorGraphs(graphData,options,graphDiv){
@@ -14493,8 +14531,9 @@ var pastWeekTransData = new Array();
 var curWeekTransData = new Array();
 
 function getTransactionMonitorData(alertType,noOfDays) {
-	
+	showOverlay();
 	if (isFetchingTransactionData == true) {
+		hideOverlay();
 		return;
 	}
 	
@@ -14514,6 +14553,10 @@ function getTransactionMonitorData(alertType,noOfDays) {
 			isFetchingTransactionData = false;
 			transactionMonitorData = data;
 			drawTransactionMonitorAlertGraphs(alertType,transactionMonitorData);
+			
+			if(hasFetchedWarningData && hasFetchedNormalData){
+				hideOverlay();
+			}
 		},
 		complete : function(){
 			if(hasFetchedWarningData == false){
@@ -14534,6 +14577,7 @@ function getTransactionMonitorData(alertType,noOfDays) {
 			}
 			$('#overlay-toast').html(e.responseText);
 			showToast();
+			hideOverlay();
 		}
 	});
 }
@@ -14840,7 +14884,6 @@ function setPastAndCurWeekDataForTransactionMonitor(graphData){
 		while(j<graphTimeSlots.length){
 			if(allTimeSlots[i]==graphTimeSlots[j]){
 				hasSlotDate = true;
-				j++;
 				break;
 			}else{
 				j++;
@@ -14850,9 +14893,9 @@ function setPastAndCurWeekDataForTransactionMonitor(graphData){
 		emptySlotGraphData.transactionDate = emptyGraphTimeSlots[i];
 		if(hasSlotDate){
 			if(i<7){
-				pastWeekTransData[i] = graphData[k++];
+				pastWeekTransData[i] = graphData[j];
 			}else{
-				curWeekTransData[i-7] = graphData[k++];
+				curWeekTransData[i-7] = graphData[j];
 			}
 		}else{
 			if(i<7){
