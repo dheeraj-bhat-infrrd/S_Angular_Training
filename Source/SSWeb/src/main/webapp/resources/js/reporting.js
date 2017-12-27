@@ -1646,19 +1646,96 @@ function drawRecentActivity(start,batchSize,tableHeader){
 function findReportWeek(startDate){
 	var currentDate = new Date();
 	var currentDay = currentDate.getDate();
+	
 	var startDateDay = parseInt(startDate.split(" ")[1].split(",")[0]);
+	var startDateYear = parseInt(startDate.split(" ")[2]);
+	var startDateMonth = getMonthNumberFromName(startDate.split(" ")[0]);
+	var startingDate = new Date(startDateYear,startDateMonth,startDateDay);
+	
+	var timeDiff = Math.abs(currentDate.getTime() - startingDate.getTime());
+	var dayDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+	
 	var weekName;
 	
-	var dayDiff = currentDay - startDateDay;
-	
-	if(dayDiff <= 7){
-		weekName="This Week";
-	}else if(dayDiff <=14){
-		weekName="Last Week";
+	weekName = startDate;
+	var weekEnd;
+	if(dayDiff<7){
+		weekEnd = getDateFromDate(currentDate);
+		weekName += ' - '+weekEnd;
 	}else{
-		weekName ="Past Week"
+		var weekEndDate = new Date(startDateYear,startDateMonth,startDateDay);
+		weekEndDate.setDate(weekEndDate.getDate()+6);
+		weekEnd = getDateFromDate(weekEndDate);
+		weekName += ' - '+weekEnd;
 	}
 	return weekName;	
+}
+
+function getDateFromDate(date){
+	var day = date.getDate();
+	var year =  date.getFullYear();
+	var month = date.getMonth()+1;
+	var monthStr = "Jan";
+	
+	switch(month){
+	case 1: monthStr = "Jan";
+		break;
+	case 2: monthStr = "Feb";
+		break;
+	case 3: monthStr = "Mar";
+		break;
+	case 4: monthStr = "Apr";
+		break;
+	case 5: monthStr = "May";
+		break;
+	case 6: monthStr = "Jun";
+		break;
+	case 7: monthStr = "Jul";
+		break;
+	case 8: monthStr = "Aug";
+		break;
+	case 9: monthStr = "Sep";
+		break;
+	case 10: monthStr = "Oct";
+		break;
+	case 11: monthStr = "Nov";
+		break;
+	case 12: monthStr = "Dec";
+		break;
+	}
+	
+	return monthStr+' '+day+', '+year;
+}
+
+function getMonthNumberFromName(monthName){
+	var month = 0;
+	
+	if(monthName == "Jan"){
+		month = 0;
+	}else if(monthName == "Feb"){
+		month = 1;
+	}else if(monthName == "Mar"){
+		month = 2;
+	}else if(monthName == "Apr"){
+		month = 3;
+	}else if(monthName == "May"){
+		month = 4;
+	}else if(monthName == "Jun"){
+		month = 5;
+	}else if(monthName == "Jul"){
+		month = 6;
+	}else if(monthName == "Aug"){
+		month = 7;
+	}else if(monthName == "Sep"){
+		month = 8;
+	}else if(monthName == "Oct"){
+		month = 9;
+	}else if(monthName == "Nov"){
+		month = 10;
+	}else if(monthName == "Dec"){
+		month = 11;
+	}
+	return month;
 }
 
 function getDateFromDateTime(dateTime){
