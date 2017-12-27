@@ -2,16 +2,19 @@ package com.realtech.socialsurvey.web.controller;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +24,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.JobLogDetailsResponse;
+import com.realtech.socialsurvey.core.entities.NpsReportWeek;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RankingRequirements;
 import com.realtech.socialsurvey.core.entities.User;
@@ -271,7 +278,21 @@ public class ReportingWebController
         long companyId = 0;
         long agentId = 0;
         OrganizationUnitSettings profileSettings = null;
-
+        JobLogDetailsResponse jobLogDetailsResponse = null;
+        String lastSuccessfulRun = "";
+        Response response = ssApiIntergrationBuilder.getIntegrationApi().getLastSuccessfulEtlTimeApi();
+        String responseString = response != null ? new String( ( (TypedByteArray) response.getBody() ).getBytes() ) : null;
+        if(responseString != null){
+            responseString = responseString.substring( 1, responseString.length() - 1 );
+            responseString = StringEscapeUtils.unescapeJava( responseString );
+            Type responseType = new TypeToken<JobLogDetailsResponse>() {}.getType();
+            jobLogDetailsResponse = new Gson().fromJson( responseString, responseType );
+            if(jobLogDetailsResponse.getLastRunTime().getStatus().equalsIgnoreCase( CommonConstants.STATUS_DUMMY )){
+                lastSuccessfulRun = "";
+            } else {
+                lastSuccessfulRun = jobLogDetailsResponse.getLastRunTime().getEst();
+            } 
+        }
         HttpSession session = request.getSession( false );
         User user = sessionHelper.getCurrentUser();
 
@@ -334,6 +355,7 @@ public class ReportingWebController
         model.addAttribute( "isRealTechOrSSAdmin", isRealTechOrSSAdmin );
 
         model.addAttribute( "profileSettings", profileSettings );
+        model.addAttribute( "lastSuccessfulRun", lastSuccessfulRun );
         session.setAttribute( CommonConstants.USER_PROFILE_SETTINGS, profileSettings );
         return JspResolver.REPORTING_DASHBOARD;
     }

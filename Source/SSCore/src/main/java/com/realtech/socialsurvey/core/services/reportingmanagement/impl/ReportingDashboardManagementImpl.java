@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -546,6 +545,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 surveyResultsReportVO.setClickTroughForRegion( surveyResultsCompanyReport.getClickTroughForRegion() );
                 surveyResultsReportVO.setClickTroughForBranch( surveyResultsCompanyReport.getClickTroughForBranch() );
                 surveyResultsReportVO.setSurveyResponseList( surveyResultsCompanyReport.getSurveyResponseList() );
+                surveyResultsReportVO.setParticipantType( surveyResultsCompanyReport.getParticipantType() );
+                surveyResultsReportVO.setAgentEmailId( surveyResultsCompanyReport.getAgentEmailId() );
+                surveyResultsReportVO.setCustomerEmailId( surveyResultsCompanyReport.getCustomerEmailId() );
+
             } else if ( type.equals( CommonConstants.REGION_ID ) ) {
                 surveyResultsReportRegion = (SurveyResultsReportRegion) entry.getValue();
                 surveyResultsReportVO.setSurveyDetailsId( surveyResultsReportRegion.getSurveyDetailsId() );
@@ -568,6 +571,9 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 surveyResultsReportVO.setClickTroughForRegion( surveyResultsReportRegion.getClickTroughForRegion() );
                 surveyResultsReportVO.setClickTroughForBranch( surveyResultsReportRegion.getClickTroughForBranch() );
                 surveyResultsReportVO.setSurveyResponseList( surveyResultsReportRegion.getSurveyResponseList() );
+                surveyResultsReportVO.setParticipantType( surveyResultsReportRegion.getParticipantType() );
+                surveyResultsReportVO.setAgentEmailId( surveyResultsReportRegion.getAgentEmailId() );
+                surveyResultsReportVO.setCustomerEmailId( surveyResultsReportRegion.getCustomerEmailId() );
             } else if ( type.equals( CommonConstants.BRANCH_ID ) ) {
                 surveyResultsReportBranch = (SurveyResultsReportBranch) entry.getValue();
                 surveyResultsReportVO.setSurveyDetailsId( surveyResultsReportBranch.getSurveyDetailsId() );
@@ -590,6 +596,9 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 surveyResultsReportVO.setClickTroughForRegion( surveyResultsReportBranch.getClickTroughForRegion() );
                 surveyResultsReportVO.setClickTroughForBranch( surveyResultsReportBranch.getClickTroughForBranch() );
                 surveyResultsReportVO.setSurveyResponseList( surveyResultsReportBranch.getSurveyResponseList() );
+                surveyResultsReportVO.setParticipantType( surveyResultsReportBranch.getParticipantType() );
+                surveyResultsReportVO.setAgentEmailId( surveyResultsReportBranch.getAgentEmailId() );
+                surveyResultsReportVO.setCustomerEmailId( surveyResultsReportBranch.getCustomerEmailId() );
             }
             surveyResultsReportVOMap.put( surveyDetailsId, surveyResultsReportVO );
         }
@@ -1707,9 +1716,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 recentActivityList.add( CommonConstants.REPORTING_USER_RANKING_YEARLY_REPORT );
             } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_INCOMPLETE_SURVEY_REPORT ) {
                 recentActivityList.add( CommonConstants.REPORTING_INCOMPLETE_SURVEY_REPORT );
-            } else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_NPS_WEEK_REPORT 
-                || fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_NPS_MONTH_REPORT){
-                recentActivityList.add( CommonConstants.REPORTING_NPS_REPORT );
+            } else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_NPS_WEEK_REPORT ) { 
+                recentActivityList.add( CommonConstants.REPORTING_NPS_REPORT_FOR_WEEK );
+            } else if(fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_NPS_MONTH_REPORT) {
+                recentActivityList.add( CommonConstants.REPORTING_NPS_REPORT_FOR_MONTH );
             }
             
             recentActivityList.add( fileUpload.getStartDate() );
@@ -2160,7 +2170,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         CellStyle style = wb.createCellStyle();//Create style
         Font font = wb.createFont();//Create font
         font.setBoldweight( Font.BOLDWEIGHT_BOLD );//Make font bold
-        style.setFillForegroundColor(IndexedColors.BLUE.index);
+        style.setFillForegroundColor(IndexedColors.LIGHT_BLUE.index);
         style.setFillPattern(CellStyle.SOLID_FOREGROUND);
         style.setFont( font );//set it to bold
 
@@ -4080,6 +4090,9 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
 	private XSSFWorkbook formatForNPSReportMonth(XSSFWorkbook workBook, List<NpsReportMonth> npsReportMonthList) {
 		makeRowBoldAndBlue(workBook, workBook.getSheetAt(0).getRow(0));
+		if(workBook.getSheetAt(0).getRow(1) == null || workBook.getSheetAt(0).getRow(1) == null){
+			return workBook;
+		}
 		makeRowBoldAndBlue(workBook, workBook.getSheetAt(0).getRow(1));
 		int rownum = 1;
 
@@ -4087,7 +4100,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 			if (npsReportMonth.getBranchId() == 0 && npsReportMonth.getRegionId() == 0) {
 				CellStyle style = workBook.createCellStyle();
 				style.setAlignment(CellStyle.ALIGN_CENTER);
-				style.setFillBackgroundColor(IndexedColors.BLUE.index);
+				style.setFillBackgroundColor(IndexedColors.AQUA.index);
 			} else if (npsReportMonth.getBranchId() == 0 && npsReportMonth.getRegionId() > 0) {
 				makeRowBold(workBook, workBook.getSheetAt(0).getRow(rownum));
 			}
@@ -4098,6 +4111,9 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
 	private XSSFWorkbook formatForNPSReportWeek(XSSFWorkbook workBook, List<NpsReportWeek> npsReportWeekList) {
 		makeRowBoldAndBlue(workBook, workBook.getSheetAt(0).getRow(0));
+		if(workBook.getSheetAt(0).getRow(1) == null || workBook.getSheetAt(0).getRow(1) == null){
+			return workBook;
+		}
 		makeRowBoldAndBlue(workBook, workBook.getSheetAt(0).getRow(1));
 		int rownum = 1;
 
@@ -4105,7 +4121,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 			if (npsReportWeek.getBranchId() == 0 && npsReportWeek.getRegionId() == 0) {
 				CellStyle style = workBook.createCellStyle();
 				style.setAlignment(CellStyle.ALIGN_CENTER);
-				style.setFillBackgroundColor(IndexedColors.BLUE.index);
+				style.setFillBackgroundColor(IndexedColors.AQUA.index);
 			} else if (npsReportWeek.getBranchId() == 0 && npsReportWeek.getRegionId() > 0) {
 				makeRowBold(workBook, workBook.getSheetAt(0).getRow(rownum));
 			}
@@ -4113,7 +4129,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 		}
 		return workBook;
 	}
-    
+
     @Override
     public void updateTransactionMonitorAlertsForCompanies() throws InvalidInputException
     {

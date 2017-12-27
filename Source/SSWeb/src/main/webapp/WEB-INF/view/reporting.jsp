@@ -101,8 +101,15 @@
 	<div class="container">
 		<div class="hm-header-row clearfix">
 			<div id="timeFrame_container">
-			<jsp:include page="reporting_timeFrame_dropdown.jsp"></jsp:include>
-			</div>	
+				<jsp:include page="reporting_timeFrame_dropdown.jsp"></jsp:include>
+			</div>
+			<c:if test='${lastSuccessfulRun != "" && lastSuccessfulRun != null && lastSuccessfulRun !=undefined}'>
+				<div class="float-left last-run-time-div">
+					<div class="align-center">
+						<span class="incomplete-trans-span rep-disc-span last-run-time-span">Last time data refresh run: ${lastSuccessfulRun}</span>
+					</div>
+				</div>
+			</c:if>		
 		</div>
 	</div>
 </div>
