@@ -10583,3 +10583,18 @@ img.lead-img {
     margin: 0 auto;
     margin-top: 10px;
 }
+
+.last-run-time-div{
+	margin-top:15px; 
+	margin-left:10px;
+}
+
+.align-center{
+	text-align:center !important;
+}
+
+.last-run-time-span{
+	font-size:small !important;
+	font-variant: none !important; 
+	color:white !important;
+}
