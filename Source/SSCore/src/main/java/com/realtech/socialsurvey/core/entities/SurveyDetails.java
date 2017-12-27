@@ -89,6 +89,8 @@ public class SurveyDetails
     private Date lastRetakeRequestDate;
     private List<RetakeSurveyHistory> retakeSurveyHistory; 
     
+    //NPS details
+    private int npsScore = -1;
         
     public String getAgentEmailId()
     {
@@ -771,6 +773,17 @@ public class SurveyDetails
     }
 
 
+    public int getNpsScore()
+    {
+        return npsScore;
+    }
+
+
+    public void setNpsScore( int npsScore )
+    {
+        this.npsScore = npsScore;
+    }
+
     public int getNoOfRetake()
     {
         return noOfRetake;
@@ -806,4 +819,5 @@ public class SurveyDetails
         this.retakeSurveyHistory = retakeSurveyHistory;
     }
 	
+    
 }

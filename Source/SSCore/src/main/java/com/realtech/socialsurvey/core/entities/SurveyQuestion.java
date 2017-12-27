@@ -11,6 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 /**
@@ -55,6 +56,9 @@ public class SurveyQuestion implements Serializable {
 	// bi-directional many-to-one association to SurveyQuestionsMapping
 	@OneToMany(mappedBy = "surveyQuestion", fetch = FetchType.LAZY)
 	private List<SurveyQuestionsMapping> surveyQuestionsMappings;
+	
+	@OneToOne(mappedBy = "surveyQuestion", fetch = FetchType.LAZY)
+	private Survey0To10Questions survey0To10Questions;
 
 	public SurveyQuestion() {}
 
@@ -165,5 +169,16 @@ public class SurveyQuestion implements Serializable {
 
 		return surveyQuestionsMapping;
 	}
+
+    public Survey0To10Questions getSurvey0To10Questions()
+    {
+        return survey0To10Questions;
+    }
+
+    public void setSurvey0To10Questions( Survey0To10Questions survey0To10Questions )
+    {
+        this.survey0To10Questions = survey0To10Questions;
+    }
+	
 
 }

@@ -222,7 +222,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     @Override
     public void updateGatewayAnswer( String surveyId, String mood, String review, boolean isAbusive, String agreedToShare )
     {
-        LOG.debug( "Method updateGatewayAnswer() to update review provided by customer started." );
+        LOG.info( "Method updateGatewayAnswer() to update review provided by customer started." );
         Query query = new Query();
         query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyId ) );
         Update update = new Update();
@@ -242,7 +242,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         update.set( CommonConstants.EDITABLE_SURVEY_COLUMN, false );
         update.set( CommonConstants.AGREE_SHARE_COLUMN, agreedToShare );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
-        LOG.debug( "Method updateGatewayAnswer() to update review provided by customer finished." );
+        LOG.info( "Method updateGatewayAnswer() to update review provided by customer finished." );
     }
 
 
@@ -252,33 +252,47 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     @Override
     public void updateFinalScore( String surveyId )
     {
-        LOG.debug( "Method to calculate and update final score based upon rating questions started." );
+        LOG.info( "Method to calculate and update final score based upon rating questions started." );
         Query query = new Query();
         List<String> ratingType = new ArrayList<>();
         ratingType.add( "sb-range-smiles" );
         ratingType.add( "sb-range-scale" );
         ratingType.add( "sb-range-star" );
+        ratingType.add( "sb-range-0to10" );
         query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyId ) );
         query.addCriteria( Criteria.where( "surveyResponse.questionType" ).in( ratingType ) );
         List<SurveyResponse> surveyResponse = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION )
             .get( CommonConstants.INITIAL_INDEX ).getSurveyResponse();
         double noOfResponse = 0;
         double answer = 0;
+        Update update = new Update();
         for ( SurveyResponse response : surveyResponse ) {
             if ( response.getQuestionType().equals( ratingType.get( CommonConstants.INITIAL_INDEX ) )
                 || response.getQuestionType().equals( ratingType.get( 1 ) )
-                || response.getQuestionType().equals( ratingType.get( 2 ) ) ) {
-                if ( response.getAnswer() != null && !response.getAnswer().isEmpty() ) {
+                || response.getQuestionType().equals( ratingType.get( 2 ) )
+                || response.getQuestionType().equals( ratingType.get( 3 ) )
+                && ( response.getAnswer() != null && !response.getAnswer().isEmpty() )) {
+                //check if question type is 0to10 and divide answer by 2
+                if(response.getQuestionType().equals( ratingType.get( 3 ))){
+                    if(response.isConsiderForScore()){
+                        int npsAnswer = Integer.parseInt( response.getAnswer() );
+                        answer += (double) npsAnswer/2;
+                        noOfResponse++;
+                    }
+                    //check if isNpsQuestion ans set npsScore
+                    if(response.getIsNpsQuestion()){
+                        update.set( CommonConstants.NPS_SCORE_COLUMN, response.getAnswer() );
+                    }
+                }else{
                     answer += Integer.parseInt( response.getAnswer() );
                     noOfResponse++;
                 }
             }
         }
-        Update update = new Update();
         update.set( CommonConstants.SCORE_COLUMN, Math.round( answer / noOfResponse * 1000.0 ) / 1000.0 );
         update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
-        LOG.debug( "Method to calculate and update final score based upon rating questions finished." );
+        LOG.info( "Method to calculate and update final score based upon rating questions finished." );
     }
 
 
@@ -3450,6 +3464,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
         Update update = new Update();
         update.set( CommonConstants.STAGE_COLUMN, surveyDetails.getStage());
+        update.set( CommonConstants.NPS_SCORE_COLUMN, surveyDetails.getNpsScore() );
         update.set( CommonConstants.REVIEW_COLUMN , surveyDetails.getReview() );
         update.set( CommonConstants.RETAKE_SURVEY_COLUMN, surveyDetails.isRetakeSurvey());
         update.set( CommonConstants.NO_OF_RETAKE_COLUMN, surveyDetails.getNoOfRetake() );

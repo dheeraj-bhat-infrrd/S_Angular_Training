@@ -29,6 +29,7 @@
 							<div class="bd-ans-header clearfix">
 								<div class="bd-ans-hd-container clearfix float-left">
 									<div data-id="sb-range" class="bd-tab-rat float-left bd-ans-tab-item bd-ans-tab-sel"><spring:message code="label.rating.key" /></div>
+									<div data-id="sb-range-0to10" class="bd-tab-rad float-left bd-ans-tab-item"><spring:message code="label.rating.0to10.key" /></div>
 									<div data-id="sb-sel-desc" class="bd-tab-com float-left bd-ans-tab-item"><spring:message code="label.comment.key" /></div>
 									<div data-id="sb-sel-mcq" class="bd-tab-mcq float-left bd-ans-tab-item"><spring:message code="label.multiplechoice.key" /></div>
 								</div>
@@ -64,6 +65,56 @@
 									</div>
   								</div>
 							</div>
+
+							<div class="bd-ans-type-radio bd-ans-type-item hide">
+								<div class="bd-and-tier2"><spring:message code="label.customer.customize.descriptions.key" /></div>
+								<div class="clearfix bd-ans-type bd-ans-type-radio-adj">
+									<div id="sq-radio-1to10" class="sq-1to10-range" style="height: 160px" selected-rating-radio="">
+										<div class="edit-survey-radio-container">
+											<div class="container-1to10 inner-container-1to10">
+												<c:forEach begin="0" end="10" varStatus="loop">
+													<c:choose>
+														<c:when test="${loop.index == 0}">
+															<div class="radio-div" style="margin-left: 10px">
+																<div class="radio-outer-gray sq-radio"></div>
+															</div>
+														</c:when>
+														<c:otherwise>
+															<div class="radio-div">
+																<div class="radio-outer-gray sq-radio"></div>
+															</div>
+														</c:otherwise>
+													</c:choose>
+												</c:forEach>
+											</div>
+											<div class="container-1to10">
+												<c:forEach begin="0" end="10" varStatus="numLoop">
+													<div class="span-1to10" style="text-align: right">${numLoop.index}</div>
+												</c:forEach>
+											</div>
+											<div class="sq-1to10-range-val">
+												<input id="sq-not-very-likely" name="notVeryLikely" class="float-left sq-range-1to10-input sq-not-very-likely" value="Not at all likely">
+												<input id="sq-very-likely" name="veryLikely" class="float-right sq-range-1to10-input text-align-right sq-very-likely" value="Very Likely">
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="bd-q-pu-done-wrapper bd-q-pu-done-wrapper-override clearfix">
+									<div id="user-ranking-chkbox-nps-wrapper" class="clearfix" style="width: 200px;">
+										<div id="user-ranking-nps-chkbox" class="float-left user-ranking-chkbox bd-check-img"></div>
+										<div class="float-left  listing-access-txt cursor-pointer">Consider for User Ranking</div>
+									</div>
+									<div id="avg-score-chkbox-wrapper" class="clearfix" style="width: 210px;">
+										<div id="avg-score-chkbox" class="float-left avg-score bd-check-img"></div>
+										<input type="hidden" id="avg-score-ques" name="considerForScore" value=true>
+										<div class="float-left  listing-access-txt cursor-pointer">Consider for Average Score</div>
+									</div>
+									<div id="nps-chkbox-wrapper-1" class="clearfix">
+										<input type="hidden" id="nps-ques-1" name="nps-ques" value=false>
+									</div>
+								</div>
+							</div>
+
 							<div id="" class="bd-ans-type-mcq bd-ans-type-item hide">
 								<div class="bd-and-tier2"><spring:message code="label.customer.answerfrom.key" /></div>
 								<div class="clearfix bd-ans-type bd-ans-type-mcq-adj">
@@ -141,16 +192,88 @@
 			<div id="btn-add-question" class="float-right bd-svry-right"><spring:message code="label.addnewquestion.key" /></div>
 		</div>
 	</div>
+	<div id="npsQuestion" data-quesref="" class="bd-srv-q-tbl" style="display:grid">
+		<div class="bd-srv-tbl-header">
+			<spring:message code="label.build.nps.question.key" />
+		</div>
+		<form id="nps-question-form" data-quesnum="1" data-quesref="" data-state="new" data-status="edited">
+		<div id="nps-chkbox-wrapper" class="clearfix" style="width: 210px;">
+			<div id="nps-chkbox" class="float-left avg-score bd-check-img bd-check-img-checked"></div>
+			<input type="hidden" id="nps-ques" name="nps-ques" value=false>
+			<div class="float-left  listing-access-txt cursor-pointer">Enable NPS Question</div>
+		</div>
+		
+		<div id="nps-add-edit" class="bd-ans-type-radio bd-ans-type-item hide">
+			<div class="bd-q-pu-header clearfix">
+				<div class="float-left bd-q-pu-header-lft">Enter/Edit Your NPS Questions Here</div>
+			</div>
+			<div class="col-xs-10 col-sm-10 col-md-10 col-lg-10" style="margin:0 auto">
+				<div class="bd-q-pu-txt-wrapper pos-relative">
+					<input type="hidden" id="sb-nps-question" name="sb-question-type-999" value="sb-range-0to10"/> 
+					<input id="sb-nps-question-txt" name="sb-question-txt-999" class="bd-q-pu-txt-nps" value="<spring:message code="label.default.nps.question.key" />">
+					<div class="bd-q-pu-close hide"></div>
+				</div>
+			</div>
+			<div class="bd-and-tier2 col-xs-12 col-sm-12 col-md-12 col-lg-12"><spring:message code="label.customer.customize.descriptions.key" /></div>
+			<div class="clearfix bd-ans-type bd-ans-type-radio-adj">
+				<div id="sq-nps-radio-1to10" class="sq-1to10-range" style="height: 160px" selected-rating-radio="">
+					<div class="edit-survey-radio-container">
+						<div class="container-1to10 inner-container-1to10">
+							<c:forEach begin="0" end="10" varStatus="loop">
+								<c:choose>
+									<c:when test="${loop.index == 0}">
+										<div class="radio-div" style="margin-left: 10px">
+											<div class="radio-outer-gray sq-radio"></div>
+										</div>
+									</c:when>
+									<c:otherwise>
+										<div class="radio-div">
+											<div class="radio-outer-gray sq-radio"></div>
+										</div>
+									</c:otherwise>
+								</c:choose>
+							</c:forEach>
+						</div>
+						<div class="container-1to10">
+							<c:forEach begin="0" end="10" varStatus="numLoop">
+								<div class="span-1to10" style="text-align: right">${numLoop.index}</div>
+							</c:forEach>
+						</div>
+						<div class="sq-1to10-range-val">
+							<input id="sq-not-very-likely-nps" name="notVeryLikely" class="float-left sq-range-1to10-input sq-not-very-likely" value="<spring:message code="label.default.not.very.likely.key" />">
+							<input id="sq-very-likely-nps" name="veryLikely" class="float-right sq-range-1to10-input text-align-right sq-very-likely" value="<spring:message code="label.default.very.likely.key" />">
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="bd-nps-checkbox-wrapper bd-q-pu-done-wrapper-override clearfix">
+				<div id="user-ranking-chkbox-wrapper-nps" class="clearfix" style="width: 200px;">
+					<div id="user-ranking-chkbox-nps" class="float-left user-ranking-chkbox bd-check-img"></div>
+					<input type="hidden" id="user-ranking-ques-nps" name="user-ranking-ques" value=true>
+					<div class="float-left  listing-access-txt cursor-pointer">Consider for User Ranking</div>
+				</div>
+				<div id="avg-score-chkbox-wrapper-nps" class="clearfix" style="width: 210px;">
+					<div id="avg-score-chkbox-nps" class="float-left avg-score bd-check-img"></div>
+					<input type="hidden" id="avg-score-ques-nps" name="considerForScore" value=true>
+					<div class="float-left  listing-access-txt cursor-pointer">Consider for Average Score</div>
+				</div>
+			</div>
+			<div class="bd-nps-checkbox-wrapper clearfix">
+				<div class="bd-nps-btn-done float-left"><spring:message code="label.done.key" /></div>
+			</div>
+		</div>
+		</form>
+	</div>
 </div>
 <script>
-$(document).ready(function() {
-	hideOverlay();
-	$(document).attr("title", "Build Survey");
-	
-	$('#bs-ques-wrapper').html('');
-	loadActiveSurveyQuestions();
-	
-	resizeAdjBuildSurvey();
-	$(window).resize(resizeAdjBuildSurvey);
-});
+	$(document).ready(function() {
+		hideOverlay();
+		$(document).attr("title", "Build Survey");
+
+		$('#bs-ques-wrapper').html('');
+		loadActiveSurveyQuestions();
+
+		resizeAdjBuildSurvey();
+		$(window).resize(resizeAdjBuildSurvey);
+	});
 </script>
