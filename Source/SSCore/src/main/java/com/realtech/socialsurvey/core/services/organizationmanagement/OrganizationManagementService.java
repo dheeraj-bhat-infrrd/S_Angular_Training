@@ -4,6 +4,7 @@ package com.realtech.socialsurvey.core.services.organizationmanagement;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -30,6 +31,7 @@ import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
+import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
@@ -1520,8 +1522,14 @@ public interface OrganizationManagementService
 
     public Set<String> parseEmailsList( String emailsStr );
 
-    public boolean updateDigestRecipients( OrganizationUnitSettings unitSettings, Set<String> emails, String collectionType )
-        throws InvalidInputException;
+    public boolean updateDigestRecipients( String entityType, long entityId, Set<String> emails )
+        throws InvalidInputException, NoRecordsFetchedException;
 
     public List<OrganizationUnitSettings> getCompaniesByAlertType( String alertType );
+
+
+    public String getCollectionFromProfileLevel( String profileLevel ) throws InvalidInputException;
+
+
+    public Set<String> getAdminEmailsForAhierarchy( String profileLevel, long iden ) throws InvalidInputException;
 }

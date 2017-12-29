@@ -9,4 +9,6 @@ public interface SurveyStatsReportCompanyDao extends GenericReportingDao<SurveyS
 
     List<SurveyStatsReportCompany> fetchCompanySurveyStatsById( Long companyId, String startTrxMonth, String endTrxMonth );
 
+    SurveyStatsReportCompany fetchCompanySurveyStats( long companyId, int month, int year );
+
 }

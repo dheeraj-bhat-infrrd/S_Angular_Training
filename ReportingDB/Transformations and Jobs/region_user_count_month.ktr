@@ -529,7 +529,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  distinct USER_ID&#xd;&#xa;, REGION_ID&#xd;&#xa;, month&#x28;CREATED_ON_EST&#x29; as month&#xd;&#xa;, year&#x28;CREATED_ON_EST&#x29; as year&#xd;&#xa;FROM user_profile &#xd;&#xa;WHERE STATUS in &#x28;1&#x29; &#xd;&#xa;order by REGION_ID,month,year&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  distinct USER_ID&#xd;&#xa;, REGION_ID&#xd;&#xa;, month&#x28;MODIFIED_ON_EST&#x29; as month&#xd;&#xa;, year&#x28;MODIFIED_ON_EST&#x29; as year&#xd;&#xa;FROM user_profile &#xd;&#xa;WHERE STATUS in &#x28;1&#x29; &#xd;&#xa;order by REGION_ID,month,year&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>

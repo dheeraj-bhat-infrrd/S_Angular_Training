@@ -45,7 +45,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.commons.OrganizationUnitSettingsComparator;
 import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
@@ -8399,22 +8398,47 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
     @Override
-    public boolean updateDigestRecipients( OrganizationUnitSettings unitSettings, Set<String> emails, String collectionType )
-        throws InvalidInputException
+    public boolean updateDigestRecipients( String entityType, long entityId, Set<String> emails )
+        throws InvalidInputException, NoRecordsFetchedException
     {
+        LOG.debug( "method updateDigestRecipients() started" );
+        if ( StringUtils.isEmpty( entityType ) ) {
+            LOG.warn( "Entity type is not specified" );
+            throw new InvalidInputException( "Entity type is not specified" );
+        } else if ( entityId <= 0 ) {
+            LOG.warn( "Entity Id is invalid" );
+            throw new InvalidInputException( "Entity Id is invalid" );
+        }
+
+        OrganizationUnitSettings unitSettings = null;
+        String collectionType = "";
+
+        if ( CommonConstants.COMPANY_ID_COLUMN.equals( entityType ) ) {
+            unitSettings = getCompanySettings( entityId );
+            collectionType = CommonConstants.COMPANY_SETTINGS_COLLECTION;
+        } else if ( CommonConstants.REGION_ID_COLUMN.equals( entityType ) ) {
+            unitSettings = getRegionSettings( entityId );
+            collectionType = CommonConstants.REGION_SETTINGS_COLLECTION;
+        } else if ( CommonConstants.BRANCH_ID_COLUMN.equals( entityType ) ) {
+            unitSettings = getBranchSettingsDefault( entityId );
+            collectionType = CommonConstants.BRANCH_SETTINGS_COLLECTION;
+        } else if ( CommonConstants.AGENT_ID_COLUMN.equals( entityType ) ) {
+            unitSettings = getAgentSettings( entityId );
+            collectionType = CommonConstants.AGENT_SETTINGS_COLLECTION;
+        } else {
+            LOG.warn( "Entity Type is invalid" );
+            throw new InvalidInputException( "Entity type is invalid" );
+        }
+
         if ( unitSettings == null ) {
             LOG.warn( "settings are not specified" );
             throw new InvalidInputException( "settings cannot be null." );
-        } else if ( StringUtils.isEmpty( collectionType ) ) {
-            LOG.warn( "target collection is not specified" );
-            throw new InvalidInputException( "target collection name cannot be null." );
         }
 
-        LOG.debug( "Updating unitSettings: {} with digest recipients: {}", unitSettings, emails );
+        LOG.trace( "Updating unitSettings: {} with digest recipients: {}", unitSettings, emails );
 
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
-            MongoOrganizationUnitSettingDaoImpl.KEY_DIGEST_RECIPIENTS, emails, unitSettings,
-            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+            MongoOrganizationUnitSettingDaoImpl.KEY_DIGEST_RECIPIENTS, emails, unitSettings, collectionType );
         LOG.debug( "Updated the record successfully" );
 
         return true;
@@ -8459,5 +8483,71 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         
         LOG.debug( "method getCompaniesByAlertType finished for alertType {}" , alertType );
         return organizationUnitSettingsDao.fetchCompaniesByAlertType( alertType, companyIds );   
+    }
+
+
+    @Override
+    public String getCollectionFromProfileLevel( String profileLevel ) throws InvalidInputException
+    {
+        LOG.debug( "method getCollectionFromProfileLevel started" );
+        if( CommonConstants.PROFILE_LEVEL_COMPANY.equals( profileLevel ) ) {
+            return MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
+        } else if( CommonConstants.PROFILE_LEVEL_REGION.equals( profileLevel ) ) {
+            return MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;            
+        } else if( CommonConstants.PROFILE_LEVEL_BRANCH.equals( profileLevel ) ) {
+            return MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
+        } else if( CommonConstants.PROFILE_LEVEL_INDIVIDUAL.equals( profileLevel ) ) {
+            return MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
+        } else {
+            LOG.warn( "Invalid profile level" );
+            throw new InvalidInputException( "Invalid profile level" );
+        }
+    }
+
+
+    @Override
+    public Set<String> getAdminEmailsForAhierarchy( String profileLevel, long iden ) throws InvalidInputException
+    {
+        LOG.debug( "method getAdminEmaillsForAhierarchy started" );
+        List<UserProfile> adminList = new ArrayList<>();
+        Set<String> emailSet = null;
+
+        Map<String, Object> queries = new HashMap<>();
+        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+
+        if ( CommonConstants.PROFILE_LEVEL_COMPANY.equals( profileLevel ) ) {
+            queries.put( CommonConstants.COMPANY_COLUMN, getCompanyById( iden ) );
+            queries.put( CommonConstants.PROFILE_MASTER_COLUMN,
+                userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID ) );
+        } else if ( CommonConstants.PROFILE_LEVEL_REGION.equals( profileLevel ) ) {
+            queries.put( CommonConstants.REGION_ID_COLUMN, iden );
+            queries.put( CommonConstants.PROFILE_MASTER_COLUMN,
+                userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) );
+        } else if ( CommonConstants.PROFILE_LEVEL_BRANCH.equals( profileLevel ) ) {
+            queries.put( CommonConstants.BRANCH_ID_COLUMN, iden );
+            queries.put( CommonConstants.PROFILE_MASTER_COLUMN,
+                userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) );
+        } else if ( CommonConstants.PROFILE_LEVEL_INDIVIDUAL.equals( profileLevel ) ) {
+            queries.put( CommonConstants.USER_COLUMN, userManagementService.getUserByUserId( iden ) );
+            queries.put( CommonConstants.PROFILE_MASTER_COLUMN,
+                userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) );
+        } else {
+            LOG.warn( "Invalid profile level" );
+            throw new InvalidInputException( "Invalid profile level" );
+        }
+
+        adminList.addAll( userProfileDao.findByKeyValue( UserProfile.class, queries ) );
+
+        if ( !adminList.isEmpty() ) {
+            emailSet = new HashSet<>();
+            for ( UserProfile admin : adminList ) {
+                emailSet.add( admin.getUser().getEmailId() );
+            }
+        } else {
+            emailSet = Collections.emptySet();
+        }
+
+        LOG.debug( "method getAdminEmaillsForAhierarchy finished" );
+        return emailSet;
     }
 }

@@ -43,6 +43,24 @@ public class SurveyStatsReportBranchDaoImpl extends GenericReportingDaoImpl<Surv
     }
     
     @Override
+    public SurveyStatsReportBranch fetchBranchSurveyStats( long branchId, int month , int year  )
+    {
+        LOG.debug( "Method to fetch all the survey stats,fetchBranchSurveyStats() started." );
+        Criteria criteria = getSession().createCriteria( SurveyStatsReportBranch.class );
+        try {
+            criteria.add( Restrictions.eq( CommonConstants.BRANCH_ID_COLUMN, branchId ) );
+            criteria.add( Restrictions.eq( CommonConstants.MONTH, (long)month ) );
+            criteria.add( Restrictions.eq( CommonConstants.YEAR, (long)year ) );
+        } catch ( HibernateException hibernateException ) {
+            LOG.error( "Exception caught in fetchBranchSurveyStats() ", hibernateException );
+            throw new DatabaseException( "Exception caught in fetchBranchSurveyStats() ", hibernateException );
+        }
+
+        LOG.debug( "Method to fetch all the users by branch id, fetchBranchSurveyStats() finished." );
+        return (SurveyStatsReportBranch) criteria.uniqueResult();
+    }
+    
+    @Override
     public List<SurveyStatsReportBranch> fetchSurveyStatsById(Long entityId , String entityType)
     {
         LOG.info( "method to fetch branch based on Id and type,fetchSurveyStatsById() started" );

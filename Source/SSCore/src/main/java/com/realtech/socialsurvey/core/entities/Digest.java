@@ -1,203 +1,216 @@
 package com.realtech.socialsurvey.core.entities;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import java.io.Serializable;
 
-@Entity
-@Table(name= "digest")
-public class Digest
+
+public class Digest implements Serializable
 {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue ( strategy = GenerationType.IDENTITY)
-    @Column ( name = "digest_id")
-    private String digestId;
-    
-    @Column (name = "company_id")
-    private Long companyId;
-    
-    @Column (name = "company_name")
-    private String companyName;
-    
-    @Column (name = "month")
+    private String profileLevel;
+    private long entityId;
+    private String entityName;
     private int month;
-    
-    @Column (name = "year")
     private int year;
-    
-    @Column (name = "average_score_rating")
-    private Double averageScoreRating;
-    
-    @Column (name = "user_count")
-    private Long userCount;
-    
-    @Column (name = "total_transactions")
-    private Long totalTransactions;
-    
-    @Column (name = "completed_transactions")
-    private Long completedTransactions;
-    
-    @Column (name = "survey_completion_rate")
-    private Double surveyCompletionRate;
-    
-    @Column (name = "sps")
-    private Double sps;
-    
-    @Column (name = "promoters")
-    private Long promoters;
-    
-    @Column (name = "detractors")
-    private Long detractors;
-    
-    @Column (name = "passives")
-    private Long passives;
-    
-    @Column (name = "total_completed_reviews")
-    private Long totalCompletedReviews;
-    
-    @Column (name = "trx_month")
-    private String trxMonth;
+    private double averageScoreRating;
+    private long userCount;
+    private long totalTransactions;
+    private long completedTransactions;
+    private double surveyCompletionRate;
+    private double sps;
+    private long promoters;
+    private long detractors;
+    private long passives;
+    private long totalCompletedReviews;
 
-	public String getDigestId() {
-		return digestId;
-	}
 
-	public void setDigestId(String digestId) {
-		this.digestId = digestId;
-	}
+    public String getProfileLevel()
+    {
+        return profileLevel;
+    }
 
-	public Long getCompanyId() {
-		return companyId;
-	}
 
-	public void setCompanyId(Long companyId) {
-		this.companyId = companyId;
-	}
+    public void setProfileLevel( String profileLevel )
+    {
+        this.profileLevel = profileLevel;
+    }
 
-	public String getCompanyName() {
-		return companyName;
-	}
 
-	public void setCompanyName(String companyName) {
-		this.companyName = companyName;
-	}
+    public long getEntityId()
+    {
+        return entityId;
+    }
 
-	public int getMonth() {
-		return month;
-	}
 
-	public void setMonth(int month) {
-		this.month = month;
-	}
+    public void setEntityId( long entityId )
+    {
+        this.entityId = entityId;
+    }
 
-	public int getYear() {
-		return year;
-	}
 
-	public void setYear(int year) {
-		this.year = year;
-	}
+    public String getEntityName()
+    {
+        return entityName;
+    }
 
-	public Double getAverageScoreRating() {
-		return averageScoreRating;
-	}
 
-	public void setAverageScoreRating(Double averageScoreRating) {
-		this.averageScoreRating = averageScoreRating;
-	}
+    public void setEntityName( String entityName )
+    {
+        this.entityName = entityName;
+    }
 
-	public Long getUserCount() {
-		return userCount;
-	}
 
-	public void setUserCount(Long userCount) {
-		this.userCount = userCount;
-	}
+    public int getMonth()
+    {
+        return month;
+    }
 
-	public Long getTotalTransactions() {
-		return totalTransactions;
-	}
 
-	public void setTotalTransactions(Long totalTransactions) {
-		this.totalTransactions = totalTransactions;
-	}
+    public void setMonth( int month )
+    {
+        this.month = month;
+    }
 
-	public Long getCompletedTransactions() {
-		return completedTransactions;
-	}
 
-	public void setCompletedTransactions(Long completedTransactions) {
-		this.completedTransactions = completedTransactions;
-	}
+    public int getYear()
+    {
+        return year;
+    }
 
-	public Double getSurveyCompletionRate() {
-		return surveyCompletionRate;
-	}
 
-	public void setSurveyCompletionRate(Double surveyCompletionRate) {
-		this.surveyCompletionRate = surveyCompletionRate;
-	}
+    public void setYear( int year )
+    {
+        this.year = year;
+    }
 
-	public Double getSps() {
-		return sps;
-	}
 
-	public void setSps(Double sps) {
-		this.sps = sps;
-	}
+    public double getAverageScoreRating()
+    {
+        return averageScoreRating;
+    }
 
-	public Long getPromoters() {
-		return promoters;
-	}
 
-	public void setPromoters(Long promoters) {
-		this.promoters = promoters;
-	}
+    public void setAverageScoreRating( double averageScoreRating )
+    {
+        this.averageScoreRating = averageScoreRating;
+    }
 
-	public Long getDetractors() {
-		return detractors;
-	}
 
-	public void setDetractors(Long detractors) {
-		this.detractors = detractors;
-	}
+    public long getUserCount()
+    {
+        return userCount;
+    }
 
-	public Long getPassives() {
-		return passives;
-	}
 
-	public void setPassives(Long passives) {
-		this.passives = passives;
-	}
+    public void setUserCount( long userCount )
+    {
+        this.userCount = userCount;
+    }
 
-	public Long getTotalCompletedReviews() {
-		return totalCompletedReviews;
-	}
 
-	public void setTotalCompletedReviews(Long totalCompletedReviews) {
-		this.totalCompletedReviews = totalCompletedReviews;
-	}
+    public long getTotalTransactions()
+    {
+        return totalTransactions;
+    }
 
-	public String getTrxMonth() {
-		return trxMonth;
-	}
 
-	public void setTrxMonth(String trxMonth) {
-		this.trxMonth = trxMonth;
-	}
+    public void setTotalTransactions( long totalTransactions )
+    {
+        this.totalTransactions = totalTransactions;
+    }
 
-	@Override
-	public String toString() {
-		return "Digest [digestId=" + digestId + ", companyId=" + companyId + ", companyName=" + companyName + ", month="
-				+ month + ", year=" + year + ", averageScoreRating=" + averageScoreRating + ", userCount=" + userCount
-				+ ", totalTransactions=" + totalTransactions + ", completedTransactions=" + completedTransactions
-				+ ", surveyCompletionRate=" + surveyCompletionRate + ", sps=" + sps + ", promoters=" + promoters
-				+ ", detractors=" + detractors + ", passives=" + passives + ", totalCompletedReviews="
-				+ totalCompletedReviews + ", trxMonth=" + trxMonth + "]";
-	}
+
+    public long getCompletedTransactions()
+    {
+        return completedTransactions;
+    }
+
+
+    public void setCompletedTransactions( long completedTransactions )
+    {
+        this.completedTransactions = completedTransactions;
+    }
+
+
+    public double getSurveyCompletionRate()
+    {
+        return surveyCompletionRate;
+    }
+
+
+    public void setSurveyCompletionRate( double surveyCompletionRate )
+    {
+        this.surveyCompletionRate = surveyCompletionRate;
+    }
+
+
+    public double getSps()
+    {
+        return sps;
+    }
+
+
+    public void setSps( double sps )
+    {
+        this.sps = sps;
+    }
+
+
+    public long getPromoters()
+    {
+        return promoters;
+    }
+
+
+    public void setPromoters( long promoters )
+    {
+        this.promoters = promoters;
+    }
+
+
+    public long getDetractors()
+    {
+        return detractors;
+    }
+
+
+    public void setDetractors( long detractors )
+    {
+        this.detractors = detractors;
+    }
+
+
+    public long getPassives()
+    {
+        return passives;
+    }
+
+
+    public void setPassives( long passives )
+    {
+        this.passives = passives;
+    }
+
+
+    public long getTotalCompletedReviews()
+    {
+        return totalCompletedReviews;
+    }
+
+
+    public void setTotalCompletedReviews( long totalCompletedReviews )
+    {
+        this.totalCompletedReviews = totalCompletedReviews;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return "Digest [profileLevel=" + profileLevel + ", entityId=" + entityId + ", entityName=" + entityName + ", month="
+            + month + ", year=" + year + ", averageScoreRating=" + averageScoreRating + ", userCount=" + userCount
+            + ", totalTransactions=" + totalTransactions + ", completedTransactions=" + completedTransactions
+            + ", surveyCompletionRate=" + surveyCompletionRate + ", sps=" + sps + ", promoters=" + promoters + ", detractors="
+            + detractors + ", passives=" + passives + ", totalCompletedReviews=" + totalCompletedReviews + "]";
+    }
 }

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.entities.CompanyDetailsReport;
 import com.realtech.socialsurvey.core.entities.CompanyActiveUsersStats;
-import com.realtech.socialsurvey.core.entities.CompanyDigestRequestData;
+import com.realtech.socialsurvey.core.entities.DigestRequestData;
 import com.realtech.socialsurvey.core.entities.CompanySurveyStatusStats;
 import com.realtech.socialsurvey.core.entities.CompanyView;
 import com.realtech.socialsurvey.core.entities.SurveyResultsReportVO;
@@ -569,29 +569,29 @@ public class ReportingController
     }
 
 
-    @RequestMapping ( value = "/getcompaniesoptedfordigestmail", method = RequestMethod.GET)
+    @RequestMapping ( value = "/getentitiesoptedfordigestmail", method = RequestMethod.GET)
     @ApiOperation ( value = "Fetch the list of companies that have digest Mail enabled")
-    public String getCompaniesOptedForDigestMail( int startIndex, int batchSize )
+    public String getCompaniesOptedForDigestMail( String profileLevel, int startIndex, int batchSize ) throws NonFatalException
     {
 
         LOGGER.info( "Fetching the list of companies that have digest Mail enabled" );
 
         String json = null;
-        List<CompanyDigestRequestData> digestRequestData;
-        digestRequestData = reportingDashboardManagement.getCompaniesOptedForDigestMail( startIndex, batchSize );
+        List<DigestRequestData> digestRequestData;
+        digestRequestData = reportingDashboardManagement.getEntitiesOptedForDigestMail( startIndex, batchSize, profileLevel );
         json = new Gson().toJson( digestRequestData );
         return json;
     }
 
 
     @RequestMapping ( value = "/buildmonthlydigestaggregate", method = RequestMethod.GET)
-    @ApiOperation ( value = "Build the monthly digest aggregate for a company for a given month")
-    public String buildMonthlyDigestAggregate( long companyId, String companyName, int monthUnderConcern, int year )
+    @ApiOperation ( value = "Build the monthly digest aggregate for a hierarchy for a given month")
+    public String buildMonthlyDigestAggregate( String  profileLevel, long entityId, String entityName, int monthUnderConcern, int year )
         throws NonFatalException
     {
 
         LOGGER.info( "Building the monthly digest aggregate for a company for a given month" );
-        return new Gson().toJson( reportingDashboardManagement.prepareMonthlyDigestMailData( companyId, companyName, monthUnderConcern, year ) );
+        return new Gson().toJson( reportingDashboardManagement.prepareMonthlyDigestMailData( profileLevel, entityId, entityName, monthUnderConcern, year ) );
     }
     
     @RequestMapping ( value = "/getcompanydetailsreport", method = RequestMethod.GET)

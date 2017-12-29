@@ -25,6 +25,7 @@ import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.DigestRequestData;
 import com.realtech.socialsurvey.core.entities.EmailEntity;
 import com.realtech.socialsurvey.core.entities.FileContentReplacements;
 import com.realtech.socialsurvey.core.entities.ForwardMailDetails;
@@ -2563,7 +2564,7 @@ public class EmailServicesImpl implements EmailServices
 
         messageBodyReplacementsList.add( applicationWordPressSite );
         messageBodyReplacementsList.add( appNewLogoUrl );
-        messageBodyReplacementsList.add( digestAggregate.getCompanyName() );
+        messageBodyReplacementsList.add( digestAggregate.getEntityName() );
         messageBodyReplacementsList.add( monthYearForDisplay );
 
         // adding average rating score data
@@ -2697,9 +2698,9 @@ public class EmailServicesImpl implements EmailServices
             LOG.error( "sendMonthlyDigestMail(): Digest Aggregate object is null" );
             throw new InvalidInputException( "Data for the monthly digest/snapshot mail is missing." );
         }
-        if ( digestAggregate.getCompanyId() < 1 ) {
-            LOG.error( "Company ID must be greater that one for Monthly digest/snapshot mail " );
-            throw new InvalidInputException( "Company ID cannot be less than one for Monthly digest/snapshot mail." );
+        if ( digestAggregate.getEntityId() < 1 ) {
+            LOG.error( "Entity ID must be greater that one for Monthly digest/snapshot mail " );
+            throw new InvalidInputException( "Entity ID cannot be less than one for Monthly digest/snapshot mail." );
         }
         if ( digestAggregate.getRecipientMailIds() == null || digestAggregate.getRecipientMailIds().isEmpty() ) {
             LOG.error( "Recipient email Id list is empty or null for Monthly digest/snapshot mail " );
@@ -2711,9 +2712,9 @@ public class EmailServicesImpl implements EmailServices
             throw new InvalidInputException( "Digest data for three months required." );
         }
 
-        if ( StringUtils.isEmpty( digestAggregate.getCompanyName() ) ) {
-            LOG.error( "Company name for the digest not specified." );
-            throw new InvalidInputException( "Company name for the digest not specified." );
+        if ( StringUtils.isEmpty( digestAggregate.getEntityName() ) ) {
+            LOG.error( "Entity name for the digest not specified." );
+            throw new InvalidInputException( "Entity name for the digest not specified." );
         }
 
         if ( StringUtils.isEmpty( digestAggregate.getMonthUnderConcern() ) ) {
@@ -2731,15 +2732,21 @@ public class EmailServicesImpl implements EmailServices
     
     @Async
     @Override
-    public void sendDigestErrorMailForCompany( String companyName, String stackTrace )
+    public void sendDigestErrorMailForCompany( DigestRequestData digestRequest, String stackTrace )
         throws InvalidInputException, UndeliveredEmailException
     {
         LOG.debug( "sendDigestErrorMailForCompany() started" );
-        if ( StringUtils.isEmpty( companyName ) ) {
-            LOG.error( "Company Name is not Specified." );
-            throw new InvalidInputException( "Company Name is not Specified." );
+        if ( digestRequest == null ) {
+            LOG.warn( "Digest request data is not specified" );
+            throw new InvalidInputException( "Digest request data is not specified" );
+        } else if ( StringUtils.isEmpty( digestRequest.getProfileLevel() ) ) {
+            LOG.warn( "Profile level is not Specified." );
+            throw new InvalidInputException( "Profile level is not Specified." );
+        } else if ( StringUtils.isEmpty( digestRequest.getEntityName() ) ) {
+            LOG.warn( "Entity Name is not Specified." );
+            throw new InvalidInputException( "Entity Name is not Specified." );
         } else if ( StringUtils.isEmpty( stackTrace ) ) {
-            LOG.error( "Reason for failure not Specified." );
+            LOG.warn( "Reason for failure not Specified." );
             throw new InvalidInputException( "Reason for failure not Specified." );
         }
 
@@ -2748,12 +2755,13 @@ public class EmailServicesImpl implements EmailServices
         FileContentReplacements messageSubjectReplacements = new FileContentReplacements();
         messageSubjectReplacements
             .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.DIGEST_ERROR_MAIL_SUBJECT );
-        messageSubjectReplacements.setReplacementArgs( Arrays.asList( companyName ) );
+        messageSubjectReplacements.setReplacementArgs( Arrays.asList( digestRequest.getEntityName() ) );
 
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements
             .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.DIGEST_ERROR_MAIL_BODY );
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, companyName, stackTrace ) );
+        messageBodyReplacements.setReplacementArgs(
+            Arrays.asList( appLogoUrl, digestRequest.getProfileLevel(), digestRequest.getEntityName(), stackTrace ) );
 
         LOG.debug( "sendDigestErrorMailForCompany() finishing" );
         emailSender.sendEmailWithSubjectAndBodyReplacements( emailEntity, messageSubjectReplacements, messageBodyReplacements,

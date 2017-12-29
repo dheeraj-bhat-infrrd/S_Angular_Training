@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.services.reportingmanagement.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hibernate.HibernateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,10 @@ import com.realtech.socialsurvey.core.dao.OverviewRegionYearDao;
 import com.realtech.socialsurvey.core.dao.OverviewUserDao;
 import com.realtech.socialsurvey.core.dao.OverviewUserMonthDao;
 import com.realtech.socialsurvey.core.dao.OverviewUserYearDao;
+import com.realtech.socialsurvey.core.dao.SurveyStatsReportBranchDao;
+import com.realtech.socialsurvey.core.dao.SurveyStatsReportCompanyDao;
+import com.realtech.socialsurvey.core.dao.SurveyStatsReportRegionDao;
+import com.realtech.socialsurvey.core.entities.Digest;
 import com.realtech.socialsurvey.core.entities.OverviewBranch;
 import com.realtech.socialsurvey.core.entities.OverviewBranchMonth;
 import com.realtech.socialsurvey.core.entities.OverviewBranchYear;
@@ -35,6 +40,11 @@ import com.realtech.socialsurvey.core.entities.OverviewRegionYear;
 import com.realtech.socialsurvey.core.entities.OverviewUser;
 import com.realtech.socialsurvey.core.entities.OverviewUserMonth;
 import com.realtech.socialsurvey.core.entities.OverviewUserYear;
+import com.realtech.socialsurvey.core.entities.SurveyStatsReportBranch;
+import com.realtech.socialsurvey.core.entities.SurveyStatsReportCompany;
+import com.realtech.socialsurvey.core.entities.SurveyStatsReportRegion;
+import com.realtech.socialsurvey.core.exception.DatabaseException;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.reportingmanagement.OverviewManagement;
 
@@ -104,22 +114,31 @@ public class OverviewManagementImpl implements OverviewManagement
     @Autowired
     private OverviewCompanyYearDao overviewCompanyYearDao;
 
+    @Autowired
+    private SurveyStatsReportBranchDao surveyStatsReportBranchDao;
+
+    @Autowired
+    private SurveyStatsReportRegionDao surveyStatsReportRegionDao;
+
+    @Autowired
+    private SurveyStatsReportCompanyDao surveyStatsReportCompanyDao;
+
 
     @Override
     public OverviewUser fetchOverviewUserDetails( long entityId, String entityType ) throws NonFatalException
     {
-    	LOG.debug("Method fetchOverviewUserDetails() Started for user {} ",entityId);
-    	
-    	LOG.debug( "Calling method for fetching overViewUserId for user {}",entityId );
+        LOG.debug( "Method fetchOverviewUserDetails() Started for user {} ", entityId );
+
+        LOG.debug( "Calling method for fetching overViewUserId for user {}", entityId );
         String overviewUserId = overviewUserDao.getOverviewUserId( entityId );
-        
+
         OverviewUser overviewUser = null;
         if ( overviewUserId != null ) {
-        	LOG.debug( "Calling method for finding Overview User for the overviewUserId: {}",overviewUserId);
+            LOG.debug( "Calling method for finding Overview User for the overviewUserId: {}", overviewUserId );
             overviewUser = overviewUserDao.findOverviewUser( OverviewUser.class, overviewUserId );
         }
-        
-        LOG.debug("Method fetchOverviewUserDetails() Finished for user {} ",entityId);
+
+        LOG.debug( "Method fetchOverviewUserDetails() Finished for user {} ", entityId );
         return overviewUser;
     }
 
@@ -127,18 +146,18 @@ public class OverviewManagementImpl implements OverviewManagement
     @Override
     public OverviewBranch fetchOverviewBranchDetails( long entityId, String entityType ) throws NonFatalException
     {
-    	LOG.debug("Method fetchOverviewBranchDetails() Started for branch {} ",entityId);
+        LOG.debug( "Method fetchOverviewBranchDetails() Started for branch {} ", entityId );
 
-    	LOG.debug( "Calling method for fetching overViewBranchId for branch {}",entityId);
+        LOG.debug( "Calling method for fetching overViewBranchId for branch {}", entityId );
         String overviewBranchId = overviewBranchDao.getOverviewBranchId( entityId );
-        
+
         OverviewBranch overviewBranch = null;
         if ( overviewBranchId != null ) {
-        	LOG.debug( "Calling method for finding Overview branch for the overviewBranchId: {} ",overviewBranchId);
+            LOG.debug( "Calling method for finding Overview branch for the overviewBranchId: {} ", overviewBranchId );
             overviewBranch = overviewBranchDao.findOverviewBranch( OverviewBranch.class, overviewBranchId );
         }
-        
-        LOG.debug("Method fetchOverviewBranchDetails() Finished for branch {} ",entityId);
+
+        LOG.debug( "Method fetchOverviewBranchDetails() Finished for branch {} ", entityId );
         return overviewBranch;
 
     }
@@ -147,18 +166,18 @@ public class OverviewManagementImpl implements OverviewManagement
     @Override
     public OverviewRegion fetchOverviewRegionDetails( long entityId, String entityType ) throws NonFatalException
     {
-    	LOG.debug("Method fetchOverviewRegionDetails() Started for region {} ",entityId);
-    	
-    	LOG.debug( "Calling method for fetching overViewRegionId for region {}",entityId);
+        LOG.debug( "Method fetchOverviewRegionDetails() Started for region {} ", entityId );
+
+        LOG.debug( "Calling method for fetching overViewRegionId for region {}", entityId );
         String overviewRegionId = overviewRegionDao.getOverviewRegionId( entityId );
-        
+
         OverviewRegion overviewRegion = null;
         if ( overviewRegionId != null ) {
-        	LOG.debug( "Calling method for finding Overview Region for the overviewRegionId: {}",overviewRegionId);
+            LOG.debug( "Calling method for finding Overview Region for the overviewRegionId: {}", overviewRegionId );
             overviewRegion = overviewRegionDao.findOverviewRegion( OverviewRegion.class, overviewRegionId );
         }
-        
-        LOG.debug("Method fetchOverviewRegionDetails() finished for region {} ",entityId);
+
+        LOG.debug( "Method fetchOverviewRegionDetails() finished for region {} ", entityId );
         return overviewRegion;
     }
 
@@ -166,18 +185,18 @@ public class OverviewManagementImpl implements OverviewManagement
     @Override
     public OverviewCompany fetchOverviewCompanyDetails( long entityId, String entityType ) throws NonFatalException
     {
-    	LOG.debug("Method fetchOverviewCompanyDetails() Started for company {}",entityId);
-    	
-    	LOG.debug( "Calling method for fetching overViewCompanyId for company {}",entityId);
+        LOG.debug( "Method fetchOverviewCompanyDetails() Started for company {}", entityId );
+
+        LOG.debug( "Calling method for fetching overViewCompanyId for company {}", entityId );
         String overviewCompanyId = overviewCompanyDao.getOverviewCompanyId( entityId );
-        
+
         OverviewCompany overviewCompany = null;
         if ( overviewCompanyId != null ) {
-        	LOG.debug( "Calling method for finding Overview Company for the overviewCompanyId: {}",overviewCompanyId);
+            LOG.debug( "Calling method for finding Overview Company for the overviewCompanyId: {}", overviewCompanyId );
             overviewCompany = overviewCompanyDao.findOverviewCompany( OverviewCompany.class, overviewCompanyId );
         }
 
-        LOG.debug("Method fetchOverviewCompanyDetails() finished for company {}",entityId);
+        LOG.debug( "Method fetchOverviewCompanyDetails() finished for company {}", entityId );
         return overviewCompany;
     }
 
@@ -186,8 +205,7 @@ public class OverviewManagementImpl implements OverviewManagement
     @Transactional ( value = "transactionManagerForReporting")
     public Map<String, Object> fetchAllTimeOverview( long entityId, String entityType ) throws NonFatalException
     {
-        LOG.debug( "Method to fetchAllTimeOverview for entityId : {} , entityType : {} started", entityId,
-            entityType );
+        LOG.debug( "Method to fetchAllTimeOverview for entityId : {} , entityType : {} started", entityId, entityType );
         Map<String, Object> overviewMap = new HashMap<>();
         if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
             OverviewUser overviewUser = fetchOverviewUserDetails( entityId, entityType );
@@ -267,8 +285,7 @@ public class OverviewManagementImpl implements OverviewManagement
 
             }
         }
-        LOG.debug( "Method to fetchAllTimeOverview for entityId : {} , entityType : {} ended", entityId,
-            entityType );
+        LOG.debug( "Method to fetchAllTimeOverview for entityId : {} , entityType : {} ended", entityId, entityType );
 
         return overviewMap;
     }
@@ -281,9 +298,9 @@ public class OverviewManagementImpl implements OverviewManagement
         LOG.info( "Method to fetchSpsAllTime and npsAllTime for entityId : {} , entityType : {} started", entityId,
             entityType );
         Map<String, Object> overviewMap = new HashMap<>();
-        
+
         if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
-        	LOG.debug( "Calling method for fetching Overview details for userId {}",entityId );
+            LOG.debug( "Calling method for fetching Overview details for userId {}", entityId );
             OverviewUser overviewUser = fetchOverviewUserDetails( entityId, entityType );
             if ( overviewUser != null ) {
                 overviewMap.put( SPSSCORE, overviewUser.getSpsScore() );
@@ -298,7 +315,7 @@ public class OverviewManagementImpl implements OverviewManagement
 
 
         } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
-        	LOG.debug( "Calling method for fetching Overview details for branchId {}",entityId );
+            LOG.debug( "Calling method for fetching Overview details for branchId {}", entityId );
             OverviewBranch overviewBranch = fetchOverviewBranchDetails( entityId, entityType );
             if ( overviewBranch != null ) {
                 overviewMap.put( SPSSCORE, overviewBranch.getSpsScore() );
@@ -313,7 +330,7 @@ public class OverviewManagementImpl implements OverviewManagement
 
 
         } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
-        	LOG.debug( "Calling method for fetching Overview details for regionId {}",entityId );
+            LOG.debug( "Calling method for fetching Overview details for regionId {}", entityId );
             OverviewRegion overviewRegion = fetchOverviewRegionDetails( entityId, entityType );
             if ( overviewRegion != null ) {
                 overviewMap.put( SPSSCORE, overviewRegion.getSpsScore() );
@@ -327,7 +344,7 @@ public class OverviewManagementImpl implements OverviewManagement
             }
 
         } else if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
-        	LOG.debug( "Calling method for fetching Overview details for companyId {}",entityId );
+            LOG.debug( "Calling method for fetching Overview details for companyId {}", entityId );
             OverviewCompany overviewCompany = fetchOverviewCompanyDetails( entityId, entityType );
             if ( overviewCompany != null ) {
                 overviewMap.put( SPSSCORE, overviewCompany.getSpsScore() );
@@ -341,12 +358,12 @@ public class OverviewManagementImpl implements OverviewManagement
             }
 
         }
-        LOG.info( "Method to fetchSpsAllTime and npsAllTime for entityId : {} , entityType : {} ended", entityId,
-            entityType );
+        LOG.info( "Method to fetchSpsAllTime and npsAllTime for entityId : {} , entityType : {} ended", entityId, entityType );
         return overviewMap;
 
     }
-    
+
+
     @Override
     @Transactional ( value = "transactionManagerForReporting")
     public Map<String, Object> fetchOverviewDetailsBasedOnMonth( long entityId, String entityType, int month, int year )
@@ -543,5 +560,148 @@ public class OverviewManagementImpl implements OverviewManagement
         }
         LOG.info( "Method to fetchOverviewDetailsBasedOnYear for entityId : {} , entityType : {} ended", entityId, entityType );
         return overviewMap;
+    }
+
+
+    @Override
+    @Transactional
+    public Digest fetchDigestDataForAHierarchy( String profileLevel, long entityId, int month, int year )
+        throws InvalidInputException
+    {
+
+        LOG.debug( "method to fetch digest data, fetchDigestDataForAHierarchy() started." );
+
+        if ( entityId <= 0 ) {
+            LOG.error( "Identifier can not be null" );
+            throw new InvalidInputException( "ID is null." );
+        } else if ( month < 1 || month > 12 ) {
+            LOG.error( "month number can not be outside of the range 1-12" );
+            throw new InvalidInputException( "month number should always be within 1-12 range." );
+        } else if ( year <= 0 ) {
+            LOG.error( "year number can not be less than or equal to zero" );
+            throw new InvalidInputException( "year number should be greater than zero." );
+        }
+
+        try {
+
+            if ( CommonConstants.PROFILE_LEVEL_COMPANY.equals( profileLevel ) ) {
+                return getDigestFromCompanyOverview(
+                    overviewCompanyMonthDao.fetchOverviewForCompanyBasedOnMonth( entityId, month, year ),
+                    surveyStatsReportCompanyDao.fetchCompanySurveyStats( entityId, month, year ) );
+            } else if ( CommonConstants.PROFILE_LEVEL_REGION.equals( profileLevel ) ) {
+                return getDigestFromRegionOverview(
+                    overviewRegionMonthDao.fetchOverviewForRegionBasedOnMonth( entityId, month, year ),
+                    surveyStatsReportRegionDao.fetchRegionSurveyStats( entityId, month, year ) );
+            } else if ( CommonConstants.PROFILE_LEVEL_BRANCH.equals( profileLevel ) ) {
+                return getDigestFromBranchOverview(
+                    overviewBranchMonthDao.fetchOverviewForBranchBasedOnMonth( entityId, month, year ),
+                    surveyStatsReportBranchDao.fetchBranchSurveyStats( entityId, month, year ) );
+            } else {
+                LOG.warn( "Invalid profile" );
+                throw new InvalidInputException( "Invalid profile" );
+            }
+
+        } catch ( HibernateException hibernateException ) {
+
+            LOG.error( "Exception caught in fetchDigestDataForAHierarchy() ", hibernateException );
+            throw new DatabaseException( "Exception caught in fetchDigestDataForAHierarchy() ", hibernateException );
+
+        }
+    }
+
+
+    private Digest getDigestFromBranchOverview( OverviewBranchMonth overview, SurveyStatsReportBranch surveyStats )
+    {
+        Digest digest = new Digest();
+        if ( overview != null ) {
+            digest.setAverageScoreRating( (double) overview.getRating() );
+            digest.setCompletedTransactions( (long) overview.getCompleted() );
+            digest.setEntityId( overview.getBranchId() );
+            digest.setMonth( overview.getMonth() );
+            digest.setProfileLevel( CommonConstants.PROFILE_LEVEL_BRANCH );
+            digest.setSurveyCompletionRate( (double) overview.getCompletePercentage() );
+            digest.setTotalCompletedReviews( (long) overview.getTotalReview() );
+            digest.setTotalTransactions( (long) ( overview.getCompleted() + overview.getIncomplete() ) );
+            digest.setUserCount( (long) overview.getUserCount() );
+            digest.setYear( overview.getYear() );
+
+            if ( surveyStats != null ) {
+
+                double sps = ( (double) ( surveyStats.getPromoters() - surveyStats.getDetractors() )
+                    / ( surveyStats.getPassives() + surveyStats.getPromoters() + surveyStats.getDetractors() ) ) * 100;
+
+                digest.setEntityName( surveyStats.getBranchName() );
+                digest.setDetractors( surveyStats.getDetractors() );
+                digest.setPassives( surveyStats.getPassives() );
+                digest.setPromoters( surveyStats.getPromoters() );
+                digest.setSps( sps );
+
+            }
+        }
+        return digest;
+    }
+
+
+    private Digest getDigestFromRegionOverview( OverviewRegionMonth overview, SurveyStatsReportRegion surveyStats )
+    {
+        Digest digest = new Digest();
+        if ( overview != null ) {
+            digest.setAverageScoreRating( (double) overview.getRating() );
+            digest.setCompletedTransactions( (long) overview.getCompleted() );
+            digest.setEntityId( overview.getRegionId() );
+            digest.setMonth( overview.getMonth() );
+            digest.setProfileLevel( CommonConstants.PROFILE_LEVEL_REGION );
+            digest.setSurveyCompletionRate( (double) overview.getCompletePercentage() );
+            digest.setTotalCompletedReviews( (long) overview.getTotalReview() );
+            digest.setTotalTransactions( (long) ( overview.getCompleted() + overview.getIncomplete() ) );
+            digest.setUserCount( (long) overview.getUserCount() );
+            digest.setYear( overview.getYear() );
+
+            if ( surveyStats != null ) {
+
+                double sps = ( (double) ( surveyStats.getPromoters() - surveyStats.getDetractors() )
+                    / ( surveyStats.getPassives() + surveyStats.getPromoters() + surveyStats.getDetractors() ) ) * 100;
+
+                digest.setEntityName( surveyStats.getRegionName() );
+                digest.setDetractors( surveyStats.getDetractors() );
+                digest.setPassives( surveyStats.getPassives() );
+                digest.setPromoters( surveyStats.getPromoters() );
+                digest.setSps( sps );
+
+            }
+        }
+        return digest;
+    }
+
+
+    private Digest getDigestFromCompanyOverview( OverviewCompanyMonth overview, SurveyStatsReportCompany surveyStats )
+    {
+        Digest digest = new Digest();
+        if ( overview != null ) {
+            digest.setAverageScoreRating( (double) overview.getRating() );
+            digest.setCompletedTransactions( (long) overview.getCompleted() );
+            digest.setEntityId( overview.getCompanyId() );
+            digest.setMonth( overview.getMonth() );
+            digest.setProfileLevel( CommonConstants.PROFILE_LEVEL_COMPANY );
+            digest.setSurveyCompletionRate( (double) overview.getCompletePercentage() );
+            digest.setTotalCompletedReviews( (long) overview.getTotalReview() );
+            digest.setTotalTransactions( (long) ( overview.getCompleted() + overview.getIncomplete() ) );
+            digest.setUserCount( (long) overview.getUserCount() );
+            digest.setYear( overview.getYear() );
+
+            if ( surveyStats != null ) {
+
+                double sps = ( (double) ( surveyStats.getPromoters() - surveyStats.getDetractors() )
+                    / ( surveyStats.getPassives() + surveyStats.getPromoters() + surveyStats.getDetractors() ) ) * 100;
+
+                digest.setEntityName( surveyStats.getCompanyName() );
+                digest.setDetractors( surveyStats.getDetractors() );
+                digest.setPassives( surveyStats.getPassives() );
+                digest.setPromoters( surveyStats.getPromoters() );
+                digest.setSps( sps );
+
+            }
+        }
+        return digest;
     }
 }

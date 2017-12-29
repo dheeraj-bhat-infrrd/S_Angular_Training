@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.dao;
 
 import java.util.List;
 
+import com.realtech.socialsurvey.core.entities.UserRankingPastMonthMain;
 import com.realtech.socialsurvey.core.entities.UserRankingPastMonthRegion;
 
 public interface UserRankingPastMonthRegionDao extends GenericReportingDao<UserRankingPastMonthRegion, String>{
@@ -15,4 +16,6 @@ public interface UserRankingPastMonthRegionDao extends GenericReportingDao<UserR
 
     List<UserRankingPastMonthRegion> fetchUserRankingWithProfileForPastMonthRegion( Long regionId, int month, int year,
         int startIndex, int batchSize );
+
+    List<UserRankingPastMonthRegion> fetchTopTenUserRankingsForARegion( long regionId, int monthUnderConcern, int year );
 }

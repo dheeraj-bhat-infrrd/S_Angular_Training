@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.services.mail;
 import java.util.List;
 import java.util.Map;
 
+import com.realtech.socialsurvey.core.entities.DigestRequestData;
 import com.realtech.socialsurvey.core.entities.MonthlyDigestAggregate;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyCsvInfo;
@@ -526,7 +527,7 @@ public interface EmailServices
         UndeliveredEmailException;
 
 
-    void sendDigestErrorMailForCompany( String companyName, String stackTrace )
+    void sendDigestErrorMailForCompany( DigestRequestData digestRequest, String stackTrace )
         throws InvalidInputException, UndeliveredEmailException;
     
     public void sendEmailToAdminForUnsuccessfulSurveyCsvUpload( SurveyCsvInfo csvInfo, String errorMessage ) throws InvalidInputException, UndeliveredEmailException;
