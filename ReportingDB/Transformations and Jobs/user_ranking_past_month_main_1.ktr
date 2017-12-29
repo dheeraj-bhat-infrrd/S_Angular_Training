@@ -143,9 +143,7 @@
   <hop> <from>Sort rows 10 2</from><to>MergeSurveyDetailsID</to><enabled>Y</enabled> </hop>
   <hop> <from>If field value is null</from><to>Generate random value</to><enabled>Y</enabled> </hop>
   <hop> <from>DatabaseId</from><to>Database join FOR NMLS</to><enabled>Y</enabled> </hop>
-  <hop> <from>Database join FOR NMLS</from><to>Filter rows 3</to><enabled>Y</enabled> </hop>
   <hop> <from>Unique rows</from><to>If field value is null</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter rows 3</from><to>Sort rows 11</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows 11</from><to>Unique rows</to><enabled>Y</enabled> </hop>
   <hop> <from>SurveyDetails</from><to>Sort rows 7 2 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows 7 2 2</from><to>Merge Join 5</to><enabled>Y</enabled> </hop>
@@ -171,6 +169,8 @@
   <hop> <from>Sort rows 2 2</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows 2 3</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>Multiway Merge Join</from><to>Select values</to><enabled>Y</enabled> </hop>
+  <hop> <from>Database join FOR NMLS</from><to>Filter rows 3</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter rows 3</from><to>Sort rows 11</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>AverageScoreGroupBy</name>
@@ -547,47 +547,6 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>976</xloc>
       <yloc>145</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Filter rows 3</name>
-    <type>FilterRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<send_true_to>Sort rows 11</send_true_to>
-<send_false_to/>
-    <compare>
-<condition>
- <negated>Y</negated>
- <conditions>
-  <condition>
-   <negated>N</negated>
-   <leftvalue>MONTH_Data</leftvalue>
-   <function>&#x3d;</function>
-   <rightvalue>PRESENT_MONTH_CHECK</rightvalue>
-   </condition>
-  <condition>
-   <negated>N</negated>
-   <operator>AND</operator>
-   <leftvalue>Year_Data</leftvalue>
-   <function>&#x3d;</function>
-   <rightvalue>PRESENT_YEAR_FINAL_CHECK</rightvalue>
-   </condition>
-  </conditions>
- </condition>
-    </compare>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1177</xloc>
-      <yloc>734</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -3239,6 +3198,52 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>1606</xloc>
       <yloc>633</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Filter rows 3</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Sort rows 11</send_true_to>
+<send_false_to/>
+    <compare>
+<condition>
+ <negated>Y</negated>
+ <conditions>
+  <condition>
+   <negated>N</negated>
+   <conditions>
+    <condition>
+     <negated>N</negated>
+     <leftvalue>MONTH_Data</leftvalue>
+     <function>&#x3d;</function>
+     <rightvalue>PRESENT_MONTH_CHECK</rightvalue>
+     </condition>
+    <condition>
+     <negated>N</negated>
+     <operator>AND</operator>
+     <leftvalue>Year_Data</leftvalue>
+     <function>&#x3d;</function>
+     <rightvalue>PRESENT_YEAR_FINAL_CHECK</rightvalue>
+     </condition>
+    </conditions>
+   </condition>
+  </conditions>
+ </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1185</xloc>
+      <yloc>737</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
