@@ -622,7 +622,7 @@ public class OverviewManagementImpl implements OverviewManagement
             digest.setSurveyCompletionRate( (double) overview.getCompletePercentage() );
             digest.setTotalCompletedReviews( (long) overview.getTotalReview() );
             digest.setTotalTransactions( (long) ( overview.getCompleted() + overview.getIncomplete() ) );
-            digest.setUserCount( (long) overview.getUserCount() );
+            digest.setUserCount( (long) overview.getCumulativeUserCount() );
             digest.setYear( overview.getYear() );
 
             if ( surveyStats != null ) {
@@ -654,7 +654,7 @@ public class OverviewManagementImpl implements OverviewManagement
             digest.setSurveyCompletionRate( (double) overview.getCompletePercentage() );
             digest.setTotalCompletedReviews( (long) overview.getTotalReview() );
             digest.setTotalTransactions( (long) ( overview.getCompleted() + overview.getIncomplete() ) );
-            digest.setUserCount( (long) overview.getUserCount() );
+            digest.setUserCount( (long) overview.getCumulativeUserCount() );
             digest.setYear( overview.getYear() );
 
             if ( surveyStats != null ) {
@@ -686,7 +686,7 @@ public class OverviewManagementImpl implements OverviewManagement
             digest.setSurveyCompletionRate( (double) overview.getCompletePercentage() );
             digest.setTotalCompletedReviews( (long) overview.getTotalReview() );
             digest.setTotalTransactions( (long) ( overview.getCompleted() + overview.getIncomplete() ) );
-            digest.setUserCount( (long) overview.getUserCount() );
+            digest.setUserCount( (long) overview.getCumulativeUserCount() );
             digest.setYear( overview.getYear() );
 
             if ( surveyStats != null ) {

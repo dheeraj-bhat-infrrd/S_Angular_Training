@@ -77,6 +77,9 @@ public class OverviewRegionMonth implements Serializable
 
     @Column ( name = "user_count")
     private int userCount;
+    
+    @Column ( name = "cumulative_user_count" )
+    private int cumulativeUserCount;
 
 
     public String getOverviewRegionMonthId()
@@ -324,6 +327,19 @@ public class OverviewRegionMonth implements Serializable
         this.userCount = userCount;
     }
 
+    
+
+    public int getCumulativeUserCount()
+    {
+        return cumulativeUserCount;
+    }
+
+
+    public void setCumulativeUserCount( int cumulativeUserCount )
+    {
+        this.cumulativeUserCount = cumulativeUserCount;
+    }
+
 
     @Override
     public String toString()
@@ -334,7 +350,7 @@ public class OverviewRegionMonth implements Serializable
             + ", duplicate=" + duplicate + ", corrupted=" + corrupted + ", other=" + other + ", completePercentage="
             + completePercentage + ", incompletePercentage=" + incompletePercentage + ", rating=" + rating + ", totalReview="
             + totalReview + ", month=" + month + ", year=" + year + ", thirdParty=" + thirdParty + ", userCount=" + userCount
-            + "]";
+            + ", cumulativeUserCount=" + cumulativeUserCount + "]";
     }
 
 }
