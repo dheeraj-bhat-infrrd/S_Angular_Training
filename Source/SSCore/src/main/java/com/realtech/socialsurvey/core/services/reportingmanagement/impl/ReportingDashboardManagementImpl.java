@@ -3356,8 +3356,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 templateData.setMonth( months.get( i ) );
                 templateData.setYear( ( digest != null && digest.getYear() != 0 ) ? String.valueOf( digest.getYear() )
                     : CommonConstants.NOT_AVAILABLE );
-                templateData.setAverageScoreRating(
-                    ( digest != null ) ? String.valueOf( digest.getAverageScoreRating() ) : CommonConstants.NOT_AVAILABLE );
+                templateData.setAverageScoreRating( ( digest != null ) ? String.format( "%.2f", digest.getAverageScoreRating() )
+                    : CommonConstants.NOT_AVAILABLE );
                 templateData.setUserCount( ( digest != null )
                     ? String.valueOf( digest.getUserCount() ) + ( digest.getUserCount() > 1 ? " Users" : " User" )
                     : CommonConstants.NOT_AVAILABLE );
@@ -3369,8 +3369,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                     ( digest != null ) ? String.format( "%.2f", digest.getSurveyCompletionRate() ) + "%"
                         : CommonConstants.NOT_AVAILABLE );
                 templateData.setSps(
-                    ( digest != null ) ? String.valueOf( digest.getSps() > 0 ? "+" + digest.getSps() : digest.getSps() )
-                        : CommonConstants.NOT_AVAILABLE );
+                    ( digest != null ) ? String.valueOf( digest.getSps() > 0 ? "+" + String.format( "%.2f", digest.getSps() )
+                        : String.format( "%.2f", digest.getSps() ) ) : CommonConstants.NOT_AVAILABLE );
                 templateData.setPromoters(
                     ( digest != null ) ? String.valueOf( digest.getPromoters() ) : CommonConstants.NOT_AVAILABLE );
                 templateData.setDetractors(
