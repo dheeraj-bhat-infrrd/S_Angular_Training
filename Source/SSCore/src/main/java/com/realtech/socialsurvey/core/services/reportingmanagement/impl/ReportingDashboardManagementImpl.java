@@ -4263,52 +4263,47 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         return workBook;
     }
 
+	private XSSFWorkbook formatForNPSReportMonth(XSSFWorkbook workBook, List<NpsReportMonth> npsReportMonthList) {
+		makeRowBoldAndBlue(workBook, workBook.getSheetAt(0).getRow(0));
+		if(workBook.getSheetAt(0).getRow(1) == null || workBook.getSheetAt(0).getRow(1) == null){
+			return workBook;
+		}
+		makeRowBoldAndBlue(workBook, workBook.getSheetAt(0).getRow(1));
+		int rownum = 1;
 
-    private XSSFWorkbook formatForNPSReportMonth( XSSFWorkbook workBook, List<NpsReportMonth> npsReportMonthList )
-    {
-        makeRowBoldAndBlue( workBook, workBook.getSheetAt( 0 ).getRow( 0 ) );
-        if ( workBook.getSheetAt( 0 ).getRow( 1 ) == null || workBook.getSheetAt( 0 ).getRow( 1 ) == null ) {
-            return workBook;
-        }
-        makeRowBoldAndBlue( workBook, workBook.getSheetAt( 0 ).getRow( 1 ) );
-        int rownum = 1;
+		for (NpsReportMonth npsReportMonth : npsReportMonthList) {
+			if (npsReportMonth.getBranchId() == 0 && npsReportMonth.getRegionId() == 0) {
+				CellStyle style = workBook.createCellStyle();
+				style.setAlignment(CellStyle.ALIGN_CENTER);
+				style.setFillBackgroundColor(IndexedColors.AQUA.index);
+			} else if (npsReportMonth.getBranchId() == 0 && npsReportMonth.getRegionId() > 0) {
+				makeRowBold(workBook, workBook.getSheetAt(0).getRow(rownum));
+			}
+			rownum++;
+		}
+		return workBook;
+	}
 
-        for ( NpsReportMonth npsReportMonth : npsReportMonthList ) {
-            if ( npsReportMonth.getBranchId() == 0 && npsReportMonth.getRegionId() == 0 ) {
-                CellStyle style = workBook.createCellStyle();
-                style.setAlignment( CellStyle.ALIGN_CENTER );
-                style.setFillBackgroundColor( IndexedColors.AQUA.index );
-            } else if ( npsReportMonth.getBranchId() == 0 && npsReportMonth.getRegionId() > 0 ) {
-                makeRowBold( workBook, workBook.getSheetAt( 0 ).getRow( rownum ) );
-            }
-            rownum++;
-        }
-        return workBook;
-    }
+	private XSSFWorkbook formatForNPSReportWeek(XSSFWorkbook workBook, List<NpsReportWeek> npsReportWeekList) {
+		makeRowBoldAndBlue(workBook, workBook.getSheetAt(0).getRow(0));
+		if(workBook.getSheetAt(0).getRow(1) == null || workBook.getSheetAt(0).getRow(1) == null){
+			return workBook;
+		}
+		makeRowBoldAndBlue(workBook, workBook.getSheetAt(0).getRow(1));
+		int rownum = 1;
 
-
-    private XSSFWorkbook formatForNPSReportWeek( XSSFWorkbook workBook, List<NpsReportWeek> npsReportWeekList )
-    {
-        makeRowBoldAndBlue( workBook, workBook.getSheetAt( 0 ).getRow( 0 ) );
-        if ( workBook.getSheetAt( 0 ).getRow( 1 ) == null || workBook.getSheetAt( 0 ).getRow( 1 ) == null ) {
-            return workBook;
-        }
-        makeRowBoldAndBlue( workBook, workBook.getSheetAt( 0 ).getRow( 1 ) );
-        int rownum = 1;
-
-        for ( NpsReportWeek npsReportWeek : npsReportWeekList ) {
-            if ( npsReportWeek.getBranchId() == 0 && npsReportWeek.getRegionId() == 0 ) {
-                CellStyle style = workBook.createCellStyle();
-                style.setAlignment( CellStyle.ALIGN_CENTER );
-                style.setFillBackgroundColor( IndexedColors.AQUA.index );
-            } else if ( npsReportWeek.getBranchId() == 0 && npsReportWeek.getRegionId() > 0 ) {
-                makeRowBold( workBook, workBook.getSheetAt( 0 ).getRow( rownum ) );
-            }
-            rownum++;
-        }
-        return workBook;
-    }
-
+		for (NpsReportWeek npsReportWeek : npsReportWeekList) {
+			if (npsReportWeek.getBranchId() == 0 && npsReportWeek.getRegionId() == 0) {
+				CellStyle style = workBook.createCellStyle();
+				style.setAlignment(CellStyle.ALIGN_CENTER);
+				style.setFillBackgroundColor(IndexedColors.AQUA.index);
+			} else if (npsReportWeek.getBranchId() == 0 && npsReportWeek.getRegionId() > 0) {
+				makeRowBold(workBook, workBook.getSheetAt(0).getRow(rownum));
+			}
+			rownum++;
+		}
+		return workBook;
+	}
 
     @Override
     public void updateTransactionMonitorAlertsForCompanies() throws InvalidInputException

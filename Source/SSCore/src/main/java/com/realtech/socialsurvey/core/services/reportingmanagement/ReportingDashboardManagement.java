@@ -310,5 +310,5 @@ public interface ReportingDashboardManagement
 	 */
 	public String generateNpsReportForWeekOrMonth(long profileValue, String profileLevel, Timestamp startDate, int type)throws ParseException, UnsupportedEncodingException, NonFatalException;
 	
-    void updateTransactionMonitorAlertsForCompanies() throws InvalidInputException;
+	void updateTransactionMonitorAlertsForCompanies() throws InvalidInputException;
 }

@@ -1,18 +1,27 @@
 package com.realtech.socialsurvey.api.controllers;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import retrofit.client.Response;
+import retrofit.http.GET;
 
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.entities.CompanyDetailsReport;
+import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyActiveUsersStats;
 import com.realtech.socialsurvey.core.entities.DigestRequestData;
 import com.realtech.socialsurvey.core.entities.CompanySurveyStatusStats;
@@ -694,6 +703,7 @@ public class ReportingController
         }
         return json;
     }
+
     @RequestMapping ( value = "/gettransactioncountforpreviousday", method = RequestMethod.GET)
     @ApiOperation ( value = "Fetch the transaction counts for companies for  previous day")
     public String getTransactionCountForPreviousDay()
