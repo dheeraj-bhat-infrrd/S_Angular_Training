@@ -1804,7 +1804,7 @@ function activaTab(tab){
 function updateReportingDashboard(){
 	
 	var currentDate =  new Date();
-	var currentMonth = currentDate.getMonth();
+	var currentMonth = currentDate.getMonth()+1;
 	var currentYear = currentDate.getFullYear();
 	
 	var monthYear = getTimeFrameValue();
@@ -2707,7 +2707,7 @@ function getReportingSocialMediaConnections(columnName,columnValue){
 function getOverallScoreStats(entityId,entityType){
 	
 	var currentDate = new Date();
-	var currentMonth = currentDate.getMonth();
+	var currentMonth = currentDate.getMonth()+1;
 	var currentYear = currentDate.getFullYear();
 	
 	var url = "/getoverallscorestats.do?entityId="+entityId+"&entityType="+entityType+"&currentMonth="+currentMonth+"&currentYear="+currentYear;
@@ -2735,7 +2735,7 @@ function getOverallScoreStats(entityId,entityType){
 
 function getQuestionScoreStats(entityId,entityType){
 	var currentDate = new Date();
-	var currentMonth = currentDate.getMonth();
+	var currentMonth = currentDate.getMonth()+1;
 	var currentYear = currentDate.getFullYear();
 	
 	var url = "/getquestionscorestats.do?entityId="+entityId+"&entityType="+entityType+"&currentMonth="+currentMonth+"&currentYear="+currentYear;
