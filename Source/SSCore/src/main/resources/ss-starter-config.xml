@@ -470,6 +470,7 @@
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="reportingDashboardManagement" value-ref="reportingDashboardManagement" />
+				<entry key="batchTrackerService" value-ref="batchTrackerService" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
