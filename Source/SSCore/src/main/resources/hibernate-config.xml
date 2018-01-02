@@ -170,6 +170,7 @@
 				<value>com.realtech.socialsurvey.core.entities.ReportingSurveyPreInititation</value>
 				<value>com.realtech.socialsurvey.core.entities.NpsReportWeek</value>
 				<value>com.realtech.socialsurvey.core.entities.NpsReportMonth</value>
+				<value>com.realtech.socialsurvey.core.entities.JobLogDetails</value>
 			</list>
 		</property>
 	</bean>
