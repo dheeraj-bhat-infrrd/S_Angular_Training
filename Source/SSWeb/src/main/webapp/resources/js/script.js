@@ -3940,5 +3940,35 @@ function copyIndividualReviewUrlToClipboard(loop){
 	} else{ 
 		message = $('#permalink_url_' + loop).val();
 	}
-	copyToClipboard( message, "Review URL copied to clipboard.", "Unable to copy to clipboard.");	
+	copyToClipboard( message, "Review URL copied to clipboard.", "Unable to copy to clipboard.");
+	
 }
+
+
+function bindEmailUnsubscribeClickEvent(){
+	
+	$("#add-unsubscribe-email-form-submit").click(function() {
+		var emailId = $("#add-unsubscribe-email").val();
+		if(emailId == undefined || emailId == ''){
+			$('#overlay-toast').html("Enter valid email address");
+			showToast();
+		}else{
+
+			var payload = {
+					"emailId" : emailId
+			}
+			callAjaxPostWithPayloadData( "./addnewunsubscribeemail.do", function(data){
+				var message = "";
+				if(data == "true")
+					message = "Email address added successfully";
+				else
+					message = "Error while adding email address" + data;
+				$('#overlay-toast').html(message);
+				showToast();
+			}, payload, false , "#add-unsubscribe-email-form-submit");
+		}
+			
+	});
+}
+
+

@@ -92,10 +92,8 @@
          <script src='//www.google.com/recaptcha/api.js' defer="defer" async="async"></script>
          <script>
             $(document).ready(function() {
-            	initializeSurveyFormPage();
+            	bindEmailUnsubscribeClickEvent();
             	
-            	//update google analytics
-            	updateGoogleTrackingId();
             });
          </script>
       </div>

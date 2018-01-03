@@ -47,7 +47,7 @@ public class SendgridController
 
             sendgridManagementService.addNewEmailToUnsubscribeList( emailId );
         } catch (  NonFatalException e ) {
-            return "false";
+            return e.getMessage();
         }
         LOG.info( "Method addNewunSubscribeEmail started with email id {}", emailId );
         return "true";
