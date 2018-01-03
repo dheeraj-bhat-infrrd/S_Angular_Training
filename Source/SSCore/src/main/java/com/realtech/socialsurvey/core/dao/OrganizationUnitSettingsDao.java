@@ -281,7 +281,7 @@ public interface OrganizationUnitSettingsDao
      * 
      * @return
      */
-    public List<OrganizationUnitSettings> getCompaniesForTransactionMonitor();
+    public List<OrganizationUnitSettings> getCompaniesForTransactionMonitor(List<Long> companyIds);
 
     /**
      * 

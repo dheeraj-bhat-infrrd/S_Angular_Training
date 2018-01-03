@@ -362,18 +362,18 @@ public class ActivityManagementServiceImpl implements ActivityManagementService
      */
     @Override
     @Transactional
-    public Map<Long, Long> getTotalTransactionCountForPast3DaysForCompanies()
+    public Map<Long, Long> getTotalTransactionCountForPast5DaysForCompanies()
     {
-        LOG.info( "method getTotalTransactionCountForPastNDaysForCompanies started" );
+        LOG.info( "method getTotalTransactionCountForPast5DaysForCompanies started" );
 
         Calendar calendar = Calendar.getInstance();
-        calendar.add( Calendar.DATE, - 3 );
+        calendar.add( Calendar.DATE, - 5 );
         Date oneMonthBackDate = new Date( calendar.getTimeInMillis() );
 
         Map<Long, Long> companySurveyStatsCountsMap = companySurveyStatusStatsDao
             .getTotalTransactionCountForCompaniesAfterSentDate( oneMonthBackDate );
 
-        LOG.info( "method getTotalTransactionCountForPastNDaysForCompanies ended" );
+        LOG.info( "method getTotalTransactionCountForPast5DaysForCompanies ended" );
         return companySurveyStatsCountsMap;
     }
     
@@ -383,18 +383,18 @@ public class ActivityManagementServiceImpl implements ActivityManagementService
      */
     @Override
     @Transactional
-    public Map<Long, Long> getTransactionCountForPreviousDay()
+    public Map<Long, Long> getTransactionCountForPast3Days()
     {
-        LOG.info( "method getTransactionCountForPreviousDay started" );
+        LOG.info( "method getTransactionCountForPast3Days started" );
 
         Calendar calendar = Calendar.getInstance();
-        calendar.add( Calendar.DATE, - 1 );
+        calendar.add( Calendar.DATE, - 3 );
         Date prevoiusDayDate = new Date( calendar.getTimeInMillis() );
 
         Map<Long, Long> companySurveyStatsCountsMap = companySurveyStatusStatsDao
             .getTotalTransactionCountForCompaniesAfterSentDate( prevoiusDayDate );
 
-        LOG.info( "method getTransactionCountForPreviousDay ended" );
+        LOG.info( "method getTransactionCountForPast3Days ended" );
         return companySurveyStatsCountsMap;
     }
     
@@ -416,12 +416,12 @@ public class ActivityManagementServiceImpl implements ActivityManagementService
     
     @Override
     @Transactional
-    public Map<Long, Long> getSendSurveyCountForPreviousDay()
+    public Map<Long, Long> getSendSurveyCountForPast5Days()
     {
         LOG.info( "method getSendSurveyCountForPreviousDay started" );
 
         Calendar calendar = Calendar.getInstance();
-        calendar.add( Calendar.DATE, - 1 );
+        calendar.add( Calendar.DATE, - 5 );
         Date prevoiusDayDate = new Date( calendar.getTimeInMillis() );
 
         Map<Long, Long> companySurveyStatsCountsMap = companySurveyStatusStatsDao
