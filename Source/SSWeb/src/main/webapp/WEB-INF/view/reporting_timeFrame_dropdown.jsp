@@ -19,37 +19,7 @@
 
 <script>
 	$(document).ready(function(){
-		var currentDate = new Date();
-		var currentMonth = currentDate.getMonth();
-		var currentYear = currentDate.getFullYear();
-		
-		var monthStr = new Array();
-		monthStr[0] = "Jan";
-		monthStr[1] = "Feb";
-		monthStr[2] = "Mar";
-		monthStr[3] = "Apr";
-		monthStr[4] = "May";
-		monthStr[5] = "Jun";
-		monthStr[6] = "Jul";
-		monthStr[7] = "Aug";
-		monthStr[8] = "Sep";
-		monthStr[9] = "Oct";
-		monthStr[10] = "Nov";
-		monthStr[11] = "Dec";
-		
-		var monthJspStr='';
-		var count=4;
-		
-		if(currentMonth > 1){
-			var month = currentMonth - 2;
-			
-			while(month >= 0 && count-- > 0){
-				monthJspStr += '<div class="time-frame-item" data-column-value="' + (month+1) + '">' + monthStr[month] + ' ' + currentYear + '</div>' ;
-				month--;
-			}
-			
-			$('#time-frame-options').append(monthJspStr);
-		}
+		drawTimeFrames();
 		
 		$('#timeFrame_container').unbind('click').on('click', '#time-frame-sel', function(e) {
 			e.stopPropagation();
