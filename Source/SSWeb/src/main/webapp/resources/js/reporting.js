@@ -32,19 +32,19 @@ function drawTimeFrames(){
 		month = currentMonth - 2;
 		
 		while(month >= 0 && count-- > 0){
-			monthJspStr += '<div class="time-frame-item" data-column-value="' + (month+1) + '">' + monthStr[month] + ' ' + currentYear + '</div>' ;
+			monthJspStr += '<div class="time-frame-item" data-year="'+currentYear+'" data-column-value="' + (month+1) + '">' + monthStr[month] + ' ' + currentYear + '</div>' ;
 			month--;
 		}
 		
 		if(currentMonth == 2){
-			monthJspStr += '<div class="time-frame-item" data-column-value="12">' + monthStr[11] + ' ' + (currentYear-1) + '</div>' ;
-			monthJspStr += '<div class="time-frame-item" data-column-value="11">' + monthStr[10] + ' ' + (currentYear-1) + '</div>' ;
-			monthJspStr += '<div class="time-frame-item" data-column-value="10">' + monthStr[9] + ' ' + (currentYear-1) + '</div>' ;
+			monthJspStr += '<div class="time-frame-item" data-year="'+(currentYear-1)+'" data-column-value="12">' + monthStr[11] + ' ' + (currentYear-1) + '</div>' ;
+			monthJspStr += '<div class="time-frame-item" data-year="'+(currentYear-1)+'" data-column-value="11">' + monthStr[10] + ' ' + (currentYear-1) + '</div>' ;
+			monthJspStr += '<div class="time-frame-item" data-year="'+(currentYear-1)+'" data-column-value="10">' + monthStr[9] + ' ' + (currentYear-1) + '</div>' ;
 		}else if(currentMonth == 3){
-			monthJspStr += '<div class="time-frame-item" data-column-value="12">' + monthStr[11] + ' ' + (currentYear) + '</div>' ;
-			monthJspStr += '<div class="time-frame-item" data-column-value="11">' + monthStr[10] + ' ' + (currentYear-1) + '</div>' ;
+			monthJspStr += '<div class="time-frame-item" data-year="'+(currentYear-1)+'" data-column-value="12">' + monthStr[11] + ' ' + (currentYear-1) + '</div>' ;
+			monthJspStr += '<div class="time-frame-item" data-year="'+(currentYear-1)+'" data-column-value="11">' + monthStr[10] + ' ' + (currentYear-1) + '</div>' ;
 		}else if(currentMonth == 4){
-			monthJspStr += '<div class="time-frame-item" data-column-value="12">' + monthStr[11] + ' ' + (currentYear-1) + '</div>' ;
+			monthJspStr += '<div class="time-frame-item" data-year="'+(currentYear-1)+'" data-column-value="12">' + monthStr[11] + ' ' + (currentYear-1) + '</div>' ;
 		}
 		
 	}else{
@@ -55,7 +55,7 @@ function drawTimeFrames(){
 		}
 			count=4;
 			while(count-- > 0){
-				monthJspStr += '<div class="time-frame-item" data-column-value="' + (month+1) + '">' + monthStr[month] + ' ' + (currentYear-1) + '</div>' ;
+				monthJspStr += '<div class="time-frame-item" data-year="'+(currentYear-1)+'" data-column-value="' + (month+1) + '">' + monthStr[month] + ' ' + (currentYear-1) + '</div>' ;
 				month--;
 			}
 	}
@@ -909,6 +909,8 @@ function getTimeFrameValue(){
 			year:2017
 	};
 	var timeFrame = parseInt($('#time-frame-sel').attr('data-column-value'));
+	var yearTimeFrame = parseInt($('#time-frame-sel').attr('data-year'));
+	
 	switch(timeFrame){
 		case 100: monthYear.month=14;
 				  monthYear.year=currentYear;
@@ -918,8 +920,12 @@ function getTimeFrameValue(){
 		  		monthYear.year=currentYear;
 		  		return monthYear;
 		
-		case 102: monthYear.month=currentMonth;
-  				monthYear.year=currentYear;
+		case 102:monthYear.month=currentMonth;
+				 monthYear.year=currentYear;
+				 if(currentMonth == 0){
+  					monthYear.month=12;
+  					monthYear.year=currentYear-1;
+				 }
   				return monthYear;
   		
 		case 103: monthYear.month=13;
@@ -931,51 +937,51 @@ function getTimeFrameValue(){
   				return monthYear;
   		
 		case 1: monthYear.month=1;
-  				monthYear.year=currentYear;
+  				monthYear.year=yearTimeFrame;
   				return monthYear;
   				
 		case 2: monthYear.month=2;
-			monthYear.year=currentYear;
+			monthYear.year=yearTimeFrame;
 			return monthYear;
 			
 		case 3: monthYear.month=3;
-			monthYear.year=currentYear;
+			monthYear.year=yearTimeFrame;
 			return monthYear;
 			
 		case 4: monthYear.month=4;
-			monthYear.year=currentYear;
+			monthYear.year=yearTimeFrame;
 			return monthYear;
 			
 		case 5: monthYear.month=5;
-			monthYear.year=currentYear;
+			monthYear.year=yearTimeFrame;
 			return monthYear;
 			
 		case 6: monthYear.month=6;
-			monthYear.year=currentYear;
+			monthYear.year=yearTimeFrame;
 			return monthYear;
 			
 		case 7: monthYear.month=7;
-			monthYear.year=currentYear;
+			monthYear.year=yearTimeFrame;
 			return monthYear;
 			
 		case 8: monthYear.month=8;
-			monthYear.year=currentYear;
+			monthYear.year=yearTimeFrame;
 			return monthYear;
 		
 		case 9: monthYear.month=9;
-			monthYear.year=currentYear;
+			monthYear.year=yearTimeFrame;
 			return monthYear;
 			
 		case 10: monthYear.month=10;
-			monthYear.year=currentYear;
+			monthYear.year=yearTimeFrame;
 			return monthYear;
 			
 		case 11: monthYear.month=11;
-			monthYear.year=currentYear;
+			monthYear.year=yearTimeFrame;
 			return monthYear;
 		
 		case 12: monthYear.month=12;
-			monthYear.year=currentYear;
+			monthYear.year=yearTimeFrame;
 			return monthYear;
 	}
 }
