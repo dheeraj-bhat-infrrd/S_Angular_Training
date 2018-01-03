@@ -7,13 +7,13 @@
 }
 </style>
 <div id="time-frame-wrapper" class="float-right clearfix hr-dsh-adj-lft hdr-prof-sel time-frame-prof-sel" style="margin-top:7px; margin-right: 10px;">
-	<div id="time-frame-sel" data-column-value="100" class="float-left hr-txt2 cursor-pointer time-frame-sel" >All Time</div>	
+	<div id="time-frame-sel" data-column-value="100" data-year="" class="float-left hr-txt2 cursor-pointer time-frame-sel" >All Time</div>	
 	<div id="time-frame-options" class="time-frame-wrapper hide">
-		<div class="time-frame-item" data-column-value="100">All Time</div>
-		<div class="time-frame-item" data-column-value="101">This Month</div>
-		<div class="time-frame-item" data-column-value="102">Last Month</div>
-		<div class="time-frame-item" data-column-value="103">This Year</div>
-		<div class="time-frame-item" data-column-value="104">Last Year</div>
+		<div class="time-frame-item" data-year="" data-column-value="100">All Time</div>
+		<div class="time-frame-item" data-year="" data-column-value="101">This Month</div>
+		<div class="time-frame-item" data-year="" data-column-value="102">Last Month</div>
+		<div class="time-frame-item" data-year="" data-column-value="103">This Year</div>
+		<div class="time-frame-item" data-year="" data-column-value="104">Last Year</div>
 	</div>
 </div>
 
@@ -33,7 +33,10 @@
 			$('#time-frame-options').slideToggle(200);
 			
 			var timeFrame = $(this).attr('data-column-value');
+			var yearTimeFrame = $(this).attr('data-year');
+			
 			$('#time-frame-sel').attr('data-column-value',timeFrame);
+			$('#time-frame-sel').attr('data-year',yearTimeFrame);
 
 			$('#reporting-trans-details').fadeOut(500);
 			$('#reporting-trans-details').fadeIn(500);
