@@ -287,10 +287,10 @@ public class ReportingWebController
             responseString = StringEscapeUtils.unescapeJava( responseString );
             Type responseType = new TypeToken<JobLogDetailsResponse>() {}.getType();
             jobLogDetailsResponse = new Gson().fromJson( responseString, responseType );
-            if(jobLogDetailsResponse.getLastRunTime().getStatus().equalsIgnoreCase( CommonConstants.STATUS_DUMMY )){
+            if(jobLogDetailsResponse.getStatus().equalsIgnoreCase( CommonConstants.STATUS_DUMMY )){
                 lastSuccessfulRun = "";
             } else {
-                lastSuccessfulRun = jobLogDetailsResponse.getLastRunTime().getEst();
+                lastSuccessfulRun = jobLogDetailsResponse.getTimestampInEst();
             } 
         }
         HttpSession session = request.getSession( false );

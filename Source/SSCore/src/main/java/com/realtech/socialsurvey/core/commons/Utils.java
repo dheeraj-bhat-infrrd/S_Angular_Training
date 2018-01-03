@@ -19,6 +19,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -403,4 +404,19 @@ public class Utils
         LOG.debug( "method getNDaysBackDate finished for noOfDays %s " + noOfDays );
         return date;
     }
+    
+    /**
+     * Convert to different timezones
+     * @param date
+     * @param toTimeZone
+     * @return
+     */
+    public String convertDateToTimeZone( Timestamp date, String toTimeZone )
+    {
+        Calendar calendar = Calendar.getInstance( TimeZone.getTimeZone( toTimeZone ) );
+        SimpleDateFormat dateFormat = new SimpleDateFormat( "MM/dd/yy, HH:mm" );
+        dateFormat.setCalendar( calendar );
+        return ( dateFormat.format( date ) );
+    }
+    
 }
