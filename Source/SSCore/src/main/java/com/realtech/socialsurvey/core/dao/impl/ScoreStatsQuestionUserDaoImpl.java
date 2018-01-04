@@ -28,6 +28,7 @@ public class ScoreStatsQuestionUserDaoImpl extends GenericReportingDaoImpl<Score
         Criteria criteria = getSession().createCriteria( ScoreStatsQuestionUser.class );
         try {
             criteria.add( Restrictions.eq( CommonConstants.USER_ID, userId ) );
+            criteria.add(Restrictions.not(Restrictions.eq(CommonConstants.QUESTION_ID, CommonConstants.DEFAULT_QUESTION_ID)));
             Criterion rest1= Restrictions.and(Restrictions.eq( CommonConstants.YEAR_VAL, endYear ), 
                 Restrictions.le( CommonConstants.MONTH_VAL, endMonth ));
             if( startMonth != 1){
