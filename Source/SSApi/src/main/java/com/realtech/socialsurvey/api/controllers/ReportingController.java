@@ -705,7 +705,7 @@ public class ReportingController
     }
     
     
-    @RequestMapping ( value = "/getsendsurveycountforpreviousday", method = RequestMethod.GET)
+    @RequestMapping ( value = "/getsendsurveycountforpast5days", method = RequestMethod.GET)
     @ApiOperation ( value = "Fetch the transaction counts for companies for past 5 days ")
     public String getSendSurveyCountForPast5Days()
     {
