@@ -348,6 +348,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyDetails.setSourceId( surveyPreInitiation.getSurveySourceId() );
         surveyDetails.setShowSurveyOnUI( true );
 
+        surveyDetails.setNpsScore( -1 );
+        surveyDetails.setReview( null );
         surveyDetails.setRetakeSurvey( retakeSurvey );
         surveyDetails.setSurveyPreIntitiationId( surveyPreInitiation.getSurveyPreIntitiationId() );
         surveyDetails.setSurveyTransactionDate( surveyPreInitiation.getEngagementClosedTime() );
@@ -873,11 +875,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         LOG.debug( "Method to update status of survey in SurveyDetails collection, changeStatusOfSurvey() started." );
         SurveyDetails surveyDetails = surveyDetailsDao.getSurveyBySurveyMongoId( surveyId );
         
-        surveyDetails.setStage( 0 );
-        surveyDetails.setReview( null );
         surveyDetails.setNoOfRetake( surveyDetails.getNoOfRetake() + 1 );
         surveyDetails.setLastRetakeRequestDate( new Date ( System.currentTimeMillis() ) );
-        surveyDetails.setNpsScore( -1 );
         
         RetakeSurveyHistory retakeSurveyHistory = new RetakeSurveyHistory();
         retakeSurveyHistory.setCompleteProfileUrl( surveyDetails.getCompleteProfileUrl() );
@@ -894,11 +893,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         retakeSurveyHistories.add( retakeSurveyHistory );
         surveyDetails.setRetakeSurveyHistory( retakeSurveyHistories );
         
-        surveyDetails.setStage( 0 );
-        surveyDetails.setReview( null );
         surveyDetails.setNoOfRetake( surveyDetails.getNoOfRetake() + 1 );
         surveyDetails.setLastRetakeRequestDate( new Date ( System.currentTimeMillis() ) );
         
+        surveyDetails.setModifiedOn(new Date(System.currentTimeMillis()));
         surveyDetailsDao.updateSurveyDetailsForRetake( surveyDetails );
         LOG.debug( "Method to update status of survey in SurveyDetails collection, changeStatusOfSurvey() finished." );
     }
