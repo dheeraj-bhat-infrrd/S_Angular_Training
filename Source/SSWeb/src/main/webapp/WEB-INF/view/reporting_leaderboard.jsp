@@ -168,6 +168,10 @@ $(document).ready(function(){
 		break;
 	case 4: year = currentYear;
 		month=currentMonth -1;
+		if(month<=0){
+			month=12;
+			year--;
+		}
 		break;
 	}
 	
@@ -217,6 +221,10 @@ $(document).on('click','#lead-ranks-above-btn',function(){
 		break;
 	case 4: year = currentYear;
 		month=currentMonth -1;
+		if(month<=0){
+			month=12;
+			year--;
+		}
 		break;
 	}
 	
@@ -293,6 +301,10 @@ $(document).on('click','#lead-ranks-below-btn',function(){
 		break;
 	case 4: year = currentYear;
 		month=currentMonth -1;
+		if(month<=0){
+			month=12;
+			year--;
+		}
 		break;
 	}
 	
@@ -363,6 +375,10 @@ $(document).on('change', '#time-selector', function() {
 		break;
 	case 4: year = currentYear;
 		month=currentMonth -1;
+		if(month<=0){
+			month=12;
+			year--;
+		}
 		break;
 	case 5: year = currentYear - 1
 	}
@@ -457,6 +473,10 @@ $(document).on('change', '#board-selector', function() {
 		break;
 	case 4: year = currentYear;
 		month=currentMonth -1;
+		if(month<=0){
+			month=12;
+			year--;
+		}
 		break;
 	case 5: year = currentYear - 1
 	}
@@ -550,6 +570,10 @@ $(document).on('click','#top-ten-ranks-btn',function(){
 		break;
 	case 4: year = currentYear;
 		month=currentMonth -1;
+		if(month<=0){
+			month=12;
+			year--;
+		}
 		break;
 	}
 	
@@ -621,6 +645,10 @@ $(document).on('click','#my-rank-btn',function(){
 		break;
 	case 4: year = currentYear;
 		month=currentMonth -1;
+		if(month<=0){
+			month=12;
+			year--;
+		}
 		break;
 	}
 	
