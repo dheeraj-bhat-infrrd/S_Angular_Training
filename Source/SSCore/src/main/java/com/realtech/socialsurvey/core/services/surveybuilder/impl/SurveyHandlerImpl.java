@@ -870,13 +870,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     @Override
-    public void markSurveyAsRetake( String surveyId, boolean editable )
+    public void markSurveyAsRetake( String surveyId, boolean editable, String requestSource )
     {
         LOG.debug( "Method to update status of survey in SurveyDetails collection, changeStatusOfSurvey() started." );
         SurveyDetails surveyDetails = surveyDetailsDao.getSurveyBySurveyMongoId( surveyId );
-        
-        surveyDetails.setNoOfRetake( surveyDetails.getNoOfRetake() + 1 );
-        surveyDetails.setLastRetakeRequestDate( new Date ( System.currentTimeMillis() ) );
         
         RetakeSurveyHistory retakeSurveyHistory = new RetakeSurveyHistory();
         retakeSurveyHistory.setCompleteProfileUrl( surveyDetails.getCompleteProfileUrl() );
@@ -887,6 +884,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         retakeSurveyHistory.setSummary( surveyDetails.getSummary() );
         retakeSurveyHistory.setSurveyResponse( surveyDetails.getSurveyResponse() );
         retakeSurveyHistory.setUrl( surveyDetails.getUrl() );
+        retakeSurveyHistory.setRetakeRequestDate( new Date ( System.currentTimeMillis() ) );
+        retakeSurveyHistory.setRequestSource(requestSource);
         List<RetakeSurveyHistory> retakeSurveyHistories =  surveyDetails.getRetakeSurveyHistory();
         if(retakeSurveyHistories == null)
             retakeSurveyHistories = new ArrayList<RetakeSurveyHistory>();
