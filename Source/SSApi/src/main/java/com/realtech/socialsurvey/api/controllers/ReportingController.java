@@ -1,28 +1,19 @@
 package com.realtech.socialsurvey.api.controllers;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import retrofit.client.Response;
-import retrofit.http.GET;
-
 import com.google.gson.Gson;
-import com.realtech.socialsurvey.core.entities.CompanyDetailsReport;
-import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyActiveUsersStats;
+import com.realtech.socialsurvey.core.entities.CompanyDetailsReport;
 import com.realtech.socialsurvey.core.entities.CompanyDigestRequestData;
 import com.realtech.socialsurvey.core.entities.CompanySurveyStatusStats;
 import com.realtech.socialsurvey.core.entities.CompanyView;
@@ -679,12 +670,12 @@ public class ReportingController
             startIndex, batchSize ) );
     }
     
-    @RequestMapping ( value = "/gettotaltransactioncountforpastndays", method = RequestMethod.GET)
-    @ApiOperation ( value = "Fetch the transaction counts for companies for  past n days ")
-    public String getTotalTransactionCountForPastNDays()
+    @RequestMapping ( value = "/gettotaltransactioncountforpast5days", method = RequestMethod.GET)
+    @ApiOperation ( value = "Fetch the transaction counts for companies for  past 5 days ")
+    public String getTotalTransactionCountForPast5Days()
     {
         LOGGER.info( "Fetch total survey counts for companies for the n days" );
-        Map<Long, Long> companySurveyStatsCountsMap = activityManagementService.getTotalTransactionCountForPast3DaysForCompanies();
+        Map<Long, Long> companySurveyStatsCountsMap = activityManagementService.getTotalTransactionCountForPast5DaysForCompanies();
         return new Gson().toJson( companySurveyStatsCountsMap );
     }
 
@@ -704,22 +695,22 @@ public class ReportingController
         return json;
     }
 
-    @RequestMapping ( value = "/gettransactioncountforpreviousday", method = RequestMethod.GET)
-    @ApiOperation ( value = "Fetch the transaction counts for companies for  previous day")
-    public String getTransactionCountForPreviousDay()
+    @RequestMapping ( value = "/gettransactioncountforpast3days", method = RequestMethod.GET)
+    @ApiOperation ( value = "Fetch the transaction counts for companies for  pasr 3 days")
+    public String getTransactionCountForPast3Days()
     {
         LOGGER.info( "Fetch total survey counts for companies for the n days" );
-        Map<Long, Long> companySurveyStatsCountsMap = activityManagementService.getTransactionCountForPreviousDay();
+        Map<Long, Long> companySurveyStatsCountsMap = activityManagementService.getTransactionCountForPast3Days();
         return new Gson().toJson( companySurveyStatsCountsMap );
     }
     
     
     @RequestMapping ( value = "/getsendsurveycountforpreviousday", method = RequestMethod.GET)
-    @ApiOperation ( value = "Fetch the transaction counts for companies for previous days ")
-    public String getSendSurveyCountForPreviousDay()
+    @ApiOperation ( value = "Fetch the transaction counts for companies for past 5 days ")
+    public String getSendSurveyCountForPast5Days()
     {
-        LOGGER.info( "Fetch sent survey counts for companies for previous days" );
-        Map<Long, Long> companySurveyStatsCountsMap = activityManagementService.getSendSurveyCountForPreviousDay();
+        LOGGER.info( "Fetch sent survey counts for companies for past 5 days" );
+        Map<Long, Long> companySurveyStatsCountsMap = activityManagementService.getSendSurveyCountForPast5Days();
         return new Gson().toJson( companySurveyStatsCountsMap );
     }
     
