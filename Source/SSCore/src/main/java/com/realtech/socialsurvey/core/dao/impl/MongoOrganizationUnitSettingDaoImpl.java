@@ -1095,7 +1095,6 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         query.fields().include( KEY_IDEN ).include( KEY_CONTACT_DETAILS );
         query.addCriteria( Criteria.where( KEY_STATUS )
             .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) ) );
-        query.addCriteria( Criteria.where( KEY_INCLUDE_FOR_TRANSACTION_MONITOR ).is( true ) );
                 
         List<OrganizationUnitSettings> settings = mongoTemplate.find( query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION );
         
