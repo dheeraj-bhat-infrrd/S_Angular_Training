@@ -1422,6 +1422,7 @@ public interface CommonConstants
     public static final String MONTH_VAL = "monthVal";
     public static final String YEAR_VAL = "yearVal";
     public static final String QUESTION_ID = "questionId";
+    public static final int DEFAULT_QUESTION_ID = -1;
     
     public static final String TRANSACTION_MONITOR_DATE_COLUMN = "transactionDate";
     public static final String SURVEY_STATS_MONITOR_DATE_COLUMN = "statsDate";
@@ -1478,4 +1479,5 @@ public interface CommonConstants
     public static final String JOB_LOG_ID = "jobLogId";
     public static final String STATUS_DUMMY = "Dummy";
     public static final String STATUS_FINISHED = "Finished";
+    public static final String TIMEZONE_EST = "EST";
 }
