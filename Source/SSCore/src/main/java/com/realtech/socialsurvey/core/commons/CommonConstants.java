@@ -1479,4 +1479,5 @@ public interface CommonConstants
     public static final String JOB_LOG_ID = "jobLogId";
     public static final String STATUS_DUMMY = "Dummy";
     public static final String STATUS_FINISHED = "Finished";
+    public static final String TIMEZONE_EST = "EST";
 }
