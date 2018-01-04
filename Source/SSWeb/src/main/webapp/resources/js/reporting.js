@@ -5,6 +5,63 @@ var overviewData=getOverviewData();
 var socialMediaList = new Array();
 var is_safari = navigator.userAgent.indexOf("Safari") > -1;
 
+function drawTimeFrames(){
+	var currentDate = new Date();
+	var currentMonth = currentDate.getMonth();
+	var currentYear = currentDate.getFullYear();
+	
+	var monthStr = new Array();
+	monthStr[0] = "Jan";
+	monthStr[1] = "Feb";
+	monthStr[2] = "Mar";
+	monthStr[3] = "Apr";
+	monthStr[4] = "May";
+	monthStr[5] = "Jun";
+	monthStr[6] = "Jul";
+	monthStr[7] = "Aug";
+	monthStr[8] = "Sep";
+	monthStr[9] = "Oct";
+	monthStr[10] = "Nov";
+	monthStr[11] = "Dec";
+	
+	var monthJspStr='';
+	var count=4;
+	var month;
+	
+	if(currentMonth > 1){
+		month = currentMonth - 2;
+		
+		while(month >= 0 && count-- > 0){
+			monthJspStr += '<div class="time-frame-item" data-year="'+currentYear+'" data-column-value="' + (month+1) + '">' + monthStr[month] + ' ' + currentYear + '</div>' ;
+			month--;
+		}
+		
+		if(currentMonth == 2){
+			monthJspStr += '<div class="time-frame-item" data-year="'+(currentYear-1)+'" data-column-value="12">' + monthStr[11] + ' ' + (currentYear-1) + '</div>' ;
+			monthJspStr += '<div class="time-frame-item" data-year="'+(currentYear-1)+'" data-column-value="11">' + monthStr[10] + ' ' + (currentYear-1) + '</div>' ;
+			monthJspStr += '<div class="time-frame-item" data-year="'+(currentYear-1)+'" data-column-value="10">' + monthStr[9] + ' ' + (currentYear-1) + '</div>' ;
+		}else if(currentMonth == 3){
+			monthJspStr += '<div class="time-frame-item" data-year="'+(currentYear-1)+'" data-column-value="12">' + monthStr[11] + ' ' + (currentYear-1) + '</div>' ;
+			monthJspStr += '<div class="time-frame-item" data-year="'+(currentYear-1)+'" data-column-value="11">' + monthStr[10] + ' ' + (currentYear-1) + '</div>' ;
+		}else if(currentMonth == 4){
+			monthJspStr += '<div class="time-frame-item" data-year="'+(currentYear-1)+'" data-column-value="12">' + monthStr[11] + ' ' + (currentYear-1) + '</div>' ;
+		}
+		
+	}else{
+		if(currentMonth == 1){
+			month=11;
+		}else{
+			month=10;
+		}
+			count=4;
+			while(count-- > 0){
+				monthJspStr += '<div class="time-frame-item" data-year="'+(currentYear-1)+'" data-column-value="' + (month+1) + '">' + monthStr[month] + ' ' + (currentYear-1) + '</div>' ;
+				month--;
+			}
+	}
+	$('#time-frame-options').append(monthJspStr);
+}
+
 function cssForSafari(){
 	if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1) {
 		is_safari = true;
@@ -852,6 +909,8 @@ function getTimeFrameValue(){
 			year:2017
 	};
 	var timeFrame = parseInt($('#time-frame-sel').attr('data-column-value'));
+	var yearTimeFrame = parseInt($('#time-frame-sel').attr('data-year'));
+	
 	switch(timeFrame){
 		case 100: monthYear.month=14;
 				  monthYear.year=currentYear;
@@ -874,51 +933,51 @@ function getTimeFrameValue(){
   				return monthYear;
   		
 		case 1: monthYear.month=1;
-  				monthYear.year=currentYear;
+  				monthYear.year=yearTimeFrame;
   				return monthYear;
   				
 		case 2: monthYear.month=2;
-			monthYear.year=currentYear;
+			monthYear.year=yearTimeFrame;
 			return monthYear;
 			
 		case 3: monthYear.month=3;
-			monthYear.year=currentYear;
+			monthYear.year=yearTimeFrame;
 			return monthYear;
 			
 		case 4: monthYear.month=4;
-			monthYear.year=currentYear;
+			monthYear.year=yearTimeFrame;
 			return monthYear;
 			
 		case 5: monthYear.month=5;
-			monthYear.year=currentYear;
+			monthYear.year=yearTimeFrame;
 			return monthYear;
 			
 		case 6: monthYear.month=6;
-			monthYear.year=currentYear;
+			monthYear.year=yearTimeFrame;
 			return monthYear;
 			
 		case 7: monthYear.month=7;
-			monthYear.year=currentYear;
+			monthYear.year=yearTimeFrame;
 			return monthYear;
 			
 		case 8: monthYear.month=8;
-			monthYear.year=currentYear;
+			monthYear.year=yearTimeFrame;
 			return monthYear;
 		
 		case 9: monthYear.month=9;
-			monthYear.year=currentYear;
+			monthYear.year=yearTimeFrame;
 			return monthYear;
 			
 		case 10: monthYear.month=10;
-			monthYear.year=currentYear;
+			monthYear.year=yearTimeFrame;
 			return monthYear;
 			
 		case 11: monthYear.month=11;
-			monthYear.year=currentYear;
+			monthYear.year=yearTimeFrame;
 			return monthYear;
 		
 		case 12: monthYear.month=12;
-			monthYear.year=currentYear;
+			monthYear.year=yearTimeFrame;
 			return monthYear;
 	}
 }
