@@ -68,19 +68,12 @@
                   <input type="hidden" value="${message}" data-status="${status}"  name="message" id="message" />
                   <div class="sq-rat-wrapper">
                   	<table class="v-um-tbl">
-	<tbody><tr id="u-tbl-header" class="u-tbl-header" data-num-found="0">
-		<td class="v-tbl-uname">Email Id</td>
-		<td class="v-tbl-email">Created On</td>
-		<td class="v-tbl-rgn-adm text-center">
-
-		</td><td class="v-tbl-ln-of text-center">Action</td>
-	</tr>
-	
-		
-		
-			<tr class="u-tbl-row"></tr>
-		
-	
+	<tbody id="unsubscribedEmailList">
+		<tr id="u-tbl-header" class="u-tbl-header" data-num-found="0">
+			<td class="v-tbl-uname">Email Id</td>
+			<td class="v-tbl-email">Created On</td>
+			<td class="v-tbl-rgn-adm text-center">Action</td>
+		</tr>
 </tbody></table>
                    </div>
                </div>
@@ -92,7 +85,7 @@
          <script src='//www.google.com/recaptcha/api.js' defer="defer" async="async"></script>
          <script>
             $(document).ready(function() {
-            	bindEmailUnsubscribeClickEvent();
+            	initiateSendgridUnsubscribeEmailPage();
             	
             });
          </script>

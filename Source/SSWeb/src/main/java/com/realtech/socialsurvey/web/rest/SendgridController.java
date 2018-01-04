@@ -72,19 +72,16 @@ public class SendgridController
     
     
     @RequestMapping ( value = "/getunsubscribedemails",  method = RequestMethod.GET)
-    public List<SendgridUnsubscribeVO> getUnsubscribedEmails( @QueryParam ( value = "emailId") String emailId)
+    public List<SendgridUnsubscribeVO> getUnsubscribedEmails()
     {
-        LOG.info( "Method getUnsubscribedEmails started with email id {}", emailId );
+        LOG.info( "Method getUnsubscribedEmails started " );
         List<SendgridUnsubscribeVO> sendgridUnsubscribeVOs =  null;
         try {
-            if ( emailId == null || emailId.isEmpty() ) {
-                throw new InvalidInputException( "The emailId parameter is empty" );
-            }
             sendgridUnsubscribeVOs =  sendgridManagementService.getUnsubscribedEmailList();
         } catch (  NonFatalException e ) {
             LOG.error( "Eror while getting unsubscribed email list " );
         }
-        LOG.info( "Method getUnsubscribedEmails started with email id {}", emailId );
+        LOG.info( "Method getUnsubscribedEmails ended " );
         return sendgridUnsubscribeVOs;
     }
 

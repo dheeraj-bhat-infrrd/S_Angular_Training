@@ -3945,7 +3945,8 @@ function copyIndividualReviewUrlToClipboard(loop){
 }
 
 
-function bindEmailUnsubscribeClickEvent(){
+function initiateSendgridUnsubscribeEmailPage()
+{
 	
 	$("#add-unsubscribe-email-form-submit").click(function() {
 		var emailId = $("#add-unsubscribe-email").val();
@@ -3969,6 +3970,20 @@ function bindEmailUnsubscribeClickEvent(){
 		}
 			
 	});
+	
+	//get all the unsubscribed email
+	callAjaxGET("./getunsubscribedemails", paintUnsubscribedEmail, true);
 }
 
-
+function paintUnsubscribedEmail(unsubscibedEmails){
+	console.log(unsubscibedEmails);
+	unsubscibedEmails =JSON.parse(unsubscibedEmails);
+	for (i = 0; i < unsubscibedEmails.length; i++) {
+	    var unsubscibedEmail = unsubscibedEmails[i];
+	    
+	    var tableRow = '<tr class="u-tbl-row user-row"><td class="v-tbl-uname fetch-name">'+ unsubscibedEmail.email +'</td><td class="v-tbl-email fetch-email">'+unsubscibedEmail.created+'</td>';
+	    tableRow += '<td class="v-tbl-btns v-tbl-btns-um"><div class="v-tbn-icn-dropdown hide"></div><div class="clearfix v-tbl-icn-wraper v-um-tbl-icn-wraper"><div class="v-tbl-rem v-icn-rem-ssadmin margin-left-125" data-email-id="'+ unsubscibedEmail.email +'"';
+	    tableRow += '</tr>';
+	    $("#unsubscribedEmailList").append(tableRow);
+	}
+}
