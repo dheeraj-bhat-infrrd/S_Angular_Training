@@ -110,13 +110,13 @@ public interface ActivityManagementService
      * @param noOfDays
      * @return
      */
-    public Map<Long, Long> getTotalTransactionCountForPast3DaysForCompanies();
+    public Map<Long, Long> getTotalTransactionCountForPast5DaysForCompanies();
 
 
-    public Map<Long, Long> getTransactionCountForPreviousDay();
+    public Map<Long, Long> getTransactionCountForPast3Days();
 
 
-    public Map<Long, Long> getSendSurveyCountForPreviousDay();
+    public Map<Long, Long> getSendSurveyCountForPast5Days();
 
 
     public Map<Long, Long> getSendSurveyCountForPast7Days();
