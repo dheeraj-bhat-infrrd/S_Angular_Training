@@ -29,6 +29,7 @@ public class ScoreStatsQuestionCompanyDaoImpl extends GenericReportingDaoImpl<Sc
         try {
             //the end month query will startmonth-1 and end year will be startyear+1
             criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
+            criteria.add(Restrictions.ne(CommonConstants.QUESTION_ID, CommonConstants.DEFAULT_QUESTION_ID));
             Criterion rest1= Restrictions.and(Restrictions.eq( CommonConstants.YEAR_VAL, endYear ), 
                 Restrictions.le( CommonConstants.MONTH_VAL, endMonth ));
             if( startMonth != 1){

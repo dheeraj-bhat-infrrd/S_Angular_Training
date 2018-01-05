@@ -94,6 +94,16 @@ public class SurveyResultsCompanyReport implements Serializable {
     
     @Transient
     private List<SurveyResponseTable> surveyResponseList;
+    
+    //SS-1505 ADD FEILDS
+    @Column(name = "PARTICIPANT_TYPE")
+    private String participantType;
+    
+    @Column(name = "AGENT_EMAILID")
+    private String agentEmailId;
+    
+    @Column(name = "CUSTOMER_EMAIL_ID")
+    private String customerEmailId;
   
 	public String getSurveyStatsReportId() {
 		return surveyStatsReportId;
@@ -298,6 +308,36 @@ public class SurveyResultsCompanyReport implements Serializable {
         this.surveyResponseList = surveyResponseList;
     }
 
+    public String getParticipantType()
+    {
+        return participantType;
+    }
+
+    public void setParticipantType( String participantType )
+    {
+        this.participantType = participantType;
+    }
+
+    public String getAgentEmailId()
+    {
+        return agentEmailId;
+    }
+
+    public void setAgentEmailId( String agentEmailId )
+    {
+        this.agentEmailId = agentEmailId;
+    }
+
+    public String getCustomerEmailId()
+    {
+        return customerEmailId;
+    }
+
+    public void setCustomerEmailId( String customerEmailId )
+    {
+        this.customerEmailId = customerEmailId;
+    }
+
     @Override
     public String toString()
     {
@@ -310,7 +350,8 @@ public class SurveyResultsCompanyReport implements Serializable {
             + agreedToShare + ", branchName=" + branchName + ", clickTroughForCompany=" + clickTroughForCompany
             + ", clickTroughForAgent=" + clickTroughForAgent + ", clickTroughForRegion=" + clickTroughForRegion
             + ", clickTroughForBranch=" + clickTroughForBranch + ", reportModifiedOn=" + reportModifiedOn + ", isDeleted="
-            + isDeleted + ", SurveyResponseList=" + surveyResponseList + "]";
+            + isDeleted + ", surveyResponseList=" + surveyResponseList + ", participantType=" + participantType
+            + ", agentEmailId=" + agentEmailId + ", customerEmailId=" + customerEmailId + "]";
     }
 
 	

@@ -1,5 +1,3 @@
-use `ss_centralized_mongodb`;
-
 DROP TABLE IF EXISTS digest;
 
 CREATE TABLE `digest` (

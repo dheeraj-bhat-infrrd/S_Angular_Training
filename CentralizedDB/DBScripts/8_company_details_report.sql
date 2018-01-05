@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS `company_details_report`;
 CREATE TABLE `company_details_report` (
   `company_details_report_id` varchar(45) NOT NULL,
   `company_id` int(11) unsigned DEFAULT NULL,

@@ -920,8 +920,12 @@ function getTimeFrameValue(){
 		  		monthYear.year=currentYear;
 		  		return monthYear;
 		
-		case 102: monthYear.month=currentMonth;
-  				monthYear.year=currentYear;
+		case 102:monthYear.month=currentMonth;
+				 monthYear.year=currentYear;
+				 if(currentMonth == 0){
+  					monthYear.month=12;
+  					monthYear.year=currentYear-1;
+				 }
   				return monthYear;
   		
 		case 103: monthYear.month=13;
