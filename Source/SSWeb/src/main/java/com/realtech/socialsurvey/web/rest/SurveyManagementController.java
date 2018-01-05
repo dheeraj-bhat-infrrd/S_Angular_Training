@@ -185,10 +185,10 @@ public class SurveyManagementController
 		String question = request.getParameter("question");
 		String questionType = request.getParameter("questionType");
 		int stage = Integer.parseInt(request.getParameter("stage"));
-		int isUserRankingQuestionInt = Integer.parseInt(request.getParameter("isUserRankingQuestion"));
+		String isUserRankingQuestionStr = request.getParameter("isUserRankingQuestion");
 		String surveyId = request.getParameter("surveyId");
 		//add a request parameter to check if the question is set to nps or not 
-		int isNpsQuestionInt = Integer.parseInt(request.getParameter("isNPSQuestion"));
+		String isNpsQuestionStr = request.getParameter("isNPSQuestion");
 		int considerForScoreInt = Integer.parseInt(request.getParameter("considerForScore"));
 		int questionId = Integer.parseInt( request.getParameter("questionId") );
 		//encode question and response
@@ -196,9 +196,18 @@ public class SurveyManagementController
 		answer = new String( DatatypeConverter.parseBase64Binary(answer) );
 		
 		//get boolean value for isUserRankingQues
+		int isUserRankingQuestionInt = CommonConstants.QUESTION_RATING_VALUE_FALSE;
+		if( ! StringUtils.isEmpty(isUserRankingQuestionStr)) {
+			isUserRankingQuestionInt = Integer.parseInt(isUserRankingQuestionStr);
+		}
 		boolean isUserRankingQuestion = false;
 		if(isUserRankingQuestionInt == CommonConstants.QUESTION_RATING_VALUE_TRUE){
 		    isUserRankingQuestion = true;
+		}
+		
+		int isNpsQuestionInt = CommonConstants.QUESTION_RATING_VALUE_FALSE;
+		if( ! StringUtils.isEmpty(isNpsQuestionStr)) {
+			isNpsQuestionInt = Integer.parseInt(isNpsQuestionStr);
 		}
 		boolean isNpsQuestion = false;
 		if(isNpsQuestionInt == CommonConstants.QUESTION_RATING_VALUE_TRUE){
@@ -1461,7 +1470,7 @@ public class SurveyManagementController
 			}
 
 			
-			surveyHandler.markSurveyAsRetake(surveyId, true);
+			surveyHandler.markSurveyAsRetake(surveyId, true, CommonConstants.RETAKE_REQUEST_CUSTOMER);
 			SurveyDetails survey = surveyHandler.getSurveyDetails(surveyId);
 			long agentId = survey.getAgentId();
 			User user = userManagementService.getUserByUserId(agentId);
@@ -1491,7 +1500,7 @@ public class SurveyManagementController
 				throw new InvalidInputException("Invalid value (Null/Empty) found for agentId.");
 			}
 			long agentId = Long.parseLong(agentIdStr);
-			surveyHandler.markSurveyAsRetake(surveyId, true);
+			surveyHandler.markSurveyAsRetake(surveyId, true , CommonConstants.RETAKE_REQUEST_CUSTOMER);
 			SurveyDetails survey = surveyHandler.getSurveyDetails(surveyId);
 			User user = userManagementService.getUserByUserId(agentId);
 			Map<String, String> urlParams = urlGenerator.decryptUrl(survey.getUrl());
