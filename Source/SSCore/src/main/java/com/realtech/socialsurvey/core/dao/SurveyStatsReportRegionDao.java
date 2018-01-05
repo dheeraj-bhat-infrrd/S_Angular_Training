@@ -9,4 +9,6 @@ public interface SurveyStatsReportRegionDao extends GenericReportingDao<SurveySt
 
     List<SurveyStatsReportRegion> fetchRegionSurveyStatsById( Long regionId, String startTrxMonth, String endTrxMonth );
 
+    SurveyStatsReportRegion fetchRegionSurveyStats( long regionId, int month, int year );
+
 }
