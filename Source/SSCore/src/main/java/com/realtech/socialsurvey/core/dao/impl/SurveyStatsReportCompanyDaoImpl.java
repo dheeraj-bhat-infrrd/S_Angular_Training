@@ -44,5 +44,25 @@ public class SurveyStatsReportCompanyDaoImpl extends GenericReportingDaoImpl<Sur
 
         return (List<SurveyStatsReportCompany>) criteria.list();
     }
-   
+    
+    
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public SurveyStatsReportCompany fetchCompanySurveyStats( long companyId , int month , int year )
+    {
+        LOG.debug( "Method to fetch all the survey stats,fetchCompanySurveyStats() started." );
+        Criteria criteria = getSession().createCriteria( SurveyStatsReportCompany.class );
+        try {
+            criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
+            criteria.add( Restrictions.eq( CommonConstants.MONTH, (long)month ) );
+            criteria.add( Restrictions.eq( CommonConstants.YEAR, (long)year ) );
+        } catch ( HibernateException hibernateException ) {
+            LOG.error( "Exception caught in fetchCompanySurveyStats() ", hibernateException );
+            throw new DatabaseException( "Exception caught in fetchCompanySurveyStats() ", hibernateException );
+        }
+
+        LOG.debug( "Method fetchCompanySurveyStats() finished." );
+
+        return (SurveyStatsReportCompany) criteria.uniqueResult();
+    }   
 }

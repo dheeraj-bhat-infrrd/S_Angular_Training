@@ -8,8 +8,9 @@ import java.util.Set;
 public class MonthlyDigestAggregate implements Serializable
 {
     private static final long serialVersionUID = 1L;
-    private long companyId;
-    private String companyName;
+    private String profileLevel;
+    private long entityId;
+    private String entityName;
     private Set<String> recipientMailIds;
     private String monthUnderConcern;
     private String yearUnderConcern;
@@ -18,31 +19,43 @@ public class MonthlyDigestAggregate implements Serializable
     private String surveyPercentageTxt;
     private String statisfactionRatingTxt;
 
-    // contains rank, name, average score and total reviews  
+    // contains rank, name, average score and total reviews
     private String userRankingHtmlRows;
 
 
-    public long getCompanyId()
+    public String getProfileLevel()
     {
-        return companyId;
+        return profileLevel;
     }
 
 
-    public void setCompanyId( long companyId )
+    public void setProfileLevel( String profileLevel )
     {
-        this.companyId = companyId;
+        this.profileLevel = profileLevel;
     }
 
 
-    public String getCompanyName()
+    public long getEntityId()
     {
-        return companyName;
+        return entityId;
     }
 
 
-    public void setCompanyName( String companyName )
+    public void setEntityId( long entityId )
     {
-        this.companyName = companyName;
+        this.entityId = entityId;
+    }
+
+
+    public String getEntityName()
+    {
+        return entityName;
+    }
+
+
+    public void setEntityName( String entityName )
+    {
+        this.entityName = entityName;
     }
 
 
@@ -145,10 +158,10 @@ public class MonthlyDigestAggregate implements Serializable
     @Override
     public String toString()
     {
-        return "MonthlyDigestAggregate [companyId=" + companyId + ", companyName=" + companyName + ", recipientMailIds="
-            + recipientMailIds + ", monthUnderConcern=" + monthUnderConcern + ", yearUnderConcern=" + yearUnderConcern
-            + ", digestList=" + digestList + ", avgRatingTxt=" + avgRatingTxt + ", surveyPercentageTxt=" + surveyPercentageTxt
-            + ", statisfactionRatingTxt=" + statisfactionRatingTxt + ", userRankingHtmlRows=" + userRankingHtmlRows + "]";
+        return "MonthlyDigestAggregate [profileLevel=" + profileLevel + ", entityId=" + entityId + ", entityName=" + entityName
+            + ", recipientMailIds=" + recipientMailIds + ", monthUnderConcern=" + monthUnderConcern + ", yearUnderConcern="
+            + yearUnderConcern + ", digestList=" + digestList + ", avgRatingTxt=" + avgRatingTxt + ", surveyPercentageTxt="
+            + surveyPercentageTxt + ", statisfactionRatingTxt=" + statisfactionRatingTxt + ", userRankingHtmlRows="
+            + userRankingHtmlRows + "]";
     }
 }
-

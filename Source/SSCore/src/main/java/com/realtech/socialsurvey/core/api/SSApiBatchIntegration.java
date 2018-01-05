@@ -1,16 +1,9 @@
 package com.realtech.socialsurvey.core.api;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-
-import com.realtech.socialsurvey.core.entities.Company;
-import com.realtech.socialsurvey.core.entities.CompanySurveyStatusStats;
-import com.realtech.socialsurvey.core.entities.CompanyView;
 
 import retrofit.client.Response;
 import retrofit.http.GET;
-import retrofit.http.Path;
 import retrofit.http.Query;
 
 
@@ -35,12 +28,12 @@ public interface SSApiBatchIntegration
         @Query ( "batchSize") int batchSize );
 
 
-    
     @GET ( "/v1/getincompletesurveys")
-    Response getIncompleteSurveyResultsReport( @Query ( "entityId") Long entityId, @Query("entityType") String entityType, 
-        @Query ( "startDate") Timestamp startDate, @Query ( "endDate") Timestamp endDate , @Query ( "startIndex") int startIndex ,
+    Response getIncompleteSurveyResultsReport( @Query ( "entityId") Long entityId, @Query ( "entityType") String entityType,
+        @Query ( "startDate") Timestamp startDate, @Query ( "endDate") Timestamp endDate, @Query ( "startIndex") int startIndex,
         @Query ( "batchSize") int batchSize );
-    
+
+
     @GET ( "/v1/getmaxquestionforcompany")
     Response getCompanyMaxQuestion( @Query ( "entityType") String entityType, @Query ( "entityId") Long entityId,
         @Query ( "startDate") Timestamp startDate, @Query ( "endDate") Timestamp endDate );
@@ -61,22 +54,26 @@ public interface SSApiBatchIntegration
         @Query ( "year") int year, @Query ( "month") int month, @Query ( "type") int type );
 
 
-    @GET ( "/v1/getcompaniesoptedfordigestmail")
-    Response getCompaniesOptedForDigestMail( @Query ( "startIndex") int startIndex, @Query ( "batchSize") int batchSize );
+    @GET ( "/v1/getentitiesoptedfordigestmail")
+    Response getEntitiesOptedForDigestMail( @Query ( "profileLevel") String profileLevel, @Query ( "startIndex") int startIndex,
+        @Query ( "batchSize") int batchSize );
 
 
     @GET ( "/v1/buildmonthlydigestaggregate")
-    Response buildMonthlyDigestAggregate( @Query ( "companyId") long companyId, @Query ( "companyName") String companyName,
-        @Query ( "monthUnderConcern") int monthUnderConcern, @Query ( "year") int year );
+    Response buildMonthlyDigestAggregate( @Query ( "profileLevel") String profileLevel, @Query ( "entityId") long entityId,
+        @Query ( "entityName") String entityName, @Query ( "monthUnderConcern") int monthUnderConcern,
+        @Query ( "year") int year );
 
 
     @GET ( "/v1/getcompanydetailsreport")
-	Response getCompanyDetailsReport( @Query("entityType") String entityType, @Query("entityId") Long entityId,
-			@Query("startIndex") int startIndex, @Query("batchSize") int batchSize);
-    
+    Response getCompanyDetailsReport( @Query ( "entityType") String entityType, @Query ( "entityId") Long entityId,
+        @Query ( "startIndex") int startIndex, @Query ( "batchSize") int batchSize );
+
+
     @GET ( "/v1/nps/week/month")
-    Response getNpsReportForWeekOrMonth( @Query("week") int week, @Query("month") int month, @Query("companyId") long companyId, @Query("year") int year, @Query("type") int type );
-    
+    Response getNpsReportForWeekOrMonth( @Query ( "week") int week, @Query ( "month") int month,
+        @Query ( "companyId") long companyId, @Query ( "year") int year, @Query ( "type") int type );
+
 
     @GET ( "/v1/getallactiveenterprisecompanies")
     Response getAllActiveEnterpriseCompanies();
@@ -97,6 +94,7 @@ public interface SSApiBatchIntegration
     @GET ( "/v1/getcompanyactiveusercountforpastday")
     Response getCompanyActiveUserCountForPastDay();
 
+    
     @GET ( "/v1/gettotaltransactioncountforpast5days")
     Response getTotalTransactionCountForPast5Days();
  
@@ -106,13 +104,16 @@ public interface SSApiBatchIntegration
     @GET ( "/v1/getsendsurveycountforpast5days")
     Response getSendSurveyCountForPast5Days();
  
+    
     @GET ( "/v1/getsurvestatsforpast7daysforallcompanies")
     Response getSurveStatsForPast7daysForAllCompanies();
-    
+
+
     @GET ( "/v1/getsurvestatsforlasttoLatweekforallcompanies")
     Response getSurveStatsForLastToLatWeekForAllCompanies();
-    
+
+
     @GET ( "/v1/getcompletedsurveycountforpastndays")
     Response getCompletedSurveyCountForPastNDays();
-    
+
 }

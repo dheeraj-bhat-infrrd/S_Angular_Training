@@ -809,9 +809,8 @@ public class OrganizationManagementController
             }
             
             // add send monthly digest email flag
-            if( CommonConstants.COMPANY_ID_COLUMN.equals( entityType ) ){
-                model.addAttribute( "sendMonthlyDigestMail", unitSettings.isSendMonthlyDigestMail() );
-            }
+            model.addAttribute( "sendMonthlyDigestMail", unitSettings.isSendMonthlyDigestMail() );
+            
         } catch ( InvalidInputException | NoRecordsFetchedException e ) {
             LOG.error( "NonFatalException while fetching profile details. Reason : ", e );
             model.addAttribute( "message",
@@ -1697,18 +1696,13 @@ public class OrganizationManagementController
     {
         LOG.info( "Method updateSendMonthlyDigestMailToggle started" );
         HttpSession session = request.getSession();
-
-        if ( !CommonConstants.COMPANY_ID_COLUMN
-            .equals( (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN ) ) ) {
-            LOG.error( "This is a company level settings and can to be set at any other hierarchy." );
-            return "false";
-        }
-
+        
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
         long companyId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
 
         try {
-            return String.valueOf( reportingDashboardManagement.updateSendDigestMailToggle( companyId,
-                Boolean.parseBoolean( request.getParameter( "sendMonthlyDigestMail" ) ) ) );
+            return String.valueOf( reportingDashboardManagement.updateSendDigestMailToggle( entityType,
+                companyId, Boolean.parseBoolean( request.getParameter( "sendMonthlyDigestMail" ) ) ) );
         } catch ( Exception error ) {
             LOG.error(
                 "Exception occured in updateSendMonthlyDigestMailToggle() while updating send montlhy digest mail flag. Nested exception is ",
@@ -3959,7 +3953,9 @@ public class OrganizationManagementController
     public String updateDigestRecipients( HttpServletRequest request, Model model )
     {
         LOG.info( "Method updateDigestRecipients() started." );
-        User user = sessionHelper.getCurrentUser();
+        HttpSession session = request.getSession();
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String status = "";
 
         try {
@@ -3971,11 +3967,8 @@ public class OrganizationManagementController
             } else {
 
                 Set<String> emailList = organizationManagementService.parseEmailsList( emailsStr );
-                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
+                organizationManagementService.updateDigestRecipients( entityType, entityId, emailList );
 
-                organizationManagementService.updateDigestRecipients( companySettings, emailList,
-                    MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
-                
                 if ( emailList == null || emailList.isEmpty() ) {
                     status = "Additional digest recipients removed!";
                 } else {
@@ -3984,8 +3977,8 @@ public class OrganizationManagementController
 
             }
 
-        } catch ( NonFatalException e ) {
-            LOG.error( "Non fatal exception caught in updateDigestRecipients(). Nested exception is ", e );
+        } catch ( NonFatalException error ) {
+            LOG.error( "Non fatal exception caught in updateDigestRecipients(). Nested exception is ", error );
             status = "Unable to update digest recipients";
         }
 

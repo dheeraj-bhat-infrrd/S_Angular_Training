@@ -143,7 +143,7 @@ public class UserRankingPastMonthMainDaoImpl extends GenericReportingDaoImpl<Use
 
             return (List<UserRankingPastMonthMain>) criteria.list();
         } catch ( HibernateException hibernateException ) {
-            LOG.error( "Exception caught in fetchTopTenUserRankingsForACompany() ", hibernateException );
+            LOG.warn( "Exception caught in fetchTopTenUserRankingsForACompany() ", hibernateException );
             throw new DatabaseException( "Exception caught in fetchTopTenUserRankingsForACompany() ", hibernateException );
         }
     }

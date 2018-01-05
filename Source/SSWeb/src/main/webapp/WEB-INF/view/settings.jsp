@@ -106,12 +106,10 @@
 									<input type="hidden" id="vndsta-access-cb" name="vendastaaccess" value="${vendastaAccess}">
 									<div class="float-left listing-access-txt cust-resp-txt" style="margin-bottom:0px;">Allow access to Listings Manager</div>
 								</c:if>
-								<c:if test="${ columnName == 'companyId' }">
-									<div id="survey-mail-thrhld-chk-box" class="float-left bd-check-img clear-both"></div>
-									<input type="hidden" id="survey-mail-thrhld-cb" name="surveymailthrhld" value="${sendMonthlyDigestMail}">
-									<div class="float-left listing-access-txt cust-resp-txt">Send Monthly Digest Mail</div>
-									<textarea id="digest-recipients" class="dig-recp" placeholder="<spring:message code="label.placehoder.digest.emails.key" />" autocorrect="off" autocomplete="off" autocapitalize="off" spellcheck="false">${digestRecipients}</textarea>
-								</c:if>
+								<div id="survey-mail-thrhld-chk-box" class="float-left bd-check-img clear-both"></div>
+								<input type="hidden" id="survey-mail-thrhld-cb" name="surveymailthrhld" value="${sendMonthlyDigestMail}">
+								<div class="float-left listing-access-txt cust-resp-txt">Send Monthly Digest Mail</div>
+								<textarea id="digest-recipients" class="dig-recp" placeholder="<spring:message code="label.placehoder.digest.emails.key" />" autocorrect="off" autocomplete="off" autocapitalize="off" spellcheck="false">${digestRecipients}</textarea>
 							</c:if>
 							
                             <c:if test="${ not empty companyAdminSwitchId or isRealTechOrSSAdmin == true or user.isOwner == 1 }">
@@ -313,7 +311,7 @@ $(document).ready(function() {
 		$('#alw-ptnr-srvy-chk-box').addClass('bd-check-img-checked');
 	}
 	
-	if("${sendMonthlyDigestMail}" == "false" && "${isRealTechOrSSAdmin}" == "true"){
+	if("${sendMonthlyDigestMail}" == "false"){
 		$('#survey-mail-thrhld-chk-box').addClass('bd-check-img-checked');
 	}
 	

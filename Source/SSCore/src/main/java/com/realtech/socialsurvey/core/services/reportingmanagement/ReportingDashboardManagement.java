@@ -11,7 +11,7 @@ import java.util.Map;
 
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyDetailsReport;
-import com.realtech.socialsurvey.core.entities.CompanyDigestRequestData;
+import com.realtech.socialsurvey.core.entities.DigestRequestData;
 import com.realtech.socialsurvey.core.entities.Digest;
 import com.realtech.socialsurvey.core.entities.MonthlyDigestAggregate;
 import com.realtech.socialsurvey.core.entities.NpsReportMonth;
@@ -19,8 +19,8 @@ import com.realtech.socialsurvey.core.entities.NpsReportWeek;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RankingRequirements;
 import com.realtech.socialsurvey.core.entities.SurveyResultsReportVO;
+import com.realtech.socialsurvey.core.entities.UserRanking;
 import com.realtech.socialsurvey.core.entities.ReportingSurveyPreInititation;
-import com.realtech.socialsurvey.core.entities.UserRankingPastMonthMain;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -163,7 +163,7 @@ public interface ReportingDashboardManagement
     String generateUserRankingForReporting( Long entityId, String entityType, Long userId, Timestamp startDate, int type )
         throws UnsupportedEncodingException, NonFatalException;
 
-    public MonthlyDigestAggregate prepareMonthlyDigestMailData( long companyId, String companyName, int monthUnderConcern, int year ) throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException;
+    public MonthlyDigestAggregate prepareMonthlyDigestMailData( String profileLevel, long entityId, String entityName, int monthUnderConcern, int year ) throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException;
 
     List<List<Object>> getScoreStatsForOverall( Long entityId, String entityType, int currentMonth, int currentYear );
 
@@ -171,20 +171,20 @@ public interface ReportingDashboardManagement
     List<List<Object>> getScoreStatsForQuestion( Long entityId, String entityType, int currentMonth, int currentYear );
 
 
-    public Map<Integer, Digest> getDigestDataForLastFourMonths( long companyId, int monthUnderConcern, int year )
+    public Map<Integer, Digest> getDigestDataForLastFourMonths( String profileLevel, String entityName, long entityId, int monthUnderConcern, int year )
         throws InvalidInputException, NoRecordsFetchedException;
 
-    public List<UserRankingPastMonthMain> getTopTenUserRankingsThisMonthForACompany( long companyId, int monthUnderConcern,
-        int year ) throws InvalidInputException;
+    public List<UserRanking> getTopTenUserRankingsThisMonthForAHierarchy( String profileLevel, long entityId,
+        int monthUnderConcern, int year ) throws InvalidInputException;
 
 
     public void startMonthlyDigestProcess();
 
 
-    public boolean updateSendDigestMailToggle( long companyId, boolean sendMonthlyDigestMail ) throws InvalidInputException;
+    public boolean updateSendDigestMailToggle( String entityType, long entityId, boolean sendMonthlyDigestMail ) throws InvalidInputException, NoRecordsFetchedException;
 
 
-    public List<CompanyDigestRequestData> getCompaniesOptedForDigestMail( int startIndex, int batchSize );
+    public List<DigestRequestData> getEntitiesOptedForDigestMail( int startIndex, int batchSize, String profileLevel ) throws InvalidInputException;
 
 
     /**
