@@ -7,12 +7,6 @@ public interface JobLogDetailsDao extends GenericReportingDao<JobLogDetails, Lon
 {
 
     /**
-     * Returns the latest JobLog Detail
-     * @return
-     */
-    public JobLogDetails getLatestJobLogDetails();
-    
-    /**
      * Returns JobLog based on last successful run
      * @return
      * @throws InvalidInputException

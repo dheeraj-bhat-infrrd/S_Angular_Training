@@ -14900,9 +14900,11 @@ var hasFetchedWarningData = false;
 var hasFetchedNormalData = false;
 var pastWeekTransData = new Array();
 var curWeekTransData = new Array();
+var errorCompanies = new Array();
 
 function getTransactionMonitorData(alertType,noOfDays) {
 	showOverlay();
+	
 	if (isFetchingTransactionData == true) {
 		hideOverlay();
 		return;
@@ -14963,11 +14965,15 @@ function drawTransactionMonitorAlertGraphs(alertType,transactionMonitorData){
 }
 
 function drawTransMonDangerGraphs(transactionMonitorData){
+	errorCompanies = new Array();
+	
 	for(var i=0;i<transactionMonitorData.length;i++){
 		
 		var transData = transactionMonitorData[i];
 		var companyId = transData.companyId;
 		var companyName = transData.companyName;
+		
+		errorCompanies.push(companyId);
 		
 		var autoStatus = 'normal';
 		var inviStatus = 'normal';
@@ -15035,6 +15041,19 @@ function drawTransMonWarnGraphs(transactionMonitorData){
 		var transData = transactionMonitorData[i];
 		var companyId = transData.companyId;
 		var companyName = transData.companyName;
+		var isErrorCompany = false;
+		
+		//Check if company comes under error alert type
+		for(var errorItr=0;errorItr<errorCompanies.length;errorItr++){
+			if(companyId == errorCompanies[errorItr]){
+				isErrorCompany = true;
+				break;
+			}
+		}
+		
+		if(isErrorCompany){
+			continue;
+		}
 		
 		var autoStatus = 'normal';
 		var inviStatus = 'normal';
