@@ -137,7 +137,7 @@
   <hop> <from>Memory Group by</from><to>Modified Java Script Value</to><enabled>Y</enabled> </hop>
   <hop> <from>Modified Java Script Value</from><to>SortRegion</to><enabled>Y</enabled> </hop>
   <hop> <from>Generate random value</from><to>overview_region_month</to><enabled>Y</enabled> </hop>
-  <hop> <from>Modified Java Script Value 2</from><to>If field value is null</to><enabled>N</enabled> </hop>
+  <hop> <from>Modified Java Script Value 2</from><to>If field value is null</to><enabled>Y</enabled> </hop>
   <hop> <from>Extra Zillow group</from><to>Sort RegionId</to><enabled>Y</enabled> </hop>
   <hop> <from>Memory Group by 3</from><to>Sort RegionId 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Group Social Post</from><to>total shared on</to><enabled>Y</enabled> </hop>
