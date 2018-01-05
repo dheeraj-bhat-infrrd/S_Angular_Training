@@ -171,7 +171,7 @@ public interface ReportingDashboardManagement
     List<List<Object>> getScoreStatsForQuestion( Long entityId, String entityType, int currentMonth, int currentYear );
 
 
-    public Map<Integer, Digest> getDigestDataForLastFourMonths( String profileLevel, long entityId, int monthUnderConcern, int year )
+    public Map<Integer, Digest> getDigestDataForLastFourMonths( String profileLevel, String entityName, long entityId, int monthUnderConcern, int year )
         throws InvalidInputException, NoRecordsFetchedException;
 
     public List<UserRanking> getTopTenUserRankingsThisMonthForAHierarchy( String profileLevel, long entityId,

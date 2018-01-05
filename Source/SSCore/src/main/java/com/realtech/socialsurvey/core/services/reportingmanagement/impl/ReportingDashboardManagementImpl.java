@@ -3206,8 +3206,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
 
     @Override
-    public Map<Integer, Digest> getDigestDataForLastFourMonths( String profileLevel, long entityId, int monthUnderConcern,
-        int year ) throws InvalidInputException, NoRecordsFetchedException
+    public Map<Integer, Digest> getDigestDataForLastFourMonths( String profileLevel, String entityName, long entityId,
+        int monthUnderConcern, int year ) throws InvalidInputException, NoRecordsFetchedException
     {
 
         LOG.debug( "method getDigestDataForLastFourMonths() started" );
@@ -3228,8 +3228,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
         Map<Integer, Digest> digestMap = new HashMap<>();
 
-        Digest primaryDigest = overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityId, monthUnderConcern,
-            year );
+        Digest primaryDigest = overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityName, entityId,
+            monthUnderConcern, year );
 
         if ( primaryDigest == null || primaryDigest.getMonth() != monthUnderConcern ) {
             LOG.error( "No digest found for the the month under concern for {}: {}", profileLevel, entityId );
@@ -3240,27 +3240,27 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
         if ( monthUnderConcern == 3 ) {
 
-            digestMap.put( 2, overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityId, 2, year ) );
-            digestMap.put( 1, overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityId, 1, year ) );
-            digestMap.put( 12, overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityId, 12, year - 1 ) );
+            digestMap.put( 2, overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityName, entityId, 2, year ) );
+            digestMap.put( 1, overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityName, entityId, 1, year ) );
+            digestMap.put( 12, overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityName, entityId, 12, year - 1 ) );
 
         } else if ( monthUnderConcern == 2 ) {
-            digestMap.put( 1, overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityId, 1, year ) );
-            digestMap.put( 12, overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityId, 12, year - 1 ) );
-            digestMap.put( 11, overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityId, 11, year - 1 ) );
+            digestMap.put( 1, overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityName, entityId, 1, year ) );
+            digestMap.put( 12, overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityName, entityId, 12, year - 1 ) );
+            digestMap.put( 11, overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityName, entityId, 11, year - 1 ) );
 
         } else if ( monthUnderConcern == 1 ) {
-            digestMap.put( 12, overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityId, 12, year - 1 ) );
-            digestMap.put( 11, overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityId, 11, year - 1 ) );
-            digestMap.put( 10, overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityId, 10, year - 1 ) );
+            digestMap.put( 12, overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityName, entityId, 12, year - 1 ) );
+            digestMap.put( 11, overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityName, entityId, 11, year - 1 ) );
+            digestMap.put( 10, overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityName, entityId, 10, year - 1 ) );
 
         } else {
             digestMap.put( monthUnderConcern - 1,
-                overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityId, monthUnderConcern - 1, year ) );
+                overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityName, entityId, monthUnderConcern - 1, year ) );
             digestMap.put( monthUnderConcern - 2,
-                overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityId, monthUnderConcern - 2, year ) );
+                overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityName, entityId, monthUnderConcern - 2, year ) );
             digestMap.put( monthUnderConcern - 3,
-                overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityId, monthUnderConcern - 3, year ) );
+                overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityName, entityId, monthUnderConcern - 3, year ) );
         }
 
         LOG.debug( "method getDigestDataForLastFourMonths() finished" );
@@ -3293,7 +3293,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
         MonthlyDigestAggregate digestAggregate = buildMonthlyDigestAggregate( profileLevel, entityId, entityName,
             monthUnderConcern, year,
-            buildOrderedMonthlyDigestList( getDigestDataForLastFourMonths( profileLevel, entityId, monthUnderConcern, year ),
+            buildOrderedMonthlyDigestList( getDigestDataForLastFourMonths( profileLevel, entityName, entityId, monthUnderConcern, year ),
                 monthUnderConcern ),
             getTopTenUserRankingsThisMonthForAHierarchy( profileLevel, entityId, monthUnderConcern, year ) );
 
@@ -3368,9 +3368,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 templateData.setSurveyCompletionRate(
                     ( digest != null ) ? String.format( "%.2f", digest.getSurveyCompletionRate() ) + "%"
                         : CommonConstants.NOT_AVAILABLE );
-                templateData.setSps(
-                    ( digest != null ) ? String.valueOf( digest.getSps() > 0 ? "+" + String.format( "%.2f", digest.getSps() )
-                        : String.format( "%.2f", digest.getSps() ) ) : CommonConstants.NOT_AVAILABLE );
+                templateData.setSps( ( digest != null && digest.getSps() != null )
+                    ? String.valueOf( digest.getSps().doubleValue() > 0 ? "+" + String.format( "%.2f", digest.getSps().doubleValue() )
+                        : String.format( "%.2f", digest.getSps().doubleValue() ) )
+                    : CommonConstants.NOT_AVAILABLE );
                 templateData.setPromoters(
                     ( digest != null ) ? String.valueOf( digest.getPromoters() ) : CommonConstants.NOT_AVAILABLE );
                 templateData.setDetractors(
@@ -3425,6 +3426,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         String increasedIndicatorIcon = "<div style=\"color: darkgreen; font-size: 16px; line-height: 30px;\">&#9650;</div>";
         String droppedIndicatorIcon = "<div style=\"color: darkred; font-size: 16px; line-height: 30px;\">&#9660;</div>";
         String noChangeIndicatorIcon = "<div style=\"color: grey; font-size: 30px; line-height: 30px;\">&bull;</div>";
+        String notAvailableIndicatorIcon = "<div style=\"color: grey; font-size: 30px; line-height: 30px;\"><b>--</b></div>";
 
         // --- average score rating
         double avgScoreRating0 = digestList.get( 0 ) != null ? digestList.get( 0 ).getAverageScoreRating() : 0d;
@@ -3439,10 +3441,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         double surveyCompletionRate3 = digestList.get( 3 ) != null ? digestList.get( 3 ).getSurveyCompletionRate() : 0d;
 
         // --- SPS score
-        double sps0 = digestList.get( 0 ) != null ? digestList.get( 0 ).getSps() : 0d;
-        double sps1 = digestList.get( 1 ) != null ? digestList.get( 1 ).getSps() : 0d;
-        double sps2 = digestList.get( 2 ) != null ? digestList.get( 2 ).getSps() : 0d;
-        double sps3 = digestList.get( 3 ) != null ? digestList.get( 3 ).getSps() : 0d;
+        Double sps0 = digestList.get( 0 ) != null ? digestList.get( 0 ).getSps() : null;
+        Double sps1 = digestList.get( 1 ) != null ? digestList.get( 1 ).getSps() : null;
+        Double sps2 = digestList.get( 2 ) != null ? digestList.get( 2 ).getSps() : null;
+        Double sps3 = digestList.get( 3 ) != null ? digestList.get( 3 ).getSps() : null;
 
         long userCount0 = digestList.get( 0 ) != null ? digestList.get( 0 ).getUserCount() : 0l;
         long userCount1 = digestList.get( 1 ) != null ? digestList.get( 1 ).getUserCount() : 0l;
@@ -3479,15 +3481,34 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             .setSurveyCompletionRateIcon( ( surveyCompletionRate2 > surveyCompletionRate3 ? increasedIndicatorIcon
                 : ( surveyCompletionRate2 == surveyCompletionRate3 ? noChangeIndicatorIcon : droppedIndicatorIcon ) ) );
 
+
         // choosing icons for SPS
-        digestAggregate.getDigestList().get( 0 ).setSpsIcon(
-            ( sps0 > sps1 ? increasedIndicatorIcon : ( sps0 == sps1 ? noChangeIndicatorIcon : droppedIndicatorIcon ) ) );
+        ////c1
+        if ( sps0 == null || sps1 == null ) {
+            digestAggregate.getDigestList().get( 0 ).setSpsIcon( notAvailableIndicatorIcon );
+        } else {
+            digestAggregate.getDigestList().get( 0 ).setSpsIcon(
+                ( sps0.doubleValue() > sps1.doubleValue() ? increasedIndicatorIcon : ( sps0.doubleValue() == sps1.doubleValue() ? noChangeIndicatorIcon : droppedIndicatorIcon ) ) );
+        }
 
-        digestAggregate.getDigestList().get( 1 ).setSpsIcon(
-            ( sps1 > sps2 ? increasedIndicatorIcon : ( sps1 == sps2 ? noChangeIndicatorIcon : droppedIndicatorIcon ) ) );
 
-        digestAggregate.getDigestList().get( 2 ).setSpsIcon(
-            ( sps2 > sps3 ? increasedIndicatorIcon : ( sps2 == sps3 ? noChangeIndicatorIcon : droppedIndicatorIcon ) ) );
+        ////c2
+        if ( sps1 == null || sps2 == null ) {
+            digestAggregate.getDigestList().get( 1 ).setSpsIcon( notAvailableIndicatorIcon );
+        } else {
+            digestAggregate.getDigestList().get( 1 ).setSpsIcon(
+                ( sps1.doubleValue() > sps2.doubleValue() ? increasedIndicatorIcon : ( sps1.doubleValue() == sps2.doubleValue() ? noChangeIndicatorIcon : droppedIndicatorIcon ) ) );
+        }
+
+
+        ////c3
+        if ( sps2 == null || sps3 == null ) {
+            digestAggregate.getDigestList().get( 2 ).setSpsIcon( notAvailableIndicatorIcon );
+        } else {
+            digestAggregate.getDigestList().get( 2 ).setSpsIcon(
+                ( sps2.doubleValue() > sps3.doubleValue() ? increasedIndicatorIcon : ( sps2.doubleValue() == sps3.doubleValue() ? noChangeIndicatorIcon : droppedIndicatorIcon ) ) );
+        }
+
 
         // building conclusion text for average rating score
         digestAggregate
@@ -3518,18 +3539,30 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                     : "has dropped by " + "<b>" + ( transcationCount1 - transcationCount0 ) + "</b>" ) )
             + " from last month." );
 
-        // building conclusion text for average rating score
-        digestAggregate.setStatisfactionRatingTxt( "Your satisfaction rating "
-            + ( sps0 > sps1 ? "has increased by " + "<b>" + String.format( "%.2f", ( sps0 - sps1 ) ) + "</b>"
-                : ( sps0 == sps1 ? "did not change"
-                    : "has dropped by " + "<b>" + String.format( "%.2f", ( sps1 - sps0 ) ) + "</b>" ) )
-            + " and your total review count "
-            + ( totalCompletedReviews0 > totalCompletedReviews1
-                ? "has increased by " + "<b>" + ( totalCompletedReviews0 - totalCompletedReviews1 ) + "</b>"
-                : ( totalCompletedReviews0 == totalCompletedReviews1 ? "did not change"
-                    : "has dropped by " + "<b>" + ( totalCompletedReviews1 - totalCompletedReviews0 ) + "</b>" ) )
-            + " from last month." );
+        // building conclusion text for SPS
+        StringBuilder satisfactionRatingText = new StringBuilder( "" );
+        
+        if( sps0 == null || sps1 == null ) {
+            satisfactionRatingText.append( "Your " );
+        }  else {
+            satisfactionRatingText.append( "Your satisfaction rating " );
+            satisfactionRatingText
+            .append( ( sps0.doubleValue() > sps1.doubleValue() ? "has increased by " + "<b>" + String.format( "%.2f", ( sps0.doubleValue() - sps1.doubleValue() ) ) + "</b>"
+                : ( sps0.doubleValue() == sps1.doubleValue() ? "did not change"
+                    : "has dropped by " + "<b>" + String.format( "%.2f", ( sps1.doubleValue() - sps0.doubleValue() ) ) + "</b>" ) ) );
+            satisfactionRatingText.append( " and your " );
+        }
+        
+        satisfactionRatingText.append( "total review count " );
+        
+        satisfactionRatingText.append( ( totalCompletedReviews0 > totalCompletedReviews1
+                    ? "has increased by " + "<b>" + ( totalCompletedReviews0 - totalCompletedReviews1 ) + "</b>"
+                    : ( totalCompletedReviews0 == totalCompletedReviews1 ? "did not change"
+                        : "has dropped by " + "<b>" + ( totalCompletedReviews1 - totalCompletedReviews0 ) + "</b>" ) ) );
+        
+        satisfactionRatingText.append( " from last month." );
 
+        digestAggregate.setStatisfactionRatingTxt( satisfactionRatingText.toString() );
     }
 
 
@@ -3777,8 +3810,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 Set<String> digestRecipients = new HashSet<>();
 
                 if ( unitSettings.isSendMonthlyDigestMail() ) {
-                    digestRecipients.addAll(
-                        organizationManagementService.getAdminEmailsForAhierarchy( profileLevel, unitSettings.getIden() ) );
+                    digestRecipients.addAll( organizationManagementService.getAdminEmailsSpecificForAHierarchy( profileLevel,
+                        unitSettings.getIden() ) );
                 }
 
                 if ( unitSettings.getDigestRecipients() != null ) {

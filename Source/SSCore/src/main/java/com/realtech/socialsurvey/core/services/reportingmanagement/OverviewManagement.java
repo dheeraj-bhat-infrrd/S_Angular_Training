@@ -38,7 +38,7 @@ public interface OverviewManagement
     Map<String, Object> fetchSpsAllTime( long entityId, String entityType ) throws NonFatalException;
 
 
-    public Digest fetchDigestDataForAHierarchy( String profileLevel, long entityId, int month, int year )
+    public Digest fetchDigestDataForAHierarchy( String profileLevel, String entityName, long entityId, int month, int year )
         throws InvalidInputException;
 
 }

@@ -565,7 +565,7 @@ public class OverviewManagementImpl implements OverviewManagement
 
     @Override
     @Transactional
-    public Digest fetchDigestDataForAHierarchy( String profileLevel, long entityId, int month, int year )
+    public Digest fetchDigestDataForAHierarchy( String profileLevel, String entityName, long entityId, int month, int year )
         throws InvalidInputException
     {
 
@@ -587,15 +587,18 @@ public class OverviewManagementImpl implements OverviewManagement
             if ( CommonConstants.PROFILE_LEVEL_COMPANY.equals( profileLevel ) ) {
                 return getDigestFromCompanyOverview(
                     overviewCompanyMonthDao.fetchOverviewForCompanyBasedOnMonth( entityId, month, year ),
-                    surveyStatsReportCompanyDao.fetchCompanySurveyStats( entityId, month, year ) );
+                    surveyStatsReportCompanyDao.fetchCompanySurveyStats( entityId, month, year ), entityName, entityId, month,
+                    year );
             } else if ( CommonConstants.PROFILE_LEVEL_REGION.equals( profileLevel ) ) {
                 return getDigestFromRegionOverview(
                     overviewRegionMonthDao.fetchOverviewForRegionBasedOnMonth( entityId, month, year ),
-                    surveyStatsReportRegionDao.fetchRegionSurveyStats( entityId, month, year ) );
+                    surveyStatsReportRegionDao.fetchRegionSurveyStats( entityId, month, year ), entityName, entityId, month,
+                    year );
             } else if ( CommonConstants.PROFILE_LEVEL_BRANCH.equals( profileLevel ) ) {
                 return getDigestFromBranchOverview(
                     overviewBranchMonthDao.fetchOverviewForBranchBasedOnMonth( entityId, month, year ),
-                    surveyStatsReportBranchDao.fetchBranchSurveyStats( entityId, month, year ) );
+                    surveyStatsReportBranchDao.fetchBranchSurveyStats( entityId, month, year ), entityName, entityId, month,
+                    year );
             } else {
                 LOG.warn( "Invalid profile" );
                 throw new InvalidInputException( "Invalid profile" );
@@ -610,97 +613,116 @@ public class OverviewManagementImpl implements OverviewManagement
     }
 
 
-    private Digest getDigestFromBranchOverview( OverviewBranchMonth overview, SurveyStatsReportBranch surveyStats )
+    private Digest getDigestFromBranchOverview( OverviewBranchMonth overview, SurveyStatsReportBranch surveyStats,
+        String entityName, long branchId, int month, int year )
     {
         Digest digest = new Digest();
+        digest.setEntityName( entityName );
+        digest.setProfileLevel( CommonConstants.PROFILE_LEVEL_BRANCH );
+        digest.setEntityId( branchId );
+        digest.setMonth( month );
+        digest.setYear( year );
+
         if ( overview != null ) {
             digest.setAverageScoreRating( (double) overview.getRating() );
             digest.setCompletedTransactions( (long) overview.getCompleted() );
-            digest.setEntityId( overview.getBranchId() );
-            digest.setMonth( overview.getMonth() );
-            digest.setProfileLevel( CommonConstants.PROFILE_LEVEL_BRANCH );
             digest.setSurveyCompletionRate( (double) overview.getCompletePercentage() );
             digest.setTotalCompletedReviews( (long) overview.getTotalReview() );
             digest.setTotalTransactions( (long) ( overview.getCompleted() + overview.getIncomplete() ) );
             digest.setUserCount( (long) overview.getCumulativeUserCount() );
-            digest.setYear( overview.getYear() );
+        }
 
-            if ( surveyStats != null ) {
+        if ( surveyStats != null ) {
 
-                double sps = ( (double) ( surveyStats.getPromoters() - surveyStats.getDetractors() )
-                    / ( surveyStats.getPassives() + surveyStats.getPromoters() + surveyStats.getDetractors() ) ) * 100;
+            double divident = ( surveyStats.getPassives() + surveyStats.getPromoters() + surveyStats.getDetractors() );
+            Double sps = null;
 
-                digest.setEntityName( surveyStats.getBranchName() );
-                digest.setDetractors( surveyStats.getDetractors() );
-                digest.setPassives( surveyStats.getPassives() );
-                digest.setPromoters( surveyStats.getPromoters() );
-                digest.setSps( sps );
-
+            if ( divident != 0 ) {
+                sps = ( (double) ( surveyStats.getPromoters() - surveyStats.getDetractors() ) / divident ) * 100;
             }
+
+            digest.setDetractors( surveyStats.getDetractors() );
+            digest.setPassives( surveyStats.getPassives() );
+            digest.setPromoters( surveyStats.getPromoters() );
+            digest.setSps( sps );
+
         }
         return digest;
     }
 
 
-    private Digest getDigestFromRegionOverview( OverviewRegionMonth overview, SurveyStatsReportRegion surveyStats )
+    private Digest getDigestFromRegionOverview( OverviewRegionMonth overview, SurveyStatsReportRegion surveyStats,
+        String entityName, long regionId, int month, int year )
     {
         Digest digest = new Digest();
+        digest.setEntityName( entityName );
+        digest.setProfileLevel( CommonConstants.PROFILE_LEVEL_REGION );
+        digest.setEntityId( regionId );
+        digest.setMonth( month );
+        digest.setYear( year );
+
+
         if ( overview != null ) {
             digest.setAverageScoreRating( (double) overview.getRating() );
             digest.setCompletedTransactions( (long) overview.getCompleted() );
-            digest.setEntityId( overview.getRegionId() );
-            digest.setMonth( overview.getMonth() );
-            digest.setProfileLevel( CommonConstants.PROFILE_LEVEL_REGION );
             digest.setSurveyCompletionRate( (double) overview.getCompletePercentage() );
             digest.setTotalCompletedReviews( (long) overview.getTotalReview() );
             digest.setTotalTransactions( (long) ( overview.getCompleted() + overview.getIncomplete() ) );
             digest.setUserCount( (long) overview.getCumulativeUserCount() );
-            digest.setYear( overview.getYear() );
+        }
 
-            if ( surveyStats != null ) {
+        if ( surveyStats != null ) {
 
-                double sps = ( (double) ( surveyStats.getPromoters() - surveyStats.getDetractors() )
-                    / ( surveyStats.getPassives() + surveyStats.getPromoters() + surveyStats.getDetractors() ) ) * 100;
+            double divident = ( surveyStats.getPassives() + surveyStats.getPromoters() + surveyStats.getDetractors() );
+            Double sps = null;
 
-                digest.setEntityName( surveyStats.getRegionName() );
-                digest.setDetractors( surveyStats.getDetractors() );
-                digest.setPassives( surveyStats.getPassives() );
-                digest.setPromoters( surveyStats.getPromoters() );
-                digest.setSps( sps );
-
+            if ( divident != 0 ) {
+                sps = ( (double) ( surveyStats.getPromoters() - surveyStats.getDetractors() ) / divident ) * 100;
             }
+
+            digest.setDetractors( surveyStats.getDetractors() );
+            digest.setPassives( surveyStats.getPassives() );
+            digest.setPromoters( surveyStats.getPromoters() );
+            digest.setSps( sps );
+
         }
         return digest;
     }
 
 
-    private Digest getDigestFromCompanyOverview( OverviewCompanyMonth overview, SurveyStatsReportCompany surveyStats )
+    private Digest getDigestFromCompanyOverview( OverviewCompanyMonth overview, SurveyStatsReportCompany surveyStats,
+        String entityName, long companyId, int month, int year )
     {
         Digest digest = new Digest();
+        digest.setEntityName( entityName );
+        digest.setProfileLevel( CommonConstants.PROFILE_LEVEL_COMPANY );
+        digest.setEntityId( companyId );
+        digest.setMonth( month );
+        digest.setYear( year );
+
         if ( overview != null ) {
             digest.setAverageScoreRating( (double) overview.getRating() );
             digest.setCompletedTransactions( (long) overview.getCompleted() );
-            digest.setEntityId( overview.getCompanyId() );
-            digest.setMonth( overview.getMonth() );
-            digest.setProfileLevel( CommonConstants.PROFILE_LEVEL_COMPANY );
             digest.setSurveyCompletionRate( (double) overview.getCompletePercentage() );
             digest.setTotalCompletedReviews( (long) overview.getTotalReview() );
             digest.setTotalTransactions( (long) ( overview.getCompleted() + overview.getIncomplete() ) );
             digest.setUserCount( (long) overview.getCumulativeUserCount() );
-            digest.setYear( overview.getYear() );
+        }
 
-            if ( surveyStats != null ) {
+        if ( surveyStats != null ) {
 
-                double sps = ( (double) ( surveyStats.getPromoters() - surveyStats.getDetractors() )
-                    / ( surveyStats.getPassives() + surveyStats.getPromoters() + surveyStats.getDetractors() ) ) * 100;
+            double divident = ( surveyStats.getPassives() + surveyStats.getPromoters() + surveyStats.getDetractors() );
+            Double sps = null;
 
-                digest.setEntityName( surveyStats.getCompanyName() );
-                digest.setDetractors( surveyStats.getDetractors() );
-                digest.setPassives( surveyStats.getPassives() );
-                digest.setPromoters( surveyStats.getPromoters() );
-                digest.setSps( sps );
-
+            if ( divident != 0 ) {
+                sps = ( (double) ( surveyStats.getPromoters() - surveyStats.getDetractors() ) / divident ) * 100;
             }
+
+            digest.setDetractors( surveyStats.getDetractors() );
+            digest.setPassives( surveyStats.getPassives() );
+            digest.setPromoters( surveyStats.getPromoters() );
+            digest.setSps( sps );
+
         }
         return digest;
     }

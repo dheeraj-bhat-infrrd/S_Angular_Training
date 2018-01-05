@@ -8506,10 +8506,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 
     @Override
-    public Set<String> getAdminEmailsForAhierarchy( String profileLevel, long iden ) throws InvalidInputException
+    public Set<String> getAdminEmailsSpecificForAHierarchy( String profileLevel, long iden ) throws InvalidInputException
     {
         LOG.debug( "method getAdminEmaillsForAhierarchy started" );
         List<UserProfile> adminList = new ArrayList<>();
+        Set<String> regionAdminEmailList = null;
         Set<String> emailSet = null;
 
         Map<String, Object> queries = new HashMap<>();
@@ -8527,6 +8528,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             queries.put( CommonConstants.BRANCH_ID_COLUMN, iden );
             queries.put( CommonConstants.PROFILE_MASTER_COLUMN,
                 userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) );
+
+            // get region specific administrator email list
+            regionAdminEmailList = getAdminEmailsSpecificForAHierarchy( CommonConstants.PROFILE_LEVEL_REGION,
+                userManagementService.getBranchById( iden ).getRegion().getRegionId() );
+
         } else if ( CommonConstants.PROFILE_LEVEL_INDIVIDUAL.equals( profileLevel ) ) {
             queries.put( CommonConstants.USER_COLUMN, userManagementService.getUserByUserId( iden ) );
             queries.put( CommonConstants.PROFILE_MASTER_COLUMN,
@@ -8541,7 +8547,18 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( !adminList.isEmpty() ) {
             emailSet = new HashSet<>();
             for ( UserProfile admin : adminList ) {
-                emailSet.add( admin.getUser().getEmailId() );
+                User user = admin.getUser();
+                if ( CommonConstants.PROFILE_LEVEL_COMPANY.equals( profileLevel )
+                    || CommonConstants.PROFILE_LEVEL_INDIVIDUAL.equals( profileLevel ) ) {
+                    emailSet.add( user.getEmailId() );
+                } else if ( CommonConstants.PROFILE_LEVEL_REGION.equals( profileLevel )
+                    && user.getIsOwner() != CommonConstants.STATUS_ACTIVE ) {
+                    emailSet.add( user.getEmailId() );
+                } else if ( CommonConstants.PROFILE_LEVEL_BRANCH.equals( profileLevel )
+                    && user.getIsOwner() != CommonConstants.STATUS_ACTIVE
+                    && !regionAdminEmailList.contains( user.getEmailId() ) ) {
+                    emailSet.add( user.getEmailId() );
+                }
             }
         } else {
             emailSet = Collections.emptySet();

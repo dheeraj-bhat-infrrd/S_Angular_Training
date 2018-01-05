@@ -17,7 +17,7 @@ public class Digest implements Serializable
     private long totalTransactions;
     private long completedTransactions;
     private double surveyCompletionRate;
-    private double sps;
+    private Double sps;
     private long promoters;
     private long detractors;
     private long passives;
@@ -144,13 +144,13 @@ public class Digest implements Serializable
     }
 
 
-    public double getSps()
+    public Double getSps()
     {
         return sps;
     }
 
 
-    public void setSps( double sps )
+    public void setSps( Double sps )
     {
         this.sps = sps;
     }

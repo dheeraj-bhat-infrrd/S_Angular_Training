@@ -1531,5 +1531,5 @@ public interface OrganizationManagementService
     public String getCollectionFromProfileLevel( String profileLevel ) throws InvalidInputException;
 
 
-    public Set<String> getAdminEmailsForAhierarchy( String profileLevel, long iden ) throws InvalidInputException;
+    public Set<String> getAdminEmailsSpecificForAHierarchy( String profileLevel, long iden ) throws InvalidInputException;
 }
