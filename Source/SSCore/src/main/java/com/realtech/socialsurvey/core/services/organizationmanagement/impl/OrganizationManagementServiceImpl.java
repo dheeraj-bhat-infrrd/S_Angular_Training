@@ -8345,7 +8345,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Override
     public List<OrganizationUnitSettings> getCompaniesForTransactionMonitor()
     {
-        return organizationUnitSettingsDao.getCompaniesForTransactionMonitor();
+        List<Company> companies =  getAllActiveEnterpriseCompanies();
+        List<Long> companyIds = new ArrayList<Long>();
+        for(Company company : companies){
+            companyIds.add( company.getCompanyId() );
+        }
+        return organizationUnitSettingsDao.getCompaniesForTransactionMonitor(companyIds);
     }
 
     @Override

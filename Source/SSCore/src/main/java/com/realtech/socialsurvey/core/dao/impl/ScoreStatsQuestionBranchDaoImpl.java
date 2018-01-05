@@ -28,6 +28,7 @@ public class ScoreStatsQuestionBranchDaoImpl extends GenericReportingDaoImpl<Sco
         Criteria criteria = getSession().createCriteria( ScoreStatsQuestionBranch.class );
         try {
             criteria.add( Restrictions.eq( CommonConstants.BRANCH_ID_COLUMN, branchId ) );
+            criteria.add(Restrictions.ne(CommonConstants.QUESTION_ID, CommonConstants.DEFAULT_QUESTION_ID));
             Criterion rest1= Restrictions.and(Restrictions.eq( CommonConstants.YEAR_VAL, endYear ), 
                 Restrictions.le( CommonConstants.MONTH_VAL, endMonth ));
             if( startMonth != 1){

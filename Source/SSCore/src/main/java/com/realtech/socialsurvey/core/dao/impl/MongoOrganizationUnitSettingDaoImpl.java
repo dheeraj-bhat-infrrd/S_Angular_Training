@@ -1081,15 +1081,20 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     }
     
     @Override
-    public List<OrganizationUnitSettings> getCompaniesForTransactionMonitor()
+    public List<OrganizationUnitSettings> getCompaniesForTransactionMonitor(List<Long> companyIds)
     {
         LOG.debug( "method getCompaniesForTransactionMonitor started ");
         
         Query query = new Query();
+        
+        query.addCriteria( Criteria.where(  KEY_IDEN).in( companyIds ));
+        
+        //include companies those have enabled monitoring
+        query.addCriteria( Criteria.where( KEY_INCLUDE_FOR_TRANSACTION_MONITOR ).is( true ));
+        
         query.fields().include( KEY_IDEN ).include( KEY_CONTACT_DETAILS );
         query.addCriteria( Criteria.where( KEY_STATUS )
             .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) ) );
-        query.addCriteria( Criteria.where( KEY_INCLUDE_FOR_TRANSACTION_MONITOR ).is( true ) );
                 
         List<OrganizationUnitSettings> settings = mongoTemplate.find( query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION );
         
@@ -1106,6 +1111,12 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         Query query = new Query();
         query.addCriteria( Criteria.where(  KEY_IDEN).in( companyIds ));
 
+        //include companies those have enabled monitoring
+        query.addCriteria( Criteria.where( KEY_INCLUDE_FOR_TRANSACTION_MONITOR ).is( true ));
+        
+        query.addCriteria( Criteria.where( KEY_STATUS )
+            .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) ) );
+        
         if(alertType.equalsIgnoreCase( CommonConstants.ALERT_TYPE_ERROR )){
             query.addCriteria( Criteria.where( KEY_ENTITY_ALERT_DETAILS + "." + KEY_IS_ERROR_ALERT ).is( true ));
 

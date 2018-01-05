@@ -32,15 +32,20 @@ public class SurveysAndReviewsVOTransformer implements Transformer<List<SurveyGe
 		
 		List<SurveyGetVO> surveyVOs = new ArrayList<SurveyGetVO>();
 		
-		for(Entry<SurveyDetails, SurveyPreInitiation> entry : d.getInitiatedSurveys().entrySet()){
-			SurveyGetVO surveyVO =  surveyTransformer.transformDomainObjectToApiResponse(entry.getKey(), entry.getValue());
-			surveyVOs.add(surveyVO);
+		if(d.getInitiatedSurveys() != null && ! d.getInitiatedSurveys().isEmpty()) {
+			for(Entry<SurveyDetails, SurveyPreInitiation> entry : d.getInitiatedSurveys().entrySet()){
+				SurveyGetVO surveyVO =  surveyTransformer.transformDomainObjectToApiResponse(entry.getKey(), entry.getValue());
+				surveyVOs.add(surveyVO);
+			}
 		}
 		
-		for(SurveyPreInitiation surveyPreInitiation : d.getPreInitiatedSurveys()){
-			SurveyGetVO surveyVO =  surveyTransformer.transformDomainObjectToApiResponse(null,surveyPreInitiation);
-			surveyVOs.add(surveyVO);
+		if(d.getPreInitiatedSurveys() != null && ! d.getPreInitiatedSurveys().isEmpty()) {
+			for(SurveyPreInitiation surveyPreInitiation : d.getPreInitiatedSurveys()){
+				SurveyGetVO surveyVO =  surveyTransformer.transformDomainObjectToApiResponse(null,surveyPreInitiation);
+				surveyVOs.add(surveyVO);
+			}
 		}
+		
 		
 		return surveyVOs;
 	}

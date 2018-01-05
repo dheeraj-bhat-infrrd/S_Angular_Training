@@ -1517,6 +1517,10 @@ function getTimeFrameForUserRankingReport(){
 		break;
 	case 4: year = currentYear;
 		month=currentMonth -1;
+		if(month<=0){
+			month=12;
+			year--;
+		}
 		break;
 	}
 	

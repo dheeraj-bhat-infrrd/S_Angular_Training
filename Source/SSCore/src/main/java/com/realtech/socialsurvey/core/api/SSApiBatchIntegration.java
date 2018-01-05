@@ -94,19 +94,17 @@ public interface SSApiBatchIntegration
     @GET ( "/v1/getcompanyactiveusercountforpastday")
     Response getCompanyActiveUserCountForPastDay();
 
-
-    @GET ( "/v1/gettotaltransactioncountforpastndays")
-    Response getTotalTransactionCountForPastNDays();
-
-
-    @GET ( "/v1/gettransactioncountforpreviousday")
-    Response getTransactionCountForPreviousDay();
-
-
-    @GET ( "/v1/getsendsurveycountforpreviousday")
-    Response getSendSurveyCountForPreviousDay();
-
-
+    
+    @GET ( "/v1/gettotaltransactioncountforpast5days")
+    Response getTotalTransactionCountForPast5Days();
+ 
+    @GET ( "/v1/gettransactioncountforpast3days")
+    Response getTransactionCountForPast3Days();
+ 
+    @GET ( "/v1/getsendsurveycountforpast5days")
+    Response getSendSurveyCountForPast5Days();
+ 
+    
     @GET ( "/v1/getsurvestatsforpast7daysforallcompanies")
     Response getSurveStatsForPast7daysForAllCompanies();
 

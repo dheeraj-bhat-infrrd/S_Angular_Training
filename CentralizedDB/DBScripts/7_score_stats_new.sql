@@ -55,7 +55,7 @@ DROP TABLE IF EXISTS score_stats_question_user;
 CREATE TABLE `score_stats_question_user` (
   `score_stats_question_user_id` varchar(36) NOT NULL,
   `user_id` int(11) unsigned DEFAULT NULL,
-  `question_id` int(10) unsigned DEFAULT NULL,
+  `question_id` int(10) DEFAULT NULL,
   `question` text,
   `sum` decimal(16,2) DEFAULT NULL,
   `count` INT(11) DEFAULT NULL,
@@ -70,7 +70,7 @@ DROP TABLE IF EXISTS score_stats_question_branch;
 CREATE TABLE `score_stats_question_branch` (
   `score_stats_question_branch_id` varchar(36) NOT NULL,
   `branch_id` int(11) unsigned DEFAULT NULL,
-  `question_id` int(10) unsigned DEFAULT NULL,
+  `question_id` int(10) DEFAULT NULL,
   `question` text,
   `sum` decimal(16,2) DEFAULT NULL,
   `count` INT(11) DEFAULT NULL,
@@ -85,7 +85,7 @@ DROP TABLE IF EXISTS score_stats_question_region;
 CREATE TABLE `score_stats_question_region` (
   `score_stats_question_region_id` varchar(36) NOT NULL,
   `region_id` int(11) unsigned DEFAULT NULL,
-  `question_id` int(10) unsigned DEFAULT NULL,
+  `question_id` int(10) DEFAULT NULL,
   `question` text,
   `sum` decimal(16,2) DEFAULT NULL,
   `count` INT(11) DEFAULT NULL,
@@ -100,7 +100,7 @@ DROP TABLE IF EXISTS score_stats_question_company;
 CREATE TABLE `score_stats_question_company` (
   `score_stats_question_company_id` varchar(36) NOT NULL,
   `company_id` int(11) unsigned DEFAULT NULL,
-  `question_id` int(10) unsigned DEFAULT NULL,
+  `question_id` int(10) DEFAULT NULL,
   `question` text,
   `sum` decimal(16,2) DEFAULT NULL,
   `count` INT(11) DEFAULT NULL,

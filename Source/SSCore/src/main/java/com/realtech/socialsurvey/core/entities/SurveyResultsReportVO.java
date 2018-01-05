@@ -7,6 +7,8 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.List;
 
+import javax.persistence.Column;
+
 /**
  * @author Subhrajit
  *
@@ -39,6 +41,10 @@ public class SurveyResultsReportVO implements Serializable {
 	private Timestamp reportModifiedOn;
     private boolean isDeleted;
     private List<SurveyResponseTable> surveyResponseList;
+    //SS-1505 ADD FEILDS
+    private String participantType;
+    private String agentEmailId;
+    private String customerEmailId;
     
 	public String getSurveyDetailsId() {
 		return surveyDetailsId;
@@ -173,7 +179,32 @@ public class SurveyResultsReportVO implements Serializable {
 		this.surveyResponseList = surveyResponseList;
 	}
 	
-	@Override
+	public String getParticipantType()
+    {
+        return participantType;
+    }
+    public void setParticipantType( String participantType )
+    {
+        this.participantType = participantType;
+    }
+    public String getAgentEmailId()
+    {
+        return agentEmailId;
+    }
+    public void setAgentEmailId( String agentEmailId )
+    {
+        this.agentEmailId = agentEmailId;
+    }
+    public String getCustomerEmailId()
+    {
+        return customerEmailId;
+    }
+    public void setCustomerEmailId( String customerEmailId )
+    {
+        this.customerEmailId = customerEmailId;
+    }
+    
+    @Override
     public String toString()
     {
         return "SurveyResultsReportVO [surveyDetailsId=" + surveyDetailsId + ", userFirstName=" + userFirstName
@@ -184,7 +215,8 @@ public class SurveyResultsReportVO implements Serializable {
             + ", agreedToShare=" + agreedToShare + ", branchName=" + branchName + ", clickTroughForCompany="
             + clickTroughForCompany + ", clickTroughForAgent=" + clickTroughForAgent + ", clickTroughForRegion="
             + clickTroughForRegion + ", clickTroughForBranch=" + clickTroughForBranch + ", reportModifiedOn=" + reportModifiedOn
-            + ", isDeleted=" + isDeleted + ", surveyResponseList=" + surveyResponseList + "]";
+            + ", isDeleted=" + isDeleted + ", surveyResponseList=" + surveyResponseList + ", participantType=" + participantType
+            + ", agentEmailId=" + agentEmailId + ", customerEmailId=" + customerEmailId + "]";
     }
 	
 
