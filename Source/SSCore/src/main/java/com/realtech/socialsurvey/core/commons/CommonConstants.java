@@ -1407,7 +1407,6 @@ public interface CommonConstants
     public static final String SURVEY_RESULTS_REPORT_MODIFIED_ON = "reportModifiedOn";
     public static final String SURVEY_RESULTS_IS_DELETED = "isDeleted";
     public static final String TRX_MONTH = "trxMonth";
-    public static final String SURVEY_RESULTS_COMPLETED_DATE = "surveyCompletedDate";
     
     public static final String THIS_MONTH="thisMonth";
     public static final String THIS_YEAR="thisYear";
@@ -1478,4 +1477,9 @@ public interface CommonConstants
     public static final String JOB_LOG_ID = "jobLogId";
     public static final String STATUS_DUMMY = "Dummy";
     public static final String STATUS_FINISHED = "Finished";
+    
+    //retake request 
+  //Constants for survey request send type
+    public static final String RETAKE_REQUEST_AGENT = "agent";
+    public static final String RETAKE_REQUEST_CUSTOMER = "customer";
 }
