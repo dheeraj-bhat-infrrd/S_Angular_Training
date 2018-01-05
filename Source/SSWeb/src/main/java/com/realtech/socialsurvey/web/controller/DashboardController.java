@@ -334,7 +334,7 @@ public class DashboardController
             //So in case of companyId 337 we assign socialPostsCount as 0
             int socialPostsCount=0;
             
-            if(!(columnName!=null && columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN) && columnValue == 909)){
+            if(!(columnName!=null && columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN) && columnValue == 337)){
             		socialPostsCount = (int) dashboardService.getSocialPostsForPastNdaysWithHierarchy( columnName, columnValue, numberOfDays );
             }
             
