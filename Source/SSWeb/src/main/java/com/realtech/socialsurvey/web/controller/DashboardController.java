@@ -329,8 +329,15 @@ public class DashboardController
             LOG.debug( "Getting the sent surveys count" );
             int sentSurveyCount = (int) dashboardService.getAllSurveyCount( columnName, columnValue, numberOfDays );
             LOG.debug( "Getting the social posts count with hierarchy" );
-            int socialPostsCount = (int) dashboardService.getSocialPostsForPastNdaysWithHierarchy( columnName, columnValue,
-                numberOfDays );
+            
+            //Workaround for the bug found in company admin Dashboard Page for Adavantage RAC, while fetching socialpost count. 
+            //So in case of companyId 337 we assign socialPostsCount as 0
+            int socialPostsCount=0;
+            
+            if(!(columnName!=null && columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN) && columnValue == 909)){
+            		socialPostsCount = (int) dashboardService.getSocialPostsForPastNdaysWithHierarchy( columnName, columnValue, numberOfDays );
+            }
+            
             int profileCompleteness = 0;
             if ( !realtechAdmin ) {
                 LOG.debug( "Getting profile completeness" );
