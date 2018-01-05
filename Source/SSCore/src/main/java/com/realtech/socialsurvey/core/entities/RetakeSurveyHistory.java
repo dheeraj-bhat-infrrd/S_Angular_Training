@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.entities;
 
+import java.util.Date;
 import java.util.List;
 
 public class RetakeSurveyHistory
@@ -12,8 +13,9 @@ public class RetakeSurveyHistory
     private List<SurveyResponse> surveyResponse;
     private String url;
     private String completeProfileUrl;
+    private Date retakeRequestDate;
     private SocialMediaPostDetails socialMediaPostDetails;
-    
+    private String requestSource;
     
     public double getScore()
     {
@@ -79,6 +81,18 @@ public class RetakeSurveyHistory
     {
         this.socialMediaPostDetails = socialMediaPostDetails;
     }
+	public Date getRetakeRequestDate() {
+		return retakeRequestDate;
+	}
+	public void setRetakeRequestDate(Date retakeRequestDate) {
+		this.retakeRequestDate = retakeRequestDate;
+	}
+	public String getRequestSource() {
+		return requestSource;
+	}
+	public void setRequestSource(String requestSource) {
+		this.requestSource = requestSource;
+	}
 
 
 }
