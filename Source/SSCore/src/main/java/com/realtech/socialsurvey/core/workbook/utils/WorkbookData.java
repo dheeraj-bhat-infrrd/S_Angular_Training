@@ -770,8 +770,11 @@ public class WorkbookData
         for(Entry<String, SurveyResultsReportVO> row : surveyResultsReportVO.entrySet() ){
             surveyResultsReportToPopulate.add(row.getValue().getUserFirstName());
             surveyResultsReportToPopulate.add(row.getValue().getUserLastName());
+            surveyResultsReportToPopulate.add(row.getValue().getAgentEmailId());
             surveyResultsReportToPopulate.add(row.getValue().getCustomerFirstName());
             surveyResultsReportToPopulate.add(row.getValue().getCustomerLastName());
+            surveyResultsReportToPopulate.add(row.getValue().getCustomerEmailId());
+            surveyResultsReportToPopulate.add(row.getValue().getParticipantType());
                 String sentDate = "";
                 if (row.getValue().getSurveySentDate()!=null){
                     sentDate = row.getValue().getSurveySentDate().toString();
@@ -844,8 +847,11 @@ public class WorkbookData
         // Setting up user sheet headers
         surveyResultsCompanyReportToPopulate.add( "User First Name" );
         surveyResultsCompanyReportToPopulate.add( "User Last Name" );
+        surveyResultsCompanyReportToPopulate.add( "User Email Address" );
         surveyResultsCompanyReportToPopulate.add( "Customer First Name" );
         surveyResultsCompanyReportToPopulate.add( "Customer Last Name" );
+        surveyResultsCompanyReportToPopulate.add( "Customer Email Address" );
+        surveyResultsCompanyReportToPopulate.add( "Participant Type" );
         surveyResultsCompanyReportToPopulate.add( "Survey Sent Date" );
         surveyResultsCompanyReportToPopulate.add( "Survey Completed Date" );
         surveyResultsCompanyReportToPopulate.add( "Time Interval" );

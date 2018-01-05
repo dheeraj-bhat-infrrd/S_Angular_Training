@@ -545,6 +545,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 surveyResultsReportVO.setClickTroughForRegion( surveyResultsCompanyReport.getClickTroughForRegion() );
                 surveyResultsReportVO.setClickTroughForBranch( surveyResultsCompanyReport.getClickTroughForBranch() );
                 surveyResultsReportVO.setSurveyResponseList( surveyResultsCompanyReport.getSurveyResponseList() );
+                surveyResultsReportVO.setParticipantType( surveyResultsCompanyReport.getParticipantType() );
+                surveyResultsReportVO.setAgentEmailId( surveyResultsCompanyReport.getAgentEmailId() );
+                surveyResultsReportVO.setCustomerEmailId( surveyResultsCompanyReport.getCustomerEmailId() );
+
             } else if ( type.equals( CommonConstants.REGION_ID ) ) {
                 surveyResultsReportRegion = (SurveyResultsReportRegion) entry.getValue();
                 surveyResultsReportVO.setSurveyDetailsId( surveyResultsReportRegion.getSurveyDetailsId() );
@@ -567,6 +571,9 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 surveyResultsReportVO.setClickTroughForRegion( surveyResultsReportRegion.getClickTroughForRegion() );
                 surveyResultsReportVO.setClickTroughForBranch( surveyResultsReportRegion.getClickTroughForBranch() );
                 surveyResultsReportVO.setSurveyResponseList( surveyResultsReportRegion.getSurveyResponseList() );
+                surveyResultsReportVO.setParticipantType( surveyResultsReportRegion.getParticipantType() );
+                surveyResultsReportVO.setAgentEmailId( surveyResultsReportRegion.getAgentEmailId() );
+                surveyResultsReportVO.setCustomerEmailId( surveyResultsReportRegion.getCustomerEmailId() );
             } else if ( type.equals( CommonConstants.BRANCH_ID ) ) {
                 surveyResultsReportBranch = (SurveyResultsReportBranch) entry.getValue();
                 surveyResultsReportVO.setSurveyDetailsId( surveyResultsReportBranch.getSurveyDetailsId() );
@@ -589,6 +596,9 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 surveyResultsReportVO.setClickTroughForRegion( surveyResultsReportBranch.getClickTroughForRegion() );
                 surveyResultsReportVO.setClickTroughForBranch( surveyResultsReportBranch.getClickTroughForBranch() );
                 surveyResultsReportVO.setSurveyResponseList( surveyResultsReportBranch.getSurveyResponseList() );
+                surveyResultsReportVO.setParticipantType( surveyResultsReportBranch.getParticipantType() );
+                surveyResultsReportVO.setAgentEmailId( surveyResultsReportBranch.getAgentEmailId() );
+                surveyResultsReportVO.setCustomerEmailId( surveyResultsReportBranch.getCustomerEmailId() );
             }
             surveyResultsReportVOMap.put( surveyDetailsId, surveyResultsReportVO );
         }
