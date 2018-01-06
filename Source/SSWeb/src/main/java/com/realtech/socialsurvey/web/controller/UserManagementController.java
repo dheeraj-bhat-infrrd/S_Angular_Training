@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.web.controller;
 
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -1720,6 +1721,7 @@ public class UserManagementController
             user.setLastName( lastName );
             user.setEmailId( emailId );
             user.setLoginName( emailId );
+            user.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
 
             // update in solr
             Map<String, Object> userMap = new HashMap<>();
