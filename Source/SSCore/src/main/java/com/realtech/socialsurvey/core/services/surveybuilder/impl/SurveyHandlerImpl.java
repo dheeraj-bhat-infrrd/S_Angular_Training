@@ -374,7 +374,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         } else {
             //update survey PreIntitiation Id for survey
             survey.setSurveyPreIntitiationId( surveyPreInitiation.getSurveyPreIntitiationId() );
-            survey.setRetakeSurvey( retakeSurvey );
+            if(survey.isOpenRetakeSurveyRequest()) {
+                survey.setRetakeSurvey( retakeSurvey );
+                survey.setNpsScore( -1 );
+            		survey.setReview( null );
+            		survey.setStage( CommonConstants.INITIAL_INDEX );
+            }
+            	survey.setOpenRetakeSurveyRequest(false);
+            surveyDetails.setModifiedOn( new Date( System.currentTimeMillis() ) );
             surveyDetailsDao.updateSurveyDetailsBySurveyId( survey );
             LOG.debug( "Method storeInitialSurveyAnswers() finished." );
             return survey;
@@ -891,7 +898,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             retakeSurveyHistories = new ArrayList<RetakeSurveyHistory>();
         retakeSurveyHistories.add( retakeSurveyHistory );
         surveyDetails.setRetakeSurveyHistory( retakeSurveyHistories );
-        
+        surveyDetails.setOpenRetakeSurveyRequest(true);
         surveyDetails.setNoOfRetake( surveyDetails.getNoOfRetake() + 1 );
         surveyDetails.setLastRetakeRequestDate( new Date ( System.currentTimeMillis() ) );
         
