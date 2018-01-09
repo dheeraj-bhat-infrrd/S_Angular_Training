@@ -8,9 +8,7 @@ import org.apache.storm.spout.SchemeAsMultiScheme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.realtech.socialsurvey.compute.common.ComputeConstants;
 import com.realtech.socialsurvey.compute.common.EnvConstants;
-import com.realtech.socialsurvey.compute.common.LocalPropertyFileHandler;
 import com.realtech.socialsurvey.compute.utils.ChararcterUtils;
 
 
@@ -28,7 +26,7 @@ public class KafkaTopicSpoutBuilder
 
     private static final Logger LOG = LoggerFactory.getLogger( KafkaTopicSpoutBuilder.class );
 
-    private static String ZOOKEEPER_BROKERS;
+    private static final String ZOOKEEPER_BROKERS = "172.30.0.188:2181";
     private static final String ZOOKEEPER_ROOT = "";
 
     // SendGrid Event Spout
@@ -47,18 +45,12 @@ public class KafkaTopicSpoutBuilder
     private static final String REPORT_TOPIC = "report-topic";
     private static final String REPORT_CONSUMER_GROUP = "rcg01";
     
-    public static void loadProperties(){
-        ZOOKEEPER_BROKERS = LocalPropertyFileHandler.getInstance()
-            .getProperty( ComputeConstants.APPLICATION_PROPERTY_FILE, ComputeConstants.ZOOKEEPER_BROKERS_ENDPOINT ).orElse( null );
-    }
-
     /**
      * Sendgrid kafka spout
      * @return
      */
     public static KafkaSpout sendGridEventTopicSpout()
     {
-        loadProperties();
         ZkHosts zkHosts = new ZkHosts( ZOOKEEPER_BROKERS );
         String topicName = ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? SENDGRID_EVENT_TOPIC
             : ChararcterUtils.appendWithHypen( SENDGRID_EVENT_TOPIC, EnvConstants.getProfile() );
@@ -77,7 +69,6 @@ public class KafkaTopicSpoutBuilder
      */
     public static KafkaSpout emailTopicKafkaSpout()
     {
-        loadProperties();
         ZkHosts zkHosts = new ZkHosts( ZOOKEEPER_BROKERS );
         String topicName = ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? MAIL_TOPIC
             : ChararcterUtils.appendWithHypen( MAIL_TOPIC, EnvConstants.getProfile() );
@@ -85,9 +76,6 @@ public class KafkaTopicSpoutBuilder
             : ChararcterUtils.appendWithHypen( MAIL_CONSUMER_GROUP, EnvConstants.getProfile() );
         SpoutConfig mailSpoutConfig = new SpoutConfig( zkHosts, topicName, ZOOKEEPER_ROOT, consumerGroup );
         mailSpoutConfig.ignoreZkOffsets = false;
-        //long startOffsetTime = kafka.api.OffsetRequest.LatestTime();
-        //LOG.info( "startOffsetTime {}", startOffsetTime );
-        //mailSpoutConfig.startOffsetTime = startOffsetTime;
         mailSpoutConfig.scheme = new SchemeAsMultiScheme( new StringScheme() );
         LOG.info( "Mail topic spout initiated. Topic: {}, Consumer Group: {}", topicName, consumerGroup );
         return new KafkaSpout( mailSpoutConfig );
@@ -98,7 +86,6 @@ public class KafkaTopicSpoutBuilder
      */
     public static KafkaSpout socialPostTopicKafkaSpout()
     {
-        loadProperties();
         ZkHosts zkHosts = new ZkHosts( ZOOKEEPER_BROKERS );
         String topicName = ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? SOCIAL_POST_TOPIC
             : ChararcterUtils.appendWithHypen( SOCIAL_POST_TOPIC, EnvConstants.getProfile() );
@@ -115,7 +102,6 @@ public class KafkaTopicSpoutBuilder
      * Report topic kafka spout
      */
     public static  KafkaSpout reportGenerationSpout() {
-        loadProperties();
         ZkHosts zkHosts = new ZkHosts( ZOOKEEPER_BROKERS );
         String topicName = ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? REPORT_TOPIC
                 : ChararcterUtils.appendWithHypen(REPORT_TOPIC, EnvConstants.getProfile() );
