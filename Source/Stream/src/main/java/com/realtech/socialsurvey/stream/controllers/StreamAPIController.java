@@ -42,7 +42,7 @@ public class StreamAPIController
 
     private KafkaTemplate<String, String> kafkaStringTemplate;
     
-    private KafkaTemplate<String, String> kafkaEmailReportGenerationTemplate;
+    private KafkaTemplate<String, String> kafkaReportGenerationTemplate;
     
     @Value ( "${kafka.topic.solrTopic}")
     private String solrTopic;
@@ -73,10 +73,10 @@ public class StreamAPIController
 
 
     @Autowired
-    @Qualifier ( "emailReportTemplate")
-    public void setKafkaEmailReportGenerationTemplate( KafkaTemplate<String, String> kafkaEmailReportGenerationTemplate )
+    @Qualifier ( "reportTemplate")
+    public void setKafkaReportGenerationTemplate(KafkaTemplate<String, String> kafkaReportGenerationTemplate)
     {
-        this.kafkaEmailReportGenerationTemplate = kafkaEmailReportGenerationTemplate;
+        this.kafkaReportGenerationTemplate = kafkaReportGenerationTemplate;
     }
     
     
@@ -139,7 +139,7 @@ public class StreamAPIController
     {
         LOG.info( "Received request to generate reports in stream" );
         LOG.debug( "Report request {}", reportRequest );
-        kafkaEmailReportGenerationTemplate.send( new GenericMessage<>( reportRequest ) ).get( 60, TimeUnit.SECONDS );
+        kafkaReportGenerationTemplate.send( new GenericMessage<>( reportRequest ) ).get( 60, TimeUnit.SECONDS );
         return new ResponseEntity<>( HttpStatus.CREATED );
     }
 

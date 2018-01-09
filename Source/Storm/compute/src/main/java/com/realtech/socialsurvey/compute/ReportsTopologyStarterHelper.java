@@ -14,21 +14,15 @@ import org.slf4j.LoggerFactory;
 
 
 
-public class MailReportsTopologyStarterHelper extends TopologyStarterHelper
+public class ReportsTopologyStarterHelper extends TopologyStarterHelper
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( MailReportsTopologyStarterHelper.class );
-    private static final String MAIL_REPORTS_TOPOLOGY = "MailReportsTopology";
+    private static final Logger LOG = LoggerFactory.getLogger( ReportsTopologyStarterHelper.class );
+    public static final String REPORTS_TOPOLOGY = "ReportsTopology";
 
 
     @Override protected void displayBanner()
     {
-        LOG.info( "                      ███╗   ███╗ █████╗ ██╗██╗                                " );
-        LOG.info( "                      ████╗ ████║██╔══██╗██║██║                                " );
-        LOG.info( "                      ██╔████╔██║███████║██║██║                                " );
-        LOG.info( "                      ██║╚██╔╝██║██╔══██║██║██║                                " );
-        LOG.info( "                      ██║ ╚═╝ ██║██║  ██║██║███████╗                           " );
-        LOG.info( "                      ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝╚══════╝                           " );
         LOG.info( "          ██████╗ ███████╗██████╗  ██████╗ ██████╗ ████████╗███████╗           " );
         LOG.info( "          ██╔══██╗██╔════╝██╔══██╗██╔═══██╗██╔══██╗╚══██╔══╝██╔════╝           " );
         LOG.info( "          ██████╔╝█████╗  ██████╔╝██║   ██║██████╔╝   ██║   ███████╗           " );
@@ -41,7 +35,6 @@ public class MailReportsTopologyStarterHelper extends TopologyStarterHelper
         LOG.info( "         ██║   ██║   ██║██╔═══╝ ██║   ██║██║     ██║   ██║██║   ██║ ╚██╔╝      " );
         LOG.info( "         ██║   ╚██████╔╝██║     ╚██████╔╝███████╗╚██████╔╝╚██████╔╝  ██║       " );
         LOG.info( "         ╚═╝    ╚═════╝ ╚═╝      ╚═════╝ ╚══════╝ ╚═════╝  ╚═════╝   ╚═╝       " );
-
     }
 
 
@@ -83,15 +76,15 @@ public class MailReportsTopologyStarterHelper extends TopologyStarterHelper
         LOG.info( "Creating mail reports topology" );
         TopologyBuilder builder = new TopologyBuilder();
         //add the spout
-        builder.setSpout("EmailReportGenerationSpout", KafkaTopicSpoutBuilder.emailReportGenerationSpout(), 1);
+        builder.setSpout("ReportGenerationSpout", KafkaTopicSpoutBuilder.reportGenerationSpout(), 1);
         //add the bolts
         builder.setBolt("UpdateFileUploadStatusBolt", new UpdateFileUploadStatusBolt(), 1)
-                .shuffleGrouping("EmailReportGenerationSpout");
+                .shuffleGrouping("ReportGenerationSpout");
         builder.setBolt("QuerySolrToFetchSurveyRelatedMailsBolt", new QuerySolrToFetchSurveyRelatedMailBolt(), 1)
-                .shuffleGrouping("EmailReportGenerationSpout");
-        builder.setBolt("WriteEmailReportToExcelBolt", new WriteEmailReportToExcelBolt(), 1)
+                .shuffleGrouping("ReportGenerationSpout");
+        builder.setBolt("WriteReportToExcelBolt", new WriteReportToExcelBolt(), 1)
                 .fieldsGrouping("QuerySolrToFetchSurveyRelatedMailsBolt", new Fields("fileUploadId"));
-        builder.setBolt("UploadOnAmazonS3Bolt", new UploadOnAmazonS3Bolt(), 1).shuffleGrouping("WriteEmailReportToExcelBolt");
+        builder.setBolt("UploadOnAmazonS3Bolt", new UploadOnAmazonS3Bolt(), 1).shuffleGrouping("WriteReportToExcelBolt");
         builder.setBolt("FileUploadStatusAndFileNameUpdationBolt", new UpdateFileUploadStatusAndFileNameBolt(), 1)
                 .shuffleGrouping("UploadOnAmazonS3Bolt");
 
@@ -105,9 +98,9 @@ public class MailReportsTopologyStarterHelper extends TopologyStarterHelper
         // Run time params should be the first step
         // DO NOT ADD ANY CODE BEFORE THIS LINE
         EnvConstants.runtimeParams( args );
-        new MailReportsTopologyStarterHelper().submitTopology( EnvConstants.getCluster().equals( EnvConstants.LOCAL_TOPOLOGY ),
+        new ReportsTopologyStarterHelper().submitTopology( EnvConstants.getCluster().equals( EnvConstants.LOCAL_TOPOLOGY ),
                 ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ?
-                        MAIL_REPORTS_TOPOLOGY :
-                        ChararcterUtils.appendWithHypen( MAIL_REPORTS_TOPOLOGY, EnvConstants.getProfile() ) );
+                        REPORTS_TOPOLOGY :
+                        ChararcterUtils.appendWithHypen(REPORTS_TOPOLOGY, EnvConstants.getProfile() ) );
     }
 }

@@ -20,7 +20,7 @@ kafka:
     emailMessageTopic: mail-topic
     solrTopic: solr-topic
     emailEventsTopic: mail-events-topic
-    emailReportTopic: mail-report-topic
+    reportTopic: report-topic
 
 ---
 
@@ -45,7 +45,7 @@ kafka:
     emailMessageTopic: mail-topic-dev
     solrTopic: solr-topic-dev
     emailEventsTopic: mail-events-topic-dev
-    emailReportTopic: mail-report-topic-dev
+    reportTopic: report-topic-dev
 
 ---
 
@@ -68,7 +68,7 @@ kafka:
     emailMessageTopic: mail-topic-demo
     solrTopic: solr-topic-demo
     emailEventsTopic: mail-events-topic-demo
-    emailReportTopic: mail-report-topic-demo
+    reportTopic: report-topic-demo
 
 ---
 
@@ -94,7 +94,7 @@ kafka:
     emailMessageTopic: mail-topic-stage
     solrTopic: solr-topic-stage
     emailEventsTopic: mail-events-topic-stage
-    emailReportTopic: mail-report-topic-stage
+    reportTopic: report-topic-stage
 
 ---
 

@@ -36,19 +36,19 @@ import static com.realtech.socialsurvey.compute.common.ComputeConstants.FILEUPLO
  * @author Subhrajit
  *
  */
-public class WriteEmailReportToExcelBolt extends BaseComputeBoltWithAck {
+public class WriteReportToExcelBolt extends BaseComputeBoltWithAck {
 
     /**
      *
      */
     private static final long serialVersionUID = 1L;
-    private static final Logger LOG = LoggerFactory.getLogger( WriteEmailReportToExcelBolt.class );
+    private static final Logger LOG = LoggerFactory.getLogger( WriteReportToExcelBolt.class );
 
     private transient XSSFWorkbook workbook;
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declare(new Fields( "isSuccess", "fileName", "file", "fileUploadId", "reportRequest", "status"));
+        outputFieldsDeclarer.declare(new Fields( "isSuccess", "fileName", "fileBytes", "fileUploadId", "reportRequest", "status"));
     }
 
     @Override
@@ -57,6 +57,7 @@ public class WriteEmailReportToExcelBolt extends BaseComputeBoltWithAck {
         boolean success = false;
         File file = null;
         String fileName = null;
+        byte[] fileBytes = null;
         String status = input.getStringByField( "status" );
         ReportRequest reportRequest = (ReportRequest) input.getValueByField("reportRequest");
 
@@ -68,12 +69,19 @@ public class WriteEmailReportToExcelBolt extends BaseComputeBoltWithAck {
             int startIndex = input.getIntegerByField( "startIndex" );
             int batchSize = input.getIntegerByField( "batchSize" );
             if( status.equals(ReportStatus.PROCESSING.getValue()) ) {
-                workbook = writeEmailReportToWorkbook(solrEmailMessageWrapper, zoneId, startIndex, batchSize);
+                workbook = writeReportToWorkbook(solrEmailMessageWrapper, zoneId, startIndex, batchSize);
             }
             else if (workbook != null && status.equals(ReportStatus.PROCESSED.getValue())){
                 fileName = "Email_Message_Report" + "-" + ( Calendar.getInstance().getTimeInMillis() ) + ".xlsx";
                 file = createFileInLocal( fileName, workbook, reportRequest );
-                if( workbook == null || file == null  || !file.exists()){
+                try {
+                    fileBytes = ConversionUtils.convertFileToBytes(file);
+                } catch (IOException e) {
+                    LOG.error( "IO  exception while converting file to bytes {}", file.getName(), e );
+                    FailedMessagesService failedMessagesService = new FailedMessagesServiceImpl();
+                    failedMessagesService.insertTemporaryFailedReportRequest(reportRequest);
+                }
+                if( workbook == null || file == null  || !file.exists() || fileBytes == null){
                     status = ReportStatus.FAILED.getValue();
                 }
             } else if(status.equals(ReportStatus.FAILED.getValue()) && workbook !=null ){
@@ -83,8 +91,13 @@ public class WriteEmailReportToExcelBolt extends BaseComputeBoltWithAck {
             success = true;
         }
         LOG.info("Emitting tuple with success = {} , fileName = {}, status = {}", success, fileName, status);
-        _collector.emit(input, Arrays.asList(success,fileName,file,input.getValueByField("fileUploadId"),
+        _collector.emit(input, Arrays.asList(success,fileName,fileBytes,input.getValueByField("fileUploadId"),
                 input.getValueByField("reportRequest"), status));
+        //if the file is successfully created , delete from the local
+        if(file != null && file.exists()) {
+            if(file.delete()) LOG.info(" {} has been successfully deleted ", fileName);
+            else LOG.info(" Unable to delete {} " , fileName);
+        }
     }
 
     @Override
@@ -92,8 +105,8 @@ public class WriteEmailReportToExcelBolt extends BaseComputeBoltWithAck {
         return Arrays.asList(false, null, null, -1, null, null);
     }
 
-    private XSSFWorkbook writeEmailReportToWorkbook(List<SolrEmailMessageWrapper> solrEmailMessageWrapper,
-                                                    String zoneId , int startIndex, int batchSize ){
+    private XSSFWorkbook writeReportToWorkbook(List<SolrEmailMessageWrapper> solrEmailMessageWrapper,
+                                               String zoneId , int startIndex, int batchSize ){
         Map<Integer, List<Object>> data;
         if ( startIndex == 1 ) {
             data = writeEmailReportHeader();

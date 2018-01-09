@@ -26,8 +26,8 @@ public class KafkaProducerConfig
     @Value ( "${kafka.topic.emailEventsTopic}")
     private String emailEventsTopic;
 
-    @Value ( "${kafka.topic.emailReportTopic}" )
-    private String emailReportTopic;
+    @Value ( "${kafka.topic.reportTopic}" )
+    private String reportTopic;
 
     @Bean
     public ProducerFactory<String, String> producerFactory()
@@ -76,12 +76,11 @@ public class KafkaProducerConfig
     /**
      * Kafka template for capturing email report generation information
      */
-    @Bean(name = "emailReportTemplate")
-    public KafkaTemplate<String, String> kafkaEmailReportGenerationTemplate(){
+    @Bean(name = "reportTemplate")
+    public KafkaTemplate<String, String> kafkaReportGenerationTemplate(){
         KafkaTemplate<String, String> kafkaTemplate = new KafkaTemplate<>( producerFactory() );
         kafkaTemplate.setMessageConverter( new StringJsonMessageConverter() );
-        kafkaTemplate.setDefaultTopic( emailReportTopic);
+        kafkaTemplate.setDefaultTopic(reportTopic);
         return kafkaTemplate;
     }
-
 }

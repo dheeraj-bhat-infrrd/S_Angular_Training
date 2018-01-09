@@ -42,10 +42,10 @@ public class TopologyStarter
             ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? SocialPostTopologyStarterHelper.SOCIAL_POST_TOPOLOGY
                 : ChararcterUtils.appendWithHypen( SocialPostTopologyStarterHelper.SOCIAL_POST_TOPOLOGY,
                     EnvConstants.getProfile() ) );
-        // Mail reports topology
-        new MailReportsTopologyStarterHelper().submitTopology( EnvConstants.getCluster().equals( EnvConstants.LOCAL_TOPOLOGY ),
-                ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? MailEventsTopologyStarterHelper.MAIL_EVENT_TOPOLOGY
-                        : ChararcterUtils.appendWithHypen( MailEventsTopologyStarterHelper.MAIL_EVENT_TOPOLOGY,
+        // Reports topology
+        new ReportsTopologyStarterHelper().submitTopology( EnvConstants.getCluster().equals( EnvConstants.LOCAL_TOPOLOGY ),
+                ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? ReportsTopologyStarterHelper.REPORTS_TOPOLOGY
+                        : ChararcterUtils.appendWithHypen( ReportsTopologyStarterHelper.REPORTS_TOPOLOGY,
                         EnvConstants.getProfile() ) );
     }
 }
