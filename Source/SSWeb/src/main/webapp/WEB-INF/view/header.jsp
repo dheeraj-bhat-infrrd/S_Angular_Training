@@ -264,7 +264,7 @@
 							<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./dashboard.do');">
 								<spring:message code="label.header.dashboard.key" />
 							</div>
-							<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showreportingpage.do');">New Dashboard (Beta)</div>
+							<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showreportingpage.do');">New Dashboard </div>
 							<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showreportspage.do');">
 								Generate Reports
 							</div>
