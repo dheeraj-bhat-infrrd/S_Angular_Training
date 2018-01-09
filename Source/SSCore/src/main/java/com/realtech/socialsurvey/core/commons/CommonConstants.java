@@ -357,7 +357,8 @@ public interface CommonConstants
     public static final String RETAKE_SURVEY_COLUMN = "retakeSurvey";
     public static final String NO_OF_RETAKE_COLUMN = "noOfRetake";
     public static final String LAST_RETAKE_REQUEST_DATE_COLUMN = "lastRetakeRequestDate";
-    public static final String RETAKE_SURVEY_HISTORY_COLUMN = "retakeSurveyHistory";    
+    public static final String RETAKE_SURVEY_HISTORY_COLUMN = "retakeSurveyHistory"; 
+    public static final String OPEN_RETAKE_SURVEY_REQUEST_COLUMN = "openRetakeSurveyRequest";
 
     /**
      * Constants to be used in code for referencing variables(i.e in maps or session attributes)

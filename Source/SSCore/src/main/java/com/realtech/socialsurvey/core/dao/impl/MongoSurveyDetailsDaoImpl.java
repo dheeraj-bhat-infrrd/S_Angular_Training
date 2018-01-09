@@ -228,6 +228,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         Update update = new Update();
         update.set( CommonConstants.STAGE_COLUMN, CommonConstants.SURVEY_STAGE_COMPLETE );
         update.set( CommonConstants.MOOD_COLUMN, mood );
+        update.set( CommonConstants.OPEN_RETAKE_SURVEY_REQUEST_COLUMN, false );
         update.set( "review", review );
         update.set( CommonConstants.IS_ABUSIVE_COLUMN, isAbusive );
         update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
@@ -3470,6 +3471,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         update.set( CommonConstants.NO_OF_RETAKE_COLUMN, surveyDetails.getNoOfRetake() );
         update.set( CommonConstants.LAST_RETAKE_REQUEST_DATE_COLUMN, surveyDetails.getLastRetakeRequestDate());
         update.set( CommonConstants.RETAKE_SURVEY_HISTORY_COLUMN, surveyDetails.getRetakeSurveyHistory());
+        update.set( CommonConstants.OPEN_RETAKE_SURVEY_REQUEST_COLUMN, surveyDetails.isOpenRetakeSurveyRequest());
         update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.debug( "Method insertSurveyDetails() to insert details of survey finished." );

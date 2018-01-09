@@ -84,6 +84,7 @@ public class SurveyDetails
     private Date lastAbuseReportedDate;
     
     //retake details
+    private boolean openRetakeSurveyRequest;
     private boolean retakeSurvey;
     private int noOfRetake;
     private Date lastRetakeRequestDate;
@@ -814,10 +815,20 @@ public class SurveyDetails
     }
 
 
-    public void setRetakeSurveyHistory( List<RetakeSurveyHistory> retakeSurveyHistory )
+    	public void setRetakeSurveyHistory( List<RetakeSurveyHistory> retakeSurveyHistory )
     {
         this.retakeSurveyHistory = retakeSurveyHistory;
     }
+
+
+		public boolean isOpenRetakeSurveyRequest() {
+			return openRetakeSurveyRequest;
+		}
+
+
+		public void setOpenRetakeSurveyRequest(boolean openRetakeSurveyRequest) {
+			this.openRetakeSurveyRequest = openRetakeSurveyRequest;
+		}
 	
     
 }
