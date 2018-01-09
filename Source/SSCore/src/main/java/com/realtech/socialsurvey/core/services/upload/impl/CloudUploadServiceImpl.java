@@ -86,6 +86,9 @@ public class CloudUploadServiceImpl implements FileUploadService
     
     @Value ( "${AMAZON_REPORTS_BUCKET}")
     private String reportBucket;
+    
+    @Value ( "${AMAZON_OLD_REPORTS_BUCKET}")
+    private String oldReportBucket;
 
 
     @Override
@@ -135,12 +138,23 @@ public class CloudUploadServiceImpl implements FileUploadService
                 DisplayMessageConstants.INVALID_LOGO_FILE );
         }
     }
+    
+    
+    @Override
+    public String uploadOldReport( File file, String fileName ) throws NonFatalException
+    {
+        String bucketString = bucket + CommonConstants.FILE_SEPARATOR + oldReportBucket;
+        
+        uploadFileAtSpecifiedBucket( file, fileName, bucketString, false );
+        
+        return endpoint + CommonConstants.FILE_SEPARATOR + bucketString + CommonConstants.FILE_SEPARATOR + fileName;
+    }
 
 
     @Override
     public void uploadReport( File file, String fileName ) throws NonFatalException
     {
-        uploadFileAtSpeicifiedBucket( file, fileName, bucket + CommonConstants.FILE_SEPARATOR + reportBucket, false );
+        uploadFileAtSpecifiedBucket( file, fileName, bucket + CommonConstants.FILE_SEPARATOR + reportBucket, false );
     }
     
     @Override
@@ -151,7 +165,7 @@ public class CloudUploadServiceImpl implements FileUploadService
 
 
     @Override
-    public void uploadFileAtSpeicifiedBucket( File file, String fileName, String bucketName, boolean expireImmediately )
+    public void uploadFileAtSpecifiedBucket( File file, String fileName, String bucketName, boolean expireImmediately )
         throws NonFatalException
     {
         LOG.info( "Uploading file : " + fileName + " at bucket: " + bucketName );

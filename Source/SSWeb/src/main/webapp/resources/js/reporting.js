@@ -1570,6 +1570,8 @@ $(document).on('click', '#reports-generate-report-btn', function(e) {
 	var startDate = $('#dsh-start-date').val();
 	var endDate = $("#dsh-end-date").val();
 	var npsTimeFrame = parseInt($('#nps-report-time-selector').val());
+	var d = new Date();
+	var clientTimeZone = d.getTimezoneOffset();
 
 	if(key == 106){
 		startDate = getTimeFrameForUserRankingReport();
@@ -1606,7 +1608,8 @@ $(document).on('click', '#reports-generate-report-btn', function(e) {
 	var payload = {
 			"startDate" : startDate,
 			"endDate" : endDate,
-			"reportId" : key
+			"reportId" : key,
+			"clientTimeZone": clientTimeZone
 		};
 	
 	showOverlay();
@@ -1625,6 +1628,7 @@ $(document).on('click', '#reports-generate-report-btn', function(e) {
 				hideOverlay();
 			},
 			error : function(e) {
+				showError("Your request could not be processed at the moment. Please try again later!");
 				if (e.status == 504) {
 					redirectToLoginPageOnSessionTimeOut(e.status);
 					return;
@@ -1679,16 +1683,32 @@ function drawRecentActivity(start,batchSize,tableHeader){
 			+"<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-blue-text\">"+recentActivityList[i][1]+"</td>";
 			if(recentActivityList[i][1] == 'NPS Report for Week'){
 				tableData += "<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-black-text \">"+findReportWeek(startDate)+"</td>";
-			}else{
+			} else if(recentActivityList[i][1] == 'Survey Invitation Email Report'){
+				tableData += '<td class="v-tbl-recent-activity fetch-email txt-bold tbl-black-text ">';
+				if(startDate==null && endDate==null){
+					tableData += "Last 30 days";
+				} else if(endDate==null){
+					tableData += "30 days starting "+startDate;
+				} else if(startDate==null){
+					tableData += "30 days ending "+ endDate;
+				} else {
+					tableData += startDate + ' - ' + endDate;
+				}
+				tableData += "</td>";
+			} else{
 				tableData += "<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-black-text "+(startDate==null?("\">"+"All Time till date "):("\">"+(endDate==null?monthStartDate:startDate)))+(endDate==null?" ":" - "+endDate)+"</td>";
 			}
 		tableData +="<td class=\"v-tbl-recent-activity fetch-name txt-bold tbl-black-text\">"+recentActivityList[i][4]+" "+recentActivityList[i][5]+"</td>";
 		
 		if(recentActivityList[i][6]==0){	
-		tableData +="<td class=\"v-tbl-recent-activity fetch-name txt-bold \" style='font-size:13px !important;'><a id=\"downloadLink"+i+"\"class='txt-bold tbl-blue-text downloadLink cursor-pointer'>"+statusString+"</a></td>"
+			tableData +="<td class=\"v-tbl-recent-activity fetch-name txt-bold \" style='font-size:13px !important;'><a id=\"downloadLink"+i+"\"class='txt-bold tbl-blue-text downloadLink cursor-pointer'>"+statusString+"</a></td>"
 			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold \" ><a id=\"recent-act-delete-row"+i+"\" class='txt-bold recent-act-delete-x cursor-pointer'>X</a></td>"
 			+"</tr>";
-		}else if(recentActivityList[i][6]==4){
+		}else if(recentActivityList[i][6]==3){
+		  	tableData +="<td class=\"v-tbl-recent-activity fetch-name txt-bold \" style='font-size:13px !important;'> No records found </td>"
+			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold \" ><a id=\"recent-act-delete-row"+i+"\" class='txt-bold recent-act-delete-x cursor-pointer'>X</a></td>"
+			+"</tr>";
+		  }else if(recentActivityList[i][6]==4){
 			tableData +="<td class=\"v-tbl-recent-activity fetch-name txt-bold \" style='font-size:13px !important;'>"+statusString+"</td>"
 			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold\" ><a id=\"recent-act-delete-row"+i+"\" class='txt-bold recent-act-delete-x cursor-pointer'>X</a></td>"
 			+"</tr>";

@@ -25,6 +25,7 @@ import com.realtech.socialsurvey.core.entities.CompanyView;
 import com.realtech.socialsurvey.core.entities.DisabledAccount;
 import com.realtech.socialsurvey.core.entities.EncompassSdkVersion;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
+import com.realtech.socialsurvey.core.entities.Keyword;
 import com.realtech.socialsurvey.core.entities.HierarchySettingsCompare;
 import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
 import com.realtech.socialsurvey.core.entities.MailContent;
@@ -1519,6 +1520,45 @@ public interface OrganizationManagementService
 
     public String getFacebookPixelImageTagsFromHierarchy( OrganizationUnitSettings companySettings,
         OrganizationUnitSettings regionSettings, OrganizationUnitSettings branchSetting, OrganizationUnitSettings unitSettings );
+
+    /**
+     * Method to add filter keywords in OrganizationUnitSettings.
+     * @param companyId : companyId for updaing keywords
+     * @param keywords : List of Keyword to insert/updates
+     * @return : will return list Of keywords(with detail)  
+     * @throws InvalidInputException
+     */
+    public List<Keyword> addKeyworodsToCompanySettings( long companyId, List<Keyword> keywords )
+        throws InvalidInputException;
+
+
+    /**
+     * Method to get filter keywords by company id
+     * @param companyId
+     * @return
+     * @throws InvalidInputException 
+     */
+    List<Keyword> getCompanyKeywordsByCompanyId( long companyId ) throws InvalidInputException;
+    
+    /**
+     * Method to enable keyword by keyword id
+     * @param companyId
+     * @param keywordId
+     * @return
+     * @throws InvalidInputException
+     */
+    public Keyword enableKeyworodForCompanySettings( long companyId, String keywordId)
+        throws InvalidInputException;
+    
+    /**
+     * method to disable keyword by keyword id
+     * @param companyId
+     * @param keywordId
+     * @return
+     * @throws InvalidInputException
+     */
+    public Keyword disableKeyworodForCompanySettings( long companyId, String keywordId)
+        throws InvalidInputException;
 
     public Set<String> parseEmailsList( String emailsStr );
 

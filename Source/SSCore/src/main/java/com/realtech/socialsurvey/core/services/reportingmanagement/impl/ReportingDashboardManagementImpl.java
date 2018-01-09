@@ -103,6 +103,7 @@ import com.realtech.socialsurvey.core.entities.NpsReportWeek;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RankingRequirements;
 import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.ReportRequest;
 import com.realtech.socialsurvey.core.entities.ReportingSurveyPreInititation;
 import com.realtech.socialsurvey.core.entities.ScoreStatsOverallBranch;
 import com.realtech.socialsurvey.core.entities.ScoreStatsOverallCompany;
@@ -143,6 +144,7 @@ import com.realtech.socialsurvey.core.enums.EntityWarningAlertType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.integration.stream.StreamApiIntegrationBuilder;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
@@ -316,6 +318,9 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
     @Autowired
     private ReportingSurveyPreInititationDao reportingSurveyPreInititationDao;
+    
+    @Autowired
+    private StreamApiIntegrationBuilder streamApiIntegrationBuilder;
 
     @Autowired
     private NpsReportWeekDao npsReportWeekDao;
@@ -359,7 +364,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
     @Override
     public void createEntryInFileUploadForReporting( int reportId, Date startDate, Date endDate, Long entityId,
-        String entityType, Company company, Long adminUserId )
+        String entityType, Company company, Long adminUserId , int actualTimeZoneOffset)
         throws InvalidInputException, NoRecordsFetchedException, IOException
     {
         // adding entry in the feild and set status to pending
@@ -393,6 +398,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_INCOMPLETE_SURVEY_REPORT );
         } else if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_DETAILS_REPORT ) {
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_DETAILS_REPORT );
+        } else if ( reportId == CommonConstants.FILE_UPLOAD_SURVEY_INVITATION_EMAIL_REPORT ) {
+            fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_SURVEY_INVITATION_EMAIL_REPORT );
         } else if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_NPS_WEEK_REPORT ) {
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_NPS_WEEK_REPORT );
         } else if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_NPS_MONTH_REPORT ) {
@@ -416,7 +423,12 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         fileUpload.setProfileLevel( entityType );
         fileUpload.setStatus( CommonConstants.STATUS_PENDING );
         fileUpload.setShowOnUI( true );
-        fileUploadDao.save( fileUpload );
+		fileUpload = fileUploadDao.save(fileUpload);
+        if ( reportId == CommonConstants.FILE_UPLOAD_SURVEY_INVITATION_EMAIL_REPORT ) {
+            ReportRequest reportRequest = new ReportRequest();
+            reportRequest.transform( fileUpload, actualTimeZoneOffset );
+            streamApiIntegrationBuilder.getStreamApi().generateEmailReport( reportRequest );
+        }
     }
 
 
@@ -1723,6 +1735,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 recentActivityList.add( CommonConstants.REPORTING_NPS_REPORT_FOR_WEEK );
             } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_NPS_MONTH_REPORT ) {
                 recentActivityList.add( CommonConstants.REPORTING_NPS_REPORT_FOR_MONTH );
+            } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_SURVEY_INVITATION_EMAIL_REPORT ) {
+                recentActivityList.add( CommonConstants.SURVEY_INVITATION_EMAIL_REPORT );
             }
 
             recentActivityList.add( fileUpload.getStartDate() );
@@ -4469,6 +4483,25 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     }
 
 
+    @Override
+    public int updateFileUploadStatus(long fileUploadId, int status) throws InvalidInputException {
+        int affectedColumns = 0;
+        LOG.info("updateFileUploadStatus() method started");
+        affectedColumns = fileUploadDao.updateStatus(fileUploadId,status);
+        LOG.info("updateFileUploadStatus() method completed");
+        return affectedColumns;
+    }
+
+    @Override
+    public int updateFileUploadStatusAndFileName(long fileUploadId, int status, String location) throws InvalidInputException {
+        int affectedColumns = 0;
+        LOG.info("updateFileUploadStatusAndFileName() method started");
+        affectedColumns = fileUploadDao.updateStatusAndFileName(fileUploadId,status,location);
+        LOG.info("updateFileUploadStatusAndFileName() method completed");
+        return affectedColumns;
+    }
+
+    
     @SuppressWarnings ( "unchecked")
     private Map<Long, Long> getTotalTransactionCountForPast5Days()
     {

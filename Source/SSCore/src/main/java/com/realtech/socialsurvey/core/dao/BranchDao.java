@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.dao;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.realtech.socialsurvey.core.entities.Branch;
@@ -27,4 +28,7 @@ public interface BranchDao extends GenericDao<Branch, Long> {
 
 
 	List<Branch> getBranchesForRegion(long regionId, int isDefault, int start, int batch) throws InvalidInputException;
+
+	Map<String, String> getBranchAndRegionName(long regionId, long branchId) throws InvalidInputException;
+
 }

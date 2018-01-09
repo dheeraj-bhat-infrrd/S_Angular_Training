@@ -330,6 +330,7 @@
 	.hierarchy-btn{
 	float:none;
 	margin-top:10px;
+	margin-left: -6px;
 	}
 	.widget-code{
     float:none !important;
@@ -394,6 +395,9 @@
 	float: none;
 	}
 
+	.ver-resp {
+	margin-bottom: 30px !important;
+	}
 	.comp-mail-thrs-txt {
 		margin-right: 4px;
 	}	

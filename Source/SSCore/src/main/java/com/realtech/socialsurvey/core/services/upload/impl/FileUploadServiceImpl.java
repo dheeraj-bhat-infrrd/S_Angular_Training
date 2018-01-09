@@ -142,10 +142,17 @@ public class FileUploadServiceImpl implements FileUploadService
 
 
     @Override
-    public void uploadFileAtSpeicifiedBucket( File file, String fileName, String bucketName, boolean expireImmediately )
+    public void uploadFileAtSpecifiedBucket( File file, String fileName, String bucketName, boolean expireImmediately )
         throws NonFatalException
     {
 
+    }
+    
+    
+    @Override
+    public String uploadOldReport( File file, String fileName ) throws NonFatalException
+    {
+        return null;
     }
 
 

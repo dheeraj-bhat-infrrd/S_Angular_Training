@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.dao;
 import java.util.List;
 
 import com.realtech.socialsurvey.core.entities.FileUpload;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
 public interface FileUploadDao extends GenericDao<FileUpload, Long>
 {
@@ -20,4 +21,7 @@ public interface FileUploadDao extends GenericDao<FileUpload, Long>
 	 */
 	FileUpload getLatestActivityForReporting(Long entityId);
 
+	int updateStatus(long filUploadId, int status) throws InvalidInputException;
+
+    int updateStatusAndFileName( long fileUploadId, int status, String location ) throws InvalidInputException;
 }

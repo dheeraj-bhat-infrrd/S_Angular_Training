@@ -239,7 +239,7 @@ public class OrganizationManagementController
     /**
      * Method to call service for adding company information for a user
      * 
-     * @param model
+     * @param redirectAttributes
      * @param request
      * @return
      */
@@ -2908,6 +2908,14 @@ public class OrganizationManagementController
         LOG.info( "Retrieved complete url for the ID : " + completeUrl );
         LOG.info( "Method to resolve shortened url sent in mail,mailUrlResolution() ended." );
 
+        //call the streamApi recieveSendGridEvents for click tracking
+        String uuid = request.getParameter("u");
+        if( uuid != null && !uuid.isEmpty() ) {
+            LOG.info( "Found UUID : " + uuid );
+            urlService.sendClickEvent(uuid);
+        }
+
+
         // Redirect to complete url found based on the ID.
         return "redirect:" + completeUrl;
     }
@@ -3051,6 +3059,7 @@ public class OrganizationManagementController
             User user = sessionHelper.getCurrentUser();
             String uploadType = request.getParameter( "uploadType" );
             String ignoreWarningStr = request.getParameter( "isWarningToBeIgnored" );
+            String verifyOnly = request.getParameter( "verifyOnly" );
 
             if( user.getIsOwner() != CommonConstants.STATUS_ACTIVE ){
                 throw new InvalidInputException( "Sorry, only a company admin or social survey admin can initiate hierarchy upload." );
@@ -3059,6 +3068,9 @@ public class OrganizationManagementController
             } else if ( StringUtils.isEmpty( ignoreWarningStr )
                 || !Arrays.asList( "true", "false" ).contains( ignoreWarningStr.trim() ) ) {
                 throw new InvalidInputException( "Please specify if warnings are to be ignored." );
+            } else if( StringUtils.isEmpty( verifyOnly )
+                || !Arrays.asList( "true", "false" ).contains( verifyOnly.trim() ) ){
+                throw new InvalidInputException( "Please specify whether to abort after verification." );
             }
 
             ParsedHierarchyUpload uploadStatus = hierarchyUploadService
@@ -3070,6 +3082,7 @@ public class OrganizationManagementController
                 uploadStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_STATUS_INITIATED );
                 uploadStatus.setInAppendMode( "append".equals( uploadType ) ? true : false );
                 uploadStatus.setWarningToBeIgnored( Boolean.parseBoolean( ignoreWarningStr.trim() ) );
+                uploadStatus.setVerifyOnly( Boolean.parseBoolean( verifyOnly.trim() ) );
                 hierarchyUploadService.reinsertParsedHierarchyUpload( uploadStatus );
                 response = uploadStatus;
             }

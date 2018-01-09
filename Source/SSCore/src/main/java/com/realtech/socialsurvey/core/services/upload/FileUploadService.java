@@ -68,7 +68,7 @@ public interface FileUploadService
      * @param expireImmediately
      * @throws NonFatalException
      */
-    public void uploadFileAtSpeicifiedBucket( File file, String fileName, String bucketName, boolean expireImmediately )
+    public void uploadFileAtSpecifiedBucket( File file, String fileName, String bucketName, boolean expireImmediately )
         throws NonFatalException;
 
 
@@ -82,6 +82,16 @@ public interface FileUploadService
      */
     public String uploadLogoImageFile( File file, String imageName, boolean preserveFileName ) throws InvalidInputException;
 
+    /**
+     * Uploads file to the old report directory and returns the URL of the uploaded file
+     * 
+     * @param file
+     * @param fileName
+     * @return
+     * @throws NonFatalException
+     */
+    public String uploadOldReport( File file, String fileName ) throws NonFatalException;
+    
 
     public void uploadReport( File file, String fileName ) throws NonFatalException;
 

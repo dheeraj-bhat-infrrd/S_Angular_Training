@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.realtech.socialsurvey.core.entities.EmailAttachment;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -105,9 +107,9 @@ public class HelpController {
             }
     	    
     		List<MultipartFile> attachmentList = new ArrayList<MultipartFile>();
-    		Map<String , String > attachmentsDetails = userSupportService.saveAttachmentLocally(attachmentList);
+    		List<EmailAttachment> attachments = userSupportService.saveAttachmentLocally(attachmentList);
     		
-    		userSupportService.sendHelpMailToAdmin( emailId, user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), subject, mailText, attachmentsDetails );
+    		userSupportService.sendHelpMailToAdmin( emailId, user.getFirstName() + ( user.getLastName() != null ? " " + user.getLastName() : "" ), subject, mailText, attachments);
 
     	}catch(NonFatalException e){
     		LOG.error("Erroe in sending the help mail : " + e.getMessage());
