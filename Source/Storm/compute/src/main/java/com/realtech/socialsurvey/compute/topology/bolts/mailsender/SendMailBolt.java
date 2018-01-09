@@ -259,9 +259,6 @@ public class SendMailBolt extends BaseComputeBoltWithAck
                         if ( emailMessage.getSendEmailThrough() == null || emailMessage.getSendEmailThrough().isEmpty() ) {
                             LOG.debug( "Mail to be sent through social survey me account." );
                             emailMessage.setSendEmailThrough( ComputeConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_ME );
-                        } else {
-                            LOG.debug( "Mail to be sent through social survey us account." );
-                            emailMessage.setSendEmailThrough( ComputeConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_US );
                         }
                         String responseId = sendMail( emailMessage );
                         LOG.debug( "Mail sent successfully. Now updating the mail attempted time" );
