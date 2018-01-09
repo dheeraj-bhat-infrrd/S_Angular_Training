@@ -1,0 +1,120 @@
+logging:
+  level:
+    org.springframework: ERROR
+    org.apache.kafka: ERROR
+    com.realtech.socialsurvey.stream: INFO
+
+server:
+  port: 8082
+  context-path: /streamapi
+   
+spring:
+  data:
+    mongodb:
+      database: stream_db
+  profiles:
+    active: "dev"
+
+kafka:
+  topic:
+    emailMessageTopic: mail-topic
+    solrTopic: solr-topic
+    emailEventsTopic: mail-events-topic
+    emailReportTopic: mail-report-topic
+
+---
+
+spring:
+  profiles: dev
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017
+
+logging:
+  level:
+    org.springframework: INFO
+    com.realtech.socialsurvey.stream: DEBUG
+ 
+management:
+  security:
+    enabled: false
+      
+kafka:
+  brokerAddress: localhost:9092
+  topic:
+    emailMessageTopic: mail-topic-dev
+    solrTopic: solr-topic-dev
+    emailEventsTopic: mail-events-topic-dev
+    emailReportTopic: mail-report-topic-dev
+
+---
+
+logging:
+  config: /opt/webapp/stream-logconfig.xml
+  
+spring:
+  profiles: demo
+  data:
+    mongodb:
+      uri: mongodb://172.30.0.186:27017
+
+management:
+  security:
+    enabled: false
+    
+kafka:
+  brokerAddress: localhost:9092
+  topic:
+    emailMessageTopic: mail-topic-demo
+    solrTopic: solr-topic-demo
+    emailEventsTopic: mail-events-topic-demo
+    emailReportTopic: mail-report-topic-demo
+
+---
+
+server:
+  port: 8083
+  
+logging:
+  config: /opt/webapp/stream-logconfig-stage.xml
+  
+spring:
+  profiles: stage
+  data:
+    mongodb:
+      uri: mongodb://172.30.0.38:27017
+
+management:
+  security:
+    enabled: false
+    
+kafka:
+  brokerAddress: localhost:9092
+  topic:
+    emailMessageTopic: mail-topic-stage
+    solrTopic: solr-topic-stage
+    emailEventsTopic: mail-events-topic-stage
+    emailReportTopic: mail-report-topic-stage
+
+---
+
+server:
+  port: 8080
+
+logging:
+  config: /opt/webapp/stream-logconfig.xml
+
+spring:
+  profiles: prod
+  data:
+    mongodb:
+      uri: mongodb://172.30.0.165:27017,172.30.0.139:27017,172.30.0.44:27017/?replicaSet=rsSocial
+
+management:
+  port: 8081
+  security:
+    enabled: false
+
+kafka:
+  brokerAddress: 172.30.0.48:9092
+

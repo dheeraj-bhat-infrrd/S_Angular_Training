@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,14 +25,17 @@ import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.EmailDao;
+import com.realtech.socialsurvey.core.entities.EmailAttachment;
 import com.realtech.socialsurvey.core.entities.EmailEntity;
 import com.realtech.socialsurvey.core.entities.EmailObject;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.mail.EmailSender;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
+import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 
 
 @Component
@@ -61,6 +65,9 @@ public class EmailProcessor implements Runnable
 
     @Autowired
     private EmailServices emailServices;
+    
+    @Autowired
+    private FileUploadService fileUploadService;
 
     @Autowired
     private EmailSender emailSender;
@@ -190,12 +197,28 @@ public class EmailProcessor implements Runnable
                 excelCreated = false;
             }
         }
-        try {
-            if ( excelCreated ) {
-                Map<String, String> attachmentsDetails = new HashMap<String, String>();
-                attachmentsDetails.put( "InvalidEmails.xls", filePath );
+        
+        
+        boolean excelUploaded = false;
+        if ( excelCreated ) {
+            try {
+                filePath = fileUploadService.uploadOldReport( file, fileName );
+                
+                excelUploaded = true;
+            } catch ( NonFatalException e ) {
+                LOG.error( "Exception caught while uploading old report", e);
+            }
+            LOG.debug( "fileUpload on s3 step is done for filename : {}", fileName );
+        } else {
+            LOG.warn( "Could not write into file {}", fileName );
+        }
 
-                emailServices.sendInvalidEmailsNotificationMail( adminName, "", adminEmailId, attachmentsDetails );
+        try {
+            if ( excelCreated && excelUploaded) {
+                List<EmailAttachment> attachments = new ArrayList<EmailAttachment>();
+                attachments.add( new EmailAttachment("InvalidEmails.xls", filePath) );
+                
+                emailServices.sendInvalidEmailsNotificationMail( adminName, "", adminEmailId, attachments);
 
             }
         } catch ( InvalidInputException | UndeliveredEmailException e ) {

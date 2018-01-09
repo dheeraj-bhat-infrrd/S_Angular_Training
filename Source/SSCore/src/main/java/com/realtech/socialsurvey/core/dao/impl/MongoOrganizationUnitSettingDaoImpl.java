@@ -113,6 +113,9 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_SEND_MONTHLY_DIGEST_MAIL = "sendMonthlyDigestMail";
     public static final String KEY_HIDE_PUBLIC_PAGE = "hidePublicPage";
     public static final String KEY_INCLUDE_FOR_TRANSACTION_MONITOR = "includeForTransactionMonitor";
+    public static final String KEY_FILTER_KEYWORDS = "filterKeywords";
+
+
     public static final String KEY_DIGEST_RECIPIENTS = "digestRecipients";
     public static final String KEY_ENTITY_ALERT_DETAILS = "entityAlertDetails";
     public static final String KEY_IS_ERROR_ALERT = "isErrorAlert";

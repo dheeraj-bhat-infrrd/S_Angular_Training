@@ -48,6 +48,7 @@ import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.EmailAttachment;
 import com.realtech.socialsurvey.core.entities.FeedStatus;
 import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.HierarchyUploadAggregate;
@@ -61,6 +62,7 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.DashboardService;
@@ -69,6 +71,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileMan
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
+import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.services.upload.HierarchyDownloadService;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookData;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookOperations;
@@ -137,7 +140,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
 
     @Value ( "${APPLICATION_BASE_URL}")
     private String applicationBaseUrl;
-
+    
     @Autowired
     private WorkbookOperations workbookOperations;
 
@@ -149,6 +152,9 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
 
     @Autowired
     private UserManagementService userManagementService;
+    
+    @Autowired
+    private FileUploadService fileUploadService;
 
 
     @Transactional
@@ -1955,10 +1961,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
             excelCreated = true;
         } catch ( FileNotFoundException fe ) {
             LOG.error( "Exception caught while generating report " + fileName + ": " + fe.getMessage() );
-            excelCreated = false;
         } catch ( IOException e ) {
             LOG.error( "Exception caught while generating report " + fileName + ": " + e.getMessage() );
-            excelCreated = false;
         } finally {
             try {
                 if ( fileOutput != null )
@@ -1971,11 +1975,23 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                 excelCreated = false;
             }
         }
+        
+        boolean excelUploaded = false;
+        if ( excelCreated ) {
+            try {
+                filePath = fileUploadService.uploadOldReport( file, fileName );
+                
+                excelUploaded = true;
+            } catch ( NonFatalException e ) {
+                LOG.error( "Exception caught while uploading old report", e);
+            }
+            LOG.debug( "fileUpload on s3 step is done for filename : {}", fileName );
+        }
 
         // Mail the report to the admin
-        if ( excelCreated ) {
-            Map<String, String> attachmentsDetails = new HashMap<String, String>();
-            attachmentsDetails.put( fileName, filePath );
+        if ( excelCreated && excelUploaded) {
+            List<EmailAttachment> attachments = new ArrayList<EmailAttachment>();
+            attachments.add( new EmailAttachment(fileName, filePath) );
             String mailId = null;
             if ( recipientMailId == null || recipientMailId.isEmpty() ) {
                 mailId = adminEmailId;
@@ -1991,7 +2007,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
             }
 
             LOG.debug( "sending mail to : " + name + " at : " + mailId );
-            emailServices.sendCustomMail( name, mailId, subject, body, attachmentsDetails );
+            emailServices.sendCustomMail( name, mailId, subject, body, attachments );
         }
     }
 }

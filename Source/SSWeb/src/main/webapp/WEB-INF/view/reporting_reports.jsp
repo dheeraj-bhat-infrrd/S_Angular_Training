@@ -47,6 +47,7 @@
   								<option value=<spring:message code="label.survey.results.report.value" /> data-report="survey-results"><spring:message code="label.survey.results.report.key" /></option>
  								<option value=<spring:message code="label.survey.transaction.report.value" /> data-report="survey-transaction-summary"><spring:message code="label.survey.transaction.report.key" /></option>
  								<option value=<spring:message code="label.incomplete.survey.report.value" /> data-report="incomplete-survey-report"><spring:message code="label.incomplete.survey.report.key" /></option>
+								<option value=<spring:message code="label.survey.invitation.email.report.value" /> data-report="survey-invitation-email-report"><spring:message code="label.survey.invitation.email.report.key" /></option>
 						</select>	
 					</div>
 					<div id="report-time-div" class="float-left board-div hide">

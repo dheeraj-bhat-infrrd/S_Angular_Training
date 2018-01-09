@@ -1,0 +1,132 @@
+package com.realtech.socialsurvey.compute.topology.spouts;
+
+import org.apache.storm.kafka.KafkaSpout;
+import org.apache.storm.kafka.SpoutConfig;
+import org.apache.storm.kafka.StringScheme;
+import org.apache.storm.kafka.ZkHosts;
+import org.apache.storm.spout.SchemeAsMultiScheme;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.realtech.socialsurvey.compute.common.ComputeConstants;
+import com.realtech.socialsurvey.compute.common.EnvConstants;
+import com.realtech.socialsurvey.compute.common.LocalPropertyFileHandler;
+import com.realtech.socialsurvey.compute.utils.ChararcterUtils;
+
+
+/**
+ * Builds Kafka spouts for Storm topologies
+ * @author nishit
+ *
+ */
+public class KafkaTopicSpoutBuilder
+{
+
+    // Private constructor to avoid instantiation
+    private KafkaTopicSpoutBuilder()
+    {}
+
+    private static final Logger LOG = LoggerFactory.getLogger( KafkaTopicSpoutBuilder.class );
+
+    private static String ZOOKEEPER_BROKERS;
+    private static final String ZOOKEEPER_ROOT = "";
+
+    // SendGrid Event Spout
+    private static final String SENDGRID_EVENT_TOPIC = "mail-events-topic";
+    private static final String SENDGRID_EVENT_CONSUMER_GROUP = "sgecg01";
+
+    // Email topic spout
+    private static final String MAIL_TOPIC = "mail-topic";
+    private static final String MAIL_CONSUMER_GROUP = "mcg01";
+    
+    // Socail post topic
+    private static final String SOCIAL_POST_TOPIC = "social-post-topic";
+    private static final String SOCIAL_POST_CONSUMER_GROUP = "spcg01";
+
+    //Email report topic
+    private static final String EMAIL_REPORT_TOPIC = "mail-report-topic";
+    private static final String EMAIL_REPORT_CONSUMER_GROUP = "mrcg01";
+    
+    
+    public static void loadProperties(){
+        ZOOKEEPER_BROKERS = LocalPropertyFileHandler.getInstance()
+            .getProperty( ComputeConstants.APPLICATION_PROPERTY_FILE, ComputeConstants.ZOOKEEPER_BROKERS_ENDPOINT ).orElse( null );
+    }
+
+
+    /**
+     * Sendgrid kafka spout
+     * @return
+     */
+    public static KafkaSpout sendGridEventTopicSpout()
+    {
+        loadProperties();
+        ZkHosts zkHosts = new ZkHosts( ZOOKEEPER_BROKERS );
+        String topicName = ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? SENDGRID_EVENT_TOPIC
+            : ChararcterUtils.appendWithHypen( SENDGRID_EVENT_TOPIC, EnvConstants.getProfile() );
+        String consumerGroup = ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? SENDGRID_EVENT_CONSUMER_GROUP
+            : ChararcterUtils.appendWithHypen( SENDGRID_EVENT_CONSUMER_GROUP, EnvConstants.getProfile() );
+        SpoutConfig sendGridEventSpoutConfig = new SpoutConfig( zkHosts, topicName, ZOOKEEPER_ROOT, consumerGroup );
+        sendGridEventSpoutConfig.ignoreZkOffsets = false;
+        sendGridEventSpoutConfig.scheme = new SchemeAsMultiScheme( new StringScheme() );
+        LOG.info( "Sendgrid spout initiated. Topic: {}, Consumer Group: {}", topicName, consumerGroup );
+        return new KafkaSpout( sendGridEventSpoutConfig );
+    }
+
+
+    /**
+     * Email topic kafka spout
+     */
+    public static KafkaSpout emailTopicKafkaSpout()
+    {
+        loadProperties();
+        ZkHosts zkHosts = new ZkHosts( ZOOKEEPER_BROKERS );
+        String topicName = ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? MAIL_TOPIC
+            : ChararcterUtils.appendWithHypen( MAIL_TOPIC, EnvConstants.getProfile() );
+        String consumerGroup = ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? MAIL_CONSUMER_GROUP
+            : ChararcterUtils.appendWithHypen( MAIL_CONSUMER_GROUP, EnvConstants.getProfile() );
+        SpoutConfig mailSpoutConfig = new SpoutConfig( zkHosts, topicName, ZOOKEEPER_ROOT, consumerGroup );
+        mailSpoutConfig.ignoreZkOffsets = false;
+        //long startOffsetTime = kafka.api.OffsetRequest.LatestTime();
+        //LOG.info( "startOffsetTime {}", startOffsetTime );
+        //mailSpoutConfig.startOffsetTime = startOffsetTime;
+        mailSpoutConfig.scheme = new SchemeAsMultiScheme( new StringScheme() );
+        LOG.info( "Mail topic spout initiated. Topic: {}, Consumer Group: {}", topicName, consumerGroup );
+        return new KafkaSpout( mailSpoutConfig );
+    }
+    
+    /**
+     * Social post topic kafka spout
+     */
+    public static KafkaSpout socialPostTopicKafkaSpout()
+    {
+        loadProperties();
+        ZkHosts zkHosts = new ZkHosts( ZOOKEEPER_BROKERS );
+        String topicName = ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? SOCIAL_POST_TOPIC
+            : ChararcterUtils.appendWithHypen( SOCIAL_POST_TOPIC, EnvConstants.getProfile() );
+        String consumerGroup = ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? SOCIAL_POST_CONSUMER_GROUP
+            : ChararcterUtils.appendWithHypen( SOCIAL_POST_CONSUMER_GROUP, EnvConstants.getProfile() );
+        SpoutConfig socialPostSpoutConfig = new SpoutConfig( zkHosts, topicName, ZOOKEEPER_ROOT, consumerGroup );
+        socialPostSpoutConfig.ignoreZkOffsets = true;
+        socialPostSpoutConfig.scheme = new SchemeAsMultiScheme( new StringScheme() );
+        LOG.info( "Social post topic spout initiated. Topic: {}, Consumer Group: {}",  topicName, consumerGroup );
+        return new KafkaSpout( socialPostSpoutConfig );
+    }
+
+    /**
+     * Email report topic kafka spout
+     */
+    public static  KafkaSpout emailReportGenerationSpout() {
+        loadProperties();
+        ZkHosts zkHosts = new ZkHosts( ZOOKEEPER_BROKERS );
+        String topicName = ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? EMAIL_REPORT_TOPIC
+                : ChararcterUtils.appendWithHypen( EMAIL_REPORT_TOPIC, EnvConstants.getProfile() );
+        String consumerGroup = ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? EMAIL_REPORT_CONSUMER_GROUP
+                : ChararcterUtils.appendWithHypen( EMAIL_REPORT_CONSUMER_GROUP, EnvConstants.getProfile() );
+        SpoutConfig emailReportSpoutConfig = new SpoutConfig( zkHosts, topicName, ZOOKEEPER_ROOT, consumerGroup );
+        emailReportSpoutConfig.ignoreZkOffsets = false;
+        emailReportSpoutConfig.scheme = new SchemeAsMultiScheme( new StringScheme() );
+        LOG.info( "Email report topic spout initiated. Topic: {}, Consumer Group: {}", topicName, consumerGroup );
+        return new KafkaSpout( emailReportSpoutConfig );
+    }
+}

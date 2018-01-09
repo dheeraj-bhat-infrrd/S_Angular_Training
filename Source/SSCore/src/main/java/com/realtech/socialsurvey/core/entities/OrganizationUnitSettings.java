@@ -83,6 +83,20 @@ public class OrganizationUnitSettings implements Serializable
 
     // flag that decides whether to send the monthly digest mail
     private boolean sendMonthlyDigestMail;
+    
+    private List<Keyword> filterKeywords;
+
+    public List<Keyword> getFilterKeywords()
+    {
+        return filterKeywords;
+    }
+
+
+    public void setFilterKeywords( List<Keyword> filterKeywords )
+    {
+        this.filterKeywords = filterKeywords;
+    }
+
 
     //alert details
     private EntityAlertDetails entityAlertDetails;

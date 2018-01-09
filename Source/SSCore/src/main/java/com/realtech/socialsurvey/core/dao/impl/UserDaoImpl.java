@@ -550,6 +550,37 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
         LOG.info( "Method getUsersCountForCompanies() finished." );        
         return activeUserCountsMap;
     }
+
+
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public List<String> getRegisteredEmailsInTheCompany( Company company ) throws InvalidInputException
+    {
+        if ( company == null ) {
+            throw new InvalidInputException( "Invalid company id passed in getRegisteredEmailsInTheCompany method" );
+        }
+        LOG.info( "Method to get all user emails address under  company id : {} started.", company.getCompanyId() );
+        Criteria criteria = null;
+        try {
+            criteria = getSession().createCriteria( User.class );
+            criteria.setProjection( Projections.property( CommonConstants.EMAIL_ID ) );
+            criteria.add( Restrictions.eq( CommonConstants.COMPANY_COLUMN , company));
+
+            Criterion criterion = Restrictions.or(
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ),
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED ),
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_TEMPORARILY_INACTIVE ),
+                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_INCOMPLETE ) );
+
+            criteria.add( criterion );
+            
+            LOG.info( "Method to get all user emails address under  company id : {} ended.", company.getCompanyId() );
+            return criteria.list();
+    } catch ( HibernateException hibernateException ) {
+        LOG.warn( "Exception caught in getRegisteredEmailsInTheCompany() ", hibernateException );
+        throw new DatabaseException( "Exception caught in getRegisteredEmailsInTheCompany() ", hibernateException );
+    }
+    }
     
 }
 // JIRA SS-42 By RM-05 EOC

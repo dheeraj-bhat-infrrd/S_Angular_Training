@@ -7,8 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFDataFormat;
@@ -28,6 +30,8 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 @Component
 public class WorkbookOperations
 {
+
+    private static final DataFormatter dataFormatter = new DataFormatter();
 
     /**
      * Method to create workbook
@@ -236,6 +240,14 @@ public class WorkbookOperations
             if ( cell.getCellType() == Cell.CELL_TYPE_STRING ) {
                 cell.setCellValue( cell.getStringCellValue().trim() );
             }
+        }
+    }
+    
+    public String getStringValue( Cell cell ){
+        if( cell == null ){
+            return "";
+        } else {
+            return StringUtils.trimToEmpty( dataFormatter.formatCellValue( cell ) );
         }
     }
 
