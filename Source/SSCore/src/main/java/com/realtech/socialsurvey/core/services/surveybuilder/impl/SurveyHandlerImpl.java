@@ -571,7 +571,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         if ( surveyPreInitiation != null ) {
             surveyPreInitiation.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
             surveyPreInitiation.setLastReminderTime( new Timestamp( System.currentTimeMillis() ) );
-            surveyPreInitiation.setIsSurveyRequestSent( 1 );
+            surveyPreInitiation.setIsSurveyRequestSent( CommonConstants.IS_SURVEY_REQUEST_SENT_TRUE );
             surveyPreInitiationDao.merge( surveyPreInitiation );
         }
         LOG.debug( "Method to increase reminder count by 1, updateReminderCount() finished." );
@@ -2333,6 +2333,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyPreInitiation.setReminderCounts( 0 );
         surveyPreInitiation.setStatus( CommonConstants.SURVEY_STATUS_PRE_INITIATED );
         surveyPreInitiation.setSurveySource( source );
+        surveyPreInitiation.setIsSurveyRequestSent( CommonConstants.IS_SURVEY_REQUEST_SENT_TRUE );
         surveyPreInitiation = surveyPreInitiationDao.save( surveyPreInitiation );
 
         LOG.debug( "Method preInitiateSurvey() finished." );
