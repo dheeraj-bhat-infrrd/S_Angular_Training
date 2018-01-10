@@ -3306,12 +3306,11 @@ public class OrganizationManagementController
                 throw new NonFatalException( "Insufficient permission for this process" );
             }
 
-
+    			//check if there is an agent already in system( User with agent profile) 
             try {
-                User existingUser = userManagementService.getUserByEmailAndCompany( sessionHelper.getCurrentUser().getCompany().getCompanyId() , emailAddress );
-                if ( existingUser != null )
-                    throw new UserAlreadyExistsException(
-                        "The email addresss " + emailAddress + " is already present in our database." );
+                User existingUser = userManagementService.getActiveAgentByEmailAndCompany( sessionHelper.getCurrentUser().getCompany().getCompanyId() , emailAddress );
+                if ( existingUser != null ) 
+                    throw new UserAlreadyExistsException("The email addresss " + emailAddress + " is already present in our database." );            
             } catch ( NoRecordsFetchedException e ) {
                 if ( ignoredEmail ) {
                     userManagementService.saveIgnoredEmailCompanyMappingAndUpdateSurveyPreinitiation( emailAddress,
@@ -3515,10 +3514,11 @@ public class OrganizationManagementController
 
             for ( String emailId : emailIdList ) {
                 try {
-                    User existingUser = userManagementService.getUserByEmailAddress( emailId );
-                    if ( existingUser != null )
-                        throw new UserAlreadyExistsException(
-                            "The email addresss " + emailId + " is already present in our database." );
+            			//check if there is an agent already in system( User with agent profile)
+                    User existingUser = userManagementService.getActiveAgentByEmailAndCompany(sessionHelper.getCurrentUser().getCompany().getCompanyId() , emailId );
+                    if ( existingUser != null ) {
+                        		throw new UserAlreadyExistsException("The email addresss " + emailId + " is already present in our database." );
+                    }
                 } catch ( NoRecordsFetchedException e ) {
                     userManagementService.saveEmailUserMappingAndUpdateAgentIdInSurveyPreinitiation( emailId, agentId );
 
