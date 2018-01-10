@@ -5767,11 +5767,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             branchProfile, individualProfile, map, true );
 
         // aggregated disclaimer
-        if ( ( CommonConstants.REGION_ID.equals( entityId ) || CommonConstants.BRANCH_ID.equals( entityId ) ) ) {
             String disclaimer = aggregateDisclaimer( profileUnderConcern, entityId );
             if ( StringUtils.isNotEmpty( disclaimer ) )
                 profileUnderConcern.setDisclaimer( disclaimer );
-        }
+        
 
         //remove sensitive info from profile JSON from company profile 
         removeTokensFromProfile( companyProfile );
