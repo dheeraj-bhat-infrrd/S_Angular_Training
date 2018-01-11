@@ -3,7 +3,7 @@ package com.realtech.socialsurvey.core.entities;
 import java.io.Serializable;
 // JIRA: SS-7: By RM02: BOC
 import java.util.List;
-import java.util.Map;
+import java.util.UUID;
 
 
 /**
@@ -24,6 +24,7 @@ public class EmailEntity implements Serializable
     public static final int RECIPIENT_TYPE_CC = 1;
     public static final int RECIPIENT_TYPE_BCC = 2;
 
+    private String randomUUID = UUID.randomUUID().toString();
     private List<String> recipients;
     private String subject;
     private String body;
@@ -32,21 +33,39 @@ public class EmailEntity implements Serializable
     private String senderName;
     private String senderPassword;
     private String sendEmailThrough;
-    
-    private Map<String , String> attachmentDetail;
+    private String mailType;
+    private long companyId;
+    private boolean sendMailToSalesLead;
+    private boolean holdSendingMail;
+    private List<EmailAttachment> attachments;
+    private String surveySourceId;
+    private List<String> recipientsName;
+    private String branchName;
+    private String regionName;
+    private long branchId;
+    private long regionId;
+    private long agentId;
+    private String agentEmailId;
+
+    public String getRandomUUID()
+    {
+        return this.randomUUID;
+    }
 
 
+    public List<EmailAttachment> getAttachments()
+    {
+        return attachments;
+    }
 
-	public Map<String, String> getAttachmentDetail() {
-		return attachmentDetail;
-	}
+
+    public void setAttachments( List<EmailAttachment> attachments )
+    {
+        this.attachments = attachments;
+    }
 
 
-	public void setAttachmentDetail(Map<String, String> attachmentDetail) {
-		this.attachmentDetail = attachmentDetail;
-	}
-
-	public List<String> getRecipients()
+    public List<String> getRecipients()
     {
         return recipients;
     }
@@ -128,27 +147,158 @@ public class EmailEntity implements Serializable
     {
         this.senderPassword = senderPassword;
     }
-    
+
+
     public String getSendEmailThrough()
     {
         return sendEmailThrough;
     }
-    
-    public void setSendEmailThrough ( String sendEmailThrough )
+
+
+    public void setSendEmailThrough( String sendEmailThrough )
     {
         this.sendEmailThrough = sendEmailThrough;
     }
 
 
-
-    @Override
-    public String toString()
+    public String getMailType()
     {
-        return "EmailEntity [recipients=" + recipients + ", subject=" + subject + ", body=" + body + ", recipientType="
-            + recipientType + ", senderEmailId=" + senderEmailId + ", senderName=" + senderName;
+        return mailType;
     }
 
 
+    public void setMailType( String mailType )
+    {
+        this.mailType = mailType;
+    }
+
+
+    public long getCompanyId()
+    {
+        return companyId;
+    }
+
+
+    public void setCompanyId( long companyId )
+    {
+        this.companyId = companyId;
+    }
+
+
+    public boolean isSendMailToSalesLead()
+    {
+        return sendMailToSalesLead;
+    }
+
+
+    public void setSendMailToSalesLead( boolean sendMailToSalesLead )
+    {
+        this.sendMailToSalesLead = sendMailToSalesLead;
+    }
+
+
+    public boolean isHoldSendingMail()
+    {
+        return holdSendingMail;
+    }
+
+
+    public void setHoldSendingMail( boolean holdSendingMail )
+    {
+        this.holdSendingMail = holdSendingMail;
+    }
+
+    public String getSurveySourceId() {
+        return surveySourceId;
+    }
+
+    public void setSurveySourceId(String surveySourceId) {
+        this.surveySourceId = surveySourceId;
+    }
+
+    public List<String> getRecipientsName() {
+        return recipientsName;
+    }
+
+    public void setRecipientsName(List<String> recipientsName) {
+        this.recipientsName = recipientsName;
+    }
+
+    public String getBranchName() {
+        return branchName;
+    }
+
+    public void setBranchName(String branchName) {
+        this.branchName = branchName;
+    }
+
+    public String getRegionName() {
+        return regionName;
+    }
+
+    public void setRegionName(String regionName) {
+        this.regionName = regionName;
+    }
+
+    public long getBranchId() {
+        return branchId;
+    }
+
+    public void setBranchId(long branchId) {
+        this.branchId = branchId;
+    }
+
+    public long getRegionId() {
+        return regionId;
+    }
+
+    public void setRegionId(long regionId) {
+        this.regionId = regionId;
+    }
+
+    public long getAgentId() {
+        return agentId;
+    }
+
+    public void setAgentId(long agentId) {
+        this.agentId = agentId;
+    }
+
+    public String getAgentEmailId() {
+        return agentEmailId;
+    }
+
+    public void setAgentEmailId(String agentEmailId) {
+        this.agentEmailId = agentEmailId;
+    }
+
+    @Override
+    public String toString() {
+        return "EmailEntity{" +
+                "randomUUID='" + randomUUID + '\'' +
+                ", recipients=" + recipients +
+                ", subject='" + subject + '\'' +
+                ", body='" + body + '\'' +
+                ", recipientType=" + recipientType +
+                ", senderEmailId='" + senderEmailId + '\'' +
+                ", senderName='" + senderName + '\'' +
+                ", senderPassword='" + senderPassword + '\'' +
+                ", sendEmailThrough='" + sendEmailThrough + '\'' +
+                ", mailType='" + mailType + '\'' +
+                ", companyId=" + companyId +
+                ", sendMailToSalesLead=" + sendMailToSalesLead +
+                ", holdSendingMail=" + holdSendingMail +
+                ", attachments=" + attachments +
+                ", surveySourceId='" + surveySourceId + '\'' +
+                ", recipientsName=" + recipientsName +
+                ", branchName='" + branchName + '\'' +
+                ", regionName='" + regionName + '\'' +
+                ", branchId=" + branchId +
+                ", regionId=" + regionId +
+                ", agentId=" + agentId +
+                ", agentEmailId='" + agentEmailId + '\'' +
+                '}';
+    }
 }
 
 // JIRA: SS-7: By RM02: EOC

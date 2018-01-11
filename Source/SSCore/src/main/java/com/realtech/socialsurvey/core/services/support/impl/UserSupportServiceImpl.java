@@ -5,20 +5,22 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.realtech.socialsurvey.core.entities.EmailAttachment;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.support.UserSupportService;
+import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 
 @Component
 public class UserSupportServiceImpl implements UserSupportService {
@@ -34,6 +36,9 @@ public class UserSupportServiceImpl implements UserSupportService {
 
 	@Autowired
 	private EmailServices emailServices;
+    
+    @Autowired
+    private FileUploadService fileUploadService;
 	
 	private static Logger LOG = LoggerFactory.getLogger(UserSupportServiceImpl.class);
 	
@@ -41,7 +46,7 @@ public class UserSupportServiceImpl implements UserSupportService {
 	 * 
 	 */
 	@Override
-	public void sendHelpMailToAdmin( String  senderEmail , String senderName , String mailSubject , String MailText , Map<String , String > attachmentsDetails) throws NonFatalException{
+	public void sendHelpMailToAdmin( String  senderEmail , String senderName , String mailSubject , String MailText , List<EmailAttachment> attachments) throws NonFatalException{
 		
 		LOG.info("Method sendHelpMailToAdmin started.");
 		if(senderEmail == null || senderEmail.isEmpty()){
@@ -52,9 +57,8 @@ public class UserSupportServiceImpl implements UserSupportService {
             throw new InvalidInputException("Sender Name is not valid");
         }
 		
-		
 		try {
-			emailServices.sendHelpMailToAdmin( senderEmail , senderName ,applicationAdminName, mailSubject, MailText, applicationSupportEmail, attachmentsDetails );
+			emailServices.sendHelpMailToAdmin( senderEmail , senderName ,applicationAdminName, mailSubject, MailText, applicationSupportEmail, attachments );
 		} catch (InvalidInputException | UndeliveredEmailException e) {
 			// TODO Auto-generated catch block
 			LOG.info("Exception caught : " + e.getMessage());
@@ -71,9 +75,10 @@ public class UserSupportServiceImpl implements UserSupportService {
 	 * @throws NonFatalException
 	 */
 	@Override
-	public Map<String , String > saveAttachmentLocally(List<MultipartFile> attachmentsList) throws NonFatalException{
+	public List<EmailAttachment> saveAttachmentLocally(List<MultipartFile> attachmentsList) throws NonFatalException{
 		LOG.info("Method saveAttachmentLocally started.");
-		Map<String , String > attachmentsDetails = new HashMap<String, String>();
+		List<EmailAttachment> attachments = new ArrayList<EmailAttachment>();
+        
 		String filePath = null;
 		String fileName = null;
 		if(attachmentsList !=null){
@@ -82,22 +87,23 @@ public class UserSupportServiceImpl implements UserSupportService {
 					try {
 						filePath = saveFileAtDirectoryLocation(attachment);
 						fileName = attachment.getOriginalFilename();
-						attachmentsDetails.put(fileName, filePath);
+						attachments.add( new EmailAttachment(fileName, filePath) );
 					} catch (IOException e) {
-						throw new NonFatalException();
+						throw new NonFatalException("Exception while saving attachment", e);
 					}
 				}
 			}
 		}
 		LOG.info("Method saveAttachmentLocally ended.");
-		return attachmentsDetails;
+		return attachments;
 	}
 	
-	private String saveFileAtDirectoryLocation(MultipartFile oldFile) throws IOException{
+	private String saveFileAtDirectoryLocation(MultipartFile oldFile) throws IOException, NonFatalException{
 		String originalFileName = oldFile.getOriginalFilename();
 		File file = new File( fileDirectoryLocation + File.separator + originalFileName);
 		OutputStream outputStream = null;
 		InputStream inputStream = null;
+		String filePath;
 		try{
 			
 			inputStream = oldFile.getInputStream();
@@ -107,6 +113,9 @@ public class UserSupportServiceImpl implements UserSupportService {
 			while ((chunk = inputStream.read()) != -1) {
 	        	outputStream.write(chunk);
 	        }
+			
+			filePath = fileUploadService.uploadOldReport( file, originalFileName );
+	        
 		}catch(IOException e){
 			LOG.error("Exception caught while saving file: " + e.getMessage());
 			throw e;
@@ -119,6 +128,7 @@ public class UserSupportServiceImpl implements UserSupportService {
 				throw e;
 			}
 		}
-		return file.getPath();
+		
+		return filePath;
 	}
 }

@@ -17,7 +17,6 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +26,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Sets;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
@@ -47,6 +48,7 @@ import com.realtech.socialsurvey.core.entities.HierarchyUploadAggregate;
 import com.realtech.socialsurvey.core.entities.HierarchyUploadIntermediate;
 import com.realtech.socialsurvey.core.entities.Licenses;
 import com.realtech.socialsurvey.core.entities.MailIdSettings;
+import com.realtech.socialsurvey.core.entities.MiscValues;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ParsedHierarchyUpload;
 import com.realtech.socialsurvey.core.entities.Region;
@@ -57,6 +59,8 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserUploadVO;
 import com.realtech.socialsurvey.core.entities.WebAddressSettings;
+import com.realtech.socialsurvey.core.enums.OrganizationUnit;
+import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.BranchAdditionException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -70,8 +74,10 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.UserAssign
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsLocker;
 import com.realtech.socialsurvey.core.services.upload.HierarchyDownloadService;
 import com.realtech.socialsurvey.core.services.upload.HierarchyUploadService;
+import com.realtech.socialsurvey.core.workbook.utils.WorkbookOperations;
 
 
 @Component
@@ -174,6 +180,12 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
     @Autowired
     private OrganizationManagementService organizationManagementService;
 
+    @Autowired
+    private SettingsLocker settingsLocker;
+
+    @Autowired
+    private WorkbookOperations workbookOperations;
+
     @Value ( "${MASK_EMAIL_ADDRESS}")
     private String maskEmail;
 
@@ -219,13 +231,16 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
 
         // ready the iterators
         Iterator<Row> regionsIterator = hierarchyWorkbook.getSheet( REGION_SHEET ) != null
-            ? hierarchyWorkbook.getSheet( REGION_SHEET ).rowIterator() : null;
+            ? hierarchyWorkbook.getSheet( REGION_SHEET ).rowIterator()
+            : null;
 
         Iterator<Row> branchesIterator = hierarchyWorkbook.getSheet( BRANCH_SHEET ) != null
-            ? hierarchyWorkbook.getSheet( BRANCH_SHEET ).rowIterator() : null;
+            ? hierarchyWorkbook.getSheet( BRANCH_SHEET ).rowIterator()
+            : null;
 
         Iterator<Row> usersIterator = hierarchyWorkbook.getSheet( USERS_SHEET ) != null
-            ? hierarchyWorkbook.getSheet( USERS_SHEET ).rowIterator() : null;
+            ? hierarchyWorkbook.getSheet( USERS_SHEET ).rowIterator()
+            : null;
 
 
         // check for the validity of the headers
@@ -271,13 +286,16 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
         if ( !parsedHierarchyUpload.isInAppendMode() ) {
 
             parsedHierarchyUpload.setNumberOfRegionsDeleted( hierarchyIntermediate.getRegions() != null
-                ? hierarchyIntermediate.getRegions().size() - hierarchyIntermediate.getRegionsProcessed() : 0 );
+                ? hierarchyIntermediate.getRegions().size() - hierarchyIntermediate.getRegionsProcessed()
+                : 0 );
 
             parsedHierarchyUpload.setNumberOfBranchesDeleted( hierarchyIntermediate.getBranches() != null
-                ? hierarchyIntermediate.getBranches().size() - hierarchyIntermediate.getBranchesProcessed() : 0 );
+                ? hierarchyIntermediate.getBranches().size() - hierarchyIntermediate.getBranchesProcessed()
+                : 0 );
 
             parsedHierarchyUpload.setNumberOfUsersDeleted( hierarchyIntermediate.getUsers() != null
-                ? hierarchyIntermediate.getUsers().size() - hierarchyIntermediate.getUsersProcessed() : 0 );
+                ? hierarchyIntermediate.getUsers().size() - hierarchyIntermediate.getUsersProcessed()
+                : 0 );
         }
 
         // check for errors or warnings
@@ -288,6 +306,15 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             parsedHierarchyUpload.setStatus( CommonConstants.HIERARCHY_UPLOAD_STATUS_VERIFIED_WITH_ERRORS_OR_WARNINGS );
             hierarchyUploadDao.reinsertParsedHierarchyUpload( parsedHierarchyUpload );
             return false;
+        }
+
+        if ( parsedHierarchyUpload.getVerifyOnly() ) {
+
+            // aborting after verification
+            parsedHierarchyUpload.setStatus( CommonConstants.HIERARCHY_UPLOAD_STATUS_VERIFIED_SUCCESSFULLY );
+            hierarchyUploadDao.reinsertParsedHierarchyUpload( parsedHierarchyUpload );
+            return true;
+
         }
 
 
@@ -562,7 +589,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
         //If sendMail = true, then you need to send the mail. So holdSendingMail should be false.
         try {
             uploadedUser = userManagementService.inviteUserToRegister( adminUser, user.getFirstName(), user.getLastName(),
-                user.getEmailId(), false, user.isSendMail() );
+                user.getEmailId(), true, user.isSendMail() );
 
             if ( uploadedUser == null ) {
                 throw new UserAdditionException( "Unable to add user with emailID : " + user.getEmailId() );
@@ -886,7 +913,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
     @Transactional
     private User modifyUser( HierarchyUploadIntermediate hierarchyIntermediate, UserUploadVO user, User adminUser )
         throws UserAdditionException, InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException,
-        UndeliveredEmailException
+        UndeliveredEmailException, UserAlreadyExistsException
     {
         LOG.info( "Method modifyUser() started for user : " + user.getEmailId() );
         User assigneeUser = null;
@@ -901,17 +928,23 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
         if ( assigneeUser == null ) {
             throw new InvalidInputException( "Couldn't find user : " + user.getSourceUserId() );
         }
-        boolean isEmailModified = false;
 
-        // check and modify user object
+
+        // check and modify email
         if ( user.isEmailModified() ) {
-            assigneeUser.setEmailId( user.getEmailId() );
-            assigneeUser.setLoginName( user.getEmailId() );
-            isEmailModified = true;
-            assigneeUser.setStatus( CommonConstants.STATUS_NOT_VERIFIED );
 
-            // Modify email Ids in userprofile
-            userProfileDao.updateEmailIdForUserProfile( assigneeUser.getUserId(), user.getEmailId() );
+            if ( assigneeUser.getStatus() != CommonConstants.STATUS_ACTIVE ) {
+                assigneeUser.setEmailId( user.getEmailId() );
+                assigneeUser.setLoginName( user.getEmailId() );
+                assigneeUser.setStatus( CommonConstants.STATUS_NOT_VERIFIED );
+
+                // Modify email Ids in userprofile
+                userProfileDao.updateEmailIdForUserProfile( assigneeUser.getUserId(), user.getEmailId() );
+                
+            } else {
+
+                startEmailModificationProcess( assigneeUser, user.getEmailId() );
+            }
         }
 
         assigneeUser.setFirstName( user.getFirstName() );
@@ -920,11 +953,10 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
 
         userDao.update( assigneeUser );
 
-        if ( isEmailModified ) {
-
+        if ( user.isAssignedBranchesModified() || user.isAssignedBranchesAdminModified() || user.isAssignedRegionsModified()
+            || user.isAssignedRegionsAdminModified() ) {
+            assignUser( hierarchyIntermediate, user, adminUser );
         }
-
-        assignUser( hierarchyIntermediate, user, adminUser );
 
         //send verification mail if needed
         if ( user.isSendMail() ) {
@@ -935,6 +967,27 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
         solrSearchService.addUserToSolr( assigneeUser );
 
         return assigneeUser;
+    }
+
+
+    private void startEmailModificationProcess( User user, String emailId )
+        throws InvalidInputException, UndeliveredEmailException, UserAlreadyExistsException, NoRecordsFetchedException
+    {
+        LOG.debug( "method startEmailModificationProcess() started" );
+        MiscValues workEmail = new MiscValues();
+        workEmail.setKey( CommonConstants.EMAIL_TYPE_WORK );
+        workEmail.setValue( emailId );
+
+        boolean isWorkEmailLockedByCompany = settingsLocker.isSettingsValueLocked( OrganizationUnit.COMPANY,
+            Long.parseLong( user.getCompany().getSettingsLockStatus() ), SettingsForApplication.EMAIL_ID_WORK );
+
+        AgentSettings agentSettings = organizationManagementService.getAgentSettings( user.getUserId() );
+
+        LOG.trace( "changing the email ID for user: {} to {}", user.getUserId(), emailId );
+        profileManagementService.updateVerifiedEmail( agentSettings, isWorkEmailLockedByCompany,
+            user.getCompany().getCompanyId(), MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+            Arrays.asList( workEmail ) );
+        LOG.debug( "method startEmailModificationProcess() finished" );
     }
 
 
@@ -979,7 +1032,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 contactNumberSettings = new ContactNumberSettings();
             }
 
-            if ( userUploadVO.isEmailModified() ) {
+            if ( userUploadVO.isEmailModified() && user.getStatus() != CommonConstants.STATUS_ACTIVE ) {
                 MailIdSettings mail_ids = contactDetailsSettings.getMail_ids();
                 if ( mail_ids == null ) {
                     mail_ids = new MailIdSettings();
@@ -1456,12 +1509,14 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
 
 
             List<String> applicationEmailIdList = new ArrayList<>();
-            Map<String, String> emailsUploadedMap = null;
+            List<String> companyEmailIdList = new ArrayList<>();
+            BiMap<String, String> emailsUploadedMap = null;
 
             // initialize other necessary objects
             if ( usersIterator.hasNext() ) {
                 applicationEmailIdList = userDao.getRegisteredEmailsInOtherCompanies( hierarchyIntermediate.getCompany() );
-                emailsUploadedMap = new HashMap<>();
+                companyEmailIdList = userDao.getRegisteredEmailsInTheCompany( hierarchyIntermediate.getCompany() );
+                emailsUploadedMap = HashBiMap.create( new HashMap<String, String>() );
                 if ( hierarchyIntermediate.getUsers() == null ) {
                     hierarchyIntermediate.setUsers( new HashMap<String, UserUploadVO>() );
                 }
@@ -1494,82 +1549,44 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 Cell userAboutMeCell = row.getCell( USER_ABOUT_ME_DESCRIPTION );
                 Cell userSendEmailCell = row.getCell( USER_SEND_EMAIL );
 
-                String userFirstName = userFirstNameCell != null && userFirstNameCell.getCellType() == XSSFCell.CELL_TYPE_STRING
-                    ? userFirstNameCell.getStringCellValue().trim() : null;
+                String userFirstName = workbookOperations.getStringValue( userFirstNameCell );
+                String userLastName = workbookOperations.getStringValue( userLastNameCell );
+                String userTitle = workbookOperations.getStringValue( userTitleCell );
+                String userEmail = workbookOperations.getStringValue( userEmailCell );
+                String userPhoneNumber = workbookOperations.getStringValue( userPhoneNumberCell );
+                String userWebsite = workbookOperations.getStringValue( userWebsiteCell );
+                String userLicenses = workbookOperations.getStringValue( userLicensesCell );
+                String userLegalDisclaimer = workbookOperations.getStringValue( userLegalDisclaimerCell );
+                String userPhotoProfileURL = workbookOperations.getStringValue( userPhotoProfileURLCell );
+                String userAboutMe = workbookOperations.getStringValue( userAboutMeCell );
+                boolean userSendEmail = CommonConstants.YES_STRING
+                    .equals( workbookOperations.getStringValue( userSendEmailCell ) );
+                String tempSourceId = workbookOperations.getStringValue( userSourceIdCell );
 
-                String userLastName = userLastNameCell != null && userLastNameCell.getCellType() == XSSFCell.CELL_TYPE_STRING
-                    ? userLastNameCell.getStringCellValue().trim() : null;
-
-                String userTitle = userTitleCell != null && userTitleCell.getCellType() == XSSFCell.CELL_TYPE_STRING
-                    ? userTitleCell.getStringCellValue().trim() : null;
-
-                HashSet<String> userBranchIdSet = userBranchIdCell != null
-                    && userBranchIdCell.getCellType() == XSSFCell.CELL_TYPE_STRING
-                    && StringUtils.isNotEmpty( userBranchIdCell.getStringCellValue().trim() )
-                        ? Sets.newHashSet( userBranchIdCell.getStringCellValue().trim().split( "\\s*,\\s*" ) ) : null;
-
-                HashSet<String> userRegionIdSet = userRegionIdCell != null
-                    && userRegionIdCell.getCellType() == XSSFCell.CELL_TYPE_STRING
-                    && StringUtils.isNotEmpty( userRegionIdCell.getStringCellValue().trim() )
-                        ? Sets.newHashSet( userRegionIdCell.getStringCellValue().trim().split( "\\s*,\\s*" ) ) : null;
-
-                HashSet<String> userBranchIdAdminSet = userBranchIdAdminCell != null
-                    && userBranchIdAdminCell.getCellType() == XSSFCell.CELL_TYPE_STRING
-                    && StringUtils.isNotEmpty( userBranchIdAdminCell.getStringCellValue().trim() )
-                        ? Sets.newHashSet( userBranchIdAdminCell.getStringCellValue().trim().split( "\\s*,\\s*" ) ) : null;
-
-                HashSet<String> userRegionIdAdminSet = userRegionIdAdminCell != null
-                    && userRegionIdAdminCell.getCellType() == XSSFCell.CELL_TYPE_STRING
-                    && StringUtils.isNotEmpty( userRegionIdAdminCell.getStringCellValue().trim() )
-                        ? Sets.newHashSet( userRegionIdAdminCell.getStringCellValue().trim().split( "\\s*,\\s*" ) ) : null;
-
-                String userEmail = ( userEmailCell != null && ( userEmailCell.getCellType() == XSSFCell.CELL_TYPE_STRING
-                    || userEmailCell.getCellType() == XSSFCell.CELL_TYPE_FORMULA ) ) ? userEmailCell.getStringCellValue().trim()
-                        : null;
-
-                String userPhoneNumber = userPhoneNumberCell != null
-                    ? ( userPhoneNumberCell.getCellType() == XSSFCell.CELL_TYPE_STRING
-                        ? userPhoneNumberCell.getStringCellValue().replaceAll( "[^0-9a-zA-Z\\(\\)\\-\\s]", "" ).trim()
-                        : ( userPhoneNumberCell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC
-                            ? String.valueOf( userPhoneNumberCell.getNumericCellValue() )
-                                .replaceAll( "[^0-9a-zA-Z\\(\\)\\-\\s]", "" ).trim()
-                            : null ) )
+                String userBranchIdAdminStr = workbookOperations.getStringValue( userBranchIdAdminCell );
+                HashSet<String> userBranchIdAdminSet = StringUtils.isNotEmpty( userBranchIdAdminStr )
+                    ? Sets.newHashSet( userBranchIdAdminStr.split( CommonConstants.COMMA_SEPERATOR_PATTERN ) )
                     : null;
 
-                String userWebsite = userWebsiteCell != null && userWebsiteCell.getCellType() == XSSFCell.CELL_TYPE_STRING
-                    ? userWebsiteCell.getStringCellValue().trim() : null;
-
-                String userLicenses = userLicensesCell != null && userLicensesCell.getCellType() == XSSFCell.CELL_TYPE_STRING
-                    ? userLicensesCell.getStringCellValue().trim() : null;
-
-                String userLegalDisclaimer = userLegalDisclaimerCell != null
-                    && userLegalDisclaimerCell.getCellType() == XSSFCell.CELL_TYPE_STRING
-                        ? userLegalDisclaimerCell.getStringCellValue().trim() : null;
-
-                String userPhotoProfileURL = userPhotoProfileURLCell != null
-                    && userPhotoProfileURLCell.getCellType() == XSSFCell.CELL_TYPE_STRING
-                        ? userPhotoProfileURLCell.getStringCellValue().trim() : null;
-
-                String userAboutMe = userAboutMeCell != null
-                    ? ( userAboutMeCell.getCellType() == XSSFCell.CELL_TYPE_STRING ? userAboutMeCell.getStringCellValue().trim()
-                        : ( userAboutMeCell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC
-                            ? String.valueOf( userAboutMeCell.getNumericCellValue() ).trim() : null ) )
+                String userRegionIdAdminStr = workbookOperations.getStringValue( userRegionIdAdminCell );
+                HashSet<String> userRegionIdAdminSet = StringUtils.isNotEmpty( userRegionIdAdminStr )
+                    ? Sets.newHashSet( userRegionIdAdminStr.split( CommonConstants.COMMA_SEPERATOR_PATTERN ) )
                     : null;
 
-                boolean userSendEmail = userSendEmailCell != null
-                    && userSendEmailCell.getCellType() == XSSFCell.CELL_TYPE_STRING
-                        ? userSendEmailCell.getStringCellValue().trim().equals( CommonConstants.YES_STRING ) : false;
+                String userBranchIdStr = workbookOperations.getStringValue( userBranchIdCell );
+                HashSet<String> userBranchIdSet = StringUtils.isNotEmpty( userBranchIdStr )
+                    ? Sets.newHashSet( userBranchIdStr.split( CommonConstants.COMMA_SEPERATOR_PATTERN ) )
+                    : null;
 
-                String tempSourceId = userSourceIdCell == null ? ""
-                    : ( userSourceIdCell.getCellType() == XSSFCell.CELL_TYPE_STRING
-                        ? userSourceIdCell.getStringCellValue().trim()
-                        : ( userSourceIdCell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC
-                            ? String.valueOf( userSourceIdCell.getNumericCellValue() ).trim() : "" ) );
+                String userRegionIdStr = workbookOperations.getStringValue( userRegionIdCell );
+                HashSet<String> userRegionIdSet = StringUtils.isNotEmpty( userRegionIdStr )
+                    ? Sets.newHashSet( userRegionIdStr.split( CommonConstants.COMMA_SEPERATOR_PATTERN ) )
+                    : null;
 
 
                 // check for a row with empty data        
                 if ( isUserRowEmpty( tempSourceId, userFirstName, userLastName, userTitle, userEmail, userPhoneNumber,
-                    userWebsite, userLicenses, userLegalDisclaimer, userPhotoProfileURL, userAboutMe, userSendEmail ) ) {
+                    userWebsite, userLicenses, userLegalDisclaimer, userPhotoProfileURL, userAboutMe ) ) {
                     continue;
                 }
 
@@ -1579,18 +1596,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
 
 
                 if ( userSourceIdCell != null ) {
-                    switch ( userSourceIdCell.getCellType() ) {
-                        case XSSFCell.CELL_TYPE_NUMERIC: {
-                            sourceUserId = String.valueOf( (long) userSourceIdCell.getNumericCellValue() ).trim();
-                            break;
-                        }
-                        case XSSFCell.CELL_TYPE_STRING: {
-                            sourceUserId = userSourceIdCell.getStringCellValue().trim();
-                            break;
-                        }
-                        default:
-                            isSourceIdUndetectable = true;
-                    }
+                    sourceUserId = workbookOperations.getStringValue( userSourceIdCell );
+                    isSourceIdUndetectable = StringUtils.isEmpty( sourceUserId );
                 } else {
                     isSourceIdUndetectable = true;
                 }
@@ -1638,9 +1645,9 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
 
 
                 processUser( hierarchyIntermediate, parsedHierarchyUpload, currentUserVO, applicationEmailIdList,
-                    emailsUploadedMap, userFirstName, userLastName, userTitle, userBranchIdSet, userRegionIdSet,
-                    userBranchIdAdminSet, userRegionIdAdminSet, userEmail, userPhoneNumber, userWebsite, userLicenses,
-                    userLegalDisclaimer, userPhotoProfileURL, userAboutMe, userSendEmail );
+                    companyEmailIdList, emailsUploadedMap, userFirstName, userLastName, userTitle, userBranchIdSet,
+                    userRegionIdSet, userBranchIdAdminSet, userRegionIdAdminSet, userEmail, userPhoneNumber, userWebsite,
+                    userLicenses, userLegalDisclaimer, userPhotoProfileURL, userAboutMe, userSendEmail );
 
                 if ( currentUserVO.isUserModified() ) {
                     parsedHierarchyUpload.setNumberOfUsersModified( parsedHierarchyUpload.getNumberOfUsersModified() + 1 );
@@ -1672,7 +1679,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
 
     private boolean isUserRowEmpty( String tempSourceId, String userFirstName, String userLastName, String userTitle,
         String userEmail, String userPhoneNumber, String userWebsite, String userLicenses, String userLegalDisclaimer,
-        String userPhotoProfileURL, String userAboutMe, boolean userSendEmail )
+        String userPhotoProfileURL, String userAboutMe )
     {
         if ( StringUtils.isEmpty( tempSourceId ) && StringUtils.isEmpty( userLastName ) && StringUtils.isEmpty( userFirstName )
             && StringUtils.isEmpty( userAboutMe ) && StringUtils.isEmpty( userPhotoProfileURL )
@@ -1686,11 +1693,11 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
 
 
     private void processUser( HierarchyUploadIntermediate hierarchyIntermediate, ParsedHierarchyUpload parsedHierarchyUpload,
-        UserUploadVO currentUserVO, List<String> applicationEmailIdList, Map<String, String> emailsUploadedMap,
-        String userFirstName, String userLastName, String userTitle, Set<String> userBranchIdSet, Set<String> userRegionIdSet,
-        Set<String> userBranchIdAdminSet, Set<String> userRegionIdAdminSet, String userEmail, String userPhoneNumber,
-        String userWebsite, String userLicenses, String userLegalDisclaimer, String userPhotoProfileURL, String userAboutMe,
-        boolean userSendEmail )
+        UserUploadVO currentUserVO, List<String> applicationEmailIdList, List<String> companyEmailIdList,
+        BiMap<String, String> emailsUploadedMap, String userFirstName, String userLastName, String userTitle,
+        Set<String> userBranchIdSet, Set<String> userRegionIdSet, Set<String> userBranchIdAdminSet,
+        Set<String> userRegionIdAdminSet, String userEmail, String userPhoneNumber, String userWebsite, String userLicenses,
+        String userLegalDisclaimer, String userPhotoProfileURL, String userAboutMe, boolean userSendEmail )
     {
         boolean isAssignmentModified = false;
         if ( !StringUtils.equals( userFirstName, currentUserVO.getFirstName() ) && !StringUtils.isEmpty( userFirstName ) ) {
@@ -1817,7 +1824,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
 
         // initialize sets
         if ( userBranchIdSet == null ) {
-            userBranchIdSet = new HashSet<String>();
+            userBranchIdSet = new HashSet<>();
         }
         if ( currentUserVO.getAssignedBranches() == null ) {
             currentUserVO.setAssignedBranches( new HashSet<String>() );
@@ -2032,6 +2039,14 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             currentUserVO.setWarningRecord( true );
         }
 
+        if ( !emailsUploadedMap.containsValue( userEmail ) ) {
+            emailsUploadedMap.put( currentUserVO.getSourceUserId(), userEmail );
+        } else {
+            parsedHierarchyUpload.getUserErrors()
+                .add( "Row: " + currentUserVO.getRowNum() + ", The Email ID entered is duplicate of a row at : "
+                    + hierarchyIntermediate.getUsers().get( emailsUploadedMap.inverse().get( userEmail ) ).getRowNum() );
+            currentUserVO.setErrorRecord( true );
+        }
 
         if ( !StringUtils.equals( userEmail, currentUserVO.getEmailId() ) && !StringUtils.isEmpty( userEmail ) ) {
 
@@ -2057,28 +2072,20 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 currentUserVO.setErrorRecord( true );
             }
 
-            // check for email ID duplication across social survey and the provided list of users
+            // check for email ID duplication across social survey and the provided list of users outside of the company
             if ( applicationEmailIdList.contains(
                 CommonConstants.YES_STRING.equals( maskEmail ) ? utils.maskEmailAddress( userEmail ) : userEmail ) ) {
-                parsedHierarchyUpload.getUserErrors()
-                    .add( "Row: " + currentUserVO.getRowNum() + ", Email ID entered already exists in the application." );
+                parsedHierarchyUpload.getUserErrors().add( "Row: " + currentUserVO.getRowNum()
+                    + ", Email ID entered already exists in Social Survey in another account." );
                 currentUserVO.setErrorRecord( true );
             }
 
-            if ( !emailsUploadedMap.containsValue( userEmail ) ) {
-                emailsUploadedMap.put( currentUserVO.getSourceUserId(), userEmail );
-            } else {
-                parsedHierarchyUpload.getUserErrors()
-                    .add( "Row: " + currentUserVO.getRowNum() + ", The Email ID entered is duplicate of a row at : "
-                        + hierarchyIntermediate.getUsers().get( emailsUploadedMap.get( userEmail ) ).getRowNum() );
+            // check if the email ID is registered within the company
+            if ( currentUserVO.isUserAdded() && companyEmailIdList.contains(
+                CommonConstants.YES_STRING.equals( maskEmail ) ? utils.maskEmailAddress( userEmail ) : userEmail ) ) {
+                parsedHierarchyUpload.getUserErrors().add( "Row: " + currentUserVO.getRowNum()
+                    + ", Cannot create this user, Email ID entered is already registered for this account. Please use the source ID generated by Social Survey for this user provided in company Hierarchy report in order to modify this user." );
                 currentUserVO.setErrorRecord( true );
-            }
-
-            // check if the user is already verified with the existing email
-            if ( currentUserVO.isUserVerified() ) {
-                parsedHierarchyUpload.getUserValidationWarnings()
-                    .add( "Row: " + currentUserVO.getRowNum() + ", This user is already verified with the existing email ID." );
-                currentUserVO.setWarningRecord( true );
             }
 
         } else if ( StringUtils.isEmpty( userEmail ) ) {
@@ -2207,39 +2214,14 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 Cell branchStateCell = row.getCell( BRANCH_STATE_INDEX );
                 Cell branchZipCodeCell = row.getCell( BRANCH_ZIP_INDEX );
 
-                String branchName = branchNameCell != null && branchNameCell.getCellType() == XSSFCell.CELL_TYPE_STRING
-                    ? branchNameCell.getStringCellValue().trim() : null;
-
-                String sourceRegionId = sourceRegionIdCell != null
-                    && sourceRegionIdCell.getCellType() == XSSFCell.CELL_TYPE_STRING
-                        ? sourceRegionIdCell.getStringCellValue().trim() : null;
-
-                String branchAddress1 = branchAddress1Cell != null
-                    && branchAddress1Cell.getCellType() == XSSFCell.CELL_TYPE_STRING
-                        ? branchAddress1Cell.getStringCellValue().trim() : null;
-
-                String branchAddress2 = branchAddress2Cell != null
-                    && branchAddress2Cell.getCellType() == XSSFCell.CELL_TYPE_STRING
-                        ? branchAddress2Cell.getStringCellValue().trim() : null;
-
-                String branchCity = branchCityCell != null && branchCityCell.getCellType() == XSSFCell.CELL_TYPE_STRING
-                    ? branchCityCell.getStringCellValue().trim() : null;
-
-                String branchState = branchStateCell != null && branchStateCell.getCellType() == XSSFCell.CELL_TYPE_STRING
-                    ? branchStateCell.getStringCellValue().trim() : null;
-
-                String branchZipCode = branchZipCodeCell != null
-                    ? ( branchZipCodeCell.getCellType() == XSSFCell.CELL_TYPE_STRING
-                        ? branchZipCodeCell.getStringCellValue().trim()
-                        : ( branchZipCodeCell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC
-                            ? String.valueOf( branchZipCodeCell.getNumericCellValue() ).trim() : null ) )
-                    : null;
-
-                String tempSourceId = branchSourceIdCell == null ? ""
-                    : ( branchSourceIdCell.getCellType() == XSSFCell.CELL_TYPE_STRING
-                        ? branchSourceIdCell.getStringCellValue().trim()
-                        : ( branchSourceIdCell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC
-                            ? String.valueOf( branchSourceIdCell.getNumericCellValue() ).trim() : "" ) );
+                String branchName = workbookOperations.getStringValue( branchNameCell );
+                String sourceRegionId = workbookOperations.getStringValue( sourceRegionIdCell );
+                String branchAddress1 = workbookOperations.getStringValue( branchAddress1Cell );
+                String branchAddress2 = workbookOperations.getStringValue( branchAddress2Cell );
+                String branchCity = workbookOperations.getStringValue( branchCityCell );
+                String branchState = workbookOperations.getStringValue( branchStateCell );
+                String branchZipCode = workbookOperations.getStringValue( branchZipCodeCell );
+                String tempSourceId = workbookOperations.getStringValue( branchSourceIdCell );
 
 
                 // check for a row with empty data        
@@ -2254,18 +2236,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
 
 
                 if ( branchSourceIdCell != null ) {
-                    switch ( branchSourceIdCell.getCellType() ) {
-                        case XSSFCell.CELL_TYPE_NUMERIC: {
-                            sourceBranchId = String.valueOf( (long) branchSourceIdCell.getNumericCellValue() ).trim();
-                            break;
-                        }
-                        case XSSFCell.CELL_TYPE_STRING: {
-                            sourceBranchId = branchSourceIdCell.getStringCellValue().trim();
-                            break;
-                        }
-                        default:
-                            isSourceIdUndetectable = true;
-                    }
+                    sourceBranchId = workbookOperations.getStringValue( branchSourceIdCell );
+                    isSourceIdUndetectable = StringUtils.isEmpty( sourceBranchId );
                 } else {
                     isSourceIdUndetectable = true;
                 }
@@ -2383,8 +2355,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
 
                 BranchUploadVO branch = hierarchyIntermediate.getBranches().get( branchSourceIdWithExistingName );
                 if ( branch.isBranchProcessed() && branch.isBranchAdded() ) {
-                    parsedHierarchyUpload.getBranchValidationWarnings()
-                        .add( "A Branch with the same already exists at : " + branch.getRowNum() );
+                    parsedHierarchyUpload.getBranchValidationWarnings().add( "Row: " + currentBranchVO.getRowNum()
+                        + ", A Branch with the same already exists at : " + branch.getRowNum() );
                 } else if ( branch.isBranchProcessed() && !branch.isBranchAdded() ) {
                     parsedHierarchyUpload.getBranchValidationWarnings().add(
                         "Row: " + currentBranchVO.getRowNum() + ", A Branch with the same already exists in the company." );
@@ -2595,36 +2567,13 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                 Cell regionStateCell = row.getCell( REGION_STATE_INDEX );
                 Cell regionZipCodeCell = row.getCell( REGION_ZIP_INDEX );
 
-                String regionName = ( regionNameCell != null && regionNameCell.getCellType() == XSSFCell.CELL_TYPE_STRING )
-                    ? regionNameCell.getStringCellValue().trim() : "";
-
-                String regionAddress1 = ( regionAddress1Cell != null
-                    && regionAddress1Cell.getCellType() == XSSFCell.CELL_TYPE_STRING )
-                        ? regionAddress1Cell.getStringCellValue().trim() : "";
-
-                String regionAddress2 = ( regionAddress2Cell != null
-                    && regionAddress2Cell.getCellType() == XSSFCell.CELL_TYPE_STRING )
-                        ? regionAddress2Cell.getStringCellValue().trim() : "";
-
-                String regionCity = ( regionCityCell != null && regionCityCell.getCellType() == XSSFCell.CELL_TYPE_STRING )
-                    ? regionCityCell.getStringCellValue().trim() : "";
-
-                String regionState = ( regionStateCell != null && regionStateCell.getCellType() == XSSFCell.CELL_TYPE_STRING )
-                    ? regionStateCell.getStringCellValue().trim() : "";
-
-                String regionZipCode = regionZipCodeCell != null
-                    ? ( regionZipCodeCell.getCellType() == XSSFCell.CELL_TYPE_STRING
-                        ? regionZipCodeCell.getStringCellValue().trim()
-                        : ( regionZipCodeCell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC
-                            ? String.valueOf( regionZipCodeCell.getNumericCellValue() ).trim() : "" ) )
-                    : "";
-
-                String tempSourceId = regionSourceIdCell == null ? ""
-                    : ( regionSourceIdCell.getCellType() == XSSFCell.CELL_TYPE_STRING
-                        ? regionSourceIdCell.getStringCellValue().trim()
-                        : ( regionSourceIdCell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC
-                            ? String.valueOf( regionSourceIdCell.getNumericCellValue() ).trim() : "" ) );
-
+                String regionName = workbookOperations.getStringValue( regionNameCell );
+                String regionAddress1 = workbookOperations.getStringValue( regionAddress1Cell );
+                String regionAddress2 = workbookOperations.getStringValue( regionAddress2Cell );
+                String regionCity = workbookOperations.getStringValue( regionCityCell );
+                String regionState = workbookOperations.getStringValue( regionStateCell );
+                String regionZipCode = workbookOperations.getStringValue( regionZipCodeCell );
+                String tempSourceId = workbookOperations.getStringValue( regionSourceIdCell );
 
                 // check for a row with empty data        
                 if ( isRegionRowEmpty( tempSourceId, regionName, regionAddress1, regionAddress2, regionCity, regionState,
@@ -2638,18 +2587,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
 
 
                 if ( regionSourceIdCell != null ) {
-                    switch ( regionSourceIdCell.getCellType() ) {
-                        case XSSFCell.CELL_TYPE_NUMERIC: {
-                            sourceRegionId = String.valueOf( (long) regionSourceIdCell.getNumericCellValue() ).trim();
-                            break;
-                        }
-                        case XSSFCell.CELL_TYPE_STRING: {
-                            sourceRegionId = regionSourceIdCell.getStringCellValue().trim();
-                            break;
-                        }
-                        default:
-                            isSourceIdUndetectable = true;
-                    }
+                    sourceRegionId = workbookOperations.getStringValue( regionSourceIdCell );
+                    isSourceIdUndetectable = StringUtils.isEmpty( sourceRegionId );
                 } else {
                     isSourceIdUndetectable = true;
                 }
@@ -2767,8 +2706,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
 
                 RegionUploadVO region = hierarchyIntermediate.getRegions().get( regionSourceIdWithExistingName );
                 if ( region.isRegionProcessed() && region.isRegionAdded() ) {
-                    parsedHierarchyUpload.getRegionValidationWarnings()
-                        .add( "A Region with the same already exists at Row: " + region.getRowNum() );
+                    parsedHierarchyUpload.getRegionValidationWarnings().add( "Row: " + currentRegionVO.getRowNum()
+                        + ", A Region with the same already exists at Row: " + region.getRowNum() );
                 } else if ( region.isRegionProcessed() && !region.isRegionAdded() ) {
                     parsedHierarchyUpload.getRegionValidationWarnings().add(
                         "Row: " + currentRegionVO.getRowNum() + ", A Region with the same already exists in the company." );

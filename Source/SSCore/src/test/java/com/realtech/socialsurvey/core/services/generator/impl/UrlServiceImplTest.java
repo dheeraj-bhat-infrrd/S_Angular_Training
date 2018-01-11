@@ -67,14 +67,14 @@ public class UrlServiceImplTest
     @Test ( expected = InvalidInputException.class)
     public void testShortenUrlWithNullURLString() throws InvalidInputException
     {
-        urlServiceImpl.shortenUrl( null );
+        urlServiceImpl.shortenUrl( null, null );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void testShortenUrlWithEmptyURLString() throws InvalidInputException
     {
-        urlServiceImpl.shortenUrl( "" );
+        urlServiceImpl.shortenUrl( "", "");
     }
 
 
@@ -103,7 +103,7 @@ public class UrlServiceImplTest
         Mockito.when( encryptionHelper.encodeBase64( Matchers.anyString() ) ).thenReturn( "encryptedurl" );
         Whitebox.setInternalState( urlServiceImpl, "applicationBaseUrl", "http://localhost:8080/" );
         Assert
-            .assertEquals( "Shorten Url", urlServiceImpl.shortenUrl( "test" ), "http://localhost:8080/mail.do?q=encryptedurl" );
+            .assertEquals( "Shorten Url", urlServiceImpl.shortenUrl( "test", "UUID-1" ), "http://localhost:8080/mail.do?q=encryptedurl&u=UUID-1" );
     }
 
 

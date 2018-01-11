@@ -30,7 +30,7 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 public interface ReportingDashboardManagement
 {
     public void createEntryInFileUploadForReporting( int reportId, Date startDate, Date endDate, Long entityId,
-        String entityType, Company company, Long adminUserid )
+        String entityType, Company company, Long adminUserid, int actualTimeZoneOffset )
         throws InvalidInputException, NoRecordsFetchedException, FileNotFoundException, IOException;
 
 
@@ -258,14 +258,17 @@ public interface ReportingDashboardManagement
     public List<ReportingSurveyPreInititation> getIncompleteSurvey( long entityId, String entityType, Date startDate, Date endDate,
         int startIndex, int batchSize ) throws InvalidInputException;
 
-   /**
+    /**
      * Method to generate incomplete survey results report.
-     * @param profileValue
-     * @param profileLevel
-     * @param adminUserId
+     * @param entityId
+     * @param entityType
+     * @param userId
      * @param startDate
      * @param endDate
      * @return
+     * @throws UnsupportedEncodingException
+     * @throws NonFatalException
+     * @throws ParseException
      */
 
     public String generateIncompleteSurveyResultsReport( Long entityId, String entityType, Long userId, Timestamp startDate, Timestamp endDate )
@@ -310,5 +313,21 @@ public interface ReportingDashboardManagement
 	 */
 	public String generateNpsReportForWeekOrMonth(long profileValue, String profileLevel, Timestamp startDate, int type)throws ParseException, UnsupportedEncodingException, NonFatalException;
 	
-	void updateTransactionMonitorAlertsForCompanies() throws InvalidInputException;
+    void updateTransactionMonitorAlertsForCompanies() throws InvalidInputException;
+
+    /**
+     * Updated the fileUpload status of given fileUploadId
+     * @param filUploadId
+     * @param status
+     */
+    public int updateFileUploadStatus(long filUploadId, int status) throws InvalidInputException;
+
+
+    /**
+     * @param fileUploadId
+     * @param status
+     * @param location
+     * @return
+     */
+    public int updateFileUploadStatusAndFileName( long fileUploadId, int status, String location ) throws InvalidInputException;
 }

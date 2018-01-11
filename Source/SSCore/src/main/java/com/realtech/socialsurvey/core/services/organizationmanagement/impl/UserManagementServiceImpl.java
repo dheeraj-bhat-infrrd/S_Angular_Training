@@ -57,6 +57,7 @@ import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyIgnoredEmailMapping;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
+import com.realtech.socialsurvey.core.entities.EmailAttachment;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -102,6 +103,7 @@ import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
+import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.vo.UserList;
@@ -138,6 +140,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Autowired
     private EmailServices emailServices;
+    
+    @Autowired
+    private FileUploadService fileUploadService;
 
     @Autowired
     private SettingsSetterDao settingsSetterDao;
@@ -4375,19 +4380,35 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                     excelCreated = false;
                 }
             }
-            try {
-                if ( excelCreated ) {
-                    Map<String, String> attachmentsDetails = new HashMap<String, String>();
-                    attachmentsDetails.put( "CorruptRecords.xls", filePath );
+            
+            
+            boolean excelUploaded = false;
+            if ( excelCreated ) {
+                try {
+                    filePath = fileUploadService.uploadOldReport( file, fileName );
+                    
+                    excelUploaded = true;
+                } catch ( NonFatalException e ) {
+                    LOG.error( "Exception caught while uploading old report", e);
+                }
+                LOG.debug( "fileUpload on s3 step is done for filename : {}", fileName );
+            } else {
+                LOG.warn( "Could not write into file {}", fileName );
+            }
 
+            try {
+                if ( excelCreated && excelUploaded) {
+                    List<EmailAttachment> attachments = new ArrayList<EmailAttachment>();
+                    attachments.add( new EmailAttachment("CorruptRecords.xls", filePath) );
+                    
                     if ( companyAdminEnabled == "1" ) {
                         User companyAdmin = getCompanyAdmin( companyId );
                         if ( companyAdmin != null ) {
                             emailServices.sendCorruptDataFromCrmNotificationMail( companyAdmin.getFirstName(),
-                                companyAdmin.getLastName(), companyAdmin.getEmailId(), attachmentsDetails );
+                                companyAdmin.getLastName(), companyAdmin.getEmailId(), attachments);
                         }
                     } else {
-                        emailServices.sendCorruptDataFromCrmNotificationMail( adminName, "", adminEmailId, attachmentsDetails );
+                        emailServices.sendCorruptDataFromCrmNotificationMail( adminName, "", adminEmailId, attachments );
                     }
                 }
             } catch ( InvalidInputException | UndeliveredEmailException e ) {

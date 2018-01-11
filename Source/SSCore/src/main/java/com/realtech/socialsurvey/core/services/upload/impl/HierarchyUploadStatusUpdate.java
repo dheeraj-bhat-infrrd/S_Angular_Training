@@ -27,7 +27,7 @@ public class HierarchyUploadStatusUpdate
             while ( upload.getStatus() == CommonConstants.HIERARCHY_UPLOAD_STATUS_IMPORTING
                 || upload.getStatus() == CommonConstants.HIERARCHY_UPLOAD_STATUS_VERIFING ) {
 
-                if ( hierarchyUploadDao.findParsedHierarchyUpload( upload.get_id() ) == null ) {
+                if ( hierarchyUploadDao.findParsedHierarchyUpload( upload.getId() ) == null ) {
                     break;
                 }
 

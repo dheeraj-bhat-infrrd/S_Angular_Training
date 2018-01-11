@@ -32,11 +32,13 @@ import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.BillingReportData;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
+import com.realtech.socialsurvey.core.entities.EmailAttachment;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
@@ -44,6 +46,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.impl.DashboardServiceImpl;
 import com.realtech.socialsurvey.core.services.reports.BillingReportsService;
+import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookData;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookOperations;
 
@@ -65,6 +68,9 @@ public class BillingReportsServiceImpl implements BillingReportsService
     @Autowired
     private EmailServices emailServices;
 
+    @Autowired
+    private FileUploadService fileUploadService;
+    
     @Autowired
     private UserManagementService userManagementService;
 
@@ -390,10 +396,24 @@ public class BillingReportsServiceImpl implements BillingReportsService
             }
         }
 
-        // Mail the report to the admin
+        boolean excelUploaded = false;
         if ( excelCreated ) {
-            Map<String, String> attachmentsDetails = new HashMap<String, String>();
-            attachmentsDetails.put( fileName + ".xls", filePath );
+            try {
+                filePath = fileUploadService.uploadOldReport( file, fileName );
+                
+                excelUploaded = true;
+            } catch ( NonFatalException e ) {
+                LOG.error( "Exception caught while uploading old report", e);
+            }
+            LOG.debug( "fileUpload on s3 step is done for filename : {}", fileName );
+        } else {
+            LOG.warn( "Could not write into file {}", fileName );
+        }
+
+        // Mail the report to the admin
+        if ( excelCreated && excelUploaded) {
+            List<EmailAttachment> attachments = new ArrayList<EmailAttachment>();
+            attachments.add( new EmailAttachment(fileName + ".xls", filePath) );
             String mailId = null;
             if ( recipientMailId == null || recipientMailId.isEmpty() ) {
                 mailId = adminEmailId;
@@ -409,7 +429,7 @@ public class BillingReportsServiceImpl implements BillingReportsService
             }
 
             LOG.debug( "sending mail to : " + name + " at : " + mailId );
-            emailServices.sendBillingReportMail( name, "", mailId, attachmentsDetails );
+            emailServices.sendBillingReportMail( name, "", mailId, attachments);
         }
 
         LOG.info( "method generateBillingReportAndMail ended" );

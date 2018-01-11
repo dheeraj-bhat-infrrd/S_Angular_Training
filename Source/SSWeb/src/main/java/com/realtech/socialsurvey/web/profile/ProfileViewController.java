@@ -424,13 +424,19 @@ public class ProfileViewController
      * @return
      */
     @RequestMapping ( value = "/profile/sendmail", method = RequestMethod.POST)
-    public @ResponseBody String sendEmail( HttpServletRequest request,
-        @QueryParam ( "companyprofilename") String companyProfileName, @QueryParam ( "profilename") String profileName,
-        @QueryParam ( "name") String senderName, @QueryParam ( "email") String senderMailId,
-        @QueryParam ( CommonConstants.MESSAGE) String message, @QueryParam ( "profiletype") String profileType,
-        @QueryParam ( CommonConstants.GOOGLE_CAPTCHA_RESPONSE) String captchaResponse )
+    public @ResponseBody String sendEmail( HttpServletRequest request )
     {
+    	
+    		String profileName = request.getParameter("profilename");
+    		String profileType = request.getParameter("profiletype");
+    		String companyProfileName = request.getParameter("companyprofilename");
 
+    		String senderName = request.getParameter("name");
+    		String senderMailId = request.getParameter("email");
+    		String message = request.getParameter( CommonConstants.MESSAGE);
+
+    		String captchaResponse = request.getParameter( CommonConstants.GOOGLE_CAPTCHA_RESPONSE);
+    		
         LOG.info( "Contact us mail controller called!" );
 
         String returnMessage = null;

@@ -3167,6 +3167,7 @@ var hierarchyUpload = {
 			var formData = new FormData();
 			formData.append("uploadType", hierarchyUpload.uploadType);
 			formData.append("isWarningToBeIgnored", $('#warn-toggle-chk-box').hasClass( 'bd-check-img-checked' ) ? false : true);
+			formData.append("verifyOnly", $('#verify-chk-box').hasClass( 'bd-check-img-checked' ) ? false : true);
 			showOverlay();
 			callAjaxPOSTWithTextDataUpload("./starthierarchyxlsxfileupload.do", hierarchyUpload.fetchUploadBatchStatusCallback, true, formData);
 		});
@@ -3183,6 +3184,10 @@ var hierarchyUpload = {
 		
 		$('#warn-toggle-chk-box').unbind('click').bind('click', function(e) {
 			$('#warn-toggle-chk-box').toggleClass('bd-check-img-checked');
+		});
+		
+		$('#verify-chk-box').unbind('click').bind('click', function(e) {
+			$('#verify-chk-box').toggleClass('bd-check-img-checked');
 		});
 
 	},
@@ -3218,7 +3223,7 @@ var hierarchyUpload = {
 	processUploadStatus : function(uploadStatus) {
 
 		// update data on UI
-		if( uploadStatus.status != 6 ){
+		if( uploadStatus.status != 6 || uploadStatus.status != 8 ){
 			// append or replace
 			if( uploadStatus.isInAppendMode ){
 				if( !$('#hierarchy-upload-append').hasClass('bd-cust-rad-img-checked') ){
@@ -3230,6 +3235,13 @@ var hierarchyUpload = {
 					$('#hierarchy-upload-replace').addClass('bd-cust-rad-img-checked');
 					$('#hierarchy-upload-append').removeClass('bd-cust-rad-img-checked');
 				}
+			}
+			
+			// Verify only
+			if( uploadStatus.verifyOnly && $('#verify-chk-box').hasClass('bd-check-img-checked') ){
+				$('#verify-chk-box').removeClass('bd-check-img-checked')
+			} else if( !uploadStatus.verifyOnly && !$('#verify-chk-box').hasClass('bd-check-img-checked') ){
+				$('#verify-chk-box').addClass('bd-check-img-checked')
 			}
 			
 			// ignore warnings
@@ -3263,6 +3275,7 @@ var hierarchyUpload = {
 			$("#add-up-rad").removeClass('disable');
 			$("#rep-rad").removeClass('disable');
 			$("#warning-toggle").removeClass('disable');
+			$("#verify-toggle").removeClass('disable');
 
 			// display file name in the input
 			$('#com-xlsx-file').val( uploadStatus.givenFileName );
@@ -3312,7 +3325,7 @@ var hierarchyUpload = {
 				var generalErrorList = '';
 
 				uploadStatus.generalErrors.forEach(function(entry) {
-					generalErrorList = generalErrorList + '</br>' + entry;
+					generalErrorList = generalErrorList + '<div></br>' + entry + '</div>';
 				});
 				$(generalErrorList).appendTo('#uploadBatchStatus');
 			}
@@ -3347,7 +3360,7 @@ var hierarchyUpload = {
 				$('#uploadBatchStatus').html('Verifing xlsx............');
 
 				uploadStatus.generalErrors.forEach(function(entry) {
-					generalErrorList = generalErrorList + '</br>' + entry;
+					generalErrorList = generalErrorList + '<div></br>' + entry + '</div>';
 				});
 				$(generalErrorList).appendTo('#uploadBatchStatus');
 
@@ -3378,7 +3391,7 @@ var hierarchyUpload = {
 				$('#uploadBatchStatus').html('Importing xlsx............');
 
 				uploadStatus.generalErrors.forEach(function(entry) {
-					generalErrorList = generalErrorList + '</br>' + entry;
+					generalErrorList = generalErrorList + '<div></br>' + entry + '</div>';
 				});
 				$(generalErrorList).appendTo('#uploadBatchStatus');
 
@@ -3408,12 +3421,11 @@ var hierarchyUpload = {
 				var generalErrorList = '';
 
 				uploadStatus.generalErrors.forEach(function(entry) {
-					generalErrorList = generalErrorList + '</br>' + entry;
+					generalErrorList = generalErrorList + '<div></br>' + entry + '</div>';
 				});
 				$('#uploadBatchStatus').html(generalErrorList);
 
 				// show general errors
-				$('#uploadBatchStatus').removeClass('hide');
 				$('#uploadBatchStatus').show();
 			}
 			
@@ -3430,7 +3442,7 @@ var hierarchyUpload = {
 			break;
 		}
 
-			// import successfully finished
+		// import successfully finished
 		case 6: {
 			removeMessageHeaders();
 			showInfo("The latest hierarchy xlsx File has been imported succesfully.");
@@ -3443,6 +3455,19 @@ var hierarchyUpload = {
 			$('#hierarchy-stats').show();
 			break;
 		}
+		
+		// verification successfully finished
+		case 8: {
+			removeMessageHeaders();
+			showInfo("The latest hierarchy xlsx File has been verified succesfully.");
+			$('#xlsVerifyUplaod').removeClass('disable');
+			
+			// populate hierarhy upload stats
+			hierarchyUpload.populateStats( uploadStatus.numberOfUsersAdded, uploadStatus.numberOfUsersModified, uploadStatus.numberOfUsersDeleted, uploadStatus.numberOfBranchesAdded, uploadStatus.numberOfBranchesModified, uploadStatus.numberOfBranchesDeleted, uploadStatus.numberOfRegionsAdded, uploadStatus.numberOfRegionsModified, uploadStatus.numberOfRegionsDeleted, true );
+			$('#hierarchy-stats').show();
+			break;
+		}
+		
 		}
 	},
 
@@ -3612,6 +3637,9 @@ var hierarchyUpload = {
 		if( !$("#warning-toggle").hasClass('disable') )
 			$("#warning-toggle").addClass('disable');
 		
+		if( !$("#verify-toggle").hasClass('disable') )
+			$("#verify-toggle").addClass('disable');
+		
 		$('#xlsVerifyUplaod').addClass('disable');
 		$('#xlsx-file-upload').addClass('disable');
 		
@@ -3646,31 +3674,50 @@ var hierarchyUpload = {
 		var interimText = importDone == false ? ' to be ' : ' '; 
 		if( regionAdded > 0 ){
 			
-			$('<div class="hierarchy-upload-add-stat">Regions' + interimText + 'Added: ' + regionAdded + '</div>').appendTo("#hierarchy-stats");
+			$('<div id="stat-reg-add" class="hierarchy-upload-add-stat hierarchy-stats-anim">Regions' + interimText + 'Added: ' + regionAdded + '</div>').appendTo("#hierarchy-stats");
+			
+			setTimeout(function(){$("#stat-reg-add").addClass("hierarchy-stats-transform");$("#stat-reg-add").animate({"margin-left":"15px"}, "slow");}, 100);
+			setTimeout(function(){$("#stat-reg-add").animate({"margin-left":"5px"},"slow");$("#stat-reg-add").removeClass("hierarchy-stats-transform");}, 700);
 		}
 		if( regionModified > 0 ){
-			$('<div class="hierarchy-upload-modify-stat">Regions' + interimText + 'Modified: ' + regionModified + '</div>').appendTo("#hierarchy-stats");
+			$('<div id="stat-reg-mod" class="hierarchy-upload-modify-stat hierarchy-stats-anim">Regions' + interimText + 'Modified: ' + regionModified + '</div>').appendTo("#hierarchy-stats");
+			setTimeout(function(){$("#stat-reg-mod").addClass("hierarchy-stats-transform");$("#stat-reg-mod").animate({"margin-left":"15px"}, "slow");}, 200);
+			setTimeout(function(){$("#stat-reg-mod").animate({"margin-left":"5px"},"slow");$("#stat-reg-mod").removeClass("hierarchy-stats-transform");}, 800);
 		}
 		if( regionDeleted > 0 ){
-			$('<div class="hierarchy-upload-delete-stat">Regions' + interimText + 'Deleted: ' + regionDeleted + '</div>').appendTo("#hierarchy-stats");
+			$('<div id="stat-reg-del" class="hierarchy-upload-delete-stat hierarchy-stats-anim">Regions' + interimText + 'Deleted: ' + regionDeleted + '</div>').appendTo("#hierarchy-stats");
+			setTimeout(function(){$("#stat-reg-del").addClass("hierarchy-stats-transform");$("#stat-reg-del").animate({"margin-left":"15px"}, "slow");}, 300);
+			setTimeout(function(){$("#stat-reg-del").animate({"margin-left":"5px"},"slow");$("#stat-reg-del").removeClass("hierarchy-stats-transform");}, 900);
 		}
 		if( branchAdded > 0 ){
-			$('<div class="hierarchy-upload-add-stat">Branches' + interimText + 'Added: ' + branchAdded + '</div>').appendTo("#hierarchy-stats");
+			$('<div id="stat-bra-add" class="hierarchy-upload-add-stat hierarchy-stats-anim">Branches' + interimText + 'Added: ' + branchAdded + '</div>').appendTo("#hierarchy-stats");
+			setTimeout(function(){$("#stat-bra-add").addClass("hierarchy-stats-transform");$("#stat-bra-add").animate({"margin-left":"15px"}, "slow");}, 400);
+			setTimeout(function(){$("#stat-bra-add").animate({"margin-left":"5px"},"slow");$("#stat-bra-add").removeClass("hierarchy-stats-transform");}, 1000);
 		}
 		if( branchModified > 0 ){
-			$('<div class="hierarchy-upload-modify-stat">Branches' + interimText + 'Modified: ' + branchModified + '</div>').appendTo("#hierarchy-stats");
+			$('<div id="stat-bra-mod" class="hierarchy-upload-modify-stat hierarchy-stats-anim">Branches' + interimText + 'Modified: ' + branchModified + '</div>').appendTo("#hierarchy-stats");
+			setTimeout(function(){$("#stat-bra-mod").addClass("hierarchy-stats-transform");$("#stat-bra-mod").animate({"margin-left":"15px"}, "slow");}, 500);
+			setTimeout(function(){$("#stat-bra-mod").animate({"margin-left":"5px"},"slow");$("#stat-bra-mod").removeClass("hierarchy-stats-transform");}, 1100);
 		}
 		if( branchDeleted > 0 ){
-			$('<div class="hierarchy-upload-delete-stat">Branches' + interimText + 'Deleted: ' + branchDeleted + '</div>').appendTo("#hierarchy-stats");
+			$('<div id="stat-bra-del" class="hierarchy-upload-delete-stat hierarchy-stats-anim">Branches' + interimText + 'Deleted: ' + branchDeleted + '</div>').appendTo("#hierarchy-stats");
+			setTimeout(function(){$("#stat-bra-del").addClass("hierarchy-stats-transform");$("#stat-bra-del").animate({"margin-left":"15px"}, "slow");}, 600);
+			setTimeout(function(){$("#stat-bra-del").animate({"margin-left":"5px"},"slow");$("#stat-bra-del").removeClass("hierarchy-stats-transform");}, 1200);
 		}
 		if( userAdded > 0 ){
-			$('<div class="hierarchy-upload-add-stat">Users' + interimText + 'Added: ' + userAdded + '</div>').appendTo("#hierarchy-stats");
+			$('<div id="stat-use-add" class="hierarchy-upload-add-stat hierarchy-stats-anim">Users' + interimText + 'Added: ' + userAdded + '</div>').appendTo("#hierarchy-stats");
+			setTimeout(function(){$("#stat-use-add").addClass("hierarchy-stats-transform");$("#stat-use-add").animate({"margin-left":"15px"}, "slow");}, 700);
+			setTimeout(function(){$("#stat-use-add").animate({"margin-left":"5px"},"slow");$("#stat-use-add").removeClass("hierarchy-stats-transform");}, 1300);
 		}
 		if( userModified > 0 ){
-			$('<div class="hierarchy-upload-modify-stat">Users' + interimText + 'Modified: ' + userModified + '</div>').appendTo("#hierarchy-stats");
+			$('<div id="stat-use-mod" class="hierarchy-upload-modify-stat hierarchy-stats-anim">Users' + interimText + 'Modified: ' + userModified + '</div>').appendTo("#hierarchy-stats");
+			setTimeout(function(){$("#stat-use-mod").addClass("hierarchy-stats-transform");$("#stat-use-mod").animate({"margin-left":"15px"}, "slow");}, 800);
+			setTimeout(function(){$("#stat-use-mod").animate({"margin-left":"5px"},"slow");$("#stat-use-mod").removeClass("hierarchy-stats-transform");}, 1400);
 		}
 		if( userDeleted > 0 ){
-			$('<div class="hierarchy-upload-delete-stat">Users' + interimText + 'Deleted: ' + userDeleted + '</div>').appendTo("#hierarchy-stats");
+			$('<div id="stat-use-del" class="hierarchy-upload-delete-stat hierarchy-stats-anim">Users' + interimText + 'Deleted: ' + userDeleted + '</div>').appendTo("#hierarchy-stats");
+			setTimeout(function(){$("#stat-use-del").addClass("hierarchy-stats-transform");$("#stat-use-del").animate({"margin-left":"15px"}, "slow");}, 900);
+			setTimeout(function(){$("#stat-use-del").animate({"margin-left":"5px"},"slow");$("#stat-use-del").removeClass("hierarchy-stats-transform");}, 1500);
 		}
 	}
 };

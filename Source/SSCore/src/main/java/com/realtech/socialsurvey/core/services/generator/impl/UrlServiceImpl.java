@@ -6,10 +6,17 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.realtech.socialsurvey.core.entities.SendGridEventEntity;
+import com.realtech.socialsurvey.core.integration.stream.StreamApiConnectException;
+import com.realtech.socialsurvey.core.integration.stream.StreamApiException;
+import com.realtech.socialsurvey.core.integration.stream.StreamApiIntegrationBuilder;
+import com.realtech.socialsurvey.core.services.stream.StreamMessagesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.UrlDetailsDao;
@@ -18,6 +25,8 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.generator.UrlService;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
+
+import static java.util.Arrays.*;
 
 
 @Component
@@ -37,9 +46,23 @@ public class UrlServiceImpl implements UrlService
     @Autowired
     private URLGenerator urlGenerator;
 
+    private StreamApiIntegrationBuilder streamApiIntegrationBuilder;
+    private StreamMessagesService streamMessagesService;
+
+    @Autowired
+    public void setStreamApiIntegrationBuilder( StreamApiIntegrationBuilder streamApiIntegrationBuilder )
+    {
+        this.streamApiIntegrationBuilder = streamApiIntegrationBuilder;
+    }
+
+    @Autowired
+    public void setStreamMessagesService( StreamMessagesService streamMessagesService )
+    {
+        this.streamMessagesService = streamMessagesService;
+    }
 
     @Override
-    public String shortenUrl( String url ) throws InvalidInputException
+    public String shortenUrl( String url, String uuid ) throws InvalidInputException
     {
         if ( url == null || url.isEmpty() ) {
             LOG.error( "URL passed in argument of shortenUrl() is null or empty" );
@@ -91,7 +114,7 @@ public class UrlServiceImpl implements UrlService
         String encryptedIdStr = encryptionHelper.encodeBase64( urlDetailsId );
         LOG.info( "Encrypted the url detail id into Base64. Encrypted value : " + encryptedIdStr );
 
-        return applicationBaseUrl + CommonConstants.SHORTENED_URL_SUFFIX + "?q=" + encryptedIdStr;
+        return applicationBaseUrl + CommonConstants.SHORTENED_URL_SUFFIX + "?q=" + encryptedIdStr + "&u=" + uuid;
     }
 
 
@@ -128,6 +151,32 @@ public class UrlServiceImpl implements UrlService
         LOG.info( "Updated Url Details : " + urlDetails );
 
         return urlDetails.getUrl();
+    }
+
+    /**
+     * This method calls the Stream api recieveSendGridEvents for click tracking
+     * @param uuid
+     * @return
+     */
+    @Async
+    @Override
+    public void sendClickEvent(String uuid) {
+        SendGridEventEntity sendGridEventEntity = new SendGridEventEntity();
+        sendGridEventEntity.setUuid(uuid);
+        sendGridEventEntity.setEvent(CommonConstants.EVENT_CLICK);
+        //gets the current time in secs
+        sendGridEventEntity.setTimestamp(System.currentTimeMillis()/1000);
+        try {
+            streamApiIntegrationBuilder.getStreamApi().streamClickEvent(asList(sendGridEventEntity));
+        } catch ( StreamApiException | StreamApiConnectException e ) {
+            LOG.error( "Could not send click event", e );
+            LOG.info( "Saving message into local db" );
+            saveMessageToStreamLater( sendGridEventEntity );
+        }
+    }
+
+    private boolean saveMessageToStreamLater( SendGridEventEntity sendGridEventEntity ) {
+        return streamMessagesService.saveFailedStreamClickEvent( sendGridEventEntity );
     }
 
 

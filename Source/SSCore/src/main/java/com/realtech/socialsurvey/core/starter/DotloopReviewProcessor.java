@@ -664,7 +664,7 @@ public class DotloopReviewProcessor extends QuartzJobBean
         OrganizationUnitSettings unitSettings )
     {
         String apiKeysStr = dotloopCrmInfo.getApi();
-        List<String> apiKeyList = Arrays.asList( apiKeysStr.split( "\\s*,\\s*" ) );
+        List<String> apiKeyList = Arrays.asList( apiKeysStr.split( CommonConstants.COMMA_SEPERATOR_PATTERN ) );
         for ( String apiKey : apiKeyList ) {
             apiKey = apiKey.trim();
             LOG.debug( "Fetching reviews for api key: " + apiKey + " with id: " + unitSettings.getIden() );

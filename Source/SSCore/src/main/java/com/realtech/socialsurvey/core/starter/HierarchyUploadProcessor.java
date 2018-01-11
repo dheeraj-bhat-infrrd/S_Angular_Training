@@ -51,7 +51,7 @@ public class HierarchyUploadProcessor implements Runnable
                             hierarchyUploadService.processHierarchyUploadXlsx( upload );
 
                         } catch ( Exception error ) {
-                            LOG.error( "Error while processing upload for company with ID: " + upload.getCompanyId(), error );
+                            LOG.error( "Error while processing upload for company with ID: {}", upload.getCompanyId(), error );
 
                             upload.setHasGeneralErrors( true );
                             // set the error message 

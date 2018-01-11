@@ -125,7 +125,7 @@ public class SiteMapServiceImpl implements SiteMapService
     public void uploadFile( String filePath, FileUploadService uploadService, String envPrefix ) throws NonFatalException
     {
         LOG.info( "Uploading " + filePath + " to Amazon" );
-        uploadService.uploadFileAtSpeicifiedBucket( new File( filePath ),
+        uploadService.uploadFileAtSpecifiedBucket( new File( filePath ),
             filePath.substring( filePath.lastIndexOf( CommonConstants.FILE_SEPARATOR ) + 1 ), siteMapBucket, true );
 
     }

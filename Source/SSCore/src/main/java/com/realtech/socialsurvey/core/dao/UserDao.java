@@ -75,4 +75,7 @@ public interface UserDao extends GenericDao<User, Long>
     public Map<Long, Long> getUsersCountForCompanies();
 
 
+    public List<String> getRegisteredEmailsInTheCompany( Company company ) throws InvalidInputException;
+
+
 }
