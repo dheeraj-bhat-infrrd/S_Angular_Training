@@ -3362,6 +3362,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
             // get the month strings
             List<String> months = buildMonthStringsForDigest( monthUnderConcern );
+            List<Long> digestUserCountList = new ArrayList<>();
 
             // populate digest data for three months in total
             for ( int i = 0; i < 3; i++ ) {
@@ -3383,14 +3384,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 templateData.setAverageScoreRating( ( digest != null ) ? String.format( "%.2f", digest.getAverageScoreRating() )
                     : CommonConstants.NOT_AVAILABLE );
                 
-                // correct cumulative user count
-                if( digest != null && digest.getUserCount() == 0 && digestList.get( ( i == 0 ? 0 : ( i - 1 ) ) ).getUserCount() > 0 ) {
-                    digest.setUserCount( digestList.get( ( i == 0 ? 0 : ( i - 1 ) ) ).getUserCount() );
-                }
+                digestUserCountList.add( i, digest != null ? digest.getUserCount() : 0l );
                 
-                templateData.setUserCount( ( digest != null )
-                    ? String.valueOf( digest.getUserCount() ) + ( digest.getUserCount() > 1 ? " Users" : " User" )
-                    : CommonConstants.NOT_AVAILABLE );
                 templateData.setCompletedTransactions(
                     ( digest != null ) ? String.valueOf( digest.getCompletedTransactions() ) : CommonConstants.NOT_AVAILABLE );
                 templateData.setTotalTransactions(
@@ -3412,6 +3407,21 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                     ( digest != null ) ? String.valueOf( digest.getTotalCompletedReviews() ) : CommonConstants.NOT_AVAILABLE );
 
                 digestAggregate.getDigestList().add( i, templateData );
+            }
+            
+            // correct cumulative user count
+            long prevCount = 0l;
+            for( int i = 0; i < 3; i++ ) {
+            	long currentCount = digestUserCountList.get(i); 
+            	
+            	if( prevCount > currentCount ) {
+            		currentCount = prevCount;
+            	}
+            	
+            	digestAggregate.getDigestList().get(i).setUserCount(
+                    String.valueOf( currentCount + ( currentCount > 1 ? " Users" : " User" ) ) );
+            	
+            	prevCount = currentCount;
             }
 
         }
