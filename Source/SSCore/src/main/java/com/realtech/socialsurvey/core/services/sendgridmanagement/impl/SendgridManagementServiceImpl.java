@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.services.sendgridmanagement.impl;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -8,9 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import retrofit.client.Response;
-import retrofit.mime.TypedByteArray;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -18,6 +16,9 @@ import com.realtech.socialsurvey.core.integration.sendgrid.SendgridIntegrationAp
 import com.realtech.socialsurvey.core.integration.sendgrid.SendgridIntegrationApiBuilder;
 import com.realtech.socialsurvey.core.services.sendgridmanagement.SendgridManagementService;
 import com.realtech.socialsurvey.core.vo.SendgridUnsubscribeVO;
+
+import retrofit.client.Response;
+import retrofit.mime.TypedByteArray;
 
 @Component
 public class SendgridManagementServiceImpl   implements SendgridManagementService
@@ -42,26 +43,34 @@ public class SendgridManagementServiceImpl   implements SendgridManagementServic
     @Autowired
     SendgridIntegrationApiBuilder sendgridIntegrationApiBuilder;
     
+    
     @Override
     public void addNewEmailToUnsubscribeList(String emailId) throws NonFatalException
     {
         LOG.info( "method addNewEmailToUnsubscribeList started for email id {}" + emailId );
         try {
             SendgridIntegrationApi sendgridIntegrationApi = sendgridIntegrationApiBuilder.getSendgridIntegrationApi();
-            Response response = sendgridIntegrationApi.unsubscribeEmail( sendGridUserName, sendGridPassword, emailId );
             
+            //unsubscribe from 'me' account
+            try {
+            			sendgridIntegrationApi.unsubscribeEmail( sendGridUserName, sendGridPassword, emailId );
+            }catch(Exception e) {
+            		LOG.error("Error while unsubscribing email " + emailId);
+            		throw new NonFatalException(e.getMessage());
+            }
             
-            String responseString = null;
-            if ( response != null ) {
-                responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+            // unsubscribe from us account
+            try {
+            			sendgridIntegrationApi.unsubscribeEmail( sendGridSocialSurveyUsUserName,
+                    sendGridSocialSurveyUsPassword, emailId );
+            }catch(Exception e){
+                LOG.error( "Error while unsubscribing emails." + emailId );
+                // re subscribe from me account and throw error
+                SendgridManagementServiceImpl sMSI = new SendgridManagementServiceImpl();
+                sMSI.removewEmailFromUnsubscribeList(emailId);
+                throw new NonFatalException(e.getMessage());
             }
-
-            String responseString2 = null;
-            Response response2 = sendgridIntegrationApi.unsubscribeEmail( sendGridSocialSurveyUsUserName,
-                sendGridSocialSurveyUsPassword, emailId );
-            if ( response2 != null ) {
-                responseString2 = new String( ( (TypedByteArray) response2.getBody() ).getBytes() );
-            }
+            
         }catch(Exception e){
             LOG.error( "Error while unsubscribing emails." );
             throw new NonFatalException(e.getMessage());
@@ -78,20 +87,27 @@ public class SendgridManagementServiceImpl   implements SendgridManagementServic
         LOG.info( "method removewEmailFromUnsubscribeList started for email id {}" + emailId );
         try {
             SendgridIntegrationApi sendgridIntegrationApi = sendgridIntegrationApiBuilder.getSendgridIntegrationApi();
-            Response response = sendgridIntegrationApi.resubscribeEmail( sendGridUserName, sendGridPassword, emailId );
             
+            //re subscribing from 'me' server
+            try {
+                sendgridIntegrationApi.resubscribeEmail( sendGridUserName, sendGridPassword, emailId );
+            }catch(Exception e) {
+        			LOG.error("Error while re subscribing email " + emailId);
+        			throw new NonFatalException(e.getMessage());
+            }
+        
+            // re subscribing form 'us' server
+            try {
+            		sendgridIntegrationApi.resubscribeEmail( sendGridSocialSurveyUsUserName,
+            				sendGridSocialSurveyUsPassword, emailId );
+            }catch(Exception e){
+                LOG.error( "Error while re subscribing emails." + emailId );
+                // unsubscribe from me account and throw error
+                SendgridManagementServiceImpl sMSI = new SendgridManagementServiceImpl();
+                sMSI.addNewEmailToUnsubscribeList(emailId);
+                throw new NonFatalException(e.getMessage());
+            }
             
-            String responseString = null;
-            if ( response != null ) {
-                responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
-            }
-
-            String responseString2 = null;
-            Response response2 = sendgridIntegrationApi.resubscribeEmail( sendGridSocialSurveyUsUserName,
-                sendGridSocialSurveyUsPassword, emailId );
-            if ( response2 != null ) {
-                responseString2 = new String( ( (TypedByteArray) response2.getBody() ).getBytes() );
-            }
         }catch(Exception e){
             LOG.error( "Error while resubscribing emails." );
             throw new NonFatalException(e.getMessage());
@@ -117,6 +133,9 @@ public class SendgridManagementServiceImpl   implements SendgridManagementServic
             if ( response != null ) 
                 responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
             sendgridUnsubscribeVOs = new ObjectMapper().readValue( responseString, new TypeReference<List<SendgridUnsubscribeVO>>() {} );
+            
+            //sort by created on desc
+            Collections.reverse(sendgridUnsubscribeVOs);
             
         }catch(Exception e){
             LOG.error( "Error while getUnsubscribedEmailList." );

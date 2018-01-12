@@ -4013,18 +4013,28 @@ function initiateSendgridUnsubscribeEmailPage()
 					message = "Error while adding email address" + data;
 				$('#overlay-toast').html(message);
 				showToast();
+				//update unsubscribed email
+				getUnsubscribeEmails();
 			}, payload, false , "#add-unsubscribe-email-form-submit");
 		}
 			
 	});
 	
 	//get all the unsubscribed email
+	getUnsubscribeEmails();
+}
+
+function getUnsubscribeEmails(){
+	showOverlay();
 	callAjaxGET("./getunsubscribedemails", paintUnsubscribedEmail, true);
 }
 
 function paintUnsubscribedEmail(unsubscibedEmails){
 	console.log(unsubscibedEmails);
 	unsubscibedEmails =JSON.parse(unsubscibedEmails);
+	//clear old data
+	$("#unsubscribedEmailList .u-tbl-row").remove();
+	
 	for (i = 0; i < unsubscibedEmails.length; i++) {
 	    var unsubscibedEmail = unsubscibedEmails[i];
 	    

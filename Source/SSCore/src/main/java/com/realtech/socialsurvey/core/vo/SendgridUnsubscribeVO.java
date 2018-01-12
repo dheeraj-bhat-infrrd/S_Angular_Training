@@ -8,8 +8,8 @@ public class SendgridUnsubscribeVO
 {
 
     private String email;
-    
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm:ss")
     private Date created;
 
     
