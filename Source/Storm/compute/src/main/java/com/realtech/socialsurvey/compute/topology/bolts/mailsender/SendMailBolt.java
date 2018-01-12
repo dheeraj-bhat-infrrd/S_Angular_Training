@@ -178,18 +178,23 @@ public class SendMailBolt extends BaseComputeBoltWithAck
         Mail mail = new Mail();
         
         String senderEmailId = null;
+        String senderName = null;
         if(emailMessage.getSenderEmailId() == null || emailMessage.getSenderEmailId().isEmpty()){
             
             //If there's no sender email address specified (as in the case of certain emailed reports), use the site admin's email address
             senderEmailId = LocalPropertyFileHandler.getInstance()
                 .getProperty( ComputeConstants.APPLICATION_PROPERTY_FILE, ComputeConstants.ADMIN_EMAIL_ADDRESS )
                 .orElse( null );
+            senderName = LocalPropertyFileHandler.getInstance()
+                .getProperty( ComputeConstants.APPLICATION_PROPERTY_FILE, ComputeConstants.ADMIN_EMAIL_ADDRESS_NAME )
+                .orElse( null );
         }
         else{
             senderEmailId = emailMessage.getSenderEmailId();
+            senderName = emailMessage.getSenderName();
         }
         
-        Email from = new Email( senderEmailId, emailMessage.getSenderName() );
+        Email from = new Email( senderEmailId, senderName );
         mail.setFrom( from );
         Personalization personalization = new Personalization();
         for ( String reciepient : emailMessage.getRecipients() ) {
