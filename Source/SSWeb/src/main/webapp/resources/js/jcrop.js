@@ -6,7 +6,14 @@ var ratio = 1;
 $(document).on('change', '#prof-image', function() {
 	overlayRevert();
 	createPopupCanvas();
-	initiateJcrop(this);
+	initiateJcrop(this, false);
+});
+
+
+$(document).on('change', '#rep-prof-image', function() {
+	overlayRevert();
+	createPopupCanvas();
+	initiateJcrop(this, true);
 });
 
 function createPopupCanvas() {
@@ -21,7 +28,7 @@ function createPopupCanvas() {
 }
 
 // Function to crop and upload profile image
-function initiateJcrop(input) {
+function initiateJcrop(input, forNewDashboard) {
 	if (input.files && input.files[0]) {
 		var reader = new FileReader();
 		reader.onload = function(e) {
@@ -93,8 +100,9 @@ function initiateJcrop(input) {
 			formData.append("selected_h", Math.round(selected_h * boxToOriginalRatio));
 			formData.append("width", Math.round($('#target').width() * boxToOriginalRatio));
 			formData.append("height", Math.round($('#target').height() * boxToOriginalRatio));
-			formData.append("imageFileName", $('#prof-image').prop("files")[0].name);
+			formData.append("imageFileName", forNewDashboard == true ? $('#rep-prof-image').prop("files")[0].name : $('#prof-image').prop("files")[0].name);
 			formData.append("imageBase64", dataurl);
+			formData.append("forNewDashboard",forNewDashboard == true ? true : false );
 			
 			overlayRevert();
 			$.ajax({
@@ -107,7 +115,11 @@ function initiateJcrop(input) {
 				success : callBackOnProfileImageUpload,
 				complete : function() {
 					hideOverlay();
-					$('#prof-image').val('');
+					if( forNewDashboard == true ){
+						$('#rep-prof-image').val('');
+					} else {
+						$('#prof-image').val('');
+					}
 				},
 				error : function(e) {
 					if(e.status == 504) {

@@ -28,6 +28,7 @@
 	<c:set value="${cannonicalusersettings.companySettings.vertical}" var="verticalVal"></c:set>
 </c:if>
 
+<div id="prof-message-header" class="hide"></div>
 <c:if test="${(highestrole != 1 && highestrole != 2 && highestrole != 3)}">
 <div id="rep-user-details" class="col-sm-6 col-lg-6 col-md-6 col-xs-6 rep-user-details">
 	<div id="rep-rank-prof-pic" class="col-lg-6 col-md-6 col-sm-6 col-xs-6 rep-rank-prof-pic">

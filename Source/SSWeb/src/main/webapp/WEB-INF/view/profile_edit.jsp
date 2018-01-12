@@ -192,9 +192,9 @@
 	<div>
 		<div class="container pos-relative">
 			<div id="logo-dash" class="hide"></div>
-			<div class="row prof-pic-name-wrapper edit-prof-pic-name-wrapper">
+			<div class="row prof-pic-name-wrapper edit-prof-pic-name-wrapper" style="margin-bottom: 20px;">
 				<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper">
-					<div id="prof-img-container" class="prog-img-container prof-img-lock-wrapper">
+					<div id="prof-img-container" class="prog-img-container prof-img-lock-wrapper"  style="height: 230px;">
 						<jsp:include page="profile_profileimage.jsp"></jsp:include>
 					</div>
 				</div>
