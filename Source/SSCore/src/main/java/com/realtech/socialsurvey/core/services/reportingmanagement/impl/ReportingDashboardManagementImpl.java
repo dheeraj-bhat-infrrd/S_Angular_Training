@@ -3411,7 +3411,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             
             // correct cumulative user count
             long prevCount = 0l;
-            for( int i = 0; i < 3; i++ ) {
+            for( int i = 2; i >= 0; i-- ) {
             	long currentCount = digestUserCountList.get(i); 
             	
             	if( prevCount > currentCount ) {
