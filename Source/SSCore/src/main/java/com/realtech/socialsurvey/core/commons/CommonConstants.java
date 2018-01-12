@@ -136,6 +136,9 @@ public interface CommonConstants
 
     public static final int IS_PRIMARY_FALSE = 0;
     public static final int IS_PRIMARY_TRUE = 1;
+    
+    public static final int IS_SURVEY_REQUEST_SENT_FALSE = 0;
+    public static final int IS_SURVEY_REQUEST_SENT_TRUE = 1;
 
     //Reporting batch size 
     public static final int BATCH_SIZE = 5000;

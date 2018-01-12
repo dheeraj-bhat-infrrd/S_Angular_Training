@@ -261,15 +261,19 @@ public final class DisplayMessageConstants
     public static final String INVALID_VALUES = "INVALID_VALUES";
     public static final String ACCOUNT_DOESNT_EXIST = "ACCOUNT_DOESNT_EXIST";
     public static final String VENDASTA_NOT_FOR_AGENT = "VENDASTA_NOT_FOR_AGENT";
-    
+
     //sort criteria settings constants
     public static final String INSUFFICIENT_USER_PERMISSION = "INSUFFICIENT_USER_PERMISSION";
     public static final String SORT_CRITERIA_SUCCESSFULLY_UPDATED = "SORT_CRITERIA_SUCCESSFULLY_UPDATED";
     public static final String SEND_EMAIL_THROUGH_SUCCESSFULLY_UPDATED = "SEND_EMAIL_THROUGH_SUCCESSFULLY_UPDATED";
     public static final String SEND_EMAIL_THROUGH_UNSUCCESSFULLY_UPDATED = "SEND_EMAIL_THROUGH_UNSUCCESSFULLY_UPDATED";
-    
+
     //email criteria
-    public static final String INSUFFICIENT_SENDGRID_USER_PERMISSION="INSUFFICIENT_SENDGRID_USER_PERMISSION";
-    
+    public static final String INSUFFICIENT_SENDGRID_USER_PERMISSION = "INSUFFICIENT_SENDGRID_USER_PERMISSION";
+
+    // profile image edit 
+    public static final String PROFILE_IMAGE_DELETE_SUCCESSFUL = "PROFILE_IMAGE_DELETE_SUCCESSFUL";
+    public static final String PROFILE_IMAGE_DELETE_UNSUCCESSFUL = "PROFILE_IMAGE_DELETE_UNSUCCESSFUL";
+
 }
 

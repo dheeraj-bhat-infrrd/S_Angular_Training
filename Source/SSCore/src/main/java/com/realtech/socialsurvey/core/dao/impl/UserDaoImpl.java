@@ -168,7 +168,7 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
             "Method checkIfAnyActiveUserExists() called to check if any active user present with the Email id : " + emailId );
         Criteria criteria = getSession().createCriteria( User.class );
         try {
-            criteria.add( Restrictions.eq( CommonConstants.LOGIN_NAME, emailId ) );
+            criteria.add( Restrictions.eq( CommonConstants.LOGIN_NAME, emailId ).ignoreCase() );
             Criterion criterion = Restrictions.or(
                 Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ),
                 Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED ),

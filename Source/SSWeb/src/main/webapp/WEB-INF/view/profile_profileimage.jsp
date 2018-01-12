@@ -21,30 +21,71 @@
 </c:choose>
 
 <c:choose>
+	<c:when test="${profilemasterid == 1}">
+		<c:set value="comp-default-img" var="defaultprofimageclass"></c:set>
+	</c:when>
+	<c:when test="${profilemasterid == 2}">
+		<c:set value="region-default-img" var="defaultprofimageclass"></c:set>
+	</c:when>
+	<c:when test="${profilemasterid == 3}">
+		<c:set value="office-default-img" var="defaultprofimageclass"></c:set>
+	</c:when>
+	<c:when test="${profilemasterid == 4}">
+		<c:set value="pers-default-big" var="defaultprofimageclass"></c:set>
+	</c:when>
+</c:choose>
+
+<input type="text" id="default-prof-image" class="hidden" value="${defaultprofimageclass}">
+<c:choose>
 	<c:when test="${not empty profileimage}">
-		<img id="prof-image-edit" class="prof-image prof-image-edit pos-relative cursor-pointer" src="${profileimage}"></img>
+	<div class="prof-img-height padding-top-one-third">
+		<img id="prof-image-edit" class="prof-image prof-image-edit height-auto pos-relative" src="${profileimage}" style="height: 195px;clear: both;"></img>
+	</div>
 	</c:when>
 	<c:otherwise>
-		<c:choose>
-			<c:when test="${profilemasterid == 1}">
-				<c:set value="comp-default-img" var="defaultprofimageclass"></c:set>
-			</c:when>
-			<c:when test="${profilemasterid == 2}">
-				<c:set value="region-default-img" var="defaultprofimageclass"></c:set>
-			</c:when>
-			<c:when test="${profilemasterid == 3}">
-				<c:set value="office-default-img" var="defaultprofimageclass"></c:set>
-			</c:when>
-			<c:when test="${profilemasterid == 4}">
-				<c:set value="pers-default-big" var="defaultprofimageclass"></c:set>
-			</c:when>
-		</c:choose>
-		<div id="prof-image-edit" class="prof-image prof-image-edit ${defaultprofimageclass} pos-relative cursor-pointer"></div>
+		<div id="prof-image-edit" class="prof-image prof-image-edit ${defaultprofimageclass} pos-relative" style="clear: both;"></div>
 	</c:otherwise>
 </c:choose>
-<form class="form_contact_image" enctype="multipart/form-data">
-	<input type='file' id="prof-image" class="con_img_inp_file" />
-</form>
+
+<div style="width: 70px; margin: 0 auto;">
+	<div class="edit-prof-img-icn float-left">
+	</div>
+	<div class="prof-img-del-icn float-left">
+	</div>
+</div>
+
 <div class="prof-rating-mobile-wrapper hide">
 	<div class="st-rating-wrapper maring-0 clearfix"></div>
 </div>
+
+<input type="file" id="prof-image" class="hidden">
+
+<script>
+$(document).ready(function(){
+	$(document).off('click', '.edit-prof-img-icn');
+	$('.edit-prof-img-icn').off('click');
+	$(document).on('click', '.edit-prof-img-icn', function(e){
+		e.stopPropagation();
+		$("#prof-image").trigger('click');
+	})
+
+	$(document).off('click', '.prof-img-del-icn');
+	$('.prof-img-del-icn').off('click');
+	$(document).on('click', '.prof-img-del-icn', function(e){
+		e.stopPropagation();
+
+		callAjaxPOST("./removeprofileimage.do", function(data){
+			hideOverlay();
+			
+			callAjaxGET("./fetchprofileimage.do", function(data) {
+				$('#prof-img-container').html(data);
+				hideOverlay();
+			}, true);
+			
+			$('#prof-message-header').html(data);
+			$('#overlay-toast').html($('#display-msg-div').text().trim());
+			showToast();
+		}, true);
+	})
+})
+</script>

@@ -203,7 +203,8 @@ public class EmailFormatHelper
         String company_zillow_link = null;
         String company_lending_tree_link = null;
         String company_realtor_com_link = null;
-
+        String company_yelp_link = null;
+        
         String facebook_link = null;
         String twitter_link = null;
         String linkedin_link = null;
@@ -212,7 +213,8 @@ public class EmailFormatHelper
         String zillow_link = null;
         String lending_tree_link = null;
         String realtor_com_link = null;
-
+        String yelp_link = null;
+        
         //JIRA SS-626 begin
         try {
             User user = userManagementService.getUserByEmailAddress( senderEmail );
@@ -280,6 +282,8 @@ public class EmailFormatHelper
                     lending_tree_link = socialMediaTokens.getLendingTreeToken().getLendingTreeProfileLink();
                 if ( socialMediaTokens.getRealtorToken() != null )
                     realtor_com_link = socialMediaTokens.getRealtorToken().getRealtorProfileLink();
+                if ( socialMediaTokens.getYelpToken()!= null )
+                    yelp_link = socialMediaTokens.getYelpToken().getYelpPageLink();
             }
 
             socialMediaTokens = companySettings.getSocialMediaTokens();
@@ -301,6 +305,8 @@ public class EmailFormatHelper
                     company_lending_tree_link = socialMediaTokens.getLendingTreeToken().getLendingTreeProfileLink();
                 if ( socialMediaTokens.getRealtorToken() != null )
                     company_realtor_com_link = socialMediaTokens.getRealtorToken().getRealtorProfileLink();
+                if ( socialMediaTokens.getYelpToken() != null )
+                		company_yelp_link = socialMediaTokens.getYelpToken().getYelpPageLink();
             }
         } catch ( NoRecordsFetchedException e ) {
             LOG.error( "No user found with email address : " + senderEmail );
@@ -316,6 +322,7 @@ public class EmailFormatHelper
         content = content.replace( "[zillow_link]", processUrl( zillow_link ) );
         content = content.replace( "[lending_tree_link]", processUrl( lending_tree_link ) );
         content = content.replace( "[realtor_com_link]", processUrl( realtor_com_link ) );
+        content = content.replace( "[yelp_link]", processUrl( yelp_link ) );        
         content = content.replace( "[company_facebook_link]", processUrl( company_facebook_link ) );
         content = content.replace( "[company_twitter_link]", processUrl( company_twitter_link ) );
         content = content.replace( "[company_linkedin_link]", processUrl( company_linkedin_link ) );
@@ -324,6 +331,7 @@ public class EmailFormatHelper
         content = content.replace( "[company_zillow_link]", processUrl( company_zillow_link ) );
         content = content.replace( "[company_lending_tree_link]", processUrl( company_lending_tree_link ) );
         content = content.replace( "[company_realtor_com_link]", processUrl( company_realtor_com_link ) );
+        content = content.replace( "[company_yelp_link]", processUrl( company_yelp_link ) );
 
         Map<String, String> surveyMap = fetchSurveySourceId( agentId, recipientMailId, initiatedDate );
         content = content.replace( "[survey_source_id]", surveyMap.get( CommonConstants.SURVEY_SOURCE_ID_COLUMN ) );
@@ -386,7 +394,8 @@ public class EmailFormatHelper
         String company_zillow_link = null;
         String company_lending_tree_link = null;
         String company_realtor_com_link = null;
-
+        String company_yelp_link = null;
+        
         String facebook_link = null;
         String twitter_link = null;
         String linkedin_link = null;
@@ -395,6 +404,7 @@ public class EmailFormatHelper
         String zillow_link = null;
         String lending_tree_link = null;
         String realtor_com_link = null;
+        String yelp_link = null;
 
         //JIRA SS-626 begin
         try {
@@ -428,6 +438,8 @@ public class EmailFormatHelper
                     lending_tree_link = socialMediaTokens.getLendingTreeToken().getLendingTreeProfileLink();
                 if ( socialMediaTokens.getRealtorToken() != null )
                     realtor_com_link = socialMediaTokens.getRealtorToken().getRealtorProfileLink();
+                if ( socialMediaTokens.getYelpToken()!= null )
+                    yelp_link = socialMediaTokens.getYelpToken().getYelpPageLink();
             }
 
             socialMediaTokens = companySettings.getSocialMediaTokens();
@@ -449,6 +461,8 @@ public class EmailFormatHelper
                     company_lending_tree_link = socialMediaTokens.getLendingTreeToken().getLendingTreeProfileLink();
                 if ( socialMediaTokens.getRealtorToken() != null )
                     company_realtor_com_link = socialMediaTokens.getRealtorToken().getRealtorProfileLink();
+                if ( socialMediaTokens.getYelpToken() != null )
+            		company_yelp_link = socialMediaTokens.getYelpToken().getYelpPageLink();
             }
         } catch ( NoRecordsFetchedException e ) {
             LOG.error( "No user found with email address : " + senderEmail );
@@ -462,6 +476,7 @@ public class EmailFormatHelper
         content = StringUtils.replace( content, "[zillow_link]", processUrl( zillow_link ) );
         content = StringUtils.replace( content, "[lending_tree_link]", processUrl( lending_tree_link ) );
         content = StringUtils.replace( content, "[realtor_com_link]", processUrl( realtor_com_link ) );
+        content = StringUtils.replace( content, "[yelp_link]", processUrl( yelp_link ) );
         content = StringUtils.replace( content, "[company_facebook_link]", processUrl( company_facebook_link ) );
         content = StringUtils.replace( content, "[company_twitter_link]", processUrl( company_twitter_link ) );
         content = StringUtils.replace( content, "[company_linkedin_link]", processUrl( company_linkedin_link ) );
@@ -470,6 +485,7 @@ public class EmailFormatHelper
         content = StringUtils.replace( content, "[company_zillow_link]", processUrl( company_zillow_link ) );
         content = StringUtils.replace( content, "[company_lending_tree_link]", processUrl( company_lending_tree_link ) );
         content = StringUtils.replace( content, "[company_realtor_com_link]", processUrl( company_realtor_com_link ) );
+        content = StringUtils.replace( content, "[company_yelp_link]", processUrl( company_yelp_link ) );
 
         content = StringUtils.replace( content, "[survey_source_id]",
             surveyMap.get( CommonConstants.SURVEY_SOURCE_ID_COLUMN ) );

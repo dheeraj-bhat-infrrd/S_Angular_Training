@@ -831,6 +831,35 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             collection, CommonConstants.IMAGE_TYPE_PROFILE, false, false );
         LOG.debug( "Image updated successfully" );
     }
+    
+    @Override
+    public void removeProfileImage( String collection, OrganizationUnitSettings unitSettings ) throws InvalidInputException
+    {
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( unitSettings == null ) {
+            throw new InvalidInputException( "Company settings passed can not be null" );
+        }
+        LOG.debug( "removing image from mongo" );
+        organizationUnitSettingsDao.removeImageForOrganizationUnitSetting( unitSettings.getIden(), collection, false,
+            CommonConstants.IMAGE_TYPE_PROFILE );
+
+        LOG.debug( "updating solr" );
+        Map<String, Object> updateMap = new HashMap<String, Object>();
+        updateMap.put( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, "" );
+        updateMap.put( CommonConstants.PROFILE_IMAGE_URL_SOLR, "" );
+        updateMap.put( CommonConstants.IS_PROFILE_IMAGE_SET_SOLR, false );
+        try {
+            solrSearchService.editUserInSolrWithMultipleValues( unitSettings.getIden(), updateMap );
+        } catch ( SolrException e ) {
+            LOG.error( "SolrException occured while updating user in solr. Reason : ", e );
+            throw new InvalidInputException( "SolrException occured while updating user in solr. Reason : ", e );
+        }
+
+        LOG.debug( "Image removed successfully" );
+    }
+
 
 
     // vertical
@@ -5767,11 +5796,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             branchProfile, individualProfile, map, true );
 
         // aggregated disclaimer
-        if ( ( CommonConstants.REGION_ID.equals( entityId ) || CommonConstants.BRANCH_ID.equals( entityId ) ) ) {
             String disclaimer = aggregateDisclaimer( profileUnderConcern, entityId );
             if ( StringUtils.isNotEmpty( disclaimer ) )
                 profileUnderConcern.setDisclaimer( disclaimer );
-        }
+        
 
         //remove sensitive info from profile JSON from company profile 
         removeTokensFromProfile( companyProfile );

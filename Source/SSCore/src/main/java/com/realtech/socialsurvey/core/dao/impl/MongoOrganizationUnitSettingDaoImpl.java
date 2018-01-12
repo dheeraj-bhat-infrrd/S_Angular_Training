@@ -897,8 +897,58 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         if ( !( isThumbnail ) ) {
 
         }
+        
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, System.currentTimeMillis() );
+
         mongoTemplate.updateMulti( query, update, OrganizationUnitSettings.class, collectionName );
         LOG.debug( "Updated thumbnail image details" );
+    }
+    
+    @Override
+    public void removeImageForOrganizationUnitSetting( long iden, String collectionName, boolean isThumbnail, String imageType )
+        throws InvalidInputException
+    {
+        LOG.debug( "removing thumbnail image or both profile and thumbnail images for collection: " + collectionName
+            + " with id: " + iden );
+
+        if ( iden <= 0l || collectionName == null || collectionName.isEmpty() ) {
+            throw new InvalidInputException( "Invalid input provided to the method updateImage" );
+        }
+
+        Query query = new Query();
+        Update update = new Update();
+        query.addCriteria( Criteria.where( CommonConstants.IDEN ).is( iden ) );
+
+        //determine the key and flag to update
+        //If the image you're removing isn't a thumb-nail, set the same value for the image column and it's thumb-nail column
+
+        if ( imageType == CommonConstants.IMAGE_TYPE_PROFILE ) {
+            if ( isThumbnail ) {
+                update.set( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, "" );
+            } else {
+                update.set( CommonConstants.PROFILE_IMAGE_URL_SOLR, "" );
+                update.set( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, "" );
+            }
+            update.set( CommonConstants.IS_PROFILE_IMAGE_PROCESSED_COLUMN, false );
+        } else if ( imageType == CommonConstants.IMAGE_TYPE_LOGO ) {
+            if ( isThumbnail ) {
+                update.set( CommonConstants.LOGO_THUMBNAIL_COLUMN, "" );
+            } else {
+                update.set( CommonConstants.LOGO_COLUMN, "" );
+                update.set( CommonConstants.LOGO_THUMBNAIL_COLUMN, "" );
+            }
+            update.set( CommonConstants.IS_LOGO_IMAGE_PROCESSED_COLUMN, "" );
+        } else {
+            throw new InvalidInputException( "Invalid image type" );
+        }
+        if ( !( isThumbnail ) ) {
+
+        }
+        
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, System.currentTimeMillis() );
+
+        mongoTemplate.updateMulti( query, update, OrganizationUnitSettings.class, collectionName );
+        LOG.debug( "removed image details" );
     }
 
 

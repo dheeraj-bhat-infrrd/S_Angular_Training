@@ -651,7 +651,13 @@ public class ProfileManagementController
         LOG.info( "Fetching profile image" );
         return JspResolver.PROFILE_IMAGE;
     }
-
+    
+    @RequestMapping ( value = "/fetchprofileimagefornewdashboard", method = RequestMethod.GET)
+    public String fetchProfileImageForNewDashboard()
+    {
+        LOG.info( "Fetching profile image for new dashboard" );
+        return JspResolver.REPORTING_PROFILE_IMAGE;
+    }
 
     @RequestMapping ( value = "/fetchprofilelogo", method = RequestMethod.GET)
     public String fetchProfileLogo( Model model, HttpServletRequest request )
@@ -1824,7 +1830,7 @@ public class ProfileManagementController
                     branchSettings, logoUrl );
                 branchSettings.setLogo( logoUrl );
                 branchSettings.setLogoThumbnail( logoUrl );
-                userSettings.getRegionSettings().put( entityId, branchSettings );
+                userSettings.getBranchSettings().put( entityId, branchSettings );
                 Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
                 if ( branch != null ) {
                     settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.LOGO, true );
@@ -1882,7 +1888,10 @@ public class ProfileManagementController
             if ( userSettings == null || profileSettings == null || entityType == null ) {
                 throw new InvalidInputException( "No user settings found in session" );
             }
-
+            
+            // new dash-board flag
+            boolean forNewDashboard = Boolean.parseBoolean( request.getParameter( "forNewDashboard" ) );
+            
             try {
                 int selectedX = Integer.parseInt( request.getParameter( "selected_x" ) );
                 int selectedY = Integer.parseInt( request.getParameter( "selected_y" ) );
@@ -1973,7 +1982,7 @@ public class ProfileManagementController
                     branchSettings, profileImageUrl );
                 branchSettings.setProfileImageUrl( profileImageUrl );
                 branchSettings.setProfileImageUrlThumbnail( profileImageUrl );
-                userSettings.getRegionSettings().put( entityId, branchSettings );
+                userSettings.getBranchSettings().put( entityId, branchSettings );
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
                 if ( agentSettings == null ) {
@@ -1998,7 +2007,8 @@ public class ProfileManagementController
 
             profileSettings.setProfileImageUrl( profileImageUrl );
             profileSettings.setProfileImageUrlThumbnail( profileImageUrl );
-            sessionHelper.setProfileImageInSession( session, userSettings );
+            
+            model.addAttribute( "forNewDashboard", forNewDashboard );
 
             LOG.info( "Profile Image uploaded successfully" );
             model.addAttribute( "message", messageUtils.getDisplayMessage(
@@ -2013,6 +2023,93 @@ public class ProfileManagementController
         return JspResolver.MESSAGE_HEADER;
     }
 
+
+    @RequestMapping ( value = "/removeprofileimage", method = RequestMethod.POST)
+    public String removeProfileImage( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method removeProfileImage() called from ProfileManagementController" );
+        User user = sessionHelper.getCurrentUser();
+        HttpSession session = request.getSession( false );
+        String profileImageUrl = "";
+
+        try {
+            UserSettings userSettings = (UserSettings) session
+                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
+                .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
+            long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+            String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+            if ( userSettings == null || profileSettings == null || entityType == null ) {
+                throw new InvalidInputException( "No user settings found in session" );
+            }
+
+            if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
+                if ( companySettings == null ) {
+                    throw new InvalidInputException( "No company settings found in current session" );
+                }
+                profileManagementService.removeProfileImage( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
+                    companySettings );
+               
+                
+                companySettings.setProfileImageUrl( profileImageUrl );
+                companySettings.setProfileImageUrlThumbnail( profileImageUrl );
+                userSettings.setCompanySettings( companySettings );
+                
+            } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+                OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
+                if ( regionSettings == null ) {
+                    throw new InvalidInputException( "No Region settings found in current session" );
+                }
+                profileManagementService.removeProfileImage( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
+                    regionSettings );
+                
+                regionSettings.setProfileImageUrl( profileImageUrl );
+                regionSettings.setProfileImageUrlThumbnail( profileImageUrl );
+                userSettings.getRegionSettings().put( entityId, regionSettings );
+                
+            } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+                OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
+                if ( branchSettings == null ) {
+                    throw new InvalidInputException( "No Branch settings found in current session" );
+                }
+                profileManagementService.removeProfileImage( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
+                    branchSettings );
+                branchSettings.setProfileImageUrl( profileImageUrl );
+                branchSettings.setProfileImageUrlThumbnail( profileImageUrl );
+                userSettings.getBranchSettings().put( entityId, branchSettings );
+                
+            } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+                AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
+                if ( agentSettings == null ) {
+                    throw new InvalidInputException( "No Agent settings found in current session" );
+                }
+                profileManagementService.removeProfileImage( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+                    agentSettings );
+                agentSettings.setProfileImageUrl( profileImageUrl );
+                agentSettings.setProfileImageUrlThumbnail( profileImageUrl );
+                userSettings.setAgentSettings( agentSettings );
+                
+            } else {
+                throw new InvalidInputException( "Invalid input exception occurred while removing profile image.",
+                    DisplayMessageConstants.GENERAL_ERROR );
+            }
+
+            profileSettings.setProfileImageUrl( profileImageUrl );
+            profileSettings.setProfileImageUrlThumbnail( profileImageUrl );
+
+            LOG.info( "Profile Image removed successfully" );
+            model.addAttribute( "message", messageUtils.getDisplayMessage(
+                DisplayMessageConstants.PROFILE_IMAGE_DELETE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
+        } catch ( NonFatalException nonFatalException ) {
+            LOG.error( "NonFatalException while removing logo. Reason :" + nonFatalException.getMessage(), nonFatalException );
+            model.addAttribute( "message", messageUtils.getDisplayMessage(
+                DisplayMessageConstants.PROFILE_IMAGE_DELETE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE ) );
+        }
+
+        LOG.info( "Method updateProfileImage() finished from ProfileManagementController" );
+        return JspResolver.MESSAGE_HEADER;
+    }
 
     /**
      * Method to update email id for profile
