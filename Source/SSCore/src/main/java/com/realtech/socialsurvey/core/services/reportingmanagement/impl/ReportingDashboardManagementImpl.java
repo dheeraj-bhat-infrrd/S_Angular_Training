@@ -3382,6 +3382,12 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                     : CommonConstants.NOT_AVAILABLE );
                 templateData.setAverageScoreRating( ( digest != null ) ? String.format( "%.2f", digest.getAverageScoreRating() )
                     : CommonConstants.NOT_AVAILABLE );
+                
+                // correct cumulative user count
+                if( digest != null && digest.getUserCount() == 0 && digestList.get( ( i == 0 ? 0 : ( i - 1 ) ) ).getUserCount() > 0 ) {
+                    digest.setUserCount( digestList.get( ( i == 0 ? 0 : ( i - 1 ) ) ).getUserCount() );
+                }
+                
                 templateData.setUserCount( ( digest != null )
                     ? String.valueOf( digest.getUserCount() ) + ( digest.getUserCount() > 1 ? " Users" : " User" )
                     : CommonConstants.NOT_AVAILABLE );
