@@ -1141,7 +1141,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                         } else {
                             userRankingThisYearMainList.add( "NR" );
                         }
-
+                        userRankingThisYearMainList.add( userRankingThisYearMain.getCompletedPercentage() );
                         userRanking.add( userRankingThisYearMainList );
                     }
                 } else {
@@ -1186,6 +1186,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                             userRankingPastYearMainList.add( "NR" );
                         }
 
+                        userRankingPastYearMainList.add( userRankingPastYearMain.getCompletedPercentage() );
                         userRanking.add( userRankingPastYearMainList );
                     }
 
@@ -1241,7 +1242,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                         } else {
                             userRankingThisYearRegionList.add( "NR" );
                         }
-
+                        userRankingThisYearRegionList.add( userRankingThisYearRegion.getCompletedPercentage() );
                         userRanking.add( userRankingThisYearRegionList );
                     }
                 } else {
@@ -1284,6 +1285,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                         } else {
                             userRankingPastYearRegionList.add( "NR" );
                         }
+                        userRankingPastYearRegionList.add( userRankingPastYearRegion.getCompletedPercentage() );
 
                         userRanking.add( userRankingPastYearRegionList );
                     }
@@ -1332,6 +1334,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                         } else {
                             userRankingThisYearBranchList.add( "NR" );
                         }
+                        userRankingThisYearBranchList.add( userRankingThisYearBranch.getCompletedPercentage() );
 
                         userRanking.add( userRankingThisYearBranchList );
                     }
@@ -1374,6 +1377,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                         } else {
                             userRankingPastYearBranchList.add( "NR" );
                         }
+                        userRankingPastYearBranchList.add( userRankingPastYearBranch.getCompletedPercentage() );
 
                         userRanking.add( userRankingPastYearBranchList );
                     }
@@ -1457,6 +1461,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                         } else {
                             userRankingThisMonthMainList.add( "NR" );
                         }
+                        userRankingThisMonthMainList.add( userRankingThisMonthMain.getCompletedPercentage() );
 
                         userRanking.add( userRankingThisMonthMainList );
                     }
@@ -1501,6 +1506,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                         } else {
                             userRankingPastMonthMainList.add( "NR" );
                         }
+                        userRankingPastMonthMainList.add( userRankingPastMonthMain.getCompletedPercentage() );
 
                         userRanking.add( userRankingPastMonthMainList );
                     }
@@ -1557,6 +1563,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                         } else {
                             userRankingThisMonthRegionList.add( "NR" );
                         }
+                        userRankingThisMonthRegionList.add( userRankingThisMonthRegion.getCompletedPercentage() );
 
                         userRanking.add( userRankingThisMonthRegionList );
                     }
@@ -1600,6 +1607,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                         } else {
                             userRankingPastMonthRegionList.add( "NR" );
                         }
+                        userRankingPastMonthRegionList.add( userRankingPastMonthRegion.getCompletedPercentage() );
 
                         userRanking.add( userRankingPastMonthRegionList );
                     }
@@ -1648,6 +1656,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                         } else {
                             userRankingMonthYearBranchList.add( "NR" );
                         }
+                        userRankingMonthYearBranchList.add( userRankingThisMonthBranch.getCompletedPercentage() );
 
                         userRanking.add( userRankingMonthYearBranchList );
                     }
@@ -1690,6 +1699,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                         } else {
                             userRankingPastMonthBranchList.add( "NR" );
                         }
+                        userRankingPastMonthBranchList.add( userRankingPastMonthBranch.getCompletedPercentage() );
 
                         userRanking.add( userRankingPastMonthBranchList );
                     }
