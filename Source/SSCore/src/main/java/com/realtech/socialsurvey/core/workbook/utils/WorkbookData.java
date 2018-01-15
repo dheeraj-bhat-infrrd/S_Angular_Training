@@ -1160,6 +1160,7 @@ public class WorkbookData
             userRankingReportToPopulate.add(Double.valueOf( row.get( 10 ) ));
             userRankingReportToPopulate.add(Double.valueOf( row.get( 11 ) ));
             userRankingReportToPopulate.add(String.valueOf( row.get( 12 ) ));
+            userRankingReportToPopulate.add(Double.valueOf( row.get( 13 ) ));
            
             userRankingData.put(++userRankingCounter ,userRankingReportToPopulate );
             userRankingReportToPopulate = new ArrayList<>();
@@ -1180,6 +1181,7 @@ public class WorkbookData
         userRankingReportToPopulate.add( "Rank Score" );
         userRankingReportToPopulate.add( "SPS Score");
         userRankingReportToPopulate.add( "Position in the Company");
+        userRankingReportToPopulate.add( "Completion percentage");
        
 
         userRankingData.put( 1, userRankingReportToPopulate );
