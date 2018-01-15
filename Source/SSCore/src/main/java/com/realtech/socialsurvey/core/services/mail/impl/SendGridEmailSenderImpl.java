@@ -166,7 +166,7 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
                 response = sendGrid1.send( email );
             }
            
-            LOG.info( "Sent the mail. {}",emailEntity.toString() );
+            LOG.info( "Sent the mail. {}",emailEntity.getRecipients() );
         } catch ( SendGridException e ) {
             LOG.error( "Exception while sending the mail.", e );
             mailSent = false;
