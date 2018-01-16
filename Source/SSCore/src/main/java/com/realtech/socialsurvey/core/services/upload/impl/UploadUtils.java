@@ -43,8 +43,8 @@ public final class UploadUtils {
 	 * Method to validate image
 	 */
 	public void validateFile(File convFile) throws InvalidInputException {
-		LOG.debug("Validating uploaded image");
-		String imageFormat=isImageFormatValid( convFile );
+        LOG.debug( "Validating uploaded image" );
+        String imageFormat = isImageFormatValid( convFile );
         if ( imageFormat != "true" ) {
             throw new InvalidInputException( "Upload failed: " + imageFormat + "is not a valid Format",
                 DisplayMessageConstants.INVALID_LOGO_FORMAT + "(" + imageFormats + ")" );
@@ -59,7 +59,7 @@ public final class UploadUtils {
             throw new InvalidInputException( "Upload Failed: MAX dimensions exceeded. Dimensions: " + imageDimension,
                 DisplayMessageConstants.INVALID_LOGO_DIMENSIONS + "(" + maxWidth + " x " + maxHeight + " pixels)" );
         }
-		LOG.debug("Validated uploaded image");
+        LOG.debug( "Validated uploaded image" );
 	}
 
 	/**
