@@ -140,7 +140,7 @@ a, a:hover, a:visited {
 }
 
 .pos-relative {
-	position: relative;
+	position: relative !important;
 }
 
 .logo {
@@ -346,10 +346,6 @@ a, a:hover, a:visited {
 .icn-zip {
 	background: url('../csssprites/form_icons.png') no-repeat -167px 0px;
 	background-size: auto 26px;
-}
-
-.pos-relative {
-	position: relative;
 }
 
 .payment-option-tab {
@@ -657,10 +653,6 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 	background: url(../images/dashloader.gif) no-repeat center;
 	background-size: 40px 40px;
 	background-color: rgba(255, 255, 255, 0.7);
-}
-
-.pos-relative {
-	position: relative;
 }
 
 .overlay-payment {
@@ -3984,20 +3976,6 @@ button.paypal.is-active {
 	background-color: rgb(244, 244, 244);
 }
 
-img.prof-image {
-	width: auto;
-	height: auto !important;
-	max-width: 100%;
-	max-height: 100%;
-	display: block;
-	position: absolute;
-	margin: auto;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	right: 0;
-}
-
 .prof-img-wrapper {
 	width: 200px;
 	height: 200px;
@@ -4013,6 +3991,13 @@ img.prof-image {
 	width: 100%;
 	opacity: 0;
 	z-index: 9;
+	background-color: #fff;
+	height: 100%;
+}
+
+.form_contact_image_trigger {
+	width: 100%;
+	opacity: 0;
 	background-color: #fff;
 	height: 100%;
 }
@@ -6216,6 +6201,18 @@ td.v-tbl-spacer {
 }
 
 .v-icn-close {
+	background: url('../images/delete.png') no-repeat center;
+	cursor: pointer;
+}
+
+.prof-img-del-icn {
+	background: url('../images/delete.png') no-repeat center;
+	cursor: pointer;
+	width: 30px;
+	height: 30px;
+}
+
+.profile-img-delete-icn {
 	background: url('../images/delete.png') no-repeat center;
 	cursor: pointer;
 }
@@ -8775,6 +8772,21 @@ img.hr-ind-img {
 }
 
 .edit-pos-icn {
+	background: url(../images/edit-1.png) no-repeat center;
+	cursor: pointer;
+	width: 30px;
+	height: 30px;
+}
+
+.edit-prof-img-icn {
+	background: url(../images/edit-1.png) no-repeat center;
+	cursor: pointer;
+	width: 30px;
+	height: 30px;
+	margin-right: 10px;
+}
+
+.profile-img-edit-icn {
 	background: url(../images/edit-1.png) no-repeat center;
 	cursor: pointer;
 	width: 30px;

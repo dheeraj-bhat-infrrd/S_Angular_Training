@@ -45,3 +45,7 @@
 <c:if test="${not empty invalidEmailAddress}">
 	<div id="invalid-display-msg-div" class="hide">${invalidEmailAddress}</div>
 </c:if>
+
+<c:if test="${not empty forNewDashboard}">
+	<input id="new-dash-flag" class="hidden" value="${forNewDashboard}">
+</c:if>

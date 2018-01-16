@@ -687,6 +687,9 @@ public interface ProfileManagementService
         boolean fromBatch, boolean fromPublicPage ) throws InvalidInputException, UnavailableException;
 
 
+    public void removeProfileImage( String collection, OrganizationUnitSettings companySettings )
+        throws InvalidInputException;
+
     public String buildJsonMessageWithStatus( int status, String message );
 
 
