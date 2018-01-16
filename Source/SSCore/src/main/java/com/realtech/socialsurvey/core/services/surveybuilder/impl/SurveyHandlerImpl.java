@@ -1882,10 +1882,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                     // check the pre-initiation and then the survey table
                     List<SurveyPreInitiation> incompleteSurveyCustomers = null;
                     if ( duplicateSurveyInterval > 0 ) {
-                        incompleteSurveyCustomers = surveyPreInitiationDao.getSurveyByAgentIdAndCustomeEmailForPastNDays(
+                        incompleteSurveyCustomers = surveyPreInitiationDao.getValidSurveyByAgentIdAndCustomeEmailForPastNDays(
                             user.getUserId(), survey.getCustomerEmailId(), duplicateSurveyInterval );
                     } else {
-                        incompleteSurveyCustomers = surveyPreInitiationDao.getSurveyByAgentIdAndCustomeEmail( user.getUserId(),
+                        incompleteSurveyCustomers = surveyPreInitiationDao.getValidSurveyByAgentIdAndCustomeEmail( user.getUserId(),
                             survey.getCustomerEmailId() );
                     }
                     if ( incompleteSurveyCustomers != null && incompleteSurveyCustomers.size() > 0 ) {
@@ -2444,10 +2444,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         List<SurveyPreInitiation> incompleteSurveyCustomers = null;
         if ( duplicateSurveyInterval > 0 ) {
-            incompleteSurveyCustomers = surveyPreInitiationDao.getSurveyByAgentIdAndCustomeEmailForPastNDays( agentId,
+            incompleteSurveyCustomers = surveyPreInitiationDao.getValidSurveyByAgentIdAndCustomeEmailForPastNDays( agentId,
                 recipientEmailId, duplicateSurveyInterval );
         } else {
-            incompleteSurveyCustomers = surveyPreInitiationDao.getSurveyByAgentIdAndCustomeEmail( agentId, recipientEmailId );
+            incompleteSurveyCustomers = surveyPreInitiationDao.getValidSurveyByAgentIdAndCustomeEmail( agentId, recipientEmailId );
         }
 
         if ( incompleteSurveyCustomers != null && incompleteSurveyCustomers.size() > 0 ) {
@@ -3221,10 +3221,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         // check if incomplete survey exist
         List<SurveyPreInitiation> incompleteSurveyCustomers = null;
         if ( duplicateSurveyInterval > 0 ) {
-            incompleteSurveyCustomers = surveyPreInitiationDao.getSurveyByAgentIdAndCustomeEmailForPastNDays( currentAgentId,
+            incompleteSurveyCustomers = surveyPreInitiationDao.getValidSurveyByAgentIdAndCustomeEmailForPastNDays( currentAgentId,
                 customerEmailId, duplicateSurveyInterval );
         } else {
-            incompleteSurveyCustomers = surveyPreInitiationDao.getSurveyByAgentIdAndCustomeEmail( currentAgentId,
+            incompleteSurveyCustomers = surveyPreInitiationDao.getValidSurveyByAgentIdAndCustomeEmail( currentAgentId,
                 customerEmailId );
         }
 
@@ -4095,7 +4095,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
                 for ( SurveyDetails survey : surveys2 ) {
                     List<SurveyPreInitiation> spis = surveyPreInitiationDao
-                        .getSurveyByAgentIdAndCustomeEmail( survey.getAgentId(), survey.getCustomerEmail() );
+                        .getValidSurveyByAgentIdAndCustomeEmail( survey.getAgentId(), survey.getCustomerEmail() );
                     if ( spis.size() == 1 ) {
                         if ( spis.get( 0 ).getEngagementClosedTime() != null ) {
                             survey.setSurveyTransactionDate( spis.get( 0 ).getEngagementClosedTime() );
@@ -4516,10 +4516,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         // get incomplete survey depending on the survey re-take interval
         if ( duplicateSurveyInterval > 0 ) {
-            incompleteSurveyCustomers = surveyPreInitiationDao.getSurveyByAgentIdAndCustomeEmailForPastNDays( user.getUserId(),
+            incompleteSurveyCustomers = surveyPreInitiationDao.getValidSurveyByAgentIdAndCustomeEmailForPastNDays( user.getUserId(),
                 survey.getCustomerEmailId(), duplicateSurveyInterval );
         } else {
-            incompleteSurveyCustomers = surveyPreInitiationDao.getSurveyByAgentIdAndCustomeEmail( user.getUserId(),
+            incompleteSurveyCustomers = surveyPreInitiationDao.getValidSurveyByAgentIdAndCustomeEmail( user.getUserId(),
                 survey.getCustomerEmailId() );
         }
 
