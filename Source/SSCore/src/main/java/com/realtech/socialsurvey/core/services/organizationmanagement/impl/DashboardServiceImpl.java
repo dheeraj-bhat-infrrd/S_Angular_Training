@@ -2014,8 +2014,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
             } else {
                 name = recipientName;
             }
-            	// add attachment link in to email
-            body += ". You can download the report using link " + filePath;
+
+            body += ". You can download the report using link <a href='" + filePath + "'>" + filePath + "</a>";
             LOG.debug( "sending mail to : " + name + " at : " + mailId );
             emailServices.sendCustomMail( name, mailId, subject, body, attachments );
         }
