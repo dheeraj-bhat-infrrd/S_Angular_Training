@@ -527,7 +527,7 @@ public class EmailFormatHelper
         }
         String surveySourceId = "";
         String surveySource = "";
-        List<SurveyPreInitiation> surveyList = surveyPreInitiationDao.getSurveyByAgentIdAndCustomeEmail( agentId,
+        List<SurveyPreInitiation> surveyList = surveyPreInitiationDao.getValidSurveyByAgentIdAndCustomeEmail( agentId,
             customerEmailAddress );
         if ( surveyList.isEmpty() ) {
             throw new InvalidInputException( "No survey found!" );
