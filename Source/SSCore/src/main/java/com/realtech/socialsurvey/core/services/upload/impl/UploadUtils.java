@@ -44,34 +44,38 @@ public final class UploadUtils {
 	 */
 	public void validateFile(File convFile) throws InvalidInputException {
 		LOG.debug("Validating uploaded image");
-		if (!imageFormat(convFile)) {
-			throw new InvalidInputException("Upload failed: Not valid Format", DisplayMessageConstants.INVALID_LOGO_FORMAT + "(" + imageFormats + ")");
-		}
-		if (!imageSize(convFile)) {
-			throw new InvalidInputException("Upload Failed: MAX size exceeded", DisplayMessageConstants.INVALID_LOGO_SIZE + "(" + maxBytes + "bytes)");
-		}
-		if (!imageDimension(convFile)) {
-			throw new InvalidInputException("Upload Failed: MAX dimensions exceeded", DisplayMessageConstants.INVALID_LOGO_DIMENSIONS + "("
-					+ maxWidth + " x " + maxHeight + " pixels)");
-		}
+        if ( isImageFormatValid( convFile ) != "true" ) {
+            throw new InvalidInputException( "Upload failed: " + isImageFormatValid( convFile ) + "is not a valid Format",
+                DisplayMessageConstants.INVALID_LOGO_FORMAT + "(" + imageFormats + ")" );
+        }
+        if ( isImageSizeValid( convFile ) != "true" ) {
+            throw new InvalidInputException(
+                "Upload Failed: MAX size exceeded. Size of image is:" + isImageSizeValid( convFile ),
+                DisplayMessageConstants.INVALID_LOGO_SIZE + "(" + maxBytes + "bytes)" );
+        }
+        if ( isImageDimensionValid( convFile ) != "true" ) {
+            throw new InvalidInputException(
+                "Upload Failed: MAX dimensions exceeded.Dimensions: " + isImageDimensionValid( convFile ),
+                DisplayMessageConstants.INVALID_LOGO_DIMENSIONS + "(" + maxWidth + " x " + maxHeight + " pixels)" );
+        }
 		LOG.debug("Validated uploaded image");
 	}
 
 	/**
 	 * Method to validate image size
 	 */
-	public boolean imageSize(File logo) {
+	public String isImageSizeValid(File logo) {
 		LOG.debug("Validation imageSize method inside ImageUploadServiceImpl called");
 		if (maxBytes == -1 ) {
-            return true;
+            return "true";
         }
-		return (logo.length() < maxBytes) ? true : false;
+        return ( logo.length() < maxBytes ) ? "true" : Long.toString( logo.length() );
 	}
 
 	/**
 	 * Method to validate image format
 	 */
-	public boolean imageFormat(File logo) {
+	public String isImageFormatValid(File logo) {
 		LOG.debug("Validation imageFormat method inside ImageUploadServiceImpl called");
 		ImageInputStream imageStream = null;
 		ImageReader reader = null;
@@ -80,24 +84,25 @@ public final class UploadUtils {
 			imageStream = ImageIO.createImageInputStream(logo);
 			Iterator<ImageReader> readers = ImageIO.getImageReaders(imageStream);
 
+			String formatName = null;
 			if (readers.hasNext()) {
 				reader = readers.next();
 				reader.setInput(imageStream, true, true);
 
 				// Find the format of the image and match with allowed extensions
-				String formatName = reader.getFormatName().toUpperCase();
+				formatName = reader.getFormatName().toUpperCase();
 				LOG.debug("Format of the file: " + formatName);
 				String[] listFormats = imageFormats.split(",");
 				Set<String> setFormats = new HashSet<String>(Arrays.asList(listFormats));
 
 				if (setFormats.contains(formatName)) {
 					LOG.debug("Validation imageFormat method inside ImageUploadServiceImpl completed successfully");
-					return true;
+					return "true";
 				}
 			}
 			
 			LOG.debug("Validation imageFormat method inside ImageUploadServiceImpl completed successfully");
-			return false;
+			return formatName;
 		}
 		catch (IOException e) {
 			LOG.error("IOException occured while reading from ImageInputStream. Reason : " + e.getMessage(), e);
@@ -121,30 +126,31 @@ public final class UploadUtils {
 	/**
 	 * Method to validate image dimension
 	 */
-	public boolean imageDimension(File logo) {
+	public String isImageDimensionValid(File logo) {
 		LOG.debug("Validation imageDimension method inside ImageUploadServiceImpl called");
 		ImageInputStream imageStream = null;
 		ImageReader reader = null;
 		
 		if (maxWidth == -1 && maxHeight == -1) {
-			return true;
+			return "true";
 		}
 		try {
 			imageStream = ImageIO.createImageInputStream(logo);
 			Iterator<ImageReader> readers = ImageIO.getImageReaders(imageStream);
 
+			int width = 0,height = 0;
 			if (readers.hasNext()) {
 				reader = readers.next();
 				reader.setInput(imageStream, true, true);
 
-				int width = reader.getWidth(0);
-				int height = reader.getHeight(0);
+				width = reader.getWidth(0);
+				height = reader.getHeight(0);
 
 				LOG.debug("Validation imageDimension method inside ImageUploadServiceImpl completed successfully");
-				return ((width <= maxWidth) && (height <= maxHeight)) ? true : false;
+                return ( ( width <= maxWidth ) && ( height <= maxHeight ) ) ? "true" : width + "X" + height;
 			}
 			LOG.debug("Validation imageDimension method inside ImageUploadServiceImpl completed successfully");
-			return false;
+            return width + "X" + height;
 		}
 		catch (IOException e) {
 			LOG.error("IOException occured while reading from ImageInputStream. Reason : " + e.getMessage(), e);
