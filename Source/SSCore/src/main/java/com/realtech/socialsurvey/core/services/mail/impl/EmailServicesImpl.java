@@ -2471,7 +2471,6 @@ public class EmailServicesImpl implements EmailServices
 
         LOG.debug( "Saving EmailEntity with recipient mail id : {}", recipientMailId );
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
-        emailEntity.setHoldSendingMail( true );
         emailEntity.setMailType( CommonConstants.EMAIL_TYPE_REPORT_BUG_MAIL_TO_ADMIN_FOR_EXCEPTION_IN_BATCH );
 
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
