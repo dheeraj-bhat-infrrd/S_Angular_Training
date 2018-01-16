@@ -44,18 +44,19 @@ public final class UploadUtils {
 	 */
 	public void validateFile(File convFile) throws InvalidInputException {
 		LOG.debug("Validating uploaded image");
-        if ( isImageFormatValid( convFile ) != "true" ) {
-            throw new InvalidInputException( "Upload failed: " + isImageFormatValid( convFile ) + "is not a valid Format",
+		String imageFormat=isImageFormatValid( convFile );
+        if ( imageFormat != "true" ) {
+            throw new InvalidInputException( "Upload failed: " + imageFormat + "is not a valid Format",
                 DisplayMessageConstants.INVALID_LOGO_FORMAT + "(" + imageFormats + ")" );
         }
-        if ( isImageSizeValid( convFile ) != "true" ) {
-            throw new InvalidInputException(
-                "Upload Failed: MAX size exceeded. Size of image is:" + isImageSizeValid( convFile ),
+        String imageSize = isImageSizeValid( convFile );
+        if ( imageSize != "true" ) {
+            throw new InvalidInputException( "Upload Failed: MAX size exceeded. Size of image is:" + imageSize,
                 DisplayMessageConstants.INVALID_LOGO_SIZE + "(" + maxBytes + "bytes)" );
         }
-        if ( isImageDimensionValid( convFile ) != "true" ) {
-            throw new InvalidInputException(
-                "Upload Failed: MAX dimensions exceeded.Dimensions: " + isImageDimensionValid( convFile ),
+        String imageDimension = isImageDimensionValid( convFile );
+        if ( imageDimension != "true" ) {
+            throw new InvalidInputException( "Upload Failed: MAX dimensions exceeded. Dimensions: " + imageDimension,
                 DisplayMessageConstants.INVALID_LOGO_DIMENSIONS + "(" + maxWidth + " x " + maxHeight + " pixels)" );
         }
 		LOG.debug("Validated uploaded image");
