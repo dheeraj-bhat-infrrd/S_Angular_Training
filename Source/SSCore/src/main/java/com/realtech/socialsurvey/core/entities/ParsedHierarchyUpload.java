@@ -1,13 +1,19 @@
 package com.realtech.socialsurvey.core.entities;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+import org.springframework.data.annotation.Id;
 
-public class ParsedHierarchyUpload
+
+public class ParsedHierarchyUpload implements Serializable
 {
+    private static final long serialVersionUID = 1L;
+    
     // identifiers
-    private String _id;
+    @Id
+    private String id;
     private long companyId;
 
     // user who started the import
@@ -26,6 +32,9 @@ public class ParsedHierarchyUpload
 
     // flag to ignore warning
     private boolean isWarningToBeIgnored;
+
+    // flag to abort after verification
+    private boolean verifyOnly;
 
     // hierarchy verification statistics
     private int numberOfRegionsAdded;
@@ -105,15 +114,15 @@ public class ParsedHierarchyUpload
     }
 
 
-    public String get_id()
+    public String getId()
     {
-        return _id;
+        return id;
     }
 
 
-    public void set_id( String _id )
+    public void setId( String id )
     {
-        this._id = _id;
+        this.id = id;
     }
 
 
@@ -162,6 +171,18 @@ public class ParsedHierarchyUpload
     public void setWarningToBeIgnored( boolean isWarningToBeIgnored )
     {
         this.isWarningToBeIgnored = isWarningToBeIgnored;
+    }
+
+
+    public boolean getVerifyOnly()
+    {
+        return verifyOnly;
+    }
+
+
+    public void setVerifyOnly( boolean verifyOnly )
+    {
+        this.verifyOnly = verifyOnly;
     }
 
 
@@ -393,4 +414,21 @@ public class ParsedHierarchyUpload
     }
 
 
+    @Override
+    public String toString()
+    {
+        return "ParsedHierarchyUpload [_id=" + id + ", companyId=" + companyId + ", importInitiatedUserId="
+            + importInitiatedUserId + ", givenFileName=" + givenFileName + ", uploadedDate=" + uploadedDate + ", fileURI="
+            + fileURI + ", status=" + status + ", isInAppendMode=" + isInAppendMode + ", isWarningToBeIgnored="
+            + isWarningToBeIgnored + ", verifyOnly=" + verifyOnly + ", numberOfRegionsAdded=" + numberOfRegionsAdded
+            + ", numberOfBranchesAdded=" + numberOfBranchesAdded + ", numberOfUsersAdded=" + numberOfUsersAdded
+            + ", numberOfRegionsModified=" + numberOfRegionsModified + ", numberOfBranchesModified=" + numberOfBranchesModified
+            + ", numberOfUsersModified=" + numberOfUsersModified + ", numberOfBranchesDeleted=" + numberOfBranchesDeleted
+            + ", numberOfUsersDeleted=" + numberOfUsersDeleted + ", numberOfRegionsDeleted=" + numberOfRegionsDeleted
+            + ", regionErrors=" + regionErrors + ", branchErrors=" + branchErrors + ", userErrors=" + userErrors
+            + ", regionValidationWarnings=" + regionValidationWarnings + ", branchValidationWarnings="
+            + branchValidationWarnings + ", userValidationWarnings=" + userValidationWarnings + ", generalErrors="
+            + generalErrors + ", hasErrors=" + hasErrors + ", hasWarnings=" + hasWarnings + ", hasGeneralErrors="
+            + hasGeneralErrors + "]";
+    }
 }

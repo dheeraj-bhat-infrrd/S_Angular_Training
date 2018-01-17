@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-
-
 /**
  * Holds application level constants
  */
@@ -139,6 +137,9 @@ public interface CommonConstants
     public static final int IS_PRIMARY_FALSE = 0;
     public static final int IS_PRIMARY_TRUE = 1;
     
+    public static final int IS_SURVEY_REQUEST_SENT_FALSE = 0;
+    public static final int IS_SURVEY_REQUEST_SENT_TRUE = 1;
+
     //Reporting batch size 
     public static final int BATCH_SIZE = 5000;
 
@@ -284,7 +285,7 @@ public interface CommonConstants
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_INCOMPLETE_SURVEY_REPORT = "Incomplete survey data report";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_USER_ADOPTION_REPORT = "User adoption report";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_SURVEY_STATS_REPORT = "Survey stats report for reporting";
-  //Note -> the USER_ADOPTION_REPORT was renamed to VERIFIED_USERS_REPORT
+    //Note -> the USER_ADOPTION_REPORT was renamed to VERIFIED_USERS_REPORT
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_VERIFIED_USERS_REPORT = "Verified users report for reporting";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_COMPANY_USER_REPORT = "Company user report for reporting";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_SURVEY_RESULTS_COMPANY_REPORT = "Survey results company report for reporting";
@@ -295,7 +296,6 @@ public interface CommonConstants
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_NPS_MONTH_REPORT = "NPS monthly report for reporting";
 
 
-    
     /**
      * Mongo entities and column name constants
      */
@@ -357,7 +357,8 @@ public interface CommonConstants
     public static final String RETAKE_SURVEY_COLUMN = "retakeSurvey";
     public static final String NO_OF_RETAKE_COLUMN = "noOfRetake";
     public static final String LAST_RETAKE_REQUEST_DATE_COLUMN = "lastRetakeRequestDate";
-    public static final String RETAKE_SURVEY_HISTORY_COLUMN = "retakeSurveyHistory";    
+    public static final String RETAKE_SURVEY_HISTORY_COLUMN = "retakeSurveyHistory"; 
+    public static final String OPEN_RETAKE_SURVEY_REQUEST_COLUMN = "openRetakeSurveyRequest";
 
     /**
      * Constants to be used in code for referencing variables(i.e in maps or session attributes)
@@ -468,7 +469,7 @@ public interface CommonConstants
     public static final String ENTITY_TYPE_COLUMN = "entityType";
 
     public static final String FILE_UPLOAD_TYPE_COLUMN = "uploadType";
-    
+
     public static final String SHOW_ON_UI_COLUMN = "showOnUI";
 
     /**
@@ -778,7 +779,7 @@ public interface CommonConstants
     public static final String UPLOAD_HIERARCHY_DETAILS_COLLECTION = "UPLOAD_HIERARCHY_DETAILS";
     public static final String TEMP_HIERARCHY_UPLOAD_COLLECTION = "TEMP_HIERARCHY_UPLOAD";
     public static final String SURVEY_CSV_UPLOAD_COLLECTION = "SURVEY_CSV_UPLOAD";
-
+    public static final String FAILED_CLICK_EVENTS_COLLECTION = "FAILED_CLICK_EVENTS";
     /*
      * Mongo social post Source
      */
@@ -981,7 +982,7 @@ public interface CommonConstants
     public static final int FILE_UPLOAD_SOCIAL_MONITOR_REPORT = 9;
     public static final int FILE_UPLOAD_INCOMPLETE_SURVEY_REPORT = 10;
     public static final int FILE_UPLOAD_USER_ADOPTION_REPORT = 11;
-    
+
     //reporting file upload status 
     public static final int FILE_UPLOAD_REPORTING_SURVEY_STATS_REPORT = 101;
     //Note -> the USER_ADOPTION_REPORT was renamed to VERIFIED_USERS_REPORT
@@ -992,14 +993,16 @@ public interface CommonConstants
     public static final int FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT = 106;
     public static final int FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT = 107;
     public static final int FILE_UPLOAD_REPORTING_INCOMPLETE_SURVEY_REPORT = 108;
+    
+    //Generating survey invitation email report through storm
+    public static final int FILE_UPLOAD_SURVEY_INVITATION_EMAIL_REPORT = 1001;
+
     public static final int FILE_UPLOAD_REPORTING_COMPANY_DETAILS_REPORT = 109;
     public static final int FILE_UPLOAD_REPORTING_NPS_WEEK_REPORT = 110;
     public static final int FILE_UPLOAD_REPORTING_NPS_MONTH_REPORT = 111;
     public static final int NPS_REPORT_TYPE_WEEK = 1;
     public static final int NPS_REPORT_TYPE_MONTH = 2;
 
-    
-    
     public static final String AGENT_MEDIA_POST_DETAILS_COLUMN = "agentMediaPostDetails";
     public static final String BRANCH_MEDIA_POST_DETAILS_COLUMN = "branchMediaPostDetailsList";
     public static final String COMPANY_MEDIA_POST_DETAILS_COLUMN = "companyMediaPostDetails";
@@ -1385,6 +1388,8 @@ public interface CommonConstants
     public static final int HIERARCHY_UPLOAD_STATUS_IMPORTED_WITH_ERRORS = 5;
     public static final int HIERARCHY_UPLOAD_STATUS_IMPORTED = 6;
     public static final int HIERARCHY_UPLOAD_STATUS_UNSCHEDULED_ABORT = 7;
+    public static final int HIERARCHY_UPLOAD_STATUS_VERIFIED_SUCCESSFULLY = 8;
+    
     
     //Reporting constants
     public static final String REPORTING_SURVEY_STATS_REPORT = "Survey Stats Report";
@@ -1400,14 +1405,14 @@ public interface CommonConstants
     public static final String REPORTING_NPS_REPORT_FOR_MONTH = "NPS Report for Month";
     public static final String REPORTING_NPS_REPORT = "NPS Report";
     public static final String REPORTING_API_DATE_FORMAT = "MMM dd, yyyy";
+    public static final String SURVEY_INVITATION_EMAIL_REPORT = "Survey Invitation Email Report";
 
-
-    
-    public static final String SURVEY_DETAILS_ID_COLUMN="surveyDetailsId";
+    public static final String SURVEY_DETAILS_ID_COLUMN = "surveyDetailsId";
     public static final String SURVEY_RESULTS_REPORT_MODIFIED_ON = "reportModifiedOn";
     public static final String SURVEY_RESULTS_IS_DELETED = "isDeleted";
     public static final String TRX_MONTH = "trxMonth";
-    
+    public static final String SURVEY_RESULTS_COMPLETED_DATE = "surveyCompletedDate";
+
     public static final String THIS_MONTH="thisMonth";
     public static final String THIS_YEAR="thisYear";
     public static final String LEADERBOARD_YEAR="year";
@@ -1417,7 +1422,7 @@ public interface CommonConstants
     public static final String RANK = "rank";
     public static final String INTERNAL_BRANCH_RANK = "internalBranchRank";
     public static final String INTERNAL_REGION_RANK = "internalRegionRank";
-	
+
     public static final String MONTH_VAL = "monthVal";
     public static final String YEAR_VAL = "yearVal";
     public static final String QUESTION_ID = "questionId";
@@ -1443,25 +1448,97 @@ public interface CommonConstants
     public static final int MIN_NO_OF_REVIEWS = 25;
     public static final int MONTH_OFFSET = 3;
     public static final int YEAR_OFFSET = -1;
-    
+
 
     public static final String SQUARE_THUMBNAIL = "squareThumbnail";
     public static final String RECTANGULAR_THUMBNAIL = "rectangularThumbnail";
-    
+
     //Digest
     public static final String MONTH = "month";
     public static final String YEAR = "year";
-    
+
     public static final String SURVEY_MAIL_THRESHOLD = "surveyCompletedMailThreshold";
 
+    // Email Constants
+    public static final String EMAIL_TYPE_REGISTRATION_INVITATION_MAIL = "REGISTRATION_INVITATION_MAIL";
+    public static final String EMAIL_TYPE_NEW_REGISTRATION_INVITATION_MAIL = "NEW_REGISTRATION_INVITATION_MAIL";
+    public static final String EMAIL_TYPE_COMPANY_REGISTRATION_STAGE_MAIL = "COMPANY_REGISTRATION_STAGE_MAIL";
+    public static final String EMAIL_TYPE_AGENT_SURVEY_REMINDER_MAIL = "AGENT_SURVEY_REMINDER_MAIL";
+    public static final String EMAIL_TYPE_RESET_PASSWORD_EMAIL = "RESET_PASSWORD_EMAIL";
+    public static final String EMAIL_TYPE_INVITATION_TO_SOCIALSURVEY_ADMIN_EMAIL = "INVITATION_TO_SOCIALSURVEY_ADMIN_EMAIL";
+    public static final String EMAIL_TYPE_SUBSCRIPTION_CHARGE_UNSUCCESSFUL_EMAIL = "SUBSCRIPTION_CHARGE_UNSUCCESSFUL_EMAIL";
+    public static final String EMAIL_TYPE_EMAIL_VERIFICATION_MAIL = "EMAIL_VERIFICATION_MAIL";
+    public static final String EMAIL_TYPE_EMAIL_VERIFICATION_REQUESTMAIL_TO_ADMIN_MAIL = "EMAIL_VERIFICATION_REQUESTMAIL_TO_ADMIN_MAIL";
+    public static final String EMAIL_TYPE_EMAIL_VERIFIED_NOTIFICATION_MAIL = "EMAIL_VERIFIED_NOTIFICATION_MAIL";
+    public static final String EMAIL_TYPE_EMAIL_VERIFIED_NOTIFICATION_MAIL_TO_ADMIN_MAIL = "EMAIL_VERIFIED_NOTIFICATION_MAIL_TO_ADMIN_MAIL";
+    public static final String EMAIL_TYPE_VERIFICATION_MAIL = "VERIFICATION_MAIL";
+    public static final String EMAIL_TYPE_REGISTRATION_COMPLETION_EMAIL = "REGISTRATION_COMPLETION_EMAIL";
+    public static final String EMAIL_TYPE_FATAL_EXCEPTION_EMAIL = "FATAL_EXCEPTION_EMAIL";
+    public static final String EMAIL_TYPE_EMAILSENDING_FAILURE_MAIL = "EMAILSENDING_FAILURE_MAIL";
+    public static final String EMAIL_TYPE_RETRY_CHARGE_EMAIL = "RETRY_CHARGE_EMAIL";
+    public static final String EMAIL_TYPE_RETRY_EXHAUSTED_EMAIL = "RETRY_EXHAUSTED_EMAIL";
+    public static final String EMAIL_TYPE_ACCOUNT_DISABLED_MAIL = "ACCOUNT_DISABLED_MAIL";
+    public static final String EMAIL_TYPE_ACCOUNT_DELETION_MAIL = "ACCOUNT_DELETION_MAIL";
+    public static final String EMAIL_TYPE_ACCOUNT_UPGRADE_MAIL = "ACCOUNT_UPGRADE_MAIL";
+    public static final String EMAIL_TYPE_DEFAULT_SURVEY_COMPLETION_MAIL = "DEFAULT_SURVEY_COMPLETION_MAIL";
+    public static final String EMAIL_TYPE_DEFAULT_SURVEY_COMPLETION_UNPLEASANT_MAIL = "DEFAULT_SURVEY_COMPLETION_UNPLEASANT_MAIL";
+    public static final String EMAIL_TYPE_DEFAULT_SURVEY_REMINDER_MAIL = "DEFAULT_SURVEY_REMINDER_MAIL";
+    public static final String EMAIL_TYPE_SURVEY_REMINDER_MAIL = "SURVEY_REMINDER_MAIL";
+    public static final String EMAIL_TYPE_SURVEY_COMPLETION_TO_ADMINS_AND_AGENT_MAIL = "SURVEY_COMPLETION_TO_ADMINS_AND_AGENT_MAIL";
+    public static final String EMAIL_TYPE_DEFAULT_SOCIAL_POST_REMINDER_MAIL = "DEFAULT_SOCIAL_POST_REMINDER_MAIL";
+    public static final String EMAIL_TYPE_CONTACT_US_MAIL = "CONTACT_US_MAIL";
+    public static final String EMAIL_TYPE_DEFAULT_SURVEY_INVITATION_MAIL = "DEFAULT_SURVEY_INVITATION_MAIL";
+    public static final String EMAIL_TYPE_SURVEY_INVITATION_MAIL = "SURVEY_INVITATION_MAIL";
+    public static final String EMAIL_TYPE_SURVEY_COMPLETION_MAIL = "SURVEY_COMPLETION_MAIL";
+    public static final String EMAIL_TYPE_SURVEY_COMPLETION_UNPLEASANT_MAIL = "SURVEY_COMPLETION_UNPLEASANT_MAIL";
+    public static final String EMAIL_TYPE_SURVEY_SOCIALPOST_REMINDER_MAIL = "SURVEY_SOCIALPOST_REMINDER_MAIL";
+    public static final String EMAIL_TYPE_SURVEY_RESTART_MAIL = "SURVEY_RESTART_MAIL";
+    public static final String EMAIL_TYPE_ACCOUNT_BLOCKING_MAIL = "ACCOUNT_BLOCKING_MAIL";
+    public static final String EMAIL_TYPE_ACCOUNT_REACTIVATION_MAIL = "ACCOUNT_REACTIVATION_MAIL";
+    public static final String EMAIL_TYPE_SUBSCRIPTION_REVISION_MAIL = "SUBSCRIPTION_REVISION_MAIL";
+    public static final String EMAIL_TYPE_MANUAL_REGISTRATION_LINK_MAIL = "MANUAL_REGISTRATION_LINK_MAIL";
+    public static final String EMAIL_TYPE_DEFAULT_SURVEY_INVITATION_MAIL_BY_CUSTOMER_MAIL = "DEFAULT_SURVEY_INVITATION_MAIL_BY_CUSTOMER_MAIL";
+    public static final String EMAIL_TYPE_SURVEY_INVITATION_MAIL_BY_CUSTOMER = "SURVEY_INVITATION_MAIL_BY_CUSTOMER";
+    public static final String EMAIL_TYPE_DEFAULT_SURVEY_RESTART_MAIL = "DEFAULT_SURVEY_RESTART_MAIL";
+    public static final String EMAIL_TYPE_SOCIAL_CONNECT_MAIL = "SOCIAL_CONNECT_MAIL";
+    public static final String EMAIL_TYPE_REPORT_ABUSE_MAIL = "REPORT_ABUSE_MAIL";
+    public static final String EMAIL_TYPE_SURVEY_REPORT_MAIL = "SURVEY_REPORT_MAIL";
+    public static final String EMAIL_TYPE_CORRUPT_DATA_FROM_CRM_NOTIFICATION_MAIL = "CORRUPT_DATA_FROM_CRM_NOTIFICATION_MAIL";
+    public static final String EMAIL_TYPE_INVALID_EMAILS_NOTIFICATION_MAIL = "INVALID_EMAILS_NOTIFICATION_MAIL";
+    public static final String EMAIL_TYPE_RECORDS_NOT_UPLOADED_CRM_NOTIFICATION_MAIL = "RECORDS_NOT_UPLOADED_CRM_NOTIFICATION_MAIL";
+    public static final String EMAIL_TYPE_HELP_MAIL_TO_ADMIN = "HELP_MAIL_TO_ADMIN";
+    public static final String EMAIL_TYPE_ZILLOW_CALL_EXCEEDED_MAIL_TO_ADMIN = "ZILLOW_CALL_EXCEEDED_MAIL_TO_ADMIN";
+    public static final String EMAIL_TYPE_REPORT_BUG_MAIL_TO_ADMIN = "REPORT_BUG_MAIL_TO_ADMIN";
+    public static final String EMAIL_TYPE_REPORT_BUG_MAIL_TO_ADMIN_FOR_EXCEPTION_IN_BATCH = "REPORT_BUG_MAIL_TO_ADMIN_FOR_EXCEPTION_IN_BATCH";
+    public static final String EMAIL_TYPE_COMPLAINT_HANDLE_MAIL = "COMPLAINT_HANDLE_MAIL";
+    public static final String EMAIL_TYPE_ZILLOW_REVIEW_COMPLAINT_HANDLE_MAIL = "ZILLOW_REVIEW_COMPLAINT_HANDLE_MAIL";
+    public static final String EMAIL_TYPE_FORWARD_CUSTOMER_REPLY_MAIL = "FORWARD_CUSTOMER_REPLY_MAIL";
+    public static final String EMAIL_TYPE_BILLING_REPORT_MAIL = "BILLING_REPORT_MAIL";
+    public static final String EMAIL_TYPE_CUSTOM_MAIL = "CUSTOM_MAIL";
+    public static final String EMAIL_TYPE_CUSTOM_REPORT_MAIL = "CUSTOM_REPORT_MAIL";
+    public static final String EMAIL_TYPE_SOCIAL_MEDIA_TOKEN_EXPIRY_EMAIL = "SOCIAL_MEDIA_TOKEN_EXPIRY_EMAIL";
+    public static final String EMAIL_TYPE_PAYMENT_FAILED_ALERT_EMAIL = "PAYMENT_FAILED_ALERT_EMAIL";
+    public static final String EMAIL_TYPE_PAYMENT_FAILED_ALERT_EMAIL_TO_ADMIN = "PAYMENT_FAILED_ALERT_EMAIL_TO_ADMIN";
+    public static final String EMAIL_TYPE_CANCEL_SUBSCRIPTION_REQUEST_ALERT_MAIL = "CANCEL_SUBSCRIPTION_REQUEST_ALERT_MAIL";
+    public static final String EMAIL_TYPE_WEB_EXCEPTION_EMAIL = "WEB_EXCEPTION_EMAIL";
+    public static final String EMAIL_TYPE_NO_TRANSACTION_ALERT_MAIL = "NO_TRANSACTION_ALERT_MAIL";
+    public static final String EMAIL_TYPE_HIGH_VOULME_UNPROCESSED_TRANSACTION_ALERT_MAIL = "HIGH_VOULME_UNPROCESSED_TRANSACTION_ALERT_MAIL";
+    public static final String EMAIL_TYPE_LESS_VOULME_OF_TRANSACTION_RECEIVED_ALERT_MAIL = "LESS_VOULME_OF_TRANSACTION_RECEIVED_ALERT_MAIL";
+    public static final String EMAIL_TYPE_MONTHLY_DIGEST_MAIL = "MONTHLY_DIGEST_MAIL";
+    public static final String EMAIL_TYPE_DIGEST_ERROR_MAIL_FOR_COMPANY = "DIGEST_ERROR_MAIL_FOR_COMPANY";
+    public static final String EMAIL_TYPE_UNSUCCESSFUL_SURVEY_CSV_UPLOAD_MAIL_TO_ADMIN = "UNSUCCESSFUL_SURVEY_CSV_UPLOAD_MAIL_TO_ADMIN";
+    public static final String EMAIL_TYPE_UNSUCCESSFUL_SURVEY_CSV_UPLOAD_MAIL_TO_UPLOADER = "UNSUCCESSFUL_SURVEY_CSV_UPLOAD_MAIL_TO_UPLOADER";
+    public static final String EMAIL_TYPE_SUCCESSFUL_SURVEY_CSV_UPLOAD_MAIL_TO_UPLOADER = "SUCCESSFUL_SURVEY_CSV_UPLOAD_MAIL_TO_UPLOADER";
+
     public static final String REDIRECT = "redirect:/";
+    public static final String EVENT_CLICK = "click";
 
     public static final String COLLECTION_TYPE = "collectionType";
 
     public static final String AGENT_COLUMN = "agent";
-    
+
     public static final String PROFILE_URL = "profileUrl";
-    
+
     public static final String OFFICE = "office";
 
     public static final String GOOGLE_CAPTCHA_RESPONSE = "g-recaptcha-response";
@@ -1472,6 +1549,8 @@ public interface CommonConstants
     public static final String ALERT_TYPE_ERROR = "error";    
     public static final String ALERT_TYPE_WARNING = "warning";
     public static final String ALERT_TYPE_NORMAL = "normal"; 
+
+    public static final String COMMA_SEPERATOR_PATTERN = "\\s*,\\s*"; 
  
 
     //JobLogDetails

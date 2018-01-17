@@ -8812,45 +8812,64 @@ $(document).on('change', '#prof-logo', function() {
 	}, 1000);
 });
 
+
 // Function to crop and upload profile image
 function callBackOnProfileImageUpload(data) {
-
-	if ($('#overlay-linkedin-import').is(":visible")) {
-		$('#message-header').html(data);
-		callAjaxGET("./fetchuploadedprofileimage.do", function(profileImageUrl) {
-			if (profilemasterid == 4) {
-				$("#wc-photo-upload").removeClass('dsh-pers-default-img');
-			} else if (profilemasterid == 3) {
-				$("#wc-photo-upload").removeClass('dsh-office-default-img');
-			} else if (profilemasterid == 2) {
-				$("#wc-photo-upload").removeClass('dsh-region-default-img');
-			} else if (profilemasterid == 1) {
-				$("#wc-photo-upload").removeClass('dsh-comp-default-img');
-			}
-
-			$('#wc-photo-upload').css("background", "url(" + profileImageUrl + ") no-repeat center");
-			$('#wc-photo-upload').css("background-size", "contain");
-			hideOverlay();
-		}, true);
-
+	
+	$('#prof-message-header').html(data);
+	
+	if( $('#new-dash-flag').val() == "true" ){
+		
 		$('#overlay-toast').html($('#display-msg-div').text().trim());
 		showToast();
+		
+		callAjaxGET("./fetchprofileimagefornewdashboard.do", function(data) {
+			hideOverlay();
+			$('.rep-prof-pic-circle').html(data);
+		}, true);
+		
+		$('#prof-message-header').html('');
+		
 	} else {
-		$('#prof-message-header').html(data);
-
-		callAjaxGET("./fetchprofileimage.do", function(data) {
-			$('#prof-img-container').html(data);
-			var profileImageUrl = $('#prof-image-edit').css("background-image");
-			if (profileImageUrl == undefined || profileImageUrl == "none") {
-				return;
-			}
-			adjustImage();
-			hideOverlay();
-		}, true);
-
-		$('#overlay-toast').html($('#display-msg-div').text().trim());
-		showToast();
-		loadDisplayPicture();
+		
+		$('#prof-message-header').html('');
+		if ($('#overlay-linkedin-import').is(":visible")) {
+			$('#message-header').html(data);
+			callAjaxGET("./fetchuploadedprofileimage.do", function(profileImageUrl) {
+				if (profilemasterid == 4) {
+					$("#wc-photo-upload").removeClass('dsh-pers-default-img');
+				} else if (profilemasterid == 3) {
+					$("#wc-photo-upload").removeClass('dsh-office-default-img');
+				} else if (profilemasterid == 2) {
+					$("#wc-photo-upload").removeClass('dsh-region-default-img');
+				} else if (profilemasterid == 1) {
+					$("#wc-photo-upload").removeClass('dsh-comp-default-img');
+				}
+	
+				$('#wc-photo-upload').css("background", "url(" + profileImageUrl + ") no-repeat center");
+				$('#wc-photo-upload').css("background-size", "contain");
+				hideOverlay();
+			}, true);
+	
+			$('#overlay-toast').html($('#display-msg-div').text().trim());
+			showToast();
+		} else {
+	
+			$('#prof-message-header').html(data);
+			callAjaxGET("./fetchprofileimage.do", function(data) {
+				$('#prof-img-container').html(data);
+				var profileImageUrl = $('#prof-image-edit').css("background-image");
+				if (profileImageUrl == undefined || profileImageUrl == "none") {
+					return;
+				}
+				adjustImage();
+				hideOverlay();
+			}, true);
+	
+			$('#overlay-toast').html($('#display-msg-div').text().trim());
+			showToast();
+			loadDisplayPicture();
+		}
 	}
 }
 

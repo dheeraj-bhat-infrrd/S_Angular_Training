@@ -20,6 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,12 +41,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.commons.OrganizationUnitSettingsComparator;
 import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
@@ -82,6 +83,7 @@ import com.realtech.socialsurvey.core.entities.FacebookToken;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
 import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.HierarchySettingsCompare;
+import com.realtech.socialsurvey.core.entities.Keyword;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.LinkedInToken;
 import com.realtech.socialsurvey.core.entities.LockSettings;
@@ -880,8 +882,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( user == null ) {
             throw new InvalidInputException( "User is not set" );
         }
-        if(LOG.isDebugEnabled()) {
-            LOG.debug( "Get company settings for the user: {}" , user.toString() );
+        if ( LOG.isDebugEnabled() ) {
+            LOG.debug( "Get company settings for the user: {}", user.toString() );
         }
         // get the company id
         if ( user.getCompany() == null ) {
@@ -917,7 +919,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     public OrganizationUnitSettings getCompanySettings( long companyId ) throws InvalidInputException
     {
 
-        LOG.debug( "Get company settings for the companyId: {} " , companyId );
+        LOG.debug( "Get company settings for the companyId: {} ", companyId );
 
         OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
@@ -929,6 +931,187 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
 
         return companySettings;
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService#addKeyworodsToCompanySettings(long, java.util.List)
+     */
+    @Override
+    public List<Keyword> addKeyworodsToCompanySettings( long companyId, List<Keyword> keywordsToAdd ) throws InvalidInputException
+    {
+        LOG.debug( "Get company settings for the companyId: {}", companyId );
+        OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        List<Keyword> companyFilterKeywords = companySettings.getFilterKeywords();
+        if ( !CollectionUtils.isEmpty( keywordsToAdd ) ) {
+            // setting
+            if ( companySettings.getFilterKeywords() == null ) {
+                companyFilterKeywords = new ArrayList<Keyword>();
+            }
+
+            for ( Keyword keyword : keywordsToAdd ) {
+
+                if ( StringUtils.isEmpty( keyword.getPhrase() ) ) {
+                    LOG.warn( "Phrase is empty or null so skipping" );
+                    continue;
+                    //throw new InvalidInputException( "Phrase can't be empty/blank" );
+                }
+
+                int idIndex = -1, phraseIndex = -1;
+                for ( int i = 0; i < companyFilterKeywords.size(); i++ ) {
+                    Keyword companyFilterKeyword = companyFilterKeywords.get( i );
+
+                    if ( StringUtils.isNotEmpty( keyword.getId() ) ) {
+                        if ( companyFilterKeyword.getId() != null
+                            && companyFilterKeyword.getId().equals( keyword.getId() ) ) {
+                            idIndex = i;
+                            // both index found exit loop
+                            if ( phraseIndex != -1 ) {
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if ( companyFilterKeyword.getPhrase() != null
+                        && companyFilterKeyword.getPhrase().equalsIgnoreCase( keyword.getPhrase() ) ) {
+                        phraseIndex = i;
+                        // both index found exit loop
+                        if ( idIndex != -1 ) {
+                            break;
+                        }
+                    }
+                }
+
+                long createdtime = new Date().getTime();
+                if ( idIndex != -1 ) {
+                    if ( phraseIndex != -1 && phraseIndex != idIndex ) {
+                        LOG.warn( "Phrase already exist in keywords" );
+                        throw new InvalidInputException( "Phrase already exist in keywords", "400" );
+                    } else {
+                        LOG.info( "Id found in existing keyword so updateing keyword" );
+                        Keyword companyFilterKeyword = companyFilterKeywords.get( idIndex );
+                        companyFilterKeyword.setModifiedOn( createdtime );
+                        companyFilterKeyword.setPhrase( keyword.getPhrase() );
+                    }
+                } else {
+
+                    if ( StringUtils.isNotEmpty( keyword.getId() ) ) {
+                        throw new InvalidInputException( "Keyword does not exist for given Id", "400" );
+                    }
+
+                    if ( phraseIndex != -1 ) {
+                        LOG.warn( "Phrase already exist in keywords" );
+                        throw new InvalidInputException( "Phrase already exist in keywords", "400" );
+                    } else {
+                        LOG.info( "Adding new keyword" );
+                        Keyword keywordNew = new Keyword();
+                        keywordNew.setCreatedOn( createdtime );
+                        keywordNew.setModifiedOn( createdtime );
+                        keywordNew.setPhrase( keyword.getPhrase() );
+                        keywordNew.setId( UUID.randomUUID().toString() );
+                        keywordNew.setStatus( 1 );
+                        companyFilterKeywords.add( keywordNew );
+                    }
+                }
+            }
+            // Updating filterKeywords in OrganizationUnitSettings
+            organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+                MongoOrganizationUnitSettingDaoImpl.KEY_FILTER_KEYWORDS, companyFilterKeywords, companySettings,
+                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        } else {
+            LOG.debug( "Keywords are empty so skiping operation" );
+        }
+        return companyFilterKeywords;
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService#enableKeyworodForCompanySettings(long, java.lang.String)
+     */
+    public Keyword enableKeyworodForCompanySettings( long companyId, String keywordId ) throws InvalidInputException
+    {
+        return updateKeyworodStatusForCompanySettings( companyId, keywordId, 1 );
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService#disableKeyworodForCompanySettings(long, java.lang.String)
+     */
+    public Keyword disableKeyworodForCompanySettings( long companyId, String keywordId ) throws InvalidInputException
+    {
+        return updateKeyworodStatusForCompanySettings( companyId, keywordId, 0 );
+    }
+
+    
+    /**
+     * Method to update keyword by keyword id and keyword status
+     * @param companyId
+     * @param keywordId
+     * @param status : it can be 0(disabled)/1(enabled)
+     * @return : keyword object which status is updated 
+     * @throws InvalidInputException
+     */
+    private Keyword updateKeyworodStatusForCompanySettings( long companyId, String keywordId, int status )
+        throws InvalidInputException
+    {
+        LOG.debug( "Get company settings for the companyId: {}", companyId );
+        Keyword keywordToUpdate = null;
+        long modifiedOn = new Date().getTime();
+
+        OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        // setting
+        if ( companySettings != null ) {
+            List<Keyword> companyFilterKeywords = companySettings.getFilterKeywords();
+
+            if ( !CollectionUtils.isEmpty( companyFilterKeywords ) ) {
+                for ( Keyword keyword : companyFilterKeywords ) {
+                    if ( keyword.getId().equals( keywordId ) ) {
+                        keyword.setStatus( status );
+                        keyword.setModifiedOn( modifiedOn );
+
+                        // Update
+                        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+                            MongoOrganizationUnitSettingDaoImpl.KEY_FILTER_KEYWORDS, companyFilterKeywords, companySettings,
+                            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+                        keywordToUpdate = keyword;
+                        break;
+                    }
+                }
+
+            } else {
+                LOG.error( "Record not found for keyword id {}", keywordId );
+            }
+
+        } else {
+            LOG.error( "Record not found for company id {}", companyId );
+        }
+
+        // Updating filterKeywords in OrganizationUnitSettings
+        return keywordToUpdate;
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService#getCompanyKeywordsByCompanyId(long)
+     */
+    @Override
+    public List<Keyword> getCompanyKeywordsByCompanyId( long companyId ) throws InvalidInputException
+    {
+        LOG.debug( "Get company settings for the companyId: {}", companyId );
+        OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        if ( companySettings == null ) {
+            throw new InvalidInputException( "Company setting doesn't exist for company id", "400" );
+        }
+
+        List<Keyword> companyFilterKeywords = companySettings.getFilterKeywords();
+        return companyFilterKeywords;
     }
 
 
@@ -1005,8 +1188,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     {
         OrganizationUnitSettings regionSettings = null;
         if ( regionId <= 0l ) {
-            LOG.warn( "Invalid region id. : {}" , regionId );
-            throw new InvalidInputException( "Invalid region id. : " + regionId ) ;
+            LOG.warn( "Invalid region id. : {}", regionId );
+            throw new InvalidInputException( "Invalid region id. : " + regionId );
         }
         LOG.debug( "Get the region settings for region id: " + regionId );
         regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( regionId,
@@ -1080,7 +1263,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             LOG.warn( "Invalid branch id. : {}", branchId );
             throw new InvalidInputException( "Invalid branch id. :" + branchId );
         }
-        LOG.debug( "Get the branch settings for branch id: {}" , branchId );
+        LOG.debug( "Get the branch settings for branch id: {}", branchId );
         organizationUnitSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( branchId,
             MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
 
@@ -7024,28 +7207,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
 
-    private void sendAccountDisabledNotificationMail( DisabledAccount disabledAccount ) throws InvalidInputException
-    {
-        // Send email to notify each company admin that the company account will be deactivated after 30 days so that they can take required steps.
-        Company company = disabledAccount.getCompany();
-        Map<String, String> companyAdmin = new HashMap<String, String>();
-        try {
-            companyAdmin = solrSearchService.getCompanyAdmin( company.getCompanyId() );
-        } catch ( SolrException e1 ) {
-            LOG.error(
-                "SolrException caught in sendAccountDisabledNotificationMail() while trying to send mail to the company admin ." );
-        }
-        try {
-            if ( companyAdmin != null && companyAdmin.get( "emailId" ) != null )
-                emailServices.sendAccountDisabledMail( companyAdmin.get( "emailId" ), companyAdmin.get( "displayName" ),
-                    companyAdmin.get( "loginName" ) );
-        } catch ( InvalidInputException | UndeliveredEmailException e ) {
-            LOG.error( "Exception caught while sending mail to " + companyAdmin.get( "displayName" ) + " .Nested exception is ",
-                e );
-        }
-    }
-
-
     @Override
     @Transactional
     public void logEvent( String eventType, String action, String modifiedBy, long companyId, int agentId, int regionId,
@@ -8340,7 +8501,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         return organizationUnitSettingsDao
             .getHiddenPublicPagesEntityIds( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
     }
-    
+
 
     @Transactional
     @Override
@@ -8353,6 +8514,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
         return organizationUnitSettingsDao.getCompaniesForTransactionMonitor(companyIds);
     }
+
 
     @Override
     public void updateTransactionMonitorSettingForCompany( long companyId, boolean includeForTransactionMonitor )
@@ -8393,7 +8555,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             if ( !StringUtils.isEmpty( branchSetting.getSocialMediaTokens().getFacebookPixelToken().getPixelImgTag() ) )
                 facebookPixelTag += branchSetting.getSocialMediaTokens().getFacebookPixelToken().getPixelImgTag();
 
-        if ( unitSettings != null &&   unitSettings.getSocialMediaTokens() != null
+        if ( unitSettings != null && unitSettings.getSocialMediaTokens() != null
             && unitSettings.getSocialMediaTokens().getFacebookPixelToken() != null )
             if ( !StringUtils.isEmpty( unitSettings.getSocialMediaTokens().getFacebookPixelToken().getPixelImgTag() ) )
                 facebookPixelTag += unitSettings.getSocialMediaTokens().getFacebookPixelToken().getPixelImgTag();
@@ -8404,22 +8566,47 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
     @Override
-    public boolean updateDigestRecipients( OrganizationUnitSettings unitSettings, Set<String> emails, String collectionType )
-        throws InvalidInputException
+    public boolean updateDigestRecipients( String entityType, long entityId, Set<String> emails )
+        throws InvalidInputException, NoRecordsFetchedException
     {
+        LOG.debug( "method updateDigestRecipients() started" );
+        if ( StringUtils.isEmpty( entityType ) ) {
+            LOG.warn( "Entity type is not specified" );
+            throw new InvalidInputException( "Entity type is not specified" );
+        } else if ( entityId <= 0 ) {
+            LOG.warn( "Entity Id is invalid" );
+            throw new InvalidInputException( "Entity Id is invalid" );
+        }
+
+        OrganizationUnitSettings unitSettings = null;
+        String collectionType = "";
+
+        if ( CommonConstants.COMPANY_ID_COLUMN.equals( entityType ) ) {
+            unitSettings = getCompanySettings( entityId );
+            collectionType = CommonConstants.COMPANY_SETTINGS_COLLECTION;
+        } else if ( CommonConstants.REGION_ID_COLUMN.equals( entityType ) ) {
+            unitSettings = getRegionSettings( entityId );
+            collectionType = CommonConstants.REGION_SETTINGS_COLLECTION;
+        } else if ( CommonConstants.BRANCH_ID_COLUMN.equals( entityType ) ) {
+            unitSettings = getBranchSettingsDefault( entityId );
+            collectionType = CommonConstants.BRANCH_SETTINGS_COLLECTION;
+        } else if ( CommonConstants.AGENT_ID_COLUMN.equals( entityType ) ) {
+            unitSettings = getAgentSettings( entityId );
+            collectionType = CommonConstants.AGENT_SETTINGS_COLLECTION;
+        } else {
+            LOG.warn( "Entity Type is invalid" );
+            throw new InvalidInputException( "Entity type is invalid" );
+        }
+
         if ( unitSettings == null ) {
             LOG.warn( "settings are not specified" );
             throw new InvalidInputException( "settings cannot be null." );
-        } else if ( StringUtils.isEmpty( collectionType ) ) {
-            LOG.warn( "target collection is not specified" );
-            throw new InvalidInputException( "target collection name cannot be null." );
         }
 
-        LOG.debug( "Updating unitSettings: {} with digest recipients: {}", unitSettings, emails );
+        LOG.trace( "Updating unitSettings: {} with digest recipients: {}", unitSettings, emails );
 
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
-            MongoOrganizationUnitSettingDaoImpl.KEY_DIGEST_RECIPIENTS, emails, unitSettings,
-            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+            MongoOrganizationUnitSettingDaoImpl.KEY_DIGEST_RECIPIENTS, emails, unitSettings, collectionType );
         LOG.debug( "Updated the record successfully" );
 
         return true;
@@ -8464,5 +8651,88 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         
         LOG.debug( "method getCompaniesByAlertType finished for alertType {}" , alertType );
         return organizationUnitSettingsDao.fetchCompaniesByAlertType( alertType, companyIds );   
+    }
+
+
+    @Override
+    public String getCollectionFromProfileLevel( String profileLevel ) throws InvalidInputException
+    {
+        LOG.debug( "method getCollectionFromProfileLevel started" );
+        if( CommonConstants.PROFILE_LEVEL_COMPANY.equals( profileLevel ) ) {
+            return MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
+        } else if( CommonConstants.PROFILE_LEVEL_REGION.equals( profileLevel ) ) {
+            return MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;            
+        } else if( CommonConstants.PROFILE_LEVEL_BRANCH.equals( profileLevel ) ) {
+            return MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
+        } else if( CommonConstants.PROFILE_LEVEL_INDIVIDUAL.equals( profileLevel ) ) {
+            return MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
+        } else {
+            LOG.warn( "Invalid profile level" );
+            throw new InvalidInputException( "Invalid profile level" );
+        }
+    }
+
+
+    @Override
+    public Set<String> getAdminEmailsSpecificForAHierarchy( String profileLevel, long iden ) throws InvalidInputException
+    {
+        LOG.debug( "method getAdminEmaillsForAhierarchy started" );
+        List<UserProfile> adminList = new ArrayList<>();
+        Set<String> regionAdminEmailList = null;
+        Set<String> emailSet = null;
+
+        Map<String, Object> queries = new HashMap<>();
+        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+
+        if ( CommonConstants.PROFILE_LEVEL_COMPANY.equals( profileLevel ) ) {
+            queries.put( CommonConstants.COMPANY_COLUMN, getCompanyById( iden ) );
+            queries.put( CommonConstants.PROFILE_MASTER_COLUMN,
+                userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID ) );
+        } else if ( CommonConstants.PROFILE_LEVEL_REGION.equals( profileLevel ) ) {
+            queries.put( CommonConstants.REGION_ID_COLUMN, iden );
+            queries.put( CommonConstants.PROFILE_MASTER_COLUMN,
+                userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) );
+        } else if ( CommonConstants.PROFILE_LEVEL_BRANCH.equals( profileLevel ) ) {
+            queries.put( CommonConstants.BRANCH_ID_COLUMN, iden );
+            queries.put( CommonConstants.PROFILE_MASTER_COLUMN,
+                userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) );
+
+            // get region specific administrator email list
+            regionAdminEmailList = getAdminEmailsSpecificForAHierarchy( CommonConstants.PROFILE_LEVEL_REGION,
+                userManagementService.getBranchById( iden ).getRegion().getRegionId() );
+
+        } else if ( CommonConstants.PROFILE_LEVEL_INDIVIDUAL.equals( profileLevel ) ) {
+            queries.put( CommonConstants.USER_COLUMN, userManagementService.getUserByUserId( iden ) );
+            queries.put( CommonConstants.PROFILE_MASTER_COLUMN,
+                userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) );
+        } else {
+            LOG.warn( "Invalid profile level" );
+            throw new InvalidInputException( "Invalid profile level" );
+        }
+
+        adminList.addAll( userProfileDao.findByKeyValue( UserProfile.class, queries ) );
+
+        if ( !adminList.isEmpty() ) {
+            emailSet = new HashSet<>();
+            for ( UserProfile admin : adminList ) {
+                User user = admin.getUser();
+                if ( CommonConstants.PROFILE_LEVEL_COMPANY.equals( profileLevel )
+                    || CommonConstants.PROFILE_LEVEL_INDIVIDUAL.equals( profileLevel ) ) {
+                    emailSet.add( user.getEmailId() );
+                } else if ( CommonConstants.PROFILE_LEVEL_REGION.equals( profileLevel )
+                    && user.getIsOwner() != CommonConstants.STATUS_ACTIVE ) {
+                    emailSet.add( user.getEmailId() );
+                } else if ( CommonConstants.PROFILE_LEVEL_BRANCH.equals( profileLevel )
+                    && user.getIsOwner() != CommonConstants.STATUS_ACTIVE
+                    && !regionAdminEmailList.contains( user.getEmailId() ) ) {
+                    emailSet.add( user.getEmailId() );
+                }
+            }
+        } else {
+            emailSet = Collections.emptySet();
+        }
+
+        LOG.debug( "method getAdminEmaillsForAhierarchy finished" );
+        return emailSet;
     }
 }

@@ -3,8 +3,10 @@ package com.realtech.socialsurvey.core.dao.impl;
 import java.util.Arrays;
 import java.util.List;
 
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -43,7 +45,8 @@ public class FileUploadDaoImpl extends GenericDaoImpl<FileUpload, Long> implemen
                 CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT,
                 CommonConstants.FILE_UPLOAD_REPORTING_INCOMPLETE_SURVEY_REPORT,
                 CommonConstants.FILE_UPLOAD_REPORTING_NPS_WEEK_REPORT,
-                CommonConstants.FILE_UPLOAD_REPORTING_NPS_MONTH_REPORT) ) );
+                CommonConstants.FILE_UPLOAD_REPORTING_NPS_MONTH_REPORT,
+                CommonConstants.FILE_UPLOAD_SURVEY_INVITATION_EMAIL_REPORT) ) );
             if ( startIndex > -1 ) {
                 criteria.setFirstResult( startIndex );
             }
@@ -78,7 +81,8 @@ public class FileUploadDaoImpl extends GenericDaoImpl<FileUpload, Long> implemen
                 CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT,
                 CommonConstants.FILE_UPLOAD_REPORTING_INCOMPLETE_SURVEY_REPORT,
                 CommonConstants.FILE_UPLOAD_REPORTING_NPS_WEEK_REPORT,
-                CommonConstants.FILE_UPLOAD_REPORTING_NPS_MONTH_REPORT) ) );
+                CommonConstants.FILE_UPLOAD_REPORTING_NPS_MONTH_REPORT,
+                CommonConstants.FILE_UPLOAD_SURVEY_INVITATION_EMAIL_REPORT) ) );
             criteria.setProjection( Projections.rowCount() );
             Long count = (Long) criteria.uniqueResult();
             LOG.info( "Method getRecentActivityCountForReporting() finished." );
@@ -107,5 +111,36 @@ public class FileUploadDaoImpl extends GenericDaoImpl<FileUpload, Long> implemen
     		return resultList.get(0);
     	}
     	return null;
+    }
+
+    @Override
+    @Transactional
+    public int updateStatus(long fileUploadId, int status) throws InvalidInputException {
+        if(fileUploadId < 0)
+            throw new InvalidInputException("Invalid fileUploadId method passed to FileUploadDaoImpl!!!");
+
+        LOG.info("Updating fileUploadId "+ fileUploadId + "with status "+ status);
+
+        Query query = getSession().createSQLQuery("UPDATE FILE_UPLOAD set STATUS = :status where FILE_UPLOAD_ID= :fileUploadId ");
+        query.setParameter("status", status);
+        query.setParameter("fileUploadId", fileUploadId);
+        int affectedColumns  = query.executeUpdate();
+        return affectedColumns;
+    }
+    
+    @Override
+    @Transactional
+    public int updateStatusAndFileName(long fileUploadId, int status, String location) throws InvalidInputException {
+        if(fileUploadId < 0)
+            throw new InvalidInputException("Invalid fileUploadId method passed to FileUploadDaoImpl!!!");
+
+        LOG.info("Updating fileUploadId "+ fileUploadId + "with status "+ status);
+
+        Query query = getSession().createSQLQuery("UPDATE FILE_UPLOAD set STATUS = :status , FILE_NAME = :location where FILE_UPLOAD_ID= :fileUploadId ");
+        query.setParameter("status", status);
+        query.setParameter("location", location);
+        query.setParameter("fileUploadId", fileUploadId);
+        int affectedColumns  = query.executeUpdate();
+        return affectedColumns;
     }
 }

@@ -267,12 +267,16 @@ public interface OrganizationUnitSettingsDao
 
 
     public List<OrganizationUnitSettings> fetchUnitSettingsForSocialMediaTokens( String collectionName );
+    
+
+    public void removeImageForOrganizationUnitSetting( long iden, String collectionName, boolean isThumbnail, String imageType )
+        throws InvalidInputException;
 
 
     public List<Long> fetchCompanyIdsWithHiddenSection();
 
 
-    public List<OrganizationUnitSettings> getCompaniesOptedForSendingMonthlyDigest(int startIndex, int batchSize);
+    public List<OrganizationUnitSettings> getMonthlyDigestEnabledEntities(String collectionType, int startIndex, int batchSize);
 
 
     public List<Long> getHiddenPublicPagesEntityIds( String collection );

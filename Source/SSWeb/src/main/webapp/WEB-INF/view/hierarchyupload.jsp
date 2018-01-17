@@ -32,7 +32,7 @@
 </div>
 
 <div id="xlsVerifyUplaod" class="clearfix disable">
-	<table style="width: 100%">
+	<table style="width: 100%; margin: 1%;">
 		<tr style="margin-top: 10px; margin-left: 45px;">
 		</tr>
 		<tr>
@@ -54,6 +54,11 @@
 					<div id="warning-toggle" class="warn-toggle">
 						<div id="warn-toggle-chk-box" class="float-left bd-check-img bd-check-img-checked clear-both"></div>
 						<div class="float-left listing-access-txt warn-resp" style="margin-bottom: 0px; margin-right: 300px;"><spring:message code="label.warn.toggle.key"/>
+						</div>
+					</div>
+					<div id="verify-toggle" class="warn-toggle">
+						<div id="verify-chk-box" class="float-left bd-check-img clear-both"></div>
+						<div class="float-left listing-access-txt warn-resp ver-resp" style="margin-bottom: 0px; margin-right: 263px;"><spring:message code="label.verify.upload.key"/>
 						</div>
 					</div>
 					<div class="float-left rfr_lbl" style="margin-top: 10px; clear: both;">

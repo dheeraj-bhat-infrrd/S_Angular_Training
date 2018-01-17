@@ -123,4 +123,27 @@ public class UserRankingPastMonthBranchDaoImpl extends GenericReportingDaoImpl<U
         }
 	}
 
+    @Override
+    public List<UserRankingPastMonthBranch> fetchTopTenUserRankingsForABranch( long branchId, int monthUnderConcern, int year )
+    {
+        LOG.debug( "method fetchTopTenUserRankingsForABranch() running" );
+        try {
+            Criteria criteria = getSession().createCriteria( UserRankingPastMonthBranch.class );
+
+            criteria.add( Restrictions.eq( CommonConstants.BRANCH_ID_COLUMN, branchId ) );
+            criteria.add( Restrictions.eq( CommonConstants.LEADERBOARD_YEAR, year ) );
+            criteria.add( Restrictions.eq( CommonConstants.LEADERBOARD_MONTH, monthUnderConcern ) );
+            criteria.add( Restrictions.eq( CommonConstants.IS_ELIGIBLE, CommonConstants.ONE ) );
+            
+            criteria.addOrder( Order.asc( CommonConstants.RANK ) );
+            criteria.setFirstResult( CommonConstants.INITIAL_INDEX );
+            criteria.setMaxResults( 10 );
+
+            return (List<UserRankingPastMonthBranch>) criteria.list();
+        } catch ( HibernateException hibernateException ) {
+            LOG.warn( "Exception caught in fetchTopTenUserRankingsForABranch() ", hibernateException );
+            throw new DatabaseException( "Exception caught in fetchTopTenUserRankingsForABranch() ", hibernateException );
+        }
+    }
+
 }

@@ -239,7 +239,7 @@ public class OrganizationManagementController
     /**
      * Method to call service for adding company information for a user
      * 
-     * @param model
+     * @param redirectAttributes
      * @param request
      * @return
      */
@@ -809,9 +809,8 @@ public class OrganizationManagementController
             }
             
             // add send monthly digest email flag
-            if( CommonConstants.COMPANY_ID_COLUMN.equals( entityType ) ){
-                model.addAttribute( "sendMonthlyDigestMail", unitSettings.isSendMonthlyDigestMail() );
-            }
+            model.addAttribute( "sendMonthlyDigestMail", unitSettings.isSendMonthlyDigestMail() );
+            
         } catch ( InvalidInputException | NoRecordsFetchedException e ) {
             LOG.error( "NonFatalException while fetching profile details. Reason : ", e );
             model.addAttribute( "message",
@@ -1697,18 +1696,13 @@ public class OrganizationManagementController
     {
         LOG.info( "Method updateSendMonthlyDigestMailToggle started" );
         HttpSession session = request.getSession();
-
-        if ( !CommonConstants.COMPANY_ID_COLUMN
-            .equals( (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN ) ) ) {
-            LOG.error( "This is a company level settings and can to be set at any other hierarchy." );
-            return "false";
-        }
-
+        
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
         long companyId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
 
         try {
-            return String.valueOf( reportingDashboardManagement.updateSendDigestMailToggle( companyId,
-                Boolean.parseBoolean( request.getParameter( "sendMonthlyDigestMail" ) ) ) );
+            return String.valueOf( reportingDashboardManagement.updateSendDigestMailToggle( entityType,
+                companyId, Boolean.parseBoolean( request.getParameter( "sendMonthlyDigestMail" ) ) ) );
         } catch ( Exception error ) {
             LOG.error(
                 "Exception occured in updateSendMonthlyDigestMailToggle() while updating send montlhy digest mail flag. Nested exception is ",
@@ -2914,6 +2908,14 @@ public class OrganizationManagementController
         LOG.info( "Retrieved complete url for the ID : " + completeUrl );
         LOG.info( "Method to resolve shortened url sent in mail,mailUrlResolution() ended." );
 
+        //call the streamApi recieveSendGridEvents for click tracking
+        String uuid = request.getParameter("u");
+        if( uuid != null && !uuid.isEmpty() ) {
+            LOG.info( "Found UUID : " + uuid );
+            urlService.sendClickEvent(uuid);
+        }
+
+
         // Redirect to complete url found based on the ID.
         return "redirect:" + completeUrl;
     }
@@ -3057,6 +3059,7 @@ public class OrganizationManagementController
             User user = sessionHelper.getCurrentUser();
             String uploadType = request.getParameter( "uploadType" );
             String ignoreWarningStr = request.getParameter( "isWarningToBeIgnored" );
+            String verifyOnly = request.getParameter( "verifyOnly" );
 
             if( user.getIsOwner() != CommonConstants.STATUS_ACTIVE ){
                 throw new InvalidInputException( "Sorry, only a company admin or social survey admin can initiate hierarchy upload." );
@@ -3065,6 +3068,9 @@ public class OrganizationManagementController
             } else if ( StringUtils.isEmpty( ignoreWarningStr )
                 || !Arrays.asList( "true", "false" ).contains( ignoreWarningStr.trim() ) ) {
                 throw new InvalidInputException( "Please specify if warnings are to be ignored." );
+            } else if( StringUtils.isEmpty( verifyOnly )
+                || !Arrays.asList( "true", "false" ).contains( verifyOnly.trim() ) ){
+                throw new InvalidInputException( "Please specify whether to abort after verification." );
             }
 
             ParsedHierarchyUpload uploadStatus = hierarchyUploadService
@@ -3076,6 +3082,7 @@ public class OrganizationManagementController
                 uploadStatus.setStatus( CommonConstants.HIERARCHY_UPLOAD_STATUS_INITIATED );
                 uploadStatus.setInAppendMode( "append".equals( uploadType ) ? true : false );
                 uploadStatus.setWarningToBeIgnored( Boolean.parseBoolean( ignoreWarningStr.trim() ) );
+                uploadStatus.setVerifyOnly( Boolean.parseBoolean( verifyOnly.trim() ) );
                 hierarchyUploadService.reinsertParsedHierarchyUpload( uploadStatus );
                 response = uploadStatus;
             }
@@ -3299,12 +3306,11 @@ public class OrganizationManagementController
                 throw new NonFatalException( "Insufficient permission for this process" );
             }
 
-
+    			//check if there is an agent already in system( User with agent profile) 
             try {
-                User existingUser = userManagementService.getUserByEmailAndCompany( sessionHelper.getCurrentUser().getCompany().getCompanyId() , emailAddress );
-                if ( existingUser != null )
-                    throw new UserAlreadyExistsException(
-                        "The email addresss " + emailAddress + " is already present in our database." );
+                User existingUser = userManagementService.getActiveAgentByEmailAndCompany( sessionHelper.getCurrentUser().getCompany().getCompanyId() , emailAddress );
+                if ( existingUser != null ) 
+                    throw new UserAlreadyExistsException("The email addresss " + emailAddress + " is already present in our database." );            
             } catch ( NoRecordsFetchedException e ) {
                 if ( ignoredEmail ) {
                     userManagementService.saveIgnoredEmailCompanyMappingAndUpdateSurveyPreinitiation( emailAddress,
@@ -3508,10 +3514,11 @@ public class OrganizationManagementController
 
             for ( String emailId : emailIdList ) {
                 try {
-                    User existingUser = userManagementService.getUserByEmailAddress( emailId );
-                    if ( existingUser != null )
-                        throw new UserAlreadyExistsException(
-                            "The email addresss " + emailId + " is already present in our database." );
+            			//check if there is an agent already in system( User with agent profile)
+                    User existingUser = userManagementService.getActiveAgentByEmailAndCompany(sessionHelper.getCurrentUser().getCompany().getCompanyId() , emailId );
+                    if ( existingUser != null ) {
+                        		throw new UserAlreadyExistsException("The email addresss " + emailId + " is already present in our database." );
+                    }
                 } catch ( NoRecordsFetchedException e ) {
                     userManagementService.saveEmailUserMappingAndUpdateAgentIdInSurveyPreinitiation( emailId, agentId );
 
@@ -3959,7 +3966,9 @@ public class OrganizationManagementController
     public String updateDigestRecipients( HttpServletRequest request, Model model )
     {
         LOG.info( "Method updateDigestRecipients() started." );
-        User user = sessionHelper.getCurrentUser();
+        HttpSession session = request.getSession();
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String status = "";
 
         try {
@@ -3971,11 +3980,8 @@ public class OrganizationManagementController
             } else {
 
                 Set<String> emailList = organizationManagementService.parseEmailsList( emailsStr );
-                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
+                organizationManagementService.updateDigestRecipients( entityType, entityId, emailList );
 
-                organizationManagementService.updateDigestRecipients( companySettings, emailList,
-                    MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
-                
                 if ( emailList == null || emailList.isEmpty() ) {
                     status = "Additional digest recipients removed!";
                 } else {
@@ -3984,8 +3990,8 @@ public class OrganizationManagementController
 
             }
 
-        } catch ( NonFatalException e ) {
-            LOG.error( "Non fatal exception caught in updateDigestRecipients(). Nested exception is ", e );
+        } catch ( NonFatalException error ) {
+            LOG.error( "Non fatal exception caught in updateDigestRecipients(). Nested exception is ", error );
             status = "Unable to update digest recipients";
         }
 

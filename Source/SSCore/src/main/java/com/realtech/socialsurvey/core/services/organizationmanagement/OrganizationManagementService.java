@@ -4,6 +4,7 @@ package com.realtech.socialsurvey.core.services.organizationmanagement;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -24,12 +25,14 @@ import com.realtech.socialsurvey.core.entities.CompanyView;
 import com.realtech.socialsurvey.core.entities.DisabledAccount;
 import com.realtech.socialsurvey.core.entities.EncompassSdkVersion;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
+import com.realtech.socialsurvey.core.entities.Keyword;
 import com.realtech.socialsurvey.core.entities.HierarchySettingsCompare;
 import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
+import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
@@ -1518,10 +1521,55 @@ public interface OrganizationManagementService
     public String getFacebookPixelImageTagsFromHierarchy( OrganizationUnitSettings companySettings,
         OrganizationUnitSettings regionSettings, OrganizationUnitSettings branchSetting, OrganizationUnitSettings unitSettings );
 
-    public Set<String> parseEmailsList( String emailsStr );
-
-    public boolean updateDigestRecipients( OrganizationUnitSettings unitSettings, Set<String> emails, String collectionType )
+    /**
+     * Method to add filter keywords in OrganizationUnitSettings.
+     * @param companyId : companyId for updaing keywords
+     * @param keywords : List of Keyword to insert/updates
+     * @return : will return list Of keywords(with detail)  
+     * @throws InvalidInputException
+     */
+    public List<Keyword> addKeyworodsToCompanySettings( long companyId, List<Keyword> keywords )
         throws InvalidInputException;
 
+
+    /**
+     * Method to get filter keywords by company id
+     * @param companyId
+     * @return
+     * @throws InvalidInputException 
+     */
+    List<Keyword> getCompanyKeywordsByCompanyId( long companyId ) throws InvalidInputException;
+    
+    /**
+     * Method to enable keyword by keyword id
+     * @param companyId
+     * @param keywordId
+     * @return
+     * @throws InvalidInputException
+     */
+    public Keyword enableKeyworodForCompanySettings( long companyId, String keywordId)
+        throws InvalidInputException;
+    
+    /**
+     * method to disable keyword by keyword id
+     * @param companyId
+     * @param keywordId
+     * @return
+     * @throws InvalidInputException
+     */
+    public Keyword disableKeyworodForCompanySettings( long companyId, String keywordId)
+        throws InvalidInputException;
+
+    public Set<String> parseEmailsList( String emailsStr );
+
+    public boolean updateDigestRecipients( String entityType, long entityId, Set<String> emails )
+        throws InvalidInputException, NoRecordsFetchedException;
+
     public List<OrganizationUnitSettings> getCompaniesByAlertType( String alertType );
+
+
+    public String getCollectionFromProfileLevel( String profileLevel ) throws InvalidInputException;
+
+
+    public Set<String> getAdminEmailsSpecificForAHierarchy( String profileLevel, long iden ) throws InvalidInputException;
 }

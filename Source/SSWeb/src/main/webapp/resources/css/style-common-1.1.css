@@ -1861,3 +1861,54 @@ span.footer-ul a:hover {
     overflow:auto;
     margin-top: -20px;
 }
+
+.hierarchy-stats-anim {
+	-webkit-transition: width 350ms;
+    -webkit-transition-timing-function: ease;
+    transition:width 350ms;
+    transition-timing-function: ease;
+   	-ms-transition: width 350ms;
+    -ms-transition-timing-function: ease;
+}
+
+.hierarchy-stats-transform {
+	width: 220px;
+}
+
+.rep-prof-pic-overlay {
+  border-radius: 50%;
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  overflow: hidden;
+  width: 100%;
+  height:0;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.rep-prof-pic-edit-icon {
+	position: absolute;
+  	top: 50%;
+  	left: 33%;
+  	transform: translate(-50%, -50%);
+  	-ms-transform: translate(-50%, -50%);
+  	-webkit-transform: translate(-50%, -50%);
+    cursor:pointer;
+}
+
+.rep-prof-pic-del-icon {
+	position: absolute;
+  	top: 50%;
+  	left: 65%;
+  	transform: translate(-50%, -50%);
+  	-ms-transform: translate(-50%, -50%);
+  	-webkit-transform: translate(-50%, -50%);
+    cursor:pointer;
+}
+
+.rep-prof-pic-circle:hover .rep-prof-pic-overlay {
+  bottom: 0;
+  height: 100%;
+}

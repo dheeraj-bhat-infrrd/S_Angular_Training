@@ -38,6 +38,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.exception.ProfileRedirectionException;
+import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
@@ -686,6 +687,9 @@ public interface ProfileManagementService
         boolean fromBatch, boolean fromPublicPage ) throws InvalidInputException, UnavailableException;
 
 
+    public void removeProfileImage( String collection, OrganizationUnitSettings companySettings )
+        throws InvalidInputException;
+
     public String buildJsonMessageWithStatus( int status, String message );
 
 
@@ -703,5 +707,37 @@ public interface ProfileManagementService
 
     public void updateFacebookPixelId( String entityType, long entityId, String pixelId, UserSettings userSettings )
         throws NonFatalException;
+
+
+    /**
+     * @param emailIdsStr
+     * @return
+     * @throws NonFatalException
+     */
+    public List<MiscValues> processEmailIdsInput( String emailIdsStr ) throws NonFatalException;
+
+
+    /**
+     * @param contactDetails
+     * @param mailIds
+     * @throws InvalidInputException
+     * @throws UserAlreadyExistsException
+     */
+    public void updateEmailIdInContactDetails( ContactDetailsSettings contactDetails, List<MiscValues> mailIds ) throws InvalidInputException, UserAlreadyExistsException;
+
+
+    /**
+     * @param unitSettings
+     * @param isWorkEmailLockedByCompany
+     * @param companyId
+     * @param collectionType
+     * @param mailIds
+     * @throws InvalidInputException
+     * @throws UndeliveredEmailException
+     * @throws UserAlreadyExistsException
+     */
+    void updateVerifiedEmail( OrganizationUnitSettings unitSettings, boolean isWorkEmailLockedByCompany, long companyId,
+        String collectionType, List<MiscValues> mailIds )
+        throws InvalidInputException, UndeliveredEmailException, UserAlreadyExistsException;
 
 }

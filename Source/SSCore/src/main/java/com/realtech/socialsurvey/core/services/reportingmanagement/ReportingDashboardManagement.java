@@ -11,7 +11,7 @@ import java.util.Map;
 
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyDetailsReport;
-import com.realtech.socialsurvey.core.entities.CompanyDigestRequestData;
+import com.realtech.socialsurvey.core.entities.DigestRequestData;
 import com.realtech.socialsurvey.core.entities.Digest;
 import com.realtech.socialsurvey.core.entities.MonthlyDigestAggregate;
 import com.realtech.socialsurvey.core.entities.NpsReportMonth;
@@ -19,8 +19,8 @@ import com.realtech.socialsurvey.core.entities.NpsReportWeek;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RankingRequirements;
 import com.realtech.socialsurvey.core.entities.SurveyResultsReportVO;
+import com.realtech.socialsurvey.core.entities.UserRanking;
 import com.realtech.socialsurvey.core.entities.ReportingSurveyPreInititation;
-import com.realtech.socialsurvey.core.entities.UserRankingPastMonthMain;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -30,7 +30,7 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 public interface ReportingDashboardManagement
 {
     public void createEntryInFileUploadForReporting( int reportId, Date startDate, Date endDate, Long entityId,
-        String entityType, Company company, Long adminUserid )
+        String entityType, Company company, Long adminUserid, int actualTimeZoneOffset )
         throws InvalidInputException, NoRecordsFetchedException, FileNotFoundException, IOException;
 
 
@@ -144,7 +144,7 @@ public interface ReportingDashboardManagement
 
 
     RankingRequirements updateRankingRequirements( int minimumRegistrationDays, float minimumCompletedPercentage,
-        int minReviews, int monthOffset, int yearOffset );
+        int minReviews, double monthOffset, int yearOffset );
 
 
     RankingRequirements updateRankingRequirementsMongo( String collection, OrganizationUnitSettings unitSettings,
@@ -163,7 +163,7 @@ public interface ReportingDashboardManagement
     String generateUserRankingForReporting( Long entityId, String entityType, Long userId, Timestamp startDate, int type )
         throws UnsupportedEncodingException, NonFatalException;
 
-    public MonthlyDigestAggregate prepareMonthlyDigestMailData( long companyId, String companyName, int monthUnderConcern, int year ) throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException;
+    public MonthlyDigestAggregate prepareMonthlyDigestMailData( String profileLevel, long entityId, String entityName, int monthUnderConcern, int year ) throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException;
 
     List<List<Object>> getScoreStatsForOverall( Long entityId, String entityType, int currentMonth, int currentYear );
 
@@ -171,20 +171,20 @@ public interface ReportingDashboardManagement
     List<List<Object>> getScoreStatsForQuestion( Long entityId, String entityType, int currentMonth, int currentYear );
 
 
-    public Map<Integer, Digest> getDigestDataForLastFourMonths( long companyId, int monthUnderConcern, int year )
+    public Map<Integer, Digest> getDigestDataForLastFourMonths( String profileLevel, String entityName, long entityId, int monthUnderConcern, int year )
         throws InvalidInputException, NoRecordsFetchedException;
 
-    public List<UserRankingPastMonthMain> getTopTenUserRankingsThisMonthForACompany( long companyId, int monthUnderConcern,
-        int year ) throws InvalidInputException;
+    public List<UserRanking> getTopTenUserRankingsThisMonthForAHierarchy( String profileLevel, long entityId,
+        int monthUnderConcern, int year ) throws InvalidInputException;
 
 
     public void startMonthlyDigestProcess();
 
 
-    public boolean updateSendDigestMailToggle( long companyId, boolean sendMonthlyDigestMail ) throws InvalidInputException;
+    public boolean updateSendDigestMailToggle( String entityType, long entityId, boolean sendMonthlyDigestMail ) throws InvalidInputException, NoRecordsFetchedException;
 
 
-    public List<CompanyDigestRequestData> getCompaniesOptedForDigestMail( int startIndex, int batchSize );
+    public List<DigestRequestData> getEntitiesOptedForDigestMail( int startIndex, int batchSize, String profileLevel ) throws InvalidInputException;
 
 
     /**
@@ -258,14 +258,17 @@ public interface ReportingDashboardManagement
     public List<ReportingSurveyPreInititation> getIncompleteSurvey( long entityId, String entityType, Date startDate, Date endDate,
         int startIndex, int batchSize ) throws InvalidInputException;
 
-   /**
+    /**
      * Method to generate incomplete survey results report.
-     * @param profileValue
-     * @param profileLevel
-     * @param adminUserId
+     * @param entityId
+     * @param entityType
+     * @param userId
      * @param startDate
      * @param endDate
      * @return
+     * @throws UnsupportedEncodingException
+     * @throws NonFatalException
+     * @throws ParseException
      */
 
     public String generateIncompleteSurveyResultsReport( Long entityId, String entityType, Long userId, Timestamp startDate, Timestamp endDate )
@@ -310,5 +313,21 @@ public interface ReportingDashboardManagement
 	 */
 	public String generateNpsReportForWeekOrMonth(long profileValue, String profileLevel, Timestamp startDate, int type)throws ParseException, UnsupportedEncodingException, NonFatalException;
 	
-	void updateTransactionMonitorAlertsForCompanies() throws InvalidInputException;
+    void updateTransactionMonitorAlertsForCompanies() throws InvalidInputException;
+
+    /**
+     * Updated the fileUpload status of given fileUploadId
+     * @param filUploadId
+     * @param status
+     */
+    public int updateFileUploadStatus(long filUploadId, int status) throws InvalidInputException;
+
+
+    /**
+     * @param fileUploadId
+     * @param status
+     * @param location
+     * @return
+     */
+    public int updateFileUploadStatusAndFileName( long fileUploadId, int status, String location ) throws InvalidInputException;
 }

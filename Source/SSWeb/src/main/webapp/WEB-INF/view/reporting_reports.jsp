@@ -28,17 +28,7 @@
 		</div>
 	</div>
 </div>
-<div class="hm-header-main-wrapper hm-hdr-bord-bot" style="background-color: #009fe0;">
-	<div class="container">
-		<div class="hm-header-row clearfix rep-disclaimer" style="color: #f2f2f2;">
-			<div id="rep-beta-disclaimer">
-				<div style="text-align:center; margin-top:15px;">
-					<span class="rep-disc-span" style="text-align: center; line-height: 15px; font-size:small; font-weight: bold !important;">Please note that this is a beta version of the page which is still undergoing final testing before its official release. Should you encounter any bugs, glitches or other problems on the page / reports, please notify us immediately. Your help in this regard is greatly appreciated.</span>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
+
 <div class="dash-stats-wrapper bord-bot-dc clearfix">
 	
 				<div class="generate-report-div">
@@ -57,6 +47,7 @@
   								<option value=<spring:message code="label.survey.results.report.value" /> data-report="survey-results"><spring:message code="label.survey.results.report.key" /></option>
  								<option value=<spring:message code="label.survey.transaction.report.value" /> data-report="survey-transaction-summary"><spring:message code="label.survey.transaction.report.key" /></option>
  								<option value=<spring:message code="label.incomplete.survey.report.value" /> data-report="incomplete-survey-report"><spring:message code="label.incomplete.survey.report.key" /></option>
+								<option value=<spring:message code="label.survey.invitation.email.report.value" /> data-report="survey-invitation-email-report"><spring:message code="label.survey.invitation.email.report.key" /></option>
 						</select>	
 					</div>
 					<div id="report-time-div" class="float-left board-div hide">

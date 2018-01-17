@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.HashMap;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -196,6 +197,35 @@ public class BranchDaoImpl extends GenericDaoImpl<Branch, Long> implements Branc
                 return branchList;
         } else
             return branchList;
+    }
+
+    /**
+     * Method to fetch the region and branch name.
+     * @param regionId
+     * @param branchId
+     * @return map containing branch name and region name
+     * @throws InvalidInputException
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public Map<String, String> getBranchAndRegionName(long regionId, long branchId) throws InvalidInputException {
+        Map<String, String> branchAndRegionNameMap = new HashMap<>();
+        if(regionId < 0 || branchId < 0)
+            throw new InvalidInputException(" Invalid branchId or regionId passed to getBranchAndRegionName method ");
+        LOG.info("Method to get the region and branch name for region id: "+regionId+"branchId: "+branchId+" started");
+
+        Query query = getSession().createSQLQuery(" SELECT BRANCH.BRANCH, REGION.REGION FROM BRANCH \n" +
+                "INNER JOIN REGION ON BRANCH.REGION_ID = REGION.REGION_ID AND BRANCH.BRANCH_ID = :branchId \n" +
+                "AND  REGION.REGION_ID = :regionId ");
+        query.setParameter(CommonConstants.BRANCH_ID_COLUMN, branchId);
+        query.setParameter(CommonConstants.REGION_ID_COLUMN, regionId);
+        List<Object[]> rows = query.list();
+        for(Object[] row: rows) {
+            branchAndRegionNameMap.put(CommonConstants.BRANCH_NAME_COLUMN, row[0].toString());
+            branchAndRegionNameMap.put(CommonConstants.REGION_COLUMN, row[1].toString());
+        }
+        LOG.info(branchAndRegionNameMap.toString());
+        return branchAndRegionNameMap;
     }
 
 

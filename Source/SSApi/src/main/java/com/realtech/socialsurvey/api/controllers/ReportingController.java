@@ -7,14 +7,19 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
+import com.realtech.socialsurvey.api.models.response.FileUploadResponse;
 import com.realtech.socialsurvey.core.entities.CompanyActiveUsersStats;
+import com.realtech.socialsurvey.core.entities.DigestRequestData;
 import com.realtech.socialsurvey.core.entities.CompanyDetailsReport;
-import com.realtech.socialsurvey.core.entities.CompanyDigestRequestData;
 import com.realtech.socialsurvey.core.entities.CompanySurveyStatusStats;
 import com.realtech.socialsurvey.core.entities.CompanyView;
 import com.realtech.socialsurvey.core.entities.SurveyResultsReportVO;
@@ -26,6 +31,7 @@ import com.realtech.socialsurvey.core.services.reportingmanagement.DashboardGrap
 import com.realtech.socialsurvey.core.services.reportingmanagement.OverviewManagement;
 import com.realtech.socialsurvey.core.services.reportingmanagement.ReportingDashboardManagement;
 import com.wordnik.swagger.annotations.ApiOperation;
+import retrofit.http.Body;
 
 
 @RestController
@@ -77,10 +83,10 @@ public class ReportingController
         return json;
 
     }
-    
+
     @RequestMapping ( value = "/npsstats", method = RequestMethod.GET)
     @ApiOperation ( value = "Fetch Data for nps Graph")
-    public String getReportingNpsStats( Long entityId, String entityType ) 
+    public String getReportingNpsStats( Long entityId, String entityType )
     {
         LOGGER.info( "Fetching NPS stats Graph for entityType :{} and entityId : {}",entityType,entityId );
 
@@ -135,7 +141,7 @@ public class ReportingController
 
         String json = null;
         List<List<Object>> recentActivityList = reportingDashboardManagement.getRecentActivityList( entityId, entityType,
-            startIndex, batchSize );
+                startIndex, batchSize );
         json = new Gson().toJson( recentActivityList );
         return json;
     }
@@ -179,11 +185,11 @@ public class ReportingController
     @RequestMapping ( value = "/getsurveyresultsreport", method = RequestMethod.GET)
     @ApiOperation ( value = "Fetch Survey Results Report For Entity Type.")
     public String getSurveyResultsReport( String entityType, Long entityId, Timestamp startDate, Timestamp endDate,
-        int startIndex, int batchSize )
+                                          int startIndex, int batchSize )
     {
         LOGGER.info( "Fetch Survey Results Report For Entity Type." );
         Map<String, SurveyResultsReportVO> surveyResultsReportList = reportingDashboardManagement
-            .getSurveyResultsReport( entityType, entityId, startDate, endDate, startIndex, batchSize );
+                .getSurveyResultsReport( entityType, entityId, startDate, endDate, startIndex, batchSize );
         return new Gson().toJson( surveyResultsReportList );
     }
 
@@ -210,7 +216,7 @@ public class ReportingController
 
         String json = null;
         List<List<Object>> surveyTransactionList = reportingDashboardManagement.getSurveyTransactionReport( entityId,
-            entityType, startDate, endDate );
+                entityType, startDate, endDate );
         json = new Gson().toJson( surveyTransactionList );
         return json;
     }
@@ -238,14 +244,14 @@ public class ReportingController
     @RequestMapping ( value = "/getmonthdataoverviewfordashboard", method = RequestMethod.GET)
     @ApiOperation ( value = "Fetch Month Data For Overview ")
     public String getMonthDataOverviewForDashboard( Long entityId, String entityType, int month, int year )
-        throws NonFatalException
+            throws NonFatalException
     {
         LOGGER.info( "Fetch Month Data For Overview " );
 
         String json = null;
 
         Map<String, Object> overviewMap = overviewManagement.fetchOverviewDetailsBasedOnMonth( entityId, entityType, month,
-            year );
+                year );
         json = new Gson().toJson( overviewMap );
         return json;
     }
@@ -273,7 +279,7 @@ public class ReportingController
         List<List<Object>> userRankingList;
 
         userRankingList = reportingDashboardManagement.getUserRankingThisYear( entityType, entityId, year, startIndex,
-            batchSize );
+                batchSize );
 
         json = new Gson().toJson( userRankingList );
 
@@ -286,7 +292,7 @@ public class ReportingController
     @RequestMapping ( value = "/getuserrankingforthismonth")
     @ApiOperation ( value = "Fetch User Ranking for this year")
     public String getUserRankingForThisMonth( Long entityId, String entityType, int month, int year, int startIndex,
-        int batchSize )
+                                              int batchSize )
     {
         LOGGER.info( "Fetching User Ranking for this month" );
 
@@ -295,7 +301,7 @@ public class ReportingController
         List<List<Object>> userRankingList;
 
         userRankingList = reportingDashboardManagement.getUserRankingThisMonth( entityType, entityId, month, year, startIndex,
-            batchSize );
+                batchSize );
 
         json = new Gson().toJson( userRankingList );
 
@@ -314,7 +320,7 @@ public class ReportingController
         List<List<Object>> userRankingList;
 
         userRankingList = reportingDashboardManagement.getUserRankingPastYear( entityType, entityId, year, startIndex,
-            batchSize );
+                batchSize );
 
         json = new Gson().toJson( userRankingList );
 
@@ -325,7 +331,7 @@ public class ReportingController
     @RequestMapping ( value = "/getuserrankingforpastmonth")
     @ApiOperation ( value = "Fetch User Ranking for this year")
     public String getUserRankingForPastMonth( Long entityId, String entityType, int month, int year, int startIndex,
-        int batchSize )
+                                              int batchSize )
     {
         LOGGER.info( "Fetching User Ranking for past month" );
 
@@ -334,7 +340,7 @@ public class ReportingController
         List<List<Object>> userRankingList;
 
         userRankingList = reportingDashboardManagement.getUserRankingPastMonth( entityType, entityId, month, year, startIndex,
-            batchSize );
+                batchSize );
 
         json = new Gson().toJson( userRankingList );
 
@@ -363,14 +369,14 @@ public class ReportingController
     @RequestMapping ( value = "/getuserrankingrankcountthisyear", method = RequestMethod.GET)
     @ApiOperation ( value = "Fetch User Ranking Rank Count for this year")
     public String getUserRankingRankCountForThisYear( Long userId, Long entityId, String entityType, int year, int batchSize )
-        throws NonFatalException
+            throws NonFatalException
     {
         LOGGER.info( "Fetching User Ranking Count For this year" );
 
         String json = null;
         Map<String, Object> rankingCountStartIndex;
         rankingCountStartIndex = reportingDashboardManagement.fetchRankingRankCountThisYear( userId, entityId, entityType, year,
-            batchSize );
+                batchSize );
         json = new Gson().toJson( rankingCountStartIndex );
 
         return json;
@@ -381,14 +387,14 @@ public class ReportingController
     @RequestMapping ( value = "/getuserrankingrankcountthismonth", method = RequestMethod.GET)
     @ApiOperation ( value = "Fetch User Ranking Rank Count for this month")
     public String getUserRankingRankCountForThisMonth( Long userId, Long entityId, String entityType, int year, int month,
-        int batchSize ) throws NonFatalException
+                                                       int batchSize ) throws NonFatalException
     {
         LOGGER.info( "Fetching User Ranking Count For this month" );
 
         String json = null;
         Map<String, Object> rankingCountStartIndex;
         rankingCountStartIndex = reportingDashboardManagement.fetchRankingRankCountThisMonth( userId, entityId, entityType,
-            year, month, batchSize );
+                year, month, batchSize );
         json = new Gson().toJson( rankingCountStartIndex );
 
         return json;
@@ -399,14 +405,14 @@ public class ReportingController
     @RequestMapping ( value = "/getuserrankingrankcountpastyear", method = RequestMethod.GET)
     @ApiOperation ( value = "Fetch User Ranking Rank Count for past year")
     public String getUserRankingRankCountForPastYear( Long userId, Long entityId, String entityType, int year, int batchSize )
-        throws NonFatalException
+            throws NonFatalException
     {
         LOGGER.info( "Fetching User Ranking Count For past year" );
 
         String json = null;
         Map<String, Object> rankingCountStartIndex;
         rankingCountStartIndex = reportingDashboardManagement.fetchRankingRankCountPastYear( userId, entityId, entityType, year,
-            batchSize );
+                batchSize );
         json = new Gson().toJson( rankingCountStartIndex );
 
         return json;
@@ -417,14 +423,14 @@ public class ReportingController
     @RequestMapping ( value = "/getuserrankingrankcountpastmonth", method = RequestMethod.GET)
     @ApiOperation ( value = "Fetch User Ranking Rank Count for past month")
     public String getUserRankingRankCountForPastMonth( Long userId, Long entityId, String entityType, int year, int month,
-        int batchSize ) throws NonFatalException
+                                                       int batchSize ) throws NonFatalException
     {
         LOGGER.info( "Fetching User Ranking Count For past month" );
 
         String json = null;
         Map<String, Object> rankingCountStartIndex;
         rankingCountStartIndex = reportingDashboardManagement.fetchRankingRankCountPastMonth( userId, entityId, entityType,
-            year, month, batchSize );
+                year, month, batchSize );
         json = new Gson().toJson( rankingCountStartIndex );
 
         return json;
@@ -435,14 +441,14 @@ public class ReportingController
     @RequestMapping ( value = "/getuserrankingrankcountpastyears", method = RequestMethod.GET)
     @ApiOperation ( value = "Fetch User Ranking Rank Count for past years")
     public String getUserRankingRankCountForPastYears( Long userId, Long entityId, String entityType, int batchSize )
-        throws NonFatalException
+            throws NonFatalException
     {
         LOGGER.info( "Fetching User Ranking Rank And Count For past year" );
 
         String json = null;
         Map<String, Object> rankingCountStartIndex;
         rankingCountStartIndex = reportingDashboardManagement.fetchRankingRankCountPastYears( userId, entityId, entityType,
-            batchSize );
+                batchSize );
         json = new Gson().toJson( rankingCountStartIndex );
 
         return json;
@@ -453,14 +459,14 @@ public class ReportingController
     @RequestMapping ( value = "/getuserrankingcountthisyear", method = RequestMethod.GET)
     @ApiOperation ( value = "Fetch User Ranking Count for this year")
     public String getUserRankingCountForThisYear( Long entityId, String entityType, int year, int batchSize )
-        throws NonFatalException
+            throws NonFatalException
     {
         LOGGER.info( "Fetching User Ranking Count For this year." );
 
         String json = null;
         Map<String, Object> rankingCountStartIndex;
         rankingCountStartIndex = reportingDashboardManagement.fetchRankingCountThisYear( entityId, entityType, year,
-            batchSize );
+                batchSize );
         json = new Gson().toJson( rankingCountStartIndex );
 
         return json;
@@ -471,14 +477,14 @@ public class ReportingController
     @RequestMapping ( value = "/getuserrankingcountthismonth", method = RequestMethod.GET)
     @ApiOperation ( value = "Fetch User Ranking Count for this month")
     public String getUserRankingCountForThisMonth( Long entityId, String entityType, int year, int month, int batchSize )
-        throws NonFatalException
+            throws NonFatalException
     {
         LOGGER.info( "Fetching User Ranking Count For this month" );
 
         String json = null;
         Map<String, Object> rankingCountStartIndex;
         rankingCountStartIndex = reportingDashboardManagement.fetchRankingCountThisMonth( entityId, entityType, year, month,
-            batchSize );
+                batchSize );
         json = new Gson().toJson( rankingCountStartIndex );
 
         return json;
@@ -489,14 +495,14 @@ public class ReportingController
     @RequestMapping ( value = "/getuserrankingcountpastyear", method = RequestMethod.GET)
     @ApiOperation ( value = "Fetch User Ranking Count for past year")
     public String getUserRankingCountForPastYear( Long entityId, String entityType, int year, int batchSize )
-        throws NonFatalException
+            throws NonFatalException
     {
         LOGGER.info( "Fetching User Ranking Count For past year" );
 
         String json = null;
         Map<String, Object> rankingCountStartIndex;
         rankingCountStartIndex = reportingDashboardManagement.fetchRankingCountPastYear( entityId, entityType, year,
-            batchSize );
+                batchSize );
         json = new Gson().toJson( rankingCountStartIndex );
 
         return json;
@@ -507,14 +513,14 @@ public class ReportingController
     @RequestMapping ( value = "/getuserrankingcountpastmonth", method = RequestMethod.GET)
     @ApiOperation ( value = "Fetch User Ranking Count for past month")
     public String getUserRankingCountForPastMonth( Long entityId, String entityType, int year, int month, int batchSize )
-        throws NonFatalException
+            throws NonFatalException
     {
         LOGGER.info( "Fetching User Ranking Count For past month" );
 
         String json = null;
         Map<String, Object> rankingCountStartIndex;
         rankingCountStartIndex = reportingDashboardManagement.fetchRankingCountPastMonth( entityId, entityType, year, month,
-            batchSize );
+                batchSize );
         json = new Gson().toJson( rankingCountStartIndex );
 
         return json;
@@ -530,7 +536,7 @@ public class ReportingController
 
         String json = null;
         Map<String, Object> rankingCountStartIndex = reportingDashboardManagement.fetchRankingCountPastYears( entityId,
-            entityType, batchSize );
+                entityType, batchSize );
         json = new Gson().toJson( rankingCountStartIndex );
 
         return json;
@@ -547,7 +553,7 @@ public class ReportingController
 
         String json = null;
         List<List<Object>> scoreStatsOverall = reportingDashboardManagement.getScoreStatsForOverall( entityId, entityType,
-            currentMonth, currentYear );
+                currentMonth, currentYear );
         json = new Gson().toJson( scoreStatsOverall );
         return json;
     }
@@ -563,45 +569,45 @@ public class ReportingController
         String json = null;
         List<List<Object>> scoreStatsQuestion;
         scoreStatsQuestion = reportingDashboardManagement.getScoreStatsForQuestion( entityId, entityType, currentMonth,
-            currentYear );
+                currentYear );
         json = new Gson().toJson( scoreStatsQuestion );
         return json;
     }
 
 
-    @RequestMapping ( value = "/getcompaniesoptedfordigestmail", method = RequestMethod.GET)
+    @RequestMapping ( value = "/getentitiesoptedfordigestmail", method = RequestMethod.GET)
     @ApiOperation ( value = "Fetch the list of companies that have digest Mail enabled")
-    public String getCompaniesOptedForDigestMail( int startIndex, int batchSize )
+    public String getCompaniesOptedForDigestMail( String profileLevel, int startIndex, int batchSize ) throws NonFatalException
     {
 
         LOGGER.info( "Fetching the list of companies that have digest Mail enabled" );
 
         String json = null;
-        List<CompanyDigestRequestData> digestRequestData;
-        digestRequestData = reportingDashboardManagement.getCompaniesOptedForDigestMail( startIndex, batchSize );
+        List<DigestRequestData> digestRequestData;
+        digestRequestData = reportingDashboardManagement.getEntitiesOptedForDigestMail( startIndex, batchSize, profileLevel );
         json = new Gson().toJson( digestRequestData );
         return json;
     }
 
 
     @RequestMapping ( value = "/buildmonthlydigestaggregate", method = RequestMethod.GET)
-    @ApiOperation ( value = "Build the monthly digest aggregate for a company for a given month")
-    public String buildMonthlyDigestAggregate( long companyId, String companyName, int monthUnderConcern, int year )
+    @ApiOperation ( value = "Build the monthly digest aggregate for a hierarchy for a given month")
+    public String buildMonthlyDigestAggregate( String  profileLevel, long entityId, String entityName, int monthUnderConcern, int year )
         throws NonFatalException
     {
 
         LOGGER.info( "Building the monthly digest aggregate for a company for a given month" );
-        return new Gson().toJson( reportingDashboardManagement.prepareMonthlyDigestMailData( companyId, companyName, monthUnderConcern, year ) );
+        return new Gson().toJson( reportingDashboardManagement.prepareMonthlyDigestMailData( profileLevel, entityId, entityName, monthUnderConcern, year ) );
     }
-    
+
     @RequestMapping ( value = "/getcompanydetailsreport", method = RequestMethod.GET)
     @ApiOperation ( value = "Social Survey Admin level report to fetch Company Details for all companies.")
     public String getCompanyDetailsReport( String entityType, Long entityId, int startIndex, int batchSize )
-        throws InvalidInputException
+            throws InvalidInputException
     {
         LOGGER.info( "Social Survey Admin level report to fetch Company Details for all companies." );
         List<CompanyDetailsReport> companyDetailsReportList = reportingDashboardManagement.getCompanyDetailsReport( entityId,
-            startIndex, batchSize );
+                startIndex, batchSize );
         return new Gson().toJson( companyDetailsReportList );
     }
 
@@ -622,7 +628,7 @@ public class ReportingController
         LOGGER.info( "Fetching the list of active enterprise companies with no transactions in past N days" );
         List<CompanyView> allActiveCompanies = organizationManagementService.getAllActiveEnterpriseCompanyViews();
         List<CompanyView> companiesWithNoTransactions = activityManagementService
-            .getCompaniesWithNoTransactionInPastNDays( allActiveCompanies, noOfDays );
+                .getCompaniesWithNoTransactionInPastNDays( allActiveCompanies, noOfDays );
         return new Gson().toJson( companiesWithNoTransactions );
     }
 
@@ -633,9 +639,9 @@ public class ReportingController
     {
         LOGGER.info( "Fetching the company ids with low sent surveys" );
         List<CompanySurveyStatusStats> companySurveyStatusStatsList = activityManagementService
-            .getSurveyStatusStatsForPastDay();
+                .getSurveyStatusStatsForPastDay();
         List<Long> companyIdsForLessSurveyAlerts = activityManagementService
-            .validateSurveyStatsForCompanies( companySurveyStatusStatsList );
+                .validateSurveyStatsForCompanies( companySurveyStatusStatsList );
         return new Gson().toJson( companyIdsForLessSurveyAlerts );
     }
 
@@ -741,5 +747,56 @@ public class ReportingController
         Map<Long, Long> companySurveyStatsCountsMap = activityManagementService.getCompletedSurveyCountForPast3DaysForCompanies();
         return new Gson().toJson( companySurveyStatsCountsMap );
     }
-    
+
+    @RequestMapping( value = "/fileUpload/{fileUploadId}/status/{status}", method = RequestMethod.PUT)
+    @ApiOperation(value = "Updates the status column of fileUpload table")
+    public ResponseEntity<FileUploadResponse> updateFileUploadStatus(@PathVariable("fileUploadId") long fileUploadId,
+                                                                     @PathVariable("status") int status) {
+        FileUploadResponse fileUploadResponse = new FileUploadResponse();
+        ResponseEntity<FileUploadResponse> responseEntity ;
+        LOGGER.info("Updating the FileUpload of id " + fileUploadId + "to status" + status );
+        try {
+            int recordsUpdated = reportingDashboardManagement.updateFileUploadStatus(fileUploadId, status);
+            if(recordsUpdated != 1) {
+                fileUploadResponse.setRecordsUpdated(-1);
+                fileUploadResponse.setMessage("Records were not updated incorrectly !!!");
+                responseEntity  = new ResponseEntity<>(fileUploadResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+            } else {
+                fileUploadResponse.setRecordsUpdated(recordsUpdated);
+                fileUploadResponse.setMessage("Record updation success!!!");
+                responseEntity  = new ResponseEntity<>(fileUploadResponse, HttpStatus.OK);
+            }
+        } catch (InvalidInputException e) {
+            fileUploadResponse.setRecordsUpdated(0);
+            fileUploadResponse.setMessage(e.getMessage());
+            responseEntity = new ResponseEntity<>(fileUploadResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return responseEntity;
+    }
+
+    @RequestMapping( value = "/fileUpload/{fileUploadId}/status/{status}", method = RequestMethod.POST)
+    @ApiOperation(value = "Updates the status column and location of fileUpload table")
+    public ResponseEntity<FileUploadResponse> updateFileUploadStatusAndLocation(@PathVariable("fileUploadId") long fileUploadId,
+                                                                                @PathVariable("status") int status,
+                                                                                @RequestBody String fileName) {
+        FileUploadResponse fileUploadResponse = new FileUploadResponse();
+        ResponseEntity<FileUploadResponse> responseEntity;
+        try {
+            int recordsUpdated = reportingDashboardManagement.updateFileUploadStatusAndFileName(fileUploadId, status, fileName);
+            if (recordsUpdated != 1) {
+                fileUploadResponse.setRecordsUpdated(-1);
+                fileUploadResponse.setMessage("Records were not updated incorrectly !!!");
+                responseEntity = new ResponseEntity<>(fileUploadResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+            } else {
+                fileUploadResponse.setRecordsUpdated(recordsUpdated);
+                fileUploadResponse.setMessage("Record updation success!!!");
+                responseEntity = new ResponseEntity<>(fileUploadResponse, HttpStatus.OK);
+            }
+        } catch (InvalidInputException e) {
+            fileUploadResponse.setRecordsUpdated(0);
+            fileUploadResponse.setMessage(e.getMessage());
+            responseEntity = new ResponseEntity<>(fileUploadResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return responseEntity;
+    }
 }

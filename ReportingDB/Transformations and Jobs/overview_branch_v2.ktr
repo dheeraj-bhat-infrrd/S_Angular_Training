@@ -522,6 +522,18 @@
         <mask/>
         <set_empty_string>N</set_empty_string>
         </field>
+      <field>
+        <name>user_count</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>cumulative_user_count</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -782,7 +794,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var FINAL_BRANCH_ID &#x3d; 0&#x3b;&#xd;&#xa;var FINAL_MONTH_VAL &#x3d; 0&#x3b;&#xd;&#xa;var FINAL_YEAR_VAL &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;BRANCH_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_BRANCH_ID &#x3d; BRANCH_ID&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_BRANCH_ID &#x3d; BRANCH_ID_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_BRANCH_ID &#x3d; BRANCH_ID_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_BRANCH_ID &#x3d; BRANCH_ID_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_BRANCH_ID &#x3d; BRANCH_ID_4&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;month &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_MONTH_VAL &#x3d; month&#x3b;&#xd;&#xa;&#x7d; else if&#x28;MONTH_Data &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_MONTH_VAL &#x3d; MONTH_Data&#x3b;&#xd;&#xa;&#x7d; else if&#x28;MONTH_Data_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_MONTH_VAL &#x3d; MONTH_Data_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;MONTH_Data_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_MONTH_VAL &#x3d; MONTH_Data_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;MONTH_Data_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_MONTH_VAL &#x3d; MONTH_Data_3&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;year &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_YEAR_VAL &#x3d; year&#x3b;&#xd;&#xa;&#x7d; else if&#x28;Year_Data &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_YEAR_VAL &#x3d; Year_Data&#x3b;&#xd;&#xa;&#x7d; else if&#x28;Year_Data_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_YEAR_VAL &#x3d; Year_Data_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;Year_Data_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_YEAR_VAL &#x3d; Year_Data_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;Year_Data_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_YEAR_VAL &#x3d; Year_Data_3&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var FINAL_BRANCH_ID &#x3d; 0&#x3b;&#xd;&#xa;var FINAL_MONTH_VAL &#x3d; 0&#x3b;&#xd;&#xa;var FINAL_YEAR_VAL &#x3d; 0&#x3b;&#xd;&#xa;var user_count &#x3d; 0&#x3b;&#xd;&#xa;var cumulative_user_count &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;BRANCH_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_BRANCH_ID &#x3d; BRANCH_ID&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_BRANCH_ID &#x3d; BRANCH_ID_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_BRANCH_ID &#x3d; BRANCH_ID_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_BRANCH_ID &#x3d; BRANCH_ID_3&#x3b;&#xd;&#xa;&#x7d; else if&#x28;BRANCH_ID_4 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_BRANCH_ID &#x3d; BRANCH_ID_4&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;month &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_MONTH_VAL &#x3d; month&#x3b;&#xd;&#xa;&#x7d; else if&#x28;MONTH_Data &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_MONTH_VAL &#x3d; MONTH_Data&#x3b;&#xd;&#xa;&#x7d; else if&#x28;MONTH_Data_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_MONTH_VAL &#x3d; MONTH_Data_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;MONTH_Data_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_MONTH_VAL &#x3d; MONTH_Data_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;MONTH_Data_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_MONTH_VAL &#x3d; MONTH_Data_3&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;year &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_YEAR_VAL &#x3d; year&#x3b;&#xd;&#xa;&#x7d; else if&#x28;Year_Data &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_YEAR_VAL &#x3d; Year_Data&#x3b;&#xd;&#xa;&#x7d; else if&#x28;Year_Data_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_YEAR_VAL &#x3d; Year_Data_1&#x3b;&#xd;&#xa;&#x7d; else if&#x28;Year_Data_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_YEAR_VAL &#x3d; Year_Data_2&#x3b;&#xd;&#xa;&#x7d; else if&#x28;Year_Data_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	FINAL_YEAR_VAL &#x3d; Year_Data_3&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>FINAL_BRANCH_ID</name>
         <rename>FINAL_BRANCH_ID</rename>
         <type>Integer</type>
@@ -797,6 +809,18 @@
         <replace>N</replace>
       </field>      <field>        <name>FINAL_YEAR_VAL</name>
         <rename>FINAL_YEAR_VAL</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>user_count</name>
+        <rename>user_count</rename>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>cumulative_user_count</name>
+        <rename>cumulative_user_count</rename>
         <type>Integer</type>
         <length>-1</length>
         <precision>-1</precision>
@@ -946,6 +970,14 @@
         <field>
           <column_name>third_party</column_name>
           <stream_name>third_party</stream_name>
+        </field>
+        <field>
+          <column_name>user_count</column_name>
+          <stream_name>user_count</stream_name>
+        </field>
+        <field>
+          <column_name>cumulative_user_count</column_name>
+          <stream_name>cumulative_user_count</stream_name>
         </field>
     </fields>
      <cluster_schema/>

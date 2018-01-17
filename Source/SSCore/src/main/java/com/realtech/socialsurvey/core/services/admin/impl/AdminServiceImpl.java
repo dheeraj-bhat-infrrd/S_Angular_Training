@@ -7,11 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -31,14 +28,17 @@ import com.braintreegateway.Transaction;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.EmailAttachment;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.admin.AdminService;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
+import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.vo.SubscriptionVO;
 import com.realtech.socialsurvey.core.vo.TransactionVO;
 
@@ -74,6 +74,9 @@ public class AdminServiceImpl implements AdminService
 
     @Value ( "${APPLICATION_ADMIN_NAME}")
     private String adminName;
+
+    @Autowired
+    private FileUploadService fileUploadService;
 
 
     @SuppressWarnings ( "deprecation")
@@ -269,16 +272,30 @@ public class AdminServiceImpl implements AdminService
             }
         }
 
-        // Mail the report to the email
+        boolean excelUploaded = false;
         if ( excelCreated ) {
-            Map<String, String> attachmentsDetails = new HashMap<String, String>();
-            attachmentsDetails.put( fileName + ".xls", filePath );
+            try {
+                filePath = fileUploadService.uploadOldReport( file, fileName );
+                
+                excelUploaded = true;
+            } catch ( NonFatalException e ) {
+                LOG.error( "Exception caught while uploading old report", e);
+            }
+            LOG.debug( "fileUpload on s3 step is done for filename : {}", fileName );
+        } else {
+            LOG.warn( "Could not write into file {}", fileName );
+        }
 
+        // Mail the report to the email
+        if ( excelCreated && excelUploaded) {
+            List<EmailAttachment> attachments = new ArrayList<EmailAttachment>();
+            attachments.add( new EmailAttachment(fileName + ".xls", filePath) );
+            
             String name = adminName;
             LOG.debug( "sending mail to : " + name + " at : " + recipientMailIds );
             try {
                 emailServices.sendCustomReportMail( CommonConstants.ADMIN_RECEPIENT_DISPLAY_NAME, recipientMailIds,
-                    CommonConstants.TRANSACTION_LIST_MAIL_SUBJECT + subscriptionId, attachmentsDetails );
+                    CommonConstants.TRANSACTION_LIST_MAIL_SUBJECT + subscriptionId, attachments);
             } catch ( InvalidInputException | UndeliveredEmailException e ) {
                 LOG.error( "Error while sending mail to ; " + recipientMailIds, e );
             }
@@ -464,17 +481,31 @@ public class AdminServiceImpl implements AdminService
                 excelCreated = false;
             }
         }
+        
+        boolean excelUploaded = false;
+        if ( excelCreated ) {
+            try {
+                filePath = fileUploadService.uploadOldReport( file, fileName );
+                
+                excelUploaded = true;
+            } catch ( NonFatalException e ) {
+                LOG.error( "Exception caught while uploading old report", e);
+            }
+            LOG.debug( "fileUpload on s3 step is done for filename : {}", fileName );
+        } else {
+            LOG.warn( "Could not write into file {}", fileName );
+        }
 
         // Mail the report to the email
-        if ( excelCreated ) {
-            Map<String, String> attachmentsDetails = new HashMap<String, String>();
-            attachmentsDetails.put( fileName + ".xls", filePath );
-
+        if ( excelCreated && excelUploaded) {
+            List<EmailAttachment> attachments = new ArrayList<EmailAttachment>();
+            attachments.add( new EmailAttachment(fileName + ".xls", filePath) );
+            
             String name = adminName;
             LOG.debug( "sending mail to : " + name + " at : " + recipientMailIds );
             try {
                 emailServices.sendCustomReportMail( CommonConstants.ADMIN_RECEPIENT_DISPLAY_NAME, recipientMailIds,
-                    CommonConstants.ACTIVE_SUBSCRIPTION_MAIL_SUBJECT, attachmentsDetails );
+                    CommonConstants.ACTIVE_SUBSCRIPTION_MAIL_SUBJECT, attachments);
             } catch ( InvalidInputException | UndeliveredEmailException e ) {
                 LOG.error( "Error while sending mail to ; " + recipientMailIds, e );
             }
@@ -585,17 +616,30 @@ public class AdminServiceImpl implements AdminService
             }
         }
 
-        // Mail the report to the email
+        boolean excelUploaded = false;
         if ( excelCreated ) {
-            Map<String, String> attachmentsDetails = new HashMap<String, String>();
-            attachmentsDetails.put( fileName + ".xls", filePath );
+            try {
+                filePath = fileUploadService.uploadOldReport( file, fileName );
+                
+                excelUploaded = true;
+            } catch ( NonFatalException e ) {
+                LOG.error( "Exception caught while uploading old report", e);
+            }
+            LOG.debug( "fileUpload on s3 step is done for filename : {}", fileName );
+        } else {
+            LOG.warn( "Could not write into file {}", fileName );
+        }
 
-
+        // Mail the report to the email
+        if ( excelCreated && excelUploaded) {
+            List<EmailAttachment> attachments = new ArrayList<EmailAttachment>();
+            attachments.add( new EmailAttachment(fileName + ".xls", filePath) );
+            
             String name = adminName;
             LOG.debug( "sending mail to : " + name + " at : " + recipientMailIds );
             try {
                 emailServices.sendCustomReportMail( CommonConstants.ADMIN_RECEPIENT_DISPLAY_NAME, recipientMailIds,
-                    CommonConstants.ACTIVE_SUBSCRIPTION_MAIL_SUBJECT, attachmentsDetails );
+                    CommonConstants.ACTIVE_SUBSCRIPTION_MAIL_SUBJECT, attachments );
             } catch ( InvalidInputException | UndeliveredEmailException e ) {
                 LOG.error( "Error while sending mail to ; " + recipientMailIds, e );
             }

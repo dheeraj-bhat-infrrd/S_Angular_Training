@@ -46,6 +46,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
@@ -118,6 +119,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.exception.ProfileRedirectionException;
+import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.integration.zillow.FetchZillowReviewBody;
 import com.realtech.socialsurvey.core.integration.zillow.FetchZillowReviewBodyByNMLS;
 import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationAgentApi;
@@ -829,6 +831,35 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             collection, CommonConstants.IMAGE_TYPE_PROFILE, false, false );
         LOG.debug( "Image updated successfully" );
     }
+    
+    @Override
+    public void removeProfileImage( String collection, OrganizationUnitSettings unitSettings ) throws InvalidInputException
+    {
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( unitSettings == null ) {
+            throw new InvalidInputException( "Company settings passed can not be null" );
+        }
+        LOG.debug( "removing image from mongo" );
+        organizationUnitSettingsDao.removeImageForOrganizationUnitSetting( unitSettings.getIden(), collection, false,
+            CommonConstants.IMAGE_TYPE_PROFILE );
+
+        LOG.debug( "updating solr" );
+        Map<String, Object> updateMap = new HashMap<String, Object>();
+        updateMap.put( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, "" );
+        updateMap.put( CommonConstants.PROFILE_IMAGE_URL_SOLR, "" );
+        updateMap.put( CommonConstants.IS_PROFILE_IMAGE_SET_SOLR, false );
+        try {
+            solrSearchService.editUserInSolrWithMultipleValues( unitSettings.getIden(), updateMap );
+        } catch ( SolrException e ) {
+            LOG.error( "SolrException occured while updating user in solr. Reason : ", e );
+            throw new InvalidInputException( "SolrException occured while updating user in solr. Reason : ", e );
+        }
+
+        LOG.debug( "Image removed successfully" );
+    }
+
 
 
     // vertical
@@ -4660,14 +4691,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         reviews = (List<HashMap<String, Object>>) map.get( "reviews" );
         if ( reviews != null ) {
             for ( Map<String, Object> review : reviews ) {
-                HashMap<String, Object> companyReviewee = (HashMap<String, Object>) review.get( "companyReviewee" );
                 HashMap<String, Object> individualReviewee = (HashMap<String, Object>) review.get( "individualReviewee" );
                 HashMap<String, Object> reviewerName = (HashMap<String, Object>) review.get( "reviewerName" );
-                HashMap<String, Object> reviewerNameIndividual = (HashMap<String, Object>) reviewerName.get( "individualName" );
+                String displayReviewerName = (String) reviewerName.get("displayName");
                 String customerFirstName = null;
-                if ( reviewerNameIndividual != null && !reviewerNameIndividual.isEmpty() ) {
-                    customerFirstName = reviewerNameIndividual.get( "firstName" ) + " "
-                        + reviewerNameIndividual.get( "lastName" );
+                if ( ! StringUtils.isEmpty(displayReviewerName) ) {
+                		customerFirstName = displayReviewerName;
                 } else {
                     customerFirstName = (String) reviewerName.get( "screenName" );
                 }
@@ -5765,11 +5794,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             branchProfile, individualProfile, map, true );
 
         // aggregated disclaimer
-        if ( ( CommonConstants.REGION_ID.equals( entityId ) || CommonConstants.BRANCH_ID.equals( entityId ) ) ) {
             String disclaimer = aggregateDisclaimer( profileUnderConcern, entityId );
             if ( StringUtils.isNotEmpty( disclaimer ) )
                 profileUnderConcern.setDisclaimer( disclaimer );
-        }
+        
 
         //remove sensitive info from profile JSON from company profile 
         removeTokensFromProfile( companyProfile );
@@ -6472,5 +6500,209 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         socialMediaTokens.setFacebookPixelToken( facebookPixelToken );
         LOG.debug( "Method updateFacebookPixelIdInMediaTokens() finished" );
         return socialMediaTokens;
+    }
+
+
+    @Override
+    public List<MiscValues> processEmailIdsInput( String emailIdsStr ) throws NonFatalException
+    {
+        try {
+            return new ObjectMapper().readValue( emailIdsStr,
+                TypeFactory.defaultInstance().constructCollectionType( List.class, MiscValues.class ) );
+        } catch ( IOException error ) {
+            LOG.warn( "Unable to parse mailIDs" );
+            throw new NonFatalException( "Unable to parse mailIDs", DisplayMessageConstants.GENERAL_ERROR, error );
+        }
+    }
+
+
+    @Override
+    public void updateEmailIdInContactDetails( ContactDetailsSettings contactDetails, List<MiscValues> mailIds )
+        throws InvalidInputException, UserAlreadyExistsException
+    {
+        LOG.info( "method updateEmailIdInContactDetails() started" );
+        String workEmailId = null;
+        String personalEmailId = null;
+        List<MiscValues> others = new ArrayList<>();
+
+        if( contactDetails == null ){
+            LOG.warn( "Contact details is not specified" );
+            throw new InvalidInputException( "Contact details is not specified" );
+        } else if( mailIds == null || mailIds.isEmpty() ){
+            LOG.warn( "New mail IDs not specified" );
+            throw new InvalidInputException( "New mail IDs not specified" );            
+        }
+
+        for ( MiscValues mailId : mailIds ) {
+            if ( CommonConstants.EMAIL_TYPE_WORK.equalsIgnoreCase( mailId.getKey() ) ) {
+                workEmailId = mailId.getValue();
+            } else if ( CommonConstants.EMAIL_TYPE_PERSONAL.equalsIgnoreCase( mailId.getKey() ) ) {
+                personalEmailId = mailId.getValue();
+            } else {
+                others.add( mailId );
+            }
+        }
+
+        if ( StringUtils.isEmpty( personalEmailId ) && StringUtils.isEmpty( workEmailId ) && others.isEmpty() ) {
+            LOG.debug( "Nothing to update" );
+            LOG.warn( "No email IDs specified to update" );
+            throw new InvalidInputException( "No email IDs specified to update" );
+        }
+
+        MailIdSettings mailIdSettings = contactDetails.getMail_ids();
+        
+        if( mailIdSettings == null ){
+            mailIdSettings = new MailIdSettings();
+            contactDetails.setMail_ids( mailIdSettings );
+        }
+        
+        // update personal and work and other e-mail IDs
+        if ( StringUtils.isNotEmpty( workEmailId ) ) {
+
+            mailIdSettings.setWorkEmailToVerify( workEmailId );
+            mailIdSettings.setWorkEmailVerified( false );
+        }
+
+        if ( StringUtils.isNotEmpty( personalEmailId ) ) {
+            mailIdSettings.setPersonalEmailToVerify( personalEmailId );
+            mailIdSettings.setPersonalEmailVerified( false );
+        }
+
+        if ( !others.isEmpty() ) {
+            mailIdSettings.setOthers( others );
+        }
+        
+        LOG.info( "method updateEmailIdInContactDetails() finished" );
+    }
+
+    @Override
+    public void updateVerifiedEmail( OrganizationUnitSettings unitSettings, boolean isWorkEmailLockedByCompany, long companyId,
+        String collectionType, List<MiscValues> mailIds )
+        throws InvalidInputException, UndeliveredEmailException, UserAlreadyExistsException
+    {
+        LOG.info( "method updateVerifiedEmail() started" );
+        
+        if( unitSettings == null ){
+            LOG.warn( "Settings are not specified" );
+            throw new InvalidInputException( "Settings are not specified" );
+        } else if( mailIds == null || mailIds.isEmpty() ){
+            LOG.warn( "New mail IDs are not specified" );
+            throw new InvalidInputException( "New mail IDs are not specified" );            
+        } else if( StringUtils.isEmpty( collectionType ) ){
+            LOG.warn( "Target collection not specified" );
+            throw new InvalidInputException( "Target collection not specified" );
+        }
+        
+        ContactDetailsSettings contactDetailsSettings = unitSettings.getContact_details();
+
+        // Send verification Links
+        if ( isWorkEmailLockedByCompany ) {
+            generateAndSendEmailVerificationRequestLinkToAdmin( mailIds, companyId, collectionType, unitSettings );
+        } else {
+            sendVerificationLinks( mailIds, collectionType, unitSettings );
+        }
+
+        contactDetailsSettings = updateMailSettings( contactDetailsSettings, mailIds, isWorkEmailLockedByCompany );
+
+        if ( unitSettings instanceof AgentSettings ) {
+            contactDetailsSettings = updateAgentContactDetails( collectionType, (AgentSettings) unitSettings,
+                contactDetailsSettings );
+        } else {
+            contactDetailsSettings = updateContactDetails( collectionType, unitSettings, contactDetailsSettings );
+        }
+
+        unitSettings.setContact_details( contactDetailsSettings );
+        LOG.info( "method updateVerifiedEmail() finished" );
+    }
+
+
+    private void checkForExistingUser( String workEmailId ) throws UserAlreadyExistsException, InvalidInputException
+    {
+        try {
+            userManagementService.getUserByEmailAddress( workEmailId );
+            throw new UserAlreadyExistsException( "User already exists with emailId : " + workEmailId );
+        } catch ( NoRecordsFetchedException e ) {
+            LOG.debug( "User not registerd already with email Id : {}", workEmailId );
+        }
+
+    }
+
+
+    /**
+     *
+     * @param mailIds
+     * @param entityType
+     * @param userSettings
+     * @throws InvalidInputException
+     * @throws UndeliveredEmailException
+     */
+    // send verification links
+    private void sendVerificationLinks( List<MiscValues> mailIds, String entityType, OrganizationUnitSettings userSettings )
+        throws InvalidInputException, UndeliveredEmailException
+    {
+        LOG.debug( "Method sendVerificationLinks() called from ProfileManagementController" );
+        Map<String, String> urlParams = null;
+
+        for ( MiscValues mailId : mailIds ) {
+            String key = mailId.getKey();
+            String emailId = mailId.getValue();
+            if ( key.equalsIgnoreCase( CommonConstants.EMAIL_TYPE_WORK ) ) {
+                urlParams = new HashMap<>();
+                urlParams.put( CommonConstants.EMAIL_ID, emailId );
+                urlParams.put( CommonConstants.EMAIL_TYPE, CommonConstants.EMAIL_TYPE_WORK );
+                urlParams.put( CommonConstants.ENTITY_ID_COLUMN, Long.toString( userSettings.getIden() ) );
+                urlParams.put( CommonConstants.ENTITY_TYPE_COLUMN, entityType );
+                urlParams.put( CommonConstants.URL_PARAM_VERIFICATION_REQUEST_TYPE,
+                    CommonConstants.URL_PARAM_VERIFICATION_REQUEST_TYPE_TO_USER );
+
+                generateVerificationUrl( urlParams,
+                    applicationBaseUrl + CommonConstants.REQUEST_MAPPING_EMAIL_EDIT_VERIFICATION, emailId,
+                    userSettings.getContact_details().getName() );
+            }
+        }
+        LOG.debug( "Method sendVerificationLinks() finished from ProfileManagementController" );
+    }
+
+
+    // Update mail IDs
+    private ContactDetailsSettings updateMailSettings( ContactDetailsSettings contactDetailsSettings, List<MiscValues> mailIds,
+        boolean verifiedByAdmin ) throws InvalidInputException, UserAlreadyExistsException
+    {
+        LOG.debug( "Method updateMailSettings() called from ProfileManagementController" );
+        if ( contactDetailsSettings == null ) {
+            throw new InvalidInputException( "No contact details object found for user" );
+        }
+
+        MailIdSettings mailIdSettings = contactDetailsSettings.getMail_ids();
+        if ( mailIdSettings == null ) {
+            LOG.debug( "No maild ids added, create new mail id object in contact details" );
+            mailIdSettings = new MailIdSettings();
+        }
+
+        List<MiscValues> others = null;
+        for ( MiscValues mailId : mailIds ) {
+            String key = mailId.getKey();
+            String value = mailId.getValue();
+            if ( key.equalsIgnoreCase( CommonConstants.EMAIL_TYPE_WORK ) ) {
+                checkForExistingUser( value );
+                mailIdSettings.setWorkEmailToVerify( value );
+                mailIdSettings.setWorkEmailVerified( false );
+                mailIdSettings.setWorkMailVerifiedByAdmin( verifiedByAdmin );
+            } else if ( key.equalsIgnoreCase( CommonConstants.EMAIL_TYPE_PERSONAL ) ) {
+                mailIdSettings.setPersonal( value );
+                mailIdSettings.setPersonalEmailToVerify( value );
+                mailIdSettings.setPersonalEmailVerified( false );
+            } else {
+                if ( others == null ) {
+                    others = new ArrayList<>();
+                }
+                others.add( mailId );
+            }
+        }
+
+        mailIdSettings.setOthers( others );
+        contactDetailsSettings.setMail_ids( mailIdSettings );
+        LOG.debug( "Method updateMailSettings() finished from ProfileManagementController" );
+        return contactDetailsSettings;
     }
 }

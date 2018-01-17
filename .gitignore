@@ -13,6 +13,10 @@ Source/.settings/
 Source/.idea/
 Source/**/*.eml
 Source/**/*.iml
+Source/**/log/*
+Source/**/logs/*
+Source/**/mvnw
+Source/**/mvnw.cmd
 Source/standalone/
 /**/target/
 /.metadata/*

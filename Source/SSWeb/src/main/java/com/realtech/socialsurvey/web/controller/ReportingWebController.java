@@ -531,6 +531,8 @@ public class ReportingWebController
         }
         String reportIdString = request.getParameter( "reportId" );
         int reportId = Integer.parseInt( reportIdString );
+        String actualTimeZoneString = request.getParameter("clientTimeZone");
+        int actualTimeZoneOffset = Integer.parseInt( actualTimeZoneString );
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
         Company company = user.getCompany();
@@ -539,8 +541,13 @@ public class ReportingWebController
             "Creating entry in file upload for reportId {} with start date {} and end date {} for entity id {}, entity type {}",
             reportId, startDate, endDate, entityId, entityType );
         reportingDashboardManagement.createEntryInFileUploadForReporting( reportId, startDate, endDate, entityId, entityType,
-            company, adminUserid );
+            company, adminUserid, actualTimeZoneOffset );
         message = "The report is being generated";
+        if ( reportId == CommonConstants.FILE_UPLOAD_SURVEY_INVITATION_EMAIL_REPORT ) {
+            if ( startDate == null || endDate == null ) {
+                message = message.concat( " for one month" );
+            }
+        }
         return message;
 
     }
@@ -558,7 +565,7 @@ public class ReportingWebController
         int reportId = CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_DETAILS_REPORT;
         LOG.debug( "Creating entry in file upload for report id {}", reportId );
         reportingDashboardManagement.createEntryInFileUploadForReporting( reportId, null, null, adminUserid,
-            CommonConstants.AGENT_ID_COLUMN, user.getCompany(), adminUserid );
+            CommonConstants.AGENT_ID_COLUMN, user.getCompany(), adminUserid, 0 );
         message = "The report is being generated";
         return message;
     }
@@ -722,7 +729,7 @@ public class ReportingWebController
         int minDaysOfRegistration = 0;
         float minCompletedPercentage = 0;
         int minNoOfReviews = 0;
-        int monthOffset = 0;
+        double monthOffset = 0.0;
         int yearOffset = 0;
         String message = null;
 
@@ -737,7 +744,7 @@ public class ReportingWebController
             minNoOfReviews = Integer.parseInt( minNoOfReviewsStr );
         }
         if ( monthOffsetStr != null && !monthOffsetStr.isEmpty() ) {
-            monthOffset = Integer.parseInt( monthOffsetStr );
+            monthOffset = Double.parseDouble( monthOffsetStr );
         }
         if ( yearOffsetStr != null && !yearOffsetStr.isEmpty() ) {
             yearOffset = Integer.parseInt( yearOffsetStr );

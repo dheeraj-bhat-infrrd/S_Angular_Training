@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.services.mail.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -9,12 +10,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
-import org.mockito.internal.util.reflection.Whitebox;
+
 import com.realtech.socialsurvey.TestConstants;
 import com.realtech.socialsurvey.core.entities.EmailEntity;
-import com.realtech.socialsurvey.core.entities.FileContentReplacements;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 
 
 public class SendGridEmailSenderImplTest
@@ -102,7 +101,7 @@ public class SendGridEmailSenderImplTest
     }
 
 
-    @Test ( expected = InvalidInputException.class)
+    /*@Test ( expected = InvalidInputException.class)
     public void testSendEmailWithBodyReplacementsWithNullSubjectFileName() throws InvalidInputException,
         UndeliveredEmailException
     {
@@ -234,5 +233,5 @@ public class SendGridEmailSenderImplTest
         email.setBody( "test" );
         email.setSubject( "" );
         sendGridEmailSenderImpl.saveEmail( email, false );
-    }
+    }*/
 }

@@ -113,6 +113,9 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_SEND_MONTHLY_DIGEST_MAIL = "sendMonthlyDigestMail";
     public static final String KEY_HIDE_PUBLIC_PAGE = "hidePublicPage";
     public static final String KEY_INCLUDE_FOR_TRANSACTION_MONITOR = "includeForTransactionMonitor";
+    public static final String KEY_FILTER_KEYWORDS = "filterKeywords";
+
+
     public static final String KEY_DIGEST_RECIPIENTS = "digestRecipients";
     public static final String KEY_ENTITY_ALERT_DETAILS = "entityAlertDetails";
     public static final String KEY_IS_ERROR_ALERT = "isErrorAlert";
@@ -894,8 +897,58 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         if ( !( isThumbnail ) ) {
 
         }
+        
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, System.currentTimeMillis() );
+
         mongoTemplate.updateMulti( query, update, OrganizationUnitSettings.class, collectionName );
         LOG.debug( "Updated thumbnail image details" );
+    }
+    
+    @Override
+    public void removeImageForOrganizationUnitSetting( long iden, String collectionName, boolean isThumbnail, String imageType )
+        throws InvalidInputException
+    {
+        LOG.debug( "removing thumbnail image or both profile and thumbnail images for collection: " + collectionName
+            + " with id: " + iden );
+
+        if ( iden <= 0l || collectionName == null || collectionName.isEmpty() ) {
+            throw new InvalidInputException( "Invalid input provided to the method updateImage" );
+        }
+
+        Query query = new Query();
+        Update update = new Update();
+        query.addCriteria( Criteria.where( CommonConstants.IDEN ).is( iden ) );
+
+        //determine the key and flag to update
+        //If the image you're removing isn't a thumb-nail, set the same value for the image column and it's thumb-nail column
+
+        if ( imageType == CommonConstants.IMAGE_TYPE_PROFILE ) {
+            if ( isThumbnail ) {
+                update.set( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, "" );
+            } else {
+                update.set( CommonConstants.PROFILE_IMAGE_URL_SOLR, "" );
+                update.set( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, "" );
+            }
+            update.set( CommonConstants.IS_PROFILE_IMAGE_PROCESSED_COLUMN, false );
+        } else if ( imageType == CommonConstants.IMAGE_TYPE_LOGO ) {
+            if ( isThumbnail ) {
+                update.set( CommonConstants.LOGO_THUMBNAIL_COLUMN, "" );
+            } else {
+                update.set( CommonConstants.LOGO_COLUMN, "" );
+                update.set( CommonConstants.LOGO_THUMBNAIL_COLUMN, "" );
+            }
+            update.set( CommonConstants.IS_LOGO_IMAGE_PROCESSED_COLUMN, "" );
+        } else {
+            throw new InvalidInputException( "Invalid image type" );
+        }
+        if ( !( isThumbnail ) ) {
+
+        }
+        
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, System.currentTimeMillis() );
+
+        mongoTemplate.updateMulti( query, update, OrganizationUnitSettings.class, collectionName );
+        LOG.debug( "removed image details" );
     }
 
 
@@ -1025,7 +1078,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
      * Method to fetch the company ID list who have opted for monthly digest mail
      */
     @Override
-    public List<OrganizationUnitSettings> getCompaniesOptedForSendingMonthlyDigest( int startIndex, int batchSize )
+    public List<OrganizationUnitSettings> getMonthlyDigestEnabledEntities( String collectionType, int startIndex, int batchSize )
     {
         LOG.debug( "Method getCompaniesOptedForSendingMonthlyDigest() started." );
 
@@ -1047,7 +1100,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         query.with( new Sort( Sort.Direction.ASC, KEY_IDEN ) );
 
         LOG.debug( "Query: " + query.toString() );
-        unitSettings = mongoTemplate.find( query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION );
+        unitSettings = mongoTemplate.find( query, OrganizationUnitSettings.class, collectionType );
         LOG.debug( "Method getCompaniesOptedForSendingMonthlyDigest() finished." );
         return unitSettings;
     }

@@ -149,7 +149,7 @@ public class SurveyHandlerImplTest
     }
 
 
-    //Tests for sendSurveyInvitationMail
+    //Tests for sendSurveyRelatedMail
     @Test ( expected = InvalidInputException.class)
     public void sendSurveyInvitationMailTestFirstNameNull() throws InvalidInputException, SolrException,
         NoRecordsFetchedException, UndeliveredEmailException, ProfileNotFoundException

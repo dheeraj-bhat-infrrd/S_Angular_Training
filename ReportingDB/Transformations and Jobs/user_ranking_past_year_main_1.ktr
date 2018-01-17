@@ -1355,7 +1355,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var days_of_registration_final &#x3d; 0&#x3b;&#xd;&#xa;var avg_rating_final &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;days_of_registration &#x21;&#x3d; null&#x29;&#x7b; days_of_registration_final &#x3d; days_of_registration&#x3b; &#x7d;&#xd;&#xa;if&#x28;AverageScore &#x21;&#x3d; null&#x29;&#x7b;avg_rating_final &#x3d; AverageScore&#x3b; &#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28; Completed &#x3d;&#x3d; null&#x29; var Completed &#x3d; 0&#xd;&#xa;if&#x28;Sent &#x3d;&#x3d; null&#x29; var Sent &#x3d; 0&#xd;&#xa;if&#x28;complete_percentage &#x3d;&#x3d; null&#x29; var complete_percentage &#x3d; 0&#xd;&#xa;&#xd;&#xa;var max_eligible_rank &#x3d; 0</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var days_of_registration_final &#x3d; 0&#x3b;&#xd;&#xa;var avg_rating_final &#x3d; 0.000&#x3b;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;days_of_registration &#x21;&#x3d; null&#x29;&#x7b; days_of_registration_final &#x3d; days_of_registration&#x3b; &#x7d;&#xd;&#xa;if&#x28;AverageScore &#x21;&#x3d; null&#x29;&#x7b;avg_rating_final &#x3d; AverageScore&#x3b; &#x7d;&#xd;&#xa;&#xd;&#xa;if&#x28; Completed &#x3d;&#x3d; null&#x29; var Completed &#x3d; 0&#xd;&#xa;if&#x28;Sent &#x3d;&#x3d; null&#x29; var Sent &#x3d; 0&#xd;&#xa;if&#x28;complete_percentage &#x3d;&#x3d; null&#x29; var complete_percentage &#x3d; 0&#xd;&#xa;&#xd;&#xa;var max_eligible_rank &#x3d; 0</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>days_of_registration_final</name>
         <rename>days_of_registration_final</rename>
         <type>String</type>
@@ -1364,9 +1364,9 @@
         <replace>N</replace>
       </field>      <field>        <name>avg_rating_final</name>
         <rename>avg_rating_final</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
+        <type>Number</type>
+        <length>16</length>
+        <precision>3</precision>
         <replace>N</replace>
       </field>      <field>        <name>Completed</name>
         <rename>Completed</rename>
@@ -1689,6 +1689,51 @@
       </meta>      <meta>        <name>total_reviews</name>
         <rename>total_reviews</rename>
         <type>String</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>Completed</name>
+        <rename>Completed</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>avg_rating_final</name>
+        <rename>avg_rating_final</rename>
+        <type>Number</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>YEAR_OFFSET</name>
+        <rename>YEAR_OFFSET</rename>
+        <type>Number</type>
         <length>-2</length>
         <precision>-2</precision>
         <conversion_mask/>
@@ -2965,7 +3010,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;var is_eligable &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;parseInt&#x28;days_of_registration_final&#x29;&#x3e;&#x3d; parseInt&#x28;MIN_DAYS_OF_REGISTRATION&#x29;&#x29;&#x7b;&#xd;&#xa;	if&#x28;parseFloat&#x28;complete_percentage&#x29; &#x3e;&#x3d; parseFloat&#x28;MIN_COMPLETED_PERCENTAGE&#x29;&#x29;&#x7b;&#xd;&#xa;			if&#x28;parseInt&#x28;total_reviews&#x29; &#x3e;&#x3d; parseInt&#x28;MIN_NO_OF_REVIEWS&#x29;&#x29;&#x7b;&#xd;&#xa;				is_eligable &#x3d; 1&#x3b;&#xd;&#xa;		&#x7d;&#xd;&#xa;	&#x7d;&#xd;&#xa;&#x7d;  &#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var RankingScore &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;Completed &#x21;&#x3d; 0 &#x26;&#x26; Completed &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var RankingScore &#x3d; &#x28;&#x28;AverageScore &#x2a; Completed&#x29; &#x2b; YEAR_OFFSET&#x29; &#x2f; &#x28;Completed &#x2b; 1&#x29;&#x3b; &#xd;&#xa;&#x7d;&#xd;&#xa;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;var is_eligable &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;parseInt&#x28;days_of_registration_final&#x29;&#x3e;&#x3d; parseInt&#x28;MIN_DAYS_OF_REGISTRATION&#x29;&#x29;&#x7b;&#xd;&#xa;	if&#x28;parseFloat&#x28;complete_percentage&#x29; &#x3e;&#x3d; parseFloat&#x28;MIN_COMPLETED_PERCENTAGE&#x29;&#x29;&#x7b;&#xd;&#xa;			if&#x28;parseInt&#x28;total_reviews&#x29; &#x3e;&#x3d; parseInt&#x28;MIN_NO_OF_REVIEWS&#x29;&#x29;&#x7b;&#xd;&#xa;				is_eligable &#x3d; 1&#x3b;&#xd;&#xa;		&#x7d;&#xd;&#xa;	&#x7d;&#xd;&#xa;&#x7d;  &#xd;&#xa;&#xd;&#xa;if&#x28;Completed &#x21;&#x3d; null &#x26;&#x26; Completed &#x21;&#x3d; 0&#x29;&#x7b;&#xd;&#xa;	var RankingScore &#x3d; &#x28;&#x28;avg_rating_final &#x2a; Completed&#x29; &#x2b; YEAR_OFFSET&#x29;&#x2f;&#x28;Completed&#x2b;1&#x29;&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>is_eligable</name>
         <rename>is_eligable</rename>
         <type>Number</type>
@@ -2976,7 +3021,7 @@
         <rename>RankingScore</rename>
         <type>Number</type>
         <length>16</length>
-        <precision>2</precision>
+        <precision>3</precision>
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
