@@ -5,7 +5,7 @@ public class RankingRequirements{
     private int minDaysOfRegistration;
     private float minCompletedPercentage;
     private int minNoOfReviews;
-    private int monthOffset;
+    private double monthOffset;
     private int yearOffset;
     public int getMinDaysOfRegistration()
     {
@@ -31,11 +31,11 @@ public class RankingRequirements{
     {
         this.minNoOfReviews = minNoOfReviews;
     }
-    public int getMonthOffset()
+    public double getMonthOffset()
     {
         return monthOffset;
     }
-    public void setMonthOffset( int monthOffset )
+    public void setMonthOffset( double monthOffset )
     {
         this.monthOffset = monthOffset;
     }
