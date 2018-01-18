@@ -8114,6 +8114,11 @@ $('.sq-np-item-next').click(function() {
 		    	$(this).parent().find('.popover').hide()
 		    }
 		});
+		
+		if(!isNaN(ratingVal) && questionDetails.isNPSQuestion==1){
+			$('#radio-nps-'+ratingVal).parent().find('.popover').show();
+		}
+		
 		if(questionDetails.isNPSQuestion==0){
 			$('#notAtAllLikelyDiv').html(questionDetails.notAtAllLikely);
 			$('#veryLikelyDiv').html(questionDetails.veryLikely);
