@@ -8085,6 +8085,14 @@ $('.sq-np-item-next').click(function() {
 	}
 	
 	if(questionDetails.questionType == "sb-range-0to10"){
+		
+		if(questionDetails.isNPSQuestion==1){
+			$('.sq-radio').each(function() {
+				$(this).removeClass('radio-outer-gray');
+		    	$(this).parent().find('.popover').hide()
+		    });
+		}
+		
 		var ratingVal = parseInt(questionDetails.customerResponse);
 		if(!isNaN(ratingVal)){
 			$('.sq-radio').each(function() {
@@ -8108,12 +8116,6 @@ $('.sq-np-item-next').click(function() {
 			
 		}
 		
-		$('.sq-radio').each(function() {
-		    $(this).removeClass('radio-outer-gray');
-		    if(questionDetails.isNPSQuestion==1){
-		    	$(this).parent().find('.popover').hide()
-		    }
-		});
 		if(questionDetails.isNPSQuestion==0){
 			$('#notAtAllLikelyDiv').html(questionDetails.notAtAllLikely);
 			$('#veryLikelyDiv').html(questionDetails.veryLikely);
