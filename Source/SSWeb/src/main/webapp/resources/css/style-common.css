@@ -10389,7 +10389,7 @@ img.lead-img {
 .radio-outer{
 	height:20px;
 	width:20px;
-	border:1px solid #21beef;
+	border:3px solid #21beef;
 	border-radius:100%;
 	margin:0 auto;
 	cursor: pointer;
@@ -10398,7 +10398,7 @@ img.lead-img {
 .radio-outer-orange{
 	height:20px;
 	width:20px;
-	border:1px solid #e9643a;
+	border:3px solid #e9643a;
 	border-radius:100%;
 	margin:0 auto;
 	cursor: pointer;
@@ -10407,7 +10407,7 @@ img.lead-img {
 .radio-outer-yellow{
 	height:20px;
 	width:20px;
-	border:1px solid #dda539;
+	border:3px solid #dda539;
 	border-radius:100%;
 	margin:0 auto;
 	cursor: pointer;
@@ -10416,7 +10416,7 @@ img.lead-img {
 .radio-outer-green{
 	height:20px;
 	width:20px;
-	border:1px solid #5c9636;
+	border:3px solid #5c9636;
 	border-radius:100%;
 	margin:0 auto;
 	cursor: pointer;
@@ -10435,7 +10435,7 @@ img.lead-img {
 	width:10px;
 	background-color:#21beef;
 	border-radius:100%;
-	margin:4px auto;
+	margin:2px auto;
 }
 
 .radio-inner-orange{
@@ -10443,7 +10443,7 @@ img.lead-img {
 	width:10px;
 	background-color:#e9643a;
 	border-radius:100%;
-	margin:4px auto;
+	margin:2px auto;
 }
 
 .radio-inner-yellow{
@@ -10451,7 +10451,7 @@ img.lead-img {
 	width:10px;
 	background-color:#dda539;
 	border-radius:100%;
-	margin:4px auto;
+	margin:2px auto;
 }
 
 .radio-inner-green{
@@ -10459,7 +10459,7 @@ img.lead-img {
 	width:10px;
 	background-color:#5c9636;
 	border-radius:100%;
-	margin:4px auto;
+	margin:2px auto;
 }
 
 .radio-popup{
