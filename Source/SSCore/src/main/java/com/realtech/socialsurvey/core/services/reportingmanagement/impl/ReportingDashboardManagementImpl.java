@@ -2935,7 +2935,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
     @Override
     public RankingRequirements updateRankingRequirements( int minDaysOfRegistration, float minCompletedPercentage,
-        int minNoOfReviews, int monthOffset, int yearOffset )
+        int minNoOfReviews, double monthOffset, int yearOffset )
     {
         RankingRequirements rankingRequirements = new RankingRequirements();
         rankingRequirements.setMinCompletedPercentage( minCompletedPercentage );
