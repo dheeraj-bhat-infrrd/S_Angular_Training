@@ -1103,7 +1103,7 @@ function drawNpsGauge(){
 		}
 
 			$(document).ready(function() {
-				var npsScore = overviewData.npsScore;
+				var npsScore = overviewData.NpsScore;
 				
 				
 				var marginLeft = parseInt($("#nps-metre-needle").css("margin-left"));
