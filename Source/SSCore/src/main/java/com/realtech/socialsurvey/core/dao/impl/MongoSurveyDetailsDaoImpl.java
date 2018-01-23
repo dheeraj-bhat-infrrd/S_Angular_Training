@@ -99,7 +99,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
      * Method to fetch survey details on the basis of agentId and customer email.
      */
     @Override
-    public SurveyDetails getSurveyByAgentIdAndCustomerEmail( long agentId, String customerEmail, String firstName,
+	public SurveyDetails getSurveyByAgentIdAndCustomerEmail( long agentId, String customerEmail, String firstName,
         String lastName )
     {
         LOG.debug( "Method getSurveyByAgentIdAndCustomerEmail() to insert details of survey started." );
@@ -111,6 +111,11 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         if ( lastName != null && !lastName.isEmpty() ) {
             query.addCriteria( Criteria.where( "customerLastName" ).is( lastName ) );
         }
+        
+        //status criteria
+        Integer[] validStatus = {CommonConstants.SURVEY_STATUS_PRE_INITIATED,CommonConstants.SURVEY_STATUS_INITIATED,CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE};
+        query.addCriteria( Criteria.where( CommonConstants.STATUS_COLUMN ).in( validStatus ) );
+        
         //get the oldest record
         query.with( new Sort( Sort.Direction.ASC, CommonConstants.CREATED_ON ) );
         List<SurveyDetails> surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
@@ -146,7 +151,10 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
         query.addCriteria( Criteria.where( CommonConstants.CREATED_ON ).gte( startDate ) );
 
-
+        //status criteria
+        Integer[] validStatus = {CommonConstants.SURVEY_STATUS_PRE_INITIATED,CommonConstants.SURVEY_STATUS_INITIATED,CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE};
+        query.addCriteria( Criteria.where( CommonConstants.STATUS_COLUMN ).in( validStatus ) );
+        
         List<SurveyDetails> surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
         if ( surveys == null || surveys.size() == 0 )
             return null;
