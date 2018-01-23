@@ -367,6 +367,7 @@ function drawSpsStatsGraph(){
 															count : 14
 														}
 													},
+													bar: { groupWidth: '60' },
 													annotations: {
 														   alwaysOutside:true,
 														   style: 'point',
@@ -510,6 +511,7 @@ function drawNpsStatsGraph(entityId,entityType){
 															count : 14
 														}
 													},
+													bar: { groupWidth: '60' },
 													annotations: {
 														   alwaysOutside:true,
 														   style: 'point',
