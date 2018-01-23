@@ -112,10 +112,6 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             query.addCriteria( Criteria.where( "customerLastName" ).is( lastName ) );
         }
         
-        //status criteria
-        Integer[] validStatus = {CommonConstants.SURVEY_STATUS_PRE_INITIATED,CommonConstants.SURVEY_STATUS_INITIATED,CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE};
-        query.addCriteria( Criteria.where( CommonConstants.STATUS_COLUMN ).in( validStatus ) );
-        
         //get the oldest record
         query.with( new Sort( Sort.Direction.ASC, CommonConstants.CREATED_ON ) );
         List<SurveyDetails> surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
