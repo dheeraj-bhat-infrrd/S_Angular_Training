@@ -40,6 +40,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.api.builder.SSApiBatchIntegrationBuilder;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.CompanyDetailsReportDao;
@@ -327,6 +328,9 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
     @Autowired
     private NpsReportMonthDao npsReportMonthDao;
+    
+    @Autowired
+    private Utils utils;
 
     @Autowired
     private OverviewManagement overviewManagement;
@@ -1723,7 +1727,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             batchSize ) ) {
             List<Object> recentActivityList = new ArrayList<>();
             User user = userManagementService.getUserByUserId( fileUpload.getAdminUserId() );
-            recentActivityList.add( fileUpload.getCreatedOn() );
+            recentActivityList.add( utils.convertDateToTimeZone(fileUpload.getCreatedOn(), CommonConstants.TIMEZONE_EST ) );
             // Set the ReportName according to the upload type
             if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_STATS_REPORT ) {
                 recentActivityList.add( CommonConstants.REPORTING_SURVEY_STATS_REPORT );
@@ -2931,7 +2935,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
     @Override
     public RankingRequirements updateRankingRequirements( int minDaysOfRegistration, float minCompletedPercentage,
-        int minNoOfReviews, int monthOffset, int yearOffset )
+        int minNoOfReviews, double monthOffset, int yearOffset )
     {
         RankingRequirements rankingRequirements = new RankingRequirements();
         rankingRequirements.setMinCompletedPercentage( minCompletedPercentage );

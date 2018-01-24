@@ -44,6 +44,9 @@
 										<span class="legend">[AgentName] </span>
 									</div>
 									<div class="legend-wrapper">
+										<span class="legend">[AgentFirstName] </span>
+									</div>
+									<div class="legend-wrapper">
 										<span class="legend">[AgentSignature]</span>
 									</div>
 									<div class="legend-wrapper">
@@ -88,6 +91,7 @@
 									<div class="legend-wrapper" title="Customer Name">Customer Name</div>
 									<div class="legend-wrapper" title="Customer First Name">Customer First Name</div>
 									<div class="legend-wrapper" title="User Name">User Name</div>
+									<div class="legend-wrapper" title="User First Name">User First Name</div>
 									<div class="legend-wrapper" title="User's Signature">User's Signature</div>
 									<div class="legend-wrapper" title="Receipient's Email">Receipient's Email</div>
 									<div class="legend-wrapper" title="Sender's Email">Sender's Email</div>
