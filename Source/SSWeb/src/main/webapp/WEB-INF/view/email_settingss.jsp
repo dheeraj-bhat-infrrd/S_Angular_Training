@@ -44,6 +44,9 @@
 										<span class="legend">[AgentName] </span>
 									</div>
 									<div class="legend-wrapper">
+										<span class="legend">[AgentFirstName] </span>
+									</div>
+									<div class="legend-wrapper">
 										<span class="legend">[AgentSignature]</span>
 									</div>
 									<div class="legend-wrapper">
@@ -74,10 +77,10 @@
 										<span class="legend">[AgentLicense]</span>
 									</div>
 									<div class="legend-wrapper">
-										<span class="legend">[survey_source_id]</span>
+										<span class="legend">[AgentTitle]</span>
 									</div>
 									<div class="legend-wrapper">
-										<span class="legend">[survey_source]</span>
+										<span class="legend">[AgentPhoneNumber]</span>
 									</div>
 								</div>
 								<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
@@ -88,6 +91,7 @@
 									<div class="legend-wrapper" title="Customer Name">Customer Name</div>
 									<div class="legend-wrapper" title="Customer First Name">Customer First Name</div>
 									<div class="legend-wrapper" title="User Name">User Name</div>
+									<div class="legend-wrapper" title="User First Name">User First Name</div>
 									<div class="legend-wrapper" title="User's Signature">User's Signature</div>
 									<div class="legend-wrapper" title="Receipient's Email">Receipient's Email</div>
 									<div class="legend-wrapper" title="Sender's Email">Sender's Email</div>
@@ -98,8 +102,8 @@
 									<div class="legend-wrapper" title="Company's disclaimer">Company's disclaimer</div>
 									<div class="legend-wrapper" title="User's disclaimer">User's disclaimer</div>
 									<div class="legend-wrapper" title="User's licenses">User's licenses</div>
-									<div class="legend-wrapper" title="User's licenses">Survey Source ID</div>
-									<div class="legend-wrapper" title="User's licenses">Survey Source</div>
+									<div class="legend-wrapper" title="User's title">User's title</div>
+									<div class="legend-wrapper" title="User's phone number">User's phone number</div>
 									<br /> <br />
 								</div>
 							</div>
@@ -160,6 +164,12 @@
 									<div class="legend-wrapper">
 										<span class="legend">[yelp_link] </span>
 									</div>
+									<div class="legend-wrapper">
+										<span class="legend">[survey_source_id]</span>
+									</div>
+									<div class="legend-wrapper">
+										<span class="legend">[survey_source]</span>
+									</div>
 								</div>
 								<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
 									<div class="legend-header hide-header">Description</div>
@@ -181,6 +191,8 @@
 									<div class="legend-wrapper" title="Lending Tree Link">Lending Tree Link</div>
 									<div class="legend-wrapper" title="Realtor.com Profile Link">Realtor.com Profile Link</div>
 									<div class="legend-wrapper" title="Yelp Link">Yelp Link</div>
+									<div class="legend-wrapper" title="User's licenses">Survey Source ID</div>
+									<div class="legend-wrapper" title="User's licenses">Survey Source</div>
 								</div>
 							</div>
 							<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin: 50px 10px 20px;">

@@ -729,7 +729,7 @@ public class ReportingWebController
         int minDaysOfRegistration = 0;
         float minCompletedPercentage = 0;
         int minNoOfReviews = 0;
-        int monthOffset = 0;
+        double monthOffset = 0.0;
         int yearOffset = 0;
         String message = null;
 
@@ -744,7 +744,7 @@ public class ReportingWebController
             minNoOfReviews = Integer.parseInt( minNoOfReviewsStr );
         }
         if ( monthOffsetStr != null && !monthOffsetStr.isEmpty() ) {
-            monthOffset = Integer.parseInt( monthOffsetStr );
+            monthOffset = Double.parseDouble( monthOffsetStr );
         }
         if ( yearOffsetStr != null && !yearOffsetStr.isEmpty() ) {
             yearOffset = Integer.parseInt( yearOffsetStr );

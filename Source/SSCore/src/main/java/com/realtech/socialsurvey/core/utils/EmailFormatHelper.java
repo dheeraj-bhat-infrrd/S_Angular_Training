@@ -155,9 +155,9 @@ public class EmailFormatHelper
 
     @Transactional
     public String replaceLegends( boolean isSubject, String content, String baseUrl, String logoUrl, String link,
-        String custFirstName, String custLastName, String agentName, String agentSignature, String recipientMailId,
+        String custFirstName, String custLastName, String agentName, String agentFirstName, String agentSignature, String recipientMailId,
         String senderEmail, String companyName, String initiatedDate, String currentYear, String fullAddress, String links,
-        String agentProfileName, String companyDisclaimer, String agentDisclaimer, String agentLicense )
+        String agentProfileName, String companyDisclaimer, String agentDisclaimer, String agentLicense, String agentTitle, String agentPhoneNumber  )
         throws InvalidInputException
     {
         LOG.info( "Method to replace legends with values called, replaceLegends() started" );
@@ -181,6 +181,7 @@ public class EmailFormatHelper
 
         content = content.replaceAll( "\\[FirstName\\]", "" + custFirstName );
         content = content.replaceAll( "\\[AgentName\\]", "" + agentName );
+        content = content.replaceAll( "\\[AgentFirstName\\]", "" + agentFirstName );
         content = content.replace( "[AgentSignature]", "" + agentSignature );
         content = content.replaceAll( "\\[RecipientEmail\\]", "" + recipientMailId );
         content = content.replaceAll( "\\[SenderEmail\\]", "" + senderEmail );
@@ -190,6 +191,9 @@ public class EmailFormatHelper
         content = content.replaceAll( "\\[FullAddress\\]", "" + fullAddress );
         content = content.replaceAll( "\\[AgentProfileName\\]", "" + agentProfileName );
 
+        content = content.replaceAll( "\\[AgentTitle\\]", "" + agentTitle );
+        content = content.replaceAll( "\\[AgentPhoneNumber\\]", "" + agentPhoneNumber );
+        
         //JIRA SS-473 begin
         content = content.replace( "[CompanyDisclaimer]", companyDisclaimer );
         content = content.replace( "[AgentDisclaimer]", agentDisclaimer );
@@ -345,9 +349,9 @@ public class EmailFormatHelper
 
     @Transactional
     public String replaceLegendsWithSettings( boolean isSubject, String content, String baseUrl, String logoUrl, String link,
-        String custFirstName, String custLastName, String agentName, String agentSignature, String recipientMailId,
+        String custFirstName, String custLastName, String agentName, String agentFirstName, String agentSignature, String recipientMailId,
         String senderEmail, String companyName, String initiatedDate, String currentYear, String fullAddress, String links,
-        String agentProfileName, String companyDisclaimer, String agentDisclaimer, String agentLicense, User user,
+        String agentProfileName, String companyDisclaimer, String agentDisclaimer, String agentLicense, String agentTitle, String agentPhoneNumber, User user,
         OrganizationUnitSettings agentSettings, OrganizationUnitSettings branchSettings,
         OrganizationUnitSettings regionSettings, OrganizationUnitSettings companySettings,
         Map<SettingsForApplication, OrganizationUnit> map, Map<String, String> surveyMap ) throws InvalidInputException
@@ -372,6 +376,7 @@ public class EmailFormatHelper
 
         content = StringUtils.replace( content, "[FirstName]", "" + custFirstName );
         content = StringUtils.replace( content, "[AgentName]", "" + agentName );
+        content = StringUtils.replace( content, "[AgentFirstName]", "" + agentFirstName );
         content = StringUtils.replace( content, "[AgentSignature]", "" + agentSignature );
         content = StringUtils.replace( content, "[RecipientEmail]", "" + recipientMailId );
         content = StringUtils.replace( content, "[SenderEmail]", "" + senderEmail );
@@ -381,6 +386,8 @@ public class EmailFormatHelper
         content = StringUtils.replace( content, "[FullAddress]", "" + fullAddress );
         content = StringUtils.replace( content, "[AgentProfileName]", "" + agentProfileName );
 
+        content = StringUtils.replace( content, "[AgentTitle]", agentTitle );
+        content = StringUtils.replace( content, "[AgentPhoneNumber]", agentPhoneNumber );
         //JIRA SS-473 begin
         content = StringUtils.replace( content, "[CompanyDisclaimer]", companyDisclaimer );
         content = StringUtils.replace( content, "[AgentDisclaimer]", agentDisclaimer );
@@ -527,7 +534,7 @@ public class EmailFormatHelper
         }
         String surveySourceId = "";
         String surveySource = "";
-        List<SurveyPreInitiation> surveyList = surveyPreInitiationDao.getSurveyByAgentIdAndCustomeEmail( agentId,
+        List<SurveyPreInitiation> surveyList = surveyPreInitiationDao.getValidSurveyByAgentIdAndCustomeEmail( agentId,
             customerEmailAddress );
         if ( surveyList.isEmpty() ) {
             throw new InvalidInputException( "No survey found!" );

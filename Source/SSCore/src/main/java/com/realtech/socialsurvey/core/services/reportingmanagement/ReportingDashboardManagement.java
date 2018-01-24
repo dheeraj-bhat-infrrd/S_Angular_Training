@@ -144,7 +144,7 @@ public interface ReportingDashboardManagement
 
 
     RankingRequirements updateRankingRequirements( int minimumRegistrationDays, float minimumCompletedPercentage,
-        int minReviews, int monthOffset, int yearOffset );
+        int minReviews, double monthOffset, int yearOffset );
 
 
     RankingRequirements updateRankingRequirementsMongo( String collection, OrganizationUnitSettings unitSettings,

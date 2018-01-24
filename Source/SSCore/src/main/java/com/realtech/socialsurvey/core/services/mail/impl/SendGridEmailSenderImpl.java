@@ -138,9 +138,10 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
             for ( EmailAttachment emailAttachment : emailEntity.getAttachments()) {
                 InputStream input = null;
                 try {
+                		LOG.info("Downloading file "  + emailAttachment.getFilePath());
                     input = new URL(emailAttachment.getFilePath()).openConnection().getInputStream();
                     email.addAttachment( emailAttachment.getFileName(), input );
-
+                    LOG.info("Email atachment has been added. file "  + emailAttachment.getFilePath());
                 } catch ( IOException e ) {
                     LOG.error( "Exception occurred when downloading attachment file", e );
                 } finally {
@@ -157,7 +158,7 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
 
         Response response = null;
         try {
-            LOG.debug( "About to send mail. {}", emailEntity.toString() );
+            LOG.warn( "About to send mail. {}", emailEntity.toString() );
             //sets credentials according to account selected
             if ( sendEmailThrough.equals( CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_US ) ) {
                 response = sendGrid2.send( email );
@@ -165,16 +166,16 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
                 response = sendGrid1.send( email );
             }
            
-            LOG.debug( "Sent the mail. {}",emailEntity.toString() );
+            LOG.info( "Sent the mail. {}",emailEntity.toString() );
         } catch ( SendGridException e ) {
             LOG.error( "Exception while sending the mail.", e );
             mailSent = false;
         }
 
         if ( response.getStatus() ) {
-            LOG.debug( "Mail sent successfully to {}", emailEntity.toString() );
+            LOG.info( "Mail sent successfully to {}", emailEntity.toString() );
         } else {
-            LOG.warn( "Could not send mail to {}. Reason: {}",emailEntity.toString(),response.getMessage() );
+            LOG.error( "Could not send mail to {}. Reason: {}",emailEntity.toString(),response.getMessage() );
             mailSent = false;
         }
         return mailSent;

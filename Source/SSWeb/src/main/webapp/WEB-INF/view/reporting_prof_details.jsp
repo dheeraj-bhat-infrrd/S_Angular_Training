@@ -35,11 +35,11 @@
 		<div class="rep-rank-rect" style="display:inline-grid;">
 			<div id="rep-rank" style="display: -webkit-box;display:inline-flex; margin-top: 5px;">
 				<span>Rank#</span>
-				<span id="rank-span" style="font-size: 23px;font-weight: bold !important;margin-left: 8px;line-height: 15px;">NA</span><span id="rank-count"></span>
+				<span id="rank-span" style="font-size: 22px;font-weight: bold !important;margin-left: 8px;line-height: 15px;">NA</span><span id="rank-count"></span>
 			</div>
 			<div id="rep-user-score" style="display: -webkit-box;display:inline-flex;">
 				<span>Userscore</span>
-				<span id="user-score-span" style="font-size: 23px;font-weight: bold !important;margin-left: 8px;line-height: 15px;">NA</span>
+				<span id="user-score-span" style="font-size: 18px;font-weight: bold !important;margin-left: 8px;line-height: 15px;">NA</span>
 			</div>
 		</div>
 		<div class="rep-prof-pic-circle rep-prof-circle-user">
