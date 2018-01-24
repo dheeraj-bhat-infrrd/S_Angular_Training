@@ -743,7 +743,7 @@
 		<property name="jobDetails">
 			<list>
 				<ref bean="sitemapjobdetail" />
-			 	<!-- <ref bean="emailreaderjobdetail" /> -->
+			 	<ref bean="emailreaderjobdetail" /> 
 				<ref bean="incompletesocialpostjobdetail" />
 				<ref bean="incompletesurveyjobdetail" />
 				<ref bean="updatesubscriptionpricejobdetail" />
@@ -780,7 +780,7 @@
 		<property name="triggers">
 			<list>
 				<ref bean="sitemapgeneratorcron" />
-			 	<!--<ref bean="emailreadercron" /> -->
+			 	<ref bean="emailreadercron" /> 
 				<ref bean="incompletesocialpostcron" />
 				<ref bean="incompletesurveycron" />
 				<ref bean="updatesubscriptionpricecron" />
