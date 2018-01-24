@@ -780,7 +780,7 @@
 		<property name="triggers">
 			<list>
 				<ref bean="sitemapgeneratorcron" />
-			 	<!--<ref bean="emailreadercron" />
+			 	<!--<ref bean="emailreadercron" /> -->
 				<ref bean="incompletesocialpostcron" />
 				<ref bean="incompletesurveycron" />
 				<ref bean="updatesubscriptionpricecron" />
