@@ -1467,12 +1467,12 @@ public class EmailServicesImpl implements EmailServices
         mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, appBaseUrl, logoUrl, shortSurveyLink,
                 customerFirstName, customerLastName, agentName, agentFirstName,  agentSignature,customerEmailId,
                 user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "",
-                user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
+                user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone );
 
         mailBody = emailFormatHelper.replaceLegends( false, mailBody, appBaseUrl, logoUrl, shortSurveyLink,
                 customerFirstName, customerLastName, agentName, agentFirstName, agentSignature, customerEmailId,
                 user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "",
-                user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
+                user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone );
 
         //send the email
         if ( mailSubject == null || mailSubject.isEmpty() ) {
@@ -2398,12 +2398,12 @@ public class EmailServicesImpl implements EmailServices
         mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, appBaseUrl, logoUrl, shortSurveyLink,
             survey.getCustomerFirstName(), survey.getCustomerLastName(), agentName, agentFirstName, agentSignature, survey.getCustomerEmailId(),
             user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "",
-            user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
+            user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone );
 
         mailBody = emailFormatHelper.replaceLegends( false, mailBody, appBaseUrl, logoUrl, shortSurveyLink,
             survey.getCustomerFirstName(), survey.getCustomerLastName(), agentName, agentFirstName, agentSignature, survey.getCustomerEmailId(),
             user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "",
-            user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
+            user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone );
         //JIRA SS-473 end
         //send mail
         if ( mailSubject == null || mailSubject.isEmpty() ) {
