@@ -149,7 +149,7 @@
     <single_statement>N</single_statement>
     <replace_variables>Y</replace_variables>
     <quoteString>N</quoteString>
-    <sql>update overview_branch_month&#xa;set cumulative_user_count &#x3d; &#xa;&#x28; select count&#x28; distinct user_id &#x29; from user_profile where branch_id &#x3d; &#x3f;, month&#x28;MODIFIED_ON_EST&#x29; &#x3c;&#x3d; &#x3f;, year&#x28;MODIFIED_ON_EST&#x29; &#x3c;&#x3d; &#x3f; and status &#x3d; 1&#x29;&#xa;where branch_id &#x3d; &#x3f;&#xa;and month &#x3d; &#x3f;&#xa;and year &#x3d; &#x3f;&#x3b;&#xa;</sql>
+    <sql>update overview_branch_month&#xa;set cumulative_user_count &#x3d; &#xa;&#x28; select count&#x28; distinct user_id &#x29; from user_profile where branch_id &#x3d; &#x3f; and MODIFIED_ON_EST &#x3c;&#x3d; LAST_DAY&#x28;STR_TO_DATE&#x28; &#x27;01,&#x3f;,&#x3f;&#x27;,&#x27;&#x25;d,&#x25;m,&#x25;Y&#x27; &#x29;&#x29; and status &#x3d; 1&#x29;&#xa;where branch_id &#x3d; &#x3f;&#xa;and month &#x3d; &#x3f;&#xa;and year &#x3d; &#x3f;&#x3b;&#xa;</sql>
     <set_params>N</set_params>
     <insert_field/>
     <update_field/>
