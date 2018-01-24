@@ -713,7 +713,7 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
     @SuppressWarnings ( "unchecked")
     @Override
     @Transactional
-    public List<SurveyPreInitiation> getSurveyByAgentIdAndCustomeEmailForPastNDays( long agentId, String customerEmail,
+    public List<SurveyPreInitiation> getValidSurveyByAgentIdAndCustomeEmailForPastNDays( long agentId, String customerEmail,
         int noOfDays ) throws DatabaseException
     {
         LOG.info( "Method getSurveyByAgentIdAndCustomeEmailForPastNDays() started." );
@@ -740,6 +740,16 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 
                 criteria.add( Restrictions.ge( CommonConstants.CREATED_ON, startDate ) );
             }
+            
+            //status criteria
+            List<Integer> statusList = new ArrayList<Integer>();
+            statusList.add( CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED );
+            statusList.add( CommonConstants.SURVEY_STATUS_INITIATED );
+            statusList.add( CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE );
+            
+            criteria.add( Restrictions.in( CommonConstants.STATUS_COLUMN,  statusList ) );
+            
+            
             LOG.info( "Method getSurveyByAgentIdAndCustomeEmailForPastNDays() finished." );
             return criteria.list();
         } catch ( HibernateException e ) {
@@ -752,7 +762,7 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 
     @SuppressWarnings ( "unchecked")
     @Override
-    public List<SurveyPreInitiation> getSurveyByAgentIdAndCustomeEmail( long agentId, String customerEmail )
+    public List<SurveyPreInitiation> getValidSurveyByAgentIdAndCustomeEmail( long agentId, String customerEmail )
         throws DatabaseException
     {
         LOG.debug( "Method getSurveyByAgentIdAndCustomeEmail() started." );
@@ -762,6 +772,13 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
             criteria.add( Restrictions.eq( CommonConstants.AGENT_ID_COLUMN, agentId ) );
             //customer Email
             criteria.add( Restrictions.eq( CommonConstants.CUSTOMER_EMAIL_ID_KEY_COLUMN, customerEmail ) );
+            //status criteria
+            List<Integer> statusList = new ArrayList<Integer>();
+            statusList.add( CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED );
+            statusList.add( CommonConstants.SURVEY_STATUS_INITIATED );
+            statusList.add( CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE );
+            
+            criteria.add( Restrictions.in( CommonConstants.STATUS_COLUMN,  statusList ) );
             LOG.debug( "Method getSurveyByAgentIdAndCustomeEmail() finihed." );
             return criteria.list();
         } catch ( HibernateException e ) {

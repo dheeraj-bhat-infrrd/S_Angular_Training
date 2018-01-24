@@ -190,7 +190,7 @@ public interface EmailServices
      * @throws InvalidInputException
      * @throws UndeliveredEmailException
      */
-    void sendSurveyRelatedMail(OrganizationUnitSettings companySettings, User user, String agentName, String agentPhone, String agentTitle,
+    void sendSurveyRelatedMail(OrganizationUnitSettings companySettings, User user, String agentName, String agentFirstName, String agentPhone, String agentTitle,
                                String surveyLink, String logoUrl, String customerFirstName, String customerLastName, String customerEmailId,
                                String emailType, String senderName, String senderEmailAddress, String mailSubject, String mailBody,
                                AgentSettings agentSettings, long branchId, long regionId, String surveySourceId, long agentId,
@@ -385,7 +385,7 @@ public interface EmailServices
      * @throws InvalidInputException 
      */
     public void sendManualSurveyReminderMail( OrganizationUnitSettings companySettings, User user, String agentName,
-        String agentEmailId, String agentPhone, String agentTitle, String companyName, SurveyPreInitiation survey,
+    		String agentFirstName, String agentEmailId, String agentPhone, String agentTitle, String companyName, SurveyPreInitiation survey,
         String surveyLink, String logoUrl, String agentDisclaimer, String agentLicenses ) throws InvalidInputException;
 
 
