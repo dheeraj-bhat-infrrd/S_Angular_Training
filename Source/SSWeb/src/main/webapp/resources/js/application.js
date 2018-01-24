@@ -7476,6 +7476,7 @@ function paintSurveyPageFromJson() {
 			$("div[data-ques-type='sb-range-0to10-nps']").show();
 			$('#notAtAllLikelyDivNps').html(questionDetails.notAtAllLikely);
 			$('#veryLikelyDivNps').html(questionDetails.veryLikely);
+			$('#nps-range-text').show();
 			if (questionDetails.customerResponse != undefined && !isNaN(parseInt(questionDetails.customerResponse))) {
 				var ratingVal = parseInt(questionDetails.customerResponse);
 				$('.sq-radio').each(function() {
@@ -7484,6 +7485,7 @@ function paintSurveyPageFromJson() {
 				});
 				$('#radio-nps-'+ratingVal).children().show();
 				$('#radio-nps-'+ratingVal).parent().find('.popover').show();
+				$('#nps-range-text').hide();
 				$('#sq-radio-1to10-nps').attr('selected-rating-radio',ratingVal);
 				$("#next-radio-nps").removeClass("btn-com-disabled");
 			}
@@ -8045,7 +8047,8 @@ $('.sq-np-item-next').click(function() {
 	    if(questionDetails.isNPSQuestion==0){
 	    	$(this).addClass('radio-outer-gray');
 	    }else{
-	    	$(this).parent().find('.popover').hide()
+	    	$(this).parent().find('.popover').hide();
+	    	$('#nps-range-text').show();
 	    }
 	});
 	qno++;
@@ -8091,6 +8094,7 @@ $('.sq-np-item-next').click(function() {
 				$(this).removeClass('radio-outer-gray');
 		    	$(this).parent().find('.popover').hide()
 		    });
+			$('#nps-range-text').show();
 		}
 		
 		var ratingVal = parseInt(questionDetails.customerResponse);
@@ -8111,6 +8115,7 @@ $('.sq-np-item-next').click(function() {
 			}else{
 				$('#radio-nps-'+ratingVal).children().show();
 				$('#radio-nps-'+ratingVal).parent().find('.popover').show();
+				$('#nps-range-text').hide();
 				$('#sq-radio-1to10-nps').attr('selected-rating-radio',ratingVal);
 			}
 			
@@ -8194,6 +8199,7 @@ $('.sq-np-item-prev').click(function() {
 				});
 				$('#radio-nps-'+ratingVal).children().show();
 				$('#radio-nps-'+ratingVal).parent().find('.popover').show();
+				$('#nps-range-text').hide();
 				$('#sq-radio-1to10-nps').attr('selected-rating-radio',ratingVal);
 			}
 			$('#notAtAllLikelyDivNps').html(questionDetails.notAtAllLikely);
@@ -8232,6 +8238,7 @@ $('.sq-radio').click(function(){
 		if (qno != questions.length - 1) {
 			$("#next-radio-nps").removeClass("btn-com-disabled");
 		}
+		$('#nps-range-text').hide();
 	}
 	
 });
