@@ -1318,9 +1318,9 @@ function paintHiddenReviewsCount(data) {
 		var reviewsSizeHtml = responseJson.entity;
 		if(reviewsSizeHtml > 0) {
 			if(reviewsSizeHtml == 1) {
-				reviewsSizeHtml = reviewsSizeHtml +' additional review not recommended';
+				reviewsSizeHtml = reviewsSizeHtml +' additional review';
 			}else {
-				reviewsSizeHtml = reviewsSizeHtml +' additional reviews not recommended';
+				reviewsSizeHtml = reviewsSizeHtml +' additional reviews';
 			}
 			
 			$("#prof-hidden-review-count")
