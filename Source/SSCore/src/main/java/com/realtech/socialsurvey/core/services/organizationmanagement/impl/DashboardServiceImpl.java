@@ -21,6 +21,7 @@ import java.util.TreeMap;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
@@ -1751,6 +1752,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         }
         String fileName = "Company_Users_Report-" + ( new Timestamp( new Date().getTime() ) )
             + CommonConstants.EXCEL_FILE_EXTENSION;
+        fileName = StringUtils.replace(fileName, " ", "_");
         XSSFWorkbook workbook = workbookOperations.createWorkbook( usersData );
         String subject = CommonConstants.COMPANY_USERS_REPORT_MAIL_SUBJ + company.getCompany();
         String body = CommonConstants.COMPANY_USERS_REPORT_MAIL_BODY;
@@ -1768,6 +1770,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         Date date = new Date();
         String fileName = "Company_Hierarchy_Report-" + ( new Timestamp( date.getTime() ) )
             + CommonConstants.EXCEL_FILE_EXTENSION;
+        fileName = StringUtils.replace(fileName, " ", "_");
         XSSFWorkbook workbook = downloadCompanyHierarchyReportData( companyId );
         if ( workbook == null ) {
             throw new InvalidInputException( "unable to create workbook" );
@@ -1788,6 +1791,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         List<Company> companyList = organizationManagementService.getCompaniesByDateRange( startDate, endDate );
         String fileName = "Company_Registration_Report-" + ( new Timestamp( date.getTime() ) )
             + CommonConstants.EXCEL_FILE_EXTENSION;
+        fileName = StringUtils.replace(fileName, " ", "_");
         XSSFWorkbook workbook = organizationManagementService.downloadCompanyReport( companyList );
         String subject = "Company Registration Report";
         String body = "Here is the company registration report you requested. Please refer to the attachment for the report";
@@ -1820,6 +1824,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         User user = userDao.findById( User.class, userId );
         String fileName = "Survey_Results-" + profileLevel + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
             + ( new Timestamp( date.getTime() ) ) + CommonConstants.EXCEL_FILE_EXTENSION;
+        fileName = StringUtils.replace(fileName, " ", "_");
         XSSFWorkbook workbook = this.downloadCustomerSurveyResultsData( surveyDetails, fileName, profileLevel, companyId );
         String subject = "Survey Data Report";
         String body = "Here is the survey data report you requested. Please refer to the attachment for the report";
@@ -1860,6 +1865,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         }
         String fileName = "User_Ranking_Report-" + profileLevel + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
             + ( new Timestamp( date.getTime() ) ) + CommonConstants.EXCEL_FILE_EXTENSION;
+        fileName = StringUtils.replace(fileName, " ", "_");
         XSSFWorkbook workbook = this.downloadAgentRankingData( agentRanking, fileName );
         String subject = "User Ranking Report";
         String body = "Here is the user ranking report you requested. Please refer to the attachment for the report";
@@ -1897,6 +1903,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         }
         String fileName = "Social_Monitor-" + profileLevel + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
             + ( new Timestamp( date.getTime() ) ) + CommonConstants.EXCEL_FILE_EXTENSION;
+        fileName = StringUtils.replace(fileName, " ", "_");
         XSSFWorkbook workbook = this.downloadSocialMonitorData( socialPosts, fileName );
         String subject = "Social Monitor Report";
         String body = "Here is the social monitor report you requested. Please refer to the attachment for the report";
@@ -1920,6 +1927,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         }
         String fileName = "Incomplete_Survey_" + profileLevel + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
             + ( new Timestamp( date.getTime() ) ) + CommonConstants.EXCEL_FILE_EXTENSION;
+        fileName = StringUtils.replace(fileName, " ", "_");
         XSSFWorkbook workbook = this.downloadIncompleteSurveyData( surveyDetails, fileName );
         String subject = "Incomplete Survey Report";
         String body = "Here is the incomplete survey report you requested. Please refer to the attachment for the report";
@@ -1936,6 +1944,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         User user = userDao.findById( User.class, userId );
         String fileName = "User_Adoption_Report-" + profileLevel + "-" + user.getFirstName() + "_" + user.getLastName() + "-"
             + ( new Timestamp( new Date().getTime() ) ) + CommonConstants.EXCEL_FILE_EXTENSION;
+        fileName = StringUtils.replace(fileName, " ", "_");
         XSSFWorkbook workbook = this.downloadUserAdoptionReportData( profileValue );
         String subject = "User Adoption Report";
         String body = "Here is the user adoption report you requested. Please refer to the attachment for the report";
@@ -2006,6 +2015,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
                 name = recipientName;
             }
 
+            body += ". You can download the report using link <a href='" + filePath + "'>" + filePath + "</a>";
             LOG.debug( "sending mail to : " + name + " at : " + mailId );
             emailServices.sendCustomMail( name, mailId, subject, body, attachments );
         }

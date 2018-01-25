@@ -197,7 +197,7 @@
 					<div class="sq-bord-bot-sm"></div>
 					<div id="sq-radio-1to10-nps" class="sq-1to10-range-nps" selected-rating-radio="">
 						<div class="radio-container">
-							<div class="sq-1to10-range-val">
+							<div id="nps-range-text" class="sq-1to10-range-val">
                                 <div id="notAtAllLikelyDivNps" class="radio-range-text" style="float:left">Not at all likely</div>
     							<div id="veryLikelyDivNps" class="radio-range-text" style="float:right;">Very Likely</div>
 							</div>
@@ -258,7 +258,7 @@
 								<c:forEach begin="0" end="10" varStatus="numLoop">
 									<c:choose>
 										<c:when test="${numLoop.index == 0}">
-											<div class="span-1to10 span-1to10-orange" style="text-align: right; margin-left:-15px">${numLoop.index}</div>
+											<div class="span-1to10 span-1to10-orange" style="text-align: right; margin-left:-19px">${numLoop.index}</div>
 										</c:when>
 										<c:when test="${numLoop.index >0 && numLoop.index<=6}">
 											<div class="span-1to10 span-1to10-orange" style="text-align: right">${numLoop.index}</div>

@@ -4691,14 +4691,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         reviews = (List<HashMap<String, Object>>) map.get( "reviews" );
         if ( reviews != null ) {
             for ( Map<String, Object> review : reviews ) {
-                HashMap<String, Object> companyReviewee = (HashMap<String, Object>) review.get( "companyReviewee" );
                 HashMap<String, Object> individualReviewee = (HashMap<String, Object>) review.get( "individualReviewee" );
                 HashMap<String, Object> reviewerName = (HashMap<String, Object>) review.get( "reviewerName" );
-                HashMap<String, Object> reviewerNameIndividual = (HashMap<String, Object>) reviewerName.get( "individualName" );
+                String displayReviewerName = (String) reviewerName.get("displayName");
                 String customerFirstName = null;
-                if ( reviewerNameIndividual != null && !reviewerNameIndividual.isEmpty() ) {
-                    customerFirstName = reviewerNameIndividual.get( "firstName" ) + " "
-                        + reviewerNameIndividual.get( "lastName" );
+                if ( ! StringUtils.isEmpty(displayReviewerName) ) {
+                		customerFirstName = displayReviewerName;
                 } else {
                     customerFirstName = (String) reviewerName.get( "screenName" );
                 }

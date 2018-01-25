@@ -3747,7 +3747,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         User user = getUserByEmailAddress( emailId );
         if ( user.getCompany().getCompanyId() != companyId ) {
-            throw new InvalidInputException( "The user is not part of the specified company" );
+            throw new NoRecordsFetchedException( "No agent found in given company" );
         }
         
         List<UserProfile> userProfiles = user.getUserProfiles();

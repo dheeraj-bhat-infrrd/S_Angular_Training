@@ -792,6 +792,15 @@
         width: 100%;
         float: none;
     }
+    
+    .sq-1to10-range-nps{
+    	width:auto;
+    }
+    
+    .sq-1to10-range{
+    	width: auto;
+    }
+    
     .icn-address-mobile{
         display: block;
     }

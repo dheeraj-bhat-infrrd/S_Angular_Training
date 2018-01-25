@@ -8040,7 +8040,7 @@ tr.u-tbl-header td {
 .prof-review-sort-link {
 	margin: 0 10px;
 	font-size: 12px;
-	color: #DDD9D5;
+	color: #999999;
 	cursor: pointer;
 }
 
@@ -10339,7 +10339,7 @@ img.lead-img {
 }
 
 .inner-container-1to10-nps{
-    border-radius: 15px;
+   margin-bottom: -10px;
 }
 
 .sq-1to10-range-nps{
@@ -10471,32 +10471,50 @@ img.lead-img {
 
 .radio-popup-orange {
     background-color: #e96439;
-    margin-bottom: -32px;
-    width: 45px;
+    margin-bottom: -40px;
+    width: 55px;
+    height: 50px;
+    text-align: center;
+    line-height: 1.5;
     display: block;
-    top: -45px;
-    left: -7px;
+    top: -65px;
+    left: -11px;
     position: relative;
-}	
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    font-size: 16px;
+}
 
 .radio-popup-yellow {
     display: block;
-    top: -45px;
-    left: -20px;
+    top: -65px;
+    left: -25px;
     position: relative;
     background-color: #dda539;
-    margin-bottom: -32px;
-    width: 70px;
+    margin-bottom: -40px;
+    width: 80px;
+    height: 50px;
+    text-align: center;
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-box-shadow: none;
+    box-shadow: none;
 }
 
-.radio-popup-green{
-	background-color: #5c9636;
-    margin-bottom: -32px;
-    width: 45px;
+.radio-popup-green {
+    background-color: #5c9636;
+    margin-bottom: -40px;
+    width: 55px;
+    text-align: center;
+    height: 50px;
+    font-size: 16px;
     display: block;
-    top: -45px;
-    left: -7px;
+    top: -65px;
+    left: -11px;
     position: relative;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    line-height: 1.5;
 }
 
 .radio-popup-text-orange{
@@ -10523,7 +10541,7 @@ img.lead-img {
 }
 
 .popover.top>.arrow {
-    bottom: -11px;
+    bottom: -21px;
     left: 50%;
     margin-left: -5px;
     border-top-color: #999;
@@ -10540,12 +10558,12 @@ img.lead-img {
 }
 
 .popover>.arrow {
-    border-width: 10px 2px 10px 5px;
+    border-width: 20px 2px 10px 5px;
 }
 
 .popover>.arrow:after {
     content: "";
-    border-width: 10px 2px 10px 5px;
+    border-width: 20px 2px 10px 5px;
 }
 
 .popover.top>.radio-arrow-orange:after{
