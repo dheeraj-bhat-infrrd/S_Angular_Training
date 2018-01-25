@@ -793,12 +793,16 @@
         float: none;
     }
     
+    .radio-container, .sq-1to10-range-val, .container-1to10, .container-1to10{
+    	width:100%;
+    }
+    
     .sq-1to10-range-nps{
-    	width:auto;
+    	width:100%;
     }
     
     .sq-1to10-range{
-    	width: auto;
+    	width: 100%;
     }
     
     .icn-address-mobile{
@@ -2100,6 +2104,36 @@
 
 }
 
+@media (min-width: 360px) and (max-width: 640px) {
+	.radio-div{
+		margin-left:1px;
+	}
+	
+	.radio-div-first{
+		margin-left:10px;
+	}
+}
+
+@media (min-width: 375px) and (max-width: 670px) {
+	.radio-div{
+		margin-left:3px;
+	}
+	
+	.radio-div-first{
+		margin-left:10px;
+	}
+}
+
+@media (min-width: 410px) and (max-width: 767px) {
+	.radio-div{
+		margin-left:6px;
+	}
+	
+	.radio-div-first{
+		margin-left:13px;
+	}
+}
+
 @media (min-width: 992px){
 	.hide-header{
 	   display:block !important;
@@ -3120,4 +3154,3 @@
 	}
 	
 }
-

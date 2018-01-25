@@ -208,7 +208,7 @@
 									</div> --%>
 									<c:choose>
 										<c:when test="${loop.index == 0}">
-											<div class="radio-div" style="margin-left:10px">
+											<div class="radio-div radio-div-first">
 												<div class="popover fade top in radio-popup-orange hide" role="tooltip" id="popover${loop.index}">
 													<div class="arrow radio-arrow-orange" style="left: 50%;"></div>
 													<div class="radio-popup-text-orange">No</div>
