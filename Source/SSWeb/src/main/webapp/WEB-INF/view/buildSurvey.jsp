@@ -223,12 +223,22 @@
 								<c:choose>
 									<c:when test="${loop.index == 0}">
 										<div class="radio-div" style="margin-left: 10px">
-											<div class="radio-outer-gray sq-radio"></div>
+											<div class="radio-outer-orange sq-radio"></div>
+										</div>
+									</c:when>
+									<c:when test="${loop.index >0 && loop.index <=6 }">
+										<div class="radio-div">
+											<div class="radio-outer-orange sq-radio"></div>
+										</div>
+									</c:when>
+									<c:when test="${loop.index >=7 && loop.index <=8 }">
+										<div class="radio-div">
+											<div class="radio-outer-yellow sq-radio"></div>
 										</div>
 									</c:when>
 									<c:otherwise>
 										<div class="radio-div">
-											<div class="radio-outer-gray sq-radio"></div>
+											<div class="radio-outer-green sq-radio"></div>
 										</div>
 									</c:otherwise>
 								</c:choose>
@@ -236,7 +246,17 @@
 						</div>
 						<div class="container-1to10">
 							<c:forEach begin="0" end="10" varStatus="numLoop">
-								<div class="span-1to10" style="text-align: right">${numLoop.index}</div>
+								<c:choose>
+									<c:when test="${numLoop.index >=0 && numLoop.index<=6}">
+										<div class="span-1to10 span-1to10-orange" style="text-align: right">${numLoop.index}</div>
+									</c:when>
+									<c:when test="${numLoop.index >=7 && numLoop.index<=8}">
+										<div class="span-1to10 span-1to10-yellow" style="text-align: right">${numLoop.index}</div>
+									</c:when>
+									<c:otherwise>
+										<div class="span-1to10 span-1to10-green" style="text-align: right">${numLoop.index}</div>
+									</c:otherwise>
+								</c:choose>
 							</c:forEach>
 						</div>
 						<div class="sq-1to10-range-val">
