@@ -157,7 +157,7 @@ public class EmailFormatHelper
     public String replaceLegends( boolean isSubject, String content, String baseUrl, String logoUrl, String link,
         String custFirstName, String custLastName, String agentName, String agentFirstName, String agentSignature, String recipientMailId,
         String senderEmail, String companyName, String initiatedDate, String currentYear, String fullAddress, String links,
-        String agentProfileName, String companyDisclaimer, String agentDisclaimer, String agentLicense )
+        String agentProfileName, String companyDisclaimer, String agentDisclaimer, String agentLicense, String agentTitle, String agentPhoneNumber  )
         throws InvalidInputException
     {
         LOG.info( "Method to replace legends with values called, replaceLegends() started" );
@@ -191,6 +191,9 @@ public class EmailFormatHelper
         content = content.replaceAll( "\\[FullAddress\\]", "" + fullAddress );
         content = content.replaceAll( "\\[AgentProfileName\\]", "" + agentProfileName );
 
+        content = content.replaceAll( "\\[AgentTitle\\]", "" + agentTitle );
+        content = content.replaceAll( "\\[AgentPhoneNumber\\]", "" + agentPhoneNumber );
+        
         //JIRA SS-473 begin
         content = content.replace( "[CompanyDisclaimer]", companyDisclaimer );
         content = content.replace( "[AgentDisclaimer]", agentDisclaimer );
@@ -348,7 +351,7 @@ public class EmailFormatHelper
     public String replaceLegendsWithSettings( boolean isSubject, String content, String baseUrl, String logoUrl, String link,
         String custFirstName, String custLastName, String agentName, String agentFirstName, String agentSignature, String recipientMailId,
         String senderEmail, String companyName, String initiatedDate, String currentYear, String fullAddress, String links,
-        String agentProfileName, String companyDisclaimer, String agentDisclaimer, String agentLicense, User user,
+        String agentProfileName, String companyDisclaimer, String agentDisclaimer, String agentLicense, String agentTitle, String agentPhoneNumber, User user,
         OrganizationUnitSettings agentSettings, OrganizationUnitSettings branchSettings,
         OrganizationUnitSettings regionSettings, OrganizationUnitSettings companySettings,
         Map<SettingsForApplication, OrganizationUnit> map, Map<String, String> surveyMap ) throws InvalidInputException
@@ -383,6 +386,8 @@ public class EmailFormatHelper
         content = StringUtils.replace( content, "[FullAddress]", "" + fullAddress );
         content = StringUtils.replace( content, "[AgentProfileName]", "" + agentProfileName );
 
+        content = StringUtils.replace( content, "[AgentTitle]", agentTitle );
+        content = StringUtils.replace( content, "[AgentPhoneNumber]", agentPhoneNumber );
         //JIRA SS-473 begin
         content = StringUtils.replace( content, "[CompanyDisclaimer]", companyDisclaimer );
         content = StringUtils.replace( content, "[AgentDisclaimer]", agentDisclaimer );

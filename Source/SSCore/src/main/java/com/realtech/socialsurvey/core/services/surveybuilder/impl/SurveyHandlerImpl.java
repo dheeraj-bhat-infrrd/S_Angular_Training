@@ -1365,11 +1365,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         //replace the legends
         mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, null, custFirstName,
             custLastName, agentName, agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ),
-            currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
+            currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone );
 
         mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, null, custFirstName,
             custLastName, agentName ,agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ),
-            currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
+            currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone );
 
         //JIRA SS-473 end
 
@@ -1519,7 +1519,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, null, custFirstName,
                 custLastName, agentName, agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName,
                 dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer,
-                agentDisclaimer, agentLicenses );
+                agentDisclaimer, agentLicenses, agentTitle, agentPhone );
 
             String mailSubject = surveyCompletionUnpleasant.getMail_subject();
             if ( mailSubject == null || mailSubject.isEmpty() ) {
@@ -1529,7 +1529,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, null, custFirstName,
                 custLastName, agentName, agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName,
                 dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer,
-                agentDisclaimer, agentLicenses );
+                agentDisclaimer, agentLicenses, agentTitle, agentPhone );
             //JIRA SS-473 end
 
             //For Company with hidden agents
@@ -1688,11 +1688,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         //replace legends
         mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, "", custFirstName,
             custLastName, agentName, agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ),
-            currentYear, fullAddress, links, user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
+            currentYear, fullAddress, links, user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone );
 
         mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, "", custFirstName,
             custLastName, agentName, agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ),
-            currentYear, fullAddress, links, user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
+            currentYear, fullAddress, links, user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone );
         //JIRA SS-473 end
 
 
@@ -2257,66 +2257,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         }
     }
 
-
-    /*
-     * Method to send email by customer to initiate survey.
-     */
-    @SuppressWarnings ( "unused")
-    private void sendInvitationMailByCustomer( User user, String custFirstName, String custLastName, String custEmail,
-        String link ) throws InvalidInputException, UndeliveredEmailException
-    {
-        LOG.debug( "sendInvitationMailByCustomer() started." );
-
-        OrganizationUnitSettings companySettings = organizationManagementService
-            .getCompanySettings( user.getCompany().getCompanyId() );
-
-        String mailBody = "";
-        String mailSubject = "";
-        if ( companySettings != null && companySettings.getMail_content() != null
-            && companySettings.getMail_content().getTake_survey_mail_customer() != null ) {
-
-            MailContent takeSurveyCustomer = companySettings.getMail_content().getTake_survey_mail_customer();
-            mailBody = emailFormatHelper.replaceEmailBodyWithParams( takeSurveyCustomer.getMail_body(),
-                takeSurveyCustomer.getParam_order() );
-            mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT_CUSTOMER;
-        } else {
-            mailSubject = fileOperations.getContentFromFile(
-                EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_INVITATION_MAIL_SUBJECT );
-
-            mailBody = fileOperations.getContentFromFile(
-                EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_INVITATION_MAIL_BODY );
-
-            mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailBody,
-                new ArrayList<String>( Arrays.asList( paramOrderTakeSurveyCustomer.split( "," ) ) ) );
-
-        }
-        //JIRA SS-473 begin
-        String agentDisclaimer = "";
-        String agentLicenses = "";
-        String companyDisclaimer = "";
-
-        if ( companySettings != null && companySettings.getDisclaimer() != null )
-            companyDisclaimer = companySettings.getDisclaimer();
-
-        //replace legends
-        mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, appLogoUrl, link, custFirstName,
-            custLastName, user.getFirstName() + " " + user.getLastName(),  user.getFirstName(),  null, null, null, null, null, null, null, "",
-            user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
-        mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, appLogoUrl, link, custFirstName,
-            custLastName, user.getFirstName() + " " + user.getLastName(),  user.getFirstName(), null, null, null, null, null, null, null, "",
-            user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
-
-        //JIRA SS-473 end
-
-        //send mail
-        try {
-            emailServices.sendSurveyInvitationMailByCustomer( custEmail, mailSubject, mailBody, user.getEmailId(),
-                user.getFirstName(), user.getUserId() );
-        } catch ( InvalidInputException | UndeliveredEmailException e ) {
-            LOG.error( "Exception caught while sending mail to " + custEmail + ". Nested exception is ", e );
-        }
-        LOG.debug( "sendInvitationMailByCustomer() finished." );
-    }
 
 
     // Method to store details of a customer in mysql at the time of sending invite.
@@ -3309,7 +3249,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         String retStr = emailFormatHelper.replaceLegendsWithSettings( false, questionText, getApplicationBaseUrl(), logoUrl,
             null, survey.getCustomerFirstName(), survey.getCustomerLastName(), survey.getAgentName(), user.getFirstName(), agentSignature,
             survey.getCustomerEmail(), user.getEmailId(), user.getCompany().getCompany(), dateFormat.format( new Date() ),
-            currentYear, "", "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, user, agentSettings,
+            currentYear, "", "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone, user, agentSettings,
             bSettings, rSettings, companySettings, mapPrimaryHierarchy, surveyMap );
 
         LOG.debug( "Method replaceGateQuestionText finished for User : " + user.getUserId() );

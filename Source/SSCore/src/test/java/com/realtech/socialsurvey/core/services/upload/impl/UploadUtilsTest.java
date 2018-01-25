@@ -52,7 +52,7 @@ public class UploadUtilsTest
     public void imageSizeTestMaxBytesInvalid()
     {
         Whitebox.setInternalState( uploadUtils, "maxBytes", -1 );
-        assertTrue( "", uploadUtils.imageSize( new File( TestConstants.TEST_FILE_PATH ) ) );
+        assertEquals( "true", uploadUtils.isImageSizeValid( new File( TestConstants.TEST_FILE_PATH ) ) );
     }
 
 
@@ -60,7 +60,7 @@ public class UploadUtilsTest
     public void imageSizeTestMaxBytesValid()
     {
         Whitebox.setInternalState( uploadUtils, "maxBytes", 0 );
-        assertFalse( "", uploadUtils.imageSize( new File( TestConstants.TEST_FILE_PATH ) ) );
+        assertEquals( "6", uploadUtils.isImageSizeValid( new File( TestConstants.TEST_FILE_PATH ) ) );
     }
 
 
@@ -81,7 +81,7 @@ public class UploadUtilsTest
     {
         Whitebox.setInternalState( uploadUtils, "maxWidth", -1 );
         Whitebox.setInternalState( uploadUtils, "maxHeight", -1 );
-        assertTrue( "", uploadUtils.imageDimension( new File( TestConstants.TEST_FILE_PATH ) ) );
+        assertEquals( "true", uploadUtils.isImageDimensionValid( new File( TestConstants.TEST_FILE_PATH ) ) );
     }
 
 
