@@ -343,7 +343,7 @@ public class ReportingWebController
             profileSettings = getOrganizationUnitSettings( companyId, regionId, branchId, agentId, user );
         } catch ( InvalidInputException | NoRecordsFetchedException e ) {
             throw new InternalServerException( new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_GENERAL,
-                CommonConstants.SERVICE_CODE_GENERAL, "Error occured while fetching profile" ), e.getMessage() );
+                CommonConstants.SERVICE_CODE_GENERAL, "Error occured while fetching profile" ), e.getMessage(), e );
         }
 
         //REALTECH_USER_ID is set only for real tech and SS admin

@@ -496,7 +496,7 @@ public class LoneWolfManagementController extends AbstractController
             } catch ( Exception e ) {
                 throw new InternalServerException( new LoneWolfErrorCode( CommonConstants.ERROR_CODE_GENERAL,
                     CommonConstants.SERVICE_CODE_GENERAL, "Exception occured while getting classifications from lone wolf" ),
-                    e.getMessage() );
+                    e.getMessage(), e );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );

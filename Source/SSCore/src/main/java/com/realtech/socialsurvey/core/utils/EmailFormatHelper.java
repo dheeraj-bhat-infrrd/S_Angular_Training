@@ -258,7 +258,7 @@ public class EmailFormatHelper
                 throw new InternalServerException(
                     new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE,
                         CommonConstants.SERVICE_CODE_REGION_PROFILE, "Error occured while fetching region profile" ),
-                    e.getMessage() );
+                    e.getMessage(), e );
             } catch ( ProfileNotFoundException e ) {
                 LOG.error( "No profile found for the user ", e );
             }
