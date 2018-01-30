@@ -68,7 +68,7 @@ public class BreadCrumbController {
 			}
 			catch (InvalidInputException e) {
 				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_INDIVIDUAL_PROFILE_SERVICE_FAILURE,
-						CommonConstants.SERVICE_CODE_INDIVIDUAL_PROFILE, "verticalName  is invalid"), e.getMessage());
+						CommonConstants.SERVICE_CODE_INDIVIDUAL_PROFILE, "verticalName  is invalid"), e.getMessage(), e );
 			}
 		}
 		catch (BaseRestException e) {
@@ -106,7 +106,7 @@ public class BreadCrumbController {
 			}
 			catch (InvalidInputException e) {
 				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_INDIVIDUAL_PROFILE_SERVICE_FAILURE,
-						CommonConstants.SERVICE_CODE_INDIVIDUAL_PROFILE, "Profile name for individual is invalid"), e.getMessage());
+						CommonConstants.SERVICE_CODE_INDIVIDUAL_PROFILE, "Profile name for individual is invalid"), e.getMessage(), e );
 			}
 		}
 		catch (BaseRestException e) {
@@ -152,7 +152,7 @@ public class BreadCrumbController {
 			}
 			catch (InvalidInputException e) {
 				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE,
-						CommonConstants.SERVICE_CODE_REGION_PROFILE, "Error occured while fetching region breadCrumb"), e.getMessage());
+						CommonConstants.SERVICE_CODE_REGION_PROFILE, "Error occured while fetching region breadCrumb"), e.getMessage(), e );
 			}
 		}
 		catch (BaseRestException e) {
@@ -196,7 +196,7 @@ public class BreadCrumbController {
 			}
 			catch (InvalidInputException e) {
 				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_BRANCH_PROFILE_SERVICE_FAILURE,
-						CommonConstants.SERVICE_CODE_BRANCH_PROFILE, "Error occured while fetching branch profile"), e.getMessage());
+						CommonConstants.SERVICE_CODE_BRANCH_PROFILE, "Error occured while fetching branch profile"), e.getMessage(), e );
 			}
 
 		}

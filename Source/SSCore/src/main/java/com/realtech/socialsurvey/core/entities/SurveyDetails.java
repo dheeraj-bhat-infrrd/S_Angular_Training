@@ -6,7 +6,11 @@ import java.util.List;
 
 public class SurveyDetails
 {
-    private String _id;
+    /**
+	 * 
+	 */
+
+	private String _id;
    
     //agent details
     private long agentId;

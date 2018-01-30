@@ -1564,4 +1564,8 @@ public interface CommonConstants
     //Constants for survey request send type
     public static final String RETAKE_REQUEST_AGENT = "agent";
     public static final String RETAKE_REQUEST_CUSTOMER = "customer";
+    
+    public static final String SURVEY_RESPONSE_QUESTION = "surveyResponse.question";
+    public static final String SURVEY_RESPONSE_QUESTION_TYPE = "surveyResponse.questionType";
+    public static final String QUESTION_TYPE_MCQ = "sb-sel-mcq";
 }

@@ -567,7 +567,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 surveyResultsReportVO.setParticipantType( surveyResultsCompanyReport.getParticipantType() );
                 surveyResultsReportVO.setAgentEmailId( surveyResultsCompanyReport.getAgentEmailId() );
                 surveyResultsReportVO.setCustomerEmailId( surveyResultsCompanyReport.getCustomerEmailId() );
-
+                surveyResultsReportVO.setState( surveyResultsCompanyReport.getState() );
+                surveyResultsReportVO.setCity( surveyResultsCompanyReport.getCity() );
             } else if ( type.equals( CommonConstants.REGION_ID ) ) {
                 surveyResultsReportRegion = (SurveyResultsReportRegion) entry.getValue();
                 surveyResultsReportVO.setSurveyDetailsId( surveyResultsReportRegion.getSurveyDetailsId() );
@@ -593,6 +594,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 surveyResultsReportVO.setParticipantType( surveyResultsReportRegion.getParticipantType() );
                 surveyResultsReportVO.setAgentEmailId( surveyResultsReportRegion.getAgentEmailId() );
                 surveyResultsReportVO.setCustomerEmailId( surveyResultsReportRegion.getCustomerEmailId() );
+                surveyResultsReportVO.setState( surveyResultsReportRegion.getState() );
+                surveyResultsReportVO.setCity( surveyResultsReportRegion.getCity() );
             } else if ( type.equals( CommonConstants.BRANCH_ID ) ) {
                 surveyResultsReportBranch = (SurveyResultsReportBranch) entry.getValue();
                 surveyResultsReportVO.setSurveyDetailsId( surveyResultsReportBranch.getSurveyDetailsId() );
@@ -618,6 +621,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 surveyResultsReportVO.setParticipantType( surveyResultsReportBranch.getParticipantType() );
                 surveyResultsReportVO.setAgentEmailId( surveyResultsReportBranch.getAgentEmailId() );
                 surveyResultsReportVO.setCustomerEmailId( surveyResultsReportBranch.getCustomerEmailId() );
+                surveyResultsReportVO.setState( surveyResultsReportBranch.getState() );
+                surveyResultsReportVO.setCity( surveyResultsReportBranch.getCity() );
             }
             surveyResultsReportVOMap.put( surveyDetailsId, surveyResultsReportVO );
         }
