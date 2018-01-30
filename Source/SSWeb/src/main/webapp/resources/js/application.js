@@ -7478,7 +7478,7 @@ function paintSurveyPageFromJson() {
 			$("div[data-ques-type='sb-range-0to10-nps']").show();
 			$('#notAtAllLikelyDivNps').html(questionDetails.notAtAllLikely);
 			$('#veryLikelyDivNps').html(questionDetails.veryLikely);
-			$('#nps-range-text').show();
+			$('#nps-range-text').css('opacity',1);
 			if (questionDetails.customerResponse != undefined && !isNaN(parseInt(questionDetails.customerResponse))) {
 				var ratingVal = parseInt(questionDetails.customerResponse);
 				$('.sq-radio').each(function() {
@@ -7489,7 +7489,7 @@ function paintSurveyPageFromJson() {
 				$('#radio-nps-'+ratingVal).children().show();
 				$('#radio-nps-'+ratingVal).parent().find('.popover').show();
 				$('#radio-nps-'+ratingVal).css("cursor","default");
-				$('#nps-range-text').hide();
+				$('#nps-range-text').css('opacity',0);
 				$('#sq-radio-1to10-nps').attr('selected-rating-radio',ratingVal);
 				$("#next-radio-nps").removeClass("btn-com-disabled");
 			}
@@ -8054,7 +8054,7 @@ $('.sq-np-item-next').click(function() {
 	    }else{
 	    	$(this).parent().find('.popover').hide();
 	    	$(this).css("cursor","pointer");
-	    	$('#nps-range-text').show();
+	    	$('#nps-range-text').css('opacity',1);
 	    }
 	});
 	qno++;
@@ -8101,7 +8101,7 @@ $('.sq-np-item-next').click(function() {
 		    	$(this).parent().find('.popover').hide();
 		    	$(this).css("cursor","pointer");
 		    });
-			$('#nps-range-text').show();
+			$('#nps-range-text').css('opacity',1);
 		}
 		
 		var ratingVal = parseInt(questionDetails.customerResponse);
@@ -8126,7 +8126,7 @@ $('.sq-np-item-next').click(function() {
 				$('#radio-nps-'+ratingVal).children().show();
 				$('#radio-nps-'+ratingVal).parent().find('.popover').show();
 				$('#radio-nps-'+ratingVal).css("cursor","default");
-				$('#nps-range-text').hide();
+				$('#nps-range-text').css('opacity',0);
 				$('#sq-radio-1to10-nps').attr('selected-rating-radio',ratingVal);
 			}
 			
@@ -8214,7 +8214,7 @@ $('.sq-np-item-prev').click(function() {
 				$('#radio-nps-'+ratingVal).children().show();
 				$('#radio-nps-'+ratingVal).parent().find('.popover').show();
 				$('#radio-nps-'+ratingVal).css("cursor","default");
-				$('#nps-range-text').hide();
+				$('#nps-range-text').css('opacity',0);
 				$('#sq-radio-1to10-nps').attr('selected-rating-radio',ratingVal);
 			}
 			$('#notAtAllLikelyDivNps').html(questionDetails.notAtAllLikely);
@@ -8256,7 +8256,7 @@ $('.sq-radio').click(function(){
 		if (qno != questions.length - 1) {
 			$("#next-radio-nps").removeClass("btn-com-disabled");
 		}
-		$('#nps-range-text').hide();
+		$('#nps-range-text').css('opacity',0);
 	}
 	
 });
