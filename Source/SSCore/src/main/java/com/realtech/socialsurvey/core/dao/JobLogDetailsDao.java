@@ -12,4 +12,11 @@ public interface JobLogDetailsDao extends GenericReportingDao<JobLogDetails, Lon
      * @throws InvalidInputException
      */
     public JobLogDetails getJobLogDetailsOfLastSuccessfulRun() throws InvalidInputException;
+
+	public JobLogDetails getJobLogDetailsOfLatestRun() throws InvalidInputException;
+
+	public long insertJobLog(JobLogDetails jobLogDetails) throws InvalidInputException;
+
+	JobLogDetails getJobLogDetailsOfLatestRunForEntity(long entityId, String entityType, String jobName)
+			throws InvalidInputException;
 }

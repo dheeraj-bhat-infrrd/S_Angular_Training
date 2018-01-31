@@ -43,6 +43,12 @@ public class JobLogDetails implements Serializable
 
     @Column ( name = "JOB_UUID")
     private String jobUuid;
+    
+    @Column ( name = "ENTITY_ID")
+    private long entityId;
+    
+    @Column ( name = "ENTITY_TYPE")
+    private String entityType;
 
 
     public long getJobLogId()
@@ -129,14 +135,34 @@ public class JobLogDetails implements Serializable
     {
         this.jobUuid = jobUuid;
     }
+    
+
+    public long getEntityId() {
+		return entityId;
+	}
 
 
-    @Override
-    public String toString()
-    {
-        return "JobLogDetails [jobLogId=" + jobLogId + ", jobName=" + jobName + ", status=" + status + ", jobStartTime="
-            + jobStartTime + ", jobEndTime=" + jobEndTime + ", currentJobName=" + currentJobName + ", jobUuid=" + jobUuid + "]";
-    }
+	public void setEntityId(long entityId) {
+		this.entityId = entityId;
+	}
+
+
+	public String getEntityType() {
+		return entityType;
+	}
+
+
+	public void setEntityType(String entityType) {
+		this.entityType = entityType;
+	}
+
+
+	@Override
+	public String toString() {
+		return "JobLogDetails [jobLogId=" + jobLogId + ", jobName=" + jobName + ", status=" + status + ", jobStartTime="
+				+ jobStartTime + ", jobEndTime=" + jobEndTime + ", currentJobName=" + currentJobName + ", jobUuid="
+				+ jobUuid + ", entityId=" + entityId + ", entityType=" + entityType + "]";
+	}
 
 
 }

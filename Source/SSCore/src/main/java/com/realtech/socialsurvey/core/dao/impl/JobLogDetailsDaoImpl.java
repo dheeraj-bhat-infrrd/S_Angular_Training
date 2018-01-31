@@ -46,6 +46,68 @@ public class JobLogDetailsDaoImpl extends GenericReportingDaoImpl<JobLogDetails,
         }
 
     }
+    
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public JobLogDetails getJobLogDetailsOfLatestRun() throws InvalidInputException
+    {
+        LOG.debug(
+            "method to fetch the job-log details of last run, getJobLogDetailsOfLatestRun() started." );
+        try {
+            // create criteria object for JobLog entity class
+            Criteria criteria = getSession().createCriteria( JobLogDetails.class );
+            criteria.addOrder( Order.desc( CommonConstants.JOB_LOG_ID ) );
+            criteria.setMaxResults( 1 );
+            LOG.debug( "method to fetch the job-log details of last run, getJobLogDetailsOfLatestRun() finished." );
+            return (JobLogDetails) criteria.uniqueResult();
+            
+        } catch ( HibernateException hibernateException ) {
+            LOG.error( "Exception caught in getJobLogDetailsOfLatestRun() :{} ", hibernateException );
+            throw new DatabaseException( "Exception caught in getJobLogDetailsOfLatestRun() ", hibernateException );
+        }
+
+    }
+    
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public long insertJobLog(JobLogDetails jobLogDetails) throws InvalidInputException
+    {
+        LOG.debug(
+            "method to insert the job-log details for user ranking, insertJobLog() started." );
+        try {
+        	super.save(jobLogDetails);
+            return jobLogDetails.getJobLogId();
+            
+        } catch ( HibernateException hibernateException ) {
+            LOG.error( "Exception caught in insertJobLog() :{} ", hibernateException );
+            throw new DatabaseException( "Exception caught in insertJobLog() ", hibernateException );
+        }
+
+    }
+    
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public JobLogDetails getJobLogDetailsOfLatestRunForEntity(long entityId , String entityType , String jobName) throws InvalidInputException
+    {
+        LOG.debug(
+            "method to fetch the job-log details of last run for entity, getJobLogDetailsOfLatestRunForEntity() started." );
+        try {
+            // create criteria object for JobLog entity class
+            Criteria criteria = getSession().createCriteria( JobLogDetails.class );
+            criteria.add(Restrictions.eq(CommonConstants.ENTITY_ID_COLUMN, entityId));
+            criteria.add(Restrictions.eq(CommonConstants.ENTITY_TYPE_COLUMN, entityType));
+            criteria.add(Restrictions.eq(CommonConstants.JOB_NAME,jobName));
+            criteria.addOrder( Order.desc( CommonConstants.JOB_LOG_ID ) );
+            criteria.setMaxResults( 1 );
+            LOG.debug( "method to fetch the job-log details of last run of entity, getJobLogDetailsOfLatestRunForEntity() finished." );
+            return (JobLogDetails) criteria.uniqueResult();
+            
+        } catch ( HibernateException hibernateException ) {
+            LOG.error( "Exception caught in getJobLogDetailsOfLatestRun() :{} ", hibernateException );
+            throw new DatabaseException( "Exception caught in getJobLogDetailsOfLatestRun() ", hibernateException );
+        }
+
+    }
 
 
 }
