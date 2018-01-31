@@ -76,7 +76,7 @@ public class ReportsTopologyStarterHelper extends TopologyStarterHelper
         LOG.info( "Creating mail reports topology" );
         TopologyBuilder builder = new TopologyBuilder();
         //add the spout
-        builder.setSpout("ReportGenerationSpout", KafkaTopicSpoutBuilder.reportGenerationSpout(), 1);
+        builder.setSpout("ReportGenerationSpout", KafkaTopicSpoutBuilder.getInstance().reportGenerationSpout(), 1);
         //add the bolts
         builder.setBolt("UpdateFileUploadStatusBolt", new UpdateFileUploadStatusBolt(), 1)
                 .shuffleGrouping("ReportGenerationSpout");

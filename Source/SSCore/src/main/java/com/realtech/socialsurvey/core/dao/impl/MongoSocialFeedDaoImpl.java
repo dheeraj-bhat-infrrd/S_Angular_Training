@@ -4,13 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.stereotype.Repository;
 
 import com.realtech.socialsurvey.core.dao.MongoSocialFeedDao;
-import com.realtech.socialsurvey.core.entities.SocialFeed;
+import com.realtech.socialsurvey.core.entities.SocialResponseObject;
 
 
 @Repository
@@ -26,7 +24,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
     public static final String KEY_IDENTIFIER = "_id";
 
     @Override
-    public void insertSocialFeed( SocialFeed socialFeed, String collectionName )
+    public void insertSocialFeed( SocialResponseObject<?> socialFeed, String collectionName )
     {
         if ( LOG.isDebugEnabled() ) {
             LOG.debug( "Creating {} document. Social feed id: {}", collectionName, socialFeed.getId() );

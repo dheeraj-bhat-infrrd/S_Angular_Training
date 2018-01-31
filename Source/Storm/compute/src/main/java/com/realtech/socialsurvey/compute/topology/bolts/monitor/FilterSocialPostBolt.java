@@ -5,18 +5,20 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.realtech.socialsurvey.compute.common.SSAPIOperations;
+import com.realtech.socialsurvey.compute.dao.RedisCompanyKeywordsDao;
+import com.realtech.socialsurvey.compute.dao.impl.RedisCompanyKeywordsDaoImpl;
 import com.realtech.socialsurvey.compute.entities.Keyword;
-import com.realtech.socialsurvey.compute.entities.SocialPost;
+import com.realtech.socialsurvey.compute.entities.SocialResponseType;
 import com.realtech.socialsurvey.compute.entities.TrieNode;
+import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBolt;
 
 
@@ -34,21 +36,28 @@ public class FilterSocialPostBolt extends BaseComputeBolt
 
     private Map<Long, TrieNode> companyTrie = new HashMap<>();
 
+    private RedisCompanyKeywordsDao redisCompanyKeywordsDao = new RedisCompanyKeywordsDaoImpl();
 
     @Override
     public void execute( Tuple input )
     {
         LOG.info( "Executing filter social post bolt" );
-        SocialPost post = (SocialPost) input.getValueByField( "post" );
+        SocialResponseObject<?> post = (SocialResponseObject<?>) input.getValueByField( "post" );
+        SocialResponseType socialResponseType = (SocialResponseType) input.getValueByField( "type" );
         long companyId = input.getLongByField( "companyId" );
-        List<String> foundKeyWords = null;
-        if ( post != null ) {
+
+        if ( post != null && post.getText() != null ) {
+            String text = post.getText();
+            List<String> foundKeyWords = null;
             TrieNode root = getTrieForCompany( companyId );
-            foundKeyWords = findPhrases( root, post.getMessage() );
-            post.setFoundKeywords( foundKeyWords );
+            foundKeyWords = findPhrases( root, text );
+            if ( !foundKeyWords.isEmpty() ) {
+                post.setFoundKeywords( foundKeyWords );
+                post.setFlagged( Boolean.TRUE );
+            }
+            LOG.debug( "Emitting tuple with companyId {}, post {}, foundKeyWords {}.", companyId, post, foundKeyWords );
         }
-        LOG.debug( "Emitting tuple with companyId {}, post {}, foundKeyWords {}.", companyId, post, foundKeyWords );
-        _collector.emit( input, Arrays.asList( companyId, post ) );
+        _collector.emit( input, Arrays.asList( companyId, post, socialResponseType ) );
         _collector.ack( input );
     }
 
@@ -60,9 +69,9 @@ public class FilterSocialPostBolt extends BaseComputeBolt
      */
     private synchronized TrieNode getTrieForCompany( long companyId )
     {
-        LOG.debug( "Inside method getTrieForCompany for company {}",companyId);
+        LOG.debug( "Inside method getTrieForCompany for company {}", companyId );
         TrieNode node = companyTrie.get( companyId );
-        if ( node == null || isKeywordsUpdated( companyId ) ) {
+        if ( node == null || isKeywordsUpdated( companyId, node ) ) {
             node = getCompanyKeywordsAndConstructTrie( companyId );
             companyTrie.put( companyId, node );
         }
@@ -75,10 +84,10 @@ public class FilterSocialPostBolt extends BaseComputeBolt
      * @param companyIden
      * @return true - keyword updated
      */
-    private boolean isKeywordsUpdated( long companyIden )
+    private boolean isKeywordsUpdated( long companyIden, TrieNode rootNode )
     {
-        // TODO write logic to check for keyword update for company by company id.
-        return true;
+        long modifiedOn = redisCompanyKeywordsDao.getKeywordModifiedOn( companyIden );
+        return ( modifiedOn > rootNode.getModifiedOn() ) ? true : false;
     }
 
 
@@ -90,14 +99,21 @@ public class FilterSocialPostBolt extends BaseComputeBolt
     private TrieNode getCompanyKeywordsAndConstructTrie( long companyIden )
     {
         LOG.debug( "Inside getCompanyKeywordsAndConstructTrie method. companyId: {}", companyIden );
-        Optional<List<Keyword>> keywordListResponse = SSAPIOperations.getInstance().getKeywordsForCompany( companyIden );
+        List<Keyword> keywordListResponse = redisCompanyKeywordsDao.getCompanyKeywordsForCompanyId( companyIden );
+        long keywordModifiedOn = redisCompanyKeywordsDao.getKeywordModifiedOn( companyIden );
 
-        if ( keywordListResponse.isPresent() ) {
+        if ( keywordListResponse != null && !keywordListResponse.isEmpty() ) {
             companyTrie.put( companyIden, new TrieNode() );
-            for ( Keyword keyword : keywordListResponse.get() ) {
+            for ( Keyword keyword : keywordListResponse ) {
                 addPhrase( companyTrie.get( companyIden ), keyword.getPhrase(), keyword.getId() );
             }
         }
+        if ( keywordModifiedOn != 0L ) {
+            companyTrie.get( companyIden ).setModifiedOn( keywordModifiedOn );
+        } else {
+            companyTrie.get( companyIden ).setModifiedOn( System.currentTimeMillis() );
+        }
+
         return companyTrie.get( companyIden );
     }
 
@@ -105,7 +121,7 @@ public class FilterSocialPostBolt extends BaseComputeBolt
     @Override
     public void declareOutputFields( OutputFieldsDeclarer declarer )
     {
-        declarer.declare( new Fields( "companyId", "post" ) );
+        declarer.declare( new Fields( "companyId", "post", "type" ) );
     }
 
 
@@ -118,16 +134,12 @@ public class FilterSocialPostBolt extends BaseComputeBolt
     private void addPhrase( TrieNode root, String phrase, String phraseId )
     {
         LOG.debug( "Inside addPhrase method" );
-        // a pointer to traverse the trie without damaging
-        // the original reference
         TrieNode node = root;
         // break phrase into words
         String[] words = phrase.split( WORD_SEPARATOR );
 
         // start traversal at root
         for ( int i = 0; i < words.length; ++i ) {
-            // if the current word does not exist as a child
-            // to current node, add it
 
             if ( node.getChildren() == null ) {
                 node.setChildren( new HashMap<String, TrieNode>() );
@@ -137,11 +149,8 @@ public class FilterSocialPostBolt extends BaseComputeBolt
                 node.getChildren().put( words[i], new TrieNode() );
             }
 
-            // move traversal pointer to current word
             node = node.getChildren().get( words[i] );
 
-            // if current word is the last one, mark it with
-            // phrase Id
             if ( i == words.length - 1 ) {
                 node.setPhraseId( phraseId );
             }
@@ -153,29 +162,22 @@ public class FilterSocialPostBolt extends BaseComputeBolt
     private List<String> findPhrases( TrieNode root, String textBody )
     {
         LOG.debug( "Inside findPhrase method." );
-        // a pointer to traverse the trie without damaging
-        // the original reference
         TrieNode node = root;
 
-        // a list of found ids
         List<String> foundPhrases = new ArrayList<>();
 
-        // break text body into words
+        if ( StringUtils.isEmpty( textBody ) ) {
+            return foundPhrases;
+        }
+
         String[] words = textBody.split( WORD_SEPARATOR );
 
         StringBuilder phraseBuffer = new StringBuilder();
-        // starting traversal at trie root and first
-        // word in text body
         for ( int i = 0; i < words.length; ) {
-            // if current node has current word as a child
-            // move both node and words pointer forward
             if ( node.getChildren() != null && node.getChildren().containsKey( words[i] ) ) {
                 // move trie pointer forward
                 node = node.getChildren().get( words[i] );
                 phraseBuffer.append( words[i] + SPACE_SEPARATOR );
-                // if there is a phrase Id, then the previous
-                // sequence of words matched a phrase, add Id to
-                // found list
                 if ( node.getPhraseId() != null ) {
                     String phrase = phraseBuffer.toString().trim();
                     foundPhrases.add( phrase );
@@ -183,24 +185,16 @@ public class FilterSocialPostBolt extends BaseComputeBolt
                 }
                 ++i;
             } else {
-                // current node does not have current
-                // word in its children
                 phraseBuffer = new StringBuilder();
                 if ( node == root ) {
-                    // if trie pointer is already at root, increment
-                    // words pointer
                     ++i;
                 } else {
-                    // if not, leave words pointer at current word
-                    // and return trie pointer to root
+
                     node = root;
                 }
             }
         }
 
-        // one case remains, word pointer as reached the end
-        // and the loop is over but the trie pointer is pointing to
-        // a phrase Id
         if ( node.getPhraseId() != null ) {
             String phrase = phraseBuffer.toString().trim();
             foundPhrases.add( phrase );

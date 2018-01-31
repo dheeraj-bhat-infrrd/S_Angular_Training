@@ -8,6 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.realtech.socialsurvey.compute.services.api.APIIntergrationException;
+import com.realtech.socialsurvey.compute.services.api.FacebookApiIntegrationService;
+import com.realtech.socialsurvey.compute.services.api.LinkedinApiIntegrationService;
 import com.realtech.socialsurvey.compute.services.api.SSApiIntegrationService;
 import com.realtech.socialsurvey.compute.services.api.SolrApiIntegrationService;
 
@@ -34,6 +36,10 @@ public class RetrofitApiBuilder
     private SolrApiIntegrationService solrAPIIntergrationService;
     
     private SSApiIntegrationService ssAPIIntergrationService;
+    
+    private FacebookApiIntegrationService facebookAPIIntergrationService;
+    
+    private LinkedinApiIntegrationService linkedinApiIntegrationService;
 
     private final String solrApiUrl = LocalPropertyFileHandler.getInstance()
         .getProperty( ComputeConstants.APPLICATION_PROPERTY_FILE, ComputeConstants.SOLR_API_ENDPOINT ).orElse( null );
@@ -41,6 +47,11 @@ public class RetrofitApiBuilder
     private final String ssApiUrl = LocalPropertyFileHandler.getInstance()
         .getProperty( ComputeConstants.APPLICATION_PROPERTY_FILE, ComputeConstants.SS_API_ENDPOINT ).orElse( null );
 
+    private final String facebookApiUrl = LocalPropertyFileHandler.getInstance()
+        .getProperty( ComputeConstants.APPLICATION_PROPERTY_FILE, ComputeConstants.FACEBOOK_API_ENDPOINT ).orElse( null );
+
+    private final String linkedinApiUrl = LocalPropertyFileHandler.getInstance()
+        .getProperty( ComputeConstants.APPLICATION_PROPERTY_FILE, ComputeConstants.LINKED_IN_REST_API_URI ).orElse( null );
 
     // Avoid creating instance
     private RetrofitApiBuilder()
@@ -51,7 +62,7 @@ public class RetrofitApiBuilder
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         httpClient.addInterceptor( loggingInterceptor );
         // Create integration service builders
-        LOG.info( "Creating SOLR API builder" );
+        LOG.info( "Creating API builder" );
         // construct api gateway url
         Retrofit solrIntegServiceBuilder = new Retrofit.Builder().baseUrl( solrApiUrl )
             .addConverterFactory( GsonConverterFactory.create() ).client( httpClient.build() ).build();
@@ -61,6 +72,16 @@ public class RetrofitApiBuilder
         Retrofit ssApiIntegServiceBuilder = new Retrofit.Builder().baseUrl( ssApiUrl )
             .addConverterFactory( GsonConverterFactory.create() ).client( httpClient.build() ).build();
         ssAPIIntergrationService = ssApiIntegServiceBuilder.create( SSApiIntegrationService.class);
+        
+     // api gateway url for Facebook
+        Retrofit facebookApiIntegServiceBuilder = new Retrofit.Builder().baseUrl( facebookApiUrl )
+            .addConverterFactory( GsonConverterFactory.create() ).client( httpClient.build() ).build();
+        facebookAPIIntergrationService = facebookApiIntegServiceBuilder.create( FacebookApiIntegrationService.class);
+        
+     // api gateway url for Linked
+        Retrofit linkedinApiIntegServiceBuilder = new Retrofit.Builder().baseUrl( linkedinApiUrl )
+            .addConverterFactory( GsonConverterFactory.create() ).client( httpClient.build() ).build();
+        linkedinApiIntegrationService = linkedinApiIntegServiceBuilder.create( LinkedinApiIntegrationService.class);
 
     }
 
@@ -79,6 +100,15 @@ public class RetrofitApiBuilder
     public SSApiIntegrationService getSSAPIIntergrationService()
     {
         return ssAPIIntergrationService;
+    }
+    
+    public FacebookApiIntegrationService getFacebookAPIIntergrationService()
+    {
+        return facebookAPIIntergrationService;
+    }
+    
+    public LinkedinApiIntegrationService getLinkedinApiIntegrationService(){
+        return linkedinApiIntegrationService;
     }
 
 

@@ -1,6 +1,6 @@
 package com.realtech.socialsurvey.core.services.socialmonitor.feed;
 
-import com.realtech.socialsurvey.core.entities.SocialFeed;
+import com.realtech.socialsurvey.core.entities.SocialResponseObject;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
 /**
@@ -15,5 +15,5 @@ public interface SocialFeedService
      * @return
      * @throws InvalidInputException 
      */
-    public SocialFeed saveFeed(SocialFeed socialFeed) throws InvalidInputException;
+    public SocialResponseObject<?> saveFeed(SocialResponseObject<?> socialFeed) throws InvalidInputException;
 }

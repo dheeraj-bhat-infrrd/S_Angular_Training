@@ -1,8 +1,8 @@
 package com.realtech.socialsurvey.core.dao;
 
-import com.realtech.socialsurvey.core.entities.SocialFeed;
+import com.realtech.socialsurvey.core.entities.SocialResponseObject;
 
 public interface MongoSocialFeedDao
 {
-    public void insertSocialFeed( SocialFeed socialFeed, String collectionName );
+    public void insertSocialFeed( SocialResponseObject<?> socialFeed, String collectionName );
 }

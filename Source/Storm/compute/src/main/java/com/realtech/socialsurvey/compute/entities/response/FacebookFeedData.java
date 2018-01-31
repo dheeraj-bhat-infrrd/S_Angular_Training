@@ -1,0 +1,144 @@
+package com.realtech.socialsurvey.compute.entities.response;
+
+import java.io.Serializable;
+
+import com.google.gson.annotations.SerializedName;
+
+
+public class FacebookFeedData implements Serializable
+{
+    private static final long serialVersionUID = 1L;
+    private String id;
+    private String message;
+    private String story;
+    
+    @SerializedName ( "created_time")
+    private String createdTime;
+
+    @SerializedName ( "updated_time")
+    private String updatedTime;
+    
+    private String fullPicture;
+    
+    private String picture;
+    
+    private FacebookFeedFrom from;
+    
+    public String getFullPicture()
+    {
+        return fullPicture;
+    }
+
+
+    public String getPicture()
+    {
+        return picture;
+    }
+
+
+    public FacebookFeedFrom getFrom()
+    {
+        return from;
+    }
+
+
+    public void setFullPicture( String fullPicture )
+    {
+        this.fullPicture = fullPicture;
+    }
+
+
+    public void setPicture( String picture )
+    {
+        this.picture = picture;
+    }
+
+
+    public void setFrom( FacebookFeedFrom from )
+    {
+        this.from = from;
+    }
+
+
+    private String link;
+
+
+    public String getLink()
+    {
+        return link;
+    }
+
+
+    public void setLink( String link )
+    {
+        this.link = link;
+    }
+
+
+    public String getId()
+    {
+        return id;
+    }
+
+
+    public String getMessage()
+    {
+        return message;
+    }
+
+
+    public void setId( String id )
+    {
+        this.id = id;
+    }
+
+
+    public void setMessage( String message )
+    {
+        this.message = message;
+    }
+
+
+    public String getCreatedTime()
+    {
+        return createdTime;
+    }
+
+
+    public String getUpdatedTime()
+    {
+        return updatedTime;
+    }
+
+
+    public void setCreatedTime( String createdTime )
+    {
+        this.createdTime = createdTime;
+    }
+
+
+    public void setUpdatedTime( String updatedTime )
+    {
+        this.updatedTime = updatedTime;
+    }
+
+
+    public String getStory()
+    {
+        return story;
+    }
+
+
+    public void setStory( String story )
+    {
+        this.story = story;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return "FacebookFeedData [id=" + id + ", message=" + message + ", story=" + story + ", createdTime=" + createdTime
+            + ", updatedTime=" + updatedTime + ", link=" + link + "]";
+    }
+}

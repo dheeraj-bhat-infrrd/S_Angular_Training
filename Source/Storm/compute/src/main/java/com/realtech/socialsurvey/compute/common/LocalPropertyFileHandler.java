@@ -52,6 +52,7 @@ public class LocalPropertyFileHandler
                 if ( !isPrepared ) {
                     propertieMap = new HashMap<>();
                     envProfile = profile;
+                    isPrepared = true;
                 }
             }
         }

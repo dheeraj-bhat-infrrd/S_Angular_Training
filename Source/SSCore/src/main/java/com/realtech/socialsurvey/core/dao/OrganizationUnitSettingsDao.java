@@ -293,4 +293,16 @@ public interface OrganizationUnitSettingsDao
      * @return
      */
     public List<OrganizationUnitSettings> fetchCompaniesByAlertType( String alertType , List<Long> companyIds );
+
+
+    /**
+     * Find Media tokens for ids by collection name
+     * @param ids
+     * @param collectionName
+     * @return
+     */
+    public List<FeedIngestionEntity> fetchSocialMediaTokensForIds( List<Long> ids, String collectionName );
+
+
+    public List<FeedIngestionEntity> getAllCompanyIdWithSocialMediaTokens( String collectionName, int skipCount, int numOfRecords );
 }

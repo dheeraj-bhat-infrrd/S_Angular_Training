@@ -46,6 +46,9 @@ public final class ComputeConstants
     public static final String ADMIN_EMAIL_ADDRESS = "ADMIN_EMAIL_ADDRESS";
     public static final String ADMIN_EMAIL_ADDRESS_NAME = "ADMIN_EMAIL_ADDRESS_NAME";
     public static final String SS_DATABASE = "ss_db";
+    public static final String FACEBOOK_API_ENDPOINT = "FACEBOOK_API_ENDPOINT";
+    
+    public static final String LINKED_IN_REST_API_URI = "LINKED_IN_REST_API_URI";
 
     // Amazon S3 constants
     public static final String AMAZON_BUCKET = "AMAZON_BUCKET";
@@ -53,5 +56,7 @@ public final class ComputeConstants
     public static final String AMAZON_ENDPOINT = "AMAZON_ENDPOINT";
     
     public static final String FILEUPLOAD_DIRECTORY_LOCATION = "FILEUPLOAD_DIRECTORY_LOCATION";
+    public static final String REDIS_HOST = "REDIS_HOST";
+    public static final String REDIS_PORT = "REDIS_PORT";
     
 }

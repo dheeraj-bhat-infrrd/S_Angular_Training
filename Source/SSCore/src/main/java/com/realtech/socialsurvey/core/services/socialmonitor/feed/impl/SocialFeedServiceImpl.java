@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 import com.realtech.socialsurvey.core.dao.MongoSocialFeedDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialFeedDaoImpl;
-import com.realtech.socialsurvey.core.entities.SocialFeed;
+import com.realtech.socialsurvey.core.entities.SocialResponseObject;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.socialmonitor.feed.SocialFeedService;
 
@@ -26,7 +26,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
     MongoSocialFeedDao mongoSocialFeedDao;
 
     @Override
-    public SocialFeed saveFeed( SocialFeed socialFeed ) throws InvalidInputException 
+    public SocialResponseObject<?> saveFeed( SocialResponseObject<?> socialFeed ) throws InvalidInputException 
     {
         LOG.info( "Inside save feed method {}" , socialFeed);
         if(socialFeed == null){

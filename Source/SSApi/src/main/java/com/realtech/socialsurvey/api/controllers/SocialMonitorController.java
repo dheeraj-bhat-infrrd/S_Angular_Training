@@ -17,9 +17,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.realtech.socialsurvey.api.exceptions.SSApiException;
-
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
 import com.realtech.socialsurvey.core.entities.Keyword;
-import com.realtech.socialsurvey.core.entities.SocialFeed;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokenResponse;
+import com.realtech.socialsurvey.core.entities.SocialResponseObject;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.socialmonitor.feed.SocialFeedService;
@@ -42,7 +45,8 @@ public class SocialMonitorController
 
 
     @Autowired
-    public void setOrganizationManagementService( OrganizationManagementService organizationManagementService, SocialFeedService socialFeedService )
+    public void setOrganizationManagementService( OrganizationManagementService organizationManagementService,
+        SocialFeedService socialFeedService )
     {
         this.organizationManagementService = organizationManagementService;
         this.socialFeedService = socialFeedService;
@@ -121,16 +125,27 @@ public class SocialMonitorController
 
     @RequestMapping ( value = "/feeds", method = RequestMethod.POST)
     @ApiOperation ( value = "Initiate account registration")
-    public ResponseEntity<?> saveFeeds( @Valid @RequestBody SocialFeed socialFeed ) throws SSApiException
+    public ResponseEntity<?> saveFeeds( @Valid @RequestBody SocialResponseObject<?> socialFeed ) throws SSApiException
     {
         try {
-            LOGGER.info( "SocialMonitorController.saveFeeds started" );
-            SocialFeed socialFeedResponse = socialFeedService.saveFeed( socialFeed );
-            LOGGER.info( "SocialMonitorController.saveFeeds completed successfully" );
+            LOGGER.info( "SocialMonitorController.disabledKeywordsByIdForCompany started" );
+            SocialResponseObject<?> socialFeedResponse = socialFeedService.saveFeed( socialFeed );
+            LOGGER.info( "SocialMonitorController.disabledKeywordsByIdForCompany completed successfully" );
             return new ResponseEntity<>( socialFeedResponse, HttpStatus.OK );
         } catch ( NonFatalException e ) {
             throw new SSApiException( e.getMessage(), e );
         }
+    }
+
+    @RequestMapping ( value = "/companies/mediatokens", method = RequestMethod.GET)
+    @ApiOperation ( value = "Initiate account registration")
+    public ResponseEntity<?> fetchSocialMediaTokens(HttpServletRequest request ) throws SSApiException, InvalidInputException
+    {
+        LOGGER.info( "SocialMonitorController.getCompanyKeywords started" );
+        // get company setting for login user
+        List<SocialMediaTokenResponse> mediaTokens = organizationManagementService.fetchSocialMediaTokensResponse( 0, 0 );
+        LOGGER.info( "SocialMonitorController.getCompanyKeywords completed successfully" );
+        return new ResponseEntity<>( mediaTokens, HttpStatus.OK );
 
     }
 }
