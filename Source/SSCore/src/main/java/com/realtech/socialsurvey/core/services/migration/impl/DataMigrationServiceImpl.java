@@ -49,7 +49,7 @@ public class DataMigrationServiceImpl implements DataMigrationService {
 			List<SurveyResponse> surveyResponseList = surveyDetails.getSurveyResponse();
 
 			if (surveyResponseList != null && surveyResponseList.size() > 0) {
-				LOGGER.info("survey details id : {}", surveyDetailsList.get(0).get_id());
+				LOGGER.info("survey details id : {}", surveyDetails.get_id());
 				for (SurveyResponse surveyResponse : surveyResponseList) {
 					if (surveyResponse.getQuestion().equals(question)) {
 						String answer = surveyResponse.getAnswer();
@@ -64,8 +64,10 @@ public class DataMigrationServiceImpl implements DataMigrationService {
 						surveyResponse.setQuestionId(questionId);
 						surveyResponse.setQuestionType("sb-range-0to10");
 						surveyDetailsDao.updateCustomerResponse(surveyDetails.get_id(), surveyResponse);
-						surveyDetails.setNpsScore(Integer.parseInt(surveyResponse.getAnswer()));
-						surveyDetailsDao.updateSurveyNPSScore(surveyDetails);
+						if(answer != null && !answer.isEmpty()){
+							surveyDetails.setNpsScore(Integer.parseInt(surveyResponse.getAnswer()));
+							surveyDetailsDao.updateSurveyNPSScore(surveyDetails);
+						}
 					}
 				}
 
