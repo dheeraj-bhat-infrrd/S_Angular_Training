@@ -46,6 +46,7 @@ public class EmailEntity implements Serializable
     private long regionId;
     private long agentId;
     private String agentEmailId;
+    private boolean isRetried;
 
     public String getRandomUUID()
     {
@@ -272,6 +273,14 @@ public class EmailEntity implements Serializable
         this.agentEmailId = agentEmailId;
     }
 
+    public boolean isRetried() {
+        return isRetried;
+    }
+
+    public void setRetried(boolean retried) {
+        isRetried = retried;
+    }
+
     @Override
     public String toString() {
         return "EmailEntity{" +
@@ -297,6 +306,7 @@ public class EmailEntity implements Serializable
                 ", regionId=" + regionId +
                 ", agentId=" + agentId +
                 ", agentEmailId='" + agentEmailId + '\'' +
+                ", isRetried=" + isRetried +
                 '}';
     }
 }
