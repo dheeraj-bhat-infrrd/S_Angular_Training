@@ -37,4 +37,22 @@ public class SocialFeedServiceImpl implements SocialFeedService
         return socialFeed;
     }
 
+    @Override
+    public long getDuplicatePostsCount(int hash, long companyId) throws InvalidInputException {
+        LOG.info("Executing getDuplicatePostsCount method with hash = {} and companyId = {} ", hash, companyId);
+        if(companyId  <= 0){
+            throw new InvalidInputException( "companyId cannot be 0" );
+        }
+        return mongoSocialFeedDao.getDuplicatePostsCount(hash, companyId);
+    }
+
+    @Override
+    public long updateDuplicateCount(int hash, long companyId, long duplicateCount) throws InvalidInputException {
+        LOG.info("Executing updateDuplicateCount method with hash = {}, companyId = {} and duplicateCount = {} ", hash, companyId, duplicateCount);
+        if( duplicateCount  <= 0 || companyId <= 0){
+            throw new InvalidInputException( "companyId or duplicateCount cannot be <= 0" );
+        }
+        return mongoSocialFeedDao.updateDuplicateCount(hash, companyId, duplicateCount);
+    }
+
 }

@@ -5852,6 +5852,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             if(feedIngestionEntity.getSocialMediaTokens() != null) {
                 socialMediaTokenResponseList.add( setSocialMediaTokenResponse( feedIngestionEntity, feedIngestionEntity.getIden(), "company" ) );
             }
+
             
             List<Long> regionIds = regionDao.getRegionIdsUnderCompany( feedIngestionEntity.getIden(), skipCount, batchSize );
             

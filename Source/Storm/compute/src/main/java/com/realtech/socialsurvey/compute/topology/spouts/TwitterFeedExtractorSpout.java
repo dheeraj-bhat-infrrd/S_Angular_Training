@@ -31,7 +31,6 @@ public class TwitterFeedExtractorSpout extends BaseComputeSpout
 {
     private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger( TwitterFeedExtractorSpout.class );
-
     private SpoutOutputCollector _collector;
     private TwitterFeedProcessor twitterFeedProcessor;
 
@@ -76,7 +75,9 @@ public class TwitterFeedExtractorSpout extends BaseComputeSpout
                             LOG.debug( "response  : ", response.size() );
                             for ( TwitterFeedData twitterFeedData : response ) {
                                 SocialResponseObject<TwitterFeedData> responseWrapper = new SocialResponseObject<>( companyId,
-                                    SocialFeedType.TWITTER, twitterFeedData.getText(), twitterFeedData );
+
+                                    SocialFeedType.TWITTER, twitterFeedData.getText(), twitterFeedData, 1 );
+                                responseWrapper.setHash( responseWrapper.getText().hashCode() );
                                 Gson gson = new Gson();
                                 String responseWrapperString = gson.toJson( responseWrapper );
                                 _collector.emit( new Values( companyId.toString(), responseWrapperString ) );

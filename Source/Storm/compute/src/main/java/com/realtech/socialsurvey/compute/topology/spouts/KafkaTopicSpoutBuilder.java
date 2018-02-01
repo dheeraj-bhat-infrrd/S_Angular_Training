@@ -36,7 +36,7 @@ public class KafkaTopicSpoutBuilder
 
     private String zookeeperBrokers;
 
-    private static final String ZOOKEEPER_BROKERS = "172.30.0.188:2181";
+
     private static final String ZOOKEEPER_ROOT = "";
 
     // SendGrid Event Spout
@@ -69,7 +69,7 @@ public class KafkaTopicSpoutBuilder
      */
     public KafkaSpout sendGridEventTopicSpout()
     {
-        ZkHosts zkHosts = new ZkHosts( ZOOKEEPER_BROKERS );
+        ZkHosts zkHosts = new ZkHosts( zookeeperBrokers );
         String topicName = ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? SENDGRID_EVENT_TOPIC
                 : ChararcterUtils.appendWithHypen( SENDGRID_EVENT_TOPIC, EnvConstants.getProfile() );
         String consumerGroup = ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? SENDGRID_EVENT_CONSUMER_GROUP
@@ -87,7 +87,7 @@ public class KafkaTopicSpoutBuilder
      */
     public KafkaSpout emailTopicKafkaSpout()
     {
-        ZkHosts zkHosts = new ZkHosts( ZOOKEEPER_BROKERS );
+        ZkHosts zkHosts = new ZkHosts( zookeeperBrokers );
         String topicName = ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? MAIL_TOPIC
                 : ChararcterUtils.appendWithHypen( MAIL_TOPIC, EnvConstants.getProfile() );
         String consumerGroup = ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? MAIL_CONSUMER_GROUP
@@ -104,7 +104,7 @@ public class KafkaTopicSpoutBuilder
      */
     public KafkaSpout socialPostTopicKafkaSpout()
     {
-        ZkHosts zkHosts = new ZkHosts( ZOOKEEPER_BROKERS );
+        ZkHosts zkHosts = new ZkHosts( zookeeperBrokers );
         String topicName = ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? SOCIAL_POST_TOPIC
                 : ChararcterUtils.appendWithHypen( SOCIAL_POST_TOPIC, EnvConstants.getProfile() );
         String consumerGroup = ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? SOCIAL_POST_CONSUMER_GROUP
@@ -120,8 +120,8 @@ public class KafkaTopicSpoutBuilder
      * Report topic kafka spout
      */
 
-    public static  KafkaSpout reportGenerationSpout() {
-        ZkHosts zkHosts = new ZkHosts( ZOOKEEPER_BROKERS );
+    public  KafkaSpout reportGenerationSpout() {
+        ZkHosts zkHosts = new ZkHosts( zookeeperBrokers );
         String topicName = ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? REPORT_TOPIC
                 : ChararcterUtils.appendWithHypen(REPORT_TOPIC, EnvConstants.getProfile() );
         String consumerGroup = ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? REPORT_CONSUMER_GROUP
