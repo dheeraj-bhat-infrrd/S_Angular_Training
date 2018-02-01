@@ -476,7 +476,7 @@
       <type>TRANS</type>
       <specification_method>filename</specification_method>
       <trans_object_id/>
-      <filename>&#x24;&#x7b;Internal.Job.Filename.Directory&#x7d;&#x2f;CreateReportJobLog.ktr</filename>
+      <filename>&#x24;&#x7b;Internal.Job.Filename.Directory&#x7d;&#x2f;createReportJobLog.ktr</filename>
       <transname/>
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
@@ -512,7 +512,7 @@
       <type>TRANS</type>
       <specification_method>filename</specification_method>
       <trans_object_id/>
-      <filename>&#x24;&#x7b;Internal.Job.Filename.Directory&#x7d;&#x2f;FinalReportJobLog.ktr</filename>
+      <filename>&#x24;&#x7b;Internal.Job.Filename.Directory&#x7d;&#x2f;FinishJobLog.ktr</filename>
       <transname/>
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
@@ -576,12 +576,12 @@
       <yloc>8</yloc>
       </entry>
     <entry>
-      <name>UpdateTransLog</name>
+      <name>UpdateJobLog</name>
       <description/>
       <type>TRANS</type>
       <specification_method>filename</specification_method>
       <trans_object_id/>
-      <filename>&#x24;&#x7b;Internal.Job.Filename.Directory&#x7d;&#x2f;UpdateTransLog.ktr</filename>
+      <filename>&#x24;&#x7b;Internal.Job.Filename.Directory&#x7d;&#x2f;UpdateJobLog.ktr</filename>
       <transname/>
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
@@ -604,10 +604,7 @@
       <parameters>        <pass_all_parameters>Y</pass_all_parameters>
             <parameter>            <name>status</name>
             <stream_name/>
-            <value>Error in &#x24;&#x7b;Internal.Transformation.Filename.Directory&#x7d;</value>
-            </parameter>            <parameter>            <name>stepName</name>
-            <stream_name>stepName</stream_name>
-            <value/>
+            <value>Error in &#x24;&#x7b;Internal.Job.Name&#x7d;</value>
             </parameter>      </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
@@ -755,7 +752,7 @@
     </hop>
     <hop>
       <from>company_user_report&#x28;2&#x29;</from>
-      <to>UpdateTransLog</to>
+      <to>UpdateJobLog</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -764,7 +761,7 @@
     </hop>
     <hop>
       <from>User_Adoption</from>
-      <to>UpdateTransLog</to>
+      <to>UpdateJobLog</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -773,7 +770,7 @@
     </hop>
     <hop>
       <from>account_statistics</from>
-      <to>UpdateTransLog</to>
+      <to>UpdateJobLog</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -782,7 +779,7 @@
     </hop>
     <hop>
       <from>SurveyResultsJob</from>
-      <to>UpdateTransLog</to>
+      <to>UpdateJobLog</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -790,13 +787,13 @@
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>UpdateTransLog</from>
+      <from>UpdateJobLog</from>
       <to>Abort job</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
+      <evaluation>N</evaluation>
+      <unconditional>Y</unconditional>
     </hop>
   </hops>
   <notepads>

@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.services.reportingmanagement.impl;
 
 import java.sql.Timestamp;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,6 +88,7 @@ public class JobLogDetailsManagementImpl implements JobLogDetailsManagement
         jobLogDetails.setJobName(jobName);
         jobLogDetails.setStatus(status);
         jobLogDetails.setJobStartTime(new Timestamp(System.currentTimeMillis()));
+        jobLogDetails.setJobUuid((UUID.randomUUID()).toString());
         long jobLogId = jobLogDetailsDao.insertJobLog(jobLogDetails);
         LOG.debug( "method to fetch the job-log details for entity, getLastRunForEntity() finished." );
         return jobLogId;
