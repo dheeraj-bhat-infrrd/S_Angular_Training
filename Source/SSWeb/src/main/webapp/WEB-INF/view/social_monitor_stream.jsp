@@ -54,10 +54,34 @@
 <div class="dash-wrapper-main">
 	<div class="dash-container container">
 		<div class="clearfix">
-			<div id="soc-mon-stream-tab" class="soc-mon-tab soc-mon-stream-active"><img id="stream-gray" src="${initParam.resourcesPath}/resources/images/stream-gray.png"  class="hide soc-mon-icns"><img id="stream-blue" src="${initParam.resourcesPath}/resources/images/stream-blue.png" class="soc-mon-icns">Stream</div>
-			<div id="soc-mon-alerts-tab" class="soc-mon-tab"><img id="alert-gray" src="${initParam.resourcesPath}/resources/images/flag.png" class="soc-mon-icns"><img id="alert-yellow" src="${initParam.resourcesPath}/resources/images/flag-yellow.png" class="hide soc-mon-icns">Alerts</div>
-			<div id="soc-mon-escalated-tab" class="soc-mon-tab"><img id="esc-gray" src="${initParam.resourcesPath}/resources/images/escalated-gray.png" class="soc-mon-icns"><img id="esc-orange" src="${initParam.resourcesPath}/resources/images/escalated-orange.png" class="hide soc-mon-icns">Escalations</div>
-			<div id="soc-mon-resolved-tab" class="soc-mon-tab"><img id="res-gray" src="${initParam.resourcesPath}/resources/images/verified-gray.png" class="soc-mon-icns"><img id="res-green" src="${initParam.resourcesPath}/resources/images/verified-green.png" class="hide soc-mon-icns">Resolutions</div>
+			<div id="soc-mon-stream-tab" class="soc-mon-tab soc-mon-stream-active"><img id="stream-inactive" src="${initParam.resourcesPath}/resources/images/stream-gray.png"  class="hide soc-mon-icns"><img id="stream-active" src="${initParam.resourcesPath}/resources/images/stream-blue.png" class="soc-mon-icns">Stream</div>
+			<div id="soc-mon-alerts-tab" class="soc-mon-tab"><img id="alert-inactive" src="${initParam.resourcesPath}/resources/images/flag-gray.png" class="soc-mon-icns"><img id="alert-active" src="${initParam.resourcesPath}/resources/images/flag-yellow.png" class="hide soc-mon-icns">Alerts</div>
+			<div id="soc-mon-escalated-tab" class="soc-mon-tab"><img id="esc-inactive" src="${initParam.resourcesPath}/resources/images/escalated-gray.png" class="soc-mon-icns"><img id="esc-active" src="${initParam.resourcesPath}/resources/images/escalated-orange.png" class="hide soc-mon-icns">Escalations</div>
+			<div id="soc-mon-resolved-tab" class="soc-mon-tab"><img id="res-inactive" src="${initParam.resourcesPath}/resources/images/verified-gray.png" class="soc-mon-icns"><img id="res-active" src="${initParam.resourcesPath}/resources/images/verified-green.png" class="hide soc-mon-icns">Resolutions</div>
+		</div>
+	</div>
+</div>
+
+<div id="soc-mon-stream" class="dash-wrapper-main">
+	<div class="dash-container container">
+		<div class="hm-header-main-wrapper hm-hdr-bord-bot soc-mon-sub-hdr">
+			<div class="container">
+				<div class="hm-header-row clearfix">
+					<div class="hm-header-left text-center float-left">
+						<img id="stream-unchecked" src="${initParam.resourcesPath}/resources/images/check-no.png"  class="float-left stream-checkbox">
+						<img id="stream-checked" src="${initParam.resourcesPath}/resources/images/check-yes.png"  class="hide float-left stream-checkbox">
+						<div id="stream-bulk-actions" class="float-left stream-bulk-actions">
+							<div class="bulk-actions-select">Bulk Actions <img src="${initParam.resourcesPath}/resources/images/chevron-down.png" id="chevron-down" class="float-right bulk-actions-dropdown-img"><img id="chevron-up" src="${initParam.resourcesPath}/resources/images/chevron-up.png" class="hide float-right bulk-actions-dropdown-img"></div>
+							<div id="stream-bulk-action-options" class="hide float-left bulk-actions-options">
+								<div id="stream-bulk-unflag" class="bulk-option">Unflag</div>
+								<div id="stream-bulk-flag" class="bulk-option">Flag</div>
+								<div id="stream-bulk-esc" class="bulk-option">Escalate</div>
+								<div id="stream-bulk-res" class="bulk-option">Resolve</div>	
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 </div>

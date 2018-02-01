@@ -15626,3 +15626,104 @@ function formatAllTimeSlots(dates){
 	}
 	return xAxisData;
 }
+
+/*
+ * Social monitor
+ */
+
+$(document).on('click','#soc-mon-stream-tab',function(e){
+	e.stopPropagation();
+	$('#soc-mon-stream-tab').addClass('soc-mon-stream-active');
+	$('#stream-inactive').hide();
+	$('#stream-active').show();
+	
+	$('#soc-mon-alerts-tab').removeClass('soc-mon-alert-active');
+	$('#alert-inactive').show();
+	$('#alert-active').hide();
+	
+	$('#soc-mon-escalated-tab').removeClass('soc-mon-esc-active');
+	$('#esc-inactive').show();
+	$('#esc-active').hide();
+	
+	$('#soc-mon-resolved-tab').removeClass('soc-mon-res-active');
+	$('#res-inactive').show();
+	$('#res-active').hide();
+	
+});
+
+$(document).on('click','#soc-mon-alerts-tab',function(e){
+	e.stopPropagation();
+	$('#soc-mon-stream-tab').removeClass('soc-mon-stream-active');
+	$('#stream-inactive').show();
+	$('#stream-active').hide();
+	
+	$('#soc-mon-alerts-tab').addClass('soc-mon-alert-active');
+	$('#alert-inactive').hide();
+	$('#alert-active').show();
+	
+	$('#soc-mon-escalated-tab').removeClass('soc-mon-esc-active');
+	$('#esc-inactive').show();
+	$('#esc-active').hide();
+	
+	$('#soc-mon-resolved-tab').removeClass('soc-mon-res-active');
+	$('#res-inactive').show();
+	$('#res-active').hide();
+	
+});
+
+$(document).on('click','#soc-mon-escalated-tab',function(e){
+	e.stopPropagation();
+	$('#soc-mon-stream-tab').removeClass('soc-mon-stream-active');
+	$('#stream-inactive').show();
+	$('#stream-active').hide();
+	
+	$('#soc-mon-alerts-tab').removeClass('soc-mon-alert-active');
+	$('#alert-inactive').show();
+	$('#alert-active').hide();
+	
+	$('#soc-mon-escalated-tab').addClass('soc-mon-esc-active');
+	$('#esc-inactive').hide();
+	$('#esc-active').show();
+	
+	$('#soc-mon-resolved-tab').removeClass('soc-mon-res-active');
+	$('#res-inactive').show();
+	$('#res-active').hide();
+	
+});
+
+$(document).on('click','#soc-mon-resolved-tab',function(e){
+	e.stopPropagation();
+	$('#soc-mon-stream-tab').removeClass('soc-mon-stream-active');
+	$('#stream-inactive').show();
+	$('#stream-active').hide();
+	
+	$('#soc-mon-alerts-tab').removeClass('soc-mon-alert-active');
+	$('#alert-inactive').show();
+	$('#alert-active').hide();
+	
+	$('#soc-mon-escalated-tab').removeClass('soc-mon-esc-active');
+	$('#esc-inactive').show();
+	$('#esc-active').hide();
+	
+	$('#soc-mon-resolved-tab').addClass('soc-mon-res-active');
+	$('#res-inactive').hide();
+	$('#res-active').show();
+	
+});
+
+$(document).on('click','#stream-bulk-actions',function(e){
+	e.stopPropagation();
+	$('#stream-bulk-action-options').toggle();
+	$('#chevron-down').toggle();
+	$('#chevron-up').toggle();
+});
+
+$(document).on('click','#stream-unchecked',function(e){
+	$('#stream-checked').toggle();
+	$('#stream-unchecked').toggle();
+});
+
+$(document).on('click','#stream-checked',function(e){
+	$('#stream-checked').toggle();
+	$('#stream-unchecked').toggle();
+});
