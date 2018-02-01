@@ -373,6 +373,9 @@ public class EmailServicesImpl implements EmailServices
             "Method sendEmailWithSubjectAndBodyReplacements called for emailEntity : {} subjectReplacements : {} and messageBodyReplacements : {}",
             emailEntity, subjectReplacements, messageBodyReplacements );
 
+        // fill in the details if missing
+        fillEmailEntity( emailEntity );
+
         if ( sendMail.equals( CommonConstants.YES_STRING ) ) {
             if ( subjectReplacements == null ) {
                 throw new InvalidInputException( "Email subject file name and replacements are null for sending mail" );

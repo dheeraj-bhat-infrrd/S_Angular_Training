@@ -7,6 +7,12 @@ import org.slf4j.LoggerFactory;
 
 import com.realtech.socialsurvey.compute.dao.FailedMessagesDao;
 import com.realtech.socialsurvey.compute.dao.impl.FailedMessagesDaoImpl;
+import com.realtech.socialsurvey.compute.entities.EmailMessage;
+import com.realtech.socialsurvey.compute.entities.FailedEmailMessage;
+import com.realtech.socialsurvey.compute.entities.FailedReportRequest;
+import com.realtech.socialsurvey.compute.entities.FailedSocialPost;
+import com.realtech.socialsurvey.compute.entities.ReportRequest;
+import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.services.FailedMessagesService;
 import com.realtech.socialsurvey.compute.utils.ThrowableUtils;
 
@@ -45,7 +51,7 @@ public class FailedMessagesServiceImpl implements FailedMessagesService
     }
     
     @Override
-    public void insertPermanentlyFailedSocialPost( SocialPost post, Throwable thrw )
+    public void insertPermanentlyFailedSocialPost( SocialResponseObject<?> post, Throwable thrw )
     {
         LOG.debug( "Adding a failed email message {}", post );
         LOG.trace( "Error encountered: {}", thrw );
@@ -108,6 +114,18 @@ public class FailedMessagesServiceImpl implements FailedMessagesService
         failedReportRequest.setData( reportRequest );
         LOG.debug( "Persisting temporarily failed email messages" );
         failedEmailMessagesDao.insertFailedReportRequest( failedReportRequest );
+    }
+
+    @Override
+    public int deleteFailedEmailMessage(String randomUUID) {
+        LOG.debug("Deleting temporary failed email message with randomUUID {}", randomUUID);
+        return failedEmailMessagesDao.deleteFailedEmailMessage(randomUUID);
+    }
+
+    @Override
+    public int updateFailedEmailMessageRetryCount(String randomUUID) {
+        LOG.debug("Updating failed email message retry count with randonUUID {}", randomUUID);
+        return failedEmailMessagesDao.updatedFailedEmailMessageRetryCount(randomUUID);
     }
 
 }

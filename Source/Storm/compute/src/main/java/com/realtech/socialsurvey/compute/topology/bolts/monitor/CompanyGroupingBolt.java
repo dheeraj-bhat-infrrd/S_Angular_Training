@@ -8,7 +8,12 @@ import org.apache.storm.tuple.Tuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.realtech.socialsurvey.compute.entities.SocialPost;
+import com.google.gson.reflect.TypeToken;
+import com.realtech.socialsurvey.compute.entities.SocialResponseType;
+import com.realtech.socialsurvey.compute.entities.response.FacebookFeedData;
+import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
+import com.realtech.socialsurvey.compute.entities.response.TwitterFeedData;
+import com.realtech.socialsurvey.compute.entities.response.linkedin.LinkedinFeedData;
 import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBolt;
 import com.realtech.socialsurvey.compute.utils.ConversionUtils;
 
@@ -31,14 +36,31 @@ public class CompanyGroupingBolt extends BaseComputeBolt
     public void execute( Tuple input )
     {
         if ( LOG.isDebugEnabled() ) {
-            LOG.debug( "Filter :{}", input.getString( 0 ) );
+            LOG.debug( "Filter :{}", input.getValue( 0 ) );
         }
-        SocialPost post = ConversionUtils.deserialize( input.getString( 0 ), SocialPost.class );
+        // Extract response type
+        SocialResponseType socialResponseType = ConversionUtils.deserialize( input.getString( 0 ), SocialResponseType.class );
+
+        SocialResponseObject<?> post = null;
+        // Check and desierialise reponse from social media
+        if ( socialResponseType != null && socialResponseType.getType() != null ) {
+            if ( socialResponseType.getType().equals( "FACEBOOK" ) ) {
+                post = ConversionUtils.deserialize( input.getString( 0 ),
+                    new TypeToken<SocialResponseObject<FacebookFeedData>>() {}.getType() );
+            } else if ( socialResponseType.getType().equals( "TWITTER" ) ) {
+                post = ConversionUtils.deserialize( input.getString( 0 ),
+                    new TypeToken<SocialResponseObject<TwitterFeedData>>() {}.getType() );
+            } else if ( socialResponseType.getType().equals( "LINKEDIN" ) ) {
+                post = ConversionUtils.deserialize( input.getString( 0 ),
+                    new TypeToken<SocialResponseObject<LinkedinFeedData>>() {}.getType() );
+            }
+        }
+
         long companyId = 0L;
         if ( post != null ) {
             companyId = post.getCompanyId();
         }
-        _collector.emit( input, Arrays.asList( companyId, post ) );
+        _collector.emit( input, Arrays.asList( companyId, post, socialResponseType ) );
         _collector.ack( input );
     }
 
@@ -46,6 +68,6 @@ public class CompanyGroupingBolt extends BaseComputeBolt
     @Override
     public void declareOutputFields( OutputFieldsDeclarer declarer )
     {
-        declarer.declare( new Fields( "companyId", "post" ) );
+        declarer.declare( new Fields( "companyId", "post", "type" ) );
     }
 }

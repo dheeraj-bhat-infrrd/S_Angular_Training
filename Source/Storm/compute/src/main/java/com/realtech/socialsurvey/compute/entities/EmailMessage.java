@@ -47,6 +47,7 @@ public class EmailMessage implements Serializable
     protected long regionId;
     protected long agentId;
     protected String agentEmailId;
+    protected boolean isRetried;
 
     public String getRandomUUID()
     {
@@ -278,6 +279,14 @@ public class EmailMessage implements Serializable
         this.agentEmailId = agentEmailId;
     }
 
+    public void setRetried(boolean retried) {
+        isRetried = retried;
+    }
+
+    public boolean isRetried() {
+        return isRetried;
+    }
+
     @Override
     public String toString() {
         return "EmailMessage{" +
@@ -303,6 +312,7 @@ public class EmailMessage implements Serializable
                 ", regionId=" + regionId +
                 ", agentId=" + agentId +
                 ", agentEmailId='" + agentEmailId + '\'' +
+                ", isRetried=" + isRetried +
                 '}';
     }
 }

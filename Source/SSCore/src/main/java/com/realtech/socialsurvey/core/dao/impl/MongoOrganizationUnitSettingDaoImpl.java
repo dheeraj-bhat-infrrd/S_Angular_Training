@@ -490,6 +490,21 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
             + collectionName );
         return tokens;
     }
+    
+    
+    @Override
+    public List<FeedIngestionEntity> fetchSocialMediaTokensForIds(List<Long> ids, String collectionName )
+    {
+        LOG.debug( "Fetching social media tokens from {}", collectionName );
+        List<FeedIngestionEntity> tokens = null;
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_SOCIAL_MEDIA_TOKENS ).exists( true ) );
+        query.addCriteria( Criteria.where( "iden" ).in( ids ) );
+        query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).include( KEY_IDENTIFIER ).exclude( "_id" );
+        tokens = mongoTemplate.find( query, FeedIngestionEntity.class, collectionName );
+        LOG.debug( "Fetched {} items with social media tokens from {}", ( tokens != null ? tokens.size() : "none" ) , collectionName );
+        return tokens;
+    }
 
 
     /*
@@ -1073,6 +1088,21 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         }
         return entityIds;
     }
+    
+    @Override
+    public List<FeedIngestionEntity> getAllCompanyIdWithSocialMediaTokens( String collectionName, int skipCount, int numOfRecords )
+    {
+        LOG.debug( "Fetching social media tokens from " + collectionName );
+        List<FeedIngestionEntity> settings = null;
+
+        Query query = new Query();
+        query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).include( KEY_IDENTIFIER ).exclude( "_id" );
+        
+        settings = mongoTemplate.find( query, FeedIngestionEntity.class, collectionName );
+
+        return settings;
+    }
+    
     
     /**
      * Method to fetch the company ID list who have opted for monthly digest mail

@@ -32,4 +32,16 @@ public interface FailedMessagesDao
      * @return
      */
     boolean insertFailedReportRequest(FailedReportRequest failedReportRequest);
+
+    /**
+     * Deletes failed email message
+     * @param randomUUID
+     */
+    int deleteFailedEmailMessage(String randomUUID);
+
+    /**
+     * Updated failed email message retry count
+     * @param randomUUID
+     */
+    int updatedFailedEmailMessageRetryCount(String randomUUID);
 }
