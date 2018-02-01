@@ -32,6 +32,7 @@ public class FacebookFeedExtractorSpout extends BaseComputeSpout
     private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger( FacebookFeedExtractorSpout.class );
 
+
     private SpoutOutputCollector _collector;
     public boolean isFbCalled;
 
@@ -76,8 +77,11 @@ public class FacebookFeedExtractorSpout extends BaseComputeSpout
                             LOG.debug( "response  : ", response.get() );
                             for ( FacebookFeedData fbResponse : response.get().getData() ) {
 
-                                SocialResponseObject<FacebookFeedData> responseWrapper = new SocialResponseObject<>( companyId,
-                                    SocialFeedType.FACEBOOK, fbResponse.getMessage(), fbResponse );
+
+                                SocialResponseObject<FacebookFeedData> responseWrapper = new SocialResponseObject<>(
+                                        companyId, SocialFeedType.FACEBOOK, fbResponse.getMessage(), fbResponse, 1 );
+
+                                responseWrapper.setHash( responseWrapper.getText().hashCode() );
 
                                 Gson gson = new Gson();
 
@@ -106,7 +110,7 @@ public class FacebookFeedExtractorSpout extends BaseComputeSpout
         //TODO Get it from redis;
         String after = null;
         long since = 0L, until = 0L;
-    
+
         if ( after == null || after.isEmpty() ) {
             Calendar cal = Calendar.getInstance();
             cal.add( Calendar.DAY_OF_YEAR, -10 );
@@ -119,6 +123,7 @@ public class FacebookFeedExtractorSpout extends BaseComputeSpout
     
         List<FacebookFeedData> feeds = new ArrayList<>();
     
+
         if ( response.isPresent() ) {
             feeds.addAll( response.get().getData() );
             
@@ -128,7 +133,6 @@ public class FacebookFeedExtractorSpout extends BaseComputeSpout
                 
             }
         } 
-    
         return feeds;
     }*/
 

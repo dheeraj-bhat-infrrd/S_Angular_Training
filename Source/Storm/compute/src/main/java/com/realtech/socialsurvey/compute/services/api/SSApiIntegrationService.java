@@ -29,33 +29,48 @@ public interface SSApiIntegrationService
     @Headers ( "Content-Type: application/json")
     @GET ( "v1/companies/{companyId}/keywords")
     Call<List<Keyword>> getKeywordsForCompanyId( @Path ( "companyId") long companyId );
-    
+
+
     @Headers ( "Content-Type: application/json")
     @GET ( "v1/companies/mediatokens")
     Call<List<SocialMediaTokenResponse>> getMediaTokens();
 
-    @Headers ( "Content-Type: application/json")
-    @POST ( "v1/feeds")
-    Call<SocialResponseObject<FacebookFeedData>> saveSocialFeed( @Body SocialResponseObject<FacebookFeedData> socialPostToMongo );
 
     @Headers ( "Content-Type: application/json")
     @POST ( "v1/feeds")
-    Call<SocialResponseObject<TwitterFeedData>> saveTwitterFeed(@Body SocialResponseObject<TwitterFeedData> socialPostToMongo );
-    
+    Call<SocialResponseObject<FacebookFeedData>> saveSocialFeed(
+        @Body SocialResponseObject<FacebookFeedData> socialPostToMongo );
+
+
     @Headers ( "Content-Type: application/json")
     @POST ( "v1/feeds")
-    Call<SocialResponseObject<LinkedinFeedData>> saveLinkedinFeed(@Body SocialResponseObject<LinkedinFeedData> socialPostToMongo );
+    Call<SocialResponseObject<TwitterFeedData>> saveTwitterFeed(
+        @Body SocialResponseObject<TwitterFeedData> socialPostToMongo );
+
 
     @Headers ( "Content-Type: application/json")
-    @PUT( "v1/fileUpload/{fileUploadId}/status/{status}" )
-    Call<FileUploadResponse> updateFileUploadStatus(@Path("fileUploadId") long fileUploadId,
-                                                    @Path("status") int status);
+    @POST ( "v1/feeds")
+    Call<SocialResponseObject<LinkedinFeedData>> saveLinkedinFeed(
+        @Body SocialResponseObject<LinkedinFeedData> socialPostToMongo );
+
 
     @Headers ( "Content-Type: application/json")
-    @POST( "v1/fileUpload/{fileUploadId}/status/{status}" )
-    Call<FileUploadResponse> updateFileUploadStatusAndLocation(@Path("fileUploadId") long fileUploadId,
-                                                               @Path("status") int status,
-                                                               @Body String fileName);
+    @PUT ( "v1/fileUpload/{fileUploadId}/status/{status}")
+    Call<FileUploadResponse> updateFileUploadStatus( @Path ( "fileUploadId") long fileUploadId, @Path ( "status") int status );
 
-    
+
+    @Headers ( "Content-Type: application/json")
+    @POST ( "v1/fileUpload/{fileUploadId}/status/{status}")
+    Call<FileUploadResponse> updateFileUploadStatusAndLocation( @Path ( "fileUploadId") long fileUploadId,
+        @Path ( "status") int status, @Body String fileName );
+
+
+    @GET ( "v1/feeds/hash/{hash}/companyId/{companyId}")
+    Call<Long> getDuplicateCount( @Path ( "hash") int hash, @Path ( "companyId") long companyId );
+
+
+    @Headers ( "Content-Type: application/json")
+    @PUT ( "v1/feeds/hash/{hash}/companyId/{companyId}/duplicateCount/{duplicateCount}")
+    Call<Long> updateDuplicateCount( @Path ( "hash") int hash, @Path ( "companyId") long companyId,
+        @Path ( "duplicateCount") long duplicateCount );
 }

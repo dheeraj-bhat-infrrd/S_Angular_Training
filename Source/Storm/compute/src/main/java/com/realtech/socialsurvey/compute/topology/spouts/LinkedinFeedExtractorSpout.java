@@ -70,20 +70,23 @@ public class LinkedinFeedExtractorSpout extends BaseComputeSpout
 
                         //Call facebook api to get facebook page post.
                         Optional<LinkedinFeedResponse> response = LinkedinAPIOperations.getInstance().fetchFeeds( "2414183", 0,
+
                             100, null, accessToken );
                         if ( response.isPresent() ) {
                             IS_LNCALLED = true;
                             LOG.debug( "response  : ", response.get() );
-                            for ( LinkedinFeedData fbResponse : response.get().getValues() ) {
+                            for ( LinkedinFeedData linkedInResponse : response.get().getValues() ) {
                                 String text = "";
-                                if ( fbResponse.getUpdateContent() != null
-                                    && fbResponse.getUpdateContent().getCompanyStatusUpdate() != null
-                                    && fbResponse.getUpdateContent().getCompanyStatusUpdate().getShare() != null ) {
-                                    text = fbResponse.getUpdateContent().getCompanyStatusUpdate().getShare().getComment();
+                                if ( linkedInResponse.getUpdateContent() != null
+                                    && linkedInResponse.getUpdateContent().getCompanyStatusUpdate() != null
+                                    && linkedInResponse.getUpdateContent().getCompanyStatusUpdate().getShare() != null ) {
+                                    text = linkedInResponse.getUpdateContent().getCompanyStatusUpdate().getShare().getComment();
                                 }
 
                                 SocialResponseObject<LinkedinFeedData> responseWrapper = new SocialResponseObject<>( companyId,
-                                    SocialFeedType.LINKEDIN, text, fbResponse );
+                                    SocialFeedType.LINKEDIN, text, linkedInResponse, 1 );
+                                responseWrapper.setHash( responseWrapper.getText().hashCode() );
+
                                 Gson gson = new Gson();
 
                                 String responseWrapperString = gson.toJson( responseWrapper );
@@ -111,5 +114,4 @@ public class LinkedinFeedExtractorSpout extends BaseComputeSpout
     {
         declarer.declare( new Fields( "companyId", "post" ) );
     }
-
 }

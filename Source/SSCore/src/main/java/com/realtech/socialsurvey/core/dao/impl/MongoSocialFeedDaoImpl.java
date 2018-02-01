@@ -5,8 +5,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
+import com.mongodb.WriteResult;
 import com.realtech.socialsurvey.core.dao.MongoSocialFeedDao;
 import com.realtech.socialsurvey.core.entities.SocialResponseObject;
 
@@ -22,6 +26,9 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 
     public static final String SOCIAL_FEED_COLLECTION = "SOCIAL_FEED_COLLECTION";
     public static final String KEY_IDENTIFIER = "_id";
+    private static final String HASH = "hash";
+    private static final String COMPANY_ID = "companyId";
+    private static final String DUPLICATE_COUNT = "duplicateCount";
 
     @Override
     public void insertSocialFeed( SocialResponseObject<?> socialFeed, String collectionName )
@@ -33,6 +40,27 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 
         mongoTemplate.insert( socialFeed, collectionName );
         LOG.debug( "Inserted into {}", collectionName );
+    }
+
+    @Override
+    public long getDuplicatePostsCount(int hash, long companyId) {
+        if(LOG.isDebugEnabled()){
+            LOG.debug("Fetching count of duplicate posts with hash = {} and companyId = {}", hash, companyId);
+        }
+        Query query = new  Query();
+        query.addCriteria(Criteria.where(HASH).is(hash).and(COMPANY_ID).is(companyId));
+        return mongoTemplate.count(query, SOCIAL_FEED_COLLECTION);
+    }
+
+    @Override
+    public long updateDuplicateCount(int hash, long companyId, long duplicateCount) {
+        if(LOG.isDebugEnabled()) {
+            LOG.debug("Updating posts with duplicateCount {} having hash = {} ");
+        }
+        Query query = new Query().addCriteria(Criteria.where(HASH).is(hash).and(COMPANY_ID).is(companyId));
+        Update update = new Update().set(DUPLICATE_COUNT, duplicateCount);
+        WriteResult result = mongoTemplate.updateMulti(query, update, SOCIAL_FEED_COLLECTION);
+        return result.getN();
     }
 
 

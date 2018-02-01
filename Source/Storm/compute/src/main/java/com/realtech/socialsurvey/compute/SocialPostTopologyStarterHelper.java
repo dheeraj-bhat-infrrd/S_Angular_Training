@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.compute;
 
+import com.realtech.socialsurvey.compute.topology.bolts.monitor.UpdateSocialPostDupliateCountBolt;
 import org.apache.storm.Config;
 import org.apache.storm.generated.StormTopology;
 import org.apache.storm.topology.TopologyBuilder;
@@ -77,6 +78,8 @@ public class SocialPostTopologyStarterHelper extends TopologyStarterHelper
         builder.setBolt( "FilterSocialPostBolt", new FilterSocialPostBolt(), 1 ).fieldsGrouping( "CompanyGroupingBolt",
             new Fields( "companyId" ) );
         builder.setBolt( "SaveFeedsToMongoBolt", new SaveFeedsToMongoBolt(), 1 ).shuffleGrouping( "FilterSocialPostBolt" );
+        builder.setBolt("updateSocialPostDuplicateCount", new UpdateSocialPostDupliateCountBolt(), 1)
+                .shuffleGrouping("SaveFeedsToMongoBolt");
         return builder.createTopology();
     }
 

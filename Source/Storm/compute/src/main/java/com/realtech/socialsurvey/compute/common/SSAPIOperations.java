@@ -42,7 +42,8 @@ public class SSAPIOperations
         }
         return apiOperations;
     }
-    
+
+
     /**
      * Get keyword for company id
      * @param companyId
@@ -51,50 +52,52 @@ public class SSAPIOperations
     public Optional<List<Keyword>> getKeywordsForCompany( long companyId )
     {
         LOG.info( "Executing getKeywordsForCompany method." );
-        Call<List<Keyword>> requestCall = RetrofitApiBuilder.apiBuilderInstance()
-            .getSSAPIIntergrationService().getKeywordsForCompanyId( companyId );
+        Call<List<Keyword>> requestCall = RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationService()
+            .getKeywordsForCompanyId( companyId );
         try {
             Response<List<Keyword>> response = requestCall.execute();
             RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
             if ( LOG.isTraceEnabled() ) {
                 LOG.trace( "getKeywordsForCompany response {}", response.body() );
             }
-            return Optional.of(response.body());
+            return Optional.of( response.body() );
         } catch ( IOException | APIIntergrationException e ) {
             LOG.error( "getKeywordsForCompany IOException/ APIIntergrationException caught", e );
             return Optional.empty();
         }
     }
-    
+
+
     /**
      * Get keyword for company id
      * @param companyId
      * @return
      */
-    public Optional<List<SocialMediaTokenResponse>> getMediaTokens( )
+    public Optional<List<SocialMediaTokenResponse>> getMediaTokens()
     {
         LOG.info( "Executing getMediaTokens method." );
-        Call<List<SocialMediaTokenResponse>> requestCall = RetrofitApiBuilder.apiBuilderInstance()
-            .getSSAPIIntergrationService().getMediaTokens();
+        Call<List<SocialMediaTokenResponse>> requestCall = RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationService()
+            .getMediaTokens();
         try {
             Response<List<SocialMediaTokenResponse>> response = requestCall.execute();
             RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
             if ( LOG.isTraceEnabled() ) {
                 LOG.trace( "getMediaTokens response {}", response.body() );
             }
-            return Optional.of(response.body());
+            return Optional.of( response.body() );
         } catch ( IOException | APIIntergrationException e ) {
             LOG.error( "getMediaTokens IOException/ APIIntergrationException caught", e );
             return Optional.empty();
         }
     }
-    
+
+
     /**
      * Save feed api call
      * @param companyId
      * @return
      */
-    public boolean saveFeedToMongo(SocialResponseObject<FacebookFeedData> socialPostToMongo )
+    public boolean saveFeedToMongo( SocialResponseObject<FacebookFeedData> socialPostToMongo )
     {
         LOG.info( "Executing saveFeedToMongo method." );
         Call<SocialResponseObject<FacebookFeedData>> requestCall = RetrofitApiBuilder.apiBuilderInstance()
@@ -130,7 +133,8 @@ public class SSAPIOperations
             return false;
         }
     }
-    
+
+
     public boolean saveLinkedinFeedToMongo( SocialResponseObject<LinkedinFeedData> socialPostToMongo )
     {
         LOG.info( "Executing saveFeedToMongo method." );
@@ -146,6 +150,44 @@ public class SSAPIOperations
         } catch ( IOException | APIIntergrationException e ) {
             LOG.error( "saveTwitterFeedToMongo IOException/ APIIntergrationException caught", e );
             return false;
+        }
+    }
+
+
+    public Optional<Long> getSocialPostDuplicateCount( int hash, long comapnyId )
+    {
+        LOG.info( "Executing getSocialPostDuplicateCount method" );
+        Call<Long> requestCall = RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationService().getDuplicateCount( hash,
+            comapnyId );
+        try {
+            Response<Long> response = requestCall.execute();
+            RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
+            if ( LOG.isTraceEnabled() ) {
+                LOG.trace( "getSocialPostDuplicateCount response {}", response.body() );
+            }
+            return Optional.of( response.body() );
+        } catch ( APIIntergrationException | IOException e ) {
+            LOG.error( "getSocialPostDuplicateCount IOException/ APIIntergrationException caught ", e );
+            return Optional.empty();
+        }
+    }
+
+
+    public Optional<Long> updateSocialPostDuplicateCount( int hash, long comapnyId, long duplicateCount )
+    {
+        LOG.info( "Executing updateSocialPostDuplicateCount method" );
+        Call<Long> requestCall = RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationService()
+            .updateDuplicateCount( hash, comapnyId, duplicateCount );
+        try {
+            Response<Long> response = requestCall.execute();
+            RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
+            if ( LOG.isTraceEnabled() ) {
+                LOG.trace( "updateSocialPostDuplicateCount response {}", response.body() );
+            }
+            return Optional.of( response.body() );
+        } catch ( APIIntergrationException | IOException e ) {
+            LOG.error( "updateSocialPostDuplicateCount IOException/ APIIntergrationException caught ", e );
+            return Optional.empty();
         }
     }
 }

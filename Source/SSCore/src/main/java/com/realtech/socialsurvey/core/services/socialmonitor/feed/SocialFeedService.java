@@ -16,4 +16,21 @@ public interface SocialFeedService
      * @throws InvalidInputException 
      */
     public SocialResponseObject<?> saveFeed(SocialResponseObject<?> socialFeed) throws InvalidInputException;
+
+    /**
+     * Gets the count of all duplicate social posts
+     * @param hash
+     * @param companyId
+     * @return
+     */
+    long getDuplicatePostsCount(int hash, long companyId) throws InvalidInputException;
+
+    /**
+     * Updates all posts matching given hash and companyId with the given duplicateCount
+     * @param hash
+     * @param companyId
+     * @param duplicateCount
+     * @return
+     */
+    long updateDuplicateCount(int hash, long companyId, long duplicateCount) throws InvalidInputException;
 }

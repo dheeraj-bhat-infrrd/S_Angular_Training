@@ -7,7 +7,6 @@ import java.util.List;
 import com.realtech.socialsurvey.compute.enums.SocialFeedStatus;
 import com.realtech.socialsurvey.compute.enums.SocialFeedType;
 
-
 /**
  * @author manish
  *
@@ -22,12 +21,13 @@ public class SocialResponseObject<T> implements Serializable
     {}
 
 
-    public SocialResponseObject( long companyId, SocialFeedType type, String text, T response )
+    public SocialResponseObject( long companyId, SocialFeedType type, String text, T response, long duplicateCount )
     {
+        this.companyId = companyId;
         this.type = type;
         this.text = text;
-        this.companyId = companyId;
         this.response = response;
+        this.duplicateCount = duplicateCount;
     }
 
 
@@ -47,9 +47,11 @@ public class SocialResponseObject<T> implements Serializable
     private long regionId;
     private long branchId;
     private long agentId;
+
+    private int hash;
+    private long duplicateCount;
     private List<String> foundKeywords;
     private List<ActionHistory> actionHistory;
-
 
     public T getResponse()
     {
@@ -60,91 +62,6 @@ public class SocialResponseObject<T> implements Serializable
     public void setResponse( T response )
     {
         this.response = response;
-    }
-    
-    
-
-    public long getCompanyId()
-    {
-        return companyId;
-    }
-
-
-    public void setCompanyId( long companyId )
-    {
-        this.companyId = companyId;
-    }
-
-
-    public boolean isFlagged()
-    {
-        return flagged;
-    }
-
-
-    public void setFlagged( boolean flagged )
-    {
-        this.flagged = flagged;
-    }
-
-
-    public long getRegionId()
-    {
-        return regionId;
-    }
-
-
-    public long getBranchId()
-    {
-        return branchId;
-    }
-
-
-    public long getAgentId()
-    {
-        return agentId;
-    }
-
-
-    public void setRegionId( long regionId )
-    {
-        this.regionId = regionId;
-    }
-
-
-    public void setBranchId( long branchId )
-    {
-        this.branchId = branchId;
-    }
-
-
-    public void setAgentId( long agentId )
-    {
-        this.agentId = agentId;
-    }
-
-
-    public String getText()
-    {
-        return text;
-    }
-
-
-    public List<String> getFoundKeywords()
-    {
-        return foundKeywords;
-    }
-
-
-    public void setText( String text )
-    {
-        this.text = text;
-    }
-
-
-    public void setFoundKeywords( List<String> foundKeywords )
-    {
-        this.foundKeywords = foundKeywords;
     }
 
 
@@ -160,54 +77,6 @@ public class SocialResponseObject<T> implements Serializable
     }
 
 
-    public String getPicture()
-    {
-        return picture;
-    }
-
-
-    public Timestamp getUpdatedTime()
-    {
-        return updatedTime;
-    }
-
-
-    public String getOwnerName()
-    {
-        return ownerName;
-    }
-
-
-    public List<ActionHistory> getActionHistory()
-    {
-        return actionHistory;
-    }
-
-
-    public void setPicture( String picture )
-    {
-        this.picture = picture;
-    }
-
-
-    public void setUpdatedTime( Timestamp updatedTime )
-    {
-        this.updatedTime = updatedTime;
-    }
-
-
-    public void setOwnerName( String ownerName )
-    {
-        this.ownerName = ownerName;
-    }
-
-
-    public void setActionHistory( List<ActionHistory> actionHistory )
-    {
-        this.actionHistory = actionHistory;
-    }
-
-
     public String getPostId()
     {
         return postId;
@@ -218,18 +87,56 @@ public class SocialResponseObject<T> implements Serializable
     {
         this.postId = postId;
     }
-    
-    public SocialFeedStatus getStatus()
+
+
+    public String getText()
     {
-        return status;
+        return text;
     }
 
 
-    public void setStatus( SocialFeedStatus status )
+    public void setText( String text )
     {
-        this.status = status;
+        this.text = text;
     }
-    
+
+
+    public String getPicture()
+    {
+        return picture;
+    }
+
+
+    public void setPicture( String picture )
+    {
+        this.picture = picture;
+    }
+
+
+    public Timestamp getUpdatedTime()
+    {
+        return updatedTime;
+    }
+
+
+    public void setUpdatedTime( Timestamp updatedTime )
+    {
+        this.updatedTime = updatedTime;
+    }
+
+
+    public String getOwnerName()
+    {
+        return ownerName;
+    }
+
+
+    public void setOwnerName( String ownerName )
+    {
+        this.ownerName = ownerName;
+    }
+
+
     public SocialFeedType getType()
     {
         return type;
@@ -241,13 +148,134 @@ public class SocialResponseObject<T> implements Serializable
         this.type = type;
     }
 
+
+    public boolean isFlagged()
+    {
+        return flagged;
+    }
+
+
+    public void setFlagged( boolean flagged )
+    {
+        this.flagged = flagged;
+    }
+
+
+    public SocialFeedStatus getStatus()
+    {
+        return status;
+    }
+
+
+    public void setStatus( SocialFeedStatus status )
+    {
+        this.status = status;
+    }
+
+
+    public long getCompanyId()
+    {
+        return companyId;
+    }
+
+
+    public void setCompanyId( long companyId )
+    {
+        this.companyId = companyId;
+    }
+
+
+    public long getRegionId()
+    {
+        return regionId;
+    }
+
+
+    public void setRegionId( long regionId )
+    {
+        this.regionId = regionId;
+    }
+
+
+    public long getBranchId()
+    {
+        return branchId;
+    }
+
+
+    public void setBranchId( long branchId )
+    {
+        this.branchId = branchId;
+    }
+
+
+    public long getAgentId()
+    {
+        return agentId;
+    }
+
+
+    public void setAgentId( long agentId )
+    {
+        this.agentId = agentId;
+    }
+
+
+    public int getHash()
+    {
+        return hash;
+    }
+
+
+    public void setHash( int hash )
+    {
+        this.hash = hash;
+    }
+
+
+    public long getDuplicateCount()
+    {
+        return duplicateCount;
+    }
+
+
+    public void setDuplicateCount( long duplicateCount )
+    {
+        this.duplicateCount = duplicateCount;
+    }
+
+
+    public List<String> getFoundKeywords()
+    {
+        return foundKeywords;
+    }
+
+
+    public void setFoundKeywords( List<String> foundKeywords )
+    {
+        this.foundKeywords = foundKeywords;
+    }
+
+
+    public List<ActionHistory> getActionHistory()
+    {
+        return actionHistory;
+    }
+
+
+    public void setActionHistory( List<ActionHistory> actionHistory )
+    {
+        this.actionHistory = actionHistory;
+    }
+
+
     @Override
     public String toString()
     {
         return "SocialResponseObject [id=" + id + ", postId=" + postId + ", text=" + text + ", picture=" + picture
             + ", updatedTime=" + updatedTime + ", ownerName=" + ownerName + ", response=" + response + ", type=" + type
             + ", flagged=" + flagged + ", status=" + status + ", companyId=" + companyId + ", regionId=" + regionId
-            + ", branchId=" + branchId + ", agentId=" + agentId + ", foundKeywords=" + foundKeywords + ", actionHistory="
-            + actionHistory + "]";
+            + ", branchId=" + branchId + ", agentId=" + agentId + ", hash=" + hash + ", duplicateCount=" + duplicateCount
+            + ", foundKeywords=" + foundKeywords + ", actionHistory=" + actionHistory + "]";
     }
 }
