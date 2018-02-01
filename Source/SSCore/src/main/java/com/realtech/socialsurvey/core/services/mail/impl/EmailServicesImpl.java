@@ -1416,7 +1416,7 @@ public class EmailServicesImpl implements EmailServices
 
     @Async
     @Override
-    public  void sendSurveyRelatedMail(OrganizationUnitSettings companySettings, User user, String agentName, String agentPhone,
+    public  void sendSurveyRelatedMail(OrganizationUnitSettings companySettings, User user, String agentName, String agentFirstName, String agentPhone,
                                        String agentTitle, String surveyLink, String logoUrl, String customerFirstName,
                                        String customerLastName, String customerEmailId, String emailType, String senderName,
                                        String senderEmailAddress, String mailSubject, String mailBody, AgentSettings agentSettings,
@@ -1465,14 +1465,14 @@ public class EmailServicesImpl implements EmailServices
 
         //replace legends
         mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, appBaseUrl, logoUrl, shortSurveyLink,
-                customerFirstName, customerLastName, agentName, agentSignature,customerEmailId,
+                customerFirstName, customerLastName, agentName, agentFirstName,  agentSignature,customerEmailId,
                 user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "",
-                user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
+                user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone );
 
         mailBody = emailFormatHelper.replaceLegends( false, mailBody, appBaseUrl, logoUrl, shortSurveyLink,
-                customerFirstName, customerLastName, agentName, agentSignature, customerEmailId,
+                customerFirstName, customerLastName, agentName, agentFirstName, agentSignature, customerEmailId,
                 user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "",
-                user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
+                user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone );
 
         //send the email
         if ( mailSubject == null || mailSubject.isEmpty() ) {
@@ -2334,7 +2334,7 @@ public class EmailServicesImpl implements EmailServices
 
     @Override
     public void sendManualSurveyReminderMail( OrganizationUnitSettings companySettings, User user, String agentName,
-        String agentEmailId, String agentPhone, String agentTitle, String companyName, SurveyPreInitiation survey,
+        String agentFirstName, String agentEmailId, String agentPhone, String agentTitle, String companyName, SurveyPreInitiation survey,
         String surveyLink, String logoUrl, String agentDisclaimer, String agentLicenses ) throws InvalidInputException
     {
         LOG.debug( "Sending manual survey reminder mail." );
@@ -2396,14 +2396,14 @@ public class EmailServicesImpl implements EmailServices
 
         //replace legends
         mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, appBaseUrl, logoUrl, shortSurveyLink,
-            survey.getCustomerFirstName(), survey.getCustomerLastName(), agentName, agentSignature, survey.getCustomerEmailId(),
+            survey.getCustomerFirstName(), survey.getCustomerLastName(), agentName, agentFirstName, agentSignature, survey.getCustomerEmailId(),
             user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "",
-            user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
+            user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone );
 
         mailBody = emailFormatHelper.replaceLegends( false, mailBody, appBaseUrl, logoUrl, shortSurveyLink,
-            survey.getCustomerFirstName(), survey.getCustomerLastName(), agentName, agentSignature, survey.getCustomerEmailId(),
+            survey.getCustomerFirstName(), survey.getCustomerLastName(), agentName, agentFirstName, agentSignature, survey.getCustomerEmailId(),
             user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "",
-            user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
+            user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone );
         //JIRA SS-473 end
         //send mail
         if ( mailSubject == null || mailSubject.isEmpty() ) {
@@ -2750,7 +2750,7 @@ public class EmailServicesImpl implements EmailServices
         messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, recipientName, body ) );
 
         LOG.trace( "Calling email sender to send mail" );
-        sendEmailWithSubjectAndBodyReplacements( emailEntity, messageSubjectReplacements, messageBodyReplacements, false,
+        sendEmailWithSubjectAndBodyReplacements( emailEntity, messageSubjectReplacements, messageBodyReplacements, true,
             false );
 
         LOG.debug( "Method sendCustomReportMail() finished." );

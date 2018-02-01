@@ -90,7 +90,7 @@ public class EncompassController extends AbstractController
             LOG.error( "An exception occured while fetching the list of companies connected to encompass. Reason : " + e );
             throw new InternalServerException( new EncompassErrorCode(
                 CommonConstants.ERROR_CODE_ENCOMPASS_COMPANY_FETCH_FAILURE, CommonConstants.SERVICE_CODE_COMPANY_CRM_INFO,
-                "Error occured while fetching companies connected to encompass" ), e.getMessage() );
+                "Error occured while fetching companies connected to encompass" ), e.getMessage(), e );
         }
         LOG.info( "Method to get the encompass credentials for all companies finished." );
         return crmInfoList;
@@ -168,15 +168,15 @@ public class EncompassController extends AbstractController
                 LOG.error( "An error occured while testing encompass credentials. Reason : " + e.getMessage() );
                 throw new InternalServerException( new EncompassErrorCode( CommonConstants.ERROR_CODE_GENERAL,
                     CommonConstants.SERVICE_CODE_GENERAL, "Exception occured while testing connection" ),
-                    "Unable to connect to encompass server at the moment" );
+                    "Unable to connect to encompass server at the moment" , e );
             } catch ( HttpServerErrorException e ) {
                 LOG.error( "An error occured while testing encompass credentials. Reason : " + e.getMessage() );
                 throw new InternalServerException( new EncompassErrorCode( CommonConstants.ERROR_CODE_GENERAL,
                     CommonConstants.SERVICE_CODE_GENERAL, "Exception occured while testing connection" ),
-                    "Unable to connect to encompass server at the moment" );
+                    "Unable to connect to encompass server at the moment", e );
             } catch ( Exception e ) {
                 throw new InternalServerException( new EncompassErrorCode( CommonConstants.ERROR_CODE_GENERAL,
-                    CommonConstants.SERVICE_CODE_GENERAL, "Exception occured while testing connection" ), e.getMessage() );
+                    CommonConstants.SERVICE_CODE_GENERAL, "Exception occured while testing connection" ), e.getMessage(), e );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );

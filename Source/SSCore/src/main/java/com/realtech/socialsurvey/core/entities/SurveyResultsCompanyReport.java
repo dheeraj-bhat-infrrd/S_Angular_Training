@@ -104,6 +104,13 @@ public class SurveyResultsCompanyReport implements Serializable {
     
     @Column(name = "CUSTOMER_EMAIL_ID")
     private String customerEmailId;
+    
+    //SS-1486
+    @Column(name = "STATE")
+    private String state;
+    
+    @Column(name = "CITY")
+    private String city;
   
 	public String getSurveyStatsReportId() {
 		return surveyStatsReportId;
@@ -338,6 +345,27 @@ public class SurveyResultsCompanyReport implements Serializable {
         this.customerEmailId = customerEmailId;
     }
 
+    
+    public String getState()
+    {
+        return state;
+    }
+
+    public void setState( String state )
+    {
+        this.state = state;
+    }
+
+    public String getCity()
+    {
+        return city;
+    }
+
+    public void setCity( String city )
+    {
+        this.city = city;
+    }
+
     @Override
     public String toString()
     {
@@ -351,7 +379,8 @@ public class SurveyResultsCompanyReport implements Serializable {
             + ", clickTroughForAgent=" + clickTroughForAgent + ", clickTroughForRegion=" + clickTroughForRegion
             + ", clickTroughForBranch=" + clickTroughForBranch + ", reportModifiedOn=" + reportModifiedOn + ", isDeleted="
             + isDeleted + ", surveyResponseList=" + surveyResponseList + ", participantType=" + participantType
-            + ", agentEmailId=" + agentEmailId + ", customerEmailId=" + customerEmailId + "]";
+            + ", agentEmailId=" + agentEmailId + ", customerEmailId=" + customerEmailId + ", state=" + state + ", city=" + city
+            + "]";
     }
 
 	

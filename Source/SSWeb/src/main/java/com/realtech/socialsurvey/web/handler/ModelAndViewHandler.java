@@ -161,7 +161,7 @@ public class ModelAndViewHandler
             throw new InternalServerException(
                 new ProfileServiceErrorCode( errorCode, serviceId, "InvalidInputException occured while fetching "
                     + profileAggregate.getProfileLevel() + " profile: " + profileAggregate.getProfileName() ),
-                error.getMessage() );
+                error.getMessage(), error );
 
         } else if ( error instanceof InvalidSettingsStateException ) {
 
@@ -170,7 +170,7 @@ public class ModelAndViewHandler
             throw new InternalServerException(
                 new ProfileServiceErrorCode( errorCode, serviceId, "InvalidSettingsStateException occured while fetching "
                     + profileAggregate.getProfileLevel() + " profile: " + profileAggregate.getProfileName() ),
-                error.getMessage() );
+                error.getMessage(), error );
 
         } else if ( error instanceof ProfileNotFoundException ) {
 
@@ -195,7 +195,7 @@ public class ModelAndViewHandler
             throw new InternalServerException(
                 new ProfileServiceErrorCode( errorCode, serviceId, "Unknown Error occured while fetching "
                     + profileAggregate.getProfileLevel() + " profile:  " + profileAggregate.getProfileName() ),
-                error.getMessage() );
+                error.getMessage(), error );
         }
 
 

@@ -1558,10 +1558,14 @@ public interface CommonConstants
     public static final String STATUS_DUMMY = "Dummy";
     public static final String STATUS_FINISHED = "Finished";
 
-    public static final String TIMEZONE_EST = "EST";
+    public static final String TIMEZONE_EST = "GMT-5:00";
     
     //retake request 
     //Constants for survey request send type
     public static final String RETAKE_REQUEST_AGENT = "agent";
     public static final String RETAKE_REQUEST_CUSTOMER = "customer";
+    
+    public static final String SURVEY_RESPONSE_QUESTION = "surveyResponse.question";
+    public static final String SURVEY_RESPONSE_QUESTION_TYPE = "surveyResponse.questionType";
+    public static final String QUESTION_TYPE_MCQ = "sb-sel-mcq";
 }

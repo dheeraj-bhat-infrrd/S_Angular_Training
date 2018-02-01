@@ -1,5 +1,9 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +42,8 @@ public class GlobalErrorController
     private EmailServices emailServices;
 
     private MessageUtils messageUtils;
+    
+    private static final Pattern SS_STACKTRACE_PATTERN = Pattern.compile( "(com.realtech.socialsurvey.*)" );
     
     @Value("${WEB_EXCEPTION_REPORTING_ADDRESS}")
     private String webExceptionReportingEmailAddress;
@@ -128,6 +134,16 @@ public class GlobalErrorController
         LOG.error("==============> Unhandled Exception <==============", thrw);
         /*LOG.info( "Sending failure mail to recpient : {}", webExceptionReportingEmailAddress );
         String stackTrace = ExceptionUtils.getFullStackTrace( thrw );
+        Matcher matcher = SS_STACKTRACE_PATTERN.matcher(stackTrace);      
+        StringBuilder sb = new StringBuilder("<pre>");   
+        while (matcher.find()) {
+            sb.append( "<b>" );
+            sb.append(matcher.group(0));
+            sb.append( "</b>\n" );
+        }
+        sb.append( "\n" );
+        sb.append( matcher.replaceAll( "<mark>$0</mark>" ) ); 
+        sb.append( "</pre>" );
         try {
             //emailServices.sendWebExceptionEmail( webExceptionReportingEmailAddress, stackTrace );
             LOG.debug( "Failure mail sent to admin." );

@@ -771,6 +771,8 @@ public class WorkbookData
             surveyResultsReportToPopulate.add(row.getValue().getUserFirstName());
             surveyResultsReportToPopulate.add(row.getValue().getUserLastName());
             surveyResultsReportToPopulate.add(row.getValue().getAgentEmailId());
+            surveyResultsReportToPopulate.add(row.getValue().getState());
+            surveyResultsReportToPopulate.add(row.getValue().getCity());
             surveyResultsReportToPopulate.add(row.getValue().getCustomerFirstName());
             surveyResultsReportToPopulate.add(row.getValue().getCustomerLastName());
             surveyResultsReportToPopulate.add(row.getValue().getCustomerEmailId());
@@ -848,6 +850,8 @@ public class WorkbookData
         surveyResultsCompanyReportToPopulate.add( "User First Name" );
         surveyResultsCompanyReportToPopulate.add( "User Last Name" );
         surveyResultsCompanyReportToPopulate.add( "User Email Address" );
+        surveyResultsCompanyReportToPopulate.add( "State" );
+        surveyResultsCompanyReportToPopulate.add( "City" );
         surveyResultsCompanyReportToPopulate.add( "Customer First Name" );
         surveyResultsCompanyReportToPopulate.add( "Customer Last Name" );
         surveyResultsCompanyReportToPopulate.add( "Customer Email Address" );

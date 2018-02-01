@@ -15,8 +15,20 @@ public class BaseRestException extends RuntimeException {
 	protected String debugMessage;
 	protected ErrorCode errorCode;
 	protected int httpCode;
+	protected Throwable thrw;
+	
+	public BaseRestException()
+    {
+        super();
+    }
 
-	public String getMessage() {
+    public BaseRestException( Throwable thrw )
+    {
+        super(thrw);
+        this.thrw = thrw;
+    }
+
+    public String getMessage() {
 		return message;
 	}
 
@@ -39,8 +51,18 @@ public class BaseRestException extends RuntimeException {
 	public void setErrorCode(ErrorCode errorCode) {
 		this.errorCode = errorCode;
 	}
+	
+	public Throwable getThrw()
+    {
+        return thrw;
+    }
 
-	/**
+    public void setThrw( Throwable thrw )
+    {
+        this.thrw = thrw;
+    }
+
+    /**
 	 * Transforms the exception to rest error object that could be sent as a response
 	 * 
 	 * @param httpStatus
@@ -53,6 +75,7 @@ public class BaseRestException extends RuntimeException {
 		restError.setErrorCode(errorCode.getErrorCode());
 		restError.setMessage(errorCode.getMessage());
 		restError.setDebugMessage(debugMessage);
+		restError.setThrw( thrw );
 		return restError;
 	}
 
