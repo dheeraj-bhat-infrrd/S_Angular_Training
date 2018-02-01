@@ -1,5 +1,7 @@
 package com.realtech.socialsurvey.core.services.reportingmanagement.impl;
 
+import java.sql.Timestamp;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,4 +49,46 @@ public class JobLogDetailsManagementImpl implements JobLogDetailsManagement
     }
 
 
+    @Override
+    public boolean getIfEtlIsRunning() throws InvalidInputException
+    {
+        LOG.debug( "method to fetch the etl run status, getIfEtlIsRunning() started." );
+        boolean isRunning = true;
+        JobLogDetails jobLogDetails = jobLogDetailsDao.getJobLogDetailsOfLatestRun();
+        if(!jobLogDetails.getStatus().equals(CommonConstants.STATUS_RUNNING)) {
+        	if(jobLogDetails.getJobName().equals(CommonConstants.REPORTING_JOB_NAME ) || jobLogDetails.getJobName().equals(CommonConstants.USER_RANKING_JOB_NAME) ) {
+        		isRunning = false;
+        	}
+        }
+
+        LOG.debug( "method to fetch the etl run status, getIfEtlIsRunning() finished." );
+        return isRunning;
+    }
+
+    @Override
+    public JobLogDetails getLastRunForEntity( long entityId , String entityType)throws InvalidInputException
+    {
+        LOG.debug( "method to fetch the job-log details for entity, getLastRunForEntity() started." );
+        
+        JobLogDetails jobLogDetails = jobLogDetailsDao.getJobLogDetailsOfLatestRunForEntity(entityId, entityType, CommonConstants.USER_RANKING_JOB_NAME);
+        
+        LOG.debug( "method to fetch the job-log details for entity, getLastRunForEntity() finished." );
+        return jobLogDetails;
+    }
+    
+    //insertJobLog
+    @Override
+    public long insertJobLog(long entityId , String entityType , String jobName , String status)throws InvalidInputException
+    {
+        LOG.debug( "method to fetch the job-log details for entity, getLastRunForEntity() started." );
+        JobLogDetails jobLogDetails = new JobLogDetails();
+        jobLogDetails.setEntityId(entityId);
+        jobLogDetails.setEntityType(entityType);
+        jobLogDetails.setJobName(jobName);
+        jobLogDetails.setStatus(status);
+        jobLogDetails.setJobStartTime(new Timestamp(System.currentTimeMillis()));
+        long jobLogId = jobLogDetailsDao.insertJobLog(jobLogDetails);
+        LOG.debug( "method to fetch the job-log details for entity, getLastRunForEntity() finished." );
+        return jobLogId;
+    }
 }

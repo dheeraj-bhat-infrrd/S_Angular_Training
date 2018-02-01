@@ -1555,8 +1555,14 @@ public interface CommonConstants
 
     //JobLogDetails
     public static final String JOB_LOG_ID = "jobLogId";
+    public static final String JOB_NAME = "jobName";
     public static final String STATUS_DUMMY = "Dummy";
     public static final String STATUS_FINISHED = "Finished";
+    public static final String STATUS_RUNNING = "Running";
+    public static final String CENTRALIZED_JOB_NAME = "CentralizedMainJob";
+    public static final String REPORTING_JOB_NAME = "ReportingMainJob";
+    public static final String USER_RANKING_JOB_NAME = "UserRankingJob";
+    
 
     public static final String TIMEZONE_EST = "EST";
     
