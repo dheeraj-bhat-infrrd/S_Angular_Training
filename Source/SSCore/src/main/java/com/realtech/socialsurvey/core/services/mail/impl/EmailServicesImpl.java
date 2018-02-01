@@ -2488,8 +2488,13 @@ public class EmailServicesImpl implements EmailServices
             Arrays.asList( appLogoUrl, displayName, batchName, lastRunTime, errorMsg, exceptionStackTrace ) );
 
         LOG.trace( "Calling email sender to send mail" );
-        sendEmailWithSubjectAndBodyReplacements( emailEntity, messageSubjectReplacements, messageBodyReplacements, false,
-            false );
+        if ( batchName == CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER ) {
+            sendEmailWithSubjectAndBodyReplacements( emailEntity, messageSubjectReplacements, messageBodyReplacements, false,
+                true );
+        } else {
+            sendEmailWithSubjectAndBodyReplacements( emailEntity, messageSubjectReplacements, messageBodyReplacements, false,
+                false );
+        }
 
         LOG.debug( "Method sendReportBugMailToAdminForExceptionInBatch() finished." );
     }
