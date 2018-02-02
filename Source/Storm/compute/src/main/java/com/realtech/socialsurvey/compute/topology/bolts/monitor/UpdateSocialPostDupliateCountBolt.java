@@ -37,8 +37,6 @@ public class UpdateSocialPostDupliateCountBolt extends BaseComputeBolt {
                     LOG.info(" Total {} docs were successfully updated having hash {} ", updatedPosts.get(), hash);
                 } else
                     LOG.warn("Something went wrong while updating duplicateCount !!! ");
-            } else {
-                LOG.info("No duplicates found for the post with hash = {} ", hash);
             }
         }
         _collector.emit( tuple, new Values(companyId, socialPost));

@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.compute;
 
+import com.realtech.socialsurvey.compute.topology.bolts.KafkaProducerBolt;
 import org.apache.storm.Config;
 import org.apache.storm.generated.StormTopology;
 import org.apache.storm.kafka.bolt.KafkaBolt;
@@ -76,11 +77,9 @@ public class SocialPostExtractorTopologyStarterHelper extends TopologyStarterHel
         builder.setSpout( "TwitterFeedExtractorSpout", new TwitterFeedExtractorSpout(), 1 );
 
         builder.setSpout( "LinkedinFeedExtractorSpout", new LinkedinFeedExtractorSpout(), 1 );
-        // add bolts          
-        KafkaBolt<String, String> kafkaBolt = KafkaBoltBuilder.buildKafkaBolt();
-
-        builder.setBolt( "forwardToKafka", kafkaBolt, 1 ).shuffleGrouping( "TwitterFeedExtractorSpout" )
-            .shuffleGrouping( "FacebookFeedExtractorSpout" ).shuffleGrouping( "LinkedinFeedExtractorSpout" );
+        // add bolts
+        builder.setBolt("KafkaProducerBolt", new KafkaProducerBolt(), 1).shuffleGrouping("LinkedinFeedExtractorSpout")
+                .shuffleGrouping("FacebookFeedExtractorSpout").shuffleGrouping("TwitterFeedExtractorSpout");
 
         return builder.createTopology();
     }
