@@ -84,6 +84,60 @@
 			</div>
 		</div>
 	</div>
+	<div class="dash-container container">
+			<div class="dash-stats-wrapper bord-bot-dc clearfix"  >
+				<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 soc-mon-post-container">
+					<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+						<img id="stream-unchecked-1" src="${initParam.resourcesPath}/resources/images/check-no.png" class="float-left stream-checkbox soc-mon-post-checkbox">
+						<img id="stream-checked-1" src="${initParam.resourcesPath}/resources/images/check-yes.png" class="hide float-left stream-checkbox soc-mon-post-checkbox">
+						<img id="stream-unflagged-icn" src="${initParam.resourcesPath}/resources/images/flag-gray.png" class="float-left soc-mon-post-icn">
+						<img id="stream-flagged-icn" src="${initParam.resourcesPath}/resources/images/flag-yellow.png" class="hide float-left soc-mon-post-icn">
+						<img id="stream-esc-icn" src="${initParam.resourcesPath}/resources/images/escalated-orange.png" class="hide float-left soc-mon-post-icn">
+						<img id="stream-res-icn" src="${initParam.resourcesPath}/resources/images/verified-green.png" class="hide float-left soc-mon-post-icn">
+					</div>
+					<div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 soc-mon-post-details">
+						<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 float-left soc-mon-post-prof-pic-div">
+							<img id="stream-res-icn" src="https://s3-us-west-1.amazonaws.com/agent-survey/dev/userprofilepics/d-f02172c39500454b75eee46f93c5cdc08cc2b2c396cd24325e9fc6436b8bd0e3b5eb57d493124683566073755b907e0e665734b42b3b03ae47073bcb61f5b3a1.jpg" class="hide float-left soc-mon-prof-pic">
+							<img id="stream-res-icn" src="${initParam.resourcesPath}/resources/images/ss-icon-small-facebook.png" class="hide float-left soc-mon-prof-pic-media">
+						</div>
+						<div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 float-left" >
+							<div class="row soc-mon-user-name">
+								Dheeraj D Bhat
+							</div>
+							<div class="row soc-mon-post-media">
+								Facebook Business Page
+							</div>
+							<div class="row soc-mon-post-date">
+								November 23 at 9:01am
+							</div>
+						</div>
+						<div class="col-lg-3 col-md-2 col-sm-2 col-xs-2 float-left soc-mon-post-dup">
+							<img id="stream-unflagged-icn" src="${initParam.resourcesPath}/resources/images/duplicates.png" class="float-left soc-mon-post-dup-icn">
+							<div class="soc-mon-post-dup-num float-left">Manage 15 duplicates</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+					<div class="row">
+						<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">Send Email</div>
+						<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">Private Note</div>
+					</div>
+					<div class="row">
+						<textarea class="form-control" rows="5" id="post-1-textbox"></textarea>
+					</div>
+					<div class="row">
+						<div class="col-lg-7 col-md-7 col-sm-7 col-xs-7">
+							<div id="post-1-macro-dropdown" class="float-left stream-bulk-actions">
+								<div class="">Bulk Actions <img src="${initParam.resourcesPath}/resources/images/chevron-down.png" id="post-1-chevron-down" class="float-right bulk-actions-dropdown-img"><img id="post-1-chevron-up" src="${initParam.resourcesPath}/resources/images/chevron-up.png" class="hide float-right bulk-actions-dropdown-img"></div>
+							</div>
+						</div>
+						<div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
+							
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 </div>
 
 <script>
