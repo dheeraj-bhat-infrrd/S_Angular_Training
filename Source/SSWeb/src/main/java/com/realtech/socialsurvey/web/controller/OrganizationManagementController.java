@@ -92,6 +92,7 @@ import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.services.upload.HierarchyUploadService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
+import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.core.utils.StateLookupExclusionStrategy;
 import com.realtech.socialsurvey.core.vo.SurveyPreInitiationList;
@@ -160,6 +161,8 @@ public class OrganizationManagementController
     @Autowired
     private ReportingDashboardManagement  reportingDashboardManagement;
 
+    @Autowired
+    private EncryptionHelper encryptionHelper;
 
     @Value ( "${CDN_PATH}")
     private String endpoint;
@@ -886,8 +889,8 @@ public class OrganizationManagementController
                 state = CommonConstants.CRM_INFO_PRODUCTION_STATE;
             }
 
-            // TODO : Encrypting the password
-            String cipherPassword = encompassPassword;
+            // encrypting the password
+            String cipherPassword = encryptionHelper.encryptAES( encompassPassword, "" );
 
             OrganizationUnitSettings companySettings = organizationManagementService
                 .getCompanySettings( user.getCompany().getCompanyId() );
@@ -936,7 +939,7 @@ public class OrganizationManagementController
                 "com.realtech.socialsurvey.core.entities.EncompassCrmInfo" );
 
             // set the updated settings value in session with plain password
-            encompassCrmInfo.setCrm_password( cipherPassword );
+            encompassCrmInfo.setCrm_password( encompassPassword );
             companySettings.setCrm_info( encompassCrmInfo );
             message = messageUtils.getDisplayMessage( DisplayMessageConstants.ENCOMPASS_DATA_UPDATE_SUCCESSFUL,
                 DisplayMessageType.SUCCESS_MESSAGE ).getMessage();

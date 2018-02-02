@@ -93,6 +93,16 @@ namespace EncompassSocialSurvey
 
         public const int SELLER_AGENT_NAME_INDEX = 14;
 
+        public const string SOCIAL_SURVEY_ENCRYPTION_SALT = "6f90b8d50f490e647d92e2a74d2c44d7";
+
+        public const string SOCIAL_SURVEY_ENCRYPTION_KEY = "";
+
+        public const string COMPANY_TYPE_DETERMINANT = "companyTypeDeterminant";
+
+
+        // UTF-8 code page
+        public const int CIPHER_BYTE_CODING_TYPE = 65001;
+
 
         public static string GetAppSettingsValue(string key)
         {
