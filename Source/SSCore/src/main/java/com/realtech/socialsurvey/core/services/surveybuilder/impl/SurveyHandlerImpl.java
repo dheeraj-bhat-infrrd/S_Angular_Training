@@ -2804,7 +2804,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 if ( !error ) {
                     String agentEmailId = bulkSurveyDetail.getAgentEmailId();
                     try {
-                        user = userManagementService.getUserByEmailAndCompany( companyId, agentEmailId );
+                        user = userManagementService.getActiveAgentByEmailAndCompany( companyId, agentEmailId );
                     } catch ( InvalidInputException e ) {
                         message = "Agent does not belong to this Company " + companyId;
                         status = CommonConstants.BULK_SURVEY_INVALID;
