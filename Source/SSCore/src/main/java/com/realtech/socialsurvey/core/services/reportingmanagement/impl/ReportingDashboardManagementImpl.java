@@ -3500,8 +3500,9 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         Double sps2 = digestList.get( 2 ) != null ? digestList.get( 2 ).getSps() : null;
         Double sps3 = digestList.get( 3 ) != null ? digestList.get( 3 ).getSps() : null;
 
-        long userCount0 = digestList.get( 0 ) != null ? digestList.get( 0 ).getUserCount() : 0l;
-        long userCount1 = digestList.get( 1 ) != null ? digestList.get( 1 ).getUserCount() : 0l;
+        // correct user count
+        long userCount0 = Long.parseLong( StringUtils.split( digestAggregate.getDigestList().get(0).getUserCount(), " ")[0] );
+        long userCount1 = Long.parseLong( StringUtils.split( digestAggregate.getDigestList().get(1).getUserCount(), " ")[0] );
 
         long transcationCount0 = digestList.get( 0 ) != null ? digestList.get( 0 ).getTotalTransactions() : 0l;
         long transcationCount1 = digestList.get( 1 ) != null ? digestList.get( 1 ).getTotalTransactions() : 0l;
