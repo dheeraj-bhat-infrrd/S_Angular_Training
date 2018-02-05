@@ -4417,6 +4417,12 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 isLessInvitationSentInPastSevenDays = true;
             }
             
+            //check if sent surey count in past 5 days is zero
+            boolean isZeroInvitationSentInPastFiceDays = false;
+            if ( sentSurveyCountForPast5Days.get(companyId ) == null || sentSurveyCountForPast5Days.get(companyId ) == 0) {
+            	isZeroInvitationSentInPastFiceDays = true;
+            }
+            
             //check if isMoreReminderSentInPastSevenDays is true
             boolean isMoreReminderSentInPastSevenDays = false; 
             if(getSentSurveyReminderCountFromList(surveStatsForPast7days) >= getSentSurveyReminderCountFromList(surveStatsForLastToLatWeek) * 2){
@@ -4475,12 +4481,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             List<String> currentWarningAlerts = new ArrayList<>();
             if ( isZeroIncomingTransactionInPastOneDay )
                 currentWarningAlerts.add( EntityWarningAlertType.LESS_TRANSACTION_IN_PAST_DAYS.getAlertType() );
-            if ( isLessIncomingTransactionInPastSevenDays )
+            if ( isLessIncomingTransactionInPastSevenDays  || isZeroInvitationSentInPastFiceDays)
                 currentWarningAlerts.add( EntityWarningAlertType.LESS_TRANSACTION_IN_PAST_WEEK.getAlertType() );
             if ( isLessInvitationSentInPastSevenDaysWarning )
                 currentWarningAlerts.add( EntityWarningAlertType.LESS_INVITATION_IN_PAST_WEEK.getAlertType() );
-            if ( isMoreReminderSentInPastSevenDaysWarning )
-                currentWarningAlerts.add( EntityWarningAlertType.MORE_REMINDER_IN_PAST_WEEK.getAlertType() );
             if ( isNoSurveyCompletedInPastThreeDays )
                 currentWarningAlerts.add( EntityWarningAlertType.LESS_SURVEY_COMPLETED_IN_PAST_DAYS.getAlertType() );
 
