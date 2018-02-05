@@ -3381,6 +3381,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
             // get the month strings
             List<String> months = buildMonthStringsForDigest( monthUnderConcern );
+            List<Long> digestUserCountList = new ArrayList<>();
 
             // populate digest data for three months in total
             for ( int i = 0; i < 3; i++ ) {
@@ -3401,9 +3402,9 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                     : CommonConstants.NOT_AVAILABLE );
                 templateData.setAverageScoreRating( ( digest != null ) ? String.format( "%.2f", digest.getAverageScoreRating() )
                     : CommonConstants.NOT_AVAILABLE );
-                templateData.setUserCount( ( digest != null )
-                    ? String.valueOf( digest.getUserCount() ) + ( digest.getUserCount() > 1 ? " Users" : " User" )
-                    : CommonConstants.NOT_AVAILABLE );
+                
+                digestUserCountList.add( i, digest != null ? digest.getUserCount() : 0l );
+                
                 templateData.setCompletedTransactions(
                     ( digest != null ) ? String.valueOf( digest.getCompletedTransactions() ) : CommonConstants.NOT_AVAILABLE );
                 templateData.setTotalTransactions(
@@ -3425,6 +3426,21 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                     ( digest != null ) ? String.valueOf( digest.getTotalCompletedReviews() ) : CommonConstants.NOT_AVAILABLE );
 
                 digestAggregate.getDigestList().add( i, templateData );
+            }
+            
+            // correct cumulative user count
+            long prevCount = 0l;
+            for( int i = 2; i >= 0; i-- ) {
+            	long currentCount = digestUserCountList.get(i); 
+            	
+            	if( prevCount > currentCount ) {
+            		currentCount = prevCount;
+            	}
+            	
+            	digestAggregate.getDigestList().get(i).setUserCount(
+                    String.valueOf( currentCount + ( currentCount > 1 ? " Users" : " User" ) ) );
+            	
+            	prevCount = currentCount;
             }
 
         }
@@ -3489,8 +3505,9 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         Double sps2 = digestList.get( 2 ) != null ? digestList.get( 2 ).getSps() : null;
         Double sps3 = digestList.get( 3 ) != null ? digestList.get( 3 ).getSps() : null;
 
-        long userCount0 = digestList.get( 0 ) != null ? digestList.get( 0 ).getUserCount() : 0l;
-        long userCount1 = digestList.get( 1 ) != null ? digestList.get( 1 ).getUserCount() : 0l;
+        // correct user count
+        long userCount0 = Long.parseLong( StringUtils.split( digestAggregate.getDigestList().get(0).getUserCount(), " ")[0] );
+        long userCount1 = Long.parseLong( StringUtils.split( digestAggregate.getDigestList().get(1).getUserCount(), " ")[0] );
 
         long transcationCount0 = digestList.get( 0 ) != null ? digestList.get( 0 ).getTotalTransactions() : 0l;
         long transcationCount1 = digestList.get( 1 ) != null ? digestList.get( 1 ).getTotalTransactions() : 0l;
