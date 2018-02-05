@@ -43,7 +43,6 @@ public class KafkaProducerBolt extends BaseComputeBolt {
         }
         LOG.info("Emitting message from kafkaproducer bolt with companyId = {}, success = {}", tuple.getString(0), success);
         _collector.emit(tuple, Arrays.asList(tuple.getString(0), tuple.getString(1), success));
-        _collector.ack(tuple);
     }
 
     @Override

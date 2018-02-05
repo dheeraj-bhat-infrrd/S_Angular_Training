@@ -1,14 +1,7 @@
 package com.realtech.socialsurvey.compute.topology.bolts.monitor;
 
 
-import java.util.Arrays;
-
-import org.apache.storm.topology.OutputFieldsDeclarer;
-import org.apache.storm.tuple.Fields;
-import org.apache.storm.tuple.Tuple;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.google.gson.Gson;
 import com.realtech.socialsurvey.compute.common.SSAPIOperations;
 import com.realtech.socialsurvey.compute.entities.SocialResponseType;
 import com.realtech.socialsurvey.compute.entities.response.FacebookFeedData;
@@ -16,6 +9,13 @@ import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.entities.response.TwitterFeedData;
 import com.realtech.socialsurvey.compute.entities.response.linkedin.LinkedinFeedData;
 import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBolt;
+import org.apache.storm.topology.OutputFieldsDeclarer;
+import org.apache.storm.tuple.Fields;
+import org.apache.storm.tuple.Tuple;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
 
 
 /**
@@ -40,18 +40,32 @@ public class SaveFeedsToMongoBolt extends BaseComputeBolt
         long companyId = input.getLongByField( "companyId" );
         SocialResponseType socialResponseType = (SocialResponseType) input.getValueByField( "type" );
         SocialResponseObject<?> post = null;
+        boolean isSuccess = true;
+
         if ( socialResponseType != null ) {
             Object socialPost = input.getValueByField( "post" );
             if ( socialPost != null ) {
                 if ( socialResponseType.getType().equals( "FACEBOOK" ) ) {
                     post = (SocialResponseObject<FacebookFeedData>) socialPost;
-                    addSocialFacebookFeedToMongo( (SocialResponseObject<FacebookFeedData>) post );
+                    boolean isfacebookPostAdded = addSocialFacebookFeedToMongo( (SocialResponseObject<FacebookFeedData>) post );
+                    if ( !isfacebookPostAdded ) {
+                        isSuccess = false;
+                        repostMessageToKafka(input, companyId, post);
+                    }
                 } else if ( socialResponseType.getType().equals( "TWITTER" ) ) {
                     post = (SocialResponseObject<TwitterFeedData>) socialPost;
-                    addSocialTwitterFeedToMongo( (SocialResponseObject<TwitterFeedData>) post );
+                    boolean isTweetAdded = addSocialTwitterFeedToMongo( (SocialResponseObject<TwitterFeedData>) post );
+                    if( !isTweetAdded ) {
+                        isSuccess = false;
+                        repostMessageToKafka(input, companyId, post);
+                    }
                 } else if ( socialResponseType.getType().equals( "LINKEDIN" ) ) {
                     post = (SocialResponseObject<LinkedinFeedData>) socialPost;
-                    addSocialLinkedinFeedToMongo( (SocialResponseObject<LinkedinFeedData>) post );
+                    boolean isLinkedInPostAdded = addSocialLinkedinFeedToMongo( (SocialResponseObject<LinkedinFeedData>) post );
+                    if(!isLinkedInPostAdded) {
+                        isSuccess = false;
+                        repostMessageToKafka(input, companyId, post);
+                    }
                 }
             } else {
                 LOG.warn( "Social post is null" );
@@ -59,9 +73,14 @@ public class SaveFeedsToMongoBolt extends BaseComputeBolt
 
 
         }
-        _collector.emit( input, Arrays.asList( companyId, post ) );
+        _collector.emit( "SUCCESS_STREAM", input, Arrays.asList(isSuccess, companyId, post ) );
         _collector.ack( input );
         LOG.info( "Successfully emitted message." );
+    }
+
+    private void repostMessageToKafka(Tuple input, long companyId, SocialResponseObject<?> post) {
+        LOG.warn("Something went wrong while adding posts to mongo!!!");
+        _collector.emit("ERROR_STREAM",input, Arrays.asList(Long.toString(companyId), new Gson().toJson(post)));
     }
 
 
@@ -86,6 +105,7 @@ public class SaveFeedsToMongoBolt extends BaseComputeBolt
     @Override
     public void declareOutputFields( OutputFieldsDeclarer declarer )
     {
-        declarer.declare( new Fields( "companyId", "post" ) );
+        declarer.declareStream("SUCCESS_STREAM", new Fields("isSuccess", "companyId", "post"));
+        declarer.declareStream("ERROR_STREAM", new Fields( "companyId", "post" ) );
     }
 }
