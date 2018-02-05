@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.services.upload.impl;
 
+import java.awt.Image;
 import java.io.IOException;
 import java.net.URL;
 import java.security.SecureRandom;
@@ -13,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
+import javax.imageio.ImageIO;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
@@ -78,6 +81,7 @@ import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsLocker
 import com.realtech.socialsurvey.core.services.upload.HierarchyDownloadService;
 import com.realtech.socialsurvey.core.services.upload.HierarchyUploadService;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookOperations;
+import com.sun.mail.handlers.image_gif;
 
 
 @Component
@@ -1110,8 +1114,10 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
     private void updateProfileImageForAgent( String userPhotoUrl, AgentSettings agentSettings ) throws InvalidInputException
     {
         LOG.debug( "Uploading for agent " + agentSettings.getIden() + " with photo: " + userPhotoUrl );
-        profileManagementService.updateProfileImage( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
-            agentSettings, userPhotoUrl );
+        if ( isImagevalid( userPhotoUrl ) ) {
+            profileManagementService.updateProfileImage( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+                agentSettings, userPhotoUrl );
+        }
     }
 
 
@@ -1641,6 +1647,12 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     parsedHierarchyUpload.getUserErrors().add( "Row: " + currentUserVO.getRowNum()
                         + ", This source ID is a Duplicate, has already been parsed  at row : " + sourceIdDuplicate );
                     currentUserVO.setErrorRecord( true );
+                }
+                
+                if ( userPhotoProfileURL != null && !userPhotoProfileURL.isEmpty() && !isImagevalid( userPhotoProfileURL ) ) {
+                    parsedHierarchyUpload.getUserValidationWarnings()
+                        .add( "Row: " + currentUserVO.getRowNum() + ", Unable to parse image for url:" + userPhotoProfileURL );
+                    currentUserVO.setWarningRecord( true );
                 }
 
 
@@ -2961,6 +2973,21 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             }
         }
         return "";
+    }
+    
+
+    private boolean isImagevalid( String userPhotoUrl )
+    {
+        try {
+            Image image = ImageIO.read( new URL( userPhotoUrl ) );
+            if ( image == null ) {
+                return false;
+            }
+        } catch ( IOException e ) {
+            LOG.error( "The url given is not a valid image url." + userPhotoUrl, e );
+            return false;
+        }
+        return true;
     }
 
     // V2.0 : END
