@@ -45,6 +45,9 @@ public class SurveyResultsReportVO implements Serializable {
     private String participantType;
     private String agentEmailId;
     private String customerEmailId;
+  //SS-1486
+    private String state;
+    private String city;
     
 	public String getSurveyDetailsId() {
 		return surveyDetailsId;
@@ -204,6 +207,22 @@ public class SurveyResultsReportVO implements Serializable {
         this.customerEmailId = customerEmailId;
     }
     
+    public String getState()
+    {
+        return state;
+    }
+    public void setState( String state )
+    {
+        this.state = state;
+    }
+    public String getCity()
+    {
+        return city;
+    }
+    public void setCity( String city )
+    {
+        this.city = city;
+    }
     @Override
     public String toString()
     {
@@ -216,7 +235,8 @@ public class SurveyResultsReportVO implements Serializable {
             + clickTroughForCompany + ", clickTroughForAgent=" + clickTroughForAgent + ", clickTroughForRegion="
             + clickTroughForRegion + ", clickTroughForBranch=" + clickTroughForBranch + ", reportModifiedOn=" + reportModifiedOn
             + ", isDeleted=" + isDeleted + ", surveyResponseList=" + surveyResponseList + ", participantType=" + participantType
-            + ", agentEmailId=" + agentEmailId + ", customerEmailId=" + customerEmailId + "]";
+            + ", agentEmailId=" + agentEmailId + ", customerEmailId=" + customerEmailId + ", state=" + state + ", city=" + city
+            + "]";
     }
 	
 
