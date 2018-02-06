@@ -1,5 +1,15 @@
 package com.realtech.socialsurvey.compute.topology.bolts.emailreports;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.storm.topology.OutputFieldsDeclarer;
+import org.apache.storm.tuple.Fields;
+import org.apache.storm.tuple.Tuple;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.realtech.socialsurvey.compute.common.RetrofitApiBuilder;
 import com.realtech.socialsurvey.compute.entities.FileUploadResponse;
 import com.realtech.socialsurvey.compute.entities.ReportRequest;
@@ -11,17 +21,9 @@ import com.realtech.socialsurvey.compute.services.api.APIIntegrationException;
 import com.realtech.socialsurvey.compute.services.impl.FailedMessagesServiceImpl;
 import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBoltWithAck;
 import com.realtech.socialsurvey.compute.utils.ConversionUtils;
-import org.apache.storm.topology.OutputFieldsDeclarer;
-import org.apache.storm.tuple.Fields;
-import org.apache.storm.tuple.Tuple;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import retrofit2.Call;
 import retrofit2.Response;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
 
 public class UpdateFileUploadStatusBolt extends BaseComputeBoltWithAck

@@ -1,10 +1,9 @@
 package com.realtech.socialsurvey.compute.services.impl;
 
-import com.realtech.socialsurvey.compute.common.FailedMessageConstants;
-import com.realtech.socialsurvey.compute.entities.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.realtech.socialsurvey.compute.common.FailedMessageConstants;
 import com.realtech.socialsurvey.compute.dao.FailedMessagesDao;
 import com.realtech.socialsurvey.compute.dao.impl.FailedMessagesDaoImpl;
 import com.realtech.socialsurvey.compute.entities.EmailMessage;

@@ -1,5 +1,28 @@
 package com.realtech.socialsurvey.compute.topology.bolts.emailreports;
 
+import static com.realtech.socialsurvey.compute.common.ComputeConstants.AMAZON_ACCESS_KEY;
+import static com.realtech.socialsurvey.compute.common.ComputeConstants.AMAZON_BUCKET;
+import static com.realtech.socialsurvey.compute.common.ComputeConstants.AMAZON_ENDPOINT;
+import static com.realtech.socialsurvey.compute.common.ComputeConstants.AMAZON_REPORTS_BUCKET;
+import static com.realtech.socialsurvey.compute.common.ComputeConstants.AMAZON_SECRET_KEY;
+import static com.realtech.socialsurvey.compute.common.ComputeConstants.APPLICATION_PROPERTY_FILE;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.storm.task.OutputCollector;
+import org.apache.storm.task.TopologyContext;
+import org.apache.storm.topology.OutputFieldsDeclarer;
+import org.apache.storm.tuple.Fields;
+import org.apache.storm.tuple.Tuple;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Region;
@@ -18,23 +41,6 @@ import com.realtech.socialsurvey.compute.services.FailedMessagesService;
 import com.realtech.socialsurvey.compute.services.impl.FailedMessagesServiceImpl;
 import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBoltWithAck;
 import com.realtech.socialsurvey.compute.utils.ConversionUtils;
-import org.apache.storm.task.OutputCollector;
-import org.apache.storm.task.TopologyContext;
-import org.apache.storm.topology.OutputFieldsDeclarer;
-import org.apache.storm.tuple.Fields;
-import org.apache.storm.tuple.Tuple;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
-import static com.realtech.socialsurvey.compute.common.ComputeConstants.*;
 
 public class UploadOnAmazonS3Bolt extends BaseComputeBoltWithAck
 {

@@ -2,11 +2,11 @@ package com.realtech.socialsurvey.compute.common;
 
 import java.io.IOException;
 
-import com.realtech.socialsurvey.compute.services.api.APIIntegrationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.realtech.socialsurvey.compute.entities.response.linkedin.LinkedinFeedResponse;
+import com.realtech.socialsurvey.compute.services.api.APIIntegrationException;
 
 import retrofit2.Call;
 import retrofit2.Response;

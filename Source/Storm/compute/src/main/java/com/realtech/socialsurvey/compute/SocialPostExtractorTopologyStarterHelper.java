@@ -1,15 +1,13 @@
 package com.realtech.socialsurvey.compute;
 
-import com.realtech.socialsurvey.compute.topology.bolts.KafkaProducerBolt;
 import org.apache.storm.Config;
 import org.apache.storm.generated.StormTopology;
-import org.apache.storm.kafka.bolt.KafkaBolt;
 import org.apache.storm.topology.TopologyBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.realtech.socialsurvey.compute.common.EnvConstants;
-import com.realtech.socialsurvey.compute.topology.bolts.KafkaBoltBuilder;
+import com.realtech.socialsurvey.compute.topology.bolts.KafkaProducerBolt;
 import com.realtech.socialsurvey.compute.topology.spouts.FacebookFeedExtractorSpout;
 import com.realtech.socialsurvey.compute.topology.spouts.LinkedinFeedExtractorSpout;
 import com.realtech.socialsurvey.compute.topology.spouts.TwitterFeedExtractorSpout;
