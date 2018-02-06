@@ -1,7 +1,10 @@
 package com.realtech.socialsurvey.compute.entities.response;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
+import java.util.Date;
+
+import com.realtech.socialsurvey.compute.enums.ActionHistoryType;
+
 
 /**
  * Action history for social post
@@ -11,40 +14,62 @@ import java.sql.Timestamp;
 public class ActionHistory implements Serializable
 {
     private static final long serialVersionUID = 1L;
-    private Timestamp createdDate;
+    private Date createdDate;
     private String ownerName;
     private String text;
-    private int actionType;
-    public Timestamp getCreatedDate()
-    {
-        return createdDate;
-    }
+    private ActionHistoryType actionType;
+
+
     public String getOwnerName()
     {
         return ownerName;
     }
+
+
     public String getText()
     {
         return text;
     }
-    public int getActionType()
-    {
-        return actionType;
-    }
-    public void setCreatedDate( Timestamp createdDate )
-    {
-        this.createdDate = createdDate;
-    }
+
     public void setOwnerName( String ownerName )
     {
         this.ownerName = ownerName;
     }
+
+
     public void setText( String text )
     {
         this.text = text;
     }
-    public void setActionType( int actionType )
+
+
+    public ActionHistoryType getActionType()
+    {
+        return actionType;
+    }
+
+
+    public void setActionType( ActionHistoryType actionType )
     {
         this.actionType = actionType;
+    }
+    
+
+    public Date getCreatedDate()
+    {
+        return createdDate;
+    }
+
+
+    public void setCreatedDate( Date createdDate )
+    {
+        this.createdDate = createdDate;
+    }
+    
+    @Override
+    public String toString()
+    {
+        return "ActionHistory [createdDate=" + createdDate + ", ownerName=" + ownerName + ", text=" + text + ", actionType="
+            + actionType + "]";
     }
 }

@@ -78,7 +78,7 @@ public class SocialPostExtractorTopologyStarterHelper extends TopologyStarterHel
 
         builder.setSpout( "LinkedinFeedExtractorSpout", new LinkedinFeedExtractorSpout(), 1 );
         // add bolts
-        builder.setBolt("KafkaProducerBolt", new KafkaProducerBolt(), 1).shuffleGrouping("LinkedinFeedExtractorSpout")
+        builder.setBolt("KafkaProducerBolt", new KafkaProducerBolt(), 3).shuffleGrouping("LinkedinFeedExtractorSpout")
                 .shuffleGrouping("FacebookFeedExtractorSpout").shuffleGrouping("TwitterFeedExtractorSpout");
 
         return builder.createTopology();

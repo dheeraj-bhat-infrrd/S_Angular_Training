@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.compute.topology.bolts.monitor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +19,9 @@ import com.realtech.socialsurvey.compute.dao.impl.RedisCompanyKeywordsDaoImpl;
 import com.realtech.socialsurvey.compute.entities.Keyword;
 import com.realtech.socialsurvey.compute.entities.SocialResponseType;
 import com.realtech.socialsurvey.compute.entities.TrieNode;
+import com.realtech.socialsurvey.compute.entities.response.ActionHistory;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
+import com.realtech.socialsurvey.compute.enums.ActionHistoryType;
 import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBolt;
 
 
@@ -38,6 +41,7 @@ public class FilterSocialPostBolt extends BaseComputeBolt
 
     private RedisCompanyKeywordsDao redisCompanyKeywordsDao = new RedisCompanyKeywordsDaoImpl();
 
+
     @Override
     public void execute( Tuple input )
     {
@@ -54,11 +58,26 @@ public class FilterSocialPostBolt extends BaseComputeBolt
             if ( !foundKeyWords.isEmpty() ) {
                 post.setFoundKeywords( foundKeyWords );
                 post.setFlagged( Boolean.TRUE );
+                if(post.getActionHistory() == null){
+                    post.setActionHistory( new ArrayList<>() );
+                }
+
+                post.getActionHistory().add(  getFlaggedActionHistory( foundKeyWords ));
             }
             LOG.debug( "Emitting tuple with companyId {}, post {}, foundKeyWords {}.", companyId, post, foundKeyWords );
         }
         _collector.emit( input, Arrays.asList( companyId, post, socialResponseType ) );
         _collector.ack( input );
+    }
+
+
+    private ActionHistory getFlaggedActionHistory( List<String> foundKeyWords )
+    {
+        ActionHistory actionHistory = new ActionHistory();
+        actionHistory.setCreatedDate( new Date() );
+        actionHistory.setActionType( ActionHistoryType.FLAGGED );
+        actionHistory.setText( "The post was <b>Flagged</b> for matching <b>" + String.join( ",", foundKeyWords )  + "</b>");
+        return actionHistory;
     }
 
 

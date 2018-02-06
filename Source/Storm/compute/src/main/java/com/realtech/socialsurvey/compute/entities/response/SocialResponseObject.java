@@ -1,7 +1,7 @@
 package com.realtech.socialsurvey.compute.entities.response;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 import com.realtech.socialsurvey.compute.enums.SocialFeedStatus;
@@ -36,7 +36,7 @@ public class SocialResponseObject<T> implements Serializable
     private String postId;
     private String text;
     private String picture;
-    private Timestamp updatedTime;
+    private Date updatedTime;
     private String ownerName;
 
     private T response;
@@ -111,19 +111,8 @@ public class SocialResponseObject<T> implements Serializable
     {
         this.picture = picture;
     }
-
-
-    public Timestamp getUpdatedTime()
-    {
-        return updatedTime;
-    }
-
-
-    public void setUpdatedTime( Timestamp updatedTime )
-    {
-        this.updatedTime = updatedTime;
-    }
-
+    
+    
 
     public String getOwnerName()
     {
@@ -266,6 +255,17 @@ public class SocialResponseObject<T> implements Serializable
     public void setActionHistory( List<ActionHistory> actionHistory )
     {
         this.actionHistory = actionHistory;
+    }
+    
+    public Date getUpdatedTime()
+    {
+        return updatedTime;
+    }
+
+
+    public void setUpdatedTime( Date updatedTime )
+    {
+        this.updatedTime = updatedTime;
     }
 
 

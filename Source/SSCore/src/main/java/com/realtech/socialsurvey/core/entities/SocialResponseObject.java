@@ -2,12 +2,14 @@ package com.realtech.socialsurvey.core.entities;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.realtech.socialsurvey.core.enums.SocialFeedStatus;
 import com.realtech.socialsurvey.core.enums.SocialFeedType;
+
 
 /**
  * @author manish
@@ -39,7 +41,7 @@ public class SocialResponseObject<T> implements Serializable
     private String postId;
     private String text;
     private String picture;
-    private Timestamp updatedTime;
+    private Date updatedTime;
     private String ownerName;
 
     private T response;
@@ -55,6 +57,7 @@ public class SocialResponseObject<T> implements Serializable
     private long duplicateCount;
     private List<String> foundKeywords;
     private List<ActionHistory> actionHistory;
+
 
     public T getResponse()
     {
@@ -116,13 +119,13 @@ public class SocialResponseObject<T> implements Serializable
     }
 
 
-    public Timestamp getUpdatedTime()
+    public Date getUpdatedTime()
     {
         return updatedTime;
     }
 
 
-    public void setUpdatedTime( Timestamp updatedTime )
+    public void setUpdatedTime( Date updatedTime )
     {
         this.updatedTime = updatedTime;
     }

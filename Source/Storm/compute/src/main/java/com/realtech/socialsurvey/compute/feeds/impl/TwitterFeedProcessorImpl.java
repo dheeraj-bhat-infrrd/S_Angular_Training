@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.realtech.socialsurvey.compute.entities.TwitterToken;
 import com.realtech.socialsurvey.compute.entities.response.TwitterFeedData;
 import com.realtech.socialsurvey.compute.feeds.TwitterFeedProcessor;
+import com.realtech.socialsurvey.compute.utils.UrlHelper;
 
 import twitter4j.Paging;
 import twitter4j.ResponseList;
@@ -25,35 +26,40 @@ public class TwitterFeedProcessorImpl implements TwitterFeedProcessor
 
     private static final int RETRIES_INITIAL = 0;
     private static final int PAGE_SIZE = 200;
-
-    private String twitterConsumerKey = "01L5xRq0Ynsa2s6z0XbNAhria";
-
-    private String twitterConsumerSecret = "TJX32M2OY7TyETtDcUlMF7O06BwVXMpFZRsxJPyeC01UN3rqFM";
-
-    private String lastFetchedPostId = "";
-
+    
+    private String consumerKey = "01L5xRq0Ynsa2s6z0XbNAhria";
+    private String consumerSecret = "TJX32M2OY7TyETtDcUlMF7O06BwVXMpFZRsxJPyeC01UN3rqFM";
+    
+    long lastFetchedPostId = 0L;
 
     @Override
-    public List<TwitterFeedData> fetchFeed( long iden, String collection, TwitterToken token )
+    public List<TwitterFeedData> fetchFeed( long companyId, TwitterToken token )
     {
-        LOG.info( "Getting tweets for {} with id: {}", collection, iden );
+        LOG.info( "Getting tweets with id: {}", companyId );
         // Settings Consumer and Access Tokens
         Twitter twitter = new TwitterFactory().getInstance();
-        twitter.setOAuthConsumer( twitterConsumerKey, twitterConsumerSecret );
+        twitter.setOAuthConsumer( consumerKey, consumerSecret );
         twitter.setOAuthAccessToken( new AccessToken( token.getTwitterAccessToken(), token.getTwitterAccessTokenSecret() ) );
 
         // building query to fetch
         List<TwitterFeedData> feedData = new ArrayList<>();
         try {
             int pageNo = 1;
+            long maxId = 0L;
             ResponseList<Status> resultList;
             do {
-                if ( lastFetchedPostId.equals( "" ) ) {
-                    resultList = twitter.getUserTimeline( new Paging( pageNo, PAGE_SIZE ) );
-                } else {
-                    resultList = twitter
-                        .getUserTimeline( new Paging( pageNo, PAGE_SIZE ).sinceId( Long.parseLong( lastFetchedPostId ) ) );
+                Paging paging = new Paging( pageNo, PAGE_SIZE );
+                
+                if ( lastFetchedPostId != 0L ) {
+                    paging.setSinceId( lastFetchedPostId );
                 }
+                
+                // Adding max for better results
+                if(maxId != 0L){
+                    paging.setMaxId( maxId-1 );
+                }
+                
+                resultList = twitter.getUserTimeline( UrlHelper.getTwitterPageIdFromURL( token.getTwitterPageLink()),  paging );
 
                 for ( Status status : resultList ) {
 
@@ -71,24 +77,20 @@ public class TwitterFeedProcessorImpl implements TwitterFeedProcessor
 
                     feedData.add( feed );
                 }
+                
+                if(!feedData.isEmpty()){
+                    maxId = feedData.get( feedData.size() -1 ).getId();
+                }
 
                 pageNo++;
             } while ( resultList.size() == PAGE_SIZE );
+            
+            if(!feedData.isEmpty()){
+                lastFetchedPostId = feedData.get( 0 ).getId();
+            }
         } catch ( TwitterException e ) {
             LOG.error( "Exception in Twitter feed extration. Reason: " + e.getMessage() );
-            if ( lastFetchedPostId.isEmpty() ) {
-                lastFetchedPostId = "0";
-            }
         }
         return feedData;
-    }
-
-
-    public static void main( String[] args )
-    {
-        TwitterToken token = new TwitterToken();
-        token.setTwitterAccessToken( "1011709898-wkha5NSmR1POjcg1SwWPWm5q4eCPVzKgXhLTq8L" );
-        token.setTwitterAccessTokenSecret( "GtmMlb1LMroWJWATmF8NmdxaI27ZF9nelyuN7MYVddS2U" );
-        new TwitterFeedProcessorImpl().fetchFeed( 10L, "Social survey", token );
     }
 }
