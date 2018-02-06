@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.entities.JobLogDetails;
 import com.realtech.socialsurvey.core.entities.JobLogDetailsResponse;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.reportingmanagement.JobLogDetailsManagement;
@@ -51,28 +50,28 @@ public class JobLogDetailsReportingController
         return json;
     }
     
-    @RequestMapping ( value = "/lastsuccessfuletltime/entityid/{entityId}/{entityType}", method = RequestMethod.GET)
+    @RequestMapping ( value = "/lastsuccessfuletltime/{entityId}/{entityType}", method = RequestMethod.GET)
     @ApiOperation ( value = "Fetch Job Log Details to check last run for entity")
-    public String lastRunForEntity(@PathVariable ( "entityId") String entityId  , @PathVariable ( "entityType") String entityType ) throws InvalidInputException
+    public String lastRunForEntity(@PathVariable ( "entityId") long entityId  , @PathVariable ( "entityType") String entityType ) throws InvalidInputException
     {
         LOGGER.info( "Fetching Job Log Details to check last etl run for entity" );
         String json = null;
-        long entityIdInt = Long.valueOf(entityId);
-        JobLogDetails jobLogDetails = jobLogDetailsManagement.getLastRunForEntity(entityIdInt, entityType);
-        json = new Gson().toJson( jobLogDetails );
+        JobLogDetailsResponse jobLogDetailsResponse = jobLogDetailsManagement.getLastRunForEntity(entityId, entityType);
+        json = new Gson().toJson( jobLogDetailsResponse );
         return json;
     }
     
-    @RequestMapping ( value = "/lastsuccessfuletltime/test/{entityId}/{entityType}", method = RequestMethod.GET)
+    @RequestMapping ( value = "/lastsuccessfuletltime/recal/{entityId}/{entityType}", method = RequestMethod.GET)
     @ApiOperation ( value = "Fetch Job Log Details to check last run for entity")
-    public String testInsert(@PathVariable ( "entityId") String entityId  , @PathVariable ( "entityType") String entityType ) throws InvalidInputException
+    public String recalUserRanking(@PathVariable ( "entityId") long entityId  , @PathVariable ( "entityType") String entityType ) throws InvalidInputException
     {
-        LOGGER.info( "insert Job Log Details for user ranking" );
-        String json = null;
-        long entityIdInt = Long.valueOf(entityId);
-        long jobLogId = jobLogDetailsManagement.insertJobLog(entityIdInt, entityType, CommonConstants.USER_RANKING_JOB_NAME, CommonConstants.STATUS_RUNNING);
-        json = new Gson().toJson( jobLogId );
-        return json;
+        LOGGER.info( "insert to Job Log Details and recal user ranking" );
+        //CHECK IF ETL IS RUNNING
+        long jobLogId = -1;
+        if(!jobLogDetailsManagement.getIfEtlIsRunning()) {
+        	 jobLogId = jobLogDetailsManagement.insertJobLog(entityId, entityType, CommonConstants.USER_RANKING_JOB_NAME, CommonConstants.STATUS_RUNNING);
+        }
+        return new Gson().toJson( jobLogId );
     }
     
     

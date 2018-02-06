@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.services.reportingmanagement.impl;
 
 import java.sql.Timestamp;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ import com.realtech.socialsurvey.core.dao.impl.JobLogDetailsDaoImpl;
 import com.realtech.socialsurvey.core.entities.JobLogDetails;
 import com.realtech.socialsurvey.core.entities.JobLogDetailsResponse;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.services.impl.testApi;
 import com.realtech.socialsurvey.core.services.reportingmanagement.JobLogDetailsManagement;
 
 
@@ -55,10 +57,8 @@ public class JobLogDetailsManagementImpl implements JobLogDetailsManagement
         LOG.debug( "method to fetch the etl run status, getIfEtlIsRunning() started." );
         boolean isRunning = true;
         JobLogDetails jobLogDetails = jobLogDetailsDao.getJobLogDetailsOfLatestRun();
-        if(!jobLogDetails.getStatus().equals(CommonConstants.STATUS_RUNNING)) {
-        	if(jobLogDetails.getJobName().equals(CommonConstants.REPORTING_JOB_NAME ) || jobLogDetails.getJobName().equals(CommonConstants.USER_RANKING_JOB_NAME) ) {
+        if(!jobLogDetails.getStatus().equals(CommonConstants.STATUS_RUNNING) && !jobLogDetails.getJobName().equals(CommonConstants.CENTRALIZED_JOB_NAME)) {
         		isRunning = false;
-        	}
         }
 
         LOG.debug( "method to fetch the etl run status, getIfEtlIsRunning() finished." );
@@ -66,14 +66,17 @@ public class JobLogDetailsManagementImpl implements JobLogDetailsManagement
     }
 
     @Override
-    public JobLogDetails getLastRunForEntity( long entityId , String entityType)throws InvalidInputException
+    public JobLogDetailsResponse getLastRunForEntity( long entityId , String entityType)throws InvalidInputException
     {
         LOG.debug( "method to fetch the job-log details for entity, getLastRunForEntity() started." );
-        
+        JobLogDetailsResponse jobLogDetailsResponse = new JobLogDetailsResponse();
         JobLogDetails jobLogDetails = jobLogDetailsDao.getJobLogDetailsOfLatestRunForEntity(entityId, entityType, CommonConstants.USER_RANKING_JOB_NAME);
-        
+        if ( jobLogDetails != null ) {
+            jobLogDetailsResponse.setStatus( jobLogDetails.getStatus() );
+            jobLogDetailsResponse.setTimestampInEst( utils.convertDateToTimeZone( jobLogDetails.getJobStartTime(), CommonConstants.TIMEZONE_EST ) );
+        }
         LOG.debug( "method to fetch the job-log details for entity, getLastRunForEntity() finished." );
-        return jobLogDetails;
+        return jobLogDetailsResponse;
     }
     
     //insertJobLog
@@ -87,7 +90,12 @@ public class JobLogDetailsManagementImpl implements JobLogDetailsManagement
         jobLogDetails.setJobName(jobName);
         jobLogDetails.setStatus(status);
         jobLogDetails.setJobStartTime(new Timestamp(System.currentTimeMillis()));
+        jobLogDetails.setJobUuid((UUID.randomUUID()).toString());
         long jobLogId = jobLogDetailsDao.insertJobLog(jobLogDetails);
+        testApi test_api = new testApi();
+        String[] args = {"sandra"};
+        test_api.main(args);
+        LOG.info("THE RETURN OF {}"+test_api);
         LOG.debug( "method to fetch the job-log details for entity, getLastRunForEntity() finished." );
         return jobLogId;
     }

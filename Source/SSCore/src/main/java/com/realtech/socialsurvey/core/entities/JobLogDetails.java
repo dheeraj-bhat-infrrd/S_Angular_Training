@@ -45,7 +45,7 @@ public class JobLogDetails implements Serializable
     private String jobUuid;
     
     @Column ( name = "ENTITY_ID")
-    private long entityId;
+    private Long entityId;
     
     @Column ( name = "ENTITY_TYPE")
     private String entityType;
