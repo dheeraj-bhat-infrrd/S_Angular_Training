@@ -1,13 +1,12 @@
 package com.realtech.socialsurvey.compute.common;
 
 import java.io.IOException;
-import java.util.Optional;
 
-import com.realtech.socialsurvey.compute.services.api.APIIntegrationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.realtech.socialsurvey.compute.entities.response.linkedin.LinkedinFeedResponse;
+import com.realtech.socialsurvey.compute.services.api.APIIntegrationException;
 
 import retrofit2.Call;
 import retrofit2.Response;
@@ -21,6 +20,7 @@ import retrofit2.Response;
 public class LinkedinAPIOperations
 {
     private static final Logger LOG = LoggerFactory.getLogger( LinkedinAPIOperations.class );
+    private static final int LIMIT = 100;
     private static LinkedinAPIOperations apiOperations;
 
 
@@ -43,21 +43,20 @@ public class LinkedinAPIOperations
      * @param accessToken
      * @return
      */
-    public Optional<LinkedinFeedResponse> fetchFeeds( String lnCompanyId, int start, int count, String eventType,
-        String accessToken )
+    public LinkedinFeedResponse fetchFeeds( String lnCompanyId, String accessToken, int start, String eventType)
     {
         Call<LinkedinFeedResponse> requestCall = RetrofitApiBuilder.apiBuilderInstance().getLinkedinApiIntegrationService()
-            .fetchFeeds( lnCompanyId, start, count, eventType, accessToken );
+            .fetchFeeds( lnCompanyId, start, LIMIT, eventType, accessToken );
         try {
             Response<LinkedinFeedResponse> response = requestCall.execute();
             RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
             if ( LOG.isTraceEnabled() ) {
                 LOG.trace( "response {}", response.body() );
             }
-            return Optional.of( response.body() );
+            return response.body();
         } catch ( IOException | APIIntegrationException e ) {
             LOG.error( "IOException/ APIIntegrationException caught", e );
-            return Optional.empty();
+            return null;
         }
     }
 }

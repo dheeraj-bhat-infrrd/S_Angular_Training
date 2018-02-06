@@ -1,13 +1,12 @@
 package com.realtech.socialsurvey.compute.common;
 
 import java.io.IOException;
-import java.util.Optional;
 
-import com.realtech.socialsurvey.compute.services.api.APIIntegrationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.realtech.socialsurvey.compute.entities.response.FacebookResponse;
+import com.realtech.socialsurvey.compute.services.api.APIIntegrationException;
 
 import retrofit2.Call;
 import retrofit2.Response;
@@ -47,10 +46,10 @@ public class FacebookAPIOperations
      * @param before - before cursor
      * @return
      */
-    public Optional<FacebookResponse> fetchFeeds( String pageId , String accessToken, long since, long until, String after, String before)
+    public FacebookResponse fetchFeeds( String pageId , String accessToken, String since, String until, String pagingToken)
     {
         Call<FacebookResponse> requestCall = RetrofitApiBuilder.apiBuilderInstance()
-            .getFacebookAPIIntergrationService().fetchFeeds( pageId, accessToken, since, until, LIMIT, after, before, FIELDS );
+            .getFacebookAPIIntergrationService().fetchFeeds( pageId, accessToken, since, until, LIMIT, pagingToken, FIELDS );
         
         try {
             Response<FacebookResponse> response = requestCall.execute();
@@ -58,10 +57,10 @@ public class FacebookAPIOperations
             if ( LOG.isTraceEnabled() ) {
                 LOG.trace( "response {}", response.body() );
             }
-            return Optional.of(response.body());
+            return response.body();
         } catch ( IOException | APIIntegrationException e ) {
             LOG.error( "IOException/ APIIntegrationException caught", e );
-            return Optional.empty();
+            return null;
         }
     }
 }

@@ -1,5 +1,9 @@
 package com.realtech.socialsurvey.compute.topology.bolts;
 
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Properties;
+
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -11,10 +15,6 @@ import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Properties;
 
 public class KafkaProducerBolt extends BaseComputeBolt {
 

@@ -5,11 +5,18 @@ import java.util.List;
 import com.realtech.socialsurvey.compute.entities.TwitterToken;
 import com.realtech.socialsurvey.compute.entities.response.TwitterFeedData;
 
-import twitter4j.Status;
-
+/**
+ * @author manish
+ *
+ */
 public interface TwitterFeedProcessor
 {
 
-    List<TwitterFeedData> fetchFeed( long iden, String collection, TwitterToken token );
-
+    /**
+     * Fetch twitter tweets
+     * @param companyId
+     * @param token
+     * @return
+     */
+    List<TwitterFeedData> fetchFeed( long companyId,  TwitterToken token );
 }
