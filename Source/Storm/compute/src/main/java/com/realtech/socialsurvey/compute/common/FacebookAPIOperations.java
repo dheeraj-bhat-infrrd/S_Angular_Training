@@ -3,15 +3,14 @@ package com.realtech.socialsurvey.compute.common;
 import java.io.IOException;
 import java.util.Optional;
 
+import com.realtech.socialsurvey.compute.services.api.APIIntegrationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.realtech.socialsurvey.compute.entities.response.FacebookResponse;
-import com.realtech.socialsurvey.compute.services.api.APIIntergrationException;
 
 import retrofit2.Call;
 import retrofit2.Response;
-import retrofit2.http.Query;
 
 
 /**
@@ -60,8 +59,8 @@ public class FacebookAPIOperations
                 LOG.trace( "response {}", response.body() );
             }
             return Optional.of(response.body());
-        } catch ( IOException | APIIntergrationException e ) {
-            LOG.error( "IOException/ APIIntergrationException caught", e );
+        } catch ( IOException | APIIntegrationException e ) {
+            LOG.error( "IOException/ APIIntegrationException caught", e );
             return Optional.empty();
         }
     }
