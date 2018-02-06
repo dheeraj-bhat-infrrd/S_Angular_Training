@@ -4,10 +4,10 @@ import java.io.IOException;
 
 import com.realtech.socialsurvey.compute.entities.FileUploadResponse;
 import com.realtech.socialsurvey.compute.exception.FileUploadUpdationException;
+import com.realtech.socialsurvey.compute.services.api.APIIntegrationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.realtech.socialsurvey.compute.services.api.APIIntergrationException;
 import com.realtech.socialsurvey.compute.services.api.FacebookApiIntegrationService;
 import com.realtech.socialsurvey.compute.services.api.LinkedinApiIntegrationService;
 import com.realtech.socialsurvey.compute.services.api.SSApiIntegrationService;
@@ -127,9 +127,9 @@ public class RetrofitApiBuilder
                     LOG.warn( "Reason: {}", response.errorBody().string() );
                 }
             } catch ( IOException e ) {
-                throw new APIIntergrationException( "IOException while sending api response", e );
+                throw new APIIntegrationException( "IOException while sending api response", e );
             }
-            throw new APIIntergrationException( response.message() );
+            throw new APIIntegrationException( response.message() );
         }
     }
 
