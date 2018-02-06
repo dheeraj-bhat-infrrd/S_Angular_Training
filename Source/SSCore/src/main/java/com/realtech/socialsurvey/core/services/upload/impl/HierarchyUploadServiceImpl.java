@@ -81,7 +81,6 @@ import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsLocker
 import com.realtech.socialsurvey.core.services.upload.HierarchyDownloadService;
 import com.realtech.socialsurvey.core.services.upload.HierarchyUploadService;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookOperations;
-import com.sun.mail.handlers.image_gif;
 
 
 @Component
@@ -192,6 +191,9 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
 
     @Value ( "${MASK_EMAIL_ADDRESS}")
     private String maskEmail;
+    
+    @Value ( "${CDN_PATH}")
+    private String cdnUrl;
 
 
     // V2.0 : BEGIN
@@ -1091,7 +1093,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
             }
 
-            if ( userUploadVO.getUserPhotoUrl() != null && !userUploadVO.getUserPhotoUrl().isEmpty() ) {
+            if ( userUploadVO.getUserPhotoUrl() != null && !userUploadVO.getUserPhotoUrl().isEmpty()
+                && userUploadVO.getUserPhotoUrl() != agentSettings.getProfileImageUrl() ) {
                 updateProfileImageForAgent( userUploadVO.getUserPhotoUrl(), agentSettings );
             }
         }
@@ -1115,8 +1118,21 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
     {
         LOG.debug( "Uploading for agent " + agentSettings.getIden() + " with photo: " + userPhotoUrl );
         if ( isImagevalid( userPhotoUrl ) ) {
-            profileManagementService.updateProfileImage( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
-                agentSettings, userPhotoUrl );
+            String url = null;
+            if ( userPhotoUrl.contains( cdnUrl ) ) {
+                url = userPhotoUrl;
+            } else {
+                try {
+                    url = uploadProfileImageToCloud( userPhotoUrl );
+                } catch ( Exception e ) {
+                    LOG.warn( "Unable to upload image to cloud.", e );
+                    throw new InvalidInputException( "Image format not valid for url:" + userPhotoUrl );
+                }
+            }
+            if ( url != null && !url.isEmpty() ) {
+                profileManagementService.updateProfileImage( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+                    agentSettings, url );
+            }
         }
     }
 
@@ -2988,6 +3004,22 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             return false;
         }
         return true;
+    }
+    
+
+    private String uploadProfileImageToCloud( String userPhotoUrl ) throws Exception
+    {
+        String imageName = java.util.UUID.randomUUID().toString();
+        if ( userPhotoUrl.contains( ".png" ) || userPhotoUrl.contains( ".PNG" ) ) {
+            imageName = imageName + ".png";
+        } else if ( userPhotoUrl.contains( ".jpg" ) || userPhotoUrl.contains( ".JPG" ) ) {
+            imageName = imageName + ".jpg";
+        } else if ( userPhotoUrl.contains( ".jpeg" ) || userPhotoUrl.contains( ".JPEG" ) ) {
+            imageName = imageName + ".jpeg";
+        } else {
+            return null;
+        }
+        return profileManagementService.copyImage( userPhotoUrl, imageName );
     }
 
     // V2.0 : END
