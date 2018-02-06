@@ -10607,6 +10607,7 @@ img.lead-img {
 
 .soc-mon-sub-hdr{
 	background-color: #ececec;
+	border-bottom: transparent;
 }
 
 .soc-mon-btn{
@@ -10726,6 +10727,8 @@ img.lead-img {
     margin-left: -11px;
     padding-left: 35px;
     margin-top: 12px;
+    z-index: 1;
+    position: absolute;
 }
 
 .bulk-option{
@@ -10737,6 +10740,7 @@ img.lead-img {
 
 .soc-mon-post-container{
 	padding-left:0;
+	border-right: 1px solid #f2ecec;
 }
 
 .soc-mon-post-checkbox{
@@ -10749,6 +10753,7 @@ img.lead-img {
 
 .soc-mon-post-details{
 	padding:0;
+	padding-right: 15px;
 }
 
 .soc-mon-post-prof-pic-div{
@@ -10804,4 +10809,228 @@ img.lead-img {
     font-size: 11px;
     font-weight: bold !important;
     margin-top: 1px;
+}
+
+.stream-post-text{
+	text-align: justify;
+    margin-top: 20px;
+    font-size: 14px;
+    color: black;
+}
+
+.stream-post-pic-div{
+	margin-top:15px;
+}
+
+.stream-post-pic{
+	width:100%;
+}
+
+.stream-post-mail-note{
+	padding: 5px 0;
+    text-align: center;
+    cursor:pointer;
+    font-weight: bold !important;
+}
+
+.stream-post-mail-note-active{
+    border-bottom: 4px solid #8d8d8d;
+    color: black; 
+    cursor:default;
+}
+
+.stream-post-textbox{
+	resize: auto !important;
+}
+
+.stream-container{
+	border: 1px solid #ececec;
+    border-top: transparent;
+    border-bottom: transparent;
+}
+
+.bottom-padding-stream{
+	padding-bottom:15px;
+}
+
+.stream-actions-btn-container{
+	height: 40px;
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.macro-dropdown{
+	height: 90%;
+    text-align: center;
+    padding: 7px;
+    border: 1px solid #e6dede;
+    border-radius: 5px;
+    cursor:pointer;
+    display: flex;
+    align-items: center;
+    font-weight: bold !important;
+    background-color: white;
+}
+
+.macro-dropdown-icn{
+	margin-top: 3px;
+    margin-right: 10px;
+}
+
+.macro-dropdown-chevron{
+	order: 2;
+    margin-left: auto;
+}
+
+.stream-actions-btn{
+	height: 100%;
+    text-align: center;
+    padding: 8px;
+   	border-radius: 5px;
+    font-weight: bold !important;
+    margin-left: auto;
+    order: 2;
+    cursor:pointer;
+    background-color: white;
+}
+
+.stream-action-unflag{
+	border: 2px solid #3f78bc;
+    color: #3f78bc;
+}
+
+.stream-action-flag{
+	border: 2px solid #dca50d;
+    color: #dca50d;
+}
+
+.stream-action-esc{
+	border: 2px solid #f95000;
+    color: #f95000;
+}
+
+.stream-action-res{
+	border: 2px solid #6ead00;
+    color: #6ead00;
+}
+
+.stream-action-submit{
+	border: 2px solid #8d8d8d;
+    color: #8d8d8d;
+    margin-left:15px;
+}
+
+.stream-action-container{
+	background-color: #ececec;
+    border-radius: 10px;
+    min-height: 50px;
+    padding: 8px;
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.stream-action-icn{
+	padding: 8px;
+}
+
+.stream-action-date{
+	color: #b6b6b6;
+    font-size: 14px;
+}
+
+.stream-action-text{
+	color: #757575;
+    font-weight: bold!important;
+}
+
+.stream-action-text-imp{
+	font-weight: bold !important;
+    color: black;
+    font-size: 14px;
+}
+
+.soc-mon-pagination{
+	display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.soc-mon-pag-text{
+	font-weight: bold !important;
+    margin-right: 10px;
+}
+
+.soc-mon-pag-icn{
+	margin:0 auto;	
+}
+
+.soc-mon-pag{
+	border: 1px solid transparent;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    background: white;
+    margin-right: 5px;
+}
+
+.soc-mon-pag-active{
+	width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    background: #f4f2f2;
+    margin-right: 5px;
+    cursor: pointer;
+    border: 1px solid #d7d5d5;
+}
+
+.macro-options{
+	border: 1px solid #e6dede;
+    background: white;
+    border-radius: 3px;
+    width: auto;
+    margin-left: -8px;
+    margin-top: 6px;
+    z-index: 1;
+    position: absolute;
+    top: 31px;
+    left: 23px;
+    max-height: 120px;
+    overflow-y: scroll;
+}
+
+.macro-options::-webkit-scrollbar {
+    width: 8px;
+    border-radius:5px;
+}
+
+.macro-options::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius:5px;
+}
+
+.macro-options::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius:5px;
+}
+
+.macro-options::-webkit-scrollbar-thumb:hover {
+    background: #555;
+    border-radius:5px;
+}
+
+.macro-opt{
+	padding: 10px;
+    cursor: pointer;
+}
+
+.stream-container-gray{
+	background-color: #ececec;
+}
+
+.stream-action-container-white{
+	background-color:white;
 }

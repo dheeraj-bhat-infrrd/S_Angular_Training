@@ -15719,11 +15719,65 @@ $(document).on('click','#stream-bulk-actions',function(e){
 });
 
 $(document).on('click','#stream-unchecked',function(e){
+	e.stopPropagation();
 	$('#stream-checked').toggle();
 	$('#stream-unchecked').toggle();
 });
 
 $(document).on('click','#stream-checked',function(e){
+	e.stopPropagation();
 	$('#stream-checked').toggle();
 	$('#stream-unchecked').toggle();
+});
+
+$(document).on('click','#send-mail-post-1',function(e){
+	e.stopPropagation();
+	$('#send-mail-post-1').addClass('stream-post-mail-note-active');
+	$('#private-note-post-1').removeClass('stream-post-mail-note-active');
+});
+
+$(document).on('click','#private-note-post-1',function(e){
+	e.stopPropagation();
+	$('#send-mail-post-1').removeClass('stream-post-mail-note-active');
+	$('#private-note-post-1').addClass('stream-post-mail-note-active');
+});
+
+$(document).on('click','#stream-macro-small',function(e){
+	e.stopPropagation();
+	$('#mac-chevron-down-small').toggle();
+	$('#mac-chevron-up-small').toggle();
+	$('#macro-options').toggle();
+});
+
+$(document).on('click','#stream-macro',function(e){
+	e.stopPropagation();
+	$('#mac-chevron-down').toggle();
+	$('#mac-chevron-up').toggle();
+	$('#macro-options').toggle();
+});
+
+$(document).on('click','#send-mail-post-2',function(e){
+	e.stopPropagation();
+	$('#send-mail-post-2').addClass('stream-post-mail-note-active');
+	$('#private-note-post-2').removeClass('stream-post-mail-note-active');
+});
+
+$(document).on('click','#private-note-post-2',function(e){
+	e.stopPropagation();
+	$('#send-mail-post-2').removeClass('stream-post-mail-note-active');
+	$('#private-note-post-2').addClass('stream-post-mail-note-active');
+});
+
+$(document).on('click','#stream-macro-small-2',function(e){
+	e.stopPropagation();
+	$('#mac-chevron-down-small-2').toggle();
+	$('#mac-chevron-up-small-2').toggle();
+	$('#macro-options-2').toggle();
+});
+
+$(document).on('click','#stream-macro',function(e){
+	e.stopPropagation();
+	$('#mac-chevron-down-2').toggle();
+	$('#mac-chevron-up-2').toggle();
+	$('#macro-options-2').toggle();
 });
