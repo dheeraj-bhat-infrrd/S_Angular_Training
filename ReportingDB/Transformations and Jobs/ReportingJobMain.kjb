@@ -139,8 +139,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>225</xloc>
-      <yloc>100</yloc>
+      <xloc>379</xloc>
+      <yloc>102</yloc>
       </entry>
     <entry>
       <name>SurveyStatsJobMain</name>
@@ -171,8 +171,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>374</xloc>
-      <yloc>100</yloc>
+      <xloc>528</xloc>
+      <yloc>102</yloc>
       </entry>
     <entry>
       <name>NPS_Report</name>
@@ -203,8 +203,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>525</xloc>
-      <yloc>100</yloc>
+      <xloc>679</xloc>
+      <yloc>102</yloc>
       </entry>
     <entry>
       <name>userranking_this_month_job</name>
@@ -235,8 +235,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>698</xloc>
-      <yloc>100</yloc>
+      <xloc>852</xloc>
+      <yloc>102</yloc>
       </entry>
     <entry>
       <name>user_ranking_this_year_job</name>
@@ -267,8 +267,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>698</xloc>
-      <yloc>222</yloc>
+      <xloc>852</xloc>
+      <yloc>216</yloc>
       </entry>
     <entry>
       <name>ScoreStats</name>
@@ -299,8 +299,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>526</xloc>
-      <yloc>222</yloc>
+      <xloc>680</xloc>
+      <yloc>216</yloc>
       </entry>
     <entry>
       <name>survey_transaction_report</name>
@@ -331,8 +331,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>379</xloc>
-      <yloc>222</yloc>
+      <xloc>533</xloc>
+      <yloc>216</yloc>
       </entry>
     <entry>
       <name>company_user_report&#x28;2&#x29;</name>
@@ -367,8 +367,8 @@
             </parameter>      </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>207</xloc>
-      <yloc>222</yloc>
+      <xloc>361</xloc>
+      <yloc>216</yloc>
       </entry>
     <entry>
       <name>User_Adoption</name>
@@ -401,7 +401,7 @@
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>69</xloc>
-      <yloc>222</yloc>
+      <yloc>216</yloc>
       </entry>
     <entry>
       <name>account_statistics</name>
@@ -503,8 +503,8 @@
             </parameter>      </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>127</xloc>
-      <yloc>16</yloc>
+      <xloc>149</xloc>
+      <yloc>102</yloc>
       </entry>
     <entry>
       <name>FinalReportJobLog</name>
@@ -572,8 +572,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>264</xloc>
-      <yloc>8</yloc>
+      <xloc>270</xloc>
+      <yloc>102</yloc>
       </entry>
     <entry>
       <name>UpdateJobLog</name>

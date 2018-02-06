@@ -25,7 +25,6 @@ public class JobLogDetailsDaoImpl extends GenericReportingDaoImpl<JobLogDetails,
 
     
 
-    @SuppressWarnings ( "unchecked")
     @Override
     public JobLogDetails getJobLogDetailsOfLastSuccessfulRun() throws InvalidInputException
     {
@@ -35,6 +34,7 @@ public class JobLogDetailsDaoImpl extends GenericReportingDaoImpl<JobLogDetails,
             // create criteria object for JobLog entity class
             Criteria criteria = getSession().createCriteria( JobLogDetails.class );
             criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_FINISHED ) );
+            criteria.add(Restrictions.eq(CommonConstants.JOB_NAME, CommonConstants.CENTRALIZED_JOB_NAME));
             criteria.addOrder( Order.desc( CommonConstants.JOB_LOG_ID ) );
             criteria.setMaxResults( 1 );
             LOG.debug( "method to fetch the job-log details of last successful run, getJobLogDetailsOfLastSuccessfulRun() finished." );
@@ -47,7 +47,6 @@ public class JobLogDetailsDaoImpl extends GenericReportingDaoImpl<JobLogDetails,
 
     }
     
-    @SuppressWarnings ( "unchecked")
     @Override
     public JobLogDetails getJobLogDetailsOfLatestRun() throws InvalidInputException
     {
@@ -68,7 +67,6 @@ public class JobLogDetailsDaoImpl extends GenericReportingDaoImpl<JobLogDetails,
 
     }
     
-    @SuppressWarnings ( "unchecked")
     @Override
     public long insertJobLog(JobLogDetails jobLogDetails) throws InvalidInputException
     {
@@ -85,7 +83,6 @@ public class JobLogDetailsDaoImpl extends GenericReportingDaoImpl<JobLogDetails,
 
     }
     
-    @SuppressWarnings ( "unchecked")
     @Override
     public JobLogDetails getJobLogDetailsOfLatestRunForEntity(long entityId , String entityType , String jobName) throws InvalidInputException
     {
@@ -94,6 +91,7 @@ public class JobLogDetailsDaoImpl extends GenericReportingDaoImpl<JobLogDetails,
         try {
             // create criteria object for JobLog entity class
             Criteria criteria = getSession().createCriteria( JobLogDetails.class );
+            criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_FINISHED ) );
             criteria.add(Restrictions.eq(CommonConstants.ENTITY_ID_COLUMN, entityId));
             criteria.add(Restrictions.eq(CommonConstants.ENTITY_TYPE_COLUMN, entityType));
             criteria.add(Restrictions.eq(CommonConstants.JOB_NAME,jobName));
