@@ -6,7 +6,7 @@ import java.util.concurrent.Executors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.realtech.socialsurvey.core.starter.ThirdPartySurveyImportor;
+import com.realtech.socialsurvey.core.starter.ThirdPartySurveyImporter;
 
 
 @Component
@@ -15,7 +15,7 @@ public class SurveyImportHandler
     private ExecutorService executor;
 
     @Autowired
-    private ThirdPartySurveyImportor thirdPartySurveyImportor;
+    private ThirdPartySurveyImporter thirdPartySurveyImportor;
 
 
     public void start3rdPartySurveyImport()

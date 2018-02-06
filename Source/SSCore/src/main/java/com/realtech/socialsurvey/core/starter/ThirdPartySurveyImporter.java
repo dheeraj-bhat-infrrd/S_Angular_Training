@@ -9,9 +9,9 @@ import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 
 
 @Component
-public class ThirdPartySurveyImportor implements Runnable
+public class ThirdPartySurveyImporter implements Runnable
 {
-    public static final Logger LOG = LoggerFactory.getLogger( ThirdPartySurveyImportor.class );
+    public static final Logger LOG = LoggerFactory.getLogger( ThirdPartySurveyImporter.class );
 
     @Autowired
     private SurveyHandler surveyHandler;
