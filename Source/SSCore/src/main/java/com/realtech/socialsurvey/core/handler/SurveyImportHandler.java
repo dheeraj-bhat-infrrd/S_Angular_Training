@@ -15,12 +15,12 @@ public class SurveyImportHandler
     private ExecutorService executor;
 
     @Autowired
-    private ThirdPartySurveyImporter thirdPartySurveyImportor;
+    private ThirdPartySurveyImporter thirdPartySurveyImporter;
 
 
     public void start3rdPartySurveyImport()
     {
         executor = Executors.newFixedThreadPool( 1 );
-        executor.execute( thirdPartySurveyImportor );
+        executor.execute( thirdPartySurveyImporter );
     }
 }
