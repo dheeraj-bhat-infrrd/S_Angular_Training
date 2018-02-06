@@ -7,7 +7,7 @@ import com.realtech.socialsurvey.compute.enums.FileUploadStatus;
 import com.realtech.socialsurvey.compute.enums.ReportType;
 import com.realtech.socialsurvey.compute.exception.FileUploadUpdationException;
 import com.realtech.socialsurvey.compute.services.FailedMessagesService;
-import com.realtech.socialsurvey.compute.services.api.APIIntergrationException;
+import com.realtech.socialsurvey.compute.services.api.APIIntegrationException;
 import com.realtech.socialsurvey.compute.services.impl.FailedMessagesServiceImpl;
 import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBoltWithAck;
 import com.realtech.socialsurvey.compute.utils.ConversionUtils;
@@ -61,7 +61,7 @@ public class UpdateFileUploadStatusBolt extends BaseComputeBoltWithAck
                 FailedMessagesService failedMessagesService = new FailedMessagesServiceImpl();
                 failedMessagesService.insertPermanentlyFailedReportRequest(reportRequest, ex);
             }
-            catch (APIIntergrationException | IllegalArgumentException | IOException ex) {
+            catch (APIIntegrationException | IllegalArgumentException | IOException ex) {
                 LOG.error("Exception occurred while updating the status of fileUploadTable" + ex.getMessage());
                 FailedMessagesService failedMessagesService = new FailedMessagesServiceImpl();
                 failedMessagesService.insertTemporaryFailedReportRequest(reportRequest);

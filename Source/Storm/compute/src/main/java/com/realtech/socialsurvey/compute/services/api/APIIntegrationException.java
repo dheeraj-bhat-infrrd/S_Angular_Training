@@ -7,25 +7,25 @@ import com.realtech.socialsurvey.compute.exception.FatalException;
  * @author nishit
  *
  */
-public class APIIntergrationException extends FatalException
+public class APIIntegrationException extends FatalException
 {
 
     private static final long serialVersionUID = 1L;
 
 
-    public APIIntergrationException()
+    public APIIntegrationException()
     {
         super();
     }
 
 
-    public APIIntergrationException( String message, Throwable thrw )
+    public APIIntegrationException( String message, Throwable thrw )
     {
         super( message, thrw );
     }
 
 
-    public APIIntergrationException( String message )
+    public APIIntegrationException( String message )
     {
         super( message );
     }
