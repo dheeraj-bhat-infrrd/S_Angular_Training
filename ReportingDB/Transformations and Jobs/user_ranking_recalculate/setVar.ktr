@@ -1,19 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>update_min_req</name>
+    <name>setVar</name>
     <description/>
     <extended_description/>
     <trans_version/>
     <trans_type>Normal</trans_type>
-    <trans_status>0</trans_status>
     <directory>&#x2f;</directory>
     <parameters>
-        <parameter>
-            <name>companyId</name>
-            <default_value>3</default_value>
-            <description/>
-        </parameter>
     </parameters>
     <log>
 <trans-log-table><connection/>
@@ -72,10 +66,10 @@
     <clusterschemas>
     </clusterschemas>
   <created_user>-</created_user>
-  <created_date>2018&#x2f;01&#x2f;19 14&#x3a;45&#x3a;06.785</created_date>
+  <created_date>2018&#x2f;02&#x2f;06 16&#x3a;42&#x3a;26.752</created_date>
   <modified_user>-</modified_user>
-  <modified_date>2018&#x2f;01&#x2f;19 14&#x3a;45&#x3a;06.785</modified_date>
-    <key_for_session_key>H4sIAAAAAAAAAAMAAAAAAAAAAAA&#x3d;</key_for_session_key>
+  <modified_date>2018&#x2f;02&#x2f;06 16&#x3a;42&#x3a;26.752</modified_date>
+    <key_for_session_key/>
     <is_key_private>N</is_key_private>
   </info>
   <notepads>
@@ -137,15 +131,12 @@
     </attributes>
   </connection>
   <order>
-  <hop> <from>Insert &#x2f; Update Min Requirement</from><to>Dummy &#x28;do nothing&#x29;</to><enabled>Y</enabled> </hop>
-  <hop> <from>JSON Min Requirement</from><to>Replace Null Min Requirement</to><enabled>Y</enabled> </hop>
-  <hop> <from>Replace Null Min Requirement</from><to>UUID-min-requirements</to><enabled>Y</enabled> </hop>
-  <hop> <from>MongoDB Input</from><to>JSON Min Requirement</to><enabled>Y</enabled> </hop>
-  <hop> <from>UUID-min-requirements</from><to>Insert &#x2f; Update Min Requirement</to><enabled>Y</enabled> </hop>
+  <hop> <from>Get Variables</from><to>Write to log</to><enabled>Y</enabled> </hop>
+  <hop> <from>Write to log</from><to>Set Variables</to><enabled>Y</enabled> </hop>
   </order>
   <step>
-    <name>Dummy &#x28;do nothing&#x29;</name>
-    <type>Dummy</type>
+    <name>Get Variables</name>
+    <type>GetVariable</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -154,226 +145,43 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>530</xloc>
-      <yloc>326</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Insert &#x2f; Update Min Requirement</name>
-    <type>InsertUpdate</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <commit>1000</commit>
-    <update_bypassed>N</update_bypassed>
-    <lookup>
-      <schema/>
-      <table>min_requirement_for_ranking</table>
-      <key>
-        <name>CompanyId</name>
-        <field>COMPANY_ID</field>
-        <condition>&#x3d;</condition>
-        <name2/>
-      </key>
-      <value>
-        <name>MIN_DAYS_OF_REGISTRATION</name>
-        <rename>minDaysOfRegistration</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>MIN_COMPLETED_PERCENTAGE</name>
-        <rename>minCompletedPercentage</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>MIN_NO_OF_REVIEWS</name>
-        <rename>minNoOfReviews</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>MONTH_OFFSET</name>
-        <rename>monthOffset</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>YEAR_OFFSET</name>
-        <rename>yearOffset</rename>
-        <update>Y</update>
-      </value>
-      <value>
-        <name>COMPANY_ID</name>
-        <rename>CompanyId</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>MIN_REQUIREMENT_ID</name>
-        <rename>MIN_REQUIREMENT_ID</rename>
-        <update>N</update>
-      </value>
-    </lookup>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>805</xloc>
-      <yloc>330</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>JSON Min Requirement</name>
-    <type>FastJsonInput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <include>N</include>
-    <include_field/>
-    <rownum>N</rownum>
-    <addresultfile>N</addresultfile>
-    <readurl>N</readurl>
-    <removeSourceField>N</removeSourceField>
-    <IsIgnoreEmptyFile>N</IsIgnoreEmptyFile>
-    <doNotFailIfNoFile>Y</doNotFailIfNoFile>
-    <ignoreMissingPath>Y</ignoreMissingPath>
-    <defaultPathLeafToNull>Y</defaultPathLeafToNull>
-    <rownum_field/>
-    <file>
-      <name/>
-      <filemask/>
-      <exclude_filemask/>
-      <file_required>N</file_required>
-      <include_subfolders>N</include_subfolders>
-    </file>
     <fields>
       <field>
-        <name>minCompletedPercentage</name>
-        <path>&#x24;.ranking_requirements.minCompletedPercentage</path>
-        <type>Number</type>
-        <format/>
+        <name>companyId</name>
+        <variable>&#x24;&#x7b;companyId&#x7d;</variable>
+        <type>Integer</type>
+        <format>&#x23;</format>
         <currency/>
         <decimal/>
         <group/>
         <length>-1</length>
         <precision>-1</precision>
-        <trim_type>none</trim_type>
-        <repeat>N</repeat>
+        <trim_type>both</trim_type>
       </field>
       <field>
-        <name>minDaysOfRegistration</name>
-        <path>&#x24;.ranking_requirements.minDaysOfRegistration</path>
-        <type>Number</type>
-        <format/>
+        <name>jobLogId</name>
+        <variable>&#x24;&#x7b;jobLogId&#x7d;</variable>
+        <type>Integer</type>
+        <format>&#x23;</format>
         <currency/>
         <decimal/>
         <group/>
         <length>-1</length>
         <precision>-1</precision>
-        <trim_type>none</trim_type>
-        <repeat>N</repeat>
-      </field>
-      <field>
-        <name>minNoOfReviews</name>
-        <path>&#x24;.ranking_requirements.minNoOfReviews</path>
-        <type>Number</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <length>-1</length>
-        <precision>-1</precision>
-        <trim_type>none</trim_type>
-        <repeat>N</repeat>
-      </field>
-      <field>
-        <name>monthOffset</name>
-        <path>&#x24;.ranking_requirements.monthOffset</path>
-        <type>Number</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <length>-1</length>
-        <precision>-1</precision>
-        <trim_type>none</trim_type>
-        <repeat>N</repeat>
-      </field>
-      <field>
-        <name>yearOffset</name>
-        <path>&#x24;.ranking_requirements.yearOffset</path>
-        <type>Number</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <length>-1</length>
-        <precision>-1</precision>
-        <trim_type>none</trim_type>
-        <repeat>N</repeat>
-      </field>
-      <field>
-        <name>CompanySettingsId</name>
-        <path>&#x24;._id.&#x24;oid</path>
-        <type>None</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <length>-1</length>
-        <precision>-1</precision>
-        <trim_type>none</trim_type>
-        <repeat>N</repeat>
-      </field>
-      <field>
-        <name>CompanyId</name>
-        <path>&#x24;.iden</path>
-        <type>None</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <length>-1</length>
-        <precision>-1</precision>
-        <trim_type>none</trim_type>
-        <repeat>N</repeat>
+        <trim_type>both</trim_type>
       </field>
     </fields>
-    <limit>0</limit>
-    <IsInFields>Y</IsInFields>
-    <IsAFile>N</IsAFile>
-    <valueField>json</valueField>
-    <shortFileFieldName/>
-    <pathFieldName/>
-    <hiddenFieldName/>
-    <lastModificationTimeFieldName/>
-    <uriNameFieldName/>
-    <rootUriNameFieldName/>
-    <extensionFieldName/>
-    <sizeFieldName/>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>280</xloc>
-      <yloc>135</yloc>
+      <xloc>162</xloc>
+      <yloc>169</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>MongoDB Input</name>
-    <type>MongoDbInput</type>
+    <name>Write to log</name>
+    <type>WriteToLog</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -382,62 +190,24 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <hostname>&#x24;&#x7b;MONGO_HOST&#x7d;</hostname>
-    <port>&#x24;&#x7b;MONGO_PORT&#x7d;</port>
-    <use_all_replica_members>N</use_all_replica_members>
-    <db_name>ss_db</db_name>
-    <fields_name/>
-    <collection>COMPANY_SETTINGS</collection>
-    <json_field_name>json</json_field_name>
-    <json_query>&#x7b;&#x24;query&#x3a;&#x7b;iden &#x3a; &#x24;&#x7b;companyId&#x7d;&#x7d;&#x7d;</json_query>
-    <auth_user/>
-    <auth_password>Encrypted </auth_password>
-    <auth_kerberos>N</auth_kerberos>
-    <connect_timeout/>
-    <socket_timeout/>
-    <read_preference>primary</read_preference>
-    <output_json>Y</output_json>
-    <query_is_pipeline>N</query_is_pipeline>
-    <execute_for_each_row>N</execute_for_each_row>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>119</xloc>
-      <yloc>133</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Replace Null Min Requirement</name>
-    <type>IfNull</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <replaceAllByValue>0</replaceAllByValue>
-      <replaceAllMask/>
-      <selectFields>N</selectFields>
-      <selectValuesType>N</selectValuesType>
-      <setEmptyStringAll>N</setEmptyStringAll>
-    <valuetypes>
-      </valuetypes>
+      <loglevel>log_level_basic</loglevel>
+      <displayHeader>Y</displayHeader>
+      <limitRows>N</limitRows>
+      <limitRowsNumber>0</limitRowsNumber>
+      <logmessage/>
     <fields>
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>530</xloc>
-      <yloc>135</yloc>
+      <xloc>324</xloc>
+      <yloc>172</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>UUID-min-requirements</name>
-    <type>RandomValue</type>
+    <name>Set Variables</name>
+    <type>SetVariable</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -448,31 +218,28 @@
            </partitioning>
     <fields>
       <field>
-        <name>MIN_REQUIREMENT_ID</name>
-        <type>random uuid</type>
-      </field>
-    </fields>
+        <field_name>companyId</field_name>
+        <variable_name>companyId</variable_name>
+        <variable_type>PARENT_JOB</variable_type>
+        <default_value/>
+        </field>
+      <field>
+        <field_name>jobLogId</field_name>
+        <variable_name>jobLogId</variable_name>
+        <variable_type>PARENT_JOB</variable_type>
+        <default_value/>
+        </field>
+      </fields>
+    <use_formatting>Y</use_formatting>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>805</xloc>
-      <yloc>135</yloc>
+      <xloc>513</xloc>
+      <yloc>166</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step_error_handling>
-      <error>
-        <source_step>Insert &#x2f; Update Min Requirement</source_step>
-        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename/>
-        <descriptions_valuename/>
-        <fields_valuename/>
-        <codes_valuename/>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
   </step_error_handling>
    <slave-step-copy-partition-distribution>
 </slave-step-copy-partition-distribution>

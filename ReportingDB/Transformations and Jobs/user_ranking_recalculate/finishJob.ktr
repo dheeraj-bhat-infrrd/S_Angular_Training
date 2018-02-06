@@ -10,6 +10,11 @@
     <directory>&#x2f;</directory>
     <parameters>
         <parameter>
+            <name>companyId</name>
+            <default_value/>
+            <description/>
+        </parameter>
+        <parameter>
             <name>status</name>
             <default_value>abc</default_value>
             <description/>
@@ -139,7 +144,8 @@
   <order>
   <hop> <from>Add constants</from><to>Update JobLogDetails</to><enabled>Y</enabled> </hop>
   <hop> <from>Get EndTime</from><to>Get Variables</to><enabled>Y</enabled> </hop>
-  <hop> <from>Get Variables</from><to>Add constants</to><enabled>Y</enabled> </hop>
+  <hop> <from>Write to log</from><to>Add constants</to><enabled>Y</enabled> </hop>
+  <hop> <from>Get Variables</from><to>Write to log</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Add constants</name>
@@ -168,8 +174,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>384</xloc>
-      <yloc>58</yloc>
+      <xloc>514</xloc>
+      <yloc>59</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -193,7 +199,7 @@
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>140</xloc>
+      <xloc>62</xloc>
       <yloc>56</yloc>
       <draw>Y</draw>
       </GUI>
@@ -239,7 +245,19 @@
         <name>jobLogId</name>
         <variable>&#x24;&#x7b;jobLogId&#x7d;</variable>
         <type>Integer</type>
-        <format/>
+        <format>&#x23;</format>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>both</trim_type>
+      </field>
+      <field>
+        <name>asd</name>
+        <variable>&#x24;&#x7b;companyId&#x7d;</variable>
+        <type>Integer</type>
+        <format>&#x23;</format>
         <currency/>
         <decimal/>
         <group/>
@@ -250,7 +268,7 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>277</xloc>
+      <xloc>199</xloc>
       <yloc>56</yloc>
       <draw>Y</draw>
       </GUI>
@@ -297,8 +315,49 @@
       </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>508</xloc>
-      <yloc>58</yloc>
+      <xloc>638</xloc>
+      <yloc>59</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Write to log</name>
+    <type>WriteToLog</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <loglevel>log_level_basic</loglevel>
+      <displayHeader>Y</displayHeader>
+      <limitRows>N</limitRows>
+      <limitRowsNumber>0</limitRowsNumber>
+      <logmessage/>
+    <fields>
+      <field>
+        <name>time</name>
+        </field>
+      <field>
+        <name>currentStep</name>
+        </field>
+      <field>
+        <name>status</name>
+        </field>
+      <field>
+        <name>jobLogId</name>
+        </field>
+      <field>
+        <name>asd</name>
+        </field>
+      </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>382</xloc>
+      <yloc>55</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
