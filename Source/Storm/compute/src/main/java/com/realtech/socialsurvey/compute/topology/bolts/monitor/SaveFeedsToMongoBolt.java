@@ -2,7 +2,11 @@ package com.realtech.socialsurvey.compute.topology.bolts.monitor;
 
 
 import com.google.gson.Gson;
+import com.realtech.socialsurvey.compute.common.ComputeConstants;
+import com.realtech.socialsurvey.compute.common.LocalPropertyFileHandler;
 import com.realtech.socialsurvey.compute.common.SSAPIOperations;
+import com.realtech.socialsurvey.compute.dao.RedisCompanyKeywordsDao;
+import com.realtech.socialsurvey.compute.dao.impl.RedisCompanyKeywordsDaoImpl;
 import com.realtech.socialsurvey.compute.entities.SocialResponseType;
 import com.realtech.socialsurvey.compute.entities.response.FacebookFeedData;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
@@ -31,6 +35,7 @@ public class SaveFeedsToMongoBolt extends BaseComputeBolt
 
     private static final Logger LOG = LoggerFactory.getLogger( SaveFeedsToMongoBolt.class );
 
+    private RedisCompanyKeywordsDao redisCompanyKeywordsDao = new RedisCompanyKeywordsDaoImpl();
 
     @SuppressWarnings ( "unchecked")
     @Override
@@ -41,7 +46,9 @@ public class SaveFeedsToMongoBolt extends BaseComputeBolt
         SocialResponseType socialResponseType = (SocialResponseType) input.getValueByField( "type" );
         SocialResponseObject<?> post = null;
         boolean isSuccess = true;
-
+        int retryCount ;
+        int maxRetryCount = Integer.parseInt(LocalPropertyFileHandler.getInstance()
+                .getProperty(ComputeConstants.APPLICATION_PROPERTY_FILE, ComputeConstants.SSAPI_MAX_RETRY_COUNT).orElse(null));
         if ( socialResponseType != null ) {
             Object socialPost = input.getValueByField( "post" );
             if ( socialPost != null ) {
@@ -50,6 +57,8 @@ public class SaveFeedsToMongoBolt extends BaseComputeBolt
                     boolean isfacebookPostAdded = addSocialFacebookFeedToMongo( (SocialResponseObject<FacebookFeedData>) post );
                     if ( !isfacebookPostAdded ) {
                         isSuccess = false;
+                        retryCount = getSSApiRetryCountFromRedis();
+                        redisCompanyKeywordsDao.setSSApiBreakerStateKeys();
                         repostMessageToKafka(input, companyId, post);
                     }
                 } else if ( socialResponseType.getType().equals( "TWITTER" ) ) {
@@ -76,6 +85,10 @@ public class SaveFeedsToMongoBolt extends BaseComputeBolt
         _collector.emit( "SUCCESS_STREAM", input, Arrays.asList(isSuccess, companyId, post ) );
         _collector.ack( input );
         LOG.info( "Successfully emitted message." );
+    }
+
+    private int getSSApiRetryCountFromRedis() {
+        return redisCompanyKeywordsDao.getSSApiRetryCount();
     }
 
     private void repostMessageToKafka(Tuple input, long companyId, SocialResponseObject<?> post) {

@@ -20,5 +20,25 @@ public interface RedisCompanyKeywordsDao
      * @return
      */
     public long getKeywordModifiedOn( long companyIden );
-    
+
+    /**
+     * Returns the ssapiretrycount value
+     * @return
+     */
+    public int getSSApiRetryCount();
+
+    /**
+     * Sets/Updates ssapiretrycount, ssapibreakerstatus and ssapibreakerontime
+     */
+    public void setSSApiBreakerStateKeys();
+
+    /**
+     *Resets/Updates ssapiretrycount, ssapibreakerstatus and ssapibreakerontime
+     */
+    public void unsetSSApiBreakerStateKeys();
+
+    /**
+     * Gets ssapibreakerstatus
+     */
+    public String getSSApiBreakerStatus();
 }

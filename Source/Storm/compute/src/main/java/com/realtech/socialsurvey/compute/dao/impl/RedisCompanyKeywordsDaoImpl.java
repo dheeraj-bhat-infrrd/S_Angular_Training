@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.compute.dao.impl;
 import java.io.Serializable;
 import java.util.List;
 
+import com.realtech.socialsurvey.compute.enums.SSApiBreakerStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,5 +66,52 @@ public class RedisCompanyKeywordsDaoImpl implements RedisCompanyKeywordsDao, Ser
             }
         }
     }
+
+    public int getSSApiRetryCount(){
+        try(Jedis jedis = RedisDB.getPoolInstance().getResource()){
+            String retryCount = jedis.get(RedisDB.SSAPI_RETRY_COUNT);
+            if(retryCount == null ){
+                jedis.setnx(RedisDB.SSAPI_RETRY_COUNT, "0");
+            }
+            return Integer.parseInt(retryCount);
+        }
+    }
+
+    @Override
+    public void setSSApiBreakerStateKeys() {
+        try(Jedis jedis = RedisDB.getPoolInstance().getResource()){
+            //set the breaker_status, time and increment the retrycount
+            jedis.set(RedisDB.SSAPI_BREAKER_STATUS, SSApiBreakerStatus.ON.name());
+
+            if(jedis.get(RedisDB.SSAPI_BREAKER_ON_TIME) == null)
+                jedis.setnx(RedisDB.SSAPI_BREAKER_ON_TIME, String.valueOf(System.currentTimeMillis()));
+            else
+                jedis.set(RedisDB.SSAPI_BREAKER_ON_TIME, String.valueOf(System.currentTimeMillis()));
+
+            jedis.incr(RedisDB.SSAPI_RETRY_COUNT);
+        }
+    }
+
+    @Override
+    public void unsetSSApiBreakerStateKeys() {
+        try(Jedis jedis = RedisDB.getPoolInstance().getResource()){
+            //resets the breaker_status, time and increment the retrycount
+            jedis.setnx(RedisDB.SSAPI_BREAKER_STATUS, SSApiBreakerStatus.OFF.name());
+            jedis.set(RedisDB.SSAPI_BREAKER_ON_TIME, "0");
+            jedis.set(RedisDB.SSAPI_RETRY_COUNT, "0");
+        }
+    }
+
+    @Override
+    public String getSSApiBreakerStatus() {
+        try(Jedis jedis = RedisDB.getPoolInstance().getResource()){
+            String breakerStatus = jedis.get(RedisDB.SSAPI_BREAKER_STATUS);
+            if(breakerStatus == null ){
+                jedis.setnx(RedisDB.SSAPI_BREAKER_STATUS, SSApiBreakerStatus.OFF.name());
+            }
+            return breakerStatus;
+        }
+    }
+
 
 }
