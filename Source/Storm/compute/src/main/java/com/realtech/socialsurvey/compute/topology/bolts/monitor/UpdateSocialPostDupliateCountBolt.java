@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.compute.topology.bolts.monitor;
 
+import com.google.gson.Gson;
 import com.realtech.socialsurvey.compute.common.SSAPIOperations;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBolt;
@@ -10,6 +11,7 @@ import org.apache.storm.tuple.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 public class UpdateSocialPostDupliateCountBolt extends BaseComputeBolt {
@@ -23,11 +25,13 @@ public class UpdateSocialPostDupliateCountBolt extends BaseComputeBolt {
         LOG.info("Executing update duplicate feedCount bolt ... ");
         long companyId = tuple.getLongByField("companyId");
         SocialResponseObject<?> socialPost = (SocialResponseObject<?>) tuple.getValueByField( "post" );
+        boolean success = tuple.getBooleanByField("isSuccess");
 
         int hash = socialPost.getHash();
+        boolean isSuccess = true;
         LOG.debug("HashCode of the social text = {}", hash);
 
-        if(hash != 0) {
+        if(success && hash != 0) {
             //check if posts with same hash are already present
             Optional<Long> duplicateCount = getSocialPostDuplicateCount(hash, companyId);
             if (duplicateCount.isPresent() && duplicateCount.get() > 1) {
@@ -35,15 +39,25 @@ public class UpdateSocialPostDupliateCountBolt extends BaseComputeBolt {
                 Optional<Long> updatedPosts = updateSocialPostDuplicateCount(hash, companyId, duplicateCount.get());
                 if (updatedPosts.isPresent() && updatedPosts.get() > 1) {
                     LOG.info(" Total {} docs were successfully updated having hash {} ", updatedPosts.get(), hash);
-                } else
+                } else {
+                    isSuccess = false;
                     LOG.warn("Something went wrong while updating duplicateCount !!! ");
-            } else {
-                LOG.info("No duplicates found for the post with hash = {} ", hash);
+                    repostMessageToKafka(tuple, companyId, socialPost);
+                }
+            }
+            else if(!duplicateCount.isPresent()){
+                isSuccess = false;
+                LOG.warn("Something went wrong while fetching duplicateCount !!! ");
+                repostMessageToKafka(tuple, companyId, socialPost);
             }
         }
-        _collector.emit( tuple, new Values(companyId, socialPost));
+        _collector.emit( "SUCCESS_STREAM",tuple, new Values(isSuccess, companyId, socialPost));
         _collector.ack( tuple );
         LOG.info( "Successfully emitted message." );
+    }
+
+    private void repostMessageToKafka(Tuple input, long companyId, SocialResponseObject<?> post) {
+        _collector.emit("ERROR_STREAM",input, Arrays.asList(Long.toString(companyId), new Gson().toJson(post)));
     }
 
     private Optional<Long> updateSocialPostDuplicateCount(int hash, long companyId, long duplicateCount) {
@@ -56,6 +70,7 @@ public class UpdateSocialPostDupliateCountBolt extends BaseComputeBolt {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare( new Fields( "companyId", "post" ) );
+        declarer.declareStream("SUCCESS_STREAM", new Fields("isSuccess", "companyId", "post" ) );
+        declarer.declareStream("ERROR_STREAM", new Fields( "companyId", "post" ));
     }
 }
