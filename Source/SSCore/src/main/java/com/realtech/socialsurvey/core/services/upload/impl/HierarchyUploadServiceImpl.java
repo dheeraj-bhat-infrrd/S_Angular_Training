@@ -1093,8 +1093,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
             }
 
-            if ( userUploadVO.getUserPhotoUrl() != null && !userUploadVO.getUserPhotoUrl().isEmpty()
-                && userUploadVO.getUserPhotoUrl() != agentSettings.getProfileImageUrl() ) {
+            if ( userUploadVO.getUserPhotoUrl() != null && !userUploadVO.getUserPhotoUrl().isEmpty() ) {
                 updateProfileImageForAgent( userUploadVO.getUserPhotoUrl(), agentSettings );
             }
         }
@@ -1118,20 +1117,22 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
     {
         LOG.debug( "Uploading for agent " + agentSettings.getIden() + " with photo: " + userPhotoUrl );
         if ( isImagevalid( userPhotoUrl ) ) {
-            String url = null;
-            if ( userPhotoUrl.contains( cdnUrl ) ) {
-                url = userPhotoUrl;
-            } else {
-                try {
-                    url = uploadProfileImageToCloud( userPhotoUrl );
-                } catch ( Exception e ) {
-                    LOG.warn( "Unable to upload image to cloud.", e );
-                    throw new InvalidInputException( "Image format not valid for url:" + userPhotoUrl );
+            if ( userPhotoUrl != agentSettings.getProfileImageUrl() && !userPhotoUrl.contains( cdnUrl ) ) {
+                String url = null;
+                if ( userPhotoUrl.contains( cdnUrl ) ) {
+                    url = userPhotoUrl;
+                } else {
+                    try {
+                        url = uploadProfileImageToCloud( userPhotoUrl );
+                    } catch ( Exception e ) {
+                        LOG.warn( "Unable to upload image to cloud.", e );
+                        throw new InvalidInputException( "Image format not valid for url:" + userPhotoUrl );
+                    }
                 }
-            }
-            if ( url != null && !url.isEmpty() ) {
-                profileManagementService.updateProfileImage( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
-                    agentSettings, url );
+                if ( url != null && !url.isEmpty() ) {
+                    profileManagementService.updateProfileImage( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+                        agentSettings, url );
+                }
             }
         }
     }
@@ -3017,7 +3018,8 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
         } else if ( userPhotoUrl.contains( ".jpeg" ) || userPhotoUrl.contains( ".JPEG" ) ) {
             imageName = imageName + ".jpeg";
         } else {
-            return null;
+            LOG.error( "The url given is not a valid image url." );
+            throw new InvalidInputException( "Image format not valid" );
         }
         return profileManagementService.copyImage( userPhotoUrl, imageName );
     }
