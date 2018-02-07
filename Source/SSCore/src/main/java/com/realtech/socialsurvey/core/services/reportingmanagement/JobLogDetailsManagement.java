@@ -14,4 +14,6 @@ public interface JobLogDetailsManagement
 	public JobLogDetailsResponse getLastRunForEntity(long entityId, String entityType) throws InvalidInputException;
 
 	public long insertJobLog(long entityId, String entityType, String jobName, String status) throws InvalidInputException;
+
+	public void recalEtl(long companyId, long jobLogId);
 }

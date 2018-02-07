@@ -705,10 +705,12 @@ public class ReportingWebController
         //add attribute to see if etl is running
         Response responseIsRun = ssApiIntergrationBuilder.getIntegrationApi().isEtlRunning();
         String responseIsRunString = responseIsRun != null ? new String( ( (TypedByteArray) responseIsRun.getBody() ).getBytes() ) : null;
+        if(responseIsRunString != null)
+        	responseIsRunString = responseIsRunString.substring( 1, responseIsRunString.length() - 1 );
         model.addAttribute( "isEtlRunning", responseIsRunString );
         //add attribute to pass last user ranking run info
         
-        Response responseLastRun = ssApiIntergrationBuilder.getIntegrationApi().lastRunForEntity(entityId, ENTITY_TYPE);
+        Response responseLastRun = ssApiIntergrationBuilder.getIntegrationApi().lastRunForEntity(entityId, entityType);
         String responseLastRunString = responseLastRun != null ? new String( ( (TypedByteArray) responseLastRun.getBody() ).getBytes() ) : null;
         if(responseLastRunString != null){
         	responseLastRunString = responseLastRunString.substring( 1, responseLastRunString.length() - 1 );
