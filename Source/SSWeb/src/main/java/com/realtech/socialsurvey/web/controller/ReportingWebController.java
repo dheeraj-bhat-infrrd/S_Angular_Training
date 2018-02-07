@@ -708,7 +708,7 @@ public class ReportingWebController
         model.addAttribute( "isEtlRunning", responseIsRunString );
         //add attribute to pass last user ranking run info
         
-        Response responseLastRun = ssApiIntergrationBuilder.getIntegrationApi().isEtlRunning();
+        Response responseLastRun = ssApiIntergrationBuilder.getIntegrationApi().lastRunForEntity(entityId, ENTITY_TYPE);
         String responseLastRunString = responseLastRun != null ? new String( ( (TypedByteArray) responseLastRun.getBody() ).getBytes() ) : null;
         if(responseLastRunString != null){
         	responseLastRunString = responseLastRunString.substring( 1, responseLastRunString.length() - 1 );
