@@ -15,7 +15,6 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.bson.types.ObjectId;
-import org.hibernate.engine.jdbc.internal.DDLFormatterImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,7 +98,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
      * Method to fetch survey details on the basis of agentId and customer email.
      */
     @Override
-    public SurveyDetails getSurveyByAgentIdAndCustomerEmail( long agentId, String customerEmail, String firstName,
+	public SurveyDetails getSurveyByAgentIdAndCustomerEmail( long agentId, String customerEmail, String firstName,
         String lastName )
     {
         LOG.debug( "Method getSurveyByAgentIdAndCustomerEmail() to insert details of survey started." );
@@ -111,6 +110,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         if ( lastName != null && !lastName.isEmpty() ) {
             query.addCriteria( Criteria.where( "customerLastName" ).is( lastName ) );
         }
+        
         //get the oldest record
         query.with( new Sort( Sort.Direction.ASC, CommonConstants.CREATED_ON ) );
         List<SurveyDetails> surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
@@ -145,8 +145,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         }
 
         query.addCriteria( Criteria.where( CommonConstants.CREATED_ON ).gte( startDate ) );
-
-
+        
         List<SurveyDetails> surveys = mongoTemplate.find( query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION );
         if ( surveys == null || surveys.size() == 0 )
             return null;
@@ -208,6 +207,19 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         Update update = new Update();
         update.set( "stage", stage );
         update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
+        update.pull( "surveyResponse", new BasicDBObject( "question", surveyResponse.getQuestion() ) );
+        mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
+        mongoTemplate.updateMulti( query, new Update().push( "surveyResponse", surveyResponse ), SURVEY_DETAILS_COLLECTION );
+        LOG.debug( "Method updateCustomerResponse() to update response provided by customer finished." );
+    }
+    
+    @Override
+    public void updateCustomerResponse( String surveyId, SurveyResponse surveyResponse)
+    {
+        LOG.debug( "Method updateCustomerResponse() to update response provided by customer started." );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyId ) );
+        Update update = new Update();
         update.pull( "surveyResponse", new BasicDBObject( "question", surveyResponse.getQuestion() ) );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
         mongoTemplate.updateMulti( query, new Update().push( "surveyResponse", surveyResponse ), SURVEY_DETAILS_COLLECTION );
@@ -3028,7 +3040,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     }
 
     
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public Float getFilteredSurveyAvgScore( long companyId,  String mood, Long startSurveyID, Date startReviewDate,
         Date startTransactionDate, List<Long> userIds, boolean isRetaken )
     {
@@ -3476,6 +3489,27 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.debug( "Method insertSurveyDetails() to insert details of survey finished." );
     }
-    
-    
+
+	@Override
+	public List<SurveyDetails> getSurveyDetailsForCompanyAndQuestion(long companyId, String question) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where(CommonConstants.COMPANY_ID_COLUMN).is(companyId));
+		query.addCriteria(Criteria.where(CommonConstants.SURVEY_RESPONSE_QUESTION).is(question));
+		query.addCriteria(Criteria.where(CommonConstants.SURVEY_RESPONSE_QUESTION_TYPE).is(CommonConstants.QUESTION_TYPE_MCQ));
+		List<SurveyDetails> surveys = mongoTemplate.find(query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION);
+		return surveys;
+	}
+
+
+	@Override
+	public void updateSurveyNPSScore(SurveyDetails surveyDetails) {
+		LOG.debug( "Method updateSurveyNPSScore started." );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyDetails.get_id() ) );
+
+        Update update = new Update();
+        update.set( CommonConstants.NPS_SCORE_COLUMN, surveyDetails.getNpsScore() );
+        mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
+        LOG.debug( "Method updateSurveyNPSScore finished." );
+	}
 }

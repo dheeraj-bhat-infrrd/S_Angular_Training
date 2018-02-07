@@ -7,10 +7,10 @@ package com.realtech.socialsurvey.core.exception;
 public class InternalServerException extends BaseRestException {
 
 	private static final long serialVersionUID = 1L;
-
-	public InternalServerException(ErrorCode errorCode, String debugMessage) {
-		super();
-		this.debugMessage = debugMessage;
-		this.errorCode = errorCode;
+	
+	public InternalServerException(ErrorCode errorCode, String debugMessage, Throwable thrw) {
+	    super(thrw);
+	    this.debugMessage=debugMessage;
+	    this.errorCode = errorCode;
 	}
 }

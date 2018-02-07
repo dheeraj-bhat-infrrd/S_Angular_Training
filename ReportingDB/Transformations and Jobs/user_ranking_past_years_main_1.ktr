@@ -1178,7 +1178,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var days_of_registration_final &#x3d; 0&#x3b;&#xd;&#xa;var avg_rating_final &#x3d; 0.000&#x3b;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;days_of_registration &#x21;&#x3d; null&#x29;&#x7b; days_of_registration_final &#x3d; days_of_registration&#x3b; &#x7d;&#xd;&#xa;if&#x28;AverageScore &#x21;&#x3d; null&#x29;&#x7b;avg_rating_final &#x3d; AverageScore&#x3b; &#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28; Completed &#x3d;&#x3d; null&#x29; var Completed &#x3d; 0&#xd;&#xa;if&#x28;total_sent &#x3d;&#x3d; null&#x29;var total_sent &#x3d; 0&#xd;&#xa;if&#x28;complete_percentage &#x3d;&#x3d; null&#x29; var complete_percentage &#x3d; 0</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var days_of_registration_final &#x3d; 0&#x3b;&#xd;&#xa;var avg_rating_final &#x3d; 0.000&#x3b;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;days_of_registration &#x21;&#x3d; null&#x29;&#x7b;&#xa; days_of_registration_final &#x3d; days_of_registration&#x3b; &#xa;&#x7d;else if&#x28;days_of_registration_1 &#x21;&#x3d; null&#x29;&#x7b;&#xa; days_of_registration_final &#x3d; days_of_registration_1&#x3b; &#xa;&#x7d;&#xa;if&#x28;AverageScore &#x21;&#x3d; null&#x29;&#x7b;avg_rating_final &#x3d; AverageScore&#x3b; &#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28; Completed &#x3d;&#x3d; null&#x29; var Completed &#x3d; 0&#xd;&#xa;if&#x28;total_sent &#x3d;&#x3d; null&#x29;var total_sent &#x3d; 0&#xd;&#xa;if&#x28;complete_percentage &#x3d;&#x3d; null&#x29; var complete_percentage &#x3d; 0</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>days_of_registration_final</name>
         <rename>days_of_registration_final</rename>
         <type>String</type>
@@ -1359,7 +1359,7 @@
     <fields>        <select_unspecified>N</select_unspecified>
       <meta>        <name>MIN_COMPLETED_PERCENTAGE</name>
         <rename>MIN_COMPLETED_PERCENTAGE</rename>
-        <type>String</type>
+        <type>Number</type>
         <length>-2</length>
         <precision>-2</precision>
         <conversion_mask/>
@@ -1374,7 +1374,7 @@
         <storage_type/>
       </meta>      <meta>        <name>MIN_DAYS_OF_REGISTRATION</name>
         <rename>MIN_DAYS_OF_REGISTRATION</rename>
-        <type>String</type>
+        <type>Integer</type>
         <length>-2</length>
         <precision>-2</precision>
         <conversion_mask/>
@@ -1389,7 +1389,7 @@
         <storage_type/>
       </meta>      <meta>        <name>MIN_NO_OF_REVIEWS</name>
         <rename>MIN_NO_OF_REVIEWS</rename>
-        <type>String</type>
+        <type>Integer</type>
         <length>-2</length>
         <precision>-2</precision>
         <conversion_mask/>
@@ -1404,7 +1404,7 @@
         <storage_type/>
       </meta>      <meta>        <name>complete_percentage</name>
         <rename>complete_percentage</rename>
-        <type>String</type>
+        <type>Number</type>
         <length>-2</length>
         <precision>-2</precision>
         <conversion_mask/>
@@ -1419,7 +1419,7 @@
         <storage_type/>
       </meta>      <meta>        <name>days_of_registration_final</name>
         <rename>days_of_registration_final</rename>
-        <type>String</type>
+        <type>Integer</type>
         <length>-2</length>
         <precision>-2</precision>
         <conversion_mask/>
@@ -1434,7 +1434,52 @@
         <storage_type/>
       </meta>      <meta>        <name>total_reviews</name>
         <rename>total_reviews</rename>
-        <type>String</type>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>AverageScore</name>
+        <rename>AverageScore</rename>
+        <type>Number</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>avg_rating_final</name>
+        <rename>avg_rating_final</rename>
+        <type>Number</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>Completed</name>
+        <rename>Completed</rename>
+        <type>Integer</type>
         <length>-2</length>
         <precision>-2</precision>
         <conversion_mask/>
@@ -2063,7 +2108,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, SURVEY_PRE_INTITIATION_ID&#xd;&#xa;, MOOD&#xd;&#xa;,SOURCE as SURVEY_SOURCE&#xd;&#xa;, date_format&#x28;MODIFIED_ON_EST,&#x27;&#x25;Y&#x27;&#x29; AS Year_Data&#xd;&#xa;FROM survey_details&#xd;&#xa;where date_format&#x28;MODIFIED_ON_EST,&#x27;&#x25;Y&#x27;&#x29; &#x3c;&#x3e; YEAR&#x28;CURRENT_TIMESTAMP&#x29;&#xd;&#xa;and stage &#x3d; -1&#xd;&#xa;order by SURVEY_PRE_INTITIATION_ID&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, SURVEY_PRE_INTITIATION_ID&#xd;&#xa;, MOOD&#xd;&#xa;,SOURCE as SURVEY_SOURCE&#xd;&#xa;, date_format&#x28;MODIFIED_ON_EST,&#x27;&#x25;Y&#x27;&#x29; AS Year_Data&#xd;&#xa;FROM survey_details&#xd;&#xa;where date_format&#x28;MODIFIED_ON_EST,&#x27;&#x25;Y&#x27;&#x29; &#x3c;&#x3e; YEAR&#x28;CURRENT_TIMESTAMP&#x29;&#xd;&#xa;and stage &#x3d; -1 and SOURCE not in &#x28;&#x22;Zillow&#x22;, &#x22;admin&#x22;, &#x22;agent&#x22;, &#x22;customer&#x22;, &#x22;3rd Party Review&#x22;, &#x22;upload&#x22;, &#x22;CSV_UPLOAD&#x22;&#x29;&#xd;&#xa;order by SURVEY_PRE_INTITIATION_ID&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -2089,7 +2134,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  SURVEY_PRE_INITIATION_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;,COMPANY_ID&#xd;&#xa;, STATUS as SURVEY_STATUS&#xd;&#xa;, date_format&#x28;MODIFIED_ON_EST,&#x27;&#x25;Y_&#x25;m&#x27;&#x29; AS TRX_MONTH&#xd;&#xa;, date_format&#x28;MODIFIED_ON_EST,&#x27;&#x25;m&#x27;&#x29; AS MONTH_Data&#xd;&#xa;, date_format&#x28;MODIFIED_ON_EST,&#x27;&#x25;Y&#x27;&#x29; AS Year_Data&#xd;&#xa;FROM survey_pre_initiation&#xd;&#xa;where date_format&#x28;MODIFIED_ON_EST,&#x27;&#x25;Y&#x27;&#x29; &#x3c;&#x3e; YEAR&#x28;CURRENT_TIMESTAMP&#x29;&#x3b;&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  SURVEY_PRE_INITIATION_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;,COMPANY_ID&#xd;&#xa;, STATUS as SURVEY_STATUS&#xd;&#xa;, date_format&#x28;MODIFIED_ON_EST,&#x27;&#x25;Y_&#x25;m&#x27;&#x29; AS TRX_MONTH&#xd;&#xa;, date_format&#x28;MODIFIED_ON_EST,&#x27;&#x25;m&#x27;&#x29; AS MONTH_Data&#xd;&#xa;, date_format&#x28;MODIFIED_ON_EST,&#x27;&#x25;Y&#x27;&#x29; AS Year_Data&#xd;&#xa;FROM survey_pre_initiation&#xd;&#xa;where date_format&#x28;MODIFIED_ON_EST,&#x27;&#x25;Y&#x27;&#x29; &#x3c;&#x3e; YEAR&#x28;CURRENT_TIMESTAMP&#x29;&#xd;&#xa;and SURVEY_SOURCE NOT IN &#x28;&#x22;Zillow&#x22; , &#x22;3rd Party Review&#x22;, &#x22;admin&#x22;, &#x22;agent&#x22;, &#x22;customer&#x22;, &#x22;upload&#x22;, &#x22;CSV_UPLOAD&#x22; &#x29;&#x3b;&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -2143,7 +2188,7 @@
     <connection>SS_Centralized_Mysql_Conn</connection>
     <schema/>
     <table>user_ranking_past_years_main</table>
-    <commit>1000</commit>
+    <commit>10000</commit>
     <truncate>Y</truncate>
     <ignore_errors>N</ignore_errors>
     <use_batch>Y</use_batch>
@@ -2475,10 +2520,10 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;var is_eligable &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;days_of_registration_final &#x3e;&#x3d; MIN_DAYS_OF_REGISTRATION&#x29;&#x7b;&#xd;&#xa;	if&#x28;complete_percentage &#x3e;&#x3d; MIN_COMPLETED_PERCENTAGE &#x29;&#x7b;&#xd;&#xa;			if&#x28;total_reviews &#x3e;&#x3d; MIN_NO_OF_REVIEWS&#x29;&#x7b;&#xd;&#xa;				is_eligable &#x3d; 1&#xd;&#xa;		&#x7d;&#xd;&#xa;	&#x7d;&#xd;&#xa;&#x7d; &#xd;&#xa;&#xd;&#xa;var RankingScore &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;Completed &#x21;&#x3d; 0 &#x26;&#x26; Completed &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var RankingScore &#x3d; &#x28;&#x28;AverageScore &#x2a; Completed&#x29; &#x2b; YEAR_OFFSET&#x29; &#x2f; &#x28;Completed &#x2b; 1&#x29;&#x3b; &#xd;&#xa;&#x7d;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;var is_eligable &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;days_of_registration_final &#x3e;&#x3d; MIN_DAYS_OF_REGISTRATION&#x29;&#x7b;&#xd;&#xa;	if&#x28;complete_percentage &#x3e;&#x3d; MIN_COMPLETED_PERCENTAGE &#x29;&#x7b;&#xd;&#xa;			if&#x28;total_reviews &#x3e;&#x3d; MIN_NO_OF_REVIEWS&#x29;&#x7b;&#xd;&#xa;				is_eligable &#x3d; 1&#x3b;&#xd;&#xa;		&#x7d;&#xd;&#xa;	&#x7d;&#xd;&#xa;&#x7d; &#xd;&#xa;&#xd;&#xa;var RankingScore &#x3d; 0.000&#x3b;&#xd;&#xa;if&#x28;Completed &#x21;&#x3d; null &#x26;&#x26; Completed &#x21;&#x3d; 0&#x29;&#x7b;&#xd;&#xa;	var RankingScore &#x3d; &#x28;&#x28;AverageScore &#x2a; Completed&#x29; &#x2b; YEAR_OFFSET&#x29; &#x2f; &#x28;Completed &#x2b; 1&#x29;&#x3b; &#xd;&#xa;&#x7d;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>is_eligable</name>
         <rename>is_eligable</rename>
-        <type>Number</type>
+        <type>Integer</type>
         <length>16</length>
         <precision>2</precision>
         <replace>N</replace>

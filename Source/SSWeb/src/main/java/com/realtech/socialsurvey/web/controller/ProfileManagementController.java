@@ -272,7 +272,7 @@ public class ProfileManagementController
                 throw new InternalServerException(
                     new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_COMPANY_PROFILE_SERVICE_FAILURE,
                         CommonConstants.SERVICE_CODE_COMPANY_PROFILE, "Error occured while fetching company profile" ),
-                    e.getMessage() );
+                    e.getMessage(), e );
             }
             profileSettings = companyProfile;
             model.addAttribute( "companyProfileName", companyProfile.getProfileName() );
@@ -303,7 +303,7 @@ public class ProfileManagementController
                     throw new InternalServerException(
                         new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE,
                             CommonConstants.SERVICE_CODE_REGION_PROFILE, "Error occured while fetching region profile" ),
-                        e.getMessage() );
+                        e.getMessage(), e );
                 } catch ( ProfileNotFoundException e ) {
                     LOG.error( "No profile found for the user ", e );
                     return JspResolver.NO_PROFILES_FOUND;
@@ -333,7 +333,7 @@ public class ProfileManagementController
                 throw new InternalServerException(
                     new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE,
                         CommonConstants.SERVICE_CODE_REGION_PROFILE, "Error occured while fetching region profile" ),
-                    e.getMessage() );
+                    e.getMessage(), e );
             }
             profileSettings = regionProfile;
             model.addAttribute( "companyProfileName", companyProfile.getProfileName() );
@@ -371,7 +371,7 @@ public class ProfileManagementController
                     throw new InternalServerException(
                         new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_BRANCH_PROFILE_SERVICE_FAILURE,
                             CommonConstants.SERVICE_CODE_BRANCH_PROFILE, "Error occured while fetching branch profile" ),
-                        e.getMessage() );
+                        e.getMessage(), e );
                 } catch ( ProfileNotFoundException e ) {
                     LOG.error( "No profile found for the user ", e );
                     return JspResolver.NO_PROFILES_FOUND;
@@ -399,7 +399,7 @@ public class ProfileManagementController
                 throw new InternalServerException(
                     new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_BRANCH_PROFILE_SERVICE_FAILURE,
                         CommonConstants.SERVICE_CODE_BRANCH_PROFILE, "Error occured while fetching branch profile" ),
-                    e.getMessage() );
+                    e.getMessage(), e );
             } catch ( NoRecordsFetchedException e ) {
                 LOG.error( "NoRecordsFetchedException: message :", e );
             }
@@ -4463,12 +4463,12 @@ public class ProfileManagementController
                     throw new InternalServerException(
                         new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_PRO_LIST_FETCH_FAILURE,
                             CommonConstants.SERVICE_CODE_PRO_LIST_FETCH, "Could not fetch users list." ),
-                        e.getMessage() );
+                        e.getMessage(), e );
                 } catch ( SolrException e ) {
                     throw new InternalServerException(
                         new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_PRO_LIST_FETCH_FAILURE,
                             CommonConstants.SERVICE_CODE_PRO_LIST_FETCH, "Could not fetch users list." ),
-                        e.getMessage() );
+                        e.getMessage(), e );
                 }
             } catch ( InternalServerException e ) {
                 return JspResolver.ERROR_PAGE;
@@ -4856,7 +4856,7 @@ public class ProfileManagementController
             throw new InternalServerException(
                 new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_COMPANY_REVIEWS_FETCH_FAILURE,
                     CommonConstants.SERVICE_CODE_COMPANY_REVIEWS, "Something went wrong while fetching reviews" ),
-                e.getMessage() );
+                e.getMessage(), e );
         }
 
         LOG.info( "Method fetchReviews() finished from ProfileManagementController" );
@@ -4930,7 +4930,7 @@ public class ProfileManagementController
             throw new InternalServerException(
                 new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_REVIEWS_COUNT_FETCH_FAILURE,
                     CommonConstants.SERVICE_CODE_COMPANY_REVIEWS, "Something went wrong while fetching reviews" ),
-                e.getMessage() );
+                e.getMessage(), e );
         }
 
         LOG.info( "Method fetchReviewCount() finished from ProfileManagementController" );
@@ -4994,7 +4994,7 @@ public class ProfileManagementController
             throw new InternalServerException(
                 new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_AVERAGE_RATING_FETCH_FAILURE,
                     CommonConstants.SERVICE_CODE_COMPANY_REVIEWS, "Something went wrong while fetching Average rating" ),
-                e.getMessage() );
+                e.getMessage(), e );
         }
 
         LOG.info( "Method fetchAverageRating() finished from ProfileManagementController" );

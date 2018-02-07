@@ -31,7 +31,6 @@ import com.realtech.socialsurvey.core.services.reportingmanagement.DashboardGrap
 import com.realtech.socialsurvey.core.services.reportingmanagement.OverviewManagement;
 import com.realtech.socialsurvey.core.services.reportingmanagement.ReportingDashboardManagement;
 import com.wordnik.swagger.annotations.ApiOperation;
-import retrofit.http.Body;
 
 
 @RestController
@@ -798,5 +797,22 @@ public class ReportingController
             responseEntity = new ResponseEntity<>(fileUploadResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return responseEntity;
+    }
+    
+    
+    @RequestMapping ( value = "/branchranking/month/year", method = RequestMethod.GET)
+    @ApiOperation ( value = "get nps report for a week or month")
+    public String getBranchRankingReport( long companyId, int month, int year, int type ) throws InvalidInputException
+    {
+        String json = null;
+        if(type == 1){
+            LOGGER.info( "Fetching branch ranking report {} for company {}", month, companyId );
+            json = new Gson().toJson( reportingDashboardManagement.getBranchRankingReportForMonth( companyId, month, year ) );
+        }
+        else if(type == 2){
+            LOGGER.info( "Fetching nps report for month {} for company {}", month, companyId );
+            json = new Gson().toJson( reportingDashboardManagement.getBranchRankingReportForYear( companyId, year ) );
+        }
+        return json;
     }
 }

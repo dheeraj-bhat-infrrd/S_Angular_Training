@@ -132,7 +132,7 @@ public class AdminToolsController
                     + e.getStackTrace() );
                 throw new InternalServerException( new AdminToolsErrorCode( CommonConstants.ERROR_CODE_GENERAL,
                     CommonConstants.SERVICE_CODE_GENERAL, "An exception occured while searching for users in a company" ),
-                    e.getMessage() );
+                    e.getMessage(), e );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
@@ -165,7 +165,7 @@ public class AdminToolsController
                 LOG.error( "Exception occured while restoring user having userId : " + userId + ". Reason : "
                     + e.getStackTrace() );
                 throw new InternalServerException( new AdminToolsErrorCode( CommonConstants.ERROR_CODE_GENERAL,
-                    CommonConstants.SERVICE_CODE_GENERAL, "An exception occured while restoring the user" ), e.getMessage() );
+                    CommonConstants.SERVICE_CODE_GENERAL, "An exception occured while restoring the user" ), e.getMessage(), e );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
@@ -211,7 +211,7 @@ public class AdminToolsController
                     + ", Reason : ", e );
                 throw new InternalServerException( new AdminToolsErrorCode( CommonConstants.ERROR_CODE_GENERAL,
                     CommonConstants.SERVICE_CODE_GENERAL, "Error occurred while moving surveys from user id : " + from_user
-                        + " to user id : " + to_user ), e.getMessage() );
+                        + " to user id : " + to_user ), e.getMessage(), e );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
@@ -245,7 +245,7 @@ public class AdminToolsController
             } catch ( Exception e ) {
                 LOG.error( "Error occurred while fetching branches with incorrect hierarchy settings", e );
                 throw new InternalServerException( new AdminToolsErrorCode( CommonConstants.ERROR_CODE_GENERAL,
-                    CommonConstants.SERVICE_CODE_GENERAL, e.getMessage() ), e.getMessage() );
+                    CommonConstants.SERVICE_CODE_GENERAL, e.getMessage() ), e.getMessage(), e );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
@@ -278,7 +278,7 @@ public class AdminToolsController
             } catch ( Exception e ) {
                 LOG.error( "Error occurred while fetching regions with incorrect hierarchy settings", e );
                 throw new InternalServerException( new AdminToolsErrorCode( CommonConstants.ERROR_CODE_GENERAL,
-                    CommonConstants.SERVICE_CODE_GENERAL, e.getMessage() ), e.getMessage() );
+                    CommonConstants.SERVICE_CODE_GENERAL, e.getMessage() ), e.getMessage(), e );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
@@ -380,7 +380,7 @@ public class AdminToolsController
                 LOG.error( "Exception occured while getting Subscription for subscriptionId : " + subscriptionId
                     + ". Reason : " + e.getStackTrace() );
                 throw new InternalServerException( new AdminToolsErrorCode( CommonConstants.ERROR_CODE_GENERAL,
-                    CommonConstants.SERVICE_CODE_GENERAL, "An exception occured while getting Subscription" ), e.getMessage() );
+                    CommonConstants.SERVICE_CODE_GENERAL, "An exception occured while getting Subscription" ), e.getMessage(), e );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
@@ -439,7 +439,7 @@ public class AdminToolsController
                 LOG.error( "Exception occured while getting transactions for subscriptionId : " + subscriptionId
                     + ". Reason : " + e.getStackTrace() );
                 throw new InternalServerException( new AdminToolsErrorCode( CommonConstants.ERROR_CODE_GENERAL,
-                    CommonConstants.SERVICE_CODE_GENERAL, "An exception occured while getting transactions" ), e.getMessage() );
+                    CommonConstants.SERVICE_CODE_GENERAL, "An exception occured while getting transactions" ), e.getMessage(), e );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
@@ -496,7 +496,7 @@ public class AdminToolsController
                 LOG.error( "Exception occured while getting active subscriptions. Reason : " + e.getMessage());
                 throw new InternalServerException( new AdminToolsErrorCode( CommonConstants.ERROR_CODE_GENERAL,
                     CommonConstants.SERVICE_CODE_GENERAL, "An exception occured while getting all active subscriptions" ),
-                    e.getMessage() );
+                    e.getMessage(), e );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
@@ -552,7 +552,7 @@ public class AdminToolsController
                 LOG.error( "Exception occured while getting auto billing mode companies. Reason : " + e.getStackTrace() );
                 throw new InternalServerException( new AdminToolsErrorCode( CommonConstants.ERROR_CODE_GENERAL,
                     CommonConstants.SERVICE_CODE_GENERAL, "An exception occured while getting auto billing mode companies" ),
-                    e.getMessage() );
+                    e.getMessage(), e );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );

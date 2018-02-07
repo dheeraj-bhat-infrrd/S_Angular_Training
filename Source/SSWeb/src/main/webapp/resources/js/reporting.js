@@ -367,6 +367,7 @@ function drawSpsStatsGraph(){
 															count : 14
 														}
 													},
+													bar: { groupWidth: '60' },
 													annotations: {
 														   alwaysOutside:true,
 														   style: 'point',
@@ -510,6 +511,7 @@ function drawNpsStatsGraph(entityId,entityType){
 															count : 14
 														}
 													},
+													bar: { groupWidth: '60' },
 													annotations: {
 														   alwaysOutside:true,
 														   style: 'point',
@@ -1101,7 +1103,7 @@ function drawNpsGauge(){
 		}
 
 			$(document).ready(function() {
-				var npsScore = overviewData.npsScore;
+				var npsScore = overviewData.NpsScore;
 				
 				
 				var marginLeft = parseInt($("#nps-metre-needle").css("margin-left"));
@@ -1398,13 +1400,13 @@ $(document).on('change', '#generate-survey-reports', function() {
 	
 	var selectedVal = $('#generate-survey-reports').val();
 	var key = parseInt(selectedVal);
-	if(key == 101 || key == 102 || key == 103 || key == 106 || key == 110){
+	if(key == 101 || key == 102 || key == 103 || key == 106 || key == 110 || key == 112){
 		$('#date-pickers').hide();
 	}else{
 		$('#date-pickers').show();
 	}
 	
-	if(key == 106){
+	if(key == 106 || key == 112){
 		$('#report-time-div').removeClass('hide');
 	}else{
 		$('#report-time-div').addClass('hide');
@@ -1591,14 +1593,30 @@ $(document).on('click', '#reports-generate-report-btn', function(e) {
 		
 	}
 	
-	var npsDates = new Object();
+	if(key == 112){
+		startDate = getTimeFrameForUserRankingReport();
+		timeFrameStr = $('#report-time-selector').val();
+		timeFrame = parseInt(timeFrameStr);
+		
+		switch(timeFrame){
+		case 1: key = 113;
+			break;
+		case 2: key = 112;
+			break;
+		case 3: key = 113;
+			break;
+		case 4: key = 112;
+			break;
+		}
+	}
+	
 	if(key == 110){
 		if(npsTimeFrame == 1 || npsTimeFrame == 2){
 			key = 110;
 		}else{
 			key = 111;
 		}
-		npsDates = getStartAndEndDateForNps(npsTimeFrame);
+		var npsDates = getStartAndEndDateForNps(npsTimeFrame);
 		startDate = npsDates.startDate;
 		endDate = npsDates.endDate;
 	}

@@ -98,7 +98,7 @@ public class LoneWolfController extends AbstractController
                 response = Response.ok( new Gson().toJson( resultMap ) ).build();
             } catch ( Exception e ) {
                 throw new InternalServerException( new LoneWolfErrorCode( CommonConstants.ERROR_CODE_GENERAL,
-                    CommonConstants.SERVICE_CODE_GENERAL, "Exception occured while testing connection" ), e.getMessage() );
+                    CommonConstants.SERVICE_CODE_GENERAL, "Exception occured while testing connection" ), e.getMessage(), e );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );

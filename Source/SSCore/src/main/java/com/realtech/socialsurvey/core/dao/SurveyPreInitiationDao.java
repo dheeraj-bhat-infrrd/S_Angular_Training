@@ -130,7 +130,7 @@ public interface SurveyPreInitiationDao extends GenericDao<SurveyPreInitiation, 
      * @return
      * @throws DatabaseException
      */
-    List<SurveyPreInitiation> getSurveyByAgentIdAndCustomeEmailForPastNDays( long agentId, String customerEmail, int noOfDays )
+    List<SurveyPreInitiation> getValidSurveyByAgentIdAndCustomeEmailForPastNDays( long agentId, String customerEmail, int noOfDays )
         throws DatabaseException;
 
     List<SurveyPreInitiation> getCorruptPreInitiatedSurveys( long companyId, int startIndex, int batchSize );
@@ -139,7 +139,7 @@ public interface SurveyPreInitiationDao extends GenericDao<SurveyPreInitiation, 
     long getCorruptPreInitiatedSurveyCount( long companyId );
 
 
-    List<SurveyPreInitiation> getSurveyByAgentIdAndCustomeEmail( long agentId, String customerEmail ) throws DatabaseException;
+    List<SurveyPreInitiation> getValidSurveyByAgentIdAndCustomeEmail( long agentId, String customerEmail ) throws DatabaseException;
 
 
     Map<Long, SurveyPreInitiation> getPreInitiatedSurveyForIds( List<Long> surveyPreinitiationIds );
