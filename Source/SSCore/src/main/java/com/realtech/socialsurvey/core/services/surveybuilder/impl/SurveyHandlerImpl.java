@@ -949,6 +949,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         // Send email to complete survey to each customer.
         OrganizationUnitSettings companySettings = null;
         String agentName = "";
+        String agentFirstName = "";
         User user = null;
         Map<String, Long> hierarchyMap = null;
         Map<SettingsForApplication, OrganizationUnit> map = null;
@@ -957,6 +958,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         if ( user != null ) {
             agentName = user.getFirstName();
+            agentFirstName = user.getFirstName();
             if ( user.getLastName() != null && !user.getLastName().isEmpty() ) {
                 agentName = user.getFirstName() + " " + user.getLastName();
             }
@@ -1064,7 +1066,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         //send mail
         try {
-            emailServices.sendSurveyRelatedMail(companySettings, user, agentName, agentPhone, agentTitle,
+            emailServices.sendSurveyRelatedMail(companySettings, user, agentName, agentFirstName, agentPhone, agentTitle,
                     surveyLink, logoUrl, survey.getCustomerFirstName(),
                     survey.getCustomerLastName(), survey.getCustomerEmailId(), CommonConstants.EMAIL_TYPE_SURVEY_REMINDER_MAIL,
                     senderName, user.getEmailId(), mailSubject, mailBody, agentSettings, branchId, regionId,
@@ -1101,6 +1103,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         }
 
         String agentName = user.getFirstName();
+        String agentFirstName = user.getFirstName();
         if ( user.getLastName() != null && !user.getLastName().isEmpty() ) {
             agentName = user.getFirstName() + " " + user.getLastName();
         }
@@ -1229,7 +1232,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         //send mail
         try {
-            emailServices.sendSurveyRelatedMail(companySettings, user, agentName, agentPhone, agentTitle,
+            emailServices.sendSurveyRelatedMail(companySettings, user, agentName, agentFirstName, agentPhone, agentTitle,
                     surveyUrl, logoUrl, custFirstName,
                     custLastName, custEmail, CommonConstants.EMAIL_TYPE_SURVEY_RESTART_MAIL,
                     senderName, user.getEmailId(), mailSubject, mailBody, agentSettings, branchId, regionId,
@@ -1262,6 +1265,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             agentPhone = agentSettings.getContact_details().getContact_numbers().getWork();
         }
 
+        String agentFirstName = user.getFirstName();
         String agentName = user.getFirstName();
         if ( user.getLastName() != null && !user.getLastName().isEmpty() ) {
             agentName = user.getFirstName() + " " + user.getLastName();
@@ -1360,12 +1364,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         }
         //replace the legends
         mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, null, custFirstName,
-            custLastName, agentName, agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ),
-            currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
+            custLastName, agentName, agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ),
+            currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone );
 
         mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, null, custFirstName,
-            custLastName, agentName, agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ),
-            currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
+            custLastName, agentName ,agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ),
+            currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone );
 
         //JIRA SS-473 end
 
@@ -1410,6 +1414,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             agentPhone = agentSettings.getContact_details().getContact_numbers().getWork();
         }
 
+        String agentFirstName = user.getFirstName();
         String agentName = user.getFirstName();
         if ( user.getLastName() != null && !user.getLastName().isEmpty() ) {
             agentName = user.getFirstName() + " " + user.getLastName();
@@ -1512,9 +1517,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 agentLicenses = StringUtils.join( agentSettings.getLicenses().getAuthorized_in(), ',' );
             }
             mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, null, custFirstName,
-                custLastName, agentName, agentSignature, custEmail, user.getEmailId(), companyName,
+                custLastName, agentName, agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName,
                 dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer,
-                agentDisclaimer, agentLicenses );
+                agentDisclaimer, agentLicenses, agentTitle, agentPhone );
 
             String mailSubject = surveyCompletionUnpleasant.getMail_subject();
             if ( mailSubject == null || mailSubject.isEmpty() ) {
@@ -1522,9 +1527,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             }
 
             mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, null, custFirstName,
-                custLastName, agentName, agentSignature, custEmail, user.getEmailId(), companyName,
+                custLastName, agentName, agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName,
                 dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer,
-                agentDisclaimer, agentLicenses );
+                agentDisclaimer, agentLicenses, agentTitle, agentPhone );
             //JIRA SS-473 end
 
             //For Company with hidden agents
@@ -1568,6 +1573,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             agentPhone = agentSettings.getContact_details().getContact_numbers().getWork();
         }
 
+        String agentFirstName = user.getFirstName();
         String agentName = user.getFirstName();
         if ( user.getLastName() != null && !user.getLastName().isEmpty() ) {
             agentName = user.getFirstName() + " " + user.getLastName();
@@ -1681,12 +1687,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         }
         //replace legends
         mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, "", custFirstName,
-            custLastName, agentName, agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ),
-            currentYear, fullAddress, links, user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
+            custLastName, agentName, agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ),
+            currentYear, fullAddress, links, user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone );
 
         mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, "", custFirstName,
-            custLastName, agentName, agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ),
-            currentYear, fullAddress, links, user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
+            custLastName, agentName, agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ),
+            currentYear, fullAddress, links, user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone );
         //JIRA SS-473 end
 
 
@@ -1882,10 +1888,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                     // check the pre-initiation and then the survey table
                     List<SurveyPreInitiation> incompleteSurveyCustomers = null;
                     if ( duplicateSurveyInterval > 0 ) {
-                        incompleteSurveyCustomers = surveyPreInitiationDao.getSurveyByAgentIdAndCustomeEmailForPastNDays(
+                        incompleteSurveyCustomers = surveyPreInitiationDao.getValidSurveyByAgentIdAndCustomeEmailForPastNDays(
                             user.getUserId(), survey.getCustomerEmailId(), duplicateSurveyInterval );
                     } else {
-                        incompleteSurveyCustomers = surveyPreInitiationDao.getSurveyByAgentIdAndCustomeEmail( user.getUserId(),
+                        incompleteSurveyCustomers = surveyPreInitiationDao.getValidSurveyByAgentIdAndCustomeEmail( user.getUserId(),
                             survey.getCustomerEmailId() );
                     }
                     if ( incompleteSurveyCustomers != null && incompleteSurveyCustomers.size() > 0 ) {
@@ -2119,6 +2125,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     {
         // Send email to complete survey to each customer.
         String agentName = "";
+        String agentFirstName = "";
         User user = null;
         Map<String, Long> hierarchyMap = null;
         Map<SettingsForApplication, OrganizationUnit> map = null;
@@ -2127,6 +2134,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         if ( user != null ) {
             agentName = user.getFirstName();
+            agentFirstName = user.getFirstName();
             if ( user.getLastName() != null && !user.getLastName().isEmpty() ) {
                 agentName = user.getFirstName() + " " + user.getLastName();
             }
@@ -2239,76 +2247,16 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         try {
             /*emailServices.sendSurveyRelatedMail( survey.getCustomerEmailId(), mailSubject, mailBody, user.getEmailId(),
                 senderName, user.getUserId(), companyId );*/
-            emailServices.sendSurveyRelatedMail(companySettings, user, agentName, agentPhone, agentTitle,
+            emailServices.sendSurveyRelatedMail(companySettings, user, agentName, agentFirstName, agentPhone, agentTitle,
                     surveyLink, logoUrl, survey.getCustomerFirstName(),
                     survey.getCustomerLastName(), survey.getCustomerEmailId(), CommonConstants.EMAIL_TYPE_SURVEY_INVITATION_MAIL,
-                    senderName, user.getEmailId(), mailSubject, mailBody, agentSettings, branchId, regionId,
+                    senderName,  user.getEmailId(), mailSubject, mailBody, agentSettings, branchId, regionId,
                     survey.getSurveySourceId(), survey.getAgentId(), companyId);
         } catch ( InvalidInputException | UndeliveredEmailException e ) {
             LOG.error( "Exception caught while sending mail to " + survey.getCustomerEmailId() + " .Nested exception is ", e );
         }
     }
 
-
-    /*
-     * Method to send email by customer to initiate survey.
-     */
-    @SuppressWarnings ( "unused")
-    private void sendInvitationMailByCustomer( User user, String custFirstName, String custLastName, String custEmail,
-        String link ) throws InvalidInputException, UndeliveredEmailException
-    {
-        LOG.debug( "sendInvitationMailByCustomer() started." );
-
-        OrganizationUnitSettings companySettings = organizationManagementService
-            .getCompanySettings( user.getCompany().getCompanyId() );
-
-        String mailBody = "";
-        String mailSubject = "";
-        if ( companySettings != null && companySettings.getMail_content() != null
-            && companySettings.getMail_content().getTake_survey_mail_customer() != null ) {
-
-            MailContent takeSurveyCustomer = companySettings.getMail_content().getTake_survey_mail_customer();
-            mailBody = emailFormatHelper.replaceEmailBodyWithParams( takeSurveyCustomer.getMail_body(),
-                takeSurveyCustomer.getParam_order() );
-            mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT_CUSTOMER;
-        } else {
-            mailSubject = fileOperations.getContentFromFile(
-                EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_INVITATION_MAIL_SUBJECT );
-
-            mailBody = fileOperations.getContentFromFile(
-                EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_INVITATION_MAIL_BODY );
-
-            mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailBody,
-                new ArrayList<String>( Arrays.asList( paramOrderTakeSurveyCustomer.split( "," ) ) ) );
-
-        }
-        //JIRA SS-473 begin
-        String agentDisclaimer = "";
-        String agentLicenses = "";
-        String companyDisclaimer = "";
-
-        if ( companySettings != null && companySettings.getDisclaimer() != null )
-            companyDisclaimer = companySettings.getDisclaimer();
-
-        //replace legends
-        mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, appLogoUrl, link, custFirstName,
-            custLastName, user.getFirstName() + " " + user.getLastName(), null, null, null, null, null, null, null, "",
-            user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
-        mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, appLogoUrl, link, custFirstName,
-            custLastName, user.getFirstName() + " " + user.getLastName(), null, null, null, null, null, null, null, "",
-            user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses );
-
-        //JIRA SS-473 end
-
-        //send mail
-        try {
-            emailServices.sendSurveyInvitationMailByCustomer( custEmail, mailSubject, mailBody, user.getEmailId(),
-                user.getFirstName(), user.getUserId() );
-        } catch ( InvalidInputException | UndeliveredEmailException e ) {
-            LOG.error( "Exception caught while sending mail to " + custEmail + ". Nested exception is ", e );
-        }
-        LOG.debug( "sendInvitationMailByCustomer() finished." );
-    }
 
 
     // Method to store details of a customer in mysql at the time of sending invite.
@@ -2444,10 +2392,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         List<SurveyPreInitiation> incompleteSurveyCustomers = null;
         if ( duplicateSurveyInterval > 0 ) {
-            incompleteSurveyCustomers = surveyPreInitiationDao.getSurveyByAgentIdAndCustomeEmailForPastNDays( agentId,
+            incompleteSurveyCustomers = surveyPreInitiationDao.getValidSurveyByAgentIdAndCustomeEmailForPastNDays( agentId,
                 recipientEmailId, duplicateSurveyInterval );
         } else {
-            incompleteSurveyCustomers = surveyPreInitiationDao.getSurveyByAgentIdAndCustomeEmail( agentId, recipientEmailId );
+            incompleteSurveyCustomers = surveyPreInitiationDao.getValidSurveyByAgentIdAndCustomeEmail( agentId, recipientEmailId );
         }
 
         if ( incompleteSurveyCustomers != null && incompleteSurveyCustomers.size() > 0 ) {
@@ -2856,7 +2804,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 if ( !error ) {
                     String agentEmailId = bulkSurveyDetail.getAgentEmailId();
                     try {
-                        user = userManagementService.getUserByEmailAndCompany( companyId, agentEmailId );
+                        user = userManagementService.getActiveAgentByEmailAndCompany( companyId, agentEmailId );
                     } catch ( InvalidInputException e ) {
                         message = "Agent does not belong to this Company " + companyId;
                         status = CommonConstants.BULK_SURVEY_INVALID;
@@ -3221,10 +3169,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         // check if incomplete survey exist
         List<SurveyPreInitiation> incompleteSurveyCustomers = null;
         if ( duplicateSurveyInterval > 0 ) {
-            incompleteSurveyCustomers = surveyPreInitiationDao.getSurveyByAgentIdAndCustomeEmailForPastNDays( currentAgentId,
+            incompleteSurveyCustomers = surveyPreInitiationDao.getValidSurveyByAgentIdAndCustomeEmailForPastNDays( currentAgentId,
                 customerEmailId, duplicateSurveyInterval );
         } else {
-            incompleteSurveyCustomers = surveyPreInitiationDao.getSurveyByAgentIdAndCustomeEmail( currentAgentId,
+            incompleteSurveyCustomers = surveyPreInitiationDao.getValidSurveyByAgentIdAndCustomeEmail( currentAgentId,
                 customerEmailId );
         }
 
@@ -3299,9 +3247,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             user.getCompany().getCompany() );
 
         String retStr = emailFormatHelper.replaceLegendsWithSettings( false, questionText, getApplicationBaseUrl(), logoUrl,
-            null, survey.getCustomerFirstName(), survey.getCustomerLastName(), survey.getAgentName(), agentSignature,
+            null, survey.getCustomerFirstName(), survey.getCustomerLastName(), survey.getAgentName(), user.getFirstName(), agentSignature,
             survey.getCustomerEmail(), user.getEmailId(), user.getCompany().getCompany(), dateFormat.format( new Date() ),
-            currentYear, "", "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, user, agentSettings,
+            currentYear, "", "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone, user, agentSettings,
             bSettings, rSettings, companySettings, mapPrimaryHierarchy, surveyMap );
 
         LOG.debug( "Method replaceGateQuestionText finished for User : " + user.getUserId() );
@@ -4095,7 +4043,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
                 for ( SurveyDetails survey : surveys2 ) {
                     List<SurveyPreInitiation> spis = surveyPreInitiationDao
-                        .getSurveyByAgentIdAndCustomeEmail( survey.getAgentId(), survey.getCustomerEmail() );
+                        .getValidSurveyByAgentIdAndCustomeEmail( survey.getAgentId(), survey.getCustomerEmail() );
                     if ( spis.size() == 1 ) {
                         if ( spis.get( 0 ).getEngagementClosedTime() != null ) {
                             survey.setSurveyTransactionDate( spis.get( 0 ).getEngagementClosedTime() );
@@ -4516,10 +4464,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         // get incomplete survey depending on the survey re-take interval
         if ( duplicateSurveyInterval > 0 ) {
-            incompleteSurveyCustomers = surveyPreInitiationDao.getSurveyByAgentIdAndCustomeEmailForPastNDays( user.getUserId(),
+            incompleteSurveyCustomers = surveyPreInitiationDao.getValidSurveyByAgentIdAndCustomeEmailForPastNDays( user.getUserId(),
                 survey.getCustomerEmailId(), duplicateSurveyInterval );
         } else {
-            incompleteSurveyCustomers = surveyPreInitiationDao.getSurveyByAgentIdAndCustomeEmail( user.getUserId(),
+            incompleteSurveyCustomers = surveyPreInitiationDao.getValidSurveyByAgentIdAndCustomeEmail( user.getUserId(),
                 survey.getCustomerEmailId() );
         }
 

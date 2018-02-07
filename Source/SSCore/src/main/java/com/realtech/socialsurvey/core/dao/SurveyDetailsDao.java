@@ -366,5 +366,12 @@ public interface SurveyDetailsDao
 
     public Float getFilteredSurveyAvgScore( long companyId, String mood, Long startSurveyID, Date startReviewDate,
         Date startTransactionDate, List<Long> userIds, boolean isRetaken );
+    
+    public List<SurveyDetails> getSurveyDetailsForCompanyAndQuestion(long companyId, String question);
+
+	void updateCustomerResponse(String surveyId, SurveyResponse surveyResponse);
+
+
+	public void updateSurveyNPSScore(SurveyDetails surveyDetails);
 
 }

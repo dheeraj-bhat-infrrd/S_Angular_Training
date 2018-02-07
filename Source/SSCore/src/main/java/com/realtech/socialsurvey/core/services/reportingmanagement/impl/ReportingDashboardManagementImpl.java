@@ -40,11 +40,13 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.api.builder.SSApiBatchIntegrationBuilder;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
+import com.realtech.socialsurvey.core.dao.BranchRankingReportMonthDao;
+import com.realtech.socialsurvey.core.dao.BranchRankingReportYearDao;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.CompanyDetailsReportDao;
 import com.realtech.socialsurvey.core.dao.CompanyUserReportDao;
-import com.realtech.socialsurvey.core.dao.DigestDao;
 import com.realtech.socialsurvey.core.dao.FileUploadDao;
 import com.realtech.socialsurvey.core.dao.NpsReportMonthDao;
 import com.realtech.socialsurvey.core.dao.NpsReportWeekDao;
@@ -86,6 +88,8 @@ import com.realtech.socialsurvey.core.dao.UserRankingThisYearMainDao;
 import com.realtech.socialsurvey.core.dao.UserRankingThisYearRegionDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.BranchRankingReportMonth;
+import com.realtech.socialsurvey.core.entities.BranchRankingReportYear;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyActiveUsersStats;
 import com.realtech.socialsurvey.core.entities.CompanyDetailsReport;
@@ -305,9 +309,6 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     private ScoreStatsQuestionUserDao scoreStatsQuestionUserDao;
 
     @Autowired
-    private DigestDao digestDao;
-
-    @Autowired
     private EmailServices emailServices;
 
     @Autowired
@@ -327,6 +328,15 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
     @Autowired
     private NpsReportMonthDao npsReportMonthDao;
+    
+    @Autowired
+    private BranchRankingReportMonthDao branchRankingMonthDao;
+    
+    @Autowired
+    private BranchRankingReportYearDao branchRankingYearDao;
+    
+	@Autowired
+	private Utils utils;
 
     @Autowired
     private OverviewManagement overviewManagement;
@@ -404,6 +414,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_NPS_WEEK_REPORT );
         } else if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_NPS_MONTH_REPORT ) {
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_NPS_MONTH_REPORT );
+        } else if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_BRANCH_RANKING_MONTHLY_REPORT ) {
+            fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_BRANCH_RANKING_MONTHLY_REPORT );
+        } else if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_BRANCH_RANKING_YEARLY_REPORT ) {
+            fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_BRANCH_RANKING_YEARLY_REPORT );
         }
 
         // get the time 23:59:59 in milliseconds
@@ -563,7 +577,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 surveyResultsReportVO.setParticipantType( surveyResultsCompanyReport.getParticipantType() );
                 surveyResultsReportVO.setAgentEmailId( surveyResultsCompanyReport.getAgentEmailId() );
                 surveyResultsReportVO.setCustomerEmailId( surveyResultsCompanyReport.getCustomerEmailId() );
-
+                surveyResultsReportVO.setState( surveyResultsCompanyReport.getState() );
+                surveyResultsReportVO.setCity( surveyResultsCompanyReport.getCity() );
             } else if ( type.equals( CommonConstants.REGION_ID ) ) {
                 surveyResultsReportRegion = (SurveyResultsReportRegion) entry.getValue();
                 surveyResultsReportVO.setSurveyDetailsId( surveyResultsReportRegion.getSurveyDetailsId() );
@@ -589,6 +604,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 surveyResultsReportVO.setParticipantType( surveyResultsReportRegion.getParticipantType() );
                 surveyResultsReportVO.setAgentEmailId( surveyResultsReportRegion.getAgentEmailId() );
                 surveyResultsReportVO.setCustomerEmailId( surveyResultsReportRegion.getCustomerEmailId() );
+                surveyResultsReportVO.setState( surveyResultsReportRegion.getState() );
+                surveyResultsReportVO.setCity( surveyResultsReportRegion.getCity() );
             } else if ( type.equals( CommonConstants.BRANCH_ID ) ) {
                 surveyResultsReportBranch = (SurveyResultsReportBranch) entry.getValue();
                 surveyResultsReportVO.setSurveyDetailsId( surveyResultsReportBranch.getSurveyDetailsId() );
@@ -614,6 +631,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 surveyResultsReportVO.setParticipantType( surveyResultsReportBranch.getParticipantType() );
                 surveyResultsReportVO.setAgentEmailId( surveyResultsReportBranch.getAgentEmailId() );
                 surveyResultsReportVO.setCustomerEmailId( surveyResultsReportBranch.getCustomerEmailId() );
+                surveyResultsReportVO.setState( surveyResultsReportBranch.getState() );
+                surveyResultsReportVO.setCity( surveyResultsReportBranch.getCity() );
             }
             surveyResultsReportVOMap.put( surveyDetailsId, surveyResultsReportVO );
         }
@@ -1723,7 +1742,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             batchSize ) ) {
             List<Object> recentActivityList = new ArrayList<>();
             User user = userManagementService.getUserByUserId( fileUpload.getAdminUserId() );
-            recentActivityList.add( fileUpload.getCreatedOn() );
+            recentActivityList.add( utils.convertDateToTimeZone(fileUpload.getCreatedOn(), CommonConstants.TIMEZONE_EST ) );
             // Set the ReportName according to the upload type
             if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_STATS_REPORT ) {
                 recentActivityList.add( CommonConstants.REPORTING_SURVEY_STATS_REPORT );
@@ -1747,6 +1766,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 recentActivityList.add( CommonConstants.REPORTING_NPS_REPORT_FOR_MONTH );
             } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_SURVEY_INVITATION_EMAIL_REPORT ) {
                 recentActivityList.add( CommonConstants.SURVEY_INVITATION_EMAIL_REPORT );
+            } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_BRANCH_RANKING_MONTHLY_REPORT ) {
+                recentActivityList.add( CommonConstants.REPORTING_BRANCH_RANKING_MONTHLY_REPORT );
+            } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_BRANCH_RANKING_YEARLY_REPORT ) {
+                recentActivityList.add( CommonConstants.REPORTING_BRANCH_RANKING_YEARLY_REPORT );
             }
 
             recentActivityList.add( fileUpload.getStartDate() );
@@ -3372,6 +3395,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
             // get the month strings
             List<String> months = buildMonthStringsForDigest( monthUnderConcern );
+            List<Long> digestUserCountList = new ArrayList<>();
 
             // populate digest data for three months in total
             for ( int i = 0; i < 3; i++ ) {
@@ -3392,9 +3416,9 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                     : CommonConstants.NOT_AVAILABLE );
                 templateData.setAverageScoreRating( ( digest != null ) ? String.format( "%.2f", digest.getAverageScoreRating() )
                     : CommonConstants.NOT_AVAILABLE );
-                templateData.setUserCount( ( digest != null )
-                    ? String.valueOf( digest.getUserCount() ) + ( digest.getUserCount() > 1 ? " Users" : " User" )
-                    : CommonConstants.NOT_AVAILABLE );
+                
+                digestUserCountList.add( i, digest != null ? digest.getUserCount() : 0l );
+                
                 templateData.setCompletedTransactions(
                     ( digest != null ) ? String.valueOf( digest.getCompletedTransactions() ) : CommonConstants.NOT_AVAILABLE );
                 templateData.setTotalTransactions(
@@ -3416,6 +3440,21 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                     ( digest != null ) ? String.valueOf( digest.getTotalCompletedReviews() ) : CommonConstants.NOT_AVAILABLE );
 
                 digestAggregate.getDigestList().add( i, templateData );
+            }
+            
+            // correct cumulative user count
+            long prevCount = 0l;
+            for( int i = 2; i >= 0; i-- ) {
+            	long currentCount = digestUserCountList.get(i); 
+            	
+            	if( prevCount > currentCount ) {
+            		currentCount = prevCount;
+            	}
+            	
+            	digestAggregate.getDigestList().get(i).setUserCount(
+                    String.valueOf( currentCount + ( currentCount > 1 ? " Users" : " User" ) ) );
+            	
+            	prevCount = currentCount;
             }
 
         }
@@ -3480,8 +3519,9 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         Double sps2 = digestList.get( 2 ) != null ? digestList.get( 2 ).getSps() : null;
         Double sps3 = digestList.get( 3 ) != null ? digestList.get( 3 ).getSps() : null;
 
-        long userCount0 = digestList.get( 0 ) != null ? digestList.get( 0 ).getUserCount() : 0l;
-        long userCount1 = digestList.get( 1 ) != null ? digestList.get( 1 ).getUserCount() : 0l;
+        // correct user count
+        long userCount0 = Long.parseLong( StringUtils.split( digestAggregate.getDigestList().get(0).getUserCount(), " ")[0] );
+        long userCount1 = Long.parseLong( StringUtils.split( digestAggregate.getDigestList().get(1).getUserCount(), " ")[0] );
 
         long transcationCount0 = digestList.get( 0 ) != null ? digestList.get( 0 ).getTotalTransactions() : 0l;
         long transcationCount1 = digestList.get( 1 ) != null ? digestList.get( 1 ).getTotalTransactions() : 0l;
@@ -4408,6 +4448,12 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 isLessInvitationSentInPastSevenDays = true;
             }
             
+            //check if sent surey count in past 5 days is zero
+            boolean isZeroInvitationSentInPastFiceDays = false;
+            if ( sentSurveyCountForPast5Days.get(companyId ) == null || sentSurveyCountForPast5Days.get(companyId ) == 0) {
+            	isZeroInvitationSentInPastFiceDays = true;
+            }
+            
             //check if isMoreReminderSentInPastSevenDays is true
             boolean isMoreReminderSentInPastSevenDays = false; 
             if(getSentSurveyReminderCountFromList(surveStatsForPast7days) >= getSentSurveyReminderCountFromList(surveStatsForLastToLatWeek) * 2){
@@ -4466,12 +4512,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             List<String> currentWarningAlerts = new ArrayList<>();
             if ( isZeroIncomingTransactionInPastOneDay )
                 currentWarningAlerts.add( EntityWarningAlertType.LESS_TRANSACTION_IN_PAST_DAYS.getAlertType() );
-            if ( isLessIncomingTransactionInPastSevenDays )
+            if ( isLessIncomingTransactionInPastSevenDays  || isZeroInvitationSentInPastFiceDays)
                 currentWarningAlerts.add( EntityWarningAlertType.LESS_TRANSACTION_IN_PAST_WEEK.getAlertType() );
             if ( isLessInvitationSentInPastSevenDaysWarning )
                 currentWarningAlerts.add( EntityWarningAlertType.LESS_INVITATION_IN_PAST_WEEK.getAlertType() );
-            if ( isMoreReminderSentInPastSevenDaysWarning )
-                currentWarningAlerts.add( EntityWarningAlertType.MORE_REMINDER_IN_PAST_WEEK.getAlertType() );
             if ( isNoSurveyCompletedInPastThreeDays )
                 currentWarningAlerts.add( EntityWarningAlertType.LESS_SURVEY_COMPLETED_IN_PAST_DAYS.getAlertType() );
 
@@ -4641,4 +4685,101 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         }
         return totalTransactionReceivedCount;
     }
+
+
+	@Override
+	public String generateBranchRankingReportMonth(long profileValue, String profileLevel, long adminUserId,
+			Timestamp startDate) throws UnsupportedEncodingException, NonFatalException {
+		User user = userManagementService.getUserByUserId(adminUserId);
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTimeInMillis(startDate.getTime());
+		int year = calendar.get(Calendar.YEAR);
+		int month = calendar.get(Calendar.MONTH) + 1;
+		String fileName = "Branch_Ranking_Report_Month" + profileValue + "-" + user.getFirstName() + "_"
+				+ user.getLastName() + "-" + (Calendar.getInstance().getTimeInMillis())
+				+ CommonConstants.EXCEL_FILE_EXTENSION;
+		XSSFWorkbook workbook = this.downloadBranchRankingReportMonth(profileValue, profileLevel, year, month);
+		return this.createExcelFileAndSaveInAmazonS3(fileName, workbook);
+	}
+
+	private XSSFWorkbook downloadBranchRankingReportMonth(long entityId, String entityType, int year, int month) {
+		Response response = ssApiBatchIntergrationBuilder.getIntegrationApi().getBranchRankingReport(entityId,
+				month, year, 1);
+		String responseString = response != null ? new String(((TypedByteArray) response.getBody()).getBytes()) : null;
+		if (responseString != null) {
+			// since the string has ""abc"" an extra quote
+			responseString = responseString.substring(1, responseString.length() - 1);
+			// Escape characters
+			responseString = StringEscapeUtils.unescapeJava(responseString);
+		}
+		List<BranchRankingReportMonth> branchRankingReportMonth = null;
+		Type listType = new TypeToken<List<BranchRankingReportMonth>>() {
+		}.getType();
+		branchRankingReportMonth = new Gson().fromJson(responseString, listType);
+		Map<Integer, List<Object>> data = workbookData.getBranchRankingReportMonthInSheet(branchRankingReportMonth);
+		return workbookOperations.createWorkbook(data);
+	}
+
+	@Override
+	public String generateBranchRankingReportYear(long profileValue, String profileLevel, long adminUserId,
+			Timestamp startDate) throws UnsupportedEncodingException, NonFatalException {
+		User user = userManagementService.getUserByUserId(adminUserId);
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTimeInMillis(startDate.getTime());
+		int year = calendar.get(Calendar.YEAR);
+		String fileName = "Branch_Ranking_Report_Year" + profileValue + "-" + user.getFirstName() + "_"
+				+ user.getLastName() + "-" + (Calendar.getInstance().getTimeInMillis())
+				+ CommonConstants.EXCEL_FILE_EXTENSION;
+		XSSFWorkbook workbook = this.downloadBranchRankingReportYear(profileValue, profileLevel, year);
+		return this.createExcelFileAndSaveInAmazonS3(fileName, workbook);
+	}
+
+	private XSSFWorkbook downloadBranchRankingReportYear(long entityId, String entityType, int year) {
+		Response response = ssApiBatchIntergrationBuilder.getIntegrationApi().getBranchRankingReport(entityId,0,
+				year,2);
+		String responseString = response != null ? new String(((TypedByteArray) response.getBody()).getBytes()) : null;
+		if (responseString != null) {
+			// since the string has ""abc"" an extra quote
+			responseString = responseString.substring(1, responseString.length() - 1);
+			// Escape characters
+			responseString = StringEscapeUtils.unescapeJava(responseString);
+		}
+		List<BranchRankingReportYear> branchRankingReportYear = null;
+		Type listType = new TypeToken<List<BranchRankingReportYear>>() {
+		}.getType();
+		branchRankingReportYear = new Gson().fromJson(responseString, listType);
+		Map<Integer, List<Object>> data = workbookData.getBranchRankingReportYearInSheet(branchRankingReportYear);
+		return workbookOperations.createWorkbook(data);
+
+	}
+
+
+	@Override
+	public List<BranchRankingReportMonth> getBranchRankingReportForMonth(long companyId, int month, int year) throws InvalidInputException {
+		
+		if(companyId < 1){
+			throw new InvalidInputException("Invalid companyId.");
+		} 
+		if(month < 1 || month > 12){
+			throw new InvalidInputException("Invalid month value.");
+		}
+		if(year < 0){
+			throw new InvalidInputException("Invalid year value.");
+		}
+		
+		return branchRankingMonthDao.getBranchRankingForMonth(companyId,month,year);
+	}
+
+
+	@Override
+	public List<BranchRankingReportYear> getBranchRankingReportForYear(long companyId, int year) throws InvalidInputException {
+		if(companyId < 1){
+			throw new InvalidInputException("Invalid companyId.");
+		} 
+		if(year < 0){
+			throw new InvalidInputException("Invalid year value.");
+		}
+		
+		return branchRankingYearDao.getBranchRankingForYear(companyId,year);
+	}
 }

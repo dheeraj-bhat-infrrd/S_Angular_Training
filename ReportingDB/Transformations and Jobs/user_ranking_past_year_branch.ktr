@@ -102,20 +102,44 @@
       <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
     </attributes>
   </connection>
+  <connection>
+    <name>SS_INFO_CONNECTION</name>
+    <server>&#x24;&#x7b;SS_MYSQL_HOST&#x7d;</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>&#x24;&#x7b;SS_MYSQL_SCHEMA&#x7d;</database>
+    <port>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</port>
+    <username>&#x24;&#x7b;SS_MYSQL_USER_NAME&#x7d;</username>
+    <password>&#x24;&#x7b;SS_MYSQL_PASSWORD&#x7d;</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCompression</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useServerPrepStmts</code><attribute>false</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
   <order>
-  <hop> <from>Branch</from><to>SortBranchId 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Generate random value</from><to>Table output</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Join</from><to>SortUserId</to><enabled>Y</enabled> </hop>
   <hop> <from>MergeOnUserId</from><to>Modified Java Script Value</to><enabled>Y</enabled> </hop>
-  <hop> <from>Select values</from><to>SortUserRanking</to><enabled>Y</enabled> </hop>
-  <hop> <from>SortBranchId</from><to>Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>SortBranchId 2</from><to>Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>SortUserId</from><to>MergeOnUserId</to><enabled>Y</enabled> </hop>
-  <hop> <from>SortUserRanking</from><to>MergeOnUserId</to><enabled>Y</enabled> </hop>
-  <hop> <from>user_profile</from><to>SortBranchId</to><enabled>Y</enabled> </hop>
-  <hop> <from>user_ranking_main</from><to>Select values</to><enabled>Y</enabled> </hop>
   <hop> <from>Modified Java Script Value</from><to>If field value is null</to><enabled>Y</enabled> </hop>
   <hop> <from>If field value is null</from><to>Generate random value</to><enabled>Y</enabled> </hop>
+  <hop> <from>user_profile</from><to>Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Branch</from><to>Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>user_ranking_main</from><to>MergeOnUserId</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Branch</name>
@@ -129,7 +153,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  BRANCH_ID&#xd;&#xa;, STATUS&#xd;&#xa;FROM branch&#xd;&#xa;where IS_DEFAULT_BY_SYSTEM &#x3d; 0 and STATUS &#x3d; 1&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  BRANCH_ID&#xd;&#xa;, STATUS&#xd;&#xa;FROM branch&#xd;&#xa;where IS_DEFAULT_BY_SYSTEM &#x3d; 0 and STATUS &#x3d; 1 order by BRANCH_ID&#x3b;&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -137,8 +161,8 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>51</xloc>
-      <yloc>172</yloc>
+      <xloc>70</xloc>
+      <yloc>420</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -162,8 +186,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>906</xloc>
-      <yloc>201</yloc>
+      <xloc>1008</xloc>
+      <yloc>229</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -205,11 +229,23 @@
         <mask/>
         <set_empty_string>N</set_empty_string>
         </field>
+      <field>
+        <name>answer_sum</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>total_questions</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>829</xloc>
-      <yloc>179</yloc>
+      <xloc>811</xloc>
+      <yloc>229</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -226,8 +262,8 @@
            <schema_name/>
            </partitioning>
 <join_type>INNER</join_type>
-<step1>SortBranchId 2</step1>
-<step2>SortBranchId</step2>
+<step1>user_profile</step1>
+<step2>Branch</step2>
     <keys_1>
       <key>BRANCH_ID</key>
     </keys_1>
@@ -236,8 +272,8 @@
     </keys_2>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>241</xloc>
-      <yloc>113</yloc>
+      <xloc>70</xloc>
+      <yloc>229</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -255,7 +291,7 @@
            </partitioning>
 <join_type>INNER</join_type>
 <step1>SortUserId</step1>
-<step2>SortUserRanking</step2>
+<step2>user_ranking_main</step2>
     <keys_1>
       <key>USER_ID</key>
     </keys_1>
@@ -264,8 +300,8 @@
     </keys_2>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>560</xloc>
-      <yloc>200</yloc>
+      <xloc>369</xloc>
+      <yloc>229</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -300,180 +336,8 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>728</xloc>
-      <yloc>200</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Select values</name>
-    <type>SelectValues</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <fields>      <field>        <name>user_ranking_past_year_main_id</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>user_id</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>company_id</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>region_id</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>branch_id</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>year</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>first_name</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>last_name</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>email_id</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>ranking_score</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>rank</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>sps</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>days_of_registration</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>completed</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>sent</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>completed_percentage</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>total_reviews</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>is_eligible</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>average_rating</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>max_eligible_rank</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>nmls_id</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>        <select_unspecified>N</select_unspecified>
-    </fields>     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>317</xloc>
-      <yloc>257</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>SortBranchId</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>BRANCH_ID</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>151</xloc>
-      <yloc>69</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>SortBranchId 2</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>BRANCH_ID</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>150</xloc>
-      <yloc>173</yloc>
+      <xloc>598</xloc>
+      <yloc>229</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -506,42 +370,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>376</xloc>
-      <yloc>116</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>SortUserRanking</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>user_id</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>430</xloc>
-      <yloc>255</yloc>
+      <xloc>200</xloc>
+      <yloc>229</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -560,7 +390,7 @@
     <connection>SS_Centralized_Mysql_Conn</connection>
     <schema/>
     <table>user_ranking_past_year_branch</table>
-    <commit>1000</commit>
+    <commit>10000</commit>
     <truncate>Y</truncate>
     <ignore_errors>N</ignore_errors>
     <use_batch>Y</use_batch>
@@ -659,11 +489,19 @@
           <column_name>email_id</column_name>
           <stream_name>email_id</stream_name>
         </field>
+        <field>
+          <column_name>total_questions</column_name>
+          <stream_name>total_questions</stream_name>
+        </field>
+        <field>
+          <column_name>answer_sum</column_name>
+          <stream_name>answer_sum</stream_name>
+        </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1027</xloc>
-      <yloc>222</yloc>
+      <xloc>1008</xloc>
+      <yloc>420</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -680,7 +518,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;DISTINCT USER_ID&#xd;&#xa;, BRANCH_ID&#xd;&#xa;FROM user_profile&#xd;&#xa;where status &#x3d; 1 and BRANCH_ID &#x21;&#x3d; 0&#xd;&#xa;group by user_id &#xd;&#xa;order by user_id&#x3b;&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;DISTINCT USER_ID&#xd;&#xa;, BRANCH_ID&#xd;&#xa;FROM user_profile&#xd;&#xa;where status &#x3d; 1 and BRANCH_ID &#x21;&#x3d; 0&#xd;&#xa;group by user_id &#xd;&#xa;order by BRANCH_ID&#x3b;&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -688,8 +526,8 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>52</xloc>
-      <yloc>74</yloc>
+      <xloc>70</xloc>
+      <yloc>44</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -706,7 +544,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  user_ranking_past_year_main_id&#xd;&#xa;, user_id&#xd;&#xa;, company_id&#xd;&#xa;, region_id&#xd;&#xa;, branch_id&#xd;&#xa;, year&#xd;&#xa;, first_name&#xd;&#xa;, last_name&#xd;&#xa;, email_id&#xd;&#xa;, ranking_score&#xd;&#xa;, rank&#xd;&#xa;, sps&#xd;&#xa;, days_of_registration&#xd;&#xa;, completed&#xd;&#xa;, sent&#xd;&#xa;, completed_percentage&#xd;&#xa;, total_reviews&#xd;&#xa;, is_eligible&#xd;&#xa;, average_rating&#xd;&#xa;, max_eligible_rank&#xd;&#xa;, nmls_id&#xd;&#xa;FROM user_ranking_past_year_main&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  user_ranking_past_year_main_id&#xd;&#xa;, user_id&#xd;&#xa;, company_id&#xd;&#xa;, region_id&#xd;&#xa;, branch_id&#xd;&#xa;, year&#xd;&#xa;, first_name&#xd;&#xa;, last_name&#xd;&#xa;, email_id&#xd;&#xa;, ranking_score&#xd;&#xa;, rank&#xd;&#xa;, sps&#xd;&#xa;, days_of_registration&#xd;&#xa;, completed&#xd;&#xa;, sent&#xd;&#xa;, completed_percentage&#xd;&#xa;, total_reviews&#xd;&#xa;, is_eligible&#xd;&#xa;, average_rating&#xd;&#xa;, max_eligible_rank&#xd;&#xa;, nmls_id&#xd;&#xa;, total_questions&#xd;&#xa;, answer_sum&#xd;&#xa;FROM user_ranking_past_year_main&#xd;&#xa;order by user_id</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -714,8 +552,8 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>180</xloc>
-      <yloc>257</yloc>
+      <xloc>369</xloc>
+      <yloc>44</yloc>
       <draw>Y</draw>
       </GUI>
     </step>

@@ -127,7 +127,7 @@
                            </div>
                            <div id="privacy-policy-link"
                               class="privacy-policy-link take-sur-link">
-                              <a href="https://www.socialsurvey.me/survey/privacy-policy/">Privacy
+                              <a href="https://www.socialsurvey.com/privacy-policy/">Privacy
                               Policy</a>
                            </div>
                         </div>

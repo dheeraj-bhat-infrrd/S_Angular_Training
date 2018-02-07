@@ -71,7 +71,7 @@
 			
 			<div class="hero-txt-wrapper">
                 <span style="color: #333;">Enterprise Reputation Management</span><br/>
-                <span> <a target="_blank" class="anchor-home" style="font-size: 20px; color: #2a6496;" href="https://www.socialsurvey.me/survey/scott-harris-talks-about-socialsurvey-2/">To Learn More Click Here</a></span>
+                <span> <a target="_blank" class="anchor-home" style="font-size: 20px; color: #2a6496;" href="https://www.socialsurvey.com/scott-harris-talks-about-socialsurvey-2/">To Learn More Click Here</a></span>
 			</div>
 			<div class="content-wrapper clearfix">
 				<div class="float-left c-pic-panel">
@@ -164,12 +164,12 @@
 				&copy; Copyright 2015. All Rights Reserved.<br/>
 				Created by BuyersRoad, Inc. in San Francisco 
 				<span class="footer-ul">
-					&bull; <a href="https://www.socialsurvey.me/survey/privacy-policy/">Privacy Policy</a>
-					&bull; <a href="https://www.socialsurvey.me/survey/pricing/">Pricing</a>
-					&bull; <a href="https://www.socialsurvey.me/survey/features/">Features</a><br/>
+					&bull; <a href="https://www.socialsurvey.com/privacy-policy/">Privacy Policy</a>
+					&bull; <a href="https://www.socialsurvey.com/pricing/">Pricing</a>
+					&bull; <a href="https://www.socialsurvey.com/features/">Features</a><br/>
 					&bull; Report Bugs to <a href="mailto:support@socialsurvey.me">support@socialsurvey.me</a>
 					&bull; Press Inquiries: <a href="mailto:pr@socialsurvey.me">pr@socialsurvey.me</a><br/>
-					&bull; <a href="https://www.socialsurvey.me/survey/terms-of-use/">Terms of Service</a>
+					&bull; <a href="https://www.socialsurvey.com/terms-of-use/">Terms of Service</a>
 				</span>
 			</div>
 		</div>
