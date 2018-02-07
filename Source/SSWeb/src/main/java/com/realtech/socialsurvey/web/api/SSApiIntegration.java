@@ -2,7 +2,6 @@ package com.realtech.socialsurvey.web.api;
 
 
 
-import com.realtech.socialsurvey.core.entities.JobLogDetailsResponse;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
 import com.realtech.socialsurvey.web.api.entities.AccountRegistrationAPIRequest;
 import com.realtech.socialsurvey.web.api.entities.CaptchaAPIRequest;

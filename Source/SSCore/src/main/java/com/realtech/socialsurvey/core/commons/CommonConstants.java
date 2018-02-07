@@ -294,6 +294,8 @@ public interface CommonConstants
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_USER_RANKING_YEARLY_REPORT = "User ranking yearly report for reporting";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_NPS_WEEK_REPORT = "NPS weekly report for reporting";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_NPS_MONTH_REPORT = "NPS monthly report for reporting";
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_BRANCH_RANKING_MONTHLY_REPORT = "Branch Ranking Monthly Report for reporting";
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_BRANCH_RANKING_YEARLY_REPORT = "Branch ranking yearly report for reporting";
 
 
     /**
@@ -993,13 +995,15 @@ public interface CommonConstants
     public static final int FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT = 106;
     public static final int FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT = 107;
     public static final int FILE_UPLOAD_REPORTING_INCOMPLETE_SURVEY_REPORT = 108;
+    public static final int FILE_UPLOAD_REPORTING_COMPANY_DETAILS_REPORT = 109;
+    public static final int FILE_UPLOAD_REPORTING_NPS_WEEK_REPORT = 110;
+    public static final int FILE_UPLOAD_REPORTING_NPS_MONTH_REPORT = 111;
+    public static final int FILE_UPLOAD_REPORTING_BRANCH_RANKING_MONTHLY_REPORT = 112;
+    public static final int FILE_UPLOAD_REPORTING_BRANCH_RANKING_YEARLY_REPORT = 113;
     
     //Generating survey invitation email report through storm
     public static final int FILE_UPLOAD_SURVEY_INVITATION_EMAIL_REPORT = 1001;
 
-    public static final int FILE_UPLOAD_REPORTING_COMPANY_DETAILS_REPORT = 109;
-    public static final int FILE_UPLOAD_REPORTING_NPS_WEEK_REPORT = 110;
-    public static final int FILE_UPLOAD_REPORTING_NPS_MONTH_REPORT = 111;
     public static final int NPS_REPORT_TYPE_WEEK = 1;
     public static final int NPS_REPORT_TYPE_MONTH = 2;
 
@@ -1406,6 +1410,8 @@ public interface CommonConstants
     public static final String REPORTING_NPS_REPORT = "NPS Report";
     public static final String REPORTING_API_DATE_FORMAT = "MMM dd, yyyy";
     public static final String SURVEY_INVITATION_EMAIL_REPORT = "Survey Invitation Email Report";
+    public static final String REPORTING_BRANCH_RANKING_MONTHLY_REPORT = "Branch Ranking Report For Month";
+    public static final String REPORTING_BRANCH_RANKING_YEARLY_REPORT = "Branch Ranking Report For Year";
 
     public static final String SURVEY_DETAILS_ID_COLUMN = "surveyDetailsId";
     public static final String SURVEY_RESULTS_REPORT_MODIFIED_ON = "reportModifiedOn";
