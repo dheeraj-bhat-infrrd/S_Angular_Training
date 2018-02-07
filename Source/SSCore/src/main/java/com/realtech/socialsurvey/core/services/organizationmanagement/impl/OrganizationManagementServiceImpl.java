@@ -147,6 +147,7 @@ import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
+import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.core.utils.ZipCodeExclusionStrategy;
 import com.realtech.socialsurvey.core.utils.images.ImageProcessor;
@@ -267,6 +268,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Autowired
     GenericDao<UploadStatus, Long> uploadStatusDao;
+    
+    @Autowired
+    private EncryptionHelper encryptionHelper;
 
     @Value ( "${HAPPY_TEXT}")
     private String happyText;
@@ -906,10 +910,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             EncompassCrmInfo crmInfo = (EncompassCrmInfo) companySettings.getCrm_info();
 
             String encryptedPassword = crmInfo.getCrm_password();
-            /*String decryptedPassword = encryptionHelper.decryptAES( encryptedPassword, "" );*/
+            String decryptedPassword = encryptionHelper.decryptAES( encryptedPassword, "" );
 
-            // TODO Temp Fix
-            crmInfo.setCrm_password( encryptedPassword );
+            crmInfo.setCrm_password( decryptedPassword );
         }
         return companySettings;
     }
@@ -8735,4 +8738,24 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.debug( "method getAdminEmaillsForAhierarchy finished" );
         return emailSet;
     }
+
+
+	@Override
+	public List<Long> filterCompanyIdsByStatus(List<Long> companies, String status) throws InvalidInputException {
+		LOG.info("method filterCompanyIdsByStatus() started");
+		if( companies == null || companies.isEmpty() ) {
+			LOG.warn("company list is non-existent");
+			return companies;
+		} else if( StringUtils.isEmpty( status ) ) {
+			LOG.warn("filter parameter status is not present");
+			return companies;
+		} else if ( status.equals(CommonConstants.STATUS_ACTIVE_MONGO ) ) {
+			return companyDao.filterIdsByStatus( companies, Arrays.asList(1) );
+		} else if ( status.equals(CommonConstants.STATUS_DELETED_MONGO ) ) {
+			return companyDao.filterIdsByStatus( companies, Arrays.asList(11) );
+		} else {
+			LOG.warn( "Invalid filter for fetching encompass" );
+			throw new InvalidInputException( "Invalid filter for fetching encompass" );
+		}
+	}
 }
