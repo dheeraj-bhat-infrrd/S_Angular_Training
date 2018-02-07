@@ -10610,3 +10610,36 @@ img.lead-img {
 	font-variant: none !important; 
 	color:white !important;
 }
+
+.recalculate-user-ranking{
+	display: flex;
+    align-items: center;
+}
+
+.recalculate-usr-rank-btn-active{
+	background-color: #009FE0;
+	color: #fff;
+	margin-left: 10px;
+	padding: 0 20px;
+	font-size: 13px;
+	line-height: 40px;
+	margin-top: -2px;
+	border-radius: 3px;
+	cursor: pointer;
+	min-width: 120px;
+	font-weight: bold !important;
+}
+
+.recalculate-usr-rank-btn-inactive{
+	background-color: #8d8d8d;
+    color: #fff;
+    margin-left: 10px;
+    padding: 0 20px;
+    font-size: 13px;
+    line-height: 40px;
+    margin-top: -2px;
+    border-radius: 3px;
+    cursor: not-allowed;
+    min-width: 120px;
+    font-weight: bold !important;
+}

@@ -2976,3 +2976,29 @@ function getUserRankingCount(entityType,entityId,year,month,batchSize,timeFrame)
 	});
 	return userRankingCount;
 }
+
+function recalculateUserRanking(){
+	$('.recalculate-usr-rank-btn-active').toggle();
+	$('.recalculate-usr-rank-btn-inactive').toggle();
+	
+	$.ajax({
+		async : false,
+		url : "/recalranking.do",
+		type : "GET",
+		success :function(response) {
+			if(response == -1){
+				$('#overlay-toast').html("ETL is already running. Please try again later.");
+				showToast();
+			}else{
+				$('#overlay-toast').html("User ranking is being Re-Calculated. Please wait.");
+				showToast();
+			}	
+		},
+		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}	
+		}
+	});
+}

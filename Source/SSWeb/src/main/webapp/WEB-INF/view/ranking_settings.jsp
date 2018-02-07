@@ -8,6 +8,9 @@
 <c:set var="yearOffset" value="${yearOffset}"></c:set>
 <c:set var="columnName" value="${columnName}"></c:set>
 <c:set var="columnId" value="${columnId}"></c:set>
+<c:set var="isEtlRunning" value="${isEtlRunning}"></c:set>
+<c:set var="lastSuccessfulRun" value="${lastSuccessfulRun}"></c:set>
+
 <style>
 	.ranking-settings-ip-div{
 		position: relative;
@@ -87,6 +90,22 @@
 				</div>
 			</div>
 		</c:if>
+		<div style="margin-top:20px">
+				<div class="st-score-rt-top width-three-five-zero"><spring:message code="lable.ranking.settings.recalculate.key" /></div>
+				<div class="recalculate-user-ranking">
+					<div class="recalculate-usr-rank-btn-active text-center" onclick="javascript:recalculateUserRanking()">
+						<spring:message code="lable.ranking.settings.recalculate.btn.key" />
+					</div>
+					<div class="recalculate-usr-rank-btn-inactive text-center">
+						<spring:message code="lable.ranking.settings.recalculate.btn.key" />
+					</div>
+				<c:if test="${ (lastSuccessfulRun != undefined and lastSuccessfulRun != '' and lastSuccessfulRun != null) }">
+					<span class="min-req-span">
+						Last ETL Runtime : ${lastSuccessfulRun}
+					</span>
+				</c:if>
+				</div>
+		</div>
 	</div>
 </div>
 <script>
@@ -95,6 +114,11 @@ var monthOffset = "${monthOffset}";
 var yearOffset = "${yearOffset}";
 var columnName = "${columnName}";
 var columnId = "${columnId}";
+var isEtlRunning = "${isEtlRunning}";
+var lastSuccessfulRun = "${lastSuccessfulRun}";
+
+console.log("isEtlRunning: ", isEtlRunning);
+console.log("lastSuccessfulRun: ", lastSuccessfulRun);
 
 $(document).ready(function(){
 	$('#min-req-container').on('blur','.ranking-settings-ip',function(e){
@@ -102,5 +126,13 @@ $(document).ready(function(){
 		$('#overlay-toast').html(message);
 		showToast();
 	});
+	
+	if(isEtlRunning == true || isEtlRunning == 'true'){
+		$('.recalculate-usr-rank-btn-inactive').show();
+		$('.recalculate-usr-rank-btn-active').hide();
+	}else if(isEtlRunning == false || isEtlRunning == 'false'){
+		$('.recalculate-usr-rank-btn-inactive').hide();
+		$('.recalculate-usr-rank-btn-active').show();
+	}
 });
 </script>
