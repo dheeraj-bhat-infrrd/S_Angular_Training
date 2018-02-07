@@ -1628,8 +1628,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             throw new InvalidInputException( "No user profile present for the specified profileId" );
         }
 
-        userProfileDao.delete( userProfile );
-        //calling method to remove user profile from database
+        userProfile.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+        userProfile.setStatus( CommonConstants.STATUS_DELETE );
+        userProfileDao.update( userProfile );
 
         LOG.debug( "Method to delete a profile finished for profile : " + profileIdToDelete );
     }
@@ -1743,6 +1744,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 throw new InvalidInputException( "No user profile present for the specified userId" );
             }
             profileToMakePrimary.setIsPrimary( CommonConstants.IS_PRIMARY_TRUE );
+            profileToMakePrimary.setModifiedOn(new Timestamp(System.currentTimeMillis()));
             userProfileDao.update( profileToMakePrimary );
 
             LOG.debug( "method updatePrimaryProfileOfUser ended for user with userid : " + user.getUserId() );
@@ -3121,6 +3123,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     public void updateUser( User user, Map<String, Object> map ) throws SolrException, InvalidInputException
     {
         LOG.debug( "Method updateUser() started to update user." );
+        user.setModifiedOn(new Timestamp(System.currentTimeMillis()));
         userDao.merge( user );
         userProfileDao.updateEmailIdForUserProfile( user.getUserId(), user.getEmailId() );
         solrSearchService.editUserInSolrWithMultipleValues( user.getUserId(), map );
@@ -3442,6 +3445,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Transactional
     public void updateCompany( Company company )
     {
+    		//update modified on
+    		company.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         companyDao.update( company );
 
     }
@@ -3450,7 +3455,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     @Transactional
     public void updateBranch( Branch branch )
-    {
+    {	
+    		//update modified on
+    		branch.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         branchDao.update( branch );
 
     }
@@ -3460,6 +3467,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Transactional
     public void updateRegion( Region region )
     {
+    		//update modified on
+    		region.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         regionDao.update( region );
 
     }
@@ -3469,6 +3478,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Transactional
     public void updateUser( User user )
     {
+    		//update modified on
+    		user.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         userDao.update( user );
 
     }
@@ -3747,7 +3758,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         User user = getUserByEmailAddress( emailId );
         if ( user.getCompany().getCompanyId() != companyId ) {
-            throw new InvalidInputException( "The user is not part of the specified company" );
+            throw new NoRecordsFetchedException( "No agent found in given company" );
         }
         
         List<UserProfile> userProfiles = user.getUserProfiles();
@@ -4831,6 +4842,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         if ( userProfile == null ){
             throw new InvalidInputException( "Passed parameter userProfile is null" );
         }
+        userProfile.setModifiedOn(new Timestamp(System.currentTimeMillis()));
         userProfileDao.update( userProfile );
         LOG.info( "method updateUserProfileObject finished for User : " + userProfile.getAgentId() );
     }
