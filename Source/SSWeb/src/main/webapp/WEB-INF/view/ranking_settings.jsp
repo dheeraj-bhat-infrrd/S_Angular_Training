@@ -90,7 +90,8 @@
 				</div>
 			</div>
 		</c:if>
-		<div style="margin-top:20px">
+		<c:if test="${ (isRealTechOrSSAdmin == true or isRealTechOrSSAdmin == 'true') }">
+			<div style="margin-top:20px">
 				<div class="st-score-rt-top width-three-five-zero"><spring:message code="lable.ranking.settings.recalculate.key" /></div>
 				<div class="recalculate-user-ranking">
 					<div class="recalculate-usr-rank-btn-active text-center" onclick="javascript:recalculateUserRanking()">
@@ -105,7 +106,8 @@
 					</span>
 				</c:if>
 				</div>
-		</div>
+			</div>
+		</c:if>
 	</div>
 </div>
 <script>
