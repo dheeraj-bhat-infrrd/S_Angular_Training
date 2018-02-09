@@ -16169,3 +16169,53 @@ $(document).on('click','#dismiss-bulk-options',function(e){
 	e.stopPropagation();
 	$('#bulk-options-popup').hide();
 });
+
+$(document).on('click','#add-macro-status',function(e){
+	e.stopPropagation();
+	$('#add-macro-status-options').toggle();
+	$('#macro-status-chevron-down').toggle();
+	$('#macro-status-chevron-up').toggle();
+});
+
+$(document).on('click','#add-macro-alerts',function(e){
+	e.stopPropagation();
+	$('#add-macro-alerts-options').toggle();
+	$('#macro-alerts-chevron-down').toggle();
+	$('#macro-alerts-chevron-up').toggle();
+});
+
+$(document).on('click','#add-macro-action',function(e){
+	e.stopPropagation();
+	$('#add-macro-action-options').toggle();
+	$('#macro-action-chevron-down').toggle();
+	$('#macro-action-chevron-up').toggle();
+});
+
+$(document).on('click','#macro-status-dropdown',function(e){
+	e.stopPropagation();
+	$('#macro-status-options').toggle();
+	$('#macro-page-chevron-down').toggle();
+	$('#macro-page-chevron-up').toggle();
+});
+
+$(document).on('click','#macro-active-container',function(e){
+	e.stopPropagation();
+	$('#macro-active-container').addClass('macro-tabs-active');
+	$('#macro-inactive-container').removeClass('macro-tabs-active');
+});
+
+$(document).on('click','#macro-inactive-container',function(e){
+	e.stopPropagation();
+	$('#macro-active-container').removeClass('macro-tabs-active');
+	$('#macro-inactive-container').addClass('macro-tabs-active');
+});
+
+$(document).on('blur','#macro-name-txt-box',function(){
+	if($('#macro-name-txt-box').val()!= '' &&  $('#macro-name-txt-box').val()!= undefined && $('#macro-name-txt-box').val()!= null){
+		$('#add-macro-save-inactive').hide();
+		$('#add-macro-save-active').show();
+	}else{
+		$('#add-macro-save-inactive').show();
+		$('#add-macro-save-active').hide();
+	}
+})

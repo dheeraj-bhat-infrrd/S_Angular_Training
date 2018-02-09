@@ -11280,3 +11280,174 @@ img.lead-img {
     font-size: x-large;
     align-self: flex-start;
 }
+
+.macro-dropdown-options{
+	height: 33px;
+    margin-top: 11px;
+    line-height: 30px;
+}
+
+.macro-hdr{
+	border: 0;
+    padding-left: 15px;
+}
+
+.macro-hdr-txt{
+	font-size: 20px;
+    font-weight: bold !important;
+}
+
+.macro-hdr-desc{
+	font-size: 14px;
+    font-weight: bold !important;
+    color: #8d8d8d;
+    margin-top: 5px;
+}
+
+.macro-tabs{
+    padding: 10px 15px;
+    text-align: center;
+    margin-right: 10px;
+    font-size: 14px;
+    font-weight: bold !important;
+    cursor: pointer;
+}
+
+.macro-tabs-active{
+	border-bottom: 3px solid #50a0e1;
+    cursor: default;
+}
+
+.macro-list-div{
+    padding-left: 30px;
+}
+
+.macro-list-hdr {
+    color: #ababab;
+    font-weight: bold !important;
+}
+
+.macro-list-item {
+    font-size: 14px;
+    font-weight: bold !important;
+}
+
+.macro-list-item-usage {
+    font-size: 14px;
+    font-weight: bold !important;
+    color: #ababab;
+}
+
+.chevron-macro-page{
+	cursor:pointer;
+}
+
+.add-macro-form-container{
+	padding-top: 15px;
+}
+
+.macro-form-txt {
+    font-weight: bold !important;
+    margin-bottom: 10px;
+}
+
+.macro-form-txt-box {
+    margin-bottom: 20px;
+}
+
+.macro-name-txt-box{
+	resize: none !important;
+}
+
+.macro-action-txt {
+    font-size: 18px;
+    font-weight: bold !important;
+}
+
+.macro-action-desc {
+    font-size: 12px;
+    font-weight: bold !important;
+    color: #8d8d8d;
+    margin-top: 5px;
+}
+
+.macro-add-action-container {
+    border: 1px solid #c8c8c8;
+    border-radius: 5px;
+    padding: 15px 15px;
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.macro-action-dropdown {
+    border: 1px solid #c8c8c8;
+    border-radius: 5px;
+    padding: 7px 15px;
+    cursor: pointer;
+}
+
+.action-dropdown-margin{
+	margin-left: 10px;
+}
+
+.action-textbox{
+	margin-left: 10px;
+}
+
+.macro-add-action-btn {
+    background: #323233;
+    margin-top: 30px;
+    margin-bottom: 15px;
+    border-radius: 3px;
+    padding: 7px 15px;
+    font-weight: bold !important;
+    color: #bbbbbb;
+    cursor:pointer;
+}
+
+.no-border-style{
+	border: 0;
+}
+
+.macro-add-btn {
+    background-color: white;
+    border: 1px solid #a8a8a8;
+    color: #8d8d8d;
+    line-height: 35px;
+    font-weight: bold !important;
+    text-align: center;
+}
+
+.macro-add-btn-disabled{
+    border: 1px solid #a8a8a8;
+    color: #8d8d8d;
+    line-height: 35px;
+    font-weight: bold !important;
+    background-color: #bbbbbb;
+    cursor: not-allowed;
+    text-align: center;
+}
+
+.add-macro-options{
+    border: 1px solid #e6dede;
+    background: white;
+    border-radius: 3px;
+    width: 100%;
+    margin-left: -24px;
+    margin-top: 3px;
+    z-index: 1;
+    position: absolute;
+    top: 30px;
+    left: 23px;
+    border-top-left-radius: 0;
+    padding: 10px 25px;
+}
+
+.add-macro-dropdown-option{
+    font-size: 13px;
+    font-weight: bold !important;
+    color: #8d8d8d;
+    cursor: pointer;
+    padding: 10px;
+}

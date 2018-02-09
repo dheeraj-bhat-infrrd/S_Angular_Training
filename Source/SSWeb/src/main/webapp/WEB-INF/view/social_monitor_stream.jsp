@@ -64,7 +64,7 @@
 			<div class="float-right hm-header-right text-center soc-mon-btn" onclick="">
 					<spring:message code="label.social.monitor.reports.key" />
 			</div>
-			<div class="float-right hm-header-right text-center soc-mon-btn" onclick="">
+			<div class="float-right hm-header-right text-center soc-mon-btn" onclick="javascript:showMainContent('./showsocialmonitormacropage.do')">
 					<spring:message code="label.edit.macros.key" />
 			</div>
 		</div>
@@ -75,9 +75,9 @@
 	<div class="container">
 		<div class="hm-header-row clearfix">
 			<div class="v-um-hdr-right v-um-hdr-search float-right soc-mon-search-bar">
-				<input id="search-monitors-key" class="v-um-inp soc-mon-inp" placeholder="<spring:message code="label.social.monitor.search.key" />">
-				<span id="soc-mon-search-icn" class="um-search-icn"></span>
-				<div id="soc-mon-search-clr" class="um-clear-input-icn hide" title="clear"></div>
+				<input id="search-post" class="v-um-inp soc-mon-inp" placeholder="<spring:message code="label.social.monitor.search.key" />">
+				<span id="soc-mon-stream-search-icn" class="um-search-icn"></span>
+				<div id="soc-mon-stream-search-clr" class="um-clear-input-icn hide" title="clear"></div>
 			</div>
 			<div class="hm-header-left text-center float-left" style="margin-top: 12px;">
 				<div class="dash-btn-dl-sd-admin report-selector soc-mon-dropdown" >

@@ -40,5 +40,28 @@ public class SocialMonitorWebController {
         
         return JspResolver.SOCIAL_MONITOR_STREAM_PAGE;
     }
+    
+    /*
+     * Web API to return JSP name for social monitor Macro page
+     */
+    @RequestMapping ( value = "/showsocialmonitormacropage", method = RequestMethod.GET)
+    public String showSocialMonitorMacroPage( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Social Monitor Macro Page Started" );
+        
+        return JspResolver.SOCIAL_MONITOR_MACRO_PAGE;
+    }
+    
+    /*
+     * Web API to return JSP name for page to Add social monitor Macros
+     */
+    @RequestMapping ( value = "/showsocialmonitoraddmacropage", method = RequestMethod.GET)
+    public String showSocialMonitorAddMacroPage( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Social Monitor Macro Page Started" );
+        
+        return JspResolver.SOCIAL_MONITOR_ADD_MACRO_PAGE;
+    }
+
 
 }
