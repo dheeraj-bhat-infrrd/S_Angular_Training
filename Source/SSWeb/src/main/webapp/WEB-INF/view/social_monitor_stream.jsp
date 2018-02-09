@@ -58,7 +58,7 @@
 			<div class="float-left hm-header-row-left hr-dsh-adj-lft soc-mon-hdr-txt">
 				<spring:message code="label.social.monitor.key" /> - <spring:message code="label.social.monitor.stream.key" />
 			</div>
-			<div class="float-right hm-header-right text-center soc-mon-btn" onclick="">
+			<div class="float-right hm-header-right text-center soc-mon-btn" onclick="javascript:showMainContent('./showsocialmonitorpage.do')">
 					<spring:message code="label.edit.monitors.key" />
 			</div>
 			<div class="float-right hm-header-right text-center soc-mon-btn" onclick="">

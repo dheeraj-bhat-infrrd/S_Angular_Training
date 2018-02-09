@@ -16218,4 +16218,35 @@ $(document).on('blur','#macro-name-txt-box',function(){
 		$('#add-macro-save-inactive').show();
 		$('#add-macro-save-active').hide();
 	}
-})
+});
+
+$(document).on('click','#mon-type-dropdown',function(e){
+	e.stopPropagation();
+	$('#mon-type-options').toggle();
+	$('#mon-type-chevron-down').toggle();
+	$('#mon-type-chevron-up').toggle();
+});
+
+$(document).on('click','#google-alerts-mon-unchecked',function(e){
+	e.stopPropagation();
+	$('#google-alerts-mon-unchecked').toggle();
+	$('#google-alerts-mon-checked').toggle();
+});
+
+$(document).on('click','#google-alerts-mon-checked',function(e){
+	e.stopPropagation();
+	$('#google-alerts-mon-unchecked').toggle();
+	$('#google-alerts-mon-checked').toggle();
+});
+
+$(document).on('click','#keyword-mon-unchecked',function(e){
+	e.stopPropagation();
+	$('#keyword-mon-unchecked').toggle();
+	$('#keyword-mon-checked').toggle();
+});
+
+$(document).on('click','#keyword-mon-checked',function(e){
+	e.stopPropagation();
+	$('#keyword-mon-unchecked').toggle();
+	$('#keyword-mon-checked').toggle();
+});

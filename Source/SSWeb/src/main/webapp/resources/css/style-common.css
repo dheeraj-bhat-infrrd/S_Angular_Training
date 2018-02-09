@@ -11451,3 +11451,81 @@ img.lead-img {
     cursor: pointer;
     padding: 10px;
 }
+
+.edit-mon-bulk-actions{
+	height: 40px;
+    width: 150px;
+    margin-top: 8px;
+    line-height: 35px;
+    border: 1px solid #999;
+    background: white;
+    border-radius: 5px;
+    box-shadow: inset 3px 3px 4px -3px #b4b0b0;
+    text-align: left;
+    padding-left: 10px;
+    cursor: pointer;
+}
+
+.mon-type-container{
+	color: #3f78bc;
+    border-bottom: 1px solid #bbbbbb;
+}
+
+.mon-type-hdr{
+	border: 1px solid #bbbbbb;
+    padding: 10px;
+}
+
+.soc-mon-txt-bold{
+	font-weight: bold !important;
+}
+
+.mon-type-hdr-txt{
+	font-weight: bold !important;
+    color: black;
+}
+
+.mon-type-gray-container{
+	border: 1px solid #bbbbbb;
+    padding: 10px 10px 30px;
+    border-top: 0;
+    border-bottom: 0;
+    background-color: #f4f4f4;
+}
+.mon-type-white-container{
+	border: 1px solid #bbbbbb;
+    padding: 10px 10px 30px;
+    border-top: 0;
+    border-bottom: 0;
+}
+
+.mon-type-keyphrase{
+	font-weight: bold !important;
+    font-size: 14px;
+}
+
+.mon-type-tbl-txt{
+	font-weight: bold !important;
+    font-size: 12px;
+}
+
+.mon-type-select-options{
+	padding-left: 8px;
+    margin-top: 7px;
+    padding-bottom: 10px;
+}
+
+.mon-type-option{
+	display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.mon-type-checkbox{
+	cursor:pointer;
+	margin-right: 10px;
+}
+
+.zero-padding{
+	padding: 0;
+}
