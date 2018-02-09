@@ -647,7 +647,7 @@
     <fields>
       <field>
         <name>CurrentDate</name>
-        <type>system date &#x28;fixed&#x29;</type>
+        <type>prev year end</type>
         </field>
       </fields>
      <cluster_schema/>
