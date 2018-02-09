@@ -7748,6 +7748,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         } catch ( UndeliveredEmailException e1 ) {
                             LOG.error( "Error while sending report excption mail to admin " );
                         }
+                        organizationUnitSettingsDao.removeImageForOrganizationUnitSetting( id,
+                            CommonConstants.COMPANY_SETTINGS_COLLECTION, false, CommonConstants.IMAGE_TYPE_PROFILE );
                     }
                 }
 
@@ -7777,6 +7779,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         } catch ( UndeliveredEmailException e1 ) {
                             LOG.error( "Error while sending report excption mail to admin " );
                         }
+                        organizationUnitSettingsDao.removeImageForOrganizationUnitSetting( id,
+                            CommonConstants.REGION_SETTINGS_COLLECTION, false, CommonConstants.IMAGE_TYPE_PROFILE );
                     }
                 }
 
@@ -7807,6 +7811,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         } catch ( UndeliveredEmailException e1 ) {
                             LOG.error( "Error while sending report excption mail to admin " );
                         }
+                        organizationUnitSettingsDao.removeImageForOrganizationUnitSetting( id,
+                            CommonConstants.BRANCH_SETTINGS_COLLECTION, false, CommonConstants.IMAGE_TYPE_PROFILE );
                     }
                 }
 
@@ -7837,6 +7843,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         } catch ( UndeliveredEmailException e1 ) {
                             LOG.error( "Error while sending report excption mail to admin " );
                         }
+                        organizationUnitSettingsDao.removeImageForOrganizationUnitSetting( id,
+                            CommonConstants.AGENT_SETTINGS_COLLECTION, false, CommonConstants.IMAGE_TYPE_PROFILE );
                     }
                 }
 
@@ -7866,6 +7874,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         } catch ( UndeliveredEmailException e1 ) {
                             LOG.error( "Error while sending report excption mail to admin " );
                         }
+                        organizationUnitSettingsDao.removeImageForOrganizationUnitSetting( id,
+                            CommonConstants.COMPANY_SETTINGS_COLLECTION, false, CommonConstants.IMAGE_TYPE_LOGO );
                     }
                 }
             }
@@ -7890,6 +7900,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         } catch ( UndeliveredEmailException e1 ) {
                             LOG.error( "Error while sending report excption mail to admin " );
                         }
+                        organizationUnitSettingsDao.removeImageForOrganizationUnitSetting( id,
+                            CommonConstants.REGION_SETTINGS_COLLECTION, false, CommonConstants.IMAGE_TYPE_LOGO );
                     }
                 }
             }
@@ -7914,6 +7926,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         } catch ( UndeliveredEmailException e1 ) {
                             LOG.error( "Error while sending report excption mail to admin " );
                         }
+                        organizationUnitSettingsDao.removeImageForOrganizationUnitSetting( id,
+                            CommonConstants.BRANCH_SETTINGS_COLLECTION, false, CommonConstants.IMAGE_TYPE_LOGO );
                     }
                 }
             }
@@ -7939,6 +7953,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         } catch ( UndeliveredEmailException e1 ) {
                             LOG.error( "Error while sending report excption mail to admin " );
                         }
+                        organizationUnitSettingsDao.removeImageForOrganizationUnitSetting( id,
+                            CommonConstants.AGENT_SETTINGS_COLLECTION, false, CommonConstants.IMAGE_TYPE_LOGO );
                     }
                 }
             }
