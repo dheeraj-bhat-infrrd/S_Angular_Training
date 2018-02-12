@@ -38,9 +38,9 @@ public class TopologyStarter
                 : ChararcterUtils.appendWithHypen( MailEventsTopologyStarterHelper.MAIL_EVENT_TOPOLOGY,
                     EnvConstants.getProfile() ) );
         // Social post topology
-        new SocialPostTopologyStarterHelper().submitTopology( EnvConstants.getCluster().equals( EnvConstants.LOCAL_TOPOLOGY ),
-            ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? SocialPostTopologyStarterHelper.SOCIAL_POST_TOPOLOGY
-                : ChararcterUtils.appendWithHypen( SocialPostTopologyStarterHelper.SOCIAL_POST_TOPOLOGY,
+        new SocialPostFilterTopologyStarterHelper().submitTopology( EnvConstants.getCluster().equals( EnvConstants.LOCAL_TOPOLOGY ),
+            ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? SocialPostFilterTopologyStarterHelper.SOCIAL_POST_TOPOLOGY
+                : ChararcterUtils.appendWithHypen( SocialPostFilterTopologyStarterHelper.SOCIAL_POST_TOPOLOGY,
                     EnvConstants.getProfile() ) );
         // Reports topology
         new ReportsTopologyStarterHelper().submitTopology( EnvConstants.getCluster().equals( EnvConstants.LOCAL_TOPOLOGY ),
