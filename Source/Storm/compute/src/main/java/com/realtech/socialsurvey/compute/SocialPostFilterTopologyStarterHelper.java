@@ -13,10 +13,10 @@ import com.realtech.socialsurvey.compute.topology.spouts.KafkaTopicSpoutBuilder;
 import com.realtech.socialsurvey.compute.utils.ChararcterUtils;
 
 
-public class SocialPostTopologyStarterHelper extends TopologyStarterHelper
+public class SocialPostFilterTopologyStarterHelper extends TopologyStarterHelper
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( SocialPostTopologyStarterHelper.class );
+    private static final Logger LOG = LoggerFactory.getLogger( SocialPostFilterTopologyStarterHelper.class );
 
     public static final String SOCIAL_POST_TOPOLOGY = "SocialPostTopology";
 
@@ -92,10 +92,10 @@ public class SocialPostTopologyStarterHelper extends TopologyStarterHelper
         EnvConstants.runtimeParams( args );
 
         // Social post topology
-        new SocialPostTopologyStarterHelper().submitTopology( EnvConstants.getCluster().equals( EnvConstants.LOCAL_TOPOLOGY ),
+        new SocialPostFilterTopologyStarterHelper().submitTopology( EnvConstants.getCluster().equals( EnvConstants.LOCAL_TOPOLOGY ),
             ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) )
-                ? SocialPostTopologyStarterHelper.SOCIAL_POST_TOPOLOGY
-                : ChararcterUtils.appendWithHypen( SocialPostTopologyStarterHelper.SOCIAL_POST_TOPOLOGY,
+                ? SocialPostFilterTopologyStarterHelper.SOCIAL_POST_TOPOLOGY
+                : ChararcterUtils.appendWithHypen( SocialPostFilterTopologyStarterHelper.SOCIAL_POST_TOPOLOGY,
                     EnvConstants.getProfile() ) );
     }
 

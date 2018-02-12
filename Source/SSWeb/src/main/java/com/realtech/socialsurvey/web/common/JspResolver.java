@@ -28,6 +28,10 @@ public interface JspResolver
     public static final String NEWREGISTRATION = "new_registration";
     public static final String NEW_ACCOUNT_SIGNUP = "new_accountsignup";
     public static final String NEW_ACCOUNT_SIGNUP_LINKEDIN = "new_accountsignup";
+    public static final String SOCIAL_MONITOR_PAGE="social_monitor";
+    public static final String SOCIAL_MONITOR_STREAM_PAGE="social_monitor_stream";
+    public static final String SOCIAL_MONITOR_MACRO_PAGE="social_monitor_macro";
+    public static final String SOCIAL_MONITOR_ADD_MACRO_PAGE="social_monitor_add_macro";
 
     // Generic pages
     public static final String INDEX = "index";
