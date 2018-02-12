@@ -33,4 +33,11 @@ public interface SocialFeedService
      * @return
      */
     long updateDuplicateCount(int hash, long companyId, long duplicateCount) throws InvalidInputException;
+
+    /**
+     * Gets the post match the given postId
+     * @param postId
+     * @return
+     */
+    SocialResponseObject<?> getSocialPost(String postId);
 }

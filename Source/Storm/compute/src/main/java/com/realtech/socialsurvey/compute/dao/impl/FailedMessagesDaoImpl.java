@@ -43,7 +43,7 @@ public class FailedMessagesDaoImpl implements FailedMessagesDao
     }
 
     @Override
-    public boolean insertFailedFailedSocialPost( FailedSocialPost failedSocialPost )
+    public boolean insertFailedSocialPost(FailedSocialPost failedSocialPost )
     {
         LOG.debug( "Inserting failed Social Post: {}", failedSocialPost );
         mongoDB.datastore().save( failedSocialPost );

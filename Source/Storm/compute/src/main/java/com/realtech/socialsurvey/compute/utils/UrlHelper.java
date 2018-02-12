@@ -21,7 +21,7 @@ public class UrlHelper
     
     private static final String URL_REGEX_FOR_FACEBOOK_PAGE_ID= "(?:https?:\\/\\/)?(?:www\\.)?facebook\\.com\\/(?:(?:\\w)*#!\\/)?(?:pages\\/)?(?:groups\\/)?(?:[\\w\\-]*\\/)*?(\\/)?([^/?]*)";
     
-    private static final String URL_REGEX_FOR_LINKEDIN_PAGE_ID= "(?:https?:\\/\\/)?(?:www\\.)?linkedin.com\\/profile\\/view\\?id=?(\\/)?([^/?]*)";
+    private static final String URL_REGEX_FOR_LINKEDIN_PAGE_ID= "(?:https?:\\/\\/)?(?:www\\.)?linkedin\\.com\\/(?:(?:\\w)*#!\\/)?(?:in\\/)?(?:company\\/)?(?:[\\w\\-]*\\/)*?(\\/)?([^/?]*)";
 
     private static final String URL_REGEX_FOR_TWITTER_PAGE_ID = "(?:https?:\\/\\/)?(?:www\\.)?twitter\\.com\\/(?:(?:\\w)*#!\\/)?(?:pages\\/)?(?:groups\\/)?(?:[\\w\\-]*\\/)*?(\\/)?([^/?]*)";
 

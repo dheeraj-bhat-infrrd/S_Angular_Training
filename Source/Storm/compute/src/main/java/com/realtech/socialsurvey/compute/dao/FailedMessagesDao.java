@@ -24,7 +24,7 @@ public interface FailedMessagesDao
      * @param failedSocialPost
      * @return
      */
-    boolean insertFailedFailedSocialPost( FailedSocialPost failedSocialPost );
+    boolean insertFailedSocialPost(FailedSocialPost failedSocialPost );
 
     /**
      * Inserts failed report request

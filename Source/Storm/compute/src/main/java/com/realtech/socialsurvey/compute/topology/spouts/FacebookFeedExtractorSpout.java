@@ -1,6 +1,5 @@
 package com.realtech.socialsurvey.compute.topology.spouts;
 
-import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -34,10 +33,8 @@ public class FacebookFeedExtractorSpout extends BaseComputeSpout
     private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger( FacebookFeedExtractorSpout.class );
 
-
     private SpoutOutputCollector _collector;
     public boolean isFbCalled;
-    private Calendar lastFetchedTill;
     private FacebookFeedProcessor facebookFeedProcessor;
 
 
@@ -48,6 +45,7 @@ public class FacebookFeedExtractorSpout extends BaseComputeSpout
         this._collector = collector;
         this.facebookFeedProcessor = new FacebookFeedProcessorImpl();
     }
+
 
     private boolean isRateLimitExceeded()
     {
@@ -66,37 +64,28 @@ public class FacebookFeedExtractorSpout extends BaseComputeSpout
             if ( mediaTokens.isPresent() ) {
 
                 for ( SocialMediaTokenResponse mediaToken : mediaTokens.get() ) {
-                    FacebookToken token = mediaToken.getSocialMediaTokens().getFacebookToken();
+                    Long companyId = mediaToken.getCompanyId();
+                    FacebookToken token = null;
+                    if ( mediaToken.getSocialMediaTokens() != null ) {
+                        token = mediaToken.getSocialMediaTokens().getFacebookToken();
+                    }
 
-                    if ( token.getFacebookPages() != null ) {
-                        // Check rate limiting for company
-                        if ( !isRateLimitExceeded( /* pass media token*/ ) && !isFbCalled ) {
-                            // Get SocailMediaToken for company
-                            Long companyId = mediaToken.getCompanyId();
+                    // Check rate limiting for company
+                    if ( isRateLimitExceeded( /* pass media token*/ ) || isFbCalled ) {
+                        LOG.warn( "Rate limit exceeded" );
+                        break;
+                    }
 
-                            List<FacebookFeedData> feeds = facebookFeedProcessor.fetchFeeds(companyId, token );
+                    List<FacebookFeedData> feeds = facebookFeedProcessor.fetchFeeds( companyId, token );
+                    isFbCalled = true;
 
-                            isFbCalled = true;
-                            LOG.debug( "response  : ", feeds );
-                            for ( FacebookFeedData fbResponse : feeds ) {
-
-                                SocialResponseObject<FacebookFeedData> responseWrapper = new SocialResponseObject<>( companyId,
-                                    SocialFeedType.FACEBOOK, fbResponse.getMessage(), fbResponse, 1 );
-
-                                if ( fbResponse.getMessage() != null ) {
-                                    responseWrapper.setHash( responseWrapper.getText().hashCode() );
-                                }
-                                //set the postId for responseObject which will be used to uniquely identify a message
-                                responseWrapper.setPostId(fbResponse.getId());
-
-                                String responseWrapperString = new Gson().toJson( responseWrapper );
-
-                                _collector.emit( new Values( Long.toString( companyId ), responseWrapperString ) );
-                                LOG.debug( "Emitted successfully {}", responseWrapper );
-                            }
-                        } else {
-                            LOG.warn( "Rate limit exceeded" );
-                        }
+                    LOG.debug( "Total tweet fetched : {}", feeds.size() );
+                    for ( FacebookFeedData facebookFeedData : feeds ) {
+                        SocialResponseObject<FacebookFeedData> responseWrapper = createSocialResponseObject( companyId,
+                            facebookFeedData );
+                        String responseWrapperString = new Gson().toJson( responseWrapper );
+                        _collector.emit( new Values( Long.toString( companyId ), responseWrapperString ) );
+                        LOG.debug( "Emitted successfully {}", responseWrapper );
                     }
 
                 }
@@ -106,19 +95,37 @@ public class FacebookFeedExtractorSpout extends BaseComputeSpout
             LOG.error( "Error while fetching post from facebook.", e );
         }
     }
-    
-    private SocialResponseObject<FacebookFeedData> createSocialResponseObject(long companyId, FacebookFeedData facebookFeedData){
-        SocialResponseObject<FacebookFeedData> responseWrapper = new SocialResponseObject<>( companyId,
-            SocialFeedType.FACEBOOK, facebookFeedData.getMessage(), facebookFeedData, 1 );
+
+
+    /**
+     * Create SocialResponseObject with common fields
+     * @param companyId
+     * @param facebookFeedData
+     * @return
+     */
+    private SocialResponseObject<FacebookFeedData> createSocialResponseObject( long companyId,
+        FacebookFeedData facebookFeedData )
+    {
+        SocialResponseObject<FacebookFeedData> responseWrapper = new SocialResponseObject<>( companyId, SocialFeedType.FACEBOOK,
+            facebookFeedData.getMessage(), facebookFeedData, 1 );
 
         if ( facebookFeedData.getMessage() != null ) {
             responseWrapper.setHash( responseWrapper.getText().hashCode() );
         }
-        
-        //responseWrapper.setUpdatedTime( facebookFeedData.getUpdatedTime() );
-        
+
+        responseWrapper.setPostId(facebookFeedData.getId());
+
+        if ( facebookFeedData.getUpdatedTime() > 0 ) {
+            responseWrapper.setUpdatedTime( facebookFeedData.getUpdatedTime() * 1000 );
+        }
+
+        if ( facebookFeedData.getCreatedTime() > 0 ) {
+            responseWrapper.setCreatedTime( facebookFeedData.getCreatedTime() * 1000 );
+        }
+
         return responseWrapper;
     }
+
 
     @Override
     public void declareOutputFields( OutputFieldsDeclarer declarer )
@@ -126,10 +133,12 @@ public class FacebookFeedExtractorSpout extends BaseComputeSpout
         declarer.declare( new Fields( "companyId", "post" ) );
     }
 
+
     public FacebookFeedProcessor getFacebookFeedProcessor()
     {
         return facebookFeedProcessor;
     }
+
 
     public void setFacebookFeedProcessor( FacebookFeedProcessor facebookFeedProcessor )
     {

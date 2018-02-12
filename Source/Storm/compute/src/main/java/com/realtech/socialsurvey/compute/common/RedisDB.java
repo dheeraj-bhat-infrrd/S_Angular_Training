@@ -24,8 +24,8 @@ import redis.clients.jedis.exceptions.JedisException;
 public class RedisDB
 {
     private static final Logger LOG = LoggerFactory.getLogger( RedisDB.class );
-    public static final String HOST = "127.0.0.1";
-    public static final int PORT = 6379;
+    public static final String DEFAULT_HOST = "127.0.0.1";
+    public static final int DEFAULT_PORT = 6379;
     public static final String COMPANYKEYWORDS_KEY_PREFIX = "companykeywords:";
     public static final String SSAPI_RETRY_COUNT = "ssapiretrycount";
     public static final String SSAPI_BREAKER_STATUS = "ssapibreakerstatus";
@@ -39,8 +39,8 @@ public class RedisDB
     static {
         host = LocalPropertyFileHandler.getInstance()
             .getProperty( ComputeConstants.APPLICATION_PROPERTY_FILE, ComputeConstants.REDIS_HOST ).orElse( null );
-        port =Integer.parseInt(LocalPropertyFileHandler.getInstance()
-            .getProperty( ComputeConstants.APPLICATION_PROPERTY_FILE, ComputeConstants.REDIS_PORT ).orElse( "" ));
+        port = Integer.parseInt( LocalPropertyFileHandler.getInstance()
+            .getProperty( ComputeConstants.APPLICATION_PROPERTY_FILE, ComputeConstants.REDIS_PORT ).orElse( "" ) );
     }
 
 
@@ -76,6 +76,7 @@ public class RedisDB
         return config;
     }
 
+
     public List<Keyword> getKeywordsFromRedis( long companyId )
     {
         Jedis jedis = getPoolInstance().getResource();
@@ -105,28 +106,15 @@ public class RedisDB
         map.put( "modifiedon", Long.toString( System.currentTimeMillis() ) );
         Jedis jedis = getPoolInstance().getResource();
         try {
-            jedis.hmset( key, map );
-        } catch ( JedisException e ) {
             if ( jedis != null ) {
-                jedis.close();
+                jedis.hmset( key, map );
             }
+        } catch ( JedisException e ) {
+            jedis.close();
         } finally {
             if ( null != jedis ) {
                 jedis.close();
             }
         }
-    }
-    
-    public static void main( String[] args )
-    {
-        RedisDB app = new RedisDB();
-        System.out.println( app.getKeywordsFromRedis( 684L ) );;
-        /*List<Keyword> keywords = new ArrayList<>();
-        Keyword k1=  new Keyword();
-        
-        
-        Keyword k2=  new Keyword();
-        keywords.add( new Keyword() );
-        app.saveKeywords( keywords, companyId );*/
     }
 }

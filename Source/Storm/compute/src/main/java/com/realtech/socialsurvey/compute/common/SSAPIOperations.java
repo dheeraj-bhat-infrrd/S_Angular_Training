@@ -173,4 +173,16 @@ public class SSAPIOperations
             return Optional.empty();
         }
     }
+
+    public SocialResponseObject getPostFromMongo(String postId) throws IOException {
+        LOG.info(" Executing getPostFromMongo method ");
+        Call<SocialResponseObject> requestCall =  RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationService().getPostFromMongo(postId);
+        Response<SocialResponseObject> response = requestCall.execute();
+        RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
+        if ( LOG.isTraceEnabled() ) {
+            //TODO change the log level to trace once tested
+            LOG.info( "getPostFromMongo response {}", response.body() );
+        }
+        return response.body();
+    }
 }

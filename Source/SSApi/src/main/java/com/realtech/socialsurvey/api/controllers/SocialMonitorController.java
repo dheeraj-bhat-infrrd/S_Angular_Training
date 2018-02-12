@@ -175,8 +175,17 @@ public class SocialMonitorController
         } catch (InvalidInputException e) {
             throw  new SSApiException(e.getMessage(), e);
         }
-
     }
 
+    @RequestMapping( value = "/feeds/postId/{postId}", method = RequestMethod.GET)
+    @ApiOperation(value = "Fetches the socialpost for given postId")
+    public ResponseEntity<?> getSocialPost(@PathVariable ( "postId" ) String postId,
+                                           HttpServletRequest request) throws SSApiException {
+            LOGGER.info( "SocialMonitorController.getSocialPost started" );
+            // gets social post with given postId
+            SocialResponseObject<?> post = socialFeedService.getSocialPost(postId);
+            LOGGER.info( "SocialMonitorController.getSocialPost completed successfully" );
+            return new ResponseEntity<>( post, HttpStatus.OK );
+    }
 
 }

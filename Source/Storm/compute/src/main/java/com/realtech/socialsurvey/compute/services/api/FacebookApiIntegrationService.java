@@ -17,7 +17,7 @@ import retrofit2.http.Query;
 public interface FacebookApiIntegrationService
 {
     @Headers ( "Content-Type: application/json")
-    @GET ( "/{pageId}/feed")
+    @GET ( "/{pageId}/feed?date_format=U")
     Call<FacebookResponse> fetchFeeds( @Path ( "pageId") String pageId, @Query ( "access_token") String accessToken,
         @Query ( "since") String since, @Query ( "until") String until, @Query ( "limit") String limit,
         @Query ( "__paging_token") String pagingToken, @Query ( "fields") String fields );

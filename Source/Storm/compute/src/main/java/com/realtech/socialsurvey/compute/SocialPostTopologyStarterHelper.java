@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.compute;
 
+import com.realtech.socialsurvey.compute.topology.bolts.monitor.*;
 import org.apache.storm.Config;
 import org.apache.storm.generated.StormTopology;
 import org.apache.storm.topology.TopologyBuilder;
@@ -8,10 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.realtech.socialsurvey.compute.common.EnvConstants;
-import com.realtech.socialsurvey.compute.topology.bolts.monitor.CompanyGroupingBolt;
-import com.realtech.socialsurvey.compute.topology.bolts.monitor.FilterSocialPostBolt;
-import com.realtech.socialsurvey.compute.topology.bolts.monitor.SaveFeedsToMongoBolt;
-import com.realtech.socialsurvey.compute.topology.bolts.monitor.UpdateSocialPostDupliateCountBolt;
 import com.realtech.socialsurvey.compute.topology.spouts.KafkaTopicSpoutBuilder;
 import com.realtech.socialsurvey.compute.utils.ChararcterUtils;
 
@@ -80,6 +77,8 @@ public class SocialPostTopologyStarterHelper extends TopologyStarterHelper
         builder.setBolt( "SaveFeedsToMongoBolt", new SaveFeedsToMongoBolt(), 1 ).shuffleGrouping( "FilterSocialPostBolt" );
         builder.setBolt("UpdateSocialPostDuplicateCount", new UpdateSocialPostDupliateCountBolt(), 1)
                 .shuffleGrouping("SaveFeedsToMongoBolt", "SUCCESS_STREAM");
+        builder.setBolt("RetryBolt", new RetryHandlerBolt(), 1)
+                .shuffleGrouping("SaveFeedsToMongoBolt", "RETRY_STREAM");
 
         return builder.createTopology();
     }

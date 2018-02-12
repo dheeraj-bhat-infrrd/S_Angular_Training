@@ -55,4 +55,9 @@ public class SocialFeedServiceImpl implements SocialFeedService
         return mongoSocialFeedDao.updateDuplicateCount(hash, companyId, duplicateCount);
     }
 
+    @Override
+    public SocialResponseObject<?> getSocialPost(String postId) {
+        return mongoSocialFeedDao.getSocialPost(postId);
+    }
+
 }

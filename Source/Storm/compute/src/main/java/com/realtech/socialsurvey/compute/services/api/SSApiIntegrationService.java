@@ -73,4 +73,7 @@ public interface SSApiIntegrationService
     @PUT ( "v1/feeds/hash/{hash}/companyId/{companyId}/duplicateCount/{duplicateCount}")
     Call<Long> updateDuplicateCount( @Path ( "hash") int hash, @Path ( "companyId") long companyId,
         @Path ( "duplicateCount") long duplicateCount );
+
+    @GET ("v1/feeds/postId/{postId}")
+    Call<SocialResponseObject> getPostFromMongo(@Path("postId") String postId);
 }

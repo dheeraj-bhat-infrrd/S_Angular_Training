@@ -987,7 +987,7 @@ public class SocialManagementController
             HttpGet httpGet = new HttpGet( linkedinProfileUri + accessToken );
             String basicProfileStr = httpclient.execute( httpGet, new BasicResponseHandler() );
             LinkedinUserProfileResponse profileData = new Gson().fromJson( basicProfileStr, LinkedinUserProfileResponse.class );
-            String profileLink = (String) profileData.getSiteStandardProfileRequest().getUrl();
+            String profileLink = profileData.getPublicProfileUrl();
 
             boolean updated = false;
             int accountMasterId = accountType.getValue();

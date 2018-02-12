@@ -37,7 +37,12 @@ public interface FailedMessagesService
      * @param reportRequest
      */
     void insertTemporaryFailedReportRequest(ReportRequest reportRequest);
-    public void insertPermanentlyFailedSocialPost( SocialResponseObject<?> post, Throwable thrw );
+
+    /*Inserts permanent failed socialPost*/
+    void insertPermanentlyFailedSocialPost( SocialResponseObject<?> post, Throwable thrw );
+
+    /* Inserts temporary failed socialPost */
+    void insertTemporaryFailedSocialPost(SocialResponseObject<?> post);
 
     /**
      * Deletes failed email message
