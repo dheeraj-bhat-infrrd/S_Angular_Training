@@ -16250,3 +16250,24 @@ $(document).on('click','#keyword-mon-checked',function(e){
 	$('#keyword-mon-unchecked').toggle();
 	$('#keyword-mon-checked').toggle();
 });
+
+$(document).on('click','#stream-usr-selection',function(e){
+	e.stopPropagation();
+	$('#stream-usr-dropdown-options').toggle();
+	$('#usr-chevron-down').toggle();
+	$('#usr-chevron-up').toggle();
+});
+
+$(document).on('click','#stream-seg-selection',function(e){
+	e.stopPropagation();
+	$('#stream-seg-dropdown-options').toggle();
+	$('#seg-chevron-down').toggle();
+	$('#seg-chevron-up').toggle();
+});
+
+$(document).on('click','#stream-feed-selection',function(e){
+	e.stopPropagation();
+	$('#stream-feed-dropdown-options').toggle();
+	$('#feed-chevron-down').toggle();
+	$('#feed-chevron-up').toggle();
+});
