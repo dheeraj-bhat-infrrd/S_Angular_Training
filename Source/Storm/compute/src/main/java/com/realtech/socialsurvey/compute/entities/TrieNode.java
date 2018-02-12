@@ -1,7 +1,7 @@
 package com.realtech.socialsurvey.compute.entities;
 
-import java.util.Map;
 import java.io.Serializable;
+import java.util.Map;
 
 
 /**

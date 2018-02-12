@@ -1,13 +1,13 @@
 package com.realtech.socialsurvey.compute.topology.bolts.monitor;
 
+import java.util.Properties;
+
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.storm.kafka.bolt.KafkaBolt;
 import org.apache.storm.kafka.bolt.mapper.FieldNameBasedTupleToKafkaMapper;
 import org.apache.storm.kafka.bolt.selector.DefaultTopicSelector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Properties;
 
 
 /**

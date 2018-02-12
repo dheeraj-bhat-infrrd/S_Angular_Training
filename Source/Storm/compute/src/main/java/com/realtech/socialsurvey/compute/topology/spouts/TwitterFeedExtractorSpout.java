@@ -42,7 +42,7 @@ public class TwitterFeedExtractorSpout extends BaseComputeSpout
     {
         super.open( conf, context, collector );
         this._collector = collector;
-        this.twitterFeedProcessor = new TwitterFeedProcessorImpl();
+        this.setTwitterFeedProcessor( new TwitterFeedProcessorImpl() );
     }
 
 
@@ -70,7 +70,7 @@ public class TwitterFeedExtractorSpout extends BaseComputeSpout
                         Long companyId = mediaToken.getCompanyId();
 
                         //Call facebook api to get facebook page post.
-                        List<TwitterFeedData> response = twitterFeedProcessor.fetchFeed( 1L, "", token );
+                        List<TwitterFeedData> response = fetchFeeds( companyId, token );
                         if ( response != null ) {
                             LOG.debug( "response  : ", response.size() );
                             for ( TwitterFeedData twitterFeedData : response ) {
@@ -98,10 +98,29 @@ public class TwitterFeedExtractorSpout extends BaseComputeSpout
     }
 
 
+    private List<TwitterFeedData> fetchFeeds( long companyIden, TwitterToken token )
+    {
+        return twitterFeedProcessor.fetchFeed( companyIden, token );
+    }
+
+
     @Override
     public void declareOutputFields( OutputFieldsDeclarer declarer )
     {
         declarer.declare( new Fields( "companyId", "post" ) );
     }
+
+
+    public TwitterFeedProcessor getTwitterFeedProcessor()
+    {
+        return twitterFeedProcessor;
+    }
+
+
+    public void setTwitterFeedProcessor( TwitterFeedProcessor twitterFeedProcessor )
+    {
+        this.twitterFeedProcessor = twitterFeedProcessor;
+    }
+
 
 }

@@ -1,5 +1,11 @@
 package com.realtech.socialsurvey.compute.common;
 
+import java.io.IOException;
+import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.realtech.socialsurvey.compute.entities.EmailMessage;
 import com.realtech.socialsurvey.compute.entities.SolrEmailMessageWrapper;
 import com.realtech.socialsurvey.compute.entities.request.SolrAdd;
@@ -9,13 +15,9 @@ import com.realtech.socialsurvey.compute.entities.response.SOLRResponseObject;
 import com.realtech.socialsurvey.compute.exception.SolrProcessingException;
 import com.realtech.socialsurvey.compute.services.api.APIIntegrationException;
 import com.realtech.socialsurvey.compute.utils.ChararcterUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import retrofit2.Call;
 import retrofit2.Response;
-
-import java.io.IOException;
-import java.util.Optional;
 
 
 /**
