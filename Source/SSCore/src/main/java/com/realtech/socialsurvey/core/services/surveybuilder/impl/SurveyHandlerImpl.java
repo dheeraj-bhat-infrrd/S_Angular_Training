@@ -5030,7 +5030,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     		surveys =  surveyPreInitiationDao.getManualCompletedSurveys(start, batchSize);
     		
     		for(SurveyPreInitiation spInitiation : surveys ) {
-    			Criterion agentEmaailIdCriteria = Restrictions.eq( "agentEmailId", spInitiation.getAgentEmailId() ); 
+    			Criterion agentEmaailIdCriteria = Restrictions.eq( "agentId", spInitiation.getAgentId()); 
     			Criterion customerEmaailIdCriteria = Restrictions.eq( "customerEmailId", spInitiation.getCustomerEmailId() ); 
     			Criterion companyIdCriteria = Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, spInitiation.getCompanyId() );
     			Criterion SPIdCriteria = Restrictions.ne( "surveyPreIntitiationId", spInitiation.getSurveyPreIntitiationId() );
