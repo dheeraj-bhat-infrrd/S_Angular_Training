@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.compute.feeds.impl;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,8 +19,10 @@ import com.realtech.socialsurvey.compute.utils.UrlHelper;
  * @author manish
  *
  */
-public class LinkedinFeedProcessorImpl implements LinkedinFeedProcessor
+public class LinkedinFeedProcessorImpl implements LinkedinFeedProcessor, Serializable
 {
+    private static final long serialVersionUID = 1L;
+
     private static final Logger LOG = LoggerFactory.getLogger( LinkedinFeedProcessorImpl.class );
 
     private static final int RETRIES_INITIAL = 0;

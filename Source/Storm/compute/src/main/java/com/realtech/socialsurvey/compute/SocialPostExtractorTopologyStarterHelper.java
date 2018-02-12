@@ -8,18 +8,22 @@ import org.slf4j.LoggerFactory;
 
 import com.realtech.socialsurvey.compute.common.EnvConstants;
 import com.realtech.socialsurvey.compute.topology.bolts.KafkaProducerBolt;
-import com.realtech.socialsurvey.compute.topology.spouts.FacebookFeedExtractorSpout;
-import com.realtech.socialsurvey.compute.topology.spouts.LinkedinFeedExtractorSpout;
-import com.realtech.socialsurvey.compute.topology.spouts.TwitterFeedExtractorSpout;
+import com.realtech.socialsurvey.compute.topology.bolts.monitor.FacebookFeedExtractorBolt;
+import com.realtech.socialsurvey.compute.topology.bolts.monitor.LinkedinFeedExtractorBolt;
+import com.realtech.socialsurvey.compute.topology.bolts.monitor.TwitterFeedExtractorBolt;
+import com.realtech.socialsurvey.compute.topology.spouts.SocialMediaTokenExtractorSpout;
 import com.realtech.socialsurvey.compute.utils.ChararcterUtils;
 
 
 public class SocialPostExtractorTopologyStarterHelper extends TopologyStarterHelper
 {
-
     private static final Logger LOG = LoggerFactory.getLogger( SocialPostExtractorTopologyStarterHelper.class );
-
     public static final String TOPOLOGY_NAME = "SocialPostExtractorTopology";
+    private static final String SOCIAL_MEDIA_TOKEN_EXTRACTOR_SPOUT = "SocialMediaTokenExtractorSpout";
+    private static final String KAFKA_PRODUCER_BOLT = "KafkaProducerBolt";
+    private static final String FACEBOOK_FEED_EXTRACTOR_BOLT = "FacebookFeedExtractorBolt";
+    private static final String LINKEDIN_FEED_EXTRACTOR_BOLT = "LinkedinFeedExtractorBolt";
+    private static final String TWITTER_FEED_EXTRACTOR_BOLT = "TwitterFeedExtractorBolt";
 
 
     @Override
@@ -70,18 +74,20 @@ public class SocialPostExtractorTopologyStarterHelper extends TopologyStarterHel
         LOG.info( "Creating Social Post Extractor topology" );
         TopologyBuilder builder = new TopologyBuilder();
         // add feed extractor spout
-        builder.setSpout( "FacebookFeedExtractorSpout", new FacebookFeedExtractorSpout(), 1 );
+        builder.setSpout( SOCIAL_MEDIA_TOKEN_EXTRACTOR_SPOUT, new SocialMediaTokenExtractorSpout(), 1 );
 
-        builder.setSpout( "TwitterFeedExtractorSpout", new TwitterFeedExtractorSpout(), 1 );
-
-        builder.setSpout( "LinkedinFeedExtractorSpout", new LinkedinFeedExtractorSpout(), 1 );
         // add bolts
-        builder.setBolt("KafkaProducerBolt", new KafkaProducerBolt(), 3).shuffleGrouping("LinkedinFeedExtractorSpout")
-                .shuffleGrouping("FacebookFeedExtractorSpout").shuffleGrouping("TwitterFeedExtractorSpout");
+        builder.setBolt( TWITTER_FEED_EXTRACTOR_BOLT, new TwitterFeedExtractorBolt(), 1 )
+            .shuffleGrouping( SOCIAL_MEDIA_TOKEN_EXTRACTOR_SPOUT, "TwitterStream" );
+        builder.setBolt( LINKEDIN_FEED_EXTRACTOR_BOLT, new LinkedinFeedExtractorBolt(), 1 )
+            .shuffleGrouping( SOCIAL_MEDIA_TOKEN_EXTRACTOR_SPOUT, "LinkedinStream" );
+        builder.setBolt( FACEBOOK_FEED_EXTRACTOR_BOLT, new FacebookFeedExtractorBolt(), 1 )
+            .shuffleGrouping( SOCIAL_MEDIA_TOKEN_EXTRACTOR_SPOUT, "FacebookStream" );
+        builder.setBolt( KAFKA_PRODUCER_BOLT, new KafkaProducerBolt(), 3 ).shuffleGrouping( TWITTER_FEED_EXTRACTOR_BOLT )
+            .shuffleGrouping( LINKEDIN_FEED_EXTRACTOR_BOLT ).shuffleGrouping( FACEBOOK_FEED_EXTRACTOR_BOLT );
 
         return builder.createTopology();
     }
-
 
     public static void main( String[] args )
     {

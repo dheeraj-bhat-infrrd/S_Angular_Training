@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.compute.feeds.impl;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -16,8 +17,10 @@ import com.realtech.socialsurvey.compute.feeds.FacebookFeedProcessor;
 import com.realtech.socialsurvey.compute.utils.UrlHelper;
 
 
-public class FacebookFeedProcessorImpl implements FacebookFeedProcessor
+public class FacebookFeedProcessorImpl implements FacebookFeedProcessor, Serializable
 {
+    private static final long serialVersionUID = 1L;
+
     private static final Logger LOG = LoggerFactory.getLogger( FacebookFeedProcessorImpl.class );
 
     private static final int RETRIES_INITIAL = 0;
