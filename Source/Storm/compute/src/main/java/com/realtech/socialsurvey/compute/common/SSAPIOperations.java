@@ -96,60 +96,44 @@ public class SSAPIOperations
      * @param companyId
      * @return
      */
-    public boolean saveFeedToMongo( SocialResponseObject<FacebookFeedData> socialPostToMongo )
-    {
+    public boolean saveFeedToMongo( SocialResponseObject<FacebookFeedData> socialPostToMongo ) throws IOException {
         LOG.info( "Executing saveFeedToMongo method." );
         Call<SocialResponseObject<FacebookFeedData>> requestCall = RetrofitApiBuilder.apiBuilderInstance()
             .getSSAPIIntergrationService().saveSocialFeed( socialPostToMongo );
-        try {
             Response<SocialResponseObject<FacebookFeedData>> response = requestCall.execute();
             RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
             if ( LOG.isTraceEnabled() ) {
                 LOG.trace( "saveFeedToMongo response {}", response.body() );
             }
             return true;
-        } catch ( IOException | APIIntegrationException e ) {
-            LOG.error( "saveFeedToMongo IOException/ APIIntegrationException caught", e );
-            return false;
-        }
     }
 
 
     public boolean saveTwitterFeedToMongo( SocialResponseObject<TwitterFeedData> socialPostToMongo )
-    {
+            throws IOException, APIIntegrationException {
         LOG.info( "Executing saveFeedToMongo method." );
         Call<SocialResponseObject<TwitterFeedData>> requestCall = RetrofitApiBuilder.apiBuilderInstance()
             .getSSAPIIntergrationService().saveTwitterFeed( socialPostToMongo );
-        try {
             Response<SocialResponseObject<TwitterFeedData>> response = requestCall.execute();
             RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
             if ( LOG.isTraceEnabled() ) {
                 LOG.trace( "saveTwitterFeedToMongo response {}", response.body() );
             }
             return true;
-        } catch ( IOException | APIIntegrationException e ) {
-            LOG.error( "saveTwitterFeedToMongo IOException/ APIIntegrationException caught", e );
-            return false;
-        }
+
     }
 
 
-    public boolean saveLinkedinFeedToMongo( SocialResponseObject<LinkedinFeedData> socialPostToMongo )
-    {
+    public boolean saveLinkedinFeedToMongo( SocialResponseObject<LinkedinFeedData> socialPostToMongo ) throws IOException {
         LOG.info( "Executing saveFeedToMongo method." );
         Call<SocialResponseObject<LinkedinFeedData>> requestCall = RetrofitApiBuilder.apiBuilderInstance()
             .getSSAPIIntergrationService().saveLinkedinFeed( socialPostToMongo );
-        try {
             Response<SocialResponseObject<LinkedinFeedData>> response = requestCall.execute();
             RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
             if ( LOG.isTraceEnabled() ) {
                 LOG.trace( "saveLinkedinFeedToMongo response {}", response.body() );
             }
             return true;
-        } catch ( IOException | APIIntegrationException e ) {
-            LOG.error( "saveTwitterFeedToMongo IOException/ APIIntegrationException caught", e );
-            return false;
-        }
     }
 
 

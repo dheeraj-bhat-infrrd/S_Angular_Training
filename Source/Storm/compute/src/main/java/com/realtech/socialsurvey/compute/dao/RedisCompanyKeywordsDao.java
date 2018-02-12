@@ -1,8 +1,8 @@
 package com.realtech.socialsurvey.compute.dao;
 
-import java.util.List;
-
 import com.realtech.socialsurvey.compute.entities.Keyword;
+
+import java.util.List;
 
 
 public interface RedisCompanyKeywordsDao

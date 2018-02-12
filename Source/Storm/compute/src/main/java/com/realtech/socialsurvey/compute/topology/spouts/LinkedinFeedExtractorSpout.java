@@ -78,15 +78,19 @@ public class LinkedinFeedExtractorSpout extends BaseComputeSpout
                         LOG.debug( "response  : ", feeds );
                         for ( LinkedinFeedData linkedInResponse : feeds ) {
                             String text = "";
+                            String id = null;
                             if ( linkedInResponse.getUpdateContent() != null
                                 && linkedInResponse.getUpdateContent().getCompanyStatusUpdate() != null
                                 && linkedInResponse.getUpdateContent().getCompanyStatusUpdate().getShare() != null ) {
                                 text = linkedInResponse.getUpdateContent().getCompanyStatusUpdate().getShare().getComment();
+                                id = linkedInResponse.getUpdateContent().getCompanyStatusUpdate().getShare().getId();
                             }
 
                             SocialResponseObject<LinkedinFeedData> responseWrapper = new SocialResponseObject<>( companyId,
                                 SocialFeedType.LINKEDIN, text, linkedInResponse, 1 );
                             responseWrapper.setHash( responseWrapper.getText().hashCode() );
+                            //set the postId for responseObject which will be used to uniquely identify a message
+                            responseWrapper.setPostId(id);
 
                             Gson gson = new Gson();
 

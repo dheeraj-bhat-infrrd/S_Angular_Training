@@ -86,6 +86,8 @@ public class FacebookFeedExtractorSpout extends BaseComputeSpout
                                 if ( fbResponse.getMessage() != null ) {
                                     responseWrapper.setHash( responseWrapper.getText().hashCode() );
                                 }
+                                //set the postId for responseObject which will be used to uniquely identify a message
+                                responseWrapper.setPostId(fbResponse.getId());
 
                                 String responseWrapperString = new Gson().toJson( responseWrapper );
 

@@ -23,6 +23,7 @@ import com.realtech.socialsurvey.compute.entities.response.ActionHistory;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.enums.ActionHistoryType;
 import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBolt;
+import redis.clients.jedis.exceptions.JedisException;
 
 
 /**
@@ -50,24 +51,29 @@ public class FilterSocialPostBolt extends BaseComputeBolt
         SocialResponseType socialResponseType = (SocialResponseType) input.getValueByField( "type" );
         long companyId = input.getLongByField( "companyId" );
 
-        if ( post != null && post.getText() != null ) {
-            String text = post.getText();
-            List<String> foundKeyWords = null;
-            TrieNode root = getTrieForCompany( companyId );
-            foundKeyWords = findPhrases( root, text );
-            if ( !foundKeyWords.isEmpty() ) {
-                post.setFoundKeywords( foundKeyWords );
-                post.setFlagged( Boolean.TRUE );
-                if(post.getActionHistory() == null){
-                    post.setActionHistory( new ArrayList<>() );
-                }
+        try{
+            if ( post != null && post.getText() != null ) {
+                String text = post.getText();
+                List<String> foundKeyWords = null;
+                TrieNode root = getTrieForCompany( companyId );
+                foundKeyWords = findPhrases( root, text );
+                if ( !foundKeyWords.isEmpty() ) {
+                    post.setFoundKeywords( foundKeyWords );
+                    post.setFlagged( Boolean.TRUE );
+                    if(post.getActionHistory() == null){
+                        post.setActionHistory( new ArrayList<>() );
+                    }
 
-                post.getActionHistory().add(  getFlaggedActionHistory( foundKeyWords ));
+                    post.getActionHistory().add(  getFlaggedActionHistory( foundKeyWords ));
+                }
+                LOG.debug( "Emitting tuple with companyId {}, post {}, foundKeyWords {}.", companyId, post, foundKeyWords );
             }
-            LOG.debug( "Emitting tuple with companyId {}, post {}, foundKeyWords {}.", companyId, post, foundKeyWords );
+            _collector.emit( input, Arrays.asList( companyId, post, socialResponseType ) );
+            _collector.ack( input );
         }
-        _collector.emit( input, Arrays.asList( companyId, post, socialResponseType ) );
-        _collector.ack( input );
+       catch (JedisException e){
+            //logic to save into mongo
+       }
     }
 
 

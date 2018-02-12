@@ -38,7 +38,7 @@ public class UpdateSocialPostDupliateCountBolt extends BaseComputeBolt {
             if (duplicateCount.isPresent() && duplicateCount.get() > 1) {
                 //update all the duplicateCount field of the social post
                 Optional<Long> updatedPosts = updateSocialPostDuplicateCount(hash, companyId, duplicateCount.get());
-                if (updatedPosts.isPresent() && updatedPosts.get() > 1) {
+                if (updatedPosts.isPresent() && updatedPosts.get() == duplicateCount.get()) {
                     LOG.info(" Total {} docs were successfully updated having hash {} ", updatedPosts.get(), hash);
                 } else {
                     isSuccess = false;

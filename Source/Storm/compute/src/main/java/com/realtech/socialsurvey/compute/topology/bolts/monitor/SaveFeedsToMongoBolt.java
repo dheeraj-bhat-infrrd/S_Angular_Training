@@ -1,8 +1,10 @@
 package com.realtech.socialsurvey.compute.topology.bolts.monitor;
 
 
+import java.io.IOException;
 import java.util.Arrays;
 
+import com.realtech.socialsurvey.compute.services.api.APIIntegrationException;
 import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
@@ -52,16 +54,21 @@ public class SaveFeedsToMongoBolt extends BaseComputeBolt
         if ( socialResponseType != null ) {
             Object socialPost = input.getValueByField( "post" );
             if ( socialPost != null ) {
-                if ( socialResponseType.getType().equals( "FACEBOOK" ) ) {
-                    post = (SocialResponseObject<FacebookFeedData>) socialPost;
-                    isSocialPostSaved = addSocialFacebookFeedToMongo( (SocialResponseObject<FacebookFeedData>) post );
-                } else if ( socialResponseType.getType().equals( "TWITTER" ) ) {
-                    post = (SocialResponseObject<TwitterFeedData>) socialPost;
-                    isSocialPostSaved = addSocialTwitterFeedToMongo( (SocialResponseObject<TwitterFeedData>) post );
-                } else if ( socialResponseType.getType().equals( "LINKEDIN" ) ) {
-                    post = (SocialResponseObject<LinkedinFeedData>) socialPost;
-                    isSocialPostSaved = addSocialLinkedinFeedToMongo( (SocialResponseObject<LinkedinFeedData>) post );
+                try{
+                    if ( socialResponseType.getType().equals( "FACEBOOK" ) ) {
+                        post = (SocialResponseObject<FacebookFeedData>) socialPost;
+                        isSocialPostSaved = addSocialFacebookFeedToMongo( (SocialResponseObject<FacebookFeedData>) post );
+                    } else if ( socialResponseType.getType().equals( "TWITTER" ) ) {
+                        post = (SocialResponseObject<TwitterFeedData>) socialPost;
+                        isSocialPostSaved = addSocialTwitterFeedToMongo( (SocialResponseObject<TwitterFeedData>) post );
+                    } else if ( socialResponseType.getType().equals( "LINKEDIN" ) ) {
+                        post = (SocialResponseObject<LinkedinFeedData>) socialPost;
+                        isSocialPostSaved = addSocialLinkedinFeedToMongo( (SocialResponseObject<LinkedinFeedData>) post );
+                    }
+                } catch (IOException | APIIntegrationException e) {
+                    //save the feed into mongo as temporary exception
                 }
+
 
                 //if post is not added to mongo then repost to kafa and update redis keys
                 if ( isSocialPostSaved ) {
@@ -91,20 +98,17 @@ public class SaveFeedsToMongoBolt extends BaseComputeBolt
     }
 
 
-    private boolean addSocialFacebookFeedToMongo( SocialResponseObject<FacebookFeedData> socialPost )
-    {
+    private boolean addSocialFacebookFeedToMongo( SocialResponseObject<FacebookFeedData> socialPost ) throws IOException {
         return SSAPIOperations.getInstance().saveFeedToMongo( socialPost );
     }
 
 
-    private boolean addSocialTwitterFeedToMongo( SocialResponseObject<TwitterFeedData> socialPost )
-    {
+    private boolean addSocialTwitterFeedToMongo( SocialResponseObject<TwitterFeedData> socialPost ) throws IOException, APIIntegrationException {
         return SSAPIOperations.getInstance().saveTwitterFeedToMongo( socialPost );
     }
 
 
-    private boolean addSocialLinkedinFeedToMongo( SocialResponseObject<LinkedinFeedData> socialPost )
-    {
+    private boolean addSocialLinkedinFeedToMongo( SocialResponseObject<LinkedinFeedData> socialPost ) throws IOException {
         return SSAPIOperations.getInstance().saveLinkedinFeedToMongo( socialPost );
     }
 

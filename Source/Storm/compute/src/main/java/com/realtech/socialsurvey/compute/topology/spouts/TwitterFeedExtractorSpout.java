@@ -78,6 +78,9 @@ public class TwitterFeedExtractorSpout extends BaseComputeSpout
 
                                     SocialFeedType.TWITTER, twitterFeedData.getText(), twitterFeedData, 1 );
                                 responseWrapper.setHash( responseWrapper.getText().hashCode() );
+                                //set the postId for responseObject which will be used to uniquely identify a message
+                                responseWrapper.setPostId(String.valueOf(twitterFeedData.getId()));
+
                                 Gson gson = new Gson();
                                 String responseWrapperString = gson.toJson( responseWrapper );
                                 _collector.emit( new Values( companyId.toString(), responseWrapperString ) );
