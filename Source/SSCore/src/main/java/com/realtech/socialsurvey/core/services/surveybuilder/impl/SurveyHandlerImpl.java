@@ -5017,4 +5017,42 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         }
         return resultString.toString();
     }
+    
+    @Override
+    public void mapSourceInManualSurvey() 
+    {
+    		int start = 0;
+    		int batchSize = 500;
+    		
+    		List<SurveyPreInitiation> surveys = null;
+    		
+    		do {
+    		surveys =  surveyPreInitiationDao.getManualCompletedSurveys(start, batchSize);
+    		
+    		for(SurveyPreInitiation spInitiation : surveys ) {
+    			Criterion agentEmaailIdCriteria = Restrictions.eq( "agentEmailId", spInitiation.getAgentEmailId() ); 
+    			Criterion customerEmaailIdCriteria = Restrictions.eq( "customerEmailId", spInitiation.getCustomerEmailId() ); 
+    			Criterion companyIdCriteria = Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, spInitiation.getCompanyId() );
+    			Criterion SPIdCriteria = Restrictions.ne( "surveyPreIntitiationId", spInitiation.getSurveyPreIntitiationId() );
+    			Criterion SourceCriteria = Restrictions.not(Restrictions.in( "surveySource", new String[] { "agent" , "admin" , "upload" , "customer"}));
+    			
+    			List<SurveyPreInitiation> similarSPIs = surveyPreInitiationDao.findByCriteria(SurveyPreInitiation.class, agentEmaailIdCriteria , customerEmaailIdCriteria, companyIdCriteria, SPIdCriteria, SourceCriteria  );
+    			if(similarSPIs != null && similarSPIs.size() > 0) {
+    				SurveyPreInitiation similarSPI = similarSPIs.get(0);
+    				spInitiation.setSurveySourceId(similarSPI.getSurveySourceId());
+    				spInitiation.setSurveySource(similarSPI.getSurveySource());
+    				surveyPreInitiationDao.update(spInitiation);
+    				
+    			 	SurveyDetails surveyDetails = surveyDetailsDao.getSurveyBySurveyPreIntitiationId(spInitiation.getSurveyPreIntitiationId());
+    				if(surveyDetails != null) {
+    					surveyDetails.setSource(similarSPI.getSurveySource());
+    					surveyDetails.setSourceId(similarSPI.getSurveySourceId());
+    					surveyDetailsDao.updateSourceDetailInExistingSurveyDetails(surveyDetails);
+    				}
+    			}
+    		}
+    		start += batchSize;
+    		}while(surveys != null && surveys.size() == batchSize );
+    		
+    }
 }
