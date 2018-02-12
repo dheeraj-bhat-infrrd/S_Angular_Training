@@ -27,28 +27,33 @@ public class LinkedinFeedProcessorImpl implements LinkedinFeedProcessor
 
     long lastFetchedPostId = 0L;
 
+
     /* (non-Javadoc)
      * @see com.realtech.socialsurvey.compute.feeds.LinkedinFeedProcessor#fetchFeeds(com.realtech.socialsurvey.compute.entities.LinkedInToken)
      */
-    public List<LinkedinFeedData> fetchFeeds(long companyId, LinkedInToken token )
+    public List<LinkedinFeedData> fetchFeeds( long companyId, LinkedInToken token )
     {
         LOG.info( "Getting feeds with id: {}", companyId );
         List<LinkedinFeedData> feeds = new ArrayList<>();
-        String pageId = UrlHelper.getLinkedinPageIdFromURL( token.getLinkedInPageLink() );
-        LinkedinFeedResponse response = LinkedinAPIOperations.getInstance().fetchFeeds( pageId, token.getLinkedInAccessToken(),
-            0, null );
-        if ( response != null ) {
-            feeds.addAll( response.getValues() );
-            while ( response.getTotal() > ( response.getStart() + 1 ) * response.getCount() ) {
-                response = LinkedinAPIOperations.getInstance().fetchFeeds( pageId, token.getLinkedInAccessToken(),
-                    response.getStart() + 1, null );
-                if ( response != null ) {
-                    feeds.addAll( response.getValues() );
-                } else {
-                    break;
+
+        if ( token != null ) {
+            String pageId = UrlHelper.getLinkedinPageIdFromURL( token.getLinkedInPageLink() );
+            LinkedinFeedResponse response = LinkedinAPIOperations.getInstance().fetchFeeds( pageId,
+                token.getLinkedInAccessToken(), 0, null );
+            if ( response != null ) {
+                feeds.addAll( response.getValues() );
+                while ( response.getTotal() > ( response.getStart() + 1 ) * response.getCount() ) {
+                    response = LinkedinAPIOperations.getInstance().fetchFeeds( pageId, token.getLinkedInAccessToken(),
+                        response.getStart() + 1, null );
+                    if ( response != null ) {
+                        feeds.addAll( response.getValues() );
+                    } else {
+                        break;
+                    }
                 }
             }
         }
+
         return feeds;
     }
 }

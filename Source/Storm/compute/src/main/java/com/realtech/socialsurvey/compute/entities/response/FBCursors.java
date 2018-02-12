@@ -1,7 +1,10 @@
 package com.realtech.socialsurvey.compute.entities.response;
 
-public class FBCursors
+import java.io.Serializable;
+
+public class FBCursors implements Serializable
 {
+    private static final long serialVersionUID = 1L;
     private String before;
     private String after;
 

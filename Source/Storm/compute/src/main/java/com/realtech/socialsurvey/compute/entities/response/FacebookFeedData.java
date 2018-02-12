@@ -13,10 +13,10 @@ public class FacebookFeedData implements Serializable
     private String story;
     
     @SerializedName ( "created_time")
-    private String createdTime;
+    private long createdTime;
 
     @SerializedName ( "updated_time")
-    private String updatedTime;
+    private long updatedTime;
     
     private String fullPicture;
     
@@ -97,30 +97,8 @@ public class FacebookFeedData implements Serializable
     {
         this.message = message;
     }
-
-
-    public String getCreatedTime()
-    {
-        return createdTime;
-    }
-
-
-    public String getUpdatedTime()
-    {
-        return updatedTime;
-    }
-
-
-    public void setCreatedTime( String createdTime )
-    {
-        this.createdTime = createdTime;
-    }
-
-
-    public void setUpdatedTime( String updatedTime )
-    {
-        this.updatedTime = updatedTime;
-    }
+    
+    
 
 
     public String getStory()
@@ -140,5 +118,29 @@ public class FacebookFeedData implements Serializable
     {
         return "FacebookFeedData [id=" + id + ", message=" + message + ", story=" + story + ", createdTime=" + createdTime
             + ", updatedTime=" + updatedTime + ", link=" + link + "]";
+    }
+
+
+    public long getCreatedTime()
+    {
+        return createdTime;
+    }
+
+
+    public void setCreatedTime( long createdTime )
+    {
+        this.createdTime = createdTime;
+    }
+
+
+    public long getUpdatedTime()
+    {
+        return updatedTime;
+    }
+
+
+    public void setUpdatedTime( long updatedTime )
+    {
+        this.updatedTime = updatedTime;
     }
 }

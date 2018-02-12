@@ -1,11 +1,11 @@
 package com.realtech.socialsurvey.compute.entities.response;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 
 import com.realtech.socialsurvey.compute.enums.SocialFeedStatus;
 import com.realtech.socialsurvey.compute.enums.SocialFeedType;
+
 
 /**
  * @author manish
@@ -36,7 +36,8 @@ public class SocialResponseObject<T> implements Serializable
     private String postId;
     private String text;
     private String picture;
-    private Date updatedTime;
+    private long updatedTime;
+    private long createdTime;
     private String ownerName;
 
     private T response;
@@ -52,6 +53,7 @@ public class SocialResponseObject<T> implements Serializable
     private long duplicateCount;
     private List<String> foundKeywords;
     private List<ActionHistory> actionHistory;
+
 
     public T getResponse()
     {
@@ -111,8 +113,7 @@ public class SocialResponseObject<T> implements Serializable
     {
         this.picture = picture;
     }
-    
-    
+
 
     public String getOwnerName()
     {
@@ -252,20 +253,33 @@ public class SocialResponseObject<T> implements Serializable
     }
 
 
-    public void setActionHistory( List<ActionHistory> actionHistory )
-    {
-        this.actionHistory = actionHistory;
-    }
-    
-    public Date getUpdatedTime()
+    public long getUpdatedTime()
     {
         return updatedTime;
     }
 
 
-    public void setUpdatedTime( Date updatedTime )
+    public void setUpdatedTime( long updatedTime )
     {
         this.updatedTime = updatedTime;
+    }
+
+
+    public long getCreatedTime()
+    {
+        return createdTime;
+    }
+
+
+    public void setCreatedTime( long createdTime )
+    {
+        this.createdTime = createdTime;
+    }
+
+
+    public void setActionHistory( List<ActionHistory> actionHistory )
+    {
+        this.actionHistory = actionHistory;
     }
 
 
@@ -273,9 +287,10 @@ public class SocialResponseObject<T> implements Serializable
     public String toString()
     {
         return "SocialResponseObject [id=" + id + ", postId=" + postId + ", text=" + text + ", picture=" + picture
-            + ", updatedTime=" + updatedTime + ", ownerName=" + ownerName + ", response=" + response + ", type=" + type
-            + ", flagged=" + flagged + ", status=" + status + ", companyId=" + companyId + ", regionId=" + regionId
-            + ", branchId=" + branchId + ", agentId=" + agentId + ", hash=" + hash + ", duplicateCount=" + duplicateCount
-            + ", foundKeywords=" + foundKeywords + ", actionHistory=" + actionHistory + "]";
+            + ", updatedTime=" + updatedTime + ", createdTime=" + createdTime + ", ownerName=" + ownerName + ", response="
+            + response + ", type=" + type + ", flagged=" + flagged + ", status=" + status + ", companyId=" + companyId
+            + ", regionId=" + regionId + ", branchId=" + branchId + ", agentId=" + agentId + ", hash=" + hash
+            + ", duplicateCount=" + duplicateCount + ", foundKeywords=" + foundKeywords + ", actionHistory=" + actionHistory
+            + "]";
     }
 }

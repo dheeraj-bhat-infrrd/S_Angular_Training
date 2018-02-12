@@ -1,8 +1,6 @@
 package com.realtech.socialsurvey.core.entities;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -41,7 +39,8 @@ public class SocialResponseObject<T> implements Serializable
     private String postId;
     private String text;
     private String picture;
-    private Date updatedTime;
+    private long updatedTime;
+    private long createdTime;
     private String ownerName;
 
     private T response;
@@ -116,18 +115,6 @@ public class SocialResponseObject<T> implements Serializable
     public void setPicture( String picture )
     {
         this.picture = picture;
-    }
-
-
-    public Date getUpdatedTime()
-    {
-        return updatedTime;
-    }
-
-
-    public void setUpdatedTime( Date updatedTime )
-    {
-        this.updatedTime = updatedTime;
     }
 
 
@@ -273,15 +260,41 @@ public class SocialResponseObject<T> implements Serializable
     {
         this.actionHistory = actionHistory;
     }
-
-
+    
+    
+    
     @Override
     public String toString()
     {
         return "SocialResponseObject [id=" + id + ", postId=" + postId + ", text=" + text + ", picture=" + picture
-            + ", updatedTime=" + updatedTime + ", ownerName=" + ownerName + ", response=" + response + ", type=" + type
-            + ", flagged=" + flagged + ", status=" + status + ", companyId=" + companyId + ", regionId=" + regionId
-            + ", branchId=" + branchId + ", agentId=" + agentId + ", hash=" + hash + ", duplicateCount=" + duplicateCount
-            + ", foundKeywords=" + foundKeywords + ", actionHistory=" + actionHistory + "]";
+            + ", updatedTime=" + updatedTime + ", createdTime=" + createdTime + ", ownerName=" + ownerName + ", response="
+            + response + ", type=" + type + ", flagged=" + flagged + ", status=" + status + ", companyId=" + companyId
+            + ", regionId=" + regionId + ", branchId=" + branchId + ", agentId=" + agentId + ", hash=" + hash
+            + ", duplicateCount=" + duplicateCount + ", foundKeywords=" + foundKeywords + ", actionHistory=" + actionHistory
+            + "]";
+    }
+
+
+    public long getUpdatedTime()
+    {
+        return updatedTime;
+    }
+
+
+    public void setUpdatedTime( long updatedTime )
+    {
+        this.updatedTime = updatedTime;
+    }
+
+
+    public long getCreatedTime()
+    {
+        return createdTime;
+    }
+
+
+    public void setCreatedTime( long createdTime )
+    {
+        this.createdTime = createdTime;
     }
 }
