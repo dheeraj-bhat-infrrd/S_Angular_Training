@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.compute.topology.spouts;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -62,32 +63,29 @@ public class TwitterFeedExtractorSpout extends BaseComputeSpout
             if ( mediaTokens.isPresent() ) {
 
                 for ( SocialMediaTokenResponse mediaToken : mediaTokens.get() ) {
-                    TwitterToken token = mediaToken.getSocialMediaTokens().getTwitterToken();
+                    Long companyId = mediaToken.getCompanyId();
+                    TwitterToken token = null;
+                    if ( mediaToken.getSocialMediaTokens() != null ) {
+                        token = mediaToken.getSocialMediaTokens().getTwitterToken();
+                    }
+
                     // Check rate limiting for company
-                    if ( !isRateLimitExceeded( /* pass media token*/ ) && !isTwitterCalled ) {
-                        isTwitterCalled = true;
-                        // Get SocailMediaToken for company
-                        Long companyId = mediaToken.getCompanyId();
-
-                        //Call facebook api to get facebook page post.
-                        List<TwitterFeedData> response = fetchFeeds( companyId, token );
-                        if ( response != null ) {
-                            LOG.debug( "response  : ", response.size() );
-                            for ( TwitterFeedData twitterFeedData : response ) {
-                                SocialResponseObject<TwitterFeedData> responseWrapper = new SocialResponseObject<>( companyId,
-
-                                    SocialFeedType.TWITTER, twitterFeedData.getText(), twitterFeedData, 1 );
-                                responseWrapper.setHash( responseWrapper.getText().hashCode() );
-                                Gson gson = new Gson();
-                                String responseWrapperString = gson.toJson( responseWrapper );
-                                _collector.emit( new Values( companyId.toString(), responseWrapperString ) );
-                                LOG.debug( "Emitted successfully {}", responseWrapper );
-                            }
-                        } else {
-                            LOG.debug( "No feed found" );
-                        }
-                    } else {
+                    if ( isRateLimitExceeded( /* pass media token*/ ) || isTwitterCalled ) {
                         LOG.warn( "Rate limit exceeded" );
+                        break;
+                    }
+
+                    isTwitterCalled = true;
+                    //Call facebook api to get facebook page post.
+                    List<TwitterFeedData> response = twitterFeedProcessor.fetchFeed( companyId, token );
+                    LOG.debug( "Total tweet fetched : {}", response.size() );
+                    for ( TwitterFeedData twitterFeedData : response ) {
+                        SocialResponseObject<TwitterFeedData> responseWrapper = createSocialResponseObject( companyId,
+                            twitterFeedData );
+
+                        String responseWrapperString = new Gson().toJson( responseWrapper );
+                        _collector.emit( new Values( companyId.toString(), responseWrapperString ) );
+                        LOG.trace( "Emitted successfully {}", responseWrapper );
                     }
                 }
             }
@@ -98,9 +96,27 @@ public class TwitterFeedExtractorSpout extends BaseComputeSpout
     }
 
 
-    private List<TwitterFeedData> fetchFeeds( long companyIden, TwitterToken token )
+    /**
+     *  Create SocialResponseObject with common fields
+     * @param companyId
+     * @param twitterFeedData
+     * @return
+     */
+    private SocialResponseObject<TwitterFeedData> createSocialResponseObject( long companyId, TwitterFeedData twitterFeedData )
     {
-        return twitterFeedProcessor.fetchFeed( companyIden, token );
+        SocialResponseObject<TwitterFeedData> responseWrapper = new SocialResponseObject<>( companyId, SocialFeedType.TWITTER,
+            twitterFeedData.getText(), twitterFeedData, 1 );
+
+        if ( twitterFeedData.getText() != null && !twitterFeedData.getText().isEmpty() ) {
+            responseWrapper.setHash( responseWrapper.getText().hashCode() );
+        }
+
+        if ( twitterFeedData.getCreatedAt() != null ) {
+            responseWrapper.setCreatedTime(twitterFeedData.getCreatedAt().getTime());
+            responseWrapper.setUpdatedTime(twitterFeedData.getCreatedAt().getTime());
+        }
+
+        return responseWrapper;
     }
 
 

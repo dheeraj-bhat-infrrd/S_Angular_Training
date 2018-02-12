@@ -42,31 +42,28 @@ public class SaveFeedsToMongoBolt extends BaseComputeBolt
         SocialResponseType socialResponseType = (SocialResponseType) input.getValueByField( "type" );
         SocialResponseObject<?> post = null;
         boolean isSuccess = true;
+        boolean isPostAdded = Boolean.FALSE;
 
         if ( socialResponseType != null ) {
             Object socialPost = input.getValueByField( "post" );
             if ( socialPost != null ) {
                 if ( socialResponseType.getType().equals( "FACEBOOK" ) ) {
                     post = (SocialResponseObject<FacebookFeedData>) socialPost;
-                    boolean isfacebookPostAdded = addSocialFacebookFeedToMongo( (SocialResponseObject<FacebookFeedData>) post );
-                    if ( !isfacebookPostAdded ) {
-                        isSuccess = false;
-                        repostMessageToKafka(input, companyId, post);
-                    }
+                    isPostAdded = addSocialFacebookFeedToMongo( (SocialResponseObject<FacebookFeedData>) post );
+                    
                 } else if ( socialResponseType.getType().equals( "TWITTER" ) ) {
                     post = (SocialResponseObject<TwitterFeedData>) socialPost;
-                    boolean isTweetAdded = addSocialTwitterFeedToMongo( (SocialResponseObject<TwitterFeedData>) post );
-                    if( !isTweetAdded ) {
-                        isSuccess = false;
-                        repostMessageToKafka(input, companyId, post);
-                    }
+                    isPostAdded = addSocialTwitterFeedToMongo( (SocialResponseObject<TwitterFeedData>) post );
+                    
                 } else if ( socialResponseType.getType().equals( "LINKEDIN" ) ) {
                     post = (SocialResponseObject<LinkedinFeedData>) socialPost;
-                    boolean isLinkedInPostAdded = addSocialLinkedinFeedToMongo( (SocialResponseObject<LinkedinFeedData>) post );
-                    if(!isLinkedInPostAdded) {
-                        isSuccess = false;
-                        repostMessageToKafka(input, companyId, post);
-                    }
+                    isPostAdded = addSocialLinkedinFeedToMongo( (SocialResponseObject<LinkedinFeedData>) post );
+                    
+                }
+                
+                if(!isPostAdded) {
+                    isSuccess = false;
+                    repostMessageToKafka(input, companyId, post);
                 }
             } else {
                 LOG.warn( "Social post is null" );

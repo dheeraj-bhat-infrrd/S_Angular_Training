@@ -65,45 +65,74 @@ public class LinkedinFeedExtractorSpout extends BaseComputeSpout
             if ( mediaTokens.isPresent() ) {
 
                 for ( SocialMediaTokenResponse mediaToken : mediaTokens.get() ) {
-                    LinkedInToken token = mediaToken.getSocialMediaTokens().getLinkedInToken();
+
+                    LinkedInToken token = null;
+
+                    if ( mediaToken.getSocialMediaTokens() != null ) {
+                        token = mediaToken.getSocialMediaTokens().getLinkedInToken();
+                    }
 
                     // Check rate limiting for company
-                    if ( !isRateLimitExceeded( /* pass media token*/ ) && !IS_LNCALLED ) {
-                        // Get SocailMediaToken for company
-                        Long companyId = mediaToken.getCompanyId();
-
-                        //Call facebook api to get facebook page post.
-                        List<LinkedinFeedData> feeds = linkedinFeedProcessor.fetchFeeds(companyId, token );
-                        IS_LNCALLED = true;
-                        LOG.debug( "response  : ", feeds );
-                        for ( LinkedinFeedData linkedInResponse : feeds ) {
-                            String text = "";
-                            if ( linkedInResponse.getUpdateContent() != null
-                                && linkedInResponse.getUpdateContent().getCompanyStatusUpdate() != null
-                                && linkedInResponse.getUpdateContent().getCompanyStatusUpdate().getShare() != null ) {
-                                text = linkedInResponse.getUpdateContent().getCompanyStatusUpdate().getShare().getComment();
-                            }
-
-                            SocialResponseObject<LinkedinFeedData> responseWrapper = new SocialResponseObject<>( companyId,
-                                SocialFeedType.LINKEDIN, text, linkedInResponse, 1 );
-                            responseWrapper.setHash( responseWrapper.getText().hashCode() );
-
-                            Gson gson = new Gson();
-
-                            String responseWrapperString = gson.toJson( responseWrapper );
-
-                            _collector.emit( new Values( companyId.toString(), responseWrapperString ) );
-                            LOG.debug( "Emitted successfully {}", responseWrapper );
-                        }
-                    } else {
+                    if ( isRateLimitExceeded( /* pass media token*/ ) || IS_LNCALLED ) {
                         LOG.warn( "Rate limit exceeded" );
+                        break;
                     }
+                    // Get SocailMediaToken for company
+                    Long companyId = mediaToken.getCompanyId();
+
+                    //Call facebook api to get facebook page post.
+                    List<LinkedinFeedData> feeds = linkedinFeedProcessor.fetchFeeds( companyId, token );
+                    IS_LNCALLED = true;
+                    LOG.debug( "Total tweet fetched : {}", feeds.size() );
+                    for ( LinkedinFeedData linkedinFeedData : feeds ) {
+
+                        SocialResponseObject<LinkedinFeedData> responseWrapper = getSocialResponseObject( companyId,
+                            linkedinFeedData );
+
+                        String responseWrapperString = new Gson().toJson( responseWrapper );
+
+                        _collector.emit( new Values( companyId.toString(), responseWrapperString ) );
+                        LOG.debug( "Emitted successfully {}", responseWrapper );
+                    }
+
                 }
             }
             // End loop for companies
         } catch ( Exception e ) {
             LOG.error( "Error while fetching post from linkedin.", e );
         }
+    }
+
+
+    /**
+     * Create SocialResponseObject with common fields
+     * @param companyId
+     * @param linkedinFeedData
+     * @return
+     */
+    private SocialResponseObject<LinkedinFeedData> getSocialResponseObject( long companyId, LinkedinFeedData linkedinFeedData )
+    {
+
+        String text = "";
+        long updatedDate = 0L;
+        if ( linkedinFeedData.getUpdateContent() != null && linkedinFeedData.getUpdateContent().getCompanyStatusUpdate() != null
+            && linkedinFeedData.getUpdateContent().getCompanyStatusUpdate().getShare() != null ) {
+            text = linkedinFeedData.getUpdateContent().getCompanyStatusUpdate().getShare().getComment();
+
+            if ( linkedinFeedData.getUpdateContent().getCompanyStatusUpdate().getShare().getTimestamp() > 0 ) {
+                updatedDate = linkedinFeedData.getUpdateContent().getCompanyStatusUpdate().getShare().getTimestamp();
+            }
+
+        }
+
+        SocialResponseObject<LinkedinFeedData> responseWrapper = new SocialResponseObject<>( companyId, SocialFeedType.LINKEDIN,
+            text, linkedinFeedData, 1 );
+
+        responseWrapper.setUpdatedTime( updatedDate  );
+        responseWrapper.setCreatedTime( updatedDate );
+
+        responseWrapper.setHash( responseWrapper.getText().hashCode() );
+        return responseWrapper;
     }
 
 

@@ -22,41 +22,44 @@ public class FacebookFeedProcessorImpl implements FacebookFeedProcessor
 
     private static final int RETRIES_INITIAL = 0;
     private static final int PAGE_SIZE = 200;
-    
+
     long lastFetchedPostId = 0L;
+
 
     /* (non-Javadoc)
      * @see com.realtech.socialsurvey.compute.feeds.FacebookFeedProcessor#fetchFeeds(com.realtech.socialsurvey.compute.entities.FacebookToken)
      */
-    public List<FacebookFeedData> fetchFeeds(long companyId,  FacebookToken token )
+    public List<FacebookFeedData> fetchFeeds( long companyId, FacebookToken token )
     {
         LOG.info( "Getting feeds with id: {}", companyId );
-        String since = null;
-        String until = null;
-
-        if ( since == null || since.isEmpty() ) {
-            Calendar cal = Calendar.getInstance();
-            until = String.valueOf( cal.getTimeInMillis() / 1000 );
-            cal.add( Calendar.DAY_OF_YEAR, -10 );
-            since = String.valueOf( cal.getTimeInMillis() / 1000 );
-        }
-
-        String pageId = UrlHelper.getFacebookPageIdFromURL( token.getFacebookPageLink());
-        FacebookResponse result = FacebookAPIOperations.getInstance().fetchFeeds( pageId, token.getFacebookAccessToken(), since,
-            until, "" );
 
         List<FacebookFeedData> feeds = new ArrayList<>();
 
-        if ( result != null ) {
-            feeds.addAll( result.getData() );
-            while ( result != null && result.getPaging() != null && result.getPaging().getNext() != null ) {
-                Map<String, String> queryMap = UrlHelper.getQueryParamsFromUrl( result.getPaging().getNext() );
+        if ( token != null ) {
+            String since = null;
+            String until = null;
+            if ( since == null || since.isEmpty() ) {
+                Calendar cal = Calendar.getInstance();
+                until = String.valueOf( cal.getTimeInMillis() / 1000 );
+                cal.add( Calendar.DAY_OF_YEAR, -10 );
+                since = String.valueOf( cal.getTimeInMillis() / 1000 );
+            }
 
-                result = FacebookAPIOperations.getInstance().fetchFeeds( pageId, token.getFacebookAccessToken(),
-                    queryMap.get( "since" ), queryMap.get( "until" ), queryMap.get( "__paging_token" ) );
+            String pageId = UrlHelper.getFacebookPageIdFromURL( token.getFacebookPageLink() );
+            FacebookResponse result = FacebookAPIOperations.getInstance().fetchFeeds( pageId, token.getFacebookAccessToken(),
+                since, until, "" );
 
-                if ( result != null ) {
-                    feeds.addAll( result.getData() );
+            if ( result != null ) {
+                feeds.addAll( result.getData() );
+                while ( result != null && result.getPaging() != null && result.getPaging().getNext() != null ) {
+                    Map<String, String> queryMap = UrlHelper.getQueryParamsFromUrl( result.getPaging().getNext() );
+
+                    result = FacebookAPIOperations.getInstance().fetchFeeds( pageId, token.getFacebookAccessToken(),
+                        queryMap.get( "since" ), queryMap.get( "until" ), queryMap.get( "__paging_token" ) );
+
+                    if ( result != null ) {
+                        feeds.addAll( result.getData() );
+                    }
                 }
             }
         }
