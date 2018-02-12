@@ -46,45 +46,38 @@ public class SaveFeedsToMongoBolt extends BaseComputeBolt
         SocialResponseType socialResponseType = (SocialResponseType) input.getValueByField( "type" );
         SocialResponseObject<?> post = null;
         boolean isSuccess = true;
-        int retryCount ;
-        int maxRetryCount = Integer.parseInt(LocalPropertyFileHandler.getInstance()
-                .getProperty(ComputeConstants.APPLICATION_PROPERTY_FILE, ComputeConstants.SSAPI_MAX_RETRY_COUNT).orElse(null));
+        boolean isSocialPostSaved = false;
+
         if ( socialResponseType != null ) {
             Object socialPost = input.getValueByField( "post" );
             if ( socialPost != null ) {
                 if ( socialResponseType.getType().equals( "FACEBOOK" ) ) {
                     post = (SocialResponseObject<FacebookFeedData>) socialPost;
-                    boolean isfacebookPostAdded = addSocialFacebookFeedToMongo( (SocialResponseObject<FacebookFeedData>) post );
-                    if ( !isfacebookPostAdded ) {
-                        isSuccess = false;
-                        retryCount = getSSApiRetryCountFromRedis();
-                        redisCompanyKeywordsDao.setSSApiBreakerStateKeys();
-                        repostMessageToKafka(input, companyId, post);
-                    }
+                    isSocialPostSaved = addSocialFacebookFeedToMongo( (SocialResponseObject<FacebookFeedData>) post );
                 } else if ( socialResponseType.getType().equals( "TWITTER" ) ) {
                     post = (SocialResponseObject<TwitterFeedData>) socialPost;
-                    boolean isTweetAdded = addSocialTwitterFeedToMongo( (SocialResponseObject<TwitterFeedData>) post );
-                    if( !isTweetAdded ) {
-                        isSuccess = false;
-                        repostMessageToKafka(input, companyId, post);
-                    }
+                    isSocialPostSaved = addSocialTwitterFeedToMongo( (SocialResponseObject<TwitterFeedData>) post );
                 } else if ( socialResponseType.getType().equals( "LINKEDIN" ) ) {
                     post = (SocialResponseObject<LinkedinFeedData>) socialPost;
-                    boolean isLinkedInPostAdded = addSocialLinkedinFeedToMongo( (SocialResponseObject<LinkedinFeedData>) post );
-                    if(!isLinkedInPostAdded) {
-                        isSuccess = false;
-                        repostMessageToKafka(input, companyId, post);
-                    }
+                    isSocialPostSaved = addSocialLinkedinFeedToMongo( (SocialResponseObject<LinkedinFeedData>) post );
                 }
+
+                //if post is not added to mongo then repost to kafa and update redis keys
+                if ( isSocialPostSaved ) {
+                    _collector.emit( "SUCCESS_STREAM", input, Arrays.asList(isSuccess, companyId, post ) );
+                    _collector.ack( input );
+                    LOG.info( "Successfully emitted message." );
+                }
+                /* isSuccess = false;
+                    redisCompanyKeywordsDao.setSSApiBreakerStateKeys();
+                    repostMessageToKafka(input, companyId, post);*/
             } else {
                 LOG.warn( "Social post is null" );
             }
 
 
         }
-        _collector.emit( "SUCCESS_STREAM", input, Arrays.asList(isSuccess, companyId, post ) );
-        _collector.ack( input );
-        LOG.info( "Successfully emitted message." );
+
     }
 
     private int getSSApiRetryCountFromRedis() {

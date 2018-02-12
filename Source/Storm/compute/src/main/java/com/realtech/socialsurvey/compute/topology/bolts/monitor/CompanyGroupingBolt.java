@@ -1,13 +1,5 @@
 package com.realtech.socialsurvey.compute.topology.bolts.monitor;
 
-import java.util.Arrays;
-
-import org.apache.storm.topology.OutputFieldsDeclarer;
-import org.apache.storm.tuple.Fields;
-import org.apache.storm.tuple.Tuple;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.compute.entities.SocialResponseType;
 import com.realtech.socialsurvey.compute.entities.response.FacebookFeedData;
@@ -16,6 +8,13 @@ import com.realtech.socialsurvey.compute.entities.response.TwitterFeedData;
 import com.realtech.socialsurvey.compute.entities.response.linkedin.LinkedinFeedData;
 import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBolt;
 import com.realtech.socialsurvey.compute.utils.ConversionUtils;
+import org.apache.storm.topology.OutputFieldsDeclarer;
+import org.apache.storm.tuple.Fields;
+import org.apache.storm.tuple.Tuple;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
 
 
 /**
@@ -42,7 +41,7 @@ public class CompanyGroupingBolt extends BaseComputeBolt
         SocialResponseType socialResponseType = ConversionUtils.deserialize( input.getString( 0 ), SocialResponseType.class );
 
         SocialResponseObject<?> post = null;
-        // Check and desierialise reponse from social media
+        // Check and deserialize response from social media
         if ( socialResponseType != null && socialResponseType.getType() != null ) {
             if ( socialResponseType.getType().equals( "FACEBOOK" ) ) {
                 post = ConversionUtils.deserialize( input.getString( 0 ),
