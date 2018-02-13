@@ -92,6 +92,7 @@ import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.services.upload.HierarchyUploadService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
+import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.core.utils.StateLookupExclusionStrategy;
 import com.realtech.socialsurvey.core.vo.SurveyPreInitiationList;
@@ -160,6 +161,8 @@ public class OrganizationManagementController
     @Autowired
     private ReportingDashboardManagement  reportingDashboardManagement;
 
+    @Autowired
+    private EncryptionHelper encryptionHelper;
 
     @Value ( "${CDN_PATH}")
     private String endpoint;
@@ -848,7 +851,9 @@ public class OrganizationManagementController
         String buyerAgentName = request.getParameter( "buyer-agent-name" );
         String sellerAgentEmail = request.getParameter( "seller-agnt-email" );
         String sellerAgentName = request.getParameter( "seller-agnt-name" );
-
+        String propertyAddress = request.getParameter( "property-address" );
+        String loanProcessorName = request.getParameter( "loan-processor-name" );
+        String loanProcessorEmail = request.getParameter( "loan-processor-email" );
 
         String version = request.getParameter( "sdk-version-selection-list" );
 
@@ -886,8 +891,8 @@ public class OrganizationManagementController
                 state = CommonConstants.CRM_INFO_PRODUCTION_STATE;
             }
 
-            // TODO : Encrypting the password
-            String cipherPassword = encompassPassword;
+            // encrypting the password
+            String cipherPassword = encryptionHelper.encryptAES( encompassPassword, "" );
 
             OrganizationUnitSettings companySettings = organizationManagementService
                 .getCompanySettings( user.getCompany().getCompanyId() );
@@ -931,12 +936,33 @@ public class OrganizationManagementController
                 encompassCrmInfo.setSellerAgentEmail( sellerAgentEmail );
                 encompassCrmInfo.setSellerAgentName( sellerAgentName );
             }
+            
+            // save property address
+            if( StringUtils.isNotEmpty(propertyAddress) ) {
+            	encompassCrmInfo.setPropertyAddress(propertyAddress);
+            } else {
+            	encompassCrmInfo.setPropertyAddress("");            	
+            }
+            
+            
+            // save loan processor name and email
+            if( StringUtils.isNotEmpty(loanProcessorName) ) {
+            	encompassCrmInfo.setLoanProcessorName(loanProcessorName);
+            } else {
+            	encompassCrmInfo.setLoanProcessorName("");            	
+            }
+            
+            if( StringUtils.isNotEmpty( loanProcessorEmail ) ) {
+            	encompassCrmInfo.setLoanProcessorEmail(loanProcessorEmail);
+            } else {
+            	encompassCrmInfo.setLoanProcessorEmail("");            	            	
+            }
 
             organizationManagementService.updateCRMDetails( companySettings, encompassCrmInfo,
                 "com.realtech.socialsurvey.core.entities.EncompassCrmInfo" );
 
             // set the updated settings value in session with plain password
-            encompassCrmInfo.setCrm_password( cipherPassword );
+            encompassCrmInfo.setCrm_password( encompassPassword );
             companySettings.setCrm_info( encompassCrmInfo );
             message = messageUtils.getDisplayMessage( DisplayMessageConstants.ENCOMPASS_DATA_UPDATE_SUCCESSFUL,
                 DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
