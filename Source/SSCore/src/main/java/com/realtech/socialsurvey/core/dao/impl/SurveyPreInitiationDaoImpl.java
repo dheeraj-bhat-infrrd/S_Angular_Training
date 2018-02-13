@@ -929,7 +929,11 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
             if ( start > 0 )
                 criteria.setFirstResult( start );
 
-          criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE  ) );
+            List<Integer> statusList = new ArrayList<Integer>();
+            statusList.add( CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED );
+            statusList.add( CommonConstants.SURVEY_STATUS_INITIATED );
+            statusList.add( CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE );
+          criteria.add( Restrictions.in( CommonConstants.STATUS_COLUMN, statusList  ) );
           
           criteria.add( Restrictions.in( "surveySource", new String[] { "agent" , "admin" , "upload" , "customer"} ) );
           
