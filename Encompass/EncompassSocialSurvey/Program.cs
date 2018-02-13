@@ -87,7 +87,7 @@ namespace EncompassSocialSurvey
                     //send main to admin
                     String StartMailSubject = "Starting loan processing for company: " + forCompCredential.CompanyName;
                     String StartMailBodyText = "Starting loan processing for company: " + forCompCredential.CompanyName
-                    + "at : " + DateTime.Now;
+                    + " at : " + DateTime.Now;
                     CommonUtility.SendMailToAdmin(StartMailSubject, StartMailBodyText);
 
                     Logger.Debug("Logging into encompass");

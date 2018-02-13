@@ -10803,3 +10803,7 @@ img.lead-img {
 	font-variant: none !important; 
 	color:white !important;
 }
+
+.width-offset {
+	width: 100px !important;
+}
