@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.services.surveybuilder.impl;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -3668,6 +3669,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 LOG.debug( "Successfully deleted the third party import file" );
             else
                 LOG.error( "Failed to delete third party import file." );
+        } catch ( FileNotFoundException e ) {
+            LOG.error( "The third party import file was not found" );
         } catch ( IOException e ) {
             LOG.error( "An IOException occurred while importing. Reason: ", e );
         }

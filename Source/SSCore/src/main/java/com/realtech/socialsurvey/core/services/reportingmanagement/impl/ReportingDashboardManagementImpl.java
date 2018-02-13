@@ -42,10 +42,11 @@ import com.realtech.socialsurvey.core.api.builder.SSApiBatchIntegrationBuilder;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
+import com.realtech.socialsurvey.core.dao.BranchRankingReportMonthDao;
+import com.realtech.socialsurvey.core.dao.BranchRankingReportYearDao;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.CompanyDetailsReportDao;
 import com.realtech.socialsurvey.core.dao.CompanyUserReportDao;
-import com.realtech.socialsurvey.core.dao.DigestDao;
 import com.realtech.socialsurvey.core.dao.FileUploadDao;
 import com.realtech.socialsurvey.core.dao.NpsReportMonthDao;
 import com.realtech.socialsurvey.core.dao.NpsReportWeekDao;
@@ -87,6 +88,8 @@ import com.realtech.socialsurvey.core.dao.UserRankingThisYearMainDao;
 import com.realtech.socialsurvey.core.dao.UserRankingThisYearRegionDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.BranchRankingReportMonth;
+import com.realtech.socialsurvey.core.entities.BranchRankingReportYear;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyActiveUsersStats;
 import com.realtech.socialsurvey.core.entities.CompanyDetailsReport;
@@ -306,9 +309,6 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     private ScoreStatsQuestionUserDao scoreStatsQuestionUserDao;
 
     @Autowired
-    private DigestDao digestDao;
-
-    @Autowired
     private EmailServices emailServices;
 
     @Autowired
@@ -330,7 +330,13 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     private NpsReportMonthDao npsReportMonthDao;
     
     @Autowired
-    private Utils utils;
+    private BranchRankingReportMonthDao branchRankingMonthDao;
+    
+    @Autowired
+    private BranchRankingReportYearDao branchRankingYearDao;
+    
+	@Autowired
+	private Utils utils;
 
     @Autowired
     private OverviewManagement overviewManagement;
@@ -408,6 +414,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_NPS_WEEK_REPORT );
         } else if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_NPS_MONTH_REPORT ) {
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_NPS_MONTH_REPORT );
+        } else if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_BRANCH_RANKING_MONTHLY_REPORT ) {
+            fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_BRANCH_RANKING_MONTHLY_REPORT );
+        } else if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_BRANCH_RANKING_YEARLY_REPORT ) {
+            fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_BRANCH_RANKING_YEARLY_REPORT );
         }
 
         // get the time 23:59:59 in milliseconds
@@ -1756,6 +1766,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 recentActivityList.add( CommonConstants.REPORTING_NPS_REPORT_FOR_MONTH );
             } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_SURVEY_INVITATION_EMAIL_REPORT ) {
                 recentActivityList.add( CommonConstants.SURVEY_INVITATION_EMAIL_REPORT );
+            } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_BRANCH_RANKING_MONTHLY_REPORT ) {
+                recentActivityList.add( CommonConstants.REPORTING_BRANCH_RANKING_MONTHLY_REPORT );
+            } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_BRANCH_RANKING_YEARLY_REPORT ) {
+                recentActivityList.add( CommonConstants.REPORTING_BRANCH_RANKING_YEARLY_REPORT );
             }
 
             recentActivityList.add( fileUpload.getStartDate() );
@@ -4671,4 +4685,101 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         }
         return totalTransactionReceivedCount;
     }
+
+
+	@Override
+	public String generateBranchRankingReportMonth(long profileValue, String profileLevel, long adminUserId,
+			Timestamp startDate) throws UnsupportedEncodingException, NonFatalException {
+		User user = userManagementService.getUserByUserId(adminUserId);
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTimeInMillis(startDate.getTime());
+		int year = calendar.get(Calendar.YEAR);
+		int month = calendar.get(Calendar.MONTH) + 1;
+		String fileName = "Branch_Ranking_Report_Month" + profileValue + "-" + user.getFirstName() + "_"
+				+ user.getLastName() + "-" + (Calendar.getInstance().getTimeInMillis())
+				+ CommonConstants.EXCEL_FILE_EXTENSION;
+		XSSFWorkbook workbook = this.downloadBranchRankingReportMonth(profileValue, profileLevel, year, month);
+		return this.createExcelFileAndSaveInAmazonS3(fileName, workbook);
+	}
+
+	private XSSFWorkbook downloadBranchRankingReportMonth(long entityId, String entityType, int year, int month) {
+		Response response = ssApiBatchIntergrationBuilder.getIntegrationApi().getBranchRankingReport(entityId,
+				month, year, 1);
+		String responseString = response != null ? new String(((TypedByteArray) response.getBody()).getBytes()) : null;
+		if (responseString != null) {
+			// since the string has ""abc"" an extra quote
+			responseString = responseString.substring(1, responseString.length() - 1);
+			// Escape characters
+			responseString = StringEscapeUtils.unescapeJava(responseString);
+		}
+		List<BranchRankingReportMonth> branchRankingReportMonth = null;
+		Type listType = new TypeToken<List<BranchRankingReportMonth>>() {
+		}.getType();
+		branchRankingReportMonth = new Gson().fromJson(responseString, listType);
+		Map<Integer, List<Object>> data = workbookData.getBranchRankingReportMonthInSheet(branchRankingReportMonth);
+		return workbookOperations.createWorkbook(data);
+	}
+
+	@Override
+	public String generateBranchRankingReportYear(long profileValue, String profileLevel, long adminUserId,
+			Timestamp startDate) throws UnsupportedEncodingException, NonFatalException {
+		User user = userManagementService.getUserByUserId(adminUserId);
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTimeInMillis(startDate.getTime());
+		int year = calendar.get(Calendar.YEAR);
+		String fileName = "Branch_Ranking_Report_Year" + profileValue + "-" + user.getFirstName() + "_"
+				+ user.getLastName() + "-" + (Calendar.getInstance().getTimeInMillis())
+				+ CommonConstants.EXCEL_FILE_EXTENSION;
+		XSSFWorkbook workbook = this.downloadBranchRankingReportYear(profileValue, profileLevel, year);
+		return this.createExcelFileAndSaveInAmazonS3(fileName, workbook);
+	}
+
+	private XSSFWorkbook downloadBranchRankingReportYear(long entityId, String entityType, int year) {
+		Response response = ssApiBatchIntergrationBuilder.getIntegrationApi().getBranchRankingReport(entityId,0,
+				year,2);
+		String responseString = response != null ? new String(((TypedByteArray) response.getBody()).getBytes()) : null;
+		if (responseString != null) {
+			// since the string has ""abc"" an extra quote
+			responseString = responseString.substring(1, responseString.length() - 1);
+			// Escape characters
+			responseString = StringEscapeUtils.unescapeJava(responseString);
+		}
+		List<BranchRankingReportYear> branchRankingReportYear = null;
+		Type listType = new TypeToken<List<BranchRankingReportYear>>() {
+		}.getType();
+		branchRankingReportYear = new Gson().fromJson(responseString, listType);
+		Map<Integer, List<Object>> data = workbookData.getBranchRankingReportYearInSheet(branchRankingReportYear);
+		return workbookOperations.createWorkbook(data);
+
+	}
+
+
+	@Override
+	public List<BranchRankingReportMonth> getBranchRankingReportForMonth(long companyId, int month, int year) throws InvalidInputException {
+		
+		if(companyId < 1){
+			throw new InvalidInputException("Invalid companyId.");
+		} 
+		if(month < 1 || month > 12){
+			throw new InvalidInputException("Invalid month value.");
+		}
+		if(year < 0){
+			throw new InvalidInputException("Invalid year value.");
+		}
+		
+		return branchRankingMonthDao.getBranchRankingForMonth(companyId,month,year);
+	}
+
+
+	@Override
+	public List<BranchRankingReportYear> getBranchRankingReportForYear(long companyId, int year) throws InvalidInputException {
+		if(companyId < 1){
+			throw new InvalidInputException("Invalid companyId.");
+		} 
+		if(year < 0){
+			throw new InvalidInputException("Invalid year value.");
+		}
+		
+		return branchRankingYearDao.getBranchRankingForYear(companyId,year);
+	}
 }

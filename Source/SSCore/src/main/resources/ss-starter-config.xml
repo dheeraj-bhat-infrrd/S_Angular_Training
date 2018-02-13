@@ -430,7 +430,7 @@
 			value="com.realtech.socialsurvey.core.starter.BulkSurveyImporter" />
 		<property name="jobDataAsMap">
 			<map>
-				<entry key="surveyHandler" value-ref="surveyHandler" />
+				<entry key="surveyImportHandler" value-ref="surveyImportHandler" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -872,6 +872,8 @@
 		class="com.realtech.socialsurvey.core.services.generator.impl.UrlGeneratorImpl" />
 	<bean id="surveyHandler"
 		class="com.realtech.socialsurvey.core.services.surveybuilder.impl.SurveyHandlerImpl" />
+	<bean id="surveyImportHandler"
+		class="com.realtech.socialsurvey.core.handler.SurveyImportHandler" />
 	<bean id="emailServices"
 		class="com.realtech.socialsurvey.core.services.mail.impl.EmailServicesImpl" />
 	<bean id="userManagementService"

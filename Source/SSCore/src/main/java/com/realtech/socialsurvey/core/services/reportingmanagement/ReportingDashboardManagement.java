@@ -9,6 +9,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.realtech.socialsurvey.core.entities.BranchRankingReportMonth;
+import com.realtech.socialsurvey.core.entities.BranchRankingReportYear;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyDetailsReport;
 import com.realtech.socialsurvey.core.entities.DigestRequestData;
@@ -330,4 +332,37 @@ public interface ReportingDashboardManagement
      * @return
      */
     public int updateFileUploadStatusAndFileName( long fileUploadId, int status, String location ) throws InvalidInputException;
+
+
+	/**
+	 * @param profileValue
+	 * @param profileLevel
+	 * @param adminUserId
+	 * @param startDate
+	 * @return
+	 * @throws NonFatalException 
+	 * @throws UnsupportedEncodingException 
+	 */
+	public String generateBranchRankingReportMonth(long profileValue, String profileLevel, long adminUserId,
+			Timestamp startDate) throws UnsupportedEncodingException, NonFatalException;
+
+
+	/**
+	 * @param profileValue
+	 * @param profileLevel
+	 * @param adminUserId
+	 * @param startDate
+	 * @return
+	 * @throws InvalidInputException 
+	 * @throws NonFatalException 
+	 * @throws UnsupportedEncodingException 
+	 */
+	public String generateBranchRankingReportYear(long profileValue, String profileLevel, long adminUserId,
+			Timestamp startDate) throws InvalidInputException, UnsupportedEncodingException, NonFatalException;
+
+
+	public List<BranchRankingReportMonth> getBranchRankingReportForMonth(long companyId, int month, int year) throws InvalidInputException;
+
+
+	public List<BranchRankingReportYear> getBranchRankingReportForYear(long companyId, int year) throws InvalidInputException;
 }

@@ -740,4 +740,13 @@ public interface ProfileManagementService
         String collectionType, List<MiscValues> mailIds )
         throws InvalidInputException, UndeliveredEmailException, UserAlreadyExistsException;
 
+    /**
+     * 
+     * @param source
+     * @param imageName
+     * @return
+     * @throws Exception
+     */
+    public String copyImage( String source, String imageName ) throws Exception;
+
 }

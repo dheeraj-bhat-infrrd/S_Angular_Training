@@ -112,6 +112,15 @@ public class SurveyPreInitiation implements Serializable
 	@Column( name = "PARTICIPANT_TYPE")
 	private int participantType;
 	
+	@Column( name = "PROPERTY_ADDRESS")
+	private String propertyAddress;
+	
+	@Column( name = "LOAN_PROCESSOR_NAME")
+	private String loanProcessorName;
+	
+	@Column( name = "LOAN_PROCESSOR_EMAIL")
+	private String loanProcessorEmail;
+	
         
 	@Transient
     private String errorCodeDescription;
@@ -450,4 +459,34 @@ public class SurveyPreInitiation implements Serializable
     {
         this.participantType = participantType;
     }
+
+
+	public String getPropertyAddress() {
+		return propertyAddress;
+	}
+
+
+	public void setPropertyAddress(String propertyAddress) {
+		this.propertyAddress = propertyAddress;
+	}
+
+
+	public String getLoanProcessorName() {
+		return loanProcessorName;
+	}
+
+
+	public void setLoanProcessorName(String loanProcessorName) {
+		this.loanProcessorName = loanProcessorName;
+	}
+
+
+	public String getLoanProcessorEmail() {
+		return loanProcessorEmail;
+	}
+
+
+	public void setLoanProcessorEmail(String loanProcessorEmail) {
+		this.loanProcessorEmail = loanProcessorEmail;
+	}
 }
