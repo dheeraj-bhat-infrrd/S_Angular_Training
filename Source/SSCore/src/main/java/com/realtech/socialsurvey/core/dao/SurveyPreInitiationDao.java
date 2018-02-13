@@ -152,4 +152,7 @@ public interface SurveyPreInitiationDao extends GenericDao<SurveyPreInitiation, 
 
 
     void disconnectSurveysFromAgent( long agentId );
+
+
+	List<SurveyPreInitiation> getManualCompletedSurveys(int start, int row) throws DatabaseException;
 }
