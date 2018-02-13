@@ -269,7 +269,7 @@ namespace EncompassSocialSurvey
                     // get the required field values
                     //string guid = loan.Guid;
                     string loanNumber = loan["Fields." + EncompassSocialSurveyConstant.LOAN_NUMBER_FIELD] as string;
-                    string loanOfficerId = loan["Fields." + EncompassSocialSurveyConstant.LOAN_OFFICER_ID_FIELD] as string;
+                    //string loanOfficerId = loan["Fields." + EncompassSocialSurveyConstant.LOAN_OFFICER_ID_FIELD] as string;
                     string loanOfficerName = loan["Fields." + EncompassSocialSurveyConstant.LOAN_OFFICER_NAME_FIELD] as string;
                     string loanOfficerEmail = loan["Fields." + EncompassSocialSurveyConstant.LOAN_OFFICER_EMAIL_FIELD] as string;
                     string borrowerFirstName = loan["Fields." + EncompassSocialSurveyConstant.BORROWER_FIRST_NAME_FIELD] as string;
@@ -303,7 +303,7 @@ namespace EncompassSocialSurvey
                     }
 
 
-                    string agentId = (loanOfficerId != null) ? loanOfficerId : "";
+                    string agentId = "0";
                     string agentName = (loanOfficerName != null) ? loanOfficerName : "";
                     string agentEmail = (loanOfficerEmail != null) ? loanOfficerEmail : "";
 
@@ -722,7 +722,7 @@ namespace EncompassSocialSurvey
             fieldIds.Add(EncompassSocialSurveyConstant.LOAN_NUMBER_FIELD);
 
             // Loan Officer Information
-            fieldIds.Add(EncompassSocialSurveyConstant.LOAN_OFFICER_ID_FIELD);
+            //fieldIds.Add(EncompassSocialSurveyConstant.LOAN_OFFICER_ID_FIELD);
             fieldIds.Add(EncompassSocialSurveyConstant.LOAN_OFFICER_NAME_FIELD);
             fieldIds.Add(EncompassSocialSurveyConstant.LOAN_OFFICER_EMAIL_FIELD);
 
