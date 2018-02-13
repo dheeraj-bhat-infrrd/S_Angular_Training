@@ -7388,6 +7388,13 @@ function paintSurveyPageFromJson() {
 	var question = questionDetails.question;
 
 	question = question.replace(/\[name\]/gi, agentName);
+	//get agentFirstName
+	var AgentFirstName = agentName;
+	if(agentName.indexOf(" ") > -1)
+		var AgentFirstName = agentName.substr(0, agentName.indexOf(" "));
+	//replace first name
+	question = question.replace(/\[AgentFirstName\]/gi, AgentFirstName);
+		
 	var questionType = questionDetails.questionType;
 	var isRatingQuestion = questionDetails.isRatingQuestion;
 	if (isRatingQuestion == 1) {

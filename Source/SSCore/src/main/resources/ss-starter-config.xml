@@ -430,7 +430,7 @@
 			value="com.realtech.socialsurvey.core.starter.BulkSurveyImporter" />
 		<property name="jobDataAsMap">
 			<map>
-				<entry key="surveyHandler" value-ref="surveyHandler" />
+				<entry key="surveyImportHandler" value-ref="surveyImportHandler" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -719,7 +719,7 @@
 	<bean id="monthlydigeststartercron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="monthlydigeststarter" />
-        <property name="cronExpression" value="0 0 14 5 1/1 ?" />
+        <property name="cronExpression" value="0 0/5 * 1/1 * ?" />
 	</bean>
 
 	<bean id="transactionActivityMonitorCron"
@@ -835,6 +835,8 @@
 		class="com.realtech.socialsurvey.core.services.generator.impl.UrlGeneratorImpl" />
 	<bean id="surveyHandler"
 		class="com.realtech.socialsurvey.core.services.surveybuilder.impl.SurveyHandlerImpl" />
+	<bean id="surveyImportHandler"
+		class="com.realtech.socialsurvey.core.handler.SurveyImportHandler" />
 	<bean id="emailServices"
 		class="com.realtech.socialsurvey.core.services.mail.impl.EmailServicesImpl" />
 	<bean id="userManagementService"

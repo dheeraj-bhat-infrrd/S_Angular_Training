@@ -681,7 +681,7 @@
 												</div>
 												<div id="privacy-policy-link" class="privacy-policy-link">
 													<a
-														href="https://www.socialsurvey.me/survey/privacy-policy/">Privacy
+														href="https://www.socialsurvey.com/privacy-policy/">Privacy
 														Policy</a>
 												</div>
 											</form>
