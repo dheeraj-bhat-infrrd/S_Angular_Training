@@ -917,4 +917,30 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         LOG.debug( "Method updateCompanyIdForAllRecordsForAgent  ended." );
     }
 
+    
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public List<SurveyPreInitiation> getManualCompletedSurveys( int start, int row ) throws DatabaseException
+    {
+        Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class );
+        try {
+            if ( row > 0 )
+                criteria.setMaxResults( row );
+            if ( start > 0 )
+                criteria.setFirstResult( start );
+
+            List<Integer> statusList = new ArrayList<Integer>();
+            statusList.add( CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED );
+            statusList.add( CommonConstants.SURVEY_STATUS_INITIATED );
+            statusList.add( CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE );
+          criteria.add( Restrictions.in( CommonConstants.STATUS_COLUMN, statusList  ) );
+          
+          criteria.add( Restrictions.in( "surveySource", new String[] { "agent" , "admin" , "upload" , "customer"} ) );
+          
+            return criteria.list();
+        } catch ( HibernateException e ) {
+            LOG.error( "Exception caught in getManualCompletedSurveys() ", e );
+            throw new DatabaseException( "Exception caught in getManualCompletedSurveys() ", e );
+        }
+    }
 }

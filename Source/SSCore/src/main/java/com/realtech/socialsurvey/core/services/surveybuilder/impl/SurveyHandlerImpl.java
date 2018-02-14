@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.services.surveybuilder.impl;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -2804,7 +2805,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 if ( !error ) {
                     String agentEmailId = bulkSurveyDetail.getAgentEmailId();
                     try {
-                        user = userManagementService.getUserByEmailAndCompany( companyId, agentEmailId );
+                        user = userManagementService.getActiveAgentByEmailAndCompany( companyId, agentEmailId );
                     } catch ( InvalidInputException e ) {
                         message = "Agent does not belong to this Company " + companyId;
                         status = CommonConstants.BULK_SURVEY_INVALID;
@@ -3668,6 +3669,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 LOG.debug( "Successfully deleted the third party import file" );
             else
                 LOG.error( "Failed to delete third party import file." );
+        } catch ( FileNotFoundException e ) {
+            LOG.error( "The third party import file was not found" );
         } catch ( IOException e ) {
             LOG.error( "An IOException occurred while importing. Reason: ", e );
         }
@@ -5016,5 +5019,43 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             resultString = new StringBuilder( "No records found." );
         }
         return resultString.toString();
+    }
+    
+    @Override
+    public void mapSourceInManualSurvey() 
+    {
+    		int start = 0;
+    		int batchSize = 500;
+    		
+    		List<SurveyPreInitiation> surveys = null;
+    		
+    		do {
+    		surveys =  surveyPreInitiationDao.getManualCompletedSurveys(start, batchSize);
+    		
+    		for(SurveyPreInitiation spInitiation : surveys ) {
+    			Criterion agentEmaailIdCriteria = Restrictions.eq( "agentId", spInitiation.getAgentId()); 
+    			Criterion customerEmaailIdCriteria = Restrictions.eq( "customerEmailId", spInitiation.getCustomerEmailId() ); 
+    			Criterion companyIdCriteria = Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, spInitiation.getCompanyId() );
+    			Criterion SPIdCriteria = Restrictions.ne( "surveyPreIntitiationId", spInitiation.getSurveyPreIntitiationId() );
+    			Criterion SourceCriteria = Restrictions.not(Restrictions.in( "surveySource", new String[] { "agent" , "admin" , "upload" , "customer"}));
+    			
+    			List<SurveyPreInitiation> similarSPIs = surveyPreInitiationDao.findByCriteria(SurveyPreInitiation.class, agentEmaailIdCriteria , customerEmaailIdCriteria, companyIdCriteria, SPIdCriteria, SourceCriteria  );
+    			if(similarSPIs != null && similarSPIs.size() > 0) {
+    				SurveyPreInitiation similarSPI = similarSPIs.get(0);
+    				spInitiation.setSurveySourceId(similarSPI.getSurveySourceId());
+    				spInitiation.setSurveySource(similarSPI.getSurveySource());
+    				surveyPreInitiationDao.update(spInitiation);
+    				
+    			 	SurveyDetails surveyDetails = surveyDetailsDao.getSurveyBySurveyPreIntitiationId(spInitiation.getSurveyPreIntitiationId());
+    				if(surveyDetails != null) {
+    					surveyDetails.setSource(similarSPI.getSurveySource());
+    					surveyDetails.setSourceId(similarSPI.getSurveySourceId());
+    					surveyDetailsDao.updateSourceDetailInExistingSurveyDetails(surveyDetails);
+    				}
+    			}
+    		}
+    		start += batchSize;
+    		}while(surveys != null && surveys.size() == batchSize );
+    		
     }
 }

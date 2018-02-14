@@ -304,6 +304,7 @@ public class SocialAsyncServiceImpl implements SocialAsyncService
         } else if(imageUrl.contains( "media.licdn.com" )){
             imageName = imageName + ".jpg";
         }else {
+
             LOG.error( "The url given is not a valid image url {} " , imageUrl );
             throw new InvalidInputException( "Image format not valid" );
         }
