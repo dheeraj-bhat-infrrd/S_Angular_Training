@@ -1569,6 +1569,9 @@ public interface CommonConstants
     public static final String CENTRALIZED_JOB_NAME = "CentralizedMainJob";
     public static final String REPORTING_JOB_NAME = "ReportingMainJob";
     public static final String USER_RANKING_JOB_NAME = "UserRankingJob";
+    public static final String IS_MANUAL = "isManual";
+    //job log buffer to 7 and half hours
+    public static final long BUFFER = (long) (7.5*60*60*1000);
     
 
     public static final String TIMEZONE_EST = "GMT-5:00";
