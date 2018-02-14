@@ -98,84 +98,67 @@
 			</div>
 	</div>
 	
-	<div class="dash-container container mon-type-container zero-padding">
-		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 clearfix mon-type-hdr"  >
-			<img id="edit-mon-unchecked" src="${initParam.resourcesPath}/resources/images/check-no.png"  class="float-left mon-type-checkbox">
-			<img id="edit-mon-checked" src="${initParam.resourcesPath}/resources/images/check-yes.png"  class="hide float-left mon-type-checkbox">
-			<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 soc-mon-txt-bold">Keyphrase</div>
-			<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 mon-type-hdr-txt">Monitor Type</div>
-		</div>
-		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 clearfix mon-type-gray-container"  >
-			<img id="edit-mon-unchecked" src="${initParam.resourcesPath}/resources/images/check-no.png"  class="float-left mon-type-checkbox">
-			<img id="edit-mon-checked" src="${initParam.resourcesPath}/resources/images/check-yes.png"  class="hide float-left mon-type-checkbox">
-			<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 mon-type-keyphrase">Lowest Rate</div>
-			<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 mon-type-tbl-txt">Keyword Monitor</div>
-		</div>
-		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 clearfix mon-type-white-container"  >
-			<img id="edit-mon-unchecked" src="${initParam.resourcesPath}/resources/images/check-no.png"  class="float-left mon-type-checkbox">
-			<img id="edit-mon-checked" src="${initParam.resourcesPath}/resources/images/check-yes.png"  class="hide float-left mon-type-checkbox">
-			<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 mon-type-keyphrase">New American Financial</div>
-			<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 mon-type-tbl-txt">Google Alert</div>
-		</div>
-		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 clearfix mon-type-gray-container"  >
-			<img id="edit-mon-unchecked" src="${initParam.resourcesPath}/resources/images/check-no.png"  class="float-left mon-type-checkbox">
-			<img id="edit-mon-checked" src="${initParam.resourcesPath}/resources/images/check-yes.png"  class="hide float-left mon-type-checkbox">
-			<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 mon-type-keyphrase">Lowest Rate</div>
-			<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 mon-type-tbl-txt">Keyword Monitor</div>
-		</div>
-		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 clearfix mon-type-white-container"  >
-			<img id="edit-mon-unchecked" src="${initParam.resourcesPath}/resources/images/check-no.png"  class="float-left mon-type-checkbox">
-			<img id="edit-mon-checked" src="${initParam.resourcesPath}/resources/images/check-yes.png"  class="hide float-left mon-type-checkbox">
-			<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 mon-type-keyphrase">New American Financial</div>
-			<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 mon-type-tbl-txt">Google Alert</div>
-		</div>
-		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 clearfix mon-type-gray-container"  >
-			<img id="edit-mon-unchecked" src="${initParam.resourcesPath}/resources/images/check-no.png"  class="float-left mon-type-checkbox">
-			<img id="edit-mon-checked" src="${initParam.resourcesPath}/resources/images/check-yes.png"  class="hide float-left mon-type-checkbox">
-			<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 mon-type-keyphrase">Lowest Rate</div>
-			<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 mon-type-tbl-txt">Keyword Monitor</div>
-		</div>
-		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 clearfix mon-type-white-container"  >
-			<img id="edit-mon-unchecked" src="${initParam.resourcesPath}/resources/images/check-no.png"  class="float-left mon-type-checkbox">
-			<img id="edit-mon-checked" src="${initParam.resourcesPath}/resources/images/check-yes.png"  class="hide float-left mon-type-checkbox">
-			<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 mon-type-keyphrase">New American Financial</div>
-			<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 mon-type-tbl-txt">Google Alert</div>
-		</div>
-		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 clearfix mon-type-gray-container"  >
-			<img id="edit-mon-unchecked" src="${initParam.resourcesPath}/resources/images/check-no.png"  class="float-left mon-type-checkbox">
-			<img id="edit-mon-checked" src="${initParam.resourcesPath}/resources/images/check-yes.png"  class="hide float-left mon-type-checkbox">
-			<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 mon-type-keyphrase">Lowest Rate</div>
-			<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 mon-type-tbl-txt">Keyword Monitor</div>
-		</div>
-		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 clearfix mon-type-white-container"  >
-			<img id="edit-mon-unchecked" src="${initParam.resourcesPath}/resources/images/check-no.png"  class="float-left mon-type-checkbox">
-			<img id="edit-mon-checked" src="${initParam.resourcesPath}/resources/images/check-yes.png"  class="hide float-left mon-type-checkbox">
-			<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 mon-type-keyphrase">New American Financial</div>
-			<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 mon-type-tbl-txt">Google Alert</div>
-		</div>
-		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 clearfix mon-type-gray-container"  >
-			<img id="edit-mon-unchecked" src="${initParam.resourcesPath}/resources/images/check-no.png"  class="float-left mon-type-checkbox">
-			<img id="edit-mon-checked" src="${initParam.resourcesPath}/resources/images/check-yes.png"  class="hide float-left mon-type-checkbox">
-			<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 mon-type-keyphrase">Lowest Rate</div>
-			<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 mon-type-tbl-txt">Keyword Monitor</div>
-		</div>
-		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 clearfix mon-type-white-container"  >
-			<img id="edit-mon-unchecked" src="${initParam.resourcesPath}/resources/images/check-no.png"  class="float-left mon-type-checkbox">
-			<img id="edit-mon-checked" src="${initParam.resourcesPath}/resources/images/check-yes.png"  class="hide float-left mon-type-checkbox">
-			<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 mon-type-keyphrase">New American Financial</div>
-			<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 mon-type-tbl-txt">Google Alert</div>
-		</div>
-		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 clearfix mon-type-gray-container"  >
-			<img id="edit-mon-unchecked" src="${initParam.resourcesPath}/resources/images/check-no.png"  class="float-left mon-type-checkbox">
-			<img id="edit-mon-checked" src="${initParam.resourcesPath}/resources/images/check-yes.png"  class="hide float-left mon-type-checkbox">
-			<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 mon-type-keyphrase">Lowest Rate</div>
-			<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 mon-type-tbl-txt">Keyword Monitor</div>
-		</div>
-		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 clearfix mon-type-white-container"  >
-			<img id="edit-mon-unchecked" src="${initParam.resourcesPath}/resources/images/check-no.png"  class="float-left mon-type-checkbox">
-			<img id="edit-mon-checked" src="${initParam.resourcesPath}/resources/images/check-yes.png"  class="hide float-left mon-type-checkbox">
-			<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 mon-type-keyphrase">New American Financial</div>
-			<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 mon-type-tbl-txt">Google Alert</div>
-		</div>
+	<div id="monitor-list-container" class="dash-container container mon-type-container zero-padding">
+		
 	</div>
 </div>
+
+<script>
+	$(document).ready(function(){
+		
+		var monitorData = [
+			  	  {
+				    "id": 60935,
+				    "keyphrase": "veniam",
+				    "monitorType": "Keyword Monitor"
+				  },
+				  {
+				    "id": 39839,
+				    "keyphrase": "cupiditate",
+				    "monitorType": "Keyword Monitor"
+				  },
+				  {
+				    "id": 10242,
+				    "keyphrase": "iure",
+				    "monitorType": "Keyword Monitor"
+				  },
+				  {
+				    "id": 67370,
+				    "keyphrase": "qui",
+				    "monitorType": "Keyword Monitor"
+				  },
+				  {
+				    "id": 94989,
+				    "keyphrase": "minus",
+				    "monitorType": "Keyword Monitor"
+				  },
+				  {
+				    "id": 5307,
+				    "keyphrase": "nihil",
+				    "monitorType": "Google Alerts"
+				  },
+				  {
+				    "id": 80192,
+				    "keyphrase": "iusto",
+				    "monitorType": "Google Alerts"
+				  },
+				  {
+				    "id": 25452,
+				    "keyphrase": "ea",
+				    "monitorType": "Google Alerts"
+				  },
+				  {
+				    "id": 439,
+				    "keyphrase": "occaecati",
+				    "monitorType": "Google Alerts"
+				  },
+				  {
+				    "id": 59423,
+				    "keyphrase": "dolorem",
+				    "monitorType": "Google Alerts"
+				  }
+				];
+		
+		drawMonitorList(monitorData);
+	});
+</script>

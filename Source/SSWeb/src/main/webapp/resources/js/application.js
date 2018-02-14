@@ -16293,3 +16293,73 @@ function hideAddMonitorPopup(){
 	$('#add-mon-type-sel-txt').html('Keyword Monitor');
 	$('#add-mon-popup').addClass('hide');
 }
+
+function drawMonitorList(monitorData){
+	
+	var monListHeader = '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 clearfix mon-type-hdr"  >'
+					+'<img id="edit-mon-unchecked" src="resources/images/check-no.png"  class="float-left mon-type-checkbox">'
+					+'<img id="edit-mon-checked" src="resources/images/check-yes.png"  class="hide float-left mon-type-checkbox">'
+					+'<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 soc-mon-txt-bold">Keyphrase</div>'
+					+'<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 mon-type-hdr-txt">Monitor Type</div></div>';
+	
+	$('#monitor-list-container').html(monListHeader);
+	
+	for(var i=0;i<monitorData.length;i++){
+		
+		var monitorId = monitorData[i].id;
+		var container = 'mon-type-gray-container';
+		
+		if(i%2==0){
+			container = 'mon-type-gray-container';
+		}else{
+			container = 'mon-type-white-container';
+		}
+		
+		var monListRow = '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 clearfix '+container+'"  data-checked=false>'
+					+'<img id="edit-mon-unchecked-'+monitorId+'" data-id='+monitorId+' src="resources/images/check-no.png"  class="float-left mon-type-checkbox mon-type-checked">'
+					+'<img id="edit-mon-checked-'+monitorId+'" data-id='+monitorId+' src="resources/images/check-yes.png"  class="hide float-left mon-type-checkbox mon-type-checked">'
+					+'<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 mon-type-keyphrase">'+monitorData[i].keyphrase+'</div>'
+					+'<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 mon-type-tbl-txt">'+monitorData[i].monitorType+'</div></div>';
+		
+		$('#monitor-list-container').append(monListRow);
+	
+	}
+	
+	$('.mon-type-checked').unbind('click');
+	$('.mon-type-checked').bind('click',function(){
+		var id=$(this).data('id');
+		
+		var checked = $(this).parent().attr('data-checked');
+		if(checked == false || checked == 'false'){
+			$(this).parent().attr('data-checked',true);
+			$('#edit-mon-checked-'+id).show();
+		}else{
+			$(this).parent().attr('data-checked',false);
+			$('#edit-mon-unchecked-'+id).show();
+		}
+		
+		$(this).hide();
+	});
+	
+	$('#edit-mon-unchecked').unbind('click');
+	$('#edit-mon-unchecked').bind('click', function() {
+		$('#edit-mon-unchecked').toggle();
+		$('#edit-mon-checked').toggle();
+		for(var i=0;i<monitorData.length;i++){
+			$('#edit-mon-unchecked-'+monitorData[i].id).hide();
+			$('#edit-mon-checked-'+monitorData[i].id).show();
+			$('#edit-mon-unchecked-'+monitorData[i].id).parent().attr('data-checked',true);
+		}
+	});
+	
+	$('#edit-mon-checked').unbind('click');
+	$('#edit-mon-checked').bind('click', function() {
+		$('#edit-mon-unchecked').toggle();
+		$('#edit-mon-checked').toggle();
+		for(var i=0;i<monitorData.length;i++){
+			$('#edit-mon-checked-'+monitorData[i].id).hide();
+			$('#edit-mon-unchecked-'+monitorData[i].id).show();
+			$('#edit-mon-unchecked-'+monitorData[i].id).parent().attr('data-checked',false);
+		}
+	});
+}
