@@ -974,6 +974,12 @@ function paintFixSocialMedia(data){
 		var noSMDiv = '<div class="clearfix"><div></div class="float-left bd-frm-left-un">Successfully connected!</div>';
 		popup += noSMDiv;
 		$('#dsh-btn0').addClass("hide");
+		if( window.location.hash.substr(1) == "showreportingpage" ){
+			$('#rep-fix-social-media').fadeOut(500);
+			delay(function(){
+				drawReportingDashButtons(columnName, columnValue);
+			},500);	
+		}
 	}
 	
 // e.stopPropagation();
