@@ -1,6 +1,5 @@
 package com.realtech.socialsurvey.compute.feeds.impl;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -17,7 +16,7 @@ import com.realtech.socialsurvey.compute.feeds.FacebookFeedProcessor;
 import com.realtech.socialsurvey.compute.utils.UrlHelper;
 
 
-public class FacebookFeedProcessorImpl implements FacebookFeedProcessor, Serializable
+public class FacebookFeedProcessorImpl implements FacebookFeedProcessor
 {
     private static final long serialVersionUID = 1L;
 
