@@ -1,12 +1,14 @@
 package com.realtech.socialsurvey.compute.entities;
 
+import java.io.Serializable;
+
 /**
  * @author manish
  *Entity for social media response
  */
-public class SocialMediaTokenResponse
+public class SocialMediaTokenResponse implements Serializable
 {
-
+    private static final long serialVersionUID = 1L;
     private long iden;
     private long companyId;
     private SocialMediaTokens socialMediaTokens;

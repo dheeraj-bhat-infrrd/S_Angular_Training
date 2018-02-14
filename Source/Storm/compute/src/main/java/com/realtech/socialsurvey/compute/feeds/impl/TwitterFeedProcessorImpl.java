@@ -1,6 +1,5 @@
 package com.realtech.socialsurvey.compute.feeds.impl;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +21,7 @@ import twitter4j.TwitterFactory;
 import twitter4j.auth.AccessToken;
 
 
-public class TwitterFeedProcessorImpl implements TwitterFeedProcessor, Serializable
+public class TwitterFeedProcessorImpl implements TwitterFeedProcessor
 {
     private static final long serialVersionUID = 1L;
 

@@ -10826,7 +10826,7 @@ img.lead-img {
 
 .soc-mon-search-bar{
 	margin-top: 11px;
-    width: 50%;
+    width: 45%;
     background-color: white;
 }
 
@@ -10846,9 +10846,8 @@ img.lead-img {
 
 .soc-mon-dropdown{
 	border: 1px solid transparent;
-    box-shadow: -3px 3px 4px -3px #b4b0b0;
     color: #8e8e8e;
-    width:150px;
+    width: 170px;
 }
 
 .soc-mon-tab{
@@ -11528,4 +11527,134 @@ img.lead-img {
 
 .zero-padding{
 	padding: 0;
+}
+
+.soc-mon-stream-dropdown{
+	width: 100%;
+    height: 100%;
+    line-height: 30px;
+    border: 1px solid transparent;
+    background: white;
+    border-radius: 2px;
+    text-align: left;
+    padding-left: 10px;
+    cursor: pointer;
+}
+
+.stream-dropdown-select{
+	font-size: 13px;
+    display: flex;
+    align-items: center;
+    font-weight: bold !important;
+    color: #8d8d8d;
+}
+
+.stream-dropdown-count-div{
+	font-weight: bold !important;
+    margin-right: 2px;
+}
+
+.stream-dropdown-actions{
+	border: 1px solid transparent;
+    background: white;
+    box-shadow: 0 -9px 0px 0px white, 4px 0 15px -4px #b4b0b0, -4px 0 15px -4px #b4b0b0;
+    margin-left: -11px;
+    margin-top: 7px;
+    z-index: 1;
+    position: absolute;
+    padding-right: 15px;
+    padding-bottom: 15px;
+}
+
+
+.stream-dropdown-option-first{
+    padding: 10px 10px;
+    font-weight: bold !important;
+    color: #8d8d8d;
+    cursor: pointer;
+}
+
+.stream-dropdown-option {
+    padding: 10px 10px 10px 50px;
+    font-weight: bold !important;
+    color: #8d8d8d;
+    cursor: pointer;
+}
+
+.chkbox-partial-sel-outer{
+	border: 1px solid #53a6db;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    margin-right: 10px;
+}
+
+.chkbox-partial-sel-inner{
+	border: 1px solid #53a6db;
+    width: 12px;
+    height: 12px;
+    background-color: #53a6db;
+    margin: 0 auto;
+}
+
+.margin-top-10{
+	margin-top:10px;
+}
+
+.stream-dropdown-img-circle{
+	width: 35px;
+    height: 35px;
+    margin-right: 10px;
+    margin-left: 10px;
+    border-radius:50%;
+}
+
+.stream-dropdown-option-container{
+	display: flex;
+    align-items: center;
+    padding: 5px 10px;
+}
+
+.stream-dropdown-segement-hdr{
+	font-size: 15px;
+    font-weight: bold !important;
+}
+
+.stream-dropdown-name-txt-bold{
+	font-weight: bold !important;
+}
+
+.add-mon-save-btn{
+	order: 2;
+    margin-left: 15px;
+}
+
+.add-mon-cancel-btn{
+	order: 1;
+    margin-left: auto;
+}
+
+.add-mon-type-dropdown{
+	width: 150px;
+    margin-top: 8px;
+    line-height: 35px;
+    border: 1px solid #ccc;
+    background: white;
+    border-radius: 2px;
+    text-align: left;
+    padding-left: 10px;
+    cursor: pointer;
+}
+
+.add-mon-type-options{
+	border: 1px solid #ccc;
+    background: white;
+    border-radius: 2px;
+    width: 150px;
+    margin-left: -11px;
+    padding-left: 10px;
+    margin-top: 35px;
+    z-index: 1;
+    position: absolute;
 }

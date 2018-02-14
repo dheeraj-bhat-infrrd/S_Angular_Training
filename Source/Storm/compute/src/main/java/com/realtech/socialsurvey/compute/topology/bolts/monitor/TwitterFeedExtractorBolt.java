@@ -2,7 +2,6 @@ package com.realtech.socialsurvey.compute.topology.bolts.monitor;
 
 import java.util.List;
 
-import org.apache.storm.spout.SpoutOutputCollector;
 import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;

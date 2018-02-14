@@ -49,6 +49,8 @@ public final class ComputeConstants
     public static final String FACEBOOK_API_ENDPOINT = "FACEBOOK_API_ENDPOINT";
     
     public static final String LINKED_IN_REST_API_URI = "LINKED_IN_REST_API_URI";
+    
+    public static final String MEDIA_TOKENS_FETCH_TIME_INTERVAL = "MEDIA_TOKENS_FETCH_TIME_INTERVAL";
 
     // Amazon S3 constants
     public static final String AMAZON_BUCKET = "AMAZON_BUCKET";

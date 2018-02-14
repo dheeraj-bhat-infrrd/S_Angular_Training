@@ -16250,3 +16250,46 @@ $(document).on('click','#keyword-mon-checked',function(e){
 	$('#keyword-mon-unchecked').toggle();
 	$('#keyword-mon-checked').toggle();
 });
+
+$(document).on('click','#stream-usr-selection',function(e){
+	e.stopPropagation();
+	$('#stream-usr-dropdown-options').toggle();
+	$('#usr-chevron-down').toggle();
+	$('#usr-chevron-up').toggle();
+});
+
+$(document).on('click','#stream-seg-selection',function(e){
+	e.stopPropagation();
+	$('#stream-seg-dropdown-options').toggle();
+	$('#seg-chevron-down').toggle();
+	$('#seg-chevron-up').toggle();
+});
+
+$(document).on('click','#stream-feed-selection',function(e){
+	e.stopPropagation();
+	$('#stream-feed-dropdown-options').toggle();
+	$('#feed-chevron-down').toggle();
+	$('#feed-chevron-up').toggle();
+});
+
+function showAddMonitorPopup(){
+	$('#add-mon-popup').removeClass('hide');
+	
+	$(document).on('blur','#mon-type-txt-box',function(e){
+		e.stopPropagation();
+		if($('#mon-type-txt-box').val() != '' && $('#mon-type-txt-box').val() != undefined && $('#mon-type-txt-box').val() != null){
+			$('#add-mon-save-active').show();
+			$('#add-mon-save-inactive').hide();
+		}else{
+			$('#add-mon-save-active').hide();
+			$('#add-mon-save-inactive').show();
+		}
+	});
+}
+
+function hideAddMonitorPopup(){
+	$('#mon-type-txt-box').val('');
+	$('#add-mon-type-select').attr('data-mon-type',1);
+	$('#add-mon-type-sel-txt').html('Keyword Monitor');
+	$('#add-mon-popup').addClass('hide');
+}

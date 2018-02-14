@@ -80,20 +80,14 @@
 				<div id="soc-mon-stream-search-clr" class="um-clear-input-icn hide" title="clear"></div>
 			</div>
 			<div class="hm-header-left text-center float-left" style="margin-top: 12px;">
-				<div class="dash-btn-dl-sd-admin report-selector soc-mon-dropdown" >
-					<select id="" class="float-left dash-download-sel-item report-selector-choice">
-  						<option value= >User1</option>
-					</select>	
+				<div id="stream-usr-selection" class="dash-btn-dl-sd-admin report-selector soc-mon-dropdown" >
+					<jsp:include page="social_monitor_stream_user_dropdown.jsp"></jsp:include>
 				</div>
-				<div class="dash-btn-dl-sd-admin report-selector soc-mon-dropdown" >
-					<select id="" class="float-left dash-download-sel-item report-selector-choice">
-  						<option value= >Segment1</option>
-					</select>	
+				<div id="stream-seg-selection" class="dash-btn-dl-sd-admin report-selector soc-mon-dropdown" >
+					<jsp:include page="social_monitor_stream_segment_dropdown.jsp"></jsp:include>	
 				</div>
-				<div class="dash-btn-dl-sd-admin report-selector soc-mon-dropdown" >
-					<select id="" class="float-left dash-download-sel-item report-selector-choice">
-  						<option value= >Feed1</option>
-					</select>	
+				<div id="stream-feed-selection" class="dash-btn-dl-sd-admin report-selector soc-mon-dropdown" >
+					<jsp:include page="social_monitor_stream_feed_dropdown.jsp"></jsp:include>
 				</div>
 			</div>
 		</div>
