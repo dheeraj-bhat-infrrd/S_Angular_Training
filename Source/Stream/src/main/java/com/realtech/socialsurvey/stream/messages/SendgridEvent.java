@@ -18,7 +18,7 @@ public class SendgridEvent
     @JsonProperty ( value = "smtp-id")
     private String smtpId;
     private String event;
-    private List<String> category;
+    private String category;
     @JsonProperty ( value = "sg_event_id")
     private String sgEventId;
     @JsonProperty ( value = "sg_message_id")
@@ -83,13 +83,13 @@ public class SendgridEvent
     }
 
 
-    public List<String> getCategory()
+    public String getCategory()
     {
         return category;
     }
 
 
-    public void setCategory( List<String> category )
+    public void setCategory( String category )
     {
         this.category = category;
     }
