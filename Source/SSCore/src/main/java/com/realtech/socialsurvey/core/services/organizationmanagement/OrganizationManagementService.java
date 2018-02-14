@@ -1572,4 +1572,7 @@ public interface OrganizationManagementService
 
 
     public Set<String> getAdminEmailsSpecificForAHierarchy( String profileLevel, long iden ) throws InvalidInputException;
+
+
+	public List<Long> filterCompanyIdsByStatus(List<Long> companies, String status) throws InvalidInputException;
 }

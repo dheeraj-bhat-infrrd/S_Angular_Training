@@ -147,6 +147,7 @@ import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
+import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.core.utils.ZipCodeExclusionStrategy;
 import com.realtech.socialsurvey.core.utils.images.ImageProcessor;
@@ -267,6 +268,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Autowired
     GenericDao<UploadStatus, Long> uploadStatusDao;
+    
+    @Autowired
+    private EncryptionHelper encryptionHelper;
 
     @Value ( "${HAPPY_TEXT}")
     private String happyText;
@@ -906,10 +910,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             EncompassCrmInfo crmInfo = (EncompassCrmInfo) companySettings.getCrm_info();
 
             String encryptedPassword = crmInfo.getCrm_password();
-            /*String decryptedPassword = encryptionHelper.decryptAES( encryptedPassword, "" );*/
+            String decryptedPassword = encryptedPassword;
+            if( StringUtils.isNotEmpty(encryptedPassword) ) {
+            	decryptedPassword = encryptionHelper.decryptAES( encryptedPassword, "" );
+            }
 
-            // TODO Temp Fix
-            crmInfo.setCrm_password( encryptedPassword );
+            crmInfo.setCrm_password( decryptedPassword );
         }
         return companySettings;
     }
@@ -7741,12 +7747,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         try {
                             //send report bug mail to admin
                             batchTrackerService.sendMailToAdminRegardingBatchError(
-                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(), e );
+                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(), 
+                                new Exception( e.getMessage() + " for profileImage of companyId:" + id, e ));
                         } catch ( InvalidInputException e1 ) {
                             LOG.error( "Error while updating error message in processing of images " );
                         } catch ( UndeliveredEmailException e1 ) {
                             LOG.error( "Error while sending report excption mail to admin " );
                         }
+                        organizationUnitSettingsDao.removeImageForOrganizationUnitSetting( id,
+                            CommonConstants.COMPANY_SETTINGS_COLLECTION, false, CommonConstants.IMAGE_TYPE_PROFILE );
                     }
                 }
 
@@ -7769,12 +7778,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         try {
                             //send report bug mail to admin
                             batchTrackerService.sendMailToAdminRegardingBatchError(
-                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(), e );
+                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(), 
+                                new Exception( e.getMessage() + " for profileImage of regionId:" + id, e ));
                         } catch ( InvalidInputException e1 ) {
                             LOG.error( "Error while updating error message in processing of images " );
                         } catch ( UndeliveredEmailException e1 ) {
                             LOG.error( "Error while sending report excption mail to admin " );
                         }
+                        organizationUnitSettingsDao.removeImageForOrganizationUnitSetting( id,
+                            CommonConstants.REGION_SETTINGS_COLLECTION, false, CommonConstants.IMAGE_TYPE_PROFILE );
                     }
                 }
 
@@ -7797,12 +7809,16 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         try {
                             //send report bug mail to admin
                             batchTrackerService.sendMailToAdminRegardingBatchError(
-                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(), e );
+                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(), 
+                                new Exception( e.getMessage() + " for profileImage of companyId:" + id, 
+                                    new Exception( e.getMessage() + " for profileImage of branchId:" + id, e )));
                         } catch ( InvalidInputException e1 ) {
                             LOG.error( "Error while updating error message in processing of images " );
                         } catch ( UndeliveredEmailException e1 ) {
                             LOG.error( "Error while sending report excption mail to admin " );
                         }
+                        organizationUnitSettingsDao.removeImageForOrganizationUnitSetting( id,
+                            CommonConstants.BRANCH_SETTINGS_COLLECTION, false, CommonConstants.IMAGE_TYPE_PROFILE );
                     }
                 }
 
@@ -7826,12 +7842,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         try {
                             //send report bug mail to admin
                             batchTrackerService.sendMailToAdminRegardingBatchError(
-                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(), e );
+                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(), 
+                                new Exception( e.getMessage() + " for profileImage of companyId:" + id, e ));
                         } catch ( InvalidInputException e1 ) {
                             LOG.error( "Error while updating error message in processing of images " );
                         } catch ( UndeliveredEmailException e1 ) {
                             LOG.error( "Error while sending report excption mail to admin " );
                         }
+                        organizationUnitSettingsDao.removeImageForOrganizationUnitSetting( id,
+                            CommonConstants.AGENT_SETTINGS_COLLECTION, false, CommonConstants.IMAGE_TYPE_PROFILE );
                     }
                 }
 
@@ -7854,12 +7873,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         try {
                             //send report bug mail to admin
                             batchTrackerService.sendMailToAdminRegardingBatchError(
-                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(), e );
+                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(), 
+                                new Exception( e.getMessage() + " for logo of companyId:" + id, e ));
                         } catch ( InvalidInputException e1 ) {
                             LOG.error( "Error while updating error message in processing of images " );
                         } catch ( UndeliveredEmailException e1 ) {
                             LOG.error( "Error while sending report excption mail to admin " );
                         }
+                        organizationUnitSettingsDao.removeImageForOrganizationUnitSetting( id,
+                            CommonConstants.COMPANY_SETTINGS_COLLECTION, false, CommonConstants.IMAGE_TYPE_LOGO );
                     }
                 }
             }
@@ -7877,12 +7899,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         try {
                             //send report bug mail to admin
                             batchTrackerService.sendMailToAdminRegardingBatchError(
-                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(), e );
+                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(), 
+                                new Exception( e.getMessage() + " for logo of regionId:" + id, e ));
                         } catch ( InvalidInputException e1 ) {
                             LOG.error( "Error while updating error message in processing of images " );
                         } catch ( UndeliveredEmailException e1 ) {
                             LOG.error( "Error while sending report excption mail to admin " );
                         }
+                        organizationUnitSettingsDao.removeImageForOrganizationUnitSetting( id,
+                            CommonConstants.REGION_SETTINGS_COLLECTION, false, CommonConstants.IMAGE_TYPE_LOGO );
                     }
                 }
             }
@@ -7900,12 +7925,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         try {
                             //send report bug mail to admin
                             batchTrackerService.sendMailToAdminRegardingBatchError(
-                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(), e );
+                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(), 
+                                new Exception( e.getMessage() + " for logo of branchId:" + id, e ));
                         } catch ( InvalidInputException e1 ) {
                             LOG.error( "Error while updating error message in processing of images " );
                         } catch ( UndeliveredEmailException e1 ) {
                             LOG.error( "Error while sending report excption mail to admin " );
                         }
+                        organizationUnitSettingsDao.removeImageForOrganizationUnitSetting( id,
+                            CommonConstants.BRANCH_SETTINGS_COLLECTION, false, CommonConstants.IMAGE_TYPE_LOGO );
                     }
                 }
             }
@@ -7924,12 +7952,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         try {
                             //send report bug mail to admin
                             batchTrackerService.sendMailToAdminRegardingBatchError(
-                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(), e );
+                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(), 
+                                new Exception( e.getMessage() + " for logo of agentId:" + id, e ));
                         } catch ( InvalidInputException e1 ) {
                             LOG.error( "Error while updating error message in processing of images " );
                         } catch ( UndeliveredEmailException e1 ) {
                             LOG.error( "Error while sending report excption mail to admin " );
                         }
+                        organizationUnitSettingsDao.removeImageForOrganizationUnitSetting( id,
+                            CommonConstants.AGENT_SETTINGS_COLLECTION, false, CommonConstants.IMAGE_TYPE_LOGO );
                     }
                 }
             }
@@ -8735,4 +8766,24 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.debug( "method getAdminEmaillsForAhierarchy finished" );
         return emailSet;
     }
+
+
+	@Override
+	public List<Long> filterCompanyIdsByStatus(List<Long> companies, String status) throws InvalidInputException {
+		LOG.info("method filterCompanyIdsByStatus() started");
+		if( companies == null || companies.isEmpty() ) {
+			LOG.warn("company list is non-existent");
+			return companies;
+		} else if( StringUtils.isEmpty( status ) ) {
+			LOG.warn("filter parameter status is not present");
+			return companies;
+		} else if ( status.equals(CommonConstants.STATUS_ACTIVE_MONGO ) ) {
+			return companyDao.filterIdsByStatus( companies, Arrays.asList(1) );
+		} else if ( status.equals(CommonConstants.STATUS_DELETED_MONGO ) ) {
+			return companyDao.filterIdsByStatus( companies, Arrays.asList(11) );
+		} else {
+			LOG.warn( "Invalid filter for fetching encompass" );
+			throw new InvalidInputException( "Invalid filter for fetching encompass" );
+		}
+	}
 }

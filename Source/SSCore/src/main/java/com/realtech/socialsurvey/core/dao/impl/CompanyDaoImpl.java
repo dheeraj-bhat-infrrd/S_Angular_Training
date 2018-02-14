@@ -443,4 +443,20 @@ public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements Com
         return companies;
 
     }
+
+    @SuppressWarnings ( "unchecked")
+	@Override
+	public List<Long> filterIdsByStatus(List<Long> companies, List<Integer> status) {
+        LOG.debug( "method getCompanyListByIds started " );
+        Session session = sessionFactory.getCurrentSession();
+        Criteria criteria = session.createCriteria( Company.class, "company" );
+        criteria.add( Restrictions.in( "companyId", companies ) );
+        criteria.add( Restrictions.in( "status", status ) );
+        criteria.setProjection(Projections.property("companyId"));
+        List<Long> filteredCompanies = criteria.list();
+        
+        LOG.debug( "method getCompanyListByIds started ended" );
+        return filteredCompanies;
+		
+	}
 }

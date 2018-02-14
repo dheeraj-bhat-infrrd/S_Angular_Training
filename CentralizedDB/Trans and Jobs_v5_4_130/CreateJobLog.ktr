@@ -10,6 +10,11 @@
     <directory>&#x2f;</directory>
     <parameters>
         <parameter>
+            <name>is_manual</name>
+            <default_value>0</default_value>
+            <description/>
+        </parameter>
+        <parameter>
             <name>mongo_host</name>
             <default_value>localhost</default_value>
             <description/>
@@ -389,6 +394,18 @@
         <precision>-1</precision>
         <trim_type>both</trim_type>
       </field>
+      <field>
+        <name>is_manual</name>
+        <variable>&#x24;&#x7b;is_manual&#x7d;</variable>
+        <type>None</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -446,6 +463,10 @@
         <field>
           <column_name>JOB_START_TIME</column_name>
           <stream_name>time</stream_name>
+        </field>
+        <field>
+          <column_name>IS_MANUAL</column_name>
+          <stream_name>is_manual</stream_name>
         </field>
     </fields>
      <cluster_schema/>

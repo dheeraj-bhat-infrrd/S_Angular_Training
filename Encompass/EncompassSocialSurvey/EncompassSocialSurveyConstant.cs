@@ -43,8 +43,8 @@ namespace EncompassSocialSurvey
 
         
         // MM/dd/yyyy
-        public const string LAST_REMINDER_TIME = "01/01/1970";
-        public const string DEFAULT_ENGAGEMENT_CLOSE_TIME = "01/01/1970";
+        public static readonly DateTime LAST_REMINDER_TIME = new DateTime(1970, 1, 1, 0, 0, 0);
+        public static readonly DateTime DEFAULT_ENGAGEMENT_CLOSE_TIME = new DateTime(1970, 1, 1, 0, 0, 0);
         public static readonly DateTime EPOCH_TIME = new DateTime(1970, 1, 2, 0, 0, 0);
 
         //TODO: Convert this into a map
@@ -83,7 +83,33 @@ namespace EncompassSocialSurvey
 
         public const string ENCOMPASS_VERSION = "encompass_version";
 
-        //field list index
+
+        // default field list
+        public const string LOAN_NUMBER_FIELD = "364";
+        public const string LOAN_OFFICER_ID_FIELD = "LOID";
+        public const string LOAN_OFFICER_NAME_FIELD = "317";
+        public const string LOAN_OFFICER_EMAIL_FIELD = "1407";
+        public const string LOAN_PROCESSOR_NAME_FIELD = "362";
+        public const string LOAN_PROCESSOR_EMAIL_FIELD = "1409";
+        public const string BORROWER_FIRST_NAME_FIELD = "36";
+        public const string BORROWER_LAST_NAME_FIELD = "37";
+        public const string BORROWER_EMAIL_FIELD = "1240";
+        public const string COBORROWER_FIRST_NAME_FIELD = "68";
+        public const string COBORROWER_LAST_NAME_FIELD = "69";
+        public const string COBORROWER_EMAIL_FIELD = "1268";
+        public const string SUBJECT_PROPERTY_STREET_FIELD = "11";
+        public const string SUBJECT_PROPERTY_CITY_FIELD = "12";
+        public const string SUBJECT_PROPERTY_COUNTRY_FIELD = "13";
+        public const string SUBJECT_PROPERTY_STATE_FIELD = "14";
+        public const string SUBJECT_PROPERTY_ZIP_FIELD = "15";
+        public const string BUYER_AGENT_NAME_FIELD = "VEND.X133";
+        public const string BUYER_AGENT_CONTACT_NAME_FIELD = "VEND.X139";
+        public const string BUYER_AGENT_EMAIL_FIELD = "VEND.X141";
+        public const string SELLER_AGENT_NAME_FIELD = "VEND.X144";
+        public const string SELLER_AGENT_CONTACT_NAME_FIELD = "VEND.X150";
+        public const string SELLER_AGENT_EMAIL_FIELD = "VEND.X152";
+        public const string TRANSACTION_CLOSED_DATE_FIELD = "748";
+
 
         public const int BUYER_AGENT_EMAIL_INDEX = 11;
 
@@ -92,6 +118,16 @@ namespace EncompassSocialSurvey
         public const int SELLER_AGENT_EMAIL_INDEX = 13;
 
         public const int SELLER_AGENT_NAME_INDEX = 14;
+
+        public const string SOCIAL_SURVEY_ENCRYPTION_SALT = "6f90b8d50f490e647d92e2a74d2c44d7";
+
+        public const string SOCIAL_SURVEY_ENCRYPTION_KEY = "";
+
+        public const string COMPANY_TYPE_DETERMINANT = "companyTypeDeterminant";
+
+
+        // UTF-8 code page
+        public const int CIPHER_BYTE_CODING_TYPE = 65001;
 
 
         public static string GetAppSettingsValue(string key)

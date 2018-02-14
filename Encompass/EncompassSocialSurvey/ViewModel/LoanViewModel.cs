@@ -1,4 +1,5 @@
 ﻿
+using System;
 namespace EncompassSocialSurvey.ViewModel
 {
     public class LoanViewModel
@@ -14,16 +15,21 @@ namespace EncompassSocialSurvey.ViewModel
         public string CustomerLastName { get; set; }
         public string CustomerEmailId { get; set; }
         public string CustomerInteractionDetails { get; set; }
-        public string EngagementClosedTime { get; set; }
+        public DateTime EngagementClosedTime { get; set; }
         public int ReminderCounts { get; set; }
-        public string LastReminderTime { get; set; }
+        public DateTime LastReminderTime { get; set; }
         public int Status { get; set; }
-        public string CreatedOn { get; set; }
-        public string ModifiedOn { get; set; }
+        public DateTime CreatedOn { get; set; }
+        public DateTime ModifiedOn { get; set; }
         public string LoanNumber { get; set; }
         public string City { get; set; }
         public string State { get; set; }
 
         public int ParticipantType { get; set; }
+
+        public string PropertyAddress { get; set; }
+        public string LoanProcessorName { get; set; }
+        public string LoanProcessorEmail { get; set; }
+
     }
 }

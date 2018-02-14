@@ -319,6 +319,7 @@ public interface CommonConstants
     public static final String SURVEY_CLICKED_COLUMN = "surveyClicked";
     public static final String IS_ABUSIVE_COLUMN = "isAbusive";
     public static final String DEFAULT_MONGO_ID_COLUMN = "_id";
+    public static final String MONGO_CLASS_COLUMN = "_class";
     public static final String LAST_REMINDER_FOR_INCOMPLETE_SURVEY = "lastReminderForIncompleteSurvey";
     public static final String REMINDERS_FOR_INCOMPLETE_SURVEYS = "remindersForIncompleteSurveys";
     public static final String LAST_REMINDER_FOR_SOCIAL_POST = "lastReminderForSocialPost";
@@ -1580,4 +1581,7 @@ public interface CommonConstants
     public static final String SURVEY_RESPONSE_QUESTION = "surveyResponse.question";
     public static final String SURVEY_RESPONSE_QUESTION_TYPE = "surveyResponse.questionType";
     public static final String QUESTION_TYPE_MCQ = "sb-sel-mcq";
+
+    //failed stream message mongo batch size
+    public static final  int FAILED_STREAM_MSGS_BATCH_SIZE = 100;
 }

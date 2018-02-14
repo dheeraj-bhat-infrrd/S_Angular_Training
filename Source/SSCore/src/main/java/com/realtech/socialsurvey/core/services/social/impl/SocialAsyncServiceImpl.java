@@ -258,11 +258,14 @@ public class SocialAsyncServiceImpl implements SocialAsyncService
                 if ( linkedInProfileData != null && linkedInProfileData.getPictureUrls() != null
                     && linkedInProfileData.getPictureUrls().getValues() != null
                     && !linkedInProfileData.getPictureUrls().getValues().isEmpty() ) {
-                    unitSettings.setProfileImageUrl( linkedInProfileData.getPictureUrls().getValues().get( 0 ) );
-                    unitSettings.setProfileImageUrlThumbnail( linkedInProfileData.getPictureUrls().getValues().get( 0 ) );
+                    String photoUrl = uploadImageToCloud( linkedInProfileData.getPictureUrls().getValues().get( 0 ) );
+                    unitSettings.setProfileImageUrl( photoUrl );
+                    unitSettings.setProfileImageUrlThumbnail( photoUrl );
                     profileManagementService.updateProfileImage( collection, unitSettings, unitSettings.getProfileImageUrl() );
                 }
             } catch ( InvalidInputException e ) {
+                LOG.error( e.getMessage(), e );
+            } catch ( Exception e ) {
                 LOG.error( e.getMessage(), e );
             }
         }
@@ -286,4 +289,25 @@ public class SocialAsyncServiceImpl implements SocialAsyncService
         LOG.debug( "Method updateLinkedInProfileImage() called from SocialAsyncServiceImpl" );
         return unitSettings;
     }
+    
+
+    public String uploadImageToCloud(String imageUrl) throws Exception 
+    {
+        String imageName = java.util.UUID.randomUUID().toString();
+        if ( imageUrl.contains( ".png" ) || imageUrl.contains( ".PNG" ) ) {
+            imageName = imageName + ".png";
+        } else if ( imageUrl.contains( ".jpg" ) || imageUrl.contains( ".JPG" ) ) {
+            imageName = imageName + ".jpg";
+        } else if ( imageUrl.contains( ".jpeg" ) || imageUrl.contains( ".JPEG" ) ) {
+            imageName = imageName + ".jpeg";
+        } else if(imageUrl.contains( "media.licdn.com" )){
+            imageName = imageName + ".jpg";
+        }else {
+            LOG.error( "The url given is not a valid image url." );
+            throw new InvalidInputException( "Image format not valid" );
+        }
+        return profileManagementService.copyImage( imageUrl, imageName );
+        
+    }
+
 }

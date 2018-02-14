@@ -12,6 +12,11 @@
   <modified_date>2017&#x2f;06&#x2f;07 23&#x3a;56&#x3a;52.930</modified_date>
     <parameters>
         <parameter>
+            <name>is_manual</name>
+            <default_value>1</default_value>
+            <description/>
+        </parameter>
+        <parameter>
             <name>mongo_host</name>
             <default_value>localhost</default_value>
             <description/>
