@@ -1,6 +1,5 @@
 package com.realtech.socialsurvey.stream.messages;
 
-import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
