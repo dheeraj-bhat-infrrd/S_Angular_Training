@@ -16271,3 +16271,25 @@ $(document).on('click','#stream-feed-selection',function(e){
 	$('#feed-chevron-down').toggle();
 	$('#feed-chevron-up').toggle();
 });
+
+function showAddMonitorPopup(){
+	$('#add-mon-popup').removeClass('hide');
+	
+	$(document).on('blur','#mon-type-txt-box',function(e){
+		e.stopPropagation();
+		if($('#mon-type-txt-box').val() != '' && $('#mon-type-txt-box').val() != undefined && $('#mon-type-txt-box').val() != null){
+			$('#add-mon-save-active').show();
+			$('#add-mon-save-inactive').hide();
+		}else{
+			$('#add-mon-save-active').hide();
+			$('#add-mon-save-inactive').show();
+		}
+	});
+}
+
+function hideAddMonitorPopup(){
+	$('#mon-type-txt-box').val('');
+	$('#add-mon-type-select').attr('data-mon-type',1);
+	$('#add-mon-type-sel-txt').html('Keyword Monitor');
+	$('#add-mon-popup').addClass('hide');
+}
