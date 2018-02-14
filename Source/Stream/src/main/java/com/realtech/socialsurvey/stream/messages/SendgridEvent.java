@@ -1,5 +1,7 @@
 package com.realtech.socialsurvey.stream.messages;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
@@ -16,7 +18,7 @@ public class SendgridEvent
     @JsonProperty ( value = "smtp-id")
     private String smtpId;
     private String event;
-    private String category;
+    private List<String> category;
     @JsonProperty ( value = "sg_event_id")
     private String sgEventId;
     @JsonProperty ( value = "sg_message_id")
@@ -81,13 +83,13 @@ public class SendgridEvent
     }
 
 
-    public String getCategory()
+    public List<String> getCategory()
     {
         return category;
     }
 
 
-    public void setCategory( String category )
+    public void setCategory( List<String> category )
     {
         this.category = category;
     }
