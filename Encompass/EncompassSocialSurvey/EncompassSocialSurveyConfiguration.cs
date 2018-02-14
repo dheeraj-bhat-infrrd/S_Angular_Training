@@ -116,5 +116,12 @@ namespace EncompassSocialSurvey
             }
         }
 
+        public static string fetchCompanyTypeDeterminant
+        {
+            get
+            {
+                return System.Configuration.ConfigurationManager.AppSettings[EncompassSocialSurveyConstant.COMPANY_TYPE_DETERMINANT];
+            }
+        }
     }
 }

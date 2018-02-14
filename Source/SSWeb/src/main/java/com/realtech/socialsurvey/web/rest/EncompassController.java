@@ -61,7 +61,7 @@ public class EncompassController extends AbstractController
     @ResponseBody
     @RequestMapping ( value = "/getcompanycredentials")
     public List<CompanyEncompassInfo> getCompanyCredentials( @QueryParam ( value = "state") String state,
-        @QueryParam ( value = "version") String version )
+        @QueryParam ( value = "version") String version, @QueryParam ( value = "status") String status )
     {
         List<CompanyEncompassInfo> crmInfoList = new ArrayList<CompanyEncompassInfo>();
         LOG.info( "Method to get the encompass credentials for all companies started." );
@@ -76,12 +76,24 @@ public class EncompassController extends AbstractController
 
             List<OrganizationUnitSettings> companyList = organizationManagementService.getCompanyListForEncompass( state, version );
 
+            
+            List<Long> companies = new ArrayList<>();
+            
+            // build company Identifier list
+            for ( OrganizationUnitSettings company : companyList ) {
+            	companies.add( company.getIden() );
+            }
+            
+            // get the list of active companies
+            companies = organizationManagementService.filterCompanyIdsByStatus( companies, status );
 
             for ( OrganizationUnitSettings company : companyList ) {
-                CompanyEncompassInfo companyEncompassInfo = new CompanyEncompassInfo();
-                companyEncompassInfo.setCompanyName( company.getProfileName() );
-                companyEncompassInfo.setEncompassCrmInfo( (EncompassCrmInfo) company.getCrm_info() );
-                crmInfoList.add( companyEncompassInfo );
+            	if( companies.contains(company.getIden() ) ) {
+	                CompanyEncompassInfo companyEncompassInfo = new CompanyEncompassInfo();
+	                companyEncompassInfo.setCompanyName( company.getProfileName() );
+	                companyEncompassInfo.setEncompassCrmInfo( (EncompassCrmInfo) company.getCrm_info() );
+	                crmInfoList.add( companyEncompassInfo );
+            	}
             }
 
         } catch ( NoRecordsFetchedException e ) {

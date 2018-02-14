@@ -3512,4 +3512,18 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.debug( "Method updateSurveyNPSScore finished." );
 	}
+	
+	@Override
+    public void updateSourceDetailInExistingSurveyDetails( SurveyDetails surveyDetails )
+    {
+        String surveyMongoId = surveyDetails.get_id();
+        LOG.info( "Method updateZillowSourceIdInExistingSurveyDetails() to update source id started " );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyMongoId ) );
+        Update update = new Update();
+        update.set( CommonConstants.SURVEY_SOURCE_ID_COLUMN, surveyDetails.getSourceId() );
+        update.set( CommonConstants.SURVEY_SOURCE_COLUMN, surveyDetails.getSource() );
+        mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
+        LOG.info( "Method updateZillowSourceIdInExistingSurveyDetails finished." );
+    }
 }

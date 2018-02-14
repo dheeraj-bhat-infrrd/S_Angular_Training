@@ -36,7 +36,7 @@ namespace EncompassSocialSurvey.Translator
             if (loanVM == null) return null;
 
             Logger.Info("EngagementClosedTime for loan id " + loanVM.SurveySourceId + " is : " + loanVM.EngagementClosedTime);
-            if (string.IsNullOrEmpty(loanVM.EngagementClosedTime) || loanVM.EngagementClosedTime.Equals("//") || loanVM.EngagementClosedTime.Equals("00/00/0000"))
+            if (loanVM.EngagementClosedTime == null)
             {
                 Logger.Debug("EngagementClosedTime for loan " + loanVM.SurveySourceId + " is inappropriate");
                 loanVM.EngagementClosedTime = EncompassSocialSurveyConstant.DEFAULT_ENGAGEMENT_CLOSE_TIME;
@@ -60,14 +60,17 @@ namespace EncompassSocialSurvey.Translator
                     CustomerLastName = loanVM.CustomerLastName,
                     CustomerEmailId = loanVM.CustomerEmailId,
 
-                    EngagementClosedTime = CommonUtility.ConvertStringToDateTime(loanVM.EngagementClosedTime),
+                    EngagementClosedTime = loanVM.EngagementClosedTime,
                     ReminderCounts = loanVM.ReminderCounts,
-                    LastReminderTime = CommonUtility.ConvertStringToDateTime(loanVM.LastReminderTime),
+                    LastReminderTime = loanVM.LastReminderTime,
                     Status = loanVM.Status,
                     CreatedOn = DateTime.Now,
                     State = loanVM.State,
                     City = loanVM.City,
-                    ParticipantType = loanVM.ParticipantType
+                    ParticipantType = loanVM.ParticipantType,
+                    PropertyAddress = loanVM.PropertyAddress,
+                    LoanProcessorName = loanVM.LoanProcessorName,
+                    LoanProcessorEmail = loanVM.LoanProcessorEmail
                 };
             }
             catch (Exception ex)

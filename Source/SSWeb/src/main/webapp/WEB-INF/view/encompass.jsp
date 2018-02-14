@@ -18,12 +18,16 @@
 					<c:set var="buyerAgentName" value="${ appSettings.crm_info.buyerAgentName }" />
 					<c:set var="sellerAgentEmail" value="${ appSettings.crm_info.sellerAgentEmail }" />
 					<c:set var="sellerAgentName" value="${ appSettings.crm_info.sellerAgentName }" />
+					
+					<c:set var="propertyAddress" value="${ appSettings.crm_info.propertyAddress }" />
+					<c:set var="loanProcessorEmail" value="${ appSettings.crm_info.loanProcessorEmail }" />
+					<c:set var="loanProcessorName" value="${ appSettings.crm_info.loanProcessorName }" />
 				</c:if>
 				<form id="encompass-form">
 					<input id="encompass-state" type="hidden" value="${ encompassstate }" />
 					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item">
 						<div class="hm-item-row item-row-OR clearfix float-left">
-							<div class="um-item-row-left text-right">
+							<div class="um-item-row-left width-offset text-right">
 								<spring:message code="label.crm.username.key" />
 							</div>
 							<div class="clearfix float-right st-username-icons">
@@ -39,7 +43,7 @@
 					</div>
 					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item overflow-hidden">
 						<div class="hm-item-row item-row-OR clearfix float-left">
-							<div class="um-item-row-left text-right">
+							<div class="um-item-row-left width-offset text-right">
 								<spring:message code="label.crm.password.key" />
 							</div>
 							<div class="clearfix float-right st-password-icons">
@@ -71,7 +75,7 @@
 					</div>
 					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item">
 						<div class="hm-item-row item-row-OR clearfix float-left">
-							<div class="um-item-row-left text-right">
+							<div class="um-item-row-left width-offset text-right">
 								<spring:message code="label.crm.url.key" />
 							</div>
 							<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
@@ -83,7 +87,7 @@
 					</div>
 					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item overflow-hidden"">
 						<div class="hm-item-row item-row-OR clearfix float-left">
-							<div class="um-item-row-left text-right">
+							<div class="um-item-row-left width-offset text-right">
 								<spring:message code="label.crm.fieldId.key" />
 							</div>
 							<div class="clearfix float-right ">
@@ -102,7 +106,7 @@
 					
 					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item ">
 						<div class="hm-item-row item-row-OR clearfix float-left">
-							<div class="um-item-row-left text-right">
+							<div class="um-item-row-left width-offset text-right">
 								<spring:message code="label.crm.buyerAgentEmail.key" />
 							</div>
 							<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
@@ -114,7 +118,7 @@
 					</div>
 					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item overflow-hidden " >
 						<div class="hm-item-row item-row-OR clearfix float-left">
-							<div class="um-item-row-left text-right">
+							<div class="um-item-row-left width-offset text-right">
 								<spring:message code="label.crm.buyerAgentName.key" />
 							</div>
 							<div class="clearfix float-right ">
@@ -134,7 +138,7 @@
 					
 					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item">
 						<div class="hm-item-row item-row-OR clearfix float-left">
-							<div class="um-item-row-left text-right">
+							<div class="um-item-row-left width-offset text-right">
 								<spring:message code="label.crm.sellerAgentEmail.key" />
 							</div>
 							<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
@@ -146,7 +150,7 @@
 					</div>
 					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item overflow-hidden" >
 						<div class="hm-item-row item-row-OR clearfix float-left">
-							<div class="um-item-row-left text-right">
+							<div class="um-item-row-left width-offset text-right">
 								<spring:message code="label.crm.sellerAgentName.key" />
 							</div>
 							<div class="clearfix float-right ">
@@ -161,10 +165,60 @@
 						</div>
 					</div>
 					
+					<!-- LOAN PROCESSOR NAME -->
+					
+					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item">
+						<div class="hm-item-row item-row-OR clearfix float-left">
+							<div class="um-item-row-left width-offset text-right">
+								<spring:message code="label.crm.loanProcessorName.key" />
+							</div>
+							<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
+								<div class="rfr_icn icn-url en-icn"></div>
+								<input id="loan-processor-name" type="text" class="encompass-url-adj um-item-row-txt um-item-row-txt-OR en-user-name en-form-align-left" placeholder="Loan Processor Name" name="loan-processor-name" value="${loanProcessorName}">
+								<div id="encompass-url-error" class="hm-item-err-2"></div>
+							</div>
+						</div>
+					</div>
+					
+					
+					<!-- LOAN PROCESSOR EMAIL -->
+					
+					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item overflow-hidden" >
+						<div class="hm-item-row item-row-OR clearfix float-left">
+							<div class="um-item-row-left width-offset text-right">
+								<spring:message code="label.crm.loanProcessorEmail.key" />
+							</div>
+							<div class="clearfix float-right ">
+								<div class="um-item-row-icon margin-left-0"></div>
+								<div class="um-item-row-icon margin-left-0"></div>
+							</div>
+							<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
+								<div class="rfr_icn icn-field-id en-icn"></div>
+								<input id="loan-processor-email" type="text" class="um-item-row-txt um-item-row-txt-OR en-form-align-left" placeholder="Loan Processor Email" name="loan-processor-email" value="${loanProcessorEmail}">
+								<div id="encompass-fieldId-error" class="hm-item-err-2"></div>
+							</div>
+						</div>
+					</div>
+					
+					<!-- PROPERTY ADDRESS -->
+					
+					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item">
+						<div class="hm-item-row item-row-OR clearfix float-left">
+							<div class="um-item-row-left width-offset text-right">
+								<spring:message code="label.crm.propertyAddress.key" />
+							</div>
+							<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
+								<div class="rfr_icn icn-url en-icn"></div>
+								<input id="property-address" type="text" class="encompass-url-adj um-item-row-txt um-item-row-txt-OR en-user-name en-form-align-left" placeholder="Property Address" name="property-address" value="${propertyAddress}">
+								<div id="encompass-url-error" class="hm-item-err-2"></div>
+							</div>
+						</div>
+					</div>
+					
 					<!-- ENCOMPASS SDK VERSION -->
 					
 					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item en-botttom-padding overflow-hidden">
-							<div class="um-item-row-left text-right">SDK Version</div>
+							<div class="um-item-row-left width-offset text-right">SDK Version</div>
 							<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
 								<select id="sdk-version-selection-list" name="sdk-version-selection-list" class="float-left app-stng-sel-item">
 								<c:forEach items="${encompassVersionList}" var="version">
