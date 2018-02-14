@@ -56,8 +56,8 @@ public class SocialFeedServiceImpl implements SocialFeedService
     }
 
     @Override
-    public SocialResponseObject<?> getSocialPost(String postId) {
-        return mongoSocialFeedDao.getSocialPost(postId);
+    public boolean isSocialPostSaved(String postId) {
+        return mongoSocialFeedDao.isSocialPostSaved(postId);
     }
 
 }

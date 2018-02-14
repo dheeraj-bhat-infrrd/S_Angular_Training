@@ -1,8 +1,6 @@
 package com.realtech.socialsurvey.api.controllers;
 
 import com.realtech.socialsurvey.api.exceptions.SSApiException;
-import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
-import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
 
 import com.realtech.socialsurvey.core.entities.Keyword;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokenResponse;
@@ -179,13 +177,13 @@ public class SocialMonitorController
 
     @RequestMapping( value = "/feeds/postId/{postId}", method = RequestMethod.GET)
     @ApiOperation(value = "Fetches the socialpost for given postId")
-    public ResponseEntity<?> getSocialPost(@PathVariable ( "postId" ) String postId,
-                                           HttpServletRequest request) throws SSApiException {
-            LOGGER.info( "SocialMonitorController.getSocialPost started" );
+    public ResponseEntity<?> isSocialPostSaved(@PathVariable ( "postId" ) String postId,
+                                               HttpServletRequest request) throws SSApiException {
+            LOGGER.info( "SocialMonitorController.isSocialPostSaved started" );
             // gets social post with given postId
-            SocialResponseObject<?> post = socialFeedService.getSocialPost(postId);
-            LOGGER.info( "SocialMonitorController.getSocialPost completed successfully" );
-            return new ResponseEntity<>( post, HttpStatus.OK );
+            boolean result = socialFeedService.isSocialPostSaved(postId);
+            LOGGER.info( "SocialMonitorController.isSocialPostSaved completed successfully" );
+            return new ResponseEntity<>( result, HttpStatus.OK );
     }
 
 }

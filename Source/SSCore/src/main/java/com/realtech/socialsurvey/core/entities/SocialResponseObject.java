@@ -52,6 +52,7 @@ public class SocialResponseObject<T> implements Serializable
     private long branchId;
     private long agentId;
 
+
     private int hash;
     private long duplicateCount;
     private List<String> foundKeywords;
@@ -261,14 +262,6 @@ public class SocialResponseObject<T> implements Serializable
         this.actionHistory = actionHistory;
     }
 
-    public boolean isRetried() {
-        return isRetried;
-    }
-
-    public void setRetried(boolean retried) {
-        isRetried = retried;
-    }
-
     public long getUpdatedTime()
     {
         return updatedTime;
@@ -290,6 +283,14 @@ public class SocialResponseObject<T> implements Serializable
     public void setCreatedTime( long createdTime )
     {
         this.createdTime = createdTime;
+    }
+
+    public boolean isRetried() {
+        return isRetried;
+    }
+
+    public void setIsRetried(boolean retried) {
+        isRetried = retried;
     }
 
     @Override

@@ -39,5 +39,5 @@ public interface SocialFeedService
      * @param postId
      * @return
      */
-    SocialResponseObject<?> getSocialPost(String postId);
+    boolean isSocialPostSaved(String postId);
 }

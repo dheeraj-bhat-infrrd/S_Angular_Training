@@ -10,5 +10,5 @@ public interface MongoSocialFeedDao
 
     long updateDuplicateCount(int hash, long companyId, long duplicateCount);
 
-    SocialResponseObject<?> getSocialPost(String postId);
+    boolean isSocialPostSaved(String postId);
 }

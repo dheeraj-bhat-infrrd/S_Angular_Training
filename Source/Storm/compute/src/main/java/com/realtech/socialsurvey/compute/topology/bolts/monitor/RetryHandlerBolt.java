@@ -1,6 +1,8 @@
 package com.realtech.socialsurvey.compute.topology.bolts.monitor;
 
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
+import com.realtech.socialsurvey.compute.services.FailedMessagesService;
+import com.realtech.socialsurvey.compute.services.impl.FailedMessagesServiceImpl;
 import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBoltWithAck;
 import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.tuple.Fields;
@@ -22,12 +24,21 @@ public class RetryHandlerBolt extends BaseComputeBoltWithAck{
         boolean success = input.getBooleanByField("isSuccess");
         SocialResponseObject<?> post = (SocialResponseObject<?>) input.getValueByField("post");
 
-        if(input.getSourceStreamId().equals("RETRY_STREAM")){
+        FailedMessagesService failedMessagesService = new FailedMessagesServiceImpl();
+
+        if(post != null && input.getSourceStreamId().equals("RETRY_STREAM")){
             if(success && post.isRetried()){
-                //TODO delete from mongo
-            }
-            else if(!success && post.isRetried()){
-                //TODO update the retryCount
+                int nRemoved = failedMessagesService.deleteFailedSocialPost(post.getPostId());
+                if(nRemoved == 1)
+                    LOG.info("SocialPost with postId {} has been sucessfully deleted", post.getPostId());
+                else
+                    LOG.error("Something went wrong while deleting socialpost having postId {}", post.getPostId());
+            } else if(!success && post.isRetried()){
+                int updatedCount = failedMessagesService.updateFailedSocialPostRetryCount(post.getPostId());
+                if(updatedCount == 1)
+                    LOG.info("SocialPost retrycount with postId {} has been sucessfully incremented by 1", post.getPostId());
+                else
+                    LOG.error("Something went wrong while incrementing socialpost retryCount having postId {}", post.getPostId());
             }
         }
 

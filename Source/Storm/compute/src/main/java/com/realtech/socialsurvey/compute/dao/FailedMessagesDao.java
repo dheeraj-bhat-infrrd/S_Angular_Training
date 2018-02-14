@@ -44,4 +44,18 @@ public interface FailedMessagesDao
      * @param randomUUID
      */
     int updatedFailedEmailMessageRetryCount(String randomUUID);
+
+    /**
+     * Deletes temporary failed social post
+     * @param postId
+     * @return
+     */
+    int deleteFailedSocialPost(String postId);
+
+    /**
+     * Updated retryCount of temporary failed social post
+     * @param postId
+     * @return
+     */
+    int updateFailedSocialPostRetryCount(String postId);
 }

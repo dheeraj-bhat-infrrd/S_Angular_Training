@@ -1,19 +1,5 @@
 package com.realtech.socialsurvey.compute.topology.bolts.monitor;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.storm.topology.OutputFieldsDeclarer;
-import org.apache.storm.tuple.Fields;
-import org.apache.storm.tuple.Tuple;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.realtech.socialsurvey.compute.dao.RedisCompanyKeywordsDao;
 import com.realtech.socialsurvey.compute.dao.impl.RedisCompanyKeywordsDaoImpl;
 import com.realtech.socialsurvey.compute.entities.Keyword;
@@ -22,15 +8,23 @@ import com.realtech.socialsurvey.compute.entities.TrieNode;
 import com.realtech.socialsurvey.compute.entities.response.ActionHistory;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.enums.ActionHistoryType;
-import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBolt;
-import redis.clients.jedis.exceptions.JedisException;
+import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBoltWithAck;
+import org.apache.commons.lang.StringUtils;
+import org.apache.storm.topology.OutputFieldsDeclarer;
+import org.apache.storm.tuple.Fields;
+import org.apache.storm.tuple.Tuple;
+import org.apache.storm.tuple.Values;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 
 /**
  * @author manish
  *
  */
-public class FilterSocialPostBolt extends BaseComputeBolt
+public class FilterSocialPostBolt extends BaseComputeBoltWithAck
 {
     private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger( FilterSocialPostBolt.class );
@@ -40,40 +34,41 @@ public class FilterSocialPostBolt extends BaseComputeBolt
 
     private Map<Long, TrieNode> companyTrie = new HashMap<>();
 
-    private RedisCompanyKeywordsDao redisCompanyKeywordsDao = new RedisCompanyKeywordsDaoImpl();
+    private  RedisCompanyKeywordsDao redisCompanyKeywordsDao = new RedisCompanyKeywordsDaoImpl();
 
 
     @Override
-    public void execute( Tuple input )
+    public void executeTuple( Tuple input )
     {
         LOG.info( "Executing filter social post bolt" );
         SocialResponseObject<?> post = (SocialResponseObject<?>) input.getValueByField( "post" );
         SocialResponseType socialResponseType = (SocialResponseType) input.getValueByField( "type" );
         long companyId = input.getLongByField( "companyId" );
-
-        try{
-            if ( post != null && post.getText() != null ) {
-                String text = post.getText();
-                List<String> foundKeyWords = null;
-                TrieNode root = getTrieForCompany( companyId );
-                foundKeyWords = findPhrases( root, text );
-                if ( !foundKeyWords.isEmpty() ) {
-                    post.setFoundKeywords( foundKeyWords );
-                    post.setFlagged( Boolean.TRUE );
-                    if(post.getActionHistory() == null){
-                        post.setActionHistory( new ArrayList<>() );
-                    }
-
-                    post.getActionHistory().add(  getFlaggedActionHistory( foundKeyWords ));
+        String postId = null;
+        if ( post != null && post.getText() != null ) {
+            String text = post.getText();
+            postId = post.getPostId();
+            List<String> foundKeyWords;
+            TrieNode root = getTrieForCompany( companyId );
+            foundKeyWords = findPhrases( root, text );
+            if ( !foundKeyWords.isEmpty() ) {
+                post.setFoundKeywords( foundKeyWords );
+                post.setFlagged( Boolean.TRUE );
+                if(post.getActionHistory() == null){
+                    post.setActionHistory( new ArrayList<>() );
                 }
-                LOG.debug( "Emitting tuple with companyId {}, post {}, foundKeyWords {}.", companyId, post, foundKeyWords );
+
+                post.getActionHistory().add(  getFlaggedActionHistory( foundKeyWords ));
             }
-            _collector.emit( input, Arrays.asList( companyId, post, socialResponseType ) );
-            _collector.ack( input );
         }
-       catch (JedisException e){
-            //logic to save into mongo
-       }
+        LOG.info( "Emitting tuple with post having postId = {}",  postId);
+        _collector.emit( input, Arrays.asList( companyId, post, socialResponseType ) );
+
+    }
+
+    @Override
+    public List<Object> prepareTupleForFailure() {
+        return new Values(0, null, null);
     }
 
 
@@ -124,11 +119,12 @@ public class FilterSocialPostBolt extends BaseComputeBolt
     private TrieNode getCompanyKeywordsAndConstructTrie( long companyIden )
     {
         LOG.debug( "Inside getCompanyKeywordsAndConstructTrie method. companyId: {}", companyIden );
+        LOG.info("is null {}", redisCompanyKeywordsDao == null);
         List<Keyword> keywordListResponse = redisCompanyKeywordsDao.getCompanyKeywordsForCompanyId( companyIden );
         long keywordModifiedOn = redisCompanyKeywordsDao.getKeywordModifiedOn( companyIden );
 
+        companyTrie.put( companyIden, new TrieNode() );
         if ( keywordListResponse != null && !keywordListResponse.isEmpty() ) {
-            companyTrie.put( companyIden, new TrieNode() );
             for ( Keyword keyword : keywordListResponse ) {
                 addPhrase( companyTrie.get( companyIden ), keyword.getPhrase(), keyword.getId() );
             }

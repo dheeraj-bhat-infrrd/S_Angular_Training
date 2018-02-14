@@ -75,10 +75,11 @@ public class SocialPostFilterTopologyStarterHelper extends TopologyStarterHelper
         builder.setBolt( "FilterSocialPostBolt", new FilterSocialPostBolt(), 1 ).fieldsGrouping( "CompanyGroupingBolt",
             new Fields( "companyId" ) );
         builder.setBolt( "SaveFeedsToMongoBolt", new SaveFeedsToMongoBolt(), 1 ).shuffleGrouping( "FilterSocialPostBolt" );
-        builder.setBolt("UpdateSocialPostDuplicateCount", new UpdateSocialPostDupliateCountBolt(), 1)
+        builder.setBolt("UpdateSocialPostDuplicateCount", new UpdateSocialPostDuplicateCountBolt(), 1)
                 .shuffleGrouping("SaveFeedsToMongoBolt", "SUCCESS_STREAM");
         builder.setBolt("RetryBolt", new RetryHandlerBolt(), 1)
-                .shuffleGrouping("SaveFeedsToMongoBolt", "RETRY_STREAM");
+                .shuffleGrouping("SaveFeedsToMongoBolt", "RETRY_STREAM")
+                .shuffleGrouping("UpdateSocialPostDuplicateCount", "RETRY_STREAM");
 
         return builder.createTopology();
     }

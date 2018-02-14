@@ -55,6 +55,7 @@ public class FailedMessagesServiceImpl implements FailedMessagesService
         LOG.debug( "Adding a failed email message {}", post );
         LOG.trace( "Error encountered: {}", thrw );
         FailedSocialPost failedSocialPost = new FailedSocialPost();
+        failedSocialPost.setMessageType(FailedMessageConstants.SOCIAL_POST_MESSAGE);
         failedSocialPost.setRetryCounts( 0 );
         failedSocialPost.setRetrySuccessful( false );
         failedSocialPost.setWillRetry( false );
@@ -140,5 +141,18 @@ public class FailedMessagesServiceImpl implements FailedMessagesService
         LOG.debug("Updating failed email message retry count with randonUUID {}", randomUUID);
         return failedEmailMessagesDao.updatedFailedEmailMessageRetryCount(randomUUID);
     }
+
+    @Override
+    public int deleteFailedSocialPost(String postId) {
+        LOG.debug("Deleting temporary failed social post with postId {}", postId);
+        return failedEmailMessagesDao.deleteFailedSocialPost(postId);
+    }
+
+    @Override
+    public int updateFailedSocialPostRetryCount(String postId) {
+        LOG.debug("Updating failed social post retryCount having postId {}", postId);
+        return failedEmailMessagesDao.updateFailedSocialPostRetryCount(postId);
+    }
+
 
 }

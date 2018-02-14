@@ -51,4 +51,8 @@ public interface FailedMessagesService
     int deleteFailedEmailMessage(String emailMessage);
 
     int updateFailedEmailMessageRetryCount(String randomUUID);
+
+    int deleteFailedSocialPost(String postId);
+
+    int updateFailedSocialPostRetryCount(String postId);
 }

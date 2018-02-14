@@ -65,12 +65,12 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
     }
 
     @Override
-    public SocialResponseObject<?> getSocialPost(String postId) {
+    public boolean isSocialPostSaved(String postId) {
         if(LOG.isDebugEnabled()) {
             LOG.debug("Fetching posts with postId {} ", postId);
         }
         Query query = new Query().addCriteria(Criteria.where(POST_ID).is(postId));
-        return mongoTemplate.findOne(query, SocialResponseObject.class, SOCIAL_FEED_COLLECTION);
+        return mongoTemplate.exists(query, SocialResponseObject.class, SOCIAL_FEED_COLLECTION);
     }
 
     @Override

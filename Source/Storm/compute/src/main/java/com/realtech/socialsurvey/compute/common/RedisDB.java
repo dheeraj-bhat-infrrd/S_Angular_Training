@@ -27,9 +27,6 @@ public class RedisDB
     public static final String DEFAULT_HOST = "127.0.0.1";
     public static final int DEFAULT_PORT = 6379;
     public static final String COMPANYKEYWORDS_KEY_PREFIX = "companykeywords:";
-    public static final String SSAPI_RETRY_COUNT = "ssapiretrycount";
-    public static final String SSAPI_BREAKER_STATUS = "ssapibreakerstatus";
-    public static final String SSAPI_BREAKER_ON_TIME = "ssapibreakerontime";
     private static JedisPool pool;
     private static String host;
     private static int port; // 6379 for NonSSL, 6380 for SSL
