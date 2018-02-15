@@ -125,11 +125,11 @@ public class JobLogDetailsManagementImpl implements JobLogDetailsManagement
         jobLogDetails.setStatus(status);
         jobLogDetails.setJobStartTime(new Timestamp(System.currentTimeMillis()));
         jobLogDetails.setJobUuid((UUID.randomUUID()).toString());
-        //long jobLogId = jobLogDetailsDao.insertJobLog(jobLogDetails);
-        recalEtl(entityId, 10);
+        long jobLogId = jobLogDetailsDao.insertJobLog(jobLogDetails);
+        recalEtl(entityId, jobLogId);
         LOG.info("THE RETURN OF SSH{}");
         LOG.debug( "method to fetch the job-log details for entity, getLastRunForEntity() finished." );
-        return 10;
+        return jobLogId;
     }
     
     @Override 
