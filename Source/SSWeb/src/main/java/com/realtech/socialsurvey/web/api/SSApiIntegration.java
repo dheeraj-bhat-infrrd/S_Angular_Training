@@ -2,7 +2,11 @@ package com.realtech.socialsurvey.web.api;
 
 
 
-import com.realtech.socialsurvey.core.entities.JobLogDetailsResponse;
+import java.util.List;
+
+import com.realtech.socialsurvey.core.entities.Keyword;
+import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
+import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
 import com.realtech.socialsurvey.web.api.entities.AccountRegistrationAPIRequest;
 import com.realtech.socialsurvey.web.api.entities.CaptchaAPIRequest;
@@ -219,4 +223,24 @@ public interface SSApiIntegration
     
     @GET ( "/v1/lastsuccessfuletltime" )
     Response getLastSuccessfulEtlTimeApi();
+    
+    @GET("/v1/companies/{companyId}/keywords")
+    public Response getCompanyKeywords(@Path ( "companyId") long companyId, @Query("startIndex") int startIndex, @Query("limit") int limit,  @Query("monitorType") String monitorType);
+    
+    @POST("/v1/companies/{companyId}/keywords")
+    public Response addKeywordsToCompany(@Path ( "companyId") long companyId, @Body List<Keyword> keywordsRequest);
+    
+    @GET( "/v1/showsocialfeeds")
+    public Response showStreamSocialPosts(@Query("profileId") long profileId, @Query("profileLevel") String profileLevel, @Query("startIndex") int startIndex, @Query("limit") int limit,
+    		@Query("status") String status, @Query("flag") boolean flag, @Query("feedtype") List<String> feedtype);
+    
+    @PUT( "/v1/updatesocialfeeds/action")
+    public Response saveSocialFeedsForAction(@Body SocialFeedsActionUpdate socialFeedsActionUpdate,
+			@Query("companyId") long companyId);
+    
+    @GET("/v1/socialfeedsmacro")
+    public Response showMacrosForEntity(@Query("companyId") long companyId);
+    
+    @POST("/v1/updateMacrosForEntity")
+    public Response updateMacrosForEntity(@Body SocialMonitorMacro socialMonitorMacro, @Query("companyId") long companyId);
 }
