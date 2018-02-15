@@ -2,9 +2,12 @@ package com.realtech.socialsurvey.compute.entities;
 
 import java.io.Serializable;
 
+import com.realtech.socialsurvey.compute.enums.ProfileType;
+
+
 /**
- * @author manish
  *Entity for social media response
+ *@author manish
  */
 public class SocialMediaTokenResponse implements Serializable
 {
@@ -12,7 +15,7 @@ public class SocialMediaTokenResponse implements Serializable
     private long iden;
     private long companyId;
     private SocialMediaTokens socialMediaTokens;
-    private String profileType;
+    private ProfileType profileType;
 
 
     public long getIden()
@@ -33,18 +36,6 @@ public class SocialMediaTokenResponse implements Serializable
     }
 
 
-    public String getProfileType()
-    {
-        return profileType;
-    }
-
-
-    public void setProfileType( String profileType )
-    {
-        this.profileType = profileType;
-    }
-
-
     public void setSocialMediaTokens( SocialMediaTokens socialMediaTokens )
     {
         this.socialMediaTokens = socialMediaTokens;
@@ -62,4 +53,15 @@ public class SocialMediaTokenResponse implements Serializable
         this.companyId = companyId;
     }
 
+
+    public ProfileType getProfileType()
+    {
+        return profileType;
+    }
+
+
+    public void setProfileType( ProfileType profileType )
+    {
+        this.profileType = profileType;
+    }
 }

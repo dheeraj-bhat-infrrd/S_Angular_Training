@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.compute.entities.response;
 import java.io.Serializable;
 import java.util.List;
 
+import com.realtech.socialsurvey.compute.enums.ProfileType;
 import com.realtech.socialsurvey.compute.enums.SocialFeedStatus;
 import com.realtech.socialsurvey.compute.enums.SocialFeedType;
 
@@ -48,6 +49,7 @@ public class SocialResponseObject<T> implements Serializable
     private long regionId;
     private long branchId;
     private long agentId;
+    private ProfileType profileType;
 
     private int hash;
     private long duplicateCount;
@@ -281,6 +283,12 @@ public class SocialResponseObject<T> implements Serializable
     {
         this.actionHistory = actionHistory;
     }
+    
+    public ProfileType getProfileType()
+    {
+        return profileType;
+    }
+
 
     public boolean isRetried() {
         return isRetried;
@@ -288,6 +296,11 @@ public class SocialResponseObject<T> implements Serializable
 
     public void setRetried(boolean retried) {
         isRetried = retried;
+    }
+
+    public void setProfileType( ProfileType profileType )
+    {
+        this.profileType = profileType;
     }
 
     @Override
