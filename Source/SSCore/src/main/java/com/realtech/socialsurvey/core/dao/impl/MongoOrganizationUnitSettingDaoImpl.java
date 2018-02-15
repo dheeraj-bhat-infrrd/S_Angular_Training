@@ -115,7 +115,6 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_INCLUDE_FOR_TRANSACTION_MONITOR = "includeForTransactionMonitor";
     public static final String KEY_FILTER_KEYWORDS = "filterKeywords";
 
-
     public static final String KEY_DIGEST_RECIPIENTS = "digestRecipients";
     public static final String KEY_ENTITY_ALERT_DETAILS = "entityAlertDetails";
     public static final String KEY_IS_ERROR_ALERT = "isErrorAlert";
@@ -159,7 +158,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         LOG.debug( "Fetch organization unit settings from {} for id: {}" , collectionName, identifier );
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_IDENTIFIER ).is( identifier ) );
-        query.fields().exclude( KEY_LINKEDIN_PROFILEDATA );
+        query.fields().exclude( KEY_LINKEDIN_PROFILEDATA );	
         OrganizationUnitSettings settings = mongoTemplate.findOne( query, OrganizationUnitSettings.class, collectionName );
         setCompleteUrlForSettings( settings, collectionName );
         return settings;
@@ -1217,4 +1216,17 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
        
         return settingsList;
     }
+    
+//    @Override
+//    public OrganizationUnitSettings fetchOrganizationUnitSettingsByIdForKeywords( long identifier, String collectionName )
+//    {
+//        LOG.debug( "Fetch organization unit settings from {} for id: {}" , collectionName, identifier );
+//        Query query = new Query();
+//        query.addCriteria( Criteria.where( KEY_IDENTIFIER ).is( identifier ) );
+//        query.fields().include(KEY_FILTER_KEYWORDS).exclude( CommonConstants.DEFAULT_MONGO_ID_COLUMN);	
+//        
+//        OrganizationUnitSettings settings = mongoTemplate.findOne( query, OrganizationUnitSettings.class, collectionName );
+//        setCompleteUrlForSettings( settings, collectionName );
+//        return settings;
+//    }
 }

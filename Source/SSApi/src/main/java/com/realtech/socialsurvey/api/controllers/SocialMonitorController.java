@@ -1,7 +1,7 @@
 package com.realtech.socialsurvey.api.controllers;
 
 import com.realtech.socialsurvey.api.exceptions.SSApiException;
-
+import com.realtech.socialsurvey.core.entities.FilterKeywordsResponse;
 import com.realtech.socialsurvey.core.entities.Keyword;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.core.entities.SocialResponseObject;
@@ -101,15 +101,15 @@ public class SocialMonitorController
 
     @RequestMapping ( value = "/companies/{companyId}/keywords", method = RequestMethod.GET)
     @ApiOperation ( value = "Initiate account registration")
-    public ResponseEntity<?> getCompanyKeywords( @PathVariable ( "companyId") long companyId, HttpServletRequest request )
+    public ResponseEntity<?> getCompanyKeywords( @PathVariable ( "companyId") long companyId, int startIndex, int limit, @RequestParam(value = "monitorType", required = false) String monitorType)
             throws SSApiException
     {
         try {
             LOGGER.info( "SocialMonitorController.getCompanyKeywords started" );
             // get company setting for login user
-            List<Keyword> filterKeywords = organizationManagementService.getCompanyKeywordsByCompanyId( companyId );
+            FilterKeywordsResponse filterKeywordsResponse = organizationManagementService.getCompanyKeywordsByCompanyId( companyId, startIndex, limit, monitorType);
             LOGGER.info( "SocialMonitorController.getCompanyKeywords completed successfully" );
-            return new ResponseEntity<>( filterKeywords, HttpStatus.OK );
+            return new ResponseEntity<>( filterKeywordsResponse, HttpStatus.OK );
         } catch ( NonFatalException e ) {
             throw new SSApiException( e.getMessage(), e.getErrorCode() );
         }

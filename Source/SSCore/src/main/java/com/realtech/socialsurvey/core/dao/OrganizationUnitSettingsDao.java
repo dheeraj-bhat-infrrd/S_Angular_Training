@@ -9,6 +9,7 @@ import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
+import com.realtech.socialsurvey.core.entities.Keyword;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
 import com.realtech.socialsurvey.core.entities.ProfileUrlEntity;
@@ -44,6 +45,8 @@ public interface OrganizationUnitSettingsDao
      * Fetches the organization unit settings for the given identifier and collection name
      * 
      * @param identifier
+     * @param limit 
+     * @param startIndex 
      * @param collectionName
      * @return
      */
@@ -305,4 +308,6 @@ public interface OrganizationUnitSettingsDao
 
 
     public List<FeedIngestionEntity> getAllCompanyIdWithSocialMediaTokens( String collectionName, int skipCount, int numOfRecords );
+    
+        
 }

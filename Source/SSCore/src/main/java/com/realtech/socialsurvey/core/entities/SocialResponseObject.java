@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.entities;
 
 import java.io.Serializable;
+
 import java.util.List;
 
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -117,7 +118,6 @@ public class SocialResponseObject<T> implements Serializable
     {
         this.picture = picture;
     }
-
 
     public String getOwnerName()
     {
@@ -318,4 +318,5 @@ public class SocialResponseObject<T> implements Serializable
                 ", isRetried=" + isRetried +
                 '}';
     }
+
 }

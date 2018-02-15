@@ -568,4 +568,6 @@ public interface EmailServices
 
 
     public void sendEmailToUploaderForSuccessfulSurveyCsvUpload( SurveyCsvInfo csvInfo, String results ) throws InvalidInputException, UndeliveredEmailException;
+    
+    public void sendSocialMonitorActionMail(String recipientMailId, String recipientName, String mailBody) throws InvalidInputException, UndeliveredEmailException;
 }

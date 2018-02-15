@@ -3,7 +3,6 @@ package com.realtech.socialsurvey.compute.entities.response;
 import com.realtech.socialsurvey.compute.enums.ActionHistoryType;
 
 import java.io.Serializable;
-import java.util.Date;
 
 
 /**
@@ -14,7 +13,7 @@ import java.util.Date;
 public class ActionHistory implements Serializable
 {
     private static final long serialVersionUID = 1L;
-    private Date createdDate;
+    private long createdDate;
     private String ownerName;
     private String text;
     private ActionHistoryType actionType;
@@ -55,13 +54,13 @@ public class ActionHistory implements Serializable
     }
     
 
-    public Date getCreatedDate()
+    public long getCreatedDate()
     {
         return createdDate;
     }
 
 
-    public void setCreatedDate( Date createdDate )
+    public void setCreatedDate( long createdDate )
     {
         this.createdDate = createdDate;
     }
