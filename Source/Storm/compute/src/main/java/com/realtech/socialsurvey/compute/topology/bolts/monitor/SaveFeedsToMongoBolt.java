@@ -2,7 +2,6 @@ package com.realtech.socialsurvey.compute.topology.bolts.monitor;
 
 
 import com.realtech.socialsurvey.compute.common.SSAPIOperations;
-import com.realtech.socialsurvey.compute.entities.SocialResponseType;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.services.FailedMessagesService;
 import com.realtech.socialsurvey.compute.services.api.APIIntegrationException;
@@ -14,7 +13,6 @@ import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.rmi.runtime.Log;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -53,8 +51,11 @@ public class SaveFeedsToMongoBolt extends BaseComputeBoltWithAck
                     isSuccess = true;
                     addSocialPostToMongo(socialPost);
                     _collector.emit("RETRY_STREAM", input, new Values(isSuccess, socialPost));
+                } else if(isPostAlreadySaved && socialPost.isRetried()) {
+                    LOG.info("Social post having postId = {} was already saved in mongo.But duplicateCount not updated.", postId);
+                    isSuccess = true;
                 } else
-                    LOG.info("Social post having postId = {} was already saved in mongo");
+                    LOG.warn("Duplicate post with postId {} !!! Hence not saving to mongo", postId);
             } catch (IOException | APIIntegrationException e) {
                 //save the feed into mongo as temporary exception if it happened for first time
                 LOG.error("Exception occured", e.getMessage());
@@ -69,7 +70,7 @@ public class SaveFeedsToMongoBolt extends BaseComputeBoltWithAck
         } else {
             LOG.warn( "Social post is null" );
         }
-        LOG.info( "Emitting message wih socialPost having postId {} to UpdateSocialPostDuplicateCount ", postId );
+        LOG.info( "Emitting message wih socialPost having postId = {}, isSuccess = {} to UpdateSocialPostDuplicateCount ", postId , isSuccess);
         _collector.emit( "SUCCESS_STREAM", input, Arrays.asList(isSuccess, companyId, socialPost ) );
     }
 

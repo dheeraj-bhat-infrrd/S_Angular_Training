@@ -119,7 +119,6 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
     private TrieNode getCompanyKeywordsAndConstructTrie( long companyIden )
     {
         LOG.debug( "Inside getCompanyKeywordsAndConstructTrie method. companyId: {}", companyIden );
-        LOG.info("is null {}", redisCompanyKeywordsDao == null);
         List<Keyword> keywordListResponse = redisCompanyKeywordsDao.getCompanyKeywordsForCompanyId( companyIden );
         long keywordModifiedOn = redisCompanyKeywordsDao.getKeywordModifiedOn( companyIden );
 

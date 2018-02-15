@@ -46,19 +46,19 @@ public class UpdateSocialPostDuplicateCountBolt extends BaseComputeBoltWithAck {
                     Optional<Long> updatedPosts = updateSocialPostDuplicateCount(hash, companyId, duplicateCount.get());
                     if (updatedPosts.isPresent() && updatedPosts.get() == duplicateCount.get()) {
                         isSuccess = true;
-                        LOG.info(" Total {} docs were successfully updated having hash {} ", updatedPosts.get(), hash);
+                        LOG.info(" Total {} docs were successfully updated for having hash {} and postId {} ", updatedPosts.get(), hash, socialPost.getPostId());
                         _collector.emit("RETRY_STREAM", tuple, new Values(isSuccess, socialPost));
                     } else {
-                        LOG.warn("Something went wrong while updating duplicateCount !!! ");
+                        LOG.warn("Something went wrong while updating duplicateCount of post having postId {} !!! ", socialPost.getPostId());
                         //insert as a permanent failure
                         failedMessagesService.insertPermanentlyFailedSocialPost(socialPost,
-                                new FatalException("DuplicateCount and updated document count donot match"));
+                                new FatalException("DuplicateCount and updated document count do not match"));
                     }
                 } else if (duplicateCount.isPresent() && duplicateCount.get() == null) {
-                    LOG.warn("Social Post with hash {} is not present in mongo !!! Something went wrong !!!");
+                    LOG.warn("Social Post with hash {} and postId {} is not present in mongo !!! Something went wrong !!!", socialPost.getPostId(), hash);
                     //insert as a permanent failure
                     failedMessagesService.insertPermanentlyFailedSocialPost(socialPost,
-                            new FatalException("Social Post with hash {} is not present in mongo !!! Something went wrong !!!"));
+                            new FatalException("Social Post is not present in mongo !!! Something went wrong !!!"));
                 }
             } catch (IOException | APIIntegrationException e ) {
                 if(!socialPost.isRetried()){
