@@ -74,7 +74,7 @@ public class FilterSocialPostBolt extends BaseComputeBolt
     private ActionHistory getFlaggedActionHistory( List<String> foundKeyWords )
     {
         ActionHistory actionHistory = new ActionHistory();
-        actionHistory.setCreatedDate( new Date() );
+        actionHistory.setCreatedDate( new Date().getTime() );
         actionHistory.setActionType( ActionHistoryType.FLAGGED );
         actionHistory.setText( "The post was <b>Flagged</b> for matching <b>" + String.join( ",", foundKeyWords )  + "</b>");
         return actionHistory;

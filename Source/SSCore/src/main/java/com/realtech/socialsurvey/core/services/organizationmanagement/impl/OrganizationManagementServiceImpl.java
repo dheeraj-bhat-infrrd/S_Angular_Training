@@ -47,7 +47,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.FilterKeywordsComparator;
 import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
+import com.realtech.socialsurvey.core.commons.SocialPostsComparator;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
@@ -82,6 +84,7 @@ import com.realtech.socialsurvey.core.entities.Event;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
 import com.realtech.socialsurvey.core.entities.FileUpload;
+import com.realtech.socialsurvey.core.entities.FilterKeywordsResponse;
 import com.realtech.socialsurvey.core.entities.HierarchySettingsCompare;
 import com.realtech.socialsurvey.core.entities.Keyword;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
@@ -91,6 +94,7 @@ import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.MailIdSettings;
+import com.realtech.socialsurvey.core.entities.MonitorType;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
@@ -995,6 +999,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         Keyword companyFilterKeyword = companyFilterKeywords.get( idIndex );
                         companyFilterKeyword.setModifiedOn( createdtime );
                         companyFilterKeyword.setPhrase( keyword.getPhrase() );
+                        companyFilterKeyword.setMonitorType(keyword.getMonitorType());
                     }
                 } else {
 
@@ -1013,6 +1018,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         keywordNew.setPhrase( keyword.getPhrase() );
                         keywordNew.setId( UUID.randomUUID().toString() );
                         keywordNew.setStatus( 1 );
+                        keywordNew.setMonitorType(keyword.getMonitorType());
                         companyFilterKeywords.add( keywordNew );
                     }
                 }
@@ -1100,20 +1106,59 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     /* (non-Javadoc)
      * @see com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService#getCompanyKeywordsByCompanyId(long)
      */
-    @Override
-    public List<Keyword> getCompanyKeywordsByCompanyId( long companyId ) throws InvalidInputException
-    {
-        LOG.debug( "Get company settings for the companyId: {}", companyId );
-        OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId,
-            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+	@Override
+	public FilterKeywordsResponse getCompanyKeywordsByCompanyId(long companyId, int startIndex, int limit,
+			String monitorType) throws InvalidInputException {
+		LOG.debug("Get company settings for the companyId: {}", companyId);
+		OrganizationUnitSettings companySettings = organizationUnitSettingsDao
+				.fetchOrganizationUnitSettingsById(companyId,
+						MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 
-        if ( companySettings == null ) {
-            throw new InvalidInputException( "Company setting doesn't exist for company id", "400" );
-        }
+		if (companySettings == null) {
+			throw new InvalidInputException("Company setting doesn't exist for company id", "400");
+		}
 
-        List<Keyword> companyFilterKeywords = companySettings.getFilterKeywords();
-        return companyFilterKeywords;
-    }
+		List<Keyword> companyFilterKeywords = companySettings.getFilterKeywords();
+        Collections.sort( companyFilterKeywords, new FilterKeywordsComparator() );
+		List<Keyword> keywords = new ArrayList<>();
+		FilterKeywordsResponse filterKeywordsResponse = new FilterKeywordsResponse();
+		if (companyFilterKeywords != null && !companyFilterKeywords.isEmpty()) {
+			if (monitorType == null || monitorType.isEmpty()) {
+				filterKeywordsResponse.setMonitorType("ALL");
+				filterKeywordsResponse.setCount(companyFilterKeywords.size());
+				if(startIndex >= companyFilterKeywords.size()) {
+					filterKeywordsResponse.setMonitorType(null);
+					filterKeywordsResponse.setCount(0);
+					filterKeywordsResponse.setFilterKeywords(null);
+				}
+				else if(limit > companyFilterKeywords.size() && startIndex < companyFilterKeywords.size()) {
+					filterKeywordsResponse.setFilterKeywords(companyFilterKeywords.subList(startIndex, companyFilterKeywords.size()));
+				} else {
+					filterKeywordsResponse.setFilterKeywords(companyFilterKeywords.subList(startIndex, startIndex + limit));
+				}
+
+			} else {
+				for (Keyword keyword : companyFilterKeywords) {
+					if (monitorType.equalsIgnoreCase(keyword.getMonitorType().toString())) {
+						keywords.add(keyword);
+					}
+				}
+				filterKeywordsResponse.setMonitorType(monitorType.toUpperCase());
+				filterKeywordsResponse.setCount(keywords.size());
+				if(startIndex >= keywords.size()) {
+					filterKeywordsResponse.setMonitorType(null);
+					filterKeywordsResponse.setCount(0);
+					filterKeywordsResponse.setFilterKeywords(null);
+				}
+				else if(limit > keywords.size() && startIndex < keywords.size()) {
+					filterKeywordsResponse.setFilterKeywords(keywords.subList(startIndex, keywords.size()));
+				} else {
+					filterKeywordsResponse.setFilterKeywords(keywords.subList(startIndex, startIndex + limit));
+				}
+			}
+		}
+		return filterKeywordsResponse;
+	}
 
 
     @Override

@@ -3404,6 +3404,37 @@ public class EmailServicesImpl implements EmailServices
         sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, true, false );
     }
 
+    @Async
+	@Override
+	public void sendSocialMonitorActionMail(String recipientMailId, String recipientName, String mailBody) throws InvalidInputException, UndeliveredEmailException {
+		LOG.info( "method sendSocialMonitorActionMail started" );
+        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+            LOG.error( "Recipient email Id is empty or null for sendSocialMonitorActionMail " );
+            throw new InvalidInputException(
+                "Recipient email Id is empty or null for sendSocialMonitorActionMail " );
+        }
+        if ( mailBody == null || mailBody.isEmpty() ) {
+            LOG.error( "mailBody is empty or null for sendSocialMonitorActionMail " );
+            throw new InvalidInputException( "Mail body is empty or null for sendSocialMonitorActionMail " );
+        }
+
+
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+        emailEntity.setMailType( CommonConstants.EMAIL_TYPE_SOCIAL_MONITOR_ACTION_MAIL_TO_USER );
+        String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.SOCIAL_MONITOR_ACTION_MAIL_SUBJECT;
+
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.SOCIAL_MONITOR_ACTION_MAIL_BODY );
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, recipientName, mailBody ) );
+
+        LOG.trace( "Calling email sender to send mail" );
+        sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );
+        LOG.debug( "method sendSocialMonitorActionMail ended" );
+	}
+    
+
 }
 
 // JIRA: SS-7: By RM02: EOC
