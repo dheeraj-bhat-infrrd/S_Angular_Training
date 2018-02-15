@@ -49,6 +49,9 @@ public class JobLogDetails implements Serializable
     
     @Column ( name = "ENTITY_TYPE")
     private String entityType;
+    
+    @Column ( name = "IS_MANUAL")
+    private boolean isManual;
 
 
     public long getJobLogId()
@@ -157,11 +160,27 @@ public class JobLogDetails implements Serializable
 	}
 
 
+	
+	public boolean isManual() {
+		return isManual;
+	}
+
+
+	public void setManual(boolean isManual) {
+		this.isManual = isManual;
+	}
+
+
+	public void setEntityId(Long entityId) {
+		this.entityId = entityId;
+	}
+
+
 	@Override
 	public String toString() {
 		return "JobLogDetails [jobLogId=" + jobLogId + ", jobName=" + jobName + ", status=" + status + ", jobStartTime="
 				+ jobStartTime + ", jobEndTime=" + jobEndTime + ", currentJobName=" + currentJobName + ", jobUuid="
-				+ jobUuid + ", entityId=" + entityId + ", entityType=" + entityType + "]";
+				+ jobUuid + ", entityId=" + entityId + ", entityType=" + entityType + ", isManual=" + isManual + "]";
 	}
 
 
