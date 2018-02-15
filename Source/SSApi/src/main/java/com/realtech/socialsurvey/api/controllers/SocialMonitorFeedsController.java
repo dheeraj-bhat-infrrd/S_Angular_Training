@@ -86,7 +86,7 @@ public class SocialMonitorFeedsController {
 
 	}
 
-	@RequestMapping(value = "/update/socialfeedsmacro", method = RequestMethod.PUT)
+	@RequestMapping(value = "/update/socialfeedsmacro", method = RequestMethod.POST)
 	@ApiOperation(value = "Update macros for a particular entity")
 	public ResponseEntity<?> updateMacrosForEntity(@RequestBody SocialMonitorMacro socialMonitorMacro, long companyId)
 			throws InvalidInputException, SSApiException {

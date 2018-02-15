@@ -26,6 +26,7 @@ public class SocialMonitorFeedData implements Serializable {
 	private SocialFeedType type;
 	private SocialFeedStatus status;
 	private List<ActionHistory> actionHistory;
+	private List<String> foundKeywords;
 	private long duplicateCount;
 
 	public SocialFeedType getType() {
@@ -140,13 +141,21 @@ public class SocialMonitorFeedData implements Serializable {
 		this.duplicateCount = duplicateCount;
 	}
 
+	public List<String> getFoundKeywords() {
+		return foundKeywords;
+	}
+
+	public void setFoundKeywords(List<String> foundKeywords) {
+		this.foundKeywords = foundKeywords;
+	}
+
 	@Override
 	public String toString() {
 		return "SocialMonitorFeedData [postId=" + postId + ", companyId=" + companyId + ", regionId=" + regionId
 				+ ", branchId=" + branchId + ", agentId=" + agentId + ", text=" + text + ", picture=" + picture
 				+ ", updatedOn=" + updatedOn + ", ownerName=" + ownerName + ", flagged=" + flagged + ", type=" + type
-				+ ", status=" + status + ", actionHistory=" + actionHistory + ", duplicateCount=" + duplicateCount
-				+ "]";
+				+ ", status=" + status + ", actionHistory=" + actionHistory + ", foundKeywords=" + foundKeywords
+				+ ", duplicateCount=" + duplicateCount + "]";
 	}
 
 }

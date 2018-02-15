@@ -103,7 +103,7 @@ public class SocialMonitorController
 
     @RequestMapping ( value = "/companies/{companyId}/keywords", method = RequestMethod.GET)
     @ApiOperation ( value = "Initiate account registration")
-    public ResponseEntity<?> getCompanyKeywords( @PathVariable ( "companyId") long companyId, HttpServletRequest request, int startIndex, int limit, @RequestParam(value = "monitorType", required = false) String monitorType)
+    public ResponseEntity<?> getCompanyKeywords( @PathVariable ( "companyId") long companyId, int startIndex, int limit, @RequestParam(value = "monitorType", required = false) String monitorType)
             throws SSApiException
     {
         try {

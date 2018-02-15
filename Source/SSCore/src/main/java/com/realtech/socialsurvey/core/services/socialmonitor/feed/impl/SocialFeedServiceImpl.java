@@ -103,6 +103,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
 				Collections.sort( socialResponseObject.getActionHistory(), new ActionHistoryComparator() );	
 				socialMonitorFeedData.setActionHistory(socialResponseObject.getActionHistory());
 				socialMonitorFeedData.setUpdatedOn(socialResponseObject.getUpdatedTime());
+				socialMonitorFeedData.setFoundKeywords(socialResponseObject.getFoundKeywords());
 				socialMonitorFeedData.setDuplicateCount(socialResponseObject.getDuplicateCount());
 				socialMonitorStreamDataList.add(socialMonitorFeedData);
 			}
