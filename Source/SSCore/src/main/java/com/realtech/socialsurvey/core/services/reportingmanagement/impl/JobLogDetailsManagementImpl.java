@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.services.reportingmanagement.impl;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -9,6 +10,7 @@ import java.util.Calendar;
 import java.util.Properties;
 import java.util.UUID;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -123,11 +125,11 @@ public class JobLogDetailsManagementImpl implements JobLogDetailsManagement
         jobLogDetails.setStatus(status);
         jobLogDetails.setJobStartTime(new Timestamp(System.currentTimeMillis()));
         jobLogDetails.setJobUuid((UUID.randomUUID()).toString());
-        long jobLogId = jobLogDetailsDao.insertJobLog(jobLogDetails);
-        recalEtl(entityId, jobLogId);
+        //long jobLogId = jobLogDetailsDao.insertJobLog(jobLogDetails);
+        recalEtl(entityId, 10);
         LOG.info("THE RETURN OF SSH{}");
         LOG.debug( "method to fetch the job-log details for entity, getLastRunForEntity() finished." );
-        return jobLogId;
+        return 10;
     }
     
     @Override 
@@ -138,21 +140,21 @@ public class JobLogDetailsManagementImpl implements JobLogDetailsManagement
          try {
          
              // give the path to private key file 
-             jsch.addIdentity("/home/user/.ssh/sndy");
+        	 jsch.addIdentity(sysPath.trim()); 
              // Set User and IP of the remote host and SSH port.
-             session = jsch.getSession(userName, host, port);
+             session = jsch.getSession(userName,host,port);
              // By default StrictHostKeyChecking  is set to yes as a security measure.
              session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");
              Properties config = new Properties();
              // This check feature is controlled by StrictHostKeyChecking ssh parameter. 
-             config.put("StrictHostKeyChecking", "yes");
+             config.put("StrictHostKeyChecking", "no");
              session.setConfig(config);
              session.connect();
 
              // create the execution channel over the session
              ChannelExec channelExec = (ChannelExec) session.openChannel("exec");
              // Set the command to execute on the channel and execute the command
-             channelExec.setCommand( scriptPath + companyId);
+             channelExec.setCommand( scriptPath+" "+companyId+" "+jobLogId);
              channelExec.connect();
 
              // Get an InputStream from this channel and read messages, generated 
