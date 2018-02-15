@@ -60,5 +60,4 @@ public final class ComputeConstants
     public static final String FILEUPLOAD_DIRECTORY_LOCATION = "FILEUPLOAD_DIRECTORY_LOCATION";
     public static final String REDIS_HOST = "REDIS_HOST";
     public static final String REDIS_PORT = "REDIS_PORT";
-    
 }

@@ -24,7 +24,7 @@ public interface FailedMessagesDao
      * @param failedSocialPost
      * @return
      */
-    boolean insertFailedFailedSocialPost( FailedSocialPost failedSocialPost );
+    boolean insertFailedSocialPost(FailedSocialPost failedSocialPost );
 
     /**
      * Inserts failed report request
@@ -44,4 +44,18 @@ public interface FailedMessagesDao
      * @param randomUUID
      */
     int updatedFailedEmailMessageRetryCount(String randomUUID);
+
+    /**
+     * Deletes temporary failed social post
+     * @param postId
+     * @return
+     */
+    int deleteFailedSocialPost(String postId);
+
+    /**
+     * Updated retryCount of temporary failed social post
+     * @param postId
+     * @return
+     */
+    int updateFailedSocialPostRetryCount(String postId);
 }

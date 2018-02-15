@@ -232,6 +232,12 @@ public class SocialFeedServiceImpl implements SocialFeedService
         return mongoSocialFeedDao.updateDuplicateCount(hash, companyId, duplicateCount);
     }
 
+    @Override
+    public boolean isSocialPostSaved(String postId) {
+        return mongoSocialFeedDao.isSocialPostSaved(postId);
+    }
+
+
 	@Override
 	public List<SocialMonitorMacro> getMacros( long companyId ) throws InvalidInputException {
 		LOG.debug( "Fetching all Macros for company with Id {} " , companyId);
@@ -267,3 +273,4 @@ public class SocialFeedServiceImpl implements SocialFeedService
 	}	
 
 } 
+

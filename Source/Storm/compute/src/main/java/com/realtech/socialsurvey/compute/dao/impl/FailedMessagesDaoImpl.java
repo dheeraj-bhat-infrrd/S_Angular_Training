@@ -43,7 +43,7 @@ public class FailedMessagesDaoImpl implements FailedMessagesDao
     }
 
     @Override
-    public boolean insertFailedFailedSocialPost( FailedSocialPost failedSocialPost )
+    public boolean insertFailedSocialPost(FailedSocialPost failedSocialPost )
     {
         LOG.debug( "Inserting failed Social Post: {}", failedSocialPost );
         mongoDB.datastore().save( failedSocialPost );
@@ -76,6 +76,30 @@ public class FailedMessagesDaoImpl implements FailedMessagesDao
                 .field("data.randomUUID").equal(randomUUID)
                 .field("permanentFailure").equal(false);
         final UpdateOperations<FailedEmailMessage> updateOperations = datastore.createUpdateOperations(FailedEmailMessage.class)
+                .inc("retryCounts", 1)
+                .set("data.isRetried", true);
+        final UpdateResults updateResults = datastore.update(query, updateOperations);
+        return updateResults.getUpdatedCount();
+    }
+
+    @Override
+    public int deleteFailedSocialPost(String postId) {
+        LOG.debug("Deleting failed social post with postId {}", postId);
+        Query<FailedSocialPost> query = mongoDB.datastore().createQuery(FailedSocialPost.class)
+                .field("data.postId").equal(postId)
+                .field("permanentFailure").equal(false);
+        final WriteResult result = mongoDB.datastore().delete(query);
+        return result.getN();
+    }
+
+    @Override
+    public int updateFailedSocialPostRetryCount(String postId) {
+        final Datastore datastore = mongoDB.datastore();
+        LOG.debug("Updating retryCount of socialpost having postId {}", postId);
+        final Query<FailedSocialPost> query = datastore.createQuery(FailedSocialPost.class)
+                .field("data.postId").equal(postId)
+                .field("permanentFailure").equal(false);
+        final UpdateOperations<FailedSocialPost> updateOperations = datastore.createUpdateOperations(FailedSocialPost.class)
                 .inc("retryCounts", 1)
                 .set("data.isRetried", true);
         final UpdateResults updateResults = datastore.update(query, updateOperations);

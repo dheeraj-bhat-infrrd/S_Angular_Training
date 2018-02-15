@@ -41,7 +41,14 @@ public interface SocialFeedService
     long updateDuplicateCount(int hash, long companyId, long duplicateCount) throws InvalidInputException;
 
     /**
-     * Gets all feeds on social monitor based on the flag
+     * Gets the post match the given postId
+     * @param postId
+     * @return
+     */
+    boolean isSocialPostSaved(String postId);
+
+
+    /** Gets all feeds on social monitor based on the flag
      * @param profileId
      * @param profileLevel
      * @param startIndex

@@ -53,11 +53,12 @@ public class SocialResponseObject<T> implements Serializable
     private long branchId;
     private long agentId;
 
+
     private int hash;
     private long duplicateCount;
     private List<String> foundKeywords;
     private List<ActionHistory> actionHistory;
-
+    private boolean isRetried;
 
     public T getResponse()
     {
@@ -260,37 +261,62 @@ public class SocialResponseObject<T> implements Serializable
     {
         this.actionHistory = actionHistory;
     }
-    
-    public long getUpdatedTime() {
-		return updatedTime;
-	}
 
-
-	public void setUpdatedTime(long updatedTime) {
-		this.updatedTime = updatedTime;
-	}
-
-
-	public long getCreatedTime() {
-		return createdTime;
-	}
-
-
-	public void setCreatedTime(long createdTime) {
-		this.createdTime = createdTime;
-	}
-
-
-	@Override
-    public String toString()
+    public long getUpdatedTime()
     {
-        return "SocialResponseObject [id=" + id + ", postId=" + postId + ", text=" + text + ", picture=" + picture
-            + ", updatedTime=" + updatedTime + ", createdTime=" + createdTime + ", ownerName=" + ownerName + ", response="
-            + response + ", type=" + type + ", flagged=" + flagged + ", status=" + status + ", companyId=" + companyId
-            + ", regionId=" + regionId + ", branchId=" + branchId + ", agentId=" + agentId + ", hash=" + hash
-            + ", duplicateCount=" + duplicateCount + ", foundKeywords=" + foundKeywords + ", actionHistory=" + actionHistory
-            + "]";
+        return updatedTime;
     }
 
+
+    public void setUpdatedTime( long updatedTime )
+    {
+        this.updatedTime = updatedTime;
+    }
+
+
+    public long getCreatedTime()
+    {
+        return createdTime;
+    }
+
+
+    public void setCreatedTime( long createdTime )
+    {
+        this.createdTime = createdTime;
+    }
+
+    public boolean isRetried() {
+        return isRetried;
+    }
+
+    public void setIsRetried(boolean retried) {
+        isRetried = retried;
+    }
+
+    @Override
+    public String toString() {
+        return "SocialResponseObject{" +
+                "id='" + id + '\'' +
+                ", postId='" + postId + '\'' +
+                ", text='" + text + '\'' +
+                ", picture='" + picture + '\'' +
+                ", updatedTime=" + updatedTime +
+                ", createdTime=" + createdTime +
+                ", ownerName='" + ownerName + '\'' +
+                ", response=" + response +
+                ", type=" + type +
+                ", flagged=" + flagged +
+                ", status=" + status +
+                ", companyId=" + companyId +
+                ", regionId=" + regionId +
+                ", branchId=" + branchId +
+                ", agentId=" + agentId +
+                ", hash=" + hash +
+                ", duplicateCount=" + duplicateCount +
+                ", foundKeywords=" + foundKeywords +
+                ", actionHistory=" + actionHistory +
+                ", isRetried=" + isRetried +
+                '}';
+    }
 
 }

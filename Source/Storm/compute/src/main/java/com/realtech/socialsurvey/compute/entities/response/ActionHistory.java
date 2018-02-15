@@ -1,8 +1,8 @@
 package com.realtech.socialsurvey.compute.entities.response;
 
-import java.io.Serializable;
-
 import com.realtech.socialsurvey.compute.enums.ActionHistoryType;
+
+import java.io.Serializable;
 
 
 /**

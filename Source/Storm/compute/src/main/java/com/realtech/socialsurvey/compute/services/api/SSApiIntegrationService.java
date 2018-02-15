@@ -38,8 +38,8 @@ public interface SSApiIntegrationService
 
     @Headers ( "Content-Type: application/json")
     @POST ( "v1/feeds")
-    Call<SocialResponseObject<FacebookFeedData>> saveSocialFeed(
-        @Body SocialResponseObject<FacebookFeedData> socialPostToMongo );
+    Call<SocialResponseObject> saveSocialFeed(
+        @Body SocialResponseObject socialPostToMongo );
 
 
     @Headers ( "Content-Type: application/json")
@@ -73,4 +73,7 @@ public interface SSApiIntegrationService
     @PUT ( "v1/feeds/hash/{hash}/companyId/{companyId}/duplicateCount/{duplicateCount}")
     Call<Long> updateDuplicateCount( @Path ( "hash") int hash, @Path ( "companyId") long companyId,
         @Path ( "duplicateCount") long duplicateCount );
+
+    @GET ("v1/feeds/postId/{postId}")
+    Call<Boolean> isSocialPostSavedInMongo(@Path("postId") String id);
 }

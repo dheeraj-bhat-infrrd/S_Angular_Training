@@ -1,22 +1,22 @@
 package com.realtech.socialsurvey.compute.topology.bolts.monitor;
 
 
-import java.util.Arrays;
-
+import com.realtech.socialsurvey.compute.common.SSAPIOperations;
+import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
+import com.realtech.socialsurvey.compute.services.FailedMessagesService;
+import com.realtech.socialsurvey.compute.services.api.APIIntegrationException;
+import com.realtech.socialsurvey.compute.services.impl.FailedMessagesServiceImpl;
+import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBoltWithAck;
 import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
+import org.apache.storm.tuple.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
-import com.realtech.socialsurvey.compute.common.SSAPIOperations;
-import com.realtech.socialsurvey.compute.entities.SocialResponseType;
-import com.realtech.socialsurvey.compute.entities.response.FacebookFeedData;
-import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
-import com.realtech.socialsurvey.compute.entities.response.TwitterFeedData;
-import com.realtech.socialsurvey.compute.entities.response.linkedin.LinkedinFeedData;
-import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBolt;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -25,85 +25,68 @@ import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBolt;
  * 
  *
  */
-public class SaveFeedsToMongoBolt extends BaseComputeBolt
+public class SaveFeedsToMongoBolt extends BaseComputeBoltWithAck
 {
 
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOG = LoggerFactory.getLogger( SaveFeedsToMongoBolt.class );
 
-
     @SuppressWarnings ( "unchecked")
     @Override
-    public void execute( Tuple input )
+    public void executeTuple( Tuple input )
     {
         LOG.info( "Executing save post to mongo bolt." );
         long companyId = input.getLongByField( "companyId" );
-        SocialResponseType socialResponseType = (SocialResponseType) input.getValueByField( "type" );
-        SocialResponseObject<?> post = null;
-        boolean isSuccess = true;
-        boolean isPostAdded = Boolean.FALSE;
-
-        if ( socialResponseType != null ) {
-            Object socialPost = input.getValueByField( "post" );
-            if ( socialPost != null ) {
-                if ( socialResponseType.getType().equals( "FACEBOOK" ) ) {
-                    post = (SocialResponseObject<FacebookFeedData>) socialPost;
-                    isPostAdded = addSocialFacebookFeedToMongo( (SocialResponseObject<FacebookFeedData>) post );
-                    
-                } else if ( socialResponseType.getType().equals( "TWITTER" ) ) {
-                    post = (SocialResponseObject<TwitterFeedData>) socialPost;
-                    isPostAdded = addSocialTwitterFeedToMongo( (SocialResponseObject<TwitterFeedData>) post );
-                    
-                } else if ( socialResponseType.getType().equals( "LINKEDIN" ) ) {
-                    post = (SocialResponseObject<LinkedinFeedData>) socialPost;
-                    isPostAdded = addSocialLinkedinFeedToMongo( (SocialResponseObject<LinkedinFeedData>) post );
-                    
+        boolean isSuccess = false;
+        String postId = null;
+        SocialResponseObject<?> socialPost = (SocialResponseObject<?>) input.getValueByField( "post" );
+        if ( socialPost != null ) {
+            postId = socialPost.getPostId();
+            try{
+                //do not add a post if its already present in mongo
+                boolean isPostAlreadySaved = SSAPIOperations.getInstance().isSocialPostSavedInMongo(postId);
+                if( !isPostAlreadySaved ){
+                    LOG.info("Adding new social post to mongo");
+                    isSuccess = true;
+                    addSocialPostToMongo(socialPost);
+                    _collector.emit("RETRY_STREAM", input, new Values(isSuccess, socialPost));
+                } else if(isPostAlreadySaved && socialPost.isRetried()) {
+                    LOG.info("Social post having postId = {} was already saved in mongo.But duplicateCount not updated.", postId);
+                    isSuccess = true;
+                } else
+                    LOG.warn("Duplicate post with postId {} !!! Hence not saving to mongo", postId);
+            } catch (IOException | APIIntegrationException e) {
+                //save the feed into mongo as temporary exception if it happened for first time
+                LOG.error("Exception occured", e.getMessage());
+                if(!socialPost.isRetried()){
+                    FailedMessagesService failedMessagesService = new FailedMessagesServiceImpl();
+                    failedMessagesService.insertTemporaryFailedSocialPost(socialPost);
                 }
-                
-                if(!isPostAdded) {
-                    isSuccess = false;
-                    repostMessageToKafka(input, companyId, post);
-                }
-            } else {
-                LOG.warn( "Social post is null" );
+                else
+                    _collector.emit("RETRY_STREAM", input, new Values(isSuccess, socialPost));
             }
 
-
+        } else {
+            LOG.warn( "Social post is null" );
         }
-        _collector.emit( "SUCCESS_STREAM", input, Arrays.asList(isSuccess, companyId, post ) );
-        _collector.ack( input );
-        LOG.info( "Successfully emitted message." );
+        LOG.info( "Emitting message wih socialPost having postId = {}, isSuccess = {} to UpdateSocialPostDuplicateCount ", postId , isSuccess);
+        _collector.emit( "SUCCESS_STREAM", input, Arrays.asList(isSuccess, companyId, socialPost ) );
     }
 
-    private void repostMessageToKafka(Tuple input, long companyId, SocialResponseObject<?> post) {
-        LOG.warn("Something went wrong while adding posts to mongo!!!");
-        _collector.emit("ERROR_STREAM",input, Arrays.asList(Long.toString(companyId), new Gson().toJson(post)));
+    private boolean addSocialPostToMongo(SocialResponseObject<?> socialPost) throws IOException {
+        return SSAPIOperations.getInstance().saveFeedToMongo(socialPost);
     }
 
-
-    private boolean addSocialFacebookFeedToMongo( SocialResponseObject<FacebookFeedData> socialPost )
-    {
-        return SSAPIOperations.getInstance().saveFeedToMongo( socialPost );
+    @Override
+    public List<Object> prepareTupleForFailure() {
+        return new Values(false, 0, null);
     }
-
-
-    private boolean addSocialTwitterFeedToMongo( SocialResponseObject<TwitterFeedData> socialPost )
-    {
-        return SSAPIOperations.getInstance().saveTwitterFeedToMongo( socialPost );
-    }
-
-
-    private boolean addSocialLinkedinFeedToMongo( SocialResponseObject<LinkedinFeedData> socialPost )
-    {
-        return SSAPIOperations.getInstance().saveLinkedinFeedToMongo( socialPost );
-    }
-
 
     @Override
     public void declareOutputFields( OutputFieldsDeclarer declarer )
     {
         declarer.declareStream("SUCCESS_STREAM", new Fields("isSuccess", "companyId", "post"));
-        declarer.declareStream("ERROR_STREAM", new Fields( "companyId", "post" ) );
+        declarer.declareStream("RETRY_STREAM", new Fields( "isSuccess", "post") );
     }
 }

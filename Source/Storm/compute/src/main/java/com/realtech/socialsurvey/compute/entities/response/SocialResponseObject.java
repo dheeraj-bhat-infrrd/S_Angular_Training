@@ -53,7 +53,7 @@ public class SocialResponseObject<T> implements Serializable
     private long duplicateCount;
     private List<String> foundKeywords;
     private List<ActionHistory> actionHistory;
-
+    private boolean isRetried;
 
     public T getResponse()
     {
@@ -282,15 +282,37 @@ public class SocialResponseObject<T> implements Serializable
         this.actionHistory = actionHistory;
     }
 
+    public boolean isRetried() {
+        return isRetried;
+    }
+
+    public void setRetried(boolean retried) {
+        isRetried = retried;
+    }
 
     @Override
-    public String toString()
-    {
-        return "SocialResponseObject [id=" + id + ", postId=" + postId + ", text=" + text + ", picture=" + picture
-            + ", updatedTime=" + updatedTime + ", createdTime=" + createdTime + ", ownerName=" + ownerName + ", response="
-            + response + ", type=" + type + ", flagged=" + flagged + ", status=" + status + ", companyId=" + companyId
-            + ", regionId=" + regionId + ", branchId=" + branchId + ", agentId=" + agentId + ", hash=" + hash
-            + ", duplicateCount=" + duplicateCount + ", foundKeywords=" + foundKeywords + ", actionHistory=" + actionHistory
-            + "]";
+    public String toString() {
+        return "SocialResponseObject{" +
+                "id='" + id + '\'' +
+                ", postId='" + postId + '\'' +
+                ", text='" + text + '\'' +
+                ", picture='" + picture + '\'' +
+                ", updatedTime=" + updatedTime +
+                ", createdTime=" + createdTime +
+                ", ownerName='" + ownerName + '\'' +
+                ", response=" + response +
+                ", type=" + type +
+                ", flagged=" + flagged +
+                ", status=" + status +
+                ", companyId=" + companyId +
+                ", regionId=" + regionId +
+                ", branchId=" + branchId +
+                ", agentId=" + agentId +
+                ", hash=" + hash +
+                ", duplicateCount=" + duplicateCount +
+                ", foundKeywords=" + foundKeywords +
+                ", actionHistory=" + actionHistory +
+                ", isRetried=" + isRetried +
+                '}';
     }
 }

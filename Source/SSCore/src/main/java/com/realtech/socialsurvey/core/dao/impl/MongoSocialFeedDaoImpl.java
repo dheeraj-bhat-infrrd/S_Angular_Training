@@ -36,9 +36,9 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
     private static final String HASH = "hash";
     private static final String COMPANY_ID = "companyId";
     private static final String DUPLICATE_COUNT = "duplicateCount";
+    private static final String POST_ID = "postId";
     private static final String FLAGGED = "flagged";
     private static final String FEED_TYPE = "type";
-
 
     @Override
     public void insertSocialFeed( SocialResponseObject<?> socialFeed, String collectionName )
@@ -65,7 +65,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
     @Override
     public long updateDuplicateCount(int hash, long companyId, long duplicateCount) {
         if(LOG.isDebugEnabled()) {
-            LOG.debug("Updating posts with duplicateCount {} having hash = {} ");
+            LOG.debug("Updating posts with duplicateCount {} having hash = {} ", duplicateCount, hash);
         }
         Query query = new Query().addCriteria(Criteria.where(HASH).is(hash).and(COMPANY_ID).is(companyId));
         Update update = new Update().set(DUPLICATE_COUNT, duplicateCount);
@@ -73,6 +73,14 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         return result.getN();
     }
 
+    @Override
+    public boolean isSocialPostSaved(String postId) {
+        if(LOG.isDebugEnabled()) {
+            LOG.debug("Fetching posts with postId {} ", postId);
+        }
+        Query query = new Query().addCriteria(Criteria.where(POST_ID).is(postId));
+        return mongoTemplate.exists(query, SocialResponseObject.class, SOCIAL_FEED_COLLECTION);
+    }
     
 	@Override
 	public void updateSocialFeed(SocialFeedsActionUpdate socialFeedsActionUpdate, List<ActionHistory> actionHistories, int updateFlag, String collectionName) {

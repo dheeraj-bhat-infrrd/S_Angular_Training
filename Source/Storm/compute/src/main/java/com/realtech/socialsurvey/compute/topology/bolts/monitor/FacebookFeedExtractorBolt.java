@@ -90,6 +90,8 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt
             responseWrapper.setHash( responseWrapper.getText().hashCode() );
         }
 
+        responseWrapper.setPostId(facebookFeedData.getId());
+
         if ( facebookFeedData.getUpdatedTime() > 0 ) {
             responseWrapper.setUpdatedTime( facebookFeedData.getUpdatedTime() * 1000 );
         }

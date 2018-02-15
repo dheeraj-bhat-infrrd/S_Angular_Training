@@ -16,6 +16,8 @@ public interface MongoSocialFeedDao
     long getDuplicatePostsCount(int hash, long companyId);
 
     long updateDuplicateCount(int hash, long companyId, long duplicateCount);
+
+    boolean isSocialPostSaved(String postId);
     
     public SocialResponseObject getSocialFeed(String postId, String collectionName);
         
@@ -30,5 +32,5 @@ public interface MongoSocialFeedDao
 	public void updateMacros(SocialMonitorMacro socialMonitorMacro, long companyId);
 	
 	public void updateMacroCount(List<SocialMonitorMacro> socialMonitorMacros, long companyId);
-		
+
 }

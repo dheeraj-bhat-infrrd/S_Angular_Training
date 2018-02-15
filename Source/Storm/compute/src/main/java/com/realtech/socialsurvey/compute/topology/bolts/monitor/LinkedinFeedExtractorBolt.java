@@ -90,10 +90,12 @@ public class LinkedinFeedExtractorBolt extends BaseComputeBolt
     {
 
         String text = "";
+        String id = null;
         long updatedDate = 0L;
         if ( linkedinFeedData.getUpdateContent() != null && linkedinFeedData.getUpdateContent().getCompanyStatusUpdate() != null
             && linkedinFeedData.getUpdateContent().getCompanyStatusUpdate().getShare() != null ) {
             text = linkedinFeedData.getUpdateContent().getCompanyStatusUpdate().getShare().getComment();
+            id = linkedinFeedData.getUpdateContent().getCompanyStatusUpdate().getShare().getId();
 
             if ( linkedinFeedData.getUpdateContent().getCompanyStatusUpdate().getShare().getTimestamp() > 0 ) {
                 updatedDate = linkedinFeedData.getUpdateContent().getCompanyStatusUpdate().getShare().getTimestamp();
@@ -108,6 +110,7 @@ public class LinkedinFeedExtractorBolt extends BaseComputeBolt
         responseWrapper.setCreatedTime( updatedDate );
 
         responseWrapper.setHash( responseWrapper.getText().hashCode() );
+        responseWrapper.setPostId(id);
         return responseWrapper;
     }
 
