@@ -14,6 +14,7 @@ import com.realtech.socialsurvey.compute.entities.LinkedInToken;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.entities.response.linkedin.LinkedinFeedData;
+import com.realtech.socialsurvey.compute.enums.ProfileType;
 import com.realtech.socialsurvey.compute.enums.SocialFeedType;
 import com.realtech.socialsurvey.compute.feeds.LinkedinFeedProcessor;
 import com.realtech.socialsurvey.compute.feeds.impl.LinkedinFeedProcessorImpl;
@@ -30,6 +31,7 @@ public class LinkedinFeedExtractorBolt extends BaseComputeBolt
     private static final Logger LOG = LoggerFactory.getLogger( LinkedinFeedExtractorBolt.class );
 
     private LinkedinFeedProcessor linkedinFeedProcessor = new LinkedinFeedProcessorImpl();
+
 
     private boolean isRateLimitExceeded()
     {
@@ -52,7 +54,7 @@ public class LinkedinFeedExtractorBolt extends BaseComputeBolt
             }
 
             // Check rate limiting for company
-            if ( isRateLimitExceeded( /* pass media token*/ )) {
+            if ( isRateLimitExceeded( /* pass media token*/ ) ) {
                 LOG.warn( "Rate limit exceeded" );
             }
             // Get SocailMediaToken for company
@@ -63,7 +65,8 @@ public class LinkedinFeedExtractorBolt extends BaseComputeBolt
             LOG.debug( "Total tweet fetched : {}", feeds.size() );
             for ( LinkedinFeedData linkedinFeedData : feeds ) {
 
-                SocialResponseObject<LinkedinFeedData> responseWrapper = getSocialResponseObject( companyId, linkedinFeedData );
+                SocialResponseObject<LinkedinFeedData> responseWrapper = getSocialResponseObject( mediaToken,
+                    linkedinFeedData );
 
                 String responseWrapperString = new Gson().toJson( responseWrapper );
 
@@ -86,7 +89,8 @@ public class LinkedinFeedExtractorBolt extends BaseComputeBolt
      * @param linkedinFeedData
      * @return
      */
-    private SocialResponseObject<LinkedinFeedData> getSocialResponseObject( long companyId, LinkedinFeedData linkedinFeedData )
+    private SocialResponseObject<LinkedinFeedData> getSocialResponseObject( SocialMediaTokenResponse mediaToken,
+        LinkedinFeedData linkedinFeedData )
     {
 
         String text = "";
@@ -103,14 +107,27 @@ public class LinkedinFeedExtractorBolt extends BaseComputeBolt
 
         }
 
-        SocialResponseObject<LinkedinFeedData> responseWrapper = new SocialResponseObject<>( companyId, SocialFeedType.LINKEDIN,
-            text, linkedinFeedData, 1 );
+        SocialResponseObject<LinkedinFeedData> responseWrapper = new SocialResponseObject<>( mediaToken.getCompanyId(),
+            SocialFeedType.LINKEDIN, text, linkedinFeedData, 1 );
+
+        if ( mediaToken.getProfileType() != null ) {
+            responseWrapper.setProfileType( mediaToken.getProfileType() );
+            if ( mediaToken.getProfileType() == ProfileType.COMPANY ) {
+                responseWrapper.setCompanyId( mediaToken.getIden() );
+            } else if ( mediaToken.getProfileType() == ProfileType.REGION ) {
+                responseWrapper.setRegionId( mediaToken.getIden() );
+            } else if ( mediaToken.getProfileType() == ProfileType.BRANCH ) {
+                responseWrapper.setBranchId( mediaToken.getIden() );
+            } else if ( mediaToken.getProfileType() == ProfileType.AGENT ) {
+                responseWrapper.setAgentId( mediaToken.getIden() );
+            }
+        }
 
         responseWrapper.setUpdatedTime( updatedDate );
         responseWrapper.setCreatedTime( updatedDate );
 
         responseWrapper.setHash( responseWrapper.getText().hashCode() );
-        responseWrapper.setPostId(id);
+        responseWrapper.setPostId( id );
         return responseWrapper;
     }
 

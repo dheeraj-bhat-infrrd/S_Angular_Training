@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.realtech.socialsurvey.core.enums.ProfileType;
 import com.realtech.socialsurvey.core.enums.SocialFeedStatus;
 import com.realtech.socialsurvey.core.enums.SocialFeedType;
 
@@ -52,6 +53,7 @@ public class SocialResponseObject<T> implements Serializable
     private long regionId;
     private long branchId;
     private long agentId;
+    private ProfileType profileType;
 
 
     private int hash;
@@ -293,30 +295,26 @@ public class SocialResponseObject<T> implements Serializable
         isRetried = retried;
     }
 
-    @Override
-    public String toString() {
-        return "SocialResponseObject{" +
-                "id='" + id + '\'' +
-                ", postId='" + postId + '\'' +
-                ", text='" + text + '\'' +
-                ", picture='" + picture + '\'' +
-                ", updatedTime=" + updatedTime +
-                ", createdTime=" + createdTime +
-                ", ownerName='" + ownerName + '\'' +
-                ", response=" + response +
-                ", type=" + type +
-                ", flagged=" + flagged +
-                ", status=" + status +
-                ", companyId=" + companyId +
-                ", regionId=" + regionId +
-                ", branchId=" + branchId +
-                ", agentId=" + agentId +
-                ", hash=" + hash +
-                ", duplicateCount=" + duplicateCount +
-                ", foundKeywords=" + foundKeywords +
-                ", actionHistory=" + actionHistory +
-                ", isRetried=" + isRetried +
-                '}';
+    public ProfileType getProfileType()
+    {
+        return profileType;
     }
 
+
+    public void setProfileType( ProfileType profileType )
+    {
+        this.profileType = profileType;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return "SocialResponseObject [id=" + id + ", postId=" + postId + ", text=" + text + ", picture=" + picture
+            + ", updatedTime=" + updatedTime + ", createdTime=" + createdTime + ", ownerName=" + ownerName + ", response="
+            + response + ", type=" + type + ", flagged=" + flagged + ", status=" + status + ", companyId=" + companyId
+            + ", regionId=" + regionId + ", branchId=" + branchId + ", agentId=" + agentId + ", profileType=" + profileType
+            + ", hash=" + hash + ", duplicateCount=" + duplicateCount + ", foundKeywords=" + foundKeywords + ", actionHistory="
+            + actionHistory + ", isRetried=" + isRetried + "]";
+    }
 }
