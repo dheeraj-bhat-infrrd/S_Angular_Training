@@ -1,6 +1,5 @@
 package com.realtech.socialsurvey.compute.entities;
 
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
