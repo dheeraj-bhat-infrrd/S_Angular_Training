@@ -12,6 +12,8 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import com.jcraft.jsch.ChannelExec;
@@ -27,7 +29,7 @@ import com.realtech.socialsurvey.core.entities.JobLogDetailsResponse;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.reportingmanagement.JobLogDetailsManagement;
 
-
+@DependsOn ( "generic")
 @Component
 public class JobLogDetailsManagementImpl implements JobLogDetailsManagement
 {
@@ -37,6 +39,21 @@ public class JobLogDetailsManagementImpl implements JobLogDetailsManagement
 
     @Autowired
     private Utils utils;
+    
+    @Value ( "${SSH_ETLBOX_USER}")
+    private String userName;
+    
+    @Value ( "${SSH_ETLBOX_PORT}")
+    private int port;
+    
+    @Value ( "${PRIVATE_KEY_SYSTEM_PATH}")
+    private String sysPath;
+    
+    @Value ( "${SSH_ETLBOX_REMOTE_HOST}")
+    private String host;
+    
+    @Value ( "${SSH_SCRIPT_PATH}")
+    private String scriptPath;
 
     private static final Logger LOG = LoggerFactory.getLogger( JobLogDetailsDaoImpl.class );
 
@@ -120,23 +137,22 @@ public class JobLogDetailsManagementImpl implements JobLogDetailsManagement
          Session session;
          try {
          
-             // Open a Session to remote SSH server and Connect.
-             jsch.addIdentity("/home/ec2-user/.ssh/sndy");
+             // give the path to private key file 
+             jsch.addIdentity("/home/user/.ssh/sndy");
              // Set User and IP of the remote host and SSH port.
-             session = jsch.getSession("ec2-user", "52.34.21.141", 22);
-             // When we do SSH to a remote host for the 1st time or if key at the remote host 
-             // changes, we will be prompted to confirm the authenticity of remote host. 
-             // This check feature is controlled by StrictHostKeyChecking ssh parameter. 
+             session = jsch.getSession(userName, host, port);
              // By default StrictHostKeyChecking  is set to yes as a security measure.
+             session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");
              Properties config = new Properties();
-             config.put("StrictHostKeyChecking", "no");
+             // This check feature is controlled by StrictHostKeyChecking ssh parameter. 
+             config.put("StrictHostKeyChecking", "yes");
              session.setConfig(config);
              session.connect();
 
              // create the execution channel over the session
              ChannelExec channelExec = (ChannelExec) session.openChannel("exec");
              // Set the command to execute on the channel and execute the command
-             channelExec.setCommand("./test/test.sh " + companyId);
+             channelExec.setCommand( scriptPath + companyId);
              channelExec.connect();
 
              // Get an InputStream from this channel and read messages, generated 
@@ -153,15 +169,12 @@ public class JobLogDetailsManagementImpl implements JobLogDetailsManagement
              // Retrieve the exit status of the executed command
              int exitStatus = channelExec.getExitStatus();
              if (exitStatus > 0) {
-            	 LOG.info("Remote script exec error! " + exitStatus);
+            	 LOG.info("Remote script exec error! {}",exitStatus);
              }
              //Disconnect the Session
              session.disconnect();
-         } catch (JSchException e) {
-             e.printStackTrace();
-         } catch (IOException e) {
-             e.printStackTrace();
+         } catch (JSchException | IOException e) {
+             LOG.error("Exception caught in recalEtl {}",e);
          }
-
     }
 }
