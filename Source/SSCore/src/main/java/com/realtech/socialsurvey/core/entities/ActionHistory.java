@@ -5,7 +5,6 @@ import java.util.Date;
 
 import com.realtech.socialsurvey.core.enums.ActionHistoryType;
 
-
 /**
  * Action history for social post
  * @author manish
@@ -14,18 +13,23 @@ import com.realtech.socialsurvey.core.enums.ActionHistoryType;
 public class ActionHistory implements Serializable
 {
     private static final long serialVersionUID = 1L;
-    private Date createdDate;
+    private long createdDate;
     private String ownerName;
     private String text;
     private ActionHistoryType actionType;
 
-    public Date getCreatedDate()
-    {
-        return createdDate;
-    }
+
+    public long getCreatedDate() {
+		return createdDate;
+	}
 
 
-    public String getOwnerName()
+	public void setCreatedDate(long createdDate) {
+		this.createdDate = createdDate;
+	}
+
+
+	public String getOwnerName()
     {
         return ownerName;
     }
@@ -34,12 +38,6 @@ public class ActionHistory implements Serializable
     public String getText()
     {
         return text;
-    }
-
-
-    public void setCreatedDate( Date createdDate )
-    {
-        this.createdDate = createdDate;
     }
 
 

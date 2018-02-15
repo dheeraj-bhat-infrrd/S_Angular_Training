@@ -25,6 +25,7 @@ import com.realtech.socialsurvey.core.entities.CompanyView;
 import com.realtech.socialsurvey.core.entities.DisabledAccount;
 import com.realtech.socialsurvey.core.entities.EncompassSdkVersion;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
+import com.realtech.socialsurvey.core.entities.FilterKeywordsResponse;
 import com.realtech.socialsurvey.core.entities.Keyword;
 import com.realtech.socialsurvey.core.entities.HierarchySettingsCompare;
 import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
@@ -1539,7 +1540,7 @@ public interface OrganizationManagementService
      * @return
      * @throws InvalidInputException 
      */
-    List<Keyword> getCompanyKeywordsByCompanyId( long companyId ) throws InvalidInputException;
+    public FilterKeywordsResponse getCompanyKeywordsByCompanyId( long companyId, int startIndex, int limit, String monitorType ) throws InvalidInputException;
     
     /**
      * Method to enable keyword by keyword id

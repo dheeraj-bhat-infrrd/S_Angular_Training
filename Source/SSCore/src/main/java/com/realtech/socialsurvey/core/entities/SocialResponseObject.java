@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.entities;
 
 import java.io.Serializable;
+
 import java.util.List;
 
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -116,7 +117,6 @@ public class SocialResponseObject<T> implements Serializable
     {
         this.picture = picture;
     }
-
 
     public String getOwnerName()
     {
@@ -261,9 +261,27 @@ public class SocialResponseObject<T> implements Serializable
         this.actionHistory = actionHistory;
     }
     
-    
-    
-    @Override
+    public long getUpdatedTime() {
+		return updatedTime;
+	}
+
+
+	public void setUpdatedTime(long updatedTime) {
+		this.updatedTime = updatedTime;
+	}
+
+
+	public long getCreatedTime() {
+		return createdTime;
+	}
+
+
+	public void setCreatedTime(long createdTime) {
+		this.createdTime = createdTime;
+	}
+
+
+	@Override
     public String toString()
     {
         return "SocialResponseObject [id=" + id + ", postId=" + postId + ", text=" + text + ", picture=" + picture
@@ -275,26 +293,4 @@ public class SocialResponseObject<T> implements Serializable
     }
 
 
-    public long getUpdatedTime()
-    {
-        return updatedTime;
-    }
-
-
-    public void setUpdatedTime( long updatedTime )
-    {
-        this.updatedTime = updatedTime;
-    }
-
-
-    public long getCreatedTime()
-    {
-        return createdTime;
-    }
-
-
-    public void setCreatedTime( long createdTime )
-    {
-        this.createdTime = createdTime;
-    }
 }
