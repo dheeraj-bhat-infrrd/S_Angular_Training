@@ -14,6 +14,7 @@ import com.realtech.socialsurvey.compute.entities.FacebookToken;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.compute.entities.response.FacebookFeedData;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
+import com.realtech.socialsurvey.compute.enums.ProfileType;
 import com.realtech.socialsurvey.compute.enums.SocialFeedType;
 import com.realtech.socialsurvey.compute.feeds.FacebookFeedProcessor;
 import com.realtech.socialsurvey.compute.feeds.impl.FacebookFeedProcessorImpl;
@@ -59,7 +60,7 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt
 
             LOG.debug( "Total tweet fetched : {}", feeds.size() );
             for ( FacebookFeedData facebookFeedData : feeds ) {
-                SocialResponseObject<FacebookFeedData> responseWrapper = createSocialResponseObject( companyId,
+                SocialResponseObject<FacebookFeedData> responseWrapper = createSocialResponseObject( mediaToken,
                     facebookFeedData );
                 String responseWrapperString = new Gson().toJson( responseWrapper );
                 _collector.emit( new Values( Long.toString( companyId ), responseWrapperString ) );
@@ -80,11 +81,24 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt
      * @param facebookFeedData
      * @return
      */
-    private SocialResponseObject<FacebookFeedData> createSocialResponseObject( long companyId,
+    private SocialResponseObject<FacebookFeedData> createSocialResponseObject( SocialMediaTokenResponse mediaToken,
         FacebookFeedData facebookFeedData )
     {
-        SocialResponseObject<FacebookFeedData> responseWrapper = new SocialResponseObject<>( companyId, SocialFeedType.FACEBOOK,
+        SocialResponseObject<FacebookFeedData> responseWrapper = new SocialResponseObject<>( mediaToken.getCompanyId(), SocialFeedType.FACEBOOK,
             facebookFeedData.getMessage(), facebookFeedData, 1 );
+        
+        if ( mediaToken.getProfileType() != null ) {
+            responseWrapper.setProfileType( mediaToken.getProfileType() );
+            if ( mediaToken.getProfileType() == ProfileType.COMPANY ) {
+                responseWrapper.setCompanyId( mediaToken.getIden() );
+            } else if ( mediaToken.getProfileType() == ProfileType.REGION ) {
+                responseWrapper.setRegionId( mediaToken.getIden() );
+            } else if ( mediaToken.getProfileType() == ProfileType.BRANCH ) {
+                responseWrapper.setBranchId( mediaToken.getIden() );
+            } else if ( mediaToken.getProfileType() == ProfileType.AGENT ) {
+                responseWrapper.setAgentId( mediaToken.getIden() );
+            }
+        }
 
         if ( facebookFeedData.getMessage() != null ) {
             responseWrapper.setHash( responseWrapper.getText().hashCode() );

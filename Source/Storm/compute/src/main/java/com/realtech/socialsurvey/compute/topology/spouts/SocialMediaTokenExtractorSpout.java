@@ -48,7 +48,6 @@ public class SocialMediaTokenExtractorSpout extends BaseComputeSpout
         this.mediaTokens = new ArrayList<>();
         this.waitTime = 1000L * Long.parseLong(LocalPropertyFileHandler.getInstance()
             .getProperty( ComputeConstants.APPLICATION_PROPERTY_FILE, ComputeConstants.MEDIA_TOKENS_FETCH_TIME_INTERVAL ).orElse( "3600" ));
-        //this.setMediaTokensPeriodically();
     }
 
 

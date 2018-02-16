@@ -14,6 +14,7 @@ import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.compute.entities.TwitterToken;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.entities.response.TwitterFeedData;
+import com.realtech.socialsurvey.compute.enums.ProfileType;
 import com.realtech.socialsurvey.compute.enums.SocialFeedType;
 import com.realtech.socialsurvey.compute.feeds.TwitterFeedProcessor;
 import com.realtech.socialsurvey.compute.feeds.impl.TwitterFeedProcessorImpl;
@@ -58,7 +59,7 @@ public class TwitterFeedExtractorBolt extends BaseComputeBolt
             List<TwitterFeedData> response = twitterFeedProcessor.fetchFeed( companyId, token );
             LOG.debug( "Total tweet fetched : {}", response.size() );
             for ( TwitterFeedData twitterFeedData : response ) {
-                SocialResponseObject<TwitterFeedData> responseWrapper = createSocialResponseObject( companyId,
+                SocialResponseObject<TwitterFeedData> responseWrapper = createSocialResponseObject( mediaToken,
                     twitterFeedData );
 
                 String responseWrapperString = new Gson().toJson( responseWrapper );
@@ -78,10 +79,23 @@ public class TwitterFeedExtractorBolt extends BaseComputeBolt
      * @param twitterFeedData
      * @return
      */
-    private SocialResponseObject<TwitterFeedData> createSocialResponseObject( long companyId, TwitterFeedData twitterFeedData )
+    private SocialResponseObject<TwitterFeedData> createSocialResponseObject( SocialMediaTokenResponse mediaToken, TwitterFeedData twitterFeedData )
     {
-        SocialResponseObject<TwitterFeedData> responseWrapper = new SocialResponseObject<>( companyId, SocialFeedType.TWITTER,
+        SocialResponseObject<TwitterFeedData> responseWrapper = new SocialResponseObject<>( mediaToken.getCompanyId(), SocialFeedType.TWITTER,
             twitterFeedData.getText(), twitterFeedData, 1 );
+        
+        if ( mediaToken.getProfileType() != null ) {
+            responseWrapper.setProfileType( mediaToken.getProfileType() );
+            if ( mediaToken.getProfileType() == ProfileType.COMPANY ) {
+                responseWrapper.setCompanyId( mediaToken.getIden() );
+            } else if ( mediaToken.getProfileType() == ProfileType.REGION ) {
+                responseWrapper.setRegionId( mediaToken.getIden() );
+            } else if ( mediaToken.getProfileType() == ProfileType.BRANCH ) {
+                responseWrapper.setBranchId( mediaToken.getIden() );
+            } else if ( mediaToken.getProfileType() == ProfileType.AGENT ) {
+                responseWrapper.setAgentId( mediaToken.getIden() );
+            }
+        }
 
         if ( twitterFeedData.getText() != null && !twitterFeedData.getText().isEmpty() ) {
             responseWrapper.setHash( responseWrapper.getText().hashCode() );

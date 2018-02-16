@@ -1,14 +1,18 @@
 package com.realtech.socialsurvey.core.entities;
 
+import com.realtech.socialsurvey.core.enums.ProfileType;
+
 /**
  * Entity for social media response
+ * @author manish
+ *
  */
 public class SocialMediaTokenResponse
 {
     private long iden;
     private long companyId;
     private SocialMediaTokens socialMediaTokens;
-    private String profileType;
+    private ProfileType profileType;
 
 
     public long getIden()
@@ -28,19 +32,6 @@ public class SocialMediaTokenResponse
         return socialMediaTokens;
     }
 
-
-    public String getProfileType()
-    {
-        return profileType;
-    }
-
-
-    public void setProfileType( String profileType )
-    {
-        this.profileType = profileType;
-    }
-
-
     public long getCompanyId()
     {
         return companyId;
@@ -56,5 +47,17 @@ public class SocialMediaTokenResponse
     public void setSocialMediaTokens( SocialMediaTokens socialMediaTokens )
     {
         this.socialMediaTokens = socialMediaTokens;
+    }
+
+
+    public ProfileType getProfileType()
+    {
+        return profileType;
+    }
+
+
+    public void setProfileType( ProfileType profileType )
+    {
+        this.profileType = profileType;
     }
 }
