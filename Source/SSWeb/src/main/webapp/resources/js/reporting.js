@@ -3001,6 +3001,15 @@ function getIncompleteSurveyCountForNewDashboard(colName, colValue) {
 	callAjaxGetWithPayloadData("./fetchdashboardincompletesurveycount.do", function(data) {
 		$('#rep-icn-sur-popup-cont').attr("data-total", data);
 		var totalCount = parseInt(data);
+		
+		if (totalCount == 0) {
+			$("#incomplete-survey-header").addClass("hide");
+			$("#inc-survey-cont").addClass("hide");
+			$("#paginate-buttons-survey").addClass("hide");
+			$("#rep-nil-dash-survey-incomplete").removeClass("hide");
+			return;
+		}
+		
 		var batchSize = parseInt($('#rep-icn-sur-popup-cont').attr("data-batch"));
 		var numPages = 0;
 		if (parseInt(totalCount % batchSize) == 0) {
@@ -3030,6 +3039,13 @@ function paintIncompleteSurveyListForNewDashboard(incompleteSurveystartIndex,col
 		} else {
 			$('#rep-sur-previous').removeClass('paginate-button');
 		}
+		
+		// move back a page if this page has no entry
+		if( parseInt($('#rep-icn-sur-popup-cont').children('.dash-lp-item').size()) < 1 && parseInt(incompleteSurveystartIndex) > 0 ){
+			paintIncompleteSurveyListForNewDashboard((parseInt(incompleteSurveystartIndex) - incompleteSurveyBatchSize),colmName,colmValue);
+			return;
+		}
+		
 		incompleteSurveystartIndex = parseInt(incompleteSurveystartIndex) + parseInt($('#rep-icn-sur-popup-cont').children('.dash-lp-item').size());
 		var totalSurveysCount = parseInt($('#rep-icn-sur-popup-cont').attr("data-total"));
 		if (incompleteSurveystartIndex < totalSurveysCount) {
@@ -3064,7 +3080,7 @@ function resendMultipleIncompleteSurveyRequestsForNewDashboard(incompleteSurveyI
 
 			// update the page
 			var incompleteSurveyStartIndex = parseInt($('#rep-icn-sur-popup-cont').attr("data-start"));
-			paintIncompleteSurveyListForNewDashboard(incompleteSurveyStartIndex);
+			paintIncompleteSurveyListForNewDashboard(incompleteSurveyStartIndex,$('#rep-prof-container').attr('data-column-name'),$('#rep-prof-container').attr('data-column-value'));
 		}else{
 			var toastmsg = data.errMsg;
 			$('#overlay-toast').html(errCode);
@@ -3079,11 +3095,6 @@ $(document).on('click', '#rep-del-mult-sur-icn.mult-sur-icn-active', function() 
 	removeMultipleIncompleteSurveyRequestForNewDashboard(selectedSurveys);
 });
 
-function removeMultipleIncompleteSurveyRequestForNewDashboard(incompleteSurveyId) {
-	var selectedSurveys = [];
-	selectedSurveys.push(incompleteSurveyId);
-	removeMultipleIncompleteSurveyRequestForNewDashboard(selectedSurveys);
-}
 
 function removeMultipleIncompleteSurveyRequestForNewDashboard(incompleteSurveyIds) {
 	callAjaxPOSTWithTextData("/deletemultipleincompletesurveyrequest.do?surveySetToDelete=" + incompleteSurveyIds, function(data) {
@@ -3112,10 +3123,10 @@ function removeMultipleIncompleteSurveyRequestForNewDashboard(incompleteSurveyId
 
 			// update the page
 			var incompleteSurveyStartIndex = parseInt($('#rep-icn-sur-popup-cont').attr("data-start"));
-			paintIncompleteSurveyListForNewDashboard(incompleteSurveyStartIndex);
+			paintIncompleteSurveyListForNewDashboard(incompleteSurveyStartIndex,$('#rep-prof-container').attr('data-column-name'),$('#rep-prof-container').attr('data-column-value'));
 
 			// Update the incomplete survey on dashboard
-			getIncompleteSurveyCount(colName, colValue);
+			getIncompleteSurveyCountForNewDashboard($('#rep-prof-container').attr('data-column-name'),$('#rep-prof-container').attr('data-column-value'));
 
 			$('#rep-del-mult-sur-icn').removeClass('mult-sur-icn-active');
 			$('#rep-resend-mult-sur-icn').removeClass('mult-sur-icn-active');
@@ -3129,7 +3140,7 @@ $(document).on('click', '#rep-sur-next.paginate-button', function() {
 	var incompleteSurveyBatchSize = parseInt($('#rep-icn-sur-popup-cont').attr("data-batch"));
 	incompleteSurveyStartIndex = incompleteSurveyStartIndex + incompleteSurveyBatchSize;
 	$('#rep-icn-sur-popup-cont').attr("data-start", incompleteSurveyStartIndex);
-	paintIncompleteSurveyListForNewDashboard(incompleteSurveyStartIndex);
+	paintIncompleteSurveyListForNewDashboard(incompleteSurveyStartIndex,$('#rep-prof-container').attr('data-column-name'),$('#rep-prof-container').attr('data-column-value'));
 });
 
 $(document).on('click', '#rep-sur-previous.paginate-button', function() {
@@ -3142,7 +3153,7 @@ $(document).on('click', '#rep-sur-previous.paginate-button', function() {
 	}
 	incompleteSurveyStartIndex = incompleteSurveyStartIndex * incompleteSurveyBatchSize;
 	$('#rep-icn-sur-popup-cont').attr("data-start", incompleteSurveyStartIndex);
-	paintIncompleteSurveyListForNewDashboard(incompleteSurveyStartIndex);
+	paintIncompleteSurveyListForNewDashboard(incompleteSurveyStartIndex,$('#rep-prof-container').attr('data-column-name'),$('#rep-prof-container').attr('data-column-value'));
 });
 
 $(document).on('keypress', '#rep-sel-page', function(e) {
@@ -3175,7 +3186,7 @@ function paginateIncompleteSurveyForNewDashboard() {
 	incompleteSurveyStartIndex = parseInt(pageNo - 1) * batchSize;
 
 	$('#rep-icn-sur-popup-cont').attr("data-start", incompleteSurveyStartIndex);
-	paintIncompleteSurveyListForNewDashboard(incompleteSurveyStartIndex);
+	paintIncompleteSurveyListForNewDashboard(incompleteSurveyStartIndex,$('#rep-prof-container').attr('data-column-name'),$('#rep-prof-container').attr('data-column-value'));
 }
 
 $(document).on('keyup', '#rep-sel-page', function(e) {

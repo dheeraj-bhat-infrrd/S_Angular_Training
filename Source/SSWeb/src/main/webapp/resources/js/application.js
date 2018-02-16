@@ -608,7 +608,6 @@ function paintReportingDashboard(profileMasterId, newProfileName, newProfileValu
 	isDashboardReviewRequestRunning = false;
 	reviewsFetchedSoFar = 0;
 	startIndexInc = 0;
-	batchSizeInc = 10;
 	totalReviewsInc = 0;
 	surveyFetchedSoFarInc = 0;
 

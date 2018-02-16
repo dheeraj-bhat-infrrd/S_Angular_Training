@@ -10603,6 +10603,11 @@ img.lead-img {
 	text-align:-webkit-right;
 }
 
+.text-align-left{
+	text-align:left;
+	text-align:-webkit-left;
+}
+
 .edit-survey-radio-container{
 	margin: 25px auto; 
 	display: grid;

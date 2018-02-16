@@ -6,7 +6,7 @@
 
 <c:if test="${not empty incompleteSurveys}">
 	<c:forEach var="survey" items="${incompleteSurveys}">
-		<div class="dash-lp-item clearfix" data-sur-iden="${survey.surveyPreIntitiationId}" 
+		<div class="dash-lp-item text-align-left clearfix" data-sur-iden="${survey.surveyPreIntitiationId}" 
 			data-iden="sur-pre-${survey.surveyPreIntitiationId}">
 			<div class="float-left rep-sur-icn-checkbox sb-q-chk-no"></div>
 			<div class="float-left dash-lp-txt">
