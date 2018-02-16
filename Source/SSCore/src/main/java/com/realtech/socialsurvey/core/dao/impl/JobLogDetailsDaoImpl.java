@@ -68,6 +68,27 @@ public class JobLogDetailsDaoImpl extends GenericReportingDaoImpl<JobLogDetails,
     }
     
     @Override
+    public JobLogDetails getLastCentrelisedRun()
+    {
+    	LOG.debug("method to fetch the job-log details of last scheduled centrelised run getLastCentrelisedRun() started");
+        try {
+            // create criteria object for JobLog entity class
+            Criteria criteria = getSession().createCriteria( JobLogDetails.class );
+            criteria.add(Restrictions.eq(CommonConstants.IS_MANUAL, false));
+            criteria.add(Restrictions.eq(CommonConstants.JOB_NAME, CommonConstants.CENTRALIZED_JOB_NAME));
+            criteria.addOrder( Order.desc( CommonConstants.JOB_LOG_ID ) );
+            criteria.setMaxResults( 1 );
+            LOG.debug( "method to fetch the job-log details of last run, getJobLogDetailsOfLatestRun() finished." );
+            return (JobLogDetails) criteria.uniqueResult();
+            
+        } catch ( HibernateException hibernateException ) {
+            LOG.error( "Exception caught in getJobLogDetailsOfLatestRun() :{} ", hibernateException );
+            throw new DatabaseException( "Exception caught in getJobLogDetailsOfLatestRun() ", hibernateException );
+        }
+    	
+    }
+    
+    @Override
     public long insertJobLog(JobLogDetails jobLogDetails) throws InvalidInputException
     {
         LOG.debug(
@@ -76,6 +97,20 @@ public class JobLogDetailsDaoImpl extends GenericReportingDaoImpl<JobLogDetails,
         	super.save(jobLogDetails);
             return jobLogDetails.getJobLogId();
             
+        } catch ( HibernateException hibernateException ) {
+            LOG.error( "Exception caught in insertJobLog() :{} ", hibernateException );
+            throw new DatabaseException( "Exception caught in insertJobLog() ", hibernateException );
+        }
+
+    }
+    
+    @Override
+    public void updateJobLog(JobLogDetails jobLogDetails) throws InvalidInputException
+    {
+        LOG.debug(
+            "method to insert the job-log details for user ranking, insertJobLog() started." );
+        try {
+        	super.saveOrUpdate(jobLogDetails);            
         } catch ( HibernateException hibernateException ) {
             LOG.error( "Exception caught in insertJobLog() :{} ", hibernateException );
             throw new DatabaseException( "Exception caught in insertJobLog() ", hibernateException );

@@ -10,6 +10,7 @@
 <c:set var="columnId" value="${columnId}"></c:set>
 <c:set var="isEtlRunning" value="${isEtlRunning}"></c:set>
 <c:set var="lastSuccessfulRun" value="${lastSuccessfulRun}"></c:set>
+<c:set var="highestrole" value="${highestrole}"></c:set>
 
 <style>
 	.ranking-settings-ip-div{
@@ -92,20 +93,20 @@
 		</c:if>
 		<c:if test="${ (isRealTechOrSSAdmin == true or isRealTechOrSSAdmin == 'true') }">
 			<div style="margin-top:20px">
-				<div class="st-score-rt-top width-three-five-zero"><spring:message code="lable.ranking.settings.recalculate.key" /></div>
-				<div class="recalculate-user-ranking">
-					<div class="recalculate-usr-rank-btn-active text-center" onclick="javascript:recalculateUserRanking()">
-						<spring:message code="lable.ranking.settings.recalculate.btn.key" />
+					<div class="st-score-rt-top width-three-five-zero"><spring:message code="lable.ranking.settings.recalculate.key" /></div>
+					<div class="recalculate-user-ranking">
+						<div class="recalculate-usr-rank-btn-active text-center" onclick="javascript:recalculateUserRanking()">
+							<spring:message code="lable.ranking.settings.recalculate.btn.key" />
+						</div>
+						<div class="recalculate-usr-rank-btn-inactive text-center">
+							<spring:message code="lable.ranking.settings.recalculate.btn.key" />
+						</div>
+						<c:if test="${ (lastSuccessfulRun != undefined and lastSuccessfulRun != '' and lastSuccessfulRun != null) }">
+							<span class="min-req-span">
+								Last ETL Runtime : ${lastSuccessfulRun}
+							</span>
+						</c:if>
 					</div>
-					<div class="recalculate-usr-rank-btn-inactive text-center">
-						<spring:message code="lable.ranking.settings.recalculate.btn.key" />
-					</div>
-				<c:if test="${ (lastSuccessfulRun != undefined and lastSuccessfulRun != '' and lastSuccessfulRun != null) }">
-					<span class="min-req-span">
-						Last ETL Runtime : ${lastSuccessfulRun}
-					</span>
-				</c:if>
-				</div>
 			</div>
 		</c:if>
 	</div>
@@ -118,9 +119,9 @@ var columnName = "${columnName}";
 var columnId = "${columnId}";
 var isEtlRunning = "${isEtlRunning}";
 var lastSuccessfulRun = "${lastSuccessfulRun}";
+var highestrole = "${highestrole}";
 
-console.log("isEtlRunning: ", isEtlRunning);
-console.log("lastSuccessfulRun: ", lastSuccessfulRun);
+console.log("highestRole: ", highestrole);
 
 $(document).ready(function(){
 	$('#min-req-container').on('blur','.ranking-settings-ip',function(e){

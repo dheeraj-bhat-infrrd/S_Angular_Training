@@ -7,14 +7,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
-import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
-
+import com.realtech.socialsurvey.core.handler.SurveyImportHandler;
 
 public class BulkSurveyImporter extends QuartzJobBean
 {
-    public static final Logger LOG = LoggerFactory.getLogger( BillingReportGenerator.class );
+    public static final Logger LOG = LoggerFactory.getLogger( BulkSurveyImporter.class );
 
-    private SurveyHandler surveyHandler;
+    private SurveyImportHandler surveyImportHandler;
 
 
     @Override
@@ -22,13 +21,13 @@ public class BulkSurveyImporter extends QuartzJobBean
     {
         LOG.info( "Bulk Survey Importer started" );
         initializeDependencies( jobExecutionContext.getMergedJobDataMap() );
-        surveyHandler.begin3rdPartySurveyImport();
+        surveyImportHandler.start3rdPartySurveyImport();
         LOG.info( "Bulk Survey Importer finished" );
     }
 
     private void initializeDependencies( JobDataMap jobMap )
     {
-        surveyHandler = (SurveyHandler) jobMap.get( "surveyHandler" );
+        surveyImportHandler = (SurveyImportHandler) jobMap.get( "surveyImportHandler" );
     }
 
 

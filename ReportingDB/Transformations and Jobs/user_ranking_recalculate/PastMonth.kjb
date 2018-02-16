@@ -12,6 +12,11 @@
   <modified_date>2017&#x2f;08&#x2f;07 18&#x3a;29&#x3a;20.477</modified_date>
     <parameters>
         <parameter>
+            <name>companyId</name>
+            <default_value>5</default_value>
+            <description/>
+        </parameter>
+        <parameter>
             <name>jobLogId</name>
             <default_value/>
             <description/>
@@ -158,8 +163,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>366</xloc>
-      <yloc>120</yloc>
+      <xloc>367</xloc>
+      <yloc>119</yloc>
       </entry>
     <entry>
       <name>past_month_main_branch</name>

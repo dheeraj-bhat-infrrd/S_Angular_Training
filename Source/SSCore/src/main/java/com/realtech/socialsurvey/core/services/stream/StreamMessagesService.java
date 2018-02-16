@@ -1,5 +1,7 @@
 package com.realtech.socialsurvey.core.services.stream;
 
+import java.util.List;
+
 import com.realtech.socialsurvey.core.entities.EmailEntity;
 import com.realtech.socialsurvey.core.entities.SendGridEventEntity;
 
@@ -24,4 +26,22 @@ public interface StreamMessagesService
      * @return
      */
     public boolean saveFailedStreamClickEvent(SendGridEventEntity sendGridEventEntity);
+
+    /**
+     * 
+     * @return
+     */
+	public List<EmailEntity> getAllFailedStreamMsgs(int start , int batchSize);
+
+	/**
+	 * 
+	 * @param id
+	 */
+	public void deleteFailedStreamMsg(String id);
+
+	/**
+	 * 
+	 * @param id
+	 */
+	public void updateRetryFailedForStreamMsg(String id);
 }

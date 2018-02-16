@@ -1,5 +1,6 @@
 ﻿using EllieMae.Encompass.Collections;
 using EncompassSocialSurvey.Entity;
+using EncompassSocialSurvey.Service;
 using System;
 using System.Collections.Generic;
 
@@ -17,7 +18,7 @@ namespace EncompassSocialSurvey
         //
         // public static ArrayList LoanFolders { get; set; }
 
-        /// <summary>
+        /// <summary> 
         /// Set the current user credentials to the global objects
         /// </summary>
         /// <param name="companyCredential"></param>
@@ -26,26 +27,27 @@ namespace EncompassSocialSurvey
             Logger.Info("Entering the method EncompassGlobal.GetUserLoginSesssion()");
             try
             {
+                // set up cipher service
+                CipherService cipherService = new CipherService();
+
                 // if user name or password field is empty return
                 if (string.IsNullOrWhiteSpace(companyCredential.EncompassCredential.UserName)) return;
                 if (string.IsNullOrWhiteSpace(companyCredential.EncompassCredential.Password)) return;
 
-                // now set the user name  password
+                // now set the user name  password( encrypted )
                 EncompassUserName = companyCredential.EncompassCredential.UserName;
-                EncompassPassword = companyCredential.EncompassCredential.Password;
+                EncompassPassword = cipherService.decrypt( companyCredential.EncompassCredential.Password, "");
                 EncompassUrl = companyCredential.EncompassCredential.EncompassUrl;
                 
                 // Start the session
                 EllieMae.Encompass.Client.Session s = new EllieMae.Encompass.Client.Session();
 
-
-
                 // 
                 if (companyCredential.EncompassCredential.EncompassUrl == "")
-                    s.StartOffline(companyCredential.EncompassCredential.UserName, companyCredential.EncompassCredential.Password);
+                    s.StartOffline(EncompassUserName, EncompassPassword);
 
                 else
-                    s.Start(companyCredential.EncompassCredential.EncompassUrl, companyCredential.EncompassCredential.UserName, companyCredential.EncompassCredential.Password);
+                    s.Start(EncompassUrl, EncompassUserName, EncompassPassword);
 
                 // set the static object
                 EncompassLoginSession = s;
