@@ -39,26 +39,16 @@ public class UpdateSocialPostDuplicateCountBolt extends BaseComputeBoltWithAck {
 
         if(success && hash != 0) {
             try {
-                //check if posts with same hash are already present
-                Optional<Long> duplicateCount = getSocialPostDuplicateCount(hash, companyId);
-                if (duplicateCount.isPresent() && duplicateCount.get() > 1) {
-                    //update all the duplicateCount field of the social post
-                    Optional<Long> updatedPosts = updateSocialPostDuplicateCount(hash, companyId, duplicateCount.get());
-                    if (updatedPosts.isPresent() && updatedPosts.get() == duplicateCount.get()) {
-                        isSuccess = true;
-                        LOG.info(" Total {} docs were successfully updated for having hash {} and postId {} ", updatedPosts.get(), hash, socialPost.getPostId());
-                        _collector.emit("RETRY_STREAM", tuple, new Values(isSuccess, socialPost));
-                    } else {
-                        LOG.warn("Something went wrong while updating duplicateCount of post having postId {} !!! ", socialPost.getPostId());
-                        //insert as a permanent failure
-                        failedMessagesService.insertPermanentlyFailedSocialPost(socialPost,
-                                new FatalException("DuplicateCount and updated document count do not match"));
-                    }
-                } else if (duplicateCount.isPresent() && duplicateCount.get() == null) {
-                    LOG.warn("Social Post with hash {} and postId {} is not present in mongo !!! Something went wrong !!!", socialPost.getPostId(), hash);
-                    //insert as a permanent failure
+                Optional<Long> updatedPosts = updateSocialPostDuplicateCount(hash, companyId);
+                if (updatedPosts.isPresent() &&  updatedPosts.get() > 1) {
+                    isSuccess = true;
+                    LOG.info(" Total {} docs were successfully updated for having hash {} and postId {} ",
+                            updatedPosts.get(), hash, socialPost.getPostId());
+                    _collector.emit("RETRY_STREAM", tuple, new Values(isSuccess, socialPost));
+                } else if ( !updatedPosts.isPresent() || updatedPosts.get() == 0){
+                    LOG.error("Something went wrong while updating the social post having postId {}", socialPost.getPostId());
                     failedMessagesService.insertPermanentlyFailedSocialPost(socialPost,
-                            new FatalException("Social Post is not present in mongo !!! Something went wrong !!!"));
+                            new Exception("Something went wrong while updating the social post"));
                 }
             } catch (IOException | APIIntegrationException e ) {
                 if(!socialPost.isRetried()){
@@ -79,12 +69,8 @@ public class UpdateSocialPostDuplicateCountBolt extends BaseComputeBoltWithAck {
         return new Values(false, 0, null);
     }
 
-    private Optional<Long> updateSocialPostDuplicateCount(int hash, long companyId, long duplicateCount) throws IOException {
-        return SSAPIOperations.getInstance().updateSocialPostDuplicateCount(hash, companyId, duplicateCount);
-    }
-
-    private Optional<Long> getSocialPostDuplicateCount(int hash, long comapanyId) throws IOException {
-        return SSAPIOperations.getInstance().getSocialPostDuplicateCount( hash, comapanyId);
+    private Optional<Long> updateSocialPostDuplicateCount(int hash, long companyId) throws IOException {
+        return SSAPIOperations.getInstance().updateSocialPostDuplicateCount(hash, companyId);
     }
 
     @Override

@@ -142,32 +142,15 @@ public class SocialMonitorController
 
     }
 
-    @RequestMapping ( value = "/feeds/hash/{hash}/companyId/{companyId}", method = RequestMethod.GET)
-    @ApiOperation ( value = "Get duplicate social post count")
-    public ResponseEntity<?> getDuplicatePostsCount(@PathVariable ( "hash" ) int hash,
-                                                    @PathVariable ( "companyId") long companyId,
-                                                    HttpServletRequest request ) throws SSApiException {
-        try{
-            LOGGER.info( "SocialMonitorController.getDuplicatePostsCount started" );
-            // get duplicate social posts count
-            long duplicates = socialFeedService.getDuplicatePostsCount(hash, companyId );
-            LOGGER.info( "SocialMonitorController.getDuplicatePostsCount completed successfully" );
-            return new ResponseEntity<>( duplicates, HttpStatus.OK );
-        } catch (InvalidInputException e) {
-            throw  new SSApiException(e.getMessage(), e);
-        }
-    }
-
-    @RequestMapping ( value = "/feeds/hash/{hash}/companyId/{companyId}/duplicateCount/{duplicateCount}", method = RequestMethod.PUT)
+    @RequestMapping ( value = "/feeds/hash/{hash}/companyId/{companyId}", method = RequestMethod.PUT)
     @ApiOperation ( value = "Updates duplicateCount field matching the given hash of social feed collection")
     public ResponseEntity<?> updateDuplicateCount(@PathVariable ( "hash" ) int hash,
                                                     @PathVariable ("companyId") long companyId,
-                                                    @PathVariable ( "duplicateCount") long duplicateCount,
                                                     HttpServletRequest request ) throws SSApiException {
         try{
             LOGGER.info( "SocialMonitorController.updateDuplicateCount started" );
             // updates duplicateCount of social post collection
-            long updatedDocs = socialFeedService.updateDuplicateCount(hash, companyId, duplicateCount );
+            long updatedDocs = socialFeedService.updateDuplicateCount(hash, companyId );
             LOGGER.info( "SocialMonitorController.updateDuplicateCount completed successfully" );
             return new ResponseEntity<>( updatedDocs, HttpStatus.OK );
         } catch (InvalidInputException e) {

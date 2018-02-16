@@ -57,7 +57,7 @@ public class RedisCompanyKeywordsDaoImpl implements RedisCompanyKeywordsDao, Ser
             String modifiedOnString = jedis.hget( RedisDB.COMPANYKEYWORDS_KEY_PREFIX + companyId, "modifiedon" );
             return Long.parseLong( modifiedOnString );
         } catch (JedisConnectionException e){
-            LOG.warn(e.getMessage());
+            LOG.error(e.getMessage());
             return 0;
         }
     }

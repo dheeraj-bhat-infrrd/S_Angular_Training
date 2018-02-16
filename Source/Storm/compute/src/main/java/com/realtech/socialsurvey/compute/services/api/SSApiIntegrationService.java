@@ -64,15 +64,9 @@ public interface SSApiIntegrationService
     Call<FileUploadResponse> updateFileUploadStatusAndLocation( @Path ( "fileUploadId") long fileUploadId,
         @Path ( "status") int status, @Body String fileName );
 
-
-    @GET ( "v1/feeds/hash/{hash}/companyId/{companyId}")
-    Call<Long> getDuplicateCount( @Path ( "hash") int hash, @Path ( "companyId") long companyId );
-
-
     @Headers ( "Content-Type: application/json")
-    @PUT ( "v1/feeds/hash/{hash}/companyId/{companyId}/duplicateCount/{duplicateCount}")
-    Call<Long> updateDuplicateCount( @Path ( "hash") int hash, @Path ( "companyId") long companyId,
-        @Path ( "duplicateCount") long duplicateCount );
+    @PUT ( "v1/feeds/hash/{hash}/companyId/{companyId}")
+    Call<Long> updateDuplicateCount( @Path ( "hash") int hash, @Path ( "companyId") long companyId);
 
     @GET ("v1/feeds/postId/{postId}")
     Call<Boolean> isSocialPostSavedInMongo(@Path("postId") String id);
