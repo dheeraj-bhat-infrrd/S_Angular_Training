@@ -70,6 +70,7 @@ public class JobLogDetailsReportingController
         long jobLogId = -1;
         if(!jobLogDetailsManagement.getIfEtlIsRunning()) {
         	 jobLogId = jobLogDetailsManagement.insertJobLog(entityId, entityType, CommonConstants.USER_RANKING_JOB_NAME, CommonConstants.STATUS_RUNNING);
+        	 jobLogDetailsManagement.recalEtl(entityId, jobLogId);
         }
         return new Gson().toJson( jobLogId );
     }

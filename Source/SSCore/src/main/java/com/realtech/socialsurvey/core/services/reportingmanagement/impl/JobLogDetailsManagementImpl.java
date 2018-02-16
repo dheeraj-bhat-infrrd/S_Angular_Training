@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import com.jcraft.jsch.ChannelExec;
@@ -127,19 +128,18 @@ public class JobLogDetailsManagementImpl implements JobLogDetailsManagement
         jobLogDetails.setJobStartTime(new Timestamp(System.currentTimeMillis()));
         jobLogDetails.setJobUuid((UUID.randomUUID()).toString());
         long jobLogId = jobLogDetailsDao.insertJobLog(jobLogDetails);
-        recalEtl(entityId, jobLogId);
         LOG.info("THE RETURN OF SSH{}");
         LOG.debug( "method to fetch the job-log details for entity, getLastRunForEntity() finished." );
         return jobLogId;
     }
     
+    @Async
     @Override 
     public void recalEtl(long companyId , long jobLogId) throws InvalidInputException {
     	 JSch jsch = new JSch();
 
          Session session;
          try {
-         
              // give the path to private key file 
         	 jsch.addIdentity(sysPath.trim()); 
              // Set User and IP of the remote host and SSH port.
@@ -160,12 +160,12 @@ public class JobLogDetailsManagementImpl implements JobLogDetailsManagement
 
              // Get an InputStream from this channel and read messages, generated 
              // by the executing command, from the remote side.
-             InputStream in = channelExec.getInputStream();
-             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-             String line;
-             while ((line = reader.readLine()) != null) {
-                 LOG.info(line);
-             }
+             //InputStream in = channelExec.getInputStream();
+             //BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+             //String line;
+             //while ((line = reader.readLine()) != null) {
+             //   LOG.info(line);
+             //}
 
              // Command execution completed here.
 
@@ -179,7 +179,7 @@ public class JobLogDetailsManagementImpl implements JobLogDetailsManagement
              }
              //Disconnect the Session
              session.disconnect();
-         } catch (JSchException | IOException | InvalidInputException e) {
+         } catch (JSchException | InvalidInputException e) {
              LOG.error("Exception caught in recalEtl {}",e);
         	 JobLogDetails jobLogDetails = jobLogDetailsDao.findById(JobLogDetails.class, jobLogId);
         	 jobLogDetails.setStatus("Exception caught in session connect");
