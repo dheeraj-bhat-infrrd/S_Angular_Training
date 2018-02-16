@@ -2409,10 +2409,7 @@ function changeSocialMedia(columnName, columnValue){
 	var max = 2;
 		
 	if (stages != undefined && stages.length != 0) {
-		if (stages.length < max) {
-			$('#rep-social-media').fadeIn(500);
-			$('#empty-rep-social-media').addClass('hide');
-		}else{
+		if (stages.length >= max) {
 			max = stages.length;
 			
 			for (var i = 0; i < max; i++) {
