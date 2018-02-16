@@ -28,6 +28,7 @@ import com.realtech.socialsurvey.core.dao.JobLogDetailsDao;
 import com.realtech.socialsurvey.core.dao.impl.JobLogDetailsDaoImpl;
 import com.realtech.socialsurvey.core.entities.JobLogDetails;
 import com.realtech.socialsurvey.core.entities.JobLogDetailsResponse;
+import com.realtech.socialsurvey.core.entities.Survey;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.reportingmanagement.JobLogDetailsManagement;
 
@@ -133,7 +134,7 @@ public class JobLogDetailsManagementImpl implements JobLogDetailsManagement
     }
     
     @Override 
-    public void recalEtl(long companyId , long jobLogId) {
+    public void recalEtl(long companyId , long jobLogId) throws InvalidInputException {
     	 JSch jsch = new JSch();
 
          Session session;
@@ -172,11 +173,18 @@ public class JobLogDetailsManagementImpl implements JobLogDetailsManagement
              int exitStatus = channelExec.getExitStatus();
              if (exitStatus > 0) {
             	 LOG.info("Remote script exec error! {}",exitStatus);
+            	 JobLogDetails jobLogDetails = jobLogDetailsDao.findById(JobLogDetails.class, jobLogId);
+            	 jobLogDetails.setStatus("Remote script exec error!");
+            	 jobLogDetailsDao.updateJobLog(jobLogDetails);
              }
              //Disconnect the Session
              session.disconnect();
-         } catch (JSchException | IOException e) {
+         } catch (JSchException | IOException | InvalidInputException e) {
              LOG.error("Exception caught in recalEtl {}",e);
+        	 JobLogDetails jobLogDetails = jobLogDetailsDao.findById(JobLogDetails.class, jobLogId);
+        	 jobLogDetails.setStatus("Exception caught in session connect");
+        	 jobLogDetailsDao.updateJobLog(jobLogDetails);
+
          }
     }
 }

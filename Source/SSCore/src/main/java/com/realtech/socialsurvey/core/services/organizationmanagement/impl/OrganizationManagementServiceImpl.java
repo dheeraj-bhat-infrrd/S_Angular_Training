@@ -28,6 +28,7 @@ import javax.annotation.Resource;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.hibernate.criterion.Criterion;
@@ -2391,7 +2392,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             throw new InvalidInputException( "Invalid searchKey passed as argument " );
         List<Region> regions = new ArrayList<Region>();
         List<SolrDocument> solrDocumentList = solrSearchService
-            .searchBranchRegionOrAgentByNameForAdmin( CommonConstants.REGION_NAME_SOLR, searchKey );
+            .searchBranchRegionOrAgentByNameForAdmin( CommonConstants.REGION_NAME_SOLR, ClientUtils.escapeQueryChars(searchKey) );
 
         for ( SolrDocument document : solrDocumentList ) {
             Region region = new Region();
@@ -2418,7 +2419,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             throw new InvalidInputException( "Invalid searchKey passed as argument " );
         List<Branch> branches = new ArrayList<Branch>();
         List<SolrDocument> solrDocumentList = solrSearchService
-            .searchBranchRegionOrAgentByNameForAdmin( CommonConstants.BRANCH_NAME_SOLR, searchKey );
+            .searchBranchRegionOrAgentByNameForAdmin( CommonConstants.BRANCH_NAME_SOLR, ClientUtils.escapeQueryChars(searchKey) );
 
         for ( SolrDocument document : solrDocumentList ) {
             Branch branch = new Branch();
@@ -2446,7 +2447,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             throw new InvalidInputException( "Invalid searchKey passed as argument " );
         List<UserFromSearch> users = new ArrayList<UserFromSearch>();
         List<SolrDocument> solrDocumentList = solrSearchService
-            .searchBranchRegionOrAgentByNameForAdmin( CommonConstants.USER_DISPLAY_NAME_SOLR, searchKey );
+            .searchBranchRegionOrAgentByNameForAdmin( CommonConstants.USER_DISPLAY_NAME_SOLR, ClientUtils.escapeQueryChars(searchKey) );
 
         for ( SolrDocument document : solrDocumentList ) {
             UserFromSearch user = new UserFromSearch();
