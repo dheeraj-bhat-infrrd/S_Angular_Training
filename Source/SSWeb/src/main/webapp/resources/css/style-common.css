@@ -7302,7 +7302,7 @@ tr.u-tbl-header td {
 
 .paginate-button {
 	cursor: pointer;
-	color: #5CC8EF;
+	background-color: #009FE0 !important;
 }
 
 .tweet-panel-item.bord-bot-dc.clearfix {
@@ -8704,6 +8704,14 @@ label.fil-label {
 .sur-paginate-btn {
 	width: 45px;
 	text-align: center;
+}
+
+.rep-sur-paginate-btn {
+	width: 45px;
+    text-align: center;
+    color: white;
+    background-color: grey;
+    border-radius: 3px;
 }
 
 .paginate-total-pages {

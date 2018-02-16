@@ -20,13 +20,14 @@
 		</div>
 	</div>
 	<div id="paginate-buttons-survey" class="paginate-buttons-survey clearfix">
-		<div id="rep-sur-previous" class="float-left sur-paginate-btn">&lt; Prev</div>
+		<div id="rep-sur-previous" class="float-left rep-sur-paginate-btn">Prev</div>
 		<div class="paginate-sel-box float-left">
 			<input id="rep-sel-page" type="text" pattern="[0-9]*" class="sel-page"/>
 			<span class="paginate-divider">/</span>
 			<span id="rep-paginate-total-pages" class="paginate-total-pages"></span>
+			<span> </span>
 		</div>
-		<div id="rep-sur-next" class="float-right sur-paginate-btn"> Next &gt;</div>
+		<div id="rep-sur-next" class="float-right rep-sur-paginate-btn">Next</div>
 	</div>
 	<div id="rep-nil-dash-survey-incomplete" class="hide">
 		<div style="text-align:center; margin:5% auto">
