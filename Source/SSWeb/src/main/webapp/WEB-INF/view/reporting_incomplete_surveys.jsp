@@ -13,10 +13,22 @@
 		<div class="float-left" style="font-size: 20px;"><spring:message code="label.incompletesurveys.key" /></div>
 		<div class="float-right dash-sur-link" onclick="showIncompleteSurveyListPopup(event)" style="font-size: 15pxpx;"></div>
 	</div>
-	<div id="dsh-inc-srvey" class="dash-lp-item-grp clearfix" data-total="0" style="text-align:left">
-		<!-- Populated with dashboard_incompletesurveys.jsp -->
+	<div class="welcome-popup-body-wrapper clearfix">
+		<div id="rep-icn-sur-popup-cont" data-start="0" data-total="0" data-batch="5" class="icn-sur-popup-cont"></div>
+		<div class="mult-sur-icn-wrapper">
+			<div id="rep-resend-mult-sur-icn" class="mult-sur-icn resend-mult-sur-icn float-left" title="Resend"></div>
+			<div id="rep-del-mult-sur-icn" class="mult-sur-icn del-mult-sur-icn float-right" title="Delete"></div>
+		</div>
 	</div>
-	<%-- <div id="dsh-inc-dwnld" class="dash-btn-sur-data hide"><spring:message code="label.incompletesurveydata.key" /></div> --%>
+	<div class="paginate-buttons-survey clearfix">
+		<div id="rep-sur-previous" class="float-left sur-paginate-btn">&lt; Prev</div>
+		<div class="paginate-sel-box float-left">
+			<input id="rep-sel-page" type="text" pattern="[0-9]*" class="sel-page"/>
+			<span class="paginate-divider">/</span>
+			<span id="rep-paginate-total-pages" class="paginate-total-pages"></span>
+		</div>
+		<div id="rep-sur-next" class="float-right sur-paginate-btn">Next &gt;</div>
+	</div>
 </div>
 <script>
 $(document).ready(function() {
@@ -24,16 +36,9 @@ $(document).ready(function() {
 	var currentProfileName = $('#rep-prof-container').attr('data-column-name');
 	var currentProfileValue = $('#rep-prof-container').attr('data-column-value');
 	
-	var scrollContainer = document.getElementById('dsh-inc-srvey');
-	scrollContainer.onscroll = function() {
-		if (scrollContainer.scrollTop >= ((scrollContainer.scrollHeight * 0.75) - scrollContainer.clientHeight)) {
-			if(!doStopIncompleteSurveyPostAjaxRequest || $('#dsh-inc-srvey>div.dsh-icn-sur-item.hide').length > 0) {
-					fetchIncompleteSurvey(false);
-					$('#dsh-inc-srvey').perfectScrollbar('update');
-			}
-		}
-	};
+	getIncompleteSurveyCountForNewDashboard(currentProfileName, currentProfileValue);
 	
-	getIncompleteSurveyCount(currentProfileName, currentProfileValue);
+	$('#rep-icn-sur-popup-cont').attr("data-start", 0);
+	paintIncompleteSurveyListForNewDashboard(0,currentProfileName,currentProfileValue);
 });
 </script>

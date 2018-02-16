@@ -10601,7 +10601,8 @@ function paintIncompleteSurveyListPopupResults(incompleteSurveystartIndex) {
 		"columnName" : colName,
 		"columnValue" : colValue,
 		"startIndex" : incompleteSurveystartIndex,
-		"batchSize" : $('#icn-sur-popup-cont').attr("data-batch")
+		"batchSize" : $('#icn-sur-popup-cont').attr("data-batch"),
+		"origin" : "oldDashboard"
 	};
 	callAjaxGetWithPayloadData("./fetchincompletesurveypopup.do", function(data) {
 		disableBodyScroll();

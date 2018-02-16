@@ -8737,6 +8737,13 @@ span.paginate-divider {
 	background-position: center;
 }
 
+.rep-sur-icn-checkbox{
+		width: 20px;
+	height: 20px;
+	margin: 0 10px 0 -10px;
+	background-position: center;
+}
+
 .mult-sur-icn-wrapper {
 	width: 80px;
 	margin: 0 auto;
