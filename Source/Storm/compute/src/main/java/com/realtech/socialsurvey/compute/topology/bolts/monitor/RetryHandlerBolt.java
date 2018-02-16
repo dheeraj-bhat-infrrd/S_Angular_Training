@@ -26,17 +26,17 @@ public class RetryHandlerBolt extends BaseComputeBoltWithAck{
 
         FailedMessagesService failedMessagesService = new FailedMessagesServiceImpl();
 
-        if(post != null && input.getSourceStreamId().equals("RETRY_STREAM")){
+        if(post != null){
             if(success && post.isRetried()){
                 int nRemoved = failedMessagesService.deleteFailedSocialPost(post.getPostId());
                 if(nRemoved == 1)
-                    LOG.info("SocialPost with postId {} has been sucessfully deleted", post.getPostId());
+                    LOG.info("SocialPost with postId {} has been successfully deleted", post.getPostId());
                 else
                     LOG.error("Something went wrong while deleting socialpost having postId {}", post.getPostId());
             } else if(!success && post.isRetried()){
                 int updatedCount = failedMessagesService.updateFailedSocialPostRetryCount(post.getPostId());
                 if(updatedCount == 1)
-                    LOG.info("SocialPost retrycount with postId {} has been sucessfully incremented by 1", post.getPostId());
+                    LOG.info("SocialPost retrycount with postId {} has been successfully incremented by 1", post.getPostId());
                 else
                     LOG.error("Something went wrong while incrementing socialpost retryCount having postId {}", post.getPostId());
             }
