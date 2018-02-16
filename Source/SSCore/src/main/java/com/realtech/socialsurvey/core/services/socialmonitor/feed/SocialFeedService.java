@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.services.socialmonitor.feed;
 
+import com.mongodb.DuplicateKeyException;
 import com.realtech.socialsurvey.core.entities.SocialResponseObject;
 import java.util.List;
 
@@ -21,7 +22,7 @@ public interface SocialFeedService
      * @return
      * @throws InvalidInputException 
      */
-    public SocialResponseObject<?> saveFeed(SocialResponseObject<?> socialFeed) throws InvalidInputException;
+    public SocialResponseObject<?> saveFeed(SocialResponseObject<?> socialFeed) throws InvalidInputException, DuplicateKeyException;
 
     /**
      * Updates all posts matching given hash and companyId with the given duplicateCount

@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
+import com.mongodb.DuplicateKeyException;
 import com.mongodb.WriteResult;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.MongoSocialFeedDao;
@@ -37,7 +38,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
     private static final String FEED_TYPE = "type";
 
     @Override
-    public void insertSocialFeed( SocialResponseObject<?> socialFeed, String collectionName )
+    public void insertSocialFeed( SocialResponseObject<?> socialFeed, String collectionName ) throws DuplicateKeyException
     {
         if ( LOG.isDebugEnabled() ) {
             LOG.debug( "Creating {} document. Social feed id: {}", collectionName, socialFeed.getId() );

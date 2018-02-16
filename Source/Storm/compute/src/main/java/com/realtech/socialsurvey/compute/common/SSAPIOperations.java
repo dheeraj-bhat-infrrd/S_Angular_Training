@@ -99,7 +99,7 @@ public class SSAPIOperations
         Call<SocialResponseObject> requestCall = RetrofitApiBuilder.apiBuilderInstance()
             .getSSAPIIntergrationService().saveSocialFeed( socialPostToMongo );
             Response response = requestCall.execute();
-            RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
+            RetrofitApiBuilder.apiBuilderInstance().validateSavePostToMongoResponse( response );
             if ( LOG.isTraceEnabled() ) {
                 LOG.trace( "saveFeedToMongo response {}", response.body() );
             }

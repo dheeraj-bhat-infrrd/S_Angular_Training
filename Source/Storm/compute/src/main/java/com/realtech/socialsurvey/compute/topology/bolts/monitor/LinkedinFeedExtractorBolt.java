@@ -85,7 +85,7 @@ public class LinkedinFeedExtractorBolt extends BaseComputeBolt
 
     /**
      * Create SocialResponseObject with common fields
-     * @param companyId
+     * @param mediaToken
      * @param linkedinFeedData
      * @return
      */
@@ -128,6 +128,7 @@ public class LinkedinFeedExtractorBolt extends BaseComputeBolt
 
         responseWrapper.setHash( responseWrapper.getText().hashCode() );
         responseWrapper.setPostId( id );
+        responseWrapper.setId( id );
         return responseWrapper;
     }
 
