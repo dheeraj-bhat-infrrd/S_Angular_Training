@@ -3,6 +3,10 @@ package com.realtech.socialsurvey.core.dao;
 import com.realtech.socialsurvey.core.entities.JobLogDetails;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
+/**
+ * @author user
+ *
+ */
 public interface JobLogDetailsDao extends GenericReportingDao<JobLogDetails, Long>
 {
 
@@ -40,4 +44,6 @@ public interface JobLogDetailsDao extends GenericReportingDao<JobLogDetails, Lon
 	 * @return
 	 */
 	public JobLogDetails getLastCentrelisedRun();
-}
+
+
+	public void updateJobLog(JobLogDetails jobLogDetails) throws InvalidInputException; } 

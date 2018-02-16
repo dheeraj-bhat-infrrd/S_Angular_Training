@@ -105,6 +105,20 @@ public class JobLogDetailsDaoImpl extends GenericReportingDaoImpl<JobLogDetails,
     }
     
     @Override
+    public void updateJobLog(JobLogDetails jobLogDetails) throws InvalidInputException
+    {
+        LOG.debug(
+            "method to insert the job-log details for user ranking, insertJobLog() started." );
+        try {
+        	super.saveOrUpdate(jobLogDetails);            
+        } catch ( HibernateException hibernateException ) {
+            LOG.error( "Exception caught in insertJobLog() :{} ", hibernateException );
+            throw new DatabaseException( "Exception caught in insertJobLog() ", hibernateException );
+        }
+
+    }
+    
+    @Override
     public JobLogDetails getJobLogDetailsOfLatestRunForEntity(long entityId , String entityType , String jobName) throws InvalidInputException
     {
         LOG.debug(
