@@ -12,6 +12,21 @@
 <c:set var="lastSuccessfulRun" value="${lastSuccessfulRun}"></c:set>
 <c:set var="highestrole" value="${highestrole}"></c:set>
 
+<c:choose>
+	<c:when test="${columnName == 'companyId'}">
+		<c:set value="1" var="profilemasterid"></c:set>
+	</c:when>
+	<c:when test="${columnName == 'regionId'}">
+		<c:set value="2" var="profilemasterid"></c:set>
+	</c:when>
+	<c:when test="${columnName == 'branchId'}">
+		<c:set value="3" var="profilemasterid"></c:set>
+	</c:when>
+	<c:when test="${columnName == 'agentId'}">
+		<c:set value="4" var="profilemasterid"></c:set>
+	</c:when>
+</c:choose>
+
 <style>
 	.ranking-settings-ip-div{
 		position: relative;
@@ -91,7 +106,7 @@
 				</div>
 			</div>
 		</c:if>
-		<c:if test="${ (isRealTechOrSSAdmin == true or isRealTechOrSSAdmin == 'true') && highestrole == 1}">
+		<c:if test="${ (isRealTechOrSSAdmin == true or isRealTechOrSSAdmin == 'true') and highestrole == 1 and profilemasterid == 1 }">
 			<div style="margin-top:20px">
 					<div class="st-score-rt-top width-three-five-zero"><spring:message code="lable.ranking.settings.recalculate.key" /></div>
 					<div class="recalculate-user-ranking">
@@ -101,11 +116,11 @@
 						<div class="recalculate-usr-rank-btn-inactive text-center">
 							<spring:message code="lable.ranking.settings.recalculate.btn.key" />
 						</div>
-					<c:if test="${ (lastSuccessfulRun != undefined and lastSuccessfulRun != '' and lastSuccessfulRun != null) }">
-						<span class="min-req-span">
-							Last ETL Runtime : ${lastSuccessfulRun}
-						</span>
-					</c:if>
+						<c:if test="${ (lastSuccessfulRun != undefined and lastSuccessfulRun != '' and lastSuccessfulRun != null) }">
+							<span class="min-req-span">
+								Last ETL Runtime : ${lastSuccessfulRun}
+							</span>
+						</c:if>
 					</div>
 			</div>
 		</c:if>
@@ -121,7 +136,7 @@ var isEtlRunning = "${isEtlRunning}";
 var lastSuccessfulRun = "${lastSuccessfulRun}";
 var highestrole = "${highestrole}";
 
-console.log("isEtlRunning: ", highestrole);
+console.log("highestRole: ", highestrole);
 
 $(document).ready(function(){
 	$('#min-req-container').on('blur','.ranking-settings-ip',function(e){
