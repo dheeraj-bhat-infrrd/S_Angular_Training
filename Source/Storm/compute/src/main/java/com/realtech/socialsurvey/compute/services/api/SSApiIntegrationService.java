@@ -67,7 +67,4 @@ public interface SSApiIntegrationService
     @Headers ( "Content-Type: application/json")
     @PUT ( "v1/feeds/hash/{hash}/companyId/{companyId}")
     Call<Long> updateDuplicateCount( @Path ( "hash") int hash, @Path ( "companyId") long companyId);
-
-    @GET ("v1/feeds/postId/{postId}")
-    Call<Boolean> isSocialPostSavedInMongo(@Path("postId") String id);
 }

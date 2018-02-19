@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.services.socialmonitor.feed;
 
+import com.mongodb.DuplicateKeyException;
 import com.realtech.socialsurvey.core.entities.SocialResponseObject;
 import java.util.List;
 
@@ -31,14 +32,6 @@ public interface SocialFeedService
      * @return
      */
     long updateDuplicateCount(int hash, long companyId) throws InvalidInputException;
-
-    /**
-     * Gets the post match the given postId
-     * @param postId
-     * @return
-     */
-    boolean isSocialPostSaved(String postId);
-
 
     /** Gets all feeds on social monitor based on the flag
      * @param profileId

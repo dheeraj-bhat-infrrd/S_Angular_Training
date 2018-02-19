@@ -99,7 +99,7 @@ public class SSAPIOperations
         Call<SocialResponseObject> requestCall = RetrofitApiBuilder.apiBuilderInstance()
             .getSSAPIIntergrationService().saveSocialFeed( socialPostToMongo );
             Response response = requestCall.execute();
-            RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
+            RetrofitApiBuilder.apiBuilderInstance().validateSavePostToMongoResponse( response );
             if ( LOG.isTraceEnabled() ) {
                 LOG.trace( "saveFeedToMongo response {}", response.body() );
             }
@@ -116,17 +116,6 @@ public class SSAPIOperations
                 LOG.trace( "updateSocialPostDuplicateCount response {}", response.body() );
             }
             return Optional.of( response.body() );
-    }
-
-    public boolean isSocialPostSavedInMongo(String postId) throws IOException {
-        LOG.info(" Executing isSocialPostSavedInMongo method ");
-        Call<Boolean> requestCall =  RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationService().isSocialPostSavedInMongo(postId);
-        Response<Boolean> response = requestCall.execute();
-        RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
-        if ( LOG.isTraceEnabled() ) {
-            LOG.trace( "isSocialPostSavedInMongo response {}", response.body() );
-        }
-        return response.body();
     }
 
 }

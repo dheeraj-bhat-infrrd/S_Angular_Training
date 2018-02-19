@@ -8,6 +8,7 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -124,14 +125,16 @@ public class SocialMonitorController
 
 
     @RequestMapping ( value = "/feeds", method = RequestMethod.POST)
-    @ApiOperation ( value = "Initiate account registration")
+    @ApiOperation ( value = "Save socialpost into mongo")
     public ResponseEntity<?> saveFeeds( @Valid @RequestBody SocialResponseObject<?> socialFeed ) throws SSApiException
     {
         try {
-            LOGGER.info( "SocialMonitorController.disabledKeywordsByIdForCompany started" );
+            LOGGER.info( "SocialMonitorController.saveFeeds started" );
             SocialResponseObject<?> socialFeedResponse = socialFeedService.saveFeed( socialFeed );
-            LOGGER.info( "SocialMonitorController.disabledKeywordsByIdForCompany completed successfully" );
+            LOGGER.info( "SocialMonitorController.saveFeeds completed successfully" );
             return new ResponseEntity<>( socialFeedResponse, HttpStatus.OK );
+        } catch (DuplicateKeyException duplicateKeyException) {
+            throw new SSApiException(duplicateKeyException.getMessage(), "11000");
         } catch ( NonFatalException e ) {
             throw new SSApiException( e.getMessage(), e );
         }
@@ -163,17 +166,6 @@ public class SocialMonitorController
         } catch (InvalidInputException e) {
             throw  new SSApiException(e.getMessage(), e);
         }
-    }
-
-    @RequestMapping( value = "/feeds/postId/{postId}", method = RequestMethod.GET)
-    @ApiOperation(value = "Fetches the socialpost for given postId")
-    public ResponseEntity<?> isSocialPostSaved(@PathVariable ( "postId" ) String postId,
-                                               HttpServletRequest request) throws SSApiException {
-            LOGGER.info( "SocialMonitorController.isSocialPostSaved started" );
-            // gets social post with given postId
-            boolean result = socialFeedService.isSocialPostSaved(postId);
-            LOGGER.info( "SocialMonitorController.isSocialPostSaved completed successfully" );
-            return new ResponseEntity<>( result, HttpStatus.OK );
     }
 
 }

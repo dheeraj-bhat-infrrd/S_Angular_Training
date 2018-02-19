@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.compute.topology.bolts.monitor;
 
 import com.realtech.socialsurvey.compute.common.SSAPIOperations;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
+import com.realtech.socialsurvey.compute.exception.MongoSaveException;
 import com.realtech.socialsurvey.compute.services.FailedMessagesService;
 import com.realtech.socialsurvey.compute.services.api.APIIntegrationException;
 import com.realtech.socialsurvey.compute.services.impl.FailedMessagesServiceImpl;
@@ -36,22 +37,21 @@ public class SaveFeedsToMongoBolt extends BaseComputeBoltWithAck
     @Override
     public void executeTuple( Tuple input )
     {
-        LOG.info( "Executing save post to mongo bolt." );
+        LOG.debug( "Executing save post to mongo bolt." );
         long companyId = input.getLongByField( "companyId" );
         boolean isSuccess = false;
         String postId = null;
         SocialResponseObject<?> socialPost = (SocialResponseObject<?>) input.getValueByField( "post" );
         if ( socialPost != null ) {
             postId = socialPost.getPostId();
-            try{
+            try {
                 //do not add a post if its already present in mongo
-                boolean isPostAlreadySaved = SSAPIOperations.getInstance().isSocialPostSavedInMongo(postId);
-                if( !isPostAlreadySaved ){
-                    LOG.info("Adding new social post to mongo");
-                    isSuccess = true;
-                    addSocialPostToMongo(socialPost);
-                    _collector.emit("RETRY_STREAM", input, new Values(isSuccess, socialPost));
-                } else if(isPostAlreadySaved && socialPost.isRetried()) {
+                LOG.info("Adding new social post to mongo");
+                addSocialPostToMongo(socialPost);
+                isSuccess = true;
+                _collector.emit("RETRY_STREAM", input, new Values(isSuccess, socialPost));
+            } catch (MongoSaveException duplicateKeyException) {
+                if(socialPost.isRetried()) {
                     LOG.info("Social post having postId = {} was already saved in mongo.But duplicateCount not updated.", postId);
                     isSuccess = true;
                 } else
@@ -84,8 +84,7 @@ public class SaveFeedsToMongoBolt extends BaseComputeBoltWithAck
     }
 
     @Override
-    public void declareOutputFields( OutputFieldsDeclarer declarer )
-    {
+    public void declareOutputFields( OutputFieldsDeclarer declarer ) {
         declarer.declareStream("SUCCESS_STREAM", new Fields("isSuccess", "companyId", "post"));
         declarer.declareStream("RETRY_STREAM", new Fields( "isSuccess", "post") );
     }

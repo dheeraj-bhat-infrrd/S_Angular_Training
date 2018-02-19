@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
+import com.mongodb.DuplicateKeyException;
 import com.mongodb.WriteResult;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.MongoSocialFeedDao;
@@ -69,15 +70,6 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 		}
 		else return duplicates;
 	}
-
-    @Override
-    public boolean isSocialPostSaved(String postId) {
-        if(LOG.isDebugEnabled()) {
-            LOG.debug("Fetching posts with postId {} ", postId);
-        }
-        Query query = new Query().addCriteria(Criteria.where(POST_ID).is(postId));
-        return mongoTemplate.exists(query, SocialResponseObject.class, SOCIAL_FEED_COLLECTION);
-    }
     
 	@Override
 	public void updateSocialFeed(SocialFeedsActionUpdate socialFeedsActionUpdate, List<ActionHistory> actionHistories, int updateFlag, String collectionName) {
