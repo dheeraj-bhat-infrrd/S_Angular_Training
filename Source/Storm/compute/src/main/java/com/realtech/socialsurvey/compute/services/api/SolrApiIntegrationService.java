@@ -32,4 +32,8 @@ public interface SolrApiIntegrationService
     Call<SOLRResponseObject<SolrEmailMessageWrapper>> getEmailMessage(@Query("q") String query, @Query("fq") String fieldQuery, @Query("fl") String fieldList,
                                                                       @Query("start") int start, @Query("rows") int rows, @Query("wt") String wt);
 
+    @Headers("Content-Type: application/json")
+    @GET("ss-emails/select")
+    Call<String> getEmailCounts(@Query("q") String query, @Query("rows") int rows,@Query("fq") String fieldQuery, @Query("wt") String wt,
+    		@Query("facet")String facet, @Query("facet.field")String facetField, @Query("facet.pivot") String facetPivot);
 }

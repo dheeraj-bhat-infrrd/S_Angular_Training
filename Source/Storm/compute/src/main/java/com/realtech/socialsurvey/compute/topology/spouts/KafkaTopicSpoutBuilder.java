@@ -26,7 +26,7 @@ public class KafkaTopicSpoutBuilder
 
     private static final Logger LOG = LoggerFactory.getLogger( KafkaTopicSpoutBuilder.class );
 
-    private static final String ZOOKEEPER_BROKERS = "172.30.0.188:2181";
+    private static final String ZOOKEEPER_BROKERS = "localhost:2181";
     private static final String ZOOKEEPER_ROOT = "";
 
     // SendGrid Event Spout
@@ -108,7 +108,7 @@ public class KafkaTopicSpoutBuilder
         String consumerGroup = ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? REPORT_CONSUMER_GROUP
                 : ChararcterUtils.appendWithHypen(REPORT_CONSUMER_GROUP, EnvConstants.getProfile() );
         SpoutConfig reportSpoutConfig = new SpoutConfig( zkHosts, topicName, ZOOKEEPER_ROOT, consumerGroup );
-        reportSpoutConfig.ignoreZkOffsets = false;
+        reportSpoutConfig.ignoreZkOffsets = true;
         reportSpoutConfig.scheme = new SchemeAsMultiScheme( new StringScheme() );
         LOG.info( "Report topic spout initiated. Topic: {}, Consumer Group: {}", topicName, consumerGroup );
         return new KafkaSpout( reportSpoutConfig );

@@ -80,7 +80,7 @@ public class ReportsTopologyStarterHelper extends TopologyStarterHelper
         //add the bolts
         builder.setBolt("UpdateFileUploadStatusBolt", new UpdateFileUploadStatusBolt(), 1)
                 .shuffleGrouping("ReportGenerationSpout");
-        builder.setBolt("QuerySolrToFetchSurveyRelatedMailsBolt", new QuerySolrToFetchSurveyRelatedMailBolt(), 1)
+        builder.setBolt("QuerySolrToFetchSurveyRelatedMailsBolt", new AggregateSolrQueryBolt(), 1)
                 .shuffleGrouping("ReportGenerationSpout");
         builder.setBolt("WriteReportToExcelBolt", new WriteReportToExcelBolt(), 1)
                 .fieldsGrouping("QuerySolrToFetchSurveyRelatedMailsBolt", new Fields("fileUploadId"));
