@@ -168,15 +168,4 @@ public class SocialMonitorController
         }
     }
 
-    @RequestMapping( value = "/feeds/postId/{postId}", method = RequestMethod.GET)
-    @ApiOperation(value = "Fetches the socialpost for given postId")
-    public ResponseEntity<?> isSocialPostSaved(@PathVariable ( "postId" ) String postId,
-                                               HttpServletRequest request) throws SSApiException {
-            LOGGER.info( "SocialMonitorController.isSocialPostSaved started" );
-            // gets social post with given postId
-            boolean result = socialFeedService.isSocialPostSaved(postId);
-            LOGGER.info( "SocialMonitorController.isSocialPostSaved completed successfully" );
-            return new ResponseEntity<>( result, HttpStatus.OK );
-    }
-
 }

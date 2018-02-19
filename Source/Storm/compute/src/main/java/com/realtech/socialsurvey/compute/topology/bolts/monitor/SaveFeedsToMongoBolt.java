@@ -37,7 +37,7 @@ public class SaveFeedsToMongoBolt extends BaseComputeBoltWithAck
     @Override
     public void executeTuple( Tuple input )
     {
-        LOG.info( "Executing save post to mongo bolt." );
+        LOG.debug( "Executing save post to mongo bolt." );
         long companyId = input.getLongByField( "companyId" );
         boolean isSuccess = false;
         String postId = null;
@@ -46,10 +46,9 @@ public class SaveFeedsToMongoBolt extends BaseComputeBoltWithAck
             postId = socialPost.getPostId();
             try {
                 //do not add a post if its already present in mongo
-                //boolean isPostAlreadySaved = SSAPIOperations.getInstance().isSocialPostSavedInMongo(postId);
                 LOG.info("Adding new social post to mongo");
-                isSuccess = true;
                 addSocialPostToMongo(socialPost);
+                isSuccess = true;
                 _collector.emit("RETRY_STREAM", input, new Values(isSuccess, socialPost));
             } catch (MongoSaveException duplicateKeyException) {
                 if(socialPost.isRetried()) {

@@ -53,7 +53,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
 	}
 
 	@Override
-    public SocialResponseObject<?> saveFeed( SocialResponseObject<?> socialFeed ) throws InvalidInputException, DuplicateKeyException
+    public SocialResponseObject<?> saveFeed( SocialResponseObject<?> socialFeed ) throws InvalidInputException
     {
         LOG.info( "Inside save feed method {}" , socialFeed);
         if(socialFeed == null){
@@ -223,12 +223,6 @@ public class SocialFeedServiceImpl implements SocialFeedService
         }
         return mongoSocialFeedDao.updateDuplicateCount(hash, companyId);
     }
-
-    @Override
-    public boolean isSocialPostSaved(String postId) {
-        return mongoSocialFeedDao.isSocialPostSaved(postId);
-    }
-
 
 	@Override
 	public List<SocialMonitorMacro> getMacros( long companyId ) throws InvalidInputException {

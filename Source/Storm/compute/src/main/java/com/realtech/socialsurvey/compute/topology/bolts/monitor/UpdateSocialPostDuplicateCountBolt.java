@@ -23,11 +23,11 @@ public class UpdateSocialPostDuplicateCountBolt extends BaseComputeBoltWithAck {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = LoggerFactory.getLogger( SaveFeedsToMongoBolt.class );
+    private static final Logger LOG = LoggerFactory.getLogger( UpdateSocialPostDuplicateCountBolt.class );
 
     @Override
     public void executeTuple(Tuple tuple) {
-        LOG.info("Executing update duplicate feedCount bolt ... ");
+        LOG.debug("Executing update duplicate feedCount bolt ... ");
         long companyId = tuple.getLongByField("companyId");
         SocialResponseObject<?> socialPost = (SocialResponseObject<?>) tuple.getValueByField( "post" );
         boolean success = tuple.getBooleanByField("isSuccess");

@@ -22,7 +22,7 @@ public interface SocialFeedService
      * @return
      * @throws InvalidInputException 
      */
-    public SocialResponseObject<?> saveFeed(SocialResponseObject<?> socialFeed) throws InvalidInputException, DuplicateKeyException;
+    public SocialResponseObject<?> saveFeed(SocialResponseObject<?> socialFeed) throws InvalidInputException;
 
     /**
      * Updates all posts matching given hash and companyId with the given duplicateCount
@@ -32,14 +32,6 @@ public interface SocialFeedService
      * @return
      */
     long updateDuplicateCount(int hash, long companyId) throws InvalidInputException;
-
-    /**
-     * Gets the post match the given postId
-     * @param postId
-     * @return
-     */
-    boolean isSocialPostSaved(String postId);
-
 
     /** Gets all feeds on social monitor based on the flag
      * @param profileId

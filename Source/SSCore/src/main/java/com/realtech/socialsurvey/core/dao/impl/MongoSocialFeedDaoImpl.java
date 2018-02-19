@@ -38,7 +38,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
     private static final String FEED_TYPE = "type";
 
     @Override
-    public void insertSocialFeed( SocialResponseObject<?> socialFeed, String collectionName ) throws DuplicateKeyException
+    public void insertSocialFeed( SocialResponseObject<?> socialFeed, String collectionName )
     {
         if ( LOG.isDebugEnabled() ) {
             LOG.debug( "Creating {} document. Social feed id: {}", collectionName, socialFeed.getId() );
@@ -70,15 +70,6 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 		}
 		else return duplicates;
 	}
-
-    @Override
-    public boolean isSocialPostSaved(String postId) {
-        if(LOG.isDebugEnabled()) {
-            LOG.debug("Fetching posts with postId {} ", postId);
-        }
-        Query query = new Query().addCriteria(Criteria.where(POST_ID).is(postId));
-        return mongoTemplate.exists(query, SocialResponseObject.class, SOCIAL_FEED_COLLECTION);
-    }
     
 	@Override
 	public void updateSocialFeed(SocialFeedsActionUpdate socialFeedsActionUpdate, List<ActionHistory> actionHistories, int updateFlag, String collectionName) {

@@ -7,11 +7,9 @@ import java.util.List;
 
 public interface MongoSocialFeedDao
 {
-    public void insertSocialFeed( SocialResponseObject<?> socialFeed, String collectionName ) throws DuplicateKeyException;
+    public void insertSocialFeed( SocialResponseObject<?> socialFeed, String collectionName );
 
     long updateDuplicateCount(int hash, long companyId);
-
-    boolean isSocialPostSaved(String postId);
     
     public SocialResponseObject getSocialFeed(String postId, String collectionName);
         

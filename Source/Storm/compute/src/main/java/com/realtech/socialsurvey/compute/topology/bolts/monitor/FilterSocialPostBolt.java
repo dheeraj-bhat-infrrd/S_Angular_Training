@@ -40,7 +40,7 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
     @Override
     public void executeTuple( Tuple input )
     {
-        LOG.info( "Executing filter social post bolt" );
+        LOG.debug( "Executing filter social post bolt" );
         SocialResponseObject<?> post = (SocialResponseObject<?>) input.getValueByField( "post" );
         SocialResponseType socialResponseType = (SocialResponseType) input.getValueByField( "type" );
         long companyId = input.getLongByField( "companyId" );

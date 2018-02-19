@@ -118,15 +118,4 @@ public class SSAPIOperations
             return Optional.of( response.body() );
     }
 
-    public boolean isSocialPostSavedInMongo(String postId) throws IOException {
-        LOG.info(" Executing isSocialPostSavedInMongo method ");
-        Call<Boolean> requestCall =  RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationService().isSocialPostSavedInMongo(postId);
-        Response<Boolean> response = requestCall.execute();
-        RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
-        if ( LOG.isTraceEnabled() ) {
-            LOG.trace( "isSocialPostSavedInMongo response {}", response.body() );
-        }
-        return response.body();
-    }
-
 }
