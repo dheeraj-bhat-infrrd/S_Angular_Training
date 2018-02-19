@@ -2409,10 +2409,7 @@ function changeSocialMedia(columnName, columnValue){
 	var max = 2;
 		
 	if (stages != undefined && stages.length != 0) {
-		if (stages.length < max) {
-			$('#rep-social-media').fadeIn(500);
-			$('#empty-rep-social-media').addClass('hide');
-		}else{
+		if (stages.length >= max) {
 			max = stages.length;
 			
 			for (var i = 0; i < max; i++) {
@@ -2994,3 +2991,214 @@ function getUserRankingCount(entityType,entityId,year,month,batchSize,timeFrame)
 	});
 	return userRankingCount;
 }
+
+function getIncompleteSurveyCountForNewDashboard(colName, colValue) {
+
+	var payload = {
+		"columnName" : colName,
+		"columnValue" : colValue
+	};
+	callAjaxGetWithPayloadData("./fetchdashboardincompletesurveycount.do", function(data) {
+		$('#rep-icn-sur-popup-cont').attr("data-total", data);
+		var totalCount = parseInt(data);
+		
+		if (totalCount == 0) {
+			$("#incomplete-survey-header").addClass("hide");
+			$("#inc-survey-cont").addClass("hide");
+			$("#paginate-buttons-survey").addClass("hide");
+			$("#rep-nil-dash-survey-incomplete").removeClass("hide");
+			return;
+		}
+		
+		var batchSize = parseInt($('#rep-icn-sur-popup-cont').attr("data-batch"));
+		var numPages = 0;
+		if (parseInt(totalCount % batchSize) == 0) {
+			numPages = parseInt(totalCount / batchSize);
+		} else {
+			numPages = parseInt(parseInt(totalCount / batchSize) + 1);
+		}
+		$('#rep-paginate-total-pages').html(numPages);
+
+	}, payload, true);
+}
+
+function paintIncompleteSurveyListForNewDashboard(incompleteSurveystartIndex,colmName,colmValue) {
+	var incompleteSurveyBatchSize = parseInt($('#rep-icn-sur-popup-cont').attr("data-batch"));
+	$('#rep-sel-page').val((incompleteSurveystartIndex / incompleteSurveyBatchSize) + 1);
+	var payload = {
+		"columnName" : colmName,
+		"columnValue" : colmValue,
+		"startIndex" : incompleteSurveystartIndex,
+		"batchSize" : $('#rep-icn-sur-popup-cont').attr("data-batch"),
+		"origin" : "newDashboard"
+	};
+	callAjaxGetWithPayloadData("./fetchincompletesurveypopup.do", function(data) {
+		$('#rep-icn-sur-popup-cont').html(data);
+		if (parseInt(incompleteSurveystartIndex) > 0) {
+			$('#rep-sur-previous').addClass('paginate-button');
+		} else {
+			$('#rep-sur-previous').removeClass('paginate-button');
+		}
+		
+		// move back a page if this page has no entry
+		if( parseInt($('#rep-icn-sur-popup-cont').children('.dash-lp-item').size()) < 1 && parseInt(incompleteSurveystartIndex) > 0 ){
+			paintIncompleteSurveyListForNewDashboard((parseInt(incompleteSurveystartIndex) - incompleteSurveyBatchSize),colmName,colmValue);
+			return;
+		}
+		
+		incompleteSurveystartIndex = parseInt(incompleteSurveystartIndex) + parseInt($('#rep-icn-sur-popup-cont').children('.dash-lp-item').size());
+		var totalSurveysCount = parseInt($('#rep-icn-sur-popup-cont').attr("data-total"));
+		if (incompleteSurveystartIndex < totalSurveysCount) {
+			$('#rep-sur-next').addClass('paginate-button');
+		} else {
+			$('#rep-sur-next').removeClass('paginate-button');
+		}
+	}, payload, true);
+}
+
+$(document).on('click', '#rep-resend-mult-sur-icn.mult-sur-icn-active', function() {
+	var selectedSurveys = $('#rep-icn-sur-popup-cont').data('selected-survey');
+	resendMultipleIncompleteSurveyRequestsForNewDashboard(selectedSurveys);
+});
+
+function resendMultipleIncompleteSurveyRequestsForNewDashboard(incompleteSurveyIds) {
+	showOverlay();
+	callAjaxPOSTWithTextData("/resendmultipleincompletesurveyrequest.do?surveysSelected=" + incompleteSurveyIds, function(data) {
+		data = JSON.parse(data);
+		if (data.errMsg == undefined || data.errMsg == "") {
+			// unselect all the options after deleting
+			$('#rep-icn-sur-popup-cont').data('selected-survey', []);
+
+			var toastmsg = data.success;
+			$('#overlay-toast').html(toastmsg);
+			showToastLong();
+			
+			$('#rep-del-mult-sur-icn').removeClass('mult-sur-icn-active');
+			$('#rep-resend-mult-sur-icn').removeClass('mult-sur-icn-active');
+			$('#rep-icn-sur-popup-cont').data('selected-survey', []);
+			$('.rep-sur-icn-checkbox').addClass('sb-q-chk-yes').removeClass('sb-q-chk-no');
+
+			// update the page
+			var incompleteSurveyStartIndex = parseInt($('#rep-icn-sur-popup-cont').attr("data-start"));
+			paintIncompleteSurveyListForNewDashboard(incompleteSurveyStartIndex,$('#rep-prof-container').attr('data-column-name'),$('#rep-prof-container').attr('data-column-value'));
+		}else{
+			var toastmsg = data.errMsg;
+			$('#overlay-toast').html(errCode);
+			showToastLong();
+		}
+	}, true, {});
+}
+
+
+$(document).on('click', '#rep-del-mult-sur-icn.mult-sur-icn-active', function() {
+	var selectedSurveys = $('#rep-icn-sur-popup-cont').data('selected-survey');
+	removeMultipleIncompleteSurveyRequestForNewDashboard(selectedSurveys);
+});
+
+
+function removeMultipleIncompleteSurveyRequestForNewDashboard(incompleteSurveyIds) {
+	callAjaxPOSTWithTextData("/deletemultipleincompletesurveyrequest.do?surveySetToDelete=" + incompleteSurveyIds, function(data) {
+		if (data == "success") {
+
+			// unselect all the options after deleting
+			$('#rep-icn-sur-popup-cont').data('selected-survey', []);
+
+			var totalIncSurveys = $('#rep-icn-sur-popup-cont').attr('data-total');
+			totalIncSurveys = totalIncSurveys - incompleteSurveyIds.length;
+			$('#rep-icn-sur-popup-cont').attr('data-total', totalIncSurveys);
+			var batchSize = parseInt($('#rep-icn-sur-popup-cont').attr('data-batch'));
+			var newTotalPages = 0;
+			if (totalIncSurveys % batchSize == 0) {
+				newTotalPages = totalIncSurveys / batchSize;
+			} else {
+				newTotalPages = parseInt(totalIncSurveys / batchSize) + 1;
+			}
+			$('#rep-paginate-total-pages').html(newTotalPages);
+			for (var i = 0; i < incompleteSurveyIds.length; i++) {
+				$('div[data-iden="sur-pre-' + incompleteSurveyIds[i] + '"]').remove();
+			}
+
+			$('#overlay-toast').html('Survey reminder request deleted successfully');
+			showToast();
+
+			// update the page
+			var incompleteSurveyStartIndex = parseInt($('#rep-icn-sur-popup-cont').attr("data-start"));
+			paintIncompleteSurveyListForNewDashboard(incompleteSurveyStartIndex,$('#rep-prof-container').attr('data-column-name'),$('#rep-prof-container').attr('data-column-value'));
+
+			// Update the incomplete survey on dashboard
+			getIncompleteSurveyCountForNewDashboard($('#rep-prof-container').attr('data-column-name'),$('#rep-prof-container').attr('data-column-value'));
+
+			$('#rep-del-mult-sur-icn').removeClass('mult-sur-icn-active');
+			$('#rep-resend-mult-sur-icn').removeClass('mult-sur-icn-active');
+		}
+	}, true, {});
+}
+
+
+$(document).on('click', '#rep-sur-next.paginate-button', function() {
+	var incompleteSurveyStartIndex = parseInt($('#rep-icn-sur-popup-cont').attr("data-start"));
+	var incompleteSurveyBatchSize = parseInt($('#rep-icn-sur-popup-cont').attr("data-batch"));
+	incompleteSurveyStartIndex = incompleteSurveyStartIndex + incompleteSurveyBatchSize;
+	$('#rep-icn-sur-popup-cont').attr("data-start", incompleteSurveyStartIndex);
+	paintIncompleteSurveyListForNewDashboard(incompleteSurveyStartIndex,$('#rep-prof-container').attr('data-column-name'),$('#rep-prof-container').attr('data-column-value'));
+});
+
+$(document).on('click', '#rep-sur-previous.paginate-button', function() {
+	var incompleteSurveyStartIndex = parseInt($('#rep-icn-sur-popup-cont').attr("data-start"));
+	var incompleteSurveyBatchSize = parseInt($('#rep-icn-sur-popup-cont').attr("data-batch"));
+	if (incompleteSurveyStartIndex % incompleteSurveyBatchSize == 0) {
+		incompleteSurveyStartIndex = parseInt(incompleteSurveyStartIndex / incompleteSurveyBatchSize) - 1;
+	} else {
+		incompleteSurveyStartIndex = parseInt(incompleteSurveyStartIndex / incompleteSurveyBatchSize);
+	}
+	incompleteSurveyStartIndex = incompleteSurveyStartIndex * incompleteSurveyBatchSize;
+	$('#rep-icn-sur-popup-cont').attr("data-start", incompleteSurveyStartIndex);
+	paintIncompleteSurveyListForNewDashboard(incompleteSurveyStartIndex,$('#rep-prof-container').attr('data-column-name'),$('#rep-prof-container').attr('data-column-value'));
+});
+
+$(document).on('keypress', '#rep-sel-page', function(e) {
+	// if the letter is not digit then don't type anything
+	if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+		return false;
+	}
+	var batchSize = parseInt($('#rep-icn-sur-popup-cont').attr("data-batch"));
+	var total = parseInt($('#rep-icn-sur-popup-cont').attr("data-total"));
+	var prevPageNoVal = parseInt($('#rep-sel-page').val());
+	if (prevPageNoVal == NaN) {
+		prevPageNoVal = 0;
+	}
+	var pageNo = prevPageNoVal + String.fromCharCode(e.which);
+	pageNo = parseInt(pageNo);
+	var incompleteSurveyStartIndex = parseInt(pageNo - 1) * batchSize;
+	if (incompleteSurveyStartIndex >= total || incompleteSurveyStartIndex <= 0) {
+		return false;
+	}
+});
+
+function paginateIncompleteSurveyForNewDashboard() {
+	$('#rep-sel-page').blur();
+	var pageNo = parseInt($('#rep-sel-page').val());
+	if (pageNo == NaN || pageNo <= 0) {
+		return false;
+	}
+	var incompleteSurveyStartIndex = 0;
+	var batchSize = parseInt($('#rep-icn-sur-popup-cont').attr("data-batch"));
+	incompleteSurveyStartIndex = parseInt(pageNo - 1) * batchSize;
+
+	$('#rep-icn-sur-popup-cont').attr("data-start", incompleteSurveyStartIndex);
+	paintIncompleteSurveyListForNewDashboard(incompleteSurveyStartIndex,$('#rep-prof-container').attr('data-column-name'),$('#rep-prof-container').attr('data-column-value'));
+}
+
+$(document).on('keyup', '#rep-sel-page', function(e) {
+	if (e.which == 13) {
+		paginateIncompleteSurveyForNewDashboard();
+	}
+});
+
+$(document).on('change', '#rep-sel-page', function(e) {
+	delay(function() {
+		paginateIncompleteSurveyForNewDashboard();
+	}, 100);
+});
+
+

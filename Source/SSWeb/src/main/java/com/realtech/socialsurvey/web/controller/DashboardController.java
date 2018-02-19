@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -719,6 +720,7 @@ public class DashboardController
         List<SurveyPreInitiation> surveyDetails;
         User user = sessionHelper.getCurrentUser();
         boolean realtechAdmin = user.isSuperAdmin();
+        String origin = request.getParameter("origin");
 
         try {
             surveyDetails = fetchIncompleteSurveys( request, user, realtechAdmin );
@@ -738,7 +740,11 @@ public class DashboardController
         }
 
         LOG.info( "Method to get reviews of company, region, branch, agent getReviews() finished." );
-        return JspResolver.HEADER_DASHBOARD_INCOMPLETESURVEYS;
+        if( StringUtils.equals("newDashboard", origin) ) {
+            return JspResolver.HEADER_NEW_DASHBOARD_INCOMPLETESURVEYS;	
+        } else {
+        	return JspResolver.HEADER_DASHBOARD_INCOMPLETESURVEYS;
+        }
     }
 
 
