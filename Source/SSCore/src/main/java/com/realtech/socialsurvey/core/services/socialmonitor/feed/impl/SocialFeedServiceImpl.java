@@ -82,10 +82,12 @@ public class SocialFeedServiceImpl implements SocialFeedService
 				socialMonitorFeedData.setStatus(socialResponseObject.getStatus());
 				socialMonitorFeedData.setText(socialResponseObject.getText());
 				socialMonitorFeedData.setPicture(socialResponseObject.getPicture());
-				socialMonitorFeedData.setAgentId(socialResponseObject.getAgentId());
-				socialMonitorFeedData.setBranchId(socialResponseObject.getBranchId());
-				socialMonitorFeedData.setRegionId(socialResponseObject.getRegionId());
+				socialMonitorFeedData.setOwnerName(socialResponseObject.getOwnerName());
+				socialMonitorFeedData.setOwnerProfileImage(socialResponseObject.getOwnerProfileImage());
 				socialMonitorFeedData.setCompanyId(socialResponseObject.getCompanyId());
+				socialMonitorFeedData.setRegionId(socialResponseObject.getRegionId());
+				socialMonitorFeedData.setBranchId(socialResponseObject.getBranchId());
+				socialMonitorFeedData.setAgentId(socialResponseObject.getAgentId());
 				socialMonitorFeedData.setPostId(socialResponseObject.getPostId());
 				socialMonitorFeedData.setFlagged(socialResponseObject.isFlagged());
 				Collections.sort( socialResponseObject.getActionHistory(), new ActionHistoryComparator() );	
@@ -141,15 +143,15 @@ public class SocialFeedServiceImpl implements SocialFeedService
 				if (socialFeedsActionUpdate.isFlagged() && (socialResponseObject.getStatus().equals(SocialFeedStatus.NEW))) {
 					updateFlag = 1;
 					actionHistory.setActionType(ActionHistoryType.FLAGGED);
-					actionHistory.setText("Post was Flagged manually by " + socialFeedsActionUpdate.getOwnerName());
-					actionHistory.setOwnerName(socialFeedsActionUpdate.getOwnerName());
+					actionHistory.setText("Post was Flagged manually by " + socialFeedsActionUpdate.getUserName());
+					actionHistory.setOwnerName(socialFeedsActionUpdate.getUserName());
 					actionHistory.setCreatedDate(new Date().getTime());
 					actionHistories.add(actionHistory);
 				} else if(!socialFeedsActionUpdate.isFlagged() && (socialResponseObject.getStatus().equals(SocialFeedStatus.NEW))){
 					updateFlag = 1;
 					actionHistory.setActionType(ActionHistoryType.UNFLAGGED);
-					actionHistory.setText("Post was Unflagged by " + socialFeedsActionUpdate.getOwnerName());
-					actionHistory.setOwnerName(socialFeedsActionUpdate.getOwnerName());
+					actionHistory.setText("Post was Unflagged by " + socialFeedsActionUpdate.getUserName());
+					actionHistory.setOwnerName(socialFeedsActionUpdate.getUserName());
 					actionHistory.setCreatedDate(new Date().getTime());
 					actionHistories.add(actionHistory);
 				}
@@ -163,8 +165,8 @@ public class SocialFeedServiceImpl implements SocialFeedService
 					actionHistory.setActionType(ActionHistoryType.RESOLVED);
 				}
 				actionHistory.setText("Post was " + socialFeedsActionUpdate.getStatus() + " by "
-						+ socialFeedsActionUpdate.getOwnerName());
-				actionHistory.setOwnerName(socialFeedsActionUpdate.getOwnerName());
+						+ socialFeedsActionUpdate.getUserName());
+				actionHistory.setOwnerName(socialFeedsActionUpdate.getUserName());
 				actionHistory.setCreatedDate(new Date().getTime());
 				actionHistories.add(actionHistory);
 			}
@@ -174,7 +176,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
 				ActionHistory actionHistory = new ActionHistory();
 				actionHistory.setActionType(ActionHistoryType.PRIVATE_MESSAGE);
 				actionHistory.setText(socialFeedsActionUpdate.getText());
-				actionHistory.setOwnerName(socialFeedsActionUpdate.getOwnerName());
+				actionHistory.setOwnerName(socialFeedsActionUpdate.getUserName());
 				actionHistory.setCreatedDate(new Date().getTime());
 				actionHistories.add(actionHistory);
 			} if ((socialFeedsActionUpdate.getTextActionType().toString()
@@ -183,12 +185,12 @@ public class SocialFeedServiceImpl implements SocialFeedService
 				ActionHistory actionHistory = new ActionHistory();
 				actionHistory.setActionType(ActionHistoryType.EMAIL);
 				actionHistory.setText(socialFeedsActionUpdate.getText());
-				actionHistory.setOwnerName(socialFeedsActionUpdate.getOwnerName());
+				actionHistory.setOwnerName(socialFeedsActionUpdate.getUserName());
 				actionHistory.setCreatedDate(new Date().getTime());
 				actionHistories.add(actionHistory);
 				// send mail to the user
 				try {
-					emailServices.sendSocialMonitorActionMail(socialFeedsActionUpdate.getUserEmailId(),
+					emailServices.sendSocialMonitorActionMail(socialResponseObject.getOwnerEmail(),
 							socialResponseObject.getOwnerName(), socialFeedsActionUpdate.getText());
 				} catch (UndeliveredEmailException e) {
 					LOG.error("Email could not be delivered", e);
