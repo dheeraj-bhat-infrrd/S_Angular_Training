@@ -1575,4 +1575,7 @@ public interface OrganizationManagementService
 
 
 	public List<Long> filterCompanyIdsByStatus(List<Long> companies, String status) throws InvalidInputException;
+
+
+	public boolean decryptEncompassPasswordIfPossible(OrganizationUnitSettings unitSettings);
 }

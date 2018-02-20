@@ -1843,6 +1843,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         LOG.debug( "Inside method mapAgentsInSurveyPreInitiation " );
         List<SurveyPreInitiation> surveys = surveyPreInitiationDao.findByColumn( SurveyPreInitiation.class,
             CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED );
+        
         List<SurveyPreInitiation> unavailableAgents = new ArrayList<>();
         List<SurveyPreInitiation> invalidAgents = new ArrayList<>();
         List<SurveyPreInitiation> customersWithoutName = new ArrayList<>();
@@ -1900,6 +1901,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                         status = CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD;
                         errorCode = SurveyErrorCode.DUPLICATE_RECORD.name();
                         survey.setStatus( status );
+                        //update source in old nor verified records
+                        updateSurveySourcesInOldRecords(incompleteSurveyCustomers , survey );
                     }
                     // check the survey collection
                     SurveyDetails surveyDetail = null;
@@ -4311,35 +4314,48 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         checkForSyntaxInSurveyPreInitiationData( survey );
 
         // obtain user object from MySQL
-        User user = obtainUserObjectFromSurveyPreInitiation( survey );
+        User user = null;
+        try {
+        		user = obtainUserObjectFromSurveyPreInitiation( survey );
+        }catch(InvalidInputException e) {
+        		LOG.warn("No user found for the email id {}" , survey.getAgentEmailId() );
+        }
 
-
-        // Cross check identifiers obtained from different sources
-        crossCheckAndVerifySurveyPreInitiationDataUsingDifferentSources( survey, user );
-
-
-        // check if survey has already been sent to the given email id within the time of discourse
-        checkForAlreadyExistingSurvey( survey, user );
+        // check for ignored agent email mapping
+        if ( isEmailIsIgnoredEmail( survey.getAgentEmailId(), survey.getCompanyId() ) ) {
+            LOG.error( "no agent found with this email id and its an ignored record" );
+            throw new InvalidInputException(
+                "Can not process the record. The Service provider email id is set to be ignored" );
+        }
 
 
         // check if the engagement time was within the valid survey interval
         performSurveyIntervalCheck( survey );
 
+		if (user != null) {
+			// Cross check identifiers obtained from different sources
+			crossCheckAndVerifySurveyPreInitiationDataUsingDifferentSources(survey, user);
 
-        // set the agent ID
-        survey.setAgentId( user.getUserId() );
+			// check if survey has already been sent to the given email id within the time
+			// of discourse
+			checkForAlreadyExistingSurvey(survey, user);
 
-        // set up survey pre-initiation object for further processing
-        if ( StringUtils.isEmpty( survey.getAgentName() ) ) {
-            survey.setAgentName( user.getFirstName() + user.getLastName() == null ? "" : " " + user.getLastName() );
-        }
+			// set the agent ID
+			survey.setAgentId(user.getUserId());
+
+			// set up survey pre-initiation object for further processing
+			if (StringUtils.isEmpty(survey.getAgentName())) {
+				survey.setAgentName(user.getFirstName() + user.getLastName() == null ? "" : " " + user.getLastName());
+			}
+
+			if (survey.getStatus() != CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD)
+				survey.setStatus(CommonConstants.SURVEY_STATUS_PRE_INITIATED);
+		} else {
+			// user is not present so mark record as mismatch
+			survey.setStatus(CommonConstants.STATUS_SURVEYPREINITIATION_MISMATCH_RECORD);
+		}
         
-        if ( survey.getStatus() == CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD )
-            survey.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD );
-        else
-            survey.setStatus( CommonConstants.SURVEY_STATUS_PRE_INITIATED );
-        survey.setStatus( CommonConstants.SURVEY_STATUS_PRE_INITIATED );
-
+        
     }
 
 
@@ -4354,7 +4370,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
         if ( StringUtils.isEmpty( survey.getAgentEmailId() ) ) {
             LOG.error( "Agent email not found , invalid survey " + survey.getSurveyPreIntitiationId() );
-            throw new InvalidInputException( "Can not process the record.  service provider email id is missing" );
+            throw new InvalidInputException( "Can not process the record. Service provider email id is missing" );
         }
 
         if ( StringUtils.isEmpty( survey.getCustomerFirstName() ) ) {
@@ -4373,7 +4389,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         if ( !organizationManagementService.validateEmail( survey.getAgentEmailId() ) ) {
             LOG.error( "Invalid Agent Email Id " );
             throw new InvalidInputException(
-                "Can not process the record. Invalid Agent email id : " + survey.getAgentEmailId() + "" );
+                "Can not process the record. Invalid Service provider email id : " + survey.getAgentEmailId() + "" );
         }
 
         if ( !organizationManagementService.validateEmail( survey.getCustomerEmailId() ) ) {
@@ -4422,13 +4438,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 "Can not process the record. No service provider found with email address :  " + survey.getAgentEmailId() );
         }
 
-
-        // check for ignored agent email mapping
-        if ( isEmailIsIgnoredEmail( survey.getAgentEmailId(), survey.getCompanyId() ) ) {
-            LOG.error( "no agent found with this email id and its an ignored record" );
-            throw new InvalidInputException(
-                "Can not process the record. No service provider found with email address :  " + survey.getAgentEmailId() );
-        }
 
     }
 
@@ -5021,41 +5030,33 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         return resultString.toString();
     }
     
-    @Override
-    public void mapSourceInManualSurvey() 
-    {
-    		int start = 0;
-    		int batchSize = 500;
-    		
-    		List<SurveyPreInitiation> surveys = null;
-    		
-    		do {
-    		surveys =  surveyPreInitiationDao.getManualCompletedSurveys(start, batchSize);
-    		
-    		for(SurveyPreInitiation spInitiation : surveys ) {
-    			Criterion agentEmaailIdCriteria = Restrictions.eq( "agentId", spInitiation.getAgentId()); 
-    			Criterion customerEmaailIdCriteria = Restrictions.eq( "customerEmailId", spInitiation.getCustomerEmailId() ); 
-    			Criterion companyIdCriteria = Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, spInitiation.getCompanyId() );
-    			Criterion SPIdCriteria = Restrictions.ne( "surveyPreIntitiationId", spInitiation.getSurveyPreIntitiationId() );
-    			Criterion SourceCriteria = Restrictions.not(Restrictions.in( "surveySource", new String[] { "agent" , "admin" , "upload" , "customer"}));
-    			
-    			List<SurveyPreInitiation> similarSPIs = surveyPreInitiationDao.findByCriteria(SurveyPreInitiation.class, agentEmaailIdCriteria , customerEmaailIdCriteria, companyIdCriteria, SPIdCriteria, SourceCriteria  );
-    			if(similarSPIs != null && similarSPIs.size() > 0) {
-    				SurveyPreInitiation similarSPI = similarSPIs.get(0);
-    				spInitiation.setSurveySourceId(similarSPI.getSurveySourceId());
-    				spInitiation.setSurveySource(similarSPI.getSurveySource());
-    				surveyPreInitiationDao.update(spInitiation);
-    				
-    			 	SurveyDetails surveyDetails = surveyDetailsDao.getSurveyBySurveyPreIntitiationId(spInitiation.getSurveyPreIntitiationId());
-    				if(surveyDetails != null) {
-    					surveyDetails.setSource(similarSPI.getSurveySource());
-    					surveyDetails.setSourceId(similarSPI.getSurveySourceId());
-    					surveyDetailsDao.updateSourceDetailInExistingSurveyDetails(surveyDetails);
-    				}
-    			}
-    		}
-    		start += batchSize;
-    		}while(surveys != null && surveys.size() == batchSize );
-    		
-    }
+    
+    private void updateSurveySourcesInOldRecords(List<SurveyPreInitiation> existingSurveyPreinititionList , SurveyPreInitiation latestSurveyPreInitiation) 
+	{
+
+		LOG.info("method updateSurveySourcesInOldRecords started");
+		// check if new survey is from verified source
+		if (!CommonConstants.CRM_UNVERIFIED_SOURCES.contains(latestSurveyPreInitiation.getSurveySource())) {
+			// check if any old survey for same customer is from non verified source
+			for (SurveyPreInitiation currentSurveyPreinitition : existingSurveyPreinititionList) {
+				// if it is from non verified source than update the source and source id
+				if (CommonConstants.CRM_UNVERIFIED_SOURCES.contains(currentSurveyPreinitition.getSurveySource())) {
+					currentSurveyPreinitition.setSurveySourceId(latestSurveyPreInitiation.getSurveySourceId());
+					currentSurveyPreinitition.setSurveySource(latestSurveyPreInitiation.getSurveySource());
+					surveyPreInitiationDao.update(currentSurveyPreinitition);
+
+					// update mongo survey detail as well
+					SurveyDetails surveyDetails = surveyDetailsDao
+							.getSurveyBySurveyPreIntitiationId(currentSurveyPreinitition.getSurveyPreIntitiationId());
+					if (surveyDetails != null) {
+						surveyDetails.setSource(latestSurveyPreInitiation.getSurveySource());
+						surveyDetails.setSourceId(latestSurveyPreInitiation.getSurveySourceId());
+						surveyDetailsDao.updateSourceDetailInExistingSurveyDetails(surveyDetails);
+					}
+				}
+			}
+
+		}
+
+	}
 }

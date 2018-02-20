@@ -94,7 +94,7 @@ public class CloudUploadServiceImpl implements FileUploadService
     @Override
     public String uploadProfileImageFile( File file, String imageName, boolean preserveFileName ) throws InvalidInputException
     {
-        LOG.info( "Method uploadProfileImageFile inside AmazonUploadServiceImpl called" );
+        LOG.info( "Method uploadProfileImageFile inside AmazonUploadServiceImpl called for image {}" , imageName);
         try {
             return uploadImage( file, imageName, bucket + CommonConstants.FILE_SEPARATOR + imageBucket, preserveFileName );
         } catch ( InvalidInputException e ) {

@@ -28,6 +28,7 @@ import javax.annotation.Resource;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.hibernate.criterion.Criterion;
@@ -902,20 +903,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( companySettings != null && companySettings.getProfileStages() != null ) {
             companySettings
                 .setProfileStages( profileCompletionList.getProfileCompletionList( companySettings.getProfileStages() ) );
-        }
-
-        // Decrypting the encompass password
-        if ( companySettings != null && companySettings.getCrm_info() != null
-            && companySettings.getCrm_info().getCrm_source().equalsIgnoreCase( CommonConstants.CRM_SOURCE_ENCOMPASS ) ) {
-            EncompassCrmInfo crmInfo = (EncompassCrmInfo) companySettings.getCrm_info();
-
-            String encryptedPassword = crmInfo.getCrm_password();
-            String decryptedPassword = encryptedPassword;
-            if( StringUtils.isNotEmpty(encryptedPassword) ) {
-            	decryptedPassword = encryptionHelper.decryptAES( encryptedPassword, "" );
-            }
-
-            crmInfo.setCrm_password( decryptedPassword );
         }
         return companySettings;
     }
@@ -2391,7 +2378,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             throw new InvalidInputException( "Invalid searchKey passed as argument " );
         List<Region> regions = new ArrayList<Region>();
         List<SolrDocument> solrDocumentList = solrSearchService
-            .searchBranchRegionOrAgentByNameForAdmin( CommonConstants.REGION_NAME_SOLR, searchKey );
+            .searchBranchRegionOrAgentByNameForAdmin( CommonConstants.REGION_NAME_SOLR, ClientUtils.escapeQueryChars(searchKey) );
 
         for ( SolrDocument document : solrDocumentList ) {
             Region region = new Region();
@@ -2418,7 +2405,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             throw new InvalidInputException( "Invalid searchKey passed as argument " );
         List<Branch> branches = new ArrayList<Branch>();
         List<SolrDocument> solrDocumentList = solrSearchService
-            .searchBranchRegionOrAgentByNameForAdmin( CommonConstants.BRANCH_NAME_SOLR, searchKey );
+            .searchBranchRegionOrAgentByNameForAdmin( CommonConstants.BRANCH_NAME_SOLR, ClientUtils.escapeQueryChars(searchKey) );
 
         for ( SolrDocument document : solrDocumentList ) {
             Branch branch = new Branch();
@@ -2446,7 +2433,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             throw new InvalidInputException( "Invalid searchKey passed as argument " );
         List<UserFromSearch> users = new ArrayList<UserFromSearch>();
         List<SolrDocument> solrDocumentList = solrSearchService
-            .searchBranchRegionOrAgentByNameForAdmin( CommonConstants.USER_DISPLAY_NAME_SOLR, searchKey );
+            .searchBranchRegionOrAgentByNameForAdmin( CommonConstants.USER_DISPLAY_NAME_SOLR, ClientUtils.escapeQueryChars(searchKey) );
 
         for ( SolrDocument document : solrDocumentList ) {
             UserFromSearch user = new UserFromSearch();
@@ -8785,5 +8772,26 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			LOG.warn( "Invalid filter for fetching encompass" );
 			throw new InvalidInputException( "Invalid filter for fetching encompass" );
 		}
+	}
+
+
+	@Override
+	public boolean decryptEncompassPasswordIfPossible(OrganizationUnitSettings unitSettings) {
+		LOG.info( "Deciphering encompass password" );
+        if ( unitSettings != null && unitSettings.getCrm_info() != null
+            && unitSettings.getCrm_info().getCrm_source().equalsIgnoreCase( CommonConstants.CRM_SOURCE_ENCOMPASS ) ) {
+            EncompassCrmInfo crmInfo = (EncompassCrmInfo) unitSettings.getCrm_info();
+            if( StringUtils.isNotEmpty(crmInfo.getCrm_password()) ) {
+            	try {
+                    // deciphering the encompass password
+                    crmInfo.setCrm_password( encryptionHelper.decryptAES( crmInfo.getCrm_password(), "" ) );
+                    LOG.debug( "Successfully decrypted encompass password for company with ID: {}", unitSettings.getIden() );
+            	} catch( InvalidInputException error ) {
+            		LOG.warn( "decryptEncompassPasswordIfPossible(): encompass password is not encrypted for company with ID: {}", unitSettings.getIden() );
+            		return false;
+            	}
+            }
+        }
+		return true;
 	}
 }

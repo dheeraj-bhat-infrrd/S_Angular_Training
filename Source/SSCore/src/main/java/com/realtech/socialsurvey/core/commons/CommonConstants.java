@@ -593,6 +593,7 @@ public interface CommonConstants
     public static final String ENCOMPASS_GENERATE_REPORT_COLUMN = "generateReport";
     public static final String ENCOMPASS_DEFAULT_FEILD_ID = "1997";
     public static final String ENCOMPASS_VERSION_COULMN = "version";
+    public static final List<String> CRM_UNVERIFIED_SOURCES =  new ArrayList<>(Arrays.asList(new String[] { "agent" , "admin", "customer"}));
 
     // mail content
     public static final String SURVEY_MAIL_BODY_CATEGORY = "SURVEY_MAIL_BODY_CATEGORY";
@@ -1562,8 +1563,15 @@ public interface CommonConstants
 
     //JobLogDetails
     public static final String JOB_LOG_ID = "jobLogId";
+    public static final String JOB_NAME = "jobName";
     public static final String STATUS_DUMMY = "Dummy";
     public static final String STATUS_FINISHED = "Finished";
+    public static final String STATUS_RUNNING = "Running";
+    public static final String CENTRALIZED_JOB_NAME = "CentralizedMainJob";
+    public static final String REPORTING_JOB_NAME = "ReportingMainJob";
+    public static final String USER_RANKING_JOB_NAME = "UserRankingJob";
+    public static final String IS_MANUAL = "isManual";
+    
 
     public static final String TIMEZONE_EST = "GMT-5:00";
     

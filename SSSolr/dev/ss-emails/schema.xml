@@ -48,6 +48,7 @@
     <field name="emailAttemptedDate" type="tdate" indexed="true" stored="true" />
     <field name="emailDeliveredDate" type="tdate" indexed="true" stored="true" />
     <field name="emailDefferedDate" type="tdate" indexed="true" stored="true" />
+    <field name="emailDroppedDate" type="tdate" indexed="true" stored="true" />
     <field name="emailBlockedDate" type="tdate" indexed="true" stored="true" />
     <field name="emailOpenedDate" type="tdate" indexed="true" stored="true" />
     <field name="emailMarkedSpamDate" type="tdate" indexed="true" stored="true" />
