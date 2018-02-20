@@ -7302,7 +7302,7 @@ tr.u-tbl-header td {
 
 .paginate-button {
 	cursor: pointer;
-	color: #5CC8EF;
+	background-color: #009FE0 !important;
 }
 
 .tweet-panel-item.bord-bot-dc.clearfix {
@@ -8706,6 +8706,14 @@ label.fil-label {
 	text-align: center;
 }
 
+.rep-sur-paginate-btn {
+	width: 45px;
+    text-align: center;
+    color: white;
+    background-color: grey;
+    border-radius: 3px;
+}
+
 .paginate-total-pages {
 	width: 30px;
 	display: inline-block;
@@ -8732,6 +8740,13 @@ span.paginate-divider {
 
 .sur-icn-checkbox {
 	width: 20px;
+	height: 20px;
+	margin: 0 10px 0 -10px;
+	background-position: center;
+}
+
+.rep-sur-icn-checkbox{
+		width: 20px;
 	height: 20px;
 	margin: 0 10px 0 -10px;
 	background-position: center;
@@ -10594,6 +10609,11 @@ img.lead-img {
 .text-align-right{
 	text-align:right;
 	text-align:-webkit-right;
+}
+
+.text-align-left{
+	text-align:left;
+	text-align:-webkit-left;
 }
 
 .edit-survey-radio-container{

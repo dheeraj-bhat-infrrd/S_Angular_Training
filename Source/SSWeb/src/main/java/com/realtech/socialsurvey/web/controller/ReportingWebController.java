@@ -314,6 +314,14 @@ public class ReportingWebController
 
         model.addAttribute( PROFILE_NAME, profileName );
         model.addAttribute( USER_ID, user.getUserId() );
+        
+        //get detail of expire social media
+        boolean isSocialMediaExpired = false;
+        if ( !organizationManagementService.getExpiredSocailMedia( entityType, entityId ).isEmpty() ) {
+            isSocialMediaExpired = true;
+        }
+        session.setAttribute( "isSocialMediaExpired", isSocialMediaExpired );
+        
 
         //Get the hierarchy details associated with the current profile get all the id's like companyId, regionId , branchId
         try {
