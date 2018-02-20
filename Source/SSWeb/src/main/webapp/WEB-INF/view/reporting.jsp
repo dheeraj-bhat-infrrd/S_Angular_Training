@@ -122,7 +122,7 @@
 					<li id="incomplete-surveys-btn" ><a href="#incomplete-surveys-tab" data-toggle="tab" style="padding-left:2px; padding-right:2px">Incomplete Surveys</a></li>
 				</ul>
 				<div class="tab-content rep-tab-content">
-					<div class="tab-pane fade active in" id="trans-stats-tab" style="margin-top: 40px;">
+					<div class="tab-pane fade active in" id="trans-stats-tab" style="padding-top: 0;">
 						<div id="reporting-trans-details" class="row prof-pic-name-wrapper edit-prof-pic-name-wrapper reporting-trans-details">
 							<jsp:include page="reporting_transaction_details.jsp"></jsp:include>
 						</div>
