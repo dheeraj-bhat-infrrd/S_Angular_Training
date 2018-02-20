@@ -136,7 +136,7 @@ var veryLikelyText = '';
 var notVeryLikelyText = '';
 var npsOrder = 999;
 
-var defaultNpsQuestion = 'Default NPS Question';
+var defaultNpsQuestion = 'How likely are you to refer friends and family to [name]?';
 var defaultNotVeryLikely = 'Not Very Likely';
 var defaultVeryLikely = 'Very Likely';
 
