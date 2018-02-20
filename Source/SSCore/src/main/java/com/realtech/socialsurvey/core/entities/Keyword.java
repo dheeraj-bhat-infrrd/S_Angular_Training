@@ -1,11 +1,13 @@
 package com.realtech.socialsurvey.core.entities;
 
+import java.io.Serializable;
+
 /**
  * @author manish
  *
  */
-public class Keyword
-{
+
+public class Keyword implements Serializable {
     private String phrase;
     private String id;
     private long createdOn;
