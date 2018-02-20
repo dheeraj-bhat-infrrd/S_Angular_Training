@@ -2,10 +2,11 @@ package com.realtech.socialsurvey.compute.dao;
 
 import com.realtech.socialsurvey.compute.entities.Keyword;
 
+import java.io.Serializable;
 import java.util.List;
 
 
-public interface RedisCompanyKeywordsDao
+public interface RedisCompanyKeywordsDao extends Serializable
 {
     /**
      * DOA method to return list of keywords for company id.

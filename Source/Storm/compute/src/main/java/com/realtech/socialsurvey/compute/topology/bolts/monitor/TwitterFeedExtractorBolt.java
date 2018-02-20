@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
-import com.realtech.socialsurvey.compute.entities.TwitterToken;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.entities.response.TwitterFeedData;
 import com.realtech.socialsurvey.compute.enums.ProfileType;
@@ -31,6 +30,7 @@ public class TwitterFeedExtractorBolt extends BaseComputeBolt
     private static final Logger LOG = LoggerFactory.getLogger( TwitterFeedExtractorBolt.class );
     private TwitterFeedProcessor twitterFeedProcessor = new TwitterFeedProcessorImpl();
 
+
     private boolean isRateLimitExceeded()
     {
         // TODO ckech for ratelimiting for facebook api (based on user-id, page-id, )
@@ -45,10 +45,6 @@ public class TwitterFeedExtractorBolt extends BaseComputeBolt
             SocialMediaTokenResponse mediaToken = (SocialMediaTokenResponse) input.getValueByField( "mediaToken" );
 
             Long companyId = mediaToken.getCompanyId();
-            TwitterToken token = null;
-            if ( mediaToken.getSocialMediaTokens() != null ) {
-                token = mediaToken.getSocialMediaTokens().getTwitterToken();
-            }
 
             // Check rate limiting for company
             if ( isRateLimitExceeded( /* pass media token*/ ) ) {
@@ -56,12 +52,11 @@ public class TwitterFeedExtractorBolt extends BaseComputeBolt
             }
 
             //Call facebook api to get facebook page post.
-            List<TwitterFeedData> response = twitterFeedProcessor.fetchFeed( companyId, token );
+            List<TwitterFeedData> response = twitterFeedProcessor.fetchFeed( companyId, mediaToken );
             LOG.debug( "Total tweet fetched : {}", response.size() );
             for ( TwitterFeedData twitterFeedData : response ) {
                 SocialResponseObject<TwitterFeedData> responseWrapper = createSocialResponseObject( mediaToken,
                     twitterFeedData );
-
                 String responseWrapperString = new Gson().toJson( responseWrapper );
                 _collector.emit( new Values( companyId.toString(), responseWrapperString ) );
                 LOG.trace( "Emitted successfully {}", responseWrapper );
@@ -79,11 +74,12 @@ public class TwitterFeedExtractorBolt extends BaseComputeBolt
      * @param twitterFeedData
      * @return
      */
-    private SocialResponseObject<TwitterFeedData> createSocialResponseObject( SocialMediaTokenResponse mediaToken, TwitterFeedData twitterFeedData )
+    private SocialResponseObject<TwitterFeedData> createSocialResponseObject( SocialMediaTokenResponse mediaToken,
+        TwitterFeedData twitterFeedData )
     {
-        SocialResponseObject<TwitterFeedData> responseWrapper = new SocialResponseObject<>( mediaToken.getCompanyId(), SocialFeedType.TWITTER,
-            twitterFeedData.getText(), twitterFeedData, 1 );
-        
+        SocialResponseObject<TwitterFeedData> responseWrapper = new SocialResponseObject<>( mediaToken.getCompanyId(),
+            SocialFeedType.TWITTER, twitterFeedData.getText(), twitterFeedData, 1 );
+
         if ( mediaToken.getProfileType() != null ) {
             responseWrapper.setProfileType( mediaToken.getProfileType() );
             if ( mediaToken.getProfileType() == ProfileType.COMPANY ) {
@@ -100,6 +96,7 @@ public class TwitterFeedExtractorBolt extends BaseComputeBolt
         if ( twitterFeedData.getText() != null && !twitterFeedData.getText().isEmpty() ) {
             responseWrapper.setHash( responseWrapper.getText().hashCode() );
         }
+
         responseWrapper.setPostId(String.valueOf(twitterFeedData.getId()));
         responseWrapper.setId(String.valueOf(twitterFeedData.getId()));
 

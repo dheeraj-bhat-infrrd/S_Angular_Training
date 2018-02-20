@@ -1,20 +1,10 @@
 package com.realtech.socialsurvey.compute.common;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.realtech.socialsurvey.compute.entities.Keyword;
-
-import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
-import redis.clients.jedis.exceptions.JedisException;
 
 
 /**
@@ -24,26 +14,29 @@ import redis.clients.jedis.exceptions.JedisException;
 public class RedisDB
 {
     private static final Logger LOG = LoggerFactory.getLogger( RedisDB.class );
-    public static final String DEFAULT_HOST = "127.0.0.1";
-    public static final int DEFAULT_PORT = 6379;
-    public static final String COMPANYKEYWORDS_KEY_PREFIX = "companykeywords:";
     private static JedisPool pool;
     private static String host;
     private static int port; // 6379 for NonSSL, 6380 for SSL
     private static int operationTimeout = 10000;
     private static JedisPoolConfig config;
 
+
+    // To avoid class instantiation.
+    private RedisDB()
+    {}
+
     static {
         host = LocalPropertyFileHandler.getInstance()
             .getProperty( ComputeConstants.APPLICATION_PROPERTY_FILE, ComputeConstants.REDIS_HOST ).orElse( null );
         port = Integer.parseInt( LocalPropertyFileHandler.getInstance()
-            .getProperty( ComputeConstants.APPLICATION_PROPERTY_FILE, ComputeConstants.REDIS_PORT ).orElse( "" ) );
+            .getProperty( ComputeConstants.APPLICATION_PROPERTY_FILE, ComputeConstants.REDIS_PORT ).orElse( null ) );
     }
 
 
     public static synchronized JedisPool getPoolInstance()
     {
         if ( pool == null ) {
+            LOG.debug( "Creating jedis instance with {}:{}", host, port );
             JedisPoolConfig poolConfig = getPoolConfig();
             pool = new JedisPool( poolConfig, host, port );
         }
@@ -71,47 +64,5 @@ public class RedisDB
         }
 
         return config;
-    }
-
-
-    public List<Keyword> getKeywordsFromRedis( long companyId )
-    {
-        Jedis jedis = getPoolInstance().getResource();
-        // Return all keywords 
-        String keywordsString = jedis.hget( COMPANYKEYWORDS_KEY_PREFIX + companyId, "keywords" );
-        Gson gson = new Gson();
-        return gson.fromJson( keywordsString, new TypeToken<List<Keyword>>() {}.getType() );
-    }
-
-
-    public long getKeywordModifiedOn( long companyId )
-    {
-        Jedis jedis = getPoolInstance().getResource();
-        // Return all keywords 
-        String modifiedOnString = jedis.hget( COMPANYKEYWORDS_KEY_PREFIX + companyId, "modifiedon" );
-        return Long.parseLong( modifiedOnString );
-    }
-
-
-    public void saveKeywords( List<Keyword> keywords, long companyId )
-    {
-        String key = COMPANYKEYWORDS_KEY_PREFIX + companyId;
-        Map<String, String> map = new HashMap<>();
-        Gson gson = new Gson();
-        String keywordsString = gson.toJson( keywords );
-        map.put( "keywords", keywordsString );
-        map.put( "modifiedon", Long.toString( System.currentTimeMillis() ) );
-        Jedis jedis = getPoolInstance().getResource();
-        try {
-            if ( jedis != null ) {
-                jedis.hmset( key, map );
-            }
-        } catch ( JedisException e ) {
-            jedis.close();
-        } finally {
-            if ( null != jedis ) {
-                jedis.close();
-            }
-        }
     }
 }

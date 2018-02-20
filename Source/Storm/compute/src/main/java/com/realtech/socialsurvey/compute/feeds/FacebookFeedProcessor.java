@@ -3,7 +3,7 @@ package com.realtech.socialsurvey.compute.feeds;
 import java.io.Serializable;
 import java.util.List;
 
-import com.realtech.socialsurvey.compute.entities.FacebookToken;
+import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.compute.entities.response.FacebookFeedData;
 
 /**
@@ -18,5 +18,5 @@ public interface FacebookFeedProcessor extends Serializable
      * @param token
      * @return
      */
-    public List<FacebookFeedData> fetchFeeds(long companyId,  FacebookToken token );
+    public List<FacebookFeedData> fetchFeeds(long companyId,  SocialMediaTokenResponse mediaToken );
 }

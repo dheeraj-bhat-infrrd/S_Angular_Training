@@ -1,9 +1,7 @@
 package com.realtech.socialsurvey.compute.dao.impl;
 
-import java.io.Serializable;
 import java.util.List;
 
-import com.realtech.socialsurvey.compute.enums.SSApiBreakerStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,11 +19,17 @@ import redis.clients.jedis.exceptions.JedisConnectionException;
  * @author manish
  * DAO to fetch Keywords from redis
  */
-public class RedisCompanyKeywordsDaoImpl implements RedisCompanyKeywordsDao, Serializable
+public class RedisCompanyKeywordsDaoImpl implements RedisCompanyKeywordsDao
 {
     private static final long serialVersionUID = 1L;
 
+    private static final String MODIFIEDON = "modifiedOn";
+
+    private static final String KEYWORDS = "keywords";
+
     private static final Logger LOG = LoggerFactory.getLogger( RedisCompanyKeywordsDaoImpl.class );
+
+    public static final String COMPANYKEYWORDS_KEY_PREFIX = "companykeywords:";
 
 
     /* (non-Javadoc)
@@ -34,13 +38,13 @@ public class RedisCompanyKeywordsDaoImpl implements RedisCompanyKeywordsDao, Ser
     @Override
     public List<Keyword> getCompanyKeywordsForCompanyId( long companyIden )
     {
-        try(Jedis jedis = RedisDB.getPoolInstance().getResource()) {
+        try ( Jedis jedis = RedisDB.getPoolInstance().getResource() ) {
             LOG.info( "Executing method getCompanyKeywordsForCompanyId {}", companyIden );
             // Return all keywords 
-            String keywordsString = jedis.hget( RedisDB.COMPANYKEYWORDS_KEY_PREFIX + companyIden, "keywords" );
+            String keywordsString = jedis.hget( COMPANYKEYWORDS_KEY_PREFIX + companyIden, KEYWORDS );
             return ConversionUtils.deserialize( keywordsString, new TypeToken<List<Keyword>>() {}.getType() );
-        } catch (JedisConnectionException e){
-            LOG.error(e.getMessage());
+        } catch ( JedisConnectionException e ) {
+            LOG.error( e.getMessage() );
             return null;
         }
 
@@ -52,9 +56,9 @@ public class RedisCompanyKeywordsDaoImpl implements RedisCompanyKeywordsDao, Ser
      */
     public long getKeywordModifiedOn( long companyId )
     {
-        try(Jedis jedis = RedisDB.getPoolInstance().getResource()) {
+        try ( Jedis jedis = RedisDB.getPoolInstance().getResource() ) {
             // Return all keywords 
-            String modifiedOnString = jedis.hget( RedisDB.COMPANYKEYWORDS_KEY_PREFIX + companyId, "modifiedon" );
+            String modifiedOnString = jedis.hget( COMPANYKEYWORDS_KEY_PREFIX + companyId, MODIFIEDON );
             return Long.parseLong( modifiedOnString );
         } catch (JedisConnectionException e){
             LOG.error(e.getMessage());

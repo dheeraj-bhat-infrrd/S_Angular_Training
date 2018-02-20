@@ -6,11 +6,14 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.realtech.socialsurvey.compute.dao.impl.RedisSinceRecordFetchedDaoImpl;
+import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.compute.entities.TwitterToken;
 import com.realtech.socialsurvey.compute.entities.response.TwitterFeedData;
 import com.realtech.socialsurvey.compute.feeds.TwitterFeedProcessor;
 import com.realtech.socialsurvey.compute.utils.UrlHelper;
 
+import redis.clients.jedis.exceptions.JedisConnectionException;
 import twitter4j.Paging;
 import twitter4j.RateLimitStatus;
 import twitter4j.ResponseList;
@@ -21,38 +24,64 @@ import twitter4j.TwitterFactory;
 import twitter4j.auth.AccessToken;
 
 
+/**
+ * @author manish
+ *
+ */
 public class TwitterFeedProcessorImpl implements TwitterFeedProcessor
 {
     private static final long serialVersionUID = 1L;
-
     private static final Logger LOG = LoggerFactory.getLogger( TwitterFeedProcessorImpl.class );
+    private RedisSinceRecordFetchedDaoImpl redisSinceRecordFetchedDao;
 
-    private static final int RETRIES_INITIAL = 0;
+
+    public TwitterFeedProcessorImpl()
+    {
+        this.redisSinceRecordFetchedDao = new RedisSinceRecordFetchedDaoImpl();
+    }
+
     private static final int PAGE_SIZE = 200;
 
-    private String consumerKey = "f6paIc7BaVao0GHwxbhLrac5B";
-    private String consumerSecret = "BNc3qvAXhGep18Jm2cSkVDFKKjXunu0yUv1cytseqkJ36M99qj";
-
-    long lastFetchedPostId = 0L;
+    private String consumerKey = "4fg4RwYM6617M8Kl1rYe5f7wm";
+    private String consumerSecret = "bk1Te7a9fX3JBUePexvIREvunh9c8M9HiTZfMW9AhcgfEIHEm4";
 
 
     @Override
-    public List<TwitterFeedData> fetchFeed( long companyId, TwitterToken token )
+    public List<TwitterFeedData> fetchFeed( long companyId, SocialMediaTokenResponse mediaToken )
     {
         LOG.info( "Getting tweets with id: {}", companyId );
 
         List<TwitterFeedData> feedData = new ArrayList<>();
 
+        TwitterToken token = null;
+        if ( mediaToken != null ) {
+            token = mediaToken.getSocialMediaTokens().getTwitterToken();
+        }
+
+
         if ( token != null ) {
-            // Settings Consumer and Access Tokens
-            Twitter twitter = new TwitterFactory().getInstance();
-            twitter.setOAuthConsumer( consumerKey, consumerSecret );
-            twitter
-                .setOAuthAccessToken( new AccessToken( token.getTwitterAccessToken(), token.getTwitterAccessTokenSecret() ) );
+
+            String pageId = UrlHelper.getTwitterPageIdFromURL( token.getTwitterPageLink() );
+            String lastFetchedKey = mediaToken.getProfileType().toString() + "_" + mediaToken.getIden() + "_" + pageId;
 
             try {
+                String sinceId = redisSinceRecordFetchedDao.getLastFetched( lastFetchedKey );
+
+                long lastFetchedPostId = 0L;
+                if ( sinceId != null && !sinceId.isEmpty() ) {
+                    lastFetchedPostId = Long.parseLong( sinceId );
+                }
+
+                // Settings Consumer and Access Tokens
+                Twitter twitter = new TwitterFactory().getInstance();
+                twitter.setOAuthConsumer( consumerKey, consumerSecret );
+                twitter.setOAuthAccessToken(
+                    new AccessToken( token.getTwitterAccessToken(), token.getTwitterAccessTokenSecret() ) );
+
+
                 long maxId = 0L;
                 ResponseList<Status> resultList;
+
                 do {
                     Paging paging = new Paging();
                     paging.setCount( 5 );
@@ -66,18 +95,22 @@ public class TwitterFeedProcessorImpl implements TwitterFeedProcessor
                         paging.setMaxId( maxId - 1 );
                     }
 
-                    String pageId = UrlHelper.getTwitterPageIdFromURL( token.getTwitterPageLink() );
                     resultList = twitter.getUserTimeline( pageId, paging );
 
                     for ( Status status : resultList ) {
                         feedData.add( createTwitterFeedData( status ) );
                         maxId = status.getId();
                     }
-
                 } while ( resultList.size() == PAGE_SIZE );
 
+                if(!feedData.isEmpty()){
+                    redisSinceRecordFetchedDao.saveLastFetched( lastFetchedKey, Long.toString( feedData.get( 0 ).getId() ), sinceId );
+                }
+
             } catch ( TwitterException e ) {
-                LOG.error( "Exception in Twitter feed extration. Reason: ", e);
+                LOG.error( "Exception in Twitter feed extration. Reason: ", e );
+            } catch ( JedisConnectionException e ) {
+                LOG.error( "Not able to connect to jedis", e);
             }
         }
 
@@ -105,13 +138,13 @@ public class TwitterFeedProcessorImpl implements TwitterFeedProcessor
         }
         return feed;
     }
-    
-    public static void main( String[] args )
+
+    /*public static void main( String[] args )
     {
         TwitterToken token= new TwitterToken();
         token.setTwitterAccessToken( "1011709898-PTKqM3dLWsSHQ5jXYNla816zcbNfPp9b91EjOrP" );
         token.setTwitterAccessTokenSecret( "hxTzYUvgaib15LpE1JCq4fqAGrlcWMxJOs6XAM6WLmDpb" );
         token.setTwitterPageLink( "www.twitter.com/ManiCarpenter" );
         new TwitterFeedProcessorImpl().fetchFeed( 985L, token );
-    }
+    }*/
 }

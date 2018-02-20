@@ -3,7 +3,7 @@ package com.realtech.socialsurvey.compute.feeds;
 import java.io.Serializable;
 import java.util.List;
 
-import com.realtech.socialsurvey.compute.entities.TwitterToken;
+import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.compute.entities.response.TwitterFeedData;
 
 /**
@@ -19,5 +19,5 @@ public interface TwitterFeedProcessor extends Serializable
      * @param token
      * @return
      */
-    List<TwitterFeedData> fetchFeed( long companyId,  TwitterToken token );
+    List<TwitterFeedData> fetchFeed( long companyId,  SocialMediaTokenResponse mediaToken);
 }

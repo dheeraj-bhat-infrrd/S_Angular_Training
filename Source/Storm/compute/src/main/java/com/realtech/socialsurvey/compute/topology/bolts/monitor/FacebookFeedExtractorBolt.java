@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
-import com.realtech.socialsurvey.compute.entities.FacebookToken;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.compute.entities.response.FacebookFeedData;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
@@ -46,17 +45,13 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt
         try {
             SocialMediaTokenResponse mediaToken = (SocialMediaTokenResponse) input.getValueByField( "mediaToken" );
             Long companyId = mediaToken.getCompanyId();
-            FacebookToken token = null;
-            if ( mediaToken.getSocialMediaTokens() != null ) {
-                token = mediaToken.getSocialMediaTokens().getFacebookToken();
-            }
-
+            
             // Check rate limiting for company
             if ( isRateLimitExceeded( /* pass media token*/ ) ) {
                 LOG.warn( "Rate limit exceeded" );
             }
 
-            List<FacebookFeedData> feeds = facebookFeedProcessor.fetchFeeds( companyId, token );
+            List<FacebookFeedData> feeds = facebookFeedProcessor.fetchFeeds( companyId, mediaToken );
 
             LOG.debug( "Total tweet fetched : {}", feeds.size() );
             for ( FacebookFeedData facebookFeedData : feeds ) {

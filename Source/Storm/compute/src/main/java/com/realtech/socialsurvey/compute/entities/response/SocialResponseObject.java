@@ -40,6 +40,8 @@ public class SocialResponseObject<T> implements Serializable
     private long updatedTime;
     private long createdTime;
     private String ownerName;
+    private String ownerEmail;
+    private String ownerProfileImage;
 
     private T response;
     private SocialFeedType type;
@@ -302,30 +304,42 @@ public class SocialResponseObject<T> implements Serializable
     {
         this.profileType = profileType;
     }
+    
+
+    public String getOwnerEmail()
+    {
+        return ownerEmail;
+    }
+
+
+    public void setOwnerEmail( String ownerEmail )
+    {
+        this.ownerEmail = ownerEmail;
+    }
+
+
+    public String getOwnerProfileImage()
+    {
+        return ownerProfileImage;
+    }
+
+
+    public void setOwnerProfileImage( String ownerProfileImage )
+    {
+        this.ownerProfileImage = ownerProfileImage;
+    }
+
 
     @Override
-    public String toString() {
-        return "SocialResponseObject{" +
-                "id='" + id + '\'' +
-                ", postId='" + postId + '\'' +
-                ", text='" + text + '\'' +
-                ", picture='" + picture + '\'' +
-                ", updatedTime=" + updatedTime +
-                ", createdTime=" + createdTime +
-                ", ownerName='" + ownerName + '\'' +
-                ", response=" + response +
-                ", type=" + type +
-                ", flagged=" + flagged +
-                ", status=" + status +
-                ", companyId=" + companyId +
-                ", regionId=" + regionId +
-                ", branchId=" + branchId +
-                ", agentId=" + agentId +
-                ", hash=" + hash +
-                ", duplicateCount=" + duplicateCount +
-                ", foundKeywords=" + foundKeywords +
-                ", actionHistory=" + actionHistory +
-                ", isRetried=" + isRetried +
-                '}';
+    public String toString()
+    {
+        return "SocialResponseObject [id=" + id + ", postId=" + postId + ", text=" + text + ", picture=" + picture
+            + ", updatedTime=" + updatedTime + ", createdTime=" + createdTime + ", ownerName=" + ownerName + ", ownerEmail="
+            + ownerEmail + ", ownerProfileImage=" + ownerProfileImage + ", response=" + response + ", type=" + type
+            + ", flagged=" + flagged + ", status=" + status + ", companyId=" + companyId + ", regionId=" + regionId
+            + ", branchId=" + branchId + ", agentId=" + agentId + ", profileType=" + profileType + ", hash=" + hash
+            + ", duplicateCount=" + duplicateCount + ", foundKeywords=" + foundKeywords + ", actionHistory=" + actionHistory
+            + ", isRetried=" + isRetried + "]";
     }
+    
 }
