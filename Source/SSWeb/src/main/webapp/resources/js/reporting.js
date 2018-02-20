@@ -4,7 +4,7 @@ var monthNamesList = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct
 var overviewData=getOverviewData();
 var socialMediaList = new Array();
 var is_safari = navigator.userAgent.indexOf("Safari") > -1;
-
+var unclickedDrawnCount=0;
 function drawTimeFrames(){
 	var currentDate = new Date();
 	var currentMonth = currentDate.getMonth();
@@ -684,6 +684,8 @@ function drawCompletionRateGraph(){
 //draw Unclicked, Processed and Unprocessed Pie charts functions
 function drawUnclickedDonutChart(overviewYearData){
 	 
+	unclickedDrawnCount=0;
+	
 	var monthYear = getTimeFrameValue();
 	
 	 google.charts.load("current", {packages:["corechart"]});
@@ -701,7 +703,16 @@ function drawUnclickedDonutChart(overviewYearData){
      }
      var chart;
      function drawChart() {
-    	 
+    	 	
+    	 	unclickedDrawnCount++;
+    	 	
+    	 	if(unclickedDrawnCount==1){
+	        	var profilemasterid=$('#rep-prof-container').attr('data-profile-master-id');
+	 	    	if(profilemasterid == 4){
+	 	    		activaTab('leaderboard-tab');
+	 	        }
+	        }
+	        
 	        var data = google.visualization.arrayToDataTable([
 	          ['Transaction', 'Number#'],
 	          ['Processed', processed],
@@ -736,7 +747,6 @@ function drawUnclickedDonutChart(overviewYearData){
 
 	        chart = new google.visualization.PieChart(document.getElementById('donutchart'));
 	        
-	        
 	        function selectHandler(){
 	        	 var selectedItem = chart.getSelection()[0];
 	             if (selectedItem) {
@@ -753,7 +763,6 @@ function drawUnclickedDonutChart(overviewYearData){
 	        google.visualization.events.addListener(chart, 'select', selectHandler);
 	        chart.draw(data, options);
 	       
-	        
 	        var optionsChartIcn = {
 		  	          pieStartAngle: 130,
 			          backgroundColor: '#f1f0f2',
@@ -773,8 +782,7 @@ function drawUnclickedDonutChart(overviewYearData){
 		        var icnChart = new google.visualization.PieChart(document.getElementById('chart-icn-chart'));
 		        
 		        icnChart.draw(data, optionsChartIcn);
-		        
-		        
+		       
 	      }
 }
 
@@ -3202,3 +3210,13 @@ $(document).on('change', '#rep-sel-page', function(e) {
 });
 
 
+function showOverviewTab(){
+	
+	var entityId = $('#rep-prof-container').attr('data-column-value');
+	var entityType = $('#rep-prof-container').attr('data-column-name');
+	activaTab('overview-tab');
+	$('#overview-tab').addClass('active');
+	 drawCompletionRateGraph();
+ 	drawSpsStatsGraph();
+	drawNpsStatsGraph(entityId,entityType);
+}
