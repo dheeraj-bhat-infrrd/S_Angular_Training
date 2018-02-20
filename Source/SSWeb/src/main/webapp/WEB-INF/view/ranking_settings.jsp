@@ -8,6 +8,25 @@
 <c:set var="yearOffset" value="${yearOffset}"></c:set>
 <c:set var="columnName" value="${columnName}"></c:set>
 <c:set var="columnId" value="${columnId}"></c:set>
+<c:set var="isEtlRunning" value="${isEtlRunning}"></c:set>
+<c:set var="lastSuccessfulRun" value="${lastSuccessfulRun}"></c:set>
+<c:set var="highestrole" value="${highestrole}"></c:set>
+
+<c:choose>
+	<c:when test="${columnName == 'companyId'}">
+		<c:set value="1" var="profilemasterid"></c:set>
+	</c:when>
+	<c:when test="${columnName == 'regionId'}">
+		<c:set value="2" var="profilemasterid"></c:set>
+	</c:when>
+	<c:when test="${columnName == 'branchId'}">
+		<c:set value="3" var="profilemasterid"></c:set>
+	</c:when>
+	<c:when test="${columnName == 'agentId'}">
+		<c:set value="4" var="profilemasterid"></c:set>
+	</c:when>
+</c:choose>
+
 <style>
 	.ranking-settings-ip-div{
 		position: relative;
@@ -87,6 +106,24 @@
 				</div>
 			</div>
 		</c:if>
+		<c:if test="${ (isRealTechOrSSAdmin == true or isRealTechOrSSAdmin == 'true') and highestrole == 1 and profilemasterid == 1 }">
+			<div style="margin-top:20px">
+					<div class="st-score-rt-top width-three-five-zero"><spring:message code="lable.ranking.settings.recalculate.key" /></div>
+					<div class="recalculate-user-ranking">
+						<div class="recalculate-usr-rank-btn-active text-center" onclick="javascript:recalculateUserRanking()">
+							<spring:message code="lable.ranking.settings.recalculate.btn.key" />
+						</div>
+						<div class="recalculate-usr-rank-btn-inactive text-center">
+							<spring:message code="lable.ranking.settings.recalculate.btn.key" />
+						</div>
+						<c:if test="${ (lastSuccessfulRun != undefined and lastSuccessfulRun != '' and lastSuccessfulRun != null) }">
+							<span class="min-req-span">
+								Last ETL Runtime : ${lastSuccessfulRun}
+							</span>
+						</c:if>
+					</div>
+			</div>
+		</c:if>
 	</div>
 </div>
 <script>
@@ -95,6 +132,11 @@ var monthOffset = "${monthOffset}";
 var yearOffset = "${yearOffset}";
 var columnName = "${columnName}";
 var columnId = "${columnId}";
+var isEtlRunning = "${isEtlRunning}";
+var lastSuccessfulRun = "${lastSuccessfulRun}";
+var highestrole = "${highestrole}";
+
+console.log("highestRole: ", highestrole);
 
 $(document).ready(function(){
 	$('#min-req-container').on('blur','.ranking-settings-ip',function(e){
@@ -102,5 +144,13 @@ $(document).ready(function(){
 		$('#overlay-toast').html(message);
 		showToast();
 	});
+	
+	if(isEtlRunning == true || isEtlRunning == 'true'){
+		$('.recalculate-usr-rank-btn-inactive').show();
+		$('.recalculate-usr-rank-btn-active').hide();
+	}else if(isEtlRunning == false || isEtlRunning == 'false'){
+		$('.recalculate-usr-rank-btn-inactive').hide();
+		$('.recalculate-usr-rank-btn-active').show();
+	}
 });
 </script>
