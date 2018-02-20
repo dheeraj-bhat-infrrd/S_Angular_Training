@@ -2,6 +2,8 @@ package com.realtech.socialsurvey.compute.common;
 
 import java.io.IOException;
 
+import com.mongodb.DuplicateKeyException;
+import com.realtech.socialsurvey.compute.exception.MongoSaveException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -130,6 +132,23 @@ public class RetrofitApiBuilder
                 throw new APIIntegrationException( "IOException while sending api response", e );
             }
             throw new APIIntegrationException( response.message() );
+        }
+    }
+
+    public void validateSavePostToMongoResponse(Response<?> response) {
+        try {
+            if(!response.isSuccessful()) {
+                String errorBody = response.errorBody().string();
+                if (LOG.isWarnEnabled()) {
+                    LOG.warn("Error found. Response code: {}. Possible reason: {}", response.code(), response.message());
+                }
+                if (LOG.isWarnEnabled()) {
+                    LOG.warn("Reason: {}", errorBody);
+                }
+                throw new MongoSaveException(errorBody);
+            }
+        } catch (IOException e) {
+            throw new APIIntegrationException("IOException while sending api response", e);
         }
     }
 

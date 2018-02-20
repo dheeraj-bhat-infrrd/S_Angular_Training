@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -17,11 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.realtech.socialsurvey.api.exceptions.SSApiException;
 import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
-import com.realtech.socialsurvey.core.entities.SocialMonitorFeedData;
 import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
 import com.realtech.socialsurvey.core.entities.SocialMonitorResponseData;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.socialmonitor.feed.SocialFeedService;
 import com.wordnik.swagger.annotations.ApiOperation;
 
@@ -40,14 +37,18 @@ public class SocialMonitorFeedsController {
 
 	@RequestMapping(value = "/showsocialfeeds", method = RequestMethod.GET)
 	@ApiOperation(value = "Get Social posts for Social monitor")
-	public ResponseEntity<?> showStreamSocialPosts(long profileId, String profileLevel, int startIndex, int limit,
-			String status, boolean flag, @RequestParam List<String> feedtype)
+	public ResponseEntity<?> showStreamSocialPosts(int startIndex, int limit,
+			@RequestParam(value = "status", required = false) String status, boolean flag,
+			@RequestParam List<String> feedtype, @RequestParam(value = "companyId", required = false) Long companyId,
+			@RequestParam(value = "regionIds", required = false) List<Long> regionIds,
+			@RequestParam(value = "branchIds", required = false) List<Long> branchIds,
+			@RequestParam(value = "agentIds", required = false) List<Long> agentIds)
 			throws InvalidInputException, SSApiException {
 		LOGGER.info("Fetching the list of Social posts for social monitor");
 		SocialMonitorResponseData socialMonitorResponseData;
 		try {
-			socialMonitorResponseData = socialFeedService.getAllSocialPosts(profileId, profileLevel, startIndex, limit,
-					status, flag, feedtype);
+			socialMonitorResponseData = socialFeedService.getAllSocialPosts(startIndex, limit, status, flag, feedtype,
+					companyId, regionIds, branchIds, agentIds);
 		} catch (InvalidInputException ie) {
 			LOGGER.error("Invalid input exception caught while fetching social feeds", ie);
 			throw new SSApiException("Invalid input exception caught while fetching social feeds", ie);
@@ -60,7 +61,8 @@ public class SocialMonitorFeedsController {
 	@RequestMapping(value = "/updatesocialfeeds/action", method = RequestMethod.PUT)
 	@ApiOperation(value = "Update Social posts for Social monitor for individual/bulk posts")
 	public ResponseEntity<?> saveSocialFeedsForAction(@RequestBody SocialFeedsActionUpdate socialFeedsActionUpdate,
-			long companyId) throws SSApiException, InvalidInputException {
+			@RequestParam(value = "companyId", required = false) Long companyId)
+			throws SSApiException, InvalidInputException {
 		LOGGER.info("Updating the action of Social feeds for social monitor");
 		try {
 			socialFeedService.updateActionForFeeds(socialFeedsActionUpdate, companyId);

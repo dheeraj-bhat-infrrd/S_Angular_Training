@@ -72,7 +72,7 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt
 
     /**
      * Create SocialResponseObject with common fields
-     * @param companyId
+     * @param mediaToken
      * @param facebookFeedData
      * @return
      */
@@ -100,6 +100,7 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt
         }
 
         responseWrapper.setPostId(facebookFeedData.getId());
+        responseWrapper.setId(facebookFeedData.getId());
 
         if ( facebookFeedData.getUpdatedTime() > 0 ) {
             responseWrapper.setUpdatedTime( facebookFeedData.getUpdatedTime() * 1000 );

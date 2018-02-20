@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -35,6 +36,11 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
     private static final String POST_ID = "postId";
     private static final String FLAGGED = "flagged";
     private static final String FEED_TYPE = "type";
+    private static final String ACTION_HISTORY = "actionHistory";
+    private static final String IDEN = "iden";
+    private static final String STATUS = "status";
+    private static final String SOCIALMONITOR_MACROS = "socialMonitorMacros";
+
 
     @Override
     public void insertSocialFeed( SocialResponseObject<?> socialFeed, String collectionName )
@@ -69,15 +75,6 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 		}
 		else return duplicates;
 	}
-
-    @Override
-    public boolean isSocialPostSaved(String postId) {
-        if(LOG.isDebugEnabled()) {
-            LOG.debug("Fetching posts with postId {} ", postId);
-        }
-        Query query = new Query().addCriteria(Criteria.where(POST_ID).is(postId));
-        return mongoTemplate.exists(query, SocialResponseObject.class, SOCIAL_FEED_COLLECTION);
-    }
     
 	@Override
 	public void updateSocialFeed(SocialFeedsActionUpdate socialFeedsActionUpdate, List<ActionHistory> actionHistories, int updateFlag, String collectionName) {
@@ -89,18 +86,18 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 			}
 			Query query = new Query();
 
-			query.addCriteria(Criteria.where("postId").is(postId));
+			query.addCriteria(Criteria.where(POST_ID).is(postId));
 
 			Update update = new Update();
 
 			if(updateFlag == 1) {
-				update.set("flagged", socialFeedsActionUpdate.isFlagged());
+				update.set(FLAGGED, socialFeedsActionUpdate.isFlagged());
 			} else if(updateFlag == 2 ) {
-				update.set("flagged", false);
-				update.set("status", socialFeedsActionUpdate.getStatus());
+				update.set(FLAGGED, false);
+				update.set(STATUS, socialFeedsActionUpdate.getStatus());
 			}
 			for(ActionHistory actionHistory : actionHistories) {
-				update.push("actionHistory", actionHistory);
+				update.push(ACTION_HISTORY, actionHistory);
 				mongoTemplate.updateFirst(query, update, collectionName);
 			}
 			LOG.debug("Updated {}", collectionName);
@@ -124,17 +121,17 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 		LOG.debug("Fetching Social Feed for postId {}", postId);
 		Query query = new Query();
 
-		query.addCriteria(Criteria.where("postId").is(postId));
+		query.addCriteria(Criteria.where(POST_ID).is(postId));
 
 		return mongoTemplate.findOne(query, SocialResponseObject.class, collectionName);
 	}
 
 	@Override
-	public OrganizationUnitSettings FetchMacros(long companyId) {
+	public OrganizationUnitSettings FetchMacros(Long companyId) {
 		LOG.debug("Fetching Macros from COMAPNY_SETTINGS");
 		Query query = new Query();
 
-		query.addCriteria(Criteria.where("iden").is(companyId));
+		query.addCriteria(Criteria.where(IDEN).is(companyId));
 
 		return mongoTemplate.findOne(query, OrganizationUnitSettings.class,
 				CommonConstants.COMPANY_SETTINGS_COLLECTION);
@@ -146,11 +143,11 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 		LOG.debug("Updating Macros in COMPANY_SETTINGS");
 		Query query = new Query();
 
-		query.addCriteria(Criteria.where("iden").is(companyId));
+		query.addCriteria(Criteria.where(IDEN).is(companyId));
 
 		Update update = new Update();
 
-		update.addToSet("socialMonitorMacros", socialMonitorMacro);
+		update.addToSet(SOCIALMONITOR_MACROS, socialMonitorMacro);
 
 		mongoTemplate.updateFirst(query, update, CommonConstants.COMPANY_SETTINGS_COLLECTION);
 		LOG.debug("Updated {}", CommonConstants.COMPANY_SETTINGS_COLLECTION);
@@ -163,11 +160,11 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 		
 		Query query = new Query();
 		
-		query.addCriteria(Criteria.where("iden").is(companyId));
+		query.addCriteria(Criteria.where(IDEN).is(companyId));
 		
 		Update update = new Update();
 
-		update.set("socialMonitorMacros", socialMonitorMacros);
+		update.set(SOCIALMONITOR_MACROS, socialMonitorMacros);
 		
 		mongoTemplate.updateFirst(query, update, CommonConstants.COMPANY_SETTINGS_COLLECTION);
 		LOG.debug("Updated {}", CommonConstants.COMPANY_SETTINGS_COLLECTION);
@@ -175,51 +172,70 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 	}
 
 	@Override
-	public List<SocialResponseObject> getAllSocialFeeds(long profileId, String key, int startIndex, int limit,
-			boolean flag, String status, List<String> feedtype) {
-		LOG.debug("Fetching Social Feeds");
+	public List<SocialResponseObject> getAllSocialFeeds(int startIndex, int limit, boolean flag, String status,
+			List<String> feedtype, Long companyId, List<Long> regionIds, List<Long> branchIds, List<Long> agentIds) {
+		LOG.debug("Fetching All Social Feeds");
 		Query query = new Query();
+		List<Criteria> criterias = new ArrayList<>();
+		if (flag) {
+			if (companyId != null) {
+				criterias.add((Criteria.where(CommonConstants.COMPANY_ID).is(companyId)
+						.andOperator((Criteria.where(FLAGGED).is(flag)), (Criteria.where(FEED_TYPE).in(feedtype)))));
+			}
+			if (regionIds != null) {
+				criterias.add((Criteria.where(CommonConstants.REGION_ID).in(regionIds)
+						.andOperator((Criteria.where(FLAGGED).is(flag)), (Criteria.where(FEED_TYPE).in(feedtype)))));
+			}
+			if (branchIds != null) {
+				criterias.add((Criteria.where(CommonConstants.BRANCH_ID).in(branchIds)
+						.andOperator((Criteria.where(FLAGGED).is(flag)), (Criteria.where(FEED_TYPE).in(feedtype)))));
+			}
+			if (agentIds != null) {
+				criterias.add((Criteria.where(CommonConstants.AGENT_ID).in(agentIds)
+						.andOperator((Criteria.where(FLAGGED).is(flag)), (Criteria.where(FEED_TYPE).in(feedtype)))));
+			}
 
-		if(flag) {
-			if (key.equals(CommonConstants.COMPANY_ID)) {
-				query.addCriteria(Criteria.where(CommonConstants.COMPANY_ID).is(profileId)
-						.andOperator((Criteria.where(FLAGGED).is(flag)), (Criteria.where(FEED_TYPE).in(feedtype))));
-			} else if (key.equals(CommonConstants.REGION_ID)) {
-				query.addCriteria(Criteria.where(CommonConstants.REGION_ID).is(profileId)
-						.andOperator((Criteria.where(FLAGGED).is(flag)), (Criteria.where(FEED_TYPE).in(feedtype))));
-			} else if (key.equals(CommonConstants.BRANCH_ID)) {
-				query.addCriteria(Criteria.where(CommonConstants.BRANCH_ID).is(profileId)
-						.andOperator((Criteria.where(FLAGGED).is(flag)), (Criteria.where(FEED_TYPE).in(feedtype))));
-			} else {
-				query.addCriteria(Criteria.where(CommonConstants.AGENT_ID).is(profileId)
-						.andOperator((Criteria.where(FLAGGED).is(flag)), (Criteria.where(FEED_TYPE).in(feedtype))));
+		} else if (status != null && !flag) {
+			if (companyId != null) {
+				criterias.add((Criteria.where(CommonConstants.COMPANY_ID).is(companyId).andOperator(
+						(Criteria.where(CommonConstants.STATUS_COLUMN).is(status.toUpperCase())),
+						(Criteria.where(FEED_TYPE).in(feedtype)))));
 			}
-		} else if(!status.isEmpty() && !flag) {
-			if (key.equals(CommonConstants.COMPANY_ID)) {
-				query.addCriteria(Criteria.where(CommonConstants.COMPANY_ID).is(profileId)
-						.andOperator((Criteria.where(CommonConstants.STATUS_COLUMN).is(status.toUpperCase())), (Criteria.where(FEED_TYPE).in(feedtype))));
-			} else if (key.equals(CommonConstants.REGION_ID)) {
-				query.addCriteria(Criteria.where(CommonConstants.REGION_ID).is(profileId)
-						.andOperator((Criteria.where(CommonConstants.STATUS_COLUMN).is(status.toUpperCase())), (Criteria.where(FEED_TYPE).in(feedtype))));
-			} else if (key.equals(CommonConstants.BRANCH_ID)) {
-				query.addCriteria(Criteria.where(CommonConstants.BRANCH_ID).is(profileId)
-						.andOperator((Criteria.where(CommonConstants.STATUS_COLUMN).is(status.toUpperCase())), (Criteria.where(FEED_TYPE).in(feedtype))));
-			} else {
-				query.addCriteria(Criteria.where(CommonConstants.AGENT_ID).is(profileId)
-						.andOperator((Criteria.where(CommonConstants.STATUS_COLUMN).is(status.toUpperCase())), (Criteria.where(FEED_TYPE).in(feedtype))));
+			if (regionIds != null) {
+				criterias.add((Criteria.where(CommonConstants.REGION_ID).in(regionIds).andOperator(
+						(Criteria.where(CommonConstants.STATUS_COLUMN).is(status.toUpperCase())),
+						(Criteria.where(FEED_TYPE).in(feedtype)))));
 			}
-		} else {
-			if (key.equals(CommonConstants.COMPANY_ID)) {
-				query.addCriteria(Criteria.where(CommonConstants.COMPANY_ID).is(profileId).andOperator(Criteria.where(FEED_TYPE).in(feedtype)));
-			} else if (key.equals(CommonConstants.REGION_ID)) {
-				query.addCriteria(Criteria.where(CommonConstants.REGION_ID).is(profileId).andOperator(Criteria.where(FEED_TYPE).in(feedtype)));
-			} else if (key.equals(CommonConstants.BRANCH_ID)) {
-				query.addCriteria(Criteria.where(CommonConstants.BRANCH_ID).is(profileId).andOperator(Criteria.where(FEED_TYPE).in(feedtype)));
-			} else {
-				query.addCriteria(Criteria.where(CommonConstants.AGENT_ID).is(profileId).andOperator(Criteria.where(FEED_TYPE).in(feedtype)));
+			if (branchIds != null) {
+				criterias.add((Criteria.where(CommonConstants.BRANCH_ID).in(branchIds).andOperator(
+						(Criteria.where(CommonConstants.STATUS_COLUMN).is(status.toUpperCase())),
+						(Criteria.where(FEED_TYPE).in(feedtype)))));
+			}
+			if (agentIds != null) {
+				criterias.add((Criteria.where(CommonConstants.AGENT_ID).in(agentIds).andOperator(
+						(Criteria.where(CommonConstants.STATUS_COLUMN).is(status.toUpperCase())),
+						(Criteria.where(FEED_TYPE).in(feedtype)))));
+			}
+		} else if (status == null && !flag) {
+			if (companyId != null) {
+				criterias.add((Criteria.where(CommonConstants.COMPANY_ID).is(companyId)
+						.andOperator(Criteria.where(FEED_TYPE).in(feedtype))));
+			}
+			if (regionIds != null) {
+				criterias.add((Criteria.where(CommonConstants.REGION_ID).in(regionIds)
+						.andOperator(Criteria.where(FEED_TYPE).in(feedtype))));
+			}
+			if (branchIds != null) {
+				criterias.add((Criteria.where(CommonConstants.BRANCH_ID).in(branchIds)
+						.andOperator(Criteria.where(FEED_TYPE).in(feedtype))));
+			}
+			if (agentIds != null) {
+				criterias.add((Criteria.where(CommonConstants.AGENT_ID).in(agentIds)
+						.andOperator(Criteria.where(FEED_TYPE).in(feedtype))));
 			}
 		}
-		
+		Criteria criteria = new Criteria().orOperator(criterias.toArray(new Criteria[criterias.size()]));
+		query.addCriteria(criteria);
 		query.with(new Sort(Sort.Direction.DESC, "_id"));
 		if (startIndex > -1) {
 			query.skip(startIndex);
@@ -235,51 +251,72 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 	}
 
 	@Override
-	public long getAllSocialFeedsCount(long profileId, String key, boolean flag,
-			String status, List<String> feedtype) {
-		LOG.debug("Fetching Social Feeds count");
+	public long getAllSocialFeedsCount(boolean flag, String status, List<String> feedtype, Long companyId,
+			List<Long> regionIds, List<Long> branchIds, List<Long> agentIds) {
+		LOG.debug("Fetching All Social Feeds count");
 		Query query = new Query();
+		List<Criteria> criterias = new ArrayList<>();
+		if (flag) {
+			if (companyId != null) {
+				criterias.add((Criteria.where(CommonConstants.COMPANY_ID).is(companyId)
+						.andOperator((Criteria.where(FLAGGED).is(flag)), (Criteria.where(FEED_TYPE).in(feedtype)))));
+			}
+			if (regionIds != null) {
+				criterias.add((Criteria.where(CommonConstants.REGION_ID).in(regionIds)
+						.andOperator((Criteria.where(FLAGGED).is(flag)), (Criteria.where(FEED_TYPE).in(feedtype)))));
+			}
+			if (branchIds != null) {
+				criterias.add((Criteria.where(CommonConstants.BRANCH_ID).in(branchIds)
+						.andOperator((Criteria.where(FLAGGED).is(flag)), (Criteria.where(FEED_TYPE).in(feedtype)))));
+			}
+			if (agentIds != null) {
+				criterias.add((Criteria.where(CommonConstants.AGENT_ID).in(agentIds)
+						.andOperator((Criteria.where(FLAGGED).is(flag)), (Criteria.where(FEED_TYPE).in(feedtype)))));
+			}
 
-		if(flag) {
-			if (key.equals(CommonConstants.COMPANY_ID)) {
-				query.addCriteria(Criteria.where(CommonConstants.COMPANY_ID).is(profileId)
-						.andOperator((Criteria.where(FLAGGED).is(flag)), (Criteria.where(FEED_TYPE).in(feedtype))));
-			} else if (key.equals(CommonConstants.REGION_ID)) {
-				query.addCriteria(Criteria.where(CommonConstants.REGION_ID).is(profileId)
-						.andOperator((Criteria.where(FLAGGED).is(flag)), (Criteria.where(FEED_TYPE).in(feedtype))));
-			} else if (key.equals(CommonConstants.BRANCH_ID)) {
-				query.addCriteria(Criteria.where(CommonConstants.BRANCH_ID).is(profileId)
-						.andOperator((Criteria.where(FLAGGED).is(flag)), (Criteria.where(FEED_TYPE).in(feedtype))));
-			} else {
-				query.addCriteria(Criteria.where(CommonConstants.AGENT_ID).is(profileId)
-						.andOperator((Criteria.where(FLAGGED).is(flag)), (Criteria.where(FEED_TYPE).in(feedtype))));
+		} else if (status != null && !flag) {
+			if (companyId != null) {
+				criterias.add((Criteria.where(CommonConstants.COMPANY_ID).is(companyId).andOperator(
+						(Criteria.where(CommonConstants.STATUS_COLUMN).is(status.toUpperCase())),
+						(Criteria.where(FEED_TYPE).in(feedtype)))));
 			}
-		} else if(!status.isEmpty() && !flag) {
-			if (key.equals(CommonConstants.COMPANY_ID)) {
-				query.addCriteria(Criteria.where(CommonConstants.COMPANY_ID).is(profileId)
-						.andOperator((Criteria.where(CommonConstants.STATUS_COLUMN).is(status.toUpperCase())), (Criteria.where(FEED_TYPE).in(feedtype))));
-			} else if (key.equals(CommonConstants.REGION_ID)) {
-				query.addCriteria(Criteria.where(CommonConstants.REGION_ID).is(profileId)
-						.andOperator((Criteria.where(CommonConstants.STATUS_COLUMN).is(status.toUpperCase())), (Criteria.where(FEED_TYPE).in(feedtype))));
-			} else if (key.equals(CommonConstants.BRANCH_ID)) {
-				query.addCriteria(Criteria.where(CommonConstants.BRANCH_ID).is(profileId)
-						.andOperator((Criteria.where(CommonConstants.STATUS_COLUMN).is(status.toUpperCase())), (Criteria.where(FEED_TYPE).in(feedtype))));
-			} else {
-				query.addCriteria(Criteria.where(CommonConstants.AGENT_ID).is(profileId)
-						.andOperator((Criteria.where(CommonConstants.STATUS_COLUMN).is(status.toUpperCase())), (Criteria.where(FEED_TYPE).in(feedtype))));
+			if (regionIds != null) {
+				criterias.add((Criteria.where(CommonConstants.REGION_ID).in(regionIds).andOperator(
+						(Criteria.where(CommonConstants.STATUS_COLUMN).is(status.toUpperCase())),
+						(Criteria.where(FEED_TYPE).in(feedtype)))));
 			}
-		} else {
-			if (key.equals(CommonConstants.COMPANY_ID)) {
-				query.addCriteria(Criteria.where(CommonConstants.COMPANY_ID).is(profileId).andOperator(Criteria.where(FEED_TYPE).in(feedtype)));
-			} else if (key.equals(CommonConstants.REGION_ID)) {
-				query.addCriteria(Criteria.where(CommonConstants.REGION_ID).is(profileId).andOperator(Criteria.where(FEED_TYPE).in(feedtype)));
-			} else if (key.equals(CommonConstants.BRANCH_ID)) {
-				query.addCriteria(Criteria.where(CommonConstants.BRANCH_ID).is(profileId).andOperator(Criteria.where(FEED_TYPE).in(feedtype)));
-			} else {
-				query.addCriteria(Criteria.where(CommonConstants.AGENT_ID).is(profileId).andOperator(Criteria.where(FEED_TYPE).in(feedtype)));
+			if (branchIds != null) {
+				criterias.add((Criteria.where(CommonConstants.BRANCH_ID).in(branchIds).andOperator(
+						(Criteria.where(CommonConstants.STATUS_COLUMN).is(status.toUpperCase())),
+						(Criteria.where(FEED_TYPE).in(feedtype)))));
+			}
+			if (agentIds != null) {
+				criterias.add((Criteria.where(CommonConstants.AGENT_ID).in(agentIds).andOperator(
+						(Criteria.where(CommonConstants.STATUS_COLUMN).is(status.toUpperCase())),
+						(Criteria.where(FEED_TYPE).in(feedtype)))));
+			}
+		} else if (status == null && !flag) {
+			if (companyId != null) {
+				criterias.add((Criteria.where(CommonConstants.COMPANY_ID).is(companyId)
+						.andOperator(Criteria.where(FEED_TYPE).in(feedtype))));
+			}
+
+			if (regionIds != null) {
+				criterias.add((Criteria.where(CommonConstants.REGION_ID).in(regionIds)
+						.andOperator(Criteria.where(FEED_TYPE).in(feedtype))));
+			}
+			if (branchIds != null) {
+				criterias.add((Criteria.where(CommonConstants.BRANCH_ID).in(branchIds)
+						.andOperator(Criteria.where(FEED_TYPE).in(feedtype))));
+			}
+			if (agentIds != null) {
+				criterias.add((Criteria.where(CommonConstants.AGENT_ID).in(agentIds)
+						.andOperator(Criteria.where(FEED_TYPE).in(feedtype))));
 			}
 		}
-		
+		Criteria criteria = new Criteria().orOperator(criterias.toArray(new Criteria[criterias.size()]));
+		query.addCriteria(criteria);
+
 		return mongoTemplate.count(query, SOCIAL_FEED_COLLECTION);
 	}	
 	

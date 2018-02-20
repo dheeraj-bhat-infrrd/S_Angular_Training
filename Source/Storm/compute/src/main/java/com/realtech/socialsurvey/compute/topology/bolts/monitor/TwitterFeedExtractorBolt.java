@@ -96,7 +96,10 @@ public class TwitterFeedExtractorBolt extends BaseComputeBolt
         if ( twitterFeedData.getText() != null && !twitterFeedData.getText().isEmpty() ) {
             responseWrapper.setHash( responseWrapper.getText().hashCode() );
         }
-        responseWrapper.setPostId( String.valueOf( twitterFeedData.getId() ) );
+
+        responseWrapper.setPostId(String.valueOf(twitterFeedData.getId()));
+        responseWrapper.setId(String.valueOf(twitterFeedData.getId()));
+
         if ( twitterFeedData.getCreatedAt() != null ) {
             responseWrapper.setCreatedTime( twitterFeedData.getCreatedAt().getTime() );
             responseWrapper.setUpdatedTime( twitterFeedData.getCreatedAt().getTime() );
