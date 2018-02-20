@@ -58,6 +58,9 @@ public class JobLogDetailsManagementImpl implements JobLogDetailsManagement
     
     @Value ( "${SSH_SCRIPT_PATH}")
     private String scriptPath;
+    
+    @Value ( "${ALLOW_ETL_RUN_BEFORE_BUFFER}" )
+    private long bufferTime;
 
     private static final Logger LOG = LoggerFactory.getLogger( JobLogDetailsDaoImpl.class );
 
@@ -90,7 +93,7 @@ public class JobLogDetailsManagementImpl implements JobLogDetailsManagement
         if(!jobLogDetails.getStatus().equals(CommonConstants.STATUS_RUNNING) && !jobLogDetails.getJobName().equals(CommonConstants.CENTRALIZED_JOB_NAME)) {
         	JobLogDetails jobLogDetailsScheduled = jobLogDetailsDao.getLastCentrelisedRun();
         	long duration = System.currentTimeMillis() - jobLogDetailsScheduled.getJobStartTime().getTime();
-        	long scheduleAfter = CommonConstants.BUFFER;
+        	long scheduleAfter = bufferTime;
         	if(scheduleAfter > duration) {
         		isRunning = false;
         	}
