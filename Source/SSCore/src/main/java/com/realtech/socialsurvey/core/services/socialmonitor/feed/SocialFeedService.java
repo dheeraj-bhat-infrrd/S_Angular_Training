@@ -1,11 +1,9 @@
 package com.realtech.socialsurvey.core.services.socialmonitor.feed;
 
-import com.mongodb.DuplicateKeyException;
 import com.realtech.socialsurvey.core.entities.SocialResponseObject;
 import java.util.List;
 
 import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
-import com.realtech.socialsurvey.core.entities.SocialMonitorFeedData;
 import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
 import com.realtech.socialsurvey.core.entities.SocialMonitorResponseData;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -33,6 +31,9 @@ public interface SocialFeedService
      */
     long updateDuplicateCount(int hash, long companyId) throws InvalidInputException;
 
+
+    /**
+     * Gets all feeds on social monitor based on the flag, status and feed type
     /** Gets all feeds on social monitor based on the flag
      * @param profileId
      * @param profileLevel
@@ -42,7 +43,7 @@ public interface SocialFeedService
      * @return
      * @throws InvalidInputException
      */
-    public SocialMonitorResponseData getAllSocialPosts(long profileId, String profileLevel, int startIndex, int limit, String status, boolean flag, List<String> feeds) throws InvalidInputException;
+    public SocialMonitorResponseData getAllSocialPosts(int startIndex, int limit, String status, boolean flag, List<String> feedtype, Long companyId, List<Long> regionIds, List<Long> branchIds, List<Long> agentIds) throws InvalidInputException;
         
     /**
      * Update actions and macros on feeds
@@ -50,7 +51,7 @@ public interface SocialFeedService
      * @param companyId
      * @throws InvalidInputException
      */
-    public void updateActionForFeeds(SocialFeedsActionUpdate socialFeedsActionUpdate, long companyId) throws InvalidInputException;
+    public void updateActionForFeeds(SocialFeedsActionUpdate socialFeedsActionUpdate, Long companyId) throws InvalidInputException;
     
     /**
      * Fetch macros based on companyId

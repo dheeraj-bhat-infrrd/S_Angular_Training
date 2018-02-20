@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import com.mongodb.DuplicateKeyException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,6 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import com.realtech.socialsurvey.core.commons.ActionHistoryComparator;
-import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.MongoSocialFeedDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialFeedDaoImpl;
 import com.realtech.socialsurvey.core.entities.ActionHistory;
@@ -66,28 +64,17 @@ public class SocialFeedServiceImpl implements SocialFeedService
     
 	@SuppressWarnings("unchecked")
 	@Override
-	public SocialMonitorResponseData getAllSocialPosts(long profileId, String profileLevel, int startIndex, int limit,
-			String status, boolean flag, List<String> feedtype) throws InvalidInputException {
-		LOG.debug("Fetching social posts for {} with Id {} ", profileLevel, profileId);
-		if (profileId <= 0 || profileLevel == null) {
-			LOG.error("Invalid profileLevel or profileId");
-			throw new InvalidInputException("Profile data cannot be null");
-		}
+	public SocialMonitorResponseData getAllSocialPosts(int startIndex, int limit, String status, boolean flag,
+			List<String> feedtype, Long companyId, List<Long> regionIds, List<Long> branchIds, List<Long> agentIds)
+			throws InvalidInputException {
+		LOG.debug("Fetching social posts");
+
 		SocialMonitorResponseData socialMonitorResponseData = new SocialMonitorResponseData();
 		List<SocialMonitorFeedData> socialMonitorStreamDataList = new ArrayList<>();
 		List<SocialResponseObject> socialResponseObjects;
 
-		String key = CommonConstants.AGENT_ID;
-
-		if (profileLevel.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-			key = CommonConstants.COMPANY_ID;
-		} else if (profileLevel.equals(CommonConstants.REGION_ID_COLUMN)) {
-			key = CommonConstants.REGION_ID;
-		} else if (profileLevel.equals(CommonConstants.BRANCH_ID_COLUMN)) {
-			key = CommonConstants.BRANCH_ID;
-		}
-		socialResponseObjects = mongoSocialFeedDao.getAllSocialFeeds(profileId, key, startIndex, limit, flag, status,
-				feedtype);
+		socialResponseObjects = mongoSocialFeedDao.getAllSocialFeeds(startIndex, limit, flag, status,
+				feedtype, companyId, regionIds, branchIds, agentIds);
 		if (socialResponseObjects != null && !socialResponseObjects.isEmpty()) {
 			for (SocialResponseObject socialResponseObject : socialResponseObjects) {
 				SocialMonitorFeedData socialMonitorFeedData = new SocialMonitorFeedData();
@@ -108,12 +95,12 @@ public class SocialFeedServiceImpl implements SocialFeedService
 				socialMonitorFeedData.setDuplicateCount(socialResponseObject.getDuplicateCount());
 				socialMonitorStreamDataList.add(socialMonitorFeedData);
 			}
-			socialMonitorResponseData.setCount(mongoSocialFeedDao.getAllSocialFeedsCount(profileId, key, flag, status, feedtype));
+			socialMonitorResponseData.setCount(mongoSocialFeedDao.getAllSocialFeedsCount(flag, status, feedtype, companyId, regionIds, branchIds, agentIds));
 			if (flag) {
 				socialMonitorResponseData.setStatus("FLAGGED");
-			} else if (!status.isEmpty() && !flag) {
+			} else if (status != null && !flag) {
 				socialMonitorResponseData.setStatus(status.toUpperCase());
-			} else {
+			} else if(status == null && !flag){
 				socialMonitorResponseData.setStatus("ALL");
 			}
 			socialMonitorResponseData.setSocialMonitorFeedData(socialMonitorStreamDataList);
@@ -125,7 +112,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
 	}
 	
 	@Override
-	public void updateActionForFeeds(SocialFeedsActionUpdate socialFeedsActionUpdate, long companyId)
+	public void updateActionForFeeds(SocialFeedsActionUpdate socialFeedsActionUpdate, Long companyId)
 			throws InvalidInputException {
 		LOG.debug("Updating social Feeds for social monitor");
 		if (socialFeedsActionUpdate == null) {
@@ -256,7 +243,8 @@ public class SocialFeedServiceImpl implements SocialFeedService
 		socialMonitorMacro.setCreatedOn(new Date().getTime());
 		mongoSocialFeedDao.updateMacros(socialMonitorMacro, companyId);
 
-	}	
+	}
+
 
 } 
 
