@@ -1111,31 +1111,36 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	public FilterKeywordsResponse getCompanyKeywordsByCompanyId(long companyId, int startIndex, int limit,
 			String monitorType) throws InvalidInputException {
 		LOG.debug("Get company settings for the companyId: {}", companyId);
-		OrganizationUnitSettings companySettings = organizationUnitSettingsDao
-				.fetchOrganizationUnitSettingsById(companyId,
-						MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
+				companyId, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 
 		if (companySettings == null) {
 			throw new InvalidInputException("Company setting doesn't exist for company id", "400");
 		}
 
 		List<Keyword> companyFilterKeywords = companySettings.getFilterKeywords();
-        Collections.sort( companyFilterKeywords, new FilterKeywordsComparator() );
+		Collections.sort(companyFilterKeywords, new FilterKeywordsComparator());
 		List<Keyword> keywords = new ArrayList<>();
 		FilterKeywordsResponse filterKeywordsResponse = new FilterKeywordsResponse();
 		if (companyFilterKeywords != null && !companyFilterKeywords.isEmpty()) {
 			if (monitorType == null || monitorType.isEmpty()) {
 				filterKeywordsResponse.setMonitorType("ALL");
 				filterKeywordsResponse.setCount(companyFilterKeywords.size());
-				if(startIndex >= companyFilterKeywords.size()) {
+				if (startIndex >= companyFilterKeywords.size()) {
 					filterKeywordsResponse.setMonitorType(null);
 					filterKeywordsResponse.setCount(0);
 					filterKeywordsResponse.setFilterKeywords(null);
-				}
-				else if(limit > companyFilterKeywords.size() && startIndex < companyFilterKeywords.size()) {
-					filterKeywordsResponse.setFilterKeywords(companyFilterKeywords.subList(startIndex, companyFilterKeywords.size()));
+				} else if (limit >= companyFilterKeywords.size() && startIndex < companyFilterKeywords.size()) {
+					filterKeywordsResponse
+							.setFilterKeywords(companyFilterKeywords.subList(startIndex, companyFilterKeywords.size()));
 				} else {
-					filterKeywordsResponse.setFilterKeywords(companyFilterKeywords.subList(startIndex, startIndex + limit));
+					if (startIndex + limit >= companyFilterKeywords.size()) {
+						filterKeywordsResponse.setFilterKeywords(
+								companyFilterKeywords.subList(startIndex, companyFilterKeywords.size()));
+					} else {
+						filterKeywordsResponse
+								.setFilterKeywords(companyFilterKeywords.subList(startIndex, startIndex + limit));
+					}
 				}
 
 			} else {
@@ -1146,15 +1151,19 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 				}
 				filterKeywordsResponse.setMonitorType(monitorType.toUpperCase());
 				filterKeywordsResponse.setCount(keywords.size());
-				if(startIndex >= keywords.size()) {
+				if (startIndex >= keywords.size()) {
 					filterKeywordsResponse.setMonitorType(null);
 					filterKeywordsResponse.setCount(0);
 					filterKeywordsResponse.setFilterKeywords(null);
-				}
-				else if(limit > keywords.size() && startIndex < keywords.size()) {
+				} else if (limit >= keywords.size() && startIndex < keywords.size()) {
 					filterKeywordsResponse.setFilterKeywords(keywords.subList(startIndex, keywords.size()));
 				} else {
-					filterKeywordsResponse.setFilterKeywords(keywords.subList(startIndex, startIndex + limit));
+					if (startIndex + limit >= keywords.size()) {
+						filterKeywordsResponse.setFilterKeywords(keywords.subList(startIndex, keywords.size()));
+					} else {
+						filterKeywordsResponse.setFilterKeywords(keywords.subList(startIndex, startIndex + limit));
+					}
+
 				}
 			}
 		}

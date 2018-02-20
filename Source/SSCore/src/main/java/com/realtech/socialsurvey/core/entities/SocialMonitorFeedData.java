@@ -22,6 +22,7 @@ public class SocialMonitorFeedData implements Serializable {
 	private String picture = "";
 	private long updatedOn;
 	private String ownerName = "";
+	private String ownerProfileImage="";
 	private boolean flagged;
 	private SocialFeedType type;
 	private SocialFeedStatus status;
@@ -149,13 +150,21 @@ public class SocialMonitorFeedData implements Serializable {
 		this.foundKeywords = foundKeywords;
 	}
 
+	public String getOwnerProfileImage() {
+		return ownerProfileImage;
+	}
+
+	public void setOwnerProfileImage(String ownerProfileImage) {
+		this.ownerProfileImage = ownerProfileImage;
+	}
+
 	@Override
 	public String toString() {
 		return "SocialMonitorFeedData [postId=" + postId + ", companyId=" + companyId + ", regionId=" + regionId
 				+ ", branchId=" + branchId + ", agentId=" + agentId + ", text=" + text + ", picture=" + picture
-				+ ", updatedOn=" + updatedOn + ", ownerName=" + ownerName + ", flagged=" + flagged + ", type=" + type
-				+ ", status=" + status + ", actionHistory=" + actionHistory + ", foundKeywords=" + foundKeywords
-				+ ", duplicateCount=" + duplicateCount + "]";
+				+ ", updatedOn=" + updatedOn + ", ownerName=" + ownerName + ", ownerProfileImage=" + ownerProfileImage
+				+ ", flagged=" + flagged + ", type=" + type + ", status=" + status + ", actionHistory=" + actionHistory
+				+ ", foundKeywords=" + foundKeywords + ", duplicateCount=" + duplicateCount + "]";
 	}
 
 }
