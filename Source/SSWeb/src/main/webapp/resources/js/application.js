@@ -608,7 +608,6 @@ function paintReportingDashboard(profileMasterId, newProfileName, newProfileValu
 	isDashboardReviewRequestRunning = false;
 	reviewsFetchedSoFar = 0;
 	startIndexInc = 0;
-	batchSizeInc = 10;
 	totalReviewsInc = 0;
 	surveyFetchedSoFarInc = 0;
 
@@ -974,6 +973,12 @@ function paintFixSocialMedia(data){
 		var noSMDiv = '<div class="clearfix"><div></div class="float-left bd-frm-left-un">Successfully connected!</div>';
 		popup += noSMDiv;
 		$('#dsh-btn0').addClass("hide");
+		if( window.location.hash.substr(1) == "showreportingpage" ){
+			$('#rep-fix-social-media').fadeOut(500);
+			delay(function(){
+				drawReportingDashButtons(columnName, columnValue);
+			},500);	
+		}
 	}
 	
 // e.stopPropagation();
@@ -10595,7 +10600,8 @@ function paintIncompleteSurveyListPopupResults(incompleteSurveystartIndex) {
 		"columnName" : colName,
 		"columnValue" : colValue,
 		"startIndex" : incompleteSurveystartIndex,
-		"batchSize" : $('#icn-sur-popup-cont').attr("data-batch")
+		"batchSize" : $('#icn-sur-popup-cont').attr("data-batch"),
+		"origin" : "oldDashboard"
 	};
 	callAjaxGetWithPayloadData("./fetchincompletesurveypopup.do", function(data) {
 		disableBodyScroll();
