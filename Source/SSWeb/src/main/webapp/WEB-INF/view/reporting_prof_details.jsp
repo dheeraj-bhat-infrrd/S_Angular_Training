@@ -94,7 +94,14 @@
 			<div id="dsh-btn1" class="dsh-btn-complete float-left rep-dash-btn "><spring:message code="label.sendsurvey.btn.key" /></div>
 		</div>	
 	</div>
-	<div id="rep-social-media" class="col-lg-6 col-md-6 col-sm-6 col-xs-6 rep-social-media-div">
+	<div id="rep-fix-social-media" class="col-lg-6 col-md-6 col-sm-6 col-xs-6 rep-social-media-div hide">
+		<button id="rep-dismiss-fix-social-media" type="button" class="close" style="position: absolute; top: 0; right: 0; margin-right: 5px;">&times;</button>
+		<span>Reconnect to your social media accounts.</span>
+		<div id="rep-pro-fix-cmplt-stars" class="dsh-star-wrapper clearfix rep-dash-btn-wrapper" data-profilecompleteness="${profileCompleteness}" data-autologin="${isAutoLogin}">
+			<div id="dsh-btn0" class="dsh-btn-complete dsh-btn-red float-left rep-dash-btn">Reconnect</div>
+		</div>
+	</div>
+	<div id="rep-social-media" class="col-lg-6 col-md-6 col-sm-6 col-xs-6 rep-social-media-div hide">
 		<button id="rep-dismiss-social-media" type="button" class="close" style="position: absolute; top: 0; right: 0; margin-right: 5px;">&times;</button>
 		<span>Extend your social reach by connecting to all your social media accounts.</span>
 		<div id="rep-pro-cmplt-stars" class="dsh-star-wrapper clearfix rep-dash-btn-wrapper" data-profilecompleteness="${profileCompleteness}" data-autologin="${isAutoLogin}">

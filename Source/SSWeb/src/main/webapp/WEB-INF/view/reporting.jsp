@@ -178,8 +178,13 @@
 	var currentProfileName = $('#rep-prof-container').attr('data-column-name');
 	var currentProfileValue = $('#rep-prof-container').attr('data-column-value');
 	var accountType = $('#rep-prof-container').attr('data-account-type');
-		
-	drawReportingDashButtons(currentProfileName, currentProfileValue);
+	
+	
+	if( "${isSocialMediaExpired}" == "true" ){
+		$("#rep-fix-social-media").removeClass("hide");
+	} else {
+		drawReportingDashButtons(currentProfileName, currentProfileValue);
+	}
 	
 	drawOverviewPage();
 	
@@ -227,6 +232,17 @@
 			}	
 		});
 		
+		$('#rep-pro-fix-cmplt-stars').on('click', '#dsh-btn0', function(e) {
+			e.stopPropagation();
+			var buttonId = 'dsh-btn0';
+			// getSocialMediaToFix
+			var payload = {
+					"columnName" : $('#rep-prof-container').attr('data-column-name'),
+					"columnValue" : $('#rep-prof-container').attr('data-column-value')
+				};
+			callAjaxGetWithPayloadData('./socialmediatofix.do', paintFixSocialMedia, payload, true);	
+		});
+		
 		$('#rep-social-media').on('click','#rep-dismiss-social-media',function(e){
 			$('#rep-social-media').fadeOut(500);
 			delay(function(){
@@ -234,6 +250,14 @@
 				var currentProfileName = $('#rep-prof-container').attr('data-column-name');
 				var currentProfileValue = $('#rep-prof-container').attr('data-column-value');
 				changeSocialMedia(currentProfileName, currentProfileValue);
+			},500);
+		});
+		
+		
+		$('#rep-fix-social-media').on('click','#rep-dismiss-fix-social-media',function(e){
+			$('#rep-fix-social-media').fadeOut(500);
+			delay(function(){
+				drawReportingDashButtons(currentProfileName, currentProfileValue);
 			},500);
 		});
 		
