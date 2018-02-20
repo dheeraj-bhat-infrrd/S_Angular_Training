@@ -127,7 +127,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 	}
 
 	@Override
-	public OrganizationUnitSettings FetchMacros(long companyId) {
+	public OrganizationUnitSettings FetchMacros(Long companyId) {
 		LOG.debug("Fetching Macros from COMAPNY_SETTINGS");
 		Query query = new Query();
 

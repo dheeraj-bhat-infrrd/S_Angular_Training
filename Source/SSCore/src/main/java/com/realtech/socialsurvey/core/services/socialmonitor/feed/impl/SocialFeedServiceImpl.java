@@ -112,7 +112,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
 	}
 	
 	@Override
-	public void updateActionForFeeds(SocialFeedsActionUpdate socialFeedsActionUpdate, long companyId)
+	public void updateActionForFeeds(SocialFeedsActionUpdate socialFeedsActionUpdate, Long companyId)
 			throws InvalidInputException {
 		LOG.debug("Updating social Feeds for social monitor");
 		if (socialFeedsActionUpdate == null) {

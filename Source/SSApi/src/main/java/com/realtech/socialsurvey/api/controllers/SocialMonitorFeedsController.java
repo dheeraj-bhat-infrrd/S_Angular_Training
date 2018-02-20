@@ -47,8 +47,8 @@ public class SocialMonitorFeedsController {
 		LOGGER.info("Fetching the list of Social posts for social monitor");
 		SocialMonitorResponseData socialMonitorResponseData;
 		try {
-			socialMonitorResponseData = socialFeedService.getAllSocialPosts(startIndex, limit,
-					status, flag, feedtype, companyId, regionIds, branchIds, agentIds);
+			socialMonitorResponseData = socialFeedService.getAllSocialPosts(startIndex, limit, status, flag, feedtype,
+					companyId, regionIds, branchIds, agentIds);
 		} catch (InvalidInputException ie) {
 			LOGGER.error("Invalid input exception caught while fetching social feeds", ie);
 			throw new SSApiException("Invalid input exception caught while fetching social feeds", ie);
@@ -61,7 +61,8 @@ public class SocialMonitorFeedsController {
 	@RequestMapping(value = "/updatesocialfeeds/action", method = RequestMethod.PUT)
 	@ApiOperation(value = "Update Social posts for Social monitor for individual/bulk posts")
 	public ResponseEntity<?> saveSocialFeedsForAction(@RequestBody SocialFeedsActionUpdate socialFeedsActionUpdate,
-			long companyId) throws SSApiException, InvalidInputException {
+			@RequestParam(value = "companyId", required = false) Long companyId)
+			throws SSApiException, InvalidInputException {
 		LOGGER.info("Updating the action of Social feeds for social monitor");
 		try {
 			socialFeedService.updateActionForFeeds(socialFeedsActionUpdate, companyId);

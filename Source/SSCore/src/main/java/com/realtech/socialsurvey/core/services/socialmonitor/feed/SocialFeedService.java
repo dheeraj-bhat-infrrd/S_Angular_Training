@@ -51,7 +51,7 @@ public interface SocialFeedService
      * @param companyId
      * @throws InvalidInputException
      */
-    public void updateActionForFeeds(SocialFeedsActionUpdate socialFeedsActionUpdate, long companyId) throws InvalidInputException;
+    public void updateActionForFeeds(SocialFeedsActionUpdate socialFeedsActionUpdate, Long companyId) throws InvalidInputException;
     
     /**
      * Fetch macros based on companyId

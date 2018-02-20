@@ -1217,16 +1217,4 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         return settingsList;
     }
     
-//    @Override
-//    public OrganizationUnitSettings fetchOrganizationUnitSettingsByIdForKeywords( long identifier, String collectionName )
-//    {
-//        LOG.debug( "Fetch organization unit settings from {} for id: {}" , collectionName, identifier );
-//        Query query = new Query();
-//        query.addCriteria( Criteria.where( KEY_IDENTIFIER ).is( identifier ) );
-//        query.fields().include(KEY_FILTER_KEYWORDS).exclude( CommonConstants.DEFAULT_MONGO_ID_COLUMN);	
-//        
-//        OrganizationUnitSettings settings = mongoTemplate.findOne( query, OrganizationUnitSettings.class, collectionName );
-//        setCompleteUrlForSettings( settings, collectionName );
-//        return settings;
-//    }
 }
