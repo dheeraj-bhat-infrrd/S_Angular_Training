@@ -23,6 +23,7 @@ import com.realtech.socialsurvey.core.entities.RankingRequirements;
 import com.realtech.socialsurvey.core.entities.SurveyResultsReportVO;
 import com.realtech.socialsurvey.core.entities.UserRanking;
 import com.realtech.socialsurvey.core.entities.ReportingSurveyPreInititation;
+import com.realtech.socialsurvey.core.entities.SurveyInvitationEmailCountMonth;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -365,4 +366,7 @@ public interface ReportingDashboardManagement
 
 
 	public List<BranchRankingReportYear> getBranchRankingReportForYear(long companyId, int year) throws InvalidInputException;
+
+
+	public List<SurveyInvitationEmailCountMonth> getReceivedCountsMonth(String startDateInGmt, String endDateInGmt) throws ParseException;
 }

@@ -917,4 +917,18 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         LOG.debug( "Method updateCompanyIdForAllRecordsForAgent  ended." );
     }
 
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Object[]> getReceivedCountForDate(Timestamp startDate, Timestamp endDate) {
+	String queryStr = "select count(spi.SURVEY_PRE_INITIATION_ID) as received_count,spi.AGENT_ID "
+			+ "from SURVEY_PRE_INITIATION spi inner join USERS u on u.USER_ID=spi.AGENT_ID "
+			+ "and u.STATUS in (1,2) and spi.CREATED_ON between ? and ? group by spi.AGENT_ID "
+			+ "ORDER BY spi.AGENT_ID;";
+	Query query = getSession().createSQLQuery(queryStr);
+	query.setParameter(0, startDate);
+	query.setParameter(1, endDate);
+	return query.list();
+	}
+
 }

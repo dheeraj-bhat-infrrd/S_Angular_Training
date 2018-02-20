@@ -3,8 +3,12 @@
  */
 package com.realtech.socialsurvey.compute.topology.bolts.emailreports;
 
+import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.solr.client.solrj.response.PivotField;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -14,12 +18,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.realtech.socialsurvey.compute.common.ComputeConstants;
+import com.realtech.socialsurvey.compute.common.SSAPIOperations;
 import com.realtech.socialsurvey.compute.dao.SQLEmailCountDao;
 import com.realtech.socialsurvey.compute.dao.impl.SQLEmailCountDaoImpl;
 import com.realtech.socialsurvey.compute.dao.impl.SolrEmailCountDaoImpl;
 import com.realtech.socialsurvey.compute.entities.ReportRequest;
 import com.realtech.socialsurvey.compute.entity.SurveyInvitationEmailCountMonth;
 import com.realtech.socialsurvey.compute.enums.ReportType;
+import com.realtech.socialsurvey.compute.services.api.SSApiIntegrationService;
 import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBoltWithAck;
 import com.realtech.socialsurvey.compute.utils.ConversionUtils;
 
@@ -74,7 +80,18 @@ public class AggregateSolrQueryBolt extends BaseComputeBoltWithAck {
 					startDateInGmt, endDateInGmt);
 
 			SurveyInvitationEmailCountMonth emailCountMonth = new SurveyInvitationEmailCountMonth();
-			//Attempted count
+			//Received Count
+			List<SurveyInvitationEmailCountMonth> agentEmailCountsMonth = null;
+			try {
+				agentEmailCountsMonth = SSAPIOperations.getInstance()
+						.getReceivedCountsMonth(startDateInGmt, endDateInGmt);
+			} catch (IOException e1) {
+				LOG.error("Exception while fetching the transaction received count.",e1);
+			}
+			getEmailCounts(response.getFacetPivot().get(ComputeConstants.SOLR_PIVOT_AGENT_EMAIL_ATTEMPT),agentEmailCountsMonth,
+					ComputeConstants.SOLR_PIVOT_AGENT_EMAIL_ATTEMPT);
+			
+			/*//Attempted count
 			emailCountMonth.setAttempted(getEmailCounts(response.getFacetPivot().get(ComputeConstants.SOLR_PIVOT_AGENT_EMAIL_ATTEMPT)));
 			//Delivered count
 			emailCountMonth.setDelivered(getEmailCounts(response.getFacetPivot().get(ComputeConstants.SOLR_PIVOT_AGENT_DELIVERED)));
@@ -91,14 +108,7 @@ public class AggregateSolrQueryBolt extends BaseComputeBoltWithAck {
 			//Bounced count
 			emailCountMonth.setBounced(getEmailCounts(response.getFacetPivot().get(ComputeConstants.SOLR_PIVOT_AGENT_BOUNCED)));
 			//Link Clicked count
-			emailCountMonth.setLinkClicked(getEmailCounts(response.getFacetPivot().get(ComputeConstants.SOLR_PIVOT_AGENT_LINK_CLICKED)));
-			//Received Count
-			try {
-				emailCountMonth.setReceived(sqlEmailCountDao.getReceivedCount(startDateInGmt, endDateInGmt));
-			} catch (SQLException e) {
-				LOG.error("SQL exception while getting received count.",e);
-				success = false;
-			}
+			emailCountMonth.setLinkClicked(getEmailCounts(response.getFacetPivot().get(ComputeConstants.SOLR_PIVOT_AGENT_LINK_CLICKED)));*/
 			
 			try {
 				sqlEmailCountDao.save(emailCountMonth);
@@ -126,12 +136,56 @@ public class AggregateSolrQueryBolt extends BaseComputeBoltWithAck {
      * @param pivotFields
      * @return
      */
-    public int getEmailCounts(List<PivotField> pivotFields) {
+    private List<SurveyInvitationEmailCountMonth> getEmailCounts(List<PivotField> pivotFields,
+    		List<SurveyInvitationEmailCountMonth> agentEmailCountsMonth, String pivotName) {
 		int count = 0;
-		for(PivotField pivotFiled : pivotFields) {
-			count += pivotFiled.getCount();
+		List<SurveyInvitationEmailCountMonth> counts = new ArrayList<SurveyInvitationEmailCountMonth>();
+		Map<Integer,SurveyInvitationEmailCountMonth> countMap = convertToMap(pivotFields,pivotName);
+			for(SurveyInvitationEmailCountMonth emailCount : agentEmailCountsMonth) {
+				if(emailCount.getAgentId() == agentId) {
+					
+				}
 		}
-		return count;
+		return agentEmailCountsMonth;
+	}
+
+	private Map<Integer, SurveyInvitationEmailCountMonth> convertToMap(List<PivotField> pivotFields, String pivotName) {
+		Map<Integer, SurveyInvitationEmailCountMonth> countMap = new HashMap<Integer,SurveyInvitationEmailCountMonth>();
+		for(PivotField pivotFiled : pivotFields) {
+			SurveyInvitationEmailCountMonth count = new SurveyInvitationEmailCountMonth();
+			
+			switch(pivotName) {
+			case ComputeConstants.SOLR_PIVOT_AGENT_EMAIL_ATTEMPT :
+				count.setAttempted(pivotFiled.getCount());
+				break;
+			case ComputeConstants.SOLR_PIVOT_AGENT_DELIVERED :
+				count.setDelivered(pivotFiled.getCount());
+				break;
+			case ComputeConstants.SOLR_PIVOT_AGENT_DIFFERED :
+				count.setDiffered(pivotFiled.getCount());
+				break;
+			case ComputeConstants.SOLR_PIVOT_AGENT_BLOCKED :
+				count.setBlocked(pivotFiled.getCount());
+				break;
+			case ComputeConstants.SOLR_PIVOT_AGENT_OPENED :
+				count.setOpened(pivotFiled.getCount());
+				break;
+			case ComputeConstants.SOLR_PIVOT_AGENT_SPAMED :
+				count.setSpamed(pivotFiled.getCount());
+				break;
+			case ComputeConstants.SOLR_PIVOT_AGENT_UNSUBSCRIBED :
+				count.setUnsubscribed(pivotFiled.getCount());
+				break;
+			case ComputeConstants.SOLR_PIVOT_AGENT_BOUNCED :
+				count.setBounced(pivotFiled.getCount());
+				break;
+			case ComputeConstants.SOLR_PIVOT_AGENT_LINK_CLICKED :
+				count.setLinkClicked(pivotFiled.getCount());
+				break;
+			}
+			countMap.put(Integer.parseInt(pivotFiled.getValue().toString()), count);
+		}
+		return countMap;
 	}
 	
 

@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import com.realtech.socialsurvey.compute.entities.Keyword;
 import com.realtech.socialsurvey.compute.entities.SocialPost;
+import com.realtech.socialsurvey.compute.entity.SurveyInvitationEmailCountMonth;
 import com.realtech.socialsurvey.compute.services.api.APIIntergrationException;
 
 import retrofit2.Call;
@@ -83,4 +84,13 @@ public class SSAPIOperations
             return false;
         }
     }
+
+	public List<SurveyInvitationEmailCountMonth> getReceivedCountsMonth(String startDateInGmt, String endDateInGmt) throws IOException {
+		Call<List<SurveyInvitationEmailCountMonth>> request = RetrofitApiBuilder.apiBuilderInstance()
+				.getSSAPIIntergrationService().getReceivedCountsMonth(startDateInGmt,endDateInGmt);
+		Response<List<SurveyInvitationEmailCountMonth>> response = request.execute();
+		RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
+		return response.body();
+		
+	}
 }

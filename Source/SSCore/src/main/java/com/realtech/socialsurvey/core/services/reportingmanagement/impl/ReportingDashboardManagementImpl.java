@@ -8,8 +8,10 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.net.URLEncoder;
 import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -61,6 +63,7 @@ import com.realtech.socialsurvey.core.dao.ScoreStatsQuestionBranchDao;
 import com.realtech.socialsurvey.core.dao.ScoreStatsQuestionCompanyDao;
 import com.realtech.socialsurvey.core.dao.ScoreStatsQuestionRegionDao;
 import com.realtech.socialsurvey.core.dao.ScoreStatsQuestionUserDao;
+import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.dao.SurveyResponseTableDao;
 import com.realtech.socialsurvey.core.dao.SurveyResultsCompanyReportDao;
 import com.realtech.socialsurvey.core.dao.SurveyResultsReportBranchDao;
@@ -117,6 +120,7 @@ import com.realtech.socialsurvey.core.entities.ScoreStatsQuestionBranch;
 import com.realtech.socialsurvey.core.entities.ScoreStatsQuestionCompany;
 import com.realtech.socialsurvey.core.entities.ScoreStatsQuestionRegion;
 import com.realtech.socialsurvey.core.entities.ScoreStatsQuestionUser;
+import com.realtech.socialsurvey.core.entities.SurveyInvitationEmailCountMonth;
 import com.realtech.socialsurvey.core.entities.SurveyResultsCompanyReport;
 import com.realtech.socialsurvey.core.entities.SurveyResultsReportBranch;
 import com.realtech.socialsurvey.core.entities.SurveyResultsReportRegion;
@@ -340,6 +344,9 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
     @Autowired
     private OverviewManagement overviewManagement;
+    
+    @Autowired
+    private SurveyPreInitiationDao surveyPreInitiationDao;
 
     @Value ( "${FILE_DIRECTORY_LOCATION}")
     private String fileDirectoryLocation;
@@ -4781,5 +4788,23 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 		}
 		
 		return branchRankingYearDao.getBranchRankingForYear(companyId,year);
+	}
+
+
+	@Override
+	public List<SurveyInvitationEmailCountMonth> getReceivedCountsMonth(String startDateInGmt, String endDateInGmt) throws ParseException {
+		List<SurveyInvitationEmailCountMonth> receivedCountMonth = new ArrayList<SurveyInvitationEmailCountMonth>();
+		DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+		Timestamp startDate = new Timestamp(format.parse(startDateInGmt).getTime());
+		Timestamp endDate = new Timestamp(format.parse(endDateInGmt).getTime());
+		List<Object[]> receivedCount = surveyPreInitiationDao.getReceivedCountForDate(startDate,endDate);
+		for(Object[] obj : receivedCount) {
+			SurveyInvitationEmailCountMonth mailCount = new SurveyInvitationEmailCountMonth();
+			mailCount.setAgentId((int) obj[1]);
+			mailCount.setReceived((int) obj[0]);
+			receivedCountMonth.add(mailCount);
+		}
+		return receivedCountMonth;
+		
 	}
 }
