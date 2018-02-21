@@ -4308,6 +4308,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      * @param survey
      * @throws InvalidInputException
      */
+    @Override
     public void validateAndProcessSurveyPreInitiation( SurveyPreInitiation survey ) throws InvalidInputException
     {
         // null and syntax checks
@@ -4348,13 +4349,16 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 				survey.setAgentName(user.getFirstName() + user.getLastName() == null ? "" : " " + user.getLastName());
 			}
 
+			//update status
 			if (survey.getStatus() != CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD)
 				survey.setStatus(CommonConstants.SURVEY_STATUS_PRE_INITIATED);
+			
 		} else {
 			// user is not present so mark record as mismatch
-			survey.setStatus(CommonConstants.STATUS_SURVEYPREINITIATION_MISMATCH_RECORD);
+			if (survey.getStatus() != CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD)
+				survey.setStatus(CommonConstants.STATUS_SURVEYPREINITIATION_MISMATCH_RECORD);
 		}
-        
+		
         
     }
 
