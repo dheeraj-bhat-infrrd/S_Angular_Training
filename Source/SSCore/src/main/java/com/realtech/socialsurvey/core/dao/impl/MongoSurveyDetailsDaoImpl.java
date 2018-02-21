@@ -2715,6 +2715,12 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         query.addCriteria( Criteria
             .where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.AGENT_MEDIA_POST_DETAILS_COLUMN )
             .exists( true ) );
+        query
+            .addCriteria(
+                Criteria
+                    .where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "."
+                        + CommonConstants.AGENT_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.AGENT_ID_COLUMN )
+                    .exists( true ) );
         update.set( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.AGENT_MEDIA_POST_DETAILS_COLUMN
             + "." + CommonConstants.AGENT_ID_COLUMN, toUserProfile.getAgentId() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
