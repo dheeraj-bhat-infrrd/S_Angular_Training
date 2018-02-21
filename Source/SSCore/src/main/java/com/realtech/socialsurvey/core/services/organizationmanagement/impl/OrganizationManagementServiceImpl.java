@@ -1019,6 +1019,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 MongoOrganizationUnitSettingDaoImpl.KEY_FILTER_KEYWORDS, companyFilterKeywords, companySettings,
                 MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
+            //update the redis with the keywords
             redisDao.addKeywords(companyId, companyFilterKeywords);
 
         } else {
