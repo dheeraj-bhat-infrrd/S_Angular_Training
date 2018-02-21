@@ -37,6 +37,18 @@ hr{
 }
 
 </style>
+<div id="trans-stats-dash" class="hide" ></div>
+
+<div class="hm-header-main-wrapper hm-hdr-bord-bot" style="background: #2f69aa;margin-bottom: 5px;">
+	<div class="container">
+		<div class="hm-header-row clearfix">
+			<div id="timeFrame_container">
+				<jsp:include page="reporting_timeFrame_dropdown.jsp"></jsp:include>
+			</div>
+		</div>
+	</div>
+</div>
+
 <div id="processed-trans-div" class="col-lg-4 col-md-4 col-sm-4 col-xs-4 cursor-pointer processed-trans-div">
 	<div id="processed-div" style="display:inline-grid; padding-left: 30px;">
 		<div id="processed-details" class="inline-flex-class" style="margin-bottom: 0px; margin-top: 45px;">
