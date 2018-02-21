@@ -74,7 +74,8 @@ public class SocialMonitorController
     @RequestMapping ( value = "/companies/{companyId}/keywords/{keywordId}/enable", method = RequestMethod.POST)
     @ApiOperation ( value = "Initiate account registration")
     public ResponseEntity<?> enableKeywordsByIdForCompany( @PathVariable ( "companyId") long companyId,
-                                                           @PathVariable ( "keywordId") long keywordId, @Valid @RequestBody List<Keyword> keywordsRequest ) throws SSApiException
+                                                           @PathVariable ( "keywordId") long keywordId,
+                                                           @Valid @RequestBody List<Keyword> keywordsRequest ) throws SSApiException
     {
         try {
             LOGGER.info( "SocialMonitorController.enableKeywordsByIdForCompany started" );
@@ -92,7 +93,8 @@ public class SocialMonitorController
     @RequestMapping ( value = "/companies/{companyId}/keywords/{keywordId}/disable", method = RequestMethod.POST)
     @ApiOperation ( value = "Initiate account registration")
     public ResponseEntity<?> disabledKeywordsByIdForCompany( @PathVariable ( "companyId") long companyId,
-                                                             @PathVariable ( "keywordId") long keywordId, @Valid @RequestBody List<Keyword> keywordsRequest ) throws SSApiException
+                                                             @PathVariable ( "keywordId") long keywordId,
+                                                             @Valid @RequestBody List<Keyword> keywordsRequest ) throws SSApiException
     {
         try {
             LOGGER.info( "SocialMonitorController.disabledKeywordsByIdForCompany started" );
@@ -109,7 +111,8 @@ public class SocialMonitorController
 
     @RequestMapping ( value = "/companies/{companyId}/keywords", method = RequestMethod.GET)
     @ApiOperation ( value = "Initiate account registration")
-    public ResponseEntity<?> getCompanyKeywords( @PathVariable ( "companyId") long companyId, int startIndex, int limit, @RequestParam(value = "monitorType", required = false) String monitorType)
+    public ResponseEntity<?> getCompanyKeywords( @PathVariable ( "companyId") long companyId, int startIndex, int limit,
+                                                 @RequestParam(value = "monitorType", required = false) String monitorType)
             throws SSApiException
     {
         try {
