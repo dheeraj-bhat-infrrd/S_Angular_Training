@@ -2638,6 +2638,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyDetailsDao.updateSurveyAsUnderResolution( surveyId );
         LOG.debug( "Method updateSurveyAsUnderResolution() to mark a survey as under resolution started, ended" );
     }
+    
+    public void updateSurveyAsAbusiveNotify( String surveyId )
+    {
+
+        LOG.debug( "Method updateSurveyAsAbusiveNotify() to mark a survey as under resolution started, started" );
+        surveyDetailsDao.updateSurveyAsAbusiveNotify(surveyId);
+        LOG.debug( "Method updateSurveyAsAbusiveNotify() to mark a survey as under resolution started, ended" );
+    }
 
 
     @Override
@@ -2955,9 +2963,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         if ( toUserProfile == null )
             throw new NoRecordsFetchedException( "To user id : " + toUser.getUserId() + " is not an agent" );
         LOG.debug( "Validating whether both from and to user belong to same company" );
-        if ( fromUser.getCompany().getCompanyId() != toUser.getCompany().getCompanyId() )
-            throw new UnsupportedOperationException( "From user : " + fromUser.getUserId() + " and to user id : "
-                + toUser.getUserId() + " do not belong to same company" );
 
         // replace agent id Survey Pre Initiation
         LOG.debug( "Moving all incomplete surveys of user : " + fromUserId + " to user : " + toUserId );
@@ -4308,6 +4313,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      * @param survey
      * @throws InvalidInputException
      */
+    @Override
     public void validateAndProcessSurveyPreInitiation( SurveyPreInitiation survey ) throws InvalidInputException
     {
         // null and syntax checks
@@ -4348,13 +4354,16 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 				survey.setAgentName(user.getFirstName() + user.getLastName() == null ? "" : " " + user.getLastName());
 			}
 
+			//update status
 			if (survey.getStatus() != CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD)
 				survey.setStatus(CommonConstants.SURVEY_STATUS_PRE_INITIATED);
+			
 		} else {
 			// user is not present so mark record as mismatch
-			survey.setStatus(CommonConstants.STATUS_SURVEYPREINITIATION_MISMATCH_RECORD);
+			if (survey.getStatus() != CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD)
+				survey.setStatus(CommonConstants.STATUS_SURVEYPREINITIATION_MISMATCH_RECORD);
 		}
-        
+		
         
     }
 

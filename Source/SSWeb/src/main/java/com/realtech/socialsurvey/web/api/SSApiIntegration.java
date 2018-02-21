@@ -218,4 +218,17 @@ public interface SSApiIntegration
     
     @GET ( "/v1/lastsuccessfuletltime" )
     Response getLastSuccessfulEtlTimeApi();
+    
+    @GET ( "/v1/lastsuccessfuletltime/isetlrunning" )
+    Response isEtlRunning();
+    
+    @GET ( "/v1/lastsuccessfuletltime/{entityId}/{entityType}" )
+    Response lastRunForEntity(@Path ("entityId") long entityId,@Path ("entityType") String entityType);
+    
+    @GET ( "/v1/lastsuccessfuletltime/recal/{entityId}/{entityType}" )
+    Response recalUserRanking(@Path ("entityId") long entityId,@Path ("entityType") String entityType);
+    
+    @POST( "/v1/updateabusivemail" )
+    Response updateAbusiveMail(@Query ("entityId") long entityId,@Query ("mailId") String mailId);
+    
 }

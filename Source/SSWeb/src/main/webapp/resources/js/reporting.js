@@ -4,7 +4,8 @@ var monthNamesList = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct
 var overviewData=getOverviewData();
 var socialMediaList = new Array();
 var is_safari = navigator.userAgent.indexOf("Safari") > -1;
-
+var unclickedDrawnCount=0;
+var isUpdateTransStats = false;
 function drawTimeFrames(){
 	var currentDate = new Date();
 	var currentMonth = currentDate.getMonth();
@@ -684,6 +685,8 @@ function drawCompletionRateGraph(){
 //draw Unclicked, Processed and Unprocessed Pie charts functions
 function drawUnclickedDonutChart(overviewYearData){
 	 
+	unclickedDrawnCount=0;
+	
 	var monthYear = getTimeFrameValue();
 	
 	 google.charts.load("current", {packages:["corechart"]});
@@ -701,7 +704,16 @@ function drawUnclickedDonutChart(overviewYearData){
      }
      var chart;
      function drawChart() {
-    	 
+    	 	
+    	 	unclickedDrawnCount++;
+    	 	
+    	 	if(unclickedDrawnCount==1 && !isUpdateTransStats){
+	        	var profilemasterid=$('#rep-prof-container').attr('data-profile-master-id');
+	 	    	if(profilemasterid == 4){
+	 	    		activaTab('leaderboard-tab');
+	 	        }
+	        }
+	        
 	        var data = google.visualization.arrayToDataTable([
 	          ['Transaction', 'Number#'],
 	          ['Processed', processed],
@@ -736,7 +748,6 @@ function drawUnclickedDonutChart(overviewYearData){
 
 	        chart = new google.visualization.PieChart(document.getElementById('donutchart'));
 	        
-	        
 	        function selectHandler(){
 	        	 var selectedItem = chart.getSelection()[0];
 	             if (selectedItem) {
@@ -753,7 +764,6 @@ function drawUnclickedDonutChart(overviewYearData){
 	        google.visualization.events.addListener(chart, 'select', selectHandler);
 	        chart.draw(data, options);
 	       
-	        
 	        var optionsChartIcn = {
 		  	          pieStartAngle: 130,
 			          backgroundColor: '#f1f0f2',
@@ -773,8 +783,8 @@ function drawUnclickedDonutChart(overviewYearData){
 		        var icnChart = new google.visualization.PieChart(document.getElementById('chart-icn-chart'));
 		        
 		        icnChart.draw(data, optionsChartIcn);
-		        
-		        
+		       
+		        isUpdateTransStats=false;
 	      }
 }
 
@@ -1911,6 +1921,7 @@ function updateReportingDashboard(){
 	var currentDate =  new Date();
 	var currentMonth = currentDate.getMonth()+1;
 	var currentYear = currentDate.getFullYear();
+	isUpdateTransStats=true;
 	
 	var monthYear = getTimeFrameValue();
 	var overviewYearData;
@@ -2003,7 +2014,10 @@ function updateReportingDashboard(){
  		drawUnprocessedDonutChart(overviewYearData);
  	}
 	$(window).resize();
-	hideOverlay();
+	
+	 setTimeout(function(){
+			hideDashOverlay('#trans-stats-dash');
+		}, 1000);
 	
 	if(overviewYearData==null){
 		$('#unclicked-trans-graph').addClass('hide');
@@ -2992,6 +3006,32 @@ function getUserRankingCount(entityType,entityId,year,month,batchSize,timeFrame)
 	return userRankingCount;
 }
 
+function recalculateUserRanking(){
+	$('.recalculate-usr-rank-btn-active').toggle();
+	$('.recalculate-usr-rank-btn-inactive').toggle();
+	
+	$.ajax({
+		async : false,
+		url : "/recalranking.do",
+		type : "GET",
+		success :function(response) {
+			if(response == -1){
+				$('#overlay-toast').html("ETL is already running. Please try again later.");
+				showToast();
+			}else{
+				$('#overlay-toast').html("User ranking is being Re-Calculated. Please wait.");
+				showToast();
+			}	
+		},
+		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}	
+		}
+	});
+}
+
 function getIncompleteSurveyCountForNewDashboard(colName, colValue) {
 
 	var payload = {
@@ -3201,4 +3241,13 @@ $(document).on('change', '#rep-sel-page', function(e) {
 	}, 100);
 });
 
-
+function showOverviewTab(){
+	
+	var entityId = $('#rep-prof-container').attr('data-column-value');
+	var entityType = $('#rep-prof-container').attr('data-column-name');
+	activaTab('overview-tab');
+	$('#overview-tab').addClass('active');
+	 drawCompletionRateGraph();
+ 	drawSpsStatsGraph();
+	drawNpsStatsGraph(entityId,entityType);
+}
