@@ -88,7 +88,13 @@ public class SurveyPreinitiationTransformer implements Transformer<SurveyPutVO, 
 		surveyPreInitiations.add(surveyPreInitiationBorrower);
          
          // check if model contains two customer
-        if(! StringUtils.isBlank(transactionInfo.getCustomer2Email()) && ! StringUtils.isBlank(transactionInfo.getCustomer2FirstName())){
+        if(! StringUtils.isBlank(transactionInfo.getCustomer2Email()) || ! StringUtils.isBlank(transactionInfo.getCustomer2FirstName())){
+        	
+        	if(StringUtils.isBlank(transactionInfo.getCustomer2Email()))
+    			throw new InvalidInputException("Invalid input passed. Customer2Email can't be null or empty");
+    		if(StringUtils.isBlank(transactionInfo.getCustomer2FirstName()))
+    			throw new InvalidInputException("Invalid input passed. Customer2FirstName can't be null or empty");
+        	
         	SurveyPreInitiation surveyPreInitiationCoBorrower = new SurveyPreInitiation();
         	surveyPreInitiationCoBorrower.setAgentEmailId(serviceProviderInfo.getServiceProviderEmail());
         	surveyPreInitiationCoBorrower.setAgentName(serviceProviderInfo.getServiceProviderName());

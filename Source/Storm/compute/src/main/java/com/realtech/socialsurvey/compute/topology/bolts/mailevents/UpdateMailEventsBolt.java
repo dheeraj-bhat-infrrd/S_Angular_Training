@@ -58,9 +58,17 @@ public class UpdateMailEventsBolt extends BaseComputeBoltWithAck
         }
         // get the event id and then update the mail event in SOLR.
         else {
-            optionalEmailMessageFromSolr = APIOperations.getInstance().getEmailMessageFromSOLRBySendgridMsgId(
-                event.getSg_message_id().substring( 0, event.getSg_message_id().indexOf( SENDGRID_MESSAGE_DELIMITER ) ) );
-        }
+            String messageId = "";
+            LOG.info( "smtp id of event is " + event.getSmtpId() );
+            if ( event.getSg_message_id().indexOf( SENDGRID_MESSAGE_DELIMITER ) >= 0 ) {
+                messageId = event.getSg_message_id().substring( 0,  event.getSg_message_id().indexOf( SENDGRID_MESSAGE_DELIMITER ) );
+            } else if ( event.getSmtpId().indexOf( "@" ) >= 0 ) {
+                messageId = event.getSmtpId().substring( 1, event.getSmtpId().indexOf( "@" ) );
+            } else {
+                messageId = event.getSmtpId().substring( 1, event.getSmtpId().indexOf( ">" ) );
+            }
+            optionalEmailMessageFromSolr = APIOperations.getInstance().getEmailMessageFromSOLRBySendgridMsgId( messageId );
+       }
         if ( optionalEmailMessageFromSolr.isPresent() ) {
             SolrEmailMessageWrapper emailMessageFromSolr = optionalEmailMessageFromSolr.get();
             try {
