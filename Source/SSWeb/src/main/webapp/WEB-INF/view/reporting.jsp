@@ -46,7 +46,7 @@
 
 <div class="overlay-loader hide"></div>
 
-<div id="rep-prof-container" data-profile-master-id="${profileMasterId}"
+<div id="rep-prof-container" data-profile-master-id="${profilemasterid}"
 			data-column-name="${columnName}" data-account-type="${accounttype}"
 			data-column-value="${columnValue}" class="hide dash-top-info dash-prof-wrapper pos-relative dash-size" >
 			<div id="top-dash" class="hide" ></div>
@@ -112,20 +112,22 @@
 				<jsp:include page="reporting_prof_details.jsp"></jsp:include>
 			</div>
 			
-			<div id="reporting-trans-details" class="row prof-pic-name-wrapper edit-prof-pic-name-wrapper reporting-trans-details">
-				<jsp:include page="reporting_transaction_details.jsp"></jsp:include>
-			</div>
-			
 			<div id="reportingDashTabs" class=" col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:15px; display:inline-block; padding: 0;">
 				<ul class="nav nav-tabs" role="tablist">
-					<li id="overview-btn" class="active"><a href="#overview-tab" data-toggle="tab">Overview</a></li>
+					<li id="transaction-stats-btn"  class="active"><a href="#trans-stats-tab" data-toggle="tab">Transaction Stats</a></li>							
+					<li id="overview-btn" onclick="showOverviewTab()"><a href="#overview-tab" data-toggle="tab">Promoter Stats</a></li>
 					<li id="leaderboard-btn"><a href="#leaderboard-tab" data-toggle="tab">LeaderBoard</a></li>
 					<li id="score-stats-btn"><a href="#score-stats-tab" data-toggle="tab">Score Stats</a></li>
 					<li id="reviews-btn"><a href="#reviews-tab" data-toggle="tab">Reviews</a></li>
 					<li id="incomplete-surveys-btn" ><a href="#incomplete-surveys-tab" data-toggle="tab" style="padding-left:2px; padding-right:2px">Incomplete Surveys</a></li>
 				</ul>
 				<div class="tab-content rep-tab-content">
-					<div class="tab-pane fade active in" id="overview-tab"  style="margin-top: 40px;">
+					<div class="tab-pane fade active in" id="trans-stats-tab" style="padding-top: 0;">
+						<div id="reporting-trans-details" class="row prof-pic-name-wrapper edit-prof-pic-name-wrapper reporting-trans-details">
+							<jsp:include page="reporting_transaction_details.jsp"></jsp:include>
+						</div>
+					</div>
+					<div class="tab-pane fade" id="overview-tab"  style="margin-top: 40px;">
 						<div id="overviewSuccess" class="hide">
 							<jsp:include page="reporting_overview.jsp"></jsp:include>
 						</div>
@@ -178,8 +180,13 @@
 	var currentProfileName = $('#rep-prof-container').attr('data-column-name');
 	var currentProfileValue = $('#rep-prof-container').attr('data-column-value');
 	var accountType = $('#rep-prof-container').attr('data-account-type');
-		
-	drawReportingDashButtons(currentProfileName, currentProfileValue);
+	
+	
+	if( "${isSocialMediaExpired}" == "true" ){
+		$("#rep-fix-social-media").removeClass("hide");
+	} else {
+		drawReportingDashButtons(currentProfileName, currentProfileValue);
+	}
 	
 	drawOverviewPage();
 	
@@ -227,6 +234,17 @@
 			}	
 		});
 		
+		$('#rep-pro-fix-cmplt-stars').on('click', '#dsh-btn0', function(e) {
+			e.stopPropagation();
+			var buttonId = 'dsh-btn0';
+			// getSocialMediaToFix
+			var payload = {
+					"columnName" : $('#rep-prof-container').attr('data-column-name'),
+					"columnValue" : $('#rep-prof-container').attr('data-column-value')
+				};
+			callAjaxGetWithPayloadData('./socialmediatofix.do', paintFixSocialMedia, payload, true);	
+		});
+		
 		$('#rep-social-media').on('click','#rep-dismiss-social-media',function(e){
 			$('#rep-social-media').fadeOut(500);
 			delay(function(){
@@ -234,6 +252,14 @@
 				var currentProfileName = $('#rep-prof-container').attr('data-column-name');
 				var currentProfileValue = $('#rep-prof-container').attr('data-column-value');
 				changeSocialMedia(currentProfileName, currentProfileValue);
+			},500);
+		});
+		
+		
+		$('#rep-fix-social-media').on('click','#rep-dismiss-fix-social-media',function(e){
+			$('#rep-fix-social-media').fadeOut(500);
+			delay(function(){
+				drawReportingDashButtons(currentProfileName, currentProfileValue);
 			},500);
 		});
 		

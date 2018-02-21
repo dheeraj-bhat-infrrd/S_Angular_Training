@@ -41,6 +41,7 @@ public class UpdateMailEventsBolt extends BaseComputeBoltWithAck
     private static final String SG_EVENT_UNSUBSCRIBE = "unsubscribe";
     private static final String SG_EVENT_BOUNCE = "bounce";
     private static final String EVENT_CLICK = "click";
+    private static final String SG_EVENT_DROPPED = "dropped";
 
     private static final String SENDGRID_MESSAGE_DELIMITER = ".filter"; // Sendgrid message id are appended with .filter* 
 
@@ -117,6 +118,10 @@ public class UpdateMailEventsBolt extends BaseComputeBoltWithAck
             case EVENT_CLICK:
                 solrEmailMessageWrapper
                     .setEmailLinkClickedDate( ConversionUtils.convertEpochSecondToSolrTrieFormat( event.getTimestamp() ) );
+                break;
+            case SG_EVENT_DROPPED:
+                solrEmailMessageWrapper
+                    .setEmailDroppedDate( ConversionUtils.convertEpochSecondToSolrTrieFormat( event.getTimestamp() ) );
                 break;
             default:
                 if ( LOG.isWarnEnabled() ) {

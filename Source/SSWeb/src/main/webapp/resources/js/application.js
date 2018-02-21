@@ -136,7 +136,7 @@ var veryLikelyText = '';
 var notVeryLikelyText = '';
 var npsOrder = 999;
 
-var defaultNpsQuestion = 'Default NPS Question';
+var defaultNpsQuestion = 'How likely are you to refer friends and family to [name]?';
 var defaultNotVeryLikely = 'Not Very Likely';
 var defaultVeryLikely = 'Very Likely';
 
@@ -608,7 +608,6 @@ function paintReportingDashboard(profileMasterId, newProfileName, newProfileValu
 	isDashboardReviewRequestRunning = false;
 	reviewsFetchedSoFar = 0;
 	startIndexInc = 0;
-	batchSizeInc = 10;
 	totalReviewsInc = 0;
 	surveyFetchedSoFarInc = 0;
 
@@ -974,6 +973,12 @@ function paintFixSocialMedia(data){
 		var noSMDiv = '<div class="clearfix"><div></div class="float-left bd-frm-left-un">Successfully connected!</div>';
 		popup += noSMDiv;
 		$('#dsh-btn0').addClass("hide");
+		if( window.location.hash.substr(1) == "showreportingpage" ){
+			$('#rep-fix-social-media').fadeOut(500);
+			delay(function(){
+				drawReportingDashButtons(columnName, columnValue);
+			},500);	
+		}
 	}
 	
 // e.stopPropagation();
@@ -7485,7 +7490,7 @@ function paintSurveyPageFromJson() {
 			$("div[data-ques-type='sb-range-0to10-nps']").show();
 			$('#notAtAllLikelyDivNps').html(questionDetails.notAtAllLikely);
 			$('#veryLikelyDivNps').html(questionDetails.veryLikely);
-			$('#nps-range-text').show();
+			$('#nps-range-text').css('opacity',1);
 			if (questionDetails.customerResponse != undefined && !isNaN(parseInt(questionDetails.customerResponse))) {
 				var ratingVal = parseInt(questionDetails.customerResponse);
 				$('.sq-radio').each(function() {
@@ -7496,7 +7501,7 @@ function paintSurveyPageFromJson() {
 				$('#radio-nps-'+ratingVal).children().show();
 				$('#radio-nps-'+ratingVal).parent().find('.popover').show();
 				$('#radio-nps-'+ratingVal).css("cursor","default");
-				$('#nps-range-text').hide();
+				$('#nps-range-text').css('opacity',0);
 				$('#sq-radio-1to10-nps').attr('selected-rating-radio',ratingVal);
 				$("#next-radio-nps").removeClass("btn-com-disabled");
 			}
@@ -8061,7 +8066,7 @@ $('.sq-np-item-next').click(function() {
 	    }else{
 	    	$(this).parent().find('.popover').hide();
 	    	$(this).css("cursor","pointer");
-	    	$('#nps-range-text').show();
+	    	$('#nps-range-text').css('opacity',1);
 	    }
 	});
 	qno++;
@@ -8108,7 +8113,7 @@ $('.sq-np-item-next').click(function() {
 		    	$(this).parent().find('.popover').hide();
 		    	$(this).css("cursor","pointer");
 		    });
-			$('#nps-range-text').show();
+			$('#nps-range-text').css('opacity',1);
 		}
 		
 		var ratingVal = parseInt(questionDetails.customerResponse);
@@ -8133,7 +8138,7 @@ $('.sq-np-item-next').click(function() {
 				$('#radio-nps-'+ratingVal).children().show();
 				$('#radio-nps-'+ratingVal).parent().find('.popover').show();
 				$('#radio-nps-'+ratingVal).css("cursor","default");
-				$('#nps-range-text').hide();
+				$('#nps-range-text').css('opacity',0);
 				$('#sq-radio-1to10-nps').attr('selected-rating-radio',ratingVal);
 			}
 			
@@ -8221,7 +8226,7 @@ $('.sq-np-item-prev').click(function() {
 				$('#radio-nps-'+ratingVal).children().show();
 				$('#radio-nps-'+ratingVal).parent().find('.popover').show();
 				$('#radio-nps-'+ratingVal).css("cursor","default");
-				$('#nps-range-text').hide();
+				$('#nps-range-text').css('opacity',0);
 				$('#sq-radio-1to10-nps').attr('selected-rating-radio',ratingVal);
 			}
 			$('#notAtAllLikelyDivNps').html(questionDetails.notAtAllLikely);
@@ -8263,7 +8268,7 @@ $('.sq-radio').click(function(){
 		if (qno != questions.length - 1) {
 			$("#next-radio-nps").removeClass("btn-com-disabled");
 		}
-		$('#nps-range-text').hide();
+		$('#nps-range-text').css('opacity',0);
 	}
 	
 });
@@ -10595,7 +10600,8 @@ function paintIncompleteSurveyListPopupResults(incompleteSurveystartIndex) {
 		"columnName" : colName,
 		"columnValue" : colValue,
 		"startIndex" : incompleteSurveystartIndex,
-		"batchSize" : $('#icn-sur-popup-cont').attr("data-batch")
+		"batchSize" : $('#icn-sur-popup-cont').attr("data-batch"),
+		"origin" : "oldDashboard"
 	};
 	callAjaxGetWithPayloadData("./fetchincompletesurveypopup.do", function(data) {
 		disableBodyScroll();

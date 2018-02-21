@@ -156,14 +156,14 @@
 									</div> --%>
 									<c:choose>
 										<c:when test="${loop.index == 0}">
-											<div class="radio-div" style="margin-left:10px">
+											<div class="radio-div radio-div-first-1to10">
 												<div class="radio-outer-gray sq-radio" id="radio-${loop.index}">
 													<div class="radio-inner hide"></div>
 												</div>
 											</div>
 										</c:when>
 										<c:otherwise>
-											<div class="radio-div">
+											<div class="radio-div radio-div-1to10">
 												<div class="radio-outer-gray sq-radio" id="radio-${loop.index}">
 													<div class="radio-inner hide"></div>
 												</div>

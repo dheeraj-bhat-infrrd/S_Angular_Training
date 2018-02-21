@@ -163,6 +163,7 @@
   <hop> <from>Convert to EST</from><to>If field value is null</to><enabled>Y</enabled> </hop>
   <hop> <from>If field value is null</from><to>Select values 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Select values 2</from><to>Insert &#x2f; Update</to><enabled>Y</enabled> </hop>
+  <hop> <from>DateConverter</from><to>Write to log</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Convert to EST</name>
@@ -228,7 +229,7 @@
     <name>DateConverter</name>
     <type>ScriptValueMod</type>
     <description/>
-    <distribute>Y</distribute>
+    <distribute>N</distribute>
     <custom_distribution/>
     <copies>1</copies>
          <partitioning>
@@ -587,7 +588,7 @@
     <fields_name/>
     <collection>SURVEY_DETAILS</collection>
     <json_field_name>json</json_field_name>
-    <json_query>&#x7b;&#x24;query&#x3a; &#x7b;&#x22;modifiedOn&#x22; &#x3a; &#x7b;&#x24;gte&#x3a;&#x7b;&#x24;date&#x3a;&#x24;&#x7b;modifiedOnSurveyDetails&#x7d;&#x7d;&#x7d;&#x7d; &#x7d;</json_query>
+    <json_query/>
     <auth_user/>
     <auth_password>Encrypted </auth_password>
     <auth_kerberos>N</auth_kerberos>
@@ -3680,6 +3681,35 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>780</xloc>
       <yloc>113</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Write to log</name>
+    <type>WriteToLog</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <loglevel>log_level_basic</loglevel>
+      <displayHeader>Y</displayHeader>
+      <limitRows>N</limitRows>
+      <limitRowsNumber>0</limitRowsNumber>
+      <logmessage/>
+    <fields>
+      <field>
+        <name>createdOn</name>
+        </field>
+      </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>493</xloc>
+      <yloc>250</yloc>
       <draw>Y</draw>
       </GUI>
     </step>

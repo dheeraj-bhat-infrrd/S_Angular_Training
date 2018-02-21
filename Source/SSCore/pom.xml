@@ -373,6 +373,13 @@
 		    <version>3.3.2</version>
 		</dependency>
 		
+		<!-- jscp -->
+		<dependency>
+		    <groupId>com.jcraft</groupId>
+		    <artifactId>jsch</artifactId>
+		    <version>0.1.42</version>
+		</dependency>
+		
 
 	</dependencies>
 

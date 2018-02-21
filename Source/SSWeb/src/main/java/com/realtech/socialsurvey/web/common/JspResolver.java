@@ -68,6 +68,7 @@ public interface JspResolver
     public static final String DASHBOARD_INCOMPLETESURVEYS = "dashboard_incompletesurveys";
     public static final String DASHBOARD_REVIEWS = "dashboard_reviews";
     public static final String HEADER_DASHBOARD_INCOMPLETESURVEYS = "header_incompletesurvey";
+    public static final String HEADER_NEW_DASHBOARD_INCOMPLETESURVEYS = "reporting_incomplete_surveys_batch";
 
     // Hierarchy Management
     public static final String BUILD_HIERARCHY = "build-hierarchy";
