@@ -10401,7 +10401,7 @@ img.lead-img {
 	margin-left:5px;
 }
 
-.radio-div-first{
+.radio-div-first, .radio-div-first-1to10{
 	margin-left:10px;
 }
 
@@ -10824,6 +10824,37 @@ img.lead-img {
 	color:white !important;
 }
 
+.recalculate-user-ranking{
+	display: flex;
+    align-items: center;
+}
+
+.recalculate-usr-rank-btn-active{
+	background-color: #009FE0;
+	color: #fff;
+	margin-left: 10px;
+	padding: 0 20px;
+	font-size: 13px;
+	line-height: 40px;
+	margin-top: -2px;
+	border-radius: 3px;
+	cursor: pointer;
+	min-width: 120px;
+	font-weight: bold !important;
+}
+
+.recalculate-usr-rank-btn-inactive{
+	background-color: #8d8d8d;
+    color: #fff;
+    margin-left: 10px;
+    padding: 0 20px;
+    font-size: 13px;
+    line-height: 40px;
+    margin-top: -2px;
+    border-radius: 3px;
+    cursor: not-allowed;
+    min-width: 120px;
+    font-weight: bold !important;
 .width-offset {
 	width: 100px !important;
 }
