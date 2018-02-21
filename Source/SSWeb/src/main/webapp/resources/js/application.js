@@ -12526,6 +12526,17 @@ $(document).on('click', '#comp-reg-form-submit', function() {
 	}
 });
 
+// abusive alert
+$(document).on('click', '#abusive-email-form-submit', function() {
+	if (validateComplaintRegistraionForm()) {
+		var formData = $('#abusive-reg-form').serialize();
+		callAjaxPostWithPayloadData("/updateabusivesurveysettings.do", function(data) {
+			$('#overlay-toast').html(data);
+			showToast();
+		}, formData, true, '#abusive-email-form-submit');
+	}
+});
+
 $(document).on('click touchstart', '#compl-checkbox', function() {
 	if ($(this).hasClass('bd-check-img-checked')) {
 		if (validateMultipleEmailIds('comp-mailId')) {

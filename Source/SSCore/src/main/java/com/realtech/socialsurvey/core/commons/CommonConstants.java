@@ -431,6 +431,7 @@ public interface CommonConstants
     public static final String USER_ACCOUNT_SETTINGS = "accountSettings";
     public static final String USER_APP_SETTINGS = "appSettings";
     public static final String COMPLAIN_REG_SETTINGS = "complaintRegSettings";
+    public static final String ABUSIVE_MAIL_SETTINGS = "abusiveMailSettings";
     public static final String ERROR = "error";
     public static final String ZILLOW_PROFILE_ERROR = "zillow-error";
     public static final String ZILLOW_NMLS_REQUIRED_ERROR = "zillow-nmls-required-error";
