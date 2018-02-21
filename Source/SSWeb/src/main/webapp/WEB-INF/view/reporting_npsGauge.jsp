@@ -16,13 +16,11 @@
 </style>
 
 <div id="nps-wrapper" onload="">
-<img id="nps-metre-needle" src="${initParam.resourcesPath}/resources/images/svg-meter-gauge-needle.svg" 
-	style=" margin-left: 155px; margin-top: 80px; height: 80px; position:absolute; z-index:1000">
-<div style="margin-left: 165px; margin-top: 180px; font-weight: bold !important; font-size: medium; position: absolute;">NPS
-	<div id="npsScorebox" style="font-weight: bold !important; font-size: medium; color: white; background: #5e5e5e;
-    	width: 50px; height: 35px; padding: 5px; border-radius: 7px;">
+<img id="nps-metre-needle" src="${initParam.resourcesPath}/resources/images/svg-meter-gauge-needle.svg" class="nps-metre-needle-img" >
+<div class="nps-metre-needle-text">NPS
+	<div id="npsScorebox" class="nps-metre-needle-val">
  	</div>
- </div>
+</div>
 
     
   <svg id="nps-meter">

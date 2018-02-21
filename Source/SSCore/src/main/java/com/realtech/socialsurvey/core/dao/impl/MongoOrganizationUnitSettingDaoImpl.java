@@ -925,18 +925,21 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 
         if ( imageType == CommonConstants.IMAGE_TYPE_PROFILE ) {
             if ( isThumbnail ) {
-                update.set( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, "" );
+                update.unset( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN );
+                update.unset( CommonConstants.PROFILE_IMAGE_RECTANGULAR_THUMBNAIL_COLUMN );
+
             } else {
-                update.set( CommonConstants.PROFILE_IMAGE_URL_SOLR, "" );
-                update.set( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, "" );
+                update.unset( CommonConstants.PROFILE_IMAGE_URL_SOLR );
+                update.unset( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN );
+                update.unset( CommonConstants.PROFILE_IMAGE_RECTANGULAR_THUMBNAIL_COLUMN );
             }
             update.set( CommonConstants.IS_PROFILE_IMAGE_PROCESSED_COLUMN, false );
         } else if ( imageType == CommonConstants.IMAGE_TYPE_LOGO ) {
             if ( isThumbnail ) {
-                update.set( CommonConstants.LOGO_THUMBNAIL_COLUMN, "" );
+                update.unset( CommonConstants.LOGO_THUMBNAIL_COLUMN );
             } else {
-                update.set( CommonConstants.LOGO_COLUMN, "" );
-                update.set( CommonConstants.LOGO_THUMBNAIL_COLUMN, "" );
+                update.unset( CommonConstants.LOGO_COLUMN );
+                update.unset( CommonConstants.LOGO_THUMBNAIL_COLUMN );
             }
             update.set( CommonConstants.IS_LOGO_IMAGE_PROCESSED_COLUMN, false );
         } else {

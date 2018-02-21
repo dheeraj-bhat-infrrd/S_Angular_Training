@@ -497,7 +497,7 @@ public class SurveyHandlerImplTest
     }
 
 
-    @Test ( expected = UnsupportedOperationException.class)
+    @Test 
     public void testMoveSurveysToAnotherUserWhenFromUserAndToUserDoNotBelongToSameCompany() throws InvalidInputException,
         NoRecordsFetchedException, SolrException
     {
