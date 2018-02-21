@@ -1910,6 +1910,7 @@
 	
 	.rep-sps-div{
 	width:0%;
+	display: -webkit-box;
 	}
 	
 	.rep-tab-content{
@@ -1917,7 +1918,7 @@
 	margin-right:0;
 	}
 	.processed-trans-div,.rep-trans-graphs,.unprocessed-trans-div{
-	width:60.7%;
+	width:100%;
 	}
 		
 	.reporting-trans-details{
@@ -3047,7 +3048,7 @@
 	}
 	
 	.processed-trans-div,.rep-trans-graphs,.unprocessed-trans-div{
-	width:52.7%;
+	width:100%;
 	}
 	
 	.reporting-trans-details{
@@ -3093,7 +3094,7 @@
 	}
 	
 	.processed-trans-div,.rep-trans-graphs,.unprocessed-trans-div{
-	width:47%;
+	width:100%;
 	}
 	
 	.reporting-trans-details{

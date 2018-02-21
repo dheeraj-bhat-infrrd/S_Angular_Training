@@ -9976,9 +9976,65 @@ ul.accordion li>a:before {
 	background:#bab8b8;
 }
 
+.sps-metre-needle-img{
+	 margin-left: 155px;
+    margin-top: 80px;
+    height: 80px;
+    position:absolute;
+    z-index:1000
+}
+
+.sps-metre-needle-text{
+	margin-left: 165px;
+    margin-top: 180px;
+    font-weight: bold !important;
+    font-size: medium;    
+    position: absolute;
+}
+
+.sps-metre-needle-val{
+	font-weight: bold !important;
+    font-size: medium;
+    color: white;
+    background: #5e5e5e;
+    width: 50px;
+    height: 35px;
+    padding: 5px;
+    border-radius: 7px;
+}
+
+.nps-metre-needle-img{
+	margin-left: 155px; 
+	margin-top: 80px; 
+	height: 80px; 
+	position:absolute; 
+	z-index:1000"
+}
+
+.nps-metre-needle-text{
+	margin-left: 165px; 
+	margin-top: 180px; 
+	font-weight: bold !important; 
+	font-size: medium; 
+	position: absolute;
+}
+
+.nps-metre-needle-val{
+	font-weight: bold !important;
+	font-size: medium; 
+	color: white; 
+	background: #5e5e5e;
+    width: 50px; 
+    height: 35px; 
+    padding: 5px; 
+    border-radius: 7px;
+}
+
 .reporting-trans-details{
 	background:#f9f9fb; 
 	border-bottom:1px solid #d2cdcd;
+	width: 100%;
+    margin: 0 auto;
 }
 	
 	.time-frame-sel{
@@ -10004,9 +10060,9 @@ ul.accordion li>a:before {
     width: 140px;
     color: #666;
     text-align: left;
-    top: 232px;
-    max-height: 400px;
-    box-shadow: 3px 3px 30px #444;
+    top: 47px;
+    max-height: 400px;    
+    box-shadow: 0 0px 0px 0px transparent, 5px 0 15px -4px #b4b0b0, -5px 0 15px -4px #b4b0b0;
 	}
 	
 	.time-frame-prof-sel{

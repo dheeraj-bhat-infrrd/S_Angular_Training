@@ -90,9 +90,6 @@
 <div class="hm-header-main-wrapper hm-hdr-bord-bot" style="background:#2f69aa">
 	<div class="container">
 		<div class="hm-header-row clearfix">
-			<div id="timeFrame_container">
-				<jsp:include page="reporting_timeFrame_dropdown.jsp"></jsp:include>
-			</div>
 			<c:if test='${lastSuccessfulRun != "" && lastSuccessfulRun != null && lastSuccessfulRun !=undefined}'>
 				<div class="float-left last-run-time-div">
 					<div class="align-center">
@@ -122,7 +119,7 @@
 					<li id="incomplete-surveys-btn" ><a href="#incomplete-surveys-tab" data-toggle="tab" style="padding-left:2px; padding-right:2px">Incomplete Surveys</a></li>
 				</ul>
 				<div class="tab-content rep-tab-content">
-					<div class="tab-pane fade active in" id="trans-stats-tab" style="padding-top: 0;">
+					<div class="tab-pane fade col-lg-12 col-md-12 col-sm-12 col-xs-12 active in" id="trans-stats-tab" style="padding: 0;">
 						<div id="reporting-trans-details" class="row prof-pic-name-wrapper edit-prof-pic-name-wrapper reporting-trans-details">
 							<jsp:include page="reporting_transaction_details.jsp"></jsp:include>
 						</div>

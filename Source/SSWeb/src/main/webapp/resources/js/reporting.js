@@ -5,6 +5,7 @@ var overviewData=getOverviewData();
 var socialMediaList = new Array();
 var is_safari = navigator.userAgent.indexOf("Safari") > -1;
 var unclickedDrawnCount=0;
+var isUpdateTransStats = false;
 function drawTimeFrames(){
 	var currentDate = new Date();
 	var currentMonth = currentDate.getMonth();
@@ -706,7 +707,7 @@ function drawUnclickedDonutChart(overviewYearData){
     	 	
     	 	unclickedDrawnCount++;
     	 	
-    	 	if(unclickedDrawnCount==1){
+    	 	if(unclickedDrawnCount==1 && !isUpdateTransStats){
 	        	var profilemasterid=$('#rep-prof-container').attr('data-profile-master-id');
 	 	    	if(profilemasterid == 4){
 	 	    		activaTab('leaderboard-tab');
@@ -783,6 +784,7 @@ function drawUnclickedDonutChart(overviewYearData){
 		        
 		        icnChart.draw(data, optionsChartIcn);
 		       
+		        isUpdateTransStats=false;
 	      }
 }
 
@@ -1919,6 +1921,7 @@ function updateReportingDashboard(){
 	var currentDate =  new Date();
 	var currentMonth = currentDate.getMonth()+1;
 	var currentYear = currentDate.getFullYear();
+	isUpdateTransStats=true;
 	
 	var monthYear = getTimeFrameValue();
 	var overviewYearData;
@@ -2011,7 +2014,10 @@ function updateReportingDashboard(){
  		drawUnprocessedDonutChart(overviewYearData);
  	}
 	$(window).resize();
-	hideOverlay();
+	
+	 setTimeout(function(){
+			hideDashOverlay('#trans-stats-dash');
+		}, 1000);
 	
 	if(overviewYearData==null){
 		$('#unclicked-trans-graph').addClass('hide');
