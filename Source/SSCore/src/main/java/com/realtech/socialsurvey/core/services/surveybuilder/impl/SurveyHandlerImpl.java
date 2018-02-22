@@ -2955,9 +2955,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         if ( toUserProfile == null )
             throw new NoRecordsFetchedException( "To user id : " + toUser.getUserId() + " is not an agent" );
         LOG.debug( "Validating whether both from and to user belong to same company" );
-        if ( fromUser.getCompany().getCompanyId() != toUser.getCompany().getCompanyId() )
-            throw new UnsupportedOperationException( "From user : " + fromUser.getUserId() + " and to user id : "
-                + toUser.getUserId() + " do not belong to same company" );
 
         // replace agent id Survey Pre Initiation
         LOG.debug( "Moving all incomplete surveys of user : " + fromUserId + " to user : " + toUserId );
