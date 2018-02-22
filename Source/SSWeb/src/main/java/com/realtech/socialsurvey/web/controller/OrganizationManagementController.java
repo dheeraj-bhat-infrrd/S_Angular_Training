@@ -633,6 +633,10 @@ public class OrganizationManagementController
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 unitSettings = userManagementService.getUserSettings( user.getUserId() );
             }
+            
+            // try and decipher encompass password 
+            organizationManagementService.decryptEncompassPasswordIfPossible( unitSettings );
+            
             model.addAttribute( CommonConstants.USER_APP_SETTINGS, unitSettings );
 
 

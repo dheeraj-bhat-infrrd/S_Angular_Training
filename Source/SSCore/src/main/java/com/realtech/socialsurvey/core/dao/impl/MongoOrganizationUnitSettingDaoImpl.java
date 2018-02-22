@@ -938,7 +938,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
                 update.set( CommonConstants.LOGO_COLUMN, "" );
                 update.set( CommonConstants.LOGO_THUMBNAIL_COLUMN, "" );
             }
-            update.set( CommonConstants.IS_LOGO_IMAGE_PROCESSED_COLUMN, "" );
+            update.set( CommonConstants.IS_LOGO_IMAGE_PROCESSED_COLUMN, false );
         } else {
             throw new InvalidInputException( "Invalid image type" );
         }

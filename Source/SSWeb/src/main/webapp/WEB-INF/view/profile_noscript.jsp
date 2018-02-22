@@ -252,9 +252,9 @@
 						<c:set var="profileNameClass" value="profile-name-img-wrapper"></c:set>
 						<div id="prog-img-container"
 							class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper prog-img-container">
-							<div class="prog-img-container">
+							<div class="prog-img-container" style="background-color: white !important; display: flex;align-items: center;">
 								<img itemprop="primaryImageOfPage"
-									class="prof-image pos-relative"
+									class="prof-image pos-relative height-auto-resp"
 									src="${profile.profileImageUrlThumbnail}"
 									alt="Photo of ${profName}"></img>
 							</div>

@@ -489,13 +489,14 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         }
         LOG.info( "Method to update pre initiated surveys agent id from " + fromUserId + " to " + toUser.getUserId()
             + " started." );
-        String queryStr = "UPDATE SURVEY_PRE_INITIATION SET AGENT_ID = ?, AGENT_NAME=?,AGENT_EMAILID=?, MODIFIED_ON=? WHERE AGENT_ID = ?";
+        String queryStr = "UPDATE SURVEY_PRE_INITIATION SET AGENT_ID = ?, AGENT_NAME=?,AGENT_EMAILID=?, MODIFIED_ON=?, COMPANY_ID=? WHERE AGENT_ID = ?";
         Query query = getSession().createSQLQuery( queryStr );
         query.setParameter( 0, toUser.getUserId() );
         query.setParameter( 1, toUser.getFirstName() + ( toUser.getLastName() == null ? "" : " " + toUser.getLastName() ) );
         query.setParameter( 2, toUser.getEmailId() );
         query.setParameter( 3, new Timestamp( System.currentTimeMillis() ) );
-        query.setParameter( 4, fromUserId );
+        query.setParameter( 4, toUser.getCompany().getCompanyId() );
+        query.setParameter( 5, fromUserId );
         query.executeUpdate();
         LOG.info( "Method to update pre initiated surveys agent id from " + fromUserId + " to " + toUser.getUserId()
             + " ended." );
@@ -917,30 +918,4 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         LOG.debug( "Method updateCompanyIdForAllRecordsForAgent  ended." );
     }
 
-    
-    @SuppressWarnings ( "unchecked")
-    @Override
-    public List<SurveyPreInitiation> getManualCompletedSurveys( int start, int row ) throws DatabaseException
-    {
-        Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class );
-        try {
-            if ( row > 0 )
-                criteria.setMaxResults( row );
-            if ( start > 0 )
-                criteria.setFirstResult( start );
-
-            List<Integer> statusList = new ArrayList<Integer>();
-            statusList.add( CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED );
-            statusList.add( CommonConstants.SURVEY_STATUS_INITIATED );
-            statusList.add( CommonConstants.STATUS_SURVEYPREINITIATION_COMPLETE );
-          criteria.add( Restrictions.in( CommonConstants.STATUS_COLUMN, statusList  ) );
-          
-          criteria.add( Restrictions.in( "surveySource", new String[] { "agent" , "admin" , "upload" , "customer"} ) );
-          
-            return criteria.list();
-        } catch ( HibernateException e ) {
-            LOG.error( "Exception caught in getManualCompletedSurveys() ", e );
-            throw new DatabaseException( "Exception caught in getManualCompletedSurveys() ", e );
-        }
-    }
 }
