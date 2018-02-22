@@ -268,7 +268,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  max&#x28;JOB_START_TIME&#x29; as lastModifiedTime&#xd;&#xa;FROM job_log_details where JOB_NAME &#x3d; &#x27;CentralizedMainJob&#x27; and &#x28; STATUS &#x3d; &#x27;Finished&#x27; or STATUS &#x3d; &#x27;Dummy&#x27;&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  max&#x28;JOB_START_TIME&#x29; as lastModifiedTime&#xd;&#xa;FROM job_log_details where &#x28;JOB_NAME &#x3d; &#x27;CentralizedMainJob&#x27; or JOB_NAME &#x3d; &#x27;Dummy Job&#x27; or JOB_NAME &#x3d; &#x27;ParentMainJob&#x27;&#x29; and &#x28; STATUS &#x3d; &#x27;Finished&#x27; or STATUS &#x3d; &#x27;Dummy&#x27;&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
