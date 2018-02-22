@@ -7,7 +7,6 @@ import com.realtech.socialsurvey.compute.common.RedisDB;
 import com.realtech.socialsurvey.compute.dao.RedisSinceRecordFetchedDao;
 
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.exceptions.JedisConnectionException;
 import redis.clients.jedis.exceptions.JedisException;
 
 
@@ -27,6 +26,10 @@ public class RedisSinceRecordFetchedDaoImpl implements RedisSinceRecordFetchedDa
     @Override
     public boolean saveLastFetched( String key, String currValue, String prevValue )
     {
+        if(currValue == null || prevValue == null) {
+            throw new IllegalArgumentException( "currValue/prevValue cann't be null" );
+        }
+        
         Jedis jedis = RedisDB.getPoolInstance().getResource();
         try {
             if ( jedis != null ) {

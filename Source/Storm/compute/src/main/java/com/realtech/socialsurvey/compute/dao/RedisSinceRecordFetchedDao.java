@@ -11,7 +11,9 @@ public interface RedisSinceRecordFetchedDao extends Serializable
     /**
      * Method to save lastFetched
      * @param key is combination of profile type + "_" + id + "_" + pageId. eg - COMPANY_3234234_34234234
-     * @param value
+     * @param currValue - Should not be null
+     * @param prevValue - Should not be null
+     * @return
      */
     public boolean saveLastFetched( String key, String currValue, String prevValue);
     

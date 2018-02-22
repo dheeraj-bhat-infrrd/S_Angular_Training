@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.compute.feeds.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,8 +43,9 @@ public class TwitterFeedProcessorImpl implements TwitterFeedProcessor
 
     private static final int PAGE_SIZE = 200;
 
-    private String consumerKey = "4fg4RwYM6617M8Kl1rYe5f7wm";
-    private String consumerSecret = "bk1Te7a9fX3JBUePexvIREvunh9c8M9HiTZfMW9AhcgfEIHEm4";
+    // TODO pass it in submit topo commands
+    private String consumerKey = "rqhYlHjXPERbAuASOZjNtzyEd";
+    private String consumerSecret = "E8K78DEgxexQjlmaVqkddW1oX07ea8eUQBkCQdKlXwaCc3txWS";
 
 
     @Override
@@ -68,8 +70,11 @@ public class TwitterFeedProcessorImpl implements TwitterFeedProcessor
                 String sinceId = redisSinceRecordFetchedDao.getLastFetched( lastFetchedKey );
 
                 long lastFetchedPostId = 0L;
-                if ( sinceId != null && !sinceId.isEmpty() ) {
+                if (StringUtils.isNotEmpty( sinceId ) ) {
                     lastFetchedPostId = Long.parseLong( sinceId );
+                } else {
+                    // To save preValue of lastFetched
+                    sinceId = "0";
                 }
 
                 // Settings Consumer and Access Tokens

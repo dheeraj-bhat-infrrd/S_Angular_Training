@@ -144,10 +144,10 @@ public class SocialMonitorController
     @ApiOperation ( value = "Initiate account registration")
     public ResponseEntity<?> fetchSocialMediaTokens(HttpServletRequest request ) throws SSApiException, InvalidInputException
     {
-        LOGGER.info( "SocialMonitorController.getCompanyKeywords started" );
+        LOGGER.info( "SocialMonitorController.fetchSocialMediaTokens started" );
         // get company setting for login user
         List<SocialMediaTokenResponse> mediaTokens = organizationManagementService.fetchSocialMediaTokensResponse( 0, 0 );
-        LOGGER.info( "SocialMonitorController.getCompanyKeywords completed successfully" );
+        LOGGER.info( "SocialMonitorController.fetchSocialMediaTokens completed successfully" );
         return new ResponseEntity<>( mediaTokens, HttpStatus.OK );
 
     }
