@@ -16,10 +16,9 @@ public class SocialFeedsActionUpdate implements Serializable {
 	private List<String> postIds;
 	private boolean flagged;
 	private SocialFeedStatus status;
-	private String userEmailId;
 	private TextActionType textActionType;
 	private String text;
-	private String ownerName;
+	private String userName;
 	private long createdOn;
 	private String macroId = "";
 
@@ -47,14 +46,6 @@ public class SocialFeedsActionUpdate implements Serializable {
 		this.status = status;
 	}
 
-	public String getUserEmailId() {
-		return userEmailId;
-	}
-
-	public void setUserEmailId(String userEmailId) {
-		this.userEmailId = userEmailId;
-	}
-
 	public TextActionType getTextActionType() {
 		return textActionType;
 	}
@@ -71,12 +62,12 @@ public class SocialFeedsActionUpdate implements Serializable {
 		this.text = text;
 	}
 
-	public String getOwnerName() {
-		return ownerName;
+	public String getUserName() {
+		return userName;
 	}
 
-	public void setOwnerName(String ownerName) {
-		this.ownerName = ownerName;
+	public void setUserName(String userName) {
+		this.userName = userName;
 	}
 
 	public long getCreatedOn() {
@@ -98,8 +89,8 @@ public class SocialFeedsActionUpdate implements Serializable {
 	@Override
 	public String toString() {
 		return "SocialFeedsActionUpdate [postIds=" + postIds + ", flagged=" + flagged + ", status=" + status
-				+ ", userEmailId=" + userEmailId + ", textActionType=" + textActionType + ", text=" + text
-				+ ", ownerName=" + ownerName + ", createdOn=" + createdOn + ", macroId=" + macroId + "]";
+				+ ", textActionType=" + textActionType + ", text=" + text + ", userName=" + userName + ", createdOn="
+				+ createdOn + ", macroId=" + macroId + "]";
 	}
 
 }
