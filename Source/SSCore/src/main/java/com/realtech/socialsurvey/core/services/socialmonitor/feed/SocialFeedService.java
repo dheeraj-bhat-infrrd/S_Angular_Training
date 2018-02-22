@@ -69,4 +69,14 @@ public interface SocialFeedService
      */
     public void updateMacrosForFeeds(SocialMonitorMacro socialMonitorMacro, long companyId) throws InvalidInputException;
     
+    /**
+     * 
+     * @param macroId
+     * @param companyId
+     * @return
+     * @throws InvalidInputException
+     */
+    public SocialMonitorMacro getMacroById(String macroId, Long companyId) throws InvalidInputException;
+
+    
 }

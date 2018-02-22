@@ -16,6 +16,7 @@ public class SocialMonitorMacro implements Serializable {
 	private boolean active;
 	private int count;
 	private long createdOn;
+	private long modifiedOn;
 
 	public String getMacroId() {
 		return macroId;
@@ -73,10 +74,44 @@ public class SocialMonitorMacro implements Serializable {
 		this.createdOn = createdOn;
 	}
 
+	public long getModifiedOn() {
+		return modifiedOn;
+	}
+
+	public void setModifiedOn(long modifiedOn) {
+		this.modifiedOn = modifiedOn;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((macroId == null) ? 0 : macroId.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SocialMonitorMacro other = (SocialMonitorMacro) obj;
+		if (macroId == null) {
+			if (other.macroId != null)
+				return false;
+		} else if (!macroId.equals(other.macroId))
+			return false;
+		return true;
+	}
+
 	@Override
 	public String toString() {
 		return "SocialMonitorMacro [macroId=" + macroId + ", macroName=" + macroName + ", description=" + description
-				+ ", actions=" + actions + ", active=" + active + ", count=" + count + ", createdOn=" + createdOn + "]";
+				+ ", actions=" + actions + ", active=" + active + ", count=" + count + ", createdOn=" + createdOn
+				+ ", modifiedOn=" + modifiedOn + "]";
 	}
 
 }

@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -73,9 +74,10 @@ public class SocialMonitorFeedsController {
 		return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/socialfeedsmacro", method = RequestMethod.GET)
+	@RequestMapping(value = "/socialfeedsmacro/company/{companyId}", method = RequestMethod.GET)
 	@ApiOperation(value = "Get macros for a particular entity")
-	public ResponseEntity<?> showMacrosForEntity(long companyId) throws InvalidInputException, SSApiException {
+	public ResponseEntity<?> showMacrosForEntity(@PathVariable long companyId)
+			throws InvalidInputException, SSApiException {
 		LOGGER.info("Fetching the list of Macros for an entity");
 		List<SocialMonitorMacro> socialMonitorMacros = new ArrayList<>();
 		try {
@@ -101,6 +103,21 @@ public class SocialMonitorFeedsController {
 		}
 		return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
 
+	}
+
+	@RequestMapping(value = "/socialfeedsmacro/company/{companyId}/macro/{macroId}", method = RequestMethod.GET)
+	@ApiOperation(value = "Get macro by macroId")
+	public ResponseEntity<?> getMacroById(@PathVariable Long companyId, @PathVariable String macroId)
+			throws InvalidInputException, SSApiException {
+		LOGGER.info("Fetching the Macro by Id");
+		SocialMonitorMacro socialMonitorMacro;
+		try {
+			socialMonitorMacro = socialFeedService.getMacroById(macroId, companyId);
+		} catch (InvalidInputException ie) {
+			LOGGER.error("Invalid input exception caught while fetching macro", ie);
+			throw new SSApiException("Invalid input exception caught while fetching macro", ie);
+		}
+		return new ResponseEntity<>(socialMonitorMacro, HttpStatus.OK);
 	}
 
 }

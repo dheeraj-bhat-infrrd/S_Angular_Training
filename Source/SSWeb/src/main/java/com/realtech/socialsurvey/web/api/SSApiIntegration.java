@@ -238,11 +238,16 @@ public interface SSApiIntegration
     
     @PUT( "/v1/updatesocialfeeds/action")
     public Response saveSocialFeedsForAction(@Body SocialFeedsActionUpdate socialFeedsActionUpdate,
-			@Query("companyId") long companyId);
+			@Query("companyId") Long companyId);
     
-    @GET("/v1/socialfeedsmacro")
-    public Response showMacrosForEntity(@Query("companyId") long companyId);
+    @GET("/v1/socialfeedsmacro/company/{companyId}")
+    public Response showMacrosForEntity(@Path("companyId") long companyId);
     
-    @POST("/v1/updateMacrosForEntity")
+    @POST("/v1/update/socialfeedsmacro")
     public Response updateMacrosForEntity(@Body SocialMonitorMacro socialMonitorMacro, @Query("companyId") long companyId);
+    
+    @GET("/v1/socialfeedsmacro/company/{companyId}/macro/{macroId}")
+    public Response getMacroById(@Path("companyId") Long companyId, @Path("macroId") long macroId);
+    
+    
 }
