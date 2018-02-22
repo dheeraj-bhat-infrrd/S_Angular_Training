@@ -26,19 +26,9 @@ import retrofit2.Response;
 public class TestSolr {
 
 	public static void main(String[] args) throws Exception {
-		List<SurveyInvitationEmailCountMonth> mailCount = new ArrayList<SurveyInvitationEmailCountMonth>();
-		SurveyInvitationEmailCountMonth month = new SurveyInvitationEmailCountMonth();
-		month.setAgentId(1);
-		month.setAttempted(10);
-		mailCount.add(month);
-		
-		for(SurveyInvitationEmailCountMonth months : mailCount) {
-			if(months.getAgentId()==1) {
-				months.setBlocked(20);
-			}
-		}
-		System.out.println(mailCount.get(0).getBlocked());
-		System.out.println(mailCount.get(0).getAttempted());
-		
+		Call<String> request = RetrofitApiBuilder.apiBuilderInstance().getSolrAPIIntergrationService().getEmailCounts("*:*", 0, "agentId : [1 TO *]",
+				"json", "true", "agentId", "agentId,emailAttemptedDate");
+		Response<String> response = request.execute();
+		System.out.println(response.body());
 	}
 }

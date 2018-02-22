@@ -489,6 +489,18 @@
 	</bean> 
 	
 	
+	<!-- Survey invitation mail count month job -->
+	<bean id="surveyInvitationEmailCountJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass" value="com.realtech.socialsurvey.core.starter.SurveyInvitationEmailCountJob" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="streamApiIntegrationBuilder" value-ref="streamApiIntegrationBuilder" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean> 
+	
+	
 	
 	<!-- setting cron for Review Count Updater -->
 	<bean id="solrreviewcounterupdatercron"
@@ -736,6 +748,13 @@
 		<property name="cronExpression" value="0 0/1 * 1/1 * ? *" />
 	</bean>
 	
+	<!-- survey invitaion mail count cron -->
+	<bean id="surveyInvitationEmailCountCron"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="surveyInvitationEmailCountJob" />
+		<property name="cronExpression" value="0 30 12 1 1/1 ? *" />
+	</bean>
+	
 	
 
 	<!-- Scheduler factory -->
@@ -774,6 +793,7 @@
 				<ref bean="monthlydigeststarter" />
 				<ref bean="transactionActivityMonitorJobDetail" />	
 				<ref bean="surveycsvuploadjobdetail" />
+				<ref bean="surveyInvitationEmailCountJob" />
 			</list>
 		</property>
 
@@ -812,6 +832,7 @@
 				<ref bean="monthlydigeststartercron" />
 				<ref bean="transactionActivityMonitorCron" />
 				<ref bean="surveycsvuploadcron" />
+				<ref bean="surveyInvitationEmailCountCron" />
 			</list>
 		</property>
 		<property name="quartzProperties">
@@ -946,6 +967,6 @@
 
 	<!-- Activity Management service bean -->
 	<bean id="activityManagementService"
-		class="com.realtech.socialsurvey.core.services.activitymanager.impl.ActivityManagementServiceImpl" />	
-		
+		class="com.realtech.socialsurvey.core.services.activitymanager.impl.ActivityManagementServiceImpl" />
+	
 </beans>

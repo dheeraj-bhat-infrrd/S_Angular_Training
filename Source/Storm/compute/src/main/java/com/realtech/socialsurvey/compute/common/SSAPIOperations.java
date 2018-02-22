@@ -93,4 +93,22 @@ public class SSAPIOperations
 		return response.body();
 		
 	}
+
+
+	public boolean saveEmailCountMonthData(List<SurveyInvitationEmailCountMonth> agentEmailCountsMonth) {
+        Call<List<SurveyInvitationEmailCountMonth>> requestCall = RetrofitApiBuilder.apiBuilderInstance()
+            .getSSAPIIntergrationService().saveEmailCountMonthData( agentEmailCountsMonth );
+        try {
+            Response<List<SurveyInvitationEmailCountMonth>> response = requestCall.execute();
+            RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
+            if ( LOG.isTraceEnabled() ) {
+                LOG.trace( "response {}", response.body() );
+            }
+            return true;
+        } catch ( IOException | APIIntergrationException e ) {
+            LOG.error( "IOException/ APIIntergrationException caught", e );
+            return false;
+        }
+		
+	}
 }

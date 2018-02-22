@@ -6,11 +6,9 @@ import com.realtech.socialsurvey.compute.entities.SocialPost;
 import com.realtech.socialsurvey.compute.entity.SurveyInvitationEmailCountMonth;
 
 import retrofit2.Call;
-import retrofit2.Response;
 import retrofit2.http.*;
 
 import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -45,5 +43,11 @@ public interface SSApiIntegrationService
     @GET ( "v1/trxcount/agent")
 	Call<List<SurveyInvitationEmailCountMonth>> getReceivedCountsMonth(@Query("startDateInGmt") String startDateInGmt,
 			@Query("endDateInGmt") String endDateInGmt);
+
+
+    @Headers ( "Content-Type: application/json")
+    @POST ( "v1/agentEmailCountsMonth")
+	Call<List<SurveyInvitationEmailCountMonth>> saveEmailCountMonthData(
+			@Body List<SurveyInvitationEmailCountMonth> agentEmailCountsMonth);
 
 }

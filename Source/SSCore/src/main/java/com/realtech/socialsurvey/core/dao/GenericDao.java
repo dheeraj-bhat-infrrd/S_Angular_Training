@@ -65,5 +65,7 @@ public interface GenericDao<T, ID extends Serializable> {
 
     public List<T> findByKeyValueAscendingWithAlias( Class<T> dataClass, Map<String, Object> queries, List<String> ascendingColumns,
         String alias );
+
+	public void saveAll(List<T> entityList);
 }
 // JIRA: SS-8: By RM05: EOC

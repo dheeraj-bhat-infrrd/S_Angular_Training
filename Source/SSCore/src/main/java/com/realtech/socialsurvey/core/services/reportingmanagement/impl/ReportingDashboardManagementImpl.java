@@ -50,6 +50,7 @@ import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.CompanyDetailsReportDao;
 import com.realtech.socialsurvey.core.dao.CompanyUserReportDao;
 import com.realtech.socialsurvey.core.dao.FileUploadDao;
+import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.NpsReportMonthDao;
 import com.realtech.socialsurvey.core.dao.NpsReportWeekDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -347,6 +348,9 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     
     @Autowired
     private SurveyPreInitiationDao surveyPreInitiationDao;
+    
+    @Autowired
+    private GenericDao<SurveyInvitationEmailCountMonth, Long> surveyEmailCountMonthDao;
 
     @Value ( "${FILE_DIRECTORY_LOCATION}")
     private String fileDirectoryLocation;
@@ -4792,19 +4796,38 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
 
 	@Override
-	public List<SurveyInvitationEmailCountMonth> getReceivedCountsMonth(String startDateInGmt, String endDateInGmt) throws ParseException {
+	public List<SurveyInvitationEmailCountMonth> getReceivedCountsMonth(String startDateInGmt, String endDateInGmt)
+			throws ParseException {
 		List<SurveyInvitationEmailCountMonth> receivedCountMonth = new ArrayList<SurveyInvitationEmailCountMonth>();
 		DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 		Timestamp startDate = new Timestamp(format.parse(startDateInGmt).getTime());
 		Timestamp endDate = new Timestamp(format.parse(endDateInGmt).getTime());
-		List<Object[]> receivedCount = surveyPreInitiationDao.getReceivedCountForDate(startDate,endDate);
-		for(Object[] obj : receivedCount) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTimeInMillis(startDate.getTime());
+		int month = cal.get(Calendar.MONTH) + 1;
+		int year = cal.get(Calendar.YEAR);
+		List<Object[]> receivedCount = surveyPreInitiationDao.getReceivedCountForDate(startDate, endDate);
+		for (Object[] obj : receivedCount) {
 			SurveyInvitationEmailCountMonth mailCount = new SurveyInvitationEmailCountMonth();
 			mailCount.setAgentId((int) obj[1]);
 			mailCount.setReceived((int) obj[0]);
+			mailCount.setMonth(month);
+			mailCount.setYear(year);
 			receivedCountMonth.add(mailCount);
 		}
 		return receivedCountMonth;
-		
+
+	}
+
+	@Override
+	public boolean saveEmailCountMonthData(List<SurveyInvitationEmailCountMonth> agentEmailCountsMonth) {
+		try {
+			surveyEmailCountMonthDao.saveAll(agentEmailCountsMonth);
+			LOG.info("Survey invitaion email count data saved to db.");
+			return true;
+		} catch (Exception e) {
+			LOG.error("Exception occured while saving survey invitation email count to db.");
+			return false;
+		}
 	}
 }

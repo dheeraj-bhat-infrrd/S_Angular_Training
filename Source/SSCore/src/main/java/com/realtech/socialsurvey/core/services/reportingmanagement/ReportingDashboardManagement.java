@@ -369,4 +369,7 @@ public interface ReportingDashboardManagement
 
 
 	public List<SurveyInvitationEmailCountMonth> getReceivedCountsMonth(String startDateInGmt, String endDateInGmt) throws ParseException;
+
+
+	public boolean saveEmailCountMonthData(List<SurveyInvitationEmailCountMonth> agentEmailCountsMonth);
 }

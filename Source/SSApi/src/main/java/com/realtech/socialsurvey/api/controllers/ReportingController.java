@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.api.models.response.FileUploadResponse;
+import com.realtech.socialsurvey.core.entities.SurveyInvitationEmailCountMonth;
 import com.realtech.socialsurvey.core.entities.CompanyActiveUsersStats;
 import com.realtech.socialsurvey.core.entities.DigestRequestData;
 import com.realtech.socialsurvey.core.entities.CompanyDetailsReport;
@@ -818,7 +819,7 @@ public class ReportingController
         return json;
     }
     
-    @RequestMapping ( value = "/branchranking/month/year", method = RequestMethod.GET)
+    @RequestMapping ( value = "/trxcount/agent", method = RequestMethod.GET)
     @ApiOperation ( value = "get nps report for a week or month")
     public String getReceivedCountsMonth(String startDateInGmt, String endDateInGmt) {
     	try {
@@ -827,5 +828,17 @@ public class ReportingController
 			LOGGER.error("Error getting received count.",e);
 		} 
     	return null;
+    }
+    @RequestMapping( value = "/agentEmailCountsMonth", method = RequestMethod.POST)
+    @ApiOperation(value = "Save the agent email counts data for month.")
+    public ResponseEntity<Boolean> saveEmailCountMonthData(@RequestBody List<SurveyInvitationEmailCountMonth> agentEmailCountsMonth) {
+    	boolean status = reportingDashboardManagement.saveEmailCountMonthData(agentEmailCountsMonth);
+    	ResponseEntity<Boolean> responseEntity = null;
+    	if(status) {
+    		responseEntity = new ResponseEntity<>(status,HttpStatus.OK);
+    	} else {
+    		responseEntity = new ResponseEntity<>(status,HttpStatus.INTERNAL_SERVER_ERROR);
+    	}
+    	return responseEntity;
     }
 }

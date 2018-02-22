@@ -173,6 +173,8 @@
 				<value>com.realtech.socialsurvey.core.entities.JobLogDetails</value>
 				<value>com.realtech.socialsurvey.core.entities.BranchRankingReportMonth</value>
 				<value>com.realtech.socialsurvey.core.entities.BranchRankingReportYear</value>
+				<value>com.realtech.socialsurvey.core.entities.SurveyInvitationEmailCountMonth</value>
+				<value>com.realtech.socialsurvey.core.entities.SurveyPreInitiation</value>
 			</list>
 		</property>
 	</bean>

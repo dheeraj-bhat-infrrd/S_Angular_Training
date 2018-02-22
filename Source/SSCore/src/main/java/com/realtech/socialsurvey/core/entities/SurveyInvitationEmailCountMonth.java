@@ -3,27 +3,68 @@
  */
 package com.realtech.socialsurvey.core.entities;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 /**
  * @author Subhrajit
  *
  */
+@Entity
+@Table(name = "invitation_mail_count_month")
 public class SurveyInvitationEmailCountMonth {
 	
-	private int id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "invitation_mail_count_month_id")
+	private long id;
+	
+	@Column(name = "agent_id")
 	private int agentId;
+	
+	@Column(name = "company_id")
 	private int companyId;
+	
+	@Column(name = "month")
 	private int month;
+	
+	@Column(name = "year")
 	private int year;
+	
+	@Column(name = "attempted_count")
 	private int attempted;
+	
+	@Column(name = "delivered")
 	private int delivered;
+	
+	@Column(name = "deffered")
 	private int differed;
+	
+	@Column(name = "blocked")
 	private int blocked;
+	
+	@Column(name = "opened")
 	private int opened;
+	
+	@Column(name = "spam")
 	private int spamed;
+	
+	@Column(name = "unsubscribed")
 	private int unsubscribed;
+	
+	@Column(name = "bounced")
 	private int bounced;
+	
+	@Column(name = "link_clicked")
 	private int linkClicked;
+	
+	@Column(name = "received")
 	private int received;
+	
 	public int getAgentId() {
 		return agentId;
 	}
