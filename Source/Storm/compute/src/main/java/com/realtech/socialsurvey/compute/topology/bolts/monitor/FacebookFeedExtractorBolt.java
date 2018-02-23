@@ -10,7 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
+import com.realtech.socialsurvey.compute.entities.FacebookToken;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
+import com.realtech.socialsurvey.compute.entities.TwitterToken;
 import com.realtech.socialsurvey.compute.entities.response.FacebookFeedData;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.enums.ProfileType;
@@ -18,6 +20,7 @@ import com.realtech.socialsurvey.compute.enums.SocialFeedType;
 import com.realtech.socialsurvey.compute.feeds.FacebookFeedProcessor;
 import com.realtech.socialsurvey.compute.feeds.impl.FacebookFeedProcessorImpl;
 import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBolt;
+import com.realtech.socialsurvey.compute.utils.UrlHelper;
 
 
 /**
@@ -32,6 +35,7 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt
 
     private FacebookFeedProcessor facebookFeedProcessor = new FacebookFeedProcessorImpl();
 
+
     private boolean isRateLimitExceeded()
     {
         // TODO ckech for ratelimiting for facebook api (based on user-id, page-id, )
@@ -45,7 +49,7 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt
         try {
             SocialMediaTokenResponse mediaToken = (SocialMediaTokenResponse) input.getValueByField( "mediaToken" );
             Long companyId = mediaToken.getCompanyId();
-            
+
             // Check rate limiting for company
             if ( isRateLimitExceeded( /* pass media token*/ ) ) {
                 LOG.warn( "Rate limit exceeded" );
@@ -53,12 +57,15 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt
 
             List<FacebookFeedData> feeds = facebookFeedProcessor.fetchFeeds( companyId, mediaToken );
 
+            String lastFetchedKey = getLastFetchedKey( mediaToken );
+
             LOG.debug( "Total tweet fetched : {}", feeds.size() );
             for ( FacebookFeedData facebookFeedData : feeds ) {
                 SocialResponseObject<FacebookFeedData> responseWrapper = createSocialResponseObject( mediaToken,
                     facebookFeedData );
                 String responseWrapperString = new Gson().toJson( responseWrapper );
-                _collector.emit( new Values( Long.toString( companyId ), responseWrapperString ) );
+
+                _collector.emit( new Values( Long.toString( companyId ), responseWrapperString, lastFetchedKey ) );
                 LOG.debug( "Emitted successfully {}", responseWrapper );
             }
 
@@ -71,6 +78,23 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt
 
 
     /**
+     * Method for creating lastfetched key
+     * @param mediaToken
+     * @return
+     */
+    private String getLastFetchedKey( SocialMediaTokenResponse mediaToken )
+    {
+        String lastFetchedKey = "";
+        if ( mediaToken.getSocialMediaTokens() != null && mediaToken.getSocialMediaTokens().getFacebookToken() != null ) {
+            FacebookToken token = mediaToken.getSocialMediaTokens().getFacebookToken();
+            String pageId = UrlHelper.getFacebookPageIdFromURL( token.getFacebookPageLink() );
+            lastFetchedKey = mediaToken.getProfileType().toString() + "_" + mediaToken.getIden() + "_" + pageId;
+        }
+        return lastFetchedKey;
+    }
+
+
+    /**
      * Create SocialResponseObject with common fields
      * @param mediaToken
      * @param facebookFeedData
@@ -79,9 +103,9 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt
     private SocialResponseObject<FacebookFeedData> createSocialResponseObject( SocialMediaTokenResponse mediaToken,
         FacebookFeedData facebookFeedData )
     {
-        SocialResponseObject<FacebookFeedData> responseWrapper = new SocialResponseObject<>( mediaToken.getCompanyId(), SocialFeedType.FACEBOOK,
-            facebookFeedData.getMessage(), facebookFeedData, 1 );
-        
+        SocialResponseObject<FacebookFeedData> responseWrapper = new SocialResponseObject<>( mediaToken.getCompanyId(),
+            SocialFeedType.FACEBOOK, facebookFeedData.getMessage(), facebookFeedData, 1 );
+
         if ( mediaToken.getProfileType() != null ) {
             responseWrapper.setProfileType( mediaToken.getProfileType() );
             if ( mediaToken.getProfileType() == ProfileType.COMPANY ) {
@@ -99,8 +123,8 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt
             responseWrapper.setHash( responseWrapper.getText().hashCode() );
         }
 
-        responseWrapper.setPostId(facebookFeedData.getId());
-        responseWrapper.setId(facebookFeedData.getId());
+        responseWrapper.setPostId( facebookFeedData.getId() );
+        responseWrapper.setId( facebookFeedData.getId() );
 
         if ( facebookFeedData.getUpdatedTime() > 0 ) {
             responseWrapper.setUpdatedTime( facebookFeedData.getUpdatedTime() * 1000 );
@@ -117,7 +141,7 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt
     @Override
     public void declareOutputFields( OutputFieldsDeclarer declarer )
     {
-        declarer.declare( new Fields( "companyId", "post" ) );
+        declarer.declare( new Fields( "companyId", "post", "lastFetchedKey" ) );
     }
 
 
