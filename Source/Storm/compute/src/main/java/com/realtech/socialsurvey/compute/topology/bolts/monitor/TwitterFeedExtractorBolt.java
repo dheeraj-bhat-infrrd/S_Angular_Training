@@ -1,14 +1,5 @@
 package com.realtech.socialsurvey.compute.topology.bolts.monitor;
 
-import java.util.List;
-
-import org.apache.storm.topology.OutputFieldsDeclarer;
-import org.apache.storm.tuple.Fields;
-import org.apache.storm.tuple.Tuple;
-import org.apache.storm.tuple.Values;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
@@ -18,6 +9,14 @@ import com.realtech.socialsurvey.compute.enums.SocialFeedType;
 import com.realtech.socialsurvey.compute.feeds.TwitterFeedProcessor;
 import com.realtech.socialsurvey.compute.feeds.impl.TwitterFeedProcessorImpl;
 import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBolt;
+import org.apache.storm.topology.OutputFieldsDeclarer;
+import org.apache.storm.tuple.Fields;
+import org.apache.storm.tuple.Tuple;
+import org.apache.storm.tuple.Values;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 
 /**
@@ -53,8 +52,9 @@ public class TwitterFeedExtractorBolt extends BaseComputeBolt
 
             //Call facebook api to get facebook page post.
             List<TwitterFeedData> response = twitterFeedProcessor.fetchFeed( companyId, mediaToken );
-            LOG.debug( "Total tweet fetched : {}", response.size() );
+            LOG.info( "Total tweet fetched : {}", response.size() );
             for ( TwitterFeedData twitterFeedData : response ) {
+                //LOG.info("Remaining limit {}", twitterFeedData.getRemaining());
                 SocialResponseObject<TwitterFeedData> responseWrapper = createSocialResponseObject( mediaToken,
                     twitterFeedData );
                 String responseWrapperString = new Gson().toJson( responseWrapper );

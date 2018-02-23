@@ -1,28 +1,20 @@
 package com.realtech.socialsurvey.compute.feeds.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.realtech.socialsurvey.compute.dao.impl.RedisSinceRecordFetchedDaoImpl;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.compute.entities.TwitterToken;
 import com.realtech.socialsurvey.compute.entities.response.TwitterFeedData;
 import com.realtech.socialsurvey.compute.feeds.TwitterFeedProcessor;
 import com.realtech.socialsurvey.compute.utils.UrlHelper;
-
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import redis.clients.jedis.exceptions.JedisConnectionException;
-import twitter4j.Paging;
-import twitter4j.RateLimitStatus;
-import twitter4j.ResponseList;
-import twitter4j.Status;
-import twitter4j.Twitter;
-import twitter4j.TwitterException;
-import twitter4j.TwitterFactory;
+import twitter4j.*;
 import twitter4j.auth.AccessToken;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -87,20 +79,25 @@ public class TwitterFeedProcessorImpl implements TwitterFeedProcessor
                 long maxId = 0L;
                 ResponseList<Status> resultList;
 
+
                 do {
                     Paging paging = new Paging();
-                    paging.setCount( 5 );
-
+                    paging.setCount( PAGE_SIZE );
                     if ( lastFetchedPostId != 0L ) {
                         paging.setSinceId( lastFetchedPostId );
                     }
-
                     // Adding max for better results
                     if ( maxId != 0L ) {
                         paging.setMaxId( maxId - 1 );
                     }
 
                     resultList = twitter.getUserTimeline( pageId, paging );
+                    //todo save the twitterSecondsUnitlRest in redis if remainingCount becomes <= 100
+                    LOG.info("RateLimit status for page {} is {} and resetTime is {}", pageId, resultList.getRateLimitStatus(),
+                            (int)(((long)resultList.getRateLimitStatus().getResetTimeInSeconds() * 1000L - System.currentTimeMillis()) / 1000L));
+                    if(resultList.getRateLimitStatus().getRemaining() <= 100) {
+                        //set twitterSecondsUntilReset to resultList.getRateLimitStatus().
+                    }
 
                     for ( Status status : resultList ) {
                         feedData.add( createTwitterFeedData( status ) );
@@ -113,6 +110,7 @@ public class TwitterFeedProcessorImpl implements TwitterFeedProcessor
                 }
 
             } catch ( TwitterException e ) {
+                //todo if the rate limit has been over used by any chance then blacklist the socialtoken
                 LOG.error( "Exception in Twitter feed extration. Reason: ", e );
             } catch ( JedisConnectionException e ) {
                 LOG.error( "Not able to connect to jedis", e);
@@ -137,6 +135,7 @@ public class TwitterFeedProcessorImpl implements TwitterFeedProcessor
         feed.setRetweetCount( status.getRetweetCount() );
         RateLimitStatus rateLimitStatus = status.getRateLimitStatus();
         if ( rateLimitStatus != null ) {
+            LOG.info("Rate Limit = {} and Remaining limit {}", status.getRateLimitStatus().getLimit(), status.getRateLimitStatus().getRemaining());
             feed.setRemaining( status.getRateLimitStatus().getRemaining() );
             feed.setLimit( status.getRateLimitStatus().getLimit() );
             feed.setResetTimeInSeconds( status.getRateLimitStatus().getResetTimeInSeconds() );
