@@ -423,4 +423,6 @@ public interface SurveyHandler
 
 	public void validateAndProcessSurveyPreInitiation(SurveyPreInitiation survey) throws InvalidInputException;
 
+	public void updateSurveyAsAbusiveNotify(String get_id);
+
 }

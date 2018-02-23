@@ -94,7 +94,7 @@
 				<div class="bd-hr-form-item clearfix comp-top-mar" >
 					<div class="float-left compl-input-text"><spring:message code="label.abusivealert.mail.text" /></div>
 					<div class="float-left bd-frm-right comp-email-input"><input class="bd-frm-rt-txt compl-input" name="mailId"
-						id="comp-mailId" value="${abusiveMailSettings.mailId}" placeholder='<spring:message code="label.addmultipleemail.key"/>'></div>
+						id="abusive-mailId" value="${abusiveMailSettings.mailId}" placeholder='<spring:message code="label.addmultipleemail.key"/>'></div>
 				</div>
 
 				<div id="abusive-email-form-submit" class="bd-btn-save cursor-pointer compl-save-btn submit-comp-btn">Save</div>
