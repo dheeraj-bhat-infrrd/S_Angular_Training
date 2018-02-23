@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import com.realtech.socialsurvey.compute.entities.LinkedInToken;
+import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.compute.entities.response.linkedin.LinkedinFeedData;
 
 /**
@@ -18,5 +19,5 @@ public interface LinkedinFeedProcessor extends Serializable
      * @param token
      * @return
      */
-    public List<LinkedinFeedData> fetchFeeds(long companyId,  LinkedInToken token );
+    public List<LinkedinFeedData> fetchFeeds(long companyId, SocialMediaTokenResponse mediaToken);
 }
