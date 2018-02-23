@@ -1,11 +1,9 @@
 package com.realtech.socialsurvey.compute.dao.impl;
 
+import com.realtech.socialsurvey.compute.common.RedisDB;
+import com.realtech.socialsurvey.compute.dao.RedisSocialMediaStateDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.realtech.socialsurvey.compute.common.RedisDB;
-import com.realtech.socialsurvey.compute.dao.RedisSinceRecordFetchedDao;
-
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.exceptions.JedisException;
 
@@ -15,7 +13,7 @@ import redis.clients.jedis.exceptions.JedisException;
  * @author manish
  *
  */
-public class RedisSinceRecordFetchedDaoImpl implements RedisSinceRecordFetchedDao
+public class RedisSocialMediaStateDaoImpl implements RedisSocialMediaStateDao
 {
     private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger( RedisCompanyKeywordsDaoImpl.class );

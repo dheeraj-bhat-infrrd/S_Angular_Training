@@ -6,7 +6,7 @@ import java.io.Serializable;
  * @author manish
  *
  */
-public interface RedisSinceRecordFetchedDao extends Serializable
+public interface RedisSocialMediaStateDao extends Serializable
 {
     /**
      * Method to save lastFetched

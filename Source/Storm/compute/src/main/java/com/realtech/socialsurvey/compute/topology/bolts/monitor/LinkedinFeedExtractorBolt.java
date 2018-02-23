@@ -10,8 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
+import com.realtech.socialsurvey.compute.entities.FacebookToken;
 import com.realtech.socialsurvey.compute.entities.LinkedInToken;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
+import com.realtech.socialsurvey.compute.entities.TwitterToken;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.entities.response.linkedin.LinkedinFeedData;
 import com.realtech.socialsurvey.compute.enums.ProfileType;
@@ -19,6 +21,7 @@ import com.realtech.socialsurvey.compute.enums.SocialFeedType;
 import com.realtech.socialsurvey.compute.feeds.LinkedinFeedProcessor;
 import com.realtech.socialsurvey.compute.feeds.impl.LinkedinFeedProcessorImpl;
 import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBolt;
+import com.realtech.socialsurvey.compute.utils.UrlHelper;
 
 
 /**
@@ -47,21 +50,16 @@ public class LinkedinFeedExtractorBolt extends BaseComputeBolt
 
             SocialMediaTokenResponse mediaToken = (SocialMediaTokenResponse) input.getValueByField( "mediaToken" );
 
-            LinkedInToken token = null;
-
-            if ( mediaToken.getSocialMediaTokens() != null ) {
-                token = mediaToken.getSocialMediaTokens().getLinkedInToken();
-            }
-
             // Check rate limiting for company
             if ( isRateLimitExceeded( /* pass media token*/ ) ) {
                 LOG.warn( "Rate limit exceeded" );
             }
             // Get SocailMediaToken for company
             Long companyId = mediaToken.getCompanyId();
-
+            
+            String lastFetchedKey = getLastFetchedKey( mediaToken );
             //Call facebook api to get facebook page post.
-            List<LinkedinFeedData> feeds = linkedinFeedProcessor.fetchFeeds( companyId, token );
+            List<LinkedinFeedData> feeds = linkedinFeedProcessor.fetchFeeds( companyId, mediaToken );
             LOG.debug( "Total tweet fetched : {}", feeds.size() );
             for ( LinkedinFeedData linkedinFeedData : feeds ) {
 
@@ -70,7 +68,7 @@ public class LinkedinFeedExtractorBolt extends BaseComputeBolt
 
                 String responseWrapperString = new Gson().toJson( responseWrapper );
 
-                _collector.emit( new Values( companyId.toString(), responseWrapperString ) );
+                _collector.emit( new Values( companyId.toString(), responseWrapperString, lastFetchedKey ) );
                 LOG.debug( "Emitted successfully {}", responseWrapper );
             }
 
@@ -80,6 +78,22 @@ public class LinkedinFeedExtractorBolt extends BaseComputeBolt
         Exception e ) {
             LOG.error( "Error while fetching post from linkedin.", e );
         }
+    }
+    
+    /**
+     * Method for creating lastfetched key
+     * @param mediaToken
+     * @return
+     */
+    private String getLastFetchedKey(SocialMediaTokenResponse mediaToken){
+        String lastFetchedKey = "";
+        
+        if ( mediaToken.getSocialMediaTokens() != null && mediaToken.getSocialMediaTokens().getFacebookToken() != null) {
+            LinkedInToken token = mediaToken.getSocialMediaTokens().getLinkedInToken();
+            String pageId = UrlHelper.getFacebookPageIdFromURL( token.getLinkedInPageLink() );
+            lastFetchedKey = mediaToken.getProfileType().toString() + "_" + mediaToken.getIden() + "_" + pageId;
+        }
+        return lastFetchedKey;
     }
 
 
@@ -136,7 +150,7 @@ public class LinkedinFeedExtractorBolt extends BaseComputeBolt
     @Override
     public void declareOutputFields( OutputFieldsDeclarer declarer )
     {
-        declarer.declare( new Fields( "companyId", "post" ) );
+        declarer.declare( new Fields( "companyId", "post", "lastFetchedKey" ) );
     }
 
 

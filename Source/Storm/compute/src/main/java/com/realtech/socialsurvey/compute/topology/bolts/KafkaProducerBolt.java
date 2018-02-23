@@ -16,6 +16,8 @@ import org.apache.storm.tuple.Tuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.realtech.socialsurvey.compute.dao.impl.RedisSocialMediaStateDaoImpl;
+
 public class KafkaProducerBolt extends BaseComputeBolt {
 
     private static final long serialVersionUID = 1L;
@@ -24,6 +26,7 @@ public class KafkaProducerBolt extends BaseComputeBolt {
     private static final String SOCIAL_POST_TOPIC_DEV = "social-post-topic-dev";
 
     Properties props;
+    private RedisSocialMediaStateDaoImpl redisSinceRecordFetchedDao;
 
     @Override
     public void execute(Tuple tuple) {
@@ -39,6 +42,8 @@ public class KafkaProducerBolt extends BaseComputeBolt {
             kafkaWriter.flush();
         } catch (Exception e){
             success = false;
+            redisSinceRecordFetchedDao.resetLastFetched( tuple.getStringByField( "lastFetchedKey" ) );
+            // TODO reset lastfetched and add time to live
             LOG.warn("Kakfa server might be down !!! Needs to be handled immediately");
         }
         LOG.info("Emitting message from kafkaproducer bolt with companyId = {}, success = {}", tuple.getString(0), success);
@@ -54,6 +59,8 @@ public class KafkaProducerBolt extends BaseComputeBolt {
     public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         super.prepare(stormConf, context, collector);
 
+        this.redisSinceRecordFetchedDao = new RedisSocialMediaStateDaoImpl();
+        
         props = new Properties();
         props.put( ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, BROKER_URL );
         props.put( ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer" );
