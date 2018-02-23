@@ -1578,4 +1578,16 @@ public interface OrganizationManagementService
 
 
 	public boolean decryptEncompassPasswordIfPossible(OrganizationUnitSettings unitSettings);
+
+
+
+	/**
+	 * @param companyId
+	 * @param mailId
+	 * @return
+	 * @throws InvalidInputException 
+	 * @throws NonFatalException 
+	 */
+	public void updateAbusiveMailService(long companyId, String mailId) throws InvalidInputException, NonFatalException;
+
 }

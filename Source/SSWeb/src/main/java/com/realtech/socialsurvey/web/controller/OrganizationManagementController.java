@@ -99,7 +99,10 @@ import com.realtech.socialsurvey.core.utils.StateLookupExclusionStrategy;
 import com.realtech.socialsurvey.core.vo.SurveyPreInitiationList;
 import com.realtech.socialsurvey.core.vo.UserList;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookData;
+import com.realtech.socialsurvey.web.api.builder.SSApiIntergrationBuilder;
 import com.realtech.socialsurvey.web.common.JspResolver;
+
+import retrofit.client.Response;
 
 
 // JIRA: SS-24 BY RM02 BOC
@@ -164,6 +167,9 @@ public class OrganizationManagementController
 
     @Autowired
     private EncryptionHelper encryptionHelper;
+    
+    @Autowired
+    private SSApiIntergrationBuilder ssApiIntergrationBuilder;
 
     @Value ( "${CDN_PATH}")
     private String endpoint;
@@ -2894,7 +2900,7 @@ public class OrganizationManagementController
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while updating complaint registration settings. Reason : " + e.getMessage(), e );
             message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
-        }
+        } 
 
         return message;
     }
@@ -2907,10 +2913,9 @@ public class OrganizationManagementController
         String mailId = request.getParameter( "mailId" );
 
         String message = "";
-        String mailIDStr = new String();
         User user = sessionHelper.getCurrentUser();
-        OrganizationUnitSettings unitSettings = null;
-        AbusiveMailSettings originalAbusiveMailSettings = new AbusiveMailSettings();
+        String mailIDStr = "";
+       
 
         try {
 
@@ -2922,79 +2927,25 @@ public class OrganizationManagementController
                     DisplayMessageConstants.GENERAL_ERROR );
             }
 
-            if ( !mailId.contains( "," ) ) {
-                if ( !organizationManagementService.validateEmail( mailId.trim() ) )
-                    throw new InvalidInputException( "Mail id - " + mailId + " entered as send alert to input is invalid",
-                        DisplayMessageConstants.GENERAL_ERROR );
-                else
-                    mailIDStr = mailId.trim();
-            } else {
-                String mailIds[] = mailId.split( "," );
-
-                if ( mailIds.length == 0 )
-                    throw new InvalidInputException( "Mail id - " + mailId + " entered as send alert to input is empty",
-                        DisplayMessageConstants.GENERAL_ERROR );
-
-                for ( String mailID : mailIds ) {
-                    if ( !organizationManagementService.validateEmail( mailID.trim() ) )
-                        throw new InvalidInputException(
-                            "Mail id - " + mailID + " entered amongst the mail ids as send alert to input is invalid",
-                            DisplayMessageConstants.GENERAL_ERROR );
-                    else
-                        mailIDStr += mailID.trim() + " , ";
-                }
-                mailId = mailIDStr.substring( 0, mailIDStr.length() - 2 );
-            }
 
             long entityId = user.getCompany().getCompanyId();
+            
+            //add service function
+            ssApiIntergrationBuilder.getIntegrationApi().updateAbusiveMail( entityId,mailId);
 
-            unitSettings = organizationManagementService.getCompanySettings( entityId );
 
-            if ( unitSettings == null )
-                throw new NonFatalException( "Company settings cannot be found for id : " + entityId );
-
-            if ( unitSettings.getSurvey_settings() == null ) {
-                // Adding default text for various flows of survey.
-                SurveySettings surveySettings = new SurveySettings();
-                surveySettings.setHappyText( happyText );
-                surveySettings.setNeutralText( neutralText );
-                surveySettings.setSadText( sadText );
-                surveySettings.setHappyTextComplete( happyTextComplete );
-                surveySettings.setNeutralTextComplete( neutralTextComplete );
-                surveySettings.setSadTextComplete( sadTextComplete );
-                surveySettings.setAutoPostEnabled( true );
-                surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
-                surveySettings.setAuto_post_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
-
-                surveySettings.setSurvey_reminder_interval_in_days( CommonConstants.DEFAULT_REMINDERMAIL_INTERVAL );
-                unitSettings.setSurvey_settings( surveySettings );
-            }
-
-            if ( unitSettings.getSurvey_settings().getAbusive_mail_settings() != null )
-            	originalAbusiveMailSettings = unitSettings.getSurvey_settings().getAbusive_mail_settings();
-
-			originalAbusiveMailSettings.setMailId( mailId );
-            unitSettings.getSurvey_settings().setAbusive_mail_settings(originalAbusiveMailSettings);
-
-            if ( originalAbusiveMailSettings.getMailId().trim().isEmpty() )
-                return "";
-
-            LOG.info( "Updating Abusive Email Settings" );
-
-            if ( organizationManagementService.updateSurveySettings( unitSettings, unitSettings.getSurvey_settings() ) ) {
-                LOG.info( "Updated Abusive Email Settings" );
-                message = messageUtils.getDisplayMessage( DisplayMessageConstants.ABUSIVE_EMAIL_SUCCESSFUL,
-                    DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
-            }
+            LOG.info( "Updated Abusive Email Settings" );
+            message = messageUtils.getDisplayMessage( DisplayMessageConstants.ABUSIVE_EMAIL_SUCCESSFUL,
+                DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while updating abusive registration settings. Reason : " + e.getMessage(), e );
             message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
-        }
+        }	
 
         return message;
     }
     
-
+   
     @RequestMapping ( value = "/fetchsurveysunderresolution", method = RequestMethod.GET)
     public String fetchSurveysUnderResolution( Model model, HttpServletRequest request )
     {

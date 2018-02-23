@@ -2362,7 +2362,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         Query query = new Query();
         query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyId ) );
         Update update = new Update();
-        update.set( CommonConstants.UNDER_RESOLUTION_COLUMN, true );
+        update.set( CommonConstants.ABUSIVE_NOTIFY_COLUMN, true );
         mongoTemplate.upsert( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.debug( "Method updateSurveyAsUnderResolution() to mark survey as under resolution finished." );
     }
@@ -3600,4 +3600,17 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.info( "Method updateZillowSourceIdInExistingSurveyDetails finished." );
     }
+
+
+	@Override
+	public void updateSurveyAsAbusiveNotify(String surveyId) {
+		LOG.debug( "Method updateSurveyAsAbusiveNotify() to mark survey as abusive notify started." );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyId ) );
+        Update update = new Update();
+        update.set( CommonConstants.ABUSIVE_NOTIFY_COLUMN, true );
+        mongoTemplate.upsert( query, update, SURVEY_DETAILS_COLLECTION );
+        LOG.debug( "Method updateSurveyAsAbusiveNotify() to mark survey as abusive notify finished." );
+	
+	}
 }

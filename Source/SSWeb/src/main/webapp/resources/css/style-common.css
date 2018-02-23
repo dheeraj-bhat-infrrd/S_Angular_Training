@@ -9149,13 +9149,22 @@ label.url-change-input-label {
 }
 
 .complaint-cont {
-	
+	padding-bottom: 30px;
+	border-bottom: 1px solid #ccc;
+}
+
+.abusive-cont{
+	padding-top:20px;
 }
 
 .mood-text {
 	line-height: 40px;
 	font-size: 14px;
 	font-family: 'opensanssemibold';
+}
+
+#abusive-email-form-submit{
+	margin-top: 25px;
 }
 
 .compl-input-cont {
