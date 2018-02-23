@@ -19,6 +19,7 @@ public class RedisSocialMediaStateDaoImpl implements RedisSocialMediaStateDao
     private static final Logger LOG = LoggerFactory.getLogger( RedisCompanyKeywordsDaoImpl.class );
     private static final String PREVIOUS = "previous";
     private static final String CURRENT = "current";
+    private static final String TWITTER_LOCK = "twitterLock:";
 
 
     @Override
@@ -71,6 +72,24 @@ public class RedisSocialMediaStateDaoImpl implements RedisSocialMediaStateDao
             }
         }
         return false;
+    }
+
+    @Override
+    public void setTwitterLock(int secondsUntilReset, String pageId) {
+        try(Jedis jedis = RedisDB.getPoolInstance().getResource()) {
+            jedis.setex(TWITTER_LOCK+pageId, secondsUntilReset,"lock"+pageId);
+        }
+    }
+
+    @Override
+    public boolean isTwitterRateLimitResetted(String pageId) {
+        try(Jedis jedis = RedisDB.getPoolInstance().getResource()) {
+            long ttlValue = jedis.ttl(TWITTER_LOCK+pageId);
+            if(ttlValue >= 1)
+                return false;
+            else
+                return true;
+        }
     }
 
 

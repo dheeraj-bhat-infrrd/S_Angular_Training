@@ -92,11 +92,13 @@ public class TwitterFeedProcessorImpl implements TwitterFeedProcessor
                     }
 
                     resultList = twitter.getUserTimeline( pageId, paging );
+
                     //todo save the twitterSecondsUnitlRest in redis if remainingCount becomes <= 100
                     LOG.info("RateLimit status for page {} is {} and resetTime is {}", pageId, resultList.getRateLimitStatus(),
                             (int)(((long)resultList.getRateLimitStatus().getResetTimeInSeconds() * 1000L - System.currentTimeMillis()) / 1000L));
-                    if(resultList.getRateLimitStatus().getRemaining() <= 100) {
-                        //set twitterSecondsUntilReset to resultList.getRateLimitStatus().
+                    if(resultList.getRateLimitStatus().getRemaining() <= 897) {
+                        int secondsUntilReset = (int)(((long)resultList.getRateLimitStatus().getResetTimeInSeconds() * 1000L - System.currentTimeMillis()) / 1000L);
+                        redisSocialMediaStateDaoImpl.setTwitterLock(secondsUntilReset,pageId);
                     }
 
                     for ( Status status : resultList ) {

@@ -30,4 +30,8 @@ public interface RedisSocialMediaStateDao extends Serializable
      * @return
      */
     public boolean resetLastFetched( String key);
+
+    void setTwitterLock(int secondsUntilReset, String pageId);
+
+    boolean isTwitterRateLimitResetted(String pageId);
 }
