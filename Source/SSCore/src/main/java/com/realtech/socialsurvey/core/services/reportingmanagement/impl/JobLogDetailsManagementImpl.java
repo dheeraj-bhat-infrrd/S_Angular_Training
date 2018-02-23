@@ -1,16 +1,13 @@
 package com.realtech.socialsurvey.core.services.reportingmanagement.impl;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Timestamp;
-import java.util.Calendar;
 import java.util.Properties;
 import java.util.UUID;
 
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +26,6 @@ import com.realtech.socialsurvey.core.dao.JobLogDetailsDao;
 import com.realtech.socialsurvey.core.dao.impl.JobLogDetailsDaoImpl;
 import com.realtech.socialsurvey.core.entities.JobLogDetails;
 import com.realtech.socialsurvey.core.entities.JobLogDetailsResponse;
-import com.realtech.socialsurvey.core.entities.Survey;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.reportingmanagement.JobLogDetailsManagement;
 
@@ -131,7 +127,6 @@ public class JobLogDetailsManagementImpl implements JobLogDetailsManagement
         jobLogDetails.setJobStartTime(new Timestamp(System.currentTimeMillis()));
         jobLogDetails.setJobUuid((UUID.randomUUID()).toString());
         long jobLogId = jobLogDetailsDao.insertJobLog(jobLogDetails);
-        LOG.info("THE RETURN OF SSH{}");
         LOG.debug( "method to fetch the job-log details for entity, getLastRunForEntity() finished." );
         return jobLogId;
     }
@@ -142,52 +137,66 @@ public class JobLogDetailsManagementImpl implements JobLogDetailsManagement
     	 JSch jsch = new JSch();
 
          Session session;
-         try {
-             // give the path to private key file 
-        	 jsch.addIdentity(sysPath.trim()); 
-             // Set User and IP of the remote host and SSH port.
-             session = jsch.getSession(userName,host,port);
-             // By default StrictHostKeyChecking  is set to yes as a security measure.
-             session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");
-             Properties config = new Properties();
-             // This check feature is controlled by StrictHostKeyChecking ssh parameter. 
-             config.put("StrictHostKeyChecking", "no");
-             session.setConfig(config);
-             session.connect();
+		try {
+			// give the path to private key file
+			jsch.addIdentity(sysPath.trim());
+			// Set User and IP of the remote host and SSH port.
+			session = jsch.getSession(userName, host, port);
+			// By default StrictHostKeyChecking is set to yes as a security measure.
+			session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");
+			Properties config = new Properties();
+			// This check feature is controlled by StrictHostKeyChecking ssh parameter.
+			config.put("StrictHostKeyChecking", "no");
+			session.setConfig(config);
+			
+			//connect session
+			LOG.info("Cooencting to ETL server as user {} to  host {} and port {}" , userName , host , port);
+			session.connect();
 
-             // create the execution channel over the session
-             ChannelExec channelExec = (ChannelExec) session.openChannel("exec");
-             // Set the command to execute on the channel and execute the command
-             channelExec.setCommand( scriptPath+" "+companyId+" "+jobLogId);
-             channelExec.connect();
+			// create the execution channel over the session
+			ChannelExec channelExec = (ChannelExec) session.openChannel("exec");
+			// Set the command to execute on the channel and execute the command
+			String commandToBeExecuted = scriptPath + " " + companyId + " " + jobLogId;
+			LOG.info("Executing command to ETL server : {}" , commandToBeExecuted);
+			channelExec.setCommand(commandToBeExecuted);
+			channelExec.connect();
 
-             // Get an InputStream from this channel and read messages, generated 
-             // by the executing command, from the remote side.
-             //InputStream in = channelExec.getInputStream();
-             //BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-             //String line;
-             //while ((line = reader.readLine()) != null) {
-             //   LOG.info(line);
-             //}
+			// Get an InputStream from this channel and read messages, generated
+			// by the executing command, from the remote side.
+			 InputStream in;
+			try {
+				in = channelExec.getInputStream();
+				BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+				 String line;
+				 LOG.info("Printing logs of ssh :");
+				 while ((line = reader.readLine()) != null) {
+					 LOG.info(line);
+				 }
+			} catch (IOException e) {
+				LOG.error("Error while reading ssh logs" , e);
+			}
+			 
 
-             // Command execution completed here.
+			// Command execution completed here.
 
-             // Retrieve the exit status of the executed command
-             int exitStatus = channelExec.getExitStatus();
-             if (exitStatus > 0) {
-            	 LOG.info("Remote script exec error! {}",exitStatus);
-            	 JobLogDetails jobLogDetails = jobLogDetailsDao.findById(JobLogDetails.class, jobLogId);
-            	 jobLogDetails.setStatus("Remote script exec error!");
-            	 jobLogDetailsDao.updateJobLog(jobLogDetails);
-             }
-             //Disconnect the Session
-             session.disconnect();
-         } catch (JSchException | InvalidInputException e) {
-             LOG.error("Exception caught in recalEtl {}",e);
-        	 JobLogDetails jobLogDetails = jobLogDetailsDao.findById(JobLogDetails.class, jobLogId);
-        	 jobLogDetails.setStatus("Exception caught in session connect");
-        	 jobLogDetailsDao.updateJobLog(jobLogDetails);
+			// Retrieve the exit status of the executed command
+			int exitStatus = channelExec.getExitStatus();
+			LOG.info("Exist status of command is {}" , exitStatus);
+			if (exitStatus > 0) {
+				LOG.info("Remote script exec error! {}", exitStatus);
+				JobLogDetails jobLogDetails = jobLogDetailsDao.findById(JobLogDetails.class, jobLogId);
+				jobLogDetails.setStatus("Remote script exec error " + exitStatus );
+				jobLogDetailsDao.updateJobLog(jobLogDetails);
+			}
+			// Disconnect the Session
+			LOG.info("Disconnecting ssh connection");
+			session.disconnect();
+		} catch (JSchException | InvalidInputException e) {
+			LOG.error("Exception caught  while trying to trigger user ranking etl {}", e);
+			JobLogDetails jobLogDetails = jobLogDetailsDao.findById(JobLogDetails.class, jobLogId);
+			jobLogDetails.setStatus("Exception caught  while trying to trigger user ranking etl : " + e.getMessage());
+			jobLogDetailsDao.updateJobLog(jobLogDetails);
 
-         }
+		}
     }
 }
