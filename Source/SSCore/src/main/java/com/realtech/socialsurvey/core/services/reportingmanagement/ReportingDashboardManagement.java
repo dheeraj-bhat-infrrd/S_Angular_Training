@@ -372,4 +372,11 @@ public interface ReportingDashboardManagement
 
 
 	public boolean saveEmailCountMonthData(List<SurveyInvitationEmailCountMonth> agentEmailCountsMonth);
+
+
+	public String generateSurveyInvitationEmailReport(long companyId, String entityType, long adminUserId,
+			Timestamp startDate) throws UnsupportedEncodingException, NonFatalException;
+
+
+	public List<SurveyInvitationEmailCountMonth> getSurveyInvitationEmailReportForMonth(long companyId, int month, int year);
 }

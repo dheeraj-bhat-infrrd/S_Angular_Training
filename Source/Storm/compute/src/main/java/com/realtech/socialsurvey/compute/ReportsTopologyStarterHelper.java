@@ -78,7 +78,9 @@ public class ReportsTopologyStarterHelper extends TopologyStarterHelper
         //add the spout
         builder.setSpout("ReportGenerationSpout", KafkaTopicSpoutBuilder.reportGenerationSpout(), 1);
         //add the bolts
-        builder.setBolt("UpdateFileUploadStatusBolt", new UpdateFileUploadStatusBolt(), 1)
+        builder.setBolt("QuerySolrToFetchSurveyRelatedMailsBolt", new AggregateSolrQueryBolt(), 1)
+        .shuffleGrouping("ReportGenerationSpout");
+        /*builder.setBolt("UpdateFileUploadStatusBolt", new UpdateFileUploadStatusBolt(), 1)
                 .shuffleGrouping("ReportGenerationSpout");
         builder.setBolt("QuerySolrToFetchSurveyRelatedMailsBolt", new AggregateSolrQueryBolt(), 1)
                 .shuffleGrouping("ReportGenerationSpout");
@@ -86,7 +88,7 @@ public class ReportsTopologyStarterHelper extends TopologyStarterHelper
                 .fieldsGrouping("QuerySolrToFetchSurveyRelatedMailsBolt", new Fields("fileUploadId"));
         builder.setBolt("UploadOnAmazonS3Bolt", new UploadOnAmazonS3Bolt(), 1).shuffleGrouping("WriteReportToExcelBolt");
         builder.setBolt("FileUploadStatusAndFileNameUpdationBolt", new UpdateFileUploadStatusAndFileNameBolt(), 1)
-                .shuffleGrouping("UploadOnAmazonS3Bolt");
+                .shuffleGrouping("UploadOnAmazonS3Bolt");*/
 
         return builder.createTopology();
     }

@@ -65,6 +65,14 @@ public class SurveyInvitationEmailCountMonth {
 	@Column(name = "received")
 	private int received;
 	
+	@Column(name = "dropped")
+	private int dropped;
+	
+	private String agentName;
+	private String agentEmail;
+	private String branchName;
+	private String regionName;
+	
 	public int getAgentId() {
 		return agentId;
 	}
@@ -149,16 +157,43 @@ public class SurveyInvitationEmailCountMonth {
 	public void setReceived(int received) {
 		this.received = received;
 	}
+	public String getAgentName() {
+		return agentName;
+	}
+	public void setAgentName(String agentName) {
+		this.agentName = agentName;
+	}
+	public String getAgentEmail() {
+		return agentEmail;
+	}
+	public void setAgentEmail(String agentEmail) {
+		this.agentEmail = agentEmail;
+	}
+	public String getBranchName() {
+		return branchName;
+	}
+	public void setBranchName(String branchName) {
+		this.branchName = branchName;
+	}
+	public String getRegionName() {
+		return regionName;
+	}
+	public void setRegionName(String regionName) {
+		this.regionName = regionName;
+	}
+	public int getDropped() {
+		return dropped;
+	}
+	public void setDropped(int dropped) {
+		this.dropped = dropped;
+	}
 	@Override
 	public String toString() {
 		return "SurveyInvitationEmailCountMonth [id=" + id + ", agentId=" + agentId + ", companyId=" + companyId
 				+ ", month=" + month + ", year=" + year + ", attempted=" + attempted + ", delivered=" + delivered
 				+ ", differed=" + differed + ", blocked=" + blocked + ", opened=" + opened + ", spamed=" + spamed
 				+ ", unsubscribed=" + unsubscribed + ", bounced=" + bounced + ", linkClicked=" + linkClicked
-				+ ", received=" + received + "]";
+				+ ", received=" + received + ", dropped=" + dropped + ", agentName=" + agentName + ", agentEmail=" + agentEmail + ", branchName="
+				+ branchName + ", regionName=" + regionName + "]";
 	}
-	
-	
-	
-
 }

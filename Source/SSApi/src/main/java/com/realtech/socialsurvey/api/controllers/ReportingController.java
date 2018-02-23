@@ -804,7 +804,7 @@ public class ReportingController
     
     
     @RequestMapping ( value = "/branchranking/month/year", method = RequestMethod.GET)
-    @ApiOperation ( value = "get nps report for a week or month")
+    @ApiOperation ( value = "get branch ranking report for month and year.")
     public String getBranchRankingReport( long companyId, int month, int year, int type ) throws InvalidInputException
     {
         String json = null;
@@ -820,7 +820,7 @@ public class ReportingController
     }
     
     @RequestMapping ( value = "/trxcount/agent", method = RequestMethod.GET)
-    @ApiOperation ( value = "get nps report for a week or month")
+    @ApiOperation ( value = "get received count for agents.")
     public String getReceivedCountsMonth(String startDateInGmt, String endDateInGmt) {
     	try {
 			return new Gson().toJson(reportingDashboardManagement.getReceivedCountsMonth(startDateInGmt,endDateInGmt));
@@ -840,5 +840,11 @@ public class ReportingController
     		responseEntity = new ResponseEntity<>(status,HttpStatus.INTERNAL_SERVER_ERROR);
     	}
     	return responseEntity;
+    }
+    @RequestMapping( value = "/emailreport/month/year", method = RequestMethod.GET)
+    @ApiOperation(value = "Get email report for month and year value.")
+    public String getSurveyInvitationEmailReport(long companyId,int month,int year) {
+    	LOGGER.info("API call to get survey invitation email report for month.");
+    	return new Gson().toJson( reportingDashboardManagement.getSurveyInvitationEmailReportForMonth( companyId, month, year ) );
     }
 }
