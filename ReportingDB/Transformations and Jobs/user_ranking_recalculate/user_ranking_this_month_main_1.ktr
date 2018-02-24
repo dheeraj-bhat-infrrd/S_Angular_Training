@@ -2321,7 +2321,7 @@
     <schema/>
     <table>user_ranking_this_month_main</table>
     <commit>10000</commit>
-    <truncate>Y</truncate>
+    <truncate>N</truncate>
     <ignore_errors>Y</ignore_errors>
     <use_batch>N</use_batch>
     <specify_fields>Y</specify_fields>
