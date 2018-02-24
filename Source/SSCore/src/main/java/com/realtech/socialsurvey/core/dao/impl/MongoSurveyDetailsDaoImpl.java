@@ -903,7 +903,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
                 new BasicDBObject( CommonConstants.DEFAULT_MONGO_ID_COLUMN, "count" ).append( "count",
                     new BasicDBObject( "$sum", new BasicDBObject( "$size", "$comb.sharedOn" ) ) ) );
             operations.add( new CustomAggregationOperation( secondGroup ) );
-            Aggregation aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, operations );
+            Aggregation aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, operations ).withOptions(Aggregation.newAggregationOptions().allowDiskUse(true).build());
             LOG.debug( "Aggregation : " + aggregation.toString() );
             AggregationResults<SurveyDetails> result = mongoTemplate.aggregate( aggregation, SURVEY_DETAILS_COLLECTION,
                 SurveyDetails.class );
