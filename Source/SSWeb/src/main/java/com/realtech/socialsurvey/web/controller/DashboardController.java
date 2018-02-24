@@ -331,11 +331,8 @@ public class DashboardController
             int sentSurveyCount = (int) dashboardService.getAllSurveyCount( columnName, columnValue, numberOfDays );
             LOG.debug( "Getting the social posts count with hierarchy" );
             
-            //Workaround for the bug found in company admin Dashboard Page for Adavantage RAC, while fetching socialpost count. 
-            //So in case of companyId 337 we assign socialPostsCount as 0
             int socialPostsCount=0;
-            
-            if(!(columnName!=null )){
+            if(columnName!=null ){
             		socialPostsCount = (int) dashboardService.getSocialPostsForPastNdaysWithHierarchy( columnName, columnValue, numberOfDays );
             }
             
