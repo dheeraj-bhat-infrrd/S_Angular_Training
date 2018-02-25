@@ -8,7 +8,6 @@ import com.realtech.socialsurvey.compute.utils.ChararcterUtils;
 import org.apache.storm.Config;
 import org.apache.storm.generated.StormTopology;
 import org.apache.storm.topology.TopologyBuilder;
-import org.apache.storm.tuple.Fields;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,18 +77,9 @@ public class ReportsTopologyStarterHelper extends TopologyStarterHelper
         //add the spout
         builder.setSpout("ReportGenerationSpout", KafkaTopicSpoutBuilder.reportGenerationSpout(), 1);
         //add the bolts
-        builder.setBolt("QuerySolrToFetchSurveyRelatedMailsBolt", new AggregateSolrQueryBolt(), 1)
+        builder.setBolt("AggregateSolrQueryBolt", new AggregateSolrQueryBolt(), 1)
         .shuffleGrouping("ReportGenerationSpout");
-        /*builder.setBolt("UpdateFileUploadStatusBolt", new UpdateFileUploadStatusBolt(), 1)
-                .shuffleGrouping("ReportGenerationSpout");
-        builder.setBolt("QuerySolrToFetchSurveyRelatedMailsBolt", new AggregateSolrQueryBolt(), 1)
-                .shuffleGrouping("ReportGenerationSpout");
-        builder.setBolt("WriteReportToExcelBolt", new WriteReportToExcelBolt(), 1)
-                .fieldsGrouping("QuerySolrToFetchSurveyRelatedMailsBolt", new Fields("fileUploadId"));
-        builder.setBolt("UploadOnAmazonS3Bolt", new UploadOnAmazonS3Bolt(), 1).shuffleGrouping("WriteReportToExcelBolt");
-        builder.setBolt("FileUploadStatusAndFileNameUpdationBolt", new UpdateFileUploadStatusAndFileNameBolt(), 1)
-                .shuffleGrouping("UploadOnAmazonS3Bolt");*/
-
+        
         return builder.createTopology();
     }
 

@@ -36,6 +36,6 @@ public interface SolrApiIntegrationService
 
     @Headers("Content-Type: application/json")
     @GET("ss-emails/select")
-    Call<String> getEmailCounts(@Query("q") String query, @Query("rows") int rows,@Query("fq") String fieldQuery, @Query("wt") String wt,
-    		@Query("facet")String facet, @Query("facet.field")String facetField, @Query("facet.pivot") List<String> facetPivot);
+    Call<String> getEmailCounts(@Query("q") String query, @Query("rows") int rows, @Query("wt") String wt,
+    		@Query("facet") Boolean facet, @Query("facet.field")String facetField, @Query("facet.pivot") List<String> facetPivot);
 }

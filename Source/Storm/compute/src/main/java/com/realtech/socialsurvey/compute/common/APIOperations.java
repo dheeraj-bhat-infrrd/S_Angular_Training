@@ -15,6 +15,7 @@ import retrofit2.Call;
 import retrofit2.Response;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -149,4 +150,21 @@ public class APIOperations
             throw new SolrProcessingException( "Exception while posting email message to solr", e );
         }
     }
+
+
+	public String getEmailCounts(String query, boolean isFacet, String facetField,
+			List<String> facetPivots) {
+        Response<String> response = null;
+        Call<String> requestCall = RetrofitApiBuilder.apiBuilderInstance()
+                        .getSolrAPIIntergrationService().getEmailCounts(query, 0, "json", isFacet, facetField, facetPivots);
+                try {
+					response =  requestCall.execute();
+				} catch (IOException e) {
+					LOG.error("Exception occured while fetching the data from solr.",e);
+				}
+                RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
+                if ( LOG.isTraceEnabled() )
+                    LOG.trace( "Email messages response {}", response.body() );
+        return response.body();
+	}
 }
