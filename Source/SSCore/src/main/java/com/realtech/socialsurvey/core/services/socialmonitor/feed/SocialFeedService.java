@@ -3,6 +3,8 @@ package com.realtech.socialsurvey.core.services.socialmonitor.feed;
 import com.realtech.socialsurvey.core.entities.SocialResponseObject;
 import java.util.List;
 
+import com.realtech.socialsurvey.core.entities.SegmentsEntity;
+import com.realtech.socialsurvey.core.entities.SegmentsVO;
 import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
 import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
 import com.realtech.socialsurvey.core.entities.SocialMonitorResponseData;
@@ -77,6 +79,27 @@ public interface SocialFeedService
      * @throws InvalidInputException
      */
     public SocialMonitorMacro getMacroById(String macroId, Long companyId) throws InvalidInputException;
+    
+    /**
+     * fetches all the regions and branches of a company
+     * @param companyId
+     * @param startIndex
+     * @param batchSize
+     * @return
+     * @throws InvalidInputException
+     */
+    public SegmentsVO getSegmentsByCompanyId(Long companyId, int startIndex, int batchSize) throws InvalidInputException;
+    
+    /**
+     * fetches all the users of a company
+     * @param companyId
+     * @param startIndex
+     * @param batchSize
+     * @return
+     * @throws InvalidInputException
+     */
+    public List<SegmentsEntity> getUsersByCompanyId(Long companyId, int startIndex, int batchSize) throws InvalidInputException;
+
 
     
 }

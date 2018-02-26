@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.realtech.socialsurvey.api.exceptions.SSApiException;
+import com.realtech.socialsurvey.core.entities.SegmentsEntity;
+import com.realtech.socialsurvey.core.entities.SegmentsVO;
 import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
 import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
 import com.realtech.socialsurvey.core.entities.SocialMonitorResponseData;
@@ -118,6 +120,38 @@ public class SocialMonitorFeedsController {
 			throw new SSApiException("Invalid input exception caught while fetching macro", ie);
 		}
 		return new ResponseEntity<>(socialMonitorMacro, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/segments/company/{companyId}", method = RequestMethod.GET)
+	@ApiOperation(value = "Get regions and branches for a company")
+	public ResponseEntity<?> getSegmentsByCompanyId(@PathVariable Long companyId, int startIndex, int limit)
+			throws InvalidInputException, SSApiException {
+		LOGGER.info("Fetching regions and branches for a company");
+		SegmentsVO segmentsVO;
+		try {
+			segmentsVO = socialFeedService.getSegmentsByCompanyId(companyId, startIndex, limit);
+		} catch (InvalidInputException ie) {
+			LOGGER.error("Invalid input exception caught while fetching branches and regions", ie);
+			throw new SSApiException("Invalid input exception caught while fetching branches and regions", ie);
+		}
+		return new ResponseEntity<>(segmentsVO, HttpStatus.OK);
+
+	}
+
+	@RequestMapping(value = "/users/company/{companyId}", method = RequestMethod.GET)
+	@ApiOperation(value = "Get users for a company")
+	public ResponseEntity<?> getUsersByCompanyId(@PathVariable Long companyId, int startIndex, int limit)
+			throws InvalidInputException, SSApiException {
+		LOGGER.info("Fetching users for a company");
+		List<SegmentsEntity> list = null;
+		try {
+			list = socialFeedService.getUsersByCompanyId(companyId, startIndex, limit);
+		} catch (InvalidInputException ie) {
+			LOGGER.error("Invalid input exception caught while fetching users", ie);
+			throw new SSApiException("Invalid input exception caught while fetching users", ie);
+		}
+		return new ResponseEntity<>(list, HttpStatus.OK);
+
 	}
 
 }
