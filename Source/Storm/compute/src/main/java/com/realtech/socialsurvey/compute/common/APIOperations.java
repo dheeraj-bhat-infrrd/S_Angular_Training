@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.compute.common;
 
+import com.google.gson.JsonObject;
 import com.realtech.socialsurvey.compute.entities.EmailMessage;
 import com.realtech.socialsurvey.compute.entities.SolrEmailMessageWrapper;
 import com.realtech.socialsurvey.compute.entities.request.SolrAdd;
@@ -152,10 +153,10 @@ public class APIOperations
     }
 
 
-	public String getEmailCounts(String query, String fieldQuery, boolean isFacet, String facetField,
+	public JsonObject getEmailCounts(String query, String fieldQuery, boolean isFacet, String facetField,
 			List<String> facetPivots) {
-        Response<String> response = null;
-        Call<String> requestCall = RetrofitApiBuilder.apiBuilderInstance()
+        Response<JsonObject> response = null;
+        Call<JsonObject> requestCall = RetrofitApiBuilder.apiBuilderInstance()
                         .getSolrAPIIntergrationService().getEmailCounts(query, fieldQuery, 0, "json", isFacet, facetField, facetPivots);
                 try {
 					response =  requestCall.execute();

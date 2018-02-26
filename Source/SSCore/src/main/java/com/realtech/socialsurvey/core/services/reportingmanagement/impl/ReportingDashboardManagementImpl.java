@@ -8,10 +8,8 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.net.URLEncoder;
 import java.sql.Timestamp;
-import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -4790,17 +4788,14 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
 
 	@Override
-	public List<SurveyInvitationEmailCountMonth> getReceivedCountsMonth(String startDateInGmt, String endDateInGmt)
+	public List<SurveyInvitationEmailCountMonth> getReceivedCountsMonth(long startDate, long endDate)
 			throws ParseException {
 		List<SurveyInvitationEmailCountMonth> receivedCountMonth = new ArrayList<SurveyInvitationEmailCountMonth>();
-		DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-		Timestamp startDate = new Timestamp(format.parse(startDateInGmt).getTime());
-		Timestamp endDate = new Timestamp(format.parse(endDateInGmt).getTime());
 		Calendar cal = Calendar.getInstance();
-		cal.setTimeInMillis(startDate.getTime());
+		cal.setTimeInMillis(startDate);
 		int month = cal.get(Calendar.MONTH) + 1;
 		int year = cal.get(Calendar.YEAR);
-		List<Object[]> receivedCount = surveyPreInitiationDao.getReceivedCountForDate(startDate, endDate);
+		List<Object[]> receivedCount = surveyPreInitiationDao.getReceivedCountForDate(new Timestamp(startDate), new Timestamp(endDate));
 		for (Object[] obj : receivedCount) {
 			SurveyInvitationEmailCountMonth mailCount = new SurveyInvitationEmailCountMonth();
 			mailCount.setAgentId((int) obj[1]);

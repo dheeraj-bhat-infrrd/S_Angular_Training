@@ -41,8 +41,8 @@ public interface SSApiIntegrationService
 
     @Headers ( "Content-Type: application/json")
     @GET ( "v1/trxcount/agent")
-	Call<List<SurveyInvitationEmailCountMonth>> getReceivedCountsMonth(@Query("startDateInGmt") String startDateInGmt,
-			@Query("endDateInGmt") String endDateInGmt);
+	Call<List<SurveyInvitationEmailCountMonth>> getReceivedCountsMonth(@Query("startDateInGmt") long startDate,
+			@Query("endDateInGmt") long endDate);
 
 
     @Headers ( "Content-Type: application/json")

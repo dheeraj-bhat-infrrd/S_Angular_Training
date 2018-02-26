@@ -821,9 +821,9 @@ public class ReportingController
     
     @RequestMapping ( value = "/trxcount/agent", method = RequestMethod.GET)
     @ApiOperation ( value = "get received count for agents.")
-    public String getReceivedCountsMonth(String startDateInGmt, String endDateInGmt) {
+    public List<SurveyInvitationEmailCountMonth> getReceivedCountsMonth(long startDateInGmt, long endDateInGmt) {
     	try {
-			return new Gson().toJson(reportingDashboardManagement.getReceivedCountsMonth(startDateInGmt,endDateInGmt));
+			return reportingDashboardManagement.getReceivedCountsMonth(startDateInGmt,endDateInGmt);
 		} catch (ParseException e) {
 			LOGGER.error("Error getting received count.",e);
 		} 

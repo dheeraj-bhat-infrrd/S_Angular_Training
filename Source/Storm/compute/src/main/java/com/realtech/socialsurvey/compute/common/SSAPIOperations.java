@@ -85,9 +85,9 @@ public class SSAPIOperations
         }
     }
 
-	public List<SurveyInvitationEmailCountMonth> getReceivedCountsMonth(String startDateInGmt, String endDateInGmt) throws IOException {
+	public List<SurveyInvitationEmailCountMonth> getReceivedCountsMonth(long startDate, long endDate) throws IOException {
 		Call<List<SurveyInvitationEmailCountMonth>> request = RetrofitApiBuilder.apiBuilderInstance()
-				.getSSAPIIntergrationService().getReceivedCountsMonth(startDateInGmt,endDateInGmt);
+				.getSSAPIIntergrationService().getReceivedCountsMonth(startDate,endDate);
 		Response<List<SurveyInvitationEmailCountMonth>> response = request.execute();
 		RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
 		return response.body();
