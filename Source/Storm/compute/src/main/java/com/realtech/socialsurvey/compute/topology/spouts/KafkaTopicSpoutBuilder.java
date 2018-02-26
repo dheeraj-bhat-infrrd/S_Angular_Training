@@ -108,7 +108,7 @@ public class KafkaTopicSpoutBuilder
         String consumerGroup = ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? REPORT_CONSUMER_GROUP
                 : ChararcterUtils.appendWithHypen(REPORT_CONSUMER_GROUP, EnvConstants.getProfile() );
         SpoutConfig reportSpoutConfig = new SpoutConfig( zkHosts, topicName, ZOOKEEPER_ROOT, consumerGroup );
-        reportSpoutConfig.ignoreZkOffsets = true;
+        reportSpoutConfig.ignoreZkOffsets = false;
         reportSpoutConfig.scheme = new SchemeAsMultiScheme( new StringScheme() );
         LOG.info( "Report topic spout initiated. Topic: {}, Consumer Group: {}", topicName, consumerGroup );
         return new KafkaSpout( reportSpoutConfig );

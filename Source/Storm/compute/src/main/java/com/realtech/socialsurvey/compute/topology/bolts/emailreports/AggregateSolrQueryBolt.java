@@ -5,6 +5,7 @@ package com.realtech.socialsurvey.compute.topology.bolts.emailreports;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.realtech.socialsurvey.compute.common.APIOperations;
 import com.realtech.socialsurvey.compute.common.ComputeConstants;
+import com.realtech.socialsurvey.compute.common.EmailConstants;
 import com.realtech.socialsurvey.compute.common.SSAPIOperations;
 import com.realtech.socialsurvey.compute.entities.ReportRequest;
 import com.realtech.socialsurvey.compute.entity.SurveyInvitationEmailCountMonth;
@@ -70,6 +72,7 @@ public class AggregateSolrQueryBolt extends BaseComputeBoltWithAck {
 			String endDateInGmt = reportRequest.getEndDateExpectedTimeZone();
 			
 			JsonObject jsonObject = getSolrResponse(ReportType.SURVEY_INVITATION_EMAIL_REPORT.getName(), startDateInGmt, endDateInGmt);
+			
 
 			/*response = new SolrEmailCountDaoImpl().getEmailCountForDateRange(
 					ReportType.SURVEY_INVITATION_EMAIL_REPORT.getName(), startDateInGmt, endDateInGmt);*/
@@ -82,24 +85,29 @@ public class AggregateSolrQueryBolt extends BaseComputeBoltWithAck {
 			} catch (IOException e1) {
 				LOG.error("Exception while fetching the transaction received count.", e1);
 			}
-			// Attempted count
-			getEmailCounts(jsonObject,agentEmailCountsMonth, ComputeConstants.SOLR_PIVOT_AGENT_EMAIL_ATTEMPT);
-			// Delivered count
-			getEmailCounts(jsonObject,agentEmailCountsMonth, ComputeConstants.SOLR_PIVOT_AGENT_DELIVERED);
-			// Differed count
-			getEmailCounts(jsonObject,agentEmailCountsMonth, ComputeConstants.SOLR_PIVOT_AGENT_DIFFERED);
-			// Blocked count
-			getEmailCounts(jsonObject,agentEmailCountsMonth, ComputeConstants.SOLR_PIVOT_AGENT_BLOCKED);
-			// Opened count
-			getEmailCounts(jsonObject,agentEmailCountsMonth, ComputeConstants.SOLR_PIVOT_AGENT_OPENED);
-			// Spamed count
-			getEmailCounts(jsonObject,agentEmailCountsMonth, ComputeConstants.SOLR_PIVOT_AGENT_SPAMED);
-			// Unsubscribed count
-			getEmailCounts(jsonObject,agentEmailCountsMonth, ComputeConstants.SOLR_PIVOT_AGENT_UNSUBSCRIBED);
-			// Bounced count
-			getEmailCounts(jsonObject,agentEmailCountsMonth, ComputeConstants.SOLR_PIVOT_AGENT_BOUNCED);
-			// Link Clicked count
-			getEmailCounts(jsonObject,agentEmailCountsMonth, ComputeConstants.SOLR_PIVOT_AGENT_LINK_CLICKED);
+			
+			if(jsonObject != null) {
+				// Attempted count
+				getEmailCounts(jsonObject,agentEmailCountsMonth, ComputeConstants.SOLR_PIVOT_AGENT_EMAIL_ATTEMPT);
+				// Delivered count
+				getEmailCounts(jsonObject,agentEmailCountsMonth, ComputeConstants.SOLR_PIVOT_AGENT_DELIVERED);
+				// Differed count
+				getEmailCounts(jsonObject,agentEmailCountsMonth, ComputeConstants.SOLR_PIVOT_AGENT_DIFFERED);
+				// Blocked count
+				getEmailCounts(jsonObject,agentEmailCountsMonth, ComputeConstants.SOLR_PIVOT_AGENT_BLOCKED);
+				// Opened count
+				getEmailCounts(jsonObject,agentEmailCountsMonth, ComputeConstants.SOLR_PIVOT_AGENT_OPENED);
+				// Spamed count
+				getEmailCounts(jsonObject,agentEmailCountsMonth, ComputeConstants.SOLR_PIVOT_AGENT_SPAMED);
+				// Unsubscribed count
+				getEmailCounts(jsonObject,agentEmailCountsMonth, ComputeConstants.SOLR_PIVOT_AGENT_UNSUBSCRIBED);
+				// Bounced count
+				getEmailCounts(jsonObject,agentEmailCountsMonth, ComputeConstants.SOLR_PIVOT_AGENT_BOUNCED);
+				// Link Clicked count
+				getEmailCounts(jsonObject,agentEmailCountsMonth, ComputeConstants.SOLR_PIVOT_AGENT_LINK_CLICKED);
+			} else {
+				LOG.info("Solr returned null response for date range.");
+			}
 			
 			if(agentEmailCountsMonth == null || agentEmailCountsMonth.size() <= 0) {
 				LOG.info("No data found for date range.");
@@ -122,9 +130,11 @@ public class AggregateSolrQueryBolt extends BaseComputeBoltWithAck {
 		facetPivots.add(ComputeConstants.SOLR_PIVOT_AGENT_UNSUBSCRIBED);
 		facetPivots.add(ComputeConstants.SOLR_PIVOT_AGENT_BOUNCED);
 		facetPivots.add(ComputeConstants.SOLR_PIVOT_AGENT_LINK_CLICKED);
-				
+		
+		String fieldQuery = formulateFieldQuery(Arrays.asList( EmailConstants.EMAIL_TYPE_SURVEY_INVITATION_MAIL,
+                EmailConstants.EMAIL_TYPE_SURVEY_REMINDER_MAIL ),startDateInGmt, endDateInGmt);
 		String response = APIOperations.getInstance()
-				.getEmailCounts( "agentId: [1 TO *]", isFacet, facetField, facetPivots );
+				.getEmailCounts( "agentId: [1 TO *]",fieldQuery, isFacet, facetField, facetPivots );
 		
 		JsonElement jsonElement = new JsonParser().parse(response);
 		JsonObject obj = jsonElement.getAsJsonObject().getAsJsonObject("facet_counts").getAsJsonObject("facet_pivot");
@@ -234,6 +244,21 @@ public class AggregateSolrQueryBolt extends BaseComputeBoltWithAck {
 			countMap.put(agentId, countVal);
 		}
 		return countMap;
+	}
+	
+	public String formulateFieldQuery(List<String> mailTypes, String startDate, String endDate) {
+		LOG.info("Formulating the field query for getting mails based on mailType , start and end date");
+		StringBuilder mailTypeInQueryBuilder = new StringBuilder("(");
+		for (String mailType : mailTypes) {
+			mailTypeInQueryBuilder.append(" ").append(mailType);
+		}
+		mailTypeInQueryBuilder.append(")");
+
+		StringBuilder fieldQuery = new StringBuilder("mailType:").append(mailTypeInQueryBuilder)
+				.append(" AND emailAttemptedDate:[").append(startDate).append(" TO ").append(endDate).append("]");
+
+		LOG.info("Field query: {}", fieldQuery);
+		return fieldQuery.toString();
 	}
 
 }
