@@ -67,6 +67,15 @@
 							</select>	
 						</div>
 					</div>
+					<div id="email-rep-time-div" class="float-left board-div hide">
+						<div class="dash-btn-dl-sd-admin time-selector" style="width:200px; margin-top:-5px">
+							<select id="email-rep-selector" class="float-left dash-download-sel-item board-selector-choice" style="width:100%">
+								<!-- <option value=1 data-report="thisYear">All Time</option>
+								<option value=2 data-report="thisMonth">This Month</option> -->
+								<option value=3 data-report="lastYear">Last Month</option>
+							</select>	
+						</div>
+					</div>
 					<div class="generate-report-date-range" id="date-pickers">
 						<div style="display: -webkit-box; display:inline-flex;">
 							<span class="generate-report-span-date">Date</span>
@@ -120,7 +129,7 @@ $(document).ready(function() {
 	
 	var selectedVal = $('#generate-survey-reports').val();
 	var key = parseInt(selectedVal);
-	if(key == 101 || key == 102 || key == 103 || key == 106 || key == 112){
+	if(key == 101 || key == 102 || key == 103 || key == 106 || key == 112 || key == 1001){
 	$('#date-pickers').hide();
 	}
 	
@@ -128,6 +137,12 @@ $(document).ready(function() {
 		$('#report-time-div').removeClass('hide');
 	}else{
 		$('#report-time-div').addClass('hide');
+	}
+	
+	if(key == 1001){
+		$('#email-rep-time-div').removeClass('hide');
+	}else{
+		$('#email-rep-time-div').addClass('hide');
 	}
 	
 	var startIndex=0;
