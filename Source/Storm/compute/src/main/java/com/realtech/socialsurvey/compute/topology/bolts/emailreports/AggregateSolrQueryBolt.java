@@ -4,11 +4,14 @@
 package com.realtech.socialsurvey.compute.topology.bolts.emailreports;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.tuple.Tuple;
@@ -68,8 +71,14 @@ public class AggregateSolrQueryBolt extends BaseComputeBoltWithAck {
 
 		if (reportRequest.getReportType().equals(ReportType.SURVEY_INVITATION_EMAIL_REPORT.getName())) {
 
-			String startDateInGmt = reportRequest.getStartDateExpectedTimeZone();
-			String endDateInGmt = reportRequest.getEndDateExpectedTimeZone();
+			long startDate = reportRequest.getStartTime();
+			long endDate = reportRequest.getEndTime();
+			
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+			sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+			
+			String startDateInGmt = sdf.format(new Date(startDate));
+			String endDateInGmt = sdf.format(new Date(endDate));
 			
 			JsonObject jsonObject = getSolrResponse(ReportType.SURVEY_INVITATION_EMAIL_REPORT.getName(), startDateInGmt, endDateInGmt);
 			
