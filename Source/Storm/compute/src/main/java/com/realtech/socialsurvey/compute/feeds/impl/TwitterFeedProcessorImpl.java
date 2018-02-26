@@ -140,7 +140,6 @@ public class TwitterFeedProcessorImpl implements TwitterFeedProcessor
         feed.setRetweetCount( status.getRetweetCount() );
         RateLimitStatus rateLimitStatus = status.getRateLimitStatus();
         if ( rateLimitStatus != null ) {
-            LOG.info("Rate Limit = {} and Remaining limit {}", status.getRateLimitStatus().getLimit(), status.getRateLimitStatus().getRemaining());
             feed.setRemaining( status.getRateLimitStatus().getRemaining() );
             feed.setLimit( status.getRateLimitStatus().getLimit() );
             feed.setResetTimeInSeconds( status.getRateLimitStatus().getResetTimeInSeconds() );
