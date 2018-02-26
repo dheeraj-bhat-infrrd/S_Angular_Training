@@ -430,7 +430,7 @@
 			value="com.realtech.socialsurvey.core.starter.BulkSurveyImporter" />
 		<property name="jobDataAsMap">
 			<map>
-				<entry key="surveyHandler" value-ref="surveyHandler" />
+				<entry key="surveyImportHandler" value-ref="surveyImportHandler" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -488,19 +488,27 @@
 		<property name="durability" value="true" />
 	</bean> 
 	
-	
 	<!-- Survey invitation mail count month job -->
 	<bean id="surveyInvitationEmailCountJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass" value="com.realtech.socialsurvey.core.starter.SurveyInvitationEmailCountJob" />
 		<property name="jobDataAsMap">
 			<map>
-				<entry key="streamApiIntegrationBuilder" value-ref="streamApiIntegrationBuilder" />
+			<entry key="streamApiIntegrationBuilder" value-ref="streamApiIntegrationBuilder" />
 			</map>
+			</property>
+			<property name="durability" value="true" />
+	</bean>
+
+	<bean id="failedstreammsgprocessorjobdetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass" value="com.realtech.socialsurvey.core.starter.FailedStreamMsgProcessor" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="streamMessagesService" value-ref="streamMessagesService" />
+				<entry key="streamApiIntegrationBuilder" value-ref="streamApiIntegrationBuilder" />
+				</map>
 		</property>
 		<property name="durability" value="true" />
 	</bean> 
-	
-	
 	
 	<!-- setting cron for Review Count Updater -->
 	<bean id="solrreviewcounterupdatercron"
@@ -623,7 +631,7 @@
 	<bean id="crmdataagentidmappercron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="crmdataagentidmapperjobdetail" />
-		<property name="cronExpression" value="0 30 * * * ?" />
+		<property name="cronExpression" value="0 35 * * * ?" />
 	</bean>
 
 	<!-- setting cron for loading image from linkedin to amazon server -->
@@ -731,7 +739,7 @@
 	<bean id="monthlydigeststartercron"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="monthlydigeststarter" />
-        <property name="cronExpression" value="0 0/5 * 1/1 * ?" />
+        <property name="cronExpression" value="0 55 14 5 1/1 ?" />
 	</bean>
 
 	<bean id="transactionActivityMonitorCron"
@@ -755,6 +763,12 @@
 		<property name="cronExpression" value="0 30 12 1 1/1 ? *" />
 	</bean>
 	
+	<bean id="failedstreammsgprocessorceron"
+		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="failedstreammsgprocessorjobdetail" />
+		<property name="repeatCount" value="0" />
+		<property name="startDelay" value="2000" />
+	</bean>
 	
 
 	<!-- Scheduler factory -->
@@ -794,6 +808,7 @@
 				<ref bean="transactionActivityMonitorJobDetail" />	
 				<ref bean="surveycsvuploadjobdetail" />
 				<ref bean="surveyInvitationEmailCountJob" />
+				<!-- <ref bean="failedstreammsgprocessorjobdetail" />  -->
 			</list>
 		</property>
 
@@ -833,6 +848,7 @@
 				<ref bean="transactionActivityMonitorCron" />
 				<ref bean="surveycsvuploadcron" />
 				<ref bean="surveyInvitationEmailCountCron" />
+				<!--  <ref bean="failedstreammsgprocessorceron" />  -->
 			</list>
 		</property>
 		<property name="quartzProperties">
@@ -856,6 +872,8 @@
 		class="com.realtech.socialsurvey.core.services.generator.impl.UrlGeneratorImpl" />
 	<bean id="surveyHandler"
 		class="com.realtech.socialsurvey.core.services.surveybuilder.impl.SurveyHandlerImpl" />
+	<bean id="surveyImportHandler"
+		class="com.realtech.socialsurvey.core.handler.SurveyImportHandler" />
 	<bean id="emailServices"
 		class="com.realtech.socialsurvey.core.services.mail.impl.EmailServicesImpl" />
 	<bean id="userManagementService"
@@ -967,6 +985,11 @@
 
 	<!-- Activity Management service bean -->
 	<bean id="activityManagementService"
-		class="com.realtech.socialsurvey.core.services.activitymanager.impl.ActivityManagementServiceImpl" />
+		class="com.realtech.socialsurvey.core.services.activitymanager.impl.ActivityManagementServiceImpl" />	
 	
+	<bean id="streamMessagesService"
+		class="com.realtech.socialsurvey.core.services.stream.impl.StreamMessagesServiceImpl" />	
+		
+	<bean id="streamApiIntegrationBuilder"
+		class="com.realtech.socialsurvey.core.integration.stream.StreamApiIntegrationBuilder" />
 </beans>

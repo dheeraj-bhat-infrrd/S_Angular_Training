@@ -828,7 +828,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
             query
                 /*.addCriteria( Criteria.where( CommonConstants.PROFILE_IMAGE_URL_SOLR )
                     .regex( StringEscapeUtils.escapeJava( amazonEndPoint ) + ".*" ) )*/
-                .addCriteria( Criteria.where( CommonConstants.PROFILE_IMAGE_URL_SOLR ).ne( null ) )
+                .addCriteria( new Criteria().andOperator( Criteria.where( CommonConstants.PROFILE_IMAGE_URL_SOLR ).ne( null ),
+                    ( Criteria.where( CommonConstants.PROFILE_IMAGE_URL_SOLR ).ne( "" ) ) ) )
                 .addCriteria( Criteria.where( CommonConstants.IS_PROFILE_IMAGE_PROCESSED_COLUMN ).is( false ) );
         } else if ( imageType.equals( CommonConstants.IMAGE_TYPE_LOGO ) ) {
             query
@@ -937,7 +938,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
                 update.set( CommonConstants.LOGO_COLUMN, "" );
                 update.set( CommonConstants.LOGO_THUMBNAIL_COLUMN, "" );
             }
-            update.set( CommonConstants.IS_LOGO_IMAGE_PROCESSED_COLUMN, "" );
+            update.set( CommonConstants.IS_LOGO_IMAGE_PROCESSED_COLUMN, false );
         } else {
             throw new InvalidInputException( "Invalid image type" );
         }

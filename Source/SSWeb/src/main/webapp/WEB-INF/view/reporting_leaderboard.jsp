@@ -62,7 +62,7 @@
 	</div>
 	
 	<div id="my-rank" class="my-rank">
-		<div id="my-rank-btn" class="float-right paginate-button top-ten-ranks-btn" style="margin-top: 20px;">Me</div>
+		<div id="my-rank-btn" class="float-right cursor-pointer top-ten-ranks-btn" style="margin-top: 20px;">Me</div>
 	</div>
 </c:if>
 <c:if test="${profilemasterid == 3}">
@@ -101,16 +101,16 @@
 </c:if>
 
 <div id="top-ten-ranks" class="top-ten-ranks">
-	<div id="top-ten-ranks-btn" class="float-right paginate-button top-ten-ranks-btn">Top Ten Ranks</div>
+	<div id="top-ten-ranks-btn" class="float-right cursor-pointer top-ten-ranks-btn">Top Ten Ranks</div>
 </div>
 <div id="lead-ranks-above" class="lead-ranks-above">
-	<div id="lead-ranks-above-btn" class="float-right paginate-button lead-ranks-above-btn">Load More</div>
+	<div id="lead-ranks-above-btn" class="float-right cursor-pointer lead-ranks-above-btn">Load More</div>
 </div>
 <div class="v-um-tbl-wrapper" id="leaderboard-list" style="width:100%;">
 	<jsp:include page="leaderboard_list.jsp"></jsp:include>
 </div>
 <div id="lead-ranks-below" class="lead-ranks-below">
-	<div id="lead-ranks-below-btn" class="float-right paginate-button lead-ranks-below-btn">Load More</div>
+	<div id="lead-ranks-below-btn" class="float-right cursor-pointer lead-ranks-below-btn">Load More</div>
 </div>
 
 <div id="leaderboard-empty-list-msg-div" class="hide">

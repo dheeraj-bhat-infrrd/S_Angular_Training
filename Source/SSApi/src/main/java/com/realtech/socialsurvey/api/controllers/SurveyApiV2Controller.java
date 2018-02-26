@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -98,7 +99,8 @@ public class SurveyApiV2Controller
     {
         LOGGER.info( "SurveyApiController.postSurveyTransaction started" );
         request.setAttribute( "input", surveyModel );
-
+        String message = "Survey successfully created.";
+        
         String authorizationHeader = request.getHeader( CommonConstants.SURVEY_API_REQUEST_PARAMETER_AUTHORIZATION );
         long companyId = 0;
         //authorize request
@@ -116,12 +118,25 @@ public class SurveyApiV2Controller
             return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, e.getMessage(), null, null, request, companyId );
         }
 
+        //duplicate check
+        List<String> customerEmailIds = new ArrayList<String>();
+        ListIterator<SurveyPreInitiation> iter = surveyPreInitiations.listIterator();
+        while(iter.hasNext()) {
+        		SurveyPreInitiation surveyPreInitiation = iter.next();
+        		if(customerEmailIds.contains(surveyPreInitiation.getCustomerEmailId())) {
+        			iter.remove();
+        			message += " Skipping duplicate customer email id " + surveyPreInitiation.getCustomerEmailId() + ".";
+        		}
+        		customerEmailIds.add(surveyPreInitiation.getCustomerEmailId());
+        }
         
+        
+        //validate survey
         try {
-        	surveyPreInitiations = surveyHandler.validatePreinitiatedRecord( surveyPreInitiations );
+        		surveyPreInitiations = surveyHandler.validatePreinitiatedRecord( surveyPreInitiations );
 		} catch (InvalidInputException e) {
             return restUtils.getRestResponseEntity( HttpStatus.NOT_ACCEPTABLE, e.getMessage(), null, null, request, companyId );
-            }
+        }
 
         
         //save the object to database
@@ -133,7 +148,7 @@ public class SurveyApiV2Controller
             }
             LOGGER.info( "SurveyApiController.postSurveyTransaction completed successfully" );
 
-            return restUtils.getRestResponseEntity( HttpStatus.CREATED, "Survey successfully created", "surveyId", surveyIds,
+            return restUtils.getRestResponseEntity( HttpStatus.CREATED, message, "surveyId", surveyIds,
                 request, companyId );
         } catch ( NonFatalException e ) {
             throw new SSApiException( e.getMessage(), e.getErrorCode() );

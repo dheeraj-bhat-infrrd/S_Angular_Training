@@ -69,6 +69,22 @@ namespace EncompassSocialSurvey.Service
             string encompassVersion = EncompassSocialSurveyConfiguration.fetchEncompassVersion;
             url += "&" + EncompassSocialSurveyConstant.fetchCompaniesUrlParameterVersion + "=" + encompassVersion;
 
+
+            url += "&status=";
+            //get companies based on their status
+            if (EncompassSocialSurveyConfiguration.fetchCompanyTypeDeterminant.Equals("A") )
+            {
+                url += "A";
+            }
+            else if (EncompassSocialSurveyConfiguration.fetchCompanyTypeDeterminant.Equals("I"))
+            {
+                url += "I";
+            }
+            else if (EncompassSocialSurveyConfiguration.fetchCompanyTypeDeterminant.Equals("D"))
+            {
+                url += "D";
+            }
+
             Logger.Debug("url for http request is :" + url);
             var response = client.GetAsync(url).Result;
 

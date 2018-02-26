@@ -421,4 +421,6 @@ public interface SurveyHandler
     public SurveysAndReviewsVO getIncompelteSurveysByFilterCriteria( Long startSurveyID, Date startTransactionDate,
         List<Long> userIds, int startIndex, int count, long companyId );
 
+	public void validateAndProcessSurveyPreInitiation(SurveyPreInitiation survey) throws InvalidInputException;
+
 }
