@@ -489,13 +489,14 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         }
         LOG.info( "Method to update pre initiated surveys agent id from " + fromUserId + " to " + toUser.getUserId()
             + " started." );
-        String queryStr = "UPDATE SURVEY_PRE_INITIATION SET AGENT_ID = ?, AGENT_NAME=?,AGENT_EMAILID=?, MODIFIED_ON=? WHERE AGENT_ID = ?";
+        String queryStr = "UPDATE SURVEY_PRE_INITIATION SET AGENT_ID = ?, AGENT_NAME=?,AGENT_EMAILID=?, MODIFIED_ON=?, COMPANY_ID=? WHERE AGENT_ID = ?";
         Query query = getSession().createSQLQuery( queryStr );
         query.setParameter( 0, toUser.getUserId() );
         query.setParameter( 1, toUser.getFirstName() + ( toUser.getLastName() == null ? "" : " " + toUser.getLastName() ) );
         query.setParameter( 2, toUser.getEmailId() );
         query.setParameter( 3, new Timestamp( System.currentTimeMillis() ) );
-        query.setParameter( 4, fromUserId );
+        query.setParameter( 4, toUser.getCompany().getCompanyId() );
+        query.setParameter( 5, fromUserId );
         query.executeUpdate();
         LOG.info( "Method to update pre initiated surveys agent id from " + fromUserId + " to " + toUser.getUserId()
             + " ended." );
@@ -916,5 +917,19 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         query.executeUpdate();
         LOG.debug( "Method updateCompanyIdForAllRecordsForAgent  ended." );
     }
+
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Object[]> getReceivedCountForDate(Timestamp startDate, Timestamp endDate) {
+	String queryStr = "select count(spi.SURVEY_PRE_INITIATION_ID) as received_count,spi.AGENT_ID "
+			+ "from SURVEY_PRE_INITIATION spi inner join USERS u on u.USER_ID=spi.AGENT_ID "
+			+ "and u.STATUS in (1,2) and spi.CREATED_ON between ? and ? group by spi.AGENT_ID "
+			+ "ORDER BY spi.AGENT_ID;";
+	Query query = getSession().createSQLQuery(queryStr);
+	query.setParameter(0, startDate);
+	query.setParameter(1, endDate);
+	return query.list();
+	}
 
 }

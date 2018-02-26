@@ -46,7 +46,7 @@ public final class UploadUtils {
         LOG.debug( "Validating uploaded image" );
         String imageFormat = isImageFormatValid( convFile );
         if ( imageFormat != "true" ) {
-            throw new InvalidInputException( "Upload failed: " + imageFormat + "is not a valid Format",
+            throw new InvalidInputException( "Upload failed: " + imageFormat + " is not a valid Format",
                 DisplayMessageConstants.INVALID_LOGO_FORMAT + "(" + imageFormats + ")" );
         }
         String imageSize = isImageSizeValid( convFile );

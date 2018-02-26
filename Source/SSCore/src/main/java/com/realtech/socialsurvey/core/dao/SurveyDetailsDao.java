@@ -374,4 +374,7 @@ public interface SurveyDetailsDao
 
 	public void updateSurveyNPSScore(SurveyDetails surveyDetails);
 
+
+	void updateSourceDetailInExistingSurveyDetails(SurveyDetails surveyDetails);
+
 }

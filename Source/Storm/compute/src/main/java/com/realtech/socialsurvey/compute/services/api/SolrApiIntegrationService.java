@@ -1,5 +1,7 @@
 package com.realtech.socialsurvey.compute.services.api;
 
+import java.util.List;
+
 import com.realtech.socialsurvey.compute.entities.SolrEmailMessageWrapper;
 import com.realtech.socialsurvey.compute.entities.request.SolrRequest;
 import com.realtech.socialsurvey.compute.entities.response.SOLRResponseObject;
@@ -32,4 +34,8 @@ public interface SolrApiIntegrationService
     Call<SOLRResponseObject<SolrEmailMessageWrapper>> getEmailMessage(@Query("q") String query, @Query("fq") String fieldQuery, @Query("fl") String fieldList,
                                                                       @Query("start") int start, @Query("rows") int rows, @Query("wt") String wt);
 
+    @Headers("Content-Type: application/json")
+    @GET("ss-emails/select")
+    Call<String> getEmailCounts(@Query("q") String query, @Query("rows") int rows, @Query("wt") String wt,
+    		@Query("facet") Boolean facet, @Query("facet.field")String facetField, @Query("facet.pivot") List<String> facetPivot);
 }

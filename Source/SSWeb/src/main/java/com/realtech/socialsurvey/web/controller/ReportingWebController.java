@@ -314,6 +314,14 @@ public class ReportingWebController
 
         model.addAttribute( PROFILE_NAME, profileName );
         model.addAttribute( USER_ID, user.getUserId() );
+        
+        //get detail of expire social media
+        boolean isSocialMediaExpired = false;
+        if ( !organizationManagementService.getExpiredSocailMedia( entityType, entityId ).isEmpty() ) {
+            isSocialMediaExpired = true;
+        }
+        session.setAttribute( "isSocialMediaExpired", isSocialMediaExpired );
+        
 
         //Get the hierarchy details associated with the current profile get all the id's like companyId, regionId , branchId
         try {
@@ -689,6 +697,8 @@ public class ReportingWebController
 
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        JobLogDetailsResponse jobLogDetailsResponse = null;
+        String lastSuccessfulRun = "";
 
         model.addAttribute( COLUMN_NAME, entityType );
         model.addAttribute( COLUMN_ID, entityId );
@@ -700,10 +710,42 @@ public class ReportingWebController
             isRealTechOrSSAdmin = true;
         }
         model.addAttribute( "isRealTechOrSSAdmin", isRealTechOrSSAdmin );
+        //add attribute to see if etl is running
+        Response responseIsRun = ssApiIntergrationBuilder.getIntegrationApi().isEtlRunning();
+        String responseIsRunString = responseIsRun != null ? new String( ( (TypedByteArray) responseIsRun.getBody() ).getBytes() ) : null;
+        if(responseIsRunString != null)
+        	responseIsRunString = responseIsRunString.substring( 1, responseIsRunString.length() - 1 );
+        model.addAttribute( "isEtlRunning", responseIsRunString );
+        //add attribute to pass last user ranking run info
+        
+        Response responseLastRun = ssApiIntergrationBuilder.getIntegrationApi().lastRunForEntity(entityId, entityType);
+        String responseLastRunString = responseLastRun != null ? new String( ( (TypedByteArray) responseLastRun.getBody() ).getBytes() ) : null;
+        if(responseLastRunString != null){
+        	responseLastRunString = responseLastRunString.substring( 1, responseLastRunString.length() - 1 );
+        	responseLastRunString = StringEscapeUtils.unescapeJava( responseLastRunString );
+            Type responseType = new TypeToken<JobLogDetailsResponse>() {}.getType();
+            jobLogDetailsResponse = new Gson().fromJson( responseLastRunString, responseType );
+            lastSuccessfulRun = jobLogDetailsResponse.getTimestampInEst();
+        }
+        model.addAttribute( "lastSuccessfulRun", lastSuccessfulRun );
 
         return JspResolver.RANKING_SETTINGS;
     }
 
+    //insert a record for user ranking job , in job log details and recalculate by kicking of script 
+    @ResponseBody
+    @RequestMapping ( value = "/recalranking", method = RequestMethod.GET)
+    public String recalRanking( Model model, HttpServletRequest request ) 
+    {
+        LOG.info( "Recalculating user ranking for a particular company" );
+        HttpSession session = request.getSession( false );
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        
+        Response response = ssApiIntergrationBuilder.getIntegrationApi().recalUserRanking( entityId, entityType);
+        return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+
+    }
 
     //Updating Ranking settings
     @ResponseBody

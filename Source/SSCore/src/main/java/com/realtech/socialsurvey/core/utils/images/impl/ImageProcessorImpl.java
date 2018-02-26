@@ -123,8 +123,8 @@ public class ImageProcessorImpl implements ImageProcessor {
 			}
 		}
 		catch (IOException e) {
-			LOG.error("Error while processing image.", e);
-			throw new ImageProcessingException("Error while processing image.", e);
+			LOG.error("Error while processing image", e);
+			throw new ImageProcessingException("Error while processing image", e);
 		}
 		return processedFile;
 	}
@@ -190,7 +190,7 @@ public class ImageProcessorImpl implements ImageProcessor {
 			bufferedImage = ImageIO.read(url);
 		}
 		catch (IOException e) {
-			LOG.error("Error while processing the image.", e);
+			LOG.error("Error while processing the image", e);
 			throw new ImageProcessingException("Could not proces image: " + imageFileName, e);
 		}
 		return bufferedImage;

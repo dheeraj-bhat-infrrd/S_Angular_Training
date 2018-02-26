@@ -152,4 +152,7 @@ public interface SurveyPreInitiationDao extends GenericDao<SurveyPreInitiation, 
 
 
     void disconnectSurveysFromAgent( long agentId );
+
+
+	public List<Object[]> getReceivedCountForDate(Timestamp startDate, Timestamp endDate);
 }

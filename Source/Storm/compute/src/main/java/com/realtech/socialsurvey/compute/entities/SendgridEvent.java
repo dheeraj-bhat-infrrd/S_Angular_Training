@@ -1,6 +1,6 @@
 package com.realtech.socialsurvey.compute.entities;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.gson.annotations.SerializedName;
 
 /**
  * Events from Sendgrid webhook
@@ -12,7 +12,7 @@ public class SendgridEvent
 
     private String email;
     private long timestamp;
-    @JsonProperty( value = "smtp-id" )
+    @SerializedName( value = "smtp-id" )
     private String smtpId;
     private String event;
     private String category;

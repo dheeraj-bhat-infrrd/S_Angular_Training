@@ -279,9 +279,9 @@
 						test="${not empty profile.profileImageUrlThumbnail && not empty fn:trim(profile.profileImageUrlThumbnail)}">
 						<div id="prog-img-container"
 							class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper">
-							<div class="prog-img-container">
+							<div class="prog-img-container" style="background-color: white !important; display: flex;align-items: center;">
 								<img itemprop="primaryImageOfPage" id="prof-image"
-									class="prof-image pos-relative"
+									class="prof-image pos-relative height-auto-resp"
 									src="${profile.profileImageUrlThumbnail}"></img>
 							</div>
 						</div>
@@ -880,7 +880,7 @@
 			
 			setUpReviewPopupListener();
 			
-			$(window).resize(adjustImage);
+			$(window).resize(adjustImageForPublicProfile);
 
 			//update google analytics
 			updateGoogleTrackingId();

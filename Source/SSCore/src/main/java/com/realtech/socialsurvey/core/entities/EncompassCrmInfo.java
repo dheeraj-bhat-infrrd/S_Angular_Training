@@ -18,6 +18,9 @@ public class EncompassCrmInfo extends CRMInfo
     private String sellerAgentEmail;
     private String sellerAgentName;
     
+    private String propertyAddress;
+    private String loanProcessorName;
+    private String loanProcessorEmail;
 
 
     public String getVersion()
@@ -174,8 +177,39 @@ public class EncompassCrmInfo extends CRMInfo
         this.sellerAgentName = sellerAgentName;
     }
 
+    
 
-    @Override
+    public String getPropertyAddress() {
+		return propertyAddress;
+	}
+
+
+	public void setPropertyAddress(String propertyAddress) {
+		this.propertyAddress = propertyAddress;
+	}
+
+
+	public String getLoanProcessorName() {
+		return loanProcessorName;
+	}
+
+
+	public void setLoanProcessorName(String loanProcessorName) {
+		this.loanProcessorName = loanProcessorName;
+	}
+
+
+	public String getLoanProcessorEmail() {
+		return loanProcessorEmail;
+	}
+
+
+	public void setLoanProcessorEmail(String loanProcessorEmail) {
+		this.loanProcessorEmail = loanProcessorEmail;
+	}
+
+
+	@Override
     public String toString()
     {
         return "crm_username: " + crm_username;

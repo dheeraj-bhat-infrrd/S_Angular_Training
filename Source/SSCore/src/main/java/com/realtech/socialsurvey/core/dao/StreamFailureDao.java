@@ -1,5 +1,7 @@
 package com.realtech.socialsurvey.core.dao;
 
+import java.util.List;
+
 import com.realtech.socialsurvey.core.entities.EmailEntity;
 import com.realtech.socialsurvey.core.entities.SendGridEventEntity;
 
@@ -23,4 +25,23 @@ public interface StreamFailureDao
      * @return
      */
     public boolean insertFailedClickEvent(SendGridEventEntity sendGridEventEntity);
+
+    /**
+     * 
+     * @return
+     */
+    public List<EmailEntity> getAllFailedStreamMessages(int start , int batchSize);
+
+	/**
+	 * 
+	 * @param id
+	 */
+	public void deleteFailedStreamMsg(String id);
+
+	/**
+	 * 
+	 * @param id
+	 * @param updatedValue
+	 */
+	public void updateRetryFailedForStreamMsg(String id, boolean updatedValue);
 }

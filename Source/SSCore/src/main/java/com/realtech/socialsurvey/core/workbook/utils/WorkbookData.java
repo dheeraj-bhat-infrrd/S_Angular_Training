@@ -49,6 +49,7 @@ import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.Survey;
 import com.realtech.socialsurvey.core.entities.SurveyCompanyMapping;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
+import com.realtech.socialsurvey.core.entities.SurveyInvitationEmailCountMonth;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionsMapping;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
@@ -76,6 +77,9 @@ public class WorkbookData
     public static final String EXCEL_FILE_EXTENSION = ".xlsx";
     public static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat( CommonConstants.DATE_FORMAT );
     public static final SimpleDateFormat REPORTING_DATE_FORMATTER = new SimpleDateFormat( CommonConstants.REPORTING_API_DATE_FORMAT );
+    private static final String SURVEY_INVITATION_EMAIL_REPORT_HEADER = "Agent Name,Agent Email,Agent Branch,Agent Region,"
+    		+ "Transactions Received for the Agent this month,Number of Emails sent for this agent this month,Number of emails delivered,"
+    		+ "Number of email bounced,Number of emails dropped,Number of emails deferred,Number of emails opened,Number of Surveys Clicked";
 
 
     @Autowired
@@ -1473,5 +1477,49 @@ public class WorkbookData
 		branchRankingReportDataToPopulate.add("Public Page URL");
 		branchRankingReportData.put(1, branchRankingReportDataToPopulate);
 		return branchRankingReportData;
+	}
+
+
+	public Map<Integer, List<Object>> getSurveyInvitationEmailReportInSheet(
+			List<SurveyInvitationEmailCountMonth> surveyInvitationEmailCountMonth) {
+		Map<Integer, List<Object>> surveyInvitationReportData = writeReportHeader(SURVEY_INVITATION_EMAIL_REPORT_HEADER);
+		
+		List<Object> surveyInvitationMailReportToPopulate = null;
+		int counter = 2;
+		for (SurveyInvitationEmailCountMonth surveyInvitationEmailMonth : surveyInvitationEmailCountMonth) {
+			surveyInvitationMailReportToPopulate = new ArrayList<Object>();
+
+			surveyInvitationMailReportToPopulate.add(surveyInvitationEmailMonth.getAgentName());
+			surveyInvitationMailReportToPopulate.add(surveyInvitationEmailMonth.getAgentEmail());
+			surveyInvitationMailReportToPopulate.add(surveyInvitationEmailMonth.getBranchName());
+			surveyInvitationMailReportToPopulate.add(surveyInvitationEmailMonth.getRegionName());
+			surveyInvitationMailReportToPopulate.add(surveyInvitationEmailMonth.getReceived());
+			surveyInvitationMailReportToPopulate.add(surveyInvitationEmailMonth.getAttempted());
+			surveyInvitationMailReportToPopulate.add(surveyInvitationEmailMonth.getDelivered());
+			surveyInvitationMailReportToPopulate.add(surveyInvitationEmailMonth.getBounced());
+			surveyInvitationMailReportToPopulate.add(surveyInvitationEmailMonth.getDropped());
+			surveyInvitationMailReportToPopulate.add(surveyInvitationEmailMonth.getDiffered());
+			surveyInvitationMailReportToPopulate.add(surveyInvitationEmailMonth.getOpened());
+			surveyInvitationMailReportToPopulate.add(surveyInvitationEmailMonth.getLinkClicked());
+
+			surveyInvitationReportData.put(counter++, surveyInvitationMailReportToPopulate);
+		}
+		return surveyInvitationReportData;
+	}
+	
+	/**
+	 * This method takes the report headers separated with ',' and writes to the map as the 1st row.
+	 * @param headers
+	 * @return
+	 */
+	private Map<Integer, List<Object>> writeReportHeader(String headers){
+		Map<Integer, List<Object>> reportDataToPopulate = new TreeMap<Integer, List<Object>>();
+		List<Object> headerList = new ArrayList<Object>();
+		String[] headerArr = headers.split(",");
+		for(String header : headerArr) {
+			headerList.add(header);
+		}
+		reportDataToPopulate.put(1, headerList);
+		return reportDataToPopulate;
 	}
 }

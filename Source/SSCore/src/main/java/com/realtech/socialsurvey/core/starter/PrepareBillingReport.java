@@ -150,13 +150,17 @@ public class PrepareBillingReport implements Runnable
                           int type = 2;
                           locationInS3 = reportingDashboardManagement.generateNpsReportForWeekOrMonth( fileUpload.getProfileValue(), fileUpload.getProfileLevel(),
                               fileUpload.getStartDate(), type);
-                      }else if (fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_BRANCH_RANKING_MONTHLY_REPORT){
+                      } else if (fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_BRANCH_RANKING_MONTHLY_REPORT){
                           locationInS3 = reportingDashboardManagement.generateBranchRankingReportMonth( fileUpload.getProfileValue(), fileUpload.getProfileLevel(),
                               fileUpload.getAdminUserId(),fileUpload.getStartDate());
 
-                     }else if (fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_BRANCH_RANKING_YEARLY_REPORT){
+                     } else if (fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_BRANCH_RANKING_YEARLY_REPORT){
                          locationInS3 = reportingDashboardManagement.generateBranchRankingReportYear( fileUpload.getProfileValue(), fileUpload.getProfileLevel(),
                              fileUpload.getAdminUserId(),fileUpload.getStartDate());
+
+                    } else if (fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_SURVEY_INVITATION_EMAIL_REPORT){
+                        locationInS3 = reportingDashboardManagement.generateSurveyInvitationEmailReport( fileUpload.getProfileValue(), fileUpload.getProfileLevel(),
+                                fileUpload.getAdminUserId(),fileUpload.getStartDate());
 
                     }
                       
