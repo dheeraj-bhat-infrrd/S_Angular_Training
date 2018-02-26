@@ -34,6 +34,7 @@ public class TwitterFeedProcessorImpl implements TwitterFeedProcessor
     }
 
     private static final int PAGE_SIZE = 200;
+    public static final int TWITTER_MIN_LIMIT = 100;
 
     // TODO pass it in submit topo commands
     private String consumerKey = "rqhYlHjXPERbAuASOZjNtzyEd";
@@ -93,10 +94,9 @@ public class TwitterFeedProcessorImpl implements TwitterFeedProcessor
 
                     resultList = twitter.getUserTimeline( pageId, paging );
 
-                    //todo save the twitterSecondsUnitlRest in redis if remainingCount becomes <= 100
-                    LOG.info("RateLimit status for page {} is {} and resetTime is {}", pageId, resultList.getRateLimitStatus(),
-                            (int)(((long)resultList.getRateLimitStatus().getResetTimeInSeconds() * 1000L - System.currentTimeMillis()) / 1000L));
-                    if(resultList.getRateLimitStatus().getRemaining() <= 897) {
+                    //save the twitterSecondsUnitlRest in redis if remainingCount becomes <= 100
+                    LOG.info("RateLimit status for page {} is {} ", pageId, resultList.getRateLimitStatus());
+                    if(resultList.getRateLimitStatus().getRemaining() <= TWITTER_MIN_LIMIT) {
                         int secondsUntilReset = (int)(((long)resultList.getRateLimitStatus().getResetTimeInSeconds() * 1000L - System.currentTimeMillis()) / 1000L);
                         redisSocialMediaStateDaoImpl.setTwitterLock(secondsUntilReset,pageId);
                     }
@@ -112,8 +112,11 @@ public class TwitterFeedProcessorImpl implements TwitterFeedProcessor
                 }
 
             } catch ( TwitterException e ) {
-                //todo if the rate limit has been over used by any chance then blacklist the socialtoken
-                LOG.error( "Exception in Twitter feed extration. Reason: ", e );
+                // if the rate limit has been over used by any chance then blacklist the socialtoken
+                LOG.error( "Exception in Twitter feed extraction. Reason: ", e );
+                if( e.getErrorCode() == 88 ) {
+                    redisSocialMediaStateDaoImpl.setTwitterLock(900,pageId);
+                }
             } catch ( JedisConnectionException e ) {
                 LOG.error( "Not able to connect to jedis", e);
             }

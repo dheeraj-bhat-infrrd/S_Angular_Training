@@ -31,7 +31,17 @@ public interface RedisSocialMediaStateDao extends Serializable
      */
     public boolean resetLastFetched( String key);
 
+    /**
+     * Locks the twitter pageId for some seconds
+     * @param secondsUntilReset
+     * @param pageId
+     */
     void setTwitterLock(int secondsUntilReset, String pageId);
 
-    boolean isTwitterRateLimitResetted(String pageId);
+    /**
+     * Checks if the twitter lock on the given pageId has been resetted
+     * @param pageId
+     * @return
+     */
+    boolean isTwitterLockSet(String pageId);
 }

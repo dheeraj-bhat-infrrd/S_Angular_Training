@@ -76,22 +76,18 @@ public class RedisSocialMediaStateDaoImpl implements RedisSocialMediaStateDao
 
     @Override
     public void setTwitterLock(int secondsUntilReset, String pageId) {
+        LOG.info("Setting twitter lock on pageId {}", pageId);
         try(Jedis jedis = RedisDB.getPoolInstance().getResource()) {
             jedis.setex(TWITTER_LOCK+pageId, secondsUntilReset,"lock"+pageId);
         }
     }
 
     @Override
-    public boolean isTwitterRateLimitResetted(String pageId) {
+    public boolean isTwitterLockSet(String pageId) {
         try(Jedis jedis = RedisDB.getPoolInstance().getResource()) {
-            long ttlValue = jedis.ttl(TWITTER_LOCK+pageId);
-            if(ttlValue >= 1)
-                return false;
-            else
-                return true;
+           return jedis.exists(TWITTER_LOCK+pageId);
         }
     }
-
 
     /* (non-Javadoc)
      * @see com.realtech.socialsurvey.compute.dao.RedisSinceRecordFetchedDao#getLastFetched(java.lang.String)

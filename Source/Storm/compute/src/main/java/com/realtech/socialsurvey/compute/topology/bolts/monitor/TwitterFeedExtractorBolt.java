@@ -37,7 +37,7 @@ public class TwitterFeedExtractorBolt extends BaseComputeBolt
 
     private boolean isRateLimitExceeded(String pageId)
     {
-        return !socialMediaStateDao.isTwitterRateLimitResetted(pageId);
+       return socialMediaStateDao.isTwitterLockSet(pageId);
     }
 
 
@@ -48,10 +48,10 @@ public class TwitterFeedExtractorBolt extends BaseComputeBolt
             SocialMediaTokenResponse mediaToken = (SocialMediaTokenResponse) input.getValueByField( "mediaToken" );
 
             Long companyId = mediaToken.getCompanyId();
-
+            String pageId = UrlHelper.getTwitterPageIdFromURL(mediaToken.getSocialMediaTokens()
+                    .getTwitterToken().getTwitterPageLink());
             // Check rate limiting for company
-            if ( isRateLimitExceeded( UrlHelper.getTwitterPageIdFromURL(mediaToken.getSocialMediaTokens()
-                    .getTwitterToken().getTwitterPageLink()) ) ) {
+            if ( isRateLimitExceeded( pageId ) ) {
                 LOG.warn( "Rate limit exceeded" );
             }
             else {
