@@ -90,7 +90,7 @@ public class AggregateSolrQueryBolt extends BaseComputeBoltWithAck {
 			List<SurveyInvitationEmailCountMonth> agentEmailCountsMonth = new ArrayList<SurveyInvitationEmailCountMonth>();
 			try {
 				agentEmailCountsMonth
-						.addAll(SSAPIOperations.getInstance().getReceivedCountsMonth(startDateInGmt, endDateInGmt));
+						.addAll(SSAPIOperations.getInstance().getReceivedCountsMonth(startDate, endDate));
 			} catch (IOException e1) {
 				LOG.error("Exception while fetching the transaction received count.", e1);
 			}
@@ -142,11 +142,10 @@ public class AggregateSolrQueryBolt extends BaseComputeBoltWithAck {
 		
 		String fieldQuery = formulateFieldQuery(Arrays.asList( EmailConstants.EMAIL_TYPE_SURVEY_INVITATION_MAIL,
                 EmailConstants.EMAIL_TYPE_SURVEY_REMINDER_MAIL ),startDateInGmt, endDateInGmt);
-		String response = APIOperations.getInstance()
-				.getEmailCounts( "agentId: [1 TO *]",fieldQuery, isFacet, facetField, facetPivots );
-		
-		JsonElement jsonElement = new JsonParser().parse(response);
-		JsonObject obj = jsonElement.getAsJsonObject().getAsJsonObject("facet_counts").getAsJsonObject("facet_pivot");
+		JsonObject response = APIOperations.getInstance()
+				.getEmailCounts( "*:*",fieldQuery, isFacet, facetField, facetPivots );
+		//agentId : [ 1 TO * ]
+		JsonObject obj = response.getAsJsonObject("facet_counts").getAsJsonObject("facet_pivot");
 		if(obj != null) {
 			return obj;
 		}
