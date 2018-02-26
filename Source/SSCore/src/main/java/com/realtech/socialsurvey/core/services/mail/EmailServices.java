@@ -572,7 +572,7 @@ public interface EmailServices
 
 
     public void sendAbusiveNotifyMail(String source,String recipientMailId, String customerName, String customerMailId, String agentName,String agentMailId,
-			String mood, String rating, String surveySourceId, String feedBack ,String surveyMarked ,String surveyDetail)
+			String mood, String rating, String surveySourceId, String feedBack ,String surveyMarked )
 			throws InvalidInputException, UndeliveredEmailException;
 
 }

@@ -2551,7 +2551,7 @@ public class EmailServicesImpl implements EmailServices
     @Async 
     @Override
     public void sendAbusiveNotifyMail(String source,String recipientMailId, String customerName, String customerMailId, String agentName,String agentMailId,
-			String mood, String rating, String surveySourceId, String feedBack ,String surveyMarked ,String surveyDetail)
+			String mood, String rating, String surveySourceId, String feedBack ,String surveyMarked )
 			throws InvalidInputException, UndeliveredEmailException
     {
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
@@ -2567,12 +2567,6 @@ public class EmailServicesImpl implements EmailServices
         if ( agentName == null || agentName.isEmpty() ) {
             LOG.warn( "Agent Name  is empty or null " );
             throw new InvalidInputException( "Agent Name is empty or null " );
-        }
-
-        //SS-1435: Send survey details too. Check that it is not null.
-        if ( surveyDetail == null || surveyDetail.isEmpty() ) {
-            LOG.warn( "surveyDetail parameter is empty or null for sending account upgrade mail " );
-            throw new InvalidInputException( "surveyDetail parameter is empty or null for sending survey completion mail " );
         }
 
         String[] mailIds = recipientMailId.split( "," );
@@ -2592,7 +2586,7 @@ public class EmailServicesImpl implements EmailServices
 
         //SS-1435: Send survey details too.
         messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, customerName, source, feedBack,
-        		rating,source, surveyMarked, agentName,agentMailId ,customerName,customerMailId,surveySourceId == null ? CommonConstants.NOT_AVAILABLE : surveySourceId,surveyDetail ) );
+        		rating,source, surveyMarked, agentName,agentMailId ,customerName,customerMailId,surveySourceId == null ? CommonConstants.NOT_AVAILABLE : surveySourceId) );
 
         LOG.trace( "Calling email sender to send mail" );
         sendEmailWithBodyReplacements( emailEntity,

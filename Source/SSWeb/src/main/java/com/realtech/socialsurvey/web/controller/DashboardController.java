@@ -1985,6 +1985,9 @@ public class DashboardController
     {
         String reason = request.getParameter( "reportText" );
         String surveyMongoId = request.getParameter( "surveyMongoId" );
+        User user = sessionHelper.getCurrentUser();
+        user.isSuperAdmin();
+        
 
         try {
             try {
@@ -1999,7 +2002,7 @@ public class DashboardController
             }
 
             SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( surveyMongoId );
-
+            
             String customerName = surveyDetails.getCustomerFirstName() + " " + surveyDetails.getCustomerLastName();
 
             //make survey as abusive
@@ -2016,14 +2019,20 @@ public class DashboardController
 				AbusiveMailSettings abusiveMailSettings = companySettings.getSurvey_settings().getAbusive_mail_settings();
 				surveyDetails.setAbusiveNotify(true);
 				surveyHandler.updateSurveyAsAbusiveNotify(surveyDetails.get_id());
+				long agentId = surveyDetails.getAgentId();
+	            User userObj = userManagementService.getUserByUserId( agentId );
+
 
 				// SS-1435: Send survey details too.
 				// SS-715: Full customer name
 				String displayName = surveyDetails.getCustomerFirstName();
 				if (surveyDetails.getCustomerLastName() != null)
 					displayName = displayName + " " + surveyDetails.getCustomerLastName();
-				emailServices.sendAbusiveNotifyMail("APPLICATION", abusiveMailSettings.getMailId(), displayName,surveyDetails.getCustomerEmail(), surveyDetails.getAgentName(), 
-						surveyDetails.getAgentEmailId(),surveyDetails.getMood(), String.valueOf(surveyDetails.getScore()), surveyDetails.getSourceId(), surveyDetails.getReview(),surveyDetails.getSurveyCompletedDate().toString(),null);
+				String loggedUser = user.getFirstName();
+				if(user.getLastName() != null)
+					loggedUser = loggedUser + " " + user.getLastName();
+				emailServices.sendAbusiveNotifyMail(loggedUser, abusiveMailSettings.getMailId(), displayName,surveyDetails.getCustomerEmail(), surveyDetails.getAgentName(), 
+						userObj.getEmailId(),surveyDetails.getMood(), String.valueOf(surveyDetails.getScore()), surveyDetails.getSourceId(), surveyDetails.getReview(),surveyDetails.getSurveyCompletedDate().toString());
 			}
         } catch ( NonFatalException e ) {
             LOG.error( "NonfatalException caught in reportAbuse(). Nested exception is ", e );

@@ -441,8 +441,8 @@ public class SurveyManagementController
 						String displayName = survey.getCustomerFirstName();
 						if (survey.getCustomerLastName() != null)
 							displayName = displayName + " " + survey.getCustomerLastName();
-						emailServices.sendAbusiveNotifyMail("APPLICATION", abusiveMailSettings.getMailId(), displayName,customerEmail, survey.getAgentName(), 
-								survey.getAgentEmailId(),mood, surveyScore, survey.getSourceId(), feedback,survey.getSurveyCompletedDate().toString(),surveyDetail);
+						emailServices.sendAbusiveNotifyMail(CommonConstants.REPORT_ABUSE_BY_APPLICATION_NAME, abusiveMailSettings.getMailId(), displayName,customerEmail, survey.getAgentName(), 
+								agent.getEmailId(),mood, surveyScore, survey.getSourceId(), feedback,survey.getSurveyCompletedDate().toString());
 					}
 				}
 				
