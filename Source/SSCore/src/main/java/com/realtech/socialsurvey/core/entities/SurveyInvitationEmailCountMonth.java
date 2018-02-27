@@ -9,6 +9,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * @author Subhrajit
@@ -21,13 +24,14 @@ public class SurveyInvitationEmailCountMonth {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "invitation_mail_count_month_id")
+	@JsonIgnoreProperties(ignoreUnknown = true)
 	private long id;
 	
 	@Column(name = "agent_id")
-	private int agentId;
+	private long agentId;
 	
 	@Column(name = "company_id")
-	private int companyId;
+	private long companyId;
 	
 	@Column(name = "month")
 	private int month;
@@ -36,56 +40,60 @@ public class SurveyInvitationEmailCountMonth {
 	private int year;
 	
 	@Column(name = "attempted_count")
-	private int attempted;
+	private long attempted;
 	
 	@Column(name = "delivered")
-	private int delivered;
+	private long delivered;
 	
 	@Column(name = "deffered")
-	private int differed;
+	private long differed;
 	
 	@Column(name = "blocked")
-	private int blocked;
+	private long blocked;
 	
 	@Column(name = "opened")
-	private int opened;
+	private long opened;
 	
 	@Column(name = "spam")
-	private int spamed;
+	private long spamed;
 	
 	@Column(name = "unsubscribed")
-	private int unsubscribed;
+	private long unsubscribed;
 	
 	@Column(name = "bounced")
-	private int bounced;
+	private long bounced;
 	
 	@Column(name = "link_clicked")
-	private int linkClicked;
+	private long linkClicked;
 	
 	@Column(name = "received")
-	private int received;
+	private long received;
 	
 	@Column(name = "dropped")
-	private int dropped;
+	private long dropped;
 	
+	@Transient
 	private String agentName;
+	@Transient
 	private String agentEmail;
+	@Transient
 	private String branchName;
+	@Transient
 	private String regionName;
 	
-	public int getAgentId() {
+	public long getAgentId() {
 		return agentId;
 	}
-	public void setAgentId(int agentId) {
+	public void setAgentId(long agentId) {
 		this.agentId = agentId;
 	}
-	public int getCompanyId() {
+	public long getCompanyId() {
 		return companyId;
 	}
-	public void setCompanyId(int companyId) {
+	public void setCompanyId(long companyId) {
 		this.companyId = companyId;
 	}
-	public int getMonth() {
+	public long getMonth() {
 		return month;
 	}
 	public void setMonth(int month) {
@@ -97,64 +105,64 @@ public class SurveyInvitationEmailCountMonth {
 	public void setYear(int year) {
 		this.year = year;
 	}
-	public int getAttempted() {
+	public long getAttempted() {
 		return attempted;
 	}
-	public void setAttempted(int attempted) {
+	public void setAttempted(long attempted) {
 		this.attempted = attempted;
 	}
-	public int getDelivered() {
+	public long getDelivered() {
 		return delivered;
 	}
-	public void setDelivered(int delivered) {
+	public void setDelivered(long delivered) {
 		this.delivered = delivered;
 	}
-	public int getDiffered() {
+	public long getDiffered() {
 		return differed;
 	}
-	public void setDiffered(int differed) {
+	public void setDiffered(long differed) {
 		this.differed = differed;
 	}
-	public int getBlocked() {
+	public long getBlocked() {
 		return blocked;
 	}
-	public void setBlocked(int blocked) {
+	public void setBlocked(long blocked) {
 		this.blocked = blocked;
 	}
-	public int getOpened() {
+	public long getOpened() {
 		return opened;
 	}
-	public void setOpened(int opened) {
+	public void setOpened(long opened) {
 		this.opened = opened;
 	}
-	public int getSpamed() {
+	public long getSpamed() {
 		return spamed;
 	}
-	public void setSpamed(int spamed) {
+	public void setSpamed(long spamed) {
 		this.spamed = spamed;
 	}
-	public int getUnsubscribed() {
+	public long getUnsubscribed() {
 		return unsubscribed;
 	}
-	public void setUnsubscribed(int unsubscribed) {
+	public void setUnsubscribed(long unsubscribed) {
 		this.unsubscribed = unsubscribed;
 	}
-	public int getBounced() {
+	public long getBounced() {
 		return bounced;
 	}
-	public void setBounced(int bounced) {
+	public void setBounced(long bounced) {
 		this.bounced = bounced;
 	}
-	public int getLinkClicked() {
+	public long getLinkClicked() {
 		return linkClicked;
 	}
-	public void setLinkClicked(int linkClicked) {
+	public void setLinkClicked(long linkClicked) {
 		this.linkClicked = linkClicked;
 	}
-	public int getReceived() {
+	public long getReceived() {
 		return received;
 	}
-	public void setReceived(int received) {
+	public void setReceived(long received) {
 		this.received = received;
 	}
 	public String getAgentName() {
@@ -181,11 +189,17 @@ public class SurveyInvitationEmailCountMonth {
 	public void setRegionName(String regionName) {
 		this.regionName = regionName;
 	}
-	public int getDropped() {
+	public long getDropped() {
 		return dropped;
 	}
-	public void setDropped(int dropped) {
+	public void setDropped(long dropped) {
 		this.dropped = dropped;
+	}
+	public long getId() {
+		return id;
+	}
+	public void setId(long id) {
+		this.id = id;
 	}
 	@Override
 	public String toString() {

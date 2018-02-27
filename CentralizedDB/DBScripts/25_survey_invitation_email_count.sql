@@ -15,5 +15,6 @@ CREATE TABLE `invitation_mail_count_month` (
   `bounced` int(10) DEFAULT NULL,
   `link_clicked` int(10) DEFAULT NULL,
   `received` varchar(45) DEFAULT NULL,
+  `dropped` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`invitation_mail_count_month_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

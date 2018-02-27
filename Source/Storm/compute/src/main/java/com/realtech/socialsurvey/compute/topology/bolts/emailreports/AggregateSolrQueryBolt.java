@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.realtech.socialsurvey.compute.common.APIOperations;
 import com.realtech.socialsurvey.compute.common.ComputeConstants;
 import com.realtech.socialsurvey.compute.common.EmailConstants;
@@ -172,82 +171,109 @@ public class AggregateSolrQueryBolt extends BaseComputeBoltWithAck {
 	 */
 	private void getEmailCounts(JsonObject jsonObject,
 			List<SurveyInvitationEmailCountMonth> agentEmailCountsMonth, String pivotName) {
-		Map<Integer, Integer> countMap = null;
+		Map<Long, Long> countMap = null;
 		switch (pivotName) {
 		case ComputeConstants.SOLR_PIVOT_AGENT_EMAIL_ATTEMPT:
 			countMap = convertToMap(jsonObject, pivotName);
 			for(SurveyInvitationEmailCountMonth mailCount : agentEmailCountsMonth) {
-				int count = countMap.get(mailCount.getAgentId());
+				long count = 0;
+				if(countMap != null && !countMap.isEmpty()) {
+					count = countMap.get(mailCount.getAgentId());
+				}
 				mailCount.setAttempted(count);
 			}
 			break;
 		case ComputeConstants.SOLR_PIVOT_AGENT_DELIVERED:
 			countMap = convertToMap(jsonObject, pivotName);
 			for(SurveyInvitationEmailCountMonth mailCount : agentEmailCountsMonth) {
-				int count = countMap.get(mailCount.getAgentId());
+				long count = 0;
+				if(countMap != null && !countMap.isEmpty()) {
+					count = countMap.get(mailCount.getAgentId());
+				}
 				mailCount.setDelivered(count);
 			}
 			break;
 		case ComputeConstants.SOLR_PIVOT_AGENT_DIFFERED:
 			countMap = convertToMap(jsonObject, pivotName);
 			for(SurveyInvitationEmailCountMonth mailCount : agentEmailCountsMonth) {
-				int count = countMap.get(mailCount.getAgentId());
+				long count = 0;
+				if(countMap != null && !countMap.isEmpty()) {
+					count = countMap.get(mailCount.getAgentId());
+				}
 				mailCount.setDiffered(count);
 			}
 			break;
 		case ComputeConstants.SOLR_PIVOT_AGENT_BLOCKED:
 			countMap = convertToMap(jsonObject, pivotName);
 			for(SurveyInvitationEmailCountMonth mailCount : agentEmailCountsMonth) {
-				int count = countMap.get(mailCount.getAgentId());
+				long count = 0;
+				if(countMap != null && !countMap.isEmpty()) {
+					count = countMap.get(mailCount.getAgentId());
+				}
 				mailCount.setBlocked(count);
 			}
 			break;
 		case ComputeConstants.SOLR_PIVOT_AGENT_OPENED:
 			countMap = convertToMap(jsonObject, pivotName);
 			for(SurveyInvitationEmailCountMonth mailCount : agentEmailCountsMonth) {
-				int count = countMap.get(mailCount.getAgentId());
+				long count = 0;
+				if(countMap != null && !countMap.isEmpty()) {
+					count = countMap.get(mailCount.getAgentId());
+				}
 				mailCount.setOpened(count);
 			}
 			break;
 		case ComputeConstants.SOLR_PIVOT_AGENT_SPAMED:
 			countMap = convertToMap(jsonObject, pivotName);
 			for(SurveyInvitationEmailCountMonth mailCount : agentEmailCountsMonth) {
-				int count = countMap.get(mailCount.getAgentId());
+				long count = 0;
+				if(countMap != null && !countMap.isEmpty()) {
+					count = countMap.get(mailCount.getAgentId());
+				}
 				mailCount.setSpamed(count);
 			}
 			break;
 		case ComputeConstants.SOLR_PIVOT_AGENT_UNSUBSCRIBED:
 			countMap = convertToMap(jsonObject, pivotName);
 			for(SurveyInvitationEmailCountMonth mailCount : agentEmailCountsMonth) {
-				int count = countMap.get(mailCount.getAgentId());
+				long count = 0;
+				if(countMap != null && !countMap.isEmpty()) {
+					count = countMap.get(mailCount.getAgentId());
+				}
 				mailCount.setUnsubscribed(count);
 			}
 			break;
 		case ComputeConstants.SOLR_PIVOT_AGENT_BOUNCED:
 			countMap = convertToMap(jsonObject, pivotName);
 			for(SurveyInvitationEmailCountMonth mailCount : agentEmailCountsMonth) {
-				int count = countMap.get(mailCount.getAgentId());
+				long count = 0;
+				if(countMap != null && !countMap.isEmpty()) {
+					count = countMap.get(mailCount.getAgentId());
+				}
 				mailCount.setBounced(count);
 			}
 			break;
 		case ComputeConstants.SOLR_PIVOT_AGENT_LINK_CLICKED:
 			countMap = convertToMap(jsonObject, pivotName);
 			for(SurveyInvitationEmailCountMonth mailCount : agentEmailCountsMonth) {
-				int count = countMap.get(mailCount.getAgentId());
+				long count = 0;
+				if(countMap != null && !countMap.isEmpty()) {
+					count = countMap.get(mailCount.getAgentId());
+				}
 				mailCount.setLinkClicked(count);
 			}
 			break;
 		}
 	}
 
-	private Map<Integer, Integer> convertToMap(JsonObject jsonObject, String pivotName) {
-		Map<Integer, Integer> countMap = new HashMap<Integer, Integer>();
+	private Map<Long, Long> convertToMap(JsonObject jsonObject, String pivotName) {
+		Map<Long, Long> countMap = new HashMap<Long, Long>();
 		
 		for (JsonElement jsonElement : jsonObject.getAsJsonArray(pivotName)) {
 			JsonObject obj = jsonElement.getAsJsonObject();
 			
-			int countVal = obj.get("count").getAsInt();
-			int agentId = obj.get("value").getAsInt();
+			long countVal = obj.get("count").getAsLong();
+			long agentId = obj.get("value").getAsLong();
 			
 			countMap.put(agentId, countVal);
 		}

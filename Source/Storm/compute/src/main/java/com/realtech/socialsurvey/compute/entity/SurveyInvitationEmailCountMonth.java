@@ -3,37 +3,45 @@
  */
 package com.realtech.socialsurvey.compute.entity;
 
+import java.io.Serializable;
+
 /**
  * @author Subhrajit
  *
  */
-public class SurveyInvitationEmailCountMonth {
+public class SurveyInvitationEmailCountMonth implements Serializable{
 	
-	private int id;
-	private int agentId;
-	private int companyId;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private long id;
+	private long agentId;
+	private long companyId;
 	private int month;
 	private int year;
-	private int attempted;
-	private int delivered;
-	private int differed;
-	private int blocked;
-	private int opened;
-	private int spamed;
-	private int unsubscribed;
-	private int bounced;
-	private int linkClicked;
-	private int received;
-	public int getAgentId() {
+	private long attempted;
+	private long delivered;
+	private long differed;
+	private long blocked;
+	private long opened;
+	private long spamed;
+	private long unsubscribed;
+	private long bounced;
+	private long linkClicked;
+	private long received;
+	private long dropped;
+	
+	public long getAgentId() {
 		return agentId;
 	}
-	public void setAgentId(int agentId) {
+	public void setAgentId(long agentId) {
 		this.agentId = agentId;
 	}
-	public int getCompanyId() {
+	public long getCompanyId() {
 		return companyId;
 	}
-	public void setCompanyId(int companyId) {
+	public void setCompanyId(long companyId) {
 		this.companyId = companyId;
 	}
 	public int getMonth() {
@@ -48,65 +56,77 @@ public class SurveyInvitationEmailCountMonth {
 	public void setYear(int year) {
 		this.year = year;
 	}
-	public int getAttempted() {
+	public long getAttempted() {
 		return attempted;
 	}
-	public void setAttempted(int attempted) {
+	public void setAttempted(long attempted) {
 		this.attempted = attempted;
 	}
-	public int getDelivered() {
+	public long getDelivered() {
 		return delivered;
 	}
-	public void setDelivered(int delivered) {
+	public void setDelivered(long delivered) {
 		this.delivered = delivered;
 	}
-	public int getDiffered() {
+	public long getDiffered() {
 		return differed;
 	}
-	public void setDiffered(int differed) {
+	public void setDiffered(long differed) {
 		this.differed = differed;
 	}
-	public int getBlocked() {
+	public long getBlocked() {
 		return blocked;
 	}
-	public void setBlocked(int blocked) {
+	public void setBlocked(long blocked) {
 		this.blocked = blocked;
 	}
-	public int getOpened() {
+	public long getOpened() {
 		return opened;
 	}
-	public void setOpened(int opened) {
+	public void setOpened(long opened) {
 		this.opened = opened;
 	}
-	public int getSpamed() {
+	public long getSpamed() {
 		return spamed;
 	}
-	public void setSpamed(int spamed) {
+	public void setSpamed(long spamed) {
 		this.spamed = spamed;
 	}
-	public int getUnsubscribed() {
+	public long getUnsubscribed() {
 		return unsubscribed;
 	}
-	public void setUnsubscribed(int unsubscribed) {
+	public void setUnsubscribed(long unsubscribed) {
 		this.unsubscribed = unsubscribed;
 	}
-	public int getBounced() {
+	public long getBounced() {
 		return bounced;
 	}
-	public void setBounced(int bounced) {
+	public void setBounced(long bounced) {
 		this.bounced = bounced;
 	}
-	public int getLinkClicked() {
+	public long getLinkClicked() {
 		return linkClicked;
 	}
-	public void setLinkClicked(int linkClicked) {
+	public void setLinkClicked(long linkClicked) {
 		this.linkClicked = linkClicked;
 	}
-	public int getReceived() {
+	public long getReceived() {
 		return received;
 	}
-	public void setReceived(int received) {
+	public void setReceived(long received) {
 		this.received = received;
+	}
+	public long getDropped() {
+		return dropped;
+	}
+	public void setDropped(long dropped) {
+		this.dropped = dropped;
+	}
+	public long getId() {
+		return id;
+	}
+	public void setId(long id) {
+		this.id = id;
 	}
 	@Override
 	public String toString() {
@@ -114,7 +134,7 @@ public class SurveyInvitationEmailCountMonth {
 				+ ", month=" + month + ", year=" + year + ", attempted=" + attempted + ", delivered=" + delivered
 				+ ", differed=" + differed + ", blocked=" + blocked + ", opened=" + opened + ", spamed=" + spamed
 				+ ", unsubscribed=" + unsubscribed + ", bounced=" + bounced + ", linkClicked=" + linkClicked
-				+ ", received=" + received + "]";
+				+ ", received=" + received + ", dropped=" + dropped + "]";
 	}
 	
 	

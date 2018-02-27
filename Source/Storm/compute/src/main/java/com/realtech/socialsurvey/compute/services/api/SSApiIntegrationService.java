@@ -47,7 +47,7 @@ public interface SSApiIntegrationService
 
     @Headers ( "Content-Type: application/json")
     @POST ( "v1/agentEmailCountsMonth")
-	Call<List<SurveyInvitationEmailCountMonth>> saveEmailCountMonthData(
+	Call<Boolean> saveEmailCountMonthData(
 			@Body List<SurveyInvitationEmailCountMonth> agentEmailCountsMonth);
 
 }

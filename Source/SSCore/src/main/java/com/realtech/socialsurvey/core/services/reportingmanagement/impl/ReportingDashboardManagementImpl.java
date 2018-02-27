@@ -49,6 +49,7 @@ import com.realtech.socialsurvey.core.dao.CompanyDetailsReportDao;
 import com.realtech.socialsurvey.core.dao.CompanyUserReportDao;
 import com.realtech.socialsurvey.core.dao.FileUploadDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
+import com.realtech.socialsurvey.core.dao.GenericReportingDao;
 import com.realtech.socialsurvey.core.dao.NpsReportMonthDao;
 import com.realtech.socialsurvey.core.dao.NpsReportWeekDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -347,7 +348,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     private SurveyPreInitiationDao surveyPreInitiationDao;
     
     @Autowired
-    private GenericDao<SurveyInvitationEmailCountMonth, Long> surveyEmailCountMonthDao;
+    private GenericReportingDao<SurveyInvitationEmailCountMonth, Long> surveyEmailCountMonthDao;
 
     @Value ( "${FILE_DIRECTORY_LOCATION}")
     private String fileDirectoryLocation;
@@ -4798,8 +4799,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 		List<Object[]> receivedCount = surveyPreInitiationDao.getReceivedCountForDate(new Timestamp(startDate), new Timestamp(endDate));
 		for (Object[] obj : receivedCount) {
 			SurveyInvitationEmailCountMonth mailCount = new SurveyInvitationEmailCountMonth();
-			mailCount.setAgentId((int) obj[1]);
-			mailCount.setReceived((int) obj[0]);
+			mailCount.setAgentId(new Long(obj[1].toString()));
+			mailCount.setReceived(new Long(obj[0].toString()));
 			mailCount.setMonth(month);
 			mailCount.setYear(year);
 			receivedCountMonth.add(mailCount);
@@ -4809,6 +4810,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 	}
 
 	@Override
+	@Transactional
 	public boolean saveEmailCountMonthData(List<SurveyInvitationEmailCountMonth> agentEmailCountsMonth) {
 		try {
 			surveyEmailCountMonthDao.saveAll(agentEmailCountsMonth);

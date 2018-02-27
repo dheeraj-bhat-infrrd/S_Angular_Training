@@ -392,4 +392,14 @@ public class GenericReportingDaoImpl<T, ID extends Serializable> implements Gene
         return crit.setResultTransformer( Transformers.aliasToBean( dataClass ) ).list();
     }
 
+
+    @Override
+	public void saveAll(List<T> entityList) {
+		// TODO Auto-generated method stub
+		for(T entity : entityList) {
+			save(entity);
+		}
+		
+	}
+
 }
