@@ -13,6 +13,6 @@ import com.realtech.socialsurvey.core.entities.SurveyInvitationEmailCountMonth;
  */
 public interface SurveyInvitationEmailDao extends GenericReportingDao<SurveyInvitationEmailCountMonth, Long> {
 
-	List<SurveyInvitationEmailCountMonth> getSurveyInvitationEmailReportForMonth(long companyId, int month, int year);
+	List<Object[]> getSurveyInvitationEmailReportForMonth(long companyId, int month, int year);
 
 }

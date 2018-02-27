@@ -23,11 +23,11 @@ public class SurveyInvitationEmailDaoImpl extends GenericReportingDaoImpl<Survey
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<SurveyInvitationEmailCountMonth> getSurveyInvitationEmailReportForMonth(long companyId, int month,
+	public List<Object[]> getSurveyInvitationEmailReportForMonth(long companyId, int month,
 			int year) {
 		String queryString = "select concat(u.FIRST_NAME,' ',coalesce(u.LAST_NAME,'')) as agent_name,"
 				+ "u.EMAIL_ID,b.BRANCH,r.REGION,imc.received,imc.attempted_count,imc.delivered,"
-				+ "imc.bounced,imc.deffered,imc.opened,imc.link_clicked "
+				+ "imc.bounced,imc.deffered,imc.opened,imc.link_clicked,imc.dropped "
 				+ "from invitation_mail_count_month imc "
 				+ "inner join users u on imc.agent_id=u.user_id "
 				+ "inner join company c on imc.company_id=c.company_id "
