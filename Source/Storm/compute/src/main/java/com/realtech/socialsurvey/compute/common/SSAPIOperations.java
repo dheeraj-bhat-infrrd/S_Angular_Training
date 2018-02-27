@@ -87,7 +87,7 @@ public class SSAPIOperations
 
 	public List<SurveyInvitationEmailCountMonth> getReceivedCountsMonth(long startDate, long endDate) throws IOException {
 		Call<List<SurveyInvitationEmailCountMonth>> request = RetrofitApiBuilder.apiBuilderInstance()
-				.getSSAPIIntergrationService().getReceivedCountsMonth(startDate,endDate);
+				.getReportingSSAPIIntergrationService().getReceivedCountsMonth(startDate,endDate);
 		Response<List<SurveyInvitationEmailCountMonth>> response = request.execute();
 		RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
 		return response.body();
@@ -97,7 +97,7 @@ public class SSAPIOperations
 
 	public boolean saveEmailCountMonthData(List<SurveyInvitationEmailCountMonth> agentEmailCountsMonth) {
         Call<Boolean> requestCall = RetrofitApiBuilder.apiBuilderInstance()
-            .getSSAPIIntergrationService().saveEmailCountMonthData( agentEmailCountsMonth );
+            .getReportingSSAPIIntergrationService().saveEmailCountMonthData( agentEmailCountsMonth );
         try {
             Response<Boolean> response = requestCall.execute();
             RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );

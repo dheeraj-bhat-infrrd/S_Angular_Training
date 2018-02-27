@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.compute.common;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import com.realtech.socialsurvey.compute.entities.FileUploadResponse;
 import com.realtech.socialsurvey.compute.exception.FileUploadUpdationException;
@@ -34,6 +35,7 @@ public class RetrofitApiBuilder
     private SolrApiIntegrationService solrAPIIntergrationService;
     
     private SSApiIntegrationService ssAPIIntergrationService;
+    private SSApiIntegrationService reportingSSAPIIntergrationService;
 
     private final String solrApiUrl = LocalPropertyFileHandler.getInstance()
         .getProperty( ComputeConstants.APPLICATION_PROPERTY_FILE, ComputeConstants.SOLR_API_ENDPOINT ).orElse( null );
@@ -49,7 +51,12 @@ public class RetrofitApiBuilder
         // set basic level logging
         loggingInterceptor.setLevel( Level.BODY );
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        OkHttpClient.Builder httpClientReporting = new OkHttpClient.Builder()
+        		.connectTimeout(60000, TimeUnit.MILLISECONDS)
+        		.readTimeout(60000, TimeUnit.MILLISECONDS)
+        		.writeTimeout(60000, TimeUnit.MILLISECONDS);
         httpClient.addInterceptor( loggingInterceptor );
+        httpClientReporting.addInterceptor(loggingInterceptor);
         // Create integration service builders
         LOG.info( "Creating SOLR API builder" );
         // construct api gateway url
@@ -61,6 +68,12 @@ public class RetrofitApiBuilder
         Retrofit ssApiIntegServiceBuilder = new Retrofit.Builder().baseUrl( ssApiUrl )
             .addConverterFactory( GsonConverterFactory.create() ).client( httpClient.build() ).build();
         ssAPIIntergrationService = ssApiIntegServiceBuilder.create( SSApiIntegrationService.class);
+        
+        // api gateway url for ss api reporting
+        Retrofit reportingSSApiIntegServiceBuilder = new Retrofit.Builder().baseUrl( ssApiUrl )
+                .addConverterFactory( GsonConverterFactory.create() ).client( httpClientReporting.build() ).build();
+        reportingSSAPIIntergrationService  = reportingSSApiIntegServiceBuilder.create( SSApiIntegrationService.class);
+        
 
     }
 
@@ -81,8 +94,12 @@ public class RetrofitApiBuilder
         return ssAPIIntergrationService;
     }
 
+    public SSApiIntegrationService getReportingSSAPIIntergrationService() {
+		return reportingSSAPIIntergrationService;
+	}
 
-    /**
+
+	/**
      * Validates the reponse from api
      * @param response
      */
