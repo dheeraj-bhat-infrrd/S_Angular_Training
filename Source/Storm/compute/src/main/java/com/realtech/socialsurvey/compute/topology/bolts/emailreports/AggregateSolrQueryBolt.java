@@ -74,7 +74,7 @@ public class AggregateSolrQueryBolt extends BaseComputeBoltWithAck {
 			long endDate = reportRequest.getEndTime();
 			
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-			sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+			//sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 			
 			String startDateInGmt = sdf.format(new Date(startDate));
 			String endDateInGmt = sdf.format(new Date(endDate));
