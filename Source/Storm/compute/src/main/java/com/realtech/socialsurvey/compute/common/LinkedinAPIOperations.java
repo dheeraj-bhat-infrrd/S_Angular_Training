@@ -43,7 +43,7 @@ public class LinkedinAPIOperations
      * @param accessToken
      * @return
      */
-    public LinkedinFeedResponse fetchFeeds( String lnCompanyId, String accessToken, int start, String eventType)
+    public LinkedinFeedResponse fetchFeeds( String lnCompanyId, String accessToken, int start, String eventType )
     {
         Call<LinkedinFeedResponse> requestCall = RetrofitApiBuilder.apiBuilderInstance().getLinkedinApiIntegrationService()
             .fetchFeeds( lnCompanyId, start, LIMIT, eventType, accessToken );

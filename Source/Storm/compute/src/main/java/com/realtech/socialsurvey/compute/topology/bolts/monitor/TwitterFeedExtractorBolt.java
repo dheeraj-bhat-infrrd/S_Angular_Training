@@ -1,7 +1,10 @@
 package com.realtech.socialsurvey.compute.topology.bolts.monitor;
 
 import java.util.List;
+import java.util.Map;
 
+import org.apache.storm.task.OutputCollector;
+import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
@@ -10,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
-import com.realtech.socialsurvey.compute.entities.FacebookToken;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.compute.entities.TwitterToken;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
@@ -31,13 +33,22 @@ public class TwitterFeedExtractorBolt extends BaseComputeBolt
 {
     private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger( TwitterFeedExtractorBolt.class );
-    private TwitterFeedProcessor twitterFeedProcessor = new TwitterFeedProcessorImpl();
+    private TwitterFeedProcessor twitterFeedProcessor;
 
 
     private boolean isRateLimitExceeded()
     {
         // TODO ckech for ratelimiting for facebook api (based on user-id, page-id, )
         return false;
+    }
+
+
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public void prepare( @SuppressWarnings ( "rawtypes") Map stormConf, TopologyContext context, OutputCollector collector )
+    {
+        super.prepare( stormConf, context, collector );
+        this.twitterFeedProcessor = new TwitterFeedProcessorImpl();
     }
 
 
@@ -71,13 +82,15 @@ public class TwitterFeedExtractorBolt extends BaseComputeBolt
             LOG.error( "Error while fetching post from Twitter.", e );
         }
     }
-    
+
+
     /**
      * Method for creating lastfetched key
      * @param mediaToken
      * @return
      */
-    private String getLastFetchedKey(SocialMediaTokenResponse mediaToken){
+    private String getLastFetchedKey( SocialMediaTokenResponse mediaToken )
+    {
         String lastFetchedKey = "";
         if ( mediaToken.getSocialMediaTokens() != null && mediaToken.getSocialMediaTokens().getFacebookToken() != null ) {
             TwitterToken token = mediaToken.getSocialMediaTokens().getTwitterToken();

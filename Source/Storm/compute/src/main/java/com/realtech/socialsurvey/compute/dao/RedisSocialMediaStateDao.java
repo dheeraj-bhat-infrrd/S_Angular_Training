@@ -6,7 +6,7 @@ import java.io.Serializable;
  * @author manish
  *
  */
-public interface RedisSinceRecordFetchedDao extends Serializable
+public interface RedisSocialMediaStateDao extends Serializable
 {
     /**
      * Method to save lastFetched
@@ -30,4 +30,33 @@ public interface RedisSinceRecordFetchedDao extends Serializable
      * @return
      */
     public boolean resetLastFetched( String key);
+
+    /**
+     * check is wait for next fetch is present in redis
+     * @return
+     */
+    public boolean waitForNextFetch();
+    
+    /**
+     * Set wati for next fetch in redis
+     * @param seconds
+     * @return
+     */
+    public boolean setWaitForNextFetch( int seconds );
+
+    /**
+     * @param key
+     * @param value
+     * @param seconds
+     * @return
+     */
+    public boolean addWithExpire( String key, String value, int seconds );
+
+    /**
+     * @param key
+     * @param value
+     * @param seconds
+     * @return
+     */
+    public long getTTLForKey( String key);
 }
