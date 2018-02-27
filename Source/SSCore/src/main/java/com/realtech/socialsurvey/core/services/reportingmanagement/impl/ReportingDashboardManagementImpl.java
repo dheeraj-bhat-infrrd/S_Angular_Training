@@ -10,6 +10,7 @@ import java.net.URLEncoder;
 import java.sql.Timestamp;
 import java.text.DateFormatSymbols;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TimeZone;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
@@ -4796,7 +4798,13 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 		cal.setTimeInMillis(startDate);
 		int month = cal.get(Calendar.MONTH) + 1;
 		int year = cal.get(Calendar.YEAR);
-		List<Object[]> receivedCount = surveyPreInitiationDao.getReceivedCountForDate(new Timestamp(startDate), new Timestamp(endDate));
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+		String startDateStr = sdf.format(new Date(startDate));
+		String endDateStr = sdf.format(new Date(endDate));
+		
+		List<Object[]> receivedCount = surveyPreInitiationDao.getReceivedCountForDate(startDateStr, endDateStr);
 		for (Object[] obj : receivedCount) {
 			if(obj[1]!=null && obj[0] !=null) {
 				SurveyInvitationEmailCountMonth mailCount = new SurveyInvitationEmailCountMonth();

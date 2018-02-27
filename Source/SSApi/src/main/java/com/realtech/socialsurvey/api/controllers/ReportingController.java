@@ -822,6 +822,7 @@ public class ReportingController
     @RequestMapping ( value = "/trxcount/agent", method = RequestMethod.GET)
     @ApiOperation ( value = "get received count for agents.")
     public List<SurveyInvitationEmailCountMonth> getReceivedCountsMonth(long startDateInGmt, long endDateInGmt) {
+    	LOGGER.info("API call for fetching transaction received count for each agent with date range.");
     	try {
 			return reportingDashboardManagement.getReceivedCountsMonth(startDateInGmt,endDateInGmt);
 		} catch (ParseException e) {

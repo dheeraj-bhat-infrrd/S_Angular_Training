@@ -921,7 +921,7 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Object[]> getReceivedCountForDate(Timestamp startDate, Timestamp endDate) {
+	public List<Object[]> getReceivedCountForDate(String startDate, String endDate) {
 	String queryStr = "select count(spi.SURVEY_PRE_INITIATION_ID) as received_count,spi.AGENT_ID,u.COMPANY_ID " + 
 			"from USERS u left join SURVEY_PRE_INITIATION spi on u.USER_ID=spi.AGENT_ID " + 
 			"and u.STATUS in (1,2) and spi.SURVEY_SOURCE not in ('3rd Party Review') " + 
