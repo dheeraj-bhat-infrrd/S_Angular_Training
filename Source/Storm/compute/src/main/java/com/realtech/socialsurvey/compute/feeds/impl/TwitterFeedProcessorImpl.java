@@ -7,7 +7,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.realtech.socialsurvey.compute.dao.impl.RedisSinceRecordFetchedDaoImpl;
+import com.realtech.socialsurvey.compute.dao.impl.RedisSocialMediaStateDaoImpl;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.compute.entities.TwitterToken;
 import com.realtech.socialsurvey.compute.entities.response.TwitterFeedData;
@@ -33,12 +33,12 @@ public class TwitterFeedProcessorImpl implements TwitterFeedProcessor
 {
     private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger( TwitterFeedProcessorImpl.class );
-    private RedisSinceRecordFetchedDaoImpl redisSinceRecordFetchedDao;
+    private RedisSocialMediaStateDaoImpl redisSocialMediaStateDao;
 
 
     public TwitterFeedProcessorImpl()
     {
-        this.redisSinceRecordFetchedDao = new RedisSinceRecordFetchedDaoImpl();
+        this.redisSocialMediaStateDao = new RedisSocialMediaStateDaoImpl();
     }
 
     private static final int PAGE_SIZE = 200;
@@ -67,7 +67,7 @@ public class TwitterFeedProcessorImpl implements TwitterFeedProcessor
             String lastFetchedKey = mediaToken.getProfileType().toString() + "_" + mediaToken.getIden() + "_" + pageId;
 
             try {
-                String sinceId = redisSinceRecordFetchedDao.getLastFetched( lastFetchedKey );
+                String sinceId = redisSocialMediaStateDao.getLastFetched( lastFetchedKey );
 
                 long lastFetchedPostId = 0L;
                 if (StringUtils.isNotEmpty( sinceId ) ) {
@@ -109,7 +109,7 @@ public class TwitterFeedProcessorImpl implements TwitterFeedProcessor
                 } while ( resultList.size() == PAGE_SIZE );
 
                 if(!feedData.isEmpty()){
-                    redisSinceRecordFetchedDao.saveLastFetched( lastFetchedKey, Long.toString( feedData.get( 0 ).getId() ), sinceId );
+                    redisSocialMediaStateDao.saveLastFetched( lastFetchedKey, Long.toString( feedData.get( 0 ).getId() ), sinceId );
                 }
 
             } catch ( TwitterException e ) {
