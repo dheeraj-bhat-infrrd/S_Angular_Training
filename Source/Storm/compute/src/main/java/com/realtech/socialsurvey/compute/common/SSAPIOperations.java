@@ -96,10 +96,10 @@ public class SSAPIOperations
 
 
 	public boolean saveEmailCountMonthData(List<SurveyInvitationEmailCountMonth> agentEmailCountsMonth) {
-        Call<List<SurveyInvitationEmailCountMonth>> requestCall = RetrofitApiBuilder.apiBuilderInstance()
+        Call<Boolean> requestCall = RetrofitApiBuilder.apiBuilderInstance()
             .getSSAPIIntergrationService().saveEmailCountMonthData( agentEmailCountsMonth );
         try {
-            Response<List<SurveyInvitationEmailCountMonth>> response = requestCall.execute();
+            Response<Boolean> response = requestCall.execute();
             RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
             if ( LOG.isTraceEnabled() ) {
                 LOG.trace( "response {}", response.body() );

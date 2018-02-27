@@ -835,9 +835,9 @@ public class ReportingController
     	boolean status = reportingDashboardManagement.saveEmailCountMonthData(agentEmailCountsMonth);
     	ResponseEntity<Boolean> responseEntity = null;
     	if(status) {
-    		responseEntity = new ResponseEntity<>(status,HttpStatus.OK);
+    		responseEntity = new ResponseEntity<Boolean>(status,HttpStatus.OK);
     	} else {
-    		responseEntity = new ResponseEntity<>(status,HttpStatus.INTERNAL_SERVER_ERROR);
+    		responseEntity = new ResponseEntity<Boolean>(status,HttpStatus.INTERNAL_SERVER_ERROR);
     	}
     	return responseEntity;
     }

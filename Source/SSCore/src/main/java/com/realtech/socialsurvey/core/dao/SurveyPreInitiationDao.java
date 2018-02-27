@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.dao;
 
+import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
