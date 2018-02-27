@@ -1,13 +1,5 @@
 package com.realtech.socialsurvey.compute.feeds.impl;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.realtech.socialsurvey.compute.common.FacebookAPIOperations;
 import com.realtech.socialsurvey.compute.dao.RedisSocialMediaStateDao;
 import com.realtech.socialsurvey.compute.dao.impl.RedisSocialMediaStateDaoImpl;
@@ -17,8 +9,14 @@ import com.realtech.socialsurvey.compute.entities.response.FacebookFeedData;
 import com.realtech.socialsurvey.compute.entities.response.FacebookResponse;
 import com.realtech.socialsurvey.compute.feeds.FacebookFeedProcessor;
 import com.realtech.socialsurvey.compute.utils.UrlHelper;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import redis.clients.jedis.exceptions.JedisConnectionException;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -59,6 +57,7 @@ public class FacebookFeedProcessorImpl implements FacebookFeedProcessor
 
                 String pageId = UrlHelper.getFacebookPageIdFromURL( token.getFacebookPageLink() );
                 String lastFetchedKey = mediaToken.getProfileType().toString() + "_" + mediaToken.getIden() + "_" + pageId;
+
                 String since = redisSocialMediaStateDao.getLastFetched( lastFetchedKey );
                 String until = null;
                 if ( since == null || since.isEmpty() ) {

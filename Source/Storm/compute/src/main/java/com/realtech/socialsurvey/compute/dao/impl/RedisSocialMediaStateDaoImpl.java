@@ -1,14 +1,12 @@
 package com.realtech.socialsurvey.compute.dao.impl;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.realtech.socialsurvey.compute.common.ComputeConstants;
 import com.realtech.socialsurvey.compute.common.LocalPropertyFileHandler;
 import com.realtech.socialsurvey.compute.common.RedisDB;
 import com.realtech.socialsurvey.compute.common.RedisKeyConstants;
 import com.realtech.socialsurvey.compute.dao.RedisSocialMediaStateDao;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.exceptions.JedisException;
 
@@ -22,6 +20,9 @@ public class RedisSocialMediaStateDaoImpl implements RedisSocialMediaStateDao
 {
     private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger( RedisCompanyKeywordsDaoImpl.class );
+    private static final String PREVIOUS = "previous";
+    private static final String CURRENT = "current";
+    private static final String TWITTER_LOCK = "twitterLock:";
 
     private static final int waitForNextFetchTime = Integer.parseInt( LocalPropertyFileHandler.getInstance()
         .getProperty( ComputeConstants.APPLICATION_PROPERTY_FILE, ComputeConstants.MEDIA_TOKENS_FETCH_TIME_INTERVAL )
@@ -80,6 +81,20 @@ public class RedisSocialMediaStateDaoImpl implements RedisSocialMediaStateDao
         return false;
     }
 
+    @Override
+    public void setTwitterLock(int secondsUntilReset, String pageId) {
+        LOG.info("Setting twitter lock on pageId {}", pageId);
+        try(Jedis jedis = RedisDB.getPoolInstance().getResource()) {
+            jedis.setex(TWITTER_LOCK+pageId, secondsUntilReset,"lock"+pageId);
+        }
+    }
+
+    @Override
+    public boolean isTwitterLockSet(String pageId) {
+        try(Jedis jedis = RedisDB.getPoolInstance().getResource()) {
+           return jedis.exists(TWITTER_LOCK+pageId);
+        }
+    }
 
     /* (non-Javadoc)
      * @see com.realtech.socialsurvey.compute.dao.RedisSinceRecordFetchedDao#getLastFetched(java.lang.String)

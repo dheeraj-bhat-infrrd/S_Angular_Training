@@ -1,11 +1,6 @@
 package com.realtech.socialsurvey.compute;
 
-import org.apache.storm.Config;
-import org.apache.storm.generated.StormTopology;
-import org.apache.storm.topology.TopologyBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.realtech.socialsurvey.compute.common.ComputeConstants;
 import com.realtech.socialsurvey.compute.common.EnvConstants;
 import com.realtech.socialsurvey.compute.topology.bolts.KafkaProducerBolt;
 import com.realtech.socialsurvey.compute.topology.bolts.monitor.FacebookFeedExtractorBolt;
@@ -13,6 +8,11 @@ import com.realtech.socialsurvey.compute.topology.bolts.monitor.LinkedinFeedExtr
 import com.realtech.socialsurvey.compute.topology.bolts.monitor.TwitterFeedExtractorBolt;
 import com.realtech.socialsurvey.compute.topology.spouts.SocialMediaTokenExtractorSpout;
 import com.realtech.socialsurvey.compute.utils.ChararcterUtils;
+import org.apache.storm.Config;
+import org.apache.storm.generated.StormTopology;
+import org.apache.storm.topology.TopologyBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class SocialPostExtractorTopologyStarterHelper extends TopologyStarterHelper
@@ -51,6 +51,16 @@ public class SocialPostExtractorTopologyStarterHelper extends TopologyStarterHel
         LOG.info( "       ╚═╝    ╚═════╝ ╚═╝      ╚═════╝ ╚══════╝ ╚═════╝  ╚═════╝   ╚═╝                " );
     }
 
+    @Override
+    public boolean validateTopologyEnvironment()
+    {
+        if ( !EnvConstants.twitterConsumerKey().isPresent() || !EnvConstants.twitterConsumerSecret().isPresent() ) {
+            LOG.warn( "Unsatisfied configuration either TWITTER_CONSUMER_KEY/SECRET is not present" );
+            return false;
+        } else {
+            return true;
+        }
+    }
 
     @Override
     public Config createConfig( boolean isLocalMode )
@@ -61,10 +71,17 @@ public class SocialPostExtractorTopologyStarterHelper extends TopologyStarterHel
             return config;
         } else {
             Config config = new Config();
-            config.put( Config.TOPOLOGY_MAX_SPOUT_PENDING, 5000 );
+            config.put( Config.TOPOLOGY_MAX_SPOUT_PENDING, 500 );
             config.put( Config.STORM_NIMBUS_RETRY_TIMES, 3 );
             return config;
         }
+    }
+
+    @Override
+    public Config enhanceConfigWithCustomVariables( Config config ) {
+        config.put( ComputeConstants.TWITTER_CONSUMER_KEY, EnvConstants.twitterConsumerKey().orElse( null ) );
+        config.put( ComputeConstants.TWITTER_CONSUMER_SECRET, EnvConstants.twitterConsumerSecret().orElse( null ) );
+        return config;
     }
 
 

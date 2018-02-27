@@ -1,16 +1,15 @@
 package com.realtech.socialsurvey.compute;
 
+import com.realtech.socialsurvey.compute.common.EnvConstants;
 import com.realtech.socialsurvey.compute.topology.bolts.monitor.*;
+import com.realtech.socialsurvey.compute.topology.spouts.KafkaTopicSpoutBuilder;
+import com.realtech.socialsurvey.compute.utils.ChararcterUtils;
 import org.apache.storm.Config;
 import org.apache.storm.generated.StormTopology;
 import org.apache.storm.topology.TopologyBuilder;
 import org.apache.storm.tuple.Fields;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.realtech.socialsurvey.compute.common.EnvConstants;
-import com.realtech.socialsurvey.compute.topology.spouts.KafkaTopicSpoutBuilder;
-import com.realtech.socialsurvey.compute.utils.ChararcterUtils;
 
 
 public class SocialPostFilterTopologyStarterHelper extends TopologyStarterHelper
@@ -61,7 +60,6 @@ public class SocialPostFilterTopologyStarterHelper extends TopologyStarterHelper
             return config;
         }
     }
-
 
     @Override
     protected StormTopology topology()
