@@ -6,6 +6,7 @@ import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
 import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
 import com.realtech.socialsurvey.core.entities.SocialResponseObject;
 import java.util.List;
+import java.util.Set;
 
 public interface MongoSocialFeedDao
 {
@@ -26,6 +27,14 @@ public interface MongoSocialFeedDao
 	public List<SocialResponseObject> getAllSocialFeeds(int startIndex, int limit, boolean flag, String status, List<String> feedtype, Long companyId, List<Long> regionId, List<Long> branchId, List<Long> agentid);
 	
 	public long getAllSocialFeedsCount(boolean flag, String status, List<String> feedtype, Long companyId, List<Long> regionId, List<Long> branchId, List<Long> agentid);
+	
+	public OrganizationUnitSettings getCompanyDetails(Long companyId);
+	
+	public List<OrganizationUnitSettings> getAllRegionDetails(List<Long> regionIds);
 
+	public List<OrganizationUnitSettings> getAllBranchDetails(List<Long> branchIds);
+	
+	public List<OrganizationUnitSettings> getAllUserDetails(Set<Long> userIds);
+	
 
 }
