@@ -1,7 +1,10 @@
 package com.realtech.socialsurvey.compute.topology.bolts.monitor;
 
 import java.util.List;
+import java.util.Map;
 
+import org.apache.storm.task.OutputCollector;
+import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
@@ -12,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.compute.entities.FacebookToken;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
-import com.realtech.socialsurvey.compute.entities.TwitterToken;
 import com.realtech.socialsurvey.compute.entities.response.FacebookFeedData;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.enums.ProfileType;
@@ -33,13 +35,21 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt
     private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger( FacebookFeedExtractorBolt.class );
 
-    private FacebookFeedProcessor facebookFeedProcessor = new FacebookFeedProcessorImpl();
+    private FacebookFeedProcessor facebookFeedProcessor;
 
 
     private boolean isRateLimitExceeded()
     {
         // TODO ckech for ratelimiting for facebook api (based on user-id, page-id, )
         return false;
+    }
+
+
+    @Override
+    public void prepare( @SuppressWarnings ( "rawtypes") Map stormConf, TopologyContext context, OutputCollector collector )
+    {
+        super.prepare( stormConf, context, collector );
+        this.facebookFeedProcessor = new FacebookFeedProcessorImpl();
     }
 
 

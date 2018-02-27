@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.compute.feeds.impl;
 
 import com.realtech.socialsurvey.compute.common.FacebookAPIOperations;
+import com.realtech.socialsurvey.compute.dao.RedisSocialMediaStateDao;
 import com.realtech.socialsurvey.compute.dao.impl.RedisSocialMediaStateDaoImpl;
 import com.realtech.socialsurvey.compute.entities.FacebookToken;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
@@ -28,17 +29,13 @@ public class FacebookFeedProcessorImpl implements FacebookFeedProcessor
 
     private static final Logger LOG = LoggerFactory.getLogger( FacebookFeedProcessorImpl.class );
 
-    private RedisSocialMediaStateDaoImpl redisSocialMediaStateDaoImpl;
+    private RedisSocialMediaStateDao redisSocialMediaStateDao;
 
 
     public FacebookFeedProcessorImpl()
     {
-        this.redisSocialMediaStateDaoImpl = new RedisSocialMediaStateDaoImpl();
+        this.redisSocialMediaStateDao = new RedisSocialMediaStateDaoImpl();
     }
-
-    long lastFetchedPostId = 0L;
-    long lastFetchedSince = 0L;
-
 
     /* (non-Javadoc)
      * @see com.realtech.socialsurvey.compute.feeds.FacebookFeedProcessor#fetchFeeds(com.realtech.socialsurvey.compute.entities.FacebookToken)
@@ -60,7 +57,8 @@ public class FacebookFeedProcessorImpl implements FacebookFeedProcessor
 
                 String pageId = UrlHelper.getFacebookPageIdFromURL( token.getFacebookPageLink() );
                 String lastFetchedKey = mediaToken.getProfileType().toString() + "_" + mediaToken.getIden() + "_" + pageId;
-                String since = redisSocialMediaStateDaoImpl.getLastFetched( lastFetchedKey );
+
+                String since = redisSocialMediaStateDao.getLastFetched( lastFetchedKey );
                 String until = null;
                 if ( since == null || since.isEmpty() ) {
                     Calendar cal = Calendar.getInstance();
@@ -85,7 +83,7 @@ public class FacebookFeedProcessorImpl implements FacebookFeedProcessor
                         }
                     }
                     if(!feeds.isEmpty()){
-                        redisSocialMediaStateDaoImpl.saveLastFetched( lastFetchedKey,
+                        redisSocialMediaStateDao.saveLastFetched( lastFetchedKey,
                             Long.toString( feeds.get( 0 ).getCreatedTime() ), since );
                     }
                 }

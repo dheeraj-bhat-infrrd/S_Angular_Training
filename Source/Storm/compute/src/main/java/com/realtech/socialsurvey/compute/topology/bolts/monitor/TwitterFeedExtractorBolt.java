@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.compute.topology.bolts.monitor;
 
+
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.compute.common.ComputeConstants;
 import com.realtech.socialsurvey.compute.dao.RedisSocialMediaStateDao;
@@ -36,8 +37,10 @@ public class TwitterFeedExtractorBolt extends BaseComputeBolt
 {
     private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger( TwitterFeedExtractorBolt.class );
-    private TwitterFeedProcessor twitterFeedProcessor = new TwitterFeedProcessorImpl();
     private RedisSocialMediaStateDao socialMediaStateDao = new RedisSocialMediaStateDaoImpl();
+
+    private TwitterFeedProcessor twitterFeedProcessor;
+
 
     private String twitterConsumerKey;
     private String twitterConsumerSecret;
@@ -46,7 +49,6 @@ public class TwitterFeedExtractorBolt extends BaseComputeBolt
     {
        return socialMediaStateDao.isTwitterLockSet(pageId);
     }
-
 
     @Override
     public void execute( Tuple input )
@@ -87,13 +89,15 @@ public class TwitterFeedExtractorBolt extends BaseComputeBolt
             LOG.error( "Error while fetching post from Twitter.", e );
         }
     }
-    
+
+
     /**
      * Method for creating lastfetched key
      * @param mediaToken
      * @return
      */
-    private String getLastFetchedKey(SocialMediaTokenResponse mediaToken){
+    private String getLastFetchedKey( SocialMediaTokenResponse mediaToken )
+    {
         String lastFetchedKey = "";
         if ( mediaToken.getSocialMediaTokens() != null && mediaToken.getSocialMediaTokens().getFacebookToken() != null ) {
             TwitterToken token = mediaToken.getSocialMediaTokens().getTwitterToken();
@@ -154,6 +158,7 @@ public class TwitterFeedExtractorBolt extends BaseComputeBolt
     @Override
     public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         super.prepare(stormConf, context, collector);
+        this.twitterFeedProcessor = new TwitterFeedProcessorImpl();
         twitterConsumerKey = (String) stormConf.get(ComputeConstants.TWITTER_CONSUMER_KEY);
         twitterConsumerSecret = (String) stormConf.get(ComputeConstants.TWITTER_CONSUMER_SECRET);
     }

@@ -16,6 +16,7 @@ import org.apache.storm.tuple.Tuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.realtech.socialsurvey.compute.common.RedisKeyConstants;
 import com.realtech.socialsurvey.compute.dao.impl.RedisSocialMediaStateDaoImpl;
 
 public class KafkaProducerBolt extends BaseComputeBolt {
@@ -38,11 +39,22 @@ public class KafkaProducerBolt extends BaseComputeBolt {
             ProducerRecord<String, String> msg = new ProducerRecord<>(SOCIAL_POST_TOPIC_DEV, tuple.getString(0), tuple.getString(1));
             RecordMetadata recordMetadata = kafkaWriter.send(msg).get();
             //DO NOT REMOVE THIS DEBUG LOG
-            LOG.debug("Offset = {}",recordMetadata.offset());
+            if(LOG.isDebugEnabled()){
+                LOG.debug("Offset = {}",recordMetadata.offset());
+            }
+
             kafkaWriter.flush();
         } catch (Exception e){
             success = false;
-            redisSinceRecordFetchedDao.resetLastFetched( tuple.getStringByField( "lastFetchedKey" ) );
+            
+            if(redisSinceRecordFetchedDao.getTTLForKey( RedisKeyConstants.IS_KAFKA_DOWN ) < 0 ){
+                if(LOG.isDebugEnabled()){
+                    LOG.debug( "Resetting last fetched for {}", tuple.getStringByField( "lastFetchedKey" ));
+                }
+                redisSinceRecordFetchedDao.addWithExpire( RedisKeyConstants.IS_KAFKA_DOWN, "true", 60 );
+                redisSinceRecordFetchedDao.resetLastFetched( tuple.getStringByField( "lastFetchedKey" ) );
+            } 
+            
             // TODO reset lastfetched and add time to live
             LOG.warn("Kakfa server might be down !!! Needs to be handled immediately");
         }

@@ -44,4 +44,30 @@ public interface RedisSocialMediaStateDao extends Serializable
      * @return
      */
     boolean isTwitterLockSet(String pageId);
+
+    /** check is wait for next fetch is present in redis
+     * @return
+     */
+    public boolean waitForNextFetch();
+    
+    /**
+     * Set wati for next fetch in redis
+     * @param seconds
+     * @return
+     */
+    public boolean setWaitForNextFetch( int seconds );
+
+    /**
+     * @param key
+     * @param value
+     * @param seconds
+     * @return
+     */
+    public boolean addWithExpire( String key, String value, int seconds );
+
+    /**
+     * @param key
+     * @return
+     */
+    public long getTTLForKey( String key);
 }
