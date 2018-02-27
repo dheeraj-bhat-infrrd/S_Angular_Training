@@ -10911,6 +10911,8 @@ img.lead-img {
     cursor: not-allowed;
     min-width: 120px;
     font-weight: bold !important;
+}
+
 .width-offset {
-	width: 100px !important;
+	width: 100px;
 }
