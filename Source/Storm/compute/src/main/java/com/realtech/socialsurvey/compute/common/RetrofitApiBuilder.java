@@ -49,7 +49,7 @@ public class RetrofitApiBuilder
     {
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
         // set basic level logging
-        loggingInterceptor.setLevel( Level.BODY );
+        loggingInterceptor.setLevel( Level.BASIC );
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         OkHttpClient.Builder httpClientReporting = new OkHttpClient.Builder()
         		.connectTimeout(60000, TimeUnit.MILLISECONDS)
