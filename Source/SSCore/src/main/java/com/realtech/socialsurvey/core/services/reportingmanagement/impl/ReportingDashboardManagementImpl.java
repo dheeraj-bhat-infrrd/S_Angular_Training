@@ -4871,7 +4871,24 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
 	@Override
 	public List<SurveyInvitationEmailCountMonth> getSurveyInvitationEmailReportForMonth(long companyId, int month, int year) {
-		return surveyInvitationEmailDao.getSurveyInvitationEmailReportForMonth(companyId,month,year);
-		
+		List<SurveyInvitationEmailCountMonth> mailCountReport = new ArrayList<SurveyInvitationEmailCountMonth>();
+		List<Object[]> reportList = surveyInvitationEmailDao.getSurveyInvitationEmailReportForMonth(companyId,month,year);
+		for(Object[] obj : reportList) {
+			SurveyInvitationEmailCountMonth reportObj = new SurveyInvitationEmailCountMonth();
+			reportObj.setAgentName((String)obj[0]);
+			reportObj.setAgentEmail((String)obj[1]);
+			reportObj.setBranchName((String)obj[2]);
+			reportObj.setRegionName((String)obj[3]);
+			reportObj.setReceived(new Long(obj[4].toString()));
+			reportObj.setAttempted(new Long(obj[5].toString()));
+			reportObj.setDelivered(new Long(obj[6].toString()));
+			reportObj.setBounced(new Long(obj[7].toString()));
+			reportObj.setDiffered(new Long(obj[8].toString()));
+			reportObj.setOpened(new Long(obj[9].toString()));
+			reportObj.setLinkClicked(new Long(obj[10].toString()));
+			reportObj.setDropped(new Long(obj[11].toString()));
+			mailCountReport.add(reportObj);
+		}
+		return mailCountReport;
 	}
 }
