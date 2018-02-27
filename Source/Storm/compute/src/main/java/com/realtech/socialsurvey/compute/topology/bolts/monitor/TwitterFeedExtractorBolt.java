@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.compute.topology.bolts.monitor;
 
 import com.google.gson.Gson;
+import com.realtech.socialsurvey.compute.common.ComputeConstants;
 import com.realtech.socialsurvey.compute.dao.RedisSocialMediaStateDao;
 import com.realtech.socialsurvey.compute.dao.impl.RedisSocialMediaStateDaoImpl;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
@@ -13,15 +14,18 @@ import com.realtech.socialsurvey.compute.feeds.TwitterFeedProcessor;
 import com.realtech.socialsurvey.compute.feeds.impl.TwitterFeedProcessorImpl;
 import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBolt;
 import com.realtech.socialsurvey.compute.utils.UrlHelper;
+import org.apache.storm.task.OutputCollector;
+import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import java.util.List;
-
+import java.util.Map;
 
 
 /**
@@ -35,6 +39,9 @@ public class TwitterFeedExtractorBolt extends BaseComputeBolt
     private TwitterFeedProcessor twitterFeedProcessor = new TwitterFeedProcessorImpl();
     private RedisSocialMediaStateDao socialMediaStateDao = new RedisSocialMediaStateDaoImpl();
 
+    private String twitterConsumerKey;
+    private String twitterConsumerSecret;
+
     private boolean isRateLimitExceeded(String pageId)
     {
        return socialMediaStateDao.isTwitterLockSet(pageId);
@@ -46,31 +53,37 @@ public class TwitterFeedExtractorBolt extends BaseComputeBolt
     {
         try {
             SocialMediaTokenResponse mediaToken = (SocialMediaTokenResponse) input.getValueByField( "mediaToken" );
+            TwitterToken twitterToken = mediaToken.getSocialMediaTokens().getTwitterToken();
+            if(twitterToken != null) {
+                Long companyId = mediaToken.getCompanyId();
+                String pageId = UrlHelper.getTwitterPageIdFromURL(twitterToken.getTwitterPageLink());
+                // Check rate limiting for company
+                if (isRateLimitExceeded(pageId)) {
+                    LOG.warn("Rate limit exceeded for pageId {}", pageId);
+                } else {
+                    String lastFetchedKey = getLastFetchedKey(mediaToken);
 
-            Long companyId = mediaToken.getCompanyId();
-            String pageId = UrlHelper.getTwitterPageIdFromURL(mediaToken.getSocialMediaTokens()
-                    .getTwitterToken().getTwitterPageLink());
-            // Check rate limiting for company
-            if ( isRateLimitExceeded( pageId ) ) {
-                LOG.warn( "Rate limit exceeded" );
-            }
-            else {
-                String lastFetchedKey = getLastFetchedKey( mediaToken );
-
-                //Call twitter api to get tweets.
-                List<TwitterFeedData> response = twitterFeedProcessor.fetchFeed( companyId, mediaToken );
-                LOG.info( "Total tweet fetched : {}", response.size() );
-                for ( TwitterFeedData twitterFeedData : response ) {
-                    SocialResponseObject<TwitterFeedData> responseWrapper = createSocialResponseObject( mediaToken,
-                            twitterFeedData );
-                    String responseWrapperString = new Gson().toJson( responseWrapper );
-                    _collector.emit( new Values( companyId.toString(), responseWrapperString, lastFetchedKey ) );
-                    LOG.trace( "Emitted successfully {}", responseWrapper );
+                    //Call twitter api to get tweets.
+                    List<TwitterFeedData> response = twitterFeedProcessor.fetchFeed(companyId, mediaToken, this.twitterConsumerKey,
+                            this.twitterConsumerSecret);
+                    LOG.info("Total tweet fetched : {}", response.size());
+                    for (TwitterFeedData twitterFeedData : response) {
+                        SocialResponseObject<TwitterFeedData> responseWrapper = createSocialResponseObject(mediaToken,
+                                twitterFeedData);
+                        String responseWrapperString = new Gson().toJson(responseWrapper);
+                        _collector.emit(new Values(companyId.toString(), responseWrapperString, lastFetchedKey));
+                        LOG.trace("Emitted successfully {}", responseWrapper);
+                    }
+                    // End loop for companies
                 }
-                // End loop for companies
-            }
+            } else
+                LOG.warn( "No twitter token found for company {}", mediaToken.getCompanyId() );
 
-        } catch ( Exception e ) {
+        }
+        catch ( JedisConnectionException jedisConnectionException ) {
+            LOG.warn("Redis might be down !!! Error message is {}", jedisConnectionException.getMessage());
+        }
+        catch ( Exception e ) {
             LOG.error( "Error while fetching post from Twitter.", e );
         }
     }
@@ -138,6 +151,12 @@ public class TwitterFeedExtractorBolt extends BaseComputeBolt
         declarer.declare( new Fields( "companyId", "post", "lastFetchedKey" ) );
     }
 
+    @Override
+    public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
+        super.prepare(stormConf, context, collector);
+        twitterConsumerKey = (String) stormConf.get(ComputeConstants.TWITTER_CONSUMER_KEY);
+        twitterConsumerSecret = (String) stormConf.get(ComputeConstants.TWITTER_CONSUMER_SECRET);
+    }
 
     public TwitterFeedProcessor getTwitterFeedProcessor()
     {

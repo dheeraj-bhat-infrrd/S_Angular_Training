@@ -36,90 +36,79 @@ public class TwitterFeedProcessorImpl implements TwitterFeedProcessor
     private static final int PAGE_SIZE = 200;
     public static final int TWITTER_MIN_LIMIT = 100;
 
-    // TODO pass it in submit topo commands
-    private String consumerKey = "rqhYlHjXPERbAuASOZjNtzyEd";
-    private String consumerSecret = "E8K78DEgxexQjlmaVqkddW1oX07ea8eUQBkCQdKlXwaCc3txWS";
-
-
     @Override
-    public List<TwitterFeedData> fetchFeed( long companyId, SocialMediaTokenResponse mediaToken )
+    public List<TwitterFeedData> fetchFeed(long companyId, SocialMediaTokenResponse mediaToken,
+                                           String twitterConsumerKey, String twitterConsumerSecret)
     {
         LOG.info( "Getting tweets with id: {}", companyId );
 
         List<TwitterFeedData> feedData = new ArrayList<>();
 
-        TwitterToken token = null;
-        if ( mediaToken != null ) {
-            token = mediaToken.getSocialMediaTokens().getTwitterToken();
-        }
+        TwitterToken token = mediaToken.getSocialMediaTokens().getTwitterToken();
 
+        String pageId = UrlHelper.getTwitterPageIdFromURL( token.getTwitterPageLink() );
+        String lastFetchedKey = mediaToken.getProfileType().toString() + "_" + mediaToken.getIden() + "_" + pageId;
 
-        if ( token != null ) {
+        try {
+            String sinceId = redisSocialMediaStateDaoImpl.getLastFetched( lastFetchedKey );
 
-            String pageId = UrlHelper.getTwitterPageIdFromURL( token.getTwitterPageLink() );
-            String lastFetchedKey = mediaToken.getProfileType().toString() + "_" + mediaToken.getIden() + "_" + pageId;
+            long lastFetchedPostId = 0L;
+            if (StringUtils.isNotEmpty( sinceId ) ) {
+                lastFetchedPostId = Long.parseLong( sinceId );
+            } else {
+                // To save preValue of lastFetched
+                sinceId = "0";
+            }
 
-            try {
-                String sinceId = redisSocialMediaStateDaoImpl.getLastFetched( lastFetchedKey );
-
-                long lastFetchedPostId = 0L;
-                if (StringUtils.isNotEmpty( sinceId ) ) {
-                    lastFetchedPostId = Long.parseLong( sinceId );
-                } else {
-                    // To save preValue of lastFetched
-                    sinceId = "0";
-                }
-
-                // Settings Consumer and Access Tokens
-                Twitter twitter = new TwitterFactory().getInstance();
-                twitter.setOAuthConsumer( consumerKey, consumerSecret );
-                twitter.setOAuthAccessToken(
+            // Settings Consumer and Access Tokens
+            Twitter twitter = new TwitterFactory().getInstance();
+            twitter.setOAuthConsumer( twitterConsumerKey, twitterConsumerSecret );
+            twitter.setOAuthAccessToken(
                     new AccessToken( token.getTwitterAccessToken(), token.getTwitterAccessTokenSecret() ) );
 
 
-                long maxId = 0L;
-                ResponseList<Status> resultList;
+            long maxId = 0L;
+            ResponseList<Status> resultList;
 
 
-                do {
-                    Paging paging = new Paging();
-                    paging.setCount( PAGE_SIZE );
-                    if ( lastFetchedPostId != 0L ) {
-                        paging.setSinceId( lastFetchedPostId );
-                    }
-                    // Adding max for better results
-                    if ( maxId != 0L ) {
-                        paging.setMaxId( maxId - 1 );
-                    }
-
-                    resultList = twitter.getUserTimeline( pageId, paging );
-
-                    //save the twitterSecondsUnitlRest in redis if remainingCount becomes <= 100
-                    LOG.info("RateLimit status for page {} is {} ", pageId, resultList.getRateLimitStatus());
-                    if(resultList.getRateLimitStatus().getRemaining() <= TWITTER_MIN_LIMIT) {
-                        int secondsUntilReset = (int)(((long)resultList.getRateLimitStatus().getResetTimeInSeconds() * 1000L - System.currentTimeMillis()) / 1000L);
-                        redisSocialMediaStateDaoImpl.setTwitterLock(secondsUntilReset,pageId);
-                    }
-
-                    for ( Status status : resultList ) {
-                        feedData.add( createTwitterFeedData( status ) );
-                        maxId = status.getId();
-                    }
-                } while ( resultList.size() == PAGE_SIZE );
-
-                if(!feedData.isEmpty()){
-                    redisSocialMediaStateDaoImpl.saveLastFetched( lastFetchedKey, Long.toString( feedData.get( 0 ).getId() ), sinceId );
+            do {
+                Paging paging = new Paging();
+                paging.setCount( PAGE_SIZE );
+                if ( lastFetchedPostId != 0L ) {
+                    paging.setSinceId( lastFetchedPostId );
+                }
+                // Adding max for better results
+                if ( maxId != 0L ) {
+                    paging.setMaxId( maxId - 1 );
                 }
 
-            } catch ( TwitterException e ) {
-                // if the rate limit has been over used by any chance then blacklist the socialtoken
-                LOG.error( "Exception in Twitter feed extraction. Reason: ", e );
-                if( e.getErrorCode() == 88 ) {
-                    redisSocialMediaStateDaoImpl.setTwitterLock(900,pageId);
+                resultList = twitter.getUserTimeline( pageId, paging );
+
+                //save the twitterSecondsUnitlRest in redis if remainingCount becomes <= 100
+                LOG.info("RateLimit status for page {} is {} ", pageId, resultList.getRateLimitStatus());
+                if(resultList.getRateLimitStatus().getRemaining() <= TWITTER_MIN_LIMIT) {
+                    int secondsUntilReset = (int)(((long)resultList.getRateLimitStatus().getResetTimeInSeconds() * 1000L - System.currentTimeMillis()) / 1000L);
+                    redisSocialMediaStateDaoImpl.setTwitterLock(secondsUntilReset,pageId);
                 }
-            } catch ( JedisConnectionException e ) {
-                LOG.error( "Not able to connect to jedis", e);
+
+                for ( Status status : resultList ) {
+                    feedData.add( createTwitterFeedData( status ) );
+                    maxId = status.getId();
+                }
+            } while ( resultList.size() == PAGE_SIZE );
+
+            if(!feedData.isEmpty()){
+                redisSocialMediaStateDaoImpl.saveLastFetched( lastFetchedKey, Long.toString( feedData.get( 0 ).getId() ), sinceId );
             }
+
+        } catch ( TwitterException e ) {
+            // if the rate limit has been over used by any chance then blacklist the socialtoken
+            LOG.error( "Exception in Twitter feed extraction. Reason: ", e );
+            if( e.getErrorCode() == 88 ) {
+                redisSocialMediaStateDaoImpl.setTwitterLock(900,pageId);
+            }
+        } catch ( JedisConnectionException e ) {
+            LOG.error( "Not able to connect to redis", e);
         }
 
         return feedData;
