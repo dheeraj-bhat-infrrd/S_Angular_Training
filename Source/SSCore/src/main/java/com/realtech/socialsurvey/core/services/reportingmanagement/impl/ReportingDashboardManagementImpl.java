@@ -4798,12 +4798,14 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 		int year = cal.get(Calendar.YEAR);
 		List<Object[]> receivedCount = surveyPreInitiationDao.getReceivedCountForDate(new Timestamp(startDate), new Timestamp(endDate));
 		for (Object[] obj : receivedCount) {
-			SurveyInvitationEmailCountMonth mailCount = new SurveyInvitationEmailCountMonth();
-			mailCount.setAgentId(new Long(obj[1].toString()));
-			mailCount.setReceived(new Long(obj[0].toString()));
-			mailCount.setMonth(month);
-			mailCount.setYear(year);
-			receivedCountMonth.add(mailCount);
+			if(obj[1]!=null && obj[0] !=null) {
+				SurveyInvitationEmailCountMonth mailCount = new SurveyInvitationEmailCountMonth();
+				mailCount.setAgentId(new Long(obj[1].toString()));
+				mailCount.setReceived(new Long(obj[0].toString()));
+				mailCount.setMonth(month);
+				mailCount.setYear(year);
+				receivedCountMonth.add(mailCount);
+			}
 		}
 		return receivedCountMonth;
 
