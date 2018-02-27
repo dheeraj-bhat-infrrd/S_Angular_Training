@@ -4805,6 +4805,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 		String endDateStr = sdf.format(new Date(endDate));
 		
 		List<Object[]> receivedCount = surveyPreInitiationDao.getReceivedCountForDate(startDateStr, endDateStr);
+		LOG.info("Db returned row count : {}",receivedCount.size());
 		for (Object[] obj : receivedCount) {
 			if(obj[1]!=null && obj[0] !=null) {
 				SurveyInvitationEmailCountMonth mailCount = new SurveyInvitationEmailCountMonth();
@@ -4812,6 +4813,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 				mailCount.setReceived(new Long(obj[0].toString()));
 				mailCount.setMonth(month);
 				mailCount.setYear(year);
+				LOG.info("Mail count obj added to list.{}",mailCount.toString());
 				receivedCountMonth.add(mailCount);
 			}
 		}

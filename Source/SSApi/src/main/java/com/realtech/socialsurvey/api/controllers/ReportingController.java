@@ -824,7 +824,9 @@ public class ReportingController
     public List<SurveyInvitationEmailCountMonth> getReceivedCountsMonth(long startDateInGmt, long endDateInGmt) {
     	LOGGER.info("API call for fetching transaction received count for each agent with date range.");
     	try {
-			return reportingDashboardManagement.getReceivedCountsMonth(startDateInGmt,endDateInGmt);
+    		List<SurveyInvitationEmailCountMonth> mailCount = reportingDashboardManagement.getReceivedCountsMonth(startDateInGmt,endDateInGmt);
+    		LOGGER.info("Fetched {} no of records",mailCount.size());
+    		return mailCount;
 		} catch (ParseException e) {
 			LOGGER.error("Error getting received count.",e);
 		} 
