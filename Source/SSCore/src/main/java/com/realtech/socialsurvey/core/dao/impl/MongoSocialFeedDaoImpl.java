@@ -17,6 +17,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 
 @Repository
@@ -40,6 +41,10 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
     private static final String IDEN = "iden";
     private static final String STATUS = "status";
     private static final String SOCIALMONITOR_MACROS = "socialMonitorMacros";
+    private static final String CONTACT_DETAILS = "contact_details";
+    private static final String NAME = "name";
+    private static final String PROFILE_IMAGE_URL = "profileImageUrl";
+
 
 
     @Override
@@ -318,7 +323,63 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 		query.addCriteria(criteria);
 
 		return mongoTemplate.count(query, SOCIAL_FEED_COLLECTION);
+	}
+	
+	@Override
+	public OrganizationUnitSettings getCompanyDetails(Long companyId) {
+		LOG.debug( "Fetching company details from {}", CommonConstants.COMPANY_SETTINGS_COLLECTION );
+		OrganizationUnitSettings organizationUnitSettings = null;
+        Query query = new Query();
+        query.addCriteria( Criteria.where( "iden" ).is( companyId ) );
+        query.fields().exclude( KEY_IDENTIFIER ).include(IDEN).include(CONTACT_DETAILS + "." + NAME).include(PROFILE_IMAGE_URL);
+        organizationUnitSettings = mongoTemplate.findOne( query, OrganizationUnitSettings.class, CommonConstants.COMPANY_SETTINGS_COLLECTION );
+        LOG.debug( "Fetched company details from {}", CommonConstants.COMPANY_SETTINGS_COLLECTION );
+        return organizationUnitSettings;
+	}
+
+	@Override
+	public List<OrganizationUnitSettings> getAllRegionDetails(List<Long> regionIds) {
+		LOG.debug( "Fetching all region details from {}", CommonConstants.REGION_SETTINGS_COLLECTION );
+        List<OrganizationUnitSettings> organizationUnitSettings = null;
+        Query query = new Query();
+        query.addCriteria( Criteria.where( "iden" ).in( regionIds ) );
+        query.fields().exclude( KEY_IDENTIFIER ).include(IDEN).include(CONTACT_DETAILS + "." + NAME).include(PROFILE_IMAGE_URL);
+        organizationUnitSettings = mongoTemplate.find( query, OrganizationUnitSettings.class, CommonConstants.REGION_SETTINGS_COLLECTION );
+        LOG.debug( "Fetched all region details from {}", CommonConstants.REGION_SETTINGS_COLLECTION );
+        return organizationUnitSettings;
+	}
+
+
+	@Override
+	public List<OrganizationUnitSettings> getAllBranchDetails(List<Long> branchIds) {
+		LOG.debug( "Fetching all branch details from {}", CommonConstants.BRANCH_SETTINGS_COLLECTION );
+        List<OrganizationUnitSettings> organizationUnitSettings = null;
+        Query query = new Query();
+        query.addCriteria( Criteria.where( "iden" ).in( branchIds ) );
+        query.fields().exclude( KEY_IDENTIFIER ).include(IDEN).include(CONTACT_DETAILS + "." + NAME).include(PROFILE_IMAGE_URL);
+        organizationUnitSettings = mongoTemplate.find( query, OrganizationUnitSettings.class, CommonConstants.BRANCH_SETTINGS_COLLECTION );
+        LOG.debug( "Fetched all branch details from {}", CommonConstants.BRANCH_SETTINGS_COLLECTION );
+        return organizationUnitSettings;
+	}
+
+	@Override
+	public List<OrganizationUnitSettings> getAllUserDetails(Set<Long> userIds) {
+		LOG.debug( "Fetching all user details from {}", CommonConstants.AGENT_SETTINGS_COLLECTION );
+        List<OrganizationUnitSettings> organizationUnitSettings = null;
+        Query query = new Query();
+        query.addCriteria( Criteria.where( "iden" ).in( userIds ) );
+        query.fields().exclude( KEY_IDENTIFIER ).include(IDEN).include(CONTACT_DETAILS + "." + NAME).include(PROFILE_IMAGE_URL);
+        organizationUnitSettings = mongoTemplate.find( query, OrganizationUnitSettings.class, CommonConstants.AGENT_SETTINGS_COLLECTION );
+        LOG.debug( "Fetched all user details from {}", CommonConstants.AGENT_SETTINGS_COLLECTION );
+        return organizationUnitSettings;
 	}	
+	
+	
+	
+	
+	
+	
+	
 	
 
 }

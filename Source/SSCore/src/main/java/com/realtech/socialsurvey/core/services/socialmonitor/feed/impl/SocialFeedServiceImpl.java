@@ -4,19 +4,30 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+
+import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import com.realtech.socialsurvey.core.commons.ActionHistoryComparator;
+import com.realtech.socialsurvey.core.dao.BranchDao;
+import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.MongoSocialFeedDao;
+import com.realtech.socialsurvey.core.dao.RegionDao;
+import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialFeedDaoImpl;
 import com.realtech.socialsurvey.core.entities.ActionHistory;
+import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.SegmentsEntity;
+import com.realtech.socialsurvey.core.entities.SegmentsVO;
 import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
 import com.realtech.socialsurvey.core.entities.SocialMonitorFeedData;
 import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
@@ -42,6 +53,19 @@ public class SocialFeedServiceImpl implements SocialFeedService
     private static final Logger LOG = LoggerFactory.getLogger( SocialFeedServiceImpl.class );
     @Autowired
     MongoSocialFeedDao mongoSocialFeedDao;
+    
+    @Autowired
+    CompanyDao companyDao;
+    
+    @Autowired
+    RegionDao regionDao;
+    
+    @Resource
+    @Qualifier ( "branch")
+    BranchDao branchDao;
+    
+    @Autowired
+    UserDao userDao;
     
     private EmailServices emailServices;
 
@@ -236,7 +260,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
 	public void updateMacrosForFeeds(SocialMonitorMacro socialMonitorMacro, long companyId)
 			throws InvalidInputException {
 		LOG.debug("Updating macros for social monitor for company with id {}", companyId);
-		SocialMonitorMacro macro = new SocialMonitorMacro();
+		SocialMonitorMacro macro;
 		if (socialMonitorMacro == null || companyId <= 0) {
 			LOG.error("Invalid parameters passed");
 			throw new InvalidInputException("Invalid parameters passed");
@@ -281,6 +305,80 @@ public class SocialFeedServiceImpl implements SocialFeedService
 		}
 		return socialMonitorMacro;
 
+	}
+
+	@Override
+	public SegmentsVO getSegmentsByCompanyId(Long companyId, int startIndex, int batchSize)
+			throws InvalidInputException {
+		LOG.debug("Fetching regions and branches for companyId {}", companyId);
+		if (companyId <= 0) {
+			LOG.error("Invalid companyId");
+			throw new InvalidInputException("Invalid companyId");
+		}
+		SegmentsVO segmentsVO = new SegmentsVO();
+		SegmentsEntity companyData = new SegmentsEntity();
+		List<SegmentsEntity> regionList = new ArrayList<>();
+		List<SegmentsEntity> branchList = new ArrayList<>();
+
+		List<Long> regionIds = regionDao.getRegionIdsUnderCompany(companyId, startIndex, batchSize);
+		List<Long> branchIds = branchDao.getBranchIdsUnderCompany(companyId, startIndex, batchSize);
+
+		OrganizationUnitSettings companyDetails = mongoSocialFeedDao.getCompanyDetails(companyId);
+		if (companyDetails != null) {
+			companyData.setIden(companyDetails.getIden());
+			companyData.setName(companyDetails.getContact_details().getName());
+			companyData.setProfileImageUrl(companyDetails.getProfileImageUrl());
+			segmentsVO.setSegmentsEntity(companyData);
+		}
+
+		List<OrganizationUnitSettings> regionDetails = mongoSocialFeedDao.getAllRegionDetails(regionIds);
+		if (!regionDetails.isEmpty() || regionDetails != null) {
+			for (OrganizationUnitSettings organizationUnitSettings : regionDetails) {
+				SegmentsEntity segmentsEntity = new SegmentsEntity();
+				segmentsEntity.setIden(organizationUnitSettings.getIden());
+				segmentsEntity.setName(organizationUnitSettings.getContact_details().getName());
+				segmentsEntity.setProfileImageUrl(organizationUnitSettings.getProfileImageUrl());
+				regionList.add(segmentsEntity);
+			}
+			segmentsVO.setRegionDetails(regionList);
+		}
+
+		List<OrganizationUnitSettings> branchdetails = mongoSocialFeedDao.getAllBranchDetails(branchIds);
+		if (!branchdetails.isEmpty() || branchdetails != null) {
+			for (OrganizationUnitSettings organizationUnitSettings : branchdetails) {
+				SegmentsEntity segmentsEntity = new SegmentsEntity();
+				segmentsEntity.setIden(organizationUnitSettings.getIden());
+				segmentsEntity.setName(organizationUnitSettings.getContact_details().getName());
+				segmentsEntity.setProfileImageUrl(organizationUnitSettings.getProfileImageUrl());
+				branchList.add(segmentsEntity);
+			}
+			segmentsVO.setBranchDetails(branchList);
+		}
+
+		return segmentsVO;
+	}
+
+	@Override
+	public List<SegmentsEntity> getUsersByCompanyId(Long companyId, int startIndex, int batchSize)
+			throws InvalidInputException {
+		LOG.debug("Fetching users for companyId {}", companyId);
+		if (companyId <= 0) {
+			LOG.error("Invalid companyId");
+			throw new InvalidInputException("Invalid companyId");
+		}
+		List<SegmentsEntity> usersList = new ArrayList<>();
+		Set<Long> userIds = userDao.getActiveUserIdsForCompany(companyDao.findById(Company.class, companyId));
+		List<OrganizationUnitSettings> userDetails = mongoSocialFeedDao.getAllUserDetails(userIds);
+		if (!userDetails.isEmpty() || userDetails != null) {
+			for (OrganizationUnitSettings organizationUnitSettings : userDetails) {
+				SegmentsEntity segmentsEntity = new SegmentsEntity();
+				segmentsEntity.setIden(organizationUnitSettings.getIden());
+				segmentsEntity.setName(organizationUnitSettings.getContact_details().getName());
+				segmentsEntity.setProfileImageUrl(organizationUnitSettings.getProfileImageUrl());
+				usersList.add(segmentsEntity);
+			}
+		}
+		return usersList;
 	}
 
 
