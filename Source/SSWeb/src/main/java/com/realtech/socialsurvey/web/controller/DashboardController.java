@@ -2032,7 +2032,7 @@ public class DashboardController
 				if(user.getLastName() != null)
 					loggedUser = loggedUser + " " + user.getLastName();
 				emailServices.sendAbusiveNotifyMail(loggedUser, abusiveMailSettings.getMailId(), displayName,surveyDetails.getCustomerEmail(), surveyDetails.getAgentName(), 
-						userObj.getEmailId(),surveyDetails.getMood(), String.valueOf(surveyDetails.getScore()), surveyDetails.getSourceId(), surveyDetails.getReview(),surveyDetails.getSurveyCompletedDate().toString());
+						userObj.getEmailId(),surveyDetails.getMood(), String.valueOf(surveyDetails.getScore()), surveyDetails.getSourceId(), surveyDetails.getReview(),surveyDetails.getLastAbuseReportedDate().toString());
 			}
         } catch ( NonFatalException e ) {
             LOG.error( "NonfatalException caught in reportAbuse(). Nested exception is ", e );

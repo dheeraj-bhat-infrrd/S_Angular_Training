@@ -8839,6 +8839,54 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 	}
 	
+	@Override
+	public void unsetAbusiveMailService(long companyId) throws NonFatalException {
+
+		LOG.info("Unset abusive mail");
+		OrganizationUnitSettings unitSettings = null;
+
+		unitSettings = getCompanySettings(companyId);
+
+		if (unitSettings == null)
+			throw new NonFatalException("Company settings cannot be found for id : " + companyId);
+		// if surveySettings doesnt exist add it
+		if (unitSettings.getSurvey_settings().getAbusive_mail_settings() != null) {
+			unsetKey(unitSettings,MongoOrganizationUnitSettingDaoImpl.KEY_ABUSIVE_EMAIL_SETTING,CommonConstants.COMPANY_SETTINGS_COLLECTION);
+		}
+
+	}
+	
+	@Override
+	public void unsetComplaintResService(long companyId) throws NonFatalException {
+
+		LOG.info("Unset Complaint Resolution mail");
+		OrganizationUnitSettings unitSettings = null;
+
+		unitSettings = getCompanySettings(companyId);
+
+		if (unitSettings == null)
+			throw new NonFatalException("Company settings cannot be found for id : " + companyId);
+		// if surveySettings doesnt exist add it
+		if (unitSettings.getSurvey_settings().getComplaint_res_settings() != null) {
+			unsetKey(unitSettings,MongoOrganizationUnitSettingDaoImpl.KEY_COMPLAINT_RESOLUTION_SETTING,CommonConstants.COMPANY_SETTINGS_COLLECTION);
+		}
+
+	}
+	
+	@Override
+    public boolean unsetKey( OrganizationUnitSettings companySettings, String keyToUpdate , String collectionName )
+        throws InvalidInputException
+    {
+        if ( companySettings == null ) {
+            throw new InvalidInputException( "Company settings cannot be null." );
+        }
+
+        LOG.debug( "unsetting comapnySettings: {} for key: {}",companySettings ,keyToUpdate );
+        organizationUnitSettingsDao.removeKeyInOrganizationSettings(companySettings, keyToUpdate, collectionName);
+        LOG.debug( "Updated the record successfully" );
+
+        return true;
+    }
 
     public String checkValidMail(String mailId) throws InvalidInputException {
 		String mailIDStr = "";
@@ -8847,7 +8895,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			if (!validateEmail(mailId.trim()))
 				throw new InvalidInputException("Mail id - {}   entered as send alert to input is invalid",mailId)  ;
 			else
-				mailIDStr = mailId.trim();
+				mailId = mailId.trim();
 		} else {
 			String mailIds[] = mailId.split(",");
 

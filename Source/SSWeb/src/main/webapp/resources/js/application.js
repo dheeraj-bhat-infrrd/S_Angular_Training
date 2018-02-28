@@ -12517,8 +12517,16 @@ function setColDetails(currentProfileName, currentProfileValue, parentCompanyId)
 }
 
 // complaint registration event binding
-$(document).on('click', '#comp-reg-form-submit', function() {
-	if (validateComplaintRegistraionForm()) {
+$(document).on('click', '#comp-reg-form-submit', function(e) {
+	
+	var emailIdStr = document.getElementById("comp-mailId").value;
+	if(emailIdStr == ""){
+		$('#overlay-main').show();
+		e.stopPropagation();
+		$('#other-account').val('true');
+		createPopupConfirm("Unsubscribe Complaint Resolution Emails", "Are you sure you want to unsubscribe compalint resolution emails");
+		overlayUnsetCompRes();
+	}else if (validateComplaintRegistraionForm()) {
 		var formData = $('#comp-reg-form').serialize();
 		callAjaxPostWithPayloadData("/updatecomplaintressettings.do", function(data) {
 			$('#overlay-toast').html(data);
@@ -12527,9 +12535,29 @@ $(document).on('click', '#comp-reg-form-submit', function() {
 	}
 });
 
+function overlayUnsetCompRes() {
+
+	$('#overlay-continue').click(function() {
+		callAjaxPOST('./unsetcomplaintresolution.do', function() {
+			$('#overlay-continue').unbind('click');
+			overlayRevert();
+		}, true)});
+	$('#overlay-cancel').click(function() {
+		overlayRevert();
+	});
+}
+
+
 // abusive alert
-$(document).on('click', '#abusive-email-form-submit', function() {
-	if (validateAbusiveEmailForm()) {
+$(document).on('click', '#abusive-email-form-submit', function(e) {
+	var emailIdStr = document.getElementById("abusive-mailId").value;
+	if(emailIdStr == ""){
+		$('#overlay-main').show();
+		e.stopPropagation();
+		$('#other-account').val('true');
+		createPopupConfirm("Unsubscribe Alert Emails", "Are you sure you want to unsubscribe abusive emails");
+		overlayUnsetAbusive();
+	}else if(validateAbusiveEmailForm()) {
 		var formData = $('#abusive-reg-form').serialize();
 		callAjaxPostWithPayloadData("/updateabusivesurveysettings.do", function(data) {
 			$('#overlay-toast').html(data);
@@ -12537,6 +12565,19 @@ $(document).on('click', '#abusive-email-form-submit', function() {
 		}, formData, true, '#abusive-email-form-submit');
 	}
 });
+
+
+function overlayUnsetAbusive() {
+
+	$('#overlay-continue').click(function() {
+		callAjaxPOST('./unsetabusivesurveysettings.do', function() {
+			$('#overlay-continue').unbind('click');
+			overlayRevert();
+		}, true)});
+	$('#overlay-cancel').click(function() {
+		overlayRevert();
+	});
+}
 
 $(document).on('click touchstart', '#compl-checkbox', function() {
 	if ($(this).hasClass('bd-check-img-checked')) {

@@ -1927,7 +1927,7 @@ public class ProfileController
 				if (surveyDetails.getCustomerLastName() != null)
 					displayName = displayName + " " + surveyDetails.getCustomerLastName();
 				emailServices.sendAbusiveNotifyMail(reporterName, abusiveMailSettings.getMailId(), displayName,surveyDetails.getCustomerEmail(), surveyDetails.getAgentName(), 
-						userObj.getEmailId(),surveyDetails.getMood(), String.valueOf(surveyDetails.getScore()), surveyDetails.getSourceId(), surveyDetails.getReview(),surveyDetails.getSurveyCompletedDate().toString());
+						userObj.getEmailId(),surveyDetails.getMood(), String.valueOf(surveyDetails.getScore()), surveyDetails.getSourceId(), surveyDetails.getReview(),surveyDetails.getLastAbuseReportedDate().toString());
 			}
         } catch ( NonFatalException e ) {
             LOG.error( "NonfatalException caught in reportAbuse(). Nested exception is ", e );

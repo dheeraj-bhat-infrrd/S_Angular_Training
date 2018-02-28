@@ -231,4 +231,10 @@ public interface SSApiIntegration
     @POST( "/v1/updateabusivemail" )
     Response updateAbusiveMail(@Query ("entityId") long entityId,@Query ("mailId") String mailId);
     
+    @POST( "/v1/unsetabusivemail" )
+    Response unsetAbusiveMail(@Query ("entityId") long entityId);
+    
+    @POST( "/v1/unsetcompres" )
+    Response unsetCompRes(@Query ("entityId") long entityId);
+    
 }

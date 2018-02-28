@@ -2816,7 +2816,7 @@ public class OrganizationManagementController
                     throw new InvalidInputException( "Mail id - " + mailId + " entered as send alert to input is invalid",
                         DisplayMessageConstants.GENERAL_ERROR );
                 else
-                    mailIDStr = mailId.trim();
+                	mailId = mailId.trim();
             } else {
                 String mailIds[] = mailId.split( "," );
 
@@ -2945,6 +2945,55 @@ public class OrganizationManagementController
         return message;
     }
     
+    @RequestMapping( value = "/unsetabusivesurveysettings" , method = RequestMethod.POST)
+    @ResponseBody
+    public String unsetAbusiveSurveySettings( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Unset Abusive Survey Settings" );
+        String message = "";
+        User user = sessionHelper.getCurrentUser();
+
+        if ( !user.isCompanyAdmin() )
+		    throw new AuthorizationException( "User is not authorized to access this page" );
+
+		long entityId = user.getCompany().getCompanyId();
+		
+		//add service function
+		ssApiIntergrationBuilder.getIntegrationApi().unsetAbusiveMail(entityId);
+
+
+		LOG.info( "Unset Abusive Email Settings" );
+		message = messageUtils.getDisplayMessage( DisplayMessageConstants.ABUSIVE_EMAIL_SUCCESSFUL,
+		    DisplayMessageType.SUCCESS_MESSAGE ).getMessage();	
+
+        return message;
+    
+    }
+    
+    @RequestMapping( value = "/unsetcomplaintresolution" , method = RequestMethod.POST)
+    @ResponseBody
+    public String unsetComplaintResSettings( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Unset Complaint Resolution Settings" );
+        String message = "";
+        User user = sessionHelper.getCurrentUser();
+
+        if ( !user.isCompanyAdmin() )
+		    throw new AuthorizationException( "User is not authorized to access this page" );
+
+		long entityId = user.getCompany().getCompanyId();
+		
+		//add service function
+		ssApiIntergrationBuilder.getIntegrationApi().unsetCompRes(entityId);
+
+
+		LOG.info( "Unset Complaint Resolution Settings" );
+		message = messageUtils.getDisplayMessage( DisplayMessageConstants.COMPLAINT_REGISTRATION_SUCCESSFUL,
+		    DisplayMessageType.SUCCESS_MESSAGE ).getMessage();	
+
+        return message;
+    
+    }
    
     @RequestMapping ( value = "/fetchsurveysunderresolution", method = RequestMethod.GET)
     public String fetchSurveysUnderResolution( Model model, HttpServletRequest request )

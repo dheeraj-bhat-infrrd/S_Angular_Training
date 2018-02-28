@@ -27,11 +27,26 @@ public class OrganizationManagementApiController
     @ApiOperation ( value = "Updating abusive mail settings")
     public String updateAbusiveMail( long entityId , String mailId) throws InvalidInputException, NonFatalException
     {
-        LOGGER.info( "Fetching Completion Rate Graph for company with companyId : {}",entityId );
+        LOGGER.info( "Updating abusive mail settings for companyId : {}",entityId );
         organizationManagementService.updateAbusiveMailService(entityId, mailId);
 		return mailId;
 
     }
 
+    @RequestMapping ( value = "/unsetabusivemail", method = RequestMethod.POST)
+    @ApiOperation ( value = "Unset abusive mail settings")
+    public void unsetAbusiveMail( long entityId ) throws  NonFatalException
+    {
+        LOGGER.info( "Unset abusive mail settings for companyId : {}",entityId );
+        organizationManagementService.unsetAbusiveMailService(entityId);
+    }
+    
+    @RequestMapping ( value = "/unsetcompres", method = RequestMethod.POST)
+    @ApiOperation ( value = "Unset Complaint Resolution settings")
+    public void unsetCompRes( long entityId ) throws  NonFatalException
+    {
+        LOGGER.info( "Unset Complaint Resolution settings for companyId : {}",entityId );
+        organizationManagementService.unsetComplaintResService(entityId);
+    }
 
 }
