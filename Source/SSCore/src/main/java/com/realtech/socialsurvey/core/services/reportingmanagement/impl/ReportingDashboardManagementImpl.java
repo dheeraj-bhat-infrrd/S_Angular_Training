@@ -4846,7 +4846,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 		calendar.setTimeInMillis(startDate.getTime());
 		int year = calendar.get(Calendar.YEAR);
 		int month = calendar.get(Calendar.MONTH) + 1;
-		String monthStr = new DateFormatSymbols().getMonths()[month];
+		String monthStr = new DateFormatSymbols().getMonths()[month-1];
 		String fileName = "Email_Message_Report_Month_" + monthStr + "_" +
 				 user.getFirstName() + " " + user.getLastName() +
 				 ( Calendar.getInstance().getTimeInMillis() ) +
