@@ -2072,6 +2072,12 @@ public class OrganizationManagementController
                         .getMessage();
                     break;
             }
+            
+            // default digest flag is the new account type is enterprise
+            if ( newAccountsMasterId == CommonConstants.ACCOUNTS_MASTER_ENTERPRISE) {
+                reportingDashboardManagement.updateSendDigestMailToggle( CommonConstants.COMPANY_ID_COLUMN, user.getCompany().getCompanyId(), true );
+            }
+            
             LOG.info( "message returned : " + message );
         } catch ( InvalidInputException | NoRecordsFetchedException | SolrException | UndeliveredEmailException e ) {
             LOG.error( "NonFatalException while upgrading subscription. Message : " + e.getMessage(), e );
@@ -2229,9 +2235,11 @@ public class OrganizationManagementController
         User user = sessionHelper.getCurrentUser();
 
         try {
+            
+            OrganizationUnitSettings companySettings = null;
+            
             try {
-                OrganizationUnitSettings companySettings = organizationManagementService
-                    .getCompanySettings( user.getCompany().getCompanyId() );
+                companySettings = organizationManagementService.getCompanySettings( user.getCompany().getCompanyId() );
                 redirectAttributes.addFlashAttribute( "hiddenSection", companySettings.isHiddenSection() );
             } catch ( InvalidInputException e ) {
                 throw new InvalidInputException( "Invalid Input exception occured in method getCompanySettings()",
@@ -2311,6 +2319,13 @@ public class OrganizationManagementController
             redirectAttributes.addFlashAttribute( "showLinkedInPopup", String.valueOf( showLinkedInPopup ) );
             redirectAttributes.addFlashAttribute( "showSendSurveyPopup", String.valueOf( showSendSurveyPopup ) );
 
+            
+            // default digest flag
+            if ( currentAccountsMaster.getAccountsMasterId() == CommonConstants.ACCOUNTS_MASTER_ENTERPRISE) {
+                reportingDashboardManagement.updateSendDigestMailToggle( CommonConstants.COMPANY_ID_COLUMN, companySettings.getIden(), true );
+            }
+            
+            
             // update the last login time and number of logins
             // userManagementService.updateUserLoginTimeAndNum(user);
         } catch ( NonFatalException e ) {
