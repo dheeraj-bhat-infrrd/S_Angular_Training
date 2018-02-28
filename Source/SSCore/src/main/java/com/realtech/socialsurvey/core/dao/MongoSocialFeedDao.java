@@ -1,34 +1,40 @@
 package com.realtech.socialsurvey.core.dao;
 
-import java.util.List;
-
 import com.realtech.socialsurvey.core.entities.ActionHistory;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
-import com.realtech.socialsurvey.core.entities.SocialMonitorFeedData;
 import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
 import com.realtech.socialsurvey.core.entities.SocialResponseObject;
+import java.util.List;
+import java.util.Set;
 
 public interface MongoSocialFeedDao
 {
     public void insertSocialFeed( SocialResponseObject<?> socialFeed, String collectionName );
 
-    long getDuplicatePostsCount(int hash, long companyId);
-
-    long updateDuplicateCount(int hash, long companyId, long duplicateCount);
+    long updateDuplicateCount(int hash, long companyId);
     
     public SocialResponseObject getSocialFeed(String postId, String collectionName);
-        
-    public List<SocialResponseObject> getAllSocialFeeds(long profileId, String key, int startIndex, int limit, boolean flag, String status, List<String> feedtype);
-    
-    public long getAllSocialFeedsCount(long profileId, String key, boolean flag, String status, List<String> feedtype);
-    
+                
 	public void updateSocialFeed(SocialFeedsActionUpdate socialFeedsActionUpdate, List<ActionHistory> actionHistory, int updateFlag, String collectionName);
 	
-	public OrganizationUnitSettings FetchMacros(long companyId);
+	public OrganizationUnitSettings FetchMacros(Long companyId);
 	
 	public void updateMacros(SocialMonitorMacro socialMonitorMacro, long companyId);
 	
 	public void updateMacroCount(List<SocialMonitorMacro> socialMonitorMacros, long companyId);
-		
+	
+	public List<SocialResponseObject> getAllSocialFeeds(int startIndex, int limit, boolean flag, String status, List<String> feedtype, Long companyId, List<Long> regionId, List<Long> branchId, List<Long> agentid);
+	
+	public long getAllSocialFeedsCount(boolean flag, String status, List<String> feedtype, Long companyId, List<Long> regionId, List<Long> branchId, List<Long> agentid);
+	
+	public OrganizationUnitSettings getCompanyDetails(Long companyId);
+	
+	public List<OrganizationUnitSettings> getAllRegionDetails(List<Long> regionIds);
+
+	public List<OrganizationUnitSettings> getAllBranchDetails(List<Long> branchIds);
+	
+	public List<OrganizationUnitSettings> getAllUserDetails(Set<Long> userIds);
+	
+
 }

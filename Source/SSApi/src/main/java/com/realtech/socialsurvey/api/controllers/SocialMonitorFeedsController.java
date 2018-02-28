@@ -16,12 +16,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.realtech.socialsurvey.api.exceptions.SSApiException;
+import com.realtech.socialsurvey.core.entities.SegmentsEntity;
+import com.realtech.socialsurvey.core.entities.SegmentsVO;
 import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
-import com.realtech.socialsurvey.core.entities.SocialMonitorFeedData;
 import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
 import com.realtech.socialsurvey.core.entities.SocialMonitorResponseData;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.socialmonitor.feed.SocialFeedService;
 import com.wordnik.swagger.annotations.ApiOperation;
 
@@ -40,14 +40,18 @@ public class SocialMonitorFeedsController {
 
 	@RequestMapping(value = "/showsocialfeeds", method = RequestMethod.GET)
 	@ApiOperation(value = "Get Social posts for Social monitor")
-	public ResponseEntity<?> showStreamSocialPosts(long profileId, String profileLevel, int startIndex, int limit,
-			String status, boolean flag, @RequestParam List<String> feedtype)
+	public ResponseEntity<?> showStreamSocialPosts(int startIndex, int limit,
+			@RequestParam(value = "status", required = false) String status, boolean flag,
+			@RequestParam List<String> feedtype, @RequestParam(value = "companyId", required = false) Long companyId,
+			@RequestParam(value = "regionIds", required = false) List<Long> regionIds,
+			@RequestParam(value = "branchIds", required = false) List<Long> branchIds,
+			@RequestParam(value = "agentIds", required = false) List<Long> agentIds)
 			throws InvalidInputException, SSApiException {
 		LOGGER.info("Fetching the list of Social posts for social monitor");
 		SocialMonitorResponseData socialMonitorResponseData;
 		try {
-			socialMonitorResponseData = socialFeedService.getAllSocialPosts(profileId, profileLevel, startIndex, limit,
-					status, flag, feedtype);
+			socialMonitorResponseData = socialFeedService.getAllSocialPosts(startIndex, limit, status, flag, feedtype,
+					companyId, regionIds, branchIds, agentIds);
 		} catch (InvalidInputException ie) {
 			LOGGER.error("Invalid input exception caught while fetching social feeds", ie);
 			throw new SSApiException("Invalid input exception caught while fetching social feeds", ie);
@@ -60,7 +64,8 @@ public class SocialMonitorFeedsController {
 	@RequestMapping(value = "/updatesocialfeeds/action", method = RequestMethod.PUT)
 	@ApiOperation(value = "Update Social posts for Social monitor for individual/bulk posts")
 	public ResponseEntity<?> saveSocialFeedsForAction(@RequestBody SocialFeedsActionUpdate socialFeedsActionUpdate,
-			long companyId) throws SSApiException, InvalidInputException {
+			@RequestParam(value = "companyId", required = false) Long companyId)
+			throws SSApiException, InvalidInputException {
 		LOGGER.info("Updating the action of Social feeds for social monitor");
 		try {
 			socialFeedService.updateActionForFeeds(socialFeedsActionUpdate, companyId);
@@ -71,9 +76,10 @@ public class SocialMonitorFeedsController {
 		return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/socialfeedsmacro", method = RequestMethod.GET)
+	@RequestMapping(value = "/socialfeedsmacro/company/{companyId}", method = RequestMethod.GET)
 	@ApiOperation(value = "Get macros for a particular entity")
-	public ResponseEntity<?> showMacrosForEntity(long companyId) throws InvalidInputException, SSApiException {
+	public ResponseEntity<?> showMacrosForEntity(@PathVariable long companyId)
+			throws InvalidInputException, SSApiException {
 		LOGGER.info("Fetching the list of Macros for an entity");
 		List<SocialMonitorMacro> socialMonitorMacros = new ArrayList<>();
 		try {
@@ -98,6 +104,53 @@ public class SocialMonitorFeedsController {
 			throw new SSApiException("Invalid input exception caught while updating macros", ie);
 		}
 		return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
+
+	}
+
+	@RequestMapping(value = "/socialfeedsmacro/company/{companyId}/macro/{macroId}", method = RequestMethod.GET)
+	@ApiOperation(value = "Get macro by macroId")
+	public ResponseEntity<?> getMacroById(@PathVariable Long companyId, @PathVariable String macroId)
+			throws InvalidInputException, SSApiException {
+		LOGGER.info("Fetching the Macro by Id");
+		SocialMonitorMacro socialMonitorMacro;
+		try {
+			socialMonitorMacro = socialFeedService.getMacroById(macroId, companyId);
+		} catch (InvalidInputException ie) {
+			LOGGER.error("Invalid input exception caught while fetching macro", ie);
+			throw new SSApiException("Invalid input exception caught while fetching macro", ie);
+		}
+		return new ResponseEntity<>(socialMonitorMacro, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/segments/company/{companyId}", method = RequestMethod.GET)
+	@ApiOperation(value = "Get regions and branches for a company")
+	public ResponseEntity<?> getSegmentsByCompanyId(@PathVariable Long companyId, int startIndex, int limit)
+			throws InvalidInputException, SSApiException {
+		LOGGER.info("Fetching regions and branches for a company");
+		SegmentsVO segmentsVO;
+		try {
+			segmentsVO = socialFeedService.getSegmentsByCompanyId(companyId, startIndex, limit);
+		} catch (InvalidInputException ie) {
+			LOGGER.error("Invalid input exception caught while fetching branches and regions", ie);
+			throw new SSApiException("Invalid input exception caught while fetching branches and regions", ie);
+		}
+		return new ResponseEntity<>(segmentsVO, HttpStatus.OK);
+
+	}
+
+	@RequestMapping(value = "/users/company/{companyId}", method = RequestMethod.GET)
+	@ApiOperation(value = "Get users for a company")
+	public ResponseEntity<?> getUsersByCompanyId(@PathVariable Long companyId, int startIndex, int limit)
+			throws InvalidInputException, SSApiException {
+		LOGGER.info("Fetching users for a company");
+		List<SegmentsEntity> list = null;
+		try {
+			list = socialFeedService.getUsersByCompanyId(companyId, startIndex, limit);
+		} catch (InvalidInputException ie) {
+			LOGGER.error("Invalid input exception caught while fetching users", ie);
+			throw new SSApiException("Invalid input exception caught while fetching users", ie);
+		}
+		return new ResponseEntity<>(list, HttpStatus.OK);
 
 	}
 

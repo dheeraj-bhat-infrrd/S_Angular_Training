@@ -4,20 +4,30 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+
+import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import com.realtech.socialsurvey.core.commons.ActionHistoryComparator;
-import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.BranchDao;
+import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.MongoSocialFeedDao;
+import com.realtech.socialsurvey.core.dao.RegionDao;
+import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialFeedDaoImpl;
 import com.realtech.socialsurvey.core.entities.ActionHistory;
+import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.SegmentsEntity;
+import com.realtech.socialsurvey.core.entities.SegmentsVO;
 import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
 import com.realtech.socialsurvey.core.entities.SocialMonitorFeedData;
 import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
@@ -44,6 +54,19 @@ public class SocialFeedServiceImpl implements SocialFeedService
     @Autowired
     MongoSocialFeedDao mongoSocialFeedDao;
     
+    @Autowired
+    CompanyDao companyDao;
+    
+    @Autowired
+    RegionDao regionDao;
+    
+    @Resource
+    @Qualifier ( "branch")
+    BranchDao branchDao;
+    
+    @Autowired
+    UserDao userDao;
+    
     private EmailServices emailServices;
 
 	@Autowired
@@ -52,7 +75,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
 	}
 
 	@Override
-    public SocialResponseObject<?> saveFeed( SocialResponseObject<?> socialFeed ) throws InvalidInputException 
+    public SocialResponseObject<?> saveFeed( SocialResponseObject<?> socialFeed ) throws InvalidInputException
     {
         LOG.info( "Inside save feed method {}" , socialFeed);
         if(socialFeed == null){
@@ -65,28 +88,17 @@ public class SocialFeedServiceImpl implements SocialFeedService
     
 	@SuppressWarnings("unchecked")
 	@Override
-	public SocialMonitorResponseData getAllSocialPosts(long profileId, String profileLevel, int startIndex, int limit,
-			String status, boolean flag, List<String> feedtype) throws InvalidInputException {
-		LOG.debug("Fetching social posts for {} with Id {} ", profileLevel, profileId);
-		if (profileId <= 0 || profileLevel == null) {
-			LOG.error("Invalid profileLevel or profileId");
-			throw new InvalidInputException("Profile data cannot be null");
-		}
+	public SocialMonitorResponseData getAllSocialPosts(int startIndex, int limit, String status, boolean flag,
+			List<String> feedtype, Long companyId, List<Long> regionIds, List<Long> branchIds, List<Long> agentIds)
+			throws InvalidInputException {
+		LOG.debug("Fetching social posts");
+
 		SocialMonitorResponseData socialMonitorResponseData = new SocialMonitorResponseData();
 		List<SocialMonitorFeedData> socialMonitorStreamDataList = new ArrayList<>();
 		List<SocialResponseObject> socialResponseObjects;
 
-		String key = CommonConstants.AGENT_ID;
-
-		if (profileLevel.equals(CommonConstants.COMPANY_ID_COLUMN)) {
-			key = CommonConstants.COMPANY_ID;
-		} else if (profileLevel.equals(CommonConstants.REGION_ID_COLUMN)) {
-			key = CommonConstants.REGION_ID;
-		} else if (profileLevel.equals(CommonConstants.BRANCH_ID_COLUMN)) {
-			key = CommonConstants.BRANCH_ID;
-		}
-		socialResponseObjects = mongoSocialFeedDao.getAllSocialFeeds(profileId, key, startIndex, limit, flag, status,
-				feedtype);
+		socialResponseObjects = mongoSocialFeedDao.getAllSocialFeeds(startIndex, limit, flag, status,
+				feedtype, companyId, regionIds, branchIds, agentIds);
 		if (socialResponseObjects != null && !socialResponseObjects.isEmpty()) {
 			for (SocialResponseObject socialResponseObject : socialResponseObjects) {
 				SocialMonitorFeedData socialMonitorFeedData = new SocialMonitorFeedData();
@@ -94,10 +106,12 @@ public class SocialFeedServiceImpl implements SocialFeedService
 				socialMonitorFeedData.setStatus(socialResponseObject.getStatus());
 				socialMonitorFeedData.setText(socialResponseObject.getText());
 				socialMonitorFeedData.setPicture(socialResponseObject.getPicture());
-				socialMonitorFeedData.setAgentId(socialResponseObject.getAgentId());
-				socialMonitorFeedData.setBranchId(socialResponseObject.getBranchId());
-				socialMonitorFeedData.setRegionId(socialResponseObject.getRegionId());
+				socialMonitorFeedData.setOwnerName(socialResponseObject.getOwnerName());
+				socialMonitorFeedData.setOwnerProfileImage(socialResponseObject.getOwnerProfileImage());
 				socialMonitorFeedData.setCompanyId(socialResponseObject.getCompanyId());
+				socialMonitorFeedData.setRegionId(socialResponseObject.getRegionId());
+				socialMonitorFeedData.setBranchId(socialResponseObject.getBranchId());
+				socialMonitorFeedData.setAgentId(socialResponseObject.getAgentId());
 				socialMonitorFeedData.setPostId(socialResponseObject.getPostId());
 				socialMonitorFeedData.setFlagged(socialResponseObject.isFlagged());
 				Collections.sort( socialResponseObject.getActionHistory(), new ActionHistoryComparator() );	
@@ -107,12 +121,12 @@ public class SocialFeedServiceImpl implements SocialFeedService
 				socialMonitorFeedData.setDuplicateCount(socialResponseObject.getDuplicateCount());
 				socialMonitorStreamDataList.add(socialMonitorFeedData);
 			}
-			socialMonitorResponseData.setCount(mongoSocialFeedDao.getAllSocialFeedsCount(profileId, key, flag, status, feedtype));
+			socialMonitorResponseData.setCount(mongoSocialFeedDao.getAllSocialFeedsCount(flag, status, feedtype, companyId, regionIds, branchIds, agentIds));
 			if (flag) {
 				socialMonitorResponseData.setStatus("FLAGGED");
-			} else if (!status.isEmpty() && !flag) {
+			} else if (status != null && !flag) {
 				socialMonitorResponseData.setStatus(status.toUpperCase());
-			} else {
+			} else if(status == null && !flag){
 				socialMonitorResponseData.setStatus("ALL");
 			}
 			socialMonitorResponseData.setSocialMonitorFeedData(socialMonitorStreamDataList);
@@ -124,7 +138,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
 	}
 	
 	@Override
-	public void updateActionForFeeds(SocialFeedsActionUpdate socialFeedsActionUpdate, long companyId)
+	public void updateActionForFeeds(SocialFeedsActionUpdate socialFeedsActionUpdate, Long companyId)
 			throws InvalidInputException {
 		LOG.debug("Updating social Feeds for social monitor");
 		if (socialFeedsActionUpdate == null) {
@@ -153,15 +167,15 @@ public class SocialFeedServiceImpl implements SocialFeedService
 				if (socialFeedsActionUpdate.isFlagged() && (socialResponseObject.getStatus().equals(SocialFeedStatus.NEW))) {
 					updateFlag = 1;
 					actionHistory.setActionType(ActionHistoryType.FLAGGED);
-					actionHistory.setText("Post was Flagged manually by " + socialFeedsActionUpdate.getOwnerName());
-					actionHistory.setOwnerName(socialFeedsActionUpdate.getOwnerName());
+					actionHistory.setText("Post was FLAGGED manually by " + socialFeedsActionUpdate.getUserName());
+					actionHistory.setOwnerName(socialFeedsActionUpdate.getUserName());
 					actionHistory.setCreatedDate(new Date().getTime());
 					actionHistories.add(actionHistory);
 				} else if(!socialFeedsActionUpdate.isFlagged() && (socialResponseObject.getStatus().equals(SocialFeedStatus.NEW))){
 					updateFlag = 1;
 					actionHistory.setActionType(ActionHistoryType.UNFLAGGED);
-					actionHistory.setText("Post was Unflagged by " + socialFeedsActionUpdate.getOwnerName());
-					actionHistory.setOwnerName(socialFeedsActionUpdate.getOwnerName());
+					actionHistory.setText("Post was UNFLAGGED by " + socialFeedsActionUpdate.getUserName());
+					actionHistory.setOwnerName(socialFeedsActionUpdate.getUserName());
 					actionHistory.setCreatedDate(new Date().getTime());
 					actionHistories.add(actionHistory);
 				}
@@ -175,8 +189,8 @@ public class SocialFeedServiceImpl implements SocialFeedService
 					actionHistory.setActionType(ActionHistoryType.RESOLVED);
 				}
 				actionHistory.setText("Post was " + socialFeedsActionUpdate.getStatus() + " by "
-						+ socialFeedsActionUpdate.getOwnerName());
-				actionHistory.setOwnerName(socialFeedsActionUpdate.getOwnerName());
+						+ socialFeedsActionUpdate.getUserName());
+				actionHistory.setOwnerName(socialFeedsActionUpdate.getUserName());
 				actionHistory.setCreatedDate(new Date().getTime());
 				actionHistories.add(actionHistory);
 			}
@@ -186,7 +200,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
 				ActionHistory actionHistory = new ActionHistory();
 				actionHistory.setActionType(ActionHistoryType.PRIVATE_MESSAGE);
 				actionHistory.setText(socialFeedsActionUpdate.getText());
-				actionHistory.setOwnerName(socialFeedsActionUpdate.getOwnerName());
+				actionHistory.setOwnerName(socialFeedsActionUpdate.getUserName());
 				actionHistory.setCreatedDate(new Date().getTime());
 				actionHistories.add(actionHistory);
 			} if ((socialFeedsActionUpdate.getTextActionType().toString()
@@ -195,12 +209,12 @@ public class SocialFeedServiceImpl implements SocialFeedService
 				ActionHistory actionHistory = new ActionHistory();
 				actionHistory.setActionType(ActionHistoryType.EMAIL);
 				actionHistory.setText(socialFeedsActionUpdate.getText());
-				actionHistory.setOwnerName(socialFeedsActionUpdate.getOwnerName());
+				actionHistory.setOwnerName(socialFeedsActionUpdate.getUserName());
 				actionHistory.setCreatedDate(new Date().getTime());
 				actionHistories.add(actionHistory);
 				// send mail to the user
 				try {
-					emailServices.sendSocialMonitorActionMail(socialFeedsActionUpdate.getUserEmailId(),
+					emailServices.sendSocialMonitorActionMail(socialResponseObject.getOwnerEmail(),
 							socialResponseObject.getOwnerName(), socialFeedsActionUpdate.getText());
 				} catch (UndeliveredEmailException e) {
 					LOG.error("Email could not be delivered", e);
@@ -215,21 +229,12 @@ public class SocialFeedServiceImpl implements SocialFeedService
 	}
 
     @Override
-    public long getDuplicatePostsCount(int hash, long companyId) throws InvalidInputException {
-        LOG.info("Executing getDuplicatePostsCount method with hash = {} and companyId = {} ", hash, companyId);
-        if(companyId  <= 0){
-            throw new InvalidInputException( "companyId cannot be 0" );
+    public long updateDuplicateCount(int hash, long companyId) throws InvalidInputException {
+        LOG.info("Executing updateDuplicateCount method with hash = {}, companyId = {}", hash, companyId);
+        if( hash  == 0 || companyId <= 0){
+            throw new InvalidInputException( "companyId cannot be <= 0 or hash cannot be 0" );
         }
-        return mongoSocialFeedDao.getDuplicatePostsCount(hash, companyId);
-    }
-
-    @Override
-    public long updateDuplicateCount(int hash, long companyId, long duplicateCount) throws InvalidInputException {
-        LOG.info("Executing updateDuplicateCount method with hash = {}, companyId = {} and duplicateCount = {} ", hash, companyId, duplicateCount);
-        if( duplicateCount  <= 0 || companyId <= 0){
-            throw new InvalidInputException( "companyId or duplicateCount cannot be <= 0" );
-        }
-        return mongoSocialFeedDao.updateDuplicateCount(hash, companyId, duplicateCount);
+        return mongoSocialFeedDao.updateDuplicateCount(hash, companyId);
     }
 
 	@Override
@@ -255,15 +260,127 @@ public class SocialFeedServiceImpl implements SocialFeedService
 	public void updateMacrosForFeeds(SocialMonitorMacro socialMonitorMacro, long companyId)
 			throws InvalidInputException {
 		LOG.debug("Updating macros for social monitor for company with id {}", companyId);
-		if (socialMonitorMacro == null || companyId <= 0){
+		SocialMonitorMacro macro;
+		if (socialMonitorMacro == null || companyId <= 0) {
 			LOG.error("Invalid parameters passed");
 			throw new InvalidInputException("Invalid parameters passed");
 		}
-		socialMonitorMacro.setCount(0);
-		socialMonitorMacro.setMacroId(UUID.randomUUID().toString());
-		socialMonitorMacro.setCreatedOn(new Date().getTime());
-		mongoSocialFeedDao.updateMacros(socialMonitorMacro, companyId);
+		if (socialMonitorMacro.getMacroId() == null || socialMonitorMacro.getMacroId().isEmpty()) {
+			socialMonitorMacro.setCount(0);
+			socialMonitorMacro.setMacroId(UUID.randomUUID().toString());
+			socialMonitorMacro.setCreatedOn(new Date().getTime());
+			socialMonitorMacro.setModifiedOn(new Date().getTime());
+			mongoSocialFeedDao.updateMacros(socialMonitorMacro, companyId);
 
-	}	
+		} else {
+			macro = getMacroById(socialMonitorMacro.getMacroId(), companyId);
+			OrganizationUnitSettings organizationUnitSettings = mongoSocialFeedDao.FetchMacros(companyId);
+			organizationUnitSettings.getSocialMonitorMacros().remove(macro);
+			socialMonitorMacro.setModifiedOn(new Date().getTime());
+			organizationUnitSettings.getSocialMonitorMacros().add(socialMonitorMacro);
+			mongoSocialFeedDao.updateMacroCount(organizationUnitSettings.getSocialMonitorMacros(), companyId);
+
+		}
+
+	}
+
+	@Override
+	public SocialMonitorMacro getMacroById(String macroId, Long companyId) throws InvalidInputException {
+		LOG.debug("Fetching Macro with Id {} and companyId {}", macroId, companyId);
+		if (macroId == null || macroId.isEmpty() || companyId <= 0 || companyId == null) {
+			LOG.error("Invalid input parameters");
+			throw new InvalidInputException("Invalid input parameters");
+		}
+		SocialMonitorMacro socialMonitorMacro = null;
+		OrganizationUnitSettings organizationUnitSettings = mongoSocialFeedDao.FetchMacros(companyId);
+		if (organizationUnitSettings != null && organizationUnitSettings.getSocialMonitorMacros() != null
+				&& !organizationUnitSettings.getSocialMonitorMacros().isEmpty()) {
+			for (SocialMonitorMacro macro : organizationUnitSettings.getSocialMonitorMacros()) {
+				if (macro.getMacroId().equalsIgnoreCase(macroId)) {
+					socialMonitorMacro = macro;
+				}
+			}
+		} else {
+			LOG.warn("The List is empty");
+		}
+		return socialMonitorMacro;
+
+	}
+
+	@Override
+	public SegmentsVO getSegmentsByCompanyId(Long companyId, int startIndex, int batchSize)
+			throws InvalidInputException {
+		LOG.debug("Fetching regions and branches for companyId {}", companyId);
+		if (companyId <= 0) {
+			LOG.error("Invalid companyId");
+			throw new InvalidInputException("Invalid companyId");
+		}
+		SegmentsVO segmentsVO = new SegmentsVO();
+		SegmentsEntity companyData = new SegmentsEntity();
+		List<SegmentsEntity> regionList = new ArrayList<>();
+		List<SegmentsEntity> branchList = new ArrayList<>();
+
+		List<Long> regionIds = regionDao.getRegionIdsUnderCompany(companyId, startIndex, batchSize);
+		List<Long> branchIds = branchDao.getBranchIdsUnderCompany(companyId, startIndex, batchSize);
+
+		OrganizationUnitSettings companyDetails = mongoSocialFeedDao.getCompanyDetails(companyId);
+		if (companyDetails != null) {
+			companyData.setIden(companyDetails.getIden());
+			companyData.setName(companyDetails.getContact_details().getName());
+			companyData.setProfileImageUrl(companyDetails.getProfileImageUrl());
+			segmentsVO.setSegmentsEntity(companyData);
+		}
+
+		List<OrganizationUnitSettings> regionDetails = mongoSocialFeedDao.getAllRegionDetails(regionIds);
+		if (!regionDetails.isEmpty() || regionDetails != null) {
+			for (OrganizationUnitSettings organizationUnitSettings : regionDetails) {
+				SegmentsEntity segmentsEntity = new SegmentsEntity();
+				segmentsEntity.setIden(organizationUnitSettings.getIden());
+				segmentsEntity.setName(organizationUnitSettings.getContact_details().getName());
+				segmentsEntity.setProfileImageUrl(organizationUnitSettings.getProfileImageUrl());
+				regionList.add(segmentsEntity);
+			}
+			segmentsVO.setRegionDetails(regionList);
+		}
+
+		List<OrganizationUnitSettings> branchdetails = mongoSocialFeedDao.getAllBranchDetails(branchIds);
+		if (!branchdetails.isEmpty() || branchdetails != null) {
+			for (OrganizationUnitSettings organizationUnitSettings : branchdetails) {
+				SegmentsEntity segmentsEntity = new SegmentsEntity();
+				segmentsEntity.setIden(organizationUnitSettings.getIden());
+				segmentsEntity.setName(organizationUnitSettings.getContact_details().getName());
+				segmentsEntity.setProfileImageUrl(organizationUnitSettings.getProfileImageUrl());
+				branchList.add(segmentsEntity);
+			}
+			segmentsVO.setBranchDetails(branchList);
+		}
+
+		return segmentsVO;
+	}
+
+	@Override
+	public List<SegmentsEntity> getUsersByCompanyId(Long companyId, int startIndex, int batchSize)
+			throws InvalidInputException {
+		LOG.debug("Fetching users for companyId {}", companyId);
+		if (companyId <= 0) {
+			LOG.error("Invalid companyId");
+			throw new InvalidInputException("Invalid companyId");
+		}
+		List<SegmentsEntity> usersList = new ArrayList<>();
+		Set<Long> userIds = userDao.getActiveUserIdsForCompany(companyDao.findById(Company.class, companyId));
+		List<OrganizationUnitSettings> userDetails = mongoSocialFeedDao.getAllUserDetails(userIds);
+		if (!userDetails.isEmpty() || userDetails != null) {
+			for (OrganizationUnitSettings organizationUnitSettings : userDetails) {
+				SegmentsEntity segmentsEntity = new SegmentsEntity();
+				segmentsEntity.setIden(organizationUnitSettings.getIden());
+				segmentsEntity.setName(organizationUnitSettings.getContact_details().getName());
+				segmentsEntity.setProfileImageUrl(organizationUnitSettings.getProfileImageUrl());
+				usersList.add(segmentsEntity);
+			}
+		}
+		return usersList;
+	}
+
 
 } 
+

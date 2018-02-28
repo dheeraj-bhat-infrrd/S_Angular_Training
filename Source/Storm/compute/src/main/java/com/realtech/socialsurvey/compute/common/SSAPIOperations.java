@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import com.realtech.socialsurvey.compute.entities.Keyword;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
-import com.realtech.socialsurvey.compute.entities.response.FacebookFeedData;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.entities.response.TwitterFeedData;
 import com.realtech.socialsurvey.compute.entities.response.linkedin.LinkedinFeedData;
@@ -69,7 +68,6 @@ public class SSAPIOperations
 
     /**
      * Get keyword for company id
-     * @param companyId
      * @return
      */
     public Optional<List<SocialMediaTokenResponse>> getMediaTokens()
@@ -93,100 +91,31 @@ public class SSAPIOperations
 
     /**
      * Save feed api call
-     * @param companyId
+     * @param socialPostToMongo
      * @return
      */
-    public boolean saveFeedToMongo( SocialResponseObject<FacebookFeedData> socialPostToMongo )
-    {
+    public boolean saveFeedToMongo( SocialResponseObject<?> socialPostToMongo ) throws IOException {
         LOG.info( "Executing saveFeedToMongo method." );
-        Call<SocialResponseObject<FacebookFeedData>> requestCall = RetrofitApiBuilder.apiBuilderInstance()
+        Call<SocialResponseObject> requestCall = RetrofitApiBuilder.apiBuilderInstance()
             .getSSAPIIntergrationService().saveSocialFeed( socialPostToMongo );
-        try {
-            Response<SocialResponseObject<FacebookFeedData>> response = requestCall.execute();
-            RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
+            Response response = requestCall.execute();
+            RetrofitApiBuilder.apiBuilderInstance().validateSavePostToMongoResponse( response );
             if ( LOG.isTraceEnabled() ) {
                 LOG.trace( "saveFeedToMongo response {}", response.body() );
             }
             return true;
-        } catch ( IOException | APIIntegrationException e ) {
-            LOG.error( "saveFeedToMongo IOException/ APIIntegrationException caught", e );
-            return false;
-        }
     }
 
-
-    public boolean saveTwitterFeedToMongo( SocialResponseObject<TwitterFeedData> socialPostToMongo )
-    {
-        LOG.info( "Executing saveFeedToMongo method." );
-        Call<SocialResponseObject<TwitterFeedData>> requestCall = RetrofitApiBuilder.apiBuilderInstance()
-            .getSSAPIIntergrationService().saveTwitterFeed( socialPostToMongo );
-        try {
-            Response<SocialResponseObject<TwitterFeedData>> response = requestCall.execute();
-            RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
-            if ( LOG.isTraceEnabled() ) {
-                LOG.trace( "saveTwitterFeedToMongo response {}", response.body() );
-            }
-            return true;
-        } catch ( IOException | APIIntegrationException e ) {
-            LOG.error( "saveTwitterFeedToMongo IOException/ APIIntegrationException caught", e );
-            return false;
-        }
-    }
-
-
-    public boolean saveLinkedinFeedToMongo( SocialResponseObject<LinkedinFeedData> socialPostToMongo )
-    {
-        LOG.info( "Executing saveFeedToMongo method." );
-        Call<SocialResponseObject<LinkedinFeedData>> requestCall = RetrofitApiBuilder.apiBuilderInstance()
-            .getSSAPIIntergrationService().saveLinkedinFeed( socialPostToMongo );
-        try {
-            Response<SocialResponseObject<LinkedinFeedData>> response = requestCall.execute();
-            RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
-            if ( LOG.isTraceEnabled() ) {
-                LOG.trace( "saveLinkedinFeedToMongo response {}", response.body() );
-            }
-            return true;
-        } catch ( IOException | APIIntegrationException e ) {
-            LOG.error( "saveTwitterFeedToMongo IOException/ APIIntegrationException caught", e );
-            return false;
-        }
-    }
-
-
-    public Optional<Long> getSocialPostDuplicateCount( int hash, long comapnyId )
-    {
-        LOG.info( "Executing getSocialPostDuplicateCount method" );
-        Call<Long> requestCall = RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationService().getDuplicateCount( hash,
-            comapnyId );
-        try {
-            Response<Long> response = requestCall.execute();
-            RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
-            if ( LOG.isTraceEnabled() ) {
-                LOG.trace( "getSocialPostDuplicateCount response {}", response.body() );
-            }
-            return Optional.of( response.body() );
-        } catch ( APIIntegrationException | IOException e ) {
-            LOG.error( "getSocialPostDuplicateCount IOException/ APIIntegrationException caught ", e );
-            return Optional.empty();
-        }
-    }
-
-
-    public Optional<Long> updateSocialPostDuplicateCount( int hash, long comapnyId, long duplicateCount )
-    {
+    public Optional<Long> updateSocialPostDuplicateCount( int hash, long comapnyId ) throws IOException {
         LOG.info( "Executing updateSocialPostDuplicateCount method" );
         Call<Long> requestCall = RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationService()
-            .updateDuplicateCount( hash, comapnyId, duplicateCount );
-        try {
+            .updateDuplicateCount( hash, comapnyId );
             Response<Long> response = requestCall.execute();
             RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
             if ( LOG.isTraceEnabled() ) {
                 LOG.trace( "updateSocialPostDuplicateCount response {}", response.body() );
             }
             return Optional.of( response.body() );
-        } catch ( APIIntegrationException | IOException e ) {
-            LOG.error( "updateSocialPostDuplicateCount IOException/ APIIntegrationException caught ", e );
-            return Optional.empty();
-        }
     }
+
 }

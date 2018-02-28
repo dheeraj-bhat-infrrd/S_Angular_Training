@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.realtech.socialsurvey.core.enums.ProfileType;
 import com.realtech.socialsurvey.core.enums.SocialFeedStatus;
 import com.realtech.socialsurvey.core.enums.SocialFeedType;
 
@@ -43,6 +44,8 @@ public class SocialResponseObject<T> implements Serializable
     private long updatedTime;
     private long createdTime;
     private String ownerName;
+    private String ownerEmail;
+    private String ownerProfileImage;
 
     private T response;
     private SocialFeedType type;
@@ -52,12 +55,14 @@ public class SocialResponseObject<T> implements Serializable
     private long regionId;
     private long branchId;
     private long agentId;
+    private ProfileType profileType;
+
 
     private int hash;
     private long duplicateCount;
     private List<String> foundKeywords;
     private List<ActionHistory> actionHistory;
-
+    private boolean isRetried;
 
     public T getResponse()
     {
@@ -260,37 +265,83 @@ public class SocialResponseObject<T> implements Serializable
     {
         this.actionHistory = actionHistory;
     }
-    
-    public long getUpdatedTime() {
-		return updatedTime;
-	}
 
-
-	public void setUpdatedTime(long updatedTime) {
-		this.updatedTime = updatedTime;
-	}
-
-
-	public long getCreatedTime() {
-		return createdTime;
-	}
-
-
-	public void setCreatedTime(long createdTime) {
-		this.createdTime = createdTime;
-	}
-
-
-	@Override
-    public String toString()
+    public long getUpdatedTime()
     {
-        return "SocialResponseObject [id=" + id + ", postId=" + postId + ", text=" + text + ", picture=" + picture
-            + ", updatedTime=" + updatedTime + ", createdTime=" + createdTime + ", ownerName=" + ownerName + ", response="
-            + response + ", type=" + type + ", flagged=" + flagged + ", status=" + status + ", companyId=" + companyId
-            + ", regionId=" + regionId + ", branchId=" + branchId + ", agentId=" + agentId + ", hash=" + hash
-            + ", duplicateCount=" + duplicateCount + ", foundKeywords=" + foundKeywords + ", actionHistory=" + actionHistory
-            + "]";
+        return updatedTime;
     }
 
 
+    public void setUpdatedTime( long updatedTime )
+    {
+        this.updatedTime = updatedTime;
+    }
+
+
+    public long getCreatedTime()
+    {
+        return createdTime;
+    }
+
+
+    public void setCreatedTime( long createdTime )
+    {
+        this.createdTime = createdTime;
+    }
+
+    public boolean isRetried() {
+        return isRetried;
+    }
+
+    public void setIsRetried(boolean retried) {
+        isRetried = retried;
+    }
+
+    public ProfileType getProfileType()
+    {
+        return profileType;
+    }
+
+
+    public void setProfileType( ProfileType profileType )
+    {
+        this.profileType = profileType;
+    }
+
+
+    public String getOwnerEmail()
+    {
+        return ownerEmail;
+    }
+
+
+    public void setOwnerEmail( String ownerEmail )
+    {
+        this.ownerEmail = ownerEmail;
+    }
+
+
+    public String getOwnerProfileImage()
+    {
+        return ownerProfileImage;
+    }
+
+
+    public void setOwnerProfileImage( String ownerProfileImage )
+    {
+        this.ownerProfileImage = ownerProfileImage;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return "SocialResponseObject [id=" + id + ", postId=" + postId + ", text=" + text + ", picture=" + picture
+            + ", updatedTime=" + updatedTime + ", createdTime=" + createdTime + ", ownerName=" + ownerName + ", ownerEmail="
+            + ownerEmail + ", ownerProfileImage=" + ownerProfileImage + ", response=" + response + ", type=" + type
+            + ", flagged=" + flagged + ", status=" + status + ", companyId=" + companyId + ", regionId=" + regionId
+            + ", branchId=" + branchId + ", agentId=" + agentId + ", profileType=" + profileType + ", hash=" + hash
+            + ", duplicateCount=" + duplicateCount + ", foundKeywords=" + foundKeywords + ", actionHistory=" + actionHistory
+            + ", isRetried=" + isRetried + "]";
+    }
 }

@@ -26,6 +26,8 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
 
+import com.realtech.socialsurvey.core.dao.*;
+import com.realtech.socialsurvey.core.dao.impl.RedisCompanyKeywordImpl;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.solr.common.SolrDocument;
@@ -49,21 +51,7 @@ import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.FilterKeywordsComparator;
 import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
-import com.realtech.socialsurvey.core.commons.SocialPostsComparator;
 import com.realtech.socialsurvey.core.commons.Utils;
-import com.realtech.socialsurvey.core.dao.BranchDao;
-import com.realtech.socialsurvey.core.dao.CompanyDao;
-import com.realtech.socialsurvey.core.dao.DisabledAccountDao;
-import com.realtech.socialsurvey.core.dao.GenericDao;
-import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
-import com.realtech.socialsurvey.core.dao.RegionDao;
-import com.realtech.socialsurvey.core.dao.RemovedUserDao;
-import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
-import com.realtech.socialsurvey.core.dao.UserDao;
-import com.realtech.socialsurvey.core.dao.UserInviteDao;
-import com.realtech.socialsurvey.core.dao.UserProfileDao;
-import com.realtech.socialsurvey.core.dao.UsercountModificationNotificationDao;
-import com.realtech.socialsurvey.core.dao.ZillowHierarchyDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
@@ -94,7 +82,6 @@ import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.MailIdSettings;
-import com.realtech.socialsurvey.core.entities.MonitorType;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
@@ -125,6 +112,7 @@ import com.realtech.socialsurvey.core.entities.ZipCodeLookup;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
+import com.realtech.socialsurvey.core.enums.ProfileType;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.FatalException;
@@ -272,6 +260,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Autowired
     GenericDao<UploadStatus, Long> uploadStatusDao;
+
+    @Autowired
+    private RedisCompanyKeywordsDao redisDao;
 
     @Value ( "${HAPPY_TEXT}")
     private String happyText;
@@ -1028,6 +1019,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 MongoOrganizationUnitSettingDaoImpl.KEY_FILTER_KEYWORDS, companyFilterKeywords, companySettings,
                 MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
+            //update the redis with the keywords
+            redisDao.addKeywords(companyId, companyFilterKeywords);
+
         } else {
             LOG.debug( "Keywords are empty so skiping operation" );
         }
@@ -1110,31 +1104,36 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	public FilterKeywordsResponse getCompanyKeywordsByCompanyId(long companyId, int startIndex, int limit,
 			String monitorType) throws InvalidInputException {
 		LOG.debug("Get company settings for the companyId: {}", companyId);
-		OrganizationUnitSettings companySettings = organizationUnitSettingsDao
-				.fetchOrganizationUnitSettingsById(companyId,
-						MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
+				companyId, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 
 		if (companySettings == null) {
 			throw new InvalidInputException("Company setting doesn't exist for company id", "400");
 		}
 
 		List<Keyword> companyFilterKeywords = companySettings.getFilterKeywords();
-        Collections.sort( companyFilterKeywords, new FilterKeywordsComparator() );
+		Collections.sort(companyFilterKeywords, new FilterKeywordsComparator());
 		List<Keyword> keywords = new ArrayList<>();
 		FilterKeywordsResponse filterKeywordsResponse = new FilterKeywordsResponse();
 		if (companyFilterKeywords != null && !companyFilterKeywords.isEmpty()) {
 			if (monitorType == null || monitorType.isEmpty()) {
 				filterKeywordsResponse.setMonitorType("ALL");
 				filterKeywordsResponse.setCount(companyFilterKeywords.size());
-				if(startIndex >= companyFilterKeywords.size()) {
+				if (startIndex >= companyFilterKeywords.size()) {
 					filterKeywordsResponse.setMonitorType(null);
 					filterKeywordsResponse.setCount(0);
 					filterKeywordsResponse.setFilterKeywords(null);
-				}
-				else if(limit > companyFilterKeywords.size() && startIndex < companyFilterKeywords.size()) {
-					filterKeywordsResponse.setFilterKeywords(companyFilterKeywords.subList(startIndex, companyFilterKeywords.size()));
+				} else if (limit >= companyFilterKeywords.size() && startIndex < companyFilterKeywords.size()) {
+					filterKeywordsResponse
+							.setFilterKeywords(companyFilterKeywords.subList(startIndex, companyFilterKeywords.size()));
 				} else {
-					filterKeywordsResponse.setFilterKeywords(companyFilterKeywords.subList(startIndex, startIndex + limit));
+					if (startIndex + limit >= companyFilterKeywords.size()) {
+						filterKeywordsResponse.setFilterKeywords(
+								companyFilterKeywords.subList(startIndex, companyFilterKeywords.size()));
+					} else {
+						filterKeywordsResponse
+								.setFilterKeywords(companyFilterKeywords.subList(startIndex, startIndex + limit));
+					}
 				}
 
 			} else {
@@ -1145,15 +1144,19 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 				}
 				filterKeywordsResponse.setMonitorType(monitorType.toUpperCase());
 				filterKeywordsResponse.setCount(keywords.size());
-				if(startIndex >= keywords.size()) {
+				if (startIndex >= keywords.size()) {
 					filterKeywordsResponse.setMonitorType(null);
 					filterKeywordsResponse.setCount(0);
 					filterKeywordsResponse.setFilterKeywords(null);
-				}
-				else if(limit > keywords.size() && startIndex < keywords.size()) {
+				} else if (limit >= keywords.size() && startIndex < keywords.size()) {
 					filterKeywordsResponse.setFilterKeywords(keywords.subList(startIndex, keywords.size()));
 				} else {
-					filterKeywordsResponse.setFilterKeywords(keywords.subList(startIndex, startIndex + limit));
+					if (startIndex + limit >= keywords.size()) {
+						filterKeywordsResponse.setFilterKeywords(keywords.subList(startIndex, keywords.size()));
+					} else {
+						filterKeywordsResponse.setFilterKeywords(keywords.subList(startIndex, startIndex + limit));
+					}
+
 				}
 			}
 		}
@@ -5895,7 +5898,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         for ( FeedIngestionEntity feedIngestionEntity : companiesMediaTokens ) {
             
             if(feedIngestionEntity.getSocialMediaTokens() != null) {
-                socialMediaTokenResponseList.add( setSocialMediaTokenResponse( feedIngestionEntity, feedIngestionEntity.getIden(), "company" ) );
+                socialMediaTokenResponseList.add( setSocialMediaTokenResponse( feedIngestionEntity, feedIngestionEntity.getIden(), ProfileType.COMPANY) );
             }
 
             
@@ -5904,7 +5907,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             List<FeedIngestionEntity> regionMediaTokens = organizationUnitSettingsDao.fetchSocialMediaTokensForIds( regionIds, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
             
             for ( FeedIngestionEntity regionFeedIngestionEntity : regionMediaTokens ) {
-                socialMediaTokenResponseList.add( setSocialMediaTokenResponse( regionFeedIngestionEntity, feedIngestionEntity.getIden(),"region" ) );
+                socialMediaTokenResponseList.add( setSocialMediaTokenResponse( regionFeedIngestionEntity, feedIngestionEntity.getIden(), ProfileType.REGION ) );
             }
             
             List<Long> branchIds = branchDao.getBranchIdsUnderCompany( feedIngestionEntity.getIden(), skipCount, batchSize );
@@ -5912,7 +5915,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             List<FeedIngestionEntity> branchMediaTokens = organizationUnitSettingsDao.fetchSocialMediaTokensForIds( branchIds, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
             
             for ( FeedIngestionEntity branchFeedIngestionEntity : branchMediaTokens ) {
-                socialMediaTokenResponseList.add( setSocialMediaTokenResponse( branchFeedIngestionEntity,feedIngestionEntity.getIden(), "branch" ) );
+                socialMediaTokenResponseList.add( setSocialMediaTokenResponse( branchFeedIngestionEntity,feedIngestionEntity.getIden(), ProfileType.BRANCH ) );
             }
             
             List<Long> userIds = getAgentIdsUnderCompany( feedIngestionEntity.getIden(), skipCount, batchSize );
@@ -5920,7 +5923,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             List<FeedIngestionEntity> usersMediaTokens = organizationUnitSettingsDao.fetchSocialMediaTokensForIds( userIds, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
             
             for ( FeedIngestionEntity userFeedIngestionEntity : usersMediaTokens ) {
-                socialMediaTokenResponseList.add( setSocialMediaTokenResponse( userFeedIngestionEntity,feedIngestionEntity.getIden(), "agent" ) );
+                socialMediaTokenResponseList.add( setSocialMediaTokenResponse( userFeedIngestionEntity,feedIngestionEntity.getIden(), ProfileType.AGENT ) );
             }
         }
         LOG.info( "End of method fetchSocialMediaTokensResponse" );
@@ -5933,7 +5936,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @param profileType
      * @return
      */
-    private SocialMediaTokenResponse setSocialMediaTokenResponse(FeedIngestionEntity feedIngestionEntity, long companyId, String profileType){
+    private SocialMediaTokenResponse setSocialMediaTokenResponse(FeedIngestionEntity feedIngestionEntity, long companyId, ProfileType profileType){
         if(feedIngestionEntity != null){
             SocialMediaTokenResponse socialMediaTokenResponse = new SocialMediaTokenResponse();
             socialMediaTokenResponse.setIden( feedIngestionEntity.getIden() );

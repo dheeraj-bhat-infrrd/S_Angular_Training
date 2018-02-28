@@ -1,20 +1,15 @@
 package com.realtech.socialsurvey.compute;
 
+import com.realtech.socialsurvey.compute.common.EnvConstants;
+import com.realtech.socialsurvey.compute.topology.bolts.monitor.*;
+import com.realtech.socialsurvey.compute.topology.spouts.KafkaTopicSpoutBuilder;
+import com.realtech.socialsurvey.compute.utils.ChararcterUtils;
 import org.apache.storm.Config;
 import org.apache.storm.generated.StormTopology;
 import org.apache.storm.topology.TopologyBuilder;
 import org.apache.storm.tuple.Fields;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.realtech.socialsurvey.compute.common.EnvConstants;
-import com.realtech.socialsurvey.compute.topology.bolts.monitor.CompanyGroupingBolt;
-import com.realtech.socialsurvey.compute.topology.bolts.monitor.FilterSocialPostBolt;
-import com.realtech.socialsurvey.compute.topology.bolts.monitor.RepostToKafkaBolt;
-import com.realtech.socialsurvey.compute.topology.bolts.monitor.SaveFeedsToMongoBolt;
-import com.realtech.socialsurvey.compute.topology.bolts.monitor.UpdateSocialPostDupliateCountBolt;
-import com.realtech.socialsurvey.compute.topology.spouts.KafkaTopicSpoutBuilder;
-import com.realtech.socialsurvey.compute.utils.ChararcterUtils;
 
 
 public class SocialPostFilterTopologyStarterHelper extends TopologyStarterHelper
@@ -66,7 +61,6 @@ public class SocialPostFilterTopologyStarterHelper extends TopologyStarterHelper
         }
     }
 
-
     @Override
     protected StormTopology topology()
     {
@@ -79,11 +73,11 @@ public class SocialPostFilterTopologyStarterHelper extends TopologyStarterHelper
         builder.setBolt( "FilterSocialPostBolt", new FilterSocialPostBolt(), 1 ).fieldsGrouping( "CompanyGroupingBolt",
             new Fields( "companyId" ) );
         builder.setBolt( "SaveFeedsToMongoBolt", new SaveFeedsToMongoBolt(), 1 ).shuffleGrouping( "FilterSocialPostBolt" );
-        builder.setBolt("UpdateSocialPostDuplicateCount", new UpdateSocialPostDupliateCountBolt(), 1)
+        builder.setBolt("UpdateSocialPostDuplicateCount", new UpdateSocialPostDuplicateCountBolt(), 1)
                 .shuffleGrouping("SaveFeedsToMongoBolt", "SUCCESS_STREAM");
-        builder.setBolt("repostToKafkaBolt", RepostToKafkaBolt.buildKafkaBolt(),1)
-                .shuffleGrouping("SaveFeedsToMongoBolt","ERROR_STREAM")
-                .shuffleGrouping("UpdateSocialPostDuplicateCount", "ERROR_STREAM");
+        builder.setBolt("RetryBolt", new RetryHandlerBolt(), 1)
+                .shuffleGrouping("SaveFeedsToMongoBolt", "RETRY_STREAM")
+                .shuffleGrouping("UpdateSocialPostDuplicateCount", "RETRY_STREAM");
 
         return builder.createTopology();
     }

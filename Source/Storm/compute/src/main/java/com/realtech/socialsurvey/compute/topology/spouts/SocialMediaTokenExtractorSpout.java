@@ -16,6 +16,8 @@ import org.slf4j.LoggerFactory;
 import com.realtech.socialsurvey.compute.common.ComputeConstants;
 import com.realtech.socialsurvey.compute.common.LocalPropertyFileHandler;
 import com.realtech.socialsurvey.compute.common.SSAPIOperations;
+import com.realtech.socialsurvey.compute.dao.RedisSocialMediaStateDao;
+import com.realtech.socialsurvey.compute.dao.impl.RedisSocialMediaStateDaoImpl;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
 
 
@@ -30,13 +32,13 @@ public class SocialMediaTokenExtractorSpout extends BaseComputeSpout
 
     private static final String MEDIA_TOKEN = "mediaToken";
     private static final String COMPANY_ID = "companyId";
-    
-    private long waitTime;
 
     SpoutOutputCollector _collector;
 
-    List<SocialMediaTokenResponse> mediaTokens;
-    
+    private List<SocialMediaTokenResponse> mediaTokens;
+
+    private RedisSocialMediaStateDao redisSocialMediaStateDao;
+
     static int count = 0;
 
 
@@ -46,9 +48,7 @@ public class SocialMediaTokenExtractorSpout extends BaseComputeSpout
         super.open( conf, context, collector );
         this._collector = collector;
         this.mediaTokens = new ArrayList<>();
-        this.waitTime = 1000L * Long.parseLong(LocalPropertyFileHandler.getInstance()
-            .getProperty( ComputeConstants.APPLICATION_PROPERTY_FILE, ComputeConstants.MEDIA_TOKENS_FETCH_TIME_INTERVAL ).orElse( "3600" ));
-        //this.setMediaTokensPeriodically();
+        this.redisSocialMediaStateDao = new RedisSocialMediaStateDaoImpl();
     }
 
 
@@ -56,25 +56,25 @@ public class SocialMediaTokenExtractorSpout extends BaseComputeSpout
     public void nextTuple()
     {
         try {
-            // get all mediatokens
-            Optional<List<SocialMediaTokenResponse>> mediaTokensResult = SSAPIOperations.getInstance().getMediaTokens();
-            if ( mediaTokensResult.isPresent() ) {
-                this.mediaTokens = mediaTokensResult.get();
-            }
-            
-            for ( SocialMediaTokenResponse mediaToken : mediaTokens ) {
-                Long companyId = mediaToken.getCompanyId();
-
-                if ( mediaToken.getSocialMediaTokens() != null ) {
-
-                    _collector.emit( "FacebookStream", new Values( companyId.toString(), mediaToken ) );
-                    _collector.emit( "LinkedinStream", new Values( companyId.toString(), mediaToken ) );
-                    _collector.emit( "TwitterStream", new Values( companyId.toString(), mediaToken ) );
+            if ( !redisSocialMediaStateDao.waitForNextFetch() ) {
+                // get all mediatokens
+                Optional<List<SocialMediaTokenResponse>> mediaTokensResult = SSAPIOperations.getInstance().getMediaTokens();
+                if ( mediaTokensResult.isPresent() ) {
+                    this.mediaTokens = mediaTokensResult.get();
                 }
 
+                for ( SocialMediaTokenResponse mediaToken : mediaTokens ) {
+                    Long companyId = mediaToken.getCompanyId();
+
+                    if ( mediaToken.getSocialMediaTokens() != null ) {
+
+                        _collector.emit( "FacebookStream", new Values( companyId.toString(), mediaToken ) );
+                        _collector.emit( "LinkedinStream", new Values( companyId.toString(), mediaToken ) );
+                        _collector.emit( "TwitterStream", new Values( companyId.toString(), mediaToken ) );
+                    }
+
+                }
             }
-            
-            Thread.sleep( waitTime );
             // End loop for companies
         } catch ( Exception e ) {
             LOG.error( "Error while fetching post from facebook.", e );

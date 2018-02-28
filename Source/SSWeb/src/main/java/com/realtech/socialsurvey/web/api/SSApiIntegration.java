@@ -230,17 +230,24 @@ public interface SSApiIntegration
     @POST("/v1/companies/{companyId}/keywords")
     public Response addKeywordsToCompany(@Path ( "companyId") long companyId, @Body List<Keyword> keywordsRequest);
     
-    @GET( "/v1/showsocialfeeds")
-    public Response showStreamSocialPosts(@Query("profileId") long profileId, @Query("profileLevel") String profileLevel, @Query("startIndex") int startIndex, @Query("limit") int limit,
-    		@Query("status") String status, @Query("flag") boolean flag, @Query("feedtype") List<String> feedtype);
+	@GET("/v1/showsocialfeeds")
+	public Response showStreamSocialPosts(@Query("startIndex") int startIndex, @Query("limit") int limit,
+			@Query("status") String status, @Query("flag") boolean flag, @Query("feedtype") List<String> feedtype,
+			@Query("companyId") Long companyId, @Query("regionIds") List<Long> regionIds,
+			@Query("branchIds") List<Long> branchIds, @Query("agentIds") List<Long> agentIds);
     
     @PUT( "/v1/updatesocialfeeds/action")
     public Response saveSocialFeedsForAction(@Body SocialFeedsActionUpdate socialFeedsActionUpdate,
-			@Query("companyId") long companyId);
+			@Query("companyId") Long companyId);
     
-    @GET("/v1/socialfeedsmacro")
-    public Response showMacrosForEntity(@Query("companyId") long companyId);
+    @GET("/v1/socialfeedsmacro/company/{companyId}")
+    public Response showMacrosForEntity(@Path("companyId") long companyId);
     
-    @POST("/v1/updateMacrosForEntity")
+    @POST("/v1/update/socialfeedsmacro")
     public Response updateMacrosForEntity(@Body SocialMonitorMacro socialMonitorMacro, @Query("companyId") long companyId);
+    
+    @GET("/v1/socialfeedsmacro/company/{companyId}/macro/{macroId}")
+    public Response getMacroById(@Path("companyId") Long companyId, @Path("macroId") long macroId);
+    
+    
 }

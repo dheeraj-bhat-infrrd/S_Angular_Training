@@ -3,8 +3,9 @@ package com.realtech.socialsurvey.core.services.socialmonitor.feed;
 import com.realtech.socialsurvey.core.entities.SocialResponseObject;
 import java.util.List;
 
+import com.realtech.socialsurvey.core.entities.SegmentsEntity;
+import com.realtech.socialsurvey.core.entities.SegmentsVO;
 import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
-import com.realtech.socialsurvey.core.entities.SocialMonitorFeedData;
 import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
 import com.realtech.socialsurvey.core.entities.SocialMonitorResponseData;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -24,24 +25,18 @@ public interface SocialFeedService
     public SocialResponseObject<?> saveFeed(SocialResponseObject<?> socialFeed) throws InvalidInputException;
 
     /**
-     * Gets the count of all duplicate social posts
-     * @param hash
-     * @param companyId
-     * @return
-     */
-    long getDuplicatePostsCount(int hash, long companyId) throws InvalidInputException;
-
-    /**
      * Updates all posts matching given hash and companyId with the given duplicateCount
      * @param hash
      * @param companyId
      * @param duplicateCount
      * @return
      */
-    long updateDuplicateCount(int hash, long companyId, long duplicateCount) throws InvalidInputException;
+    long updateDuplicateCount(int hash, long companyId) throws InvalidInputException;
+
 
     /**
-     * Gets all feeds on social monitor based on the flag
+     * Gets all feeds on social monitor based on the flag, status and feed type
+    /** Gets all feeds on social monitor based on the flag
      * @param profileId
      * @param profileLevel
      * @param startIndex
@@ -50,7 +45,7 @@ public interface SocialFeedService
      * @return
      * @throws InvalidInputException
      */
-    public SocialMonitorResponseData getAllSocialPosts(long profileId, String profileLevel, int startIndex, int limit, String status, boolean flag, List<String> feeds) throws InvalidInputException;
+    public SocialMonitorResponseData getAllSocialPosts(int startIndex, int limit, String status, boolean flag, List<String> feedtype, Long companyId, List<Long> regionIds, List<Long> branchIds, List<Long> agentIds) throws InvalidInputException;
         
     /**
      * Update actions and macros on feeds
@@ -58,7 +53,7 @@ public interface SocialFeedService
      * @param companyId
      * @throws InvalidInputException
      */
-    public void updateActionForFeeds(SocialFeedsActionUpdate socialFeedsActionUpdate, long companyId) throws InvalidInputException;
+    public void updateActionForFeeds(SocialFeedsActionUpdate socialFeedsActionUpdate, Long companyId) throws InvalidInputException;
     
     /**
      * Fetch macros based on companyId
@@ -75,5 +70,36 @@ public interface SocialFeedService
      * @throws InvalidInputException
      */
     public void updateMacrosForFeeds(SocialMonitorMacro socialMonitorMacro, long companyId) throws InvalidInputException;
+    
+    /**
+     * 
+     * @param macroId
+     * @param companyId
+     * @return
+     * @throws InvalidInputException
+     */
+    public SocialMonitorMacro getMacroById(String macroId, Long companyId) throws InvalidInputException;
+    
+    /**
+     * fetches all the regions and branches of a company
+     * @param companyId
+     * @param startIndex
+     * @param batchSize
+     * @return
+     * @throws InvalidInputException
+     */
+    public SegmentsVO getSegmentsByCompanyId(Long companyId, int startIndex, int batchSize) throws InvalidInputException;
+    
+    /**
+     * fetches all the users of a company
+     * @param companyId
+     * @param startIndex
+     * @param batchSize
+     * @return
+     * @throws InvalidInputException
+     */
+    public List<SegmentsEntity> getUsersByCompanyId(Long companyId, int startIndex, int batchSize) throws InvalidInputException;
+
+
     
 }
