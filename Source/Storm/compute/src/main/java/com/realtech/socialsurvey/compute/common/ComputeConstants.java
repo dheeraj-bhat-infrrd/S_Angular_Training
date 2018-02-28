@@ -64,5 +64,6 @@ public final class ComputeConstants
     public static final String SOLR_PIVOT_AGENT_UNSUBSCRIBED = "agentId,emailUnsubscribeDate";
     public static final String SOLR_PIVOT_AGENT_BOUNCED = "agentId,emailBounceDate";
     public static final String SOLR_PIVOT_AGENT_LINK_CLICKED = "agentId,emailLinkClickedDate";
+    public static final String SOLR_PIVOT_AGENT_DROPPED = "agentId,emailDroppedDate";
     
 }

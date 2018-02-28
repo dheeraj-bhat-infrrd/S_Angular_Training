@@ -4800,7 +4800,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 		int year = cal.get(Calendar.YEAR);
 		
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		//sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 		String startDateStr = sdf.format(new Date(startDate));
 		String endDateStr = sdf.format(new Date(endDate));
 		
@@ -4814,6 +4814,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 				mailCount.setCompanyId(new Long(obj[2].toString()));
 				mailCount.setMonth(month);
 				mailCount.setYear(year);
+				mailCount.setAgentName((String)obj[3]);
+				mailCount.setAgentEmail((String)obj[4]);
 				LOG.info("Mail count obj added to list.{}",mailCount.toString());
 				receivedCountMonth.add(mailCount);
 			}
@@ -4839,12 +4841,16 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 	@Override
 	public String generateSurveyInvitationEmailReport(long companyId, String entityType, long adminUserId,
 			Timestamp startDate) throws UnsupportedEncodingException, NonFatalException {
+		User user = userManagementService.getUserByUserId(adminUserId);
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(startDate.getTime());
 		int year = calendar.get(Calendar.YEAR);
 		int month = calendar.get(Calendar.MONTH) + 1;
-		String fileName = "Email_Message_Report" + "-" + ( Calendar.getInstance().getTimeInMillis() )
-				+ CommonConstants.EXCEL_FILE_EXTENSION;
+		String monthStr = new DateFormatSymbols().getMonths()[month];
+		String fileName = "Email_Message_Report_Month_" + monthStr + "_" +
+				 user.getFirstName() + " " + user.getLastName() +
+				 ( Calendar.getInstance().getTimeInMillis() ) +
+				 CommonConstants.EXCEL_FILE_EXTENSION;
 		XSSFWorkbook workbook = this.downloadSurveyInvitationEmailReport(companyId, entityType, year, month);
 		return this.createExcelFileAndSaveInAmazonS3(fileName, workbook);
 	}

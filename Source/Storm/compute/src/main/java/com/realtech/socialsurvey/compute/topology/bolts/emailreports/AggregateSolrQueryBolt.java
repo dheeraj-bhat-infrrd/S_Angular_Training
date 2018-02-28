@@ -74,7 +74,7 @@ public class AggregateSolrQueryBolt extends BaseComputeBoltWithAck {
 			long endDate = reportRequest.getEndTime();
 			
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-			//sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+			sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 			
 			String startDateInGmt = sdf.format(new Date(startDate));
 			String endDateInGmt = sdf.format(new Date(endDate));
@@ -113,6 +113,8 @@ public class AggregateSolrQueryBolt extends BaseComputeBoltWithAck {
 				getEmailCounts(jsonObject,agentEmailCountsMonth, ComputeConstants.SOLR_PIVOT_AGENT_BOUNCED);
 				// Link Clicked count
 				getEmailCounts(jsonObject,agentEmailCountsMonth, ComputeConstants.SOLR_PIVOT_AGENT_LINK_CLICKED);
+				// Dropped Count
+				getEmailCounts(jsonObject,agentEmailCountsMonth, ComputeConstants.SOLR_PIVOT_AGENT_DROPPED);
 			} else {
 				LOG.info("Solr returned null response for date range.");
 			}
@@ -138,11 +140,14 @@ public class AggregateSolrQueryBolt extends BaseComputeBoltWithAck {
 		facetPivots.add(ComputeConstants.SOLR_PIVOT_AGENT_UNSUBSCRIBED);
 		facetPivots.add(ComputeConstants.SOLR_PIVOT_AGENT_BOUNCED);
 		facetPivots.add(ComputeConstants.SOLR_PIVOT_AGENT_LINK_CLICKED);
+		facetPivots.add(ComputeConstants.SOLR_PIVOT_AGENT_DROPPED);
 		
 		String fieldQuery = formulateFieldQuery(Arrays.asList( EmailConstants.EMAIL_TYPE_SURVEY_INVITATION_MAIL,
                 EmailConstants.EMAIL_TYPE_SURVEY_REMINDER_MAIL ),startDateInGmt, endDateInGmt);
+		int facetLimit = -1;
+		int facetMinCount = 1;
 		JsonObject response = APIOperations.getInstance()
-				.getEmailCounts( "*:*",fieldQuery, isFacet, facetField, facetPivots );
+				.getEmailCounts( "*:*",fieldQuery, isFacet, facetField, facetPivots,facetLimit, facetMinCount );
 		//agentId : [ 1 TO * ]
 		JsonObject obj = response.getAsJsonObject("facet_counts").getAsJsonObject("facet_pivot");
 		if(obj != null) {
@@ -284,7 +289,19 @@ public class AggregateSolrQueryBolt extends BaseComputeBoltWithAck {
 				}
 			}
 			break;
-		}
+		case ComputeConstants.SOLR_PIVOT_AGENT_DROPPED:
+				countMap = convertToMap(jsonObject, pivotName);
+				if(countMap != null && !countMap.isEmpty()) {
+					for(SurveyInvitationEmailCountMonth mailCount : agentEmailCountsMonth) {
+						long count = 0;
+						if(countMap.containsKey(mailCount.getAgentId())) {
+							count = countMap.get(mailCount.getAgentId());
+						}
+						mailCount.setDropped(count);
+					}
+				}
+				break;
+			}
 	}
 
 	private Map<Long, Long> convertToMap(JsonObject jsonObject, String pivotName) {
@@ -293,7 +310,7 @@ public class AggregateSolrQueryBolt extends BaseComputeBoltWithAck {
 		for (JsonElement jsonElement : jsonObject.getAsJsonArray(pivotName)) {
 			JsonObject obj = jsonElement.getAsJsonObject();
 			
-			long countVal = obj.get("count").getAsLong();
+			long countVal = obj.get("pivot").getAsJsonArray().size();
 			long agentId = obj.get("value").getAsLong();
 			
 			countMap.put(agentId, countVal);
