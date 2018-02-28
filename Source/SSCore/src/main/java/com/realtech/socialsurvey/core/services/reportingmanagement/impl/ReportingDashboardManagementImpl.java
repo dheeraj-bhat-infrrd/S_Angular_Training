@@ -4815,7 +4815,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 				mailCount.setMonth(month);
 				mailCount.setYear(year);
 				mailCount.setAgentName((String)obj[3]);
-				mailCount.setAgentEmail((String)obj[4]);
+				mailCount.setEmailId((String)obj[4]);
 				LOG.info("Mail count obj added to list.{}",mailCount.toString());
 				receivedCountMonth.add(mailCount);
 			}
@@ -4882,7 +4882,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 		for(Object[] obj : reportList) {
 			SurveyInvitationEmailCountMonth reportObj = new SurveyInvitationEmailCountMonth();
 			reportObj.setAgentName((String)obj[0]);
-			reportObj.setAgentEmail((String)obj[1]);
+			reportObj.setEmailId((String)obj[1]);
 			reportObj.setBranchName((String)obj[2]);
 			reportObj.setRegionName((String)obj[3]);
 			reportObj.setReceived(new Long(obj[4].toString()));

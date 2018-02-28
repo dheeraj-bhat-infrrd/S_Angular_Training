@@ -79,8 +79,6 @@ public class SurveyInvitationEmailCountMonth {
 	private long dropped;
 	
 	@Transient
-	private String agentEmail;
-	@Transient
 	private String branchName;
 	@Transient
 	private String regionName;
@@ -175,12 +173,6 @@ public class SurveyInvitationEmailCountMonth {
 	public void setAgentName(String agentName) {
 		this.agentName = agentName;
 	}
-	public String getAgentEmail() {
-		return agentEmail;
-	}
-	public void setAgentEmail(String agentEmail) {
-		this.agentEmail = agentEmail;
-	}
 	public String getBranchName() {
 		return branchName;
 	}
@@ -218,7 +210,7 @@ public class SurveyInvitationEmailCountMonth {
 				+ ", attempted=" + attempted + ", delivered=" + delivered + ", differed=" + differed + ", blocked="
 				+ blocked + ", opened=" + opened + ", spamed=" + spamed + ", unsubscribed=" + unsubscribed
 				+ ", bounced=" + bounced + ", linkClicked=" + linkClicked + ", received=" + received + ", dropped="
-				+ dropped + ", agentEmail=" + agentEmail + ", branchName=" + branchName + ", regionName=" + regionName
+				+ dropped + ", branchName=" + branchName + ", regionName=" + regionName
 				+ "]";
 	}
 }

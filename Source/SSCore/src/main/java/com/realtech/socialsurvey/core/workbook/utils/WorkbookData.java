@@ -1490,7 +1490,7 @@ public class WorkbookData
 			surveyInvitationMailReportToPopulate = new ArrayList<Object>();
 
 			surveyInvitationMailReportToPopulate.add(surveyInvitationEmailMonth.getAgentName());
-			surveyInvitationMailReportToPopulate.add(surveyInvitationEmailMonth.getAgentEmail());
+			surveyInvitationMailReportToPopulate.add(surveyInvitationEmailMonth.getEmailId());
 			surveyInvitationMailReportToPopulate.add(surveyInvitationEmailMonth.getBranchName());
 			surveyInvitationMailReportToPopulate.add(surveyInvitationEmailMonth.getRegionName());
 			surveyInvitationMailReportToPopulate.add(surveyInvitationEmailMonth.getReceived());

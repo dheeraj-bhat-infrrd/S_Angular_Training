@@ -922,15 +922,14 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Object[]> getReceivedCountForDate(String startDate, String endDate) {
-	String queryStr = "select count(spi.SURVEY_PRE_INITIATION_ID) as received_count,u.USER_ID,u.COMPANY_ID," +
-			"concat(u.FIRST_NAME,' ',coalesce(u.LAST_NAME,'')) as agent_name,u.EMAIL_ID " +
-			"from USERS u left join SURVEY_PRE_INITIATION spi on u.USER_ID=spi.AGENT_ID " + 
-			"and u.STATUS in (1,2) and spi.SURVEY_SOURCE not in ('3rd Party Review') " + 
-			"and spi.AGENT_ID != 0 and spi.CREATED_ON between ? and ? " + 
-			"group by spi.AGENT_ID ORDER BY u.USER_ID";
+	String queryStr = "select u.USER_ID,count(spi.SURVEY_PRE_INITIATION_ID) as c from USERS u " + 
+				"left join SURVEY_PRE_INITIATION spi on u.user_id=spi.agent_id and u.status in (1,2) " + 
+				"and spi.survey_source != '3rd Party Review' and spi.created_on between ? and ? " +
+				"and spi.agent_id != 0 group by u.user_id";
 	Query query = getSession().createSQLQuery(queryStr);
 	query.setParameter(0, startDate);
 	query.setParameter(1, endDate);
+	LOG.debug("query to fetch data for email report : {}",query.toString());
 	return query.list();
 	}
 }
