@@ -65,6 +65,13 @@ public class ReportsTopologyStarterHelper extends TopologyStarterHelper
             Config config = new Config();
             config.put( Config.TOPOLOGY_MAX_SPOUT_PENDING, 5000 );
             config.put( Config.STORM_NIMBUS_RETRY_TIMES, 3 );
+            /* The maximum amount of time given to the topology to 
+               fully process a message emitted by a spout. If the 
+               message is not acked within this time frame, 
+               Storm will fail the message on the spout. 
+               Some spouts implementations will then replay the 
+               message at a later time. */ 
+            config.put(Config.TOPOLOGY_MESSAGE_TIMEOUT_SECS, 300);
             return config;
         }
     }

@@ -50,7 +50,6 @@ import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.CompanyDetailsReportDao;
 import com.realtech.socialsurvey.core.dao.CompanyUserReportDao;
 import com.realtech.socialsurvey.core.dao.FileUploadDao;
-import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.GenericReportingDao;
 import com.realtech.socialsurvey.core.dao.NpsReportMonthDao;
 import com.realtech.socialsurvey.core.dao.NpsReportWeekDao;
@@ -4803,14 +4802,14 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 		String startDateStr = sdf.format(new Date(startDate));
 		String endDateStr = sdf.format(new Date(endDate));
-		
+		LOG.info("start date {} and end date {}",startDateStr,endDateStr);
 		List<Object[]> receivedCount = surveyPreInitiationDao.getReceivedCountForDate(startDateStr, endDateStr);
 		LOG.info("Db returned row count : {}",receivedCount.size());
 		for (Object[] obj : receivedCount) {
 			if(obj[0] !=null && obj[1]!=null && obj[2] !=null) {
 				SurveyInvitationEmailCountMonth mailCount = new SurveyInvitationEmailCountMonth();
-				mailCount.setAgentId(new Long(obj[1].toString()));
-				mailCount.setReceived(new Long(obj[0].toString()));
+				mailCount.setAgentId(new Long(obj[0].toString()));
+				mailCount.setReceived(new Long(obj[1].toString()));
 				mailCount.setCompanyId(new Long(obj[2].toString()));
 				mailCount.setMonth(month);
 				mailCount.setYear(year);
