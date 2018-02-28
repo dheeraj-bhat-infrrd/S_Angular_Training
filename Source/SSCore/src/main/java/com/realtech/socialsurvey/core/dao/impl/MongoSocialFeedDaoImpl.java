@@ -363,13 +363,13 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 	}
 
 	@Override
-	public List<OrganizationUnitSettings> getAllUserDetails(Set<Long> userIds) {
+	public OrganizationUnitSettings getAllUserDetails(Long userId) {
 		LOG.debug( "Fetching all user details from {}", CommonConstants.AGENT_SETTINGS_COLLECTION );
-        List<OrganizationUnitSettings> organizationUnitSettings = null;
+        OrganizationUnitSettings organizationUnitSettings = null;
         Query query = new Query();
-        query.addCriteria( Criteria.where( "iden" ).in( userIds ) );
+        query.addCriteria( Criteria.where( "iden" ).is( userId ) );
         query.fields().exclude( KEY_IDENTIFIER ).include(IDEN).include(CONTACT_DETAILS + "." + NAME).include(PROFILE_IMAGE_URL);
-        organizationUnitSettings = mongoTemplate.find( query, OrganizationUnitSettings.class, CommonConstants.AGENT_SETTINGS_COLLECTION );
+        organizationUnitSettings = mongoTemplate.findOne( query, OrganizationUnitSettings.class, CommonConstants.AGENT_SETTINGS_COLLECTION );
         LOG.debug( "Fetched all user details from {}", CommonConstants.AGENT_SETTINGS_COLLECTION );
         return organizationUnitSettings;
 	}	

@@ -34,7 +34,7 @@ public interface MongoSocialFeedDao
 
 	public List<OrganizationUnitSettings> getAllBranchDetails(List<Long> branchIds);
 	
-	public List<OrganizationUnitSettings> getAllUserDetails(Set<Long> userIds);
+	public OrganizationUnitSettings getAllUserDetails(Long userId);
 	
 
 }

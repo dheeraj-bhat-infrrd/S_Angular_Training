@@ -4,6 +4,8 @@ package com.realtech.socialsurvey.web.api;
 
 import java.util.List;
 
+import org.springframework.web.bind.annotation.PathVariable;
+
 import com.realtech.socialsurvey.core.entities.Keyword;
 import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
 import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
@@ -248,6 +250,12 @@ public interface SSApiIntegration
     
     @GET("/v1/socialfeedsmacro/company/{companyId}/macro/{macroId}")
     public Response getMacroById(@Path("companyId") Long companyId, @Path("macroId") long macroId);
+    
+    @GET("/v1/segments/company/{companyId}")
+    public Response getSegmentsByCompanyId(@Path("companyId") Long companyId, @Query("startIndex") int startIndex, @Query("limit") int limit);
+    
+    @GET("/v1/users/company/{companyId}")
+    public Response getUsersByCompanyId(@Path("companyId") Long companyId);
     
     
 }
