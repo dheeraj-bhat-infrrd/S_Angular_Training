@@ -25,11 +25,10 @@ public class SurveyInvitationEmailDaoImpl extends GenericReportingDaoImpl<Survey
 	@Override
 	public List<Object[]> getSurveyInvitationEmailReportForMonth(long companyId, int month,
 			int year) {
-		String queryString = "select concat(u.FIRST_NAME,' ',coalesce(u.LAST_NAME,'')) as agent_name,"
-				+ "u.EMAIL_ID,b.BRANCH,r.REGION,imc.received,imc.attempted_count,imc.delivered,"
-				+ "imc.bounced,imc.deffered,imc.opened,imc.link_clicked,imc.dropped "
+		String queryString = "select imc.agent_name,imc.agent_email,b.BRANCH,r.REGION,"
+				+ "imc.received,imc.attempted_count,imc.delivered,imc.bounced,imc.deffered,"
+				+ "imc.opened,imc.link_clicked,imc.dropped "
 				+ "from invitation_mail_count_month imc "
-				+ "inner join users u on imc.agent_id=u.user_id "
 				+ "inner join company c on imc.company_id=c.company_id "
 				+ "inner join user_profile up on imc.agent_id=up.user_id and up.status = 1 "
 				+ "left join branch b on up.branch_id = b.branch_id and b.IS_DEFAULT_BY_SYSTEM=0 "

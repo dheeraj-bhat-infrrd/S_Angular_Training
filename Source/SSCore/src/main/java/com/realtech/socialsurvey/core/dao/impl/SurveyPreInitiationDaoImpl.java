@@ -922,10 +922,11 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Object[]> getReceivedCountForDate(String startDate, String endDate) {
-	String queryStr = "select count(spi.SURVEY_PRE_INITIATION_ID) as received_count,spi.AGENT_ID,u.COMPANY_ID " + 
+	String queryStr = "select count(spi.SURVEY_PRE_INITIATION_ID) as received_count,u.USER_ID,u.COMPANY_ID," +
+			"concat(u.FIRST_NAME,' ',coalesce(u.LAST_NAME,'')) as agent_name,u.EMAIL_ID" +
 			"from USERS u left join SURVEY_PRE_INITIATION spi on u.USER_ID=spi.AGENT_ID " + 
 			"and u.STATUS in (1,2) and spi.SURVEY_SOURCE not in ('3rd Party Review') " + 
-			"and spi.AGENT_ID is not null and spi.CREATED_ON between ? and ? " + 
+			"and spi.AGENT_ID != 0 and spi.CREATED_ON between ? and ? " + 
 			"group by spi.AGENT_ID ORDER BY u.USER_ID";
 	Query query = getSession().createSQLQuery(queryStr);
 	query.setParameter(0, startDate);

@@ -31,6 +31,8 @@ public class SurveyInvitationEmailCountMonth implements Serializable{
 	private long linkClicked;
 	private long received;
 	private long dropped;
+	private String agentName;
+	private String emailId;
 	
 	public long getAgentId() {
 		return agentId;
@@ -128,16 +130,25 @@ public class SurveyInvitationEmailCountMonth implements Serializable{
 	public void setId(long id) {
 		this.id = id;
 	}
+	public String getAgentName() {
+		return agentName;
+	}
+	public void setAgentName(String agentName) {
+		this.agentName = agentName;
+	}
+	public String getEmailId() {
+		return emailId;
+	}
+	public void setEmailId(String emailId) {
+		this.emailId = emailId;
+	}
 	@Override
 	public String toString() {
 		return "SurveyInvitationEmailCountMonth [id=" + id + ", agentId=" + agentId + ", companyId=" + companyId
 				+ ", month=" + month + ", year=" + year + ", attempted=" + attempted + ", delivered=" + delivered
 				+ ", differed=" + differed + ", blocked=" + blocked + ", opened=" + opened + ", spamed=" + spamed
 				+ ", unsubscribed=" + unsubscribed + ", bounced=" + bounced + ", linkClicked=" + linkClicked
-				+ ", received=" + received + ", dropped=" + dropped + "]";
+				+ ", received=" + received + ", dropped=" + dropped + ", agentName=" + agentName + ", emailId="
+				+ emailId + "]";
 	}
-	
-	
-	
-
 }

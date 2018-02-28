@@ -33,6 +33,12 @@ public class SurveyInvitationEmailCountMonth {
 	@Column(name = "company_id")
 	private long companyId;
 	
+	@Column(name = "agent_name")
+	private String agentName;
+	
+	@Column(name = "agent_email")
+	private String emailId;
+	
 	@Column(name = "month")
 	private int month;
 	
@@ -72,8 +78,6 @@ public class SurveyInvitationEmailCountMonth {
 	@Column(name = "dropped")
 	private long dropped;
 	
-	@Transient
-	private String agentName;
 	@Transient
 	private String agentEmail;
 	@Transient
@@ -201,13 +205,20 @@ public class SurveyInvitationEmailCountMonth {
 	public void setId(long id) {
 		this.id = id;
 	}
+	public String getEmailId() {
+		return emailId;
+	}
+	public void setEmailId(String emailId) {
+		this.emailId = emailId;
+	}
 	@Override
 	public String toString() {
 		return "SurveyInvitationEmailCountMonth [id=" + id + ", agentId=" + agentId + ", companyId=" + companyId
-				+ ", month=" + month + ", year=" + year + ", attempted=" + attempted + ", delivered=" + delivered
-				+ ", differed=" + differed + ", blocked=" + blocked + ", opened=" + opened + ", spamed=" + spamed
-				+ ", unsubscribed=" + unsubscribed + ", bounced=" + bounced + ", linkClicked=" + linkClicked
-				+ ", received=" + received + ", dropped=" + dropped + ", agentName=" + agentName + ", agentEmail=" + agentEmail + ", branchName="
-				+ branchName + ", regionName=" + regionName + "]";
+				+ ", agentName=" + agentName + ", emailId=" + emailId + ", month=" + month + ", year=" + year
+				+ ", attempted=" + attempted + ", delivered=" + delivered + ", differed=" + differed + ", blocked="
+				+ blocked + ", opened=" + opened + ", spamed=" + spamed + ", unsubscribed=" + unsubscribed
+				+ ", bounced=" + bounced + ", linkClicked=" + linkClicked + ", received=" + received + ", dropped="
+				+ dropped + ", agentEmail=" + agentEmail + ", branchName=" + branchName + ", regionName=" + regionName
+				+ "]";
 	}
 }
