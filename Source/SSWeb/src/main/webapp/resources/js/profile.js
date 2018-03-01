@@ -29,7 +29,7 @@ $(document).ajaxStop(function() {
 
 
 function adjustImageForPublicProfile(){
-    //var windW = getWindowWidth();
+    var windW = getWindowWidth();
     if(windW < 768){
         //var imgW = $('#prof-image').width();
         //$('#prof-image').height(imgW * 0.7);
