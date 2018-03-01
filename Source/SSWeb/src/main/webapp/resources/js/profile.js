@@ -757,10 +757,12 @@ function paintReviews(result){
 		}*/
 		
 		var custName = reviewItem.customerFirstName.trim();
-		var custDispName = reviewItem.customerFirstName.trim();
+		
 		if(reviewItem.customerLastName != undefined && reviewItem.customerLastName.trim() != ""){
-			custDispName += ' '+reviewItem.customerLastName.substr(0,1).toUpperCase()+'.';
+			custName =  custName + ' ' + reviewItem.customerLastName.trim();
 		}
+		var custArray = custName.split( " " );
+		var custDispName = custArray[0] + ( ( custArray[1] != undefined && custArray[1].trim() != "" ) ? " " + custArray[1].substr(0,1).toUpperCase() : "" );
 		
 		reviewsHtml = reviewsHtml +
 			'<div class="' + lastItemClass + ' cursor-pointer"' + ' data-rating=' + reviewItem.score + ' data-review="' + escapeHtml(reviewItem.review) + '" data-agentid="' + reviewItem.agentId + '" survey-mongo-id="' + reviewItem._id + '">';
