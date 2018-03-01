@@ -37,6 +37,10 @@ import com.realtech.socialsurvey.core.enums.ActionHistoryType;
 import com.realtech.socialsurvey.core.enums.SocialFeedStatus;
 import com.realtech.socialsurvey.core.enums.TextActionType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.integration.stream.StreamApi;
+import com.realtech.socialsurvey.core.integration.stream.StreamApiConnectException;
+import com.realtech.socialsurvey.core.integration.stream.StreamApiException;
+import com.realtech.socialsurvey.core.integration.stream.StreamApiIntegrationBuilder;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.socialmonitor.feed.SocialFeedService;
@@ -67,6 +71,9 @@ public class SocialFeedServiceImpl implements SocialFeedService
     @Autowired
     UserDao userDao;
     
+    @Autowired
+    private StreamApiIntegrationBuilder streamApiIntegrationBuilder;
+
     private EmailServices emailServices;
 
 	@Autowired
@@ -380,6 +387,18 @@ public class SocialFeedServiceImpl implements SocialFeedService
 		}
 		return usersList;
 	}
+
+
+    @Override
+    public void retryFailedSocialFeeds()
+    {
+        LOG.info("Starting retryFailedSocialFeeds method.");
+        try {
+            streamApiIntegrationBuilder.getStreamApi().queueFailedSocialFeeds();
+        } catch ( StreamApiException | StreamApiConnectException e ) {
+            LOG.error( "Could not stream failed social feeds", e );
+        }
+    }
 
 
 } 

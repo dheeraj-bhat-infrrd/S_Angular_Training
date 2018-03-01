@@ -100,6 +100,10 @@ public interface SocialFeedService
      */
     public List<SegmentsEntity> getUsersByCompanyId(Long companyId, int startIndex, int batchSize) throws InvalidInputException;
 
+    /**
+     * Hits StreamApi to queue failed social feeds
+     */
+    public void retryFailedSocialFeeds();
 
     
 }
