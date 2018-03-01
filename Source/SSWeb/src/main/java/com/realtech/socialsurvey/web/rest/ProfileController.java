@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.web.rest;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1926,8 +1927,9 @@ public class ProfileController
 				String displayName = surveyDetails.getCustomerFirstName();
 				if (surveyDetails.getCustomerLastName() != null)
 					displayName = displayName + " " + surveyDetails.getCustomerLastName();
+				Date currentDate = new Date( System.currentTimeMillis() );
 				emailServices.sendAbusiveNotifyMail(reporterName, abusiveMailSettings.getMailId(), displayName,surveyDetails.getCustomerEmail(), surveyDetails.getAgentName(), 
-						userObj.getEmailId(),surveyDetails.getMood(), String.valueOf(surveyDetails.getScore()), surveyDetails.getSourceId(), surveyDetails.getReview(),surveyDetails.getLastAbuseReportedDate().toString());
+						userObj.getEmailId(),surveyDetails.getMood(), String.valueOf(surveyDetails.getScore()), surveyDetails.getSourceId(), surveyDetails.getReview(),currentDate.toString());
 			}
         } catch ( NonFatalException e ) {
             LOG.error( "NonfatalException caught in reportAbuse(). Nested exception is ", e );
