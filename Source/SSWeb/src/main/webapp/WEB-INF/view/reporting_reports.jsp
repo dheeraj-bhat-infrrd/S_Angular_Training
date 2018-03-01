@@ -148,6 +148,8 @@ $(document).ready(function() {
 		drawRecentActivity(startIndex, batchSize,tableHeaderData);
 		showHidePaginateButtons(startIndex, recentActivityCount);
 	});
+	
+	autoRefresh(tableHeaderData);	
 		
 });
 </script>
