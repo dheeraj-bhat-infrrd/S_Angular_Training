@@ -788,7 +788,7 @@ function paintReviews(result){
 		}
 		
 		
-		reviewsHtml += '			<div class="ppl-head-1 float-left " style="clear:both"><span class="float-left"> Reviewed by<span style="font-weight:600 !important;"> '+custDispName+'</span></span>';
+		reviewsHtml += '			<div class="ppl-head-1 float-left " style="clear:both"><span class="float-left"> Reviewed by<span style="font-weight:600 !important;"> '+custDispName+'.</span></span>';
 		if(profileLevel!= 'INDIVIDUAL' && reviewItem.agentName!=null && hiddenSection=="false"){
 			reviewsHtml +='<span class="float-left" style="margin-left:5px;"> for<a style="color:#236CAF;font-weight: 600 !important;" href="'+reviewItem.completeProfileUrl+'"> '+reviewItem.agentName+'</a></span>';
 		}
