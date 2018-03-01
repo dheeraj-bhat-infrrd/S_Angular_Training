@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RegistrationStage;
@@ -261,6 +263,7 @@ public class LoginController
                 return "redirect:/registeraccount/newloginas.do?userId=" + user.getUserId();
             }
 
+            
             try {
                 OrganizationUnitSettings companySettings = organizationManagementService
                     .getCompanySettings( user.getCompany().getCompanyId() );
@@ -331,6 +334,22 @@ public class LoginController
                 LOG.debug( "License details not found for the user's company" );
             }
 
+            //get agent settings
+            AgentSettings agentSettings = null;
+            try {
+                agentSettings = organizationManagementService.getAgentSettings(user.getUserId());            	
+            }catch(NoRecordsFetchedException e) {
+            		throw new InvalidInputException( "No settings found for user", DisplayMessageConstants.GENERAL_ERROR );
+            }
+            
+            //check if login is prevented for user
+            if(agentSettings.isLoginPrevented() &&  ! StringUtils.equals(((String) session.getAttribute( CommonConstants.IS_AUTO_LOGIN)), "true")  ) {
+            		session.invalidate();
+                SecurityContextHolder.clearContext();
+                model.addAttribute( CommonConstants.DISABLED_ACCOUNT_FLAG, CommonConstants.YES );
+                return JspResolver.LOGIN_DISABLED_PAGE;
+            }
+            
             /**
              * Check if if the company inserted is default company or registration is not complete ,
              * if company registration not done redirect to company registration page

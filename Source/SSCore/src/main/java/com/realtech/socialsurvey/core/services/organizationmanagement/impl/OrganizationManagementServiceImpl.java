@@ -8929,4 +8929,26 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		unitSettings.setSurvey_settings(surveySettings);
 	}
 	
+	
+	@Override
+    public void updateIsLoginPreventedForUser( AgentSettings agentSettings, boolean isLoginPrevented ) throws InvalidInputException
+    {
+		if(agentSettings == null) {
+			throw new InvalidInputException("Agent settings can not be null");
+		}
+        LOG.info( "Inside method updateIsLoginPreventedForUser for user : " + agentSettings.getIden() );
+        organizationUnitSettingsDao.updateParticularKeyAgentSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_IS_LOGIN_PREVENTED, isLoginPrevented, agentSettings );
+    }
+	
+	@Override
+    public void updateHidePublicPageForUser( AgentSettings agentSettings, boolean hidePublicPage ) throws InvalidInputException
+    {
+		if(agentSettings == null) {
+			throw new InvalidInputException("Agent settings can not be null");
+		}
+        LOG.info( "Inside method updateHidePublicPageForUser for user : " + agentSettings.getIden() );
+        organizationUnitSettingsDao.updateParticularKeyAgentSettings(
+            MongoOrganizationUnitSettingDaoImpl.KEY_HIDE_PUBLIC_PAGE, hidePublicPage, agentSettings );
+    }
 }
