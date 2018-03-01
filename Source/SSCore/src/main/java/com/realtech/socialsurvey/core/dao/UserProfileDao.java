@@ -92,4 +92,6 @@ public interface UserProfileDao extends GenericDao<UserProfile, Long>
 
     public UserProfile findUserProfile( long userId, long branchId, long regionId, int profilesMasterId )
         throws InvalidInputException, NoRecordsFetchedException;
+    
+    public List<UserProfile> getUserProfiles(Long companyId);
 }
