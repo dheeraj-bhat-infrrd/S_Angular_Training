@@ -11,7 +11,7 @@ import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.entities.JobLogDetailsResponse;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.reportingmanagement.JobLogDetailsManagement;
-import com.wordnik.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiOperation;
 
 
 @RestController

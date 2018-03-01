@@ -15,9 +15,12 @@ public interface TwitterFeedProcessor extends Serializable
 
     /**
      * Fetch twitter tweets
+     * @param mediaToken
      * @param companyId
-     * @param token
+     * @param twitterConsumerKey
+     * @param twitterConsumerSecret
      * @return
      */
-    List<TwitterFeedData> fetchFeed( long companyId,  SocialMediaTokenResponse mediaToken);
+    List<TwitterFeedData> fetchFeed(long companyId, SocialMediaTokenResponse mediaToken,
+                                    String twitterConsumerKey, String twitterConsumerSecret);
 }

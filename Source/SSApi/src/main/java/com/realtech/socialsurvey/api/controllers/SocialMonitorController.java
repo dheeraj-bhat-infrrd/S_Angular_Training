@@ -27,7 +27,11 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.socialmonitor.feed.SocialFeedService;
-import com.wordnik.swagger.annotations.ApiOperation;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 
 /**
@@ -36,6 +40,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
  */
 @RestController
 @RequestMapping ( "/v1")
+@Api ( value = "Social monitor APIs", description = "APIs for Social Monitor Feeds")
 public class SocialMonitorController
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( SocialMonitorController.class );
@@ -55,7 +60,8 @@ public class SocialMonitorController
 
 
     @RequestMapping ( value = "/companies/{companyId}/keywords", method = RequestMethod.POST)
-    @ApiOperation ( value = "Initiate account registration")
+    @ApiOperation ( value = "Add keywords to the company", response = Keyword.class, responseContainer = "List")
+	@ApiResponses(value = { @ApiResponse ( code = 200, message = "Successfully updated the keywords")})
     public ResponseEntity<?> addKeywordsToCompany( @PathVariable ( "companyId") long companyId,
                                                    @Valid @RequestBody List<Keyword> keywordsRequest ) throws SSApiException
     {
@@ -110,7 +116,8 @@ public class SocialMonitorController
 
 
     @RequestMapping ( value = "/companies/{companyId}/keywords", method = RequestMethod.GET)
-    @ApiOperation ( value = "Initiate account registration")
+    @ApiOperation ( value = "Get keywords of a company", response = FilterKeywordsResponse.class)
+	@ApiResponses(value = { @ApiResponse ( code = 200, message = "Successfully fetched the keywords of a company")})
     public ResponseEntity<?> getCompanyKeywords( @PathVariable ( "companyId") long companyId, int startIndex, int limit,
                                                  @RequestParam(value = "monitorType", required = false) String monitorType)
             throws SSApiException

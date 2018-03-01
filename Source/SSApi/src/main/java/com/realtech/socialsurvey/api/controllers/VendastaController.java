@@ -25,7 +25,7 @@ import com.realtech.socialsurvey.api.validators.VendastaRmAccountValidator;
 import com.realtech.socialsurvey.core.entities.VendastaRmAccount;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.VendastaManagementService;
-import com.wordnik.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiOperation;
 
 
 @RestController
