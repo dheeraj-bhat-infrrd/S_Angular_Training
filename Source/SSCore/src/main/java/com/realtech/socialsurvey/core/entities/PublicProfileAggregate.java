@@ -29,6 +29,7 @@ public class PublicProfileAggregate
     private String completeBranchProfileUrl;
     private IndividualReviewAggregate reviewAggregate;
     private String surveyId;
+    private String companyName;
 
 
     public String getProfileUrl()
@@ -259,7 +260,17 @@ public class PublicProfileAggregate
     }
 
 
-    @Override
+    public String getCompanyName() {
+		return companyName;
+	}
+
+
+	public void setCompanyName(String companyName) {
+		this.companyName = companyName;
+	}
+
+
+	@Override
     public String toString()
     {
         return "PublicProfileAggregate [profileUrl=" + profileUrl + ", hierarchyMap=" + hierarchyMap + ", profile=" + profile

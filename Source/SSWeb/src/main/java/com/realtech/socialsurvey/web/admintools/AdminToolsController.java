@@ -606,4 +606,49 @@ public class AdminToolsController
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR ).tag(e.getMessage()).build();
 		}
     }
+    
+    @ResponseBody
+    @RequestMapping ( value = "/manualposttolinkedin", method = RequestMethod.POST)
+    public Response manualPostToLinkedin( HttpServletRequest request )
+	{
+		LOG.info("Method manualPostToLinkedin started");
+		String authorizationHeader = request.getHeader("Authorization");
+		String surveyMongoId = request.getParameter("surveyMongoId");
+		String entityType = request.getParameter("entityType");
+		String entityIdStr = request.getParameter("entityId");
+		Long entityId = 0l;
+
+		try {
+
+			// authorize request
+			try {
+				validateAuthHeader(authorizationHeader);
+			} catch (InvalidInputException e) {
+				return Response.status(Response.Status.UNAUTHORIZED).tag(e.getMessage()).build();
+			}
+			
+			//validate request
+			try {
+				entityId = Long.parseLong(entityIdStr);
+			} catch (NumberFormatException e) {
+				throw new InvalidInputException("Wrong value passed for parameter entityId ");
+			}
+
+			if (StringUtils.isEmpty(surveyMongoId))
+				throw new InvalidInputException("Parameter surveyMongoId is missing");
+
+			if (StringUtils.isEmpty(entityType))
+				throw new InvalidInputException("Parameter entityType is missing");
+			
+			//return response entity
+			return Response.status(Response.Status.CREATED)
+					.tag("Successfully posted to Linkedin for " + entityType + " with id  " + entityId).build();
+		}catch(InvalidInputException e) {
+			LOG.error("Error in manualPostToLinkedin " , e);
+			return Response.status(Response.Status.BAD_REQUEST ).tag(e.getMessage()).build();
+		}catch(Exception e) {
+			LOG.error("Error in manualPostToLinkedin " , e);
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR ).tag(e.getMessage()).build();
+		}
+	}
 }
