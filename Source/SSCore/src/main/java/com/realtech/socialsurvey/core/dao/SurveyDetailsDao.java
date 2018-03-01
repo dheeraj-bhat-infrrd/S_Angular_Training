@@ -207,6 +207,8 @@ public interface SurveyDetailsDao
 
 
     public void updateSurveyAsUnderResolution( String surveyId );
+    
+    public void updateSurveyAsAbusiveNotify( String surveyId );
 
 
     public List<AbusiveSurveyReportWrapper> getSurveysReporetedAsAbusive( long companyId, int start, int rows );

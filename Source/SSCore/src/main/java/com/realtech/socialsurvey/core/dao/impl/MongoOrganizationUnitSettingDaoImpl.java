@@ -120,6 +120,10 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_ENTITY_ALERT_DETAILS = "entityAlertDetails";
     public static final String KEY_IS_ERROR_ALERT = "isErrorAlert";
     public static final String KEY_IS_WARNING_ALERT_= "isWarningAlert";
+    
+    public static final String KEY_ABUSIVE_EMAIL_SETTING = "survey_settings.abusive_mail_settings";
+    public static final String KEY_COMPLAINT_RESOLUTION_SETTING = "survey_settings.complaint_res_settings";
+
 
     @Value ( "${CDN_PATH}")
     private String amazonEndPoint;

@@ -60,6 +60,10 @@ import com.realtech.socialsurvey.core.services.search.exception.SolrException;
  * @author Ustav
  *
  */
+/**
+ * @author sandra
+ *
+ */
 public interface OrganizationManagementService
 {
 
@@ -1578,4 +1582,40 @@ public interface OrganizationManagementService
 
 
 	public boolean decryptEncompassPasswordIfPossible(OrganizationUnitSettings unitSettings);
+
+
+
+	/**
+	 * @param companyId
+	 * @param mailId
+	 * @return
+	 * @throws InvalidInputException 
+	 * @throws NonFatalException 
+	 */
+	public void updateAbusiveMailService(long companyId, String mailId) throws InvalidInputException, NonFatalException;
+
+
+	/**
+	 * @param companyId
+	 * @throws NonFatalException
+	 */
+	public void unsetAbusiveMailService(long companyId) throws NonFatalException;
+
+
+	/**
+	 * @param companySettings
+	 * @param keyToUpdate
+	 * @param collectionName
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public boolean unsetKey(OrganizationUnitSettings companySettings, String keyToUpdate, String collectionName)
+			throws InvalidInputException;
+
+
+	/**
+	 * @param companyId
+	 * @throws NonFatalException
+	 */
+	public void unsetComplaintResService(long companyId) throws NonFatalException; 
 }
