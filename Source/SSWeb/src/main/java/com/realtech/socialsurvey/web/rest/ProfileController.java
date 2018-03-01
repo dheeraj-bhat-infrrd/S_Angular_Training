@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.AbusiveMailSettings;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
@@ -1910,6 +1911,24 @@ public class ProfileController
 
             // Calling email services method to send mail to the reporter
             emailServices.sendSurveyReportMail( reporterEmail, reporterName, reason );
+            //send abusive mail for registered email
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(surveyDetails.getCompanyId());
+            if (companySettings.getSurvey_settings() != null && companySettings.getSurvey_settings().getAbusive_mail_settings() != null) {
+				AbusiveMailSettings abusiveMailSettings = companySettings.getSurvey_settings().getAbusive_mail_settings();
+				surveyDetails.setAbusiveNotify(true);
+				surveyHandler.updateSurveyAsAbusiveNotify(surveyDetails.get_id());
+				long agentId = surveyDetails.getAgentId();
+	            User userObj = userManagementService.getUserByUserId( agentId );
+
+
+				// SS-1435: Send survey details too.
+				// SS-715: Full customer name
+				String displayName = surveyDetails.getCustomerFirstName();
+				if (surveyDetails.getCustomerLastName() != null)
+					displayName = displayName + " " + surveyDetails.getCustomerLastName();
+				emailServices.sendAbusiveNotifyMail(reporterName, abusiveMailSettings.getMailId(), displayName,surveyDetails.getCustomerEmail(), surveyDetails.getAgentName(), 
+						userObj.getEmailId(),surveyDetails.getMood(), String.valueOf(surveyDetails.getScore()), surveyDetails.getSourceId(), surveyDetails.getReview(),surveyDetails.getLastAbuseReportedDate().toString());
+			}
         } catch ( NonFatalException e ) {
             LOG.error( "NonfatalException caught in reportAbuse(). Nested exception is ", e );
             return CommonConstants.ERROR;

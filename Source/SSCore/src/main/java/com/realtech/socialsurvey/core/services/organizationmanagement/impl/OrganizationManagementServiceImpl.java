@@ -64,6 +64,7 @@ import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.UsercountModificationNotificationDao;
 import com.realtech.socialsurvey.core.dao.ZillowHierarchyDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.AbusiveMailSettings;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
@@ -8805,4 +8806,127 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
 		return true;
 	}
+	
+	@Override
+	public void updateAbusiveMailService(long companyId, String mailId) throws NonFatalException {
+
+		LOG.info("Update abusive mail");
+		OrganizationUnitSettings unitSettings = null;
+		AbusiveMailSettings originalAbusiveMailSettings = new AbusiveMailSettings();
+        mailId = checkValidMail(mailId);
+
+		unitSettings = getCompanySettings(companyId);
+
+		if (unitSettings == null)
+			throw new NonFatalException("Company settings cannot be found for id : " + companyId);
+		// if surveySettings doesnt exist add it
+		if (unitSettings.getSurvey_settings() == null) {
+			addSurveySettings(unitSettings);
+		}
+
+		if (unitSettings.getSurvey_settings().getAbusive_mail_settings() != null)
+			originalAbusiveMailSettings = unitSettings.getSurvey_settings().getAbusive_mail_settings();
+
+		originalAbusiveMailSettings.setMailId(mailId);
+		unitSettings.getSurvey_settings().setAbusive_mail_settings(originalAbusiveMailSettings);
+		updateSurveySettings( unitSettings, unitSettings.getSurvey_settings() );
+
+	}
+	
+	@Override
+	public void unsetAbusiveMailService(long companyId) throws NonFatalException {
+
+		LOG.info("Unset abusive mail");
+		OrganizationUnitSettings unitSettings = null;
+
+		unitSettings = getCompanySettings(companyId);
+
+		if (unitSettings == null)
+			throw new NonFatalException("Company settings cannot be found for id : " + companyId);
+		// if surveySettings doesnt exist add it
+		if (unitSettings.getSurvey_settings().getAbusive_mail_settings() != null) {
+			unsetKey(unitSettings,MongoOrganizationUnitSettingDaoImpl.KEY_ABUSIVE_EMAIL_SETTING,CommonConstants.COMPANY_SETTINGS_COLLECTION);
+		}
+
+	}
+	
+	@Override
+	public void unsetComplaintResService(long companyId) throws NonFatalException {
+
+		LOG.info("Unset Complaint Resolution mail");
+		OrganizationUnitSettings unitSettings = null;
+
+		unitSettings = getCompanySettings(companyId);
+
+		if (unitSettings == null)
+			throw new NonFatalException("Company settings cannot be found for id : " + companyId);
+		// if surveySettings doesnt exist add it
+		if (unitSettings.getSurvey_settings().getComplaint_res_settings() != null) {
+			unsetKey(unitSettings,MongoOrganizationUnitSettingDaoImpl.KEY_COMPLAINT_RESOLUTION_SETTING,CommonConstants.COMPANY_SETTINGS_COLLECTION);
+		}
+
+	}
+	
+	@Override
+    public boolean unsetKey( OrganizationUnitSettings companySettings, String keyToUpdate , String collectionName )
+        throws InvalidInputException
+    {
+        if ( companySettings == null ) {
+            throw new InvalidInputException( "Company settings cannot be null." );
+        }
+
+        LOG.debug( "unsetting comapnySettings: {} for key: {}",companySettings ,keyToUpdate );
+        organizationUnitSettingsDao.removeKeyInOrganizationSettings(companySettings, keyToUpdate, collectionName);
+        LOG.debug( "Updated the record successfully" );
+
+        return true;
+    }
+
+    public String checkValidMail(String mailId) throws InvalidInputException {
+		String mailIDStr = "";
+
+		if (!mailId.contains(",")) {
+			if (!validateEmail(mailId.trim()))
+				throw new InvalidInputException("Mail id - {}   entered as send alert to input is invalid",mailId)  ;
+			else
+				mailId = mailId.trim();
+		} else {
+			String mailIds[] = mailId.split(",");
+
+			if (mailIds.length == 0)
+				throw new InvalidInputException("Mail id - {} entered as send alert to input is empty",mailId);
+
+			for (String mailID : mailIds) {
+				if (!validateEmail(mailID.trim()))
+					throw new InvalidInputException(
+							"Mail id - {} entered amongst the mail ids as send alert to input is invalid",mailId);
+				else
+					mailIDStr += mailID.trim() + " , ";
+			}
+			mailId = mailIDStr.substring(0, mailIDStr.length() - 2);
+		}
+		return mailId;
+	}
+
+
+	
+	
+	public void addSurveySettings(OrganizationUnitSettings unitSettings) {
+
+		// Adding default text for various flows of survey.
+		SurveySettings surveySettings = new SurveySettings();
+		surveySettings.setHappyText(happyText);
+		surveySettings.setNeutralText(neutralText);
+		surveySettings.setSadText(sadText);
+		surveySettings.setHappyTextComplete(happyTextComplete);
+		surveySettings.setNeutralTextComplete(neutralTextComplete);
+		surveySettings.setSadTextComplete(sadTextComplete);
+		surveySettings.setAutoPostEnabled(true);
+		surveySettings.setShow_survey_above_score(CommonConstants.DEFAULT_AUTOPOST_SCORE);
+		surveySettings.setAuto_post_score(CommonConstants.DEFAULT_AUTOPOST_SCORE);
+
+		surveySettings.setSurvey_reminder_interval_in_days(CommonConstants.DEFAULT_REMINDERMAIL_INTERVAL);
+		unitSettings.setSurvey_settings(surveySettings);
+	}
+	
 }

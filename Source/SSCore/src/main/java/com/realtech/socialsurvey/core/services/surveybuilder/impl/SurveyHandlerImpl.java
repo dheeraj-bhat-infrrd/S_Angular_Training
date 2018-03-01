@@ -2638,6 +2638,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyDetailsDao.updateSurveyAsUnderResolution( surveyId );
         LOG.debug( "Method updateSurveyAsUnderResolution() to mark a survey as under resolution started, ended" );
     }
+    
+    public void updateSurveyAsAbusiveNotify( String surveyId )
+    {
+
+        LOG.debug( "Method updateSurveyAsAbusiveNotify() to mark a survey as under resolution started, started" );
+        surveyDetailsDao.updateSurveyAsAbusiveNotify(surveyId);
+        LOG.debug( "Method updateSurveyAsAbusiveNotify() to mark a survey as under resolution started, ended" );
+    }
 
 
     @Override

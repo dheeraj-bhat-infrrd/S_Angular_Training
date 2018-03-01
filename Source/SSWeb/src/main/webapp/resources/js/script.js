@@ -1071,6 +1071,26 @@ function validateComplaintRegistraionForm() {
 	}
 }
 
+//Function to validate abusive email form
+function validateAbusiveEmailForm() {
+	var validate = true;
+
+	// hide the server error
+	$("#serverSideerror").hide();
+
+	// validate error code on email id
+	validate = validateMultipleEmailIds('abusive-mailId')
+	
+
+	if (!validate) {
+		return false;
+	} else {
+		/* Form validated. */
+		return true;
+	}
+	
+}
+
 // Functions for login page
 function loginUserLoginPage() {
 	if (validateFormLoginPage('login-form')) {
