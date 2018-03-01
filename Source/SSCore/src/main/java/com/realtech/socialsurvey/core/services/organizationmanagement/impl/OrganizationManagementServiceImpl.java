@@ -754,12 +754,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         MailContentSettings mailContentSettings = new MailContentSettings();
         companySettings.setMail_content( mailContentSettings );
         
-        // default digest flag
- 		List<LicenseDetail> companyLicenses = company.getLicenseDetails();
- 		if (companyLicenses != null && !companyLicenses.isEmpty() && companyLicenses.get(0).getAccountsMaster()
- 				.getAccountsMasterId() == CommonConstants.ACCOUNTS_MASTER_ENTERPRISE) {
- 			companySettings.setSendMonthlyDigestMail(true);
- 		}
 
         LOG.debug( "Inserting company settings." );
         OrganizationUnitSettings oldCompanySettings = null;
