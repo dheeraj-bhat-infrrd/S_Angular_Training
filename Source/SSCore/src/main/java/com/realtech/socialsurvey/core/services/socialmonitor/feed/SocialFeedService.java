@@ -1,14 +1,13 @@
 package com.realtech.socialsurvey.core.services.socialmonitor.feed;
 
-import com.realtech.socialsurvey.core.entities.SocialResponseObject;
 import java.util.List;
 
-import com.realtech.socialsurvey.core.entities.SegmentsEntity;
 import com.realtech.socialsurvey.core.entities.SegmentsVO;
 import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
 import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
 import com.realtech.socialsurvey.core.entities.SocialMonitorResponseData;
 import com.realtech.socialsurvey.core.entities.SocialMonitorUsersVO;
+import com.realtech.socialsurvey.core.entities.SocialResponseObject;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 
@@ -100,6 +99,10 @@ public interface SocialFeedService
      */
     public List<SocialMonitorUsersVO> getUsersByCompanyId(Long companyId) throws InvalidInputException, ProfileNotFoundException;
 
+    /**
+     * Hits StreamApi to queue failed social feeds
+     */
+    public void retryFailedSocialFeeds();
 
     
 }

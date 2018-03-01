@@ -5,6 +5,7 @@ import com.realtech.socialsurvey.core.entities.ReportRequest;
 import com.realtech.socialsurvey.core.entities.SendGridEventEntity;
 import retrofit.client.Response;
 import retrofit.http.Body;
+import retrofit.http.GET;
 import retrofit.http.POST;
 
 import java.util.List;
@@ -24,5 +25,8 @@ public interface StreamApi
     
     @POST("/api/v1/stream/report")
     public Response generateEmailReport(@Body ReportRequest reportRequest);
+    
+    @GET("/api/v1/analyze/failed/socialposts")
+    public Response queueFailedSocialFeeds();
 
 }

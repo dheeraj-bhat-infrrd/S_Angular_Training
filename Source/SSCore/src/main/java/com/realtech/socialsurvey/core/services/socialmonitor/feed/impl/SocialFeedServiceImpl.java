@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import javax.annotation.Resource;
@@ -25,10 +24,7 @@ import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialFeedDaoImpl;
 import com.realtech.socialsurvey.core.entities.ActionHistory;
-import com.realtech.socialsurvey.core.entities.Branch;
-import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SegmentsEntity;
 import com.realtech.socialsurvey.core.entities.SegmentsVO;
 import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
@@ -37,12 +33,14 @@ import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
 import com.realtech.socialsurvey.core.entities.SocialMonitorResponseData;
 import com.realtech.socialsurvey.core.entities.SocialMonitorUsersVO;
 import com.realtech.socialsurvey.core.entities.SocialResponseObject;
-import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.enums.ActionHistoryType;
 import com.realtech.socialsurvey.core.enums.SocialFeedStatus;
 import com.realtech.socialsurvey.core.enums.TextActionType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.integration.stream.StreamApiConnectException;
+import com.realtech.socialsurvey.core.integration.stream.StreamApiException;
+import com.realtech.socialsurvey.core.integration.stream.StreamApiIntegrationBuilder;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
@@ -78,6 +76,9 @@ public class SocialFeedServiceImpl implements SocialFeedService
     @Autowired
     UserDao userDao;
     
+    @Autowired
+    private StreamApiIntegrationBuilder streamApiIntegrationBuilder;
+
     @Autowired
     UserProfileDao userProfileDao;
     
@@ -400,6 +401,18 @@ public class SocialFeedServiceImpl implements SocialFeedService
 		}
 		return usersList;
 	}	
+
+    @Override
+    public void retryFailedSocialFeeds()
+    {
+        LOG.info("Starting retryFailedSocialFeeds method.");
+        try {
+            streamApiIntegrationBuilder.getStreamApi().queueFailedSocialFeeds();
+        } catch ( StreamApiException | StreamApiConnectException e ) {
+            LOG.error( "Could not stream failed social feeds", e );
+        }
+    }
+
 
 } 
 
