@@ -1679,6 +1679,16 @@ $(document).on('click', '#reports-generate-report-btn', function(e) {
 			},
 			complete : function() {	
 				hideOverlay();
+				
+				var recentActivityCount=getRecentActivityCount();
+				drawRecentActivity(0,batchSize,tableHeaderData);
+				showHidePaginateButtons(0, recentActivityCount);
+				
+				if(recentActivityCount == 0){
+					var tableData='';
+					tableData+="</table><div style='text-align:center; margin:20px auto'><span class='incomplete-trans-span'>There are No Recent Activities</span></div>";
+					$('#recent-activity-list-table').html(tableData);
+				}
 			},
 			error : function(e) {
 				showError("Your request could not be processed at the moment. Please try again later!");
@@ -1693,7 +1703,6 @@ $(document).on('click', '#reports-generate-report-btn', function(e) {
 $(document).on('click', '.err-close-rep', function() {
 	hideError();
 	hideInfo();
-	location.reload(true);
 });
 
 
@@ -3287,4 +3296,25 @@ function showOverviewTab(){
 	 drawCompletionRateGraph();
  	drawSpsStatsGraph();
 	drawNpsStatsGraph(entityId,entityType);
+}
+
+function autoRefresh(tableHeaderData){
+	setTimeout(function(){
+		
+		if($('#reports_page_container').length<=0){
+			return;
+		}
+		
+		var recentActivityCount=getRecentActivityCount();
+		drawRecentActivity(0,10,tableHeaderData);
+		showHidePaginateButtons(0, recentActivityCount);
+		
+		if(recentActivityCount == 0){
+			var tableData='';
+			tableData+="</table><div style='text-align:center; margin:20px auto'><span class='incomplete-trans-span'>There are No Recent Activities</span></div>";
+			$('#recent-activity-list-table').html(tableData);
+		}
+		
+		autoRefresh(tableHeaderData);
+	}, 30000);
 }

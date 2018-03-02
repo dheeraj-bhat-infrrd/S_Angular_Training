@@ -31,7 +31,7 @@
 </div>
 
 
-<div class="dash-stats-wrapper bord-bot-dc clearfix">
+<div id="reports_page_container" class="dash-stats-wrapper bord-bot-dc clearfix">
 	
 				<div class="generate-report-div">
 					<span class="generate-report-span-report" >Report</span>
@@ -165,6 +165,8 @@ $(document).ready(function() {
 		drawRecentActivity(startIndex, batchSize,tableHeaderData);
 		showHidePaginateButtons(startIndex, recentActivityCount);
 	});
+	
+	autoRefresh(tableHeaderData);	
 		
 });
 </script>
