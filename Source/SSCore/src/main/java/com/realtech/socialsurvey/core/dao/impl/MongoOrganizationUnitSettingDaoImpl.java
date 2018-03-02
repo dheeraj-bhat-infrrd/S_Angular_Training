@@ -114,12 +114,16 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_HIDE_PUBLIC_PAGE = "hidePublicPage";
     public static final String KEY_INCLUDE_FOR_TRANSACTION_MONITOR = "includeForTransactionMonitor";
     public static final String KEY_FILTER_KEYWORDS = "filterKeywords";
-
+    public static final String KEY_IS_LOGIN_PREVENTED = "isLoginPrevented";
 
     public static final String KEY_DIGEST_RECIPIENTS = "digestRecipients";
     public static final String KEY_ENTITY_ALERT_DETAILS = "entityAlertDetails";
     public static final String KEY_IS_ERROR_ALERT = "isErrorAlert";
     public static final String KEY_IS_WARNING_ALERT_= "isWarningAlert";
+    
+    public static final String KEY_ABUSIVE_EMAIL_SETTING = "survey_settings.abusive_mail_settings";
+    public static final String KEY_COMPLAINT_RESOLUTION_SETTING = "survey_settings.complaint_res_settings";
+
 
     @Value ( "${CDN_PATH}")
     private String amazonEndPoint;
@@ -925,18 +929,21 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 
         if ( imageType == CommonConstants.IMAGE_TYPE_PROFILE ) {
             if ( isThumbnail ) {
-                update.set( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, "" );
+                update.unset( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN );
+                update.unset( CommonConstants.PROFILE_IMAGE_RECTANGULAR_THUMBNAIL_COLUMN );
+
             } else {
-                update.set( CommonConstants.PROFILE_IMAGE_URL_SOLR, "" );
-                update.set( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, "" );
+                update.unset( CommonConstants.PROFILE_IMAGE_URL_SOLR );
+                update.unset( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN );
+                update.unset( CommonConstants.PROFILE_IMAGE_RECTANGULAR_THUMBNAIL_COLUMN );
             }
             update.set( CommonConstants.IS_PROFILE_IMAGE_PROCESSED_COLUMN, false );
         } else if ( imageType == CommonConstants.IMAGE_TYPE_LOGO ) {
             if ( isThumbnail ) {
-                update.set( CommonConstants.LOGO_THUMBNAIL_COLUMN, "" );
+                update.unset( CommonConstants.LOGO_THUMBNAIL_COLUMN );
             } else {
-                update.set( CommonConstants.LOGO_COLUMN, "" );
-                update.set( CommonConstants.LOGO_THUMBNAIL_COLUMN, "" );
+                update.unset( CommonConstants.LOGO_COLUMN );
+                update.unset( CommonConstants.LOGO_THUMBNAIL_COLUMN );
             }
             update.set( CommonConstants.IS_LOGO_IMAGE_PROCESSED_COLUMN, false );
         } else {

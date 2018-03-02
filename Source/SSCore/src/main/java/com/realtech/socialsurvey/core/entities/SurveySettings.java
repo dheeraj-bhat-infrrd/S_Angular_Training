@@ -25,6 +25,7 @@ public class SurveySettings {
 	private String neutralTextComplete;
 	private String sadTextComplete;
 	private ComplaintResolutionSettings complaint_res_settings;
+	private AbusiveMailSettings abusive_mail_settings;
 	
     // threshold for sending survey completed mail to agents and admins
     private double surveyCompletedMailThreshold;
@@ -198,19 +199,28 @@ public class SurveySettings {
         this.surveyCompletedMailThreshold = surveyCompletedMailThreshold;
     }
 
-    @Override
-    public String toString()
-    {
-        return "SurveySettings [auto_post_score=" + auto_post_score + ", show_survey_above_score=" + show_survey_above_score
-            + ", survey_reminder_interval_in_days=" + survey_reminder_interval_in_days + ", max_number_of_survey_reminders="
-            + max_number_of_survey_reminders + ", isReminderDisabled=" + isReminderDisabled
-            + ", social_post_reminder_interval_in_days=" + social_post_reminder_interval_in_days
-            + ", max_number_of_social_pos_reminders=" + max_number_of_social_pos_reminders + ", isSocialPostReminderDisabled="
-            + isSocialPostReminderDisabled + ", autoPostEnabled=" + autoPostEnabled + ", autoPostLinkToUserSiteEnabled="
-            + autoPostLinkToUserSiteEnabled + ", happyText=" + happyText + ", neutralText=" + neutralText + ", sadText="
-            + sadText + ", happyTextComplete=" + happyTextComplete + ", neutralTextComplete=" + neutralTextComplete
-            + ", sadTextComplete=" + sadTextComplete + ", complaint_res_settings=" + complaint_res_settings
-            + ", surveyCompletedMailThreshold=" + surveyCompletedMailThreshold + ", duplicateSurveyInterval="
-            + duplicateSurveyInterval + "]";
-    }
+    public AbusiveMailSettings getAbusive_mail_settings() {
+		return abusive_mail_settings;
+	}
+
+	public void setAbusive_mail_settings(AbusiveMailSettings abusive_mail_settings) {
+		this.abusive_mail_settings = abusive_mail_settings;
+	}
+
+	@Override
+	public String toString() {
+		return "SurveySettings [auto_post_score=" + auto_post_score + ", show_survey_above_score="
+				+ show_survey_above_score + ", survey_reminder_interval_in_days=" + survey_reminder_interval_in_days
+				+ ", max_number_of_survey_reminders=" + max_number_of_survey_reminders + ", isReminderDisabled="
+				+ isReminderDisabled + ", social_post_reminder_interval_in_days="
+				+ social_post_reminder_interval_in_days + ", max_number_of_social_pos_reminders="
+				+ max_number_of_social_pos_reminders + ", isSocialPostReminderDisabled=" + isSocialPostReminderDisabled
+				+ ", autoPostEnabled=" + autoPostEnabled + ", autoPostLinkToUserSiteEnabled="
+				+ autoPostLinkToUserSiteEnabled + ", happyText=" + happyText + ", neutralText=" + neutralText
+				+ ", sadText=" + sadText + ", happyTextComplete=" + happyTextComplete + ", neutralTextComplete="
+				+ neutralTextComplete + ", sadTextComplete=" + sadTextComplete + ", complaint_res_settings="
+				+ complaint_res_settings + ", abusive_mail_settings=" + abusive_mail_settings
+				+ ", surveyCompletedMailThreshold=" + surveyCompletedMailThreshold + ", duplicateSurveyInterval="
+				+ duplicateSurveyInterval + "]";
+	}
 }

@@ -70,7 +70,10 @@ public class JobLogDetailsReportingController
         long jobLogId = -1;
         if(!jobLogDetailsManagement.getIfEtlIsRunning()) {
         	 jobLogId = jobLogDetailsManagement.insertJobLog(entityId, entityType, CommonConstants.USER_RANKING_JOB_NAME, CommonConstants.STATUS_RUNNING);
+        	 LOGGER.info("Calling method to trigger user ranking etl.");
         	 jobLogDetailsManagement.recalEtl(entityId, jobLogId);
+        }else {
+        		LOGGER.warn("Found One running job. Can't Trigger user ranking ETL.");
         }
         return new Gson().toJson( jobLogId );
     }

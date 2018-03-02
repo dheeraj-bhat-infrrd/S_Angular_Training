@@ -781,12 +781,12 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         if ( columnName == null ) {
             aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
                 Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ).lte( endDate ) ),
-                Aggregation.unwind( "sharedOn" ), Aggregation.group( "sharedOn" ).count().as( "count" ) );
+                Aggregation.unwind( "sharedOn" ), Aggregation.group( "sharedOn" ).count().as( "count" ) ).withOptions(Aggregation.newAggregationOptions().allowDiskUse(true).build());
         } else {
             aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
                 Aggregation.match( Criteria.where( columnName ).is( columnValue ) ),
                 Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ).lte( endDate ) ),
-                Aggregation.unwind( "sharedOn" ), Aggregation.group().count().as( "count" ) );
+                Aggregation.unwind( "sharedOn" ), Aggregation.group().count().as( "count" ) ).withOptions(Aggregation.newAggregationOptions().allowDiskUse(true).build());
         }
         AggregationResults<SurveyDetails> result = mongoTemplate.aggregate( aggregation, SURVEY_DETAILS_COLLECTION,
             SurveyDetails.class );
@@ -903,7 +903,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
                 new BasicDBObject( CommonConstants.DEFAULT_MONGO_ID_COLUMN, "count" ).append( "count",
                     new BasicDBObject( "$sum", new BasicDBObject( "$size", "$comb.sharedOn" ) ) ) );
             operations.add( new CustomAggregationOperation( secondGroup ) );
-            Aggregation aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, operations );
+            Aggregation aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, operations ).withOptions(Aggregation.newAggregationOptions().allowDiskUse(true).build());
             LOG.debug( "Aggregation : " + aggregation.toString() );
             AggregationResults<SurveyDetails> result = mongoTemplate.aggregate( aggregation, SURVEY_DETAILS_COLLECTION,
                 SurveyDetails.class );
@@ -2362,7 +2362,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         Query query = new Query();
         query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyId ) );
         Update update = new Update();
-        update.set( CommonConstants.UNDER_RESOLUTION_COLUMN, true );
+        update.set( CommonConstants.ABUSIVE_NOTIFY_COLUMN, true );
         mongoTemplate.upsert( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.debug( "Method updateSurveyAsUnderResolution() to mark survey as under resolution finished." );
     }
@@ -3600,4 +3600,17 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.info( "Method updateZillowSourceIdInExistingSurveyDetails finished." );
     }
+
+
+	@Override
+	public void updateSurveyAsAbusiveNotify(String surveyId) {
+		LOG.debug( "Method updateSurveyAsAbusiveNotify() to mark survey as abusive notify started." );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyId ) );
+        Update update = new Update();
+        update.set( CommonConstants.ABUSIVE_NOTIFY_COLUMN, true );
+        mongoTemplate.upsert( query, update, SURVEY_DETAILS_COLLECTION );
+        LOG.debug( "Method updateSurveyAsAbusiveNotify() to mark survey as abusive notify finished." );
+	
+	}
 }

@@ -5826,6 +5826,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         // NOTE: It was decided not to show Social posts on the UI. So not fetching anymore.
 
+        //set company name
+        profileAggregate.setCompanyName(companyProfile.getContact_details().getName());
+        
         // build the individual review aggregate
         profileAggregate.setReviewAggregate( buildReviewAggregate( profileAggregate ) );
 

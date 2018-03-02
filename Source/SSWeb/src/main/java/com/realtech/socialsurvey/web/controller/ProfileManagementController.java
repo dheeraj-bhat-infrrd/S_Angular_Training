@@ -991,6 +991,8 @@ public class ProfileManagementController
                     settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.ABOUT_ME, true );
                     userManagementService.updateCompany( company );
                 }
+                //ask Facebook to re scrape page
+                socialManagementService.askFaceBookToReScrapePage( companySettings.getCompleteProfileUrl() );
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
                 if ( regionSettings == null ) {
@@ -1008,6 +1010,8 @@ public class ProfileManagementController
                     settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.ABOUT_ME, true );
                     userManagementService.updateRegion( region );
                 }
+                //ask Facebook to re scrape page
+                socialManagementService.askFaceBookToReScrapePage( regionSettings.getCompleteProfileUrl() );
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
                 if ( branchSettings == null ) {
@@ -1025,6 +1029,8 @@ public class ProfileManagementController
                     settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.ABOUT_ME, true );
                     userManagementService.updateBranch( branch );
                 }
+                //ask Facebook to re scrape page
+                socialManagementService.askFaceBookToReScrapePage( branchSettings.getCompleteProfileUrl() );
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
                 if ( agentSettings == null ) {
@@ -1040,6 +1046,8 @@ public class ProfileManagementController
 
                 // Modify Agent details in Solr
                 solrSearchService.editUserInSolr( agentSettings.getIden(), CommonConstants.ABOUT_ME_SOLR, aboutMe );
+                //ask facebook to rescrape page
+                socialManagementService.askFaceBookToReScrapePage( agentSettings.getCompleteProfileUrl() );
             } else {
                 LOG.warn( "Error occurred while updating About me." );
                 throw new InvalidInputException( "Error occurred while updating About me.",
@@ -1048,6 +1056,7 @@ public class ProfileManagementController
 
             profileSettings.setContact_details( contactDetailsSettings );
 
+            
             LOG.info( "About me details updated successfully" );
             model.addAttribute( "message", messageUtils.getDisplayMessage(
                 DisplayMessageConstants.ABOUT_ME_DETAILS_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
@@ -1166,6 +1175,8 @@ public class ProfileManagementController
                     companySettings, vertical );
 
                 userSettings.setCompanySettings( companySettings );
+                //ask facebook to rescrape page
+                socialManagementService.askFaceBookToReScrapePage( companySettings.getCompleteProfileUrl() );
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
                 if ( regionSettings == null ) {
@@ -1194,6 +1205,8 @@ public class ProfileManagementController
                 //JIRA SS-1439 Fix END
 
                 userSettings.getRegionSettings().put( entityId, regionSettings );
+                //ask facebook to rescrape page
+                socialManagementService.askFaceBookToReScrapePage( regionSettings.getCompleteProfileUrl() );
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
                 if ( branchSettings == null ) {
@@ -1222,6 +1235,8 @@ public class ProfileManagementController
                 //JIRA SS-1439 Fix END
 
                 userSettings.getRegionSettings().put( entityId, branchSettings );
+                //ask facebook to rescrape page
+                socialManagementService.askFaceBookToReScrapePage( branchSettings.getCompleteProfileUrl() );
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
                 if ( agentSettings == null ) {
@@ -1265,6 +1280,9 @@ public class ProfileManagementController
                 user.setModifiedBy( String.valueOf( agentSettings.getIden() ) );
                 user.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
                 userManagementService.updateUser( user, userMap );
+                
+                //ask facebook to rescrape page
+                socialManagementService.askFaceBookToReScrapePage( agentSettings.getCompleteProfileUrl() );
             } else {
                 LOG.warn( "Invalid input exception occurred in upadting Basic details." );
                 throw new InvalidInputException( "Invalid input exception occurred in upadting Basic details.",

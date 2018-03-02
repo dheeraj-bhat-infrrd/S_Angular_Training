@@ -96,6 +96,9 @@ public class SurveyDetails
     
     //NPS details
     private int npsScore = -1;
+    
+    //abusive email set
+    private boolean abusiveNotify;
         
     public String getAgentEmailId()
     {
@@ -825,14 +828,26 @@ public class SurveyDetails
     }
 
 
-		public boolean isOpenRetakeSurveyRequest() {
-			return openRetakeSurveyRequest;
-		}
+	public boolean isOpenRetakeSurveyRequest() {
+		return openRetakeSurveyRequest;
+	}
 
 
-		public void setOpenRetakeSurveyRequest(boolean openRetakeSurveyRequest) {
-			this.openRetakeSurveyRequest = openRetakeSurveyRequest;
-		}
+	public void setOpenRetakeSurveyRequest(boolean openRetakeSurveyRequest) {
+		this.openRetakeSurveyRequest = openRetakeSurveyRequest;
+	}
+
+
+	public boolean isAbusiveNotify() {
+		return abusiveNotify;
+	}
+
+
+	public void setAbusiveNotify(boolean abusiveNotify) {
+		this.abusiveNotify = abusiveNotify;
+	}
+
 	
+		
     
 }

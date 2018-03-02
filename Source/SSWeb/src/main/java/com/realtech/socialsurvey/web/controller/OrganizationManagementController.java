@@ -41,6 +41,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.AbusiveMailSettings;
 import com.realtech.socialsurvey.core.entities.AccountsMaster;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.ComplaintResolutionSettings;
@@ -98,7 +99,10 @@ import com.realtech.socialsurvey.core.utils.StateLookupExclusionStrategy;
 import com.realtech.socialsurvey.core.vo.SurveyPreInitiationList;
 import com.realtech.socialsurvey.core.vo.UserList;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookData;
+import com.realtech.socialsurvey.web.api.builder.SSApiIntergrationBuilder;
 import com.realtech.socialsurvey.web.common.JspResolver;
+
+import retrofit.client.Response;
 
 
 // JIRA: SS-24 BY RM02 BOC
@@ -163,6 +167,9 @@ public class OrganizationManagementController
 
     @Autowired
     private EncryptionHelper encryptionHelper;
+    
+    @Autowired
+    private SSApiIntergrationBuilder ssApiIntergrationBuilder;
 
     @Value ( "${CDN_PATH}")
     private String endpoint;
@@ -2072,6 +2079,12 @@ public class OrganizationManagementController
                         .getMessage();
                     break;
             }
+            
+            // default digest flag is the new account type is enterprise
+            if ( newAccountsMasterId == CommonConstants.ACCOUNTS_MASTER_ENTERPRISE) {
+                reportingDashboardManagement.updateSendDigestMailToggle( CommonConstants.COMPANY_ID_COLUMN, user.getCompany().getCompanyId(), true );
+            }
+            
             LOG.info( "message returned : " + message );
         } catch ( InvalidInputException | NoRecordsFetchedException | SolrException | UndeliveredEmailException e ) {
             LOG.error( "NonFatalException while upgrading subscription. Message : " + e.getMessage(), e );
@@ -2229,9 +2242,11 @@ public class OrganizationManagementController
         User user = sessionHelper.getCurrentUser();
 
         try {
+            
+            OrganizationUnitSettings companySettings = null;
+            
             try {
-                OrganizationUnitSettings companySettings = organizationManagementService
-                    .getCompanySettings( user.getCompany().getCompanyId() );
+                companySettings = organizationManagementService.getCompanySettings( user.getCompany().getCompanyId() );
                 redirectAttributes.addFlashAttribute( "hiddenSection", companySettings.isHiddenSection() );
             } catch ( InvalidInputException e ) {
                 throw new InvalidInputException( "Invalid Input exception occured in method getCompanySettings()",
@@ -2311,6 +2326,13 @@ public class OrganizationManagementController
             redirectAttributes.addFlashAttribute( "showLinkedInPopup", String.valueOf( showLinkedInPopup ) );
             redirectAttributes.addFlashAttribute( "showSendSurveyPopup", String.valueOf( showSendSurveyPopup ) );
 
+            
+            // default digest flag
+            if ( currentAccountsMaster.getAccountsMasterId() == CommonConstants.ACCOUNTS_MASTER_ENTERPRISE) {
+                reportingDashboardManagement.updateSendDigestMailToggle( CommonConstants.COMPANY_ID_COLUMN, companySettings.getIden(), true );
+            }
+            
+            
             // update the last login time and number of logins
             // userManagementService.updateUserLoginTimeAndNum(user);
         } catch ( NonFatalException e ) {
@@ -2749,6 +2771,14 @@ public class OrganizationManagementController
             model.addAttribute( "columnName", CommonConstants.COMPANY_ID_COLUMN );
             model.addAttribute( "columnValue", entityId );
             session.setAttribute( CommonConstants.COMPLAIN_REG_SETTINGS, complaintRegistrationSettings );
+            
+            AbusiveMailSettings abusiveMailSettings = new AbusiveMailSettings();
+            if( unitSettings.getSurvey_settings() != null
+            		&& unitSettings.getSurvey_settings().getAbusive_mail_settings() != null) {
+            	abusiveMailSettings = unitSettings.getSurvey_settings().getAbusive_mail_settings();
+            }
+            session.setAttribute(CommonConstants.ABUSIVE_MAIL_SETTINGS, abusiveMailSettings);
+            
         } catch ( InvalidInputException e ) {
             LOG.error( "InvalidInputException while fetching complaint resolution details. Reason :" + e.getMessage(), e );
             model.addAttribute( "message",
@@ -2797,11 +2827,11 @@ public class OrganizationManagementController
             }
 
             if ( !mailId.contains( "," ) ) {
-                if ( !organizationManagementService.validateEmail( mailId ) )
+                if ( !organizationManagementService.validateEmail( mailId.trim() ) )
                     throw new InvalidInputException( "Mail id - " + mailId + " entered as send alert to input is invalid",
                         DisplayMessageConstants.GENERAL_ERROR );
                 else
-                    mailIDStr = mailId;
+                	mailId = mailId.trim();
             } else {
                 String mailIds[] = mailId.split( "," );
 
@@ -2885,12 +2915,101 @@ public class OrganizationManagementController
         } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while updating complaint registration settings. Reason : " + e.getMessage(), e );
             message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
-        }
+        } 
 
         return message;
     }
 
+    @RequestMapping ( value = "/updateabusivesurveysettings", method = RequestMethod.POST)
+    @ResponseBody
+    public String updateAbusiveSurveyettings( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Updating Abusive Survey Settings" );
+        String mailId = request.getParameter( "mailId" );
 
+        String message = "";
+        User user = sessionHelper.getCurrentUser();
+        String mailIDStr = "";
+       
+
+        try {
+
+            if ( !user.isCompanyAdmin() )
+                throw new AuthorizationException( "User is not authorized to access this page" );
+
+            if ( mailId == null || mailId.isEmpty() ) {
+                throw new InvalidInputException( "Mail Id(s) of Complaint Handler(s) is null",
+                    DisplayMessageConstants.GENERAL_ERROR );
+            }
+
+
+            long entityId = user.getCompany().getCompanyId();
+            
+            //add service function
+            ssApiIntergrationBuilder.getIntegrationApi().updateAbusiveMail( entityId,mailId);
+
+
+            LOG.info( "Updated Abusive Email Settings" );
+            message = messageUtils.getDisplayMessage( DisplayMessageConstants.ABUSIVE_EMAIL_SUCCESSFUL,
+                DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException while updating abusive registration settings. Reason : " + e.getMessage(), e );
+            message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
+        }	
+
+        return message;
+    }
+    
+    @RequestMapping( value = "/unsetabusivesurveysettings" , method = RequestMethod.POST)
+    @ResponseBody
+    public String unsetAbusiveSurveySettings( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Unset Abusive Survey Settings" );
+        String message = "";
+        User user = sessionHelper.getCurrentUser();
+
+        if ( !user.isCompanyAdmin() )
+		    throw new AuthorizationException( "User is not authorized to access this page" );
+
+		long entityId = user.getCompany().getCompanyId();
+		
+		//add service function
+		ssApiIntergrationBuilder.getIntegrationApi().unsetAbusiveMail(entityId);
+
+
+		LOG.info( "Unset Abusive Email Settings" );
+		message = messageUtils.getDisplayMessage( DisplayMessageConstants.ABUSIVE_EMAIL_SUCCESSFUL,
+		    DisplayMessageType.SUCCESS_MESSAGE ).getMessage();	
+
+        return message;
+    
+    }
+    
+    @RequestMapping( value = "/unsetcomplaintresolution" , method = RequestMethod.POST)
+    @ResponseBody
+    public String unsetComplaintResSettings( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Unset Complaint Resolution Settings" );
+        String message = "";
+        User user = sessionHelper.getCurrentUser();
+
+        if ( !user.isCompanyAdmin() )
+		    throw new AuthorizationException( "User is not authorized to access this page" );
+
+		long entityId = user.getCompany().getCompanyId();
+		
+		//add service function
+		ssApiIntergrationBuilder.getIntegrationApi().unsetCompRes(entityId);
+
+
+		LOG.info( "Unset Complaint Resolution Settings" );
+		message = messageUtils.getDisplayMessage( DisplayMessageConstants.COMPLAINT_REGISTRATION_SUCCESSFUL,
+		    DisplayMessageType.SUCCESS_MESSAGE ).getMessage();	
+
+        return message;
+    
+    }
+   
     @RequestMapping ( value = "/fetchsurveysunderresolution", method = RequestMethod.GET)
     public String fetchSurveysUnderResolution( Model model, HttpServletRequest request )
     {
