@@ -451,7 +451,9 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_DIGEST ) {
             processDigestRequest( fileUpload );
         }
+
         fileUpload = fileUploadDao.save( fileUpload );
+
         if ( reportId == CommonConstants.FILE_UPLOAD_SURVEY_INVITATION_EMAIL_REPORT ) {
             ReportRequest reportRequest = new ReportRequest();
             reportRequest.transform( fileUpload, actualTimeZoneOffset );
@@ -5067,12 +5069,32 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     {
         LOG.debug( "method processDigestRequest started" );
 
-        List<SavedDigestRecord> digestRecords = organizationUnitSettingsDao.fetchSavedDigestRecords(
-            fileUpload.getProfileLevel(), fileUpload.getProfileValue(), fileUpload.getStartDate(), fileUpload.getEndDate() );
+        List<SavedDigestRecord> digestRecords = organizationUnitSettingsDao
+            .fetchSavedDigestRecords( fileUpload.getProfileLevel(), fileUpload.getProfileValue() ).getSavedDigestRecords();
 
         if ( digestRecords != null && !digestRecords.isEmpty() ) {
-            fileUpload.setStatus( CommonConstants.STATUS_VIEW );
-            fileUpload.setFileName( digestRecords.get( CommonConstants.INITIAL_INDEX ).getAbsoluteFileName() );
+
+            Date endDate = fileUpload.getEndDate();
+            Calendar cal = Calendar.getInstance();
+            cal.setTime( endDate );
+            String month = new DateFormatSymbols().getMonths()[cal.get( Calendar.MONTH )];
+            String year = String.valueOf( cal.get( Calendar.YEAR ) );
+            SavedDigestRecord digest = null;
+            Date uploadedDate = new Date();
+            for ( SavedDigestRecord digestRecord : digestRecords ) {
+                if ( month.equals( digestRecord.getMonth() ) && year.equals( digestRecord.getYear() )
+                    && uploadedDate.after( digestRecord.getUploadedDate() ) ) {
+                    digest = digestRecord;
+                    uploadedDate = digest.getUploadedDate();
+                }
+            }
+
+            if ( digest != null ) {
+                fileUpload.setStatus( CommonConstants.STATUS_VIEW );
+                fileUpload.setFileName( digestRecords.get( CommonConstants.INITIAL_INDEX ).getAbsoluteFileName() );
+            } else {
+                fileUpload.setStatus( CommonConstants.STATUS_REPORT_NO_RECORDS );
+            }
 
         } else {
             fileUpload.setStatus( CommonConstants.STATUS_REPORT_NO_RECORDS );

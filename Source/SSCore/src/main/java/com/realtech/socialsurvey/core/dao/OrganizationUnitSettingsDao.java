@@ -300,6 +300,5 @@ public interface OrganizationUnitSettingsDao
     public void saveDigestRecord( String profileLevel, long entityId, SavedDigestRecord digestRecord ) throws InvalidInputException;
 
 
-    public List<SavedDigestRecord> fetchSavedDigestRecords( String profileLevel, long profileValue, Date startDate,
-        Date endDate ) throws InvalidInputException;
+    public OrganizationUnitSettings fetchSavedDigestRecords( String profileLevel, long profileValue ) throws InvalidInputException;
 }

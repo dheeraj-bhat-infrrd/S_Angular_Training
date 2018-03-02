@@ -1215,9 +1215,9 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         
         if ( CommonConstants.PROFILE_LEVEL_COMPANY.equals( profileLevel ) ) {
             collectionName = CommonConstants.COMPANY_SETTINGS_COLLECTION;
-        } else if ( CommonConstants.PROFILE_LEVEL_COMPANY.equals( profileLevel ) ) {
+        } else if ( CommonConstants.PROFILE_LEVEL_REGION.equals( profileLevel ) ) {
             collectionName = CommonConstants.REGION_SETTINGS_COLLECTION;
-        } else if ( CommonConstants.PROFILE_LEVEL_COMPANY.equals( profileLevel ) ) {
+        } else if ( CommonConstants.PROFILE_LEVEL_BRANCH.equals( profileLevel ) ) {
             collectionName = CommonConstants.BRANCH_SETTINGS_COLLECTION;
         } else {
             LOG.warn( "Invalid profile type" );
@@ -1235,10 +1235,9 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 
 
     @Override
-    public List<SavedDigestRecord> fetchSavedDigestRecords( String entityType, long entityId, Date startDate,
-        Date endDate ) throws InvalidInputException
+    public OrganizationUnitSettings fetchSavedDigestRecords( String entityType, long entityId ) throws InvalidInputException
     {
-        LOG.debug( "Method saveDigestRecord() to update digest record list running." );
+        LOG.debug( "Method saveDigestRecord() to fetch digest record list running." );
 
         String collectionName = null;
 
@@ -1253,14 +1252,10 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
             throw new InvalidInputException( "Invalid profile type" );
         }
         
-        Calendar queryDate = Calendar.getInstance();
-        queryDate.setTime( endDate );
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_IDEN ).is( entityId ) );
-        query.addCriteria( Criteria.where( KEY_SAVED_DIGEST_RECORD_MONTH ).is( new DateFormatSymbols().getMonths()[queryDate.get( Calendar.MONTH ) ] ) );
-        query.addCriteria( Criteria.where( KEY_SAVED_DIGEST_RECORD_YEAR ).is( queryDate.get( Calendar.YEAR  ) ) );
         
         query.fields().include( KEY_SAVED_DIGEST_RECORD ).exclude( CommonConstants.DEFAULT_MONGO_ID_COLUMN );
-        return mongoTemplate.find( query, SavedDigestRecord.class, collectionName );
+        return mongoTemplate.findOne( query, OrganizationUnitSettings.class, collectionName );
     }
 }
