@@ -85,6 +85,8 @@ public class OrganizationUnitSettings implements Serializable
     private boolean sendMonthlyDigestMail;
     
     private List<Keyword> filterKeywords;
+    
+    private List<SavedDigestRecord> savedDigestRecords;
 
     public List<Keyword> getFilterKeywords()
     {
@@ -765,6 +767,20 @@ public class OrganizationUnitSettings implements Serializable
     {
         this.entityAlertDetails = entityAlertDetails;
     }
+    
+    
+
+
+    public List<SavedDigestRecord> getSavedDigestRecords()
+    {
+        return savedDigestRecords;
+    }
+
+
+    public void setSavedDigestRecords( List<SavedDigestRecord> savedDigestRecords )
+    {
+        this.savedDigestRecords = savedDigestRecords;
+    }
 
 
     @Override
@@ -791,7 +807,9 @@ public class OrganizationUnitSettings implements Serializable
             + hideFromBreadCrumb + ", hidePublicPage=" + hidePublicPage + ", digestRecipients=" + digestRecipients
             + ", includeForTransactionMonitor=" + includeForTransactionMonitor + ", vendasta_rm_settings="
             + vendasta_rm_settings + ", ranking_requirements=" + ranking_requirements + ", contactUsEmailsRoutedToCompanyAdmin="
-            + contactUsEmailsRoutedToCompanyAdmin + ", sendMonthlyDigestMail=" + sendMonthlyDigestMail + "]";
+            + contactUsEmailsRoutedToCompanyAdmin + ", sendMonthlyDigestMail=" + sendMonthlyDigestMail + ", filterKeywords="
+            + filterKeywords + ", savedDigestRecords=" + savedDigestRecords + ", entityAlertDetails=" + entityAlertDetails
+            + "]";
     }
 
 }

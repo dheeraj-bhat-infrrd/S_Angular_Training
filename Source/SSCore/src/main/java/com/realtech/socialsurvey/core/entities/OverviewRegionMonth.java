@@ -74,9 +74,6 @@ public class OverviewRegionMonth implements Serializable
 
     @Column ( name = "third_party")
     private int thirdParty;
-
-    @Column ( name = "user_count")
-    private int userCount;
     
     @Column ( name = "cumulative_user_count" )
     private int cumulativeUserCount;
@@ -315,18 +312,6 @@ public class OverviewRegionMonth implements Serializable
         this.thirdParty = thirdParty;
     }
 
-
-    public int getUserCount()
-    {
-        return userCount;
-    }
-
-
-    public void setUserCount( int userCount )
-    {
-        this.userCount = userCount;
-    }
-
     
 
     public int getCumulativeUserCount()
@@ -349,8 +334,8 @@ public class OverviewRegionMonth implements Serializable
             + ", zillowReviews=" + zillowReviews + ", unprocessed=" + unprocessed + ", unassigned=" + unassigned
             + ", duplicate=" + duplicate + ", corrupted=" + corrupted + ", other=" + other + ", completePercentage="
             + completePercentage + ", incompletePercentage=" + incompletePercentage + ", rating=" + rating + ", totalReview="
-            + totalReview + ", month=" + month + ", year=" + year + ", thirdParty=" + thirdParty + ", userCount=" + userCount
-            + ", cumulativeUserCount=" + cumulativeUserCount + "]";
+            + totalReview + ", month=" + month + ", year=" + year + ", thirdParty=" + thirdParty + ", cumulativeUserCount="
+            + cumulativeUserCount + "]";
     }
 
 }

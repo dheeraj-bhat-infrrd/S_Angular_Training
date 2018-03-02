@@ -107,6 +107,7 @@ import com.realtech.socialsurvey.core.entities.StateLookup;
 import com.realtech.socialsurvey.core.entities.SurveyCompanyMapping;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
+import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.UploadStatus;
 import com.realtech.socialsurvey.core.entities.UploadValidation;
@@ -147,6 +148,7 @@ import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsLocker;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
+import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
@@ -273,6 +275,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     
     @Autowired
     private EncryptionHelper encryptionHelper;
+    
+    @Autowired
+    private SurveyBuilder surveyBuilder;
 
     @Value ( "${HAPPY_TEXT}")
     private String happyText;
@@ -8952,6 +8957,21 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             MongoOrganizationUnitSettingDaoImpl.KEY_HIDE_PUBLIC_PAGE, hidePublicPage, agentSettings );
     }
 	
+	@Override
+    public boolean doesSurveyHaveNPSQuestions( User user ) {
+        if( user != null ) {
+            try {
+                for( SurveyQuestionDetails survey : surveyBuilder.getAllActiveQuestionsOfMappedSurvey( user ) ) {
+                    if( survey.getIsNPSQuestion() == CommonConstants.ONE ) {
+                        return true;
+                    }
+                }
+            } catch ( InvalidInputException e ) {
+                LOG.error( "unable to get active questions for COMPANY with ID: {}",user.getCompany().getCompanyId() );
+            }
+        }
+        return false;
+    }
 
     @Override
     public void updateIsLoginPreventedForUsers( List<Long> userIdList, boolean isLoginPrevented ) throws InvalidInputException
@@ -8973,6 +8993,4 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.info( "Inside method updateHidePublicPageForUsers " );
         organizationUnitSettingsDao.updateHidePublicPageForUsers( userIdList, hidePublicPage );
     }
-    
-    
 }

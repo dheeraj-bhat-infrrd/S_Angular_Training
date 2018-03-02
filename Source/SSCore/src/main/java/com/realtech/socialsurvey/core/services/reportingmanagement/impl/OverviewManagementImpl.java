@@ -635,16 +635,27 @@ public class OverviewManagementImpl implements OverviewManagement
         if ( surveyStats != null ) {
 
             double divident = ( surveyStats.getPassives() + surveyStats.getPromoters() + surveyStats.getDetractors() );
+            double npsDivident = ( surveyStats.getNpsPassives() + surveyStats.getNpsPromoters() + surveyStats.getNpsDetractors() );
             Double sps = null;
+            Double nps = null;
 
             if ( divident != 0 ) {
                 sps = ( (double) ( surveyStats.getPromoters() - surveyStats.getDetractors() ) / divident ) * 100;
+            }
+            
+            if( npsDivident != 0 ) {
+                nps = ( (double) ( surveyStats.getNpsPromoters() - surveyStats.getNpsDetractors() ) / npsDivident ) * 100;
             }
 
             digest.setDetractors( surveyStats.getDetractors() );
             digest.setPassives( surveyStats.getPassives() );
             digest.setPromoters( surveyStats.getPromoters() );
             digest.setSps( sps );
+
+            digest.setNpsDetractors( surveyStats.getNpsDetractors() );
+            digest.setNpsPassives( surveyStats.getNpsPassives() );
+            digest.setNpsPromoters( surveyStats.getNpsPromoters() );
+            digest.setNps( nps );
 
         }
         return digest;
@@ -674,16 +685,27 @@ public class OverviewManagementImpl implements OverviewManagement
         if ( surveyStats != null ) {
 
             double divident = ( surveyStats.getPassives() + surveyStats.getPromoters() + surveyStats.getDetractors() );
+            double npsDivident = ( surveyStats.getNpsPassives() + surveyStats.getNpsPromoters() + surveyStats.getNpsDetractors() );
             Double sps = null;
+            Double nps = null;
 
             if ( divident != 0 ) {
                 sps = ( (double) ( surveyStats.getPromoters() - surveyStats.getDetractors() ) / divident ) * 100;
+            }
+            
+            if( npsDivident != 0 ) {
+                nps = ( (double) ( surveyStats.getNpsPromoters() - surveyStats.getNpsDetractors() ) / npsDivident ) * 100;
             }
 
             digest.setDetractors( surveyStats.getDetractors() );
             digest.setPassives( surveyStats.getPassives() );
             digest.setPromoters( surveyStats.getPromoters() );
             digest.setSps( sps );
+
+            digest.setNpsDetractors( surveyStats.getNpsDetractors() );
+            digest.setNpsPassives( surveyStats.getNpsPassives() );
+            digest.setNpsPromoters( surveyStats.getNpsPromoters() );
+            digest.setNps( nps );
 
         }
         return digest;
@@ -712,10 +734,16 @@ public class OverviewManagementImpl implements OverviewManagement
         if ( surveyStats != null ) {
 
             double divident = ( surveyStats.getPassives() + surveyStats.getPromoters() + surveyStats.getDetractors() );
+            double npsDivident = ( surveyStats.getNpsPassives() + surveyStats.getNpsPromoters() + surveyStats.getNpsDetractors() );
             Double sps = null;
+            Double nps = null;
 
             if ( divident != 0 ) {
                 sps = ( (double) ( surveyStats.getPromoters() - surveyStats.getDetractors() ) / divident ) * 100;
+            }
+            
+            if( npsDivident != 0 ) {
+                nps = ( (double) ( surveyStats.getNpsPromoters() - surveyStats.getNpsDetractors() ) / npsDivident ) * 100;
             }
 
             digest.setDetractors( surveyStats.getDetractors() );
@@ -723,6 +751,10 @@ public class OverviewManagementImpl implements OverviewManagement
             digest.setPromoters( surveyStats.getPromoters() );
             digest.setSps( sps );
 
+            digest.setNpsDetractors( surveyStats.getNpsDetractors() );
+            digest.setNpsPassives( surveyStats.getNpsPassives() );
+            digest.setNpsPromoters( surveyStats.getNpsPromoters() );
+            digest.setNps( nps );
         }
         return digest;
     }
