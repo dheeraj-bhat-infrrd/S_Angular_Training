@@ -929,8 +929,8 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 		Query query = getSession().createSQLQuery(queryStr);
 		query.setParameter(0, startDate);
 		query.setParameter(1, endDate);
-		query.setParameter(3, startIndex);
-		query.setParameter(4, batchSize);
+		query.setParameter(2, startIndex);
+		query.setParameter(3, batchSize);
 		LOG.debug("query to fetch data for email report : {}", query.toString());
 		return query.list();
 	}
