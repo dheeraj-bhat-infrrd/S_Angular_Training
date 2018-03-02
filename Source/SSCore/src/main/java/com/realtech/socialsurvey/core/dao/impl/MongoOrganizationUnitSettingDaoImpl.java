@@ -1,7 +1,9 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
+import java.text.DateFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -127,7 +129,11 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_COMPLAINT_RESOLUTION_SETTING = "survey_settings.complaint_res_settings";
 
     public static final String KEY_SAVED_DIGEST_RECORD = "savedDigestRecords";
-
+    public static final String KEY_SAVED_DIGEST_RECORD_DATE = "savedDigestRecords.uploadedDate";
+    public static final String KEY_SAVED_DIGEST_RECORD_MONTH = "savedDigestRecords.month";
+    public static final String KEY_SAVED_DIGEST_RECORD_YEAR = "savedDigestRecords.year";
+    
+    
     @Value ( "${CDN_PATH}")
     private String amazonEndPoint;
 
@@ -1225,5 +1231,36 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         update.push( KEY_SAVED_DIGEST_RECORD, digestRecord );
         mongoTemplate.updateMulti( query, update, collectionName );
         LOG.debug( "Method saveDigestRecord() to update digest record list started." );
+    }
+
+
+    @Override
+    public List<SavedDigestRecord> fetchSavedDigestRecords( String entityType, long entityId, Date startDate,
+        Date endDate ) throws InvalidInputException
+    {
+        LOG.debug( "Method saveDigestRecord() to update digest record list running." );
+
+        String collectionName = null;
+
+        if ( CommonConstants.COMPANY_ID.equals( entityType ) ) {
+            collectionName = CommonConstants.COMPANY_SETTINGS_COLLECTION;
+        } else if ( CommonConstants.REGION_ID.equals( entityType ) ) {
+            collectionName = CommonConstants.REGION_SETTINGS_COLLECTION;
+        } else if ( CommonConstants.BRANCH_ID.equals( entityType ) ) {
+            collectionName = CommonConstants.BRANCH_SETTINGS_COLLECTION;
+        } else {
+            LOG.warn( "Invalid profile type" );
+            throw new InvalidInputException( "Invalid profile type" );
+        }
+        
+        Calendar queryDate = Calendar.getInstance();
+        queryDate.setTime( endDate );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_IDEN ).is( entityId ) );
+        query.addCriteria( Criteria.where( KEY_SAVED_DIGEST_RECORD_MONTH ).is( new DateFormatSymbols().getMonths()[queryDate.get( Calendar.MONTH ) ] ) );
+        query.addCriteria( Criteria.where( KEY_SAVED_DIGEST_RECORD_YEAR ).is( queryDate.get( Calendar.YEAR  ) ) );
+        
+        query.fields().include( KEY_SAVED_DIGEST_RECORD ).exclude( CommonConstants.DEFAULT_MONGO_ID_COLUMN );
+        return mongoTemplate.find( query, SavedDigestRecord.class, collectionName );
     }
 }

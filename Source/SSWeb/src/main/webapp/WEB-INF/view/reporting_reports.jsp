@@ -30,12 +30,6 @@
 	</div>
 </div>
 
-<c:set var="monthBeforeLastMonth" value="<%
-	Calendar calendar = Calendar.getInstance();
-	calendar.add( Calendar.MONTH, -2 );
-    out.print( calendar.getDisplayName( Calendar.MONTH, Calendar.LONG, Locale.ENGLISH ) );
-%>"></c:set>
-
 
 <div class="dash-stats-wrapper bord-bot-dc clearfix">
 	

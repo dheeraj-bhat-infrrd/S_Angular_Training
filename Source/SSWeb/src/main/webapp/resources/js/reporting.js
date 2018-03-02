@@ -1583,6 +1583,28 @@ function getStartAndEndDateForNps(npsTimeFrame){
 	return npsDates;
 }
 
+function getStartAndEndDateForDigest(timeFrame){
+	
+	var date = new Date();
+	date.setMonth(date.getMonth() - timeFrame);
+	
+	var digestDates = new Object();
+	digestDates.startDate = formatDateForDigest( new Date(date.getFullYear(), date.getMonth(), 1) );
+	
+	date.setMonth( date.getMonth() + 1 );
+	date = new Date(date.getFullYear(), date.getMonth(), 1);
+	date.setSeconds( date.getSeconds() - 1 ); 
+	digestDates.endDate = formatDateForDigest(date);
+	return digestDates;
+}
+
+function formatDateForDigest( date ){
+	var year = date.getFullYear();
+	var month = date.getMonth() < 10 ? '0' + (  date.getMonth() + 1 ) : ( date.getMonth() + 1 );
+	var date = date.getDate() < 10 ? '0' + date.getDate() : date.getDate();
+	return month + '/' + date + '/' + year;
+}
+
 $(document).on('click', '#reports-generate-report-btn', function(e) {
 	var selectedValue = $('#generate-survey-reports').val();
 	var key = parseInt(selectedValue);
@@ -1595,24 +1617,15 @@ $(document).on('click', '#reports-generate-report-btn', function(e) {
 
 	if( key == 200 ){
 		digestMonthValue = $('#digest-time-selector').val()
+		var digestDates = getStartAndEndDateForDigest(parseInt(digestMonthValue));
+		startDate = digestDates.startDate;
+		endDate = digestDates.endDate;
 	}
 	
 	if(key == 106){
 		startDate = getTimeFrameForUserRankingReport();
 		var timeFrameStr = $('#report-time-selector').val();
-		timeFrame = parseInt(timeFrameStr);
-		
-		switch(timeFrame){
-		case 1: key = 107;
-			break;
-		case 2: key = 106;
-			break;
-		case 3: key = 107;
-			break;
-		case 4: key = 106;
-			break;
-		}
-		
+
 	}
 	
 	if(key == 112){
@@ -1694,7 +1707,9 @@ function getStatusString(status){
 		case 2: statusString='Pending';
 			break;
 		case 4: statusString='Failed';
-		break;
+			break;
+		case 5: statusString='View';
+			break;
 		default: statusString='Failed'
 		}
 		return statusString;
@@ -1751,6 +1766,10 @@ function drawRecentActivity(start,batchSize,tableHeader){
 		  }else if(recentActivityList[i][6]==4){
 			tableData +="<td class=\"v-tbl-recent-activity fetch-name txt-bold \" style='font-size:13px !important;'>"+statusString+"</td>"
 			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold\" ><a id=\"recent-act-delete-row"+i+"\" class='txt-bold recent-act-delete-x cursor-pointer'>X</a></td>"
+			+"</tr>";
+		} else if(recentActivityList[i][6]==5){	
+			tableData +="<td class=\"v-tbl-recent-activity fetch-name txt-bold \" style='font-size:13px !important;'><a id=\"viewLink"+i+"\"class='txt-bold tbl-blue-text downloadLink cursor-pointer'>"+statusString+"</a></td>"
+			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold \" ><a id=\"recent-act-delete-row"+i+"\" class='txt-bold recent-act-delete-x cursor-pointer'>X</a></td>"
 			+"</tr>";
 		}else{
 			tableData +="<td class=\"v-tbl-recent-activity fetch-name txt-bold \" style='font-size:13px !important;'>"+statusString+"</td>"
@@ -1885,7 +1904,13 @@ $(document).on('click','.downloadLink',function(e){
 	var clickedID = this.id;
 	var indexRecentActivity = clickedID.match(/\d+$/)[0];
 	var downloadLink=recentActivityList[indexRecentActivity][7];
-	window.location=downloadLink;
+	
+	// open digest in new tab
+	if( recentActivityList[indexRecentActivity][1] == "Digest" ){
+		window.open(downloadLink,'_blank');
+	} else {
+		window.location=downloadLink;	
+	}
 });
 
 $(document).on('click','.recent-act-delete-x',function(e){

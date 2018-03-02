@@ -133,6 +133,10 @@ public interface CommonConstants
     public static final int STATUS_DONE = 0;
     public static final int STATUS_FAIL = 4; // changing the status failed to 4 since the status under processing is 2
     public static final int STATUS_DELETE = 3;
+    public static final int STATUS_VIEW = 5;    
+
+
+    
 
     public static final int IS_PRIMARY_FALSE = 0;
     public static final int IS_PRIMARY_TRUE = 1;
@@ -1418,6 +1422,8 @@ public interface CommonConstants
     public static final String SURVEY_INVITATION_EMAIL_REPORT = "Survey Invitation Email Report";
     public static final String REPORTING_BRANCH_RANKING_MONTHLY_REPORT = "Branch Ranking Report For Month";
     public static final String REPORTING_BRANCH_RANKING_YEARLY_REPORT = "Branch Ranking Report For Year";
+    
+    public static final String REPORTING_DIGEST = "Digest";
 
     public static final String SURVEY_DETAILS_ID_COLUMN = "surveyDetailsId";
     public static final String SURVEY_RESULTS_REPORT_MODIFIED_ON = "reportModifiedOn";
@@ -1619,4 +1625,6 @@ public interface CommonConstants
     public static final String LEFT = "left";
 
     public static final String DIGEST_MAIL_NPS_TEXT = "NPS";
+
+    public static final int STATUS_REPORT_NO_RECORDS = 3;
 }

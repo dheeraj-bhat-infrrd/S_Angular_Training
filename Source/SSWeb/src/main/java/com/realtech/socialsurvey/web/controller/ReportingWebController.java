@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.web.controller;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.text.DateFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -535,8 +536,6 @@ public class ReportingWebController
         int reportId = Integer.parseInt( reportIdString );
         String actualTimeZoneString = request.getParameter("clientTimeZone");
         int actualTimeZoneOffset = Integer.parseInt( actualTimeZoneString );
-        String digestMonthValueStr = request.getParameter("digestMonthValue");
-        int DigestMonthValue = Integer.parseInt( digestMonthValueStr );
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
         Company company = user.getCompany();
@@ -677,6 +676,12 @@ public class ReportingWebController
                 model.addAttribute( COLUMN_VALUE, entityId );
             }
         }
+        
+        // add the month name for month before last month
+        Calendar calendar = Calendar.getInstance(); 
+        calendar.add(Calendar.MONTH, -2);
+        model.addAttribute( "monthBeforeLastMonth", new DateFormatSymbols().getMonths()[ calendar.get( Calendar.MONTH ) ] );
+        
         return JspResolver.REPORTS;
     }
 

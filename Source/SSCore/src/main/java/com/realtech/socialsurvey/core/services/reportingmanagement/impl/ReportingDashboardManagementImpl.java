@@ -425,6 +425,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_BRANCH_RANKING_MONTHLY_REPORT );
         } else if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_BRANCH_RANKING_YEARLY_REPORT ) {
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_BRANCH_RANKING_YEARLY_REPORT );
+        } else if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_DIGEST ) {
+            fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_DIGEST );
         }
 
         // get the time 23:59:59 in milliseconds
@@ -444,6 +446,11 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         fileUpload.setProfileLevel( entityType );
         fileUpload.setStatus( CommonConstants.STATUS_PENDING );
         fileUpload.setShowOnUI( true );
+
+        // get digest s3 URI from mongoDB if present
+        if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_DIGEST ) {
+            processDigestRequest( fileUpload );
+        }
         fileUpload = fileUploadDao.save( fileUpload );
         if ( reportId == CommonConstants.FILE_UPLOAD_SURVEY_INVITATION_EMAIL_REPORT ) {
             ReportRequest reportRequest = new ReportRequest();
@@ -1777,6 +1784,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 recentActivityList.add( CommonConstants.REPORTING_BRANCH_RANKING_MONTHLY_REPORT );
             } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_BRANCH_RANKING_YEARLY_REPORT ) {
                 recentActivityList.add( CommonConstants.REPORTING_BRANCH_RANKING_YEARLY_REPORT );
+            } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_DIGEST ) {
+                recentActivityList.add( CommonConstants.REPORTING_DIGEST );
             }
 
             recentActivityList.add( fileUpload.getStartDate() );
@@ -5042,13 +5051,33 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
         // store the digest file name appropriately
         SavedDigestRecord digestRecord = new SavedDigestRecord();
-        
+
         digestRecord.setAbsoluteFileName( uploadedFileName );
-        digestRecord.setUploadedDate( new Date(currentTime) );
+        digestRecord.setUploadedDate( new Date( currentTime ) );
         digestRecord.setMonth( digestAggregate.getMonthUnderConcern() );
         digestRecord.setYear( digestAggregate.getYearUnderConcern() );
-        
-        organizationUnitSettingsDao.saveDigestRecord( digestAggregate.getProfileLevel(), digestAggregate.getEntityId(), digestRecord );
 
+        organizationUnitSettingsDao.saveDigestRecord( digestAggregate.getProfileLevel(), digestAggregate.getEntityId(),
+            digestRecord );
+
+    }
+
+
+    private void processDigestRequest( FileUpload fileUpload ) throws InvalidInputException
+    {
+        LOG.debug( "method processDigestRequest started" );
+
+        List<SavedDigestRecord> digestRecords = organizationUnitSettingsDao.fetchSavedDigestRecords(
+            fileUpload.getProfileLevel(), fileUpload.getProfileValue(), fileUpload.getStartDate(), fileUpload.getEndDate() );
+
+        if ( digestRecords != null && !digestRecords.isEmpty() ) {
+            fileUpload.setStatus( CommonConstants.STATUS_VIEW );
+            fileUpload.setFileName( digestRecords.get( CommonConstants.INITIAL_INDEX ).getAbsoluteFileName() );
+
+        } else {
+            fileUpload.setStatus( CommonConstants.STATUS_REPORT_NO_RECORDS );
+        }
+
+        LOG.debug( "method processDigestRequest finished" );
     }
 }

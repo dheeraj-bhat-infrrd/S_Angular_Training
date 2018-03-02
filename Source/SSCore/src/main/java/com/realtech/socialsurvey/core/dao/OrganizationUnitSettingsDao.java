@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.dao;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -297,4 +298,8 @@ public interface OrganizationUnitSettingsDao
 
 
     public void saveDigestRecord( String profileLevel, long entityId, SavedDigestRecord digestRecord ) throws InvalidInputException;
+
+
+    public List<SavedDigestRecord> fetchSavedDigestRecords( String profileLevel, long profileValue, Date startDate,
+        Date endDate ) throws InvalidInputException;
 }
