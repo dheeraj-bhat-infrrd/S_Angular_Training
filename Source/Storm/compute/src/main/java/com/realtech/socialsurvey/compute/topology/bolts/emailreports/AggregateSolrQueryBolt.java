@@ -125,6 +125,8 @@ public class AggregateSolrQueryBolt extends BaseComputeBoltWithAck {
 			if(agentEmailCountsMonth == null || agentEmailCountsMonth.size() <= 0) {
 				LOG.info("No data found for date range.");
 			} else {
+				LOG.info("Saving agent email count data for month {}-{}",agentEmailCountsMonth.get(0).getMonth(),
+						agentEmailCountsMonth.get(0).getYear());
 				SSAPIOperations.getInstance().saveEmailCountMonthData(agentEmailCountsMonth);
 			}
 		}

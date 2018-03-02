@@ -837,6 +837,7 @@ public class ReportingController
     @RequestMapping( value = "/agentEmailCountsMonth", method = RequestMethod.POST)
     @ApiOperation(value = "Save the agent email counts data for month.")
     public ResponseEntity<Boolean> saveEmailCountMonthData(@RequestBody List<SurveyInvitationEmailCountMonth> agentEmailCountsMonth) {
+    	LOGGER.info("API call to save agent email count data for month");
     	boolean status = reportingDashboardManagement.saveEmailCountMonthData(agentEmailCountsMonth);
     	ResponseEntity<Boolean> responseEntity = null;
     	if(status) {
