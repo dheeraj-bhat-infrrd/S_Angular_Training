@@ -337,13 +337,7 @@
 								</c:when>
 								<c:otherwise>
 									<div class="prof-rating clearfix">
-										<div class="prof-rating-wrapper maring-0 clearfix float-left"
-											id="rating-avg-comp">
-											<div class='rating-image float-left smiley-rat-0'></div>
-											<div class='rating-rounded float-left'>
-												<span>${floatingAverageRating}</span> -
-											</div>
-										</div>
+										<div class="st-rating-wrapper maring-0 clearfix float-left" id="rating-avg-comp"></div>
 										<div class="float-left review-count-left cursor-pointer"
 											id="prof-company-review-count">
 											<span>${reviewsCount}</span> Reviews(s)
@@ -807,6 +801,8 @@
 		var reviewsSortBy = "${reviewSortCriteria}";
 		var pageUrl = "${pageUrl}";
 		var showAllReviews = false;
+		var avgRating = '${floatingAverageRating}';
+		
 		$(document).ready(function() {
 						
 			if( '${popup}' == "true" && !$('body').hasClass("overflow-hidden-important") ){
@@ -815,6 +811,8 @@
 			 	// post icons
 				buildReviewPopupShareData();
 			}
+			
+			paintAvgRatingForPpf(avgRating);
 			
 			 $('body').on('click','#dismiss-single-review-popup',function(e){
 				 
