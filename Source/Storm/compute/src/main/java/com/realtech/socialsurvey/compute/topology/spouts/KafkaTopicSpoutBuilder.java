@@ -26,7 +26,7 @@ public class KafkaTopicSpoutBuilder
 
     private static final Logger LOG = LoggerFactory.getLogger( KafkaTopicSpoutBuilder.class );
 
-    private static final String ZOOKEEPER_BROKERS = "127.0.0.1:2181";
+    private static final String ZOOKEEPER_BROKERS = "localhost:2181";
     private static final String ZOOKEEPER_ROOT = "";
 
     // SendGrid Event Spout
