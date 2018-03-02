@@ -289,6 +289,26 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     }
 
 
+    @Override
+    public void updateIsLoginPreventedForUsersInMongo( List<Long> userIdList, boolean isLoginPrevented )
+    {
+        LOG.debug( "updating IsLoginPreventedForUsers in Mongo" );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.IDEN ).in( userIdList ) );
+        Update update = new Update().set( MongoOrganizationUnitSettingDaoImpl.KEY_IS_LOGIN_PREVENTED, isLoginPrevented );
+        mongoTemplate.updateMulti( query, update, OrganizationUnitSettings.class, AGENT_SETTINGS_COLLECTION );
+    }
+    
+    @Override
+    public void updateHidePublicPageForUsers ( List<Long> userIdList, boolean hidePublicPage )
+    {
+        LOG.debug( "updating IsLoginPreventedForUsers in Mongo" );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.IDEN ).in( userIdList ) );
+        Update update = new Update().set( MongoOrganizationUnitSettingDaoImpl.KEY_HIDE_PUBLIC_PAGE, hidePublicPage );
+        mongoTemplate.updateMulti( query, update, OrganizationUnitSettings.class, AGENT_SETTINGS_COLLECTION );
+    }
+
     /**
      * Fetchs the list of names of logos being used.
      * 

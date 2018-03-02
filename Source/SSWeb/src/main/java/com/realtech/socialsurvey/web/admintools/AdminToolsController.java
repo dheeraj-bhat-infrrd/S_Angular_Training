@@ -651,4 +651,64 @@ public class AdminToolsController
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR ).tag(e.getMessage()).build();
 		}
 	}
+    
+    
+    @ResponseBody
+    @RequestMapping ( value = "/updatelistofuserloginpreventions", method = RequestMethod.POST)
+    public Response updateListOfUserLoginPreventions( HttpServletRequest request )
+    {
+        LOG.info( "Method updateListOfUserLoginPreventions started" );
+
+        try {
+            List<Long> userIdList = new ArrayList<>();
+            String userIdListStr[] = null;
+            Boolean isLoginPrevented = false;
+            String authorizationHeader = request.getHeader( "Authorization" );
+            String userIdsStr = request.getParameter( "userIds" );
+            String isLoginPreventedStr = request.getParameter( "isLoginPrevented" );
+
+            // authorize request
+            try {
+                validateAuthHeader( authorizationHeader );
+            } catch ( InvalidInputException e ) {
+                return Response.status( Response.Status.UNAUTHORIZED ).tag( e.getMessage() ).build();
+            }
+
+            // process request
+            if ( StringUtils.isEmpty( isLoginPreventedStr )
+                || ( !isLoginPreventedStr.equals( "true" ) && !isLoginPreventedStr.equals( "false" ) ) ) {
+                throw new InvalidInputException( "Wrong value passed for parameter isLoginPrevented" );
+            }
+            isLoginPrevented = Boolean.parseBoolean( isLoginPreventedStr );
+
+            if ( userIdsStr.contains( "," ) ) {
+                try {
+                    userIdListStr = userIdsStr.split( "," );
+                    for ( String userIdStr : userIdListStr ) {
+                        userIdList.add( Long.parseLong( userIdStr ) );
+                    }
+                } catch ( NumberFormatException e ) {
+                    throw new InvalidInputException( "Wrong value passed for parameter userId " );
+                }
+
+
+                //update isLoginPrevented for the users
+                organizationManagementService.updateIsLoginPreventedForUsers( userIdList, isLoginPrevented );
+                // update hidePublicPage as well
+                organizationManagementService.updateHidePublicPageForUsers( userIdList, isLoginPrevented );
+
+                LOG.info( "Method updateUserLoginPrevention finished" );
+                return Response.status( Response.Status.CREATED )
+                    .tag( "Field isLoginPrevented updated for user ids: " + userIdList + " to : " + isLoginPrevented ).build();
+            }
+            LOG.info( "Method updateUserLoginPrevention finished" );
+            return Response.status( Response.Status.CREATED )
+                .tag( "Field isLoginPrevented updated for user ids: " + userIdList + " to : " + isLoginPrevented ).build();
+        } catch ( Exception e ) {
+            LOG.error( "Error while updating user log in prevention field ", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).tag( e.getMessage() ).build();
+        }
+    }
+
+
 }
