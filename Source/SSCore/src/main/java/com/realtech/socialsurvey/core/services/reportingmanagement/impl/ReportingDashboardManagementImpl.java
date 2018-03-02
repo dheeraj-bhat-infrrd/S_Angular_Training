@@ -4790,7 +4790,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
 
 	@Override
-	public List<SurveyInvitationEmailCountMonth> getReceivedCountsMonth(long startDate, long endDate)
+	public List<SurveyInvitationEmailCountMonth> getReceivedCountsMonth(long startDate, long endDate, int startIndex, int batchSize)
 			throws ParseException {
 		List<SurveyInvitationEmailCountMonth> receivedCountMonth = new ArrayList<SurveyInvitationEmailCountMonth>();
 		Calendar cal = Calendar.getInstance();
@@ -4803,7 +4803,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 		String startDateStr = sdf.format(new Date(startDate));
 		String endDateStr = sdf.format(new Date(endDate));
 		LOG.info("start date {} and end date {}",startDateStr,endDateStr);
-		List<Object[]> receivedCount = surveyPreInitiationDao.getReceivedCountForDate(startDateStr, endDateStr);
+		List<Object[]> receivedCount = surveyPreInitiationDao.getReceivedCountForDate(startDateStr, endDateStr,
+				startIndex, batchSize);
 		LOG.info("Db returned row count : {}",receivedCount.size());
 		for (Object[] obj : receivedCount) {
 			if(obj[0] !=null && obj[1]!=null && obj[2] !=null) {
@@ -4815,7 +4816,6 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 				mailCount.setYear(year);
 				mailCount.setAgentName((String)obj[3]);
 				mailCount.setEmailId((String)obj[4]);
-				LOG.info("Mail count obj added to list.{}",mailCount.toString());
 				receivedCountMonth.add(mailCount);
 			}
 		}
