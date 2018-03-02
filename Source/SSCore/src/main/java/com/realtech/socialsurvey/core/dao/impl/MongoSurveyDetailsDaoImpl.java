@@ -781,12 +781,12 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         if ( columnName == null ) {
             aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
                 Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ).lte( endDate ) ),
-                Aggregation.unwind( "sharedOn" ), Aggregation.group( "sharedOn" ).count().as( "count" ) );
+                Aggregation.unwind( "sharedOn" ), Aggregation.group( "sharedOn" ).count().as( "count" ) ).withOptions(Aggregation.newAggregationOptions().allowDiskUse(true).build());
         } else {
             aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
                 Aggregation.match( Criteria.where( columnName ).is( columnValue ) ),
                 Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ).lte( endDate ) ),
-                Aggregation.unwind( "sharedOn" ), Aggregation.group().count().as( "count" ) );
+                Aggregation.unwind( "sharedOn" ), Aggregation.group().count().as( "count" ) ).withOptions(Aggregation.newAggregationOptions().allowDiskUse(true).build());
         }
         AggregationResults<SurveyDetails> result = mongoTemplate.aggregate( aggregation, SURVEY_DETAILS_COLLECTION,
             SurveyDetails.class );
@@ -903,7 +903,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
                 new BasicDBObject( CommonConstants.DEFAULT_MONGO_ID_COLUMN, "count" ).append( "count",
                     new BasicDBObject( "$sum", new BasicDBObject( "$size", "$comb.sharedOn" ) ) ) );
             operations.add( new CustomAggregationOperation( secondGroup ) );
-            Aggregation aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, operations );
+            Aggregation aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class, operations ).withOptions(Aggregation.newAggregationOptions().allowDiskUse(true).build());
             LOG.debug( "Aggregation : " + aggregation.toString() );
             AggregationResults<SurveyDetails> result = mongoTemplate.aggregate( aggregation, SURVEY_DETAILS_COLLECTION,
                 SurveyDetails.class );
@@ -2362,7 +2362,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         Query query = new Query();
         query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyId ) );
         Update update = new Update();
-        update.set( CommonConstants.UNDER_RESOLUTION_COLUMN, true );
+        update.set( CommonConstants.ABUSIVE_NOTIFY_COLUMN, true );
         mongoTemplate.upsert( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.debug( "Method updateSurveyAsUnderResolution() to mark survey as under resolution finished." );
     }
@@ -2686,6 +2686,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             throw new InvalidInputException( "toUser's user profile passed cannot be null in updateAgentIdOfSurveys()" );
 
         LOG.debug( "Method updateAgentIdOfSurveys() to update agent ids when survey moved from one to another user started." );
+        //updating social media post details
+        updateSocialMediaPostDetails( fromUserId, toUserProfile );
         Query query = new Query();
         query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( fromUserId ) );
         Update update = new Update();
@@ -2694,8 +2696,80 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             toUser.getFirstName() + ( toUser.getLastName() == null ? "" : " " + toUser.getLastName() ) );
         update.set( CommonConstants.REGION_ID_COLUMN, toUserProfile.getRegionId() );
         update.set( CommonConstants.BRANCH_ID_COLUMN, toUserProfile.getBranchId() );
+        update.set( CommonConstants.COMPANY_ID_COLUMN, toUserProfile.getCompany().getCompanyId() );
+        
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.debug( "Method updateAgentIdOfSurveys() to update agent ids when survey moved from one to another user finished." );
+
+    }
+
+
+    private void updateSocialMediaPostDetails( long fromUserId, UserProfile toUserProfile )
+    {
+
+        //update agent media post details
+        Query query = new Query();
+        Update update = new Update();
+        query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( fromUserId ) );
+        query.addCriteria( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN ).exists( true ) );
+        query.addCriteria( Criteria
+            .where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.AGENT_MEDIA_POST_DETAILS_COLUMN )
+            .exists( true ) );
+        query
+            .addCriteria(
+                Criteria
+                    .where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "."
+                        + CommonConstants.AGENT_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.AGENT_ID_COLUMN )
+                    .exists( true ) );
+        update.set( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.AGENT_MEDIA_POST_DETAILS_COLUMN
+            + "." + CommonConstants.AGENT_ID_COLUMN, toUserProfile.getAgentId() );
+        mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
+
+        //update branch media post details
+        query = new Query();
+        update = new Update();
+        query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( fromUserId ) );
+        query.addCriteria( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN ).exists( true ) );
+        query
+            .addCriteria( Criteria
+                .where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "."
+                    + CommonConstants.BRANCH_MEDIA_POST_DETAILS_COLUMN + ".0." + CommonConstants.BRANCH_ID_COLUMN )
+                .exists( true ) );
+        update.set( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.BRANCH_MEDIA_POST_DETAILS_COLUMN
+            + ".0." + CommonConstants.BRANCH_ID_COLUMN, toUserProfile.getBranchId() );
+        update.set( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.BRANCH_MEDIA_POST_DETAILS_COLUMN
+            + ".0." + CommonConstants.REGION_ID_COLUMN, toUserProfile.getRegionId() );
+        mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
+
+        //update region media post details
+        query = new Query();
+        update = new Update();
+        query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( fromUserId ) );
+        query.addCriteria( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN ).exists( true ) );
+        query
+            .addCriteria( Criteria
+                .where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "."
+                    + CommonConstants.REGION_MEDIA_POST_DETAILS_COLUMN + ".0." + CommonConstants.REGION_ID_COLUMN )
+                .exists( true ) );
+        update.set( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.REGION_MEDIA_POST_DETAILS_COLUMN
+            + ".0." + CommonConstants.REGION_ID_COLUMN, toUserProfile.getRegionId() );
+        mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
+
+
+        //update company media post details
+        query = new Query();
+        update = new Update();
+        query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( fromUserId ) );
+        query.addCriteria( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN ).exists( true ) );
+        query
+            .addCriteria( Criteria
+                .where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "."
+                    + CommonConstants.COMPANY_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.COMPANY_ID_COLUMN )
+                .exists( true ) );
+        update.set( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.COMPANY_MEDIA_POST_DETAILS_COLUMN
+            + "." + CommonConstants.COMPANY_ID_COLUMN, toUserProfile.getCompany().getCompanyId() );
+
+        mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
 
     }
 
@@ -3511,5 +3585,32 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         update.set( CommonConstants.NPS_SCORE_COLUMN, surveyDetails.getNpsScore() );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.debug( "Method updateSurveyNPSScore finished." );
+	}
+	
+	@Override
+    public void updateSourceDetailInExistingSurveyDetails( SurveyDetails surveyDetails )
+    {
+        String surveyMongoId = surveyDetails.get_id();
+        LOG.info( "Method updateZillowSourceIdInExistingSurveyDetails() to update source id started " );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyMongoId ) );
+        Update update = new Update();
+        update.set( CommonConstants.SURVEY_SOURCE_ID_COLUMN, surveyDetails.getSourceId() );
+        update.set( CommonConstants.SURVEY_SOURCE_COLUMN, surveyDetails.getSource() );
+        mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
+        LOG.info( "Method updateZillowSourceIdInExistingSurveyDetails finished." );
+    }
+
+
+	@Override
+	public void updateSurveyAsAbusiveNotify(String surveyId) {
+		LOG.debug( "Method updateSurveyAsAbusiveNotify() to mark survey as abusive notify started." );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.DEFAULT_MONGO_ID_COLUMN ).is( surveyId ) );
+        Update update = new Update();
+        update.set( CommonConstants.ABUSIVE_NOTIFY_COLUMN, true );
+        mongoTemplate.upsert( query, update, SURVEY_DETAILS_COLLECTION );
+        LOG.debug( "Method updateSurveyAsAbusiveNotify() to mark survey as abusive notify finished." );
+	
 	}
 }

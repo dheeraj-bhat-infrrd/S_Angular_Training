@@ -1384,3 +1384,9 @@ var div = document.createElement('div');
 div.appendChild(document.createTextNode(stringInput));
 return div.innerHTML;
 }
+
+function paintAvgRatingForPpf(avgRating) {
+	if (avgRating != undefined) {
+		changeRatingPattern(avgRating, $("#rating-avg-comp"), true);
+	}
+}

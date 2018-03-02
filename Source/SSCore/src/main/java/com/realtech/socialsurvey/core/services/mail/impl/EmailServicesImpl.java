@@ -2550,6 +2550,53 @@ public class EmailServicesImpl implements EmailServices
             messageBodyReplacements, false, false );
         LOG.debug( "Successfully sent survey completion mail" );
     }
+    
+    @Async 
+    @Override
+    public void sendAbusiveNotifyMail(String source,String recipientMailId, String customerName, String customerMailId, String agentName,String agentMailId,
+			String mood, String rating, String surveySourceId, String feedBack ,String surveyMarked )
+			throws InvalidInputException, UndeliveredEmailException
+    {
+        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+            LOG.warn( "Recipient email Id is empty or null for sending survey completion mail " );
+            throw new InvalidInputException( "Recipient email Id is empty or null for sending survey complaint handler mail " );
+        }
+
+        if ( customerMailId == null || customerMailId.isEmpty() ) {
+            LOG.warn( "Customer email Id is empty or null " );
+            throw new InvalidInputException( "Customer email Id is empty or null " );
+        }
+
+        if ( agentName == null || agentName.isEmpty() ) {
+            LOG.warn( "Agent Name  is empty or null " );
+            throw new InvalidInputException( "Agent Name is empty or null " );
+        }
+
+        String[] mailIds = recipientMailId.split( "," );
+        List<String> mailIdList = new ArrayList<String>();
+
+        for ( String mailId : mailIds ) {
+            mailIdList.add( mailId.trim() );
+        }
+
+        LOG.debug( "Sending abusive handle email to : {}", recipientMailId );
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( mailIdList );
+        emailEntity.setMailType( CommonConstants.EMAIL_TYPE_ABUSIVE_HANDLE_MAIL );
+
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        messageBodyReplacements.setFileName(
+            EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_ABUSIVE_HANDLER_MAIL_BODY );
+
+        //SS-1435: Send survey details too.
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, customerName, source, feedBack,
+        		rating,source, surveyMarked, agentName,agentMailId ,customerName,customerMailId,surveySourceId == null ? CommonConstants.NOT_AVAILABLE : surveySourceId) );
+
+        LOG.trace( "Calling email sender to send mail" );
+        sendEmailWithBodyReplacements( emailEntity,
+            EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_ABUSIVE_HANDLER_MAIL_SUBJECT,
+            messageBodyReplacements, false, false );
+        LOG.debug( "Successfully sent survey abusive mail" );
+    }
 
 
     /**

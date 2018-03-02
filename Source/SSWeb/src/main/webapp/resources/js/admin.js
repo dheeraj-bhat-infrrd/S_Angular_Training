@@ -33,32 +33,32 @@ $(document).on('click','#dsh-ind-report-dwn-btn',function(e){
 $(document).on('keyup','#hr-comp-sel',function(e){
 	if(e.which == 13) {
 		var key = $(this).val();
-		
+		var encodedKey = encodeURIComponent( key ).replace(/[!'()]/g, escape).replace(/\*/g, "%2A");
 		var srchType = $('#hr-comp-sel').attr("srch-type");
 		
 		if(srchType == "company")
-			searchAndDisplayCompanies(key);
+			searchAndDisplayCompanies(encodedKey);
 		else if(srchType == "region")
-			searchAndDisplayRegions(key);
+			searchAndDisplayRegions(encodedKey);
 		else if(srchType == "office")
-			searchAndDisplayBranches(key);
+			searchAndDisplayBranches(encodedKey);
 		else if(srchType == "user")
-			searchAndDisplayUsers(key);
+			searchAndDisplayUsers(encodedKey);
 	}
 });
 
 $(document).on('click','#hr-comp-icn',function(e){
 	var key = $('#hr-comp-sel').val();
-	
+	var encodedKey = encodeURIComponent( key ).replace(/[!'()]/g, escape).replace(/\*/g, "%2A");
 	var srchType = $('#hr-comp-sel').attr("srch-type");
 	if(srchType == "company")
-		searchAndDisplayCompanies(key);
+		searchAndDisplayCompanies(encodedKey);
 	else if(srchType == "region")
-		searchAndDisplayRegions(key);
+		searchAndDisplayRegions(encodedKey);
 	else if(srchType == "office")
-		searchAndDisplayBranches(key);
+		searchAndDisplayBranches(encodedKey);
 	else if(srchType == "user")
-		searchAndDisplayUsers(key);
+		searchAndDisplayUsers(encodedKey);
 });
 
 //deelte company
@@ -160,7 +160,7 @@ function searchAndDisplayBranches(key) {
 function searchAndDisplayUsers(key) {
 	
 	showOverlay();
-	callAjaxGETAndAbortLastRequest("/fetchusersbykey.do?searchKey="+encodeURIComponent(key), function(data) {
+	callAjaxGETAndAbortLastRequest("/fetchusersbykey.do?searchKey="+key, function(data) {
 		
 		$('#admin-com-list').html('<div data-iden="0" class="hide comp-hr-cont"></div>');
 		

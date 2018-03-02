@@ -5620,15 +5620,15 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             URL url = new URL( imageUrl );
             image = ImageIO.read( url );
         } catch ( IOException e ) {
-            LOG.error( "Exception caught " + e.getMessage() );
+            LOG.error( "Exception caught while reading image" + e.getMessage() );
         }
         return image;
     }
 
-
-    private String copyImage( String source, String imageName ) throws Exception
+    @Override
+    public String copyImage( String source, String imageName ) throws Exception
     {
-
+        LOG.info( "Method copyImage called for url {} and imageName {}" , source , imageName );
         String fileName = null;
         try {
             BufferedImage image = getImageFromUrl( source );
@@ -5646,11 +5646,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     fileName = fileUploadService.uploadProfileImageFile( tempImage, imageName, false );
                     FileUtils
                         .deleteQuietly( new File( CommonConstants.TEMP_FOLDER + CommonConstants.FILE_SEPARATOR + imageName ) );
-                    LOG.debug( "Successfully retrieved photo of contact" );
+                    LOG.info( "Successfully retrieved photo of contact with file name {} " , fileName );
                 } else {
+                    LOG.warn("Error while creating temp image. Can't able to process image {}" , source);
                     return null;
                 }
             } else {
+                LOG.warn( "error while getting image. Cant able to process image {} " , source );
                 return null;
             }
         } catch ( Exception e ) {
@@ -5824,6 +5826,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         // NOTE: It was decided not to show Social posts on the UI. So not fetching anymore.
 
+        //set company name
+        profileAggregate.setCompanyName(companyProfile.getContact_details().getName());
+        
         // build the individual review aggregate
         profileAggregate.setReviewAggregate( buildReviewAggregate( profileAggregate ) );
 

@@ -60,7 +60,7 @@ public class RetrofitApiBuilder
     {
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
         // set basic level logging
-        loggingInterceptor.setLevel( Level.BODY );
+        loggingInterceptor.setLevel( Level.BASIC );
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         httpClient.addInterceptor( loggingInterceptor );
         // Create integration service builders

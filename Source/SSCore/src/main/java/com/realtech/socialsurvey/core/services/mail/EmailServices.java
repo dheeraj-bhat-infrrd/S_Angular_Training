@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.services.mail;
 
+import java.util.Date;
 import java.util.List;
 
 import com.realtech.socialsurvey.core.entities.AgentSettings;
@@ -568,6 +569,12 @@ public interface EmailServices
 
 
     public void sendEmailToUploaderForSuccessfulSurveyCsvUpload( SurveyCsvInfo csvInfo, String results ) throws InvalidInputException, UndeliveredEmailException;
-    
+
     public void sendSocialMonitorActionMail(String recipientMailId, String recipientName, String mailBody) throws InvalidInputException, UndeliveredEmailException;
+
+
+    public void sendAbusiveNotifyMail(String source,String recipientMailId, String customerName, String customerMailId, String agentName,String agentMailId,
+			String mood, String rating, String surveySourceId, String feedBack ,String surveyMarked )
+			throws InvalidInputException, UndeliveredEmailException;
+
 }

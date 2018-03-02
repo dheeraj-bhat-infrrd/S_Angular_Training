@@ -47,7 +47,7 @@ public class MailEventsTopologyStarterHelper extends TopologyStarterHelper
             return config;
         } else {
             Config config = new Config();
-            config.put( Config.TOPOLOGY_MAX_SPOUT_PENDING, 5000 );
+            config.put( Config.TOPOLOGY_MAX_SPOUT_PENDING, 100 );
             config.put( Config.STORM_NIMBUS_RETRY_TIMES, 3 );
             return config;
         }

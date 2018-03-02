@@ -52,8 +52,16 @@ namespace EncompassSocialSurvey.Entity
         public string sellerAgentName { get; set; }
 
 
+        [DataMember(Name = "propertyAddress")]
+        public string propertyAddress { get; set; }
 
 
+        [DataMember(Name = "loanProcessorName")]
+        public string loanProcessorName { get; set; }
+
+
+        [DataMember(Name = "loanProcessorEmail")]
+        public string loanProcessorEmail { get; set; }
 
     } 
 }

@@ -1,28 +1,8 @@
 package com.realtech.socialsurvey.api.controllers;
 
-import java.sql.Timestamp;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.api.models.response.FileUploadResponse;
-import com.realtech.socialsurvey.core.entities.CompanyActiveUsersStats;
-import com.realtech.socialsurvey.core.entities.DigestRequestData;
-import com.realtech.socialsurvey.core.entities.CompanyDetailsReport;
-import com.realtech.socialsurvey.core.entities.CompanySurveyStatusStats;
-import com.realtech.socialsurvey.core.entities.CompanyView;
-import com.realtech.socialsurvey.core.entities.SurveyResultsReportVO;
+import com.realtech.socialsurvey.core.entities.*;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.activitymanager.ActivityManagementService;
@@ -31,7 +11,16 @@ import com.realtech.socialsurvey.core.services.reportingmanagement.DashboardGrap
 import com.realtech.socialsurvey.core.services.reportingmanagement.OverviewManagement;
 import com.realtech.socialsurvey.core.services.reportingmanagement.ReportingDashboardManagement;
 import io.swagger.annotations.ApiOperation;
-import retrofit.http.Body;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -798,5 +787,22 @@ public class ReportingController
             responseEntity = new ResponseEntity<>(fileUploadResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return responseEntity;
+    }
+    
+    
+    @RequestMapping ( value = "/branchranking/month/year", method = RequestMethod.GET)
+    @ApiOperation ( value = "get nps report for a week or month")
+    public String getBranchRankingReport( long companyId, int month, int year, int type ) throws InvalidInputException
+    {
+        String json = null;
+        if(type == 1){
+            LOGGER.info( "Fetching branch ranking report {} for company {}", month, companyId );
+            json = new Gson().toJson( reportingDashboardManagement.getBranchRankingReportForMonth( companyId, month, year ) );
+        }
+        else if(type == 2){
+            LOGGER.info( "Fetching nps report for month {} for company {}", month, companyId );
+            json = new Gson().toJson( reportingDashboardManagement.getBranchRankingReportForYear( companyId, year ) );
+        }
+        return json;
     }
 }
