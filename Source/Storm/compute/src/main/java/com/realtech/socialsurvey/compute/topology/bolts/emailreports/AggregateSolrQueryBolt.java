@@ -149,7 +149,11 @@ public class AggregateSolrQueryBolt extends BaseComputeBoltWithAck {
 		JsonObject response = APIOperations.getInstance()
 				.getEmailCounts( "*:*",fieldQuery, isFacet, facetField, facetPivots,facetLimit, facetMinCount );
 		//agentId : [ 1 TO * ]
-		JsonObject obj = response.getAsJsonObject("facet_counts").getAsJsonObject("facet_pivot");
+		JsonObject obj = null;
+		if(response != null && response.getAsJsonObject("facet_counts") != null) {
+			obj = response.getAsJsonObject("facet_counts").getAsJsonObject("facet_pivot");
+		}
+		
 		if(obj != null) {
 			return obj;
 		}
