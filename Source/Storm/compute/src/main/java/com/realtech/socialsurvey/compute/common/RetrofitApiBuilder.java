@@ -35,7 +35,10 @@ public class RetrofitApiBuilder
     private SolrApiIntegrationService solrAPIIntergrationService;
     
     private SSApiIntegrationService ssAPIIntergrationService;
-    private SSApiIntegrationService reportingSSAPIIntergrationService;
+    
+    
+    private SSApiIntegrationService ssAPIIntergrationServiceWithIncreasedTimeout;
+    private SolrApiIntegrationService solrAPIIntergrationServiceWithIncreasedTimeout;
 
     private final String solrApiUrl = LocalPropertyFileHandler.getInstance()
         .getProperty( ComputeConstants.APPLICATION_PROPERTY_FILE, ComputeConstants.SOLR_API_ENDPOINT ).orElse( null );
@@ -51,12 +54,12 @@ public class RetrofitApiBuilder
         // set basic level logging
         loggingInterceptor.setLevel( Level.BASIC );
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-        OkHttpClient.Builder httpClientReporting = new OkHttpClient.Builder()
+        OkHttpClient.Builder httpClientWithIncreasedTimeout = new OkHttpClient.Builder()
         		.connectTimeout(180000, TimeUnit.MILLISECONDS)
         		.readTimeout(180000, TimeUnit.MILLISECONDS)
         		.writeTimeout(180000, TimeUnit.MILLISECONDS);
         httpClient.addInterceptor( loggingInterceptor );
-        httpClientReporting.addInterceptor(loggingInterceptor);
+        httpClientWithIncreasedTimeout.addInterceptor(loggingInterceptor);
         // Create integration service builders
         LOG.info( "Creating SOLR API builder" );
         // construct api gateway url
@@ -71,8 +74,14 @@ public class RetrofitApiBuilder
         
         // api gateway url for ss api reporting
         Retrofit reportingSSApiIntegServiceBuilder = new Retrofit.Builder().baseUrl( ssApiUrl )
-                .addConverterFactory( GsonConverterFactory.create() ).client( httpClientReporting.build() ).build();
-        reportingSSAPIIntergrationService  = reportingSSApiIntegServiceBuilder.create( SSApiIntegrationService.class);
+                .addConverterFactory( GsonConverterFactory.create() ).client( httpClientWithIncreasedTimeout.build() ).build();
+        ssAPIIntergrationServiceWithIncreasedTimeout  = reportingSSApiIntegServiceBuilder.create( SSApiIntegrationService.class);
+        
+        // api gateway for solr with increased timeout.
+        Retrofit solrIntegServiceBuilderWithIncreasedTimeout = new Retrofit.Builder().baseUrl( solrApiUrl )
+                .addConverterFactory( GsonConverterFactory.create() ).client( httpClientWithIncreasedTimeout.build() ).build();
+        solrAPIIntergrationServiceWithIncreasedTimeout = solrIntegServiceBuilderWithIncreasedTimeout
+        		.create( SolrApiIntegrationService.class );
         
 
     }
@@ -94,8 +103,12 @@ public class RetrofitApiBuilder
         return ssAPIIntergrationService;
     }
 
-    public SSApiIntegrationService getReportingSSAPIIntergrationService() {
-		return reportingSSAPIIntergrationService;
+    public SSApiIntegrationService getSSAPIIntergrationServiceWithIncreasedTimeOut() {
+		return ssAPIIntergrationServiceWithIncreasedTimeout;
+	}
+
+	public SolrApiIntegrationService getSolrAPIIntergrationServiceWithIncreasedTimeout() {
+		return solrAPIIntergrationServiceWithIncreasedTimeout;
 	}
 
 
