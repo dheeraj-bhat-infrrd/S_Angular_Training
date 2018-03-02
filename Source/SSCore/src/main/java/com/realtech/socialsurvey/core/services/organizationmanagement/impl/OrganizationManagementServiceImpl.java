@@ -8972,4 +8972,25 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
         return false;
     }
+
+    @Override
+    public void updateIsLoginPreventedForUsers( List<Long> userIdList, boolean isLoginPrevented ) throws InvalidInputException
+    {
+        if ( userIdList == null || userIdList.isEmpty() ) {
+            throw new InvalidInputException( "List of userIds is null" );
+        }
+        LOG.info( "Inside method updateIsLoginPreventedForUsers " );
+        organizationUnitSettingsDao.updateIsLoginPreventedForUsersInMongo( userIdList, isLoginPrevented );
+    }
+    
+    
+    @Override
+    public void updateHidePublicPageForUsers( List<Long> userIdList, boolean hidePublicPage ) throws InvalidInputException
+    {
+        if ( userIdList == null || userIdList.isEmpty() ) {
+            throw new InvalidInputException( "List of userIds is null" );
+        }
+        LOG.info( "Inside method updateHidePublicPageForUsers " );
+        organizationUnitSettingsDao.updateHidePublicPageForUsers( userIdList, hidePublicPage );
+    }
 }

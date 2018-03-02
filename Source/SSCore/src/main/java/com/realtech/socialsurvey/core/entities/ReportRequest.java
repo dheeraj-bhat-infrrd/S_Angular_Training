@@ -3,8 +3,10 @@ package com.realtech.socialsurvey.core.entities;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.TimeZone;
 
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.enums.ReportType;
 
 public class ReportRequest implements Serializable{
@@ -20,6 +22,8 @@ public class ReportRequest implements Serializable{
 	private long companyId;
 	private String actualTimeZone;
 	private String expectedTimeZone;
+	private long startTime;
+	private long endTime;
 
 	public long getFileUploadId() {
 		return fileUploadId;
@@ -103,8 +107,23 @@ public class ReportRequest implements Serializable{
         this.expectedTimeZone = expectedTimeZone;
     }
 
+    public long getStartTime() {
+		return startTime;
+	}
 
-    public void transform( FileUpload fileUpload, int actualTimeZoneOffset )
+	public void setStartTime(long startTime) {
+		this.startTime = startTime;
+	}
+
+	public long getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(long endTime) {
+		this.endTime = endTime;
+	}
+
+	public void transform( FileUpload fileUpload, int actualTimeZoneOffset )
     {
         this.fileUploadId = fileUpload.getFileUploadId();
         this.reportType = ReportType.SURVEY_INVITATION_EMAIL_REPORT.getName();
@@ -135,7 +154,35 @@ public class ReportRequest implements Serializable{
         this.companyId = fileUpload.getCompany().getCompanyId();
 
     }
+    
+    public void transform(String timeFrame) {
+    	this.reportType = ReportType.SURVEY_INVITATION_EMAIL_REPORT.getName();
+    	switch(timeFrame) {
+    	case CommonConstants.TIME_FRAME_PAST_MONTH :
+    		this.startTime = getFirstDayOfPastMonth();
+    		this.endTime = getLastDayOfPastMonth();
+    		break;
+    	case CommonConstants.TIME_FRAME_THIS_MONTH :
+    		break;
+    	case CommonConstants.TIME_FRAME_ALL_TIME :
+    		break;
+    	}
+    	
+    }
 
+	private long getLastDayOfPastMonth() {
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.MONTH, -1);
+		cal.set(Calendar.DATE, 1);
+		return cal.getTimeInMillis();
+	}
+
+	private long getFirstDayOfPastMonth() {
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.MONTH, -1);
+		cal.set(Calendar.DATE, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+		return cal.getTimeInMillis();
+	}
 
 	public String timezoneDate(Timestamp date, String timeZone) {
         if ( date != null ) {
@@ -146,14 +193,12 @@ public class ReportRequest implements Serializable{
             return null;
 	}
 
-    @Override
-    public String toString()
-    {
-        return "ReportRequest [fileUploadId=" + fileUploadId + ", reportType=" + reportType + ", startDateExpectedTimeZone="
-            + startDateExpectedTimeZone + ", endDateExpectedTimeZone=" + endDateExpectedTimeZone + ", profileLevel="
-            + profileLevel + ", profileValue=" + profileValue + ", companyId=" + companyId + ", actualTimeZone="
-            + actualTimeZone + ", expectedTimeZone=" + expectedTimeZone + "]";
-    }
-	
-
+	@Override
+	public String toString() {
+		return "ReportRequest [fileUploadId=" + fileUploadId + ", reportType=" + reportType
+				+ ", startDateExpectedTimeZone=" + startDateExpectedTimeZone + ", endDateExpectedTimeZone="
+				+ endDateExpectedTimeZone + ", profileLevel=" + profileLevel + ", profileValue=" + profileValue
+				+ ", companyId=" + companyId + ", actualTimeZone=" + actualTimeZone + ", expectedTimeZone="
+				+ expectedTimeZone + ", startTime=" + startTime + ", endTime=" + endTime + "]";
+	}
 }

@@ -12,7 +12,8 @@ public class SendgridEvent
 
     private String email;
     private long timestamp;
-    @SerializedName( value = "smtp-id" )
+
+    @SerializedName ( value = "smtp-id")
     private String smtpId;
     private String event;
     private String category;

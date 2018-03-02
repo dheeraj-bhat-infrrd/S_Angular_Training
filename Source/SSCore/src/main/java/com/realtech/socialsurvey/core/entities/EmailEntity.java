@@ -47,8 +47,7 @@ public class EmailEntity implements Serializable
     private long regionId;
     private long agentId;
     private String agentEmailId;
-    
-    private boolean streamRetryFailed;
+    private boolean isRetried;
 
     public String get_id() {
 		return _id;
@@ -284,17 +283,15 @@ public class EmailEntity implements Serializable
         this.agentEmailId = agentEmailId;
     }
 
-    public boolean isStreamRetryFailed() {
-		return streamRetryFailed;
-	}
+    public boolean isRetried() {
+        return isRetried;
+    }
 
+    public void setRetried(boolean retried) {
+        isRetried = retried;
+    }
 
-	public void setStreamRetryFailed(boolean streamRetryFailed) {
-		this.streamRetryFailed = streamRetryFailed;
-	}
-
-
-	@Override
+    @Override
     public String toString() {
         return "EmailEntity{" +
                 "randomUUID='" + randomUUID + '\'' +
@@ -319,6 +316,7 @@ public class EmailEntity implements Serializable
                 ", regionId=" + regionId +
                 ", agentId=" + agentId +
                 ", agentEmailId='" + agentEmailId + '\'' +
+                ", isRetried=" + isRetried +
                 '}';
     }
 }

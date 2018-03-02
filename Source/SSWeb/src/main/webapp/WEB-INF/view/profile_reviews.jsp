@@ -114,7 +114,7 @@
 					</c:choose>
 					<div class="ppl-head-1 review-detail-profile" style="clear:both">
 					<span class="float-left">  Reviewed by </span>
-						<span class="float-left" style="margin-left:5px;font-weight:600 !important;">${reviewItem.customerFirstName} ${reviewItem.customerLastName}</span>
+						<span class="float-left" style="margin-left:5px;font-weight:600 !important;">${customerDisplayName}</span>
 						<c:if test="${profilemasterid !=4}">
 							<c:if test="${not empty reviewItem.agentName}">
 							 <span class="float-left" style="margin-left: 5px;">for

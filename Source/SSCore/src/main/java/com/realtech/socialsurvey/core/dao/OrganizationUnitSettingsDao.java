@@ -301,4 +301,10 @@ public interface OrganizationUnitSettingsDao
 
 
     public OrganizationUnitSettings fetchSavedDigestRecords( String profileLevel, long profileValue ) throws InvalidInputException;
+
+    
+    void updateIsLoginPreventedForUsersInMongo( List<Long> userIdList, boolean isLoginPrevented );
+
+
+    void updateHidePublicPageForUsers( List<Long> userIdList, boolean hidePublicPage );
 }

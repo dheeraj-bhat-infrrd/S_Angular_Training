@@ -1627,4 +1627,9 @@ public interface CommonConstants
     public static final String DIGEST_MAIL_NPS_TEXT = "NPS";
 
     public static final int STATUS_REPORT_NO_RECORDS = 3;
+    
+    //
+    public static final String TIME_FRAME_PAST_MONTH = "PastMonth";
+    public static final String TIME_FRAME_THIS_MONTH = "ThisMonth";
+    public static final String TIME_FRAME_ALL_TIME = "AllTime";
 }

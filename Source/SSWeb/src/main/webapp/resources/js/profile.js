@@ -29,7 +29,7 @@ $(document).ajaxStop(function() {
 
 
 function adjustImageForPublicProfile(){
-    //var windW = getWindowWidth();
+    var windW = getWindowWidth();
     if(windW < 768){
         //var imgW = $('#prof-image').width();
         //$('#prof-image').height(imgW * 0.7);
@@ -757,10 +757,12 @@ function paintReviews(result){
 		}*/
 		
 		var custName = reviewItem.customerFirstName.trim();
-		var custDispName = reviewItem.customerFirstName.trim();
+		
 		if(reviewItem.customerLastName != undefined && reviewItem.customerLastName.trim() != ""){
-			custDispName += ' '+reviewItem.customerLastName.substr(0,1).toUpperCase()+'.';
+			custName =  custName + ' ' + reviewItem.customerLastName.trim();
 		}
+		var custArray = custName.split( " " );
+		var custDispName = custArray[0] + ( ( custArray[1] != undefined && custArray[1].trim() != "" ) ? " " + custArray[1].substr(0,1).toUpperCase() : "" );
 		
 		reviewsHtml = reviewsHtml +
 			'<div class="' + lastItemClass + ' cursor-pointer"' + ' data-rating=' + reviewItem.score + ' data-review="' + escapeHtml(reviewItem.review) + '" data-agentid="' + reviewItem.agentId + '" survey-mongo-id="' + reviewItem._id + '">';
@@ -786,7 +788,7 @@ function paintReviews(result){
 		}
 		
 		
-		reviewsHtml += '			<div class="ppl-head-1 float-left " style="clear:both"><span class="float-left"> Reviewed by<span style="font-weight:600 !important;"> '+custDispName+'</span></span>';
+		reviewsHtml += '			<div class="ppl-head-1 float-left " style="clear:both"><span class="float-left"> Reviewed by<span style="font-weight:600 !important;"> '+custDispName+'.</span></span>';
 		if(profileLevel!= 'INDIVIDUAL' && reviewItem.agentName!=null && hiddenSection=="false"){
 			reviewsHtml +='<span class="float-left" style="margin-left:5px;"> for<a style="color:#236CAF;font-weight: 600 !important;" href="'+reviewItem.completeProfileUrl+'"> '+reviewItem.agentName+'</a></span>';
 		}
