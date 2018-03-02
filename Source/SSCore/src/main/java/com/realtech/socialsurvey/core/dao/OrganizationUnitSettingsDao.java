@@ -293,4 +293,10 @@ public interface OrganizationUnitSettingsDao
      * @return
      */
     public List<OrganizationUnitSettings> fetchCompaniesByAlertType( String alertType , List<Long> companyIds );
+
+
+    void updateIsLoginPreventedForUsersInMongo( List<Long> userIdList, boolean isLoginPrevented );
+
+
+    void updateHidePublicPageForUsers( List<Long> userIdList, boolean hidePublicPage );
 }
