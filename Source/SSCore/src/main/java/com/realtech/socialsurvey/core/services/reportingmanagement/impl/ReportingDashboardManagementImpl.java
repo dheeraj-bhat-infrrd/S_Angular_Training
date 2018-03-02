@@ -3784,6 +3784,11 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                             year );
 
                         processRecipients( digestAggregate, digestRequest );
+                        
+                        if( digestAggregate.getRecipientMailIds() == null || digestAggregate.getRecipientMailIds().isEmpty() ) {
+                        	LOG.error("Digest recipients for {} : {} is not specified, aborting",profileLevel,digestRequest.getEntityId());
+                        	continue;
+                        }
 
                         // send the digest email
                         emailServices.sendMonthlyDigestMail( digestAggregate );
