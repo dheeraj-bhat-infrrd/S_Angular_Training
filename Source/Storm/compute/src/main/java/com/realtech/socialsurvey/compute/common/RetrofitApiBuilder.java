@@ -52,9 +52,9 @@ public class RetrofitApiBuilder
         loggingInterceptor.setLevel( Level.BASIC );
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         OkHttpClient.Builder httpClientReporting = new OkHttpClient.Builder()
-        		.connectTimeout(60000, TimeUnit.MILLISECONDS)
-        		.readTimeout(60000, TimeUnit.MILLISECONDS)
-        		.writeTimeout(60000, TimeUnit.MILLISECONDS);
+        		.connectTimeout(180000, TimeUnit.MILLISECONDS)
+        		.readTimeout(180000, TimeUnit.MILLISECONDS)
+        		.writeTimeout(180000, TimeUnit.MILLISECONDS);
         httpClient.addInterceptor( loggingInterceptor );
         httpClientReporting.addInterceptor(loggingInterceptor);
         // Create integration service builders

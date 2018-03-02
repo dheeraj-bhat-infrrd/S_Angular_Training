@@ -80,18 +80,21 @@ public class AggregateSolrQueryBolt extends BaseComputeBoltWithAck {
 			String endDateInGmt = sdf.format(new Date(endDate));
 			
 			JsonObject jsonObject = getSolrResponse(ReportType.SURVEY_INVITATION_EMAIL_REPORT.getName(), startDateInGmt, endDateInGmt);
-			
-
-			/*response = new SolrEmailCountDaoImpl().getEmailCountForDateRange(
-					ReportType.SURVEY_INVITATION_EMAIL_REPORT.getName(), startDateInGmt, endDateInGmt);*/
 
 			// Received Count
 			List<SurveyInvitationEmailCountMonth> agentEmailCountsMonth = new ArrayList<SurveyInvitationEmailCountMonth>();
+			List<SurveyInvitationEmailCountMonth> rcvdresponse = null;
+			int startIndex = 0;
 			try {
-				agentEmailCountsMonth
-						.addAll(SSAPIOperations.getInstance().getReceivedCountsMonth(startDate, endDate));
-			} catch (IOException e1) {
-				LOG.error("Exception while fetching the transaction received count.", e1);
+				do {
+					rcvdresponse = SSAPIOperations.getInstance().getReceivedCountsMonth(startDate, endDate, startIndex,
+							ComputeConstants.BATCH_SIZE);
+					agentEmailCountsMonth.addAll(rcvdresponse);
+					startIndex += ComputeConstants.BATCH_SIZE;
+				} while (rcvdresponse != null && rcvdresponse.size() == ComputeConstants.BATCH_SIZE);
+			} catch (IOException e) {
+				LOG.error("Failed getting received count for date range {},{} in batch {}", startDateInGmt,
+						endDateInGmt, startIndex);
 			}
 			
 			if(jsonObject != null) {
@@ -149,7 +152,11 @@ public class AggregateSolrQueryBolt extends BaseComputeBoltWithAck {
 		JsonObject response = APIOperations.getInstance()
 				.getEmailCounts( "*:*",fieldQuery, isFacet, facetField, facetPivots,facetLimit, facetMinCount );
 		//agentId : [ 1 TO * ]
-		JsonObject obj = response.getAsJsonObject("facet_counts").getAsJsonObject("facet_pivot");
+		JsonObject obj = null;
+		if(response != null && response.getAsJsonObject("facet_counts") != null) {
+			obj = response.getAsJsonObject("facet_counts").getAsJsonObject("facet_pivot");
+		}
+		
 		if(obj != null) {
 			return obj;
 		}
