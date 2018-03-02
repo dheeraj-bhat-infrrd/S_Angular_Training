@@ -86,8 +86,6 @@ public class EmailServicesImpl implements EmailServices
     @Value ( "${APPLICATION_LOGO_URL}")
     private String appLogoUrl;
 
-    @Value ( "${APPLICATION_NEW_LOGO_URL}")
-    private String appNewLogoUrl;
 
     @Value ( "${APPLICATION_ADMIN_EMAIL}")
     private String applicationAdminEmail;
@@ -101,8 +99,6 @@ public class EmailServicesImpl implements EmailServices
     @Value ( "${CURRENT_PROFILE}")
     private String currentProfile;
 
-    @Value ( "${APPLICATION_WORD_PRESS_SITE_URL}")
-    private String applicationWordPressSite;
 
     @Value ( "${SEND_MAIL}")
     private String sendMail;
@@ -141,9 +137,12 @@ public class EmailServicesImpl implements EmailServices
 
     private StreamMessagesService streamMessagesService;
 
+    private DigestMailHelper digestMailHelper;
+
     @javax.annotation.Resource
-    @Qualifier( "branch" )
+    @Qualifier ( "branch")
     private BranchDao branchDao;
+
 
     @Autowired
     public void setForwardMailDetailsDao( ForwardMailDetailsDao forwardMailDetailsDao )
@@ -226,6 +225,13 @@ public class EmailServicesImpl implements EmailServices
     public void setStreamMessagesService( StreamMessagesService streamMessagesService )
     {
         this.streamMessagesService = streamMessagesService;
+    }
+
+
+    @Autowired
+    public void setDigestMailHelper( DigestMailHelper digestMailHelper )
+    {
+        this.digestMailHelper = digestMailHelper;
     }
 
 
@@ -481,7 +487,7 @@ public class EmailServicesImpl implements EmailServices
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
 
         LOG.trace( "Initiating URL Service to shorten the url: %s", url );
-        String shortUrl = urlService.shortenUrl( url , emailEntity.getRandomUUID());
+        String shortUrl = urlService.shortenUrl( url, emailEntity.getRandomUUID() );
         LOG.trace( "Finished calling URL Service to shorten the url in sendRegistrationInviteMail. Shortened URL : %s",
             shortUrl );
 
@@ -1414,21 +1420,23 @@ public class EmailServicesImpl implements EmailServices
         LOG.debug( "Successfully sent survey completion mail" );
     }
 
+
     @Async
     @Override
-    public  void sendSurveyRelatedMail(OrganizationUnitSettings companySettings, User user, String agentName, String agentFirstName, String agentPhone,
-                                       String agentTitle, String surveyLink, String logoUrl, String customerFirstName,
-                                       String customerLastName, String customerEmailId, String emailType, String senderName,
-                                       String senderEmailAddress, String mailSubject, String mailBody, AgentSettings agentSettings,
-                                       long branchId, long regionId, String surveySourceId, long agentId, long companyId)
-            throws InvalidInputException, UndeliveredEmailException {
+    public void sendSurveyRelatedMail( OrganizationUnitSettings companySettings, User user, String agentName,
+        String agentFirstName, String agentPhone, String agentTitle, String surveyLink, String logoUrl,
+        String customerFirstName, String customerLastName, String customerEmailId, String emailType, String senderName,
+        String senderEmailAddress, String mailSubject, String mailBody, AgentSettings agentSettings, long branchId,
+        long regionId, String surveySourceId, long agentId, long companyId )
+        throws InvalidInputException, UndeliveredEmailException
+    {
 
         if ( customerEmailId == null || customerEmailId.isEmpty() ) {
             LOG.warn( "Recipient email Id is empty or null for sending survey completion mail " );
             throw new InvalidInputException( "Recipient email Id is empty or null for sending survey completion mail " );
         }
 
-        Map<String, String> branchAndRegion =  branchDao.getBranchAndRegionName(regionId, branchId);
+        Map<String, String> branchAndRegion = branchDao.getBranchAndRegionName( regionId, branchId );
 
         String companyName = user.getCompany().getCompany();
         String agentSignature = emailFormatHelper.buildAgentSignature( agentName, agentPhone, agentTitle, companyName );
@@ -1438,7 +1446,7 @@ public class EmailServicesImpl implements EmailServices
 
         LOG.trace( "Initiating URL Service to shorten the url {}", surveyLink );
         String shortSurveyLink = null;
-        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( customerEmailId , agentId, agentName);
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( customerEmailId, agentId, agentName );
 
         try {
             shortSurveyLink = urlService.shortenUrl( surveyLink, emailEntity.getRandomUUID() );
@@ -1465,14 +1473,14 @@ public class EmailServicesImpl implements EmailServices
 
         //replace legends
         mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, appBaseUrl, logoUrl, shortSurveyLink,
-                customerFirstName, customerLastName, agentName, agentFirstName,  agentSignature,customerEmailId,
-                user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "",
-                user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone );
+            customerFirstName, customerLastName, agentName, agentFirstName, agentSignature, customerEmailId, user.getEmailId(),
+            companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(),
+            companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone );
 
-        mailBody = emailFormatHelper.replaceLegends( false, mailBody, appBaseUrl, logoUrl, shortSurveyLink,
-                customerFirstName, customerLastName, agentName, agentFirstName, agentSignature, customerEmailId,
-                user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "",
-                user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone );
+        mailBody = emailFormatHelper.replaceLegends( false, mailBody, appBaseUrl, logoUrl, shortSurveyLink, customerFirstName,
+            customerLastName, agentName, agentFirstName, agentSignature, customerEmailId, user.getEmailId(), companyName,
+            dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer,
+            agentDisclaimer, agentLicenses, agentTitle, agentPhone );
 
         //send the email
         if ( mailSubject == null || mailSubject.isEmpty() ) {
@@ -1480,20 +1488,21 @@ public class EmailServicesImpl implements EmailServices
             throw new InvalidInputException( "displayName parameter is empty or null for sending survey completion mail " );
         }
         emailEntity.setMailType( emailType );
-        emailEntity.setRecipientsName(Arrays.asList(customerFirstName+" "+customerLastName));
-        emailEntity.setBranchName(branchAndRegion.get(CommonConstants.BRANCH_NAME_COLUMN));
-        emailEntity.setRegionName(branchAndRegion.get(CommonConstants.REGION_COLUMN));
-        emailEntity.setCompanyId(companyId);
-        emailEntity.setSurveySourceId(surveySourceId);
-        emailEntity.setRegionId(regionId);
-        emailEntity.setBranchId(branchId);
-        emailEntity.setAgentId(agentId);
-        emailEntity.setAgentEmailId(senderEmailAddress);
+        emailEntity.setRecipientsName( Arrays.asList( customerFirstName + " " + customerLastName ) );
+        emailEntity.setBranchName( branchAndRegion.get( CommonConstants.BRANCH_NAME_COLUMN ) );
+        emailEntity.setRegionName( branchAndRegion.get( CommonConstants.REGION_COLUMN ) );
+        emailEntity.setCompanyId( companyId );
+        emailEntity.setSurveySourceId( surveySourceId );
+        emailEntity.setRegionId( regionId );
+        emailEntity.setBranchId( branchId );
+        emailEntity.setAgentId( agentId );
+        emailEntity.setAgentEmailId( senderEmailAddress );
         LOG.trace( "Calling email sender to send mail" );
         sendEmail( emailEntity, mailSubject, mailBody, false, false );
         LOG.debug( "Successfully sent survey completion mail" );
 
     }
+
 
     @Async
     @Override
@@ -1697,7 +1706,7 @@ public class EmailServicesImpl implements EmailServices
     @Async
     @Override
     public void sendSurveyRelatedMail( String recipientMailId, String subject, String mailBody, String emailId, String name,
-                                      long agentId, long companyId, String mailType ) throws InvalidInputException, UndeliveredEmailException
+        long agentId, long companyId, String mailType ) throws InvalidInputException, UndeliveredEmailException
     {
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
             LOG.warn( "Recipient email Id is empty or null for sending survey completion mail " );
@@ -1868,7 +1877,7 @@ public class EmailServicesImpl implements EmailServices
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientId );
 
         LOG.trace( "Initiating URL Service to shorten the url {}", link );
-        String shortlink = urlService.shortenUrl( link,emailEntity.getRandomUUID() );
+        String shortlink = urlService.shortenUrl( link, emailEntity.getRandomUUID() );
         LOG.trace( "Finished calling URL Service to shorten the url.Shortened URL : {}", shortlink );
 
         LOG.trace( "Sending manual registration email to : {}", recipientId );
@@ -2334,8 +2343,9 @@ public class EmailServicesImpl implements EmailServices
 
     @Override
     public void sendManualSurveyReminderMail( OrganizationUnitSettings companySettings, User user, String agentName,
-        String agentFirstName, String agentEmailId, String agentPhone, String agentTitle, String companyName, SurveyPreInitiation survey,
-        String surveyLink, String logoUrl, String agentDisclaimer, String agentLicenses ) throws InvalidInputException
+        String agentFirstName, String agentEmailId, String agentPhone, String agentTitle, String companyName,
+        SurveyPreInitiation survey, String surveyLink, String logoUrl, String agentDisclaimer, String agentLicenses )
+        throws InvalidInputException
     {
         LOG.debug( "Sending manual survey reminder mail." );
         if ( survey.getCustomerEmailId() == null || survey.getCustomerEmailId().isEmpty() ) {
@@ -2396,14 +2406,14 @@ public class EmailServicesImpl implements EmailServices
 
         //replace legends
         mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, appBaseUrl, logoUrl, shortSurveyLink,
-            survey.getCustomerFirstName(), survey.getCustomerLastName(), agentName, agentFirstName, agentSignature, survey.getCustomerEmailId(),
-            user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "",
-            user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone );
+            survey.getCustomerFirstName(), survey.getCustomerLastName(), agentName, agentFirstName, agentSignature,
+            survey.getCustomerEmailId(), user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
+            fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone );
 
         mailBody = emailFormatHelper.replaceLegends( false, mailBody, appBaseUrl, logoUrl, shortSurveyLink,
-            survey.getCustomerFirstName(), survey.getCustomerLastName(), agentName, agentFirstName, agentSignature, survey.getCustomerEmailId(),
-            user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "",
-            user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone );
+            survey.getCustomerFirstName(), survey.getCustomerLastName(), agentName, agentFirstName, agentSignature,
+            survey.getCustomerEmailId(), user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
+            fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone );
         //JIRA SS-473 end
         //send mail
         if ( mailSubject == null || mailSubject.isEmpty() ) {
@@ -2914,9 +2924,9 @@ public class EmailServicesImpl implements EmailServices
             throw new InvalidInputException( "displayName parameter is empty or null for sending payment faield alert mail " );
         }
 
-        LOG.debug( "Sending payment faield alert email to : {}" , recipientMailId );
+        LOG.debug( "Sending payment faield alert email to : {}", recipientMailId );
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
-        emailEntity.setMailType(CommonConstants.EMAIL_TYPE_PAYMENT_FAILED_ALERT_EMAIL_TO_ADMIN);
+        emailEntity.setMailType( CommonConstants.EMAIL_TYPE_PAYMENT_FAILED_ALERT_EMAIL_TO_ADMIN );
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.PAYMENT_FAILED_MAIL_SUBJECT;
 
@@ -3095,204 +3105,53 @@ public class EmailServicesImpl implements EmailServices
     {
 
         LOG.info( "method sendMonthlyDigestMail() started" );
-        validateDigestAggregate( digestAggregate );
+        digestMailHelper.validateDigestAggregate( digestAggregate, false );
 
         String emails = StringUtils.join( digestAggregate.getRecipientMailIds(), "," );
         LOG.debug( "Sending Monthly digest/snapshot email to : {}", emails );
 
 
-        EmailEntity emailEntity = prepareEmailEntityForSendingEmail(
-            new ArrayList<String>( digestAggregate.getRecipientMailIds() ) );
-        String monthYearForDisplay = StringUtils.capitalize( digestAggregate.getMonthUnderConcern() ) + " "
-            + digestAggregate.getYearUnderConcern();
-        FileContentReplacements messageSubjectReplacements = new FileContentReplacements();
-        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
-        List<String> messageBodyReplacementsList = new ArrayList<>();
+        // prepare Email Entity for all digest recipients 
+        for ( String digestRecipient : digestAggregate.getRecipientMailIds() ) {
+
+            if ( StringUtils.isNotEmpty( digestRecipient ) ) {
+
+                EmailEntity emailEntity = prepareEmailEntityForSendingEmail( Arrays.asList( digestRecipient ) );
+
+                FileContentReplacements messageSubjectReplacements = new FileContentReplacements();
+                FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+                List<String> messageSubjectReplacementsList = new ArrayList<>();
+                List<String> messageBodyReplacementsList = new ArrayList<>();
+
+                // setup message and body replacements
+                messageSubjectReplacements
+                    .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.DIGEST_MAIL_SUBJECT );
+                messageSubjectReplacements.setReplacementArgs( messageSubjectReplacementsList );
+
+                messageBodyReplacements
+                    .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.DIGEST_MAIL_BODY );
+                messageBodyReplacements.setReplacementArgs( messageBodyReplacementsList );
 
 
-        // setup message and body replacements
-        messageSubjectReplacements
-            .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.DIGEST_MAIL_SUBJECT );
-        messageSubjectReplacements.setReplacementArgs( Arrays.asList( monthYearForDisplay ) );
+                digestMailHelper.buildDigestMailReplacents( digestAggregate, messageSubjectReplacementsList,
+                    messageBodyReplacementsList, digestRecipient, false );
 
-        messageBodyReplacements
-            .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.DIGEST_MAIL_BODY );
-        messageBodyReplacements.setReplacementArgs( messageBodyReplacementsList );
+                emailEntity.setMailType( CommonConstants.EMAIL_TYPE_MONTHLY_DIGEST_MAIL );
 
+                LOG.debug( "Calling email sender to send digest mail to {}", digestAggregate );
+                sendEmailWithSubjectAndBodyReplacements( emailEntity, messageSubjectReplacements, messageBodyReplacements,
+                    false, false );
 
-        // user ranking display toggle
-        messageBodyReplacementsList
-            .add( StringUtils.isEmpty( digestAggregate.getUserRankingHtmlRows() ) ? "display:none;" : "" );
-
-        messageBodyReplacementsList.add( applicationWordPressSite );
-        messageBodyReplacementsList.add( appNewLogoUrl );
-        messageBodyReplacementsList.add( digestAggregate.getEntityName() );
-        messageBodyReplacementsList.add( monthYearForDisplay );
-
-        // adding average rating score data
-        messageBodyReplacementsList
-            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getAverageScoreRatingIcon() ) );
-        messageBodyReplacementsList
-            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getAverageScoreRating() ) );
-        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getUserCount() ) );
-        messageBodyReplacementsList
-            .add( StringUtils.upperCase( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getMonth() ) ) );
-
-        messageBodyReplacementsList
-            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getAverageScoreRatingIcon() ) );
-        messageBodyReplacementsList
-            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getAverageScoreRating() ) );
-        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getUserCount() ) );
-        messageBodyReplacementsList
-            .add( StringUtils.upperCase( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getMonth() ) ) );
-
-        messageBodyReplacementsList
-            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getAverageScoreRatingIcon() ) );
-        messageBodyReplacementsList
-            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getAverageScoreRating() ) );
-        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getUserCount() ) );
-        messageBodyReplacementsList
-            .add( StringUtils.upperCase( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getMonth() ) ) );
-
-        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getAvgRatingTxt() ) );
-
-
-        // adding survey completion rate data
-        messageBodyReplacementsList
-            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getSurveyCompletionRateIcon() ) );
-        messageBodyReplacementsList
-            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getSurveyCompletionRate() ) );
-        messageBodyReplacementsList
-            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getCompletedTransactions() ) );
-        messageBodyReplacementsList
-            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getTotalTransactions() ) );
-        messageBodyReplacementsList
-            .add( StringUtils.upperCase( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getMonth() ) ) );
-
-        messageBodyReplacementsList
-            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getSurveyCompletionRateIcon() ) );
-        messageBodyReplacementsList
-            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getSurveyCompletionRate() ) );
-        messageBodyReplacementsList
-            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getCompletedTransactions() ) );
-        messageBodyReplacementsList
-            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getTotalTransactions() ) );
-        messageBodyReplacementsList
-            .add( StringUtils.upperCase( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getMonth() ) ) );
-
-        messageBodyReplacementsList
-            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getSurveyCompletionRateIcon() ) );
-        messageBodyReplacementsList
-            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getSurveyCompletionRate() ) );
-        messageBodyReplacementsList
-            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getCompletedTransactions() ) );
-        messageBodyReplacementsList
-            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getTotalTransactions() ) );
-        messageBodyReplacementsList
-            .add( StringUtils.upperCase( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getMonth() ) ) );
-
-        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getSurveyPercentageTxt() ) );
-
-
-        // adding satisfaction rating data
-        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getSpsIcon() ) );
-        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getSps() ) );
-        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getPromoters() ) );
-        messageBodyReplacementsList
-            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getDetractors() ) );
-        messageBodyReplacementsList
-            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getTotalCompletedReviews() ) );
-        messageBodyReplacementsList
-            .add( StringUtils.upperCase( StringUtils.defaultString( digestAggregate.getDigestList().get( 2 ).getMonth() ) ) );
-
-        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getSpsIcon() ) );
-        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getSps() ) );
-        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getPromoters() ) );
-        messageBodyReplacementsList
-            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getDetractors() ) );
-        messageBodyReplacementsList
-            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getTotalCompletedReviews() ) );
-        messageBodyReplacementsList
-            .add( StringUtils.upperCase( StringUtils.defaultString( digestAggregate.getDigestList().get( 1 ).getMonth() ) ) );
-
-        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getSpsIcon() ) );
-        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getSps() ) );
-        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getPromoters() ) );
-        messageBodyReplacementsList
-            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getDetractors() ) );
-        messageBodyReplacementsList
-            .add( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getTotalCompletedReviews() ) );
-        messageBodyReplacementsList
-            .add( StringUtils.upperCase( StringUtils.defaultString( digestAggregate.getDigestList().get( 0 ).getMonth() ) ) );
-
-        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getStatisfactionRatingTxt() ) );
-
-
-        // top ten ranked users HTML
-        messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getUserRankingHtmlRows() ) );
-
-        emailEntity.setMailType(CommonConstants.EMAIL_TYPE_MONTHLY_DIGEST_MAIL);
-
-        for ( String email : digestAggregate.getRecipientMailIds() ) {
-            if ( StringUtils.isNotEmpty( email ) ) {
-                // email meta-data
-                messageBodyReplacementsList.add( StringUtils.defaultString( email ) );
-                messageBodyReplacementsList.add( StringUtils.defaultString( email ) );
-
-                LOG.debug( "Calling email sender to send digest mail to {}", email );
-                sendEmailWithSubjectAndBodyReplacements( emailEntity, messageSubjectReplacements,
-                    messageBodyReplacements, false, false );
-
-                // remove email from body replacements list
-                messageBodyReplacementsList.remove( messageBodyReplacementsList.size() - 1 );
-                messageBodyReplacementsList.remove( messageBodyReplacementsList.size() - 1 );
             } else {
-                LOG.warn( "Unable to send digest email to {}", email );
+                LOG.debug( "empty digest recipient found in email list." );
             }
         }
+
         LOG.debug( "Successfully sent Monthly digest/snapshot mail" );
 
     }
 
 
-    private void validateDigestAggregate( MonthlyDigestAggregate digestAggregate ) throws InvalidInputException
-    {
-        if ( digestAggregate == null ) {
-            LOG.error( "sendMonthlyDigestMail(): Digest Aggregate object is null" );
-            throw new InvalidInputException( "Data for the monthly digest/snapshot mail is missing." );
-        }
-        if ( digestAggregate.getEntityId() < 1 ) {
-            LOG.error( "Entity ID must be greater that one for Monthly digest/snapshot mail " );
-            throw new InvalidInputException( "Entity ID cannot be less than one for Monthly digest/snapshot mail." );
-        }
-        if ( digestAggregate.getRecipientMailIds() == null || digestAggregate.getRecipientMailIds().isEmpty() ) {
-            LOG.error( "Recipient email Id list is empty or null for Monthly digest/snapshot mail " );
-            throw new InvalidInputException( "Recipient email Id list is empty or null for Monthly digest/snapshot mail." );
-        }
-
-        if ( digestAggregate.getDigestList() == null || digestAggregate.getDigestList().size() != 3 ) {
-            LOG.error( "Digest data for three months required." );
-            throw new InvalidInputException( "Digest data for three months required." );
-        }
-
-        if ( StringUtils.isEmpty( digestAggregate.getEntityName() ) ) {
-            LOG.error( "Entity name for the digest not specified." );
-            throw new InvalidInputException( "Entity name for the digest not specified." );
-        }
-
-        if ( StringUtils.isEmpty( digestAggregate.getMonthUnderConcern() ) ) {
-            LOG.error( "Month for the digest not specified." );
-            throw new InvalidInputException( "Month for the digest not specified." );
-        }
-
-        if ( StringUtils.isEmpty( digestAggregate.getYearUnderConcern() ) ) {
-            LOG.error( "Year for the digest not specified." );
-            throw new InvalidInputException( "Year for the digest not specified." );
-        }
-
-    }
-
-    
     @Async
     @Override
     public void sendDigestErrorMailForCompany( DigestRequestData digestRequest, String stackTrace )
@@ -3351,7 +3210,7 @@ public class EmailServicesImpl implements EmailServices
         LOG.debug( "Sending survey csv upload unsuccessful email to : " + applicationAdminEmail );
 
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( applicationAdminEmail );
-        emailEntity.setMailType(CommonConstants.EMAIL_TYPE_UNSUCCESSFUL_SURVEY_CSV_UPLOAD_MAIL_TO_ADMIN);
+        emailEntity.setMailType( CommonConstants.EMAIL_TYPE_UNSUCCESSFUL_SURVEY_CSV_UPLOAD_MAIL_TO_ADMIN );
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SURVEY_CSV_UPLOAD_UNSUCCESSFUL_ADMIN_SUBJECT;
 
@@ -3393,7 +3252,7 @@ public class EmailServicesImpl implements EmailServices
         LOG.debug( "Sending survey csv upload unsuccessful email to : " + csvInfo.getUploaderEmail() );
 
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( csvInfo.getUploaderEmail() );
-        emailEntity.setMailType(CommonConstants.EMAIL_TYPE_UNSUCCESSFUL_SURVEY_CSV_UPLOAD_MAIL_TO_UPLOADER);
+        emailEntity.setMailType( CommonConstants.EMAIL_TYPE_UNSUCCESSFUL_SURVEY_CSV_UPLOAD_MAIL_TO_UPLOADER );
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SURVEY_CSV_UPLOAD_UNSUCCESSFUL_AGENT_SUBJECT;
 
@@ -3431,7 +3290,7 @@ public class EmailServicesImpl implements EmailServices
         LOG.debug( "Sending survey csv upload unsuccessful email to : " + csvInfo.getUploaderEmail() );
 
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( csvInfo.getUploaderEmail() );
-        emailEntity.setMailType(CommonConstants.EMAIL_TYPE_SUCCESSFUL_SURVEY_CSV_UPLOAD_MAIL_TO_UPLOADER);
+        emailEntity.setMailType( CommonConstants.EMAIL_TYPE_SUCCESSFUL_SURVEY_CSV_UPLOAD_MAIL_TO_UPLOADER );
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SURVEY_CSV_UPLOAD_SUCCESSFUL_SUBJECT;
 

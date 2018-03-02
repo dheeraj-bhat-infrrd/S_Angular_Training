@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.dao.impl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -36,6 +37,7 @@ import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
 import com.realtech.socialsurvey.core.entities.ProfileUrlEntity;
+import com.realtech.socialsurvey.core.entities.SavedDigestRecord;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -124,6 +126,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_ABUSIVE_EMAIL_SETTING = "survey_settings.abusive_mail_settings";
     public static final String KEY_COMPLAINT_RESOLUTION_SETTING = "survey_settings.complaint_res_settings";
 
+    public static final String KEY_SAVED_DIGEST_RECORD = "savedDigestRecords";
 
     @Value ( "${CDN_PATH}")
     private String amazonEndPoint;
@@ -1194,5 +1197,33 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         LOG.info( "method fetchCompaniesByAlertType finished for alertType {} and companyIds {}", alertType, companyIds );
        
         return settingsList;
+    }
+
+
+    @Override
+    public void saveDigestRecord( String profileLevel, long entityId, SavedDigestRecord digestRecord ) throws InvalidInputException
+    {
+        LOG.debug( "Method saveDigestRecord() to update digest record list started." );
+        
+        String collectionName = null;
+        
+        if ( CommonConstants.PROFILE_LEVEL_COMPANY.equals( profileLevel ) ) {
+            collectionName = CommonConstants.COMPANY_SETTINGS_COLLECTION;
+        } else if ( CommonConstants.PROFILE_LEVEL_COMPANY.equals( profileLevel ) ) {
+            collectionName = CommonConstants.REGION_SETTINGS_COLLECTION;
+        } else if ( CommonConstants.PROFILE_LEVEL_COMPANY.equals( profileLevel ) ) {
+            collectionName = CommonConstants.BRANCH_SETTINGS_COLLECTION;
+        } else {
+            LOG.warn( "Invalid profile type" );
+            throw new InvalidInputException( "Invalid profile type" );
+        }
+        
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_IDEN ).is( entityId ) );
+        Update update = new Update();
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, System.currentTimeMillis() );
+        update.push( KEY_SAVED_DIGEST_RECORD, digestRecord );
+        mongoTemplate.updateMulti( query, update, collectionName );
+        LOG.debug( "Method saveDigestRecord() to update digest record list started." );
     }
 }

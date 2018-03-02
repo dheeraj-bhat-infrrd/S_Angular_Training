@@ -1005,6 +1005,8 @@ public interface CommonConstants
     public static final int FILE_UPLOAD_REPORTING_BRANCH_RANKING_MONTHLY_REPORT = 112;
     public static final int FILE_UPLOAD_REPORTING_BRANCH_RANKING_YEARLY_REPORT = 113;
     
+    public static final int FILE_UPLOAD_REPORTING_DIGEST = 200;
+    
     //Generating survey invitation email report through storm
     public static final int FILE_UPLOAD_SURVEY_INVITATION_EMAIL_REPORT = 1001;
 
@@ -1589,4 +1591,32 @@ public interface CommonConstants
 
     //failed stream message mongo batch size
     public static final  int FAILED_STREAM_MSGS_BATCH_SIZE = 100;
+
+    public static final String DIGEST_USER_RANKING_COLUMN = "Company Ranking";
+
+    public static final String DIGEST_USER_NAME_COLUMN = "Name";
+
+    public static final String DIGEST_AVG_SCORE_COLUMN = "Average Score";
+
+    public static final String DIGEST_REVIEWS_COLUMN = "Reviews";
+
+    public static final String DIGEST_USER_RANKING_TITLE = "Top Users";
+
+    public static final String DIGEST_USER_RANKING_DESC =  "Congratulations to your top performers";
+
+    public static final int DEFAULT_NPS_QUESTION_ORDER = 999;
+
+    public static final String DIGEST_NPS_SECTION_TITLE = "NPS Rating";
+
+    public static final String DIGEST_NPS_SECTION_DESC = "Your NPS rating is calculated by Promoters minus detractors based on the response to the NPS question over Total surveys completed that included the NPS question.";
+
+    public static final String TOTAL = "Total";
+
+    public static final String RIGHT = "right";
+
+    public static final String CENTER = "center";
+
+    public static final String LEFT = "left";
+
+    public static final String DIGEST_MAIL_NPS_TEXT = "NPS";
 }

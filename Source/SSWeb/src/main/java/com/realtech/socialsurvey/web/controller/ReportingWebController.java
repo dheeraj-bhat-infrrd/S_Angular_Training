@@ -535,6 +535,8 @@ public class ReportingWebController
         int reportId = Integer.parseInt( reportIdString );
         String actualTimeZoneString = request.getParameter("clientTimeZone");
         int actualTimeZoneOffset = Integer.parseInt( actualTimeZoneString );
+        String digestMonthValueStr = request.getParameter("digestMonthValue");
+        int DigestMonthValue = Integer.parseInt( digestMonthValueStr );
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
         Company company = user.getCompany();

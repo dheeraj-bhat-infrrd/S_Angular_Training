@@ -1410,7 +1410,7 @@ $(document).on('change', '#generate-survey-reports', function() {
 	
 	var selectedVal = $('#generate-survey-reports').val();
 	var key = parseInt(selectedVal);
-	if(key == 101 || key == 102 || key == 103 || key == 106 || key == 110 || key == 112){
+	if(key == 101 || key == 102 || key == 103 || key == 106 || key == 110 || key == 112 || key == 200 ){
 		$('#date-pickers').hide();
 	}else{
 		$('#date-pickers').show();
@@ -1428,6 +1428,13 @@ $(document).on('change', '#generate-survey-reports', function() {
 	}else{
 		$('#nps-report-time-div').addClass('hide');
 	}
+	
+	if( key == 200 ){
+		$('#digest-time-div').removeClass('hide');
+	} else {
+		$('#digest-time-div').addClass('hide');
+	}
+	
 });
 
 function setNpsTimeFrames(){
@@ -1581,10 +1588,15 @@ $(document).on('click', '#reports-generate-report-btn', function(e) {
 	var key = parseInt(selectedValue);
 	var startDate = $('#dsh-start-date').val();
 	var endDate = $("#dsh-end-date").val();
+	var digestMonthValue = 0;
 	var npsTimeFrame = parseInt($('#nps-report-time-selector').val());
 	var d = new Date();
 	var clientTimeZone = d.getTimezoneOffset();
 
+	if( key == 200 ){
+		digestMonthValue = $('#digest-time-selector').val()
+	}
+	
 	if(key == 106){
 		startDate = getTimeFrameForUserRankingReport();
 		var timeFrameStr = $('#report-time-selector').val();
@@ -1637,7 +1649,7 @@ $(document).on('click', '#reports-generate-report-btn', function(e) {
 			"startDate" : startDate,
 			"endDate" : endDate,
 			"reportId" : key,
-			"clientTimeZone": clientTimeZone
+			"clientTimeZone": clientTimeZone,
 		};
 	
 	showOverlay();
