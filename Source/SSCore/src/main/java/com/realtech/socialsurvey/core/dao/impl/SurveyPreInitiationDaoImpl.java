@@ -924,13 +924,13 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 		String queryStr = "select u.USER_ID,count(spi.SURVEY_PRE_INITIATION_ID) as c,u.COMPANY_ID,"
 				+ "concat(u.FIRST_NAME,' ',coalesce(u.LAST_NAME,'')) as agent_name,u.EMAIL_ID from USERS u "
 				+ "left join SURVEY_PRE_INITIATION spi on u.user_id=spi.agent_id and u.status in (1,2) "
-				+ "and spi.survey_source not in ('3rd Party Review') and spi.created_on between ? and ? "
-				+ "and spi.agent_id != 0 group by u.user_id limit ?:?";
+				+ "and spi.survey_source not in ('3rd Party Review') and spi.created_on between :startdate and :endDate "
+				+ "and spi.agent_id != 0 group by u.user_id";
 		Query query = getSession().createSQLQuery(queryStr);
-		query.setParameter(0, startDate);
-		query.setParameter(1, endDate);
-		query.setParameter(2, startIndex);
-		query.setParameter(3, batchSize);
+		query.setParameter("startdate", startDate);
+		query.setParameter("endDate", endDate);
+		query.setFirstResult(startIndex);
+		query.setFetchSize(batchSize);
 		LOG.debug("query to fetch data for email report : {}", query.toString());
 		return query.list();
 	}

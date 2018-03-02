@@ -4845,6 +4845,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 	@Override
 	public String generateSurveyInvitationEmailReport(long companyId, String entityType, long adminUserId,
 			Timestamp startDate) throws UnsupportedEncodingException, NonFatalException {
+		LOG.info("Generating survey invitation email report.");
 		User user = userManagementService.getUserByUserId(adminUserId);
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(startDate.getTime());
