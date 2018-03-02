@@ -8962,7 +8962,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if( user != null ) {
             try {
                 for( SurveyQuestionDetails survey : surveyBuilder.getAllActiveQuestionsOfMappedSurvey( user ) ) {
-                    if( survey.getQuestionOrder() == CommonConstants.DEFAULT_NPS_QUESTION_ORDER ) {
+                    if( survey.getIsNPSQuestion() == CommonConstants.ONE ) {
                         return true;
                     }
                 }
