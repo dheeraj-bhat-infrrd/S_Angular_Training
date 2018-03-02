@@ -3262,8 +3262,12 @@ function showOverviewTab(){
 }
 
 function autoRefresh(tableHeaderData){
-
 	setTimeout(function(){
+		
+		if($('#reports_page_container').length<=0){
+			return;
+		}
+		
 		var recentActivityCount=getRecentActivityCount();
 		drawRecentActivity(0,10,tableHeaderData);
 		showHidePaginateButtons(0, recentActivityCount);
