@@ -157,7 +157,8 @@ public class APIOperations
 			List<String> facetPivots, int facetLimit, int facetMinCount) {
         Response<JsonObject> response = null;
         Call<JsonObject> requestCall = RetrofitApiBuilder.apiBuilderInstance()
-                        .getSolrAPIIntergrationService().getEmailCounts(query, fieldQuery, 0, "json", isFacet, facetField, facetPivots,
+                        .getSolrAPIIntergrationServiceWithIncreasedTimeout()
+                        .getEmailCounts(query, fieldQuery, 0, "json", isFacet, facetField, facetPivots,
                         		facetLimit, facetMinCount);
                 try {
 					response =  requestCall.execute();
