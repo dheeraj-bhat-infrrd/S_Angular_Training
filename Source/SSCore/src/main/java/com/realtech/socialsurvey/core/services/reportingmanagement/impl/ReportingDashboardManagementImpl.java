@@ -10,6 +10,7 @@ import java.net.URLEncoder;
 import java.sql.Timestamp;
 import java.text.DateFormatSymbols;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TimeZone;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
@@ -48,6 +50,7 @@ import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.CompanyDetailsReportDao;
 import com.realtech.socialsurvey.core.dao.CompanyUserReportDao;
 import com.realtech.socialsurvey.core.dao.FileUploadDao;
+import com.realtech.socialsurvey.core.dao.GenericReportingDao;
 import com.realtech.socialsurvey.core.dao.NpsReportMonthDao;
 import com.realtech.socialsurvey.core.dao.NpsReportWeekDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -61,6 +64,8 @@ import com.realtech.socialsurvey.core.dao.ScoreStatsQuestionBranchDao;
 import com.realtech.socialsurvey.core.dao.ScoreStatsQuestionCompanyDao;
 import com.realtech.socialsurvey.core.dao.ScoreStatsQuestionRegionDao;
 import com.realtech.socialsurvey.core.dao.ScoreStatsQuestionUserDao;
+import com.realtech.socialsurvey.core.dao.SurveyInvitationEmailDao;
+import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.dao.SurveyResponseTableDao;
 import com.realtech.socialsurvey.core.dao.SurveyResultsCompanyReportDao;
 import com.realtech.socialsurvey.core.dao.SurveyResultsReportBranchDao;
@@ -107,7 +112,6 @@ import com.realtech.socialsurvey.core.entities.NpsReportWeek;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RankingRequirements;
 import com.realtech.socialsurvey.core.entities.Region;
-import com.realtech.socialsurvey.core.entities.ReportRequest;
 import com.realtech.socialsurvey.core.entities.ReportingSurveyPreInititation;
 import com.realtech.socialsurvey.core.entities.ScoreStatsOverallBranch;
 import com.realtech.socialsurvey.core.entities.ScoreStatsOverallCompany;
@@ -117,6 +121,7 @@ import com.realtech.socialsurvey.core.entities.ScoreStatsQuestionBranch;
 import com.realtech.socialsurvey.core.entities.ScoreStatsQuestionCompany;
 import com.realtech.socialsurvey.core.entities.ScoreStatsQuestionRegion;
 import com.realtech.socialsurvey.core.entities.ScoreStatsQuestionUser;
+import com.realtech.socialsurvey.core.entities.SurveyInvitationEmailCountMonth;
 import com.realtech.socialsurvey.core.entities.SurveyResultsCompanyReport;
 import com.realtech.socialsurvey.core.entities.SurveyResultsReportBranch;
 import com.realtech.socialsurvey.core.entities.SurveyResultsReportRegion;
@@ -148,7 +153,6 @@ import com.realtech.socialsurvey.core.enums.EntityWarningAlertType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
-import com.realtech.socialsurvey.core.integration.stream.StreamApiIntegrationBuilder;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
@@ -321,7 +325,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     private ReportingSurveyPreInititationDao reportingSurveyPreInititationDao;
     
     @Autowired
-    private StreamApiIntegrationBuilder streamApiIntegrationBuilder;
+    private SurveyInvitationEmailDao surveyInvitationEmailDao;
 
     @Autowired
     private NpsReportWeekDao npsReportWeekDao;
@@ -340,6 +344,12 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
     @Autowired
     private OverviewManagement overviewManagement;
+    
+    @Autowired
+    private SurveyPreInitiationDao surveyPreInitiationDao;
+    
+    @Autowired
+    private GenericReportingDao<SurveyInvitationEmailCountMonth, Long> surveyEmailCountMonthDao;
 
     @Value ( "${FILE_DIRECTORY_LOCATION}")
     private String fileDirectoryLocation;
@@ -438,11 +448,6 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         fileUpload.setStatus( CommonConstants.STATUS_PENDING );
         fileUpload.setShowOnUI( true );
 		fileUpload = fileUploadDao.save(fileUpload);
-        if ( reportId == CommonConstants.FILE_UPLOAD_SURVEY_INVITATION_EMAIL_REPORT ) {
-            ReportRequest reportRequest = new ReportRequest();
-            reportRequest.transform( fileUpload, actualTimeZoneOffset );
-            streamApiIntegrationBuilder.getStreamApi().generateEmailReport( reportRequest );
-        }
     }
 
 
@@ -4786,5 +4791,115 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 		}
 		
 		return branchRankingYearDao.getBranchRankingForYear(companyId,year);
+	}
+
+
+	@Override
+	public List<SurveyInvitationEmailCountMonth> getReceivedCountsMonth(long startDate, long endDate, int startIndex, int batchSize)
+			throws ParseException {
+		List<SurveyInvitationEmailCountMonth> receivedCountMonth = new ArrayList<SurveyInvitationEmailCountMonth>();
+		Calendar cal = Calendar.getInstance();
+		cal.setTimeInMillis(startDate);
+		int month = cal.get(Calendar.MONTH) + 1;
+		int year = cal.get(Calendar.YEAR);
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+		String startDateStr = sdf.format(new Date(startDate));
+		String endDateStr = sdf.format(new Date(endDate));
+		LOG.info("start date {} and end date {}",startDateStr,endDateStr);
+		List<Object[]> receivedCount = surveyPreInitiationDao.getReceivedCountForDate(startDateStr, endDateStr,
+				startIndex, batchSize);
+		LOG.info("Db returned row count : {}",receivedCount.size());
+		for (Object[] obj : receivedCount) {
+			if(obj[0] !=null && obj[1]!=null && obj[2] !=null) {
+				SurveyInvitationEmailCountMonth mailCount = new SurveyInvitationEmailCountMonth();
+				mailCount.setAgentId(new Long(obj[0].toString()));
+				mailCount.setReceived(new Long(obj[1].toString()));
+				mailCount.setCompanyId(new Long(obj[2].toString()));
+				mailCount.setMonth(month);
+				mailCount.setYear(year);
+				mailCount.setAgentName((String)obj[3]);
+				mailCount.setEmailId((String)obj[4]);
+				receivedCountMonth.add(mailCount);
+			}
+		}
+		return receivedCountMonth;
+
+	}
+
+	@Override
+	@Transactional
+	public boolean saveEmailCountMonthData(List<SurveyInvitationEmailCountMonth> agentEmailCountsMonth) {
+		try {
+			surveyEmailCountMonthDao.saveAll(agentEmailCountsMonth);
+			LOG.info("Survey invitaion email count data saved to db.");
+			return true;
+		} catch (Exception e) {
+			LOG.error("Exception occured while saving survey invitation email count to db.");
+			return false;
+		}
+	}
+
+
+	@Override
+	public String generateSurveyInvitationEmailReport(long companyId, String entityType, long adminUserId,
+			Timestamp startDate) throws UnsupportedEncodingException, NonFatalException {
+		LOG.info("Generating survey invitation email report.");
+		User user = userManagementService.getUserByUserId(adminUserId);
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTimeInMillis(startDate.getTime());
+		int year = calendar.get(Calendar.YEAR);
+		int month = calendar.get(Calendar.MONTH) + 1;
+		String monthStr = new DateFormatSymbols().getMonths()[month-1];
+		String fileName = "Email_Message_Report_Month_" + monthStr + "_" +
+				 user.getFirstName() + " " + user.getLastName() +
+				 ( Calendar.getInstance().getTimeInMillis() ) +
+				 CommonConstants.EXCEL_FILE_EXTENSION;
+		XSSFWorkbook workbook = this.downloadSurveyInvitationEmailReport(companyId, entityType, year, month);
+		return this.createExcelFileAndSaveInAmazonS3(fileName, workbook);
+	}
+
+
+	private XSSFWorkbook downloadSurveyInvitationEmailReport(long companyId, String entityType, int year, int month) {
+		Response response = ssApiBatchIntergrationBuilder.getIntegrationApi().getSurveyInvitationEmailReport(companyId,
+				month, year);
+		String responseString = response != null ? new String(((TypedByteArray) response.getBody()).getBytes()) : null;
+		if (responseString != null) {
+			// since the string has ""abc"" an extra quote
+			responseString = responseString.substring(1, responseString.length() - 1);
+			// Escape characters
+			responseString = StringEscapeUtils.unescapeJava(responseString);
+		}
+		List<SurveyInvitationEmailCountMonth> surveyInvitationEmailCountMonth = null;
+		Type listType = new TypeToken<List<SurveyInvitationEmailCountMonth>>() {
+		}.getType();
+		surveyInvitationEmailCountMonth = new Gson().fromJson(responseString, listType);
+		Map<Integer, List<Object>> data = workbookData.getSurveyInvitationEmailReportInSheet(surveyInvitationEmailCountMonth);
+		return workbookOperations.createWorkbook(data);
+	}
+
+
+	@Override
+	public List<SurveyInvitationEmailCountMonth> getSurveyInvitationEmailReportForMonth(long companyId, int month, int year) {
+		List<SurveyInvitationEmailCountMonth> mailCountReport = new ArrayList<SurveyInvitationEmailCountMonth>();
+		List<Object[]> reportList = surveyInvitationEmailDao.getSurveyInvitationEmailReportForMonth(companyId,month,year);
+		for(Object[] obj : reportList) {
+			SurveyInvitationEmailCountMonth reportObj = new SurveyInvitationEmailCountMonth();
+			reportObj.setAgentName((String)obj[0]);
+			reportObj.setEmailId((String)obj[1]);
+			reportObj.setBranchName((String)obj[2]);
+			reportObj.setRegionName((String)obj[3]);
+			reportObj.setReceived(new Long(obj[4].toString()));
+			reportObj.setAttempted(new Long(obj[5].toString()));
+			reportObj.setDelivered(new Long(obj[6].toString()));
+			reportObj.setBounced(new Long(obj[7].toString()));
+			reportObj.setDiffered(new Long(obj[8].toString()));
+			reportObj.setOpened(new Long(obj[9].toString()));
+			reportObj.setLinkClicked(new Long(obj[10].toString()));
+			reportObj.setDropped(new Long(obj[11].toString()));
+			mailCountReport.add(reportObj);
+		}
+		return mailCountReport;
 	}
 }

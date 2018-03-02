@@ -15,6 +15,8 @@ public class ReportRequest implements Serializable
     private long companyId;
     private String actualTimeZone;
     private String expectedTimeZone;
+    private long startTime;
+	private long endTime;
 
 
     public long getFileUploadId()
@@ -124,15 +126,36 @@ public class ReportRequest implements Serializable
         this.expectedTimeZone = expectedTimeZone;
     }
 
+    public long getStartTime() {
+		return startTime;
+	}
 
-    @Override
-    public String toString()
-    {
-        return "ReportRequest [fileUploadId=" + fileUploadId + ", reportType=" + reportType + ", startDateExpectedTimeZone="
-            + startDateExpectedTimeZone + ", endDateExpectedTimeZone=" + endDateExpectedTimeZone + ", profileLevel="
-            + profileLevel + ", profileValue=" + profileValue + ", companyId=" + companyId + ", actualTimeZone="
-            + actualTimeZone + ", expectedTimeZone=" + expectedTimeZone + "]";
-    }
+
+	public void setStartTime(long startTime) {
+		this.startTime = startTime;
+	}
+
+
+	public long getEndTime() {
+		return endTime;
+	}
+
+
+	public void setEndTime(long endTime) {
+		this.endTime = endTime;
+	}
+
+
+	@Override
+	public String toString() {
+		return "ReportRequest [fileUploadId=" + fileUploadId + ", reportType=" + reportType
+				+ ", startDateExpectedTimeZone=" + startDateExpectedTimeZone + ", endDateExpectedTimeZone="
+				+ endDateExpectedTimeZone + ", profileLevel=" + profileLevel + ", profileValue=" + profileValue
+				+ ", companyId=" + companyId + ", actualTimeZone=" + actualTimeZone + ", expectedTimeZone="
+				+ expectedTimeZone + ", startTime=" + startTime + ", endTime=" + endTime + "]";
+	}
+
+
 
 
 }

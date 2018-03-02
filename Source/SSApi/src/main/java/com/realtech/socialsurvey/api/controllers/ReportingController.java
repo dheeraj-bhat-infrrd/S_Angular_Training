@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.api.controllers;
 
 import java.sql.Timestamp;
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.api.models.response.FileUploadResponse;
+import com.realtech.socialsurvey.core.entities.SurveyInvitationEmailCountMonth;
 import com.realtech.socialsurvey.core.entities.CompanyActiveUsersStats;
 import com.realtech.socialsurvey.core.entities.DigestRequestData;
 import com.realtech.socialsurvey.core.entities.CompanyDetailsReport;
@@ -31,6 +33,7 @@ import com.realtech.socialsurvey.core.services.reportingmanagement.DashboardGrap
 import com.realtech.socialsurvey.core.services.reportingmanagement.OverviewManagement;
 import com.realtech.socialsurvey.core.services.reportingmanagement.ReportingDashboardManagement;
 import com.wordnik.swagger.annotations.ApiOperation;
+
 
 
 @RestController
@@ -801,7 +804,7 @@ public class ReportingController
     
     
     @RequestMapping ( value = "/branchranking/month/year", method = RequestMethod.GET)
-    @ApiOperation ( value = "get nps report for a week or month")
+    @ApiOperation ( value = "get branch ranking report for month and year.")
     public String getBranchRankingReport( long companyId, int month, int year, int type ) throws InvalidInputException
     {
         String json = null;
@@ -814,5 +817,40 @@ public class ReportingController
             json = new Gson().toJson( reportingDashboardManagement.getBranchRankingReportForYear( companyId, year ) );
         }
         return json;
+    }
+    
+    @RequestMapping ( value = "/trxcount/agent", method = RequestMethod.GET)
+    @ApiOperation ( value = "get received count for agents.")
+    public List<SurveyInvitationEmailCountMonth> getReceivedCountsMonth(long startDateInGmt, long endDateInGmt,
+    		int startIndex, int batchSize) {
+    	LOGGER.info("API call for fetching transaction received count for each agent with date range.");
+    	try {
+    		List<SurveyInvitationEmailCountMonth> mailCount = reportingDashboardManagement.getReceivedCountsMonth(startDateInGmt,endDateInGmt,
+    				startIndex,batchSize);
+    		LOGGER.info("Fetched {} no of records",mailCount.size());
+    		return mailCount;
+		} catch (ParseException e) {
+			LOGGER.error("Error getting received count.",e);
+		} 
+    	return null;
+    }
+    @RequestMapping( value = "/agentEmailCountsMonth", method = RequestMethod.POST)
+    @ApiOperation(value = "Save the agent email counts data for month.")
+    public ResponseEntity<Boolean> saveEmailCountMonthData(@RequestBody List<SurveyInvitationEmailCountMonth> agentEmailCountsMonth) {
+    	LOGGER.info("API call to save agent email count data for month");
+    	boolean status = reportingDashboardManagement.saveEmailCountMonthData(agentEmailCountsMonth);
+    	ResponseEntity<Boolean> responseEntity = null;
+    	if(status) {
+    		responseEntity = new ResponseEntity<Boolean>(status,HttpStatus.OK);
+    	} else {
+    		responseEntity = new ResponseEntity<Boolean>(status,HttpStatus.INTERNAL_SERVER_ERROR);
+    	}
+    	return responseEntity;
+    }
+    @RequestMapping( value = "/emailreport/month/year", method = RequestMethod.GET)
+    @ApiOperation(value = "Get email report for month and year value.")
+    public String getSurveyInvitationEmailReport(long companyId,int month,int year) {
+    	LOGGER.info("API call to get survey invitation email report for month.");
+    	return new Gson().toJson( reportingDashboardManagement.getSurveyInvitationEmailReportForMonth( companyId, month, year ) );
     }
 }

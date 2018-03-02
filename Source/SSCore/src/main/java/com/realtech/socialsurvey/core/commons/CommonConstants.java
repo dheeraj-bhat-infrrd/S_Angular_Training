@@ -1589,4 +1589,9 @@ public interface CommonConstants
 
     //failed stream message mongo batch size
     public static final  int FAILED_STREAM_MSGS_BATCH_SIZE = 100;
+    
+    //
+    public static final String TIME_FRAME_PAST_MONTH = "PastMonth";
+    public static final String TIME_FRAME_THIS_MONTH = "ThisMonth";
+    public static final String TIME_FRAME_ALL_TIME = "AllTime";
 }

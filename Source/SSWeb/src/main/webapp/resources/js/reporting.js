@@ -1410,7 +1410,7 @@ $(document).on('change', '#generate-survey-reports', function() {
 	
 	var selectedVal = $('#generate-survey-reports').val();
 	var key = parseInt(selectedVal);
-	if(key == 101 || key == 102 || key == 103 || key == 106 || key == 110 || key == 112){
+	if(key == 101 || key == 102 || key == 103 || key == 106 || key == 110 || key == 112 || key == 1001){
 		$('#date-pickers').hide();
 	}else{
 		$('#date-pickers').show();
@@ -1427,6 +1427,12 @@ $(document).on('change', '#generate-survey-reports', function() {
 		setNpsTimeFrames();
 	}else{
 		$('#nps-report-time-div').addClass('hide');
+	}
+	
+	if(key == 1001){
+		$('#email-rep-time-div').removeClass('hide');
+	}else{
+		$('#email-rep-time-div').addClass('hide');
 	}
 });
 
@@ -1541,6 +1547,38 @@ function getTimeFrameForUserRankingReport(){
 	return dateTimeFrame;
 }
 
+function getTimeFrameForEmailReport(){
+	var currentDate = new Date();
+	var currentYear = currentDate.getFullYear();
+	var currentMonth = currentDate.getMonth()+1;
+	
+	var year = currentYear;
+	var month = currentMonth;
+	
+	var dateTimeFrame = '';
+	
+	var timeFrameStr = $('#email-rep-selector').val();
+	timeFrame = parseInt(timeFrameStr);
+	
+	switch(timeFrame){
+	case 2: year = currentYear;
+		month = currentMonth;
+		dateTimeFrame = month+"/01/"+year;
+		break;
+	
+	case 3: year = currentYear;
+		month=currentMonth -1;
+		if(month<=0){
+			month=12;
+			year--;
+		}
+		dateTimeFrame = month+"/01/"+year;
+		break;
+	}
+		
+	return dateTimeFrame;
+}
+
 function getStartAndEndDateForNps(npsTimeFrame){
 	var currentDate = new Date;
 	var currentMonth = currentDate.getMonth()+1;
@@ -1629,6 +1667,10 @@ $(document).on('click', '#reports-generate-report-btn', function(e) {
 		var npsDates = getStartAndEndDateForNps(npsTimeFrame);
 		startDate = npsDates.startDate;
 		endDate = npsDates.endDate;
+	}
+	
+	if(key == 1001){
+		startDate = getTimeFrameForEmailReport();
 	}
 	
 	var success = false;
