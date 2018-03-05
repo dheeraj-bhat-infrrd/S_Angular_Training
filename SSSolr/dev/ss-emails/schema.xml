@@ -50,6 +50,7 @@
     <field name="emailDefferedDate" type="tdate" indexed="true" stored="true" />
     <field name="emailDroppedDate" type="tdate" indexed="true" stored="true" />
     <field name="emailBlockedDate" type="tdate" indexed="true" stored="true" />
+    <field name="emailDroppedDate" type="tdate" indexed="true" stored="true" />
     <field name="emailOpenedDate" type="tdate" indexed="true" stored="true" />
     <field name="emailMarkedSpamDate" type="tdate" indexed="true" stored="true" />
     <field name="emailUnsubscribeDate" type="tdate" indexed="true" stored="true" />
@@ -61,6 +62,7 @@
     <field name="regionName" type="text" indexed="true" stored="true"/>
     <field name="surveySourceId" type="text" indexed="true" stored="true"/>
     <field name="recipientsName" type="text" indexed="true" stored="true" multiValued="true" />   
+    <field name="isRetried" type="boolean" indexed="false" stored="true" />
   </fields>
 
  <uniqueKey>randomUUID</uniqueKey>

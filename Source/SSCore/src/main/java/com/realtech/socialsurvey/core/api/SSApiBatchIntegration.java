@@ -120,4 +120,9 @@ public interface SSApiBatchIntegration
 	Response getBranchRankingReport(@Query("companyId") long companyId, @Query("month") int month,
 			@Query("year") int year, @Query("type") int type);
 
+
+	@GET("/v1/emailreport/month/year")
+	Response getSurveyInvitationEmailReport(@Query("companyId") long companyId,@Query("month") int month,
+			@Query("year") int year);
+
 }

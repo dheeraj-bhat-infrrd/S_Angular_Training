@@ -40,9 +40,25 @@
 			<c:set var="agentFirstName" value="${contact_details.firstName}"></c:set>
 		</c:if>
 	</c:if>
+	
 	<c:if test="${not empty profile.vertical}">
 		<c:set var="vertical" value="${profile.vertical}"></c:set>
 	</c:if>
+	
+	<c:if
+		test="${not empty profile.contact_details && not empty profile.contact_details.name }">
+		<c:set var="profName" value="${profile.contact_details.name }"></c:set>
+	</c:if>
+	<c:if test="${not empty title and title != ''}">
+		<c:set var="includeTitle" value=" ${firstName} is the ${title} of ${companyName}."></c:set>
+	</c:if>
+	<c:if test="${not empty location and location != '' }">
+		<c:set var="includeLocation" value=" in ${location}"></c:set>
+	</c:if>
+	<c:if test="${not empty city or not empty state or not empty country }">
+		<c:set var="includeLoc" value=" in ${city} ${state} ${country}"></c:set>
+	</c:if>
+	
 	<c:choose>
 		<c:when test="${profileLevel == 'INDIVIDUAL'}">
 			<c:if test="${not empty profile.companyProfileData}">
@@ -56,6 +72,28 @@
 	</c:choose>
 </c:if>
 
+    <c:choose>
+		<c:when test="${not empty profile.contact_details && not empty profile.contact_details.about_me && not fn:containsIgnoreCase(profile.contact_details.about_me, '<') }">
+			<c:set var="descriptionTag" value="${profile.contact_details.about_me}"></c:set>
+		</c:when>
+	<c:otherwise>
+		<c:choose>
+			<c:when test="${profileLevel == 'INDIVIDUAL'}">
+				<c:set var="descriptionTag" value="${profName} has ${reviewsCount} reviews. ${firstName} is a ${vertical} professional ${includeLocation}.${includeTitle}"></c:set>				
+			</c:when>
+			<c:when test="${profileLevel == 'REGION'}">
+				<c:set var="descriptionTag" value="${companyName} ${profName} has ${reviewsCount} reviews. ${profName} is a region for the ${vertical} company ${companyName}"></c:set>				
+			</c:when>
+			<c:when test="${profileLevel == 'BRANCH'}">
+				<c:set var="descriptionTag" value="${companyName} ${profName} has ${reviewsCount} reviews. ${profName} is a office for the ${vertical} company ${companyName}"></c:set>				
+			</c:when>
+			<c:otherwise>
+				<c:set var="descriptionTag" value="${profName} has ${reviewsCount} reviews. ${profName} is a ${vertical} company ${includeLoc}."></c:set>
+			</c:otherwise>
+		</c:choose>
+	</c:otherwise>
+	</c:choose>
+
 <!DOCTYPE>
 <html>
 <head>
@@ -66,6 +104,9 @@
 <meta http-equiv="cache-control" content="no-cache" />
 <meta http-equiv="expires" content="0" />
 <meta property="og:image" content="${profile.profileImageUrlThumbnail}" />
+<meta property="og:description" content="${descriptionTag}" />
+<meta property="og:profileLevel" content="${profileLevel}" />
+<meta property="og:title" content="${profName} ${title} ${companyName} ${location} ${vertical} Professional Reviews | SocialSurvey.me" />
 <link rel="shortcut icon" href="/favicon.ico" sizes="16x16">
 <link rel="stylesheet"
 	href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
@@ -337,13 +378,7 @@
 								</c:when>
 								<c:otherwise>
 									<div class="prof-rating clearfix">
-										<div class="prof-rating-wrapper maring-0 clearfix float-left"
-											id="rating-avg-comp">
-											<div class='rating-image float-left smiley-rat-0'></div>
-											<div class='rating-rounded float-left'>
-												<span>${floatingAverageRating}</span> -
-											</div>
-										</div>
+										<div class="st-rating-wrapper maring-0 clearfix float-left" id="rating-avg-comp"></div>
 										<div class="float-left review-count-left cursor-pointer"
 											id="prof-company-review-count">
 											<span>${reviewsCount}</span> Reviews(s)
@@ -726,6 +761,27 @@
 										</c:if>
 											</div>
 										</c:when>
+										
+										<c:when test="${profileLevel == 'BRANCH'}">
+											<div class="intro-body">
+												<c:if test="${reviewsCount > 0}">
+													<span class="capitalize">${companyProfileData.name} ${profName}</span> has ${reviewsCount} reviews.
+										</c:if>
+												<c:if test="${not empty  vertical}">
+													<span class="capitalize">${profName}</span> is a office for the ${vertical} company ${companyName}.
+										</c:if>
+											</div>
+										</c:when>
+										<c:when test="${profileLevel == 'REGION'}">
+											<div class="intro-body">
+												<c:if test="${reviewsCount > 0}">
+													<span class="capitalize">${companyProfileData.name} ${profName}</span> has ${reviewsCount} reviews.
+										</c:if>
+												<c:if test="${not empty  vertical }">
+													<span class="capitalize">${profName}</span> is a office for the ${vertical} company ${companyName}.
+										</c:if>
+											</div>
+										</c:when>
 										<c:otherwise>
 											<div class="intro-body">
 												<c:if test="${reviewsCount > 0}">
@@ -807,6 +863,8 @@
 		var reviewsSortBy = "${reviewSortCriteria}";
 		var pageUrl = "${pageUrl}";
 		var showAllReviews = false;
+		var avgRating = '${floatingAverageRating}';
+		
 		$(document).ready(function() {
 						
 			if( '${popup}' == "true" && !$('body').hasClass("overflow-hidden-important") ){
@@ -815,6 +873,8 @@
 			 	// post icons
 				buildReviewPopupShareData();
 			}
+			
+			paintAvgRatingForPpf(avgRating);
 			
 			 $('body').on('click','#dismiss-single-review-popup',function(e){
 				 

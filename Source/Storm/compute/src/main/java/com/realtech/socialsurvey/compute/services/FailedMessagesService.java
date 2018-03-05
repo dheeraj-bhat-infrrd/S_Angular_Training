@@ -44,4 +44,12 @@ public interface FailedMessagesService
      * @param reportRequest
      */
     void insertTemporaryFailedReportRequest(ReportRequest reportRequest);
+
+    /**
+     * Deletes failed email message
+     * @param emailMessage
+     */
+    int deleteFailedEmailMessage(String emailMessage);
+
+    int updateFailedEmailMessageRetryCount(String randomUUID);
 }

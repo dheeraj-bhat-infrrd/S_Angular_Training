@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.compute;
 
 import com.realtech.socialsurvey.compute.common.ComputeConstants;
 import com.realtech.socialsurvey.compute.common.EnvConstants;
+import com.realtech.socialsurvey.compute.topology.bolts.mailsender.RetryHandlerBolt;
 import com.realtech.socialsurvey.compute.topology.bolts.mailsender.SaveMailToSolrBolt;
 import com.realtech.socialsurvey.compute.topology.bolts.mailsender.SendMailBolt;
 import com.realtech.socialsurvey.compute.topology.spouts.KafkaTopicSpoutBuilder;
@@ -71,10 +72,11 @@ public class MailTopologyStarterHelper extends TopologyStarterHelper
         LOG.info( "Creating mail topology" );
         TopologyBuilder builder = new TopologyBuilder();
         // add mail kafka spout
-        builder.setSpout( "MailSenderSpout", KafkaTopicSpoutBuilder.emailTopicKafkaSpout(), 1 );
+        builder.setSpout( "MailSenderSpout", KafkaTopicSpoutBuilder.getInstance().emailTopicKafkaSpout(), 1 );
         // add bolts
         builder.setBolt( "SaveMailToSolrBolt", new SaveMailToSolrBolt(), 1 ).shuffleGrouping( "MailSenderSpout" );
         builder.setBolt( "SendMailBolt", new SendMailBolt(), 1 ).shuffleGrouping( "SaveMailToSolrBolt" );
+        builder.setBolt("RetryHandlerBolt" , new RetryHandlerBolt(), 1).shuffleGrouping("SendMailBolt");
 
         return builder.createTopology();
     }

@@ -12,6 +12,7 @@ public class AgentSettings extends OrganizationUnitSettings {
 	private String surveyUrl;
 	private String userEncryptedId;
 	private boolean allowPartnerSurvey;
+	private boolean isLoginPrevented;
 
 	public boolean isAllowPartnerSurvey()
     {
@@ -81,6 +82,14 @@ public class AgentSettings extends OrganizationUnitSettings {
 
 	public void setCompanyProfileData(CompanyProfileData companyProfileData) {
 		this.companyProfileData = companyProfileData;
+	}
+
+	public boolean isLoginPrevented() {
+		return isLoginPrevented;
+	}
+
+	public void setLoginPrevented(boolean isLoginPrevented) {
+		this.isLoginPrevented = isLoginPrevented;
 	}
 
 	@Override

@@ -418,5 +418,10 @@ public class Utils
         dateFormat.setCalendar( calendar );
         return ( dateFormat.format( date ) );
     }
+
+
+    public String formatNumber( int precision, Object... args ) {
+        return String.format( "%." + precision + "f", args);
+    }
     
 }

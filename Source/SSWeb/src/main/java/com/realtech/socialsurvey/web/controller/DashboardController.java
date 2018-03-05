@@ -33,6 +33,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.AbusiveMailSettings;
 import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileStage;
@@ -1984,6 +1985,9 @@ public class DashboardController
     {
         String reason = request.getParameter( "reportText" );
         String surveyMongoId = request.getParameter( "surveyMongoId" );
+        User user = sessionHelper.getCurrentUser();
+        user.isSuperAdmin();
+        
 
         try {
             try {
@@ -1998,7 +2002,7 @@ public class DashboardController
             }
 
             SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( surveyMongoId );
-
+            
             String customerName = surveyDetails.getCustomerFirstName() + " " + surveyDetails.getCustomerLastName();
 
             //make survey as abusive
@@ -2009,6 +2013,29 @@ public class DashboardController
             emailServices.sendReportAbuseMail( applicationSupportEmail, applicationAdminName, surveyDetails.getAgentName(),
                 customerName.replaceAll( "null", "" ), surveyDetails.getCustomerEmail(), surveyDetails.getReview(), reason,
                 null, null );
+            //send abusive mail for registered email
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(surveyDetails.getCompanyId());
+            if (companySettings.getSurvey_settings() != null && companySettings.getSurvey_settings().getAbusive_mail_settings() != null) {
+				AbusiveMailSettings abusiveMailSettings = companySettings.getSurvey_settings().getAbusive_mail_settings();
+				surveyDetails.setAbusiveNotify(true);
+				surveyHandler.updateSurveyAsAbusiveNotify(surveyDetails.get_id());
+				long agentId = surveyDetails.getAgentId();
+	            User userObj = userManagementService.getUserByUserId( agentId );
+
+
+				// SS-1435: Send survey details too.
+				// SS-715: Full customer name
+				String displayName = surveyDetails.getCustomerFirstName();
+				if (surveyDetails.getCustomerLastName() != null)
+					displayName = displayName + " " + surveyDetails.getCustomerLastName();
+				String loggedUser = user.getFirstName();
+	            Date currentDate = new Date( System.currentTimeMillis() );
+
+				if(user.getLastName() != null)
+					loggedUser = loggedUser + " " + user.getLastName();
+				emailServices.sendAbusiveNotifyMail(loggedUser, abusiveMailSettings.getMailId(), displayName,surveyDetails.getCustomerEmail(), surveyDetails.getAgentName(), 
+						userObj.getEmailId(),surveyDetails.getMood(), String.valueOf(surveyDetails.getScore()), surveyDetails.getSourceId(), surveyDetails.getReview(),currentDate.toString());
+			}
         } catch ( NonFatalException e ) {
             LOG.error( "NonfatalException caught in reportAbuse(). Nested exception is ", e );
             return CommonConstants.ERROR;

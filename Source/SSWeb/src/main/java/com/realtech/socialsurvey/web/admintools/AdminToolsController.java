@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.HierarchySettingsCompare;
@@ -30,7 +31,6 @@ import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SearchedUser;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.AdminToolsErrorCode;
-import com.realtech.socialsurvey.core.exception.AuthorizationException;
 import com.realtech.socialsurvey.core.exception.BaseRestException;
 import com.realtech.socialsurvey.core.exception.InputValidationException;
 import com.realtech.socialsurvey.core.exception.InternalServerException;
@@ -328,7 +328,7 @@ public class AdminToolsController
         LOG.debug( " method validateAuthHeader started" );
 
         if (StringUtils.isBlank( authorizationHeader )) {
-            throw new InvalidInputException( "Authorization header is null" );
+            throw new InvalidInputException( "Authorization failure. Header is null" );
         }
 
         String encodedUserPassword = authorizationHeader.replaceFirst("Basic" + " ", "");
@@ -337,7 +337,7 @@ public class AdminToolsController
         try {
              plainText = encryptionHelper.decryptAES( encodedUserPassword, "" );
         } catch ( Exception e ) {
-            throw new InvalidInputException( "Authorization failure" );
+            throw new InvalidInputException( "Authorization failure. Not a valid token" );
         }
         
         long comapnyId;
@@ -355,7 +355,7 @@ public class AdminToolsController
         }
         
         if(!isValid){
-            throw new InvalidInputException( "Authorization failure" );
+            throw new InvalidInputException( "Authorization failure. Not a valid token" );
         }
        
         LOG.debug( " method validateAuthHeader ended" );
@@ -560,4 +560,155 @@ public class AdminToolsController
 
         return response;
     }
+    
+    @ResponseBody
+    @RequestMapping ( value = "/updateuserloginprevention", method = RequestMethod.POST)
+    public Response updateUserLoginPrevention( HttpServletRequest request )
+    {
+    		LOG.info("Method updateUserLoginPrevention started");
+    		
+		try {
+			Long userId = 0l;
+			Boolean isLoginPrevented = false;
+			String authorizationHeader = request.getHeader("Authorization");
+			String userIdStr = request.getParameter("userId");
+			String isLoginPreventedStr = request.getParameter("isLoginPrevented");
+			
+			// authorize request
+			try {
+				validateAuthHeader(authorizationHeader);
+			} catch (InvalidInputException e) {
+				return Response.status(Response.Status.UNAUTHORIZED).tag(e.getMessage()).build();
+			}
+
+			// process request
+			if(StringUtils.isEmpty(isLoginPreventedStr) || (! isLoginPreventedStr.equals("true") && ! isLoginPreventedStr.equals("false")) ) {
+				throw new InvalidInputException("Wrong value passed for parameter isLoginPrevented");
+			}
+			isLoginPrevented = Boolean.parseBoolean(isLoginPreventedStr);
+			
+			try {
+				userId = Long.parseLong(userIdStr);
+			} catch (NumberFormatException e) {
+				throw new InvalidInputException("Wrong value passed for parameter userId ");
+			}
+
+			// get existing setting and update
+			AgentSettings agentSettings = organizationManagementService.getAgentSettings(userId);
+			organizationManagementService.updateIsLoginPreventedForUser(agentSettings, isLoginPrevented);
+			// update hidePublicPage as well
+			organizationManagementService.updateHidePublicPageForUser(agentSettings, isLoginPrevented);
+			
+			LOG.info("Method updateUserLoginPrevention finished");
+			return Response.status(Response.Status.CREATED).tag("Field isLoginPrevented updated for user id " + userId  + " to : " +  isLoginPrevented ).build();
+		} catch (Exception e) {
+			LOG.error("Error while updating user log in prevention field " , e);
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR ).tag(e.getMessage()).build();
+		}
+    }
+    
+    @ResponseBody
+    @RequestMapping ( value = "/manualposttolinkedin", method = RequestMethod.POST)
+    public Response manualPostToLinkedin( HttpServletRequest request )
+	{
+		LOG.info("Method manualPostToLinkedin started");
+		String authorizationHeader = request.getHeader("Authorization");
+		String surveyMongoId = request.getParameter("surveyMongoId");
+		String entityType = request.getParameter("entityType");
+		String entityIdStr = request.getParameter("entityId");
+		Long entityId = 0l;
+
+		try {
+
+			// authorize request
+			try {
+				validateAuthHeader(authorizationHeader);
+			} catch (InvalidInputException e) {
+				return Response.status(Response.Status.UNAUTHORIZED).tag(e.getMessage()).build();
+			}
+			
+			//validate request
+			try {
+				entityId = Long.parseLong(entityIdStr);
+			} catch (NumberFormatException e) {
+				throw new InvalidInputException("Wrong value passed for parameter entityId ");
+			}
+
+			if (StringUtils.isEmpty(surveyMongoId))
+				throw new InvalidInputException("Parameter surveyMongoId is missing");
+
+			if (StringUtils.isEmpty(entityType))
+				throw new InvalidInputException("Parameter entityType is missing");
+			
+			//return response entity
+			return Response.status(Response.Status.CREATED)
+					.tag("Successfully posted to Linkedin for " + entityType + " with id  " + entityId).build();
+		}catch(InvalidInputException e) {
+			LOG.error("Error in manualPostToLinkedin " , e);
+			return Response.status(Response.Status.BAD_REQUEST ).tag(e.getMessage()).build();
+		}catch(Exception e) {
+			LOG.error("Error in manualPostToLinkedin " , e);
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR ).tag(e.getMessage()).build();
+		}
+	}
+    
+    
+    @ResponseBody
+    @RequestMapping ( value = "/updatelistofuserloginpreventions", method = RequestMethod.POST)
+    public Response updateListOfUserLoginPreventions( HttpServletRequest request )
+    {
+        LOG.info( "Method updateListOfUserLoginPreventions started" );
+
+        try {
+            List<Long> userIdList = new ArrayList<>();
+            String userIdListStr[] = null;
+            Boolean isLoginPrevented = false;
+            String authorizationHeader = request.getHeader( "Authorization" );
+            String userIdsStr = request.getParameter( "userIds" );
+            String isLoginPreventedStr = request.getParameter( "isLoginPrevented" );
+
+            // authorize request
+            try {
+                validateAuthHeader( authorizationHeader );
+            } catch ( InvalidInputException e ) {
+                return Response.status( Response.Status.UNAUTHORIZED ).tag( e.getMessage() ).build();
+            }
+
+            // process request
+            if ( StringUtils.isEmpty( isLoginPreventedStr )
+                || ( !isLoginPreventedStr.equals( "true" ) && !isLoginPreventedStr.equals( "false" ) ) ) {
+                throw new InvalidInputException( "Wrong value passed for parameter isLoginPrevented" );
+            }
+            isLoginPrevented = Boolean.parseBoolean( isLoginPreventedStr );
+
+            if ( userIdsStr.contains( "," ) ) {
+                try {
+                    userIdListStr = userIdsStr.split( "," );
+                    for ( String userIdStr : userIdListStr ) {
+                        userIdList.add( Long.parseLong( userIdStr ) );
+                    }
+                } catch ( NumberFormatException e ) {
+                    throw new InvalidInputException( "Wrong value passed for parameter userId " );
+                }
+
+
+                //update isLoginPrevented for the users
+                organizationManagementService.updateIsLoginPreventedForUsers( userIdList, isLoginPrevented );
+                // update hidePublicPage as well
+                organizationManagementService.updateHidePublicPageForUsers( userIdList, isLoginPrevented );
+
+                LOG.info( "Method updateUserLoginPrevention finished" );
+                return Response.status( Response.Status.CREATED )
+                    .tag( "Field isLoginPrevented updated for user ids: " + userIdList + " to : " + isLoginPrevented ).build();
+            }
+            LOG.info( "Method updateUserLoginPrevention finished" );
+            return Response.status( Response.Status.CREATED )
+                .tag( "Field isLoginPrevented updated for user ids: " + userIdList + " to : " + isLoginPrevented ).build();
+        } catch ( Exception e ) {
+            LOG.error( "Error while updating user log in prevention field ", e );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).tag( e.getMessage() ).build();
+        }
+    }
+
+
 }

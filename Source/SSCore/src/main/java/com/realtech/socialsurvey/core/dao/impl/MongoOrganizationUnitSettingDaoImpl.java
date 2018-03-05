@@ -1,8 +1,11 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
+import java.text.DateFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -36,6 +39,7 @@ import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
 import com.realtech.socialsurvey.core.entities.ProfileUrlEntity;
+import com.realtech.socialsurvey.core.entities.SavedDigestRecord;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -114,13 +118,22 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_HIDE_PUBLIC_PAGE = "hidePublicPage";
     public static final String KEY_INCLUDE_FOR_TRANSACTION_MONITOR = "includeForTransactionMonitor";
     public static final String KEY_FILTER_KEYWORDS = "filterKeywords";
-
+    public static final String KEY_IS_LOGIN_PREVENTED = "isLoginPrevented";
 
     public static final String KEY_DIGEST_RECIPIENTS = "digestRecipients";
     public static final String KEY_ENTITY_ALERT_DETAILS = "entityAlertDetails";
     public static final String KEY_IS_ERROR_ALERT = "isErrorAlert";
     public static final String KEY_IS_WARNING_ALERT_= "isWarningAlert";
+    
+    public static final String KEY_ABUSIVE_EMAIL_SETTING = "survey_settings.abusive_mail_settings";
+    public static final String KEY_COMPLAINT_RESOLUTION_SETTING = "survey_settings.complaint_res_settings";
 
+    public static final String KEY_SAVED_DIGEST_RECORD = "savedDigestRecords";
+    public static final String KEY_SAVED_DIGEST_RECORD_DATE = "savedDigestRecords.uploadedDate";
+    public static final String KEY_SAVED_DIGEST_RECORD_MONTH = "savedDigestRecords.month";
+    public static final String KEY_SAVED_DIGEST_RECORD_YEAR = "savedDigestRecords.year";
+    
+    
     @Value ( "${CDN_PATH}")
     private String amazonEndPoint;
 
@@ -284,6 +297,26 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         LOG.debug( "Updated the unit setting" );
     }
 
+
+    @Override
+    public void updateIsLoginPreventedForUsersInMongo( List<Long> userIdList, boolean isLoginPrevented )
+    {
+        LOG.debug( "updating IsLoginPreventedForUsers in Mongo" );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.IDEN ).in( userIdList ) );
+        Update update = new Update().set( MongoOrganizationUnitSettingDaoImpl.KEY_IS_LOGIN_PREVENTED, isLoginPrevented );
+        mongoTemplate.updateMulti( query, update, OrganizationUnitSettings.class, AGENT_SETTINGS_COLLECTION );
+    }
+    
+    @Override
+    public void updateHidePublicPageForUsers ( List<Long> userIdList, boolean hidePublicPage )
+    {
+        LOG.debug( "updating IsLoginPreventedForUsers in Mongo" );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.IDEN ).in( userIdList ) );
+        Update update = new Update().set( MongoOrganizationUnitSettingDaoImpl.KEY_HIDE_PUBLIC_PAGE, hidePublicPage );
+        mongoTemplate.updateMulti( query, update, OrganizationUnitSettings.class, AGENT_SETTINGS_COLLECTION );
+    }
 
     /**
      * Fetchs the list of names of logos being used.
@@ -925,18 +958,21 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 
         if ( imageType == CommonConstants.IMAGE_TYPE_PROFILE ) {
             if ( isThumbnail ) {
-                update.set( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, "" );
+                update.unset( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN );
+                update.unset( CommonConstants.PROFILE_IMAGE_RECTANGULAR_THUMBNAIL_COLUMN );
+
             } else {
-                update.set( CommonConstants.PROFILE_IMAGE_URL_SOLR, "" );
-                update.set( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN, "" );
+                update.unset( CommonConstants.PROFILE_IMAGE_URL_SOLR );
+                update.unset( CommonConstants.PROFILE_IMAGE_THUMBNAIL_COLUMN );
+                update.unset( CommonConstants.PROFILE_IMAGE_RECTANGULAR_THUMBNAIL_COLUMN );
             }
             update.set( CommonConstants.IS_PROFILE_IMAGE_PROCESSED_COLUMN, false );
         } else if ( imageType == CommonConstants.IMAGE_TYPE_LOGO ) {
             if ( isThumbnail ) {
-                update.set( CommonConstants.LOGO_THUMBNAIL_COLUMN, "" );
+                update.unset( CommonConstants.LOGO_THUMBNAIL_COLUMN );
             } else {
-                update.set( CommonConstants.LOGO_COLUMN, "" );
-                update.set( CommonConstants.LOGO_THUMBNAIL_COLUMN, "" );
+                update.unset( CommonConstants.LOGO_COLUMN );
+                update.unset( CommonConstants.LOGO_THUMBNAIL_COLUMN );
             }
             update.set( CommonConstants.IS_LOGO_IMAGE_PROCESSED_COLUMN, false );
         } else {
@@ -1187,5 +1223,59 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         LOG.info( "method fetchCompaniesByAlertType finished for alertType {} and companyIds {}", alertType, companyIds );
        
         return settingsList;
+    }
+
+
+    @Override
+    public void saveDigestRecord( String profileLevel, long entityId, SavedDigestRecord digestRecord ) throws InvalidInputException
+    {
+        LOG.debug( "Method saveDigestRecord() to update digest record list started." );
+        
+        String collectionName = null;
+        
+        if ( CommonConstants.PROFILE_LEVEL_COMPANY.equals( profileLevel ) ) {
+            collectionName = CommonConstants.COMPANY_SETTINGS_COLLECTION;
+        } else if ( CommonConstants.PROFILE_LEVEL_REGION.equals( profileLevel ) ) {
+            collectionName = CommonConstants.REGION_SETTINGS_COLLECTION;
+        } else if ( CommonConstants.PROFILE_LEVEL_BRANCH.equals( profileLevel ) ) {
+            collectionName = CommonConstants.BRANCH_SETTINGS_COLLECTION;
+        } else {
+            LOG.warn( "Invalid profile type" );
+            throw new InvalidInputException( "Invalid profile type" );
+        }
+        
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_IDEN ).is( entityId ) );
+        Update update = new Update();
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, System.currentTimeMillis() );
+        update.push( KEY_SAVED_DIGEST_RECORD, digestRecord );
+        mongoTemplate.updateMulti( query, update, collectionName );
+        LOG.debug( "Method saveDigestRecord() to update digest record list started." );
+    }
+
+
+    @Override
+    public OrganizationUnitSettings fetchSavedDigestRecords( String entityType, long entityId ) throws InvalidInputException
+    {
+        LOG.debug( "Method saveDigestRecord() to fetch digest record list running." );
+
+        String collectionName = null;
+
+        if ( CommonConstants.COMPANY_ID.equals( entityType ) ) {
+            collectionName = CommonConstants.COMPANY_SETTINGS_COLLECTION;
+        } else if ( CommonConstants.REGION_ID.equals( entityType ) ) {
+            collectionName = CommonConstants.REGION_SETTINGS_COLLECTION;
+        } else if ( CommonConstants.BRANCH_ID.equals( entityType ) ) {
+            collectionName = CommonConstants.BRANCH_SETTINGS_COLLECTION;
+        } else {
+            LOG.warn( "Invalid profile type" );
+            throw new InvalidInputException( "Invalid profile type" );
+        }
+        
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_IDEN ).is( entityId ) );
+        
+        query.fields().include( KEY_SAVED_DIGEST_RECORD ).exclude( CommonConstants.DEFAULT_MONGO_ID_COLUMN );
+        return mongoTemplate.findOne( query, OrganizationUnitSettings.class, collectionName );
     }
 }

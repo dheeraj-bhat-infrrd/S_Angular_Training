@@ -60,7 +60,7 @@ public class MailEventsTopologyStarterHelper extends TopologyStarterHelper
         LOG.info( "Creating mail event topology" );
         TopologyBuilder builder = new TopologyBuilder();
         // add mail kafka spout
-        builder.setSpout( "SendgridEventCaptureSpout", KafkaTopicSpoutBuilder.sendGridEventTopicSpout(), 1 );
+        builder.setSpout( "SendgridEventCaptureSpout", KafkaTopicSpoutBuilder.getInstance().sendGridEventTopicSpout(), 1 );
         // add bolts
         builder.setBolt( "ProceessEventBolt", new UpdateMailEventsBolt(), 1 ).shuffleGrouping( "SendgridEventCaptureSpout" );
         return builder.createTopology();
