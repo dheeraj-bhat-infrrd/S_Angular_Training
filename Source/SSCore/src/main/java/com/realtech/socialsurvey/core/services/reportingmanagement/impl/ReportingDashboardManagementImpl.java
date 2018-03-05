@@ -4993,7 +4993,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
             if ( digest != null ) {
                 fileUpload.setStatus( CommonConstants.STATUS_VIEW );
-                fileUpload.setFileName( digestRecords.get( CommonConstants.INITIAL_INDEX ).getAbsoluteFileName() );
+                fileUpload.setFileName( digest.getAbsoluteFileName() );
             } else {
                 fileUpload.setStatus( CommonConstants.STATUS_REPORT_NO_RECORDS );
             }

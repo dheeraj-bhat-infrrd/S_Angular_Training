@@ -1957,7 +1957,7 @@ $(document).on('click','.downloadLink',function(e){
 	var downloadLink=recentActivityList[indexRecentActivity][7];
 	
 	// open digest in new tab
-	if( recentActivityList[indexRecentActivity][1] == "Digest" ){
+	if( recentActivityList[indexRecentActivity][1] == "Monthly Digest" ){
 		window.open(downloadLink,'_blank');
 	} else {
 		window.location=downloadLink;	
