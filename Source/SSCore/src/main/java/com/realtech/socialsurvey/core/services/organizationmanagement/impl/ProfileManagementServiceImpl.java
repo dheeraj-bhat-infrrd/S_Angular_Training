@@ -5319,6 +5319,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     if ( profile.getContact_details() != null && profile.getContact_details().getName() != null
                         && profile.getContact_details().getName().trim().length() > 0 ) {
                         surveyDetails.setAgentName( profile.getContact_details().getName() );
+                        if ( profile.getContact_details().getMail_ids().getWork() != null )
+                            surveyDetails.setAgentEmailId( profile.getContact_details().getMail_ids().getWork() );
                     }
                     surveyDetails.setCompanyId( companyId );
                 }
