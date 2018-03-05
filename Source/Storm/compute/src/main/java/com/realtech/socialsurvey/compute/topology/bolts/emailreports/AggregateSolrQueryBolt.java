@@ -147,8 +147,7 @@ public class AggregateSolrQueryBolt extends BaseComputeBoltWithAck {
 		facetPivots.add(ComputeConstants.SOLR_PIVOT_AGENT_LINK_CLICKED);
 		facetPivots.add(ComputeConstants.SOLR_PIVOT_AGENT_DROPPED);
 		
-		String fieldQuery = formulateFieldQuery(Arrays.asList( EmailConstants.EMAIL_TYPE_SURVEY_INVITATION_MAIL,
-                EmailConstants.EMAIL_TYPE_SURVEY_REMINDER_MAIL ),startDateInGmt, endDateInGmt);
+		String fieldQuery = formulateFieldQuery(Arrays.asList( EmailConstants.EMAIL_TYPE_SURVEY_INVITATION_MAIL ),startDateInGmt, endDateInGmt);
 		int facetLimit = -1;
 		int facetMinCount = 1;
 		JsonObject response = APIOperations.getInstance()
