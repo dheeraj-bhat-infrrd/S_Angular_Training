@@ -4982,10 +4982,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             String month = new DateFormatSymbols().getMonths()[cal.get( Calendar.MONTH )];
             String year = String.valueOf( cal.get( Calendar.YEAR ) );
             SavedDigestRecord digest = null;
-            Date uploadedDate = new Date();
+            Date uploadedDate = new Date( CommonConstants.EPOCH_TIME_IN_MILLIS );
             for ( SavedDigestRecord digestRecord : digestRecords ) {
                 if ( month.equals( digestRecord.getMonth() ) && year.equals( digestRecord.getYear() )
-                    && uploadedDate.after( digestRecord.getUploadedDate() ) ) {
+                    && uploadedDate.before( digestRecord.getUploadedDate() ) ) {
                     digest = digestRecord;
                     uploadedDate = digest.getUploadedDate();
                 }
