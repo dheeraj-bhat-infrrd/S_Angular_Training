@@ -64,8 +64,7 @@ public class QuerySolrToFetchSurveyRelatedMailBolt extends BaseComputeBoltWithAc
             String zoneId = reportRequest.getExpectedTimeZone();
             long fileUploadId = reportRequest.getFileUploadId();
 
-            String fieldQuery = formulateFieldQuery(Arrays.asList( EmailConstants.EMAIL_TYPE_SURVEY_INVITATION_MAIL,
-                    EmailConstants.EMAIL_TYPE_SURVEY_REMINDER_MAIL ),
+            String fieldQuery = formulateFieldQuery(Arrays.asList( EmailConstants.EMAIL_TYPE_SURVEY_INVITATION_MAIL),
                     startDateInGmt, endDateInGmt, reportRequest.getProfileLevel(), reportRequest.getProfileValue());
             String fieldList = formulateFieldList(Arrays.asList("surveySourceId","senderName", "branchName", "regionName",
                     "agentEmailId", "recipientsName", "recipients", "emailAttemptedDate", "emailDeliveredDate", "emailBounceDate",

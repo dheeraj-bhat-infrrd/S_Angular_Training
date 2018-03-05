@@ -20,7 +20,14 @@ public class MonthlyDigestAggregate implements Serializable
     private String statisfactionRatingTxt;
 
     // contains rank, name, average score and total reviews
-    private String userRankingHtmlRows;
+    private String userRankingHtmlSection;
+
+    // for those companies who have enabled NPS question
+    private String npsHtmlsection;
+
+    private boolean havingNpsSection;
+
+    private String npsInferenceTxt;;
 
 
     public String getProfileLevel()
@@ -143,15 +150,51 @@ public class MonthlyDigestAggregate implements Serializable
     }
 
 
-    public String getUserRankingHtmlRows()
+    public String getUserRankingHtmlSection()
     {
-        return userRankingHtmlRows;
+        return userRankingHtmlSection;
     }
 
 
-    public void setUserRankingHtmlRows( String userRankingHtmlRows )
+    public void setUserRankingHtmlSection( String userRankingHtmlSection )
     {
-        this.userRankingHtmlRows = userRankingHtmlRows;
+        this.userRankingHtmlSection = userRankingHtmlSection;
+    }
+
+
+    public String getNpsHtmlsection()
+    {
+        return npsHtmlsection;
+    }
+
+
+    public void setNpsHtmlsection( String npsHtmlsection )
+    {
+        this.npsHtmlsection = npsHtmlsection;
+    }
+
+
+    public boolean isHavingNpsSection()
+    {
+        return havingNpsSection;
+    }
+
+
+    public void setHavingNpsSection( boolean hasNpsSection )
+    {
+        this.havingNpsSection = hasNpsSection;
+    }
+
+
+    public String getNpsInferenceTxt()
+    {
+        return npsInferenceTxt;
+    }
+
+
+    public void setNpsInferenceTxt( String npsInferenceTxt )
+    {
+        this.npsInferenceTxt = npsInferenceTxt;
     }
 
 
@@ -162,6 +205,7 @@ public class MonthlyDigestAggregate implements Serializable
             + ", recipientMailIds=" + recipientMailIds + ", monthUnderConcern=" + monthUnderConcern + ", yearUnderConcern="
             + yearUnderConcern + ", digestList=" + digestList + ", avgRatingTxt=" + avgRatingTxt + ", surveyPercentageTxt="
             + surveyPercentageTxt + ", statisfactionRatingTxt=" + statisfactionRatingTxt + ", userRankingHtmlRows="
-            + userRankingHtmlRows + "]";
+            + userRankingHtmlSection + ", npsHtmlsection=" + npsHtmlsection + ", havingNpsSection=" + havingNpsSection
+            + ", npsInferenceTxt=" + npsInferenceTxt + "]";
     }
 }

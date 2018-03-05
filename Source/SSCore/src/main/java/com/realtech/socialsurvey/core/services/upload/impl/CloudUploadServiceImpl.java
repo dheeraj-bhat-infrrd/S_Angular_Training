@@ -162,6 +162,12 @@ public class CloudUploadServiceImpl implements FileUploadService
     {
         uploadFile( file, fileName, bucket, false );
     }
+    
+    @Override
+    public void uploadFileAtDigestBucket( File file, String fileName ) throws NonFatalException
+    {
+        uploadFile( file, fileName, bucket, false );
+    }
 
 
     @Override

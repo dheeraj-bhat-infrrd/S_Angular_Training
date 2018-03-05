@@ -2,6 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ page import = "java.io.*,java.util.*" %>
 
 <c:choose>
 	<c:when test="${columnName == 'companyId'}">
@@ -29,7 +30,8 @@
 	</div>
 </div>
 
-<div class="dash-stats-wrapper bord-bot-dc clearfix">
+
+<div id="reports_page_container" class="dash-stats-wrapper bord-bot-dc clearfix">
 	
 				<div class="generate-report-div">
 					<span class="generate-report-span-report" >Report</span>
@@ -39,6 +41,7 @@
  								<option value=<spring:message code="label.survey.stats.report.value" /> data-report="survey-stats"><spring:message code="label.survey.stats.report.key" /></option>
  								<option value=<spring:message code="label.verified.users.report.value" /> data-report="verified-users"><spring:message code="label.reports.verfied.users.report.key" /></option>
  								<option value=<spring:message code="label.user.ranking.report.value" /> data-report="user-ranking"><spring:message code="label.user.ranking.report.key" /></option>
+ 								<option value=<spring:message code="label.digest.copy.value" /> data-report="digest-copy"><spring:message code="label.digest.copy.key" /></option>
   							</c:if>
   							<c:if test="${profilemasterid == 1}"> 
  								<option value=<spring:message code="label.company.user.report.value" /> data-report="company-user"><spring:message code="label.company.user.report.key" /></option>
@@ -58,6 +61,14 @@
 								<option value=2 data-report="thisMonth">This Month</option>
 								<option value=3 data-report="lastYear">Last Year</option>
 								<option value=4 data-report="lastMonth">Last Month</option>
+							</select>	
+						</div>
+					</div>
+					<div id="digest-time-div" class="float-left board-div hide">
+						<div class="dash-btn-dl-sd-admin time-selector" style="width:200px; margin-top:-5px">
+							<select id="digest-time-selector" class="float-left dash-download-sel-item board-selector-choice" style="width:100%">
+								<option value=1 data-report="lastMonth">Last Month</option>
+								<option value=2 data-report="monthBefore">${monthBeforeLastMonth}</option>
 							</select>	
 						</div>
 					</div>
@@ -129,8 +140,8 @@ $(document).ready(function() {
 	
 	var selectedVal = $('#generate-survey-reports').val();
 	var key = parseInt(selectedVal);
-	if(key == 101 || key == 102 || key == 103 || key == 106 || key == 112 || key == 1001){
-	$('#date-pickers').hide();
+	if(key == 101 || key == 102 || key == 103 || key == 106 || key == 112 || key == 200 || key == 1001 ){
+		$('#date-pickers').hide();
 	}
 	
 	if(key == 106 || key == 112){
@@ -139,6 +150,12 @@ $(document).ready(function() {
 		$('#report-time-div').addClass('hide');
 	}
 	
+	if( key == 200 ){
+		$('#digest-time-div').removeClass('hide');
+	} else {
+		$('#digest-time-div').addClass('hide');
+
+		
 	if(key == 1001){
 		$('#email-rep-time-div').removeClass('hide');
 	}else{
@@ -163,6 +180,8 @@ $(document).ready(function() {
 		drawRecentActivity(startIndex, batchSize,tableHeaderData);
 		showHidePaginateButtons(startIndex, recentActivityCount);
 	});
+	
+	autoRefresh(tableHeaderData);	
 		
 });
 </script>

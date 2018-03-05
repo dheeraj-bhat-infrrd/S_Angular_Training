@@ -15,15 +15,7 @@ import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBoltWithAck;
 import com.realtech.socialsurvey.compute.topology.bolts.mailsender.exception.MailProcessingException;
 import com.realtech.socialsurvey.compute.topology.bolts.mailsender.exception.TemporaryMailProcessingException;
 import com.realtech.socialsurvey.compute.utils.ConversionUtils;
-import com.sendgrid.Attachments;
-import com.sendgrid.Content;
-import com.sendgrid.Email;
-import com.sendgrid.Mail;
-import com.sendgrid.Method;
-import com.sendgrid.Personalization;
-import com.sendgrid.Request;
-import com.sendgrid.Response;
-import com.sendgrid.SendGrid;
+import com.sendgrid.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpStatus;
 import org.apache.storm.task.OutputCollector;
@@ -39,11 +31,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 
 /**
@@ -59,10 +47,10 @@ public class SendMailBolt extends BaseComputeBoltWithAck
     private static final Logger LOG = LoggerFactory.getLogger( SendMailBolt.class );
 
     private static final List<String> IGNORE_TYPES = new ArrayList<>(
-        Arrays.asList( EmailConstants.EMAIL_TYPE_FATAL_EXCEPTION_EMAIL, EmailConstants.EMAIL_TYPE_WEB_EXCEPTION_EMAIL, EmailConstants.EMAIL_TYPE_REPORT_BUG_MAIL_TO_ADMIN ) );
+            Arrays.asList( EmailConstants.EMAIL_TYPE_FATAL_EXCEPTION_EMAIL, EmailConstants.EMAIL_TYPE_WEB_EXCEPTION_EMAIL, EmailConstants.EMAIL_TYPE_REPORT_BUG_MAIL_TO_ADMIN ) );
 
-    private SendGrid sendgridMe;
-    private SendGrid sendgridUs;
+    private transient SendGrid sendgridMe;
+    private transient SendGrid sendgridUs;
 
     private String sendgridMeApiKey;
     private String sendgridUsApiKey;
@@ -102,7 +90,7 @@ public class SendMailBolt extends BaseComputeBoltWithAck
     @Override
     public void declareOutputFields( OutputFieldsDeclarer declarer )
     {
-        declarer.declare( new Fields( "success", "mailType", "emailMessage" ) );
+        declarer.declare( new Fields( "success", "mailType", "emailMessage", "isTemporaryException" ) );
 
     }
 
@@ -141,7 +129,7 @@ public class SendMailBolt extends BaseComputeBoltWithAck
         String responseId = null;
         if ( !emailMessage.isHoldSendingMail() && !IGNORE_TYPES.contains( emailMessage.getMailType() ) ) {
             Mail mail = prepareMail( emailMessage );
-            SendGrid sendGrid = null;
+            SendGrid sendGrid;
             if ( emailMessage.getSendEmailThrough().equals( ComputeConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_US ) ) {
                 sendGrid = getSendGridUS();
             } else {
@@ -154,11 +142,11 @@ public class SendMailBolt extends BaseComputeBoltWithAck
                 request.setBody( mail.build() );
                 Response response = sendGrid.api( request );
                 LOG.debug( "Response status code {},\nresponse body: {},\nheader: {}", response.getStatusCode(),
-                    response.getBody(), response.getHeaders() );
+                        response.getBody(), response.getHeaders() );
                 if ( response.getStatusCode() != HttpStatus.SC_ACCEPTED ) {
                     LOG.warn( "Sending mail failed. Got status code {}", response.getStatusCode() );
                     throw new TemporaryMailProcessingException(
-                        "Sending mail failed. Got status code " + response.getStatusCode() );
+                            "Sending mail failed. Got status code " + response.getStatusCode() );
                 } else {
                     // X-Message-Id is the unique send grid id for the email message
                     responseId = response.getHeaders().get( "X-Message-Id" );
@@ -176,11 +164,11 @@ public class SendMailBolt extends BaseComputeBoltWithAck
     private Mail prepareMail( EmailMessage emailMessage )
     {
         Mail mail = new Mail();
-        
+
         String senderEmailId = null;
         String senderName = null;
         if(emailMessage.getSenderEmailId() == null || emailMessage.getSenderEmailId().isEmpty()){
-            
+
             //If there's no sender email address specified (as in the case of certain emailed reports), use the site admin's email address
             senderEmailId = LocalPropertyFileHandler.getInstance()
                 .getProperty( ComputeConstants.APPLICATION_PROPERTY_FILE, ComputeConstants.ADMIN_EMAIL_ADDRESS )
@@ -202,8 +190,8 @@ public class SendMailBolt extends BaseComputeBoltWithAck
         }
         if ( emailMessage.isSendMailToSalesLead() ) {
             String salesLeadEmailAddress = LocalPropertyFileHandler.getInstance()
-                .getProperty( ComputeConstants.APPLICATION_PROPERTY_FILE, ComputeConstants.SALES_LEAD_EMAIL_ADDRESS )
-                .orElse( null );
+                    .getProperty( ComputeConstants.APPLICATION_PROPERTY_FILE, ComputeConstants.SALES_LEAD_EMAIL_ADDRESS )
+                    .orElse( null );
             if ( !StringUtils.isBlank( salesLeadEmailAddress ) ) {
                 personalization.addBcc( new Email( salesLeadEmailAddress ) );
             }
@@ -244,6 +232,7 @@ public class SendMailBolt extends BaseComputeBoltWithAck
     {
         LOG.debug( "Executing send mail bolt." );
         boolean isSuccess = false;
+        boolean isTemporaryException = false;
         // get the email message
         EmailMessage emailMessage = (EmailMessage) input.getValueByField( "emailMessage" );
         boolean deliveryAttempted = input.getBooleanByField( "deliveryAttempted" );
@@ -252,7 +241,7 @@ public class SendMailBolt extends BaseComputeBoltWithAck
             LOG.debug( "New mail. Should send and update SOLR" );
             // the email from SOLR
             Optional<SolrEmailMessageWrapper> optionalSolrEmailMessage = APIOperations.getInstance()
-                .getEmailMessageFromSOLR( emailMessage );
+                    .getEmailMessageFromSOLR( emailMessage );
             if ( optionalSolrEmailMessage.isPresent() ) {
                 SolrEmailMessageWrapper solrEmailMessage = optionalSolrEmailMessage.get();
                 // check if if the message was already sent
@@ -278,8 +267,13 @@ public class SendMailBolt extends BaseComputeBoltWithAck
                         FailedMessagesService failedMessageService = new FailedMessagesServiceImpl();
                         failedMessageService.insertPermanentlyFailedEmailMessage( emailMessage, e );
                     } catch ( TemporaryMailProcessingException e ) {
-                        FailedMessagesService failedMessageService = new FailedMessagesServiceImpl();
-                        failedMessageService.insertTemporaryFailedEmailMessage( emailMessage );
+                        //insert into mongo only if it failed for the first time
+                        if(!emailMessage.isRetried()) {
+                            FailedMessagesService failedMessageService = new FailedMessagesServiceImpl();
+                            failedMessageService.insertTemporaryFailedEmailMessage( emailMessage );
+                        }
+                        //else increase the retryCount by 1
+                        else isTemporaryException = true;
                     }
                 }
             } else {
@@ -289,13 +283,13 @@ public class SendMailBolt extends BaseComputeBoltWithAck
         } else {
             LOG.warn( "Email {} was already sent.", emailMessage );
         }
-        _collector.emit( input, Arrays.asList( isSuccess, emailMessage.getMailType(), emailMessage ) );
+        _collector.emit( input, Arrays.asList( isSuccess, emailMessage.getMailType(), emailMessage, isTemporaryException ) );
     }
 
 
     @Override
     public List<Object> prepareTupleForFailure()
     {
-        return Arrays.asList( false, null, null );
+        return Arrays.asList( false, null, null, false );
     }
 }

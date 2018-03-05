@@ -100,4 +100,7 @@ public interface FileUploadService
 
     
     public String uploadFileAtSurveyCsvBucket( MultipartFile tempFile, String fileName ) throws NonFatalException;
+
+
+    public void uploadFileAtDigestBucket( File file, String fileName ) throws NonFatalException;
 }

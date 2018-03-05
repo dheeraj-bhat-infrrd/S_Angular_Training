@@ -71,7 +71,7 @@ public class SocialPostTopologyStarterHelper extends TopologyStarterHelper
         LOG.info( "Creating social post topology" );
         TopologyBuilder builder = new TopologyBuilder();
         // add mail kafka spout
-        builder.setSpout( "SocialPostSpout", KafkaTopicSpoutBuilder.socialPostTopicKafkaSpout(), 1 );
+        builder.setSpout( "SocialPostSpout", KafkaTopicSpoutBuilder.getInstance().socialPostTopicKafkaSpout(), 1 );
         // add bolts
         builder.setBolt( "CompanyGroupingBolt", new CompanyGroupingBolt(), 1 ).shuffleGrouping( "SocialPostSpout" );
         builder.setBolt( "FilterSocialPostBolt", new FilterSocialPostBolt(), 1 ).fieldsGrouping( "CompanyGroupingBolt",
