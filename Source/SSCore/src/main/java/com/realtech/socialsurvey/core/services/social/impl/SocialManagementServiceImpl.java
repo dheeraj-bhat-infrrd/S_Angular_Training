@@ -231,7 +231,10 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     
     @Value ( "${FB_PERMISSION_SCOPE_LIST}")
     private String fbPermissionScopeList;
-
+    
+    @Value ( "${FB_APP_ACCESS_TOKEN}" )
+    private String facebookApplicationAccessToken;
+    
     // Twitter
     @Value ( "${TWITTER_CONSUMER_KEY}")
     private String twitterConsumerKey;
@@ -3559,7 +3562,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             throw new InvalidInputException( "Passed Parameter Url is null or empty" );
         }
 
-        String facebookRescrapeUrl = fbGraphUrl + "?scrape=true&id=" + url;
+        String facebookRescrapeUrl = fbGraphUrl + "?scrape=true&access_token=" + facebookApplicationAccessToken + "&id=" + url;
 
         RestTemplate restTemplate = new RestTemplate();
         try {
