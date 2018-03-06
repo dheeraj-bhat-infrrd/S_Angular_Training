@@ -1423,7 +1423,7 @@ public interface CommonConstants
     public static final String REPORTING_BRANCH_RANKING_MONTHLY_REPORT = "Branch Ranking Report For Month";
     public static final String REPORTING_BRANCH_RANKING_YEARLY_REPORT = "Branch Ranking Report For Year";
     
-    public static final String REPORTING_DIGEST = "Digest";
+    public static final String REPORTING_DIGEST = "Monthly Digest";
 
     public static final String SURVEY_DETAILS_ID_COLUMN = "surveyDetailsId";
     public static final String SURVEY_RESULTS_REPORT_MODIFIED_ON = "reportModifiedOn";
