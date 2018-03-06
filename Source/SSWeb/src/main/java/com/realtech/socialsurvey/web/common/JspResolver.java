@@ -32,6 +32,8 @@ public interface JspResolver
     public static final String SOCIAL_MONITOR_STREAM_PAGE="social_monitor_stream";
     public static final String SOCIAL_MONITOR_MACRO_PAGE="social_monitor_macro";
     public static final String SOCIAL_MONITOR_ADD_MACRO_PAGE="social_monitor_add_macro";
+    public static final String STREAM_CONTAINER_PAGE="stream_container_white";
+    public static final String STREAM_ACTION_CONTAINER_PAGE="stream_action_container_gray";
 
     // Generic pages
     public static final String INDEX = "index";

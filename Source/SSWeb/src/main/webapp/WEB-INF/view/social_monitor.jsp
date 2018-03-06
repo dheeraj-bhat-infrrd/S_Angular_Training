@@ -3,26 +3,31 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
+<form id="add-monitor-form" data-state="new" data-status="new">
 <div id="add-mon-popup" class="hide bulk-action-popup">
 	<button type="button" class="close bulk-options-dismiss dismiss-add-mon-popup" id="dismiss-add-mon-popup" onclick="javascript:hideAddMonitorPopup()">&times;</button>
 		<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 bulk-action-edit-container">
 			<div class="bulk-action-hdr">Add Monitor</div>
 			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 macro-form-txt">KeyPhrase*</div>
 			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 macro-form-txt-box">						
-				<textarea class="form-control stream-post-textbox macro-name-txt-box" rows="1" id="mon-type-txt-box" placeholder="Enter a KeyPhrase"></textarea>
+				<textarea class="form-control stream-post-textbox macro-name-txt-box" rows="1" id="monitor-keyphrase" name="monitor-keyphrase" placeholder="Enter a KeyPhrase"></textarea>
 			</div>
 			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 macro-form-txt">MonitorType</div>
 			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-1">
 				<div id="add-mon-type-dropdown" class="float-left add-mon-type-dropdown">
-					<div id="add-mon-type-select" class="bulk-actions-select" data-mon-type=1><div class="float-left" id="add-mon-type-sel-txt">Keyword Monitor</div> <img src="${initParam.resourcesPath}/resources/images/chevron-down.png" id="add-mon-type-chevron-down" class="float-right bulk-actions-dropdown-img"><img id="add-mon-type-chevron-up" src="${initParam.resourcesPath}/resources/images/chevron-up.png" class="hide float-right bulk-actions-dropdown-img"></div>
+					<div id="add-mon-type-select" class="bulk-actions-select" data-mon-type=0><div class="float-left" id="add-mon-type-sel-txt">Keyword Monitor</div> 
+						<img src="${initParam.resourcesPath}/resources/images/chevron-down.png" id="add-mon-type-chevron-down" class="float-right bulk-actions-dropdown-img">
+						<img id="add-mon-type-chevron-up" src="${initParam.resourcesPath}/resources/images/chevron-up.png" class="hide float-right bulk-actions-dropdown-img">
+					</div>
 					<div id="add-mon-type-options" class="hide float-left add-mon-type-options">
 						<div id="add-mon-type-km" class="bulk-option">Keyword Monitor</div>
 						<div id="add-mon-type-ga" class="bulk-option">Google Alerts</div>
 					</div>
 				</div>
+				<input type="hidden" id="monitor-type" name="monitor-type" value="KEYWORD_MONITOR">
 			</div>
 			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 stream-actions-btn-container">
-				<div id="add-mon-save-active" class="hide float-right hm-header-right text-center macro-add-btn add-mon-save-btn" onclick="javascript:hideAddMonitorPopup()">
+				<div id="add-mon-save-active" class="hide float-right hm-header-right text-center macro-add-btn add-mon-save-btn" onclick="javascript:addMonitor()">
 					Save
 				</div>
 				<div id="add-mon-save-inactive" class="float-right hm-header-right text-center macro-add-btn-disabled add-mon-save-btn">
@@ -34,6 +39,7 @@
 			</div>		
 		</div>
 </div>
+</form>
 
 
 <div class="hm-header-main-wrapper hm-hdr-bord-bot soc-mon-hdr">
@@ -160,5 +166,6 @@
 				];
 		
 		drawMonitorList(monitorData);
+		getMonitors();
 	});
 </script>

@@ -275,5 +275,11 @@ public final class DisplayMessageConstants
     public static final String PROFILE_IMAGE_DELETE_SUCCESSFUL = "PROFILE_IMAGE_DELETE_SUCCESSFUL";
     public static final String PROFILE_IMAGE_DELETE_UNSUCCESSFUL = "PROFILE_IMAGE_DELETE_UNSUCCESSFUL";
 
+    //Social Monitor
+    public static final String ADD_MONITOR_SUCCESSFUL = "SUCCESSFULLY ADDED MONITOR";
+    public static final String ADD_MONITOR_UNSUCCESSFUL = "UNABLE TO ADD MONITOR";
+    
+    public static final String ADD_MACRO_SUCCESSFUL = "SUCCESSFULLY ADDED MACRO";
+    public static final String ADD_MACRO_UNSUCCESSFUL = "UNABLE TO ADD MACRO";
 }
 
