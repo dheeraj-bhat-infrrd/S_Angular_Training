@@ -323,5 +323,8 @@ public interface SocialManagementService
 
 
     public void updateSocialConnectionHistoryAfterHierarchyRelocation( SocialUpdateAction socialUpdateAction );
+
+
+    public void checkForLinkedInTokenExpiry( OrganizationUnitSettings settings );
 }
 // JIRA SS-34 BY RM02 BOC

@@ -22,6 +22,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -253,6 +254,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     private String linkedinAuthUri;
     @Value ( "${LINKED_IN_SCOPE}")
     private String linkedinScope;
+    @Value ("${LINKEN_IN_ACCESS_VALIDITY_URI}")
+    private String  linkedInAccessValidityUri;
 
     @Value ( "${APPLICATION_BASE_URL}")
     private String applicationBaseUrl;
@@ -4093,6 +4096,37 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 			
 		}
 	}
-		
-		
+    
+
+    @Override
+    public void checkForLinkedInTokenExpiry( OrganizationUnitSettings settings )
+    {
+        if ( settings.getSocialMediaTokens() != null && settings.getSocialMediaTokens().getLinkedInToken() != null
+            && settings.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken() != null
+            && !settings.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken().isEmpty()
+            && !checkLinkedInTokenExpiry( settings.getSocialMediaTokens().getLinkedInToken() ) ) {
+
+            HttpClient client = HttpClientBuilder.create().build();
+            HttpGet get = new HttpGet(
+                linkedInAccessValidityUri + settings.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken() );
+            HttpResponse response;
+            try {
+                response = client.execute( get );
+
+                if ( response.getStatusLine() != null && response.getStatusLine().getStatusCode() != HttpStatus.SC_OK ) {
+                    // call social media error handler for linkedIn exception
+                    socialMediaExceptionHandler.handleLinkedinException( settings,
+                        MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+                }
+
+            } catch ( IOException e ) {
+                LOG.error( "Unable to connect to LinkedIn to get acces token.", e );
+            }
+        } else {
+            LOG.warn( "LinkedIn media tokens not found for userId:{}", settings.getIden() );
+
+        }
+    }
+
+
 }
