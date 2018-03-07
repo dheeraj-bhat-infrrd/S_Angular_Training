@@ -50,4 +50,10 @@ public interface SSApiIntegrationService
 	Call<Boolean> saveEmailCountMonthData(
 			@Body List<SurveyInvitationEmailCountMonth> agentEmailCountsMonth);
 
+
+    @Headers ( "Content-Type: application/json")
+    @GET ( "v1/surveyinvitationemailalltime")
+	Call<List<SurveyInvitationEmailCountMonth>> getAllTimeDataForSurveyInvitationMail(@Query("startIndex") int startIndex,
+			@Query ("batchSize")int bATCH_SIZE);
+
 }

@@ -488,12 +488,25 @@
 		<property name="durability" value="true" />
 	</bean> 
 	
-	<!-- Survey invitation mail count month job -->
-	<bean id="surveyInvitationEmailCountJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+	<!-- Survey invitation mail count past month job -->
+	<bean id="surveyInvitationEmailCountJobPastMonth" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass" value="com.realtech.socialsurvey.core.starter.SurveyInvitationEmailCountJob" />
 		<property name="jobDataAsMap">
 			<map>
 			<entry key="streamApiIntegrationBuilder" value-ref="streamApiIntegrationBuilder" />
+			<entry key="timeFrame" value="PastMonth" />
+			</map>
+			</property>
+			<property name="durability" value="true" />
+	</bean>
+	
+	<!-- Survey invitation mail count this month job -->
+	<bean id="surveyInvitationEmailCountJobThisMonth" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass" value="com.realtech.socialsurvey.core.starter.SurveyInvitationEmailCountJob" />
+		<property name="jobDataAsMap">
+			<map>
+			<entry key="streamApiIntegrationBuilder" value-ref="streamApiIntegrationBuilder" />
+			<entry key="timeFrame" value="ThisMonth" />
 			</map>
 			</property>
 			<property name="durability" value="true" />
@@ -757,10 +770,17 @@
 	</bean>
 	
 	<!-- survey invitaion mail count cron -->
-	<bean id="surveyInvitationEmailCountCron"
+	<bean id="surveyInvitationEmailCountCronPastMonth"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
-		<property name="jobDetail" ref="surveyInvitationEmailCountJob" />
+		<property name="jobDetail" ref="surveyInvitationEmailCountJobPastMonth" />
 		<property name="cronExpression" value="0 0 8 1/1 * ? *" />
+	</bean>
+	
+	<!-- survey invitaion mail count this month cron -->
+	<bean id="surveyInvitationEmailCountCronThisMonth"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="surveyInvitationEmailCountJobThisMonth" />
+		<property name="cronExpression" value="	0 0/1 * 1/1 * ? *" />
 	</bean>
 	
 	<bean id="failedstreammsgprocessorceron"
@@ -807,7 +827,8 @@
 				<ref bean="monthlydigeststarter" />
 				<ref bean="transactionActivityMonitorJobDetail" />	
 				<ref bean="surveycsvuploadjobdetail" />
-				<ref bean="surveyInvitationEmailCountJob" />
+				<ref bean="surveyInvitationEmailCountJobPastMonth" />
+				<ref bean="surveyInvitationEmailCountJobThisMonth" />
 				<!-- <ref bean="failedstreammsgprocessorjobdetail" />  -->
 			</list>
 		</property>
@@ -847,7 +868,8 @@
 				<ref bean="monthlydigeststartercron" />
 				<ref bean="transactionActivityMonitorCron" />
 				<ref bean="surveycsvuploadcron" />
-				<ref bean="surveyInvitationEmailCountCron" />
+				<ref bean="surveyInvitationEmailCountCronPastMonth" />
+				<ref bean="surveyInvitationEmailCountCronThisMonth" />
 				<!--  <ref bean="failedstreammsgprocessorceron" />  -->
 			</list>
 		</property>

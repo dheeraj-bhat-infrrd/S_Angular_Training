@@ -15,4 +15,6 @@ public interface SurveyInvitationEmailDao extends GenericReportingDao<SurveyInvi
 
 	List<Object[]> getSurveyInvitationEmailReportForMonth(long companyId, int month, int year);
 
+	
+
 }

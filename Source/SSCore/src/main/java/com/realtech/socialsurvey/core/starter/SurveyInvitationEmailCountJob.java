@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
-import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.ReportRequest;
 import com.realtech.socialsurvey.core.integration.stream.StreamApiIntegrationBuilder;
 
@@ -25,6 +24,7 @@ public class SurveyInvitationEmailCountJob extends QuartzJobBean {
 	
 	private ReportRequest reportRequest = new ReportRequest();
 	private StreamApiIntegrationBuilder streamApiIntegrationBuilder;
+	private String timeFrame;
 
 	/* (non-Javadoc)
 	 * @see org.springframework.scheduling.quartz.QuartzJobBean#executeInternal(org.quartz.JobExecutionContext)
@@ -32,7 +32,7 @@ public class SurveyInvitationEmailCountJob extends QuartzJobBean {
 	@Override
 	protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
 		initializeDependencies( jobExecutionContext.getMergedJobDataMap() );
-		reportRequest.transform(CommonConstants.TIME_FRAME_PAST_MONTH);
+		reportRequest.transform(timeFrame);
         streamApiIntegrationBuilder.getStreamApi().generateEmailReport( reportRequest );
 
 	}
@@ -40,6 +40,7 @@ public class SurveyInvitationEmailCountJob extends QuartzJobBean {
 	private void initializeDependencies( JobDataMap jobMap )
     {
 		streamApiIntegrationBuilder = (StreamApiIntegrationBuilder) jobMap.get( "streamApiIntegrationBuilder" );
+		timeFrame = (String) jobMap.get("timeFrame");
     }
 
 }

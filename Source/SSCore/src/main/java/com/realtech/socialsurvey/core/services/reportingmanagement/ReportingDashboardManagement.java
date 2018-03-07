@@ -379,4 +379,7 @@ public interface ReportingDashboardManagement
 
 
 	public List<SurveyInvitationEmailCountMonth> getSurveyInvitationEmailReportForMonth(long companyId, int month, int year);
+
+
+	public List<SurveyInvitationEmailCountMonth> getAllTimeDataForSurveyInvitationMail(int startIndex, int batchSize);
 }

@@ -51,7 +51,6 @@ import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.CompanyDetailsReportDao;
 import com.realtech.socialsurvey.core.dao.CompanyUserReportDao;
 import com.realtech.socialsurvey.core.dao.FileUploadDao;
-import com.realtech.socialsurvey.core.dao.GenericReportingDao;
 import com.realtech.socialsurvey.core.dao.NpsReportMonthDao;
 import com.realtech.socialsurvey.core.dao.NpsReportWeekDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -351,9 +350,6 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     @Autowired
     private SurveyPreInitiationDao surveyPreInitiationDao;
     
-    @Autowired
-    private GenericReportingDao<SurveyInvitationEmailCountMonth, Long> surveyEmailCountMonthDao;
-
     @Autowired
     private DigestMailHelper digestMailHelper;
 
@@ -5103,6 +5099,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 	}
 
 
+	@Transactional
 	@Override
 	public List<SurveyInvitationEmailCountMonth> getReceivedCountsMonth(long startDate, long endDate, int startIndex, int batchSize)
 			throws ParseException {
@@ -5116,10 +5113,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 		String startDateStr = sdf.format(new Date(startDate));
 		String endDateStr = sdf.format(new Date(endDate));
-		LOG.info("start date {} and end date {}",startDateStr,endDateStr);
+		LOG.debug("start date {} and end date {}",startDateStr,endDateStr);
 		List<Object[]> receivedCount = surveyPreInitiationDao.getReceivedCountForDate(startDateStr, endDateStr,
 				startIndex, batchSize);
-		LOG.info("Db returned row count : {}",receivedCount.size());
+		LOG.debug("Db returned row count : {}",receivedCount.size());
 		for (Object[] obj : receivedCount) {
 			if(obj[0] !=null && obj[1]!=null && obj[2] !=null) {
 				SurveyInvitationEmailCountMonth mailCount = new SurveyInvitationEmailCountMonth();
@@ -5141,7 +5138,20 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 	@Transactional
 	public boolean saveEmailCountMonthData(List<SurveyInvitationEmailCountMonth> agentEmailCountsMonth) {
 		try {
-			surveyEmailCountMonthDao.saveAll(agentEmailCountsMonth);
+			Map<String, Object> queryMap = new HashMap<String, Object>();
+			queryMap.put("month", agentEmailCountsMonth.get(0).getMonth());
+			queryMap.put("year", agentEmailCountsMonth.get(0).getYear());
+			List<SurveyInvitationEmailCountMonth> emailCountOlddata = surveyInvitationEmailDao
+					.findByKeyValue(SurveyInvitationEmailCountMonth.class, queryMap);
+			if (emailCountOlddata != null && !emailCountOlddata.isEmpty() && emailCountOlddata.size() > 0) {
+				LOG.info("Deleting {} entries for email count data for time period : {}-{}", emailCountOlddata.size(),
+						emailCountOlddata.get(0).getMonth(), emailCountOlddata.get(0).getYear());
+				surveyInvitationEmailDao.deleteAll(emailCountOlddata);
+			} else {
+				LOG.info("No old record found for time frame {}-{}", agentEmailCountsMonth.get(0).getMonth(),
+						agentEmailCountsMonth.get(0).getYear());
+			}
+			surveyInvitationEmailDao.saveAll(agentEmailCountsMonth);
 			LOG.info("Survey invitaion email count data saved to db.");
 			return true;
 		} catch (Exception e) {
@@ -5190,6 +5200,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
 
 	@Override
+	@Transactional
 	public List<SurveyInvitationEmailCountMonth> getSurveyInvitationEmailReportForMonth(long companyId, int month, int year) {
 		List<SurveyInvitationEmailCountMonth> mailCountReport = new ArrayList<SurveyInvitationEmailCountMonth>();
 		List<Object[]> reportList = surveyInvitationEmailDao.getSurveyInvitationEmailReportForMonth(companyId,month,year);
@@ -5210,5 +5221,15 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 			mailCountReport.add(reportObj);
 		}
 		return mailCountReport;
+	}
+
+
+	@Override
+	@Transactional
+	public List<SurveyInvitationEmailCountMonth> getAllTimeDataForSurveyInvitationMail(int startIndex, int batchSize) {
+		Map<String, Object> queryMap = new HashMap<String, Object>();
+		queryMap.put("month", 0);
+		queryMap.put("year", 0);
+		return surveyInvitationEmailDao.findByKeyValueInBatch(SurveyInvitationEmailCountMonth.class, queryMap, startIndex, batchSize);
 	}
 }
