@@ -154,7 +154,7 @@ $(document).ready(function() {
 		$('#digest-time-div').removeClass('hide');
 	} else {
 		$('#digest-time-div').addClass('hide');
-
+	}
 		
 	if(key == 1001){
 		$('#email-rep-time-div').removeClass('hide');
@@ -169,7 +169,7 @@ $(document).ready(function() {
 		startIndex=getStartIndex();	
 		startIndex-=10;
 		recentActivityCount=getRecentActivityCount();
-		drawRecentActivity(startIndex, batchSize,tableHeaderData);
+		drawRecentActivity(startIndex, batchSize,tableHeaderData,recentActivityCount);
 		showHidePaginateButtons(startIndex, recentActivityCount);
 	});
 
@@ -177,7 +177,7 @@ $(document).ready(function() {
 		startIndex=getStartIndex();
 		startIndex+=10;
 		recentActivityCount=getRecentActivityCount();
-		drawRecentActivity(startIndex, batchSize,tableHeaderData);
+		drawRecentActivity(startIndex, batchSize,tableHeaderData,recentActivityCount);
 		showHidePaginateButtons(startIndex, recentActivityCount);
 	});
 	
