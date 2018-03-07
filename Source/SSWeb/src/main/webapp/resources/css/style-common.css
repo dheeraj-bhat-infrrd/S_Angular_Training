@@ -10284,6 +10284,14 @@ ul.accordion li>a:before {
 	padding:0;
 	margin-bottom: 20px;
 }
+
+.rep-sps-nps-lbl{
+	width: auto !important;
+    position: relative;
+    margin-right: 0 !important;
+    display: flex;
+    align-items: center;
+}
 /*leaderboard*/
 .board-selector{
 	float: right;

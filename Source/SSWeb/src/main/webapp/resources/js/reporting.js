@@ -356,7 +356,13 @@ function drawSpsStatsGraph(){
 
 												var data = google.visualization
 														.arrayToDataTable(spsChartData);
-
+												
+												var windowSize = $( window ).width();
+												var groupWidth = '60';
+												if(windowSize <= 500){
+													groupWidth = '30';
+												}
+												
 												var options = {
 													legend : {
 														position : 'none'
@@ -368,7 +374,7 @@ function drawSpsStatsGraph(){
 															count : 14
 														}
 													},
-													bar: { groupWidth: '60' },
+													bar: { groupWidth: groupWidth },
 													annotations: {
 														   alwaysOutside:true,
 														   style: 'point',
@@ -501,6 +507,12 @@ function drawNpsStatsGraph(entityId,entityType){
 												var data = google.visualization
 														.arrayToDataTable(npsChartData);
 
+												var windowSize = $( window ).width();
+												var groupWidth = '60';
+												if(windowSize <= 500){
+													groupWidth = '30';
+												}
+												
 												var options = {
 													legend : {
 														position : 'none'
@@ -512,7 +524,7 @@ function drawNpsStatsGraph(entityId,entityType){
 															count : 14
 														}
 													},
-													bar: { groupWidth: '60' },
+													bar: { groupWidth: groupWidth },
 													annotations: {
 														   alwaysOutside:true,
 														   style: 'point',
