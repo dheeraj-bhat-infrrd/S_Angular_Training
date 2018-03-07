@@ -419,7 +419,7 @@ public class SocialMonitorWebController {
     	
     	try {
     		response = ssApiIntergrationBuilder.getIntegrationApi().saveSocialFeedsForAction(socialFeedsActionUpdate, companyId);
-    		message = messageUtils.getDisplayMessage(DisplayMessageConstants.ADD_MACRO_SUCCESSFUL,
+    		message = messageUtils.getDisplayMessage(DisplayMessageConstants.UPDATE_POST_SUCCESSFUL,
     				DisplayMessageType.SUCCESS_MESSAGE).getMessage();
     		String status = new String(((TypedByteArray) response.getBody()).getBytes());
     		statusMap.put("userName", userName);
@@ -427,7 +427,76 @@ public class SocialMonitorWebController {
     		statusMap.put(STATUS, CommonConstants.SUCCESS_ATTRIBUTE);
     	}catch(Exception e){
     		LOG.error("Exception occured in SS-API while updating post action.", e);
-    		message = messageUtils.getDisplayMessage(DisplayMessageConstants.ADD_MACRO_UNSUCCESSFUL,
+    		message = messageUtils.getDisplayMessage(DisplayMessageConstants.UPDATE_POST_UNSUCCESSFUL,
+    				DisplayMessageType.ERROR_MESSAGE).getMessage();
+    		statusMap.put("STATUS", CommonConstants.ERROR);
+    	}
+    	
+    	statusMap.put(MESSAGE, message);
+    	statusJson = new Gson().toJson(statusMap);
+    	
+    	return statusJson;
+    }
+    
+    private SocialFeedsActionUpdate createSFAUFromRequestForMacro(HttpServletRequest request, String userName) {
+        
+    	String postId = request.getParameter("macro-form-post-id");
+    	String flaggedStr = request.getParameter("macro-form-flagged");
+    	String statusStr = request.getParameter("macro-form-status");
+    	String textActType = request.getParameter("macroform-text-act-type");
+    	String text = request.getParameter("macro-form-text");
+    	String macroId = request.getParameter("macro-form-macro-id");
+    	List<String> postIds = new ArrayList<>();
+    	postIds.add(postId);
+    	
+    	SocialFeedsActionUpdate socialFeedsActionUpdate = new SocialFeedsActionUpdate();
+    	socialFeedsActionUpdate.setPostIds(postIds);
+    	
+    	boolean flagged = false;
+    	if(flaggedStr!=null && !flaggedStr.isEmpty() && flaggedStr.equalsIgnoreCase("true")) {
+    		flagged = true;
+    	}
+    	socialFeedsActionUpdate.setFlagged(flagged);
+    	
+    	socialFeedsActionUpdate.setStatus(SocialFeedStatus.valueOf(statusStr));
+    	socialFeedsActionUpdate.setTextActionType(TextActionType.valueOf(textActType));
+    	socialFeedsActionUpdate.setText(text);
+    	socialFeedsActionUpdate.setMacroId(macroId);
+    	socialFeedsActionUpdate.setUserName(userName);
+    	
+    	return socialFeedsActionUpdate;
+    }
+    
+    @ResponseBody
+    @RequestMapping ( value = "/updatepostactionwithmacro", method = RequestMethod.POST)
+    public String updatePostActionWithMacro( Model model, HttpServletRequest request)
+    {
+    	
+    	LOG.info("Method updatePostAction of SocialMonitorWebController called");
+    	
+    	User user = sessionHelper.getCurrentUser();
+        Long companyId = user.getCompany().getCompanyId();
+        String userName = user.getProfileName();
+        
+    	Map<String, String> statusMap = new HashMap<>();
+    	String message = "";
+    	String statusJson = "";
+    	
+    	SocialFeedsActionUpdate socialFeedsActionUpdate = createSFAUFromRequestForMacro(request, userName);
+    	
+    	Response response =null;
+    	
+    	try {
+    		response = ssApiIntergrationBuilder.getIntegrationApi().saveSocialFeedsForAction(socialFeedsActionUpdate, companyId);
+    		message = messageUtils.getDisplayMessage(DisplayMessageConstants.UPDATE_POST_SUCCESSFUL,
+    				DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+    		String status = new String(((TypedByteArray) response.getBody()).getBytes());
+    		statusMap.put("userName", userName);
+    		statusMap.put("success", status);
+    		statusMap.put(STATUS, CommonConstants.SUCCESS_ATTRIBUTE);
+    	}catch(Exception e){
+    		LOG.error("Exception occured in SS-API while updating post action.", e);
+    		message = messageUtils.getDisplayMessage(DisplayMessageConstants.UPDATE_POST_UNSUCCESSFUL,
     				DisplayMessageType.ERROR_MESSAGE).getMessage();
     		statusMap.put("STATUS", CommonConstants.ERROR);
     	}

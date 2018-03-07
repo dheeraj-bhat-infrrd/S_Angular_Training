@@ -16940,18 +16940,6 @@ function drawStreamPage(streamPostList){
 		$('#stream-post-icn-cont').attr('id','stream-post-icn-cont-'+postId);
 		$('#action-form-container').attr('id','action-form-container'+postId);
 		
-		for(var m=0;m<macroList.length;m++){
-			var macroId = macroList[m].macroId;
-			var macroName=macroList[m].macroName;
-			var active = macroList[m].active;
-			
-			if(active == true || active == 'true'){
-				var macroDiv = '<div id="macro-option-'+macroId+'" data-macro-id="'+macroId+'" class="macro-opt">'+macroName+'</div>';
-				$('#action-form-container'+postId).find('.macro-options-list').append(macroDiv);
-			}
-						
-		}
-		
 		if(i%2 != 0){
 			$('#stream-post-cont-'+postId).addClass('stream-container-gray');
 		}
@@ -17033,6 +17021,13 @@ function drawStreamPage(streamPostList){
 			$(this).parent().find('.form-text-act-type').val('PRIVATE_NOTE');
 		});
 		
+		$('#add-post-action').attr('id','add-post-action-'+postId);
+		$('#add-post-action-'+postId).find('.form-flagged').val(streamPostList[i].flagged);
+		$('#add-post-action-'+postId).find('.form-status').val(streamPostList[i].status);
+		$('#add-post-action-'+postId).find('.form-post-id').val(postId);
+		
+		drawMacroListDropdown(postId,macroList);
+				
 		$('.stream-macro-dropdown').unbind('click');
 		$('.stream-macro-dropdown').bind('click',function(e){
 			e.stopPropagation();
@@ -17058,8 +17053,59 @@ function drawStreamPage(streamPostList){
 		
 		$(document).on('click','.macro-opt',function(e){
 			e.stopPropagation();
-			$('.macro-opt').closest('.stream-macro-dropdown').find('.mac-chevron-down').removeClass('hide');
-			$('.macro-opt').closest('.stream-macro-dropdown').find('.mac-chevron-up').addClass('hide');
+			var postId =  $(this).find('.macro-list-data').attr('data-post-id');
+			var macroId = $(this).find('.macro-list-data').attr('data-macro-id');
+			var macroName =$(this).find('.macro-list-data').attr('data-macro-name');
+			var flagged = $(this).find('.macro-list-data').attr('data-flagged');
+			var status = $(this).find('.macro-list-data').attr('data-status');
+			var textActionType = $(this).find('.macro-list-data').attr('data-text-action-type');
+			var text = $(this).find('.macro-list-data').attr('data-text');
+			
+			if(text == undefined || text == null){
+				text='';
+			}
+			
+			$('#macro-form-post-id').val(postId);
+			$('#macro-form-flagged').val(flagged);
+			$('#macro-form-status').val(status);
+			$('#macroform-text-act-type').val(textActionType);
+			$('#macro-form-macro-id').val(macroId);
+			$('#macro-form-text').val(text);
+			
+			$('#add-post-action-'+postId).find('.form-flagged').val(flagged);
+			$('#add-post-action-'+postId).find('.form-status').val(status);
+			
+			var url = './updatepostactionwithmacro.do';
+			callAjaxFormSubmit(url,function(data){
+				
+				var map = $.parseJSON(data);
+				$("#overlay-toast").html(map.message);
+				showToast();
+				if (map.status == "success") {
+							
+					updatePostSuccess(postId,text,status,flagged,map);
+										
+					$('#action-form-cont'+postId).find('.form-post-textbox').val('');
+					$("#overlay-toast").html("Successfully Updated Post");
+					showToast();
+				} else {
+					$("#overlay-toast").html("Failed to update post. Please Try again");
+					showToast();
+				}
+				
+			},'macro-form-apply');
+			
+			if($(this).closest('.stream-macro-dropdown').find('.mac-chevron-down').hasClass('hide')){
+				$(this).closest('.stream-macro-dropdown').find('.mac-chevron-down').removeClass('hide');
+			}else{
+				$(this).closest('.stream-macro-dropdown').find('.mac-chevron-down').addClass('hide');
+			}
+			
+			if($(this).closest('.stream-macro-dropdown').find('.mac-chevron-up').hasClass('hide')){
+				$(this).closest('.stream-macro-dropdown').find('.mac-chevron-up').removeClass('hide');
+			}else{
+				$(this).closest('.stream-macro-dropdown').find('.mac-chevron-up').addClass('hide');
+			}
 			$(this).closest('.macro-options-list').addClass('hide');
 		});
 		
@@ -17118,18 +17164,75 @@ function drawStreamPage(streamPostList){
 			
 			$('#act-cont'+postId+'-'+j).find('.act-details-date').html(lastUpdatedDateActionStr);
 		}
-		
-		$('#add-post-action').attr('id','add-post-action-'+postId);
-		$('#add-post-action-'+postId).find('.form-flagged').val(streamPostList[i].flagged);
-		$('#add-post-action-'+postId).find('.form-status').val(streamPostList[i].status);
-		$('#add-post-action-'+postId).find('.form-post-id').val(postId);
 	}	
+}
+
+function drawMacroListDropdown(postId,macroList){
+	$('#action-form-container'+postId).find('.macro-options-list').html('');
+	
+	for(var m=0;m<macroList.length;m++){
+		var macroId = macroList[m].macroId;
+		var macroName=macroList[m].macroName;
+		var active = macroList[m].active;
+		var actions=macroList[m].actions;
+		var flagged = actions.flagged;
+		var status = actions.socialFeedStatus;
+		var textActionType = actions.textActionType;
+		var text = actions.text;
+		if(text == undefined || text == null){
+			text='';
+		}
+		
+		if(flagged == 'true' || flagged == true){
+			flagged= true;
+		}else{
+			flagged=false;
+		}
+		
+		var postFlagged = $('#add-post-action-'+postId).find('.form-flagged').val();
+		var postStatus = $('#add-post-action-'+postId).find('.form-status').val();
+		
+		if(postFlagged == 'true' || postFlagged == true){
+			postFlagged= true;
+		}else{
+			postFlagged=false;
+		}
+		
+		var inputDiv = '<input type="hidden" id="macro-'+postId+'-'+macroId+'" class="macro-list-data" data-post-id="'+postId+'" data-macro-id="'+macroId
+		+'" data-macro-name="'+macroName+'" data-flagged='+flagged+' data-status="'+status+'" data-text-action-type="'+textActionType+'" data-text="'+text+'">';
+		var macroDiv = '<div id="macro-option-'+macroId+'" data-macro-id="'+macroId+'" class="macro-opt">'+inputDiv+macroName+'</div>';
+		
+		if(active == true || active == 'true'){
+			if((postStatus == 'RESOLVED')){
+				if(status != 'NEW' && status != 'RESOLVED'){	
+					$('#action-form-container'+postId).find('.macro-options-list').append(macroDiv);
+				}
+			}else if(postStatus == 'ESCALATED'){
+				if(status != 'NEW' && status != 'ESCALATED'){	
+					$('#action-form-container'+postId).find('.macro-options-list').append(macroDiv);
+				}
+			}else if(postStatus == 'NEW'){
+				if(postFlagged == true || flagged =='true'){
+					if(!(status == 'NEW' && (flagged =='true' || flagged == true))){
+						$('#action-form-container'+postId).find('.macro-options-list').append(macroDiv);
+					}
+				}else{
+					if(!(status == 'NEW' && (flagged =='false' || flagged == false))){
+						$('#action-form-container'+postId).find('.macro-options-list').append(macroDiv);
+					}
+				}
+			}			
+			
+		}
+					
+	}
 }
 
 var lastUpdatedAction;
 var lastUpdatedDateAction;
 var lastUpdatedDateActionStr;
 var monthName=new Array("January","February","March","April","May","June","July","August","September","October","November","December");
+
 $(document).on('click','.stream-action-unflag',function(e){
 	e.stopPropagation();
 	var postId = $(this).closest('.action-form-cont').find('.form-post-id').val();
@@ -17146,65 +17249,11 @@ $(document).on('click','.stream-action-unflag',function(e){
 		$("#overlay-toast").html(map.message);
 		showToast();
 		if (map.status == "success") {
-			var actionHistory = $('#action-history'+postId).html();
-			
-			$('#stream-post-icn-cont'+postId).find('.stream-flagged-icn').addClass('hide');
-			$('#stream-post-icn-cont'+postId).find('.stream-unflagged-icn').removeClass('hide');
-			$('#action-history'+postId).html(streamActionContainer);
-			var j = $('#action-history'+postId).attr('data-count');
-			$('#act-cont').attr('id','act-cont'+postId+'-'+j);
-			
-			if($('#stream-post-cont-'+postId).hasClass('stream-container-gray')){
-				$('#act-cont'+postId+'-'+j).addClass('stream-action-container-white');
-			}
-			
-			$('#act-cont'+postId+'-'+j).find('.action-flag-icn').removeClass('hide');	
-			$('#act-cont'+postId+'-'+j).find('.act-details-text').html('Post was UNFLAGGED manually by '+map.userName);
-			
-			lastUpdatedAction = (new Date()).getTime();
-			lastUpdatedDateAction = new Date(lastUpdatedAction);
-			lastUpdatedDateActionStr = monthName[lastUpdatedDateAction.getMonth()]+' '+(lastUpdatedDateAction.getDate()%10!=lastUpdatedDateAction.getDate()?lastUpdatedDateAction.getDate():('0'+lastUpdatedDateAction.getDate()))+', '+lastUpdatedDateAction.getFullYear()
-			+' at '+(lastUpdatedDateAction.getHours()%10!=lastUpdatedDateAction.getHours()?lastUpdatedDateAction.getHours():('0'+lastUpdatedDateAction.getHours()))+':'
-			+(lastUpdatedDateAction.getMinutes()%10!=lastUpdatedDateAction.getMinutes()?lastUpdatedDateAction.getMinutes():('0'+lastUpdatedDateAction.getMinutes()))+':'
-			+(lastUpdatedDateAction.getSeconds()%10!=lastUpdatedDateAction.getSeconds()?lastUpdatedDateAction.getSeconds():('0'+lastUpdatedDateAction.getSeconds()));
-			
-			$('#act-cont'+postId+'-'+j).find('.act-details-date').html(lastUpdatedDateActionStr);
-			
-			$('#action-history'+postId).append(actionHistory);
-			
-			var text = $('#action-form-cont'+postId).find('.form-post-textbox').val();
-			if(text!='' && text != undefined && text!=null){
-				var actionHistoryMail = $('#action-history'+postId).html();
-				
-				$('#action-history'+postId).html(streamActionContainer);
-				j = $('#action-history'+postId).attr('data-count');
-				$('#act-cont').attr('id','act-cont'+postId+'-'+j);
-				
-				if($('#stream-post-cont-'+postId).hasClass('stream-container-gray')){
-					$('#act-cont'+postId+'-'+j).addClass('stream-action-container-white');
-				}
-				
-				if($('#action-form-cont'+postId).find('.form-flagged').val() == 'SEND_EMAIL'){
-					$('#act-cont'+postId+'-'+j).find('.action-mail-icn').removeClass('hide');
-					$('#act-cont'+postId+'-'+j).addClass('stream-action-mail');	
-				}
-				$('#act-cont'+postId+'-'+j).find('.act-details-text').html(text);
-				
-				lastUpdatedAction = (new Date()).getTime();
-				lastUpdatedDateAction = new Date(lastUpdatedAction);
-				lastUpdatedDateActionStr = monthName[lastUpdatedDateAction.getMonth()]+' '+(lastUpdatedDateAction.getDate()%10!=lastUpdatedDateAction.getDate()?lastUpdatedDateAction.getDate():('0'+lastUpdatedDateAction.getDate()))+', '+lastUpdatedDateAction.getFullYear()
-				+' at '+(lastUpdatedDateAction.getHours()%10!=lastUpdatedDateAction.getHours()?lastUpdatedDateAction.getHours():('0'+lastUpdatedDateAction.getHours()))+':'
-				+(lastUpdatedDateAction.getMinutes()%10!=lastUpdatedDateAction.getMinutes()?lastUpdatedDateAction.getMinutes():('0'+lastUpdatedDateAction.getMinutes()))+':'
-				+(lastUpdatedDateAction.getSeconds()%10!=lastUpdatedDateAction.getSeconds()?lastUpdatedDateAction.getSeconds():('0'+lastUpdatedDateAction.getSeconds()));
-				
-				$('#act-cont'+postId+'-'+j).find('.act-details-date').html(lastUpdatedDateActionStr);
-				
-				$('#action-history'+postId).append(actionHistoryMail);
-			}
-			
-			$('#action-form-container'+postId).find('.stream-action-unflag').addClass('hide');
-			$('#action-form-container'+postId).find('.stream-action-flag').removeClass('hide');
 					
+			var text = $('#action-form-cont'+postId).find('.form-post-textbox').val();
+			
+			updatePostSuccess(postId,text,'NEW',false,map);
+			
 			$('#action-form-cont'+postId).find('.form-post-textbox').val('');
 			$("#overlay-toast").html("Successfully Updated Post");
 			showToast();
@@ -17231,65 +17280,10 @@ $(document).on('click','.stream-action-flag',function(e){
 		$("#overlay-toast").html(map.message);
 		showToast();
 		if (map.status == "success") {
-			var actionHistory = $('#action-history'+postId).html();
+
+			var text = $('#action-form-cont'+postId).find('.form-post-textbox').val();			
 			
-			$('#stream-post-icn-cont'+postId).find('.stream-unflagged-icn').addClass('hide');
-			$('#stream-post-icn-cont'+postId).find('.stream-flagged-icn').removeClass('hide');
-			
-			$('#action-history'+postId).html(streamActionContainer);
-			var j = $('#action-history'+postId).attr('data-count');
-			$('#act-cont').attr('id','act-cont'+postId+'-'+j);
-			
-			if($('#stream-post-cont-'+postId).hasClass('stream-container-gray')){
-				$('#act-cont'+postId+'-'+j).addClass('stream-action-container-white');
-			}
-			
-			$('#act-cont'+postId+'-'+j).find('.action-flag-icn').removeClass('hide');	
-			$('#act-cont'+postId+'-'+j).find('.act-details-text').html('Post was FLAGGED manually by '+map.userName);
-			
-			lastUpdatedAction = (new Date()).getTime();
-			lastUpdatedDateAction = new Date(lastUpdatedAction);
-			lastUpdatedDateActionStr = monthName[lastUpdatedDateAction.getMonth()]+' '+(lastUpdatedDateAction.getDate()%10!=lastUpdatedDateAction.getDate()?lastUpdatedDateAction.getDate():('0'+lastUpdatedDateAction.getDate()))+', '+lastUpdatedDateAction.getFullYear()
-			+' at '+(lastUpdatedDateAction.getHours()%10!=lastUpdatedDateAction.getHours()?lastUpdatedDateAction.getHours():('0'+lastUpdatedDateAction.getHours()))+':'
-			+(lastUpdatedDateAction.getMinutes()%10!=lastUpdatedDateAction.getMinutes()?lastUpdatedDateAction.getMinutes():('0'+lastUpdatedDateAction.getMinutes()))+':'
-			+(lastUpdatedDateAction.getSeconds()%10!=lastUpdatedDateAction.getSeconds()?lastUpdatedDateAction.getSeconds():('0'+lastUpdatedDateAction.getSeconds()));
-			
-			$('#act-cont'+postId+'-'+j).find('.act-details-date').html(lastUpdatedDateActionStr);
-			
-			$('#action-history'+postId).append(actionHistory);
-			
-			var text = $('#action-form-cont'+postId).find('.form-post-textbox').val();
-			if(text!='' && text != undefined && text!=null){
-				var actionHistoryMail = $('#action-history'+postId).html();
-				
-				$('#action-history'+postId).html(streamActionContainer);
-				j = $('#action-history'+postId).attr('data-count');
-				$('#act-cont').attr('id','act-cont'+postId+'-'+j);
-				
-				if($('#stream-post-cont-'+postId).hasClass('stream-container-gray')){
-					$('#act-cont'+postId+'-'+j).addClass('stream-action-container-white');
-				}
-				
-				if($('#action-form-cont'+postId).find('.form-flagged').val() == 'SEND_EMAIL'){
-					$('#act-cont'+postId+'-'+j).find('.action-mail-icn').removeClass('hide');
-					$('#act-cont'+postId+'-'+j).addClass('stream-action-mail');	
-				}
-				$('#act-cont'+postId+'-'+j).find('.act-details-text').html(text);
-				
-				lastUpdatedAction = (new Date()).getTime();
-				lastUpdatedDateAction = new Date(lastUpdatedAction);
-				lastUpdatedDateActionStr = monthName[lastUpdatedDateAction.getMonth()]+' '+(lastUpdatedDateAction.getDate()%10!=lastUpdatedDateAction.getDate()?lastUpdatedDateAction.getDate():('0'+lastUpdatedDateAction.getDate()))+', '+lastUpdatedDateAction.getFullYear()
-				+' at '+(lastUpdatedDateAction.getHours()%10!=lastUpdatedDateAction.getHours()?lastUpdatedDateAction.getHours():('0'+lastUpdatedDateAction.getHours()))+':'
-				+(lastUpdatedDateAction.getMinutes()%10!=lastUpdatedDateAction.getMinutes()?lastUpdatedDateAction.getMinutes():('0'+lastUpdatedDateAction.getMinutes()))+':'
-				+(lastUpdatedDateAction.getSeconds()%10!=lastUpdatedDateAction.getSeconds()?lastUpdatedDateAction.getSeconds():('0'+lastUpdatedDateAction.getSeconds()));
-				
-				$('#act-cont'+postId+'-'+j).find('.act-details-date').html(lastUpdatedDateActionStr);
-				
-				$('#action-history'+postId).append(actionHistoryMail);
-			}
-			
-			$('#action-form-container'+postId).find('.stream-action-flag').addClass('hide');
-			$('#action-form-container'+postId).find('.stream-action-unflag').removeClass('hide');
+			updatePostSuccess(postId,text,'NEW',true,map);
 			
 			$('#action-form-cont'+postId).find('.form-post-textbox').val('');
 			$("#overlay-toast").html("Successfully Updated Post");
@@ -17318,73 +17312,15 @@ $(document).on('click','.stream-action-esc',function(e){
 		$("#overlay-toast").html(map.message);
 		showToast();
 		if (map.status == "success") {
-			var actionHistory = $('#action-history'+postId).html();
-			
-			$('#stream-post-icn-cont'+postId).find('.stream-unflagged-icn').addClass('hide');
-			$('#stream-post-icn-cont'+postId).find('.stream-flagged-icn').addClass('hide');
-			$('#stream-post-icn-cont'+postId).find('.stream-res-icn').addClass('hide');
-			$('#stream-post-icn-cont'+postId).find('.stream-esc-icn').removeClass('hide');
-			
-			$('#action-history'+postId).html(streamActionContainer);
-			var j = $('#action-history'+postId).attr('data-count');
-			$('#act-cont').attr('id','act-cont'+postId+'-'+j);
-			
-			if($('#stream-post-cont-'+postId).hasClass('stream-container-gray')){
-				$('#act-cont'+postId+'-'+j).addClass('stream-action-container-white');
-			}
-			
-			$('#act-cont'+postId+'-'+j).find('.action-esc-icn').removeClass('hide');	
-			$('#act-cont'+postId+'-'+j).find('.act-details-text').html('Post was ESCALATED manually by '+map.userName);
-			
-			lastUpdatedAction = (new Date()).getTime();
-			lastUpdatedDateAction = new Date(lastUpdatedAction);
-			lastUpdatedDateActionStr = monthName[lastUpdatedDateAction.getMonth()]+' '+(lastUpdatedDateAction.getDate()%10!=lastUpdatedDateAction.getDate()?lastUpdatedDateAction.getDate():('0'+lastUpdatedDateAction.getDate()))+', '+lastUpdatedDateAction.getFullYear()
-			+' at '+(lastUpdatedDateAction.getHours()%10!=lastUpdatedDateAction.getHours()?lastUpdatedDateAction.getHours():('0'+lastUpdatedDateAction.getHours()))+':'
-			+(lastUpdatedDateAction.getMinutes()%10!=lastUpdatedDateAction.getMinutes()?lastUpdatedDateAction.getMinutes():('0'+lastUpdatedDateAction.getMinutes()))+':'
-			+(lastUpdatedDateAction.getSeconds()%10!=lastUpdatedDateAction.getSeconds()?lastUpdatedDateAction.getSeconds():('0'+lastUpdatedDateAction.getSeconds()));
-			
-			$('#act-cont'+postId+'-'+j).find('.act-details-date').html(lastUpdatedDateActionStr);
-			
-			$('#action-history'+postId).append(actionHistory);
 			
 			var text = $('#action-form-cont'+postId).find('.form-post-textbox').val();
-			if(text!='' && text != undefined && text!=null){
-				var actionHistoryMail = $('#action-history'+postId).html();
-				
-				$('#action-history'+postId).html(streamActionContainer);
-				j = $('#action-history'+postId).attr('data-count');
-				$('#act-cont').attr('id','act-cont'+postId+'-'+j);
-				
-				if($('#stream-post-cont-'+postId).hasClass('stream-container-gray')){
-					$('#act-cont'+postId+'-'+j).addClass('stream-action-container-white');
-				}
-				
-				if($('#action-form-cont'+postId).find('.form-flagged').val() == 'SEND_EMAIL'){
-					$('#act-cont'+postId+'-'+j).find('.action-mail-icn').removeClass('hide');
-					$('#act-cont'+postId+'-'+j).addClass('stream-action-mail');	
-				}
-				$('#act-cont'+postId+'-'+j).find('.act-details-text').html(text);
-				
-				lastUpdatedAction = (new Date()).getTime();
-				lastUpdatedDateAction = new Date(lastUpdatedAction);
-				lastUpdatedDateActionStr = monthName[lastUpdatedDateAction.getMonth()]+' '+(lastUpdatedDateAction.getDate()%10!=lastUpdatedDateAction.getDate()?lastUpdatedDateAction.getDate():('0'+lastUpdatedDateAction.getDate()))+', '+lastUpdatedDateAction.getFullYear()
-				+' at '+(lastUpdatedDateAction.getHours()%10!=lastUpdatedDateAction.getHours()?lastUpdatedDateAction.getHours():('0'+lastUpdatedDateAction.getHours()))+':'
-				+(lastUpdatedDateAction.getMinutes()%10!=lastUpdatedDateAction.getMinutes()?lastUpdatedDateAction.getMinutes():('0'+lastUpdatedDateAction.getMinutes()))+':'
-				+(lastUpdatedDateAction.getSeconds()%10!=lastUpdatedDateAction.getSeconds()?lastUpdatedDateAction.getSeconds():('0'+lastUpdatedDateAction.getSeconds()));
-				
-				$('#act-cont'+postId+'-'+j).find('.act-details-date').html(lastUpdatedDateActionStr);
-				
-				$('#action-history'+postId).append(actionHistoryMail);
-			}
 			
-			$('#action-form-container'+postId).find('.stream-action-flag').addClass('hide');
-			$('#action-form-container'+postId).find('.stream-action-unflag').addClass('hide');
-			$('#action-form-container'+postId).find('.stream-action-esc').addClass('hide');
-			$('#action-form-container'+postId).find('.stream-action-res').removeClass('hide');
+			updatePostSuccess(postId,text,'ESCALATED',true,map)
 			
 			$('#action-form-cont'+postId).find('.form-post-textbox').val('');
 			$("#overlay-toast").html("Successfully Updated Post");
 			showToast();
+			
 		} else {
 			$("#overlay-toast").html("Failed to update post. Please Try again");
 			showToast();
@@ -17408,77 +17344,127 @@ $(document).on('click','.stream-action-res',function(e){
 		$("#overlay-toast").html(map.message);
 		showToast();
 		if (map.status == "success") {
-			var actionHistory = $('#action-history'+postId).html();
-			
-			$('#stream-post-icn-cont'+postId).find('.stream-esc-icn').addClass('hide');
-			$('#stream-post-icn-cont'+postId).find('.stream-res-icn').removeClass('hide');
-			
-			$('#action-history'+postId).html(streamActionContainer);
-			var j = $('#action-history'+postId).attr('data-count');
-			$('#act-cont').attr('id','act-cont'+postId+'-'+j);
-			
-			if($('#stream-post-cont-'+postId).hasClass('stream-container-gray')){
-				$('#act-cont'+postId+'-'+j).addClass('stream-action-container-white');
-			}
-			
-			$('#act-cont'+postId+'-'+j).find('.action-res-icn').removeClass('hide');	
-			$('#act-cont'+postId+'-'+j).find('.act-details-text').html('Post was ESCALATED manually by '+map.userName);
-			
-			lastUpdatedAction = (new Date()).getTime();
-			lastUpdatedDateAction = new Date(lastUpdatedAction);
-			lastUpdatedDateActionStr = monthName[lastUpdatedDateAction.getMonth()]+' '+(lastUpdatedDateAction.getDate()%10!=lastUpdatedDateAction.getDate()?lastUpdatedDateAction.getDate():('0'+lastUpdatedDateAction.getDate()))+', '+lastUpdatedDateAction.getFullYear()
-			+' at '+(lastUpdatedDateAction.getHours()%10!=lastUpdatedDateAction.getHours()?lastUpdatedDateAction.getHours():('0'+lastUpdatedDateAction.getHours()))+':'
-			+(lastUpdatedDateAction.getMinutes()%10!=lastUpdatedDateAction.getMinutes()?lastUpdatedDateAction.getMinutes():('0'+lastUpdatedDateAction.getMinutes()))+':'
-			+(lastUpdatedDateAction.getSeconds()%10!=lastUpdatedDateAction.getSeconds()?lastUpdatedDateAction.getSeconds():('0'+lastUpdatedDateAction.getSeconds()));
-			
-			$('#act-cont'+postId+'-'+j).find('.act-details-date').html(lastUpdatedDateActionStr);
-			
-			$('#action-history'+postId).append(actionHistory);
-			
+	
 			var text = $('#action-form-cont'+postId).find('.form-post-textbox').val();
-			if(text!='' && text != undefined && text!=null){
-				var actionHistoryMail = $('#action-history'+postId).html();
-				
-				$('#action-history'+postId).html(streamActionContainer);
-				j = $('#action-history'+postId).attr('data-count');
-				$('#act-cont').attr('id','act-cont'+postId+'-'+j);
-				
-				if($('#stream-post-cont-'+postId).hasClass('stream-container-gray')){
-					$('#act-cont'+postId+'-'+j).addClass('stream-action-container-white');
-				}
-				
-				if($('#action-form-cont'+postId).find('.form-flagged').val() == 'SEND_EMAIL'){
-					$('#act-cont'+postId+'-'+j).find('.action-mail-icn').removeClass('hide');
-					$('#act-cont'+postId+'-'+j).addClass('stream-action-mail');	
-				}
-				$('#act-cont'+postId+'-'+j).find('.act-details-text').html(text);
-				
-				var lastUpdatedAction = (new Date()).getTime();
-				var lastUpdatedDateAction = new Date(lastUpdatedAction);
-				var lastUpdatedDateActionStr = monthName[lastUpdatedDateAction.getMonth()]+' '+(lastUpdatedDateAction.getDate()%10!=lastUpdatedDateAction.getDate()?lastUpdatedDateAction.getDate():('0'+lastUpdatedDateAction.getDate()))+', '+lastUpdatedDateAction.getFullYear()
-				+' at '+(lastUpdatedDateAction.getHours()%10!=lastUpdatedDateAction.getHours()?lastUpdatedDateAction.getHours():('0'+lastUpdatedDateAction.getHours()))+':'
-				+(lastUpdatedDateAction.getMinutes()%10!=lastUpdatedDateAction.getMinutes()?lastUpdatedDateAction.getMinutes():('0'+lastUpdatedDateAction.getMinutes()))+':'
-				+(lastUpdatedDateAction.getSeconds()%10!=lastUpdatedDateAction.getSeconds()?lastUpdatedDateAction.getSeconds():('0'+lastUpdatedDateAction.getSeconds()));
-				
-				$('#act-cont'+postId+'-'+j).find('.act-details-date').html(lastUpdatedDateActionStr);
-				
-				$('#action-history'+postId).append(actionHistoryMail);
-			}
 			
-			$('#action-form-container'+postId).find('.stream-action-flag').addClass('hide');
-			$('#action-form-container'+postId).find('.stream-action-unflag').addClass('hide');
-			$('#action-form-container'+postId).find('.stream-action-res').addClass('hide');
-			$('#action-form-container'+postId).find('.stream-action-esc').removeClass('hide');
+			updatePostSuccess(postId,text,'RESOLVED',false,map)
 			
 			$('#action-form-cont'+postId).find('.form-post-textbox').val('');
 			$("#overlay-toast").html("Successfully Updated Post");
 			showToast();
+			
 		} else {
 			$("#overlay-toast").html("Failed to update post. Please Try again");
 			showToast();
 		}
 	}, formId,disableEle);
 });
+
+function updatePostSuccess(postId,text,status,flagged,map){
+	
+	$('#action-history'+postId).prepend(streamActionContainer).hide().fadeIn('slow');;
+	var j = $('#action-history'+postId).attr('data-count');
+	$('#act-cont').attr('id','act-cont'+postId+'-'+j);
+	
+	if($('#stream-post-cont-'+postId).hasClass('stream-container-gray')){
+		$('#act-cont'+postId+'-'+j).addClass('stream-action-container-white');
+	}
+	
+	lastUpdatedAction = (new Date()).getTime();
+	lastUpdatedDateAction = new Date(lastUpdatedAction);
+	lastUpdatedDateActionStr = monthName[lastUpdatedDateAction.getMonth()]+' '+(lastUpdatedDateAction.getDate()%10!=lastUpdatedDateAction.getDate()?lastUpdatedDateAction.getDate():('0'+lastUpdatedDateAction.getDate()))+', '+lastUpdatedDateAction.getFullYear()
+	+' at '+(lastUpdatedDateAction.getHours()%10!=lastUpdatedDateAction.getHours()?lastUpdatedDateAction.getHours():('0'+lastUpdatedDateAction.getHours()))+':'
+	+(lastUpdatedDateAction.getMinutes()%10!=lastUpdatedDateAction.getMinutes()?lastUpdatedDateAction.getMinutes():('0'+lastUpdatedDateAction.getMinutes()))+':'
+	+(lastUpdatedDateAction.getSeconds()%10!=lastUpdatedDateAction.getSeconds()?lastUpdatedDateAction.getSeconds():('0'+lastUpdatedDateAction.getSeconds()));
+	
+	$('#act-cont'+postId+'-'+j).find('.act-details-date').html(lastUpdatedDateActionStr);
+	
+	if(status == 'NEW'){
+		if(flagged == true || flagged == 'true'){
+			
+			$('#stream-post-icn-cont'+postId).find('.stream-unflagged-icn').addClass('hide');
+			$('#stream-post-icn-cont'+postId).find('.stream-flagged-icn').removeClass('hide');
+			
+			$('#act-cont'+postId+'-'+j).find('.action-flag-icn').removeClass('hide');	
+			$('#act-cont'+postId+'-'+j).find('.act-details-text').html('Post was FLAGGED manually by '+map.userName);
+			
+			$('#action-form-container'+postId).find('.stream-action-flag').addClass('hide');
+			$('#action-form-container'+postId).find('.stream-action-unflag').removeClass('hide');
+			
+		}else{
+			
+			$('#stream-post-icn-cont'+postId).find('.stream-flagged-icn').addClass('hide');
+			$('#stream-post-icn-cont'+postId).find('.stream-unflagged-icn').removeClass('hide');
+			
+			$('#act-cont'+postId+'-'+j).find('.action-flag-icn').removeClass('hide');	
+			$('#act-cont'+postId+'-'+j).find('.act-details-text').html('Post was UNFLAGGED manually by '+map.userName);
+			
+			$('#action-form-container'+postId).find('.stream-action-unflag').addClass('hide');
+			$('#action-form-container'+postId).find('.stream-action-flag').removeClass('hide');
+			
+		}
+		
+	}else if(status == 'ESCALATED'){
+		
+		$('#stream-post-icn-cont'+postId).find('.stream-unflagged-icn').addClass('hide');
+		$('#stream-post-icn-cont'+postId).find('.stream-flagged-icn').addClass('hide');
+		$('#stream-post-icn-cont'+postId).find('.stream-res-icn').addClass('hide');
+		$('#stream-post-icn-cont'+postId).find('.stream-esc-icn').removeClass('hide');
+		
+		$('#act-cont'+postId+'-'+j).find('.action-esc-icn').removeClass('hide');	
+		$('#act-cont'+postId+'-'+j).find('.act-details-text').html('Post was ESCALATED manually by '+map.userName);
+		
+		$('#action-form-container'+postId).find('.stream-action-flag').addClass('hide');
+		$('#action-form-container'+postId).find('.stream-action-unflag').addClass('hide');
+		$('#action-form-container'+postId).find('.stream-action-esc').addClass('hide');
+		$('#action-form-container'+postId).find('.stream-action-res').removeClass('hide');
+		
+	}else if(status == 'RESOLVED'){
+		$('#stream-post-icn-cont'+postId).find('.stream-esc-icn').addClass('hide');
+		$('#stream-post-icn-cont'+postId).find('.stream-res-icn').removeClass('hide');
+		
+		$('#act-cont'+postId+'-'+j).find('.action-res-icn').removeClass('hide');	
+		$('#act-cont'+postId+'-'+j).find('.act-details-text').html('Post was RESOLVED manually by '+map.userName);
+		
+		$('#action-form-container'+postId).find('.stream-action-flag').addClass('hide');
+		$('#action-form-container'+postId).find('.stream-action-unflag').addClass('hide');
+		$('#action-form-container'+postId).find('.stream-action-res').addClass('hide');
+		$('#action-form-container'+postId).find('.stream-action-esc').removeClass('hide');
+	}
+	
+	if(text!='' && text != undefined && text!=null){
+		var actionHistoryMail = $('#action-history'+postId).html();
+		
+		$('#action-history'+postId).prepend(streamActionContainer).hide().fadeIn('slow');;
+		j = $('#action-history'+postId).attr('data-count');
+		$('#act-cont').attr('id','act-cont'+postId+'-'+j);
+		
+		if($('#stream-post-cont-'+postId).hasClass('stream-container-gray')){
+			$('#act-cont'+postId+'-'+j).addClass('stream-action-container-white');
+		}
+		
+		if($('#action-form-cont'+postId).find('.form-text-act-type').val() == 'SEND_EMAIL'){
+			$('#act-cont'+postId+'-'+j).find('.action-mail-icn').removeClass('hide');
+			$('#act-cont'+postId+'-'+j).addClass('stream-action-mail');	
+		}
+		$('#act-cont'+postId+'-'+j).find('.act-details-text').html(text);
+		
+		lastUpdatedAction = (new Date()).getTime();
+		lastUpdatedDateAction = new Date(lastUpdatedAction);
+		lastUpdatedDateActionStr = monthName[lastUpdatedDateAction.getMonth()]+' '+(lastUpdatedDateAction.getDate()%10!=lastUpdatedDateAction.getDate()?lastUpdatedDateAction.getDate():('0'+lastUpdatedDateAction.getDate()))+', '+lastUpdatedDateAction.getFullYear()
+		+' at '+(lastUpdatedDateAction.getHours()%10!=lastUpdatedDateAction.getHours()?lastUpdatedDateAction.getHours():('0'+lastUpdatedDateAction.getHours()))+':'
+		+(lastUpdatedDateAction.getMinutes()%10!=lastUpdatedDateAction.getMinutes()?lastUpdatedDateAction.getMinutes():('0'+lastUpdatedDateAction.getMinutes()))+':'
+		+(lastUpdatedDateAction.getSeconds()%10!=lastUpdatedDateAction.getSeconds()?lastUpdatedDateAction.getSeconds():('0'+lastUpdatedDateAction.getSeconds()));
+		
+		$('#act-cont'+postId+'-'+j).find('.act-details-date').html(lastUpdatedDateActionStr);
+		
+		//$('#action-history'+postId).append(actionHistoryMail);
+		
+	}
+	
+	var macroList = macrosForStream;
+	drawMacroListDropdown(postId,macroList);
+}
 
 $(document).on('click','.stream-action-submit',function(e){
 	e.stopPropagation();
@@ -17498,7 +17484,7 @@ $(document).on('click','.stream-action-submit',function(e){
 			if(text!='' && text != undefined && text!=null){
 				var actionHistoryMail = $('#action-history'+postId).html();
 				
-				$('#action-history'+postId).html(streamActionContainer);
+				$('#action-history'+postId).prepend(streamActionContainer).hide().fadeIn('slow');
 				var j = $('#action-history'+postId).attr('data-count');
 				$('#act-cont').attr('id','act-cont'+postId+'-'+j);
 				
@@ -17506,7 +17492,7 @@ $(document).on('click','.stream-action-submit',function(e){
 					$('#act-cont'+postId+'-'+j).addClass('stream-action-container-white');
 				}
 				
-				if($('#action-form-cont'+postId).find('.form-flagged').val() == 'SEND_EMAIL'){
+				if($('#action-form-cont'+postId).find('.form-text-act-type').val() == 'SEND_EMAIL'){
 					$('#act-cont'+postId+'-'+j).find('.action-mail-icn').removeClass('hide');
 					$('#act-cont'+postId+'-'+j).addClass('stream-action-mail');	
 				}
@@ -17521,7 +17507,7 @@ $(document).on('click','.stream-action-submit',function(e){
 				
 				$('#act-cont'+postId+'-'+j).find('.act-details-date').html(lastUpdatedDateActionStr);
 				
-				$('#action-history'+postId).append(actionHistoryMail);
+				//$('#action-history'+postId).append(actionHistoryMail);
 			}
 			
 			$('#action-form-cont'+postId).find('.form-post-textbox').val('');

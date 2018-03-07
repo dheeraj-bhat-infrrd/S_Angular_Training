@@ -281,5 +281,8 @@ public final class DisplayMessageConstants
     
     public static final String ADD_MACRO_SUCCESSFUL = "SUCCESSFULLY ADDED MACRO";
     public static final String ADD_MACRO_UNSUCCESSFUL = "UNABLE TO ADD MACRO";
+    
+    public static final String UPDATE_POST_SUCCESSFUL = "SUCCESSFULLY UPDATED POST";
+    public static final String UPDATE_POST_UNSUCCESSFUL = "UNABLE TO UPDATE POST";
 }
 

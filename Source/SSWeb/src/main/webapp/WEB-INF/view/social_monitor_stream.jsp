@@ -105,6 +105,14 @@
 	</div>
 </div>
 
+<form id="macro-form-apply">
+	<input type="hidden" id="macro-form-post-id" class="macro-form-post-id" name="macro-form-post-id" value="">
+	<input type="hidden" id="macro-form-flagged" class="macro-form-flagged" name="macro-form-flagged" value="false">
+	<input type="hidden" id="macro-form-status" name="macro-form-status" class="macro-form-status" value="NEW">
+	<input type="hidden" id="macroform-text-act-type" class="macroform-text-act-type" name="macroform-text-act-type" value="SEND_EMAIL">
+	<input type="hidden" id="macro-form-macro-id" class="macro-form-macro-id" name="macro-form-macro-id" value="">
+	<input type="hidden" id="macro-form-text" class="macro-form-text" name="macro-form-text" value="">
+</form>
 <div id="soc-mon-stream" class="dash-wrapper-main">
 	<div class="dash-container container">
 		<div class="hm-header-main-wrapper hm-hdr-bord-bot soc-mon-sub-hdr">

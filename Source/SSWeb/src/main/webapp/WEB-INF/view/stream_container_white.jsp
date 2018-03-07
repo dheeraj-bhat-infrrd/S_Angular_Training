@@ -52,7 +52,7 @@
 			<div class="private-note-post col-lg-3 col-md-3 col-sm-3 col-xs-3 stream-post-mail-note">Private Note</div>
 		</div>
 		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-			<textarea class="form-control stream-post-textbox" rows="3" name="form-post-textbox" class="form-post-textbox" id="form-post-textbox" placeholder="Send an email message to offending user or take a private note"></textarea>
+			<textarea class="form-post-textbox form-control stream-post-textbox" rows="3" name="form-post-textbox" id="form-post-textbox" placeholder="Send an email message to offending user or take a private note"></textarea>
 		</div>
 		<div id="action-form-container" class="action-form-container col-lg-12 col-md-12 col-sm-12 col-xs-12 stream-actions-btn-container">
 			<input type="hidden" id="form-post-act-macro-id" name="form-post-act-macro-id" value=>
