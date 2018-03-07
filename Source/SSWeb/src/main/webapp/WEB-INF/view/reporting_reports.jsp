@@ -154,7 +154,7 @@ $(document).ready(function() {
 		$('#digest-time-div').removeClass('hide');
 	} else {
 		$('#digest-time-div').addClass('hide');
-
+	}
 		
 	if(key == 1001){
 		$('#email-rep-time-div').removeClass('hide');

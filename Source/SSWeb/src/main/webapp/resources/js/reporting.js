@@ -2116,14 +2116,14 @@ function updateReportingDashboard(){
 }
 
 function drawLeaderboardTableStructure(userRankingList,userId,profileMasterId){
-	var tableHeaderData='<table id="leaderboard-table" class="v-um-tbl leaderboard-table">'
+	var tableHeaderData='<table id="leaderboard-table" class="v-um-tbl leaderboard-table col-lg-12 col-md-12 col-sm-12 col-xs-12">'
 		+'<tr id="u-tbl-header" class="u-tbl-header">'
 		+'<td class="lead-tbl-ln-of text-center">Rank</td>'
 		+'<td class="v-tbl-uname lead-name-alignment">Name</td>'
-		+'<td class="lead-tbl-ln-of text-center">Reviews</td>'
-		+'<td class="lead-tbl-ln-of text-center">Average Score</td>'
-		+'<td class="lead-tbl-ln-of text-center">SPS</td>'
-		+'<td class="lead-tbl-ln-of text-center">Completion %</td>'
+		+'<td class="lead-tbl-ln-of text-center lead-tbl-hdr">Reviews</td>'
+		+'<td class="lead-tbl-ln-of text-center lead-tbl-hdr">Average Score</td>'
+		+'<td class="lead-tbl-ln-of text-center lead-tbl-hdr">SPS</td>'
+		+'<td class="lead-tbl-ln-of text-center lead-tbl-hdr">Completion %</td>'
 		+'</tr>';
 	
 	var tableData = '';
@@ -2281,10 +2281,8 @@ function drawLineGraphForScoreStats(chartDiv,chartData){
 
 			var options = {
 							chartArea : {
-							width : '95%'
+							width : '90%'
 							},
-							width: 800,
-							height : 300,
 							vAxis : {
 								minValue : 0,
 								maxValue : 5,
@@ -2420,10 +2418,10 @@ function drawQuestionScoreStatsGraph(entityId,entityType){
 		for(var i=0; i<questionScoreStatsArray.length ; i++){
 			
 			var graphDivHtml = '';
-			graphDivHtml += '<div class="col-md-12 col-lg-12 col-sm-12 col-xs-12" style="margin-top: 10px; display: inline-block; float:left; width:100%;height:350px; margin-left:15px">'
-						+ '<span class="rep-sps-lbl" style="margin-top: 13px;">'+ (i+1)+') ' + questionArray[i] + '</span>'
+			graphDivHtml += '<div class="col-md-12 col-lg-12 col-sm-12 col-xs-12  score-stats-graph-con score-stats-ques-graph-con">'
+						+ '<span class="score-stats-lbl" >'+ (i+1)+') ' + questionArray[i] + '</span>'
 						+ '<div class="col-md-12 col-lg-12 col-sm-12 col-xs-12"> '
-						+ '<div id="question-rating-chart-'+i+'" style="width:80%; height:300px;margin: 20px 20px 20px 60px;"></div>'
+						+ '<div id="question-rating-chart-'+i+'" style="width: 100%; height: 300px"></div>'
 						+ '</div></div>';
 			
 			$('#question-ratings-div').append(graphDivHtml);
