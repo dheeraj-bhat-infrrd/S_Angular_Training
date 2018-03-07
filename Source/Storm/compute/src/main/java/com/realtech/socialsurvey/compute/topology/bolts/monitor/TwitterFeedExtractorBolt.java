@@ -37,7 +37,7 @@ public class TwitterFeedExtractorBolt extends BaseComputeBolt
 {
     private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger( TwitterFeedExtractorBolt.class );
-    private RedisSocialMediaStateDao socialMediaStateDao = new RedisSocialMediaStateDaoImpl();
+    private RedisSocialMediaStateDao socialMediaStateDao;
 
     private TwitterFeedProcessor twitterFeedProcessor;
 
@@ -159,6 +159,7 @@ public class TwitterFeedExtractorBolt extends BaseComputeBolt
     public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
         super.prepare(stormConf, context, collector);
         this.twitterFeedProcessor = new TwitterFeedProcessorImpl();
+        this.socialMediaStateDao = new RedisSocialMediaStateDaoImpl();
         twitterConsumerKey = (String) stormConf.get(ComputeConstants.TWITTER_CONSUMER_KEY);
         twitterConsumerSecret = (String) stormConf.get(ComputeConstants.TWITTER_CONSUMER_SECRET);
     }

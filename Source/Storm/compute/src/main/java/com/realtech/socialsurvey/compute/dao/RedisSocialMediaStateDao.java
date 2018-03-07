@@ -58,6 +58,7 @@ public interface RedisSocialMediaStateDao extends Serializable
     public boolean setWaitForNextFetch( int seconds );
 
     /**
+     * Add key with TTL
      * @param key
      * @param value
      * @param seconds
@@ -66,8 +67,50 @@ public interface RedisSocialMediaStateDao extends Serializable
     public boolean addWithExpire( String key, String value, int seconds );
 
     /**
+     * Get TTL for given key
      * @param key
      * @return
      */
     public long getTTLForKey( String key);
+
+    /**
+     * Loock on facebook for pageid
+     * @param pageId
+     * @param secondsUntilReset
+     */
+    public void setFacebookLockForPage( String pageId, int secondsUntilReset );
+
+    /**
+     * Lock on facebook for accessToken
+     * @param accessToken
+     * @param secondsUntilReset
+     */
+    public void setFacebookLockForToken( String accessToken, int secondsUntilReset );
+    
+    /**
+     * Lock on facebook for application
+     * @param accessToken
+     * @param secondsUntilReset
+     */
+    public void setFacebookLockForApplication( int secondsUntilReset );
+
+    /**
+     * check for facebook page lock
+     * @param pageId
+     * @return
+     */
+    boolean isFacebookPageLockSet( String pageId );
+
+    /**
+     * Check for facebook access token lock
+     * @param accessToken
+     * @return
+     */
+    boolean isFacebookTokenLockSet( String accessToken );
+
+    /**
+     * Check for facebook application lock
+     * @return
+     */
+    boolean isFacebookApplicationLockSet();
 }

@@ -14,9 +14,9 @@ import com.realtech.socialsurvey.compute.common.RetrofitApiBuilder;
 import com.realtech.socialsurvey.compute.entities.FileUploadResponse;
 import com.realtech.socialsurvey.compute.entities.ReportRequest;
 import com.realtech.socialsurvey.compute.enums.FileUploadStatus;
+import com.realtech.socialsurvey.compute.exception.APIIntegrationException;
 import com.realtech.socialsurvey.compute.exception.FileUploadUpdationException;
 import com.realtech.socialsurvey.compute.services.FailedMessagesService;
-import com.realtech.socialsurvey.compute.services.api.APIIntegrationException;
 import com.realtech.socialsurvey.compute.services.impl.FailedMessagesServiceImpl;
 import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBoltWithAck;
 

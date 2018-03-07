@@ -12,8 +12,8 @@ import com.realtech.socialsurvey.compute.entities.request.SolrAdd;
 import com.realtech.socialsurvey.compute.entities.request.SolrRequest;
 import com.realtech.socialsurvey.compute.entities.response.SOLRResponse;
 import com.realtech.socialsurvey.compute.entities.response.SOLRResponseObject;
+import com.realtech.socialsurvey.compute.exception.APIIntegrationException;
 import com.realtech.socialsurvey.compute.exception.SolrProcessingException;
-import com.realtech.socialsurvey.compute.services.api.APIIntegrationException;
 import com.realtech.socialsurvey.compute.utils.ChararcterUtils;
 
 import retrofit2.Call;
