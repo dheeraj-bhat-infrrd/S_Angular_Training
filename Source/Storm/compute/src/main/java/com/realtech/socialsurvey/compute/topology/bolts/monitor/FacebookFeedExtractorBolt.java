@@ -13,6 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
+import com.realtech.socialsurvey.compute.dao.RedisSocialMediaStateDao;
+import com.realtech.socialsurvey.compute.dao.impl.RedisSocialMediaStateDaoImpl;
 import com.realtech.socialsurvey.compute.entities.FacebookToken;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.compute.entities.response.FacebookFeedData;
@@ -36,11 +38,21 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt
     private static final Logger LOG = LoggerFactory.getLogger( FacebookFeedExtractorBolt.class );
 
     private FacebookFeedProcessor facebookFeedProcessor;
+    private RedisSocialMediaStateDao socialMediaStateDao;
 
 
-    private boolean isRateLimitExceeded()
+    private boolean isRateLimitExceeded( SocialMediaTokenResponse mediaToken )
     {
-        // TODO ckech for ratelimiting for facebook api (based on user-id, page-id, )
+        if ( mediaToken.getSocialMediaTokens() != null && mediaToken.getSocialMediaTokens().getFacebookToken() != null ) {
+            FacebookToken token = mediaToken.getSocialMediaTokens().getFacebookToken();
+            String pageId = UrlHelper.getFacebookPageIdFromURL( token.getFacebookPageLink() );
+
+            if (socialMediaStateDao.isFacebookApplicationLockSet() || socialMediaStateDao.isFacebookPageLockSet( pageId ) || socialMediaStateDao
+                .isFacebookTokenLockSet( mediaToken.getSocialMediaTokens().getFacebookToken().getFacebookAccessToken() ) ) {
+                LOG.warn( "Facebook feed extractor reached rate limiting." );
+                return true;
+            }
+        }
         return false;
     }
 
@@ -50,6 +62,7 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt
     {
         super.prepare( stormConf, context, collector );
         this.facebookFeedProcessor = new FacebookFeedProcessorImpl();
+        this.socialMediaStateDao = new RedisSocialMediaStateDaoImpl();
     }
 
 
@@ -61,24 +74,23 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt
             Long companyId = mediaToken.getCompanyId();
 
             // Check rate limiting for company
-            if ( isRateLimitExceeded( /* pass media token*/ ) ) {
+            if ( isRateLimitExceeded( mediaToken ) ) {
                 LOG.warn( "Rate limit exceeded" );
+            } else {
+                List<FacebookFeedData> feeds = facebookFeedProcessor.fetchFeeds( companyId, mediaToken );
+
+                String lastFetchedKey = getLastFetchedKey( mediaToken );
+
+                LOG.debug( "Total tweet fetched : {}", feeds.size() );
+                for ( FacebookFeedData facebookFeedData : feeds ) {
+                    SocialResponseObject<FacebookFeedData> responseWrapper = createSocialResponseObject( mediaToken,
+                        facebookFeedData );
+                    String responseWrapperString = new Gson().toJson( responseWrapper );
+
+                    _collector.emit( new Values( Long.toString( companyId ), responseWrapperString, lastFetchedKey ) );
+                    LOG.debug( "Emitted successfully {}", responseWrapper );
+                }
             }
-
-            List<FacebookFeedData> feeds = facebookFeedProcessor.fetchFeeds( companyId, mediaToken );
-
-            String lastFetchedKey = getLastFetchedKey( mediaToken );
-
-            LOG.debug( "Total tweet fetched : {}", feeds.size() );
-            for ( FacebookFeedData facebookFeedData : feeds ) {
-                SocialResponseObject<FacebookFeedData> responseWrapper = createSocialResponseObject( mediaToken,
-                    facebookFeedData );
-                String responseWrapperString = new Gson().toJson( responseWrapper );
-
-                _collector.emit( new Values( Long.toString( companyId ), responseWrapperString, lastFetchedKey ) );
-                LOG.debug( "Emitted successfully {}", responseWrapper );
-            }
-
         }
         // End loop for companies
         catch ( Exception e ) {

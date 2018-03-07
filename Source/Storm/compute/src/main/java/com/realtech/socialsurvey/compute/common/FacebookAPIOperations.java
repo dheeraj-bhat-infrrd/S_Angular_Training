@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.realtech.socialsurvey.compute.entities.response.FacebookResponse;
-import com.realtech.socialsurvey.compute.services.api.APIIntegrationException;
+import com.realtech.socialsurvey.compute.exception.APIIntegrationException;
 
 import retrofit2.Call;
 import retrofit2.Response;
@@ -22,8 +22,8 @@ public class FacebookAPIOperations
     private static final Logger LOG = LoggerFactory.getLogger( FacebookAPIOperations.class );
     private static FacebookAPIOperations apiOperations;
     
-    private static String FIELDS ="story,message,created_time,updated_time,full_picture,picture,message_tags,from";
-    private static String LIMIT = "100";
+    private static final String FIELDS ="story,message,created_time,updated_time,full_picture,picture,message_tags,from";
+    private static final String LIMIT = "100";
 
     private FacebookAPIOperations()
     {}
@@ -46,18 +46,20 @@ public class FacebookAPIOperations
      * @param before - before cursor
      * @return
      */
-    public FacebookResponse fetchFeeds( String pageId , String accessToken, String since, String until, String pagingToken)
+    public Response<FacebookResponse> fetchFeeds( String pageId , String accessToken, String since, String until, String pagingToken)
     {
         Call<FacebookResponse> requestCall = RetrofitApiBuilder.apiBuilderInstance()
             .getFacebookAPIIntergrationService().fetchFeeds( pageId, accessToken, since, until, LIMIT, pagingToken, FIELDS );
         
         try {
             Response<FacebookResponse> response = requestCall.execute();
-            RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
+            RetrofitApiBuilder.apiBuilderInstance().validateFacebookResponse( response );
+
             if ( LOG.isTraceEnabled() ) {
                 LOG.trace( "response {}", response.body() );
+                LOG.trace( "headers {}", response.headers() );
             }
-            return response.body();
+            return response;
         } catch ( IOException | APIIntegrationException e ) {
             LOG.error( "IOException/ APIIntegrationException caught", e );
             return null;

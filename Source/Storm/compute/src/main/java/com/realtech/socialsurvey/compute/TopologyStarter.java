@@ -37,10 +37,15 @@ public class TopologyStarter
             ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? MailEventsTopologyStarterHelper.MAIL_EVENT_TOPOLOGY
                 : ChararcterUtils.appendWithHypen( MailEventsTopologyStarterHelper.MAIL_EVENT_TOPOLOGY,
                     EnvConstants.getProfile() ) );
-        // Social post topology
+        // Social post extractor topology
+        new SocialPostExtractorTopologyStarterHelper().submitTopology( EnvConstants.getCluster().equals( EnvConstants.LOCAL_TOPOLOGY ),
+            ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? SocialPostExtractorTopologyStarterHelper.TOPOLOGY_NAME
+                : ChararcterUtils.appendWithHypen( SocialPostExtractorTopologyStarterHelper.TOPOLOGY_NAME,
+                    EnvConstants.getProfile() ) );
+        // Social post filter topology
         new SocialPostFilterTopologyStarterHelper().submitTopology( EnvConstants.getCluster().equals( EnvConstants.LOCAL_TOPOLOGY ),
-            ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? SocialPostFilterTopologyStarterHelper.SOCIAL_POST_TOPOLOGY
-                : ChararcterUtils.appendWithHypen( SocialPostFilterTopologyStarterHelper.SOCIAL_POST_TOPOLOGY,
+            ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? SocialPostFilterTopologyStarterHelper.TOPOLOGY_NAME
+                : ChararcterUtils.appendWithHypen( SocialPostFilterTopologyStarterHelper.TOPOLOGY_NAME,
                     EnvConstants.getProfile() ) );
         // Reports topology
         new ReportsTopologyStarterHelper().submitTopology( EnvConstants.getCluster().equals( EnvConstants.LOCAL_TOPOLOGY ),

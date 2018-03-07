@@ -12,12 +12,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+/**
+ * Social post topology starter
+ * @author manish
+ *
+ */
 public class SocialPostFilterTopologyStarterHelper extends TopologyStarterHelper
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( SocialPostFilterTopologyStarterHelper.class );
 
-    public static final String SOCIAL_POST_TOPOLOGY = "SocialPostTopology";
+    public static final String TOPOLOGY_NAME = "SocialPostFilterTopology";
 
 
     @Override
@@ -93,8 +98,8 @@ public class SocialPostFilterTopologyStarterHelper extends TopologyStarterHelper
         // Social post topology
         new SocialPostFilterTopologyStarterHelper().submitTopology( EnvConstants.getCluster().equals( EnvConstants.LOCAL_TOPOLOGY ),
             ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) )
-                ? SocialPostFilterTopologyStarterHelper.SOCIAL_POST_TOPOLOGY
-                : ChararcterUtils.appendWithHypen( SocialPostFilterTopologyStarterHelper.SOCIAL_POST_TOPOLOGY,
+                ? SocialPostFilterTopologyStarterHelper.TOPOLOGY_NAME
+                : ChararcterUtils.appendWithHypen( SocialPostFilterTopologyStarterHelper.TOPOLOGY_NAME,
                     EnvConstants.getProfile() ) );
     }
 

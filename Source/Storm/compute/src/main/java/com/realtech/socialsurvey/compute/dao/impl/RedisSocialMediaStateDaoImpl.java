@@ -1,14 +1,15 @@
 package com.realtech.socialsurvey.compute.dao.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.realtech.socialsurvey.compute.common.ComputeConstants;
 import com.realtech.socialsurvey.compute.common.LocalPropertyFileHandler;
 import com.realtech.socialsurvey.compute.common.RedisDB;
 import com.realtech.socialsurvey.compute.common.RedisKeyConstants;
 import com.realtech.socialsurvey.compute.dao.RedisSocialMediaStateDao;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.exceptions.JedisException;
 
 
 /**
@@ -20,9 +21,8 @@ public class RedisSocialMediaStateDaoImpl implements RedisSocialMediaStateDao
 {
     private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger( RedisCompanyKeywordsDaoImpl.class );
-    private static final String PREVIOUS = "previous";
-    private static final String CURRENT = "current";
     private static final String TWITTER_LOCK = "twitterLock:";
+    private static final String FACEBOOK_LOCK = "facebookLock:";
 
     private static final int waitForNextFetchTime = Integer.parseInt( LocalPropertyFileHandler.getInstance()
         .getProperty( ComputeConstants.APPLICATION_PROPERTY_FILE, ComputeConstants.MEDIA_TOKENS_FETCH_TIME_INTERVAL )
@@ -35,23 +35,11 @@ public class RedisSocialMediaStateDaoImpl implements RedisSocialMediaStateDao
         if ( currValue == null || prevValue == null ) {
             throw new IllegalArgumentException( "currValue/prevValue cann't be null" );
         }
-
-        Jedis jedis = RedisDB.getPoolInstance().getResource();
-        try {
-            if ( jedis != null ) {
-                jedis.hset( key, RedisKeyConstants.CURRENT, currValue );
-                jedis.hset( key, RedisKeyConstants.PREVIOUS, prevValue );
-                return true;
-            }
-        } catch ( JedisException e ) {
-            LOG.warn( "Jedis exception", e );
-            jedis.close();
-        } finally {
-            if ( null != jedis ) {
-                jedis.close();
-            }
+        try ( Jedis jedis = RedisDB.getPoolInstance().getResource() ) {
+            jedis.hset( key, RedisKeyConstants.CURRENT, currValue );
+            jedis.hset( key, RedisKeyConstants.PREVIOUS, prevValue );
+            return true;
         }
-        return false;
     }
 
 
@@ -63,38 +51,90 @@ public class RedisSocialMediaStateDaoImpl implements RedisSocialMediaStateDao
     @Override
     public boolean resetLastFetched( String key )
     {
-        Jedis jedis = RedisDB.getPoolInstance().getResource();
-        try {
-            if ( jedis != null ) {
-                String prevValue = jedis.hget( key, RedisKeyConstants.PREVIOUS );
-                jedis.hset( key, RedisKeyConstants.CURRENT, prevValue );
-                return true;
-            }
-        } catch ( JedisException e ) {
-            LOG.warn( "Jedis exception", e );
-            jedis.close();
-        } finally {
-            if ( null != jedis ) {
-                jedis.close();
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public void setTwitterLock(int secondsUntilReset, String pageId) {
-        LOG.info("Setting twitter lock on pageId {}", pageId);
-        try(Jedis jedis = RedisDB.getPoolInstance().getResource()) {
-            jedis.setex(TWITTER_LOCK+pageId, secondsUntilReset,"lock"+pageId);
+        try ( Jedis jedis = RedisDB.getPoolInstance().getResource() ) {
+            String prevValue = jedis.hget( key, RedisKeyConstants.PREVIOUS );
+            jedis.hset( key, RedisKeyConstants.CURRENT, prevValue );
+            return true;
         }
     }
 
+
     @Override
-    public boolean isTwitterLockSet(String pageId) {
-        try(Jedis jedis = RedisDB.getPoolInstance().getResource()) {
-           return jedis.exists(TWITTER_LOCK+pageId);
+    public void setTwitterLock( int secondsUntilReset, String pageId )
+    {
+        LOG.info( "Setting twitter lock on pageId {}", pageId );
+        try ( Jedis jedis = RedisDB.getPoolInstance().getResource() ) {
+            jedis.setex( TWITTER_LOCK + pageId, secondsUntilReset, "lock" + pageId );
         }
     }
+
+
+    @Override
+    public boolean isTwitterLockSet( String pageId )
+    {
+        try ( Jedis jedis = RedisDB.getPoolInstance().getResource() ) {
+            return jedis.exists( TWITTER_LOCK + pageId );
+        }
+    }
+
+
+    @Override
+    public boolean isFacebookPageLockSet( String pageId )
+    {
+        try ( Jedis jedis = RedisDB.getPoolInstance().getResource() ) {
+            return jedis.exists( FACEBOOK_LOCK + pageId );
+        }
+    }
+
+
+    @Override
+    public void setFacebookLockForPage( String pageId, int secondsUntilReset )
+    {
+        LOG.info( "Setting facebook lock on pageId {}", pageId );
+        try ( Jedis jedis = RedisDB.getPoolInstance().getResource() ) {
+            jedis.setex( FACEBOOK_LOCK + pageId, secondsUntilReset, "lock" + pageId );
+        }
+    }
+
+
+    @Override
+    public void setFacebookLockForToken( String accessToken, int secondsUntilReset )
+    {
+        LOG.info( "Setting facebook lock on access token {}", accessToken );
+        try ( Jedis jedis = RedisDB.getPoolInstance().getResource() ) {
+            jedis.setex( FACEBOOK_LOCK + accessToken, secondsUntilReset, "lock" + accessToken );
+        }
+    }
+
+
+    @Override
+    public void setFacebookLockForApplication( int secondsUntilReset )
+    {
+        LOG.info( "Setting twitter lock on pageId {}" );
+        try ( Jedis jedis = RedisDB.getPoolInstance().getResource() ) {
+            jedis.setex( FACEBOOK_LOCK + "application", secondsUntilReset, "facebook_application_lock" );
+        }
+
+    }
+
+
+    @Override
+    public boolean isFacebookTokenLockSet( String accessToken )
+    {
+        try ( Jedis jedis = RedisDB.getPoolInstance().getResource() ) {
+            return jedis.exists( FACEBOOK_LOCK + accessToken );
+        }
+    }
+
+
+    @Override
+    public boolean isFacebookApplicationLockSet()
+    {
+        try ( Jedis jedis = RedisDB.getPoolInstance().getResource() ) {
+            return jedis.exists( FACEBOOK_LOCK + "application" );
+        }
+    }
+
 
     /* (non-Javadoc)
      * @see com.realtech.socialsurvey.compute.dao.RedisSinceRecordFetchedDao#getLastFetched(java.lang.String)
@@ -117,11 +157,9 @@ public class RedisSocialMediaStateDaoImpl implements RedisSocialMediaStateDao
     @Override
     public boolean waitForNextFetch()
     {
-        LOG.info( "Executing method getLastFetched waitForNextFetch" );
         try ( Jedis jedis = RedisDB.getPoolInstance().getResource(); ) {
-            
-            if ( jedis.exists( RedisKeyConstants.WAIT_FOR_NEXT_FETCH ) 
-                || jedis.exists( RedisKeyConstants.IS_KAFKA_DOWN )) {
+
+            if ( jedis.exists( RedisKeyConstants.WAIT_FOR_NEXT_FETCH ) || jedis.exists( RedisKeyConstants.IS_KAFKA_DOWN ) ) {
                 return true;
             } else {
                 jedis.setex( RedisKeyConstants.WAIT_FOR_NEXT_FETCH, waitForNextFetchTime, "true" );
@@ -143,7 +181,8 @@ public class RedisSocialMediaStateDaoImpl implements RedisSocialMediaStateDao
             return false;
         }
     }
-    
+
+
     /* (non-Javadoc)
      * @see com.realtech.socialsurvey.compute.dao.RedisSocialMediaStateDao#setWaitForNextFetch(int)
      */
@@ -163,4 +202,6 @@ public class RedisSocialMediaStateDaoImpl implements RedisSocialMediaStateDao
         // TODO Auto-generated method stub
         return false;
     }
+
+
 }
