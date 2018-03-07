@@ -114,17 +114,17 @@ hr{
 			</div>
 		</div>
 	</div>
-	<div id="unclicked-trans-graph" style="margin-top:40px" >
+	<div id="unclicked-trans-graph" class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:40px; padding:0" >
 		<div id="unclicked-graph-div" style="position:relative">
 			<div id="donutchart" style="width: 100%; height: 90%;"></div>
 		</div>	
 	</div>
-	<div id="processed-trans-graph" style="margin-top:40px" class="hide">
+	<div id="processed-trans-graph" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 hide" style="margin-top:40px; padding:0">
 		<div id="processed-graph-div" style="position:relative">
 			<div id="processedDonutchart" style="width: 100%; height: 90%;"></div>
 		</div>
 	</div>
-	<div id="unprocessed-trans-graph" style="margin-top:40px" class="hide">
+	<div id="unprocessed-trans-graph" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 hide" style="margin-top:40px; padding:0">
 		<div id="unprocessed-graph-div" style="position:relative">
 			<div id="unprocessedDonutchart" style="width: 100%; height: 90%;"></div>
 		</div>

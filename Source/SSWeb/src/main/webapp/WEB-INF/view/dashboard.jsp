@@ -20,7 +20,7 @@
 <div class="hm-header-main-wrapper hm-hdr-bord-bot">
 	<div class="container">
 		<div class="hm-header-row clearfix">
-			<div class="float-left hm-header-row-left hr-dsh-adj-lft"><spring:message code="label.header.dashboard.key" /></div>
+			<div class="float-left hm-header-row-left hr-dsh-adj-lft"><spring:message code="label.header.legacy.dashboard.key" /></div>
 			<!-- Add user assignment dropdown -->
 			<jsp:include page="user_assignment_dropdown.jsp"></jsp:include>
 		</div>
@@ -192,7 +192,7 @@
 <script>
 /* var  is_dashboard_loaded = window.is_dashboard_loaded; */
 $(document).ready(function() {
-	$(document).attr("title", "Dashboard");
+	$(document).attr("title", "Legacy Dashboard");
 
 	$(window).off('scroll');
 	$(window).scroll(function() {

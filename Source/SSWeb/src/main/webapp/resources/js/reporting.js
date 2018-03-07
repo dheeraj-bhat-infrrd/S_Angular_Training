@@ -698,7 +698,7 @@ function drawCompletionRateGraph(){
 function drawUnclickedDonutChart(overviewYearData){
 	 
 	unclickedDrawnCount=0;
-	
+	$('#processed-trans-graph').removeClass('hide');
 	var monthYear = getTimeFrameValue();
 	
 	 google.charts.load("current", {packages:["corechart"]});
@@ -797,10 +797,14 @@ function drawUnclickedDonutChart(overviewYearData){
 		        icnChart.draw(data, optionsChartIcn);
 		       
 		        isUpdateTransStats=false;
+		        
+		        $('#processed-trans-graph').addClass('hide');
 	      }
 }
 
 function drawProcessedDonutChart(overviewYearData){
+	
+	$('#unprocessed-trans-graph').removeClass('hide');
 	
 	var monthYear = getTimeFrameValue();
 	    
@@ -856,6 +860,7 @@ function drawProcessedDonutChart(overviewYearData){
 	        var chart = new google.visualization.PieChart(document.getElementById('processedDonutchart'));
 	        chart.draw(data, options);
 	       
+	        $('#processed-trans-graph').addClass('hide');
 	      }
 }
 
@@ -2281,6 +2286,10 @@ function getAndSaveRankingSettingsVal(columnName,isRealTechOrSSAdmin,monthOff,ye
 function drawLineGraphForScoreStats(chartDiv,chartData){
 	google.charts.load('current', {'packages':['corechart']});
 	google.charts.setOnLoadCallback(function(){
+		
+		var windowSize = $(window).width();
+		var graphWidth = windowSize - 200;
+		
 		var scoreStatsChartData = [
 									['Month','Rating'],
 									[ '', 0 ] ];
@@ -2302,10 +2311,30 @@ function drawLineGraphForScoreStats(chartDiv,chartData){
 									count : 6
 								}
 							},
+							width: windowSize,
+							height: 300,
 							pointSize : 5,
 							legend: {position:'none'}
 						};
 			
+			if(windowSize > 1100){
+				 options = {
+							chartArea : {
+							width : '90%'
+							},
+							width: graphWidth,
+							height: 300,
+							vAxis : {
+								minValue : 0,
+								maxValue : 5,
+								gridlines : {
+									count : 6
+								}
+							},
+							pointSize : 5,
+							legend: {position:'none'}
+						};
+			}
 			var chart = new google.visualization.LineChart(document.getElementById(chartDiv));
 			chart.draw(data, options);
 	});
