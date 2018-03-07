@@ -89,6 +89,9 @@ public class CloudUploadServiceImpl implements FileUploadService
     
     @Value ( "${AMAZON_OLD_REPORTS_BUCKET}")
     private String oldReportBucket;
+    
+    @Value ( "${AMAZON_DIGEST_BUCKET}")
+    private String digestBucket;
 
 
     @Override
@@ -166,7 +169,7 @@ public class CloudUploadServiceImpl implements FileUploadService
     @Override
     public void uploadFileAtDigestBucket( File file, String fileName ) throws NonFatalException
     {
-        uploadFile( file, fileName, bucket, false );
+        uploadFile( file, fileName, bucket + "/" + digestBucket, false );
     }
 
 
