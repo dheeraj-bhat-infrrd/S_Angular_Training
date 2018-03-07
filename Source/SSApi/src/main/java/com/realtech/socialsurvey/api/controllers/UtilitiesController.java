@@ -5,7 +5,7 @@ import com.realtech.socialsurvey.api.validators.CaptchaValidator;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.authentication.CaptchaValidation;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
-import com.wordnik.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

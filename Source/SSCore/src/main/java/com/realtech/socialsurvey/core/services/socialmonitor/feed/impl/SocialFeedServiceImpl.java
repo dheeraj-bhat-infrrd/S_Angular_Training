@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import javax.annotation.Resource;
@@ -22,9 +21,9 @@ import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.MongoSocialFeedDao;
 import com.realtech.socialsurvey.core.dao.RegionDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
+import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialFeedDaoImpl;
 import com.realtech.socialsurvey.core.entities.ActionHistory;
-import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SegmentsEntity;
 import com.realtech.socialsurvey.core.entities.SegmentsVO;
@@ -32,13 +31,20 @@ import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
 import com.realtech.socialsurvey.core.entities.SocialMonitorFeedData;
 import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
 import com.realtech.socialsurvey.core.entities.SocialMonitorResponseData;
+import com.realtech.socialsurvey.core.entities.SocialMonitorUsersVO;
 import com.realtech.socialsurvey.core.entities.SocialResponseObject;
+import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.enums.ActionHistoryType;
 import com.realtech.socialsurvey.core.enums.SocialFeedStatus;
 import com.realtech.socialsurvey.core.enums.TextActionType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.integration.stream.StreamApiConnectException;
+import com.realtech.socialsurvey.core.integration.stream.StreamApiException;
+import com.realtech.socialsurvey.core.integration.stream.StreamApiIntegrationBuilder;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.socialmonitor.feed.SocialFeedService;
 
 
@@ -55,6 +61,9 @@ public class SocialFeedServiceImpl implements SocialFeedService
     MongoSocialFeedDao mongoSocialFeedDao;
     
     @Autowired
+    OrganizationManagementService organizationManagementService;
+    
+    @Autowired
     CompanyDao companyDao;
     
     @Autowired
@@ -66,6 +75,12 @@ public class SocialFeedServiceImpl implements SocialFeedService
     
     @Autowired
     UserDao userDao;
+    
+    @Autowired
+    private StreamApiIntegrationBuilder streamApiIntegrationBuilder;
+
+    @Autowired
+    UserProfileDao userProfileDao;
     
     private EmailServices emailServices;
 
@@ -359,27 +374,44 @@ public class SocialFeedServiceImpl implements SocialFeedService
 	}
 
 	@Override
-	public List<SegmentsEntity> getUsersByCompanyId(Long companyId, int startIndex, int batchSize)
-			throws InvalidInputException {
+	public List<SocialMonitorUsersVO> getUsersByCompanyId(Long companyId)
+			throws InvalidInputException, ProfileNotFoundException {
 		LOG.debug("Fetching users for companyId {}", companyId);
 		if (companyId <= 0) {
 			LOG.error("Invalid companyId");
 			throw new InvalidInputException("Invalid companyId");
 		}
-		List<SegmentsEntity> usersList = new ArrayList<>();
-		Set<Long> userIds = userDao.getActiveUserIdsForCompany(companyDao.findById(Company.class, companyId));
-		List<OrganizationUnitSettings> userDetails = mongoSocialFeedDao.getAllUserDetails(userIds);
-		if (!userDetails.isEmpty() || userDetails != null) {
-			for (OrganizationUnitSettings organizationUnitSettings : userDetails) {
-				SegmentsEntity segmentsEntity = new SegmentsEntity();
-				segmentsEntity.setIden(organizationUnitSettings.getIden());
-				segmentsEntity.setName(organizationUnitSettings.getContact_details().getName());
-				segmentsEntity.setProfileImageUrl(organizationUnitSettings.getProfileImageUrl());
-				usersList.add(segmentsEntity);
+		List<SocialMonitorUsersVO> usersList = new ArrayList<>();
+		List<UserProfile> userProfiles = userProfileDao.getUserProfiles(companyId);
+		if (!userProfiles.isEmpty() || userProfiles != null) {
+			for (UserProfile userProfile : userProfiles) {
+				if (userProfile.getAgentId() != 0) {
+					SocialMonitorUsersVO socialMonitorUsersVO = new SocialMonitorUsersVO();
+					socialMonitorUsersVO.setRegionId(userProfile.getRegionId());
+					socialMonitorUsersVO.setBranchId(userProfile.getBranchId());
+					socialMonitorUsersVO.setUserId(userProfile.getAgentId());
+
+					socialMonitorUsersVO.setName(mongoSocialFeedDao.getAllUserDetails(userProfile.getAgentId())
+							.getContact_details().getName());
+					socialMonitorUsersVO.setProfileImageUrl(
+							mongoSocialFeedDao.getAllUserDetails(userProfile.getAgentId()).getProfileImageUrl());
+					usersList.add(socialMonitorUsersVO);
+				}
 			}
 		}
 		return usersList;
-	}
+	}	
+
+    @Override
+    public void retryFailedSocialFeeds()
+    {
+        LOG.info("Starting retryFailedSocialFeeds method.");
+        try {
+            streamApiIntegrationBuilder.getStreamApi().queueFailedSocialFeeds();
+        } catch ( StreamApiException | StreamApiConnectException e ) {
+            LOG.error( "Could not stream failed social feeds", e );
+        }
+    }
 
 
 } 

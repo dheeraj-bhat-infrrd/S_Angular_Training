@@ -30,7 +30,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.reportingmanagement.DashboardGraphManagement;
 import com.realtech.socialsurvey.core.services.reportingmanagement.OverviewManagement;
 import com.realtech.socialsurvey.core.services.reportingmanagement.ReportingDashboardManagement;
-import com.wordnik.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiOperation;
 import retrofit.http.Body;
 
 

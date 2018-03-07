@@ -28,6 +28,9 @@ public class KafkaProducerConfig
 
     @Value ( "${kafka.topic.reportTopic}" )
     private String reportTopic;
+    
+    @Value ( "${kafka.topic.socialMonitorTopic}" )
+    private String socialMonitorTopic;
 
     @Bean
     public ProducerFactory<String, String> producerFactory()
@@ -81,6 +84,17 @@ public class KafkaProducerConfig
         KafkaTemplate<String, String> kafkaTemplate = new KafkaTemplate<>( producerFactory() );
         kafkaTemplate.setMessageConverter( new StringJsonMessageConverter() );
         kafkaTemplate.setDefaultTopic(reportTopic);
+        return kafkaTemplate;
+    }
+    
+    /**
+     * Kafka template for capturing social monitor information
+     */
+    @Bean(name = "socialMonitorTemplate")
+    public KafkaTemplate<String, String> kafkaSocialMonitorTemplate(){
+        KafkaTemplate<String, String> kafkaTemplate = new KafkaTemplate<>( producerFactory() );
+        kafkaTemplate.setMessageConverter( new StringJsonMessageConverter() );
+        kafkaTemplate.setDefaultTopic(socialMonitorTopic);
         return kafkaTemplate;
     }
 }
