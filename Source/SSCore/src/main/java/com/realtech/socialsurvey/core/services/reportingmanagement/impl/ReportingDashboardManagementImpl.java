@@ -381,6 +381,9 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
     @Value ( "${APPLICATION_ADMIN_EMAIL}")
     private String applicationAdminEmail;
+    
+    @Value ( "${AMAZON_DIGEST_BUCKET}")
+    private String digestBucket;
 
     public static final int DIGEST_MAIL_START_INDEX = 0;
 
@@ -3578,8 +3581,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         long transcationCount0 = digestList.get( 0 ) != null ? digestList.get( 0 ).getTotalTransactions() : 0l;
         long transcationCount1 = digestList.get( 1 ) != null ? digestList.get( 1 ).getTotalTransactions() : 0l;
 
-        long totalCompletedReviews0 = digestList.get( 0 ) != null ? digestList.get( 0 ).getTotalTransactions() : 0l;
-        long totalCompletedReviews1 = digestList.get( 1 ) != null ? digestList.get( 1 ).getTotalTransactions() : 0l;
+        long totalCompletedReviews0 = digestList.get( 0 ) != null ? digestList.get( 0 ).getDetractors()
+            + digestList.get( 0 ).getPassives() + digestList.get( 0 ).getPromoters() : 0l;
+        long totalCompletedReviews1 = digestList.get( 1 ) != null ? digestList.get( 1 ).getDetractors()
+            + digestList.get( 1 ).getPassives() + digestList.get( 1 ).getPromoters() : 0l;
 
         long totalCompletedNpsReviews0 = digestList.get( 0 ) != null ? digestList.get( 0 ).getNpsDetractors()
             + digestList.get( 0 ).getNpsPassives() + digestList.get( 0 ).getNpsPromoters() : 0l;
@@ -4951,7 +4956,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         digestHtml.delete();
 
         // create absolute file name
-        uploadedFileName = endpoint + CommonConstants.FILE_SEPARATOR + URLEncoder.encode( uploadedFileName, "UTF-8" );
+        uploadedFileName = endpoint + "/" + digestBucket + CommonConstants.FILE_SEPARATOR + URLEncoder.encode( uploadedFileName, "UTF-8" );
 
         // store the digest file name appropriately
         SavedDigestRecord digestRecord = new SavedDigestRecord();
