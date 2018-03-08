@@ -43,5 +43,5 @@ public class SurveyInvitationEmailDaoImpl extends GenericReportingDaoImpl<Survey
 		
 		return query.list();
 	}
-
+	
 }

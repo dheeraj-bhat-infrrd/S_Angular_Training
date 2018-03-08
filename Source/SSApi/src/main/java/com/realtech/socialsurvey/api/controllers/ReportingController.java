@@ -838,7 +838,12 @@ public class ReportingController
     @ApiOperation(value = "Save the agent email counts data for month.")
     public ResponseEntity<Boolean> saveEmailCountMonthData(@RequestBody List<SurveyInvitationEmailCountMonth> agentEmailCountsMonth) {
     	LOGGER.info("API call to save agent email count data for month");
-    	boolean status = reportingDashboardManagement.saveEmailCountMonthData(agentEmailCountsMonth);
+    	boolean status = false;
+    	if(agentEmailCountsMonth != null && !agentEmailCountsMonth.isEmpty() && agentEmailCountsMonth.size() > 0) {
+    		status = reportingDashboardManagement.saveEmailCountMonthData(agentEmailCountsMonth);
+    	} else {
+    		LOGGER.info("No data found to save for invitation mail count month.");
+    	}
     	ResponseEntity<Boolean> responseEntity = null;
     	if(status) {
     		responseEntity = new ResponseEntity<Boolean>(status,HttpStatus.OK);
@@ -852,5 +857,12 @@ public class ReportingController
     public String getSurveyInvitationEmailReport(long companyId,int month,int year) {
     	LOGGER.info("API call to get survey invitation email report for month.");
     	return new Gson().toJson( reportingDashboardManagement.getSurveyInvitationEmailReportForMonth( companyId, month, year ) );
+    }
+    
+    @RequestMapping( value = "/surveyinvitationemailalltime", method = RequestMethod.GET)
+    @ApiOperation(value = "Get all time data for survey initation mail.")
+    public String getAllTimeDataForSurveyInvitationMail(int startIndex, int batchSize) {
+    	LOGGER.info("API call to get survey invitation email counts for all time data.");
+    	return new Gson().toJson( reportingDashboardManagement.getAllTimeDataForSurveyInvitationMail( startIndex, batchSize ) );
     }
 }

@@ -95,7 +95,7 @@ public class SurveyInvitationEmailCountMonth {
 	public void setCompanyId(long companyId) {
 		this.companyId = companyId;
 	}
-	public long getMonth() {
+	public int getMonth() {
 		return month;
 	}
 	public void setMonth(int month) {
