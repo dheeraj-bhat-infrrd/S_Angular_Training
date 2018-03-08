@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.services.socialmonitor.feed.impl;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -8,6 +9,7 @@ import java.util.UUID;
 
 import javax.annotation.Resource;
 
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -167,6 +169,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
 			for (SocialMonitorMacro macro : organizationUnitSettings.getSocialMonitorMacros()) {
 				if (macro.getMacroId().equalsIgnoreCase(socialFeedsActionUpdate.getMacroId())) {
 					macro.setCount(macro.getCount() + socialFeedsActionUpdate.getPostIds().size());
+					(macro.getMacroUsageTime()).add(new Date().getTime());
 					mongoSocialFeedDao.updateMacroCount(organizationUnitSettings.getSocialMonitorMacros(), companyId);
 					break;
 				}
@@ -253,22 +256,25 @@ public class SocialFeedServiceImpl implements SocialFeedService
     }
 
 	@Override
-	public List<SocialMonitorMacro> getMacros( long companyId ) throws InvalidInputException {
-		LOG.debug( "Fetching all Macros for company with Id {} " , companyId);
-        if(companyId <= 0){
-        	LOG.error("Invalid companyId");
-            throw new InvalidInputException( "Invalid companyId" );
-        }
-        List<SocialMonitorMacro> macros = new ArrayList<>();
-        OrganizationUnitSettings organizationUnitSettings = mongoSocialFeedDao.FetchMacros(companyId);
-        if(organizationUnitSettings != null && organizationUnitSettings.getSocialMonitorMacros() != null && !organizationUnitSettings.getSocialMonitorMacros().isEmpty()) {
-        	macros = organizationUnitSettings.getSocialMonitorMacros();
-        } else {
-        	LOG.warn("The List is empty");
-        }
-        return macros;
-        
-		
+	public List<SocialMonitorMacro> getMacros(long companyId) throws InvalidInputException {
+		LOG.debug("Fetching all Macros for company with Id {} ", companyId);
+		if (companyId <= 0) {
+			LOG.error("Invalid companyId");
+			throw new InvalidInputException("Invalid companyId");
+		}
+		List<SocialMonitorMacro> macros = new ArrayList<>();
+		OrganizationUnitSettings organizationUnitSettings = mongoSocialFeedDao.FetchMacros(companyId);
+		if (organizationUnitSettings != null && organizationUnitSettings.getSocialMonitorMacros() != null
+				&& !organizationUnitSettings.getSocialMonitorMacros().isEmpty()) {
+			macros = organizationUnitSettings.getSocialMonitorMacros();
+			for (SocialMonitorMacro macro : macros) {
+				macro.setLast7DaysMacroCount(last7DaysCountForMacro(macro.getMacroUsageTime()));
+			}
+		} else {
+			LOG.warn("The List is empty");
+		}
+		return macros;
+
 	}
 
 	@Override
@@ -282,6 +288,8 @@ public class SocialFeedServiceImpl implements SocialFeedService
 		}
 		if (socialMonitorMacro.getMacroId() == null || socialMonitorMacro.getMacroId().isEmpty()) {
 			socialMonitorMacro.setCount(0);
+			socialMonitorMacro.setLast7DaysMacroCount(0);
+			socialMonitorMacro.setMacroAdditionTime(new ArrayList<Long>());
 			socialMonitorMacro.setMacroId(UUID.randomUUID().toString());
 			socialMonitorMacro.setCreatedOn(new Date().getTime());
 			socialMonitorMacro.setModifiedOn(new Date().getTime());
@@ -411,6 +419,19 @@ public class SocialFeedServiceImpl implements SocialFeedService
         } catch ( StreamApiException | StreamApiConnectException e ) {
             LOG.error( "Could not stream failed social feeds", e );
         }
+    }
+    
+    public int last7DaysCountForMacro(List<Long> MacroAdditionTime  ) {
+    	Date today = new Date();
+    	int count = 0;
+    	Date daysAgo = new DateTime(today).minusDays(7).toDate();
+    	long daysAgoTimestamp = daysAgo.getTime();
+    	for(Long time : MacroAdditionTime) {
+    		if(time >= daysAgoTimestamp) {
+    			count++;
+    		}
+    	}
+		return count;
     }
 
 
