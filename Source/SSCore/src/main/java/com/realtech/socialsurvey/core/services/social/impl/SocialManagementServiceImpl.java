@@ -614,6 +614,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
                         message = message.replace( "\\", "\\\\" );
                         message = message.replace( "&amp;lmnlf;", "\\n" ).replace( "&amp;dash;", "\\u2014" );
+                        message = message.replace( "\n", "\\n" );
                         
                         String linkedPostJSON = "{\"comment\": \"" + message + "\",\"content\": {" + "\"title\": \"" + title
                             + "\"," + "\"description\": \"" + description + "\"," + "\"submitted-url\": \"" + profileUrl
