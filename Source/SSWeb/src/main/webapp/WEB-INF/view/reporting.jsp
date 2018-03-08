@@ -82,7 +82,7 @@
 				New Dashboard
 			</div>
 			<!-- Add user assignment dropdown -->
-			<jsp:include page="user_assignment_dropdown.jsp"></jsp:include>
+			<%@ include file="user_assignment_dropdown.jsp" %>
 		</div>
 	</div>
 </div>
@@ -106,7 +106,7 @@
 		<div class="container pos-relative">
 			<div id="logo-dash" class="hide"></div>
 			<div id="reporting-prof-details" class="row prof-pic-name-wrapper edit-prof-pic-name-wrapper rep-prof-details" style="border-bottom:1px solid #d2cdcd">
-				<jsp:include page="reporting_prof_details.jsp"></jsp:include>
+				<%@ include file="reporting_prof_details.jsp" %>
 			</div>
 			
 			<div id="reportingDashTabs" class=" col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:15px; display:inline-block; padding: 0;">
@@ -121,12 +121,12 @@
 				<div class="tab-content rep-tab-content">
 					<div class="tab-pane fade col-lg-12 col-md-12 col-sm-12 col-xs-12 active in" id="trans-stats-tab" style="padding: 0;">
 						<div id="reporting-trans-details" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 prof-pic-name-wrapper edit-prof-pic-name-wrapper reporting-trans-details">
-							<jsp:include page="reporting_transaction_details.jsp"></jsp:include>
+							<%@ include file="reporting_transaction_details.jsp" %>
 						</div>
 					</div>
 					<div class="tab-pane fade" id="overview-tab"  style="margin-top: 40px;">
 						<div id="overviewSuccess" class="hide col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding:0">
-							<jsp:include page="reporting_overview.jsp"></jsp:include>
+							<%@ include file="reporting_overview.jsp" %>
 						</div>
 						<div id="overviewFailure" class="hide">
 							<div style="text-align:center; margin:5% auto">
@@ -138,16 +138,16 @@
 						</div>
 					</div>
 					<div class="tab-pane fade col-lg-12 col-md-12 col-sm-12 col-xs-12" id="leaderboard-tab" style="padding: 0;">
-						<jsp:include page="reporting_leaderboard.jsp"></jsp:include>
+						<%@ include file="reporting_leaderboard.jsp" %>
 					</div>
 					<div class="tab-pane fade col-lg-12 col-md-12 col-sm-12 col-xs-12" id="score-stats-tab">
-						<jsp:include page="reporting_score_stats.jsp"></jsp:include>
+						<%@ include file="reporting_score_stats.jsp" %>
 					</div>
 					<div class="tab-pane fade" id="reviews-tab" style="margin-top: 30px;">
-						<jsp:include page="reporting_reviews.jsp"></jsp:include>
+						<%@ include file="reporting_reviews.jsp" %>
 					</div>
 					<div class="tab-pane fade" id="incomplete-surveys-tab" style="max-height:600px; margin-top: 30px;">
-						<jsp:include page="reporting_incomplete_surveys.jsp"></jsp:include>
+						<%@ include file="reporting_incomplete_surveys.jsp" %>
 					</div>
 				</div>
 			</div>

@@ -121,7 +121,7 @@
 </c:if>
 
 <div class="v-um-tbl-wrapper" id="leaderboard-list" style="width:100%;">
-	<jsp:include page="leaderboard_list.jsp"></jsp:include>
+	<%@ include file="leaderboard_list.jsp" %>
 </div>
 <div id="lead-ranks-below" class="lead-ranks-below">
 	<div id="lead-ranks-below-btn" class="float-right cursor-pointer lead-ranks-below-btn">Load More</div>

@@ -22,7 +22,7 @@
 <div class="col-lg-3 col-md-3 col-sm-3 rep-sps-div">
 	
 	<div id="spsGaugeSuccess" class="hide">
-		<jsp:include page="reporting_spsGauge.jsp"></jsp:include>
+		<%@ include file="reporting_spsGauge.jsp" %>
 	</div>
 	<div id="spsGaugeFailure" class=hide>
 		<div style="text-align:center; margin:30% auto">
@@ -69,7 +69,7 @@
 	<div class="col-lg-3 col-md-3 col-sm-3 rep-sps-div">
 
 		<div id="npsGaugeSuccess" class="hide">
-			<jsp:include page="reporting_npsGauge.jsp"></jsp:include>
+			<%@ include file="reporting_npsGauge.jsp" %>
 		</div>
 		<div id="npsGaugeFailure" class=hide>
 			<div style="text-align: center; margin: 30% auto">
