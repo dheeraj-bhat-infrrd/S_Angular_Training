@@ -1627,7 +1627,7 @@ $(document).on('click', '#reports-generate-report-btn', function(e) {
 				hideOverlay();
 				
 				var recentActivityCount=getRecentActivityCount();
-				drawRecentActivity(0,batchSize,tableHeaderData);
+				drawRecentActivity(0,batchSize,tableHeaderData,recentActivityCount);
 				showHidePaginateButtons(0, recentActivityCount);
 				
 				if(recentActivityCount == 0){
@@ -1674,7 +1674,7 @@ var batchSize=10
 var tableHeaderData;
 var recentActivityList;
 
-function drawRecentActivity(start,batchSize,tableHeader){
+function drawRecentActivity(start,batchSize,tableHeader,recentActivityCount){
 	
 	tableHeaderData=tableHeader;
 	startIndex=start;
@@ -1733,7 +1733,6 @@ function drawRecentActivity(start,batchSize,tableHeader){
 		}
 	}
 	
-	var recentActivityCount = getRecentActivityCount();
 	if(recentActivityCount == 0){
 		tableData='';
 		tableData+="</table><div style='text-align:center; margin:20px auto'><span class='incomplete-trans-span'>There are No Recent Activities</span></div>";
@@ -1741,6 +1740,8 @@ function drawRecentActivity(start,batchSize,tableHeader){
 	}else{
 		$('#recent-activity-list-table').html(tableHeaderData+tableData+"</table>");
 	}
+	
+	$('#rec-act-start-index').attr('data-start-index',startIndex);
 	
 }
 
@@ -2932,9 +2933,9 @@ function deleteRecentActivity(fileUploadId,idIndex){
 				.promise()
 				.done(function(){
 					if(recentActivityCount <= startIndex){
-						drawRecentActivity(startIndex-10,batchSize,tableHeaderData);
+						drawRecentActivity(startIndex-10,batchSize,tableHeaderData,recentActivityCount);
 					}else if(recentActivityCount>=10){
-						drawRecentActivity(startIndex,batchSize,tableHeaderData);
+						drawRecentActivity(startIndex,batchSize,tableHeaderData,recentActivityCount);
 					}
 					showHidePaginateButtons(startIndex, recentActivityCount);
 					
@@ -3365,15 +3366,18 @@ function showOverviewTab(){
 }
 
 function autoRefresh(tableHeaderData){
+	
 	setTimeout(function(){
 		
+		var startIndexStr = $('#rec-act-start-index').attr('data-start-index');
+		var startIndex = parseInt(startIndexStr);
 		if($('#reports_page_container').length<=0){
 			return;
 		}
 		
 		var recentActivityCount=getRecentActivityCount();
-		drawRecentActivity(0,10,tableHeaderData);
-		showHidePaginateButtons(0, recentActivityCount);
+		drawRecentActivity(startIndex,10,tableHeaderData,recentActivityCount);
+		showHidePaginateButtons(startIndex, recentActivityCount);
 		
 		if(recentActivityCount == 0){
 			var tableData='';

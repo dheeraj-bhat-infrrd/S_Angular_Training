@@ -8,6 +8,7 @@
 <c:set var="requestedByKey"><spring:message code="label.recent.activity.requestedby.key" /></c:set>
 <c:set var="statusKey"><spring:message code="label.recent.activity.status.key" /></c:set>
 
+<input type="hidden" id="rec-act-start-index" data-start-index=0>
 <div id="recent-activity-list-table">
 	
 </div>
@@ -28,7 +29,7 @@ $(document).ready(function(){
 		+"<td class=\"v-tbl-recent-activity \"></td>"
 		+"</tr>";
 	
-	drawRecentActivity(startIndex, batchSize,tableHeaderData);
+	drawRecentActivity(startIndex, batchSize,tableHeaderData,recentActivityCount);
 	showHidePaginateButtons(startIndex, recentActivityCount);		
 
 });

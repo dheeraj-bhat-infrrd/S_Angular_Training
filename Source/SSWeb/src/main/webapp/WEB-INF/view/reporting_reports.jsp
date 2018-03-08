@@ -169,7 +169,7 @@ $(document).ready(function() {
 		startIndex=getStartIndex();	
 		startIndex-=10;
 		recentActivityCount=getRecentActivityCount();
-		drawRecentActivity(startIndex, batchSize,tableHeaderData);
+		drawRecentActivity(startIndex, batchSize,tableHeaderData,recentActivityCount);
 		showHidePaginateButtons(startIndex, recentActivityCount);
 	});
 
@@ -177,7 +177,7 @@ $(document).ready(function() {
 		startIndex=getStartIndex();
 		startIndex+=10;
 		recentActivityCount=getRecentActivityCount();
-		drawRecentActivity(startIndex, batchSize,tableHeaderData);
+		drawRecentActivity(startIndex, batchSize,tableHeaderData,recentActivityCount);
 		showHidePaginateButtons(startIndex, recentActivityCount);
 	});
 	

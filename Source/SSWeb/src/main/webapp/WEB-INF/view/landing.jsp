@@ -130,7 +130,7 @@ function landingFlow() {
         return;
     }
 	
-	showMainContent('./showreportingpage.do');
+	showMainContent('./dashboard.do');
 }
 </script>
 <jsp:include page="footer.jsp" />
