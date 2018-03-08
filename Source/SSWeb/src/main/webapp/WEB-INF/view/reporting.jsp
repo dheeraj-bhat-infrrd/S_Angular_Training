@@ -187,17 +187,7 @@
 	
 	drawOverviewPage();
 	
-	var showOverview = getOverviewData();
-	
-		if (showOverview == null) {
-			$('#overviewSuccess').hide();
-			$('#overviewFailure').show();
-		} else {
-			$('#overviewSuccess').show();
-			$('#overviewFailure').hide();
-		}
-		
-		$(window).resize();
+	$(window).resize();
 		
 	//Score stats
 		var entityType = "${columnName}";
