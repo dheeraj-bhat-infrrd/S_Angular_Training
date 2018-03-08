@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.realtech.socialsurvey.compute.entities.response.linkedin.LinkedinFeedResponse;
-import com.realtech.socialsurvey.compute.services.api.APIIntegrationException;
+import com.realtech.socialsurvey.compute.exception.APIIntegrationException;
 
 import retrofit2.Call;
 import retrofit2.Response;

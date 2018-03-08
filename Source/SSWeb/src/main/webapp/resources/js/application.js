@@ -136,7 +136,7 @@ var veryLikelyText = '';
 var notVeryLikelyText = '';
 var npsOrder = 999;
 
-var defaultNpsQuestion = 'Default NPS Question';
+var defaultNpsQuestion = 'How likely are you to refer friends and family to [name]?';
 var defaultNotVeryLikely = 'Not Very Likely';
 var defaultVeryLikely = 'Very Likely';
 
@@ -612,7 +612,6 @@ function paintReportingDashboard(profileMasterId, newProfileName, newProfileValu
 	isDashboardReviewRequestRunning = false;
 	reviewsFetchedSoFar = 0;
 	startIndexInc = 0;
-	batchSizeInc = 10;
 	totalReviewsInc = 0;
 	surveyFetchedSoFarInc = 0;
 
@@ -978,6 +977,12 @@ function paintFixSocialMedia(data){
 		var noSMDiv = '<div class="clearfix"><div></div class="float-left bd-frm-left-un">Successfully connected!</div>';
 		popup += noSMDiv;
 		$('#dsh-btn0').addClass("hide");
+		if( window.location.hash.substr(1) == "showreportingpage" ){
+			$('#rep-fix-social-media').fadeOut(500);
+			delay(function(){
+				drawReportingDashButtons(columnName, columnValue);
+			},500);	
+		}
 	}
 	
 // e.stopPropagation();
@@ -7235,6 +7240,7 @@ function initSurveyWithUrl(q) {
 				}else{
 					$("#pst-srvy-div .bd-check-txt").html(message.replace("%s", agentName));
 				}
+				swearWords=getSwearWords();
 			} 
 			else {
 				$('.sq-ques-wrapper').addClass( 'sq-main-txt' );
@@ -7390,6 +7396,13 @@ function paintSurveyPageFromJson() {
 	var question = questionDetails.question;
 
 	question = question.replace(/\[name\]/gi, agentName);
+	//get agentFirstName
+	var AgentFirstName = agentName;
+	if(agentName.indexOf(" ") > -1)
+		var AgentFirstName = agentName.substr(0, agentName.indexOf(" "));
+	//replace first name
+	question = question.replace(/\[AgentFirstName\]/gi, AgentFirstName);
+		
 	var questionType = questionDetails.questionType;
 	var isRatingQuestion = questionDetails.isRatingQuestion;
 	if (isRatingQuestion == 1) {
@@ -7480,7 +7493,7 @@ function paintSurveyPageFromJson() {
 			$("div[data-ques-type='sb-range-0to10-nps']").show();
 			$('#notAtAllLikelyDivNps').html(questionDetails.notAtAllLikely);
 			$('#veryLikelyDivNps').html(questionDetails.veryLikely);
-			$('#nps-range-text').show();
+			$('#nps-range-text').css('opacity',1);
 			if (questionDetails.customerResponse != undefined && !isNaN(parseInt(questionDetails.customerResponse))) {
 				var ratingVal = parseInt(questionDetails.customerResponse);
 				$('.sq-radio').each(function() {
@@ -7491,7 +7504,7 @@ function paintSurveyPageFromJson() {
 				$('#radio-nps-'+ratingVal).children().show();
 				$('#radio-nps-'+ratingVal).parent().find('.popover').show();
 				$('#radio-nps-'+ratingVal).css("cursor","default");
-				$('#nps-range-text').hide();
+				$('#nps-range-text').css('opacity',0);
 				$('#sq-radio-1to10-nps').attr('selected-rating-radio',ratingVal);
 				$("#next-radio-nps").removeClass("btn-com-disabled");
 			}
@@ -8056,7 +8069,7 @@ $('.sq-np-item-next').click(function() {
 	    }else{
 	    	$(this).parent().find('.popover').hide();
 	    	$(this).css("cursor","pointer");
-	    	$('#nps-range-text').show();
+	    	$('#nps-range-text').css('opacity',1);
 	    }
 	});
 	qno++;
@@ -8103,7 +8116,7 @@ $('.sq-np-item-next').click(function() {
 		    	$(this).parent().find('.popover').hide();
 		    	$(this).css("cursor","pointer");
 		    });
-			$('#nps-range-text').show();
+			$('#nps-range-text').css('opacity',1);
 		}
 		
 		var ratingVal = parseInt(questionDetails.customerResponse);
@@ -8128,7 +8141,7 @@ $('.sq-np-item-next').click(function() {
 				$('#radio-nps-'+ratingVal).children().show();
 				$('#radio-nps-'+ratingVal).parent().find('.popover').show();
 				$('#radio-nps-'+ratingVal).css("cursor","default");
-				$('#nps-range-text').hide();
+				$('#nps-range-text').css('opacity',0);
 				$('#sq-radio-1to10-nps').attr('selected-rating-radio',ratingVal);
 			}
 			
@@ -8216,7 +8229,7 @@ $('.sq-np-item-prev').click(function() {
 				$('#radio-nps-'+ratingVal).children().show();
 				$('#radio-nps-'+ratingVal).parent().find('.popover').show();
 				$('#radio-nps-'+ratingVal).css("cursor","default");
-				$('#nps-range-text').hide();
+				$('#nps-range-text').css('opacity',0);
 				$('#sq-radio-1to10-nps').attr('selected-rating-radio',ratingVal);
 			}
 			$('#notAtAllLikelyDivNps').html(questionDetails.notAtAllLikely);
@@ -8258,7 +8271,7 @@ $('.sq-radio').click(function(){
 		if (qno != questions.length - 1) {
 			$("#next-radio-nps").removeClass("btn-com-disabled");
 		}
-		$('#nps-range-text').hide();
+		$('#nps-range-text').css('opacity',0);
 	}
 	
 });
@@ -10590,7 +10603,8 @@ function paintIncompleteSurveyListPopupResults(incompleteSurveystartIndex) {
 		"columnName" : colName,
 		"columnValue" : colValue,
 		"startIndex" : incompleteSurveystartIndex,
-		"batchSize" : $('#icn-sur-popup-cont').attr("data-batch")
+		"batchSize" : $('#icn-sur-popup-cont').attr("data-batch"),
+		"origin" : "oldDashboard"
 	};
 	callAjaxGetWithPayloadData("./fetchincompletesurveypopup.do", function(data) {
 		disableBodyScroll();
@@ -12505,8 +12519,16 @@ function setColDetails(currentProfileName, currentProfileValue, parentCompanyId)
 }
 
 // complaint registration event binding
-$(document).on('click', '#comp-reg-form-submit', function() {
-	if (validateComplaintRegistraionForm()) {
+$(document).on('click', '#comp-reg-form-submit', function(e) {
+	
+	var emailIdStr = document.getElementById("comp-mailId").value;
+	if(emailIdStr == ""){
+		$('#overlay-main').show();
+		e.stopPropagation();
+		$('#other-account').val('true');
+		createPopupConfirm("Unsubscribe Complaint Resolution Emails", "Are you sure you want to unsubscribe compalint resolution emails");
+		overlayUnsetCompRes();
+	}else if (validateComplaintRegistraionForm()) {
 		var formData = $('#comp-reg-form').serialize();
 		callAjaxPostWithPayloadData("/updatecomplaintressettings.do", function(data) {
 			$('#overlay-toast').html(data);
@@ -12514,6 +12536,50 @@ $(document).on('click', '#comp-reg-form-submit', function() {
 		}, formData, true, '#comp-reg-form-submit');
 	}
 });
+
+function overlayUnsetCompRes() {
+
+	$('#overlay-continue').click(function() {
+		callAjaxPOST('./unsetcomplaintresolution.do', function() {
+			$('#overlay-continue').unbind('click');
+			overlayRevert();
+		}, true)});
+	$('#overlay-cancel').click(function() {
+		overlayRevert();
+	});
+}
+
+
+// abusive alert
+$(document).on('click', '#abusive-email-form-submit', function(e) {
+	var emailIdStr = document.getElementById("abusive-mailId").value;
+	if(emailIdStr == ""){
+		$('#overlay-main').show();
+		e.stopPropagation();
+		$('#other-account').val('true');
+		createPopupConfirm("Unsubscribe Alert Emails", "Are you sure you want to unsubscribe abusive emails");
+		overlayUnsetAbusive();
+	}else if(validateAbusiveEmailForm()) {
+		var formData = $('#abusive-reg-form').serialize();
+		callAjaxPostWithPayloadData("/updateabusivesurveysettings.do", function(data) {
+			$('#overlay-toast').html(data);
+			showToast();
+		}, formData, true, '#abusive-email-form-submit');
+	}
+});
+
+
+function overlayUnsetAbusive() {
+
+	$('#overlay-continue').click(function() {
+		callAjaxPOST('./unsetabusivesurveysettings.do', function() {
+			$('#overlay-continue').unbind('click');
+			overlayRevert();
+		}, true)});
+	$('#overlay-cancel').click(function() {
+		overlayRevert();
+	});
+}
 
 $(document).on('click touchstart', '#compl-checkbox', function() {
 	if ($(this).hasClass('bd-check-img-checked')) {
@@ -12528,6 +12594,7 @@ $(document).on('click touchstart', '#compl-checkbox', function() {
 		$('input[name="enabled"]').val("");
 	}
 });
+
 
 // function to remove social post
 function removeUserPost(surveyMongoId) {
@@ -15766,6 +15833,28 @@ function formatAllTimeSlots(dates){
 	return xAxisData;
 }
 
+
+function getSwearWords() {
+	 
+	 $.ajax({
+	 url : getLocationOrigin() + surveyUrl + "data/getSwearWords",
+	 async:true,
+	 type : "GET",
+	 cache : false,
+	 dataType : "JSON",
+	 success : function(data) {
+	 swearWords=JSON.parse(data);
+	 },
+	 error : function(e) {
+	 if (e.status == 504) {
+	 redirectToLoginPageOnSessionTimeOut(e.status);
+	 return;
+	 }
+	 }
+	 });
+}
+
+
 /*
  * Social monitor
  */
@@ -17519,4 +17608,3 @@ $(document).on('click','.stream-action-submit',function(e){
 		}
 	}, formId,disableEle);
 });
-

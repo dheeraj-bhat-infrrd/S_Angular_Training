@@ -15,6 +15,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+/**
+ * Social post extractor topology starter
+ * @author manish
+ *
+ */
 public class SocialPostExtractorTopologyStarterHelper extends TopologyStarterHelper
 {
     private static final Logger LOG = LoggerFactory.getLogger( SocialPostExtractorTopologyStarterHelper.class );

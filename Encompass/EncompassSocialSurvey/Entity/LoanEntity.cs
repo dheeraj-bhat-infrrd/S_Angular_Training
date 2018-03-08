@@ -27,6 +27,9 @@ namespace EncompassSocialSurvey.Entity
         public DateTime LastReminderTime { get; set; }
         public int Status { get; set; }
         public int ParticipantType { get; set; }
+        public string PropertyAddress { get; set; }
+        public string LoanProcessorName { get; set; }
+        public string LoanProcessorEmail { get; set; }
 
 
         //

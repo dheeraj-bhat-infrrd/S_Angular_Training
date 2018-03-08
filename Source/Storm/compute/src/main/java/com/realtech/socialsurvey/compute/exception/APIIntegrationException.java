@@ -1,6 +1,4 @@
-package com.realtech.socialsurvey.compute.services.api;
-
-import com.realtech.socialsurvey.compute.exception.FatalException;
+package com.realtech.socialsurvey.compute.exception;
 
 /**
  * Exception for api integration

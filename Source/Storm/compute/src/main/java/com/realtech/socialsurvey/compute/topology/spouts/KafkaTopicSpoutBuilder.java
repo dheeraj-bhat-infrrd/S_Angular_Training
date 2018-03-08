@@ -36,7 +36,6 @@ public class KafkaTopicSpoutBuilder
 
     private String zookeeperBrokers;
 
-
     private static final String ZOOKEEPER_ROOT = "";
 
     // SendGrid Event Spout

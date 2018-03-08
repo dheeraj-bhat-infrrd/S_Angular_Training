@@ -4,7 +4,8 @@ var monthNamesList = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct
 var overviewData=getOverviewData();
 var socialMediaList = new Array();
 var is_safari = navigator.userAgent.indexOf("Safari") > -1;
-
+var unclickedDrawnCount=0;
+var isUpdateTransStats = false;
 function drawTimeFrames(){
 	var currentDate = new Date();
 	var currentMonth = currentDate.getMonth();
@@ -684,6 +685,8 @@ function drawCompletionRateGraph(){
 //draw Unclicked, Processed and Unprocessed Pie charts functions
 function drawUnclickedDonutChart(overviewYearData){
 	 
+	unclickedDrawnCount=0;
+	
 	var monthYear = getTimeFrameValue();
 	
 	 google.charts.load("current", {packages:["corechart"]});
@@ -701,7 +704,16 @@ function drawUnclickedDonutChart(overviewYearData){
      }
      var chart;
      function drawChart() {
-    	 
+    	 	
+    	 	unclickedDrawnCount++;
+    	 	
+    	 	if(unclickedDrawnCount==1 && !isUpdateTransStats){
+	        	var profilemasterid=$('#rep-prof-container').attr('data-profile-master-id');
+	 	    	if(profilemasterid == 4){
+	 	    		activaTab('leaderboard-tab');
+	 	        }
+	        }
+	        
 	        var data = google.visualization.arrayToDataTable([
 	          ['Transaction', 'Number#'],
 	          ['Processed', processed],
@@ -736,7 +748,6 @@ function drawUnclickedDonutChart(overviewYearData){
 
 	        chart = new google.visualization.PieChart(document.getElementById('donutchart'));
 	        
-	        
 	        function selectHandler(){
 	        	 var selectedItem = chart.getSelection()[0];
 	             if (selectedItem) {
@@ -753,7 +764,6 @@ function drawUnclickedDonutChart(overviewYearData){
 	        google.visualization.events.addListener(chart, 'select', selectHandler);
 	        chart.draw(data, options);
 	       
-	        
 	        var optionsChartIcn = {
 		  	          pieStartAngle: 130,
 			          backgroundColor: '#f1f0f2',
@@ -773,8 +783,8 @@ function drawUnclickedDonutChart(overviewYearData){
 		        var icnChart = new google.visualization.PieChart(document.getElementById('chart-icn-chart'));
 		        
 		        icnChart.draw(data, optionsChartIcn);
-		        
-		        
+		       
+		        isUpdateTransStats=false;
 	      }
 }
 
@@ -1400,13 +1410,13 @@ $(document).on('change', '#generate-survey-reports', function() {
 	
 	var selectedVal = $('#generate-survey-reports').val();
 	var key = parseInt(selectedVal);
-	if(key == 101 || key == 102 || key == 103 || key == 106 || key == 110){
+	if(key == 101 || key == 102 || key == 103 || key == 106 || key == 110 || key == 112){
 		$('#date-pickers').hide();
 	}else{
 		$('#date-pickers').show();
 	}
 	
-	if(key == 106){
+	if(key == 106 || key == 112){
 		$('#report-time-div').removeClass('hide');
 	}else{
 		$('#report-time-div').addClass('hide');
@@ -1593,14 +1603,30 @@ $(document).on('click', '#reports-generate-report-btn', function(e) {
 		
 	}
 	
-	var npsDates = new Object();
+	if(key == 112){
+		startDate = getTimeFrameForUserRankingReport();
+		timeFrameStr = $('#report-time-selector').val();
+		timeFrame = parseInt(timeFrameStr);
+		
+		switch(timeFrame){
+		case 1: key = 113;
+			break;
+		case 2: key = 112;
+			break;
+		case 3: key = 113;
+			break;
+		case 4: key = 112;
+			break;
+		}
+	}
+	
 	if(key == 110){
 		if(npsTimeFrame == 1 || npsTimeFrame == 2){
 			key = 110;
 		}else{
 			key = 111;
 		}
-		npsDates = getStartAndEndDateForNps(npsTimeFrame);
+		var npsDates = getStartAndEndDateForNps(npsTimeFrame);
 		startDate = npsDates.startDate;
 		endDate = npsDates.endDate;
 	}
@@ -1628,6 +1654,16 @@ $(document).on('click', '#reports-generate-report-btn', function(e) {
 			},
 			complete : function() {	
 				hideOverlay();
+				
+				var recentActivityCount=getRecentActivityCount();
+				drawRecentActivity(0,batchSize,tableHeaderData);
+				showHidePaginateButtons(0, recentActivityCount);
+				
+				if(recentActivityCount == 0){
+					var tableData='';
+					tableData+="</table><div style='text-align:center; margin:20px auto'><span class='incomplete-trans-span'>There are No Recent Activities</span></div>";
+					$('#recent-activity-list-table').html(tableData);
+				}
 			},
 			error : function(e) {
 				showError("Your request could not be processed at the moment. Please try again later!");
@@ -1642,7 +1678,6 @@ $(document).on('click', '#reports-generate-report-btn', function(e) {
 $(document).on('click', '.err-close-rep', function() {
 	hideError();
 	hideInfo();
-	location.reload(true);
 });
 
 
@@ -1895,6 +1930,7 @@ function updateReportingDashboard(){
 	var currentDate =  new Date();
 	var currentMonth = currentDate.getMonth()+1;
 	var currentYear = currentDate.getFullYear();
+	isUpdateTransStats=true;
 	
 	var monthYear = getTimeFrameValue();
 	var overviewYearData;
@@ -1987,7 +2023,10 @@ function updateReportingDashboard(){
  		drawUnprocessedDonutChart(overviewYearData);
  	}
 	$(window).resize();
-	hideOverlay();
+	
+	 setTimeout(function(){
+			hideDashOverlay('#trans-stats-dash');
+		}, 1000);
 	
 	if(overviewYearData==null){
 		$('#unclicked-trans-graph').addClass('hide');
@@ -2393,10 +2432,7 @@ function changeSocialMedia(columnName, columnValue){
 	var max = 2;
 		
 	if (stages != undefined && stages.length != 0) {
-		if (stages.length < max) {
-			$('#rep-social-media').fadeIn(500);
-			$('#empty-rep-social-media').addClass('hide');
-		}else{
+		if (stages.length >= max) {
 			max = stages.length;
 			
 			for (var i = 0; i < max; i++) {
@@ -2977,4 +3013,271 @@ function getUserRankingCount(entityType,entityId,year,month,batchSize,timeFrame)
 		}
 	});
 	return userRankingCount;
+}
+
+function recalculateUserRanking(){
+	$('.recalculate-usr-rank-btn-active').toggle();
+	$('.recalculate-usr-rank-btn-inactive').toggle();
+	
+	$.ajax({
+		async : false,
+		url : "/recalranking.do",
+		type : "GET",
+		success :function(response) {
+			if(response == -1){
+				$('#overlay-toast').html("ETL is already running. Please try again later.");
+				showToast();
+			}else{
+				$('#overlay-toast').html("User ranking is being Re-Calculated. Please wait.");
+				showToast();
+			}	
+		},
+		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}	
+		}
+	});
+}
+
+function getIncompleteSurveyCountForNewDashboard(colName, colValue) {
+
+	var payload = {
+		"columnName" : colName,
+		"columnValue" : colValue
+	};
+	callAjaxGetWithPayloadData("./fetchdashboardincompletesurveycount.do", function(data) {
+		$('#rep-icn-sur-popup-cont').attr("data-total", data);
+		var totalCount = parseInt(data);
+		
+		if (totalCount == 0) {
+			$("#incomplete-survey-header").addClass("hide");
+			$("#inc-survey-cont").addClass("hide");
+			$("#paginate-buttons-survey").addClass("hide");
+			$("#rep-nil-dash-survey-incomplete").removeClass("hide");
+			return;
+		}
+		
+		var batchSize = parseInt($('#rep-icn-sur-popup-cont').attr("data-batch"));
+		var numPages = 0;
+		if (parseInt(totalCount % batchSize) == 0) {
+			numPages = parseInt(totalCount / batchSize);
+		} else {
+			numPages = parseInt(parseInt(totalCount / batchSize) + 1);
+		}
+		$('#rep-paginate-total-pages').html(numPages);
+
+	}, payload, true);
+}
+
+function paintIncompleteSurveyListForNewDashboard(incompleteSurveystartIndex,colmName,colmValue) {
+	var incompleteSurveyBatchSize = parseInt($('#rep-icn-sur-popup-cont').attr("data-batch"));
+	$('#rep-sel-page').val((incompleteSurveystartIndex / incompleteSurveyBatchSize) + 1);
+	var payload = {
+		"columnName" : colmName,
+		"columnValue" : colmValue,
+		"startIndex" : incompleteSurveystartIndex,
+		"batchSize" : $('#rep-icn-sur-popup-cont').attr("data-batch"),
+		"origin" : "newDashboard"
+	};
+	callAjaxGetWithPayloadData("./fetchincompletesurveypopup.do", function(data) {
+		$('#rep-icn-sur-popup-cont').html(data);
+		if (parseInt(incompleteSurveystartIndex) > 0) {
+			$('#rep-sur-previous').addClass('paginate-button');
+		} else {
+			$('#rep-sur-previous').removeClass('paginate-button');
+		}
+		
+		// move back a page if this page has no entry
+		if( parseInt($('#rep-icn-sur-popup-cont').children('.dash-lp-item').size()) < 1 && parseInt(incompleteSurveystartIndex) > 0 ){
+			paintIncompleteSurveyListForNewDashboard((parseInt(incompleteSurveystartIndex) - incompleteSurveyBatchSize),colmName,colmValue);
+			return;
+		}
+		
+		incompleteSurveystartIndex = parseInt(incompleteSurveystartIndex) + parseInt($('#rep-icn-sur-popup-cont').children('.dash-lp-item').size());
+		var totalSurveysCount = parseInt($('#rep-icn-sur-popup-cont').attr("data-total"));
+		if (incompleteSurveystartIndex < totalSurveysCount) {
+			$('#rep-sur-next').addClass('paginate-button');
+		} else {
+			$('#rep-sur-next').removeClass('paginate-button');
+		}
+	}, payload, true);
+}
+
+$(document).on('click', '#rep-resend-mult-sur-icn.mult-sur-icn-active', function() {
+	var selectedSurveys = $('#rep-icn-sur-popup-cont').data('selected-survey');
+	resendMultipleIncompleteSurveyRequestsForNewDashboard(selectedSurveys);
+});
+
+function resendMultipleIncompleteSurveyRequestsForNewDashboard(incompleteSurveyIds) {
+	showOverlay();
+	callAjaxPOSTWithTextData("/resendmultipleincompletesurveyrequest.do?surveysSelected=" + incompleteSurveyIds, function(data) {
+		data = JSON.parse(data);
+		if (data.errMsg == undefined || data.errMsg == "") {
+			// unselect all the options after deleting
+			$('#rep-icn-sur-popup-cont').data('selected-survey', []);
+
+			var toastmsg = data.success;
+			$('#overlay-toast').html(toastmsg);
+			showToastLong();
+			
+			$('#rep-del-mult-sur-icn').removeClass('mult-sur-icn-active');
+			$('#rep-resend-mult-sur-icn').removeClass('mult-sur-icn-active');
+			$('#rep-icn-sur-popup-cont').data('selected-survey', []);
+			$('.rep-sur-icn-checkbox').addClass('sb-q-chk-yes').removeClass('sb-q-chk-no');
+
+			// update the page
+			var incompleteSurveyStartIndex = parseInt($('#rep-icn-sur-popup-cont').attr("data-start"));
+			paintIncompleteSurveyListForNewDashboard(incompleteSurveyStartIndex,$('#rep-prof-container').attr('data-column-name'),$('#rep-prof-container').attr('data-column-value'));
+		}else{
+			var toastmsg = data.errMsg;
+			$('#overlay-toast').html(errCode);
+			showToastLong();
+		}
+	}, true, {});
+}
+
+
+$(document).on('click', '#rep-del-mult-sur-icn.mult-sur-icn-active', function() {
+	var selectedSurveys = $('#rep-icn-sur-popup-cont').data('selected-survey');
+	removeMultipleIncompleteSurveyRequestForNewDashboard(selectedSurveys);
+});
+
+
+function removeMultipleIncompleteSurveyRequestForNewDashboard(incompleteSurveyIds) {
+	callAjaxPOSTWithTextData("/deletemultipleincompletesurveyrequest.do?surveySetToDelete=" + incompleteSurveyIds, function(data) {
+		if (data == "success") {
+
+			// unselect all the options after deleting
+			$('#rep-icn-sur-popup-cont').data('selected-survey', []);
+
+			var totalIncSurveys = $('#rep-icn-sur-popup-cont').attr('data-total');
+			totalIncSurveys = totalIncSurveys - incompleteSurveyIds.length;
+			$('#rep-icn-sur-popup-cont').attr('data-total', totalIncSurveys);
+			var batchSize = parseInt($('#rep-icn-sur-popup-cont').attr('data-batch'));
+			var newTotalPages = 0;
+			if (totalIncSurveys % batchSize == 0) {
+				newTotalPages = totalIncSurveys / batchSize;
+			} else {
+				newTotalPages = parseInt(totalIncSurveys / batchSize) + 1;
+			}
+			$('#rep-paginate-total-pages').html(newTotalPages);
+			for (var i = 0; i < incompleteSurveyIds.length; i++) {
+				$('div[data-iden="sur-pre-' + incompleteSurveyIds[i] + '"]').remove();
+			}
+
+			$('#overlay-toast').html('Survey reminder request deleted successfully');
+			showToast();
+
+			// update the page
+			var incompleteSurveyStartIndex = parseInt($('#rep-icn-sur-popup-cont').attr("data-start"));
+			paintIncompleteSurveyListForNewDashboard(incompleteSurveyStartIndex,$('#rep-prof-container').attr('data-column-name'),$('#rep-prof-container').attr('data-column-value'));
+
+			// Update the incomplete survey on dashboard
+			getIncompleteSurveyCountForNewDashboard($('#rep-prof-container').attr('data-column-name'),$('#rep-prof-container').attr('data-column-value'));
+
+			$('#rep-del-mult-sur-icn').removeClass('mult-sur-icn-active');
+			$('#rep-resend-mult-sur-icn').removeClass('mult-sur-icn-active');
+		}
+	}, true, {});
+}
+
+
+$(document).on('click', '#rep-sur-next.paginate-button', function() {
+	var incompleteSurveyStartIndex = parseInt($('#rep-icn-sur-popup-cont').attr("data-start"));
+	var incompleteSurveyBatchSize = parseInt($('#rep-icn-sur-popup-cont').attr("data-batch"));
+	incompleteSurveyStartIndex = incompleteSurveyStartIndex + incompleteSurveyBatchSize;
+	$('#rep-icn-sur-popup-cont').attr("data-start", incompleteSurveyStartIndex);
+	paintIncompleteSurveyListForNewDashboard(incompleteSurveyStartIndex,$('#rep-prof-container').attr('data-column-name'),$('#rep-prof-container').attr('data-column-value'));
+});
+
+$(document).on('click', '#rep-sur-previous.paginate-button', function() {
+	var incompleteSurveyStartIndex = parseInt($('#rep-icn-sur-popup-cont').attr("data-start"));
+	var incompleteSurveyBatchSize = parseInt($('#rep-icn-sur-popup-cont').attr("data-batch"));
+	if (incompleteSurveyStartIndex % incompleteSurveyBatchSize == 0) {
+		incompleteSurveyStartIndex = parseInt(incompleteSurveyStartIndex / incompleteSurveyBatchSize) - 1;
+	} else {
+		incompleteSurveyStartIndex = parseInt(incompleteSurveyStartIndex / incompleteSurveyBatchSize);
+	}
+	incompleteSurveyStartIndex = incompleteSurveyStartIndex * incompleteSurveyBatchSize;
+	$('#rep-icn-sur-popup-cont').attr("data-start", incompleteSurveyStartIndex);
+	paintIncompleteSurveyListForNewDashboard(incompleteSurveyStartIndex,$('#rep-prof-container').attr('data-column-name'),$('#rep-prof-container').attr('data-column-value'));
+});
+
+$(document).on('keypress', '#rep-sel-page', function(e) {
+	// if the letter is not digit then don't type anything
+	if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+		return false;
+	}
+	var batchSize = parseInt($('#rep-icn-sur-popup-cont').attr("data-batch"));
+	var total = parseInt($('#rep-icn-sur-popup-cont').attr("data-total"));
+	var prevPageNoVal = parseInt($('#rep-sel-page').val());
+	if (prevPageNoVal == NaN) {
+		prevPageNoVal = 0;
+	}
+	var pageNo = prevPageNoVal + String.fromCharCode(e.which);
+	pageNo = parseInt(pageNo);
+	var incompleteSurveyStartIndex = parseInt(pageNo - 1) * batchSize;
+	if (incompleteSurveyStartIndex >= total || incompleteSurveyStartIndex <= 0) {
+		return false;
+	}
+});
+
+function paginateIncompleteSurveyForNewDashboard() {
+	$('#rep-sel-page').blur();
+	var pageNo = parseInt($('#rep-sel-page').val());
+	if (pageNo == NaN || pageNo <= 0) {
+		return false;
+	}
+	var incompleteSurveyStartIndex = 0;
+	var batchSize = parseInt($('#rep-icn-sur-popup-cont').attr("data-batch"));
+	incompleteSurveyStartIndex = parseInt(pageNo - 1) * batchSize;
+
+	$('#rep-icn-sur-popup-cont').attr("data-start", incompleteSurveyStartIndex);
+	paintIncompleteSurveyListForNewDashboard(incompleteSurveyStartIndex,$('#rep-prof-container').attr('data-column-name'),$('#rep-prof-container').attr('data-column-value'));
+}
+
+$(document).on('keyup', '#rep-sel-page', function(e) {
+	if (e.which == 13) {
+		paginateIncompleteSurveyForNewDashboard();
+	}
+});
+
+$(document).on('change', '#rep-sel-page', function(e) {
+	delay(function() {
+		paginateIncompleteSurveyForNewDashboard();
+	}, 100);
+});
+
+function showOverviewTab(){
+	
+	var entityId = $('#rep-prof-container').attr('data-column-value');
+	var entityType = $('#rep-prof-container').attr('data-column-name');
+	activaTab('overview-tab');
+	$('#overview-tab').addClass('active');
+	 drawCompletionRateGraph();
+ 	drawSpsStatsGraph();
+	drawNpsStatsGraph(entityId,entityType);
+}
+
+function autoRefresh(tableHeaderData){
+	setTimeout(function(){
+		
+		if($('#reports_page_container').length<=0){
+			return;
+		}
+		
+		var recentActivityCount=getRecentActivityCount();
+		drawRecentActivity(0,10,tableHeaderData);
+		showHidePaginateButtons(0, recentActivityCount);
+		
+		if(recentActivityCount == 0){
+			var tableData='';
+			tableData+="</table><div style='text-align:center; margin:20px auto'><span class='incomplete-trans-span'>There are No Recent Activities</span></div>";
+			$('#recent-activity-list-table').html(tableData);
+		}
+		
+		autoRefresh(tableHeaderData);
+	}, 30000);
 }

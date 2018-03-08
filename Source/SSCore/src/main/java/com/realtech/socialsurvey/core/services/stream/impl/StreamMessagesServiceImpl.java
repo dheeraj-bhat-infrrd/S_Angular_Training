@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.services.stream.impl;
 
-import com.realtech.socialsurvey.core.entities.SendGridEventEntity;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.realtech.socialsurvey.core.dao.StreamFailureDao;
 import com.realtech.socialsurvey.core.entities.EmailEntity;
+import com.realtech.socialsurvey.core.entities.SendGridEventEntity;
 import com.realtech.socialsurvey.core.services.stream.StreamMessagesService;
 
 /**
@@ -46,5 +48,26 @@ public class StreamMessagesServiceImpl implements StreamMessagesService
         LOG.debug( "Saving failed click event" );
         return streamFailureDao.insertFailedClickEvent( sendGridEventEntity );
     }
+    
+    @Override
+    public List<EmailEntity> getAllFailedStreamMsgs(int start , int batchSize)
+    {
+        LOG.debug( "Getting all failed strem messages" );
+        return streamFailureDao.getAllFailedStreamMessages(start, batchSize);
+    }
+    
+    
+    @Override
+    public void deleteFailedStreamMsg(String id)
+    {
+        LOG.debug( "Deleting strem message with id {}" , id );
+        streamFailureDao.deleteFailedStreamMsg(id);
+    }
 
+    @Override
+    public void updateRetryFailedForStreamMsg(String id)
+    {
+    		LOG.debug( "update retry failed to strem message with id " );
+        streamFailureDao.updateRetryFailedForStreamMsg(id , true);
+    }
 }

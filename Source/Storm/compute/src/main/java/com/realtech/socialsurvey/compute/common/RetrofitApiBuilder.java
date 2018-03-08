@@ -2,18 +2,20 @@ package com.realtech.socialsurvey.compute.common;
 
 import java.io.IOException;
 
-import com.mongodb.DuplicateKeyException;
-import com.realtech.socialsurvey.compute.exception.MongoSaveException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.realtech.socialsurvey.compute.entities.FileUploadResponse;
+import com.realtech.socialsurvey.compute.entities.response.FacebookErrorResponse;
+import com.realtech.socialsurvey.compute.exception.APIIntegrationException;
+import com.realtech.socialsurvey.compute.exception.FacebookRateLimitException;
 import com.realtech.socialsurvey.compute.exception.FileUploadUpdationException;
-import com.realtech.socialsurvey.compute.services.api.APIIntegrationException;
+import com.realtech.socialsurvey.compute.exception.MongoSaveException;
 import com.realtech.socialsurvey.compute.services.api.FacebookApiIntegrationService;
 import com.realtech.socialsurvey.compute.services.api.LinkedinApiIntegrationService;
 import com.realtech.socialsurvey.compute.services.api.SSApiIntegrationService;
 import com.realtech.socialsurvey.compute.services.api.SolrApiIntegrationService;
+import com.realtech.socialsurvey.compute.utils.ConversionUtils;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -60,7 +62,7 @@ public class RetrofitApiBuilder
     {
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
         // set basic level logging
-        loggingInterceptor.setLevel( Level.BODY );
+        loggingInterceptor.setLevel( Level.BASIC );
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         httpClient.addInterceptor( loggingInterceptor );
         // Create integration service builders
@@ -132,6 +134,29 @@ public class RetrofitApiBuilder
                 throw new APIIntegrationException( "IOException while sending api response", e );
             }
             throw new APIIntegrationException( response.message() );
+        }
+    }
+    
+    /**
+     * Validates the reponse from api
+     * @param response
+     */
+    public void validateFacebookResponse( Response<?> response )
+    {
+        if ( !response.isSuccessful() ) {
+            if ( LOG.isWarnEnabled() ) {
+                LOG.warn( "Error found. Response code: {}. Possible reason: {}", response.code(), response.message() );
+            }
+            try {
+                if ( LOG.isWarnEnabled() ) {
+                    LOG.warn( "Reason: {}", response.errorBody().string() );
+                }
+                
+                FacebookErrorResponse errorResponse = ConversionUtils.deserialize( response.errorBody().string(), FacebookErrorResponse.class );
+                throw new FacebookRateLimitException( errorResponse.getError().getCode(), errorResponse.getError().getMessage() );
+            } catch ( IOException e ) {
+                throw new APIIntegrationException( "IOException while sending api response", e );
+            }
         }
     }
 

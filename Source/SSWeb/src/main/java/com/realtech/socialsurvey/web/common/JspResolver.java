@@ -65,6 +65,7 @@ public interface JspResolver
     public static final String HEADER_SURVEY_INVITE = "header_sendsurveyinvite";
     public static final String HEADER_SURVEY_INVITE_ADMIN = "header_sendsurveyinvite_admin";
     public static final String ACCOUNT_DISABLED_PAGE = "accountdisabled";
+    public static final String LOGIN_DISABLED_PAGE = "loginDisabled";
     public static final String USER_LOGIN = "userlogin";
     public static final String LANDING = "landing";
     public static final String DASHBOARD = "dashboard";
@@ -74,6 +75,7 @@ public interface JspResolver
     public static final String DASHBOARD_INCOMPLETESURVEYS = "dashboard_incompletesurveys";
     public static final String DASHBOARD_REVIEWS = "dashboard_reviews";
     public static final String HEADER_DASHBOARD_INCOMPLETESURVEYS = "header_incompletesurvey";
+    public static final String HEADER_NEW_DASHBOARD_INCOMPLETESURVEYS = "reporting_incomplete_surveys_batch";
 
     // Hierarchy Management
     public static final String BUILD_HIERARCHY = "build-hierarchy";

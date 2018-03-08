@@ -1,15 +1,5 @@
 package com.realtech.socialsurvey.compute.topology.bolts.mailevents;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-
-import org.apache.storm.topology.OutputFieldsDeclarer;
-import org.apache.storm.tuple.Fields;
-import org.apache.storm.tuple.Tuple;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.realtech.socialsurvey.compute.common.APIOperations;
 import com.realtech.socialsurvey.compute.common.EnvConstants;
 import com.realtech.socialsurvey.compute.common.LocalPropertyFileHandler;
@@ -20,6 +10,16 @@ import com.realtech.socialsurvey.compute.services.FailedMessagesService;
 import com.realtech.socialsurvey.compute.services.impl.FailedMessagesServiceImpl;
 import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBoltWithAck;
 import com.realtech.socialsurvey.compute.utils.ConversionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.storm.topology.OutputFieldsDeclarer;
+import org.apache.storm.tuple.Fields;
+import org.apache.storm.tuple.Tuple;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -41,6 +41,7 @@ public class UpdateMailEventsBolt extends BaseComputeBoltWithAck
     private static final String SG_EVENT_UNSUBSCRIBE = "unsubscribe";
     private static final String SG_EVENT_BOUNCE = "bounce";
     private static final String EVENT_CLICK = "click";
+    private static final String SG_EVENT_DROPPED = "dropped";
 
     private static final String SENDGRID_MESSAGE_DELIMITER = ".filter"; // Sendgrid message id are appended with .filter* 
 
@@ -48,25 +49,38 @@ public class UpdateMailEventsBolt extends BaseComputeBoltWithAck
     @Override public void executeTuple( Tuple input )
     {
         SendgridEvent event = ConversionUtils.deserialize( input.getString( 0 ), SendgridEvent.class );
-        LOG.debug( "Processing event {}", event );
+        LOG.info( "Processing event {}", event );
         Optional<SolrEmailMessageWrapper> optionalEmailMessageFromSolr = null;
         // check if uuid is present
         // if uuid present, then query SOLR based on randomUUID
         if ( event.getUuid() != null && !event.getUuid().isEmpty() ) {
             optionalEmailMessageFromSolr = APIOperations.getInstance().getEmailMessageFromSOLRByRandomUUID( event.getUuid() );
         }
-        // get the event id and then update the mail event in SOLR.
+        // get sendgrid event id
         else {
-            optionalEmailMessageFromSolr = APIOperations.getInstance().getEmailMessageFromSOLRBySendgridMsgId(
-                event.getSg_message_id().substring( 0, event.getSg_message_id().indexOf( SENDGRID_MESSAGE_DELIMITER ) ) );
-        }
+        		String messageId = "";
+            if ( event.getSg_message_id() != null && event.getSg_message_id().indexOf( SENDGRID_MESSAGE_DELIMITER ) >= 0 ) {
+                messageId = event.getSg_message_id().substring( 0,  event.getSg_message_id().indexOf( SENDGRID_MESSAGE_DELIMITER ) );
+            } else if ( event.getSmtpId() != null && event.getSmtpId().indexOf( "@" ) >= 0 ) {
+                messageId = event.getSmtpId().substring( 1, event.getSmtpId().indexOf( "@" ) );
+            } else if( event.getSmtpId() != null && event.getSmtpId().indexOf( ">" ) >= 0 ){
+                messageId = event.getSmtpId().substring( 1, event.getSmtpId().indexOf( ">" ) );
+            }
+            if( ! StringUtils.isEmpty(messageId)) {
+        		optionalEmailMessageFromSolr = APIOperations.getInstance().getEmailMessageFromSOLRBySendgridMsgId( messageId );            	
+            }else {
+            		LOG.warn("Couldn't extract randomUUID, sgMessageId or SMTP-ID from event");
+            }
+       }
+        
+        //update mail event in sor
         if ( optionalEmailMessageFromSolr.isPresent() ) {
             SolrEmailMessageWrapper emailMessageFromSolr = optionalEmailMessageFromSolr.get();
             try {
                 emailMessageFromSolr = updateEmailMessageWithStatus( emailMessageFromSolr, event );
                 APIOperations.getInstance().postEmailToSolr( emailMessageFromSolr );
             } catch ( SolrProcessingException e ) {
-                LOG.error( "Error while processing email event.", e );
+                LOG.error( "Error while updating email event.", e );
                 LOG.warn( "Message processing will NOT be retried. Message will be logged for inspection." );
                 FailedMessagesService failedMessageService = new FailedMessagesServiceImpl();
                 failedMessageService.insertPermanentlyFailedEmailMessage( emailMessageFromSolr, new SolrProcessingException(
@@ -75,7 +89,7 @@ public class UpdateMailEventsBolt extends BaseComputeBoltWithAck
             }
         } else {
             // Should be fine for profile other than prod as sendgrid account is shared.
-            LOG.warn( "Could not find message with sendgrid id {}", event.getSg_message_id() );
+            LOG.warn( "Could not find message for this event" );
             if ( LocalPropertyFileHandler.getInstance().getProfile().equals( EnvConstants.PROFILE_PROD ) ) {
                 // TODO: Log event in failed message
             }
@@ -117,6 +131,10 @@ public class UpdateMailEventsBolt extends BaseComputeBoltWithAck
             case EVENT_CLICK:
                 solrEmailMessageWrapper
                     .setEmailLinkClickedDate( ConversionUtils.convertEpochSecondToSolrTrieFormat( event.getTimestamp() ) );
+                break;
+            case SG_EVENT_DROPPED:
+                solrEmailMessageWrapper
+                    .setEmailDroppedDate( ConversionUtils.convertEpochSecondToSolrTrieFormat( event.getTimestamp() ) );
                 break;
             default:
                 if ( LOG.isWarnEnabled() ) {

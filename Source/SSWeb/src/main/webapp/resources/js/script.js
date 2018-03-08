@@ -1071,6 +1071,26 @@ function validateComplaintRegistraionForm() {
 	}
 }
 
+//Function to validate abusive email form
+function validateAbusiveEmailForm() {
+	var validate = true;
+
+	// hide the server error
+	$("#serverSideerror").hide();
+
+	// validate error code on email id
+	validate = validateMultipleEmailIds('abusive-mailId')
+	
+
+	if (!validate) {
+		return false;
+	} else {
+		/* Form validated. */
+		return true;
+	}
+	
+}
+
 // Functions for login page
 function loginUserLoginPage() {
 	if (validateFormLoginPage('login-form')) {
@@ -2269,7 +2289,7 @@ function paintMappedUser(usersList) {
 		if (usersSize > 0) {
 			usersList.users.forEach(function(arrayItem) {
 
-				untrack += '<div class="un-row">' + '						<div style="width:30%" class="float-left unmatchtab ss-name" title="' + undefinedval(arrayItem.firstName) + '">' + undefinedval(arrayItem.firstName) + '</div>' + ' <div class="hide ss-id" title="' + undefinedval(arrayItem.userId) + '">' + undefinedval(arrayItem.userId) + '</div>' + '						<div style="width:40%" class="float-left unmatchtab ss-eids" title="' + undefinedval(arrayItem.mappedEmails) + '">' + undefinedval(arrayItem.mappedEmails) + '</div>' + '						<div style="width:20%;color:#009FE0;" class="float-left unmatchtab v-mapped-edit cursor-pointer"></div>' + '						</div>';
+				untrack += '<div class="un-row">' + '						<div style="width:30%" class="float-left unmatchtab ss-name" title="' + undefinedval(arrayItem.firstName) + ' ' + undefinedval(arrayItem.lastName) + '">' + undefinedval(arrayItem.firstName) + ' ' + undefinedval(arrayItem.lastName) + '</div>' + ' <div class="hide ss-id" title="' + undefinedval(arrayItem.userId) + '">' + undefinedval(arrayItem.userId) + '</div>' + '						<div style="width:40%" class="float-left unmatchtab ss-eids" title="' + undefinedval(arrayItem.mappedEmails) + '">' + undefinedval(arrayItem.mappedEmails) + '</div>' + '						<div style="width:20%;color:#009FE0;" class="float-left unmatchtab v-mapped-edit cursor-pointer"></div>' + '						</div>';
 
 			});
 

@@ -152,4 +152,5 @@ public interface SurveyPreInitiationDao extends GenericDao<SurveyPreInitiation, 
 
 
     void disconnectSurveysFromAgent( long agentId );
+
 }

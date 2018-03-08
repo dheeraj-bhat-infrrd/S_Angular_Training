@@ -3,9 +3,9 @@ package com.realtech.socialsurvey.compute.topology.bolts.monitor;
 
 import com.realtech.socialsurvey.compute.common.SSAPIOperations;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
+import com.realtech.socialsurvey.compute.exception.APIIntegrationException;
 import com.realtech.socialsurvey.compute.exception.MongoSaveException;
 import com.realtech.socialsurvey.compute.services.FailedMessagesService;
-import com.realtech.socialsurvey.compute.services.api.APIIntegrationException;
 import com.realtech.socialsurvey.compute.services.impl.FailedMessagesServiceImpl;
 import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBoltWithAck;
 import org.apache.storm.topology.OutputFieldsDeclarer;

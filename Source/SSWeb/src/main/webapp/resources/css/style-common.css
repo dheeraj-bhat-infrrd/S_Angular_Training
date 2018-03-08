@@ -1844,7 +1844,7 @@ button.paypal.is-active {
 	line-height: 60px;
 	height: 50px;
 	font-size: 12px;
-	color: #DDD9D5;
+	color: #999999;
 	cursor: pointer;
 	float: right;
 }
@@ -7302,7 +7302,7 @@ tr.u-tbl-header td {
 
 .paginate-button {
 	cursor: pointer;
-	color: #5CC8EF;
+	background-color: #009FE0 !important;
 }
 
 .tweet-panel-item.bord-bot-dc.clearfix {
@@ -8706,6 +8706,14 @@ label.fil-label {
 	text-align: center;
 }
 
+.rep-sur-paginate-btn {
+	width: 45px;
+    text-align: center;
+    color: white;
+    background-color: grey;
+    border-radius: 3px;
+}
+
 .paginate-total-pages {
 	width: 30px;
 	display: inline-block;
@@ -8732,6 +8740,13 @@ span.paginate-divider {
 
 .sur-icn-checkbox {
 	width: 20px;
+	height: 20px;
+	margin: 0 10px 0 -10px;
+	background-position: center;
+}
+
+.rep-sur-icn-checkbox{
+		width: 20px;
 	height: 20px;
 	margin: 0 10px 0 -10px;
 	background-position: center;
@@ -9134,13 +9149,22 @@ label.url-change-input-label {
 }
 
 .complaint-cont {
-	
+	padding-bottom: 30px;
+	border-bottom: 1px solid #ccc;
+}
+
+.abusive-cont{
+	padding-top:20px;
 }
 
 .mood-text {
 	line-height: 40px;
 	font-size: 14px;
 	font-family: 'opensanssemibold';
+}
+
+#abusive-email-form-submit{
+	margin-top: 25px;
 }
 
 .compl-input-cont {
@@ -9961,9 +9985,65 @@ ul.accordion li>a:before {
 	background:#bab8b8;
 }
 
+.sps-metre-needle-img{
+	 margin-left: 155px;
+    margin-top: 80px;
+    height: 80px;
+    position:absolute;
+    z-index:1000
+}
+
+.sps-metre-needle-text{
+	margin-left: 165px;
+    margin-top: 180px;
+    font-weight: bold !important;
+    font-size: medium;    
+    position: absolute;
+}
+
+.sps-metre-needle-val{
+	font-weight: bold !important;
+    font-size: medium;
+    color: white;
+    background: #5e5e5e;
+    width: 50px;
+    height: 35px;
+    padding: 5px;
+    border-radius: 7px;
+}
+
+.nps-metre-needle-img{
+	margin-left: 155px; 
+	margin-top: 80px; 
+	height: 80px; 
+	position:absolute; 
+	z-index:1000"
+}
+
+.nps-metre-needle-text{
+	margin-left: 165px; 
+	margin-top: 180px; 
+	font-weight: bold !important; 
+	font-size: medium; 
+	position: absolute;
+}
+
+.nps-metre-needle-val{
+	font-weight: bold !important;
+	font-size: medium; 
+	color: white; 
+	background: #5e5e5e;
+    width: 50px; 
+    height: 35px; 
+    padding: 5px; 
+    border-radius: 7px;
+}
+
 .reporting-trans-details{
 	background:#f9f9fb; 
 	border-bottom:1px solid #d2cdcd;
+	width: 100%;
+    margin: 0 auto;
 }
 	
 	.time-frame-sel{
@@ -9989,9 +10069,9 @@ ul.accordion li>a:before {
     width: 140px;
     color: #666;
     text-align: left;
-    top: 232px;
-    max-height: 400px;
-    box-shadow: 3px 3px 30px #444;
+    top: 47px;
+    max-height: 400px;    
+    box-shadow: 0 0px 0px 0px transparent, 5px 0 15px -4px #b4b0b0, -5px 0 15px -4px #b4b0b0;
 	}
 	
 	.time-frame-prof-sel{
@@ -10386,7 +10466,7 @@ img.lead-img {
 	margin-left:5px;
 }
 
-.radio-div-first{
+.radio-div-first, .radio-div-first-1to10{
 	margin-left:10px;
 }
 
@@ -10596,6 +10676,11 @@ img.lead-img {
 	text-align:-webkit-right;
 }
 
+.text-align-left{
+	text-align:left;
+	text-align:-webkit-left;
+}
+
 .edit-survey-radio-container{
 	margin: 25px auto; 
 	display: grid;
@@ -10803,6 +10888,7 @@ img.lead-img {
 	font-variant: none !important; 
 	color:white !important;
 }
+
 
 /*Social Monitor Styles*/
 .soc-mon-hdr{
@@ -11670,4 +11756,41 @@ img.lead-img {
 .dup-count{
 	font-size: 11px;
     font-weight: bold !important;
+}
+
+.recalculate-user-ranking{
+	display: flex;
+    align-items: center;
+}
+
+.recalculate-usr-rank-btn-active{
+	background-color: #009FE0;
+	color: #fff;
+	margin-left: 10px;
+	padding: 0 20px;
+	font-size: 13px;
+	line-height: 40px;
+	margin-top: -2px;
+	border-radius: 3px;
+	cursor: pointer;
+	min-width: 120px;
+	font-weight: bold !important;
+}
+
+.recalculate-usr-rank-btn-inactive{
+	background-color: #8d8d8d;
+    color: #fff;
+    margin-left: 10px;
+    padding: 0 20px;
+    font-size: 13px;
+    line-height: 40px;
+    margin-top: -2px;
+    border-radius: 3px;
+    cursor: not-allowed;
+    min-width: 120px;
+    font-weight: bold !important;
+}
+
+.width-offset {
+	width: 100px;
 }

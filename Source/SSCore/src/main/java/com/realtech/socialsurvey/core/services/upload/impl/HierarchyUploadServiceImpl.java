@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.services.upload.impl;
 
+import java.awt.Image;
 import java.io.IOException;
 import java.net.URL;
 import java.security.SecureRandom;
@@ -13,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
+import javax.imageio.ImageIO;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
@@ -188,6 +191,9 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
 
     @Value ( "${MASK_EMAIL_ADDRESS}")
     private String maskEmail;
+    
+    @Value ( "${CDN_PATH}")
+    private String cdnUrl;
 
 
     // V2.0 : BEGIN
@@ -1110,8 +1116,25 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
     private void updateProfileImageForAgent( String userPhotoUrl, AgentSettings agentSettings ) throws InvalidInputException
     {
         LOG.debug( "Uploading for agent " + agentSettings.getIden() + " with photo: " + userPhotoUrl );
-        profileManagementService.updateProfileImage( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
-            agentSettings, userPhotoUrl );
+        if ( isImagevalid( userPhotoUrl ) ) {
+            if ( userPhotoUrl != agentSettings.getProfileImageUrl() && !userPhotoUrl.contains( cdnUrl ) ) {
+                String url = null;
+                if ( userPhotoUrl.contains( cdnUrl ) ) {
+                    url = userPhotoUrl;
+                } else {
+                    try {
+                        url = uploadProfileImageToCloud( userPhotoUrl );
+                    } catch ( Exception e ) {
+                        LOG.warn( "Unable to upload image to cloud.", e );
+                        throw new InvalidInputException( "Image format not valid for url:" + userPhotoUrl );
+                    }
+                }
+                if ( url != null && !url.isEmpty() ) {
+                    profileManagementService.updateProfileImage( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+                        agentSettings, url );
+                }
+            }
+        }
     }
 
 
@@ -1641,6 +1664,12 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
                     parsedHierarchyUpload.getUserErrors().add( "Row: " + currentUserVO.getRowNum()
                         + ", This source ID is a Duplicate, has already been parsed  at row : " + sourceIdDuplicate );
                     currentUserVO.setErrorRecord( true );
+                }
+                
+                if ( userPhotoProfileURL != null && !userPhotoProfileURL.isEmpty() && !isImagevalid( userPhotoProfileURL ) ) {
+                    parsedHierarchyUpload.getUserValidationWarnings()
+                        .add( "Row: " + currentUserVO.getRowNum() + ", Unable to parse image for url:" + userPhotoProfileURL );
+                    currentUserVO.setWarningRecord( true );
                 }
 
 
@@ -2961,6 +2990,38 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
             }
         }
         return "";
+    }
+    
+
+    private boolean isImagevalid( String userPhotoUrl )
+    {
+        try {
+            Image image = ImageIO.read( new URL( userPhotoUrl ) );
+            if ( image == null ) {
+                return false;
+            }
+        } catch ( IOException e ) {
+            LOG.error( "The url given is not a valid image url." + userPhotoUrl, e );
+            return false;
+        }
+        return true;
+    }
+    
+
+    private String uploadProfileImageToCloud( String userPhotoUrl ) throws Exception
+    {
+        String imageName = java.util.UUID.randomUUID().toString();
+        if ( userPhotoUrl.contains( ".png" ) || userPhotoUrl.contains( ".PNG" ) ) {
+            imageName = imageName + ".png";
+        } else if ( userPhotoUrl.contains( ".jpg" ) || userPhotoUrl.contains( ".JPG" ) ) {
+            imageName = imageName + ".jpg";
+        } else if ( userPhotoUrl.contains( ".jpeg" ) || userPhotoUrl.contains( ".JPEG" ) ) {
+            imageName = imageName + ".jpeg";
+        } else {
+            LOG.error( "The url given is not a valid image url." );
+            throw new InvalidInputException( "Image format not valid" );
+        }
+        return profileManagementService.copyImage( userPhotoUrl, imageName );
     }
 
     // V2.0 : END
