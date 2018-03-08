@@ -22,7 +22,7 @@
 	<div class="container">
 		<div class="hm-header-row clearfix">
 			<div class="float-left hm-header-row-left hr-dsh-adj-lft">
-				<spring:message code="label.reporting.reports.key" />
+				<spring:message code="label.reporting.key" />
 			</div>
 			<!-- Add user assignment dropdown -->
 			<jsp:include page="user_assignment_dropdown.jsp"></jsp:include>
@@ -134,7 +134,7 @@
 </div>
 <script>
 $(document).ready(function() {
-	$(document).attr("title", "Reports");
+	$(document).attr("title", "Reporting");
 	updateViewAsScroll();
 	bindDatePickerforSurveyDownload();
 	
@@ -154,7 +154,7 @@ $(document).ready(function() {
 		$('#digest-time-div').removeClass('hide');
 	} else {
 		$('#digest-time-div').addClass('hide');
-
+	}
 		
 	if(key == 1001){
 		$('#email-rep-time-div').removeClass('hide');
