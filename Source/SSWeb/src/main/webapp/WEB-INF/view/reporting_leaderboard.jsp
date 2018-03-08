@@ -60,10 +60,6 @@
 			</select>	
 		</div>
 	</div>
-	
-	<div id="my-rank" class="my-rank">
-		<div id="my-rank-btn" class="float-right cursor-pointer top-ten-ranks-btn" style="margin-top: 20px;">Me</div>
-	</div>
 </c:if>
 <c:if test="${profilemasterid == 3}">
 	<div id="board-div" class="float-right board-div" style="margin-top: 20px;width: 250px;margin-right: 25px;">
@@ -100,12 +96,30 @@
 	</div>
 </c:if>
 
-<div id="top-ten-ranks" class="top-ten-ranks">
-	<div id="top-ten-ranks-btn" class="float-right cursor-pointer top-ten-ranks-btn">Top Ten Ranks</div>
-</div>
-<div id="lead-ranks-above" class="lead-ranks-above">
-	<div id="lead-ranks-above-btn" class="float-right cursor-pointer lead-ranks-above-btn">Load More</div>
-</div>
+<c:if test="${profilemasterid == 4}">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div id="lead-ranks-above" class="lead-ranks-above">
+			<div id="lead-ranks-above-btn" class="float-right cursor-pointer lead-ranks-above-btn">Load More</div>
+		</div>
+		<div id="top-ten-ranks" class="top-ten-ranks">
+			<div id="top-ten-ranks-btn" class="float-right cursor-pointer top-ten-ranks-btn">Top Ten Ranks</div>
+		</div>
+		<div id="my-rank" class="my-rank">
+			<div id="my-rank-btn" class="float-right cursor-pointer top-ten-ranks-btn">Me</div>
+		</div>
+	</div>
+</c:if>
+<c:if test="${profilemasterid != 4}">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div id="lead-ranks-above" class="lead-ranks-above">
+			<div id="lead-ranks-above-btn" class="float-right cursor-pointer lead-ranks-above-btn">Load More</div>
+		</div>
+		<div id="top-ten-ranks" class="top-ten-ranks">
+			<div id="top-ten-ranks-btn" class="float-right cursor-pointer top-ten-ranks-btn">Top Ten Ranks</div>
+		</div>
+	</div>
+</c:if>
+
 <div class="v-um-tbl-wrapper" id="leaderboard-list" style="width:100%;">
 	<jsp:include page="leaderboard_list.jsp"></jsp:include>
 </div>
@@ -259,25 +273,11 @@ $(document).on('click','#lead-ranks-above-btn',function(){
 		userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
 	}
 	
-	if(userRankingList != null && userRankingList.length != 0){
-		tableData=drawLeaderboardTableStructure(userRankingList, userId,profileMasterId);
-		$('#leaderboard-list').removeClass('hide');
-		$('#leaderboard-tbl').html(tableData);
-		$('#leaderboard-empty-list-msg-div').addClass('hide');
-	}else{
-		$('#leaderboard-list').addClass('hide');
-		$('#leaderboard-empty-list-msg-div').removeClass('hide');
-	}
-	
 	showHideRankPaginateBtns(startIndex, count);
 	
 	 $('html, body').animate({
 	        scrollTop: $('#leaderboard-tbl').offset().top - 20
 	    }, 'slow');
-	 
-	 setTimeout(function(){
-			hideDashOverlay('#leaderboard-dash');
-		}, 1000);
 });
 
 $(document).on('click','#lead-ranks-below-btn',function(){
@@ -339,24 +339,10 @@ $(document).on('click','#lead-ranks-below-btn',function(){
 		userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
 	}
 	
-	if(userRankingList != null && userRankingList.length != 0){
-		tableData=drawLeaderboardTableStructure(userRankingList, userId,profileMasterId);
-		$('#leaderboard-list').removeClass('hide');
-		$('#leaderboard-tbl').html(tableData);
-		$('#leaderboard-empty-list-msg-div').addClass('hide');
-	}else{
-		$('#leaderboard-list').addClass('hide');
-		$('#leaderboard-empty-list-msg-div').removeClass('hide');
-	}
-	
 	showHideRankPaginateBtns(startIndex, count);
 	$('html, body').animate({
         scrollTop: $('#leaderboard-tbl').offset().top - 20
     }, 'slow');
-	
-	 setTimeout(function(){
-			hideDashOverlay('#leaderboard-dash');
-		}, 1000);
 });
 
 $(document).on('change', '#time-selector', function() {
@@ -435,25 +421,11 @@ $(document).on('change', '#time-selector', function() {
 		userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
 	}
 	
-	if(userRankingList != null && userRankingList.length != 0){
-		tableData=drawLeaderboardTableStructure(userRankingList, userId,profileMasterId);
-		$('#leaderboard-list').removeClass('hide');
-		$('#leaderboard-tbl').html(tableData);
-		$('#leaderboard-empty-list-msg-div').addClass('hide');
-	}else{
-		$('#leaderboard-list').addClass('hide');
-		$('#leaderboard-empty-list-msg-div').removeClass('hide');
-	}
-	
 	showHideRankPaginateBtns(startIndex, count);
 	
 	 $('html, body').animate({
 	        scrollTop: $('#leaderboard-tbl').offset().top - 20
 	    }, 'slow');
-	 
-	 setTimeout(function(){
-			hideDashOverlay('#leaderboard-dash');
-		}, 1000);
 	 
 });
 
@@ -532,25 +504,12 @@ $(document).on('change', '#board-selector', function() {
 		userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
 	}
 	
-	if(userRankingList != null && userRankingList.length != 0){
-		tableData=drawLeaderboardTableStructure(userRankingList, userId,profileMasterId);
-		$('#leaderboard-list').removeClass('hide');
-		$('#leaderboard-tbl').html(tableData);
-		$('#leaderboard-empty-list-msg-div').addClass('hide');
-	}else{
-		$('#leaderboard-list').addClass('hide');
-		$('#leaderboard-empty-list-msg-div').removeClass('hide');
-	}
-	
 	showHideRankPaginateBtns(startIndex, count);
 	
 	 $('html, body').animate({
 	        scrollTop: $('#leaderboard-tbl').offset().top - 20
 	    }, 'slow');
 	 
-	 setTimeout(function(){
-			hideDashOverlay('#leaderboard-dash');
-		}, 1000);
 });
 
 $(document).on('click','#top-ten-ranks-btn',function(){
@@ -607,25 +566,12 @@ $(document).on('click','#top-ten-ranks-btn',function(){
 	}else{
 		userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
 	}
-	
-	if(userRankingList != null && userRankingList.length != 0){
-		tableData=drawLeaderboardTableStructure(userRankingList, userId,profileMasterId);
-		$('#leaderboard-list').removeClass('hide');
-		$('#leaderboard-tbl').html(tableData);
-		$('#leaderboard-empty-list-msg-div').addClass('hide');
-	}else{
-		$('#leaderboard-list').addClass('hide');
-		$('#leaderboard-empty-list-msg-div').removeClass('hide');
-	}
-	
+
 	showHideRankPaginateBtns(startIndex, count);
 	$('html, body').animate({
         scrollTop: $('#leaderboard-tbl').offset().top - 20
     }, 'slow');
 	
-	 setTimeout(function(){
-			hideDashOverlay('#leaderboard-dash');
-		}, 1000);
 });
 
 $(document).on('click','#my-rank-btn',function(){
@@ -677,25 +623,12 @@ $(document).on('click','#my-rank-btn',function(){
 	var userRankingList = null;
 	
 	userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
-	
-	if(userRankingList != null && userRankingList.length != 0){
-		tableData=drawLeaderboardTableStructure(userRankingList, userId,profileMasterId);
-		$('#leaderboard-list').removeClass('hide');
-		$('#leaderboard-tbl').html(tableData);
-		$('#leaderboard-empty-list-msg-div').addClass('hide');
-	}else{
-		$('#leaderboard-list').addClass('hide');
-		$('#leaderboard-empty-list-msg-div').removeClass('hide');
-	}
-	
+
 	showHideRankPaginateBtns(startIndex, count);
 	$('html, body').animate({
         scrollTop: $('#leaderboard-tbl').offset().top - 20
     }, 'slow');
 	
-	setTimeout(function(){
-		hideDashOverlay('#leaderboard-dash');
-	}, 1000);
 });
 
 });

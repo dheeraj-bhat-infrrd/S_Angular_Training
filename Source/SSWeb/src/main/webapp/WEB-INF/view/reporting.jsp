@@ -45,7 +45,7 @@
 </c:choose>
 
 <div class="overlay-loader hide"></div>
-
+<input type="hidden" data-profile-master-id="${profilemasterid}" data-user-id="${userId}" id="reporting-data-div">
 <div id="rep-prof-container" data-profile-master-id="${profilemasterid}"
 			data-column-name="${columnName}" data-account-type="${accounttype}"
 			data-column-value="${columnValue}" class="hide dash-top-info dash-prof-wrapper pos-relative dash-size" >
@@ -202,9 +202,9 @@
 		
 		drawLeaderboardPage(columnName, columnId, profileMasterIdLead, userId, companyId);
 		
-		drawOverallScoreStatsGraph(entityId, entityType);		
+		getOverallScoreStats(entityId, entityType);		
 		
-		drawQuestionScoreStatsGraph(entityId, entityType);
+		getQuestionScoreStats(entityId,entityType);
 		
 		paintReportingDashboard(profileMasterId, currentProfileName, currentProfileValue, accountType);
 		
