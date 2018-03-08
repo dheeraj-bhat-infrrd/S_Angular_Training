@@ -79,7 +79,7 @@
 	<div class="container">
 		<div class="hm-header-row clearfix">
 			<div class="float-left hm-header-row-left hr-dsh-adj-lft">
-				<spring:message code="label.header.dashboard.key" />
+				New Dashboard
 			</div>
 			<!-- Add user assignment dropdown -->
 			<jsp:include page="user_assignment_dropdown.jsp"></jsp:include>
@@ -187,17 +187,7 @@
 	
 	drawOverviewPage();
 	
-	var showOverview = getOverviewData();
-	
-		if (showOverview == null) {
-			$('#overviewSuccess').hide();
-			$('#overviewFailure').show();
-		} else {
-			$('#overviewSuccess').show();
-			$('#overviewFailure').hide();
-		}
-		
-		$(window).resize();
+	$(window).resize();
 		
 	//Score stats
 		var entityType = "${columnName}";

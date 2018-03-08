@@ -1418,6 +1418,14 @@ function drawOverviewPage(){
 			$('#nps-row').hide();
 			
 	}
+	
+	if (overviewData == null) {
+		$('#overviewSuccess').hide();
+		$('#overviewFailure').show();
+	} else {
+		$('#overviewSuccess').show();
+		$('#overviewFailure').hide();
+	}
 }
 
 //javascript for reporting_reports page
