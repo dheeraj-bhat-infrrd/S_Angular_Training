@@ -65,6 +65,7 @@ public class SocialMonitorController
     public ResponseEntity<?> addKeywordsToCompany( @PathVariable ( "companyId") long companyId,
                                                    @Valid @RequestBody List<Keyword> keywordsRequest ) throws SSApiException
     {
+    	LOGGER.info("asdasd");
         try {
             LOGGER.info( "SocialMonitorController.addKeywordsToCompany started" );
             List<Keyword> filterKeywords = organizationManagementService.addKeyworodsToCompanySettings( companyId,

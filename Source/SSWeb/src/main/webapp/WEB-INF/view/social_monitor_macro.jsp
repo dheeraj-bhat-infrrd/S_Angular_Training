@@ -48,7 +48,7 @@
 </div>
 
 <div id="soc-mon-macro" class="dash-wrapper-main" style="margin-bottom:40px">
-	<div class="dash-container container">
+	<div id="macro-container" class="dash-container container">
 		<div class="dash-stats-wrapper bord-bot-dc clearfix macro-hdr">
 			<div class="macro-hdr-txt">Macros</div>
 			<div class="macro-hdr-desc">A macro is a prepared response or action that is used to manage posts.</div>
@@ -61,17 +61,74 @@
 			<div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 macro-list-hdr ">Name</div>
 			<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 macro-list-hdr">Usage  (last 7 days)</div>
 		</div>
-		<div class="dash-stats-wrapper bord-bot-dc clearfix macro-list-div">
-			<div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 macro-list-item">Post has questionable language - Flag</div>
-			<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 macro-list-item-usage">4</div>
+		<div id="active-macros-list">
+			
 		</div>
-		<div class="dash-stats-wrapper bord-bot-dc clearfix macro-list-div">
-			<div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 macro-list-item">Request post must be Removed - Escalate</div>
-			<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 macro-list-item-usage">0</div>
-		</div>
-		<div class="dash-stats-wrapper bord-bot-dc clearfix macro-list-div">
-			<div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 macro-list-item">Confirm post Removed - Resolve</div>
-			<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 macro-list-item-usage">0</div>
-		</div>
+		<div id="inactive-macros-list" class="hide">
+			
+		</div>		
 	</div>
 </div>
+<script>
+	$(document).ready(function(){
+		/* var macroList = [
+			{
+				"macroId" : "mac-1",
+				"macroName" : "Post has questionable language - Flag",
+				"description" : "",
+				"actions" : {"SocialFeedStatus":"NEW","flagged":true,"TextActionType":"PRIVATE_NOTE","text":"This need to be reviewed"},
+				"active" : true,
+				"count" : 4,
+				"createdOn" : "October 23, 2017"
+			},
+			{
+				"macroId" : "mac-2",
+				"macroName" : "Request post to be removed - Escalated",
+				"description" : "",
+				"actions" : {"SocialFeedStatus":"ESCALATED","flagged":true,"TextActionType":"PRIVATE_NOTE","text":"This need to be reviewed"},
+				"active" : true,
+				"count" : 0,
+				"createdOn" : "October 24, 2017"
+			},
+			{
+				"macroId" : "mac-3",
+				"macroName" : "Confirm post removed -  Resolve",
+				"description" : "",
+				"actions" : {"SocialFeedStatus":"RESOLVED","flagged":false,"TextActionType":"PRIVATE_NOTE","text":"This need to be reviewed"},
+				"active" : true,
+				"count" : 0,
+				"createdOn" : "October 23, 2017"
+			},
+			{
+				"macroId" : "mac-4",
+				"macroName" : "Confirm post removed -  Resolve",
+				"description" : "",
+				"actions" : {"SocialFeedStatus":"NEW","flagged":true,"TextActionType":"PRIVATE_NOTE","text":"This need to be reviewed"},
+				"active" : false,
+				"count" : 4,
+				"createdOn" : "October 25, 2017"
+			},
+			{
+				"macroId" : "mac-5",
+				"macroName" : "Post has questionable language - Flag",
+				"description" : "",
+				"actions" : {"SocialFeedStatus":"ESCALATED","flagged":true,"TextActionType":"PRIVATE_NOTE","text":"This need to be reviewed"},
+				"active" : false,
+				"count" : 6,
+				"createdOn" : "October 26, 2017"
+			},
+			{
+				"macroId" : "mac-6",
+				"macroName" : "Request post to be removed - Escalated",
+				"description" : "",
+				"actions" : {"SocialFeedStatus":"RESOLVED","flagged":false,"TextActionType":"PRIVATE_NOTE","text":"This need to be reviewed"},
+				"active" : false,
+				"count" : 2,
+				"createdOn" : "October 23, 2017"
+			}
+		];
+		
+		drawMacroList(macroList); */
+		getMacros();
+	});
+</script>

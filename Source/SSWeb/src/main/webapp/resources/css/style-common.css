@@ -11030,7 +11030,7 @@ img.lead-img {
 
 .soc-mon-post-container{
 	padding-left:0;
-	border-right: 1px solid #f2ecec;
+	border-right: 1px solid #dbdbdb;
 }
 
 .soc-mon-post-checkbox{
@@ -11137,10 +11137,14 @@ img.lead-img {
 	border: 1px solid #ececec;
     border-top: transparent;
     border-bottom: transparent;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
 }
 
 .bottom-padding-stream{
 	padding-bottom:15px;
+	flex: 0 0 auto;
 }
 
 .stream-actions-btn-container{
@@ -11250,6 +11254,10 @@ img.lead-img {
 .soc-mon-pag-text{
 	font-weight: bold !important;
     margin-right: 10px;
+}
+
+.soc-mon-bold-text{
+	font-weight: bold !important;
 }
 
 .soc-mon-pag-icn{
@@ -11743,6 +11751,11 @@ img.lead-img {
     margin-top: 35px;
     z-index: 1;
     position: absolute;
+}
+
+.dup-count{
+	font-size: 11px;
+    font-weight: bold !important;
 }
 
 .recalculate-user-ranking{

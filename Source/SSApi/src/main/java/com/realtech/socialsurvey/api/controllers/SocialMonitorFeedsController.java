@@ -52,7 +52,8 @@ public class SocialMonitorFeedsController {
 	@ApiOperation(value = "Get Social posts for Social monitor", response = SocialMonitorResponseData.class)
 	@ApiResponses(value = { @ApiResponse ( code = 200, message = "Successfully fetched the list of social feeds")})
 	public ResponseEntity<?> showStreamSocialPosts(int startIndex, int limit,
-			@RequestParam(value = "status", required = false) String status, boolean flag,
+			@RequestParam(value = "status", required = false) String status,
+			@RequestParam(value = "flag", required = false) boolean flag,
 			@RequestParam List<String> feedtype, @RequestParam(value = "companyId", required = false) Long companyId,
 			@RequestParam(value = "regionIds", required = false) List<Long> regionIds,
 			@RequestParam(value = "branchIds", required = false) List<Long> branchIds,
