@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.services.hierarchylocationmanagement.impl;
 
 
+import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -183,11 +184,13 @@ public class HierarchyLocationManagementServiceImpl implements HierarchyLocation
                     userProfile.setBranchId( targetLocation.getTargetBranch().getBranchId() );
                     userProfile.setRegionId( targetLocation.getTargetRegion().getRegionId() );
                     userProfile.setCompany( targetLocation.getTargetCompany() );
+                    userProfile.setModifiedOn(new Timestamp(System.currentTimeMillis()));
                 }
                 break;
             }
             case BRANCH: {
                 for ( UserProfile userProfile : userProfiles ) {
+                		userProfile.setModifiedOn(new Timestamp(System.currentTimeMillis()));
                     if ( userProfile.getBranchId() == targetLocation.getTargetBranch().getBranchId() ) {
                         if ( !userToBeRelocated.isCompanyAdmin() ) {
                             userProfile.setRegionId( targetLocation.getTargetRegion().getRegionId() );
@@ -207,6 +210,7 @@ public class HierarchyLocationManagementServiceImpl implements HierarchyLocation
             }
             case REGION: {
                 for ( UserProfile userProfile : userProfiles ) {
+                		userProfile.setModifiedOn(new Timestamp(System.currentTimeMillis()));
                     if ( userProfile.getRegionId() == targetLocation.getTargetRegion().getRegionId() ) {
                         if ( !userToBeRelocated.isCompanyAdmin() ) {
                             userProfile.setCompany( targetLocation.getTargetCompany() );

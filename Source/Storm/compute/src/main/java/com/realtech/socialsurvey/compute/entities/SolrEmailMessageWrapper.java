@@ -18,6 +18,7 @@ public class SolrEmailMessageWrapper extends EmailMessage
     private String emailUnsubscribeDate;
     private String emailBounceDate;
     private String emailLinkClickedDate;
+    private String emailDroppedDate;
     
     private List<String> attachmentDetail;
 
@@ -56,7 +57,8 @@ public class SolrEmailMessageWrapper extends EmailMessage
 
     public SolrEmailMessageWrapper( EmailMessage emailMessage, String sendgridMessageId, String emailDeliveredDate,
         String emailDefferedDate, String emailBlockedDate, String emailOpenedDate, String emailMarkedSpamDate,
-        String emailAttemptedDate, String emailUnsubscribeDate, String emailBounceDate, String emailLinkClickedDate )
+        String emailAttemptedDate, String emailUnsubscribeDate, String emailBounceDate, String emailLinkClickedDate,
+        String emailDroppedDate )
     {
         this( emailMessage );
         this.sendgridMessageId = sendgridMessageId;
@@ -69,6 +71,7 @@ public class SolrEmailMessageWrapper extends EmailMessage
         this.emailUnsubscribeDate = emailUnsubscribeDate;
         this.emailBounceDate = emailBounceDate;
         this.emailLinkClickedDate = emailLinkClickedDate;
+        this.emailDroppedDate = emailDroppedDate;
     }
 
 
@@ -200,5 +203,16 @@ public class SolrEmailMessageWrapper extends EmailMessage
         this.attachmentDetail = attachmentDetail;
     }
 
+
+    public String getEmailDroppedDate()
+    {
+        return emailDroppedDate;
+    }
+
+
+    public void setEmailDroppedDate( String emailDroppedDate )
+    {
+        this.emailDroppedDate = emailDroppedDate;
+    }
 
 }

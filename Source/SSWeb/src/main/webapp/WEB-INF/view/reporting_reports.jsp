@@ -29,7 +29,7 @@
 	</div>
 </div>
 
-<div class="dash-stats-wrapper bord-bot-dc clearfix">
+<div id="reports_page_container" class="dash-stats-wrapper bord-bot-dc clearfix">
 	
 				<div class="generate-report-div">
 					<span class="generate-report-span-report" >Report</span>
@@ -43,6 +43,7 @@
   							<c:if test="${profilemasterid == 1}"> 
  								<option value=<spring:message code="label.company.user.report.value" /> data-report="company-user"><spring:message code="label.company.user.report.key" /></option>
  								<option value=<spring:message code="label.nps.report.value" /> data-report="nps-report"><spring:message code="label.nps.report.key" /></option>
+								<option value=<spring:message code="label.branch.ranking.monthly.report.value" /> data-report="company-user"><spring:message code="label.branch.ranking.report.key" /></option>
 							</c:if>
   								<option value=<spring:message code="label.survey.results.report.value" /> data-report="survey-results"><spring:message code="label.survey.results.report.key" /></option>
  								<option value=<spring:message code="label.survey.transaction.report.value" /> data-report="survey-transaction-summary"><spring:message code="label.survey.transaction.report.key" /></option>
@@ -119,11 +120,11 @@ $(document).ready(function() {
 	
 	var selectedVal = $('#generate-survey-reports').val();
 	var key = parseInt(selectedVal);
-	if(key == 101 || key == 102 || key == 103 || key == 106){
+	if(key == 101 || key == 102 || key == 103 || key == 106 || key == 112){
 	$('#date-pickers').hide();
 	}
 	
-	if(key == 106){
+	if(key == 106 || key == 112){
 		$('#report-time-div').removeClass('hide');
 	}else{
 		$('#report-time-div').addClass('hide');
@@ -147,6 +148,8 @@ $(document).ready(function() {
 		drawRecentActivity(startIndex, batchSize,tableHeaderData);
 		showHidePaginateButtons(startIndex, recentActivityCount);
 	});
+	
+	autoRefresh(tableHeaderData);	
 		
 });
 </script>

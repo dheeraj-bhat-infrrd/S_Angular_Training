@@ -1,11 +1,6 @@
 package com.realtech.socialsurvey.web.api;
 
 
-
-import java.util.List;
-
-import org.springframework.web.bind.annotation.PathVariable;
-
 import com.realtech.socialsurvey.core.entities.Keyword;
 import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
 import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
@@ -16,15 +11,10 @@ import com.realtech.socialsurvey.web.api.entities.VendastaRmCreateRequest;
 import com.realtech.socialsurvey.web.entities.CompanyProfile;
 import com.realtech.socialsurvey.web.entities.Payment;
 import com.realtech.socialsurvey.web.entities.PersonalProfile;
-
 import retrofit.client.Response;
-import retrofit.http.Body;
-import retrofit.http.DELETE;
-import retrofit.http.GET;
-import retrofit.http.POST;
-import retrofit.http.PUT;
-import retrofit.http.Path;
-import retrofit.http.Query;
+import retrofit.http.*;
+
+import java.util.List;
 
 
 public interface SSApiIntegration
@@ -257,5 +247,22 @@ public interface SSApiIntegration
     @GET("/v1/users/company/{companyId}")
     public Response getUsersByCompanyId(@Path("companyId") Long companyId);
     
+    @GET ( "/v1/lastsuccessfuletltime/isetlrunning" )
+    Response isEtlRunning();
     
+    @GET ( "/v1/lastsuccessfuletltime/{entityId}/{entityType}" )
+    Response lastRunForEntity(@Path ("entityId") long entityId,@Path ("entityType") String entityType);
+    
+    @GET ( "/v1/lastsuccessfuletltime/recal/{entityId}/{entityType}" )
+    Response recalUserRanking(@Path ("entityId") long entityId,@Path ("entityType") String entityType);
+    
+    @POST( "/v1/updateabusivemail" )
+    Response updateAbusiveMail(@Query ("entityId") long entityId,@Query ("mailId") String mailId);
+    
+    @POST( "/v1/unsetabusivemail" )
+    Response unsetAbusiveMail(@Query ("entityId") long entityId);
+    
+    @POST( "/v1/unsetcompres" )
+    Response unsetCompRes(@Query ("entityId") long entityId);
+
 }

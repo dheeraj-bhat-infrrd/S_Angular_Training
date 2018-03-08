@@ -42,4 +42,6 @@ public interface CompanyDao extends GenericDao<Company, Long> {
 
     List<Company> getCompanyListByIds( Set<Long> companyIds );
 
+	public List<Long> filterIdsByStatus(List<Long> companies, List<Integer> asList);
+
 }

@@ -294,6 +294,8 @@ public interface CommonConstants
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_USER_RANKING_YEARLY_REPORT = "User ranking yearly report for reporting";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_NPS_WEEK_REPORT = "NPS weekly report for reporting";
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_NPS_MONTH_REPORT = "NPS monthly report for reporting";
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_BRANCH_RANKING_MONTHLY_REPORT = "Branch Ranking Monthly Report for reporting";
+    public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_REPORTING_BRANCH_RANKING_YEARLY_REPORT = "Branch ranking yearly report for reporting";
 
 
     /**
@@ -317,6 +319,7 @@ public interface CommonConstants
     public static final String SURVEY_CLICKED_COLUMN = "surveyClicked";
     public static final String IS_ABUSIVE_COLUMN = "isAbusive";
     public static final String DEFAULT_MONGO_ID_COLUMN = "_id";
+    public static final String MONGO_CLASS_COLUMN = "_class";
     public static final String LAST_REMINDER_FOR_INCOMPLETE_SURVEY = "lastReminderForIncompleteSurvey";
     public static final String REMINDERS_FOR_INCOMPLETE_SURVEYS = "remindersForIncompleteSurveys";
     public static final String LAST_REMINDER_FOR_SOCIAL_POST = "lastReminderForSocialPost";
@@ -359,6 +362,7 @@ public interface CommonConstants
     public static final String LAST_RETAKE_REQUEST_DATE_COLUMN = "lastRetakeRequestDate";
     public static final String RETAKE_SURVEY_HISTORY_COLUMN = "retakeSurveyHistory"; 
     public static final String OPEN_RETAKE_SURVEY_REQUEST_COLUMN = "openRetakeSurveyRequest";
+    public static final String ABUSIVE_NOTIFY_COLUMN = "abusiveNotify";
 
     /**
      * Constants to be used in code for referencing variables(i.e in maps or session attributes)
@@ -428,6 +432,7 @@ public interface CommonConstants
     public static final String USER_ACCOUNT_SETTINGS = "accountSettings";
     public static final String USER_APP_SETTINGS = "appSettings";
     public static final String COMPLAIN_REG_SETTINGS = "complaintRegSettings";
+    public static final String ABUSIVE_MAIL_SETTINGS = "abusiveMailSettings";
     public static final String ERROR = "error";
     public static final String ZILLOW_PROFILE_ERROR = "zillow-error";
     public static final String ZILLOW_NMLS_REQUIRED_ERROR = "zillow-nmls-required-error";
@@ -590,6 +595,7 @@ public interface CommonConstants
     public static final String ENCOMPASS_GENERATE_REPORT_COLUMN = "generateReport";
     public static final String ENCOMPASS_DEFAULT_FEILD_ID = "1997";
     public static final String ENCOMPASS_VERSION_COULMN = "version";
+    public static final List<String> CRM_UNVERIFIED_SOURCES =  new ArrayList<>(Arrays.asList(new String[] { "agent" , "admin", "customer"}));
 
     // mail content
     public static final String SURVEY_MAIL_BODY_CATEGORY = "SURVEY_MAIL_BODY_CATEGORY";
@@ -993,13 +999,15 @@ public interface CommonConstants
     public static final int FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT = 106;
     public static final int FILE_UPLOAD_REPORTING_USER_RANKING_YEARLY_REPORT = 107;
     public static final int FILE_UPLOAD_REPORTING_INCOMPLETE_SURVEY_REPORT = 108;
+    public static final int FILE_UPLOAD_REPORTING_COMPANY_DETAILS_REPORT = 109;
+    public static final int FILE_UPLOAD_REPORTING_NPS_WEEK_REPORT = 110;
+    public static final int FILE_UPLOAD_REPORTING_NPS_MONTH_REPORT = 111;
+    public static final int FILE_UPLOAD_REPORTING_BRANCH_RANKING_MONTHLY_REPORT = 112;
+    public static final int FILE_UPLOAD_REPORTING_BRANCH_RANKING_YEARLY_REPORT = 113;
     
     //Generating survey invitation email report through storm
     public static final int FILE_UPLOAD_SURVEY_INVITATION_EMAIL_REPORT = 1001;
 
-    public static final int FILE_UPLOAD_REPORTING_COMPANY_DETAILS_REPORT = 109;
-    public static final int FILE_UPLOAD_REPORTING_NPS_WEEK_REPORT = 110;
-    public static final int FILE_UPLOAD_REPORTING_NPS_MONTH_REPORT = 111;
     public static final int NPS_REPORT_TYPE_WEEK = 1;
     public static final int NPS_REPORT_TYPE_MONTH = 2;
 
@@ -1406,6 +1414,8 @@ public interface CommonConstants
     public static final String REPORTING_NPS_REPORT = "NPS Report";
     public static final String REPORTING_API_DATE_FORMAT = "MMM dd, yyyy";
     public static final String SURVEY_INVITATION_EMAIL_REPORT = "Survey Invitation Email Report";
+    public static final String REPORTING_BRANCH_RANKING_MONTHLY_REPORT = "Branch Ranking Report For Month";
+    public static final String REPORTING_BRANCH_RANKING_YEARLY_REPORT = "Branch Ranking Report For Year";
 
     public static final String SURVEY_DETAILS_ID_COLUMN = "surveyDetailsId";
     public static final String SURVEY_RESULTS_REPORT_MODIFIED_ON = "reportModifiedOn";
@@ -1530,6 +1540,7 @@ public interface CommonConstants
     public static final String EMAIL_TYPE_UNSUCCESSFUL_SURVEY_CSV_UPLOAD_MAIL_TO_UPLOADER = "UNSUCCESSFUL_SURVEY_CSV_UPLOAD_MAIL_TO_UPLOADER";
     public static final String EMAIL_TYPE_SUCCESSFUL_SURVEY_CSV_UPLOAD_MAIL_TO_UPLOADER = "SUCCESSFUL_SURVEY_CSV_UPLOAD_MAIL_TO_UPLOADER";
     public static final String EMAIL_TYPE_SOCIAL_MONITOR_ACTION_MAIL_TO_USER = "EMAIL_TYPE_SOCIAL_MONITOR_ACTION_MAIL_TO_USER";
+    public static final String EMAIL_TYPE_ABUSIVE_HANDLE_MAIL = "ABUSIVE_HANDLE_MAIL";
 
     public static final String REDIRECT = "redirect:/";
     public static final String EVENT_CLICK = "click";
@@ -1556,8 +1567,15 @@ public interface CommonConstants
 
     //JobLogDetails
     public static final String JOB_LOG_ID = "jobLogId";
+    public static final String JOB_NAME = "jobName";
     public static final String STATUS_DUMMY = "Dummy";
     public static final String STATUS_FINISHED = "Finished";
+    public static final String STATUS_RUNNING = "Running";
+    public static final String CENTRALIZED_JOB_NAME = "CentralizedMainJob";
+    public static final String REPORTING_JOB_NAME = "ReportingMainJob";
+    public static final String USER_RANKING_JOB_NAME = "UserRankingJob";
+    public static final String IS_MANUAL = "isManual";
+    
 
     public static final String TIMEZONE_EST = "GMT-5:00";
     
@@ -1569,4 +1587,7 @@ public interface CommonConstants
     public static final String SURVEY_RESPONSE_QUESTION = "surveyResponse.question";
     public static final String SURVEY_RESPONSE_QUESTION_TYPE = "surveyResponse.questionType";
     public static final String QUESTION_TYPE_MCQ = "sb-sel-mcq";
+
+    //failed stream message mongo batch size
+    public static final  int FAILED_STREAM_MSGS_BATCH_SIZE = 100;
 }

@@ -24,8 +24,24 @@ var zillowCallBreak = false
 var processedPermalink = 0;
 
 $(document).ajaxStop(function() {
-	adjustImage();
+	adjustImageForPublicProfile();
 });
+
+
+function adjustImageForPublicProfile(){
+    //var windW = getWindowWidth();
+    if(windW < 768){
+        //var imgW = $('#prof-image').width();
+        //$('#prof-image').height(imgW * 0.7);
+        $('.footer-main-wrapper').hide();
+    }else{
+        $('.lp-con-row-item').width('auto');
+        $('.footer-main-wrapper').show();
+        //show all the containers
+        $('#reviews-container, #prof-company-intro, #prof-agent-container').show();
+        $('#recent-post-container, #ppl-post-cont, #contact-wrapper, #intro-about-me').show();
+    }
+}
 
 //Profile page event binding
 $(document).on("click", "#prof-company-review-count",function(){
@@ -1318,9 +1334,9 @@ function paintHiddenReviewsCount(data) {
 		var reviewsSizeHtml = responseJson.entity;
 		if(reviewsSizeHtml > 0) {
 			if(reviewsSizeHtml == 1) {
-				reviewsSizeHtml = reviewsSizeHtml +' additional review not recommended';
+				reviewsSizeHtml = reviewsSizeHtml +' additional review';
 			}else {
-				reviewsSizeHtml = reviewsSizeHtml +' additional reviews not recommended';
+				reviewsSizeHtml = reviewsSizeHtml +' additional reviews';
 			}
 			
 			$("#prof-hidden-review-count")

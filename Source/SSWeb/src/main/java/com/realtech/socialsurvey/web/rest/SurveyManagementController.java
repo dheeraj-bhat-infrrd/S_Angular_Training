@@ -40,6 +40,7 @@ import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialPostDaoImpl;
+import com.realtech.socialsurvey.core.entities.AbusiveMailSettings;
 import com.realtech.socialsurvey.core.entities.AgentMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
@@ -92,6 +93,7 @@ import com.realtech.socialsurvey.web.util.RequestUtils;
 
 import facebook4j.FacebookException;
 import retrofit.client.Response;
+import retrofit.mime.TypedByteArray;
 import twitter4j.TwitterException;
 
 // JIRA SS-119 by RM-05 : BOC
@@ -234,9 +236,10 @@ public class SurveyManagementController
      */
     @ResponseBody
     @RequestMapping(value = "/data/getSwearWords" , method = RequestMethod.GET)
-    public Response getSwearList() {
+    public String getSwearList() {
         LOG.info( "Method to get swear list started" );
-        return ssApiIntergrationBuilder.getIntegrationApi().getSwearWordsList();
+        Response response = ssApiIntergrationBuilder.getIntegrationApi().getSwearWordsList();
+        return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
 
     }
 
@@ -426,6 +429,23 @@ public class SurveyManagementController
 					}
 
 				}
+				
+				if(isAbusive) {
+					if (companySettings.getSurvey_settings() != null && companySettings.getSurvey_settings().getAbusive_mail_settings() != null) {
+						AbusiveMailSettings abusiveMailSettings = companySettings.getSurvey_settings().getAbusive_mail_settings();
+						survey.setAbusiveNotify(true);
+						surveyHandler.updateSurveyAsAbusiveNotify(survey.get_id());
+
+						// SS-1435: Send survey details too.
+						// SS-715: Full customer name
+						String displayName = survey.getCustomerFirstName();
+						if (survey.getCustomerLastName() != null)
+							displayName = displayName + " " + survey.getCustomerLastName();
+						emailServices.sendAbusiveNotifyMail(CommonConstants.REPORT_ABUSE_BY_APPLICATION_NAME, abusiveMailSettings.getMailId(), displayName,customerEmail, survey.getAgentName(), 
+								agent.getEmailId(),mood, surveyScore, survey.getSourceId(), feedback,survey.getSurveyCompletedDate().toString());
+					}
+				}
+				
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Exception occurred while trying to send survey completion mail to : " + customerEmail);
