@@ -356,7 +356,13 @@ function drawSpsStatsGraph(){
 
 												var data = google.visualization
 														.arrayToDataTable(spsChartData);
-
+												
+												var windowSize = $( window ).width();
+												var groupWidth = '60';
+												if(windowSize <= 500){
+													groupWidth = '30';
+												}
+												
 												var options = {
 													legend : {
 														position : 'none'
@@ -368,7 +374,7 @@ function drawSpsStatsGraph(){
 															count : 14
 														}
 													},
-													bar: { groupWidth: '60' },
+													bar: { groupWidth: groupWidth },
 													annotations: {
 														   alwaysOutside:true,
 														   style: 'point',
@@ -501,6 +507,12 @@ function drawNpsStatsGraph(entityId,entityType){
 												var data = google.visualization
 														.arrayToDataTable(npsChartData);
 
+												var windowSize = $( window ).width();
+												var groupWidth = '60';
+												if(windowSize <= 500){
+													groupWidth = '30';
+												}
+												
 												var options = {
 													legend : {
 														position : 'none'
@@ -512,7 +524,7 @@ function drawNpsStatsGraph(entityId,entityType){
 															count : 14
 														}
 													},
-													bar: { groupWidth: '60' },
+													bar: { groupWidth: groupWidth },
 													annotations: {
 														   alwaysOutside:true,
 														   style: 'point',
@@ -686,7 +698,7 @@ function drawCompletionRateGraph(){
 function drawUnclickedDonutChart(overviewYearData){
 	 
 	unclickedDrawnCount=0;
-	
+	$('#processed-trans-graph').removeClass('hide');
 	var monthYear = getTimeFrameValue();
 	
 	 google.charts.load("current", {packages:["corechart"]});
@@ -785,10 +797,14 @@ function drawUnclickedDonutChart(overviewYearData){
 		        icnChart.draw(data, optionsChartIcn);
 		       
 		        isUpdateTransStats=false;
+		        
+		        $('#processed-trans-graph').addClass('hide');
 	      }
 }
 
 function drawProcessedDonutChart(overviewYearData){
+	
+	$('#unprocessed-trans-graph').removeClass('hide');
 	
 	var monthYear = getTimeFrameValue();
 	    
@@ -844,6 +860,7 @@ function drawProcessedDonutChart(overviewYearData){
 	        var chart = new google.visualization.PieChart(document.getElementById('processedDonutchart'));
 	        chart.draw(data, options);
 	       
+	        $('#processed-trans-graph').addClass('hide');
 	      }
 }
 
@@ -1401,6 +1418,14 @@ function drawOverviewPage(){
 			$('#nps-row').hide();
 			
 	}
+	
+	if (overviewData == null) {
+		$('#overviewSuccess').hide();
+		$('#overviewFailure').show();
+	} else {
+		$('#overviewSuccess').show();
+		$('#overviewFailure').hide();
+	}
 }
 
 //javascript for reporting_reports page
@@ -1410,7 +1435,7 @@ $(document).on('change', '#generate-survey-reports', function() {
 	
 	var selectedVal = $('#generate-survey-reports').val();
 	var key = parseInt(selectedVal);
-	if(key == 101 || key == 102 || key == 103 || key == 106 || key == 110 || key == 112){
+	if(key == 101 || key == 102 || key == 103 || key == 106 || key == 110 || key == 112 || key == 200 || key == 1001 ){
 		$('#date-pickers').hide();
 	}else{
 		$('#date-pickers').show();
@@ -1427,6 +1452,19 @@ $(document).on('change', '#generate-survey-reports', function() {
 		setNpsTimeFrames();
 	}else{
 		$('#nps-report-time-div').addClass('hide');
+	}
+	
+	if( key == 200 ){
+		$('#digest-time-div').removeClass('hide');
+	} else {
+		$('#digest-time-div').addClass('hide');
+	}
+	
+
+	if(key == 1001){
+		$('#email-rep-time-div').removeClass('hide');
+	}else{
+		$('#email-rep-time-div').addClass('hide');
 	}
 });
 
@@ -1541,6 +1579,38 @@ function getTimeFrameForUserRankingReport(){
 	return dateTimeFrame;
 }
 
+function getTimeFrameForEmailReport(){
+	var currentDate = new Date();
+	var currentYear = currentDate.getFullYear();
+	var currentMonth = currentDate.getMonth()+1;
+	
+	var year = currentYear;
+	var month = currentMonth;
+	
+	var dateTimeFrame = '';
+	
+	var timeFrameStr = $('#email-rep-selector').val();
+	timeFrame = parseInt(timeFrameStr);
+	
+	switch(timeFrame){
+	case 2: year = currentYear;
+		month = currentMonth;
+		dateTimeFrame = month+"/01/"+year;
+		break;
+	
+	case 3: year = currentYear;
+		month=currentMonth -1;
+		if(month<=0){
+			month=12;
+			year--;
+		}
+		dateTimeFrame = month+"/01/"+year;
+		break;
+	}
+		
+	return dateTimeFrame;
+}
+
 function getStartAndEndDateForNps(npsTimeFrame){
 	var currentDate = new Date;
 	var currentMonth = currentDate.getMonth()+1;
@@ -1576,31 +1646,49 @@ function getStartAndEndDateForNps(npsTimeFrame){
 	return npsDates;
 }
 
+function getStartAndEndDateForDigest(timeFrame){
+	
+	var date = new Date();
+	date.setMonth(date.getMonth() - timeFrame);
+	
+	var digestDates = new Object();
+	digestDates.startDate = formatDateForDigest( new Date(date.getFullYear(), date.getMonth(), 1) );
+	
+	date.setMonth( date.getMonth() + 1 );
+	date = new Date(date.getFullYear(), date.getMonth(), 1);
+	date.setSeconds( date.getSeconds() - 1 ); 
+	digestDates.endDate = formatDateForDigest(date);
+	return digestDates;
+}
+
+function formatDateForDigest( date ){
+	var year = date.getFullYear();
+	var month = date.getMonth() < 10 ? '0' + (  date.getMonth() + 1 ) : ( date.getMonth() + 1 );
+	var date = date.getDate() < 10 ? '0' + date.getDate() : date.getDate();
+	return month + '/' + date + '/' + year;
+}
+
 $(document).on('click', '#reports-generate-report-btn', function(e) {
 	var selectedValue = $('#generate-survey-reports').val();
 	var key = parseInt(selectedValue);
 	var startDate = $('#dsh-start-date').val();
 	var endDate = $("#dsh-end-date").val();
+	var digestMonthValue = 0;
 	var npsTimeFrame = parseInt($('#nps-report-time-selector').val());
 	var d = new Date();
 	var clientTimeZone = d.getTimezoneOffset();
 
+	if( key == 200 ){
+		digestMonthValue = $('#digest-time-selector').val()
+		var digestDates = getStartAndEndDateForDigest(parseInt(digestMonthValue));
+		startDate = digestDates.startDate;
+		endDate = digestDates.endDate;
+	}
+	
 	if(key == 106){
 		startDate = getTimeFrameForUserRankingReport();
 		var timeFrameStr = $('#report-time-selector').val();
-		timeFrame = parseInt(timeFrameStr);
-		
-		switch(timeFrame){
-		case 1: key = 107;
-			break;
-		case 2: key = 106;
-			break;
-		case 3: key = 107;
-			break;
-		case 4: key = 106;
-			break;
-		}
-		
+
 	}
 	
 	if(key == 112){
@@ -1631,13 +1719,17 @@ $(document).on('click', '#reports-generate-report-btn', function(e) {
 		endDate = npsDates.endDate;
 	}
 	
+	if(key == 1001){
+		startDate = getTimeFrameForEmailReport();
+	}
+	
 	var success = false;
 	var messageToDisplay;
 	var payload = {
 			"startDate" : startDate,
 			"endDate" : endDate,
 			"reportId" : key,
-			"clientTimeZone": clientTimeZone
+			"clientTimeZone": clientTimeZone,
 		};
 	
 	showOverlay();
@@ -1656,7 +1748,7 @@ $(document).on('click', '#reports-generate-report-btn', function(e) {
 				hideOverlay();
 				
 				var recentActivityCount=getRecentActivityCount();
-				drawRecentActivity(0,batchSize,tableHeaderData);
+				drawRecentActivity(0,batchSize,tableHeaderData,recentActivityCount);
 				showHidePaginateButtons(0, recentActivityCount);
 				
 				if(recentActivityCount == 0){
@@ -1691,7 +1783,9 @@ function getStatusString(status){
 		case 2: statusString='Pending';
 			break;
 		case 4: statusString='Failed';
-		break;
+			break;
+		case 5: statusString='View';
+			break;
 		default: statusString='Failed'
 		}
 		return statusString;
@@ -1701,7 +1795,7 @@ var batchSize=10
 var tableHeaderData;
 var recentActivityList;
 
-function drawRecentActivity(start,batchSize,tableHeader){
+function drawRecentActivity(start,batchSize,tableHeader,recentActivityCount){
 	
 	tableHeaderData=tableHeader;
 	startIndex=start;
@@ -1749,6 +1843,10 @@ function drawRecentActivity(start,batchSize,tableHeader){
 			tableData +="<td class=\"v-tbl-recent-activity fetch-name txt-bold \" style='font-size:13px !important;'>"+statusString+"</td>"
 			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold\" ><a id=\"recent-act-delete-row"+i+"\" class='txt-bold recent-act-delete-x cursor-pointer'>X</a></td>"
 			+"</tr>";
+		} else if(recentActivityList[i][6]==5){	
+			tableData +="<td class=\"v-tbl-recent-activity fetch-name txt-bold \" style='font-size:13px !important;'><a id=\"viewLink"+i+"\"class='txt-bold tbl-blue-text downloadLink cursor-pointer'>"+statusString+"</a></td>"
+			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold \" ><a id=\"recent-act-delete-row"+i+"\" class='txt-bold recent-act-delete-x cursor-pointer'>X</a></td>"
+			+"</tr>";
 		}else{
 			tableData +="<td class=\"v-tbl-recent-activity fetch-name txt-bold \" style='font-size:13px !important;'>"+statusString+"</td>"
 				+"<td class=\"v-tbl-recent-activity fetch-name txt-bold\" >  </td>"
@@ -1756,7 +1854,6 @@ function drawRecentActivity(start,batchSize,tableHeader){
 		}
 	}
 	
-	var recentActivityCount = getRecentActivityCount();
 	if(recentActivityCount == 0){
 		tableData='';
 		tableData+="</table><div style='text-align:center; margin:20px auto'><span class='incomplete-trans-span'>There are No Recent Activities</span></div>";
@@ -1764,6 +1861,8 @@ function drawRecentActivity(start,batchSize,tableHeader){
 	}else{
 		$('#recent-activity-list-table').html(tableHeaderData+tableData+"</table>");
 	}
+	
+	$('#rec-act-start-index').attr('data-start-index',startIndex);
 	
 }
 
@@ -1882,7 +1981,13 @@ $(document).on('click','.downloadLink',function(e){
 	var clickedID = this.id;
 	var indexRecentActivity = clickedID.match(/\d+$/)[0];
 	var downloadLink=recentActivityList[indexRecentActivity][7];
-	window.location=downloadLink;
+	
+	// open digest in new tab
+	if( recentActivityList[indexRecentActivity][1] == "Monthly Digest" ){
+		window.open(downloadLink,'_blank');
+	} else {
+		window.location=downloadLink;	
+	}
 });
 
 $(document).on('click','.recent-act-delete-x',function(e){
@@ -2037,14 +2142,14 @@ function updateReportingDashboard(){
 }
 
 function drawLeaderboardTableStructure(userRankingList,userId,profileMasterId){
-	var tableHeaderData='<table id="leaderboard-table" class="v-um-tbl leaderboard-table">'
+	var tableHeaderData='<table id="leaderboard-table" class="v-um-tbl leaderboard-table col-lg-12 col-md-12 col-sm-12 col-xs-12">'
 		+'<tr id="u-tbl-header" class="u-tbl-header">'
 		+'<td class="lead-tbl-ln-of text-center">Rank</td>'
 		+'<td class="v-tbl-uname lead-name-alignment">Name</td>'
-		+'<td class="lead-tbl-ln-of text-center">Reviews</td>'
-		+'<td class="lead-tbl-ln-of text-center">Average Score</td>'
-		+'<td class="lead-tbl-ln-of text-center">SPS</td>'
-		+'<td class="lead-tbl-ln-of text-center">Completion %</td>'
+		+'<td class="lead-tbl-ln-of text-center lead-tbl-hdr">Reviews</td>'
+		+'<td class="lead-tbl-ln-of text-center lead-tbl-hdr">Average Score</td>'
+		+'<td class="lead-tbl-ln-of text-center lead-tbl-hdr">SPS</td>'
+		+'<td class="lead-tbl-ln-of text-center lead-tbl-hdr">Completion %</td>'
 		+'</tr>';
 	
 	var tableData = '';
@@ -2190,6 +2295,10 @@ function getAndSaveRankingSettingsVal(columnName,isRealTechOrSSAdmin,monthOff,ye
 function drawLineGraphForScoreStats(chartDiv,chartData){
 	google.charts.load('current', {'packages':['corechart']});
 	google.charts.setOnLoadCallback(function(){
+		
+		var windowSize = $(window).width();
+		var graphWidth = windowSize - 200;
+		
 		var scoreStatsChartData = [
 									['Month','Rating'],
 									[ '', 0 ] ];
@@ -2202,10 +2311,28 @@ function drawLineGraphForScoreStats(chartDiv,chartData){
 
 			var options = {
 							chartArea : {
-							width : '95%'
+							width : '90%'
 							},
-							width: 800,
-							height : 300,
+							vAxis : {
+								minValue : 0,
+								maxValue : 5,
+								gridlines : {
+									count : 6
+								}
+							},
+							width: windowSize,
+							height: 300,
+							pointSize : 5,
+							legend: {position:'none'}
+						};
+			
+			if(windowSize > 1100){
+				 options = {
+							chartArea : {
+							width : '90%'
+							},
+							width: graphWidth,
+							height: 300,
 							vAxis : {
 								minValue : 0,
 								maxValue : 5,
@@ -2216,7 +2343,7 @@ function drawLineGraphForScoreStats(chartDiv,chartData){
 							pointSize : 5,
 							legend: {position:'none'}
 						};
-			
+			}
 			var chart = new google.visualization.LineChart(document.getElementById(chartDiv));
 			chart.draw(data, options);
 	});
@@ -2341,10 +2468,10 @@ function drawQuestionScoreStatsGraph(entityId,entityType){
 		for(var i=0; i<questionScoreStatsArray.length ; i++){
 			
 			var graphDivHtml = '';
-			graphDivHtml += '<div class="col-md-12 col-lg-12 col-sm-12 col-xs-12" style="margin-top: 10px; display: inline-block; float:left; width:100%;height:350px; margin-left:15px">'
-						+ '<span class="rep-sps-lbl" style="margin-top: 13px;">'+ (i+1)+') ' + questionArray[i] + '</span>'
+			graphDivHtml += '<div class="col-md-12 col-lg-12 col-sm-12 col-xs-12  score-stats-graph-con score-stats-ques-graph-con">'
+						+ '<span class="score-stats-lbl" >'+ (i+1)+') ' + questionArray[i] + '</span>'
 						+ '<div class="col-md-12 col-lg-12 col-sm-12 col-xs-12"> '
-						+ '<div id="question-rating-chart-'+i+'" style="width:80%; height:300px;margin: 20px 20px 20px 60px;"></div>'
+						+ '<div id="question-rating-chart-'+i+'" style="width: 100%; height: 300px"></div>'
 						+ '</div></div>';
 			
 			$('#question-ratings-div').append(graphDivHtml);
@@ -2765,9 +2892,9 @@ function deleteRecentActivity(fileUploadId,idIndex){
 				.promise()
 				.done(function(){
 					if(recentActivityCount <= startIndex){
-						drawRecentActivity(startIndex-10,batchSize,tableHeaderData);
+						drawRecentActivity(startIndex-10,batchSize,tableHeaderData,recentActivityCount);
 					}else if(recentActivityCount>=10){
-						drawRecentActivity(startIndex,batchSize,tableHeaderData);
+						drawRecentActivity(startIndex,batchSize,tableHeaderData,recentActivityCount);
 					}
 					showHidePaginateButtons(startIndex, recentActivityCount);
 					
@@ -3262,15 +3389,18 @@ function showOverviewTab(){
 }
 
 function autoRefresh(tableHeaderData){
+	
 	setTimeout(function(){
 		
+		var startIndexStr = $('#rec-act-start-index').attr('data-start-index');
+		var startIndex = parseInt(startIndexStr);
 		if($('#reports_page_container').length<=0){
 			return;
 		}
 		
 		var recentActivityCount=getRecentActivityCount();
-		drawRecentActivity(0,10,tableHeaderData);
-		showHidePaginateButtons(0, recentActivityCount);
+		drawRecentActivity(startIndex,10,tableHeaderData,recentActivityCount);
+		showHidePaginateButtons(startIndex, recentActivityCount);
 		
 		if(recentActivityCount == 0){
 			var tableData='';

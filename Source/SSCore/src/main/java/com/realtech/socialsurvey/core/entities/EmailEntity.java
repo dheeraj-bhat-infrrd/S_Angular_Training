@@ -303,7 +303,7 @@ public class EmailEntity implements Serializable
 	}
 
 
-	@Override
+    @Override
     public String toString() {
         return "EmailEntity{" +
                 "randomUUID='" + randomUUID + '\'' +

@@ -56,13 +56,13 @@ public class SendgridEvent
         this.timestamp = timestamp;
     }
 
-
+    @JsonProperty ( value = "smtp-id")
     public String getSmtpId()
     {
         return smtpId;
     }
 
-
+    @JsonProperty ( value = "smtp-id")
     public void setSmtpId( String smtpId )
     {
         this.smtpId = smtpId;

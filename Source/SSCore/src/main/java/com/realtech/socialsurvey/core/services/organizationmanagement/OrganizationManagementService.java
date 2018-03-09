@@ -1632,4 +1632,12 @@ public interface OrganizationManagementService
 
 
 	public void updateHidePublicPageForUser(AgentSettings agentSettings, boolean hidePublicPage) throws InvalidInputException;
+
+
+	public boolean doesSurveyHaveNPSQuestions( User user );
+
+    void updateIsLoginPreventedForUsers( List<Long> userIdList, boolean isLoginPrevented ) throws InvalidInputException;
+
+
+    void updateHidePublicPageForUsers( List<Long> userIdList, boolean hidePublicPage ) throws InvalidInputException;
 }

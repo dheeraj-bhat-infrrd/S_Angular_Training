@@ -329,6 +329,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         SurveyDetails surveyDetails = new SurveyDetails();
         surveyDetails.setAgentId( surveyPreInitiation.getAgentId() );
         surveyDetails.setAgentName( agentName );
+        surveyDetails.setAgentEmailId( surveyPreInitiation.getAgentEmailId() );
         surveyDetails.setBranchId( branchId );
         surveyDetails.setCustomerFirstName( surveyPreInitiation.getCustomerFirstName() );
         String lastName = surveyPreInitiation.getCustomerLastName();
@@ -3099,6 +3100,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         if ( user.getLastName() != null && !user.getLastName().isEmpty() )
             agentName += " " + user.getLastName();
         surveyDetails.setAgentName( agentName );
+        if ( user.getEmailId() != null && !user.getEmailId().isEmpty() )
+            surveyDetails.setAgentEmailId( user.getEmailId() );
         Map<String, Long> profile = userManagementService.getPrimaryUserProfileByAgentId( user.getUserId() );
         surveyDetails.setBranchId( profile.get( CommonConstants.BRANCH_ID_COLUMN ) );
         surveyDetails.setCustomerFirstName( surveyImportVO.getCustomerFirstName() );

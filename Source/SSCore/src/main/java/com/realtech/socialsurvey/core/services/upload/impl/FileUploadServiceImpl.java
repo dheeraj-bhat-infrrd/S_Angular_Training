@@ -177,4 +177,12 @@ public class FileUploadServiceImpl implements FileUploadService
         // TODO Auto-generated method stub
         return null;
     }
+
+
+    @Override
+    public void uploadFileAtDigestBucket( File file, String fileName ) throws NonFatalException
+    {
+        // TODO Auto-generated method stub
+        
+    }
 }
