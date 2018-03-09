@@ -15,11 +15,12 @@
 }
 </style>
 
-<img id="nps-metre-needle" src="${initParam.resourcesPath}/resources/images/svg-meter-gauge-needle.svg" class="nps-metre-needle-img" >
-<div class="nps-metre-needle-text">NPS
-	<div id="npsScorebox" class="nps-metre-needle-val">
- 	</div>
-</div>
+<div id="nps-wrapper" onload="">
+	<img id="nps-metre-needle" src="${initParam.resourcesPath}/resources/images/svg-meter-gauge-needle.svg" class="nps-metre-needle-img" >
+	<div class="nps-metre-needle-text">NPS
+		<div id="npsScorebox" class="nps-metre-needle-val">
+	 	</div>
+	</div>
 
     
   <svg id="nps-meter">
