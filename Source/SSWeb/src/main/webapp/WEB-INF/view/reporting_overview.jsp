@@ -131,8 +131,8 @@ $(window).resize(function(){
 		 }
 	 }
 	 
-	 var entityType = "${columnName}";
-	 var entityId = "${columnValue}";
+	 var entityType = $('#reporting-data-div').attr('data-column-name');
+	 var entityId = parseInt($('#reporting-data-div').attr('data-column-value'));
 	 
 	 if($('#nps_chart_div').length>0){
 		 if($('#overview-tab').hasClass('active')){
