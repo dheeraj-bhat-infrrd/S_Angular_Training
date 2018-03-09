@@ -287,7 +287,8 @@ public class SocialMonitorWebController {
 		socialMonitorMacro.setActions(actions);
 		socialMonitorMacro.setActive(active);
 		socialMonitorMacro.setCount(count);
-		
+		socialMonitorMacro.setLast7DaysMacroCount(0);
+		socialMonitorMacro.setMacroUsageTime(new ArrayList<Long>());
 		return socialMonitorMacro;
     }
     

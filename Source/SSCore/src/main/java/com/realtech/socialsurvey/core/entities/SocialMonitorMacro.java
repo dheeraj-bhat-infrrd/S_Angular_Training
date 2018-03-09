@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.core.entities;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 
 public class SocialMonitorMacro implements Serializable {
@@ -17,7 +16,7 @@ public class SocialMonitorMacro implements Serializable {
 	private boolean active;
 	private int count;
 	private int last7DaysMacroCount;
-	private List<Long> MacroUsageTime;
+	private List<Long> macroUsageTime;
 	private long createdOn;
 	private long modifiedOn;
 
@@ -86,11 +85,11 @@ public class SocialMonitorMacro implements Serializable {
 	}
 
 	public List<Long> getMacroUsageTime() {
-		return MacroUsageTime;
+		return macroUsageTime;
 	}
 
-	public void setMacroAdditionTime(List<Long> macroUsageTime) {
-		MacroUsageTime = macroUsageTime;
+	public void setMacroUsageTime(List<Long> macroUsageTime) {
+		this.macroUsageTime = macroUsageTime;
 	}
 
 	public int getLast7DaysMacroCount() {
@@ -130,7 +129,7 @@ public class SocialMonitorMacro implements Serializable {
 	public String toString() {
 		return "SocialMonitorMacro [macroId=" + macroId + ", macroName=" + macroName + ", description=" + description
 				+ ", actions=" + actions + ", active=" + active + ", count=" + count + ", last7DaysMacroCount="
-				+ last7DaysMacroCount + ", MacroUsageTime=" + MacroUsageTime + ", createdOn=" + createdOn
+				+ last7DaysMacroCount + ", macroUsageTime=" + macroUsageTime + ", createdOn=" + createdOn
 				+ ", modifiedOn=" + modifiedOn + "]";
 	}
 
