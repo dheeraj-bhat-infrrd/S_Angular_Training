@@ -1,7 +1,7 @@
 //javascript for populating the graphs in reporting dashboard overview
 
 var monthNamesList = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];	
-var overviewData=getOverviewData();
+var overviewData=null;
 var socialMediaList = new Array();
 var is_safari = navigator.userAgent.indexOf("Safari") > -1;
 var unclickedDrawnCount=0;
@@ -1060,6 +1060,8 @@ function drawNpsGauge(){
 }
 
 function drawSpsGauge(){
+
+	getOverviewData();
 	
 	if(overviewData != null && !isEmpty(overviewData)){
 		var detractorEndAngle;
@@ -2859,9 +2861,6 @@ function getOverviewData() {
 			overviewData = null;
 		}
 	});
-	
-	return overviewData;
-
 }
 
 function getRecentActivityList(startIndex,batchSize){
