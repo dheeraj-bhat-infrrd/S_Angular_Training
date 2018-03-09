@@ -149,6 +149,10 @@ function drawLeaderboardPage(columnName, columnId,profileMasterId,userId,company
 	}else{
 		getUserRankingList("companyId",companyId, currentYear, currentMonth, startIndex, batchSize, timeFrame);
 	}
+	
+	showHideRankPaginateBtns(startIndex, count);
+	$('#user-ranking-data').attr('data-start-index',startIndex);
+	$('#user-ranking-data').attr('data-count',count);
 
 }
 
@@ -1083,8 +1087,6 @@ function drawNpsGauge(){
 
 function drawSpsGauge(){
 
-	getOverviewData();
-	
 	if(overviewData != null && !isEmpty(overviewData)){
 		var detractorEndAngle;
 		var passivesEndAngle;
@@ -1250,6 +1252,8 @@ function drawSpsGauge(){
 
 function drawOverviewPage(){
 	
+	getOverviewData();
+	
 	var detractors; 
 	var passives;
 	var promoters;
@@ -1321,6 +1325,11 @@ function drawOverviewPage(){
 			$('#nps-row').hide();
 			
 	}
+	
+	drawSpsGauge();
+	
+	drawNpsGauge();
+	
 	
 	if (overviewData == null) {
 		$('#overviewSuccess').hide();

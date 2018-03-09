@@ -29,6 +29,9 @@
  display:block !important;
 }
 </style>
+
+<input type="hidden"  id="user-ranking-data" data-start-index=0 data-count=0>
+
 <div class="hm-header-main-wrapper hm-hdr-bord-bot"
 	style="background: #2f69aa">
 	<div class="container">
@@ -191,30 +194,10 @@ $(document).ready(function(){
 	
 	var entityId = companyId;
 	
-	if(profileMasterId != 4){
-		if(entityType == "regionId" && profileMasterId == 2){
-			entityId = columnId;
-		}else if(profileMasterId == 3 && entityType == "regionId"){
-			entityId = columnId;
-		}else if(entityType == "branchId" && profileMasterId == 3){
-			entityId = columnId;
-		}
-		userRankingCount = getUserRankingCountForAdmins(entityType, entityId, year, month, batchSize, timeFrame)
-		if(userRankingCount != null){
-			startIndex= 0;
-			count=userRankingCount.Count;
-		}
-	}else{
-		userRankingCount = getUserRankingCount(entityType, companyId, year, month, batchSize, timeFrame);
-		if(userRankingCount != null){
-			startIndex= userRankingCount.startIndex;
-			count=userRankingCount.Count;
-		}
-	}
-	
-showHideRankPaginateBtns(startIndex, count);
-	
 $(document).on('click','#lead-ranks-above-btn',function(){
+	startIndex = $('#user-ranking-data').attr('data-start-index');
+	count = $('#user-ranking-data').attr('data-count');
+	
 	showDashOverlay('#leaderboard-dash');
 	showOverlay();
 	startIndex -= 10;
@@ -275,6 +258,9 @@ $(document).on('click','#lead-ranks-above-btn',function(){
 	
 	showHideRankPaginateBtns(startIndex, count);
 	
+	$('#user-ranking-data').attr('data-start-index',startIndex);
+	$('#user-ranking-data').attr('data-count',count);
+	
 	 $('html, body').animate({
 	        scrollTop: $('#leaderboard-tbl').offset().top - 20
 	    }, 'slow');
@@ -282,6 +268,9 @@ $(document).on('click','#lead-ranks-above-btn',function(){
 
 $(document).on('click','#lead-ranks-below-btn',function(){
 	showDashOverlay('#leaderboard-dash'); 
+	
+	startIndex = $('#user-ranking-data').attr('data-start-index');
+	count = $('#user-ranking-data').attr('data-count');
 	
 	startIndex += 10;
 	if(startIndex>=count){
@@ -340,6 +329,10 @@ $(document).on('click','#lead-ranks-below-btn',function(){
 	}
 	
 	showHideRankPaginateBtns(startIndex, count);
+	
+	$('#user-ranking-data').attr('data-start-index',startIndex);
+	$('#user-ranking-data').attr('data-count',count);
+	
 	$('html, body').animate({
         scrollTop: $('#leaderboard-tbl').offset().top - 20
     }, 'slow');
@@ -347,6 +340,9 @@ $(document).on('click','#lead-ranks-below-btn',function(){
 
 $(document).on('change', '#time-selector', function() {
 	showDashOverlay('#leaderboard-dash');
+	
+	count = $('#user-ranking-data').attr('data-count');
+	
 	timeFrameStr = $('#time-selector').val();
 	timeFrame = parseInt(timeFrameStr);
 	startIndex = 0;
@@ -422,6 +418,9 @@ $(document).on('change', '#time-selector', function() {
 	}
 	
 	showHideRankPaginateBtns(startIndex, count);
+	
+	$('#user-ranking-data').attr('data-start-index',startIndex);
+	$('#user-ranking-data').attr('data-count',count);
 	
 	 $('html, body').animate({
 	        scrollTop: $('#leaderboard-tbl').offset().top - 20
@@ -431,6 +430,9 @@ $(document).on('change', '#time-selector', function() {
 
 $(document).on('change', '#board-selector', function() {
 	showDashOverlay('#leaderboard-dash');
+	
+	count = $('#user-ranking-data').attr('data-count');
+	
 	timeFrameStr = $('#time-selector').val();
 	timeFrame = parseInt(timeFrameStr);
 	startIndex = 0;
@@ -506,6 +508,9 @@ $(document).on('change', '#board-selector', function() {
 	
 	showHideRankPaginateBtns(startIndex, count);
 	
+	$('#user-ranking-data').attr('data-start-index',startIndex);
+	$('#user-ranking-data').attr('data-count',count);
+	
 	 $('html, body').animate({
 	        scrollTop: $('#leaderboard-tbl').offset().top - 20
 	    }, 'slow');
@@ -514,6 +519,8 @@ $(document).on('change', '#board-selector', function() {
 
 $(document).on('click','#top-ten-ranks-btn',function(){
 	showDashOverlay('#leaderboard-dash');
+	
+	count = $('#user-ranking-data').attr('data-count');
 	startIndex=0;
 	
 	timeFrameStr = $('#time-selector').val();
@@ -568,6 +575,10 @@ $(document).on('click','#top-ten-ranks-btn',function(){
 	}
 
 	showHideRankPaginateBtns(startIndex, count);
+	
+	$('#user-ranking-data').attr('data-start-index',startIndex);
+	$('#user-ranking-data').attr('data-count',count);
+	
 	$('html, body').animate({
         scrollTop: $('#leaderboard-tbl').offset().top - 20
     }, 'slow');
@@ -576,6 +587,8 @@ $(document).on('click','#top-ten-ranks-btn',function(){
 
 $(document).on('click','#my-rank-btn',function(){
 	showDashOverlay('#leaderboard-dash');
+	
+	count = $('#user-ranking-data').attr('data-count');
 	startIndex=0;
 	
 	timeFrameStr = $('#time-selector').val();
@@ -625,6 +638,10 @@ $(document).on('click','#my-rank-btn',function(){
 	userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
 
 	showHideRankPaginateBtns(startIndex, count);
+	
+	$('#user-ranking-data').attr('data-start-index',startIndex);
+	$('#user-ranking-data').attr('data-count',count);
+	
 	$('html, body').animate({
         scrollTop: $('#leaderboard-tbl').offset().top - 20
     }, 'slow');
