@@ -72,7 +72,7 @@ public class SSAPIOperations
     public Optional<List<SocialMediaTokenResponse>> getMediaTokens()
     {
         LOG.info( "Executing getMediaTokens method." );
-        Call<List<SocialMediaTokenResponse>> requestCall = RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationService()
+        Call<List<SocialMediaTokenResponse>> requestCall = RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationServiceWithIncreasedTimeOut()
             .getMediaTokens();
         try {
             Response<List<SocialMediaTokenResponse>> response = requestCall.execute();
