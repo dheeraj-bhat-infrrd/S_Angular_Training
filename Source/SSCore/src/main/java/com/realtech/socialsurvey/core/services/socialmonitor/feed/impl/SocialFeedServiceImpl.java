@@ -90,6 +90,8 @@ public class SocialFeedServiceImpl implements SocialFeedService
 	public void setEmailServices(EmailServices emailServices) {
 		this.emailServices = emailServices;
 	}
+	
+    private static final int NO_OF_DAYS = 7;
 
 	@Override
     public SocialResponseObject<?> saveFeed( SocialResponseObject<?> socialFeed ) throws InvalidInputException
@@ -441,7 +443,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
     public int last7DaysCountForMacro(List<Long> MacroAdditionTime  ) {
     	Date today = new Date();
     	int count = 0;
-    	Date daysAgo = new DateTime(today).minusDays(7).toDate();
+    	Date daysAgo = new DateTime(today).minusDays(NO_OF_DAYS).toDate();
     	long daysAgoTimestamp = daysAgo.getTime();
     	for(Long time : MacroAdditionTime) {
     		if(time.compareTo(daysAgoTimestamp) == 0 || time.compareTo(daysAgoTimestamp) > 0) {
