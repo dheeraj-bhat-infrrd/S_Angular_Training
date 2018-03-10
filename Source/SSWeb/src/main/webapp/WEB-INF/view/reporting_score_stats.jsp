@@ -6,27 +6,14 @@
 <c:set var="columnName" value="${columnName}"></c:set>
 <c:set var="columnValue" value="${columnValue}"></c:set>
 
-<style>
-	.rep-sps-lbl{
-     	font-size: 20px;
-    	position: absolute;
-    	left: 0;
-    	z-index: 1000;
-    	float: left;
-    	margin-top: -20px;
-   		margin-left: 50px;
-    	
-     }
-</style>
-
-<div id="overall-ratings-div" class="col-md-12 col-lg-12 col-sm-12 col-xs-12" style="margin-top: 10px; display: inline-block; float:left; width:100%;height:350px; margin-left:15px">
-	<span class="rep-sps-lbl" style="margin-top: 13px;">Overall Rating</span>
-	<div class="col-md-12 col-lg-12 col-sm-12 col-xs-12"> 
-		<div id="overall-rating-chart" style="width:80%; height:300px;margin: 20px 20px 20px 60px;"></div>
+<div id="overall-ratings-div" class="col-md-12 col-lg-12 col-sm-12 col-xs-12 score-stats-overall-con">
+	<span class="score-stats-lbl">Overall Rating</span>
+	<div class="col-md-12 col-lg-12 col-sm-12 col-xs-12 score-stats-graph-con">
+		<div id="overall-rating-chart" style="width: 100%; min-height: 300px"></div>
 	</div>
 </div>
 
-<div id="question-ratings-div" class="col-md-12 col-lg-12 col-sm-12 col-xs-12" style="margin-top: 10px; float:left; width:100%; margin-left:15px">
+<div id="question-ratings-div" class="col-md-12 col-lg-12 col-sm-12 col-xs-12 score-stats-ques-con">
 	
 </div>
 <div id="empty-questions-div" class="hide">

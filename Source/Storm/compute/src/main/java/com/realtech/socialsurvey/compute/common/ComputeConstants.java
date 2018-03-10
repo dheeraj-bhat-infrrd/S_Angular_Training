@@ -64,4 +64,18 @@ public final class ComputeConstants
     // Twitter consumer keys
     public static final String TWITTER_CONSUMER_KEY = "twitter.consumer.key";
     public static final String TWITTER_CONSUMER_SECRET = "twitter.consumer.secret";
+    
+    //Solr Pivots
+    public static final String SOLR_PIVOT_AGENT_EMAIL_ATTEMPT = "agentId,emailAttemptedDate";
+    public static final String SOLR_PIVOT_AGENT_DELIVERED = "agentId,emailDeliveredDate";
+    public static final String SOLR_PIVOT_AGENT_DIFFERED = "agentId,emailDefferedDate";
+    public static final String SOLR_PIVOT_AGENT_BLOCKED = "agentId,emailBlockedDate";
+    public static final String SOLR_PIVOT_AGENT_OPENED = "agentId,emailOpenedDate";
+    public static final String SOLR_PIVOT_AGENT_SPAMED = "agentId,emailMarkedSpamDate";
+    public static final String SOLR_PIVOT_AGENT_UNSUBSCRIBED = "agentId,emailUnsubscribeDate";
+    public static final String SOLR_PIVOT_AGENT_BOUNCED = "agentId,emailBounceDate";
+    public static final String SOLR_PIVOT_AGENT_LINK_CLICKED = "agentId,emailLinkClickedDate";
+    public static final String SOLR_PIVOT_AGENT_DROPPED = "agentId,emailDroppedDate";
+
+    public static int BATCH_SIZE = 5000;
 }

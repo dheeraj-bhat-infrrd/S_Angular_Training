@@ -79,7 +79,7 @@
 	<div class="container">
 		<div class="hm-header-row clearfix">
 			<div class="float-left hm-header-row-left hr-dsh-adj-lft">
-				<spring:message code="label.reporting.key" />
+				New Dashboard
 			</div>
 			<!-- Add user assignment dropdown -->
 			<jsp:include page="user_assignment_dropdown.jsp"></jsp:include>
@@ -111,21 +111,21 @@
 			
 			<div id="reportingDashTabs" class=" col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:15px; display:inline-block; padding: 0;">
 				<ul class="nav nav-tabs" role="tablist">
-					<li id="transaction-stats-btn"  class="active"><a href="#trans-stats-tab" data-toggle="tab">Transaction Stats</a></li>							
-					<li id="overview-btn" onclick="showOverviewTab()"><a href="#overview-tab" data-toggle="tab">Promoter Stats</a></li>
-					<li id="leaderboard-btn"><a href="#leaderboard-tab" data-toggle="tab">LeaderBoard</a></li>
-					<li id="score-stats-btn"><a href="#score-stats-tab" data-toggle="tab">Score Stats</a></li>
-					<li id="reviews-btn"><a href="#reviews-tab" data-toggle="tab">Reviews</a></li>
-					<li id="incomplete-surveys-btn" ><a href="#incomplete-surveys-tab" data-toggle="tab" style="padding-left:2px; padding-right:2px">Incomplete Surveys</a></li>
+					<li id="transaction-stats-btn"  class="active float-left"><a href="#trans-stats-tab" data-toggle="tab">Transaction Stats</a></li>							
+					<li id="overview-btn" onclick="showOverviewTab()" class="float-left"><a href="#overview-tab" data-toggle="tab">Promoter Stats</a></li>
+					<li id="leaderboard-btn"  class="float-left"><a href="#leaderboard-tab" data-toggle="tab">LeaderBoard</a></li>
+					<li id="score-stats-btn" class="float-left"><a href="#score-stats-tab" data-toggle="tab">Score Stats</a></li>
+					<li id="reviews-btn" class="float-left"><a href="#reviews-tab" data-toggle="tab">Reviews</a></li>
+					<li id="incomplete-surveys-btn" class="float-left" ><a href="#incomplete-surveys-tab" data-toggle="tab" style="padding-left:2px; padding-right:2px">Incomplete Surveys</a></li>
 				</ul>
 				<div class="tab-content rep-tab-content">
 					<div class="tab-pane fade col-lg-12 col-md-12 col-sm-12 col-xs-12 active in" id="trans-stats-tab" style="padding: 0;">
-						<div id="reporting-trans-details" class="row prof-pic-name-wrapper edit-prof-pic-name-wrapper reporting-trans-details">
+						<div id="reporting-trans-details" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 prof-pic-name-wrapper edit-prof-pic-name-wrapper reporting-trans-details">
 							<jsp:include page="reporting_transaction_details.jsp"></jsp:include>
 						</div>
 					</div>
 					<div class="tab-pane fade" id="overview-tab"  style="margin-top: 40px;">
-						<div id="overviewSuccess" class="hide">
+						<div id="overviewSuccess" class="hide col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding:0">
 							<jsp:include page="reporting_overview.jsp"></jsp:include>
 						</div>
 						<div id="overviewFailure" class="hide">
@@ -156,7 +156,7 @@
 </div>
 <script>
 	$(document).ready(function() {
-		$(document).attr("title", "Reporting Dashboard");
+		$(document).attr("title", "Dashboard");
 	
 		updateViewAsScroll();
 		
@@ -187,17 +187,7 @@
 	
 	drawOverviewPage();
 	
-	var showOverview = getOverviewData();
-	
-		if (showOverview == null) {
-			$('#overviewSuccess').hide();
-			$('#overviewFailure').show();
-		} else {
-			$('#overviewSuccess').show();
-			$('#overviewFailure').hide();
-		}
-		
-		$(window).resize();
+	$(window).resize();
 		
 	//Score stats
 		var entityType = "${columnName}";

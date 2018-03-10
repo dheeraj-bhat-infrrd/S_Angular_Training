@@ -43,7 +43,6 @@ public interface FailedMessagesService
 
     /* Inserts temporary failed socialPost */
     void insertTemporaryFailedSocialPost(SocialResponseObject<?> post);
-
     /**
      * Deletes failed email message
      * @param emailMessage

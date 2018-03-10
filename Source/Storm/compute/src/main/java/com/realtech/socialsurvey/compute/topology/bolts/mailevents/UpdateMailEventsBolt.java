@@ -1,5 +1,16 @@
 package com.realtech.socialsurvey.compute.topology.bolts.mailevents;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.storm.topology.OutputFieldsDeclarer;
+import org.apache.storm.tuple.Fields;
+import org.apache.storm.tuple.Tuple;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.realtech.socialsurvey.compute.common.APIOperations;
 import com.realtech.socialsurvey.compute.common.EnvConstants;
 import com.realtech.socialsurvey.compute.common.LocalPropertyFileHandler;
@@ -10,16 +21,6 @@ import com.realtech.socialsurvey.compute.services.FailedMessagesService;
 import com.realtech.socialsurvey.compute.services.impl.FailedMessagesServiceImpl;
 import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBoltWithAck;
 import com.realtech.socialsurvey.compute.utils.ConversionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.storm.topology.OutputFieldsDeclarer;
-import org.apache.storm.tuple.Fields;
-import org.apache.storm.tuple.Tuple;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
 
 
 /**
@@ -44,8 +45,7 @@ public class UpdateMailEventsBolt extends BaseComputeBoltWithAck
     private static final String SG_EVENT_DROPPED = "dropped";
 
     private static final String SENDGRID_MESSAGE_DELIMITER = ".filter"; // Sendgrid message id are appended with .filter* 
-
-
+    
     @Override public void executeTuple( Tuple input )
     {
         SendgridEvent event = ConversionUtils.deserialize( input.getString( 0 ), SendgridEvent.class );
@@ -53,6 +53,7 @@ public class UpdateMailEventsBolt extends BaseComputeBoltWithAck
         Optional<SolrEmailMessageWrapper> optionalEmailMessageFromSolr = null;
         // check if uuid is present
         // if uuid present, then query SOLR based on randomUUID
+        LOG.info( "Event Uuid is " + event.getUuid() );
         if ( event.getUuid() != null && !event.getUuid().isEmpty() ) {
             optionalEmailMessageFromSolr = APIOperations.getInstance().getEmailMessageFromSOLRByRandomUUID( event.getUuid() );
         }
@@ -74,7 +75,7 @@ public class UpdateMailEventsBolt extends BaseComputeBoltWithAck
        }
         
         //update mail event in sor
-        if ( optionalEmailMessageFromSolr.isPresent() ) {
+        if ( optionalEmailMessageFromSolr != null && optionalEmailMessageFromSolr.isPresent() ) {
             SolrEmailMessageWrapper emailMessageFromSolr = optionalEmailMessageFromSolr.get();
             try {
                 emailMessageFromSolr = updateEmailMessageWithStatus( emailMessageFromSolr, event );

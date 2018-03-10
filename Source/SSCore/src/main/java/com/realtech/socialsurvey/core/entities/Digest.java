@@ -22,6 +22,10 @@ public class Digest implements Serializable
     private long detractors;
     private long passives;
     private long totalCompletedReviews;
+    private Double nps;
+    private long npsPromoters;
+    private long npsDetractors;
+    private long npsPassives;
 
 
     public String getProfileLevel()
@@ -204,6 +208,54 @@ public class Digest implements Serializable
     }
 
 
+    public Double getNps()
+    {
+        return nps;
+    }
+
+
+    public void setNps( Double nps )
+    {
+        this.nps = nps;
+    }
+
+
+    public long getNpsPromoters()
+    {
+        return npsPromoters;
+    }
+
+
+    public void setNpsPromoters( long npsPromoters )
+    {
+        this.npsPromoters = npsPromoters;
+    }
+
+
+    public long getNpsDetractors()
+    {
+        return npsDetractors;
+    }
+
+
+    public void setNpsDetractors( long npsDetractors )
+    {
+        this.npsDetractors = npsDetractors;
+    }
+
+
+    public long getNpsPassives()
+    {
+        return npsPassives;
+    }
+
+
+    public void setNpsPassives( long npsPassives )
+    {
+        this.npsPassives = npsPassives;
+    }
+
+
     @Override
     public String toString()
     {
@@ -211,6 +263,7 @@ public class Digest implements Serializable
             + month + ", year=" + year + ", averageScoreRating=" + averageScoreRating + ", userCount=" + userCount
             + ", totalTransactions=" + totalTransactions + ", completedTransactions=" + completedTransactions
             + ", surveyCompletionRate=" + surveyCompletionRate + ", sps=" + sps + ", promoters=" + promoters + ", detractors="
-            + detractors + ", passives=" + passives + ", totalCompletedReviews=" + totalCompletedReviews + "]";
+            + detractors + ", passives=" + passives + ", totalCompletedReviews=" + totalCompletedReviews + ", nps=" + nps
+            + ", npsPromoters=" + npsPromoters + ", npsDetractors=" + npsDetractors + ", npsPassives=" + npsPassives + "]";
     }
 }

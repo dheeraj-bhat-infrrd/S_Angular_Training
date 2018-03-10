@@ -3,17 +3,12 @@ package com.realtech.socialsurvey.compute;
 import org.apache.storm.Config;
 import org.apache.storm.generated.StormTopology;
 import org.apache.storm.topology.TopologyBuilder;
-import org.apache.storm.tuple.Fields;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.realtech.socialsurvey.compute.common.ComputeConstants;
 import com.realtech.socialsurvey.compute.common.EnvConstants;
-import com.realtech.socialsurvey.compute.topology.bolts.emailreports.QuerySolrToFetchSurveyRelatedMailBolt;
-import com.realtech.socialsurvey.compute.topology.bolts.emailreports.UpdateFileUploadStatusAndFileNameBolt;
-import com.realtech.socialsurvey.compute.topology.bolts.emailreports.UpdateFileUploadStatusBolt;
-import com.realtech.socialsurvey.compute.topology.bolts.emailreports.UploadOnAmazonS3Bolt;
-import com.realtech.socialsurvey.compute.topology.bolts.emailreports.WriteReportToExcelBolt;
+import com.realtech.socialsurvey.compute.topology.bolts.emailreports.AggregateSolrQueryBolt;
 import com.realtech.socialsurvey.compute.topology.spouts.KafkaTopicSpoutBuilder;
 import com.realtech.socialsurvey.compute.utils.ChararcterUtils;
 
@@ -71,6 +66,13 @@ public class ReportsTopologyStarterHelper extends TopologyStarterHelper
             Config config = new Config();
             config.put( Config.TOPOLOGY_MAX_SPOUT_PENDING, 5000 );
             config.put( Config.STORM_NIMBUS_RETRY_TIMES, 3 );
+            /* The maximum amount of time given to the topology to 
+               fully process a message emitted by a spout. If the 
+               message is not acked within this time frame, 
+               Storm will fail the message on the spout. 
+               Some spouts implementations will then replay the 
+               message at a later time. */ 
+            config.put(Config.TOPOLOGY_MESSAGE_TIMEOUT_SECS, 300);
             return config;
         }
     }
@@ -83,16 +85,9 @@ public class ReportsTopologyStarterHelper extends TopologyStarterHelper
         //add the spout
         builder.setSpout("ReportGenerationSpout", KafkaTopicSpoutBuilder.getInstance().reportGenerationSpout(), 1);
         //add the bolts
-        builder.setBolt("UpdateFileUploadStatusBolt", new UpdateFileUploadStatusBolt(), 1)
-                .shuffleGrouping("ReportGenerationSpout");
-        builder.setBolt("QuerySolrToFetchSurveyRelatedMailsBolt", new QuerySolrToFetchSurveyRelatedMailBolt(), 1)
-                .shuffleGrouping("ReportGenerationSpout");
-        builder.setBolt("WriteReportToExcelBolt", new WriteReportToExcelBolt(), 1)
-                .fieldsGrouping("QuerySolrToFetchSurveyRelatedMailsBolt", new Fields("fileUploadId"));
-        builder.setBolt("UploadOnAmazonS3Bolt", new UploadOnAmazonS3Bolt(), 1).shuffleGrouping("WriteReportToExcelBolt");
-        builder.setBolt("FileUploadStatusAndFileNameUpdationBolt", new UpdateFileUploadStatusAndFileNameBolt(), 1)
-                .shuffleGrouping("UploadOnAmazonS3Bolt");
-
+        builder.setBolt("AggregateSolrQueryBolt", new AggregateSolrQueryBolt(), 1)
+        .shuffleGrouping("ReportGenerationSpout");
+        
         return builder.createTopology();
     }
 

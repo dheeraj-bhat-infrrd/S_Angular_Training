@@ -57,6 +57,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.SurveyPreI
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.reports.AdminReports;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
+import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.services.surveybuilder.impl.DuplicateSurveyRequestException;
 import com.realtech.socialsurvey.core.services.surveybuilder.impl.SelfSurveyInitiationException;
@@ -106,6 +107,9 @@ public class DashboardController
 
     @Autowired
     BatchTrackerService batchTrackerService;
+    
+    @Autowired
+    SocialManagementService socialManagementService;
 
     @Autowired
     private AdminReports adminReport;
@@ -291,6 +295,11 @@ public class DashboardController
                 model.addAttribute( "company", user.getCompany().getCompany() );
                 model.addAttribute( "location", unitSettings.getContact_details().getLocation() );
                 model.addAttribute( "vertical", unitSettings.getVertical() );
+                //check if user's linkedIn token has expired
+                if ( unitSettings.getSocialMediaTokens() != null
+                    && unitSettings.getSocialMediaTokens().getLinkedInToken() != null ) {
+                    socialManagementService.checkForLinkedInTokenExpiry( unitSettings );
+                }
             } else if ( realtechAdminStr != null && !realtechAdminStr.isEmpty() ) {
                 realtechAdmin = Boolean.parseBoolean( realtechAdminStr );
             }

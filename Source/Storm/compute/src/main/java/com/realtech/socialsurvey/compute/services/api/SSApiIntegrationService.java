@@ -5,10 +5,10 @@ import java.util.List;
 import com.realtech.socialsurvey.compute.entities.FileUploadResponse;
 import com.realtech.socialsurvey.compute.entities.Keyword;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
-import com.realtech.socialsurvey.compute.entities.response.FacebookFeedData;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.entities.response.TwitterFeedData;
 import com.realtech.socialsurvey.compute.entities.response.linkedin.LinkedinFeedData;
+import com.realtech.socialsurvey.compute.entity.SurveyInvitationEmailCountMonth;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -17,6 +17,7 @@ import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 
 /**
@@ -38,8 +39,7 @@ public interface SSApiIntegrationService
 
     @Headers ( "Content-Type: application/json")
     @POST ( "v1/feeds")
-    Call<SocialResponseObject> saveSocialFeed(
-        @Body SocialResponseObject socialPostToMongo );
+    Call<SocialResponseObject> saveSocialFeed( @Body SocialResponseObject socialPostToMongo );
 
 
     @Headers ( "Content-Type: application/json")
@@ -64,7 +64,19 @@ public interface SSApiIntegrationService
     Call<FileUploadResponse> updateFileUploadStatusAndLocation( @Path ( "fileUploadId") long fileUploadId,
         @Path ( "status") int status, @Body String fileName );
 
+
     @Headers ( "Content-Type: application/json")
     @PUT ( "v1/feeds/hash/{hash}/companyId/{companyId}")
-    Call<Long> updateDuplicateCount( @Path ( "hash") int hash, @Path ( "companyId") long companyId);
+    Call<Long> updateDuplicateCount( @Path ( "hash") int hash, @Path ( "companyId") long companyId );
+
+
+    @GET ( "v1/trxcount/agent")
+    Call<List<SurveyInvitationEmailCountMonth>> getReceivedCountsMonth( @Query ( "startDateInGmt") long startDate,
+        @Query ( "endDateInGmt") long endDate, @Query ( "startIndex") int startIndex, @Query ( "batchSize") int batchSize );
+
+
+    @Headers ( "Content-Type: application/json")
+    @POST ( "v1/agentEmailCountsMonth")
+    Call<Boolean> saveEmailCountMonthData( @Body List<SurveyInvitationEmailCountMonth> agentEmailCountsMonth );
+
 }

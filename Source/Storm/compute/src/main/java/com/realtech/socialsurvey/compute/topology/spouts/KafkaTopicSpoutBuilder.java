@@ -118,7 +118,6 @@ public class KafkaTopicSpoutBuilder
     /**
      * Report topic kafka spout
      */
-
     public  KafkaSpout reportGenerationSpout() {
         ZkHosts zkHosts = new ZkHosts( zookeeperBrokers );
         String topicName = ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? REPORT_TOPIC

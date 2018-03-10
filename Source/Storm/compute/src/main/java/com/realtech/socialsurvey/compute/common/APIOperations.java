@@ -1,11 +1,13 @@
 package com.realtech.socialsurvey.compute.common;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.JsonObject;
 import com.realtech.socialsurvey.compute.entities.EmailMessage;
 import com.realtech.socialsurvey.compute.entities.SolrEmailMessageWrapper;
 import com.realtech.socialsurvey.compute.entities.request.SolrAdd;
@@ -18,6 +20,7 @@ import com.realtech.socialsurvey.compute.utils.ChararcterUtils;
 
 import retrofit2.Call;
 import retrofit2.Response;
+
 
 
 /**
@@ -152,4 +155,23 @@ public class APIOperations
             throw new SolrProcessingException( "Exception while posting email message to solr", e );
         }
     }
+
+
+	public JsonObject getEmailCounts(String query, String fieldQuery, boolean isFacet, String facetField,
+			List<String> facetPivots, int facetLimit, int facetMinCount) {
+        Response<JsonObject> response = null;
+        Call<JsonObject> requestCall = RetrofitApiBuilder.apiBuilderInstance()
+                        .getSolrAPIIntergrationServiceWithIncreasedTimeout()
+                        .getEmailCounts(query, fieldQuery, 0, "json", isFacet, facetField, facetPivots,
+                        		facetLimit, facetMinCount);
+                try {
+					response =  requestCall.execute();
+				} catch (IOException e) {
+					LOG.error("Exception occured while fetching the data from solr.",e);
+				}
+                RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
+                if ( LOG.isTraceEnabled() )
+                    LOG.trace( "Email messages response {}", response.body() );
+        return response.body();
+	}
 }
