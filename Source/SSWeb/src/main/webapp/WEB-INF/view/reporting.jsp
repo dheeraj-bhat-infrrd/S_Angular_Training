@@ -228,7 +228,7 @@
 </div>
 <script>
 	$(document).ready(function() {
-		$(document).attr("title", "New Dashboard");
+		$(document).attr("title", "Dashboard");
 	
 		updateViewAsScroll();
 		
