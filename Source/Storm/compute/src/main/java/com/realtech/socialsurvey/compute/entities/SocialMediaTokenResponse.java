@@ -14,7 +14,7 @@ public class SocialMediaTokenResponse implements Serializable
     private static final long serialVersionUID = 1L;
     private long iden;
     private long companyId;
-    private SocialMediaTokens socialMediaTokens;
+    private SocialMediaTokensForSM socialMediaTokens;
     private ProfileType profileType;
 
 
@@ -27,18 +27,6 @@ public class SocialMediaTokenResponse implements Serializable
     public void setIden( long iden )
     {
         this.iden = iden;
-    }
-
-
-    public SocialMediaTokens getSocialMediaTokens()
-    {
-        return socialMediaTokens;
-    }
-
-
-    public void setSocialMediaTokens( SocialMediaTokens socialMediaTokens )
-    {
-        this.socialMediaTokens = socialMediaTokens;
     }
 
 
@@ -64,4 +52,17 @@ public class SocialMediaTokenResponse implements Serializable
     {
         this.profileType = profileType;
     }
+
+
+    public SocialMediaTokensForSM getSocialMediaTokens()
+    {
+        return socialMediaTokens;
+    }
+
+
+    public void setSocialMediaTokens( SocialMediaTokensForSM socialMediaTokens )
+    {
+        this.socialMediaTokens = socialMediaTokens;
+    }
+    
 }

@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.compute.dao.RedisSocialMediaStateDao;
 import com.realtech.socialsurvey.compute.dao.impl.RedisSocialMediaStateDaoImpl;
-import com.realtech.socialsurvey.compute.entities.FacebookToken;
+import com.realtech.socialsurvey.compute.entities.FacebookTokenForSM;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.compute.entities.response.FacebookFeedData;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
@@ -44,7 +44,7 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt
     private boolean isRateLimitExceeded( SocialMediaTokenResponse mediaToken )
     {
         if ( mediaToken.getSocialMediaTokens() != null && mediaToken.getSocialMediaTokens().getFacebookToken() != null ) {
-            FacebookToken token = mediaToken.getSocialMediaTokens().getFacebookToken();
+            FacebookTokenForSM token = mediaToken.getSocialMediaTokens().getFacebookToken();
             String pageId = UrlHelper.getFacebookPageIdFromURL( token.getFacebookPageLink() );
 
             if (socialMediaStateDao.isFacebookApplicationLockSet() || socialMediaStateDao.isFacebookPageLockSet( pageId ) || socialMediaStateDao
@@ -108,7 +108,7 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt
     {
         String lastFetchedKey = "";
         if ( mediaToken.getSocialMediaTokens() != null && mediaToken.getSocialMediaTokens().getFacebookToken() != null ) {
-            FacebookToken token = mediaToken.getSocialMediaTokens().getFacebookToken();
+            FacebookTokenForSM token = mediaToken.getSocialMediaTokens().getFacebookToken();
             String pageId = UrlHelper.getFacebookPageIdFromURL( token.getFacebookPageLink() );
             lastFetchedKey = mediaToken.getProfileType().toString() + "_" + mediaToken.getIden() + "_" + pageId;
         }

@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import com.realtech.socialsurvey.compute.common.FacebookAPIOperations;
 import com.realtech.socialsurvey.compute.dao.RedisSocialMediaStateDao;
 import com.realtech.socialsurvey.compute.dao.impl.RedisSocialMediaStateDaoImpl;
-import com.realtech.socialsurvey.compute.entities.FacebookToken;
+import com.realtech.socialsurvey.compute.entities.FacebookTokenForSM;
 import com.realtech.socialsurvey.compute.entities.FacebookXUsageHeader;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.compute.entities.response.FacebookFeedData;
@@ -64,7 +64,7 @@ public class FacebookFeedProcessorImpl implements FacebookFeedProcessor
 
         List<FacebookFeedData> feeds = new ArrayList<>();
 
-        FacebookToken token = null;
+        FacebookTokenForSM token = null;
         if ( mediaToken.getSocialMediaTokens() != null ) {
             token = mediaToken.getSocialMediaTokens().getFacebookToken();
         }

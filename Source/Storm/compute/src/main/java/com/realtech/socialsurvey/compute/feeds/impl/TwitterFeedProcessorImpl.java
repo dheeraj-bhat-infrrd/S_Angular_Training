@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.compute.feeds.impl;
 import com.realtech.socialsurvey.compute.dao.impl.RedisSocialMediaStateDaoImpl;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.compute.entities.TwitterToken;
+import com.realtech.socialsurvey.compute.entities.TwitterTokenForSM;
 import com.realtech.socialsurvey.compute.entities.response.TwitterFeedData;
 import com.realtech.socialsurvey.compute.feeds.TwitterFeedProcessor;
 import com.realtech.socialsurvey.compute.utils.UrlHelper;
@@ -44,7 +45,7 @@ public class TwitterFeedProcessorImpl implements TwitterFeedProcessor
 
         List<TwitterFeedData> feedData = new ArrayList<>();
 
-        TwitterToken token = mediaToken.getSocialMediaTokens().getTwitterToken();
+        TwitterTokenForSM token = mediaToken.getSocialMediaTokens().getTwitterToken();
 
         String pageId = UrlHelper.getTwitterPageIdFromURL( token.getTwitterPageLink() );
         String lastFetchedKey = mediaToken.getProfileType().toString() + "_" + mediaToken.getIden() + "_" + pageId;

@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import com.realtech.socialsurvey.compute.common.LinkedinAPIOperations;
 import com.realtech.socialsurvey.compute.entities.LinkedInToken;
+import com.realtech.socialsurvey.compute.entities.LinkedInTokenForSM;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.compute.entities.TwitterToken;
 import com.realtech.socialsurvey.compute.entities.response.linkedin.LinkedinFeedData;
@@ -40,7 +41,7 @@ public class LinkedinFeedProcessorImpl implements LinkedinFeedProcessor
         LOG.info( "Getting feeds with id: {}", companyId );
         List<LinkedinFeedData> feeds = new ArrayList<>();
         
-        LinkedInToken token = null;
+        LinkedInTokenForSM token = null;
         if ( mediaToken != null ) {
             token = mediaToken.getSocialMediaTokens().getLinkedInToken();
         }
