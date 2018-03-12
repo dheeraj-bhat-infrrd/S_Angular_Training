@@ -154,5 +154,4 @@ public class FailedMessagesServiceImpl implements FailedMessagesService
         return failedEmailMessagesDao.updateFailedSocialPostRetryCount(postId);
     }
 
-
 }

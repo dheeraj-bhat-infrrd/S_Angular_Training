@@ -35,6 +35,8 @@
 		<okhttp3.version>3.9.0</okhttp3.version>
 		<kafka.version>0.11.0.1</kafka.version>
 		<jedis.version>2.9.0</jedis.version>
+		<!-- Hibernate -->
+		<hibernate.version>4.2.1.Final</hibernate.version>
 	</properties>
 
 	<dependencies>
@@ -191,6 +193,21 @@
 			<groupId>redis.clients</groupId>
 			<artifactId>jedis</artifactId>
 			<version>${jedis.version}</version>
+		<!-- Dependency for solr java api -->
+		</dependency>
+		<dependency>
+			<groupId>org.apache.solr</groupId>
+			<artifactId>solr-solrj</artifactId>
+			<version>4.9.0</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<!-- MySQL Connector -->
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.6</version>
+			<scope>compile</scope>
 		</dependency>
 
 	</dependencies>

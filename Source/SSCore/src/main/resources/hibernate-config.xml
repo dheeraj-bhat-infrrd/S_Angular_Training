@@ -90,6 +90,7 @@
 				<value>com.realtech.socialsurvey.core.entities.VendastaSingleSignOnTicket</value>
 				<value>com.realtech.socialsurvey.core.entities.BatchTrackerHistory</value>
 				<value>com.realtech.socialsurvey.core.entities.EncompassSdkVersion</value>
+				<value>com.realtech.socialsurvey.core.entities.SurveyPreInitiation</value>
 			</list>
 		</property>
 	</bean>
@@ -173,6 +174,7 @@
 				<value>com.realtech.socialsurvey.core.entities.JobLogDetails</value>
 				<value>com.realtech.socialsurvey.core.entities.BranchRankingReportMonth</value>
 				<value>com.realtech.socialsurvey.core.entities.BranchRankingReportYear</value>
+				<value>com.realtech.socialsurvey.core.entities.SurveyInvitationEmailCountMonth</value>
 			</list>
 		</property>
 	</bean>

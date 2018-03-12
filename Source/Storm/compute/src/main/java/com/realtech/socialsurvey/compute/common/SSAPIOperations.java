@@ -10,8 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.realtech.socialsurvey.compute.entities.Keyword;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
-import com.realtech.socialsurvey.compute.entities.response.TwitterFeedData;
-import com.realtech.socialsurvey.compute.entities.response.linkedin.LinkedinFeedData;
+import com.realtech.socialsurvey.compute.entity.SurveyInvitationEmailCountMonth;
 import com.realtech.socialsurvey.compute.exception.APIIntegrationException;
 
 import retrofit2.Call;
@@ -73,7 +72,7 @@ public class SSAPIOperations
     public Optional<List<SocialMediaTokenResponse>> getMediaTokens()
     {
         LOG.info( "Executing getMediaTokens method." );
-        Call<List<SocialMediaTokenResponse>> requestCall = RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationService()
+        Call<List<SocialMediaTokenResponse>> requestCall = RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationServiceWithIncreasedTimeOut()
             .getMediaTokens();
         try {
             Response<List<SocialMediaTokenResponse>> response = requestCall.execute();
@@ -118,4 +117,30 @@ public class SSAPIOperations
             return Optional.of( response.body() );
     }
 
+	public List<SurveyInvitationEmailCountMonth> getReceivedCountsMonth(long startDate, long endDate, int startIndex, int batchSize) throws IOException {
+		Call<List<SurveyInvitationEmailCountMonth>> request = RetrofitApiBuilder.apiBuilderInstance()
+				.getSSAPIIntergrationServiceWithIncreasedTimeOut().getReceivedCountsMonth(startDate,endDate, startIndex, batchSize);
+		Response<List<SurveyInvitationEmailCountMonth>> response = request.execute();
+		RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
+		return response.body();
+		
+	}
+
+
+	public boolean saveEmailCountMonthData(List<SurveyInvitationEmailCountMonth> agentEmailCountsMonth) {
+        Call<Boolean> requestCall = RetrofitApiBuilder.apiBuilderInstance()
+            .getSSAPIIntergrationServiceWithIncreasedTimeOut().saveEmailCountMonthData( agentEmailCountsMonth );
+        try {
+            Response<Boolean> response = requestCall.execute();
+            RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
+            if ( LOG.isTraceEnabled() ) {
+                LOG.trace( "response {}", response.body() );
+            }
+            return true;
+        } catch ( IOException | APIIntegrationException e ) {
+            LOG.error( "IOException/ APIIntergrationException caught", e );
+            return false;
+        }
+		
+	}
 }

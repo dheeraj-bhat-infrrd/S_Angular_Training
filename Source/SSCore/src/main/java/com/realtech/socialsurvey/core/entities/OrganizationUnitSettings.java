@@ -88,6 +88,7 @@ public class OrganizationUnitSettings implements Serializable
     
     //Social Monitor Macros
     private List<SocialMonitorMacro> socialMonitorMacros;
+    private List<SavedDigestRecord> savedDigestRecords;
 
     public List<Keyword> getFilterKeywords()
     {
@@ -778,9 +779,22 @@ public class OrganizationUnitSettings implements Serializable
 	public void setSocialMonitorMacros(List<SocialMonitorMacro> socialMonitorMacros) {
 		this.socialMonitorMacros = socialMonitorMacros;
 	}
+    
 
 
-	@Override
+    public List<SavedDigestRecord> getSavedDigestRecords()
+    {
+        return savedDigestRecords;
+    }
+
+
+    public void setSavedDigestRecords( List<SavedDigestRecord> savedDigestRecords )
+    {
+        this.savedDigestRecords = savedDigestRecords;
+    }
+
+
+    @Override
     public String toString()
     {
         return "OrganizationUnitSettings [id=" + id + ", iden=" + iden + ", uniqueIdentifier=" + uniqueIdentifier
@@ -804,7 +818,10 @@ public class OrganizationUnitSettings implements Serializable
             + hideFromBreadCrumb + ", hidePublicPage=" + hidePublicPage + ", digestRecipients=" + digestRecipients
             + ", includeForTransactionMonitor=" + includeForTransactionMonitor + ", vendasta_rm_settings="
             + vendasta_rm_settings + ", ranking_requirements=" + ranking_requirements + ", contactUsEmailsRoutedToCompanyAdmin="
-            + contactUsEmailsRoutedToCompanyAdmin + ", sendMonthlyDigestMail=" + sendMonthlyDigestMail + ", socialMonitorMacros=" + socialMonitorMacros + "]";
+            + contactUsEmailsRoutedToCompanyAdmin + ", sendMonthlyDigestMail=" + sendMonthlyDigestMail + ", filterKeywords="
+            + filterKeywords + ", socialMonitorMacros=" + socialMonitorMacros + ", savedDigestRecords=" + savedDigestRecords
+            + ", entityAlertDetails=" + entityAlertDetails + "]";
     }
-
+    
+    
 }
