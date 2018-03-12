@@ -261,7 +261,7 @@
 					<a id="dashboard-link" href="javascript:showMainContent('./showreportingpage.do')" onclick="showOverlay();"><spring:message code="label.header.dashboard.key" /></a>
 					<div id="hdr-dashboard-dropdown" class="hdr-link-item-dropdown-icn"></div>
 						<div id="hdr-link-item-dropdown-dash" class="hdr-link-item-dropdown hide">
-							<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showreportingpage.do');">\
+							<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showreportingpage.do');">
 								<spring:message code="label.header.dashboard.key" />
 							</div>
 							<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./dashboard.do');">

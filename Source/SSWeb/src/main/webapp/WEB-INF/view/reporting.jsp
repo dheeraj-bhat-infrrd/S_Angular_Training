@@ -90,7 +90,7 @@
 	<div class="container">
 		<div class="hm-header-row clearfix">
 			<div class="float-left hm-header-row-left hr-dsh-adj-lft">
-				New Dashboard
+				<spring:message code="label.header.dashboard.key" />
 			</div>
 			<!-- Add user assignment dropdown -->
 			<%@ include file="user_assignment_dropdown.jsp" %>
