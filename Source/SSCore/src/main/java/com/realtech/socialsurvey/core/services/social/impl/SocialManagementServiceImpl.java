@@ -563,9 +563,10 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     try {
                         HttpClient client = HttpClientBuilder.create().build();
                         HttpPost post = new HttpPost( linkedInPost );
-
+                        
                         // add header
                         post.setHeader( "Content-Type", "application/json" );
+                        post.setHeader("Accept-Encoding", "UTF-8");
                         // String a = "{\"comment\": \"\",\"content\": {" +
                         // "\"title\": \"\"," + "\"description\": \"" + message
                         // + "-" + linkedinMessageFeedback + "\"," +
@@ -614,14 +615,15 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                         }
                         message = StringEscapeUtils.escapeXml( message );
 
+                        message = message.replace( "\\", "\\\\" );
                         message = message.replace( "&amp;lmnlf;", "\\n" ).replace( "&amp;dash;", "\\u2014" );
                         message = message.replace( "\n", "\\n" );
-
+                        
                         String linkedPostJSON = "{\"comment\": \"" + message + "\",\"content\": {" + "\"title\": \"" + title
                             + "\"," + "\"description\": \"" + description + "\"," + "\"submitted-url\": \"" + profileUrl
                             + "\",  " + "\"submitted-image-url\": \"" + imageUrl + "\"},"
                             + "\"visibility\": {\"code\": \"anyone\" }}";
-                        StringEntity entity = new StringEntity( linkedPostJSON );
+                        StringEntity entity = new StringEntity( linkedPostJSON,  "UTF-8" );
                         post.setEntity( entity );
                         try {
                             HttpResponse response = client.execute( post );
