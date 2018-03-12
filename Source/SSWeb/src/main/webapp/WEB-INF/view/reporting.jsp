@@ -232,8 +232,6 @@
 	
 		updateViewAsScroll();
 		
-		drawTransactionDetailsTab();
-		
 	$('#pro-cmplt-stars').on('click', '#dsh-btn1', function(e) {
 			e.stopPropagation();
 			if (colName == 'agentId') {
@@ -257,10 +255,10 @@
 		drawReportingDashButtons(currentProfileName, currentProfileValue);
 	}
 	
+	drawTransactionDetailsTab();
+	
 	drawOverviewPage();
 	
-	$(window).resize();
-		
 	//Score stats
 		var companyId = "${companyId}";
 		var userId = "${userId}";
@@ -278,6 +276,8 @@
 		getQuestionScoreStats(entityId,entityType);
 		
 		paintReportingDashboard(profileMasterId, currentProfileName, currentProfileValue, accountType);
+		
+		$(window).resize();
 		
 		var currentProfileName = $('#rep-prof-container').attr('data-column-name');
 		var currentProfileValue = $('#rep-prof-container').attr('data-column-value');
