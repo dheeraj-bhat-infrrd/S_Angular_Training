@@ -1632,4 +1632,7 @@ public interface OrganizationManagementService
 
 
 	public void updateHidePublicPageForUser(AgentSettings agentSettings, boolean hidePublicPage) throws InvalidInputException;
+
+
+    public Map<String, Long> getFacebookAndTwitterLocks( String lockType ) throws InvalidInputException;
 }

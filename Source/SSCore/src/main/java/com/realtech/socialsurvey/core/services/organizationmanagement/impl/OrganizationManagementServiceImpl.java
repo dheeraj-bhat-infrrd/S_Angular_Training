@@ -27,7 +27,6 @@ import java.util.regex.Pattern;
 import javax.annotation.Resource;
 
 import com.realtech.socialsurvey.core.dao.*;
-import com.realtech.socialsurvey.core.dao.impl.RedisCompanyKeywordImpl;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.solr.client.solrj.util.ClientUtils;
@@ -268,7 +267,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     private EncryptionHelper encryptionHelper;
 
     @Autowired
-    private RedisCompanyKeywordsDao redisDao;
+    private RedisDao redisDao;
 
     @Value ( "${HAPPY_TEXT}")
     private String happyText;
@@ -1024,6 +1023,27 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
 
+    @Override
+    public  Map<String, Long> getFacebookAndTwitterLocks( String lockType ) throws InvalidInputException
+    {
+        LOG.debug( "Method getFacebookAndTwitterLocks() started" );
+        if ( lockType != null && !lockType.equalsIgnoreCase( "facebook" ) && !lockType.equalsIgnoreCase( "twitter" ) ) {
+            LOG.warn( "" );
+            throw new InvalidInputException( "Invalid value passed for lockType", "400" );
+        }
+        Map<String, Long> resultList = new HashMap<>();
+        if ( lockType == null ) {
+            resultList.putAll( redisDao.getFacebookLock() );
+            resultList.putAll( redisDao.getTwitterLock() );
+        } else if ( lockType.equalsIgnoreCase( "facebook" ) ) {
+            resultList.putAll( redisDao.getFacebookLock() );
+        } else if ( lockType.equalsIgnoreCase( "twitter" ) ) {
+            resultList.putAll( redisDao.getTwitterLock() );
+        }
+        return resultList;
+
+    }
+       
     /* (non-Javadoc)
      * @see com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService#enableKeyworodForCompanySettings(long, java.lang.String)
      */
