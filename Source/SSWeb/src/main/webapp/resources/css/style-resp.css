@@ -2110,6 +2110,10 @@
 	#score-stats-tab{
 		padding:0;
 	}
+	
+	.my-rank{
+		margin-right:0;
+	}
 }
 
 @media (min-width: 320px) and (max-width: 580px) and (orientation: portrait) {
