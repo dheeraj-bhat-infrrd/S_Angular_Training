@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.web.rest;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.AbusiveMailSettings;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
@@ -191,7 +193,7 @@ public class ProfileController
             } catch ( InvalidInputException | NoRecordsFetchedException e ) {
                 throw new InternalServerException( new ProfileServiceErrorCode(
                     CommonConstants.ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_REGION_PROFILE,
-                    "Error occured while fetching region profile" ), e.getMessage() );
+                    "Error occured while fetching region profile" ), e.getMessage(), e );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
@@ -243,7 +245,7 @@ public class ProfileController
             } catch ( InvalidInputException | NoRecordsFetchedException e ) {
                 throw new InternalServerException( new ProfileServiceErrorCode(
                     CommonConstants.ERROR_CODE_BRANCH_PROFILE_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_BRANCH_PROFILE,
-                    "Error occured while fetching branch profile" ), e.getMessage() );
+                    "Error occured while fetching branch profile" ), e.getMessage(), e );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
@@ -288,7 +290,7 @@ public class ProfileController
             } catch ( InvalidInputException | NoRecordsFetchedException e ) {
                 throw new InternalServerException( new ProfileServiceErrorCode(
                     CommonConstants.ERROR_CODE_INDIVIDUAL_PROFILE_SERVICE_FAILURE,
-                    CommonConstants.SERVICE_CODE_INDIVIDUAL_PROFILE, "Profile name for individual is invalid" ), e.getMessage() );
+                    CommonConstants.SERVICE_CODE_INDIVIDUAL_PROFILE, "Profile name for individual is invalid" ), e.getMessage(), e );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
@@ -329,7 +331,7 @@ public class ProfileController
             } catch ( InvalidInputException e ) {
                 throw new InternalServerException( new ProfileServiceErrorCode(
                     CommonConstants.ERROR_CODE_REGION_FETCH_SERVICE_FAILURE, CommonConstants.SERVICE_CODE_FETCH_ALL_REGIONS,
-                    "Error occured while fetching regions under a company" ), e.getMessage() );
+                    "Error occured while fetching regions under a company" ), e.getMessage(), e );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
@@ -369,7 +371,7 @@ public class ProfileController
                 throw new InternalServerException( new ProfileServiceErrorCode(
                     CommonConstants.ERROR_CODE_COMPANY_BRANCHES_FETCH_SERVICE_FAILURE,
                     CommonConstants.SERVICE_CODE_FETCH_COMPANY_BRANCHES,
-                    "Something went wrong while fetching branches under company" ), e.getMessage() );
+                    "Something went wrong while fetching branches under company" ), e.getMessage(), e );
             }
 
         } catch ( BaseRestException e ) {
@@ -458,7 +460,7 @@ public class ProfileController
                 throw new InternalServerException( new ProfileServiceErrorCode(
                     CommonConstants.ERROR_CODE_REGION_BRANCHES_FETCH_SERVICE_FAILURE,
                     CommonConstants.SERVICE_CODE_FETCH_REGION_BRANCHES,
-                    "Something went wrong while fetching branches under region" ), e.getMessage() );
+                    "Something went wrong while fetching branches under region" ), e.getMessage(), e );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
@@ -497,7 +499,7 @@ public class ProfileController
                 throw new InternalServerException( new ProfileServiceErrorCode(
                     CommonConstants.ERROR_CODE_REGION_BRANCHES_FETCH_SERVICE_FAILURE,
                     CommonConstants.SERVICE_CODE_FETCH_REGION_BRANCHES,
-                    "Something went wrong while fetching individuals under region" ), e.getMessage() );
+                    "Something went wrong while fetching individuals under region" ), e.getMessage(), e );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
@@ -539,7 +541,7 @@ public class ProfileController
                 throw new InternalServerException( new ProfileServiceErrorCode(
                     CommonConstants.ERROR_CODE_BRANCH_INDIVIDUALS_FETCH_SERVICE_FAILURE,
                     CommonConstants.SERVICE_CODE_FETCH_BRANCH_INDIVIDUALS,
-                    "Something went wrong while fetching individuals under branch" ), e.getMessage() );
+                    "Something went wrong while fetching individuals under branch" ), e.getMessage(), e );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
@@ -590,7 +592,7 @@ public class ProfileController
                 throw new InternalServerException( new ProfileServiceErrorCode(
                     CommonConstants.ERROR_CODE_REGION_INDIVIDUALS_FETCH_SERVICE_FAILURE,
                     CommonConstants.SERVICE_CODE_FETCH_REGION_INDIVIDUALS,
-                    "Something went wrong while fetching individuals under region" ), e.getMessage() );
+                    "Something went wrong while fetching individuals under region" ), e.getMessage(), e );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
@@ -637,7 +639,7 @@ public class ProfileController
                 throw new InternalServerException( new ProfileServiceErrorCode(
                     CommonConstants.ERROR_CODE_REGION_INDIVIDUALS_FETCH_SERVICE_FAILURE,
                     CommonConstants.SERVICE_CODE_FETCH_REGION_INDIVIDUALS,
-                    "Something went wrong while fetching individuals under region" ), e.getMessage() );
+                    "Something went wrong while fetching individuals under region" ), e.getMessage(), e );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
@@ -684,7 +686,7 @@ public class ProfileController
                 throw new InternalServerException( new ProfileServiceErrorCode(
                     CommonConstants.ERROR_CODE_BRANCH_INDIVIDUALS_FETCH_SERVICE_FAILURE,
                     CommonConstants.SERVICE_CODE_FETCH_BRANCH_INDIVIDUALS,
-                    "Something went wrong while fetching individuals under branch" ), e.getMessage() );
+                    "Something went wrong while fetching individuals under branch" ), e.getMessage(), e );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
@@ -741,7 +743,7 @@ public class ProfileController
             } catch ( InvalidInputException e ) {
                 throw new InternalServerException( new ProfileServiceErrorCode(
                     CommonConstants.ERROR_CODE_COMPANY_REVIEWS_FETCH_FAILURE, CommonConstants.SERVICE_CODE_COMPANY_REVIEWS,
-                    "Something went wrong while fetching reviews for a company" ), e.getMessage() );
+                    "Something went wrong while fetching reviews for a company" ), e.getMessage(), e );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
@@ -834,7 +836,7 @@ public class ProfileController
             } catch ( InvalidInputException e ) {
                 throw new InternalServerException( new ProfileServiceErrorCode(
                     CommonConstants.ERROR_CODE_REGION_REVIEWS_FETCH_FAILURE, CommonConstants.SERVICE_CODE_REGION_REVIEWS,
-                    "Something went wrong while fetching reviews for a region" ), e.getMessage() );
+                    "Something went wrong while fetching reviews for a region" ), e.getMessage(), e );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
@@ -874,7 +876,7 @@ public class ProfileController
                 throw new InternalServerException( new ProfileServiceErrorCode(
                     CommonConstants.ERROR_CODE_AVERAGE_RATING_FETCH_FAILURE,
                     CommonConstants.SERVICE_CODE_COMPANY_AVERAGE_RATINGS,
-                    "Something went wrong while fetching average ratings for company" ), e.getMessage() );
+                    "Something went wrong while fetching average ratings for company" ), e.getMessage(), e );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
@@ -926,7 +928,7 @@ public class ProfileController
             } catch ( InvalidInputException e ) {
                 throw new InternalServerException( new ProfileServiceErrorCode(
                     CommonConstants.ERROR_CODE_REVIEWS_COUNT_FETCH_FAILURE, CommonConstants.SERVICE_CODE_COMPANY_REVIEWS_COUNT,
-                    "Error occured while getting reviews count" ), e.getMessage() );
+                    "Error occured while getting reviews count" ), e.getMessage(), e );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
@@ -966,7 +968,7 @@ public class ProfileController
                 throw new InternalServerException( new ProfileServiceErrorCode(
                     CommonConstants.ERROR_CODE_AVERAGE_RATING_FETCH_FAILURE,
                     CommonConstants.SERVICE_CODE_REGION_AVERAGE_RATINGS,
-                    "Something went wrong while fetching average ratings for region" ), e.getMessage() );
+                    "Something went wrong while fetching average ratings for region" ), e.getMessage(), e );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
@@ -1018,7 +1020,7 @@ public class ProfileController
             } catch ( InvalidInputException e ) {
                 throw new InternalServerException( new ProfileServiceErrorCode(
                     CommonConstants.ERROR_CODE_REVIEWS_COUNT_FETCH_FAILURE, CommonConstants.SERVICE_CODE_REGION_REVIEWS_COUNT,
-                    "Error occured while getting reviews count" ), e.getMessage() );
+                    "Error occured while getting reviews count" ), e.getMessage(), e );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
@@ -1057,7 +1059,7 @@ public class ProfileController
                 throw new InternalServerException( new ProfileServiceErrorCode(
                     CommonConstants.ERROR_CODE_AVERAGE_RATING_FETCH_FAILURE,
                     CommonConstants.SERVICE_CODE_BRANCH_AVERAGE_RATINGS,
-                    "Something went wrong while fetching average ratings for branch" ), e.getMessage() );
+                    "Something went wrong while fetching average ratings for branch" ), e.getMessage(), e );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
@@ -1109,7 +1111,7 @@ public class ProfileController
             } catch ( InvalidInputException e ) {
                 throw new InternalServerException( new ProfileServiceErrorCode(
                     CommonConstants.ERROR_CODE_REVIEWS_COUNT_FETCH_FAILURE, CommonConstants.SERVICE_CODE_BRANCH_REVIEWS_COUNT,
-                    "Error occured while getting reviews count" ), e.getMessage() );
+                    "Error occured while getting reviews count" ), e.getMessage(), e );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
@@ -1201,7 +1203,7 @@ public class ProfileController
             } catch ( InvalidInputException e ) {
                 throw new InternalServerException( new ProfileServiceErrorCode(
                     CommonConstants.ERROR_CODE_BRANCH_REVIEWS_FETCH_FAILURE, CommonConstants.SERVICE_CODE_BRANCH_REVIEWS,
-                    "Something went wrong while fetching reviews for a branch" ), e.getMessage() );
+                    "Something went wrong while fetching reviews for a branch" ), e.getMessage(), e );
             } catch ( NoRecordsFetchedException e1 ) {
                 LOG.error( "Branch Profile Not Found ", e1 );
             }
@@ -1243,7 +1245,7 @@ public class ProfileController
                 throw new InternalServerException( new ProfileServiceErrorCode(
                     CommonConstants.ERROR_CODE_AVERAGE_RATING_FETCH_FAILURE,
                     CommonConstants.SERVICE_CODE_BRANCH_AVERAGE_RATINGS,
-                    "Something went wrong while fetching average ratings for agent" ), e.getMessage() );
+                    "Something went wrong while fetching average ratings for agent" ), e.getMessage(), e );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
@@ -1296,7 +1298,7 @@ public class ProfileController
                 throw new InternalServerException( new ProfileServiceErrorCode(
                     CommonConstants.ERROR_CODE_REVIEWS_COUNT_FETCH_FAILURE,
                     CommonConstants.SERVICE_CODE_INDIVIDUAL_REVIEWS_COUNT, "Error occured while getting reviews count" ),
-                    e.getMessage() );
+                    e.getMessage(), e );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
@@ -1456,11 +1458,11 @@ public class ProfileController
             } catch ( SolrException e ) {
                 throw new InternalServerException( new ProfileServiceErrorCode(
                     CommonConstants.ERROR_CODE_PRO_LIST_FETCH_FAILURE, CommonConstants.SERVICE_CODE_PRO_LIST_FETCH,
-                    "Could not fetch users list." ), e.getMessage() );
+                    "Could not fetch users list." ), e.getMessage(), e );
             } catch ( InvalidInputException e ) {
                 throw new InternalServerException( new ProfileServiceErrorCode(
                     CommonConstants.ERROR_CODE_PRO_LIST_FETCH_FAILURE, CommonConstants.SERVICE_CODE_PRO_LIST_FETCH,
-                    "Could not fetch users list." ), e.getMessage() );
+                    "Could not fetch users list." ), e.getMessage(), e  );
             }
         } catch ( BaseRestException e ) {
             LOG.error( "BaseRestException while searching in getProListByProfile(). Reason : " + e.getMessage(), e );
@@ -1569,7 +1571,7 @@ public class ProfileController
                 }
             } catch ( InvalidInputException | NoRecordsFetchedException e ) {
                 throw new InternalServerException( new ProfileServiceErrorCode( CommonConstants.ERROR_CODE_GENERAL,
-                    CommonConstants.SERVICE_CODE_GENERAL, "Profile name for individual is invalid" ), e.getMessage() );
+                    CommonConstants.SERVICE_CODE_GENERAL, "Profile name for individual is invalid" ), e.getMessage(), e );
             }
         } catch ( BaseRestException e ) {
             return getErrorResponse( e );
@@ -1618,7 +1620,7 @@ public class ProfileController
             } catch ( InvalidInputException | NoRecordsFetchedException e ) {
                 throw new InternalServerException( new ProfileServiceErrorCode(
                     CommonConstants.ERROR_CODE_INDIVIDUAL_POSTS_FETCH_FAILURE, CommonConstants.SERVICE_CODE_INDIVIDUAL_POSTS,
-                    "Profile name for individual is invalid" ), e.getMessage() );
+                    "Profile name for individual is invalid" ), e.getMessage(), e );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
@@ -1668,7 +1670,7 @@ public class ProfileController
             } catch ( InvalidInputException e ) {
                 throw new InternalServerException( new ProfileServiceErrorCode(
                     CommonConstants.ERROR_CODE_COMPANY_POSTS_FETCH_FAILURE, CommonConstants.SERVICE_CODE_COMPANY_POSTS,
-                    "Profile name for company is invalid" ), e.getMessage() );
+                    "Profile name for company is invalid" ), e.getMessage(), e  );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
@@ -1719,7 +1721,7 @@ public class ProfileController
             } catch ( InvalidInputException e ) {
                 throw new InternalServerException( new ProfileServiceErrorCode(
                     CommonConstants.ERROR_CODE_REGION_POSTS_FETCH_FAILURE, CommonConstants.SERVICE_CODE_REGION_POSTS,
-                    "Profile name for region is invalid" ), e.getMessage() );
+                    "Profile name for region is invalid" ), e.getMessage(), e );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
@@ -1770,7 +1772,7 @@ public class ProfileController
             } catch ( InvalidInputException e ) {
                 throw new InternalServerException( new ProfileServiceErrorCode(
                     CommonConstants.ERROR_CODE_BRANCH_POSTS_FETCH_FAILURE, CommonConstants.SERVICE_CODE_BRANCH_POSTS,
-                    "Profile name for branch is invalid" ), e.getMessage() );
+                    "Profile name for branch is invalid" ), e.getMessage(), e );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );
@@ -1910,6 +1912,25 @@ public class ProfileController
 
             // Calling email services method to send mail to the reporter
             emailServices.sendSurveyReportMail( reporterEmail, reporterName, reason );
+            //send abusive mail for registered email
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(surveyDetails.getCompanyId());
+            if (companySettings.getSurvey_settings() != null && companySettings.getSurvey_settings().getAbusive_mail_settings() != null) {
+				AbusiveMailSettings abusiveMailSettings = companySettings.getSurvey_settings().getAbusive_mail_settings();
+				surveyDetails.setAbusiveNotify(true);
+				surveyHandler.updateSurveyAsAbusiveNotify(surveyDetails.get_id());
+				long agentId = surveyDetails.getAgentId();
+	            User userObj = userManagementService.getUserByUserId( agentId );
+
+
+				// SS-1435: Send survey details too.
+				// SS-715: Full customer name
+				String displayName = surveyDetails.getCustomerFirstName();
+				if (surveyDetails.getCustomerLastName() != null)
+					displayName = displayName + " " + surveyDetails.getCustomerLastName();
+				Date currentDate = new Date( System.currentTimeMillis() );
+				emailServices.sendAbusiveNotifyMail(reporterName, abusiveMailSettings.getMailId(), displayName,surveyDetails.getCustomerEmail(), surveyDetails.getAgentName(), 
+						userObj.getEmailId(),surveyDetails.getMood(), String.valueOf(surveyDetails.getScore()), surveyDetails.getSourceId(), surveyDetails.getReview(),currentDate.toString());
+			}
         } catch ( NonFatalException e ) {
             LOG.error( "NonfatalException caught in reportAbuse(). Nested exception is ", e );
             return CommonConstants.ERROR;

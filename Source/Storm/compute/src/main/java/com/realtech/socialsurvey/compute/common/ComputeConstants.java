@@ -54,4 +54,17 @@ public final class ComputeConstants
     
     public static final String FILEUPLOAD_DIRECTORY_LOCATION = "FILEUPLOAD_DIRECTORY_LOCATION";
     
+    //Solr Pivots
+    public static final String SOLR_PIVOT_AGENT_EMAIL_ATTEMPT = "agentId,emailAttemptedDate";
+    public static final String SOLR_PIVOT_AGENT_DELIVERED = "agentId,emailDeliveredDate";
+    public static final String SOLR_PIVOT_AGENT_DIFFERED = "agentId,emailDefferedDate";
+    public static final String SOLR_PIVOT_AGENT_BLOCKED = "agentId,emailBlockedDate";
+    public static final String SOLR_PIVOT_AGENT_OPENED = "agentId,emailOpenedDate";
+    public static final String SOLR_PIVOT_AGENT_SPAMED = "agentId,emailMarkedSpamDate";
+    public static final String SOLR_PIVOT_AGENT_UNSUBSCRIBED = "agentId,emailUnsubscribeDate";
+    public static final String SOLR_PIVOT_AGENT_BOUNCED = "agentId,emailBounceDate";
+    public static final String SOLR_PIVOT_AGENT_LINK_CLICKED = "agentId,emailLinkClickedDate";
+    public static final String SOLR_PIVOT_AGENT_DROPPED = "agentId,emailDroppedDate";
+
+    public static int BATCH_SIZE = 5000;
 }

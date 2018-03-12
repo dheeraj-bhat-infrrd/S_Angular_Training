@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.hibernate.criterion.Criterion;
 
+
 public interface GenericReportingDao<T, ID extends Serializable>{
 
     public List<T> findAll(Class<T> entityClass);
@@ -52,4 +53,6 @@ public interface GenericReportingDao<T, ID extends Serializable>{
 
     public List<T> findByKeyValueAscendingWithAlias( Class<T> dataClass, Map<String, Object> queries, List<String> ascendingColumns,
         String alias );
+
+    public void saveAll(List<T> entityList);
 }

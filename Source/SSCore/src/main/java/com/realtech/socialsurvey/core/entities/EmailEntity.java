@@ -24,7 +24,8 @@ public class EmailEntity implements Serializable
     public static final int RECIPIENT_TYPE_CC = 1;
     public static final int RECIPIENT_TYPE_BCC = 2;
 
-    private String randomUUID = UUID.randomUUID().toString();
+    private String _id;
+    	private String randomUUID = UUID.randomUUID().toString();
     private List<String> recipients;
     private String subject;
     private String body;
@@ -46,7 +47,17 @@ public class EmailEntity implements Serializable
     private long regionId;
     private long agentId;
     private String agentEmailId;
+    private boolean isRetried;
 
+    public String get_id() {
+		return _id;
+	}
+
+
+	public void set_id(String _id) {
+		this._id = _id;
+	}
+	
     public String getRandomUUID()
     {
         return this.randomUUID;
@@ -272,6 +283,14 @@ public class EmailEntity implements Serializable
         this.agentEmailId = agentEmailId;
     }
 
+    public boolean isRetried() {
+        return isRetried;
+    }
+
+    public void setRetried(boolean retried) {
+        isRetried = retried;
+    }
+
     @Override
     public String toString() {
         return "EmailEntity{" +
@@ -297,6 +316,7 @@ public class EmailEntity implements Serializable
                 ", regionId=" + regionId +
                 ", agentId=" + agentId +
                 ", agentEmailId='" + agentEmailId + '\'' +
+                ", isRetried=" + isRetried +
                 '}';
     }
 }

@@ -42,6 +42,7 @@ public class EmailMessage implements Serializable
     private long regionId;
     private long agentId;
     private String agentEmailId;
+    private boolean isRetried;
     
     private List<EmailAttachment> attachments;
 
@@ -277,6 +278,14 @@ public class EmailMessage implements Serializable
         this.agentEmailId = agentEmailId;
     }
 
+    public boolean getIsRetried() {
+        return isRetried;
+    }
+
+    public void setIsRetried(boolean isRetried) {
+        this.isRetried = isRetried;
+    }
+
     @Override
     public String toString() {
         return "EmailMessage{" +
@@ -301,6 +310,7 @@ public class EmailMessage implements Serializable
                 ", regionId=" + regionId +
                 ", agentId=" + agentId +
                 ", agentEmailId='" + agentEmailId + '\'' +
+                ", isRetried='" + isRetried + '\'' +
                 ", attachments=" + attachments +
                 '}';
     }

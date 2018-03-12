@@ -136,7 +136,7 @@ var veryLikelyText = '';
 var notVeryLikelyText = '';
 var npsOrder = 999;
 
-var defaultNpsQuestion = 'Default NPS Question';
+var defaultNpsQuestion = 'How likely are you to refer friends and family to [name]?';
 var defaultNotVeryLikely = 'Not Very Likely';
 var defaultVeryLikely = 'Very Likely';
 
@@ -608,7 +608,6 @@ function paintReportingDashboard(profileMasterId, newProfileName, newProfileValu
 	isDashboardReviewRequestRunning = false;
 	reviewsFetchedSoFar = 0;
 	startIndexInc = 0;
-	batchSizeInc = 10;
 	totalReviewsInc = 0;
 	surveyFetchedSoFarInc = 0;
 
@@ -974,6 +973,12 @@ function paintFixSocialMedia(data){
 		var noSMDiv = '<div class="clearfix"><div></div class="float-left bd-frm-left-un">Successfully connected!</div>';
 		popup += noSMDiv;
 		$('#dsh-btn0').addClass("hide");
+		if( window.location.hash.substr(1) == "showreportingpage" ){
+			$('#rep-fix-social-media').fadeOut(500);
+			delay(function(){
+				drawReportingDashButtons(columnName, columnValue);
+			},500);	
+		}
 	}
 	
 // e.stopPropagation();
@@ -7233,6 +7238,7 @@ function initSurveyWithUrl(q) {
 				}else{
 					$("#pst-srvy-div .bd-check-txt").html(message.replace("%s", agentName));
 				}
+				swearWords=getSwearWords();
 			} 
 			else {
 				$('.sq-ques-wrapper').addClass( 'sq-main-txt' );
@@ -7388,6 +7394,13 @@ function paintSurveyPageFromJson() {
 	var question = questionDetails.question;
 
 	question = question.replace(/\[name\]/gi, agentName);
+	//get agentFirstName
+	var AgentFirstName = agentName;
+	if(agentName.indexOf(" ") > -1)
+		var AgentFirstName = agentName.substr(0, agentName.indexOf(" "));
+	//replace first name
+	question = question.replace(/\[AgentFirstName\]/gi, AgentFirstName);
+		
 	var questionType = questionDetails.questionType;
 	var isRatingQuestion = questionDetails.isRatingQuestion;
 	if (isRatingQuestion == 1) {
@@ -7396,6 +7409,7 @@ function paintSurveyPageFromJson() {
 		$("#next-smile").addClass("btn-com-disabled");
 		$("#next-scale").addClass("btn-com-disabled");
 		$("#next-radio").addClass("btn-com-disabled");
+		$("#next-radio-nps").addClass("btn-com-disabled");
 	}
 	if (questionType == "sb-range-star") {
 		$("div[data-ques-type='stars']").show();
@@ -7454,21 +7468,46 @@ function paintSurveyPageFromJson() {
 		$("#smiles-final").show();
 		$("#ques-text-textarea").html(question);
 	} else if (questionType == "sb-range-0to10"){
-		$("#ques-text-1to10").html(question)
-		$("div[data-ques-type='sb-range-0to10']").show();
-		$('#notAtAllLikelyDiv').html(questionDetails.notAtAllLikely);
-		$('#veryLikelyDiv').html(questionDetails.veryLikely);
-		if (questionDetails.customerResponse != undefined && !isNaN(parseInt(questionDetails.customerResponse))) {
-			var ratingVal = parseInt(questionDetails.customerResponse);
-			$('.sq-radio').each(function() {
-			    $(this).removeClass('radio-outer-gray');
-			    $(this).children().hide();
-			    $(this).addClass('radio-outer');
-			});
-			$('#radio-'+ratingVal).children().show();
-			$('#sq-radio-1to10').attr('selected-rating-radio',ratingVal);
-			$("#next-radio").removeClass("btn-com-disabled");
+		if(questionDetails.isNPSQuestion == 0){
+			$("#ques-text-1to10").html(question)
+			$("div[data-ques-type='sb-range-0to10']").show();
+			$('#notAtAllLikelyDiv').html(questionDetails.notAtAllLikely);
+			$('#veryLikelyDiv').html(questionDetails.veryLikely);
+			if (questionDetails.customerResponse != undefined && !isNaN(parseInt(questionDetails.customerResponse))) {
+				var ratingVal = parseInt(questionDetails.customerResponse);
+				$('.sq-radio').each(function() {
+				    $(this).removeClass('radio-outer-gray');
+				    $(this).children().hide();
+				    $(this).addClass('radio-outer');
+				    $(this).css("cursor","pointer");
+				});
+				$('#radio-'+ratingVal).children().show();
+				$('#radio-'+ratingVal).css("cursor","default");
+				$('#sq-radio-1to10').attr('selected-rating-radio',ratingVal);
+				$("#next-radio").removeClass("btn-com-disabled");
+			}
+		}else{
+			$("#ques-text-1to10-nps").html(question)
+			$("div[data-ques-type='sb-range-0to10-nps']").show();
+			$('#notAtAllLikelyDivNps').html(questionDetails.notAtAllLikely);
+			$('#veryLikelyDivNps').html(questionDetails.veryLikely);
+			$('#nps-range-text').css('opacity',1);
+			if (questionDetails.customerResponse != undefined && !isNaN(parseInt(questionDetails.customerResponse))) {
+				var ratingVal = parseInt(questionDetails.customerResponse);
+				$('.sq-radio').each(function() {
+				    $(this).children().hide();
+				    $(this).parent().find('.popover').hide();
+				    $(this).css("cursor","pointer");
+				});
+				$('#radio-nps-'+ratingVal).children().show();
+				$('#radio-nps-'+ratingVal).parent().find('.popover').show();
+				$('#radio-nps-'+ratingVal).css("cursor","default");
+				$('#nps-range-text').css('opacity',0);
+				$('#sq-radio-1to10-nps').attr('selected-rating-radio',ratingVal);
+				$("#next-radio-nps").removeClass("btn-com-disabled");
+			}
 		}
+		
 	}
 	togglePrevAndNext();
 	if (qno == questions.length - 1) {
@@ -7476,6 +7515,7 @@ function paintSurveyPageFromJson() {
 		$("#next-smile").addClass("btn-com-disabled");
 		$("#next-star").addClass("btn-com-disabled");
 		$("#next-radio").addClass("btn-com-disabled");
+		$("#next-radio-nps").addClass("btn-com-disabled");
 		$("#next-textarea-smiley").addClass("btn-com-disabled");
 		$("#skip-ques-mcq").hide();
 	}
@@ -7499,6 +7539,7 @@ function togglePrevAndNext() {
 		$("#prev-scale").addClass("btn-com-disabled");
 		$("#prev-mcq").addClass("btn-com-disabled");
 		$("#prev-radio").addClass("btn-com-disabled");
+		$("#prev-radio-nps").addClass("btn-com-disabled");
 		$("#prev-textarea-smiley").addClass("btn-com-disabled");
 	} else {
 		$("#prev-star").removeClass("btn-com-disabled");
@@ -7506,6 +7547,7 @@ function togglePrevAndNext() {
 		$("#prev-scale").removeClass("btn-com-disabled");
 		$("#prev-mcq").removeClass("btn-com-disabled");
 		$("#prev-radio").removeClass("btn-com-disabled");
+		$("#prev-radio-nps").removeClass("btn-com-disabled");
 		$("#prev-textarea-smiley").removeClass("btn-com-disabled");
 	}
 }
@@ -7994,12 +8036,23 @@ $('.sq-np-item-next').click(function() {
 		}
 		return;
 	} else if (questionDetails.questionType == "sb-range-0to10"){
-		if ($('#next-radio').hasClass("btn-com-disabled")) {
+		if ($('#next-radio').hasClass("btn-com-disabled") && questionDetails.isNPSQuestion == 0) {
+			$('#overlay-toast').html('Please answer the question. You can not skip a rating question.');
+			showToast();
+			return;
+		}else if ($('#next-radio-nps').hasClass("btn-com-disabled") && questionDetails.isNPSQuestion == 1){
 			$('#overlay-toast').html('Please answer the question. You can not skip a rating question.');
 			showToast();
 			return;
 		}
-		var ratingVal = parseInt($('#sq-radio-1to10').attr('selected-rating-radio'));
+		
+		var ratingVal = 0;
+		if(questionDetails.isNPSQuestion==0){
+			ratingVal = parseInt($('#sq-radio-1to10').attr('selected-rating-radio'));
+		}else{
+			ratingVal = parseInt($('#sq-radio-1to10-nps').attr('selected-rating-radio'));
+		}
+		
 		storeCustomerAnswer(ratingVal);
 	} 
 	
@@ -8008,7 +8061,14 @@ $('.sq-np-item-next').click(function() {
 	$('.sq-radio').each(function() {
 	    $(this).removeClass('radio-outer');
 	    $(this).children().hide();
-	    $(this).addClass('radio-outer-gray');
+	    if(questionDetails.isNPSQuestion==0){
+	    	$(this).addClass('radio-outer-gray');
+	    	$(this).css("cursor","pointer");
+	    }else{
+	    	$(this).parent().find('.popover').hide();
+	    	$(this).css("cursor","pointer");
+	    	$('#nps-range-text').css('opacity',1);
+	    }
 	});
 	qno++;
 	paintSurveyPageFromJson();
@@ -8047,18 +8107,51 @@ $('.sq-np-item-next').click(function() {
 	}
 	
 	if(questionDetails.questionType == "sb-range-0to10"){
+		
+		if(questionDetails.isNPSQuestion==1){
+			$('.sq-radio').each(function() {
+				$(this).removeClass('radio-outer-gray');
+		    	$(this).parent().find('.popover').hide();
+		    	$(this).css("cursor","pointer");
+		    });
+			$('#nps-range-text').css('opacity',1);
+		}
+		
 		var ratingVal = parseInt(questionDetails.customerResponse);
 		if(!isNaN(ratingVal)){
 			$('.sq-radio').each(function() {
 			    $(this).removeClass('radio-outer-gray');
 			    $(this).children().hide();
-			    $(this).addClass('radio-outer');
+			    if(questionDetails.isNPSQuestion==0){
+			    	$(this).addClass('radio-outer');
+			    	$(this).css("cursor","pointer");
+			    }else{
+			    	$(this).parent().find('.popover').hide();
+			    	$(this).css("cursor","pointer");
+			    }
 			});
-			$('#radio-'+ratingVal).children().show();
-			$('#sq-radio-1to10').attr('selected-rating-radio',ratingVal);
+			
+			if(questionDetails.isNPSQuestion==0){
+				$('#radio-'+ratingVal).children().show();
+				$('#radio-'+ratingVal).css("cursor","default");
+				$('#sq-radio-1to10').attr('selected-rating-radio',ratingVal);
+			}else{
+				$('#radio-nps-'+ratingVal).children().show();
+				$('#radio-nps-'+ratingVal).parent().find('.popover').show();
+				$('#radio-nps-'+ratingVal).css("cursor","default");
+				$('#nps-range-text').css('opacity',0);
+				$('#sq-radio-1to10-nps').attr('selected-rating-radio',ratingVal);
+			}
+			
 		}
-		$('#notAtAllLikelyDiv').html(questionDetails.notAtAllLikely);
-		$('#veryLikelyDiv').html(questionDetails.veryLikely);
+		
+		if(questionDetails.isNPSQuestion==0){
+			$('#notAtAllLikelyDiv').html(questionDetails.notAtAllLikely);
+			$('#veryLikelyDiv').html(questionDetails.veryLikely);
+		}else{
+			$('#notAtAllLikelyDivNps').html(questionDetails.notAtAllLikely);
+			$('#veryLikelyDivNps').html(questionDetails.veryLikely);
+		}	
 	}
 
 });
@@ -8110,23 +8203,44 @@ $('.sq-np-item-prev').click(function() {
 	
 	if(questionDetails.questionType == "sb-range-0to10"){
 		var ratingVal = parseInt(questionDetails.customerResponse);
-		if(!isNaN(ratingVal)){
-			$('.sq-radio').each(function() {
-			    $(this).removeClass('radio-outer-gray');
-			    $(this).children().hide();
-			    $(this).addClass('radio-outer');
-			});
-			$('#radio-'+ratingVal).children().show();
-			$('#sq-radio-1to10').attr('selected-rating-radio',ratingVal);
+		if(questionDetails.isNPSQuestion==0){
+			if(!isNaN(ratingVal)){
+				$('.sq-radio').each(function() {
+				    $(this).removeClass('radio-outer-gray');
+				    $(this).children().hide();
+				    $(this).addClass('radio-outer');
+				    $(this).css("cursor","pointer");
+				});
+				$('#radio-'+ratingVal).children().show();
+				$('#sq-radio-1to10').attr('selected-rating-radio',ratingVal);
+				$('#radio-'+ratingVal).css("cursor","default");
+			}
+			$('#notAtAllLikelyDiv').html(questionDetails.notAtAllLikely);
+			$('#veryLikelyDiv').html(questionDetails.veryLikely);	
+		} else{
+			if(!isNaN(ratingVal)){
+				$('.sq-radio').each(function() {
+				    $(this).children().hide();
+				    $(this).parent().find('.popover').hide();
+				    $(this).css("cursor","pointer");
+				});
+				$('#radio-nps-'+ratingVal).children().show();
+				$('#radio-nps-'+ratingVal).parent().find('.popover').show();
+				$('#radio-nps-'+ratingVal).css("cursor","default");
+				$('#nps-range-text').css('opacity',0);
+				$('#sq-radio-1to10-nps').attr('selected-rating-radio',ratingVal);
+			}
+			$('#notAtAllLikelyDivNps').html(questionDetails.notAtAllLikely);
+			$('#veryLikelyDivNps').html(questionDetails.veryLikely);
 		}
-		$('#notAtAllLikelyDiv').html(questionDetails.notAtAllLikely);
-		$('#veryLikelyDiv').html(questionDetails.veryLikely);
+		
 	}
 	
 	$("#next-star").removeClass("btn-com-disabled");
 	$("#next-smile").removeClass("btn-com-disabled");
 	$("#next-scale").removeClass("btn-com-disabled");
 	$("#next-radio").removeClass("btn-com-disabled");
+	$("#next-radio-nps").removeClass("btn-com-disabled");
 	$("#next-textarea-smiley").removeClass("btn-com-disabled");
 });
 
@@ -8134,13 +8248,30 @@ $('.sq-radio').click(function(){
 	$('.sq-radio').each(function() {
 	    $(this).removeClass('radio-outer-gray');
 	    $(this).children().hide();
-	    $(this).addClass('radio-outer');
+	    if(questionDetails.isNPSQuestion == 0){
+	    	$(this).addClass('radio-outer');
+	    	$(this).css("cursor","pointer");
+	    }else{
+	    	$(this).parent().find('.popover').hide();
+	    	$(this).css("cursor","pointer");
+	    }
 	});
 	$(this).children().show();
-	$('#sq-radio-1to10').attr('selected-rating-radio',$(this).attr('id').split('-').pop());
-	if (qno != questions.length - 1) {
-		$("#next-radio").removeClass("btn-com-disabled");
+	$(this).parent().find('.popover').show();
+	$(this).css("cursor","default");
+	if(questionDetails.isNPSQuestion == 0){
+		$('#sq-radio-1to10').attr('selected-rating-radio',$(this).attr('id').split('-').pop());
+		if (qno != questions.length - 1) {
+			$("#next-radio").removeClass("btn-com-disabled");
+		}
+	}else{
+		$('#sq-radio-1to10-nps').attr('selected-rating-radio',$(this).attr('id').split('-').pop());
+		if (qno != questions.length - 1) {
+			$("#next-radio-nps").removeClass("btn-com-disabled");
+		}
+		$('#nps-range-text').css('opacity',0);
 	}
+	
 });
 
 /* Click event on grey smile. */
@@ -10470,7 +10601,8 @@ function paintIncompleteSurveyListPopupResults(incompleteSurveystartIndex) {
 		"columnName" : colName,
 		"columnValue" : colValue,
 		"startIndex" : incompleteSurveystartIndex,
-		"batchSize" : $('#icn-sur-popup-cont').attr("data-batch")
+		"batchSize" : $('#icn-sur-popup-cont').attr("data-batch"),
+		"origin" : "oldDashboard"
 	};
 	callAjaxGetWithPayloadData("./fetchincompletesurveypopup.do", function(data) {
 		disableBodyScroll();
@@ -12385,8 +12517,16 @@ function setColDetails(currentProfileName, currentProfileValue, parentCompanyId)
 }
 
 // complaint registration event binding
-$(document).on('click', '#comp-reg-form-submit', function() {
-	if (validateComplaintRegistraionForm()) {
+$(document).on('click', '#comp-reg-form-submit', function(e) {
+	
+	var emailIdStr = document.getElementById("comp-mailId").value;
+	if(emailIdStr == ""){
+		$('#overlay-main').show();
+		e.stopPropagation();
+		$('#other-account').val('true');
+		createPopupConfirm("Unsubscribe Complaint Resolution Emails", "Are you sure you want to unsubscribe compalint resolution emails");
+		overlayUnsetCompRes();
+	}else if (validateComplaintRegistraionForm()) {
 		var formData = $('#comp-reg-form').serialize();
 		callAjaxPostWithPayloadData("/updatecomplaintressettings.do", function(data) {
 			$('#overlay-toast').html(data);
@@ -12394,6 +12534,50 @@ $(document).on('click', '#comp-reg-form-submit', function() {
 		}, formData, true, '#comp-reg-form-submit');
 	}
 });
+
+function overlayUnsetCompRes() {
+
+	$('#overlay-continue').click(function() {
+		callAjaxPOST('./unsetcomplaintresolution.do', function() {
+			$('#overlay-continue').unbind('click');
+			overlayRevert();
+		}, true)});
+	$('#overlay-cancel').click(function() {
+		overlayRevert();
+	});
+}
+
+
+// abusive alert
+$(document).on('click', '#abusive-email-form-submit', function(e) {
+	var emailIdStr = document.getElementById("abusive-mailId").value;
+	if(emailIdStr == ""){
+		$('#overlay-main').show();
+		e.stopPropagation();
+		$('#other-account').val('true');
+		createPopupConfirm("Unsubscribe Alert Emails", "Are you sure you want to unsubscribe abusive emails");
+		overlayUnsetAbusive();
+	}else if(validateAbusiveEmailForm()) {
+		var formData = $('#abusive-reg-form').serialize();
+		callAjaxPostWithPayloadData("/updateabusivesurveysettings.do", function(data) {
+			$('#overlay-toast').html(data);
+			showToast();
+		}, formData, true, '#abusive-email-form-submit');
+	}
+});
+
+
+function overlayUnsetAbusive() {
+
+	$('#overlay-continue').click(function() {
+		callAjaxPOST('./unsetabusivesurveysettings.do', function() {
+			$('#overlay-continue').unbind('click');
+			overlayRevert();
+		}, true)});
+	$('#overlay-cancel').click(function() {
+		overlayRevert();
+	});
+}
 
 $(document).on('click touchstart', '#compl-checkbox', function() {
 	if ($(this).hasClass('bd-check-img-checked')) {
@@ -12408,6 +12592,7 @@ $(document).on('click touchstart', '#compl-checkbox', function() {
 		$('input[name="enabled"]').val("");
 	}
 });
+
 
 // function to remove social post
 function removeUserPost(surveyMongoId) {
@@ -15644,4 +15829,24 @@ function formatAllTimeSlots(dates){
 	  }
 	}
 	return xAxisData;
+}
+
+function getSwearWords() {
+	 
+	 $.ajax({
+	 url : getLocationOrigin() + surveyUrl + "data/getSwearWords",
+	 async:true,
+	 type : "GET",
+	 cache : false,
+	 dataType : "JSON",
+	 success : function(data) {
+	 swearWords=JSON.parse(data);
+	 },
+	 error : function(e) {
+	 if (e.status == 504) {
+	 redirectToLoginPageOnSessionTimeOut(e.status);
+	 return;
+	 }
+	 }
+	 });
 }

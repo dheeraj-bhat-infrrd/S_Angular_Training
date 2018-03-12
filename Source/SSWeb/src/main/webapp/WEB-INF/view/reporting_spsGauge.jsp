@@ -21,25 +21,10 @@
 </style>
 
 <div id="wrapper" onload="">
-<img id="metre-needle" src="${initParam.resourcesPath}/resources/images/svg-meter-gauge-needle.svg" style="
-    margin-left: 155px;
-    margin-top: 80px;
-    height: 80px;
-    position:absolute;
-    z-index:1000">
-<div style="margin-left: 165px;
-    margin-top: 180px;
-    font-weight: bold !important;
-    font-size: medium;    
-    position: absolute;">SPS
-<div id="spsScorebox" style="font-weight: bold !important;
-    font-size: medium;
-    color: white;
-    background: #5e5e5e;
-    width: 50px;
-    height: 35px;
-    padding: 5px;
-    border-radius: 7px;"></div></div>
+<img id="metre-needle" src="${initParam.resourcesPath}/resources/images/svg-meter-gauge-needle.svg" class="sps-metre-needle-img">
+<div class="sps-metre-needle-text">SPS
+	<div id="spsScorebox" class="sps-metre-needle-val"></div>
+</div>
 
     
   <svg id="meter">
@@ -52,6 +37,3 @@
   </svg>
 
 </div>
-<script>
-drawSpsGauge();
-</script>

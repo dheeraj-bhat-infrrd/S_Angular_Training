@@ -110,4 +110,16 @@ public class FailedMessagesServiceImpl implements FailedMessagesService
         failedEmailMessagesDao.insertFailedReportRequest( failedReportRequest );
     }
 
+    @Override
+    public int deleteFailedEmailMessage(String randomUUID) {
+        LOG.debug("Deleting temporary failed email message with randomUUID {}", randomUUID);
+        return failedEmailMessagesDao.deleteFailedEmailMessage(randomUUID);
+    }
+
+    @Override
+    public int updateFailedEmailMessageRetryCount(String randomUUID) {
+        LOG.debug("Updating failed email message retry count with randonUUID {}", randomUUID);
+        return failedEmailMessagesDao.updatedFailedEmailMessageRetryCount(randomUUID);
+    }
+
 }

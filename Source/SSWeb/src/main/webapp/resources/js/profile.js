@@ -24,8 +24,24 @@ var zillowCallBreak = false
 var processedPermalink = 0;
 
 $(document).ajaxStop(function() {
-	adjustImage();
+	adjustImageForPublicProfile();
 });
+
+
+function adjustImageForPublicProfile(){
+    var windW = getWindowWidth();
+    if(windW < 768){
+        //var imgW = $('#prof-image').width();
+        //$('#prof-image').height(imgW * 0.7);
+        $('.footer-main-wrapper').hide();
+    }else{
+        $('.lp-con-row-item').width('auto');
+        $('.footer-main-wrapper').show();
+        //show all the containers
+        $('#reviews-container, #prof-company-intro, #prof-agent-container').show();
+        $('#recent-post-container, #ppl-post-cont, #contact-wrapper, #intro-about-me').show();
+    }
+}
 
 //Profile page event binding
 $(document).on("click", "#prof-company-review-count",function(){
@@ -741,10 +757,12 @@ function paintReviews(result){
 		}*/
 		
 		var custName = reviewItem.customerFirstName.trim();
-		var custDispName = reviewItem.customerFirstName.trim();
+		
 		if(reviewItem.customerLastName != undefined && reviewItem.customerLastName.trim() != ""){
-			custDispName += ' '+reviewItem.customerLastName.substr(0,1).toUpperCase()+'.';
+			custName =  custName + ' ' + reviewItem.customerLastName.trim();
 		}
+		var custArray = custName.split( " " );
+		var custDispName = custArray[0] + ( ( custArray[1] != undefined && custArray[1].trim() != "" ) ? " " + custArray[1].substr(0,1).toUpperCase() : "" );
 		
 		reviewsHtml = reviewsHtml +
 			'<div class="' + lastItemClass + ' cursor-pointer"' + ' data-rating=' + reviewItem.score + ' data-review="' + escapeHtml(reviewItem.review) + '" data-agentid="' + reviewItem.agentId + '" survey-mongo-id="' + reviewItem._id + '">';
@@ -770,7 +788,7 @@ function paintReviews(result){
 		}
 		
 		
-		reviewsHtml += '			<div class="ppl-head-1 float-left " style="clear:both"><span class="float-left"> Reviewed by<span style="font-weight:600 !important;"> '+custDispName+'</span></span>';
+		reviewsHtml += '			<div class="ppl-head-1 float-left " style="clear:both"><span class="float-left"> Reviewed by<span style="font-weight:600 !important;"> '+custDispName+'.</span></span>';
 		if(profileLevel!= 'INDIVIDUAL' && reviewItem.agentName!=null && hiddenSection=="false"){
 			reviewsHtml +='<span class="float-left" style="margin-left:5px;"> for<a style="color:#236CAF;font-weight: 600 !important;" href="'+reviewItem.completeProfileUrl+'"> '+reviewItem.agentName+'</a></span>';
 		}
@@ -1318,9 +1336,9 @@ function paintHiddenReviewsCount(data) {
 		var reviewsSizeHtml = responseJson.entity;
 		if(reviewsSizeHtml > 0) {
 			if(reviewsSizeHtml == 1) {
-				reviewsSizeHtml = reviewsSizeHtml +' additional review not recommended';
+				reviewsSizeHtml = reviewsSizeHtml +' additional review';
 			}else {
-				reviewsSizeHtml = reviewsSizeHtml +' additional reviews not recommended';
+				reviewsSizeHtml = reviewsSizeHtml +' additional reviews';
 			}
 			
 			$("#prof-hidden-review-count")

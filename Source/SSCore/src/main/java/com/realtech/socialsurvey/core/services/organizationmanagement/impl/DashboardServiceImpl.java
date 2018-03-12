@@ -785,6 +785,9 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean
         uploadTypeList.add( CommonConstants.FILE_UPLOAD_REPORTING_INCOMPLETE_SURVEY_REPORT);
         uploadTypeList.add( CommonConstants.FILE_UPLOAD_REPORTING_NPS_WEEK_REPORT );
         uploadTypeList.add( CommonConstants.FILE_UPLOAD_REPORTING_NPS_MONTH_REPORT );
+        uploadTypeList.add( CommonConstants.FILE_UPLOAD_REPORTING_BRANCH_RANKING_MONTHLY_REPORT);
+        uploadTypeList.add( CommonConstants.FILE_UPLOAD_REPORTING_BRANCH_RANKING_YEARLY_REPORT);
+        uploadTypeList.add(CommonConstants.FILE_UPLOAD_SURVEY_INVITATION_EMAIL_REPORT);
         Criterion fileUploadTypeCriteria = Restrictions.in( CommonConstants.FILE_UPLOAD_TYPE_COLUMN, uploadTypeList );
         List<Integer> statusList = new ArrayList<Integer>();
         //get only active records

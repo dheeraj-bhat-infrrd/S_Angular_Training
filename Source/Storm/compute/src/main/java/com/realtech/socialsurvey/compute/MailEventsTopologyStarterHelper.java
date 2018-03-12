@@ -47,7 +47,7 @@ public class MailEventsTopologyStarterHelper extends TopologyStarterHelper
             return config;
         } else {
             Config config = new Config();
-            config.put( Config.TOPOLOGY_MAX_SPOUT_PENDING, 5000 );
+            config.put( Config.TOPOLOGY_MAX_SPOUT_PENDING, 100 );
             config.put( Config.STORM_NIMBUS_RETRY_TIMES, 3 );
             return config;
         }
@@ -60,7 +60,7 @@ public class MailEventsTopologyStarterHelper extends TopologyStarterHelper
         LOG.info( "Creating mail event topology" );
         TopologyBuilder builder = new TopologyBuilder();
         // add mail kafka spout
-        builder.setSpout( "SendgridEventCaptureSpout", KafkaTopicSpoutBuilder.sendGridEventTopicSpout(), 1 );
+        builder.setSpout( "SendgridEventCaptureSpout", KafkaTopicSpoutBuilder.getInstance().sendGridEventTopicSpout(), 1 );
         // add bolts
         builder.setBolt( "ProceessEventBolt", new UpdateMailEventsBolt(), 1 ).shuffleGrouping( "SendgridEventCaptureSpout" );
         return builder.createTopology();

@@ -4,7 +4,6 @@ package com.realtech.socialsurvey.core.services.organizationmanagement;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -25,14 +24,13 @@ import com.realtech.socialsurvey.core.entities.CompanyView;
 import com.realtech.socialsurvey.core.entities.DisabledAccount;
 import com.realtech.socialsurvey.core.entities.EncompassSdkVersion;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
-import com.realtech.socialsurvey.core.entities.Keyword;
 import com.realtech.socialsurvey.core.entities.HierarchySettingsCompare;
+import com.realtech.socialsurvey.core.entities.Keyword;
 import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
-import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
@@ -58,6 +56,10 @@ import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
 /**
  * @author Ustav
+ *
+ */
+/**
+ * @author sandra
  *
  */
 public interface OrganizationManagementService
@@ -1572,4 +1574,59 @@ public interface OrganizationManagementService
 
 
     public Set<String> getAdminEmailsSpecificForAHierarchy( String profileLevel, long iden ) throws InvalidInputException;
+
+
+	public List<Long> filterCompanyIdsByStatus(List<Long> companies, String status) throws InvalidInputException;
+
+
+	public boolean decryptEncompassPasswordIfPossible(OrganizationUnitSettings unitSettings);
+
+
+	/**
+	 * @param companyId
+	 * @param mailId
+	 * @return
+	 * @throws InvalidInputException 
+	 * @throws NonFatalException 
+	 */
+	public void updateAbusiveMailService(long companyId, String mailId) throws InvalidInputException, NonFatalException;
+
+
+	/**
+	 * @param companyId
+	 * @throws NonFatalException
+	 */
+	public void unsetAbusiveMailService(long companyId) throws NonFatalException;
+
+
+	/**
+	 * @param companySettings
+	 * @param keyToUpdate
+	 * @param collectionName
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public boolean unsetKey(OrganizationUnitSettings companySettings, String keyToUpdate, String collectionName)
+			throws InvalidInputException;
+
+
+	/**
+	 * @param companyId
+	 * @throws NonFatalException
+	 */
+	public void unsetComplaintResService(long companyId) throws NonFatalException; 
+
+	public void updateIsLoginPreventedForUser(AgentSettings agentSettings, boolean isLoginPrevented)
+			throws InvalidInputException;
+
+
+	public void updateHidePublicPageForUser(AgentSettings agentSettings, boolean hidePublicPage) throws InvalidInputException;
+
+
+	public boolean doesSurveyHaveNPSQuestions( User user );
+
+    void updateIsLoginPreventedForUsers( List<Long> userIdList, boolean isLoginPrevented ) throws InvalidInputException;
+
+
+    void updateHidePublicPageForUsers( List<Long> userIdList, boolean hidePublicPage ) throws InvalidInputException;
 }

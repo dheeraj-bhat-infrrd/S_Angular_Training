@@ -59,6 +59,7 @@ public interface JspResolver
     public static final String HEADER_SURVEY_INVITE = "header_sendsurveyinvite";
     public static final String HEADER_SURVEY_INVITE_ADMIN = "header_sendsurveyinvite_admin";
     public static final String ACCOUNT_DISABLED_PAGE = "accountdisabled";
+    public static final String LOGIN_DISABLED_PAGE = "loginDisabled";
     public static final String USER_LOGIN = "userlogin";
     public static final String LANDING = "landing";
     public static final String DASHBOARD = "dashboard";
@@ -68,6 +69,7 @@ public interface JspResolver
     public static final String DASHBOARD_INCOMPLETESURVEYS = "dashboard_incompletesurveys";
     public static final String DASHBOARD_REVIEWS = "dashboard_reviews";
     public static final String HEADER_DASHBOARD_INCOMPLETESURVEYS = "header_incompletesurvey";
+    public static final String HEADER_NEW_DASHBOARD_INCOMPLETESURVEYS = "reporting_incomplete_surveys_batch";
 
     // Hierarchy Management
     public static final String BUILD_HIERARCHY = "build-hierarchy";
@@ -191,6 +193,8 @@ public interface JspResolver
     public static final String RANKING_SETTINGS = "ranking_settings";
     public static final String LEADERBOARD_LIST= "leaderboard_list";
     public static final String LEADERBOARD_PROFILE_IMAGE = "leaderboard_profile_image";
+    public static final String REPORTING_TRANSACTION_DETAILS = "reporting_transaction_details";
+    public static final String REPORTING_SCORE_STATS = "reporting_score_stats";
     
     public static final String SENDGRID_EMAIL_MNGMNT="sendgrid_email_management";
 }

@@ -27,7 +27,7 @@
 		});
 		
 		$('#timeFrame_container').on('click', '.time-frame-item', function(e) {
-			showOverlay();
+			showDashOverlay('#trans-stats-dash');
 			var time=$(this).html();
 			$('#time-frame-sel').html($(this).html());
 			$('#time-frame-options').slideToggle(200);
@@ -38,8 +38,6 @@
 			$('#time-frame-sel').attr('data-column-value',timeFrame);
 			$('#time-frame-sel').attr('data-year',yearTimeFrame);
 
-			$('#reporting-trans-details').fadeOut(500);
-			$('#reporting-trans-details').fadeIn(500);
 			updateReportingDashboard();
 			
 		});

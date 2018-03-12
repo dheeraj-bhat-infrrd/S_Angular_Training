@@ -89,12 +89,15 @@ public class CloudUploadServiceImpl implements FileUploadService
     
     @Value ( "${AMAZON_OLD_REPORTS_BUCKET}")
     private String oldReportBucket;
+    
+    @Value ( "${AMAZON_DIGEST_BUCKET}")
+    private String digestBucket;
 
 
     @Override
     public String uploadProfileImageFile( File file, String imageName, boolean preserveFileName ) throws InvalidInputException
     {
-        LOG.info( "Method uploadProfileImageFile inside AmazonUploadServiceImpl called" );
+        LOG.info( "Method uploadProfileImageFile inside AmazonUploadServiceImpl called for image {}" , imageName);
         try {
             return uploadImage( file, imageName, bucket + CommonConstants.FILE_SEPARATOR + imageBucket, preserveFileName );
         } catch ( InvalidInputException e ) {
@@ -161,6 +164,12 @@ public class CloudUploadServiceImpl implements FileUploadService
     public void uploadFileAtDefautBucket( File file, String fileName ) throws NonFatalException
     {
         uploadFile( file, fileName, bucket, false );
+    }
+    
+    @Override
+    public void uploadFileAtDigestBucket( File file, String fileName ) throws NonFatalException
+    {
+        uploadFile( file, fileName, bucket + "/" + digestBucket, false );
     }
 
 

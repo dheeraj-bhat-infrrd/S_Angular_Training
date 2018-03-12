@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.dao;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,7 @@ import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
 import com.realtech.socialsurvey.core.entities.ProfileUrlEntity;
+import com.realtech.socialsurvey.core.entities.SavedDigestRecord;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -293,4 +295,16 @@ public interface OrganizationUnitSettingsDao
      * @return
      */
     public List<OrganizationUnitSettings> fetchCompaniesByAlertType( String alertType , List<Long> companyIds );
+
+
+    public void saveDigestRecord( String profileLevel, long entityId, SavedDigestRecord digestRecord ) throws InvalidInputException;
+
+
+    public OrganizationUnitSettings fetchSavedDigestRecords( String profileLevel, long profileValue ) throws InvalidInputException;
+
+    
+    void updateIsLoginPreventedForUsersInMongo( List<Long> userIdList, boolean isLoginPrevented );
+
+
+    void updateHidePublicPageForUsers( List<Long> userIdList, boolean hidePublicPage );
 }

@@ -10,6 +10,7 @@ import java.net.URLEncoder;
 import java.sql.Timestamp;
 import java.text.DateFormatSymbols;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -19,7 +20,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TimeZone;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -40,12 +43,15 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.api.builder.SSApiBatchIntegrationBuilder;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
+import com.realtech.socialsurvey.core.dao.BranchRankingReportMonthDao;
+import com.realtech.socialsurvey.core.dao.BranchRankingReportYearDao;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.CompanyDetailsReportDao;
 import com.realtech.socialsurvey.core.dao.CompanyUserReportDao;
-import com.realtech.socialsurvey.core.dao.DigestDao;
 import com.realtech.socialsurvey.core.dao.FileUploadDao;
+import com.realtech.socialsurvey.core.dao.GenericReportingDao;
 import com.realtech.socialsurvey.core.dao.NpsReportMonthDao;
 import com.realtech.socialsurvey.core.dao.NpsReportWeekDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -59,6 +65,8 @@ import com.realtech.socialsurvey.core.dao.ScoreStatsQuestionBranchDao;
 import com.realtech.socialsurvey.core.dao.ScoreStatsQuestionCompanyDao;
 import com.realtech.socialsurvey.core.dao.ScoreStatsQuestionRegionDao;
 import com.realtech.socialsurvey.core.dao.ScoreStatsQuestionUserDao;
+import com.realtech.socialsurvey.core.dao.SurveyInvitationEmailDao;
+import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.dao.SurveyResponseTableDao;
 import com.realtech.socialsurvey.core.dao.SurveyResultsCompanyReportDao;
 import com.realtech.socialsurvey.core.dao.SurveyResultsReportBranchDao;
@@ -86,6 +94,8 @@ import com.realtech.socialsurvey.core.dao.UserRankingThisYearMainDao;
 import com.realtech.socialsurvey.core.dao.UserRankingThisYearRegionDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.BranchRankingReportMonth;
+import com.realtech.socialsurvey.core.entities.BranchRankingReportYear;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyActiveUsersStats;
 import com.realtech.socialsurvey.core.entities.CompanyDetailsReport;
@@ -103,8 +113,8 @@ import com.realtech.socialsurvey.core.entities.NpsReportWeek;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RankingRequirements;
 import com.realtech.socialsurvey.core.entities.Region;
-import com.realtech.socialsurvey.core.entities.ReportRequest;
 import com.realtech.socialsurvey.core.entities.ReportingSurveyPreInititation;
+import com.realtech.socialsurvey.core.entities.SavedDigestRecord;
 import com.realtech.socialsurvey.core.entities.ScoreStatsOverallBranch;
 import com.realtech.socialsurvey.core.entities.ScoreStatsOverallCompany;
 import com.realtech.socialsurvey.core.entities.ScoreStatsOverallRegion;
@@ -113,6 +123,7 @@ import com.realtech.socialsurvey.core.entities.ScoreStatsQuestionBranch;
 import com.realtech.socialsurvey.core.entities.ScoreStatsQuestionCompany;
 import com.realtech.socialsurvey.core.entities.ScoreStatsQuestionRegion;
 import com.realtech.socialsurvey.core.entities.ScoreStatsQuestionUser;
+import com.realtech.socialsurvey.core.entities.SurveyInvitationEmailCountMonth;
 import com.realtech.socialsurvey.core.entities.SurveyResultsCompanyReport;
 import com.realtech.socialsurvey.core.entities.SurveyResultsReportBranch;
 import com.realtech.socialsurvey.core.entities.SurveyResultsReportRegion;
@@ -144,10 +155,10 @@ import com.realtech.socialsurvey.core.enums.EntityWarningAlertType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
-import com.realtech.socialsurvey.core.integration.stream.StreamApiIntegrationBuilder;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
+import com.realtech.socialsurvey.core.services.mail.impl.DigestMailHelper;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.reportingmanagement.OverviewManagement;
@@ -305,9 +316,6 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     private ScoreStatsQuestionUserDao scoreStatsQuestionUserDao;
 
     @Autowired
-    private DigestDao digestDao;
-
-    @Autowired
     private EmailServices emailServices;
 
     @Autowired
@@ -318,9 +326,9 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
     @Autowired
     private ReportingSurveyPreInititationDao reportingSurveyPreInititationDao;
-    
+
     @Autowired
-    private StreamApiIntegrationBuilder streamApiIntegrationBuilder;
+    private SurveyInvitationEmailDao surveyInvitationEmailDao;
 
     @Autowired
     private NpsReportWeekDao npsReportWeekDao;
@@ -329,7 +337,26 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     private NpsReportMonthDao npsReportMonthDao;
 
     @Autowired
+    private BranchRankingReportMonthDao branchRankingMonthDao;
+
+    @Autowired
+    private BranchRankingReportYearDao branchRankingYearDao;
+
+    @Autowired
+    private Utils utils;
+
+    @Autowired
     private OverviewManagement overviewManagement;
+    
+    @Autowired
+    private SurveyPreInitiationDao surveyPreInitiationDao;
+    
+    @Autowired
+    private GenericReportingDao<SurveyInvitationEmailCountMonth, Long> surveyEmailCountMonthDao;
+
+    @Autowired
+    private DigestMailHelper digestMailHelper;
+
 
     @Value ( "${FILE_DIRECTORY_LOCATION}")
     private String fileDirectoryLocation;
@@ -354,6 +381,9 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
     @Value ( "${APPLICATION_ADMIN_EMAIL}")
     private String applicationAdminEmail;
+    
+    @Value ( "${AMAZON_DIGEST_BUCKET}")
+    private String digestBucket;
 
     public static final int DIGEST_MAIL_START_INDEX = 0;
 
@@ -364,7 +394,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
     @Override
     public void createEntryInFileUploadForReporting( int reportId, Date startDate, Date endDate, Long entityId,
-        String entityType, Company company, Long adminUserId , int actualTimeZoneOffset)
+        String entityType, Company company, Long adminUserId, int actualTimeZoneOffset )
         throws InvalidInputException, NoRecordsFetchedException, IOException
     {
         // adding entry in the feild and set status to pending
@@ -404,6 +434,12 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_NPS_WEEK_REPORT );
         } else if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_NPS_MONTH_REPORT ) {
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_NPS_MONTH_REPORT );
+        } else if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_BRANCH_RANKING_MONTHLY_REPORT ) {
+            fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_BRANCH_RANKING_MONTHLY_REPORT );
+        } else if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_BRANCH_RANKING_YEARLY_REPORT ) {
+            fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_BRANCH_RANKING_YEARLY_REPORT );
+        } else if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_DIGEST ) {
+            fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_DIGEST );
         }
 
         // get the time 23:59:59 in milliseconds
@@ -423,12 +459,13 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         fileUpload.setProfileLevel( entityType );
         fileUpload.setStatus( CommonConstants.STATUS_PENDING );
         fileUpload.setShowOnUI( true );
-		fileUpload = fileUploadDao.save(fileUpload);
-        if ( reportId == CommonConstants.FILE_UPLOAD_SURVEY_INVITATION_EMAIL_REPORT ) {
-            ReportRequest reportRequest = new ReportRequest();
-            reportRequest.transform( fileUpload, actualTimeZoneOffset );
-            streamApiIntegrationBuilder.getStreamApi().generateEmailReport( reportRequest );
+
+        // get digest s3 URI from mongoDB if present
+        if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_DIGEST ) {
+            processDigestRequest( fileUpload );
         }
+
+        fileUpload = fileUploadDao.save( fileUpload );
     }
 
 
@@ -563,7 +600,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 surveyResultsReportVO.setParticipantType( surveyResultsCompanyReport.getParticipantType() );
                 surveyResultsReportVO.setAgentEmailId( surveyResultsCompanyReport.getAgentEmailId() );
                 surveyResultsReportVO.setCustomerEmailId( surveyResultsCompanyReport.getCustomerEmailId() );
-
+                surveyResultsReportVO.setState( surveyResultsCompanyReport.getState() );
+                surveyResultsReportVO.setCity( surveyResultsCompanyReport.getCity() );
             } else if ( type.equals( CommonConstants.REGION_ID ) ) {
                 surveyResultsReportRegion = (SurveyResultsReportRegion) entry.getValue();
                 surveyResultsReportVO.setSurveyDetailsId( surveyResultsReportRegion.getSurveyDetailsId() );
@@ -589,6 +627,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 surveyResultsReportVO.setParticipantType( surveyResultsReportRegion.getParticipantType() );
                 surveyResultsReportVO.setAgentEmailId( surveyResultsReportRegion.getAgentEmailId() );
                 surveyResultsReportVO.setCustomerEmailId( surveyResultsReportRegion.getCustomerEmailId() );
+                surveyResultsReportVO.setState( surveyResultsReportRegion.getState() );
+                surveyResultsReportVO.setCity( surveyResultsReportRegion.getCity() );
             } else if ( type.equals( CommonConstants.BRANCH_ID ) ) {
                 surveyResultsReportBranch = (SurveyResultsReportBranch) entry.getValue();
                 surveyResultsReportVO.setSurveyDetailsId( surveyResultsReportBranch.getSurveyDetailsId() );
@@ -614,6 +654,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 surveyResultsReportVO.setParticipantType( surveyResultsReportBranch.getParticipantType() );
                 surveyResultsReportVO.setAgentEmailId( surveyResultsReportBranch.getAgentEmailId() );
                 surveyResultsReportVO.setCustomerEmailId( surveyResultsReportBranch.getCustomerEmailId() );
+                surveyResultsReportVO.setState( surveyResultsReportBranch.getState() );
+                surveyResultsReportVO.setCity( surveyResultsReportBranch.getCity() );
             }
             surveyResultsReportVOMap.put( surveyDetailsId, surveyResultsReportVO );
         }
@@ -1723,7 +1765,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             batchSize ) ) {
             List<Object> recentActivityList = new ArrayList<>();
             User user = userManagementService.getUserByUserId( fileUpload.getAdminUserId() );
-            recentActivityList.add( fileUpload.getCreatedOn() );
+            recentActivityList.add( utils.convertDateToTimeZone( fileUpload.getCreatedOn(), CommonConstants.TIMEZONE_EST ) );
             // Set the ReportName according to the upload type
             if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_STATS_REPORT ) {
                 recentActivityList.add( CommonConstants.REPORTING_SURVEY_STATS_REPORT );
@@ -1747,6 +1789,12 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 recentActivityList.add( CommonConstants.REPORTING_NPS_REPORT_FOR_MONTH );
             } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_SURVEY_INVITATION_EMAIL_REPORT ) {
                 recentActivityList.add( CommonConstants.SURVEY_INVITATION_EMAIL_REPORT );
+            } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_BRANCH_RANKING_MONTHLY_REPORT ) {
+                recentActivityList.add( CommonConstants.REPORTING_BRANCH_RANKING_MONTHLY_REPORT );
+            } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_BRANCH_RANKING_YEARLY_REPORT ) {
+                recentActivityList.add( CommonConstants.REPORTING_BRANCH_RANKING_YEARLY_REPORT );
+            } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_DIGEST ) {
+                recentActivityList.add( CommonConstants.REPORTING_DIGEST );
             }
 
             recentActivityList.add( fileUpload.getStartDate() );
@@ -3276,25 +3324,31 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
             digestMap.put( 2, overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityName, entityId, 2, year ) );
             digestMap.put( 1, overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityName, entityId, 1, year ) );
-            digestMap.put( 12, overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityName, entityId, 12, year - 1 ) );
+            digestMap.put( 12,
+                overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityName, entityId, 12, year - 1 ) );
 
         } else if ( monthUnderConcern == 2 ) {
             digestMap.put( 1, overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityName, entityId, 1, year ) );
-            digestMap.put( 12, overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityName, entityId, 12, year - 1 ) );
-            digestMap.put( 11, overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityName, entityId, 11, year - 1 ) );
+            digestMap.put( 12,
+                overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityName, entityId, 12, year - 1 ) );
+            digestMap.put( 11,
+                overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityName, entityId, 11, year - 1 ) );
 
         } else if ( monthUnderConcern == 1 ) {
-            digestMap.put( 12, overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityName, entityId, 12, year - 1 ) );
-            digestMap.put( 11, overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityName, entityId, 11, year - 1 ) );
-            digestMap.put( 10, overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityName, entityId, 10, year - 1 ) );
+            digestMap.put( 12,
+                overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityName, entityId, 12, year - 1 ) );
+            digestMap.put( 11,
+                overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityName, entityId, 11, year - 1 ) );
+            digestMap.put( 10,
+                overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityName, entityId, 10, year - 1 ) );
 
         } else {
-            digestMap.put( monthUnderConcern - 1,
-                overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityName, entityId, monthUnderConcern - 1, year ) );
-            digestMap.put( monthUnderConcern - 2,
-                overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityName, entityId, monthUnderConcern - 2, year ) );
-            digestMap.put( monthUnderConcern - 3,
-                overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityName, entityId, monthUnderConcern - 3, year ) );
+            digestMap.put( monthUnderConcern - 1, overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityName,
+                entityId, monthUnderConcern - 1, year ) );
+            digestMap.put( monthUnderConcern - 2, overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityName,
+                entityId, monthUnderConcern - 2, year ) );
+            digestMap.put( monthUnderConcern - 3, overviewManagement.fetchDigestDataForAHierarchy( profileLevel, entityName,
+                entityId, monthUnderConcern - 3, year ) );
         }
 
         LOG.debug( "method getDigestDataForLastFourMonths() finished" );
@@ -3327,7 +3381,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
         MonthlyDigestAggregate digestAggregate = buildMonthlyDigestAggregate( profileLevel, entityId, entityName,
             monthUnderConcern, year,
-            buildOrderedMonthlyDigestList( getDigestDataForLastFourMonths( profileLevel, entityName, entityId, monthUnderConcern, year ),
+            buildOrderedMonthlyDigestList(
+                getDigestDataForLastFourMonths( profileLevel, entityName, entityId, monthUnderConcern, year ),
                 monthUnderConcern ),
             getTopTenUserRankingsThisMonthForAHierarchy( profileLevel, entityId, monthUnderConcern, year ) );
 
@@ -3348,6 +3403,9 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         digestAggregate.setMonthUnderConcern( new DateFormatSymbols().getMonths()[monthUnderConcern - 1] );
         digestAggregate.setYearUnderConcern( String.valueOf( year ) );
 
+        // set NPS flag
+        digestAggregate.setHavingNpsSection( checkForNpsQuestion( profileLevel, entityId ) );
+
         // initialize digestTemplate list
         digestAggregate.setDigestList( new ArrayList<DigestTemplateData>() );
 
@@ -3359,6 +3417,9 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
         // create rows of users with their ranking in HTML format
         buildUserRankingRows( digestAggregate, userRankings );
+
+        // create NPS section if NPS question enabled
+        buildNpsSection( digestAggregate );
 
         LOG.debug( "method buildMonthlyDigestAggregate() finished" );
         return digestAggregate;
@@ -3390,22 +3451,24 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                 templateData.setMonth( months.get( i ) );
                 templateData.setYear( ( digest != null && digest.getYear() != 0 ) ? String.valueOf( digest.getYear() )
                     : CommonConstants.NOT_AVAILABLE );
-                templateData.setAverageScoreRating( ( digest != null ) ? String.format( "%.2f", digest.getAverageScoreRating() )
+                templateData.setAverageScoreRating( ( digest != null ) ? utils.formatNumber( 2, digest.getAverageScoreRating() )
                     : CommonConstants.NOT_AVAILABLE );
-                templateData.setUserCount( ( digest != null )
-                    ? String.valueOf( digest.getUserCount() ) + ( digest.getUserCount() > 1 ? " Users" : " User" )
-                    : CommonConstants.NOT_AVAILABLE );
+
+
                 templateData.setCompletedTransactions(
                     ( digest != null ) ? String.valueOf( digest.getCompletedTransactions() ) : CommonConstants.NOT_AVAILABLE );
                 templateData.setTotalTransactions(
                     ( digest != null ) ? String.valueOf( digest.getTotalTransactions() ) : CommonConstants.NOT_AVAILABLE );
                 templateData.setSurveyCompletionRate(
-                    ( digest != null ) ? String.format( "%.2f", digest.getSurveyCompletionRate() ) + "%"
+                    ( digest != null ) ? utils.formatNumber( 2, digest.getSurveyCompletionRate() ) + "%"
                         : CommonConstants.NOT_AVAILABLE );
-                templateData.setSps( ( digest != null && digest.getSps() != null )
-                    ? String.valueOf( digest.getSps().doubleValue() > 0 ? "+" + String.format( "%.2f", digest.getSps().doubleValue() )
-                        : String.format( "%.2f", digest.getSps().doubleValue() ) )
-                    : CommonConstants.NOT_AVAILABLE );
+                templateData
+                    .setSps(
+                        ( digest != null && digest.getSps() != null )
+                            ? String.valueOf(
+                                digest.getSps().doubleValue() > 0 ? "+" + utils.formatNumber( 2, digest.getSps().doubleValue() )
+                                    : utils.formatNumber( 2, digest.getSps().doubleValue() ) )
+                            : CommonConstants.NOT_AVAILABLE );
                 templateData.setPromoters(
                     ( digest != null ) ? String.valueOf( digest.getPromoters() ) : CommonConstants.NOT_AVAILABLE );
                 templateData.setDetractors(
@@ -3414,6 +3477,28 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                     .setPassives( ( digest != null ) ? String.valueOf( digest.getPassives() ) : CommonConstants.NOT_AVAILABLE );
                 templateData.setTotalCompletedReviews(
                     ( digest != null ) ? String.valueOf( digest.getTotalCompletedReviews() ) : CommonConstants.NOT_AVAILABLE );
+
+                // for NPS section
+                templateData
+                    .setNps(
+                        ( digest != null && digest.getNps() != null )
+                            ? String.valueOf(
+                                digest.getNps().doubleValue() > 0 ? "+" + utils.formatNumber( 2, digest.getNps().doubleValue() )
+                                    : utils.formatNumber( 2, digest.getNps().doubleValue() ) )
+                            : CommonConstants.NOT_AVAILABLE );
+                templateData.setNpsPromoters(
+                    ( digest != null ) ? String.valueOf( digest.getNpsPromoters() ) : CommonConstants.NOT_AVAILABLE );
+                templateData.setNpsDetractors(
+                    ( digest != null ) ? String.valueOf( digest.getNpsDetractors() ) : CommonConstants.NOT_AVAILABLE );
+                templateData.setNpsPassives(
+                    ( digest != null ) ? String.valueOf( digest.getNpsPassives() ) : CommonConstants.NOT_AVAILABLE );
+                templateData.setTotalCompletedNpsReviews( ( digest != null )
+                    ? String.valueOf( digest.getNpsDetractors() + digest.getNpsPassives() + digest.getNpsPromoters() )
+                    : CommonConstants.NOT_AVAILABLE );
+
+                templateData.setUserCount( digest != null
+                    ? String.valueOf( digest.getUserCount() + ( digest.getUserCount() > 1 ? " Users" : " User" ) )
+                    : "0 Users" );
 
                 digestAggregate.getDigestList().add( i, templateData );
             }
@@ -3457,10 +3542,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         List<Digest> digestList )
     {
         // change indicators
-        String increasedIndicatorIcon = "<div style=\"color: darkgreen; font-size: 16px; line-height: 30px;\">&#9650;</div>";
-        String droppedIndicatorIcon = "<div style=\"color: darkred; font-size: 16px; line-height: 30px;\">&#9660;</div>";
-        String noChangeIndicatorIcon = "<div style=\"color: grey; font-size: 30px; line-height: 30px;\">&bull;</div>";
-        String notAvailableIndicatorIcon = "<div style=\"color: grey; font-size: 30px; line-height: 30px;\"><b>--</b></div>";
+        String increasedIndicatorIcon = digestMailHelper.getDigestMailIncreasedIndicatorIcon();
+        String droppedIndicatorIcon = digestMailHelper.getDigestMailDroppedIndicatorIcon();
+        String noChangeIndicatorIcon = digestMailHelper.getDigestMailNoChangeIndicatorIcon();
+        String notAvailableIndicatorIcon = digestMailHelper.getDigestMailNotAvailableIndicatorIcon();
 
         // --- average score rating
         double avgScoreRating0 = digestList.get( 0 ) != null ? digestList.get( 0 ).getAverageScoreRating() : 0d;
@@ -3480,14 +3565,31 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         Double sps2 = digestList.get( 2 ) != null ? digestList.get( 2 ).getSps() : null;
         Double sps3 = digestList.get( 3 ) != null ? digestList.get( 3 ).getSps() : null;
 
-        long userCount0 = digestList.get( 0 ) != null ? digestList.get( 0 ).getUserCount() : 0l;
-        long userCount1 = digestList.get( 1 ) != null ? digestList.get( 1 ).getUserCount() : 0l;
+
+        // --- NPS score
+        Double nps0 = digestList.get( 0 ) != null ? digestList.get( 0 ).getNps() : null;
+        Double nps1 = digestList.get( 1 ) != null ? digestList.get( 1 ).getNps() : null;
+        Double nps2 = digestList.get( 2 ) != null ? digestList.get( 2 ).getNps() : null;
+        Double nps3 = digestList.get( 3 ) != null ? digestList.get( 3 ).getNps() : null;
+
+        // correct user count
+        long userCount0 = Long
+            .parseLong( StringUtils.split( digestAggregate.getDigestList().get( 0 ).getUserCount(), " " )[0] );
+        long userCount1 = Long
+            .parseLong( StringUtils.split( digestAggregate.getDigestList().get( 1 ).getUserCount(), " " )[0] );
 
         long transcationCount0 = digestList.get( 0 ) != null ? digestList.get( 0 ).getTotalTransactions() : 0l;
         long transcationCount1 = digestList.get( 1 ) != null ? digestList.get( 1 ).getTotalTransactions() : 0l;
 
-        long totalCompletedReviews0 = digestList.get( 0 ) != null ? digestList.get( 0 ).getTotalCompletedReviews() : 0l;
-        long totalCompletedReviews1 = digestList.get( 1 ) != null ? digestList.get( 1 ).getTotalCompletedReviews() : 0l;
+        long totalCompletedReviews0 = digestList.get( 0 ) != null ? digestList.get( 0 ).getDetractors()
+            + digestList.get( 0 ).getPassives() + digestList.get( 0 ).getPromoters() : 0l;
+        long totalCompletedReviews1 = digestList.get( 1 ) != null ? digestList.get( 1 ).getDetractors()
+            + digestList.get( 1 ).getPassives() + digestList.get( 1 ).getPromoters() : 0l;
+
+        long totalCompletedNpsReviews0 = digestList.get( 0 ) != null ? digestList.get( 0 ).getNpsDetractors()
+            + digestList.get( 0 ).getNpsPassives() + digestList.get( 0 ).getNpsPromoters() : 0l;
+        long totalCompletedNpsReviews1 = digestList.get( 1 ) != null ? digestList.get( 1 ).getNpsDetractors()
+            + digestList.get( 1 ).getNpsPassives() + digestList.get( 1 ).getNpsPromoters() : 0l;
 
         // choosing icons for average rating score
         digestAggregate.getDigestList().get( 0 )
@@ -3521,8 +3623,9 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         if ( sps0 == null || sps1 == null ) {
             digestAggregate.getDigestList().get( 0 ).setSpsIcon( notAvailableIndicatorIcon );
         } else {
-            digestAggregate.getDigestList().get( 0 ).setSpsIcon(
-                ( sps0.doubleValue() > sps1.doubleValue() ? increasedIndicatorIcon : ( sps0.doubleValue() == sps1.doubleValue() ? noChangeIndicatorIcon : droppedIndicatorIcon ) ) );
+            digestAggregate.getDigestList().get( 0 )
+                .setSpsIcon( ( sps0.doubleValue() > sps1.doubleValue() ? increasedIndicatorIcon
+                    : ( sps0.doubleValue() == sps1.doubleValue() ? noChangeIndicatorIcon : droppedIndicatorIcon ) ) );
         }
 
 
@@ -3530,8 +3633,9 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         if ( sps1 == null || sps2 == null ) {
             digestAggregate.getDigestList().get( 1 ).setSpsIcon( notAvailableIndicatorIcon );
         } else {
-            digestAggregate.getDigestList().get( 1 ).setSpsIcon(
-                ( sps1.doubleValue() > sps2.doubleValue() ? increasedIndicatorIcon : ( sps1.doubleValue() == sps2.doubleValue() ? noChangeIndicatorIcon : droppedIndicatorIcon ) ) );
+            digestAggregate.getDigestList().get( 1 )
+                .setSpsIcon( ( sps1.doubleValue() > sps2.doubleValue() ? increasedIndicatorIcon
+                    : ( sps1.doubleValue() == sps2.doubleValue() ? noChangeIndicatorIcon : droppedIndicatorIcon ) ) );
         }
 
 
@@ -3539,108 +3643,188 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         if ( sps2 == null || sps3 == null ) {
             digestAggregate.getDigestList().get( 2 ).setSpsIcon( notAvailableIndicatorIcon );
         } else {
-            digestAggregate.getDigestList().get( 2 ).setSpsIcon(
-                ( sps2.doubleValue() > sps3.doubleValue() ? increasedIndicatorIcon : ( sps2.doubleValue() == sps3.doubleValue() ? noChangeIndicatorIcon : droppedIndicatorIcon ) ) );
+            digestAggregate.getDigestList().get( 2 )
+                .setSpsIcon( ( sps2.doubleValue() > sps3.doubleValue() ? increasedIndicatorIcon
+                    : ( sps2.doubleValue() == sps3.doubleValue() ? noChangeIndicatorIcon : droppedIndicatorIcon ) ) );
+        }
+
+
+        // choosing icons for NPS
+        ////c1'
+        if ( nps0 == null || nps1 == null ) {
+            digestAggregate.getDigestList().get( 0 ).setNpsIcon( notAvailableIndicatorIcon );
+        } else {
+            digestAggregate.getDigestList().get( 0 )
+                .setNpsIcon( ( nps0.doubleValue() > nps1.doubleValue() ? increasedIndicatorIcon
+                    : ( nps0.doubleValue() == nps1.doubleValue() ? noChangeIndicatorIcon : droppedIndicatorIcon ) ) );
+        }
+
+
+        ////c2'
+        if ( nps1 == null || nps2 == null ) {
+            digestAggregate.getDigestList().get( 1 ).setNpsIcon( notAvailableIndicatorIcon );
+        } else {
+            digestAggregate.getDigestList().get( 1 )
+                .setNpsIcon( ( nps1.doubleValue() > nps2.doubleValue() ? increasedIndicatorIcon
+                    : ( nps1.doubleValue() == nps2.doubleValue() ? noChangeIndicatorIcon : droppedIndicatorIcon ) ) );
+        }
+
+
+        ////c3'
+        if ( nps2 == null || nps3 == null ) {
+            digestAggregate.getDigestList().get( 2 ).setNpsIcon( notAvailableIndicatorIcon );
+        } else {
+            digestAggregate.getDigestList().get( 2 )
+                .setNpsIcon( ( nps2.doubleValue() > nps3.doubleValue() ? increasedIndicatorIcon
+                    : ( nps2.doubleValue() == nps3.doubleValue() ? noChangeIndicatorIcon : droppedIndicatorIcon ) ) );
         }
 
 
         // building conclusion text for average rating score
-        digestAggregate
-            .setAvgRatingTxt( "Your average score rating "
-                + ( avgScoreRating0 > avgScoreRating1
-                    ? "has increased by " + "<b>" + String.format( "%.2f", ( avgScoreRating0 - avgScoreRating1 ) ) + "</b>"
-                    : ( avgScoreRating0 == avgScoreRating1 ? "did not change"
-                        : "has dropped by " + "<b>" + String.format( "%.2f", ( avgScoreRating1 - avgScoreRating0 ) )
-                            + "</b>" ) )
-                + " and your user count "
-                + ( userCount0 > userCount1 ? "has increased by " + "<b>" + ( userCount0 - userCount1 ) + "</b>"
-                    : ( userCount0 == userCount1 ? "did not change"
-                        : "has dropped by " + "<b>" + ( userCount1 - userCount0 ) + "</b>" ) )
-                + " from last month." );
+        digestAggregate.setAvgRatingTxt( "Your average score rating "
+            + ( avgScoreRating0 > avgScoreRating1
+                ? "has increased by "
+                    + digestMailHelper.getBoldTextForHtml( utils.formatNumber( 2, ( avgScoreRating0 - avgScoreRating1 ) ) )
+                : ( avgScoreRating0 == avgScoreRating1 ? "did not change"
+                    : "has dropped by " + digestMailHelper
+                        .getBoldTextForHtml( utils.formatNumber( 2, ( avgScoreRating1 - avgScoreRating0 ) ) ) ) )
+            + " and your user count "
+            + ( userCount0 > userCount1
+                ? "has increased by " + digestMailHelper.getBoldTextForHtml( String.valueOf( ( userCount0 - userCount1 ) ) )
+                : ( userCount0 == userCount1 ? "did not change"
+                    : "has dropped by "
+                        + digestMailHelper.getBoldTextForHtml( String.valueOf( ( userCount1 - userCount0 ) ) ) ) )
+            + " from last month." );
 
         // building conclusion text for survey completion rate
-        digestAggregate.setSurveyPercentageTxt( "Your survey completion rate "
-            + ( surveyCompletionRate0 > surveyCompletionRate1
-                ? "has increased by " + "<b>" + String.format( "%.2f", ( surveyCompletionRate0 - surveyCompletionRate1 ) )
-                    + "%</b>"
-                : ( surveyCompletionRate0 == surveyCompletionRate1 ? "did not change"
-                    : "has dropped by "
-                        + "<b>" + String.format( "%.2f", ( surveyCompletionRate1 - surveyCompletionRate0 ) ) + "%</b>" ) )
-            + " and your transaction count "
-            + ( transcationCount0 > transcationCount1
-                ? "has increased by " + "<b>" + ( transcationCount0 - transcationCount1 ) + "</b>"
-                : ( transcationCount0 == transcationCount1 ? "did not change"
-                    : "has dropped by " + "<b>" + ( transcationCount1 - transcationCount0 ) + "</b>" ) )
-            + " from last month." );
+        digestAggregate
+            .setSurveyPercentageTxt( "Your survey completion rate "
+                + ( surveyCompletionRate0 > surveyCompletionRate1
+                    ? "has increased by " + digestMailHelper
+                        .getBoldTextForHtml( utils.formatNumber( 2, ( surveyCompletionRate0 - surveyCompletionRate1 ) ) + "%" )
+                    : ( surveyCompletionRate0 == surveyCompletionRate1 ? "did not change"
+                        : "has dropped by " + digestMailHelper.getBoldTextForHtml(
+                            utils.formatNumber( 2, ( surveyCompletionRate1 - surveyCompletionRate0 ) ) + "%" ) ) )
+                + " and your transaction count "
+                + ( transcationCount0 > transcationCount1
+                    ? "has increased by "
+                        + digestMailHelper.getBoldTextForHtml( String.valueOf( ( transcationCount0 - transcationCount1 ) ) )
+                    : ( transcationCount0 == transcationCount1 ? "did not change"
+                        : "has dropped by " + digestMailHelper
+                            .getBoldTextForHtml( String.valueOf( ( transcationCount1 - transcationCount0 ) ) ) ) )
+                + " from last month." );
 
         // building conclusion text for SPS
         StringBuilder satisfactionRatingText = new StringBuilder( "" );
-        
-        if( sps0 == null || sps1 == null ) {
+
+        if ( sps0 == null || sps1 == null ) {
             satisfactionRatingText.append( "Your " );
-        }  else {
+        } else {
             satisfactionRatingText.append( "Your satisfaction rating " );
-            satisfactionRatingText
-            .append( ( sps0.doubleValue() > sps1.doubleValue() ? "has increased by " + "<b>" + String.format( "%.2f", ( sps0.doubleValue() - sps1.doubleValue() ) ) + "</b>"
+            satisfactionRatingText.append( ( sps0.doubleValue() > sps1.doubleValue()
+                ? "has increased by " + digestMailHelper
+                    .getBoldTextForHtml( utils.formatNumber( 2, ( sps0.doubleValue() - sps1.doubleValue() ) ) )
                 : ( sps0.doubleValue() == sps1.doubleValue() ? "did not change"
-                    : "has dropped by " + "<b>" + String.format( "%.2f", ( sps1.doubleValue() - sps0.doubleValue() ) ) + "</b>" ) ) );
+                    : "has dropped by " + digestMailHelper
+                        .getBoldTextForHtml( utils.formatNumber( 2, ( sps1.doubleValue() - sps0.doubleValue() ) ) ) ) ) );
             satisfactionRatingText.append( " and your " );
         }
-        
+
         satisfactionRatingText.append( "total review count " );
-        
+
         satisfactionRatingText.append( ( totalCompletedReviews0 > totalCompletedReviews1
-                    ? "has increased by " + "<b>" + ( totalCompletedReviews0 - totalCompletedReviews1 ) + "</b>"
-                    : ( totalCompletedReviews0 == totalCompletedReviews1 ? "did not change"
-                        : "has dropped by " + "<b>" + ( totalCompletedReviews1 - totalCompletedReviews0 ) + "</b>" ) ) );
-        
+            ? "has increased by "
+                + digestMailHelper.getBoldTextForHtml( String.valueOf( ( totalCompletedReviews0 - totalCompletedReviews1 ) ) )
+            : ( totalCompletedReviews0 == totalCompletedReviews1 ? "did not change"
+                : "has dropped by " + digestMailHelper
+                    .getBoldTextForHtml( String.valueOf( ( totalCompletedReviews1 - totalCompletedReviews0 ) ) ) ) ) );
+
         satisfactionRatingText.append( " from last month." );
 
         digestAggregate.setStatisfactionRatingTxt( satisfactionRatingText.toString() );
+
+
+        // building conclusion text for NPS
+        StringBuilder npsInferenceTxt = new StringBuilder( "" );
+
+        if ( nps0 == null || nps1 == null ) {
+            npsInferenceTxt.append( "Your " );
+        } else {
+            npsInferenceTxt.append( "Your NPS rating " );
+            npsInferenceTxt.append( ( nps0.doubleValue() > nps1.doubleValue()
+                ? "has increased by " + digestMailHelper
+                    .getBoldTextForHtml( utils.formatNumber( 2, ( nps0.doubleValue() - nps1.doubleValue() ) ) )
+                : ( nps0.doubleValue() == nps1.doubleValue() ? "did not change"
+                    : "has dropped by " + digestMailHelper
+                        .getBoldTextForHtml( utils.formatNumber( 2, ( nps1.doubleValue() - nps0.doubleValue() ) ) ) ) ) );
+            npsInferenceTxt.append( " and your " );
+        }
+
+        npsInferenceTxt.append( "total review count for reviews with NPS " );
+
+        npsInferenceTxt.append( ( totalCompletedNpsReviews0 > totalCompletedNpsReviews1
+            ? "has increased by " + digestMailHelper
+                .getBoldTextForHtml( String.valueOf( ( totalCompletedNpsReviews0 - totalCompletedNpsReviews1 ) ) )
+            : ( totalCompletedNpsReviews0 == totalCompletedNpsReviews1 ? "did not change"
+                : "has dropped by " + digestMailHelper
+                    .getBoldTextForHtml( String.valueOf( ( totalCompletedNpsReviews1 - totalCompletedNpsReviews0 ) ) ) ) ) );
+
+        npsInferenceTxt.append( " from last month." );
+
+        digestAggregate.setNpsInferenceTxt( npsInferenceTxt.toString() );
     }
 
 
     private void buildUserRankingRows( MonthlyDigestAggregate digestAggregate, List<UserRanking> userRankingList )
     {
-        StringBuilder userRankingBuilder = new StringBuilder( "" );
-
         if ( userRankingList != null && userRankingList.size() > 0 ) {
-            String trStart = "<tr style=\"margin:0;padding:0;border:0;font:inherit;font-size:100%;vertical-align:baseline\">";
-            String tdStart = "<td style=\"margin:0;padding:0;border:0;font:inherit;font-size:100%;vertical-align:baseline;text-align:left;font-weight:normal;vertical-align:middle;font-size:1rem;line-height:1.28571rem;margin-bottom:1.28571rem;padding:4.5px .5em;padding-right:0;border-bottom: 1px dotted #ccc; padding: 4px;\">";
-            String trEnd = "</tr>";
-            String tdEnd = "</td>";
 
-            for ( UserRanking userRanking : userRankingList ) {
-                userRankingBuilder.append( trStart );
+            String head = digestMailHelper
+                .wrapUserRankingTableHeadOrBody( digestMailHelper.wrapUserRankingTableRow(
+                    digestMailHelper.wrapUserRankingTableCell( CommonConstants.DIGEST_USER_RANKING_COLUMN, true )
+                        + digestMailHelper.wrapUserRankingTableCell( CommonConstants.DIGEST_USER_NAME_COLUMN, true )
+                        + digestMailHelper.wrapUserRankingTableCell( CommonConstants.DIGEST_AVG_SCORE_COLUMN, true )
+                        + digestMailHelper.wrapUserRankingTableCell( CommonConstants.DIGEST_REVIEWS_COLUMN, true ),
+                    true, false ), true );
 
-                // user ranking
-                userRankingBuilder.append( tdStart );
-                userRankingBuilder.append( userRanking.getRank() == 0 ? CommonConstants.NOT_AVAILABLE : userRanking.getRank() );
-                userRankingBuilder.append( tdEnd );
+            String body = "";
 
-                // user name
-                userRankingBuilder.append( tdStart );
-                userRankingBuilder.append( buildDisplayName( userRanking.getFirstName(), userRanking.getLastName() ) );
-                userRankingBuilder.append( tdEnd );
+            for ( int i = 0; i < userRankingList.size(); i++ ) {
 
-                // average score
-                userRankingBuilder.append( tdStart );
-                userRankingBuilder.append(
-                    userRanking.getAverageRating() == 0f ? CommonConstants.NOT_AVAILABLE : userRanking.getAverageRating() );
-                userRankingBuilder.append( tdEnd );
+                UserRanking userRanking = userRankingList.get( i );
 
-                // total reviews
-                userRankingBuilder.append( tdStart );
-                userRankingBuilder.append(
-                    userRanking.getTotalReviews() == 0 ? CommonConstants.NOT_AVAILABLE : userRanking.getTotalReviews() );
-                userRankingBuilder.append( tdEnd );
+                // add a row of HTML with user ranking information
+                body += digestMailHelper.wrapUserRankingTableRow(
+                    digestMailHelper
+                        .wrapUserRankingTableCell( ( userRanking.getRank() == 0 ? CommonConstants.NOT_AVAILABLE
+                            : String.valueOf( userRanking.getRank() ) ), false )
+                        + digestMailHelper.wrapUserRankingTableCell(
+                            buildDisplayName( userRanking.getFirstName(), userRanking.getLastName() ), false )
+                        + digestMailHelper
+                            .wrapUserRankingTableCell( userRanking.getAverageRating() == 0f ? CommonConstants.NOT_AVAILABLE
+                                : String.valueOf( userRanking.getAverageRating() ), false )
+                        + digestMailHelper
+                            .wrapUserRankingTableCell( userRanking.getTotalReviews() == 0 ? CommonConstants.NOT_AVAILABLE
+                                : String.valueOf( userRanking.getTotalReviews() ), false ),
+                    false, ( ( i + 1 ) % 2 ) == 0 ? true : false );
 
-                userRankingBuilder.append( trEnd );
             }
 
-        }
+            body = digestMailHelper.wrapUserRankingTableHeadOrBody( body, false );
 
-        digestAggregate.setUserRankingHtmlRows( userRankingBuilder.toString() );
+
+            digestAggregate.setUserRankingHtmlSection( digestMailHelper.getDigestMailSectionPaddingWithSeperator()
+                + digestMailHelper.getDigestMailIntraSectionPadding()
+                + digestMailHelper.wrapDigestMailSectionTitle( CommonConstants.DIGEST_USER_RANKING_TITLE )
+                + digestMailHelper.getDigestMailInterLinePadding()
+                + digestMailHelper.wrapDigestMailSectionDescription( CommonConstants.DIGEST_USER_RANKING_DESC )
+                + digestMailHelper.getDigestMailIntraSectionPadding() + digestMailHelper.wrapUserRankingTable( head + body ) );
+
+
+        } else {
+            digestAggregate.setUserRankingHtmlSection( digestMailHelper.getDigestMailSectionPaddingWithSeperator()
+                + digestMailHelper.getDigestMailIntraSectionPadding() );
+        }
     }
 
 
@@ -3738,7 +3922,18 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
                         MonthlyDigestAggregate digestAggregate = getMonthlyDigestAggregateForAHierarchy( digestRequest, month,
                             year );
 
+
+                        // save the copy of digest generated for further use
+                        constructAndSaveDigestCopy( digestAggregate );
+
                         processRecipients( digestAggregate, digestRequest );
+
+                        if ( digestAggregate.getRecipientMailIds() == null
+                            || digestAggregate.getRecipientMailIds().isEmpty() ) {
+                            LOG.error( "Digest recipients for {} : {} is not specified, aborting", profileLevel,
+                                digestRequest.getEntityId() );
+                            continue;
+                        }
 
                         // send the digest email
                         emailServices.sendMonthlyDigestMail( digestAggregate );
@@ -4330,47 +4525,52 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         return workBook;
     }
 
-	private XSSFWorkbook formatForNPSReportMonth(XSSFWorkbook workBook, List<NpsReportMonth> npsReportMonthList) {
-		makeRowBoldAndBlue(workBook, workBook.getSheetAt(0).getRow(0));
-		if(workBook.getSheetAt(0).getRow(1) == null || workBook.getSheetAt(0).getRow(1) == null){
-			return workBook;
-		}
-		makeRowBoldAndBlue(workBook, workBook.getSheetAt(0).getRow(1));
-		int rownum = 1;
 
-		for (NpsReportMonth npsReportMonth : npsReportMonthList) {
-			if (npsReportMonth.getBranchId() == 0 && npsReportMonth.getRegionId() == 0) {
-				CellStyle style = workBook.createCellStyle();
-				style.setAlignment(CellStyle.ALIGN_CENTER);
-				style.setFillBackgroundColor(IndexedColors.AQUA.index);
-			} else if (npsReportMonth.getBranchId() == 0 && npsReportMonth.getRegionId() > 0) {
-				makeRowBold(workBook, workBook.getSheetAt(0).getRow(rownum));
-			}
-			rownum++;
-		}
-		return workBook;
-	}
+    private XSSFWorkbook formatForNPSReportMonth( XSSFWorkbook workBook, List<NpsReportMonth> npsReportMonthList )
+    {
+        makeRowBoldAndBlue( workBook, workBook.getSheetAt( 0 ).getRow( 0 ) );
+        if ( workBook.getSheetAt( 0 ).getRow( 1 ) == null || workBook.getSheetAt( 0 ).getRow( 1 ) == null ) {
+            return workBook;
+        }
+        makeRowBoldAndBlue( workBook, workBook.getSheetAt( 0 ).getRow( 1 ) );
+        int rownum = 1;
 
-	private XSSFWorkbook formatForNPSReportWeek(XSSFWorkbook workBook, List<NpsReportWeek> npsReportWeekList) {
-		makeRowBoldAndBlue(workBook, workBook.getSheetAt(0).getRow(0));
-		if(workBook.getSheetAt(0).getRow(1) == null || workBook.getSheetAt(0).getRow(1) == null){
-			return workBook;
-		}
-		makeRowBoldAndBlue(workBook, workBook.getSheetAt(0).getRow(1));
-		int rownum = 1;
+        for ( NpsReportMonth npsReportMonth : npsReportMonthList ) {
+            if ( npsReportMonth.getBranchId() == 0 && npsReportMonth.getRegionId() == 0 ) {
+                CellStyle style = workBook.createCellStyle();
+                style.setAlignment( CellStyle.ALIGN_CENTER );
+                style.setFillBackgroundColor( IndexedColors.AQUA.index );
+            } else if ( npsReportMonth.getBranchId() == 0 && npsReportMonth.getRegionId() > 0 ) {
+                makeRowBold( workBook, workBook.getSheetAt( 0 ).getRow( rownum ) );
+            }
+            rownum++;
+        }
+        return workBook;
+    }
 
-		for (NpsReportWeek npsReportWeek : npsReportWeekList) {
-			if (npsReportWeek.getBranchId() == 0 && npsReportWeek.getRegionId() == 0) {
-				CellStyle style = workBook.createCellStyle();
-				style.setAlignment(CellStyle.ALIGN_CENTER);
-				style.setFillBackgroundColor(IndexedColors.AQUA.index);
-			} else if (npsReportWeek.getBranchId() == 0 && npsReportWeek.getRegionId() > 0) {
-				makeRowBold(workBook, workBook.getSheetAt(0).getRow(rownum));
-			}
-			rownum++;
-		}
-		return workBook;
-	}
+
+    private XSSFWorkbook formatForNPSReportWeek( XSSFWorkbook workBook, List<NpsReportWeek> npsReportWeekList )
+    {
+        makeRowBoldAndBlue( workBook, workBook.getSheetAt( 0 ).getRow( 0 ) );
+        if ( workBook.getSheetAt( 0 ).getRow( 1 ) == null || workBook.getSheetAt( 0 ).getRow( 1 ) == null ) {
+            return workBook;
+        }
+        makeRowBoldAndBlue( workBook, workBook.getSheetAt( 0 ).getRow( 1 ) );
+        int rownum = 1;
+
+        for ( NpsReportWeek npsReportWeek : npsReportWeekList ) {
+            if ( npsReportWeek.getBranchId() == 0 && npsReportWeek.getRegionId() == 0 ) {
+                CellStyle style = workBook.createCellStyle();
+                style.setAlignment( CellStyle.ALIGN_CENTER );
+                style.setFillBackgroundColor( IndexedColors.AQUA.index );
+            } else if ( npsReportWeek.getBranchId() == 0 && npsReportWeek.getRegionId() > 0 ) {
+                makeRowBold( workBook, workBook.getSheetAt( 0 ).getRow( rownum ) );
+            }
+            rownum++;
+        }
+        return workBook;
+    }
+
 
     @Override
     public void updateTransactionMonitorAlertsForCompanies() throws InvalidInputException
@@ -4380,17 +4580,17 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         // Method to call the api
         Map<Long, List<CompanySurveyStatusStats>> surveStatsForPast7daysForAllCompanies = getSurveStatsForPast7daysForAllCompanies();
         Map<Long, List<CompanySurveyStatusStats>> surveStatsForLastToLatWeekForAllCompanies = getSurveStatsForLastToLatWeekForAllCompanies();
-        
-        Map<Long, Long> transacionCountForPast5Days = getTotalTransactionCountForPast5Days();       
+
+        Map<Long, Long> transacionCountForPast5Days = getTotalTransactionCountForPast5Days();
         Map<Long, Long> transacionCountForPast3Days = getTransactionCountForPast3Days();
         Map<Long, Long> sentSurveyCountForPast5Days = getSendSurveyCountForPast5Days();
         Map<Long, Long> completedSurveyCountForPastNDays = getCompletedSurveyCountForPastNDays();
-                
-        List<OrganizationUnitSettings> companySettingsList =  organizationManagementService.getCompaniesForTransactionMonitor();
-        
-        for(OrganizationUnitSettings companySettings : companySettingsList){
-            long companyId = companySettings.getIden() ;
-            
+
+        List<OrganizationUnitSettings> companySettingsList = organizationManagementService.getCompaniesForTransactionMonitor();
+
+        for ( OrganizationUnitSettings companySettings : companySettingsList ) {
+            long companyId = companySettings.getIden();
+
 
             List<CompanySurveyStatusStats> surveStatsForPast7days = surveStatsForPast7daysForAllCompanies.get( companyId );
             List<CompanySurveyStatusStats> surveStatsForLastToLatWeek = surveStatsForLastToLatWeekForAllCompanies
@@ -4398,45 +4598,56 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
             // check if lessTransactionInPastDays is true
             boolean isZeroIncomingTransactionInPastThreeDays = false;
-            if(transacionCountForPast5Days.get( companyId ) == null || transacionCountForPast5Days.get( companyId ) == 0){
+            if ( transacionCountForPast5Days.get( companyId ) == null || transacionCountForPast5Days.get( companyId ) == 0 ) {
                 isZeroIncomingTransactionInPastThreeDays = true;
             }
 
             // check if isLessInvitationSentInPastSevenDays is true
             boolean isLessInvitationSentInPastSevenDays = false;
-            if(getSentSurveyCountFromList(surveStatsForPast7days) <= getSentSurveyCountFromList(surveStatsForLastToLatWeek) / 2){
+            if ( getSentSurveyCountFromList(
+                surveStatsForPast7days ) <= getSentSurveyCountFromList( surveStatsForLastToLatWeek ) / 2 ) {
                 isLessInvitationSentInPastSevenDays = true;
             }
-            
+
+            //check if sent surey count in past 5 days is zero
+            boolean isZeroInvitationSentInPastFiceDays = false;
+            if ( sentSurveyCountForPast5Days.get( companyId ) == null || sentSurveyCountForPast5Days.get( companyId ) == 0 ) {
+                isZeroInvitationSentInPastFiceDays = true;
+            }
+
             //check if isMoreReminderSentInPastSevenDays is true
-            boolean isMoreReminderSentInPastSevenDays = false; 
-            if(getSentSurveyReminderCountFromList(surveStatsForPast7days) >= getSentSurveyReminderCountFromList(surveStatsForLastToLatWeek) * 2){
+            boolean isMoreReminderSentInPastSevenDays = false;
+            if ( getSentSurveyReminderCountFromList(
+                surveStatsForPast7days ) >= getSentSurveyReminderCountFromList( surveStatsForLastToLatWeek ) * 2 ) {
                 isMoreReminderSentInPastSevenDays = true;
             }
 
             // check if isZeroIncomingTransactionInPastOneDay is true
             boolean isZeroIncomingTransactionInPastOneDay = false;
-            if(transacionCountForPast3Days.get( companyId ) == null || transacionCountForPast3Days.get( companyId ) == 0){
+            if ( transacionCountForPast3Days.get( companyId ) == null || transacionCountForPast3Days.get( companyId ) == 0 ) {
                 isZeroIncomingTransactionInPastOneDay = true;
             }
 
             // check if isLessIncomingTransactionInPastSevenDays is true
             boolean isLessIncomingTransactionInPastSevenDays = false;
-            if(getTransactionReceivedCountFromList(surveStatsForPast7days) <= getTransactionReceivedCountFromList(surveStatsForLastToLatWeek) / 2){
+            if ( getTransactionReceivedCountFromList(
+                surveStatsForPast7days ) <= getTransactionReceivedCountFromList( surveStatsForLastToLatWeek ) / 2 ) {
                 isLessIncomingTransactionInPastSevenDays = true;
             }
-            
-            
+
+
             //check if isLessInvitationSentInPastSevenDaysWarning is true
             boolean isLessInvitationSentInPastSevenDaysWarning = false;
-            if(getSentSurveyCountFromList(surveStatsForPast7days) <= (getSentSurveyCountFromList(surveStatsForLastToLatWeek)* 3 / 4)){
+            if ( getSentSurveyCountFromList(
+                surveStatsForPast7days ) <= ( getSentSurveyCountFromList( surveStatsForLastToLatWeek ) * 3 / 4 ) ) {
                 isLessInvitationSentInPastSevenDaysWarning = true;
             }
-            
-            
-          //check if isMoreReminderSentInPastSevenDays is true
-            boolean isMoreReminderSentInPastSevenDaysWarning = false; 
-            if(getSentSurveyReminderCountFromList(surveStatsForPast7days) >= (getSentSurveyReminderCountFromList(surveStatsForLastToLatWeek) * 3 / 2) ){
+
+
+            //check if isMoreReminderSentInPastSevenDays is true
+            boolean isMoreReminderSentInPastSevenDaysWarning = false;
+            if ( getSentSurveyReminderCountFromList(
+                surveStatsForPast7days ) >= ( getSentSurveyReminderCountFromList( surveStatsForLastToLatWeek ) * 3 / 2 ) ) {
                 isMoreReminderSentInPastSevenDaysWarning = true;
             }
 
@@ -4454,9 +4665,9 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             List<String> currentErrorAlerts = new ArrayList<>();
             if ( isZeroIncomingTransactionInPastThreeDays )
                 currentErrorAlerts.add( EntityErrorAlertType.LESS_TRANSACTION_IN_PAST_DAYS.getAlertType() );
-            if(isLessInvitationSentInPastSevenDays)
-                currentErrorAlerts.add( EntityErrorAlertType.LESS_INVITATION_IN_PAST_DAYS.getAlertType());
-           
+            if ( isLessInvitationSentInPastSevenDays )
+                currentErrorAlerts.add( EntityErrorAlertType.LESS_INVITATION_IN_PAST_DAYS.getAlertType() );
+
             entityAlertDetails.setCurrentErrorAlerts( currentErrorAlerts );
             if ( currentErrorAlerts.size() > 0 )
                 entityAlertDetails.setErrorAlert( true );
@@ -4466,12 +4677,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             List<String> currentWarningAlerts = new ArrayList<>();
             if ( isZeroIncomingTransactionInPastOneDay )
                 currentWarningAlerts.add( EntityWarningAlertType.LESS_TRANSACTION_IN_PAST_DAYS.getAlertType() );
-            if ( isLessIncomingTransactionInPastSevenDays )
+            if ( isLessIncomingTransactionInPastSevenDays || isZeroInvitationSentInPastFiceDays )
                 currentWarningAlerts.add( EntityWarningAlertType.LESS_TRANSACTION_IN_PAST_WEEK.getAlertType() );
             if ( isLessInvitationSentInPastSevenDaysWarning )
                 currentWarningAlerts.add( EntityWarningAlertType.LESS_INVITATION_IN_PAST_WEEK.getAlertType() );
-            if ( isMoreReminderSentInPastSevenDaysWarning )
-                currentWarningAlerts.add( EntityWarningAlertType.MORE_REMINDER_IN_PAST_WEEK.getAlertType() );
             if ( isNoSurveyCompletedInPastThreeDays )
                 currentWarningAlerts.add( EntityWarningAlertType.LESS_SURVEY_COMPLETED_IN_PAST_DAYS.getAlertType() );
 
@@ -4494,29 +4703,33 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
 
     @Override
-    public int updateFileUploadStatus(long fileUploadId, int status) throws InvalidInputException {
+    public int updateFileUploadStatus( long fileUploadId, int status ) throws InvalidInputException
+    {
         int affectedColumns = 0;
-        LOG.info("updateFileUploadStatus() method started");
-        affectedColumns = fileUploadDao.updateStatus(fileUploadId,status);
-        LOG.info("updateFileUploadStatus() method completed");
+        LOG.info( "updateFileUploadStatus() method started" );
+        affectedColumns = fileUploadDao.updateStatus( fileUploadId, status );
+        LOG.info( "updateFileUploadStatus() method completed" );
         return affectedColumns;
     }
+
 
     @Override
-    public int updateFileUploadStatusAndFileName(long fileUploadId, int status, String location) throws InvalidInputException {
+    public int updateFileUploadStatusAndFileName( long fileUploadId, int status, String location ) throws InvalidInputException
+    {
         int affectedColumns = 0;
-        LOG.info("updateFileUploadStatusAndFileName() method started");
-        affectedColumns = fileUploadDao.updateStatusAndFileName(fileUploadId,status,location);
-        LOG.info("updateFileUploadStatusAndFileName() method completed");
+        LOG.info( "updateFileUploadStatusAndFileName() method started" );
+        affectedColumns = fileUploadDao.updateStatusAndFileName( fileUploadId, status, location );
+        LOG.info( "updateFileUploadStatusAndFileName() method completed" );
         return affectedColumns;
     }
 
-    
+
     @SuppressWarnings ( "unchecked")
     private Map<Long, Long> getTotalTransactionCountForPast5Days()
     {
         LOG.debug( "getTotalTransactionCountForPast5Days() started" );
-        Response companiesListResponse = ssApiBatchIntergrationBuilder.getIntegrationApi().getTotalTransactionCountForPast5Days();
+        Response companiesListResponse = ssApiBatchIntergrationBuilder.getIntegrationApi()
+            .getTotalTransactionCountForPast5Days();
 
         String companiesListString = StringEscapeUtils.unescapeJava(
             companiesListResponse != null ? new String( ( (TypedByteArray) companiesListResponse.getBody() ).getBytes() )
@@ -4641,4 +4854,366 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         }
         return totalTransactionReceivedCount;
     }
+
+
+    private boolean checkForNpsQuestion( String profileLevel, long entityId )
+    {
+        LOG.trace( "checking if survey has nps question" );
+        if ( CommonConstants.PROFILE_LEVEL_COMPANY.equals( profileLevel ) ) {
+
+            return organizationManagementService.doesSurveyHaveNPSQuestions(
+                organizationManagementService.getCompanyById( entityId ).getUsers().get( CommonConstants.INITIAL_INDEX ) );
+
+        } else if ( CommonConstants.PROFILE_LEVEL_REGION.equals( profileLevel ) ) {
+
+            return organizationManagementService.doesSurveyHaveNPSQuestions(
+                userManagementService.getRegionById( entityId ).getCompany().getUsers().get( CommonConstants.INITIAL_INDEX ) );
+
+        } else if ( CommonConstants.PROFILE_LEVEL_BRANCH.equals( profileLevel ) ) {
+            return organizationManagementService.doesSurveyHaveNPSQuestions(
+                userManagementService.getBranchById( entityId ).getCompany().getUsers().get( CommonConstants.INITIAL_INDEX ) );
+        }
+
+        return false;
+    }
+
+
+    private void buildNpsSection( MonthlyDigestAggregate digestAggregate )
+    {
+        LOG.debug( " building NPS section for digest" );
+        if ( digestAggregate.isHavingNpsSection() ) {
+
+            digestAggregate.setNpsHtmlsection(
+                digestMailHelper.WrapDigestMailSection( digestMailHelper.getDigestMailSectionPaddingWithSeperator()
+                    + digestMailHelper.getDigestMailIntraSectionPadding()
+                    + digestMailHelper.wrapDigestMailSectionTitle( CommonConstants.DIGEST_NPS_SECTION_TITLE )
+                    + digestMailHelper.getDigestMailInterLinePadding()
+                    + digestMailHelper.wrapDigestMailSectionDescription( CommonConstants.DIGEST_NPS_SECTION_DESC )
+                    + digestMailHelper.getDigestMailIntraSectionPadding() + constructNpsComparisons( digestAggregate )
+                    + digestMailHelper.getDigestMailIntraSectionPadding()
+                    + digestMailHelper.wrapDigestMailSectionInference( digestAggregate.getNpsInferenceTxt() ) ) );
+
+        } else {
+            digestAggregate.setNpsHtmlsection( "" );
+        }
+
+    }
+
+
+    private String constructNpsComparisons( MonthlyDigestAggregate digestAggregate )
+    {
+        return digestMailHelper.wrapDigestMailSectionComparison( digestMailHelper.wrapDigestMailSectionComparisonElement(
+            constructNpsComparisonElement( digestAggregate.getDigestList().get( 2 ) ), CommonConstants.RIGHT )
+            + digestMailHelper.wrapDigestMailSectionComparisonElement(
+                constructNpsComparisonElement( digestAggregate.getDigestList().get( 1 ) ), CommonConstants.CENTER )
+            + digestMailHelper.wrapDigestMailSectionComparisonElement(
+                constructNpsComparisonElement( digestAggregate.getDigestList().get( 0 ) ), CommonConstants.LEFT ) );
+    }
+
+
+    private String constructNpsComparisonElement( DigestTemplateData digest )
+    {
+        return digestMailHelper
+            .wrapDigestMailSectionComparisonElementValue( digest.getNpsIcon() + digest.getNps() + " "
+                + digestMailHelper.wrapDigestMailTextWithSpan( CommonConstants.DIGEST_MAIL_NPS_TEXT, 14 ), 50 )
+            + digestMailHelper.wrapDigestMailSectionComparisonElementStats( digestMailHelper
+                .wrapDigestMailPromoterCountValue( digest.getNpsPromoters() + " "
+                    + digestMailHelper.wrapDigestMailTextWithSpan( CommonConstants.SURVEY_MOOD_GREAT, 9 ) )
+                + " / "
+                + digestMailHelper.wrapDigestMailDetractorCountValue( digest.getNpsDetractors() + " "
+                    + digestMailHelper.wrapDigestMailTextWithSpan( CommonConstants.SURVEY_MOOD_UNPLEASANT, 9 ) ) )
+            + digestMailHelper.wrapDigestMailSectionComparisonElementCount( digest.getTotalCompletedNpsReviews() + " "
+                + digestMailHelper.wrapDigestMailTextWithSpan( CommonConstants.TOTAL, 9 ) )
+            + digestMailHelper.getSectionComparisonElementIntraPadding()
+            + digestMailHelper.wrapDigestMailSectionComparisonElementMonth( StringUtils.upperCase( digest.getMonth() ) )
+            + digestMailHelper.getSectionComparisonElementInterPadding();
+
+    }
+
+
+    private void constructAndSaveDigestCopy( MonthlyDigestAggregate digestAggregate ) throws IOException, NonFatalException
+    {
+        LOG.debug( "saving a digest copy for an entity" );
+        digestMailHelper.validateDigestAggregate( digestAggregate, true );
+
+        // save the digest mail without the disclaimer
+        String digest = digestMailHelper.buildDigestMailReplacents( digestAggregate, null, null, null, true );
+
+        long currentTime = System.currentTimeMillis();
+
+        // create suitable file name for digest
+        String uploadedFileName = "DIGEST_" + digestAggregate.getProfileLevel() + "_" + digestAggregate.getEntityId() + "_"
+            + digestAggregate.getMonthUnderConcern() + "_" + digestAggregate.getYearUnderConcern() + "_" + currentTime
+            + ".html";
+
+        File digestHtml = new File( uploadedFileName );
+        FileUtils.writeStringToFile( digestHtml, digest );
+
+        // upload digest to s3
+        fileUploadService.uploadFileAtDigestBucket( digestHtml, uploadedFileName );
+
+        // remove file from file system
+        digestHtml.delete();
+
+        // create absolute file name
+        uploadedFileName = endpoint + "/" + digestBucket + CommonConstants.FILE_SEPARATOR + URLEncoder.encode( uploadedFileName, "UTF-8" );
+
+        // store the digest file name appropriately
+        SavedDigestRecord digestRecord = new SavedDigestRecord();
+
+        digestRecord.setAbsoluteFileName( uploadedFileName );
+        digestRecord.setUploadedDate( new Date( currentTime ) );
+        digestRecord.setMonth( digestAggregate.getMonthUnderConcern() );
+        digestRecord.setYear( digestAggregate.getYearUnderConcern() );
+
+        organizationUnitSettingsDao.saveDigestRecord( digestAggregate.getProfileLevel(), digestAggregate.getEntityId(),
+            digestRecord );
+
+    }
+
+
+    private void processDigestRequest( FileUpload fileUpload ) throws InvalidInputException
+    {
+        LOG.debug( "method processDigestRequest started" );
+
+        List<SavedDigestRecord> digestRecords = organizationUnitSettingsDao
+            .fetchSavedDigestRecords( fileUpload.getProfileLevel(), fileUpload.getProfileValue() ).getSavedDigestRecords();
+
+        if ( digestRecords != null && !digestRecords.isEmpty() ) {
+
+            Date endDate = fileUpload.getEndDate();
+            Calendar cal = Calendar.getInstance();
+            cal.setTime( endDate );
+            String month = new DateFormatSymbols().getMonths()[cal.get( Calendar.MONTH )];
+            String year = String.valueOf( cal.get( Calendar.YEAR ) );
+            SavedDigestRecord digest = null;
+            Date uploadedDate = new Date( CommonConstants.EPOCH_TIME_IN_MILLIS );
+            for ( SavedDigestRecord digestRecord : digestRecords ) {
+                if ( month.equals( digestRecord.getMonth() ) && year.equals( digestRecord.getYear() )
+                    && uploadedDate.before( digestRecord.getUploadedDate() ) ) {
+                    digest = digestRecord;
+                    uploadedDate = digest.getUploadedDate();
+                }
+            }
+
+            if ( digest != null ) {
+                fileUpload.setStatus( CommonConstants.STATUS_VIEW );
+                fileUpload.setFileName( digest.getAbsoluteFileName() );
+            } else {
+                fileUpload.setStatus( CommonConstants.STATUS_REPORT_NO_RECORDS );
+            }
+
+        } else {
+            fileUpload.setStatus( CommonConstants.STATUS_REPORT_NO_RECORDS );
+        }
+
+        LOG.debug( "method processDigestRequest finished" );
+    }
+
+
+    @Override
+	public String generateBranchRankingReportMonth(long profileValue, String profileLevel, long adminUserId,
+			Timestamp startDate) throws UnsupportedEncodingException, NonFatalException {
+		User user = userManagementService.getUserByUserId(adminUserId);
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTimeInMillis(startDate.getTime());
+		int year = calendar.get(Calendar.YEAR);
+		int month = calendar.get(Calendar.MONTH) + 1;
+		String fileName = "Branch_Ranking_Report_Month" + profileValue + "-" + user.getFirstName() + "_"
+				+ user.getLastName() + "-" + (Calendar.getInstance().getTimeInMillis())
+				+ CommonConstants.EXCEL_FILE_EXTENSION;
+		XSSFWorkbook workbook = this.downloadBranchRankingReportMonth(profileValue, profileLevel, year, month);
+		return this.createExcelFileAndSaveInAmazonS3(fileName, workbook);
+	}
+
+	private XSSFWorkbook downloadBranchRankingReportMonth(long entityId, String entityType, int year, int month) {
+		Response response = ssApiBatchIntergrationBuilder.getIntegrationApi().getBranchRankingReport(entityId,
+				month, year, 1);
+		String responseString = response != null ? new String(((TypedByteArray) response.getBody()).getBytes()) : null;
+		if (responseString != null) {
+			// since the string has ""abc"" an extra quote
+			responseString = responseString.substring(1, responseString.length() - 1);
+			// Escape characters
+			responseString = StringEscapeUtils.unescapeJava(responseString);
+		}
+		List<BranchRankingReportMonth> branchRankingReportMonth = null;
+		Type listType = new TypeToken<List<BranchRankingReportMonth>>() {
+		}.getType();
+		branchRankingReportMonth = new Gson().fromJson(responseString, listType);
+		Map<Integer, List<Object>> data = workbookData.getBranchRankingReportMonthInSheet(branchRankingReportMonth);
+		return workbookOperations.createWorkbook(data);
+	}
+
+	@Override
+	public String generateBranchRankingReportYear(long profileValue, String profileLevel, long adminUserId,
+			Timestamp startDate) throws UnsupportedEncodingException, NonFatalException {
+		User user = userManagementService.getUserByUserId(adminUserId);
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTimeInMillis(startDate.getTime());
+		int year = calendar.get(Calendar.YEAR);
+		String fileName = "Branch_Ranking_Report_Year" + profileValue + "-" + user.getFirstName() + "_"
+				+ user.getLastName() + "-" + (Calendar.getInstance().getTimeInMillis())
+				+ CommonConstants.EXCEL_FILE_EXTENSION;
+		XSSFWorkbook workbook = this.downloadBranchRankingReportYear(profileValue, profileLevel, year);
+		return this.createExcelFileAndSaveInAmazonS3(fileName, workbook);
+	}
+
+	private XSSFWorkbook downloadBranchRankingReportYear(long entityId, String entityType, int year) {
+		Response response = ssApiBatchIntergrationBuilder.getIntegrationApi().getBranchRankingReport(entityId,0,
+				year,2);
+		String responseString = response != null ? new String(((TypedByteArray) response.getBody()).getBytes()) : null;
+		if (responseString != null) {
+			// since the string has ""abc"" an extra quote
+			responseString = responseString.substring(1, responseString.length() - 1);
+			// Escape characters
+			responseString = StringEscapeUtils.unescapeJava(responseString);
+		}
+		List<BranchRankingReportYear> branchRankingReportYear = null;
+		Type listType = new TypeToken<List<BranchRankingReportYear>>() {
+		}.getType();
+		branchRankingReportYear = new Gson().fromJson(responseString, listType);
+		Map<Integer, List<Object>> data = workbookData.getBranchRankingReportYearInSheet(branchRankingReportYear);
+		return workbookOperations.createWorkbook(data);
+
+	}
+
+
+	@Override
+	public List<BranchRankingReportMonth> getBranchRankingReportForMonth(long companyId, int month, int year) throws InvalidInputException {
+		
+		if(companyId < 1){
+			throw new InvalidInputException("Invalid companyId.");
+		} 
+		if(month < 1 || month > 12){
+			throw new InvalidInputException("Invalid month value.");
+		}
+		if(year < 0){
+			throw new InvalidInputException("Invalid year value.");
+		}
+		
+		return branchRankingMonthDao.getBranchRankingForMonth(companyId,month,year);
+	}
+
+
+	@Override
+	public List<BranchRankingReportYear> getBranchRankingReportForYear(long companyId, int year) throws InvalidInputException {
+		if(companyId < 1){
+			throw new InvalidInputException("Invalid companyId.");
+		} 
+		if(year < 0){
+			throw new InvalidInputException("Invalid year value.");
+		}
+		
+		return branchRankingYearDao.getBranchRankingForYear(companyId,year);
+	}
+
+
+	@Override
+	public List<SurveyInvitationEmailCountMonth> getReceivedCountsMonth(long startDate, long endDate, int startIndex, int batchSize)
+			throws ParseException {
+		List<SurveyInvitationEmailCountMonth> receivedCountMonth = new ArrayList<SurveyInvitationEmailCountMonth>();
+		Calendar cal = Calendar.getInstance();
+		cal.setTimeInMillis(startDate);
+		int month = cal.get(Calendar.MONTH) + 1;
+		int year = cal.get(Calendar.YEAR);
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+		String startDateStr = sdf.format(new Date(startDate));
+		String endDateStr = sdf.format(new Date(endDate));
+		LOG.info("start date {} and end date {}",startDateStr,endDateStr);
+		List<Object[]> receivedCount = surveyPreInitiationDao.getReceivedCountForDate(startDateStr, endDateStr,
+				startIndex, batchSize);
+		LOG.info("Db returned row count : {}",receivedCount.size());
+		for (Object[] obj : receivedCount) {
+			if(obj[0] !=null && obj[1]!=null && obj[2] !=null) {
+				SurveyInvitationEmailCountMonth mailCount = new SurveyInvitationEmailCountMonth();
+				mailCount.setAgentId(new Long(obj[0].toString()));
+				mailCount.setReceived(new Long(obj[1].toString()));
+				mailCount.setCompanyId(new Long(obj[2].toString()));
+				mailCount.setMonth(month);
+				mailCount.setYear(year);
+				mailCount.setAgentName((String)obj[3]);
+				mailCount.setEmailId((String)obj[4]);
+				receivedCountMonth.add(mailCount);
+			}
+		}
+		return receivedCountMonth;
+
+	}
+
+	@Override
+	@Transactional
+	public boolean saveEmailCountMonthData(List<SurveyInvitationEmailCountMonth> agentEmailCountsMonth) {
+		try {
+			surveyEmailCountMonthDao.saveAll(agentEmailCountsMonth);
+			LOG.info("Survey invitaion email count data saved to db.");
+			return true;
+		} catch (Exception e) {
+			LOG.error("Exception occured while saving survey invitation email count to db.");
+			return false;
+		}
+	}
+
+
+	@Override
+	public String generateSurveyInvitationEmailReport(long companyId, String entityType, long adminUserId,
+			Timestamp startDate) throws UnsupportedEncodingException, NonFatalException {
+		LOG.info("Generating survey invitation email report.");
+		User user = userManagementService.getUserByUserId(adminUserId);
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTimeInMillis(startDate.getTime());
+		int year = calendar.get(Calendar.YEAR);
+		int month = calendar.get(Calendar.MONTH) + 1;
+		String monthStr = new DateFormatSymbols().getMonths()[month-1];
+		String fileName = "Email_Message_Report_Month_" + monthStr + "_" +
+				 user.getFirstName() + " " + user.getLastName() +
+				 ( Calendar.getInstance().getTimeInMillis() ) +
+				 CommonConstants.EXCEL_FILE_EXTENSION;
+		XSSFWorkbook workbook = this.downloadSurveyInvitationEmailReport(companyId, entityType, year, month);
+		return this.createExcelFileAndSaveInAmazonS3(fileName, workbook);
+	}
+
+
+	private XSSFWorkbook downloadSurveyInvitationEmailReport(long companyId, String entityType, int year, int month) {
+		Response response = ssApiBatchIntergrationBuilder.getIntegrationApi().getSurveyInvitationEmailReport(companyId,
+				month, year);
+		String responseString = response != null ? new String(((TypedByteArray) response.getBody()).getBytes()) : null;
+		if (responseString != null) {
+			// since the string has ""abc"" an extra quote
+			responseString = responseString.substring(1, responseString.length() - 1);
+			// Escape characters
+			responseString = StringEscapeUtils.unescapeJava(responseString);
+		}
+		List<SurveyInvitationEmailCountMonth> surveyInvitationEmailCountMonth = null;
+		Type listType = new TypeToken<List<SurveyInvitationEmailCountMonth>>() {
+		}.getType();
+		surveyInvitationEmailCountMonth = new Gson().fromJson(responseString, listType);
+		Map<Integer, List<Object>> data = workbookData.getSurveyInvitationEmailReportInSheet(surveyInvitationEmailCountMonth);
+		return workbookOperations.createWorkbook(data);
+	}
+
+
+	@Override
+	public List<SurveyInvitationEmailCountMonth> getSurveyInvitationEmailReportForMonth(long companyId, int month, int year) {
+		List<SurveyInvitationEmailCountMonth> mailCountReport = new ArrayList<SurveyInvitationEmailCountMonth>();
+		List<Object[]> reportList = surveyInvitationEmailDao.getSurveyInvitationEmailReportForMonth(companyId,month,year);
+		for(Object[] obj : reportList) {
+			SurveyInvitationEmailCountMonth reportObj = new SurveyInvitationEmailCountMonth();
+			reportObj.setAgentName((String)obj[0]);
+			reportObj.setEmailId((String)obj[1]);
+			reportObj.setBranchName((String)obj[2]);
+			reportObj.setRegionName((String)obj[3]);
+			reportObj.setReceived(new Long(obj[4].toString()));
+			reportObj.setAttempted(new Long(obj[5].toString()));
+			reportObj.setDelivered(new Long(obj[6].toString()));
+			reportObj.setBounced(new Long(obj[7].toString()));
+			reportObj.setDiffered(new Long(obj[8].toString()));
+			reportObj.setOpened(new Long(obj[9].toString()));
+			reportObj.setLinkClicked(new Long(obj[10].toString()));
+			reportObj.setDropped(new Long(obj[11].toString()));
+			mailCountReport.add(reportObj);
+		}
+		return mailCountReport;
+	}
 }

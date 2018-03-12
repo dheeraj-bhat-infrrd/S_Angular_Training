@@ -33,6 +33,8 @@
 		<retrofit.version>2.3.0</retrofit.version>
 		<!-- OKHttp3 -->
 		<okhttp3.version>3.9.0</okhttp3.version>
+		<!-- Hibernate -->
+		<hibernate.version>4.2.1.Final</hibernate.version>
 	</properties>
 
 	<dependencies>
@@ -160,6 +162,21 @@
 			<artifactId>aws-java-sdk-s3</artifactId>
 			<groupId>com.amazonaws</groupId>
 			<version>1.9.13</version>
+			<scope>compile</scope>
+		</dependency>
+		<!-- Dependency for solr java api -->
+		<dependency>
+			<groupId>org.apache.solr</groupId>
+			<artifactId>solr-solrj</artifactId>
+			<version>4.9.0</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<!-- MySQL Connector -->
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.6</version>
 			<scope>compile</scope>
 		</dependency>
 

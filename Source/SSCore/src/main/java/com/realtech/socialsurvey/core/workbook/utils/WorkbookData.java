@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +36,8 @@ import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostDetails;
+import com.realtech.socialsurvey.core.entities.BranchRankingReportMonth;
+import com.realtech.socialsurvey.core.entities.BranchRankingReportYear;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyDetailsReport;
 import com.realtech.socialsurvey.core.entities.NpsReportMonth;
@@ -46,6 +49,7 @@ import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.Survey;
 import com.realtech.socialsurvey.core.entities.SurveyCompanyMapping;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
+import com.realtech.socialsurvey.core.entities.SurveyInvitationEmailCountMonth;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionsMapping;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
@@ -73,6 +77,9 @@ public class WorkbookData
     public static final String EXCEL_FILE_EXTENSION = ".xlsx";
     public static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat( CommonConstants.DATE_FORMAT );
     public static final SimpleDateFormat REPORTING_DATE_FORMATTER = new SimpleDateFormat( CommonConstants.REPORTING_API_DATE_FORMAT );
+    private static final String SURVEY_INVITATION_EMAIL_REPORT_HEADER = "Agent Name,Agent Email,Agent Branch,Agent Region,"
+    		+ "Transactions Received for the Agent this month,Number of Emails sent for this agent this month,Number of emails delivered,"
+    		+ "Number of email bounced,Number of emails dropped,Number of emails deferred,Number of emails opened,Number of Surveys Clicked";
 
 
     @Autowired
@@ -96,6 +103,9 @@ public class WorkbookData
 
     @Autowired
     private GenericDao<SurveyQuestionsMapping, Long> surveyQuestionsMappingDao;
+    
+    @Value ( "${APPLICATION_BASE_URL}")
+    private String applicationBaseUrl;
 
 
     public Map<Integer, List<Object>> getCorruptSurveyDataToBeWrittenInSheet(
@@ -771,6 +781,8 @@ public class WorkbookData
             surveyResultsReportToPopulate.add(row.getValue().getUserFirstName());
             surveyResultsReportToPopulate.add(row.getValue().getUserLastName());
             surveyResultsReportToPopulate.add(row.getValue().getAgentEmailId());
+            surveyResultsReportToPopulate.add(row.getValue().getState());
+            surveyResultsReportToPopulate.add(row.getValue().getCity());
             surveyResultsReportToPopulate.add(row.getValue().getCustomerFirstName());
             surveyResultsReportToPopulate.add(row.getValue().getCustomerLastName());
             surveyResultsReportToPopulate.add(row.getValue().getCustomerEmailId());
@@ -848,6 +860,8 @@ public class WorkbookData
         surveyResultsCompanyReportToPopulate.add( "User First Name" );
         surveyResultsCompanyReportToPopulate.add( "User Last Name" );
         surveyResultsCompanyReportToPopulate.add( "User Email Address" );
+        surveyResultsCompanyReportToPopulate.add( "State" );
+        surveyResultsCompanyReportToPopulate.add( "City" );
         surveyResultsCompanyReportToPopulate.add( "Customer First Name" );
         surveyResultsCompanyReportToPopulate.add( "Customer Last Name" );
         surveyResultsCompanyReportToPopulate.add( "Customer Email Address" );
@@ -1393,4 +1407,119 @@ public class WorkbookData
         npsWeekReportData.put( 1, npsWeekReportDataToPopulate );
         return npsWeekReportData;
     }
+
+
+	public Map<Integer, List<Object>> getBranchRankingReportYearInSheet(
+			List<BranchRankingReportYear> branchRankingReportYear) {
+		Map<Integer, List<Object>> branchRankingReportData = writeBranchRankingReportHeader();
+		int counter = 2;
+		List<Object> branchRankingReportToPopulate = null;
+		for (BranchRankingReportYear branchRankingReport : branchRankingReportYear) {
+			branchRankingReportToPopulate = new ArrayList<Object>();
+
+			branchRankingReportToPopulate.add(branchRankingReport.getRankInCompany());
+			branchRankingReportToPopulate.add(branchRankingReport.getBranchId());
+			branchRankingReportToPopulate.add(branchRankingReport.getBranchName());
+			branchRankingReportToPopulate.add(branchRankingReport.getRegionName());
+			branchRankingReportToPopulate.add(branchRankingReport.getUserCount());
+			branchRankingReportToPopulate.add(branchRankingReport.getAverageScore());
+			branchRankingReportToPopulate.add(branchRankingReport.getRankingScore());
+			branchRankingReportToPopulate.add(branchRankingReport.getCompletionPercentage());
+			branchRankingReportToPopulate.add(branchRankingReport.getSps());
+			branchRankingReportToPopulate.add(getCompleteURL(branchRankingReport.getPublicPageURL()));
+
+			branchRankingReportData.put(counter++, branchRankingReportToPopulate);
+		}
+		return branchRankingReportData;
+	}
+
+	private String getCompleteURL(String publicPageURL) {
+		return applicationBaseUrl + CommonConstants.BRANCH_PROFILE_FIXED_URL + publicPageURL;
+	}
+
+
+	public Map<Integer, List<Object>> getBranchRankingReportMonthInSheet(
+			List<BranchRankingReportMonth> branchRankingReportMonth) {
+		Map<Integer, List<Object>> branchRankingReportData = writeBranchRankingReportHeader();
+		int counter = 2;
+		List<Object> branchRankingReportToPopulate = null;
+		for (BranchRankingReportMonth branchRankingReport : branchRankingReportMonth) {
+			branchRankingReportToPopulate = new ArrayList<Object>();
+
+			branchRankingReportToPopulate.add(branchRankingReport.getRankInCompany());
+			branchRankingReportToPopulate.add(branchRankingReport.getBranchId());
+			branchRankingReportToPopulate.add(branchRankingReport.getBranchName());
+			branchRankingReportToPopulate.add(branchRankingReport.getRegionName());
+			branchRankingReportToPopulate.add(branchRankingReport.getUserCount());
+			branchRankingReportToPopulate.add(branchRankingReport.getAverageScore());
+			branchRankingReportToPopulate.add(branchRankingReport.getRankingScore());
+			branchRankingReportToPopulate.add(branchRankingReport.getCompletionPercentage());
+			branchRankingReportToPopulate.add(branchRankingReport.getSps());
+			branchRankingReportToPopulate.add(getCompleteURL(branchRankingReport.getPublicPageURL()));
+
+			branchRankingReportData.put(counter++, branchRankingReportToPopulate);
+		}
+		return branchRankingReportData;
+	}
+
+	private Map<Integer, List<Object>> writeBranchRankingReportHeader() {
+		Map<Integer, List<Object>> branchRankingReportData = new TreeMap<Integer, List<Object>>();
+		List<Object> branchRankingReportDataToPopulate = new ArrayList<Object>();
+		branchRankingReportDataToPopulate.add("Ranking within Company");
+		branchRankingReportDataToPopulate.add("Branch ID");
+		branchRankingReportDataToPopulate.add("Branch Name");
+		branchRankingReportDataToPopulate.add("Region Name");
+		branchRankingReportDataToPopulate.add("Number of Users");
+		branchRankingReportDataToPopulate.add("Average Score");
+		branchRankingReportDataToPopulate.add("Ranking Score");
+		branchRankingReportDataToPopulate.add("Completion Percentage");
+		branchRankingReportDataToPopulate.add("SPS");
+		branchRankingReportDataToPopulate.add("Public Page URL");
+		branchRankingReportData.put(1, branchRankingReportDataToPopulate);
+		return branchRankingReportData;
+	}
+
+
+	public Map<Integer, List<Object>> getSurveyInvitationEmailReportInSheet(
+			List<SurveyInvitationEmailCountMonth> surveyInvitationEmailCountMonth) {
+		Map<Integer, List<Object>> surveyInvitationReportData = writeReportHeader(SURVEY_INVITATION_EMAIL_REPORT_HEADER);
+		
+		List<Object> surveyInvitationMailReportToPopulate = null;
+		int counter = 2;
+		for (SurveyInvitationEmailCountMonth surveyInvitationEmailMonth : surveyInvitationEmailCountMonth) {
+			surveyInvitationMailReportToPopulate = new ArrayList<Object>();
+
+			surveyInvitationMailReportToPopulate.add(surveyInvitationEmailMonth.getAgentName());
+			surveyInvitationMailReportToPopulate.add(surveyInvitationEmailMonth.getEmailId());
+			surveyInvitationMailReportToPopulate.add(surveyInvitationEmailMonth.getBranchName());
+			surveyInvitationMailReportToPopulate.add(surveyInvitationEmailMonth.getRegionName());
+			surveyInvitationMailReportToPopulate.add(surveyInvitationEmailMonth.getReceived());
+			surveyInvitationMailReportToPopulate.add(surveyInvitationEmailMonth.getAttempted());
+			surveyInvitationMailReportToPopulate.add(surveyInvitationEmailMonth.getDelivered());
+			surveyInvitationMailReportToPopulate.add(surveyInvitationEmailMonth.getBounced());
+			surveyInvitationMailReportToPopulate.add(surveyInvitationEmailMonth.getDropped());
+			surveyInvitationMailReportToPopulate.add(surveyInvitationEmailMonth.getDiffered());
+			surveyInvitationMailReportToPopulate.add(surveyInvitationEmailMonth.getOpened());
+			surveyInvitationMailReportToPopulate.add(surveyInvitationEmailMonth.getLinkClicked());
+
+			surveyInvitationReportData.put(counter++, surveyInvitationMailReportToPopulate);
+		}
+		return surveyInvitationReportData;
+	}
+	
+	/**
+	 * This method takes the report headers separated with ',' and writes to the map as the 1st row.
+	 * @param headers
+	 * @return
+	 */
+	private Map<Integer, List<Object>> writeReportHeader(String headers){
+		Map<Integer, List<Object>> reportDataToPopulate = new TreeMap<Integer, List<Object>>();
+		List<Object> headerList = new ArrayList<Object>();
+		String[] headerArr = headers.split(",");
+		for(String header : headerArr) {
+			headerList.add(header);
+		}
+		reportDataToPopulate.put(1, headerList);
+		return reportDataToPopulate;
+	}
 }

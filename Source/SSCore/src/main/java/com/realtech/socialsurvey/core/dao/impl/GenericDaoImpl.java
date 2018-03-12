@@ -464,5 +464,15 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
         }
         return crit.setResultTransformer( Transformers.aliasToBean( dataClass ) ).list();
     }
+
+
+	@Override
+	public void saveAll(List<T> entityList) {
+		// TODO Auto-generated method stub
+		for(T entity : entityList) {
+			save(entity);
+		}
+		
+	}
 }
 // JIRA: SS-8: By RM05: EOC

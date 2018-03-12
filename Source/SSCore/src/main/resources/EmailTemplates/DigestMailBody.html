@@ -94,11 +94,6 @@
          }
          @media only screen and (max-width: 480px){table[id="canspamBar"] td{font-size:14px !important;}}
       </style>
-      <style type="text/css">    
-         .user-ranking-display-toggle {
-         %s
-         }
-         </style>
    </head>
    <body bgcolor="#f8f8f8" style="margin:0 auto; padding:0; width: 100%; height: 100%; color: #555; font-size: 13px; font-family: Helvetica, Arial, sans-serif; text-align: center; -webkit-text-size-adjust: none;">
       <table class="wrapper" bgcolor="#000000" width="800" cellspacing="0" cellpadding="0" style="margin: 0 auto;">
@@ -556,52 +551,10 @@
                               </table>
                            </td>
                         </tr>
-                        <tr>
+                        %s<tr>
                            <td>
                               <table width="100%" bgcolor="#FFFFFF" cellspacing="0" cellpadding="0">
-                                 <tbody>
-                                    <tr>
-                                       <td height="60" style="font-size:0;line-height:0;border-bottom: 2px solid grey;"></td>
-                                    </tr>
-                                    <tr>
-                                       <td height="40" style="font-size:0;line-height:0;"></td>
-                                    </tr>
-                                    <tr class="user-ranking-display-toggle">
-                                       <td class="font-heading-bold" align="center" valign="middle" style="color: #333; font-size: 20px; line-height: 22px; font-family: Helvetica, Arial, sans-serif;"> Top 10 Users</td>
-                                    </tr>
-                                    <tr class="user-ranking-display-toggle">
-                                       <td height="20" style="font-size:0;line-height:0;"></td>
-                                    </tr>
-                                    <tr class="user-ranking-display-toggle">
-                                       <td align="center">
-                                          <table class="content-wrap wrap-260" width="100%" bgcolor="#FFFFFF" cellspacing="0" cellpadding="0">
-                                             <tbody>
-                                                <tr>
-                                                   <td class="font-light" align="center" style="color: #666; font-size: 16px; line-height: 20px; font-family: Helvetica, Arial, sans-serif;"> Congratulations to your top performers </td>
-                                                </tr>
-                                             </tbody>
-                                          </table>
-                                       </td>
-                                    </tr>
-                                    <tr class="user-ranking-display-toggle">
-                                       <td height="40" style="font-size:0;line-height:0;"></td>
-                                    </tr>
-                                    <tr class="user-ranking-display-toggle">
-                                       <td height="40" style="font-size:0;line-height:0;">
-                                          <table cellspacing="0" style="margin:0;padding:0;border:0;font:inherit;font-size:100%;vertical-align:baseline;border-collapse:collapse;border-spacing:0;font-size:1rem;line-height:1.28571rem;margin-bottom:1.28571rem;color:#555;border-collapse: separate; font-size: 12px; width: 100%;">
-                                             <thead style="margin:0;padding:0;border:0;font:inherit;font-size:100%;vertical-align:baseline">
-                                                <tr style="margin:0;padding:0;border:0;font:inherit;font-size:100%;vertical-align:baseline;background-color:#f1f1f1">
-                                                   <th style="margin:0;padding:0;border:0;font:inherit;font-size:100%;vertical-align:baseline;font-weight:normal;vertical-align:middle;font-size:1rem;line-height:1.28571rem;margin-bottom:1.28571rem;font-weight:700;text-align:left;padding:4.5px .5em;padding-left:0;padding-bottom:3.5px;border-bottom:1px solid #d2d2d2;text-align:left;padding-left:4px;border-bottom: 1px dotted #ccc; border-top: 2px solid #2f69aa; padding-top: 4px; padding-bottom: 8px;">Rank</th>
-                                                   <th style="margin:0;padding:0;border:0;font:inherit;font-size:100%;vertical-align:baseline;font-weight:normal;vertical-align:middle;font-size:1rem;line-height:1.28571rem;margin-bottom:1.28571rem;font-weight:700;text-align:left;padding:4.5px .5em;padding-bottom:3.5px;border-bottom:1px solid #d2d2d2;text-align:left;padding-left:4px;border-bottom: 1px dotted #ccc; border-top: 2px solid #2f69aa; padding-top: 4px; padding-bottom: 8px;">Name</th>
-                                                   <th style="margin:0;padding:0;border:0;font:inherit;font-size:100%;vertical-align:baseline;font-weight:normal;vertical-align:middle;font-size:1rem;line-height:1.28571rem;margin-bottom:1.28571rem;font-weight:700;text-align:left;padding:4.5px .5em;padding-bottom:3.5px;border-bottom:1px solid #d2d2d2;text-align:left;padding-left:4px;border-bottom: 1px dotted #ccc; border-top: 2px solid #2f69aa; padding-top: 4px; padding-bottom: 8px;">Average Score</th>
-                                                   <th style="margin:0;padding:0;border:0;font:inherit;font-size:100%;vertical-align:baseline;font-weight:normal;vertical-align:middle;font-size:1rem;line-height:1.28571rem;margin-bottom:1.28571rem;font-weight:700;text-align:left;padding:4.5px .5em;padding-right:0;padding-bottom:3.5px;border-bottom:1px solid #d2d2d2;text-align:left;padding-left:4px;border-bottom: 1px dotted#ccc; border-top: 2px solid #2f69aa; padding-top: 4px; padding-bottom: 8px;">Reviews</th>
-                                                </tr>
-                                             </thead>
-                                             <tbody style="margin:0;padding:0;border:0;font:inherit;font-size:100%;vertical-align:baseline">%s
-                                              </tbody>
-                                          </table>
-                                       </td>
-                                    </tr>
+                                 <tbody>%s
                                     <tr>
                                        <td height="40" style="font-size:0;line-height:0;"></td>
                                     </tr>
@@ -626,8 +579,6 @@
                                     </tr>
                                     <tr>
                                        <td height="40" style="font-size:0;line-height:0;"></td>
-                                    </tr>
-                                    <tr>
                                     </tr>
                                     <tr>
                                        <td align="center">
@@ -660,28 +611,6 @@
                </td>
             </tr>
          </tbody>
-      </table>
-      <center>
-         <table border="0" cellpadding="0" cellspacing="0" width="100%" id="canspamBarWrapper" style="background-color:#FFFFFF;">
-            <tbody>
-               <tr>
-                  <td align="center" valign="top" style="padding-top:20px; padding-bottom:20px;">
-                     <table border="0" cellpadding="0" cellspacing="0" id="canspamBar">
-                        <tbody>
-                           <tr>
-                              <td align="center" valign="top" style="color:#606060; font-family:Helvetica, Arial, sans-serif; font-size:11px; line-height:150%; padding-right:20px; padding-bottom:5px; padding-left:20px; text-align:center;">
-                                 <p>This email was sent to <a href="mailto:%s" style="color:#989ea6;font-weight:normal;text-decoration:underline;word-break:break-word;" target="_blank">%s</a>. You received this email because you have a SocialSurvey account. If you feel this was sent to you in error please contact <a href="mailto:support@socialsurvey.com" style="color:#989ea6;font-weight:normal;text-decoration:underline;word-break:break-word;" target="_blank">support@socialsurvey.com</a>. <br>
-                                    <br>
-                                    © Copyright 2017 SocialSurvey. Created by BuyersRoad, Inc. All Rights Reserved. 3000 Executive Pkwy, Suite 315, San Ramon, CA 94583. <a href="http://socialsurvey.me/survey/privacy-policy" style="color:#989ea6 !important;font-weight:bold;text-decoration:none;word-break:break-word;" target="_blank">Privacy Policy</a>
-                                 </p>
-                              </td>
-                           </tr>
-                        </tbody>
-                     </table>
-                  </td>
-               </tr>
-            </tbody>
-         </table>
-      </center>
+      </table>%s
    </body>
 </html>

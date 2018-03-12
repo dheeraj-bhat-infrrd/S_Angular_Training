@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.dao;
 
+import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
@@ -152,4 +153,7 @@ public interface SurveyPreInitiationDao extends GenericDao<SurveyPreInitiation, 
 
 
     void disconnectSurveysFromAgent( long agentId );
+
+
+	public List<Object[]> getReceivedCountForDate(String startDateStr, String endDateStr, int startIndex, int batchSize);
 }

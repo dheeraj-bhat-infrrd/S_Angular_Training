@@ -61,7 +61,7 @@ public class EncompassController extends AbstractController
     @ResponseBody
     @RequestMapping ( value = "/getcompanycredentials")
     public List<CompanyEncompassInfo> getCompanyCredentials( @QueryParam ( value = "state") String state,
-        @QueryParam ( value = "version") String version )
+        @QueryParam ( value = "version") String version, @QueryParam ( value = "status") String status )
     {
         List<CompanyEncompassInfo> crmInfoList = new ArrayList<CompanyEncompassInfo>();
         LOG.info( "Method to get the encompass credentials for all companies started." );
@@ -76,12 +76,24 @@ public class EncompassController extends AbstractController
 
             List<OrganizationUnitSettings> companyList = organizationManagementService.getCompanyListForEncompass( state, version );
 
+            
+            List<Long> companies = new ArrayList<>();
+            
+            // build company Identifier list
+            for ( OrganizationUnitSettings company : companyList ) {
+            	companies.add( company.getIden() );
+            }
+            
+            // get the list of active companies
+            companies = organizationManagementService.filterCompanyIdsByStatus( companies, status );
 
             for ( OrganizationUnitSettings company : companyList ) {
-                CompanyEncompassInfo companyEncompassInfo = new CompanyEncompassInfo();
-                companyEncompassInfo.setCompanyName( company.getProfileName() );
-                companyEncompassInfo.setEncompassCrmInfo( (EncompassCrmInfo) company.getCrm_info() );
-                crmInfoList.add( companyEncompassInfo );
+            	if( companies.contains(company.getIden() ) ) {
+	                CompanyEncompassInfo companyEncompassInfo = new CompanyEncompassInfo();
+	                companyEncompassInfo.setCompanyName( company.getProfileName() );
+	                companyEncompassInfo.setEncompassCrmInfo( (EncompassCrmInfo) company.getCrm_info() );
+	                crmInfoList.add( companyEncompassInfo );
+            	}
             }
 
         } catch ( NoRecordsFetchedException e ) {
@@ -90,7 +102,7 @@ public class EncompassController extends AbstractController
             LOG.error( "An exception occured while fetching the list of companies connected to encompass. Reason : " + e );
             throw new InternalServerException( new EncompassErrorCode(
                 CommonConstants.ERROR_CODE_ENCOMPASS_COMPANY_FETCH_FAILURE, CommonConstants.SERVICE_CODE_COMPANY_CRM_INFO,
-                "Error occured while fetching companies connected to encompass" ), e.getMessage() );
+                "Error occured while fetching companies connected to encompass" ), e.getMessage(), e );
         }
         LOG.info( "Method to get the encompass credentials for all companies finished." );
         return crmInfoList;
@@ -168,15 +180,15 @@ public class EncompassController extends AbstractController
                 LOG.error( "An error occured while testing encompass credentials. Reason : " + e.getMessage() );
                 throw new InternalServerException( new EncompassErrorCode( CommonConstants.ERROR_CODE_GENERAL,
                     CommonConstants.SERVICE_CODE_GENERAL, "Exception occured while testing connection" ),
-                    "Unable to connect to encompass server at the moment" );
+                    "Unable to connect to encompass server at the moment" , e );
             } catch ( HttpServerErrorException e ) {
                 LOG.error( "An error occured while testing encompass credentials. Reason : " + e.getMessage() );
                 throw new InternalServerException( new EncompassErrorCode( CommonConstants.ERROR_CODE_GENERAL,
                     CommonConstants.SERVICE_CODE_GENERAL, "Exception occured while testing connection" ),
-                    "Unable to connect to encompass server at the moment" );
+                    "Unable to connect to encompass server at the moment", e );
             } catch ( Exception e ) {
                 throw new InternalServerException( new EncompassErrorCode( CommonConstants.ERROR_CODE_GENERAL,
-                    CommonConstants.SERVICE_CODE_GENERAL, "Exception occured while testing connection" ), e.getMessage() );
+                    CommonConstants.SERVICE_CODE_GENERAL, "Exception occured while testing connection" ), e.getMessage(), e );
             }
         } catch ( BaseRestException e ) {
             response = getErrorResponse( e );

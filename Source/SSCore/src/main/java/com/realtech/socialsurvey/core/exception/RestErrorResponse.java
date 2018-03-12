@@ -14,6 +14,7 @@ public class RestErrorResponse {
 	private int errorCode;
 	private String message;
 	private String debugMessage;
+	private Throwable thrw;
 	private Map<String, String> messageArgs;
 
 	public int getHttpStatus() {
@@ -63,5 +64,15 @@ public class RestErrorResponse {
 	public void setMessageArgs(Map<String, String> messageArgs) {
 		this.messageArgs = messageArgs;
 	}
+
+    public Throwable getThrw()
+    {
+        return thrw;
+    }
+
+    public void setThrw( Throwable thrw )
+    {
+        this.thrw = thrw;
+    }
 
 }

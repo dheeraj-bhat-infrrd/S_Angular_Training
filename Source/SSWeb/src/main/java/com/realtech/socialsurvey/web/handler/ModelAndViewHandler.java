@@ -62,6 +62,8 @@ public class ModelAndViewHandler
     private static final String REVIEW_AGGREGATE = "reviewAggregate";
 
     private static final String PROFILE_URL = "pageUrl";
+    
+    private static final String COMPANY_NAME = "companyName";
 
     @Autowired
     private BotRequestUtils botRequestUtils;
@@ -88,6 +90,7 @@ public class ModelAndViewHandler
         model.addAttribute( FIND_A_PRO_COMPANY_PROFILE_NAME, profileAggregate.getFindAProCompanyProfileName() );
         model.addAttribute( COMPANY_PROFILE_NAME, profileAggregate.getCompanyProfileName() );
         model.addAttribute( PROFILE_URL, profileAggregate.getProfileUrl() );
+        model.addAttribute( COMPANY_NAME, profileAggregate.getCompanyName() );
 
         if ( CommonConstants.PROFILE_LEVEL_REGION.equals( profileAggregate.getProfileLevel() ) ) {
             model.addAttribute( REGION_PROFILE_NAME, profileAggregate.getProfileName() );
@@ -161,7 +164,7 @@ public class ModelAndViewHandler
             throw new InternalServerException(
                 new ProfileServiceErrorCode( errorCode, serviceId, "InvalidInputException occured while fetching "
                     + profileAggregate.getProfileLevel() + " profile: " + profileAggregate.getProfileName() ),
-                error.getMessage() );
+                error.getMessage(), error );
 
         } else if ( error instanceof InvalidSettingsStateException ) {
 
@@ -170,7 +173,7 @@ public class ModelAndViewHandler
             throw new InternalServerException(
                 new ProfileServiceErrorCode( errorCode, serviceId, "InvalidSettingsStateException occured while fetching "
                     + profileAggregate.getProfileLevel() + " profile: " + profileAggregate.getProfileName() ),
-                error.getMessage() );
+                error.getMessage(), error );
 
         } else if ( error instanceof ProfileNotFoundException ) {
 
@@ -195,7 +198,7 @@ public class ModelAndViewHandler
             throw new InternalServerException(
                 new ProfileServiceErrorCode( errorCode, serviceId, "Unknown Error occured while fetching "
                     + profileAggregate.getProfileLevel() + " profile:  " + profileAggregate.getProfileName() ),
-                error.getMessage() );
+                error.getMessage(), error );
         }
 
 

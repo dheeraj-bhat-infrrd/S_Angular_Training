@@ -9,6 +9,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.realtech.socialsurvey.core.entities.BranchRankingReportMonth;
+import com.realtech.socialsurvey.core.entities.BranchRankingReportYear;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyDetailsReport;
 import com.realtech.socialsurvey.core.entities.DigestRequestData;
@@ -21,6 +23,7 @@ import com.realtech.socialsurvey.core.entities.RankingRequirements;
 import com.realtech.socialsurvey.core.entities.SurveyResultsReportVO;
 import com.realtech.socialsurvey.core.entities.UserRanking;
 import com.realtech.socialsurvey.core.entities.ReportingSurveyPreInititation;
+import com.realtech.socialsurvey.core.entities.SurveyInvitationEmailCountMonth;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -330,4 +333,50 @@ public interface ReportingDashboardManagement
      * @return
      */
     public int updateFileUploadStatusAndFileName( long fileUploadId, int status, String location ) throws InvalidInputException;
+
+
+	/**
+	 * @param profileValue
+	 * @param profileLevel
+	 * @param adminUserId
+	 * @param startDate
+	 * @return
+	 * @throws NonFatalException 
+	 * @throws UnsupportedEncodingException 
+	 */
+	public String generateBranchRankingReportMonth(long profileValue, String profileLevel, long adminUserId,
+			Timestamp startDate) throws UnsupportedEncodingException, NonFatalException;
+
+
+	/**
+	 * @param profileValue
+	 * @param profileLevel
+	 * @param adminUserId
+	 * @param startDate
+	 * @return
+	 * @throws InvalidInputException 
+	 * @throws NonFatalException 
+	 * @throws UnsupportedEncodingException 
+	 */
+	public String generateBranchRankingReportYear(long profileValue, String profileLevel, long adminUserId,
+			Timestamp startDate) throws InvalidInputException, UnsupportedEncodingException, NonFatalException;
+
+
+	public List<BranchRankingReportMonth> getBranchRankingReportForMonth(long companyId, int month, int year) throws InvalidInputException;
+
+
+	public List<BranchRankingReportYear> getBranchRankingReportForYear(long companyId, int year) throws InvalidInputException;
+
+
+	public List<SurveyInvitationEmailCountMonth> getReceivedCountsMonth(long startDateInGmt, long endDateInGmt, int startIndex, int batchSize) throws ParseException;
+
+
+	public boolean saveEmailCountMonthData(List<SurveyInvitationEmailCountMonth> agentEmailCountsMonth);
+
+
+	public String generateSurveyInvitationEmailReport(long companyId, String entityType, long adminUserId,
+			Timestamp startDate) throws UnsupportedEncodingException, NonFatalException;
+
+
+	public List<SurveyInvitationEmailCountMonth> getSurveyInvitationEmailReportForMonth(long companyId, int month, int year);
 }

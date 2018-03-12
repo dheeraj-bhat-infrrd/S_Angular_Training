@@ -21,6 +21,12 @@ public class DigestTemplateData implements Serializable
     private String averageScoreRatingIcon;
     private String surveyCompletionRateIcon;
     private String spsIcon;
+    private String nps;
+    private String npsPromoters;
+    private String npsDetractors;
+    private String npsPassives;
+    private String totalCompletedNpsReviews;
+    private String npsIcon;
 
 
     public String getMonth()
@@ -203,6 +209,78 @@ public class DigestTemplateData implements Serializable
     }
 
 
+    public String getNps()
+    {
+        return nps;
+    }
+
+
+    public void setNps( String nps )
+    {
+        this.nps = nps;
+    }
+
+
+    public String getNpsPromoters()
+    {
+        return npsPromoters;
+    }
+
+
+    public void setNpsPromoters( String npsPromoters )
+    {
+        this.npsPromoters = npsPromoters;
+    }
+
+
+    public String getNpsDetractors()
+    {
+        return npsDetractors;
+    }
+
+
+    public void setNpsDetractors( String npsDetractors )
+    {
+        this.npsDetractors = npsDetractors;
+    }
+
+
+    public String getNpsPassives()
+    {
+        return npsPassives;
+    }
+
+
+    public void setNpsPassives( String npsPassives )
+    {
+        this.npsPassives = npsPassives;
+    }
+
+
+    public String getTotalCompletedNpsReviews()
+    {
+        return totalCompletedNpsReviews;
+    }
+
+
+    public void setTotalCompletedNpsReviews( String totalCompletedNpsReviews )
+    {
+        this.totalCompletedNpsReviews = totalCompletedNpsReviews;
+    }
+
+
+    public String getNpsIcon()
+    {
+        return npsIcon;
+    }
+
+
+    public void setNpsIcon( String npsIcon )
+    {
+        this.npsIcon = npsIcon;
+    }
+
+
     @Override
     public String toString()
     {
@@ -211,7 +289,9 @@ public class DigestTemplateData implements Serializable
             + completedTransactions + ", surveyCompletionRate=" + surveyCompletionRate + ", sps=" + sps + ", promoters="
             + promoters + ", detractors=" + detractors + ", passives=" + passives + ", totalCompletedReviews="
             + totalCompletedReviews + ", averageScoreRatingIcon=" + averageScoreRatingIcon + ", surveyCompletionRateIcon="
-            + surveyCompletionRateIcon + ", spsIcon=" + spsIcon + "]";
+            + surveyCompletionRateIcon + ", spsIcon=" + spsIcon + ", nps=" + nps + ", npsPromoters=" + npsPromoters
+            + ", npsDetractors=" + npsDetractors + ", npsPassives=" + npsPassives + ", totalCompletedNpsReviews="
+            + totalCompletedNpsReviews + ", npsIcon=" + npsIcon + "]";
     }
 
 }

@@ -8,7 +8,6 @@ import java.util.Map.Entry;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Criterion;
@@ -25,7 +24,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.GenericReportingDao;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 
@@ -393,5 +391,15 @@ public class GenericReportingDaoImpl<T, ID extends Serializable> implements Gene
         }
         return crit.setResultTransformer( Transformers.aliasToBean( dataClass ) ).list();
     }
+
+
+    @Override
+	public void saveAll(List<T> entityList) {
+		// TODO Auto-generated method stub
+		for(T entity : entityList) {
+			save(entity);
+		}
+		
+	}
 
 }

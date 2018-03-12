@@ -252,9 +252,9 @@
 						<c:set var="profileNameClass" value="profile-name-img-wrapper"></c:set>
 						<div id="prog-img-container"
 							class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper prog-img-container">
-							<div class="prog-img-container">
+							<div class="prog-img-container" style="background-color: white !important; display: flex;align-items: center;">
 								<img itemprop="primaryImageOfPage"
-									class="prof-image pos-relative"
+									class="prof-image pos-relative height-auto-resp"
 									src="${profile.profileImageUrlThumbnail}"
 									alt="Photo of ${profName}"></img>
 							</div>
@@ -840,6 +840,27 @@
 										<c:if test="${integerRating == 0}">
 											<c:set var="integerRating" value="1"></c:set>
 										</c:if>
+										
+										<c:if test="${ not empty reviewItem.customerLastName }">
+											<c:set value="${ reviewItem.customerFirstName } ${ reviewItem.customerLastName }" var="customerName"></c:set>
+										</c:if>
+										
+										<c:if test="${ empty reviewItem.customerLastName }">
+											<c:set value="${ reviewItem.customerFirstName }" var="customerName"></c:set>
+										</c:if>
+										
+										
+										<c:set value="${fn:split(customerName, ' ')}" var="nameArray"></c:set>
+										
+										<c:choose>
+											<c:when test="${ not empty nameArray[1] }">
+												<c:set value="${ nameArray[0] } ${ nameArray[1].substring( 0, 1 ).toUpperCase() }" var="customerDisplayName"></c:set>
+											</c:when>
+											<c:otherwise>
+												<c:set value="${ nameArray[0] }" var="customerDisplayName"></c:set>
+											</c:otherwise>
+										</c:choose>
+										
 										<div itemprop="review" itemscope
 											itemtype="http://schema.org/Review" class="ppl-review-item"
 											data-cust-first-name="${reviewItem.customerFirstName }"
@@ -945,21 +966,7 @@
 													</c:choose>
 													<div class="ppl-head-1 " style="clear: both">
 														<span class="float-left"> Reviewed by </span>
-														<c:choose>
-															<c:when
-																test="${fn:toLowerCase(reviewItem.customerLastName) eq 'null'}">
-																<span class="float-left"
-																	style="margin-left: 5px; font-weight: 600 !important;">
-																	${reviewItem.customerFirstName} </span>
-															</c:when>
-															<c:otherwise>
-																<span class="float-left"
-																	style="margin-left: 5px; font-weight: 600 !important;">
-																	${reviewItem.customerFirstName}
-																	${reviewItem.customerLastName}</span>
-															</c:otherwise>
-														</c:choose>
-
+														<span>${customerDisplayName}</span>
 														<c:if test="${profilemasterid !=4}">
 															<c:if test="${not empty reviewItem.agentName}">
 																<span class="float-left" style="margin-left: 5px;">for

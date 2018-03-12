@@ -137,23 +137,14 @@
   <hop> <from>jsArrays</from><to>jsGenerateRows</to><enabled>Y</enabled> </hop>
   <hop> <from>Usersinput</from><to>Modified Java Script Value 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter rows</from><to>LastDay</to><enabled>Y</enabled> </hop>
-  <hop> <from>LastDay</from><to>Calculator</to><enabled>Y</enabled> </hop>
   <hop> <from>Calculator</from><to>Sort rows 6</to><enabled>Y</enabled> </hop>
   <hop> <from>AverageScoreGroupBy</from><to>Sort rows 2 3</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter Sentrows</from><to>Sort rowsSent</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter rows 2</from><to>Sort rows</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter rows 2 2</from><to>Sort rows 4</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter rows 2 2 2</from><to>Sort rows 5</to><enabled>Y</enabled> </hop>
-  <hop> <from>FilterCompleted</from><to>Sort rowsCompleted</to><enabled>Y</enabled> </hop>
   <hop> <from>Generate random value</from><to>Table output</to><enabled>Y</enabled> </hop>
   <hop> <from>GroupByAgentId</from><to>Sort rows 2 2</to><enabled>Y</enabled> </hop>
   <hop> <from>GroupByMood</from><to>jsForMood</to><enabled>Y</enabled> </hop>
-  <hop> <from>GroupCompleted</from><to>Filter rows 2 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>GroupSent</from><to>Filter rows 2 2 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Join 2</from><to>Modified Java Script Value</to><enabled>Y</enabled> </hop>
-  <hop> <from>MergeSurveyDetailsID</from><to>Filter rows 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Modified Java Script Value</from><to>Sort rows 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>Select values</from><to>jsForMainValues</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows</from><to>Memory Group by</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows 3</from><to>GroupByAgentId</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows 4</from><to>Merge Join 2</to><enabled>Y</enabled> </hop>
@@ -182,23 +173,26 @@
   <hop> <from>jsMinRequirements</from><to>DatabaseFirstNameLAst</to><enabled>Y</enabled> </hop>
   <hop> <from>DatabaseFirstNameLAst</from><to>DatabaseId</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Join 5</from><to>companyFinal</to><enabled>Y</enabled> </hop>
-  <hop> <from>companyFinal</from><to>FilterCompleted</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Join</from><to>javaComb</to><enabled>Y</enabled> </hop>
   <hop> <from>javaComb</from><to>Filter Sentrows</to><enabled>Y</enabled> </hop>
   <hop> <from>Null to Zero</from><to>Select values 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Select values 2</from><to>jsMinRequirements</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows 8</from><to>Database join</to><enabled>Y</enabled> </hop>
   <hop> <from>Database join</from><to>Null to Zero</to><enabled>Y</enabled> </hop>
-  <hop> <from>companyFinal</from><to>Filter rows 4 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter rows 4 2</from><to>SortMood</to><enabled>Y</enabled> </hop>
-  <hop> <from>companyFinal</from><to>Filter rows 4 2 2</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter rows 4 2 2</from><to>Sort rows 10 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>Database join FOR NMLS</from><to>Filter rows 3</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter rows 3</from><to>Sort rows 11</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows 2</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows 2 2</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows 2 3</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Multiway Merge Join</from><to>Select values</to><enabled>Y</enabled> </hop>
-  <hop> <from>Database join FOR NMLS</from><to>Filter rows 3</to><enabled>Y</enabled> </hop>
-  <hop> <from>Filter rows 3</from><to>Sort rows 11</to><enabled>Y</enabled> </hop>
+  <hop> <from>Multiway Merge Join</from><to>jsForMainValues</to><enabled>Y</enabled> </hop>
+  <hop> <from>companyFinal</from><to>Sort rows 10 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>companyFinal</from><to>SortMood</to><enabled>Y</enabled> </hop>
+  <hop> <from>companyFinal</from><to>Sort rowsCompleted</to><enabled>Y</enabled> </hop>
+  <hop> <from>MergeSurveyDetailsID</from><to>Sort rows</to><enabled>Y</enabled> </hop>
+  <hop> <from>GroupSent</from><to>Sort rows 5</to><enabled>Y</enabled> </hop>
+  <hop> <from>GroupCompleted</from><to>Sort rows 4</to><enabled>Y</enabled> </hop>
+  <hop> <from>LastDay</from><to>Select values</to><enabled>Y</enabled> </hop>
+  <hop> <from>Select values</from><to>Calculator</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>AverageScoreGroupBy</name>
@@ -214,13 +208,13 @@
       <give_back_row>N</give_back_row>
       <group>
         <field>
-          <name>AGENT_ID</name>
+          <name>AGENT_ID_f</name>
         </field>
         <field>
-          <name>MONTH_Data</name>
+          <name>MONTH_Data_f</name>
         </field>
         <field>
-          <name>Year_Data</name>
+          <name>Year_Data_f</name>
         </field>
       </group>
       <fields>
@@ -248,6 +242,18 @@
           <type>FIRST</type>
           <valuefield/>
         </field>
+        <field>
+          <aggregate>total_questions</aggregate>
+          <subject>total_questions</subject>
+          <type>SUM</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>answer_sum</aggregate>
+          <subject>answer_sum</subject>
+          <type>SUM</type>
+          <valuefield/>
+        </field>
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -271,9 +277,9 @@
        <calculation><field_name>DaysOfRegistration</field_name>
 <calc_type>DATE_DIFF</calc_type>
 <field_a>LastDayOfMonthString</field_a>
-<field_b>CREATED_ON</field_b>
+<field_b>CREATED_ON_EST</field_b>
 <field_c/>
-<value_type>None</value_type>
+<value_type>Integer</value_type>
 <value_length>-1</value_length>
 <value_precision>-1</value_precision>
 <remove>N</remove>
@@ -284,8 +290,8 @@
 </calculation>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>281</xloc>
-      <yloc>135</yloc>
+      <xloc>32</xloc>
+      <yloc>101</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -338,7 +344,7 @@
     <replace_vars>N</replace_vars>
     <parameter>
       <field>
-        <name>AGENT_ID</name>
+        <name>AGENT_ID_fi</name>
         <type>None</type>
       </field>
     </parameter>
@@ -363,12 +369,12 @@
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
     <rowlimit>0</rowlimit>
-    <sql>select FIRST_NAME , LAST_NAME , EMAIL_ID, DATEDIFF&#x28;DATE&#x28;NOW&#x28;&#x29;&#x29;, CREATED_ON_EST&#x29; AS days_of_registration  from users where user_id &#x3d; &#x3f;</sql>
+    <sql>select FIRST_NAME , LAST_NAME , EMAIL_ID from users where user_id &#x3d; &#x3f;</sql>
     <outer_join>Y</outer_join>
     <replace_vars>N</replace_vars>
     <parameter>
       <field>
-        <name>AGENT_ID</name>
+        <name>AGENT_ID_fi</name>
         <type>None</type>
       </field>
     </parameter>
@@ -398,7 +404,7 @@
     <replace_vars>N</replace_vars>
     <parameter>
       <field>
-        <name>AGENT_ID</name>
+        <name>AGENT_ID_fi</name>
         <type>None</type>
       </field>
     </parameter>
@@ -481,100 +487,8 @@
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>72</xloc>
-      <yloc>145</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Filter rows 2</name>
-    <type>FilterRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<send_true_to>Sort rows</send_true_to>
-<send_false_to/>
-    <compare>
-<condition>
- <negated>N</negated>
- <conditions>
-  <condition>
-   <negated>N</negated>
-   <leftvalue>IS_USER_RANKING_QUESTION</leftvalue>
-   <function>&#x3d;</function>
-   <rightvalue/>
-   <value><name>constant</name><type>String</type><text>1</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
-  </conditions>
- </condition>
-    </compare>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>643</xloc>
-      <yloc>444</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Filter rows 2 2</name>
-    <type>FilterRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<send_true_to>Sort rows 4</send_true_to>
-<send_false_to/>
-    <compare>
-<condition>
- <negated>N</negated>
- <leftvalue>PRESENT_MONTH</leftvalue>
- <function>&#x3c;&#x3e;</function>
- <rightvalue>MONTH_Data</rightvalue>
- </condition>
-    </compare>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>988</xloc>
-      <yloc>238</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Filter rows 2 2 2</name>
-    <type>FilterRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<send_true_to>Sort rows 5</send_true_to>
-<send_false_to/>
-    <compare>
-<condition>
- <negated>N</negated>
- <leftvalue>PRESENT_MONTH</leftvalue>
- <function>&#x3c;&#x3e;</function>
- <rightvalue>MONTH_Data</rightvalue>
- </condition>
-    </compare>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>976</xloc>
-      <yloc>145</yloc>
+      <xloc>453</xloc>
+      <yloc>101</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -601,14 +515,14 @@
    <conditions>
     <condition>
      <negated>N</negated>
-     <leftvalue>MONTH_Data</leftvalue>
+     <leftvalue>MONTH_Data_fi</leftvalue>
      <function>&#x3d;</function>
      <rightvalue>PRESENT_MONTH_CHECK</rightvalue>
      </condition>
     <condition>
      <negated>N</negated>
      <operator>AND</operator>
-     <leftvalue>Year_Data</leftvalue>
+     <leftvalue>YEAR_Data_fi</leftvalue>
      <function>&#x3d;</function>
      <rightvalue>PRESENT_YEAR_FINAL_CHECK</rightvalue>
      </condition>
@@ -626,140 +540,10 @@
     </step>
 
   <step>
-    <name>Filter rows 4 2</name>
-    <type>FilterRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<send_true_to>SortMood</send_true_to>
-<send_false_to/>
-    <compare>
-<condition>
- <negated>N</negated>
- <conditions>
-  <condition>
-   <negated>N</negated>
-   <leftvalue>SURVEY_SOURCE</leftvalue>
-   <function>&#x3c;&#x3e;</function>
-   <rightvalue/>
-   <value><name>constant</name><type>String</type><text>Zillow</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
-  <condition>
-   <negated>N</negated>
-   <operator>AND</operator>
-   <leftvalue>SURVEY_SOURCE</leftvalue>
-   <function>&#x3c;&#x3e;</function>
-   <rightvalue/>
-   <value><name>constant</name><type>String</type><text>3rd Party Review</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
-  </conditions>
- </condition>
-    </compare>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>529</xloc>
-      <yloc>322</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Filter rows 4 2 2</name>
-    <type>FilterRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<send_true_to>Sort rows 10 2</send_true_to>
-<send_false_to/>
-    <compare>
-<condition>
- <negated>N</negated>
- <conditions>
-  <condition>
-   <negated>N</negated>
-   <leftvalue>SURVEY_SOURCE</leftvalue>
-   <function>&#x3c;&#x3e;</function>
-   <rightvalue/>
-   <value><name>constant</name><type>String</type><text>Zillow</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
-  <condition>
-   <negated>N</negated>
-   <operator>AND</operator>
-   <leftvalue>SURVEY_SOURCE</leftvalue>
-   <function>&#x3c;&#x3e;</function>
-   <rightvalue/>
-   <value><name>constant</name><type>String</type><text>3rd Party Review</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
-  </conditions>
- </condition>
-    </compare>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>420</xloc>
-      <yloc>369</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>FilterCompleted</name>
-    <type>FilterRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<send_true_to>Sort rowsCompleted</send_true_to>
-<send_false_to/>
-    <compare>
-<condition>
- <negated>N</negated>
- <conditions>
-  <condition>
-   <negated>N</negated>
-   <leftvalue>stage</leftvalue>
-   <function>&#x3d;</function>
-   <rightvalue/>
-   <value><name>constant</name><type>Integer</type><text>-1</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>   </condition>
-  <condition>
-   <negated>N</negated>
-   <operator>AND</operator>
-   <leftvalue>SURVEY_SOURCE</leftvalue>
-   <function>&#x3c;&#x3e;</function>
-   <rightvalue/>
-   <value><name>constant</name><type>String</type><text>3rd Party Review</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
-  <condition>
-   <negated>N</negated>
-   <operator>AND</operator>
-   <leftvalue>SURVEY_SOURCE</leftvalue>
-   <function>&#x3c;&#x3e;</function>
-   <rightvalue/>
-   <value><name>constant</name><type>String</type><text>Zillow</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
-  </conditions>
- </condition>
-    </compare>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>617</xloc>
-      <yloc>244</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
     <name>Generate random value</name>
     <type>RandomValue</type>
     <description/>
-    <distribute>Y</distribute>
+    <distribute>N</distribute>
     <custom_distribution/>
     <copies>1</copies>
          <partitioning>
@@ -794,13 +578,13 @@
       <give_back_row>N</give_back_row>
       <group>
         <field>
-          <name>AGENT_ID</name>
+          <name>AGENT_ID_f</name>
         </field>
         <field>
-          <name>MONTH_Data</name>
+          <name>MONTH_Data_f</name>
         </field>
         <field>
-          <name>Year_Data</name>
+          <name>Year_Data_f</name>
         </field>
       </group>
       <fields>
@@ -828,12 +612,6 @@
           <type>FIRST</type>
           <valuefield/>
         </field>
-        <field>
-          <aggregate>TRX_MONTH</aggregate>
-          <subject>TRX_MONTH</subject>
-          <type>FIRST</type>
-          <valuefield/>
-        </field>
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -857,13 +635,13 @@
       <give_back_row>N</give_back_row>
       <group>
         <field>
-          <name>AGENT_ID</name>
+          <name>AGENT_ID_f</name>
         </field>
         <field>
-          <name>MONTH_Data</name>
+          <name>MONTH_Data_f</name>
         </field>
         <field>
-          <name>Year_Data</name>
+          <name>Year_Data_f</name>
         </field>
         <field>
           <name>MOOD</name>
@@ -878,7 +656,7 @@
         </field>
         <field>
           <aggregate>COMPANY_ID</aggregate>
-          <subject>COMPANY_ID</subject>
+          <subject>COMPANY_ID_f</subject>
           <type>FIRST</type>
           <valuefield/>
         </field>
@@ -1070,7 +848,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-      <replaceAllByValue>0</replaceAllByValue>
+      <replaceAllByValue/>
       <replaceAllMask/>
       <selectFields>Y</selectFields>
       <selectValuesType>N</selectValuesType>
@@ -1079,25 +857,19 @@
       </valuetypes>
     <fields>
       <field>
-        <name>RankingScore</name>
+        <name>AGENT_ID</name>
         <value>0</value>
         <mask/>
         <set_empty_string>N</set_empty_string>
         </field>
       <field>
-        <name>BRANCH_ID</name>
+        <name>MONTH_Data</name>
         <value>0</value>
         <mask/>
         <set_empty_string>N</set_empty_string>
         </field>
       <field>
-        <name>REGION_ID</name>
-        <value>0</value>
-        <mask/>
-        <set_empty_string>N</set_empty_string>
-        </field>
-      <field>
-        <name>NMLS_ID</name>
+        <name>Year_Data</name>
         <value>0</value>
         <mask/>
         <set_empty_string>N</set_empty_string>
@@ -1109,13 +881,415 @@
         <set_empty_string>N</set_empty_string>
         </field>
       <field>
+        <name>first_name</name>
+        <value/>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>last_name</name>
+        <value/>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>days_of_registration</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>COMPANY_ID</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>PRESENT_MONTH</name>
+        <value/>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>EMAIL_ID</name>
+        <value/>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>TRX_MONTH</name>
+        <value/>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>AGENT_ID_1</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>MONTH_DATA_1</name>
+        <value/>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>Year_Data_1</name>
+        <value/>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>Sent</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>first_name_1</name>
+        <value/>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>last_name_1</name>
+        <value/>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>days_of_registration_1</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>COMPANY_ID_1</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>PRESENT_MONTH_1</name>
+        <value/>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>EMAIL_ID_1</name>
+        <value/>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>month_row</name>
+        <value/>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>complete_percentage</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
         <name>total_sent</name>
         <value>0</value>
         <mask/>
         <set_empty_string>N</set_empty_string>
         </field>
       <field>
-        <name>complete_percentage</name>
+        <name>AGENT_ID_temp</name>
+        <value/>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>month_data_final</name>
+        <value/>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>year_data_final</name>
+        <value/>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>AGENT_ID_f</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>MONTH_Data_f</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>Year_Data_f</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>total_detractors</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>total_passives</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>total_promoters</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>COMPANY_ID_2</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>AGENT_ID_f_1</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>MONTH_Data_f_1</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>Year_Data_f_1</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>AverageScore</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>SocialSurveyCount</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>COMPANY_ID_3</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>TRX_MONTH_1</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>total_questions</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>answer_sum</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>AGENT_ID_fi</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>final_company_id</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>MONTH_Data_fi</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>YEAR_Data_fi</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>sps</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>total_reviews</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>rank</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>max_eligible_rank</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>TODAY</name>
+        <value/>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>PRESENT_MONTH_FINAL_CHECK</name>
+        <value/>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>PRESENT_YEAR_FINAL_CHECK</name>
+        <value/>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>PRESENT_MONTH_CHECK</name>
+        <value/>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>MIN_REQUIREMENT_ID</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>COMPANY_ID_MIN</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>MIN_DAYS_OF_REGISTRATION</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>MIN_COMPLETED_PERCENTAGE</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>MIN_NO_OF_REVIEWS</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>MONTH_OFFSET</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>YEAR_OFFSET</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>days_of_registration_final</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>avg_rating_final</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>MONTH_YEAR_FINAL</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>is_eligable</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>RankingScore</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>FIRST_NAME_2</name>
+        <value/>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>LAST_NAME_2</name>
+        <value/>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>EMAIL_ID_2</name>
+        <value/>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>REGION_ID</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>BRANCH_ID</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
+      <field>
+        <name>NMLS_ID</name>
         <value>0</value>
         <mask/>
         <set_empty_string>N</set_empty_string>
@@ -1144,16 +1318,16 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;function LastDayOfMonth&#x28;Year, Month&#x29; &#x7b;&#xd;&#xa;    return new Date&#x28; &#x28;new Date&#x28;Year, Month,1&#x29;&#x29;-1 &#x29;&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var Year_Data &#x3d; month_row.substring&#x28;0,4&#x29;&#x3b;&#xd;&#xa;var MONTH_DATA &#x3d; month_row.substring&#x28;5,7&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;var LastDayOfMonthString &#x3d; LastDayOfMonth&#x28;Year_Data ,  MONTH_DATA &#x29;&#xd;&#xa;&#xd;&#xa;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;function LastDayOfMonth&#x28;Year, Month&#x29; &#x7b;&#xd;&#xa;    return &#x28;new Date&#x28;Year, Month,0,23,59,59&#x29;&#x29;&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var Year_Data &#x3d; month_row.substring&#x28;0,4&#x29;&#x3b;&#xd;&#xa;var MONTH_DATA &#x3d; month_row.substring&#x28;5,7&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;var LastDayOfMonthString &#x3d; LastDayOfMonth&#x28;Year_Data ,  MONTH_DATA &#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>Year_Data</name>
         <rename>Year_Data</rename>
-        <type>String</type>
+        <type>Integer</type>
         <length>-1</length>
         <precision>-1</precision>
         <replace>N</replace>
       </field>      <field>        <name>MONTH_DATA</name>
         <rename>MONTH_DATA</rename>
-        <type>String</type>
+        <type>Integer</type>
         <length>-1</length>
         <precision>-1</precision>
         <replace>N</replace>
@@ -1165,8 +1339,8 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>193</xloc>
-      <yloc>138</yloc>
+      <xloc>343</xloc>
+      <yloc>101</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1185,13 +1359,13 @@
       <give_back_row>N</give_back_row>
       <group>
         <field>
-          <name>AGENT_ID</name>
+          <name>AGENT_ID_f</name>
         </field>
         <field>
-          <name>MONTH_Data</name>
+          <name>MONTH_Data_f</name>
         </field>
         <field>
-          <name>Year_Data</name>
+          <name>Year_Data_f</name>
         </field>
         <field>
           <name>SURVEY_DETAILS_ID</name>
@@ -1214,6 +1388,18 @@
           <aggregate>TRX_MONTH</aggregate>
           <subject>TRX_MONTH</subject>
           <type>FIRST</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>total_questions</aggregate>
+          <subject>ANSWER</subject>
+          <type>COUNT_ALL</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>answer_sum</aggregate>
+          <subject>ANSWER</subject>
+          <type>SUM</type>
           <valuefield/>
         </field>
       </fields>
@@ -1305,9 +1491,13 @@
 <step2>Sort rows 6 2</step2>
     <keys_1>
       <key>AGENT_ID</key>
+      <key>MONTH_Data</key>
+      <key>Year_Data</key>
     </keys_1>
     <keys_2>
       <key>USER_ID</key>
+      <key>MONTH_DATA</key>
+      <key>Year_Data</key>
     </keys_2>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -1360,67 +1550,37 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var complete_percentage &#x3d; 0&#x3b;&#xd;&#xa;var total_sent &#x3d; Sent &#x2b; Completed&#xd;&#xa;if&#x28;total_sent &#x21;&#x3d; 0 &#x26;&#x26; total_sent  &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;		complete_percentage &#x3d; &#x28;Completed&#x2f;total_sent &#x29;&#x2a;100.00&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var AGENT_ID_temp &#x3d; 0&#xd;&#xa;&#xd;&#xa;if&#x28;AGENT_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	AGENT_ID_temp &#x3d; AGENT_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	AGENT_ID_temp  &#x3d; AGENT_ID_1&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var COMPANY_ID&#xd;&#xa;&#xd;&#xa;if&#x28;COMPANY_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	COMPANY_ID_temp &#x3d; COMPANY_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;COMPANY_ID_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	COMPANY_ID_temp  &#x3d; COMPANY_ID_1&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var first_name&#xd;&#xa;&#xd;&#xa;if&#x28;first_name &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  first_name &#x3d; first_name&#x3b;&#xd;&#xa;&#x7d;else if&#x28;first_name_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  first_name &#x3d; first_name_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var last_name&#xd;&#xa;&#xd;&#xa;if&#x28;last_name &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  last_name &#x3d; last_name&#x3b;&#xd;&#xa;&#x7d;else if&#x28;last_name_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  last_name &#x3d; last_name_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var MONTH_Data&#xd;&#xa;&#xd;&#xa;if&#x28;MONTH_Data&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa; MONTH_Data &#x3d; MONTH_Data&#x3b;&#xd;&#xa;&#x7d;else if&#x28;MONTH_DATA_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  MONTH_Data &#x3d;MONTH_DATA_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var Year_Data&#xd;&#xa;&#xd;&#xa;if&#x28;Year_Data &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa; Year_Data &#x3d; Year_Data&#x3b;&#xd;&#xa;&#x7d;else if&#x28;Year_Data_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  Year_Data &#x3d; Year_Data_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var days_of_registration&#xd;&#xa;&#xd;&#xa;if&#x28;days_of_registration &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa; days_of_registration &#x3d; days_of_registration&#x3b;&#xd;&#xa;&#x7d;else if&#x28;days_of_registration_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  days_of_registration &#x3d; days_of_registration_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var EMAIL_ID&#xd;&#xa;&#xd;&#xa;if&#x28;EMAIL_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;EMAIL_ID &#x3d; EMAIL_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;EMAIL_ID_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  EMAIL_ID&#x3d; EMAIL_ID_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var complete_percentage &#x3d; 0.000&#x3b;&#xd;&#xa;var total_sent &#x3d; Sent &#x2b; Completed&#x3b;&#xd;&#xa;if&#x28;total_sent &#x21;&#x3d; 0 &#x26;&#x26; total_sent  &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;		complete_percentage &#x3d; &#x28;Completed&#x2f;total_sent &#x29;&#x2a;100.00&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var AGENT_ID_temp &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;AGENT_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	AGENT_ID_temp &#x3d; AGENT_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	AGENT_ID_temp  &#x3d; AGENT_ID_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xa;var month_data_final &#x3d; 0&#x3b;&#xa;var year_data_final &#x3d; 0&#x3b;&#xa;&#xa;if&#x28;MONTH_Data &#x21;&#x3d; null&#x29;&#x7b;&#xa;	month_data_final &#x3d; MONTH_Data&#x3b;&#xa;&#x7d; else if&#x28;MONTH_DATA_1 &#x21;&#x3d; null&#x29;&#x7b;&#xa;	month_data_final &#x3d; MONTH_DATA_1&#x3b;&#xa;&#x7d;&#xa;&#xa;if&#x28;Year_Data &#x21;&#x3d; null&#x29;&#x7b;&#xa;	year_data_final &#x3d; Year_Data&#x3b;&#xa;&#x7d; else if&#x28;Year_Data_1 &#x21;&#x3d; null&#x29;&#x7b;&#xa;	year_data_final &#x3d; Year_Data_1&#x3b;&#xa;&#x7d;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>complete_percentage</name>
         <rename>complete_percentage</rename>
         <type>Number</type>
         <length>16</length>
-        <precision>2</precision>
+        <precision>3</precision>
         <replace>N</replace>
       </field>      <field>        <name>total_sent</name>
         <rename>total_sent</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
         <replace>N</replace>
       </field>      <field>        <name>AGENT_ID_temp</name>
         <rename>AGENT_ID_temp</rename>
-        <type>String</type>
+        <type>Integer</type>
         <length>-1</length>
         <precision>-1</precision>
         <replace>N</replace>
-      </field>      <field>        <name>COMPANY_ID</name>
-        <rename>COMPANY_ID</rename>
-        <type>String</type>
+      </field>      <field>        <name>month_data_final</name>
+        <rename>month_data_final</rename>
+        <type>Integer</type>
         <length>-1</length>
         <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>first_name</name>
-        <rename>first_name</rename>
-        <type>String</type>
+        <replace>N</replace>
+      </field>      <field>        <name>year_data_final</name>
+        <rename>year_data_final</rename>
+        <type>Integer</type>
         <length>-1</length>
         <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>last_name</name>
-        <rename>last_name</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>MONTH_Data</name>
-        <rename>MONTH_Data</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>Year_Data</name>
-        <rename>Year_Data</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>days_of_registration</name>
-        <rename>days_of_registration</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>EMAIL_ID</name>
-        <rename>EMAIL_ID</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
+        <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>1318</xloc>
@@ -1494,14 +1654,14 @@
     <step2>Sort rows 2 3</step2>
     <number_input>3</number_input>
     <keys>
-      <key>AGENT_ID_temp,MONTH_Data,Year_Data</key>
-      <key>AGENT_ID,MONTH_Data,Year_Data</key>
-      <key>AGENT_ID,MONTH_Data,Year_Data</key>
+      <key>AGENT_ID_temp,month_data_final,year_data_final</key>
+      <key>AGENT_ID_f,MONTH_Data_f,Year_Data_f</key>
+      <key>AGENT_ID_f,MONTH_Data_f,Year_Data_f</key>
     </keys>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1450</xloc>
-      <yloc>335</yloc>
+      <xloc>1375</xloc>
+      <yloc>341</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1521,10 +1681,10 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var days_of_registration_final &#x3d; 0&#x3b;&#xd;&#xa;var avg_rating_final &#x3d; 0.000&#x3b;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;days_of_registration &#x21;&#x3d; null&#x29;&#x7b; days_of_registration_final &#x3d; days_of_registration&#x3b; &#x7d;&#xd;&#xa;if&#x28;AverageScore &#x21;&#x3d; null&#x29;&#x7b;avg_rating_final &#x3d; AverageScore&#x3b; &#x7d;&#xd;&#xa;&#xd;&#xa;var MONTH_YEAR_FINAL&#xd;&#xa;&#xd;&#xa;if&#x28;MONTH_Data.length &#x3c; 2&#x29;&#x7b;&#xd;&#xa;				var	MONTH_YEAR_FINAL&#x3d; Year_Data&#x2b;&#x22;_0&#x22;&#x2b;MONTH_Data&#x3b;&#xd;&#xa;		&#x7d;else&#x7b;&#xd;&#xa;				var	MONTH_YEAR_FINAL&#x3d;Year_Data &#x2b;&#x22;_&#x22;&#x2b; MONTH_Data&#x3b;&#xd;&#xa;		&#x7d;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var days_of_registration_final &#x3d; 0&#x3b;&#xd;&#xa;var avg_rating_final &#x3d; 0.000&#x3b;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;if&#x28;days_of_registration &#x21;&#x3d; null &#x26;&#x26; days_of_registration &#x21;&#x3d;0&#x29;&#x7b;&#xa; days_of_registration_final &#x3d; days_of_registration&#x3b; &#xa;&#x7d;else if&#x28;days_of_registration_1 &#x21;&#x3d; null &#x26;&#x26; days_of_registration_1 &#x21;&#x3d; 0&#x29;&#x7b;&#xa; days_of_registration_final &#x3d; days_of_registration_1&#x3b; &#xa;&#x7d;&#xa;&#xd;&#xa;if&#x28;AverageScore &#x21;&#x3d; null&#x29;&#x7b;avg_rating_final &#x3d; AverageScore&#x3b; &#x7d;&#xd;&#xa;&#xd;&#xa;var MONTH_YEAR_FINAL&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;MONTH_Data_fi.length &#x3c; 2&#x29;&#x7b;&#xd;&#xa;				MONTH_YEAR_FINAL&#x3d; YEAR_Data_fi&#x2b;&#x22;_0&#x22;&#x2b;MONTH_Data_fi&#x3b;&#xd;&#xa;		&#x7d;else&#x7b;&#xd;&#xa;				MONTH_YEAR_FINAL&#x3d;YEAR_Data_fi &#x2b;&#x22;_&#x22;&#x2b; MONTH_Data_fi&#x3b;&#xd;&#xa;		&#x7d;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>days_of_registration_final</name>
         <rename>days_of_registration_final</rename>
-        <type>String</type>
+        <type>Integer</type>
         <length>-1</length>
         <precision>-1</precision>
         <replace>N</replace>
@@ -1559,170 +1719,40 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <fields>      <field>        <name>AGENT_ID</name>
-        <rename/>
+    <fields>        <select_unspecified>N</select_unspecified>
+      <meta>        <name>CREATED_ON_EST</name>
+        <rename>CREATED_ON_EST</rename>
+        <type>Date</type>
         <length>-2</length>
         <precision>-2</precision>
-      </field>      <field>        <name>AGENT_ID_1</name>
-        <rename/>
+        <conversion_mask>yyyy-MM-dd HH&#x3a;mm&#x3a;ss</conversion_mask>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>MONTH_DATA</name>
+        <rename>MONTH_DATA</rename>
+        <type>Integer</type>
         <length>-2</length>
         <precision>-2</precision>
-      </field>      <field>        <name>AGENT_ID_2</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>AGENT_ID_3</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>AGENT_ID_temp</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>AverageScore</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>COMPANY_ID</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>COMPANY_ID_1</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>COMPANY_ID_2</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>COMPANY_ID_3</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>Completed</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>EMAIL_ID</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>EMAIL_ID_1</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>MONTH_DATA_1</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>MONTH_Data</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>MONTH_Data_2</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>MONTH_Data_3</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>PRESENT_MONTH</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>PRESENT_MONTH_1</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>Sent</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>SocialSurveyCount</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>TRX_MONTH</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>TRX_MONTH_1</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>TRX_MONTH_2</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>Year_Data</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>Year_Data_1</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>Year_Data_2</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>Year_Data_3</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>complete_percentage</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>days_of_registration</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>days_of_registration_1</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>first_name</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>first_name_1</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>last_name</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>last_name_1</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>month_row</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>total_detractors</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>total_passives</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>total_promoters</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>      <field>        <name>total_sent</name>
-        <rename/>
-        <length>-2</length>
-        <precision>-2</precision>
-      </field>        <select_unspecified>N</select_unspecified>
-      <meta>        <name>complete_percentage</name>
-        <rename>complete_percentage</rename>
-        <type>Number</type>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>Year_Data</name>
+        <rename>Year_Data</rename>
+        <type>Integer</type>
         <length>-2</length>
         <precision>-2</precision>
         <conversion_mask/>
@@ -1737,8 +1767,8 @@
         <storage_type/>
       </meta>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1606</xloc>
-      <yloc>149</yloc>
+      <xloc>179</xloc>
+      <yloc>101</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1757,7 +1787,7 @@
     <fields>        <select_unspecified>N</select_unspecified>
       <meta>        <name>MIN_COMPLETED_PERCENTAGE</name>
         <rename>MIN_COMPLETED_PERCENTAGE</rename>
-        <type>String</type>
+        <type>Number</type>
         <length>-2</length>
         <precision>-2</precision>
         <conversion_mask/>
@@ -1772,7 +1802,7 @@
         <storage_type/>
       </meta>      <meta>        <name>complete_percentage</name>
         <rename>complete_percentage</rename>
-        <type>String</type>
+        <type>Number</type>
         <length>-2</length>
         <precision>-2</precision>
         <conversion_mask/>
@@ -1787,7 +1817,7 @@
         <storage_type/>
       </meta>      <meta>        <name>MIN_DAYS_OF_REGISTRATION</name>
         <rename>MIN_DAYS_OF_REGISTRATION</rename>
-        <type>String</type>
+        <type>Integer</type>
         <length>-2</length>
         <precision>-2</precision>
         <conversion_mask/>
@@ -1802,7 +1832,7 @@
         <storage_type/>
       </meta>      <meta>        <name>days_of_registration_final</name>
         <rename>days_of_registration_final</rename>
-        <type>String</type>
+        <type>Integer</type>
         <length>-2</length>
         <precision>-2</precision>
         <conversion_mask/>
@@ -1817,7 +1847,7 @@
         <storage_type/>
       </meta>      <meta>        <name>MIN_NO_OF_REVIEWS</name>
         <rename>MIN_NO_OF_REVIEWS</rename>
-        <type>String</type>
+        <type>Integer</type>
         <length>-2</length>
         <precision>-2</precision>
         <conversion_mask/>
@@ -1832,7 +1862,37 @@
         <storage_type/>
       </meta>      <meta>        <name>total_reviews</name>
         <rename>total_reviews</rename>
-        <type>String</type>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>total_questions</name>
+        <rename>total_questions</rename>
+        <type>Integer</type>
+        <length>-2</length>
+        <precision>-2</precision>
+        <conversion_mask/>
+        <date_format_lenient>false</date_format_lenient>
+        <date_format_locale/>
+        <date_format_timezone/>
+        <lenient_string_to_number>false</lenient_string_to_number>
+        <encoding/>
+        <decimal_symbol/>
+        <grouping_symbol/>
+        <currency_symbol/>
+        <storage_type/>
+      </meta>      <meta>        <name>answer_sum</name>
+        <rename>answer_sum</rename>
+        <type>Integer</type>
         <length>-2</length>
         <precision>-2</precision>
         <conversion_mask/>
@@ -1873,19 +1933,19 @@
       <unique_rows>N</unique_rows>
     <fields>
       <field>
-        <name>AGENT_ID</name>
+        <name>AGENT_ID_f</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
       </field>
       <field>
-        <name>MONTH_Data</name>
+        <name>MONTH_Data_f</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
       </field>
       <field>
-        <name>Year_Data</name>
+        <name>Year_Data_f</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -1943,7 +2003,7 @@
     <name>Sort rows 10 2</name>
     <type>SortRows</type>
     <description/>
-    <distribute>Y</distribute>
+    <distribute>N</distribute>
     <custom_distribution/>
     <copies>1</copies>
          <partitioning>
@@ -1993,7 +2053,7 @@
       <unique_rows>N</unique_rows>
     <fields>
       <field>
-        <name>AGENT_ID</name>
+        <name>AGENT_ID_fi</name>
         <ascending>N</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -2033,19 +2093,19 @@
       <unique_rows>N</unique_rows>
     <fields>
       <field>
-        <name>AGENT_ID</name>
+        <name>AGENT_ID_f</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
       </field>
       <field>
-        <name>MONTH_Data</name>
+        <name>MONTH_Data_f</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
       </field>
       <field>
-        <name>Year_Data</name>
+        <name>Year_Data_f</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -2085,13 +2145,13 @@
         <presorted>N</presorted>
       </field>
       <field>
-        <name>MONTH_Data</name>
+        <name>month_data_final</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
       </field>
       <field>
-        <name>Year_Data</name>
+        <name>year_data_final</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -2125,19 +2185,19 @@
       <unique_rows>N</unique_rows>
     <fields>
       <field>
-        <name>AGENT_ID</name>
+        <name>AGENT_ID_f</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
       </field>
       <field>
-        <name>MONTH_Data</name>
+        <name>MONTH_Data_f</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
       </field>
       <field>
-        <name>Year_Data</name>
+        <name>Year_Data_f</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -2171,19 +2231,19 @@
       <unique_rows>N</unique_rows>
     <fields>
       <field>
-        <name>AGENT_ID</name>
+        <name>AGENT_ID_f</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
       </field>
       <field>
-        <name>MONTH_Data</name>
+        <name>MONTH_Data_f</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
       </field>
       <field>
-        <name>Year_Data</name>
+        <name>Year_Data_f</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -2217,19 +2277,19 @@
       <unique_rows>N</unique_rows>
     <fields>
       <field>
-        <name>AGENT_ID</name>
+        <name>AGENT_ID_f</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
       </field>
       <field>
-        <name>MONTH_Data</name>
+        <name>MONTH_Data_f</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
       </field>
       <field>
-        <name>Year_Data</name>
+        <name>Year_Data_f</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -2375,8 +2435,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>365</xloc>
-      <yloc>140</yloc>
+      <xloc>191</xloc>
+      <yloc>189</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2385,7 +2445,7 @@
     <name>Sort rows 6 2</name>
     <type>SortRows</type>
     <description/>
-    <distribute>Y</distribute>
+    <distribute>N</distribute>
     <custom_distribution/>
     <copies>1</copies>
          <partitioning>
@@ -2402,6 +2462,18 @@
     <fields>
       <field>
         <name>USER_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>MONTH_DATA</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>Year_Data</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -2482,6 +2554,18 @@
     <fields>
       <field>
         <name>AGENT_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>MONTH_Data</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>Year_Data</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -2569,8 +2653,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>744</xloc>
-      <yloc>242</yloc>
+      <xloc>611</xloc>
+      <yloc>240</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2641,19 +2725,19 @@
       <unique_rows>N</unique_rows>
     <fields>
       <field>
-        <name>AGENT_ID</name>
+        <name>AGENT_ID_f</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
       </field>
       <field>
-        <name>MONTH_Data</name>
+        <name>MONTH_Data_f</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
       </field>
       <field>
-        <name>Year_Data</name>
+        <name>Year_Data_f</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -2677,7 +2761,7 @@
     <name>SurveyDetails</name>
     <type>TableInput</type>
     <description/>
-    <distribute>N</distribute>
+    <distribute>Y</distribute>
     <custom_distribution/>
     <copies>1</copies>
          <partitioning>
@@ -2685,7 +2769,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, SURVEY_PRE_INTITIATION_ID&#xd;&#xa;, MOOD&#xd;&#xa;,stage&#xd;&#xa;,SOURCE as SURVEY_SOURCE&#xd;&#xa;, date_format&#x28;SURVEY_COMPLETED_DATE_EST,&#x27;&#x25;m&#x27;&#x29; AS MONTH_Data&#xd;&#xa;, date_format&#x28;SURVEY_COMPLETED_DATE_EST,&#x27;&#x25;Y_&#x25;m&#x27;&#x29; AS TRX_MONTH&#xd;&#xa;, date_format&#x28;SURVEY_COMPLETED_DATE_EST,&#x27;&#x25;Y&#x27;&#x29; AS Year_Data&#xd;&#xa;FROM survey_details&#xd;&#xa;where stage &#x3d; -1&#xd;&#xa;order by SURVEY_PRE_INTITIATION_ID&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, SURVEY_PRE_INTITIATION_ID&#xd;&#xa;, MOOD&#xd;&#xa;,stage&#xd;&#xa;,SOURCE as SURVEY_SOURCE&#xd;&#xa;, month&#x28;SURVEY_COMPLETED_DATE_EST&#x29; AS MONTH_Data&#xd;&#xa;, year&#x28;SURVEY_COMPLETED_DATE_EST&#x29; AS Year_Data&#xd;&#xa;FROM survey_details&#xd;&#xa;where stage &#x3d; -1 and  SOURCE not in &#x28;&#x22;Zillow&#x22;, &#x22;admin&#x22;, &#x22;agent&#x22;, &#x22;customer&#x22;, &#x22;3rd Party Review&#x22;, &#x22;upload&#x22;, &#x22;CSV_UPLOAD&#x22;&#x29;&#xd;&#xa;order by SURVEY_PRE_INTITIATION_ID&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -2711,7 +2795,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  SURVEY_PRE_INITIATION_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, STATUS as SURVEY_STATUS&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;Y_&#x25;m&#x27;&#x29; AS TRX_MONTH&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;m&#x27;&#x29; AS MONTH_Data&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;Y&#x27;&#x29; AS Year_Data&#xd;&#xa;FROM survey_pre_initiation&#xd;&#xa;WHERE SURVEY_SOURCE NOT IN &#x28;&#x22;Zillow&#x22; , &#x22;3rd Party Review&#x22; &#x29;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  SURVEY_PRE_INITIATION_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, STATUS as SURVEY_STATUS&#xd;&#xa;, month&#x28;CREATED_ON_EST&#x29; AS MONTH_Data&#xd;&#xa;, year&#x28;CREATED_ON_EST&#x29; AS Year_Data&#xd;&#xa;FROM survey_pre_initiation&#xd;&#xa;WHERE SURVEY_SOURCE NOT IN &#x28;&#x22;Zillow&#x22; , &#x22;3rd Party Review&#x22;, &#x22;admin&#x22;, &#x22;agent&#x22;, &#x22;customer&#x22;, &#x22;upload&#x22;, &#x22;CSV_UPLOAD&#x22; &#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -2737,7 +2821,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  SURVEY_RESPONSE_ID&#xd;&#xa;, SURVEY_DETAILS_ID&#xd;&#xa;, if &#x28;QUESTION_TYPE &#x3d; &#x27;sb-range-0to10&#x27;,ANSWER&#x2f;2, ANSWER&#x29; as ANSWER&#xd;&#xa;, QUESTION&#xd;&#xa;, QUESTION_TYPE&#xd;&#xa;, IS_USER_RANKING_QUESTION&#xd;&#xa;FROM survey_response&#xd;&#xa;where IS_USER_RANKING_QUESTION &#x3d; 1&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  SURVEY_RESPONSE_ID&#xd;&#xa;, SURVEY_DETAILS_ID&#xd;&#xa;, if &#x28;QUESTION_TYPE &#x3d; &#x27;sb-range-0to10&#x27;,ANSWER&#x2f;2, ANSWER&#x29; as ANSWER&#xd;&#xa;, QUESTION&#xd;&#xa;, QUESTION_TYPE&#xd;&#xa;, IS_USER_RANKING_QUESTION&#xd;&#xa;FROM survey_response&#xd;&#xa;where IS_USER_RANKING_QUESTION &#x3d; 1&#xa;order by SURVEY_DETAILS_ID&#x3b;&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -2745,8 +2829,8 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>309</xloc>
-      <yloc>419</yloc>
+      <xloc>294</xloc>
+      <yloc>505</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2765,7 +2849,7 @@
     <connection>SS_Centralized_Mysql_Conn</connection>
     <schema/>
     <table>user_ranking_past_month_main</table>
-    <commit>1000</commit>
+    <commit>10000</commit>
     <truncate>Y</truncate>
     <ignore_errors>N</ignore_errors>
     <use_batch>Y</use_batch>
@@ -2782,7 +2866,7 @@
     <fields>
         <field>
           <column_name>user_id</column_name>
-          <stream_name>AGENT_ID</stream_name>
+          <stream_name>AGENT_ID_fi</stream_name>
         </field>
         <field>
           <column_name>first_name</column_name>
@@ -2842,11 +2926,11 @@
         </field>
         <field>
           <column_name>month</column_name>
-          <stream_name>MONTH_Data</stream_name>
+          <stream_name>MONTH_Data_fi</stream_name>
         </field>
         <field>
           <column_name>year</column_name>
-          <stream_name>Year_Data</stream_name>
+          <stream_name>YEAR_Data_fi</stream_name>
         </field>
         <field>
           <column_name>average_rating</column_name>
@@ -2872,6 +2956,14 @@
           <column_name>email_id</column_name>
           <stream_name>EMAIL_ID_2</stream_name>
         </field>
+        <field>
+          <column_name>total_questions</column_name>
+          <stream_name>total_questions</stream_name>
+        </field>
+        <field>
+          <column_name>answer_sum</column_name>
+          <stream_name>answer_sum</stream_name>
+        </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -2896,7 +2988,7 @@
       <count_field/>
       <reject_duplicate_row>N</reject_duplicate_row>
       <error_description/>
-    <fields>      <field>        <name>AGENT_ID</name>
+    <fields>      <field>        <name>AGENT_ID_fi</name>
         <case_insensitive>N</case_insensitive>
         </field>      <field>        <name>MONTH_YEAR_FINAL</name>
         <case_insensitive>N</case_insensitive>
@@ -2920,7 +3012,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  USER_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, FIRST_NAME&#xd;&#xa;, LAST_NAME&#xd;&#xa;,EMAIL_ID&#xd;&#xa;, CREATED_ON_EST&#xd;&#xa;, CREATED_ON&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;m&#x27;&#x29; AS USER_MONTH_DATA&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;Y_&#x25;m&#x27;&#x29; AS TRX_MONTH&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;Y&#x27;&#x29; AS USER_Year_Data&#xd;&#xa;FROM users&#xd;&#xa;where status in &#x28;1,2&#x29;&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  USER_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, FIRST_NAME&#xd;&#xa;, LAST_NAME&#xd;&#xa;,EMAIL_ID&#xd;&#xa;, CREATED_ON_EST&#xd;&#xa;, CREATED_ON&#xd;&#xa;, month&#x28;CREATED_ON_EST&#x29; AS USER_MONTH_DATA&#xd;&#xa;, year&#x28;CREATED_ON_EST&#x29; AS USER_Year_Data&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;Y_&#x25;m&#x27;&#x29; AS TRX_MONTH&#xd;&#xa;FROM users&#xd;&#xa;where status in &#x28;1,2&#x29;&#x3b;&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -2928,8 +3020,8 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>47</xloc>
-      <yloc>27</yloc>
+      <xloc>35</xloc>
+      <yloc>25</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -2949,37 +3041,31 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var COMPANY_ID&#xd;&#xa;&#xd;&#xa;if&#x28;COMPANY_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa; COMPANY_ID &#x3d; COMPANY_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;COMPANY_ID_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa; COMPANY_ID &#x3d;COMPANY_ID_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var AGENT_ID&#xd;&#xa;&#xd;&#xa;if&#x28;AGENT_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;AGENT_ID &#x3d; AGENT_ID&#xd;&#xa;&#x7d;else if&#x28;USER_ID&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;AGENT_ID &#x3d; USER_ID&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var MONTH_Data&#xd;&#xa;&#xd;&#xa;if&#x28;MONTH_Data &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;MONTH_Data &#x3d; MONTH_Data&#xd;&#xa;&#x7d;else if&#x28;MONTH_DATA_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;MONTH_Data &#x3d; MONTH_DATA_1&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var Year_Data&#xd;&#xa;&#xd;&#xa;if&#x28;Year_Data &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;Year_Data &#x3d; Year_Data&#xd;&#xa;&#x7d;else if&#x28;Year_DATA_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;Year_Data &#x3d; Year_DATA_1&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var TRX_MONTH&#xd;&#xa;&#xd;&#xa;if&#x28;TRX_MONTH &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;TRX_MONTH &#x3d; TRX_MONTH&#xd;&#xa;&#x7d;else if&#x28;TRX_MONTH_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;TRX_MONTH &#x3d; TRX_MONTH_1&#xd;&#xa;&#x7d;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>COMPANY_ID</name>
-        <rename>COMPANY_ID</rename>
-        <type>String</type>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var COMPANY_ID_f &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;COMPANY_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa; COMPANY_ID_f &#x3d; COMPANY_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;COMPANY_ID_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa; COMPANY_ID_f &#x3d;COMPANY_ID_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var AGENT_ID_f&#x3d;0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;AGENT_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;AGENT_ID_f &#x3d; AGENT_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;USER_ID&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;AGENT_ID_f &#x3d; USER_ID&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var MONTH_Data_f &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;MONTH_Data &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;MONTH_Data_f &#x3d; MONTH_Data&#x3b;&#xd;&#xa;&#x7d;else if&#x28;MONTH_DATA_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;MONTH_Data_f &#x3d; MONTH_DATA_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var Year_Data_f &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;Year_Data &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;Year_Data_f &#x3d; Year_Data&#x3b;&#xd;&#xa;&#x7d;else if&#x28;Year_DATA_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;Year_Data_f &#x3d; Year_DATA_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var TRX_MONTH&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;TRX_MONTH &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;TRX_MONTH &#x3d; TRX_MONTH&#x3b;&#xd;&#xa;&#x7d;else if&#x28;TRX_MONTH_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;TRX_MONTH &#x3d; TRX_MONTH_1&#x3b;&#xd;&#xa;&#x7d;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>COMPANY_ID_f</name>
+        <rename>COMPANY_ID_f</rename>
+        <type>Integer</type>
         <length>-1</length>
         <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>AGENT_ID</name>
-        <rename>AGENT_ID</rename>
-        <type>String</type>
+        <replace>N</replace>
+      </field>      <field>        <name>AGENT_ID_f</name>
+        <rename>AGENT_ID_f</rename>
+        <type>Integer</type>
         <length>-1</length>
         <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>MONTH_Data</name>
-        <rename>MONTH_Data</rename>
-        <type>String</type>
+        <replace>N</replace>
+      </field>      <field>        <name>MONTH_Data_f</name>
+        <rename>MONTH_Data_f</rename>
+        <type>Integer</type>
         <length>-1</length>
         <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>Year_Data</name>
-        <rename>Year_Data</rename>
-        <type>String</type>
+        <replace>N</replace>
+      </field>      <field>        <name>Year_Data_f</name>
+        <rename>Year_Data_f</rename>
+        <type>Integer</type>
         <length>-1</length>
         <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>TRX_MONTH</name>
-        <rename>TRX_MONTH</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
+        <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>340</xloc>
@@ -3006,19 +3092,19 @@
         <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var AGENT_ID&#xd;&#xa;if&#x28;AGENT_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;AGENT_ID &#x3d; AGENT_ID&#xd;&#xa;&#x7d;else if&#x28;USER_ID&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;AGENT_ID &#x3d; USER_ID&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var MONTH_DATA&#xd;&#xa;if&#x28;MONTH_DATA &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;MONTH_DATA &#x3d; MONTH_DATA&#xd;&#xa;&#x7d;else if&#x28;MONTH_Data_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;MONTH_DATA &#x3d; MONTH_Data_1&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var Year_Data&#xd;&#xa;if&#x28;Year_Data &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;Year_Data &#x3d; Year_Data&#xd;&#xa;&#x7d;else if&#x28;Year_Data_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;Year_Data&#x3d; Year_Data_1&#xd;&#xa;&#x7d;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>AGENT_ID</name>
         <rename>AGENT_ID</rename>
-        <type>String</type>
+        <type>Integer</type>
         <length>-1</length>
         <precision>-1</precision>
         <replace>Y</replace>
       </field>      <field>        <name>MONTH_DATA</name>
         <rename>MONTH_DATA</rename>
-        <type>String</type>
+        <type>Integer</type>
         <length>-1</length>
         <precision>-1</precision>
         <replace>Y</replace>
       </field>      <field>        <name>Year_Data</name>
         <rename>Year_Data</rename>
-        <type>String</type>
+        <type>Integer</type>
         <length>-1</length>
         <precision>-1</precision>
         <replace>Y</replace>
@@ -3064,7 +3150,7 @@
     <name>jsForMainValues</name>
     <type>ScriptValueMod</type>
     <description/>
-    <distribute>Y</distribute>
+    <distribute>N</distribute>
     <custom_distribution/>
     <copies>1</copies>
          <partitioning>
@@ -3075,60 +3161,54 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var AGENT_ID &#xd;&#xa;&#xd;&#xa;if&#x28;AGENT_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  AGENT_ID &#x3d; AGENT_ID&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  AGENT_ID &#x3d; AGENT_ID_1&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  AGENT_ID &#x3d; AGENT_ID_2&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID_3&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  AGENT_ID &#x3d; AGENT_ID_3&#xd;&#xa;&#x7d;else if&#x28;AGENT_ID_temp&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;  AGENT_ID &#x3d; AGENT_ID_temp&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var final_company_id &#x3d; 0&#xd;&#xa;if&#x28;COMPANY_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;COMPANY_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_1&#x3b;&#xd;&#xa;&#x7d;else if&#x28;COMPANY_ID_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_2&#x3b;&#xd;&#xa;&#x7d;else if&#x28;COMPANY_ID_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_3&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var TRX_MONTH_Final &#x3d; 0&#xd;&#xa;if&#x28;TRX_MONTH &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa; TRX_MONTH_Final&#x3d; TRX_MONTH&#xd;&#xa;&#x7d;else if&#x28;TRX_MONTH_1&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa; TRX_MONTH_Final  &#x3d;TRX_MONTH_1&#xd;&#xa;&#x7d;else if&#x28;TRX_MONTH_2&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa; TRX_MONTH_Final  &#x3d; TRX_MONTH_2&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var MONTH_Data&#xd;&#xa;if&#x28;MONTH_Data &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;MONTH_Data &#x3d; MONTH_Data&#x3b;&#xd;&#xa;&#x7d;else if&#x28;MONTH_DATA_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;MONTH_Data &#x3d; MONTH_DATA_1&#x3b;&#xd;&#xa;&#x7d;else if&#x28;MONTH_Data_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;MONTH_Data &#x3d; MONTH_Data_2&#x3b;&#xd;&#xa;&#x7d;else if&#x28;MONTH_Data_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;MONTH_Data &#x3d; MONTH_Data_3&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var Year_Data&#xd;&#xa;if&#x28;Year_Data &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;Year_Data &#x3d; Year_Data &#x3b;&#xd;&#xa;&#x7d;else if&#x28;Year_Data_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;Year_Data &#x3d; Year_Data_1 &#x3b;&#xd;&#xa;&#x7d;else if&#x28;Year_Data_2&#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;Year_Data &#x3d; Year_Data_2 &#x3b;&#xd;&#xa;&#x7d;else if&#x28;Year_Data_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;Year_Data &#x3d; Year_Data_3 &#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var sps &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;&#x28;total_detractors &#x2b; total_passives &#x2b; total_promoters&#x29; &#x21;&#x3d; 0 &#x26;&#x26; &#x28;total_detractors &#x2b; total_passives &#x2b; total_promoters&#x29; &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var sps &#x3d; &#x28;&#x28;total_promoters - total_detractors&#x29; &#x2a; 100&#x29; &#x2f; &#x28;total_detractors &#x2b; total_passives &#x2b; total_promoters&#x29; &#x3b; &#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var total_reviews &#x3d; Completed&#x3b;&#xd;&#xa;if&#x28;total_reviews &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	total_reviews &#x3d;0 &#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var rank &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;var max_eligible_rank &#x3d; 0&#x3b;&#xd;&#xa;var TODAY &#x3d;  new Date&#x28;&#x29;&#x3b;&#xd;&#xa;var PRESENT_MONTH_FINAL_CHECK &#x3d; TODAY.getMonth &#x28;&#x29; &#x2b; 1&#x3b;&#xd;&#xa;var PRESENT_YEAR_FINAL_CHECK &#x3d; TODAY.getFullYear&#x28;&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;PRESENT_MONTH_FINAL_CHECK.length &#x3c; 2&#x29;&#x7b;&#xd;&#xa;				var	PRESENT_MONTH_CHECK&#x3d; &#x22;0&#x22;&#x2b;PRESENT_MONTH_FINAL_CHECK&#x3b;&#xd;&#xa;		&#x7d;else&#x7b;&#xd;&#xa;				var	PRESENT_MONTH_CHECK&#x3d; PRESENT_MONTH_FINAL_CHECK&#x3b;&#xd;&#xa;		&#x7d;</jsScript_script>
-      </jsScript>    </jsScripts>    <fields>      <field>        <name>AGENT_ID</name>
-        <rename>AGENT_ID</rename>
-        <type>String</type>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var AGENT_ID_fi &#x3d; 0&#x3b;&#xa;&#xa;if&#x28;AGENT_ID_temp &#x21;&#x3d; null&#x29;&#x7b;&#xa;	AGENT_ID_fi &#x3d; AGENT_ID_temp&#x3b;&#xa;&#x7d; else if&#x28;AGENT_ID_f &#x21;&#x3d; null&#x29;&#x7b;&#xa;	AGENT_ID_fi &#x3d; AGENT_ID_f&#x3b;&#xa;&#x7d; else if&#x28;AGENT_ID_f_1 &#x21;&#x3d; null&#x29;&#x7b;&#xa;	AGENT_ID_fi &#x3d; AGENT_ID_f_1&#x3b;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var final_company_id &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;COMPANY_ID &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID&#x3b;&#xd;&#xa;&#x7d;else if&#x28;COMPANY_ID_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_1&#x3b;&#xd;&#xa;&#x7d;else if&#x28;COMPANY_ID_2 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_2&#x3b;&#xd;&#xa;&#x7d;else if&#x28;COMPANY_ID_3 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	final_company_id &#x3d; COMPANY_ID_3&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;&#xd;&#xa;var MONTH_Data_fi &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;month_data_final &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;MONTH_Data_fi &#x3d; month_data_final&#x3b;&#xd;&#xa;&#x7d;else if&#x28;MONTH_Data_f &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;MONTH_Data_fi &#x3d; MONTH_Data_f&#x3b;&#xd;&#xa;&#x7d;else if&#x28;MONTH_Data_f_1 &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;MONTH_Data_fi &#x3d; MONTH_Data_f_1&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var YEAR_Data_fi &#x3d; 0&#x3b;&#xa;if&#x28;year_data_final &#x21;&#x3d; null&#x29;&#x7b;&#xa;YEAR_Data_fi &#x3d; year_data_final&#x3b;&#xa;&#x7d;else if&#x28;Year_Data_f &#x21;&#x3d; null&#x29;&#x7b;&#xa;YEAR_Data_fi &#x3d; Year_Data_f&#x3b;&#xa;&#x7d;else if&#x28;Year_Data_f_1 &#x21;&#x3d; null&#x29;&#x7b;&#xa;YEAR_Data_fi &#x3d; Year_Data_f_1&#x3b;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var sps &#x3d; 0.000&#x3b;&#xd;&#xa;if&#x28;&#x28;total_detractors &#x2b; total_passives &#x2b; total_promoters&#x29; &#x21;&#x3d; 0 &#x26;&#x26; &#x28;total_detractors &#x2b; total_passives &#x2b; total_promoters&#x29; &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	var sps &#x3d; &#x28;&#x28;total_promoters - total_detractors&#x29; &#x2a; 100.000&#x29; &#x2f; &#x28;total_detractors &#x2b; total_passives &#x2b; total_promoters&#x29; &#x3b; &#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var total_reviews &#x3d; Completed&#x3b;&#xd;&#xa;if&#x28;total_reviews &#x3d;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	total_reviews &#x3d;0 &#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var rank &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;var max_eligible_rank &#x3d; 0&#x3b;&#xd;&#xa;var TODAY &#x3d;  new Date&#x28;&#x29;&#x3b;&#xd;&#xa;var PRESENT_MONTH_FINAL_CHECK &#x3d; TODAY.getMonth &#x28;&#x29; &#x2b; 1&#x3b;&#xd;&#xa;var PRESENT_YEAR_FINAL_CHECK &#x3d; TODAY.getFullYear&#x28;&#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;PRESENT_MONTH_FINAL_CHECK.length &#x3c; 2&#x29;&#x7b;&#xd;&#xa;				var	PRESENT_MONTH_CHECK&#x3d; &#x22;0&#x22;&#x2b;PRESENT_MONTH_FINAL_CHECK&#x3b;&#xd;&#xa;		&#x7d;else&#x7b;&#xd;&#xa;				var	PRESENT_MONTH_CHECK&#x3d; PRESENT_MONTH_FINAL_CHECK&#x3b;&#xd;&#xa;		&#x7d;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>AGENT_ID_fi</name>
+        <rename>AGENT_ID_fi</rename>
+        <type>Integer</type>
         <length>-1</length>
         <precision>-1</precision>
-        <replace>Y</replace>
+        <replace>N</replace>
       </field>      <field>        <name>final_company_id</name>
         <rename>final_company_id</rename>
-        <type>String</type>
+        <type>Integer</type>
         <length>-1</length>
         <precision>-1</precision>
         <replace>N</replace>
-      </field>      <field>        <name>TRX_MONTH_Final</name>
-        <rename>TRX_MONTH_Final</rename>
-        <type>String</type>
+      </field>      <field>        <name>MONTH_Data_fi</name>
+        <rename>MONTH_Data_fi</rename>
+        <type>Integer</type>
         <length>-1</length>
         <precision>-1</precision>
         <replace>N</replace>
-      </field>      <field>        <name>MONTH_Data</name>
-        <rename>MONTH_Data</rename>
-        <type>String</type>
+      </field>      <field>        <name>YEAR_Data_fi</name>
+        <rename>YEAR_Data_fi</rename>
+        <type>Integer</type>
         <length>-1</length>
         <precision>-1</precision>
-        <replace>Y</replace>
-      </field>      <field>        <name>Year_Data</name>
-        <rename>Year_Data</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>Y</replace>
+        <replace>N</replace>
       </field>      <field>        <name>sps</name>
         <rename>sps</rename>
         <type>Number</type>
         <length>16</length>
-        <precision>2</precision>
+        <precision>3</precision>
         <replace>N</replace>
       </field>      <field>        <name>total_reviews</name>
         <rename>total_reviews</rename>
-        <type>String</type>
+        <type>Integer</type>
         <length>-1</length>
         <precision>-1</precision>
         <replace>N</replace>
       </field>      <field>        <name>rank</name>
         <rename>rank</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
         <replace>N</replace>
       </field>      <field>        <name>max_eligible_rank</name>
         <rename>max_eligible_rank</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
         <replace>N</replace>
       </field>      <field>        <name>TODAY</name>
         <rename>TODAY</rename>
@@ -3138,21 +3218,21 @@
         <replace>N</replace>
       </field>      <field>        <name>PRESENT_MONTH_FINAL_CHECK</name>
         <rename>PRESENT_MONTH_FINAL_CHECK</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
         <replace>N</replace>
       </field>      <field>        <name>PRESENT_YEAR_FINAL_CHECK</name>
         <rename>PRESENT_YEAR_FINAL_CHECK</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
         <replace>N</replace>
       </field>      <field>        <name>PRESENT_MONTH_CHECK</name>
         <rename>PRESENT_MONTH_CHECK</rename>
-        <type>Number</type>
-        <length>16</length>
-        <precision>2</precision>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -3234,8 +3314,8 @@
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>186</xloc>
-      <yloc>85</yloc>
+      <xloc>454</xloc>
+      <yloc>17</yloc>
       <draw>Y</draw>
       </GUI>
     </step>

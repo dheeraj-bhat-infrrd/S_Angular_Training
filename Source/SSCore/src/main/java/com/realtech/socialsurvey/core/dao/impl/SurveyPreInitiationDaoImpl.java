@@ -489,13 +489,14 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         }
         LOG.info( "Method to update pre initiated surveys agent id from " + fromUserId + " to " + toUser.getUserId()
             + " started." );
-        String queryStr = "UPDATE SURVEY_PRE_INITIATION SET AGENT_ID = ?, AGENT_NAME=?,AGENT_EMAILID=?, MODIFIED_ON=? WHERE AGENT_ID = ?";
+        String queryStr = "UPDATE SURVEY_PRE_INITIATION SET AGENT_ID = ?, AGENT_NAME=?,AGENT_EMAILID=?, MODIFIED_ON=?, COMPANY_ID=? WHERE AGENT_ID = ?";
         Query query = getSession().createSQLQuery( queryStr );
         query.setParameter( 0, toUser.getUserId() );
         query.setParameter( 1, toUser.getFirstName() + ( toUser.getLastName() == null ? "" : " " + toUser.getLastName() ) );
         query.setParameter( 2, toUser.getEmailId() );
         query.setParameter( 3, new Timestamp( System.currentTimeMillis() ) );
-        query.setParameter( 4, fromUserId );
+        query.setParameter( 4, toUser.getCompany().getCompanyId() );
+        query.setParameter( 5, fromUserId );
         query.executeUpdate();
         LOG.info( "Method to update pre initiated surveys agent id from " + fromUserId + " to " + toUser.getUserId()
             + " ended." );
@@ -917,4 +918,20 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         LOG.debug( "Method updateCompanyIdForAllRecordsForAgent  ended." );
     }
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Object[]> getReceivedCountForDate(String startDate, String endDate, int startIndex, int batchSize) {
+		String queryStr = "select u.USER_ID,count(spi.SURVEY_PRE_INITIATION_ID) as c,u.COMPANY_ID,"
+				+ "concat(u.FIRST_NAME,' ',coalesce(u.LAST_NAME,'')) as agent_name,u.EMAIL_ID from USERS u "
+				+ "left join SURVEY_PRE_INITIATION spi on u.user_id=spi.agent_id and u.status in (1,2) "
+				+ "and spi.survey_source not in ('3rd Party Review') and spi.created_on between :startdate and :endDate "
+				+ "and spi.agent_id != 0 group by u.user_id";
+		Query query = getSession().createSQLQuery(queryStr);
+		query.setParameter("startdate", startDate);
+		query.setParameter("endDate", endDate);
+		query.setFirstResult(startIndex);
+		query.setFetchSize(batchSize);
+		LOG.debug("query to fetch data for email report : {}", query.toString());
+		return query.list();
+	}
 }

@@ -156,14 +156,14 @@
 									</div> --%>
 									<c:choose>
 										<c:when test="${loop.index == 0}">
-											<div class="radio-div" style="margin-left:10px">
+											<div class="radio-div radio-div-first-1to10">
 												<div class="radio-outer-gray sq-radio" id="radio-${loop.index}">
 													<div class="radio-inner hide"></div>
 												</div>
 											</div>
 										</c:when>
 										<c:otherwise>
-											<div class="radio-div">
+											<div class="radio-div radio-div-1to10">
 												<div class="radio-outer-gray sq-radio" id="radio-${loop.index}">
 													<div class="radio-inner hide"></div>
 												</div>
@@ -186,6 +186,97 @@
 					<div class="sq-np-wrapper clearfix">
 						<div id="prev-radio" class="float-left sq-np-item sq-np-item-prev btn-com"><spring:message code="label.prev.btn.key"/></div>
 						<div id="next-radio" class="float-left sq-np-item sq-np-item-next btn-com"><spring:message code="label.nxt.btn.key"/></div>
+					</div>
+				</div>
+				
+				<div data-ques-type="sb-range-0to10-nps" class="sq-quest-item hide">
+					<div class="sq-main-txt"></div>
+					<div class="sq-ques">
+						<i><span id="ques-text-1to10-nps" class="sq-ques-txt"></span></i>
+					</div>
+					<div class="sq-bord-bot-sm"></div>
+					<div id="sq-radio-1to10-nps" class="sq-1to10-range-nps" selected-rating-radio="">
+						<div class="radio-container">
+							<div id="nps-range-text" class="sq-1to10-range-val">
+                                <div id="notAtAllLikelyDivNps" class="radio-range-text" style="float:left">Not at all likely</div>
+    							<div id="veryLikelyDivNps" class="radio-range-text" style="float:right;">Very Likely</div>
+							</div>
+							<div class="container-1to10 inner-container-1to10-nps">
+								<c:forEach begin="0" end="10" varStatus="loop">
+    								<%-- <div class="radio-1to10">
+  										<input type="radio" name="sb-range-0to10"><label></label>
+									</div> --%>
+									<c:choose>
+										<c:when test="${loop.index == 0}">
+											<div class="radio-div radio-div-first">
+												<div class="popover fade top in radio-popup-orange hide" role="tooltip" id="popover${loop.index}">
+													<div class="arrow radio-arrow-orange" style="left: 50%;"></div>
+													<div class="radio-popup-text-orange">No</div>
+												</div>
+												<div class="radio-outer-orange sq-radio" id="radio-nps-${loop.index}">
+													<div class="radio-inner-orange hide"></div>
+												</div>
+											</div>
+										</c:when>
+										<c:when test="${loop.index > 0 && loop.index <= 6}">
+											<div class="radio-div">
+												<div class="popover fade top in radio-popup-orange hide" role="tooltip" id="popover${loop.index}">
+													<div class="arrow radio-arrow-orange" style="left: 50%;"></div>
+													<div class="radio-popup-text-orange">No</div>
+												</div>
+												<div class="radio-outer-orange sq-radio" id="radio-nps-${loop.index}">
+													<div class="radio-inner-orange hide"></div>
+												</div>
+											</div>
+										</c:when>
+										<c:when test="${loop.index >= 7 && loop.index <= 8}">
+											<div class="radio-div">
+												<div class="popover fade top in radio-popup-yellow hide" role="tooltip" id="popover${loop.index}">
+													<div class="arrow radio-arrow-yellow" style="left: 50%;"></div>
+													<div class="radio-popup-text-yellow">Maybe</div>
+												</div>
+												<div class="radio-outer-yellow sq-radio" id="radio-nps-${loop.index}">
+														<div class="radio-inner-yellow hide"></div>
+												</div>
+											</div>
+										</c:when>
+										<c:otherwise>
+											<div class="radio-div">
+												<div class="popover fade top in radio-popup-green hide" role="tooltip" id="popover${loop.index}">
+													<div class="arrow radio-arrow-green" style="left: 50%;"></div>
+													<div class="radio-popup-text-green">Yes</div>
+												</div>
+												<div class="radio-outer-green sq-radio" id="radio-nps-${loop.index}">
+													<div class="radio-inner-green hide"></div>
+												</div>
+											</div>
+										</c:otherwise>
+									</c:choose>
+								</c:forEach>
+							</div>
+							<div class="container-1to10">
+								<c:forEach begin="0" end="10" varStatus="numLoop">
+									<c:choose>
+										<c:when test="${numLoop.index == 0}">
+											<div class="span-1to10 span-1to10-orange" style="text-align: right; margin-left:-19px">${numLoop.index}</div>
+										</c:when>
+										<c:when test="${numLoop.index >0 && numLoop.index<=6}">
+											<div class="span-1to10 span-1to10-orange" style="text-align: right">${numLoop.index}</div>
+										</c:when>
+										<c:when test="${numLoop.index >=7 && numLoop.index<=8}">
+											<div class="span-1to10 span-1to10-yellow" style="text-align: right">${numLoop.index}</div>
+										</c:when>
+										<c:otherwise>
+											<div class="span-1to10 span-1to10-green" style="text-align: right">${numLoop.index}</div>
+										</c:otherwise>
+									</c:choose>
+								</c:forEach>
+							</div>
+						</div>
+					</div>
+					<div class="sq-np-wrapper clearfix">
+						<div id="prev-radio-nps" class="float-left sq-np-item sq-np-item-prev btn-com"><spring:message code="label.prev.btn.key"/></div>
+						<div id="next-radio-nps" class="float-left sq-np-item sq-np-item-next btn-com"><spring:message code="label.nxt.btn.key"/></div>
 					</div>
 				</div>
 				
