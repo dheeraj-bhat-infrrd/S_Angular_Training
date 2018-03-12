@@ -121,4 +121,13 @@ public class SSAPIOperations
 		return response.body();
 		
 	}
+
+
+	public List<SurveyInvitationEmailCountMonth> getDataForEmailReport(int month, int year, long companyId) throws IOException {
+		Call<List<SurveyInvitationEmailCountMonth>> request = RetrofitApiBuilder.apiBuilderInstance()
+				.getSSAPIIntergrationServiceWithIncreasedTimeOut().getDataForEmailReport(month,year,companyId);
+		Response<List<SurveyInvitationEmailCountMonth>> response = request.execute();
+		RetrofitApiBuilder.apiBuilderInstance().validateResponse(response);
+		return response.body();
+	}
 }

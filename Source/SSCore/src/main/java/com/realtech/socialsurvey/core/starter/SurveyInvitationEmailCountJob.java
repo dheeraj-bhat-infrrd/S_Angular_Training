@@ -33,7 +33,7 @@ public class SurveyInvitationEmailCountJob extends QuartzJobBean {
 	protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
 		initializeDependencies( jobExecutionContext.getMergedJobDataMap() );
 		reportRequest.transform(timeFrame);
-        streamApiIntegrationBuilder.getStreamApi().generateEmailReport( reportRequest );
+        streamApiIntegrationBuilder.getStreamApi().triggerBatch( reportRequest );
 
 	}
 	

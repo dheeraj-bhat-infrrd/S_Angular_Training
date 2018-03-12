@@ -56,4 +56,10 @@ public interface SSApiIntegrationService
 	Call<List<SurveyInvitationEmailCountMonth>> getAllTimeDataForSurveyInvitationMail(@Query("startIndex") int startIndex,
 			@Query ("batchSize")int bATCH_SIZE);
 
+
+    @Headers ( "Content-Type: application/json")
+    @GET ( "v1/surveyinvitationemail/month/year")
+	Call<List<SurveyInvitationEmailCountMonth>> getDataForEmailReport(@Query("month") int month,@Query("year") int year,
+			@Query("companyId")  long companyId);
+
 }
