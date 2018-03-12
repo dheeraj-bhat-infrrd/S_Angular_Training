@@ -408,7 +408,7 @@ public class SocialMonitorWebController {
     	
     	User user = sessionHelper.getCurrentUser();
         Long companyId = user.getCompany().getCompanyId();
-        String userName = user.getProfileName();
+        String userName = user.getFirstName() + " " + user.getLastName();
         
     	Map<String, String> statusMap = new HashMap<>();
     	String message = "";
@@ -477,7 +477,7 @@ public class SocialMonitorWebController {
     	
     	User user = sessionHelper.getCurrentUser();
         Long companyId = user.getCompany().getCompanyId();
-        String userName = user.getProfileName();
+        String userName = user.getFirstName() + " " + user.getLastName();
         
     	Map<String, String> statusMap = new HashMap<>();
     	String message = "";

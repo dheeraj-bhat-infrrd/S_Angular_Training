@@ -16604,12 +16604,13 @@ function drawMacroList(macroList){
 		var active=macroList[i].active;
 		var usage=macroList[i].count;
 		var createdOn=macroList[i].modifiedOn;
+		var last7DaysMacroCount = macroList[i].last7DaysMacroCount;
 		
 		macroDiv ='<div id="'+macroId+'" class="dash-stats-wrapper bord-bot-dc clearfix macro-list-div macro-item cursor-pointer">'
 					+'<div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 macro-list-item">'+macroName+'</div>'
-					+'<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 macro-list-item-usage">'+usage+'</div>'
+					+'<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 macro-list-item-usage">'+last7DaysMacroCount+'</div>'
 					+'<input type="hidden" id="macro-'+macroId+'" name="monitor-type" data-macroId="'+macroId+'" data-macro-name="'+macroName+'" data-description="'+description
-					+'" data-alert="'+actions.socialFeedStatus+'" data-flagged='+actions.flagged+' data-action-type="'+actions.textActionType+'" data-action-text="'+actions.text+'" data-active='+active+' data-usage='+usage+' data-last-updated="'+createdOn+'" >'
+					+'" data-alert="'+actions.socialFeedStatus+'" data-flagged='+actions.flagged+' data-action-type="'+actions.textActionType+'" data-action-text="'+actions.text+'" data-active='+active+' data-last-used='+last7DaysMacroCount+' data-usage='+usage+' data-last-updated="'+createdOn+'" >'
 					+'</div>';
 		
 		if(active==true || active=='true'){
@@ -16633,7 +16634,8 @@ function drawMacroList(macroList){
 		 "actionText" : $('#macro-'+macroId).attr('data-action-text'),
 		 "active" : $('#macro-'+macroId).attr('data-active'),
 		 "usage" : $('#macro-'+macroId).attr('data-usage'),
-		 "lastUpdated" : $('#macro-'+macroId).attr('data-last-updated')
+		 "lastUpdated" : $('#macro-'+macroId).attr('data-last-updated'),
+		 "last7DaysMacroCount" : $('#macro-'+macroId).attr('data-last-used')
 		};
 		
 		showAddMacroPage('./showsocialmonitoraddmacropage.do',macroId,macroData);
@@ -17117,9 +17119,9 @@ function drawStreamPage(streamPostList){
 		
 		drawMacroListDropdown(postId,macroList);
 				
-		$('.stream-macro-dropdown').unbind('click');
-		$('.stream-macro-dropdown').bind('click',function(e){
-			e.stopPropagation();
+		$(document).on('click','.stream-macro-dropdown',function(e){
+			e.stopImmediatePropagation();
+			e.preventDefault();
 			
 			if($(this).closest('.action-form-container').find('.macro-options-list').hasClass('hide')){
 				$(this).closest('.action-form-container').find('.macro-options-list').removeClass('hide');
@@ -17141,7 +17143,8 @@ function drawStreamPage(streamPostList){
 		});
 		
 		$(document).on('click','.macro-opt',function(e){
-			e.stopPropagation();
+			e.stopImmediatePropagation();
+			e.preventDefault();
 			var postId =  $(this).find('.macro-list-data').attr('data-post-id');
 			var macroId = $(this).find('.macro-list-data').attr('data-macro-id');
 			var macroName =$(this).find('.macro-list-data').attr('data-macro-name');
@@ -17172,7 +17175,7 @@ function drawStreamPage(streamPostList){
 				showToast();
 				if (map.status == "success") {
 							
-					updatePostSuccess(postId,text,status,flagged,map);
+					updatePostSuccess(postId,text,status,flagged,textActionType,map);
 										
 					$('#action-form-cont'+postId).find('.form-post-textbox').val('');
 					$("#overlay-toast").html("Successfully Updated Post");
@@ -17302,11 +17305,11 @@ function drawMacroListDropdown(postId,macroList){
 				}
 			}else if(postStatus == 'NEW'){
 				if(postFlagged == true || flagged =='true'){
-					if(!(status == 'NEW' && (flagged =='true' || flagged == true))){
+					if(!(status == 'NEW' && (flagged =='true' || flagged == true)) && status != "RESOLVED"){
 						$('#action-form-container'+postId).find('.macro-options-list').append(macroDiv);
 					}
 				}else{
-					if(!(status == 'NEW' && (flagged =='false' || flagged == false))){
+					if(!(status == 'NEW' && (flagged =='false' || flagged == false)) && status != "RESOLVED"){
 						$('#action-form-container'+postId).find('.macro-options-list').append(macroDiv);
 					}
 				}
@@ -17328,6 +17331,7 @@ $(document).on('click','.stream-action-unflag',function(e){
 	$(this).attr('id','stream-action-unflag-'+postId);
 	var formId = ('add-post-action-'+postId);
 	var disableEle = ('#stream-action-unflag-'+postId);
+	var textActionType = $('#action-form-cont'+postId).find('.form-text-act-type').val();
 	
 	$(this).closest('.action-form-cont').find('.form-flagged').val(false);
 	$(this).closest('.action-form-cont').find('.form-status').val('NEW');
@@ -17341,7 +17345,7 @@ $(document).on('click','.stream-action-unflag',function(e){
 					
 			var text = $('#action-form-cont'+postId).find('.form-post-textbox').val();
 			
-			updatePostSuccess(postId,text,'NEW',false,map);
+			updatePostSuccess(postId,text,'NEW',false,textActionType,map);
 			
 			$('#action-form-cont'+postId).find('.form-post-textbox').val('');
 			$("#overlay-toast").html("Successfully Updated Post");
@@ -17359,7 +17363,8 @@ $(document).on('click','.stream-action-flag',function(e){
 	$(this).attr('id','stream-action-flag-'+postId);
 	var formId = ('add-post-action-'+postId);
 	var disableEle = ('#stream-action-flag-'+postId);
-
+	var textActionType = $('#action-form-cont'+postId).find('.form-text-act-type').val();
+	
 	$(this).closest('.action-form-cont').find('.form-flagged').val(true);
 	$(this).closest('.action-form-cont').find('.form-status').val('NEW');
 	
@@ -17372,7 +17377,7 @@ $(document).on('click','.stream-action-flag',function(e){
 
 			var text = $('#action-form-cont'+postId).find('.form-post-textbox').val();			
 			
-			updatePostSuccess(postId,text,'NEW',true,map);
+			updatePostSuccess(postId,text,'NEW',true,textActionType,map);
 			
 			$('#action-form-cont'+postId).find('.form-post-textbox').val('');
 			$("#overlay-toast").html("Successfully Updated Post");
@@ -17391,7 +17396,8 @@ $(document).on('click','.stream-action-esc',function(e){
 	$(this).attr('id','stream-action-esc-'+postId);
 	var formId = ('add-post-action-'+postId);
 	var disableEle = ('#stream-action-esc-'+postId);
-
+	var textActionType = $('#action-form-cont'+postId).find('.form-text-act-type').val();
+	
 	$(this).closest('.action-form-cont').find('.form-flagged').val(true);
 	$(this).closest('.action-form-cont').find('.form-status').val('ESCALATED');
 	
@@ -17404,7 +17410,7 @@ $(document).on('click','.stream-action-esc',function(e){
 			
 			var text = $('#action-form-cont'+postId).find('.form-post-textbox').val();
 			
-			updatePostSuccess(postId,text,'ESCALATED',true,map)
+			updatePostSuccess(postId,text,'ESCALATED',true,textActionType,map)
 			
 			$('#action-form-cont'+postId).find('.form-post-textbox').val('');
 			$("#overlay-toast").html("Successfully Updated Post");
@@ -17423,7 +17429,8 @@ $(document).on('click','.stream-action-res',function(e){
 	$(this).attr('id','stream-action-res-'+postId);
 	var formId = ('add-post-action-'+postId);
 	var disableEle = ('#stream-action-res-'+postId);
-
+	var textActionType = $('#action-form-cont'+postId).find('.form-text-act-type').val();
+	
 	$(this).closest('.action-form-cont').find('.form-flagged').val(false);
 	$(this).closest('.action-form-cont').find('.form-status').val('RESOLVED');
 	
@@ -17436,7 +17443,7 @@ $(document).on('click','.stream-action-res',function(e){
 	
 			var text = $('#action-form-cont'+postId).find('.form-post-textbox').val();
 			
-			updatePostSuccess(postId,text,'RESOLVED',false,map)
+			updatePostSuccess(postId,text,'RESOLVED',false,textActionType,map)
 			
 			$('#action-form-cont'+postId).find('.form-post-textbox').val('');
 			$("#overlay-toast").html("Successfully Updated Post");
@@ -17449,7 +17456,7 @@ $(document).on('click','.stream-action-res',function(e){
 	}, formId,disableEle);
 });
 
-function updatePostSuccess(postId,text,status,flagged,map){
+function updatePostSuccess(postId,text,status,flagged,textActionType,map){
 	
 	$('#action-history'+postId).prepend(streamActionContainer).hide().fadeIn('slow');;
 	var j = $('#action-history'+postId).attr('data-count');
@@ -17532,7 +17539,7 @@ function updatePostSuccess(postId,text,status,flagged,map){
 			$('#act-cont'+postId+'-'+j).addClass('stream-action-container-white');
 		}
 		
-		if($('#action-form-cont'+postId).find('.form-text-act-type').val() == 'SEND_EMAIL'){
+		if(textActionType == 'SEND_EMAIL'){
 			$('#act-cont'+postId+'-'+j).find('.action-mail-icn').removeClass('hide');
 			$('#act-cont'+postId+'-'+j).addClass('stream-action-mail');	
 		}
