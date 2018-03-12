@@ -29,6 +29,9 @@
  display:block !important;
 }
 </style>
+
+<input type="hidden"  id="user-ranking-data" data-start-index=0 data-count=0>
+
 <div class="hm-header-main-wrapper hm-hdr-bord-bot"
 	style="background: #2f69aa">
 	<div class="container">
@@ -59,10 +62,6 @@
 				<option value=3 data-report="branch">My Branch</option>
 			</select>	
 		</div>
-	</div>
-	
-	<div id="my-rank" class="my-rank">
-		<div id="my-rank-btn" class="float-right cursor-pointer top-ten-ranks-btn" style="margin-top: 20px;">Me</div>
 	</div>
 </c:if>
 <c:if test="${profilemasterid == 3}">
@@ -100,14 +99,32 @@
 	</div>
 </c:if>
 
-<div id="top-ten-ranks" class="top-ten-ranks">
-	<div id="top-ten-ranks-btn" class="float-right cursor-pointer top-ten-ranks-btn">Top Ten Ranks</div>
-</div>
-<div id="lead-ranks-above" class="lead-ranks-above">
-	<div id="lead-ranks-above-btn" class="float-right cursor-pointer lead-ranks-above-btn">Load More</div>
-</div>
+<c:if test="${profilemasterid == 4}">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div id="lead-ranks-above" class="lead-ranks-above">
+			<div id="lead-ranks-above-btn" class="float-right cursor-pointer lead-ranks-above-btn">Load More</div>
+		</div>
+		<div id="top-ten-ranks" class="top-ten-ranks">
+			<div id="top-ten-ranks-btn" class="float-right cursor-pointer top-ten-ranks-btn">Top Ten Ranks</div>
+		</div>
+		<div id="my-rank" class="my-rank">
+			<div id="my-rank-btn" class="float-right cursor-pointer top-ten-ranks-btn">Me</div>
+		</div>
+	</div>
+</c:if>
+<c:if test="${profilemasterid != 4}">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div id="lead-ranks-above" class="lead-ranks-above">
+			<div id="lead-ranks-above-btn" class="float-right cursor-pointer lead-ranks-above-btn">Load More</div>
+		</div>
+		<div id="top-ten-ranks" class="top-ten-ranks">
+			<div id="top-ten-ranks-btn" class="float-right cursor-pointer top-ten-ranks-btn">Top Ten Ranks</div>
+		</div>
+	</div>
+</c:if>
+
 <div class="v-um-tbl-wrapper" id="leaderboard-list" style="width:100%;">
-	<jsp:include page="leaderboard_list.jsp"></jsp:include>
+	<%@ include file="leaderboard_list.jsp" %>
 </div>
 <div id="lead-ranks-below" class="lead-ranks-below">
 	<div id="lead-ranks-below-btn" class="float-right cursor-pointer lead-ranks-below-btn">Load More</div>
@@ -177,30 +194,10 @@ $(document).ready(function(){
 	
 	var entityId = companyId;
 	
-	if(profileMasterId != 4){
-		if(entityType == "regionId" && profileMasterId == 2){
-			entityId = columnId;
-		}else if(profileMasterId == 3 && entityType == "regionId"){
-			entityId = columnId;
-		}else if(entityType == "branchId" && profileMasterId == 3){
-			entityId = columnId;
-		}
-		userRankingCount = getUserRankingCountForAdmins(entityType, entityId, year, month, batchSize, timeFrame)
-		if(userRankingCount != null){
-			startIndex= 0;
-			count=userRankingCount.Count;
-		}
-	}else{
-		userRankingCount = getUserRankingCount(entityType, companyId, year, month, batchSize, timeFrame);
-		if(userRankingCount != null){
-			startIndex= userRankingCount.startIndex;
-			count=userRankingCount.Count;
-		}
-	}
-	
-showHideRankPaginateBtns(startIndex, count);
-	
 $(document).on('click','#lead-ranks-above-btn',function(){
+	startIndex = $('#user-ranking-data').attr('data-start-index');
+	count = $('#user-ranking-data').attr('data-count');
+	
 	showDashOverlay('#leaderboard-dash');
 	showOverlay();
 	startIndex -= 10;
@@ -259,29 +256,21 @@ $(document).on('click','#lead-ranks-above-btn',function(){
 		userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
 	}
 	
-	if(userRankingList != null && userRankingList.length != 0){
-		tableData=drawLeaderboardTableStructure(userRankingList, userId,profileMasterId);
-		$('#leaderboard-list').removeClass('hide');
-		$('#leaderboard-tbl').html(tableData);
-		$('#leaderboard-empty-list-msg-div').addClass('hide');
-	}else{
-		$('#leaderboard-list').addClass('hide');
-		$('#leaderboard-empty-list-msg-div').removeClass('hide');
-	}
-	
 	showHideRankPaginateBtns(startIndex, count);
+	
+	$('#user-ranking-data').attr('data-start-index',startIndex);
+	$('#user-ranking-data').attr('data-count',count);
 	
 	 $('html, body').animate({
 	        scrollTop: $('#leaderboard-tbl').offset().top - 20
 	    }, 'slow');
-	 
-	 setTimeout(function(){
-			hideDashOverlay('#leaderboard-dash');
-		}, 1000);
 });
 
 $(document).on('click','#lead-ranks-below-btn',function(){
 	showDashOverlay('#leaderboard-dash'); 
+	
+	startIndex = $('#user-ranking-data').attr('data-start-index');
+	count = $('#user-ranking-data').attr('data-count');
 	
 	startIndex += 10;
 	if(startIndex>=count){
@@ -339,28 +328,21 @@ $(document).on('click','#lead-ranks-below-btn',function(){
 		userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
 	}
 	
-	if(userRankingList != null && userRankingList.length != 0){
-		tableData=drawLeaderboardTableStructure(userRankingList, userId,profileMasterId);
-		$('#leaderboard-list').removeClass('hide');
-		$('#leaderboard-tbl').html(tableData);
-		$('#leaderboard-empty-list-msg-div').addClass('hide');
-	}else{
-		$('#leaderboard-list').addClass('hide');
-		$('#leaderboard-empty-list-msg-div').removeClass('hide');
-	}
-	
 	showHideRankPaginateBtns(startIndex, count);
+	
+	$('#user-ranking-data').attr('data-start-index',startIndex);
+	$('#user-ranking-data').attr('data-count',count);
+	
 	$('html, body').animate({
         scrollTop: $('#leaderboard-tbl').offset().top - 20
     }, 'slow');
-	
-	 setTimeout(function(){
-			hideDashOverlay('#leaderboard-dash');
-		}, 1000);
 });
 
 $(document).on('change', '#time-selector', function() {
 	showDashOverlay('#leaderboard-dash');
+	
+	count = $('#user-ranking-data').attr('data-count');
+	
 	timeFrameStr = $('#time-selector').val();
 	timeFrame = parseInt(timeFrameStr);
 	startIndex = 0;
@@ -435,30 +417,22 @@ $(document).on('change', '#time-selector', function() {
 		userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
 	}
 	
-	if(userRankingList != null && userRankingList.length != 0){
-		tableData=drawLeaderboardTableStructure(userRankingList, userId,profileMasterId);
-		$('#leaderboard-list').removeClass('hide');
-		$('#leaderboard-tbl').html(tableData);
-		$('#leaderboard-empty-list-msg-div').addClass('hide');
-	}else{
-		$('#leaderboard-list').addClass('hide');
-		$('#leaderboard-empty-list-msg-div').removeClass('hide');
-	}
-	
 	showHideRankPaginateBtns(startIndex, count);
+	
+	$('#user-ranking-data').attr('data-start-index',startIndex);
+	$('#user-ranking-data').attr('data-count',count);
 	
 	 $('html, body').animate({
 	        scrollTop: $('#leaderboard-tbl').offset().top - 20
 	    }, 'slow');
-	 
-	 setTimeout(function(){
-			hideDashOverlay('#leaderboard-dash');
-		}, 1000);
 	 
 });
 
 $(document).on('change', '#board-selector', function() {
 	showDashOverlay('#leaderboard-dash');
+	
+	count = $('#user-ranking-data').attr('data-count');
+	
 	timeFrameStr = $('#time-selector').val();
 	timeFrame = parseInt(timeFrameStr);
 	startIndex = 0;
@@ -532,29 +506,21 @@ $(document).on('change', '#board-selector', function() {
 		userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
 	}
 	
-	if(userRankingList != null && userRankingList.length != 0){
-		tableData=drawLeaderboardTableStructure(userRankingList, userId,profileMasterId);
-		$('#leaderboard-list').removeClass('hide');
-		$('#leaderboard-tbl').html(tableData);
-		$('#leaderboard-empty-list-msg-div').addClass('hide');
-	}else{
-		$('#leaderboard-list').addClass('hide');
-		$('#leaderboard-empty-list-msg-div').removeClass('hide');
-	}
-	
 	showHideRankPaginateBtns(startIndex, count);
+	
+	$('#user-ranking-data').attr('data-start-index',startIndex);
+	$('#user-ranking-data').attr('data-count',count);
 	
 	 $('html, body').animate({
 	        scrollTop: $('#leaderboard-tbl').offset().top - 20
 	    }, 'slow');
 	 
-	 setTimeout(function(){
-			hideDashOverlay('#leaderboard-dash');
-		}, 1000);
 });
 
 $(document).on('click','#top-ten-ranks-btn',function(){
 	showDashOverlay('#leaderboard-dash');
+	
+	count = $('#user-ranking-data').attr('data-count');
 	startIndex=0;
 	
 	timeFrameStr = $('#time-selector').val();
@@ -607,29 +573,22 @@ $(document).on('click','#top-ten-ranks-btn',function(){
 	}else{
 		userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
 	}
-	
-	if(userRankingList != null && userRankingList.length != 0){
-		tableData=drawLeaderboardTableStructure(userRankingList, userId,profileMasterId);
-		$('#leaderboard-list').removeClass('hide');
-		$('#leaderboard-tbl').html(tableData);
-		$('#leaderboard-empty-list-msg-div').addClass('hide');
-	}else{
-		$('#leaderboard-list').addClass('hide');
-		$('#leaderboard-empty-list-msg-div').removeClass('hide');
-	}
-	
+
 	showHideRankPaginateBtns(startIndex, count);
+	
+	$('#user-ranking-data').attr('data-start-index',startIndex);
+	$('#user-ranking-data').attr('data-count',count);
+	
 	$('html, body').animate({
         scrollTop: $('#leaderboard-tbl').offset().top - 20
     }, 'slow');
 	
-	 setTimeout(function(){
-			hideDashOverlay('#leaderboard-dash');
-		}, 1000);
 });
 
 $(document).on('click','#my-rank-btn',function(){
 	showDashOverlay('#leaderboard-dash');
+	
+	count = $('#user-ranking-data').attr('data-count');
 	startIndex=0;
 	
 	timeFrameStr = $('#time-selector').val();
@@ -677,25 +636,16 @@ $(document).on('click','#my-rank-btn',function(){
 	var userRankingList = null;
 	
 	userRankingList = getUserRankingList(entityType,companyId, year, month, startIndex, batchSize, timeFrame);
-	
-	if(userRankingList != null && userRankingList.length != 0){
-		tableData=drawLeaderboardTableStructure(userRankingList, userId,profileMasterId);
-		$('#leaderboard-list').removeClass('hide');
-		$('#leaderboard-tbl').html(tableData);
-		$('#leaderboard-empty-list-msg-div').addClass('hide');
-	}else{
-		$('#leaderboard-list').addClass('hide');
-		$('#leaderboard-empty-list-msg-div').removeClass('hide');
-	}
-	
+
 	showHideRankPaginateBtns(startIndex, count);
+	
+	$('#user-ranking-data').attr('data-start-index',startIndex);
+	$('#user-ranking-data').attr('data-count',count);
+	
 	$('html, body').animate({
         scrollTop: $('#leaderboard-tbl').offset().top - 20
     }, 'slow');
 	
-	setTimeout(function(){
-		hideDashOverlay('#leaderboard-dash');
-	}, 1000);
 });
 
 });
