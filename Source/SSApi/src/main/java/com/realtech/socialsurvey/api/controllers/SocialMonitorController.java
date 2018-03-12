@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.api.controllers;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -176,6 +177,23 @@ public class SocialMonitorController
             return new ResponseEntity<>( updatedDocs, HttpStatus.OK );
         } catch (InvalidInputException e) {
             throw  new SSApiException(e.getMessage(), e);
+        }
+    }
+    
+    
+    @RequestMapping ( value = "/token/locks", method = RequestMethod.GET)
+    @ApiOperation ( value = "Updates duplicateCount field matching the given hash of social feed collection")
+    public ResponseEntity<?> getLockedTokens( @RequestParam ( value = "lockType", required = false) String lockType,
+        HttpServletRequest request ) throws SSApiException
+    {
+        try {
+            LOGGER.info( "SocialMonitorController.getLockedTokens started" );
+
+            Map<String, Long> lockedTokens = organizationManagementService.getFacebookAndTwitterLocks( lockType );
+            LOGGER.info( "SocialMonitorController.updateDuplicateCount completed successfully" );
+            return new ResponseEntity<>( lockedTokens, HttpStatus.OK );
+        } catch ( InvalidInputException e ) {
+            throw new SSApiException( e.getMessage(), e );
         }
     }
 
