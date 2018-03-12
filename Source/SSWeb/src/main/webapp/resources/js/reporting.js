@@ -1,7 +1,7 @@
 //javascript for populating the graphs in reporting dashboard overview
 
 var monthNamesList = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];	
-var overviewData=getOverviewData();
+var overviewData=null;
 var socialMediaList = new Array();
 var is_safari = navigator.userAgent.indexOf("Safari") > -1;
 var unclickedDrawnCount=0;
@@ -78,6 +78,28 @@ function isEmpty(obj) {
     return true;
 }
 
+function drawTransactionDetailsTab(){
+	showDashOverlay('#trans-stats-dash');
+	$.ajax({
+		url : './reportingtransactiondetails.do',
+		type : "GET",
+		cache : false,
+		success : function(data){
+			$('#reporting-trans-details').append(data);
+			paintForReportingDash();
+		},
+		complete: function(){
+			hideDashOverlay('#trans-stats-dash');
+		},
+		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+		}
+	});
+}
+
 function paintForReportingDash() {
 	
 	showDashOverlay('#unclicked-graph-dash');
@@ -85,142 +107,12 @@ function paintForReportingDash() {
 	var overviewYearData = null;
 	
 	if(monthYear.month == 14){
-		overviewYearData = getoverviewAllTimeData();
+		getoverviewAllTimeData();
 	}else if(monthYear.month == 13){
-    	overviewYearData =  getoverviewYearData(monthYear.year);
+    	getoverviewYearData(monthYear.year);
     }else{
-    	overviewYearData = getOverviewMonthData(monthYear.month, monthYear.year);
+    	getOverviewMonthData(monthYear.month, monthYear.year);
     }
-	
-	if(overviewYearData != null && !isEmpty(overviewYearData)){
-		var avgRating = overviewYearData.Rating;
-		var reviewCount=  overviewYearData.TotalReview;
-		paintAvgRating(avgRating);
-		paintReviewCount(reviewCount);
-	
-	}else{
-		var avgRating = 0;
-		var reviewCount=  0;
-		paintAvgRating(avgRating);
-		paintReviewCount(reviewCount);
-	}
-	
-	//Paint the transactions section of the reporting the dashboard
-	if(overviewYearData!=null && !isEmpty(overviewYearData)){
-		if($('#donutchart').length > 0 ){
-	 		drawUnclickedDonutChart(overviewYearData);
-	 	}
-	 	if($('#processedDonutchart').length > 0 ){
-	 		drawProcessedDonutChart(overviewYearData);
-	 	}
-		
-	 	if($('#unprocessedDonutchart').length > 0 ){
-	 		drawUnprocessedDonutChart(overviewYearData);
-	 	}
-		$('#processed-lbl-span').html(overviewYearData.Processed);
-		$('#completed-lbl-span').html(overviewYearData.Completed+' ('+overviewYearData.CompletePercentage+'%)');
-		$('#incomplete-lbl-span').html(overviewYearData.Incomplete+' ('+overviewYearData.IncompletePercentage+'%)');
-		$('#incomplete-lbl-span-sel').html(overviewYearData.Incomplete+' ('+overviewYearData.IncompletePercentage+'%)');
-		$('#social-posts-lbl-span').html(overviewYearData.SocialPosts);
-		$('#zillow-lbl-span').html(overviewYearData.ZillowReviews);
-		$('#third-party-lbl-span').html(overviewYearData.ThirdParty);
-		$('#unprocessed-lbl-span').html(overviewYearData.Unprocessed);
-		$('#unassigned-lbl-span').html(overviewYearData.Unassigned);
-		$('#duplicate-lbl-span').html(overviewYearData.Duplicate);
-		$('#unassigned-lbl-span-sel').html(overviewYearData.Unassigned);
-		$('#corrupted-lbl-span').html(overviewYearData.Corrupted);
-		var other = overviewYearData.Unprocessed - (overviewYearData.Unassigned + overviewYearData.Duplicate + overviewYearData.Corrupted);
-		$('#other-lbl-span').html(other);
-		$('#unclicked-trans-graph').removeClass('hide');
-		$('#processed-trans-graph').addClass('hide');
-		$('#unprocessed-trans-graph').addClass('hide');
-		$('#empty-rep-chart-div').addClass('hide');
-	}else{
-		if($('#donutchart').length > 0 ){
-	 		drawUnclickedDonutChart(overviewYearData);
-	 	}
-	 	if($('#processedDonutchart').length > 0 ){
-	 		drawProcessedDonutChart(overviewYearData);
-	 	}
-		
-	 	if($('#unprocessedDonutchart').length > 0 ){
-	 		drawUnprocessedDonutChart(overviewYearData);
-	 	}
-		$('#processed-lbl-span').html(0);
-		$('#completed-lbl-span').html(0+' ('+0+'%)');
-		$('#incomplete-lbl-span').html(0+' ('+0+'%)');
-		$('#incomplete-lbl-span-sel').html(0);
-		$('#social-posts-lbl-span').html(0);
-		$('#zillow-lbl-span').html(0);
-		$('#third-party-lbl-span').html(0);
-		$('#unprocessed-lbl-span').html(0);
-		$('#unassigned-lbl-span').html(0);
-		$('#duplicate-lbl-span').html(0);
-		$('#unassigned-lbl-span-sel').html(0);
-		$('#corrupted-lbl-span').html(0);
-		$('#other-lbl-span').html(0);
-		$('#unclicked-trans-graph').addClass('hide');
-		$('#processed-trans-graph').addClass('hide');
-		$('#unprocessed-trans-graph').addClass('hide');
-		$('#empty-rep-chart-div').removeClass('hide');
-	}	
-	
-	var processed=parseInt($('#processed-lbl-span').html());
-	var unprocessed=parseInt($('#unprocessed-lbl-span').html());
-	if(processed != 0 || unprocessed != 0){
-		$('#unclicked-trans-graph').removeClass('hide');
-		$('#unprocessed-trans-graph').addClass('hide');
-		$('#processed-trans-graph').addClass('hide');
-		if(!($('#empty-rep-chart-div').hasClass('hide'))){
-			$('#empty-rep-chart-div').addClass('hide');
-		}	
-	}else{
-		$('#unclicked-trans-graph').addClass('hide');
-		$('#unprocessed-trans-graph').addClass('hide');
-		$('#processed-trans-graph').addClass('hide');
-		if($('#empty-rep-chart-div').hasClass('hide')){
-			$('#empty-rep-chart-div').removeClass('hide');
-		}	
-	}
-	
-	$(window).resize(function(){
-		 showDashOverlay('#unclicked-graph-dash');
-		 $('#unclicked-trans-graph').removeClass('hide');
-		 	if($('#donutchart').length > 0 ){
-		 		drawUnclickedDonutChart(overviewYearData);
-		 	}
-		 	if($('#processedDonutchart').length > 0 ){
-		 		drawProcessedDonutChart(overviewYearData);
-		 	}
-			
-		 	if($('#unprocessedDonutchart').length > 0 ){
-		 		drawUnprocessedDonutChart(overviewYearData);
-		 	}
-			
-			var processed=parseInt($('#processed-lbl-span').html());
-			var unprocessed=parseInt($('#unprocessed-lbl-span').html());
-			if(processed != 0 || unprocessed != 0){
-				$('#unclicked-trans-graph').removeClass('hide');
-				$('#unprocessed-trans-graph').addClass('hide');
-				$('#processed-trans-graph').addClass('hide');
-				if(!($('#empty-rep-chart-div').hasClass('hide'))){
-					$('#empty-rep-chart-div').addClass('hide');
-				}	
-			}else{
-				$('#unclicked-trans-graph').addClass('hide');
-				$('#unprocessed-trans-graph').addClass('hide');
-				$('#processed-trans-graph').addClass('hide');
-				if($('#empty-rep-chart-div').hasClass('hide')){
-					$('#empty-rep-chart-div').removeClass('hide');
-				}	
-			}
-			setTimeout(function(){
-				hideDashOverlay('#unclicked-graph-dash');
-			}, 3000);
-	 });
-	setTimeout(function(){
-		hideDashOverlay('#unclicked-graph-dash');
-	}, 3000);
 	
 }
 
@@ -253,12 +145,24 @@ function drawLeaderboardPage(columnName, columnId,profileMasterId,userId,company
 	
 	var userRankingList = null;
 	if(profileMasterId != 4){
-		userRankingList = getUserRankingList(columnName,columnId, currentYear, currentMonth, startIndex, batchSize, timeFrame);
+		getUserRankingList(columnName,columnId, currentYear, currentMonth, startIndex, batchSize, timeFrame);
 	}else{
-		userRankingList = getUserRankingList("companyId",companyId, currentYear, currentMonth, startIndex, batchSize, timeFrame);
+		getUserRankingList("companyId",companyId, currentYear, currentMonth, startIndex, batchSize, timeFrame);
 	}
 	
+	showHideRankPaginateBtns(startIndex, count);
+	$('#user-ranking-data').attr('data-start-index',startIndex);
+	$('#user-ranking-data').attr('data-count',count);
+
+}
+
+function leaderboardPageStructure(userRankingList){
 	var tableData='';
+	var userIdStr = $('#reporting-data-div').attr('data-user-id');
+	var userId = parseInt(userIdStr);
+	var profileMasterIdStr = $('#reporting-data-div').attr('data-profile-master-id');
+	var profileMasterId = parseInt(profileMasterIdStr);
+	
 	if(userRankingList != null && userRankingList.length != 0){
 		tableData=drawLeaderboardTableStructure(userRankingList, userId,profileMasterId);
 		$('#leaderboard-list').removeClass('hide');
@@ -268,11 +172,8 @@ function drawLeaderboardPage(columnName, columnId,profileMasterId,userId,company
 		$('#leaderboard-list').addClass('hide');
 		$('#leaderboard-empty-list-msg-div').removeClass('hide');
 	}
-	
-	setTimeout(function(){
-		hideDashOverlay('#leaderboard-dash');
-	}, 2000);
 }
+
 //draw sps graphs and completion rate graphs functions
 function drawSpsStatsGraph(){
 	showDashOverlay('#sps-dash');
@@ -698,7 +599,6 @@ function drawCompletionRateGraph(){
 function drawUnclickedDonutChart(overviewYearData){
 	 
 	unclickedDrawnCount=0;
-	$('#processed-trans-graph').removeClass('hide');
 	var monthYear = getTimeFrameValue();
 	
 	 google.charts.load("current", {packages:["corechart"]});
@@ -798,13 +698,13 @@ function drawUnclickedDonutChart(overviewYearData){
 		       
 		        isUpdateTransStats=false;
 		        
-		        $('#processed-trans-graph').addClass('hide');
+		        hideDashOverlay('#unclicked-graph-dash');
 	      }
 }
 
 function drawProcessedDonutChart(overviewYearData){
 	
-	$('#unprocessed-trans-graph').removeClass('hide');
+	$('#processed-trans-graph').removeClass('hide');
 	
 	var monthYear = getTimeFrameValue();
 	    
@@ -865,6 +765,9 @@ function drawProcessedDonutChart(overviewYearData){
 }
 
 function drawUnprocessedDonutChart(overviewYearData){
+	
+	$('#unprocessed-trans-graph').removeClass('hide');
+	
 	 google.charts.load("current", {packages:["corechart"]});
     google.charts.setOnLoadCallback(drawChart);
     
@@ -924,6 +827,8 @@ function drawUnprocessedDonutChart(overviewYearData){
 
 	        var chart = new google.visualization.PieChart(document.getElementById('unprocessedDonutchart'));
 	        chart.draw(data, options);
+	        
+	        $('#unprocessed-trans-graph').addClass('hide');
 	      }
 }
 
@@ -1181,7 +1086,7 @@ function drawNpsGauge(){
 }
 
 function drawSpsGauge(){
-	
+
 	if(overviewData != null && !isEmpty(overviewData)){
 		var detractorEndAngle;
 		var passivesEndAngle;
@@ -1347,6 +1252,8 @@ function drawSpsGauge(){
 
 function drawOverviewPage(){
 	
+	getOverviewData();
+	
 	var detractors; 
 	var passives;
 	var promoters;
@@ -1418,6 +1325,11 @@ function drawOverviewPage(){
 			$('#nps-row').hide();
 			
 	}
+	
+	drawSpsGauge();
+	
+	drawNpsGauge();
+	
 	
 	if (overviewData == null) {
 		$('#overviewSuccess').hide();
@@ -2391,10 +2303,9 @@ function splitAndEditDate(monthYear){
 	return (monthStr + " " + yearStr);
 }
 
-function drawOverallScoreStatsGraph(entityId, entityType){
+function drawOverallScoreStatsGraph(overallScoreStats){
 		
 	var overallChartDiv = "overall-rating-chart";
-	var overallScoreStats = getOverallScoreStats(entityId, entityType);
 	
 	if(overallScoreStats != null && overallScoreStats.length != 0){
 		for(var i=0; i<overallScoreStats.length; i++){
@@ -2421,9 +2332,7 @@ function drawOverallScoreStatsGraph(entityId, entityType){
 	}
 }
 
-function drawQuestionScoreStatsGraph(entityId,entityType){
-	
-	var questionScoreStats = getQuestionScoreStats(entityId, entityType);
+function drawQuestionScoreStatsGraph(questionScoreStats){
 	
 	if(questionScoreStats != null && questionScoreStats.length != 0){
 		
@@ -2496,8 +2405,45 @@ function isContainsQuestion(array,questionId){
 
 function drawReportingDashButtons(columnName, columnValue){
 	
-	var stages = getReportingSocialMediaConnections(columnName, columnValue);
-	
+	var payload = {
+			"columnName" : columnName,
+			"columnValue" : columnValue
+		};
+		
+		var stages = null;
+		$.ajax({
+			url : './dashboardbuttonsorder.do',
+			headers: {          
+	            Accept : "text/plain; charset=utf-8"   
+			},
+			type : "GET",
+			data : payload,
+			cache : false,
+			success : function(data){
+				data = $.parseJSON(data);
+				stages = data.stages;
+				reportingSocialMediaButtons(stages,columnName,columnValue)
+			},
+			complete: function(){
+				hideOverlay();
+				hideDashOverlay('#mid-dash');
+				hideDashOverlay('#top-dash');
+				hideDashOverlay('#latest-post-ep');
+			},
+			error : function(e) {
+				if(e.status == 504) {
+					redirectToLoginPageOnSessionTimeOut(e.status);
+					return;
+				}
+				if(e.status == 0) {
+					return;
+				}
+				redirectErrorpage();
+			}
+		});
+}
+
+function reportingSocialMediaButtons(stages,columnName,columnValue){
 	var max = 1;
 	
 	if(columnName == null){
@@ -2538,7 +2484,7 @@ function drawReportingDashButtons(columnName, columnValue){
 				$('#dsh-btn2').data('social', stages[i].profileStageKey);
 				$('#dsh-btn2').html(contentToDisplay);
 				$('#dsh-btn2').removeClass('hide');
-				updateSocialMediaList(stages, stages[i].profileStageKey);
+				updateSocialMediaList(stages[i].profileStageKey);
 			}
 		}
 		
@@ -2546,15 +2492,52 @@ function drawReportingDashButtons(columnName, columnValue){
 		$('#rep-social-media').addClass('hide');
 		$('#empty-rep-social-media').removeClass('hide');
 	}
-	
-	
 }
+
 
 function changeSocialMedia(columnName, columnValue){
 	
-	var profileStageKey = $('#dsh-btn2').data('social');
-	
-	var stages = getReportingSocialMediaConnections(columnName, columnValue);
+		var payload = {
+			"columnName" : columnName,
+			"columnValue" : columnValue
+		};
+		
+		var stages = null;
+		$.ajax({
+			url : './dashboardbuttonsorder.do',
+			headers: {          
+	            Accept : "text/plain; charset=utf-8"   
+			},
+			type : "GET",
+			data : payload,
+			cache : false,
+			success : function(data){
+				data = $.parseJSON(data);
+				stages = data.stages;
+				changeReportingSocialMediaButtons(stages);
+			},
+			complete: function(){
+				hideOverlay();
+				hideDashOverlay('#mid-dash');
+				hideDashOverlay('#top-dash');
+				hideDashOverlay('#latest-post-ep');
+			},
+			error : function(e) {
+				if(e.status == 504) {
+					redirectToLoginPageOnSessionTimeOut(e.status);
+					return;
+				}
+				if(e.status == 0) {
+					return;
+				}
+				redirectErrorpage();
+			}
+		});
+}
+
+
+function changeReportingSocialMediaButtons(stages){
+var profileStageKey = $('#dsh-btn2').data('social');
 	
 	var max = 2;
 		
@@ -2601,7 +2584,7 @@ function changeSocialMedia(columnName, columnValue){
 					$('#dsh-btn2').html(contentToDisplay);
 					$('#dsh-btn2').removeClass('hide');
 					$('#rep-social-media').fadeIn(500);
-					updateSocialMediaList(stages, stages[i].profileStageKey);
+					updateSocialMediaList(stages[i].profileStageKey);
 					break;
 				}
 			}
@@ -2611,10 +2594,9 @@ function changeSocialMedia(columnName, columnValue){
 		$('#rep-social-media').addClass('hide');
 		$('#empty-rep-social-media').removeClass('hide');	
 	}
-	
 }
 
-function updateSocialMediaList(stages,socialMedia){
+function updateSocialMediaList(socialMedia){
 	
 	socialMediaList.push(socialMedia);
 	
@@ -2692,10 +2674,103 @@ function clickUnprocessedDiv(){
 
 //api calls functions
 
+function drawTransactionStats(overviewYearData){
+	
+	if(overviewYearData != null && !isEmpty(overviewYearData)){
+		var avgRating = overviewYearData.Rating;
+		var reviewCount=  overviewYearData.TotalReview;
+		paintAvgRating(avgRating);
+		paintReviewCount(reviewCount);
+	
+	}else{
+		var avgRating = 0;
+		var reviewCount=  0;
+		paintAvgRating(avgRating);
+		paintReviewCount(reviewCount);
+	}
+	
+	//Paint the transactions section of the reporting the dashboard
+	if(overviewYearData!=null && !isEmpty(overviewYearData)){
+		if($('#donutchart').length > 0 ){
+	 		drawUnclickedDonutChart(overviewYearData);
+	 	}
+	 	if($('#processedDonutchart').length > 0 ){
+	 		drawProcessedDonutChart(overviewYearData);
+	 	}
+		
+	 	if($('#unprocessedDonutchart').length > 0 ){
+	 		drawUnprocessedDonutChart(overviewYearData);
+	 	}
+		$('#processed-lbl-span').html(overviewYearData.Processed);
+		$('#completed-lbl-span').html(overviewYearData.Completed+' ('+overviewYearData.CompletePercentage+'%)');
+		$('#incomplete-lbl-span').html(overviewYearData.Incomplete+' ('+overviewYearData.IncompletePercentage+'%)');
+		$('#incomplete-lbl-span-sel').html(overviewYearData.Incomplete+' ('+overviewYearData.IncompletePercentage+'%)');
+		$('#social-posts-lbl-span').html(overviewYearData.SocialPosts);
+		$('#zillow-lbl-span').html(overviewYearData.ZillowReviews);
+		$('#third-party-lbl-span').html(overviewYearData.ThirdParty);
+		$('#unprocessed-lbl-span').html(overviewYearData.Unprocessed);
+		$('#unassigned-lbl-span').html(overviewYearData.Unassigned);
+		$('#duplicate-lbl-span').html(overviewYearData.Duplicate);
+		$('#unassigned-lbl-span-sel').html(overviewYearData.Unassigned);
+		$('#corrupted-lbl-span').html(overviewYearData.Corrupted);
+		var other = overviewYearData.Unprocessed - (overviewYearData.Unassigned + overviewYearData.Duplicate + overviewYearData.Corrupted);
+		$('#other-lbl-span').html(other);
+		$('#unclicked-trans-graph').removeClass('hide');
+		$('#processed-trans-graph').addClass('hide');
+		$('#unprocessed-trans-graph').addClass('hide');
+		$('#empty-rep-chart-div').addClass('hide');
+	}else{
+		if($('#donutchart').length > 0 ){
+	 		drawUnclickedDonutChart(overviewYearData);
+	 	}
+	 	if($('#processedDonutchart').length > 0 ){
+	 		drawProcessedDonutChart(overviewYearData);
+	 	}
+		
+	 	if($('#unprocessedDonutchart').length > 0 ){
+	 		drawUnprocessedDonutChart(overviewYearData);
+	 	}
+		$('#processed-lbl-span').html(0);
+		$('#completed-lbl-span').html(0+' ('+0+'%)');
+		$('#incomplete-lbl-span').html(0+' ('+0+'%)');
+		$('#incomplete-lbl-span-sel').html(0);
+		$('#social-posts-lbl-span').html(0);
+		$('#zillow-lbl-span').html(0);
+		$('#third-party-lbl-span').html(0);
+		$('#unprocessed-lbl-span').html(0);
+		$('#unassigned-lbl-span').html(0);
+		$('#duplicate-lbl-span').html(0);
+		$('#unassigned-lbl-span-sel').html(0);
+		$('#corrupted-lbl-span').html(0);
+		$('#other-lbl-span').html(0);
+		$('#unclicked-trans-graph').addClass('hide');
+		$('#processed-trans-graph').addClass('hide');
+		$('#unprocessed-trans-graph').addClass('hide');
+		$('#empty-rep-chart-div').removeClass('hide');
+	}	
+	
+	var processed=parseInt($('#processed-lbl-span').html());
+	var unprocessed=parseInt($('#unprocessed-lbl-span').html());
+	if(processed != 0 || unprocessed != 0){
+		$('#unclicked-trans-graph').removeClass('hide');
+		$('#unprocessed-trans-graph').addClass('hide');
+		$('#processed-trans-graph').addClass('hide');
+		if(!($('#empty-rep-chart-div').hasClass('hide'))){
+			$('#empty-rep-chart-div').addClass('hide');
+		}	
+	}else{
+		$('#unclicked-trans-graph').addClass('hide');
+		$('#unprocessed-trans-graph').addClass('hide');
+		$('#processed-trans-graph').addClass('hide');
+		if($('#empty-rep-chart-div').hasClass('hide')){
+			$('#empty-rep-chart-div').removeClass('hide');
+		}	
+	}
+}
+
 function getOverviewMonthData(month,year) {
 
 	$.ajax({
-		async : false,
 		url : "/fetchmonthdataforoverview.do?month="+month+"&year="+year,
 		type : "GET",
 		cache : false,
@@ -2710,6 +2785,7 @@ function getOverviewMonthData(month,year) {
 								overviewMonthData = JSON.parse(response);
 							}
 						}
+						drawTransactionStats(overviewMonthData);
 		},
 		error : function(e) {
 			if (e.status == 504) {
@@ -2717,10 +2793,9 @@ function getOverviewMonthData(month,year) {
 				return;
 			}
 			overviewMonthData = null;
+			drawTransactionStats(overviewMonthData);
 		}
 	});
-	
-	return overviewMonthData;
 
 }
 
@@ -2728,7 +2803,6 @@ function getOverviewMonthData(month,year) {
 function getoverviewYearData(year) {
 
 $.ajax({
-	async : false,
 	url : "/fetchyeardataforoverview.do?year="+year,
 	type : "GET",
 	cache : false,
@@ -2744,6 +2818,7 @@ $.ajax({
 						}
 						
 					}
+					drawTransactionStats(overviewYearData);
 	},
 	error : function(e) {
 		if (e.status == 504) {
@@ -2751,17 +2826,15 @@ $.ajax({
 			return;
 		}
 		overviewYearData = null;
+		drawTransactionStats(overviewYearData);
 	}
 });
-
-return overviewYearData;
 
 }
 
 function getoverviewAllTimeData() {
 
 	$.ajax({
-		async : false,
 		url : "/fetchalltimefromreportingoverview.do",
 		type : "GET",
 		cache : false,
@@ -2777,6 +2850,8 @@ function getoverviewAllTimeData() {
 							}
 							
 						}
+						
+						drawTransactionStats(overviewAllTimeData);
 		},
 		error : function(e) {
 			if (e.status == 504) {
@@ -2784,10 +2859,9 @@ function getoverviewAllTimeData() {
 				return;
 			}
 			overviewAllTimeData = null;
+			drawTransactionStats(overviewAllTimeData);
 		}
 	});
-
-	return overviewAllTimeData;
 
 	}
 
@@ -2818,9 +2892,6 @@ function getOverviewData() {
 			overviewData = null;
 		}
 	});
-	
-	return overviewData;
-
 }
 
 function getRecentActivityList(startIndex,batchSize){
@@ -2916,46 +2987,6 @@ function deleteRecentActivity(fileUploadId,idIndex){
 	});
 }
 
-function getReportingSocialMediaConnections(columnName,columnValue){
-	var payload = {
-			"columnName" : columnName,
-			"columnValue" : columnValue
-		};
-		
-		var stages = null;
-		$.ajax({
-			url : './dashboardbuttonsorder.do',
-			headers: {          
-	            Accept : "text/plain; charset=utf-8"   
-			},
-			type : "GET",
-			data : payload,
-			async : false,
-			cache : false,
-			success : function(data){
-				data = $.parseJSON(data);
-				stages = data.stages;
-			},
-			complete: function(){
-				hideOverlay();
-				hideDashOverlay('#mid-dash');
-				hideDashOverlay('#top-dash');
-				hideDashOverlay('#latest-post-ep');
-			},
-			error : function(e) {
-				if(e.status == 504) {
-					redirectToLoginPageOnSessionTimeOut(e.status);
-					return;
-				}
-				if(e.status == 0) {
-					return;
-				}
-				redirectErrorpage();
-			}
-		});
-		return stages;
-}
-
 function getOverallScoreStats(entityId,entityType){
 	
 	var currentDate = new Date();
@@ -2967,22 +2998,22 @@ function getOverallScoreStats(entityId,entityType){
 	var overallScoreStats=null;
 	
 	$.ajax({
-		async : false,
 		url : url,
 		type : "GET",
 		cache : false,
 		dataType : "json",
 		success : function(response) {
-					overallScoreStats = JSON.parse(response);
+			 overallScoreStats = JSON.parse(response);
+			 drawOverallScoreStatsGraph(overallScoreStats);
 		},
 		error : function(e) {
 			if (e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}	
+			drawOverallScoreStatsGraph(overallScoreStats);
 		}
 	});
-	return overallScoreStats;
 }
 
 function getQuestionScoreStats(entityId,entityType){
@@ -2995,47 +3026,23 @@ function getQuestionScoreStats(entityId,entityType){
 	var questionScoreStats=null;
 	
 	$.ajax({
-		async : false,
 		url : url,
 		type : "GET",
 		cache : false,
 		dataType : "json",
 		success : function(response) {
 					questionScoreStats = JSON.parse(response);
+					drawQuestionScoreStatsGraph(questionScoreStats);
 		},
 		error : function(e) {
 			if (e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}	
+			drawQuestionScoreStatsGraph(questionScoreStats);
 		}
 	});
 	return questionScoreStats;
-}
-
-function getProfileImageByUserId(userId){
-	var profileImageUrlData=null;
-	$.ajax({
-		async : false,
-		url : "/getuserprofimageforleaderboard.do?userId="+userId,
-		type : "GET",
-		cache : false,
-		dataType : "json",
-		success : function(data) {
-			profileImageUrlData = data;						
-		},
-		complete:function(){
-			hideOverlay();
-		},
-		error : function(e) {
-			if (e.status == 504) {
-				redirectToLoginPageOnSessionTimeOut(e.status);
-				return;
-			}	
-		}
-	});
-	
-	return profileImageUrlData;
 }
 
 function saveRankingSettings(minDaysOfRegistration, minCompletedPercentage, minNoOfReviews, monthOffset, yearOffset){
@@ -3074,25 +3081,26 @@ function getUserRankingList(entityType,entityId,year,month,startIndex,batchSize,
 	var userRankingList =null;	
 	
 	$.ajax({
-		async : false,
 		url : "/getuserranking.do?entityId="+entityId+"&entityType="+entityType+"&month="+month+"&year="+year+"&startIndex="+startIndex+"&batchSize="+batchSize+"&timeFrame="+timeFrame,
 		type : "GET",
 		cache : false,
 		dataType : "json",
 		success : function(response) {
 					userRankingList = JSON.parse(response);	
+					leaderboardPageStructure(userRankingList)
 		},
 		complete: function(){
 			hideOverlay();
+			hideDashOverlay('#leaderboard-dash');
 		},
 		error : function(e) {
 			if (e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
+			leaderboardPageStructure(userRankingList)
 		}
 	});
-	return userRankingList;
 }
 
 function getUserRankingCountForAdmins(entityType,entityId,year,month,batchSize,timeFrame){
@@ -3147,7 +3155,6 @@ function recalculateUserRanking(){
 	$('.recalculate-usr-rank-btn-inactive').toggle();
 	
 	$.ajax({
-		async : false,
 		url : "/recalranking.do",
 		type : "GET",
 		success :function(response) {
@@ -3411,3 +3418,76 @@ function autoRefresh(tableHeaderData){
 		autoRefresh(tableHeaderData);
 	}, 30000);
 }
+
+// new dashboard event handlers
+$(document).on('click','#prof-company-review-count',function(e){
+	e.stopPropagation();
+	activaTab('reviews-tab');
+	delay(function(){
+		$(window).scrollTop($('#rep-reviews-container').offset().top);
+	},300);
+});
+
+$(document).on('click','#incompleted-lbl-sel',function(e){
+	e.stopPropagation();
+	activaTab('incomplete-surveys-tab');
+	
+	delay(function(){
+		$(window).scrollTop($('#rep-dash-survey-incomplete').offset().top);
+	},300);
+	
+});
+
+$(document).on('click','#unassigned-lbl-sel-span',function(e){
+	e.stopPropagation();
+	showMainContent('./showapps.do');
+});
+
+$(document).on('click','#unprocessed-trans-div',function(e){
+	
+	clickUnprocessedDiv();
+});
+
+$(document).on('click','#processed-trans-div',function(e){
+	clickProcessedDiv();
+});
+
+$(document).on('click','#chart-icn-btn',function(e){
+	$('#incompleted-details-selectable').show();
+	$('#incompleted-details').addClass('hide');
+	$('#incompleted-details').removeClass('inline-flex-class');
+	$('#unassigned-details-selectable').show();
+	$('#unassigned-details').addClass('hide');
+	$('#unassigned-details').removeClass('inline-flex-class');
+	$('.processed-background-rect').show();
+	$('#processed-background-rect').hide();
+	$('.unprocessed-background-rect').show();
+	$('#unprocessed-background-rect').hide();
+	$('#unprocessed-lbl-rect').show();
+	$('#processed-lbl-rect').show();
+	$('#completed-lbl-rect').hide();
+	$('#incompleted-lbl-rect').hide();
+	$('#social-posts-lbl-rect').hide();
+	$('#zillow-lbl-rect').hide();
+	$('#third-party-lbl-rect').hide();
+	$('#unassigned-lbl-rect').hide();
+	$('#duplicate-lbl-rect').hide();
+	$('#corrupted-lbl-rect').hide();
+	$('#other-lbl-rect').hide();
+	
+	$('#unprocessed-trans-div').fadeTo('fast','1.0');
+	$('#processed-trans-div').fadeTo('fast','1.0');
+	
+	var processed=parseInt($('#processed-lbl-span').html());
+	var unprocessed=parseInt($('#unprocessed-lbl-span').html());
+	if(processed != 0 || unprocessed != 0){
+		$('#unclicked-trans-graph').removeClass('hide');
+		$('#unprocessed-trans-graph').addClass('hide');
+		$('#processed-trans-graph').addClass('hide');
+		$('#empty-rep-chart-div').addClass('hide');
+	}else{
+		$('#unclicked-trans-graph').addClass('hide');
+		$('#unprocessed-trans-graph').addClass('hide');
+		$('#processed-trans-graph').addClass('hide');
+	}
+});
