@@ -37,9 +37,8 @@ hr{
 }
 
 </style>
-<div id="trans-stats-dash" class="hide" ></div>
 
-<div class="hm-header-main-wrapper hm-hdr-bord-bot" style="background: #2f69aa;margin-bottom: 5px;">
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 hm-header-main-wrapper hm-hdr-bord-bot" style="background: #2f69aa;margin-bottom: 5px;">
 	<div class="container">
 		<div class="hm-header-row clearfix">
 			<div id="timeFrame_container">
@@ -50,7 +49,7 @@ hr{
 </div>
 
 <div id="processed-trans-div" class="col-lg-4 col-md-4 col-sm-4 col-xs-4 cursor-pointer processed-trans-div">
-	<div id="processed-div" style="display:inline-grid; padding-left: 30px;">
+	<div id="processed-div" class="processed-trans-cont" style="">
 		<div id="processed-details" class="inline-flex-class" style="margin-bottom: 0px; margin-top: 45px;">
 			<div id="processed-background-rect" class="background-rect hide"></div>
 			<div id="processed-lbl-rect" class="processed-lbl-rect-div"></div>
@@ -114,24 +113,24 @@ hr{
 			</div>
 		</div>
 	</div>
-	<div id="unclicked-trans-graph" style="margin-top:40px" >
+	<div id="unclicked-trans-graph" class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:40px; padding:0" >
 		<div id="unclicked-graph-div" style="position:relative">
 			<div id="donutchart" style="width: 100%; height: 90%;"></div>
 		</div>	
 	</div>
-	<div id="processed-trans-graph" style="margin-top:40px" class="hide">
+	<div id="processed-trans-graph" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 hide" style="margin-top:40px; padding:0">
 		<div id="processed-graph-div" style="position:relative">
 			<div id="processedDonutchart" style="width: 100%; height: 90%;"></div>
 		</div>
 	</div>
-	<div id="unprocessed-trans-graph" style="margin-top:40px" class="hide">
+	<div id="unprocessed-trans-graph" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 hide" style="margin-top:40px; padding:0">
 		<div id="unprocessed-graph-div" style="position:relative">
 			<div id="unprocessedDonutchart" style="width: 100%; height: 90%;"></div>
 		</div>
 	</div>
 </div>
 <div id="unprocessed-trans-div" class="col-lg-4 col-md-4 col-sm-4 col-xs-4 cursor-pointer unprocessed-trans-div">
-	<div id="unprocessed-div" style="display:inline-grid; padding-left: 30px; width: 100%;">
+	<div id="unprocessed-div" class="processed-trans-cont">
 		<div id="unprocessed-details" class="inline-flex-class" style="margin-bottom: 0px; margin-top: 45px;">
 			<div id="unprocessed-background-rect" class="background-rect hide"></div>
 			<div id="unprocessed-lbl-rect" class="unprocessed-lbl-rect-div"></div>
@@ -175,70 +174,3 @@ hr{
 			
 	</div>
 </div>
-<script>
-$(document).ready(function(){
-	$(document).on('click','#incompleted-lbl-sel',function(e){
-		e.stopPropagation();
-		activaTab('incomplete-surveys-tab');
-		
-		delay(function(){
-			$(window).scrollTop($('#rep-dash-survey-incomplete').offset().top);
-		},300);
-		
-	});
-	
-	$(document).on('click','#unassigned-lbl-sel-span',function(e){
-		e.stopPropagation();
-		showMainContent('./showapps.do');
-	});
-	
-	$(document).on('click','#unprocessed-trans-div',function(e){
-		
-		clickUnprocessedDiv();
-	});
-	
-	$(document).on('click','#processed-trans-div',function(e){
-		clickProcessedDiv();
-	});
-	
-	$(document).on('click','#chart-icn-btn',function(e){
-		$('#incompleted-details-selectable').show();
-		$('#incompleted-details').addClass('hide');
-		$('#incompleted-details').removeClass('inline-flex-class');
-		$('#unassigned-details-selectable').show();
-		$('#unassigned-details').addClass('hide');
-		$('#unassigned-details').removeClass('inline-flex-class');
-		$('.processed-background-rect').show();
-		$('#processed-background-rect').hide();
-		$('.unprocessed-background-rect').show();
-		$('#unprocessed-background-rect').hide();
-		$('#unprocessed-lbl-rect').show();
-		$('#processed-lbl-rect').show();
-		$('#completed-lbl-rect').hide();
-		$('#incompleted-lbl-rect').hide();
-		$('#social-posts-lbl-rect').hide();
-		$('#zillow-lbl-rect').hide();
-		$('#third-party-lbl-rect').hide();
-		$('#unassigned-lbl-rect').hide();
-		$('#duplicate-lbl-rect').hide();
-		$('#corrupted-lbl-rect').hide();
-		$('#other-lbl-rect').hide();
-		
-		$('#unprocessed-trans-div').fadeTo('fast','1.0');
-		$('#processed-trans-div').fadeTo('fast','1.0');
-		
-		var processed=parseInt($('#processed-lbl-span').html());
-		var unprocessed=parseInt($('#unprocessed-lbl-span').html());
-		if(processed != 0 || unprocessed != 0){
-			$('#unclicked-trans-graph').removeClass('hide');
-			$('#unprocessed-trans-graph').addClass('hide');
-			$('#processed-trans-graph').addClass('hide');
-			$('#empty-rep-chart-div').addClass('hide');
-		}else{
-			$('#unclicked-trans-graph').addClass('hide');
-			$('#unprocessed-trans-graph').addClass('hide');
-			$('#processed-trans-graph').addClass('hide');
-		}
-	});
-});
-</script>

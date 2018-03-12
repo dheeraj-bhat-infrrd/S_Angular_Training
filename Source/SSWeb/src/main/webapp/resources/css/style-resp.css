@@ -1924,7 +1924,6 @@
 	.reporting-trans-details{
 	display: inline-grid;
     margin-left: 0;
-	width:100%;
 	}
 	
 	.time-frame-prof-sel {
@@ -2090,7 +2089,31 @@
 	.warn-toggle {
 		margin-left: 0px;
 	}
+	
+	.processed-trans-cont{
+		padding-left: 0;	
+	}
 
+	.lead-tbl-hdr {
+    	transform: rotate(-40deg);
+	}
+	
+	.score-stats-graph-con{
+		margin: 0 0 60px;
+		padding: 0;	
+	}
+	
+	.score-stats-overall-con{
+		margin-left:0;
+	}
+	
+	#score-stats-tab{
+		padding:0;
+	}
+	
+	.my-rank{
+		margin-right:0;
+	}
 }
 
 @media (min-width: 320px) and (max-width: 580px) and (orientation: portrait) {
@@ -3051,10 +3074,6 @@
 	width:100%;
 	}
 	
-	.reporting-trans-details{
-		width:100%;
-	}
-	
 	.sr-popup-hdr-details {
 	display: grid !important;
 	padding-left: 7% !important;
@@ -3095,10 +3114,6 @@
 	
 	.processed-trans-div,.rep-trans-graphs,.unprocessed-trans-div{
 	width:100%;
-	}
-	
-	.reporting-trans-details{
-		width:100%;
 	}
 	
 	.padding-top-one-third {

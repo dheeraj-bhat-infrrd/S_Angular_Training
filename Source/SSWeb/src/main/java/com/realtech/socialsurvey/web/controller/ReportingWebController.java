@@ -261,7 +261,15 @@ public class ReportingWebController
         return profileSettings;
     }
 
-
+    
+    @RequestMapping ( value = "/reportingtransactiondetails", method = RequestMethod.GET)
+    public String getReportingProfileDetails( Model model, HttpServletRequest request ) throws NonFatalException
+    {
+    	LOG.info( "get Reporting transaction details page" );
+    	
+    	return JspResolver.REPORTING_TRANSACTION_DETAILS;
+    }
+   
     @RequestMapping ( value = "/showreportingpage", method = RequestMethod.GET)
     public String showReportingPage( Model model, HttpServletRequest request ) throws NonFatalException
     {

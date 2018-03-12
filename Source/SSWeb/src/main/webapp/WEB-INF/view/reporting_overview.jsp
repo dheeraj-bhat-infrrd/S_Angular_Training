@@ -22,7 +22,7 @@
 <div class="col-lg-3 col-md-3 col-sm-3 rep-sps-div">
 	
 	<div id="spsGaugeSuccess" class="hide">
-		<jsp:include page="reporting_spsGauge.jsp"></jsp:include>
+		<%@ include file="reporting_spsGauge.jsp" %>
 	</div>
 	<div id="spsGaugeFailure" class=hide>
 		<div style="text-align:center; margin:30% auto">
@@ -38,19 +38,19 @@
 </div>
 <div class="col-lg-3 col-md-3 col-sm-3 rep-sps-scores">
 	<div class="rep-det-div">
-		<div class="float-left dash-sel-lbl rep-dash-sel-lbl-det">Detractors</div>
+		<div class="float-left dash-sel-lbl rep-dash-sel-lbl-det rep-sps-nps-lbl">Detractors</div>
 		<div id="detractorsBar" class="float-left dash-sel-lbl rep-dash-bar-margin"
 			style=" height:65%; background:#E8341F; "></div>
 		<div id="detractorsValue" class="float-left dash-sel-lbl" style="color: #E8341F; text-align:left; margin-left:5px"></div>
 	</div>
 	<div class="rep-det-div">
-		<div class="float-left dash-sel-lbl rep-dash-sel-lbl-pas">Passives</div>
+		<div class="float-left dash-sel-lbl rep-dash-sel-lbl-pas rep-sps-nps-lbl">Passives</div>
 		<div id="passivesBar" class="float-left dash-sel-lbl rep-dash-bar-margin"
 			style=" height:65%; background:#999999; "></div>
 		<div id="passivesValue" class="float-left dash-sel-lbl" style="color: #999999; text-align:left; margin-left:5px"></div>
 	</div>
 	<div class="rep-det-div">
-		<div class="float-left dash-sel-lbl rep-dash-lbl-sel-prom">Promoters</div>
+		<div class="float-left dash-sel-lbl rep-dash-lbl-sel-prom rep-sps-nps-lbl">Promoters</div>
 		<div id="promotersBar" class="float-left dash-sel-lbl rep-dash-bar-margin"
 			style=" height:65%; background:#7ab400; "></div>
 		<div id="promotersValue" class="float-left dash-sel-lbl" style="color: #7ab400; text-align:left; margin-left:5px"></div>
@@ -69,7 +69,7 @@
 	<div class="col-lg-3 col-md-3 col-sm-3 rep-sps-div">
 
 		<div id="npsGaugeSuccess" class="hide">
-			<jsp:include page="reporting_npsGauge.jsp"></jsp:include>
+			<%@ include file="reporting_npsGauge.jsp" %>
 		</div>
 		<div id="npsGaugeFailure" class=hide>
 			<div style="text-align: center; margin: 30% auto">
@@ -85,17 +85,17 @@
 	</div>
 	<div class="col-lg-3 col-md-3 col-sm-3 rep-sps-scores">
 		<div class="rep-det-div">
-			<div class="float-left dash-sel-lbl rep-dash-sel-lbl-det">Detractors</div>
+			<div class="float-left dash-sel-lbl rep-dash-sel-lbl-det rep-sps-nps-lbl">Detractors</div>
 			<div id="npsDetractorsBar" class="float-left dash-sel-lbl rep-dash-bar-margin" style="height: 65%; background: #E8341F;"></div>
 			<div id="npsDetractorsValue" class="float-left dash-sel-lbl" style="color: #E8341F; text-align: left; margin-left: 5px"></div>
 		</div>
 		<div class="rep-det-div">
-			<div class="float-left dash-sel-lbl rep-dash-sel-lbl-pas">Passives</div>
+			<div class="float-left dash-sel-lbl rep-dash-sel-lbl-pas rep-sps-nps-lbl">Passives</div>
 			<div id="npsPassivesBar" class="float-left dash-sel-lbl rep-dash-bar-margin" style="height: 65%; background: #999999;"></div>
 			<div id="npsPassivesValue" class="float-left dash-sel-lbl" style="color: #999999; text-align: left; margin-left: 5px"></div>
 		</div>
 		<div class="rep-det-div">
-			<div class="float-left dash-sel-lbl rep-dash-lbl-sel-prom">Promoters</div>
+			<div class="float-left dash-sel-lbl rep-dash-lbl-sel-prom rep-sps-nps-lbl">Promoters</div>
 			<div id="npsPromotersBar" class="float-left dash-sel-lbl rep-dash-bar-margin" style="height: 65%; background: #7ab400;"></div>
 			<div id="npsPromotersValue" class="float-left dash-sel-lbl" style="color: #7ab400; text-align: left; margin-left: 5px"></div>
 		</div>
@@ -131,8 +131,8 @@ $(window).resize(function(){
 		 }
 	 }
 	 
-	 var entityType = "${columnName}";
-	 var entityId = "${columnValue}";
+	 var entityType = $('#reporting-data-div').attr('data-column-name');
+	 var entityId = parseInt($('#reporting-data-div').attr('data-column-value'));
 	 
 	 if($('#nps_chart_div').length>0){
 		 if($('#overview-tab').hasClass('active')){
