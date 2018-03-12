@@ -192,7 +192,7 @@
 <script>
 /* var  is_dashboard_loaded = window.is_dashboard_loaded; */
 $(document).ready(function() {
-	$(document).attr("title", "Legacy Dashboard");
+	$(document).attr("title", "Dashboard");
 
 	$(window).off('scroll');
 	$(window).scroll(function() {
