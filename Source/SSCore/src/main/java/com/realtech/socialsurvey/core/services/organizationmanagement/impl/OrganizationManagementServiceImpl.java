@@ -72,6 +72,7 @@ import com.realtech.socialsurvey.core.entities.EncompassSdkVersion;
 import com.realtech.socialsurvey.core.entities.Event;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
+import com.realtech.socialsurvey.core.entities.FeedIngestionEntityForSM;
 import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.FilterKeywordsResponse;
 import com.realtech.socialsurvey.core.entities.HierarchySettingsCompare;
@@ -5923,9 +5924,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         List<SocialMediaTokenResponse> socialMediaTokenResponseList = new ArrayList<>();
 
         // fetch companies media token
-        List<FeedIngestionEntity> companiesMediaTokens = organizationUnitSettingsDao.getAllCompanyIdWithSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, 0, 0 );
+        List<FeedIngestionEntityForSM> companiesMediaTokens = organizationUnitSettingsDao.getAllCompanyIdWithSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, 0, 0 );
 
-        for ( FeedIngestionEntity feedIngestionEntity : companiesMediaTokens ) {
+        for ( FeedIngestionEntityForSM feedIngestionEntity : companiesMediaTokens ) {
             
             if(feedIngestionEntity.getSocialMediaTokens() != null) {
                 socialMediaTokenResponseList.add( setSocialMediaTokenResponse( feedIngestionEntity, feedIngestionEntity.getIden(), ProfileType.COMPANY) );
@@ -5934,25 +5935,25 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             
             List<Long> regionIds = regionDao.getRegionIdsUnderCompany( feedIngestionEntity.getIden(), skipCount, batchSize );
             
-            List<FeedIngestionEntity> regionMediaTokens = organizationUnitSettingsDao.fetchSocialMediaTokensForIds( regionIds, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+            List<FeedIngestionEntityForSM> regionMediaTokens = organizationUnitSettingsDao.fetchSocialMediaTokensForIds( regionIds, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
             
-            for ( FeedIngestionEntity regionFeedIngestionEntity : regionMediaTokens ) {
+            for ( FeedIngestionEntityForSM regionFeedIngestionEntity : regionMediaTokens ) {
                 socialMediaTokenResponseList.add( setSocialMediaTokenResponse( regionFeedIngestionEntity, feedIngestionEntity.getIden(), ProfileType.REGION ) );
             }
             
             List<Long> branchIds = branchDao.getBranchIdsUnderCompany( feedIngestionEntity.getIden(), skipCount, batchSize );
             
-            List<FeedIngestionEntity> branchMediaTokens = organizationUnitSettingsDao.fetchSocialMediaTokensForIds( branchIds, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+            List<FeedIngestionEntityForSM> branchMediaTokens = organizationUnitSettingsDao.fetchSocialMediaTokensForIds( branchIds, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
             
-            for ( FeedIngestionEntity branchFeedIngestionEntity : branchMediaTokens ) {
+            for ( FeedIngestionEntityForSM branchFeedIngestionEntity : branchMediaTokens ) {
                 socialMediaTokenResponseList.add( setSocialMediaTokenResponse( branchFeedIngestionEntity,feedIngestionEntity.getIden(), ProfileType.BRANCH ) );
             }
             
             List<Long> userIds = getAgentIdsUnderCompany( feedIngestionEntity.getIden(), skipCount, batchSize );
             
-            List<FeedIngestionEntity> usersMediaTokens = organizationUnitSettingsDao.fetchSocialMediaTokensForIds( userIds, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+            List<FeedIngestionEntityForSM> usersMediaTokens = organizationUnitSettingsDao.fetchSocialMediaTokensForIds( userIds, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
             
-            for ( FeedIngestionEntity userFeedIngestionEntity : usersMediaTokens ) {
+            for ( FeedIngestionEntityForSM userFeedIngestionEntity : usersMediaTokens ) {
                 socialMediaTokenResponseList.add( setSocialMediaTokenResponse( userFeedIngestionEntity,feedIngestionEntity.getIden(), ProfileType.AGENT ) );
             }
         }
@@ -5966,7 +5967,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @param profileType
      * @return
      */
-    private SocialMediaTokenResponse setSocialMediaTokenResponse(FeedIngestionEntity feedIngestionEntity, long companyId, ProfileType profileType){
+    private SocialMediaTokenResponse setSocialMediaTokenResponse(FeedIngestionEntityForSM feedIngestionEntity, long companyId, ProfileType profileType){
         if(feedIngestionEntity != null){
             SocialMediaTokenResponse socialMediaTokenResponse = new SocialMediaTokenResponse();
             socialMediaTokenResponse.setIden( feedIngestionEntity.getIden() );

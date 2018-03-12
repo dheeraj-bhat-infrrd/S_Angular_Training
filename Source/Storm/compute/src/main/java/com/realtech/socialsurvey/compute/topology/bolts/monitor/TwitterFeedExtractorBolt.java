@@ -7,6 +7,7 @@ import com.realtech.socialsurvey.compute.dao.RedisSocialMediaStateDao;
 import com.realtech.socialsurvey.compute.dao.impl.RedisSocialMediaStateDaoImpl;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.compute.entities.TwitterToken;
+import com.realtech.socialsurvey.compute.entities.TwitterTokenForSM;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.entities.response.TwitterFeedData;
 import com.realtech.socialsurvey.compute.enums.ProfileType;
@@ -55,7 +56,7 @@ public class TwitterFeedExtractorBolt extends BaseComputeBolt
     {
         try {
             SocialMediaTokenResponse mediaToken = (SocialMediaTokenResponse) input.getValueByField( "mediaToken" );
-            TwitterToken twitterToken = mediaToken.getSocialMediaTokens().getTwitterToken();
+            TwitterTokenForSM twitterToken = mediaToken.getSocialMediaTokens().getTwitterToken();
             if(twitterToken != null) {
                 Long companyId = mediaToken.getCompanyId();
                 String pageId = UrlHelper.getTwitterPageIdFromURL(twitterToken.getTwitterPageLink());
@@ -100,7 +101,7 @@ public class TwitterFeedExtractorBolt extends BaseComputeBolt
     {
         String lastFetchedKey = "";
         if ( mediaToken.getSocialMediaTokens() != null && mediaToken.getSocialMediaTokens().getFacebookToken() != null ) {
-            TwitterToken token = mediaToken.getSocialMediaTokens().getTwitterToken();
+            TwitterTokenForSM token = mediaToken.getSocialMediaTokens().getTwitterToken();
             String pageId = UrlHelper.getTwitterPageIdFromURL( token.getTwitterPageLink() );
             lastFetchedKey = mediaToken.getProfileType().toString() + "_" + mediaToken.getIden() + "_" + pageId;
         }

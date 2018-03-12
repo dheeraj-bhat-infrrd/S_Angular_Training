@@ -36,6 +36,7 @@ import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
+import com.realtech.socialsurvey.core.entities.FeedIngestionEntityForSM;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
 import com.realtech.socialsurvey.core.entities.ProfileUrlEntity;
@@ -135,6 +136,21 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_SAVED_DIGEST_RECORD_YEAR = "savedDigestRecords.year";
     
     
+    public static final String KEY_FACEBOOK_ID = "socialMediaTokens.facebookToken.facebookId";
+    public static final String KEY_FACEBOOK_PAGE_LINK = "socialMediaTokens.facebookToken.facebookPageLink";
+    public static final String KEY_FACEBOOK_ACCESS_TOKEN = "socialMediaTokens.facebookToken.facebookAccessToken";
+    public static final String KEY_FACEBOOK_ACCESS_TOKEN_TO_POST = "socialMediaTokens.facebookToken.facebookAccessTokenToPost";
+    
+    public static final String KEY_TWITTER_ID = "socialMediaTokens.twitterToken.twitterId";
+    public static final String KEY_TWITTER_PAGE_LINK = "socialMediaTokens.twitterToken.twitterPageLink";
+    public static final String KEY_TWITTER_ACCESS_TOKEN = "socialMediaTokens.twitterToken.twitterAccessToken";
+    public static final String KEY_TWITTER_ACCESS_TOKEN_SECRET = "socialMediaTokens.twitterToken.twitterAccessTokenSecret";
+    
+    public static final String KEY_LINKEDIN_ID = "socialMediaTokens.linkedInToken.linkedInId";
+    public static final String KEY_LINKEDIN_PAGE_LINK = "socialMediaTokens.linkedInToken.linkedInPageLink";
+    public static final String KEY_LINKEDIN_ACCESS_TOKEN = "socialMediaTokens.linkedInToken.linkedInAccessToken";
+
+
     @Value ( "${CDN_PATH}")
     private String amazonEndPoint;
 
@@ -527,16 +543,24 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     
     
     @Override
-    public List<FeedIngestionEntity> fetchSocialMediaTokensForIds(List<Long> ids, String collectionName )
+    public List<FeedIngestionEntityForSM> fetchSocialMediaTokensForIds( List<Long> ids, String collectionName )
     {
         LOG.debug( "Fetching social media tokens from {}", collectionName );
-        List<FeedIngestionEntity> tokens = null;
+        List<FeedIngestionEntityForSM> tokens = null;
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_SOCIAL_MEDIA_TOKENS ).exists( true ) );
         query.addCriteria( Criteria.where( "iden" ).in( ids ) );
-        query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).include( KEY_IDENTIFIER ).exclude( "_id" );
-        tokens = mongoTemplate.find( query, FeedIngestionEntity.class, collectionName );
-        LOG.debug( "Fetched {} items with social media tokens from {}", ( tokens != null ? tokens.size() : "none" ) , collectionName );
+        query.fields().include( KEY_FACEBOOK_ID ).include( KEY_FACEBOOK_PAGE_LINK ).include( KEY_FACEBOOK_ACCESS_TOKEN )
+            .include( KEY_FACEBOOK_ACCESS_TOKEN_TO_POST )
+
+            .include( KEY_TWITTER_PAGE_LINK ).include( KEY_TWITTER_ACCESS_TOKEN ).include( KEY_TWITTER_ID )
+            .include( KEY_TWITTER_ACCESS_TOKEN_SECRET )
+
+            .include( KEY_LINKEDIN_ID ).include( KEY_LINKEDIN_PAGE_LINK ).include( KEY_LINKEDIN_ACCESS_TOKEN )
+            .include( KEY_IDENTIFIER ).exclude( "_id" );
+        tokens = mongoTemplate.find( query, FeedIngestionEntityForSM.class, collectionName );
+        LOG.debug( "Fetched {} items with social media tokens from {}", ( tokens != null ? tokens.size() : "none" ),
+            collectionName );
         return tokens;
     }
 
@@ -1128,15 +1152,13 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     }
     
     @Override
-    public List<FeedIngestionEntity> getAllCompanyIdWithSocialMediaTokens( String collectionName, int skipCount, int numOfRecords )
+    public List<FeedIngestionEntityForSM> getAllCompanyIdWithSocialMediaTokens( String collectionName, int skipCount, int numOfRecords )
     {
         LOG.debug( "Fetching social media tokens from " + collectionName );
-        List<FeedIngestionEntity> settings = null;
-
         Query query = new Query();
         query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).include( KEY_IDENTIFIER ).exclude( "_id" );
         
-        settings = mongoTemplate.find( query, FeedIngestionEntity.class, collectionName );
+        List<FeedIngestionEntityForSM> settings = mongoTemplate.find( query, FeedIngestionEntityForSM.class, collectionName );
 
         return settings;
     }
