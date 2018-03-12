@@ -13,8 +13,6 @@ import org.apache.storm.tuple.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.realtech.socialsurvey.compute.common.ComputeConstants;
-import com.realtech.socialsurvey.compute.common.LocalPropertyFileHandler;
 import com.realtech.socialsurvey.compute.common.SSAPIOperations;
 import com.realtech.socialsurvey.compute.dao.RedisSocialMediaStateDao;
 import com.realtech.socialsurvey.compute.dao.impl.RedisSocialMediaStateDaoImpl;
@@ -77,7 +75,7 @@ public class SocialMediaTokenExtractorSpout extends BaseComputeSpout
             }
             // End loop for companies
         } catch ( Exception e ) {
-            LOG.error( "Error while fetching post from facebook.", e );
+            LOG.error( "Error in SocialMediaTokenExtractorSpout.nextTuple()", e );
         }
     }
 

@@ -14,7 +14,6 @@ public class FacebookToken {
 	private String facebookAccessTokenToPost;
 	
 	private boolean tokenExpiryAlertSent;
-	private Date tokenExpiryAlertTime;
 	private String tokenExpiryAlertEmail;
 	
 	public String getFacebookId() {
@@ -81,16 +80,6 @@ public class FacebookToken {
     public void setTokenExpiryAlertSent( boolean tokenExpiryAlertSent )
     {
         this.tokenExpiryAlertSent = tokenExpiryAlertSent;
-    }
-
-    public Date getTokenExpiryAlertTime()
-    {
-        return tokenExpiryAlertTime;
-    }
-
-    public void setTokenExpiryAlertTime( Date tokenExpiryAlertTime )
-    {
-        this.tokenExpiryAlertTime = tokenExpiryAlertTime;
     }
 
     public String getTokenExpiryAlertEmail()
