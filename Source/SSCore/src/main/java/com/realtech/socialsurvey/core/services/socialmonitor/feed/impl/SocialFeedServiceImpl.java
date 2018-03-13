@@ -133,7 +133,9 @@ public class SocialFeedServiceImpl implements SocialFeedService
 				socialMonitorFeedData.setAgentId(socialResponseObject.getAgentId());
 				socialMonitorFeedData.setPostId(socialResponseObject.getPostId());
 				socialMonitorFeedData.setFlagged(socialResponseObject.isFlagged());
-				Collections.sort( socialResponseObject.getActionHistory(), new ActionHistoryComparator() );	
+				if(socialResponseObject.getActionHistory() != null){
+				    Collections.sort( socialResponseObject.getActionHistory(), new ActionHistoryComparator() ); 
+				}
 				socialMonitorFeedData.setActionHistory(socialResponseObject.getActionHistory());
 				socialMonitorFeedData.setUpdatedOn(socialResponseObject.getUpdatedTime());
 				socialMonitorFeedData.setFoundKeywords(socialResponseObject.getFoundKeywords());
