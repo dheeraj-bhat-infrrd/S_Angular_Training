@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.realtech.socialsurvey.compute.entities.FileUploadResponse;
 import com.realtech.socialsurvey.compute.entities.response.FacebookErrorResponse;
 import com.realtech.socialsurvey.compute.exception.APIIntegrationException;
-import com.realtech.socialsurvey.compute.exception.FacebookRateLimitException;
+import com.realtech.socialsurvey.compute.exception.FacebookFeedException;
 import com.realtech.socialsurvey.compute.exception.FileUploadUpdationException;
 import com.realtech.socialsurvey.compute.exception.MongoSaveException;
 import com.realtech.socialsurvey.compute.services.api.FacebookApiIntegrationService;
@@ -176,12 +176,13 @@ public class RetrofitApiBuilder
                 LOG.warn( "Error found. Response code: {}. Possible reason: {}", response.code(), response.message() );
             }
             try {
+                String errorBody = response.errorBody().string();
                 if ( LOG.isWarnEnabled() ) {
-                    LOG.warn( "Reason: {}", response.errorBody().string() );
+                    LOG.warn( "Reason: {}", errorBody );
                 }
                 
-                FacebookErrorResponse errorResponse = ConversionUtils.deserialize( response.errorBody().string(), FacebookErrorResponse.class );
-                throw new FacebookRateLimitException( errorResponse.getError().getCode(), errorResponse.getError().getMessage() );
+                FacebookErrorResponse errorResponse = ConversionUtils.deserialize( errorBody, FacebookErrorResponse.class );
+                throw new FacebookFeedException( errorResponse.getError().getCode(), errorResponse.getError().getMessage() );
             } catch ( IOException e ) {
                 throw new APIIntegrationException( "IOException while sending api response", e );
             }
