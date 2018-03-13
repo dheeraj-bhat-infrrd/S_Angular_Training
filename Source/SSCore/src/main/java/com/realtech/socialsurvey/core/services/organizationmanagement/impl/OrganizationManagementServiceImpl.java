@@ -27,7 +27,6 @@ import java.util.regex.Pattern;
 import javax.annotation.Resource;
 
 import com.realtech.socialsurvey.core.dao.*;
-import com.realtech.socialsurvey.core.dao.impl.RedisCompanyKeywordImpl;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.solr.client.solrj.util.ClientUtils;
@@ -73,6 +72,7 @@ import com.realtech.socialsurvey.core.entities.EncompassSdkVersion;
 import com.realtech.socialsurvey.core.entities.Event;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
+import com.realtech.socialsurvey.core.entities.FeedIngestionEntityForSM;
 import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.FilterKeywordsResponse;
 import com.realtech.socialsurvey.core.entities.HierarchySettingsCompare;
@@ -273,7 +273,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     private SurveyBuilder surveyBuilder;
 
     @Autowired
-    private RedisCompanyKeywordsDao redisDao;
+    private RedisDao redisDao;
 
     @Value ( "${HAPPY_TEXT}")
     private String happyText;
@@ -1029,6 +1029,27 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
 
+    @Override
+    public  Map<String, Long> getFacebookAndTwitterLocks( String lockType ) throws InvalidInputException
+    {
+        LOG.debug( "Method getFacebookAndTwitterLocks() started" );
+        if ( lockType != null && !lockType.equalsIgnoreCase( "facebook" ) && !lockType.equalsIgnoreCase( "twitter" ) ) {
+            LOG.warn( "" );
+            throw new InvalidInputException( "Invalid value passed for lockType", "400" );
+        }
+        Map<String, Long> resultList = new HashMap<>();
+        if ( lockType == null ) {
+            resultList.putAll( redisDao.getFacebookLock() );
+            resultList.putAll( redisDao.getTwitterLock() );
+        } else if ( lockType.equalsIgnoreCase( "facebook" ) ) {
+            resultList.putAll( redisDao.getFacebookLock() );
+        } else if ( lockType.equalsIgnoreCase( "twitter" ) ) {
+            resultList.putAll( redisDao.getTwitterLock() );
+        }
+        return resultList;
+
+    }
+       
     /* (non-Javadoc)
      * @see com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService#enableKeyworodForCompanySettings(long, java.lang.String)
      */
@@ -5903,9 +5924,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         List<SocialMediaTokenResponse> socialMediaTokenResponseList = new ArrayList<>();
 
         // fetch companies media token
-        List<FeedIngestionEntity> companiesMediaTokens = organizationUnitSettingsDao.getAllCompanyIdWithSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, 0, 0 );
+        List<FeedIngestionEntityForSM> companiesMediaTokens = organizationUnitSettingsDao.getAllCompanyIdWithSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, 0, 0 );
 
-        for ( FeedIngestionEntity feedIngestionEntity : companiesMediaTokens ) {
+        for ( FeedIngestionEntityForSM feedIngestionEntity : companiesMediaTokens ) {
             
             if(feedIngestionEntity.getSocialMediaTokens() != null) {
                 socialMediaTokenResponseList.add( setSocialMediaTokenResponse( feedIngestionEntity, feedIngestionEntity.getIden(), ProfileType.COMPANY) );
@@ -5914,25 +5935,25 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             
             List<Long> regionIds = regionDao.getRegionIdsUnderCompany( feedIngestionEntity.getIden(), skipCount, batchSize );
             
-            List<FeedIngestionEntity> regionMediaTokens = organizationUnitSettingsDao.fetchSocialMediaTokensForIds( regionIds, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+            List<FeedIngestionEntityForSM> regionMediaTokens = organizationUnitSettingsDao.fetchSocialMediaTokensForIds( regionIds, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
             
-            for ( FeedIngestionEntity regionFeedIngestionEntity : regionMediaTokens ) {
+            for ( FeedIngestionEntityForSM regionFeedIngestionEntity : regionMediaTokens ) {
                 socialMediaTokenResponseList.add( setSocialMediaTokenResponse( regionFeedIngestionEntity, feedIngestionEntity.getIden(), ProfileType.REGION ) );
             }
             
             List<Long> branchIds = branchDao.getBranchIdsUnderCompany( feedIngestionEntity.getIden(), skipCount, batchSize );
             
-            List<FeedIngestionEntity> branchMediaTokens = organizationUnitSettingsDao.fetchSocialMediaTokensForIds( branchIds, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+            List<FeedIngestionEntityForSM> branchMediaTokens = organizationUnitSettingsDao.fetchSocialMediaTokensForIds( branchIds, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
             
-            for ( FeedIngestionEntity branchFeedIngestionEntity : branchMediaTokens ) {
+            for ( FeedIngestionEntityForSM branchFeedIngestionEntity : branchMediaTokens ) {
                 socialMediaTokenResponseList.add( setSocialMediaTokenResponse( branchFeedIngestionEntity,feedIngestionEntity.getIden(), ProfileType.BRANCH ) );
             }
             
             List<Long> userIds = getAgentIdsUnderCompany( feedIngestionEntity.getIden(), skipCount, batchSize );
             
-            List<FeedIngestionEntity> usersMediaTokens = organizationUnitSettingsDao.fetchSocialMediaTokensForIds( userIds, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+            List<FeedIngestionEntityForSM> usersMediaTokens = organizationUnitSettingsDao.fetchSocialMediaTokensForIds( userIds, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
             
-            for ( FeedIngestionEntity userFeedIngestionEntity : usersMediaTokens ) {
+            for ( FeedIngestionEntityForSM userFeedIngestionEntity : usersMediaTokens ) {
                 socialMediaTokenResponseList.add( setSocialMediaTokenResponse( userFeedIngestionEntity,feedIngestionEntity.getIden(), ProfileType.AGENT ) );
             }
         }
@@ -5946,7 +5967,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @param profileType
      * @return
      */
-    private SocialMediaTokenResponse setSocialMediaTokenResponse(FeedIngestionEntity feedIngestionEntity, long companyId, ProfileType profileType){
+    private SocialMediaTokenResponse setSocialMediaTokenResponse(FeedIngestionEntityForSM feedIngestionEntity, long companyId, ProfileType profileType){
         if(feedIngestionEntity != null){
             SocialMediaTokenResponse socialMediaTokenResponse = new SocialMediaTokenResponse();
             socialMediaTokenResponse.setIden( feedIngestionEntity.getIden() );

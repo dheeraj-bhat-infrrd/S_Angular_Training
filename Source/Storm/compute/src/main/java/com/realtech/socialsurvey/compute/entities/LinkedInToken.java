@@ -11,7 +11,6 @@ public class LinkedInToken {
 	private long linkedInAccessTokenExpiresIn;
 	
 	private boolean tokenExpiryAlertSent;
-    private Date tokenExpiryAlertTime;
     private String tokenExpiryAlertEmail;
 
 	public String getLinkedInId() {
@@ -62,16 +61,6 @@ public class LinkedInToken {
     public void setTokenExpiryAlertSent( boolean tokenExpiryAlertSent )
     {
         this.tokenExpiryAlertSent = tokenExpiryAlertSent;
-    }
-
-    public Date getTokenExpiryAlertTime()
-    {
-        return tokenExpiryAlertTime;
-    }
-
-    public void setTokenExpiryAlertTime( Date tokenExpiryAlertTime )
-    {
-        this.tokenExpiryAlertTime = tokenExpiryAlertTime;
     }
 
     public String getTokenExpiryAlertEmail()

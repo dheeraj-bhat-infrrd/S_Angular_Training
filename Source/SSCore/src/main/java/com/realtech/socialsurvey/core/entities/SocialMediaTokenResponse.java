@@ -11,7 +11,7 @@ public class SocialMediaTokenResponse
 {
     private long iden;
     private long companyId;
-    private SocialMediaTokens socialMediaTokens;
+    private SocialMediaTokensForSM socialMediaTokens;
     private ProfileType profileType;
 
 
@@ -27,10 +27,7 @@ public class SocialMediaTokenResponse
     }
 
 
-    public SocialMediaTokens getSocialMediaTokens()
-    {
-        return socialMediaTokens;
-    }
+    
 
     public long getCompanyId()
     {
@@ -43,13 +40,7 @@ public class SocialMediaTokenResponse
         this.companyId = companyId;
     }
 
-
-    public void setSocialMediaTokens( SocialMediaTokens socialMediaTokens )
-    {
-        this.socialMediaTokens = socialMediaTokens;
-    }
-
-
+    
     public ProfileType getProfileType()
     {
         return profileType;
@@ -60,4 +51,17 @@ public class SocialMediaTokenResponse
     {
         this.profileType = profileType;
     }
+
+
+    public SocialMediaTokensForSM getSocialMediaTokens()
+    {
+        return socialMediaTokens;
+    }
+
+
+    public void setSocialMediaTokens( SocialMediaTokensForSM socialMediaTokens )
+    {
+        this.socialMediaTokens = socialMediaTokens;
+    }
+    
 }

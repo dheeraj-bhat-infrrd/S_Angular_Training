@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.compute.entities.FacebookToken;
 import com.realtech.socialsurvey.compute.entities.LinkedInToken;
+import com.realtech.socialsurvey.compute.entities.LinkedInTokenForSM;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.compute.entities.TwitterToken;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
@@ -89,7 +90,7 @@ public class LinkedinFeedExtractorBolt extends BaseComputeBolt
         String lastFetchedKey = "";
         
         if ( mediaToken.getSocialMediaTokens() != null && mediaToken.getSocialMediaTokens().getFacebookToken() != null) {
-            LinkedInToken token = mediaToken.getSocialMediaTokens().getLinkedInToken();
+            LinkedInTokenForSM token = mediaToken.getSocialMediaTokens().getLinkedInToken();
             String pageId = UrlHelper.getFacebookPageIdFromURL( token.getLinkedInPageLink() );
             lastFetchedKey = mediaToken.getProfileType().toString() + "_" + mediaToken.getIden() + "_" + pageId;
         }

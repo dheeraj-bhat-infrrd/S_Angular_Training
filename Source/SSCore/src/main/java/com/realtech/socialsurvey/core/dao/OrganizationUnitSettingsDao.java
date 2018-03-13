@@ -10,6 +10,7 @@ import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
+import com.realtech.socialsurvey.core.entities.FeedIngestionEntityForSM;
 import com.realtech.socialsurvey.core.entities.Keyword;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
@@ -306,10 +307,10 @@ public interface OrganizationUnitSettingsDao
      * @param collectionName
      * @return
      */
-    public List<FeedIngestionEntity> fetchSocialMediaTokensForIds( List<Long> ids, String collectionName );
+    public List<FeedIngestionEntityForSM> fetchSocialMediaTokensForIds( List<Long> ids, String collectionName );
 
 
-    public List<FeedIngestionEntity> getAllCompanyIdWithSocialMediaTokens( String collectionName, int skipCount, int numOfRecords );
+    public List<FeedIngestionEntityForSM> getAllCompanyIdWithSocialMediaTokens( String collectionName, int skipCount, int numOfRecords );
     
         
     public void saveDigestRecord( String profileLevel, long entityId, SavedDigestRecord digestRecord ) throws InvalidInputException;
