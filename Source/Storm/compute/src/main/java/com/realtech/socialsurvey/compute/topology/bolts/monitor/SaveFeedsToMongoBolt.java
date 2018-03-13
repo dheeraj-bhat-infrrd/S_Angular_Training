@@ -80,7 +80,7 @@ public class SaveFeedsToMongoBolt extends BaseComputeBoltWithAck
 
     @Override
     public List<Object> prepareTupleForFailure() {
-        return new Values(false, 0, null);
+        return new Values(false, 0L, null);
     }
 
     @Override

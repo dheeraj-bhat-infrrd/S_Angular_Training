@@ -1,13 +1,9 @@
 package com.realtech.socialsurvey.compute.topology.bolts.monitor;
 
-import com.realtech.socialsurvey.compute.common.SSAPIOperations;
-import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
-import com.realtech.socialsurvey.compute.exception.APIIntegrationException;
-import com.realtech.socialsurvey.compute.exception.FatalException;
-import com.realtech.socialsurvey.compute.services.FailedMessagesService;
-import com.realtech.socialsurvey.compute.services.impl.FailedMessagesServiceImpl;
-import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBolt;
-import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBoltWithAck;
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
+
 import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
@@ -15,9 +11,12 @@ import org.apache.storm.tuple.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
+import com.realtech.socialsurvey.compute.common.SSAPIOperations;
+import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
+import com.realtech.socialsurvey.compute.exception.APIIntegrationException;
+import com.realtech.socialsurvey.compute.services.FailedMessagesService;
+import com.realtech.socialsurvey.compute.services.impl.FailedMessagesServiceImpl;
+import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBoltWithAck;
 
 public class UpdateSocialPostDuplicateCountBolt extends BaseComputeBoltWithAck {
 
@@ -66,7 +65,7 @@ public class UpdateSocialPostDuplicateCountBolt extends BaseComputeBoltWithAck {
 
     @Override
     public List<Object> prepareTupleForFailure() {
-        return new Values(false, 0, null);
+        return new Values(false, 0L, null);
     }
 
     private Optional<Long> updateSocialPostDuplicateCount(int hash, long companyId) throws IOException {

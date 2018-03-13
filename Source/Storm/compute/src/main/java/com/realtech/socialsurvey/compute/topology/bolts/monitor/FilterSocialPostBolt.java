@@ -68,7 +68,7 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
 
     @Override
     public List<Object> prepareTupleForFailure() {
-        return new Values(0, null, null);
+        return new Values(0L, null, null);
     }
 
 
