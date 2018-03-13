@@ -8,6 +8,7 @@ import com.realtech.socialsurvey.compute.entities.TrieNode;
 import com.realtech.socialsurvey.compute.entities.response.ActionHistory;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.enums.ActionHistoryType;
+import com.realtech.socialsurvey.compute.enums.SocialFeedStatus;
 import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBoltWithAck;
 import org.apache.commons.lang.StringUtils;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -45,23 +46,23 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
         SocialResponseType socialResponseType = (SocialResponseType) input.getValueByField( "type" );
         long companyId = input.getLongByField( "companyId" );
         String postId = null;
-        if ( post != null && post.getText() != null ) {
-            String text = post.getText();
-            postId = post.getPostId();
-            List<String> foundKeyWords;
-            TrieNode root = getTrieForCompany( companyId );
-            foundKeyWords = findPhrases( root, text );
-            if ( !foundKeyWords.isEmpty() ) {
-                post.setFoundKeywords( foundKeyWords );
-                post.setFlagged( Boolean.TRUE );
-                if(post.getActionHistory() == null){
-                    post.setActionHistory( new ArrayList<>() );
+        if ( post != null ) {
+            post.setStatus( SocialFeedStatus.NEW );
+            post.setActionHistory( new ArrayList<>() );
+            if ( post.getText() != null ) {
+                String text = post.getText();
+                postId = post.getPostId();
+                List<String> foundKeyWords;
+                TrieNode root = getTrieForCompany( companyId );
+                foundKeyWords = findPhrases( root, text );
+                if ( !foundKeyWords.isEmpty() ) {
+                    post.setFoundKeywords( foundKeyWords );
+                    post.setFlagged( Boolean.TRUE );
+                    post.getActionHistory().add( getFlaggedActionHistory( foundKeyWords ) );
                 }
-
-                post.getActionHistory().add(  getFlaggedActionHistory( foundKeyWords ));
             }
         }
-        LOG.info( "Emitting tuple with post having postId = {}",  postId);
+        LOG.debug( "Emitting tuple with post having postId = {}",  postId);
         _collector.emit( input, Arrays.asList( companyId, post, socialResponseType ) );
 
     }
