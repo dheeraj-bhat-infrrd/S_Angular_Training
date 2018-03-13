@@ -8,6 +8,7 @@ import com.realtech.socialsurvey.compute.utils.ChararcterUtils;
 import org.apache.storm.Config;
 import org.apache.storm.generated.StormTopology;
 import org.apache.storm.topology.TopologyBuilder;
+import org.apache.storm.tuple.Fields;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,23 +78,31 @@ public class ReportsTopologyStarterHelper extends TopologyStarterHelper
     }
 
 
-    @Override protected StormTopology topology()
-    {
-        LOG.info( "Creating mail reports topology" );
-        TopologyBuilder builder = new TopologyBuilder();
-        //add the spout
-        builder.setSpout("ReportGenerationSpout", KafkaTopicSpoutBuilder.getInstance().reportGenerationSpout(), 1);
-        //add the bolts
-        builder.setBolt("AggregateSolrQueryBolt", new AggregateSolrQueryBolt(), 1)
-        .shuffleGrouping("ReportGenerationSpout");
-        
-        return builder.createTopology();
-    }
+	@Override
+	protected StormTopology topology() {
+		LOG.info("Creating mail reports topology");
+		TopologyBuilder builder = new TopologyBuilder();
+		// add the spout
+		builder.setSpout("ReportGenerationSpout", KafkaTopicSpoutBuilder.getInstance().reportGenerationSpout(), 1);
+		// add the bolts
+		builder.setBolt("UpdateFileUploadStatusBolt", new UpdateFileUploadStatusBolt(), 1)
+				.shuffleGrouping("ReportGenerationSpout");
+		builder.setBolt("GetEmailReportDataBolt", new GetDataForEmailReport(), 1)
+				.shuffleGrouping("ReportGenerationSpout");
+		builder.setBolt("WriteReportToExcelBolt", new WriteReportToExcelBolt(), 1)
+				.fieldsGrouping("GetEmailReportDataBolt", new Fields("fileUploadId"));
+		builder.setBolt("UploadOnAmazonS3Bolt", new UploadOnAmazonS3Bolt(), 1)
+				.shuffleGrouping("WriteReportToExcelBolt");
+		builder.setBolt("FileUploadStatusAndFileNameUpdationBolt", new UpdateFileUploadStatusAndFileNameBolt(), 1)
+				.shuffleGrouping("UploadOnAmazonS3Bolt");
+		// Create the topology.
+		return builder.createTopology();
+	}
 
 
     public static void main( String[] args )
     {
-        LOG.info( "Starting up mail reports topology..." );
+        LOG.info( "Starting up reports topology..." );
         // Run time params should be the first step
         // DO NOT ADD ANY CODE BEFORE THIS LINE
         EnvConstants.runtimeParams( args );

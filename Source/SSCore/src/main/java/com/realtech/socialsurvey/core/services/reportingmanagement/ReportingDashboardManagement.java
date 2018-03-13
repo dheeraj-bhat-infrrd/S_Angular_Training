@@ -382,4 +382,7 @@ public interface ReportingDashboardManagement
 
 
 	public List<SurveyInvitationEmailCountMonth> getAllTimeDataForSurveyInvitationMail(int startIndex, int batchSize);
+
+
+	public List<SurveyInvitationEmailCountMonth> getDataForSurveyInvitationMail(int month, int year, long companyId);
 }

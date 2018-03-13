@@ -37,6 +37,3 @@
   </svg>
 
 </div>
-<script>
-drawSpsGauge();
-</script>

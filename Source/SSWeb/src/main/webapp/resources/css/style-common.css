@@ -10042,8 +10042,8 @@ ul.accordion li>a:before {
 .reporting-trans-details{
 	background:#f9f9fb; 
 	border-bottom:1px solid #d2cdcd;
-	width: 100%;
     margin: 0 auto;
+    padding:0;
 }
 	
 	.time-frame-sel{
@@ -10240,6 +10240,58 @@ ul.accordion li>a:before {
 	margin-left: 40px;
 }
 
+.processed-trans-cont{
+	display:inline-grid;
+	padding-left: 30px;	
+}
+
+.score-stats-graph-con{
+	margin: 20px 0 60px;
+	padding: 0;	
+}
+
+.score-stats-overall-con{
+	padding: 0; 
+	margin-top: 10px; 
+	display: inline-block; 
+	float:left; 
+	width:100%;
+	height:350px;
+}
+
+.score-stats-ques-con{
+	margin-top: 10px;
+    width: 100%;
+    padding: 0;
+}
+
+.score-stats-lbl{
+    font-size: 20px;
+    left: 0;
+    z-index: 1000;
+	margin-top: 13px;
+    margin-left: 0;
+    float: left;
+    position: relative;
+}
+
+.score-stats-ques-graph-con{
+	margin-top: 10px; 
+	display: inline-block; 
+	float:left; 
+	width:100%;
+	height:350px; 
+	padding:0;
+	margin-bottom: 20px;
+}
+
+.rep-sps-nps-lbl{
+	width: auto !important;
+    position: relative;
+    margin-right: 0 !important;
+    display: flex;
+    align-items: center;
+}
 /*leaderboard*/
 .board-selector{
 	float: right;
@@ -10340,26 +10392,25 @@ img.lead-img {
 .top-ten-ranks{
 	width: 110px;
     margin: 0;
-    margin-left: 75%;
+    float: right;
 }
 
 .my-rank{
 	width: 100px;
     margin: 0;
-    margin-left: 58%;
-    margin-top: 70px;
+    float: right;
+    margin-right: 10px;
 }
 
 .lead-ranks-above{
 	width: 100px;
     margin: 0;
-    margin-left: 89%;
+    float: right;
 }
 
 .top-ten-ranks-btn{
 	font-size: 14px;
     font-weight: bold !important;
-    margin-bottom: -25px;
 }
 
 .lead-ranks-above-btn{
@@ -10371,7 +10422,8 @@ img.lead-img {
 .lead-ranks-below{
     width: 100px;
     margin: 0;
-    margin-left: 89%
+    float: right;
+    margin-top: 10px;
 }
 
 .lead-ranks-below-btn{

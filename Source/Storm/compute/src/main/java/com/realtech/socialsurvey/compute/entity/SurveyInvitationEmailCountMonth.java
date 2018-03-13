@@ -33,6 +33,8 @@ public class SurveyInvitationEmailCountMonth implements Serializable{
 	private long dropped;
 	private String agentName;
 	private String emailId;
+	private String branchName;
+	private String regionName;
 	
 	public long getAgentId() {
 		return agentId;
@@ -141,6 +143,18 @@ public class SurveyInvitationEmailCountMonth implements Serializable{
 	}
 	public void setEmailId(String emailId) {
 		this.emailId = emailId;
+	}
+	public String getBranchName() {
+		return branchName;
+	}
+	public void setBranchName(String branchName) {
+		this.branchName = branchName;
+	}
+	public String getRegionName() {
+		return regionName;
+	}
+	public void setRegionName(String regionName) {
+		this.regionName = regionName;
 	}
 	@Override
 	public String toString() {

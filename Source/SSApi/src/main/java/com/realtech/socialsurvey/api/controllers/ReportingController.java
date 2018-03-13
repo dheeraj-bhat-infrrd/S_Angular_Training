@@ -865,4 +865,12 @@ public class ReportingController
     	LOGGER.info("API call to get survey invitation email counts for all time data.");
     	return new Gson().toJson( reportingDashboardManagement.getAllTimeDataForSurveyInvitationMail( startIndex, batchSize ) );
     }
+    
+    
+    @RequestMapping( value = "/surveyinvitationemail/month/year", method = RequestMethod.GET)
+    @ApiOperation(value = "Get data for survey initation mail for month and year.")
+    public String getDataForEmailReport(int month, int year, long companyId) {
+    	LOGGER.info("API call to get survey invitation email counts for month and year value.{}-{}",month,year);
+    	return new Gson().toJson( reportingDashboardManagement.getDataForSurveyInvitationMail(month,year,companyId ) );
+    }
 }

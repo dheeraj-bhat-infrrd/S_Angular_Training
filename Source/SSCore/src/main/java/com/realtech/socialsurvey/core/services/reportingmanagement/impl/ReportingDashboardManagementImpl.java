@@ -112,6 +112,7 @@ import com.realtech.socialsurvey.core.entities.NpsReportWeek;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RankingRequirements;
 import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.ReportRequest;
 import com.realtech.socialsurvey.core.entities.ReportingSurveyPreInititation;
 import com.realtech.socialsurvey.core.entities.SavedDigestRecord;
 import com.realtech.socialsurvey.core.entities.ScoreStatsOverallBranch;
@@ -154,6 +155,7 @@ import com.realtech.socialsurvey.core.enums.EntityWarningAlertType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.integration.stream.StreamApiIntegrationBuilder;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
@@ -352,6 +354,9 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     
     @Autowired
     private DigestMailHelper digestMailHelper;
+    
+    @Autowired
+    private StreamApiIntegrationBuilder streamApiIntegrationBuilder;
 
 
     @Value ( "${FILE_DIRECTORY_LOCATION}")
@@ -377,6 +382,9 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
     @Value ( "${APPLICATION_ADMIN_EMAIL}")
     private String applicationAdminEmail;
+    
+    @Value ( "${AMAZON_DIGEST_BUCKET}")
+    private String digestBucket;
 
     public static final int DIGEST_MAIL_START_INDEX = 0;
 
@@ -459,6 +467,12 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         }
 
         fileUpload = fileUploadDao.save( fileUpload );
+        
+        if ( reportId == CommonConstants.FILE_UPLOAD_SURVEY_INVITATION_EMAIL_REPORT ) {
+            ReportRequest reportRequest = new ReportRequest();
+            reportRequest.transform( fileUpload, actualTimeZoneOffset );
+            streamApiIntegrationBuilder.getStreamApi().generateEmailReport( reportRequest );
+        }
     }
 
 
@@ -3574,8 +3588,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         long transcationCount0 = digestList.get( 0 ) != null ? digestList.get( 0 ).getTotalTransactions() : 0l;
         long transcationCount1 = digestList.get( 1 ) != null ? digestList.get( 1 ).getTotalTransactions() : 0l;
 
-        long totalCompletedReviews0 = digestList.get( 0 ) != null ? digestList.get( 0 ).getTotalTransactions() : 0l;
-        long totalCompletedReviews1 = digestList.get( 1 ) != null ? digestList.get( 1 ).getTotalTransactions() : 0l;
+        long totalCompletedReviews0 = digestList.get( 0 ) != null ? digestList.get( 0 ).getDetractors()
+            + digestList.get( 0 ).getPassives() + digestList.get( 0 ).getPromoters() : 0l;
+        long totalCompletedReviews1 = digestList.get( 1 ) != null ? digestList.get( 1 ).getDetractors()
+            + digestList.get( 1 ).getPassives() + digestList.get( 1 ).getPromoters() : 0l;
 
         long totalCompletedNpsReviews0 = digestList.get( 0 ) != null ? digestList.get( 0 ).getNpsDetractors()
             + digestList.get( 0 ).getNpsPassives() + digestList.get( 0 ).getNpsPromoters() : 0l;
@@ -4947,7 +4963,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         digestHtml.delete();
 
         // create absolute file name
-        uploadedFileName = endpoint + CommonConstants.FILE_SEPARATOR + URLEncoder.encode( uploadedFileName, "UTF-8" );
+        uploadedFileName = endpoint + "/" + digestBucket + CommonConstants.FILE_SEPARATOR + URLEncoder.encode( uploadedFileName, "UTF-8" );
 
         // store the digest file name appropriately
         SavedDigestRecord digestRecord = new SavedDigestRecord();
@@ -5231,5 +5247,46 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 		queryMap.put("month", 0);
 		queryMap.put("year", 0);
 		return surveyInvitationEmailDao.findByKeyValueInBatch(SurveyInvitationEmailCountMonth.class, queryMap, startIndex, batchSize);
+	}
+
+
+	@Override
+	@Transactional
+	public List<SurveyInvitationEmailCountMonth> getDataForSurveyInvitationMail(int month, int year, long companyId) {
+
+		List<SurveyInvitationEmailCountMonth> monthData = null;
+		if (month == 0 && year == 0) {
+			monthData = new ArrayList<>();
+			Calendar cal = Calendar.getInstance();
+			month = cal.get(Calendar.MONTH);
+			year = cal.get(Calendar.YEAR);
+			List<Object[]> thisMonth = surveyInvitationEmailDao.getSurveyInvitationEmailReportForAllTime(companyId,
+					month, year);
+
+			for (Object[] obj : thisMonth) {
+				SurveyInvitationEmailCountMonth reportObj = new SurveyInvitationEmailCountMonth();
+				reportObj.setAgentName((String) obj[0]);
+				reportObj.setEmailId((String) obj[1]);
+				reportObj.setBranchName((String) obj[2]);
+				reportObj.setRegionName((String) obj[3]);
+				reportObj.setReceived(new Long(obj[4].toString()));
+				reportObj.setAttempted(new Long(obj[5].toString()));
+				reportObj.setDelivered(new Long(obj[6].toString()));
+				reportObj.setBounced(new Long(obj[7].toString()));
+				reportObj.setDiffered(new Long(obj[8].toString()));
+				reportObj.setOpened(new Long(obj[9].toString()));
+				reportObj.setLinkClicked(new Long(obj[10].toString()));
+				reportObj.setDropped(new Long(obj[11].toString()));
+				monthData.add(reportObj);
+			}
+
+		} else {
+			Map<String, Object> queryMap = new HashMap<String, Object>();
+			queryMap.put("companyId", companyId);
+			queryMap.put("month", month);
+			queryMap.put("year", year);
+			monthData = surveyInvitationEmailDao.findByKeyValue(SurveyInvitationEmailCountMonth.class, queryMap);
+		}
+		return monthData;
 	}
 }

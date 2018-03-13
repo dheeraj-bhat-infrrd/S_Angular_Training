@@ -43,5 +43,27 @@ public class SurveyInvitationEmailDaoImpl extends GenericReportingDaoImpl<Survey
 		
 		return query.list();
 	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Object[]> getSurveyInvitationEmailReportForAllTime(long companyId, int month, int year) {
+		String queryString = "select imc.agent_name,imc.agent_email,b.BRANCH,r.REGION,"
+				+ "sum(imc.received),sum(imc.attempted_count),sum(imc.delivered),sum(imc.bounced),"
+				+ "sum(imc.deffered),sum(imc.opened),sum(imc.link_clicked),sum(imc.dropped) "
+				+ "from invitation_mail_count_month imc "
+				+ "inner join company c on imc.company_id=c.company_id "
+				+ "inner join user_profile up on imc.agent_id=up.user_id and up.status = 1 "
+				+ "left join branch b on up.branch_id = b.branch_id and b.IS_DEFAULT_BY_SYSTEM=0 "
+				+ "left join region r on up.region_id = r.region_id and r.IS_DEFAULT_BY_SYSTEM=0 "
+				+ "where imc.month in (0, :month ) and imc.year in (0, :year ) and imc.company_id=:companyId "
+				+ "group by imc.agent_id order by imc.agent_name;";
+		
+		SQLQuery query = getSession().createSQLQuery(queryString);
+		query.setInteger("month", month)
+		.setInteger("year", year)
+		.setLong("companyId", companyId);
+		
+		return query.list();
+	}
 	
 }
