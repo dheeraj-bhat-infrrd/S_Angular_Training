@@ -1,12 +1,23 @@
 package com.realtech.socialsurvey.compute.topology.bolts.monitor;
 
 
+import java.util.List;
+import java.util.Map;
+
+import org.apache.storm.task.OutputCollector;
+import org.apache.storm.task.TopologyContext;
+import org.apache.storm.topology.OutputFieldsDeclarer;
+import org.apache.storm.tuple.Fields;
+import org.apache.storm.tuple.Tuple;
+import org.apache.storm.tuple.Values;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.compute.common.ComputeConstants;
 import com.realtech.socialsurvey.compute.dao.RedisSocialMediaStateDao;
 import com.realtech.socialsurvey.compute.dao.impl.RedisSocialMediaStateDaoImpl;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
-import com.realtech.socialsurvey.compute.entities.TwitterToken;
 import com.realtech.socialsurvey.compute.entities.TwitterTokenForSM;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.entities.response.TwitterFeedData;
@@ -16,18 +27,8 @@ import com.realtech.socialsurvey.compute.feeds.TwitterFeedProcessor;
 import com.realtech.socialsurvey.compute.feeds.impl.TwitterFeedProcessorImpl;
 import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBolt;
 import com.realtech.socialsurvey.compute.utils.UrlHelper;
-import org.apache.storm.task.OutputCollector;
-import org.apache.storm.task.TopologyContext;
-import org.apache.storm.topology.OutputFieldsDeclarer;
-import org.apache.storm.tuple.Fields;
-import org.apache.storm.tuple.Tuple;
-import org.apache.storm.tuple.Values;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import redis.clients.jedis.exceptions.JedisConnectionException;
 
-import java.util.List;
-import java.util.Map;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 
 
 /**
