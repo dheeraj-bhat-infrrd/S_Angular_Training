@@ -27,10 +27,8 @@ public class KafkaProducerBolt extends BaseComputeBolt
 
     private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger( KafkaProducerBolt.class );
-    private static final String BROKER_URL = LocalPropertyFileHandler.getInstance()
-        .getProperty( ComputeConstants.APPLICATION_PROPERTY_FILE, ComputeConstants.BROKER_URL ).orElseGet( null );
-    private static final String SOCIAL_POST_TOPIC_DEV = LocalPropertyFileHandler.getInstance()
-        .getProperty( ComputeConstants.APPLICATION_PROPERTY_FILE, ComputeConstants.SOCIAL_POST_TOPIC ).orElseGet( null );
+    private String brokerUrl;
+    private String socialPostTopicDev;
 
     Properties props;
     private RedisSocialMediaStateDaoImpl redisSinceRecordFetchedDao;
@@ -44,7 +42,7 @@ public class KafkaProducerBolt extends BaseComputeBolt
         boolean success = true;
 
         try ( KafkaProducer<String, String> kafkaWriter = new KafkaProducer<>( props ) ) {
-            ProducerRecord<String, String> msg = new ProducerRecord<>( SOCIAL_POST_TOPIC_DEV, tuple.getString( 0 ),
+            ProducerRecord<String, String> msg = new ProducerRecord<>( socialPostTopicDev, tuple.getString( 0 ),
                 tuple.getString( 1 ) );
             RecordMetadata recordMetadata = kafkaWriter.send( msg ).get();
             //DO NOT REMOVE THIS DEBUG LOG
@@ -84,10 +82,15 @@ public class KafkaProducerBolt extends BaseComputeBolt
     {
         super.prepare( stormConf, context, collector );
 
+        brokerUrl = LocalPropertyFileHandler.getInstance()
+            .getProperty( ComputeConstants.APPLICATION_PROPERTY_FILE, ComputeConstants.BROKER_URL ).orElseGet( null );
+        socialPostTopicDev = LocalPropertyFileHandler.getInstance()
+            .getProperty( ComputeConstants.APPLICATION_PROPERTY_FILE, ComputeConstants.SOCIAL_POST_TOPIC ).orElseGet( null );
+        
         this.redisSinceRecordFetchedDao = new RedisSocialMediaStateDaoImpl();
 
         props = new Properties();
-        props.put( ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, BROKER_URL );
+        props.put( ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerUrl );
         props.put( ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer" );
         props.put( ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer" );
     }
