@@ -43,7 +43,7 @@
 			</div>
 		</div>
 		<div class="rep-prof-pic-circle rep-prof-circle-user">
-			<jsp:include page="reporting_profileimage.jsp"></jsp:include>
+			<%@ include file="reporting_profileimage.jsp" %>
 		</div>
 	</div>
 	<div id="rep-user-info" class="col-lg-6 col-md-6 col-sm-6 col-xs-6 rep-user-info" >
@@ -112,15 +112,3 @@
 		<span>You have successfully connected to all your social media accounts.</span>
 	</div>
 </div>
-
-<script>
-	$(document).ready(function(){
-		$(document).on('click','#prof-company-review-count',function(e){
-			e.stopPropagation();
-			activaTab('reviews-tab');
-			delay(function(){
-				$(window).scrollTop($('#rep-reviews-container').offset().top);
-			},300);
-		});
-	});
-</script>

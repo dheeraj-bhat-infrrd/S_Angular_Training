@@ -37,7 +37,6 @@ hr{
 }
 
 </style>
-<div id="trans-stats-dash" class="hide" ></div>
 
 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 hm-header-main-wrapper hm-hdr-bord-bot" style="background: #2f69aa;margin-bottom: 5px;">
 	<div class="container">
@@ -175,70 +174,3 @@ hr{
 			
 	</div>
 </div>
-<script>
-$(document).ready(function(){
-	$(document).on('click','#incompleted-lbl-sel',function(e){
-		e.stopPropagation();
-		activaTab('incomplete-surveys-tab');
-		
-		delay(function(){
-			$(window).scrollTop($('#rep-dash-survey-incomplete').offset().top);
-		},300);
-		
-	});
-	
-	$(document).on('click','#unassigned-lbl-sel-span',function(e){
-		e.stopPropagation();
-		showMainContent('./showapps.do');
-	});
-	
-	$(document).on('click','#unprocessed-trans-div',function(e){
-		
-		clickUnprocessedDiv();
-	});
-	
-	$(document).on('click','#processed-trans-div',function(e){
-		clickProcessedDiv();
-	});
-	
-	$(document).on('click','#chart-icn-btn',function(e){
-		$('#incompleted-details-selectable').show();
-		$('#incompleted-details').addClass('hide');
-		$('#incompleted-details').removeClass('inline-flex-class');
-		$('#unassigned-details-selectable').show();
-		$('#unassigned-details').addClass('hide');
-		$('#unassigned-details').removeClass('inline-flex-class');
-		$('.processed-background-rect').show();
-		$('#processed-background-rect').hide();
-		$('.unprocessed-background-rect').show();
-		$('#unprocessed-background-rect').hide();
-		$('#unprocessed-lbl-rect').show();
-		$('#processed-lbl-rect').show();
-		$('#completed-lbl-rect').hide();
-		$('#incompleted-lbl-rect').hide();
-		$('#social-posts-lbl-rect').hide();
-		$('#zillow-lbl-rect').hide();
-		$('#third-party-lbl-rect').hide();
-		$('#unassigned-lbl-rect').hide();
-		$('#duplicate-lbl-rect').hide();
-		$('#corrupted-lbl-rect').hide();
-		$('#other-lbl-rect').hide();
-		
-		$('#unprocessed-trans-div').fadeTo('fast','1.0');
-		$('#processed-trans-div').fadeTo('fast','1.0');
-		
-		var processed=parseInt($('#processed-lbl-span').html());
-		var unprocessed=parseInt($('#unprocessed-lbl-span').html());
-		if(processed != 0 || unprocessed != 0){
-			$('#unclicked-trans-graph').removeClass('hide');
-			$('#unprocessed-trans-graph').addClass('hide');
-			$('#processed-trans-graph').addClass('hide');
-			$('#empty-rep-chart-div').addClass('hide');
-		}else{
-			$('#unclicked-trans-graph').addClass('hide');
-			$('#unprocessed-trans-graph').addClass('hide');
-			$('#processed-trans-graph').addClass('hide');
-		}
-	});
-});
-</script>
