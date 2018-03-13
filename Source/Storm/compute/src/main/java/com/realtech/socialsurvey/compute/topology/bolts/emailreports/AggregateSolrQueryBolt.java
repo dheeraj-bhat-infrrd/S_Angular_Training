@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -128,9 +129,18 @@ public class AggregateSolrQueryBolt extends BaseComputeBoltWithAck {
 				LOG.info("Saving agent email count data for time frame {}-{}",agentEmailCountsMonth.get(0).getMonth(),
 						agentEmailCountsMonth.get(0).getYear());
 				saveEmailCountMonthData(agentEmailCountsMonth);
-				LOG.info("Saved agent email count data for time frame {}-{}",agentEmailCountsMonth.get(0).getMonth(), 
-												agentEmailCountsMonth.get(0).getYear());
-				processAlltimeData(agentEmailCountsMonth);
+
+				Calendar cal = Calendar.getInstance();
+				if (agentEmailCountsMonth.get(0)
+						.getMonth() == ((cal.get(Calendar.MONTH) == 0) ? 12 : cal.get(Calendar.MONTH))
+						&& agentEmailCountsMonth.get(0)
+								.getYear() == ((cal.get(Calendar.MONTH) == 0) ? cal.get(Calendar.YEAR) - 1
+										: cal.get(Calendar.YEAR))) {
+					LOG.info("Saved agent email count data for time frame {}-{}",
+							agentEmailCountsMonth.get(0).getMonth(), agentEmailCountsMonth.get(0).getYear());
+					processAlltimeData(agentEmailCountsMonth);
+				}
+				
 			}
 		}
 	}

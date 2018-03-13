@@ -861,9 +861,9 @@ public class ReportingController
     
     @RequestMapping( value = "/surveyinvitationemailalltime", method = RequestMethod.GET)
     @ApiOperation(value = "Get all time data for survey initation mail.")
-    public String getAllTimeDataForSurveyInvitationMail(int startIndex, int batchSize) {
+    public List<SurveyInvitationEmailCountMonth> getAllTimeDataForSurveyInvitationMail(int startIndex, int batchSize) {
     	LOGGER.info("API call to get survey invitation email counts for all time data.");
-    	return new Gson().toJson( reportingDashboardManagement.getAllTimeDataForSurveyInvitationMail( startIndex, batchSize ) );
+    	return reportingDashboardManagement.getAllTimeDataForSurveyInvitationMail( startIndex, batchSize );
     }
     
     

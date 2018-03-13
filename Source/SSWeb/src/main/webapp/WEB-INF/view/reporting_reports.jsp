@@ -81,8 +81,8 @@
 					<div id="email-rep-time-div" class="float-left board-div hide">
 						<div class="dash-btn-dl-sd-admin time-selector" style="width:200px; margin-top:-5px">
 							<select id="email-rep-selector" class="float-left dash-download-sel-item board-selector-choice" style="width:100%">
-								<!-- <option value=1 data-report="thisYear">All Time</option>
-								<option value=2 data-report="thisMonth">This Month</option> -->
+								<option value=1 data-report="thisYear">All Time</option>
+								<option value=2 data-report="thisMonth">This Month</option>
 								<option value=3 data-report="lastYear">Last Month</option>
 							</select>	
 						</div>
