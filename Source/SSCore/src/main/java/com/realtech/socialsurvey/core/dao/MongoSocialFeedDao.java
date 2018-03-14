@@ -16,7 +16,7 @@ public interface MongoSocialFeedDao
     
     public SocialResponseObject getSocialFeed(String postId, String collectionName);
                 
-	public void updateSocialFeed(SocialFeedsActionUpdate socialFeedsActionUpdate, List<ActionHistory> actionHistory, int updateFlag, String collectionName);
+	public void updateSocialFeed(SocialFeedsActionUpdate socialFeedsActionUpdate, String postId, List<ActionHistory> actionHistory, int updateFlag, String collectionName);
 	
 	public OrganizationUnitSettings FetchMacros(Long companyId);
 	
