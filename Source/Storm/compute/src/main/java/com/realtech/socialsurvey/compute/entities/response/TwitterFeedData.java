@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.compute.entities.response;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 
 public class TwitterFeedData implements Serializable
@@ -24,6 +25,7 @@ public class TwitterFeedData implements Serializable
     private long retweetCount;
     private boolean isPossiblySensitive;
     private String lang;
+    private List<String> pictures;
     
     private int remaining;
     private int limit;
@@ -298,21 +300,42 @@ public class TwitterFeedData implements Serializable
         this.resetTimeInSeconds = resetTimeInSeconds;
     }
 
+    public List<String> getPictures() {
+        return pictures;
+    }
+
+    public void setPictures(List<String> pictures) {
+        this.pictures = pictures;
+    }
 
     @Override
-    public String toString()
-    {
-        return "TwitterFeedData [createdAt=" + createdAt + ", id=" + id + ", text=" + text + ", displayTextRangeStart="
-            + displayTextRangeStart + ", displayTextRangeEnd=" + displayTextRangeEnd + ", source=" + source + ", isTruncated="
-            + isTruncated + ", inReplyToStatusId=" + inReplyToStatusId + ", inReplyToUserId=" + inReplyToUserId
-            + ", isFavorited=" + isFavorited + ", isRetweeted=" + isRetweeted + ", favoriteCount=" + favoriteCount
-            + ", inReplyToScreenName=" + inReplyToScreenName + ", retweetCount=" + retweetCount + ", isPossiblySensitive="
-            + isPossiblySensitive + ", lang=" + lang + ", remaining=" + remaining + ", limit=" + limit + ", resetTimeInSeconds="
-            + resetTimeInSeconds + ", contributorsIDs=" + Arrays.toString( contributorsIDs ) + ", userName=" + userName
-            + ", withheldInCountries=" + Arrays.toString( withheldInCountries ) + "]";
+    public String toString() {
+        return "TwitterFeedData{" +
+                "createdAt=" + createdAt +
+                ", id=" + id +
+                ", text='" + text + '\'' +
+                ", displayTextRangeStart=" + displayTextRangeStart +
+                ", displayTextRangeEnd=" + displayTextRangeEnd +
+                ", source='" + source + '\'' +
+                ", isTruncated=" + isTruncated +
+                ", inReplyToStatusId=" + inReplyToStatusId +
+                ", inReplyToUserId=" + inReplyToUserId +
+                ", isFavorited=" + isFavorited +
+                ", isRetweeted=" + isRetweeted +
+                ", favoriteCount=" + favoriteCount +
+                ", inReplyToScreenName='" + inReplyToScreenName + '\'' +
+                ", retweetCount=" + retweetCount +
+                ", isPossiblySensitive=" + isPossiblySensitive +
+                ", lang='" + lang + '\'' +
+                ", pictures=" + pictures +
+                ", remaining=" + remaining +
+                ", limit=" + limit +
+                ", resetTimeInSeconds=" + resetTimeInSeconds +
+                ", contributorsIDs=" + Arrays.toString(contributorsIDs) +
+                ", userName='" + userName + '\'' +
+                ", withheldInCountries=" + Arrays.toString(withheldInCountries) +
+                '}';
     }
-    
-    
 
 
 }

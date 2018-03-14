@@ -5974,6 +5974,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             socialMediaTokenResponse.setCompanyId( companyId );
             socialMediaTokenResponse.setProfileType( profileType );
             socialMediaTokenResponse.setSocialMediaTokens( feedIngestionEntity.getSocialMediaTokens() );
+            socialMediaTokenResponse.setProfileImageUrl( feedIngestionEntity.getProfileImageUrl() );
             return socialMediaTokenResponse;
         }
         return null;

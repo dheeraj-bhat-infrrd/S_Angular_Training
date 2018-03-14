@@ -13,7 +13,7 @@ public class SocialMediaTokenResponse
     private long companyId;
     private SocialMediaTokensForSM socialMediaTokens;
     private ProfileType profileType;
-
+    private String profileImageUrl;
 
     public long getIden()
     {
@@ -25,9 +25,6 @@ public class SocialMediaTokenResponse
     {
         this.iden = iden;
     }
-
-
-    
 
     public long getCompanyId()
     {
@@ -63,5 +60,12 @@ public class SocialMediaTokenResponse
     {
         this.socialMediaTokens = socialMediaTokens;
     }
-    
+
+    public String getProfileImageUrl() {
+        return profileImageUrl;
+    }
+
+    public void setProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
+    }
 }
