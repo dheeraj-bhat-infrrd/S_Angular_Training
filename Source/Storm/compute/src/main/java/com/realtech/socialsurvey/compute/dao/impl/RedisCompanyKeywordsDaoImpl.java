@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.compute.dao.impl;
 
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,10 +51,10 @@ public class RedisCompanyKeywordsDaoImpl implements RedisCompanyKeywordsDao
         try ( Jedis jedis = RedisDB.getPoolInstance().getResource() ) {
             // Return all keywords 
             String modifiedOnString = jedis.hget(RedisKeyConstants.COMPANYKEYWORDS_KEY_PREFIX + companyId, RedisKeyConstants.MODIFIEDON );
-            return Long.parseLong( modifiedOnString );
+            return StringUtils.isNotEmpty( modifiedOnString ) ? Long.parseLong( modifiedOnString ) : 0L;
         } catch (JedisConnectionException e){
             LOG.error(e.getMessage());
-            return 0;
+            return 0L;
         }
     }
 

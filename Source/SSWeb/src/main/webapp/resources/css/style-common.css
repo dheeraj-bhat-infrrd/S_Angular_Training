@@ -10392,26 +10392,25 @@ img.lead-img {
 .top-ten-ranks{
 	width: 110px;
     margin: 0;
-    margin-left: 75%;
+    float: right;
 }
 
 .my-rank{
 	width: 100px;
     margin: 0;
-    margin-left: 58%;
-    margin-top: 70px;
+    float: right;
+    margin-right: 10px;
 }
 
 .lead-ranks-above{
 	width: 100px;
     margin: 0;
-    margin-left: 89%;
+    float: right;
 }
 
 .top-ten-ranks-btn{
 	font-size: 14px;
     font-weight: bold !important;
-    margin-bottom: -25px;
 }
 
 .lead-ranks-above-btn{
@@ -10423,7 +10422,8 @@ img.lead-img {
 .lead-ranks-below{
     width: 100px;
     margin: 0;
-    margin-left: 89%
+    float: right;
+    margin-top: 10px;
 }
 
 .lead-ranks-below-btn{

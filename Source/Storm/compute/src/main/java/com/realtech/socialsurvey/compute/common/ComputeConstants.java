@@ -60,6 +60,10 @@ public final class ComputeConstants
     public static final String FILEUPLOAD_DIRECTORY_LOCATION = "FILEUPLOAD_DIRECTORY_LOCATION";
     public static final String REDIS_HOST = "REDIS_HOST";
     public static final String REDIS_PORT = "REDIS_PORT";
+    
+    // kafka properties
+    public static final String BROKER_URL = "BROKER_URL";
+    public static final String SOCIAL_POST_TOPIC = "SOCIAL_POST_TOPIC";
 
     // Twitter consumer keys
     public static final String TWITTER_CONSUMER_KEY = "twitter.consumer.key";

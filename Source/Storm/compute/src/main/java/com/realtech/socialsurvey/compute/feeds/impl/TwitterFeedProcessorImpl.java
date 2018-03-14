@@ -1,21 +1,28 @@
 package com.realtech.socialsurvey.compute.feeds.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.realtech.socialsurvey.compute.dao.impl.RedisSocialMediaStateDaoImpl;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
-import com.realtech.socialsurvey.compute.entities.TwitterToken;
 import com.realtech.socialsurvey.compute.entities.TwitterTokenForSM;
 import com.realtech.socialsurvey.compute.entities.response.TwitterFeedData;
 import com.realtech.socialsurvey.compute.feeds.TwitterFeedProcessor;
 import com.realtech.socialsurvey.compute.utils.UrlHelper;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import redis.clients.jedis.exceptions.JedisConnectionException;
-import twitter4j.*;
-import twitter4j.auth.AccessToken;
 
-import java.util.ArrayList;
-import java.util.List;
+import redis.clients.jedis.exceptions.JedisConnectionException;
+import twitter4j.Paging;
+import twitter4j.RateLimitStatus;
+import twitter4j.ResponseList;
+import twitter4j.Status;
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
+import twitter4j.TwitterFactory;
+import twitter4j.auth.AccessToken;
 
 
 /**
@@ -86,7 +93,10 @@ public class TwitterFeedProcessorImpl implements TwitterFeedProcessor
                 resultList = twitter.getUserTimeline( pageId, paging );
 
                 //save the twitterSecondsUnitlRest in redis if remainingCount becomes <= 100
-                LOG.info("RateLimit status for page {} is {} ", pageId, resultList.getRateLimitStatus());
+                if(LOG.isDebugEnabled()){
+                    LOG.debug("RateLimit status for page {} is {} ", pageId, resultList.getRateLimitStatus());
+                }
+                
                 if(resultList.getRateLimitStatus().getRemaining() <= TWITTER_MIN_LIMIT) {
                     int secondsUntilReset = (int)(((long)resultList.getRateLimitStatus().getResetTimeInSeconds() * 1000L - System.currentTimeMillis()) / 1000L);
                     redisSocialMediaStateDao.setTwitterLock(secondsUntilReset,pageId);

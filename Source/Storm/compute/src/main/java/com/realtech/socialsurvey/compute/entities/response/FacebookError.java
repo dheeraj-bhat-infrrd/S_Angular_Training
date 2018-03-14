@@ -2,6 +2,8 @@ package com.realtech.socialsurvey.compute.entities.response;
 
 import java.io.Serializable;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * @author manish
  *
@@ -12,7 +14,10 @@ public class FacebookError implements Serializable
     private String message;
     private int code;
     private String type;
+    @SerializedName("error_subcode")
     private String errorSubcode;
+
+    @SerializedName("fbtrace_id")
     private String fbTraceId;
 
 

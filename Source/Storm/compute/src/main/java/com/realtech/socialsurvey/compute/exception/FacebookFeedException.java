@@ -6,7 +6,7 @@ package com.realtech.socialsurvey.compute.exception;
  * @author manish
  *
  */
-public class FacebookRateLimitException extends FatalException
+public class FacebookFeedException extends FatalException
 {
 
     private static final long serialVersionUID = 1L;
@@ -14,21 +14,21 @@ public class FacebookRateLimitException extends FatalException
     private final int facebookErrorCode;
 
 
-    public FacebookRateLimitException( int facebookErrorCode )
+    public FacebookFeedException( int facebookErrorCode )
     {
         super();
         this.facebookErrorCode = facebookErrorCode;
     }
 
 
-    public FacebookRateLimitException( int facebookErrorCode, String message, Throwable thrw )
+    public FacebookFeedException( int facebookErrorCode, String message, Throwable thrw )
     {
         super( message, thrw );
         this.facebookErrorCode = facebookErrorCode;
     }
 
 
-    public FacebookRateLimitException( int facebookErrorCode, String message )
+    public FacebookFeedException( int facebookErrorCode, String message )
     {
         super( message );
         this.facebookErrorCode = facebookErrorCode;

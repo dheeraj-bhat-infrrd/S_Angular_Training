@@ -16,7 +16,7 @@ import com.realtech.socialsurvey.compute.entities.FacebookXUsageHeader;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.compute.entities.response.FacebookFeedData;
 import com.realtech.socialsurvey.compute.entities.response.FacebookResponse;
-import com.realtech.socialsurvey.compute.exception.FacebookRateLimitException;
+import com.realtech.socialsurvey.compute.exception.FacebookFeedException;
 import com.realtech.socialsurvey.compute.feeds.FacebookFeedProcessor;
 import com.realtech.socialsurvey.compute.utils.ConversionUtils;
 import com.realtech.socialsurvey.compute.utils.UrlHelper;
@@ -130,7 +130,7 @@ public class FacebookFeedProcessorImpl implements FacebookFeedProcessor
                 checkRateLimiting( response.headers(), pageId, accessToken );
                 return response.body();
             }
-        } catch (FacebookRateLimitException e) {
+        } catch (FacebookFeedException e) {
             if(e.getFacebookErrorCode() == 4){
                 // Application level
                 redisSocialMediaStateDao.setFacebookLockForApplication(TOKEN_BLOCK_TIME );

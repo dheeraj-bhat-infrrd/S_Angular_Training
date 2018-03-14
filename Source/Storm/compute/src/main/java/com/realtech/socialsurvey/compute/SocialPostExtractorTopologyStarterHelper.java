@@ -101,12 +101,12 @@ public class SocialPostExtractorTopologyStarterHelper extends TopologyStarterHel
         // add bolts
         builder.setBolt( TWITTER_FEED_EXTRACTOR_BOLT, new TwitterFeedExtractorBolt(), 1 )
             .shuffleGrouping( SOCIAL_MEDIA_TOKEN_EXTRACTOR_SPOUT, "TwitterStream" );
-        builder.setBolt( LINKEDIN_FEED_EXTRACTOR_BOLT, new LinkedinFeedExtractorBolt(), 1 )
-            .shuffleGrouping( SOCIAL_MEDIA_TOKEN_EXTRACTOR_SPOUT, "LinkedinStream" );
+        /*builder.setBolt( LINKEDIN_FEED_EXTRACTOR_BOLT, new LinkedinFeedExtractorBolt(), 1 )
+            .shuffleGrouping( SOCIAL_MEDIA_TOKEN_EXTRACTOR_SPOUT, "LinkedinStream" );*/
         builder.setBolt( FACEBOOK_FEED_EXTRACTOR_BOLT, new FacebookFeedExtractorBolt(), 1 )
             .shuffleGrouping( SOCIAL_MEDIA_TOKEN_EXTRACTOR_SPOUT, "FacebookStream" );
-        builder.setBolt( KAFKA_PRODUCER_BOLT, new KafkaProducerBolt(), 3 ).shuffleGrouping( TWITTER_FEED_EXTRACTOR_BOLT )
-            .shuffleGrouping( LINKEDIN_FEED_EXTRACTOR_BOLT ).shuffleGrouping( FACEBOOK_FEED_EXTRACTOR_BOLT );
+        builder.setBolt( KAFKA_PRODUCER_BOLT, new KafkaProducerBolt(), 2 ).shuffleGrouping( TWITTER_FEED_EXTRACTOR_BOLT )
+            .shuffleGrouping( FACEBOOK_FEED_EXTRACTOR_BOLT );
 
         return builder.createTopology();
     }

@@ -22,7 +22,7 @@
 <div class="col-lg-3 col-md-3 col-sm-3 rep-sps-div">
 	
 	<div id="spsGaugeSuccess" class="hide">
-		<jsp:include page="reporting_spsGauge.jsp"></jsp:include>
+		<%@ include file="reporting_spsGauge.jsp" %>
 	</div>
 	<div id="spsGaugeFailure" class=hide>
 		<div style="text-align:center; margin:30% auto">
@@ -69,7 +69,7 @@
 	<div class="col-lg-3 col-md-3 col-sm-3 rep-sps-div">
 
 		<div id="npsGaugeSuccess" class="hide">
-			<jsp:include page="reporting_npsGauge.jsp"></jsp:include>
+			<%@ include file="reporting_npsGauge.jsp" %>
 		</div>
 		<div id="npsGaugeFailure" class=hide>
 			<div style="text-align: center; margin: 30% auto">
@@ -131,8 +131,8 @@ $(window).resize(function(){
 		 }
 	 }
 	 
-	 var entityType = "${columnName}";
-	 var entityId = "${columnValue}";
+	 var entityType = $('#reporting-data-div').attr('data-column-name');
+	 var entityId = parseInt($('#reporting-data-div').attr('data-column-value'));
 	 
 	 if($('#nps_chart_div').length>0){
 		 if($('#overview-tab').hasClass('active')){
