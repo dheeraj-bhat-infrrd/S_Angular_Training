@@ -14,7 +14,6 @@ import org.apache.storm.tuple.Tuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.realtech.socialsurvey.compute.common.ComputeConstants;
 import com.realtech.socialsurvey.compute.common.SSAPIOperations;
 import com.realtech.socialsurvey.compute.entities.ReportRequest;
 import com.realtech.socialsurvey.compute.entity.SurveyInvitationEmailCountMonth;
@@ -73,7 +72,7 @@ public class GetDataForEmailReport extends BaseComputeBoltWithAck {
 
                     } else if ( reportResponse == null ) {
                         status = ReportStatus.BLANK.getValue();
-                    } else if ( !reportResponse.isEmpty() && reportResponse.size() < ComputeConstants.BATCH_SIZE ) {
+                    } else if ( !reportResponse.isEmpty() ) {
                         status = ReportStatus.PROCESSED.getValue();
                     }
                     success = true;
