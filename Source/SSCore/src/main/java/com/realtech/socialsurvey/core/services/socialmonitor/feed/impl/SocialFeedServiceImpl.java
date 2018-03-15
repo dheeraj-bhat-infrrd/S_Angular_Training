@@ -376,6 +376,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
 			companyData.setIden(companyDetails.getIden());
 			companyData.setName(companyDetails.getContact_details().getName());
 			companyData.setProfileImageUrl(companyDetails.getProfileImageUrl());
+			companyData.setRegionId( 0 );
 			segmentsVO.setSegmentsEntity(companyData);
 		}
 
@@ -386,6 +387,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
 				segmentsEntity.setIden(organizationUnitSettings.getIden());
 				segmentsEntity.setName(organizationUnitSettings.getContact_details().getName());
 				segmentsEntity.setProfileImageUrl(organizationUnitSettings.getProfileImageUrl());
+				segmentsEntity.setRegionId( 0 );
 				regionList.add(segmentsEntity);
 			}
 			segmentsVO.setRegionDetails(regionList);
@@ -398,6 +400,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
 				segmentsEntity.setIden(organizationUnitSettings.getIden());
 				segmentsEntity.setName(organizationUnitSettings.getContact_details().getName());
 				segmentsEntity.setProfileImageUrl(organizationUnitSettings.getProfileImageUrl());
+				segmentsEntity.setRegionId( branchDao.getRegionIdByBranchId( organizationUnitSettings.getIden() ) );
 				branchList.add(segmentsEntity);
 			}
 			segmentsVO.setBranchDetails(branchList);
