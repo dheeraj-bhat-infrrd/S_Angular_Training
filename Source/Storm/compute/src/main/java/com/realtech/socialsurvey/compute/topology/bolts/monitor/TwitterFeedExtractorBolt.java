@@ -141,6 +141,8 @@ public class TwitterFeedExtractorBolt extends BaseComputeBolt
 
         responseWrapper.setPostId( String.valueOf( twitterFeedData.getId() ) );
         responseWrapper.setId( String.valueOf( twitterFeedData.getId() ) );
+        responseWrapper.setOwnerProfileImage(mediaToken.getProfileImageUrl());
+        responseWrapper.setPictures(twitterFeedData.getPictures());
 
         if ( twitterFeedData.getCreatedAt() != null ) {
             responseWrapper.setCreatedTime( twitterFeedData.getCreatedAt().getTime() );

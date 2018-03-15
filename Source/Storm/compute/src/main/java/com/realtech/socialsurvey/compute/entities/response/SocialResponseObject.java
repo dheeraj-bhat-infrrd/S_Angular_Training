@@ -36,7 +36,7 @@ public class SocialResponseObject<T> implements Serializable
     private String id;
     private String postId;
     private String text;
-    private String picture;
+    private List<String> pictures;
     private long updatedTime;
     private long createdTime;
     private String ownerName;
@@ -107,17 +107,13 @@ public class SocialResponseObject<T> implements Serializable
     }
 
 
-    public String getPicture()
-    {
-        return picture;
+    public List<String> getPictures() {
+        return pictures;
     }
 
-
-    public void setPicture( String picture )
-    {
-        this.picture = picture;
+    public void setPictures(List<String> pictures) {
+        this.pictures = pictures;
     }
-
 
     public String getOwnerName()
     {
@@ -331,15 +327,32 @@ public class SocialResponseObject<T> implements Serializable
 
 
     @Override
-    public String toString()
-    {
-        return "SocialResponseObject [id=" + id + ", postId=" + postId + ", text=" + text + ", picture=" + picture
-            + ", updatedTime=" + updatedTime + ", createdTime=" + createdTime + ", ownerName=" + ownerName + ", ownerEmail="
-            + ownerEmail + ", ownerProfileImage=" + ownerProfileImage + ", response=" + response + ", type=" + type
-            + ", flagged=" + flagged + ", status=" + status + ", companyId=" + companyId + ", regionId=" + regionId
-            + ", branchId=" + branchId + ", agentId=" + agentId + ", profileType=" + profileType + ", hash=" + hash
-            + ", duplicateCount=" + duplicateCount + ", foundKeywords=" + foundKeywords + ", actionHistory=" + actionHistory
-            + ", isRetried=" + isRetried + "]";
+    public String toString() {
+        return "SocialResponseObject{" +
+                "id='" + id + '\'' +
+                ", postId='" + postId + '\'' +
+                ", text='" + text + '\'' +
+                ", pictures=" + pictures +
+                ", updatedTime=" + updatedTime +
+                ", createdTime=" + createdTime +
+                ", ownerName='" + ownerName + '\'' +
+                ", ownerEmail='" + ownerEmail + '\'' +
+                ", ownerProfileImage='" + ownerProfileImage + '\'' +
+                ", response=" + response +
+                ", type=" + type +
+                ", flagged=" + flagged +
+                ", status=" + status +
+                ", companyId=" + companyId +
+                ", regionId=" + regionId +
+                ", branchId=" + branchId +
+                ", agentId=" + agentId +
+                ", profileType=" + profileType +
+                ", hash=" + hash +
+                ", duplicateCount=" + duplicateCount +
+                ", foundKeywords=" + foundKeywords +
+                ", actionHistory=" + actionHistory +
+                ", isRetried=" + isRetried +
+                '}';
     }
-    
+
 }
