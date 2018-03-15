@@ -6,6 +6,7 @@
 <div id="stream-post-cont" class="dash-stats-wrapper bord-bot-dc clearfix stream-container"  >
 	<div id="stream-post-details-cont" class="col-lg-6 col-md-6 col-sm-6 col-xs-6 soc-mon-post-container bottom-padding-stream">
 		<div id="stream-post-icn-cont" class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+			<input type="hidden" class="post-id-details" data-post-id=>
 			<img src="${initParam.resourcesPath}/resources/images/check-no.png" class="stream-unchecked float-left stream-checkbox soc-mon-post-checkbox">
 			<img src="${initParam.resourcesPath}/resources/images/check-yes.png" class="stream-checked hide float-left stream-checkbox soc-mon-post-checkbox">
 			<img src="${initParam.resourcesPath}/resources/images/flag-gray.png" class="stream-unflagged-icn hide float-left soc-mon-post-icn">
