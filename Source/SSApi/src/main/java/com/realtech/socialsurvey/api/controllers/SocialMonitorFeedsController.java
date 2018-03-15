@@ -141,12 +141,12 @@ public class SocialMonitorFeedsController {
 	@RequestMapping(value = "/segments/company/{companyId}", method = RequestMethod.GET)
 	@ApiOperation(value = "Get regions and branches for a company", response = SegmentsVO.class)
 	@ApiResponses(value = { @ApiResponse ( code = 200, message = "Successfully fetched the segments")})
-	public ResponseEntity<?> getSegmentsByCompanyId(@PathVariable Long companyId, int startIndex, int limit)
+	public ResponseEntity<?> getSegmentsByCompanyId(@PathVariable Long companyId)
 			throws InvalidInputException, SSApiException {
 		LOGGER.info("Fetching regions and branches for a company");
 		SegmentsVO segmentsVO;
 		try {
-			segmentsVO = socialFeedService.getSegmentsByCompanyId(companyId, startIndex, limit);
+			segmentsVO = socialFeedService.getSegmentsByCompanyId(companyId);
 		} catch (InvalidInputException ie) {
 			LOGGER.error("Invalid input exception caught while fetching branches and regions", ie);
 			throw new SSApiException("Invalid input exception caught while fetching branches and regions", ie);
