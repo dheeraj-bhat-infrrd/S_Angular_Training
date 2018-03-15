@@ -11377,6 +11377,11 @@ img.lead-img {
     cursor: pointer;
 }
 
+.bulk-macro-opt{
+	padding: 10px;
+    cursor: pointer;
+}
+
 .stream-container-gray{
 	background-color: #ececec;
 }
@@ -11808,6 +11813,10 @@ img.lead-img {
 .dup-count{
 	font-size: 11px;
     font-weight: bold !important;
+}
+
+.bulk-act-btn{
+	margin-left:3px;	
 }
 
 .recalculate-user-ranking{
