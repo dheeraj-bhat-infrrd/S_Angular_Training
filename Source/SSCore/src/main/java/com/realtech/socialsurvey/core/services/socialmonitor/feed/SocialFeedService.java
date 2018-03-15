@@ -84,12 +84,10 @@ public interface SocialFeedService
     /**
      * fetches all the regions and branches of a company
      * @param companyId
-     * @param startIndex
-     * @param batchSize
      * @return
      * @throws InvalidInputException
      */
-    public SegmentsVO getSegmentsByCompanyId(Long companyId, int startIndex, int batchSize) throws InvalidInputException;
+    public SegmentsVO getSegmentsByCompanyId(Long companyId) throws InvalidInputException;
     
     /**
      * fetches all the users of a company
