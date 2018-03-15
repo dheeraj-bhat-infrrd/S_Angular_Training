@@ -468,15 +468,47 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
         fileUpload = fileUploadDao.save( fileUpload );
         
-        if ( reportId == CommonConstants.FILE_UPLOAD_SURVEY_INVITATION_EMAIL_REPORT ) {
-            ReportRequest reportRequest = new ReportRequest();
-            reportRequest.transform( fileUpload, actualTimeZoneOffset );
-            streamApiIntegrationBuilder.getStreamApi().generateEmailReport( reportRequest );
-        }
+		if (reportId == CommonConstants.FILE_UPLOAD_SURVEY_INVITATION_EMAIL_REPORT) {
+			ReportRequest reportRequest = new ReportRequest();
+			String timeFrame = CommonConstants.TIME_FRAME_ALL_TIME;
+			if (fileUpload.getStartDate() != null) {
+				if (fileUpload.getStartDate().getTime() == getFirstDayOfThisMonthTime()) {
+					timeFrame = CommonConstants.TIME_FRAME_THIS_MONTH;
+				} else if (fileUpload.getStartDate().getTime() == getFirstDayOfPastMonthTime()) {
+					timeFrame = CommonConstants.TIME_FRAME_PAST_MONTH;
+				}
+			}
+			reportRequest.transform(timeFrame);
+			reportRequest.setFileUploadId(fileUpload.getFileUploadId());
+			streamApiIntegrationBuilder.getStreamApi().generateEmailReport(reportRequest);
+		}
     }
 
 
-    /*
+    private long getFirstDayOfPastMonthTime() {
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
+		cal.set(Calendar.HOUR, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+		cal.add(Calendar.MONTH, -1);
+		return cal.getTimeInMillis();
+	}
+
+
+	private long getFirstDayOfThisMonthTime() {
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
+		cal.set(Calendar.HOUR, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+		return cal.getTimeInMillis();
+	}
+
+
+	/*
      * Generate report from the surveyStats Table
      * 
      */
@@ -5281,11 +5313,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 			}
 
 		} else {
-			Map<String, Object> queryMap = new HashMap<String, Object>();
-			queryMap.put("companyId", companyId);
-			queryMap.put("month", month);
-			queryMap.put("year", year);
-			monthData = surveyInvitationEmailDao.findByKeyValue(SurveyInvitationEmailCountMonth.class, queryMap);
+			monthData = getSurveyInvitationEmailReportForMonth(companyId, month, year); 
 		}
 		return monthData;
 	}
