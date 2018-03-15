@@ -71,64 +71,6 @@
 </div>
 <script>
 	$(document).ready(function(){
-		/* var macroList = [
-			{
-				"macroId" : "mac-1",
-				"macroName" : "Post has questionable language - Flag",
-				"description" : "",
-				"actions" : {"SocialFeedStatus":"NEW","flagged":true,"TextActionType":"PRIVATE_NOTE","text":"This need to be reviewed"},
-				"active" : true,
-				"count" : 4,
-				"createdOn" : "October 23, 2017"
-			},
-			{
-				"macroId" : "mac-2",
-				"macroName" : "Request post to be removed - Escalated",
-				"description" : "",
-				"actions" : {"SocialFeedStatus":"ESCALATED","flagged":true,"TextActionType":"PRIVATE_NOTE","text":"This need to be reviewed"},
-				"active" : true,
-				"count" : 0,
-				"createdOn" : "October 24, 2017"
-			},
-			{
-				"macroId" : "mac-3",
-				"macroName" : "Confirm post removed -  Resolve",
-				"description" : "",
-				"actions" : {"SocialFeedStatus":"RESOLVED","flagged":false,"TextActionType":"PRIVATE_NOTE","text":"This need to be reviewed"},
-				"active" : true,
-				"count" : 0,
-				"createdOn" : "October 23, 2017"
-			},
-			{
-				"macroId" : "mac-4",
-				"macroName" : "Confirm post removed -  Resolve",
-				"description" : "",
-				"actions" : {"SocialFeedStatus":"NEW","flagged":true,"TextActionType":"PRIVATE_NOTE","text":"This need to be reviewed"},
-				"active" : false,
-				"count" : 4,
-				"createdOn" : "October 25, 2017"
-			},
-			{
-				"macroId" : "mac-5",
-				"macroName" : "Post has questionable language - Flag",
-				"description" : "",
-				"actions" : {"SocialFeedStatus":"ESCALATED","flagged":true,"TextActionType":"PRIVATE_NOTE","text":"This need to be reviewed"},
-				"active" : false,
-				"count" : 6,
-				"createdOn" : "October 26, 2017"
-			},
-			{
-				"macroId" : "mac-6",
-				"macroName" : "Request post to be removed - Escalated",
-				"description" : "",
-				"actions" : {"SocialFeedStatus":"RESOLVED","flagged":false,"TextActionType":"PRIVATE_NOTE","text":"This need to be reviewed"},
-				"active" : false,
-				"count" : 2,
-				"createdOn" : "October 23, 2017"
-			}
-		];
-		
-		drawMacroList(macroList); */
 		getMacros();
 	});
 </script>

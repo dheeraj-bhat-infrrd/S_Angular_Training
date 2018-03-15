@@ -1,9 +1,11 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Arrays;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.QueryParam;
@@ -343,12 +345,15 @@ public class SocialMonitorWebController {
         String batchSizeStr = request.getParameter(BATCH_SIZE);
         String status = request.getParameter(STATUS);
         String flagStr = request.getParameter(FLAG);
+        String companyIdStr = request.getParameter( "company" );
+        String regionIdStr = request.getParameter( "region" );
+        String branchIdStr = request.getParameter( "branch" );
         
         List<String> feedType = new ArrayList<>();
         feedType.add("FACEBOOK");feedType.add("TWITTER");feedType.add("LINKEDIN");
-        List<Long> regionIds = null;
-        List<Long> branchIds = null;
-        List<Long> agentIds = null;
+        List<Long> regionIds = new ArrayList<>();
+        List<Long> branchIds = new ArrayList<>();
+        List<Long> agentIds = new ArrayList<>();
         int startIndex=0;
         int batchSize=10;
         boolean flag = false;
@@ -361,13 +366,44 @@ public class SocialMonitorWebController {
         	batchSize = Integer.valueOf( batchSizeStr );
         }
         
+        if(status.equalsIgnoreCase("none") || status.isEmpty()){
+            status=null;
+        }
+        
        if ( flagStr != null && !flagStr.isEmpty() ) {
         	flag = Boolean.valueOf( flagStr );
         }
        
-        Response response = ssApiIntergrationBuilder.getIntegrationApi().showStreamSocialPosts(startIndex, batchSize, status, flag, feedType, companyId, regionIds, branchIds, agentIds);
+       if(regionIdStr!=null && !regionIdStr.isEmpty()) {
+           String[] regionIdList = regionIdStr.split(",");
+           
+           for(int i=0;i<regionIdList.length;i++) {
+               regionIds.add(Long.valueOf(regionIdList[i]));
+           }
+       }else {
+           regionIds = null;
+       }
+       
+       if(branchIdStr!=null && !branchIdStr.isEmpty()) {
+           String[] branchIdList = branchIdStr.split(",");
+           
+           for(int i=0;i<branchIdList.length;i++) {
+               branchIds.add(Long.valueOf(branchIdList[i]));
+           }
+       }else {
+           branchIds = null;
+       }
+       
+       if(companyIdStr != null && !companyIdStr.isEmpty()) {
+           companyId = Long.valueOf( companyIdStr );
+           if(companyId == 0) {
+               companyId = null;
+           }
+       }
+       
+       Response response = ssApiIntergrationBuilder.getIntegrationApi().showStreamSocialPosts(startIndex, batchSize, status, flag, feedType, companyId, regionIds, branchIds, agentIds);
         		
-        return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+        return new String( ( (TypedByteArray) response.getBody() ).getBytes(),Charset.forName("UTF-8") );
        
     }
     
@@ -379,8 +415,14 @@ public class SocialMonitorWebController {
     	String textActType = request.getParameter("form-text-act-type");
     	String text = request.getParameter("form-post-textbox");
     	String macroId = request.getParameter("form-post-act-macro-id");
+    	
+    	String[] postIdList = postId.split(",");
     	List<String> postIds = new ArrayList<>();
-    	postIds.add(postId);
+    	
+    	for(int i=0;i<postIdList.length;i++) {
+    		postIds.add(postIdList[i]);
+    	}
+    	
     	SocialFeedsActionUpdate socialFeedsActionUpdate = new SocialFeedsActionUpdate();
     	socialFeedsActionUpdate.setPostIds(postIds);
     	
@@ -390,7 +432,12 @@ public class SocialMonitorWebController {
     	}
     	socialFeedsActionUpdate.setFlagged(flagged);
     	
-    	socialFeedsActionUpdate.setStatus(SocialFeedStatus.valueOf(statusStr));
+    	if(statusStr.equalsIgnoreCase("NONE")){
+    		socialFeedsActionUpdate.setStatus(null);
+    	}else {
+    		socialFeedsActionUpdate.setStatus(SocialFeedStatus.valueOf(statusStr));
+    	}
+    	
     	socialFeedsActionUpdate.setTextActionType(TextActionType.valueOf(textActType));
     	socialFeedsActionUpdate.setText(text);
     	socialFeedsActionUpdate.setMacroId(macroId);
@@ -408,7 +455,7 @@ public class SocialMonitorWebController {
     	
     	User user = sessionHelper.getCurrentUser();
         Long companyId = user.getCompany().getCompanyId();
-        String userName = user.getProfileName();
+        String userName = user.getFirstName() + " " + user.getLastName();
         
     	Map<String, String> statusMap = new HashMap<>();
     	String message = "";
@@ -444,11 +491,16 @@ public class SocialMonitorWebController {
     	String postId = request.getParameter("macro-form-post-id");
     	String flaggedStr = request.getParameter("macro-form-flagged");
     	String statusStr = request.getParameter("macro-form-status");
-    	String textActType = request.getParameter("macroform-text-act-type");
+    	String textActType = request.getParameter("macro-form-text-act-type");
     	String text = request.getParameter("macro-form-text");
     	String macroId = request.getParameter("macro-form-macro-id");
+    	
+    	String[] postIdList = postId.split(",");
     	List<String> postIds = new ArrayList<>();
-    	postIds.add(postId);
+    	
+    	for(int i=0;i<postIdList.length;i++) {
+    		postIds.add(postIdList[i]);
+    	}
     	
     	SocialFeedsActionUpdate socialFeedsActionUpdate = new SocialFeedsActionUpdate();
     	socialFeedsActionUpdate.setPostIds(postIds);
@@ -459,7 +511,12 @@ public class SocialMonitorWebController {
     	}
     	socialFeedsActionUpdate.setFlagged(flagged);
     	
-    	socialFeedsActionUpdate.setStatus(SocialFeedStatus.valueOf(statusStr));
+    	if(statusStr.equalsIgnoreCase("NONE")){
+    		socialFeedsActionUpdate.setStatus(null);
+    	}else {
+    		socialFeedsActionUpdate.setStatus(SocialFeedStatus.valueOf(statusStr));
+    	}
+    	
     	socialFeedsActionUpdate.setTextActionType(TextActionType.valueOf(textActType));
     	socialFeedsActionUpdate.setText(text);
     	socialFeedsActionUpdate.setMacroId(macroId);
@@ -477,7 +534,7 @@ public class SocialMonitorWebController {
     	
     	User user = sessionHelper.getCurrentUser();
         Long companyId = user.getCompany().getCompanyId();
-        String userName = user.getProfileName();
+        String userName = user.getFirstName() + " " + user.getLastName();
         
     	Map<String, String> statusMap = new HashMap<>();
     	String message = "";
@@ -506,6 +563,18 @@ public class SocialMonitorWebController {
     	statusJson = new Gson().toJson(statusMap);
     	
     	return statusJson;
+    }
+    
+    @ResponseBody
+    @RequestMapping ( value = "/getsegmentsbycompanyid", method = RequestMethod.GET)
+    public String getSegmentsByCompanyId(Model model, HttpServletRequest request) {
+        
+        User user = sessionHelper.getCurrentUser();
+        Long companyId = user.getCompany().getCompanyId();
+        
+        Response response = ssApiIntergrationBuilder.getIntegrationApi().getSegmentsByCompanyId( companyId, 0, 200 );
+        
+        return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
     }
 
 }
