@@ -618,8 +618,15 @@ function drawUnclickedDonutChart(overviewYearData){
      function drawChart() {
     	 	
     	 	unclickedDrawnCount++;
-    	 	
-    	 	if(unclickedDrawnCount==1 && !isUpdateTransStats){
+    	 	var switchable = $('#reporting-trans-details').attr('data-switch');
+    	 	var isSwitchable=true;
+    	 	if(switchable == 'true' || switchable == true){
+    	 		isSwitchable=true;
+    	 	}else{
+    	 		isSwitchable=false;
+    	 	}
+    	 		
+    	 	if(unclickedDrawnCount==1 && !isUpdateTransStats && isSwitchable){
 	        	var profilemasterid=$('#rep-prof-container').attr('data-profile-master-id');
 	 	    	if(profilemasterid == 4){
 	 	    		activaTab('leaderboard-tab');
@@ -697,6 +704,8 @@ function drawUnclickedDonutChart(overviewYearData){
 		        icnChart.draw(data, optionsChartIcn);
 		       
 		        isUpdateTransStats=false;
+		        
+		        var switchable = $('#reporting-trans-details').attr('data-switch',true);
 		        
 		        hideDashOverlay('#unclicked-graph-dash');
 	      }
@@ -1944,6 +1953,7 @@ function activaTab(tab){
 
 function updateReportingDashboard(){
 	
+	$('#reporting-trans-details').attr('data-switch',false);
 	var currentDate =  new Date();
 	var currentMonth = currentDate.getMonth()+1;
 	var currentYear = currentDate.getFullYear();
@@ -1953,61 +1963,12 @@ function updateReportingDashboard(){
 	var overviewYearData;
 	
 	if(monthYear.month == 14){
-		overviewYearData = getoverviewAllTimeData();
+		getoverviewAllTimeData();
 	}else if(monthYear.month == 13){
-    	overviewYearData =  getoverviewYearData(monthYear.year);
+    	getoverviewYearData(monthYear.year);
     }else{
-    	overviewYearData = getOverviewMonthData(monthYear.month, monthYear.year);
+    	getOverviewMonthData(monthYear.month, monthYear.year);
     }
-	
-	if(overviewYearData!=null && !isEmpty(overviewYearData)){
-		$('#processed-lbl-span').html(overviewYearData.Processed);
-		$('#completed-lbl-span').html(overviewYearData.Completed+' ('+overviewYearData.CompletePercentage+'%)');
-		$('#incomplete-lbl-span').html(overviewYearData.Incomplete+' ('+overviewYearData.IncompletePercentage+'%)');
-		$('#incomplete-lbl-span-sel').html(overviewYearData.Incomplete+' ('+overviewYearData.IncompletePercentage+'%)');
-		$('#social-posts-lbl-span').html(overviewYearData.SocialPosts);
-		$('#zillow-lbl-span').html(overviewYearData.ZillowReviews);
-		$('#third-party-lbl-span').html(overviewYearData.ThirdParty);
-		$('#unprocessed-lbl-span').html(overviewYearData.Unprocessed);
-		$('#unassigned-lbl-span').html(overviewYearData.Unassigned);
-		$('#duplicate-lbl-span').html(overviewYearData.Duplicate);
-		$('#unassigned-lbl-span-sel').html(overviewYearData.Unassigned);
-		$('#corrupted-lbl-span').html(overviewYearData.Corrupted);
-		var other = overviewYearData.Unprocessed - (overviewYearData.Unassigned + overviewYearData.Duplicate + overviewYearData.Corrupted);
-		$('#other-lbl-span').html(other);
-		$('#unclicked-trans-graph').removeClass('hide');
-		$('#processed-trans-graph').addClass('hide');
-		$('#unprocessed-trans-graph').addClass('hide');
-		$('#empty-rep-chart-div').addClass('hide');
-		
-		var avgRating = overviewYearData.Rating;
-		var reviewCount=  overviewYearData.TotalReview;
-		paintAvgRating(avgRating);
-		paintReviewCount(reviewCount);
-	}else{
-		$('#processed-lbl-span').html(0);
-		$('#completed-lbl-span').html(0+' ('+0+'%)');
-		$('#incomplete-lbl-span').html(0+' ('+0+'%)');
-		$('#incomplete-lbl-span-sel').html(0);
-		$('#social-posts-lbl-span').html(0);
-		$('#zillow-lbl-span').html(0);
-		$('#third-party-lbl-span').html(0);
-		$('#unprocessed-lbl-span').html(0);
-		$('#unassigned-lbl-span').html(0);
-		$('#duplicate-lbl-span').html(0);
-		$('#unassigned-lbl-span-sel').html(0);
-		$('#corrupted-lbl-span').html(0);
-		$('#other-lbl-span').html(0);
-		$('#unclicked-trans-graph').addClass('hide');
-		$('#processed-trans-graph').addClass('hide');
-		$('#unprocessed-trans-graph').addClass('hide');
-		$('#empty-rep-chart-div').removeClass('hide');
-		
-		var avgRating = 0;
-		var reviewCount=  0;
-		paintAvgRating(avgRating);
-		paintReviewCount(reviewCount);
-	}
 	
 	$('#processed-trans-div').css('opacity','1.0');
 	$('#unprocessed-trans-div').css('opacity','1.0');
@@ -2028,29 +1989,6 @@ function updateReportingDashboard(){
 	$('#duplicate-lbl-rect').hide();
 	$('#corrupted-lbl-rect').hide();
 	$('#other-lbl-rect').hide();
-	
-	if($('#donutchart').length > 0 ){
- 		drawUnclickedDonutChart(overviewYearData);
- 	}
- 	if($('#processedDonutchart').length > 0 ){
- 		drawProcessedDonutChart(overviewYearData);
- 	}
-	
- 	if($('#unprocessedDonutchart').length > 0 ){
- 		drawUnprocessedDonutChart(overviewYearData);
- 	}
-	$(window).resize();
-	
-	 setTimeout(function(){
-			hideDashOverlay('#trans-stats-dash');
-		}, 1000);
-	
-	if(overviewYearData==null){
-		$('#unclicked-trans-graph').addClass('hide');
-		$('#processed-trans-graph').addClass('hide');
-		$('#unprocessed-trans-graph').addClass('hide');
-	}
-	
 }
 
 function drawLeaderboardTableStructure(userRankingList,userId,profileMasterId){
