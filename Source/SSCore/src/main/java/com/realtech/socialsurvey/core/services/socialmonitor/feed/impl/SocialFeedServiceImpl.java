@@ -179,57 +179,61 @@ public class SocialFeedServiceImpl implements SocialFeedService
 				}
 			}
 		}
-		List<ActionHistory> actionHistories = new ArrayList<>();
 		for (String postId : socialFeedsActionUpdate.getPostIds()) {
+			List<ActionHistory> actionHistories = new ArrayList<>();
 			updateFlag = 0;
 			SocialResponseObject socialResponseObject = mongoSocialFeedDao.getSocialFeed(postId,
 					MongoSocialFeedDaoImpl.SOCIAL_FEED_COLLECTION);
-			if (socialResponseObject.isFlagged() != socialFeedsActionUpdate.isFlagged()) {
-				ActionHistory actionHistory = new ActionHistory();
-				if (socialFeedsActionUpdate.isFlagged()
-						&& (socialResponseObject.getStatus().equals(SocialFeedStatus.NEW))) {
-					updateFlag = 1;
-					actionHistory.setActionType(ActionHistoryType.FLAGGED);
-					actionHistory.setText("Post was FLAGGED manually by " + socialFeedsActionUpdate.getUserName());
-					actionHistory.setOwnerName(socialFeedsActionUpdate.getUserName());
-					actionHistory.setCreatedDate(new Date().getTime());
-					actionHistories.add(actionHistory);
-				} else if (!socialFeedsActionUpdate.isFlagged()
-						&& (socialResponseObject.getStatus().equals(SocialFeedStatus.NEW))) {
-					updateFlag = 1;
-					actionHistory.setActionType(ActionHistoryType.UNFLAGGED);
-					actionHistory.setText("Post was UNFLAGGED by " + socialFeedsActionUpdate.getUserName());
-					actionHistory.setOwnerName(socialFeedsActionUpdate.getUserName());
-					actionHistory.setCreatedDate(new Date().getTime());
-					actionHistories.add(actionHistory);
+			if (socialFeedsActionUpdate.getStatus() != null) {
+				if (socialResponseObject.isFlagged() != socialFeedsActionUpdate.isFlagged()
+						&& !(socialFeedsActionUpdate.getStatus().equals(SocialFeedStatus.RESOLVED))
+						&& !(socialFeedsActionUpdate.getStatus().equals(SocialFeedStatus.ESCALATED))) {
+					ActionHistory actionHistory = new ActionHistory();
+					if (socialFeedsActionUpdate.isFlagged()
+							&& (socialResponseObject.getStatus().equals(SocialFeedStatus.NEW))) {
+						updateFlag = 1;
+						actionHistory.setActionType(ActionHistoryType.FLAGGED);
+						actionHistory.setText("Post was FLAGGED manually by " + socialFeedsActionUpdate.getUserName());
+						actionHistory.setOwnerName(socialFeedsActionUpdate.getUserName());
+						actionHistory.setCreatedDate(new Date().getTime());
+						actionHistories.add(actionHistory);
+					} else if (!socialFeedsActionUpdate.isFlagged()
+							&& (socialResponseObject.getStatus().equals(SocialFeedStatus.NEW))) {
+						updateFlag = 1;
+						actionHistory.setActionType(ActionHistoryType.UNFLAGGED);
+						actionHistory.setText("Post was UNFLAGGED by " + socialFeedsActionUpdate.getUserName());
+						actionHistory.setOwnerName(socialFeedsActionUpdate.getUserName());
+						actionHistory.setCreatedDate(new Date().getTime());
+						actionHistories.add(actionHistory);
+					}
 				}
-			}
-			if (!socialFeedsActionUpdate.getStatus().toString()
-					.equalsIgnoreCase(socialResponseObject.getStatus().toString())
-					&& socialFeedsActionUpdate.getStatus() != null && !socialFeedsActionUpdate.getStatus().toString()
-							.equalsIgnoreCase(SocialFeedStatus.NEW.toString())) {
-				ActionHistory actionHistory = new ActionHistory();
-				if (socialFeedsActionUpdate.getStatus().toString()
-						.equalsIgnoreCase(SocialFeedStatus.ESCALATED.toString())) {
-					updateFlag = 2;
-					actionHistory.setActionType(ActionHistoryType.ESCALATE);
-					actionHistory.setText("Post was " + socialFeedsActionUpdate.getStatus() + " by "
-							+ socialFeedsActionUpdate.getUserName());
-					actionHistory.setOwnerName(socialFeedsActionUpdate.getUserName());
-					actionHistory.setCreatedDate(new Date().getTime());
-					actionHistories.add(actionHistory);
-				} else if (socialFeedsActionUpdate.getStatus().toString()
-						.equalsIgnoreCase(SocialFeedStatus.RESOLVED.toString())
-						&& socialResponseObject.getStatus().toString().equalsIgnoreCase(
-								SocialFeedStatus.ESCALATED.toString())
-						&& !socialResponseObject.isFlagged()) {
-					updateFlag = 2;
-					actionHistory.setActionType(ActionHistoryType.RESOLVED);
-					actionHistory.setText("Post was " + socialFeedsActionUpdate.getStatus() + " by "
-							+ socialFeedsActionUpdate.getUserName());
-					actionHistory.setOwnerName(socialFeedsActionUpdate.getUserName());
-					actionHistory.setCreatedDate(new Date().getTime());
-					actionHistories.add(actionHistory);
+				if (!socialFeedsActionUpdate.getStatus().toString()
+						.equalsIgnoreCase(socialResponseObject.getStatus().toString())
+						&& socialFeedsActionUpdate.getStatus() != null && !socialFeedsActionUpdate.getStatus()
+								.toString().equalsIgnoreCase(SocialFeedStatus.NEW.toString())) {
+					ActionHistory actionHistory = new ActionHistory();
+					if (socialFeedsActionUpdate.getStatus().toString()
+							.equalsIgnoreCase(SocialFeedStatus.ESCALATED.toString())) {
+						updateFlag = 2;
+						actionHistory.setActionType(ActionHistoryType.ESCALATE);
+						actionHistory.setText("Post was " + socialFeedsActionUpdate.getStatus() + " by "
+								+ socialFeedsActionUpdate.getUserName());
+						actionHistory.setOwnerName(socialFeedsActionUpdate.getUserName());
+						actionHistory.setCreatedDate(new Date().getTime());
+						actionHistories.add(actionHistory);
+					} else if (socialFeedsActionUpdate.getStatus().toString()
+							.equalsIgnoreCase(SocialFeedStatus.RESOLVED.toString())
+							&& socialResponseObject.getStatus().toString().equalsIgnoreCase(
+									SocialFeedStatus.ESCALATED.toString())
+							&& !socialResponseObject.isFlagged()) {
+						updateFlag = 2;
+						actionHistory.setActionType(ActionHistoryType.RESOLVED);
+						actionHistory.setText("Post was " + socialFeedsActionUpdate.getStatus() + " by "
+								+ socialFeedsActionUpdate.getUserName());
+						actionHistory.setOwnerName(socialFeedsActionUpdate.getUserName());
+						actionHistory.setCreatedDate(new Date().getTime());
+						actionHistories.add(actionHistory);
+					}
 				}
 			}
 			if ((socialFeedsActionUpdate.getTextActionType().toString()
@@ -259,10 +263,10 @@ public class SocialFeedServiceImpl implements SocialFeedService
 					LOG.error("Email could not be delivered", e);
 				}
 			}
+			mongoSocialFeedDao.updateSocialFeed(socialFeedsActionUpdate, postId, actionHistories, updateFlag,
+					MongoSocialFeedDaoImpl.SOCIAL_FEED_COLLECTION);
 		}
 
-		mongoSocialFeedDao.updateSocialFeed(socialFeedsActionUpdate, actionHistories, updateFlag,
-				MongoSocialFeedDaoImpl.SOCIAL_FEED_COLLECTION);
 		LOG.debug("End of saveSocialPostsForStream{}");
 
 	}
