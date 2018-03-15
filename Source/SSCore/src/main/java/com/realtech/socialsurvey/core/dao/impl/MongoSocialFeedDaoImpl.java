@@ -82,33 +82,31 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 	}
     
 	@Override
-	public void updateSocialFeed(SocialFeedsActionUpdate socialFeedsActionUpdate, List<ActionHistory> actionHistories, int updateFlag, String collectionName) {
+	public void updateSocialFeed(SocialFeedsActionUpdate socialFeedsActionUpdate, String postId,
+			List<ActionHistory> actionHistories, int updateFlag, String collectionName) {
 		LOG.debug("Method updateSocialFeed() started");
-		List<String> postIds = socialFeedsActionUpdate.getPostIds();
-		for (String postId : postIds) {
-			if (LOG.isDebugEnabled()) {
-				LOG.debug("Updating {} document. Social feed id: {}", collectionName, postId);
-			}
-			Query query = new Query();
 
-			query.addCriteria(Criteria.where(POST_ID).is(postId));
+		LOG.debug("Updating {} document. Social feed id: {}", collectionName, postId);
 
-			Update update = new Update();
+		Query query = new Query();
 
-			if(updateFlag == 1) {
-				update.set(FLAGGED, socialFeedsActionUpdate.isFlagged());
-			} else if(updateFlag == 2 ) {
-				update.set(FLAGGED, false);
-				update.set(STATUS, socialFeedsActionUpdate.getStatus());
-			}
-			for(ActionHistory actionHistory : actionHistories) {
-				update.push(ACTION_HISTORY, actionHistory);
-				mongoTemplate.updateFirst(query, update, collectionName);
-			}
-			LOG.debug("Updated {}", collectionName);
+		query.addCriteria(Criteria.where(POST_ID).is(postId));
+
+		Update update = new Update();
+
+		if (updateFlag == 1) {
+			update.set(FLAGGED, socialFeedsActionUpdate.isFlagged());
+		} else if (updateFlag == 2) {
+			update.set(FLAGGED, false);
+			update.set(STATUS, socialFeedsActionUpdate.getStatus());
 		}
-
+		for (ActionHistory actionHistory : actionHistories) {
+			update.push(ACTION_HISTORY, actionHistory);
+			mongoTemplate.updateFirst(query, update, collectionName);
+		}
+		LOG.debug("Updated {}", collectionName);
 	}
+
 
     @Override
     public void afterPropertiesSet() throws Exception
