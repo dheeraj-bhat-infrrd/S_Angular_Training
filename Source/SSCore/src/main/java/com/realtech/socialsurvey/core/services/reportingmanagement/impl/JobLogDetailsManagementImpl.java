@@ -71,7 +71,7 @@ public class JobLogDetailsManagementImpl implements JobLogDetailsManagement
             jobLogDetailsResponse.setStatus( CommonConstants.STATUS_DUMMY );
         } else {
             jobLogDetailsResponse.setStatus( lastSuccessfulRun.getStatus() );
-            jobLogDetailsResponse.setTimestampInEst( utils.convertDateToTimeZone( lastSuccessfulRun.getJobStartTime(), CommonConstants.TIMEZONE_EST ) );
+            jobLogDetailsResponse.setTimestampInEst( utils.convertDateToTimeZone( lastSuccessfulRun.getJobStartTime().getTime(), CommonConstants.TIMEZONE_EST ) );
 
         }
 
@@ -108,7 +108,7 @@ public class JobLogDetailsManagementImpl implements JobLogDetailsManagement
         JobLogDetails jobLogDetails = jobLogDetailsDao.getJobLogDetailsOfLatestRunForEntity(entityId, entityType, CommonConstants.USER_RANKING_JOB_NAME);
         if ( jobLogDetails != null ) {
             jobLogDetailsResponse.setStatus( jobLogDetails.getStatus() );
-            jobLogDetailsResponse.setTimestampInEst( utils.convertDateToTimeZone( jobLogDetails.getJobStartTime(), CommonConstants.TIMEZONE_EST ) );
+            jobLogDetailsResponse.setTimestampInEst( utils.convertDateToTimeZone( jobLogDetails.getJobStartTime().getTime(), CommonConstants.TIMEZONE_EST ) );
         }
         LOG.debug( "method to fetch the job-log details for entity, getLastRunForEntity() finished." );
         return jobLogDetailsResponse;
