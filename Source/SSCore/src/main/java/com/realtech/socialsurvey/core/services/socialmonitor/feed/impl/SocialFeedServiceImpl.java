@@ -356,7 +356,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
 	}
 
 	@Override
-	public SegmentsVO getSegmentsByCompanyId(Long companyId, int startIndex, int batchSize)
+	public SegmentsVO getSegmentsByCompanyId(Long companyId)
 			throws InvalidInputException {
 		LOG.debug("Fetching regions and branches for companyId {}", companyId);
 		if (companyId <= 0) {
@@ -368,8 +368,8 @@ public class SocialFeedServiceImpl implements SocialFeedService
 		List<SegmentsEntity> regionList = new ArrayList<>();
 		List<SegmentsEntity> branchList = new ArrayList<>();
 
-		List<Long> regionIds = regionDao.getRegionIdsUnderCompany(companyId, startIndex, batchSize);
-		List<Long> branchIds = branchDao.getBranchIdsUnderCompany(companyId, startIndex, batchSize);
+		List<Long> regionIds = regionDao.getRegionIdsOfCompany( companyId );
+		List<Long> branchIds = branchDao.getBranchIdsOfCompany( companyId );
 
 		OrganizationUnitSettings companyDetails = mongoSocialFeedDao.getCompanyDetails(companyId);
 		if (companyDetails != null) {
