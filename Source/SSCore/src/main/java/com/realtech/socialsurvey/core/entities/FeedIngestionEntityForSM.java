@@ -7,6 +7,7 @@ public class FeedIngestionEntityForSM {
 
 	private long iden;
 	private SocialMediaTokensForSM socialMediaTokens;
+	private String profileImageUrl;
 
 	public long getIden() {
 		return iden;
@@ -25,5 +26,12 @@ public class FeedIngestionEntityForSM {
     {
         this.socialMediaTokens = socialMediaTokens;
     }
-	
+
+    public String getProfileImageUrl() {
+        return profileImageUrl;
+    }
+
+    public void setProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
+    }
 }

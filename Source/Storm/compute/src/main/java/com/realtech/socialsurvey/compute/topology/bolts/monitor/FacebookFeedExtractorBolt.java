@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.compute.topology.bolts.monitor;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -147,6 +148,8 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt
 
         responseWrapper.setPostId( facebookFeedData.getId() );
         responseWrapper.setId( facebookFeedData.getId() );
+        responseWrapper.setOwnerProfileImage(mediaToken.getProfileImageUrl());
+        responseWrapper.setPictures(Arrays.asList(facebookFeedData.getFullPicture()));
 
         if ( facebookFeedData.getUpdatedTime() > 0 ) {
             responseWrapper.setUpdatedTime( facebookFeedData.getUpdatedTime() * 1000 );

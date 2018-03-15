@@ -17,7 +17,8 @@ public class FacebookFeedData implements Serializable
 
     @SerializedName ( "updated_time")
     private long updatedTime;
-    
+
+    @SerializedName( "full_picture" )
     private String fullPicture;
     
     private String picture;

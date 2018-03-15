@@ -1,7 +1,9 @@
 package com.realtech.socialsurvey.compute.feeds.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -138,6 +140,7 @@ public class TwitterFeedProcessorImpl implements TwitterFeedProcessor
         feed.setCreatedAt( status.getCreatedAt() );
         feed.setId( status.getId() );
         feed.setRetweetCount( status.getRetweetCount() );
+        feed.setPictures(Arrays.stream(status.getMediaEntities()).map(x -> x.getMediaURL()).collect(Collectors.toList()));
         RateLimitStatus rateLimitStatus = status.getRateLimitStatus();
         if ( rateLimitStatus != null ) {
             feed.setRemaining( status.getRateLimitStatus().getRemaining() );

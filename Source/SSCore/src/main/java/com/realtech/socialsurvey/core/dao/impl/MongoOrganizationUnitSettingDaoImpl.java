@@ -119,6 +119,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_HIDE_PUBLIC_PAGE = "hidePublicPage";
     public static final String KEY_INCLUDE_FOR_TRANSACTION_MONITOR = "includeForTransactionMonitor";
     public static final String KEY_FILTER_KEYWORDS = "filterKeywords";
+    public static final String PROFILE_IMAGE_URL = "profileImageUrl";
 
     public static final String KEY_IS_LOGIN_PREVENTED = "isLoginPrevented";
 
@@ -557,7 +558,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
             .include( KEY_TWITTER_ACCESS_TOKEN_SECRET )
 
             .include( KEY_LINKEDIN_ID ).include( KEY_LINKEDIN_PAGE_LINK ).include( KEY_LINKEDIN_ACCESS_TOKEN )
-            .include( KEY_IDENTIFIER ).exclude( "_id" );
+            .include( KEY_IDENTIFIER ).exclude( "_id" )
+            .include( PROFILE_IMAGE_URL );
         tokens = mongoTemplate.find( query, FeedIngestionEntityForSM.class, collectionName );
         LOG.debug( "Fetched {} items with social media tokens from {}", ( tokens != null ? tokens.size() : "none" ),
             collectionName );
@@ -1156,7 +1158,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     {
         LOG.debug( "Fetching social media tokens from " + collectionName );
         Query query = new Query();
-        query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).include( KEY_IDENTIFIER ).exclude( "_id" );
+        query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).include( KEY_IDENTIFIER ).include( PROFILE_IMAGE_URL ).exclude( "_id" );
         
         List<FeedIngestionEntityForSM> settings = mongoTemplate.find( query, FeedIngestionEntityForSM.class, collectionName );
 
