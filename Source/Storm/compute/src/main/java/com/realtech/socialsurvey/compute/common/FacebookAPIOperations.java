@@ -2,6 +2,8 @@ package com.realtech.socialsurvey.compute.common;
 
 import java.io.IOException;
 
+import com.realtech.socialsurvey.compute.entities.response.InstagramFeedData;
+import com.realtech.socialsurvey.compute.entities.response.InstagramMediaData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +26,8 @@ public class FacebookAPIOperations
     
     private static final String FIELDS ="story,message,created_time,updated_time,full_picture,picture,message_tags,from";
     private static final String LIMIT = "100";
+
+    private static final String IG_INITIAL_FIELDS = "connected_instagram_account{media.limit(50){ig_id,caption,media_url,media_type,timestamp}}";
 
     private FacebookAPIOperations()
     {}
@@ -53,6 +57,30 @@ public class FacebookAPIOperations
         
         try {
             Response<FacebookResponse> response = requestCall.execute();
+            RetrofitApiBuilder.apiBuilderInstance().validateFacebookResponse( response );
+
+            if ( LOG.isTraceEnabled() ) {
+                LOG.trace( "response {}", response.body() );
+                LOG.trace( "headers {}", response.headers() );
+            }
+            return response;
+        } catch ( IOException | APIIntegrationException e ) {
+            LOG.error( "IOException/ APIIntegrationException caught", e );
+            return null;
+        }
+    }
+
+    /**
+     * Initial fetch of the instagram feeds
+     * @param pageId
+     * @param accessToken
+     * @return
+     */
+    public Response<InstagramFeedData> fetchFirstMedia( String pageId, String accessToken ) {
+        Call<InstagramFeedData> requestCall = RetrofitApiBuilder.apiBuilderInstance().getFacebookAPIIntergrationService()
+                .fetchFirstIgFeeds(pageId, accessToken, IG_INITIAL_FIELDS);
+        try {
+            Response<InstagramFeedData> response = requestCall.execute();
             RetrofitApiBuilder.apiBuilderInstance().validateFacebookResponse( response );
 
             if ( LOG.isTraceEnabled() ) {

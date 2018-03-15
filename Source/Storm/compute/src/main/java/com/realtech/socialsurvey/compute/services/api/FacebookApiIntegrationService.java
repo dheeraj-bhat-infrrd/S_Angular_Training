@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.compute.services.api;
 
 import com.realtech.socialsurvey.compute.entities.response.FacebookResponse;
 
+import com.realtech.socialsurvey.compute.entities.response.InstagramFeedData;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
@@ -21,4 +22,9 @@ public interface FacebookApiIntegrationService
     Call<FacebookResponse> fetchFeeds( @Path ( "pageId") String pageId, @Query ( "access_token") String accessToken,
         @Query ( "since") String since, @Query ( "until") String until, @Query ( "limit") String limit,
         @Query ( "__paging_token") String pagingToken, @Query ( "fields") String fields );
+
+    @Headers( "Content-Type: application/json" )
+    @GET ( "/{pageId}?date_format=U" )
+    Call<InstagramFeedData> fetchFirstIgFeeds( @Path ( "pageId" ) String pageId, @Query ( "access_token") String accessToken,
+                                              @Query( "fields" ) String fields);
 }
