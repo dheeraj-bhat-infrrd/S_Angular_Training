@@ -5925,7 +5925,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         // fetch companies media token
         List<FeedIngestionEntityForSM> companiesMediaTokens = organizationUnitSettingsDao.getAllCompanyIdWithSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, 0, 0 );
-
         for ( FeedIngestionEntityForSM feedIngestionEntity : companiesMediaTokens ) {
             
             if(feedIngestionEntity.getSocialMediaTokens() != null) {

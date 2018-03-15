@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.core.entities;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 
 import com.realtech.socialsurvey.core.enums.SocialFeedStatus;
@@ -19,7 +18,7 @@ public class SocialMonitorFeedData implements Serializable {
 	private long branchId = 0;
 	private long agentId = 0;
 	private String text = "";
-	private String picture = "";
+	private List<String> pictures;
 	private long updatedOn;
 	private String ownerName = "";
 	private String ownerProfileImage="";
@@ -94,12 +93,12 @@ public class SocialMonitorFeedData implements Serializable {
 		this.text = text;
 	}
 
-	public String getPicture() {
-		return picture;
+	public List<String> getPictures() {
+		return pictures;
 	}
 
-	public void setPicture(String picture) {
-		this.picture = picture;
+	public void setPictures(List<String> pictures) {
+		this.pictures = pictures;
 	}
 
 	public long getUpdatedOn() {
@@ -160,11 +159,24 @@ public class SocialMonitorFeedData implements Serializable {
 
 	@Override
 	public String toString() {
-		return "SocialMonitorFeedData [postId=" + postId + ", companyId=" + companyId + ", regionId=" + regionId
-				+ ", branchId=" + branchId + ", agentId=" + agentId + ", text=" + text + ", picture=" + picture
-				+ ", updatedOn=" + updatedOn + ", ownerName=" + ownerName + ", ownerProfileImage=" + ownerProfileImage
-				+ ", flagged=" + flagged + ", type=" + type + ", status=" + status + ", actionHistory=" + actionHistory
-				+ ", foundKeywords=" + foundKeywords + ", duplicateCount=" + duplicateCount + "]";
+		return "SocialMonitorFeedData{" +
+				"postId='" + postId + '\'' +
+				", companyId=" + companyId +
+				", regionId=" + regionId +
+				", branchId=" + branchId +
+				", agentId=" + agentId +
+				", text='" + text + '\'' +
+				", pictures=" + pictures +
+				", updatedOn=" + updatedOn +
+				", ownerName='" + ownerName + '\'' +
+				", ownerProfileImage='" + ownerProfileImage + '\'' +
+				", flagged=" + flagged +
+				", type=" + type +
+				", status=" + status +
+				", actionHistory=" + actionHistory +
+				", foundKeywords=" + foundKeywords +
+				", duplicateCount=" + duplicateCount +
+				'}';
 	}
 
 }

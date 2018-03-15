@@ -141,7 +141,6 @@ public class TwitterFeedProcessorImpl implements TwitterFeedProcessor
         feed.setId( status.getId() );
         feed.setRetweetCount( status.getRetweetCount() );
         feed.setPictures(Arrays.stream(status.getMediaEntities()).map(x -> x.getMediaURL()).collect(Collectors.toList()));
-        LOG.info("Twitter profile image URL {}", status.getUser().getOriginalProfileImageURL());
         RateLimitStatus rateLimitStatus = status.getRateLimitStatus();
         if ( rateLimitStatus != null ) {
             feed.setRemaining( status.getRateLimitStatus().getRemaining() );

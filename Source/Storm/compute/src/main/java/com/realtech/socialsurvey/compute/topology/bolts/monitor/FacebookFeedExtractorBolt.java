@@ -150,7 +150,6 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt
         responseWrapper.setId( facebookFeedData.getId() );
         responseWrapper.setOwnerProfileImage(mediaToken.getProfileImageUrl());
         responseWrapper.setPictures(Arrays.asList(facebookFeedData.getFullPicture()));
-        LOG.info("Facebook profileImageUrl {}, ownerProfilePicture {}", responseWrapper.getPictures().get(0), responseWrapper.getOwnerProfileImage());
 
         if ( facebookFeedData.getUpdatedTime() > 0 ) {
             responseWrapper.setUpdatedTime( facebookFeedData.getUpdatedTime() * 1000 );

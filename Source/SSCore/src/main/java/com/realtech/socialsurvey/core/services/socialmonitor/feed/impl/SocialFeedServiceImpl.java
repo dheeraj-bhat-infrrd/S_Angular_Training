@@ -124,7 +124,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
 				socialMonitorFeedData.setType(socialResponseObject.getType());
 				socialMonitorFeedData.setStatus(socialResponseObject.getStatus());
 				socialMonitorFeedData.setText(socialResponseObject.getText());
-				socialMonitorFeedData.setPicture(socialResponseObject.getPicture());
+				socialMonitorFeedData.setPictures(socialResponseObject.getPictures());
 				socialMonitorFeedData.setOwnerName(socialResponseObject.getOwnerName());
 				socialMonitorFeedData.setOwnerProfileImage(socialResponseObject.getOwnerProfileImage());
 				socialMonitorFeedData.setCompanyId(socialResponseObject.getCompanyId());
