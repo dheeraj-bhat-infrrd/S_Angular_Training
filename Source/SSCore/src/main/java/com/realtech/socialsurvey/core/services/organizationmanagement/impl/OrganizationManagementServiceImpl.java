@@ -1121,68 +1121,77 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     /* (non-Javadoc)
      * @see com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService#getCompanyKeywordsByCompanyId(long)
      */
-	@Override
-	public FilterKeywordsResponse getCompanyKeywordsByCompanyId(long companyId, int startIndex, int limit,
-			String monitorType) throws InvalidInputException {
-		LOG.debug("Get company settings for the companyId: {}", companyId);
-		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
-				companyId, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+    @Override
+    public FilterKeywordsResponse getCompanyKeywordsByCompanyId( long companyId, int startIndex, int limit, String monitorType )
+        throws InvalidInputException
+    {
+        LOG.debug( "Get company settings for the companyId: {}", companyId );
+        OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
-		if (companySettings == null) {
-			throw new InvalidInputException("Company setting doesn't exist for company id", "400");
-		}
+        if ( companySettings == null ) {
+            throw new InvalidInputException( "Company setting doesn't exist for company id", "400" );
+        }
 
-		List<Keyword> companyFilterKeywords = companySettings.getFilterKeywords();
-		Collections.sort(companyFilterKeywords, new FilterKeywordsComparator());
-		List<Keyword> keywords = new ArrayList<>();
-		FilterKeywordsResponse filterKeywordsResponse = new FilterKeywordsResponse();
-		if (companyFilterKeywords != null && !companyFilterKeywords.isEmpty()) {
-			if (monitorType == null || monitorType.isEmpty()) {
-				filterKeywordsResponse.setMonitorType("ALL");
-				filterKeywordsResponse.setCount(companyFilterKeywords.size());
-				if (startIndex >= companyFilterKeywords.size()) {
-					filterKeywordsResponse.setMonitorType(null);
-					filterKeywordsResponse.setCount(0);
-					filterKeywordsResponse.setFilterKeywords(null);
-				} else if (limit >= companyFilterKeywords.size() && startIndex < companyFilterKeywords.size()) {
-					filterKeywordsResponse
-							.setFilterKeywords(companyFilterKeywords.subList(startIndex, companyFilterKeywords.size()));
-				} else {
-					if (startIndex + limit >= companyFilterKeywords.size()) {
-						filterKeywordsResponse.setFilterKeywords(
-								companyFilterKeywords.subList(startIndex, companyFilterKeywords.size()));
-					} else {
-						filterKeywordsResponse
-								.setFilterKeywords(companyFilterKeywords.subList(startIndex, startIndex + limit));
-					}
-				}
+        List<Keyword> allKeywords = companySettings.getFilterKeywords();
+        List<Keyword> companyFilterKeywords = new ArrayList<>();
+        if ( allKeywords != null && !allKeywords.isEmpty() ) {
+            for ( Keyword keyword : allKeywords ) {
+                if ( keyword.getStatus() == CommonConstants.STATUS_ACTIVE ) {
+                    companyFilterKeywords.add( keyword );
+                }
+            }
+        }
+        List<Keyword> keywords = new ArrayList<>();
+        FilterKeywordsResponse filterKeywordsResponse = new FilterKeywordsResponse();
+        if ( companyFilterKeywords != null && !companyFilterKeywords.isEmpty() ) {
+            Collections.sort( companyFilterKeywords, new FilterKeywordsComparator() );
+            if ( monitorType == null || monitorType.isEmpty() ) {
+                filterKeywordsResponse.setMonitorType( "ALL" );
+                filterKeywordsResponse.setCount( companyFilterKeywords.size() );
+                if ( startIndex >= companyFilterKeywords.size() ) {
+                    filterKeywordsResponse.setMonitorType( null );
+                    filterKeywordsResponse.setCount( 0 );
+                    filterKeywordsResponse.setFilterKeywords( null );
+                } else if ( limit >= companyFilterKeywords.size() && startIndex < companyFilterKeywords.size() ) {
+                    filterKeywordsResponse
+                        .setFilterKeywords( companyFilterKeywords.subList( startIndex, companyFilterKeywords.size() ) );
+                } else {
+                    if ( startIndex + limit >= companyFilterKeywords.size() ) {
+                        filterKeywordsResponse
+                            .setFilterKeywords( companyFilterKeywords.subList( startIndex, companyFilterKeywords.size() ) );
+                    } else {
+                        filterKeywordsResponse
+                            .setFilterKeywords( companyFilterKeywords.subList( startIndex, startIndex + limit ) );
+                    }
+                }
 
-			} else {
-				for (Keyword keyword : companyFilterKeywords) {
-					if (monitorType.equalsIgnoreCase(keyword.getMonitorType().toString())) {
-						keywords.add(keyword);
-					}
-				}
-				filterKeywordsResponse.setMonitorType(monitorType.toUpperCase());
-				filterKeywordsResponse.setCount(keywords.size());
-				if (startIndex >= keywords.size()) {
-					filterKeywordsResponse.setMonitorType(null);
-					filterKeywordsResponse.setCount(0);
-					filterKeywordsResponse.setFilterKeywords(null);
-				} else if (limit >= keywords.size() && startIndex < keywords.size()) {
-					filterKeywordsResponse.setFilterKeywords(keywords.subList(startIndex, keywords.size()));
-				} else {
-					if (startIndex + limit >= keywords.size()) {
-						filterKeywordsResponse.setFilterKeywords(keywords.subList(startIndex, keywords.size()));
-					} else {
-						filterKeywordsResponse.setFilterKeywords(keywords.subList(startIndex, startIndex + limit));
-					}
+            } else {
+                for ( Keyword keyword : companyFilterKeywords ) {
+                    if ( monitorType.equalsIgnoreCase( keyword.getMonitorType().toString() ) ) {
+                        keywords.add( keyword );
+                    }
+                }
+                filterKeywordsResponse.setMonitorType( monitorType.toUpperCase() );
+                filterKeywordsResponse.setCount( keywords.size() );
+                if ( startIndex >= keywords.size() ) {
+                    filterKeywordsResponse.setMonitorType( null );
+                    filterKeywordsResponse.setCount( 0 );
+                    filterKeywordsResponse.setFilterKeywords( null );
+                } else if ( limit >= keywords.size() && startIndex < keywords.size() ) {
+                    filterKeywordsResponse.setFilterKeywords( keywords.subList( startIndex, keywords.size() ) );
+                } else {
+                    if ( startIndex + limit >= keywords.size() ) {
+                        filterKeywordsResponse.setFilterKeywords( keywords.subList( startIndex, keywords.size() ) );
+                    } else {
+                        filterKeywordsResponse.setFilterKeywords( keywords.subList( startIndex, startIndex + limit ) );
+                    }
 
-				}
-			}
-		}
-		return filterKeywordsResponse;
-	}
+                }
+            }
+        }
+        return filterKeywordsResponse;
+    }
 
 
     @Override
@@ -9129,5 +9138,113 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
         LOG.info( "Inside method updateHidePublicPageForUsers " );
         organizationUnitSettingsDao.updateHidePublicPageForUsers( userIdList, hidePublicPage );
+    }
+    
+
+    @Override
+    public void deleteKeywordsFromCompany( long companyId, List<String> keywordIds ) throws InvalidInputException
+    {
+        LOG.debug( "Method deleteKeywordsFromCompany started for companyId {}", companyId );
+        if ( companyId <= 0 || keywordIds.isEmpty() || keywordIds == null ) {
+            LOG.warn( "Invalid input parameters" );
+            throw new InvalidInputException( "Invalid input parameters" );
+        }
+        OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId,
+            CommonConstants.COMPANY_SETTINGS_COLLECTION );
+        List<Keyword> keywords = companySettings.getFilterKeywords();
+        if ( keywords != null && !keywords.isEmpty() ) {
+            for ( String keywordId : keywordIds ) {
+                for ( Keyword keyword : keywords ) {
+                    if ( keyword.getId().equalsIgnoreCase( keywordId ) ) {
+                        keyword.setStatus( CommonConstants.STATUS_INACTIVE );
+                        keyword.setModifiedOn( new Date().getTime() );
+                    }
+                }
+            }
+            // Updating filterKeywords in OrganizationUnitSettings
+            organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+                MongoOrganizationUnitSettingDaoImpl.KEY_FILTER_KEYWORDS, keywords, companySettings,
+                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        } else {
+            LOG.warn( "The list of keywords is empty" );
+            throw new InvalidInputException( "keywords do not exist for the company" );
+        }
+
+    }
+
+
+    @Override
+    public List<Keyword> addKeywordToCompanySettings( long companyId, Keyword keyword ) throws InvalidInputException
+    {
+        LOG.debug( "Get company settings for the companyId: {}", companyId );
+        OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        List<Keyword> companyFilterKeywords = companySettings.getFilterKeywords();
+        if ( keyword != null ) {
+            // setting
+            if ( companySettings.getFilterKeywords() == null ) {
+                companyFilterKeywords = new ArrayList<Keyword>();
+            }
+
+            int flag = 0;
+
+            if ( StringUtils.isNotEmpty( keyword.getId() ) ) {
+                flag = 1;
+                for ( int i = 0; i < companyFilterKeywords.size(); i++ ) {
+                    Keyword companyFilterKeyword = companyFilterKeywords.get( i );
+
+                    if ( keyword.getId() != null && companyFilterKeyword.getId().equals( keyword.getId() ) ) {
+                        flag = 2;
+                        if ( keyword.getPhrase() != null ) {
+                            if ( companyFilterKeyword.getPhrase().equalsIgnoreCase( keyword.getPhrase() ) ) {
+                                LOG.warn( "Phrase already exists" );
+                            } else {
+                                companyFilterKeyword.setPhrase( keyword.getPhrase() );
+                                companyFilterKeyword.setModifiedOn( new Date().getTime() );
+                            }
+                        }
+                        if ( keyword.getMonitorType() != null
+                            && !keyword.getMonitorType().equals( companyFilterKeyword.getMonitorType() ) ) {
+                            companyFilterKeyword.setMonitorType( keyword.getMonitorType() );
+                            companyFilterKeyword.setModifiedOn( new Date().getTime() );
+                        }
+                    }
+                }
+            }
+
+            if ( flag == 1 ) {
+                throw new InvalidInputException( "Keyword does not exist for given Id", "400" );
+            }
+            if ( flag == 0 ) {
+                for ( Keyword duplicateKeyword : companyFilterKeywords ) {
+                    if ( duplicateKeyword.getPhrase().equalsIgnoreCase( keyword.getPhrase() )
+                        && duplicateKeyword.getMonitorType().equals( keyword.getMonitorType() ) ) {
+                        LOG.warn( "duplicate entry" );
+                        throw new InvalidInputException( "duplicate entry", "400" );
+                    }
+                }
+                LOG.info( "Adding new keyword" );
+                Keyword keywordNew = new Keyword();
+                keywordNew.setCreatedOn( new Date().getTime() );
+                keywordNew.setModifiedOn( new Date().getTime() );
+                keywordNew.setPhrase( keyword.getPhrase() );
+                keywordNew.setId( UUID.randomUUID().toString() );
+                keywordNew.setStatus( CommonConstants.STATUS_ACTIVE );
+                keywordNew.setMonitorType( keyword.getMonitorType() );
+                companyFilterKeywords.add( keywordNew );
+            }
+            // Updating filterKeywords in OrganizationUnitSettings
+            organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+                MongoOrganizationUnitSettingDaoImpl.KEY_FILTER_KEYWORDS, companyFilterKeywords, companySettings,
+                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+            // update the redis with the keywords
+            redisDao.addKeywords( companyId, companyFilterKeywords );
+
+        } else {
+            LOG.debug( "Keywords are empty so skiping operation" );
+        }
+        return companyFilterKeywords;
     }
 }
