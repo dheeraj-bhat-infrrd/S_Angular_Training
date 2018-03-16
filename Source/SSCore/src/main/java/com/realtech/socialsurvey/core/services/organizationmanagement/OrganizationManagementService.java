@@ -30,6 +30,7 @@ import com.realtech.socialsurvey.core.entities.HierarchySettingsCompare;
 import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
+import com.realtech.socialsurvey.core.entities.MonitorType;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
 import com.realtech.socialsurvey.core.entities.Region;
@@ -1643,5 +1644,23 @@ public interface OrganizationManagementService
 
 
     void updateHidePublicPageForUsers( List<Long> userIdList, boolean hidePublicPage ) throws InvalidInputException;
+    
 
+    /**
+     * Method to delete keywords from company
+     * @param companyId
+     * @param keywordIds
+     * @throws InvalidInputException
+     */
+    public void deleteKeywordsFromCompany( long companyId, List<String> keywordIds ) throws InvalidInputException;
+
+
+    /**
+     * Method to add or update keyword to a company
+     * @param companyId
+     * @param keyword
+     * @return
+     * @throws InvalidInputException
+     */
+    public List<Keyword> addKeywordToCompanySettings( long companyId, Keyword keyword ) throws InvalidInputException;
 }
