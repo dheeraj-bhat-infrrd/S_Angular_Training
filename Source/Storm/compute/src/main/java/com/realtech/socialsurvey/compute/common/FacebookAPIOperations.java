@@ -2,8 +2,7 @@ package com.realtech.socialsurvey.compute.common;
 
 import java.io.IOException;
 
-import com.realtech.socialsurvey.compute.entities.response.InstagramFeedData;
-import com.realtech.socialsurvey.compute.entities.response.InstagramMediaData;
+import com.realtech.socialsurvey.compute.entities.response.InstagramMedia;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,8 +26,8 @@ public class FacebookAPIOperations
     private static final String FIELDS ="story,message,created_time,updated_time,full_picture,picture,message_tags,from";
     private static final String LIMIT = "100";
 
-    private static final String IG_INITIAL_FIELDS = "connected_instagram_account{media.limit(50){ig_id,caption,media_url,media_type,timestamp}}";
-
+    private static final String IG_FIELDS = "ig_id,caption,media_url,media_type,timestamp";
+    public static final String IG_LIMIT = "50";
     private FacebookAPIOperations()
     {}
 
@@ -76,11 +75,11 @@ public class FacebookAPIOperations
      * @param accessToken
      * @return
      */
-    public Response<InstagramFeedData> fetchFirstMedia( String pageId, String accessToken ) {
-        Call<InstagramFeedData> requestCall = RetrofitApiBuilder.apiBuilderInstance().getFacebookAPIIntergrationService()
-                .fetchFirstIgFeeds(pageId, accessToken, IG_INITIAL_FIELDS);
+    public Response<InstagramMedia> fetchMedia(String pageId, String accessToken , String after) {
+        Call<InstagramMedia> requestCall = RetrofitApiBuilder.apiBuilderInstance().getFacebookAPIIntergrationService()
+                .fetchIgFeeds(pageId, accessToken, IG_FIELDS, IG_LIMIT, after);
         try {
-            Response<InstagramFeedData> response = requestCall.execute();
+            Response<InstagramMedia> response = requestCall.execute();
             RetrofitApiBuilder.apiBuilderInstance().validateFacebookResponse( response );
 
             if ( LOG.isTraceEnabled() ) {

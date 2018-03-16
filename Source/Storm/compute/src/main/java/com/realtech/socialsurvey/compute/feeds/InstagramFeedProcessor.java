@@ -1,8 +1,6 @@
 package com.realtech.socialsurvey.compute.feeds;
 
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
-import com.realtech.socialsurvey.compute.entities.response.FacebookFeedData;
-import com.realtech.socialsurvey.compute.entities.response.InstagramFeedData;
 import com.realtech.socialsurvey.compute.entities.response.InstagramMediaData;
 
 import java.util.List;

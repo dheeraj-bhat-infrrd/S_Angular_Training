@@ -3,11 +3,8 @@ package com.realtech.socialsurvey.compute.feeds.impl;
 import com.realtech.socialsurvey.compute.common.FacebookAPIOperations;
 import com.realtech.socialsurvey.compute.dao.RedisSocialMediaStateDao;
 import com.realtech.socialsurvey.compute.dao.impl.RedisSocialMediaStateDaoImpl;
-import com.realtech.socialsurvey.compute.entities.FacebookToken;
 import com.realtech.socialsurvey.compute.entities.FacebookTokenForSM;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
-import com.realtech.socialsurvey.compute.entities.response.FacebookResponse;
-import com.realtech.socialsurvey.compute.entities.response.InstagramFeedData;
 import com.realtech.socialsurvey.compute.entities.response.InstagramMedia;
 import com.realtech.socialsurvey.compute.entities.response.InstagramMediaData;
 import com.realtech.socialsurvey.compute.exception.FacebookFeedException;
@@ -17,9 +14,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Response;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class InstagramFeedProcessorImpl implements InstagramFeedProcessor {
     /**
@@ -29,7 +27,7 @@ public class InstagramFeedProcessorImpl implements InstagramFeedProcessor {
     private static final Logger LOG = LoggerFactory.getLogger( InstagramFeedProcessorImpl.class );
 
     private RedisSocialMediaStateDao redisSocialMediaStateDao;
-
+    private static final String limit = "50";
     public InstagramFeedProcessorImpl() {
         this.redisSocialMediaStateDao = new RedisSocialMediaStateDaoImpl();
     }
@@ -40,36 +38,53 @@ public class InstagramFeedProcessorImpl implements InstagramFeedProcessor {
         LOG.info("Getting instagram feed with companyId {}", companyId);
 
         List<InstagramMediaData> instagramMediaData = null;
-
+        InstagramMedia instagramMedia;
         FacebookTokenForSM fbToken = mediaToken.getSocialMediaTokens().getFacebookToken();
 
         String pageId = UrlHelper.getFacebookPageIdFromURL( fbToken.getFacebookPageLink() );
         String lastFetchedKey = mediaToken.getProfileType().toString() + "_" + mediaToken.getIden() + "_" + pageId;
 
-        String lastFetchedTimeStamp = redisSocialMediaStateDao.getLastFetched( lastFetchedKey );
+        String lastFetchedIgId = redisSocialMediaStateDao.getLastFetched( lastFetchedKey );
 
-        if(lastFetchedTimeStamp == null){
-            //todo Running the extractor for the first time so get latest 500 records
-           InstagramMedia instagramMedia =  fetchFeeds(pageId, fbToken.getFacebookAccessToken());
-           if ( instagramMedia != null){
-               instagramMediaData = instagramMedia.getData();
-               //todo save the lastFetchedTimeStamp in redis
-           }
-
+        if(lastFetchedIgId == null || lastFetchedIgId.isEmpty() ){
+            //run the extractor for the first time so get latest 50 records
+            instagramMedia = fetchFeeds(pageId, fbToken.getFacebookAccessToken(), "");
+            if ( instagramMedia != null){
+                instagramMediaData = instagramMedia.getData();
+                //save the first record in the redis
+                redisSocialMediaStateDao.saveLastFetched(lastFetchedKey, instagramMediaData.get(0).getIgId(), "" );
+            }
         } else{
-            //Get all the feeds untill we encounter the lastFetchedMedia
+            //Get all the feeds untill we encounter the lastFetchedIgId
+                instagramMedia = fetchFeeds(pageId, fbToken.getFacebookAccessToken(), "");
+                do{
+                    if(instagramMedia != null){
+                        Map<String, String> queryMap = UrlHelper.getQueryParamsFromUrl( instagramMedia.getPaging().getNext() );
+
+                        List<String> igIds =  instagramMedia.getData().stream().map(x -> x.getIgId()).collect(Collectors.toList());
+                        if(igIds.contains(lastFetchedIgId)){
+                            instagramMediaData.addAll(instagramMedia.getData().subList(0, igIds.indexOf(lastFetchedIgId)));
+                            break;
+                        } else{
+                            instagramMediaData.addAll(instagramMedia.getData());
+                        }
+                    }
+                } while (instagramMedia != null && instagramMedia.getPaging().getNext() != null);
+            //save the lastestigId for
+            if (instagramMediaData != null)
+                redisSocialMediaStateDao.saveLastFetched(lastFetchedKey, instagramMediaData.get(0).getIgId(), lastFetchedIgId);
         }
 
         return instagramMediaData;
     }
 
-    private InstagramMedia fetchFeeds(String pageId, String accessToken) {
+    private InstagramMedia fetchFeeds(String pageId, String accessToken, String after) {
         try {
-            Response<InstagramFeedData> response = FacebookAPIOperations.getInstance().fetchFirstMedia( pageId, accessToken );
+            Response<InstagramMedia> response = FacebookAPIOperations.getInstance().fetchMedia( pageId, accessToken, after );
 
             if ( response != null ) {
                // checkRateLimiting( response.headers(), pageId, accessToken );
-                return response.body().getMedia();
+                return response.body();
             }
         } catch (FacebookFeedException e) {
            /* if(e.getFacebookErrorCode() == 4){
