@@ -348,12 +348,14 @@ public class SocialMonitorWebController {
         String companyIdStr = request.getParameter( "company" );
         String regionIdStr = request.getParameter( "region" );
         String branchIdStr = request.getParameter( "branch" );
+        String agentIdStr = request.getParameter( "user" );
+        String feedsStr = request.getParameter( "feeds" );
         
         List<String> feedType = new ArrayList<>();
-        feedType.add("FACEBOOK");feedType.add("TWITTER");feedType.add("LINKEDIN");
         List<Long> regionIds = new ArrayList<>();
         List<Long> branchIds = new ArrayList<>();
         List<Long> agentIds = new ArrayList<>();
+        
         int startIndex=0;
         int batchSize=10;
         boolean flag = false;
@@ -374,7 +376,7 @@ public class SocialMonitorWebController {
         	flag = Boolean.valueOf( flagStr );
         }
        
-       if(regionIdStr!=null && !regionIdStr.isEmpty()) {
+      /* if(regionIdStr!=null && !regionIdStr.isEmpty()) {
            String[] regionIdList = regionIdStr.split(",");
            
            for(int i=0;i<regionIdList.length;i++) {
@@ -392,6 +394,18 @@ public class SocialMonitorWebController {
            }
        }else {
            branchIds = null;
+       }*/
+       
+       regionIds = splitList( regionIdStr );
+       branchIds = splitList( branchIdStr );
+       agentIds = splitList( agentIdStr );
+       
+       if(feedsStr!=null && !feedsStr.isEmpty()) {
+           String[] feedsList = feedsStr.split(",");
+           
+           for(int i=0;i<feedsList.length;i++) {
+               feedType.add(feedsList[i]);
+           }
        }
        
        if(companyIdStr != null && !companyIdStr.isEmpty()) {
@@ -405,6 +419,21 @@ public class SocialMonitorWebController {
         		
         return new String( ( (TypedByteArray) response.getBody() ).getBytes(),Charset.forName("UTF-8") );
        
+    }
+    
+    private List<Long> splitList(String listStr) {
+  
+        if(listStr!=null && !listStr.isEmpty()) {
+            List<Long> listOfIds = new ArrayList<>();
+            String[] splittedList = listStr.split(",");
+            
+            for(int i=0;i<splittedList.length;i++) {
+                listOfIds.add(Long.valueOf(splittedList[i]));
+            }
+            return listOfIds;
+        }
+        
+        return null;   
     }
     
     private SocialFeedsActionUpdate createSFAUFromRequest(HttpServletRequest request, String userName) {
@@ -572,7 +601,19 @@ public class SocialMonitorWebController {
         User user = sessionHelper.getCurrentUser();
         Long companyId = user.getCompany().getCompanyId();
         
-        Response response = ssApiIntergrationBuilder.getIntegrationApi().getSegmentsByCompanyId( companyId, 0, 200 );
+        Response response = ssApiIntergrationBuilder.getIntegrationApi().getSegmentsByCompanyId(companyId);
+        
+        return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+    }
+    
+    @ResponseBody
+    @RequestMapping ( value = "/getusersbycompanyid", method = RequestMethod.GET)
+    public String getUsersByCompanyId(Model model, HttpServletRequest request) {
+        
+        User user = sessionHelper.getCurrentUser();
+        Long companyId = user.getCompany().getCompanyId();
+        
+        Response response = ssApiIntergrationBuilder.getIntegrationApi().getUsersByCompanyId( companyId );
         
         return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
     }

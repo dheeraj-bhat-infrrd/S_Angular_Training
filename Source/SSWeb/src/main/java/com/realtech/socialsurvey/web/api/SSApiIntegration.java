@@ -242,7 +242,7 @@ public interface SSApiIntegration
     public Response getMacroById(@Path("companyId") Long companyId, @Path("macroId") long macroId);
     
     @GET("/v1/segments/company/{companyId}")
-    public Response getSegmentsByCompanyId(@Path("companyId") Long companyId, @Query("startIndex") int startIndex, @Query("limit") int limit);
+    public Response getSegmentsByCompanyId(@Path("companyId") Long companyId);
     
     @GET("/v1/users/company/{companyId}")
     public Response getUsersByCompanyId(@Path("companyId") Long companyId);
