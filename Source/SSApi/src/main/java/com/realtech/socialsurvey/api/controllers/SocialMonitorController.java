@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.realtech.socialsurvey.api.exceptions.SSApiException;
 import com.realtech.socialsurvey.core.entities.FilterKeywordsResponse;
 import com.realtech.socialsurvey.core.entities.Keyword;
+import com.realtech.socialsurvey.core.entities.MonitorType;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.core.entities.SocialResponseObject;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -66,7 +67,6 @@ public class SocialMonitorController
     public ResponseEntity<?> addKeywordsToCompany( @PathVariable ( "companyId") long companyId,
                                                    @Valid @RequestBody List<Keyword> keywordsRequest ) throws SSApiException
     {
-    	LOGGER.info("asdasd");
         try {
             LOGGER.info( "SocialMonitorController.addKeywordsToCompany started" );
             List<Keyword> filterKeywords = organizationManagementService.addKeyworodsToCompanySettings( companyId,
@@ -179,8 +179,7 @@ public class SocialMonitorController
             throw  new SSApiException(e.getMessage(), e);
         }
     }
-    
-    
+        
     @RequestMapping ( value = "/token/locks", method = RequestMethod.GET)
     @ApiOperation ( value = "Updates duplicateCount field matching the given hash of social feed collection")
     public ResponseEntity<?> getLockedTokens( @RequestParam ( value = "lockType", required = false) String lockType,
@@ -194,6 +193,39 @@ public class SocialMonitorController
             return new ResponseEntity<>( lockedTokens, HttpStatus.OK );
         } catch ( InvalidInputException e ) {
             throw new SSApiException( e.getMessage(), e );
+        }
+    }
+    
+    @RequestMapping ( value = "/company/{companyId}keywords", method = RequestMethod.DELETE)
+    @ApiOperation ( value = "Delete keywords from the company", response = String.class)
+	@ApiResponses(value = { @ApiResponse ( code = 200, message = "Successfully deleted the keywords")})
+    public ResponseEntity<?> deleteKeywordsFromCompany( @PathVariable ( "companyId") long companyId,
+                                                   @RequestParam List<String> keywordIds ) throws SSApiException
+    {
+        try {
+            LOGGER.info( "SocialMonitorController.deleteKeywordsFromCompany started" );
+            organizationManagementService.deleteKeywordsFromCompany(companyId, keywordIds);
+            LOGGER.info( "SocialMonitorController.deleteKeywordsFromCompany completed successfully" );
+            return new ResponseEntity<>( "SUCCESS", HttpStatus.OK );
+        } catch ( NonFatalException e ) {
+            throw new SSApiException( e.getMessage(), e.getErrorCode() );
+        }
+    }
+    
+    @RequestMapping ( value = "/company/{companyId}/keyword", method = RequestMethod.POST)
+    @ApiOperation ( value = "Add keyword to the company", response = Keyword.class, responseContainer = "List")
+	@ApiResponses(value = { @ApiResponse ( code = 200, message = "Successfully updated the keywords")})
+    public ResponseEntity<?> addKeywordToCompany( @PathVariable ( "companyId") long companyId,
+                                                   @Valid @RequestBody Keyword keywordsRequest ) throws SSApiException
+    {
+        try {
+            LOGGER.info( "SocialMonitorController.addKeywordToCompany started" );
+            List<Keyword> filterKeywords = organizationManagementService.addKeywordToCompanySettings( companyId,
+                    keywordsRequest );
+            LOGGER.info( "SocialMonitorController.addKeywordToCompany completed successfully" );
+            return new ResponseEntity<>( filterKeywords, HttpStatus.OK );
+        } catch ( NonFatalException e ) {
+            throw new SSApiException( e.getMessage(), e.getErrorCode() );
         }
     }
 

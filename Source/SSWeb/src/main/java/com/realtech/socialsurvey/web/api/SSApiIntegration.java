@@ -247,6 +247,13 @@ public interface SSApiIntegration
     @GET("/v1/users/company/{companyId}")
     public Response getUsersByCompanyId(@Path("companyId") Long companyId);
     
+    @POST("/v1/company/{companyId}/keyword")
+    public Response addKeywordToCompany(@Path ( "companyId") long companyId, @Body Keyword keywordsRequest);
+    
+    @DELETE ( "/v1/company/{companyId}keywords")
+    public Response deleteKeywordsFromCompany( @Path ( "companyId") long companyId,
+        @Query ( "keywordIds") List<String> keywordIds );
+    
     @GET ( "/v1/lastsuccessfuletltime/isetlrunning" )
     Response isEtlRunning();
     
