@@ -1645,15 +1645,16 @@ public interface OrganizationManagementService
 
     void updateHidePublicPageForUsers( List<Long> userIdList, boolean hidePublicPage ) throws InvalidInputException;
     
+
     /**
      * Method to delete keywords from company
      * @param companyId
      * @param keywordIds
      * @throws InvalidInputException
      */
-    public void deleteKeywordsFromCompany(long companyId, List<String> keywordIds )
-            throws InvalidInputException;
-    
+    public void deleteKeywordsFromCompany( long companyId, List<String> keywordIds ) throws InvalidInputException;
+
+
     /**
      * Method to add or update keyword to a company
      * @param companyId
@@ -1661,6 +1662,5 @@ public interface OrganizationManagementService
      * @return
      * @throws InvalidInputException
      */
-    public List<Keyword> addKeywordToCompanySettings( long companyId, Keyword keyword )
-    		throws InvalidInputException;
+    public List<Keyword> addKeywordToCompanySettings( long companyId, Keyword keyword ) throws InvalidInputException;
 }

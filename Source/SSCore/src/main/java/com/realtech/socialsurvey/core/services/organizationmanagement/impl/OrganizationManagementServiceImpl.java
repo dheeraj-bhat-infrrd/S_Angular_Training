@@ -1135,9 +1135,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         List<Keyword> allKeywords = companySettings.getFilterKeywords();
         List<Keyword> companyFilterKeywords = new ArrayList<>();
-        if(allKeywords != null && !allKeywords.isEmpty()) {
-            for(Keyword keyword : allKeywords) {
-                if(keyword.getStatus() == CommonConstants.STATUS_ACTIVE) {
+        if ( allKeywords != null && !allKeywords.isEmpty() ) {
+            for ( Keyword keyword : allKeywords ) {
+                if ( keyword.getStatus() == CommonConstants.STATUS_ACTIVE ) {
                     companyFilterKeywords.add( keyword );
                 }
             }
@@ -9140,107 +9140,111 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         organizationUnitSettingsDao.updateHidePublicPageForUsers( userIdList, hidePublicPage );
     }
     
-	@Override
-	public void deleteKeywordsFromCompany(long companyId, List<String> keywordIds) throws InvalidInputException {
-		LOG.debug("Method deleteKeywordsFromCompany started for companyId {}", companyId);
-		if (companyId <= 0 || keywordIds.isEmpty() || keywordIds == null) {
-			LOG.warn("Invalid input parameters");
-			throw new InvalidInputException("Invalid input parameters");
-		}
-		OrganizationUnitSettings companySettings = organizationUnitSettingsDao
-				.fetchOrganizationUnitSettingsById(companyId, CommonConstants.COMPANY_SETTINGS_COLLECTION);
-		List<Keyword> keywords = companySettings.getFilterKeywords();
-		if (keywords != null && !keywords.isEmpty()) {
-			for (String keywordId : keywordIds) {
-				for (Keyword keyword : keywords) {
-					if (keyword.getId().equalsIgnoreCase(keywordId)) {
-						keyword.setStatus(CommonConstants.STATUS_INACTIVE);
-						keyword.setModifiedOn(new Date().getTime());
-					}
-				}
-			}
-			// Updating filterKeywords in OrganizationUnitSettings
-			organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
-					MongoOrganizationUnitSettingDaoImpl.KEY_FILTER_KEYWORDS, keywords, companySettings,
-					MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
-		} else {
-			LOG.warn("The list of keywords is empty");
-			throw new InvalidInputException("keywords do not exist for the company");
-		}
 
-	}
+    @Override
+    public void deleteKeywordsFromCompany( long companyId, List<String> keywordIds ) throws InvalidInputException
+    {
+        LOG.debug( "Method deleteKeywordsFromCompany started for companyId {}", companyId );
+        if ( companyId <= 0 || keywordIds.isEmpty() || keywordIds == null ) {
+            LOG.warn( "Invalid input parameters" );
+            throw new InvalidInputException( "Invalid input parameters" );
+        }
+        OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId,
+            CommonConstants.COMPANY_SETTINGS_COLLECTION );
+        List<Keyword> keywords = companySettings.getFilterKeywords();
+        if ( keywords != null && !keywords.isEmpty() ) {
+            for ( String keywordId : keywordIds ) {
+                for ( Keyword keyword : keywords ) {
+                    if ( keyword.getId().equalsIgnoreCase( keywordId ) ) {
+                        keyword.setStatus( CommonConstants.STATUS_INACTIVE );
+                        keyword.setModifiedOn( new Date().getTime() );
+                    }
+                }
+            }
+            // Updating filterKeywords in OrganizationUnitSettings
+            organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+                MongoOrganizationUnitSettingDaoImpl.KEY_FILTER_KEYWORDS, keywords, companySettings,
+                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        } else {
+            LOG.warn( "The list of keywords is empty" );
+            throw new InvalidInputException( "keywords do not exist for the company" );
+        }
 
-	@Override
-	public List<Keyword> addKeywordToCompanySettings(long companyId, Keyword keyword) throws InvalidInputException {
-		LOG.debug("Get company settings for the companyId: {}", companyId);
-		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
-				companyId, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+    }
 
-		List<Keyword> companyFilterKeywords = companySettings.getFilterKeywords();
-		if (keyword != null) {
-			// setting
-			if (companySettings.getFilterKeywords() == null) {
-				companyFilterKeywords = new ArrayList<Keyword>();
-			}
 
-			int flag = 0;
+    @Override
+    public List<Keyword> addKeywordToCompanySettings( long companyId, Keyword keyword ) throws InvalidInputException
+    {
+        LOG.debug( "Get company settings for the companyId: {}", companyId );
+        OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
-			if (StringUtils.isNotEmpty(keyword.getId())) {
-				flag = 1;
-				for (int i = 0; i < companyFilterKeywords.size(); i++) {
-					Keyword companyFilterKeyword = companyFilterKeywords.get(i);
+        List<Keyword> companyFilterKeywords = companySettings.getFilterKeywords();
+        if ( keyword != null ) {
+            // setting
+            if ( companySettings.getFilterKeywords() == null ) {
+                companyFilterKeywords = new ArrayList<Keyword>();
+            }
 
-					if (keyword.getId() != null && companyFilterKeyword.getId().equals(keyword.getId())) {
-						flag = 2;
-						if (keyword.getPhrase() != null) {
-							if (companyFilterKeyword.getPhrase().equalsIgnoreCase(keyword.getPhrase())) {
-								LOG.warn("Phrase already exists");
-							} else {
-								companyFilterKeyword.setPhrase(keyword.getPhrase());
-								companyFilterKeyword.setModifiedOn(new Date().getTime());
-							}
-						}
-						if (keyword.getMonitorType() != null
-								&& !keyword.getMonitorType().equals(companyFilterKeyword.getMonitorType())) {
-							companyFilterKeyword.setMonitorType(keyword.getMonitorType());
-							companyFilterKeyword.setModifiedOn(new Date().getTime());
-						}
-					}
-				}
-			}
+            int flag = 0;
 
-			if (flag == 1) {
-				throw new InvalidInputException("Keyword does not exist for given Id", "400");
-			}
-			if (flag == 0) {
-				for (Keyword duplicateKeyword : companyFilterKeywords) {
-					if (duplicateKeyword.getPhrase().equalsIgnoreCase(keyword.getPhrase())
-							&& duplicateKeyword.getMonitorType().equals(keyword.getMonitorType())) {
-						LOG.warn("duplicate entry");
-						throw new InvalidInputException("duplicate entry", "400");
-					}
-				}
-				LOG.info("Adding new keyword");
-				Keyword keywordNew = new Keyword();
-				keywordNew.setCreatedOn(new Date().getTime());
-				keywordNew.setModifiedOn(new Date().getTime());
-				keywordNew.setPhrase(keyword.getPhrase());
-				keywordNew.setId(UUID.randomUUID().toString());
-				keywordNew.setStatus(CommonConstants.STATUS_ACTIVE);
-				keywordNew.setMonitorType(keyword.getMonitorType());
-				companyFilterKeywords.add(keywordNew);
-			}
-			// Updating filterKeywords in OrganizationUnitSettings
-			organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
-					MongoOrganizationUnitSettingDaoImpl.KEY_FILTER_KEYWORDS, companyFilterKeywords, companySettings,
-					MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+            if ( StringUtils.isNotEmpty( keyword.getId() ) ) {
+                flag = 1;
+                for ( int i = 0; i < companyFilterKeywords.size(); i++ ) {
+                    Keyword companyFilterKeyword = companyFilterKeywords.get( i );
 
-			// update the redis with the keywords
-			redisDao.addKeywords(companyId, companyFilterKeywords);
+                    if ( keyword.getId() != null && companyFilterKeyword.getId().equals( keyword.getId() ) ) {
+                        flag = 2;
+                        if ( keyword.getPhrase() != null ) {
+                            if ( companyFilterKeyword.getPhrase().equalsIgnoreCase( keyword.getPhrase() ) ) {
+                                LOG.warn( "Phrase already exists" );
+                            } else {
+                                companyFilterKeyword.setPhrase( keyword.getPhrase() );
+                                companyFilterKeyword.setModifiedOn( new Date().getTime() );
+                            }
+                        }
+                        if ( keyword.getMonitorType() != null
+                            && !keyword.getMonitorType().equals( companyFilterKeyword.getMonitorType() ) ) {
+                            companyFilterKeyword.setMonitorType( keyword.getMonitorType() );
+                            companyFilterKeyword.setModifiedOn( new Date().getTime() );
+                        }
+                    }
+                }
+            }
 
-		} else {
-			LOG.debug("Keywords are empty so skiping operation");
-		}
-		return companyFilterKeywords;
-	}
+            if ( flag == 1 ) {
+                throw new InvalidInputException( "Keyword does not exist for given Id", "400" );
+            }
+            if ( flag == 0 ) {
+                for ( Keyword duplicateKeyword : companyFilterKeywords ) {
+                    if ( duplicateKeyword.getPhrase().equalsIgnoreCase( keyword.getPhrase() )
+                        && duplicateKeyword.getMonitorType().equals( keyword.getMonitorType() ) ) {
+                        LOG.warn( "duplicate entry" );
+                        throw new InvalidInputException( "duplicate entry", "400" );
+                    }
+                }
+                LOG.info( "Adding new keyword" );
+                Keyword keywordNew = new Keyword();
+                keywordNew.setCreatedOn( new Date().getTime() );
+                keywordNew.setModifiedOn( new Date().getTime() );
+                keywordNew.setPhrase( keyword.getPhrase() );
+                keywordNew.setId( UUID.randomUUID().toString() );
+                keywordNew.setStatus( CommonConstants.STATUS_ACTIVE );
+                keywordNew.setMonitorType( keyword.getMonitorType() );
+                companyFilterKeywords.add( keywordNew );
+            }
+            // Updating filterKeywords in OrganizationUnitSettings
+            organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+                MongoOrganizationUnitSettingDaoImpl.KEY_FILTER_KEYWORDS, companyFilterKeywords, companySettings,
+                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+            // update the redis with the keywords
+            redisDao.addKeywords( companyId, companyFilterKeywords );
+
+        } else {
+            LOG.debug( "Keywords are empty so skiping operation" );
+        }
+        return companyFilterKeywords;
+    }
 }
