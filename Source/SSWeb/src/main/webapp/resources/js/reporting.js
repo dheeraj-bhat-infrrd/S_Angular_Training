@@ -1729,7 +1729,7 @@ function drawRecentActivity(start,batchSize,tableHeader,recentActivityCount){
 			} else if(recentActivityList[i][1] == 'Survey Invitation Email Report'){
 				tableData += '<td class="v-tbl-recent-activity fetch-email txt-bold tbl-black-text ">';
 				if(startDate==null && endDate==null){
-					tableData += "Last 30 days";
+					tableData += "All Time";
 				} else if(endDate==null){
 					tableData += "30 days starting "+startDate;
 				} else if(startDate==null){
