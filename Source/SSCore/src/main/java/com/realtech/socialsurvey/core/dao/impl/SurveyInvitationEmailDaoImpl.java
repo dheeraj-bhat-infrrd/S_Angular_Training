@@ -56,7 +56,7 @@ public class SurveyInvitationEmailDaoImpl extends GenericReportingDaoImpl<Survey
 				+ "left join branch b on up.branch_id = b.branch_id and b.IS_DEFAULT_BY_SYSTEM=0 "
 				+ "left join region r on up.region_id = r.region_id and r.IS_DEFAULT_BY_SYSTEM=0 "
 				+ "where imc.month in (0, :month ) and imc.year in (0, :year ) and imc.company_id=:companyId "
-				+ "group by imc.agent_id order by imc.agent_name;";
+				+ "group by imc.agent_id order by imc.agent_name";
 		
 		SQLQuery query = getSession().createSQLQuery(queryString);
 		query.setInteger("month", month)

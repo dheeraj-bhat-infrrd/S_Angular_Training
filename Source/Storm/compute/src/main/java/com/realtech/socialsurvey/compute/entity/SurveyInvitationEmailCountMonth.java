@@ -163,6 +163,7 @@ public class SurveyInvitationEmailCountMonth implements Serializable{
 				+ ", differed=" + differed + ", blocked=" + blocked + ", opened=" + opened + ", spamed=" + spamed
 				+ ", unsubscribed=" + unsubscribed + ", bounced=" + bounced + ", linkClicked=" + linkClicked
 				+ ", received=" + received + ", dropped=" + dropped + ", agentName=" + agentName + ", emailId="
-				+ emailId + "]";
+				+ emailId + ", branchName=" + branchName + ", regionName=" + regionName + "]";
 	}
+	
 }

@@ -67,16 +67,13 @@ public class GetDataForEmailReport extends BaseComputeBoltWithAck {
             
             try {
                 	reportResponse = SSAPIOperations.getInstance().getDataForEmailReport(month,year,companyId);
-                    if ( reportResponse != null && !reportResponse.isEmpty() && reportResponse.size() > 0  ) {
-                        status = ReportStatus.PROCESSING.getValue();
-
-                    } else if ( reportResponse == null ) {
+                   if ( reportResponse == null ) {
                         status = ReportStatus.BLANK.getValue();
-                    } else if ( !reportResponse.isEmpty() ) {
+                    } else if ( !reportResponse.isEmpty() && reportResponse.size() > 0) {
                         status = ReportStatus.PROCESSED.getValue();
                     }
                     success = true;
-                    LOG.info( "Emitting tuple with success = {},  fileUploadId = {}, status = {} ", success, status, fileUploadId );
+                    LOG.info( "Emitting tuple with success = {},  fileUploadId = {}, status = {} ", success, fileUploadId, status );
                     _collector.emit( input, Arrays.asList( success, reportResponse, fileUploadId, status,
                              reportRequest ) );
 

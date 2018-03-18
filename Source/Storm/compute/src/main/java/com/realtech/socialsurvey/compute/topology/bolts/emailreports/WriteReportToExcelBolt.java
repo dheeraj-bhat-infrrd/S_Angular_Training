@@ -71,28 +71,28 @@ public class WriteReportToExcelBolt extends BaseComputeBoltWithAck {
         if( !input.getBooleanByField("isSuccess")){
             if(workbook != null) workbook = null;
         } else {
-            List<SurveyInvitationEmailCountMonth> emailReportWrapper = (List<SurveyInvitationEmailCountMonth>) input.getValueByField("surveyMailList");
-            int startIndex = input.getIntegerByField( "startIndex" );
-            int batchSize = input.getIntegerByField( "batchSize" );
-            if( status.equals(ReportStatus.PROCESSING.getValue()) ) {
-                workbook = writeReportToWorkbook(emailReportWrapper, startIndex, batchSize);
-            }
-            else if (workbook != null && status.equals(ReportStatus.PROCESSED.getValue())){
-            	String monthStr = new DateFormatSymbols().getMonths()[emailReportWrapper.get(0).getMonth()-1];
-                fileName = "Email_Message_Report_Month_" + monthStr + "_" +
-    				 ( Calendar.getInstance().getTimeInMillis() ) +
-    				 EXCEL_FILE_EXTENSION;
-                file = createFileInLocal( fileName, workbook, reportRequest );
-                try {
-                    fileBytes = ConversionUtils.convertFileToBytes(file);
-                } catch (IOException e) {
-                    LOG.error( "IO  exception while converting file to bytes {}", file.getName(), e );
-                    FailedMessagesService failedMessagesService = new FailedMessagesServiceImpl();
-                    failedMessagesService.insertTemporaryFailedReportRequest(reportRequest);
-                }
-                if( workbook == null || file == null  || !file.exists() || fileBytes == null){
-                    status = ReportStatus.FAILED.getValue();
-                }
+			List<SurveyInvitationEmailCountMonth> emailReportWrapper = (List<SurveyInvitationEmailCountMonth>) input
+					.getValueByField("surveyMailList");
+			workbook = writeReportToWorkbook(emailReportWrapper);
+			if (status.equals(ReportStatus.PROCESSED.getValue())) {
+				int month = emailReportWrapper.get(0).getMonth();
+				String monthStr = "All_Time";
+				if(month != 0 ) {
+					monthStr = new DateFormatSymbols().getMonths()[month - 1];
+				}
+				fileName = "Email_Message_Report_Month_" + monthStr + "_" + (Calendar.getInstance().getTimeInMillis())
+						+ EXCEL_FILE_EXTENSION;
+				file = createFileInLocal(fileName, workbook, reportRequest);
+				try {
+					fileBytes = ConversionUtils.convertFileToBytes(file);
+				} catch (IOException e) {
+					LOG.error("IO  exception while converting file to bytes {}", file.getName(), e);
+					FailedMessagesService failedMessagesService = new FailedMessagesServiceImpl();
+					failedMessagesService.insertTemporaryFailedReportRequest(reportRequest);
+				}
+				if (workbook == null || file == null || !file.exists() || fileBytes == null) {
+					status = ReportStatus.FAILED.getValue();
+				}
             } else if(status.equals(ReportStatus.FAILED.getValue()) && workbook !=null ){
                 workbook = null;
             }
@@ -114,18 +114,12 @@ public class WriteReportToExcelBolt extends BaseComputeBoltWithAck {
 		return Arrays.asList(false, null, null, -1, null, null);
 	}
 
-	private XSSFWorkbook writeReportToWorkbook(List<SurveyInvitationEmailCountMonth> emailReportWrapper, int startIndex, int batchSize) {
+	private XSSFWorkbook writeReportToWorkbook(List<SurveyInvitationEmailCountMonth> emailReportWrapper) {
 		Map<Integer, List<Object>> data;
-		if (startIndex == 1) {
-			data = writeEmailReportHeader(SURVEY_INVITATION_EMAIL_REPORT_HEADER);
-			workbook = createWorkbook(data);
-			data = getEmailReportToBeWrittenInSheet(emailReportWrapper);
-			workbook = writeToWorkbook(data, workbook, ((startIndex - 1) * batchSize) + 2);
-		} else if (startIndex > 1 && workbook != null) {
-			data = getEmailReportToBeWrittenInSheet(emailReportWrapper);
-			workbook = writeToWorkbook(data, workbook, (startIndex - 1) * batchSize + 2);
-		}
-
+		data = writeEmailReportHeader(SURVEY_INVITATION_EMAIL_REPORT_HEADER);
+		workbook = createWorkbook(data);
+		data = getEmailReportToBeWrittenInSheet(emailReportWrapper);
+		workbook = writeToWorkbook(data, workbook, 1);
 		return workbook;
 	}
 

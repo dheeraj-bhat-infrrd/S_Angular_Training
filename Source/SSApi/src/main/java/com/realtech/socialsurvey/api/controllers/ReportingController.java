@@ -869,8 +869,8 @@ public class ReportingController
     
     @RequestMapping( value = "/surveyinvitationemail/month/year", method = RequestMethod.GET)
     @ApiOperation(value = "Get data for survey initation mail for month and year.")
-    public String getDataForEmailReport(int month, int year, long companyId) {
+    public List<SurveyInvitationEmailCountMonth> getDataForEmailReport(int month, int year, long companyId) {
     	LOGGER.info("API call to get survey invitation email counts for month and year value.{}-{}",month,year);
-    	return new Gson().toJson( reportingDashboardManagement.getDataForSurveyInvitationMail(month,year,companyId ) );
+    	return reportingDashboardManagement.getDataForSurveyInvitationMail(month,year,companyId ) ;
     }
 }
