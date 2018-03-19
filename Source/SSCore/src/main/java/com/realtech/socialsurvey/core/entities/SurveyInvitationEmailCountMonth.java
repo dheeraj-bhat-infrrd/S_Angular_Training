@@ -3,6 +3,8 @@
  */
 package com.realtech.socialsurvey.core.entities;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -19,8 +21,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  */
 @Entity
 @Table(name = "invitation_mail_count_month")
-public class SurveyInvitationEmailCountMonth {
+public class SurveyInvitationEmailCountMonth implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "invitation_mail_count_month_id")
@@ -78,9 +85,7 @@ public class SurveyInvitationEmailCountMonth {
 	@Column(name = "dropped")
 	private long dropped;
 	
-	@Transient
 	private String branchName;
-	@Transient
 	private String regionName;
 	
 	public long getAgentId() {

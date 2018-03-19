@@ -1584,7 +1584,7 @@ public interface CommonConstants
     public static final String IS_MANUAL = "isManual";
     
 
-    public static final String TIMEZONE_EST = "GMT-5:00";
+    public static final String TIMEZONE_EST = "EST5EDT";
     
     //retake request 
     //Constants for survey request send type

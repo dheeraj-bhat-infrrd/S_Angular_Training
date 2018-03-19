@@ -480,6 +480,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 			}
 			reportRequest.transform(timeFrame);
 			reportRequest.setFileUploadId(fileUpload.getFileUploadId());
+			reportRequest.setCompanyId(fileUpload.getCompany().getCompanyId());
 			streamApiIntegrationBuilder.getStreamApi().generateEmailReport(reportRequest);
 		}
     }
@@ -1804,7 +1805,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             batchSize ) ) {
             List<Object> recentActivityList = new ArrayList<>();
             User user = userManagementService.getUserByUserId( fileUpload.getAdminUserId() );
-            recentActivityList.add( utils.convertDateToTimeZone( fileUpload.getCreatedOn(), CommonConstants.TIMEZONE_EST ) );
+            recentActivityList.add( utils.convertDateToTimeZone( fileUpload.getCreatedOn().getTime(), CommonConstants.TIMEZONE_EST ) );
             // Set the ReportName according to the upload type
             if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_STATS_REPORT ) {
                 recentActivityList.add( CommonConstants.REPORTING_SURVEY_STATS_REPORT );
@@ -5290,7 +5291,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 		if (month == 0 && year == 0) {
 			monthData = new ArrayList<>();
 			Calendar cal = Calendar.getInstance();
-			month = cal.get(Calendar.MONTH);
+			month = cal.get(Calendar.MONTH)+1;
 			year = cal.get(Calendar.YEAR);
 			List<Object[]> thisMonth = surveyInvitationEmailDao.getSurveyInvitationEmailReportForAllTime(companyId,
 					month, year);
