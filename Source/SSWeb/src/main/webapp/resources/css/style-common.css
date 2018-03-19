@@ -11754,8 +11754,8 @@ img.lead-img {
 }
 
 .stream-dropdown-img-circle{
-	width: 35px;
-    height: 35px;
+	width: 25px;
+    height: 25px;
     margin-right: 10px;
     margin-left: 10px;
     border-radius:50%;
@@ -11854,4 +11854,10 @@ img.lead-img {
 
 .width-offset {
 	width: 100px;
+}
+
+.stream-alert{
+	font-size: medium;
+    margin: 50px auto;
+    display: table;
 }
