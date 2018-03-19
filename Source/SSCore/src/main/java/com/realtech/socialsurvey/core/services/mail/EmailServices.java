@@ -145,32 +145,6 @@ public interface EmailServices
 
 
     /**
-     * Sends the survey complete mail
-     * 
-     * @param recipientMailId
-     * @param displayName
-     * @param agentName
-     * @throws InvalidInputException
-     */
-    public void sendDefaultSurveyCompletionMail( String recipientMailId, String displayName, String agentName,
-        String agentEmail, String agentProfileName, String logoUrl, long agentId )
-        throws InvalidInputException, UndeliveredEmailException;
-
-
-    /**
-     * Sends the survey reminder mail
-     * 
-     * @param recipientMailId
-     * @param displayName
-     * @param agentName
-     * @throws InvalidInputException
-     */
-    public void sendDefaultSurveyReminderMail( String recipientMailId, String logoUrl, String displayName, String agentName,
-        String agentEmailId, String link, String agentPhone, String agentTitle, String companyName )
-        throws InvalidInputException, UndeliveredEmailException;
-
-
-    /**
      * Sends all survey related emails
      * @param companySettings
      * @param user
@@ -195,7 +169,7 @@ public interface EmailServices
                                String surveyLink, String logoUrl, String customerFirstName, String customerLastName, String customerEmailId,
                                String emailType, String senderName, String senderEmailAddress, String mailSubject, String mailBody,
                                AgentSettings agentSettings, long branchId, long regionId, String surveySourceId, long agentId,
-                               long companyId) throws InvalidInputException, UndeliveredEmailException;
+                               long companyId, boolean sentFromCompany) throws InvalidInputException, UndeliveredEmailException;
 
     /**
      * Sends the survey complete admin mail
@@ -209,19 +183,6 @@ public interface EmailServices
     public void sendSurveyCompletionMailToAdminsAndAgent( String agentName, String recipientName, String recipientMailId,
         String surveyDetail, String customerName, String rating, String logoUrl, String agentProfileLink,
         String customerDetail ) throws InvalidInputException, UndeliveredEmailException;
-
-
-    /**
-     * Sends the social post reminder mail
-     * 
-     * @param recipientMailId
-     * @param displayName
-     * @param agentName
-     * @throws InvalidInputException
-     */
-    public void sendDefaultSocialPostReminderMail( String recipientMailId, String agentPhone, String agentTitle,
-        String companyName, String displayName, String agentName, String links, String logoUrl )
-        throws InvalidInputException, UndeliveredEmailException;
 
 
     /**
@@ -252,8 +213,8 @@ public interface EmailServices
      * @throws InvalidInputException
      * @throws UndeliveredEmailException
      */
-    public void sendSurveyRelatedMail(String recipientMailId, String subject, String mailBody, String emailId, String name,
-                                      long agentId, long companyId, String mailType ) throws InvalidInputException, UndeliveredEmailException;
+    public void sendSurveyRelatedMail(String recipientMailId, String subject, String mailBody, String emailId, String senderName,
+                                      long agentId, long companyId, String mailType, boolean sentFromCompany ) throws InvalidInputException, UndeliveredEmailException;
 
 
     /**
@@ -308,36 +269,12 @@ public interface EmailServices
     public void sendManualRegistrationLink( String recipientId, String firstName, String lastName, String link )
         throws InvalidInputException, UndeliveredEmailException;
 
-
-    public void sendSurveyReminderMail( String recipientMailId, String subject, String mailBody, String name, String emailId )
-        throws InvalidInputException, UndeliveredEmailException;
-
-
-    public void sendDefaultSurveyInvitationMail( String recipientMailId, String logoUrl, String displayName, String agentName,
-        String link, String agentEmailId, String agentSignature, String companyName, String surveyInitiatedOn,
-        String currentYear, String fullAddress, long agentId ) throws InvalidInputException, UndeliveredEmailException;
-
-
-    public void sendDefaultSurveyInvitationMailByCustomer( String recipientMailId, String firstName, String agentName,
-        String link, String agentEmailId, long agentId ) throws InvalidInputException, UndeliveredEmailException;
-
-
-    public void sendSurveyInvitationMailByCustomer( String recipientMailId, String subject, String mailBody, String emailId,
-        String firstName, long agentId ) throws InvalidInputException, UndeliveredEmailException;
-
-
     public void sendFatalExceptionEmail( String recipientMailId, String stackTrace )
         throws InvalidInputException, UndeliveredEmailException;
 
 
     public void sendEmailSendingFailureMail( String recipientMailId, String destinationMailId, String displayName,
         String stackTrace ) throws InvalidInputException, UndeliveredEmailException;
-
-
-    public void sendDefaultSurveyRestartMail( String recipientMailId, String logoUrl, String firstName, String agentName,
-        String link, String agentEmailId, String agentSignature, long agentId )
-        throws InvalidInputException, UndeliveredEmailException;
-
 
     public void sendSocialConnectMail( String recipientMailId, String displayName, String loginName, String account )
         throws InvalidInputException, UndeliveredEmailException;
@@ -373,34 +310,11 @@ public interface EmailServices
         throws InvalidInputException, UndeliveredEmailException;
 
 
-    /**
-     * Method to send survey reminder when the resend button is manually clicked
-     * 
-     * @param user
-     * @param agentName
-     * @param agentPhone
-     * @param agentTitle
-     * @param companyName
-     * @param survey
-     * @param surveyLink
-     * @throws InvalidInputException 
-     */
-    public void sendManualSurveyReminderMail( OrganizationUnitSettings companySettings, User user, String agentName,
-    		String agentFirstName, String agentEmailId, String agentPhone, String agentTitle, String companyName, SurveyPreInitiation survey,
-        String surveyLink, String logoUrl, String agentDisclaimer, String agentLicenses ) throws InvalidInputException;
-
-
     void sendZillowCallExceededMailToAdmin( int count ) throws InvalidInputException, UndeliveredEmailException;
 
 
     void sendReportBugMailToAdmin( String displayName, String errorMsg, String recipientMailId )
         throws InvalidInputException, UndeliveredEmailException;
-
-
-    void sendDefaultSurveyCompletionUnpleasantMail( String recipientMailId, String firstName, String agentName,
-        String agentEmail, String companyName, String logoUrl, long agentId )
-        throws InvalidInputException, UndeliveredEmailException;
-
 
     //SS-1435: Send survey details too
     void sendComplaintHandleMail( String recipientMailId, String customerName, String customerMailId, String agentName,
