@@ -152,6 +152,9 @@
 			</div>
 		</div>
 	</div>
+	<div  id="empty-stream" class="dash-container container">
+		<span class="incomplete-trans-span stream-alert">No posts found for the stream</span>
+	</div>
 	<div  id="stream-posts" class="dash-container container">
 		<div class="dash-stats-wrapper bord-bot-dc clearfix stream-container"  >
 				<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 soc-mon-post-container bottom-padding-stream">
