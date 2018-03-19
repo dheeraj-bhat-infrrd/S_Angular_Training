@@ -7570,6 +7570,10 @@ function retakeSurveyRequest() {
  * This method is used to store the answer provided by the customer for a specific question.
  */
 function storeCustomerAnswer(customerResponse) {
+	
+	 if(!$('#sq-data').data('edited')){
+		 return;
+	 }
 	var success = false;
 	//encode question and response
 	var encodedCustomerResponse = window.btoa( unescape( encodeURIComponent( customerResponse ) ) );
@@ -7735,6 +7739,7 @@ function bindMcqCheckButton() {
 	});
 
 	$('.st-mcq-chk-off').click(function() {
+		$('#sq-data').data('edited')
 		customerResponse = $(this).parent().parent().attr('data-answer');
 		$('.sq-mcq-wrapper').find('.st-mcq-chk-on').hide();
 		$('.sq-mcq-wrapper').find('.st-mcq-chk-off').show();
@@ -7954,6 +7959,7 @@ function clearForm() {
 
 // Code to be executed on click of stars of rating question.
 $('.sq-star').click(function() {
+	$('#sq-data').data('edited' , true);
 	$(this).parent().find('.sq-star').removeClass('sq-full-star');
 	$(this).parent().find('.sq-star').removeClass('sq-full-star-click');
 	var starVal = $(this).attr('star-no');
@@ -7996,80 +8002,81 @@ $('.sq-star').hover(function() {
 $('.sq-np-item-next').click(function() {
 
 	if (questionDetails.questionType == "sb-sel-mcq" && customerResponse != undefined) {
-		storeCustomerAnswer(customerResponse);
-	} else if (questionDetails.questionType == "sb-sel-desc") {
-		customerResponse = $("#text-area").val();
-		if (customerResponse == undefined) {
-			customerResponse = "";
-		}
-		storeCustomerAnswer(customerResponse);
-	} else if (questionDetails.questionType == "sb-range-star") {
-		reduceOpacityOfStars();
-		if ($('#next-star').hasClass("btn-com-disabled")) {
-			$('#overlay-toast').html('Please answer the question. You can not skip a rating question.');
-			showToast();
+			storeCustomerAnswer(customerResponse);
+		} else if (questionDetails.questionType == "sb-sel-desc") {
+			customerResponse = $("#text-area").val();
+			if (customerResponse == undefined) {
+				customerResponse = "";
+			}
+			storeCustomerAnswer(customerResponse);
+		} else if (questionDetails.questionType == "sb-range-star") {
+			reduceOpacityOfStars();
+			if ($('#next-star').hasClass("btn-com-disabled")) {
+				$('#overlay-toast').html('Please answer the question. You can not skip a rating question.');
+				showToast();
+				return;
+			}
+			var starVal = $('#sq-stars').attr('selected-star-no');
+			storeCustomerAnswer(starVal);
+		} else if (questionDetails.questionType == "sb-range-smiles") {
+			reduceOpacityOfSmiles();
+			if ($('#next-smile').hasClass("btn-com-disabled")) {
+				$('#overlay-toast').html('Please answer the question. You can not skip a rating question.');
+				showToast();
+				return;
+			}
+			var smileVal = $('#sq-smiles').attr('selected-smiles-no');
+			storeCustomerAnswer(smileVal);
+		} else if (questionDetails.questionType == "sb-range-scale") {
+			if ($('#next-scale').hasClass("btn-com-disabled")) {
+				$('#overlay-toast').html('Please answer the question. You can not skip a rating question.');
+				showToast();
+				return;
+			}
+		} else if (questionDetails.questionType == "sb-master") {
+			if ($('#next-textarea-smiley').hasClass("btn-com-disabled")) {
+				$('#overlay-toast').html('Please answer this question.');
+				showToast();
+			} else {
+				showMasterQuestionPage();
+			}
 			return;
-		}
-		var starVal = $('#sq-stars').attr('selected-star-no');
-		storeCustomerAnswer(starVal);
-	} else if (questionDetails.questionType == "sb-range-smiles") {
-		reduceOpacityOfSmiles();
-		if ($('#next-smile').hasClass("btn-com-disabled")) {
-			$('#overlay-toast').html('Please answer the question. You can not skip a rating question.');
-			showToast();
-			return;
-		}
-		var smileVal = $('#sq-smiles').attr('selected-smiles-no');
-		storeCustomerAnswer(smileVal);
-	} else if (questionDetails.questionType == "sb-range-scale") {
-		if ($('#next-scale').hasClass("btn-com-disabled")) {
-			$('#overlay-toast').html('Please answer the question. You can not skip a rating question.');
-			showToast();
-			return;
-		}
-	} else if (questionDetails.questionType == "sb-master") {
-		if ($('#next-textarea-smiley').hasClass("btn-com-disabled")) {
-			$('#overlay-toast').html('Please answer this question.');
-			showToast();
-		} else {
-			showMasterQuestionPage();
-		}
-		return;
-	} else if (questionDetails.questionType == "sb-range-0to10"){
-		if ($('#next-radio').hasClass("btn-com-disabled") && questionDetails.isNPSQuestion == 0) {
-			$('#overlay-toast').html('Please answer the question. You can not skip a rating question.');
-			showToast();
-			return;
-		}else if ($('#next-radio-nps').hasClass("btn-com-disabled") && questionDetails.isNPSQuestion == 1){
-			$('#overlay-toast').html('Please answer the question. You can not skip a rating question.');
-			showToast();
-			return;
-		}
+		} else if (questionDetails.questionType == "sb-range-0to10"){
+			if ($('#next-radio').hasClass("btn-com-disabled") && questionDetails.isNPSQuestion == 0) {
+				$('#overlay-toast').html('Please answer the question. You can not skip a rating question.');
+				showToast();
+				return;
+			}else if ($('#next-radio-nps').hasClass("btn-com-disabled") && questionDetails.isNPSQuestion == 1){
+				$('#overlay-toast').html('Please answer the question. You can not skip a rating question.');
+				showToast();
+				return;
+			}
+			
+			var ratingVal = 0;
+			if(questionDetails.isNPSQuestion==0){
+				ratingVal = parseInt($('#sq-radio-1to10').attr('selected-rating-radio'));
+			}else{
+				ratingVal = parseInt($('#sq-radio-1to10-nps').attr('selected-rating-radio'));
+			}
+			
+			storeCustomerAnswer(ratingVal);
+		} 
 		
-		var ratingVal = 0;
-		if(questionDetails.isNPSQuestion==0){
-			ratingVal = parseInt($('#sq-radio-1to10').attr('selected-rating-radio'));
-		}else{
-			ratingVal = parseInt($('#sq-radio-1to10-nps').attr('selected-rating-radio'));
-		}
-		
-		storeCustomerAnswer(ratingVal);
-	} 
-	
-	$(".sq-star").removeClass('sq-full-star');
-	$(".sq-smile").removeClass('sq-full-smile');
-	$('.sq-radio').each(function() {
-	    $(this).removeClass('radio-outer');
-	    $(this).children().hide();
-	    if(questionDetails.isNPSQuestion==0){
-	    	$(this).addClass('radio-outer-gray');
-	    	$(this).css("cursor","pointer");
-	    }else{
-	    	$(this).parent().find('.popover').hide();
-	    	$(this).css("cursor","pointer");
-	    	$('#nps-range-text').css('opacity',1);
-	    }
-	});
+		$(".sq-star").removeClass('sq-full-star');
+		$(".sq-smile").removeClass('sq-full-smile');
+		$('.sq-radio').each(function() {
+		    $(this).removeClass('radio-outer');
+		    $(this).children().hide();
+		    if(questionDetails.isNPSQuestion==0){
+		    	$(this).addClass('radio-outer-gray');
+		    	$(this).css("cursor","pointer");
+		    }else{
+		    	$(this).parent().find('.popover').hide();
+		    	$(this).css("cursor","pointer");
+		    	$('#nps-range-text').css('opacity',1);
+		    }	
+		});
+
 	qno++;
 	paintSurveyPageFromJson();
 
@@ -8153,7 +8160,6 @@ $('.sq-np-item-next').click(function() {
 			$('#veryLikelyDivNps').html(questionDetails.veryLikely);
 		}	
 	}
-
 });
 
 // Code to be executed on click of previous for star and smile questions.
@@ -8245,6 +8251,7 @@ $('.sq-np-item-prev').click(function() {
 });
 
 $('.sq-radio').click(function(){
+	$('#sq-data').data('edited',true);
 	$('.sq-radio').each(function() {
 	    $(this).removeClass('radio-outer-gray');
 	    $(this).children().hide();
@@ -8276,6 +8283,7 @@ $('.sq-radio').click(function(){
 
 /* Click event on grey smile. */
 $('.sq-smile').click(function() {
+	$('#sq-data').data('edited' , true);
 	$(this).parent().find('.sq-smile').removeClass('sq-full-smile');
 	$(this).parent().find('.sq-smile').removeClass('sq-full-smile-click');
 	var smileVal = $(this).attr('smile-no');
@@ -8317,6 +8325,7 @@ $('.sq-smile').hover(function() {
 
 $('#sq-happy-smile').click(function() {
 	// Update customer's mood in db and ask for cutomer's kind words.
+	$('#sq-data').data('edited',true)
 	mood = "Great";
 	$('#next-textarea-smiley').removeClass("btn-com-disabled");
 	isSmileTypeQuestion = true;
@@ -8326,6 +8335,7 @@ $('#sq-happy-smile').click(function() {
 $('#sq-neutral-smile').click(function() {
 	// Update customer's mood in db and ask for feedback that could have made
 	// him happy.
+	$('#sq-data').data('edited',true)
 	mood = "OK";
 	$('#next-textarea-smiley').removeClass("btn-com-disabled");
 	isSmileTypeQuestion = true;
@@ -8335,6 +8345,7 @@ $('#sq-neutral-smile').click(function() {
 $('#sq-sad-smile').click(function() {
 	// Update customer's mood in db and ask what went wrong during the entire
 	// course.
+	$('#sq-data').data('edited',true)
 	mood = "Unpleasant";
 	$('#next-textarea-smiley').removeClass("btn-com-disabled");
 	isSmileTypeQuestion = true;
