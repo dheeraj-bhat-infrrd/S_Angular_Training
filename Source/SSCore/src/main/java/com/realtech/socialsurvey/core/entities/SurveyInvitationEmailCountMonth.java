@@ -11,7 +11,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -84,9 +83,6 @@ public class SurveyInvitationEmailCountMonth implements Serializable {
 	
 	@Column(name = "dropped")
 	private long dropped;
-	
-	private String branchName;
-	private String regionName;
 	
 	public long getAgentId() {
 		return agentId;
@@ -178,18 +174,6 @@ public class SurveyInvitationEmailCountMonth implements Serializable {
 	public void setAgentName(String agentName) {
 		this.agentName = agentName;
 	}
-	public String getBranchName() {
-		return branchName;
-	}
-	public void setBranchName(String branchName) {
-		this.branchName = branchName;
-	}
-	public String getRegionName() {
-		return regionName;
-	}
-	public void setRegionName(String regionName) {
-		this.regionName = regionName;
-	}
 	public long getDropped() {
 		return dropped;
 	}
@@ -215,7 +199,6 @@ public class SurveyInvitationEmailCountMonth implements Serializable {
 				+ ", attempted=" + attempted + ", delivered=" + delivered + ", differed=" + differed + ", blocked="
 				+ blocked + ", opened=" + opened + ", spamed=" + spamed + ", unsubscribed=" + unsubscribed
 				+ ", bounced=" + bounced + ", linkClicked=" + linkClicked + ", received=" + received + ", dropped="
-				+ dropped + ", branchName=" + branchName + ", regionName=" + regionName
-				+ "]";
+				+ dropped + "]";
 	}
 }

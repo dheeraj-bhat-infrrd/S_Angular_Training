@@ -772,7 +772,7 @@
 	<!-- survey invitaion mail count cron -->
 	<bean id="surveyInvitationEmailCountCronPastMonth"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
-		<property name="jobDetail" ref="surveyInvitationEmailCountJob" />
+		<property name="jobDetail" ref="surveyInvitationEmailCountJobPastMonth" />
 		<property name="cronExpression" value="0 30 12 1 * ?" />
 	</bean>
 	

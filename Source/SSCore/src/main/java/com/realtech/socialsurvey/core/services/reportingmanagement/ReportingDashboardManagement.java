@@ -28,6 +28,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
+import com.realtech.socialsurvey.core.vo.SurveyInvitationEmailCountVO;
 
 
 public interface ReportingDashboardManagement
@@ -378,11 +379,11 @@ public interface ReportingDashboardManagement
 			Timestamp startDate) throws UnsupportedEncodingException, NonFatalException;
 
 
-	public List<SurveyInvitationEmailCountMonth> getSurveyInvitationEmailReportForMonth(long companyId, int month, int year);
+	public List<SurveyInvitationEmailCountVO> getSurveyInvitationEmailReportForMonth(long companyId, int month, int year);
 
 
 	public List<SurveyInvitationEmailCountMonth> getAllTimeDataForSurveyInvitationMail(int startIndex, int batchSize);
 
 
-	public List<SurveyInvitationEmailCountMonth> getDataForSurveyInvitationMail(int month, int year, long companyId);
+	public List<SurveyInvitationEmailCountVO> getDataForSurveyInvitationMail(int month, int year, long companyId);
 }

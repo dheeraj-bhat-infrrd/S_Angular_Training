@@ -165,6 +165,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.UserManage
 import com.realtech.socialsurvey.core.services.reportingmanagement.OverviewManagement;
 import com.realtech.socialsurvey.core.services.reportingmanagement.ReportingDashboardManagement;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
+import com.realtech.socialsurvey.core.vo.SurveyInvitationEmailCountVO;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookData;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookOperations;
 
@@ -5250,11 +5251,11 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
 	@Override
 	@Transactional
-	public List<SurveyInvitationEmailCountMonth> getSurveyInvitationEmailReportForMonth(long companyId, int month, int year) {
-		List<SurveyInvitationEmailCountMonth> mailCountReport = new ArrayList<SurveyInvitationEmailCountMonth>();
+	public List<SurveyInvitationEmailCountVO> getSurveyInvitationEmailReportForMonth(long companyId, int month, int year) {
+		List<SurveyInvitationEmailCountVO> mailCountReport = new ArrayList<SurveyInvitationEmailCountVO>();
 		List<Object[]> reportList = surveyInvitationEmailDao.getSurveyInvitationEmailReportForMonth(companyId,month,year);
 		for(Object[] obj : reportList) {
-			SurveyInvitationEmailCountMonth reportObj = new SurveyInvitationEmailCountMonth();
+			SurveyInvitationEmailCountVO reportObj = new SurveyInvitationEmailCountVO();
 			reportObj.setAgentName((String)obj[0]);
 			reportObj.setEmailId((String)obj[1]);
 			reportObj.setBranchName((String)obj[2]);
@@ -5285,9 +5286,9 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
 	@Override
 	@Transactional
-	public List<SurveyInvitationEmailCountMonth> getDataForSurveyInvitationMail(int month, int year, long companyId) {
+	public List<SurveyInvitationEmailCountVO> getDataForSurveyInvitationMail(int month, int year, long companyId) {
 
-		List<SurveyInvitationEmailCountMonth> monthData = null;
+		List<SurveyInvitationEmailCountVO> monthData = null;
 		if (month == 0 && year == 0) {
 			monthData = new ArrayList<>();
 			Calendar cal = Calendar.getInstance();
@@ -5297,7 +5298,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 					month, year);
 
 			for (Object[] obj : thisMonth) {
-				SurveyInvitationEmailCountMonth reportObj = new SurveyInvitationEmailCountMonth();
+				SurveyInvitationEmailCountVO reportObj = new SurveyInvitationEmailCountVO();
 				reportObj.setAgentName((String) obj[0]);
 				reportObj.setEmailId((String) obj[1]);
 				reportObj.setBranchName((String) obj[2]);

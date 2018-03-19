@@ -32,6 +32,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.reportingmanagement.DashboardGraphManagement;
 import com.realtech.socialsurvey.core.services.reportingmanagement.OverviewManagement;
 import com.realtech.socialsurvey.core.services.reportingmanagement.ReportingDashboardManagement;
+import com.realtech.socialsurvey.core.vo.SurveyInvitationEmailCountVO;
 import com.wordnik.swagger.annotations.ApiOperation;
 
 
@@ -869,7 +870,7 @@ public class ReportingController
     
     @RequestMapping( value = "/surveyinvitationemail/month/year", method = RequestMethod.GET)
     @ApiOperation(value = "Get data for survey initation mail for month and year.")
-    public List<SurveyInvitationEmailCountMonth> getDataForEmailReport(int month, int year, long companyId) {
+    public List<SurveyInvitationEmailCountVO> getDataForEmailReport(int month, int year, long companyId) {
     	LOGGER.info("API call to get survey invitation email counts for month and year value.{}-{}",month,year);
     	return reportingDashboardManagement.getDataForSurveyInvitationMail(month,year,companyId ) ;
     }
