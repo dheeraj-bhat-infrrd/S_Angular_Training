@@ -7372,6 +7372,7 @@ function paintSurveyPage(jsonData) {
  */
 function paintSurveyPageFromJson() {
 	$("div[data-ques-type]").hide();
+	$('#sq-data').data('edited',false);
 	if (qno == -1 && editable == false) {
 		$("div[data-ques-type]").hide();
 		$("div[data-ques-type='error']").show();
@@ -7739,7 +7740,7 @@ function bindMcqCheckButton() {
 	});
 
 	$('.st-mcq-chk-off').click(function() {
-		$('#sq-data').data('edited')
+		$('#sq-data').data('edited',true)
 		customerResponse = $(this).parent().parent().attr('data-answer');
 		$('.sq-mcq-wrapper').find('.st-mcq-chk-on').hide();
 		$('.sq-mcq-wrapper').find('.st-mcq-chk-off').show();
