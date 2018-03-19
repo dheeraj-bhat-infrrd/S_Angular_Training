@@ -330,7 +330,7 @@ public class TopicConsumer implements Runnable
         LOG.debug( "Agent profile: " + agentProfile );
 
         LOG.debug( "Sending account completion mail" );
-        emailServices.sendDefaultSurveyCompletionMail( recipient, name, agentName, agentEmail, agentProfile, null, -1 );
+        //emailServices.sendDefaultSurveyCompletionMail( recipient, name, agentName, agentEmail, agentProfile, null, -1 );
     }
 
 
@@ -374,8 +374,8 @@ public class TopicConsumer implements Runnable
         LOG.debug( "companyName: " + companyName );
 
         LOG.debug( "Sending retry exhausted mail" );
-        emailServices.sendDefaultSurveyReminderMail( recipient, null, name, agentName, agentEmailId, link, agentPhone,
-            agentTitle, companyName );
+        //emailServices.sendDefaultSurveyReminderMail( recipient, null, name, agentName, agentEmailId, link, agentPhone,
+          //  agentTitle, companyName );
     }
 
 

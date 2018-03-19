@@ -16,10 +16,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 
@@ -44,6 +46,9 @@ public class IncomingMailController
     @Autowired
     private UserManagementService userManagementService;
 
+    @Autowired
+    private OrganizationManagementService organizationManagementService;
+    
     @Autowired
     private EmailServices emailServices;
 
@@ -172,19 +177,35 @@ public class IncomingMailController
 
         LOG.info( "Method resolveMailTo() called to resolve mail to email id" );
         String resolvedMailId = mailTo;
+        
+        //user email regex
         String agentEmailRegex = "u-(.*)@" + Matcher.quoteReplacement( defaultEmailDomain );
-        // String agentEmailRegex = "u(\\d+)@" + Matcher.quoteReplacement( defaultEmailDomain );
-        Pattern pattern = Pattern.compile( agentEmailRegex );
-        Matcher matcher = pattern.matcher( mailTo );
-        if ( matcher.find() ) {
+        Pattern agentTegexPattern = Pattern.compile( agentEmailRegex );
+        Matcher agentRegexMatcher = agentTegexPattern.matcher( mailTo );
+        
+        //company email regex
+        String companyEmailRegex = "c-(.*)@" + Matcher.quoteReplacement( defaultEmailDomain );
+        Pattern companyRegexPattern = Pattern.compile( companyEmailRegex );
+        Matcher companyRegexMatcher = companyRegexPattern.matcher( mailTo );
+        
+        if ( agentRegexMatcher.find() ) {
             LOG.info( "Mail id belongs to agent mail id format" );
-            String userEncryptedId = matcher.group( 1 );
+            String userEncryptedId = agentRegexMatcher.group( 1 );
             LOG.info( "userEncryptedId id from the mail id is " + userEncryptedId );
             ContactDetailsSettings contactDetailsSettings = userManagementService.fetchAgentContactDetailByEncryptedId( userEncryptedId );
             if(contactDetailsSettings != null && contactDetailsSettings.getMail_ids() != null  )
                 resolvedMailId = contactDetailsSettings.getMail_ids().getWork();
             if ( userEncryptedId == null )
 	            resolvedMailId = applicationAdminEmail;
+        }
+        else if( companyRegexMatcher.find() ) {
+        		LOG.info( "Mail id belongs to company mail id format" );
+        		String encryptedId = companyRegexMatcher.group( 1 );
+        		ContactDetailsSettings contactDetailsSettings = organizationManagementService.fetchContactDetailByEncryptedId(encryptedId, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+                if(contactDetailsSettings != null && contactDetailsSettings.getMail_ids() != null  )
+                    resolvedMailId = contactDetailsSettings.getMail_ids().getWork();
+                if ( encryptedId == null )
+    	            		resolvedMailId = applicationAdminEmail;
         } else if ( mailTo.contains( defaultFromAddress ) || mailTo.contains( applicationAdminEmail ) || mailTo
 	        .contains( NULL_USER_EMAIL_ADDRESS ) || mailTo.contains( NULL_USER_EMAIL_ADDRESS_DEMO ) ) {
 	        resolvedMailId = applicationAdminEmail;
