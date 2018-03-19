@@ -167,7 +167,7 @@
 						<div id="question-ratings-div" class="col-md-12 col-lg-12 col-sm-12 col-xs-12 score-stats-ques-con">
 							
 						</div>
-						<div id="empty-questions-div" class="hide">
+						<div id="empty-questions-div" class="hide" style="position: relative;">
 							<div style="text-align: center; margin: 5% auto">
 								<span class="incomplete-trans-span" style="font-size: large">Sorry!!!</span>
 								<div style="clear: both">
@@ -228,7 +228,7 @@
 </div>
 <script>
 	$(document).ready(function() {
-		$(document).attr("title", "New Dashboard");
+		$(document).attr("title", "Dashboard");
 	
 		updateViewAsScroll();
 		
