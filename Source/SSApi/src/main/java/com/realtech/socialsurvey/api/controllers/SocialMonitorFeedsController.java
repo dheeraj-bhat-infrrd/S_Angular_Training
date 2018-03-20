@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.realtech.socialsurvey.api.exceptions.SSApiException;
-import com.realtech.socialsurvey.core.entities.SegmentsEntity;
 import com.realtech.socialsurvey.core.entities.SegmentsVO;
 import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
 import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
@@ -57,13 +56,13 @@ public class SocialMonitorFeedsController {
 			@RequestParam List<String> feedtype, @RequestParam(value = "companyId", required = false) Long companyId,
 			@RequestParam(value = "regionIds", required = false) List<Long> regionIds,
 			@RequestParam(value = "branchIds", required = false) List<Long> branchIds,
-			@RequestParam(value = "agentIds", required = false) List<Long> agentIds)
+			@RequestParam(value = "agentIds", required = false) List<Long> agentIds, @RequestParam(value = "searchText", required = false) String searchText)
 			throws InvalidInputException, SSApiException {
 		LOGGER.info("Fetching the list of Social posts for social monitor");
 		SocialMonitorResponseData socialMonitorResponseData;
 		try {
 			socialMonitorResponseData = socialFeedService.getAllSocialPosts(startIndex, limit, status, flag, feedtype,
-					companyId, regionIds, branchIds, agentIds);
+					companyId, regionIds, branchIds, agentIds, searchText);
 		} catch (InvalidInputException ie) {
 			LOGGER.error("Invalid input exception caught while fetching social feeds", ie);
 			throw new SSApiException("Invalid input exception caught while fetching social feeds", ie);
