@@ -11241,27 +11241,27 @@ img.lead-img {
     background-color: white;
 }
 
-.stream-action-unflag{
+.stream-action-unflag, .dup-stream-action-unflag{
 	border: 2px solid #3f78bc;
     color: #3f78bc;
 }
 
-.stream-action-flag{
+.stream-action-flag, .dup-stream-action-flag{
 	border: 2px solid #dca50d;
     color: #dca50d;
 }
 
-.stream-action-esc{
+.stream-action-esc, .dup-stream-action-esc{
 	border: 2px solid #f95000;
     color: #f95000;
 }
 
-.stream-action-res{
+.stream-action-res, .dup-stream-action-res{
 	border: 2px solid #6ead00;
     color: #6ead00;
 }
 
-.stream-action-submit{
+.stream-action-submit, .dup-stream-action-submit{
 	border: 2px solid #8d8d8d;
     color: #8d8d8d;
     margin-left:15px;
@@ -11860,4 +11860,37 @@ img.lead-img {
 	font-size: medium;
     margin: 50px auto;
     display: table;
+}
+
+.dup-post-popup{
+	display: flex;
+    align-items: start;
+}
+
+#dup-post-popup-body{
+	border:0;
+}
+
+.dup-post-cont{
+	padding: 0;
+    border: 0;
+}
+
+.dup-post-details{
+	display: grid;
+    border: 0;
+    padding-right: 0;
+}
+
+.dup-post-pic-cont{
+	margin: 20px auto;
+    padding: 0;
+}
+
+.dup-post-act-cont{
+	padding: 0;
+}
+
+.dup-post-pic{
+	max-height: 250px;
 }

@@ -82,6 +82,14 @@ public class SocialMonitorWebController {
         return JspResolver.STREAM_ACTION_CONTAINER_PAGE;
     }
     
+    @RequestMapping ( value = "/showsocialduplicate", method = RequestMethod.GET)
+    public String showSocialMonitorDuplicate( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Social Monitor, show Duplicate Started" );
+        
+        return JspResolver.SOCIAL_MONITOR_DUPLICATE_POPUP;
+    }
+    
     @RequestMapping ( value = "/showsocialmonitorpage", method = RequestMethod.GET)
     public String showSocialMonitorPage( Model model, HttpServletRequest request )
     {
@@ -339,7 +347,7 @@ public class SocialMonitorWebController {
         LOG.info( "Method to fetch Social Posts for Social Monitor Stream,  getSocialPostsForStream() Started" );
         
         User user = sessionHelper.getCurrentUser();
-        Long companyId = user.getCompany().getCompanyId();
+        long companyId = -1;
        
         String startIndexStr = request.getParameter(START_INDEX);
         String batchSizeStr = request.getParameter(BATCH_SIZE);
@@ -350,6 +358,7 @@ public class SocialMonitorWebController {
         String branchIdStr = request.getParameter( "branch" );
         String agentIdStr = request.getParameter( "user" );
         String feedsStr = request.getParameter( "feeds" );
+        String text = request.getParameter("text");
         
         List<String> feedType = new ArrayList<>();
         List<Long> regionIds = new ArrayList<>();
@@ -411,11 +420,15 @@ public class SocialMonitorWebController {
        if(companyIdStr != null && !companyIdStr.isEmpty()) {
            companyId = Long.valueOf( companyIdStr );
            if(companyId == 0) {
-               companyId = null;
+               companyId = -1;
            }
        }
        
-       Response response = ssApiIntergrationBuilder.getIntegrationApi().showStreamSocialPosts(startIndex, batchSize, status, flag, feedType, companyId, regionIds, branchIds, agentIds);
+       if(text == null) {
+           text = "";
+       }
+       
+       Response response = ssApiIntergrationBuilder.getIntegrationApi().showStreamSocialPosts(startIndex, batchSize, status, flag, feedType, companyId, regionIds, branchIds, agentIds,text);
         		
         return new String( ( (TypedByteArray) response.getBody() ).getBytes(),Charset.forName("UTF-8") );
        

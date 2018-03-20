@@ -18414,6 +18414,9 @@ function getUsersByCompanyId(){
 			var userList = response;
 			drawUserList(userList);
 		},
+		complete: function(){
+			getStreamPosts(0,'none',false);
+		},
 		error : function(e){
 			if (e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
@@ -18643,3 +18646,71 @@ $(document).on('click','.feed-checked',function(e){
 	
 	$('#stream-feed-count').html(feedsList.length);
 });
+
+$(document).on('click','.post-dup',function(e){
+	e.stopImmediatePropagation();
+	e.preventDefault();
+	
+	$('#duplicate-post-popup').removeClass('hide');
+	showDashOverlay('#dup-dash');
+	
+	var postText = $(this).parent().parent().find('.stream-post-details-text').html();
+	var postPic = $(this).parent().parent().find('.stream-post-details-pic').attr('src');
+	var postId = $(this).parent().parent().find('.post-id-details').attr('data-post-id');
+	
+	drawDuplicatePopup(postId,postText,postPic);
+});
+
+$(document).on('click','#dismiss-duplicate-post-popup',function(e){
+	e.stopImmediatePropagation();
+	e.preventDefault();
+	
+	$('#dup-post-popup-body').html('');
+	$('#duplicate-post-popup').addClass('hide');
+});
+
+function drawDuplicatePopup(postId,postText,postPic){
+	
+	var postDetails = {
+			"postId" : postId,
+			"postText" : postText,
+			"postPic" : postPic
+	};
+	
+	$.ajax({
+		url : './showsocialduplicate.do',
+		type : "GET",
+		dataType : "html",
+		cache : false,
+		success : function(data){
+			$('#dup-post-popup-body').html(data);
+			drawDuplicatePopupDetails(postDetails);
+		},
+		complete: function(data){
+			hideDashOverlay('#dup-dash');
+		},
+		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			redirectErrorpage();
+		}
+	});
+}
+
+function drawDuplicatePopupDetails(postDetails){
+	
+	$('#dup-post-text').html(postDetails.postText);
+	$('#dup-post-img').attr('src',postDetails.postPic);
+	
+	var postId = postDetails.postId;
+	
+	var status = $('#add-post-action'+postId).find('.form-status');
+	var flagged = $('#add-post-action'+postId).find('.form-flagged');
+	
+	$('#dup-post-add-post-action').find('.form-post-id').val(postId);
+	$('#dup-post-add-post-action').find('.form-status').val(status);
+	$('#dup-post-add-post-action').find('.form-flagged').val(flagged);
+	
+}
