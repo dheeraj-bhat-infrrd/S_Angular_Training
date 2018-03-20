@@ -1288,7 +1288,7 @@ public class EmailServicesImpl implements EmailServices
 
         LOG.trace( "Initiating URL Service to shorten the url {}", surveyLink );
         String shortSurveyLink = null;
-        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( customerEmailId, agentId, companyId, sentFromCompany, agentName );
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( customerEmailId, agentId, companyId, sentFromCompany, senderName );
         
         try {
             shortSurveyLink = urlService.shortenUrl( surveyLink, emailEntity.getRandomUUID() );
