@@ -34,7 +34,7 @@ public class SurveyInvitationEmailDaoImpl extends GenericReportingDaoImpl<Survey
 				+ "imc.opened,imc.link_clicked,imc.dropped,imc.month,imc.year "
 				+ "from invitation_mail_count_month imc "
 				+ "inner join company c on imc.company_id=c.company_id "
-				+ "inner join user_profile up on imc.agent_id=up.user_id and up.status = 1 "
+				+ "inner join user_profile up on imc.agent_id=up.user_id and up.status = 1 and up.profiles_master_id=4 "
 				+ "left join branch b on up.branch_id = b.branch_id and b.IS_DEFAULT_BY_SYSTEM=0 "
 				+ "left join region r on up.region_id = r.region_id and r.IS_DEFAULT_BY_SYSTEM=0 "
 				+ "where imc.month=:month and imc.year=:year and imc.company_id=:companyId "
