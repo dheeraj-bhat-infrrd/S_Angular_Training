@@ -77,7 +77,7 @@
 				<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 sr-review-details">
 					<span class="sr-reviewed-by">Reviewed By ${customerDisplayName}.</span>
 					<div class="sr-margin-bottom-50">
-						<span>Wrote on </span> 
+						<span>Posted on </span> 
 						<c:choose>
 							<c:when test="${not empty singleReviewItem.surveyUpdatedDate and singleReviewItem.surveyUpdatedDate != singleReviewItem.surveyCompletedDate }">
 							 	<fmt:formatDate type="date" pattern="MMMM d, YYYY"value="${singleReviewItem.surveyUpdatedDate}" /> 
