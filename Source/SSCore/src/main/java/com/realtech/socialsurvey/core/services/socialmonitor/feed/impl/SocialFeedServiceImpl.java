@@ -108,7 +108,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
 	@SuppressWarnings("unchecked")
 	@Override
 	public SocialMonitorResponseData getAllSocialPosts(int startIndex, int limit, String status, boolean flag,
-			List<String> feedtype, Long companyId, List<Long> regionIds, List<Long> branchIds, List<Long> agentIds)
+			List<String> feedtype, Long companyId, List<Long> regionIds, List<Long> branchIds, List<Long> agentIds, String searchText)
 			throws InvalidInputException {
 		LOG.debug("Fetching social posts");
 
@@ -117,7 +117,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
 		List<SocialResponseObject> socialResponseObjects;
 
 		socialResponseObjects = mongoSocialFeedDao.getAllSocialFeeds(startIndex, limit, flag, status,
-				feedtype, companyId, regionIds, branchIds, agentIds);
+				feedtype, companyId, regionIds, branchIds, agentIds, searchText);
 		if (socialResponseObjects != null && !socialResponseObjects.isEmpty()) {
 			for (SocialResponseObject socialResponseObject : socialResponseObjects) {
 				SocialMonitorFeedData socialMonitorFeedData = new SocialMonitorFeedData();
@@ -142,7 +142,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
 				socialMonitorFeedData.setDuplicateCount(socialResponseObject.getDuplicateCount());
 				socialMonitorStreamDataList.add(socialMonitorFeedData);
 			}
-			socialMonitorResponseData.setCount(mongoSocialFeedDao.getAllSocialFeedsCount(flag, status, feedtype, companyId, regionIds, branchIds, agentIds));
+			socialMonitorResponseData.setCount(mongoSocialFeedDao.getAllSocialFeedsCount(flag, status, feedtype, companyId, regionIds, branchIds, agentIds, searchText));
 			if (flag) {
 				socialMonitorResponseData.setStatus("FLAGGED");
 			} else if (status != null && !flag) {

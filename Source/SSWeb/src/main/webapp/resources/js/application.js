@@ -16806,7 +16806,7 @@ var streamContainer = jspData;
 getJspData('./getstreamactioncontainer.do');
 var streamActionContainer = jspData;
 
-function getStreamPosts(startIndex,status,flag){
+function getStreamPosts(startIndex,status,flag,text){
 	
 	var batchSize = 10;
 	showDashOverlay('#stream-dash');
@@ -16816,6 +16816,10 @@ function getStreamPosts(startIndex,status,flag){
 	
 	if(flag == undefined){
 		flag=false;
+	}
+	
+	if(text == null || text == undefined){
+		text = '';
 	}
 	
 	$('#seg-reg-data').val($('#segment-data').data('regionIds'));
@@ -16838,7 +16842,8 @@ function getStreamPosts(startIndex,status,flag){
 		"region":regionIds,
 		"branch":branchIds,
 		"user":userIds,
-		"feeds": feeds
+		"feeds": feeds,
+		"text" : text
 	};
 	
 	$.ajax({
@@ -17065,8 +17070,10 @@ function drawStreamPage(streamPostList){
 		
 		$('#stream-post-details-cont-'+postId).find('.stream-post-details-text').html(streamPostList[i].text);
 		
-		if(streamPostList[i].picture != null && streamPostList[i].picture != undefined && streamPostList[i].picture != ''){
-			$('#stream-post-details-cont-'+postId).find('.stream-post-details-pic').attr('src',streamPostList[i].picture);
+		if(streamPostList[i].pictures != null && streamPostList[i].pictures != undefined){
+			if(streamPostList[i].pictures.length != 0 ){
+				$('#stream-post-details-cont-'+postId).find('.stream-post-details-pic').attr('src',streamPostList[i].pictures[0]);
+			}	
 		}
 		
 		$('#action-form-cont').attr('id','action-form-cont'+postId);
