@@ -72,6 +72,7 @@ public class OrganizationUnitSettings implements Serializable
     private boolean hidePublicPage; //to hide entity form public page and sitemap
     private Set<String> digestRecipients;
     private boolean includeForTransactionMonitor;
+    private String encryptedId;
 
     // vendasta product details 
     private VendastaProductSettings vendasta_rm_settings;
@@ -783,7 +784,17 @@ public class OrganizationUnitSettings implements Serializable
     }
 
 
-    @Override
+    public String getEncryptedId() {
+		return encryptedId;
+	}
+
+
+	public void setEncryptedId(String encryptedId) {
+		this.encryptedId = encryptedId;
+	}
+
+
+	@Override
     public String toString()
     {
         return "OrganizationUnitSettings [id=" + id + ", iden=" + iden + ", uniqueIdentifier=" + uniqueIdentifier
