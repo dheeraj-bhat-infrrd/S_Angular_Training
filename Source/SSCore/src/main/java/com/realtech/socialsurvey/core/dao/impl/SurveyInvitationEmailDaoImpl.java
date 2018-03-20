@@ -6,6 +6,8 @@ package com.realtech.socialsurvey.core.dao.impl;
 import java.util.List;
 
 import org.hibernate.SQLQuery;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.realtech.socialsurvey.core.dao.SurveyInvitationEmailDao;
@@ -17,6 +19,8 @@ import com.realtech.socialsurvey.core.entities.SurveyInvitationEmailCountMonth;
  */
 @Component
 public class SurveyInvitationEmailDaoImpl extends GenericReportingDaoImpl<SurveyInvitationEmailCountMonth, Long> implements SurveyInvitationEmailDao {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(SurveyInvitationEmailDaoImpl.class);
 
 	/* (non-Javadoc)
 	 * @see com.realtech.socialsurvey.core.dao.SurveyInvitationEmailDao#getSurveyInvitationEmailReportForMonth(long, int, int)
@@ -64,6 +68,16 @@ public class SurveyInvitationEmailDaoImpl extends GenericReportingDaoImpl<Survey
 		.setLong("companyId", companyId);
 		
 		return query.list();
+	}
+
+	@Override
+	public void deleteOldDataForMonth(int month, int year) {
+		String queryString = "delete from invitation_mail_count_month where month= :month and year= :year ";
+		SQLQuery query = getSession().createSQLQuery(queryString);
+		query.setInteger("month", month)
+		.setInteger("year", year);
+		query.executeUpdate();
+		LOG.info("Deleted records for {}-{}",month,year);
 	}
 	
 }
