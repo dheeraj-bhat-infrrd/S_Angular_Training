@@ -197,7 +197,3 @@
 		</div>
 	</c:if>
 </c:if>
-
-<script>
-console.log('${reviewAggregate}');
-</script>
