@@ -46,7 +46,7 @@ public interface SocialFeedService
      * @return
      * @throws InvalidInputException
      */
-    public SocialMonitorResponseData getAllSocialPosts(int startIndex, int limit, String status, boolean flag, List<String> feedtype, Long companyId, List<Long> regionIds, List<Long> branchIds, List<Long> agentIds) throws InvalidInputException;
+    public SocialMonitorResponseData getAllSocialPosts(int startIndex, int limit, String status, boolean flag, List<String> feedtype, Long companyId, List<Long> regionIds, List<Long> branchIds, List<Long> agentIds, String searchText) throws InvalidInputException;
         
     /**
      * Update actions and macros on feeds

@@ -1633,4 +1633,8 @@ public interface CommonConstants
     public static final String TIME_FRAME_PAST_MONTH = "PastMonth";
     public static final String TIME_FRAME_THIS_MONTH = "ThisMonth";
     public static final String TIME_FRAME_ALL_TIME = "AllTime";
+    
+    //social monitor constants
+    public static final String PROFILE_TYPE = "profileType";
+    
 }
