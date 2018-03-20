@@ -801,6 +801,14 @@ input#find-pro-submit{
    	word-wrap: break-word;
 }
 
+.comp-logo-srp{
+    width: 150px;
+    height: 50px;
+    float: right;
+    background: #f9f9fb;
+    background-size: contain !important;
+}
+
 .overlay-single-review{
 	position: fixed;
     top: 0;
