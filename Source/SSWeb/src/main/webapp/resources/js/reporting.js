@@ -1725,18 +1725,31 @@ function drawRecentActivity(start,batchSize,tableHeader,recentActivityCount){
 	startIndex=start;
 	recentActivityList = getRecentActivityList(startIndex,batchSize);
 	var tableData=''; 
+	
+	var curDate = new Date();
+	var curYear = curDate.getFullYear();
+	
 	for(var i=0;i<recentActivityList.length;i++){
 		
 		var statusString = getStatusString(recentActivityList[i][6]);
 		var startDate = getDateFromDateTime(recentActivityList[i][2]);
 		var endDate =getDateFromDateTime(recentActivityList[i][3]);
 		var monthStartDate = getMonthFromDateTime(recentActivityList[i][2]);
+		var reportType = recentActivityList[i][9];
 		
 		tableData += "<tr id='recent-activity-row"+i+"' class=\"u-tbl-row user-row \">"
 			+"<td class=\"v-tbl-recent-activity fetch-name hide\">"+i+"</td>"
 			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold tbl-black-text\">"+recentActivityList[i][0]+"</td>"
 			+"<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-blue-text\">"+recentActivityList[i][1]+"</td>";
-			if(recentActivityList[i][1] == 'NPS Report for Week'){
+			
+			if(reportType == 107){
+				var yearOfReport = parseInt(startDate.split(",")[1]);
+				if(yearOfReport < curYear){
+					tableData += "<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-black-text \">Last Year</td>";
+				}else{
+					tableData += "<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-black-text \">This Year</td>";
+				}
+			}else if(recentActivityList[i][1] == 'NPS Report for Week'){
 				tableData += "<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-black-text \">"+findReportWeek(startDate)+"</td>";
 			} else if(recentActivityList[i][1] == 'Survey Invitation Email Report'){
 				tableData += '<td class="v-tbl-recent-activity fetch-email txt-bold tbl-black-text ">';
