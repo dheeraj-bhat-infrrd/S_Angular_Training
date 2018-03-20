@@ -1,6 +1,8 @@
 package com.realtech.socialsurvey.compute.entities.response;
 
-public class ConnectedInstagramAccount {
+import java.io.Serializable;
+
+public class ConnectedInstagramAccount implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

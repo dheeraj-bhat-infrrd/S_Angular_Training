@@ -1,6 +1,8 @@
 package com.realtech.socialsurvey.compute.entities.response;
 
-public class InstagramMediaData {
+import java.io.Serializable;
+
+public class InstagramMediaData implements Serializable{
 
     private static final long serialVersionUID = 1L;
 
@@ -11,6 +13,8 @@ public class InstagramMediaData {
     private String media_url;
 
     private String media_type;
+
+    private String caption;
 
     private String id;
 
@@ -29,6 +33,14 @@ public class InstagramMediaData {
     public String getMediaType() { return this.media_type; }
 
     public void setMediaType(String media_type) { this.media_type = media_type; }
+
+    public String getCaption() {
+        return caption;
+    }
+
+    public void setCaption(String caption) {
+        this.caption = caption;
+    }
 
     public String getId() { return this.id; }
 

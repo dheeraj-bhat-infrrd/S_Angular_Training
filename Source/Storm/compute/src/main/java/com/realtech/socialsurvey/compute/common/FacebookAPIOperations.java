@@ -76,14 +76,14 @@ public class FacebookAPIOperations
 
     /**
      * Fetch instagram feeds using the cursor
-     * @param pageId
+     * @param igAccountId
      * @param accessToken
      * @param after
      * @return
      */
-    public Response<InstagramMedia> fetchMedia(String pageId, String accessToken , String after) {
+    public Response<InstagramMedia> fetchMedia(String igAccountId, String accessToken , String after) {
         Call<InstagramMedia> requestCall = RetrofitApiBuilder.apiBuilderInstance().getFacebookAPIIntergrationService()
-                .fetchIgFeeds(pageId, accessToken, IG_FIELDS, IG_LIMIT, after);
+                .fetchIgFeeds(igAccountId, accessToken, IG_FIELDS, IG_LIMIT, after);
         try {
             Response<InstagramMedia> response = requestCall.execute();
             RetrofitApiBuilder.apiBuilderInstance().validateFacebookResponse( response );

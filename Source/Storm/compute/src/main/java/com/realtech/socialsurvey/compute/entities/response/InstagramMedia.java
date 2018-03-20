@@ -1,8 +1,9 @@
 package com.realtech.socialsurvey.compute.entities.response;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class InstagramMedia {
+public class InstagramMedia implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

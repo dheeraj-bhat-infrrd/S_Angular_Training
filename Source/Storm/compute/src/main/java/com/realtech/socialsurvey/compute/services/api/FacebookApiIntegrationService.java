@@ -24,8 +24,8 @@ public interface FacebookApiIntegrationService
                                        @Query ( "__paging_token") String pagingToken, @Query ( "fields") String fields );
 
     @Headers( "Content-Type: application/json" )
-    @GET ( "/{pageId}/media?date_format=U" )
-    Call<InstagramMedia> fetchIgFeeds(@Path ( "pageId" ) String pageId, @Query ( "access_token") String accessToken,
+    @GET ( "/{igAccountId}/media?date_format=U" )
+    Call<InstagramMedia> fetchIgFeeds(@Path ( "igAccountId" ) String igAccountId, @Query ( "access_token") String accessToken,
                                       @Query( "fields" ) String fields, @Query("limit") String limit, @Query("after") String after );
 
     @Headers( "Content-Type: application/json" )

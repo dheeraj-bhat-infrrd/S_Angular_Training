@@ -4,22 +4,27 @@ import com.realtech.socialsurvey.compute.common.FacebookAPIOperations;
 import com.realtech.socialsurvey.compute.dao.RedisSocialMediaStateDao;
 import com.realtech.socialsurvey.compute.dao.impl.RedisSocialMediaStateDaoImpl;
 import com.realtech.socialsurvey.compute.entities.FacebookTokenForSM;
+import com.realtech.socialsurvey.compute.entities.FacebookXUsageHeader;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.compute.entities.response.ConnectedInstagramAccount;
 import com.realtech.socialsurvey.compute.entities.response.InstagramMedia;
 import com.realtech.socialsurvey.compute.entities.response.InstagramMediaData;
 import com.realtech.socialsurvey.compute.exception.FacebookFeedException;
 import com.realtech.socialsurvey.compute.feeds.InstagramFeedProcessor;
+import com.realtech.socialsurvey.compute.utils.ConversionUtils;
 import com.realtech.socialsurvey.compute.utils.UrlHelper;
+import okhttp3.Headers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Response;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class InstagramFeedProcessorImpl implements InstagramFeedProcessor {
+public class InstagramFeedProcessorImpl implements InstagramFeedProcessor, Serializable {
     /**
      * @author Lavanya
      */
@@ -28,6 +33,8 @@ public class InstagramFeedProcessorImpl implements InstagramFeedProcessor {
 
     private RedisSocialMediaStateDao redisSocialMediaStateDao;
 
+    private static final int USAGE_PERCENT = 80;
+
     private static final int TOKEN_BLOCK_TIME = 3600;
 
     private static final int PAGE_BLOCK_TIME = 86400;
@@ -35,6 +42,8 @@ public class InstagramFeedProcessorImpl implements InstagramFeedProcessor {
     private static final String X_PAGE_USAGE = "X-Page-Usage";
 
     private static final String X_APP_USAGE = "X-App-Usage";
+
+    private static final int LIMIT = 50;
 
     public InstagramFeedProcessorImpl() {
         this.redisSocialMediaStateDao = new RedisSocialMediaStateDaoImpl();
@@ -46,7 +55,7 @@ public class InstagramFeedProcessorImpl implements InstagramFeedProcessor {
         LOG.info("Getting instagram feed with companyId {}", companyId);
 
         List<InstagramMediaData> instagramMediaData = new ArrayList<>();
-        InstagramMedia instagramMedia = null;
+        InstagramMedia instagramMedia ;
         ConnectedInstagramAccount instagramAccount;
         FacebookTokenForSM fbToken = mediaToken.getSocialMediaTokens().getFacebookToken();
 
@@ -58,40 +67,44 @@ public class InstagramFeedProcessorImpl implements InstagramFeedProcessor {
         if(lastFetchedIgId == null || lastFetchedIgId.isEmpty() ){
             //run the extractor for the first time so get latest 50 records
             instagramAccount = fetchFeeds( pageId, fbToken.getFacebookAccessToken() );
-            if ( instagramAccount != null){
-                instagramMediaData = instagramAccount.getMedia().getData();
+            if ( instagramAccount != null && instagramAccount.getMedia() != null){
+                instagramMediaData.addAll(instagramAccount.getMedia().getData());
                 //save the first record in the redis
                 redisSocialMediaStateDao.saveLastFetched(lastFetchedKey, instagramMediaData.get(0).getIgId(), "" );
             }
         } else{
             //Get all the feeds until we encounter the lastFetchedIgId
             instagramAccount = fetchFeeds( pageId, fbToken.getFacebookAccessToken() );
-            if( instagramAccount != null ){
+            if( instagramAccount != null){
                 instagramMedia = instagramAccount.getMedia();
-                do {
-                    if (instagramMedia != null && !instagramMedia.getData().isEmpty()) {
-                        List<String> igIds = instagramMedia.getData().stream().map( InstagramMediaData::getIgId ).collect(Collectors.toList());
-                        if ( igIds.contains(lastFetchedIgId) ) {
-                            instagramMediaData.addAll(instagramMedia.getData().subList(0, igIds.indexOf(lastFetchedIgId)));
-                            break;
-                        } else {
-                            instagramMediaData.addAll(instagramMedia.getData());
-                        }
-
-                        if( instagramMedia.getPaging().getNext() != null )
-                            instagramMedia = fetchFeeds(instagramAccount.getId(), fbToken.getFacebookAccessToken(),
-                                    instagramMedia.getPaging().getCursors().getAfter());
-                    }
-                }while( instagramMedia.getPaging().getNext() != null );
+                instagramMediaData.addAll(addInstagramMedia(instagramMedia, lastFetchedIgId));
+               /* Here we are checking for size because if lastFetchedIg is encountered
+                then we'll fetch only till that record ignoring the rest.Hence the size < 50*/
+                while( instagramMediaData.size() == LIMIT && instagramMedia.getPaging() != null && instagramMedia.getPaging().getNext() != null ){
+                    instagramMedia = fetchFeeds(pageId, instagramAccount.getId(), fbToken.getFacebookAccessToken(),
+                            instagramMedia.getPaging().getCursors().getAfter());
+                    instagramMediaData.addAll(addInstagramMedia(instagramMedia, lastFetchedIgId));
+                }
                 //save the lastestIgId for consecutive fetches
-                if (instagramMediaData.isEmpty())
+                if (!instagramMediaData.isEmpty())
                     redisSocialMediaStateDao.saveLastFetched(lastFetchedKey, instagramMediaData.get(0).getIgId(), lastFetchedIgId);
             }
             else
                 LOG.warn("Facebook account with ID {} is currently not linked with instagram" , fbToken.getFacebookId());
         }
-
         return instagramMediaData;
+    }
+
+    private List<InstagramMediaData> addInstagramMedia(InstagramMedia instagramMedia, String lastFetchedIgId) {
+        if ( instagramMedia != null && !instagramMedia.getData().isEmpty() ) {
+            List<String> igIds = instagramMedia.getData().stream().map( InstagramMediaData::getIgId ).collect(Collectors.toList());
+            if ( igIds.contains(lastFetchedIgId) ) {
+                return instagramMedia.getData().subList(0, igIds.indexOf(lastFetchedIgId));
+            } else {
+                return instagramMedia.getData();
+            }
+        } else
+            return Collections.emptyList();
     }
 
     /**
@@ -105,7 +118,7 @@ public class InstagramFeedProcessorImpl implements InstagramFeedProcessor {
             Response<ConnectedInstagramAccount> response = FacebookAPIOperations.getInstance().fetchMedia( pageId, accessToken );
 
             if ( response != null ) {
-                // checkRateLimiting( response.headers(), pageId, accessToken );
+                 checkRateLimiting( response.headers(), pageId, accessToken );
                 return response.body();
             }
         } catch (FacebookFeedException e) {
@@ -116,21 +129,21 @@ public class InstagramFeedProcessorImpl implements InstagramFeedProcessor {
 
     /**
      * Fetches the instagram media using cursor
-     * @param pageId
+     * @param igAccountId
      * @param accessToken
      * @param after
      * @return
      */
-    private InstagramMedia fetchFeeds(String pageId, String accessToken, String after) {
+    private InstagramMedia fetchFeeds(String pageId, String igAccountId, String accessToken, String after) {
         try {
-            Response<InstagramMedia> response = FacebookAPIOperations.getInstance().fetchMedia( pageId, accessToken, after );
+            Response<InstagramMedia> response = FacebookAPIOperations.getInstance().fetchMedia( igAccountId, accessToken, after );
 
             if ( response != null ) {
-                // checkRateLimiting( response.headers(), pageId, accessToken );
+                checkRateLimiting( response.headers(), pageId, accessToken );
                 return response.body();
             }
         } catch (FacebookFeedException e) {
-            handleError(pageId, e);
+            handleError(igAccountId, e);
         }
 
         return null;
@@ -151,6 +164,32 @@ public class InstagramFeedProcessorImpl implements InstagramFeedProcessor {
             LOG.error(e.getMessage());
         }
 
+    }
+
+    private void checkRateLimiting(Headers headers, String pageId, String accessToken )
+    {
+        String xAppUsageHeaderStr = headers.get( X_APP_USAGE );
+        String xPageUsageHeaderStr = headers.get( X_PAGE_USAGE );
+
+        if ( xPageUsageHeaderStr != null ) {
+            FacebookXUsageHeader xPageUsageHeader = ConversionUtils.deserialize( xPageUsageHeaderStr,
+                    FacebookXUsageHeader.class );
+            LOG.debug( "Response contains X-Page-Usage header, {}", xPageUsageHeader );
+            if ( xPageUsageHeader.getCallCount() >= USAGE_PERCENT || xPageUsageHeader.getTotalCputime() >= USAGE_PERCENT
+                    || xPageUsageHeader.getTotalTime() >= USAGE_PERCENT) {
+                redisSocialMediaStateDao.setFacebookLockForPage( pageId, PAGE_BLOCK_TIME );
+            }
+        }
+
+        if ( xAppUsageHeaderStr != null ) {
+            FacebookXUsageHeader xAppUsageHeader = ConversionUtils.deserialize( xAppUsageHeaderStr,
+                    FacebookXUsageHeader.class );
+            LOG.debug( "Response contains X-App-Usage header, {}", xAppUsageHeader );
+            if ( xAppUsageHeader.getCallCount() >= USAGE_PERCENT || xAppUsageHeader.getTotalCputime() >= USAGE_PERCENT
+                    || xAppUsageHeader.getTotalTime() >= USAGE_PERCENT) {
+                redisSocialMediaStateDao.setFacebookLockForToken( accessToken, TOKEN_BLOCK_TIME );
+            }
+        }
     }
 
 }
