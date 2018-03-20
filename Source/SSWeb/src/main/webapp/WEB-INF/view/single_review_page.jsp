@@ -56,7 +56,7 @@
 			 </c:if>
 		 </c:if>
 		 <c:set value="${unitProfile.contact_details.firstName}" var = "agentFirstNameValue"></c:set>
-
+		 <c:set value="${profile.logo}" var="profileLogo"></c:set>
 
 		<div id="sr-review-info" data-customeremail="${singleReviewItem.customerEmail}" data-agentid="${singleReviewItem.agentId}" data-cust-first-name="${singleReviewItem.customerFirstName}" data-cust-last-name="${singleReviewItem.customerLastName}" data-agent-name="${singleReviewItem.agentName}" data-review="${singleReviewItem.review}" data-survey-mongo-id="${singleReviewItem._id}" data-score="${singleReviewItem.score}" data-facebookshareurl="${singleReviewItem.faceBookShareUrl}" data-googleapi="${singleReviewItem.googleApi}"></div>
 		<div id="single-review-popup" class="single-review-popup-wrapper">
@@ -68,14 +68,19 @@
 						</div>
 					</div>
 				</c:if>
-				<div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 sr-popup-hdr-details">
+				<div class="col-lg-6 col-md-6 col-sm-6 col-xs-9 sr-popup-hdr-details">
 					<span style="font-weight:bold !important; line-height:25px" class="capitalize">${unitName}</span>
 					<span>${unitProfile.contact_details.title}</span>
 				</div>
+				<c:if test="${not empty profileLogo && profileLogo != null}">
+					<div class="col-lg-4 col-md-4 col-sm-4 col-xs-0 sr-logo-cont">
+						<img class="comp-logo-srp prof-image-edit" src="${profileLogo}"></img>
+					</div>
+				</c:if>
 			</div>
 			<div class="single-review-popup-body-wrapper clearfix">
 				<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 sr-review-details">
-					<span class="sr-reviewed-by">Reviewed By ${customerDisplayName}.</span>
+					<span class="sr-reviewed-by">Reviewed by ${customerDisplayName}.</span>
 					<div class="sr-margin-bottom-50">
 						<span>Posted on </span> 
 						<c:choose>
@@ -175,14 +180,14 @@
 						<c:when test="${singleReviewItem.source != 'Zillow' }">
 							<div class="sr-wc-btn-col float-left">
 								<div id="single-review-contact-btn" data-contact-link="${unitProfile.completeProfileUrl}" class="sr-wc-sub-send-btn float-left wc-final-submit">
-									<span class="capitalize">Contact ${agentFirstNameValue}</span>
+									<span class="capitalize">View Profile</span>
 								</div>
 							</div>
 						</c:when>
 						<c:otherwise>
 							<div class="sr-wc-btn-col-zillow float-left">
 								<div id="single-review-contact-btn" data-contact-link="${unitProfile.completeProfileUrl}" class="sr-wc-sub-send-btn float-left wc-final-submit">
-									<span class="capitalize">Contact ${agentFirstNameValue}</span>
+									<span class="capitalize">View Profile</span>
 								</div>
 							</div>
 						</c:otherwise>
