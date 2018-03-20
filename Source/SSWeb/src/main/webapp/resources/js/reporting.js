@@ -1600,7 +1600,19 @@ $(document).on('click', '#reports-generate-report-btn', function(e) {
 	if(key == 106){
 		startDate = getTimeFrameForUserRankingReport();
 		var timeFrameStr = $('#report-time-selector').val();
-
+		timeFrame = parseInt(timeFrameStr);
+				
+		switch(timeFrame){
+			case 1: key = 107;
+				break;
+			case 2: key = 106;
+				break;
+			case 3: key = 107;
+				break;
+			case 4: key = 106;
+				break;
+		}
+		
 	}
 	
 	if(key == 112){
