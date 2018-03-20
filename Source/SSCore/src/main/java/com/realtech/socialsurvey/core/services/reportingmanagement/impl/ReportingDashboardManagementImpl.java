@@ -5261,6 +5261,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 			reportObj.setOpened(new Long(obj[9].toString()));
 			reportObj.setLinkClicked(new Long(obj[10].toString()));
 			reportObj.setDropped(new Long(obj[11].toString()));
+			reportObj.setMonth(new Integer(obj[12].toString()));
+			reportObj.setYear(new Integer(obj[13].toString()));
 			mailCountReport.add(reportObj);
 		}
 		return mailCountReport;
@@ -5304,6 +5306,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 				reportObj.setOpened(new Long(obj[9].toString()));
 				reportObj.setLinkClicked(new Long(obj[10].toString()));
 				reportObj.setDropped(new Long(obj[11].toString()));
+				reportObj.setMonth(new Integer(obj[12].toString()));
+				reportObj.setYear(new Integer(obj[13].toString()));
 				monthData.add(reportObj);
 			}
 

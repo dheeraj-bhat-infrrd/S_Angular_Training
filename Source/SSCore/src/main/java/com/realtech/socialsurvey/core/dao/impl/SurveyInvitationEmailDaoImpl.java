@@ -31,7 +31,7 @@ public class SurveyInvitationEmailDaoImpl extends GenericReportingDaoImpl<Survey
 			int year) {
 		String queryString = "select imc.agent_name,imc.agent_email,b.BRANCH,r.REGION, "
 				+ "imc.received,imc.attempted_count,imc.delivered,imc.bounced,imc.deffered, "
-				+ "imc.opened,imc.link_clicked,imc.dropped "
+				+ "imc.opened,imc.link_clicked,imc.dropped,imc.month,imc.year "
 				+ "from invitation_mail_count_month imc "
 				+ "inner join company c on imc.company_id=c.company_id "
 				+ "inner join user_profile up on imc.agent_id=up.user_id and up.status = 1 "
@@ -53,7 +53,7 @@ public class SurveyInvitationEmailDaoImpl extends GenericReportingDaoImpl<Survey
 	public List<Object[]> getSurveyInvitationEmailReportForAllTime(long companyId, int month, int year) {
 		String queryString = "select imc.agent_name,imc.agent_email,b.BRANCH,r.REGION,"
 				+ "sum(imc.received),sum(imc.attempted_count),sum(imc.delivered),sum(imc.bounced),"
-				+ "sum(imc.deffered),sum(imc.opened),sum(imc.link_clicked),sum(imc.dropped) "
+				+ "sum(imc.deffered),sum(imc.opened),sum(imc.link_clicked),sum(imc.dropped),imc.month,imc.year "
 				+ "from invitation_mail_count_month imc "
 				+ "inner join company c on imc.company_id=c.company_id "
 				+ "inner join user_profile up on imc.agent_id=up.user_id and up.status = 1 "

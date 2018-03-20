@@ -80,8 +80,8 @@ public class WriteReportToExcelBolt extends BaseComputeBoltWithAck {
 				if(month != 0 ) {
 					monthStr = new DateFormatSymbols().getMonths()[month - 1];
 				}
-				fileName = "Email_Message_Report_Month_" + monthStr + "_" + (Calendar.getInstance().getTimeInMillis())
-						+ EXCEL_FILE_EXTENSION;
+				fileName = "Email_Message_Report_Month_" + monthStr + "_" + emailReportWrapper.get(0).getYear() 
+						+ (Calendar.getInstance().getTimeInMillis()) + EXCEL_FILE_EXTENSION;
 				file = createFileInLocal(fileName, workbook, reportRequest);
 				try {
 					fileBytes = ConversionUtils.convertFileToBytes(file);
