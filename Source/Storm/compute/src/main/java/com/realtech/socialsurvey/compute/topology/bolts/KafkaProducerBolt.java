@@ -1,9 +1,9 @@
 package com.realtech.socialsurvey.compute.topology.bolts;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Properties;
-
+import com.realtech.socialsurvey.compute.common.ComputeConstants;
+import com.realtech.socialsurvey.compute.common.LocalPropertyFileHandler;
+import com.realtech.socialsurvey.compute.common.RedisKeyConstants;
+import com.realtech.socialsurvey.compute.dao.impl.RedisSocialMediaStateDaoImpl;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -16,10 +16,9 @@ import org.apache.storm.tuple.Tuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.realtech.socialsurvey.compute.common.ComputeConstants;
-import com.realtech.socialsurvey.compute.common.LocalPropertyFileHandler;
-import com.realtech.socialsurvey.compute.common.RedisKeyConstants;
-import com.realtech.socialsurvey.compute.dao.impl.RedisSocialMediaStateDaoImpl;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Properties;
 
 
 public class KafkaProducerBolt extends BaseComputeBolt
@@ -32,7 +31,6 @@ public class KafkaProducerBolt extends BaseComputeBolt
 
     Properties props;
     private RedisSocialMediaStateDaoImpl redisSinceRecordFetchedDao;
-
 
     @Override
     public void execute( Tuple tuple )
