@@ -323,5 +323,6 @@ $(document).ready(function() {
 	$(document).attr("title", "Social Monitor");
 	getMacrosForStream();
 	getSegmentsByCompanyId();
+	drawDuplicatePopup();
 });
 </script>

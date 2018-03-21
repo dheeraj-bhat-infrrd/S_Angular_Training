@@ -46,7 +46,7 @@
 			<div class="hide col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn dup-stream-action-res">
 							Resolve
 			</div>
-			<div class="hide col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn dup-stream-action-submit">
+			<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn dup-stream-action-submit">
 							Submit
 			</div>
 			<div class="hide macro-options-list float-left macro-options">

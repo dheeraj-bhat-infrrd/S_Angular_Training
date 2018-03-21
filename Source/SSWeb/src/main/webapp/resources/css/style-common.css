@@ -11894,3 +11894,25 @@ img.lead-img {
 .dup-post-pic{
 	max-height: 250px;
 }
+
+.macro-disabled{
+	padding: 10px;
+	cursor: not-allowed;
+    background: #e3e3e3;
+    opacity: 0.4;
+}
+
+.dup-post-popup::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+    background-color: #fff;
+}
+
+.dup-post-popup::-webkit-scrollbar-thumb {
+    background: #4078bc;
+}
+
+.dup-macro-opt{
+	padding: 10px;
+    cursor: pointer;
+}
