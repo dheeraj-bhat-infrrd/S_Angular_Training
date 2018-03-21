@@ -1804,6 +1804,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             recentActivityList.add( fileUpload.getStatus() );
             recentActivityList.add( fileUpload.getFileName() );
             recentActivityList.add( fileUpload.getFileUploadId() );
+            recentActivityList.add( fileUpload.getUploadType() );
             recentActivity.add( recentActivityList );
         }
         return recentActivity;
