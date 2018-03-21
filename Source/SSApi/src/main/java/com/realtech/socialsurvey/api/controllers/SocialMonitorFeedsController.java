@@ -47,17 +47,19 @@ public class SocialMonitorFeedsController {
 		this.socialFeedService = socialFeedService;
 	}
 	
-	@RequestMapping(value = "/showsocialfeeds", method = RequestMethod.GET )
-	@ApiOperation(value = "Get Social posts for Social monitor", response = SocialMonitorResponseData.class)
-	@ApiResponses(value = { @ApiResponse ( code = 200, message = "Successfully fetched the list of social feeds")})
-	public ResponseEntity<?> showStreamSocialPosts(int startIndex, int limit,
-			@RequestParam(value = "status", required = false) String status,
-			@RequestParam(value = "flag", required = false) boolean flag,
-			@RequestParam List<String> feedtype, @RequestParam(value = "companyId", required = false) Long companyId,
-			@RequestParam(value = "regionIds", required = false) List<Long> regionIds,
-			@RequestParam(value = "branchIds", required = false) List<Long> branchIds,
-			@RequestParam(value = "agentIds", required = false) List<Long> agentIds, @RequestParam(value = "searchText", required = false) String searchText)
-			throws InvalidInputException, SSApiException {
+
+    @RequestMapping ( value = "/showsocialfeeds", method = RequestMethod.GET)
+    @ApiOperation ( value = "Get Social posts for Social monitor", response = SocialMonitorResponseData.class)
+    @ApiResponses ( value = { @ApiResponse ( code = 200, message = "Successfully fetched the list of social feeds") })
+    public ResponseEntity<?> showStreamSocialPosts( int startIndex, int limit,
+        @RequestParam ( value = "status", required = false) String status,
+        @RequestParam ( value = "flag", required = false) boolean flag, @RequestParam List<String> feedtype,
+        @RequestParam ( value = "companyId", required = false) Long companyId,
+        @RequestParam ( value = "regionIds", required = false) List<Long> regionIds,
+        @RequestParam ( value = "branchIds", required = false) List<Long> branchIds,
+        @RequestParam ( value = "agentIds", required = false) List<Long> agentIds,
+        @RequestParam ( value = "searchText", required = false) String searchText ) throws InvalidInputException, SSApiException
+    {
 		LOGGER.info("Fetching the list of Social posts for social monitor");
 		SocialMonitorResponseData socialMonitorResponseData;
 		try {
@@ -88,15 +90,18 @@ public class SocialMonitorFeedsController {
 		return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/socialfeedsmacro/company/{companyId}", method = RequestMethod.GET)
-	@ApiOperation(value = "Get macros for a particular entity", response = SocialMonitorMacro.class, responseContainer = "List")
-	@ApiResponses(value = { @ApiResponse ( code = 200, message = "Successfully fetched the list of macros")})
-	public ResponseEntity<?> showMacrosForEntity(@PathVariable long companyId)
-			throws InvalidInputException, SSApiException {
+
+    @RequestMapping ( value = "/socialfeedsmacro/company/{companyId}", method = RequestMethod.GET)
+    @ApiOperation ( value = "Get macros for a particular entity", response = SocialMonitorMacro.class, responseContainer = "List")
+    @ApiResponses ( value = { @ApiResponse ( code = 200, message = "Successfully fetched the list of macros") })
+    public ResponseEntity<?> showMacrosForEntity( @PathVariable long companyId,
+        @RequestParam ( value = "searchMacros", required = false) String searchMacros )
+        throws InvalidInputException, SSApiException
+    {
 		LOGGER.info("Fetching the list of Macros for an entity");
 		List<SocialMonitorMacro> socialMonitorMacros = new ArrayList<>();
 		try {
-			socialMonitorMacros = socialFeedService.getMacros(companyId);
+			socialMonitorMacros = socialFeedService.getMacros(companyId, searchMacros);
 		} catch (InvalidInputException ie) {
 			LOGGER.error("Invalid input exception caught while fetching macros", ie);
 			throw new SSApiException("Invalid input exception caught while fetching macros", ie);

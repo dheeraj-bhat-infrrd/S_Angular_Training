@@ -1543,7 +1543,7 @@ public interface OrganizationManagementService
      * @return
      * @throws InvalidInputException 
      */
-    public FilterKeywordsResponse getCompanyKeywordsByCompanyId( long companyId, int startIndex, int limit, String monitorType ) throws InvalidInputException;
+    public FilterKeywordsResponse getCompanyKeywordsByCompanyId( long companyId, int startIndex, int limit, String monitorType, String searchPhrase ) throws InvalidInputException;
     
     /**
      * Method to enable keyword by keyword id

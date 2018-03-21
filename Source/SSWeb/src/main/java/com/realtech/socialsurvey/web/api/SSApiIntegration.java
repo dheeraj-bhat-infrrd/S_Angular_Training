@@ -217,7 +217,7 @@ public interface SSApiIntegration
     Response getLastSuccessfulEtlTimeApi();
     
     @GET("/v1/companies/{companyId}/keywords")
-    public Response getCompanyKeywords(@Path ( "companyId") long companyId, @Query("startIndex") int startIndex, @Query("limit") int limit,  @Query("monitorType") String monitorType);
+    public Response getCompanyKeywords(@Path ( "companyId") long companyId, @Query("startIndex") int startIndex, @Query("limit") int limit,  @Query("monitorType") String monitorType, @Query("searchPhrase") String searchPhrase);
     
     @POST("/v1/companies/{companyId}/keywords")
     public Response addKeywordsToCompany(@Path ( "companyId") long companyId, @Body List<Keyword> keywordsRequest);
@@ -233,7 +233,7 @@ public interface SSApiIntegration
 			@Query("companyId") Long companyId);
     
     @GET("/v1/socialfeedsmacro/company/{companyId}")
-    public Response showMacrosForEntity(@Path("companyId") long companyId);
+    public Response showMacrosForEntity(@Path("companyId") long companyId, @Query("searchMacros") String searchMacros);
     
     @POST("/v1/update/socialfeedsmacro")
     public Response updateMacrosForEntity(@Body SocialMonitorMacro socialMonitorMacro, @Query("companyId") long companyId);
