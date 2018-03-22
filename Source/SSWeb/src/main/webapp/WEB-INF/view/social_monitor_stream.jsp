@@ -43,6 +43,17 @@
 		</div>
 </div>
 
+<div id="duplicate-post-popup" class="hide bulk-action-popup dup-post-popup">
+	<div id="dup-dash" class="hide" ></div>
+	<button type="button" class="close bulk-options-dismiss" id="dismiss-duplicate-post-popup">&times;</button>
+	<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 bulk-action-edit-container" style="top: 20px;">
+		<div class="bulk-action-hdr">Manage Duplicates</div>
+		<div id="dup-post-popup-body">
+			<!-- populated by social monitor duplicate popup -->
+		</div>
+	</div>
+</div>
+			
 <div class="hm-header-main-wrapper hm-hdr-bord-bot soc-mon-hdr">
 	
 	<div class="container">
@@ -312,6 +323,6 @@ $(document).ready(function() {
 	$(document).attr("title", "Social Monitor");
 	getMacrosForStream();
 	getSegmentsByCompanyId();
-	getStreamPosts(0,'none',false);
+	drawDuplicatePopup();
 });
 </script>

@@ -231,7 +231,7 @@
 					</div>					
 				</c:if>
 				<c:if test="${accountMasterId > 1 && accountMasterId <5 && highestrole != 4}">
-					<div class="header-links-item" onclick="showMainContent('./showsocialmonitorstreampage.do')"><spring:message code="label.social.monitor.key" /></div>
+					<div class="header-links-item hide" onclick="showMainContent('./showsocialmonitorstreampage.do')"><spring:message code="label.social.monitor.key" /></div>
 				</c:if>
 				<c:if test="${hiddenSectionDashboard && highestrole != 4 }">
 				<div class="header-links-item" onclick="showMainContent('./showprofilepage.do')"><spring:message code="label.editprofile.key" /></div>
@@ -385,7 +385,7 @@
 					</div>
 				</c:if>
 				<c:if test="${accountMasterId > 1 && accountMasterId <5 && highestrole != 4}">
-					<div class="hdr-link-item">
+					<div class="hdr-link-item hide">
 						<a href="javascript:showMainContent('./showsocialmonitorstreampage.do')" onclick="showOverlay();"><spring:message code="label.social.monitor.key" /></a>
 					</div>
 				</c:if>
