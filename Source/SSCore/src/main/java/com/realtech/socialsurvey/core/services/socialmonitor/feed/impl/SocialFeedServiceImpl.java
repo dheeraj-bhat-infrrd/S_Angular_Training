@@ -280,27 +280,37 @@ public class SocialFeedServiceImpl implements SocialFeedService
         return mongoSocialFeedDao.updateDuplicateCount(hash, companyId);
     }
 
-	@Override
-	public List<SocialMonitorMacro> getMacros(long companyId) throws InvalidInputException {
-		LOG.debug("Fetching all Macros for company with Id {} ", companyId);
-		if (companyId <= 0) {
-			LOG.error("Invalid companyId");
-			throw new InvalidInputException("Invalid companyId");
-		}
-		List<SocialMonitorMacro> macros = new ArrayList<>();
-		OrganizationUnitSettings organizationUnitSettings = mongoSocialFeedDao.FetchMacros(companyId);
-		if (organizationUnitSettings != null && organizationUnitSettings.getSocialMonitorMacros() != null
-				&& !organizationUnitSettings.getSocialMonitorMacros().isEmpty()) {
-			macros = organizationUnitSettings.getSocialMonitorMacros();
-			for (SocialMonitorMacro macro : macros) {
-				macro.setLast7DaysMacroCount(last7DaysCountForMacro(macro.getMacroUsageTime()));
-			}
-		} else {
-			LOG.warn("The List is empty");
-		}
-		return macros;
 
-	}
+    @Override
+    public List<SocialMonitorMacro> getMacros( long companyId, String searchMacros ) throws InvalidInputException
+    {
+        LOG.debug( "Fetching all Macros for company with Id {} ", companyId );
+        if ( companyId <= 0 ) {
+            LOG.error( "Invalid companyId" );
+            throw new InvalidInputException( "Invalid companyId" );
+        }
+        List<SocialMonitorMacro> macros = new ArrayList<>();
+        List<SocialMonitorMacro> macrosToAdd = new ArrayList<>();
+        OrganizationUnitSettings organizationUnitSettings = mongoSocialFeedDao.FetchMacros( companyId );
+        if ( organizationUnitSettings != null && organizationUnitSettings.getSocialMonitorMacros() != null
+            && !organizationUnitSettings.getSocialMonitorMacros().isEmpty() ) {
+            macros = organizationUnitSettings.getSocialMonitorMacros();
+            for ( SocialMonitorMacro macro : macros ) {
+                if ( searchMacros != null && !searchMacros.isEmpty() ) {
+                    if ( macro.getMacroName().toLowerCase().contains( searchMacros.trim().toLowerCase() ) ) {
+                        macrosToAdd.add( macro );
+                    }
+                } else {
+                    macrosToAdd.add( macro );
+                }
+                macro.setLast7DaysMacroCount( last7DaysCountForMacro( macro.getMacroUsageTime() ) );
+            }
+        } else {
+            LOG.warn( "The List is empty" );
+        }
+        return macrosToAdd;
+
+    }
 
 	@Override
 	public void updateMacrosForFeeds(SocialMonitorMacro socialMonitorMacro, long companyId)

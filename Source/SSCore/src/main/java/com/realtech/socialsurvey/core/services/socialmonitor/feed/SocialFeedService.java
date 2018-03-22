@@ -62,7 +62,7 @@ public interface SocialFeedService
      * @return
      * @throws InvalidInputException
      */
-    public List<SocialMonitorMacro> getMacros(long companyId) throws InvalidInputException; 
+    public List<SocialMonitorMacro> getMacros(long companyId, String searchMacros) throws InvalidInputException; 
     
     /**
      * add macros to a company

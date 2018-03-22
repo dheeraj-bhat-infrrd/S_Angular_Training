@@ -19,6 +19,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 
 @Repository
@@ -244,7 +245,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 		Criteria criteria = new Criteria().orOperator(criterias.toArray(new Criteria[criterias.size()]));
 		if(searchText != null)
         {
-		    criteria.andOperator((Criteria.where( TEXT ).regex( searchText )));
+		    criteria.andOperator((Criteria.where( TEXT ).regex( Pattern.compile(searchText.trim() , Pattern.CASE_INSENSITIVE) )));
         }
 		query.addCriteria(criteria);
 		query.with(new Sort(Sort.Direction.DESC, "_id"));
@@ -329,7 +330,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 	    Criteria criteria = new Criteria().orOperator(criterias.toArray(new Criteria[criterias.size()]));
 		if(searchText != null)
         {
-	          criteria.andOperator((Criteria.where( TEXT ).regex( searchText )));
+	          criteria.andOperator((Criteria.where( TEXT ).regex( Pattern.compile(searchText.trim() , Pattern.CASE_INSENSITIVE) )));
         }
 		query.addCriteria(criteria);
 
