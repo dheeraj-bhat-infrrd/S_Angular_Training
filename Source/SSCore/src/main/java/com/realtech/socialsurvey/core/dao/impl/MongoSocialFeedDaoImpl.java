@@ -242,7 +242,12 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
                         .andOperator((Criteria.where(CommonConstants.PROFILE_TYPE).is(ProfileType.AGENT)), Criteria.where(FEED_TYPE).in(feedtype))));
             }
         }
-		Criteria criteria = new Criteria().orOperator(criterias.toArray(new Criteria[criterias.size()]));
+		Criteria criteria = new Criteria();
+		
+		if(!criterias.isEmpty() && criterias!=null) {
+		    criteria.orOperator(criterias.toArray(new Criteria[criterias.size()]));
+		}
+		
 		if(searchText != null)
         {
 		    criteria.andOperator((Criteria.where( TEXT ).regex( Pattern.compile(searchText.trim() , Pattern.CASE_INSENSITIVE) )));
@@ -327,11 +332,23 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 						.andOperator((Criteria.where(CommonConstants.PROFILE_TYPE).is(ProfileType.AGENT)), Criteria.where(FEED_TYPE).in(feedtype))));
 			}
 		}
-	    Criteria criteria = new Criteria().orOperator(criterias.toArray(new Criteria[criterias.size()]));
+		
+		Criteria criteria = new Criteria();
+        
+        if(!criterias.isEmpty() && criterias!=null) {
+            criteria.orOperator(criterias.toArray(new Criteria[criterias.size()]));
+        }
+        
+        if(searchText != null)
+        {
+            criteria.andOperator((Criteria.where( TEXT ).regex( Pattern.compile(searchText.trim() , Pattern.CASE_INSENSITIVE) )));
+        }
+        
+	   /* Criteria criteria = new Criteria().orOperator(criterias.toArray(new Criteria[criterias.size()]));
 		if(searchText != null)
         {
 	          criteria.andOperator((Criteria.where( TEXT ).regex( Pattern.compile(searchText.trim() , Pattern.CASE_INSENSITIVE) )));
-        }
+        }*/
 		query.addCriteria(criteria);
 
 		return mongoTemplate.count(query, SOCIAL_FEED_COLLECTION);

@@ -473,6 +473,10 @@ $(document).on('keyup', function(e) {
 		}
 		
 		checkSocMonDropdowns(null);
+		
+		$('#bulk-options-popup').hide();
+		
+		$('#duplicate-post-popup').addClass('hide');
 	}
 });
 
@@ -16435,7 +16439,7 @@ function addMonitor(){
 	}
 }
 
-function getMonitors(){
+function getMonitors(text){
 	var monitorType = null;
 	if(!$('#keyword-mon-checked').hasClass('hide') && !$('#google-alerts-mon-checked').hasClass('hide')){
 		monitorType=null;
@@ -16450,10 +16454,15 @@ function getMonitors(){
 	var startIndex = 0;
 	var batchSize = 30;
 	
+	if(text == undefined || text == null){
+		text = '';
+	}
+	
 	var payload = {
 			"startIndex" : startIndex,
 			"batchSize" : batchSize,
-			"monitorType" : monitorType
+			"monitorType" : monitorType,
+			"text" : text
 	}
 	
 	$.ajax({
@@ -16619,11 +16628,20 @@ function drawMacroData(macroId,macroData){
 	$('#add-macro-save-active').addClass('hide');
 }
 
-function getMacros(){
+function getMacros(text){
+	
+	if(text == undefined || text == null){
+		text = '';
+	}
+	
+	var payload = {
+		"text" : text
+	}
 	
 	$.ajax({
 		url : "/getmacrosbycompanyid.do",
 		type : "GET",
+		data : payload,
 		cache : false,
 		dataType : "json",
 		success : function(response) {
@@ -18479,9 +18497,6 @@ function getUsersByCompanyId(){
 			var userList = response;
 			drawUserList(userList);
 		},
-		complete: function(){
-			getStreamPosts(0,'none',false);
-		},
 		error : function(e){
 			if (e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
@@ -19217,5 +19232,88 @@ $(document).on('keyup','#search-post', function(e){
 		var text = $('#search-post').val();
 		
 		getStreamPosts(startIndex, status, flag, text);
+	}else if(e.keyCode == 27){
+		
+		$('#search-post').val('');
+		$('#soc-mon-stream-search-clr').hide();
+		
+		var status = $('#stream-tabs').data('status');
+		var flag = $('#stream-tabs').data('flagged');
+		var startIndex = $('#stream-pagination').data('startIndex');
+		
+		getStreamPosts(startIndex, status, flag);
 	}
+});
+
+$(document).on('input','#search-macro',function(){
+	$('#soc-mon-macro-search-clr').show();
+});
+
+$(document).on('click','#soc-mon-macro-search-clr',function(e){
+	e.stopImmediatePropagation();
+	e.preventDefault();
+	
+	$('#search-macro').val('');
+	$(this).hide();
+	
+	getMacros();
+});
+
+$(document).on('click','#soc-mon-macro-search-icn',function(e){
+	
+	var text = $('#search-macro').val();
+	
+	getMacros(text);
+});
+
+$(document).on('keyup','#search-macro', function(e){
+	if(e.keyCode == 13){
+		var text = $('#search-macro').val();
+		
+		getMacros(text);
+		
+	}else if(e.keyCode == 27){
+		
+		$('#search-macro').val('');
+		$('#soc-mon-macro-search-clr').hide();
+		
+		getMacros();
+	}
+});
+
+$(document).on('input','#search-monitors-key',function(){
+	$('#soc-mon-search-clr').show();
+});
+
+$(document).on('click','#soc-mon-search-clr',function(e){
+	e.stopImmediatePropagation();
+	e.preventDefault();
+	
+	$('#search-monitors-key').val('');
+	$(this).hide();
+	
+	getMonitors();
+});
+
+$(document).on('click','#soc-mon-search-icn',function(e){
+	
+	var text = $('#search-monitors-key').val();
+	
+	getMonitors(text);
+});
+
+$(document).on('keyup','#search-monitors-key', function(e){
+	if(e.keyCode == 13){
+		var text = $('#search-monitors-key').val();
+		
+		getMonitors(text);
+		
+	}else if(e.keyCode == 27){
+		
+		$('#search-monitors-key').val('');
+		$('#soc-mon-search-clr').hide();
+		
+		getMonitors();
+	}
+	
 });

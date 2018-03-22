@@ -190,6 +190,8 @@ public class LoginController
         LOG.info( "Login Page started" );
 
         User user = sessionHelper.getCurrentUser();
+        HttpSession session = request.getSession( false );
+        
         boolean hiddenSection = false;
         try {
             OrganizationUnitSettings settings = organizationManagementService
@@ -198,6 +200,15 @@ public class LoginController
                 hiddenSection = settings.isHiddenSection();
                 model.addAttribute( "hiddenSection", hiddenSection );
             }
+            
+            //REALTECH_USER_ID is set only for real tech and SS admin
+            boolean isRealTechOrSSAdmin = false;
+            Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
+            if ( adminUserid != null ) {
+                isRealTechOrSSAdmin = true;
+            }
+            model.addAttribute( "isRealTechOrSSAdmin", isRealTechOrSSAdmin );
+            
         } catch ( InvalidInputException e ) {
             LOG.error( "fetching hiddensction varibale value failed." + e );
         }

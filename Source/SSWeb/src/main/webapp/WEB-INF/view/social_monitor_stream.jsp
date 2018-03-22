@@ -5,16 +5,16 @@
 
 <div id="bulk-options-popup" class="hide bulk-action-popup">
 	<button type="button" class="close bulk-options-dismiss" id="dismiss-bulk-options">&times;</button>
-		<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 bulk-action-edit-container">
-			<div class="bulk-action-hdr">Bulk Actions</div>
-			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-				<div id="bulk-send-mail-post" class="col-lg-3 col-md-3 col-sm-3 col-xs-3 stream-post-mail-note stream-post-mail-note-active">Send Email</div>
-				<div id="bulk-private-note-post" class="col-lg-3 col-md-3 col-sm-3 col-xs-3 stream-post-mail-note">Private Note</div>
-			</div>
-			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-				<textarea class="form-control stream-post-textbox" rows="3" id="bulk-edit-txt-box" placeholder="Send an email message to offending user or take a private note"></textarea>
-			</div>
-			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 stream-actions-btn-container">
+	<div id="stream-bulk-actions-popup-body" class="col-lg-6 col-md-6 col-sm-6 col-xs-6 bulk-action-edit-container">
+		<div class="bulk-action-hdr">Bulk Actions</div>
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div id="bulk-send-mail-post" class="col-lg-3 col-md-3 col-sm-3 col-xs-3 stream-post-mail-note stream-post-mail-note-active">Send Email</div>
+			<div id="bulk-private-note-post" class="col-lg-3 col-md-3 col-sm-3 col-xs-3 stream-post-mail-note">Private Note</div>
+		</div>
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<textarea class="form-control stream-post-textbox" rows="3" id="bulk-edit-txt-box" placeholder="Send an email message to offending user or take a private note"></textarea>
+		</div>
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 stream-actions-btn-container">
 			<div id="bulk-macro-dropdown" class="col-lg-5 col-md-5 col-sm-5 col-xs-5 macro-dropdown">
 				<img src="${initParam.resourcesPath}/resources/images/flash.png" class="macro-dropdown-icn">
 				 Apply Macro 
@@ -28,7 +28,7 @@
 				Flag
 			</div>
 			<div id="bulk-edit-esc" class="col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn stream-action-esc bulk-act-btn">
-				Escalate
+			Escalate
 			</div>
 			<div id="bulk-edit-res" class="col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn stream-action-res bulk-act-btn">
 				Resolve
@@ -39,17 +39,17 @@
 			<div id="bulk-macro-options" class="hide float-left macro-options">
 					
 			</div>
-			</div>		
-		</div>
+		</div>		
+	</div>
 </div>
 
 <div id="duplicate-post-popup" class="hide bulk-action-popup dup-post-popup">
 	<div id="dup-dash" class="hide" ></div>
 	<button type="button" class="close bulk-options-dismiss" id="dismiss-duplicate-post-popup">&times;</button>
-	<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 bulk-action-edit-container" style="top: 20px;">
+	<div id="dup-post-popup-body-container" class="col-lg-6 col-md-6 col-sm-6 col-xs-6 bulk-action-edit-container" style="top: 20px;">
 		<div class="bulk-action-hdr">Manage Duplicates</div>
 		<div id="dup-post-popup-body">
-			<!-- populated by social monitor duplicate popup -->
+			<%@ include file="social_monitor_duplicate_popup.jsp" %>
 		</div>
 	</div>
 </div>
@@ -163,158 +163,11 @@
 			</div>
 		</div>
 	</div>
-	<div  id="empty-stream" class="dash-container container">
+	<div  id="empty-stream" class="hide dash-container container">
 		<span class="incomplete-trans-span stream-alert">No posts found for the stream</span>
 	</div>
 	<div  id="stream-posts" class="dash-container container">
-		<div class="dash-stats-wrapper bord-bot-dc clearfix stream-container"  >
-				<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 soc-mon-post-container bottom-padding-stream">
-					<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
-						<img id="stream-unchecked-1" src="${initParam.resourcesPath}/resources/images/check-no.png" class="float-left stream-checkbox soc-mon-post-checkbox">
-						<img id="stream-checked-1" src="${initParam.resourcesPath}/resources/images/check-yes.png" class="hide float-left stream-checkbox soc-mon-post-checkbox">
-						<img id="stream-unflagged-icn-1" src="${initParam.resourcesPath}/resources/images/flag-gray.png" class="hide float-left soc-mon-post-icn">
-						<img id="stream-flagged-icn-1" src="${initParam.resourcesPath}/resources/images/flag-yellow.png" class="hide float-left soc-mon-post-icn">
-						<img id="stream-esc-icn-1" src="${initParam.resourcesPath}/resources/images/escalated-orange.png" class="hide float-left soc-mon-post-icn">
-						<img id="stream-res-icn" src="${initParam.resourcesPath}/resources/images/verified-green.png" class="float-left soc-mon-post-icn">
-					</div>
-					<div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 soc-mon-post-details">
-						<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 float-left soc-mon-post-prof-pic-div">
-							<img id="stream-res-icn" src="https://s3-us-west-1.amazonaws.com/agent-survey/dev/userprofilepics/d-f02172c39500454b75eee46f93c5cdc08cc2b2c396cd24325e9fc6436b8bd0e3b5eb57d493124683566073755b907e0e665734b42b3b03ae47073bcb61f5b3a1.jpg" class="float-left soc-mon-prof-pic">
-							<img id="stream-res-icn" src="${initParam.resourcesPath}/resources/images/ss-icon-small-facebook.png" class=" float-left soc-mon-prof-pic-media">
-						</div>
-						<div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 float-left" >
-							<div class="row soc-mon-user-name">
-								Loren Bronczyk
-							</div>
-							<div class="row soc-mon-post-media">
-								Facebook Business Page
-							</div>
-							<div class="row soc-mon-post-date">
-								November 23 at 9:01am
-							</div>
-						</div>
-						<div class="col-lg-3 col-md-2 col-sm-2 col-xs-2 float-left soc-mon-post-dup">
-							<img id="stream-unflagged-icn" src="${initParam.resourcesPath}/resources/images/duplicates.png" class="float-left soc-mon-post-dup-icn">
-							<div class="soc-mon-post-dup-num float-left">Manage 15 duplicates</div>
-						</div>
-					</div>
-					<div id="stream-post-text-1" class="col-lg-10 col-md-10 col-sm-10 col-xs-10 stream-post-text float-right">
-						The best vacations are true departures from everyday life. To accomplish that feeling, however, you need to leave your cares behind. Here are some tips to help you do that whenever you leave your home unoccupied for  several days. #ThursdayThought 
-					</div>
-					<div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 float-right stream-post-pic-div" >
-						<img id="stream-post-pic-1" src="${initParam.resourcesPath}/resources/images/soc-mon-img-1.png" class="float-left stream-post-pic">
-					</div>
-				</div>
-				<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 bottom-padding-stream">
-					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-						<div id="send-mail-post-1" class="col-lg-3 col-md-3 col-sm-3 col-xs-3 stream-post-mail-note stream-post-mail-note-active">Send Email</div>
-						<div id="private-note-post-1" class="col-lg-3 col-md-3 col-sm-3 col-xs-3 stream-post-mail-note">Private Note</div>
-					</div>
-					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-						<textarea class="form-control stream-post-textbox" rows="3" id="post-1-textbox" placeholder="Send an email message to offending user or take a private note"></textarea>
-					</div>
-					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 stream-actions-btn-container">
-						<div id="stream-macro-small-1" class="hide col-lg-5 col-md-5 col-sm-5 col-xs-5 macro-dropdown">
-							<img src="${initParam.resourcesPath}/resources/images/flash.png" class="macro-dropdown-icn">
-						 	 Apply Macro 
-							<img id="mac-chevron-down-small-1" src="${initParam.resourcesPath}/resources/images/chevron-down.png" class="macro-dropdown-chevron">
-							<img id="mac-chevron-up-small-1" src="${initParam.resourcesPath}/resources/images/chevron-up.png" class="hide macro-dropdown-chevron">
-						</div>
-						<div id="stream-macro-1" class="col-lg-6 col-md-6 col-sm-6 col-xs-6 macro-dropdown">
-							<img src="${initParam.resourcesPath}/resources/images/flash.png" class="macro-dropdown-icn">
-							 Apply Macro 
-							<img id="mac-chevron-down-1" src="${initParam.resourcesPath}/resources/images/chevron-down.png" class="macro-dropdown-chevron">
-							<img id="mac-chevron-up-1" src="${initParam.resourcesPath}/resources/images/chevron-up.png" class="hide macro-dropdown-chevron">
-						</div>
-						<div class="hide col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn stream-action-unflag">
-							Unflag
-						</div>
-						<div class="hide col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn stream-action-flag">
-							Flag
-						</div>
-						<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn stream-action-esc">
-							Escalate
-						</div>
-						<div class="hide col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn stream-action-res">
-							Resolve
-						</div>
-						<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn stream-action-submit">
-							Submit
-						</div>
-						<div id="macro-options-1" class="hide float-left macro-options">
-								<div id="macro-1" class="macro-opt">Post has questionable language - Flag</div>
-								<div id="macro-2" class="macro-opt">Request post must be Removed - Escalate</div>
-								<div id="macro-3" class="macro-opt">Confirm post Removed - Resolve</div>
-						</div>
-					</div>
-					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-						<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 float-left stream-action-container">
-							<div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 float-left stream-action-icn">
-								<img id="" src="${initParam.resourcesPath}/resources/images/verified-green.png" class="float-left">
-							</div>
-							<div class="col-lg-11 col-md-11 col-sm-11 col-xs-11 float-left">
-								<div class="row stream-action-date">
-									Dec 7, 2017 7:59AM
-								</div>
-								<div class="row stream-action-text">
-									Post was <span class="stream-action-text-imp">Resolved</span> by <span class="stream-action-text-imp">New American Funding Admin</span>
-								</div>
-							</div>	
-						</div>
-						<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 float-left stream-action-container">
-							<div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 float-left stream-action-icn">
-							</div>
-							<div class="col-lg-11 col-md-11 col-sm-11 col-xs-11 float-left">
-								<div class="row stream-action-date">
-									Dec 9, 2017 7:59AM - New American Funding Admin
-								</div>
-								<div class="row stream-action-text">
-									I have verified that the post was removed
-								</div>
-							</div>	
-						</div>	
-						<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 float-left stream-action-container stream-action-mail">
-							<div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 float-left stream-action-icn">
-								<img id="" src="${initParam.resourcesPath}/resources/images/email-18px.png" class="float-left">
-							</div>
-							<div class="col-lg-11 col-md-11 col-sm-11 col-xs-11 float-left">
-								<div class="row stream-action-date">
-									Dec 7, 2017 7:59AM - New American Funding Admin
-								</div>
-								<div class="row stream-action-text">
-									This post must be taken down immediatly. Please reply to confirm once it has been removed.
-								</div>
-							</div>	
-						</div>
-						<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 float-left stream-action-container">
-							<div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 float-left stream-action-icn">
-								<img id="" src="${initParam.resourcesPath}/resources/images/escalated-gray.png" class="float-left">
-							</div>
-							<div class="col-lg-11 col-md-11 col-sm-11 col-xs-11 float-left">
-								<div class="row stream-action-date">
-									Dec 7, 2017 7:59AM
-								</div>
-								<div class="row stream-action-text">
-									Post was <span class="stream-action-text-imp">Escalated</span>
-								</div>
-							</div>	
-						</div>	
-						<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 float-left stream-action-container">
-							<div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 float-left stream-action-icn">
-								<img id="" src="${initParam.resourcesPath}/resources/images/flag-gray.png" class="float-left">
-							</div>
-							<div class="col-lg-11 col-md-11 col-sm-11 col-xs-11 float-left">
-								<div class="row stream-action-date">
-									Dec 7, 2017 7:59AM
-								</div>
-								<div class="row stream-action-text">
-									Post was <span class="stream-action-text-imp">Flagged</span> for matching <span class="stream-action-text-imp">best</span>
-								</div>
-							</div>	
-						</div>		
-					</div>
-				</div>
-			</div>
+		
 	</div>
 </div>
 <script>
@@ -322,7 +175,7 @@
 $(document).ready(function() {
 	$(document).attr("title", "Social Monitor");
 	getMacrosForStream();
-	getSegmentsByCompanyId();
-	drawDuplicatePopup();
+	getStreamPosts(0,'none',false);
+	getSegmentsByCompanyId();	
 });
 </script>
