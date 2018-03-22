@@ -66,7 +66,7 @@ public class LinkedinFeedExtractorBolt extends BaseComputeBolt
 
                 SocialResponseObject<LinkedinFeedData> responseWrapper = getSocialResponseObject( mediaToken,
                     linkedinFeedData );
-
+                responseWrapper.setPageLink( mediaToken.getSocialMediaTokens().getLinkedInToken().getLinkedInPageLink() );
                 String responseWrapperString = new Gson().toJson( responseWrapper );
 
                 _collector.emit( new Values( companyId.toString(), responseWrapperString, lastFetchedKey ) );

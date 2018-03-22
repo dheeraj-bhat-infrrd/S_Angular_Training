@@ -33,4 +33,7 @@ public interface BranchDao extends GenericDao<Branch, Long> {
 
     public List<Long> getBranchIdsOfCompany( long companyId ) throws InvalidInputException;
 
+
+    public Map<Long, Long> getCompanyIdsForBranchIds( List<Long> branchIds );
+
 }

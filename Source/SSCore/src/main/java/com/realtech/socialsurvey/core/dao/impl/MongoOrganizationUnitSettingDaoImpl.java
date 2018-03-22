@@ -1154,15 +1154,30 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     }
     
     @Override
-    public List<FeedIngestionEntityForSM> getAllCompanyIdWithSocialMediaTokens( String collectionName, int skipCount, int numOfRecords )
+    public List<FeedIngestionEntityForSM> getAllCompanyIdWithSocialMediaTokens( String collectionName, int skipCount, int batchSize )
     {
-        LOG.debug( "Fetching social media tokens from " + collectionName );
+        LOG.debug( "Fetching social media tokens from {}", collectionName );
         Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_SOCIAL_MEDIA_TOKENS ).exists( true )  );
         query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).include( KEY_IDENTIFIER ).include( PROFILE_IMAGE_URL ).exclude( "_id" );
         
-        List<FeedIngestionEntityForSM> settings = mongoTemplate.find( query, FeedIngestionEntityForSM.class, collectionName );
-
-        return settings;
+        if ( skipCount > 0 ) {
+            query.skip( skipCount );
+        }
+        if ( batchSize > 0 ) {
+            query.limit( batchSize );
+        }
+        return mongoTemplate.find( query, FeedIngestionEntityForSM.class, collectionName );
+    }
+    
+    @Override
+    public long getSocialMediaTokensCount( String collectionName)
+    {
+        LOG.debug( "Fetching social media tokens record count {}", collectionName );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_SOCIAL_MEDIA_TOKENS ).exists( true )  );
+        query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).include( KEY_IDENTIFIER ).include( PROFILE_IMAGE_URL ).exclude( "_id" );
+        return mongoTemplate.count( query, collectionName );
     }
     
     

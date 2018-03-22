@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 
 /**
@@ -27,6 +28,9 @@ import java.util.*;
  */
 public class FilterSocialPostBolt extends BaseComputeBoltWithAck
 {
+    private static final String HIGHLIGHT_END = "</mark>";
+    private static final String HIGHLIGHT_START = "<mark>";
+    private static final String IGNORE_CASE_REGEX_PREFIX = "(?i)";
     private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger( FilterSocialPostBolt.class );
 
@@ -59,12 +63,28 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
                     post.setFoundKeywords( foundKeyWords );
                     post.setFlagged( Boolean.TRUE );
                     post.getActionHistory().add( getFlaggedActionHistory( foundKeyWords ) );
+                    addTextHighlight(post);
                 }
             }
         }
         LOG.debug( "Emitting tuple with post having postId = {}",  postId);
         _collector.emit( input, Arrays.asList( companyId, post, socialResponseType ) );
 
+    }
+
+    /**
+     * Method to add text highlighting
+     * @param post
+     */
+    private void addTextHighlight( SocialResponseObject<?> post )
+    {
+        LOG.debug( "Adding text highlighting for found keywords for post id {}",  post.getPostId());
+        String textHighlighted = post.getText();
+        for ( String keyword : post.getFoundKeywords() ) {
+            textHighlighted = Pattern.compile( IGNORE_CASE_REGEX_PREFIX + keyword ).matcher(textHighlighted).replaceAll( HIGHLIGHT_START+keyword+HIGHLIGHT_END );
+        }
+        post.setTextHighlighted(textHighlighted);
+        LOG.debug( "Success fully added text highlighting for found keywords {}", post.getPostId() );
     }
 
     @Override
@@ -126,7 +146,9 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
         companyTrie.put( companyIden, new TrieNode() );
         if ( keywordListResponse != null && !keywordListResponse.isEmpty() ) {
             for ( Keyword keyword : keywordListResponse ) {
-                addPhrase( companyTrie.get( companyIden ), keyword.getPhrase(), keyword.getId() );
+                if(keyword.getPhrase() != null){
+                    addPhrase( companyTrie.get( companyIden ), keyword.getPhrase().toLowerCase(), keyword.getId() );
+                }
             }
         }
         if ( keywordModifiedOn != 0L ) {
@@ -185,19 +207,19 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
         LOG.debug( "Inside findPhrase method." );
         TrieNode node = root;
 
-        List<String> foundPhrases = new ArrayList<>();
-
         if ( StringUtils.isEmpty( textBody ) ) {
-            return foundPhrases;
+            return Collections.emptyList();
         }
-
+        
         String[] words = textBody.split( WORD_SEPARATOR );
-
+        List<String> foundPhrases = new ArrayList<>();
         StringBuilder phraseBuffer = new StringBuilder();
+
         for ( int i = 0; i < words.length; ) {
-            if ( node.getChildren() != null && node.getChildren().containsKey( words[i] ) ) {
+            String word = words[i].toLowerCase();
+            if ( node.getChildren() != null && node.getChildren().containsKey( word ) ) {
                 // move trie pointer forward
-                node = node.getChildren().get( words[i] );
+                node = node.getChildren().get( word );
                 phraseBuffer.append( words[i] + SPACE_SEPARATOR );
                 if ( node.getPhraseId() != null ) {
                     String phrase = phraseBuffer.toString().trim();

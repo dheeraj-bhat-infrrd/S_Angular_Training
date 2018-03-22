@@ -86,6 +86,7 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt
                 for ( FacebookFeedData facebookFeedData : feeds ) {
                     SocialResponseObject<FacebookFeedData> responseWrapper = createSocialResponseObject( mediaToken,
                         facebookFeedData );
+                    responseWrapper.setPageLink( mediaToken.getSocialMediaTokens().getFacebookToken().getFacebookPageLink() );
                     String responseWrapperString = new Gson().toJson( responseWrapper );
 
                     _collector.emit( new Values( Long.toString( companyId ), responseWrapperString, lastFetchedKey ) );

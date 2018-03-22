@@ -36,6 +36,8 @@ public class SocialResponseObject<T> implements Serializable
     private String id;
     private String postId;
     private String text;
+    private String textHighlighted;
+    private String pageLink;
     private List<String> pictures;
     private long updatedTime;
     private long createdTime;
@@ -324,35 +326,38 @@ public class SocialResponseObject<T> implements Serializable
     {
         this.ownerProfileImage = ownerProfileImage;
     }
-
-
-    @Override
-    public String toString() {
-        return "SocialResponseObject{" +
-                "id='" + id + '\'' +
-                ", postId='" + postId + '\'' +
-                ", text='" + text + '\'' +
-                ", pictures=" + pictures +
-                ", updatedTime=" + updatedTime +
-                ", createdTime=" + createdTime +
-                ", ownerName='" + ownerName + '\'' +
-                ", ownerEmail='" + ownerEmail + '\'' +
-                ", ownerProfileImage='" + ownerProfileImage + '\'' +
-                ", response=" + response +
-                ", type=" + type +
-                ", flagged=" + flagged +
-                ", status=" + status +
-                ", companyId=" + companyId +
-                ", regionId=" + regionId +
-                ", branchId=" + branchId +
-                ", agentId=" + agentId +
-                ", profileType=" + profileType +
-                ", hash=" + hash +
-                ", duplicateCount=" + duplicateCount +
-                ", foundKeywords=" + foundKeywords +
-                ", actionHistory=" + actionHistory +
-                ", isRetried=" + isRetried +
-                '}';
+    
+    public String getTextHighlighted()
+    {
+        return textHighlighted;
     }
 
+
+    public void setTextHighlighted( String textHighlighted )
+    {
+        this.textHighlighted = textHighlighted;
+    }
+    
+    public String getPageLink()
+    {
+        return pageLink;
+    }
+
+
+    public void setPageLink( String pageLink )
+    {
+        this.pageLink = pageLink;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "SocialResponseObject [id=" + id + ", postId=" + postId + ", text=" + text + ", textHighlighted="
+            + textHighlighted + ", pageLink=" + pageLink + ", pictures=" + pictures + ", updatedTime=" + updatedTime
+            + ", createdTime=" + createdTime + ", ownerName=" + ownerName + ", ownerEmail=" + ownerEmail
+            + ", ownerProfileImage=" + ownerProfileImage + ", response=" + response + ", type=" + type + ", flagged=" + flagged
+            + ", status=" + status + ", companyId=" + companyId + ", regionId=" + regionId + ", branchId=" + branchId
+            + ", agentId=" + agentId + ", profileType=" + profileType + ", hash=" + hash + ", duplicateCount=" + duplicateCount
+            + ", foundKeywords=" + foundKeywords + ", actionHistory=" + actionHistory + ", isRetried=" + isRetried + "]";
+    }
 }
