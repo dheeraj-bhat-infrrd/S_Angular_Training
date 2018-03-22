@@ -1845,6 +1845,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
             recentActivityList.add( fileUpload.getStatus() );
             recentActivityList.add( fileUpload.getFileName() );
             recentActivityList.add( fileUpload.getFileUploadId() );
+            recentActivityList.add( fileUpload.getUploadType() );
             recentActivity.add( recentActivityList );
         }
         return recentActivity;
@@ -5191,18 +5192,11 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 			Map<String, Object> queryMap = new HashMap<String, Object>();
 			queryMap.put("month", agentEmailCountsMonth.get(0).getMonth());
 			queryMap.put("year", agentEmailCountsMonth.get(0).getYear());
-			List<SurveyInvitationEmailCountMonth> emailCountOlddata = surveyInvitationEmailDao
-					.findByKeyValue(SurveyInvitationEmailCountMonth.class, queryMap);
-			if (emailCountOlddata != null && !emailCountOlddata.isEmpty() && emailCountOlddata.size() > 0) {
-				LOG.info("Deleting {} entries for email count data for time period : {}-{}", emailCountOlddata.size(),
-						emailCountOlddata.get(0).getMonth(), emailCountOlddata.get(0).getYear());
-				surveyInvitationEmailDao.deleteAll(emailCountOlddata);
-			} else {
-				LOG.info("No old record found for time frame {}-{}", agentEmailCountsMonth.get(0).getMonth(),
-						agentEmailCountsMonth.get(0).getYear());
-			}
+			surveyInvitationEmailDao.deleteOldDataForMonth(agentEmailCountsMonth.get(0).getMonth(),
+					agentEmailCountsMonth.get(0).getYear());
 			surveyInvitationEmailDao.saveAll(agentEmailCountsMonth);
-			LOG.info("Survey invitaion email count data saved to db.");
+			LOG.info("Survey invitaion email count data saved to db for {}-{}",agentEmailCountsMonth.get(0).getMonth(),
+					agentEmailCountsMonth.get(0).getYear());
 			return true;
 		} catch (Exception e) {
 			LOG.error("Exception occured while saving survey invitation email count to db.");
@@ -5268,6 +5262,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 			reportObj.setOpened(new Long(obj[9].toString()));
 			reportObj.setLinkClicked(new Long(obj[10].toString()));
 			reportObj.setDropped(new Long(obj[11].toString()));
+			reportObj.setMonth(new Integer(obj[12].toString()));
+			reportObj.setYear(new Integer(obj[13].toString()));
 			mailCountReport.add(reportObj);
 		}
 		return mailCountReport;
@@ -5311,6 +5307,8 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 				reportObj.setOpened(new Long(obj[9].toString()));
 				reportObj.setLinkClicked(new Long(obj[10].toString()));
 				reportObj.setDropped(new Long(obj[11].toString()));
+				reportObj.setMonth(new Integer(obj[12].toString()));
+				reportObj.setYear(new Integer(obj[13].toString()));
 				monthData.add(reportObj);
 			}
 

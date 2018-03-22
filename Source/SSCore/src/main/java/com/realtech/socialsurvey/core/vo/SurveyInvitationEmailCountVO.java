@@ -21,6 +21,8 @@ public class SurveyInvitationEmailCountVO {
 	private long opened;
 	private long linkClicked;
 	private long dropped;
+	private int month;
+	private int year;
 	
 	
 	public String getAgentName() {
@@ -95,12 +97,24 @@ public class SurveyInvitationEmailCountVO {
 	public void setDropped(long dropped) {
 		this.dropped = dropped;
 	}
+	public int getMonth() {
+		return month;
+	}
+	public void setMonth(int month) {
+		this.month = month;
+	}
+	public int getYear() {
+		return year;
+	}
+	public void setYear(int year) {
+		this.year = year;
+	}
 	@Override
 	public String toString() {
 		return "SurveyInvitationEmailCountVO [agentName=" + agentName + ", emailId=" + emailId + ", branchName="
 				+ branchName + ", regionName=" + regionName + ", received=" + received + ", attempted=" + attempted
 				+ ", delivered=" + delivered + ", bounced=" + bounced + ", differed=" + differed + ", opened=" + opened
-				+ ", linkClicked=" + linkClicked + ", dropped=" + dropped + "]";
+				+ ", linkClicked=" + linkClicked + ", dropped=" + dropped + ", month=" + month + ", year=" + year + "]";
 	}
 	
 
