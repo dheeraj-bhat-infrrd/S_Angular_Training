@@ -158,16 +158,13 @@
     </attributes>
   </connection>
   <order>
-  <hop> <from>survey transaction report</from><to>Sort rows</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort rows</from><to>Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Join</from><to>Modified Java Script Value</to><enabled>Y</enabled> </hop>
   <hop> <from>Modified Java Script Value</from><to>Generate random value</to><enabled>Y</enabled> </hop>
-  <hop> <from>FilterSocialSurvey</from><to>Sort rows SocialSurvey</to><enabled>Y</enabled> </hop>
   <hop> <from>Group SocialSurvey</from><to>Sort rowsSocialSurvey</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort rows SocialSurvey</from><to>Group SocialSurvey</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rowsSocialSurvey</from><to>Merge Join</to><enabled>Y</enabled> </hop>
-  <hop> <from>Survey Details</from><to>FilterSocialSurvey</to><enabled>Y</enabled> </hop>
   <hop> <from>Generate random value</from><to>Filter rows</to><enabled>Y</enabled> </hop>
+  <hop> <from>survey transaction report</from><to>Merge Join</to><enabled>Y</enabled> </hop>
+  <hop> <from>Survey Details</from><to>Group SocialSurvey</to><enabled>Y</enabled> </hop>
   <hop> <from>Filter rows</from><to>survey_transaction_report-ss</to><enabled>Y</enabled> </hop>
   </order>
   <step>
@@ -181,7 +178,7 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-<send_true_to/>
+<send_true_to>survey_transaction_report-ss</send_true_to>
 <send_false_to/>
     <compare>
 <condition>
@@ -207,54 +204,6 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>581</xloc>
       <yloc>207</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>FilterSocialSurvey</name>
-    <type>FilterRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<send_true_to>Sort rows SocialSurvey</send_true_to>
-<send_false_to/>
-    <compare>
-<condition>
- <negated>Y</negated>
- <conditions>
-  <condition>
-   <negated>N</negated>
-   <leftvalue>SOURCE</leftvalue>
-   <function>LIKE</function>
-   <rightvalue/>
-   <value><name>constant</name><type>String</type><text>Zillow</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>   </condition>
-  <condition>
-   <negated>N</negated>
-   <operator>OR</operator>
-   <leftvalue>SOURCE</leftvalue>
-   <function>LIKE</function>
-   <rightvalue/>
-   <value><name>constant</name><type>String</type><text>3rd Party Review</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
-  <condition>
-   <negated>N</negated>
-   <operator>OR</operator>
-   <leftvalue>SOURCE</leftvalue>
-   <function>LIKE</function>
-   <rightvalue/>
-   <value><name>constant</name><type>String</type><text>zillow</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
-  </conditions>
- </condition>
-    </compare>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>263</xloc>
-      <yloc>49</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -342,7 +291,7 @@
            <schema_name/>
            </partitioning>
 <join_type>FULL OUTER</join_type>
-<step1>Sort rows</step1>
+<step1>survey transaction report</step1>
 <step2>Sort rowsSocialSurvey</step2>
     <keys_1>
       <key>user_id</key>
@@ -411,98 +360,6 @@
     </step>
 
   <step>
-    <name>Sort rows</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>user_id</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>month</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>year</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1205</xloc>
-      <yloc>49</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Sort rows SocialSurvey</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>AGENT_ID</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>MONTH_Data</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>Year_Data</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>455</xloc>
-      <yloc>49</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
     <name>Sort rowsSocialSurvey</name>
     <type>SortRows</type>
     <description/>
@@ -560,7 +417,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, AGENT_NAME&#xd;&#xa;, BRANCH_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, REGION_ID&#xd;&#xa;, SURVEY_PRE_INTITIATION_ID&#xd;&#xa;, CUSTOMER_EMAIL&#xd;&#xa;, CUSTOMER_FIRST_NAME&#xd;&#xa;, CUSTOMER_LAST_NAME&#xd;&#xa;, CREATED_ON&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;, SOURCE&#xd;&#xa;, SOURCE_ID&#xd;&#xa;, STAGE&#xd;&#xa;, STATE&#xd;&#xa;, MOOD&#xd;&#xa;, SURVEY_CLICKED&#xd;&#xa;, SURVEY_COMPLETED_DATE&#xd;&#xa;, SURVEY_TRANSACTION_DATE&#xd;&#xa;, SURVEY_UPDATED_DATE&#xd;&#xa;, AGREED_TO_SHARE&#xd;&#xa;, CITY&#xd;&#xa;, COMPLETE_PROFILE_URL&#xd;&#xa;, EDITABLE&#xd;&#xa;, IS_ABUSE_REP_BY_USER&#xd;&#xa;, IS_ABUSIVE&#xd;&#xa;, LAST_REMINDER_FOR_SOCIAL_POST&#xd;&#xa;, REMINDER_COUNT&#xd;&#xa;, REMINDERS_FOR_SOCIAL_POSTS&#xd;&#xa;, RETAKE_SURVEY&#xd;&#xa;, REVIEW&#xd;&#xa;, SCORE&#xd;&#xa;, date_format&#x28;SURVEY_COMPLETED_DATE_EST,&#x27;&#x25;Y_&#x25;m&#x27;&#x29; AS TRX_MONTH&#xd;&#xa;, date_format&#x28;SURVEY_COMPLETED_DATE_EST,&#x27;&#x25;c&#x27;&#x29; AS MONTH_Data&#xd;&#xa;, date_format&#x28;SURVEY_COMPLETED_DATE_EST,&#x27;&#x25;Y&#x27;&#x29; AS Year_Data&#xd;&#xa;FROM survey_details order by SURVEY_PRE_INTITIATION_ID&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, AGENT_NAME&#xd;&#xa;, BRANCH_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, REGION_ID&#xd;&#xa;, SURVEY_PRE_INTITIATION_ID&#xd;&#xa;, CUSTOMER_EMAIL&#xd;&#xa;, CUSTOMER_FIRST_NAME&#xd;&#xa;, CUSTOMER_LAST_NAME&#xd;&#xa;, CREATED_ON&#xd;&#xa;, MODIFIED_ON&#xd;&#xa;, SOURCE&#xd;&#xa;, SOURCE_ID&#xd;&#xa;, STAGE&#xd;&#xa;, STATE&#xd;&#xa;, MOOD&#xd;&#xa;, SURVEY_CLICKED&#xd;&#xa;, SURVEY_COMPLETED_DATE&#xd;&#xa;, SURVEY_TRANSACTION_DATE&#xd;&#xa;, SURVEY_UPDATED_DATE&#xd;&#xa;, AGREED_TO_SHARE&#xd;&#xa;, CITY&#xd;&#xa;, COMPLETE_PROFILE_URL&#xd;&#xa;, EDITABLE&#xd;&#xa;, IS_ABUSE_REP_BY_USER&#xd;&#xa;, IS_ABUSIVE&#xd;&#xa;, LAST_REMINDER_FOR_SOCIAL_POST&#xd;&#xa;, REMINDER_COUNT&#xd;&#xa;, REMINDERS_FOR_SOCIAL_POSTS&#xd;&#xa;, RETAKE_SURVEY&#xd;&#xa;, REVIEW&#xd;&#xa;, SCORE&#xd;&#xa;, month&#x28;SURVEY_COMPLETED_DATE_EST&#x29; AS MONTH_Data&#xd;&#xa;, year&#x28;SURVEY_COMPLETED_DATE_EST&#x29; AS Year_Data&#xd;&#xa;FROM survey_details &#xa;WHERE SOURCE not in &#x28;&#x27;Zillow&#x27;,&#x27;3rd Party review&#x27;&#x29;&#xa;order by AGENT_ID,MONTH_Data,Year_Data&#x3b;&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -568,7 +425,7 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>86</xloc>
+      <xloc>380</xloc>
       <yloc>49</yloc>
       <draw>Y</draw>
       </GUI>
@@ -586,7 +443,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  month&#xd;&#xa;, year&#xd;&#xa;, user_name&#xd;&#xa;, user_id&#xd;&#xa;, nmls&#xd;&#xa;, license_id&#xd;&#xa;, company_name&#xd;&#xa;, company_id&#xd;&#xa;, region_name&#xd;&#xa;, branch_name&#xd;&#xa;, total_reviews&#xd;&#xa;, total_zillow_reviews&#xd;&#xa;, total_3rd_party_reviews&#xd;&#xa;, total_verified_customer_reviews&#xd;&#xa;, total_unverified_customer_reviews&#xd;&#xa;, total_social_survey_reviews&#xd;&#xa;, total_abusive_reviews&#xd;&#xa;, total_retake_reviews&#xd;&#xa;, total_retake_completed&#xd;&#xa;, transaction_received_by_source&#xd;&#xa;, transaction_sent&#xd;&#xa;, transaction_unprocessable&#xd;&#xa;, transaction_clicked&#xd;&#xa;, transaction_completed_&#xd;&#xa;, transaction_partially_completed&#xd;&#xa;, transaction_unopened&#xd;&#xa;, transaction_duplicates&#xd;&#xa;, transaction_mismatched&#xd;&#xa;, transaction_unassigned&#xd;&#xa;FROM survey_transaction_report</sql>
+    <sql>SELECT&#xd;&#xa;  month&#xd;&#xa;, year&#xd;&#xa;, user_name&#xd;&#xa;, user_id&#xd;&#xa;, nmls&#xd;&#xa;, license_id&#xd;&#xa;, company_name&#xd;&#xa;, company_id&#xd;&#xa;, region_name&#xd;&#xa;, branch_name&#xd;&#xa;, total_reviews&#xd;&#xa;, total_zillow_reviews&#xd;&#xa;, total_3rd_party_reviews&#xd;&#xa;, total_verified_customer_reviews&#xd;&#xa;, total_unverified_customer_reviews&#xd;&#xa;, total_social_survey_reviews&#xd;&#xa;, total_abusive_reviews&#xd;&#xa;, total_retake_reviews&#xd;&#xa;, total_retake_completed&#xd;&#xa;, transaction_received_by_source&#xd;&#xa;, transaction_sent&#xd;&#xa;, transaction_unprocessable&#xd;&#xa;, transaction_clicked&#xd;&#xa;, transaction_completed_&#xd;&#xa;, transaction_partially_completed&#xd;&#xa;, transaction_unopened&#xd;&#xa;, transaction_duplicates&#xd;&#xa;, transaction_mismatched&#xd;&#xa;, transaction_unassigned&#xd;&#xa;FROM survey_transaction_report&#xa;order by user_id,month,year&#x3b;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -594,7 +451,7 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1365</xloc>
+      <xloc>1199</xloc>
       <yloc>49</yloc>
       <draw>Y</draw>
       </GUI>

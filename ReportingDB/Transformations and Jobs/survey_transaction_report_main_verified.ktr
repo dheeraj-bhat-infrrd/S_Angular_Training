@@ -69,7 +69,7 @@
   <created_date>2017&#x2f;10&#x2f;22 09&#x3a;45&#x3a;25.526</created_date>
   <modified_user>-</modified_user>
   <modified_date>2017&#x2f;10&#x2f;22 09&#x3a;45&#x3a;25.526</modified_date>
-    <key_for_session_key/>
+    <key_for_session_key>H4sIAAAAAAAAAAMAAAAAAAAAAAA&#x3d;</key_for_session_key>
     <is_key_private>N</is_key_private>
   </info>
   <notepads>
@@ -135,15 +135,14 @@
   <hop> <from>Merge Join</from><to>Modified Java Script Value</to><enabled>Y</enabled> </hop>
   <hop> <from>Modified Java Script Value</from><to>Users Join</to><enabled>Y</enabled> </hop>
   <hop> <from>Name Null check</from><to>Generate random value</to><enabled>Y</enabled> </hop>
-  <hop> <from>Sort rows</from><to>Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort verified</from><to>Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>Users Join</from><to>Name Null check</to><enabled>Y</enabled> </hop>
-  <hop> <from>survey transaction report</from><to>Sort rows</to><enabled>Y</enabled> </hop>
   <hop> <from>survey details input</from><to>Merge Join 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Survey Pre Initiation</from><to>Merge Join 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Merge Join 2</from><to>Sort rows verified</to><enabled>Y</enabled> </hop>
   <hop> <from>Group verified</from><to>Sort verified</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort rows verified</from><to>Group verified</to><enabled>Y</enabled> </hop>
+  <hop> <from>survey transaction report</from><to>Merge Join</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Generate random value</name>
@@ -171,6 +170,52 @@
     </step>
 
   <step>
+    <name>Group verified</name>
+    <type>GroupBy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <all_rows>N</all_rows>
+      <ignore_aggregate>N</ignore_aggregate>
+      <field_ignore/>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>grp</prefix>
+      <add_linenr>N</add_linenr>
+      <linenr_fieldname/>
+      <give_back_row>N</give_back_row>
+      <group>
+        <field>
+          <name>AGENT_ID</name>
+        </field>
+        <field>
+          <name>MONTH_Data</name>
+        </field>
+        <field>
+          <name>Year_Data</name>
+        </field>
+      </group>
+      <fields>
+        <field>
+          <aggregate>verified</aggregate>
+          <subject>SURVEY_DETAILS_ID</subject>
+          <type>COUNT_DISTINCT</type>
+          <valuefield/>
+        </field>
+      </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>616</xloc>
+      <yloc>142</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
     <name>Merge Join</name>
     <type>MergeJoin</type>
     <description/>
@@ -182,7 +227,7 @@
            <schema_name/>
            </partitioning>
 <join_type>FULL OUTER</join_type>
-<step1>Sort rows</step1>
+<step1>survey transaction report</step1>
 <step2>Sort verified</step2>
     <keys_1>
       <key>user_id</key>
@@ -197,6 +242,34 @@
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>950</xloc>
+      <yloc>142</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Merge Join 2</name>
+    <type>MergeJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<join_type>INNER</join_type>
+<step1>survey details input</step1>
+<step2>Survey Pre Initiation</step2>
+    <keys_1>
+      <key>SURVEY_PRE_INTITIATION_ID</key>
+    </keys_1>
+    <keys_2>
+      <key>SURVEY_PRE_INITIATION_ID</key>
+    </keys_2>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>283</xloc>
       <yloc>142</yloc>
       <draw>Y</draw>
       </GUI>
@@ -281,7 +354,7 @@
     </step>
 
   <step>
-    <name>Sort rows</name>
+    <name>Sort rows verified</name>
     <type>SortRows</type>
     <description/>
     <distribute>Y</distribute>
@@ -300,19 +373,19 @@
       <unique_rows>N</unique_rows>
     <fields>
       <field>
-        <name>user_id</name>
+        <name>AGENT_ID</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
       </field>
       <field>
-        <name>month</name>
+        <name>MONTH_Data</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
       </field>
       <field>
-        <name>year</name>
+        <name>Year_Data</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <presorted>N</presorted>
@@ -320,7 +393,7 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1143</xloc>
+      <xloc>444</xloc>
       <yloc>142</yloc>
       <draw>Y</draw>
       </GUI>
@@ -373,6 +446,32 @@
     </step>
 
   <step>
+    <name>Survey Pre Initiation</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <sql>SELECT&#xd;&#xa;  SURVEY_PRE_INITIATION_ID&#xd;&#xa;, MONTH&#x28;CREATED_ON_EST&#x29; AS MONTH_Data&#xd;&#xa;, YEAR&#x28;CREATED_ON_EST&#x29; AS Year_Data&#xd;&#xa;FROM survey_pre_initiation order by SURVEY_PRE_INITIATION_ID&#x3b;&#xd;&#xa;</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>77</xloc>
+      <yloc>223</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
     <name>Users Join</name>
     <type>DBJoin</type>
     <description/>
@@ -403,6 +502,32 @@
     </step>
 
   <step>
+    <name>survey details input</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
+    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, SURVEY_PRE_INTITIATION_ID&#xd;&#xa;, SOURCE&#xd;&#xa;FROM survey_details&#xd;&#xa;where SOURCE not in &#x28;&#x22;Zillow&#x22;, &#x22;admin&#x22;, &#x22;agent&#x22;, &#x22;customer&#x22;, &#x22;3rd Party Review&#x22;, &#x22;upload&#x22;, &#x22;CSV_UPLOAD&#x22;&#x29; &#xd;&#xa;order by SURVEY_PRE_INTITIATION_ID&#xd;&#xa;</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>77</xloc>
+      <yloc>57</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
     <name>survey transaction report</name>
     <type>TableInput</type>
     <description/>
@@ -414,7 +539,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  month&#xd;&#xa;, year&#xd;&#xa;, user_name&#xd;&#xa;, user_id&#xd;&#xa;, nmls&#xd;&#xa;, license_id&#xd;&#xa;, company_name&#xd;&#xa;, company_id&#xd;&#xa;, region_name&#xd;&#xa;, branch_name&#xd;&#xa;, total_reviews&#xd;&#xa;, total_zillow_reviews&#xd;&#xa;, total_3rd_party_reviews&#xd;&#xa;, total_verified_customer_reviews&#xd;&#xa;, total_unverified_customer_reviews&#xd;&#xa;, total_social_survey_reviews&#xd;&#xa;, total_abusive_reviews&#xd;&#xa;, total_retake_reviews&#xd;&#xa;, total_retake_completed&#xd;&#xa;, transaction_received_by_source&#xd;&#xa;, transaction_sent&#xd;&#xa;, transaction_unprocessable&#xd;&#xa;, transaction_clicked&#xd;&#xa;, transaction_completed_&#xd;&#xa;, transaction_partially_completed&#xd;&#xa;, transaction_unopened&#xd;&#xa;, transaction_duplicates&#xd;&#xa;, transaction_mismatched&#xd;&#xa;, transaction_unassigned&#xd;&#xa;FROM survey_transaction_report</sql>
+    <sql>SELECT&#xd;&#xa;  month&#xd;&#xa;, year&#xd;&#xa;, user_name&#xd;&#xa;, user_id&#xd;&#xa;, nmls&#xd;&#xa;, license_id&#xd;&#xa;, company_name&#xd;&#xa;, company_id&#xd;&#xa;, region_name&#xd;&#xa;, branch_name&#xd;&#xa;, total_reviews&#xd;&#xa;, total_zillow_reviews&#xd;&#xa;, total_3rd_party_reviews&#xd;&#xa;, total_verified_customer_reviews&#xd;&#xa;, total_unverified_customer_reviews&#xd;&#xa;, total_social_survey_reviews&#xd;&#xa;, total_abusive_reviews&#xd;&#xa;, total_retake_reviews&#xd;&#xa;, total_retake_completed&#xd;&#xa;, transaction_received_by_source&#xd;&#xa;, transaction_sent&#xd;&#xa;, transaction_unprocessable&#xd;&#xa;, transaction_clicked&#xd;&#xa;, transaction_completed_&#xd;&#xa;, transaction_partially_completed&#xd;&#xa;, transaction_unopened&#xd;&#xa;, transaction_duplicates&#xd;&#xa;, transaction_mismatched&#xd;&#xa;, transaction_unassigned&#xd;&#xa;FROM survey_transaction_report&#xa;ORDER BY user_id,month,year&#x3b;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -422,7 +547,7 @@
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1373</xloc>
+      <xloc>1167</xloc>
       <yloc>142</yloc>
       <draw>Y</draw>
       </GUI>
@@ -618,178 +743,6 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>221</xloc>
       <yloc>317</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>survey details input</name>
-    <type>TableInput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, SURVEY_PRE_INTITIATION_ID&#xd;&#xa;, SOURCE&#xd;&#xa;FROM survey_details&#xd;&#xa;where SOURCE in &#x28;&#x27;encompass&#x27;,&#x27;DOTLOOP&#x27;,&#x27;API&#x27;,&#x27;FTP&#x27;,&#x27;LONEWOLF&#x27;&#x29; &#xd;&#xa;order by SURVEY_PRE_INTITIATION_ID&#xd;&#xa;</sql>
-    <limit>0</limit>
-    <lookup/>
-    <execute_each_row>N</execute_each_row>
-    <variables_active>N</variables_active>
-    <lazy_conversion_active>N</lazy_conversion_active>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>77</xloc>
-      <yloc>57</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Survey Pre Initiation</name>
-    <type>TableInput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  SURVEY_PRE_INITIATION_ID&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;c&#x27;&#x29; AS MONTH_Data&#xd;&#xa;, date_format&#x28;CREATED_ON_EST,&#x27;&#x25;Y&#x27;&#x29; AS Year_Data&#xd;&#xa;FROM survey_pre_initiation order by SURVEY_PRE_INITIATION_ID&#xd;&#xa;</sql>
-    <limit>0</limit>
-    <lookup/>
-    <execute_each_row>N</execute_each_row>
-    <variables_active>N</variables_active>
-    <lazy_conversion_active>N</lazy_conversion_active>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>77</xloc>
-      <yloc>223</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Merge Join 2</name>
-    <type>MergeJoin</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-<join_type>INNER</join_type>
-<step1>survey details input</step1>
-<step2>Survey Pre Initiation</step2>
-    <keys_1>
-      <key>SURVEY_PRE_INTITIATION_ID</key>
-    </keys_1>
-    <keys_2>
-      <key>SURVEY_PRE_INITIATION_ID</key>
-    </keys_2>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>283</xloc>
-      <yloc>142</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Group verified</name>
-    <type>GroupBy</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <all_rows>N</all_rows>
-      <ignore_aggregate>N</ignore_aggregate>
-      <field_ignore/>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>grp</prefix>
-      <add_linenr>N</add_linenr>
-      <linenr_fieldname/>
-      <give_back_row>N</give_back_row>
-      <group>
-        <field>
-          <name>AGENT_ID</name>
-        </field>
-        <field>
-          <name>MONTH_Data</name>
-        </field>
-        <field>
-          <name>Year_Data</name>
-        </field>
-      </group>
-      <fields>
-        <field>
-          <aggregate>verified</aggregate>
-          <subject>SURVEY_DETAILS_ID</subject>
-          <type>COUNT_DISTINCT</type>
-          <valuefield/>
-        </field>
-      </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>616</xloc>
-      <yloc>142</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Sort rows verified</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>out</prefix>
-      <sort_size>1000000</sort_size>
-      <free_memory/>
-      <compress>N</compress>
-      <compress_variable/>
-      <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>AGENT_ID</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>MONTH_Data</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-      <field>
-        <name>Year_Data</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>444</xloc>
-      <yloc>142</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
