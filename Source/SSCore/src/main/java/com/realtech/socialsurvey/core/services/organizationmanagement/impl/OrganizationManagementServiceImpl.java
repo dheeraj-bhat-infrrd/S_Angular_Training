@@ -8993,4 +8993,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.info( "Inside method updateHidePublicPageForUsers " );
         organizationUnitSettingsDao.updateHidePublicPageForUsers( userIdList, hidePublicPage );
     }
+    
+    @Override
+    public ContactDetailsSettings fetchContactDetailByEncryptedId( String encryptedId, String collection ) {
+    		return organizationUnitSettingsDao.fetchContactDetailByEncryptedId(encryptedId, collection);
+    }
 }

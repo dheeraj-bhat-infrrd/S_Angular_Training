@@ -307,4 +307,7 @@ public interface OrganizationUnitSettingsDao
 
 
     void updateHidePublicPageForUsers( List<Long> userIdList, boolean hidePublicPage );
+
+
+	public ContactDetailsSettings fetchContactDetailByEncryptedId(String encryptedId, String collection);
 }

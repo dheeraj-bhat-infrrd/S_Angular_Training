@@ -353,6 +353,7 @@ public interface CommonConstants
     public static final String SUMMARY_COLUMN = "summary";
     public static final String REVIEW_COLUMN = "review";
     public static final String USER_ENCRYPTED_ID = "userEncryptedId";
+    public static final String ENCRYPTED_ID = "encryptedId";
     public static final String SURVEY_COMPLETED_DATE_COLUMN = "surveyCompletedDate";
     public static final String SURVEY_UPDATED_DATE_COLUMN = "surveyUpdatedDate";
     public static final String SURVEY_TRANSACTION_DATE_COLUMN = "surveyTransactionDate";
