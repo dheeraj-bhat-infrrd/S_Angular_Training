@@ -21,6 +21,7 @@ import com.realtech.socialsurvey.core.entities.CollectionDotloopProfileMapping;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyHiddenNotification;
 import com.realtech.socialsurvey.core.entities.CompanyView;
+import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.DisabledAccount;
 import com.realtech.socialsurvey.core.entities.EncompassSdkVersion;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
@@ -1629,4 +1630,7 @@ public interface OrganizationManagementService
 
 
     void updateHidePublicPageForUsers( List<Long> userIdList, boolean hidePublicPage ) throws InvalidInputException;
+
+
+	ContactDetailsSettings fetchContactDetailByEncryptedId(String encryptedId, String collection);
 }
