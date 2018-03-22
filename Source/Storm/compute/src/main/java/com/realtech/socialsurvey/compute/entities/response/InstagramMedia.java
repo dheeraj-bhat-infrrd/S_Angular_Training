@@ -18,4 +18,12 @@ public class InstagramMedia implements Serializable {
     public FBPaging getPaging() { return this.paging; }
 
     public void setPaging(FBPaging paging) { this.paging = paging; }
+
+    @Override
+    public String toString() {
+        return "InstagramMedia{" +
+                "data=" + data +
+                ", paging=" + paging +
+                '}';
+    }
 }

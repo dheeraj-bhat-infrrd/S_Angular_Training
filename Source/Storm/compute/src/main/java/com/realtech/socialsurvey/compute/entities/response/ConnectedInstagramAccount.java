@@ -17,4 +17,12 @@ public class ConnectedInstagramAccount implements Serializable {
     public String getId() { return this.id; }
 
     public void setId(String id) { this.id = id; }
+
+    @Override
+    public String toString() {
+        return "ConnectedInstagramAccount{" +
+                "media=" + media +
+                ", id='" + id + '\'' +
+                '}';
+    }
 }

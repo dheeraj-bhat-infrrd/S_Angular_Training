@@ -45,4 +45,16 @@ public class InstagramMediaData implements Serializable{
     public String getId() { return this.id; }
 
     public void setId(String id) { this.id = id; }
+
+    @Override
+    public String toString() {
+        return "InstagramMediaData{" +
+                "ig_id='" + ig_id + '\'' +
+                ", timestamp=" + timestamp +
+                ", media_url='" + media_url + '\'' +
+                ", media_type='" + media_type + '\'' +
+                ", caption='" + caption + '\'' +
+                ", id='" + id + '\'' +
+                '}';
+    }
 }

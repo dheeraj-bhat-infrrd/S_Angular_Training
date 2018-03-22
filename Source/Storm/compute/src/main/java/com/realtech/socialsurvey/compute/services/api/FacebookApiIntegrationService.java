@@ -1,8 +1,8 @@
 package com.realtech.socialsurvey.compute.services.api;
 
-import com.realtech.socialsurvey.compute.entities.response.ConnectedInstagramAccount;
 import com.realtech.socialsurvey.compute.entities.response.FacebookResponse;
 import com.realtech.socialsurvey.compute.entities.response.InstagramMedia;
+import com.realtech.socialsurvey.compute.entities.response.InstagramResponse;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
@@ -29,7 +29,7 @@ public interface FacebookApiIntegrationService
                                       @Query( "fields" ) String fields, @Query("limit") String limit, @Query("after") String after );
 
     @Headers( "Content-Type: application/json" )
-    @GET ( "/{pageId}/media?date_format=U" )
-    Call<ConnectedInstagramAccount> fetchIgFeeds(@Path ( "pageId" ) String pageId, @Query ( "access_token") String accessToken,
-                                                 @Query( "fields" ) String fields );
+    @GET ( "/{pageId}?date_format=U" )
+    Call<InstagramResponse> fetchIgFeeds(@Path ( "pageId" ) String pageId, @Query ( "access_token") String accessToken,
+                                         @Query( "fields" ) String fields );
 }

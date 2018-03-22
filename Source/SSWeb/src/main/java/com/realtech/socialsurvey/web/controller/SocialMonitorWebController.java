@@ -1,15 +1,15 @@
 package com.realtech.socialsurvey.web.controller;
 
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Arrays;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.QueryParam;
-
+import com.google.gson.Gson;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.*;
+import com.realtech.socialsurvey.core.enums.DisplayMessageType;
+import com.realtech.socialsurvey.core.enums.SocialFeedStatus;
+import com.realtech.socialsurvey.core.enums.TextActionType;
+import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
+import com.realtech.socialsurvey.core.utils.MessageUtils;
+import com.realtech.socialsurvey.web.api.builder.SSApiIntergrationBuilder;
+import com.realtech.socialsurvey.web.common.JspResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,25 +18,15 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import com.google.gson.Gson;
-import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.entities.Actions;
-import com.realtech.socialsurvey.core.entities.Keyword;
-import com.realtech.socialsurvey.core.entities.MonitorType;
-import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
-import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
-import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.enums.DisplayMessageType;
-import com.realtech.socialsurvey.core.enums.SocialFeedStatus;
-import com.realtech.socialsurvey.core.enums.TextActionType;
-import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
-import com.realtech.socialsurvey.core.utils.MessageUtils;
-import com.realtech.socialsurvey.web.api.builder.SSApiIntergrationBuilder;
-import com.realtech.socialsurvey.web.common.JspResolver;
-
 import retrofit.client.Response;
 import retrofit.mime.TypedByteArray;
+
+import javax.servlet.http.HttpServletRequest;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /*
  * Controller for Social Monitor Web Page 
@@ -158,7 +148,7 @@ public class SocialMonitorWebController {
         }
         
         
-        Response response = ssApiIntergrationBuilder.getIntegrationApi().getCompanyKeywords(companyId, startIndex, batchSize, monitorType);
+		Response response = ssApiIntergrationBuilder.getIntegrationApi().getCompanyKeywords(companyId, startIndex, batchSize, monitorType,"");
         		
         return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
        
@@ -228,7 +218,7 @@ public class SocialMonitorWebController {
         User user = sessionHelper.getCurrentUser();
         Long companyId = user.getCompany().getCompanyId();
        
-        Response response = ssApiIntergrationBuilder.getIntegrationApi().showMacrosForEntity(companyId);
+        Response response = ssApiIntergrationBuilder.getIntegrationApi().showMacrosForEntity(companyId,"");
         		
         return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
        

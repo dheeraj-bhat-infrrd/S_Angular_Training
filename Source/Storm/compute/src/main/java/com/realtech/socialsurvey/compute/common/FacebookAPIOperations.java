@@ -1,17 +1,15 @@
 package com.realtech.socialsurvey.compute.common;
 
-import java.io.IOException;
-
-import com.realtech.socialsurvey.compute.entities.response.ConnectedInstagramAccount;
+import com.realtech.socialsurvey.compute.entities.response.FacebookResponse;
 import com.realtech.socialsurvey.compute.entities.response.InstagramMedia;
+import com.realtech.socialsurvey.compute.entities.response.InstagramResponse;
+import com.realtech.socialsurvey.compute.exception.APIIntegrationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.realtech.socialsurvey.compute.entities.response.FacebookResponse;
-import com.realtech.socialsurvey.compute.exception.APIIntegrationException;
-
 import retrofit2.Call;
 import retrofit2.Response;
+
+import java.io.IOException;
 
 
 /**
@@ -105,18 +103,18 @@ public class FacebookAPIOperations
      * @param accessToken
      * @return
      */
-    public Response<ConnectedInstagramAccount> fetchMedia(String pageId, String accessToken) {
-        Call<ConnectedInstagramAccount> requestCall = RetrofitApiBuilder.apiBuilderInstance().getFacebookAPIIntergrationService()
+    public Response<InstagramResponse> fetchMedia(String pageId, String accessToken) {
+        Call<InstagramResponse> requestCall = RetrofitApiBuilder.apiBuilderInstance().getFacebookAPIIntergrationService()
                 .fetchIgFeeds( pageId, accessToken, IG_INITIAL_FIELDS );
         try {
-            Response<ConnectedInstagramAccount> response = requestCall.execute();
+            Response<InstagramResponse> response = requestCall.execute();
             RetrofitApiBuilder.apiBuilderInstance().validateFacebookResponse( response );
 
             if ( LOG.isTraceEnabled() ) {
                 LOG.trace( "response {}", response.body() );
                 LOG.trace( "headers {}", response.headers() );
             }
-            return response;
+            return response ;
         } catch ( IOException | APIIntegrationException e ) {
             LOG.error( "IOException/ APIIntegrationException caught", e );
             return null;
