@@ -119,15 +119,16 @@ public class SocialMonitorController
 
     @RequestMapping ( value = "/companies/{companyId}/keywords", method = RequestMethod.GET)
     @ApiOperation ( value = "Get keywords of a company", response = FilterKeywordsResponse.class)
-	@ApiResponses(value = { @ApiResponse ( code = 200, message = "Successfully fetched the keywords of a company")})
+    @ApiResponses ( value = { @ApiResponse ( code = 200, message = "Successfully fetched the keywords of a company") })
     public ResponseEntity<?> getCompanyKeywords( @PathVariable ( "companyId") long companyId, int startIndex, int limit,
-                                                 @RequestParam(value = "monitorType", required = false) String monitorType)
-            throws SSApiException
+        @RequestParam ( value = "monitorType", required = false) String monitorType,
+        @RequestParam ( value = "searchPhrase", required = false) String searchPhrase ) throws SSApiException
     {
         try {
             LOGGER.info( "SocialMonitorController.getCompanyKeywords started" );
             // get company setting for login user
-            FilterKeywordsResponse filterKeywordsResponse = organizationManagementService.getCompanyKeywordsByCompanyId( companyId, startIndex, limit, monitorType);
+            FilterKeywordsResponse filterKeywordsResponse = organizationManagementService
+                .getCompanyKeywordsByCompanyId( companyId, startIndex, limit, monitorType, searchPhrase );
             LOGGER.info( "SocialMonitorController.getCompanyKeywords completed successfully" );
             return new ResponseEntity<>( filterKeywordsResponse, HttpStatus.OK );
         } catch ( NonFatalException e ) {

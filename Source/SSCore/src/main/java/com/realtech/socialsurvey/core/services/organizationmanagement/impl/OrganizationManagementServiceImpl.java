@@ -1122,7 +1122,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @see com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService#getCompanyKeywordsByCompanyId(long)
      */
     @Override
-    public FilterKeywordsResponse getCompanyKeywordsByCompanyId( long companyId, int startIndex, int limit, String monitorType )
+    public FilterKeywordsResponse getCompanyKeywordsByCompanyId( long companyId, int startIndex, int limit, String monitorType, String searchPhrase )
         throws InvalidInputException
     {
         LOG.debug( "Get company settings for the companyId: {}", companyId );
@@ -1136,8 +1136,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         List<Keyword> allKeywords = companySettings.getFilterKeywords();
         List<Keyword> companyFilterKeywords = new ArrayList<>();
         if ( allKeywords != null && !allKeywords.isEmpty() ) {
-            for ( Keyword keyword : allKeywords ) {
-                if ( keyword.getStatus() == CommonConstants.STATUS_ACTIVE ) {
+            for ( Keyword keyword : allKeywords ) { 
+                if(searchPhrase != null && !searchPhrase.isEmpty()) {
+                    if(keyword.getPhrase().toLowerCase().contains( searchPhrase.trim().toLowerCase() ) && keyword.getStatus() == CommonConstants.STATUS_ACTIVE) {
+                        companyFilterKeywords.add( keyword );
+                    }
+                }
+                else if ( keyword.getStatus() == CommonConstants.STATUS_ACTIVE ) {
                     companyFilterKeywords.add( keyword );
                 }
             }
