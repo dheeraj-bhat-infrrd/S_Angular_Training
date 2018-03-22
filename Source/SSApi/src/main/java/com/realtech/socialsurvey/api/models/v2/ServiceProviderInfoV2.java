@@ -4,9 +4,20 @@ public class ServiceProviderInfoV2
 {
     private String serviceProviderName;
     private String serviceProviderEmail;
+    private long serviceProviderId;
 
 
-    public String getServiceProviderName()
+    public long getServiceProviderId() {
+		return serviceProviderId;
+	}
+
+
+	public void setServiceProviderId(long serviceProviderId) {
+		this.serviceProviderId = serviceProviderId;
+	}
+
+
+	public String getServiceProviderName()
     {
         return serviceProviderName;
     }
