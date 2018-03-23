@@ -18,6 +18,7 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import com.realtech.socialsurvey.core.commons.ActionHistoryComparator;
+import com.realtech.socialsurvey.core.commons.SocialMonitorStreamDataComparator;
 import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.MongoSocialFeedDao;
@@ -141,6 +142,8 @@ public class SocialFeedServiceImpl implements SocialFeedService
 				socialMonitorFeedData.setFoundKeywords(socialResponseObject.getFoundKeywords());
 				socialMonitorFeedData.setDuplicateCount(socialResponseObject.getDuplicateCount());
 				socialMonitorStreamDataList.add(socialMonitorFeedData);
+				//add in chronological order
+				Collections.sort( socialMonitorStreamDataList, new SocialMonitorStreamDataComparator() ); 
 			}
 			socialMonitorResponseData.setCount(mongoSocialFeedDao.getAllSocialFeedsCount(flag, status, feedtype, companyId, regionIds, branchIds, agentIds, searchText,isCompanySet));
 			if (flag) {
