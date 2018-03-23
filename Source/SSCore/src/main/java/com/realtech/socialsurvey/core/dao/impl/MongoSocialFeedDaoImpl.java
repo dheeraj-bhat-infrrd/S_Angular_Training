@@ -179,7 +179,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 
 	@Override
 	public List<SocialResponseObject> getAllSocialFeeds(int startIndex, int limit, boolean flag, String status,
-			List<String> feedtype, Long companyId, List<Long> regionIds, List<Long> branchIds, List<Long> agentIds, String searchText) {
+			List<String> feedtype, Long companyId, List<Long> regionIds, List<Long> branchIds, List<Long> agentIds, String searchText, boolean isCompanySet) {
 		LOG.debug("Fetching All Social Feeds");
 		Query query = new Query();
 		List<Criteria> criterias = new ArrayList<>();
@@ -242,13 +242,20 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
                         .andOperator((Criteria.where(CommonConstants.PROFILE_TYPE).is(ProfileType.AGENT)), Criteria.where(FEED_TYPE).in(feedtype))));
             }
         }
-		Criteria criteria = new Criteria().orOperator(criterias.toArray(new Criteria[criterias.size()]));
+		Criteria criteria = new Criteria();
+		
+		if(!criterias.isEmpty() && criterias!=null && isCompanySet) {
+		    criteria.orOperator(criterias.toArray(new Criteria[criterias.size()]));
+		}else {
+		    criteria.orOperator((Criteria.where(CommonConstants.COMPANY_ID).is(companyId)));
+		}
+		
 		if(searchText != null)
         {
 		    criteria.andOperator((Criteria.where( TEXT ).regex( Pattern.compile(searchText.trim() , Pattern.CASE_INSENSITIVE) )));
         }
 		query.addCriteria(criteria);
-		query.with(new Sort(Sort.Direction.DESC, "_id"));
+		query.with(new Sort(Sort.Direction.DESC, "updatedTime"));
 		if (startIndex > -1) {
 			query.skip(startIndex);
 		}
@@ -256,15 +263,12 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 			query.limit(limit);
 		}
 
-		List<SocialResponseObject> socialResponseObjects = mongoTemplate.find(query, SocialResponseObject.class,
-				SOCIAL_FEED_COLLECTION);
-
-		return socialResponseObjects;
+		return mongoTemplate.find(query, SocialResponseObject.class, SOCIAL_FEED_COLLECTION);
 	}
 
 	@Override
 	public long getAllSocialFeedsCount(boolean flag, String status, List<String> feedtype, Long companyId,
-			List<Long> regionIds, List<Long> branchIds, List<Long> agentIds, String searchText) {
+			List<Long> regionIds, List<Long> branchIds, List<Long> agentIds, String searchText, boolean isCompanySet) {
 		LOG.debug("Fetching All Social Feeds count");
 		Query query = new Query();
 		List<Criteria> criterias = new ArrayList<>();
@@ -327,12 +331,21 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 						.andOperator((Criteria.where(CommonConstants.PROFILE_TYPE).is(ProfileType.AGENT)), Criteria.where(FEED_TYPE).in(feedtype))));
 			}
 		}
-	    Criteria criteria = new Criteria().orOperator(criterias.toArray(new Criteria[criterias.size()]));
-		if(searchText != null)
-        {
-	          criteria.andOperator((Criteria.where( TEXT ).regex( Pattern.compile(searchText.trim() , Pattern.CASE_INSENSITIVE) )));
+		
+		Criteria criteria = new Criteria();
+        
+        if(!criterias.isEmpty() && criterias!=null && isCompanySet) {
+            criteria.orOperator(criterias.toArray(new Criteria[criterias.size()]));
+        }else {
+            criteria.orOperator((Criteria.where(CommonConstants.COMPANY_ID).is(companyId)));
         }
-		query.addCriteria(criteria);
+        
+        if(searchText != null)
+        {
+            criteria.andOperator((Criteria.where( TEXT ).regex( Pattern.compile(searchText.trim() , Pattern.CASE_INSENSITIVE) )));
+        }
+        
+        query.addCriteria(criteria);
 
 		return mongoTemplate.count(query, SOCIAL_FEED_COLLECTION);
 	}

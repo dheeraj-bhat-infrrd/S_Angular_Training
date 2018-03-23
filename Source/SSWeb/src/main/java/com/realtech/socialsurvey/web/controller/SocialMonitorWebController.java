@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 /*
  * Controller for Social Monitor Web Page 
  */
@@ -42,6 +43,7 @@ public class SocialMonitorWebController {
     private static final String STATUS = "status";
     private static final String FLAG = "flag";
     private static final String MESSAGE = "message";
+    private static final String SUCCESS = "Success";
     
     @Autowired
 	private MessageUtils messageUtils;
@@ -59,7 +61,7 @@ public class SocialMonitorWebController {
     @RequestMapping ( value = "/getstreamcontainer", method = RequestMethod.GET)
     public String getStreamContainer( Model model, HttpServletRequest request )
     {
-        LOG.info( "Social Monitor stream container page fetched" );
+        LOG.info("Social Monitor stream container page fetched");
         
         return JspResolver.STREAM_CONTAINER_PAGE;
     }
@@ -132,6 +134,7 @@ public class SocialMonitorWebController {
        
         String startIndexStr = request.getParameter(START_INDEX);
         String batchSizeStr = request.getParameter(BATCH_SIZE);
+        String searchText =  request.getParameter("text");
         
         int startIndex=0;
         int batchSize=10;
@@ -147,9 +150,12 @@ public class SocialMonitorWebController {
         	batchSize = Integer.valueOf( batchSizeStr );
         }
         
-        
-		Response response = ssApiIntergrationBuilder.getIntegrationApi().getCompanyKeywords(companyId, startIndex, batchSize, monitorType,"");
-        		
+        if(searchText == null) {
+            searchText = "";
+        }
+
+        Response response = ssApiIntergrationBuilder.getIntegrationApi().getCompanyKeywords(companyId, startIndex, batchSize, monitorType,searchText);
+
         return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
        
     }
@@ -217,9 +223,14 @@ public class SocialMonitorWebController {
         
         User user = sessionHelper.getCurrentUser();
         Long companyId = user.getCompany().getCompanyId();
-       
-        Response response = ssApiIntergrationBuilder.getIntegrationApi().showMacrosForEntity(companyId,"");
-        		
+
+        String searchText =  request.getParameter("text");
+        if(searchText == null) {
+            searchText = "";
+        }
+        
+        Response response = ssApiIntergrationBuilder.getIntegrationApi().showMacrosForEntity(companyId,searchText);
+
         return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
        
     }
@@ -315,13 +326,13 @@ public class SocialMonitorWebController {
     		message = messageUtils.getDisplayMessage(DisplayMessageConstants.ADD_MACRO_SUCCESSFUL,
 					DisplayMessageType.SUCCESS_MESSAGE).getMessage();
     		String status = new String(((TypedByteArray) response.getBody()).getBytes());
-    		statusMap.put("success", status);
+    		statusMap.put(SUCCESS, status);
 			statusMap.put(STATUS, CommonConstants.SUCCESS_ATTRIBUTE);
     	}catch(Exception e){
     		LOG.error("Exception occured in SS-API while updating macro.", e);
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.ADD_MACRO_UNSUCCESSFUL,
 					DisplayMessageType.ERROR_MESSAGE).getMessage();
-			statusMap.put("STATUS", CommonConstants.ERROR);
+			statusMap.put(STATUS, CommonConstants.ERROR);
     	}
     	
     	statusMap.put(MESSAGE, message);
@@ -337,8 +348,10 @@ public class SocialMonitorWebController {
         LOG.info( "Method to fetch Social Posts for Social Monitor Stream,  getSocialPostsForStream() Started" );
         
         User user = sessionHelper.getCurrentUser();
-        long companyId = -1;
-       
+        Long companyId = user.getCompany().getCompanyId();
+        
+        boolean isCompanySet = false;
+        
         String startIndexStr = request.getParameter(START_INDEX);
         String batchSizeStr = request.getParameter(BATCH_SIZE);
         String status = request.getParameter(STATUS);
@@ -351,9 +364,9 @@ public class SocialMonitorWebController {
         String text = request.getParameter("text");
         
         List<String> feedType = new ArrayList<>();
-        List<Long> regionIds = new ArrayList<>();
-        List<Long> branchIds = new ArrayList<>();
-        List<Long> agentIds = new ArrayList<>();
+        List<Long> regionIds;
+        List<Long> branchIds;
+        List<Long> agentIds;
         
         int startIndex=0;
         int batchSize=10;
@@ -374,69 +387,47 @@ public class SocialMonitorWebController {
        if ( flagStr != null && !flagStr.isEmpty() ) {
         	flag = Boolean.valueOf( flagStr );
         }
-       
-      /* if(regionIdStr!=null && !regionIdStr.isEmpty()) {
-           String[] regionIdList = regionIdStr.split(",");
-           
-           for(int i=0;i<regionIdList.length;i++) {
-               regionIds.add(Long.valueOf(regionIdList[i]));
-           }
-       }else {
-           regionIds = null;
-       }
-       
-       if(branchIdStr!=null && !branchIdStr.isEmpty()) {
-           String[] branchIdList = branchIdStr.split(",");
-           
-           for(int i=0;i<branchIdList.length;i++) {
-               branchIds.add(Long.valueOf(branchIdList[i]));
-           }
-       }else {
-           branchIds = null;
-       }*/
-       
+  
        regionIds = splitList( regionIdStr );
        branchIds = splitList( branchIdStr );
        agentIds = splitList( agentIdStr );
        
-       if(feedsStr!=null && !feedsStr.isEmpty()) {
-           String[] feedsList = feedsStr.split(",");
-           
-           for(int i=0;i<feedsList.length;i++) {
-               feedType.add(feedsList[i]);
-           }
+       String[] feedsList = feedsStr.split(",");
+       for(int i=0;i<feedsList.length;i++) {
+           feedType.add(feedsList[i]);
        }
        
        if(companyIdStr != null && !companyIdStr.isEmpty()) {
            companyId = Long.valueOf( companyIdStr );
            if(companyId == 0) {
-               companyId = -1;
+               companyId = -1l;
            }
+           isCompanySet = true;
        }
        
        if(text == null) {
            text = "";
        }
        
-       Response response = ssApiIntergrationBuilder.getIntegrationApi().showStreamSocialPosts(startIndex, batchSize, status, flag, feedType, companyId, regionIds, branchIds, agentIds,text);
+       Response response = ssApiIntergrationBuilder.getIntegrationApi().showStreamSocialPosts(startIndex, batchSize, status, flag, feedType, companyId, regionIds, branchIds, agentIds,text,isCompanySet);
         		
         return new String( ( (TypedByteArray) response.getBody() ).getBytes(),Charset.forName("UTF-8") );
        
     }
     
     private List<Long> splitList(String listStr) {
-  
+        List<Long> listOfIds = new ArrayList<>();
+        
         if(listStr!=null && !listStr.isEmpty()) {
-            List<Long> listOfIds = new ArrayList<>();
+           
             String[] splittedList = listStr.split(",");
             
             for(int i=0;i<splittedList.length;i++) {
                 listOfIds.add(Long.valueOf(splittedList[i]));
             }
-            return listOfIds;
         }
         
-        return null;   
+        return listOfIds;   
     }
     
     private SocialFeedsActionUpdate createSFAUFromRequest(HttpServletRequest request, String userName) {
@@ -503,13 +494,13 @@ public class SocialMonitorWebController {
     				DisplayMessageType.SUCCESS_MESSAGE).getMessage();
     		String status = new String(((TypedByteArray) response.getBody()).getBytes());
     		statusMap.put("userName", userName);
-    		statusMap.put("success", status);
+    		statusMap.put(SUCCESS, status);
     		statusMap.put(STATUS, CommonConstants.SUCCESS_ATTRIBUTE);
     	}catch(Exception e){
     		LOG.error("Exception occured in SS-API while updating post action.", e);
     		message = messageUtils.getDisplayMessage(DisplayMessageConstants.UPDATE_POST_UNSUCCESSFUL,
     				DisplayMessageType.ERROR_MESSAGE).getMessage();
-    		statusMap.put("STATUS", CommonConstants.ERROR);
+    		statusMap.put(STATUS, CommonConstants.ERROR);
     	}
     	
     	statusMap.put(MESSAGE, message);
@@ -582,13 +573,13 @@ public class SocialMonitorWebController {
     				DisplayMessageType.SUCCESS_MESSAGE).getMessage();
     		String status = new String(((TypedByteArray) response.getBody()).getBytes());
     		statusMap.put("userName", userName);
-    		statusMap.put("success", status);
+    		statusMap.put(SUCCESS, status);
     		statusMap.put(STATUS, CommonConstants.SUCCESS_ATTRIBUTE);
     	}catch(Exception e){
     		LOG.error("Exception occured in SS-API while updating post action.", e);
     		message = messageUtils.getDisplayMessage(DisplayMessageConstants.UPDATE_POST_UNSUCCESSFUL,
     				DisplayMessageType.ERROR_MESSAGE).getMessage();
-    		statusMap.put("STATUS", CommonConstants.ERROR);
+    		statusMap.put(STATUS, CommonConstants.ERROR);
     	}
     	
     	statusMap.put(MESSAGE, message);

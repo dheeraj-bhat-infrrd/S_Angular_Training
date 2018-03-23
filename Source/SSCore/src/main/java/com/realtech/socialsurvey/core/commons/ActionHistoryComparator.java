@@ -8,7 +8,7 @@ import com.realtech.socialsurvey.core.entities.ActionHistory;
 
 public class ActionHistoryComparator implements Comparator<ActionHistory> {
 
-	private static final Logger LOG = LoggerFactory.getLogger(FilterKeywordsComparator.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ActionHistoryComparator.class);
 
 	@Override
 	public int compare(ActionHistory actionHistory1, ActionHistory actionHistory2) {
