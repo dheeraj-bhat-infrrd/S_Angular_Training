@@ -255,7 +255,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 		    criteria.andOperator((Criteria.where( TEXT ).regex( Pattern.compile(searchText.trim() , Pattern.CASE_INSENSITIVE) )));
         }
 		query.addCriteria(criteria);
-		query.with(new Sort(Sort.Direction.DESC, "_id"));
+		query.with(new Sort(Sort.Direction.DESC, "updatedTime"));
 		if (startIndex > -1) {
 			query.skip(startIndex);
 		}
