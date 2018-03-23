@@ -353,10 +353,10 @@ public class SocialMonitorWebController {
         LOG.info( "Method to fetch Social Posts for Social Monitor Stream,  getSocialPostsForStream() Started" );
         
         User user = sessionHelper.getCurrentUser();
-        Long sessionCompanyId = user.getCompany().getCompanyId();
+        Long companyId = user.getCompany().getCompanyId();
         
-        Long companyId = -1l;
-       
+        boolean isCompanySet = false;
+        
         String startIndexStr = request.getParameter(START_INDEX);
         String batchSizeStr = request.getParameter(BATCH_SIZE);
         String status = request.getParameter(STATUS);
@@ -407,18 +407,14 @@ public class SocialMonitorWebController {
            if(companyId == 0) {
                companyId = -1l;
            }
-       }else {
-           companyId = null;
-           regionIds = null;
-           branchIds = null;
-           agentIds = null;
+           isCompanySet = true;
        }
        
        if(text == null) {
            text = "";
        }
        
-       Response response = ssApiIntergrationBuilder.getIntegrationApi().showStreamSocialPosts(startIndex, batchSize, status, flag, feedType, companyId, regionIds, branchIds, agentIds,text);
+       Response response = ssApiIntergrationBuilder.getIntegrationApi().showStreamSocialPosts(startIndex, batchSize, status, flag, feedType, companyId, regionIds, branchIds, agentIds,text,isCompanySet);
         		
         return new String( ( (TypedByteArray) response.getBody() ).getBytes(),Charset.forName("UTF-8") );
        

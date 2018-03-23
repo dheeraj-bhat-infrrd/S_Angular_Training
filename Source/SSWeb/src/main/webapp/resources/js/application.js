@@ -16956,7 +16956,7 @@ function drawPaginationForSocialMonitor(count,startIndex,batchSize){
 		$('#stream-next-page').addClass('hide');
 	}
 	
-	if(startIndex < count-(count%10)){
+	if(startIndex < count-(count%10) && count > batchSize){
 		$('#stream-end-page-active').removeClass('hide');
 		$('#stream-end-page').addClass('hide');
 	}else{
@@ -17108,7 +17108,7 @@ function drawStreamPage(streamPostList){
 		
 		$('#stream-post-details-'+postId).find('.stream-post-date').html(lastUpdatedDateStr);
 		
-		if(streamPostList[i].duplicateCount > 0){
+		if(streamPostList[i].duplicateCount > 1){
 			$('#stream-post-details-'+postId).find('.post-dup').removeClass('hide');
 			$('#stream-post-details-'+postId).find('.post-dup').find('.dup-count').html(streamPostList[i].duplicateCount);
 		}
@@ -18280,12 +18280,17 @@ function drawSegmentList(segments){
 		+'<img src="" class="usr-list-img float-left stream-dropdown-img-circle">'
 		+'<div class="usr-list-name float-left stream-dropdown-name-txt-bold"></div></div>';
 	
+	var companyProfileImageUrl = company.profileImageUrl;
+	if(companyProfileImageUrl == null || companyProfileImageUrl == '' || companyProfileImageUrl == undefined){
+		companyProfileImageUrl = 'resources/images/place-holder-individual.png';
+	}
+	
 	$('#stream-seg-dropdown-options').html('');
 	
 	$('#stream-seg-dropdown-options').append(segContainer);
 	$('#seg').data('segId',company.iden);
 	$('#seg').data('segType','COMPANY');
-	$('#seg').find('.seg-img').attr('src',company.profileImageUrl);
+	$('#seg').find('.seg-img').attr('src',companyProfileImageUrl);
 	$('#seg').find('.seg-name').html(company.name);
 	$('#seg').attr('id','company-'+company.iden);
 	
@@ -18304,7 +18309,7 @@ function drawSegmentList(segments){
 		for(var i=0; i<regions.length; i++){
 			
 			var regionProfileImageUrl = regions[i].profileImageUrl;
-			if(regionProfileImageUrl == null){
+			if(regionProfileImageUrl == null || regionProfileImageUrl == '' || regionProfileImageUrl == undefined){
 				regionProfileImageUrl = 'resources/images/place-holder-individual.png';
 			}
 			
@@ -18335,7 +18340,7 @@ function drawSegmentList(segments){
 		for(var i=0; i<branchs.length; i++){
 			
 			var branchProfileImageUrl = branchs[i].profileImageUrl;
-			if(branchProfileImageUrl == null){
+			if(branchProfileImageUrl == null || branchProfileImageUrl == '' || branchProfileImageUrl == undefined){
 				branchProfileImageUrl = 'resources/images/place-holder-individual.png';
 			}
 			
@@ -18439,7 +18444,7 @@ $(document).on('click','.seg-unchecked',function(e){
 	var startIndex = $('#stream-pagination').data('startIndex');
 	var text = $('#search-post').val();
 	
-	getStreamPosts(startIndex, status, flag,text);
+	getStreamPosts(0, status, flag,text);
 	
 });
 
@@ -18484,7 +18489,7 @@ $(document).on('click','.seg-checked',function(e){
 	var startIndex = $('#stream-pagination').data('startIndex');
 	var text = $('#search-post').val();
 	
-	getStreamPosts(startIndex, status, flag,text);
+	getStreamPosts(0, status, flag,text);
 });
 
 function getUsersByCompanyId(){
@@ -18524,7 +18529,7 @@ function drawUserList(userList){
 			var branchId = userList[i].branchId;
 			var name = userList[i].name;
 			var profileImageUrl =userList[i].profileImageUrl;
-			if(profileImageUrl == null || profileImageUrl == undefined){
+			if(profileImageUrl == null || profileImageUrl == undefined || profileImageUrl == ''){
 				profileImageUrl='resources/images/place-holder-individual.png';
 			}
 			
@@ -18600,7 +18605,7 @@ $(document).on('click','.usr-seg-unchecked',function(e){
 	var startIndex = $('#stream-pagination').data('startIndex');
 	var text = $('#search-post').val();
 	
-	getStreamPosts(startIndex, status, flag,text);
+	getStreamPosts(0, status, flag,text);
 });
 
 $(document).on('click','.usr-seg-checked',function(e){
@@ -18635,7 +18640,7 @@ $(document).on('click','.usr-seg-checked',function(e){
 	var startIndex = $('#stream-pagination').data('startIndex');
 	var text = $('#search-post').val();
 	
-	getStreamPosts(startIndex, status, flag,text);
+	getStreamPosts(0, status, flag,text);
 });
 
 $(document).on('click','.usr-unchecked',function(e){
@@ -18662,7 +18667,7 @@ $(document).on('click','.usr-unchecked',function(e){
 	var startIndex = $('#stream-pagination').data('startIndex');
 	var text = $('#search-post').val();
 	
-	getStreamPosts(startIndex, status, flag,text);
+	getStreamPosts(0, status, flag,text);
 });
 
 $(document).on('click','.usr-checked',function(e){
@@ -18688,7 +18693,7 @@ $(document).on('click','.usr-checked',function(e){
 	var startIndex = $('#stream-pagination').data('startIndex');
 	var text = $('#search-post').val();
 	
-	getStreamPosts(startIndex, status, flag,text);
+	getStreamPosts(0, status, flag,text);
 	
 });
 
@@ -18741,7 +18746,7 @@ $(document).on('click','.feed-unchecked',function(e){
 	var startIndex = $('#stream-pagination').data('startIndex');
 	var text = $('#search-post').val();
 	
-	getStreamPosts(startIndex, status, flag,text);
+	getStreamPosts(0, status, flag,text);
 });
 
 $(document).on('click','.feed-checked',function(e){
@@ -18767,7 +18772,7 @@ $(document).on('click','.feed-checked',function(e){
 	var startIndex = $('#stream-pagination').data('startIndex');
 	var text = $('#search-post').val();
 	
-	getStreamPosts(startIndex, status, flag,text);
+	getStreamPosts(0, status, flag,text);
 });
 
 $(document).on('click','.post-dup',function(e){
@@ -19211,7 +19216,7 @@ $(document).on('click','#soc-mon-stream-search-clr',function(e){
 	var flag = $('#stream-tabs').data('flagged');
 	var startIndex = $('#stream-pagination').data('startIndex');
 	
-	getStreamPosts(startIndex, status, flag);
+	getStreamPosts(0, status, flag);
 });
 
 $(document).on('click','#soc-mon-stream-search-icn',function(e){
@@ -19221,7 +19226,7 @@ $(document).on('click','#soc-mon-stream-search-icn',function(e){
 	var startIndex = $('#stream-pagination').data('startIndex');
 	var text = $('#search-post').val();
 	
-	getStreamPosts(startIndex, status, flag, text);
+	getStreamPosts(0, status, flag, text);
 });
 
 $(document).on('keyup','#search-post', function(e){
@@ -19231,7 +19236,7 @@ $(document).on('keyup','#search-post', function(e){
 		var startIndex = $('#stream-pagination').data('startIndex');
 		var text = $('#search-post').val();
 		
-		getStreamPosts(startIndex, status, flag, text);
+		getStreamPosts(0, status, flag, text);
 	}else if(e.keyCode == 27){
 		
 		$('#search-post').val('');
@@ -19241,7 +19246,7 @@ $(document).on('keyup','#search-post', function(e){
 		var flag = $('#stream-tabs').data('flagged');
 		var startIndex = $('#stream-pagination').data('startIndex');
 		
-		getStreamPosts(startIndex, status, flag);
+		getStreamPosts(0, status, flag);
 	}
 });
 
