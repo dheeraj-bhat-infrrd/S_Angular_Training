@@ -12,7 +12,7 @@ public interface InstagramFeedProcessor extends Serializable {
      */
 
     /**
-     * Fetch feeds from facebook
+     * Fetch feeds from Instagram
      * @param companyId
      * @param mediaToken
      * @return

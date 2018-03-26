@@ -21,6 +21,7 @@ import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import java.util.Arrays;
 import java.util.List;
@@ -42,7 +43,7 @@ public class InstagramFeedExactorBolt extends BaseComputeBolt {
             if(fbToken != null){
                 Long companyId = mediaToken.getCompanyId();
                 if (isRateLimitExceeded( mediaToken)) {
-                    LOG.warn("Rate limit exceeded");
+                    LOG.warn(" Rate limit exceeded for instagram account {} ", fbToken.getFacebookPageLink() );
                 } else {
                     List<InstagramMediaData> feeds = instagramFeedProcessor.fetchFeeds(companyId, mediaToken);
                     LOG.debug( "Total tweet fetched : {}", feeds.size() );
@@ -62,7 +63,10 @@ public class InstagramFeedExactorBolt extends BaseComputeBolt {
             } else
                 LOG.warn( "No facebook token found for company {}", mediaToken.getCompanyId() );
 
-        } catch (Exception e) {
+        } catch (JedisConnectionException jce){
+            LOG.error("Redis might be down !!! Error message is {}", jce.getMessage());
+        }
+        catch (Exception e) {
             LOG.error(" Error while fetching posts from instragram {} ", e );
         }
     }
@@ -96,6 +100,7 @@ public class InstagramFeedExactorBolt extends BaseComputeBolt {
 
         if ( instagramMediaData.getTimestamp() > 0 ) {
             responseWrapper.setCreatedTime( instagramMediaData.getTimestamp() * 1000 );
+            responseWrapper.setUpdatedTime( instagramMediaData.getTimestamp() * 1000 );
         }
 
         return responseWrapper;
