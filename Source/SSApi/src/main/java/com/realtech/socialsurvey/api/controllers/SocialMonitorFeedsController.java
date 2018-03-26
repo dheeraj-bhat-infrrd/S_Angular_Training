@@ -58,13 +58,13 @@ public class SocialMonitorFeedsController {
         @RequestParam ( value = "regionIds", required = false) List<Long> regionIds,
         @RequestParam ( value = "branchIds", required = false) List<Long> branchIds,
         @RequestParam ( value = "agentIds", required = false) List<Long> agentIds,
-        @RequestParam ( value = "searchText", required = false) String searchText ) throws InvalidInputException, SSApiException
+        @RequestParam ( value = "searchText", required = false) String searchText, boolean isCompanySet ) throws InvalidInputException, SSApiException
     {
 		LOGGER.info("Fetching the list of Social posts for social monitor");
 		SocialMonitorResponseData socialMonitorResponseData;
 		try {
 			socialMonitorResponseData = socialFeedService.getAllSocialPosts(startIndex, limit, status, flag, feedtype,
-					companyId, regionIds, branchIds, agentIds, searchText);
+					companyId, regionIds, branchIds, agentIds, searchText, isCompanySet);
 		} catch (InvalidInputException ie) {
 			LOGGER.error("Invalid input exception caught while fetching social feeds", ie);
 			throw new SSApiException("Invalid input exception caught while fetching social feeds", ie);

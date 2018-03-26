@@ -57,7 +57,7 @@ public class TwitterFeedExtractorBolt extends BaseComputeBolt
     {
         try {
             SocialMediaTokenResponse mediaToken = (SocialMediaTokenResponse) input.getValueByField( "mediaToken" );
-            TwitterTokenForSM twitterToken = mediaToken.getSocialMediaTokens().getTwitterToken();
+            TwitterTokenForSM twitterToken = mediaToken.getSocialMediaTokens() != null ? mediaToken.getSocialMediaTokens().getTwitterToken() : null ;
             if(twitterToken != null) {
                 Long companyId = mediaToken.getCompanyId();
                 String pageId = UrlHelper.getTwitterPageIdFromURL(twitterToken.getTwitterPageLink());

@@ -111,61 +111,6 @@
 
 <script>
 	$(document).ready(function(){
-		
-		var monitorData = [
-			  	  {
-				    "id": 60935,
-				    "keyphrase": "veniam",
-				    "monitorType": "Keyword Monitor"
-				  },
-				  {
-				    "id": 39839,
-				    "keyphrase": "cupiditate",
-				    "monitorType": "Keyword Monitor"
-				  },
-				  {
-				    "id": 10242,
-				    "keyphrase": "iure",
-				    "monitorType": "Keyword Monitor"
-				  },
-				  {
-				    "id": 67370,
-				    "keyphrase": "qui",
-				    "monitorType": "Keyword Monitor"
-				  },
-				  {
-				    "id": 94989,
-				    "keyphrase": "minus",
-				    "monitorType": "Keyword Monitor"
-				  },
-				  {
-				    "id": 5307,
-				    "keyphrase": "nihil",
-				    "monitorType": "Google Alerts"
-				  },
-				  {
-				    "id": 80192,
-				    "keyphrase": "iusto",
-				    "monitorType": "Google Alerts"
-				  },
-				  {
-				    "id": 25452,
-				    "keyphrase": "ea",
-				    "monitorType": "Google Alerts"
-				  },
-				  {
-				    "id": 439,
-				    "keyphrase": "occaecati",
-				    "monitorType": "Google Alerts"
-				  },
-				  {
-				    "id": 59423,
-				    "keyphrase": "dolorem",
-				    "monitorType": "Google Alerts"
-				  }
-				];
-		
-		drawMonitorList(monitorData);
 		getMonitors();
 	});
 </script>

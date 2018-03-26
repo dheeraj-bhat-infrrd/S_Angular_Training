@@ -1,10 +1,9 @@
 package com.realtech.socialsurvey.compute.topology.spouts;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
+import com.realtech.socialsurvey.compute.common.SSAPIOperations;
+import com.realtech.socialsurvey.compute.dao.RedisSocialMediaStateDao;
+import com.realtech.socialsurvey.compute.dao.impl.RedisSocialMediaStateDaoImpl;
+import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
 import org.apache.storm.spout.SpoutOutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -13,10 +12,10 @@ import org.apache.storm.tuple.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.realtech.socialsurvey.compute.common.SSAPIOperations;
-import com.realtech.socialsurvey.compute.dao.RedisSocialMediaStateDao;
-import com.realtech.socialsurvey.compute.dao.impl.RedisSocialMediaStateDaoImpl;
-import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 
 /**
@@ -36,9 +35,6 @@ public class SocialMediaTokenExtractorSpout extends BaseComputeSpout
     private List<SocialMediaTokenResponse> mediaTokens;
 
     private RedisSocialMediaStateDao redisSocialMediaStateDao;
-
-    static int count = 0;
-
 
     @Override
     public void open( @SuppressWarnings ( "rawtypes") Map conf, TopologyContext context, SpoutOutputCollector collector )
@@ -67,8 +63,9 @@ public class SocialMediaTokenExtractorSpout extends BaseComputeSpout
                     if ( mediaToken.getSocialMediaTokens() != null ) {
 
                         _collector.emit( "FacebookStream", new Values( companyId.toString(), mediaToken ) );
-                        _collector.emit( "LinkedinStream", new Values( companyId.toString(), mediaToken ) );
+                       // _collector.emit( "LinkedinStream", new Values( companyId.toString(), mediaToken ) );
                         _collector.emit( "TwitterStream", new Values( companyId.toString(), mediaToken ) );
+                        _collector.emit( "InstagramStream", new Values(companyId.toString(), mediaToken));
                     }
 
                 }
@@ -85,6 +82,7 @@ public class SocialMediaTokenExtractorSpout extends BaseComputeSpout
     {
         declarer.declareStream( "FacebookStream", new Fields( COMPANY_ID, MEDIA_TOKEN ) );
         declarer.declareStream( "TwitterStream", new Fields( COMPANY_ID, MEDIA_TOKEN ) );
-        declarer.declareStream( "LinkedinStream", new Fields( COMPANY_ID, MEDIA_TOKEN ) );
+        //declarer.declareStream( "LinkedinStream", new Fields( COMPANY_ID, MEDIA_TOKEN ) );
+        declarer.declareStream( "InstagramStream", new Fields( COMPANY_ID, MEDIA_TOKEN ) );
     }
 }

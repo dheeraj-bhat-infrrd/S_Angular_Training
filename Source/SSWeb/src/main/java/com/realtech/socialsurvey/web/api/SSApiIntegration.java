@@ -226,7 +226,7 @@ public interface SSApiIntegration
 	public Response showStreamSocialPosts(@Query("startIndex") int startIndex, @Query("limit") int limit,
 			@Query("status") String status, @Query("flag") boolean flag, @Query("feedtype") List<String> feedtype,
 			@Query("companyId") Long companyId, @Query("regionIds") List<Long> regionIds,
-			@Query("branchIds") List<Long> branchIds, @Query("agentIds") List<Long> agentIds, @Query("searchText") String searchText);
+			@Query("branchIds") List<Long> branchIds, @Query("agentIds") List<Long> agentIds, @Query("searchText") String searchText,@Query("isCompanySet") boolean isCompanySet);
     
     @PUT( "/v1/updatesocialfeeds/action")
     public Response saveSocialFeedsForAction(@Body SocialFeedsActionUpdate socialFeedsActionUpdate,
