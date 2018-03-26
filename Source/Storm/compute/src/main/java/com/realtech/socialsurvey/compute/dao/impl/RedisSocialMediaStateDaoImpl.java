@@ -11,13 +11,15 @@ import com.realtech.socialsurvey.compute.dao.RedisSocialMediaStateDao;
 
 import redis.clients.jedis.Jedis;
 
+import java.io.Serializable;
+
 
 /**
  * Class to save and retrieve last fetched since time/id
  * @author manish
  *
  */
-public class RedisSocialMediaStateDaoImpl implements RedisSocialMediaStateDao
+public class RedisSocialMediaStateDaoImpl implements RedisSocialMediaStateDao, Serializable
 {
     private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger( RedisCompanyKeywordsDaoImpl.class );

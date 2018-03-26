@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.compute.topology.bolts.monitor;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.compute.entities.SocialResponseType;
 import com.realtech.socialsurvey.compute.entities.response.FacebookFeedData;
+import com.realtech.socialsurvey.compute.entities.response.InstagramMediaData;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.entities.response.TwitterFeedData;
 import com.realtech.socialsurvey.compute.entities.response.linkedin.LinkedinFeedData;
@@ -27,7 +28,7 @@ public class CompanyGroupingBolt extends BaseComputeBoltWithAck
 {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger( CompanyGroupingBolt.class );
@@ -48,13 +49,16 @@ public class CompanyGroupingBolt extends BaseComputeBoltWithAck
         if ( socialResponseType != null && socialResponseType.getType() != null ) {
             if ( socialResponseType.getType().equals( "FACEBOOK" ) ) {
                 post = ConversionUtils.deserialize( input.getString( 0 ),
-                    new TypeToken<SocialResponseObject<FacebookFeedData>>() {}.getType() );
+                        new TypeToken<SocialResponseObject<FacebookFeedData>>() {}.getType() );
             } else if ( socialResponseType.getType().equals( "TWITTER" ) ) {
                 post = ConversionUtils.deserialize( input.getString( 0 ),
-                    new TypeToken<SocialResponseObject<TwitterFeedData>>() {}.getType() );
+                        new TypeToken<SocialResponseObject<TwitterFeedData>>() {}.getType() );
             } else if ( socialResponseType.getType().equals( "LINKEDIN" ) ) {
                 post = ConversionUtils.deserialize( input.getString( 0 ),
-                    new TypeToken<SocialResponseObject<LinkedinFeedData>>() {}.getType() );
+                        new TypeToken<SocialResponseObject<LinkedinFeedData>>() {}.getType() );
+            } else if( socialResponseType.getType().equals("INSTAGRAM") ) {
+                post = ConversionUtils.deserialize( input.getString(0),
+                        new TypeToken<SocialResponseObject<InstagramMediaData>>() {}.getType());
             }
         }
 

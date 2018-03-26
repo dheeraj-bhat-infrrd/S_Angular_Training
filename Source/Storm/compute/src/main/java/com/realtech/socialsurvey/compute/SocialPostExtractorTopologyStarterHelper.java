@@ -4,7 +4,7 @@ import com.realtech.socialsurvey.compute.common.ComputeConstants;
 import com.realtech.socialsurvey.compute.common.EnvConstants;
 import com.realtech.socialsurvey.compute.topology.bolts.KafkaProducerBolt;
 import com.realtech.socialsurvey.compute.topology.bolts.monitor.FacebookFeedExtractorBolt;
-import com.realtech.socialsurvey.compute.topology.bolts.monitor.LinkedinFeedExtractorBolt;
+import com.realtech.socialsurvey.compute.topology.bolts.monitor.InstagramFeedExactorBolt;
 import com.realtech.socialsurvey.compute.topology.bolts.monitor.TwitterFeedExtractorBolt;
 import com.realtech.socialsurvey.compute.topology.spouts.SocialMediaTokenExtractorSpout;
 import com.realtech.socialsurvey.compute.utils.ChararcterUtils;
@@ -27,6 +27,7 @@ public class SocialPostExtractorTopologyStarterHelper extends TopologyStarterHel
     private static final String SOCIAL_MEDIA_TOKEN_EXTRACTOR_SPOUT = "SocialMediaTokenExtractorSpout";
     private static final String KAFKA_PRODUCER_BOLT = "KafkaProducerBolt";
     private static final String FACEBOOK_FEED_EXTRACTOR_BOLT = "FacebookFeedExtractorBolt";
+    private static final String INSTAGRAM_FEED_EXTRACTOR_BOLT = "InstagramFeedExtractorBolt";
     private static final String LINKEDIN_FEED_EXTRACTOR_BOLT = "LinkedinFeedExtractorBolt";
     private static final String TWITTER_FEED_EXTRACTOR_BOLT = "TwitterFeedExtractorBolt";
 
@@ -105,8 +106,10 @@ public class SocialPostExtractorTopologyStarterHelper extends TopologyStarterHel
             .shuffleGrouping( SOCIAL_MEDIA_TOKEN_EXTRACTOR_SPOUT, "LinkedinStream" );*/
         builder.setBolt( FACEBOOK_FEED_EXTRACTOR_BOLT, new FacebookFeedExtractorBolt(), 1 )
             .shuffleGrouping( SOCIAL_MEDIA_TOKEN_EXTRACTOR_SPOUT, "FacebookStream" );
-        builder.setBolt( KAFKA_PRODUCER_BOLT, new KafkaProducerBolt(), 2 ).shuffleGrouping( TWITTER_FEED_EXTRACTOR_BOLT )
-            .shuffleGrouping( FACEBOOK_FEED_EXTRACTOR_BOLT );
+        builder.setBolt( INSTAGRAM_FEED_EXTRACTOR_BOLT, new InstagramFeedExactorBolt(), 1 )
+                .shuffleGrouping( SOCIAL_MEDIA_TOKEN_EXTRACTOR_SPOUT, "InstagramStream" );
+        builder.setBolt( KAFKA_PRODUCER_BOLT, new KafkaProducerBolt(), 3 ).shuffleGrouping( TWITTER_FEED_EXTRACTOR_BOLT )
+            .shuffleGrouping( FACEBOOK_FEED_EXTRACTOR_BOLT ).shuffleGrouping(INSTAGRAM_FEED_EXTRACTOR_BOLT);
 
         return builder.createTopology();
     }
