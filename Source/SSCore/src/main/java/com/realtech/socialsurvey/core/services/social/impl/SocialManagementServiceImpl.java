@@ -678,6 +678,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         Set<Long> regionIds = new HashSet<>();
         Map<String, Object> queries = new HashMap<>();
         queries.put( CommonConstants.USER_COLUMN, user );
+        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
         queries.put( CommonConstants.PROFILE_MASTER_COLUMN,
             userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) );
         List<UserProfile> userProfiles = userProfileDao.findByKeyValue( UserProfile.class, queries );

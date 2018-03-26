@@ -61,6 +61,7 @@ public class SurveyV2Transformer implements Transformer<SurveyGetV2VO, SurveyDet
                     ( (SurveyPreInitiation) objects[0] ).getLastReminderTime(), CommonConstants.SURVEY_API_DATE_FORMAT ) );
             serviceProviderInfo.setServiceProviderEmail( d.getAgentEmailId() );
             serviceProviderInfo.setServiceProviderName( d.getAgentName() );
+            serviceProviderInfo.setServiceProviderId(d.getAgentId());
             survey.setReviewId( d.get_id() );
             review.setSummary( d.getSummary() );
             review.setDescription( d.getReview() );
