@@ -253,8 +253,8 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-<join_type>FULL OUTER</join_type>
-<step1>Sort rows unverified</step1>
+<join_type>RIGHT OUTER</join_type>
+<step1>survey transaction report</step1>
 <step2>Sort rows unverified</step2>
     <keys_1>
       <key>user_id</key>

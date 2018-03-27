@@ -48,3 +48,5 @@ ALTER TABLE `survey_transaction_report_region` DROP INDEX `UserIdYearMonthRegion
 
 ALTER TABLE `survey_transaction_report_branch` DROP INDEX `userIdMonthYearBranch` ,ADD UNIQUE INDEX `userIdMonthYearBranch` USING BTREE (`user_id` ASC, `branch_id` ASC, `month` ASC, `year` ASC);
 
+ALTER TABLE `survey_transaction_report` ADD INDEX `UserId` (`user_id` ASC);
+
