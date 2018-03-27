@@ -15,6 +15,8 @@ public class ChararcterUtils
     private ChararcterUtils()
     {}
 
+    private static final String RETWEET_REGEX = "(^rt\\s*@(.*):\\s)(.*)";
+    private static final Pattern PATTERN = Pattern.compile( RETWEET_REGEX, Pattern.CASE_INSENSITIVE );
 
     /**
      * Escapes SOLR query characters
@@ -51,8 +53,7 @@ public class ChararcterUtils
      */
     public static String getTextIfRetweet( String text )
     {
-        Pattern pattern = Pattern.compile( "(^rt\\s*@(.*):\\s)(.*)", Pattern.CASE_INSENSITIVE );
-        Matcher matcher = pattern.matcher( text );
+        Matcher matcher = PATTERN.matcher( text );
         if ( matcher.matches() ) {
             text = matcher.group( 3 );
         }
