@@ -13,9 +13,7 @@ public interface MongoSocialFeedDao
     public void insertSocialFeed( SocialResponseObject<?> socialFeed, String collectionName );
 
     long updateDuplicateCount(int hash, long companyId);
-    
-    public SocialResponseObject getSocialFeed(String postId, String collectionName);
-                
+                    
 	public void updateSocialFeed(SocialFeedsActionUpdate socialFeedsActionUpdate, String postId, List<ActionHistory> actionHistory, int updateFlag, String collectionName);
 	
 	public OrganizationUnitSettings FetchMacros(Long companyId);
@@ -35,6 +33,10 @@ public interface MongoSocialFeedDao
 	public List<OrganizationUnitSettings> getAllBranchDetails(List<Long> branchIds);
 	
 	public OrganizationUnitSettings getAllUserDetails(Long userId);
+	
+	public List<SocialResponseObject> getSocialPostsByIds(Set<String> postIds, String collectionName);
+	
+	public List<SocialResponseObject> getDuplicatePostIds(int hash, Long companyId);
 	
 
 }

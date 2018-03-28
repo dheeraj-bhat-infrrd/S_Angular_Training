@@ -1,8 +1,7 @@
 package com.realtech.socialsurvey.core.entities;
 
 import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 import com.realtech.socialsurvey.core.enums.SocialFeedStatus;
 import com.realtech.socialsurvey.core.enums.TextActionType;
@@ -13,7 +12,7 @@ public class SocialFeedsActionUpdate implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private List<String> postIds;
+	private Set<String> postIds;
 	private boolean flagged;
 	private SocialFeedStatus status;
 	private TextActionType textActionType;
@@ -22,15 +21,18 @@ public class SocialFeedsActionUpdate implements Serializable {
 	private long createdOn;
 	private String macroId = "";
 
-	public List<String> getPostIds() {
-		return postIds;
-	}
 
-	public void setPostIds(List<String> postIds) {
-		this.postIds = postIds;
-	}
+	public Set<String> getPostIds()
+    {
+        return postIds;
+    }
 
-	public boolean isFlagged() {
+    public void setPostIds( Set<String> postIds )
+    {
+        this.postIds = postIds;
+    }
+
+    public boolean isFlagged() {
 		return flagged;
 	}
 

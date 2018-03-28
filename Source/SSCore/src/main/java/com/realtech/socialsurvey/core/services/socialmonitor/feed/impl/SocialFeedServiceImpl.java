@@ -1,6 +1,5 @@
 package com.realtech.socialsurvey.core.services.socialmonitor.feed.impl;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -29,6 +28,7 @@ import com.realtech.socialsurvey.core.entities.ActionHistory;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SegmentsEntity;
 import com.realtech.socialsurvey.core.entities.SegmentsVO;
+import com.realtech.socialsurvey.core.entities.SocialFeedActionResponse;
 import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
 import com.realtech.socialsurvey.core.entities.SocialMonitorFeedData;
 import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
@@ -158,118 +158,162 @@ public class SocialFeedServiceImpl implements SocialFeedService
 		return socialMonitorResponseData;
 	}
 	
-	@Override
-	public void updateActionForFeeds(SocialFeedsActionUpdate socialFeedsActionUpdate, Long companyId)
-			throws InvalidInputException {
-		LOG.debug("Updating social Feeds for social monitor");
-		if (socialFeedsActionUpdate == null) {
-			LOG.error("No action passed");
-			throw new InvalidInputException("No action passed");
-		}
-		int updateFlag = 0;
-		// Check if a macro is applied
-		if (!socialFeedsActionUpdate.getMacroId().isEmpty()) {
-			OrganizationUnitSettings organizationUnitSettings = mongoSocialFeedDao.FetchMacros(companyId);
-			for (SocialMonitorMacro macro : organizationUnitSettings.getSocialMonitorMacros()) {
-				if (macro.getMacroId().equalsIgnoreCase(socialFeedsActionUpdate.getMacroId())) {
-					macro.setCount(macro.getCount() + socialFeedsActionUpdate.getPostIds().size());
-					(macro.getMacroUsageTime()).add(new Date().getTime());
-					mongoSocialFeedDao.updateMacroCount(organizationUnitSettings.getSocialMonitorMacros(), companyId);
-					break;
-				}
-			}
-		}
-		for (String postId : socialFeedsActionUpdate.getPostIds()) {
-			List<ActionHistory> actionHistories = new ArrayList<>();
-			updateFlag = 0;
-			SocialResponseObject socialResponseObject = mongoSocialFeedDao.getSocialFeed(postId,
-					MongoSocialFeedDaoImpl.SOCIAL_FEED_COLLECTION);
-			if (socialFeedsActionUpdate.getStatus() != null) {
-				if (socialResponseObject.isFlagged() != socialFeedsActionUpdate.isFlagged()
-						&& !(socialFeedsActionUpdate.getStatus().equals(SocialFeedStatus.RESOLVED))
-						&& !(socialFeedsActionUpdate.getStatus().equals(SocialFeedStatus.ESCALATED))) {
-					ActionHistory actionHistory = new ActionHistory();
-					if (socialFeedsActionUpdate.isFlagged()
-							&& (socialResponseObject.getStatus().equals(SocialFeedStatus.NEW))) {
-						updateFlag = 1;
-						actionHistory.setActionType(ActionHistoryType.FLAGGED);
-						actionHistory.setText("Post was FLAGGED manually by " + socialFeedsActionUpdate.getUserName());
-						actionHistory.setOwnerName(socialFeedsActionUpdate.getUserName());
-						actionHistory.setCreatedDate(new Date().getTime());
-						actionHistories.add(actionHistory);
-					} else if (!socialFeedsActionUpdate.isFlagged()
-							&& (socialResponseObject.getStatus().equals(SocialFeedStatus.NEW))) {
-						updateFlag = 1;
-						actionHistory.setActionType(ActionHistoryType.UNFLAGGED);
-						actionHistory.setText("Post was UNFLAGGED by " + socialFeedsActionUpdate.getUserName());
-						actionHistory.setOwnerName(socialFeedsActionUpdate.getUserName());
-						actionHistory.setCreatedDate(new Date().getTime());
-						actionHistories.add(actionHistory);
-					}
-				}
-				if (!socialFeedsActionUpdate.getStatus().toString()
-						.equalsIgnoreCase(socialResponseObject.getStatus().toString())
-						&& socialFeedsActionUpdate.getStatus() != null && !socialFeedsActionUpdate.getStatus()
-								.toString().equalsIgnoreCase(SocialFeedStatus.NEW.toString())) {
-					ActionHistory actionHistory = new ActionHistory();
-					if (socialFeedsActionUpdate.getStatus().toString()
-							.equalsIgnoreCase(SocialFeedStatus.ESCALATED.toString())) {
-						updateFlag = 2;
-						actionHistory.setActionType(ActionHistoryType.ESCALATE);
-						actionHistory.setText("Post was " + socialFeedsActionUpdate.getStatus() + " by "
-								+ socialFeedsActionUpdate.getUserName());
-						actionHistory.setOwnerName(socialFeedsActionUpdate.getUserName());
-						actionHistory.setCreatedDate(new Date().getTime());
-						actionHistories.add(actionHistory);
-					} else if (socialFeedsActionUpdate.getStatus().toString()
-							.equalsIgnoreCase(SocialFeedStatus.RESOLVED.toString())
-							&& socialResponseObject.getStatus().toString().equalsIgnoreCase(
-									SocialFeedStatus.ESCALATED.toString())
-							&& !socialResponseObject.isFlagged()) {
-						updateFlag = 2;
-						actionHistory.setActionType(ActionHistoryType.RESOLVED);
-						actionHistory.setText("Post was " + socialFeedsActionUpdate.getStatus() + " by "
-								+ socialFeedsActionUpdate.getUserName());
-						actionHistory.setOwnerName(socialFeedsActionUpdate.getUserName());
-						actionHistory.setCreatedDate(new Date().getTime());
-						actionHistories.add(actionHistory);
-					}
-				}
-			}
-			if ((socialFeedsActionUpdate.getTextActionType().toString()
-					.equalsIgnoreCase(TextActionType.PRIVATE_NOTE.toString()))
-					&& (socialFeedsActionUpdate.getText() != null) && !(socialFeedsActionUpdate.getText().isEmpty())) {
-				ActionHistory actionHistory = new ActionHistory();
-				actionHistory.setActionType(ActionHistoryType.PRIVATE_MESSAGE);
-				actionHistory.setText(socialFeedsActionUpdate.getText());
-				actionHistory.setOwnerName(socialFeedsActionUpdate.getUserName());
-				actionHistory.setCreatedDate(new Date().getTime());
-				actionHistories.add(actionHistory);
-			}
-			if ((socialFeedsActionUpdate.getTextActionType().toString()
-					.equalsIgnoreCase(TextActionType.SEND_EMAIL.toString()))
-					&& (socialFeedsActionUpdate.getText() != null) && !(socialFeedsActionUpdate.getText().isEmpty())) {
-				ActionHistory actionHistory = new ActionHistory();
-				actionHistory.setActionType(ActionHistoryType.EMAIL);
-				actionHistory.setText(socialFeedsActionUpdate.getText());
-				actionHistory.setOwnerName(socialFeedsActionUpdate.getUserName());
-				actionHistory.setCreatedDate(new Date().getTime());
-				actionHistories.add(actionHistory);
-				// send mail to the user
-				try {
-					emailServices.sendSocialMonitorActionMail(socialResponseObject.getOwnerEmail(),
-							socialResponseObject.getOwnerName(), socialFeedsActionUpdate.getText());
-				} catch (UndeliveredEmailException e) {
-					LOG.error("Email could not be delivered", e);
-				}
-			}
-			mongoSocialFeedDao.updateSocialFeed(socialFeedsActionUpdate, postId, actionHistories, updateFlag,
-					MongoSocialFeedDaoImpl.SOCIAL_FEED_COLLECTION);
-		}
 
-		LOG.debug("End of saveSocialPostsForStream{}");
+    @Override
+    public SocialFeedActionResponse updateActionForFeeds( SocialFeedsActionUpdate socialFeedsActionUpdate, Long companyId,
+        boolean duplicateFlag ) throws InvalidInputException
+    {
+        LOG.debug( "Updating social Feeds for social monitor" );
+        if ( socialFeedsActionUpdate == null ) {
+            LOG.error( "No action passed" );
+            throw new InvalidInputException( "No action passed" );
+        }
+        int updateFlag = 0;
+        SocialFeedActionResponse socialFeedActionResponse = new SocialFeedActionResponse();
+        List<String> successPostIds = new ArrayList<>();
+        SocialMonitorMacro socialMonitorMacro = null;
+        boolean macroFlag = false;
+        int macroActionFlag = 0;
+        //add duplicate post ids to the Set of existing postIds in socialFeedsActionUpdate
+        if ( duplicateFlag ) {
+            socialFeedsActionUpdate = getPostIdsWithDuplicates( socialFeedsActionUpdate, companyId );
+        }
+        // Check if a macro is applied
+        OrganizationUnitSettings organizationUnitSettings = new OrganizationUnitSettings();
+        if ( !socialFeedsActionUpdate.getMacroId().isEmpty() ) {
+            organizationUnitSettings = mongoSocialFeedDao.FetchMacros( companyId );
+            if(organizationUnitSettings.getSocialMonitorMacros() != null)
+            {
+                for ( SocialMonitorMacro macro : organizationUnitSettings.getSocialMonitorMacros() ) {
+                    if ( macro.getMacroId().equalsIgnoreCase( socialFeedsActionUpdate.getMacroId() ) ) {
+                        socialMonitorMacro = macro;
+                        macroFlag = true;
+                        break;
+                    }
+                }
+            }
+        }
+        List<SocialResponseObject> socialResponseObjectsToAdd = mongoSocialFeedDao
+            .getSocialPostsByIds( socialFeedsActionUpdate.getPostIds(), MongoSocialFeedDaoImpl.SOCIAL_FEED_COLLECTION );
+        for ( SocialResponseObject socialResponseObject : socialResponseObjectsToAdd ) {
+            List<ActionHistory> actionHistories = new ArrayList<>();
+            updateFlag = 0;
+            if ( socialFeedsActionUpdate.getStatus() != null ) {
+                updateFlag = 1;
+                if ( macroFlag ) {
+                    macroActionFlag = 1;
+                }
+                if ( socialResponseObject.isFlagged() != socialFeedsActionUpdate.isFlagged()
+                    && !( socialFeedsActionUpdate.getStatus().equals( SocialFeedStatus.RESOLVED ) )
+                    && !( socialFeedsActionUpdate.getStatus().equals( SocialFeedStatus.ESCALATED ) ) ) {
+                    ActionHistory actionHistory = new ActionHistory();
+                    if ( socialFeedsActionUpdate.isFlagged()
+                        && ( socialResponseObject.getStatus().equals( SocialFeedStatus.NEW ) ) ) {
+                        updateFlag = 2;
+                        if ( macroFlag ) {
+                            macroActionFlag = 2;
+                        }
+                        actionHistory.setActionType( ActionHistoryType.FLAGGED );
+                        actionHistory.setText( "Post was FLAGGED manually by " + socialFeedsActionUpdate.getUserName() );
+                        actionHistory.setOwnerName( socialFeedsActionUpdate.getUserName() );
+                        actionHistory.setCreatedDate( new Date().getTime() );
+                        actionHistories.add( actionHistory );
+                    } else if ( !socialFeedsActionUpdate.isFlagged()
+                        && ( socialResponseObject.getStatus().equals( SocialFeedStatus.NEW ) ) ) {
+                        updateFlag = 2;
+                        if ( macroFlag ) {
+                            macroActionFlag = 2;
+                        }
+                        actionHistory.setActionType( ActionHistoryType.UNFLAGGED );
+                        actionHistory.setText( "Post was UNFLAGGED by " + socialFeedsActionUpdate.getUserName() );
+                        actionHistory.setOwnerName( socialFeedsActionUpdate.getUserName() );
+                        actionHistory.setCreatedDate( new Date().getTime() );
+                        actionHistories.add( actionHistory );
+                    }
+                }
+                if ( !socialFeedsActionUpdate.getStatus().toString()
+                    .equalsIgnoreCase( socialResponseObject.getStatus().toString() )
+                    && socialFeedsActionUpdate.getStatus() != null
+                    && !socialFeedsActionUpdate.getStatus().toString().equalsIgnoreCase( SocialFeedStatus.NEW.toString() ) ) {
+                    ActionHistory actionHistory = new ActionHistory();
+                    if ( socialFeedsActionUpdate.getStatus().toString()
+                        .equalsIgnoreCase( SocialFeedStatus.ESCALATED.toString() ) ) {
+                        updateFlag = 3;
+                        if ( macroFlag ) {
+                            macroActionFlag = 3;
+                        }
+                        actionHistory.setActionType( ActionHistoryType.ESCALATE );
+                        actionHistory.setText( "Post was " + socialFeedsActionUpdate.getStatus() + " by "
+                            + socialFeedsActionUpdate.getUserName() );
+                        actionHistory.setOwnerName( socialFeedsActionUpdate.getUserName() );
+                        actionHistory.setCreatedDate( new Date().getTime() );
+                        actionHistories.add( actionHistory );
+                    } else if ( socialFeedsActionUpdate.getStatus().toString()
+                        .equalsIgnoreCase( SocialFeedStatus.RESOLVED.toString() )
+                        && socialResponseObject.getStatus().toString().equalsIgnoreCase( SocialFeedStatus.ESCALATED.toString() )
+                        && !socialResponseObject.isFlagged() ) {
+                        updateFlag = 3;
+                        if ( macroFlag ) {
+                            macroActionFlag = 3;
+                        }
+                        actionHistory.setActionType( ActionHistoryType.RESOLVED );
+                        actionHistory.setText( "Post was " + socialFeedsActionUpdate.getStatus() + " by "
+                            + socialFeedsActionUpdate.getUserName() );
+                        actionHistory.setOwnerName( socialFeedsActionUpdate.getUserName() );
+                        actionHistory.setCreatedDate( new Date().getTime() );
+                        actionHistories.add( actionHistory );
+                    }
+                }
+            }
+            if ( macroActionFlag != 1 ) {
+                if ( ( socialFeedsActionUpdate.getTextActionType().toString()
+                    .equalsIgnoreCase( TextActionType.PRIVATE_NOTE.toString() ) )
+                    && ( socialFeedsActionUpdate.getText() != null ) && !( socialFeedsActionUpdate.getText().isEmpty() ) ) {
+                    ActionHistory actionHistory = new ActionHistory();
+                    actionHistory.setActionType( ActionHistoryType.PRIVATE_MESSAGE );
+                    actionHistory.setText( socialFeedsActionUpdate.getText() );
+                    actionHistory.setOwnerName( socialFeedsActionUpdate.getUserName() );
+                    actionHistory.setCreatedDate( new Date().getTime() );
+                    actionHistories.add( actionHistory );
+                }
+                if ( ( socialFeedsActionUpdate.getTextActionType().toString()
+                    .equalsIgnoreCase( TextActionType.SEND_EMAIL.toString() ) ) && ( socialFeedsActionUpdate.getText() != null )
+                    && !( socialFeedsActionUpdate.getText().isEmpty() ) ) {
+                    ActionHistory actionHistory = new ActionHistory();
+                    actionHistory.setActionType( ActionHistoryType.EMAIL );
+                    actionHistory.setText( socialFeedsActionUpdate.getText() );
+                    actionHistory.setOwnerName( socialFeedsActionUpdate.getUserName() );
+                    actionHistory.setCreatedDate( new Date().getTime() );
+                    actionHistories.add( actionHistory );
+                    // send mail to the user
+                    try {
+                        emailServices.sendSocialMonitorActionMail( socialResponseObject.getOwnerEmail(),
+                            socialResponseObject.getOwnerName(), socialFeedsActionUpdate.getText() );
+                    } catch ( UndeliveredEmailException e ) {
+                        LOG.error( "Email could not be delivered", e );
+                    }
+                }
+                mongoSocialFeedDao.updateSocialFeed( socialFeedsActionUpdate, socialResponseObject.getPostId(), actionHistories,
+                    updateFlag, MongoSocialFeedDaoImpl.SOCIAL_FEED_COLLECTION );
+            }
+            //add successful postIds
+            if ( updateFlag != 1 && macroActionFlag != 1) {
+                successPostIds.add( socialResponseObject.getPostId() );
+                socialFeedActionResponse.setSuccessPostIds( successPostIds );
+            }
+            //update macro count only if the action is applied on the current postId
+            if ( macroFlag && macroActionFlag != 1 ) {
+                ( socialMonitorMacro.getMacroUsageTime() ).add( new Date().getTime() );
+            }
+        }
+        if ( macroFlag ) {
+            mongoSocialFeedDao.updateMacroCount( organizationUnitSettings.getSocialMonitorMacros(), companyId );
+        }
 
-	}
+        LOG.debug( "End of saveSocialPostsForStream{}" );
+        return socialFeedActionResponse;
+
+    }
 
     @Override
     public long updateDuplicateCount(int hash, long companyId) throws InvalidInputException {
@@ -470,6 +514,20 @@ public class SocialFeedServiceImpl implements SocialFeedService
     		}
     	}
 		return count;
+    }
+    
+    public SocialFeedsActionUpdate getPostIdsWithDuplicates(SocialFeedsActionUpdate socialFeedsActionUpdate, Long companyId)
+    {
+        List<SocialResponseObject> socialResponseObjects = mongoSocialFeedDao
+            .getSocialPostsByIds( socialFeedsActionUpdate.getPostIds(), MongoSocialFeedDaoImpl.SOCIAL_FEED_COLLECTION );
+        for ( SocialResponseObject socialResponseObject : socialResponseObjects ) {
+            List<SocialResponseObject> duplicateSocialResponseObjects = mongoSocialFeedDao
+                .getDuplicatePostIds( socialResponseObject.getHash(), companyId );
+            for ( SocialResponseObject responseObject : duplicateSocialResponseObjects ) {
+                socialFeedsActionUpdate.getPostIds().add( responseObject.getPostId() );
+            }
+        }
+        return socialFeedsActionUpdate;
     }
 
 
