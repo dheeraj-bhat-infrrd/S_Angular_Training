@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.services.socialmonitor.feed;
 import java.util.List;
 
 import com.realtech.socialsurvey.core.entities.SegmentsVO;
+import com.realtech.socialsurvey.core.entities.SocialFeedActionResponse;
 import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
 import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
 import com.realtech.socialsurvey.core.entities.SocialMonitorResponseData;
@@ -52,9 +53,11 @@ public interface SocialFeedService
      * Update actions and macros on feeds
      * @param socialFeedsActionUpdate
      * @param companyId
+     * @param duplicateFlag
+     * @return
      * @throws InvalidInputException
      */
-    public void updateActionForFeeds(SocialFeedsActionUpdate socialFeedsActionUpdate, Long companyId) throws InvalidInputException;
+    public SocialFeedActionResponse updateActionForFeeds(SocialFeedsActionUpdate socialFeedsActionUpdate, Long companyId, boolean duplicateFlag) throws InvalidInputException;
     
     /**
      * Fetch macros based on companyId

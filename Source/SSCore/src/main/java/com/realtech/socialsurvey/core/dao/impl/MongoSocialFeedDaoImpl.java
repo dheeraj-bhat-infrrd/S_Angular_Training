@@ -19,6 +19,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 
@@ -97,9 +98,9 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 
 		Update update = new Update();
 
-		if (updateFlag == 1) {
+		if (updateFlag == 2) {
 			update.set(FLAGGED, socialFeedsActionUpdate.isFlagged());
-		} else if (updateFlag == 2) {
+		} else if (updateFlag == 3) {
 			update.set(FLAGGED, false);
 			update.set(STATUS, socialFeedsActionUpdate.getStatus());
 		}
@@ -123,21 +124,12 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
     }
 
 	@Override
-	public SocialResponseObject getSocialFeed(String postId, String collectionName) {
-		LOG.debug("Fetching Social Feed for postId {}", postId);
-		Query query = new Query();
-
-		query.addCriteria(Criteria.where(POST_ID).is(postId));
-
-		return mongoTemplate.findOne(query, SocialResponseObject.class, collectionName);
-	}
-
-	@Override
 	public OrganizationUnitSettings FetchMacros(Long companyId) {
 		LOG.debug("Fetching Macros from COMAPNY_SETTINGS");
 		Query query = new Query();
 
 		query.addCriteria(Criteria.where(IDEN).is(companyId));
+		query.fields().exclude( KEY_IDENTIFIER ).include( SOCIALMONITOR_MACROS );
 
 		return mongoTemplate.findOne(query, OrganizationUnitSettings.class,
 				CommonConstants.COMPANY_SETTINGS_COLLECTION);
@@ -397,7 +389,28 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         organizationUnitSettings = mongoTemplate.findOne( query, OrganizationUnitSettings.class, CommonConstants.AGENT_SETTINGS_COLLECTION );
         LOG.debug( "Fetched all user details from {}", CommonConstants.AGENT_SETTINGS_COLLECTION );
         return organizationUnitSettings;
-	}	
+	}
+
+    @Override
+    public List<SocialResponseObject> getSocialPostsByIds( Set<String> postIds, String collectionName )
+    {
+        LOG.debug("Fetching Social Feeds for postIds {}", postIds);
+        Query query = new Query();
+
+        query.addCriteria(Criteria.where(POST_ID).in(postIds));
+
+        return mongoTemplate.find(query, SocialResponseObject.class, collectionName);
+    }
+
+    @Override
+    public List<SocialResponseObject> getDuplicatePostIds( int hash, Long companyId )
+    {
+        LOG.debug("Fetching duplicate posts with hash = {} and companyId = {}", hash, companyId);
+        Query query = new  Query();
+        query.addCriteria(Criteria.where(HASH).is(hash).and(COMPANY_ID).is(companyId));
+        query.fields().exclude( KEY_IDENTIFIER ).include(POST_ID);
+        return mongoTemplate.find( query, SocialResponseObject.class, SOCIAL_FEED_COLLECTION );
+    }	
 	
 	
 	
