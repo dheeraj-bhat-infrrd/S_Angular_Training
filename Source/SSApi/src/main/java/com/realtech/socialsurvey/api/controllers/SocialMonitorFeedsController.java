@@ -77,7 +77,7 @@ public class SocialMonitorFeedsController {
 
 
     @RequestMapping ( value = "/updatesocialfeeds/action", method = RequestMethod.PUT)
-    @ApiOperation ( value = "Update Social posts for Social monitor for individual/bulk posts", response = String.class)
+    @ApiOperation ( value = "Update Social posts for Social monitor for individual/bulk posts", response = SocialFeedActionResponse.class)
     @ApiResponses ( value = { @ApiResponse ( code = 200, message = "Successfully updated the action on a post") })
     public ResponseEntity<?> saveSocialFeedsForAction( @RequestBody SocialFeedsActionUpdate socialFeedsActionUpdate,
         @RequestParam ( value = "companyId", required = false) Long companyId,
