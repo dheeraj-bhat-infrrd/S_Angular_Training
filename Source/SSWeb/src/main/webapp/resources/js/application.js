@@ -1490,11 +1490,52 @@ function updateEventOnDashboardPageForReviews() {
 	$('.ppl-share-icns').bind('click', function() {
 		var link = $(this).attr('data-link');
 		var title = $(this).attr('title');
+		var surveyMongoId  = $(this).closest('.ppl-review-item').attr('survey-mongo-id');
+		var entityId = $('#rep-prof-container').data('column-value');
+		var entityType = $('#rep-prof-container').data('column-name');
+		
+		var payload = {
+			"surveyMongoId" :surveyMongoId,
+			"entityId" : entityId,
+			"entityType" : entityType
+		};
+		
+		if(title == 'LinkedIn'){
+			$.ajax({
+				url : "./postonlinkedin.do",
+				type : "POST",
+				data : payload,
+				success : function(data) {
+					var response = JSON.parse(data);
+					linkedInShare(response,link,title);
+				},
+				error : function(e) {
+					if (e.status == 504) {
+						redirectToLoginPageOnSessionTimeOut(e.status);
+						return;
+					}
+					$('#overlay-toast').html("Oops! Something went wrong. Please try again later.");
+				}
+			});
+		}else{
+			if (link == undefined || link == "") {
+				return false;
+			}
+			window.open(link, 'Post to ' + title, 'width=800,height=600,scrollbars=yes');
+		}		
+	});
+}
+
+function linkedInShare(data,link,title){
+	if(data == false || data == 'false'){
 		if (link == undefined || link == "") {
 			return false;
 		}
 		window.open(link, 'Post to ' + title, 'width=800,height=600,scrollbars=yes');
-	});
+	}else if(data == true || data == 'true'){
+		$('#overlay-toast').html('Successfully posted to LinkedIn.');
+		showToast();
+	}
 }
 
 function showSurveyStatisticsGraphically(columnName, columnValue) {

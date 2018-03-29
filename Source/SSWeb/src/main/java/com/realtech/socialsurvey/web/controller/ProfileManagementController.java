@@ -211,7 +211,7 @@ public class ProfileManagementController
         if ( entityType == null || entityType.isEmpty() ) {
             entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
         }
-
+        
         boolean allowOverrideForSocialMedia = false;
         long branchId = 0;
         long regionId = 0;
@@ -245,7 +245,8 @@ public class ProfileManagementController
         }
 
         sessionHelper.updateSelectedProfile( session, entityId, entityType );
-
+        model.addAttribute( "columnValue", entityId );
+        
         // fetching details from profile
         if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
             //If the profile is a company profile
