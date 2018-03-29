@@ -25,8 +25,10 @@ import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 /*
@@ -446,8 +448,11 @@ public class SocialMonitorWebController {
     		postIds.add(postIdList[i]);
     	}
     	
+    	Set<String> postIdSet = new HashSet<>();
+    	postIdSet.addAll( postIds );
+    	
     	SocialFeedsActionUpdate socialFeedsActionUpdate = new SocialFeedsActionUpdate();
-    	socialFeedsActionUpdate.setPostIds(postIds);
+    	socialFeedsActionUpdate.setPostIds(postIdSet);
     	
     	boolean flagged = false;
     	if(flaggedStr!=null && !flaggedStr.isEmpty() && flaggedStr.equalsIgnoreCase("true")) {
@@ -486,10 +491,12 @@ public class SocialMonitorWebController {
     	
     	SocialFeedsActionUpdate socialFeedsActionUpdate = createSFAUFromRequest(request,userName);
     	
+    	boolean duplicateFlag = false;
+        
     	Response response =null;
     	
     	try {
-    		response = ssApiIntergrationBuilder.getIntegrationApi().saveSocialFeedsForAction(socialFeedsActionUpdate, companyId);
+    		response = ssApiIntergrationBuilder.getIntegrationApi().saveSocialFeedsForAction(socialFeedsActionUpdate, companyId, duplicateFlag);
     		message = messageUtils.getDisplayMessage(DisplayMessageConstants.UPDATE_POST_SUCCESSFUL,
     				DisplayMessageType.SUCCESS_MESSAGE).getMessage();
     		String status = new String(((TypedByteArray) response.getBody()).getBytes());
@@ -524,9 +531,12 @@ public class SocialMonitorWebController {
     	for(int i=0;i<postIdList.length;i++) {
     		postIds.add(postIdList[i]);
     	}
+    	   
+        Set<String> postIdSet = new HashSet<>();
+        postIdSet.addAll( postIds );
     	
-    	SocialFeedsActionUpdate socialFeedsActionUpdate = new SocialFeedsActionUpdate();
-    	socialFeedsActionUpdate.setPostIds(postIds);
+        SocialFeedsActionUpdate socialFeedsActionUpdate = new SocialFeedsActionUpdate();
+    	socialFeedsActionUpdate.setPostIds(postIdSet);
     	
     	boolean flagged = false;
     	if(flaggedStr!=null && !flaggedStr.isEmpty() && flaggedStr.equalsIgnoreCase("true")) {
@@ -567,8 +577,10 @@ public class SocialMonitorWebController {
     	
     	Response response =null;
     	
+    	boolean duplicateFlag = false;
+    	
     	try {
-    		response = ssApiIntergrationBuilder.getIntegrationApi().saveSocialFeedsForAction(socialFeedsActionUpdate, companyId);
+    		response = ssApiIntergrationBuilder.getIntegrationApi().saveSocialFeedsForAction(socialFeedsActionUpdate, companyId, duplicateFlag);
     		message = messageUtils.getDisplayMessage(DisplayMessageConstants.UPDATE_POST_SUCCESSFUL,
     				DisplayMessageType.SUCCESS_MESSAGE).getMessage();
     		String status = new String(((TypedByteArray) response.getBody()).getBytes());
