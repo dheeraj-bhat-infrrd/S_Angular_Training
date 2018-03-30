@@ -39,6 +39,7 @@ import com.realtech.socialsurvey.core.exception.RestErrorResponse;
 import com.realtech.socialsurvey.core.services.admin.AdminService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
@@ -57,6 +58,9 @@ public class AdminToolsController
 
     @Autowired
     private OrganizationManagementService organizationManagementService;
+    
+    @Autowired
+    private SocialManagementService socialManagementService;
 
     @Autowired
     private MessageUtils messageUtils;
@@ -640,6 +644,7 @@ public class AdminToolsController
 			if (StringUtils.isEmpty(entityType))
 				throw new InvalidInputException("Parameter entityType is missing");
 			
+			socialManagementService.manualPostToLinkedInForEntity(entityType, entityId, surveyMongoId);
 			//return response entity
 			return Response.status(Response.Status.CREATED)
 					.tag("Successfully posted to Linkedin for " + entityType + " with id  " + entityId).build();
