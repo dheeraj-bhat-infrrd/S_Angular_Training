@@ -4037,8 +4037,10 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
      * @param entityType
      * @param entityId
      * @param surveyMongoId
+     * @throws NonFatalException 
      */
-    public void  manualPostToLinkedInForEntity(String entityType , Long entityId , String surveyMongoId) 
+    @Override
+    public void  manualPostToLinkedInForEntity(String entityType , Long entityId , String surveyMongoId) throws NonFatalException 
 	{
 		LOG.info("Method manualPostToLinkedInForEntity started for entityType {} , entityId , surveyMongoId {} ",
 				entityType, entityId, surveyMongoId);
@@ -4097,9 +4099,11 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 		postToLinkedInForAHierarchy(settings, collectionName, rating, false, linkedinMessage, linkedinMessage,
 				linkedinProfileUrl, linkedinMessageFeedback, companySettings, agentSettings, mediaPostDetails, entityMediaPostResponseDetails, surveyMongoId);
 	
-		
+		LOG.info("Method manualPostToLinkedInForEntity ended for entityType {} , entityId , surveyMongoId {} ",
+				entityType, entityId, surveyMongoId);
 		}catch(Exception e) {
-			
+			LOG.error("Error while posting on linkedIn ");
+			throw new NonFatalException(e.getMessage());
 		}
 	}
     
