@@ -37,6 +37,7 @@ import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokensPaginated;
 import com.realtech.socialsurvey.core.entities.StateLookup;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
@@ -1663,4 +1664,8 @@ public interface OrganizationManagementService
      * @throws InvalidInputException
      */
     public List<Keyword> addKeywordToCompanySettings( long companyId, Keyword keyword ) throws InvalidInputException;
+
+    public SocialMediaTokensPaginated fetchSocialMediaTokensPaginated( int skipCount, int batchSize )
+        throws InvalidInputException;
+
 }

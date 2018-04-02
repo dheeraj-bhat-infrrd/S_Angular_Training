@@ -95,6 +95,7 @@ import com.realtech.socialsurvey.core.entities.RemovedUser;
 import com.realtech.socialsurvey.core.entities.RetriedTransaction;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokensPaginated;
 import com.realtech.socialsurvey.core.entities.StateLookup;
 import com.realtech.socialsurvey.core.entities.SurveyCompanyMapping;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
@@ -265,10 +266,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Autowired
     GenericDao<UploadStatus, Long> uploadStatusDao;
-    
+
     @Autowired
     private EncryptionHelper encryptionHelper;
-    
+
     @Autowired
     private SurveyBuilder surveyBuilder;
 
@@ -754,7 +755,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         MailContentSettings mailContentSettings = new MailContentSettings();
         companySettings.setMail_content( mailContentSettings );
-        
+
 
         LOG.debug( "Inserting company settings." );
         OrganizationUnitSettings oldCompanySettings = null;
@@ -934,7 +935,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @see com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService#addKeyworodsToCompanySettings(long, java.util.List)
      */
     @Override
-    public List<Keyword> addKeyworodsToCompanySettings( long companyId, List<Keyword> keywordsToAdd ) throws InvalidInputException
+    public List<Keyword> addKeyworodsToCompanySettings( long companyId, List<Keyword> keywordsToAdd )
+        throws InvalidInputException
     {
         LOG.debug( "Get company settings for the companyId: {}", companyId );
         OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId,
@@ -960,8 +962,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                     Keyword companyFilterKeyword = companyFilterKeywords.get( i );
 
                     if ( StringUtils.isNotEmpty( keyword.getId() ) ) {
-                        if ( companyFilterKeyword.getId() != null
-                            && companyFilterKeyword.getId().equals( keyword.getId() ) ) {
+                        if ( companyFilterKeyword.getId() != null && companyFilterKeyword.getId().equals( keyword.getId() ) ) {
                             idIndex = i;
                             // both index found exit loop
                             if ( phraseIndex != -1 ) {
@@ -969,7 +970,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                             }
                         }
                     }
-                    
+
                     if ( companyFilterKeyword.getPhrase() != null
                         && companyFilterKeyword.getPhrase().equalsIgnoreCase( keyword.getPhrase() ) ) {
                         phraseIndex = i;
@@ -990,7 +991,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         Keyword companyFilterKeyword = companyFilterKeywords.get( idIndex );
                         companyFilterKeyword.setModifiedOn( createdtime );
                         companyFilterKeyword.setPhrase( keyword.getPhrase() );
-                        companyFilterKeyword.setMonitorType(keyword.getMonitorType());
+                        companyFilterKeyword.setMonitorType( keyword.getMonitorType() );
                     }
                 } else {
 
@@ -1009,7 +1010,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         keywordNew.setPhrase( keyword.getPhrase() );
                         keywordNew.setId( UUID.randomUUID().toString() );
                         keywordNew.setStatus( 1 );
-                        keywordNew.setMonitorType(keyword.getMonitorType());
+                        keywordNew.setMonitorType( keyword.getMonitorType() );
                         companyFilterKeywords.add( keywordNew );
                     }
                 }
@@ -1020,7 +1021,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
             //update the redis with the keywords
-            redisDao.addKeywords(companyId, companyFilterKeywords);
+            redisDao.addKeywords( companyId, companyFilterKeywords );
 
         } else {
             LOG.debug( "Keywords are empty so skiping operation" );
@@ -1030,7 +1031,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 
     @Override
-    public  Map<String, Long> getFacebookAndTwitterLocks( String lockType ) throws InvalidInputException
+    public Map<String, Long> getFacebookAndTwitterLocks( String lockType ) throws InvalidInputException
     {
         LOG.debug( "Method getFacebookAndTwitterLocks() started" );
         if ( lockType != null && !lockType.equalsIgnoreCase( "facebook" ) && !lockType.equalsIgnoreCase( "twitter" ) ) {
@@ -1049,7 +1050,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         return resultList;
 
     }
-       
+
+
     /* (non-Javadoc)
      * @see com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService#enableKeyworodForCompanySettings(long, java.lang.String)
      */
@@ -1067,7 +1069,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         return updateKeyworodStatusForCompanySettings( companyId, keywordId, 0 );
     }
 
-    
+
     /**
      * Method to update keyword by keyword id and keyword status
      * @param companyId
@@ -1151,6 +1153,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         FilterKeywordsResponse filterKeywordsResponse = new FilterKeywordsResponse();
         if ( companyFilterKeywords != null && !companyFilterKeywords.isEmpty() ) {
             Collections.sort( companyFilterKeywords, new FilterKeywordsComparator() );
+
             if ( monitorType == null || monitorType.isEmpty() ) {
                 filterKeywordsResponse.setMonitorType( "ALL" );
                 filterKeywordsResponse.setCount( companyFilterKeywords.size() );
@@ -2468,8 +2471,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( searchKey == null )
             throw new InvalidInputException( "Invalid searchKey passed as argument " );
         List<Region> regions = new ArrayList<Region>();
-        List<SolrDocument> solrDocumentList = solrSearchService
-            .searchBranchRegionOrAgentByNameForAdmin( CommonConstants.REGION_NAME_SOLR, ClientUtils.escapeQueryChars(searchKey) );
+        List<SolrDocument> solrDocumentList = solrSearchService.searchBranchRegionOrAgentByNameForAdmin(
+            CommonConstants.REGION_NAME_SOLR, ClientUtils.escapeQueryChars( searchKey ) );
 
         for ( SolrDocument document : solrDocumentList ) {
             Region region = new Region();
@@ -2495,8 +2498,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( searchKey == null )
             throw new InvalidInputException( "Invalid searchKey passed as argument " );
         List<Branch> branches = new ArrayList<Branch>();
-        List<SolrDocument> solrDocumentList = solrSearchService
-            .searchBranchRegionOrAgentByNameForAdmin( CommonConstants.BRANCH_NAME_SOLR, ClientUtils.escapeQueryChars(searchKey) );
+        List<SolrDocument> solrDocumentList = solrSearchService.searchBranchRegionOrAgentByNameForAdmin(
+            CommonConstants.BRANCH_NAME_SOLR, ClientUtils.escapeQueryChars( searchKey ) );
 
         for ( SolrDocument document : solrDocumentList ) {
             Branch branch = new Branch();
@@ -2523,8 +2526,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( searchKey == null )
             throw new InvalidInputException( "Invalid searchKey passed as argument " );
         List<UserFromSearch> users = new ArrayList<UserFromSearch>();
-        List<SolrDocument> solrDocumentList = solrSearchService
-            .searchBranchRegionOrAgentByNameForAdmin( CommonConstants.USER_DISPLAY_NAME_SOLR, ClientUtils.escapeQueryChars(searchKey) );
+        List<SolrDocument> solrDocumentList = solrSearchService.searchBranchRegionOrAgentByNameForAdmin(
+            CommonConstants.USER_DISPLAY_NAME_SOLR, ClientUtils.escapeQueryChars( searchKey ) );
 
         for ( SolrDocument document : solrDocumentList ) {
             UserFromSearch user = new UserFromSearch();
@@ -4504,10 +4507,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         // set default profile stages.
         organizationSettings.setProfileStages( profileCompletionList.getDefaultProfileCompletionList( false ) );
-        
+
         // default digest flag
-        if( !isDefaultFlag ) {
-        	organizationSettings.setSendMonthlyDigestMail(true);
+        if ( !isDefaultFlag ) {
+            organizationSettings.setSendMonthlyDigestMail( true );
         }
 
         organizationUnitSettingsDao.insertOrganizationUnitSettings( organizationSettings,
@@ -4558,10 +4561,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         // set default profile stages.
         organizationSettings.setProfileStages( profileCompletionList.getDefaultProfileCompletionList( false ) );
-        
+
         // default digest flag
-        if( !isDefaultFlag ) {
-        	organizationSettings.setSendMonthlyDigestMail(true);
+        if ( !isDefaultFlag ) {
+            organizationSettings.setSendMonthlyDigestMail( true );
         }
 
         organizationUnitSettingsDao.insertOrganizationUnitSettings( organizationSettings,
@@ -5925,63 +5928,211 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             skipCount, batchSize );
         return fieldIngestionEntities;
     }
-    
+
+
     /* (non-Javadoc)
      * @see com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService#fetchSocialMediaTokensResponse(int, int)
      */
     @Transactional
     @Override
-    public List<SocialMediaTokenResponse> fetchSocialMediaTokensResponse(int skipCount, int batchSize ) throws InvalidInputException
+    public List<SocialMediaTokenResponse> fetchSocialMediaTokensResponse( int skipCount, int batchSize )
+        throws InvalidInputException
     {
-       
+
         LOG.info( "Inside method fetchSocialMediaTokensResponse" );
         List<SocialMediaTokenResponse> socialMediaTokenResponseList = new ArrayList<>();
 
         // fetch companies media token
-        List<FeedIngestionEntityForSM> companiesMediaTokens = organizationUnitSettingsDao.getAllCompanyIdWithSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, 0, 0 );
+        List<FeedIngestionEntityForSM> companiesMediaTokens = organizationUnitSettingsDao
+            .getAllCompanyIdWithSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, 0, 0 );
         for ( FeedIngestionEntityForSM feedIngestionEntity : companiesMediaTokens ) {
-            
-            if(feedIngestionEntity.getSocialMediaTokens() != null) {
-                socialMediaTokenResponseList.add( setSocialMediaTokenResponse( feedIngestionEntity, feedIngestionEntity.getIden(), ProfileType.COMPANY) );
+
+            if ( feedIngestionEntity.getSocialMediaTokens() != null ) {
+                socialMediaTokenResponseList.add(
+                    setSocialMediaTokenResponse( feedIngestionEntity, feedIngestionEntity.getIden(), ProfileType.COMPANY ) );
             }
 
-            
+
             List<Long> regionIds = regionDao.getRegionIdsUnderCompany( feedIngestionEntity.getIden(), skipCount, batchSize );
-            
-            List<FeedIngestionEntityForSM> regionMediaTokens = organizationUnitSettingsDao.fetchSocialMediaTokensForIds( regionIds, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
-            
+
+            List<FeedIngestionEntityForSM> regionMediaTokens = organizationUnitSettingsDao
+                .fetchSocialMediaTokensForIds( regionIds, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+
             for ( FeedIngestionEntityForSM regionFeedIngestionEntity : regionMediaTokens ) {
-                socialMediaTokenResponseList.add( setSocialMediaTokenResponse( regionFeedIngestionEntity, feedIngestionEntity.getIden(), ProfileType.REGION ) );
+                socialMediaTokenResponseList.add( setSocialMediaTokenResponse( regionFeedIngestionEntity,
+                    feedIngestionEntity.getIden(), ProfileType.REGION ) );
             }
-            
+
             List<Long> branchIds = branchDao.getBranchIdsUnderCompany( feedIngestionEntity.getIden(), skipCount, batchSize );
-            
-            List<FeedIngestionEntityForSM> branchMediaTokens = organizationUnitSettingsDao.fetchSocialMediaTokensForIds( branchIds, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
-            
+
+            List<FeedIngestionEntityForSM> branchMediaTokens = organizationUnitSettingsDao
+                .fetchSocialMediaTokensForIds( branchIds, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+
             for ( FeedIngestionEntityForSM branchFeedIngestionEntity : branchMediaTokens ) {
-                socialMediaTokenResponseList.add( setSocialMediaTokenResponse( branchFeedIngestionEntity,feedIngestionEntity.getIden(), ProfileType.BRANCH ) );
+                socialMediaTokenResponseList.add( setSocialMediaTokenResponse( branchFeedIngestionEntity,
+                    feedIngestionEntity.getIden(), ProfileType.BRANCH ) );
             }
-            
+
             List<Long> userIds = getAgentIdsUnderCompany( feedIngestionEntity.getIden(), skipCount, batchSize );
-            
-            List<FeedIngestionEntityForSM> usersMediaTokens = organizationUnitSettingsDao.fetchSocialMediaTokensForIds( userIds, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
-            
+
+            List<FeedIngestionEntityForSM> usersMediaTokens = organizationUnitSettingsDao.fetchSocialMediaTokensForIds( userIds,
+                MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+
             for ( FeedIngestionEntityForSM userFeedIngestionEntity : usersMediaTokens ) {
-                socialMediaTokenResponseList.add( setSocialMediaTokenResponse( userFeedIngestionEntity,feedIngestionEntity.getIden(), ProfileType.AGENT ) );
+                socialMediaTokenResponseList.add(
+                    setSocialMediaTokenResponse( userFeedIngestionEntity, feedIngestionEntity.getIden(), ProfileType.AGENT ) );
             }
         }
         LOG.info( "End of method fetchSocialMediaTokensResponse" );
         return socialMediaTokenResponseList;
     }
+
+
+    @Override
+    @Transactional
+    public SocialMediaTokensPaginated fetchSocialMediaTokensPaginated( int skipCount, int batchSize )
+        throws InvalidInputException
+    {
+        LOG.info( "Inside method fetchSocialMediaTokensResponse" );
+        SocialMediaTokensPaginated socialMediaTokensPaginated = new SocialMediaTokensPaginated();
+        int totalRecord = 0;
+
+        // fetch companies media token
+        long companyTokensCount = organizationUnitSettingsDao
+            .getSocialMediaTokensCount( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        long regionTokensCount = organizationUnitSettingsDao
+            .getSocialMediaTokensCount( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+        long branchTokensCount = organizationUnitSettingsDao
+            .getSocialMediaTokensCount( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+        long agentTokensCount = organizationUnitSettingsDao
+            .getSocialMediaTokensCount( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+
+        if ( skipCount < companyTokensCount ) {
+            List<FeedIngestionEntityForSM> companiesMediaTokens = organizationUnitSettingsDao
+                .getAllCompanyIdWithSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
+                    skipCount, batchSize );
+
+            totalRecord = companiesMediaTokens.size();
+
+            socialMediaTokensPaginated.setCompaniesTokens( companiesMediaTokens );
+
+            if ( totalRecord < batchSize ) {
+                List<FeedIngestionEntityForSM> regionsMediaTokens = organizationUnitSettingsDao
+                    .getAllCompanyIdWithSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, 0,
+                        batchSize - totalRecord );
+                totalRecord += regionsMediaTokens.size();
+
+                socialMediaTokensPaginated.setRegionsTokens( regionsMediaTokens );
+
+                if ( totalRecord < batchSize ) {
+                    List<FeedIngestionEntityForSM> branchMediaTokens = organizationUnitSettingsDao
+                        .getAllCompanyIdWithSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
+                            0, batchSize - totalRecord );
+                    totalRecord += branchMediaTokens.size();
+                    socialMediaTokensPaginated.setBranchesTokens( branchMediaTokens );
+
+                    if ( totalRecord < batchSize ) {
+                        List<FeedIngestionEntityForSM> agentMediaTokens = organizationUnitSettingsDao
+                            .getAllCompanyIdWithSocialMediaTokens(
+                                MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, 0,
+                                batchSize - totalRecord );
+                        socialMediaTokensPaginated.setAgentsTokens( agentMediaTokens );
+                    }
+                }
+            }
+        } else if ( skipCount < companyTokensCount + regionTokensCount ) {
+
+            List<FeedIngestionEntityForSM> regionsMediaTokens = organizationUnitSettingsDao
+                .getAllCompanyIdWithSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
+                    (int) ( skipCount - companyTokensCount ), batchSize );
+            totalRecord += regionsMediaTokens.size();
+
+            socialMediaTokensPaginated.setRegionsTokens( regionsMediaTokens );
+
+            if ( totalRecord < batchSize ) {
+                List<FeedIngestionEntityForSM> branchMediaTokens = organizationUnitSettingsDao
+                    .getAllCompanyIdWithSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, 0,
+                        batchSize - totalRecord );
+                totalRecord += branchMediaTokens.size();
+                socialMediaTokensPaginated.setBranchesTokens( branchMediaTokens );
+
+                if ( totalRecord < batchSize ) {
+                    List<FeedIngestionEntityForSM> agentMediaTokens = organizationUnitSettingsDao
+                        .getAllCompanyIdWithSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, 0,
+                            batchSize - totalRecord );
+                    socialMediaTokensPaginated.setAgentsTokens( agentMediaTokens );
+                }
+            }
+        } else if ( skipCount < companyTokensCount + regionTokensCount + branchTokensCount ) {
+            List<FeedIngestionEntityForSM> branchMediaTokens = organizationUnitSettingsDao.getAllCompanyIdWithSocialMediaTokens(
+                MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
+                (int) ( skipCount - ( companyTokensCount + regionTokensCount ) ), batchSize );
+            totalRecord += branchMediaTokens.size();
+            socialMediaTokensPaginated.setBranchesTokens( branchMediaTokens );
+
+            if ( totalRecord < batchSize ) {
+                List<FeedIngestionEntityForSM> agentMediaTokens = organizationUnitSettingsDao
+                    .getAllCompanyIdWithSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, 0,
+                        batchSize - totalRecord );
+                socialMediaTokensPaginated.setAgentsTokens( agentMediaTokens );
+            }
+        } else if ( skipCount < companyTokensCount + regionTokensCount + branchTokensCount + agentTokensCount ) {
+            List<FeedIngestionEntityForSM> agentMediaTokens = organizationUnitSettingsDao.getAllCompanyIdWithSocialMediaTokens(
+                MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+                (int) ( skipCount - ( companyTokensCount + regionTokensCount + branchTokensCount ) ), batchSize );
+            socialMediaTokensPaginated.setAgentsTokens( agentMediaTokens );
+        }
+
+        setCompanyIdsMap( socialMediaTokensPaginated );
+
+        LOG.info( "End of method fetchSocialMediaTokensResponse" );
+        return socialMediaTokensPaginated;
+    }
     
+    /**
+     * Method to set companies map in social media paginated response.
+     * @param socialMediaTokensPaginated
+     */
+    private void setCompanyIdsMap(SocialMediaTokensPaginated socialMediaTokensPaginated ){
+        LOG.debug( "Inside  setCompanyIdsMap" );
+        List<Long> regionIds = new ArrayList<>();
+
+        for ( FeedIngestionEntityForSM regionToken : socialMediaTokensPaginated.getRegionsTokens() ) {
+            regionIds.add( regionToken.getIden() );
+        }
+
+        Map<Long, Long> regionCompanyIdMap = regionDao.getCompanyIdsForRegionIds( regionIds );
+        socialMediaTokensPaginated.setRegionCompanyIdMap( regionCompanyIdMap );
+
+        List<Long> branchIds = new ArrayList<>();
+        for ( FeedIngestionEntityForSM branchToken : socialMediaTokensPaginated.getBranchesTokens() ) {
+            branchIds.add( branchToken.getIden() );
+        }
+
+        Map<Long, Long> branchCompanyIdMap = branchDao.getCompanyIdsForBranchIds( branchIds );
+        socialMediaTokensPaginated.setBranchCompanyIdMap( branchCompanyIdMap );
+
+        List<Long> userIds = new ArrayList<>();
+        for ( FeedIngestionEntityForSM agentToken : socialMediaTokensPaginated.getAgentsTokens() ) {
+            userIds.add( agentToken.getIden() );
+        }
+
+        Map<Long, Long> userCompanyIdMap = userDao.getCompanyIdsForUserIds( userIds );
+        socialMediaTokensPaginated.setAgentCompanyIdMap( userCompanyIdMap );
+        LOG.debug( "End of setCompanyIdsMap" );
+    }
+
+
     /**
      * Populate SocialMediaTokenResponse from FeedIngestionEntity
      * @param feedIngestionEntity
      * @param profileType
      * @return
      */
-    private SocialMediaTokenResponse setSocialMediaTokenResponse(FeedIngestionEntityForSM feedIngestionEntity, long companyId, ProfileType profileType){
-        if(feedIngestionEntity != null){
+    private SocialMediaTokenResponse setSocialMediaTokenResponse( FeedIngestionEntityForSM feedIngestionEntity, long companyId,
+        ProfileType profileType )
+    {
+        if ( feedIngestionEntity != null ) {
             SocialMediaTokenResponse socialMediaTokenResponse = new SocialMediaTokenResponse();
             socialMediaTokenResponse.setIden( feedIngestionEntity.getIden() );
             socialMediaTokenResponse.setCompanyId( companyId );
@@ -7902,8 +8053,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         try {
                             //send report bug mail to admin
                             batchTrackerService.sendMailToAdminRegardingBatchError(
-                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(), 
-                                new Exception( e.getMessage() + " for profileImage of companyId:" + id, e ));
+                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(),
+                                new Exception( e.getMessage() + " for profileImage of companyId:" + id, e ) );
                         } catch ( InvalidInputException e1 ) {
                             LOG.error( "Error while updating error message in processing of images " );
                         } catch ( UndeliveredEmailException e1 ) {
@@ -7933,8 +8084,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         try {
                             //send report bug mail to admin
                             batchTrackerService.sendMailToAdminRegardingBatchError(
-                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(), 
-                                new Exception( e.getMessage() + " for profileImage of regionId:" + id, e ));
+                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(),
+                                new Exception( e.getMessage() + " for profileImage of regionId:" + id, e ) );
                         } catch ( InvalidInputException e1 ) {
                             LOG.error( "Error while updating error message in processing of images " );
                         } catch ( UndeliveredEmailException e1 ) {
@@ -7964,9 +8115,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         try {
                             //send report bug mail to admin
                             batchTrackerService.sendMailToAdminRegardingBatchError(
-                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(), 
-                                new Exception( e.getMessage() + " for profileImage of companyId:" + id, 
-                                    new Exception( e.getMessage() + " for profileImage of branchId:" + id, e )));
+                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(),
+                                new Exception( e.getMessage() + " for profileImage of companyId:" + id,
+                                    new Exception( e.getMessage() + " for profileImage of branchId:" + id, e ) ) );
                         } catch ( InvalidInputException e1 ) {
                             LOG.error( "Error while updating error message in processing of images " );
                         } catch ( UndeliveredEmailException e1 ) {
@@ -7997,8 +8148,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         try {
                             //send report bug mail to admin
                             batchTrackerService.sendMailToAdminRegardingBatchError(
-                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(), 
-                                new Exception( e.getMessage() + " for profileImage of companyId:" + id, e ));
+                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(),
+                                new Exception( e.getMessage() + " for profileImage of companyId:" + id, e ) );
                         } catch ( InvalidInputException e1 ) {
                             LOG.error( "Error while updating error message in processing of images " );
                         } catch ( UndeliveredEmailException e1 ) {
@@ -8028,8 +8179,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         try {
                             //send report bug mail to admin
                             batchTrackerService.sendMailToAdminRegardingBatchError(
-                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(), 
-                                new Exception( e.getMessage() + " for logo of companyId:" + id, e ));
+                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(),
+                                new Exception( e.getMessage() + " for logo of companyId:" + id, e ) );
                         } catch ( InvalidInputException e1 ) {
                             LOG.error( "Error while updating error message in processing of images " );
                         } catch ( UndeliveredEmailException e1 ) {
@@ -8054,8 +8205,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         try {
                             //send report bug mail to admin
                             batchTrackerService.sendMailToAdminRegardingBatchError(
-                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(), 
-                                new Exception( e.getMessage() + " for logo of regionId:" + id, e ));
+                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(),
+                                new Exception( e.getMessage() + " for logo of regionId:" + id, e ) );
                         } catch ( InvalidInputException e1 ) {
                             LOG.error( "Error while updating error message in processing of images " );
                         } catch ( UndeliveredEmailException e1 ) {
@@ -8080,8 +8231,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         try {
                             //send report bug mail to admin
                             batchTrackerService.sendMailToAdminRegardingBatchError(
-                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(), 
-                                new Exception( e.getMessage() + " for logo of branchId:" + id, e ));
+                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(),
+                                new Exception( e.getMessage() + " for logo of branchId:" + id, e ) );
                         } catch ( InvalidInputException e1 ) {
                             LOG.error( "Error while updating error message in processing of images " );
                         } catch ( UndeliveredEmailException e1 ) {
@@ -8107,8 +8258,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         try {
                             //send report bug mail to admin
                             batchTrackerService.sendMailToAdminRegardingBatchError(
-                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(), 
-                                new Exception( e.getMessage() + " for logo of agentId:" + id, e ));
+                                CommonConstants.BATCH_NAME_IMAGE_PROCESSING_STARTER, System.currentTimeMillis(),
+                                new Exception( e.getMessage() + " for logo of agentId:" + id, e ) );
                         } catch ( InvalidInputException e1 ) {
                             LOG.error( "Error while updating error message in processing of images " );
                         } catch ( UndeliveredEmailException e1 ) {
@@ -8693,12 +8844,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Override
     public List<OrganizationUnitSettings> getCompaniesForTransactionMonitor()
     {
-        List<Company> companies =  getAllActiveEnterpriseCompanies();
+        List<Company> companies = getAllActiveEnterpriseCompanies();
         List<Long> companyIds = new ArrayList<Long>();
-        for(Company company : companies){
+        for ( Company company : companies ) {
             companyIds.add( company.getCompanyId() );
         }
-        return organizationUnitSettingsDao.getCompaniesForTransactionMonitor(companyIds);
+        return organizationUnitSettingsDao.getCompaniesForTransactionMonitor( companyIds );
     }
 
 
@@ -8709,7 +8860,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             MongoOrganizationUnitSettingDaoImpl.KEY_INCLUDE_FOR_TRANSACTION_MONITOR, includeForTransactionMonitor, companyId,
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
     }
-        
+
+
     /**
      * 
      * @param companySettings
@@ -8723,7 +8875,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         OrganizationUnitSettings regionSettings, OrganizationUnitSettings branchSetting, OrganizationUnitSettings unitSettings )
     {
 
-        LOG.debug( "method  getFacebookPixelImageTagsFromHierarchy started");
+        LOG.debug( "method  getFacebookPixelImageTagsFromHierarchy started" );
         String facebookPixelTag = "";
 
         if ( companySettings != null && companySettings.getSocialMediaTokens() != null
@@ -8745,11 +8897,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             && unitSettings.getSocialMediaTokens().getFacebookPixelToken() != null )
             if ( !StringUtils.isEmpty( unitSettings.getSocialMediaTokens().getFacebookPixelToken().getPixelImgTag() ) )
                 facebookPixelTag += unitSettings.getSocialMediaTokens().getFacebookPixelToken().getPixelImgTag();
-        
+
         LOG.debug( "the fenerated facebook pixel tag is : {}", facebookPixelTag );
-        LOG.debug( "method  getFacebookPixelImageTagsFromHierarchy finished");
+        LOG.debug( "method  getFacebookPixelImageTagsFromHierarchy finished" );
         return facebookPixelTag;
     }
+
 
     @Override
     public boolean updateDigestRecipients( String entityType, long entityId, Set<String> emails )
@@ -8819,24 +8972,25 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         return emailList;
     }
-    
+
+
     /**
      * 
      * @param alertType
      * @return
      */
     @Override
-    public List<OrganizationUnitSettings> getCompaniesByAlertType(String alertType)
+    public List<OrganizationUnitSettings> getCompaniesByAlertType( String alertType )
     {
-        LOG.debug( "method getCompaniesByAlertType started for alertType {}" , alertType );
-        List<Company> companies =  getAllActiveEnterpriseCompanies();
+        LOG.debug( "method getCompaniesByAlertType started for alertType {}", alertType );
+        List<Company> companies = getAllActiveEnterpriseCompanies();
         List<Long> companyIds = new ArrayList<Long>();
-        
-        for(Company company : companies)
+
+        for ( Company company : companies )
             companyIds.add( company.getCompanyId() );
-        
-        LOG.debug( "method getCompaniesByAlertType finished for alertType {}" , alertType );
-        return organizationUnitSettingsDao.fetchCompaniesByAlertType( alertType, companyIds );   
+
+        LOG.debug( "method getCompaniesByAlertType finished for alertType {}", alertType );
+        return organizationUnitSettingsDao.fetchCompaniesByAlertType( alertType, companyIds );
     }
 
 
@@ -8844,13 +8998,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     public String getCollectionFromProfileLevel( String profileLevel ) throws InvalidInputException
     {
         LOG.debug( "method getCollectionFromProfileLevel started" );
-        if( CommonConstants.PROFILE_LEVEL_COMPANY.equals( profileLevel ) ) {
+        if ( CommonConstants.PROFILE_LEVEL_COMPANY.equals( profileLevel ) ) {
             return MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
-        } else if( CommonConstants.PROFILE_LEVEL_REGION.equals( profileLevel ) ) {
-            return MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;            
-        } else if( CommonConstants.PROFILE_LEVEL_BRANCH.equals( profileLevel ) ) {
+        } else if ( CommonConstants.PROFILE_LEVEL_REGION.equals( profileLevel ) ) {
+            return MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
+        } else if ( CommonConstants.PROFILE_LEVEL_BRANCH.equals( profileLevel ) ) {
             return MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
-        } else if( CommonConstants.PROFILE_LEVEL_INDIVIDUAL.equals( profileLevel ) ) {
+        } else if ( CommonConstants.PROFILE_LEVEL_INDIVIDUAL.equals( profileLevel ) ) {
             return MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
         } else {
             LOG.warn( "Invalid profile level" );
@@ -8923,206 +9077,225 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
 
-	@Override
-	public List<Long> filterCompanyIdsByStatus(List<Long> companies, String status) throws InvalidInputException {
-		LOG.info("method filterCompanyIdsByStatus() started");
-		if( companies == null || companies.isEmpty() ) {
-			LOG.warn("company list is non-existent");
-			return companies;
-		} else if( StringUtils.isEmpty( status ) ) {
-			LOG.warn("filter parameter status is not present");
-			return companies;
-		} else if ( status.equals(CommonConstants.STATUS_ACTIVE_MONGO ) ) {
-			return companyDao.filterIdsByStatus( companies, Arrays.asList(1) );
-		} else if ( status.equals(CommonConstants.STATUS_DELETED_MONGO ) ) {
-			return companyDao.filterIdsByStatus( companies, Arrays.asList(11) );
-		} else {
-			LOG.warn( "Invalid filter for fetching encompass" );
-			throw new InvalidInputException( "Invalid filter for fetching encompass" );
-		}
-	}
+    @Override
+    public List<Long> filterCompanyIdsByStatus( List<Long> companies, String status ) throws InvalidInputException
+    {
+        LOG.info( "method filterCompanyIdsByStatus() started" );
+        if ( companies == null || companies.isEmpty() ) {
+            LOG.warn( "company list is non-existent" );
+            return companies;
+        } else if ( StringUtils.isEmpty( status ) ) {
+            LOG.warn( "filter parameter status is not present" );
+            return companies;
+        } else if ( status.equals( CommonConstants.STATUS_ACTIVE_MONGO ) ) {
+            return companyDao.filterIdsByStatus( companies, Arrays.asList( 1 ) );
+        } else if ( status.equals( CommonConstants.STATUS_DELETED_MONGO ) ) {
+            return companyDao.filterIdsByStatus( companies, Arrays.asList( 11 ) );
+        } else {
+            LOG.warn( "Invalid filter for fetching encompass" );
+            throw new InvalidInputException( "Invalid filter for fetching encompass" );
+        }
+    }
 
 
-	@Override
-	public boolean decryptEncompassPasswordIfPossible(OrganizationUnitSettings unitSettings) {
-		LOG.info( "Deciphering encompass password" );
+    @Override
+    public boolean decryptEncompassPasswordIfPossible( OrganizationUnitSettings unitSettings )
+    {
+        LOG.info( "Deciphering encompass password" );
         if ( unitSettings != null && unitSettings.getCrm_info() != null
             && unitSettings.getCrm_info().getCrm_source().equalsIgnoreCase( CommonConstants.CRM_SOURCE_ENCOMPASS ) ) {
             EncompassCrmInfo crmInfo = (EncompassCrmInfo) unitSettings.getCrm_info();
-            if( StringUtils.isNotEmpty(crmInfo.getCrm_password()) ) {
-            	try {
+            if ( StringUtils.isNotEmpty( crmInfo.getCrm_password() ) ) {
+                try {
                     // deciphering the encompass password
                     crmInfo.setCrm_password( encryptionHelper.decryptAES( crmInfo.getCrm_password(), "" ) );
                     LOG.debug( "Successfully decrypted encompass password for company with ID: {}", unitSettings.getIden() );
-            	} catch( InvalidInputException error ) {
-            		LOG.warn( "decryptEncompassPasswordIfPossible(): encompass password is not encrypted for company with ID: {}", unitSettings.getIden() );
-            		return false;
-            	}
+                } catch ( InvalidInputException error ) {
+                    LOG.warn(
+                        "decryptEncompassPasswordIfPossible(): encompass password is not encrypted for company with ID: {}",
+                        unitSettings.getIden() );
+                    return false;
+                }
             }
         }
-		return true;
-	}
-	
-	@Override
-	public void updateAbusiveMailService(long companyId, String mailId) throws NonFatalException {
+        return true;
+    }
 
-		LOG.info("Update abusive mail");
-		OrganizationUnitSettings unitSettings = null;
-		AbusiveMailSettings originalAbusiveMailSettings = new AbusiveMailSettings();
-        mailId = checkValidMail(mailId);
 
-		unitSettings = getCompanySettings(companyId);
+    @Override
+    public void updateAbusiveMailService( long companyId, String mailId ) throws NonFatalException
+    {
 
-		if (unitSettings == null)
-			throw new NonFatalException("Company settings cannot be found for id : " + companyId);
-		// if surveySettings doesnt exist add it
-		if (unitSettings.getSurvey_settings() == null) {
-			addSurveySettings(unitSettings);
-		}
+        LOG.info( "Update abusive mail" );
+        OrganizationUnitSettings unitSettings = null;
+        AbusiveMailSettings originalAbusiveMailSettings = new AbusiveMailSettings();
+        mailId = checkValidMail( mailId );
 
-		if (unitSettings.getSurvey_settings().getAbusive_mail_settings() != null)
-			originalAbusiveMailSettings = unitSettings.getSurvey_settings().getAbusive_mail_settings();
+        unitSettings = getCompanySettings( companyId );
 
-		originalAbusiveMailSettings.setMailId(mailId);
-		unitSettings.getSurvey_settings().setAbusive_mail_settings(originalAbusiveMailSettings);
-		updateSurveySettings( unitSettings, unitSettings.getSurvey_settings() );
+        if ( unitSettings == null )
+            throw new NonFatalException( "Company settings cannot be found for id : " + companyId );
+        // if surveySettings doesnt exist add it
+        if ( unitSettings.getSurvey_settings() == null ) {
+            addSurveySettings( unitSettings );
+        }
 
-	}
-	
-	@Override
-	public void unsetAbusiveMailService(long companyId) throws NonFatalException {
+        if ( unitSettings.getSurvey_settings().getAbusive_mail_settings() != null )
+            originalAbusiveMailSettings = unitSettings.getSurvey_settings().getAbusive_mail_settings();
 
-		LOG.info("Unset abusive mail");
-		OrganizationUnitSettings unitSettings = null;
+        originalAbusiveMailSettings.setMailId( mailId );
+        unitSettings.getSurvey_settings().setAbusive_mail_settings( originalAbusiveMailSettings );
+        updateSurveySettings( unitSettings, unitSettings.getSurvey_settings() );
 
-		unitSettings = getCompanySettings(companyId);
+    }
 
-		if (unitSettings == null)
-			throw new NonFatalException("Company settings cannot be found for id : " + companyId);
-		// if surveySettings doesnt exist add it
-		if (unitSettings.getSurvey_settings().getAbusive_mail_settings() != null) {
-			unsetKey(unitSettings,MongoOrganizationUnitSettingDaoImpl.KEY_ABUSIVE_EMAIL_SETTING,CommonConstants.COMPANY_SETTINGS_COLLECTION);
-		}
 
-	}
-	
-	@Override
-	public void unsetComplaintResService(long companyId) throws NonFatalException {
+    @Override
+    public void unsetAbusiveMailService( long companyId ) throws NonFatalException
+    {
 
-		LOG.info("Unset Complaint Resolution mail");
-		OrganizationUnitSettings unitSettings = null;
+        LOG.info( "Unset abusive mail" );
+        OrganizationUnitSettings unitSettings = null;
 
-		unitSettings = getCompanySettings(companyId);
+        unitSettings = getCompanySettings( companyId );
 
-		if (unitSettings == null)
-			throw new NonFatalException("Company settings cannot be found for id : " + companyId);
-		// if surveySettings doesnt exist add it
-		if (unitSettings.getSurvey_settings().getComplaint_res_settings() != null) {
-			unsetKey(unitSettings,MongoOrganizationUnitSettingDaoImpl.KEY_COMPLAINT_RESOLUTION_SETTING,CommonConstants.COMPANY_SETTINGS_COLLECTION);
-		}
+        if ( unitSettings == null )
+            throw new NonFatalException( "Company settings cannot be found for id : " + companyId );
+        // if surveySettings doesnt exist add it
+        if ( unitSettings.getSurvey_settings().getAbusive_mail_settings() != null ) {
+            unsetKey( unitSettings, MongoOrganizationUnitSettingDaoImpl.KEY_ABUSIVE_EMAIL_SETTING,
+                CommonConstants.COMPANY_SETTINGS_COLLECTION );
+        }
 
-	}
-	
-	@Override
-    public boolean unsetKey( OrganizationUnitSettings companySettings, String keyToUpdate , String collectionName )
+    }
+
+
+    @Override
+    public void unsetComplaintResService( long companyId ) throws NonFatalException
+    {
+
+        LOG.info( "Unset Complaint Resolution mail" );
+        OrganizationUnitSettings unitSettings = null;
+
+        unitSettings = getCompanySettings( companyId );
+
+        if ( unitSettings == null )
+            throw new NonFatalException( "Company settings cannot be found for id : " + companyId );
+        // if surveySettings doesnt exist add it
+        if ( unitSettings.getSurvey_settings().getComplaint_res_settings() != null ) {
+            unsetKey( unitSettings, MongoOrganizationUnitSettingDaoImpl.KEY_COMPLAINT_RESOLUTION_SETTING,
+                CommonConstants.COMPANY_SETTINGS_COLLECTION );
+        }
+
+    }
+
+
+    @Override
+    public boolean unsetKey( OrganizationUnitSettings companySettings, String keyToUpdate, String collectionName )
         throws InvalidInputException
     {
         if ( companySettings == null ) {
             throw new InvalidInputException( "Company settings cannot be null." );
         }
 
-        LOG.debug( "unsetting comapnySettings: {} for key: {}",companySettings ,keyToUpdate );
-        organizationUnitSettingsDao.removeKeyInOrganizationSettings(companySettings, keyToUpdate, collectionName);
+        LOG.debug( "unsetting comapnySettings: {} for key: {}", companySettings, keyToUpdate );
+        organizationUnitSettingsDao.removeKeyInOrganizationSettings( companySettings, keyToUpdate, collectionName );
         LOG.debug( "Updated the record successfully" );
 
         return true;
     }
 
-    public String checkValidMail(String mailId) throws InvalidInputException {
-		String mailIDStr = "";
 
-		if (!mailId.contains(",")) {
-			if (!validateEmail(mailId.trim()))
-				throw new InvalidInputException("Mail id - {}   entered as send alert to input is invalid",mailId)  ;
-			else
-				mailId = mailId.trim();
-		} else {
-			String mailIds[] = mailId.split(",");
-
-			if (mailIds.length == 0)
-				throw new InvalidInputException("Mail id - {} entered as send alert to input is empty",mailId);
-
-			for (String mailID : mailIds) {
-				if (!validateEmail(mailID.trim()))
-					throw new InvalidInputException(
-							"Mail id - {} entered amongst the mail ids as send alert to input is invalid",mailId);
-				else
-					mailIDStr += mailID.trim() + " , ";
-			}
-			mailId = mailIDStr.substring(0, mailIDStr.length() - 2);
-		}
-		return mailId;
-	}
-
-
-	
-	
-	public void addSurveySettings(OrganizationUnitSettings unitSettings) {
-
-		// Adding default text for various flows of survey.
-		SurveySettings surveySettings = new SurveySettings();
-		surveySettings.setHappyText(happyText);
-		surveySettings.setNeutralText(neutralText);
-		surveySettings.setSadText(sadText);
-		surveySettings.setHappyTextComplete(happyTextComplete);
-		surveySettings.setNeutralTextComplete(neutralTextComplete);
-		surveySettings.setSadTextComplete(sadTextComplete);
-		surveySettings.setAutoPostEnabled(true);
-		surveySettings.setShow_survey_above_score(CommonConstants.DEFAULT_AUTOPOST_SCORE);
-		surveySettings.setAuto_post_score(CommonConstants.DEFAULT_AUTOPOST_SCORE);
-
-		surveySettings.setSurvey_reminder_interval_in_days(CommonConstants.DEFAULT_REMINDERMAIL_INTERVAL);
-		unitSettings.setSurvey_settings(surveySettings);
-	}
-	
-	
-	@Override
-    public void updateIsLoginPreventedForUser( AgentSettings agentSettings, boolean isLoginPrevented ) throws InvalidInputException
+    public String checkValidMail( String mailId ) throws InvalidInputException
     {
-		if(agentSettings == null) {
-			throw new InvalidInputException("Agent settings can not be null");
-		}
+        String mailIDStr = "";
+
+        if ( !mailId.contains( "," ) ) {
+            if ( !validateEmail( mailId.trim() ) )
+                throw new InvalidInputException( "Mail id - {}   entered as send alert to input is invalid", mailId );
+            else
+                mailId = mailId.trim();
+        } else {
+            String mailIds[] = mailId.split( "," );
+
+            if ( mailIds.length == 0 )
+                throw new InvalidInputException( "Mail id - {} entered as send alert to input is empty", mailId );
+
+            for ( String mailID : mailIds ) {
+                if ( !validateEmail( mailID.trim() ) )
+                    throw new InvalidInputException(
+                        "Mail id - {} entered amongst the mail ids as send alert to input is invalid", mailId );
+                else
+                    mailIDStr += mailID.trim() + " , ";
+            }
+            mailId = mailIDStr.substring( 0, mailIDStr.length() - 2 );
+        }
+        return mailId;
+    }
+
+
+    public void addSurveySettings( OrganizationUnitSettings unitSettings )
+    {
+
+        // Adding default text for various flows of survey.
+        SurveySettings surveySettings = new SurveySettings();
+        surveySettings.setHappyText( happyText );
+        surveySettings.setNeutralText( neutralText );
+        surveySettings.setSadText( sadText );
+        surveySettings.setHappyTextComplete( happyTextComplete );
+        surveySettings.setNeutralTextComplete( neutralTextComplete );
+        surveySettings.setSadTextComplete( sadTextComplete );
+        surveySettings.setAutoPostEnabled( true );
+        surveySettings.setShow_survey_above_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+        surveySettings.setAuto_post_score( CommonConstants.DEFAULT_AUTOPOST_SCORE );
+
+        surveySettings.setSurvey_reminder_interval_in_days( CommonConstants.DEFAULT_REMINDERMAIL_INTERVAL );
+        unitSettings.setSurvey_settings( surveySettings );
+    }
+
+
+    @Override
+    public void updateIsLoginPreventedForUser( AgentSettings agentSettings, boolean isLoginPrevented )
+        throws InvalidInputException
+    {
+        if ( agentSettings == null ) {
+            throw new InvalidInputException( "Agent settings can not be null" );
+        }
         LOG.info( "Inside method updateIsLoginPreventedForUser for user : " + agentSettings.getIden() );
         organizationUnitSettingsDao.updateParticularKeyAgentSettings(
             MongoOrganizationUnitSettingDaoImpl.KEY_IS_LOGIN_PREVENTED, isLoginPrevented, agentSettings );
     }
-	
-	@Override
+
+
+    @Override
     public void updateHidePublicPageForUser( AgentSettings agentSettings, boolean hidePublicPage ) throws InvalidInputException
     {
-		if(agentSettings == null) {
-			throw new InvalidInputException("Agent settings can not be null");
-		}
+        if ( agentSettings == null ) {
+            throw new InvalidInputException( "Agent settings can not be null" );
+        }
         LOG.info( "Inside method updateHidePublicPageForUser for user : " + agentSettings.getIden() );
-        organizationUnitSettingsDao.updateParticularKeyAgentSettings(
-            MongoOrganizationUnitSettingDaoImpl.KEY_HIDE_PUBLIC_PAGE, hidePublicPage, agentSettings );
+        organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_HIDE_PUBLIC_PAGE,
+            hidePublicPage, agentSettings );
     }
-	
-	@Override
-    public boolean doesSurveyHaveNPSQuestions( User user ) {
-        if( user != null ) {
+
+
+    @Override
+    public boolean doesSurveyHaveNPSQuestions( User user )
+    {
+        if ( user != null ) {
             try {
-                for( SurveyQuestionDetails survey : surveyBuilder.getAllActiveQuestionsOfMappedSurvey( user ) ) {
-                    if( survey.getIsNPSQuestion() == CommonConstants.ONE ) {
+                for ( SurveyQuestionDetails survey : surveyBuilder.getAllActiveQuestionsOfMappedSurvey( user ) ) {
+                    if ( survey.getIsNPSQuestion() == CommonConstants.ONE ) {
                         return true;
                     }
                 }
             } catch ( InvalidInputException e ) {
-                LOG.error( "unable to get active questions for COMPANY with ID: {}",user.getCompany().getCompanyId() );
+                LOG.error( "unable to get active questions for COMPANY with ID: {}", user.getCompany().getCompanyId() );
             }
         }
         return false;
     }
+
 
     @Override
     public void updateIsLoginPreventedForUsers( List<Long> userIdList, boolean isLoginPrevented ) throws InvalidInputException
@@ -9133,8 +9306,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.info( "Inside method updateIsLoginPreventedForUsers " );
         organizationUnitSettingsDao.updateIsLoginPreventedForUsersInMongo( userIdList, isLoginPrevented );
     }
-    
-    
+
+
     @Override
     public void updateHidePublicPageForUsers( List<Long> userIdList, boolean hidePublicPage ) throws InvalidInputException
     {

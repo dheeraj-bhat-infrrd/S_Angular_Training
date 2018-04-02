@@ -75,6 +75,7 @@ public class TwitterFeedExtractorBolt extends BaseComputeBolt
                     for (TwitterFeedData twitterFeedData : response) {
                         SocialResponseObject<TwitterFeedData> responseWrapper = createSocialResponseObject(mediaToken,
                                 twitterFeedData);
+                        responseWrapper.setPageLink( mediaToken.getSocialMediaTokens().getTwitterToken().getTwitterPageLink() );
                         String responseWrapperString = new Gson().toJson(responseWrapper);
                         _collector.emit(new Values(companyId.toString(), responseWrapperString, lastFetchedKey));
                         LOG.trace("Emitted successfully {}", responseWrapper);

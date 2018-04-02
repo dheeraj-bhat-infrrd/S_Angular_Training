@@ -1,12 +1,15 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.HashMap;
+import java.util.Iterator;
+
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -303,6 +306,41 @@ public class BranchDaoImpl extends GenericDaoImpl<Branch, Long> implements Branc
         }
         LOG.info( "Method to get all branch ids under company id : " + companyId + ",getBranchIdsUnderCompany() ended." );
         return criteria.list();
+    }
+
+
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public Map<Long, Long> getCompanyIdsForBranchIds( List<Long> branchIds )
+    {
+        LOG.debug( "Inside method getCompanyIdsForBranchIds {}", branchIds );
+        if ( branchIds.isEmpty() ) {
+            return Collections.emptyMap();
+        }
+
+        try {
+            Query query = getSession()
+                .createQuery( "select b.branchId, b.company.companyId from Branch b where b.branchId in (:ids)" );
+            query.setParameterList( "ids", branchIds );
+
+            Map<Long, Long> branchCompanyIdsMap = new HashMap<>();
+
+            List<Object> result = (List<Object>) query.list();
+            Iterator<Object> itr = result.iterator();
+
+            while ( itr.hasNext() ) {
+                Object[] obj = (Object[]) itr.next();
+                Long branchId = (Long) obj[0];
+                Long companyId = (Long) obj[1];
+                branchCompanyIdsMap.put( branchId, companyId );
+                LOG.trace( "branchId {} and company Id {}", branchId, companyId );
+            }
+
+            return branchCompanyIdsMap;
+        } catch ( HibernateException e ) {
+            LOG.error( "HibernateException caught in getCompanyIdsForBranchIds(). Reason: " + e.getMessage(), e );
+            throw new DatabaseException( "HibernateException caught in getCompanyIdsForBranchIds().", e );
+        }
     }
     
 }

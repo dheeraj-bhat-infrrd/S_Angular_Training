@@ -24,6 +24,7 @@ import com.realtech.socialsurvey.core.entities.FilterKeywordsResponse;
 import com.realtech.socialsurvey.core.entities.Keyword;
 import com.realtech.socialsurvey.core.entities.MonitorType;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokenResponse;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokensPaginated;
 import com.realtech.socialsurvey.core.entities.SocialResponseObject;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -154,7 +155,7 @@ public class SocialMonitorController
     }
 
     @RequestMapping ( value = "/companies/mediatokens", method = RequestMethod.GET)
-    @ApiOperation ( value = "Initiate account registration")
+    @ApiOperation ( value = "Fetch media tokens")
     public ResponseEntity<?> fetchSocialMediaTokens(HttpServletRequest request ) throws SSApiException, InvalidInputException
     {
         LOGGER.info( "SocialMonitorController.fetchSocialMediaTokens started" );
@@ -164,6 +165,18 @@ public class SocialMonitorController
         return new ResponseEntity<>( mediaTokens, HttpStatus.OK );
 
     }
+    
+    
+    @RequestMapping ( value = "/companies/mediaTokensPaginated", method = RequestMethod.GET)
+    @ApiOperation ( value = "Fetch media tokens paginated")
+    public ResponseEntity<SocialMediaTokensPaginated> fetchSocialMediaTokensPaginated(HttpServletRequest request,@RequestParam(value = "skipCount", required = false) int skipCount,@RequestParam(value = "batchSize", required = false) int batchSize ) throws SSApiException, InvalidInputException
+    {
+        // get company setting for login user
+        SocialMediaTokensPaginated mediaTokens = organizationManagementService.fetchSocialMediaTokensPaginated( skipCount, batchSize );
+        return new ResponseEntity<>( mediaTokens, HttpStatus.OK );
+
+    }
+
 
     @RequestMapping ( value = "/feeds/hash/{hash}/companyId/{companyId}", method = RequestMethod.PUT)
     @ApiOperation ( value = "Updates duplicateCount field matching the given hash of social feed collection")

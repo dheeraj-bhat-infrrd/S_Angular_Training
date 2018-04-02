@@ -323,4 +323,11 @@ public interface OrganizationUnitSettingsDao
 
 
     void updateHidePublicPageForUsers( List<Long> userIdList, boolean hidePublicPage );
+
+    /**
+     * Method to get social media tokens count
+     * @param collectionName
+     * @return
+     */
+    public long getSocialMediaTokensCount( String collectionName );
 }
