@@ -25,7 +25,7 @@ namespace EncompassSocialSurvey.DAL
 
         // select spi.SURVEY_SOURCE_ID, spi.CUSTOMER_EMAIL_ID, spi.CUSTOMER_FIRST_NAME from survey_pre_initiation as spi
         private const string SELECT_QUERY = @"SELECT spi.SURVEY_PRE_INITIATION_ID, spi.SURVEY_SOURCE_ID FROM SURVEY_PRE_INITIATION as  spi
-                                        WHERE spi.SURVEY_SOURCE_ID = ?SURVEY_SOURCE_ID AND spi.CUSTOMER_EMAIL_ID = ?CUSTOMER_EMAIL_ID AND spi.CUSTOMER_FIRST_NAME = ?CUSTOMER_FIRST_NAME ;";
+                                        WHERE spi.SURVEY_SOURCE_ID = ?SURVEY_SOURCE_ID AND spi.CUSTOMER_EMAIL_ID = ?CUSTOMER_EMAIL_ID AND spi.CUSTOMER_FIRST_NAME = ?CUSTOMER_FIRST_NAME AND spi.COMPANY_ID = ?COMPANY_ID;";
 
         private const string CRM_BATCH_TRACKER_SELECT_QUERY = @"SELECT crmtrck.ID, crmtrck.SOURCE, crmtrck.COMPANY_ID, crmtrck.LAST_RUN_START_DATE, crmtrck.LAST_RUN_END_DATE, crmtrck.RECENT_RECORD_FETCHED_DATE, crmtrck.ERROR, crmtrck.CREATED_ON, crmtrck.MODIFIED_ON FROM CRM_BATCH_TRACKER as  crmtrck WHERE crmtrck.COMPANY_ID = ?COMPANY_ID AND crmtrck.SOURCE = ?SOURCE ;";
 
@@ -465,7 +465,8 @@ namespace EncompassSocialSurvey.DAL
         public bool IsSurveySourceIdExists(LoanEntity loan, MySqlConnection mySqlDbConnection)
         {
             Logger.Info("Entering the method LoanRepository.IsSurveySourceIdExists(): SURVEY_SOURCE_ID: " + loan.SurveySourceId
-                 + " : CUSTOMER_EMAIL_ID :  " + loan.CustomerEmailId + " : CUSTOMER_FIRST_NAME : " + loan.CustomerFirstName);
+                 + " : CUSTOMER_EMAIL_ID :  " + loan.CustomerEmailId + " : CUSTOMER_FIRST_NAME : " + loan.CustomerFirstName
+                 + " : COMPANY_ID : " + loan.CompanyId );
             bool returnValue = false;
 
             string sqlQuery = SELECT_QUERY;
@@ -479,6 +480,7 @@ namespace EncompassSocialSurvey.DAL
                     commandToSelect.Parameters.Add("?SURVEY_SOURCE_ID", MySqlDbType.VarChar, 250).Value = loan.SurveySourceId;
                     commandToSelect.Parameters.Add("?CUSTOMER_EMAIL_ID", MySqlDbType.VarChar, 250).Value = loan.CustomerEmailId;
                     commandToSelect.Parameters.Add("?CUSTOMER_FIRST_NAME", MySqlDbType.VarChar, 100).Value = loan.CustomerFirstName;
+                    commandToSelect.Parameters.Add("?COMPANY_ID", MySqlDbType.Int32, 100).Value = loan.CompanyId;
 
                     using (MySqlDataReader dataReader = commandToSelect.ExecuteReader())
                     {
@@ -500,12 +502,12 @@ namespace EncompassSocialSurvey.DAL
             if (returnValue)
             {
                 Logger.Info("Exiting the method LoanRepository.IsSurveySourceIdExists(): Records already present in database: don't insert: SURVEY_SOURCE_ID: " + loan.SurveySourceId
-                     + " : CUSTOMER_EMAIL_ID :  " + loan.CustomerEmailId + " : CUSTOMER_FIRST_NAME : " + loan.CustomerFirstName);
+                     + " : CUSTOMER_EMAIL_ID :  " + loan.CustomerEmailId + " : CUSTOMER_FIRST_NAME : " + loan.CustomerFirstName + " : COMPANY_ID : " + loan.CompanyId);
             }
             else
             {
                 Logger.Info("Exiting the method LoanRepository.IsSurveySourceIdExists(): SURVEY_SOURCE_ID: " + loan.SurveySourceId
-                    + " : CUSTOMER_EMAIL_ID :  " + loan.CustomerEmailId + " : CUSTOMER_FIRST_NAME : " + loan.CustomerFirstName);
+                    + " : CUSTOMER_EMAIL_ID :  " + loan.CustomerEmailId + " : CUSTOMER_FIRST_NAME : " + loan.CustomerFirstName + " : COMPANY_ID : " + loan.CompanyId);
             }
             return returnValue;
         }
