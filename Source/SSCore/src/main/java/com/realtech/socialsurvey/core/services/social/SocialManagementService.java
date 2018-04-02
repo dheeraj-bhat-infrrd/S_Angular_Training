@@ -326,5 +326,8 @@ public interface SocialManagementService
 
 
     public void checkForLinkedInTokenExpiry( OrganizationUnitSettings settings );
+
+
+	public void manualPostToLinkedInForEntity(String entityType, Long entityId, String surveyMongoId) throws NonFatalException;
 }
 // JIRA SS-34 BY RM02 BOC
