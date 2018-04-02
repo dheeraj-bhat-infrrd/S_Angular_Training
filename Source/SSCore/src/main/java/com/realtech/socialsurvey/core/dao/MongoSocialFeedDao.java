@@ -20,7 +20,7 @@ public interface MongoSocialFeedDao
 	
 	public void updateMacros(SocialMonitorMacro socialMonitorMacro, long companyId);
 	
-	public void updateMacroCount(List<SocialMonitorMacro> socialMonitorMacros, long companyId);
+	public void updateMacroList(List<SocialMonitorMacro> socialMonitorMacros, long companyId);
 	
 	public List<SocialResponseObject> getAllSocialFeeds(int startIndex, int limit, boolean flag, String status, List<String> feedtype, Long companyId, List<Long> regionId, List<Long> branchId, List<Long> agentid, String searchText, boolean isCompanySet);
 	

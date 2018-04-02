@@ -153,7 +153,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 	}
 
 	@Override
-	public void updateMacroCount(List<SocialMonitorMacro> socialMonitorMacros, long companyId) {
+	public void updateMacroList(List<SocialMonitorMacro> socialMonitorMacros, long companyId) {
 		LOG.debug("Updating Macro count in COMPANY_SETTINGS");
 		
 		Query query = new Query();

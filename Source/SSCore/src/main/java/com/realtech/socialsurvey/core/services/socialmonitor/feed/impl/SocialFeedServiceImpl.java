@@ -306,10 +306,6 @@ public class SocialFeedServiceImpl implements SocialFeedService
                 ( socialMonitorMacro.getMacroUsageTime() ).add( new Date().getTime() );
             }
         }
-        if ( macroFlag ) {
-            mongoSocialFeedDao.updateMacroCount( organizationUnitSettings.getSocialMonitorMacros(), companyId );
-        }
-
         LOG.debug( "End of saveSocialPostsForStream{}" );
         return socialFeedActionResponse;
 
@@ -356,35 +352,38 @@ public class SocialFeedServiceImpl implements SocialFeedService
 
     }
 
-	@Override
-	public void updateMacrosForFeeds(SocialMonitorMacro socialMonitorMacro, long companyId)
-			throws InvalidInputException {
-		LOG.debug("Updating macros for social monitor for company with id {}", companyId);
-		SocialMonitorMacro macro;
-		if (socialMonitorMacro == null || companyId <= 0) {
-			LOG.error("Invalid parameters passed");
-			throw new InvalidInputException("Invalid parameters passed");
-		}
-		if (socialMonitorMacro.getMacroId() == null || socialMonitorMacro.getMacroId().isEmpty()) {
-			socialMonitorMacro.setCount(0);
-			socialMonitorMacro.setLast7DaysMacroCount(0);
-			socialMonitorMacro.setMacroUsageTime(new ArrayList<Long>());
-			socialMonitorMacro.setMacroId(UUID.randomUUID().toString());
-			socialMonitorMacro.setCreatedOn(new Date().getTime());
-			socialMonitorMacro.setModifiedOn(new Date().getTime());
-			mongoSocialFeedDao.updateMacros(socialMonitorMacro, companyId);
 
-		} else {
-			macro = getMacroById(socialMonitorMacro.getMacroId(), companyId);
-			OrganizationUnitSettings organizationUnitSettings = mongoSocialFeedDao.FetchMacros(companyId);
-			organizationUnitSettings.getSocialMonitorMacros().remove(macro);
-			socialMonitorMacro.setModifiedOn(new Date().getTime());
-			organizationUnitSettings.getSocialMonitorMacros().add(socialMonitorMacro);
-			mongoSocialFeedDao.updateMacroCount(organizationUnitSettings.getSocialMonitorMacros(), companyId);
+    @Override
+    public void updateMacrosForFeeds( SocialMonitorMacro socialMonitorMacro, long companyId ) throws InvalidInputException
+    {
+        LOG.debug( "Updating macros for social monitor for company with id {}", companyId );
+        SocialMonitorMacro macro;
+        if ( socialMonitorMacro == null || companyId <= 0 ) {
+            LOG.error( "Invalid parameters passed" );
+            throw new InvalidInputException( "Invalid parameters passed" );
+        }
+        if ( socialMonitorMacro.getMacroId() == null || socialMonitorMacro.getMacroId().isEmpty() ) {
+            socialMonitorMacro.setLast7DaysMacroCount( 0 );
+            socialMonitorMacro.setMacroUsageTime( new ArrayList<Long>() );
+            socialMonitorMacro.setMacroId( UUID.randomUUID().toString() );
+            socialMonitorMacro.setCreatedOn( new Date().getTime() );
+            socialMonitorMacro.setModifiedOn( new Date().getTime() );
+            mongoSocialFeedDao.updateMacros( socialMonitorMacro, companyId );
 
-		}
+        } else {
+            macro = getMacroById( socialMonitorMacro.getMacroId(), companyId );
+            OrganizationUnitSettings organizationUnitSettings = mongoSocialFeedDao.FetchMacros( companyId );
+            if ( organizationUnitSettings != null ) {
+                organizationUnitSettings.getSocialMonitorMacros().remove( macro );
+                socialMonitorMacro.setModifiedOn( new Date().getTime() );
+                organizationUnitSettings.getSocialMonitorMacros().add( socialMonitorMacro );
+                mongoSocialFeedDao.updateMacroList( organizationUnitSettings.getSocialMonitorMacros(), companyId );
+            }
 
-	}
+
+        }
+
+    }
 
 	@Override
 	public SocialMonitorMacro getMacroById(String macroId, Long companyId) throws InvalidInputException {
