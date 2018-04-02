@@ -288,9 +288,9 @@ public class SocialMonitorWebController {
 			active = false;
 		}
 		
-		if(usageText != null) {
-			count = Integer.valueOf(usageText);
-		}
+//		if(usageText != null) {
+//			count = Integer.valueOf(usageText);
+//		}
 		
 		// Created VO and added required fields.
 		SocialMonitorMacro socialMonitorMacro = new SocialMonitorMacro();
@@ -299,7 +299,7 @@ public class SocialMonitorWebController {
 		socialMonitorMacro.setDescription(description);
 		socialMonitorMacro.setActions(actions);
 		socialMonitorMacro.setActive(active);
-		socialMonitorMacro.setCount(count);
+//		socialMonitorMacro.setCount(count);
 		socialMonitorMacro.setLast7DaysMacroCount(0);
 		socialMonitorMacro.setMacroUsageTime(new ArrayList<Long>());
 		return socialMonitorMacro;

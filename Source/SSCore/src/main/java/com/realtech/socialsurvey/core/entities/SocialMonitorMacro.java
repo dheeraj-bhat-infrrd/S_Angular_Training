@@ -14,7 +14,6 @@ public class SocialMonitorMacro implements Serializable {
 	private String description;
 	private Actions actions;
 	private boolean active;
-	private int count;
 	private int last7DaysMacroCount;
 	private List<Long> macroUsageTime;
 	private long createdOn;
@@ -58,14 +57,6 @@ public class SocialMonitorMacro implements Serializable {
 
 	public void setActive(boolean active) {
 		this.active = active;
-	}
-
-	public int getCount() {
-		return count;
-	}
-
-	public void setCount(int count) {
-		this.count = count;
 	}
 
 	public long getCreatedOn() {
@@ -128,7 +119,7 @@ public class SocialMonitorMacro implements Serializable {
 	@Override
 	public String toString() {
 		return "SocialMonitorMacro [macroId=" + macroId + ", macroName=" + macroName + ", description=" + description
-				+ ", actions=" + actions + ", active=" + active + ", count=" + count + ", last7DaysMacroCount="
+				+ ", actions=" + actions + ", active=" + active + ", last7DaysMacroCount="
 				+ last7DaysMacroCount + ", macroUsageTime=" + macroUsageTime + ", createdOn=" + createdOn
 				+ ", modifiedOn=" + modifiedOn + "]";
 	}
