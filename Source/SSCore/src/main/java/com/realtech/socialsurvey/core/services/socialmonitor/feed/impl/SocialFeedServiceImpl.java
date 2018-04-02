@@ -306,6 +306,10 @@ public class SocialFeedServiceImpl implements SocialFeedService
                 ( socialMonitorMacro.getMacroUsageTime() ).add( new Date().getTime() );
             }
         }
+        if(macroFlag) {
+            mongoSocialFeedDao.updateMacroList( organizationUnitSettings.getSocialMonitorMacros(), companyId );
+        }
+            
         LOG.debug( "End of saveSocialPostsForStream{}" );
         return socialFeedActionResponse;
 
