@@ -2099,8 +2099,8 @@ $('#prof-review-item').on('click', '.ppl-share-icns', function(e) {
 		$('#overlay-cancel').html("Cancel");
 		
 		var copyText = $(this).parent().find('.linkedInSummary').val();
-		var text = copyText.replace(/(%20)/g," ");
-		var dummyInput = $('<input>').val(text).appendTo('body').select();
+		var decodedText = decodeURIComponent(copyText);
+		var dummyInput = $('<input>').val(decodedText).appendTo('body').select();
 		document.execCommand('copy');
 
 		$('#overlay-continue').off();
@@ -2164,8 +2164,8 @@ $('.sr-share-wrapper').on('click', '.ppl-share-icns', function(e) {
 		$('#overlay-cancel').html("Cancel");
 		
 		var copyText = $(this).parent().find('.linkedInSummary').val();
-		var text = copyText.replace(/(%20)/g," ");
-		var dummyInput = $('<input>').val(text).appendTo('body').select();
+		var decodedText = decodeURIComponent(copyText);
+		var dummyInput = $('<input>').val(decodedText).appendTo('body').select();
 		document.execCommand('copy');
 
 		$('#overlay-continue').off();
