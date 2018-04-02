@@ -881,14 +881,15 @@ function paintReviews(result){
 		if(reviewItem.agentName == undefined || reviewItem.agentName == null)
 			reviewItem.agentName = "us";
 		
-		
+		var reviewSummary = reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) +' at SocialSurvey - ' + encodeURIComponent(reviewItem.review);
 		reviewsHtml += '	</div>';
 		reviewsHtml += '	<div class="ppl-share-wrapper clearfix share-plus-height" >';
 		reviewsHtml += '		<div class="float-left clearfix ppl-share-social ">';
 		reviewsHtml += '			<span id ="fb_' + i + '"class="float-left ppl-share-icns icn-fb-rev icn-fb-pp" title="Facebook" data-link="https://www.facebook.com/dialog/share?' + reviewItem.faceBookShareUrl + '&href=' +profileUrl.replace("localhost","127.0.0.1")+ '&quote=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '&redirect_uri=https://www.facebook.com"></span>';
 		reviewsHtml += '            <input type="hidden" id="twttxt_' + i + '" class ="twitterText_loop" value ="' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '"/></input>';
 		reviewsHtml += '			<span id ="twitt_' + i + '" class="float-left ppl-share-icns icn-twit-rev icn-twit-pp" onclick="twitterFn(' + i + ');" title="Twitter" data-link="https://twitter.com/intent/tweet?text=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) + ' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + ' &url='+ profileUrl +'"></span>';	
-		reviewsHtml += '			<span class="float-left ppl-share-icns icn-lin-rev icn-lin-pp" title="LinkedIn" data-link="https://www.linkedin.com/shareArticle?mini=true&url=' + profileUrl + '&title=&summary=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) +' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '&reviewid=' + reviewItem._id + '&source="></span>';
+		reviewsHtml += '			<input type="hidden" class="linkedInSummary" value="'+reviewSummary+'" >'
+		reviewsHtml += '			<span class="float-left ppl-share-icns icn-lin-rev icn-lin-pp" title="LinkedIn" data-summary="'+reviewSummary+'" data-link="https://www.linkedin.com/shareArticle?mini=true&url=' + profileUrl + '&title=&summary=' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ' for ' + encodeURIComponent(reviewItem.agentName) +' at SocialSurvey - ' + encodeURIComponent(reviewItem.review) + '&reviewid=' + reviewItem._id + '&source="></span>';
 		reviewsHtml += '			<span class="float-left" title="Google+"> <button class="g-interactivepost float-left ppl-share-icns icn-gplus-rev" data-contenturl="' + profileUrl + '" data-clientid="' + reviewItem.googleApi + '"data-cookiepolicy="single_host_origin" data-prefilltext="' + reviewItem.score.toFixed(scoreFixVal) + '-star response from ' + stringEscape(custDispName) + ' for ' + stringEscape(reviewItem.agentName) + ' at SocialSurvey - ' + stringEscape(reviewItem.review) + '" data-calltoactionlabel="USE"'+''+'data-calltoactionurl=" ' + profileUrl + '"> <span class="icon">&nbsp;</span> <span class="label">share</span> </button> </span>';
 		reviewsHtml += '			<span class="float-left ppl-share-icns permalink icn-permalink-rev" title="Permalink" onclick="copyIndividualReviewUrlToClipboard(' + processedPermalink + ')"><input id="permalink_url_' + processedPermalink + '" type="hidden" value="' + profileUrl + '"/></span>';
 		reviewsHtml += '		</div>';
@@ -2090,20 +2091,108 @@ $('#prof-review-item').on('click', '.ppl-share-icns', function(e) {
 	e.stopPropagation();
 	var link = $(this).attr('data-link');
 	var title = $(this).attr('title');
-	if (link == undefined || link == "") {
-		return false;
+	
+	if(title == 'LinkedIn'){
+		$('#overlay-header').html("");
+		$('#overlay-text').html('<div style="text-align:left; display: grid;">The text of the post has been copied to clipboard. Please use the text to post in LinkedIn Page.</div>');
+		$('#overlay-continue').html("Ok");
+		$('#overlay-cancel').html("Cancel");
+		
+		var copyText = $(this).parent().find('.linkedInSummary').val();
+		var text = copyText.replace(/(%20)/g," ");
+		var dummyInput = $('<input>').val(text).appendTo('body').select();
+		document.execCommand('copy');
+
+		$('#overlay-continue').off();
+		$('#overlay-continue').click(function() {
+			overlayRevert();
+			if (link == undefined || link == "") {
+				return false;
+			}
+			window.open(link, 'Post to ' + title, 'width=800,height=600,scrollbars=yes');
+		});
+		
+		$('#overlay-cancel').click(function() {
+			$('#overlay-continue').unbind('click');
+			$('#overlay-cancel').unbind('click');
+			overlayRevert();
+
+		});
+		
+		$('#overlay-main').show();
+		
+	}else{
+		if (link == undefined || link == "") {
+			return false;
+		}
+		window.open(link, 'Post to ' + title, 'width=800,height=600,scrollbars=yes');
 	}
-	window.open(link, 'Post to ' + title, 'width=800,height=600,scrollbars=yes');
+	
 });
+
+function overlayRevert() {
+	$('#overlay-main').hide();
+	if ($('#overlay-continue').attr("disabled") == "disabled") {
+		$('#overlay-continue').removeAttr("disabled");
+	}
+	$("#overlay-header").html('');
+	$("#overlay-text").html('');
+	$('#overlay-continue').html('');
+	$('#overlay-cancel').html('');
+
+	$('#overlay-continue').unbind('click');
+
+	enableBodyScroll();
+	$('.overlay-disable-wrapper').removeClass('pu_arrow_rt');
+
+	$("#overlay-pop-up").removeClass("overlay-disable-wrapper-zillow");
+	$('#zillow-popup').hide();
+	$('#zillow-popup-body').html('');
+}
+
 
 $('.sr-share-wrapper').on('click', '.ppl-share-icns', function(e) {
 	e.stopPropagation();
 	var link = $(this).attr('data-link');
 	var title = $(this).attr('title');
-	if (link == undefined || link == "") {
-		return false;
+	
+
+	if(title == 'LinkedIn'){
+		$('#overlay-header').html("");
+		$('#overlay-text').html('<div style="text-align:left; display: grid;">The text of the post has been copied to clipboard. Please use the text to post in LinkedIn Page.</div>');
+		$('#overlay-continue').html("Ok");
+		$('#overlay-cancel').html("Cancel");
+		
+		var copyText = $(this).parent().find('.linkedInSummary').val();
+		var text = copyText.replace(/(%20)/g," ");
+		var dummyInput = $('<input>').val(text).appendTo('body').select();
+		document.execCommand('copy');
+
+		$('#overlay-continue').off();
+		$('#overlay-continue').click(function() {
+			overlayRevert();
+			if (link == undefined || link == "") {
+				return false;
+			}
+			window.open(link, 'Post to ' + title, 'width=800,height=600,scrollbars=yes');
+		});
+		
+		$('#overlay-cancel').click(function() {
+			$('#overlay-continue').unbind('click');
+			$('#overlay-cancel').unbind('click');
+			overlayRevert();
+
+		});
+		
+		$('#overlay-main').show();
+		
+	}else{
+		if (link == undefined || link == "") {
+			return false;
+		}
+		window.open(link, 'Post to ' + title, 'width=800,height=600,scrollbars=yes');
 	}
-	window.open(link, 'Post to ' + title, 'width=800,height=600,scrollbars=yes');
+
 });
 
 /**
@@ -2253,9 +2342,12 @@ function buildReviewPopupShareData(){
 	//$('#gplus_post').data( 'calltoactionlabel',"USE");
 	//$('#gplus_post').data( 'data-calltoactionurl', profileUrl );
 	
+	var reviewSummary = score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ( agentName != undefined ? ' for ' + encodeURIComponent(agentName) : '' ) +' at SocialSurvey - ' + encodeURIComponent(review);
+	
 	socialPostHtml += '         <span id ="fb_post" class="float-left ppl-share-icns sr-icn-fb-rev icn-fb-pp" title="Facebook" data-link="https://www.facebook.com/dialog/share?' + faceBookShareUrl + '&href=' +profileUrl.replace("localhost","127.0.0.1")+ '&quote=' + score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ( agentName != undefined ? ' for ' + encodeURIComponent(agentName) : '' ) + ' at SocialSurvey - ' + encodeURIComponent(review) + '&redirect_uri=https://www.facebook.com"></span>';
 	socialPostHtml += '         <input type="hidden" id="twttxt_post" class ="twitterText_loop" value ="' + score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ( agentName != undefined ? ' for ' + encodeURIComponent( agentName) : '' ) + ' at SocialSurvey - ' + encodeURIComponent( review) + '"/></input>';
 	socialPostHtml += '			<span id ="twitt_post" class="float-left ppl-share-icns sr-icn-twit-rev icn-twit-pp" onclick="processTwitterTextForSingleReview();" title="Twitter" data-link="https://twitter.com/intent/tweet?text=' + score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ( agentName != undefined ? ' for ' + encodeURIComponent(agentName) : '' ) + ' at SocialSurvey - ' + encodeURIComponent(review) + ' &url='+ profileUrl +'"></span>';	
+	socialPostHtml += '			<input type="hidden" class"linkedInSummary" value="'+reviewSummary+'" >'
 	socialPostHtml += '			<span class="float-left ppl-share-icns sr-icn-lin-rev icn-lin-pp" title="LinkedIn" data-link="https://www.linkedin.com/shareArticle?mini=true&url=' + profileUrl + '&title=&summary=' + score.toFixed(scoreFixVal) + '-star response from ' + encodeURIComponent(custDispName) + ( agentName != undefined ? ' for ' + encodeURIComponent(agentName) : '' ) +' at SocialSurvey - ' + encodeURIComponent(review) + '&reviewid=' + _id + '&source="></span>';
 	socialPostHtml += '			<span class="float-left" title="Google+"> <button class="g-interactivepost float-left ppl-share-icns sr-icn-gplus-rev" data-contenturl="' + profileUrl + '" data-clientid="' + googleApi + '"data-cookiepolicy="single_host_origin" data-prefilltext="' + score.toFixed(scoreFixVal) + '-star response from ' + stringEscape(custDispName) + (agentName != undefined ? ' for ' + stringEscape(agentName) : '' ) + ' at SocialSurvey - ' + stringEscape(review) + '" data-calltoactionlabel="USE"'+''+'data-calltoactionurl=" ' + profileUrl + '"> </button> </span>';
 	socialPostHtml += '			<span class="float-left ppl-share-icns permalink sr-icn-permalink-rev" title="Permalink" onclick="copyIndividualReviewUrlToClipboard(-1);"><input id="permalink_url_btn" type="hidden" value="' + profileUrl + '"/></span>';
