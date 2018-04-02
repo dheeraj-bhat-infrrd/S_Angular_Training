@@ -489,7 +489,7 @@ namespace EncompassSocialSurvey.DAL
                     commandToSelect.Parameters.Add("?SURVEY_SOURCE_ID", MySqlDbType.VarChar, 250).Value = loan.SurveySourceId;
                     commandToSelect.Parameters.Add("?CUSTOMER_EMAIL_ID", MySqlDbType.VarChar, 250).Value = loan.CustomerEmailId;
                     commandToSelect.Parameters.Add("?CUSTOMER_FIRST_NAME", MySqlDbType.VarChar, 100).Value = loan.CustomerFirstName;
-                    commandToSelect.Parameters.Add("?COMPANY_ID", MySqlDbType.Int32, 100).Value = loan.CompanyId;
+                    commandToSelect.Parameters.Add("?COMPANY_ID", MySqlDbType.Int32).Value = loan.CompanyId;
 
                     using (MySqlDataReader dataReader = commandToSelect.ExecuteReader())
                     {
