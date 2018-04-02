@@ -5625,8 +5625,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         return image;
     }
 
-
-    private String copyImage( String source, String imageName ) throws Exception
+    @Override
+    public String copyImage( String source, String imageName ) throws Exception
     {
 
         String fileName = null;

@@ -7,7 +7,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,12 +26,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.JobLogDetailsResponse;
-import com.realtech.socialsurvey.core.entities.NpsReportWeek;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RankingRequirements;
 import com.realtech.socialsurvey.core.entities.User;
@@ -94,9 +91,6 @@ public class ReportingWebController
 
     private ReportingDashboardManagement reportingDashboardManagement;
     
-    @Autowired
-    private Utils utils;
-
     @Autowired
     public void setSessionHelper( SessionHelper sessionHelper )
     {
@@ -536,7 +530,6 @@ public class ReportingWebController
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
         Company company = user.getCompany();
-        String npsTimeFrame = request.getParameter( "npsTimeFrame" );
         LOG.debug(
             "Creating entry in file upload for reportId {} with start date {} and end date {} for entity id {}, entity type {}",
             reportId, startDate, endDate, entityId, entityType );

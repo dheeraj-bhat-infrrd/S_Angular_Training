@@ -6,27 +6,27 @@
 				<h3>Features</h3>
 				<div class="menu-features-container">
 					<ul id="menu-features" class="menu">
-						<li><a href="https://www.socialsurvey.me/survey/features/">Amplify
+						<li><a href="https://www.socialsurvey.com/features/">Amplify
 								the Voice of Your Customer</a></li>
 						<li><a
-							href="https://www.socialsurvey.me/survey/quick-setup-simple-customization/">Quick
+							href="https://www.socialsurvey.com/quick-setup-simple-customization/">Quick
 								Setup &amp; Simple Customization</a></li>
 						<li><a
-							href="https://www.socialsurvey.me/survey/customize-your-client-experience/">Customize
+							href="https://www.socialsurvey.com/customize-your-client-experience/">Customize
 								Your Client Experience</a></li>
 						<li><a
-							href="https://www.socialsurvey.me/survey/boost-customer-satisfaction/">Boost
+							href="https://www.socialsurvey.com/boost-customer-satisfaction/">Boost
 								Customer Satisfaction</a></li>
 						<li><a
-							href="https://www.socialsurvey.me/survey/dominate-search-engine-results/">Dominate
+							href="https://www.socialsurvey.com/dominate-search-engine-results/">Dominate
 								Search Engine Results</a></li>
 						<li><a
-							href="https://www.socialsurvey.me/survey/manage-your-company-hierarchy/">Manage
+							href="https://www.socialsurvey.com/manage-your-company-hierarchy/">Manage
 								Your Company Hierarchy</a></li>
 						<li><a
-							href="https://www.socialsurvey.me/survey/automate-your-survey-workflow/">Automate
+							href="https://www.socialsurvey.com/automate-your-survey-workflow/">Automate
 								Your Survey Workflow</a></li>
-						<li><a href="https://www.socialsurvey.me/survey/coming-soon/">Coming
+						<li><a href="https://www.socialsurvey.com/coming-soon/">Coming
 								Soon</a></li>
 					</ul>
 				</div>
@@ -35,9 +35,9 @@
 				<h3>About</h3>
 				<div class="menu-about-container">
 					<ul id="menu-about" class="menu">
-						<li><a href="https://www.socialsurvey.me/survey/pricing/">Pricing</a>
+						<li><a href="https://www.socialsurvey.com/pricing/">Pricing</a>
 						</li>
-						<li><a href="https://www.socialsurvey.me/survey/features/">Features</a>
+						<li><a href="https://www.socialsurvey.com/features/">Features</a>
 						</li>
 						<li><a href="https://socialsurvey.me/home.do">Sign Up</a></li>
 					</ul>
@@ -50,12 +50,12 @@
 						<li><a href="https://www.socialsurvey.me/findapro.do">Find
 								a Pro</a></li>
 						<li><a
-							href="https://www.socialsurvey.me/survey/terms-of-use/">Terms
+							href="https://www.socialsurvey.com/terms-of-use/">Terms
 								of Use</a></li>
 						<li><a
-							href="https://www.socialsurvey.me/survey/privacy-policy/">Privacy
+							href="https://www.socialsurvey.com/privacy-policy/">Privacy
 								Policy</a></li>
-						<li><a href="https://www.socialsurvey.me/survey/contact/">Contact
+						<li><a href="https://www.socialsurvey.com/contact/">Contact
 								Us</a></li>
 					</ul>
 				</div>
@@ -75,12 +75,12 @@
 			<p>&copy; Copyright 2015. All Rights Reserved.</p>
 			<p>
 				Created by BuyersRoad, Inc. in San Francisco &#149; <a
-					href="https://www.socialsurvey.me/survey/privacy-policy/" style="padding-left: 1px;">Privacy
-					Policy</a> &#149; <a href="https://www.socialsurvey.me/survey/pricing/">Features
+					href="https://www.socialsurvey.com/survey/privacy-policy/" style="padding-left: 1px;">Privacy
+					Policy</a> &#149; <a href="https://www.socialsurvey.com/survey/pricing/">Features
 					&amp; Pricing</a> &#149; Report Bugs to <a
 					href="mailto:support@socialsurvey.me">support@socialsurvey.me</a> &#149;
 				Press Inquiries: <a href="mailto:pr@socialsurvey.me">pr@socialsurvey.me</a>
-				&#149; <a href="https://www.socialsurvey.me/survey/terms-of-use/">Terms
+				&#149; <a href="https://www.socialsurvey.com/survey/terms-of-use/">Terms
 					of Service</a>
 			</p>
 		</div>

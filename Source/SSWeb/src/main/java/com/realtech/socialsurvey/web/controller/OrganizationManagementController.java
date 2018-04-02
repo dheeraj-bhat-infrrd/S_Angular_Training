@@ -851,7 +851,9 @@ public class OrganizationManagementController
         String buyerAgentName = request.getParameter( "buyer-agent-name" );
         String sellerAgentEmail = request.getParameter( "seller-agnt-email" );
         String sellerAgentName = request.getParameter( "seller-agnt-name" );
-
+        String propertyAddress = request.getParameter( "property-address" );
+        String loanProcessorName = request.getParameter( "loan-processor-name" );
+        String loanProcessorEmail = request.getParameter( "loan-processor-email" );
 
         String version = request.getParameter( "sdk-version-selection-list" );
 
@@ -933,6 +935,27 @@ public class OrganizationManagementController
                 encompassCrmInfo.setBuyerAgentName( buyerAgentName );
                 encompassCrmInfo.setSellerAgentEmail( sellerAgentEmail );
                 encompassCrmInfo.setSellerAgentName( sellerAgentName );
+            }
+            
+            // save property address
+            if( StringUtils.isNotEmpty(propertyAddress) ) {
+            	encompassCrmInfo.setPropertyAddress(propertyAddress);
+            } else {
+            	encompassCrmInfo.setPropertyAddress("");            	
+            }
+            
+            
+            // save loan processor name and email
+            if( StringUtils.isNotEmpty(loanProcessorName) ) {
+            	encompassCrmInfo.setLoanProcessorName(loanProcessorName);
+            } else {
+            	encompassCrmInfo.setLoanProcessorName("");            	
+            }
+            
+            if( StringUtils.isNotEmpty( loanProcessorEmail ) ) {
+            	encompassCrmInfo.setLoanProcessorEmail(loanProcessorEmail);
+            } else {
+            	encompassCrmInfo.setLoanProcessorEmail("");            	            	
             }
 
             organizationManagementService.updateCRMDetails( companySettings, encompassCrmInfo,

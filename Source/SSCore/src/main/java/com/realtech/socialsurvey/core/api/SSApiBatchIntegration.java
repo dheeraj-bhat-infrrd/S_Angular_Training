@@ -116,4 +116,8 @@ public interface SSApiBatchIntegration
     @GET ( "/v1/getcompletedsurveycountforpastndays")
     Response getCompletedSurveyCountForPastNDays();
 
+	@GET("/v1/branchranking/month/year")
+	Response getBranchRankingReport(@Query("companyId") long companyId, @Query("month") int month,
+			@Query("year") int year, @Query("type") int type);
+
 }

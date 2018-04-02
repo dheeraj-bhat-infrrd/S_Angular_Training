@@ -82,6 +82,9 @@ namespace EncompassSocialSurvey.DAL
                                         , STATE
                                         , CITY
                                         , PARTICIPANT_TYPE
+                                        , PROPERTY_ADDRESS
+                                        , LOAN_PROCESSOR_NAME
+                                        , LOAN_PROCESSOR_EMAIL
                                           )
                                         VALUES(
                                           ?SURVEY_SOURCE
@@ -104,6 +107,9 @@ namespace EncompassSocialSurvey.DAL
                                         , ?STATE
                                         , ?CITY
                                         , ?PARTICIPANT_TYPE
+                                        , ?PROPERTY_ADDRESS
+                                        , ?LOAN_PROCESSOR_NAME
+                                        , ?LOAN_PROCESSOR_EMAIL
                                         ) ;";
 
         
@@ -261,6 +267,9 @@ namespace EncompassSocialSurvey.DAL
                         commandToInsert.Parameters.Add("?STATE", MySqlDbType.VarChar, 100).Value = loan.State;
                         commandToInsert.Parameters.Add("?CITY", MySqlDbType.VarChar, 100).Value = loan.City;
                         commandToInsert.Parameters.Add("?PARTICIPANT_TYPE", MySqlDbType.Int32).Value = loan.ParticipantType;
+                        commandToInsert.Parameters.Add("?PROPERTY_ADDRESS", MySqlDbType.VarChar, 250).Value = loan.PropertyAddress;
+                        commandToInsert.Parameters.Add("?LOAN_PROCESSOR_NAME", MySqlDbType.VarChar, 250).Value = loan.LoanProcessorName;
+                        commandToInsert.Parameters.Add("?LOAN_PROCESSOR_EMAIL", MySqlDbType.VarChar, 250).Value = loan.LoanProcessorEmail;
                         //
                         commandToInsert.ExecuteNonQuery();
                         noOfRecordsInserted++;
