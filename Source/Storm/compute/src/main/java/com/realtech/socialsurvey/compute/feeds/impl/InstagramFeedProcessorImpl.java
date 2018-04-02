@@ -67,18 +67,14 @@ public class InstagramFeedProcessorImpl implements InstagramFeedProcessor {
         if(lastFetchedIgId == null || lastFetchedIgId.isEmpty() ){
             //run the extractor for the first time so get latest 50 records
             instagramAccount = fetchFeeds( pageId, fbToken.getFacebookAccessToken() );
-            LOG.info(instagramAccount.toString());
             if ( instagramAccount != null && instagramAccount.getMedia() != null){
-                LOG.info("Account is not null");
                 instagramMediaData.addAll(instagramAccount.getMedia().getData());
                 //save the first record in the redis
                 redisSocialMediaStateDao.saveLastFetched(lastFetchedKey, instagramMediaData.get(0).getIgId(), "" );
             }
         } else{
             //Get all the feeds until we encounter the lastFetchedIgId
-            LOG.info("Getting the next batches in instageam");
             instagramAccount = fetchFeeds( pageId, fbToken.getFacebookAccessToken() );
-            LOG.info("Instagram account {}", instagramAccount);
             if( instagramAccount != null){
                 instagramMedia = instagramAccount.getMedia();
                 instagramMediaData.addAll(addInstagramMedia(instagramMedia, lastFetchedIgId));
@@ -102,13 +98,9 @@ public class InstagramFeedProcessorImpl implements InstagramFeedProcessor {
     private List<InstagramMediaData> addInstagramMedia(InstagramMedia instagramMedia, String lastFetchedIgId) {
         if ( instagramMedia != null && !instagramMedia.getData().isEmpty() ) {
             List<String> igIds = instagramMedia.getData().stream().map( InstagramMediaData::getIgId ).collect(Collectors.toList());
-            LOG.info("Ig ids {}", igIds);
             if ( igIds.contains(lastFetchedIgId) ) {
-                LOG.info("encountered the lastfetchedIG id so getting data till that id {}",
-                        instagramMedia.getData().subList(0, igIds.indexOf(lastFetchedIgId)));
                 return instagramMedia.getData().subList(0, igIds.indexOf(lastFetchedIgId));
             } else {
-                LOG.info("Fetching all records");
                 return instagramMedia.getData();
             }
         } else

@@ -230,7 +230,7 @@ public interface SSApiIntegration
     
     @PUT( "/v1/updatesocialfeeds/action")
     public Response saveSocialFeedsForAction(@Body SocialFeedsActionUpdate socialFeedsActionUpdate,
-			@Query("companyId") Long companyId);
+			@Query("companyId") Long companyId, @Query("duplicateFlag") boolean duplicateFlag);
     
     @GET("/v1/socialfeedsmacro/company/{companyId}")
     public Response showMacrosForEntity(@Path("companyId") long companyId, @Query("searchMacros") String searchMacros);

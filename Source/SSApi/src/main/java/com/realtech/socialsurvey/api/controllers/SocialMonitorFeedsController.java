@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.realtech.socialsurvey.api.exceptions.SSApiException;
 import com.realtech.socialsurvey.core.entities.SegmentsVO;
+import com.realtech.socialsurvey.core.entities.SocialFeedActionResponse;
 import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
 import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
 import com.realtech.socialsurvey.core.entities.SocialMonitorResponseData;
@@ -74,21 +75,25 @@ public class SocialMonitorFeedsController {
 
 	}
 
-	@RequestMapping(value = "/updatesocialfeeds/action", method = RequestMethod.PUT)
-	@ApiOperation(value = "Update Social posts for Social monitor for individual/bulk posts", response = String.class)
-	@ApiResponses(value = { @ApiResponse ( code = 200, message = "Successfully updated the action on a post")})
-	public ResponseEntity<?> saveSocialFeedsForAction(@RequestBody SocialFeedsActionUpdate socialFeedsActionUpdate,
-			@RequestParam(value = "companyId", required = false) Long companyId)
-			throws SSApiException, InvalidInputException {
-		LOGGER.info("Updating the action of Social feeds for social monitor");
-		try {
-			socialFeedService.updateActionForFeeds(socialFeedsActionUpdate, companyId);
-		} catch (InvalidInputException ie) {
-			LOGGER.error("Invalid input exception caught while updating social feeds", ie);
-			throw new SSApiException("Invalid input exception caught while updating social feeds", ie);
-		}
-		return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
-	}
+
+    @RequestMapping ( value = "/updatesocialfeeds/action", method = RequestMethod.PUT)
+    @ApiOperation ( value = "Update Social posts for Social monitor for individual/bulk posts", response = SocialFeedActionResponse.class)
+    @ApiResponses ( value = { @ApiResponse ( code = 200, message = "Successfully updated the action on a post") })
+    public ResponseEntity<?> saveSocialFeedsForAction( @RequestBody SocialFeedsActionUpdate socialFeedsActionUpdate,
+        @RequestParam ( value = "companyId", required = false) Long companyId,
+        @RequestParam ( value = "duplicateFlag", required = false) boolean duplicateFlag )
+        throws SSApiException, InvalidInputException
+    {
+        LOGGER.info( "Updating the action of Social feeds for social monitor" );
+        SocialFeedActionResponse actionResponse;
+        try {
+            actionResponse = socialFeedService.updateActionForFeeds( socialFeedsActionUpdate, companyId, duplicateFlag );
+        } catch ( InvalidInputException ie ) {
+            LOGGER.error( "Invalid input exception caught while updating social feeds", ie );
+            throw new SSApiException( "Invalid input exception caught while updating social feeds", ie );
+        }
+        return new ResponseEntity<>( actionResponse, HttpStatus.OK );
+    }
 
 
     @RequestMapping ( value = "/socialfeedsmacro/company/{companyId}", method = RequestMethod.GET)

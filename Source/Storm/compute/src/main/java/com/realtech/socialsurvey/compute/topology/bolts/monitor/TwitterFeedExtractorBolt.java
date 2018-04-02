@@ -26,6 +26,7 @@ import com.realtech.socialsurvey.compute.enums.SocialFeedType;
 import com.realtech.socialsurvey.compute.feeds.TwitterFeedProcessor;
 import com.realtech.socialsurvey.compute.feeds.impl.TwitterFeedProcessorImpl;
 import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBolt;
+import com.realtech.socialsurvey.compute.utils.ChararcterUtils;
 import com.realtech.socialsurvey.compute.utils.UrlHelper;
 
 import redis.clients.jedis.exceptions.JedisConnectionException;
@@ -137,7 +138,8 @@ public class TwitterFeedExtractorBolt extends BaseComputeBolt
         }
 
         if ( twitterFeedData.getText() != null && !twitterFeedData.getText().isEmpty() ) {
-            responseWrapper.setHash( responseWrapper.getText().hashCode() );
+            String twitterText = ChararcterUtils.getTextIfRetweet( responseWrapper.getText() );
+            responseWrapper.setHash( twitterText.hashCode() );
         }
 
         responseWrapper.setPostId( String.valueOf( twitterFeedData.getId() ) );

@@ -27,6 +27,7 @@ import com.realtech.socialsurvey.compute.feeds.FacebookFeedProcessor;
 import com.realtech.socialsurvey.compute.feeds.impl.FacebookFeedProcessorImpl;
 import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBolt;
 import com.realtech.socialsurvey.compute.utils.UrlHelper;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 
 
 /**
@@ -96,6 +97,10 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt implements Serial
             }
         }
         // End loop for companies
+        catch (JedisConnectionException jce){
+            LOG.error("Redis might be down !!! Error message is {}", jce.getMessage());
+        }
+
         catch ( Exception e ) {
             LOG.error( "Error while fetching post from facebook.", e );
         }
