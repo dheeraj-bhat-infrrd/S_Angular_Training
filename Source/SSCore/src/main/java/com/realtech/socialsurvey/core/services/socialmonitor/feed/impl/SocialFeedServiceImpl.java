@@ -17,6 +17,7 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import com.realtech.socialsurvey.core.commons.ActionHistoryComparator;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.MongoSocialFeedDao;
@@ -37,6 +38,7 @@ import com.realtech.socialsurvey.core.entities.SocialMonitorUsersVO;
 import com.realtech.socialsurvey.core.entities.SocialResponseObject;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.enums.ActionHistoryType;
+import com.realtech.socialsurvey.core.enums.ProfileType;
 import com.realtech.socialsurvey.core.enums.SocialFeedStatus;
 import com.realtech.socialsurvey.core.enums.TextActionType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -105,58 +107,77 @@ public class SocialFeedServiceImpl implements SocialFeedService
         return socialFeed;
     }
     
-	@SuppressWarnings("unchecked")
-	@Override
-	public SocialMonitorResponseData getAllSocialPosts(int startIndex, int limit, String status, boolean flag,
-			List<String> feedtype, Long companyId, List<Long> regionIds, List<Long> branchIds, List<Long> agentIds, String searchText, boolean isCompanySet)
-			throws InvalidInputException {
-		LOG.debug("Fetching social posts");
 
-		SocialMonitorResponseData socialMonitorResponseData = new SocialMonitorResponseData();
-		List<SocialMonitorFeedData> socialMonitorStreamDataList = new ArrayList<>();
-		List<SocialResponseObject> socialResponseObjects;
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public SocialMonitorResponseData getAllSocialPosts( int startIndex, int limit, String status, boolean flag,
+        List<String> feedtype, Long companyId, List<Long> regionIds, List<Long> branchIds, List<Long> agentIds,
+        String searchText, boolean isCompanySet ) throws InvalidInputException
+    {
+        LOG.debug( "Fetching social posts" );
 
-		socialResponseObjects = mongoSocialFeedDao.getAllSocialFeeds(startIndex, limit, flag, status,
-				feedtype, companyId, regionIds, branchIds, agentIds, searchText,isCompanySet);
-		if (socialResponseObjects != null && !socialResponseObjects.isEmpty()) {
-			for (SocialResponseObject socialResponseObject : socialResponseObjects) {
-				SocialMonitorFeedData socialMonitorFeedData = new SocialMonitorFeedData();
-				socialMonitorFeedData.setType(socialResponseObject.getType());
-				socialMonitorFeedData.setStatus(socialResponseObject.getStatus());
-				socialMonitorFeedData.setText(socialResponseObject.getText());
-				socialMonitorFeedData.setPictures(socialResponseObject.getPictures());
-				socialMonitorFeedData.setOwnerName(socialResponseObject.getOwnerName());
-				socialMonitorFeedData.setOwnerProfileImage(socialResponseObject.getOwnerProfileImage());
-				socialMonitorFeedData.setCompanyId(socialResponseObject.getCompanyId());
-				socialMonitorFeedData.setRegionId(socialResponseObject.getRegionId());
-				socialMonitorFeedData.setBranchId(socialResponseObject.getBranchId());
-				socialMonitorFeedData.setAgentId(socialResponseObject.getAgentId());
-				socialMonitorFeedData.setPostId(socialResponseObject.getPostId());
-				socialMonitorFeedData.setFlagged(socialResponseObject.isFlagged());
-				if(socialResponseObject.getActionHistory() != null){
-				    Collections.sort( socialResponseObject.getActionHistory(), new ActionHistoryComparator() ); 
-				}
-				socialMonitorFeedData.setActionHistory(socialResponseObject.getActionHistory());
-				socialMonitorFeedData.setUpdatedOn(socialResponseObject.getUpdatedTime());
-				socialMonitorFeedData.setFoundKeywords(socialResponseObject.getFoundKeywords());
-				socialMonitorFeedData.setDuplicateCount(socialResponseObject.getDuplicateCount());
-				socialMonitorStreamDataList.add(socialMonitorFeedData);
-			}
-			socialMonitorResponseData.setCount(mongoSocialFeedDao.getAllSocialFeedsCount(flag, status, feedtype, companyId, regionIds, branchIds, agentIds, searchText,isCompanySet));
-			if (flag) {
-				socialMonitorResponseData.setStatus("FLAGGED");
-			} else if (status != null && !flag) {
-				socialMonitorResponseData.setStatus(status.toUpperCase());
-			} else if(status == null && !flag){
-				socialMonitorResponseData.setStatus("ALL");
-			}
-			socialMonitorResponseData.setSocialMonitorFeedData(socialMonitorStreamDataList);
-		} else {
-			LOG.warn("List is empty");
-		}
-		LOG.debug("End of getSocialPostsForStream{}");
-		return socialMonitorResponseData;
-	}
+        SocialMonitorResponseData socialMonitorResponseData = new SocialMonitorResponseData();
+        List<SocialMonitorFeedData> socialMonitorStreamDataList = new ArrayList<>();
+        List<SocialResponseObject> socialResponseObjects;
+        OrganizationUnitSettings organizationUnitSettings;
+
+        socialResponseObjects = mongoSocialFeedDao.getAllSocialFeeds( startIndex, limit, flag, status, feedtype, companyId,
+            regionIds, branchIds, agentIds, searchText, isCompanySet );
+        if ( socialResponseObjects != null && !socialResponseObjects.isEmpty() ) {
+            for ( SocialResponseObject socialResponseObject : socialResponseObjects ) {
+                SocialMonitorFeedData socialMonitorFeedData = new SocialMonitorFeedData();
+                if ( socialResponseObject.getProfileType().equals( ProfileType.COMPANY ) ) {
+                    organizationUnitSettings = mongoSocialFeedDao.getProfileImageUrl( socialResponseObject.getCompanyId(),
+                        CommonConstants.COMPANY_SETTINGS_COLLECTION );
+                } else if ( socialResponseObject.getProfileType().equals( ProfileType.REGION ) ) {
+                    organizationUnitSettings = mongoSocialFeedDao.getProfileImageUrl( socialResponseObject.getRegionId(),
+                        CommonConstants.REGION_SETTINGS_COLLECTION );
+                } else if ( socialResponseObject.getProfileType().equals( ProfileType.BRANCH ) ) {
+                    organizationUnitSettings = mongoSocialFeedDao.getProfileImageUrl( socialResponseObject.getBranchId(),
+                        CommonConstants.BRANCH_SETTINGS_COLLECTION );
+                } else {
+                    organizationUnitSettings = mongoSocialFeedDao.getProfileImageUrl( socialResponseObject.getAgentId(),
+                        CommonConstants.AGENT_SETTINGS_COLLECTION );
+                }
+                socialMonitorFeedData.setType( socialResponseObject.getType() );
+                socialMonitorFeedData.setStatus( socialResponseObject.getStatus() );
+                socialMonitorFeedData.setText( socialResponseObject.getText() );
+                socialMonitorFeedData.setPictures( socialResponseObject.getPictures() );
+                socialMonitorFeedData.setOwnerName( socialResponseObject.getOwnerName() );
+                if ( organizationUnitSettings != null ) {
+                    socialMonitorFeedData.setOwnerProfileImage( organizationUnitSettings.getProfileImageUrl() );
+                }
+                socialMonitorFeedData.setCompanyId( socialResponseObject.getCompanyId() );
+                socialMonitorFeedData.setRegionId( socialResponseObject.getRegionId() );
+                socialMonitorFeedData.setBranchId( socialResponseObject.getBranchId() );
+                socialMonitorFeedData.setAgentId( socialResponseObject.getAgentId() );
+                socialMonitorFeedData.setPostId( socialResponseObject.getPostId() );
+                socialMonitorFeedData.setFlagged( socialResponseObject.isFlagged() );
+                if ( socialResponseObject.getActionHistory() != null ) {
+                    Collections.sort( socialResponseObject.getActionHistory(), new ActionHistoryComparator() );
+                }
+                socialMonitorFeedData.setActionHistory( socialResponseObject.getActionHistory() );
+                socialMonitorFeedData.setUpdatedOn( socialResponseObject.getUpdatedTime() );
+                socialMonitorFeedData.setFoundKeywords( socialResponseObject.getFoundKeywords() );
+                socialMonitorFeedData.setDuplicateCount( socialResponseObject.getDuplicateCount() );
+                socialMonitorStreamDataList.add( socialMonitorFeedData );
+            }
+            socialMonitorResponseData.setCount( mongoSocialFeedDao.getAllSocialFeedsCount( flag, status, feedtype, companyId,
+                regionIds, branchIds, agentIds, searchText, isCompanySet ) );
+            if ( flag ) {
+                socialMonitorResponseData.setStatus( "FLAGGED" );
+            } else if ( status != null && !flag ) {
+                socialMonitorResponseData.setStatus( status.toUpperCase() );
+            } else if ( status == null && !flag ) {
+                socialMonitorResponseData.setStatus( "ALL" );
+            }
+            socialMonitorResponseData.setSocialMonitorFeedData( socialMonitorStreamDataList );
+        } else {
+            LOG.warn( "List is empty" );
+        }
+        LOG.debug( "End of getSocialPostsForStream{}" );
+        return socialMonitorResponseData;
+    }
 	
 
     @Override

@@ -38,5 +38,7 @@ public interface MongoSocialFeedDao
 	
 	public List<SocialResponseObject> getDuplicatePostIds(int hash, Long companyId);
 	
+	public OrganizationUnitSettings getProfileImageUrl(long iden, String collectionName);
+	
 
 }
