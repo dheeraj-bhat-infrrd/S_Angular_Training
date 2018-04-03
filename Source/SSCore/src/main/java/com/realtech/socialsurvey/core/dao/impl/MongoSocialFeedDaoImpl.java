@@ -410,14 +410,17 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         query.addCriteria(Criteria.where(HASH).is(hash).and(COMPANY_ID).is(companyId));
         query.fields().exclude( KEY_IDENTIFIER ).include(POST_ID);
         return mongoTemplate.find( query, SocialResponseObject.class, SOCIAL_FEED_COLLECTION );
-    }	
-	
-	
-	
-	
-	
-	
-	
-	
+    }
+
+    @Override
+    public OrganizationUnitSettings getProfileImageUrl( long iden, String collectionName )
+    {
+        LOG.debug("Fetching profile image for id {} with profileType {}", iden, collectionName);
+        Query query = new  Query();
+        query.addCriteria(Criteria.where(IDEN).is(iden));
+        query.fields().exclude( KEY_IDENTIFIER ).include(PROFILE_IMAGE_URL);
+        return mongoTemplate.findOne( query, OrganizationUnitSettings.class, collectionName );
+       
+    }
 
 }
