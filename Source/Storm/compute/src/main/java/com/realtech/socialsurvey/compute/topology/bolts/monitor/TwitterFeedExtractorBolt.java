@@ -145,7 +145,6 @@ public class TwitterFeedExtractorBolt extends BaseComputeBolt
         responseWrapper.setPostId( String.valueOf( twitterFeedData.getId() ) );
         //Id is postId_companyId
         responseWrapper.setId( String.valueOf( twitterFeedData.getId() ) + "_" + responseWrapper.getCompanyId() );
-        responseWrapper.setId( String.valueOf( twitterFeedData.getId() ) );
         responseWrapper.setPictures(twitterFeedData.getPictures());
 
         if ( twitterFeedData.getCreatedAt() != null ) {

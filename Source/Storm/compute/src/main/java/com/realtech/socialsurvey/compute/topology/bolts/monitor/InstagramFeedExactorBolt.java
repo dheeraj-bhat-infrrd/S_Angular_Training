@@ -97,7 +97,6 @@ public class InstagramFeedExactorBolt extends BaseComputeBolt {
         responseWrapper.setPostId( instagramMediaData.getIgId() );
         //Id is postId_companyId
         responseWrapper.setId( instagramMediaData.getIgId() + "_" + responseWrapper.getCompanyId() );
-        responseWrapper.setId( instagramMediaData.getIgId() );
         responseWrapper.setPictures(Arrays.asList(instagramMediaData.getMediaUrl()));
 
         if ( instagramMediaData.getTimestamp() > 0 ) {
