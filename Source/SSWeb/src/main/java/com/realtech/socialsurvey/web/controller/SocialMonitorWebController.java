@@ -623,5 +623,47 @@ public class SocialMonitorWebController {
         
         return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
     }
+    
+    @ResponseBody
+    @RequestMapping ( value = "/deletemonitorsbyid", method = RequestMethod.POST)
+    public String deleteMonitor(Model model, HttpServletRequest request) {
+        
+        String monitorIdStr = request.getParameter( "monitorIds" );
+        List<String> monitorIds= new ArrayList<>();
+        
+        User user = sessionHelper.getCurrentUser();
+        Long companyId = user.getCompany().getCompanyId();
+        
+        Map<String, String> statusMap = new HashMap<>();
+        String message = "";
+        String statusJson = "";
+        
+        String[] monitorIdList = monitorIdStr.split(",");
+        for(int i=0;i<monitorIdList.length;i++) {
+            monitorIds.add(monitorIdList[i]);
+        }
+        
+        Response response = null;
+        
+        try {
+           
+            response = ssApiIntergrationBuilder.getIntegrationApi().deleteKeywordsFromCompany( companyId, monitorIds );
+            message = messageUtils.getDisplayMessage(DisplayMessageConstants.UPDATE_POST_SUCCESSFUL,
+                    DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+            String status = new String(((TypedByteArray) response.getBody()).getBytes());
+            statusMap.put(SUCCESS, status);
+            statusMap.put(STATUS, CommonConstants.SUCCESS_ATTRIBUTE);
+         }catch(Exception e){
+            LOG.error("Exception occured in SS-API while updating post action.", e);
+            message = messageUtils.getDisplayMessage(DisplayMessageConstants.UPDATE_POST_UNSUCCESSFUL,
+                    DisplayMessageType.ERROR_MESSAGE).getMessage();
+            statusMap.put(STATUS, CommonConstants.ERROR);
+         }
+        
+        statusMap.put(MESSAGE, message);
+        statusJson = new Gson().toJson(statusMap);
+        
+        return statusJson;
+    }
 
 }

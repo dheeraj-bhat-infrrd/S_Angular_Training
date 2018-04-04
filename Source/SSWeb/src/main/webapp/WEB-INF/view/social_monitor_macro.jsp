@@ -66,7 +66,12 @@
 		</div>
 		<div id="inactive-macros-list" class="hide">
 			
-		</div>		
+		</div>
+		<div id="empty-macros-list" class="hide">
+			<div class="dash-stats-wrapper bord-bot-dc clearfix macro-list-div">
+				<span class="incomplete-trans-span monitors-empty-span">No macros found</span>
+			</div>
+		</div>
 	</div>
 </div>
 <script>
