@@ -143,7 +143,8 @@ public class LinkedinFeedExtractorBolt extends BaseComputeBolt
 
         responseWrapper.setHash( responseWrapper.getText().hashCode() );
         responseWrapper.setPostId( id );
-        responseWrapper.setId( id );
+        //Id is postId_companyId
+        responseWrapper.setId( id + "_" + responseWrapper.getCompanyId() );
         return responseWrapper;
     }
 
