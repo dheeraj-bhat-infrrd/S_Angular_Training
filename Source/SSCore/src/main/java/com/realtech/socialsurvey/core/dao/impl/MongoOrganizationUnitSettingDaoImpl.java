@@ -41,6 +41,7 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
 import com.realtech.socialsurvey.core.entities.ProfileUrlEntity;
 import com.realtech.socialsurvey.core.entities.SavedDigestRecord;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -544,10 +545,10 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     
     
     @Override
-    public List<FeedIngestionEntityForSM> fetchSocialMediaTokensForIds( List<Long> ids, String collectionName )
+    public List<SocialMediaTokenResponse> fetchSocialMediaTokensForIds( List<Long> ids, String collectionName )
     {
         LOG.debug( "Fetching social media tokens from {}", collectionName );
-        List<FeedIngestionEntityForSM> tokens = null;
+        List<SocialMediaTokenResponse> tokens = null;
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_SOCIAL_MEDIA_TOKENS ).exists( true ) );
         query.addCriteria( Criteria.where( "iden" ).in( ids ) );
@@ -560,7 +561,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
             .include( KEY_LINKEDIN_ID ).include( KEY_LINKEDIN_PAGE_LINK ).include( KEY_LINKEDIN_ACCESS_TOKEN )
             .include( KEY_IDENTIFIER ).exclude( "_id" )
             .include( PROFILE_IMAGE_URL );
-        tokens = mongoTemplate.find( query, FeedIngestionEntityForSM.class, collectionName );
+        tokens = mongoTemplate.find( query, SocialMediaTokenResponse.class, collectionName );
         LOG.debug( "Fetched {} items with social media tokens from {}", ( tokens != null ? tokens.size() : "none" ),
             collectionName );
         return tokens;
@@ -1154,12 +1155,12 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     }
     
     @Override
-    public List<FeedIngestionEntityForSM> getAllCompanyIdWithSocialMediaTokens( String collectionName, int skipCount, int batchSize )
+    public List<SocialMediaTokenResponse> getSocialMediaTokensByCollection( String collectionName, int skipCount, int batchSize )
     {
         LOG.debug( "Fetching social media tokens from {}", collectionName );
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_SOCIAL_MEDIA_TOKENS ).exists( true )  );
-        query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).include( KEY_IDENTIFIER ).include( PROFILE_IMAGE_URL ).exclude( "_id" );
+        query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).include( KEY_IDENTIFIER ).exclude( "_id" );
         
         if ( skipCount > 0 ) {
             query.skip( skipCount );
@@ -1167,16 +1168,16 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         if ( batchSize > 0 ) {
             query.limit( batchSize );
         }
-        return mongoTemplate.find( query, FeedIngestionEntityForSM.class, collectionName );
+        return mongoTemplate.find( query, SocialMediaTokenResponse.class, collectionName );
     }
     
     @Override
     public long getSocialMediaTokensCount( String collectionName)
     {
-        LOG.debug( "Fetching social media tokens record count {}", collectionName );
+        LOG.debug( "Fetching social media tokens record count from {}", collectionName );
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_SOCIAL_MEDIA_TOKENS ).exists( true )  );
-        query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).include( KEY_IDENTIFIER ).include( PROFILE_IMAGE_URL ).exclude( "_id" );
+        query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).include( KEY_IDENTIFIER ).exclude( "_id" );
         return mongoTemplate.count( query, collectionName );
     }
     

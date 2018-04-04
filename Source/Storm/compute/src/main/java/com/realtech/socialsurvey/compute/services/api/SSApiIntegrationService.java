@@ -5,6 +5,7 @@ import java.util.List;
 import com.realtech.socialsurvey.compute.entities.FileUploadResponse;
 import com.realtech.socialsurvey.compute.entities.Keyword;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
+import com.realtech.socialsurvey.compute.entities.SocialMediaTokensPaginated;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.entities.response.TwitterFeedData;
 import com.realtech.socialsurvey.compute.entities.response.linkedin.LinkedinFeedData;
@@ -35,7 +36,10 @@ public interface SSApiIntegrationService
     @Headers ( "Content-Type: application/json")
     @GET ( "v1/companies/mediatokens")
     Call<List<SocialMediaTokenResponse>> getMediaTokens();
-
+    
+    @Headers ( "Content-Type: application/json")
+    @GET ( "v1/companies/mediaTokensPaginated")
+    Call<SocialMediaTokensPaginated> getMediaTokensPaginated(@Query ( "skipCount") int skipCount,@Query ( "batchSize") int batchSize);
 
     @Headers ( "Content-Type: application/json")
     @POST ( "v1/feeds")

@@ -43,7 +43,6 @@ public class SocialResponseObject<T> implements Serializable
     private long createdTime;
     private String ownerName;
     private String ownerEmail;
-    private String ownerProfileImage;
 
     private T response;
     private SocialFeedType type;
@@ -314,18 +313,7 @@ public class SocialResponseObject<T> implements Serializable
     {
         this.ownerEmail = ownerEmail;
     }
-
-
-    public String getOwnerProfileImage()
-    {
-        return ownerProfileImage;
-    }
-
-
-    public void setOwnerProfileImage( String ownerProfileImage )
-    {
-        this.ownerProfileImage = ownerProfileImage;
-    }
+    
     
     public String getTextHighlighted()
     {
@@ -349,15 +337,17 @@ public class SocialResponseObject<T> implements Serializable
         this.pageLink = pageLink;
     }
 
+
     @Override
     public String toString()
     {
         return "SocialResponseObject [id=" + id + ", postId=" + postId + ", text=" + text + ", textHighlighted="
             + textHighlighted + ", pageLink=" + pageLink + ", pictures=" + pictures + ", updatedTime=" + updatedTime
-            + ", createdTime=" + createdTime + ", ownerName=" + ownerName + ", ownerEmail=" + ownerEmail
-            + ", ownerProfileImage=" + ownerProfileImage + ", response=" + response + ", type=" + type + ", flagged=" + flagged
-            + ", status=" + status + ", companyId=" + companyId + ", regionId=" + regionId + ", branchId=" + branchId
-            + ", agentId=" + agentId + ", profileType=" + profileType + ", hash=" + hash + ", duplicateCount=" + duplicateCount
-            + ", foundKeywords=" + foundKeywords + ", actionHistory=" + actionHistory + ", isRetried=" + isRetried + "]";
+            + ", createdTime=" + createdTime + ", ownerName=" + ownerName + ", ownerEmail=" + ownerEmail + ", response="
+            + response + ", type=" + type + ", flagged=" + flagged + ", status=" + status + ", companyId=" + companyId
+            + ", regionId=" + regionId + ", branchId=" + branchId + ", agentId=" + agentId + ", profileType=" + profileType
+            + ", hash=" + hash + ", duplicateCount=" + duplicateCount + ", foundKeywords=" + foundKeywords + ", actionHistory="
+            + actionHistory + ", isRetried=" + isRetried + "]";
     }
+    
 }
