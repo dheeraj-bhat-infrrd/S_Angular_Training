@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import com.realtech.socialsurvey.compute.entities.Keyword;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
+import com.realtech.socialsurvey.compute.entities.SocialMediaTokensPaginated;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.entity.SurveyInvitationEmailCountMonth;
 import com.realtech.socialsurvey.compute.exception.APIIntegrationException;
@@ -76,6 +77,30 @@ public class SSAPIOperations
             .getMediaTokens();
         try {
             Response<List<SocialMediaTokenResponse>> response = requestCall.execute();
+            RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
+            if ( LOG.isTraceEnabled() ) {
+                LOG.trace( "getMediaTokens response {}", response.body() );
+            }
+            return Optional.of( response.body() );
+        } catch ( IOException | APIIntegrationException e ) {
+            LOG.error( "getMediaTokens IOException/ APIIntegrationException caught", e );
+            return Optional.empty();
+        }
+    }
+    
+    /**
+     * Get keyword for company id
+     * @param batchSize 
+     * @param skipCount 
+     * @return
+     */
+    public Optional<SocialMediaTokensPaginated> getMediaTokensPaginated(int skipCount, int batchSize)
+    {
+        LOG.info( "Executing getMediaTokensPaginated method." );
+        Call<SocialMediaTokensPaginated> requestCall = RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationServiceWithIncreasedTimeOut()
+            .getMediaTokensPaginated( skipCount, batchSize);
+        try {
+            Response<SocialMediaTokensPaginated> response = requestCall.execute();
             RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
             if ( LOG.isTraceEnabled() ) {
                 LOG.trace( "getMediaTokens response {}", response.body() );

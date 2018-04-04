@@ -5943,9 +5943,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         List<SocialMediaTokenResponse> socialMediaTokenResponseList = new ArrayList<>();
 
         // fetch companies media token
-        List<FeedIngestionEntityForSM> companiesMediaTokens = organizationUnitSettingsDao
-            .getAllCompanyIdWithSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, 0, 0 );
-        for ( FeedIngestionEntityForSM feedIngestionEntity : companiesMediaTokens ) {
+        List<SocialMediaTokenResponse> companiesMediaTokens = organizationUnitSettingsDao
+            .getSocialMediaTokensByCollection( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, 0, 0 );
+        for ( SocialMediaTokenResponse feedIngestionEntity : companiesMediaTokens ) {
 
             if ( feedIngestionEntity.getSocialMediaTokens() != null ) {
                 socialMediaTokenResponseList.add(
@@ -5955,30 +5955,30 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
             List<Long> regionIds = regionDao.getRegionIdsUnderCompany( feedIngestionEntity.getIden(), skipCount, batchSize );
 
-            List<FeedIngestionEntityForSM> regionMediaTokens = organizationUnitSettingsDao
+            List<SocialMediaTokenResponse> regionMediaTokens = organizationUnitSettingsDao
                 .fetchSocialMediaTokensForIds( regionIds, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
 
-            for ( FeedIngestionEntityForSM regionFeedIngestionEntity : regionMediaTokens ) {
+            for ( SocialMediaTokenResponse regionFeedIngestionEntity : regionMediaTokens ) {
                 socialMediaTokenResponseList.add( setSocialMediaTokenResponse( regionFeedIngestionEntity,
                     feedIngestionEntity.getIden(), ProfileType.REGION ) );
             }
 
             List<Long> branchIds = branchDao.getBranchIdsUnderCompany( feedIngestionEntity.getIden(), skipCount, batchSize );
 
-            List<FeedIngestionEntityForSM> branchMediaTokens = organizationUnitSettingsDao
+            List<SocialMediaTokenResponse> branchMediaTokens = organizationUnitSettingsDao
                 .fetchSocialMediaTokensForIds( branchIds, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
 
-            for ( FeedIngestionEntityForSM branchFeedIngestionEntity : branchMediaTokens ) {
+            for ( SocialMediaTokenResponse branchFeedIngestionEntity : branchMediaTokens ) {
                 socialMediaTokenResponseList.add( setSocialMediaTokenResponse( branchFeedIngestionEntity,
                     feedIngestionEntity.getIden(), ProfileType.BRANCH ) );
             }
 
             List<Long> userIds = getAgentIdsUnderCompany( feedIngestionEntity.getIden(), skipCount, batchSize );
 
-            List<FeedIngestionEntityForSM> usersMediaTokens = organizationUnitSettingsDao.fetchSocialMediaTokensForIds( userIds,
+            List<SocialMediaTokenResponse> usersMediaTokens = organizationUnitSettingsDao.fetchSocialMediaTokensForIds( userIds,
                 MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
 
-            for ( FeedIngestionEntityForSM userFeedIngestionEntity : usersMediaTokens ) {
+            for ( SocialMediaTokenResponse userFeedIngestionEntity : usersMediaTokens ) {
                 socialMediaTokenResponseList.add(
                     setSocialMediaTokenResponse( userFeedIngestionEntity, feedIngestionEntity.getIden(), ProfileType.AGENT ) );
             }
@@ -6008,8 +6008,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             .getSocialMediaTokensCount( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
 
         if ( skipCount < companyTokensCount ) {
-            List<FeedIngestionEntityForSM> companiesMediaTokens = organizationUnitSettingsDao
-                .getAllCompanyIdWithSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
+            List<SocialMediaTokenResponse> companiesMediaTokens = organizationUnitSettingsDao
+                .getSocialMediaTokensByCollection( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
                     skipCount, batchSize );
 
             totalRecord = companiesMediaTokens.size();
@@ -6017,71 +6017,77 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             socialMediaTokensPaginated.setCompaniesTokens( companiesMediaTokens );
 
             if ( totalRecord < batchSize ) {
-                List<FeedIngestionEntityForSM> regionsMediaTokens = organizationUnitSettingsDao
-                    .getAllCompanyIdWithSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, 0,
+                List<SocialMediaTokenResponse> regionsMediaTokens = organizationUnitSettingsDao
+                    .getSocialMediaTokensByCollection( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, 0,
                         batchSize - totalRecord );
                 totalRecord += regionsMediaTokens.size();
 
                 socialMediaTokensPaginated.setRegionsTokens( regionsMediaTokens );
 
                 if ( totalRecord < batchSize ) {
-                    List<FeedIngestionEntityForSM> branchMediaTokens = organizationUnitSettingsDao
-                        .getAllCompanyIdWithSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
+                    List<SocialMediaTokenResponse> branchMediaTokens = organizationUnitSettingsDao
+                        .getSocialMediaTokensByCollection( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
                             0, batchSize - totalRecord );
                     totalRecord += branchMediaTokens.size();
                     socialMediaTokensPaginated.setBranchesTokens( branchMediaTokens );
 
                     if ( totalRecord < batchSize ) {
-                        List<FeedIngestionEntityForSM> agentMediaTokens = organizationUnitSettingsDao
-                            .getAllCompanyIdWithSocialMediaTokens(
+                        List<SocialMediaTokenResponse> agentMediaTokens = organizationUnitSettingsDao
+                            .getSocialMediaTokensByCollection(
                                 MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, 0,
                                 batchSize - totalRecord );
+                        totalRecord +=agentMediaTokens.size();
                         socialMediaTokensPaginated.setAgentsTokens( agentMediaTokens );
                     }
                 }
             }
         } else if ( skipCount < companyTokensCount + regionTokensCount ) {
 
-            List<FeedIngestionEntityForSM> regionsMediaTokens = organizationUnitSettingsDao
-                .getAllCompanyIdWithSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
+            List<SocialMediaTokenResponse> regionsMediaTokens = organizationUnitSettingsDao
+                .getSocialMediaTokensByCollection( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
                     (int) ( skipCount - companyTokensCount ), batchSize );
             totalRecord += regionsMediaTokens.size();
 
             socialMediaTokensPaginated.setRegionsTokens( regionsMediaTokens );
 
             if ( totalRecord < batchSize ) {
-                List<FeedIngestionEntityForSM> branchMediaTokens = organizationUnitSettingsDao
-                    .getAllCompanyIdWithSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, 0,
+                List<SocialMediaTokenResponse> branchMediaTokens = organizationUnitSettingsDao
+                    .getSocialMediaTokensByCollection( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, 0,
                         batchSize - totalRecord );
                 totalRecord += branchMediaTokens.size();
                 socialMediaTokensPaginated.setBranchesTokens( branchMediaTokens );
 
                 if ( totalRecord < batchSize ) {
-                    List<FeedIngestionEntityForSM> agentMediaTokens = organizationUnitSettingsDao
-                        .getAllCompanyIdWithSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, 0,
+                    List<SocialMediaTokenResponse> agentMediaTokens = organizationUnitSettingsDao
+                        .getSocialMediaTokensByCollection( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, 0,
                             batchSize - totalRecord );
+                    totalRecord +=agentMediaTokens.size();
                     socialMediaTokensPaginated.setAgentsTokens( agentMediaTokens );
                 }
             }
         } else if ( skipCount < companyTokensCount + regionTokensCount + branchTokensCount ) {
-            List<FeedIngestionEntityForSM> branchMediaTokens = organizationUnitSettingsDao.getAllCompanyIdWithSocialMediaTokens(
+            List<SocialMediaTokenResponse> branchMediaTokens = organizationUnitSettingsDao.getSocialMediaTokensByCollection(
                 MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
                 (int) ( skipCount - ( companyTokensCount + regionTokensCount ) ), batchSize );
             totalRecord += branchMediaTokens.size();
             socialMediaTokensPaginated.setBranchesTokens( branchMediaTokens );
 
             if ( totalRecord < batchSize ) {
-                List<FeedIngestionEntityForSM> agentMediaTokens = organizationUnitSettingsDao
-                    .getAllCompanyIdWithSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, 0,
+                List<SocialMediaTokenResponse> agentMediaTokens = organizationUnitSettingsDao
+                    .getSocialMediaTokensByCollection( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, 0,
                         batchSize - totalRecord );
+                totalRecord +=agentMediaTokens.size();
                 socialMediaTokensPaginated.setAgentsTokens( agentMediaTokens );
             }
         } else if ( skipCount < companyTokensCount + regionTokensCount + branchTokensCount + agentTokensCount ) {
-            List<FeedIngestionEntityForSM> agentMediaTokens = organizationUnitSettingsDao.getAllCompanyIdWithSocialMediaTokens(
+            List<SocialMediaTokenResponse> agentMediaTokens = organizationUnitSettingsDao.getSocialMediaTokensByCollection(
                 MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
                 (int) ( skipCount - ( companyTokensCount + regionTokensCount + branchTokensCount ) ), batchSize );
+            totalRecord +=agentMediaTokens.size();
             socialMediaTokensPaginated.setAgentsTokens( agentMediaTokens );
         }
+        
+        socialMediaTokensPaginated.setTotalRecord(totalRecord);
 
         setCompanyIdsMap( socialMediaTokensPaginated );
 
@@ -6089,15 +6095,17 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         return socialMediaTokensPaginated;
     }
     
+
     /**
      * Method to set companies map in social media paginated response.
      * @param socialMediaTokensPaginated
      */
-    private void setCompanyIdsMap(SocialMediaTokensPaginated socialMediaTokensPaginated ){
+    private void setCompanyIdsMap( SocialMediaTokensPaginated socialMediaTokensPaginated )
+    {
         LOG.debug( "Inside  setCompanyIdsMap" );
         List<Long> regionIds = new ArrayList<>();
 
-        for ( FeedIngestionEntityForSM regionToken : socialMediaTokensPaginated.getRegionsTokens() ) {
+        for ( SocialMediaTokenResponse regionToken : socialMediaTokensPaginated.getRegionsTokens() ) {
             regionIds.add( regionToken.getIden() );
         }
 
@@ -6105,7 +6113,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         socialMediaTokensPaginated.setRegionCompanyIdMap( regionCompanyIdMap );
 
         List<Long> branchIds = new ArrayList<>();
-        for ( FeedIngestionEntityForSM branchToken : socialMediaTokensPaginated.getBranchesTokens() ) {
+        for ( SocialMediaTokenResponse branchToken : socialMediaTokensPaginated.getBranchesTokens() ) {
             branchIds.add( branchToken.getIden() );
         }
 
@@ -6113,7 +6121,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         socialMediaTokensPaginated.setBranchCompanyIdMap( branchCompanyIdMap );
 
         List<Long> userIds = new ArrayList<>();
-        for ( FeedIngestionEntityForSM agentToken : socialMediaTokensPaginated.getAgentsTokens() ) {
+        for ( SocialMediaTokenResponse agentToken : socialMediaTokensPaginated.getAgentsTokens() ) {
             userIds.add( agentToken.getIden() );
         }
 
@@ -6129,7 +6137,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @param profileType
      * @return
      */
-    private SocialMediaTokenResponse setSocialMediaTokenResponse( FeedIngestionEntityForSM feedIngestionEntity, long companyId,
+    private SocialMediaTokenResponse setSocialMediaTokenResponse(SocialMediaTokenResponse  feedIngestionEntity, long companyId,
         ProfileType profileType )
     {
         if ( feedIngestionEntity != null ) {

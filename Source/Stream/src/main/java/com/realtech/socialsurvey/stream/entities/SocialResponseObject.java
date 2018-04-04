@@ -32,16 +32,16 @@ public class SocialResponseObject<T> implements Serializable
     }
 
 
-    // Common fields
     private String id;
     private String postId;
     private String text;
-    private String picture;
+    private String textHighlighted;
+    private String pageLink;
+    private List<String> pictures;
     private long updatedTime;
     private long createdTime;
     private String ownerName;
     private String ownerEmail;
-    private String ownerProfileImage;
 
     private T response;
     private SocialFeedType type;
@@ -105,18 +105,6 @@ public class SocialResponseObject<T> implements Serializable
     public void setText( String text )
     {
         this.text = text;
-    }
-
-
-    public String getPicture()
-    {
-        return picture;
-    }
-
-
-    public void setPicture( String picture )
-    {
-        this.picture = picture;
     }
 
 
@@ -322,30 +310,55 @@ public class SocialResponseObject<T> implements Serializable
     {
         this.ownerEmail = ownerEmail;
     }
+    
 
-
-    public String getOwnerProfileImage()
+    public String getTextHighlighted()
     {
-        return ownerProfileImage;
+        return textHighlighted;
     }
 
 
-    public void setOwnerProfileImage( String ownerProfileImage )
+    public void setTextHighlighted( String textHighlighted )
     {
-        this.ownerProfileImage = ownerProfileImage;
+        this.textHighlighted = textHighlighted;
+    }
+
+
+    public String getPageLink()
+    {
+        return pageLink;
+    }
+
+
+    public void setPageLink( String pageLink )
+    {
+        this.pageLink = pageLink;
+    }
+
+
+    public List<String> getPictures()
+    {
+        return pictures;
+    }
+
+
+    public void setPictures( List<String> pictures )
+    {
+        this.pictures = pictures;
     }
 
 
     @Override
     public String toString()
     {
-        return "SocialResponseObject [id=" + id + ", postId=" + postId + ", text=" + text + ", picture=" + picture
-            + ", updatedTime=" + updatedTime + ", createdTime=" + createdTime + ", ownerName=" + ownerName + ", ownerEmail="
-            + ownerEmail + ", ownerProfileImage=" + ownerProfileImage + ", response=" + response + ", type=" + type
-            + ", flagged=" + flagged + ", status=" + status + ", companyId=" + companyId + ", regionId=" + regionId
-            + ", branchId=" + branchId + ", agentId=" + agentId + ", profileType=" + profileType + ", hash=" + hash
-            + ", duplicateCount=" + duplicateCount + ", foundKeywords=" + foundKeywords + ", actionHistory=" + actionHistory
-            + ", isRetried=" + isRetried + "]";
+        return "SocialResponseObject [id=" + id + ", postId=" + postId + ", text=" + text + ", textHighlighted="
+            + textHighlighted + ", pageLink=" + pageLink + ", pictures=" + pictures + ", updatedTime=" + updatedTime
+            + ", createdTime=" + createdTime + ", ownerName=" + ownerName + ", ownerEmail=" + ownerEmail + ", response="
+            + response + ", type=" + type + ", flagged=" + flagged + ", status=" + status + ", companyId=" + companyId
+            + ", regionId=" + regionId + ", branchId=" + branchId + ", agentId=" + agentId + ", profileType=" + profileType
+            + ", hash=" + hash + ", duplicateCount=" + duplicateCount + ", foundKeywords=" + foundKeywords + ", actionHistory="
+            + actionHistory + ", isRetried=" + isRetried + "]";
     }
-
+    
+    
 }
