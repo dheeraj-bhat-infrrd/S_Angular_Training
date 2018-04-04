@@ -1491,8 +1491,8 @@ public class WorkbookData
 
 			surveyInvitationMailReportToPopulate.add(surveyInvitationEmailMonth.getAgentName());
 			surveyInvitationMailReportToPopulate.add(surveyInvitationEmailMonth.getEmailId());
-			surveyInvitationMailReportToPopulate.add(surveyInvitationEmailMonth.getBranchName());
-			surveyInvitationMailReportToPopulate.add(surveyInvitationEmailMonth.getRegionName());
+			//surveyInvitationMailReportToPopulate.add(surveyInvitationEmailMonth.getBranchName());
+			//surveyInvitationMailReportToPopulate.add(surveyInvitationEmailMonth.getRegionName());
 			surveyInvitationMailReportToPopulate.add(surveyInvitationEmailMonth.getReceived());
 			surveyInvitationMailReportToPopulate.add(surveyInvitationEmailMonth.getAttempted());
 			surveyInvitationMailReportToPopulate.add(surveyInvitationEmailMonth.getDelivered());

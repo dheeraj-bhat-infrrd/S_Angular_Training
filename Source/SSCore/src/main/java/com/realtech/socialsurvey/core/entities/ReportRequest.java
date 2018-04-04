@@ -163,6 +163,8 @@ public class ReportRequest implements Serializable{
     		this.endTime = getLastDayOfPastMonth();
     		break;
     	case CommonConstants.TIME_FRAME_THIS_MONTH :
+    		this.startTime = getFirstDayOfThisMonth();
+    		this.endTime = getYesterday();
     		break;
     	case CommonConstants.TIME_FRAME_ALL_TIME :
     		break;
@@ -170,17 +172,49 @@ public class ReportRequest implements Serializable{
     	
     }
 
-	private long getLastDayOfPastMonth() {
-		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.MONTH, -1);
-		cal.set(Calendar.DATE, 1);
-		return cal.getTimeInMillis();
-	}
-
 	private long getFirstDayOfPastMonth() {
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.MONTH, -1);
+		cal.set(Calendar.DATE, 1);
+		cal.set(Calendar.HOUR_OF_DAY, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+		cal.setTimeZone(TimeZone.getTimeZone("UTC"));
+		return cal.getTimeInMillis();
+	}
+
+	private long getLastDayOfPastMonth() {
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.MONTH, -1);
 		cal.set(Calendar.DATE, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+		cal.set(Calendar.HOUR_OF_DAY, 23);
+		cal.set(Calendar.MINUTE, 59);
+		cal.set(Calendar.SECOND, 59);
+		cal.set(Calendar.MILLISECOND, 999);
+		cal.setTimeZone(TimeZone.getTimeZone("UTC"));
+		return cal.getTimeInMillis();
+	}
+	
+	private long getFirstDayOfThisMonth() {
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.DATE, 1);
+		cal.set(Calendar.HOUR_OF_DAY, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+		cal.setTimeZone(TimeZone.getTimeZone("UTC"));
+		return cal.getTimeInMillis();
+	}
+	
+	private long getYesterday() {
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.DATE, cal.get(Calendar.DATE)-1);
+		cal.set(Calendar.HOUR_OF_DAY, 23);
+		cal.set(Calendar.MINUTE, 59);
+		cal.set(Calendar.SECOND, 59);
+		cal.set(Calendar.MILLISECOND, 999);
+		cal.setTimeZone(TimeZone.getTimeZone("UTC"));
 		return cal.getTimeInMillis();
 	}
 

@@ -47,11 +47,11 @@
  								<option value=<spring:message code="label.company.user.report.value" /> data-report="company-user"><spring:message code="label.company.user.report.key" /></option>
  								<option value=<spring:message code="label.nps.report.value" /> data-report="nps-report"><spring:message code="label.nps.report.key" /></option>
 								<option value=<spring:message code="label.branch.ranking.monthly.report.value" /> data-report="company-user"><spring:message code="label.branch.ranking.report.key" /></option>
+								<option value=<spring:message code="label.survey.invitation.email.report.value" /> data-report="survey-invitation-email-report"><spring:message code="label.survey.invitation.email.report.key" /></option>
 							</c:if>
   								<option value=<spring:message code="label.survey.results.report.value" /> data-report="survey-results"><spring:message code="label.survey.results.report.key" /></option>
  								<option value=<spring:message code="label.survey.transaction.report.value" /> data-report="survey-transaction-summary"><spring:message code="label.survey.transaction.report.key" /></option>
  								<option value=<spring:message code="label.incomplete.survey.report.value" /> data-report="incomplete-survey-report"><spring:message code="label.incomplete.survey.report.key" /></option>
-								<option value=<spring:message code="label.survey.invitation.email.report.value" /> data-report="survey-invitation-email-report"><spring:message code="label.survey.invitation.email.report.key" /></option>
 						</select>	
 					</div>
 					<div id="report-time-div" class="float-left board-div hide">
@@ -81,8 +81,8 @@
 					<div id="email-rep-time-div" class="float-left board-div hide">
 						<div class="dash-btn-dl-sd-admin time-selector" style="width:200px; margin-top:-5px">
 							<select id="email-rep-selector" class="float-left dash-download-sel-item board-selector-choice" style="width:100%">
-								<!-- <option value=1 data-report="thisYear">All Time</option>
-								<option value=2 data-report="thisMonth">This Month</option> -->
+								<option value=1 data-report="thisYear">All Time</option>
+								<option value=2 data-report="thisMonth">This Month</option>
 								<option value=3 data-report="lastYear">Last Month</option>
 							</select>	
 						</div>

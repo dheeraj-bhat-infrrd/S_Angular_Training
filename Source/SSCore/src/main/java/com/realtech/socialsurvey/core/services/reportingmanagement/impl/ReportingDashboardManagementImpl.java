@@ -51,7 +51,6 @@ import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.CompanyDetailsReportDao;
 import com.realtech.socialsurvey.core.dao.CompanyUserReportDao;
 import com.realtech.socialsurvey.core.dao.FileUploadDao;
-import com.realtech.socialsurvey.core.dao.GenericReportingDao;
 import com.realtech.socialsurvey.core.dao.NpsReportMonthDao;
 import com.realtech.socialsurvey.core.dao.NpsReportWeekDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -113,6 +112,7 @@ import com.realtech.socialsurvey.core.entities.NpsReportWeek;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RankingRequirements;
 import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.ReportRequest;
 import com.realtech.socialsurvey.core.entities.ReportingSurveyPreInititation;
 import com.realtech.socialsurvey.core.entities.SavedDigestRecord;
 import com.realtech.socialsurvey.core.entities.ScoreStatsOverallBranch;
@@ -155,6 +155,7 @@ import com.realtech.socialsurvey.core.enums.EntityWarningAlertType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.integration.stream.StreamApiIntegrationBuilder;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
@@ -164,6 +165,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.UserManage
 import com.realtech.socialsurvey.core.services.reportingmanagement.OverviewManagement;
 import com.realtech.socialsurvey.core.services.reportingmanagement.ReportingDashboardManagement;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
+import com.realtech.socialsurvey.core.vo.SurveyInvitationEmailCountVO;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookData;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookOperations;
 
@@ -352,10 +354,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
     private SurveyPreInitiationDao surveyPreInitiationDao;
     
     @Autowired
-    private GenericReportingDao<SurveyInvitationEmailCountMonth, Long> surveyEmailCountMonthDao;
-
-    @Autowired
     private DigestMailHelper digestMailHelper;
+    
+    @Autowired
+    private StreamApiIntegrationBuilder streamApiIntegrationBuilder;
 
 
     @Value ( "${FILE_DIRECTORY_LOCATION}")
@@ -466,10 +468,49 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
         }
 
         fileUpload = fileUploadDao.save( fileUpload );
+        
+		if (reportId == CommonConstants.FILE_UPLOAD_SURVEY_INVITATION_EMAIL_REPORT) {
+			ReportRequest reportRequest = new ReportRequest();
+			String timeFrame = CommonConstants.TIME_FRAME_ALL_TIME;
+			if (fileUpload.getStartDate() != null) {
+				if (fileUpload.getStartDate().getTime() == getFirstDayOfThisMonthTime()) {
+					timeFrame = CommonConstants.TIME_FRAME_THIS_MONTH;
+				} else if (fileUpload.getStartDate().getTime() == getFirstDayOfPastMonthTime()) {
+					timeFrame = CommonConstants.TIME_FRAME_PAST_MONTH;
+				}
+			}
+			reportRequest.transform(timeFrame);
+			reportRequest.setFileUploadId(fileUpload.getFileUploadId());
+			reportRequest.setCompanyId(fileUpload.getCompany().getCompanyId());
+			streamApiIntegrationBuilder.getStreamApi().generateEmailReport(reportRequest);
+		}
     }
 
 
-    /*
+    private long getFirstDayOfPastMonthTime() {
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
+		cal.set(Calendar.HOUR, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+		cal.add(Calendar.MONTH, -1);
+		return cal.getTimeInMillis();
+	}
+
+
+	private long getFirstDayOfThisMonthTime() {
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
+		cal.set(Calendar.HOUR, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+		return cal.getTimeInMillis();
+	}
+
+
+	/*
      * Generate report from the surveyStats Table
      * 
      */
@@ -5109,6 +5150,7 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 	}
 
 
+	@Transactional
 	@Override
 	public List<SurveyInvitationEmailCountMonth> getReceivedCountsMonth(long startDate, long endDate, int startIndex, int batchSize)
 			throws ParseException {
@@ -5122,10 +5164,10 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 		String startDateStr = sdf.format(new Date(startDate));
 		String endDateStr = sdf.format(new Date(endDate));
-		LOG.info("start date {} and end date {}",startDateStr,endDateStr);
+		LOG.debug("start date {} and end date {}",startDateStr,endDateStr);
 		List<Object[]> receivedCount = surveyPreInitiationDao.getReceivedCountForDate(startDateStr, endDateStr,
 				startIndex, batchSize);
-		LOG.info("Db returned row count : {}",receivedCount.size());
+		LOG.debug("Db returned row count : {}",receivedCount.size());
 		for (Object[] obj : receivedCount) {
 			if(obj[0] !=null && obj[1]!=null && obj[2] !=null) {
 				SurveyInvitationEmailCountMonth mailCount = new SurveyInvitationEmailCountMonth();
@@ -5147,8 +5189,14 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 	@Transactional
 	public boolean saveEmailCountMonthData(List<SurveyInvitationEmailCountMonth> agentEmailCountsMonth) {
 		try {
-			surveyEmailCountMonthDao.saveAll(agentEmailCountsMonth);
-			LOG.info("Survey invitaion email count data saved to db.");
+			Map<String, Object> queryMap = new HashMap<String, Object>();
+			queryMap.put("month", agentEmailCountsMonth.get(0).getMonth());
+			queryMap.put("year", agentEmailCountsMonth.get(0).getYear());
+			surveyInvitationEmailDao.deleteOldDataForMonth(agentEmailCountsMonth.get(0).getMonth(),
+					agentEmailCountsMonth.get(0).getYear());
+			surveyInvitationEmailDao.saveAll(agentEmailCountsMonth);
+			LOG.info("Survey invitaion email count data saved to db for {}-{}",agentEmailCountsMonth.get(0).getMonth(),
+					agentEmailCountsMonth.get(0).getYear());
 			return true;
 		} catch (Exception e) {
 			LOG.error("Exception occured while saving survey invitation email count to db.");
@@ -5196,11 +5244,12 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 
 
 	@Override
-	public List<SurveyInvitationEmailCountMonth> getSurveyInvitationEmailReportForMonth(long companyId, int month, int year) {
-		List<SurveyInvitationEmailCountMonth> mailCountReport = new ArrayList<SurveyInvitationEmailCountMonth>();
+	@Transactional
+	public List<SurveyInvitationEmailCountVO> getSurveyInvitationEmailReportForMonth(long companyId, int month, int year) {
+		List<SurveyInvitationEmailCountVO> mailCountReport = new ArrayList<SurveyInvitationEmailCountVO>();
 		List<Object[]> reportList = surveyInvitationEmailDao.getSurveyInvitationEmailReportForMonth(companyId,month,year);
 		for(Object[] obj : reportList) {
-			SurveyInvitationEmailCountMonth reportObj = new SurveyInvitationEmailCountMonth();
+			SurveyInvitationEmailCountVO reportObj = new SurveyInvitationEmailCountVO();
 			reportObj.setAgentName((String)obj[0]);
 			reportObj.setEmailId((String)obj[1]);
 			reportObj.setBranchName((String)obj[2]);
@@ -5213,8 +5262,59 @@ public class ReportingDashboardManagementImpl implements ReportingDashboardManag
 			reportObj.setOpened(new Long(obj[9].toString()));
 			reportObj.setLinkClicked(new Long(obj[10].toString()));
 			reportObj.setDropped(new Long(obj[11].toString()));
+			reportObj.setMonth(new Integer(obj[12].toString()));
+			reportObj.setYear(new Integer(obj[13].toString()));
 			mailCountReport.add(reportObj);
 		}
 		return mailCountReport;
+	}
+
+
+	@Override
+	@Transactional
+	public List<SurveyInvitationEmailCountMonth> getAllTimeDataForSurveyInvitationMail(int startIndex, int batchSize) {
+		Map<String, Object> queryMap = new HashMap<String, Object>();
+		queryMap.put("month", 0);
+		queryMap.put("year", 0);
+		return surveyInvitationEmailDao.findByKeyValueInBatch(SurveyInvitationEmailCountMonth.class, queryMap, startIndex, batchSize);
+	}
+
+
+	@Override
+	@Transactional
+	public List<SurveyInvitationEmailCountVO> getDataForSurveyInvitationMail(int month, int year, long companyId) {
+
+		List<SurveyInvitationEmailCountVO> monthData = null;
+		if (month == 0 && year == 0) {
+			monthData = new ArrayList<>();
+			Calendar cal = Calendar.getInstance();
+			month = cal.get(Calendar.MONTH)+1;
+			year = cal.get(Calendar.YEAR);
+			List<Object[]> thisMonth = surveyInvitationEmailDao.getSurveyInvitationEmailReportForAllTime(companyId,
+					month, year);
+
+			for (Object[] obj : thisMonth) {
+				SurveyInvitationEmailCountVO reportObj = new SurveyInvitationEmailCountVO();
+				reportObj.setAgentName((String) obj[0]);
+				reportObj.setEmailId((String) obj[1]);
+				reportObj.setBranchName((String) obj[2]);
+				reportObj.setRegionName((String) obj[3]);
+				reportObj.setReceived(new Long(obj[4].toString()));
+				reportObj.setAttempted(new Long(obj[5].toString()));
+				reportObj.setDelivered(new Long(obj[6].toString()));
+				reportObj.setBounced(new Long(obj[7].toString()));
+				reportObj.setDiffered(new Long(obj[8].toString()));
+				reportObj.setOpened(new Long(obj[9].toString()));
+				reportObj.setLinkClicked(new Long(obj[10].toString()));
+				reportObj.setDropped(new Long(obj[11].toString()));
+				reportObj.setMonth(new Integer(obj[12].toString()));
+				reportObj.setYear(new Integer(obj[13].toString()));
+				monthData.add(reportObj);
+			}
+
+		} else {
+			monthData = getSurveyInvitationEmailReportForMonth(companyId, month, year); 
+		}
+		return monthData;
 	}
 }
