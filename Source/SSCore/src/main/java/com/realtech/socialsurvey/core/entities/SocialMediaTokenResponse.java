@@ -1,5 +1,7 @@
 package com.realtech.socialsurvey.core.entities;
 
+import java.io.Serializable;
+
 import com.realtech.socialsurvey.core.enums.ProfileType;
 
 /**
@@ -7,8 +9,9 @@ import com.realtech.socialsurvey.core.enums.ProfileType;
  * @author manish
  *
  */
-public class SocialMediaTokenResponse
+public class SocialMediaTokenResponse implements Serializable
 {
+    private static final long serialVersionUID = 1L;
     private long iden;
     private long companyId;
     private SocialMediaTokensForSM socialMediaTokens;

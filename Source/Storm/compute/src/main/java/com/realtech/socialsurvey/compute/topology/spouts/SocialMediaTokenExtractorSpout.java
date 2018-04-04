@@ -1,9 +1,8 @@
 package com.realtech.socialsurvey.compute.topology.spouts;
 
-import com.realtech.socialsurvey.compute.common.SSAPIOperations;
-import com.realtech.socialsurvey.compute.dao.RedisSocialMediaStateDao;
-import com.realtech.socialsurvey.compute.dao.impl.RedisSocialMediaStateDaoImpl;
-import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
+import java.util.Map;
+import java.util.Optional;
+
 import org.apache.storm.spout.SpoutOutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -12,10 +11,13 @@ import org.apache.storm.tuple.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import com.realtech.socialsurvey.compute.common.SSAPIOperations;
+import com.realtech.socialsurvey.compute.dao.RedisSocialMediaStateDao;
+import com.realtech.socialsurvey.compute.dao.impl.RedisSocialMediaStateDaoImpl;
+import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
+import com.realtech.socialsurvey.compute.entities.SocialMediaTokensPaginated;
+import com.realtech.socialsurvey.compute.enums.ProfileType;
+
 
 
 /**
@@ -29,19 +31,20 @@ public class SocialMediaTokenExtractorSpout extends BaseComputeSpout
 
     private static final String MEDIA_TOKEN = "mediaToken";
     private static final String COMPANY_ID = "companyId";
+    
 
     SpoutOutputCollector _collector;
 
-    private List<SocialMediaTokenResponse> mediaTokens;
-
     private RedisSocialMediaStateDao redisSocialMediaStateDao;
+    
+    private static final int PAGE_SIZE = 100;
+
 
     @Override
     public void open( @SuppressWarnings ( "rawtypes") Map conf, TopologyContext context, SpoutOutputCollector collector )
     {
         super.open( conf, context, collector );
         this._collector = collector;
-        this.mediaTokens = new ArrayList<>();
         this.redisSocialMediaStateDao = new RedisSocialMediaStateDaoImpl();
     }
 
@@ -51,28 +54,60 @@ public class SocialMediaTokenExtractorSpout extends BaseComputeSpout
     {
         try {
             if ( !redisSocialMediaStateDao.waitForNextFetch() ) {
-                // get all mediatokens
-                Optional<List<SocialMediaTokenResponse>> mediaTokensResult = SSAPIOperations.getInstance().getMediaTokens();
-                if ( mediaTokensResult.isPresent() ) {
-                    this.mediaTokens = mediaTokensResult.get();
-                }
+                // get all media tokens
+                int skipCount =0;
+                Optional<SocialMediaTokensPaginated> mediaTokensResultPaginated = null;
+                do {
+                    mediaTokensResultPaginated = SSAPIOperations.getInstance()
+                        .getMediaTokensPaginated( skipCount, PAGE_SIZE );
+                    
+                    if ( mediaTokensResultPaginated.isPresent() && mediaTokensResultPaginated.get().getTotalRecord() != 0 ) {
+                        SocialMediaTokensPaginated mediaTokens = mediaTokensResultPaginated.get();
 
-                for ( SocialMediaTokenResponse mediaToken : mediaTokens ) {
-                    Long companyId = mediaToken.getCompanyId();
+                        for ( SocialMediaTokenResponse companiesToken : mediaTokens.getCompaniesTokens() ) {
+                            companiesToken.setProfileType( ProfileType.COMPANY );
+                            emitSocialMediaTokensToStream( companiesToken.getIden(), companiesToken );
+                        }
 
-                    if ( mediaToken.getSocialMediaTokens() != null ) {
+                        for ( SocialMediaTokenResponse regionsToken : mediaTokens.getRegionsTokens() ) {
+                            Long companyId = mediaTokensResultPaginated.get().getAgentCompanyIdMap().get( regionsToken.getIden() );
+                            regionsToken.setProfileType( ProfileType.REGION );
+                            emitSocialMediaTokensToStream( companyId, regionsToken );
+                        }
 
-                        _collector.emit( "FacebookStream", new Values( companyId.toString(), mediaToken ) );
-                       // _collector.emit( "LinkedinStream", new Values( companyId.toString(), mediaToken ) );
-                        _collector.emit( "TwitterStream", new Values( companyId.toString(), mediaToken ) );
-                        _collector.emit( "InstagramStream", new Values(companyId.toString(), mediaToken));
-                    }
+                        for ( SocialMediaTokenResponse branchesToken : mediaTokens.getBranchesTokens() ) {
+                            Long companyId = mediaTokensResultPaginated.get().getAgentCompanyIdMap().get( branchesToken.getIden() );
+                            branchesToken.setProfileType( ProfileType.BRANCH );
+                            emitSocialMediaTokensToStream( companyId, branchesToken );
+                        }
 
-                }
+                        for ( SocialMediaTokenResponse agentsToken : mediaTokens.getAgentsTokens() ) {
+                            Long companyId = mediaTokensResultPaginated.get().getAgentCompanyIdMap().get( agentsToken.getIden() );
+                            agentsToken.setProfileType( ProfileType.AGENT );
+                            emitSocialMediaTokensToStream( companyId, agentsToken );
+                        }
+                        
+                        if(mediaTokensResultPaginated.get().getTotalRecord() < PAGE_SIZE) {
+                            break;
+                        } else {
+                            skipCount += PAGE_SIZE;
+                        }
+                    } 
+                } while(mediaTokensResultPaginated.isPresent());
             }
             // End loop for companies
         } catch ( Exception e ) {
             LOG.error( "Error in SocialMediaTokenExtractorSpout.nextTuple()", e );
+        }
+    }
+    
+    private void emitSocialMediaTokensToStream(Long companyId, SocialMediaTokenResponse mediaToken){
+        if ( mediaToken.getSocialMediaTokens() != null &&  (companyId != null)) {
+            mediaToken.setCompanyId( companyId );
+            _collector.emit( "FacebookStream", new Values( companyId.toString(), mediaToken ) );
+            //_collector.emit( "LinkedinStream", new Values( companyId.toString(), mediaToken ) );
+            _collector.emit( "TwitterStream", new Values( companyId.toString(), mediaToken ) );
+            _collector.emit( "InstagramStream", new Values(companyId.toString(), mediaToken));
         }
     }
 

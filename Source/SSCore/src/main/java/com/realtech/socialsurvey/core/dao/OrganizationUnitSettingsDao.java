@@ -16,6 +16,7 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
 import com.realtech.socialsurvey.core.entities.ProfileUrlEntity;
 import com.realtech.socialsurvey.core.entities.SavedDigestRecord;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -307,10 +308,17 @@ public interface OrganizationUnitSettingsDao
      * @param collectionName
      * @return
      */
-    public List<FeedIngestionEntityForSM> fetchSocialMediaTokensForIds( List<Long> ids, String collectionName );
+    public List<SocialMediaTokenResponse> fetchSocialMediaTokensForIds( List<Long> ids, String collectionName );
 
 
-    public List<FeedIngestionEntityForSM> getAllCompanyIdWithSocialMediaTokens( String collectionName, int skipCount, int numOfRecords );
+    /**
+     * Get all social media tokan by collection name
+     * @param collectionName
+     * @param skipCount
+     * @param numOfRecords
+     * @return
+     */
+    public List<SocialMediaTokenResponse> getSocialMediaTokensByCollection( String collectionName, int skipCount, int numOfRecords );
     
         
     public void saveDigestRecord( String profileLevel, long entityId, SavedDigestRecord digestRecord ) throws InvalidInputException;

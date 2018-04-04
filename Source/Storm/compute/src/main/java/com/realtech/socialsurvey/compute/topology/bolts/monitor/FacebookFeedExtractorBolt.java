@@ -156,7 +156,6 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt implements Serial
         responseWrapper.setPostId( facebookFeedData.getId() );
         //Id is postId_companyId
         responseWrapper.setId( facebookFeedData.getId() + "_" + responseWrapper.getCompanyId() );
-        responseWrapper.setOwnerProfileImage(mediaToken.getProfileImageUrl());
         responseWrapper.setPictures(Arrays.asList(facebookFeedData.getFullPicture()));
 
         if ( facebookFeedData.getUpdatedTime() > 0 ) {
