@@ -94,10 +94,10 @@
 	<div class="dash-container container zero-padding">
 			<div class="container zero-padding" style="width:100%">
 				<div class="dash-stats-wrapper clearfix"  >
-					<div id="mon-type-bulk-actions" class="float-left edit-mon-bulk-actions">
-						<div class="bulk-actions-select">Bulk Actions <img src="${initParam.resourcesPath}/resources/images/chevron-down.png" id="chevron-down" class="float-right bulk-actions-dropdown-img"><img id="chevron-up" src="${initParam.resourcesPath}/resources/images/chevron-up.png" class="hide float-right bulk-actions-dropdown-img"></div>
-						<div id="edit-monitor-bulk-options" class="hide float-left bulk-actions-options">
-								
+					<div id="monitor-bulk-actions" class="float-left stream-bulk-actions monitors-bulk-select">
+						<div class="bulk-actions-select">Bulk Actions <img src="${initParam.resourcesPath}/resources/images/chevron-down.png" id="monitor-chevron-down" class="float-right bulk-actions-dropdown-img"><img id="monitor-chevron-up" src="${initParam.resourcesPath}/resources/images/chevron-up.png" class="hide float-right bulk-actions-dropdown-img"></div>
+						<div id="monitor-bulk-action-options" class="hide float-left bulk-actions-options monitors-bulk-options">
+							<div id="monitor-bulk-delete" class="bulk-option">Delete</div>
 						</div>
 					</div>
 				</div>
