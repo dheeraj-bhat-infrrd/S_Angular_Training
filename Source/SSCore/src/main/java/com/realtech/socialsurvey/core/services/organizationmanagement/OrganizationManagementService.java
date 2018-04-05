@@ -1651,9 +1651,10 @@ public interface OrganizationManagementService
      * Method to delete keywords from company
      * @param companyId
      * @param keywordIds
+     * @return
      * @throws InvalidInputException
      */
-    public void deleteKeywordsFromCompany( long companyId, List<String> keywordIds ) throws InvalidInputException;
+    public List<Keyword> deleteKeywordsFromCompany( long companyId, List<String> keywordIds ) throws InvalidInputException;
 
 
     /**
