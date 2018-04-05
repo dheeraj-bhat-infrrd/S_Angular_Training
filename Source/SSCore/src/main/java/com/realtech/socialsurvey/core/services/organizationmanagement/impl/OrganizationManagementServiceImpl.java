@@ -9328,33 +9328,42 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     
 
     @Override
-    public void deleteKeywordsFromCompany( long companyId, List<String> keywordIds ) throws InvalidInputException
+    public List<Keyword> deleteKeywordsFromCompany( long companyId, List<String> keywordIds ) throws InvalidInputException
     {
         LOG.debug( "Method deleteKeywordsFromCompany started for companyId {}", companyId );
         if ( companyId <= 0 || keywordIds.isEmpty() || keywordIds == null ) {
             LOG.warn( "Invalid input parameters" );
             throw new InvalidInputException( "Invalid input parameters" );
         }
+        List<Keyword> companyFilterKeywords = new ArrayList<>();
         OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId,
             CommonConstants.COMPANY_SETTINGS_COLLECTION );
-        List<Keyword> keywords = companySettings.getFilterKeywords();
-        if ( keywords != null && !keywords.isEmpty() ) {
-            for ( String keywordId : keywordIds ) {
-                for ( Keyword keyword : keywords ) {
-                    if ( keyword.getId().equalsIgnoreCase( keywordId ) ) {
-                        keyword.setStatus( CommonConstants.STATUS_INACTIVE );
-                        keyword.setModifiedOn( new Date().getTime() );
+        if ( companySettings != null ) {
+            List<Keyword> keywords = companySettings.getFilterKeywords();
+            if ( keywords != null && !keywords.isEmpty() ) {
+                for ( String keywordId : keywordIds ) {
+                    for ( Keyword keyword : keywords ) {
+                        if ( keyword.getId().equalsIgnoreCase( keywordId ) ) {
+                            keyword.setStatus( CommonConstants.STATUS_INACTIVE );
+                            keyword.setModifiedOn( new Date().getTime() );
+                        }
                     }
                 }
+                // Updating filterKeywords in OrganizationUnitSettings
+                organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+                    MongoOrganizationUnitSettingDaoImpl.KEY_FILTER_KEYWORDS, keywords, companySettings,
+                    MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+            } else {
+                LOG.warn( "The list of keywords is empty" );
+                throw new InvalidInputException( "keywords do not exist for the company" );
             }
-            // Updating filterKeywords in OrganizationUnitSettings
-            organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
-                MongoOrganizationUnitSettingDaoImpl.KEY_FILTER_KEYWORDS, keywords, companySettings,
-                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
-        } else {
-            LOG.warn( "The list of keywords is empty" );
-            throw new InvalidInputException( "keywords do not exist for the company" );
+            for ( Keyword keywordToAdd : keywords ) {
+                if ( keywordToAdd.getStatus() == CommonConstants.STATUS_ACTIVE ) {
+                    companyFilterKeywords.add( keywordToAdd );
+                }
+            }
         }
+        return companyFilterKeywords;
 
     }
 
@@ -9367,10 +9376,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
         List<Keyword> companyFilterKeywords = companySettings.getFilterKeywords();
+        List<Keyword> filterKeywordsAdded = new ArrayList<>();
         if ( keyword != null ) {
             // setting
             if ( companySettings.getFilterKeywords() == null ) {
-                companyFilterKeywords = new ArrayList<Keyword>();
+                companyFilterKeywords = new ArrayList<>();
             }
 
             int flag = 0;
@@ -9380,7 +9390,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 for ( int i = 0; i < companyFilterKeywords.size(); i++ ) {
                     Keyword companyFilterKeyword = companyFilterKeywords.get( i );
 
-                    if ( keyword.getId() != null && companyFilterKeyword.getId().equals( keyword.getId() ) ) {
+                    if ( keyword.getId() != null && companyFilterKeyword.getId().equals( keyword.getId() )
+                        && companyFilterKeyword.getStatus() == CommonConstants.STATUS_ACTIVE ) {
                         flag = 2;
                         if ( keyword.getPhrase() != null ) {
                             if ( companyFilterKeyword.getPhrase().equalsIgnoreCase( keyword.getPhrase() ) ) {
@@ -9405,7 +9416,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             if ( flag == 0 ) {
                 for ( Keyword duplicateKeyword : companyFilterKeywords ) {
                     if ( duplicateKeyword.getPhrase().equalsIgnoreCase( keyword.getPhrase() )
-                        && duplicateKeyword.getMonitorType().equals( keyword.getMonitorType() ) ) {
+                        && duplicateKeyword.getMonitorType().equals( keyword.getMonitorType() )
+                        && duplicateKeyword.getStatus() == CommonConstants.STATUS_ACTIVE ) {
                         LOG.warn( "duplicate entry" );
                         throw new InvalidInputException( "duplicate entry", "400" );
                     }
@@ -9431,6 +9443,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         } else {
             LOG.debug( "Keywords are empty so skiping operation" );
         }
-        return companyFilterKeywords;
+        for ( Keyword keywordToAdd : companyFilterKeywords ) {
+            if ( keywordToAdd.getStatus() == CommonConstants.STATUS_ACTIVE ) {
+                filterKeywordsAdded.add( keywordToAdd );
+            }
+        }
+        return filterKeywordsAdded;
     }
 }

@@ -210,16 +210,16 @@ public class SocialMonitorController
     }
     
     @RequestMapping ( value = "/company/{companyId}keywords", method = RequestMethod.DELETE)
-    @ApiOperation ( value = "Delete keywords from the company", response = String.class)
+    @ApiOperation ( value = "Delete keywords from the company", response = Keyword.class, responseContainer = "List")
 	@ApiResponses(value = { @ApiResponse ( code = 200, message = "Successfully deleted the keywords")})
     public ResponseEntity<?> deleteKeywordsFromCompany( @PathVariable ( "companyId") long companyId,
                                                    @RequestParam List<String> keywordIds ) throws SSApiException
     {
         try {
             LOGGER.info( "SocialMonitorController.deleteKeywordsFromCompany started" );
-            organizationManagementService.deleteKeywordsFromCompany(companyId, keywordIds);
+            List<Keyword> filterKeywords = organizationManagementService.deleteKeywordsFromCompany(companyId, keywordIds);
             LOGGER.info( "SocialMonitorController.deleteKeywordsFromCompany completed successfully" );
-            return new ResponseEntity<>( "SUCCESS", HttpStatus.OK );
+            return new ResponseEntity<>(filterKeywords, HttpStatus.OK );
         } catch ( NonFatalException e ) {
             throw new SSApiException( e.getMessage(), e.getErrorCode() );
         }
