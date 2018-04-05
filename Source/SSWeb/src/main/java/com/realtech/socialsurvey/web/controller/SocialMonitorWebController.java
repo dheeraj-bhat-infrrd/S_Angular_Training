@@ -191,14 +191,12 @@ public class SocialMonitorWebController {
 		String message = "";
 		String statusJson = "";
 		
-		List<Keyword> keywordsRequest = new ArrayList<>();
     	Keyword newKeyword = createKeywordFromRequest(request);
-    	keywordsRequest.add(newKeyword);
     	
     	Response response =null;
     	
     	try {
-    		response = ssApiIntergrationBuilder.getIntegrationApi().addKeywordsToCompany(companyId, keywordsRequest);
+    		response = ssApiIntergrationBuilder.getIntegrationApi().addKeywordToCompany(companyId, newKeyword);
     		message = messageUtils.getDisplayMessage(DisplayMessageConstants.ADD_MONITOR_SUCCESSFUL,
 					DisplayMessageType.SUCCESS_MESSAGE).getMessage();
     		String keywords = new String(((TypedByteArray) response.getBody()).getBytes());
