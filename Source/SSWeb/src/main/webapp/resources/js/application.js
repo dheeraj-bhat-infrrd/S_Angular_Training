@@ -16901,11 +16901,7 @@ function fetchJspData(data){
 	jspData = data;
 }
 
-getJspData('./getstreamcontainer.do');
-var streamContainer = jspData;
-
-getJspData('./getstreamactioncontainer.do');
-var streamActionContainer = jspData;
+var streamActionContainer;
 
 var lastgetStreamPostRequestToDelete=null;
 function getStreamPosts(startIndex,status,flag,text){
@@ -17104,6 +17100,13 @@ $(document).on('click','#stream-end-page-active',function(e){
 function drawStreamPage(streamPostList){
 	$('#stream-posts').html('');
 	var macroList = macrosForStream;
+	
+	getJspData('./getstreamcontainer.do');
+	var streamContainer = jspData;
+	
+	getJspData('./getstreamactioncontainer.do');
+	streamActionContainer = jspData;
+	
 	for(var i=0;i<streamPostList.length;i++){
 		var postId = streamPostList[i].postId;
 		$('#stream-posts').append(streamContainer);
