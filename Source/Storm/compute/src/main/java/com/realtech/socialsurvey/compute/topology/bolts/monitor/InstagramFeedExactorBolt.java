@@ -54,6 +54,7 @@ public class InstagramFeedExactorBolt extends BaseComputeBolt {
                     for ( InstagramMediaData instagramMediaData : feeds ) {
                         SocialResponseObject<InstagramMediaData> responseWrapper = createSocialResponseObject( mediaToken,
                                 instagramMediaData );
+                        responseWrapper.setPageLink( mediaToken.getSocialMediaTokens().getFacebookToken().getFacebookPageLink() );
                         String responseWrapperString = new Gson().toJson( responseWrapper );
 
                         _collector.emit( new Values( Long.toString( companyId ), responseWrapperString, lastFetchedKey ) );
@@ -94,7 +95,8 @@ public class InstagramFeedExactorBolt extends BaseComputeBolt {
         }
 
         responseWrapper.setPostId( instagramMediaData.getIgId() );
-        responseWrapper.setId( instagramMediaData.getIgId() );
+        //Id is postId_companyId
+        responseWrapper.setId( instagramMediaData.getIgId() + "_" + responseWrapper.getCompanyId() );
         responseWrapper.setPictures(Arrays.asList(instagramMediaData.getMediaUrl()));
 
         if ( instagramMediaData.getTimestamp() > 0 ) {

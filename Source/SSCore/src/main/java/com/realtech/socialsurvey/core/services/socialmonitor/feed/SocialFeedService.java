@@ -30,7 +30,6 @@ public interface SocialFeedService
      * Updates all posts matching given hash and companyId with the given duplicateCount
      * @param hash
      * @param companyId
-     * @param duplicateCount
      * @return
      */
     long updateDuplicateCount(int hash, long companyId) throws InvalidInputException;

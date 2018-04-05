@@ -368,6 +368,12 @@ $(document).on('click', function(e) {
 		enableBodyScroll();
 	} 
 	checkSocMonDropdowns(null);
+	
+	if($('#monitor-bulk-action-options').is(':visible')){
+		$('#monitor-bulk-action-options').toggle();
+		$('#monitor-chevron-down').toggle();
+		$('#monitor-chevron-up').toggle();
+	}
 });
 
 function checkSocMonDropdowns(e){
@@ -474,6 +480,11 @@ $(document).on('keyup', function(e) {
 		
 		checkSocMonDropdowns(null);
 		
+		if($('#monitor-bulk-action-options').is(':visible')){
+			$('#monitor-bulk-action-options').toggle();
+			$('#monitor-chevron-down').toggle();
+			$('#monitor-chevron-up').toggle();
+		}
 		$('#bulk-options-popup').hide();
 		
 		$('#duplicate-post-popup').addClass('hide');
@@ -16149,7 +16160,15 @@ $(document).on('click','#macro-active-container',function(e){
 	e.stopPropagation();
 	$('#macro-active-container').addClass('macro-tabs-active');
 	$('#macro-inactive-container').removeClass('macro-tabs-active');
-	$('#active-macros-list').removeClass('hide');
+	
+	if($('#active-macros-list').children('.macro-item').length > 0){
+		$('#active-macros-list').removeClass('hide');
+		$('#empty-macros-list').addClass('hide');
+	}else{
+		$('#active-macros-list').addClass('hide');
+		$('#empty-macros-list').removeClass('hide');
+	}
+	
 	$('#inactive-macros-list').addClass('hide');
 });
 
@@ -16157,8 +16176,16 @@ $(document).on('click','#macro-inactive-container',function(e){
 	e.stopPropagation();
 	$('#macro-active-container').removeClass('macro-tabs-active');
 	$('#macro-inactive-container').addClass('macro-tabs-active');
+	
+	if($('#inactive-macros-list').children('.macro-item').length > 0){
+		$('#inactive-macros-list').removeClass('hide');
+		$('#empty-macros-list').addClass('hide');
+	}else{
+		$('#inactive-macros-list').addClass('hide');
+		$('#empty-macros-list').removeClass('hide');
+	}
+	
 	$('#active-macros-list').addClass('hide');
-	$('#inactive-macros-list').removeClass('hide');
 });
 
 $(document).on('input','#macro-name',function(){
@@ -16316,13 +16343,28 @@ function hideAddMonitorPopup(){
 
 function drawMonitorList(monitorData){
 	
+	var monitorDataInput = '<input type="hidden" id="selectedMonitors" data-idList= val="">';
 	var monListHeader = '<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 clearfix mon-type-hdr"  >'
 					+'<img id="edit-mon-unchecked" src="resources/images/check-no.png"  class="float-left mon-type-checkbox">'
 					+'<img id="edit-mon-checked" src="resources/images/check-yes.png"  class="hide float-left mon-type-checkbox">'
 					+'<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 soc-mon-txt-bold">Keyphrase</div>'
 					+'<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 mon-type-hdr-txt">Monitor Type</div></div>';
 	
-	$('#monitor-list-container').html(monListHeader);
+	$('#monitor-list-container').html(monitorDataInput+monListHeader);
+	
+	var emptyMonitorsDiv = '<div id="empty-monitors" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 clearfix monitors-empty-div hide">'
+					+'<span class="incomplete-trans-span monitors-empty-span">No monitors found</span></div>';
+	$('#monitor-list-container').append(emptyMonitorsDiv);
+	
+	var selectedMonitors = [];
+	$('#selectedMonitors').data('idList',selectedMonitors);
+	
+	if(monitorData==null || monitorData.length <= 0){
+		$('#empty-monitors').show();
+		return;
+	}else{
+		$('#empty-monitors').hide();
+	}
 	
 	for(var i=0;i<monitorData.length;i++){
 		
@@ -16350,31 +16392,53 @@ function drawMonitorList(monitorData){
 	$('.mon-type-checked').bind('click',function(){
 		var id=$(this).data('id');
 		
+		var selectedIds = $('#selectedMonitors').data('idList');
+		var index = isInArray(id,selectedIds);
+		
 		var checked = $(this).parent().attr('data-checked');
 		if(checked == false || checked == 'false'){
 			$(this).parent().attr('data-checked',true);
 			$('#edit-mon-checked-'+id).show();
+			
+			if(index == -1){
+				selectedIds.push(id);
+			}
+			
 		}else{
 			$(this).parent().attr('data-checked',false);
 			$('#edit-mon-unchecked-'+id).show();
+			
+			if(index > -1){
+				selectedIds.splice(index,1);
+			}
 		}
 		
+		$('#selectedMonitors').data('idList',selectedIds);
 		$(this).hide();
 	});
 	
 	$('#edit-mon-unchecked').unbind('click');
 	$('#edit-mon-unchecked').bind('click', function() {
+		
+		var selectedIds = [];
+		
 		$('#edit-mon-unchecked').toggle();
 		$('#edit-mon-checked').toggle();
 		for(var i=0;i<monitorData.length;i++){
 			$('#edit-mon-unchecked-'+monitorData[i].id).hide();
 			$('#edit-mon-checked-'+monitorData[i].id).show();
 			$('#edit-mon-unchecked-'+monitorData[i].id).parent().attr('data-checked',true);
+			selectedIds.push(monitorData[i].id);
 		}
+		
+		$('#selectedMonitors').data('idList',selectedIds);
 	});
 	
 	$('#edit-mon-checked').unbind('click');
 	$('#edit-mon-checked').bind('click', function() {
+		
+		var selectedIds = [];
+		
 		$('#edit-mon-unchecked').toggle();
 		$('#edit-mon-checked').toggle();
 		for(var i=0;i<monitorData.length;i++){
@@ -16382,6 +16446,8 @@ function drawMonitorList(monitorData){
 			$('#edit-mon-unchecked-'+monitorData[i].id).show();
 			$('#edit-mon-unchecked-'+monitorData[i].id).parent().attr('data-checked',false);
 		}
+		
+		$('#selectedMonitors').data('idList',selectedIds);
 	});
 }
 
@@ -16835,11 +16901,7 @@ function fetchJspData(data){
 	jspData = data;
 }
 
-getJspData('./getstreamcontainer.do');
-var streamContainer = jspData;
-
-getJspData('./getstreamactioncontainer.do');
-var streamActionContainer = jspData;
+var streamActionContainer;
 
 var lastgetStreamPostRequestToDelete=null;
 function getStreamPosts(startIndex,status,flag,text){
@@ -17038,6 +17100,13 @@ $(document).on('click','#stream-end-page-active',function(e){
 function drawStreamPage(streamPostList){
 	$('#stream-posts').html('');
 	var macroList = macrosForStream;
+	
+	getJspData('./getstreamcontainer.do');
+	var streamContainer = jspData;
+	
+	getJspData('./getstreamactioncontainer.do');
+	streamActionContainer = jspData;
+	
 	for(var i=0;i<streamPostList.length;i++){
 		var postId = streamPostList[i].postId;
 		$('#stream-posts').append(streamContainer);
@@ -19320,5 +19389,60 @@ $(document).on('keyup','#search-monitors-key', function(e){
 		
 		getMonitors();
 	}
+});
+
+function deleteMonitors(){
 	
+	$('#selectedMonitors').val( $('#selectedMonitors').data('idList'));
+	
+	var selectedIds =$('#selectedMonitors').val();
+	var url = './deletemonitorsbyid.do';
+	
+	var formData = new FormData();
+	formData.append("monitorIds", selectedIds);
+	
+	$.ajax({
+		url : url,
+		type : "POST",
+		dataType : "text",
+		contentType : false,
+		processData : false,
+		cache : false,
+		data : formData,
+		success : function(data){
+			$('#overlay-toast').html('Successfully deleted selected Monitors.');
+			showToast();
+		},
+		complete: function(){
+			getMonitors();
+		},
+		error : function(e) {
+			$('#overlay-toast').html('Failed to delete selected Monitors.');
+			showToast();
+			
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+		}
+	});
+	
+}
+
+$(document).on('click','#monitor-bulk-actions',function(e){
+	e.stopPropagation();
+	
+	$('#monitor-bulk-action-options').toggle();
+	$('#monitor-chevron-down').toggle();
+	$('#monitor-chevron-up').toggle();
+});
+
+$(document).on('click','#monitor-bulk-delete',function(e){
+	e.stopPropagation();
+	
+	deleteMonitors();
+	
+	$('#monitor-bulk-action-options').toggle();
+	$('#monitor-chevron-down').toggle();
+	$('#monitor-chevron-up').toggle();
 });

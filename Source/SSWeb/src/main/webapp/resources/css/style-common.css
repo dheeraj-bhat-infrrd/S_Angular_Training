@@ -11693,7 +11693,7 @@ img.lead-img {
 }
 
 .stream-dropdown-select{
-	font-size: 13px;
+	font-size: 12px;
     display: flex;
     align-items: center;
     font-weight: bold !important;
@@ -11915,4 +11915,29 @@ img.lead-img {
 .dup-macro-opt{
 	padding: 10px;
     cursor: pointer;
+}
+
+.monitors-bulk-select{
+	margin-left: 0;
+    border: 1px solid #bbbbbb;
+}
+
+.monitors-bulk-options{
+	border: 1px solid rgb(187, 187, 187);
+    margin-top: 3px;
+    box-shadow: rgb(180, 176, 176) 5px 0px 15px -4px, rgb(180, 176, 176) -5px 0px 15px -4px;
+}
+
+.monitors-empty-div{
+	border: 1px solid #bbbbbb;
+    padding: 10px 10px;
+    border-top: 0;
+    border-bottom: 0;
+}
+
+.monitors-empty-span{
+	font-size: medium;
+    margin: 10px auto;
+    display: table;
+    color: #666666;
 }
