@@ -43,10 +43,8 @@ public class KafkaProducerBolt extends BaseComputeBolt
             ProducerRecord<String, String> msg = new ProducerRecord<>( socialPostTopicDev, tuple.getString( 0 ),
                 tuple.getString( 1 ) );
             RecordMetadata recordMetadata = kafkaWriter.send( msg ).get();
-            //DO NOT REMOVE THIS DEBUG LOG
-            if ( LOG.isDebugEnabled() ) {
-                LOG.debug( "Offset = {}", recordMetadata.offset() );
-            }
+            //DO NOT REMOVE THIS DEBUG LOG or check for debugEnabled.
+            LOG.debug( "Offset = {}", recordMetadata.offset() );
 
             kafkaWriter.flush();
         } catch ( Exception e ) {
