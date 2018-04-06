@@ -35,13 +35,11 @@ public class KafkaProducerBolt extends BaseComputeBolt
     public void execute( Tuple tuple )
     {
         LOG.info( "Build KafkaBolt for pushing messages in kafka queue." );
-        //Configure the Producer
-
 
         try(KafkaProducer<String, String> kafkaWriter = new KafkaProducer<>( props )) {
             ProducerRecord<String, String> msg = new ProducerRecord<>(socialPostTopicDev, tuple.getString(0),
                     tuple.getString(1));
-            
+
             kafkaWriter.send(msg, (recordMetaDate, e) -> {
                 if(e != null) {
                     success = false;
