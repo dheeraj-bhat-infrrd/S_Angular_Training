@@ -20,7 +20,7 @@
 </head>
 
 <body>
-<input id="sq-data" type="hidden" data-edited=false>
+<input  type="hidden" data-edited=false>
 	<div id="toast-container" class="toast-container">
 		<span id="overlay-toast" class="overlay-toast"></span>
 	</div>
