@@ -7801,7 +7801,7 @@ function showMasterQuestionPage() {
 		// Check character encoding
 		var isIsoEncoded = false;
 		try {
-			feedback = decodeURIComponent(escape(feedback));
+			feedback = decodeURIComponent(encodeURIComponent(feedback));
 		} catch (err) {
 			isIsoEncoded = true;
 		}
