@@ -103,7 +103,7 @@ public class TwitterFeedExtractorBolt extends BaseComputeBolt
     private String getLastFetchedKey( SocialMediaTokenResponse mediaToken )
     {
         String lastFetchedKey = "";
-        if ( mediaToken.getSocialMediaTokens() != null && mediaToken.getSocialMediaTokens().getFacebookToken() != null ) {
+        if ( mediaToken.getSocialMediaTokens() != null && mediaToken.getSocialMediaTokens().getTwitterToken() != null ) {
             TwitterTokenForSM token = mediaToken.getSocialMediaTokens().getTwitterToken();
             String pageId = UrlHelper.getTwitterPageIdFromURL( token.getTwitterPageLink() );
             lastFetchedKey = mediaToken.getProfileType().toString() + "_" + mediaToken.getIden() + "_" + pageId;
