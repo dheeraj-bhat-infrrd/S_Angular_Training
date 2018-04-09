@@ -26,7 +26,10 @@
 		</div>
 	</div>
 </div>
-
+<div id="rep-prof-container" data-profile-master-id="${profilemasterid}"
+			data-column-name="${columnName}" data-account-type="${accounttype}"
+			data-column-value="${columnValue}" class="hide dash-top-info dash-prof-wrapper pos-relative dash-size" >
+</div>
 <div class="dash-wrapper-main">
 	<div class="dash-container container">
 		<div id="prof-container" data-profile-master-id="${profileMasterId}"

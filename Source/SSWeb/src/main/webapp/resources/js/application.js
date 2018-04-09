@@ -1494,6 +1494,14 @@ function updateEventOnDashboardPageForReviews() {
 		var entityId = $('#rep-prof-container').data('column-value');
 		var entityType = $('#rep-prof-container').data('column-name');
 		
+		var copyText = $(this).parent().find('.linkedInSummary').val();
+		var $temp = $("<input>");
+	    $("body").append($temp);
+	    $temp.val(copyText).select();
+	    document.execCommand("copy");
+	    $temp.remove();
+		
+		
 		var payload = {
 			"surveyMongoId" :surveyMongoId,
 			"entityId" : entityId,
@@ -1528,10 +1536,36 @@ function updateEventOnDashboardPageForReviews() {
 
 function linkedInShare(data,link,title){
 	if(data == false || data == 'false'){
-		if (link == undefined || link == "") {
-			return false;
+		if(title == 'LinkedIn'){
+			$('#overlay-header').html("");
+			$('#overlay-text').html('<div style="text-align:left; display: grid;">The text of the post has been copied to clipboard. Please use the text to post in LinkedIn Page.</div>');
+			$('#overlay-continue').html("Ok");
+			$('#overlay-cancel').html("Cancel");
+			
+			$('#overlay-continue').off();
+			$('#overlay-continue').click(function() {
+				overlayRevert();
+				if (link == undefined || link == "") {
+					return false;
+				}
+				window.open(link, 'Post to ' + title, 'width=800,height=600,scrollbars=yes');
+			});
+			
+			$('#overlay-cancel').click(function() {
+				$('#overlay-continue').unbind('click');
+				$('#overlay-cancel').unbind('click');
+				overlayRevert();
+
+			});
+			
+			$('#overlay-main').show();
+			
+		}else{
+			if (link == undefined || link == "") {
+				return false;
+			}
+			window.open(link, 'Post to ' + title, 'width=800,height=600,scrollbars=yes');
 		}
-		window.open(link, 'Post to ' + title, 'width=800,height=600,scrollbars=yes');
 	}else if(data == true || data == 'true'){
 		$('#overlay-toast').html('Successfully posted to LinkedIn.');
 		showToast();
