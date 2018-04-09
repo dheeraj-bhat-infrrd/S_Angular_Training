@@ -89,7 +89,7 @@ public class LinkedinFeedExtractorBolt extends BaseComputeBolt
     private String getLastFetchedKey(SocialMediaTokenResponse mediaToken){
         String lastFetchedKey = "";
         
-        if ( mediaToken.getSocialMediaTokens() != null && mediaToken.getSocialMediaTokens().getFacebookToken() != null) {
+        if ( mediaToken.getSocialMediaTokens() != null && mediaToken.getSocialMediaTokens().getLinkedInToken() != null) {
             LinkedInTokenForSM token = mediaToken.getSocialMediaTokens().getLinkedInToken();
             String pageId = UrlHelper.getFacebookPageIdFromURL( token.getLinkedInPageLink() );
             lastFetchedKey = mediaToken.getProfileType().toString() + "_" + mediaToken.getIden() + "_" + pageId;

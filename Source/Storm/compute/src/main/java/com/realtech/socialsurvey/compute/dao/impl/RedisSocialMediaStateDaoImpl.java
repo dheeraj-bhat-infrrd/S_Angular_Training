@@ -55,7 +55,8 @@ public class RedisSocialMediaStateDaoImpl implements RedisSocialMediaStateDao, S
     {
         try ( Jedis jedis = RedisDB.getPoolInstance().getResource() ) {
             String prevValue = jedis.hget( key, RedisKeyConstants.PREVIOUS );
-            jedis.hset( key, RedisKeyConstants.CURRENT, prevValue );
+            if(prevValue != null)
+                jedis.hset( key, RedisKeyConstants.CURRENT, prevValue );
             return true;
         }
     }
