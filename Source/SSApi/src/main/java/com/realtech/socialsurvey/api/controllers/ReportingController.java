@@ -32,6 +32,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.reportingmanagement.DashboardGraphManagement;
 import com.realtech.socialsurvey.core.services.reportingmanagement.OverviewManagement;
 import com.realtech.socialsurvey.core.services.reportingmanagement.ReportingDashboardManagement;
+import com.realtech.socialsurvey.core.vo.SurveyTransactionReportVO;
 import com.realtech.socialsurvey.core.vo.SurveyInvitationEmailCountVO;
 import com.wordnik.swagger.annotations.ApiOperation;
 
@@ -212,14 +213,14 @@ public class ReportingController
 
     @RequestMapping ( value = "/getsurveytransactionreportforreporting", method = RequestMethod.GET)
     @ApiOperation ( value = "Fetch Survey Transaction Report For Reporting ")
-    public String getSurveyTransactionReport( Long entityId, String entityType, Timestamp startDate, Timestamp endDate )
+    public String getSurveyTransactionReport( Long entityId, String entityType, int month, int year )
 
     {
         LOGGER.info( "Fetch Survey Transaction Report For Reporting" );
 
         String json = null;
-        List<List<Object>> surveyTransactionList = reportingDashboardManagement.getSurveyTransactionReport( entityId,
-                entityType, startDate, endDate );
+        List<SurveyTransactionReportVO> surveyTransactionList = reportingDashboardManagement.getSurveyTransactionReport( entityId,
+                entityType, month, year );
         json = new Gson().toJson( surveyTransactionList );
         return json;
     }
