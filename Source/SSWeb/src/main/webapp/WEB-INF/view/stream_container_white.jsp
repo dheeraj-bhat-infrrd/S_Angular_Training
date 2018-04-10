@@ -23,7 +23,7 @@
 				<div class="stream-user-name row soc-mon-user-name">
 								
 				</div>
-				<div class="stream-feed-type row soc-mon-post-media">
+				<div class="stream-feed-type row soc-mon-post-media" data-link="">
 								
 				</div>
 				<div class="stream-post-date row soc-mon-post-date">

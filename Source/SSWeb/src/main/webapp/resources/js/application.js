@@ -17284,6 +17284,7 @@ function drawStreamPage(streamPostList){
 		
 		$('#stream-post-details-'+postId).find('.stream-user-name').html(streamPostList[i].ownerName);
 		$('#stream-post-details-'+postId).find('.stream-feed-type').html(streamPostList[i].type);
+		$('#stream-post-details-'+postId).find('.stream-feed-type').attr('data-link',streamPostList[i].pageLink);
 		
 		var lastUpdated = parseInt(streamPostList[i].updatedOn);
 		var lastUpdatedDate = new Date(lastUpdated);
@@ -19579,4 +19580,23 @@ $(document).on('click','#monitor-bulk-delete',function(e){
 	$('#monitor-bulk-action-options').toggle();
 	$('#monitor-chevron-down').toggle();
 	$('#monitor-chevron-up').toggle();
+});
+
+$(document).on('click','.stream-feed-type',function(e){
+	e.stopImmediatePropagation();
+	e.preventDefault();
+	
+	var pageLink = $(this).attr('data-link');
+	
+	if(!/^(http|https):\/\//.test(pageLink)){
+		pageLink = "//" + pageLink;
+    }
+	var win = window.open(pageLink, '_blank');
+	
+	if (win) {
+	   win.focus();
+	} else {
+		$('#overlay-toast').html('Failed to open page. Please allow popups for this page.');
+		showToast();
+	}
 });
