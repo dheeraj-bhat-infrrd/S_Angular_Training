@@ -15,6 +15,7 @@
 	</div>
 	<div id="dup-post-action-form-cont" class="action-form-cont col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-padding-stream dup-post-act-cont">
 		<form id="dup-post-add-post-action" class="">
+		<input type="hidden" id="form-is-dup" class="form-is-dup" name="form-is-dup" value="false">
 		<input type="hidden" id="form-post-id" class="form-post-id" name="form-post-id" value="">
 		<input type="hidden" id="form-flagged" class="form-flagged" name="form-flagged" value="false">
 		<input type="hidden" id="form-status" name="form-status" class="form-status" value="false">

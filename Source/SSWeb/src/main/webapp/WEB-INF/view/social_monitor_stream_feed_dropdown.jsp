@@ -32,12 +32,18 @@
 			<img src="${initParam.resourcesPath}/resources/images/Zillow_logo_blue.png" class="float-left margin-right-10 stream-dropdown-img-circle">
 			<div class="float-left stream-dropdown-name-txt-bold">Zillow</div>
 		</div>
+		<div class="stream-dropdown-option-container" data-feed="INSTAGRAM">
+			<img src="${initParam.resourcesPath}/resources/images/check-no.png"  class="feed-unchecked hide float-left margin-right-10 cursor-pointer">
+			<img src="${initParam.resourcesPath}/resources/images/check-yes.png"  class="feed-checked float-left margin-right-10 cursor-pointer">
+			<img src="${initParam.resourcesPath}/resources/images/ss-icon-instagram.png" class="float-left margin-right-10 stream-dropdown-img-circle">
+			<div class="float-left stream-dropdown-name-txt-bold">Instagram</div>
+		</div>
 	</div>
 </div>
 
 <script>
 $(document).ready(function(){
-	var feedTypes = ["FACEBOOK","TWITTER","LINKEDIN","GOOGLEPLUS","ZILLOW"];
+	var feedTypes = ["FACEBOOK","TWITTER","LINKEDIN","GOOGLEPLUS","ZILLOW","INSTAGRAM"];
 	$('#feed-data').data('feeds',feedTypes);
 	$('#stream-feed-count').html(feedTypes.length);
 });

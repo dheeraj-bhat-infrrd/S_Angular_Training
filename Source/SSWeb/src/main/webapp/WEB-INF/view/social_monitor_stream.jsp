@@ -110,6 +110,7 @@
 </div>
 
 <form id="macro-form-apply">
+	<input type="hidden" id="macro-form-is-dup" class="macro-form-is-dup" name="macro-form-is-dup" value="false">
 	<input type="hidden" id="macro-form-post-id" class="macro-form-post-id" name="macro-form-post-id" value="">
 	<input type="hidden" id="macro-form-flagged" class="macro-form-flagged" name="macro-form-flagged" value="false">
 	<input type="hidden" id="macro-form-status" name="macro-form-status" class="macro-form-status" value="NEW">
@@ -119,6 +120,7 @@
 </form>
 
 <form id="bulk-actions-apply">
+	<input type="hidden" id="form-is-dup" class="form-is-dup" name="form-is-dup" value="false">
 	<input type="hidden" id="form-post-id" class="form-post-id" name="form-post-id" value="">
 	<input type="hidden" id="form-flagged" class="form-flagged" name="form-flagged" value="false">
 	<input type="hidden" id="form-status" name="form-status" class="form-status" value="NEW">

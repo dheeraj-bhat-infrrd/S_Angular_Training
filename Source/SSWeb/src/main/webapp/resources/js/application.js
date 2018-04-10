@@ -374,6 +374,13 @@ $(document).on('click', function(e) {
 		$('#monitor-chevron-down').toggle();
 		$('#monitor-chevron-up').toggle();
 	}
+	
+	if ($('#add-mon-type-options').is(':visible')) {
+		$('#add-mon-type-options').hide();
+		$('#add-mon-type-chevron-down').show();
+		$('#add-mon-type-chevron-up').hide();
+	}
+	
 });
 
 function checkSocMonDropdowns(e){
@@ -485,9 +492,16 @@ $(document).on('keyup', function(e) {
 			$('#monitor-chevron-down').toggle();
 			$('#monitor-chevron-up').toggle();
 		}
+		
 		$('#bulk-options-popup').hide();
 		
-		$('#duplicate-post-popup').addClass('hide');
+		if($('#duplicate-post-popup').length > 0){
+			$('#dup-post-add-post-action').find('.form-is-dup').val(false);
+			$('#macro-form-is-dup').val(false);
+			$('#duplicate-post-popup').addClass('hide');
+		}
+		
+		hideAddMonitorPopup();
 	}
 });
 
@@ -8345,6 +8359,7 @@ $('.sq-radio').click(function(){
 	    	$(this).css("cursor","pointer");
 	    }
 	});
+	$(this).removeClass('radio-outer-gray');
 	$(this).children().show();
 	$(this).parent().find('.popover').show();
 	$(this).css("cursor","default");
@@ -16217,23 +16232,45 @@ $(document).on('click','#add-mon-type-dropdown',function(e){
 	
 	$('#add-mon-type-options').on('click','#add-mon-type-km',function(e){
 		e.stopPropagation();
-		$('#add-mon-type-select').attr('data-mon-type',0);
-		$('#monitor-type').val(KEYWORD_MONITOR);
-		$('#add-mon-type-sel-txt').html('Keyword Monitor');
-		$('#add-mon-type-options').toggle();
-		$('#add-mon-type-chevron-down').toggle();
-		$('#add-mon-type-chevron-up').toggle();
+					
+		if($('#add-keyword-mon-unchecked').hasClass('hide')){
+			$('#add-keyword-mon-unchecked').removeClass('hide');
+			$('#add-keyword-mon-checked').addClass('hide');
+		}else{
+			$('#add-keyword-mon-unchecked').addClass('hide');
+			$('#add-keyword-mon-checked').removeClass('hide');
+			$('#add-mon-type-select').attr('data-mon-type',0);
+			$('#monitor-type').val(0);
+		}
+		
+		if($('#add-keyword-mon-unchecked').hasClass('hide') && $('#add-google-alerts-mon-unchecked').hasClass('hide')){
+			$('#add-mon-type-select').attr('data-mon-type',2);
+			$('#monitor-type').val(2);
+		}
+		
+		
 	});
 	
 	$('#add-mon-type-options').on('click','#add-mon-type-ga',function(e){
 		e.stopPropagation();
-		$('#add-mon-type-select').attr('data-mon-type',1);
-		$('#monitor-type').val(GOOGLE_ALERTS);
-		$('#add-mon-type-sel-txt').html('Google Alerts');
-		$('#add-mon-type-options').toggle();
-		$('#add-mon-type-chevron-down').toggle();
-		$('#add-mon-type-chevron-up').toggle();
+				
+		if($('#add-google-alerts-mon-unchecked').hasClass('hide')){
+			$('#add-google-alerts-mon-unchecked').removeClass('hide');
+			$('#add-google-alerts-mon-checked').addClass('hide');
+		}else{
+			$('#add-google-alerts-mon-unchecked').addClass('hide');
+			$('#add-google-alerts-mon-checked').removeClass('hide');
+			$('#add-mon-type-select').attr('data-mon-type',1);
+			$('#monitor-type').val(1);
+		}
+		
+		if($('#add-keyword-mon-unchecked').hasClass('hide') && $('#add-google-alerts-mon-unchecked').hasClass('hide')){
+			$('#add-mon-type-select').attr('data-mon-type',2);
+			$('#monitor-type').val(2);
+		}
+		
 	});
+	
 });
 
 $(document).on('click','#google-alerts-mon-unchecked',function(e){
@@ -16335,9 +16372,8 @@ function showAddMonitorPopup(){
 
 function hideAddMonitorPopup(){
 	$('#mon-type-txt-box').val('');
-	$('#add-mon-type-select').attr('data-mon-type',0);
-	$('#monitor-type').val(KEYWORD_MONITOR);
-	$('#add-mon-type-sel-txt').html('Keyword Monitor');
+	$('#add-mon-type-select').attr('data-mon-type',2);
+	$('#monitor-type').val(2);
 	$('#add-mon-popup').addClass('hide');
 }
 
@@ -16370,6 +16406,7 @@ function drawMonitorList(monitorData){
 		
 		if(monitorData[i].status == 1){
 			var monitorId = monitorData[i].id;
+			var monitorType = (monitorData[i].monitorType == KEYWORD_MONITOR)?'Keyword Monitor':((monitorData[i].monitorType == GOOGLE_ALERTS)?'Google Alerts':'Unknown');
 			var container = 'mon-type-gray-container';
 			
 			if(i%2==0){
@@ -16382,7 +16419,7 @@ function drawMonitorList(monitorData){
 						+'<img id="edit-mon-unchecked-'+monitorId+'" data-id='+monitorId+' src="resources/images/check-no.png"  class="float-left mon-type-checkbox mon-type-checked">'
 						+'<img id="edit-mon-checked-'+monitorId+'" data-id='+monitorId+' src="resources/images/check-yes.png"  class="hide float-left mon-type-checkbox mon-type-checked">'
 						+'<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 mon-type-keyphrase">'+monitorData[i].phrase+'</div>'
-						+'<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 mon-type-tbl-txt">'+monitorData[i].monitorType+'</div></div>';
+						+'<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 mon-type-tbl-txt">'+monitorType+'</div></div>';
 			
 			$('#monitor-list-container').append(monListRow);
 		}	
@@ -16459,6 +16496,13 @@ $(document).on('input','#monitor-keyphrase',function(){
 
 function addMonitor(){
 	
+	if($('#add-keyword-mon-checked').hasClass('hide') && $('#add-google-alerts-mon-checked').hasClass('hide')){
+		
+		$("#overlay-toast").html("Please select a Monitor type.");
+		showToast();
+		return;
+	}
+	
 	var keyPhrase = $('#monitor-keyphrase').val();
 	if ($('#add-monitor-form').attr('data-status') == 'edited') {
 		if(keyPhrase == '' || keyPhrase == null || keyPhrase == undefined){
@@ -16480,9 +16524,9 @@ function addMonitor(){
 				if (map.status == "success") {
 					$('#add-monitor-form').attr('data-status', 'new');
 					$("#overlay-toast").html("Successfully Added Monitor");
-					$('#add-mon-type-select').attr('data-mon-type',0);
-					$('#monitor-type').val(KEYWORD_MONITOR);
-					$('#add-mon-type-sel-txt').html('Keyword Monitor');
+					$('#add-mon-type-select').attr('data-mon-type',2);
+					$('#monitor-type').val(2);
+					
 					$('#monitor-keyphrase').html('');
 					var monitorData = JSON.parse(map.keywords);
 					drawMonitorList(monitorData);
@@ -16654,10 +16698,26 @@ function drawMacroData(macroId,macroData){
 	$('#macro-description').text(description);
 	
 	$('#macro-status').val(active);
+	
+	$('.add-mac-radio').each(function() {
+	    $(this).removeClass('macro-radio');
+	    $(this).children().hide();
+	    $(this).addClass('macro-radio-outer');
+	    $(this).css("cursor","pointer");
+	});
+	
 	if(active == true || active == 'true'){
-		$('#macro-status-text').html('Active');
+		
+		$('#add-mac-active-radio').removeClass('macro-radio');
+		$('#add-mac-active-radio').children().show();
+		$('#add-mac-active-radio').css("cursor","default");
+		
 	}else if(active == false || active == 'false'){
-		$('#macro-status-text').html('Inactive');
+		
+		$('#add-mac-inactive-radio').removeClass('macro-radio');
+		$('#add-mac-inactive-radio').children().show();
+		$('#add-mac-inactive-radio').css("cursor","default");
+		
 	}
 	
 	if(alert == 'NEW'){
@@ -16688,6 +16748,7 @@ function drawMacroData(macroId,macroData){
 	
 	$('#macro-action-text').text(actionText);
 	
+	$('#add-macro-form').attr('data-state','edited');
 	$('#add-macro-form').attr('data-status', 'new');
 	
 	$('#add-macro-save-inactive').removeClass('hide');
@@ -16745,7 +16806,17 @@ function addMacro(){
 
 				if (map.status == "success") {
 					$('#add-macro-form').attr('data-status', 'new');
-					$("#overlay-toast").html("Successfully Added Macro");
+					
+					var dataState= $('#add-macro-form').attr('data-state');
+					
+					if(dataState == 'new'){
+						$("#overlay-toast").html("Successfully Added Macro");
+					}else{
+						$("#overlay-toast").html("Successfully Updated Macro");
+					}
+					
+					$('#add-macro-form').attr('data-state','new');
+					
 					showToast();
 					
 					$('#macro-name-hdr').html('Add Macro');
@@ -16779,10 +16850,50 @@ function addMacro(){
 	}
 }
 
+$(document).on('click','.add-mac-radio',function(e){
+	e.stopImmediatePropagation();
+	e.preventDefault();
+	
+	var macroStatus = $('#macro-status').val();
+	var isChanged = false;
+	
+	$('.add-mac-radio').each(function() {
+	    $(this).removeClass('macro-radio');
+	    $(this).children().hide();
+	    $(this).addClass('macro-radio-outer');
+	    $(this).css("cursor","pointer");
+	});
+	
+	$(this).removeClass('macro-radio');
+	$(this).children().show();
+	$(this).css("cursor","default");
+	
+	var radioId = $(this).attr('id');
+	
+	if(radioId == 'add-mac-active-radio'){
+		if(macroStatus != 'true' || macroStatus != true){
+			isChanged=true;
+		}
+		$('#macro-status').val(true);
+	}else if(radioId == 'add-mac-inactive-radio'){
+		if(macroStatus != 'false' || macroStatus != false){
+			isChanged=true;
+		}
+		
+		$('#macro-status').val(false);
+	}
+	
+	if(isChanged){
+		if($('#macro-name').val()!= '' &&  $('#macro-name').val()!= undefined && $('#macro-name').val()!= null){
+			$('#add-macro-form').attr('data-status', 'edited');
+			$('#add-macro-save-inactive').addClass('hide');
+			$('#add-macro-save-active').removeClass('hide');
+		}
+	}
+});
+
 $(document).on('click','#macro-status-active',function(){
 	$('#macro-status').val('true');
-	$('#macro-status-text').html('Active');
-	$('#add-macro-status-options').addClass('hide');
 	var macroName = $('#macro-name').html();
 	if(macroName != '' || macroName != null || macroName != undefined){
 		$('#add-macro-form').attr('data-status', 'edited');
@@ -17161,6 +17272,14 @@ function drawStreamPage(streamPostList){
 			$('#stream-post-details-'+postId).find('.stream-res-feed-icn').attr('src','resources/images/ss-icon-small-linkedin.png');
 		}else if(streamPostList[i].type == 'TWITTER'){
 			$('#stream-post-details-'+postId).find('.stream-res-feed-icn').attr('src','resources/images/ss-icon-small-twitter.png');
+		}else if(streamPostList[i].type == 'GOOGLEPLUS'){
+			$('#stream-post-details-'+postId).find('.stream-res-feed-icn').attr('src','resources/images/ss-icon-small-gplus.png');
+		}else if(streamPostList[i].type == 'ZILLOW'){
+			$('#stream-post-details-'+postId).find('.stream-res-feed-icn').attr('src','resources/images/Zillow_logo_blue.png');
+			$('#stream-post-details-'+postId).find('.stream-res-feed-icn').addClass('stream-feed-zillow');
+		}else if(streamPostList[i].type == 'INSTAGRAM'){
+			$('#stream-post-details-'+postId).find('.stream-res-feed-icn').attr('src','resources/images/ss-icon-instagram.png');
+			$('#stream-post-details-'+postId).find('.stream-res-feed-icn').addClass('stream-feed-insta');
 		}
 		
 		$('#stream-post-details-'+postId).find('.stream-user-name').html(streamPostList[i].ownerName);
@@ -17185,8 +17304,12 @@ function drawStreamPage(streamPostList){
 		$('#stream-post-details-cont-'+postId).find('.stream-post-details-text').html(streamPostList[i].text);
 		
 		if(streamPostList[i].pictures != null && streamPostList[i].pictures != undefined){
-			if(streamPostList[i].pictures.length != 0 ){
-				$('#stream-post-details-cont-'+postId).find('.stream-post-details-pic').attr('src',streamPostList[i].pictures[0]);
+			for(var picI=0; picI<streamPostList[i].pictures.length; picI++){
+				
+				var picContainer = '<div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 float-right stream-post-pic-div" >'
+					   			+'<img src="'+streamPostList[i].pictures[picI]+'" class="stream-post-details-pic float-left stream-post-pic"></div>';
+				
+				$('#stream-post-details-cont-'+postId).append(picContainer);
 			}	
 		}
 		
@@ -18868,6 +18991,9 @@ $(document).on('click','#dismiss-duplicate-post-popup',function(e){
 	e.preventDefault();
 	
 	$('#duplicate-post-popup').addClass('hide');
+	
+	$('#dup-post-add-post-action').find('.form-is-dup').val(false);
+	$('#macro-form-is-dup').val(false);
 });
 
 function drawDuplicatePopup(){
@@ -18900,6 +19026,8 @@ function drawDuplicatePopupDetails(postDetails){
 	var status = $('#add-post-action-'+postId).find('.form-status').val();
 	var flagged = $('#add-post-action-'+postId).find('.form-flagged').val();
 	
+	$('#dup-post-add-post-action').find('.form-is-dup').val(true);
+	$('#macro-form-is-dup').val(true);
 	$('#dup-post-add-post-action').find('.form-post-id').val(postId);
 	$('#dup-post-add-post-action').find('.form-status').val(status);
 	$('#dup-post-add-post-action').find('.form-flagged').val(flagged);
@@ -19410,11 +19538,17 @@ function deleteMonitors(){
 		cache : false,
 		data : formData,
 		success : function(data){
-			$('#overlay-toast').html('Successfully deleted selected Monitors.');
-			showToast();
-		},
-		complete: function(){
-			getMonitors();
+			var map = $.parseJSON(data);
+			
+			if (map.status == "success") {
+				$('#overlay-toast').html('Successfully deleted selected Monitors.');
+				showToast();
+				var monitorData = JSON.parse(map.keywords);
+				drawMonitorList(monitorData);
+			}else{
+				$('#overlay-toast').html('Failed to delete selected Monitors.');
+				showToast();
+			}
 		},
 		error : function(e) {
 			$('#overlay-toast').html('Failed to delete selected Monitors.');
