@@ -3,13 +3,14 @@
  */
 package com.realtech.socialsurvey.core.entities;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -19,8 +20,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  */
 @Entity
 @Table(name = "invitation_mail_count_month")
-public class SurveyInvitationEmailCountMonth {
+public class SurveyInvitationEmailCountMonth implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "invitation_mail_count_month_id")
@@ -78,11 +84,6 @@ public class SurveyInvitationEmailCountMonth {
 	@Column(name = "dropped")
 	private long dropped;
 	
-	@Transient
-	private String branchName;
-	@Transient
-	private String regionName;
-	
 	public long getAgentId() {
 		return agentId;
 	}
@@ -95,7 +96,7 @@ public class SurveyInvitationEmailCountMonth {
 	public void setCompanyId(long companyId) {
 		this.companyId = companyId;
 	}
-	public long getMonth() {
+	public int getMonth() {
 		return month;
 	}
 	public void setMonth(int month) {
@@ -173,18 +174,6 @@ public class SurveyInvitationEmailCountMonth {
 	public void setAgentName(String agentName) {
 		this.agentName = agentName;
 	}
-	public String getBranchName() {
-		return branchName;
-	}
-	public void setBranchName(String branchName) {
-		this.branchName = branchName;
-	}
-	public String getRegionName() {
-		return regionName;
-	}
-	public void setRegionName(String regionName) {
-		this.regionName = regionName;
-	}
 	public long getDropped() {
 		return dropped;
 	}
@@ -210,7 +199,6 @@ public class SurveyInvitationEmailCountMonth {
 				+ ", attempted=" + attempted + ", delivered=" + delivered + ", differed=" + differed + ", blocked="
 				+ blocked + ", opened=" + opened + ", spamed=" + spamed + ", unsubscribed=" + unsubscribed
 				+ ", bounced=" + bounced + ", linkClicked=" + linkClicked + ", received=" + received + ", dropped="
-				+ dropped + ", branchName=" + branchName + ", regionName=" + regionName
-				+ "]";
+				+ dropped + "]";
 	}
 }

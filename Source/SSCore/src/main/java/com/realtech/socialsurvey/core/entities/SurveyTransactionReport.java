@@ -87,8 +87,8 @@ public class SurveyTransactionReport
     @Column ( name = "transaction_clicked")
     private Long transactionClicked;
     
-    @Column ( name = "transaction_completed_")
-    private Long transactionCompleted_;
+    @Column ( name = "transaction_completed")
+    private Long transactionCompleted;
     
     @Column ( name = "transaction_partially_completed")
     private Long transactionPartiallyCompleted;
@@ -99,11 +99,8 @@ public class SurveyTransactionReport
     @Column ( name = "transaction_duplicates")
     private Long transactionDuplicates;
     
-    @Column ( name = "transaction_mismatched")
-    private Long transactionMismatched;
-    
-    @Column ( name = "transaction_unassigned")
-    private Long transactionUnassigned;
+    @Column (name = "email_id")
+    private String emailId;
 
     public String getSurveyTransactionReportId()
     {
@@ -345,14 +342,14 @@ public class SurveyTransactionReport
         this.transactionClicked = transactionClicked;
     }
 
-    public Long getTransactionCompleted_()
+    public Long getTransactionCompleted()
     {
-        return transactionCompleted_;
+        return transactionCompleted;
     }
 
-    public void setTransactionCompleted_( Long transactionCompleted_ )
+    public void setTransactionCompleted( Long transactionCompleted )
     {
-        this.transactionCompleted_ = transactionCompleted_;
+        this.transactionCompleted = transactionCompleted;
     }
 
     public Long getTransactionPartiallyCompleted()
@@ -385,70 +382,35 @@ public class SurveyTransactionReport
         this.transactionDuplicates = transactionDuplicates;
     }
 
-    public Long getTransactionMismatched()
-    {
-        return transactionMismatched;
-    }
-
-    public void setTransactionMismatched( Long transactionMismatched )
-    {
-        this.transactionMismatched = transactionMismatched;
-    }
-
-    public Long getTransactionUnassigned()
-    {
-        return transactionUnassigned;
-    }
-
-    public void setTransactionUnassigned( Long transactionUnassigned )
-    {
-        this.transactionUnassigned = transactionUnassigned;
-    }
-
     public static long getSerialversionuid()
     {
         return serialVersionUID;
     }
 
-    @Override
-    public String toString()
-    {
-        return "SurveyTransactionReport [surveyTransactionReportId=" + surveyTransactionReportId + ", month=" + month
-            + ", year=" + year + ", userName=" + userName + ", userId=" + userId + ", nmls=" + nmls + ", licenseId=" + licenseId
-            + ", companyName=" + companyName + ", companyId=" + companyId + ", regionName=" + regionName + ", branchName="
-            + branchName + ", totalReviews=" + totalReviews + ", totalZillowReviews=" + totalZillowReviews
-            + ", total_3rdPartyReviews=" + total_3rdPartyReviews + ", totalVerifiedCustomerReviews="
-            + totalVerifiedCustomerReviews + ", totalUnverifiedCustomerReviews=" + totalUnverifiedCustomerReviews
-            + ", totalSocialSurveyReviews=" + totalSocialSurveyReviews + ", totalAbusiveReviews=" + totalAbusiveReviews
-            + ", totalRetakeReviews=" + totalRetakeReviews + ", totalRetakeCompleted=" + totalRetakeCompleted
-            + ", transactionReceivedBySource=" + transactionReceivedBySource + ", transactionSent=" + transactionSent
-            + ", transactionUnprocessable=" + transactionUnprocessable + ", transactionClicked=" + transactionClicked
-            + ", transactionCompleted_=" + transactionCompleted_ + ", transactionPartiallyCompleted="
-            + transactionPartiallyCompleted + ", transactionUnopened=" + transactionUnopened + ", transactionDuplicates="
-            + transactionDuplicates + ", transactionMismatched=" + transactionMismatched + ", transactionUnassigned="
-            + transactionUnassigned + ", getSurveyTransactionReportId()=" + getSurveyTransactionReportId() + ", getMonth()="
-            + getMonth() + ", getYear()=" + getYear() + ", getUserName()=" + getUserName() + ", getUserId()=" + getUserId()
-            + ", getNmls()=" + getNmls() + ", getLicenseId()=" + getLicenseId() + ", getCompanyName()=" + getCompanyName()
-            + ", getCompanyId()=" + getCompanyId() + ", getRegionName()=" + getRegionName() + ", getBranchName()="
-            + getBranchName() + ", getTotalReviews()=" + getTotalReviews() + ", getTotalZillowReviews()="
-            + getTotalZillowReviews() + ", getTotal_3rdPartyReviews()=" + getTotal_3rdPartyReviews()
-            + ", getTotalVerifiedCustomerReviews()=" + getTotalVerifiedCustomerReviews()
-            + ", getTotalUnverifiedCustomerReviews()=" + getTotalUnverifiedCustomerReviews()
-            + ", getTotalSocialSurveyReviews()=" + getTotalSocialSurveyReviews() + ", getTotalAbusiveReviews()="
-            + getTotalAbusiveReviews() + ", getTotalRetakeReviews()=" + getTotalRetakeReviews() + ", getTotalRetakeCompleted()="
-            + getTotalRetakeCompleted() + ", getTransactionReceivedBySource()=" + getTransactionReceivedBySource()
-            + ", getTransactionSent()=" + getTransactionSent() + ", getTransactionUnprocessable()="
-            + getTransactionUnprocessable() + ", getTransactionClicked()=" + getTransactionClicked()
-            + ", getTransactionCompleted_()=" + getTransactionCompleted_() + ", getTransactionPartiallyCompleted()="
-            + getTransactionPartiallyCompleted() + ", getTransactionUnopened()=" + getTransactionUnopened()
-            + ", getTransactionDuplicates()=" + getTransactionDuplicates() + ", getTransactionMismatched()="
-            + getTransactionMismatched() + ", getTransactionUnassigned()=" + getTransactionUnassigned() + ", getClass()="
-            + getClass() + ", hashCode()=" + hashCode() + ", toString()=" + super.toString() + "]";
-    }
-    
-    
-    
-    
-    
+    public String getEmailId() {
+		return emailId;
+	}
+
+	public void setEmailId(String emailId) {
+		this.emailId = emailId;
+	}
+
+	@Override
+	public String toString() {
+		return "SurveyTransactionReport [surveyTransactionReportId=" + surveyTransactionReportId + ", month=" + month
+				+ ", year=" + year + ", userName=" + userName + ", userId=" + userId + ", nmls=" + nmls + ", licenseId="
+				+ licenseId + ", companyName=" + companyName + ", companyId=" + companyId + ", regionName=" + regionName
+				+ ", branchName=" + branchName + ", totalReviews=" + totalReviews + ", totalZillowReviews="
+				+ totalZillowReviews + ", total_3rdPartyReviews=" + total_3rdPartyReviews
+				+ ", totalVerifiedCustomerReviews=" + totalVerifiedCustomerReviews + ", totalUnverifiedCustomerReviews="
+				+ totalUnverifiedCustomerReviews + ", totalSocialSurveyReviews=" + totalSocialSurveyReviews
+				+ ", totalAbusiveReviews=" + totalAbusiveReviews + ", totalRetakeReviews=" + totalRetakeReviews
+				+ ", totalRetakeCompleted=" + totalRetakeCompleted + ", transactionReceivedBySource="
+				+ transactionReceivedBySource + ", transactionSent=" + transactionSent + ", transactionUnprocessable="
+				+ transactionUnprocessable + ", transactionClicked=" + transactionClicked + ", transactionCompleted="
+				+ transactionCompleted + ", transactionPartiallyCompleted=" + transactionPartiallyCompleted
+				+ ", transactionUnopened=" + transactionUnopened + ", transactionDuplicates=" + transactionDuplicates
+				+ ", emailId=" + emailId + "]";
+	}
 
 }

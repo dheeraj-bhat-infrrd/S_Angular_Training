@@ -63,6 +63,64 @@ function drawTimeFrames(){
 	$('#time-frame-options').append(monthJspStr);
 }
 
+function drawTransReportTimeFrames(){
+	var currentDate = new Date();
+	var currentMonth = currentDate.getMonth();
+	var currentYear = currentDate.getFullYear();
+	
+	var monthStr = new Array();
+	monthStr[0] = "Jan";
+	monthStr[1] = "Feb";
+	monthStr[2] = "Mar";
+	monthStr[3] = "Apr";
+	monthStr[4] = "May";
+	monthStr[5] = "Jun";
+	monthStr[6] = "Jul";
+	monthStr[7] = "Aug";
+	monthStr[8] = "Sep";
+	monthStr[9] = "Oct";
+	monthStr[10] = "Nov";
+	monthStr[11] = "Dec";
+	
+	var monthJspStr='';
+	var count=4;
+	var month;
+	var counter = 6;
+	
+	if(currentMonth > 1){
+		month = currentMonth - 2;
+		
+		while(month >= 0 && count-- > 0){
+			monthJspStr += '<option value="'+(counter++)+'" data-year="'+currentYear+'" data-month="' + (month+1) + '">' + monthStr[month] + ' ' + currentYear + '</option>' ;
+			month--;
+		}
+		
+		if(currentMonth == 2){
+			monthJspStr += '<option value="'+(counter++)+'" data-year="'+(currentYear-1)+'" data-month="12">' + monthStr[11] + ' ' + (currentYear-1) + '</option>' ;
+			monthJspStr += '<option value="'+(counter++)+'" data-year="'+(currentYear-1)+'" data-month="11">' + monthStr[10] + ' ' + (currentYear-1) + '</option>' ;
+			monthJspStr += '<option value="'+(counter)+'" data-year="'+(currentYear-1)+'" data-month="10">' + monthStr[9] + ' ' + (currentYear-1) + '</option>' ;
+		}else if(currentMonth == 3){
+			monthJspStr += '<option value="'+(counter++)+'" data-year="'+(currentYear-1)+'" data-month="12">' + monthStr[11] + ' ' + (currentYear-1) + '</option>' ;
+			monthJspStr += '<option value="'+(counter)+'" data-year="'+(currentYear-1)+'" data-month="11">' + monthStr[10] + ' ' + (currentYear-1) + '</option>' ;
+		}else if(currentMonth == 4){
+			monthJspStr += '<option value="'+(counter)+'" data-year="'+(currentYear-1)+'" data-month="12">' + monthStr[11] + ' ' + (currentYear-1) + '</option>' ;
+		}
+		
+	}else{
+		if(currentMonth == 1){
+			month=11;
+		}else{
+			month=10;
+		}
+			count=4;
+			while(count-- > 0){
+				monthJspStr += '<option value="'+(counter++)+'" data-year="'+(currentYear-1)+'" data-month="' + (month+1) + '">' + monthStr[month] + ' ' + (currentYear-1) + '</div>' ;
+				month--;
+			}
+	}
+	$('#trans-report-time-selector').append(monthJspStr);
+}
+
 function cssForSafari(){
 	if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1) {
 		is_safari = true;
@@ -1356,10 +1414,16 @@ $(document).on('change', '#generate-survey-reports', function() {
 	
 	var selectedVal = $('#generate-survey-reports').val();
 	var key = parseInt(selectedVal);
-	if(key == 101 || key == 102 || key == 103 || key == 106 || key == 110 || key == 112 || key == 200 || key == 1001 ){
+	if(key == 101 || key == 102 || key == 103 || key == 106 || key == 110 || key == 112 || key == 200 || key == 1001 || key==105){
 		$('#date-pickers').hide();
 	}else{
 		$('#date-pickers').show();
+	}
+	
+	if(key==105){
+		$('#trans-report-time-div').show();	
+	}else{
+		$('#trans-report-time-div').hide();	
 	}
 	
 	if(key == 106 || key == 112){
@@ -1532,6 +1596,52 @@ function getTimeFrameForEmailReport(){
 	return dateTimeFrame;
 }
 
+function getTimeFrameForTransReport(){
+	var currentDate = new Date();
+	var currentYear = currentDate.getFullYear();
+	var currentMonth = currentDate.getMonth()+1;
+	
+	var year;
+	var month;
+	
+	var dateTimeFrame = '';
+	
+	var timeFrameStr = $('#trans-report-time-selector').val();
+	timeFrame = parseInt(timeFrameStr);
+	
+	switch(timeFrame){
+	case 2: year = currentYear;
+		month = currentMonth;
+		dateTimeFrame = month+"/01/"+year;
+		break;
+	
+	case 3: year = currentYear;
+		month=currentMonth -1;
+		if(month<=0){
+			month=12;
+			year--;
+		}
+		dateTimeFrame = month+"/01/"+year;
+		break;
+	
+	case 4: year = currentYear;
+		dateTimeFrame = "01/01/"+year;
+		break;
+	
+	case 5: year = currentYear-1;
+		dateTimeFrame = "01/01/"+year;
+		break;
+	}
+	
+	if(timeFrame>5){
+		year = $('#trans-report-time-selector').find(':selected').data('year');
+		month = $('#trans-report-time-selector').find(':selected').data('month');
+		dateTimeFrame = month+"/01/"+year;
+	}
+		
+	return dateTimeFrame;
+}
+
 function getStartAndEndDateForNps(npsTimeFrame){
 	var currentDate = new Date;
 	var currentMonth = currentDate.getMonth()+1;
@@ -1656,6 +1766,10 @@ $(document).on('click', '#reports-generate-report-btn', function(e) {
 		startDate = getTimeFrameForEmailReport();
 	}
 	
+	if(key==105){
+		startDate = getTimeFrameForTransReport();
+	}
+	
 	var success = false;
 	var messageToDisplay;
 	var payload = {
@@ -1763,7 +1877,7 @@ function drawRecentActivity(start,batchSize,tableHeader,recentActivityCount){
 			} else if(recentActivityList[i][1] == 'Survey Invitation Email Report'){
 				tableData += '<td class="v-tbl-recent-activity fetch-email txt-bold tbl-black-text ">';
 				if(startDate==null && endDate==null){
-					tableData += "Last 30 days";
+					tableData += "All Time till date";
 				} else if(endDate==null){
 					tableData += "30 days starting "+startDate;
 				} else if(startDate==null){

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -125,11 +126,74 @@ public class AggregateSolrQueryBolt extends BaseComputeBoltWithAck {
 			if(agentEmailCountsMonth == null || agentEmailCountsMonth.size() <= 0) {
 				LOG.info("No data found for date range.");
 			} else {
-				LOG.info("Saving agent email count data for month {}-{}",agentEmailCountsMonth.get(0).getMonth(),
+				LOG.info("Saving agent email count data for time frame {}-{}",agentEmailCountsMonth.get(0).getMonth(),
 						agentEmailCountsMonth.get(0).getYear());
-				SSAPIOperations.getInstance().saveEmailCountMonthData(agentEmailCountsMonth);
+				saveEmailCountMonthData(agentEmailCountsMonth);
+
+				Calendar cal = Calendar.getInstance();
+				if (agentEmailCountsMonth.get(0)
+						.getMonth() == ((cal.get(Calendar.MONTH) == 0) ? 12 : cal.get(Calendar.MONTH))
+						&& agentEmailCountsMonth.get(0)
+								.getYear() == ((cal.get(Calendar.MONTH) == 0) ? cal.get(Calendar.YEAR) - 1
+										: cal.get(Calendar.YEAR))) {
+					LOG.info("Saved agent email count data for time frame {}-{}",
+							agentEmailCountsMonth.get(0).getMonth(), agentEmailCountsMonth.get(0).getYear());
+					processAlltimeData(agentEmailCountsMonth);
+				}
+				
 			}
 		}
+	}
+	
+	private void saveEmailCountMonthData(List<SurveyInvitationEmailCountMonth> agentEmailCountsMonth) {
+		SSAPIOperations.getInstance().saveEmailCountMonthData(agentEmailCountsMonth);
+	}
+
+	private void processAlltimeData(List<SurveyInvitationEmailCountMonth> agentEmailCountsMonth) {
+		LOG.info("Data processin for all time started.");
+		List<SurveyInvitationEmailCountMonth> invitationAllTimeData = new ArrayList<SurveyInvitationEmailCountMonth>();
+		List<SurveyInvitationEmailCountMonth> responseList = null;
+		int startIndex = 0;
+		try {
+			do {
+				responseList = SSAPIOperations.getInstance().getAllTimeDataForSurveyInvitationMail(startIndex,ComputeConstants.BATCH_SIZE);
+				invitationAllTimeData.addAll(responseList);
+				startIndex += ComputeConstants.BATCH_SIZE;
+			}while(responseList != null && !responseList.isEmpty() && responseList.size() == ComputeConstants.BATCH_SIZE);
+		}catch(IOException ie) {
+			LOG.error("Failed getting all time data in batch {}", startIndex);
+		}
+		
+		responseList = new ArrayList<SurveyInvitationEmailCountMonth>();
+		
+		for(int i = 0; i < agentEmailCountsMonth.size(); i++) {
+			SurveyInvitationEmailCountMonth newCountObj = agentEmailCountsMonth.get(i);
+			SurveyInvitationEmailCountMonth oldCountObj = null;
+			try {
+				oldCountObj = invitationAllTimeData.get(i);
+			}catch(IndexOutOfBoundsException e) {
+				LOG.debug("Array size is less than {}",i);
+			}
+			if(oldCountObj != null) {
+				newCountObj.setAttempted(newCountObj.getAttempted() + oldCountObj.getAttempted());
+				newCountObj.setDelivered(newCountObj.getDelivered() + oldCountObj.getDelivered());
+				newCountObj.setDiffered(newCountObj.getDiffered() + oldCountObj.getDiffered());
+				newCountObj.setBlocked(newCountObj.getBlocked() + oldCountObj.getBlocked());
+				newCountObj.setOpened(newCountObj.getOpened() + oldCountObj.getOpened());
+				newCountObj.setSpamed(newCountObj.getSpamed() + oldCountObj.getSpamed());
+				newCountObj.setUnsubscribed(newCountObj.getUnsubscribed() + oldCountObj.getUnsubscribed());
+				newCountObj.setBounced(newCountObj.getBounced() + oldCountObj.getBounced());
+				newCountObj.setLinkClicked(newCountObj.getLinkClicked() + oldCountObj.getLinkClicked());
+				newCountObj.setReceived(newCountObj.getReceived() + oldCountObj.getReceived());
+				newCountObj.setDropped(newCountObj.getDropped() + oldCountObj.getDropped());
+			}
+			newCountObj.setMonth(0);
+			newCountObj.setYear(0);
+			responseList.add(newCountObj);
+		}
+		
+		LOG.info("Triggering api call to store all time data.");
+		saveEmailCountMonthData(responseList);
 	}
 
 	private JsonObject getSolrResponse(String name, String startDateInGmt, String endDateInGmt) {

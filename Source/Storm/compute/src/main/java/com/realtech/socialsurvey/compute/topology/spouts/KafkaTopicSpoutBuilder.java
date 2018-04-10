@@ -53,6 +53,10 @@ public class KafkaTopicSpoutBuilder
     //Report topic
     private static final String REPORT_TOPIC = "report-topic";
     private static final String REPORT_CONSUMER_GROUP = "rcg01";
+    
+    // Batch processing topic
+    private static final String BATCH_TOPIC = "batch-topic";
+    private static final String BATCH_CONSUMER_GROUP = "bcg01";
 
     public static synchronized KafkaTopicSpoutBuilder getInstance(){
         if (kafkaTopicSpoutBuilder == null){
@@ -129,5 +133,21 @@ public class KafkaTopicSpoutBuilder
         reportSpoutConfig.scheme = new SchemeAsMultiScheme( new StringScheme() );
         LOG.info( "Report topic spout initiated. Topic: {}, Consumer Group: {}", topicName, consumerGroup );
         return new KafkaSpout( reportSpoutConfig );
+    }
+    
+    /**
+     * Batch processing topic kafka spout
+     */
+    public  KafkaSpout batchProcessingSpout() {
+        ZkHosts zkHosts = new ZkHosts( zookeeperBrokers );
+        String topicName = ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? BATCH_TOPIC
+                : ChararcterUtils.appendWithHypen(BATCH_TOPIC, EnvConstants.getProfile() );
+        String consumerGroup = ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? BATCH_CONSUMER_GROUP
+                : ChararcterUtils.appendWithHypen(BATCH_CONSUMER_GROUP, EnvConstants.getProfile() );
+        SpoutConfig batchSpoutConfig = new SpoutConfig( zkHosts, topicName, ZOOKEEPER_ROOT, consumerGroup );
+        batchSpoutConfig.ignoreZkOffsets = false;
+        batchSpoutConfig.scheme = new SchemeAsMultiScheme( new StringScheme() );
+        LOG.info( "Batch topic spout initiated. Topic: {}, Consumer Group: {}", topicName, consumerGroup );
+        return new KafkaSpout( batchSpoutConfig );
     }
 }
