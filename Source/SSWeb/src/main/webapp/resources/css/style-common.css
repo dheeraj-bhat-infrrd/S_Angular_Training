@@ -11128,6 +11128,7 @@ img.lead-img {
     font-size: 12px;
     font-weight: bold !important;
     margin-bottom: 3px;
+    cursor:pointer;
 }
 
 .soc-mon-post-date{
@@ -11997,4 +11998,14 @@ img.lead-img {
 	width: 24px;
     height: 24px;
     background: #0074e5;
+}
+
+#stream-dash,#dup-dash {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	z-index: 9999999;
+	background: url(../images/dashloader.gif) no-repeat center;
+	background-size: 50px 50px;
+	background-color: rgba(255, 255, 255, 0.7);
 }

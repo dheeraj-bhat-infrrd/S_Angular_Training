@@ -101,9 +101,9 @@
 						<textarea class="form-control stream-post-textbox" rows="1" id="macro-action-text" name="macro-action-text" placeholder=""></textarea>
 				</div>
 			</div>
-			<div class="float-left hm-header-left text-center macro-add-action-btn" onclick="">
+			<!-- <div class="float-left hm-header-left text-center macro-add-action-btn" onclick="">
 				Add Action
-			</div>
+			</div> -->
 		</div>
 		<div class="dash-stats-wrapper bord-bot-dc clearfix no-border-style">
 			<div id="add-macro-save-active" class="hide float-right hm-header-right text-center macro-add-btn" onclick="javascript:addMacro()">

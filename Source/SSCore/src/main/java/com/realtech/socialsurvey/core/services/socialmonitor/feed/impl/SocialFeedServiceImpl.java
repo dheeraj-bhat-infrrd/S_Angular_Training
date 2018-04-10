@@ -160,6 +160,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
                 socialMonitorFeedData.setUpdatedOn( socialResponseObject.getUpdatedTime() );
                 socialMonitorFeedData.setFoundKeywords( socialResponseObject.getFoundKeywords() );
                 socialMonitorFeedData.setDuplicateCount( socialResponseObject.getDuplicateCount() );
+                socialMonitorFeedData.setPageLink( socialResponseObject.getPageLink() );
                 socialMonitorStreamDataList.add( socialMonitorFeedData );
             }
             socialMonitorResponseData.setCount( mongoSocialFeedDao.getAllSocialFeedsCount( flag, status, feedtype, companyId,

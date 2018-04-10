@@ -27,7 +27,18 @@ public class SocialMonitorFeedData implements Serializable {
 	private SocialFeedStatus status;
 	private List<ActionHistory> actionHistory;
 	private List<String> foundKeywords;
-	private long duplicateCount;
+	public String getPageLink()
+    {
+        return pageLink;
+    }
+
+    public void setPageLink( String pageLink )
+    {
+        this.pageLink = pageLink;
+    }
+
+    private long duplicateCount;
+	private String pageLink;
 
 	public SocialFeedType getType() {
 		return type;
