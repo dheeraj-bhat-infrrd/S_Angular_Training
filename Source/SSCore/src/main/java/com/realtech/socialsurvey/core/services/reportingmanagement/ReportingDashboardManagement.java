@@ -28,6 +28,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
+import com.realtech.socialsurvey.core.vo.SurveyTransactionReportVO;
 import com.realtech.socialsurvey.core.vo.SurveyInvitationEmailCountVO;
 
 
@@ -84,11 +85,11 @@ public interface ReportingDashboardManagement
         Timestamp endDate ) throws UnsupportedEncodingException, NonFatalException, ParseException;
 
 
-    List<List<Object>> getSurveyTransactionReport( Long entityId, String entityType, Timestamp startDate, Timestamp endDate );
+    List<SurveyTransactionReportVO> getSurveyTransactionReport( Long entityId, String entityType, int month, int year );
 
 
-    String generateSurveyTransactionForReporting( Long entityId, String entityType, Long userId, Timestamp startDate,
-        Timestamp endDate ) throws UnsupportedEncodingException, NonFatalException;
+    String generateSurveyTransactionForReporting( Long entityId, String entityType, Long userId, Timestamp startDate ) 
+    		throws UnsupportedEncodingException, NonFatalException;
 
 
     List<List<Object>> getUserRankingThisYear( String entityType, Long entityId, int year, int startIndex, int batchSize );

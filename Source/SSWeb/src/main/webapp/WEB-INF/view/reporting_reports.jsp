@@ -64,6 +64,14 @@
 							</select>	
 						</div>
 					</div>
+					<div id="trans-report-time-div" class="float-left board-div hide">
+						<div class="dash-btn-dl-sd-admin time-selector" style="width:200px; margin-top:-5px">
+							<select id="trans-report-time-selector" class="float-left dash-download-sel-item board-selector-choice" style="width:100%">
+								<option value=2 data-report="thisMonth">This Month</option>
+								<option value=3 data-report="lastMonth">Last Month</option>
+							</select>	
+						</div>
+					</div>
 					<div id="digest-time-div" class="float-left board-div hide">
 						<div class="dash-btn-dl-sd-admin time-selector" style="width:200px; margin-top:-5px">
 							<select id="digest-time-selector" class="float-left dash-download-sel-item board-selector-choice" style="width:100%">
@@ -137,11 +145,16 @@ $(document).ready(function() {
 	$(document).attr("title", "Reporting");
 	updateViewAsScroll();
 	bindDatePickerforSurveyDownload();
+	drawTransReportTimeFrames();
 	
 	var selectedVal = $('#generate-survey-reports').val();
 	var key = parseInt(selectedVal);
-	if(key == 101 || key == 102 || key == 103 || key == 106 || key == 112 || key == 200 || key == 1001 ){
+	if(key == 101 || key == 102 || key == 103 || key == 106 || key == 112 || key == 200 || key == 1001 || key==105 ){
 		$('#date-pickers').hide();
+	}
+	
+	if(key==105){
+		$('#trans-report-time-div').show();	
 	}
 	
 	if(key == 106 || key == 112){

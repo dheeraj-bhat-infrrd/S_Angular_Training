@@ -122,7 +122,7 @@ public class PrepareBillingReport implements Runnable
                          
                         }else if (fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_SURVEY_TRANSACTION_REPORT){
                              locationInS3 = reportingDashboardManagement.generateSurveyTransactionForReporting( fileUpload.getProfileValue(), fileUpload.getProfileLevel(),
-                                 fileUpload.getAdminUserId(),fileUpload.getStartDate(),fileUpload.getEndDate() );
+                                 fileUpload.getAdminUserId(),fileUpload.getStartDate() );
 
                         }else if (fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_USER_RANKING_MONTHLY_REPORT){
                             //change this to have user ranking report 

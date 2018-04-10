@@ -69,7 +69,7 @@
   <created_date>2018&#x2f;03&#x2f;29 15&#x3a;05&#x3a;33.783</created_date>
   <modified_user>-</modified_user>
   <modified_date>2018&#x2f;03&#x2f;29 15&#x3a;05&#x3a;33.783</modified_date>
-    <key_for_session_key/>
+    <key_for_session_key>H4sIAAAAAAAAAAMAAAAAAAAAAAA&#x3d;</key_for_session_key>
     <is_key_private>N</is_key_private>
   </info>
   <notepads>
@@ -132,34 +132,8 @@
   </connection>
   <order>
   <hop> <from>Survey pre initiation input</from><to>Memory Group by</to><enabled>Y</enabled> </hop>
-  <hop> <from>Memory Group by</from><to>Update</to><enabled>Y</enabled> </hop>
+  <hop> <from>Memory Group by</from><to>Insert &#x2f; Update</to><enabled>Y</enabled> </hop>
   </order>
-  <step>
-    <name>Survey pre initiation input</name>
-    <type>TableInput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xa;  SURVEY_PRE_INITIATION_ID&#xa;, SURVEY_SOURCE&#xa;, SURVEY_SOURCE_ID&#xa;, COMPANY_ID&#xa;, AGENT_ID&#xa;, AGENT_NAME&#xa;, AGENT_EMAILID&#xa;, CUSTOMER_FIRST_NAME&#xa;, CUSTOMER_LAST_NAME&#xa;, CUSTOMER_EMAIL_ID&#xa;, CUSTOMER_INTERACTION_DETAILS&#xa;, PARTICIPANT_TYPE&#xa;, ENGAGEMENT_CLOSED_TIME&#xa;, IS_SURVEY_REQUEST_SENT&#xa;, REMINDER_COUNTS&#xa;, LAST_REMINDER_TIME&#xa;, STATUS&#xa;, CREATED_ON&#xa;, MODIFIED_ON&#xa;, REGION_COLLECTION_ID&#xa;, BRANCH_COLLECTION_ID&#xa;, COLLECTION_NAME&#xa;, ERROR_CODE&#xa;, STATE&#xa;, CITY&#xa;, TRANSACTION_TYPE&#xa;, CREATED_ON_EST&#xa;, MODIFIED_ON_EST&#xa;, ENGAGEMENT_CLOSED_TIME_EST&#xa;, LAST_REMINDER_TIME_EST&#xa;, MONTH&#x28;CREATED_ON_EST&#x29; AS month&#xa;, year&#x28;CREATED_ON_EST&#x29; as year&#xa;FROM survey_pre_initiation&#xa;where CREATED_ON_EST &#x3e;&#x3d; DATE_FORMAT&#x28;DATE_SUB&#x28; NOW&#x28;&#x29;, INTERVAL 5 MONTH &#x29;,&#x27;&#x25;Y-&#x25;m-01 00&#x3a;00&#x3a;00&#x27;&#x29;&#xa;order by AGENT_ID,month,year&#x3b;</sql>
-    <limit>0</limit>
-    <lookup/>
-    <execute_each_row>N</execute_each_row>
-    <variables_active>N</variables_active>
-    <lazy_conversion_active>N</lazy_conversion_active>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>118</xloc>
-      <yloc>116</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
   <step>
     <name>Memory Group by</name>
     <type>MemoryGroupBy</type>
@@ -200,8 +174,8 @@
     </step>
 
   <step>
-    <name>Update</name>
-    <type>Update</type>
+    <name>Survey pre initiation input</name>
+    <type>TableInput</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -211,11 +185,34 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <skip_lookup>N</skip_lookup>
+    <sql>SELECT&#xa;  SURVEY_PRE_INITIATION_ID&#xa;, SURVEY_SOURCE&#xa;, SURVEY_SOURCE_ID&#xa;, COMPANY_ID&#xa;, AGENT_ID&#xa;, AGENT_NAME&#xa;, AGENT_EMAILID&#xa;, CUSTOMER_FIRST_NAME&#xa;, CUSTOMER_LAST_NAME&#xa;, CUSTOMER_EMAIL_ID&#xa;, CUSTOMER_INTERACTION_DETAILS&#xa;, PARTICIPANT_TYPE&#xa;, ENGAGEMENT_CLOSED_TIME&#xa;, IS_SURVEY_REQUEST_SENT&#xa;, REMINDER_COUNTS&#xa;, LAST_REMINDER_TIME&#xa;, STATUS&#xa;, CREATED_ON&#xa;, MODIFIED_ON&#xa;, REGION_COLLECTION_ID&#xa;, BRANCH_COLLECTION_ID&#xa;, COLLECTION_NAME&#xa;, ERROR_CODE&#xa;, STATE&#xa;, CITY&#xa;, TRANSACTION_TYPE&#xa;, CREATED_ON_EST&#xa;, MODIFIED_ON_EST&#xa;, ENGAGEMENT_CLOSED_TIME_EST&#xa;, LAST_REMINDER_TIME_EST&#xa;, MONTH&#x28;CREATED_ON_EST&#x29; AS month&#xa;, year&#x28;CREATED_ON_EST&#x29; as year&#xa;FROM survey_pre_initiation&#xa;where CREATED_ON_EST &#x3e;&#x3d; DATE_FORMAT&#x28;DATE_SUB&#x28; NOW&#x28;&#x29;, INTERVAL 5 MONTH &#x29;,&#x27;&#x25;Y-&#x25;m-01 00&#x3a;00&#x3a;00&#x27;&#x29;&#xa;AND AGENT_ID &#x21;&#x3d; 0&#xa;order by AGENT_ID,month,year&#x3b;</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>118</xloc>
+      <yloc>116</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Insert &#x2f; Update</name>
+    <type>InsertUpdate</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>SS_Centralized_Mysql_Conn</connection>
     <commit>10000</commit>
-    <use_batch>N</use_batch>
-    <error_ignored>N</error_ignored>
-    <ignore_flag_field/>
+    <update_bypassed>N</update_bypassed>
     <lookup>
       <schema/>
       <table>survey_transaction_report</table>
@@ -224,24 +221,40 @@
         <field>month</field>
         <condition>&#x3d;</condition>
         <name2/>
-        </key>
+      </key>
       <key>
         <name>year</name>
         <field>year</field>
         <condition>&#x3d;</condition>
         <name2/>
-        </key>
+      </key>
       <key>
         <name>AGENT_ID</name>
         <field>user_id</field>
         <condition>&#x3d;</condition>
         <name2/>
-        </key>
+      </key>
+      <value>
+        <name>user_id</name>
+        <rename>AGENT_ID</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>month</name>
+        <rename>month</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>year</name>
+        <rename>year</rename>
+        <update>N</update>
+      </value>
       <value>
         <name>transaction_received_by_source</name>
         <rename>received_count</rename>
-        </value>
-      </lookup>
+        <update>Y</update>
+      </value>
+    </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>518</xloc>
@@ -251,18 +264,6 @@
     </step>
 
   <step_error_handling>
-      <error>
-        <source_step>Update</source_step>
-        <target_step>Dummy &#x28;do nothing&#x29;</target_step>
-        <is_enabled>Y</is_enabled>
-        <nr_valuename/>
-        <descriptions_valuename/>
-        <fields_valuename/>
-        <codes_valuename/>
-        <max_errors/>
-        <max_pct_errors/>
-        <min_pct_rows/>
-      </error>
   </step_error_handling>
    <slave-step-copy-partition-distribution>
 </slave-step-copy-partition-distribution>
