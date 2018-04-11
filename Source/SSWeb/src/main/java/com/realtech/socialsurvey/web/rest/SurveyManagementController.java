@@ -1576,6 +1576,11 @@ public class SurveyManagementController
 						}
 					}
 				}
+				//need to reset stage to existing count of active surveyQuestions if stage is greater then the count 
+				if(stage > surveyQuestionDetails.size()-1) {
+				    stage = surveyQuestionDetails.size()-1;
+				}
+				
 				branchSettings = organizationManagementService.getBranchSettings(survey.getBranchId());
 				regionSettings = organizationManagementService.getRegionSettings(survey.getRegionId());
 			} else {
