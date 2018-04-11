@@ -1,4 +1,4 @@
-package com.realtech.socialsurvey.web.controller;
+                                    package com.realtech.socialsurvey.web.controller;
 
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -13,6 +13,7 @@ import com.realtech.socialsurvey.web.common.JspResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,6 +47,9 @@ public class SocialMonitorWebController {
     private static final String FLAG = "flag";
     private static final String MESSAGE = "message";
     private static final String SUCCESS = "Success";
+    
+    @Value("${SOCIAL_MONITOR_AUTH_HEADER}")
+    private String authHeader;
     
     @Autowired
 	private MessageUtils messageUtils;
@@ -155,8 +159,10 @@ public class SocialMonitorWebController {
         if(searchText == null) {
             searchText = "";
         }
+        
+        String authorizationHeader = "Basic " + authHeader;
 
-        Response response = ssApiIntergrationBuilder.getIntegrationApi().getCompanyKeywords(companyId, startIndex, batchSize, monitorType,searchText);
+        Response response = ssApiIntergrationBuilder.getIntegrationApi().getCompanyKeywords(companyId, startIndex, batchSize, monitorType,searchText, authorizationHeader);
 
         return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
        
@@ -212,6 +218,8 @@ public class SocialMonitorWebController {
 		
 		List<Keyword> monitorList = createKeywordFromRequest(request);
 		
+		String authorizationHeader = "Basic " + authHeader;
+		
 		Response response =null;
     	Integer successCount = 0;
     	try {
@@ -221,7 +229,7 @@ public class SocialMonitorWebController {
         	            
         	            newKeyword = monitorList.get(i);
         	            
-                        response = ssApiIntergrationBuilder.getIntegrationApi().addKeywordToCompany( companyId, newKeyword );
+                        response = ssApiIntergrationBuilder.getIntegrationApi().addKeywordToCompany( companyId, newKeyword, authorizationHeader );
                         
                         successCount++;
         	    }
@@ -263,7 +271,9 @@ public class SocialMonitorWebController {
             searchText = "";
         }
         
-        Response response = ssApiIntergrationBuilder.getIntegrationApi().showMacrosForEntity(companyId,searchText);
+        String authorizationHeader = "Basic " + authHeader;
+        
+        Response response = ssApiIntergrationBuilder.getIntegrationApi().showMacrosForEntity(companyId,searchText, authorizationHeader);
 
         return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
        
@@ -355,8 +365,10 @@ public class SocialMonitorWebController {
     	
     	Response response =null;
     	
+        String authorizationHeader = "Basic " + authHeader;
+    	
     	try {
-    		response = ssApiIntergrationBuilder.getIntegrationApi().updateMacrosForEntity(socialMonitorMacro, companyId);
+    		response = ssApiIntergrationBuilder.getIntegrationApi().updateMacrosForEntity(socialMonitorMacro, companyId, authorizationHeader);
     		message = messageUtils.getDisplayMessage(DisplayMessageConstants.ADD_MACRO_SUCCESSFUL,
 					DisplayMessageType.SUCCESS_MESSAGE).getMessage();
     		String status = new String(((TypedByteArray) response.getBody()).getBytes());
@@ -443,7 +455,9 @@ public class SocialMonitorWebController {
            text = "";
        }
        
-       Response response = ssApiIntergrationBuilder.getIntegrationApi().showStreamSocialPosts(startIndex, batchSize, status, flag, feedType, companyId, regionIds, branchIds, agentIds,text,isCompanySet);
+       String authorizationHeader = "Basic " + authHeader;
+       
+       Response response = ssApiIntergrationBuilder.getIntegrationApi().showStreamSocialPosts(startIndex, batchSize, status, flag, feedType, companyId, regionIds, branchIds, agentIds,text,isCompanySet, authorizationHeader);
         		
         return new String( ( (TypedByteArray) response.getBody() ).getBytes(),Charset.forName("UTF-8") );
        
@@ -532,8 +546,10 @@ public class SocialMonitorWebController {
         
     	Response response =null;
     	
+        String authorizationHeader = "Basic " + authHeader;
+    	
     	try {
-    		response = ssApiIntergrationBuilder.getIntegrationApi().saveSocialFeedsForAction(socialFeedsActionUpdate, companyId, duplicateFlag);
+    		response = ssApiIntergrationBuilder.getIntegrationApi().saveSocialFeedsForAction(socialFeedsActionUpdate, companyId, duplicateFlag, authorizationHeader);
     		message = messageUtils.getDisplayMessage(DisplayMessageConstants.UPDATE_POST_SUCCESSFUL,
     				DisplayMessageType.SUCCESS_MESSAGE).getMessage();
     		String status = new String(((TypedByteArray) response.getBody()).getBytes());
@@ -621,8 +637,10 @@ public class SocialMonitorWebController {
             duplicateFlag = Boolean.valueOf( isDup );
         }
     	
+        String authorizationHeader = "Basic " + authHeader;
+    	
     	try {
-    		response = ssApiIntergrationBuilder.getIntegrationApi().saveSocialFeedsForAction(socialFeedsActionUpdate, companyId, duplicateFlag);
+    		response = ssApiIntergrationBuilder.getIntegrationApi().saveSocialFeedsForAction(socialFeedsActionUpdate, companyId, duplicateFlag, authorizationHeader);
     		message = messageUtils.getDisplayMessage(DisplayMessageConstants.UPDATE_POST_SUCCESSFUL,
     				DisplayMessageType.SUCCESS_MESSAGE).getMessage();
     		String status = new String(((TypedByteArray) response.getBody()).getBytes());
@@ -649,7 +667,9 @@ public class SocialMonitorWebController {
         User user = sessionHelper.getCurrentUser();
         Long companyId = user.getCompany().getCompanyId();
         
-        Response response = ssApiIntergrationBuilder.getIntegrationApi().getSegmentsByCompanyId(companyId);
+        String authorizationHeader = "Basic " + authHeader;
+        
+        Response response = ssApiIntergrationBuilder.getIntegrationApi().getSegmentsByCompanyId(companyId, authorizationHeader);
         
         return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
     }
@@ -661,7 +681,9 @@ public class SocialMonitorWebController {
         User user = sessionHelper.getCurrentUser();
         Long companyId = user.getCompany().getCompanyId();
         
-        Response response = ssApiIntergrationBuilder.getIntegrationApi().getUsersByCompanyId( companyId );
+        String authorizationHeader = "Basic " + authHeader;
+        
+        Response response = ssApiIntergrationBuilder.getIntegrationApi().getUsersByCompanyId( companyId, authorizationHeader );
         
         return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
     }
@@ -687,9 +709,11 @@ public class SocialMonitorWebController {
         
         Response response = null;
         
+        String authorizationHeader = "Basic " + authHeader;
+        
         try {
            
-            response = ssApiIntergrationBuilder.getIntegrationApi().deleteKeywordsFromCompany( companyId, monitorIds );
+            response = ssApiIntergrationBuilder.getIntegrationApi().deleteKeywordsFromCompany( companyId, monitorIds, authorizationHeader );
             message = messageUtils.getDisplayMessage(DisplayMessageConstants.UPDATE_POST_SUCCESSFUL,
                     DisplayMessageType.SUCCESS_MESSAGE).getMessage();
             String keywords = new String(((TypedByteArray) response.getBody()).getBytes());
