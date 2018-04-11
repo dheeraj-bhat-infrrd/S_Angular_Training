@@ -31,6 +31,7 @@ import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.MonitorType;
+import com.realtech.socialsurvey.core.entities.MultiplePhrasesVO;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
 import com.realtech.socialsurvey.core.entities.Region;
@@ -1668,5 +1669,14 @@ public interface OrganizationManagementService
 
     public SocialMediaTokensPaginated fetchSocialMediaTokensPaginated( int skipCount, int batchSize )
         throws InvalidInputException;
+
+    /**
+     * Method to add multiple phrases in a keyword to a company
+     * @param companyId
+     * @param multiplePhrasesVO
+     * @return
+     * @throws InvalidInputException
+     */
+    public List<Keyword> addMultiplePhrasesToCompany( long companyId, MultiplePhrasesVO multiplePhrasesVO ) throws InvalidInputException;
 
 }
