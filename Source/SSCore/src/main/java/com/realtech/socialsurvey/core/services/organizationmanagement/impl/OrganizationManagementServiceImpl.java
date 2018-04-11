@@ -84,6 +84,7 @@ import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.MailIdSettings;
+import com.realtech.socialsurvey.core.entities.MultiplePhrasesVO;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
@@ -9379,7 +9380,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         List<Keyword> filterKeywordsAdded = new ArrayList<>();
         if ( keyword != null ) {
             // setting
-            if ( companySettings.getFilterKeywords() == null ) {
+            if ( companySettings.getFilterKeywords() == null || companySettings.getFilterKeywords().isEmpty()) {
                 companyFilterKeywords = new ArrayList<>();
             }
 
@@ -9439,6 +9440,67 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
             // update the redis with the keywords
             redisDao.addKeywords( companyId, companyFilterKeywords );
+
+        } else {
+            LOG.debug( "Keywords are empty so skiping operation" );
+        }
+        for ( Keyword keywordToAdd : companyFilterKeywords ) {
+            if ( keywordToAdd.getStatus() == CommonConstants.STATUS_ACTIVE ) {
+                filterKeywordsAdded.add( keywordToAdd );
+            }
+        }
+        return filterKeywordsAdded;
+    }
+
+
+    @Override
+    public List<Keyword> addMultiplePhrasesToCompany( long companyId, MultiplePhrasesVO multiplePhrasesVO )
+        throws InvalidInputException
+    {
+        LOG.debug( "Get company settings for the companyId: {}", companyId );
+        OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        List<Keyword> companyFilterKeywords = companySettings.getFilterKeywords();
+        List<Keyword> filterKeywordsAdded = new ArrayList<>();
+        int flag = 0;
+
+        if ( multiplePhrasesVO != null ) {
+            if ( companySettings.getFilterKeywords() == null || companySettings.getFilterKeywords().isEmpty()) {
+                companyFilterKeywords = new ArrayList<>();
+            }
+
+            for ( String phrase : multiplePhrasesVO.getPhrases() ) {
+                flag = 1;
+                for ( Keyword duplicateKeyword : companyFilterKeywords ) {
+                    if ( duplicateKeyword.getPhrase().equalsIgnoreCase( phrase )
+                        && duplicateKeyword.getMonitorType().equals( multiplePhrasesVO.getMonitorType() )
+                        && duplicateKeyword.getStatus() == CommonConstants.STATUS_ACTIVE ) {
+                        LOG.warn( "duplicate entry" );
+                        flag = 2;
+                        break;
+                    }
+                }
+                if ( flag == 1 ) {
+                    LOG.info( "Adding new keyword" );
+                    Keyword keywordNew = new Keyword();
+                    keywordNew.setCreatedOn( new Date().getTime() );
+                    keywordNew.setModifiedOn( new Date().getTime() );
+                    keywordNew.setPhrase( phrase );
+                    keywordNew.setId( UUID.randomUUID().toString() );
+                    keywordNew.setStatus( CommonConstants.STATUS_ACTIVE );
+                    keywordNew.setMonitorType( multiplePhrasesVO.getMonitorType() );
+                    companyFilterKeywords.add( keywordNew );
+                }
+                // Updating filterKeywords in OrganizationUnitSettings
+                organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+                    MongoOrganizationUnitSettingDaoImpl.KEY_FILTER_KEYWORDS, companyFilterKeywords, companySettings,
+                    MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+                // update the redis with the keywords
+                redisDao.addKeywords( companyId, companyFilterKeywords );
+
+            }
 
         } else {
             LOG.debug( "Keywords are empty so skiping operation" );

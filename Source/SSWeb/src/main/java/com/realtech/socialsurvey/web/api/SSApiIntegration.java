@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.web.api;
 
 
 import com.realtech.socialsurvey.core.entities.Keyword;
+import com.realtech.socialsurvey.core.entities.MultiplePhrasesVO;
 import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
 import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
@@ -251,6 +252,9 @@ public interface SSApiIntegration
     
     @POST("/v1/company/{companyId}/keyword")
     public Response addKeywordToCompany(@Path ( "companyId") long companyId, @Body Keyword keywordsRequest, @Header("authorizationHeader") String authorizationHeader);
+    
+    @POST("/v1/company/{companyId}/keyword/phrases")
+    public Response addMultiplePhrasesToCompany(@Path ( "companyId") long companyId, @Body MultiplePhrasesVO multiplePhrasesVO, @Header("authorizationHeader") String authorizationHeader);
     
     @DELETE ( "/v1/company/{companyId}keywords")
     public Response deleteKeywordsFromCompany( @Path ( "companyId") long companyId,

@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.realtech.socialsurvey.api.exceptions.SSApiException;
 import com.realtech.socialsurvey.core.entities.FilterKeywordsResponse;
 import com.realtech.socialsurvey.core.entities.Keyword;
+import com.realtech.socialsurvey.core.entities.MultiplePhrasesVO;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokensPaginated;
 import com.realtech.socialsurvey.core.entities.SocialResponseObject;
@@ -308,6 +309,29 @@ public class SocialMonitorController
                 List<Keyword> filterKeywords = organizationManagementService.addKeywordToCompanySettings( companyId,
                     keywordsRequest );
                 LOGGER.info( "SocialMonitorController.addKeywordToCompany completed successfully" );
+                return new ResponseEntity<>( filterKeywords, HttpStatus.OK );
+            } catch ( NonFatalException e ) {
+                throw new SSApiException( e.getMessage(), e.getErrorCode() );
+            }
+        } catch ( AuthorizationException authoriztionFailure ) {
+            return new ResponseEntity<>( AUTH_FAILED, HttpStatus.UNAUTHORIZED );
+        }
+
+    }
+    
+    @RequestMapping ( value = "/company/{companyId}/keyword/phrases", method = RequestMethod.POST)
+    @ApiOperation ( value = "Add keyword to the company with multiple phrases", response = Keyword.class, responseContainer = "List")
+    @ApiResponses ( value = { @ApiResponse ( code = 200, message = "Successfully updated the keywords") })
+    public ResponseEntity<?> addMultiplePhrasesToCompany( @PathVariable ( "companyId") long companyId,
+        @Valid @RequestBody MultiplePhrasesVO multiplePhrasesVO, @RequestHeader ( "authorizationHeader") String authorizationHeader )
+        throws SSApiException
+    {
+        try {
+            adminAuthenticationService.validateAuthHeader( authorizationHeader );
+            try {
+                LOGGER.info( "SocialMonitorController.addMultiplePhrasesToCompany started" );
+                List<Keyword> filterKeywords = organizationManagementService.addMultiplePhrasesToCompany( companyId, multiplePhrasesVO );
+                LOGGER.info( "SocialMonitorController.addMultiplePhrasesToCompany completed successfully" );
                 return new ResponseEntity<>( filterKeywords, HttpStatus.OK );
             } catch ( NonFatalException e ) {
                 throw new SSApiException( e.getMessage(), e.getErrorCode() );
