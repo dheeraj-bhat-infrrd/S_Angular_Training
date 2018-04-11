@@ -69,6 +69,8 @@ public final class ComputeConstants
     public static final String TWITTER_CONSUMER_KEY = "twitter.consumer.key";
     public static final String TWITTER_CONSUMER_SECRET = "twitter.consumer.secret";
     
+    public static final String TWITTER_FIRST_RETRIEVAL_COUNT = "twitter.first.retrieval.count";
+    
     //Solr Pivots
     public static final String SOLR_PIVOT_AGENT_EMAIL_ATTEMPT = "agentId,emailAttemptedDate";
     public static final String SOLR_PIVOT_AGENT_DELIVERED = "agentId,emailDeliveredDate";
