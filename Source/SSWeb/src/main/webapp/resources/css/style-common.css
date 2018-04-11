@@ -11128,6 +11128,7 @@ img.lead-img {
     font-size: 12px;
     font-weight: bold !important;
     margin-bottom: 3px;
+    cursor:pointer;
 }
 
 .soc-mon-post-date{
@@ -11538,7 +11539,7 @@ img.lead-img {
 }
 
 .action-dropdown-margin{
-	margin-left: 10px;
+	margin-left: 25px;
 }
 
 .action-textbox{
@@ -11940,4 +11941,71 @@ img.lead-img {
     margin: 10px auto;
     display: table;
     color: #666666;
+}
+
+.macro-radio{
+	height: 20px;
+    width: 20px;
+    border: 1px solid #909090;
+    border-radius: 100%;
+    cursor: pointer;
+}
+
+.macro-radio-outer{
+	height: 20px;
+    width: 20px;
+    border: 3px solid #21beef;
+    border-radius: 100%;
+    cursor: pointer;
+}
+
+.macro-status-text-div{
+	font-size: 14px;
+    margin-bottom: 0;
+    order: 2;
+    margin-left: auto;
+    align-self: flex-end;
+}
+
+.sm-display-flex{
+	 display: flex;
+}
+
+.mac-radio-div {
+    display: flex;
+    order: 2;
+    margin-left: 40px;
+    align-items: flex-end;
+}
+
+.mac-status-text-span{
+	margin: 0 10px;
+    padding-bottom: 2px;
+}
+
+.add-mon-type-opt {
+    display: flex;
+    align-items: center;
+}
+
+.stream-feed-insta{
+	width: 24px;
+    height: 24px;
+    background: red;
+}
+
+.stream-feed-zillow{
+	width: 24px;
+    height: 24px;
+    background: #0074e5;
+}
+
+#stream-dash,#dup-dash {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	z-index: 9999999;
+	background: url(../images/dashloader.gif) no-repeat center;
+	background-size: 50px 50px;
+	background-color: rgba(255, 255, 255, 0.7);
 }

@@ -1,4 +1,4 @@
-package com.realtech.socialsurvey.web.controller;
+                                    package com.realtech.socialsurvey.web.controller;
 
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -13,6 +13,7 @@ import com.realtech.socialsurvey.web.common.JspResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,6 +47,9 @@ public class SocialMonitorWebController {
     private static final String FLAG = "flag";
     private static final String MESSAGE = "message";
     private static final String SUCCESS = "Success";
+    
+    @Value("${SOCIAL_MONITOR_AUTH_HEADER}")
+    private String authHeader;
     
     @Autowired
 	private MessageUtils messageUtils;
@@ -155,26 +159,47 @@ public class SocialMonitorWebController {
         if(searchText == null) {
             searchText = "";
         }
+        
+        String authorizationHeader = "Basic " + authHeader;
 
-        Response response = ssApiIntergrationBuilder.getIntegrationApi().getCompanyKeywords(companyId, startIndex, batchSize, monitorType,searchText);
+        Response response = ssApiIntergrationBuilder.getIntegrationApi().getCompanyKeywords(companyId, startIndex, batchSize, monitorType,searchText, authorizationHeader);
 
         return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
        
     }
     
-    private Keyword createKeywordFromRequest(HttpServletRequest request) {
+    private List<Keyword> createKeywordFromRequest(HttpServletRequest request) {
     	
     	LOG.debug("Method to create Keyword object called.");
 		String keyPhrase = request.getParameter("monitor-keyphrase");
-		String monitorType = request.getParameter("monitor-type");
+		String monitorTypeStr = request.getParameter("monitor-type");
+		int monitorTypeNumVal = 0;
 		
-		// Created VO and added required fields.
 		Keyword newKeyword = new Keyword();
+        List<Keyword> monitorList = new ArrayList<>();
+        
+		if(!monitorTypeStr.isEmpty() && monitorTypeStr != null) {
+		    monitorTypeNumVal = Integer.valueOf( monitorTypeStr );
+		    
+		    if(monitorTypeNumVal>1) {
+		        
+		        monitorList.add( new Keyword() );
+		        monitorList.get(0).setPhrase( keyPhrase );
+		        monitorList.get(0).setMonitorType(MonitorType.KEYWORD_MONITOR);
+		        
+		        monitorList.add( new Keyword() );
+                monitorList.get(1).setPhrase( keyPhrase );
+                monitorList.get(1).setMonitorType(MonitorType.GOOGLE_ALERTS);
+                
+		    }else{
+		        newKeyword.setPhrase(keyPhrase);
+		        newKeyword.setMonitorType(MonitorType.values()[monitorTypeNumVal]);
+		        monitorList.add(newKeyword);
+		    }
+		}
+		// Created VO and added required fields.
 		
-		newKeyword.setPhrase(keyPhrase);
-		newKeyword.setMonitorType(MonitorType.valueOf(monitorType));
-		
-		return newKeyword;
+		return monitorList;
     }
     
     @ResponseBody
@@ -191,27 +216,42 @@ public class SocialMonitorWebController {
 		String message = "";
 		String statusJson = "";
 		
-		List<Keyword> keywordsRequest = new ArrayList<>();
-    	Keyword newKeyword = createKeywordFromRequest(request);
-    	keywordsRequest.add(newKeyword);
-    	
-    	Response response =null;
-    	
+		List<Keyword> monitorList = createKeywordFromRequest(request);
+		
+		String authorizationHeader = "Basic " + authHeader;
+		
+		Response response =null;
+    	Integer successCount = 0;
     	try {
-    		response = ssApiIntergrationBuilder.getIntegrationApi().addKeywordsToCompany(companyId, keywordsRequest);
-    		message = messageUtils.getDisplayMessage(DisplayMessageConstants.ADD_MONITOR_SUCCESSFUL,
-					DisplayMessageType.SUCCESS_MESSAGE).getMessage();
-    		String keywords = new String(((TypedByteArray) response.getBody()).getBytes());
-    		statusMap.put("keywords", keywords);
-			statusMap.put(STATUS, CommonConstants.SUCCESS_ATTRIBUTE);
-    	}catch(Exception e){
-    		LOG.error("Exception occured in SS-API while adding new monitor.", e);
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.ADD_MONITOR_UNSUCCESSFUL,
-					DisplayMessageType.ERROR_MESSAGE).getMessage();
-			statusMap.put(STATUS, CommonConstants.ERROR);
-    	}
-    	
+        	if(!monitorList.isEmpty() && monitorList != null) {
+        	    Keyword newKeyword = new Keyword();
+        	    for(int i=0;i<monitorList.size();i++) {
+        	            
+        	            newKeyword = monitorList.get(i);
+        	            
+                        response = ssApiIntergrationBuilder.getIntegrationApi().addKeywordToCompany( companyId, newKeyword, authorizationHeader );
+                        
+                        successCount++;
+        	    }
+        	    message = messageUtils.getDisplayMessage(DisplayMessageConstants.ADD_MONITOR_SUCCESSFUL,
+                    DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+               String keywords = new String(((TypedByteArray) response.getBody()).getBytes());
+               statusMap.put("keywords", keywords);
+               statusMap.put(STATUS, CommonConstants.SUCCESS_ATTRIBUTE);
+        	} else {
+        	    message = messageUtils.getDisplayMessage(DisplayMessageConstants.ADD_MONITOR_UNSUCCESSFUL,
+                    DisplayMessageType.ERROR_MESSAGE).getMessage();
+        	    statusMap.put(STATUS, CommonConstants.ERROR);
+        	}
+        }catch(Exception e){
+            LOG.error("Exception occured in SS-API while adding new monitor.", e);
+            message = messageUtils.getDisplayMessage(DisplayMessageConstants.ADD_MONITOR_UNSUCCESSFUL,
+                    DisplayMessageType.ERROR_MESSAGE).getMessage();
+            statusMap.put(STATUS, CommonConstants.ERROR);
+        }
+    	    	
     	statusMap.put(MESSAGE, message);
+    	statusMap.put("successCount", successCount.toString());
 		statusJson = new Gson().toJson(statusMap);
 		
     	return statusJson;
@@ -231,7 +271,9 @@ public class SocialMonitorWebController {
             searchText = "";
         }
         
-        Response response = ssApiIntergrationBuilder.getIntegrationApi().showMacrosForEntity(companyId,searchText);
+        String authorizationHeader = "Basic " + authHeader;
+        
+        Response response = ssApiIntergrationBuilder.getIntegrationApi().showMacrosForEntity(companyId,searchText, authorizationHeader);
 
         return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
        
@@ -323,8 +365,10 @@ public class SocialMonitorWebController {
     	
     	Response response =null;
     	
+        String authorizationHeader = "Basic " + authHeader;
+    	
     	try {
-    		response = ssApiIntergrationBuilder.getIntegrationApi().updateMacrosForEntity(socialMonitorMacro, companyId);
+    		response = ssApiIntergrationBuilder.getIntegrationApi().updateMacrosForEntity(socialMonitorMacro, companyId, authorizationHeader);
     		message = messageUtils.getDisplayMessage(DisplayMessageConstants.ADD_MACRO_SUCCESSFUL,
 					DisplayMessageType.SUCCESS_MESSAGE).getMessage();
     		String status = new String(((TypedByteArray) response.getBody()).getBytes());
@@ -411,7 +455,9 @@ public class SocialMonitorWebController {
            text = "";
        }
        
-       Response response = ssApiIntergrationBuilder.getIntegrationApi().showStreamSocialPosts(startIndex, batchSize, status, flag, feedType, companyId, regionIds, branchIds, agentIds,text,isCompanySet);
+       String authorizationHeader = "Basic " + authHeader;
+       
+       Response response = ssApiIntergrationBuilder.getIntegrationApi().showStreamSocialPosts(startIndex, batchSize, status, flag, feedType, companyId, regionIds, branchIds, agentIds,text,isCompanySet, authorizationHeader);
         		
         return new String( ( (TypedByteArray) response.getBody() ).getBytes(),Charset.forName("UTF-8") );
        
@@ -440,7 +486,7 @@ public class SocialMonitorWebController {
     	String textActType = request.getParameter("form-text-act-type");
     	String text = request.getParameter("form-post-textbox");
     	String macroId = request.getParameter("form-post-act-macro-id");
-    	
+    	    	
     	String[] postIdList = postId.split(",");
     	List<String> postIds = new ArrayList<>();
     	
@@ -491,12 +537,19 @@ public class SocialMonitorWebController {
     	
     	SocialFeedsActionUpdate socialFeedsActionUpdate = createSFAUFromRequest(request,userName);
     	
+    	String isDup = request.getParameter("form-is-dup");
     	boolean duplicateFlag = false;
+    	
+    	if(!isDup.isEmpty() && isDup != null) {
+    	    duplicateFlag = Boolean.valueOf( isDup );
+    	}
         
     	Response response =null;
     	
+        String authorizationHeader = "Basic " + authHeader;
+    	
     	try {
-    		response = ssApiIntergrationBuilder.getIntegrationApi().saveSocialFeedsForAction(socialFeedsActionUpdate, companyId, duplicateFlag);
+    		response = ssApiIntergrationBuilder.getIntegrationApi().saveSocialFeedsForAction(socialFeedsActionUpdate, companyId, duplicateFlag, authorizationHeader);
     		message = messageUtils.getDisplayMessage(DisplayMessageConstants.UPDATE_POST_SUCCESSFUL,
     				DisplayMessageType.SUCCESS_MESSAGE).getMessage();
     		String status = new String(((TypedByteArray) response.getBody()).getBytes());
@@ -577,10 +630,17 @@ public class SocialMonitorWebController {
     	
     	Response response =null;
     	
-    	boolean duplicateFlag = false;
+    	String isDup = request.getParameter("macro-form-is-dup");
+        boolean duplicateFlag = false;
+        
+        if(!isDup.isEmpty() && isDup != null) {
+            duplicateFlag = Boolean.valueOf( isDup );
+        }
+    	
+        String authorizationHeader = "Basic " + authHeader;
     	
     	try {
-    		response = ssApiIntergrationBuilder.getIntegrationApi().saveSocialFeedsForAction(socialFeedsActionUpdate, companyId, duplicateFlag);
+    		response = ssApiIntergrationBuilder.getIntegrationApi().saveSocialFeedsForAction(socialFeedsActionUpdate, companyId, duplicateFlag, authorizationHeader);
     		message = messageUtils.getDisplayMessage(DisplayMessageConstants.UPDATE_POST_SUCCESSFUL,
     				DisplayMessageType.SUCCESS_MESSAGE).getMessage();
     		String status = new String(((TypedByteArray) response.getBody()).getBytes());
@@ -607,7 +667,9 @@ public class SocialMonitorWebController {
         User user = sessionHelper.getCurrentUser();
         Long companyId = user.getCompany().getCompanyId();
         
-        Response response = ssApiIntergrationBuilder.getIntegrationApi().getSegmentsByCompanyId(companyId);
+        String authorizationHeader = "Basic " + authHeader;
+        
+        Response response = ssApiIntergrationBuilder.getIntegrationApi().getSegmentsByCompanyId(companyId, authorizationHeader);
         
         return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
     }
@@ -619,7 +681,9 @@ public class SocialMonitorWebController {
         User user = sessionHelper.getCurrentUser();
         Long companyId = user.getCompany().getCompanyId();
         
-        Response response = ssApiIntergrationBuilder.getIntegrationApi().getUsersByCompanyId( companyId );
+        String authorizationHeader = "Basic " + authHeader;
+        
+        Response response = ssApiIntergrationBuilder.getIntegrationApi().getUsersByCompanyId( companyId, authorizationHeader );
         
         return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
     }
@@ -645,13 +709,15 @@ public class SocialMonitorWebController {
         
         Response response = null;
         
+        String authorizationHeader = "Basic " + authHeader;
+        
         try {
            
-            response = ssApiIntergrationBuilder.getIntegrationApi().deleteKeywordsFromCompany( companyId, monitorIds );
+            response = ssApiIntergrationBuilder.getIntegrationApi().deleteKeywordsFromCompany( companyId, monitorIds, authorizationHeader );
             message = messageUtils.getDisplayMessage(DisplayMessageConstants.UPDATE_POST_SUCCESSFUL,
                     DisplayMessageType.SUCCESS_MESSAGE).getMessage();
-            String status = new String(((TypedByteArray) response.getBody()).getBytes());
-            statusMap.put(SUCCESS, status);
+            String keywords = new String(((TypedByteArray) response.getBody()).getBytes());
+            statusMap.put("keywords", keywords);
             statusMap.put(STATUS, CommonConstants.SUCCESS_ATTRIBUTE);
          }catch(Exception e){
             LOG.error("Exception occured in SS-API while updating post action.", e);

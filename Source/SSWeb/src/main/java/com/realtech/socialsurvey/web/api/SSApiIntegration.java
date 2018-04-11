@@ -16,6 +16,8 @@ import retrofit.http.*;
 
 import java.util.List;
 
+import org.springframework.web.bind.annotation.RequestHeader;
+
 
 public interface SSApiIntegration
 {
@@ -217,7 +219,7 @@ public interface SSApiIntegration
     Response getLastSuccessfulEtlTimeApi();
     
     @GET("/v1/companies/{companyId}/keywords")
-    public Response getCompanyKeywords(@Path ( "companyId") long companyId, @Query("startIndex") int startIndex, @Query("limit") int limit,  @Query("monitorType") String monitorType, @Query("searchPhrase") String searchPhrase);
+    public Response getCompanyKeywords(@Path ( "companyId") long companyId, @Query("startIndex") int startIndex, @Query("limit") int limit,  @Query("monitorType") String monitorType, @Query("searchPhrase") String searchPhrase, @Header("authorizationHeader") String authorizationHeader);
     
     @POST("/v1/companies/{companyId}/keywords")
     public Response addKeywordsToCompany(@Path ( "companyId") long companyId, @Body List<Keyword> keywordsRequest);
@@ -226,33 +228,33 @@ public interface SSApiIntegration
 	public Response showStreamSocialPosts(@Query("startIndex") int startIndex, @Query("limit") int limit,
 			@Query("status") String status, @Query("flag") boolean flag, @Query("feedtype") List<String> feedtype,
 			@Query("companyId") Long companyId, @Query("regionIds") List<Long> regionIds,
-			@Query("branchIds") List<Long> branchIds, @Query("agentIds") List<Long> agentIds, @Query("searchText") String searchText,@Query("isCompanySet") boolean isCompanySet);
+			@Query("branchIds") List<Long> branchIds, @Query("agentIds") List<Long> agentIds, @Query("searchText") String searchText,@Query("isCompanySet") boolean isCompanySet, @Header("authorizationHeader") String authorizationHeader);
     
     @PUT( "/v1/updatesocialfeeds/action")
     public Response saveSocialFeedsForAction(@Body SocialFeedsActionUpdate socialFeedsActionUpdate,
-			@Query("companyId") Long companyId, @Query("duplicateFlag") boolean duplicateFlag);
+			@Query("companyId") Long companyId, @Query("duplicateFlag") boolean duplicateFlag, @Header("authorizationHeader") String authorizationHeader);
     
     @GET("/v1/socialfeedsmacro/company/{companyId}")
-    public Response showMacrosForEntity(@Path("companyId") long companyId, @Query("searchMacros") String searchMacros);
+    public Response showMacrosForEntity(@Path("companyId") long companyId, @Query("searchMacros") String searchMacros, @Header("authorizationHeader") String authorizationHeader);
     
     @POST("/v1/update/socialfeedsmacro")
-    public Response updateMacrosForEntity(@Body SocialMonitorMacro socialMonitorMacro, @Query("companyId") long companyId);
+    public Response updateMacrosForEntity(@Body SocialMonitorMacro socialMonitorMacro, @Query("companyId") long companyId, @Header("authorizationHeader") String authorizationHeader);
     
     @GET("/v1/socialfeedsmacro/company/{companyId}/macro/{macroId}")
-    public Response getMacroById(@Path("companyId") Long companyId, @Path("macroId") long macroId);
+    public Response getMacroById(@Path("companyId") Long companyId, @Path("macroId") long macroId, @Header("authorizationHeader") String authorizationHeader);
     
     @GET("/v1/segments/company/{companyId}")
-    public Response getSegmentsByCompanyId(@Path("companyId") Long companyId);
+    public Response getSegmentsByCompanyId(@Path("companyId") Long companyId, @Header("authorizationHeader") String authorizationHeader);
     
     @GET("/v1/users/company/{companyId}")
-    public Response getUsersByCompanyId(@Path("companyId") Long companyId);
+    public Response getUsersByCompanyId(@Path("companyId") Long companyId, @Header("authorizationHeader") String authorizationHeader);
     
     @POST("/v1/company/{companyId}/keyword")
-    public Response addKeywordToCompany(@Path ( "companyId") long companyId, @Body Keyword keywordsRequest);
+    public Response addKeywordToCompany(@Path ( "companyId") long companyId, @Body Keyword keywordsRequest, @Header("authorizationHeader") String authorizationHeader);
     
     @DELETE ( "/v1/company/{companyId}keywords")
     public Response deleteKeywordsFromCompany( @Path ( "companyId") long companyId,
-        @Query ( "keywordIds") List<String> keywordIds );
+        @Query ( "keywordIds") List<String> keywordIds, @Header("authorizationHeader") String authorizationHeader );
     
     @GET ( "/v1/lastsuccessfuletltime/isetlrunning" )
     Response isEtlRunning();
