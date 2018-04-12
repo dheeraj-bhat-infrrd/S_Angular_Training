@@ -5,10 +5,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.realtech.socialsurvey.compute.common.ComputeConstants;
+import com.realtech.socialsurvey.compute.common.LocalPropertyFileHandler;
 import com.realtech.socialsurvey.compute.dao.impl.RedisSocialMediaStateDaoImpl;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.compute.entities.TwitterTokenForSM;
@@ -46,9 +48,13 @@ public class TwitterFeedProcessorImpl implements TwitterFeedProcessor
     private static final int PAGE_SIZE = 200;
     public static final int TWITTER_MIN_LIMIT = 100;
 
+    private static final int TWITTER_FIRST_RETRIEVAL_COUNT = NumberUtils.toInt( LocalPropertyFileHandler.getInstance()
+        .getProperty( ComputeConstants.APPLICATION_PROPERTY_FILE, ComputeConstants.TWITTER_FIRST_RETRIEVAL_COUNT )
+        .orElse( "200" ) );
+
     @Override
-    public List<TwitterFeedData> fetchFeed(long companyId, SocialMediaTokenResponse mediaToken,
-                                           String twitterConsumerKey, String twitterConsumerSecret)
+    public List<TwitterFeedData> fetchFeed( long companyId, SocialMediaTokenResponse mediaToken, String twitterConsumerKey,
+        String twitterConsumerSecret )
     {
         LOG.info( "Getting tweets with id: {}", companyId );
 
@@ -60,26 +66,17 @@ public class TwitterFeedProcessorImpl implements TwitterFeedProcessor
         String lastFetchedKey = mediaToken.getProfileType().toString() + "_" + mediaToken.getIden() + "_" + pageId;
 
         try {
-                String sinceId = redisSocialMediaStateDao.getLastFetched( lastFetchedKey );
 
-                long lastFetchedPostId = 0L;
-                if (StringUtils.isNotEmpty( sinceId ) ) {
-                    lastFetchedPostId = Long.parseLong( sinceId );
-                } else {
-                    // To save preValue of lastFetched
-                    sinceId = "0";
-                }
+            long lastFetchedPostId = NumberUtils.toLong( redisSocialMediaStateDao.getLastFetched( lastFetchedKey ) );
 
             // Settings Consumer and Access Tokens
             Twitter twitter = new TwitterFactory().getInstance();
             twitter.setOAuthConsumer( twitterConsumerKey, twitterConsumerSecret );
-            twitter.setOAuthAccessToken(
-                    new AccessToken( token.getTwitterAccessToken(), token.getTwitterAccessTokenSecret() ) );
-
+            twitter
+                .setOAuthAccessToken( new AccessToken( token.getTwitterAccessToken(), token.getTwitterAccessTokenSecret() ) );
 
             long maxId = 0L;
             ResponseList<Status> resultList;
-
 
             do {
                 Paging paging = new Paging();
@@ -95,33 +92,40 @@ public class TwitterFeedProcessorImpl implements TwitterFeedProcessor
                 resultList = twitter.getUserTimeline( pageId, paging );
 
                 //save the twitterSecondsUnitlRest in redis if remainingCount becomes <= 100
-                if(LOG.isDebugEnabled()){
-                    LOG.debug("RateLimit status for page {} is {} ", pageId, resultList.getRateLimitStatus());
-                }
-                
-                if(resultList.getRateLimitStatus().getRemaining() <= TWITTER_MIN_LIMIT) {
-                    int secondsUntilReset = (int)(((long)resultList.getRateLimitStatus().getResetTimeInSeconds() * 1000L - System.currentTimeMillis()) / 1000L);
-                    redisSocialMediaStateDao.setTwitterLock(secondsUntilReset,pageId);
+                if ( LOG.isDebugEnabled() ) {
+                    LOG.debug( "RateLimit status for page {} is {} ", pageId, resultList.getRateLimitStatus() );
                 }
 
+                if ( resultList.getRateLimitStatus().getRemaining() <= TWITTER_MIN_LIMIT ) {
+                    int secondsUntilReset = (int) ( ( (long) resultList.getRateLimitStatus().getResetTimeInSeconds() * 1000L
+                        - System.currentTimeMillis() ) / 1000L );
+                    redisSocialMediaStateDao.setTwitterLock( secondsUntilReset, pageId );
+                }
+
+                
                 for ( Status status : resultList ) {
-                    feedData.add(createTwitterFeedData(status));
+                    feedData.add( createTwitterFeedData( status ) );
                     maxId = status.getId();
+                }
+
+                if ( lastFetchedPostId == 0L && feedData.size() >= TWITTER_FIRST_RETRIEVAL_COUNT ) {
+                    LOG.debug( "Inside fetchFeed method returning {} records", feedData.size() );
+                    break;
                 }
             } while ( resultList.size() == PAGE_SIZE );
 
-            if(!feedData.isEmpty()){
-                redisSocialMediaStateDao.saveLastFetched( lastFetchedKey, Long.toString( feedData.get( 0 ).getId() ), sinceId );
+            if ( !feedData.isEmpty() ) {
+                redisSocialMediaStateDao.saveLastFetched( lastFetchedKey, Long.toString( feedData.get( 0 ).getId() ), Long.toString( lastFetchedPostId ) );
             }
 
         } catch ( TwitterException e ) {
             // if the rate limit has been over used by any chance then blacklist the socialtoken
             LOG.error( "Exception in Twitter feed extraction. Reason: ", e );
-            if( e.getErrorCode() == 88 ) {
-                redisSocialMediaStateDao.setTwitterLock(900,pageId);
+            if ( e.getErrorCode() == 88 ) {
+                redisSocialMediaStateDao.setTwitterLock( 900, pageId );
             }
         } catch ( JedisConnectionException e ) {
-            LOG.error( "Not able to connect to redis", e);
+            LOG.error( "Not able to connect to redis", e );
         }
 
         return feedData;
@@ -140,7 +144,8 @@ public class TwitterFeedProcessorImpl implements TwitterFeedProcessor
         feed.setCreatedAt( status.getCreatedAt() );
         feed.setId( status.getId() );
         feed.setRetweetCount( status.getRetweetCount() );
-        feed.setPictures(Arrays.stream(status.getMediaEntities()).map(x -> x.getMediaURL()).collect(Collectors.toList()));
+        feed.setPictures(
+            Arrays.stream( status.getMediaEntities() ).map( x -> x.getMediaURL() ).collect( Collectors.toList() ) );
         RateLimitStatus rateLimitStatus = status.getRateLimitStatus();
         if ( rateLimitStatus != null ) {
             feed.setRemaining( status.getRateLimitStatus().getRemaining() );
