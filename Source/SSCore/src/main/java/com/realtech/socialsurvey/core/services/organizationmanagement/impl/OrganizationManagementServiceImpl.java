@@ -9115,7 +9115,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         emailServices.sendUserAdditionMail( companySettings.getUserAddDeleteNotificationRecipients(),
             adminUser.getFirstName() + ( StringUtils.isEmpty( adminUser.getLastName() ) ? "" : " " + adminUser.getLastName() ),
-            user.getEmailId(), user, getAgentSettings( user.getUserId() ) );
+            adminUser.getEmailId(), user, getAgentSettings( user.getUserId() ) );
     }
     
     
@@ -9148,7 +9148,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         emailServices.sendUserDeletionMail( companySettings.getUserAddDeleteNotificationRecipients(),
             adminUser.getFirstName() + ( StringUtils.isEmpty( adminUser.getLastName() ) ? "" : " " + adminUser.getLastName() ),
-            user.getEmailId(), user, getAgentSettings( user.getUserId() ) );
+            adminUser.getEmailId(), user, getAgentSettings( user.getUserId() ) );
     }
     
 }
