@@ -18,6 +18,7 @@ import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import facebook4j.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -42,6 +43,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import retrofit.mime.TypedByteArray;
+import scala.util.parsing.combinator.testing.Str;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.auth.AccessToken;
@@ -108,9 +110,6 @@ import com.realtech.socialsurvey.web.common.ErrorResponse;
 import com.realtech.socialsurvey.web.common.JspResolver;
 import com.realtech.socialsurvey.web.common.TokenHandler;
 import com.realtech.socialsurvey.web.util.RequestUtils;
-
-import facebook4j.Facebook;
-import facebook4j.FacebookException;
 
 
 /**
@@ -179,6 +178,12 @@ public class SocialManagementController
 
     @Value ( "${FB_URI}")
     private String facebookUri;
+
+    // Instagram
+    @Value ( "IG_REDIRECT_URI" )
+    private String instagramRedirectUri;
+    @Value ( "${IG_URI}")
+    private String instagramUri;
 
     // LinkedIn
     @Value ( "${LINKED_IN_REST_API_URI}")
@@ -298,13 +303,13 @@ public class SocialManagementController
 
             // Building facebook authUrl
             case "facebook":
-                Facebook facebook = socialManagementService.getFacebookInstance( serverBaseUrl );
+                Facebook facebook = socialManagementService.getFacebookInstance( serverBaseUrl, facebookRedirectUri );
 
                 // Setting authUrl in model
                 session.setAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN, facebook );
                 model.addAttribute( CommonConstants.SOCIAL_AUTH_URL,
                     facebook.getOAuthAuthorizationURL( serverBaseUrl + facebookRedirectUri ) );
-
+                model.addAttribute(CommonConstants.CALLBACK, "./saveSelectedAccessFacebookToken.do");
                 break;
 
             // Building twitter authUrl
@@ -363,12 +368,22 @@ public class SocialManagementController
             case "rss":
                 break;
 
+            case "instagram" :
+                Facebook fb = socialManagementService.getFacebookInstance( serverBaseUrl, instagramRedirectUri );
+
+                // Setting authUrl in model
+                session.setAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN, fb );
+                model.addAttribute( CommonConstants.SOCIAL_AUTH_URL,
+                        fb.getOAuthAuthorizationURL( serverBaseUrl + instagramRedirectUri ) );
+                model.addAttribute(CommonConstants.CALLBACK, "./saveSelectedInstagramToken.do");
+                break;
+
             default:
                 LOG.error( "Social Network Type invalid in getSocialAuthPage" );
         }
 
         model.addAttribute( CommonConstants.MESSAGE, CommonConstants.YES );
-        if ( socialNetwork.equalsIgnoreCase( "facebook" ) )
+        if ( socialNetwork.equalsIgnoreCase( "facebook" ) || socialNetwork.equalsIgnoreCase("instagram") )
             return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;
         else if ( socialNetwork.equalsIgnoreCase( "zillow" ) ) {
             session.setAttribute( "zillowNonLenderURI", CommonConstants.ZILLOW_PROFILE_URL);
@@ -531,6 +546,112 @@ public class SocialManagementController
         return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;
     }
 
+    /**
+     * The url that Facebook send request to with the oauth verification code
+     * @param model
+     * @param request
+     * @return
+     */
+    @RequestMapping ( value = "/instagramAuth", method = RequestMethod.GET)
+    public String authenticateInstagramAccess( Model model, HttpServletRequest request ) {
+        LOG.info( "Instagram authentication url requested" );
+        User user = sessionHelper.getCurrentUser();
+        HttpSession session = request.getSession( false );
+        AccountType accountType = (AccountType) session.getAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION );
+        if ( session.getAttribute( "columnName" ) != null ) {
+            String columnName = (String) session.getAttribute( "columnName" );
+            String columnValue = (String) session.getAttribute( "columnValue" );
+            session.removeAttribute( "columnName" );
+            session.removeAttribute( "columnValue" );
+            model.addAttribute( "columnName", columnName );
+            model.addAttribute( "columnValue", columnValue );
+            model.addAttribute( "fromDashboard", 1 );
+        }
+
+        try {
+            UserSettings userSettings = (UserSettings) session
+                    .getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+            long entityId = (long) session.getAttribute(CommonConstants.ENTITY_ID_COLUMN);
+            String entityType = (String) session.getAttribute(CommonConstants.ENTITY_TYPE_COLUMN);
+            if (userSettings == null || entityType == null) {
+                throw new InvalidInputException("No user settings found in session");
+            }
+
+            // On auth error
+            String errorCode = request.getParameter("error");
+            if (errorCode != null) {
+                LOG.error("Error code : {}", errorCode);
+                model.addAttribute(CommonConstants.ERROR, CommonConstants.YES);
+                return JspResolver.SOCIAL_AUTH_MESSAGE;
+            }
+
+            // Getting Oauth accesstoken for facebook
+            String oauthCode = request.getParameter("code");
+            Facebook facebook = (Facebook) session.getAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
+            String profileLink = null;
+            facebook4j.auth.AccessToken accessToken = null;
+            List<FacebookPage> facebookPages = new ArrayList<>();
+            List<Account> accounts = new ArrayList<>();
+
+            accessToken = facebook.getOAuthAccessToken(oauthCode,
+                    requestUtils.getRequestServerName(request) + facebookRedirectUri);
+            facebook4j.User fbUser = facebook.getUser(facebook.getId());
+
+            // no need to show the user facebook personal account as cannot be connected instagram business profiles
+
+            //get all fb pages connected to instagram using pagination
+            ResponseList<Account> resultList;
+            Reading reading = new Reading().limit( 25 );
+            resultList = facebook.getAccounts( reading );
+            if(resultList != null){
+                accounts.addAll( resultList );
+            }
+
+            while ( resultList!= null && resultList.getPaging() != null && resultList.getPaging().getNext() != null ) {
+                resultList = facebook.fetchNext( resultList.getPaging() );
+                accounts.addAll( resultList );
+            }
+
+            Map<String, String> params = new HashMap<>();
+            params.put("fields", "connected_instagram_account{username}");
+
+            //convert Facebook account to SS entity
+            FacebookPage facebookPage = null;
+            RawAPIResponse response ;
+            for ( Account account : accounts ) {
+                //check if the page is connected to valid instagram account and add to facebookpages list
+                response = facebook.callGetAPI(account.getId(), params);
+                if(response.asJSONObject().getString("error") == null) {
+                    facebookPage = new FacebookPage();
+                    facebookPage.setId(account.getId());
+                    facebookPage.setName(account.getName());
+                    facebookPage.setAccessToken(account.getAccessToken());
+                    facebookPage.setCategory(account.getCategory());
+                    facebookPage.setProfileUrl(instagramUri.concat(response.asJSONObject().getString("connected_instagram_account.username")));
+                    facebookPages.add(facebookPage);
+                }
+            }
+
+            String fbAccessTokenStr = new Gson().toJson( accessToken, facebook4j.auth.AccessToken.class );
+            model.addAttribute( "pageNames", facebookPages );
+            model.addAttribute( "fbAccessToken", fbAccessTokenStr );
+        }
+        catch ( FacebookException e ) {
+            LOG.error( "Error while creating access token for facebook: " , e );
+        }
+        catch ( Exception e ) {
+            session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
+            LOG.error( "Exception while getting facebook access token. Reason : " , e );
+            return JspResolver.SOCIAL_AUTH_MESSAGE;
+        }
+
+        // Updating attributes
+        session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
+        model.addAttribute( CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES );
+        model.addAttribute( "socialNetwork", "facebook" );
+        LOG.info( "Facebook Access tokens obtained and added to mongo successfully!" );
+        return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;
+    }
 
     @ResponseBody
     @RequestMapping ( value = "/saveSelectedAccessFacebookToken")

@@ -1636,5 +1636,6 @@ public interface CommonConstants
     
     //social monitor constants
     public static final String PROFILE_TYPE = "profileType";
-    
+
+    public static final String CALLBACK = "callback";
 }

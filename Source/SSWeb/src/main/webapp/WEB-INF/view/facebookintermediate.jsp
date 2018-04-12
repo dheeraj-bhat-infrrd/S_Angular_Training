@@ -115,7 +115,7 @@ $(document).ready(function() {
 			'fbAccessToken' : fbAccessToken
 		};
 		$.ajax({
-			url : './saveSelectedAccessFacebookToken.do',
+			url : "${callback}",
 			type : "GET",
 			cache : false,
 			data : facebookToken,
