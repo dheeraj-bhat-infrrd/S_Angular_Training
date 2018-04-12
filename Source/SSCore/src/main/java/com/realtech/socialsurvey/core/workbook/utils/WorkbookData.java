@@ -54,12 +54,14 @@ import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionsMapping;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
 import com.realtech.socialsurvey.core.entities.SurveyResultsReportVO;
+import com.realtech.socialsurvey.core.entities.SurveyTransactionReport;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.vo.SurveyPreInitiationList;
+import com.realtech.socialsurvey.core.vo.SurveyTransactionReportVO;
 import com.realtech.socialsurvey.core.vo.UserList;
 
 
@@ -80,7 +82,13 @@ public class WorkbookData
     private static final String SURVEY_INVITATION_EMAIL_REPORT_HEADER = "Agent Name,Agent Email,Agent Branch,Agent Region,"
     		+ "Transactions Received for the Agent this month,Number of Emails sent for this agent this month,Number of emails delivered,"
     		+ "Number of email bounced,Number of emails dropped,Number of emails deferred,Number of emails opened,Number of Surveys Clicked";
-
+    
+	private static final String SURVEY_TRANSACTION_REPORT_HEADERS = "Name,User ID,Email ID,TRX_MONTH,NMLS,License ID,Company Name,"
+			+ "Region Name,Branch Name,Total number of reviews [Zillow + Social Survey],Total number of Zillow Reviews,"
+			+ "Total number of 3rd party reviews,Total number of verified customer reviews,Total number of unverified customer reviews,"
+			+ "Total number of Social Survey Reviews,Total number of Abusive Reviews,Total number of Retake Reviews,"
+			+ "Total number of Retake Completed,Transaction Received by Source,Transaction Sent,Transaction Unprocessable,"
+			+ "Transaction Clicked,Transaction Completed,Transaction Partially Completed,Transaction Unopened,Transaction Duplicates";
 
     @Autowired
     private OrganizationManagementService organizationManagementService;
@@ -1072,81 +1080,43 @@ public class WorkbookData
         
     }
     
-    public Map<Integer, List<Object>> getSurveyTransactionReportToBeWrittenInSheet( List<List<String>> surveyTransactionReport )
+    public Map<Integer, List<Object>> getSurveyTransactionReportToBeWrittenInSheet( List<SurveyTransactionReportVO> surveyTransactionReport )
     {
      // This data needs to be written (List<Object>)
-        Map<Integer, List<Object>>  surveyTransactionData = new TreeMap<>();
-        
-        Integer surveyTransactionCounter = 1;
-        
-        List<Object> surveyTransactionReportToPopulate = new ArrayList<>();
-                
-        for(List<String> row : surveyTransactionReport ){
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 0 ) ));
-            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 1 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 2 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 3 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 4 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 5 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 6 ) ));
-            surveyTransactionReportToPopulate.add(String.valueOf( row.get( 7 ) ));
-            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 8 ) ));
-            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 9 ) ));
-            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 10 ) ));
-            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 11 ) ));
-            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 12 ) ));
-            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 13 ) ));
-            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 14 ) ));
-            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 15 ) ));
-            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 16 ) ));
-            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 17 ) ));
-            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 18 ) ));
-            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 19 ) ));
-            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 20 ) ));
-            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 21 ) ));
-            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 22 ) ));
-            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 23 ) ));
-            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 24 ) ));
-            surveyTransactionReportToPopulate.add(Integer.valueOf( row.get( 25 ) ));
-
-
-            surveyTransactionData.put(++surveyTransactionCounter ,surveyTransactionReportToPopulate );
-            surveyTransactionReportToPopulate = new ArrayList<>();
-            
+        Map<Integer, List<Object>>  surveyTransactionData = writeReportHeader(SURVEY_TRANSACTION_REPORT_HEADERS); 
+        int surveyTransactionCounter = 2;
+        List<Object> surveyTransactionReportToPopulate;
+        for(SurveyTransactionReportVO row : surveyTransactionReport ){
+        	surveyTransactionReportToPopulate = new ArrayList<>();
+            surveyTransactionReportToPopulate.add(row.getUserName());
+            surveyTransactionReportToPopulate.add(row.getUserId());
+            surveyTransactionReportToPopulate.add(row.getEmailId());
+            surveyTransactionReportToPopulate.add( row.getYear()+"_"+row.getMonth());
+            surveyTransactionReportToPopulate.add(row.getNmls());
+            surveyTransactionReportToPopulate.add(row.getLicenseId());
+            surveyTransactionReportToPopulate.add(row.getCompanyName());
+            surveyTransactionReportToPopulate.add(row.getRegionName());
+            surveyTransactionReportToPopulate.add(row.getBranchName());
+            surveyTransactionReportToPopulate.add(row.getTotalReviews());
+            surveyTransactionReportToPopulate.add(row.getTotalZillowReviews());
+            surveyTransactionReportToPopulate.add(row.getTotal_3rdPartyReviews());
+            surveyTransactionReportToPopulate.add(row.getTotalVerifiedCustomerReviews());
+            surveyTransactionReportToPopulate.add(row.getTotalUnverifiedCustomerReviews());
+            surveyTransactionReportToPopulate.add(row.getTotalSocialSurveyReviews());
+            surveyTransactionReportToPopulate.add(row.getTotalAbusiveReviews());
+            surveyTransactionReportToPopulate.add(row.getTotalRetakeReviews());
+            surveyTransactionReportToPopulate.add(row.getTotalRetakeCompleted());
+            surveyTransactionReportToPopulate.add(row.getTransactionReceivedBySource());
+            surveyTransactionReportToPopulate.add(row.getTransactionSent());
+            surveyTransactionReportToPopulate.add(row.getTransactionUnprocessable());
+            surveyTransactionReportToPopulate.add(row.getTransactionClicked());
+            surveyTransactionReportToPopulate.add(row.getTransactionCompleted());
+            surveyTransactionReportToPopulate.add(row.getTransactionPartiallyCompleted());
+            surveyTransactionReportToPopulate.add(row.getTransactionUnopened());
+            surveyTransactionReportToPopulate.add(row.getTransactionDuplicates());
+            surveyTransactionData.put(surveyTransactionCounter++ ,surveyTransactionReportToPopulate );
         }
        
-        // Setting up user sheet headers
-        surveyTransactionReportToPopulate.add( "Name" );
-        surveyTransactionReportToPopulate.add( "User ID" );
-        surveyTransactionReportToPopulate.add( "TRX_MONTH" );
-        surveyTransactionReportToPopulate.add( "NMLS" );
-        surveyTransactionReportToPopulate.add( "License ID" );
-        surveyTransactionReportToPopulate.add( "Company Name" );
-        surveyTransactionReportToPopulate.add( "Region Name" );
-        surveyTransactionReportToPopulate.add( "Branch Name" );
-        surveyTransactionReportToPopulate.add( "Total number of reviews [Zillow + Social Survey]" );
-        surveyTransactionReportToPopulate.add( "Total number of Zillow Reviews" );
-        surveyTransactionReportToPopulate.add( "Total number of 3rd party reviews" );
-        surveyTransactionReportToPopulate.add( "Total number of verified customer reviews");
-        surveyTransactionReportToPopulate.add( "Total number of unverified customer reviews");
-        surveyTransactionReportToPopulate.add( "Total number of Social Survey Reviews");
-        surveyTransactionReportToPopulate.add( "Total number of Abusive Reviews");
-        surveyTransactionReportToPopulate.add( "Total number of Retake Reviews");
-        surveyTransactionReportToPopulate.add( "Total number of Retake Completed");
-        surveyTransactionReportToPopulate.add( "Transaction Received by Source");
-        surveyTransactionReportToPopulate.add( "Transaction Sent (0,1,2,7)");
-        surveyTransactionReportToPopulate.add( "Transaction Unprocessable (3,5,8,9,10)" );
-        surveyTransactionReportToPopulate.add( "Transaction Clicked [2,7]" );
-        surveyTransactionReportToPopulate.add( "Transaction Completed [7]" );
-        surveyTransactionReportToPopulate.add( "Transaction Partially Completed" );
-        surveyTransactionReportToPopulate.add( "Transaction Unopened [1]" );
-        surveyTransactionReportToPopulate.add( "Transaction Duplicates [5]" );
-        surveyTransactionReportToPopulate.add( "Transaction Mismatched [3]" );
-        surveyTransactionReportToPopulate.add( "Transaction Unassigned [10]" );
-
-
-        surveyTransactionData.put( 1, surveyTransactionReportToPopulate );
-        
         return surveyTransactionData;
         
     }

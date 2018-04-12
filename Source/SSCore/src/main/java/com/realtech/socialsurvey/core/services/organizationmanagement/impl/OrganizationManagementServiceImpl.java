@@ -2387,17 +2387,21 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         List<SolrDocument> solrDocumentList = solrSearchService.searchBranchRegionOrAgentByNameForAdmin(
             CommonConstants.REGION_NAME_SOLR, ClientUtils.escapeQueryChars( searchKey ) );
 
-        for ( SolrDocument document : solrDocumentList ) {
-            Region region = new Region();
-            region.setRegionId( Long.parseLong( document.get( CommonConstants.REGION_ID_SOLR ).toString() ) );
-            region.setRegionName( document.get( CommonConstants.REGION_NAME_SOLR ).toString() );
-            region.setRegion( document.get( CommonConstants.REGION_NAME_SOLR ).toString() );
-            if ( document.get( CommonConstants.ADDRESS1_SOLR ) != null )
-                region.setAddress1( document.get( CommonConstants.ADDRESS1_SOLR ).toString() );
-            if ( document.get( CommonConstants.ADDRESS2_SOLR ) != null )
-                region.setAddress2( document.get( CommonConstants.ADDRESS2_SOLR ).toString() );
-            regions.add( region );
-        }
+        	for ( SolrDocument document : solrDocumentList ) {
+        		try {
+        			Region region = new Region();
+                    region.setRegionId( Long.parseLong( document.get( CommonConstants.REGION_ID_SOLR ).toString() ) );
+                    region.setRegionName( document.get( CommonConstants.REGION_NAME_SOLR ).toString() );
+                    region.setRegion( document.get( CommonConstants.REGION_NAME_SOLR ).toString() );
+                    if ( document.get( CommonConstants.ADDRESS1_SOLR ) != null )
+                        region.setAddress1( document.get( CommonConstants.ADDRESS1_SOLR ).toString() );
+                    if ( document.get( CommonConstants.ADDRESS2_SOLR ) != null )
+                        region.setAddress2( document.get( CommonConstants.ADDRESS2_SOLR ).toString() );
+                    regions.add( region );
+        		} catch(NumberFormatException | NullPointerException e ) {
+                	LOG.error("Exception while setting the solr search result to object",e);
+                }
+            }
 
         return regions;
     }
@@ -2414,17 +2418,21 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         List<SolrDocument> solrDocumentList = solrSearchService.searchBranchRegionOrAgentByNameForAdmin(
             CommonConstants.BRANCH_NAME_SOLR, ClientUtils.escapeQueryChars( searchKey ) );
 
-        for ( SolrDocument document : solrDocumentList ) {
-            Branch branch = new Branch();
-            branch.setBranchId( Long.parseLong( document.get( CommonConstants.BRANCH_ID_SOLR ).toString() ) );
-            branch.setBranchName( document.get( CommonConstants.BRANCH_NAME_SOLR ).toString() );
-            branch.setBranch( document.get( CommonConstants.BRANCH_NAME_SOLR ).toString() );
-            if ( document.get( CommonConstants.ADDRESS1_SOLR ) != null )
-                branch.setAddress1( document.get( CommonConstants.ADDRESS1_SOLR ).toString() );
-            if ( document.get( CommonConstants.ADDRESS2_SOLR ) != null )
-                branch.setAddress2( document.get( CommonConstants.ADDRESS2_SOLR ).toString() );
-            branches.add( branch );
-        }
+        	for ( SolrDocument document : solrDocumentList ) {
+        		try {
+        			Branch branch = new Branch();
+                    branch.setBranchId( Long.parseLong( document.get( CommonConstants.BRANCH_ID_SOLR ).toString() ) );
+                    branch.setBranchName( document.get( CommonConstants.BRANCH_NAME_SOLR ).toString() );
+                    branch.setBranch( document.get( CommonConstants.BRANCH_NAME_SOLR ).toString() );
+                    if ( document.get( CommonConstants.ADDRESS1_SOLR ) != null )
+                        branch.setAddress1( document.get( CommonConstants.ADDRESS1_SOLR ).toString() );
+                    if ( document.get( CommonConstants.ADDRESS2_SOLR ) != null )
+                        branch.setAddress2( document.get( CommonConstants.ADDRESS2_SOLR ).toString() );
+                    branches.add( branch );
+        		} catch(NumberFormatException | NullPointerException e ) {
+                	LOG.error("Exception while setting the solr search result to object",e);
+                }
+            }
 
         return branches;
     }
@@ -2442,21 +2450,27 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         List<SolrDocument> solrDocumentList = solrSearchService.searchBranchRegionOrAgentByNameForAdmin(
             CommonConstants.USER_DISPLAY_NAME_SOLR, ClientUtils.escapeQueryChars( searchKey ) );
 
-        for ( SolrDocument document : solrDocumentList ) {
-            UserFromSearch user = new UserFromSearch();
-            user.setUserId( Long.parseLong( document.get( CommonConstants.USER_ID_SOLR ).toString() ) );
-            user.setEmailId( document.get( CommonConstants.USER_EMAIL_ID_SOLR ).toString() );
-            user.setDisplayName( document.get( CommonConstants.USER_DISPLAY_NAME_SOLR ).toString() );
-            user.setCompanyId( Long.parseLong( document.get( CommonConstants.COMPANY_ID_SOLR ).toString() ) );
-            user.setAgent( Boolean.parseBoolean( document.get( CommonConstants.IS_AGENT_SOLR ).toString() ) );
-            user.setStatus( Integer.parseInt( document.get( CommonConstants.STATUS_SOLR ).toString() ) );
-            user.setIsOwner( Integer.parseInt( document.get( CommonConstants.IS_OWNER_COLUMN ).toString() ) );
-            user.setBranchAdmin( Boolean.parseBoolean( document.get( CommonConstants.IS_BRANCH_ADMIN_SOLR ).toString() ) );
-            user.setRegionAdmin( Boolean.parseBoolean( document.get( CommonConstants.IS_REGION_ADMIN_SOLR ).toString() ) );
-            user.setRegions( (List<Long>) document.get( CommonConstants.REGIONS_SOLR ) );
-            user.setBranches( (List<Long>) document.get( CommonConstants.BRANCHES_SOLR ) );
-            users.add( user );
-        }
+		for (SolrDocument document : solrDocumentList) {
+			try {
+				UserFromSearch user = new UserFromSearch();
+				user.setUserId(Long.parseLong(document.get(CommonConstants.USER_ID_SOLR).toString()));
+				user.setEmailId(document.get(CommonConstants.USER_EMAIL_ID_SOLR).toString());
+				user.setDisplayName(document.get(CommonConstants.USER_DISPLAY_NAME_SOLR).toString());
+				user.setCompanyId(Long.parseLong(document.get(CommonConstants.COMPANY_ID_SOLR).toString()));
+				user.setAgent(Boolean.parseBoolean(document.get(CommonConstants.IS_AGENT_SOLR).toString()));
+				user.setStatus(Integer.parseInt(document.get(CommonConstants.STATUS_SOLR).toString()));
+				user.setIsOwner(Integer.parseInt(document.get(CommonConstants.IS_OWNER_COLUMN).toString()));
+				user.setBranchAdmin(
+						Boolean.parseBoolean(document.get(CommonConstants.IS_BRANCH_ADMIN_SOLR).toString()));
+				user.setRegionAdmin(
+						Boolean.parseBoolean(document.get(CommonConstants.IS_REGION_ADMIN_SOLR).toString()));
+				user.setRegions((List<Long>) document.get(CommonConstants.REGIONS_SOLR));
+				user.setBranches((List<Long>) document.get(CommonConstants.BRANCHES_SOLR));
+				users.add(user);
+			} catch (NumberFormatException | NullPointerException e) {
+				LOG.error("Exception while setting the solr search result to object", e);
+			}
+		}
 
         return users;
     }
