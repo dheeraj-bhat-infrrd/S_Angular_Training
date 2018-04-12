@@ -90,15 +90,6 @@ public class EmailProcessor implements Runnable
     public void run()
     {
         try {
-
-
-            emailServices.sendUserAdditionMail( new HashSet<String>( Arrays.asList( "yogananda@infrrd.ai" ) ), "yogananda",
-                "admin@infrrd.ai", userManagementService.getUserByUserId( 2 ), organizationManagementService.getAgentSettings( 2 ) );
-
-            emailServices.sendUserDeletionMail( new HashSet<String>( Arrays.asList( "yogananda@infrrd.ai" ) ), "yogananda",
-                "admin@infrrd.ai", userManagementService.getUserByUserId( 2 ), organizationManagementService.getAgentSettings( 2 ) );
-            
-            
             //update last run start time
             batchTrackerService.getLastRunEndTimeAndUpdateLastStartTimeByBatchType( CommonConstants.BATCH_TYPE_EMAIL_READER,
                 CommonConstants.BATCH_NAME_EMAIL_READER );
