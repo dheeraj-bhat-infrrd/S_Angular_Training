@@ -32,6 +32,8 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.reportingmanagement.DashboardGraphManagement;
 import com.realtech.socialsurvey.core.services.reportingmanagement.OverviewManagement;
 import com.realtech.socialsurvey.core.services.reportingmanagement.ReportingDashboardManagement;
+import com.realtech.socialsurvey.core.vo.SurveyTransactionReportVO;
+import com.realtech.socialsurvey.core.vo.SurveyInvitationEmailCountVO;
 import com.wordnik.swagger.annotations.ApiOperation;
 
 
@@ -211,14 +213,14 @@ public class ReportingController
 
     @RequestMapping ( value = "/getsurveytransactionreportforreporting", method = RequestMethod.GET)
     @ApiOperation ( value = "Fetch Survey Transaction Report For Reporting ")
-    public String getSurveyTransactionReport( Long entityId, String entityType, Timestamp startDate, Timestamp endDate )
+    public String getSurveyTransactionReport( Long entityId, String entityType, int month, int year )
 
     {
         LOGGER.info( "Fetch Survey Transaction Report For Reporting" );
 
         String json = null;
-        List<List<Object>> surveyTransactionList = reportingDashboardManagement.getSurveyTransactionReport( entityId,
-                entityType, startDate, endDate );
+        List<SurveyTransactionReportVO> surveyTransactionList = reportingDashboardManagement.getSurveyTransactionReport( entityId,
+                entityType, month, year );
         json = new Gson().toJson( surveyTransactionList );
         return json;
     }
@@ -838,7 +840,12 @@ public class ReportingController
     @ApiOperation(value = "Save the agent email counts data for month.")
     public ResponseEntity<Boolean> saveEmailCountMonthData(@RequestBody List<SurveyInvitationEmailCountMonth> agentEmailCountsMonth) {
     	LOGGER.info("API call to save agent email count data for month");
-    	boolean status = reportingDashboardManagement.saveEmailCountMonthData(agentEmailCountsMonth);
+    	boolean status = false;
+    	if(agentEmailCountsMonth != null && !agentEmailCountsMonth.isEmpty() && agentEmailCountsMonth.size() > 0) {
+    		status = reportingDashboardManagement.saveEmailCountMonthData(agentEmailCountsMonth);
+    	} else {
+    		LOGGER.info("No data found to save for invitation mail count month.");
+    	}
     	ResponseEntity<Boolean> responseEntity = null;
     	if(status) {
     		responseEntity = new ResponseEntity<Boolean>(status,HttpStatus.OK);
@@ -852,5 +859,20 @@ public class ReportingController
     public String getSurveyInvitationEmailReport(long companyId,int month,int year) {
     	LOGGER.info("API call to get survey invitation email report for month.");
     	return new Gson().toJson( reportingDashboardManagement.getSurveyInvitationEmailReportForMonth( companyId, month, year ) );
+    }
+    
+    @RequestMapping( value = "/surveyinvitationemailalltime", method = RequestMethod.GET)
+    @ApiOperation(value = "Get all time data for survey initation mail.")
+    public List<SurveyInvitationEmailCountMonth> getAllTimeDataForSurveyInvitationMail(int startIndex, int batchSize) {
+    	LOGGER.info("API call to get survey invitation email counts for all time data.");
+    	return reportingDashboardManagement.getAllTimeDataForSurveyInvitationMail( startIndex, batchSize );
+    }
+    
+    
+    @RequestMapping( value = "/surveyinvitationemail/month/year", method = RequestMethod.GET)
+    @ApiOperation(value = "Get data for survey initation mail for month and year.")
+    public List<SurveyInvitationEmailCountVO> getDataForEmailReport(int month, int year, long companyId) {
+    	LOGGER.info("API call to get survey invitation email counts for month and year value.{}-{}",month,year);
+    	return reportingDashboardManagement.getDataForSurveyInvitationMail(month,year,companyId ) ;
     }
 }

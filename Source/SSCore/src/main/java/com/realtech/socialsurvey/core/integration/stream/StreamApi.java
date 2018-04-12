@@ -24,5 +24,8 @@ public interface StreamApi
     
     @POST("/api/v1/stream/report")
     public Response generateEmailReport(@Body ReportRequest reportRequest);
+    
+    @POST("/api/v1/stream/batch")
+    public Response triggerBatch(@Body ReportRequest reportRequest);
 
 }

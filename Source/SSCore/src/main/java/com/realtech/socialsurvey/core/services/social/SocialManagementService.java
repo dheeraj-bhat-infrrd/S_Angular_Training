@@ -329,5 +329,6 @@ public interface SocialManagementService
 
 
     public boolean manualPostToLinkedInForEntity( String entityType, Long entityId, String surveyMongoId );
+
 }
 // JIRA SS-34 BY RM02 BOC

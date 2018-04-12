@@ -7878,7 +7878,7 @@ function showMasterQuestionPage() {
 		// Check character encoding
 		var isIsoEncoded = false;
 		try {
-			feedback = decodeURIComponent(escape(feedback));
+			feedback = decodeURIComponent(encodeURIComponent(feedback));
 		} catch (err) {
 			isIsoEncoded = true;
 		}
@@ -8082,6 +8082,7 @@ $('.sq-np-item-next').click(function() {
 	if (questionDetails.questionType == "sb-sel-mcq" && customerResponse != undefined) {
 			storeCustomerAnswer(customerResponse);
 		} else if (questionDetails.questionType == "sb-sel-desc") {
+			$('#sq-data').data('edited',true);
 			customerResponse = $("#text-area").val();
 			if (customerResponse == undefined) {
 				customerResponse = "";
@@ -8429,6 +8430,10 @@ $('#sq-sad-smile').click(function() {
 	isSmileTypeQuestion = true;
 	$(this).parent().find('.sq-smile-icn-container').addClass('opacity-red');
 	$(this).removeClass('opacity-red');
+});
+
+$(document).on('input','.sq-txt-area',function(){
+	$('#sq-data').data('edited',true);
 });
 
 /*

@@ -91,8 +91,8 @@ public class SurveyTransactionReportBranch
     @Column ( name = "transaction_clicked")
     private Long transactionClicked;
     
-    @Column ( name = "transaction_completed_")
-    private Long transactionCompleted_;
+    @Column ( name = "transaction_completed")
+    private Long transactionCompleted;
     
     @Column ( name = "transaction_partially_completed")
     private Long transactionPartiallyCompleted;
@@ -108,6 +108,9 @@ public class SurveyTransactionReportBranch
     
     @Column ( name = "transaction_unassigned")
     private Long transactionUnassigned;
+    
+    @Column (name = "email_id")
+    private String emailId;
 
     public String getSurveyTransactionReportBranchId()
     {
@@ -359,14 +362,14 @@ public class SurveyTransactionReportBranch
         this.transactionClicked = transactionClicked;
     }
 
-    public Long getTransactionCompleted_()
+    public Long getTransactionCompleted()
     {
-        return transactionCompleted_;
+        return transactionCompleted;
     }
 
-    public void setTransactionCompleted_( Long transactionCompleted_ )
+    public void setTransactionCompleted( Long transactionCompleted )
     {
-        this.transactionCompleted_ = transactionCompleted_;
+        this.transactionCompleted = transactionCompleted;
     }
 
     public Long getTransactionPartiallyCompleted()
@@ -424,25 +427,32 @@ public class SurveyTransactionReportBranch
         return serialVersionUID;
     }
 
-    @Override
-    public String toString()
-    {
-        return "SurveyTransactionReportBranch [surveyTransactionReportBranchId=" + surveyTransactionReportBranchId + ", month="
-            + month + ", year=" + year + ", userName=" + userName + ", userId=" + userId + ", nmls=" + nmls + ", licenseId="
-            + licenseId + ", companyName=" + companyName + ", companyId=" + companyId + ", regionName=" + regionName
-            + ", branchName=" + branchName + ", branchId=" + branchId + ", totalReviews=" + totalReviews
-            + ", totalZillowReviews=" + totalZillowReviews + ", total_3rdPartyReviews=" + total_3rdPartyReviews
-            + ", totalVerifiedCustomerReviews=" + totalVerifiedCustomerReviews + ", totalUnverifiedCustomerReviews="
-            + totalUnverifiedCustomerReviews + ", totalSocialSurveyReviews=" + totalSocialSurveyReviews
-            + ", totalAbusiveReviews=" + totalAbusiveReviews + ", totalRetakeReviews=" + totalRetakeReviews
-            + ", totalRetakeCompleted=" + totalRetakeCompleted + ", transactionReceivedBySource=" + transactionReceivedBySource
-            + ", transactionSent=" + transactionSent + ", transactionUnprocessable=" + transactionUnprocessable
-            + ", transactionClicked=" + transactionClicked + ", transactionCompleted_=" + transactionCompleted_
-            + ", transactionPartiallyCompleted=" + transactionPartiallyCompleted + ", transactionUnopened="
-            + transactionUnopened + ", transactionDuplicates=" + transactionDuplicates + ", transactionMismatched="
-            + transactionMismatched + ", transactionUnassigned=" + transactionUnassigned + "]";
-    }
-    
-    
+    public String getEmailId() {
+		return emailId;
+	}
+
+	public void setEmailId(String emailId) {
+		this.emailId = emailId;
+	}
+
+	@Override
+	public String toString() {
+		return "SurveyTransactionReportBranch [surveyTransactionReportBranchId=" + surveyTransactionReportBranchId
+				+ ", month=" + month + ", year=" + year + ", userName=" + userName + ", userId=" + userId + ", nmls="
+				+ nmls + ", licenseId=" + licenseId + ", companyName=" + companyName + ", companyId=" + companyId
+				+ ", regionName=" + regionName + ", branchName=" + branchName + ", branchId=" + branchId
+				+ ", totalReviews=" + totalReviews + ", totalZillowReviews=" + totalZillowReviews
+				+ ", total_3rdPartyReviews=" + total_3rdPartyReviews + ", totalVerifiedCustomerReviews="
+				+ totalVerifiedCustomerReviews + ", totalUnverifiedCustomerReviews=" + totalUnverifiedCustomerReviews
+				+ ", totalSocialSurveyReviews=" + totalSocialSurveyReviews + ", totalAbusiveReviews="
+				+ totalAbusiveReviews + ", totalRetakeReviews=" + totalRetakeReviews + ", totalRetakeCompleted="
+				+ totalRetakeCompleted + ", transactionReceivedBySource=" + transactionReceivedBySource
+				+ ", transactionSent=" + transactionSent + ", transactionUnprocessable=" + transactionUnprocessable
+				+ ", transactionClicked=" + transactionClicked + ", transactionCompleted=" + transactionCompleted
+				+ ", transactionPartiallyCompleted=" + transactionPartiallyCompleted + ", transactionUnopened="
+				+ transactionUnopened + ", transactionDuplicates=" + transactionDuplicates + ", transactionMismatched="
+				+ transactionMismatched + ", transactionUnassigned=" + transactionUnassigned + ", emailId=" + emailId
+				+ "]";
+	}
 
 }

@@ -28,6 +28,9 @@ public class KafkaProducerConfig
 
     @Value ( "${kafka.topic.reportTopic}" )
     private String reportTopic;
+    
+	@Value("${kafka.topic.batchTopic}" )
+    private String batchTopic;
 
     @Bean
     public ProducerFactory<String, String> producerFactory()
@@ -74,13 +77,24 @@ public class KafkaProducerConfig
     }
 
     /**
-     * Kafka template for capturing email report generation information
+     * Kafka template for capturing report generation information
      */
     @Bean(name = "reportTemplate")
     public KafkaTemplate<String, String> kafkaReportGenerationTemplate(){
         KafkaTemplate<String, String> kafkaTemplate = new KafkaTemplate<>( producerFactory() );
         kafkaTemplate.setMessageConverter( new StringJsonMessageConverter() );
         kafkaTemplate.setDefaultTopic(reportTopic);
+        return kafkaTemplate;
+    }
+    
+    /**
+     * Kafka template for capturing email report batch information
+     */
+    @Bean(name = "batchTemplate")
+    public KafkaTemplate<String, String> kafkaBatchProcessingTemplate(){
+        KafkaTemplate<String, String> kafkaTemplate = new KafkaTemplate<>( producerFactory() );
+        kafkaTemplate.setMessageConverter( new StringJsonMessageConverter() );
+        kafkaTemplate.setDefaultTopic(batchTopic);
         return kafkaTemplate;
     }
 }

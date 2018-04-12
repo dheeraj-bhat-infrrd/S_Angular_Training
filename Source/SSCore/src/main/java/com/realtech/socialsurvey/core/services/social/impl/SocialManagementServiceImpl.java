@@ -4114,8 +4114,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             return false;
         }
 
-    }
-    
+    }    
 
     @Override
     public void checkForLinkedInTokenExpiry( OrganizationUnitSettings settings )
