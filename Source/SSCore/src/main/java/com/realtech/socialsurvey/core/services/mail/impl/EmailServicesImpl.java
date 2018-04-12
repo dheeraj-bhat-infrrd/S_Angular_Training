@@ -10,9 +10,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +37,6 @@ import com.realtech.socialsurvey.core.entities.EmailEntity;
 import com.realtech.socialsurvey.core.entities.EmailObject;
 import com.realtech.socialsurvey.core.entities.FileContentReplacements;
 import com.realtech.socialsurvey.core.entities.ForwardMailDetails;
-import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.MonthlyDigestAggregate;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Plan;
@@ -1263,6 +1262,7 @@ public class EmailServicesImpl implements EmailServices
         LOG.debug( "Successfully sent account upgrade mail" );
     }
 
+
     @Async
     @Override
     public void sendSurveyRelatedMail( OrganizationUnitSettings companySettings, User user, String agentName,
@@ -1288,8 +1288,9 @@ public class EmailServicesImpl implements EmailServices
 
         LOG.trace( "Initiating URL Service to shorten the url {}", surveyLink );
         String shortSurveyLink = null;
-        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( customerEmailId, agentId, companyId, sentFromCompany, senderName );
-        
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( customerEmailId, agentId, companyId, sentFromCompany,
+            senderName );
+
         try {
             shortSurveyLink = urlService.shortenUrl( surveyLink, emailEntity.getRandomUUID() );
         } catch ( InvalidInputException e ) {
@@ -1395,6 +1396,7 @@ public class EmailServicesImpl implements EmailServices
         LOG.debug( "Successfully sent survey completion mail" );
     }
 
+
     /**
      * Sends the message from the contact us page as a mail to the respective
      * admin or agent
@@ -1455,8 +1457,9 @@ public class EmailServicesImpl implements EmailServices
 
     @Async
     @Override
-    public void sendSurveyRelatedMail( String recipientMailId, String subject, String mailBody, String emailId, String senderName,
-        long agentId, long companyId, String mailType, boolean sentFromCompany ) throws InvalidInputException, UndeliveredEmailException
+    public void sendSurveyRelatedMail( String recipientMailId, String subject, String mailBody, String emailId,
+        String senderName, long agentId, long companyId, String mailType, boolean sentFromCompany )
+        throws InvalidInputException, UndeliveredEmailException
     {
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
             LOG.warn( "Recipient email Id is empty or null for sending survey completion mail " );
@@ -1468,7 +1471,8 @@ public class EmailServicesImpl implements EmailServices
         }
 
         LOG.debug( "Sending survey reminder email to : {}", recipientMailId );
-        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId, agentId, companyId, sentFromCompany, senderName );
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId, agentId, companyId, sentFromCompany,
+            senderName );
         emailEntity.setCompanyId( companyId );
         emailEntity.setMailType( mailType );
 
@@ -1933,48 +1937,50 @@ public class EmailServicesImpl implements EmailServices
 
 
     // creating email entity with senders email id as U<userid>@socialsurvey.me
-    private EmailEntity prepareEmailEntityForSendingEmail( String recipientMailId, long userId, long companyId, boolean sentFromCompany, String senderName )
-        throws InvalidInputException
+    private EmailEntity prepareEmailEntityForSendingEmail( String recipientMailId, long userId, long companyId,
+        boolean sentFromCompany, String senderName ) throws InvalidInputException
     {
         LOG.debug( "Preparing email entity with recipent {} user id {} and name {}", recipientMailId, userId, senderName );
         String fromEmailId;
         EmailEntity emailEntity = new EmailEntity();
         OrganizationUnitSettings companySettings = null;
-         
+
         //set recipients
         List<String> recipients = new ArrayList<String>();
         recipients.add( recipientMailId );
         emailEntity.setRecipients( recipients );
-        
+
         //set sender name
         emailEntity.setSenderName( senderName );
 
         //set sender mail
-		if (sentFromCompany) {
-			companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
-					companyId, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
-			if (companySettings.getEncryptedId() == null) {
-				companySettings.setEncryptedId(userManagementService.generateUserEncryptedId(companyId));
-				organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(CommonConstants.ENCRYPTED_ID,
-						companySettings.getEncryptedId(), companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
-			}
-			fromEmailId =  "c-" + companySettings.getEncryptedId();
-		}else {
-        		AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById( userId );
+        if ( sentFromCompany ) {
+            companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId,
+                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+            if ( companySettings.getEncryptedId() == null ) {
+                companySettings.setEncryptedId( userManagementService.generateUserEncryptedId( companyId ) );
+                organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( CommonConstants.ENCRYPTED_ID,
+                    companySettings.getEncryptedId(), companySettings,
+                    MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+            }
+            fromEmailId = "c-" + companySettings.getEncryptedId();
+        } else {
+            AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById( userId );
             //JIRA SS-700 begin
             if ( agentSettings.getUserEncryptedId() == null ) {
                 agentSettings.setUserEncryptedId( userManagementService.generateUserEncryptedId( agentSettings.getIden() ) );
                 organizationUnitSettingsDao.updateParticularKeyAgentSettings( CommonConstants.USER_ENCRYPTED_ID,
                     agentSettings.getUserEncryptedId(), agentSettings );
             }
-            fromEmailId =  "u-" + agentSettings.getUserEncryptedId();
-            
+            fromEmailId = "u-" + agentSettings.getUserEncryptedId();
+
             //get company settings
-            companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( userDao.findById( User.class, userId ).getCompany().getCompanyId(),
-                    MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+            companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
+                userDao.findById( User.class, userId ).getCompany().getCompanyId(),
+                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
         }
-        
-        
+
+
         //set send email through
         String sendEmailThrough = companySettings.getSendEmailThrough();
         emailEntity.setSendEmailThrough( sendEmailThrough );
@@ -1989,9 +1995,9 @@ public class EmailServicesImpl implements EmailServices
             defaultEmailDomain = defaultSendGridUsEmailDomain;
         }
         //get full send email address
-        String fullFromEmailId = fromEmailId +  "@" + defaultEmailDomain;
-        emailEntity.setSenderEmailId(fullFromEmailId);
-        
+        String fullFromEmailId = fromEmailId + "@" + defaultEmailDomain;
+        emailEntity.setSenderEmailId( fullFromEmailId );
+
         emailEntity.setRecipientType( EmailEntity.RECIPIENT_TYPE_TO );
 
         LOG.trace( "Prepared email entity for sending mail" );
@@ -2122,12 +2128,13 @@ public class EmailServicesImpl implements EmailServices
             messageBodyReplacements, false, false );
         LOG.debug( "Successfully sent survey completion mail" );
     }
-    
-    @Async 
+
+
+    @Async
     @Override
-    public void sendAbusiveNotifyMail(String source,String recipientMailId, String customerName, String customerMailId, String agentName,String agentMailId,
-			String mood, String rating, String surveySourceId, String feedBack ,String surveyMarked )
-			throws InvalidInputException, UndeliveredEmailException
+    public void sendAbusiveNotifyMail( String source, String recipientMailId, String customerName, String customerMailId,
+        String agentName, String agentMailId, String mood, String rating, String surveySourceId, String feedBack,
+        String surveyMarked ) throws InvalidInputException, UndeliveredEmailException
     {
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
             LOG.warn( "Recipient email Id is empty or null for sending survey completion mail " );
@@ -2160,8 +2167,9 @@ public class EmailServicesImpl implements EmailServices
             EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_ABUSIVE_HANDLER_MAIL_BODY );
 
         //SS-1435: Send survey details too.
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, customerName, source, feedBack,
-        		rating,source, surveyMarked, agentName,agentMailId ,customerName,customerMailId,surveySourceId == null ? CommonConstants.NOT_AVAILABLE : surveySourceId) );
+        messageBodyReplacements.setReplacementArgs(
+            Arrays.asList( appLogoUrl, customerName, source, feedBack, rating, source, surveyMarked, agentName, agentMailId,
+                customerName, customerMailId, surveySourceId == null ? CommonConstants.NOT_AVAILABLE : surveySourceId ) );
 
         LOG.trace( "Calling email sender to send mail" );
         sendEmailWithBodyReplacements( emailEntity,
@@ -2870,6 +2878,92 @@ public class EmailServicesImpl implements EmailServices
             results ) );
 
         sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, true, false );
+    }
+
+    //@Async
+    @Override
+    public boolean sendUserAdditionMail( Set<String> recipients, String addedAdminName, String addedAdminEmailId,
+        User addedUser, OrganizationUnitSettings agentSettings ) throws InvalidInputException, UndeliveredEmailException
+    {
+        LOG.debug( "method sendUserAdditionMail() called" );
+
+        if ( recipients == null || recipients.isEmpty() ) {
+            LOG.warn( "No recipients for user addition mail specified" );
+            throw new InvalidInputException( "No recipients for user addition mail specified" );
+        } else if ( addedUser == null ) {
+            LOG.warn( "User details for added user not specified" );
+            throw new InvalidInputException( "User details for added user not specified" );
+        } else if ( agentSettings == null ) {
+            LOG.warn( "User settings for the added user not specified" );
+        }
+
+        if ( LOG.isTraceEnabled() ) {
+            LOG.trace( "sending user addition mail for user {}, to {}", addedUser, recipients );
+        }
+
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( new ArrayList<>( recipients ) );
+        emailEntity.setMailType( CommonConstants.EMAIL_TYPE_USER_ADDITION_MAIL );
+
+        FileContentReplacements messageSubjectReplacements = new FileContentReplacements();
+        messageSubjectReplacements
+            .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.USER_ADDITION_MAIL_SUBJECT );
+
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        messageBodyReplacements
+            .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.CUSTOM_MAIL_BODY );
+
+        messageBodyReplacements
+            .setReplacementArgs( Arrays.asList( appLogoUrl, CommonConstants.ADMIN_RECEPIENT_DISPLAY_NAME, emailFormatHelper
+                .buildAgentAdditionOrDeletionMessage( addedAdminName, addedAdminEmailId, addedUser, agentSettings, true ) ) );
+
+        sendEmailWithSubjectAndBodyReplacements( emailEntity, messageSubjectReplacements, messageBodyReplacements, false,
+            false );
+
+        LOG.debug( "method sendUserAdditionMail() finished" );
+        return true;
+    }
+
+    //@Async
+    @Override
+    public boolean sendUserDeletionMail( Set<String> recipients, String deletedAdminName, String deletedAdminEmailId,
+        User deletedUser, OrganizationUnitSettings agentSettings ) throws InvalidInputException, UndeliveredEmailException
+    {
+        LOG.debug( "method sendUserDeletionMail() called" );
+
+        if ( recipients == null || recipients.isEmpty() ) {
+            LOG.warn( "No recipients for user deletion mail specified" );
+            throw new InvalidInputException( "No recipients for user deletion mail specified" );
+        } else if ( deletedUser == null ) {
+            LOG.warn( "User details not specified for the user to be deleted" );
+            throw new InvalidInputException( "User details not specified for the user to be deleted" );
+        } else if ( agentSettings == null ) {
+            LOG.warn( "User settings not specified for the user to be deleted" );
+        }
+
+        if ( LOG.isTraceEnabled() ) {
+            LOG.trace( "sending user deletion mail for user {}, to {}", deletedUser, recipients );
+        }
+
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( new ArrayList<>( recipients ) );
+        emailEntity.setMailType( CommonConstants.EMAIL_TYPE_USER_DELETION_MAIL );
+
+        FileContentReplacements messageSubjectReplacements = new FileContentReplacements();
+        messageSubjectReplacements
+            .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.USER_DELETION_MAIL_SUBJECT );
+
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        messageBodyReplacements
+            .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.CUSTOM_MAIL_BODY );
+
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, CommonConstants.ADMIN_RECEPIENT_DISPLAY_NAME,
+            emailFormatHelper.buildAgentAdditionOrDeletionMessage( deletedAdminName, deletedAdminEmailId, deletedUser,
+                agentSettings, false ) ) );
+
+        sendEmailWithSubjectAndBodyReplacements( emailEntity, messageSubjectReplacements, messageBodyReplacements, false,
+            false );
+
+        LOG.debug( "method sendUserDeletionMail() finished" );
+        return true;
     }
 
 }

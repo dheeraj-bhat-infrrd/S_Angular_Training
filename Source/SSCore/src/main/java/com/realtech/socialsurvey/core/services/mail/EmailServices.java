@@ -1,7 +1,7 @@
 package com.realtech.socialsurvey.core.services.mail;
 
-import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.DigestRequestData;
@@ -488,5 +488,13 @@ public interface EmailServices
     public void sendAbusiveNotifyMail(String source,String recipientMailId, String customerName, String customerMailId, String agentName,String agentMailId,
 			String mood, String rating, String surveySourceId, String feedBack ,String surveyMarked )
 			throws InvalidInputException, UndeliveredEmailException;
+
+    
+    public boolean sendUserAdditionMail( Set<String> recipients, String addedAdminName, String addedAdminEmailId, User addedUser,
+        OrganizationUnitSettings agentSettings ) throws InvalidInputException, UndeliveredEmailException;
+
+
+    public boolean sendUserDeletionMail( Set<String> recipients, String deletedAdminName, String deletedAdminEmailId, User deletedUser,
+        OrganizationUnitSettings agentSettings ) throws InvalidInputException, UndeliveredEmailException;
 
 }

@@ -2133,7 +2133,7 @@ public class HierarchyManagementController
                                     false, true );
 
                                 userEntity = new UserFromSearch();
-                            } catch ( UserAlreadyExistsException | UndeliveredEmailException e ) {
+                            } catch ( UserAlreadyExistsException | UndeliveredEmailException | NoRecordsFetchedException e ) {
                                 LOG.debug( "Exception in validateAndParseIndividualDetails while inviting a new user. Reason:"
                                     + e.getMessage(), e );
                             }

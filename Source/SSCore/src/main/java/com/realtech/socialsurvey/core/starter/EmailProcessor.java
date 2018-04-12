@@ -6,7 +6,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +37,8 @@ import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.mail.EmailSender;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 
 
@@ -65,7 +69,7 @@ public class EmailProcessor implements Runnable
 
     @Autowired
     private EmailServices emailServices;
-    
+
     @Autowired
     private FileUploadService fileUploadService;
 
@@ -74,15 +78,30 @@ public class EmailProcessor implements Runnable
 
     @Autowired
     private BatchTrackerService batchTrackerService;
-
+    
+    
+    @Autowired
+    private OrganizationManagementService organizationManagementService;
+    
+    @Autowired
+    private UserManagementService userManagementService;    
 
     @Override
     public void run()
     {
         try {
+
+
+            emailServices.sendUserAdditionMail( new HashSet<String>( Arrays.asList( "yogananda@infrrd.ai" ) ), "yogananda",
+                "admin@infrrd.ai", userManagementService.getUserByUserId( 2 ), organizationManagementService.getAgentSettings( 2 ) );
+
+            emailServices.sendUserDeletionMail( new HashSet<String>( Arrays.asList( "yogananda@infrrd.ai" ) ), "yogananda",
+                "admin@infrrd.ai", userManagementService.getUserByUserId( 2 ), organizationManagementService.getAgentSettings( 2 ) );
+            
+            
             //update last run start time
-            batchTrackerService.getLastRunEndTimeAndUpdateLastStartTimeByBatchType(
-                CommonConstants.BATCH_TYPE_EMAIL_READER , CommonConstants.BATCH_NAME_EMAIL_READER );
+            batchTrackerService.getLastRunEndTimeAndUpdateLastStartTimeByBatchType( CommonConstants.BATCH_TYPE_EMAIL_READER,
+                CommonConstants.BATCH_NAME_EMAIL_READER );
             Map<EmailEntity, String> errorEmails = new HashMap<EmailEntity, String>();
             while ( true ) {
                 List<EmailObject> emailObjectList = emailDao.findAllEmailsToBeSent();
@@ -102,7 +121,7 @@ public class EmailProcessor implements Runnable
                             LOG.warn( " Email Sending Failed, Trying again " );
                             errorEmails.put( emailEntity, "unable to send email" );
                             // TODO: deleting error email for now. Should be set as a different status
-                            emailDao.deleteEmail(emailObject);
+                            emailDao.deleteEmail( emailObject );
                         } else {
                             LOG.debug( "Email Sent Successfully " );
                             LOG.debug( "Removing The Email From Database" + emailObject.getId() );
@@ -112,7 +131,7 @@ public class EmailProcessor implements Runnable
                         LOG.error( "Exception caught " + e.getMessage() );
                         errorEmails.put( emailEntity, e.getMessage() );
                         // TODO: deleting error email for now. Should be set as a different status
-                        emailDao.deleteEmail(emailObject);
+                        emailDao.deleteEmail( emailObject );
                     }
 
                 }
@@ -128,7 +147,7 @@ public class EmailProcessor implements Runnable
                     throw ex;
                 }
 
-              //Update last run end time in batch tracker table
+                //Update last run end time in batch tracker table
                 batchTrackerService.updateLastRunEndTimeByBatchType( CommonConstants.BATCH_TYPE_EMAIL_READER );
             }
 
@@ -197,16 +216,16 @@ public class EmailProcessor implements Runnable
                 excelCreated = false;
             }
         }
-        
-        
+
+
         boolean excelUploaded = false;
         if ( excelCreated ) {
             try {
                 filePath = fileUploadService.uploadOldReport( file, fileName );
-                
+
                 excelUploaded = true;
             } catch ( NonFatalException e ) {
-                LOG.error( "Exception caught while uploading old report", e);
+                LOG.error( "Exception caught while uploading old report", e );
             }
             LOG.debug( "fileUpload on s3 step is done for filename : {}", fileName );
         } else {
@@ -214,11 +233,11 @@ public class EmailProcessor implements Runnable
         }
 
         try {
-            if ( excelCreated && excelUploaded) {
+            if ( excelCreated && excelUploaded ) {
                 List<EmailAttachment> attachments = new ArrayList<EmailAttachment>();
-                attachments.add( new EmailAttachment("InvalidEmails.xls", filePath) );
-                
-                emailServices.sendInvalidEmailsNotificationMail( adminName, "", adminEmailId, attachments);
+                attachments.add( new EmailAttachment( "InvalidEmails.xls", filePath ) );
+
+                emailServices.sendInvalidEmailsNotificationMail( adminName, "", adminEmailId, attachments );
 
             }
         } catch ( InvalidInputException | UndeliveredEmailException e ) {

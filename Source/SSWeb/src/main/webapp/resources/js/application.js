@@ -15862,3 +15862,26 @@ function getSwearWords() {
 	 }
 	 });
 }
+
+
+
+
+$('body').on('blur', '#user-notification-recipients', function() {
+	
+	// format email IDs
+	var emails = $("#user-notification-recipients").val();
+	
+	if( emails == undefined ){
+		return;
+	}
+	
+	var payload = {
+		"emails" : emails
+	};
+	
+	callAjaxPostWithPayloadData("./updateadddeletenotifyrecipients.do", function(data) {
+		$('#overlay-toast').html(data);
+		showToast();
+	}, payload, true);
+	
+});
