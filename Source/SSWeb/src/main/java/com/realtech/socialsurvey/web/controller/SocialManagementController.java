@@ -3126,7 +3126,7 @@ public class SocialManagementController
     @RequestMapping ( value = "/postonlinkedin", method = RequestMethod.POST)
     public boolean postToLinkedIn( HttpServletRequest request )
     {
-        LOG.info( "Method to post feedback of customer to facebook started." );
+        LOG.info( "Method to post feedback of customer to linkedin started." );
         String entityType = request.getParameter( "entityType" );
         String surveyMongoId = request.getParameter( "surveyMongoId" );
         long entityId = Long.parseLong( request.getParameter( "entityId" ) );

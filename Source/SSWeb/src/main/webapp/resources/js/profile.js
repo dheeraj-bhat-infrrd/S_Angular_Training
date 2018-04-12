@@ -2094,6 +2094,7 @@ $('#prof-review-item').on('click', '.ppl-share-icns', function(e) {
 	
 	if(title == 'LinkedIn'){
 		$('#overlay-header').html("");
+		$('#overlay-header').css("z-index", "99999")
 		$('#overlay-text').html('<div style="text-align:left; display: grid;">The text of the post has been copied to clipboard. Please use the text to post in LinkedIn Page.</div>');
 		$('#overlay-continue').html("Ok");
 		$('#overlay-cancel').html("Cancel");
@@ -2184,6 +2185,10 @@ $('.sr-share-wrapper').on('click', '.ppl-share-icns', function(e) {
 
 		});
 		
+		$('#overlay-main').css('z-index',99999);
+		if(window.innerWidth < 768){
+			$('#overlay-main').css('top',70);
+		}
 		$('#overlay-main').show();
 		
 	}else{

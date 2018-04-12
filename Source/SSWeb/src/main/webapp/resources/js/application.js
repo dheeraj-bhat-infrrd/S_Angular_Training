@@ -1491,6 +1491,9 @@ function updateEventOnDashboardPageForReviews() {
 		var link = $(this).attr('data-link');
 		var title = $(this).attr('title');
 		var surveyMongoId  = $(this).closest('.ppl-review-item').attr('survey-mongo-id');
+		if (surveyMongoId == null){
+			surveyMongoId  = $(this).closest('.ppl-review-item-last').attr('survey-mongo-id');
+		}
 		var entityId = $('#rep-prof-container').data('column-value');
 		var entityType = $('#rep-prof-container').data('column-name');
 		
@@ -1557,7 +1560,6 @@ function linkedInShare(data,link,title){
 				overlayRevert();
 
 			});
-			
 			$('#overlay-main').show();
 			
 		}else{
