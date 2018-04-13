@@ -1003,7 +1003,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
 
         // Delete the user
         try {
-            userManagementService.deleteUserDataFromAllSources( adminUser, user.getUserId(), CommonConstants.STATUS_INACTIVE, false );
+            userManagementService.deleteUserDataFromAllSources( adminUser, user.getUserId(), CommonConstants.STATUS_INACTIVE, true );
 
         } catch ( Exception errorWhileDeletingUser ) {
             // process errors and return them to the user
