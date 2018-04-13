@@ -60,13 +60,14 @@ public interface UserManagementService
      * @param lastName
      * @param emailId
      * @param holdSendingMail
+     * @param isForHierarchyUpload TODO
      * @throws InvalidInputException
      * @throws UserAlreadyExistsException
      * @throws UndeliveredEmailException
      * @throws NoRecordsFetchedException 
      */
     public User inviteUserToRegister( User admin, String firstName, String lastName, String emailId, boolean holdSendingMail,
-        boolean sendMail ) throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException, NoRecordsFetchedException;
+        boolean sendMail, boolean isForHierarchyUpload ) throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException, NoRecordsFetchedException;
 
 
     /**
@@ -574,7 +575,7 @@ public interface UserManagementService
     void updateUserEmailMapping( User agent, long emailMappingId, int status ) throws InvalidInputException;
 
 
-    public void deleteUserDataFromAllSources( User loggedInUser, long userIdToBeDeleted, int status )
+    public void deleteUserDataFromAllSources( User loggedInUser, long userIdToBeDeleted, int status, boolean isForHierarchyUpload )
         throws InvalidInputException, SolrException;
 
 

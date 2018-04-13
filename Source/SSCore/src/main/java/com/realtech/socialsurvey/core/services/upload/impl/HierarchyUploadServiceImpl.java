@@ -595,7 +595,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
         //If sendMail = true, then you need to send the mail. So holdSendingMail should be false.
         try {
             uploadedUser = userManagementService.inviteUserToRegister( adminUser, user.getFirstName(), user.getLastName(),
-                user.getEmailId(), true, user.isSendMail() );
+                user.getEmailId(), true, user.isSendMail(), true );
 
             if ( uploadedUser == null ) {
                 throw new UserAdditionException( "Unable to add user with emailID : " + user.getEmailId() );
@@ -1003,7 +1003,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
 
         // Delete the user
         try {
-            userManagementService.deleteUserDataFromAllSources( adminUser, user.getUserId(), CommonConstants.STATUS_INACTIVE );
+            userManagementService.deleteUserDataFromAllSources( adminUser, user.getUserId(), CommonConstants.STATUS_INACTIVE, false );
 
         } catch ( Exception errorWhileDeletingUser ) {
             // process errors and return them to the user

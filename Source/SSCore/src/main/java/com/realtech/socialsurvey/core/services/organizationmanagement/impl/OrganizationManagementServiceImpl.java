@@ -2947,7 +2947,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                      */
                     try {
                         user = userManagementService.inviteUserToRegister( adminUser, firstName, lastName, emailId,
-                            holdSendingMail, sendMail );
+                            holdSendingMail, sendMail, false );
                     } catch ( UserAlreadyExistsException | UndeliveredEmailException | NoRecordsFetchedException e1 ) {
                         LOG.debug( "Exception in getUsersFromEmailIds while inviting a new user. Reason:" + e1.getMessage(),
                             e1 );
@@ -5412,7 +5412,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 for ( User user : company.getUsers() ) {
                     if ( CommonConstants.STATUS_INACTIVE != user.getStatus() ) {
                         userManagementService.deleteUserDataFromAllSources( loggedInUser, user.getUserId(),
-                            CommonConstants.STATUS_COMPANY_DELETED );
+                            CommonConstants.STATUS_COMPANY_DELETED, false );
 
                     }
                 }

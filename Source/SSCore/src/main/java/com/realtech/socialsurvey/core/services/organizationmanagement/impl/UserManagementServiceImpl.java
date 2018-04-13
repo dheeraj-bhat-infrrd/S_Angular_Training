@@ -568,7 +568,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Transactional
     @Override
     public User inviteUserToRegister( User admin, String firstName, String lastName, String emailId, boolean holdSendingMail,
-        boolean sendMail ) throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException, NoRecordsFetchedException
+        boolean sendMail, boolean isForHierarchyUpload ) throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException, NoRecordsFetchedException
     {
         if ( firstName == null || firstName.isEmpty() ) {
             throw new InvalidInputException( "First name is either null or empty in inviteUserToRegister()." );
@@ -594,7 +594,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         insertAgentSettings( user );
         
         // send user addition mail
-        organizationManagementService.sendUserAdditionMail( admin, user );
+        if( !isForHierarchyUpload  ) {
+            organizationManagementService.sendUserAdditionMail( admin, user );
+        }
 
         String profileName = getUserSettings( user.getUserId() ).getProfileName();
         if ( sendMail ) {
@@ -4259,20 +4261,22 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Override
     @Transactional
-    public void deleteUserDataFromAllSources( User loggedInUser, long userIdToBeDeleted, int status )
+    public void deleteUserDataFromAllSources( User loggedInUser, long userIdToBeDeleted, int status, boolean isForHierarchyUpload )
         throws InvalidInputException, SolrException
     {
         LOG.debug( "Method deleteUserDataFromAllSources called for userId:" + userIdToBeDeleted );
         
         //send user deletion mail
-        try {
-            organizationManagementService.sendUserDeletionMail( loggedInUser, getUserByUserId( userIdToBeDeleted ) );
-        } catch ( NoRecordsFetchedException error ) {
-            LOG.warn( "Unable to send user deletion mail" );
-            throw new InvalidInputException( "unable to send user deletion mail", error );
-        } catch( UndeliveredEmailException sendgridError ) {
-            LOG.warn( "Unable to send user deletion mail" );
-            // continue            
+        if( !isForHierarchyUpload ) {
+            try {
+                organizationManagementService.sendUserDeletionMail( loggedInUser, getUserByUserId( userIdToBeDeleted ) );
+            } catch ( NoRecordsFetchedException error ) {
+                LOG.warn( "Unable to send user deletion mail" );
+                throw new InvalidInputException( "unable to send user deletion mail", error );
+            } catch( UndeliveredEmailException sendgridError ) {
+                LOG.warn( "Unable to send user deletion mail" );
+                // continue            
+            }
         }
 
         // Removing user data from MySql DB & MongoDB.
