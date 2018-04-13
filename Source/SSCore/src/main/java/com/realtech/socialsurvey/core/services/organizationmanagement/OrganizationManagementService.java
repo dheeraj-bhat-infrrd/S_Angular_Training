@@ -50,6 +50,7 @@ import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionCancellationUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
@@ -1633,4 +1634,15 @@ public interface OrganizationManagementService
 
 
 	ContactDetailsSettings fetchContactDetailByEncryptedId(String encryptedId, String collection);
+
+    public boolean updateUserAdditionDeletionRecipients( String entityType, long entityId, Set<String> emails )
+        throws InvalidInputException, NoRecordsFetchedException;
+
+
+    public void sendUserAdditionMail( User adminUser, User user )
+        throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException;
+
+
+    public void sendUserDeletionMail( User adminUser, User user )
+        throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException;
 }

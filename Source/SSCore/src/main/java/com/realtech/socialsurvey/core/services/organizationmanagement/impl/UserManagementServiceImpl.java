@@ -563,11 +563,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     /**
      * Method to add a new user into a company. Admin sends the invite to user for registering.
+     * @throws NoRecordsFetchedException 
      */
     @Transactional
     @Override
     public User inviteUserToRegister( User admin, String firstName, String lastName, String emailId, boolean holdSendingMail,
-        boolean sendMail ) throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException
+        boolean sendMail, boolean isForHierarchyUpload ) throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException, NoRecordsFetchedException
     {
         if ( firstName == null || firstName.isEmpty() ) {
             throw new InvalidInputException( "First name is either null or empty in inviteUserToRegister()." );
@@ -591,6 +592,11 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         LOG.debug( "Inserting agent settings for the user:" + user );
         insertAgentSettings( user );
+        
+        // send user addition mail
+        if( !isForHierarchyUpload  ) {
+            organizationManagementService.sendUserAdditionMail( admin, user );
+        }
 
         String profileName = getUserSettings( user.getUserId() ).getProfileName();
         if ( sendMail ) {
@@ -3135,7 +3141,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Override
     @Transactional ( rollbackFor = { NonFatalException.class, FatalException.class })
     public User inviteUser( User admin, String firstName, String lastName, String emailId )
-        throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException, SolrException
+        throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException, SolrException, NoRecordsFetchedException
     {
         User user = inviteNewUser( admin, firstName, lastName, emailId );
         LOG.debug( "Adding user {} to solr server.", user.getFirstName() );
@@ -3153,6 +3159,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
             throw e;
         }
+        
+        // send user addition mail
+        organizationManagementService.sendUserAdditionMail( admin, user );
+        
         LOG.debug( "Added newly added user {} to solr", user.getFirstName() );
 
         return user;
@@ -3163,7 +3173,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Transactional ( rollbackFor = { NonFatalException.class, FatalException.class })
     public User addCorporateAdmin( String firstName, String lastName, String emailId, String confirmPassword,
         boolean isDirectRegistration )
-        throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException, SolrException
+        throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException, SolrException, NoRecordsFetchedException
     {
 
         User user = addCorporateAdminAndUpdateStage( firstName, lastName, emailId, confirmPassword, isDirectRegistration );
@@ -3171,6 +3181,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         LOG.debug( "Adding newly added user {} to mongo", user.getFirstName() );
         insertAgentSettings( user );
+        
+        // send user addition mail
+        organizationManagementService.sendUserAdditionMail( user, user );
+        
         LOG.debug( "Added newly added user {} to mongo", user.getFirstName() );
 
         LOG.debug( "Adding newly added user {} to solr", user.getFirstName() );
@@ -4247,10 +4261,23 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Override
     @Transactional
-    public void deleteUserDataFromAllSources( User loggedInUser, long userIdToBeDeleted, int status )
+    public void deleteUserDataFromAllSources( User loggedInUser, long userIdToBeDeleted, int status, boolean isForHierarchyUpload )
         throws InvalidInputException, SolrException
     {
         LOG.debug( "Method deleteUserDataFromAllSources called for userId:" + userIdToBeDeleted );
+        
+        //send user deletion mail
+        if( !isForHierarchyUpload ) {
+            try {
+                organizationManagementService.sendUserDeletionMail( loggedInUser, getUserByUserId( userIdToBeDeleted ) );
+            } catch ( NoRecordsFetchedException error ) {
+                LOG.warn( "Unable to send user deletion mail" );
+                throw new InvalidInputException( "unable to send user deletion mail", error );
+            } catch( UndeliveredEmailException sendgridError ) {
+                LOG.warn( "Unable to send user deletion mail" );
+                // continue            
+            }
+        }
 
         // Removing user data from MySql DB & MongoDB.
         this.removeExistingUser( loggedInUser, userIdToBeDeleted, status );
