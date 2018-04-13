@@ -14,6 +14,7 @@ public class SocialMediaTokens
     private RealtorToken realtorToken;
     private GoogleBusinessToken googleBusinessToken;
     private FacebookPixelToken facebookPixelToken;
+    private InstagramToken instagramToken;
 
     public GoogleBusinessToken getGoogleBusinessToken()
     {
@@ -146,13 +147,29 @@ public class SocialMediaTokens
         this.facebookPixelToken = facebookPixelToken;
     }
 
+    public InstagramToken getInstagramToken() {
+        return instagramToken;
+    }
+
+    public void setInstagramToken(InstagramToken instagramToken) {
+        this.instagramToken = instagramToken;
+    }
 
     @Override
-    public String toString()
-    {
-        return "SocialMediaTokens [facebookToken=" + facebookToken + ", twitterToken=" + twitterToken + ", linkdenInToken="
-            + linkedInToken + ", yelpToken=" + yelpToken + ", googleToken=" + googleToken + ", rssToken=" + rssToken
-            + ", zillowToken=" + zillowToken + ", lendingTreeToken=" + lendingTreeToken + ", googleBusinessToken="
-            + googleBusinessToken + "]";
+    public String toString() {
+        return "SocialMediaTokens{" +
+                "facebookToken=" + facebookToken +
+                ", googleToken=" + googleToken +
+                ", linkedInToken=" + linkedInToken +
+                ", rssToken=" + rssToken +
+                ", twitterToken=" + twitterToken +
+                ", yelpToken=" + yelpToken +
+                ", zillowToken=" + zillowToken +
+                ", lendingTreeToken=" + lendingTreeToken +
+                ", realtorToken=" + realtorToken +
+                ", googleBusinessToken=" + googleBusinessToken +
+                ", facebookPixelToken=" + facebookPixelToken +
+                ", instagramToken=" + instagramToken +
+                '}';
     }
 }

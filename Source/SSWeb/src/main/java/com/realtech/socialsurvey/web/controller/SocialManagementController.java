@@ -1,23 +1,45 @@
 package com.realtech.socialsurvey.web.controller;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.servlet.UnavailableException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.ExternalApiCallDetailsDao;
+import com.realtech.socialsurvey.core.dao.SocialPostDao;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.*;
+import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.enums.AccountType;
+import com.realtech.socialsurvey.core.enums.DisplayMessageType;
+import com.realtech.socialsurvey.core.enums.SettingsForApplication;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.integration.zillow.FetchZillowReviewBodyByNMLS;
+import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationAgentApi;
+import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationLenderApi;
+import com.realtech.socialsurvey.core.integration.zillow.ZillowIntergrationApiBuilder;
+import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
+import com.realtech.socialsurvey.core.services.generator.URLGenerator;
+import com.realtech.socialsurvey.core.services.mail.EmailServices;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.search.SolrSearchService;
+import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
+import com.realtech.socialsurvey.core.services.social.SocialAsyncService;
+import com.realtech.socialsurvey.core.services.social.SocialManagementService;
+import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
+import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
+import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
+import com.realtech.socialsurvey.core.utils.MessageUtils;
+import com.realtech.socialsurvey.web.common.ErrorResponse;
+import com.realtech.socialsurvey.web.common.JspResolver;
+import com.realtech.socialsurvey.web.common.TokenHandler;
+import com.realtech.socialsurvey.web.util.RequestUtils;
 import facebook4j.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
@@ -41,75 +63,18 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import retrofit.mime.TypedByteArray;
-import scala.util.parsing.combinator.testing.Str;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.dao.ExternalApiCallDetailsDao;
-import com.realtech.socialsurvey.core.dao.SocialPostDao;
-import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
-import com.realtech.socialsurvey.core.entities.AgentSettings;
-import com.realtech.socialsurvey.core.entities.Branch;
-import com.realtech.socialsurvey.core.entities.Company;
-import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
-import com.realtech.socialsurvey.core.entities.ExternalAPICallDetails;
-import com.realtech.socialsurvey.core.entities.FacebookPage;
-import com.realtech.socialsurvey.core.entities.GoogleToken;
-import com.realtech.socialsurvey.core.entities.LenderRef;
-import com.realtech.socialsurvey.core.entities.LinkedinUserProfileResponse;
-import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
-import com.realtech.socialsurvey.core.entities.ProfileStage;
-import com.realtech.socialsurvey.core.entities.Region;
-import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
-import com.realtech.socialsurvey.core.entities.SocialMonitorData;
-import com.realtech.socialsurvey.core.entities.SocialMonitorPost;
-import com.realtech.socialsurvey.core.entities.SocialPost;
-import com.realtech.socialsurvey.core.entities.SurveyDetails;
-import com.realtech.socialsurvey.core.entities.TwitterToken;
-import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.entities.UserSettings;
-import com.realtech.socialsurvey.core.entities.ZillowToken;
-import com.realtech.socialsurvey.core.enums.AccountType;
-import com.realtech.socialsurvey.core.enums.DisplayMessageType;
-import com.realtech.socialsurvey.core.enums.SettingsForApplication;
-import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
-import com.realtech.socialsurvey.core.exception.NonFatalException;
-import com.realtech.socialsurvey.core.integration.zillow.FetchZillowReviewBodyByNMLS;
-import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationAgentApi;
-import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationLenderApi;
-import com.realtech.socialsurvey.core.integration.zillow.ZillowIntergrationApiBuilder;
-import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
-import com.realtech.socialsurvey.core.services.generator.URLGenerator;
-import com.realtech.socialsurvey.core.services.mail.EmailServices;
-import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
-import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
-import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
-import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
-import com.realtech.socialsurvey.core.services.search.SolrSearchService;
-import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
-import com.realtech.socialsurvey.core.services.social.SocialAsyncService;
-import com.realtech.socialsurvey.core.services.social.SocialManagementService;
-import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
-import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
-import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
-import com.realtech.socialsurvey.core.utils.MessageUtils;
-import com.realtech.socialsurvey.web.common.ErrorResponse;
-import com.realtech.socialsurvey.web.common.JspResolver;
-import com.realtech.socialsurvey.web.common.TokenHandler;
-import com.realtech.socialsurvey.web.util.RequestUtils;
+import javax.servlet.UnavailableException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.*;
 
 
 /**
@@ -594,7 +559,7 @@ public class SocialManagementController
             List<Account> accounts = new ArrayList<>();
 
             accessToken = facebook.getOAuthAccessToken(oauthCode,
-                    requestUtils.getRequestServerName(request) + facebookRedirectUri);
+                    requestUtils.getRequestServerName(request) + instagramRedirectUri);
             facebook4j.User fbUser = facebook.getUser(facebook.getId());
 
             // no need to show the user facebook personal account as cannot be connected instagram business profiles
@@ -616,7 +581,7 @@ public class SocialManagementController
             params.put("fields", "connected_instagram_account{username}");
 
             //convert Facebook account to SS entity
-            FacebookPage facebookPage = null;
+            FacebookPage facebookPage ;
             RawAPIResponse response ;
             for ( Account account : accounts ) {
                 //check if the page is connected to valid instagram account and add to facebookpages list
@@ -648,8 +613,8 @@ public class SocialManagementController
         // Updating attributes
         session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
         model.addAttribute( CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES );
-        model.addAttribute( "socialNetwork", "facebook" );
-        LOG.info( "Facebook Access tokens obtained and added to mongo successfully!" );
+        model.addAttribute( "socialNetwork", "instagram" );
+        LOG.info( "Instagram authentication completed" );
         return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;
     }
 
@@ -816,6 +781,69 @@ public class SocialManagementController
         return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;
     }
 
+    @ResponseBody
+    @RequestMapping ( value = "/saveSelectedAccessTwitterToken")
+    public String saveSelectedAccessTwitterToken( Model model, HttpServletRequest request ){
+        LOG.info( " Trying to save selected twitteraccount " );
+        String selectedAccessToken = request.getParameter( "selectedAccessFacebookToken" );
+        String selectedProfileUrl = request.getParameter( "selectedProfileUrl" );
+        User user = sessionHelper.getCurrentUser();
+        HttpSession session = request.getSession( false );
+        AccountType accountType = (AccountType) session.getAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION );
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+
+        int accountMasterId = accountType.getValue();
+        if ( session.getAttribute( "columnName" ) != null ) {
+            String columnName = (String) session.getAttribute( "columnName" );
+            String columnValue = (String) session.getAttribute( "columnValue" );
+            session.removeAttribute( "columnName" );
+            session.removeAttribute( "columnValue" );
+            model.addAttribute( "columnName", columnName );
+            model.addAttribute( "columnValue", columnValue );
+            model.addAttribute( "fromDashboard", 1 );
+        }
+
+        if ( session.getAttribute( "isFixSocialMedia" ) != null ) {
+            model.addAttribute( "isFixSocialMedia", 1 );
+        }
+
+        boolean updated = false;
+        SocialMediaTokens mediaTokens = null;
+        String fbAccessTokenStr = request.getParameter( "fbAccessToken" );
+        if ( fbAccessTokenStr == null || fbAccessTokenStr.isEmpty() ) {
+            LOG.error( "Facebook access token is empty!" );
+        }
+
+        facebook4j.auth.AccessToken accessToken = new Gson().fromJson( fbAccessTokenStr, facebook4j.auth.AccessToken.class );
+
+        try {
+            //create the instagram token
+            InstagramToken instagramToken = new InstagramToken();
+            instagramToken.setAccessTokenToPost(selectedAccessToken);
+            instagramToken.setPageLink(selectedProfileUrl);
+            instagramToken.setAccessToken(selectedAccessToken);
+            instagramToken.setAccessTokenCreatedOn(System.currentTimeMillis());
+            instagramToken.setTokenExpiryAlertSent( false );
+            instagramToken.setTokenExpiryAlertEmail( null );
+            instagramToken.setTokenExpiryAlertTime( null );
+
+            if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                OrganizationUnitSettings companySettings = organizationManagementService
+                        .getCompanySettings(user.getCompany().getCompanyId());
+                if (companySettings == null) {
+                    throw new InvalidInputException("No company settings found in current session");
+                }
+
+
+            }
+        }
+        catch ( InvalidInputException | NoRecordsFetchedException e ) {
+            LOG.error( "Error while saving access token for facebook to post: ", e );
+        } catch ( NonFatalException e ) {
+            LOG.error( "Error setting settings value. Reason : ", e );
+        }
+    }
 
     /**
      * The url that twitter send request to with the oauth verification code
