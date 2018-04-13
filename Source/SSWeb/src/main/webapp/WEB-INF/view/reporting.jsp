@@ -183,7 +183,6 @@
 								<div id="review-desc" class="float-left dash-ppl-say-lbl" data-profile-name="${profileName}"></div>
 							</div>
 							<div id="review-details" class="ppl-review-item-wrapper">
-								
 							</div>
 						</div>
 					</div>

@@ -177,6 +177,30 @@
 </c:if>
 </head>
 <body>
+	<div id="overlay-main" class="overlay-main hide">
+		<div id="overlay-pop-up" class="overlay-disable-wrapper">
+			<div id="overlay-header" class="ol-header">
+				<!-- Populated by javascript -->
+			</div>
+			<div class="ol-content">
+				<div id="overlay-text" class="ol-txt">
+					<!-- Populated by javascript -->
+				</div>
+				<div class="clearfix">
+					<div class="float-left ol-btn-wrapper">
+						<div id="overlay-cancel" class="ol-btn cursor-pointer">
+							<!-- Populated by javascript -->
+						</div>
+					</div>
+					<div class="float-left ol-btn-wrapper">
+						<div id="overlay-continue" class="ol-btn cursor-pointer">
+							<!-- Populated by javascript -->
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 	<div id="toast-container" class="toast-container">
 		<span id="overlay-toast" class="overlay-toast"></span>
 	</div>

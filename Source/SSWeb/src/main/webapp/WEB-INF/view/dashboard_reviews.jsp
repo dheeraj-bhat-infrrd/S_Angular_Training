@@ -218,7 +218,8 @@
 					
 					<input type="hidden" id="twttxt_${loop.index}" class ="twitterText_loop" value ="<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${feedback.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } ${includeAgentName}at SocialSurvey - ${fn:escapeXml(feedback.review)}"/>
 					<span class="float-left ppl-share-icns icn-twit-rev" id ="twitt_${loop.index}" onclick="twitterDashboardFn(${loop.index},this);" data-link="https://twitter.com/intent/tweet?text=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${feedback.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } ${includeAgentName}at SocialSurvey - ${fn:escapeXml(feedback.review)}&url=${completeProfileUrl}/${feedback._id}"></span>
-					 <span
+					 	<input type="hidden" class="linkedInSummary" value="<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${feedback.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } ${includeAgentName}at SocialSurvey - ${fn:escapeXml(feedback.review)}" >
+					 	<span
 						class="float-left ppl-share-icns icn-lin-rev" title="LinkedIn"
 						data-link="https://www.linkedin.com/shareArticle?mini=true&url=${completeProfileUrl}/${feedback._id}&title=&summary=<fmt:formatNumber type="number" pattern="${ scoreformat }" value="${feedback.score}" maxFractionDigits="1" minFractionDigits="1" />-star response from ${ customerDisplayName } ${includeAgentName}at SocialSurvey - ${fn:escapeXml(feedback.review)}&reviewid=${feedback._id}&source="></span>
                        <span class="float-left" title="Google+">
