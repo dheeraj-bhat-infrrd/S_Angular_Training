@@ -92,6 +92,10 @@
 		<c:set value="${profileSettings.hobbies}" var="hobbies"></c:set>
 	</c:if>
 </c:if>
+<div id="rep-prof-container" data-profile-master-id="${profilemasterid}"
+			data-column-name="${columnName}" data-account-type="${accounttype}"
+			data-column-value="${columnValue}" class="hide dash-top-info dash-prof-wrapper pos-relative dash-size" >
+</div>
 <input id="gmb-data" data-companyName="${companyName}" data-city="${gmbCity}" data-state="${gmbState}" data-country="${gmbCountry}" data-profile-master-id="${profilemasterid}" type="hidden"/>
 <div id="gmb-map" style="height:1px; width:1px"></div>
 <div id="prof-message-header" class="hide"></div>

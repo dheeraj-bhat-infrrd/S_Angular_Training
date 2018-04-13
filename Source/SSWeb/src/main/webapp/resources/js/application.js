@@ -1490,11 +1490,88 @@ function updateEventOnDashboardPageForReviews() {
 	$('.ppl-share-icns').bind('click', function() {
 		var link = $(this).attr('data-link');
 		var title = $(this).attr('title');
-		if (link == undefined || link == "") {
-			return false;
+		var surveyMongoId  = $(this).closest('.ppl-review-item').attr('survey-mongo-id');
+		if (surveyMongoId == null){
+			surveyMongoId  = $(this).closest('.ppl-review-item-last').attr('survey-mongo-id');
 		}
-		window.open(link, 'Post to ' + title, 'width=800,height=600,scrollbars=yes');
+		var entityId = $('#rep-prof-container').data('column-value');
+		var entityType = $('#rep-prof-container').data('column-name');
+		
+		var copyText = $(this).parent().find('.linkedInSummary').val();
+		var $temp = $("<input>");
+	    $("body").append($temp);
+	    $temp.val(copyText).select();
+	    document.execCommand("copy");
+	    $temp.remove();
+		
+		
+		var payload = {
+			"surveyMongoId" :surveyMongoId,
+			"entityId" : entityId,
+			"entityType" : entityType
+		};
+		
+		if(title == 'LinkedIn'){
+			$.ajax({
+				url : "./postonlinkedin.do",
+				type : "POST",
+				data : payload,
+				success : function(data) {
+					var response = JSON.parse(data);
+					linkedInShare(response,link,title);
+				},
+				error : function(e) {
+					if (e.status == 504) {
+						redirectToLoginPageOnSessionTimeOut(e.status);
+						return;
+					}
+					$('#overlay-toast').html("Oops! Something went wrong. Please try again later.");
+				}
+			});
+		}else{
+			if (link == undefined || link == "") {
+				return false;
+			}
+			window.open(link, 'Post to ' + title, 'width=800,height=600,scrollbars=yes');
+		}		
 	});
+}
+
+function linkedInShare(data,link,title){
+	if(data == false || data == 'false'){
+		if(title == 'LinkedIn'){
+			$('#overlay-header').html("");
+			$('#overlay-text').html('<div style="text-align:left; display: grid;">The text of the post has been copied to clipboard. Please use the text to post in LinkedIn Page.</div>');
+			$('#overlay-continue').html("Ok");
+			$('#overlay-cancel').html("Cancel");
+			
+			$('#overlay-continue').off();
+			$('#overlay-continue').click(function() {
+				overlayRevert();
+				if (link == undefined || link == "") {
+					return false;
+				}
+				window.open(link, 'Post to ' + title, 'width=800,height=600,scrollbars=yes');
+			});
+			
+			$('#overlay-cancel').click(function() {
+				$('#overlay-continue').unbind('click');
+				$('#overlay-cancel').unbind('click');
+				overlayRevert();
+
+			});
+			$('#overlay-main').show();
+			
+		}else{
+			if (link == undefined || link == "") {
+				return false;
+			}
+			window.open(link, 'Post to ' + title, 'width=800,height=600,scrollbars=yes');
+		}
+	}else if(data == true || data == 'true'){
+		$('#overlay-toast').html('Successfully posted to LinkedIn.');
+		showToast();
+	}
 }
 
 function showSurveyStatisticsGraphically(columnName, columnValue) {
