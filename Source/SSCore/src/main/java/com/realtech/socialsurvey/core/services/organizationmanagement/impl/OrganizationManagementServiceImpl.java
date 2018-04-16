@@ -9151,4 +9151,62 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             adminUser.getEmailId(), user, getAgentSettings( user.getUserId() ) );
     }
     
+    
+    /**
+     * 
+     */
+    @Override
+    public boolean updateEncompassVersion( long companyId, String version ) throws InvalidInputException
+    {
+        if ( LOG.isDebugEnabled() ) {
+            LOG.debug( "method updateEncompassVersion() called" );
+        }
+        if ( companyId <= 0 ) {
+            LOG.warn( "company ID specified is invalid" );
+            throw new InvalidInputException( "company ID specified is invalid" );
+        } else if ( StringUtils.isEmpty( version ) ) {
+            LOG.warn( "encompass version specified is invalid" );
+            throw new InvalidInputException( "encompass version specified is invalid" );
+        }
+
+
+        OrganizationUnitSettings companySettings = getCompanySettings( companyId );
+
+        if ( companySettings == null ) {
+            LOG.warn( "company ID specified is does not exist" );
+            throw new InvalidInputException( "company ID specified is does not exist" );
+        } else if ( companySettings.getCrm_info() == null || !StringUtils.equals( companySettings.getCrm_info().getCrm_source(),
+            CommonConstants.CRM_INFO_SOURCE_ENCOMPASS ) ) {
+            LOG.warn( "company specified does not have encompass connection" );
+            throw new InvalidInputException( "company specified does not have encompass connection" );
+        }
+
+        boolean isVersionSupported = false;
+        for ( EncompassSdkVersion encompassVersion : encompassSdkVersionDao.findAll( EncompassSdkVersion.class ) ) {
+            if ( encompassVersion.getSdkVersion().trim().equals( version.trim() ) ) {
+                isVersionSupported = true;
+                break;
+            }
+        }
+
+        if ( !isVersionSupported ) {
+            LOG.warn( "The new encompass version specified is not supported" );
+            throw new InvalidInputException( "The new encompass version specified is not supported" );
+        }
+
+        if ( LOG.isTraceEnabled() ) {
+            LOG.trace( "updating encompass version for company with ID : {}, from {} to {}", companyId,
+                ( (EncompassCrmInfo) companySettings.getCrm_info() ).getVersion(), version );
+        }
+
+        EncompassCrmInfo encompassCrmInfo = (EncompassCrmInfo) companySettings.getCrm_info();
+        encompassCrmInfo.setVersion( version.trim() );
+
+        updateCRMDetails( companySettings, encompassCrmInfo, EncompassCrmInfo.class.getName() );
+
+        if ( LOG.isDebugEnabled() ) {
+            LOG.debug( "method updateEncompassVersion() finished" );
+        }
+        return false;
+    }
 }
