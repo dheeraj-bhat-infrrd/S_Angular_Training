@@ -22,6 +22,7 @@ kafka:
     emailEventsTopic: mail-events-topic
     reportTopic: report-topic
     socialMonitorTopic: social-monitor-topic
+    batchTopic: batch-topic
 
 ---
 
@@ -48,6 +49,7 @@ kafka:
     emailEventsTopic: mail-events-topic-dev
     reportTopic: report-topic-dev
     socialMonitorTopic: social-monitor-topic-dev
+    batchTopic: batch-topic-dev
 
 ---
 
@@ -72,6 +74,7 @@ kafka:
     emailEventsTopic: mail-events-topic-demo
     reportTopic: report-topic-demo
     socialMonitorTopic: social-monitor-topic-demo
+    batchTopic: batch-topic-demo
 
 ---
 
@@ -99,6 +102,7 @@ kafka:
     emailEventsTopic: mail-events-topic-stage
     reportTopic: report-topic-stage
     socialMonitorTopic: social-monitor-topic-stage
+    batchTopic: batch-topic-stage
 
 ---
 

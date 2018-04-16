@@ -63,6 +63,64 @@ function drawTimeFrames(){
 	$('#time-frame-options').append(monthJspStr);
 }
 
+function drawTransReportTimeFrames(){
+	var currentDate = new Date();
+	var currentMonth = currentDate.getMonth();
+	var currentYear = currentDate.getFullYear();
+	
+	var monthStr = new Array();
+	monthStr[0] = "Jan";
+	monthStr[1] = "Feb";
+	monthStr[2] = "Mar";
+	monthStr[3] = "Apr";
+	monthStr[4] = "May";
+	monthStr[5] = "Jun";
+	monthStr[6] = "Jul";
+	monthStr[7] = "Aug";
+	monthStr[8] = "Sep";
+	monthStr[9] = "Oct";
+	monthStr[10] = "Nov";
+	monthStr[11] = "Dec";
+	
+	var monthJspStr='';
+	var count=4;
+	var month;
+	var counter = 6;
+	
+	if(currentMonth > 1){
+		month = currentMonth - 2;
+		
+		while(month >= 0 && count-- > 0){
+			monthJspStr += '<option value="'+(counter++)+'" data-year="'+currentYear+'" data-month="' + (month+1) + '">' + monthStr[month] + ' ' + currentYear + '</option>' ;
+			month--;
+		}
+		
+		if(currentMonth == 2){
+			monthJspStr += '<option value="'+(counter++)+'" data-year="'+(currentYear-1)+'" data-month="12">' + monthStr[11] + ' ' + (currentYear-1) + '</option>' ;
+			monthJspStr += '<option value="'+(counter++)+'" data-year="'+(currentYear-1)+'" data-month="11">' + monthStr[10] + ' ' + (currentYear-1) + '</option>' ;
+			monthJspStr += '<option value="'+(counter)+'" data-year="'+(currentYear-1)+'" data-month="10">' + monthStr[9] + ' ' + (currentYear-1) + '</option>' ;
+		}else if(currentMonth == 3){
+			monthJspStr += '<option value="'+(counter++)+'" data-year="'+(currentYear-1)+'" data-month="12">' + monthStr[11] + ' ' + (currentYear-1) + '</option>' ;
+			monthJspStr += '<option value="'+(counter)+'" data-year="'+(currentYear-1)+'" data-month="11">' + monthStr[10] + ' ' + (currentYear-1) + '</option>' ;
+		}else if(currentMonth == 4){
+			monthJspStr += '<option value="'+(counter)+'" data-year="'+(currentYear-1)+'" data-month="12">' + monthStr[11] + ' ' + (currentYear-1) + '</option>' ;
+		}
+		
+	}else{
+		if(currentMonth == 1){
+			month=11;
+		}else{
+			month=10;
+		}
+			count=4;
+			while(count-- > 0){
+				monthJspStr += '<option value="'+(counter++)+'" data-year="'+(currentYear-1)+'" data-month="' + (month+1) + '">' + monthStr[month] + ' ' + (currentYear-1) + '</div>' ;
+				month--;
+			}
+	}
+	$('#trans-report-time-selector').append(monthJspStr);
+}
+
 function cssForSafari(){
 	if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1) {
 		is_safari = true;
@@ -618,8 +676,15 @@ function drawUnclickedDonutChart(overviewYearData){
      function drawChart() {
     	 	
     	 	unclickedDrawnCount++;
-    	 	
-    	 	if(unclickedDrawnCount==1 && !isUpdateTransStats){
+    	 	var switchable = $('#reporting-trans-details').attr('data-switch');
+    	 	var isSwitchable=true;
+    	 	if(switchable == 'true' || switchable == true){
+    	 		isSwitchable=true;
+    	 	}else{
+    	 		isSwitchable=false;
+    	 	}
+    	 		
+    	 	if(unclickedDrawnCount==1 && !isUpdateTransStats && isSwitchable){
 	        	var profilemasterid=$('#rep-prof-container').attr('data-profile-master-id');
 	 	    	if(profilemasterid == 4){
 	 	    		activaTab('leaderboard-tab');
@@ -697,6 +762,8 @@ function drawUnclickedDonutChart(overviewYearData){
 		        icnChart.draw(data, optionsChartIcn);
 		       
 		        isUpdateTransStats=false;
+		        
+		        var switchable = $('#reporting-trans-details').attr('data-switch',true);
 		        
 		        hideDashOverlay('#unclicked-graph-dash');
 	      }
@@ -1347,10 +1414,16 @@ $(document).on('change', '#generate-survey-reports', function() {
 	
 	var selectedVal = $('#generate-survey-reports').val();
 	var key = parseInt(selectedVal);
-	if(key == 101 || key == 102 || key == 103 || key == 106 || key == 110 || key == 112 || key == 200 || key == 1001 ){
+	if(key == 101 || key == 102 || key == 103 || key == 106 || key == 110 || key == 112 || key == 200 || key == 1001 || key==105){
 		$('#date-pickers').hide();
 	}else{
 		$('#date-pickers').show();
+	}
+	
+	if(key==105){
+		$('#trans-report-time-div').show();	
+	}else{
+		$('#trans-report-time-div').hide();	
 	}
 	
 	if(key == 106 || key == 112){
@@ -1523,6 +1596,52 @@ function getTimeFrameForEmailReport(){
 	return dateTimeFrame;
 }
 
+function getTimeFrameForTransReport(){
+	var currentDate = new Date();
+	var currentYear = currentDate.getFullYear();
+	var currentMonth = currentDate.getMonth()+1;
+	
+	var year;
+	var month;
+	
+	var dateTimeFrame = '';
+	
+	var timeFrameStr = $('#trans-report-time-selector').val();
+	timeFrame = parseInt(timeFrameStr);
+	
+	switch(timeFrame){
+	case 2: year = currentYear;
+		month = currentMonth;
+		dateTimeFrame = month+"/01/"+year;
+		break;
+	
+	case 3: year = currentYear;
+		month=currentMonth -1;
+		if(month<=0){
+			month=12;
+			year--;
+		}
+		dateTimeFrame = month+"/01/"+year;
+		break;
+	
+	case 4: year = currentYear;
+		dateTimeFrame = "01/01/"+year;
+		break;
+	
+	case 5: year = currentYear-1;
+		dateTimeFrame = "01/01/"+year;
+		break;
+	}
+	
+	if(timeFrame>5){
+		year = $('#trans-report-time-selector').find(':selected').data('year');
+		month = $('#trans-report-time-selector').find(':selected').data('month');
+		dateTimeFrame = month+"/01/"+year;
+	}
+		
+	return dateTimeFrame;
+}
+
 function getStartAndEndDateForNps(npsTimeFrame){
 	var currentDate = new Date;
 	var currentMonth = currentDate.getMonth()+1;
@@ -1600,7 +1719,19 @@ $(document).on('click', '#reports-generate-report-btn', function(e) {
 	if(key == 106){
 		startDate = getTimeFrameForUserRankingReport();
 		var timeFrameStr = $('#report-time-selector').val();
-
+		timeFrame = parseInt(timeFrameStr);
+				
+		switch(timeFrame){
+			case 1: key = 107;
+				break;
+			case 2: key = 106;
+				break;
+			case 3: key = 107;
+				break;
+			case 4: key = 106;
+				break;
+		}
+		
 	}
 	
 	if(key == 112){
@@ -1633,6 +1764,10 @@ $(document).on('click', '#reports-generate-report-btn', function(e) {
 	
 	if(key == 1001){
 		startDate = getTimeFrameForEmailReport();
+	}
+	
+	if(key==105){
+		startDate = getTimeFrameForTransReport();
 	}
 	
 	var success = false;
@@ -1713,23 +1848,36 @@ function drawRecentActivity(start,batchSize,tableHeader,recentActivityCount){
 	startIndex=start;
 	recentActivityList = getRecentActivityList(startIndex,batchSize);
 	var tableData=''; 
+	
+	var curDate = new Date();
+	var curYear = curDate.getFullYear();
+	
 	for(var i=0;i<recentActivityList.length;i++){
 		
 		var statusString = getStatusString(recentActivityList[i][6]);
 		var startDate = getDateFromDateTime(recentActivityList[i][2]);
 		var endDate =getDateFromDateTime(recentActivityList[i][3]);
 		var monthStartDate = getMonthFromDateTime(recentActivityList[i][2]);
+		var reportType = recentActivityList[i][9];
 		
 		tableData += "<tr id='recent-activity-row"+i+"' class=\"u-tbl-row user-row \">"
 			+"<td class=\"v-tbl-recent-activity fetch-name hide\">"+i+"</td>"
 			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold tbl-black-text\">"+recentActivityList[i][0]+"</td>"
 			+"<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-blue-text\">"+recentActivityList[i][1]+"</td>";
-			if(recentActivityList[i][1] == 'NPS Report for Week'){
+			
+			if(reportType == 107){
+				var yearOfReport = parseInt(startDate.split(",")[1]);
+				if(yearOfReport < curYear){
+					tableData += "<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-black-text \">Last Year</td>";
+				}else{
+					tableData += "<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-black-text \">This Year</td>";
+				}
+			}else if(recentActivityList[i][1] == 'NPS Report for Week'){
 				tableData += "<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-black-text \">"+findReportWeek(startDate)+"</td>";
 			} else if(recentActivityList[i][1] == 'Survey Invitation Email Report'){
 				tableData += '<td class="v-tbl-recent-activity fetch-email txt-bold tbl-black-text ">';
 				if(startDate==null && endDate==null){
-					tableData += "Last 30 days";
+					tableData += "All Time till date";
 				} else if(endDate==null){
 					tableData += "30 days starting "+startDate;
 				} else if(startDate==null){
@@ -1944,6 +2092,7 @@ function activaTab(tab){
 
 function updateReportingDashboard(){
 	
+	$('#reporting-trans-details').attr('data-switch',false);
 	var currentDate =  new Date();
 	var currentMonth = currentDate.getMonth()+1;
 	var currentYear = currentDate.getFullYear();
@@ -1953,61 +2102,12 @@ function updateReportingDashboard(){
 	var overviewYearData;
 	
 	if(monthYear.month == 14){
-		overviewYearData = getoverviewAllTimeData();
+		getoverviewAllTimeData();
 	}else if(monthYear.month == 13){
-    	overviewYearData =  getoverviewYearData(monthYear.year);
+    	getoverviewYearData(monthYear.year);
     }else{
-    	overviewYearData = getOverviewMonthData(monthYear.month, monthYear.year);
+    	getOverviewMonthData(monthYear.month, monthYear.year);
     }
-	
-	if(overviewYearData!=null && !isEmpty(overviewYearData)){
-		$('#processed-lbl-span').html(overviewYearData.Processed);
-		$('#completed-lbl-span').html(overviewYearData.Completed+' ('+overviewYearData.CompletePercentage+'%)');
-		$('#incomplete-lbl-span').html(overviewYearData.Incomplete+' ('+overviewYearData.IncompletePercentage+'%)');
-		$('#incomplete-lbl-span-sel').html(overviewYearData.Incomplete+' ('+overviewYearData.IncompletePercentage+'%)');
-		$('#social-posts-lbl-span').html(overviewYearData.SocialPosts);
-		$('#zillow-lbl-span').html(overviewYearData.ZillowReviews);
-		$('#third-party-lbl-span').html(overviewYearData.ThirdParty);
-		$('#unprocessed-lbl-span').html(overviewYearData.Unprocessed);
-		$('#unassigned-lbl-span').html(overviewYearData.Unassigned);
-		$('#duplicate-lbl-span').html(overviewYearData.Duplicate);
-		$('#unassigned-lbl-span-sel').html(overviewYearData.Unassigned);
-		$('#corrupted-lbl-span').html(overviewYearData.Corrupted);
-		var other = overviewYearData.Unprocessed - (overviewYearData.Unassigned + overviewYearData.Duplicate + overviewYearData.Corrupted);
-		$('#other-lbl-span').html(other);
-		$('#unclicked-trans-graph').removeClass('hide');
-		$('#processed-trans-graph').addClass('hide');
-		$('#unprocessed-trans-graph').addClass('hide');
-		$('#empty-rep-chart-div').addClass('hide');
-		
-		var avgRating = overviewYearData.Rating;
-		var reviewCount=  overviewYearData.TotalReview;
-		paintAvgRating(avgRating);
-		paintReviewCount(reviewCount);
-	}else{
-		$('#processed-lbl-span').html(0);
-		$('#completed-lbl-span').html(0+' ('+0+'%)');
-		$('#incomplete-lbl-span').html(0+' ('+0+'%)');
-		$('#incomplete-lbl-span-sel').html(0);
-		$('#social-posts-lbl-span').html(0);
-		$('#zillow-lbl-span').html(0);
-		$('#third-party-lbl-span').html(0);
-		$('#unprocessed-lbl-span').html(0);
-		$('#unassigned-lbl-span').html(0);
-		$('#duplicate-lbl-span').html(0);
-		$('#unassigned-lbl-span-sel').html(0);
-		$('#corrupted-lbl-span').html(0);
-		$('#other-lbl-span').html(0);
-		$('#unclicked-trans-graph').addClass('hide');
-		$('#processed-trans-graph').addClass('hide');
-		$('#unprocessed-trans-graph').addClass('hide');
-		$('#empty-rep-chart-div').removeClass('hide');
-		
-		var avgRating = 0;
-		var reviewCount=  0;
-		paintAvgRating(avgRating);
-		paintReviewCount(reviewCount);
-	}
 	
 	$('#processed-trans-div').css('opacity','1.0');
 	$('#unprocessed-trans-div').css('opacity','1.0');
@@ -2028,29 +2128,6 @@ function updateReportingDashboard(){
 	$('#duplicate-lbl-rect').hide();
 	$('#corrupted-lbl-rect').hide();
 	$('#other-lbl-rect').hide();
-	
-	if($('#donutchart').length > 0 ){
- 		drawUnclickedDonutChart(overviewYearData);
- 	}
- 	if($('#processedDonutchart').length > 0 ){
- 		drawProcessedDonutChart(overviewYearData);
- 	}
-	
- 	if($('#unprocessedDonutchart').length > 0 ){
- 		drawUnprocessedDonutChart(overviewYearData);
- 	}
-	$(window).resize();
-	
-	 setTimeout(function(){
-			hideDashOverlay('#trans-stats-dash');
-		}, 1000);
-	
-	if(overviewYearData==null){
-		$('#unclicked-trans-graph').addClass('hide');
-		$('#processed-trans-graph').addClass('hide');
-		$('#unprocessed-trans-graph').addClass('hide');
-	}
-	
 }
 
 function drawLeaderboardTableStructure(userRankingList,userId,profileMasterId){

@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -218,7 +219,11 @@ public class SurveyBuilderController {
 		questionDetails.setVerticalId(user.getCompany().getVerticalsMaster().getVerticalsMasterId());
 		String order = request.getParameter("order");
 		String questionType = request.getParameter("sb-question-type-" + order);
-		questionDetails.setQuestion(request.getParameter("sb-question-txt-" + order));
+		
+		String questionText = request.getParameter("sb-question-txt-" + order);
+		questionText = StringEscapeUtils.escapeHtml( questionText );
+		questionDetails.setQuestion(questionText);
+		
 		questionDetails.setQuestionType(questionType);
 		String[] answerArr = request.getParameterValues("sb-answers-" + order + "[]");
 		if(answerArr != null && answerArr.length > 0){

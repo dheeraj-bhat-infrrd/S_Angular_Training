@@ -338,4 +338,6 @@ public interface OrganizationUnitSettingsDao
      * @return
      */
     public long getSocialMediaTokensCount( String collectionName );
+
+	public ContactDetailsSettings fetchContactDetailByEncryptedId(String encryptedId, String collection);
 }

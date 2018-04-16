@@ -21,6 +21,7 @@ import com.realtech.socialsurvey.core.entities.CollectionDotloopProfileMapping;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyHiddenNotification;
 import com.realtech.socialsurvey.core.entities.CompanyView;
+import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.DisabledAccount;
 import com.realtech.socialsurvey.core.entities.EncompassSdkVersion;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
@@ -54,6 +55,7 @@ import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionCancellationUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
@@ -1679,4 +1681,18 @@ public interface OrganizationManagementService
      */
     public List<Keyword> addMultiplePhrasesToCompany( long companyId, MultiplePhrasesVO multiplePhrasesVO ) throws InvalidInputException;
 
+
+
+	ContactDetailsSettings fetchContactDetailByEncryptedId(String encryptedId, String collection);
+
+    public boolean updateUserAdditionDeletionRecipients( String entityType, long entityId, Set<String> emails )
+        throws InvalidInputException, NoRecordsFetchedException;
+
+
+    public void sendUserAdditionMail( User adminUser, User user )
+        throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException;
+
+
+    public void sendUserDeletionMail( User adminUser, User user )
+        throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException;
 }

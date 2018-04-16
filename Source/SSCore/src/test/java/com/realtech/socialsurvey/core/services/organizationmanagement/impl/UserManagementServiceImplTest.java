@@ -168,17 +168,17 @@ public class UserManagementServiceImplTest
 
     @Test ( expected = InvalidInputException.class)
     public void testinviteUserToRegisterForNullFirstName() throws InvalidInputException, SolrException,
-        UserAlreadyExistsException, UndeliveredEmailException
+        UserAlreadyExistsException, UndeliveredEmailException, NoRecordsFetchedException
     {
-        userManagementServiceImpl.inviteUserToRegister( new User(), null, "test", "test2", false, true );
+        userManagementServiceImpl.inviteUserToRegister( new User(), null, "test", "test2", false, true, false );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void testinviteUserToRegisterForNullEmail() throws InvalidInputException, SolrException, UserAlreadyExistsException,
-        UndeliveredEmailException
+        UndeliveredEmailException, NoRecordsFetchedException
     {
-        userManagementServiceImpl.inviteUserToRegister( new User(), "test", "test2", null, false, true );
+        userManagementServiceImpl.inviteUserToRegister( new User(), "test", "test2", null, false, true, false );
     }
 
 

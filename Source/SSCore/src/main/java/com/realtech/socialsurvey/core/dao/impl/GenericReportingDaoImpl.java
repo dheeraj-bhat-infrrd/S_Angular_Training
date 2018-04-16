@@ -206,8 +206,7 @@ public class GenericReportingDaoImpl<T, ID extends Serializable> implements Gene
         }
         return criteria.list();
     }
-
-
+    
     @Override
     @SuppressWarnings ( "unchecked")
     public List<T> findByColumn( Class<T> dataClass, String column, Object value )
@@ -395,11 +394,46 @@ public class GenericReportingDaoImpl<T, ID extends Serializable> implements Gene
 
     @Override
 	public void saveAll(List<T> entityList) {
-		// TODO Auto-generated method stub
 		for(T entity : entityList) {
 			save(entity);
 		}
 		
 	}
+
+	@Override
+	public void deleteAll(List<T> entityList) {
+		for(T entity : entityList) {
+			delete(entity);
+		}
+		
+	}
+
+	@Override
+	public void delete(T entity) {
+		try {
+            getSession().delete(entity);
+        } catch ( HibernateException hibernateException ) {
+            LOG.error( "HibernateException caught in delete().", hibernateException );
+            throw new DatabaseException( "HibernateException caught in delete().", hibernateException );
+        }
+	}
+	
+	@Override
+    @SuppressWarnings ( "unchecked")
+    public List<T> findByKeyValueInBatch(Class<T> dataClass, Map<String, Object> queries, int startIndex, int batchSize )
+    {
+        Criteria criteria = getSession().createCriteria( dataClass );
+        try {
+            for ( Entry<String, Object> query : queries.entrySet() ) {
+                criteria.add( Restrictions.eq( query.getKey(), query.getValue() ) );
+            }
+            criteria.setFirstResult(startIndex);
+            criteria.setFetchSize(batchSize);
+        } catch ( HibernateException hibernateException ) {
+            LOG.error( "HibernateException caught in findByKeyValue().", hibernateException );
+            throw new DatabaseException( "HibernateException caught in findByKeyValue().", hibernateException );
+        }
+        return criteria.list();
+    }
 
 }
