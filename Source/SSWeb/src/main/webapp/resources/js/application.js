@@ -1595,11 +1595,88 @@ function updateEventOnDashboardPageForReviews() {
 	$('.ppl-share-icns').bind('click', function() {
 		var link = $(this).attr('data-link');
 		var title = $(this).attr('title');
-		if (link == undefined || link == "") {
-			return false;
+		var surveyMongoId  = $(this).closest('.ppl-review-item').attr('survey-mongo-id');
+		if (surveyMongoId == null){
+			surveyMongoId  = $(this).closest('.ppl-review-item-last').attr('survey-mongo-id');
 		}
-		window.open(link, 'Post to ' + title, 'width=800,height=600,scrollbars=yes');
+		var entityId = $('#rep-prof-container').data('column-value');
+		var entityType = $('#rep-prof-container').data('column-name');
+		
+		var copyText = $(this).parent().find('.linkedInSummary').val();
+		var $temp = $("<input>");
+	    $("body").append($temp);
+	    $temp.val(copyText).select();
+	    document.execCommand("copy");
+	    $temp.remove();
+		
+		
+		var payload = {
+			"surveyMongoId" :surveyMongoId,
+			"entityId" : entityId,
+			"entityType" : entityType
+		};
+		
+		if(title == 'LinkedIn'){
+			$.ajax({
+				url : "./postonlinkedin.do",
+				type : "POST",
+				data : payload,
+				success : function(data) {
+					var response = JSON.parse(data);
+					linkedInShare(response,link,title);
+				},
+				error : function(e) {
+					if (e.status == 504) {
+						redirectToLoginPageOnSessionTimeOut(e.status);
+						return;
+					}
+					$('#overlay-toast').html("Oops! Something went wrong. Please try again later.");
+				}
+			});
+		}else{
+			if (link == undefined || link == "") {
+				return false;
+			}
+			window.open(link, 'Post to ' + title, 'width=800,height=600,scrollbars=yes');
+		}		
 	});
+}
+
+function linkedInShare(data,link,title){
+	if(data == false || data == 'false'){
+		if(title == 'LinkedIn'){
+			$('#overlay-header').html("");
+			$('#overlay-text').html('<div style="text-align:left; display: grid;">The text of the post has been copied to clipboard. Please use the text to post in LinkedIn Page.</div>');
+			$('#overlay-continue').html("Ok");
+			$('#overlay-cancel').html("Cancel");
+			
+			$('#overlay-continue').off();
+			$('#overlay-continue').click(function() {
+				overlayRevert();
+				if (link == undefined || link == "") {
+					return false;
+				}
+				window.open(link, 'Post to ' + title, 'width=800,height=600,scrollbars=yes');
+			});
+			
+			$('#overlay-cancel').click(function() {
+				$('#overlay-continue').unbind('click');
+				$('#overlay-cancel').unbind('click');
+				overlayRevert();
+
+			});
+			$('#overlay-main').show();
+			
+		}else{
+			if (link == undefined || link == "") {
+				return false;
+			}
+			window.open(link, 'Post to ' + title, 'width=800,height=600,scrollbars=yes');
+		}
+	}else if(data == true || data == 'true'){
+		$('#overlay-toast').html('Successfully posted to LinkedIn.');
+		showToast();
+	}
 }
 
 function showSurveyStatisticsGraphically(columnName, columnValue) {
@@ -7475,6 +7552,7 @@ function paintSurveyPage(jsonData) {
  */
 function paintSurveyPageFromJson() {
 	$("div[data-ques-type]").hide();
+	$('#sq-data').data('edited',false);
 	if (qno == -1 && editable == false) {
 		$("div[data-ques-type]").hide();
 		$("div[data-ques-type='error']").show();
@@ -7673,6 +7751,10 @@ function retakeSurveyRequest() {
  * This method is used to store the answer provided by the customer for a specific question.
  */
 function storeCustomerAnswer(customerResponse) {
+	
+	 if(!$('#sq-data').data('edited')){
+		 return;
+	 }
 	var success = false;
 	//encode question and response
 	var encodedCustomerResponse = window.btoa( unescape( encodeURIComponent( customerResponse ) ) );
@@ -7838,6 +7920,7 @@ function bindMcqCheckButton() {
 	});
 
 	$('.st-mcq-chk-off').click(function() {
+		$('#sq-data').data('edited',true)
 		customerResponse = $(this).parent().parent().attr('data-answer');
 		$('.sq-mcq-wrapper').find('.st-mcq-chk-on').hide();
 		$('.sq-mcq-wrapper').find('.st-mcq-chk-off').show();
@@ -7898,7 +7981,7 @@ function showMasterQuestionPage() {
 		// Check character encoding
 		var isIsoEncoded = false;
 		try {
-			feedback = decodeURIComponent(escape(feedback));
+			feedback = decodeURIComponent(encodeURIComponent(feedback));
 		} catch (err) {
 			isIsoEncoded = true;
 		}
@@ -8057,6 +8140,7 @@ function clearForm() {
 
 // Code to be executed on click of stars of rating question.
 $('.sq-star').click(function() {
+	$('#sq-data').data('edited' , true);
 	$(this).parent().find('.sq-star').removeClass('sq-full-star');
 	$(this).parent().find('.sq-star').removeClass('sq-full-star-click');
 	var starVal = $(this).attr('star-no');
@@ -8099,80 +8183,82 @@ $('.sq-star').hover(function() {
 $('.sq-np-item-next').click(function() {
 
 	if (questionDetails.questionType == "sb-sel-mcq" && customerResponse != undefined) {
-		storeCustomerAnswer(customerResponse);
-	} else if (questionDetails.questionType == "sb-sel-desc") {
-		customerResponse = $("#text-area").val();
-		if (customerResponse == undefined) {
-			customerResponse = "";
-		}
-		storeCustomerAnswer(customerResponse);
-	} else if (questionDetails.questionType == "sb-range-star") {
-		reduceOpacityOfStars();
-		if ($('#next-star').hasClass("btn-com-disabled")) {
-			$('#overlay-toast').html('Please answer the question. You can not skip a rating question.');
-			showToast();
+			storeCustomerAnswer(customerResponse);
+		} else if (questionDetails.questionType == "sb-sel-desc") {
+			$('#sq-data').data('edited',true);
+			customerResponse = $("#text-area").val();
+			if (customerResponse == undefined) {
+				customerResponse = "";
+			}
+			storeCustomerAnswer(customerResponse);
+		} else if (questionDetails.questionType == "sb-range-star") {
+			reduceOpacityOfStars();
+			if ($('#next-star').hasClass("btn-com-disabled")) {
+				$('#overlay-toast').html('Please answer the question. You can not skip a rating question.');
+				showToast();
+				return;
+			}
+			var starVal = $('#sq-stars').attr('selected-star-no');
+			storeCustomerAnswer(starVal);
+		} else if (questionDetails.questionType == "sb-range-smiles") {
+			reduceOpacityOfSmiles();
+			if ($('#next-smile').hasClass("btn-com-disabled")) {
+				$('#overlay-toast').html('Please answer the question. You can not skip a rating question.');
+				showToast();
+				return;
+			}
+			var smileVal = $('#sq-smiles').attr('selected-smiles-no');
+			storeCustomerAnswer(smileVal);
+		} else if (questionDetails.questionType == "sb-range-scale") {
+			if ($('#next-scale').hasClass("btn-com-disabled")) {
+				$('#overlay-toast').html('Please answer the question. You can not skip a rating question.');
+				showToast();
+				return;
+			}
+		} else if (questionDetails.questionType == "sb-master") {
+			if ($('#next-textarea-smiley').hasClass("btn-com-disabled")) {
+				$('#overlay-toast').html('Please answer this question.');
+				showToast();
+			} else {
+				showMasterQuestionPage();
+			}
 			return;
-		}
-		var starVal = $('#sq-stars').attr('selected-star-no');
-		storeCustomerAnswer(starVal);
-	} else if (questionDetails.questionType == "sb-range-smiles") {
-		reduceOpacityOfSmiles();
-		if ($('#next-smile').hasClass("btn-com-disabled")) {
-			$('#overlay-toast').html('Please answer the question. You can not skip a rating question.');
-			showToast();
-			return;
-		}
-		var smileVal = $('#sq-smiles').attr('selected-smiles-no');
-		storeCustomerAnswer(smileVal);
-	} else if (questionDetails.questionType == "sb-range-scale") {
-		if ($('#next-scale').hasClass("btn-com-disabled")) {
-			$('#overlay-toast').html('Please answer the question. You can not skip a rating question.');
-			showToast();
-			return;
-		}
-	} else if (questionDetails.questionType == "sb-master") {
-		if ($('#next-textarea-smiley').hasClass("btn-com-disabled")) {
-			$('#overlay-toast').html('Please answer this question.');
-			showToast();
-		} else {
-			showMasterQuestionPage();
-		}
-		return;
-	} else if (questionDetails.questionType == "sb-range-0to10"){
-		if ($('#next-radio').hasClass("btn-com-disabled") && questionDetails.isNPSQuestion == 0) {
-			$('#overlay-toast').html('Please answer the question. You can not skip a rating question.');
-			showToast();
-			return;
-		}else if ($('#next-radio-nps').hasClass("btn-com-disabled") && questionDetails.isNPSQuestion == 1){
-			$('#overlay-toast').html('Please answer the question. You can not skip a rating question.');
-			showToast();
-			return;
-		}
+		} else if (questionDetails.questionType == "sb-range-0to10"){
+			if ($('#next-radio').hasClass("btn-com-disabled") && questionDetails.isNPSQuestion == 0) {
+				$('#overlay-toast').html('Please answer the question. You can not skip a rating question.');
+				showToast();
+				return;
+			}else if ($('#next-radio-nps').hasClass("btn-com-disabled") && questionDetails.isNPSQuestion == 1){
+				$('#overlay-toast').html('Please answer the question. You can not skip a rating question.');
+				showToast();
+				return;
+			}
+			
+			var ratingVal = 0;
+			if(questionDetails.isNPSQuestion==0){
+				ratingVal = parseInt($('#sq-radio-1to10').attr('selected-rating-radio'));
+			}else{
+				ratingVal = parseInt($('#sq-radio-1to10-nps').attr('selected-rating-radio'));
+			}
+			
+			storeCustomerAnswer(ratingVal);
+		} 
 		
-		var ratingVal = 0;
-		if(questionDetails.isNPSQuestion==0){
-			ratingVal = parseInt($('#sq-radio-1to10').attr('selected-rating-radio'));
-		}else{
-			ratingVal = parseInt($('#sq-radio-1to10-nps').attr('selected-rating-radio'));
-		}
-		
-		storeCustomerAnswer(ratingVal);
-	} 
-	
-	$(".sq-star").removeClass('sq-full-star');
-	$(".sq-smile").removeClass('sq-full-smile');
-	$('.sq-radio').each(function() {
-	    $(this).removeClass('radio-outer');
-	    $(this).children().hide();
-	    if(questionDetails.isNPSQuestion==0){
-	    	$(this).addClass('radio-outer-gray');
-	    	$(this).css("cursor","pointer");
-	    }else{
-	    	$(this).parent().find('.popover').hide();
-	    	$(this).css("cursor","pointer");
-	    	$('#nps-range-text').css('opacity',1);
-	    }
-	});
+		$(".sq-star").removeClass('sq-full-star');
+		$(".sq-smile").removeClass('sq-full-smile');
+		$('.sq-radio').each(function() {
+		    $(this).removeClass('radio-outer');
+		    $(this).children().hide();
+		    if(questionDetails.isNPSQuestion==0){
+		    	$(this).addClass('radio-outer-gray');
+		    	$(this).css("cursor","pointer");
+		    }else{
+		    	$(this).parent().find('.popover').hide();
+		    	$(this).css("cursor","pointer");
+		    	$('#nps-range-text').css('opacity',1);
+		    }	
+		});
+
 	qno++;
 	paintSurveyPageFromJson();
 
@@ -8256,7 +8342,6 @@ $('.sq-np-item-next').click(function() {
 			$('#veryLikelyDivNps').html(questionDetails.veryLikely);
 		}	
 	}
-
 });
 
 // Code to be executed on click of previous for star and smile questions.
@@ -8348,6 +8433,7 @@ $('.sq-np-item-prev').click(function() {
 });
 
 $('.sq-radio').click(function(){
+	$('#sq-data').data('edited',true);
 	$('.sq-radio').each(function() {
 	    $(this).removeClass('radio-outer-gray');
 	    $(this).children().hide();
@@ -8380,6 +8466,7 @@ $('.sq-radio').click(function(){
 
 /* Click event on grey smile. */
 $('.sq-smile').click(function() {
+	$('#sq-data').data('edited' , true);
 	$(this).parent().find('.sq-smile').removeClass('sq-full-smile');
 	$(this).parent().find('.sq-smile').removeClass('sq-full-smile-click');
 	var smileVal = $(this).attr('smile-no');
@@ -8421,6 +8508,7 @@ $('.sq-smile').hover(function() {
 
 $('#sq-happy-smile').click(function() {
 	// Update customer's mood in db and ask for cutomer's kind words.
+	$('#sq-data').data('edited',true)
 	mood = "Great";
 	$('#next-textarea-smiley').removeClass("btn-com-disabled");
 	isSmileTypeQuestion = true;
@@ -8430,6 +8518,7 @@ $('#sq-happy-smile').click(function() {
 $('#sq-neutral-smile').click(function() {
 	// Update customer's mood in db and ask for feedback that could have made
 	// him happy.
+	$('#sq-data').data('edited',true)
 	mood = "OK";
 	$('#next-textarea-smiley').removeClass("btn-com-disabled");
 	isSmileTypeQuestion = true;
@@ -8439,11 +8528,16 @@ $('#sq-neutral-smile').click(function() {
 $('#sq-sad-smile').click(function() {
 	// Update customer's mood in db and ask what went wrong during the entire
 	// course.
+	$('#sq-data').data('edited',true)
 	mood = "Unpleasant";
 	$('#next-textarea-smiley').removeClass("btn-com-disabled");
 	isSmileTypeQuestion = true;
 	$(this).parent().find('.sq-smile-icn-container').addClass('opacity-red');
 	$(this).removeClass('opacity-red');
+});
+
+$(document).on('input','.sq-txt-area',function(){
+	$('#sq-data').data('edited',true);
 });
 
 /*
@@ -19599,4 +19693,25 @@ $(document).on('click','.stream-feed-type',function(e){
 		$('#overlay-toast').html('Failed to open page. Please allow popups for this page.');
 		showToast();
 	}
+});
+
+
+$('body').on('blur', '#user-notification-recipients', function() {
+	
+	// format email IDs
+	var emails = $("#user-notification-recipients").val();
+	
+	if( emails == undefined ){
+		return;
+	}
+	
+	var payload = {
+		"emails" : emails
+	};
+	
+	callAjaxPostWithPayloadData("./updateadddeletenotifyrecipients.do", function(data) {
+		$('#overlay-toast').html(data);
+		showToast();
+	}, payload, true);
+	
 });

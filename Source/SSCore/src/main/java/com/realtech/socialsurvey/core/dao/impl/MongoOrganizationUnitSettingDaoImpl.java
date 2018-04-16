@@ -111,6 +111,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_POSTIONS = "positions";
     public static final String KEY_STATUS = "status";
     public static final String KEY_USER_ENCRYPTED_ID = "userEncryptedId";
+    public static final String KEY_ENCRYPTED_ID = "encryptedId";
     public static final String KEY_VENDASTA_RM_SETTINGS = "vendasta_rm_settings";
     public static final String KEY_REVIEW_SORT_CRITERIA = "reviewSortCriteria";
     public static final String KEY_SEND_EMAIL_THROUGH = "sendEmailThrough";
@@ -136,6 +137,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_SAVED_DIGEST_RECORD_DATE = "savedDigestRecords.uploadedDate";
     public static final String KEY_SAVED_DIGEST_RECORD_MONTH = "savedDigestRecords.month";
     public static final String KEY_SAVED_DIGEST_RECORD_YEAR = "savedDigestRecords.year";
+    public static final String KEY_USER_ADD_DELETE_NOTIFICATION_RECIPIENTS = "userAddDeleteNotificationRecipients";
     
     
     public static final String KEY_FACEBOOK_ID = "socialMediaTokens.facebookToken.facebookId";
@@ -1349,4 +1351,19 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         query.fields().include( KEY_SAVED_DIGEST_RECORD ).exclude( CommonConstants.DEFAULT_MONGO_ID_COLUMN );
         return mongoTemplate.findOne( query, OrganizationUnitSettings.class, collectionName );
     }
+    
+    @Override
+    public ContactDetailsSettings fetchContactDetailByEncryptedId( String encryptedId, String collection )
+    {
+        LOG.debug( "Fetch unit settings from for encryptedId: " + encryptedId );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_ENCRYPTED_ID ).is( encryptedId ) );
+        query.fields().include( KEY_CONTACT_DETAILS );
+        OrganizationUnitSettings settings = mongoTemplate.findOne( query, OrganizationUnitSettings.class, collection );
+        ContactDetailsSettings contactDetails = null;
+        if ( settings != null )
+            contactDetails = settings.getContact_details();
+        return contactDetails;
+    }
+
 }

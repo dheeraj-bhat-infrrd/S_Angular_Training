@@ -28,5 +28,7 @@ public interface StreamApi
     
     @GET("/api/v1/analyze/failed/socialposts")
     public Response queueFailedSocialFeeds();
+    @POST("/api/v1/stream/batch")
+    public Response triggerBatch(@Body ReportRequest reportRequest);
 
 }

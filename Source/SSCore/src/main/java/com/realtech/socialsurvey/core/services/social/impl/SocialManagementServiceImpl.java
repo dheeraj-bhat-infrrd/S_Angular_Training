@@ -678,6 +678,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         Set<Long> regionIds = new HashSet<>();
         Map<String, Object> queries = new HashMap<>();
         queries.put( CommonConstants.USER_COLUMN, user );
+        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
         queries.put( CommonConstants.PROFILE_MASTER_COLUMN,
             userManagementService.getProfilesMasterById( CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) );
         List<UserProfile> userProfiles = userProfileDao.findByKeyValue( UserProfile.class, queries );
@@ -1457,7 +1458,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     }
 
 
-    void postToLinkedInForAHierarchy( OrganizationUnitSettings setting, String collectionName, Double rating, boolean isZillow,
+    boolean postToLinkedInForAHierarchy( OrganizationUnitSettings setting, String collectionName, Double rating, boolean isZillow,
         String updatedLinkedInMessage, String linkedinMessage, String linkedinProfileUrl, String linkedinMessageFeedback,
         OrganizationUnitSettings companySettings, AgentSettings agentSettings, MediaPostDetails mediaPostDetails,
         EntityMediaPostResponseDetails mediaPostResponseDetails, String surveyId )
@@ -1488,8 +1489,10 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     if ( mediaPostResponseDetails.getLinkedinPostResponseList() == null )
                         mediaPostResponseDetails.setLinkedinPostResponseList( new ArrayList<SocialMediaPostResponse>() );
                     mediaPostResponseDetails.getLinkedinPostResponseList().add( linkedinPostResponse );
+                    return true;
                 }
             }
+            return false;
         } catch ( Exception e ) {
             // update SocialMediaPostResponse object
             SocialMediaPostResponse linkedinPostResponse = new SocialMediaPostResponse();
@@ -1501,6 +1504,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             mediaPostResponseDetails.getLinkedinPostResponseList().add( linkedinPostResponse );
 
             reportBug( "Linkedin", setting.getProfileName(), e );
+            return false;
         }
     }
 
@@ -4042,72 +4046,81 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
      * @param entityType
      * @param entityId
      * @param surveyMongoId
+     * @return 
      */
-    public void  manualPostToLinkedInForEntity(String entityType , Long entityId , String surveyMongoId) 
-	{
-		LOG.info("Method manualPostToLinkedInForEntity started for entityType {} , entityId , surveyMongoId {} ",
-				entityType, entityId, surveyMongoId);
+    @Override
+    public boolean manualPostToLinkedInForEntity( String entityType, Long entityId, String surveyMongoId )
+    {
+        LOG.info( "Method manualPostToLinkedInForEntity started for entityType {} , entityId , surveyMongoId {} ", entityType,
+            entityId, surveyMongoId );
 
-		try {
-		String collectionName = "";
-		MediaPostDetails mediaPostDetails = null;
-		EntityMediaPostResponseDetails entityMediaPostResponseDetails = null;
-		
-		//get survey
-		SurveyDetails surveyDetails = surveyHandler.getSurveyDetails(surveyMongoId);
-		if (surveyDetails == null)
-			throw new InvalidInputException("No survey found with survey id : " + surveyMongoId);
+        try {
+            String collectionName = "";
+            MediaPostDetails mediaPostDetails = null;
+            EntityMediaPostResponseDetails entityMediaPostResponseDetails = null;
 
-		//get setting
-		OrganizationUnitSettings settings = null;
-		if (entityType.equalsIgnoreCase(CommonConstants.COMPANY_ID_COLUMN)) {
-			settings = organizationManagementService.getCompanySettings(entityId);
-			mediaPostDetails = surveyDetails.getSocialMediaPostDetails().getCompanyMediaPostDetails();
-			entityMediaPostResponseDetails = surveyDetails.getSocialMediaPostResponseDetails().getCompanyMediaPostResponseDetails();
-			collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
-		} else if (entityType.equalsIgnoreCase(CommonConstants.REGION_ID_COLUMN)) {
-			settings = organizationManagementService.getRegionSettings(entityId);
-			mediaPostDetails = surveyDetails.getSocialMediaPostDetails().getRegionMediaPostDetailsList().get(0);
-			entityMediaPostResponseDetails = surveyDetails.getSocialMediaPostResponseDetails().getRegionMediaPostResponseDetailsList().get(0);
-			collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
-		} else if (entityType.equalsIgnoreCase(CommonConstants.BRANCH_ID_COLUMN)) {
-			settings = organizationManagementService.getBranchSettingsDefault(entityId);
-			mediaPostDetails = surveyDetails.getSocialMediaPostDetails().getBranchMediaPostDetailsList().get(0);
-			entityMediaPostResponseDetails = surveyDetails.getSocialMediaPostResponseDetails().getBranchMediaPostResponseDetailsList().get(0);
-			collectionName = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
-		} else if (entityType.equalsIgnoreCase(CommonConstants.AGENT_ID_COLUMN)) {
-			settings = userManagementService.getUserSettings(entityId);
-			mediaPostDetails = surveyDetails.getSocialMediaPostDetails().getAgentMediaPostDetails();
-			entityMediaPostResponseDetails = surveyDetails.getSocialMediaPostResponseDetails().getAgentMediaPostResponseDetails();
-			collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
-		}
-		if(settings == null)
-			throw new InvalidInputException("No data found for " + entityType );
-		
-		double rating = surveyHandler.getFormattedSurveyScore( surveyDetails.getScore() );
-		String feedback = surveyDetails.getReview();
-		String agentName = surveyDetails.getAgentName();
-		String customerDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail( surveyDetails.getCustomerFirstName(), surveyDetails.getCustomerLastName() );
-		AgentSettings agentSettings = organizationManagementService.getAgentSettings(surveyDetails.getAgentId());
-		OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(surveyDetails.getCompanyId());
-		 
-		// LinkedIn message
-        String linkedinMessage = buildLinkedInAutoPostMessage( customerDisplayName, agentName, rating, feedback,
-            surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentSettings.getProfileUrl(), false );
+            //get survey
+            SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( surveyMongoId );
+            if ( surveyDetails == null )
+                throw new InvalidInputException( "No survey found with survey id : " + surveyMongoId );
 
-        String linkedinProfileUrl = surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
-            + agentSettings.getProfileUrl() + "/" + surveyMongoId;
-        String linkedinMessageFeedback = "From : " + customerDisplayName + " - " + feedback;
-		
-		postToLinkedInForAHierarchy(settings, collectionName, rating, false, linkedinMessage, linkedinMessage,
-				linkedinProfileUrl, linkedinMessageFeedback, companySettings, agentSettings, mediaPostDetails, entityMediaPostResponseDetails, surveyMongoId);
-	
-		
-		}catch(Exception e) {
-			
-		}
-	}
-    
+            //get setting
+            OrganizationUnitSettings settings = null;
+            if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                settings = organizationManagementService.getCompanySettings( entityId );
+                mediaPostDetails = surveyDetails.getSocialMediaPostDetails().getCompanyMediaPostDetails();
+                entityMediaPostResponseDetails = surveyDetails.getSocialMediaPostResponseDetails()
+                    .getCompanyMediaPostResponseDetails();
+                collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
+            } else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
+                settings = organizationManagementService.getRegionSettings( entityId );
+                mediaPostDetails = surveyDetails.getSocialMediaPostDetails().getRegionMediaPostDetailsList().get( 0 );
+                entityMediaPostResponseDetails = surveyDetails.getSocialMediaPostResponseDetails()
+                    .getRegionMediaPostResponseDetailsList().get( 0 );
+                collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
+            } else if ( entityType.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
+                settings = organizationManagementService.getBranchSettingsDefault( entityId );
+                mediaPostDetails = surveyDetails.getSocialMediaPostDetails().getBranchMediaPostDetailsList().get( 0 );
+                entityMediaPostResponseDetails = surveyDetails.getSocialMediaPostResponseDetails()
+                    .getBranchMediaPostResponseDetailsList().get( 0 );
+                collectionName = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
+            } else if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) ) {
+                settings = userManagementService.getUserSettings( entityId );
+                mediaPostDetails = surveyDetails.getSocialMediaPostDetails().getAgentMediaPostDetails();
+                entityMediaPostResponseDetails = surveyDetails.getSocialMediaPostResponseDetails()
+                    .getAgentMediaPostResponseDetails();
+                collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
+            }
+            if ( settings == null )
+                throw new InvalidInputException( "No data found for " + entityType );
+
+            double rating = surveyHandler.getFormattedSurveyScore( surveyDetails.getScore() );
+            String feedback = surveyDetails.getReview();
+            String agentName = surveyDetails.getAgentName();
+            String customerDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail( surveyDetails.getCustomerFirstName(),
+                surveyDetails.getCustomerLastName() );
+            AgentSettings agentSettings = organizationManagementService.getAgentSettings( surveyDetails.getAgentId() );
+            OrganizationUnitSettings companySettings = organizationManagementService
+                .getCompanySettings( surveyDetails.getCompanyId() );
+
+            // LinkedIn message
+            String linkedinMessage = buildLinkedInAutoPostMessage( customerDisplayName, agentName, rating, feedback,
+                surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentSettings.getProfileUrl(),
+                false );
+
+            String linkedinProfileUrl = surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
+                + agentSettings.getProfileUrl() + "/" + surveyMongoId;
+            String linkedinMessageFeedback = "From : " + customerDisplayName + " - " + feedback;
+
+            return postToLinkedInForAHierarchy( settings, collectionName, rating, false, linkedinMessage, linkedinMessage,
+                linkedinProfileUrl, linkedinMessageFeedback, companySettings, agentSettings, mediaPostDetails,
+                entityMediaPostResponseDetails, surveyMongoId );
+        } catch ( InvalidInputException | NoRecordsFetchedException e ) {
+            LOG.error( "Could not auto-post to LinkedIn", e );
+            return false;
+        }
+
+    }    
 
     @Override
     public void checkForLinkedInTokenExpiry( OrganizationUnitSettings settings )

@@ -353,6 +353,7 @@ public interface CommonConstants
     public static final String SUMMARY_COLUMN = "summary";
     public static final String REVIEW_COLUMN = "review";
     public static final String USER_ENCRYPTED_ID = "userEncryptedId";
+    public static final String ENCRYPTED_ID = "encryptedId";
     public static final String SURVEY_COMPLETED_DATE_COLUMN = "surveyCompletedDate";
     public static final String SURVEY_UPDATED_DATE_COLUMN = "surveyUpdatedDate";
     public static final String SURVEY_TRANSACTION_DATE_COLUMN = "surveyTransactionDate";
@@ -1550,6 +1551,8 @@ public interface CommonConstants
     public static final String EMAIL_TYPE_SUCCESSFUL_SURVEY_CSV_UPLOAD_MAIL_TO_UPLOADER = "SUCCESSFUL_SURVEY_CSV_UPLOAD_MAIL_TO_UPLOADER";
     public static final String EMAIL_TYPE_SOCIAL_MONITOR_ACTION_MAIL_TO_USER = "EMAIL_TYPE_SOCIAL_MONITOR_ACTION_MAIL_TO_USER";
     public static final String EMAIL_TYPE_ABUSIVE_HANDLE_MAIL = "ABUSIVE_HANDLE_MAIL";
+    public static final String EMAIL_TYPE_USER_ADDITION_MAIL = "USER_ADDITION_MAIL";
+    public static final String EMAIL_TYPE_USER_DELETION_MAIL = "USER_DELETION_MAIL";
 
     public static final String REDIRECT = "redirect:/";
     public static final String EVENT_CLICK = "click";
@@ -1586,7 +1589,7 @@ public interface CommonConstants
     public static final String IS_MANUAL = "isManual";
     
 
-    public static final String TIMEZONE_EST = "GMT-5:00";
+    public static final String TIMEZONE_EST = "EST5EDT";
     
     //retake request 
     //Constants for survey request send type
@@ -1630,7 +1633,7 @@ public interface CommonConstants
 
     public static final int STATUS_REPORT_NO_RECORDS = 3;
     
-    //
+    // Time frames
     public static final String TIME_FRAME_PAST_MONTH = "PastMonth";
     public static final String TIME_FRAME_THIS_MONTH = "ThisMonth";
     public static final String TIME_FRAME_ALL_TIME = "AllTime";

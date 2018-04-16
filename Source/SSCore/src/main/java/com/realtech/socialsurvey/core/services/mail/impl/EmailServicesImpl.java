@@ -10,9 +10,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +37,6 @@ import com.realtech.socialsurvey.core.entities.EmailEntity;
 import com.realtech.socialsurvey.core.entities.EmailObject;
 import com.realtech.socialsurvey.core.entities.FileContentReplacements;
 import com.realtech.socialsurvey.core.entities.ForwardMailDetails;
-import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.MonthlyDigestAggregate;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Plan;
@@ -1266,171 +1265,11 @@ public class EmailServicesImpl implements EmailServices
 
     @Async
     @Override
-    public void sendDefaultSurveyCompletionMail( String recipientMailId, String firstName, String agentName, String agentEmail,
-        String agentProfileName, String logoUrl, long agentId ) throws InvalidInputException, UndeliveredEmailException
-    {
-        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
-            LOG.warn( "Recipient email Id is empty or null for sending survey completion mail " );
-            throw new InvalidInputException( "Recipient email Id is empty or null for sending survey completion mail " );
-        }
-        if ( firstName == null || firstName.isEmpty() ) {
-            LOG.warn( "firstName parameter is empty or null for sending account upgrade mail " );
-            throw new InvalidInputException( "firstName parameter is empty or null for sending survey completion mail " );
-        }
-
-        LOG.debug( "Sending survey completion email to : {}", recipientMailId );
-        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId, agentId, agentName );
-        emailEntity.setMailType( CommonConstants.EMAIL_TYPE_DEFAULT_SURVEY_COMPLETION_MAIL );
-        String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
-            + EmailTemplateConstants.SURVEY_COMPLETION_MAIL_SUBJECT;
-
-        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
-        messageBodyReplacements
-            .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_COMPLETION_MAIL_BODY );
-        if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
-            messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, WordUtils.capitalize( firstName ), agentName,
-                agentName, appBaseUrl, agentProfileName, appBaseUrl, agentProfileName, agentName ) );
-        } else {
-            messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, WordUtils.capitalize( firstName ), agentName,
-                agentName, appBaseUrl, agentProfileName, appBaseUrl, agentProfileName, agentName ) );
-        }
-
-
-        LOG.trace( "Calling email sender to send mail" );
-        sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );
-        LOG.debug( "Successfully sent survey completion mail" );
-    }
-
-
-    @Async
-    @Override
-    public void sendDefaultSurveyCompletionUnpleasantMail( String recipientMailId, String firstName, String agentName,
-        String agentEmail, String companyName, String logoUrl, long agentId )
-        throws InvalidInputException, UndeliveredEmailException
-    {
-        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
-            LOG.warn( "Recipient email Id is empty or null for sending survey completion unpleasant mail " );
-            throw new InvalidInputException(
-                "Recipient email Id is empty or null for sending survey completion unpleasant mail " );
-        }
-        if ( firstName == null || firstName.isEmpty() ) {
-            LOG.warn( "firstName parameter is empty or null for sending account upgrade mail " );
-            throw new InvalidInputException(
-                "firstName parameter is empty or null for sending survey completion unpleasant mail " );
-        }
-
-        LOG.debug( "Sending survey completion email to : {}", recipientMailId );
-        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId, agentId, agentName );
-        emailEntity.setMailType( CommonConstants.EMAIL_TYPE_DEFAULT_SURVEY_COMPLETION_UNPLEASANT_MAIL );
-        String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
-            + EmailTemplateConstants.SURVEY_COMPLETION_MAIL_SUBJECT;
-
-        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
-        messageBodyReplacements.setFileName(
-            EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_COMPLETION_UNPLEASANT_MAIL_BODY );
-        if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
-            messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, firstName, agentName, companyName ) );
-        } else {
-            messageBodyReplacements
-                .setReplacementArgs( Arrays.asList( logoUrl, firstName, agentName, agentName, companyName ) );
-        }
-
-
-        LOG.trace( "Calling email sender to send mail" );
-        sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );
-        LOG.debug( "Successfully sent survey completion mail" );
-    }
-
-
-    @Async
-    @Override
-    public void sendDefaultSurveyReminderMail( String recipientMailId, String logoUrl, String firstName, String agentName,
-        String agentEmailId, String link, String agentPhone, String agentTitle, String companyName )
-        throws InvalidInputException, UndeliveredEmailException
-    {
-        LOG.debug( "Executing the sendDefaultSurveyReminderMail() method" );
-
-        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
-            LOG.warn( "Recipient email Id is empty or null for sending survey completion mail " );
-            throw new InvalidInputException( "Recipient email Id is empty or null for sending survey completion mail " );
-        }
-        if ( firstName == null || firstName.isEmpty() ) {
-            LOG.warn( "firstName parameter is empty or null for sending account upgrade mail " );
-            throw new InvalidInputException( "firstName parameter is empty or null for sending survey completion mail " );
-        }
-        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
-
-        LOG.trace( "Initiating URL Service to shorten the url {}", link );
-        String shortLink = urlService.shortenUrl( link, emailEntity.getRandomUUID() );
-        LOG.trace( "Finished calling URL Service to shorten the url.Shortened URL : {}", shortLink );
-
-        LOG.debug( "Sending survey reminder email to : {}", recipientMailId );
-        emailEntity.setMailType( CommonConstants.EMAIL_TYPE_DEFAULT_SURVEY_REMINDER_MAIL );
-
-        String agentSignature = emailFormatHelper.buildAgentSignature( agentName, agentPhone, agentTitle, companyName );
-
-        FileContentReplacements subjectReplacements = new FileContentReplacements();
-        subjectReplacements
-            .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_REMINDER_MAIL_SUBJECT );
-        subjectReplacements.setReplacementArgs( Arrays.asList( agentName ) );
-
-        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
-        messageBodyReplacements
-            .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_REMINDER_MAIL_BODY );
-        String currentYear = String.valueOf( Calendar.getInstance().get( Calendar.YEAR ) );
-        DateFormat dateFormat = new SimpleDateFormat( "yyyy/MM/dd" );
-        String fullAddress = "";
-
-        if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
-            messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, WordUtils.capitalize( firstName ), shortLink,
-                shortLink, shortLink, "", agentSignature, appBaseUrl, appBaseUrl, recipientMailId, companyName,
-                dateFormat.format( new Date() ), agentEmailId, companyName, currentYear, fullAddress ) );
-        } else {
-            messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, WordUtils.capitalize( firstName ), shortLink,
-                shortLink, shortLink, "", agentSignature, appBaseUrl, appBaseUrl, recipientMailId, companyName,
-                dateFormat.format( new Date() ), agentEmailId, companyName, currentYear, fullAddress ) );
-        }
-
-        LOG.trace( "Calling email sender to send mail" );
-        sendEmailWithSubjectAndBodyReplacements( emailEntity, subjectReplacements, messageBodyReplacements, false, false );
-        LOG.debug( "Successfully sent survey completion mail" );
-    }
-
-
-    @Async
-    @Override
-    public void sendSurveyReminderMail( String recipientMailId, String subject, String mailBody, String senderName,
-        String senderEmailAddress ) throws InvalidInputException, UndeliveredEmailException
-    {
-        LOG.debug( "Executing the sendSurveyReminderMail() method" );
-
-        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
-            LOG.warn( "Recipient email Id is empty or null for sending survey completion mail " );
-            throw new InvalidInputException( "Recipient email Id is empty or null for sending survey completion mail " );
-        }
-        if ( subject == null || subject.isEmpty() ) {
-            LOG.warn( "subject parameter is empty or null for sending social post reminder mail " );
-            throw new InvalidInputException( "displayName parameter is empty or null for sending survey completion mail " );
-        }
-
-        LOG.debug( "Sending survey reminder email to : {}", recipientMailId );
-        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
-        emailEntity.setMailType( CommonConstants.EMAIL_TYPE_SURVEY_REMINDER_MAIL );
-        emailEntity.setSenderName( senderName );
-        emailEntity.setSenderEmailId( senderEmailAddress );
-        LOG.trace( "Calling email sender to send mail" );
-        sendEmail( emailEntity, subject, mailBody, false, false );
-        LOG.debug( "Successfully sent survey completion mail" );
-    }
-
-
-    @Async
-    @Override
     public void sendSurveyRelatedMail( OrganizationUnitSettings companySettings, User user, String agentName,
         String agentFirstName, String agentPhone, String agentTitle, String surveyLink, String logoUrl,
         String customerFirstName, String customerLastName, String customerEmailId, String emailType, String senderName,
         String senderEmailAddress, String mailSubject, String mailBody, AgentSettings agentSettings, long branchId,
-        long regionId, String surveySourceId, long agentId, long companyId )
+        long regionId, String surveySourceId, long agentId, long companyId, boolean sentFromCompany )
         throws InvalidInputException, UndeliveredEmailException
     {
 
@@ -1449,7 +1288,8 @@ public class EmailServicesImpl implements EmailServices
 
         LOG.trace( "Initiating URL Service to shorten the url {}", surveyLink );
         String shortSurveyLink = null;
-        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( customerEmailId, agentId, agentName );
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( customerEmailId, agentId, companyId, sentFromCompany,
+            senderName );
 
         try {
             shortSurveyLink = urlService.shortenUrl( surveyLink, emailEntity.getRandomUUID() );
@@ -1557,46 +1397,6 @@ public class EmailServicesImpl implements EmailServices
     }
 
 
-    @Async
-    @Override
-    public void sendDefaultSocialPostReminderMail( String recipientMailId, String agentPhone, String agentTitle,
-        String companyName, String firstName, String agentName, String links, String logoUrl )
-        throws InvalidInputException, UndeliveredEmailException
-    {
-        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
-            LOG.warn( "Recipient email Id is empty or null for sending survey completion mail " );
-            throw new InvalidInputException( "Recipient email Id is empty or null for sending survey completion mail " );
-        }
-        if ( firstName == null || firstName.isEmpty() ) {
-            LOG.warn( "firstName parameter is empty or null for sending account upgrade mail " );
-            throw new InvalidInputException( "firstName parameter is empty or null for sending survey completion mail " );
-        }
-
-        LOG.debug( "Sending survey reminder email to : {}", recipientMailId );
-        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
-        emailEntity.setMailType( CommonConstants.EMAIL_TYPE_DEFAULT_SOCIAL_POST_REMINDER_MAIL );
-        String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
-            + EmailTemplateConstants.SOCIALPOST_REMINDER_MAIL_SUBJECT;
-
-        String agentSignature = emailFormatHelper.buildAgentSignature( agentName, agentPhone, agentTitle, companyName );
-
-        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
-        messageBodyReplacements.setFileName(
-            EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SOCIALPOST_REMINDER_MAIL_BODY );
-        if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
-            messageBodyReplacements.setReplacementArgs(
-                Arrays.asList( appLogoUrl, WordUtils.capitalize( firstName ), links, "", agentSignature ) );
-        } else {
-            messageBodyReplacements
-                .setReplacementArgs( Arrays.asList( logoUrl, WordUtils.capitalize( firstName ), links, "", agentSignature ) );
-        }
-
-        LOG.trace( "Calling email sender to send mail" );
-        sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );
-        LOG.debug( "Successfully sent survey completion mail" );
-    }
-
-
     /**
      * Sends the message from the contact us page as a mail to the respective
      * admin or agent
@@ -1657,59 +1457,9 @@ public class EmailServicesImpl implements EmailServices
 
     @Async
     @Override
-    public void sendDefaultSurveyInvitationMail( String recipientMailId, String logoUrl, String firstName, String agentName,
-        String link, String agentEmailId, String agentSignature, String companyName, String surveyInitiatedOn,
-        String currentYear, String fullAddress, long agentId ) throws InvalidInputException, UndeliveredEmailException
-    {
-        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
-            LOG.warn( "Recipient email Id is empty or null for sending survey completion mail " );
-            throw new InvalidInputException( "Recipient email Id is empty or null for sending survey completion mail " );
-        }
-        if ( firstName == null || firstName.isEmpty() ) {
-            LOG.warn( "firstName parameter is empty or null for sending account upgrade mail " );
-            throw new InvalidInputException( "firstName parameter is empty or null for sending survey completion mail " );
-        }
-        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId, agentId, agentName );
-
-        LOG.trace( "Initiating URL Service to shorten the url {}", link );
-        String shortLink = urlService.shortenUrl( link, emailEntity.getRandomUUID() );
-        LOG.trace( "Finished calling URL Service to shorten the url.Shortened URL : {}", shortLink );
-
-        LOG.debug( "Sending survey reminder email to : {}", recipientMailId );
-        emailEntity.setMailType( CommonConstants.EMAIL_TYPE_DEFAULT_SURVEY_INVITATION_MAIL );
-        String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
-            + EmailTemplateConstants.SURVEY_INVITATION_MAIL_SUBJECT;
-
-        FileContentReplacements messageSubjectReplacements = new FileContentReplacements();
-        messageSubjectReplacements.setFileName( subjectFileName );
-        messageSubjectReplacements.setReplacementArgs( Arrays.asList( agentName ) );
-
-        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
-        messageBodyReplacements
-            .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_INVITATION_MAIL_BODY );
-
-        if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
-            messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, WordUtils.capitalize( firstName ), shortLink,
-                shortLink, shortLink, "", agentSignature, recipientMailId, companyName, surveyInitiatedOn, agentEmailId,
-                companyName, currentYear, fullAddress ) );
-        } else {
-            messageBodyReplacements.setReplacementArgs(
-                Arrays.asList( logoUrl, WordUtils.capitalize( firstName ), shortLink, shortLink, shortLink, "", agentSignature,
-                    recipientMailId, companyName, surveyInitiatedOn, agentEmailId, companyName, currentYear, fullAddress ) );
-        }
-
-
-        LOG.trace( "Calling email sender to send mail" );
-        sendEmailWithSubjectAndBodyReplacements( emailEntity, messageSubjectReplacements, messageBodyReplacements, false,
-            false );
-        LOG.debug( "Successfully sent survey invitation mail" );
-    }
-
-
-    @Async
-    @Override
-    public void sendSurveyRelatedMail( String recipientMailId, String subject, String mailBody, String emailId, String name,
-        long agentId, long companyId, String mailType ) throws InvalidInputException, UndeliveredEmailException
+    public void sendSurveyRelatedMail( String recipientMailId, String subject, String mailBody, String emailId,
+        String senderName, long agentId, long companyId, String mailType, boolean sentFromCompany )
+        throws InvalidInputException, UndeliveredEmailException
     {
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
             LOG.warn( "Recipient email Id is empty or null for sending survey completion mail " );
@@ -1721,7 +1471,8 @@ public class EmailServicesImpl implements EmailServices
         }
 
         LOG.debug( "Sending survey reminder email to : {}", recipientMailId );
-        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId, agentId, name );
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId, agentId, companyId, sentFromCompany,
+            senderName );
         emailEntity.setCompanyId( companyId );
         emailEntity.setMailType( mailType );
 
@@ -1903,112 +1654,6 @@ public class EmailServicesImpl implements EmailServices
         LOG.trace( "Calling email sender to send mail" );
         sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );
         LOG.debug( "Successfully sent manual registration mail" );
-    }
-
-
-    @Async
-    @Override
-    public void sendDefaultSurveyInvitationMailByCustomer( String recipientMailId, String firstName, String agentName,
-        String link, String agentEmailId, long agentId ) throws InvalidInputException, UndeliveredEmailException
-    {
-        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
-            LOG.warn( "Recipient email Id is empty or null for sending survey completion mail " );
-            throw new InvalidInputException( "Recipient email Id is empty or null for sending survey completion mail " );
-        }
-        if ( firstName == null || firstName.isEmpty() ) {
-            LOG.warn( "firstName parameter is empty or null for sending account upgrade mail " );
-            throw new InvalidInputException( "firstName parameter is empty or null for sending survey completion mail " );
-        }
-        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId, agentId, agentName );
-
-        LOG.trace( "Initiating URL Service to shorten the url {}", link );
-        String shortLink = urlService.shortenUrl( link, emailEntity.getRandomUUID() );
-        LOG.trace( "Finished calling URL Service to shorten the url.Shortened URL : {}", shortLink );
-
-        LOG.debug( "Sending survey reminder email to : {}", recipientMailId );
-        emailEntity.setMailType( CommonConstants.EMAIL_TYPE_DEFAULT_SURVEY_INVITATION_MAIL_BY_CUSTOMER_MAIL );
-
-        String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
-            + EmailTemplateConstants.SURVEY_INVITATION_MAIL_CUSTOMER_SUBJECT;
-
-        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
-        messageBodyReplacements.setFileName(
-            EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_INVITATION_MAIL_CUSTOMER_BODY );
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, WordUtils.capitalize( firstName ), agentName,
-            shortLink, shortLink, shortLink, appBaseUrl, appBaseUrl ) );
-
-        LOG.trace( "Calling email sender to send mail" );
-        sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );
-        LOG.debug( "Successfully sent survey invitation mail" );
-    }
-
-
-    @Async
-    @Override
-    public void sendSurveyInvitationMailByCustomer( String recipientMailId, String subject, String mailBody, String emailId,
-        String firstName, long agentId ) throws InvalidInputException, UndeliveredEmailException
-    {
-        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
-            LOG.warn( "Recipient email Id is empty or null for sending survey invitation mail by customer" );
-            throw new InvalidInputException(
-                "Recipient email Id is empty or null for sending survey invitation mail by customer" );
-        }
-        if ( subject == null || subject.isEmpty() ) {
-            LOG.warn( "subject parameter is empty or null for sending survey invitation mail by customer" );
-            throw new InvalidInputException(
-                "subject parameter is empty or null for sending survey invitation mail by customer" );
-        }
-
-        LOG.debug( "Sending survey invitation email to : {}", recipientMailId );
-        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId, agentId, firstName );
-        emailEntity.setMailType( CommonConstants.EMAIL_TYPE_SURVEY_INVITATION_MAIL_BY_CUSTOMER );
-
-        LOG.trace( "Calling email sender to send mail" );
-        sendEmail( emailEntity, subject, mailBody, false, false );
-        LOG.debug( "Successfully sent survey invitation mail" );
-    }
-
-
-    @Async
-    @Override
-    public void sendDefaultSurveyRestartMail( String recipientMailId, String logoUrl, String firstName, String agentName,
-        String link, String agentEmailId, String agentSignature, long agentId )
-        throws InvalidInputException, UndeliveredEmailException
-    {
-        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
-            LOG.warn( "Recipient email Id is empty or null for sending survey restart mail " );
-            throw new InvalidInputException( "Recipient email Id is empty or null for sending survey restart mail " );
-        }
-        if ( firstName == null || firstName.isEmpty() ) {
-            LOG.warn( "firstName parameter is empty or null for sending survey restart mail " );
-            throw new InvalidInputException( "firstName parameter is empty or null for sending survey restart mail " );
-        }
-        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId, agentId, agentName );
-
-        LOG.trace( "Initiating URL Service to shorten the url {}", link );
-        String shortLink = urlService.shortenUrl( link, emailEntity.getRandomUUID() );
-        LOG.trace( "Finished calling URL Service to shorten the url.Shortened URL : {}", shortLink );
-
-        LOG.debug( "Sending survey restart email to : {}", recipientMailId );
-        emailEntity.setMailType( CommonConstants.EMAIL_TYPE_DEFAULT_SURVEY_RESTART_MAIL );
-        String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
-            + EmailTemplateConstants.SURVEY_RESTART_MAIL_SUBJECT;
-
-        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
-        messageBodyReplacements
-            .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_RESTART_MAIL_BODY );
-
-        if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
-            messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, WordUtils.capitalize( firstName ), shortLink,
-                shortLink, shortLink, "", agentSignature ) );
-        } else {
-            messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, WordUtils.capitalize( firstName ), shortLink,
-                shortLink, shortLink, "", agentSignature ) );
-        }
-
-        LOG.trace( "Calling email sender to send mail" );
-        sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );
-        LOG.debug( "Successfully sent survey invitation mail" );
     }
 
 
@@ -2292,40 +1937,54 @@ public class EmailServicesImpl implements EmailServices
 
 
     // creating email entity with senders email id as U<userid>@socialsurvey.me
-    private EmailEntity prepareEmailEntityForSendingEmail( String recipientMailId, long userId, String name )
-        throws InvalidInputException
+    private EmailEntity prepareEmailEntityForSendingEmail( String recipientMailId, long userId, long companyId,
+        boolean sentFromCompany, String senderName ) throws InvalidInputException
     {
-        LOG.debug( "Preparing email entity with recipent {} user id {} and name {}", recipientMailId, userId, name );
+        LOG.debug( "Preparing email entity with recipent {} user id {} and name {}", recipientMailId, userId, senderName );
+        String fromEmailId;
+        EmailEntity emailEntity = new EmailEntity();
+        OrganizationUnitSettings companySettings = null;
+
+        //set recipients
         List<String> recipients = new ArrayList<String>();
         recipients.add( recipientMailId );
-
-        EmailEntity emailEntity = new EmailEntity();
         emailEntity.setRecipients( recipients );
-        emailEntity.setSenderName( name );
 
-        AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById( userId );
-        //JIRA SS-700 begin
-        if ( agentSettings.getUserEncryptedId() == null ) {
-            agentSettings.setUserEncryptedId( userManagementService.generateUserEncryptedId( agentSettings.getIden() ) );
-            organizationUnitSettingsDao.updateParticularKeyAgentSettings( CommonConstants.USER_ENCRYPTED_ID,
-                agentSettings.getUserEncryptedId(), agentSettings );
+        //set sender name
+        emailEntity.setSenderName( senderName );
+
+        //set sender mail
+        if ( sentFromCompany ) {
+            companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId,
+                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+            if ( companySettings.getEncryptedId() == null ) {
+                companySettings.setEncryptedId( userManagementService.generateUserEncryptedId( companyId ) );
+                organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings( CommonConstants.ENCRYPTED_ID,
+                    companySettings.getEncryptedId(), companySettings,
+                    MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+            }
+            fromEmailId = "c-" + companySettings.getEncryptedId();
+        } else {
+            AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById( userId );
+            //JIRA SS-700 begin
+            if ( agentSettings.getUserEncryptedId() == null ) {
+                agentSettings.setUserEncryptedId( userManagementService.generateUserEncryptedId( agentSettings.getIden() ) );
+                organizationUnitSettingsDao.updateParticularKeyAgentSettings( CommonConstants.USER_ENCRYPTED_ID,
+                    agentSettings.getUserEncryptedId(), agentSettings );
+            }
+            fromEmailId = "u-" + agentSettings.getUserEncryptedId();
+
+            //get company settings
+            companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
+                userDao.findById( User.class, userId ).getCompany().getCompanyId(),
+                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
         }
-        //JIRA SS-700 end
-        //JIRA SS-60 //pass stored encrypted id in mongo for the user
 
-        //JIRA SS-975
-        //get companyId
-        User user = userDao.findById( User.class, agentSettings.getIden() );
-        long companyId = user.getCompany().getCompanyId();
-        //get company settings
-        OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId,
-            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
-        //get sendemailthrough
+
+        //set send email through
         String sendEmailThrough = companySettings.getSendEmailThrough();
-
         emailEntity.setSendEmailThrough( sendEmailThrough );
 
-        //JIRA SS-975 end
 
         //checking for the right defaultEmailDomain
         String defaultEmailDomain = null;
@@ -2335,105 +1994,14 @@ public class EmailServicesImpl implements EmailServices
         } else if ( sendEmailThrough.equals( CommonConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_US ) ) {
             defaultEmailDomain = defaultSendGridUsEmailDomain;
         }
-        emailEntity.setSenderEmailId( "u-" + agentSettings.getUserEncryptedId() + "@" + defaultEmailDomain );
+        //get full send email address
+        String fullFromEmailId = fromEmailId + "@" + defaultEmailDomain;
+        emailEntity.setSenderEmailId( fullFromEmailId );
 
         emailEntity.setRecipientType( EmailEntity.RECIPIENT_TYPE_TO );
 
         LOG.trace( "Prepared email entity for sending mail" );
         return emailEntity;
-    }
-
-
-    @Override
-    public void sendManualSurveyReminderMail( OrganizationUnitSettings companySettings, User user, String agentName,
-        String agentFirstName, String agentEmailId, String agentPhone, String agentTitle, String companyName,
-        SurveyPreInitiation survey, String surveyLink, String logoUrl, String agentDisclaimer, String agentLicenses )
-        throws InvalidInputException
-    {
-        LOG.debug( "Sending manual survey reminder mail." );
-        if ( survey.getCustomerEmailId() == null || survey.getCustomerEmailId().isEmpty() ) {
-            LOG.warn( "Recipient email Id is empty or null for sending survey completion mail " );
-            throw new InvalidInputException( "Recipient email Id is empty or null for sending survey completion mail " );
-        }
-
-
-        String agentSignature = emailFormatHelper.buildAgentSignature( agentName, agentPhone, agentTitle, companyName );
-        DateFormat dateFormat = new SimpleDateFormat( "yyyy/MM/dd" );
-        String currentYear = String.valueOf( Calendar.getInstance().get( Calendar.YEAR ) );
-        String fullAddress = "";
-
-        if ( logoUrl == null || logoUrl.equalsIgnoreCase( "" ) ) {
-            logoUrl = appLogoUrl;
-        }
-        LOG.trace( "Initiating URL Service to shorten the url {}", surveyLink );
-        String shortSurveyLink = null;
-
-        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( survey.getCustomerEmailId() );
-        try {
-            shortSurveyLink = urlService.shortenUrl( surveyLink, emailEntity.getRandomUUID() );
-        } catch ( InvalidInputException e ) {
-            LOG.error( "InvalidInput Exception while url shortening url. Reason : ", e );
-        }
-        LOG.trace( "Finished calling URL Service to shorten the url.Shortened URL : {}", shortSurveyLink );
-
-
-        //get mail body and content
-        String mailBody = "";
-        String mailSubject = "";
-        if ( companySettings != null && companySettings.getMail_content() != null
-            && companySettings.getMail_content().getTake_survey_reminder_mail() != null ) {
-
-            MailContent mailContent = companySettings.getMail_content().getTake_survey_reminder_mail();
-
-            mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailContent.getMail_body(), mailContent.getParam_order() );
-            mailSubject = CommonConstants.REMINDER_MAIL_SUBJECT;
-            if ( mailContent.getMail_subject() != null && !mailContent.getMail_subject().isEmpty() ) {
-                mailSubject = mailContent.getMail_subject();
-            }
-
-
-        } else {
-            mailSubject = fileOperations.getContentFromFile(
-                EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_REMINDER_MAIL_SUBJECT );
-
-            mailBody = fileOperations.getContentFromFile(
-                EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_REMINDER_MAIL_BODY );
-            mailBody = emailFormatHelper.replaceEmailBodyWithParams( mailBody,
-                new ArrayList<String>( Arrays.asList( paramOrderTakeSurveyReminder.split( "," ) ) ) );
-        }
-
-        //JIRA SS-473 begin
-        String companyDisclaimer = "";
-        if ( companySettings.getDisclaimer() != null )
-            companyDisclaimer = companySettings.getDisclaimer();
-
-        //replace legends
-        mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, appBaseUrl, logoUrl, shortSurveyLink,
-            survey.getCustomerFirstName(), survey.getCustomerLastName(), agentName, agentFirstName, agentSignature,
-            survey.getCustomerEmailId(), user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
-            fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone );
-
-        mailBody = emailFormatHelper.replaceLegends( false, mailBody, appBaseUrl, logoUrl, shortSurveyLink,
-            survey.getCustomerFirstName(), survey.getCustomerLastName(), agentName, agentFirstName, agentSignature,
-            survey.getCustomerEmailId(), user.getEmailId(), companyName, dateFormat.format( new Date() ), currentYear,
-            fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone );
-        //JIRA SS-473 end
-        //send mail
-        if ( mailSubject == null || mailSubject.isEmpty() ) {
-            LOG.warn( "subject parameter is empty or null for sending social post reminder mail " );
-            throw new InvalidInputException( "displayName parameter is empty or null for sending survey completion mail " );
-        }
-        try {
-            //sendSurveyReminderMail( survey.getCustomerEmailId(), mailSubject, mailBody, agentName, user.getEmailId() );
-            emailEntity.setMailType( CommonConstants.EMAIL_TYPE_SURVEY_REMINDER_MAIL );
-            emailEntity.setSenderName( agentName );
-            emailEntity.setSenderEmailId( user.getEmailId() );
-            LOG.trace( "Calling email sender to send mail" );
-            sendEmail( emailEntity, mailSubject, mailBody, false, false );
-            LOG.debug( "Successfully sent survey completion mail" );
-        } catch ( InvalidInputException | UndeliveredEmailException e ) {
-            LOG.error( "Exception caught while sending mail to " + survey.getCustomerEmailId() + " .Nested exception is ", e );
-        }
     }
 
 
@@ -2560,12 +2128,13 @@ public class EmailServicesImpl implements EmailServices
             messageBodyReplacements, false, false );
         LOG.debug( "Successfully sent survey completion mail" );
     }
-    
-    @Async 
+
+
+    @Async
     @Override
-    public void sendAbusiveNotifyMail(String source,String recipientMailId, String customerName, String customerMailId, String agentName,String agentMailId,
-			String mood, String rating, String surveySourceId, String feedBack ,String surveyMarked )
-			throws InvalidInputException, UndeliveredEmailException
+    public void sendAbusiveNotifyMail( String source, String recipientMailId, String customerName, String customerMailId,
+        String agentName, String agentMailId, String mood, String rating, String surveySourceId, String feedBack,
+        String surveyMarked ) throws InvalidInputException, UndeliveredEmailException
     {
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
             LOG.warn( "Recipient email Id is empty or null for sending survey completion mail " );
@@ -2598,8 +2167,9 @@ public class EmailServicesImpl implements EmailServices
             EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_ABUSIVE_HANDLER_MAIL_BODY );
 
         //SS-1435: Send survey details too.
-        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, customerName, source, feedBack,
-        		rating,source, surveyMarked, agentName,agentMailId ,customerName,customerMailId,surveySourceId == null ? CommonConstants.NOT_AVAILABLE : surveySourceId) );
+        messageBodyReplacements.setReplacementArgs(
+            Arrays.asList( appLogoUrl, customerName, source, feedBack, rating, source, surveyMarked, agentName, agentMailId,
+                customerName, customerMailId, surveySourceId == null ? CommonConstants.NOT_AVAILABLE : surveySourceId ) );
 
         LOG.trace( "Calling email sender to send mail" );
         sendEmailWithBodyReplacements( emailEntity,
@@ -3340,6 +2910,91 @@ public class EmailServicesImpl implements EmailServices
         LOG.debug( "method sendSocialMonitorActionMail ended" );
 	}
     
+    //@Async
+    @Override
+    public boolean sendUserAdditionMail( Set<String> recipients, String addedAdminName, String addedAdminEmailId,
+        User addedUser, OrganizationUnitSettings agentSettings ) throws InvalidInputException, UndeliveredEmailException
+    {
+        LOG.debug( "method sendUserAdditionMail() called" );
+
+        if ( recipients == null || recipients.isEmpty() ) {
+            LOG.warn( "No recipients for user addition mail specified" );
+            throw new InvalidInputException( "No recipients for user addition mail specified" );
+        } else if ( addedUser == null ) {
+            LOG.warn( "User details for added user not specified" );
+            throw new InvalidInputException( "User details for added user not specified" );
+        } else if ( agentSettings == null ) {
+            LOG.warn( "User settings for the added user not specified" );
+        }
+
+        if ( LOG.isTraceEnabled() ) {
+            LOG.trace( "sending user addition mail for user {}, to {}", addedUser, recipients );
+        }
+
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( new ArrayList<>( recipients ) );
+        emailEntity.setMailType( CommonConstants.EMAIL_TYPE_USER_ADDITION_MAIL );
+
+        FileContentReplacements messageSubjectReplacements = new FileContentReplacements();
+        messageSubjectReplacements
+            .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.USER_ADDITION_MAIL_SUBJECT );
+
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        messageBodyReplacements
+            .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.CUSTOM_MAIL_BODY );
+
+        messageBodyReplacements
+            .setReplacementArgs( Arrays.asList( appLogoUrl, CommonConstants.ADMIN_RECEPIENT_DISPLAY_NAME, emailFormatHelper
+                .buildAgentAdditionOrDeletionMessage( addedAdminName, addedAdminEmailId, addedUser, agentSettings, true ) ) );
+
+        sendEmailWithSubjectAndBodyReplacements( emailEntity, messageSubjectReplacements, messageBodyReplacements, false,
+            false );
+
+        LOG.debug( "method sendUserAdditionMail() finished" );
+        return true;
+    }
+
+    //@Async
+    @Override
+    public boolean sendUserDeletionMail( Set<String> recipients, String deletedAdminName, String deletedAdminEmailId,
+        User deletedUser, OrganizationUnitSettings agentSettings ) throws InvalidInputException, UndeliveredEmailException
+    {
+        LOG.debug( "method sendUserDeletionMail() called" );
+
+        if ( recipients == null || recipients.isEmpty() ) {
+            LOG.warn( "No recipients for user deletion mail specified" );
+            throw new InvalidInputException( "No recipients for user deletion mail specified" );
+        } else if ( deletedUser == null ) {
+            LOG.warn( "User details not specified for the user to be deleted" );
+            throw new InvalidInputException( "User details not specified for the user to be deleted" );
+        } else if ( agentSettings == null ) {
+            LOG.warn( "User settings not specified for the user to be deleted" );
+        }
+
+        if ( LOG.isTraceEnabled() ) {
+            LOG.trace( "sending user deletion mail for user {}, to {}", deletedUser, recipients );
+        }
+
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( new ArrayList<>( recipients ) );
+        emailEntity.setMailType( CommonConstants.EMAIL_TYPE_USER_DELETION_MAIL );
+
+        FileContentReplacements messageSubjectReplacements = new FileContentReplacements();
+        messageSubjectReplacements
+            .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.USER_DELETION_MAIL_SUBJECT );
+
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        messageBodyReplacements
+            .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.CUSTOM_MAIL_BODY );
+
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, CommonConstants.ADMIN_RECEPIENT_DISPLAY_NAME,
+            emailFormatHelper.buildAgentAdditionOrDeletionMessage( deletedAdminName, deletedAdminEmailId, deletedUser,
+                agentSettings, false ) ) );
+
+        sendEmailWithSubjectAndBodyReplacements( emailEntity, messageSubjectReplacements, messageBodyReplacements, false,
+            false );
+
+        LOG.debug( "method sendUserDeletionMail() finished" );
+        return true;
+    }
 
 }
 

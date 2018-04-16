@@ -84,6 +84,7 @@
 	$(document).ready(function(){
 		$(document).attr("title", "Hierarchy");
 		bindCompanyIntervalCriteriaSelection();
+		$('#com-type-filter').val("enterprise");
 		searchAndDisplayCompanies("");
 	});
 </script>

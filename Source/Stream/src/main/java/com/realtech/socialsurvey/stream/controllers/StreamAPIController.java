@@ -44,6 +44,8 @@ public class StreamAPIController
     
     private KafkaTemplate<String, String> kafkaReportGenerationTemplate;
     
+    private KafkaTemplate<String, String> kafkaBatchProcessingTemplate;    
+    
     @Value ( "${kafka.topic.solrTopic}")
     private String solrTopic;
 
@@ -80,8 +82,14 @@ public class StreamAPIController
     }
     
     
+    @Autowired
+    @Qualifier ( "batchTemplate")
+    public void setKafkaBatchProcessingTemplate(KafkaTemplate<String, String> kafkaBatchProcessingTemplate) {
+		this.kafkaBatchProcessingTemplate = kafkaBatchProcessingTemplate;
+	}
 
-    @ApiOperation ( value = "Queues an email message.", response = Void.class)
+
+	@ApiOperation ( value = "Queues an email message.", response = Void.class)
     @ApiResponses ( value = { @ApiResponse ( code = 201, message = "Successfully queued the message"),
         @ApiResponse ( code = 401, message = "You are not authorized to view the resource"),
         @ApiResponse ( code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
@@ -140,6 +148,22 @@ public class StreamAPIController
         LOG.info( "Received request to generate reports in stream" );
         LOG.debug( "Report request {}", reportRequest );
         kafkaReportGenerationTemplate.send( new GenericMessage<>( reportRequest ) ).get( 60, TimeUnit.SECONDS );
+        return new ResponseEntity<>( HttpStatus.CREATED );
+    }
+    
+    
+    @ApiOperation ( value = "Processes batch for survey invitation email report.", response = Void.class)
+    @ApiResponses ( value = { @ApiResponse ( code = 201, message = "Report generation requested."),
+        @ApiResponse ( code = 401, message = "You are not authorized to view the resource"),
+        @ApiResponse ( code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
+        @ApiResponse ( code = 503, message = "Service not available") })
+    @RequestMapping ( value = "/batch", method = RequestMethod.POST)
+    public ResponseEntity<?> queueBatchProcessingRequest( @RequestBody ReportRequest reportRequest )
+        throws InterruptedException, ExecutionException, TimeoutException
+    {
+        LOG.info( "Received request to process batch." );
+        LOG.debug( "Report request {}", reportRequest );
+        kafkaBatchProcessingTemplate.send( new GenericMessage<>( reportRequest ) ).get( 60, TimeUnit.SECONDS );
         return new ResponseEntity<>( HttpStatus.CREATED );
     }
 
