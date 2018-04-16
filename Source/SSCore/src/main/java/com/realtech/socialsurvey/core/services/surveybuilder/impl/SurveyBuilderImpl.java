@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +33,7 @@ import com.realtech.socialsurvey.core.entities.SurveyQuestionsMapping;
 import com.realtech.socialsurvey.core.entities.SurveyTemplate;
 import com.realtech.socialsurvey.core.entities.SurveyVerticalMapping;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserRankingThisYearRegion;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -236,12 +240,15 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 			throw new InvalidInputException("Invalid argument. Null value is passed for survey.");
 		}
 
-		HashMap<String, Object> queries = new HashMap<>();
-		queries.put(CommonConstants.SURVEY_COLUMN, survey);
-		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		//changing the method findNumberOfRowsByKeyValue to findByCriteria cause there is no not equal
+		Criterion surveyColCriteria = Restrictions.eq( CommonConstants.SURVEY_COLUMN, survey);
+        Criterion activeCriteria = Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		//issue with the order after adding an nps question since nps question shdn't be considered in count
+		//cause the count is +1 ahead of what it's supposed to be
+        Criterion orderCriteria = Restrictions.ne(CommonConstants.SURVEY_QUESTION_ORDER_COLUMN, CommonConstants.DEFAULT_NPS_QUESTION_ORDER);
 
 		LOG.debug("Method countQuestionsInSurvey() finished.");
-		return surveyQuestionsMappingDao.findNumberOfRowsByKeyValue(SurveyQuestionsMapping.class, queries);
+		return surveyQuestionsMappingDao.findNumberOfRowsByCriteria(SurveyQuestionsMapping.class, surveyColCriteria,activeCriteria,orderCriteria);
 	}
 
 	@Override
@@ -769,11 +776,13 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 
 		int count = 1;
 		for (SurveyQuestionsMapping mapping : surveyQuestionsMappings) {
-			mapping.setQuestionOrder(count);
+		    if(mapping.getQuestionOrder() != CommonConstants.DEFAULT_NPS_QUESTION_ORDER) {
+		          mapping.setQuestionOrder(count);
+		          count++;
+		    }
 			surveyQuestionsMappingDao.save(mapping);
 			surveyQuestionsMappingDao.flush();
 
-			count++;
 		}
 		LOG.debug("Method reorderSurveyQuestions() finished.");
 	}
@@ -980,7 +989,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		questionDetails = setNPSRankingAnswer(questionDetails);
 		int maxQuestion = (int) countActiveQuestionsInSurvey(survey);
 		if(questionDetails.getIsNPSQuestion() == 1){
-		      questionDetails.setQuestionOrder(999);
+		      questionDetails.setQuestionOrder(CommonConstants.DEFAULT_NPS_QUESTION_ORDER);
 		}else{
 		       questionDetails.setQuestionOrder(maxQuestion + 1); 
 		}
