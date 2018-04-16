@@ -123,5 +123,13 @@ namespace EncompassSocialSurvey
                 return System.Configuration.ConfigurationManager.AppSettings[EncompassSocialSurveyConstant.COMPANY_TYPE_DETERMINANT];
             }
         }
+
+        public static string fetchSsapiUrl
+        {
+            get
+            {
+                return System.Configuration.ConfigurationManager.AppSettings[EncompassSocialSurveyConstant.SSAPI_URL];
+            }
+        }
     }
 }
