@@ -1633,4 +1633,14 @@ public interface OrganizationManagementService
 
 
 	ContactDetailsSettings fetchContactDetailByEncryptedId(String encryptedId, String collection);
+
+
+	/**
+	 * 
+	 * @param companyId
+	 * @param version
+	 * @return
+	 * @throws InvalidInputException
+	 */
+    public  boolean updateEncompassVersion( long companyId, String version ) throws InvalidInputException;
 }
