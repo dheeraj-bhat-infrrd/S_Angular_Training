@@ -2130,10 +2130,10 @@ public class HierarchyManagementController
                                     : userEntity.getEmailId().substring( 0, userEntity.getEmailId().indexOf( "@" ) );
                                 String lastName = ( userEntity.getLastName() != null ) ? userEntity.getLastName() : null;
                                 userManagementService.inviteUserToRegister( admin, firstName, lastName, userEntity.getEmailId(),
-                                    false, true );
+                                    false, true, false );
 
                                 userEntity = new UserFromSearch();
-                            } catch ( UserAlreadyExistsException | UndeliveredEmailException e ) {
+                            } catch ( UserAlreadyExistsException | UndeliveredEmailException | NoRecordsFetchedException e ) {
                                 LOG.debug( "Exception in validateAndParseIndividualDetails while inviting a new user. Reason:"
                                     + e.getMessage(), e );
                             }

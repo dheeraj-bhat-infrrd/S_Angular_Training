@@ -88,6 +88,9 @@ public class OrganizationUnitSettings implements Serializable
     private List<Keyword> filterKeywords;
     
     private List<SavedDigestRecord> savedDigestRecords;
+    
+    private Set<String> userAddDeleteNotificationRecipients;
+
 
     public List<Keyword> getFilterKeywords()
     {
@@ -793,8 +796,21 @@ public class OrganizationUnitSettings implements Serializable
 		this.encryptedId = encryptedId;
 	}
 
+	
 
-	@Override
+	public Set<String> getUserAddDeleteNotificationRecipients()
+    {
+        return userAddDeleteNotificationRecipients;
+    }
+
+
+    public void setUserAddDeleteNotificationRecipients( Set<String> userAddDeleteNotificationRecipients )
+    {
+        this.userAddDeleteNotificationRecipients = userAddDeleteNotificationRecipients;
+    }
+
+
+    @Override
     public String toString()
     {
         return "OrganizationUnitSettings [id=" + id + ", iden=" + iden + ", uniqueIdentifier=" + uniqueIdentifier
@@ -816,11 +832,11 @@ public class OrganizationUnitSettings implements Serializable
             + ", status=" + status + ", hiddenSection=" + hiddenSection + ", sendEmailFromCompany=" + sendEmailFromCompany
             + ", reviewSortCriteria=" + reviewSortCriteria + ", sendEmailThrough=" + sendEmailThrough + ", hideFromBreadCrumb="
             + hideFromBreadCrumb + ", hidePublicPage=" + hidePublicPage + ", digestRecipients=" + digestRecipients
-            + ", includeForTransactionMonitor=" + includeForTransactionMonitor + ", vendasta_rm_settings="
-            + vendasta_rm_settings + ", ranking_requirements=" + ranking_requirements + ", contactUsEmailsRoutedToCompanyAdmin="
-            + contactUsEmailsRoutedToCompanyAdmin + ", sendMonthlyDigestMail=" + sendMonthlyDigestMail + ", filterKeywords="
-            + filterKeywords + ", savedDigestRecords=" + savedDigestRecords + ", entityAlertDetails=" + entityAlertDetails
-            + "]";
+            + ", includeForTransactionMonitor=" + includeForTransactionMonitor + ", encryptedId=" + encryptedId
+            + ", vendasta_rm_settings=" + vendasta_rm_settings + ", ranking_requirements=" + ranking_requirements
+            + ", contactUsEmailsRoutedToCompanyAdmin=" + contactUsEmailsRoutedToCompanyAdmin + ", sendMonthlyDigestMail="
+            + sendMonthlyDigestMail + ", filterKeywords=" + filterKeywords + ", savedDigestRecords=" + savedDigestRecords
+            + ", userAddDeleteNotificationRecipients=" + userAddDeleteNotificationRecipients + ", entityAlertDetails=" + entityAlertDetails + "]";
     }
 
 }
