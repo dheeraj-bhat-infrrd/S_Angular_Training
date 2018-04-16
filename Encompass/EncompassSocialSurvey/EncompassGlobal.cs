@@ -119,7 +119,7 @@ namespace EncompassSocialSurvey
                             }
                             else
                             {
-                                Logger.Info("Sucessfully updated encompass version to " + versionString + " for company with ID" + companyCredential.EncompassCredential.CompanyId );
+                                Logger.Info("Sucessfully updated encompass version to " + versionString + " for company with ID : " + companyCredential.EncompassCredential.CompanyId );
                             }
                         }
 
