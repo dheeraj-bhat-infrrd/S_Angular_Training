@@ -64,6 +64,12 @@ public class ProfileCompletionList {
 		profileStage.setStatus(CommonConstants.STATUS_ACTIVE);
 		profileStages.add(profileStage);
 
+		profileStage = new ProfileStage();
+		profileStage.setOrder(ProfileStages.INSTAGRAM_PRF.getOrder());
+		profileStage.setProfileStageKey(ProfileStages.INSTAGRAM_PRF.name());
+		profileStage.setStatus(CommonConstants.STATUS_ACTIVE);
+		profileStages.add(profileStage);
+
 		if (isAgent) {
 			profileStage = new ProfileStage();
 			profileStage.setOrder(ProfileStages.LICENSE_PRF.getOrder());
