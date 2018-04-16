@@ -1991,7 +1991,13 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     && ( mediaTokens.getFacebookPixelToken().getPixelId() != null )
                     && !( mediaTokens.getFacebookPixelToken().getPixelId().isEmpty() ) )
                     socialUpdateAction.setLink( mediaTokens.getFacebookPixelToken().getPixelId() );
-                break;    
+                break;
+            case CommonConstants.INSTAGRAM_SOCIAL_SITE:
+                if ( ( mediaTokens.getInstagramToken() != null )
+                        && ( mediaTokens.getInstagramToken().getPageLink() != null )
+                        && !( mediaTokens.getInstagramToken().getPageLink().isEmpty() ) )
+                    socialUpdateAction.setLink( mediaTokens.getInstagramToken().getPageLink() );
+                break;
 
             default:
                 throw new InvalidInputException( "Invalid social media token entered" );

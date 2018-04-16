@@ -782,9 +782,9 @@ public class SocialManagementController
     }
 
     @ResponseBody
-    @RequestMapping ( value = "/saveSelectedAccessTwitterToken")
-    public String saveSelectedAccessTwitterToken( Model model, HttpServletRequest request ){
-        LOG.info( " Trying to save selected twitteraccount " );
+    @RequestMapping ( value = "/saveSelectedAccessInstagramToken")
+    public String saveSelectedAccessInstagramToken( Model model, HttpServletRequest request ){
+        LOG.info( " Trying to save selected Instagram " );
         String selectedAccessToken = request.getParameter( "selectedAccessFacebookToken" );
         String selectedProfileUrl = request.getParameter( "selectedProfileUrl" );
         User user = sessionHelper.getCurrentUser();
@@ -835,14 +835,117 @@ public class SocialManagementController
                     throw new InvalidInputException("No company settings found in current session");
                 }
 
+                mediaTokens = companySettings.getSocialMediaTokens();
+                mediaTokens.setInstagramToken(instagramToken);
+                socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
+                        companySettings, mediaTokens );
+                //update SETTINGS_SET_STATUS of COMPANY table to set.
+                Company company = userManagementService.getCompanyById( companySettings.getIden() );
+                if ( company != null ) {
+                    settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.FACEBOOK,
+                            CommonConstants.SET_SETTINGS );
+                    userManagementService.updateCompany( company );
+                }
+                for ( ProfileStage stage : companySettings.getProfileStages() ) {
+                    if ( stage.getProfileStageKey().equalsIgnoreCase( "INSTAGRAM_PRF" ) ) {
+                        stage.setStatus( CommonConstants.STATUS_INACTIVE );
+                    }
+                }
+                profileManagementService.updateProfileStages( companySettings.getProfileStages(), companySettings,
+                        MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+                updated = true;
+            } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+                OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
+                if ( regionSettings == null ) {
+                    throw new InvalidInputException( "No Region settings found in current session" );
+                }
+                mediaTokens = regionSettings.getSocialMediaTokens();
+                mediaTokens.setInstagramToken(instagramToken);
+                socialManagementService.updateSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
+                        regionSettings, mediaTokens );
+                //update SETTINGS_SET_STATUS of REGION table to set.
+                Region region = userManagementService.getRegionById( regionSettings.getIden() );
+                if ( region != null ) {
+                    settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.FACEBOOK,
+                            CommonConstants.SET_SETTINGS );
+                    userManagementService.updateRegion( region );
+                }
+                for ( ProfileStage stage : regionSettings.getProfileStages() ) {
+                    if ( stage.getProfileStageKey().equalsIgnoreCase( "INSTAGRAM_PRF" ) ) {
+                        stage.setStatus( CommonConstants.STATUS_INACTIVE );
+                    }
+                }
+                profileManagementService.updateProfileStages( regionSettings.getProfileStages(), regionSettings,
+                        MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+                updated = true;
+            } else if( entityType.equals( CommonConstants.BRANCH_ID_COLUMN )) {
+                OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
+                if ( branchSettings == null ) {
+                    throw new InvalidInputException( "No Branch settings found in current session" );
+                }
+                mediaTokens = branchSettings.getSocialMediaTokens();
+                mediaTokens.setInstagramToken(instagramToken);
+                socialManagementService.updateSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
+                branchSettings, mediaTokens );
+                //update SETTINGS_SET_STATUS of BRANCH table to set.
+                Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
+                if ( branch != null ) {
+                    settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.FACEBOOK,
+                            CommonConstants.SET_SETTINGS );
+                    userManagementService.updateBranch( branch );
+                }
 
+                for ( ProfileStage stage : branchSettings.getProfileStages() ) {
+                    if ( stage.getProfileStageKey().equalsIgnoreCase( "INSTAGRAM_PRF" ) ) {
+                        stage.setStatus( CommonConstants.STATUS_INACTIVE );
+                    }
+                }
+                profileManagementService.updateProfileStages( branchSettings.getProfileStages(), branchSettings,
+                        MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+                updated = true;
+            } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN )
+                    || accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
+                AgentSettings agentSettings = userManagementService.getUserSettings(entityId);
+                if (agentSettings == null) {
+                    throw new InvalidInputException("No Agent settings found in current session");
+                }
+                mediaTokens = agentSettings.getSocialMediaTokens();
+                mediaTokens.setInstagramToken(instagramToken);
+                socialManagementService.updateAgentSocialMediaTokens( agentSettings, mediaTokens );
+
+                for ( ProfileStage stage : agentSettings.getProfileStages() ) {
+                    if ( stage.getProfileStageKey().equalsIgnoreCase( "INSTAGRAM_PRF" ) ) {
+                        stage.setStatus( CommonConstants.STATUS_INACTIVE );
+                    }
+                }
+                profileManagementService.updateProfileStages( agentSettings.getProfileStages(), agentSettings,
+                        MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+                updated = true;
             }
+
+            if ( !updated ) {
+                throw new InvalidInputException( "Invalid input exception occurred while saving access token for instagram",
+                        DisplayMessageConstants.GENERAL_ERROR );
+            }
+
+            //get detail of expire social media
+            boolean isSocialMediaExpired = false;
+            if(organizationManagementService.getExpiredSocailMedia( entityType, entityId ).size() > 0)
+                isSocialMediaExpired = true;
+            session.setAttribute( "isSocialMediaExpired" , isSocialMediaExpired );
+
+            //Add action to social connection history
+            socialManagementService.updateSocialConnectionsHistory( entityType, entityId, mediaTokens,
+                    CommonConstants.INSTAGRAM_SOCIAL_SITE, CommonConstants.SOCIAL_MEDIA_CONNECTED );
+
         }
         catch ( InvalidInputException | NoRecordsFetchedException e ) {
-            LOG.error( "Error while saving access token for facebook to post: ", e );
+            LOG.error( "Error while saving access token for instagram to post: ", e );
         } catch ( NonFatalException e ) {
             LOG.error( "Error setting settings value. Reason : ", e );
         }
+        model.addAttribute( "socialNetwork", "instagram" );
+        return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;
     }
 
     /**
@@ -2635,6 +2738,14 @@ public class SocialManagementController
                     profileUrl = usersettings.getAgentSettings().getSocialMediaTokens().getZillowToken().getZillowProfileLink();
                 }
             }
+        } else if ( socialNetwork.equalsIgnoreCase( "instagram" ) ) {
+            if ( usersettings != null && usersettings.getAgentSettings() != null
+                    && usersettings.getAgentSettings().getSocialMediaTokens() != null
+                    && usersettings.getAgentSettings().getSocialMediaTokens().getInstagramToken() != null ) {
+                if ( usersettings.getAgentSettings().getSocialMediaTokens().getInstagramToken().getPageLink() != null ) {
+                    profileUrl = usersettings.getAgentSettings().getSocialMediaTokens().getInstagramToken().getPageLink();
+                }
+            }
         }
 
         LOG.info( "Method getProfileUrl() finished from SocialManagementController" );
@@ -3003,6 +3114,10 @@ public class SocialManagementController
 		            && tokens.getGoogleBusinessToken().getGoogleBusinessLink() != null ) {
 		            model.addAttribute( "googleBusinessLink", tokens.getGoogleBusinessToken().getGoogleBusinessLink() );
 	            }
+                if ( tokens.getInstagramToken() != null
+                        && tokens.getInstagramToken().getPageLink() != null ) {
+                    model.addAttribute( "instagramLink", tokens.getInstagramToken().getPageLink() );
+                }
             }
         } catch ( NonFatalException e ) {
             LOG.error( "Exception occured in getSocialMediaTokenonSettingsPage()" );

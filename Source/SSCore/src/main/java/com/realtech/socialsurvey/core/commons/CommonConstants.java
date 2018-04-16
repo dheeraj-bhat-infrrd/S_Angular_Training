@@ -459,6 +459,7 @@ public interface CommonConstants
     public static final String GOOGLE_BUSINESS_SOCIAL_SITE = "google business";
     public static final String GOOGLE_SOCIAL_SITE = "google";
     public static final String SOCIAL_SURVEY_SOCIAL_SITE = "socialsurvey";
+    public static final String INSTAGRAM_SOCIAL_SITE = "instagram";
     public static final String TWITTER_BASE_URL = "www.twitter.com/";
     public static final String COMPANY_ID = "companyId";
     public static final String REGION_ID = "regionId";
