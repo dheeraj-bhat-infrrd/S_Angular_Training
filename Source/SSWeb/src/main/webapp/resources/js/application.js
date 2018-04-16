@@ -8012,7 +8012,7 @@ $('.sq-np-item-next').click(function() {
 			storeCustomerAnswer(customerResponse);
 		} else if (questionDetails.questionType == "sb-range-star") {
 			reduceOpacityOfStars();
-			if ($('#next-star').hasClass("btn-com-disabled")) {
+			if ($('#next-star').hasClass("btn-com-disabled") || $('#sq-stars').attr('selected-star-no') == 0) {
 				$('#overlay-toast').html('Please answer the question. You can not skip a rating question.');
 				showToast();
 				return;
@@ -8021,9 +8021,9 @@ $('.sq-np-item-next').click(function() {
 			if(starVal > 5)
 				starVal = Math.floor(starVal/2);
 			storeCustomerAnswer(starVal);
-		} else if (questionDetails.questionType == "sb-range-smiles") {
+		} else if (questionDetails.questionType == "sb-range-smiles" ) {
 			reduceOpacityOfSmiles();
-			if ($('#next-smile').hasClass("btn-com-disabled")) {
+			if ($('#next-smile').hasClass("btn-com-disabled") || $('#sq-smiles').attr('selected-smiles-no') == 0) {
 				$('#overlay-toast').html('Please answer the question. You can not skip a rating question.');
 				showToast();
 				return;
