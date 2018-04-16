@@ -20,6 +20,7 @@
 </head>
 
 <body>
+<input id="sq-data" type="hidden" data-edited=false>
 	<div id="toast-container" class="toast-container">
 		<span id="overlay-toast" class="overlay-toast"></span>
 	</div>
@@ -65,7 +66,7 @@
 	data-last-name="${lastName}" data-first-name="${firstName}"
 		 class="prof-main-content-wrapper margin-top-25 margin-bottom-25 min-height-container">
 		<div class="container">
-			<div class="sq-ques-wrapper">
+			<div class="sq-ques-wrapper" data-edited=false>
 				<div id="agnt-img" class="sq-top-img"></div>
 				<div data-ques-type="stars" class="sq-quest-item hide">
 					<!-- <div class="sq-top-img"></div> -->

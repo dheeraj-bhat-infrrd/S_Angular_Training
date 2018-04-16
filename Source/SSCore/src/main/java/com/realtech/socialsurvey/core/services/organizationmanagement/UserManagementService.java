@@ -60,12 +60,14 @@ public interface UserManagementService
      * @param lastName
      * @param emailId
      * @param holdSendingMail
+     * @param isForHierarchyUpload TODO
      * @throws InvalidInputException
      * @throws UserAlreadyExistsException
      * @throws UndeliveredEmailException
+     * @throws NoRecordsFetchedException 
      */
     public User inviteUserToRegister( User admin, String firstName, String lastName, String emailId, boolean holdSendingMail,
-        boolean sendMail ) throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException;
+        boolean sendMail, boolean isForHierarchyUpload ) throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException, NoRecordsFetchedException;
 
 
     /**
@@ -399,12 +401,12 @@ public interface UserManagementService
 
 
     public User inviteUser( User admin, String firstName, String lastName, String emailId )
-        throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException, SolrException;
+        throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException, SolrException, NoRecordsFetchedException;
 
 
     public User addCorporateAdmin( String firstName, String lastName, String emailId, String confirmPassword,
         boolean isDirectRegistration )
-        throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException, SolrException;
+        throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException, SolrException, NoRecordsFetchedException;
 
 
     public String generateIndividualProfileName( long userId, String name, String emailId ) throws InvalidInputException;
@@ -573,7 +575,7 @@ public interface UserManagementService
     void updateUserEmailMapping( User agent, long emailMappingId, int status ) throws InvalidInputException;
 
 
-    public void deleteUserDataFromAllSources( User loggedInUser, long userIdToBeDeleted, int status )
+    public void deleteUserDataFromAllSources( User loggedInUser, long userIdToBeDeleted, int status, boolean isForHierarchyUpload )
         throws InvalidInputException, SolrException;
 
 

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -131,6 +132,9 @@ public class AccountServiceImpl implements AccountService
             //solr, mongo with status 'I'. Set the force password column to 1.
             user = userService.addUser( user.getFirstName(), user.getLastName(), user.getEmailId(), phone, company );
             ids.put( "userId", user.getUserId() );
+            
+            // send user addition mail
+            organizationManagementService.sendUserAdditionMail( user, user );
 
             // Send registration email to user, Send mail to sales lead, maybe to support
             userService.sendRegistrationEmail( user, planId );

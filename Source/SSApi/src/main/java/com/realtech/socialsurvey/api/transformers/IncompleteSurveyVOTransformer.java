@@ -56,6 +56,7 @@ public class IncompleteSurveyVOTransformer implements Transformer<List<Incompete
                 	serviceProviderInfo.setServiceProviderEmail( surveyPreInitiation.getAgentEmailId() );
                 if ( StringUtils.isBlank( serviceProviderInfo.getServiceProviderName() ) )
                 	serviceProviderInfo.setServiceProviderName( surveyPreInitiation.getAgentName() );
+                serviceProviderInfo.setServiceProviderId(surveyPreInitiation.getAgentId());
                 if ( StringUtils.isBlank( transactionInfo.getTransactionCity() ) )
                 	transactionInfo.setTransactionCity( surveyPreInitiation.getCity() );
                 if ( StringUtils.isBlank( transactionInfo.getTransactionState() ) )
@@ -68,6 +69,7 @@ public class IncompleteSurveyVOTransformer implements Transformer<List<Incompete
                 if ( StringUtils.isBlank( transactionInfo.getTransactionType() ) )
                 	transactionInfo.setTransactionType( surveyPreInitiation.getTransactionType() );                
 
+                
                 incompeteSurveyGetVO.setTransactionInfo( transactionInfo );
                 incompeteSurveyGetVO.setServiceProviderInfo( serviceProviderInfo );
                 incompleteSurveyVOs.add(incompeteSurveyGetVO);

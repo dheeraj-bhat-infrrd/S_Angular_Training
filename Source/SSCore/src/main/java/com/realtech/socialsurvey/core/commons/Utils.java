@@ -23,6 +23,8 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -411,12 +413,14 @@ public class Utils
      * @param toTimeZone
      * @return
      */
-    public String convertDateToTimeZone( Timestamp date, String toTimeZone )
-    {
-        Calendar calendar = Calendar.getInstance( TimeZone.getTimeZone( toTimeZone ) );
-        SimpleDateFormat dateFormat = new SimpleDateFormat( "MM/dd/yy, HH:mm" );
-        dateFormat.setCalendar( calendar );
-        return ( dateFormat.format( date ) );
+    public String convertDateToTimeZone( long date, String toTimeZone )
+    {	
+    	DateTime dateTime = new DateTime(new Date(date));
+    	DateTimeZone dateTimeZone = DateTimeZone.forID(toTimeZone);
+    	DateTime dateTimeWithZone = dateTime.withZone(dateTimeZone);
+    	Date dateWithZone = dateTimeWithZone.toLocalDateTime().toDate();
+    	SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yy, HH:mm");
+    	return (dateFormat.format(dateWithZone));
     }
 
 

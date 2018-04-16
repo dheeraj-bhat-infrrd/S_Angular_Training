@@ -771,6 +771,13 @@ public class OrganizationManagementController
             }
             model.addAttribute( "digestRecipients", digestRecipients );
 
+            // prepare user notify recipients String
+            String userNotifyRecipients = "";
+            if( unitSettings.getUserAddDeleteNotificationRecipients() != null ){
+                userNotifyRecipients = StringUtils.join( unitSettings.getUserAddDeleteNotificationRecipients(), ",\n" );
+            }
+            model.addAttribute( "userNotifyRecipients", userNotifyRecipients );
+
             //set allow parter survey
             boolean allowPartnerSurvey = false;
             if ( unitSettings.getCrm_info() != null )
@@ -4125,7 +4132,7 @@ public class OrganizationManagementController
             String emailsStr = request.getParameter( "emails" );
             if ( emailsStr == null ) {
                 LOG.warn( "Null or empty value found in updateDigestRecipients() for emails." );
-                status = "Unable to get email data";
+                status = "Unable to find email data";
             } else {
 
                 Set<String> emailList = organizationManagementService.parseEmailsList( emailsStr );
@@ -4140,7 +4147,7 @@ public class OrganizationManagementController
             }
 
         } catch ( NonFatalException error ) {
-            LOG.error( "Non fatal exception caught in updateDigestRecipients(). Nested exception is ", error );
+            LOG.warn( "Non fatal exception caught in updateDigestRecipients(). Nested exception is ", error );
             status = "Unable to update digest recipients";
         }
 
@@ -4148,5 +4155,48 @@ public class OrganizationManagementController
         return status;
     }
 
+
+    @ResponseBody
+    @RequestMapping ( value = "/updateadddeletenotifyrecipients", method = RequestMethod.POST)
+    public String updateAddDeleteNotifyRecipients( HttpServletRequest request, Model model )
+    {
+        LOG.info( "Method updateAddDeleteNotifyRecipients() started." );
+        HttpSession session = request.getSession();
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String status = "";
+        
+        if( StringUtils.isEmpty( entityType ) || !CommonConstants.COMPANY_ID.equals( entityType ) ) {
+            LOG.warn( "Unable to update add/delete notification recipients" );
+            return "Unable to update add/delete notification recipients, insufficient permissions";
+        }
+
+        try {
+
+            String emailsStr = request.getParameter( "emails" );
+            if ( emailsStr == null ) {
+                LOG.warn( "Null or empty value found in updateAddDeleteNotifyRecipients() for emails." );
+                status = "Unable to find email data";
+            } else {
+
+                Set<String> emailList = organizationManagementService.parseEmailsList( emailsStr );
+                organizationManagementService.updateUserAdditionDeletionRecipients( entityType, entityId, emailList );
+
+                if ( emailList == null || emailList.isEmpty() ) {
+                    status = "User add/delete notification recipients removed!";
+                } else {
+                    status = "User add/delete notification recipients updated successfully!";
+                }
+
+            }
+
+        } catch ( NonFatalException error ) {
+            LOG.warn( "Non fatal exception caught in updateAddDeleteNotifyRecipients(). Nested exception is ", error );
+            status = "Unable to update add/delete notification recipients";
+        }
+
+        LOG.info( "Method updateAddDeleteNotifyRecipients() finished." );
+        return status;
+    }
 }
 // JIRA: SS-24 BY RM02 EOC

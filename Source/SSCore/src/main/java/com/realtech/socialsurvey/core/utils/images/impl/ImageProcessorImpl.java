@@ -112,7 +112,7 @@ public class ImageProcessorImpl implements ImageProcessor {
 		File f = new File(".");
 		LOG.debug("File path: "+f.getAbsolutePath());
 		File processedFile = null;
-		scaledImage = Scalr.resize(image, Method.SPEED, Mode.AUTOMATIC, width, height);
+		scaledImage = Scalr.resize(image, Method.ULTRA_QUALITY, Mode.AUTOMATIC, width, height);
 		processedFile = new File(CommonConstants.TEMP_FOLDER + CommonConstants.FILE_SEPARATOR + String.valueOf(System.currentTimeMillis()) + "-"
 				+ width + "-" + height + "." + imageExtension);
 		try {
@@ -139,7 +139,7 @@ public class ImageProcessorImpl implements ImageProcessor {
             throw new InvalidInputException("Could not find file to process");
         }
         BufferedImage scaledImage = null;
-        scaledImage = Scalr.resize(image, Method.SPEED, Mode.AUTOMATIC, width, height);
+        scaledImage = Scalr.resize(image, Method.ULTRA_QUALITY, Mode.AUTOMATIC, width, height);
         File processedFile = null;
         
         BufferedImage newRectangularImage = null;

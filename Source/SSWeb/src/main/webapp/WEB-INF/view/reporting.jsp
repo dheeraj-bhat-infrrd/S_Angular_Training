@@ -131,7 +131,7 @@
 				</ul>
 				<div class="tab-content rep-tab-content">
 					<div class="tab-pane fade col-lg-12 col-md-12 col-sm-12 col-xs-12 active in" id="trans-stats-tab" style="padding: 0;">
-						<div id="reporting-trans-details" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 prof-pic-name-wrapper edit-prof-pic-name-wrapper reporting-trans-details">
+						<div id="reporting-trans-details" data-switch="true" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 prof-pic-name-wrapper edit-prof-pic-name-wrapper reporting-trans-details">
 							<div id="trans-stats-dash" class="hide" ></div>
 							<%-- <%@ include file="reporting_transaction_details.jsp" %> --%>
 						</div>
@@ -167,7 +167,7 @@
 						<div id="question-ratings-div" class="col-md-12 col-lg-12 col-sm-12 col-xs-12 score-stats-ques-con">
 							
 						</div>
-						<div id="empty-questions-div" class="hide">
+						<div id="empty-questions-div" class="hide" style="position: relative;">
 							<div style="text-align: center; margin: 5% auto">
 								<span class="incomplete-trans-span" style="font-size: large">Sorry!!!</span>
 								<div style="clear: both">
@@ -183,7 +183,6 @@
 								<div id="review-desc" class="float-left dash-ppl-say-lbl" data-profile-name="${profileName}"></div>
 							</div>
 							<div id="review-details" class="ppl-review-item-wrapper">
-								
 							</div>
 						</div>
 					</div>
@@ -228,7 +227,7 @@
 </div>
 <script>
 	$(document).ready(function() {
-		$(document).attr("title", "New Dashboard");
+		$(document).attr("title", "Dashboard");
 	
 		updateViewAsScroll();
 		

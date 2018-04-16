@@ -239,8 +239,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>742</xloc>
-      <yloc>223</yloc>
+      <xloc>983</xloc>
+      <yloc>341</yloc>
       </entry>
     <entry>
       <name>nps_report_month_company</name>

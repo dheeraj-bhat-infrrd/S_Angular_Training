@@ -55,4 +55,10 @@ public interface GenericReportingDao<T, ID extends Serializable>{
         String alias );
 
     public void saveAll(List<T> entityList);
+
+	public void deleteAll(List<T> entityList);
+	public void delete(T entity);
+	
+	List<T> findByKeyValueInBatch(Class<T> dataClass, Map<String, Object> queries, int startIndex, int batchSize);
+
 }

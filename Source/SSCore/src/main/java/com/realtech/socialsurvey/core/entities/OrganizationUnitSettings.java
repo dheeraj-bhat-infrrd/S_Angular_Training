@@ -72,6 +72,7 @@ public class OrganizationUnitSettings implements Serializable
     private boolean hidePublicPage; //to hide entity form public page and sitemap
     private Set<String> digestRecipients;
     private boolean includeForTransactionMonitor;
+    private String encryptedId;
 
     // vendasta product details 
     private VendastaProductSettings vendasta_rm_settings;
@@ -89,6 +90,9 @@ public class OrganizationUnitSettings implements Serializable
     //Social Monitor Macros
     private List<SocialMonitorMacro> socialMonitorMacros;
     private List<SavedDigestRecord> savedDigestRecords;
+    
+    private Set<String> userAddDeleteNotificationRecipients;
+
 
     public List<Keyword> getFilterKeywords()
     {
@@ -794,6 +798,29 @@ public class OrganizationUnitSettings implements Serializable
     }
 
 
+    public String getEncryptedId() {
+		return encryptedId;
+	}
+
+
+	public void setEncryptedId(String encryptedId) {
+		this.encryptedId = encryptedId;
+	}
+
+	
+
+	public Set<String> getUserAddDeleteNotificationRecipients()
+    {
+        return userAddDeleteNotificationRecipients;
+    }
+
+
+    public void setUserAddDeleteNotificationRecipients( Set<String> userAddDeleteNotificationRecipients )
+    {
+        this.userAddDeleteNotificationRecipients = userAddDeleteNotificationRecipients;
+    }
+
+
     @Override
     public String toString()
     {
@@ -816,12 +843,12 @@ public class OrganizationUnitSettings implements Serializable
             + ", status=" + status + ", hiddenSection=" + hiddenSection + ", sendEmailFromCompany=" + sendEmailFromCompany
             + ", reviewSortCriteria=" + reviewSortCriteria + ", sendEmailThrough=" + sendEmailThrough + ", hideFromBreadCrumb="
             + hideFromBreadCrumb + ", hidePublicPage=" + hidePublicPage + ", digestRecipients=" + digestRecipients
-            + ", includeForTransactionMonitor=" + includeForTransactionMonitor + ", vendasta_rm_settings="
-            + vendasta_rm_settings + ", ranking_requirements=" + ranking_requirements + ", contactUsEmailsRoutedToCompanyAdmin="
-            + contactUsEmailsRoutedToCompanyAdmin + ", sendMonthlyDigestMail=" + sendMonthlyDigestMail + ", filterKeywords="
-            + filterKeywords + ", socialMonitorMacros=" + socialMonitorMacros + ", savedDigestRecords=" + savedDigestRecords
-            + ", entityAlertDetails=" + entityAlertDetails + "]";
+            + ", includeForTransactionMonitor=" + includeForTransactionMonitor + ", encryptedId=" + encryptedId
+            + ", vendasta_rm_settings=" + vendasta_rm_settings + ", ranking_requirements=" + ranking_requirements
+            + ", contactUsEmailsRoutedToCompanyAdmin=" + contactUsEmailsRoutedToCompanyAdmin + ", sendMonthlyDigestMail="
+            + sendMonthlyDigestMail + ", filterKeywords=" + filterKeywords + ", socialMonitorMacros=" + socialMonitorMacros
+            + ", savedDigestRecords=" + savedDigestRecords + ", userAddDeleteNotificationRecipients="
+            + userAddDeleteNotificationRecipients + ", entityAlertDetails=" + entityAlertDetails + "]";
     }
-    
     
 }
