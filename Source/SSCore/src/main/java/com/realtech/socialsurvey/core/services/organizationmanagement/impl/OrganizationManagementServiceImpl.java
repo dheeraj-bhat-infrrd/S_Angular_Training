@@ -8929,21 +8929,17 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 mailId = mailId.trim();
         } else {
             String mailIds[] = mailId.split( "," );
-
-            if ( mailIds.length == 0 )
-                throw new InvalidInputException( "Mail id - {} entered as send alert to input is empty", mailId );
-
-            for ( String mailID : mailIds ) {
-                if ( !validateEmail( mailID.trim() ) )
-                    throw new InvalidInputException(
-                        "Mail id - {} entered amongst the mail ids as send alert to input is invalid", mailId );
-                else
-                    mailIDStr += mailID.trim() + " , ";
-            }
-            mailId = mailIDStr.substring( 0, mailIDStr.length() - 2 );
-        }
-        return mailId;
-    }
+			for (String mailID : mailIds) {
+				if (!validateEmail(mailID.trim()))
+					throw new InvalidInputException(
+							"Mail id - {} entered amongst the mail ids as send alert to input is invalid",mailId);
+				else
+					mailIDStr += mailID.trim() + " , ";
+			}
+			mailId = mailIDStr.substring(0, mailIDStr.length() - 2);
+		}
+		return mailId;
+	}
 
 
     public void addSurveySettings( OrganizationUnitSettings unitSettings )
@@ -8967,31 +8963,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 
     @Override
-    public void updateIsLoginPreventedForUser( AgentSettings agentSettings, boolean isLoginPrevented )
-        throws InvalidInputException
-    {
-        if ( agentSettings == null ) {
-            throw new InvalidInputException( "Agent settings can not be null" );
-        }
-        LOG.info( "Inside method updateIsLoginPreventedForUser for user : " + agentSettings.getIden() );
-        organizationUnitSettingsDao.updateParticularKeyAgentSettings(
-            MongoOrganizationUnitSettingDaoImpl.KEY_IS_LOGIN_PREVENTED, isLoginPrevented, agentSettings );
-    }
-
-
-    @Override
-    public void updateHidePublicPageForUser( AgentSettings agentSettings, boolean hidePublicPage ) throws InvalidInputException
-    {
-        if ( agentSettings == null ) {
-            throw new InvalidInputException( "Agent settings can not be null" );
-        }
-        LOG.info( "Inside method updateHidePublicPageForUser for user : " + agentSettings.getIden() );
-        organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_HIDE_PUBLIC_PAGE,
-            hidePublicPage, agentSettings );
-    }
-
-
-    @Override
     public boolean doesSurveyHaveNPSQuestions( User user )
     {
         if ( user != null ) {
@@ -9007,8 +8978,28 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
         return false;
     }
-
-
+	
+	/**
+	 * Update isLoginPrevented flag in Mongo for user
+	 */
+	@Override
+    public void updateIsLoginPreventedForUser( Long userId, boolean isLoginPrevented ) throws InvalidInputException
+    {
+	    if ( userId == null || userId == 0l ) {
+            throw new InvalidInputException( "userId is null or 0" );
+        }
+        
+        List<Long> userIdList = new ArrayList<Long>();
+        userIdList.add( userId );
+        
+        LOG.info( "Inside method updateIsLoginPreventedForUser for user : {}", userId );
+        updateIsLoginPreventedForUsers( userIdList, isLoginPrevented );
+    }
+    
+	
+	/**
+     * Update isLoginPrevented flag in Mongo for list of users
+     */
     @Override
     public void updateIsLoginPreventedForUsers( List<Long> userIdList, boolean isLoginPrevented ) throws InvalidInputException
     {
@@ -9018,8 +9009,29 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.info( "Inside method updateIsLoginPreventedForUsers " );
         organizationUnitSettingsDao.updateIsLoginPreventedForUsersInMongo( userIdList, isLoginPrevented );
     }
-
-
+    
+    
+    /**
+     * Update hidePublicPage flag in Mongo for user
+     */
+    @Override
+    public void updateHidePublicPageForUser( Long userId, boolean hidePublicPage ) throws InvalidInputException
+    {
+        if ( userId == null || userId == 0l ) {
+            throw new InvalidInputException( "userId is null or 0" );
+        }
+        
+        List<Long> userIdList = new ArrayList<Long>();
+        userIdList.add( userId );
+        
+        LOG.info( "Inside method updateHidePublicPageForUser for user : {}", userId );
+        updateHidePublicPageForUsers( userIdList, hidePublicPage );
+    }
+    
+    
+    /**
+     * Update hidePublicPage flag in Mongo for a list of user
+     */
     @Override
     public void updateHidePublicPageForUsers( List<Long> userIdList, boolean hidePublicPage ) throws InvalidInputException
     {
@@ -9037,6 +9049,38 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         return organizationUnitSettingsDao.fetchContactDetailByEncryptedId( encryptedId, collection );
     }
     
+    
+    
+    /**
+     * Update socialMediaTokens in Mongo for a user
+     */
+    @Override
+    public void updateSocialMediaForUser( Long userId, boolean disableSocialMediaTokens ) throws InvalidInputException
+    {
+        if ( userId == null || userId == 0l ) {
+            throw new InvalidInputException( "userId is null or 0" );
+        }
+        
+        List<Long> userIdList = new ArrayList<Long>();
+        userIdList.add( userId );
+        
+        LOG.info( "Inside method updateSocialMediaForUser " );
+        updateSocialMediaForUsers( userIdList, disableSocialMediaTokens );
+    }
+    
+    
+    /**
+     * Update socialMediaTokens in Mongo for a list of users
+     */
+    @Override
+    public void updateSocialMediaForUsers( List<Long> userIdList, boolean disableSocialMediaTokens ) throws InvalidInputException
+    {
+        if ( userIdList == null || userIdList.isEmpty() ) {
+            throw new InvalidInputException( "List of userIds is null" );
+        }
+        LOG.info( "Inside method updateSocialMediaForUsers " );
+        organizationUnitSettingsDao.updateSocialMediaForUsers( userIdList, disableSocialMediaTokens );
+    }
     
     @Override
     public boolean updateUserAdditionDeletionRecipients( String entityType, long entityId, Set<String> emails )

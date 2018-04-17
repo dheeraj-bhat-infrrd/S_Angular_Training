@@ -47,7 +47,7 @@
 	<div class="container reg_panel_container">
 		<div class="reg_header text-center"><spring:message code="label.account.disabled.notification.key" /></div>
 		<div class="reg_lkin_wrapper text-center">
-			<div class="reg_lin_lin2">Login is prevented for this your account. Please contact your admin.</div>
+			<div class="reg_lin_lin2"><spring:message code="label.account.login.disabled.title.key" /></div>
 		</div>
 	</div>
 </div>

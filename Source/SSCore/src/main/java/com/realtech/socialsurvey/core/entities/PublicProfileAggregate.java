@@ -277,7 +277,7 @@ public class PublicProfileAggregate
             + ", profileLevel=" + profileLevel + ", profileName=" + profileName + ", averageRating=" + averageRating
             + ", reviewCount=" + reviewCount + ", profileJson=" + profileJson + ", reviews=" + reviews + ", companyProfileName="
             + companyProfileName + ", findAProCompanyProfileName=" + findAProCompanyProfileName + ", reviewSortCriteria="
-            + reviewSortCriteria + ", isAgent=" + isAgent + ", hiddenSection=" + hiddenSection + ", completeCompanyProfileUrl="
+            + reviewSortCriteria + ", isAgent=" + isAgent + ", hiddenSection=" + hiddenSection + ", completeCompanyProfileUrl=" 
             + completeCompanyProfileUrl + ", completeRegionProfileUrl=" + completeRegionProfileUrl
             + ", completeBranchProfileUrl=" + completeBranchProfileUrl + ", reviewAggregate=" + reviewAggregate + ", surveyId="
             + surveyId + "]";
