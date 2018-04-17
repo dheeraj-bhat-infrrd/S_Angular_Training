@@ -5,7 +5,10 @@ package com.realtech.socialsurvey.core.dao.impl;
 
 import java.util.List;
 
+import org.hibernate.Criteria;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -78,6 +81,17 @@ public class SurveyInvitationEmailDaoImpl extends GenericReportingDaoImpl<Survey
 		.setInteger("year", year);
 		query.executeUpdate();
 		LOG.info("Deleted records for {}-{}",month,year);
+	}
+
+	@Override
+	public int getSurveyInvitationEmailReportCountForMonth(int month, int year) {
+		int count = 0;
+		Criteria criteria = getSession().createCriteria(SurveyInvitationEmailCountMonth.class);
+		criteria.add(Restrictions.eq("month", month))
+		.add(Restrictions.eq("year", year));
+		criteria.setProjection(Projections.rowCount());
+		count = (Integer)criteria.uniqueResult();
+		return count;
 	}
 	
 }
