@@ -16,6 +16,7 @@ public class FacebookToken {
 	private boolean tokenExpiryAlertSent;
 	private Date tokenExpiryAlertTime;
 	private String tokenExpiryAlertEmail;
+	private long lastTokenExpiryValidationTime;
 	
 	public String getFacebookId() {
 		return facebookId;
@@ -101,6 +102,16 @@ public class FacebookToken {
     public void setTokenExpiryAlertEmail( String tokenExpiryAlertEmail )
     {
         this.tokenExpiryAlertEmail = tokenExpiryAlertEmail;
+    }
+
+    public long getLastTokenExpiryValidationTime()
+    {
+        return lastTokenExpiryValidationTime;
+    }
+
+    public void setLastTokenExpiryValidationTime( long lastTokenExpiryValidationTime )
+    {
+        this.lastTokenExpiryValidationTime = lastTokenExpiryValidationTime;
     }
 
     @Override

@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
@@ -62,6 +63,9 @@ public class EmailFormatHelper
 
     @Autowired
     private SurveyPreInitiationDao surveyPreInitiationDao;
+
+    @Autowired
+    private Utils utils;
 
     private static final String PARAM_PATTERN_REGEX = "\\[(.*?)\\]";
     private static final String PARAM_PATTERN = "%s";
@@ -155,10 +159,10 @@ public class EmailFormatHelper
 
     @Transactional
     public String replaceLegends( boolean isSubject, String content, String baseUrl, String logoUrl, String link,
-        String custFirstName, String custLastName, String agentName, String agentFirstName, String agentSignature, String recipientMailId,
-        String senderEmail, String companyName, String initiatedDate, String currentYear, String fullAddress, String links,
-        String agentProfileName, String companyDisclaimer, String agentDisclaimer, String agentLicense, String agentTitle, String agentPhoneNumber  )
-        throws InvalidInputException
+        String custFirstName, String custLastName, String agentName, String agentFirstName, String agentSignature,
+        String recipientMailId, String senderEmail, String companyName, String initiatedDate, String currentYear,
+        String fullAddress, String links, String agentProfileName, String companyDisclaimer, String agentDisclaimer,
+        String agentLicense, String agentTitle, String agentPhoneNumber ) throws InvalidInputException
     {
         LOG.info( "Method to replace legends with values called, replaceLegends() started" );
         if ( StringUtils.isEmpty( content ) ) {
@@ -193,7 +197,7 @@ public class EmailFormatHelper
 
         content = content.replaceAll( "\\[AgentTitle\\]", "" + agentTitle );
         content = content.replaceAll( "\\[AgentPhoneNumber\\]", "" + agentPhoneNumber );
-        
+
         //JIRA SS-473 begin
         content = content.replace( "[CompanyDisclaimer]", companyDisclaimer );
         content = content.replace( "[AgentDisclaimer]", agentDisclaimer );
@@ -208,7 +212,7 @@ public class EmailFormatHelper
         String company_lending_tree_link = null;
         String company_realtor_com_link = null;
         String company_yelp_link = null;
-        
+
         String facebook_link = null;
         String twitter_link = null;
         String linkedin_link = null;
@@ -218,7 +222,7 @@ public class EmailFormatHelper
         String lending_tree_link = null;
         String realtor_com_link = null;
         String yelp_link = null;
-        
+
         //JIRA SS-626 begin
         try {
             User user = userManagementService.getUserByEmailAddress( senderEmail );
@@ -286,7 +290,7 @@ public class EmailFormatHelper
                     lending_tree_link = socialMediaTokens.getLendingTreeToken().getLendingTreeProfileLink();
                 if ( socialMediaTokens.getRealtorToken() != null )
                     realtor_com_link = socialMediaTokens.getRealtorToken().getRealtorProfileLink();
-                if ( socialMediaTokens.getYelpToken()!= null )
+                if ( socialMediaTokens.getYelpToken() != null )
                     yelp_link = socialMediaTokens.getYelpToken().getYelpPageLink();
             }
 
@@ -310,7 +314,7 @@ public class EmailFormatHelper
                 if ( socialMediaTokens.getRealtorToken() != null )
                     company_realtor_com_link = socialMediaTokens.getRealtorToken().getRealtorProfileLink();
                 if ( socialMediaTokens.getYelpToken() != null )
-                		company_yelp_link = socialMediaTokens.getYelpToken().getYelpPageLink();
+                    company_yelp_link = socialMediaTokens.getYelpToken().getYelpPageLink();
             }
         } catch ( NoRecordsFetchedException e ) {
             LOG.error( "No user found with email address : " + senderEmail );
@@ -326,7 +330,7 @@ public class EmailFormatHelper
         content = content.replace( "[zillow_link]", processUrl( zillow_link ) );
         content = content.replace( "[lending_tree_link]", processUrl( lending_tree_link ) );
         content = content.replace( "[realtor_com_link]", processUrl( realtor_com_link ) );
-        content = content.replace( "[yelp_link]", processUrl( yelp_link ) );        
+        content = content.replace( "[yelp_link]", processUrl( yelp_link ) );
         content = content.replace( "[company_facebook_link]", processUrl( company_facebook_link ) );
         content = content.replace( "[company_twitter_link]", processUrl( company_twitter_link ) );
         content = content.replace( "[company_linkedin_link]", processUrl( company_linkedin_link ) );
@@ -349,12 +353,13 @@ public class EmailFormatHelper
 
     @Transactional
     public String replaceLegendsWithSettings( boolean isSubject, String content, String baseUrl, String logoUrl, String link,
-        String custFirstName, String custLastName, String agentName, String agentFirstName, String agentSignature, String recipientMailId,
-        String senderEmail, String companyName, String initiatedDate, String currentYear, String fullAddress, String links,
-        String agentProfileName, String companyDisclaimer, String agentDisclaimer, String agentLicense, String agentTitle, String agentPhoneNumber, User user,
-        OrganizationUnitSettings agentSettings, OrganizationUnitSettings branchSettings,
-        OrganizationUnitSettings regionSettings, OrganizationUnitSettings companySettings,
-        Map<SettingsForApplication, OrganizationUnit> map, Map<String, String> surveyMap ) throws InvalidInputException
+        String custFirstName, String custLastName, String agentName, String agentFirstName, String agentSignature,
+        String recipientMailId, String senderEmail, String companyName, String initiatedDate, String currentYear,
+        String fullAddress, String links, String agentProfileName, String companyDisclaimer, String agentDisclaimer,
+        String agentLicense, String agentTitle, String agentPhoneNumber, User user, OrganizationUnitSettings agentSettings,
+        OrganizationUnitSettings branchSettings, OrganizationUnitSettings regionSettings,
+        OrganizationUnitSettings companySettings, Map<SettingsForApplication, OrganizationUnit> map,
+        Map<String, String> surveyMap ) throws InvalidInputException
     {
         LOG.info( "Method to replace legends with values called, replaceLegends() started" );
         if ( StringUtils.isEmpty( content ) ) {
@@ -402,7 +407,7 @@ public class EmailFormatHelper
         String company_lending_tree_link = null;
         String company_realtor_com_link = null;
         String company_yelp_link = null;
-        
+
         String facebook_link = null;
         String twitter_link = null;
         String linkedin_link = null;
@@ -445,7 +450,7 @@ public class EmailFormatHelper
                     lending_tree_link = socialMediaTokens.getLendingTreeToken().getLendingTreeProfileLink();
                 if ( socialMediaTokens.getRealtorToken() != null )
                     realtor_com_link = socialMediaTokens.getRealtorToken().getRealtorProfileLink();
-                if ( socialMediaTokens.getYelpToken()!= null )
+                if ( socialMediaTokens.getYelpToken() != null )
                     yelp_link = socialMediaTokens.getYelpToken().getYelpPageLink();
             }
 
@@ -469,7 +474,7 @@ public class EmailFormatHelper
                 if ( socialMediaTokens.getRealtorToken() != null )
                     company_realtor_com_link = socialMediaTokens.getRealtorToken().getRealtorProfileLink();
                 if ( socialMediaTokens.getYelpToken() != null )
-            		company_yelp_link = socialMediaTokens.getYelpToken().getYelpPageLink();
+                    company_yelp_link = socialMediaTokens.getYelpToken().getYelpPageLink();
             }
         } catch ( NoRecordsFetchedException e ) {
             LOG.error( "No user found with email address : " + senderEmail );
@@ -575,5 +580,75 @@ public class EmailFormatHelper
             surveySourceId = survey.getSurveySourceId();
         LOG.info( "Method fetchSurveySourceId finished." );
         return surveySourceId;
+    }
+
+
+    /**
+     * 
+     * @param adminName
+     * @param adminEmailId
+     * @param user
+     * @param agentSettings
+     * @return
+     * @throws InvalidInputException 
+     */
+    public String buildAgentAdditionOrDeletionMessage( String adminName, String adminEmailId, User user,
+        OrganizationUnitSettings agentSettings, boolean isUserAdded ) throws InvalidInputException
+    {
+        LOG.debug( "method buildAgentAdditionOrDeletionMessage() started" );
+        StringBuilder message = new StringBuilder();
+
+        if ( user == null || agentSettings == null ) {
+            LOG.warn( "No user data specified" );
+            throw new InvalidInputException( "No user data specified" );
+        }
+
+        message.append( "<p>" );
+        message.append( isUserAdded ? "A new user has been added " : "A user has been deleted " );
+        if ( StringUtils.isNotEmpty( adminName ) || StringUtils.isNotEmpty( adminEmailId ) ) {
+            message.append( "by " );
+            if ( StringUtils.isNotEmpty( adminName ) ) {
+                message.append( adminName ).append( ", " );
+            }
+            if ( StringUtils.isNotEmpty( adminEmailId ) ) {
+                message.append( "[" ).append( adminEmailId ).append( "] " );
+            }
+        }
+        message.append( "at " );
+        message.append( utils.convertDateToTimeZone( new Date().getTime(), CommonConstants.TIMEZONE_EST ) ).append( ". " );
+        message.append( "Please find the details below." );
+        message.append( "</p>" );
+
+        message.append( buildAgentDetailBulletList(
+            user.getFirstName() + ( StringUtils.isEmpty( user.getLastName() ) ? "" : " " + user.getLastName() ),
+            user.getEmailId(), agentSettings.getCompleteProfileUrl() ) );
+
+        LOG.debug( "method buildAgentAdditionOrDeletionMessage() finished" );
+        return message.toString();
+    }
+
+
+    private String buildAgentDetailBulletList( String agentName, String agentEmail, String publicProfileUrl )
+    {
+        return wrapUnorderedListTag( wrapListElementTag( agentName ) + wrapListElementTag( agentEmail )
+            + ( StringUtils.isEmpty( publicProfileUrl ) ? "" : wrapListElementTag( wrapHrefForLink( publicProfileUrl ) ) ) );
+    }
+
+
+    private String wrapUnorderedListTag( String data )
+    {
+        return "<ul>" + data + "</ul>";
+    }
+
+
+    private String wrapListElementTag( String data )
+    {
+        return "<li>" + data + "</li>";
+    }
+
+
+    private String wrapHrefForLink( String link )
+    {
+        return "<a href=" + link + ">" + link + "</a>";
     }
 }

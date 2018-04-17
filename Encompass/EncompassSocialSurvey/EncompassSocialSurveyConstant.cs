@@ -125,6 +125,8 @@ namespace EncompassSocialSurvey
 
         public const string COMPANY_TYPE_DETERMINANT = "companyTypeDeterminant";
 
+        public const string SSAPI_URL = "ssapiUrl";
+
 
         // UTF-8 code page
         public const int CIPHER_BYTE_CODING_TYPE = 65001;

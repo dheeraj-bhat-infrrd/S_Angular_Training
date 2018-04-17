@@ -183,7 +183,6 @@
 								<div id="review-desc" class="float-left dash-ppl-say-lbl" data-profile-name="${profileName}"></div>
 							</div>
 							<div id="review-details" class="ppl-review-item-wrapper">
-								
 							</div>
 						</div>
 					</div>
@@ -250,7 +249,10 @@
 	
 	
 	if( "${isSocialMediaExpired}" == "true" ){
+		var columnName = "${columnName}";
+		var columnValue = "${columnValue}";
 		$("#rep-fix-social-media").removeClass("hide");
+		
 	} else {
 		drawReportingDashButtons(currentProfileName, currentProfileValue);
 	}

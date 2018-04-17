@@ -6180,6 +6180,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         // set agent and company related flags
         profileAggregate.setAgent( isAgent( user ) );
         profileAggregate.setHiddenSection( companyProfile.isHiddenSection() );
+        
+        //For an agent, if login is prevented, then agent's public page should be hidden and redirected to branch/region/company
+        profileAggregate.setHiddenSection( individualProfile.isHidePublicPage() );
 
 
         //set vertical name from the company

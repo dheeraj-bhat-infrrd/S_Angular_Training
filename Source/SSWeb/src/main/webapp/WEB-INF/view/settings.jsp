@@ -109,7 +109,11 @@
 								<div id="survey-mail-thrhld-chk-box" class="float-left bd-check-img clear-both"></div>
 								<input type="hidden" id="survey-mail-thrhld-cb" name="surveymailthrhld" value="${sendMonthlyDigestMail}">
 								<div class="float-left listing-access-txt cust-resp-txt">Send Monthly Digest Mail</div>
-								<textarea id="digest-recipients" class="dig-recp" placeholder="<spring:message code="label.placehoder.digest.emails.key" />" autocorrect="off" autocomplete="off" autocapitalize="off" spellcheck="false">${digestRecipients}</textarea>
+								<textarea id="digest-recipients" class="dig-recp"  placeholder="<spring:message code="label.placehoder.digest.emails.key" />" autocorrect="off" autocomplete="off" autocapitalize="off" spellcheck="false">${digestRecipients}</textarea>
+								<c:if test="${ columnName == 'companyId' }">
+									<div class="float-left listing-access-txt cust-resp-txt">Send user Add/Delete Notification Mail</div>
+									<textarea id="user-notification-recipients" class="dig-recp" style="margin-bottom:40px" placeholder="<spring:message code="label.placehoder.user.notify.emails.key" />" autocorrect="off" autocomplete="off" autocapitalize="off" spellcheck="false">${userNotifyRecipients}</textarea>
+								</c:if>	
 							</c:if>
 							
                             <c:if test="${ not empty companyAdminSwitchId or isRealTechOrSSAdmin == true or user.isOwner == 1 }">

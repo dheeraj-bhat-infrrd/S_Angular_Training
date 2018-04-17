@@ -3,6 +3,7 @@ using EncompassSocialSurvey.Entity;
 using EncompassSocialSurvey.Service;
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 
 namespace EncompassSocialSurvey
 {
@@ -55,10 +56,12 @@ namespace EncompassSocialSurvey
             catch (Exception ex)
             {
                 Logger.Error("Caught an exception: EncompassGlobal.GetUserLoginSesssion(): ", ex);
+                processMismatchError( companyCredential, ex);
                 throw ex;
             }
             Logger.Info("Exiting the method EncompassGlobal.GetUserLoginSesssion()");
         }
+
 
         public StringList InitialFieldList()
         {
@@ -80,6 +83,53 @@ namespace EncompassSocialSurvey
                 fieldIds.Add("12"); // City
             }
             return fieldIds;
+        }
+
+
+        private void processMismatchError( CompanyCredential companyCredential, Exception error)
+        {
+            Logger.Debug("checking for mismatch errors");
+            try
+            {
+                if (error.Message.IndexOf("version mismatch", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    string serverVersionString = error.Message.Substring(error.Message.IndexOf("server version = ", StringComparison.OrdinalIgnoreCase));
+
+                    // length of 'server version = ' is 17
+                    if (serverVersionString.Length > 17)
+                    {
+                        serverVersionString = serverVersionString.Substring(17);
+
+                        // server encompass version
+                        string versionString = serverVersionString.Split(' ')[0];
+
+                        if (versionString.Length > 0)
+                        {
+                            HttpClient client = new HttpClient();
+
+                            string versionUpdateUrl = EncompassSocialSurveyConfiguration.fetchSsapiUrl;
+                            versionUpdateUrl += "/encompass/" + companyCredential.EncompassCredential.CompanyId + "/version/update";
+
+                            versionUpdateUrl += "?version=" + versionString;
+
+                            // update the encompass version of the company
+                            var response = client.PostAsync(versionUpdateUrl,null).Result;
+                            if( !response.IsSuccessStatusCode ){
+                                Logger.Error("Unable to update the encompass version for company with ID : " + companyCredential.EncompassCredential.CompanyId );
+                            }
+                            else
+                            {
+                                Logger.Info("Sucessfully updated encompass version to " + versionString + " for company with ID : " + companyCredential.EncompassCredential.CompanyId );
+                            }
+                        }
+
+                    }
+                }
+            }
+            catch (Exception errorWhileParsingError)
+            {
+                Logger.Error("Unable to look for version mismatch error", errorWhileParsingError );
+            }
         }
 
     }

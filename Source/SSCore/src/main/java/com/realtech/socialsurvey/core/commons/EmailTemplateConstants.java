@@ -198,4 +198,8 @@ public final class EmailTemplateConstants {
     
     public static final String SURVEY_ABUSIVE_HANDLER_MAIL_SUBJECT = "SurveyAbusiveHandlerMailSubject.txt";
     public static final String SURVEY_ABUSIVE_HANDLER_MAIL_BODY = "SurveyAbusiveHandlerMailBody.html";
+
+    public static final String USER_ADDITION_MAIL_SUBJECT = "UserAdditionMailSubject.txt";
+    public static final String USER_DELETION_MAIL_SUBJECT = "UserDeletionMailSubject.txt";
+
 }

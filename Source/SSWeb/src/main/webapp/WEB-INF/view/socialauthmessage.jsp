@@ -104,12 +104,13 @@ $(window).on('unload', function(){
 	var flow = "${socialFlow}";
 	var isFixSocialMedia ="${isFixSocialMedia}";
 	var waitMessage = "${message}";
+	var isManual = "${isManual}"
 	
 	if(fromDashboard == 1){
 		var columnName = "${columnName}";
 		var columnValue = "${columnValue}";
 		
-		if(isFixSocialMedia != undefined && isFixSocialMedia == 1 && parseInt(waitMessage) != 1){
+		if(isFixSocialMedia != undefined && isFixSocialMedia == 1 && parseInt(waitMessage) != 1 && isManual == "true"){
 			parentWindow.fixSocialMediaResponse(columnName, columnValue);
 		}
 		

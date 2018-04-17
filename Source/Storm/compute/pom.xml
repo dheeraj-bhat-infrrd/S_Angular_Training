@@ -164,13 +164,6 @@
 			<version>1.9.13</version>
 			<scope>compile</scope>
 		</dependency>
-		<!-- Dependency for solr java api -->
-		<dependency>
-			<groupId>org.apache.solr</groupId>
-			<artifactId>solr-solrj</artifactId>
-			<version>4.9.0</version>
-			<scope>compile</scope>
-		</dependency>
 
 		<!-- MySQL Connector -->
 		<dependency>

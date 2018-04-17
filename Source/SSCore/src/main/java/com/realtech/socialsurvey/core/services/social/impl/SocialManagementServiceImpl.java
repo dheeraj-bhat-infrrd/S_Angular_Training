@@ -280,7 +280,11 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
     @Value ( "${ZILLOW_AUTO_POST_THRESHOLD}")
     private int zillowAutoPostThreshold;
+    
+    @Value ( "${TOKEN_REFRESH_INTERVAL}")
+    private int tokenRefreshInterval;
 
+    
     @Autowired
     private SocialPostDao socialPostDao;
 
@@ -400,6 +404,21 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
 
     @Override
+    public SocialMediaTokens updateFacebookPagesInMongo( String collection, long iden, SocialMediaTokens mediaTokens )
+        throws InvalidInputException
+    {
+        if ( mediaTokens == null ) {
+            throw new InvalidInputException( "Facebook pages passed can not be null" );
+        }
+        LOG.info( "Updating Social Tokens information" );
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden(
+            MongoOrganizationUnitSettingDaoImpl.KEY_FACEBOOK_SOCIAL_MEDIA_TOKEN, mediaTokens.getFacebookToken(), iden, collection );
+        LOG.info( "Facebook pages updated successfully" );
+        return mediaTokens;
+    }
+
+
+    @Override
     public SocialMediaTokens updateSocialMediaTokens( String collection, long iden, SocialMediaTokens mediaTokens )
         throws InvalidInputException
     {
@@ -451,7 +470,6 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                             settings.getSocialMediaTokens().getFacebookToken().getFacebookAccessToken(), null ) );
                     try {
                         facebookNotSetup = false;
-
                         // Updating customised data
                         PostUpdate postUpdate = new PostUpdate( message );
                         postUpdate.setCaption( completeProfileUrl );
@@ -1458,7 +1476,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
     }
 
 
-    void postToLinkedInForAHierarchy( OrganizationUnitSettings setting, String collectionName, Double rating, boolean isZillow,
+    boolean postToLinkedInForAHierarchy( OrganizationUnitSettings setting, String collectionName, Double rating, boolean isZillow,
         String updatedLinkedInMessage, String linkedinMessage, String linkedinProfileUrl, String linkedinMessageFeedback,
         OrganizationUnitSettings companySettings, AgentSettings agentSettings, MediaPostDetails mediaPostDetails,
         EntityMediaPostResponseDetails mediaPostResponseDetails, String surveyId )
@@ -1489,8 +1507,10 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     if ( mediaPostResponseDetails.getLinkedinPostResponseList() == null )
                         mediaPostResponseDetails.setLinkedinPostResponseList( new ArrayList<SocialMediaPostResponse>() );
                     mediaPostResponseDetails.getLinkedinPostResponseList().add( linkedinPostResponse );
+                    return true;
                 }
             }
+            return false;
         } catch ( Exception e ) {
             // update SocialMediaPostResponse object
             SocialMediaPostResponse linkedinPostResponse = new SocialMediaPostResponse();
@@ -1502,6 +1522,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             mediaPostResponseDetails.getLinkedinPostResponseList().add( linkedinPostResponse );
 
             reportBug( "Linkedin", setting.getProfileName(), e );
+            return false;
         }
     }
 
@@ -3418,10 +3439,11 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
      * @param mediaTokens
      * @param profileLink
      * @return
+     * @throws InvalidInputException 
      */
     @Override
-    public SocialMediaTokens updateFacebookToken( facebook4j.auth.AccessToken accessToken, SocialMediaTokens mediaTokens,
-        String profileLink )
+    public SocialMediaTokens updateFacebookPages( facebook4j.auth.AccessToken accessToken, SocialMediaTokens mediaTokens,
+        List<FacebookPage> facebookPages )
     {
         LOG.debug( "Method updateFacebookToken() called from SocialManagementController" );
         if ( mediaTokens == null ) {
@@ -3435,17 +3457,109 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             facebookToken = new FacebookToken();
         }
 
-        // update profile link
-        if ( profileLink != null )
-            facebookToken.setFacebookPageLink( profileLink );
+        if ( facebookPages != null )
+            facebookToken.setFacebookPages( facebookPages );
 
-        // update access tokem
-        facebookToken.setFacebookAccessToken( accessToken.getToken() );
+        // update access token expiry
         facebookToken.setFacebookAccessTokenCreatedOn( System.currentTimeMillis() );
         if ( accessToken.getExpires() != null )
             facebookToken.setFacebookAccessTokenExpiresOn( accessToken.getExpires() );
 
-        facebookToken.setFacebookAccessTokenToPost( accessToken.getToken() );
+
+        // update facebook token in media token
+        mediaTokens.setFacebookToken( facebookToken );
+
+        LOG.debug( "Method updateFacebookToken() finished from SocialManagementController" );
+        return mediaTokens;
+    }
+    
+    
+    @Override
+    public void updateFacebookTokenAndSave( String accessToken, SocialMediaTokens mediaTokens, String profileLink,
+        String collection, OrganizationUnitSettings unitSettings ) throws NonFatalException
+    {
+        LOG.info( "Method updateFacebookTokenAndSave() called from SocialManagementController" );
+
+        // update profile link
+        if ( profileLink != null && !profileLink.isEmpty() )
+            mediaTokens.getFacebookToken().setFacebookPageLink( profileLink );
+
+        // update access token
+        if ( accessToken != null && !accessToken.isEmpty() ) {
+            mediaTokens.getFacebookToken().setFacebookAccessToken( accessToken );
+            mediaTokens.getFacebookToken().setFacebookAccessTokenToPost( accessToken );
+        }
+
+        // update expiry email alert detail
+        mediaTokens.getFacebookToken().setTokenExpiryAlertSent( false );
+        mediaTokens.getFacebookToken().setTokenExpiryAlertEmail( null );
+        mediaTokens.getFacebookToken().setTokenExpiryAlertTime( null );
+
+        if ( collection == MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION ) {
+            //update SETTINGS_SET_STATUS of COMPANY table to set.
+            Company company = userManagementService.getCompanyById( unitSettings.getIden() );
+            if ( company != null ) {
+                settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.FACEBOOK,
+                    CommonConstants.SET_SETTINGS );
+                userManagementService.updateCompany( company );
+            }
+            for ( ProfileStage stage : unitSettings.getProfileStages() ) {
+                if ( stage.getProfileStageKey().equalsIgnoreCase( "FACEBOOK_PRF" ) ) {
+                    stage.setStatus( CommonConstants.STATUS_INACTIVE );
+                }
+            }
+            profileManagementService.updateProfileStages( unitSettings.getProfileStages(), unitSettings,
+                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        } else if ( collection == MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) {
+            //update SETTINGS_SET_STATUS of REGION table to set.
+            Region region = userManagementService.getRegionById( unitSettings.getIden() );
+            if ( region != null ) {
+                settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.FACEBOOK,
+                    CommonConstants.SET_SETTINGS );
+                userManagementService.updateRegion( region );
+            }
+            for ( ProfileStage stage : unitSettings.getProfileStages() ) {
+                if ( stage.getProfileStageKey().equalsIgnoreCase( "FACEBOOK_PRF" ) ) {
+                    stage.setStatus( CommonConstants.STATUS_INACTIVE );
+                }
+            }
+            profileManagementService.updateProfileStages( unitSettings.getProfileStages(), unitSettings,
+                MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+        } else if ( collection == MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) {
+            Branch branch = userManagementService.getBranchById( unitSettings.getIden() );
+            if ( branch != null ) {
+                settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.FACEBOOK,
+                    CommonConstants.SET_SETTINGS );
+                userManagementService.updateBranch( branch );
+            }
+
+            for ( ProfileStage stage : unitSettings.getProfileStages() ) {
+                if ( stage.getProfileStageKey().equalsIgnoreCase( "FACEBOOK_PRF" ) ) {
+                    stage.setStatus( CommonConstants.STATUS_INACTIVE );
+                }
+            }
+            profileManagementService.updateProfileStages( unitSettings.getProfileStages(), unitSettings,
+                MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+        } else if ( collection == MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) {
+            for ( ProfileStage stage : unitSettings.getProfileStages() ) {
+                if ( stage.getProfileStageKey().equalsIgnoreCase( "FACEBOOK_PRF" ) ) {
+                    stage.setStatus( CommonConstants.STATUS_INACTIVE );
+                }
+            }
+            profileManagementService.updateProfileStages( unitSettings.getProfileStages(), unitSettings,
+                MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+        }
+
+        updateSocialMediaTokens( collection, unitSettings.getIden(), mediaTokens );
+        LOG.info( "Method updateFacebookTokenAndSave() finished." );
+
+    }
+
+
+    @Override
+    public List<FacebookPage> getFacebookPages( facebook4j.auth.AccessToken accessToken, String profileLink )
+    {
+        LOG.debug( "Method getFacebookPages() called from SocialManagementController" );
 
         Facebook facebook = new FacebookFactory().getInstance();
         facebook.setOAuthAppId( facebookClientId, facebookAppSecret );
@@ -3459,11 +3573,11 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             ResponseList<Account> resultList;
             Reading reading = new Reading().limit( 25 );
             resultList = facebook.getAccounts( reading );
-            if(resultList != null){
+            if ( resultList != null ) {
                 accounts.addAll( resultList );
             }
-            
-            while ( resultList!= null && resultList.getPaging() != null && resultList.getPaging().getNext() != null ) {
+
+            while ( resultList != null && resultList.getPaging() != null && resultList.getPaging().getNext() != null ) {
                 resultList = facebook.fetchNext( resultList.getPaging() );
                 accounts.addAll( resultList );
             }
@@ -3481,18 +3595,69 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         } catch ( FacebookException e ) {
             LOG.error( "Error while creating access token for facebook: " + e.getLocalizedMessage(), e );
         }
-        facebookToken.setFacebookPages( facebookPages );
+        return facebookPages;
+    }
+    
+    
+    @Override
+    public boolean updateFacebookTokenForExistingUser( List<FacebookPage> facebookPages, OrganizationUnitSettings unitSettings,
+        SocialMediaTokens mediaTokens, String collection ) throws NonFatalException
+    {
+        LOG.debug( "Method updateFacebookTokenForExistingUser() called from SocialManagementController" );
+        for ( FacebookPage currentFbPage : facebookPages ) {
+            if ( currentFbPage.getProfileUrl()
+                .equalsIgnoreCase( unitSettings.getSocialMediaTokens().getFacebookToken().getFacebookPageLink() ) ) {
+                mediaTokens = updateFacebookPagesInMongo( collection, unitSettings.getIden(), mediaTokens );
+                updateFacebookTokenAndSave( currentFbPage.getAccessToken(), mediaTokens, currentFbPage.getProfileUrl(),
+                    collection, unitSettings );
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    @Override
+    public boolean checkForFacebookTokenRefresh( SocialMediaTokens mediaTokens )
+    {
+        LOG.debug( "Method checkForFacebookTokenRefresh() called to check if token refresh is required." );
+        if ( mediaTokens != null && mediaTokens.getFacebookToken() != null ) {
+            if ( mediaTokens.getFacebookToken().isTokenExpiryAlertSent() )
+                return true;
+            long tokenCreatedOn = mediaTokens.getFacebookToken().getFacebookAccessTokenCreatedOn();
 
-        // update expiry email alert detail
-        facebookToken.setTokenExpiryAlertSent( false );
-        facebookToken.setTokenExpiryAlertEmail( null );
-        facebookToken.setTokenExpiryAlertTime( null );
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis( tokenCreatedOn );
 
-        // update facebook token in media token
-        mediaTokens.setFacebookToken( facebookToken );
+            // adding 1 month to created time
+            cal.add( Calendar.DATE, tokenRefreshInterval );
+            Date createdOnPlusRefreshInterval = cal.getTime();
+            if ( new Date( System.currentTimeMillis() ).after( createdOnPlusRefreshInterval ) ) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    @Override
+    public boolean checkForLinkedInTokenRefresh( SocialMediaTokens mediaTokens )
+    {
+        LOG.debug( "Method checkForLinkedInTokenRefresh() called to check if token refresh is required" );
+        if ( mediaTokens != null && mediaTokens.getLinkedInToken() != null ) {
+            if ( mediaTokens.getLinkedInToken().isTokenExpiryAlertSent() )
+                return true;
+            long tokenCreatedOn = mediaTokens.getLinkedInToken().getLinkedInAccessTokenCreatedOn();
 
-        LOG.debug( "Method updateFacebookToken() finished from SocialManagementController" );
-        return mediaTokens;
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis( tokenCreatedOn );
+
+            // adding 1 month to created time
+            cal.add( Calendar.DATE, tokenRefreshInterval );
+            Date createdOnPlusRefreshInterval = cal.getTime();
+            if ( new Date( System.currentTimeMillis() ).after( createdOnPlusRefreshInterval ) ) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
@@ -3708,42 +3873,67 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
      * @return
      */
     @Override
-    public boolean checkFacebookTokenExpiry(FacebookToken facebookToken )
+    public boolean checkFacebookTokenExpiry( OrganizationUnitSettings settings, String collection )
     {
-        
+
+        FacebookToken facebookToken = settings.getSocialMediaTokens().getFacebookToken();
         long tokenCreatedOn = facebookToken.getFacebookAccessTokenCreatedOn();
-        long expirySeconds = facebookToken.getFacebookAccessTokenExpiresOn();
-        
-        long expiryHours = expirySeconds / 3600;
+
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis( tokenCreatedOn );
         Date createdOn = cal.getTime();
 
+        if ( facebookToken.getFacebookAccessTokenExpiresOn() != 0L ) {
+            long expirySeconds = facebookToken.getFacebookAccessTokenExpiresOn();
+            long expiryHours = expirySeconds / 3600;
 
-        Calendar curDateCal = Calendar.getInstance();
-        // adding 7 days to current time
-        curDateCal.add( Calendar.HOUR, 168 );
-        Date curDatePlusSeven = curDateCal.getTime();
+            Calendar curDateCal = Calendar.getInstance();
+            // adding 7 days to current time
+            curDateCal.add( Calendar.HOUR, 168 );
+            Date curDatePlusSeven = curDateCal.getTime();
 
-        Calendar cal2 = Calendar.getInstance();
-        cal2.setTimeInMillis( createdOn.getTime() );
+            Calendar cal2 = Calendar.getInstance();
+            cal2.setTimeInMillis( createdOn.getTime() );
 
-        cal2.add( Calendar.HOUR, (int) expiryHours );
-        Date expiresOn = cal2.getTime();
+            cal2.add( Calendar.HOUR, (int) expiryHours );
+            Date expiresOn = cal2.getTime();
 
-        if ( curDatePlusSeven.after( expiresOn ) ){
-            Facebook facebook = new FacebookFactory().getInstance();
-            facebook.setOAuthAppId( facebookClientId, facebookAppSecret );
-            facebook.setOAuthAccessToken( new AccessToken( facebookToken.getFacebookAccessTokenToPost() ) );
-            try{
-                facebook.getPosts( new Reading().limit( 1 ) );                        
-            }catch ( FacebookException e ){
-                return true;                       
+            if ( curDatePlusSeven.after( expiresOn ) ) {
+                facebookToken.setLastTokenExpiryValidationTime( System.currentTimeMillis() );
+                updateFacebookToken( collection, settings.getIden(), facebookToken );
+                return validateFacebookToken( facebookToken );
             }
+        }
+        // validate token if facebook token is not validated
+        if ( facebookToken.getLastTokenExpiryValidationTime() == 0L ) {
+            facebookToken.setLastTokenExpiryValidationTime( System.currentTimeMillis() );
+            updateFacebookToken( collection, settings.getIden(), facebookToken );
+            return validateFacebookToken( facebookToken );
+        }
+        // validate token if it was validated 5 days ago
+        cal.setTimeInMillis( facebookToken.getLastTokenExpiryValidationTime() );
+        cal.add( Calendar.DATE, 5 );
+        Date lastValidatedPlusFive = cal.getTime();
+        if ( new Date( System.currentTimeMillis() ).after( lastValidatedPlusFive ) ) {
+            facebookToken.setLastTokenExpiryValidationTime( System.currentTimeMillis() );
+            updateFacebookToken( collection, settings.getIden(), facebookToken );
+            return validateFacebookToken( facebookToken );
         }
 
         return false;
 
+    }
+    
+    private boolean validateFacebookToken(FacebookToken facebookToken ) {
+        Facebook facebook = new FacebookFactory().getInstance();
+        facebook.setOAuthAppId( facebookClientId, facebookAppSecret );
+        facebook.setOAuthAccessToken( new AccessToken( facebookToken.getFacebookAccessTokenToPost() ) );
+        try{
+            facebook.getPosts( new Reading().limit( 1 ) );                        
+        }catch ( FacebookException e ){
+            return true;                       
+        }
+        return false;
     }
     
     
@@ -3754,17 +3944,17 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
      * @return
      */
     @Override
-    public boolean checkLinkedInTokenExpiry(LinkedInToken linkedInToken )
+    public boolean checkLinkedInTokenExpiry( OrganizationUnitSettings settings, String collection )
     {
-        
+
+        LinkedInToken linkedInToken = settings.getSocialMediaTokens().getLinkedInToken();
         long tokenCreatedOn = linkedInToken.getLinkedInAccessTokenCreatedOn();
         long expirySeconds = linkedInToken.getLinkedInAccessTokenExpiresIn();
-        
+
         long expiryHours = expirySeconds / 3600;
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis( tokenCreatedOn );
         Date createdOn = cal.getTime();
-
 
         Calendar curDateCal = Calendar.getInstance();
         // adding 7 days to current time
@@ -3777,12 +3967,28 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         cal2.add( Calendar.HOUR, (int) expiryHours );
         Date expiresOn = cal2.getTime();
 
-        if ( curDatePlusSeven.after( expiresOn ) ){
-                return true;                           
+        if ( curDatePlusSeven.after( expiresOn ) ) {
+            return true;
+        }
+        // validate token if linkedIn token is not validated
+        if ( linkedInToken.getLastTokenExpiryValidationTime() == 0L ) {
+            linkedInToken.setLastTokenExpiryValidationTime( System.currentTimeMillis() );
+            updateLinkedinToken( collection, settings.getIden(), linkedInToken );
+            return checkForLinkedInTokenExpiry( linkedInToken );
+        }
+        // validate token if it was validated 5 days ago
+        cal.setTimeInMillis( linkedInToken.getLastTokenExpiryValidationTime() );
+        cal.add( Calendar.DATE, 5 );
+        Date lastValidatedPlusFive = cal.getTime();
+        if ( new Date( System.currentTimeMillis() ).after( lastValidatedPlusFive ) ) {
+            linkedInToken.setLastTokenExpiryValidationTime( System.currentTimeMillis() );
+            updateLinkedinToken( collection, settings.getIden(), linkedInToken );
+            return checkForLinkedInTokenExpiry( linkedInToken );
         }
 
         return false;
     }
+
 
     @Override
     public void updateSocialPostAfterHierarchyRelocation( SocialPost socialPost )
@@ -4037,103 +4243,106 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
      * @param entityType
      * @param entityId
      * @param surveyMongoId
-     * @throws NonFatalException 
+     * @return 
      */
     @Override
-    public void  manualPostToLinkedInForEntity(String entityType , Long entityId , String surveyMongoId) throws NonFatalException 
-	{
-		LOG.info("Method manualPostToLinkedInForEntity started for entityType {} , entityId , surveyMongoId {} ",
-				entityType, entityId, surveyMongoId);
+    public boolean manualPostToLinkedInForEntity( String entityType, Long entityId, String surveyMongoId )
+    {
+        LOG.info( "Method manualPostToLinkedInForEntity started for entityType {} , entityId , surveyMongoId {} ", entityType,
+            entityId, surveyMongoId );
 
-		try {
-		String collectionName = "";
-		MediaPostDetails mediaPostDetails = null;
-		EntityMediaPostResponseDetails entityMediaPostResponseDetails = null;
-		
-		//get survey
-		SurveyDetails surveyDetails = surveyHandler.getSurveyDetails(surveyMongoId);
-		if (surveyDetails == null)
-			throw new InvalidInputException("No survey found with survey id : " + surveyMongoId);
+        try {
+            String collectionName = "";
+            MediaPostDetails mediaPostDetails = null;
+            EntityMediaPostResponseDetails entityMediaPostResponseDetails = null;
 
-		//get setting
-		OrganizationUnitSettings settings = null;
-		if (entityType.equalsIgnoreCase(CommonConstants.COMPANY_ID_COLUMN)) {
-			settings = organizationManagementService.getCompanySettings(entityId);
-			mediaPostDetails = surveyDetails.getSocialMediaPostDetails().getCompanyMediaPostDetails();
-			entityMediaPostResponseDetails = surveyDetails.getSocialMediaPostResponseDetails().getCompanyMediaPostResponseDetails();
-			collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
-		} else if (entityType.equalsIgnoreCase(CommonConstants.REGION_ID_COLUMN)) {
-			settings = organizationManagementService.getRegionSettings(entityId);
-			mediaPostDetails = surveyDetails.getSocialMediaPostDetails().getRegionMediaPostDetailsList().get(0);
-			entityMediaPostResponseDetails = surveyDetails.getSocialMediaPostResponseDetails().getRegionMediaPostResponseDetailsList().get(0);
-			collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
-		} else if (entityType.equalsIgnoreCase(CommonConstants.BRANCH_ID_COLUMN)) {
-			settings = organizationManagementService.getBranchSettingsDefault(entityId);
-			mediaPostDetails = surveyDetails.getSocialMediaPostDetails().getBranchMediaPostDetailsList().get(0);
-			entityMediaPostResponseDetails = surveyDetails.getSocialMediaPostResponseDetails().getBranchMediaPostResponseDetailsList().get(0);
-			collectionName = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
-		} else if (entityType.equalsIgnoreCase(CommonConstants.AGENT_ID_COLUMN)) {
-			settings = userManagementService.getUserSettings(entityId);
-			mediaPostDetails = surveyDetails.getSocialMediaPostDetails().getAgentMediaPostDetails();
-			entityMediaPostResponseDetails = surveyDetails.getSocialMediaPostResponseDetails().getAgentMediaPostResponseDetails();
-			collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
-		}
-		if(settings == null)
-			throw new InvalidInputException("No data found for " + entityType );
-		
-		double rating = surveyHandler.getFormattedSurveyScore( surveyDetails.getScore() );
-		String feedback = surveyDetails.getReview();
-		String agentName = surveyDetails.getAgentName();
-		String customerDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail( surveyDetails.getCustomerFirstName(), surveyDetails.getCustomerLastName() );
-		AgentSettings agentSettings = organizationManagementService.getAgentSettings(surveyDetails.getAgentId());
-		OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(surveyDetails.getCompanyId());
-		 
-		// LinkedIn message
-        String linkedinMessage = buildLinkedInAutoPostMessage( customerDisplayName, agentName, rating, feedback,
-            surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentSettings.getProfileUrl(), false );
+            //get survey
+            SurveyDetails surveyDetails = surveyHandler.getSurveyDetails( surveyMongoId );
+            if ( surveyDetails == null )
+                throw new InvalidInputException( "No survey found with survey id : " + surveyMongoId );
 
-        String linkedinProfileUrl = surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
-            + agentSettings.getProfileUrl() + "/" + surveyMongoId;
-        String linkedinMessageFeedback = "From : " + customerDisplayName + " - " + feedback;
-		
-		postToLinkedInForAHierarchy(settings, collectionName, rating, false, linkedinMessage, linkedinMessage,
-				linkedinProfileUrl, linkedinMessageFeedback, companySettings, agentSettings, mediaPostDetails, entityMediaPostResponseDetails, surveyMongoId);
-	
-		LOG.info("Method manualPostToLinkedInForEntity ended for entityType {} , entityId , surveyMongoId {} ",
-				entityType, entityId, surveyMongoId);
-		}catch(Exception e) {
-			LOG.error("Error while posting on linkedIn ");
-			throw new NonFatalException(e.getMessage());
-		}
-	}
-    
+            //get setting
+            OrganizationUnitSettings settings = null;
+            if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                settings = organizationManagementService.getCompanySettings( entityId );
+                mediaPostDetails = surveyDetails.getSocialMediaPostDetails().getCompanyMediaPostDetails();
+                entityMediaPostResponseDetails = surveyDetails.getSocialMediaPostResponseDetails()
+                    .getCompanyMediaPostResponseDetails();
+                collectionName = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
+            } else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
+                settings = organizationManagementService.getRegionSettings( entityId );
+                mediaPostDetails = surveyDetails.getSocialMediaPostDetails().getRegionMediaPostDetailsList().get( 0 );
+                entityMediaPostResponseDetails = surveyDetails.getSocialMediaPostResponseDetails()
+                    .getRegionMediaPostResponseDetailsList().get( 0 );
+                collectionName = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
+            } else if ( entityType.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
+                settings = organizationManagementService.getBranchSettingsDefault( entityId );
+                mediaPostDetails = surveyDetails.getSocialMediaPostDetails().getBranchMediaPostDetailsList().get( 0 );
+                entityMediaPostResponseDetails = surveyDetails.getSocialMediaPostResponseDetails()
+                    .getBranchMediaPostResponseDetailsList().get( 0 );
+                collectionName = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
+            } else if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) ) {
+                settings = userManagementService.getUserSettings( entityId );
+                mediaPostDetails = surveyDetails.getSocialMediaPostDetails().getAgentMediaPostDetails();
+                entityMediaPostResponseDetails = surveyDetails.getSocialMediaPostResponseDetails()
+                    .getAgentMediaPostResponseDetails();
+                collectionName = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
+            }
+            if ( settings == null )
+                throw new InvalidInputException( "No data found for " + entityType );
+
+            double rating = surveyHandler.getFormattedSurveyScore( surveyDetails.getScore() );
+            String feedback = surveyDetails.getReview();
+            String agentName = surveyDetails.getAgentName();
+            String customerDisplayName = emailFormatHelper.getCustomerDisplayNameForEmail( surveyDetails.getCustomerFirstName(),
+                surveyDetails.getCustomerLastName() );
+            AgentSettings agentSettings = organizationManagementService.getAgentSettings( surveyDetails.getAgentId() );
+            OrganizationUnitSettings companySettings = organizationManagementService
+                .getCompanySettings( surveyDetails.getCompanyId() );
+
+            // LinkedIn message
+            String linkedinMessage = buildLinkedInAutoPostMessage( customerDisplayName, agentName, rating, feedback,
+                surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentSettings.getProfileUrl(),
+                false );
+
+            String linkedinProfileUrl = surveyHandler.getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
+                + agentSettings.getProfileUrl() + "/" + surveyMongoId;
+            String linkedinMessageFeedback = "From : " + customerDisplayName + " - " + feedback;
+
+            return postToLinkedInForAHierarchy( settings, collectionName, rating, false, linkedinMessage, linkedinMessage,
+                linkedinProfileUrl, linkedinMessageFeedback, companySettings, agentSettings, mediaPostDetails,
+                entityMediaPostResponseDetails, surveyMongoId );
+        } catch ( InvalidInputException | NoRecordsFetchedException e ) {
+            LOG.error( "Could not auto-post to LinkedIn", e );
+            return false;
+        }
+
+    }    
 
     @Override
-    public void checkForLinkedInTokenExpiry( OrganizationUnitSettings settings )
+    public boolean checkForLinkedInTokenExpiry( LinkedInToken token )
     {
-        if ( settings.getSocialMediaTokens() != null && settings.getSocialMediaTokens().getLinkedInToken() != null
-            && settings.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken() != null
-            && !settings.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken().isEmpty()
-            && !checkLinkedInTokenExpiry( settings.getSocialMediaTokens().getLinkedInToken() ) ) {
+        if ( !token.isTokenExpiryAlertSent() && token.getLinkedInAccessToken() != null
+            && !token.getLinkedInAccessToken().isEmpty() ) {
 
             HttpClient client = HttpClientBuilder.create().build();
-            HttpGet get = new HttpGet(
-                linkedInAccessValidityUri + settings.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken() );
+            HttpGet get = new HttpGet( linkedInAccessValidityUri + token.getLinkedInAccessToken() );
             HttpResponse response;
             try {
                 response = client.execute( get );
 
                 if ( response.getStatusLine() != null && response.getStatusLine().getStatusCode() != HttpStatus.SC_OK ) {
-                    // call social media error handler for linkedIn exception
-                    socialMediaExceptionHandler.handleLinkedinException( settings,
-                        MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+                    return true;
                 }
+                return false;
 
             } catch ( IOException e ) {
                 LOG.error( "Unable to connect to LinkedIn to get acces token.", e );
+                return false;
             }
         } else {
-            LOG.warn( "LinkedIn media tokens not found for userId:{}", settings.getIden() );
+            LOG.warn( "LinkedIn media tokens not found for token:{}", token );
+            return false;
 
         }
     }
