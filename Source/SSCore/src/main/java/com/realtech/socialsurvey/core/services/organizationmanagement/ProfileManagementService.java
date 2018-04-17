@@ -749,4 +749,15 @@ public interface ProfileManagementService
      */
     public String copyImage( String source, String imageName ) throws Exception;
 
+
+    /**
+     * 
+     * @param collection
+     * @param unitSettings
+     * @param mediaTokens
+     * @throws InvalidInputException
+     */
+    public void deleteGoogleBusiness( String collection, OrganizationUnitSettings unitSettings, SocialMediaTokens mediaTokens )
+        throws InvalidInputException;
+
 }

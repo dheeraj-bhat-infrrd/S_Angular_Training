@@ -159,6 +159,7 @@
 		</div>
 		<div class="clearfix gmb-wc-btn-row">
 			<div id="gmb-add-link" class="gmb-wc-sub-send-btn wc-final-submit">Add Link</div>
+			<div id="gmb-disconnect-link" class="gmb-wc-sub-send-btn wc-final-submit">Disconnect</div>
 		</div>
 	</div>
 </div>

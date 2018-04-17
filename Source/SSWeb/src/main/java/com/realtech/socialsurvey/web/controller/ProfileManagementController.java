@@ -3553,6 +3553,78 @@ public class ProfileManagementController
         return socialMediaTokens;
     }
 
+    
+    @ResponseBody
+    @RequestMapping ( value = "/disconnectgooglebusiness", method = RequestMethod.POST)
+    public String disconnectGoogleBusinesslink( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method disconnectGoogleBusinesslink() called from ProfileManagementController" );
+        User user = sessionHelper.getCurrentUser();
+        HttpSession session = request.getSession( false );
+        SocialMediaTokens socialMediaTokens = null;
+
+        try {
+            UserSettings userSettings = (UserSettings) session
+                .getAttribute( CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION );
+            OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
+                .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
+            long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+            String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+            if ( userSettings == null || profileSettings == null || entityType == null ) {
+                throw new InvalidInputException( "No user settings found in session", DisplayMessageConstants.GENERAL_ERROR );
+            }
+
+            if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
+                if ( companySettings == null ) {
+                    throw new InvalidInputException( "No company settings found in current session" );
+                }
+                socialMediaTokens = companySettings.getSocialMediaTokens();
+                if ( socialMediaTokens != null && socialMediaTokens.getGoogleBusinessToken() != null ) {
+                    profileManagementService.deleteGoogleBusiness(
+                        MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, socialMediaTokens );
+                }
+            } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+                OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
+                if ( regionSettings == null ) {
+                    throw new InvalidInputException( "No Region settings found in current session" );
+                }
+                socialMediaTokens = regionSettings.getSocialMediaTokens();
+                if ( socialMediaTokens != null && socialMediaTokens.getGoogleBusinessToken() != null ) {
+                    profileManagementService.deleteGoogleBusiness(
+                        MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, socialMediaTokens );
+                }
+            } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+                OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
+                if ( branchSettings == null ) {
+                    throw new InvalidInputException( "No Branch settings found in current session" );
+                }
+                socialMediaTokens = branchSettings.getSocialMediaTokens();
+                if ( socialMediaTokens != null && socialMediaTokens.getGoogleBusinessToken() != null ) {
+                    profileManagementService.deleteGoogleBusiness(
+                        MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, socialMediaTokens );
+                }
+            } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+                AgentSettings agentSettings = userManagementService.getUserSettings( entityId );
+                if ( agentSettings == null ) {
+                    throw new InvalidInputException( "No Agent settings found in current session" );
+                }
+                socialMediaTokens = agentSettings.getSocialMediaTokens();
+                if ( socialMediaTokens != null && socialMediaTokens.getGoogleBusinessToken() != null ) {
+                    profileManagementService.deleteGoogleBusiness(
+                        MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, socialMediaTokens );
+                }
+            } else {
+                throw new InvalidInputException( "Invalid input exception occurred in updating lendingTree token.",
+                    DisplayMessageConstants.GENERAL_ERROR );
+            }
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException while updating googleBusinessLink in profile. Reason :" + e.getMessage(), e );
+            model.addAttribute( "message", messageUtils.getDisplayMessage(
+                DisplayMessageConstants.GOOGLE_BUSINESS_TOKEN_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE ) );
+        }
+        return "Disconnected successfully";
+    }
 
     @RequestMapping ( value = "/updateRealtorlink", method = RequestMethod.POST)
     public String updateRealtorLink( Model model, HttpServletRequest request )

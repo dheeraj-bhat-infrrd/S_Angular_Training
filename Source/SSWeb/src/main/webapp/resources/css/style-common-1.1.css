@@ -1775,6 +1775,7 @@ span.footer-ul a:hover {
     border-bottom-left-radius: 8px;
     line-height: 40px;
     padding: 15px 10px;
+    display: flex;
 }
 
 .gmb-wc-sub-send-btn {

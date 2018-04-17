@@ -9714,6 +9714,34 @@ $('body').on('click', '#prof-edit-social-link .icn-google-business', function(e)
         "onblur" : "updateGoogleBusinessLink(this.value);$('#social-token-text').hide();"
     });
     $('#social-token-text').val(link);*/
+	$('body').on('click','#gmb-disconnect-link',function(){
+		
+		$.ajax({
+			url : './disconnectgooglebusiness.do',
+			type : "POST",
+			dataType : "TEXT",
+			async : true,
+			success : function(data) {
+				$('#overlay-toast').html(data);
+				showToast();
+			},
+			complete: function(){
+				hideOverlay();
+				enable(disableEle);
+			
+			},
+
+			error : function(e) {
+				if(e.status == 504) {
+					redirectToLoginPageOnSessionTimeOut(e.status);
+					return;
+				}
+				redirectErrorpage();
+			}
+		});
+		
+		$('#overlay-gmb-popup').addClass('hide');	
+	});
 
 });
 
