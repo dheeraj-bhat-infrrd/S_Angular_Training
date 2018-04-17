@@ -341,13 +341,13 @@
 			<div class="container">
 				<div class="row prof-pic-name-wrapper">
 					<c:if
-						test="${not empty profile.profileImageUrlThumbnail && not empty fn:trim(profile.profileImageUrlThumbnail)}">
+						test="${not empty profile.profileImageUrl && not empty fn:trim(profile.profileImageUrl)}">
 						<div id="prog-img-container"
 							class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper">
 							<div class="prog-img-container" style="background-color: white !important; display: flex;align-items: center;">
 								<img itemprop="primaryImageOfPage" id="prof-image"
 									class="prof-image pos-relative height-auto-resp"
-									src="${profile.profileImageUrlThumbnail}"></img>
+									src="${profile.profileImageUrl}"></img>
 							</div>
 						</div>
 					</c:if>
