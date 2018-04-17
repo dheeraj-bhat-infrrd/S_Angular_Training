@@ -1141,8 +1141,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 
     @Override
-    public void deleteGoogleBusiness( String collection, OrganizationUnitSettings unitSettings, SocialMediaTokens mediaTokens )
-        throws InvalidInputException
+    public void disconnectSelectedSocialMedia( String collection, OrganizationUnitSettings unitSettings,
+        SocialMediaTokens mediaTokens, String keyToUpdate ) throws InvalidInputException
     {
         if ( mediaTokens == null ) {
             throw new InvalidInputException( "Media tokens passed was null" );
@@ -1153,10 +1153,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         if ( unitSettings == null ) {
             throw new InvalidInputException( "Unit settings passed can not be null" );
         }
+        if ( keyToUpdate == null ) {
+            throw new InvalidInputException( "key passed can not be null" );
+        }
         LOG.debug( "Deleting google business from social media tokens in profile." );
-        if ( mediaTokens.getGoogleBusinessToken() != null )
-            organizationUnitSettingsDao.removeKeyInOrganizationSettings( unitSettings,
-                MongoOrganizationUnitSettingDaoImpl.KEY_GOOGLE_BUSINESS_SOCIAL_MEDIA_TOKEN, collection );
+        organizationUnitSettingsDao.removeKeyInOrganizationSettings( unitSettings, keyToUpdate, collection );
         LOG.debug( "Successfully deleted google business from social media tokens." );
     }
 

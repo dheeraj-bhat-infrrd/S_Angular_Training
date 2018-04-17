@@ -7218,10 +7218,10 @@ $(document).on('blur', '#yelp-profile-url', function() {
 		return;
 	}
 
-	var payload = {
-		"yelplink" : yelpLink
-	};
 	if (isValidUrl(yelpLink)) {
+		var payload = {
+				"yelplink" : yelpLink
+			};
 		callAjaxPostWithPayloadData("./updateyelplink.do", function(data) {
 			$('#yelp-profile-url-display').html(yelpLink);
 			$('#yelp-profile-url-display').removeClass('hide');
@@ -7232,6 +7232,14 @@ $(document).on('blur', '#yelp-profile-url', function() {
 			$('#overlay-toast').html($('#display-msg-div').text().trim());
 			showToast();
 		}, payload, true);
+	} else if( yelpLink == '') {
+		var payload = {
+				"socialmedia" : yelp
+			};
+		callAjaxPostWithPayloadData("./disconnectparticularsocialmedia.do", function(data) {
+				$('#overlay-toast').html(data);
+				showToast();
+			}, payload, true);
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
@@ -9552,6 +9560,15 @@ function updateYelpLink(link) {
 	if (isValidUrl(link)) {
 		callAjaxPostWithPayloadData("./updateyelplink.do", callBackUpdateSocialLink, payload, true);
 		showProfileLinkInEditProfilePage("yelp", link);
+	} else if( link == '') {
+		var payload = {
+				"socialmedia" : "yelp"
+			};
+		callAjaxPostWithPayloadData("./disconnectparticularsocialmedia.do", function(data) {
+				$('#overlay-toast').html(data);
+				showToast();
+			}, payload, true);
+		removeProfileLinkInEditProfilePage( "yelp" );
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
@@ -9587,6 +9604,15 @@ function updateLendingTreeLink(link) {
 	if (isValidUrl(link)) {
 		callAjaxPostWithPayloadData("./updatelendingtreelink.do", callBackUpdateSocialLink, payload, true);
 		showProfileLinkInEditProfilePage("lendingtree", link);
+	} else if( link == '') {
+		var payload = {
+				"socialmedia" : "lendingtree"
+			};
+		callAjaxPostWithPayloadData("./disconnectparticularsocialmedia.do", function(data) {
+				$('#overlay-toast').html(data);
+				showToast();
+			}, payload, true);
+		removeProfileLinkInEditProfilePage( "lendingtree" );
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
@@ -9606,14 +9632,23 @@ $('body').on('click', '#prof-edit-social-link .icn-fb-pxl', function(e) {
 });
 
 function updateFacebookPixelId(pixelId) {
-	var payload = {
-		"pixelId" : pixelId
-	};
 	var parsedPixelId = parseInt(pixelId, 10);
 	var isPixelIdInt = parsedPixelId == pixelId;
 	if (pixelId != undefined && pixelId != '' && isPixelIdInt ) {
+		var payload = {
+				"pixelId" : pixelId
+			};
 		callAjaxPostWithPayloadData("./updatefacebookpixelid.do", callBackUpdateSocialLink, payload, true);
 		showProfileLinkInEditProfilePage("facebookPixel", pixelId);
+	} else if( pixelId == '') {
+		var payload = {
+				"socialmedia" : "facebookpixel"
+			};
+		callAjaxPostWithPayloadData("./disconnectparticularsocialmedia.do", function(data) {
+				$('#overlay-toast').html(data);
+				showToast();
+			}, payload, true);
+		removeProfileLinkInEditProfilePage( "facebookPixel" );
 	} else {
 		$('#overlay-toast').html("Enter a valid pixel id");
 		showToast();
@@ -9716,29 +9751,16 @@ $('body').on('click', '#prof-edit-social-link .icn-google-business', function(e)
     $('#social-token-text').val(link);*/
 	$('body').on('click','#gmb-disconnect-link',function(){
 		
-		$.ajax({
-			url : './disconnectgooglebusiness.do',
-			type : "POST",
-			dataType : "TEXT",
-			async : true,
-			success : function(data) {
+		var payload = {
+				"socialmedia" : "google business"
+			};
+		callAjaxPostWithPayloadData("./disconnectparticularsocialmedia.do", function(data) {
 				$('#overlay-toast').html(data);
 				showToast();
-			},
-			complete: function(){
-				hideOverlay();
-			},
-
-			error : function(e) {
-				if(e.status == 504) {
-					redirectToLoginPageOnSessionTimeOut(e.status);
-					return;
-				}
-				redirectErrorpage();
-			}
-		});
+			}, payload, true);
 		
-		$('#overlay-gmb-popup').addClass('hide');	
+		$('#overlay-gmb-popup').addClass('hide');
+		removeProfileLinkInEditProfilePage( "googleBusiness" );
 	});
 
 });
@@ -9750,6 +9772,15 @@ function updateRealtorLink(link) {
 	if (isValidUrl(link)) {
 		callAjaxPostWithPayloadData("./updateRealtorlink.do", callBackUpdateSocialLink, payload, true);
 		showProfileLinkInEditProfilePage("realtor", link);
+	} else if( link == '') {
+		var payload = {
+				"socialmedia" : "realtor"
+			};
+		callAjaxPostWithPayloadData("./disconnectparticularsocialmedia.do", function(data) {
+				$('#overlay-toast').html(data);
+				showToast();
+			}, payload, true);
+		removeProfileLinkInEditProfilePage( "realtor" );
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
@@ -11592,6 +11623,10 @@ function disconnectSocialMedia(event, socialMedia, isAutoLogin) {
 
 function showProfileLinkInEditProfilePage(source, profileUrl) {
 	$('.social-item-icon[data-source="' + source + '"').attr('data-link', profileUrl).removeClass('icn-social-add');
+}
+
+function removeProfileLinkInEditProfilePage(source) {
+	$('.social-item-icon[data-source="' + source + '"').attr('data-link','' ).addClass('icn-social-add');
 }
 
 function showSurveysUnderResolution(startIndexCmp, batchSizeCmp) {

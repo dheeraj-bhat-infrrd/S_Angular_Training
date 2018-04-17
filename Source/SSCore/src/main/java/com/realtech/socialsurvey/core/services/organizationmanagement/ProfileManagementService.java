@@ -757,7 +757,7 @@ public interface ProfileManagementService
      * @param mediaTokens
      * @throws InvalidInputException
      */
-    public void deleteGoogleBusiness( String collection, OrganizationUnitSettings unitSettings, SocialMediaTokens mediaTokens )
-        throws InvalidInputException;
+    public void disconnectSelectedSocialMedia( String collection, OrganizationUnitSettings unitSettings, SocialMediaTokens mediaTokens,
+        String keyToupdate ) throws InvalidInputException;
 
 }
