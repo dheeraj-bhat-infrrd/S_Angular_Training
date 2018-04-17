@@ -310,4 +310,7 @@ public interface OrganizationUnitSettingsDao
 
 
 	public ContactDetailsSettings fetchContactDetailByEncryptedId(String encryptedId, String collection);
+
+
+    void updateSocialMediaForUsers( List<Long> userIdList, boolean disableSocialMediaTokens );
 }
