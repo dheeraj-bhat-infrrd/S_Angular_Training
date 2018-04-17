@@ -115,7 +115,7 @@ public class InstagramFeedExactorBolt extends BaseComputeBolt {
     private boolean isRateLimitExceeded(SocialMediaTokenResponse mediaToken){
         String pageId = UrlHelper.getFacebookPageIdFromURL( mediaToken.getSocialMediaTokens().getFacebookToken().getFacebookPageLink() );
         if (socialMediaStateDao.isFacebookApplicationLockSet() || socialMediaStateDao.isFacebookPageLockSet( pageId )
-                || socialMediaStateDao.isFacebookTokenLockSet( mediaToken.getSocialMediaTokens().getFacebookToken().getFacebookAccessToken() ) ) {
+                || socialMediaStateDao.isFacebookTokenLockSet( mediaToken.getSocialMediaTokens().getFacebookToken().getFacebookAccessTokenToPost() ) ) {
             return true;
         }
         else return false;

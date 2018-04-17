@@ -66,7 +66,7 @@ public class InstagramFeedProcessorImpl implements InstagramFeedProcessor {
 
         if(lastFetchedIgId == null || lastFetchedIgId.isEmpty() ){
             //run the extractor for the first time so get latest 50 records
-            instagramAccount = fetchFeeds( pageId, fbToken.getFacebookAccessToken() );
+            instagramAccount = fetchFeeds( pageId, fbToken.getFacebookAccessTokenToPost() );
             if ( instagramAccount != null && instagramAccount.getMedia() != null){
                 instagramMediaData.addAll(instagramAccount.getMedia().getData());
                 //save the first record in the redis
@@ -74,14 +74,14 @@ public class InstagramFeedProcessorImpl implements InstagramFeedProcessor {
             }
         } else{
             //Get all the feeds until we encounter the lastFetchedIgId
-            instagramAccount = fetchFeeds( pageId, fbToken.getFacebookAccessToken() );
+            instagramAccount = fetchFeeds( pageId, fbToken.getFacebookAccessTokenToPost() );
             if( instagramAccount != null){
                 instagramMedia = instagramAccount.getMedia();
                 instagramMediaData.addAll(addInstagramMedia(instagramMedia, lastFetchedIgId));
                /* Here we are checking for size because if lastFetchedIg is encountered
                 then we'll fetch only till that record ignoring the rest.Hence the size < 50*/
                 while( instagramMediaData.size() == LIMIT && instagramMedia.getPaging() != null && instagramMedia.getPaging().getNext() != null ){
-                    instagramMedia = fetchFeeds(pageId, instagramAccount.getId(), fbToken.getFacebookAccessToken(),
+                    instagramMedia = fetchFeeds(pageId, instagramAccount.getId(), fbToken.getFacebookAccessTokenToPost(),
                             instagramMedia.getPaging().getCursors().getAfter());
                     instagramMediaData.addAll(addInstagramMedia(instagramMedia, lastFetchedIgId));
                 }
