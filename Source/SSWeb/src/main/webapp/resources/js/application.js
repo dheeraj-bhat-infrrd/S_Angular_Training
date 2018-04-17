@@ -9727,8 +9727,6 @@ $('body').on('click', '#prof-edit-social-link .icn-google-business', function(e)
 			},
 			complete: function(){
 				hideOverlay();
-				enable(disableEle);
-			
 			},
 
 			error : function(e) {
