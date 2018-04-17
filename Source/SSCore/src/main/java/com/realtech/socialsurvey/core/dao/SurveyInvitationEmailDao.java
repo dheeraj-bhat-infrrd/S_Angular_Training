@@ -16,7 +16,7 @@ public interface SurveyInvitationEmailDao extends GenericReportingDao<SurveyInvi
 	List<Object[]> getSurveyInvitationEmailReportForMonth(long companyId, int month, int year);
 	List<Object[]> getSurveyInvitationEmailReportForAllTime(long companyId, int month, int year);
 	public void deleteOldDataForMonth(int month, int year);
-	int getSurveyInvitationEmailReportCountForMonth(int month, int year);
+	long getSurveyInvitationEmailReportCountForMonth(int month, int year);
 
 	
 
