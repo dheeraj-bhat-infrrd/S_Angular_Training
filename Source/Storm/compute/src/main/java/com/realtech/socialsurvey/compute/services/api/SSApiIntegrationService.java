@@ -14,6 +14,7 @@ import com.realtech.socialsurvey.compute.entity.SurveyInvitationEmailCountMonth;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
@@ -30,32 +31,32 @@ public interface SSApiIntegrationService
 {
     @Headers ( "Content-Type: application/json")
     @GET ( "v1/companies/{companyId}/keywords")
-    Call<List<Keyword>> getKeywordsForCompanyId( @Path ( "companyId") long companyId );
+    Call<List<Keyword>> getKeywordsForCompanyId( @Path ( "companyId") long companyId ,@Header("authorizationHeader") String authorizationHeader);
 
 
     @Headers ( "Content-Type: application/json")
     @GET ( "v1/companies/mediatokens")
-    Call<List<SocialMediaTokenResponse>> getMediaTokens();
+    Call<List<SocialMediaTokenResponse>> getMediaTokens(@Header("authorizationHeader") String authorizationHeader);
     
     @Headers ( "Content-Type: application/json")
     @GET ( "v1/companies/mediaTokensPaginated")
-    Call<SocialMediaTokensPaginated> getMediaTokensPaginated(@Query ( "skipCount") int skipCount,@Query ( "batchSize") int batchSize);
+    Call<SocialMediaTokensPaginated> getMediaTokensPaginated(@Query ( "skipCount") int skipCount,@Query ( "batchSize") int batchSize, @Header("authorizationHeader") String authorizationHeader);
 
     @Headers ( "Content-Type: application/json")
     @POST ( "v1/feeds")
-    Call<SocialResponseObject> saveSocialFeed( @Body SocialResponseObject socialPostToMongo );
+    Call<SocialResponseObject> saveSocialFeed( @Body SocialResponseObject socialPostToMongo ,@Header("authorizationHeader") String authorizationHeader);
 
 
     @Headers ( "Content-Type: application/json")
     @POST ( "v1/feeds")
     Call<SocialResponseObject<TwitterFeedData>> saveTwitterFeed(
-        @Body SocialResponseObject<TwitterFeedData> socialPostToMongo );
+        @Body SocialResponseObject<TwitterFeedData> socialPostToMongo , @Header("authorizationHeader") String authorizationHeader);
 
 
     @Headers ( "Content-Type: application/json")
     @POST ( "v1/feeds")
     Call<SocialResponseObject<LinkedinFeedData>> saveLinkedinFeed(
-        @Body SocialResponseObject<LinkedinFeedData> socialPostToMongo );
+        @Body SocialResponseObject<LinkedinFeedData> socialPostToMongo , @Header("authorizationHeader") String authorizationHeader);
 
 
     @Headers ( "Content-Type: application/json")
@@ -71,12 +72,12 @@ public interface SSApiIntegrationService
 
     @Headers ( "Content-Type: application/json")
     @PUT ( "v1/feeds/hash/{hash}/companyId/{companyId}")
-    Call<Long> updateDuplicateCount( @Path ( "hash") int hash, @Path ( "companyId") long companyId );
+    Call<Long> updateDuplicateCount( @Path ( "hash") int hash, @Path ( "companyId") long companyId, @Header("authorizationHeader") String authorizationHeader );
 
 
     @GET ( "v1/trxcount/agent")
     Call<List<SurveyInvitationEmailCountMonth>> getReceivedCountsMonth( @Query ( "startDateInGmt") long startDate,
-        @Query ( "endDateInGmt") long endDate, @Query ( "startIndex") int startIndex, @Query ( "batchSize") int batchSize );
+        @Query ( "endDateInGmt") long endDate, @Query ( "startIndex") int startIndex, @Query ( "batchSize") int batchSize, @Header("authorizationHeader") String authorizationHeader );
 
 
     @Headers ( "Content-Type: application/json")

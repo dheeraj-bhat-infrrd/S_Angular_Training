@@ -27,6 +27,9 @@ public class SSAPIOperations
 {
     private static final Logger LOG = LoggerFactory.getLogger( SSAPIOperations.class );
     private static SSAPIOperations apiOperations;
+    
+    private static final String AUTH_HEADER = LocalPropertyFileHandler.getInstance()
+        .getProperty( ComputeConstants.APPLICATION_PROPERTY_FILE, ComputeConstants.AUTH_HEADER ).orElse( null );
 
 
     private SSAPIOperations()
@@ -51,7 +54,7 @@ public class SSAPIOperations
     {
         LOG.info( "Executing getKeywordsForCompany method." );
         Call<List<Keyword>> requestCall = RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationService()
-            .getKeywordsForCompanyId( companyId );
+            .getKeywordsForCompanyId( companyId, AUTH_HEADER );
         try {
             Response<List<Keyword>> response = requestCall.execute();
             RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
@@ -74,7 +77,7 @@ public class SSAPIOperations
     {
         LOG.info( "Executing getMediaTokens method." );
         Call<List<SocialMediaTokenResponse>> requestCall = RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationServiceWithIncreasedTimeOut()
-            .getMediaTokens();
+            .getMediaTokens(AUTH_HEADER);
         try {
             Response<List<SocialMediaTokenResponse>> response = requestCall.execute();
             RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
@@ -98,7 +101,7 @@ public class SSAPIOperations
     {
         LOG.info( "Executing getMediaTokensPaginated method." );
         Call<SocialMediaTokensPaginated> requestCall = RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationServiceWithIncreasedTimeOut()
-            .getMediaTokensPaginated( skipCount, batchSize);
+            .getMediaTokensPaginated( skipCount, batchSize, AUTH_HEADER);
         try {
             Response<SocialMediaTokensPaginated> response = requestCall.execute();
             RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
@@ -121,7 +124,7 @@ public class SSAPIOperations
     public boolean saveFeedToMongo( SocialResponseObject<?> socialPostToMongo ) throws IOException {
         LOG.info( "Executing saveFeedToMongo method." );
         Call<SocialResponseObject> requestCall = RetrofitApiBuilder.apiBuilderInstance()
-            .getSSAPIIntergrationService().saveSocialFeed( socialPostToMongo );
+            .getSSAPIIntergrationService().saveSocialFeed( socialPostToMongo, AUTH_HEADER );
             Response response = requestCall.execute();
             RetrofitApiBuilder.apiBuilderInstance().validateSavePostToMongoResponse( response );
             if ( LOG.isTraceEnabled() ) {
@@ -133,7 +136,7 @@ public class SSAPIOperations
     public Optional<Long> updateSocialPostDuplicateCount( int hash, long comapnyId ) throws IOException {
         LOG.info( "Executing updateSocialPostDuplicateCount method" );
         Call<Long> requestCall = RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationService()
-            .updateDuplicateCount( hash, comapnyId );
+            .updateDuplicateCount( hash, comapnyId , AUTH_HEADER);
             Response<Long> response = requestCall.execute();
             RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
             if ( LOG.isTraceEnabled() ) {
@@ -144,7 +147,7 @@ public class SSAPIOperations
 
 	public List<SurveyInvitationEmailCountMonth> getReceivedCountsMonth(long startDate, long endDate, int startIndex, int batchSize) throws IOException {
 		Call<List<SurveyInvitationEmailCountMonth>> request = RetrofitApiBuilder.apiBuilderInstance()
-				.getSSAPIIntergrationServiceWithIncreasedTimeOut().getReceivedCountsMonth(startDate,endDate, startIndex, batchSize);
+				.getSSAPIIntergrationServiceWithIncreasedTimeOut().getReceivedCountsMonth(startDate,endDate, startIndex, batchSize, AUTH_HEADER);
 		Response<List<SurveyInvitationEmailCountMonth>> response = request.execute();
 		RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
 		return response.body();
