@@ -85,14 +85,14 @@ public class FacebookFeedProcessorImpl implements FacebookFeedProcessor
                     since = String.valueOf( cal.getTimeInMillis() / 1000 );
                 }
 
-                FacebookResponse result = fetchFeeds( pageId, token.getFacebookAccessToken(), since, until, "" );
+                FacebookResponse result = fetchFeeds( pageId, token.getFacebookAccessTokenToPost(), since, until, "" );
 
                 if ( result != null ) {
                     feeds.addAll( result.getData() );
                     while ( result != null && result.getPaging() != null && result.getPaging().getNext() != null ) {
                         Map<String, String> queryMap = UrlHelper.getQueryParamsFromUrl( result.getPaging().getNext() );
 
-                        result = fetchFeeds( pageId, token.getFacebookAccessToken(), queryMap.get( "since" ),
+                        result = fetchFeeds( pageId, token.getFacebookAccessTokenToPost(), queryMap.get( "since" ),
                             queryMap.get( "until" ), queryMap.get( "__paging_token" ) );
 
                         if ( result != null ) {

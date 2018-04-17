@@ -84,4 +84,7 @@ public final class ComputeConstants
     public static final String SOLR_PIVOT_AGENT_DROPPED = "agentId,emailDroppedDate";
 
     public static int BATCH_SIZE = 5000;
+    
+    public static final String AUTH_HEADER = "social.monitor.auth.header";
+
 }

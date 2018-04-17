@@ -51,7 +51,7 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt implements Serial
             String pageId = UrlHelper.getFacebookPageIdFromURL( token.getFacebookPageLink() );
 
             if (socialMediaStateDao.isFacebookApplicationLockSet() || socialMediaStateDao.isFacebookPageLockSet( pageId ) || socialMediaStateDao
-                .isFacebookTokenLockSet( mediaToken.getSocialMediaTokens().getFacebookToken().getFacebookAccessToken() ) ) {
+                .isFacebookTokenLockSet( mediaToken.getSocialMediaTokens().getFacebookToken().getFacebookAccessTokenToPost() ) ) {
                 LOG.warn( "Facebook feed extractor reached rate limiting." );
                 return true;
             }
