@@ -961,10 +961,10 @@ function paintFixSocialMedia(data){
 	for (var i = 0; i < socialMedias.length; i++){
 		var socialMedia = socialMedias[i];
 		if(socialMedia == "facebook"){
-			var facebookDiv = '<div class="clearfix display-inline-block"><div class="float-left soc-nw-icns cursor-pointer icn-wide-fb soc-nw-adj " onclick="openAuthPageFixSocialMedia('+ "'facebook'" +', '+ "'" + columnName + "'" +', '+columnValue+');"></div></div>';
+			var facebookDiv = '<div class="clearfix display-inline-block"><div class="float-left soc-nw-icns cursor-pointer icn-wide-fb soc-nw-adj " onclick="openAuthPageFixSocialMedia('+ "'facebook'" +', '+ "'" + columnName + "'" +', '+columnValue+',true'+');"></div></div>';
 			popup += facebookDiv;
 		}else if(socialMedia == "linkedin"){
-			var linkedinDiv = '<div class="clearfix display-inline-block"><div class="float-left soc-nw-icns cursor-pointer icn-wide-linkedin soc-nw-adj " onclick="openAuthPageFixSocialMedia(' + "'linkedin'" + ',' + "'" + columnName + "'" + ', '+columnValue+');" data-link=""></div></div>';
+			var linkedinDiv = '<div class="clearfix display-inline-block"><div class="float-left soc-nw-icns cursor-pointer icn-wide-linkedin soc-nw-adj " onclick="openAuthPageFixSocialMedia(' + "'linkedin'" + ',' + "'" + columnName + "'" + ', '+columnValue+',true'+');" data-link=""></div></div>';
 			popup += linkedinDiv;
 		}
 	}

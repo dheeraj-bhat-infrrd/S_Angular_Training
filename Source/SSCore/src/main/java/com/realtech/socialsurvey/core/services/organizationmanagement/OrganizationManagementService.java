@@ -1633,6 +1633,8 @@ public interface OrganizationManagementService
     void updateHidePublicPageForUsers( List<Long> userIdList, boolean hidePublicPage ) throws InvalidInputException;
 
 
+    public List<String> validateSocailMedia( String columnName, long columnValue ) throws InvalidInputException, NoRecordsFetchedException;
+
 	ContactDetailsSettings fetchContactDetailByEncryptedId(String encryptedId, String collection);
 	
 	void updateSocialMediaForUser( Long userId, boolean disableSocialMediaTokens ) throws InvalidInputException;
@@ -1650,6 +1652,7 @@ public interface OrganizationManagementService
     public  boolean updateEncompassVersion( long companyId, String version ) throws InvalidInputException;
 
 
+
     public boolean updateUserAdditionDeletionRecipients( String entityType, long entityId, Set<String> emails )
         throws InvalidInputException, NoRecordsFetchedException;
 
@@ -1660,4 +1663,5 @@ public interface OrganizationManagementService
 
     public void sendUserDeletionMail( User adminUser, User user )
         throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException;
+
 }

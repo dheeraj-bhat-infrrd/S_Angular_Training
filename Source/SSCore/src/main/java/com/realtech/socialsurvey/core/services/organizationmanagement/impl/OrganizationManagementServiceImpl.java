@@ -148,6 +148,7 @@ import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsLocker;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
+import com.realtech.socialsurvey.core.services.social.SocialMediaExceptionHandler;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
@@ -319,6 +320,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Value ( "${CDN_PATH}")
     String cdnPath;
+    
+    @Value ( "${TOKEN_REFRESH_INTERVAL}")
+    private int tokenRefreshInterval;
 
     @Autowired
     private ProfileCompletionList profileCompletionList;
@@ -364,6 +368,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Autowired
     private WorkbookData workbookData;
+    
+    @Autowired
+    private SocialMediaExceptionHandler socialMediaExceptionHandler;
 
 
     /**
@@ -8086,6 +8093,74 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
 
+    @Override
+    public List<String> validateSocailMedia( String columnName, long columnValue )
+        throws InvalidInputException, NoRecordsFetchedException
+    {
+        OrganizationUnitSettings settings = null;
+        String collection = null;
+        List<String> tokenRefreshList = new ArrayList<>();
+        if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
+            settings = getCompanySettings( columnValue );
+            collection = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
+        } else if ( columnName.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
+            settings = getRegionSettings( columnValue );
+            collection = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
+        } else if ( columnName.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
+            settings = getBranchSettingsDefault( columnValue );
+            collection = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
+        } else if ( columnName.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) ) {
+            settings = userManagementService.getUserSettings( columnValue );
+            collection = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
+        }
+
+        //facebook token
+        if ( settings != null && settings.getSocialMediaTokens() != null
+            && settings.getSocialMediaTokens().getFacebookToken() != null ) {
+            if ( socialManagementService.checkFacebookTokenExpiry( settings, collection ) ) {
+                FacebookToken facebookToken = settings.getSocialMediaTokens().getFacebookToken();
+                if ( !facebookToken.isTokenExpiryAlertSent() ) {
+                    LOG.debug( "Alert Mail hasn't send to sending alert mail for entity" );
+                    String emailId = socialMediaExceptionHandler.generateAndSendSocialMedialTokenExpiryMail( settings,
+                        collection, CommonConstants.FACEBOOK_SOCIAL_SITE );
+                    //update alert detail in token
+                    if ( emailId != null ) {
+                        facebookToken.setTokenExpiryAlertEmail( emailId );
+                        facebookToken.setTokenExpiryAlertSent( true );
+                        facebookToken.setTokenExpiryAlertTime( new Date() );
+                        socialManagementService.updateFacebookToken( collection, settings.getIden(), facebookToken );
+                    }
+                }
+            }
+            if(socialManagementService.checkForFacebookTokenRefresh( settings.getSocialMediaTokens() ))
+                tokenRefreshList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+        }
+
+        //linkedin token
+        if ( settings != null && settings.getSocialMediaTokens() != null
+            && settings.getSocialMediaTokens().getLinkedInToken() != null ) {
+            if ( socialManagementService.checkLinkedInTokenExpiry( settings, collection ) ) {
+                LinkedInToken linkedInToken = settings.getSocialMediaTokens().getLinkedInToken();
+                if ( !linkedInToken.isTokenExpiryAlertSent() ) {
+                    //send alert mail to entity 
+                    String emailId = socialMediaExceptionHandler.generateAndSendSocialMedialTokenExpiryMail( settings,
+                        collection, CommonConstants.LINKEDIN_SOCIAL_SITE );
+                    //update alert mail detail in linkedin token
+                    if ( emailId != null ) {
+                        linkedInToken.setTokenExpiryAlertEmail( emailId );
+                        linkedInToken.setTokenExpiryAlertSent( true );
+                        linkedInToken.setTokenExpiryAlertTime( new Date() );
+                        socialManagementService.updateLinkedinToken( collection, settings.getIden(), linkedInToken );
+                    }
+                }
+            }
+            if(socialManagementService.checkForLinkedInTokenRefresh( settings.getSocialMediaTokens() ))
+                tokenRefreshList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+        }
+        return tokenRefreshList;
+    }
+
+
     /**
      * 
      */
@@ -8096,33 +8171,34 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.debug( "method getExpiredSocailMedia started" );
         Set<String> socialMedias = new HashSet<String>();
         OrganizationUnitSettings settings = null;
+        String collection = null;
         if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
             settings = getCompanySettings( columnValue );
+            collection = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
         } else if ( columnName.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
             settings = getRegionSettings( columnValue );
+            collection = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
         } else if ( columnName.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
             settings = getBranchSettingsDefault( columnValue );
+            collection = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
         } else if ( columnName.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) ) {
             settings = userManagementService.getUserSettings( columnValue );
+            collection = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
         }
 
         //facebook token
         if ( settings != null && settings.getSocialMediaTokens() != null
             && settings.getSocialMediaTokens().getFacebookToken() != null ) {
-            FacebookToken facebookToken = settings.getSocialMediaTokens().getFacebookToken();
-            if ( facebookToken.getFacebookAccessTokenExpiresOn() != 0L ) {
-                if ( socialManagementService.checkFacebookTokenExpiry( facebookToken ) ) {
-                    //check if token is still expired
-                    socialMedias.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
-                }
+            if ( settings.getSocialMediaTokens().getFacebookToken().isTokenExpiryAlertSent() ) {
+                //check if token is still expired
+                socialMedias.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
             }
         }
 
         //linkedin token
         if ( settings != null && settings.getSocialMediaTokens() != null
             && settings.getSocialMediaTokens().getLinkedInToken() != null ) {
-            LinkedInToken linkedInToken = settings.getSocialMediaTokens().getLinkedInToken();
-            if ( socialManagementService.checkLinkedInTokenExpiry( linkedInToken ) ) {
+            if ( settings.getSocialMediaTokens().getLinkedInToken().isTokenExpiryAlertSent() ) {
                 socialMedias.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
             }
         }
