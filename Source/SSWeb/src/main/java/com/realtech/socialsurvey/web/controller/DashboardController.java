@@ -295,11 +295,6 @@ public class DashboardController
                 model.addAttribute( "company", user.getCompany().getCompany() );
                 model.addAttribute( "location", unitSettings.getContact_details().getLocation() );
                 model.addAttribute( "vertical", unitSettings.getVertical() );
-                //check if user's linkedIn token has expired
-                if ( unitSettings.getSocialMediaTokens() != null
-                    && unitSettings.getSocialMediaTokens().getLinkedInToken() != null ) {
-                    socialManagementService.checkForLinkedInTokenExpiry( unitSettings );
-                }
             } else if ( realtechAdminStr != null && !realtechAdminStr.isEmpty() ) {
                 realtechAdmin = Boolean.parseBoolean( realtechAdminStr );
             }
@@ -1949,7 +1944,6 @@ public class DashboardController
 
         String entityType = request.getParameter( "entityType" );
         sessionHelper.updateSelectedProfile( session, entityId, entityType );
-
         LOG.info( "Method updateSelectedProfile() finished." );
         return CommonConstants.SUCCESS_ATTRIBUTE;
     }

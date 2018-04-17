@@ -249,7 +249,10 @@
 	
 	
 	if( "${isSocialMediaExpired}" == "true" ){
+		var columnName = "${columnName}";
+		var columnValue = "${columnValue}";
 		$("#rep-fix-social-media").removeClass("hide");
+		
 	} else {
 		drawReportingDashButtons(currentProfileName, currentProfileValue);
 	}

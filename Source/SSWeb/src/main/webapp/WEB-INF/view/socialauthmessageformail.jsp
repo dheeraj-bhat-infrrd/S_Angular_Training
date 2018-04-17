@@ -28,6 +28,7 @@
      <div style="padding: 0px 20px;" class="clearfix">
       <div  style="margin-bottom: 10px; font-size: 19px; text-align: center; padding: 0px 10px;">
        <c:choose>
+        <c:when test="${isNewUser == true || isNewUser == 'true' }"><span style="font-size:15px; margin: 15px auto;" >Invalid Credentials.Please disconnect older account to link a new Facebook Account</span></c:when>
         <c:when test="${success == 1}"><spring:message code="label.authorization.success" /></c:when>
         <c:when test="${message == 1}"><spring:message code="label.waitmessage.key" /></c:when>
         <c:otherwise><spring:message code="label.authorization.failure" /></c:otherwise>
@@ -86,6 +87,7 @@
   }, 3000);
  }
  
+
  // close on success
  setTimeout(function() {
 $('#close-text').text("Please close the tab and continue by logining in to Social Survey.");

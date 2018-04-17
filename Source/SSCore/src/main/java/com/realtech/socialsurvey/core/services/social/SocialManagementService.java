@@ -10,6 +10,7 @@ import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchMediaPostResponseDetails;
 import com.realtech.socialsurvey.core.entities.ExternalSurveyTracker;
+import com.realtech.socialsurvey.core.entities.FacebookPage;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
 import com.realtech.socialsurvey.core.entities.HierarchyRelocationTarget;
 import com.realtech.socialsurvey.core.entities.LinkedInToken;
@@ -291,9 +292,6 @@ public interface SocialManagementService
         throws InvalidInputException;
 
 
-    SocialMediaTokens updateFacebookToken( AccessToken accessToken, SocialMediaTokens mediaTokens, String profileLink );
-
-
     String getLinkedinAuthUrl( String redirectUri );
 
 
@@ -304,10 +302,10 @@ public interface SocialManagementService
         String collectionType ) throws InvalidInputException;
 
 
-    boolean checkFacebookTokenExpiry( FacebookToken facebookToken );
+    boolean checkFacebookTokenExpiry( OrganizationUnitSettings settings, String collection );
 
 
-    boolean checkLinkedInTokenExpiry( LinkedInToken linkedInToken );
+    boolean checkLinkedInTokenExpiry( OrganizationUnitSettings settings, String collection );
     
     
     public void updateSocialPostAfterHierarchyRelocation( SocialPost socialPost );
@@ -325,10 +323,36 @@ public interface SocialManagementService
     public void updateSocialConnectionHistoryAfterHierarchyRelocation( SocialUpdateAction socialUpdateAction );
 
 
-    public void checkForLinkedInTokenExpiry( OrganizationUnitSettings settings );
+    public List<FacebookPage> getFacebookPages( AccessToken accessToken, String profileLink );
+
+
+    public void updateFacebookTokenAndSave( String accessToken, SocialMediaTokens mediaTokens, String profileLink,
+        String collection, OrganizationUnitSettings unitSettings ) throws NonFatalException;
+
+
+    public SocialMediaTokens updateFacebookPages( AccessToken userAccessToken, SocialMediaTokens mediaTokens,
+        List<FacebookPage> facebookPages );
+
+
+    public SocialMediaTokens updateFacebookPagesInMongo( String collection, long iden, SocialMediaTokens mediaTokens )
+        throws InvalidInputException;
+
+
+    public boolean checkForLinkedInTokenExpiry( LinkedInToken token );
+
+
+    public boolean updateFacebookTokenForExistingUser( List<FacebookPage> facebookPages, OrganizationUnitSettings unitSettings,
+        SocialMediaTokens mediaTokens, String collection ) throws NonFatalException;
+
+
+    public boolean checkForFacebookTokenRefresh( SocialMediaTokens mediaTokens );
+
+
+    public boolean checkForLinkedInTokenRefresh( SocialMediaTokens mediaTokens );
 
 
     public boolean manualPostToLinkedInForEntity( String entityType, Long entityId, String surveyMongoId );
+
 
 }
 // JIRA SS-34 BY RM02 BOC
