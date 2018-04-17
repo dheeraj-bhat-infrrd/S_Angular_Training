@@ -37,7 +37,7 @@ public class ProfileCompletionListTest
     @Test
     public void testGetDefaultProfileCompletionListForISAgentTrue() {
         List<ProfileStage> profileStages = profileCompletionList.getDefaultProfileCompletionList( true );
-        assertEquals("Length of the stage returned is incorrect", 9, profileStages.size());
+        assertEquals("Length of the stage returned is incorrect", 10, profileStages.size());
         boolean isLisenceProfilePresent = false;
         boolean isHobbiesProfilePresent = false;
         boolean isAchievemetsProfilePresent = false;
@@ -59,7 +59,7 @@ public class ProfileCompletionListTest
     @Test
     public void testGetDefaultProfileCompletionListForISAgentFalse() {
         List<ProfileStage> profileStages = profileCompletionList.getDefaultProfileCompletionList( false );
-        assertEquals("Length of the stage returned is incorrect", 6, profileStages.size());
+        assertEquals("Length of the stage returned is incorrect", 7, profileStages.size());
         boolean isLisenceProfilePresent = false;
         boolean isHobbiesProfilePresent = false;
         boolean isAchievemetsProfilePresent = false;
