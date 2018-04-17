@@ -10461,6 +10461,8 @@ function paintDashboardButtons(data) {
 				contentToDisplay = 'Enter hobbies';
 			} else if (stages[i].profileStageKey == 'ACHIEVEMENTS_PRF') {
 				contentToDisplay = 'Enter achievements';
+			} else if (stages[i].profileStageKey == 'INSTAGRAM_PRF') {
+				contentToDisplay = 'Connect to Instagram';
 			}
 			if (i == 0) {
 				$('#dsh-btn2').data('social', stages[i].profileStageKey);
@@ -10503,6 +10505,8 @@ function dashboardButtonAction(buttonId, task, columnName, columnValue) {
 	} else if (task == 'ACHIEVEMENTS_PRF') {
 		showMainContent('./showprofilepage.do');
 		editProfileForAchievements = true;
+	} else if (task == 'INSTAGRAM_PRF') {
+		openAuthPageDashboard('Instagram', columnName, columnValue);
 	}
 }
 
