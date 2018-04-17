@@ -27,7 +27,7 @@ public class SettingsSetterImpl implements SettingsSetter {
 			throw new InvalidInputException("Invalid input sent for settings update");
 		}
 		LOG.debug("Setting values to company " + company);
-		long modifiedSetSettingsValue = getModifiedSetSettingsValue(OrganizationUnit.COMPANY, Long.parseLong(company.getSettingsSetStatus()),
+		double modifiedSetSettingsValue = getModifiedSetSettingsValue(OrganizationUnit.COMPANY, Long.parseLong(company.getSettingsSetStatus()),
 				settings, hasBeenSet);
 		company.setSettingsSetStatus(String.valueOf(modifiedSetSettingsValue));
 		return company;
@@ -41,7 +41,7 @@ public class SettingsSetterImpl implements SettingsSetter {
 			throw new InvalidInputException("Invalid input sent for settings update");
 		}
 		LOG.debug("Setting values to region " + region);
-		long modifiedSetSettingsValue = getModifiedSetSettingsValue(OrganizationUnit.REGION, Long.parseLong(region.getSettingsSetStatus()), settings,
+		double modifiedSetSettingsValue = getModifiedSetSettingsValue(OrganizationUnit.REGION, Long.parseLong(region.getSettingsSetStatus()), settings,
 				hasBeenSet);
 		region.setSettingsSetStatus(String.valueOf(modifiedSetSettingsValue));
 		return region;
@@ -55,17 +55,17 @@ public class SettingsSetterImpl implements SettingsSetter {
 			throw new InvalidInputException("Invalid input sent for settings update");
 		}
 		LOG.debug("Setting values to branch " + branch);
-		long modifiedSetSettingsValue = getModifiedSetSettingsValue(OrganizationUnit.BRANCH, Long.parseLong(branch.getSettingsSetStatus()), settings,
+		double modifiedSetSettingsValue = getModifiedSetSettingsValue(OrganizationUnit.BRANCH, Long.parseLong(branch.getSettingsSetStatus()), settings,
 				hasBeenSet);
 		branch.setSettingsSetStatus(String.valueOf(modifiedSetSettingsValue));
 		return branch;
 	}
 
-	long getModifiedSetSettingsValue(OrganizationUnit organizationUnit, long currentSetValue, SettingsForApplication settings,
-			boolean hasBeenSet) {
+	double getModifiedSetSettingsValue(OrganizationUnit organizationUnit, long currentSetValue, SettingsForApplication settings,
+									   boolean hasBeenSet) {
 		LOG.debug("Finding the modified set settings value");
-		long valueToBeReturned = currentSetValue;
-		long valueToBeAdded = 0l;
+		double valueToBeReturned = currentSetValue;
+		double valueToBeAdded = 0l;
 		boolean isValueAlreadySet = false; // check if the value can be added or not
 		if (organizationUnit == OrganizationUnit.COMPANY) {
 			LOG.debug("Setting set for company");

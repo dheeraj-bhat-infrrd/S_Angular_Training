@@ -344,7 +344,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
      * @throws TwitterException
      */
     @Override
-    public Facebook getFacebookInstance( String serverBaseUrl )
+    public Facebook getFacebookInstance( String serverBaseUrl, String facebookRedirectUri )
     {
         facebook4j.conf.ConfigurationBuilder confBuilder = new facebook4j.conf.ConfigurationBuilder();
         confBuilder.setOAuthAppId( facebookClientId );
@@ -438,7 +438,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         }
         LOG.info( "Updating Social Tokens information" );
         boolean facebookNotSetup = true;
-        Facebook facebook = getFacebookInstance( serverBaseUrl );
+        Facebook facebook = getFacebookInstance( serverBaseUrl, facebookRedirectUri );
         if ( settings != null ) {
             if ( settings.getSocialMediaTokens() != null ) {
                 if ( settings.getSocialMediaTokens().getFacebookToken() != null
@@ -1995,7 +1995,13 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                     && ( mediaTokens.getFacebookPixelToken().getPixelId() != null )
                     && !( mediaTokens.getFacebookPixelToken().getPixelId().isEmpty() ) )
                     socialUpdateAction.setLink( mediaTokens.getFacebookPixelToken().getPixelId() );
-                break;    
+                break;
+            case CommonConstants.INSTAGRAM_SOCIAL_SITE:
+                if ( ( mediaTokens.getInstagramToken() != null )
+                        && ( mediaTokens.getInstagramToken().getPageLink() != null )
+                        && !( mediaTokens.getInstagramToken().getPageLink().isEmpty() ) )
+                    socialUpdateAction.setLink( mediaTokens.getInstagramToken().getPageLink() );
+                break;
 
             default:
                 throw new InvalidInputException( "Invalid social media token entered" );

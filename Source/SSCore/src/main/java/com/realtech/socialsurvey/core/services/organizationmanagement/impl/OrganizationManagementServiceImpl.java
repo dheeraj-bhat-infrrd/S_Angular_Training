@@ -914,7 +914,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 
     @Override
-    public OrganizationUnitSettings getCompanySettings( long companyId ) throws InvalidInputException
+    public OrganizationUnitSettings
+    getCompanySettings( long companyId ) throws InvalidInputException
     {
 
         LOG.debug( "Get company settings for the companyId: {} ", companyId );

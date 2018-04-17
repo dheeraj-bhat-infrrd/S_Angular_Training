@@ -53,6 +53,8 @@ public class PublicSocialController {
 
 	@Value("${FB_REDIRECT_URI_SESSION}")
 	private String facebookRedirectUriInSession;
+	@Value ( "${FB_REDIRECT_URI}")
+	private String facebookRedirectUri;
 
 	@Value("${TWITTER_REDIRECT_URI_SESSION}")
 	private String twitterRedirectUriInSession;
@@ -130,7 +132,7 @@ public class PublicSocialController {
 
 		// Building facebook authUrl
 			case "facebook":
-				Facebook facebook = socialManagementService.getFacebookInstance(serverBaseUrl);
+				Facebook facebook = socialManagementService.getFacebookInstance(serverBaseUrl, facebookRedirectUri);
 
 				// Setting authUrl in model
 				session.setAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN, facebook);
