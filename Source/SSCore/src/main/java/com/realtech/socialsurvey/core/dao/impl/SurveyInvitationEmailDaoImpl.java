@@ -84,13 +84,13 @@ public class SurveyInvitationEmailDaoImpl extends GenericReportingDaoImpl<Survey
 	}
 
 	@Override
-	public int getSurveyInvitationEmailReportCountForMonth(int month, int year) {
-		int count = 0;
+	public long getSurveyInvitationEmailReportCountForMonth(int month, int year) {
+		long count = 0;
 		Criteria criteria = getSession().createCriteria(SurveyInvitationEmailCountMonth.class);
 		criteria.add(Restrictions.eq("month", month))
 		.add(Restrictions.eq("year", year));
 		criteria.setProjection(Projections.rowCount());
-		count = (Integer)criteria.uniqueResult();
+		count = (Long)criteria.uniqueResult();
 		return count;
 	}
 	
