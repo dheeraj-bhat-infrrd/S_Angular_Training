@@ -145,7 +145,7 @@ public class SocialManagementController
     private String facebookUri;
 
     // Instagram
-    @Value ( "IG_REDIRECT_URI" )
+    @Value ( "${IG_REDIRECT_URI}" )
     private String instagramRedirectUri;
     @Value ( "${IG_URI}")
     private String instagramUri;
@@ -268,8 +268,8 @@ public class SocialManagementController
 
             // Building facebook authUrl
             case "facebook":
+                LOG.info("FacebookRedirectUri is {}", facebookRedirectUri);
                 Facebook facebook = socialManagementService.getFacebookInstance( serverBaseUrl, facebookRedirectUri );
-
                 // Setting authUrl in model
                 session.setAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN, facebook );
                 model.addAttribute( CommonConstants.SOCIAL_AUTH_URL,
@@ -334,6 +334,7 @@ public class SocialManagementController
                 break;
 
             case "instagram" :
+                LOG.info("In instagram with instagramRedirectUri {}", instagramRedirectUri);
                 Facebook fb = socialManagementService.getFacebookInstance( serverBaseUrl, instagramRedirectUri );
 
                 // Setting authUrl in model
@@ -403,11 +404,14 @@ public class SocialManagementController
 
             // Getting Oauth accesstoken for facebook
             String oauthCode = request.getParameter( "code" );
+            LOG.info("Oath is {}",oauthCode);
             Facebook facebook = (Facebook) session.getAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
+            LOG.info("Oath is {} , {}, {} ",oauthCode, facebook == null, request  );
             String profileLink = null;
             facebook4j.auth.AccessToken accessToken = null;
             List<FacebookPage> facebookPages = new ArrayList<>();
             try {
+                LOG.info("facebookRedirectUri is {}",facebookRedirectUri);
                 accessToken = facebook.getOAuthAccessToken( oauthCode,
                     requestUtils.getRequestServerName( request ) + facebookRedirectUri );
                 facebook4j.User fbUser = facebook.getUser( facebook.getId() );
@@ -507,6 +511,7 @@ public class SocialManagementController
         session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
         model.addAttribute( CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES );
         model.addAttribute( "socialNetwork", "facebook" );
+        model.addAttribute(CommonConstants.CALLBACK, "./saveSelectedAccessFacebookToken.do");
         LOG.info( "Facebook Access tokens obtained and added to mongo successfully!" );
         return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;
     }
@@ -586,7 +591,7 @@ public class SocialManagementController
             for ( Account account : accounts ) {
                 //check if the page is connected to valid instagram account and add to facebookpages list
                 response = facebook.callGetAPI(account.getId(), params);
-                if(response.asJSONObject().getString("error") == null) {
+                if( ! response.asJSONObject().has("error") ) {
                     facebookPage = new FacebookPage();
                     facebookPage.setId(account.getId());
                     facebookPage.setName(account.getName());
