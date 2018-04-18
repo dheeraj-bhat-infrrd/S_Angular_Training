@@ -2098,6 +2098,10 @@ button.paypal.is-active {
 	background: url(../csssprites/icons_social.png) no-repeat -200px 0;
 }
 
+.icn-insta {
+	background: url(../images/social_instagram.png) no-repeat 0 0;
+}
+
 .sr-icn-fb-rev:hover { 
 	background:url(../images/colfb.png) no-repeat;
 	-ms-transform: scale(1.2, 1.2);
@@ -6727,6 +6731,10 @@ tr.u-tbl-header td {
 	background: url(../csssprites/social_wide.png) no-repeat -5px -19px;
 }
 
+.icn-wide-instagram {
+	background: url(../images/instagram_wide.png) no-repeat 0px 0px;
+}
+
 .dd-arrow-dn {
 	background: url(../images/sb-dd-icn-pd.png) no-repeat right center;
 }
@@ -7887,6 +7895,10 @@ tr.u-tbl-header td {
 }
 .icn-social-add.icn-fb-pxl{
 	background-position: -400px -38px;
+}
+
+.icn-social-add.icn-insta{
+	background: url(../images/social_instagram_grey.png) no-repeat 0 0;
 }
 
 .lp-input-cont {
