@@ -57,7 +57,7 @@ public interface SettingsSetter {
 	 * @param settings
 	 * @return
 	 */
-	public boolean isSettingsValueSet(OrganizationUnit organizationUnit, long currentSetValue, SettingsForApplication settings);
+	public boolean isSettingsValueSet(OrganizationUnit organizationUnit, double currentSetValue, SettingsForApplication settings);
 
 	/**
 	 * Check the settings set status
