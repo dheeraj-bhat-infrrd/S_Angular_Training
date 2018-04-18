@@ -21,23 +21,54 @@
 				<img id="bulk-mac-chevron-down" src="${initParam.resourcesPath}/resources/images/chevron-down.png" class="macro-dropdown-chevron">
 				<img id="bulk-mac-chevron-up" src="${initParam.resourcesPath}/resources/images/chevron-up.png" class="hide macro-dropdown-chevron">
 			</div>
-			<div id="bulk-edit-unflag" class="col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn stream-action-unflag bulk-act-btn">
+			<div id="bulk-edit-unflag" class="col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn bulk-stream-action-unflag bulk-act-btn">
 				Unflag
 			</div>
-			<div id="bulk-edit-flag" class="col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn stream-action-flag bulk-act-btn">
+			<div id="bulk-edit-flag" class="col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn bulk-stream-action-flag bulk-act-btn">
 				Flag
 			</div>
-			<div id="bulk-edit-esc" class="col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn stream-action-esc bulk-act-btn">
+			<div id="bulk-edit-esc" class="col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn bulk-stream-action-esc bulk-act-btn">
 			Escalate
 			</div>
-			<div id="bulk-edit-res" class="col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn stream-action-res bulk-act-btn">
+			<div id="bulk-edit-res" class="col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn bulk-stream-action-res bulk-act-btn">
 				Resolve
 			</div>
-			<div id="bulk-edit-sub" class="col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn stream-action-submit bulk-act-btn">
+			<div id="bulk-edit-sub" class="col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn bulk-stream-action-submit bulk-act-btn">
 				Submit
 			</div>
 			<div id="bulk-macro-options" class="hide float-left macro-options">
 					
+			</div>
+		</div>		
+	</div>
+</div>
+
+<div id="action-popup" class="hide bulk-action-popup">
+	<button type="button" class="close bulk-options-dismiss" id="dismiss-bulk-action-popup" onclick="javascript:actionPopupRevert()">&times;</button>
+	<div id="action-popup-body" class="col-lg-6 col-md-6 col-sm-6 col-xs-6 bulk-action-edit-container">
+		<div class="bulk-action-hdr">Bulk Actions</div>
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div id="action-send-mail-post" class="col-lg-3 col-md-3 col-sm-3 col-xs-3 stream-post-mail-note stream-post-mail-note-active">Send Email</div>
+			<div id="action-private-note-post" class="col-lg-3 col-md-3 col-sm-3 col-xs-3 stream-post-mail-note">Private Note</div>
+		</div>
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<textarea class="form-control stream-post-textbox" rows="3" id="action-edit-txt-box" placeholder="Send an email message to offending user or take a private note"></textarea>
+		</div>
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 stream-actions-btn-container">
+			<div id="action-cancel" class="col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn act-stream-action-submit bulk-act-btn">
+				Cancel
+			</div>
+			<div id="action-edit-unflag" class="col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn act-stream-action-unflag bulk-act-btn hide">
+				Unflag
+			</div>
+			<div id="action-edit-flag" class="col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn act-stream-action-flag bulk-act-btn hide">
+				Flag
+			</div>
+			<div id="action-edit-esc" class="col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn act-stream-action-esc bulk-act-btn hide">
+			Escalate
+			</div>
+			<div id="action-edit-res" class="col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn act-stream-action-res bulk-act-btn hide">
+				Resolve
 			</div>
 		</div>		
 	</div>
@@ -139,7 +170,7 @@
 						<img id="stream-unchecked" src="${initParam.resourcesPath}/resources/images/check-no.png"  class="float-left stream-checkbox">
 						<img id="stream-checked" src="${initParam.resourcesPath}/resources/images/check-yes.png"  class="hide float-left stream-checkbox">
 						<div id="stream-bulk-actions" class="float-left stream-bulk-actions">
-							<div class="bulk-actions-select">Bulk Actions <img src="${initParam.resourcesPath}/resources/images/chevron-down.png" id="chevron-down" class="float-right bulk-actions-dropdown-img"><img id="chevron-up" src="${initParam.resourcesPath}/resources/images/chevron-up.png" class="hide float-right bulk-actions-dropdown-img"></div>
+							<div class="bulk-actions-select">Select Action <img src="${initParam.resourcesPath}/resources/images/chevron-down.png" id="chevron-down" class="float-right bulk-actions-dropdown-img"><img id="chevron-up" src="${initParam.resourcesPath}/resources/images/chevron-up.png" class="hide float-right bulk-actions-dropdown-img"></div>
 							<div id="stream-bulk-action-options" class="hide float-left bulk-actions-options">
 								<div id="stream-bulk-edit" class="bulk-option">Edit</div>
 								<div id="stream-bulk-unflag" class="bulk-option">Unflag</div>

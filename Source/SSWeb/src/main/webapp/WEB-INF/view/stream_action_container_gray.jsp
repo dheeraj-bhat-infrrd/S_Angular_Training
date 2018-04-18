@@ -3,7 +3,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
-<div id="act-cont" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 float-left stream-action-container">
+<div id="act-cont" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 float-left stream-action-container hide">
 	<div class="icn-cont col-lg-1 col-md-1 col-sm-1 col-xs-1 float-left stream-action-icn">
 		<img src="${initParam.resourcesPath}/resources/images/verified-gray.png" class="hide float-left action-res-icn">
 		<img src="${initParam.resourcesPath}/resources/images/escalated-gray.png" class="hide float-left action-esc-icn">
