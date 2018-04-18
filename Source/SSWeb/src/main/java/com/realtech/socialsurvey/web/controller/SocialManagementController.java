@@ -590,13 +590,14 @@ public class SocialManagementController
             for ( Account account : accounts ) {
                 //check if the page is connected to valid instagram account and add to facebookpages list
                 response = facebook.callGetAPI(account.getId(), params);
-                if( ! response.asJSONObject().has("error") ) {
+                if( response.asJSONObject().has("connected_instagram_account") ) {
                     facebookPage = new FacebookPage();
                     facebookPage.setId(account.getId());
                     facebookPage.setName(account.getName());
                     facebookPage.setAccessToken(account.getAccessToken());
                     facebookPage.setCategory(account.getCategory());
-                    facebookPage.setProfileUrl(instagramUri.concat(response.asJSONObject().getString("connected_instagram_account.username")));
+                    facebookPage.setProfileUrl(instagramUri.concat(response.asJSONObject().
+                            getJSONObject("connected_instagram_account").getString("username")));
                     facebookPages.add(facebookPage);
                 }
             }
@@ -618,7 +619,7 @@ public class SocialManagementController
         session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
         model.addAttribute( CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES );
 
-        model.addAttribute(CommonConstants.CALLBACK, "./saveSelectedInstagramToken.do");
+        model.addAttribute(CommonConstants.CALLBACK, "./saveSelectedAccessInstagramToken.do");
         model.addAttribute( "socialNetwork", "instagram" );
         LOG.info( "Instagram authentication completed" );
         return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;
@@ -793,6 +794,7 @@ public class SocialManagementController
         LOG.info( " Trying to save selected Instagram " );
         String selectedAccessToken = request.getParameter( "selectedAccessFacebookToken" );
         String selectedProfileUrl = request.getParameter( "selectedProfileUrl" );
+        String selectedProfileId = request.getParameter("selectedProfileId");
         User user = sessionHelper.getCurrentUser();
         HttpSession session = request.getSession( false );
         AccountType accountType = (AccountType) session.getAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION );
@@ -826,6 +828,7 @@ public class SocialManagementController
         try {
             //create the instagram token
             InstagramToken instagramToken = new InstagramToken();
+            instagramToken.setId(selectedProfileId);
             instagramToken.setAccessTokenToPost(selectedAccessToken);
             instagramToken.setPageLink(selectedProfileUrl);
             instagramToken.setAccessToken(selectedAccessToken);
@@ -2946,6 +2949,10 @@ public class SocialManagementController
                 case CommonConstants.ZILLOW_SOCIAL_SITE:
                     settings = SettingsForApplication.ZILLOW;
                     isZillow = true;
+                    break;
+
+                case CommonConstants.INSTAGRAM_SOCIAL_SITE:
+                    settings = SettingsForApplication.INSTAGRAM;
                     break;
 
                 default:
