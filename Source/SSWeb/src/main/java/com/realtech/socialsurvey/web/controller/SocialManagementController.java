@@ -341,7 +341,6 @@ public class SocialManagementController
                 session.setAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN, fb );
                 model.addAttribute( CommonConstants.SOCIAL_AUTH_URL,
                         fb.getOAuthAuthorizationURL( serverBaseUrl + instagramRedirectUri ) );
-                model.addAttribute(CommonConstants.CALLBACK, "./saveSelectedInstagramToken.do");
                 break;
 
             default:
@@ -618,6 +617,8 @@ public class SocialManagementController
         // Updating attributes
         session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
         model.addAttribute( CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES );
+
+        model.addAttribute(CommonConstants.CALLBACK, "./saveSelectedInstagramToken.do");
         model.addAttribute( "socialNetwork", "instagram" );
         LOG.info( "Instagram authentication completed" );
         return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;

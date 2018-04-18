@@ -27,7 +27,7 @@ public class SettingsSetterImpl implements SettingsSetter {
 			throw new InvalidInputException("Invalid input sent for settings update");
 		}
 		LOG.debug("Setting values to company " + company);
-		double modifiedSetSettingsValue = getModifiedSetSettingsValue(OrganizationUnit.COMPANY, Long.parseLong(company.getSettingsSetStatus()),
+		double modifiedSetSettingsValue = getModifiedSetSettingsValue(OrganizationUnit.COMPANY, Double.parseDouble(company.getSettingsSetStatus()),
 				settings, hasBeenSet);
 		company.setSettingsSetStatus(String.valueOf(modifiedSetSettingsValue));
 		return company;
@@ -41,7 +41,7 @@ public class SettingsSetterImpl implements SettingsSetter {
 			throw new InvalidInputException("Invalid input sent for settings update");
 		}
 		LOG.debug("Setting values to region " + region);
-		double modifiedSetSettingsValue = getModifiedSetSettingsValue(OrganizationUnit.REGION, Long.parseLong(region.getSettingsSetStatus()), settings,
+		double modifiedSetSettingsValue = getModifiedSetSettingsValue(OrganizationUnit.REGION, Double.parseDouble(region.getSettingsSetStatus()), settings,
 				hasBeenSet);
 		region.setSettingsSetStatus(String.valueOf(modifiedSetSettingsValue));
 		return region;
@@ -55,13 +55,13 @@ public class SettingsSetterImpl implements SettingsSetter {
 			throw new InvalidInputException("Invalid input sent for settings update");
 		}
 		LOG.debug("Setting values to branch " + branch);
-		double modifiedSetSettingsValue = getModifiedSetSettingsValue(OrganizationUnit.BRANCH, Long.parseLong(branch.getSettingsSetStatus()), settings,
+		double modifiedSetSettingsValue = getModifiedSetSettingsValue(OrganizationUnit.BRANCH, Double.parseDouble(branch.getSettingsSetStatus()), settings,
 				hasBeenSet);
 		branch.setSettingsSetStatus(String.valueOf(modifiedSetSettingsValue));
 		return branch;
 	}
 
-	double getModifiedSetSettingsValue(OrganizationUnit organizationUnit, long currentSetValue, SettingsForApplication settings,
+	double getModifiedSetSettingsValue(OrganizationUnit organizationUnit, double currentSetValue, SettingsForApplication settings,
 									   boolean hasBeenSet) {
 		LOG.debug("Finding the modified set settings value");
 		double valueToBeReturned = currentSetValue;
@@ -94,7 +94,7 @@ public class SettingsSetterImpl implements SettingsSetter {
 	}
 
 	@Override
-	public boolean isSettingsValueSet(OrganizationUnit organizationUnit, long currentSetValue, SettingsForApplication settings) {
+	public boolean isSettingsValueSet(OrganizationUnit organizationUnit, double currentSetValue, SettingsForApplication settings) {
 		LOG.debug("Checking if the value is set for the settings");
 		boolean isValueSet = false;
 		String sCurrentSetValue = String.valueOf(currentSetValue);
