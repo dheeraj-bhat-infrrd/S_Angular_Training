@@ -33,6 +33,11 @@
 		class="wc-icn-txt float-left wc-form-input hide">
 	<div id="yelp-profile-url-display" class="wc-icn-txt float-left"></div>
 </div>
+<div class="wc-social-icn-row clearfix">
+	<div class="wc-social-icn float-left icn-wide-instagram"
+		onclick="authenticate(event,'instagram');"></div>
+	<div id="insta-profile-url" class="wc-icn-txt float-left">${instagramProfileUrl}</div>
+</div>
 <!-- <div class="wc-social-icn-row clearfix">
 				<div class="wc-social-icn i-rss float-left"></div>
 				<div class="wc-icn-txt float-left"></div>

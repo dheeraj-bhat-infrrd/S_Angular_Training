@@ -168,38 +168,46 @@ public class SocialMonitorWebController {
        
     }
     
-    private List<Keyword> createKeywordFromRequest(HttpServletRequest request) {
+    private List<MultiplePhrasesVO> createKeywordFromRequest(HttpServletRequest request) {
     	
     	LOG.debug("Method to create Keyword object called.");
 		String keyPhrase = request.getParameter("monitor-keyphrase");
 		String monitorTypeStr = request.getParameter("monitor-type");
 		int monitorTypeNumVal = 0;
 		
-		Keyword newKeyword = new Keyword();
-        List<Keyword> monitorList = new ArrayList<>();
+		List<String> keyphraseList=new ArrayList<>();
+		if(!keyPhrase.isEmpty() && keyPhrase != null) {
+		    String[] phraeList = keyPhrase.split(",");
+		       for(int i=0;i<phraeList.length;i++) {
+		           keyphraseList.add(phraeList[i]);
+		       }
+		}
+		
+		List<MultiplePhrasesVO> multiplePhrasesVOList = new ArrayList<>();  
+        MultiplePhrasesVO newKeyword = new MultiplePhrasesVO();
         
 		if(!monitorTypeStr.isEmpty() && monitorTypeStr != null) {
 		    monitorTypeNumVal = Integer.valueOf( monitorTypeStr );
-		    
+    		    
 		    if(monitorTypeNumVal>1) {
 		        
-		        monitorList.add( new Keyword() );
-		        monitorList.get(0).setPhrase( keyPhrase );
-		        monitorList.get(0).setMonitorType(MonitorType.KEYWORD_MONITOR);
+		        multiplePhrasesVOList.add( new MultiplePhrasesVO() );
+		        multiplePhrasesVOList.get(0).setPhrases( keyphraseList );;
+		        multiplePhrasesVOList.get(0).setMonitorType(MonitorType.KEYWORD_MONITOR);
 		        
-		        monitorList.add( new Keyword() );
-                monitorList.get(1).setPhrase( keyPhrase );
-                monitorList.get(1).setMonitorType(MonitorType.GOOGLE_ALERTS);
+		        multiplePhrasesVOList.add( new MultiplePhrasesVO() );
+                multiplePhrasesVOList.get(1).setPhrases( keyphraseList );;
+                multiplePhrasesVOList.get(1).setMonitorType(MonitorType.GOOGLE_ALERTS);
                 
 		    }else{
-		        newKeyword.setPhrase(keyPhrase);
+		        newKeyword.setPhrases(keyphraseList);
 		        newKeyword.setMonitorType(MonitorType.values()[monitorTypeNumVal]);
-		        monitorList.add(newKeyword);
+		        multiplePhrasesVOList.add(newKeyword);
 		    }
 		}
 		// Created VO and added required fields.
 		
-		return monitorList;
+		return multiplePhrasesVOList;
     }
     
     @ResponseBody
@@ -216,7 +224,7 @@ public class SocialMonitorWebController {
 		String message = "";
 		String statusJson = "";
 		
-		List<Keyword> monitorList = createKeywordFromRequest(request);
+		List<MultiplePhrasesVO> monitorList = createKeywordFromRequest(request);
 		
 		String authorizationHeader = "Basic " + authHeader;
 		
@@ -224,12 +232,12 @@ public class SocialMonitorWebController {
     	Integer successCount = 0;
     	try {
         	if(!monitorList.isEmpty() && monitorList != null) {
-        	    Keyword newKeyword = new Keyword();
+        	    MultiplePhrasesVO newKeyword = new MultiplePhrasesVO();
         	    for(int i=0;i<monitorList.size();i++) {
         	            
         	            newKeyword = monitorList.get(i);
         	            
-                        response = ssApiIntergrationBuilder.getIntegrationApi().addKeywordToCompany( companyId, newKeyword, authorizationHeader );
+                        response = ssApiIntergrationBuilder.getIntegrationApi().addMultiplePhrasesToCompany( companyId, newKeyword, authorizationHeader );
                         
                         successCount++;
         	    }
@@ -330,9 +338,9 @@ public class SocialMonitorWebController {
 			active = false;
 		}
 		
-//		if(usageText != null) {
-//			count = Integer.valueOf(usageText);
-//		}
+		if(usageText != null) {
+			count = Integer.valueOf(usageText);
+		}
 		
 		// Created VO and added required fields.
 		SocialMonitorMacro socialMonitorMacro = new SocialMonitorMacro();
@@ -341,8 +349,7 @@ public class SocialMonitorWebController {
 		socialMonitorMacro.setDescription(description);
 		socialMonitorMacro.setActions(actions);
 		socialMonitorMacro.setActive(active);
-//		socialMonitorMacro.setCount(count);
-		socialMonitorMacro.setLast7DaysMacroCount(0);
+		socialMonitorMacro.setLast7DaysMacroCount(count);
 		socialMonitorMacro.setMacroUsageTime(new ArrayList<Long>());
 		return socialMonitorMacro;
     }

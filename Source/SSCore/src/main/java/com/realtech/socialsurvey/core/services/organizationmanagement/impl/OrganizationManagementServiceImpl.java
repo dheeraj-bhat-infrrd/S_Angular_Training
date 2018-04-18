@@ -9382,6 +9382,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 }
             }
         }
+        Collections.sort( companyFilterKeywords, new FilterKeywordsComparator() );
         return companyFilterKeywords;
 
     }
@@ -9467,6 +9468,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 filterKeywordsAdded.add( keywordToAdd );
             }
         }
+        Collections.sort( filterKeywordsAdded, new FilterKeywordsComparator() );
         return filterKeywordsAdded;
     }
 
@@ -9528,6 +9530,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 filterKeywordsAdded.add( keywordToAdd );
             }
         }
+        Collections.sort( filterKeywordsAdded, new FilterKeywordsComparator() );
         return filterKeywordsAdded;
     }
 

@@ -103,7 +103,7 @@
 		</c:otherwise>
 	</c:choose>
 	<div
-		class="float-left soc-nw-icns cursor-pointer icn-wide-fb soc-nw-adj ${socialDisabled}"
+		class="float-left soc-nw-icns cursor-pointer icn-wide-instagram soc-nw-adj ${socialDisabled}"
 		onclick="openAuthPage(event,'instagram', ${isAutoLogin}, this);" data-link="${instagramLink}"></div>
 	<div id="edt-prof-insta-lnk" class="float-left soc-nw-icn-link"
 		data-social='instagram'>${instagramLink}</div>
