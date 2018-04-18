@@ -7373,6 +7373,8 @@ function showProfileLink(source, profileUrl) {
 		$('#linkedin-profile-url').html(profileUrl);
 	} else if (source == 'google') {
 		$('#ggl-profile-url').html(profileUrl);
+	} else if (source == 'instagram') {
+		$('#instagram-profile-url').html(profileUrl);
 	}
 }
 
