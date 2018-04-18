@@ -268,7 +268,6 @@ public class SocialManagementController
 
             // Building facebook authUrl
             case "facebook":
-                LOG.info("FacebookRedirectUri is {}", facebookRedirectUri);
                 Facebook facebook = socialManagementService.getFacebookInstance( serverBaseUrl, facebookRedirectUri );
                 // Setting authUrl in model
                 session.setAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN, facebook );
@@ -334,7 +333,6 @@ public class SocialManagementController
                 break;
 
             case "instagram" :
-                LOG.info("In instagram with instagramRedirectUri {}", instagramRedirectUri);
                 Facebook fb = socialManagementService.getFacebookInstance( serverBaseUrl, instagramRedirectUri );
 
                 // Setting authUrl in model
@@ -403,14 +401,11 @@ public class SocialManagementController
 
             // Getting Oauth accesstoken for facebook
             String oauthCode = request.getParameter( "code" );
-            LOG.info("Oath is {}",oauthCode);
             Facebook facebook = (Facebook) session.getAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
-            LOG.info("Oath is {} , {}, {} ",oauthCode, facebook == null, request  );
             String profileLink = null;
             facebook4j.auth.AccessToken accessToken = null;
             List<FacebookPage> facebookPages = new ArrayList<>();
             try {
-                LOG.info("facebookRedirectUri is {}",facebookRedirectUri);
                 accessToken = facebook.getOAuthAccessToken( oauthCode,
                     requestUtils.getRequestServerName( request ) + facebookRedirectUri );
                 facebook4j.User fbUser = facebook.getUser( facebook.getId() );
