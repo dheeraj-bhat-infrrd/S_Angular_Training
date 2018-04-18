@@ -14,10 +14,10 @@ public class FilterKeywordsComparator implements Comparator<Keyword> {
 	public int compare(Keyword keyword1, Keyword keyword2) {
 		LOG.debug("Comparing Keywords");
 
-		if (keyword1.getCreatedOn() > keyword2.getCreatedOn()) {
-			return 1;
-		} else if (keyword1.getCreatedOn() < keyword2.getCreatedOn()) {
+		if (keyword1.getModifiedOn() > keyword2.getModifiedOn()) {
 			return -1;
+		} else if (keyword1.getModifiedOn() < keyword2.getModifiedOn()) {
+			return 1;
 		} else {
 			return 0;
 		}
