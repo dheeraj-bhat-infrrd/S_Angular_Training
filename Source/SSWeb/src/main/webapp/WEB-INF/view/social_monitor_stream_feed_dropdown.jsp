@@ -17,20 +17,8 @@
 		<div class="stream-dropdown-option-container" data-feed="LINKEDIN">
 			<img src="${initParam.resourcesPath}/resources/images/check-no.png"  class="feed-unchecked hide float-left margin-right-10 cursor-pointer">
 			<img src="${initParam.resourcesPath}/resources/images/check-yes.png"  class="feed-checked float-left margin-right-10 cursor-pointer">
-			<img src="${initParam.resourcesPath}/resources/images/ss-icon-small-linkedin.png" class="float-left margin-right-10 stream-dropdown-img-circle">
-			<div class="float-left stream-dropdown-name-txt-bold">LinedIn</div>
-		</div>
-		<div class="stream-dropdown-option-container" data-feed="GOOGLEPLUS">
-			<img src="${initParam.resourcesPath}/resources/images/check-no.png"  class="feed-unchecked hide float-left margin-right-10 cursor-pointer">
-			<img src="${initParam.resourcesPath}/resources/images/check-yes.png"  class="feed-checked float-left margin-right-10 cursor-pointer">
-			<img src="${initParam.resourcesPath}/resources/images/ss-icon-small-gplus.png" class="float-left margin-right-10 stream-dropdown-img-circle">
-			<div class="float-left stream-dropdown-name-txt-bold">Google+</div>
-		</div>
-		<div class="stream-dropdown-option-container" data-feed="ZILLOW">
-			<img src="${initParam.resourcesPath}/resources/images/check-no.png"  class="feed-unchecked hide float-left margin-right-10 cursor-pointer">
-			<img src="${initParam.resourcesPath}/resources/images/check-yes.png"  class="feed-checked float-left margin-right-10 cursor-pointer">
-			<img src="${initParam.resourcesPath}/resources/images/Zillow_logo_blue.png" class="float-left margin-right-10 stream-dropdown-img-circle">
-			<div class="float-left stream-dropdown-name-txt-bold">Zillow</div>
+			<img src="${initParam.resourcesPath}/resources/images/linkedin_circle_color.png" class="float-left margin-right-10 stream-dropdown-img-circle">
+			<div class="float-left stream-dropdown-name-txt-bold">LinkedIn</div>
 		</div>
 		<div class="stream-dropdown-option-container" data-feed="INSTAGRAM">
 			<img src="${initParam.resourcesPath}/resources/images/check-no.png"  class="feed-unchecked hide float-left margin-right-10 cursor-pointer">
@@ -43,7 +31,7 @@
 
 <script>
 $(document).ready(function(){
-	var feedTypes = ["FACEBOOK","TWITTER","LINKEDIN","GOOGLEPLUS","ZILLOW","INSTAGRAM"];
+	var feedTypes = ["FACEBOOK","TWITTER","LINKEDIN","INSTAGRAM"];
 	$('#feed-data').data('feeds',feedTypes);
 	$('#stream-feed-count').html(feedTypes.length);
 });

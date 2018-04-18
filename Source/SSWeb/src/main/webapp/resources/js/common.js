@@ -302,6 +302,33 @@ function callAjaxFormSubmit(url, callBackFunction, formId,disableEle) {
 	});
 }
 
+function callAjaxFormSubmitWithComplete(url, callBackFunction,completeCallBackFunction, formId,disableEle) {
+	if ( $(disableEle).data('requestRunning') ) {
+		return;
+    }
+	
+	disable(disableEle);
+	var $form = $("#" + formId);
+	var payLoad = $form.serialize();
+	$.ajax({
+		url : url,
+		headers: {          
+            Accept : "text/plain; charset=utf-8"   
+		},
+		type : "POST",
+		data : payLoad,
+		success : callBackFunction,
+		complete: completeCallBackFunction,
+		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			redirectErrorpage();
+		}
+	});
+}
+
 /**
  * Generic function to be used for making form submission with ajax post
  */

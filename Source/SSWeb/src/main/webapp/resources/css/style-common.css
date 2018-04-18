@@ -11120,6 +11120,16 @@ img.lead-img {
 	 border-radius: 50%;
 }
 
+.soc-mon-def-prof{
+	width:50px;
+	height: 50px; 
+	border-radius: 50%;
+	border: 2px solid #e1e1e1;
+    background-position: center;
+    background-size: contain;
+    background-image:url('../images/no-star.png');
+}
+
 .soc-mon-prof-pic-media{
 	 position: absolute; 
 	 top: 30px; 
@@ -11254,27 +11264,27 @@ img.lead-img {
     background-color: white;
 }
 
-.stream-action-unflag, .dup-stream-action-unflag{
+.stream-action-unflag, .dup-stream-action-unflag,.act-stream-action-unflag,.bulk-stream-action-unflag{
 	border: 2px solid #3f78bc;
     color: #3f78bc;
 }
 
-.stream-action-flag, .dup-stream-action-flag{
+.stream-action-flag, .dup-stream-action-flag,.act-stream-action-flag,.bulk-stream-action-flag{
 	border: 2px solid #dca50d;
     color: #dca50d;
 }
 
-.stream-action-esc, .dup-stream-action-esc{
+.stream-action-esc, .dup-stream-action-esc,.act-stream-action-esc,.bulk-stream-action-esc{
 	border: 2px solid #f95000;
     color: #f95000;
 }
 
-.stream-action-res, .dup-stream-action-res{
+.stream-action-res, .dup-stream-action-res,.act-stream-action-res,.bulk-stream-action-res{
 	border: 2px solid #6ead00;
     color: #6ead00;
 }
 
-.stream-action-submit, .dup-stream-action-submit{
+.stream-action-submit, .dup-stream-action-submit,.act-stream-action-submit,.bulk-stream-action-submit{
 	border: 2px solid #8d8d8d;
     color: #8d8d8d;
     margin-left:15px;
@@ -11363,6 +11373,10 @@ img.lead-img {
     left: 23px;
     max-height: 120px;
     overflow-y: scroll;
+}
+
+.dup-macro-options{
+	left:8px;
 }
 
 .macro-options::-webkit-scrollbar {
@@ -11772,7 +11786,15 @@ img.lead-img {
     margin-right: 10px;
     margin-left: 10px;
     border-radius:50%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
 }
+
+/* .usr-list-img{
+	background-size: contain;
+    background-repeat: no-repeat;
+} */
 
 .stream-dropdown-option-container{
 	display: flex;
@@ -12012,7 +12034,7 @@ img.lead-img {
     background: #0074e5;
 }
 
-#stream-dash,#dup-dash {
+#stream-dash,#dup-dash,.add-action-stream-dash {
 	position: absolute;
 	width: 100%;
 	height: 100%;

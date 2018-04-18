@@ -32,7 +32,7 @@
 						</div>
 					</div>
 				</div>
-				<input type="hidden" id="monitor-type" name="monitor-type" value="KEYWORD_MONITOR">
+				<input type="hidden" id="monitor-type" name="monitor-type" value=2>
 			</div>
 			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 stream-actions-btn-container">
 				<div id="add-mon-save-active" class="hide float-right hm-header-right text-center macro-add-btn add-mon-save-btn" onclick="javascript:addMonitor()">
@@ -103,7 +103,7 @@
 			<div class="container zero-padding" style="width:100%">
 				<div class="dash-stats-wrapper clearfix"  >
 					<div id="monitor-bulk-actions" class="float-left stream-bulk-actions monitors-bulk-select">
-						<div class="bulk-actions-select">Bulk Actions <img src="${initParam.resourcesPath}/resources/images/chevron-down.png" id="monitor-chevron-down" class="float-right bulk-actions-dropdown-img"><img id="monitor-chevron-up" src="${initParam.resourcesPath}/resources/images/chevron-up.png" class="hide float-right bulk-actions-dropdown-img"></div>
+						<div class="bulk-actions-select">Select Action <img src="${initParam.resourcesPath}/resources/images/chevron-down.png" id="monitor-chevron-down" class="float-right bulk-actions-dropdown-img"><img id="monitor-chevron-up" src="${initParam.resourcesPath}/resources/images/chevron-up.png" class="hide float-right bulk-actions-dropdown-img"></div>
 						<div id="monitor-bulk-action-options" class="hide float-left bulk-actions-options monitors-bulk-options">
 							<div id="monitor-bulk-delete" class="bulk-option">Delete</div>
 						</div>

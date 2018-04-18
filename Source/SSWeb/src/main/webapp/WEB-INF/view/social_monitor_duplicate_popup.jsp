@@ -50,10 +50,15 @@
 			<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn dup-stream-action-submit">
 							Submit
 			</div>
-			<div class="hide macro-options-list float-left macro-options">
+			<div class="hide macro-options-list float-left macro-options dup-macro-options">
 				
 			</div>
 		</div>
 		</form>
 	</div>
 </div>
+<script>
+	$(document).ready(function(){
+		$('#dup-post-action-form-container').find('.macro-options-list').css('width',$('#dup-post-action-form-container').find('.stream-macro-dropdown').css('width'));
+	});
+</script>
