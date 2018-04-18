@@ -415,6 +415,10 @@ $(document).on('click', '#welcome-popup-invite', function(e) {
 $(document).on('click', '#overlay-pop-up', function(e) {
 	e.stopPropagation();
 });
+
+$(document).on('click', '#disconnect-overlay-pop-up', function(e) {
+	e.stopPropagation();
+});
 $(document).on('click', '#zillow-popup-body', function(e) {
 	e.stopPropagation();
 });
@@ -7233,13 +7237,7 @@ $(document).on('blur', '#yelp-profile-url', function() {
 			showToast();
 		}, payload, true);
 	} else if( yelpLink == '') {
-		var payload = {
-				"socialmedia" : yelp
-			};
-		callAjaxPostWithPayloadData("./disconnectparticularsocialmedia.do", function(data) {
-				$('#overlay-toast').html(data);
-				showToast();
-			}, payload, true);
+		confirmDisconnectSocialMedia("yelp");
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
@@ -8947,6 +8945,7 @@ function overlayRevert() {
 	$("#overlay-pop-up").removeClass("overlay-disable-wrapper-zillow");
 	$('#zillow-popup').hide();
 	$('#zillow-popup-body').html('');
+	$('#disconnect-overlay-main').hide();
 }
 
 // Update Basic detail
@@ -9561,14 +9560,7 @@ function updateYelpLink(link) {
 		callAjaxPostWithPayloadData("./updateyelplink.do", callBackUpdateSocialLink, payload, true);
 		showProfileLinkInEditProfilePage("yelp", link);
 	} else if( link == '') {
-		var payload = {
-				"socialmedia" : "yelp"
-			};
-		callAjaxPostWithPayloadData("./disconnectparticularsocialmedia.do", function(data) {
-				$('#overlay-toast').html(data);
-				showToast();
-			}, payload, true);
-		removeProfileLinkInEditProfilePage( "yelp" );
+		confirmDisconnectSocialMedia("yelp");
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
@@ -9605,14 +9597,7 @@ function updateLendingTreeLink(link) {
 		callAjaxPostWithPayloadData("./updatelendingtreelink.do", callBackUpdateSocialLink, payload, true);
 		showProfileLinkInEditProfilePage("lendingtree", link);
 	} else if( link == '') {
-		var payload = {
-				"socialmedia" : "lendingtree"
-			};
-		callAjaxPostWithPayloadData("./disconnectparticularsocialmedia.do", function(data) {
-				$('#overlay-toast').html(data);
-				showToast();
-			}, payload, true);
-		removeProfileLinkInEditProfilePage( "lendingtree" );
+		confirmDisconnectSocialMedia("lendingtree");
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
@@ -9641,14 +9626,7 @@ function updateFacebookPixelId(pixelId) {
 		callAjaxPostWithPayloadData("./updatefacebookpixelid.do", callBackUpdateSocialLink, payload, true);
 		showProfileLinkInEditProfilePage("facebookPixel", pixelId);
 	} else if( pixelId == '') {
-		var payload = {
-				"socialmedia" : "facebookpixel"
-			};
-		callAjaxPostWithPayloadData("./disconnectparticularsocialmedia.do", function(data) {
-				$('#overlay-toast').html(data);
-				showToast();
-			}, payload, true);
-		removeProfileLinkInEditProfilePage( "facebookPixel" );
+		confirmDisconnectSocialMedia("facebookPixel");
 	} else {
 		$('#overlay-toast').html("Enter a valid pixel id");
 		showToast();
@@ -9773,14 +9751,7 @@ function updateRealtorLink(link) {
 		callAjaxPostWithPayloadData("./updateRealtorlink.do", callBackUpdateSocialLink, payload, true);
 		showProfileLinkInEditProfilePage("realtor", link);
 	} else if( link == '') {
-		var payload = {
-				"socialmedia" : "realtor"
-			};
-		callAjaxPostWithPayloadData("./disconnectparticularsocialmedia.do", function(data) {
-				$('#overlay-toast').html(data);
-				showToast();
-			}, payload, true);
-		removeProfileLinkInEditProfilePage( "realtor" );
+		confirmDisconnectSocialMedia("realtor");
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
@@ -9798,6 +9769,37 @@ function updateGoogleBusinessLink(link) {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
 	}
+}
+
+function confirmDisconnectSocialMedia(socialMedia) {
+
+	$('#disconnect-overlay-header').html("Confirm Disconnect");
+	$('#disconnect-overlay-text').html("This action will disconnect your account from " + socialMedia);
+	$('#disconnect-overlay-continue').html("Disconnect");
+	$('#disconnect-overlay-cancel').html("Cancel");
+	$('#disconnect-overlay-continue').off();
+	$('#disconnect-overlay-continue').click(function() {
+		disconnectParticularSocialMedia(socialMedia);
+		overlayRevert();
+	});
+	
+	$('#disconnect-overlay-cancel').off();
+	$('#disconnect-overlay-cancel').click(function() {
+		overlayRevert();
+	});
+	
+	$('#disconnect-overlay-main').show();
+}
+
+function disconnectParticularSocialMedia(socialMedia) {
+	var payload = {
+			"socialmedia" : socialMedia
+		};
+	callAjaxPostWithPayloadData("./disconnectparticularsocialmedia.do", function(data) {
+			$('#overlay-toast').html(data);
+			showToast();
+		}, payload, true);
+	removeProfileLinkInEditProfilePage( socialMedia );
 }
 
 function callBackUpdateSocialLink(data) {
