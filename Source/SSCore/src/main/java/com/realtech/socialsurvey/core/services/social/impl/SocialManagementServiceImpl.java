@@ -929,6 +929,16 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_GOOGLE_BUSINESS_SOCIAL_MEDIA_TOKEN;
                 break;
 
+            case CommonConstants.INSTAGRAM_SOCIAL_SITE:
+                profileStage.setOrder( ProfileStages.INSTAGRAM_PRF.getOrder() );
+                profileStage.setProfileStageKey( ProfileStages.INSTAGRAM_PRF.name() );
+                keyToUpdate = MongoOrganizationUnitSettingDaoImpl.KEY_INSTAGRAM_SOCIAL_MEDIA_TOKEN;
+                if ( removeFeed ) {
+                    // Remove from SOCIAL_POST
+                    removeFromSocialPosts( collectionName, unitSettings.getIden(), socialMedia );
+                }
+                break;
+
             default:
                 throw new InvalidInputException( "Invalid social media token entered" );
         }

@@ -103,16 +103,19 @@ $(document).ready(function() {
 		}
 		var selectedAccessFacebookToken;
 		var selectedProfileUrl;
+		var selectedProfileId;
 		<c:forEach var="page" items="${pageNames}"  varStatus="loop">
 		  if("${loop.index}" == selectedPage){
 			  selectedProfileUrl= "${page.profileUrl}";
 			  selectedAccessFacebookToken= "${page.accessToken}";
+			  selectedProfileId = "${page.id}";
 		  }
 		</c:forEach>
 		var facebookToken = {
 			'selectedAccessFacebookToken' : selectedAccessFacebookToken,
 			'selectedProfileUrl' :  selectedProfileUrl,
-			'fbAccessToken' : fbAccessToken
+			'fbAccessToken' : fbAccessToken,
+			'selectedProfileId' : selectedProfileId
 		};
 		$.ajax({
 			url : "${callback}",

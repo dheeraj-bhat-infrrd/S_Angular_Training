@@ -3,7 +3,7 @@ package com.realtech.socialsurvey.compute.topology.bolts.monitor;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.compute.dao.RedisSocialMediaStateDao;
 import com.realtech.socialsurvey.compute.dao.impl.RedisSocialMediaStateDaoImpl;
-import com.realtech.socialsurvey.compute.entities.FacebookTokenForSM;
+import com.realtech.socialsurvey.compute.entities.InstagramTokenForSM;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.compute.entities.response.InstagramMediaData;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
@@ -39,22 +39,22 @@ public class InstagramFeedExactorBolt extends BaseComputeBolt {
     public void execute(Tuple input) {
         try {
             SocialMediaTokenResponse mediaToken = (SocialMediaTokenResponse) input.getValueByField("mediaToken");
-            FacebookTokenForSM fbToken = mediaToken.getSocialMediaTokens()!= null ? mediaToken.getSocialMediaTokens().getFacebookToken() : null;
-            if(fbToken != null){
+            InstagramTokenForSM igToken = mediaToken.getSocialMediaTokens()!= null ? mediaToken.getSocialMediaTokens().getInstagramToken() : null;
+            if(igToken != null){
                 Long companyId = mediaToken.getCompanyId();
                 if (isRateLimitExceeded( mediaToken)) {
-                    LOG.warn(" Rate limit exceeded for instagram account {} ", fbToken.getFacebookPageLink() );
+                    LOG.warn(" Rate limit exceeded for instagram account {} ", igToken.getPageLink() );
                 } else {
                     List<InstagramMediaData> feeds = instagramFeedProcessor.fetchFeeds(companyId, mediaToken);
                     LOG.debug( "Total tweet fetched : {}", feeds.size() );
 
-                    String pageId = UrlHelper.getFacebookPageIdFromURL( fbToken.getFacebookPageLink() );
+                    String pageId = UrlHelper.getFacebookPageIdFromURL( igToken.getPageLink() );
                     String lastFetchedKey = mediaToken.getProfileType().toString() + "_" + mediaToken.getIden() + "_" + pageId;
 
                     for ( InstagramMediaData instagramMediaData : feeds ) {
                         SocialResponseObject<InstagramMediaData> responseWrapper = createSocialResponseObject( mediaToken,
                                 instagramMediaData );
-                        responseWrapper.setPageLink( mediaToken.getSocialMediaTokens().getFacebookToken().getFacebookPageLink() );
+                        responseWrapper.setPageLink( mediaToken.getSocialMediaTokens().getInstagramToken().getPageLink() );
                         String responseWrapperString = new Gson().toJson( responseWrapper );
 
                         _collector.emit( new Values( Long.toString( companyId ), responseWrapperString, lastFetchedKey ) );
@@ -113,9 +113,9 @@ public class InstagramFeedExactorBolt extends BaseComputeBolt {
     }
 
     private boolean isRateLimitExceeded(SocialMediaTokenResponse mediaToken){
-        String pageId = UrlHelper.getFacebookPageIdFromURL( mediaToken.getSocialMediaTokens().getFacebookToken().getFacebookPageLink() );
+        String pageId = UrlHelper.getFacebookPageIdFromURL( mediaToken.getSocialMediaTokens().getInstagramToken().getPageLink() );
         if (socialMediaStateDao.isFacebookApplicationLockSet() || socialMediaStateDao.isFacebookPageLockSet( pageId )
-                || socialMediaStateDao.isFacebookTokenLockSet( mediaToken.getSocialMediaTokens().getFacebookToken().getFacebookAccessTokenToPost() ) ) {
+                || socialMediaStateDao.isFacebookTokenLockSet( mediaToken.getSocialMediaTokens().getInstagramToken().getAccessTokenToPost() ) ) {
             return true;
         }
         else return false;
