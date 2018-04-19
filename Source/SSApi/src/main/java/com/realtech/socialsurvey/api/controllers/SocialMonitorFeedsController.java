@@ -20,6 +20,7 @@ import com.realtech.socialsurvey.api.exceptions.SSApiException;
 import com.realtech.socialsurvey.core.entities.SegmentsVO;
 import com.realtech.socialsurvey.core.entities.SocialFeedActionResponse;
 import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
+import com.realtech.socialsurvey.core.entities.SocialMonitorFeedTypeVO;
 import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
 import com.realtech.socialsurvey.core.entities.SocialMonitorResponseData;
 import com.realtech.socialsurvey.core.entities.SocialMonitorUsersVO;
@@ -235,5 +236,31 @@ public class SocialMonitorFeedsController {
 		return new ResponseEntity<>(list, HttpStatus.OK);
 
 	}
+    
+
+    @RequestMapping ( value = "/feedtypes/company/{companyId}", method = RequestMethod.GET)
+    @ApiOperation ( value = "Get feedtypes for a company", response = SocialMonitorFeedTypeVO.class)
+    @ApiResponses ( value = { @ApiResponse ( code = 200, message = "Successfully fetched the feedtypes for a company") })
+    public ResponseEntity<?> getFeedTypesByCompanyId( @PathVariable Long companyId,
+        @RequestHeader ( "authorizationHeader") String authorizationHeader ) throws InvalidInputException, SSApiException
+    {
+        LOGGER.info( "Fetching the feedtypes for a company" );
+        SocialMonitorFeedTypeVO socialMonitorFeedTypeVO;
+        try {
+            adminAuthenticationService.validateAuthHeader( authorizationHeader );
+            try {
+                socialMonitorFeedTypeVO = socialFeedService.getFeedTypesByCompanyId( companyId );
+            } catch ( InvalidInputException ie ) {
+                LOGGER.error( "Invalid input exception caught while fetching feedtypes for a company", ie );
+                throw new SSApiException( "Invalid input exception caught while fetching feedtypes for a company", ie );
+            }
+        } catch ( AuthorizationException authoriztionFailure ) {
+            return new ResponseEntity<>( AUTH_FAILED, HttpStatus.UNAUTHORIZED );
+        }
+        return new ResponseEntity<>( socialMonitorFeedTypeVO, HttpStatus.OK );
+
+    }
+    
+    
 
 }

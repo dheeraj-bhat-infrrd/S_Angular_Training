@@ -48,6 +48,13 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
     private static final String NAME = "name";
     private static final String PROFILE_IMAGE_URL = "profileImageUrl";
     private static final String TEXT = "text";
+    private static final String SOCIAL_MEDIA_TOKENS = "socialMediaTokens";
+    private static final String FACEBOOK_TOKEN = "facebookToken";
+    private static final String TWITTER_TOKEN = "twitterToken";
+    private static final String LINKEDIN_TOKEN = "linkedInToken";
+    private static final String INSTAGRAM_TOKEN = "instagramToken";
+
+
 
 
 
@@ -421,6 +428,49 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         query.fields().exclude( KEY_IDENTIFIER ).include(PROFILE_IMAGE_URL);
         return mongoTemplate.findOne( query, OrganizationUnitSettings.class, collectionName );
        
+    }
+
+
+    @Override
+    public long fetchFacebookTokenCount( List<Long> ids, String collectioName )
+    {
+        LOG.debug( "Fetching Facebook Token count from {}", collectioName );
+        Query query = new Query();
+        query
+            .addCriteria( Criteria.where( IDEN ).in( ids ).and( SOCIAL_MEDIA_TOKENS + "." + FACEBOOK_TOKEN ).exists( true ) );
+        return mongoTemplate.count( query, collectioName );
+    }
+
+
+    @Override
+    public long fetchTwitterTokenCount( List<Long> ids, String collectioName )
+    {
+        LOG.debug( "Fetching Twitter Token count from {}", collectioName );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( IDEN ).in( ids ).and( SOCIAL_MEDIA_TOKENS + "." + TWITTER_TOKEN ).exists( true ) );
+        return mongoTemplate.count( query, collectioName );
+    }
+
+
+    @Override
+    public long fetchLinkedinTokenCount( List<Long> ids, String collectioName )
+    {
+        LOG.debug( "Fetching Linkedin Token count from {}", collectioName );
+        Query query = new Query();
+        query
+            .addCriteria( Criteria.where( IDEN ).in( ids ).and( SOCIAL_MEDIA_TOKENS + "." + LINKEDIN_TOKEN ).exists( true ) );
+        return mongoTemplate.count( query, collectioName );
+    }
+
+
+    @Override
+    public long fetchInstagramTokenCount( List<Long> ids, String collectioName )
+    {
+        LOG.debug( "Fetching Instagram Token count from {}", collectioName );
+        Query query = new Query();
+        query.addCriteria(
+            Criteria.where( IDEN ).in( ids ).and( SOCIAL_MEDIA_TOKENS + "." + INSTAGRAM_TOKEN ).exists( true ) );
+        return mongoTemplate.count( query, collectioName );
     }
 
 }
