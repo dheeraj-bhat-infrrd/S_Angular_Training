@@ -23,7 +23,7 @@
 		<div class="stream-dropdown-option-container" data-feed="INSTAGRAM">
 			<img src="${initParam.resourcesPath}/resources/images/check-no.png"  class="feed-unchecked hide float-left margin-right-10 cursor-pointer">
 			<img src="${initParam.resourcesPath}/resources/images/check-yes.png"  class="feed-checked float-left margin-right-10 cursor-pointer">
-			<img src="${initParam.resourcesPath}/resources/images/ss-icon-instagram.png" class="float-left margin-right-10 stream-dropdown-img-circle">
+			<img src="${initParam.resourcesPath}/resources/images/social_instagram.png" class="float-left margin-right-10 stream-dropdown-img-circle">
 			<div class="float-left stream-dropdown-name-txt-bold">Instagram</div>
 		</div>
 	</div>

@@ -16760,7 +16760,6 @@ function drawMacroList(macroList){
 		 "actionType" : $('#macro-'+macroId).attr('data-action-type'),
 		 "actionText" : $('#macro-'+macroId).attr('data-action-text'),
 		 "active" : $('#macro-'+macroId).attr('data-active'),
-		 "usage" : $('#macro-'+macroId).attr('data-usage'),
 		 "lastUpdated" : $('#macro-'+macroId).attr('data-last-updated'),
 		 "last7DaysMacroCount" : $('#macro-'+macroId).attr('data-last-used')
 		};
@@ -16802,7 +16801,7 @@ function drawMacroData(macroId,macroData){
 	var actionType= macroData.actionType;
 	var actionText= macroData.actionText;
 	var active= macroData.active;
-	var usage= macroData.usage;
+	var usage= macroData.last7DaysMacroCount;
 	var lastUpdatedStr= macroData.lastUpdated;
 	
 	var lastUpdated = parseInt(lastUpdatedStr);
@@ -17396,13 +17395,8 @@ function drawStreamPage(streamPostList){
 			$('#stream-post-details-'+postId).find('.stream-res-feed-icn').attr('src','resources/images/ss-icon-small-linkedin.png');
 		}else if(streamPostList[i].type == 'TWITTER'){
 			$('#stream-post-details-'+postId).find('.stream-res-feed-icn').attr('src','resources/images/ss-icon-small-twitter.png');
-		}else if(streamPostList[i].type == 'GOOGLEPLUS'){
-			$('#stream-post-details-'+postId).find('.stream-res-feed-icn').attr('src','resources/images/ss-icon-small-gplus.png');
-		}else if(streamPostList[i].type == 'ZILLOW'){
-			$('#stream-post-details-'+postId).find('.stream-res-feed-icn').attr('src','resources/images/Zillow_logo_blue.png');
-			$('#stream-post-details-'+postId).find('.stream-res-feed-icn').addClass('stream-feed-zillow');
 		}else if(streamPostList[i].type == 'INSTAGRAM'){
-			$('#stream-post-details-'+postId).find('.stream-res-feed-icn').attr('src','resources/images/ss-icon-instagram.png');
+			$('#stream-post-details-'+postId).find('.stream-res-feed-icn').attr('src','resources/images/social_instagram.png');
 			$('#stream-post-details-'+postId).find('.stream-res-feed-icn').addClass('stream-feed-insta');
 		}
 		
