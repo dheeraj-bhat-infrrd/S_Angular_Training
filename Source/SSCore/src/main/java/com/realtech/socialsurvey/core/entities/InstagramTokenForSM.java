@@ -1,14 +1,14 @@
-package com.realtech.socialsurvey.compute.entities;
+package com.realtech.socialsurvey.core.entities;
 
 import java.io.Serializable;
 
 
 /**
- * @author Lavanya
+ * @author manish
+ *
  */
 public class InstagramTokenForSM implements Serializable
 {
-
     private static final long serialVersionUID = 1L;
     private String id;
     private String pageLink;
@@ -67,7 +67,8 @@ public class InstagramTokenForSM implements Serializable
     @Override
     public String toString()
     {
-        return "InstagramTokenForSM{" + "id='" + id + '\'' + ", pageLink='" + pageLink + '\'' + ", accessToken='" + accessToken
-            + '\'' + ", accessTokenToPost='" + accessTokenToPost + '\'' + '}';
+        return "InstagramTokenForSM [id=" + id + ", pageLink=" + pageLink + ", accessToken=" + accessToken
+            + ", accessTokenToPost=" + accessTokenToPost + "]";
     }
+    
 }
