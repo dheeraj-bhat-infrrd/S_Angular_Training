@@ -9225,9 +9225,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             throw new InvalidInputException( "user details not specified for user addition mail" );  
         }
         
+        if(user.getCompany() == null)
+        		return;
+        
         OrganizationUnitSettings companySettings = getCompanySettings( user.getCompany().getCompanyId() );
 
-        if ( companySettings.getUserAddDeleteNotificationRecipients() == null
+        if ( companySettings == null || companySettings.getUserAddDeleteNotificationRecipients() == null
             || companySettings.getUserAddDeleteNotificationRecipients().isEmpty() ) {
             LOG.warn( "No user addition notification mail recipient found" );
             return;
