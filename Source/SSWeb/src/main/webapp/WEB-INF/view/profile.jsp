@@ -682,9 +682,10 @@
 								</c:choose>
 							</c:if>
 
-							<c:if test="${not empty workEmail }">
+							
 								<div class="prof-left-row prof-left-assoc bord-bot-dc">
 									<div class="left-contact-wrapper">
+										<c:if test="${not empty workEmail }">
 										<div id="prof-contact-hdr"
 											class="left-panel-header prof-contact-hdr">Contact
 											${profName}</div>
@@ -745,6 +746,7 @@
 												</div>
 											</form>
 										</div>
+										</c:if>
 										<c:if test="${not empty profile.disclaimer }">
 											<div class="prof-left-ach">
 												<div class="left-ach-wrapper">
@@ -756,7 +758,6 @@
 										</c:if>
 									</div>
 								</div>
-							</c:if>
 						</div>
 					</div>
 
