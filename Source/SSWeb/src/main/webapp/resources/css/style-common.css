@@ -11196,6 +11196,7 @@ img.lead-img {
     text-align: center;
     cursor:pointer;
     font-weight: bold !important;
+	margin-left: 2px;
 }
 
 .stream-post-mail-note-active{
@@ -11205,7 +11206,7 @@ img.lead-img {
 }
 
 .stream-post-textbox{
-	resize: auto !important;
+	resize: vertical !important;
 }
 
 .stream-container{
@@ -11372,7 +11373,7 @@ img.lead-img {
     top: 31px;
     left: 23px;
     max-height: 120px;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .dup-macro-options{
