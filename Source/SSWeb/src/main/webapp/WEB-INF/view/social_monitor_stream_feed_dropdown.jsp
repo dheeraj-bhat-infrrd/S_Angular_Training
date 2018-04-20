@@ -5,19 +5,19 @@
 		<div id="feed-facebook" class="stream-dropdown-option-container hide" data-feed="FACEBOOK">
 			<img src="${initParam.resourcesPath}/resources/images/check-no.png"  class="feed-unchecked hide float-left margin-right-10 cursor-pointer">
 			<img src="${initParam.resourcesPath}/resources/images/check-yes.png"  class="feed-checked float-left margin-right-10 cursor-pointer">
-			<img src="${initParam.resourcesPath}/resources/images/ss-icon-small-facebook.png" class="float-left margin-right-10 stream-dropdown-img-circle">
+			<img src="${initParam.resourcesPath}/resources/images/ss-icon-small-facebook.png" class="float-left margin-right-10 stream-dropdown-img-circle feeds-fb-icon">
 			<div class="float-left stream-dropdown-name-txt-bold">Facebook</div>
 		</div>
 		<div id="feed-twitter" class="stream-dropdown-option-container hide" data-feed="TWITTER">
 			<img src="${initParam.resourcesPath}/resources/images/check-no.png"  class="feed-unchecked hide float-left margin-right-10 cursor-pointer">
 			<img src="${initParam.resourcesPath}/resources/images/check-yes.png"  class="feed-checked float-left margin-right-10 cursor-pointer">
-			<img src="${initParam.resourcesPath}/resources/images/ss-icon-small-twitter.png" class="float-left margin-right-10 stream-dropdown-img-circle">
+			<img src="${initParam.resourcesPath}/resources/images/ss-icon-small-twitter.png" class="float-left margin-right-10 stream-dropdown-img-circle feeds-tw-icon">
 			<div class="float-left stream-dropdown-name-txt-bold">Twitter</div>
 		</div>
 		<div id="feed-linkedin" class="stream-dropdown-option-container hide" data-feed="LINKEDIN">
 			<img src="${initParam.resourcesPath}/resources/images/check-no.png"  class="feed-unchecked hide float-left margin-right-10 cursor-pointer">
 			<img src="${initParam.resourcesPath}/resources/images/check-yes.png"  class="feed-checked float-left margin-right-10 cursor-pointer">
-			<img src="${initParam.resourcesPath}/resources/images/linkedin_circle_color.png" class="float-left margin-right-10 stream-dropdown-img-circle">
+			<img src="${initParam.resourcesPath}/resources/images/linkedin_circle_color.png" class="float-left margin-right-10 stream-dropdown-img-circle feeds-lin-icon">
 			<div class="float-left stream-dropdown-name-txt-bold">LinkedIn</div>
 		</div>
 		<div id="feed-instagram" class="stream-dropdown-option-container hide" data-feed="INSTAGRAM">

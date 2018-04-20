@@ -11079,13 +11079,20 @@ img.lead-img {
     box-shadow: 0 -9px 0px 0px white, 5px 0 15px -4px #b4b0b0, -5px 0 15px -4px #b4b0b0;
     width: 150px;
     margin-left: -11px;
-    padding-left: 35px;
     margin-top: 12px;
     z-index: 1;
     position: absolute;
 }
 
 .bulk-option{
+	font-size: 13px;
+    font-weight: bold !important;
+    color: #8d8d8d;
+    cursor:pointer;
+    padding-left: 35px;
+}
+
+.bulk-mon-option{
 	font-size: 13px;
     font-weight: bold !important;
     color: #8d8d8d;
@@ -11619,7 +11626,6 @@ img.lead-img {
     top: 30px;
     left: 23px;
     border-top-left-radius: 0;
-    padding: 10px 25px;
 }
 
 .add-macro-dropdown-option{
@@ -11627,7 +11633,7 @@ img.lead-img {
     font-weight: bold !important;
     color: #8d8d8d;
     cursor: pointer;
-    padding: 10px;
+    padding: 10px 25px;
 }
 
 .edit-mon-bulk-actions{
@@ -12043,4 +12049,16 @@ img.lead-img {
 	background: url(../images/dashloader.gif) no-repeat center;
 	background-size: 50px 50px;
 	background-color: rgba(255, 255, 255, 0.7);
+}
+
+.feeds-fb-icon{
+	background: radial-gradient(white 50%,#215ca9 50%);
+}
+
+.feeds-lin-icon{
+    background: radial-gradient(white 50%,#007ab9 50%);
+}
+	
+.feeds-tw-icon{
+    background: radial-gradient(white 50%,#26c0f4 50%);
 }
