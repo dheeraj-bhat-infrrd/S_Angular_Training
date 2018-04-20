@@ -256,9 +256,12 @@ public interface SSApiIntegration
     @POST("/v1/company/{companyId}/keyword/phrases")
     public Response addMultiplePhrasesToCompany(@Path ( "companyId") long companyId, @Body MultiplePhrasesVO multiplePhrasesVO, @Header("authorizationHeader") String authorizationHeader);
     
-    @DELETE ( "/v1/company/{companyId}keywords")
+    @DELETE ( "/v1/company/{companyId}/keywords")
     public Response deleteKeywordsFromCompany( @Path ( "companyId") long companyId,
         @Query ( "keywordIds") List<String> keywordIds, @Header("authorizationHeader") String authorizationHeader );
+    
+    @GET("/v1/feedtypes/company/{companyId}")
+    public Response getFeedTypesByCompanyId(@Path("companyId") Long companyId, @Header("authorizationHeader") String authorizationHeader);
     
     @GET ( "/v1/lastsuccessfuletltime/isetlrunning" )
     Response isEtlRunning();
