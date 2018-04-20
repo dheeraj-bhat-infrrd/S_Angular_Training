@@ -69,7 +69,7 @@ public class SettingsManagerImpl implements SettingsManager
 
         int counter = loopTillValue;
         Map<SettingsForApplication, OrganizationUnit> settingsMap = new HashMap<SettingsForApplication, OrganizationUnit>();
-        int setIndex = -1;
+        double setIndex = -1;
 
         int lockIndex = -1;
         while ( counter > 0 ) {
@@ -81,7 +81,7 @@ public class SettingsManagerImpl implements SettingsManager
                 // get values for both setting and lock
                 lockIndex = Integer.parseInt( currentLockAggregateValue.substring( lockCounter - 1, lockCounter ) );
                 if ( lockIndex == CommonConstants.LOCKED_BY_NONE ) {
-                    setIndex = Integer.parseInt( currentSetAggregateValue.substring( counter - 1, counter ) );
+                    setIndex = Double.parseDouble( currentSetAggregateValue.substring( counter - 1, counter ) );
                 }
 
             } else {

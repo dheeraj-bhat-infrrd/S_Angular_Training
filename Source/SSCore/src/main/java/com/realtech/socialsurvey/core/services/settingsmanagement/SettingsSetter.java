@@ -84,5 +84,5 @@ public interface SettingsSetter {
 	 * @return
 	 * @throws InvalidSettingsStateException
 	 */
-	public OrganizationUnit getLowestSetterLevel(int setUnitValue) throws InvalidSettingsStateException;
+	public OrganizationUnit getLowestSetterLevel( double setUnitValue) throws InvalidSettingsStateException;
 }

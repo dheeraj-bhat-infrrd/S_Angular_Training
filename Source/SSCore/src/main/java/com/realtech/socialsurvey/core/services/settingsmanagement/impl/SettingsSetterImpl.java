@@ -179,7 +179,7 @@ public class SettingsSetterImpl implements SettingsSetter {
 	}
 
 	@Override
-	public OrganizationUnit getLowestSetterLevel(int setUnitValue) throws InvalidSettingsStateException {
+	public OrganizationUnit getLowestSetterLevel( double setUnitValue) throws InvalidSettingsStateException {
 		LOG.debug("Getting the lowest setter level for " + setUnitValue);
 		OrganizationUnit organizationUnit = null;
 		if (setUnitValue == CommonConstants.SET_BY_NONE) {
