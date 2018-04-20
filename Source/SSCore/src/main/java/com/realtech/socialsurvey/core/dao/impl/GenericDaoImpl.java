@@ -474,5 +474,23 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 		}
 		
 	}
+	
+	//Since findNumberOfRowsByKeyValue doesn't have ne option and criteria doesn't have a count function
+	//infucing both
+	@Override
+    @Transactional
+    public long findNumberOfRowsByCriteria( Class<T> dataClass, Criterion... criterion )
+    {
+        Criteria criteria = getSession().createCriteria( dataClass );
+        try {
+            for ( Criterion c : criterion ) {
+                criteria.add( c );
+            }
+        } catch ( HibernateException hibernateException ) {
+            LOG.error( "HibernateException caught in findNumberOfRowsByCriteria().", hibernateException );
+            throw new DatabaseException( "HibernateException caught in findNumberOfRowsByCriteria().", hibernateException );
+        }
+        return (long) criteria.setProjection( Projections.rowCount() ).uniqueResult();
+    }
 }
 // JIRA: SS-8: By RM05: EOC

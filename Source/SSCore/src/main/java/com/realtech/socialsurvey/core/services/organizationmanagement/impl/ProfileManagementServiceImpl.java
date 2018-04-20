@@ -1140,6 +1140,28 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
     }
 
 
+    @Override
+    public void disconnectSelectedSocialMedia( String collection, OrganizationUnitSettings unitSettings,
+        SocialMediaTokens mediaTokens, String keyToUpdate ) throws InvalidInputException
+    {
+        if ( mediaTokens == null ) {
+            throw new InvalidInputException( "Media tokens passed was null" );
+        }
+        if ( collection == null || collection.isEmpty() ) {
+            throw new InvalidInputException( "Collection name passed can not be null or empty" );
+        }
+        if ( unitSettings == null ) {
+            throw new InvalidInputException( "Unit settings passed can not be null" );
+        }
+        if ( keyToUpdate == null ) {
+            throw new InvalidInputException( "key passed can not be null" );
+        }
+        LOG.debug( "Deleting google business from social media tokens in profile." );
+        organizationUnitSettingsDao.removeKeyInOrganizationSettings( unitSettings, keyToUpdate, collection );
+        LOG.debug( "Successfully deleted google business from social media tokens." );
+    }
+
+
     // Disclaimer
     @Override
     public void updateDisclaimer( String collection, OrganizationUnitSettings unitSettings, String disclaimer )
@@ -6180,6 +6202,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         // set agent and company related flags
         profileAggregate.setAgent( isAgent( user ) );
         profileAggregate.setHiddenSection( companyProfile.isHiddenSection() );
+        
+        //For an agent, if login is prevented, then agent's public page should be hidden and redirected to branch/region/company
+        profileAggregate.setHiddenSection( individualProfile.isHidePublicPage() );
 
 
         //set vertical name from the company

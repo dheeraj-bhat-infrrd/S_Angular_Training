@@ -1632,21 +1632,21 @@ public interface OrganizationManagementService
 	 */
 	public void unsetComplaintResService(long companyId) throws NonFatalException; 
 
-	public void updateIsLoginPreventedForUser(AgentSettings agentSettings, boolean isLoginPrevented)
-			throws InvalidInputException;
+	public boolean doesSurveyHaveNPSQuestions( User user );
 
-
-	public void updateHidePublicPageForUser(AgentSettings agentSettings, boolean hidePublicPage) throws InvalidInputException;
-
+    
+	void updateIsLoginPreventedForUser( Long userId, boolean isLoginPrevented ) throws InvalidInputException;
 
     public Map<String, Long> getFacebookAndTwitterLocks( String lockType ) throws InvalidInputException;
 
     
-    public boolean doesSurveyHaveNPSQuestions( User user );
 
-    void updateIsLoginPreventedForUsers( List<Long> userIdList, boolean isLoginPrevented ) throws InvalidInputException;
+	void updateIsLoginPreventedForUsers( List<Long> userIdList, boolean isLoginPrevented ) throws InvalidInputException;
 
 
+	void updateHidePublicPageForUser( Long userId, boolean hidePublicPage) throws InvalidInputException;
+    
+    
     void updateHidePublicPageForUsers( List<Long> userIdList, boolean hidePublicPage ) throws InvalidInputException;
     
 
@@ -1683,7 +1683,25 @@ public interface OrganizationManagementService
 
 
 
+    public List<String> validateSocailMedia( String columnName, long columnValue ) throws InvalidInputException, NoRecordsFetchedException;
+
 	ContactDetailsSettings fetchContactDetailByEncryptedId(String encryptedId, String collection);
+	
+	void updateSocialMediaForUser( Long userId, boolean disableSocialMediaTokens ) throws InvalidInputException;
+	
+
+    void updateSocialMediaForUsers( List<Long> userIdList, boolean disableSocialMediaTokens ) throws InvalidInputException;
+
+	/**
+	 * 
+	 * @param companyId
+	 * @param version
+	 * @return
+	 * @throws InvalidInputException
+	 */
+    public  boolean updateEncompassVersion( long companyId, String version ) throws InvalidInputException;
+
+
 
     public boolean updateUserAdditionDeletionRecipients( String entityType, long entityId, Set<String> emails )
         throws InvalidInputException, NoRecordsFetchedException;
@@ -1695,4 +1713,5 @@ public interface OrganizationManagementService
 
     public void sendUserDeletionMail( User adminUser, User user )
         throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException;
+
 }

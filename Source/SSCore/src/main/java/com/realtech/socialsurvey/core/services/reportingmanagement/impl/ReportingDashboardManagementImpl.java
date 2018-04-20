@@ -497,6 +497,7 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
 		cal.set(Calendar.MINUTE, 0);
 		cal.set(Calendar.SECOND, 0);
 		cal.set(Calendar.MILLISECOND, 0);
+		cal.set(Calendar.AM_PM,Calendar.AM);
 		cal.add(Calendar.MONTH, -1);
 		return cal.getTimeInMillis();
 	}
@@ -509,6 +510,7 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
 		cal.set(Calendar.MINUTE, 0);
 		cal.set(Calendar.SECOND, 0);
 		cal.set(Calendar.MILLISECOND, 0);
+		cal.set(Calendar.AM_PM,Calendar.AM);
 		return cal.getTimeInMillis();
 	}
 
@@ -5122,11 +5124,17 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
 	@Transactional
 	public boolean saveEmailCountMonthData(List<SurveyInvitationEmailCountMonth> agentEmailCountsMonth) {
 		try {
+			int month = agentEmailCountsMonth.get(0).getMonth();
+			int year = agentEmailCountsMonth.get(0).getYear();
 			Map<String, Object> queryMap = new HashMap<String, Object>();
-			queryMap.put("month", agentEmailCountsMonth.get(0).getMonth());
-			queryMap.put("year", agentEmailCountsMonth.get(0).getYear());
-			surveyInvitationEmailDao.deleteOldDataForMonth(agentEmailCountsMonth.get(0).getMonth(),
-					agentEmailCountsMonth.get(0).getYear());
+			queryMap.put("month", month);
+			queryMap.put("year", year);
+			if(surveyInvitationEmailDao.getSurveyInvitationEmailReportCountForMonth(month, year) > 0) {
+				surveyInvitationEmailDao.deleteOldDataForMonth(agentEmailCountsMonth.get(0).getMonth(),
+						agentEmailCountsMonth.get(0).getYear());
+			} else {
+				LOG.info("No old data found to delete before save.");
+			}
 			surveyInvitationEmailDao.saveAll(agentEmailCountsMonth);
 			LOG.info("Survey invitaion email count data saved to db for {}-{}",agentEmailCountsMonth.get(0).getMonth(),
 					agentEmailCountsMonth.get(0).getYear());

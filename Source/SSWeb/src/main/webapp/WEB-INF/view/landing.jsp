@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <jsp:include page="header.jsp" />
+<input type="hidden" id="social_media_details" data-social-media-expired="${isSocialMediaExpired}" data-social-media-refresh="${isTokenRefreshRequired}" data-expired-social-media-list=>
 <div id="main-content"></div>
 <jsp:include page="scripts.jsp"/>
 <script src="${initParam.resourcesPath}/resources/js/intlTelInput.js"></script>
@@ -8,6 +9,10 @@
 <script type="text/javascript">
 var hiddenSection = "false";
 var vendastaAccess = "false";
+var expiredSocialMediaList = JSON.parse('${expiredSocialMediaList}');
+var isTokenRefreshRequired = '${isTokenRefreshRequired}';
+var isSocialMediaExpired = '${isSocialMediaExpired}';
+
 $(document).ready(function() {
 	callAjaxGetWithPayloadData("/ishiddensection.do", function(data) {
 		hiddenSection = data;
@@ -25,6 +30,10 @@ $(document).ready(function() {
 		showOrHideListingsManager( vendastaAccess );
 		showOrHideVendastaProductSettings( vendastaAccess );
 	});
+	
+	$('#social_media_details').data('expired-social-media-list',expiredSocialMediaList);
+	$('#social_media_details').data('social-media-expired',isSocialMediaExpired);
+	$('#social_media_details').data('social-media-refresh',isTokenRefreshRequired);
 });
 
 function landingFlow() {
@@ -131,6 +140,22 @@ function landingFlow() {
     }
 	
 	showMainContent('./showreportingpage.do');
+	
+	//update social media
+	if( isSocialMediaExpired == "true" || isSocialMediaExpired == true ){
+		if($("#rep-fix-social-media").length > 0){
+			$("#rep-fix-social-media").removeClass("hide");
+		}
+		
+	}
+	if( isTokenRefreshRequired == "true" || isTokenRefreshRequired == true ){
+		var columnName = "${entityType}";
+		var columnValue = "${entityId}";
+		
+		for (var expiredSocialMedia in expiredSocialMediaList) {
+		 	 openAuthPageFixSocialMedia(expiredSocialMediaList[expiredSocialMedia], columnName, columnValue, "false");
+		}
+	}
 }
 </script>
 <jsp:include page="footer.jsp" />
