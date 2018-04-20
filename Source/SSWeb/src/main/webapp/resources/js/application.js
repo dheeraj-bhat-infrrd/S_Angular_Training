@@ -17029,6 +17029,25 @@ function addMacro(){
 			
 		}else{
 			
+			var alertSelected = parseInt($('#macro-alert').val());
+			var commentText = $('#macro-action-text').val();
+			
+			if(alertSelected == 2){
+				if(commentText == undefined || commentText == null || commentText == ''){
+					$("#overlay-toast").html("Please enter some text for Mail/Private note. Escalation not allowed without a comment for the user");
+					showToast();
+					
+					return;
+				}
+			}else if(alertSelected == 3){
+				if(commentText == undefined || commentText == null || commentText == ''){
+					$("#overlay-toast").html("Please enter some text for Mail/Private note. Resolution not allowed without a comment for the user");
+					showToast();
+					
+					return;
+				}
+			}
+			
 			var url = './updatemacro.do';
 			callAjaxFormSubmit(url, function(data) {
 				var map = $.parseJSON(data);
