@@ -143,6 +143,7 @@ import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsLocker;
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
+import com.realtech.socialsurvey.core.services.social.SocialMediaExceptionHandler;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
@@ -317,6 +318,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Value ( "${CDN_PATH}")
     String cdnPath;
+    
+    @Value ( "${TOKEN_REFRESH_INTERVAL}")
+    private int tokenRefreshInterval;
 
     @Autowired
     private ProfileCompletionList profileCompletionList;
@@ -362,6 +366,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Autowired
     private WorkbookData workbookData;
+    
+    @Autowired
+    private SocialMediaExceptionHandler socialMediaExceptionHandler;
 
 
     /**
@@ -8401,6 +8408,74 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
 
+    @Override
+    public List<String> validateSocailMedia( String columnName, long columnValue )
+        throws InvalidInputException, NoRecordsFetchedException
+    {
+        OrganizationUnitSettings settings = null;
+        String collection = null;
+        List<String> tokenRefreshList = new ArrayList<>();
+        if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
+            settings = getCompanySettings( columnValue );
+            collection = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
+        } else if ( columnName.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
+            settings = getRegionSettings( columnValue );
+            collection = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
+        } else if ( columnName.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
+            settings = getBranchSettingsDefault( columnValue );
+            collection = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
+        } else if ( columnName.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) ) {
+            settings = userManagementService.getUserSettings( columnValue );
+            collection = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
+        }
+
+        //facebook token
+        if ( settings != null && settings.getSocialMediaTokens() != null
+            && settings.getSocialMediaTokens().getFacebookToken() != null ) {
+            if ( socialManagementService.checkFacebookTokenExpiry( settings, collection ) ) {
+                FacebookToken facebookToken = settings.getSocialMediaTokens().getFacebookToken();
+                if ( !facebookToken.isTokenExpiryAlertSent() ) {
+                    LOG.debug( "Alert Mail hasn't send to sending alert mail for entity" );
+                    String emailId = socialMediaExceptionHandler.generateAndSendSocialMedialTokenExpiryMail( settings,
+                        collection, CommonConstants.FACEBOOK_SOCIAL_SITE );
+                    //update alert detail in token
+                    if ( emailId != null ) {
+                        facebookToken.setTokenExpiryAlertEmail( emailId );
+                        facebookToken.setTokenExpiryAlertSent( true );
+                        facebookToken.setTokenExpiryAlertTime( new Date() );
+                        socialManagementService.updateFacebookToken( collection, settings.getIden(), facebookToken );
+                    }
+                }
+            }
+            if(socialManagementService.checkForFacebookTokenRefresh( settings.getSocialMediaTokens() ))
+                tokenRefreshList.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
+        }
+
+        //linkedin token
+        if ( settings != null && settings.getSocialMediaTokens() != null
+            && settings.getSocialMediaTokens().getLinkedInToken() != null ) {
+            if ( socialManagementService.checkLinkedInTokenExpiry( settings, collection ) ) {
+                LinkedInToken linkedInToken = settings.getSocialMediaTokens().getLinkedInToken();
+                if ( !linkedInToken.isTokenExpiryAlertSent() ) {
+                    //send alert mail to entity 
+                    String emailId = socialMediaExceptionHandler.generateAndSendSocialMedialTokenExpiryMail( settings,
+                        collection, CommonConstants.LINKEDIN_SOCIAL_SITE );
+                    //update alert mail detail in linkedin token
+                    if ( emailId != null ) {
+                        linkedInToken.setTokenExpiryAlertEmail( emailId );
+                        linkedInToken.setTokenExpiryAlertSent( true );
+                        linkedInToken.setTokenExpiryAlertTime( new Date() );
+                        socialManagementService.updateLinkedinToken( collection, settings.getIden(), linkedInToken );
+                    }
+                }
+            }
+            if(socialManagementService.checkForLinkedInTokenRefresh( settings.getSocialMediaTokens() ))
+                tokenRefreshList.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
+        }
+        return tokenRefreshList;
+    }
+
+
     /**
      * 
      */
@@ -8411,33 +8486,34 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.debug( "method getExpiredSocailMedia started" );
         Set<String> socialMedias = new HashSet<String>();
         OrganizationUnitSettings settings = null;
+        String collection = null;
         if ( columnName.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
             settings = getCompanySettings( columnValue );
+            collection = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
         } else if ( columnName.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) ) {
             settings = getRegionSettings( columnValue );
+            collection = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
         } else if ( columnName.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) ) {
             settings = getBranchSettingsDefault( columnValue );
+            collection = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
         } else if ( columnName.equalsIgnoreCase( CommonConstants.AGENT_ID_COLUMN ) ) {
             settings = userManagementService.getUserSettings( columnValue );
+            collection = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
         }
 
         //facebook token
         if ( settings != null && settings.getSocialMediaTokens() != null
             && settings.getSocialMediaTokens().getFacebookToken() != null ) {
-            FacebookToken facebookToken = settings.getSocialMediaTokens().getFacebookToken();
-            if ( facebookToken.getFacebookAccessTokenExpiresOn() != 0L ) {
-                if ( socialManagementService.checkFacebookTokenExpiry( facebookToken ) ) {
-                    //check if token is still expired
-                    socialMedias.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
-                }
+            if ( settings.getSocialMediaTokens().getFacebookToken().isTokenExpiryAlertSent() ) {
+                //check if token is still expired
+                socialMedias.add( CommonConstants.FACEBOOK_SOCIAL_SITE );
             }
         }
 
         //linkedin token
         if ( settings != null && settings.getSocialMediaTokens() != null
             && settings.getSocialMediaTokens().getLinkedInToken() != null ) {
-            LinkedInToken linkedInToken = settings.getSocialMediaTokens().getLinkedInToken();
-            if ( socialManagementService.checkLinkedInTokenExpiry( linkedInToken ) ) {
+            if ( settings.getSocialMediaTokens().getLinkedInToken().isTokenExpiryAlertSent() ) {
                 socialMedias.add( CommonConstants.LINKEDIN_SOCIAL_SITE );
             }
         }
@@ -9244,21 +9320,17 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 mailId = mailId.trim();
         } else {
             String mailIds[] = mailId.split( "," );
-
-            if ( mailIds.length == 0 )
-                throw new InvalidInputException( "Mail id - {} entered as send alert to input is empty", mailId );
-
-            for ( String mailID : mailIds ) {
-                if ( !validateEmail( mailID.trim() ) )
-                    throw new InvalidInputException(
-                        "Mail id - {} entered amongst the mail ids as send alert to input is invalid", mailId );
-                else
-                    mailIDStr += mailID.trim() + " , ";
-            }
-            mailId = mailIDStr.substring( 0, mailIDStr.length() - 2 );
-        }
-        return mailId;
-    }
+			for (String mailID : mailIds) {
+				if (!validateEmail(mailID.trim()))
+					throw new InvalidInputException(
+							"Mail id - {} entered amongst the mail ids as send alert to input is invalid",mailId);
+				else
+					mailIDStr += mailID.trim() + " , ";
+			}
+			mailId = mailIDStr.substring(0, mailIDStr.length() - 2);
+		}
+		return mailId;
+	}
 
 
     public void addSurveySettings( OrganizationUnitSettings unitSettings )
@@ -9282,31 +9354,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 
     @Override
-    public void updateIsLoginPreventedForUser( AgentSettings agentSettings, boolean isLoginPrevented )
-        throws InvalidInputException
-    {
-        if ( agentSettings == null ) {
-            throw new InvalidInputException( "Agent settings can not be null" );
-        }
-        LOG.info( "Inside method updateIsLoginPreventedForUser for user : " + agentSettings.getIden() );
-        organizationUnitSettingsDao.updateParticularKeyAgentSettings(
-            MongoOrganizationUnitSettingDaoImpl.KEY_IS_LOGIN_PREVENTED, isLoginPrevented, agentSettings );
-    }
-
-
-    @Override
-    public void updateHidePublicPageForUser( AgentSettings agentSettings, boolean hidePublicPage ) throws InvalidInputException
-    {
-        if ( agentSettings == null ) {
-            throw new InvalidInputException( "Agent settings can not be null" );
-        }
-        LOG.info( "Inside method updateHidePublicPageForUser for user : " + agentSettings.getIden() );
-        organizationUnitSettingsDao.updateParticularKeyAgentSettings( MongoOrganizationUnitSettingDaoImpl.KEY_HIDE_PUBLIC_PAGE,
-            hidePublicPage, agentSettings );
-    }
-
-
-    @Override
     public boolean doesSurveyHaveNPSQuestions( User user )
     {
         if ( user != null ) {
@@ -9322,8 +9369,28 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
         return false;
     }
-
-
+	
+	/**
+	 * Update isLoginPrevented flag in Mongo for user
+	 */
+	@Override
+    public void updateIsLoginPreventedForUser( Long userId, boolean isLoginPrevented ) throws InvalidInputException
+    {
+	    if ( userId == null || userId == 0l ) {
+            throw new InvalidInputException( "userId is null or 0" );
+        }
+        
+        List<Long> userIdList = new ArrayList<Long>();
+        userIdList.add( userId );
+        
+        LOG.info( "Inside method updateIsLoginPreventedForUser for user : {}", userId );
+        updateIsLoginPreventedForUsers( userIdList, isLoginPrevented );
+    }
+    
+	
+	/**
+     * Update isLoginPrevented flag in Mongo for list of users
+     */
     @Override
     public void updateIsLoginPreventedForUsers( List<Long> userIdList, boolean isLoginPrevented ) throws InvalidInputException
     {
@@ -9333,8 +9400,29 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.info( "Inside method updateIsLoginPreventedForUsers " );
         organizationUnitSettingsDao.updateIsLoginPreventedForUsersInMongo( userIdList, isLoginPrevented );
     }
-
-
+    
+    
+    /**
+     * Update hidePublicPage flag in Mongo for user
+     */
+    @Override
+    public void updateHidePublicPageForUser( Long userId, boolean hidePublicPage ) throws InvalidInputException
+    {
+        if ( userId == null || userId == 0l ) {
+            throw new InvalidInputException( "userId is null or 0" );
+        }
+        
+        List<Long> userIdList = new ArrayList<Long>();
+        userIdList.add( userId );
+        
+        LOG.info( "Inside method updateHidePublicPageForUser for user : {}", userId );
+        updateHidePublicPageForUsers( userIdList, hidePublicPage );
+    }
+    
+    
+    /**
+     * Update hidePublicPage flag in Mongo for a list of user
+     */
     @Override
     public void updateHidePublicPageForUsers( List<Long> userIdList, boolean hidePublicPage ) throws InvalidInputException
     {
@@ -9542,6 +9630,38 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
     
     
+    
+    /**
+     * Update socialMediaTokens in Mongo for a user
+     */
+    @Override
+    public void updateSocialMediaForUser( Long userId, boolean disableSocialMediaTokens ) throws InvalidInputException
+    {
+        if ( userId == null || userId == 0l ) {
+            throw new InvalidInputException( "userId is null or 0" );
+        }
+        
+        List<Long> userIdList = new ArrayList<Long>();
+        userIdList.add( userId );
+        
+        LOG.info( "Inside method updateSocialMediaForUser " );
+        updateSocialMediaForUsers( userIdList, disableSocialMediaTokens );
+    }
+    
+    
+    /**
+     * Update socialMediaTokens in Mongo for a list of users
+     */
+    @Override
+    public void updateSocialMediaForUsers( List<Long> userIdList, boolean disableSocialMediaTokens ) throws InvalidInputException
+    {
+        if ( userIdList == null || userIdList.isEmpty() ) {
+            throw new InvalidInputException( "List of userIds is null" );
+        }
+        LOG.info( "Inside method updateSocialMediaForUsers " );
+        organizationUnitSettingsDao.updateSocialMediaForUsers( userIdList, disableSocialMediaTokens );
+    }
+    
     @Override
     public boolean updateUserAdditionDeletionRecipients( String entityType, long entityId, Set<String> emails )
         throws InvalidInputException, NoRecordsFetchedException
@@ -9603,15 +9723,21 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException
     {
         LOG.debug( "sending user adition mail" );
-        
-        if( adminUser == null || user == null ) {
+
+        if ( adminUser == null || user == null ) {
             LOG.warn( "user details not specified for user addition mail" );
-            throw new InvalidInputException( "user details not specified for user addition mail" );  
+            throw new InvalidInputException( "user details not specified for user addition mail" );
         }
-        
+
+
+        if ( user.getCompany() == null ) {
+            LOG.warn( "User added, is not associated with a company" );
+            return;
+        }
+
         OrganizationUnitSettings companySettings = getCompanySettings( user.getCompany().getCompanyId() );
 
-        if ( companySettings.getUserAddDeleteNotificationRecipients() == null
+        if ( companySettings == null || companySettings.getUserAddDeleteNotificationRecipients() == null
             || companySettings.getUserAddDeleteNotificationRecipients().isEmpty() ) {
             LOG.warn( "No user addition notification mail recipient found" );
             return;
@@ -9636,15 +9762,20 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException
     {
         LOG.debug( "sending user deletion mail" );
-        
-        if( adminUser == null || user == null ) {
+
+        if ( adminUser == null || user == null ) {
             LOG.warn( "user details not specified for user deletion mail" );
-            throw new InvalidInputException( "user details not specified for user deletion mail" );  
+            throw new InvalidInputException( "user details not specified for user deletion mail" );
         }
         
+        if ( user.getCompany() == null ) {
+            LOG.warn( "User to be deleted, is not associated with a company" );
+            return;
+        }
+
         OrganizationUnitSettings companySettings = getCompanySettings( user.getCompany().getCompanyId() );
 
-        if ( companySettings.getUserAddDeleteNotificationRecipients() == null
+        if ( companySettings == null || companySettings.getUserAddDeleteNotificationRecipients() == null
             || companySettings.getUserAddDeleteNotificationRecipients().isEmpty() ) {
             LOG.warn( "No user deletion notification mail recipient found" );
             return;
@@ -9655,4 +9786,62 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             adminUser.getEmailId(), user, getAgentSettings( user.getUserId() ) );
     }
     
+    
+    /**
+     * 
+     */
+    @Override
+    public boolean updateEncompassVersion( long companyId, String version ) throws InvalidInputException
+    {
+        if ( LOG.isDebugEnabled() ) {
+            LOG.debug( "method updateEncompassVersion() called" );
+        }
+        if ( companyId <= 0 ) {
+            LOG.warn( "company ID specified is invalid" );
+            throw new InvalidInputException( "company ID specified is invalid" );
+        } else if ( StringUtils.isEmpty( version ) ) {
+            LOG.warn( "encompass version specified is invalid" );
+            throw new InvalidInputException( "encompass version specified is invalid" );
+        }
+
+
+        OrganizationUnitSettings companySettings = getCompanySettings( companyId );
+
+        if ( companySettings == null ) {
+            LOG.warn( "company ID specified is does not exist" );
+            throw new InvalidInputException( "company ID specified is does not exist" );
+        } else if ( companySettings.getCrm_info() == null || !StringUtils.equals( companySettings.getCrm_info().getCrm_source(),
+            CommonConstants.CRM_INFO_SOURCE_ENCOMPASS ) ) {
+            LOG.warn( "company specified does not have encompass connection" );
+            throw new InvalidInputException( "company specified does not have encompass connection" );
+        }
+
+        boolean isVersionSupported = false;
+        for ( EncompassSdkVersion encompassVersion : encompassSdkVersionDao.findAll( EncompassSdkVersion.class ) ) {
+            if ( encompassVersion.getSdkVersion().trim().equals( version.trim() ) ) {
+                isVersionSupported = true;
+                break;
+            }
+        }
+
+        if ( !isVersionSupported ) {
+            LOG.warn( "The new encompass version specified is not supported" );
+            throw new InvalidInputException( "The new encompass version specified is not supported" );
+        }
+
+        if ( LOG.isTraceEnabled() ) {
+            LOG.trace( "updating encompass version for company with ID : {}, from {} to {}", companyId,
+                ( (EncompassCrmInfo) companySettings.getCrm_info() ).getVersion(), version );
+        }
+
+        EncompassCrmInfo encompassCrmInfo = (EncompassCrmInfo) companySettings.getCrm_info();
+        encompassCrmInfo.setVersion( version.trim() );
+
+        updateCRMDetails( companySettings, encompassCrmInfo, EncompassCrmInfo.class.getName() );
+
+        if ( LOG.isDebugEnabled() ) {
+            LOG.debug( "method updateEncompassVersion() finished" );
+        }
+        return false;
+    }
 }

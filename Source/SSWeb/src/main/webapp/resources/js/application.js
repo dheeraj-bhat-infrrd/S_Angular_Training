@@ -529,6 +529,10 @@ $(document).on('click', '#welcome-popup-invite', function(e) {
 $(document).on('click', '#overlay-pop-up', function(e) {
 	e.stopPropagation();
 });
+
+$(document).on('click', '#disconnect-overlay-pop-up', function(e) {
+	e.stopPropagation();
+});
 $(document).on('click', '#zillow-popup-body', function(e) {
 	e.stopPropagation();
 });
@@ -1075,10 +1079,10 @@ function paintFixSocialMedia(data){
 	for (var i = 0; i < socialMedias.length; i++){
 		var socialMedia = socialMedias[i];
 		if(socialMedia == "facebook"){
-			var facebookDiv = '<div class="clearfix display-inline-block"><div class="float-left soc-nw-icns cursor-pointer icn-wide-fb soc-nw-adj " onclick="openAuthPageFixSocialMedia('+ "'facebook'" +', '+ "'" + columnName + "'" +', '+columnValue+');"></div></div>';
+			var facebookDiv = '<div class="clearfix display-inline-block"><div class="float-left soc-nw-icns cursor-pointer icn-wide-fb soc-nw-adj " onclick="openAuthPageFixSocialMedia('+ "'facebook'" +', '+ "'" + columnName + "'" +', '+columnValue+',true'+');"></div></div>';
 			popup += facebookDiv;
 		}else if(socialMedia == "linkedin"){
-			var linkedinDiv = '<div class="clearfix display-inline-block"><div class="float-left soc-nw-icns cursor-pointer icn-wide-linkedin soc-nw-adj " onclick="openAuthPageFixSocialMedia(' + "'linkedin'" + ',' + "'" + columnName + "'" + ', '+columnValue+');" data-link=""></div></div>';
+			var linkedinDiv = '<div class="clearfix display-inline-block"><div class="float-left soc-nw-icns cursor-pointer icn-wide-linkedin soc-nw-adj " onclick="openAuthPageFixSocialMedia(' + "'linkedin'" + ',' + "'" + columnName + "'" + ', '+columnValue+',true'+');" data-link=""></div></div>';
 			popup += linkedinDiv;
 		}
 	}
@@ -7330,10 +7334,10 @@ $(document).on('blur', '#yelp-profile-url', function() {
 		return;
 	}
 
-	var payload = {
-		"yelplink" : yelpLink
-	};
 	if (isValidUrl(yelpLink)) {
+		var payload = {
+				"yelplink" : yelpLink
+			};
 		callAjaxPostWithPayloadData("./updateyelplink.do", function(data) {
 			$('#yelp-profile-url-display').html(yelpLink);
 			$('#yelp-profile-url-display').removeClass('hide');
@@ -7344,6 +7348,8 @@ $(document).on('blur', '#yelp-profile-url', function() {
 			$('#overlay-toast').html($('#display-msg-div').text().trim());
 			showToast();
 		}, payload, true);
+	} else if( yelpLink == '') {
+		confirmDisconnectSocialMedia("yelp");
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
@@ -7563,7 +7569,6 @@ function paintSurveyPage(jsonData) {
  */
 function paintSurveyPageFromJson() {
 	$("div[data-ques-type]").hide();
-	$('#sq-data').data('edited',false);
 	if (qno == -1 && editable == false) {
 		$("div[data-ques-type]").hide();
 		$("div[data-ques-type='error']").show();
@@ -7608,8 +7613,11 @@ function paintSurveyPageFromJson() {
 		$("#ques-text").html(question);
 		$("#sq-stars").show();
 		if (questionDetails.customerResponse != undefined && !isNaN(parseInt(questionDetails.customerResponse))) {
-			$('#sq-stars').attr('selected-star-no' , questionDetails.customerResponse);
-			increaseOpacityOfStars(parseInt(questionDetails.customerResponse));
+			var starVal = parseInt(questionDetails.customerResponse);
+			if(starVal > 5)
+				starVal = Math.floor(starVal/2);
+			$('#sq-stars').attr('selected-star-no' , starVal);
+			increaseOpacityOfStars(parseInt(starVal));
 			$("#next-star").removeClass("btn-com-disabled");
 		}
 	} else if (questionType == "sb-range-smiles") {
@@ -7617,8 +7625,11 @@ function paintSurveyPageFromJson() {
 		$("#ques-text-smiley").html(question);
 		$("#sq-smiles").show();
 		if (questionDetails.customerResponse != undefined && !isNaN(parseInt(questionDetails.customerResponse))) {
-			$('#sq-smiles').attr('selected-smiles-no' , questionDetails.customerResponse);
-			increaseOpacityOfStars(parseInt(questionDetails.customerResponse));
+			var starVal = parseInt(questionDetails.customerResponse);
+			if(starVal > 5)
+				starVal = Math.floor(starVal/2);
+			$('#sq-smiles').attr('selected-smiles-no' , starVal);
+			increaseOpacityOfStars(parseInt(starVal));
 			$("#next-smile").removeClass("btn-com-disabled");
 		}
 	} else if (questionType == "sb-range-scale") {
@@ -7763,9 +7774,6 @@ function retakeSurveyRequest() {
  */
 function storeCustomerAnswer(customerResponse) {
 	
-	 if(!$('#sq-data').data('edited')){
-		 return;
-	 }
 	var success = false;
 	//encode question and response
 	var encodedCustomerResponse = window.btoa( unescape( encodeURIComponent( customerResponse ) ) );
@@ -7931,7 +7939,6 @@ function bindMcqCheckButton() {
 	});
 
 	$('.st-mcq-chk-off').click(function() {
-		$('#sq-data').data('edited',true)
 		customerResponse = $(this).parent().parent().attr('data-answer');
 		$('.sq-mcq-wrapper').find('.st-mcq-chk-on').hide();
 		$('.sq-mcq-wrapper').find('.st-mcq-chk-off').show();
@@ -8151,7 +8158,6 @@ function clearForm() {
 
 // Code to be executed on click of stars of rating question.
 $('.sq-star').click(function() {
-	$('#sq-data').data('edited' , true);
 	$(this).parent().find('.sq-star').removeClass('sq-full-star');
 	$(this).parent().find('.sq-star').removeClass('sq-full-star-click');
 	var starVal = $(this).attr('star-no');
@@ -8196,7 +8202,6 @@ $('.sq-np-item-next').click(function() {
 	if (questionDetails.questionType == "sb-sel-mcq" && customerResponse != undefined) {
 			storeCustomerAnswer(customerResponse);
 		} else if (questionDetails.questionType == "sb-sel-desc") {
-			$('#sq-data').data('edited',true);
 			customerResponse = $("#text-area").val();
 			if (customerResponse == undefined) {
 				customerResponse = "";
@@ -8204,21 +8209,25 @@ $('.sq-np-item-next').click(function() {
 			storeCustomerAnswer(customerResponse);
 		} else if (questionDetails.questionType == "sb-range-star") {
 			reduceOpacityOfStars();
-			if ($('#next-star').hasClass("btn-com-disabled")) {
+			if ($('#next-star').hasClass("btn-com-disabled") || $('#sq-stars').attr('selected-star-no') == 0) {
 				$('#overlay-toast').html('Please answer the question. You can not skip a rating question.');
 				showToast();
 				return;
 			}
 			var starVal = $('#sq-stars').attr('selected-star-no');
+			if(starVal > 5)
+				starVal = Math.floor(starVal/2);
 			storeCustomerAnswer(starVal);
-		} else if (questionDetails.questionType == "sb-range-smiles") {
+		} else if (questionDetails.questionType == "sb-range-smiles" ) {
 			reduceOpacityOfSmiles();
-			if ($('#next-smile').hasClass("btn-com-disabled")) {
+			if ($('#next-smile').hasClass("btn-com-disabled") || $('#sq-smiles').attr('selected-smiles-no') == 0) {
 				$('#overlay-toast').html('Please answer the question. You can not skip a rating question.');
 				showToast();
 				return;
 			}
 			var smileVal = $('#sq-smiles').attr('selected-smiles-no');
+			if(smileVal > 5)
+				smileVal = Math.floor(smileVal/2);
 			storeCustomerAnswer(smileVal);
 		} else if (questionDetails.questionType == "sb-range-scale") {
 			if ($('#next-scale').hasClass("btn-com-disabled")) {
@@ -8275,6 +8284,8 @@ $('.sq-np-item-next').click(function() {
 
 	if (questionDetails.questionType == "sb-range-star") {
 		var starVal = parseInt(questionDetails.customerResponse);
+		if(starVal > 5)
+			starVal = Math.floor(starVal/2);
 		if (!isNaN(starVal)) {
 			$("#next-star").removeClass("btn-com-disabled");
 			$('#sq-stars').find('.sq-star').each(function(index) {
@@ -8287,6 +8298,8 @@ $('.sq-np-item-next').click(function() {
 	}
 	if (questionDetails.questionType == "sb-range-smiles") {
 		var smileVal = parseInt(questionDetails.customerResponse);
+		if(smileVal > 5)
+			smileVal = Math.floor(smileVal/2);
 		if (!isNaN(smileVal)) {
 			$("#next-smile").removeClass("btn-com-disabled");
 			$('#sq-smiles').find('.sq-smile').each(function(index) {
@@ -8371,6 +8384,8 @@ $('.sq-np-item-prev').click(function() {
 	if (questionDetails.questionType == "sb-range-star") {
 		reduceOpacityOfStars();
 		var starVal = parseInt(questionDetails.customerResponse);
+		if(starVal > 5)
+			starVal = Math.floor(starVal/2);
 		$('#sq-stars').find('.sq-star').each(function(index) {
 			if (index < starVal) {
 				$(this).addClass('sq-full-star-click');
@@ -8382,6 +8397,8 @@ $('.sq-np-item-prev').click(function() {
 	if (questionDetails.questionType == "sb-range-smiles") {
 		reduceOpacityOfSmiles();
 		var starVal = parseInt(questionDetails.customerResponse);
+		if(starVal > 5)
+			starVal = Math.floor(starVal/2);
 		$('#sq-smiles').find('.sq-smile').each(function(index) {
 			if (index < starVal) {
 				$(this).addClass('sq-full-smile-click');
@@ -8444,7 +8461,6 @@ $('.sq-np-item-prev').click(function() {
 });
 
 $('.sq-radio').click(function(){
-	$('#sq-data').data('edited',true);
 	$('.sq-radio').each(function() {
 	    $(this).removeClass('radio-outer-gray');
 	    $(this).children().hide();
@@ -8477,7 +8493,6 @@ $('.sq-radio').click(function(){
 
 /* Click event on grey smile. */
 $('.sq-smile').click(function() {
-	$('#sq-data').data('edited' , true);
 	$(this).parent().find('.sq-smile').removeClass('sq-full-smile');
 	$(this).parent().find('.sq-smile').removeClass('sq-full-smile-click');
 	var smileVal = $(this).attr('smile-no');
@@ -8519,7 +8534,6 @@ $('.sq-smile').hover(function() {
 
 $('#sq-happy-smile').click(function() {
 	// Update customer's mood in db and ask for cutomer's kind words.
-	$('#sq-data').data('edited',true)
 	mood = "Great";
 	$('#next-textarea-smiley').removeClass("btn-com-disabled");
 	isSmileTypeQuestion = true;
@@ -8529,7 +8543,6 @@ $('#sq-happy-smile').click(function() {
 $('#sq-neutral-smile').click(function() {
 	// Update customer's mood in db and ask for feedback that could have made
 	// him happy.
-	$('#sq-data').data('edited',true)
 	mood = "OK";
 	$('#next-textarea-smiley').removeClass("btn-com-disabled");
 	isSmileTypeQuestion = true;
@@ -8539,7 +8552,6 @@ $('#sq-neutral-smile').click(function() {
 $('#sq-sad-smile').click(function() {
 	// Update customer's mood in db and ask what went wrong during the entire
 	// course.
-	$('#sq-data').data('edited',true)
 	mood = "Unpleasant";
 	$('#next-textarea-smiley').removeClass("btn-com-disabled");
 	isSmileTypeQuestion = true;
@@ -8548,7 +8560,6 @@ $('#sq-sad-smile').click(function() {
 });
 
 $(document).on('input','.sq-txt-area',function(){
-	$('#sq-data').data('edited',true);
 });
 
 /*
@@ -9054,6 +9065,7 @@ function overlayRevert() {
 	$("#overlay-pop-up").removeClass("overlay-disable-wrapper-zillow");
 	$('#zillow-popup').hide();
 	$('#zillow-popup-body').html('');
+	$('#disconnect-overlay-main').hide();
 }
 
 // Update Basic detail
@@ -9667,6 +9679,8 @@ function updateYelpLink(link) {
 	if (isValidUrl(link)) {
 		callAjaxPostWithPayloadData("./updateyelplink.do", callBackUpdateSocialLink, payload, true);
 		showProfileLinkInEditProfilePage("yelp", link);
+	} else if( link == '') {
+		confirmDisconnectSocialMedia("yelp");
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
@@ -9702,6 +9716,8 @@ function updateLendingTreeLink(link) {
 	if (isValidUrl(link)) {
 		callAjaxPostWithPayloadData("./updatelendingtreelink.do", callBackUpdateSocialLink, payload, true);
 		showProfileLinkInEditProfilePage("lendingtree", link);
+	} else if( link == '') {
+		confirmDisconnectSocialMedia("lendingtree");
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
@@ -9721,14 +9737,16 @@ $('body').on('click', '#prof-edit-social-link .icn-fb-pxl', function(e) {
 });
 
 function updateFacebookPixelId(pixelId) {
-	var payload = {
-		"pixelId" : pixelId
-	};
 	var parsedPixelId = parseInt(pixelId, 10);
 	var isPixelIdInt = parsedPixelId == pixelId;
 	if (pixelId != undefined && pixelId != '' && isPixelIdInt ) {
+		var payload = {
+				"pixelId" : pixelId
+			};
 		callAjaxPostWithPayloadData("./updatefacebookpixelid.do", callBackUpdateSocialLink, payload, true);
 		showProfileLinkInEditProfilePage("facebookPixel", pixelId);
+	} else if( pixelId == '') {
+		confirmDisconnectSocialMedia("facebookPixel");
 	} else {
 		$('#overlay-toast').html("Enter a valid pixel id");
 		showToast();
@@ -9829,6 +9847,19 @@ $('body').on('click', '#prof-edit-social-link .icn-google-business', function(e)
         "onblur" : "updateGoogleBusinessLink(this.value);$('#social-token-text').hide();"
     });
     $('#social-token-text').val(link);*/
+	$('body').on('click','#gmb-disconnect-link',function(){
+		
+		var payload = {
+				"socialmedia" : "google business"
+			};
+		callAjaxPostWithPayloadData("./disconnectparticularsocialmedia.do", function(data) {
+				$('#overlay-toast').html(data);
+				showToast();
+			}, payload, true);
+		
+		$('#overlay-gmb-popup').addClass('hide');
+		removeProfileLinkInEditProfilePage( "googleBusiness" );
+	});
 
 });
 
@@ -9839,6 +9870,8 @@ function updateRealtorLink(link) {
 	if (isValidUrl(link)) {
 		callAjaxPostWithPayloadData("./updateRealtorlink.do", callBackUpdateSocialLink, payload, true);
 		showProfileLinkInEditProfilePage("realtor", link);
+	} else if( link == '') {
+		confirmDisconnectSocialMedia("realtor");
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
@@ -9856,6 +9889,37 @@ function updateGoogleBusinessLink(link) {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
 	}
+}
+
+function confirmDisconnectSocialMedia(socialMedia) {
+
+	$('#disconnect-overlay-header').html("Confirm Disconnect");
+	$('#disconnect-overlay-text').html("This action will disconnect your account from " + socialMedia);
+	$('#disconnect-overlay-continue').html("Disconnect");
+	$('#disconnect-overlay-cancel').html("Cancel");
+	$('#disconnect-overlay-continue').off();
+	$('#disconnect-overlay-continue').click(function() {
+		disconnectParticularSocialMedia(socialMedia);
+		overlayRevert();
+	});
+	
+	$('#disconnect-overlay-cancel').off();
+	$('#disconnect-overlay-cancel').click(function() {
+		overlayRevert();
+	});
+	
+	$('#disconnect-overlay-main').show();
+}
+
+function disconnectParticularSocialMedia(socialMedia) {
+	var payload = {
+			"socialmedia" : socialMedia
+		};
+	callAjaxPostWithPayloadData("./disconnectparticularsocialmedia.do", function(data) {
+			$('#overlay-toast').html(data);
+			showToast();
+		}, payload, true);
+	removeProfileLinkInEditProfilePage( socialMedia );
 }
 
 function callBackUpdateSocialLink(data) {
@@ -11685,6 +11749,10 @@ function disconnectSocialMedia(event, socialMedia, isAutoLogin) {
 
 function showProfileLinkInEditProfilePage(source, profileUrl) {
 	$('.social-item-icon[data-source="' + source + '"').attr('data-link', profileUrl).removeClass('icn-social-add');
+}
+
+function removeProfileLinkInEditProfilePage(source) {
+	$('.social-item-icon[data-source="' + source + '"').attr('data-link','' ).addClass('icn-social-add');
 }
 
 function showSurveysUnderResolution(startIndexCmp, batchSizeCmp) {

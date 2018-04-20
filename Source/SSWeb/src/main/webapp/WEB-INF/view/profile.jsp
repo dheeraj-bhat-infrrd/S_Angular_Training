@@ -106,7 +106,7 @@
 <meta property="og:image" content="${profile.profileImageUrlThumbnail}" />
 <meta property="og:description" content="${descriptionTag}" />
 <meta property="og:profileLevel" content="${profileLevel}" />
-<meta property="og:title" content="${profName} ${title} ${companyName} ${location} ${vertical} Professional Reviews | SocialSurvey.me" />
+<meta property="og:title" content="${profName} ${title} ${companyName} ${location} ${vertical} Professional Reviews" />
 <link rel="shortcut icon" href="/favicon.ico" sizes="16x16">
 <link rel="stylesheet"
 	href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
@@ -138,14 +138,14 @@
 		<c:when test="${not empty profName}">
 			<c:choose>
 				<c:when test="${profileLevel == 'INDIVIDUAL'}">
-					<title>${profName} ${title} ${companyName} ${location} ${vertical} Professional Reviews | SocialSurvey.me</title>
+					<title>${profName} ${title} ${companyName} ${location} ${vertical} Professional Reviews</title>
 					<meta name="keywords"
 						content="${profName}, ${title}, ${companyName}, ${location}, ${vertical}, professional, online, reputation, social, survey, reviews, rating">
 					<meta name="description"
 						content="${firstName} has ${reviewsCount} reviews. ${firstName} is a ${vertical} professional${includeLocation}.${includeTitle}">
 				</c:when>
 				<c:otherwise>
-					<title>${profName} ${vertical} Reviews | SocialSurvey.me</title>
+					<title>${profName} ${vertical} Reviews</title>
 					<meta name="keywords"
 						content="${profName}, ${vertical}, professional, online, reputation, social, survey, reviews, rating">
 					<meta name="description"
@@ -341,13 +341,13 @@
 			<div class="container">
 				<div class="row prof-pic-name-wrapper">
 					<c:if
-						test="${not empty profile.profileImageUrlThumbnail && not empty fn:trim(profile.profileImageUrlThumbnail)}">
+						test="${not empty profile.profileImageUrl && not empty fn:trim(profile.profileImageUrl)}">
 						<div id="prog-img-container"
 							class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper">
 							<div class="prog-img-container" style="background-color: white !important; display: flex;align-items: center;">
 								<img itemprop="primaryImageOfPage" id="prof-image"
 									class="prof-image pos-relative height-auto-resp"
-									src="${profile.profileImageUrlThumbnail}"></img>
+									src="${profile.profileImageUrl}"></img>
 							</div>
 						</div>
 					</c:if>
@@ -682,9 +682,10 @@
 								</c:choose>
 							</c:if>
 
-							<c:if test="${not empty workEmail }">
+							
 								<div class="prof-left-row prof-left-assoc bord-bot-dc">
 									<div class="left-contact-wrapper">
+										<c:if test="${not empty workEmail }">
 										<div id="prof-contact-hdr"
 											class="left-panel-header prof-contact-hdr">Contact
 											${profName}</div>
@@ -745,6 +746,7 @@
 												</div>
 											</form>
 										</div>
+										</c:if>
 										<c:if test="${not empty profile.disclaimer }">
 											<div class="prof-left-ach">
 												<div class="left-ach-wrapper">
@@ -756,7 +758,6 @@
 										</c:if>
 									</div>
 								</div>
-							</c:if>
 						</div>
 					</div>
 

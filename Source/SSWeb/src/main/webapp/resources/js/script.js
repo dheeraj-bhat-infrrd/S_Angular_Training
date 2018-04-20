@@ -4064,3 +4064,59 @@ function paintUnsubscribedEmail(unsubscibedEmails){
 	    $("#unsubscribedEmailList").append(tableRow);
 	}
 }
+
+function closeSMPopup(closeSMParam){
+	
+	var fromDashboard = closeSMParam.fromDashboard;
+	var restful = closeSMParam.restful;
+	var flow = closeSMParam.flow;
+	var isFixSocialMedia =closeSMParam.isFixSocialMedia;
+	var isManual = closeSMParam.isManual;
+	var columnName = closeSMParam.columnName;
+	var columnValue = closeSMParam.columnValue;
+	var socialNetwork = closeSMParam.socialNetwork;
+	var checkIfFacebookSet = closeSMParam.checkIfFacebookSet;
+	
+	if(checkIfFacebookSet){
+		var parentWindow = null;
+		if (window.opener != null && !window.opener.closed) {
+			parentWindow = window.opener;
+		}
+		
+		
+		if(fromDashboard == 1){
+			
+			if(isFixSocialMedia == 1 && isManual == "true"){
+				parentWindow.fixSocialMediaResponse(columnName, columnValue);
+			}else{
+				parentWindow.$('#overlay-main').hide();
+			}
+			
+			parentWindow.fixSocialMediaResponse(columnName, columnValue);
+			parentWindow.showDashboardButtons(columnName, columnValue);
+		}
+		else if(restful != "1"){
+			if (flow == "registration") {
+				var payload = {
+					'socialNetwork' : "linkedin"
+				};
+				fetchSocialProfileUrl(payload, function(data) {
+					parentWindow.showLinkedInProfileUrl(data);
+					parentWindow.showProfileLink("linkedin", data);
+				});
+			}
+			else {
+				var payload = {
+					'socialNetwork' : socialNetwork
+				};
+				fetchSocialProfileUrl(payload, function(data) {
+					if(data.statusText == 'OK'){
+					//	parentWindow.loadSocialMediaUrlInSettingsPage();
+						//parentWindow.showProfileLink("${socialNetwork}", data.responseText);
+						parentWindow.showProfileLinkInEditProfilePage(socialNetwork , data.responseText);					
+					}
+				});
+			}
+		}
+	}
+}
