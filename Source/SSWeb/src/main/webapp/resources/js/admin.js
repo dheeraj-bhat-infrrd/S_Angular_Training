@@ -578,8 +578,8 @@ function confirmDeleteSSAdmin(ssAdminId){
 	$('#overlay-continue').show();
 	$('#overlay-continue').html("Delete");
 	$('#overlay-cancel').html("Cancel");
-	$('#overlay-header').html("Delete Social Survey Admin");
-	$('#overlay-text').html("Are you sure you want to delete the Social Survey admin ?");
+	$('#overlay-header').html("Delete SocialSurvey Admin");
+	$('#overlay-text').html("Are you sure you want to delete the SocialSurvey admin ?");
 	$('#overlay-continue').attr("onclick", "deleteSSAdmin('" + ssAdminId + "');");
 }
 
