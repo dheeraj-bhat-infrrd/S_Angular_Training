@@ -54,16 +54,20 @@ public class SurveyInvitationEmailDaoImpl extends GenericReportingDaoImpl<Survey
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Object[]> getSurveyInvitationEmailReportForAllTime(long companyId, int month, int year) {
-		String queryString = "select imc.agent_name,imc.agent_email,b.BRANCH,r.REGION,"
-				+ "sum(imc.received),sum(imc.attempted_count),sum(imc.delivered),sum(imc.bounced),"
-				+ "sum(imc.deffered),sum(imc.opened),sum(imc.link_clicked),sum(imc.dropped),imc.month,imc.year "
-				+ "from invitation_mail_count_month imc "
-				+ "inner join company c on imc.company_id=c.company_id "
-				+ "inner join user_profile up on imc.agent_id=up.user_id and up.status = 1 "
-				+ "left join branch b on up.branch_id = b.branch_id and b.IS_DEFAULT_BY_SYSTEM=0 "
-				+ "left join region r on up.region_id = r.region_id and r.IS_DEFAULT_BY_SYSTEM=0 "
-				+ "where imc.month in (0, :month ) and imc.year in (0, :year ) and imc.company_id=:companyId "
-				+ "group by imc.agent_id order by imc.agent_name";
+		String queryString = "select u.agent_name,u.agent_email,b.BRANCH,r.REGION,u.received,"
+				+ "u.attempted_count,u.delivered,u.bounced,u.deffered,u.opened,u.link_clicked,"
+				+ "u.dropped,u.month,u.year from  user_profile up "
+				+ "inner join (select imc.agent_id,imc.agent_name,imc.agent_email,"
+				+ "sum(imc.received) as received,sum(imc.attempted_count) as attempted_count,"
+				+ "sum(imc.delivered) as delivered,sum(imc.bounced) as bounced,sum(imc.deffered) as deffered,"
+				+ "sum(imc.opened) as opened,sum(imc.link_clicked) as link_clicked,sum(imc.dropped) as dropped,"
+				+ "imc.month,imc.year from invitation_mail_count_month imc "
+				+ "inner join company c on imc.company_id=c.company_id where imc.month in (0, :month ) "
+				+ "and imc.year in (0, :year ) and imc.company_id=:companyId group by imc.agent_id "
+				+ "order by imc.agent_name) as u on up.user_id=u.agent_id and up.STATUS=1 and "
+				+ "up.PROFILES_MASTER_ID=4 left join branch b on up.branch_id = b.branch_id "
+				+ "and b.IS_DEFAULT_BY_SYSTEM=0 left join region r on up.region_id = r.region_id "
+				+ "and r.IS_DEFAULT_BY_SYSTEM=0 order by u.agent_name";
 		
 		SQLQuery query = getSession().createSQLQuery(queryString);
 		query.setInteger("month", month)
