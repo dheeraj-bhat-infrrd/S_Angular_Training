@@ -115,6 +115,9 @@
 	<div id="monitor-list-container" class="dash-container container mon-type-container zero-padding">
 		
 	</div>
+	<div  id="empty-monitors" class="hide dash-container container mon-type-container zero-padding">
+		<span class="incomplete-trans-span stream-alert">No monitors found.</span>
+	</div>
 </div>
 
 <script>

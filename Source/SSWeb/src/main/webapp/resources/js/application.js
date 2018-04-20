@@ -16707,12 +16707,30 @@ function getMonitors(text){
 		success : function(response) {
 			var monitorData = response.filterKeywords;
 			drawMonitorList(monitorData);
+			
+			if(monitorData != undefined && monitorData != null){
+				if(monitorData.length > 0){
+					$('#empty-monitors').addClass('hide');
+					$('#monitor-list-container').removeClass('hide');
+					drawStreamPage(streamPostList);
+				}else{
+					$('#empty-monitors').removeClass('hide');
+					$('#monitor-list-container').addClass('hide');
+				}
+			}else{
+				$('#empty-monitors').removeClass('hide');
+				$('#monitor-list-container').addClass('hide');
+			}
 		},
 		error : function(e){
 			if (e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
+			$('#empty-monitors').removeClass('hide');
+			$('#monitor-list-container').addClass('hide');
+			$('#overlay-toast').html('Unable to fetch monitors.');
+			showToast();
 		}
 	});
 }
@@ -16902,6 +16920,8 @@ function getMacros(text){
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
+			$('#overlay-toast').html('Unable to fetch macros.');
+			showToast();
 		}
 	});
 }
@@ -17217,6 +17237,11 @@ function getStreamPosts(startIndex,status,flag,text){
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
+			hideDashOverlay('#stream-dash');
+			$('#empty-stream').removeClass('hide');
+			$('#stream-posts').addClass('hide');
+			$('#overlay-toast').html('Unable to fetch posts.');
+			showToast();
 		}
 	});
 }
@@ -17238,6 +17263,8 @@ function getMacrosForStream(){
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
+			$('#overlay-toast').html('Unable to fetch macros.');
+			showToast();
 		}
 	});
 }
@@ -18616,7 +18643,8 @@ function callFormAjaxPostForSocMon(url,disableEle,formId){
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
-			redirectErrorpage();
+			$("#overlay-toast").html("Failed to update posts. Please Try again");
+			showToast();
 		}
 	});
 }
@@ -19317,7 +19345,6 @@ function drawDuplicatePopup(){
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
-			redirectErrorpage();
 		}
 	});
 }
@@ -19918,6 +19945,58 @@ $(document).on('click','.stream-feed-type',function(e){
 	}
 });
 
+function getFeedTypes(){
+		$.ajax({
+			url : "/getfeedsbycompanyid.do",
+			type : "GET",
+			cache : false,
+			dataType : "json",
+			success : function(response) {
+				var feedData = response;
+				checkFeedTypes(feedData);
+			},
+			error : function(e){
+				if (e.status == 504) {
+					redirectToLoginPageOnSessionTimeOut(e.status);
+					return;
+				}
+			}
+		});
+}
+
+function checkFeedTypes(feedData){
+	
+	var feedTypes = [];
+	if(feedData.facebook == true || feedData.facebook == 'true'){
+		$('#feed-facebook').removeClass('hide');
+		feedTypes.push("FACEBOOK");
+	}
+	
+	if(feedData.twitter == true || feedData.twitter == 'true'){
+		$('#feed-twitter').removeClass('hide');
+		feedTypes.push("TWITTER");
+	}
+	
+	if(feedData.linkedin == true || feedData.linkedin == 'true'){
+		$('#feed-linkedin').removeClass('hide');
+		feedTypes.push("LINKEDIN");
+	}
+	
+	if(feedData.instagram == true || feedData.instagram == 'true'){
+		$('#feed-instagram').removeClass('hide');
+		feedTypes.push("INSTAGRAM");
+	}
+	
+	if(feedTypes.length == 0){
+		$('#feed-data').data('feeds',feedTypes);
+		$('#stream-feed-count').html(0);
+		$('#feed-empty').removeClass('hide');
+		$('#stream-feed-dropdown-options').css('width',$('#stream-feed-dropdown').css('width'))
+	}else{
+		$('#feed-data').data('feeds',feedTypes);
+		$('#stream-feed-count').html(feedTypes.length);
+	}
+}
 
 $('body').on('blur', '#user-notification-recipients', function() {
 	
