@@ -82,7 +82,7 @@ $(document).ready(function() {
 		radioButtonDiv.append('<input type="radio" name="pageselection" value="${loop.index}"/>'+"${fn:escapeXml(page.name)}"+" <br/>");
 	</c:forEach>
 	$("#page").append(radioButtonDiv);
-	
+
 	var saveButton= $("<div class='reg_btn'>save</div>");
 	var warnText = $("<div>No connected instagram accounts</div>")
 	<c:if test="${not empty pageNames}">

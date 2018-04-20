@@ -55,21 +55,21 @@ public class SettingsSetterDaoImpl extends GenericDaoImpl<SettingsDetails, Long>
             scoreList = query.list();
             for ( Object[] row : scoreList ) {
                 SettingsDetails companySettingsDetails = new SettingsDetails();
-                companySettingsDetails.setSetSettingsHolder( Long.valueOf( String.valueOf( row[0] ) ) );
+                companySettingsDetails.setSetSettingsHolder( Double.valueOf( String.valueOf( row[0] ) ) );
                 companySettingsDetails.setLockSettingsHolder( Long.valueOf( String.valueOf( row[1] ) ) );
                 SettingsDetails regionSettingsDetails = null;
                 if ( row.length > 2 && row.length <= 4 ) {
                     regionSettingsDetails = new SettingsDetails();
-                    regionSettingsDetails.setSetSettingsHolder( Long.valueOf( String.valueOf( row[2] ) ) );
+                    regionSettingsDetails.setSetSettingsHolder( Double.valueOf( String.valueOf( row[2] ) ) );
                     regionSettingsDetails.setLockSettingsHolder( Long.valueOf( String.valueOf( row[3] ) ) );
                 }
                 SettingsDetails branchSettingsDetails = null;
                 if ( row.length > 4 ) {
                     regionSettingsDetails = new SettingsDetails();
-                    regionSettingsDetails.setSetSettingsHolder( Long.valueOf( String.valueOf( row[2] ) ) );
+                    regionSettingsDetails.setSetSettingsHolder( Double.valueOf( String.valueOf( row[2] ) ) );
                     regionSettingsDetails.setLockSettingsHolder( Long.valueOf( String.valueOf( row[3] ) ) );
                     branchSettingsDetails = new SettingsDetails();
-                    branchSettingsDetails.setSetSettingsHolder( Long.valueOf( String.valueOf( row[4] ) ) );
+                    branchSettingsDetails.setSetSettingsHolder( Double.valueOf( String.valueOf( row[4] ) ) );
                     branchSettingsDetails.setLockSettingsHolder( Long.valueOf( String.valueOf( row[5] ) ) );
                 }
                 scoreListObject.add( companySettingsDetails );
