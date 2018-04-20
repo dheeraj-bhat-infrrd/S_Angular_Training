@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.annotation.Resource;
@@ -26,12 +27,14 @@ import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialFeedDaoImpl;
 import com.realtech.socialsurvey.core.entities.ActionHistory;
+import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SegmentsEntity;
 import com.realtech.socialsurvey.core.entities.SegmentsVO;
 import com.realtech.socialsurvey.core.entities.SocialFeedActionResponse;
 import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
 import com.realtech.socialsurvey.core.entities.SocialMonitorFeedData;
+import com.realtech.socialsurvey.core.entities.SocialMonitorFeedTypeVO;
 import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
 import com.realtech.socialsurvey.core.entities.SocialMonitorResponseData;
 import com.realtech.socialsurvey.core.entities.SocialMonitorUsersVO;
@@ -553,6 +556,173 @@ public class SocialFeedServiceImpl implements SocialFeedService
             }
         }
         return socialFeedsActionUpdate;
+    }
+
+
+    @Override
+    public SocialMonitorFeedTypeVO getFeedTypesByCompanyId( Long companyId ) throws InvalidInputException
+    {
+        LOG.debug( "Fetching feedtypes for companyId {}", companyId );
+        if ( companyId <= 0 ) {
+            LOG.error( "Invalid companyId" );
+            throw new InvalidInputException( "Invalid companyId" );
+        }
+        SocialMonitorFeedTypeVO socialMonitorFeedTypeVO = new SocialMonitorFeedTypeVO();
+        List<Long> companyIds = new ArrayList<>();
+        List<Long> regionIds = regionDao.getRegionIdsOfCompany( companyId );
+        List<Long> branchIds = branchDao.getBranchIdsOfCompany( companyId );
+        Set<Long> agentIds = userDao.getActiveUserIdsForCompany( companyDao.findById( Company.class, companyId ) );
+        List<Long> agentIdsList = new ArrayList<>();
+        agentIdsList.addAll( agentIds );
+        companyIds.add( companyId );
+
+        boolean facebookFlag = isFbTokenPresent( companyIds, regionIds, branchIds, agentIdsList );
+        boolean twitterFlag = isTwitterTokenPresent( companyIds, regionIds, branchIds, agentIdsList );
+        boolean linkedinFlag = isLinkedinTokenPresent( companyIds, regionIds, branchIds, agentIdsList );
+        boolean instagramFlag = isInstagramTokenPresent( companyIds, regionIds, branchIds, agentIdsList );
+
+        socialMonitorFeedTypeVO.setFacebook( facebookFlag );
+        socialMonitorFeedTypeVO.setInstagram( instagramFlag );
+        socialMonitorFeedTypeVO.setTwitter( twitterFlag );
+        socialMonitorFeedTypeVO.setLinkedin( linkedinFlag );
+        return socialMonitorFeedTypeVO;
+    }
+
+
+    public boolean isFbTokenPresent( List<Long> companyIds, List<Long> regionIds, List<Long> branchIds,
+        List<Long> agentIdsList )
+    {
+        boolean facebookFlag = false;
+        long facebookCount = 0;
+
+        facebookCount = mongoSocialFeedDao.fetchFacebookTokenCount( agentIdsList, CommonConstants.AGENT_SETTINGS_COLLECTION );
+        if ( facebookCount > 0 ) {
+            facebookFlag = true;
+        }
+        if ( !facebookFlag ) {
+            facebookCount = mongoSocialFeedDao.fetchFacebookTokenCount( branchIds, CommonConstants.BRANCH_SETTINGS_COLLECTION );
+            if ( facebookCount > 0 ) {
+                facebookFlag = true;
+            }
+        }
+        if ( !facebookFlag ) {
+            facebookCount = mongoSocialFeedDao.fetchFacebookTokenCount( regionIds, CommonConstants.REGION_SETTINGS_COLLECTION );
+            if ( facebookCount > 0 ) {
+                facebookFlag = true;
+            }
+        }
+        if ( !facebookFlag ) {
+            facebookCount = mongoSocialFeedDao.fetchFacebookTokenCount( companyIds,
+                CommonConstants.COMPANY_SETTINGS_COLLECTION );
+            if ( facebookCount > 0 ) {
+                facebookFlag = true;
+            }
+        }
+
+        return facebookFlag;
+    }
+
+
+    public boolean isTwitterTokenPresent( List<Long> companyIds, List<Long> regionIds, List<Long> branchIds,
+        List<Long> agentIdsList )
+    {
+        boolean twitterFlag = false;
+        long twitterCount = 0;
+
+        twitterCount = mongoSocialFeedDao.fetchTwitterTokenCount( agentIdsList, CommonConstants.AGENT_SETTINGS_COLLECTION );
+        if ( twitterCount > 0 ) {
+            twitterFlag = true;
+        }
+        if ( !twitterFlag ) {
+            twitterCount = mongoSocialFeedDao.fetchTwitterTokenCount( branchIds, CommonConstants.BRANCH_SETTINGS_COLLECTION );
+            if ( twitterCount > 0 ) {
+                twitterFlag = true;
+            }
+        }
+        if ( !twitterFlag ) {
+            twitterCount = mongoSocialFeedDao.fetchTwitterTokenCount( regionIds, CommonConstants.REGION_SETTINGS_COLLECTION );
+            if ( twitterCount > 0 ) {
+                twitterFlag = true;
+            }
+        }
+        if ( !twitterFlag ) {
+            twitterCount = mongoSocialFeedDao.fetchTwitterTokenCount( companyIds, CommonConstants.COMPANY_SETTINGS_COLLECTION );
+            if ( twitterCount > 0 ) {
+                twitterFlag = true;
+            }
+        }
+
+        return twitterFlag;
+    }
+
+
+    public boolean isLinkedinTokenPresent( List<Long> companyIds, List<Long> regionIds, List<Long> branchIds,
+        List<Long> agentIdsList )
+    {
+        boolean linkedinFlag = false;
+        long linkedinCount = 0;
+
+        linkedinCount = mongoSocialFeedDao.fetchLinkedinTokenCount( agentIdsList, CommonConstants.AGENT_SETTINGS_COLLECTION );
+        if ( linkedinCount > 0 ) {
+            linkedinFlag = true;
+        }
+        if ( !linkedinFlag ) {
+            linkedinCount = mongoSocialFeedDao.fetchLinkedinTokenCount( branchIds, CommonConstants.BRANCH_SETTINGS_COLLECTION );
+            if ( linkedinCount > 0 ) {
+                linkedinFlag = true;
+            }
+        }
+        if ( !linkedinFlag ) {
+            linkedinCount = mongoSocialFeedDao.fetchLinkedinTokenCount( regionIds, CommonConstants.REGION_SETTINGS_COLLECTION );
+            if ( linkedinCount > 0 ) {
+                linkedinFlag = true;
+            }
+        }
+        if ( !linkedinFlag ) {
+            linkedinCount = mongoSocialFeedDao.fetchLinkedinTokenCount( companyIds,
+                CommonConstants.COMPANY_SETTINGS_COLLECTION );
+            if ( linkedinCount > 0 ) {
+                linkedinFlag = true;
+            }
+        }
+
+        return linkedinFlag;
+    }
+
+
+    public boolean isInstagramTokenPresent( List<Long> companyIds, List<Long> regionIds, List<Long> branchIds,
+        List<Long> agentIdsList )
+    {
+        boolean instagramFlag = false;
+        long instagramCount = 0;
+
+        instagramCount = mongoSocialFeedDao.fetchInstagramTokenCount( agentIdsList, CommonConstants.AGENT_SETTINGS_COLLECTION );
+        if ( instagramCount > 0 ) {
+            instagramFlag = true;
+        }
+        if ( !instagramFlag ) {
+            instagramCount = mongoSocialFeedDao.fetchInstagramTokenCount( branchIds,
+                CommonConstants.BRANCH_SETTINGS_COLLECTION );
+            if ( instagramCount > 0 ) {
+                instagramFlag = true;
+            }
+        }
+        if ( !instagramFlag ) {
+            instagramCount = mongoSocialFeedDao.fetchInstagramTokenCount( regionIds,
+                CommonConstants.REGION_SETTINGS_COLLECTION );
+            if ( instagramCount > 0 ) {
+                instagramFlag = true;
+            }
+        }
+        if ( !instagramFlag ) {
+            instagramCount = mongoSocialFeedDao.fetchInstagramTokenCount( companyIds,
+                CommonConstants.COMPANY_SETTINGS_COLLECTION );
+            if ( instagramCount > 0 ) {
+                instagramFlag = true;
+            }
+        }
+
+        return instagramFlag;
     }
 
 

@@ -5,6 +5,7 @@ import java.util.List;
 import com.realtech.socialsurvey.core.entities.SegmentsVO;
 import com.realtech.socialsurvey.core.entities.SocialFeedActionResponse;
 import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
+import com.realtech.socialsurvey.core.entities.SocialMonitorFeedTypeVO;
 import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
 import com.realtech.socialsurvey.core.entities.SocialMonitorResponseData;
 import com.realtech.socialsurvey.core.entities.SocialMonitorUsersVO;
@@ -103,6 +104,15 @@ public interface SocialFeedService
      * Hits StreamApi to queue failed social feeds
      */
     public void retryFailedSocialFeeds();
-
+    
+    /**
+     * Fetches all the feedtypes for a company
+     * @param companyId
+     * @return
+     * @throws InvalidInputException
+     * @throws ProfileNotFoundException
+     */
+    public SocialMonitorFeedTypeVO getFeedTypesByCompanyId(Long companyId) throws InvalidInputException;
+   
     
 }

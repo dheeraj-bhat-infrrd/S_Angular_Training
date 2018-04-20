@@ -40,5 +40,15 @@ public interface MongoSocialFeedDao
 	
 	public OrganizationUnitSettings getProfileImageUrl(long iden, String collectionName);
 	
+	public long fetchFacebookTokenCount(List<Long> ids, String collectioName);
+	
+	public long fetchTwitterTokenCount(List<Long> ids, String collectioName);
+	
+	public long fetchLinkedinTokenCount(List<Long> ids, String collectioName);
+	
+	public long fetchInstagramTokenCount(List<Long> ids, String collectioName);
+	
+	
+	
 
 }
