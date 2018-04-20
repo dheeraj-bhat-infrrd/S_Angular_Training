@@ -553,7 +553,7 @@ public class OrganizationManagementController
                 LOG.debug( "Unlocking the logo" );
                 try {
                     if ( settingsLocker.isSettingsValueLocked( OrganizationUnit.COMPANY,
-                        Long.parseLong( user.getCompany().getSettingsLockStatus() ), SettingsForApplication.LOGO ) ) {
+                        Double.parseDouble( user.getCompany().getSettingsLockStatus() ), SettingsForApplication.LOGO ) ) {
                         settingsLocker.lockSettingsValueForCompany( user.getCompany(), SettingsForApplication.LOGO, false );
                     }
                 } catch ( InvalidSettingsStateException e ) {

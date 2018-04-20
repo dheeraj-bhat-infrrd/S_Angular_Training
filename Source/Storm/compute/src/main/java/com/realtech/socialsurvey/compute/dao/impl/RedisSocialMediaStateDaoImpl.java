@@ -146,7 +146,7 @@ public class RedisSocialMediaStateDaoImpl implements RedisSocialMediaStateDao, S
     public String getLastFetched( String key )
     {
 
-        try ( Jedis jedis = RedisDB.getPoolInstance().getResource(); ) {
+        try ( Jedis jedis = RedisDB.getPoolInstance().getResource() ) {
             LOG.info( "Executing method getLastFetched {}", key );
             // Return all keywords 
             return jedis.hget( key, RedisKeyConstants.CURRENT );
@@ -160,7 +160,7 @@ public class RedisSocialMediaStateDaoImpl implements RedisSocialMediaStateDao, S
     @Override
     public boolean waitForNextFetch()
     {
-        try ( Jedis jedis = RedisDB.getPoolInstance().getResource(); ) {
+        try ( Jedis jedis = RedisDB.getPoolInstance().getResource() ) {
 
             if ( jedis.exists( RedisKeyConstants.WAIT_FOR_NEXT_FETCH ) || jedis.exists( RedisKeyConstants.IS_KAFKA_DOWN ) ) {
                 return true;
@@ -179,7 +179,7 @@ public class RedisSocialMediaStateDaoImpl implements RedisSocialMediaStateDao, S
     public boolean addWithExpire( String key, String value, int seconds )
     {
         LOG.info( "Executing method getLastFetched addWithExpire" );
-        try ( Jedis jedis = RedisDB.getPoolInstance().getResource(); ) {
+        try ( Jedis jedis = RedisDB.getPoolInstance().getResource() ) {
             jedis.setex( key, seconds, value );
             return false;
         }
@@ -193,7 +193,7 @@ public class RedisSocialMediaStateDaoImpl implements RedisSocialMediaStateDao, S
     public long getTTLForKey( String key )
     {
         LOG.info( "Executing method getLastFetched getTTLForKey" );
-        try ( Jedis jedis = RedisDB.getPoolInstance().getResource(); ) {
+        try ( Jedis jedis = RedisDB.getPoolInstance().getResource() ) {
             return jedis.ttl( key );
         }
     }

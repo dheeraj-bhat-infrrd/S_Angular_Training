@@ -25,6 +25,7 @@ public class UrlHelper
 
     private static final String URL_REGEX_FOR_TWITTER_PAGE_ID = "(?:https?:\\/\\/)?(?:www\\.)?twitter\\.com\\/(?:(?:\\w)*#!\\/)?(?:pages\\/)?(?:groups\\/)?(?:[\\w\\-]*\\/)*?(\\/)?([^/?]*)";
 
+    private static final String URL_REGEX_FOR_INSTAGRAM_PAGE_ID= "(?:https?:\\/\\/)?(?:www\\.)?instagram\\.com\\/(?:(?:\\w)*#!\\/)?(?:pages\\/)?(?:groups\\/)?(?:[\\w\\-]*\\/)*?(\\/)?([^/?]*)";
 
     // private constructor to avoid instantiation
     private UrlHelper()
@@ -104,5 +105,15 @@ public class UrlHelper
      */
     public static String getLinkedinPageIdFromURL(String url){
         return getPageIdFromURL(url, URL_REGEX_FOR_LINKEDIN_PAGE_ID);
+    }
+
+
+    /**
+     * Get instagram page id from linkedin page URL
+     * @param url
+     * @return
+     */
+    public static String getInstagramPageIdFromURL(String url) {
+        return getPageIdFromURL( url, URL_REGEX_FOR_INSTAGRAM_PAGE_ID );
     }
 }

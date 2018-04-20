@@ -33,12 +33,12 @@ public class SettingsManagerImpl implements SettingsManager
 
 
     @Override
-    public Map<String, Long> calculateSettingsScore( List<SettingsDetails> settingsDetailsList )
+    public Map<String, Double> calculateSettingsScore( List<SettingsDetails> settingsDetailsList )
     {
         LOG.debug( "Inside method calcualteSettingsScore " );
-        long lockScore = 0;
-        long setScore = 0;
-        Map<String, Long> map = new HashMap<String, Long>();
+        double lockScore = 0;
+        double setScore = 0;
+        Map<String, Double> map = new HashMap<>();
         for ( SettingsDetails settingsDetails : settingsDetailsList ) {
             lockScore = lockScore + settingsDetails.getLockSettingsHolder();
             setScore = setScore + settingsDetails.getSetSettingsHolder();
