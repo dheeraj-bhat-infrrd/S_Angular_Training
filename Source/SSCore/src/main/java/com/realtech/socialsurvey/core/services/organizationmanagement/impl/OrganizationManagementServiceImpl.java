@@ -9219,15 +9219,18 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException
     {
         LOG.debug( "sending user adition mail" );
-        
-        if( adminUser == null || user == null ) {
+
+        if ( adminUser == null || user == null ) {
             LOG.warn( "user details not specified for user addition mail" );
-            throw new InvalidInputException( "user details not specified for user addition mail" );  
+            throw new InvalidInputException( "user details not specified for user addition mail" );
         }
-        
-        if(user.getCompany() == null)
-        		return;
-        
+
+
+        if ( user.getCompany() == null ) {
+            LOG.warn( "User added, is not associated with a company" );
+            return;
+        }
+
         OrganizationUnitSettings companySettings = getCompanySettings( user.getCompany().getCompanyId() );
 
         if ( companySettings == null || companySettings.getUserAddDeleteNotificationRecipients() == null
@@ -9255,15 +9258,20 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException
     {
         LOG.debug( "sending user deletion mail" );
-        
-        if( adminUser == null || user == null ) {
+
+        if ( adminUser == null || user == null ) {
             LOG.warn( "user details not specified for user deletion mail" );
-            throw new InvalidInputException( "user details not specified for user deletion mail" );  
+            throw new InvalidInputException( "user details not specified for user deletion mail" );
         }
         
+        if ( user.getCompany() == null ) {
+            LOG.warn( "User to be deleted, is not associated with a company" );
+            return;
+        }
+
         OrganizationUnitSettings companySettings = getCompanySettings( user.getCompany().getCompanyId() );
 
-        if ( companySettings.getUserAddDeleteNotificationRecipients() == null
+        if ( companySettings == null || companySettings.getUserAddDeleteNotificationRecipients() == null
             || companySettings.getUserAddDeleteNotificationRecipients().isEmpty() ) {
             LOG.warn( "No user deletion notification mail recipient found" );
             return;
