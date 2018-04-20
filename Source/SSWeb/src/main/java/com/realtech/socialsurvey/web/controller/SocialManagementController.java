@@ -2882,10 +2882,10 @@ public class SocialManagementController
     }
     
     private Boolean checkForExistiongProfile(OrganizationUnitSettings unitSettings) {
-        if(unitSettings != null 
-            && ( unitSettings.getSocialMediaTokens() == null 
+        if(unitSettings != null
+            && ( unitSettings.getSocialMediaTokens() == null
             || unitSettings.getSocialMediaTokens().getZillowToken() == null )) {
-            return false; 
+            return false;
             //"no-zillow"
         } else {
             return true;

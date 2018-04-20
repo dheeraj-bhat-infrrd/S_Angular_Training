@@ -192,11 +192,11 @@ public class SocialMonitorWebController {
 		    if(monitorTypeNumVal>1) {
 		        
 		        multiplePhrasesVOList.add( new MultiplePhrasesVO() );
-		        multiplePhrasesVOList.get(0).setPhrases( keyphraseList );;
-		        multiplePhrasesVOList.get(0).setMonitorType(MonitorType.KEYWORD_MONITOR);
+		        multiplePhrasesVOList.get(0).setPhrases( keyphraseList );
+                multiplePhrasesVOList.get(0).setMonitorType(MonitorType.KEYWORD_MONITOR);
 		        
 		        multiplePhrasesVOList.add( new MultiplePhrasesVO() );
-                multiplePhrasesVOList.get(1).setPhrases( keyphraseList );;
+                multiplePhrasesVOList.get(1).setPhrases( keyphraseList );
                 multiplePhrasesVOList.get(1).setMonitorType(MonitorType.GOOGLE_ALERTS);
                 
 		    }else{
