@@ -1570,11 +1570,11 @@ public interface CommonConstants
     public static final String INVALID_CAPTCHA = "invalidCaptcha";
     
     //trnsaction monitor alert type
-    public static final String ALERT_TYPE_ERROR = "error";    
+    public static final String ALERT_TYPE_ERROR = "error";
     public static final String ALERT_TYPE_WARNING = "warning";
-    public static final String ALERT_TYPE_NORMAL = "normal"; 
+    public static final String ALERT_TYPE_NORMAL = "normal";
 
-    public static final String COMMA_SEPERATOR_PATTERN = "\\s*,\\s*"; 
+    public static final String COMMA_SEPERATOR_PATTERN = "\\s*,\\s*";
  
 
     //JobLogDetails

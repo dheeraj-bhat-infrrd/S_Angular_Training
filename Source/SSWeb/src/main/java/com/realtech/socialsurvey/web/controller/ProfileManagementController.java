@@ -904,7 +904,6 @@ public class ProfileManagementController
             case "web-address-work-lock":
                 if ( !parentLock.getIsWebAddressLocked() ) {
                     lockSettings.setWebAddressLocked( status );
-                    ;
                 }
                 break;
             case "web-address-blogs-lock":
@@ -2172,7 +2171,7 @@ public class ProfileManagementController
             }
 
             boolean isWorkEmailLockedByCompany = settingsLocker.isSettingsValueLocked( OrganizationUnit.COMPANY,
-                Long.parseLong( user.getCompany().getSettingsLockStatus() ), SettingsForApplication.EMAIL_ID_WORK );
+                Double.parseDouble( user.getCompany().getSettingsLockStatus() ), SettingsForApplication.EMAIL_ID_WORK );
 
             ContactDetailsSettings sessionContactDetail = profileSettings.getContact_details();
 

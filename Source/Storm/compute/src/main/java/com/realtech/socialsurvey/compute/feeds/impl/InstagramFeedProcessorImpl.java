@@ -59,14 +59,14 @@ public class InstagramFeedProcessorImpl implements InstagramFeedProcessor {
         ConnectedInstagramAccount instagramAccount;
         InstagramTokenForSM igToken = mediaToken.getSocialMediaTokens().getInstagramToken();
 
-        String pageId = UrlHelper.getFacebookPageIdFromURL( igToken.getPageLink() );
+        String pageId = UrlHelper.getInstagramPageIdFromURL( igToken.getPageLink() );
         String lastFetchedKey = "IG_" + mediaToken.getProfileType().toString() + "_" + mediaToken.getIden() + "_" + pageId;
 
         String lastFetchedIgId = redisSocialMediaStateDao.getLastFetched( lastFetchedKey );
 
         if(lastFetchedIgId == null || lastFetchedIgId.isEmpty() ){
             //run the extractor for the first time so get latest 50 records
-            instagramAccount = fetchFeeds( pageId, igToken.getAccessTokenToPost() );
+            instagramAccount = fetchFeeds( igToken.getId(), igToken.getAccessTokenToPost() );
             if ( instagramAccount != null && instagramAccount.getMedia() != null){
                 instagramMediaData.addAll(instagramAccount.getMedia().getData());
                 //save the first record in the redis
@@ -74,7 +74,7 @@ public class InstagramFeedProcessorImpl implements InstagramFeedProcessor {
             }
         } else{
             //Get all the feeds until we encounter the lastFetchedIgId
-            instagramAccount = fetchFeeds( pageId, igToken.getAccessTokenToPost() );
+            instagramAccount = fetchFeeds( igToken.getId(), igToken.getAccessTokenToPost() );
             if( instagramAccount != null){
                 instagramMedia = instagramAccount.getMedia();
                 instagramMediaData.addAll(addInstagramMedia(instagramMedia, lastFetchedIgId));

@@ -54,7 +54,7 @@ public interface SettingsLocker {
 	 * @param settings
 	 * @return
 	 */
-	public boolean isSettingsValueLocked(OrganizationUnit organizationUnit, long currentLockValue, SettingsForApplication settings);
+	public boolean isSettingsValueLocked(OrganizationUnit organizationUnit, Double currentLockValue, SettingsForApplication settings);
 
 	/**
 	 * Checks the settings lock status
