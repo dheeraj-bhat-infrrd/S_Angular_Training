@@ -44,7 +44,7 @@
 
         <div class="footer-main-wrapper">
             <div class="container text-center footer-text">
-                Copyright &copy; Social Survey <span class="center-dot">.</span> All Rights Reserved.
+                Copyright &copy; SocialSurvey <span class="center-dot">.</span> All Rights Reserved.
             </div>
         </div>
     </div>
