@@ -144,7 +144,7 @@ $(document).ready(function() {
 			}
 		});
     });
-});
+	
 	var isFixSocialMedia ="${isFixSocialMedia}";
 	var isNewUser = "${isNewUser}";
 	var fromDashboard = "${fromDashboard}";
