@@ -8,6 +8,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -326,11 +327,12 @@ public class ReportingWebController
         
         //get detail of expire social media
         boolean isSocialMediaExpired = false;
-        if ( !organizationManagementService.getExpiredSocailMedia( entityType, entityId ).isEmpty() ) {
+        List<String> expiredSocialMediaList = organizationManagementService.getExpiredSocailMedia( entityType, entityId );
+        if ( !expiredSocialMediaList.isEmpty() ) {
             isSocialMediaExpired = true;
         }
         session.setAttribute( "isSocialMediaExpired", isSocialMediaExpired );
-        
+        session.setAttribute( "expiredSocialMediaList", new Gson().toJson( expiredSocialMediaList )   );
 
         //Get the hierarchy details associated with the current profile get all the id's like companyId, regionId , branchId
         try {

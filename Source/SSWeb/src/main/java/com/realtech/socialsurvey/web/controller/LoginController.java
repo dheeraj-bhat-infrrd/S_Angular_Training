@@ -189,9 +189,12 @@ public class LoginController
     {
         LOG.info( "Login Page started" );
 
-        User user = sessionHelper.getCurrentUser();
         HttpSession session = request.getSession( false );
+        User user = sessionHelper.getCurrentUser();
         
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+
         boolean hiddenSection = false;
         try {
             OrganizationUnitSettings settings = organizationManagementService
@@ -209,8 +212,25 @@ public class LoginController
             }
             model.addAttribute( "isRealTechOrSSAdmin", isRealTechOrSSAdmin );
             
+            //get detail of expire social media
+            boolean isTokenRefreshRequired = false;
+            boolean isSocialMediaExpired = false;
+            List<String> socialMediaListToRefresh = null;
+            if ( entityType == CommonConstants.AGENT_ID_COLUMN || entityType == CommonConstants.COMPANY_ID_COLUMN ) {
+                socialMediaListToRefresh = organizationManagementService.validateSocailMedia( entityType, entityId );
+                if ( !socialMediaListToRefresh.isEmpty() ) {
+                    isTokenRefreshRequired = true;
+                }
+                if ( !organizationManagementService.getExpiredSocailMedia( entityType, entityId ).isEmpty() )
+                    isSocialMediaExpired = true;
+            }
+            model.addAttribute( "isSocialMediaExpired", isSocialMediaExpired );
+            model.addAttribute( "isTokenRefreshRequired", isTokenRefreshRequired );
+            model.addAttribute( "expiredSocialMediaList", new Gson().toJson( socialMediaListToRefresh ) );
         } catch ( InvalidInputException e ) {
             LOG.error( "fetching hiddensction varibale value failed." + e );
+        } catch ( NoRecordsFetchedException e ) {
+            LOG.error( "No records found while checking social media expiry.", e );
         }
 
         if ( user.isSuperAdmin() ) {

@@ -67,5 +67,7 @@ public interface GenericDao<T, ID extends Serializable> {
         String alias );
 
 	public void saveAll(List<T> entityList);
+
+    long findNumberOfRowsByCriteria( Class<T> dataClass,  Criterion... criterion);
 }
 // JIRA: SS-8: By RM05: EOC

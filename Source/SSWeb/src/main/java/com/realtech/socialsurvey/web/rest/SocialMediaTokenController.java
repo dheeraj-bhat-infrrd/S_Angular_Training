@@ -382,6 +382,8 @@ public class SocialMediaTokenController
     {
         LOG.info( "Facebook authentication url requested" );
         Map<String, String> params = null;
+        boolean isNewUser = true;
+        
         try {
             String q = request.getParameter( "q" );
             params = urlGenerator.decryptParameters( q );
@@ -389,8 +391,7 @@ public class SocialMediaTokenController
             String columnName = params.get( "columnName" );
             String columnValue = params.get( "columnValue" );
             String serverBaseUrl = params.get( "serverBaseUrl" );
-
-
+            boolean updated = false;
             // On auth error
             String errorCode = request.getParameter( "error" );
             if ( errorCode != null ) {
@@ -409,14 +410,16 @@ public class SocialMediaTokenController
             String profileLink = null;
             facebook4j.auth.AccessToken accessToken = null;
             List<FacebookPage> facebookPages = new ArrayList<>();
+            String collection = null;
 
-            String facebookOauthRedirectUrlForRequestServer = socialManagementService.getFbRedirectUrIForEmailRequest(
-                columnName, columnValue, requestUtils.getRequestServerName( request ) );
+            String facebookOauthRedirectUrlForRequestServer = socialManagementService
+                .getFbRedirectUrIForEmailRequest( columnName, columnValue, requestUtils.getRequestServerName( request ) );
             accessToken = facebook.getOAuthAccessToken( oauthCode, facebookOauthRedirectUrlForRequestServer );
             facebook4j.User fbUser = facebook.getUser( facebook.getId() );
             if ( fbUser != null ) {
-                profileLink = facebookUri +  facebook.getId() ; //fbUser.getLink().toString();
+                profileLink = facebookUri + facebook.getId(); //fbUser.getLink().toString();
                 FacebookPage personalUserAccount = new FacebookPage();
+                personalUserAccount.setId( facebook.getId() );
                 personalUserAccount.setAccessToken( accessToken.getToken() );
                 personalUserAccount.setName( fbUser.getName() );
                 personalUserAccount.setProfileUrl( profileLink );
@@ -429,23 +432,40 @@ public class SocialMediaTokenController
             OrganizationUnitSettings settings = null;
             String entityType = columnName;
             long entityId = Long.valueOf( columnValue );
-            if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) )
+            if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
                 settings = organizationManagementService.getCompanySettings( entityId );
-            else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) )
+                collection = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
+            } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 settings = organizationManagementService.getRegionSettings( entityId );
-            else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) )
+                collection = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
+            } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 settings = organizationManagementService.getBranchSettingsDefault( entityId );
-            else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) )
+                collection = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
+            } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 settings = userManagementService.getUserSettings( entityId );
+                collection = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
+            }
 
 
             if ( settings == null ) {
                 throw new InvalidInputException( "No Agent settings found in current session" );
             }
             mediaTokens = settings.getSocialMediaTokens();
-            mediaTokens = socialManagementService.updateFacebookToken( accessToken, mediaTokens, profileLink );
-            facebookPages.addAll( mediaTokens.getFacebookToken().getFacebookPages() );
-
+            facebookPages.addAll( socialManagementService.getFacebookPages( accessToken, profileLink ) );
+            
+            for ( FacebookPage currentFbPage : facebookPages ) {
+                if ( currentFbPage.getProfileUrl()
+                    .equalsIgnoreCase( settings.getSocialMediaTokens().getFacebookToken().getFacebookPageLink() ) ) {
+                    mediaTokens = socialManagementService.updateFacebookPages( accessToken, mediaTokens, facebookPages );
+                    mediaTokens = socialManagementService.updateFacebookPagesInMongo( collection, settings.getIden(), mediaTokens );
+                    socialManagementService.updateFacebookTokenAndSave( currentFbPage.getAccessToken(), mediaTokens,
+                        currentFbPage.getProfileUrl(), collection, settings );
+                    isNewUser = false;
+                    updated = true;
+                    break;
+                }
+            }
+            
             String mediaTokensStr = new Gson().toJson( mediaTokens, SocialMediaTokens.class );
             model.addAttribute( "mediaTokens", mediaTokensStr );
 
@@ -455,20 +475,32 @@ public class SocialMediaTokenController
             model.addAttribute( "fbAccessToken", fbAccessTokenStr );
             model.addAttribute( "columnName", columnName );
             model.addAttribute( "columnValue", columnValue );
-
+            
+            if ( !isNewUser && !updated ) {
+                throw new InvalidInputException( "Invalid input exception occurred while saving access token for facebook",
+                    DisplayMessageConstants.GENERAL_ERROR );
+            }
+                        
         } catch ( Exception e ) {
-            LOG.error( "Exception while getting facebook access token. Reason : " + e.getMessage(), e );
+            
+            LOG.error( "Exception while getting facebook access token. Reason : " + e.getMessage(), e );    
+                        
             return JspResolver.SOCIAL_AUTH_MSG_FOR_EMAIL;
         }
 
+
         // Updating attributes
-        model.addAttribute( CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES );
+        model.addAttribute( CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.NO );
         model.addAttribute( "socialNetwork", "facebook" );
-        LOG.info( "Facebook Access tokens obtained and added to mongo successfully!" );
-        return JspResolver.FACEBOOK_TOKEN_EMAIL_UPDATE;
+        model.addAttribute( "isNewUser", isNewUser );
+        
+        if(!isNewUser) {
+            model.addAttribute( CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES );
+            LOG.info( "Facebook Access tokens obtained and added to mongo successfully!" );
+        }
+        
+        return JspResolver.SOCIAL_AUTH_MSG_FOR_EMAIL;
     }
-    
-    
     
     
     @RequestMapping ( value = "/saveSelectedAccessFacebookTokenForEmail")
@@ -477,11 +509,11 @@ public class SocialMediaTokenController
         LOG.info( "Method saveSelectedAccessFacebookToken() called from SocialManagementController" );
         String selectedAccessFacebookToken = request.getParameter( "selectedAccessFacebookToken" );
         String selectedProfileUrl = request.getParameter( "selectedProfileUrl" );
-        
-        long entityId = Long.parseLong(request.getParameter( "columnValue" ));
+
+        long entityId = Long.parseLong( request.getParameter( "columnValue" ) );
         String entityType = request.getParameter( "columnName" );
 
-   
+
         boolean updated = false;
         SocialMediaTokens mediaTokens = null;
         String fbAccessTokenStr = request.getParameter( "fbAccessToken" );
@@ -498,7 +530,8 @@ public class SocialMediaTokenController
                     throw new InvalidInputException( "No company settings found in current session" );
                 }
                 mediaTokens = companySettings.getSocialMediaTokens();
-                mediaTokens = socialManagementService.updateFacebookToken( accessToken, mediaTokens, selectedProfileUrl );
+                mediaTokens = socialManagementService.updateFacebookPages( accessToken, mediaTokens,
+                    mediaTokens.getFacebookToken().getFacebookPages() );
                 mediaTokens.getFacebookToken().setFacebookAccessTokenToPost( selectedAccessFacebookToken );
                 mediaTokens.getFacebookToken().setFacebookPageLink( selectedProfileUrl );
                 socialManagementService.updateSocialMediaTokens(
@@ -524,11 +557,12 @@ public class SocialMediaTokenController
                     throw new InvalidInputException( "No Region settings found in current session" );
                 }
                 mediaTokens = regionSettings.getSocialMediaTokens();
-                mediaTokens = socialManagementService.updateFacebookToken( accessToken, mediaTokens, selectedProfileUrl );
+                mediaTokens = socialManagementService.updateFacebookPages( accessToken, mediaTokens,
+                    mediaTokens.getFacebookToken().getFacebookPages() );
                 mediaTokens.getFacebookToken().setFacebookAccessTokenToPost( selectedAccessFacebookToken );
                 mediaTokens.getFacebookToken().setFacebookPageLink( selectedProfileUrl );
-                socialManagementService.updateSocialMediaTokens(
-                    MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, mediaTokens );
+                socialManagementService.updateSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
+                    regionSettings, mediaTokens );
                 //update SETTINGS_SET_STATUS of REGION table to set.
                 Region region = userManagementService.getRegionById( regionSettings.getIden() );
                 if ( region != null ) {
@@ -550,11 +584,12 @@ public class SocialMediaTokenController
                     throw new InvalidInputException( "No Branch settings found in current session" );
                 }
                 mediaTokens = branchSettings.getSocialMediaTokens();
-                mediaTokens = socialManagementService.updateFacebookToken( accessToken, mediaTokens, selectedProfileUrl );
+                mediaTokens = socialManagementService.updateFacebookPages( accessToken, mediaTokens,
+                    mediaTokens.getFacebookToken().getFacebookPages() );
                 mediaTokens.getFacebookToken().setFacebookAccessTokenToPost( selectedAccessFacebookToken );
                 mediaTokens.getFacebookToken().setFacebookPageLink( selectedProfileUrl );
-                socialManagementService.updateSocialMediaTokens(
-                    MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, mediaTokens );
+                socialManagementService.updateSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
+                    branchSettings, mediaTokens );
                 //update SETTINGS_SET_STATUS of BRANCH table to set.
                 Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
                 if ( branch != null ) {
@@ -577,7 +612,8 @@ public class SocialMediaTokenController
                     throw new InvalidInputException( "No Agent settings found in current session" );
                 }
                 mediaTokens = agentSettings.getSocialMediaTokens();
-                mediaTokens = socialManagementService.updateFacebookToken( accessToken, mediaTokens, selectedProfileUrl );
+                mediaTokens = socialManagementService.updateFacebookPages( accessToken, mediaTokens,
+                    mediaTokens.getFacebookToken().getFacebookPages() );
                 mediaTokens.getFacebookToken().setFacebookAccessTokenToPost( selectedAccessFacebookToken );
                 mediaTokens.getFacebookToken().setFacebookPageLink( selectedProfileUrl );
                 socialManagementService.updateAgentSocialMediaTokens( agentSettings, mediaTokens );

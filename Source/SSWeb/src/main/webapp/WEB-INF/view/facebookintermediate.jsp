@@ -65,16 +65,12 @@ $(document).ready(function() {
 		if (authUrl != null) {
 			location.href = authUrl;
 		}
-		else {
-		}
 	}
 	
 	// select parent Window
 	var parentWindow;
 	if (window.opener != null && !window.opener.closed) {
 		parentWindow = window.opener;
-	}
-	else {
 	}
 	
 	var radioButtonDiv= $("<div style='text-align:left;margin-left:130px;max-height: 220px;overflow: auto;'>")
@@ -149,52 +145,135 @@ $(document).ready(function() {
 		});
     });
 });
+	var isFixSocialMedia ="${isFixSocialMedia}";
+	var isNewUser = "${isNewUser}";
+	var fromDashboard = "${fromDashboard}";
+	var restful = "${restful}";
+	var flow = "${socialFlow}";
+	var isFixSocialMedia ="${isFixSocialMedia}";
+	var isManual = "${isManual}";
+	var columnName = "${columnName}";
+	var columnValue = "${columnValue}";
+	var socialNetwork = "${socialNetwork}";
 
-$(window).on('unload', function(){
-	if(checkIfFacebookSet){
-		var parentWindow = null;
-		if (window.opener != null && !window.opener.closed) {
-			parentWindow = window.opener;
-		}
-		var fromDashboard = "${fromDashboard}";
-		var restful = "${restful}";
-		var flow = "${socialFlow}";
-		var isFixSocialMedia ="${isFixSocialMedia}";
-		
-		if(fromDashboard == 1){
-			var columnName = "${columnName}";
-			var columnValue = "${columnValue}";
-			alert(isFixSocialMedia);
-			if(isFixSocialMedia == 1){
-				parentWindow.fixSocialMediaResponse(columnName, columnValue);
-			}
+	if(isFixSocialMedia ==  1){
+		if(isNewUser==true || isNewUser=="true"){
 			
-			parentWindow.showDashboardButtons(columnName, columnValue);
+			var closeSMParam = {
+				"fromDashboard":fromDashboard,
+				"restful":restful,
+				"flow":flow,
+				"isFixSocialMedia":isFixSocialMedia,
+				"isManual":isManual,
+				"columnName":columnName,
+				"columnValue":columnValue,
+				"socialNetwork":socialNetwork,
+				"checkIfFacebookSet":checkIfFacebookSet
+			};
+			
+			var errorPopupDiv = $("<div style='display:grid'>");
+			errorPopupDiv.append('<span>Invalid Credentials.</span>');
+			errorPopupDiv.append('<span style="font-size:15px; margin: 15px auto;" >Please disconnect older account, to link a new Facebook Account</span>');
+			$('#page').append(errorPopupDiv);
+			var okButton= $("<div class='reg_btn'>OK</div>");
+			$('#page').append(okButton);
+			
+			okButton.click(function(){
+				window.close();
+			});
+			
+		}else if(isNewUser==false || isNewUser=="false"){
+			
+			parentWindow.loadSocialMediaUrlInSettingsPage();
+			parentWindow.loadSocialMediaUrlInPopup();
+			checkIfFacebookSet = true;
+			
+			var closeSMParam = {
+				"fromDashboard":fromDashboard,
+				"restful":restful,
+				"flow":flow,
+				"isFixSocialMedia":isFixSocialMedia,
+				"isManual":isManual,
+				"columnName":columnName,
+				"columnValue":columnValue,
+				"socialNetwork":socialNetwork,
+				"checkIfFacebookSet":checkIfFacebookSet
+			};
+			
+			setTimeout(function() {
+				closeSMPopup(closeSMParam);
+				window.close();
+				
+				
+			}, 3000);
+			
 		}
-		else if(restful != "1"){
-			if (flow == "registration") {
-				var payload = {
-					'socialNetwork' : "linkedin"
-				};
-				fetchSocialProfileUrl(payload, function(data) {
-					parentWindow.showLinkedInProfileUrl(data);
-					parentWindow.showProfileLink("linkedin", data);
-				});
+	}else{
+		var radioButtonDiv= $("<div style='text-align:left;margin-left:130px;max-height: 220px;overflow: auto;'>")
+		<c:forEach var="page" items="${pageNames}" varStatus="loop">
+			radioButtonDiv.append('<input type="radio" name="pageselection" value="${loop.index}"/>'+"${fn:escapeXml(page.name)}"+" <br/>");
+		</c:forEach>
+		$("#page").append(radioButtonDiv);
+		
+		var saveButton= $("<div class='reg_btn'>save</div>");
+		<c:if test="${not empty pageNames}">
+			$("#page").append(saveButton);
+		</c:if>
+		 
+		saveButton.click(function() {
+			
+			if ( $(this).data('requestRunning') ) {
+				return;
+		    }
+			disable(this);
+			var selectedPage=$('input:radio[name=pageselection]:checked').val();
+			if(selectedPage == undefined){
+				$('#overlay-toast').html("Please select an account");
+				showToast();
+				enable(this);
+				return;
 			}
-			else {
-				var payload = {
-					'socialNetwork' : "${socialNetwork}"
-				};
-				fetchSocialProfileUrl(payload, function(data) {
-					if(data.statusText == 'OK'){
-					//	parentWindow.loadSocialMediaUrlInSettingsPage();
-						//parentWindow.showProfileLink("${socialNetwork}", data.responseText);
-						parentWindow.showProfileLinkInEditProfilePage("${socialNetwork}", data.responseText);					
+			var selectedAccessFacebookToken;
+			var selectedProfileUrl;
+			<c:forEach var="page" items="${pageNames}"  varStatus="loop">
+			  if("${loop.index}" == selectedPage){
+				  selectedProfileUrl= "${page.profileUrl}";
+				  selectedAccessFacebookToken= "${page.accessToken}";
+			  }
+			</c:forEach>
+			var facebookToken = {
+				'selectedAccessFacebookToken' : selectedAccessFacebookToken,
+				'selectedProfileUrl' :  selectedProfileUrl,
+				'fbAccessToken' : fbAccessToken
+			};
+			$.ajax({
+				url : './saveSelectedAccessFacebookToken.do',
+				type : "GET",
+				cache : false,
+				data : facebookToken,
+				async : false,
+				complete :function(e){
+					enable(this);
+					parentWindow.loadSocialMediaUrlInSettingsPage();
+					parentWindow.loadSocialMediaUrlInPopup();
+					checkIfFacebookSet = true;
+					setTimeout(function() {
+						window.close();
+					}, 3000);
+					
+				},
+				error : function(e) {
+					if(e.status == 504) {
+						redirectToLoginPageOnSessionTimeOut(e.status);
+						return;
 					}
-				});
-			}
-		}
+					redirectErrorpage();
+				}
+			});
+	    });
 	}
+	
+	
 });
 
 function fetchSocialProfileUrl(payload, callBackFunction){

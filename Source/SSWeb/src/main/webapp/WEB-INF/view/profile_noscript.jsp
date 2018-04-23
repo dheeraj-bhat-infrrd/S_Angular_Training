@@ -112,14 +112,14 @@
 		<c:when test="${not empty profName}">
 			<c:choose>
 				<c:when test="${profileLevel == 'INDIVIDUAL' }">
-					<title>${profName} ${title} ${companyName} ${location} ${vertical} Professional Reviews | SocialSurvey.me</title>
+					<title>${profName} ${title} ${companyName} ${location} ${vertical} Professional Reviews</title>
 					<meta name="keywords"
 						content="${profName}, ${title }, ${companyName }, ${location }, ${vertical }, professional, online, reputation, social, survey, reviews, rating">
 					<meta name="description"
 						content="Reviews for ${profName}. ${firstName} has ${reviewsCount} reviews. ${firstName} is a ${vertical} professional${includeLocation}.${includeTitle}">
 				</c:when>
 				<c:otherwise>
-					<title>${profName} ${vertical} Reviews | SocialSurvey.me</title>
+					<title>${profName} ${vertical} Reviews</title>
 					<meta name="keywords"
 						content="${profName}, ${vertical}, professional, online, reputation, social, survey, reviews, rating">
 					<meta name="description"
