@@ -30,7 +30,7 @@ public class SettingsSetterImpl implements SettingsSetter {
 		double modifiedSetSettingsValue = getModifiedSetSettingsValue(OrganizationUnit.COMPANY, Double.parseDouble(company.getSettingsSetStatus()),
 				settings, hasBeenSet);
 		String modifiedSetSettingsStringValue = String.valueOf( modifiedSetSettingsValue );
-		company.setSettingsSetStatus(modifiedSetSettingsStringValue.split( "." ).length > 0 ? modifiedSetSettingsStringValue.split( "." )[0]
+		company.setSettingsSetStatus(modifiedSetSettingsStringValue.split( "\\." ).length > 1 ? modifiedSetSettingsStringValue.split( "\\." )[0]
 			: modifiedSetSettingsStringValue);
 		return company;
 	}
@@ -46,7 +46,7 @@ public class SettingsSetterImpl implements SettingsSetter {
 		double modifiedSetSettingsValue = getModifiedSetSettingsValue(OrganizationUnit.REGION, Double.parseDouble(region.getSettingsSetStatus()), settings,
 				hasBeenSet);
 		String modifiedSetSettingsStringValue = String.valueOf( modifiedSetSettingsValue );
-		region.setSettingsSetStatus(modifiedSetSettingsStringValue.split( "." ).length > 0 ? modifiedSetSettingsStringValue.split( "." )[0]
+		region.setSettingsSetStatus(modifiedSetSettingsStringValue.split( "\\." ).length > 1 ? modifiedSetSettingsStringValue.split( "\\." )[0]
 			: modifiedSetSettingsStringValue);
 		return region;
 	}
@@ -62,7 +62,7 @@ public class SettingsSetterImpl implements SettingsSetter {
 		double modifiedSetSettingsValue = getModifiedSetSettingsValue(OrganizationUnit.BRANCH, Double.parseDouble(branch.getSettingsSetStatus()), settings,
 				hasBeenSet);
 		String modifiedSetSettingsStringValue = String.valueOf( modifiedSetSettingsValue );
-		branch.setSettingsSetStatus(modifiedSetSettingsStringValue.split( "." ).length > 0 ? modifiedSetSettingsStringValue.split( "." )[0]
+		branch.setSettingsSetStatus(modifiedSetSettingsStringValue.split( "\\." ).length > 1 ? modifiedSetSettingsStringValue.split( "\\." )[0]
 			: modifiedSetSettingsStringValue);
 		return branch;
 	}
@@ -103,7 +103,8 @@ public class SettingsSetterImpl implements SettingsSetter {
 	public boolean isSettingsValueSet(OrganizationUnit organizationUnit, double currentSetValue, SettingsForApplication settings) {
 		LOG.debug("Checking if the value is set for the settings");
 		boolean isValueSet = false;
-		String sCurrentSetValue = String.valueOf(currentSetValue);
+		String sCurrentSetValue = String.valueOf(currentSetValue).split( "\\." ).length > 1 ?
+			String.valueOf(currentSetValue).split( "\\." )[0] : String.valueOf(currentSetValue);
 		// find index of the settings to be checked for.
 		// get the length of the value. Get the index from enum and deduct it from the length
 		if (sCurrentSetValue.length() >= settings.getIndex()) {
@@ -148,7 +149,9 @@ public class SettingsSetterImpl implements SettingsSetter {
 	public SettingsSetterLevel getSettingsSetLevel(long currentSetAggregateValue, SettingsForApplication settings) {
 		LOG.debug("Getting all the levels where settings are set for aggregate value: " + currentSetAggregateValue);
 		SettingsSetterLevel level = new SettingsSetterLevel();
-		String sCurrentSetValue = String.valueOf(currentSetAggregateValue);
+		//String sCurrentSetValue = String.valueOf(currentSetAggregateValue);
+		String sCurrentSetValue = String.valueOf(currentSetAggregateValue).split( "\\." ).length > 1 ?
+			String.valueOf(currentSetAggregateValue).split( "\\." )[0] : String.valueOf(currentSetAggregateValue);
 		// find index of the settings to be checked for.
 		// get the length of the value. Get the index from enum and deduct it from the length
 		if (sCurrentSetValue.length() >= settings.getIndex()) {

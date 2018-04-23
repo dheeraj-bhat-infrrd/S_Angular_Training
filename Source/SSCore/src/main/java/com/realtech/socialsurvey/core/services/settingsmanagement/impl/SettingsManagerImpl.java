@@ -63,6 +63,12 @@ public class SettingsManagerImpl implements SettingsManager
         String currentLockAggregateValue ) throws InvalidSettingsStateException
     {
         LOG.debug( "Getting a map of all the settings with the closest level of setter" );
+
+        currentLockAggregateValue = currentLockAggregateValue.split( "\\." ).length > 1 ? currentLockAggregateValue.split( "\\." )[0]
+            : currentLockAggregateValue ;
+        currentSetAggregateValue = currentSetAggregateValue.split( "\\." ).length > 1 ? currentSetAggregateValue.split( "\\." )[0]
+            : currentSetAggregateValue ;
+
         int lockValueLength = currentLockAggregateValue.length();
         int loopTillValue = ( currentSetAggregateValue.length() > lockValueLength ? currentSetAggregateValue.length()
             : lockValueLength );
