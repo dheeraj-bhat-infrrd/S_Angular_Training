@@ -17488,7 +17488,7 @@ function drawStreamPage(streamPostList){
 			$('#stream-post-details-'+postId).find('.post-dup').find('.dup-count').html(streamPostList[i].duplicateCount);
 		}
 		
-		$('#stream-post-details-cont-'+postId).find('.stream-post-details-text').html(streamPostList[i].text);
+		$('#stream-post-details-cont-'+postId).find('.stream-post-details-text').html(streamPostList[i].textHighlighted);
 		
 		if(streamPostList[i].pictures != null && streamPostList[i].pictures != undefined){
 			for(var picI=0; picI<streamPostList[i].pictures.length; picI++){
