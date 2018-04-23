@@ -486,6 +486,14 @@ public class SurveyManagementController
     }
 
     private String generateSurveyTextForMail(String customerName, String mood, SurveyDetails survey, boolean isAbusive, boolean allowCheckBox) {
+        Map<String,String> questionTypeInit = new HashMap<>();
+        questionTypeInit.put( "sb-range-star", "1-5 Range" );
+        questionTypeInit.put( "sb-range-smiles", "1-5 Range" );
+        questionTypeInit.put( "sb-range-0to10", "0-10 Range" );
+        questionTypeInit.put( "sb-sel-mcq", "Multiple Choice" );
+        questionTypeInit.put( "sb-sel-desc", "Comment" );
+
+
 		final String tableOneFirstColumnWidth = "150px";
 		final String tableTwoFirstColumnWidth = "50%";
 
@@ -523,8 +531,8 @@ public class SurveyManagementController
 		surveyDetail.append(paragraph).append(tableStart);
 
 		for (SurveyResponse response : survey.getSurveyResponse()) {
-			surveyDetail.append(tableTwoRowStart).append(response.getQuestion()).append(tableRowMiddle).append(response.getAnswer())
-					.append(tableRowEnd);
+			surveyDetail.append(tableOneRowStart).append(response.getQuestion()).append(tableTwoRowStart).append(response.getAnswer())
+			.append(tableRowMiddle).append( questionTypeInit.get( response.getQuestionType() ) ).append(tableRowEnd);
 		}
 
 		surveyDetail.append(tableEnd).append(paragraph);
