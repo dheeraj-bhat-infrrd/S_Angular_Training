@@ -164,6 +164,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
                 socialMonitorFeedData.setFoundKeywords( socialResponseObject.getFoundKeywords() );
                 socialMonitorFeedData.setDuplicateCount( socialResponseObject.getDuplicateCount() );
                 socialMonitorFeedData.setPageLink( socialResponseObject.getPageLink() );
+                socialMonitorFeedData.setTextHighlighted( socialResponseObject.getTextHighlighted() );
                 socialMonitorStreamDataList.add( socialMonitorFeedData );
             }
             socialMonitorResponseData.setCount( mongoSocialFeedDao.getAllSocialFeedsCount( flag, status, feedtype, companyId,

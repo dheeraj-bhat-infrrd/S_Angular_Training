@@ -27,6 +27,10 @@ public class SocialMonitorFeedData implements Serializable {
 	private SocialFeedStatus status;
 	private List<ActionHistory> actionHistory;
 	private List<String> foundKeywords;
+	private long duplicateCount;
+    private String pageLink;
+    private String textHighlighted;
+
 	public String getPageLink()
     {
         return pageLink;
@@ -36,9 +40,6 @@ public class SocialMonitorFeedData implements Serializable {
     {
         this.pageLink = pageLink;
     }
-
-    private long duplicateCount;
-	private String pageLink;
 
 	public SocialFeedType getType() {
 		return type;
@@ -168,26 +169,27 @@ public class SocialMonitorFeedData implements Serializable {
 		this.ownerProfileImage = ownerProfileImage;
 	}
 
-	@Override
-	public String toString() {
-		return "SocialMonitorFeedData{" +
-				"postId='" + postId + '\'' +
-				", companyId=" + companyId +
-				", regionId=" + regionId +
-				", branchId=" + branchId +
-				", agentId=" + agentId +
-				", text='" + text + '\'' +
-				", pictures=" + pictures +
-				", updatedOn=" + updatedOn +
-				", ownerName='" + ownerName + '\'' +
-				", ownerProfileImage='" + ownerProfileImage + '\'' +
-				", flagged=" + flagged +
-				", type=" + type +
-				", status=" + status +
-				", actionHistory=" + actionHistory +
-				", foundKeywords=" + foundKeywords +
-				", duplicateCount=" + duplicateCount +
-				'}';
-	}
+	public String getTextHighlighted()
+    {
+        return textHighlighted;
+    }
+
+    public void setTextHighlighted( String textHighlighted )
+    {
+        this.textHighlighted = textHighlighted;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return "SocialMonitorFeedData [postId=" + postId + ", companyId=" + companyId + ", regionId=" + regionId + ", branchId="
+            + branchId + ", agentId=" + agentId + ", text=" + text + ", pictures=" + pictures + ", updatedOn=" + updatedOn
+            + ", ownerName=" + ownerName + ", ownerProfileImage=" + ownerProfileImage + ", flagged=" + flagged + ", type="
+            + type + ", status=" + status + ", actionHistory=" + actionHistory + ", foundKeywords=" + foundKeywords
+            + ", duplicateCount=" + duplicateCount + ", pageLink=" + pageLink + ", textHighlighted=" + textHighlighted + "]";
+    }
+
+    
 
 }
