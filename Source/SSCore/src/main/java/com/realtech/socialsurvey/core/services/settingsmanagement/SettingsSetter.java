@@ -66,7 +66,7 @@ public interface SettingsSetter {
 	 * @param organizationUnit
 	 * @return
 	 */
-	public boolean checkSettingsSetStatus(int settingNumber, OrganizationUnit organizationUnit);
+	public boolean checkSettingsSetStatus( double settingNumber, OrganizationUnit organizationUnit);
 
 	/**
 	 * Finds out all te level who have set the settings value

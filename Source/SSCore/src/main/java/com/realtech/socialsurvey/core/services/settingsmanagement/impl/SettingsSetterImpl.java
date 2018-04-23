@@ -29,7 +29,9 @@ public class SettingsSetterImpl implements SettingsSetter {
 		LOG.debug("Setting values to company " + company);
 		double modifiedSetSettingsValue = getModifiedSetSettingsValue(OrganizationUnit.COMPANY, Double.parseDouble(company.getSettingsSetStatus()),
 				settings, hasBeenSet);
-		company.setSettingsSetStatus(String.valueOf(modifiedSetSettingsValue));
+		String modifiedSetSettingsStringValue = String.valueOf( modifiedSetSettingsValue );
+		company.setSettingsSetStatus(modifiedSetSettingsStringValue.split( "." ).length > 0 ? modifiedSetSettingsStringValue.split( "." )[0]
+			: modifiedSetSettingsStringValue);
 		return company;
 	}
 
@@ -43,7 +45,9 @@ public class SettingsSetterImpl implements SettingsSetter {
 		LOG.debug("Setting values to region " + region);
 		double modifiedSetSettingsValue = getModifiedSetSettingsValue(OrganizationUnit.REGION, Double.parseDouble(region.getSettingsSetStatus()), settings,
 				hasBeenSet);
-		region.setSettingsSetStatus(String.valueOf(modifiedSetSettingsValue));
+		String modifiedSetSettingsStringValue = String.valueOf( modifiedSetSettingsValue );
+		region.setSettingsSetStatus(modifiedSetSettingsStringValue.split( "." ).length > 0 ? modifiedSetSettingsStringValue.split( "." )[0]
+			: modifiedSetSettingsStringValue);
 		return region;
 	}
 
@@ -57,7 +61,9 @@ public class SettingsSetterImpl implements SettingsSetter {
 		LOG.debug("Setting values to branch " + branch);
 		double modifiedSetSettingsValue = getModifiedSetSettingsValue(OrganizationUnit.BRANCH, Double.parseDouble(branch.getSettingsSetStatus()), settings,
 				hasBeenSet);
-		branch.setSettingsSetStatus(String.valueOf(modifiedSetSettingsValue));
+		String modifiedSetSettingsStringValue = String.valueOf( modifiedSetSettingsValue );
+		branch.setSettingsSetStatus(modifiedSetSettingsStringValue.split( "." ).length > 0 ? modifiedSetSettingsStringValue.split( "." )[0]
+			: modifiedSetSettingsStringValue);
 		return branch;
 	}
 
@@ -69,15 +75,15 @@ public class SettingsSetterImpl implements SettingsSetter {
 		boolean isValueAlreadySet = false; // check if the value can be added or not
 		if (organizationUnit == OrganizationUnit.COMPANY) {
 			LOG.debug("Setting set for company");
-			valueToBeAdded = settings.getOrder();
+			valueToBeAdded =  settings.getOrder();
 		}
 		else if (organizationUnit == OrganizationUnit.REGION) {
 			LOG.debug("Setting set for region");
-			valueToBeAdded = 2 * settings.getOrder();
+			valueToBeAdded = 2 *  settings.getOrder() ;
 		}
 		else if (organizationUnit == OrganizationUnit.BRANCH) {
 			LOG.debug("Setting set for branch");
-			valueToBeAdded = 4 * settings.getOrder();
+			valueToBeAdded = 4 *  settings.getOrder() ;
 		}
 		isValueAlreadySet = isSettingsValueSet(organizationUnit, currentSetValue, settings);
 		if (hasBeenSet) {
@@ -103,7 +109,8 @@ public class SettingsSetterImpl implements SettingsSetter {
 		if (sCurrentSetValue.length() >= settings.getIndex()) {
 			String sSettingNumber = sCurrentSetValue.substring(sCurrentSetValue.length() - settings.getIndex(),
 					sCurrentSetValue.length() - settings.getIndex() + 1);
-			isValueSet = checkSettingsSetStatus(Integer.parseInt(sSettingNumber), organizationUnit);
+			LOG.info( "sSettingNumber {}" ,  sSettingNumber );
+			isValueSet = checkSettingsSetStatus(Double.parseDouble(sSettingNumber), organizationUnit);
 		}
 		else {
 			// value is not set at all
@@ -113,7 +120,7 @@ public class SettingsSetterImpl implements SettingsSetter {
 	}
 
 	@Override
-	public boolean checkSettingsSetStatus(int settingNumber, OrganizationUnit organizationUnit) {
+	public boolean checkSettingsSetStatus( double settingNumber, OrganizationUnit organizationUnit) {
 		LOG.debug("Checking for set status " + settingNumber + " and organiztion unit " + organizationUnit);
 		boolean setStatus = false;
 		if (organizationUnit == OrganizationUnit.COMPANY) {

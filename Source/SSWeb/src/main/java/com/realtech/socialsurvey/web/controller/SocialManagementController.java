@@ -846,7 +846,7 @@ public class SocialManagementController
                 //update SETTINGS_SET_STATUS of COMPANY table to set.
                 Company company = userManagementService.getCompanyById( companySettings.getIden() );
                 if ( company != null ) {
-                    settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.FACEBOOK,
+                    settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.INSTAGRAM,
                             CommonConstants.SET_SETTINGS );
                     userManagementService.updateCompany( company );
                 }
@@ -870,7 +870,7 @@ public class SocialManagementController
                 //update SETTINGS_SET_STATUS of REGION table to set.
                 Region region = userManagementService.getRegionById( regionSettings.getIden() );
                 if ( region != null ) {
-                    settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.FACEBOOK,
+                    settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.INSTAGRAM,
                             CommonConstants.SET_SETTINGS );
                     userManagementService.updateRegion( region );
                 }
@@ -894,7 +894,7 @@ public class SocialManagementController
                 //update SETTINGS_SET_STATUS of BRANCH table to set.
                 Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
                 if ( branch != null ) {
-                    settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.FACEBOOK,
+                    settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.INSTAGRAM,
                             CommonConstants.SET_SETTINGS );
                     userManagementService.updateBranch( branch );
                 }
