@@ -597,11 +597,11 @@ public class AdminToolsController
 				throw new InvalidInputException("Wrong value passed for parameter userId ");
 			}
 
-			// get existing setting and update
-			AgentSettings agentSettings = organizationManagementService.getAgentSettings(userId);
-			organizationManagementService.updateIsLoginPreventedForUser(agentSettings, isLoginPrevented);
+			organizationManagementService.updateIsLoginPreventedForUser(userId, isLoginPrevented);
 			// update hidePublicPage as well
-			organizationManagementService.updateHidePublicPageForUser(agentSettings, isLoginPrevented);
+			organizationManagementService.updateHidePublicPageForUser(userId, isLoginPrevented);
+			//update social media tokens
+			organizationManagementService.updateSocialMediaForUser( userId, isLoginPrevented );
 			
 			LOG.info("Method updateUserLoginPrevention finished");
 			return Response.status(Response.Status.CREATED).tag("Field isLoginPrevented updated for user id " + userId  + " to : " +  isLoginPrevented ).build();
@@ -696,13 +696,13 @@ public class AdminToolsController
                     throw new InvalidInputException( "Wrong value passed for parameter userId " );
                 }
 
-
                 //update isLoginPrevented for the users
                 organizationManagementService.updateIsLoginPreventedForUsers( userIdList, isLoginPrevented );
                 // update hidePublicPage as well
                 organizationManagementService.updateHidePublicPageForUsers( userIdList, isLoginPrevented );
+                //update social media tokens
+                organizationManagementService.updateSocialMediaForUsers( userIdList, isLoginPrevented );
 
-                LOG.info( "Method updateUserLoginPrevention finished" );
                 return Response.status( Response.Status.CREATED )
                     .tag( "Field isLoginPrevented updated for user ids: " + userIdList + " to : " + isLoginPrevented ).build();
             }

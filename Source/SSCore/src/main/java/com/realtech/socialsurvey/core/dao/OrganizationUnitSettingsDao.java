@@ -340,4 +340,7 @@ public interface OrganizationUnitSettingsDao
     public long getSocialMediaTokensCount( String collectionName );
 
 	public ContactDetailsSettings fetchContactDetailByEncryptedId(String encryptedId, String collection);
+
+
+    void updateSocialMediaForUsers( List<Long> userIdList, boolean disableSocialMediaTokens );
 }

@@ -13,6 +13,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.solr.common.SolrDocumentList;
 import org.noggit.JSONUtil;
 import org.slf4j.Logger;
@@ -1161,10 +1162,24 @@ public class UserManagementController
                 throw new InvalidInputException( e.getMessage(), DisplayMessageConstants.USER_NOT_PRESENT, e );
             }
 
+            //get agent settings
+            AgentSettings agentSettings = null;
+            try {
+                agentSettings = organizationManagementService.getAgentSettings(user.getUserId());               
+            }catch(NoRecordsFetchedException e) {
+                    throw new InvalidInputException( "No settings found for user", DisplayMessageConstants.GENERAL_ERROR );
+            }
+            
+            //check if login is prevented for user
+            if(agentSettings.isLoginPrevented()) {
+                SecurityContextHolder.clearContext();
+                return JspResolver.LOGIN_DISABLED_PAGE;
+            }
+
             LOG.debug( "Adding newly registered user to principal session" );
             sessionHelper.loginOnRegistration( emailId, password );
             LOG.debug( "Successfully added registered user to principal session" );
-
+            
             AccountType accountType = null;
             HttpSession session = request.getSession( true );
             List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
@@ -1218,9 +1233,7 @@ public class UserManagementController
 
             // update the last login time and number of logins
             userManagementService.updateUserLoginTimeAndNum( user );
-        } catch (
-
-        NonFatalException e ) {
+        } catch (NonFatalException e ) {
             LOG.error( "NonFatalException while setting new Password. Reason : " + e.getMessage(), e );
             redirectAttributes.addFlashAttribute( "message",
                 messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );

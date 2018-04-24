@@ -751,7 +751,7 @@ function openAuthPageDashboard(socialNetwork, columnName, columnValue) {
 	});
 }
 
-function openAuthPageFixSocialMedia(socialNetwork, columnName, columnValue) {
+function openAuthPageFixSocialMedia(socialNetwork, columnName, columnValue, isManual) {
 	//check if user is autologged in
 	if($('#pro-cmplt-stars').attr('data-autologin') == 'true') {
 		$('#overlay-toast').html('Insufficient permission to connect to ' + socialNetwork);
@@ -760,7 +760,7 @@ function openAuthPageFixSocialMedia(socialNetwork, columnName, columnValue) {
 	}
 	
 		window.open("./socialauth.do?social=" + socialNetwork + "&columnName="
-				+ columnName + "&columnValue=" + columnValue + "&isFixSocialMedia=true" , "Authorization Page",
+				+ columnName + "&columnValue=" + columnValue + "&isFixSocialMedia=true&isManual="+isManual, socialNetwork + " Authorization Page",
 				"width=800,height=600,scrollbars=yes");
 	
 }

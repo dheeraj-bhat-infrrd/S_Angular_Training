@@ -10248,6 +10248,11 @@ ul.accordion li>a:before {
     border-radius: 4px;
 }
 
+.rep-instagram-btn{
+	height: 35px;
+    background: url(../images/instagram_wide.png) no-repeat center #ffff;
+}
+
 .warn-toggle {
 	margin-left: 40px;
 }

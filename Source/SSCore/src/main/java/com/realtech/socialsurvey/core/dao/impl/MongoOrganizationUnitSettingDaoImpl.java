@@ -1,11 +1,8 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
-import java.text.DateFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -108,6 +105,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_REALTOR_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.realtorToken";
     public static final String KEY_GOOGLE_BUSINESS_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.googleBusinessToken";
     public static final String KEY_INSTAGRAM_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.instagramToken";
+    public static final String KEY_FACEBOOK_PIXEL_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.facebookPixelToken";
     public static final String KEY_CONTACT_NAME = "contact_details.name";
     public static final String KEY_POSTIONS = "positions";
     public static final String KEY_STATUS = "status";
@@ -337,6 +335,27 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         Query query = new Query();
         query.addCriteria( Criteria.where( CommonConstants.IDEN ).in( userIdList ) );
         Update update = new Update().set( MongoOrganizationUnitSettingDaoImpl.KEY_HIDE_PUBLIC_PAGE, hidePublicPage );
+        mongoTemplate.updateMulti( query, update, OrganizationUnitSettings.class, AGENT_SETTINGS_COLLECTION );
+    }
+    
+    /**
+     * Enable/Disable the social media tokens for the given list of userIds
+     */
+    @Override
+    public void updateSocialMediaForUsers ( List<Long> userIdList, boolean disableSocialMediaTokens )
+    {
+        LOG.debug( "updating enableSocialMediaForUsers in Mongo" );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.IDEN ).in( userIdList ) );
+        Update update = new Update();
+        
+        if(disableSocialMediaTokens){
+            update.rename( KEY_SOCIAL_MEDIA_TOKENS, CommonConstants.DELETED_SOCIAL_MEDIA_TOKENS_COLUMN );
+        }
+        else {
+            update.rename( CommonConstants.DELETED_SOCIAL_MEDIA_TOKENS_COLUMN, KEY_SOCIAL_MEDIA_TOKENS );
+        }
+        
         mongoTemplate.updateMulti( query, update, OrganizationUnitSettings.class, AGENT_SETTINGS_COLLECTION );
     }
 
