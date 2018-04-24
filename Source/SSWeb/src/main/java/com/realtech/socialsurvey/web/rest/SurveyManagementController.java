@@ -531,8 +531,9 @@ public class SurveyManagementController
 		surveyDetail.append(paragraph).append(tableStart);
 
 		for (SurveyResponse response : survey.getSurveyResponse()) {
-			surveyDetail.append(tableOneRowStart).append(response.getQuestion()).append(tableTwoRowStart).append(response.getAnswer())
-			.append(tableRowMiddle).append( questionTypeInit.get( response.getQuestionType() ) ).append(tableRowEnd);
+			surveyDetail.append(tableTwoRowStart).append(response.getQuestion()).append( " (" ).append( questionTypeInit.get( response.getQuestionType() ) ).append( ")" )
+			.append(tableRowMiddle).append(response.getAnswer())
+			.append(tableRowEnd);
 		}
 
 		surveyDetail.append(tableEnd).append(paragraph);
