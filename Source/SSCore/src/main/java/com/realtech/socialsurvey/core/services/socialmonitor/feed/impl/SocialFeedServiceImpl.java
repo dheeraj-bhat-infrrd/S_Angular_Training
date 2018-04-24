@@ -240,7 +240,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
                             macroActionFlag = 2;
                         }
                         actionHistory.setActionType( ActionHistoryType.FLAGGED );
-                        actionHistory.setText( "Post was FLAGGED manually by " + socialFeedsActionUpdate.getUserName() );
+                        actionHistory.setText( "Post was <b class='soc-mon-bold-text'>flagged</b> manually by " + "<b class='soc-mon-bold-text'>" + socialFeedsActionUpdate.getUserName() + "</b>" );
                         actionHistory.setOwnerName( socialFeedsActionUpdate.getUserName() );
                         actionHistory.setCreatedDate( new Date().getTime() );
                         actionHistories.add( actionHistory );
@@ -251,7 +251,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
                             macroActionFlag = 2;
                         }
                         actionHistory.setActionType( ActionHistoryType.UNFLAGGED );
-                        actionHistory.setText( "Post was UNFLAGGED by " + socialFeedsActionUpdate.getUserName() );
+                        actionHistory.setText( "Post was <b class='soc-mon-bold-text'>unflagged</b> by " + "<b class='soc-mon-bold-text'>" + socialFeedsActionUpdate.getUserName() + "</b>" );
                         actionHistory.setOwnerName( socialFeedsActionUpdate.getUserName() );
                         actionHistory.setCreatedDate( new Date().getTime() );
                         actionHistories.add( actionHistory );
@@ -269,8 +269,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
                             macroActionFlag = 3;
                         }
                         actionHistory.setActionType( ActionHistoryType.ESCALATE );
-                        actionHistory.setText( "Post was " + socialFeedsActionUpdate.getStatus() + " by "
-                            + socialFeedsActionUpdate.getUserName() );
+                        actionHistory.setText( "Post was <b class='soc-mon-bold-text'>escalated</b> by " + "<b class='soc-mon-bold-text'>" + socialFeedsActionUpdate.getUserName() + "</b>");
                         actionHistory.setOwnerName( socialFeedsActionUpdate.getUserName() );
                         actionHistory.setCreatedDate( new Date().getTime() );
                         actionHistories.add( actionHistory );
@@ -283,8 +282,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
                             macroActionFlag = 3;
                         }
                         actionHistory.setActionType( ActionHistoryType.RESOLVED );
-                        actionHistory.setText( "Post was " + socialFeedsActionUpdate.getStatus() + " by "
-                            + socialFeedsActionUpdate.getUserName() );
+                        actionHistory.setText( "Post was <b class='soc-mon-bold-text'>resolved</b> by " + "<b class='soc-mon-bold-text'>" + socialFeedsActionUpdate.getUserName() + "</b>" );
                         actionHistory.setOwnerName( socialFeedsActionUpdate.getUserName() );
                         actionHistory.setCreatedDate( new Date().getTime() );
                         actionHistories.add( actionHistory );
