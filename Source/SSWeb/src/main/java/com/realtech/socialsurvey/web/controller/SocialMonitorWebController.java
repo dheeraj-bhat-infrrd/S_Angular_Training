@@ -738,5 +738,19 @@ public class SocialMonitorWebController {
         
         return statusJson;
     }
+    
+    @ResponseBody
+    @RequestMapping ( value = "/getfeedsbycompanyid", method = RequestMethod.GET)
+    public String getFeedsByCompanyId(Model model, HttpServletRequest request) {
+        
+        User user = sessionHelper.getCurrentUser();
+        Long companyId = user.getCompany().getCompanyId();
+        
+        String authorizationHeader = "Basic " + authHeader;
+        
+        Response response = ssApiIntergrationBuilder.getIntegrationApi().getFeedTypesByCompanyId( companyId, authorizationHeader );
+        
+        return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+    }
 
 }
