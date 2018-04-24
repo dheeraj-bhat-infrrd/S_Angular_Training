@@ -7719,44 +7719,44 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     private void processRegion( OrganizationUnitSettings regionSetting, Region region )
     {
         LOG.debug( "Processing region " + region.getRegion() );
-        long setterValue = 0l;
+        double setterValue = 0l;
         LOG.debug( "Getting details of region: " + region.getRegion() );
         if ( regionSetting.getLogo() != null ) {
             LOG.debug( "Logo is set" );
-            setterValue += SettingsForApplication.LOGO.getOrder() * 2;
+            setterValue += SettingsForApplication.LOGO.getOrder()  * 2;
         } else {
             LOG.debug( "Logo is not set" );
         }
         if ( regionSetting.getContact_details() != null ) {
             if ( regionSetting.getContact_details().getAddress() != null ) {
                 LOG.debug( "Address is set" );
-                setterValue += SettingsForApplication.ADDRESS.getOrder() * 2;
+                setterValue +=  SettingsForApplication.ADDRESS.getOrder() * 2;
             } else {
                 LOG.debug( "Address is not set" );
             }
             if ( regionSetting.getContact_details().getContact_numbers() != null ) {
                 LOG.debug( "Contact number is set" );
-                setterValue += SettingsForApplication.PHONE.getOrder() * 2;
+                setterValue +=  SettingsForApplication.PHONE.getOrder() * 2;
             } else {
                 LOG.debug( "Contact number is not set" );
             }
             // skipping location
             if ( regionSetting.getContact_details().getWeb_addresses() != null ) {
                 LOG.debug( "Web address is set" );
-                setterValue += SettingsForApplication.WEB_ADDRESS_WORK.getOrder() * 2;
+                setterValue +=  SettingsForApplication.WEB_ADDRESS_WORK.getOrder()  * 2;
             } else {
                 LOG.debug( "Web address is not set" );
             }
             if ( regionSetting.getContact_details().getAbout_me() != null ) {
                 LOG.debug( "About me is set" );
-                setterValue += SettingsForApplication.ABOUT_ME.getOrder() * 2;
+                setterValue +=  SettingsForApplication.ABOUT_ME.getOrder()  * 2;
             } else {
                 LOG.debug( "About me is not set" );
             }
             if ( regionSetting.getContact_details().getMail_ids() != null
                 && regionSetting.getContact_details().getMail_ids().getWork() != null ) {
                 LOG.debug( "Work email id is set" );
-                setterValue += SettingsForApplication.EMAIL_ID_WORK.getOrder() * 2;
+                setterValue +=  SettingsForApplication.EMAIL_ID_WORK.getOrder()  * 2;
             } else {
                 LOG.debug( "Work email id is not set" );
             }
@@ -7764,61 +7764,61 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( regionSetting.getSocialMediaTokens() != null ) {
             if ( regionSetting.getSocialMediaTokens().getFacebookToken() != null ) {
                 LOG.debug( "Facebook is set" );
-                setterValue += SettingsForApplication.FACEBOOK.getOrder() * 2;
+                setterValue +=  SettingsForApplication.FACEBOOK.getOrder()  * 2;
             } else {
                 LOG.debug( "Facebook is not set" );
             }
             if ( regionSetting.getSocialMediaTokens().getTwitterToken() != null ) {
                 LOG.debug( "Twitter is set" );
-                setterValue += SettingsForApplication.TWITTER.getOrder() * 2;
+                setterValue += SettingsForApplication.TWITTER.getOrder()  * 2;
             } else {
                 LOG.debug( "Twitter is not set" );
             }
             if ( regionSetting.getSocialMediaTokens().getLinkedInToken() != null ) {
                 LOG.debug( "Linkedin is set" );
-                setterValue += SettingsForApplication.LINKED_IN.getOrder() * 2;
+                setterValue +=  SettingsForApplication.LINKED_IN.getOrder() * 2;
             } else {
                 LOG.debug( "Linkedin is not set" );
             }
             if ( regionSetting.getSocialMediaTokens().getGoogleToken() != null ) {
                 LOG.debug( "Google+ is set" );
-                setterValue += SettingsForApplication.GOOGLE_PLUS.getOrder() * 2;
+                setterValue +=  SettingsForApplication.GOOGLE_PLUS.getOrder()  * 2;
             } else {
                 LOG.debug( "Google+ is not set" );
             }
             if ( regionSetting.getSocialMediaTokens().getYelpToken() != null ) {
                 LOG.debug( "Yelp is set" );
-                setterValue += SettingsForApplication.YELP.getOrder() * 2;
+                setterValue +=  SettingsForApplication.YELP.getOrder() * 2;
             } else {
                 LOG.debug( "Yelp is not set" );
             }
             if ( regionSetting.getSocialMediaTokens().getZillowToken() != null ) {
                 LOG.debug( "Zillow is set" );
-                setterValue += SettingsForApplication.ZILLOW.getOrder() * 2;
+                setterValue +=  SettingsForApplication.ZILLOW.getOrder()  * 2;
             } else {
                 LOG.debug( "Zillow is not set" );
             }
             if ( regionSetting.getSocialMediaTokens().getRealtorToken() != null ) {
                 LOG.debug( "Realtor is set" );
-                setterValue += SettingsForApplication.REALTOR.getOrder() * 2;
+                setterValue += SettingsForApplication.REALTOR.getOrder()  * 2;
             } else {
                 LOG.debug( "Realtor is not set" );
             }
             if ( regionSetting.getSocialMediaTokens().getLendingTreeToken() != null ) {
                 LOG.debug( "Lending tree is set" );
-                setterValue += SettingsForApplication.LENDING_TREE.getOrder() * 2;
+                setterValue +=  SettingsForApplication.LENDING_TREE.getOrder()  * 2;
             } else {
                 LOG.debug( "Lending tree is not set" );
             }
             if ( regionSetting.getSocialMediaTokens().getGoogleBusinessToken() != null ) {
                 LOG.debug( "Google business is set" );
-                setterValue += SettingsForApplication.GOOGLE_BUSINESS.getOrder() * 2;
+                setterValue +=  SettingsForApplication.GOOGLE_BUSINESS.getOrder()  * 2;
             } else {
                 LOG.debug( "Google business is not set" );
             }
         }
         LOG.debug( "Final Settings setter value : " + setterValue );
-        region.setSettingsSetStatus( String.valueOf( setterValue ) );
+        region.setSettingsSetStatus( String.valueOf( setterValue ).split( "." )[0] );
         // update the values to company
         updateRegion( region );
         // get list of branches for region
@@ -7841,7 +7841,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     private void processBranch( OrganizationUnitSettings branchSetting, Branch branch )
     {
         LOG.debug( "Updating details for branch " + branch.getBranch() );
-        long setterValue = 0l;
+        double setterValue = 0l;
         LOG.debug( "Getting details of branch: " + branch.getRegion() );
         if ( branchSetting.getLogo() != null ) {
             LOG.debug( "Logo is set" );
@@ -7852,26 +7852,26 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( branchSetting.getContact_details() != null ) {
             if ( branchSetting.getContact_details().getAddress() != null ) {
                 LOG.debug( "Address is set" );
-                setterValue += SettingsForApplication.ADDRESS.getOrder() * 4;
+                setterValue +=  SettingsForApplication.ADDRESS.getOrder() * 4;
             } else {
                 LOG.debug( "Address is not set" );
             }
             if ( branchSetting.getContact_details().getContact_numbers() != null ) {
                 LOG.debug( "Contact number is set" );
-                setterValue += SettingsForApplication.PHONE.getOrder() * 4;
+                setterValue +=  SettingsForApplication.PHONE.getOrder() * 4;
             } else {
                 LOG.debug( "Contact number is not set" );
             }
             // skipping location
             if ( branchSetting.getContact_details().getWeb_addresses() != null ) {
                 LOG.debug( "Web address is set" );
-                setterValue += SettingsForApplication.WEB_ADDRESS_WORK.getOrder() * 4;
+                setterValue +=  SettingsForApplication.WEB_ADDRESS_WORK.getOrder()  * 4;
             } else {
                 LOG.debug( "Web address is not set" );
             }
             if ( branchSetting.getContact_details().getAbout_me() != null ) {
                 LOG.debug( "About me is set" );
-                setterValue += SettingsForApplication.ABOUT_ME.getOrder() * 4;
+                setterValue +=  SettingsForApplication.ABOUT_ME.getOrder() * 4;
             } else {
                 LOG.debug( "About me is not set" );
             }
@@ -7886,7 +7886,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( branchSetting.getSocialMediaTokens() != null ) {
             if ( branchSetting.getSocialMediaTokens().getFacebookToken() != null ) {
                 LOG.debug( "Facebook is set" );
-                setterValue += SettingsForApplication.FACEBOOK.getOrder() * 4;
+                setterValue += SettingsForApplication.FACEBOOK.getOrder()* 4;
             } else {
                 LOG.debug( "Facebook is not set" );
             }
@@ -7940,7 +7940,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         }
         LOG.debug( "Final Settings setter value : " + setterValue );
-        branch.setSettingsSetStatus( String.valueOf( setterValue ) );
+        branch.setSettingsSetStatus( String.valueOf( setterValue ).split( "." )[0] );
         // update the values to company
         updateBranch( branch );
     }
@@ -7948,7 +7948,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     private void processCompany( OrganizationUnitSettings companySetting )
     {
-        long setterValue = 0l;
+        double setterValue = 0l;
         /* String lockValue = "0";*/
         // get a the company id and get the company from SQL
         LOG.debug( "Getting details of company: " + companySetting.getIden() );
@@ -8055,7 +8055,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         LOG.debug( "Final Settings setter value : " + setterValue );
         /*    LOG.debug( "Final Settings locker value : " + lockValue );*/
-        company.setSettingsSetStatus( String.valueOf( setterValue ) );
+        company.setSettingsSetStatus( String.valueOf( setterValue ).split( "." )[0] );
         /* company.setSettingsLockStatus( lockValue );*/
         // update the values to company
         updateCompany( company );

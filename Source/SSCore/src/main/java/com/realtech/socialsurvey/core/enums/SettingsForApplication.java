@@ -6,32 +6,32 @@ package com.realtech.socialsurvey.core.enums;
 public enum SettingsForApplication
 {
 
-    LOGO( 1d, 1 ),
-    ADDRESS( 10d, 2 ),
-    PHONE( 100d, 3 ),
-    LOCATION( 1000d, 4 ),
-    FACEBOOK( 10000d, 5 ),
-    TWITTER( 100000d, 6 ),
-    LINKED_IN( 1000000d, 7 ),
-    GOOGLE_PLUS( 10000000d, 8 ),
-    YELP( 100000000d, 9 ),
-    ZILLOW( 1000000000d, 10 ),
-    REALTOR( 10000000000d, 11 ),
-    LENDING_TREE( 100000000000d, 12 ),
-    WEB_ADDRESS_WORK( 1000000000000d, 13 ),
-    WEB_ADDRESS_PERSONAL( 100000000000000d, 15 ),
-    ABOUT_ME( 1000000000000000d, 16 ),
-    EMAIL_ID_PERSONAL( 10000000000000000d, 17 ),
-    EMAIL_ID_WORK( 100000000000000000d, 18 ),
-    GOOGLE_BUSINESS( 1000000000000000000d, 19 ),
-    INSTAGRAM( 10000000000000000000d , 20 );
+    LOGO( "1", 1 ),
+    ADDRESS( "10", 2 ),
+    PHONE( "100", 3 ),
+    LOCATION( "1000", 4 ),
+    FACEBOOK( "10000", 5 ),
+    TWITTER( "100000", 6 ),
+    LINKED_IN( "1000000", 7 ),
+    GOOGLE_PLUS( "10000000", 8 ),
+    YELP( "100000000", 9 ),
+    ZILLOW( "1000000000", 10 ),
+    REALTOR( "10000000000", 11 ),
+    LENDING_TREE( "100000000000", 12 ),
+    WEB_ADDRESS_WORK( "1000000000000", 13 ),
+    WEB_ADDRESS_PERSONAL( "100000000000000", 15 ),
+    ABOUT_ME( "1000000000000000", 16 ),
+    EMAIL_ID_PERSONAL( "10000000000000000", 17 ),
+    EMAIL_ID_WORK( "100000000000000000", 18 ),
+    GOOGLE_BUSINESS( "1000000000000000000", 19 ),
+    INSTAGRAM( "10000000000000000000" , 20 );
 
-    private final double order;
+    private final String order;
     private final int index; // the order is the not the index. 1 means units, 2 means tens decimal
                              // places and so on.
 
 
-    SettingsForApplication( double order, int index )
+    SettingsForApplication( String order, int index )
     {
         this.order = order;
         this.index = index;
@@ -40,7 +40,7 @@ public enum SettingsForApplication
 
     public double getOrder()
     {
-        return this.order;
+        return Double.parseDouble( this.order );
     }
 
 
