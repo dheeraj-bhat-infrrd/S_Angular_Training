@@ -1022,3 +1022,8 @@ display: inline-block;
 .margin-top-hundred {
 	margin-top: 100px;
 }
+
+mark{
+	background: #F6FF57;
+	border-radius: 4px;	
+}
