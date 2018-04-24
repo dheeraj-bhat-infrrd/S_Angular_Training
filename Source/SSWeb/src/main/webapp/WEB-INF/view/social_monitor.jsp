@@ -20,12 +20,12 @@
 						<img id="add-mon-type-chevron-up" src="${initParam.resourcesPath}/resources/images/chevron-up.png" class="hide float-right bulk-actions-dropdown-img">
 					</div>
 					<div id="add-mon-type-options" class="hide float-left add-mon-type-options">
-						<div id="add-mon-type-km" class="bulk-option add-mon-type-opt">
+						<div id="add-mon-type-km" class="bulk-mon-option add-mon-type-opt">
 							<img id="add-keyword-mon-unchecked" src="${initParam.resourcesPath}/resources/images/check-no.png"  class="hide float-left mon-type-checkbox add-mon-type-uncheckbox">
 							<img id="add-keyword-mon-checked" src="${initParam.resourcesPath}/resources/images/check-yes.png"  class="float-left mon-type-checkbox add-mon-type-checkbox">
 							Keyword Monitor
 						</div>
-						<div id="add-mon-type-ga" class="bulk-option add-mon-type-opt">
+						<div id="add-mon-type-ga" class="bulk-mon-option add-mon-type-opt">
 							<img id="add-google-alerts-mon-unchecked" src="${initParam.resourcesPath}/resources/images/check-no.png"  class="hide float-left mon-type-checkbox add-mon-type-uncheckbox">
 							<img id="add-google-alerts-mon-checked" src="${initParam.resourcesPath}/resources/images/check-yes.png"  class="float-left mon-type-checkbox add-mon-type-checkbox">
 							Google Alerts
@@ -78,12 +78,12 @@
 				<div id="mon-type-dropdown" class="float-left stream-bulk-actions macro-dropdown-options">
 					<div class="mon-type-select">Monitor Type(s) <img src="${initParam.resourcesPath}/resources/images/chevron-down.png" id="mon-type-chevron-down" class="float-right bulk-actions-dropdown-img"><img id="mon-type-chevron-up" src="${initParam.resourcesPath}/resources/images/chevron-up.png" class="hide float-right bulk-actions-dropdown-img"></div>
 					<div id="mon-type-options" class="hide float-left bulk-actions-options mon-type-select-options">
-						<div id="mon-type-keyword-mon" class="bulk-option mon-type-option">
+						<div id="mon-type-keyword-mon" class="bulk-mon-option mon-type-option">
 							<img id="keyword-mon-unchecked" src="${initParam.resourcesPath}/resources/images/check-no.png"  class="hide float-left mon-type-checkbox">
 							<img id="keyword-mon-checked" src="${initParam.resourcesPath}/resources/images/check-yes.png"  class="float-left mon-type-checkbox">
 							Keyword Monitor
 						</div>
-						<div id="mon-type-google-alerts" class="bulk-option mon-type-option">
+						<div id="mon-type-google-alerts" class="bulk-mon-option mon-type-option">
 							<img id="google-alerts-mon-unchecked" src="${initParam.resourcesPath}/resources/images/check-no.png"  class="hide float-left mon-type-checkbox">
 							<img id="google-alerts-mon-checked" src="${initParam.resourcesPath}/resources/images/check-yes.png"  class="float-left mon-type-checkbox">
 							Google Alerts
@@ -114,6 +114,9 @@
 	
 	<div id="monitor-list-container" class="dash-container container mon-type-container zero-padding">
 		
+	</div>
+	<div  id="empty-monitors" class="hide dash-container container mon-type-container zero-padding">
+		<span class="incomplete-trans-span stream-alert">No monitors found.</span>
 	</div>
 </div>
 

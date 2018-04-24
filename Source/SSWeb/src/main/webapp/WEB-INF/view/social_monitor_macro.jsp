@@ -31,15 +31,6 @@
 				<span id="soc-mon-macro-search-icn" class="um-search-icn"></span>
 				<div id="soc-mon-macro-search-clr" class="um-clear-input-icn hide" title="clear"></div>
 			</div>
-			<%-- <div class="hm-header-left text-center float-left">
-				<div id="macro-status-dropdown" class="float-left stream-bulk-actions macro-dropdown-options">
-					<div class="bulk-actions-select">Active <img src="${initParam.resourcesPath}/resources/images/chevron-down.png" id="macro-page-chevron-down" class="float-right bulk-actions-dropdown-img"><img id="macro-page-chevron-up" src="${initParam.resourcesPath}/resources/images/chevron-up.png" class="hide float-right bulk-actions-dropdown-img"></div>
-					<div id="macro-status-options" class="hide float-left bulk-actions-options">
-						<div id="macro-active" class="bulk-option">Active</div>
-						<div id="macro-inactive" class="bulk-option">Inactive</div>
-					</div>
-				</div>
-			</div> --%>
 			<div class="float-right hm-header-right text-center soc-mon-btn soc-mon-add-mon" onclick="javascript:showMainContent('./showsocialmonitoraddmacropage.do')">
 				<spring:message code="label.add.macros.key" />
 			</div>
