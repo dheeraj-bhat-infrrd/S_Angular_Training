@@ -486,12 +486,12 @@ public class SurveyManagementController
     }
 
     private String generateSurveyTextForMail(String customerName, String mood, SurveyDetails survey, boolean isAbusive, boolean allowCheckBox) {
-        Map<String,String> questionTypeInit = new HashMap<>();
-        questionTypeInit.put( "sb-range-star", "1-5 Range" );
-        questionTypeInit.put( "sb-range-smiles", "1-5 Range" );
-        questionTypeInit.put( "sb-range-0to10", "0-10 Range" );
-        questionTypeInit.put( "sb-sel-mcq", "Multiple Choice" );
-        questionTypeInit.put( "sb-sel-desc", "Comment" );
+        Map<String,String> questionTypeDisplayName = new HashMap<>();
+        questionTypeDisplayName.put( "sb-range-star", "1-5 Range" );
+        questionTypeDisplayName.put( "sb-range-smiles", "1-5 Range" );
+        questionTypeDisplayName.put( "sb-range-0to10", "0-10 Range" );
+        questionTypeDisplayName.put( "sb-sel-mcq", "Multiple Choice" );
+        questionTypeDisplayName.put( "sb-sel-desc", "Comment" );
 
 
 		final String tableOneFirstColumnWidth = "150px";
@@ -531,7 +531,7 @@ public class SurveyManagementController
 		surveyDetail.append(paragraph).append(tableStart);
 
 		for (SurveyResponse response : survey.getSurveyResponse()) {
-			surveyDetail.append(tableTwoRowStart).append(response.getQuestion()).append( " (" ).append( questionTypeInit.get( response.getQuestionType() ) ).append( ")" )
+			surveyDetail.append(tableTwoRowStart).append(response.getQuestion()).append( " (" ).append( questionTypeDisplayName.get( response.getQuestionType() ) ).append( ")" )
 			.append(tableRowMiddle).append(response.getAnswer())
 			.append(tableRowEnd);
 		}
