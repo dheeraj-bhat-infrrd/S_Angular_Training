@@ -289,7 +289,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
                     }
                 }
             }
-            if ( macroActionFlag != 1 ) {
+            if ( macroActionFlag != 1 && updateFlag != 1) {
                 if ( ( socialFeedsActionUpdate.getTextActionType().toString()
                     .equalsIgnoreCase( TextActionType.PRIVATE_NOTE.toString() ) )
                     && ( socialFeedsActionUpdate.getText() != null ) && !( socialFeedsActionUpdate.getText().isEmpty() ) ) {
