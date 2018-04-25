@@ -6732,7 +6732,9 @@ tr.u-tbl-header td {
 }
 
 .icn-wide-instagram {
-	background: url(../images/instagram_wide.png) no-repeat 0px 0px;
+	background: url(../images/instawide.png) no-repeat 0px 0px;
+    border-radius: 5px;
+    margin-left: 2px;
 }
 
 .dd-arrow-dn {
@@ -10250,7 +10252,7 @@ ul.accordion li>a:before {
 
 .rep-instagram-btn{
 	height: 35px;
-    background: url(../images/instagram_wide.png) no-repeat center #ffff;
+    background: url(../images/insta_wide_large.png) no-repeat center #ffff;
 }
 
 .warn-toggle {
