@@ -26,10 +26,10 @@ public class FacebookAPIOperations
     private static final String FIELDS ="story,message,created_time,updated_time,full_picture,picture,message_tags,from";
     private static final String LIMIT = "100";
 
-    private static final String IG_FIELDS = "ig_id,caption,media_url,media_type,timestamp";
+    private static final String IG_FIELDS = "ig_id,caption,media_url,media_type,timestamp,username";
     public static final String IG_LIMIT = "50";
 
-    private static final String IG_INITIAL_FIELDS = "connected_instagram_account{media.limit(50){ig_id,caption,media_url,media_type,timestamp}}";
+    private static final String IG_INITIAL_FIELDS = "connected_instagram_account{media.limit(50){ig_id,caption,media_url,media_type,timestamp,username}}";
 
     private FacebookAPIOperations()
     {}

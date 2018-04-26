@@ -145,6 +145,10 @@ public class LinkedinFeedExtractorBolt extends BaseComputeBolt
         responseWrapper.setPostId( id );
         //Id is postId_companyId
         responseWrapper.setId( id + "_" + responseWrapper.getCompanyId() );
+
+        if(linkedinFeedData.getUpdateContent() != null && linkedinFeedData.getUpdateContent().getCompany() != null)
+            responseWrapper.setOwnerName( linkedinFeedData.getUpdateContent().getCompany().getName() );
+
         return responseWrapper;
     }
 
