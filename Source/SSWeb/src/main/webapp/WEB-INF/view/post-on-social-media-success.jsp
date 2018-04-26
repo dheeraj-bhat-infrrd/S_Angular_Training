@@ -43,7 +43,7 @@
 
         <div class="footer-main-wrapper">
             <div class="container text-center footer-text">
-                Copyright &copy; SocialSurvey <span class="center-dot">.</span> All Rights Reserved.
+                Copyright &copy; 2018 SocialSurvey<span class="center-dot">.</span> All Rights Reserved.
             </div>
         </div>
     </div>
