@@ -18632,7 +18632,7 @@ $(document).on('click','#stream-bulk-unflag',function(e){
 		$('#bulk-actions-apply').find('.form-macro-id').val('');
 		
 		var text = $('#action-edit-txt-box').val();
-		$('#bulk-actions-apply').find('.form-text').val(text);
+		$('#bulk-actions-apply').find('.form-post-textbox').val(text);
 		
 		actionPopupRevert();
 		
@@ -18668,7 +18668,7 @@ $(document).on('click','#stream-bulk-flag',function(e){
 		$('#bulk-actions-apply').find('.form-macro-id').val('');
 		
 		var text = $('#action-edit-txt-box').val();
-		$('#bulk-actions-apply').find('.form-text').val(text);
+		$('#bulk-actions-apply').find('.form-post-textbox').val(text);
 		
 		actionPopupRevert();
 		
@@ -18710,7 +18710,7 @@ $(document).on('click','#stream-bulk-esc',function(e){
 			
 			return;
 		}
-		$('#bulk-actions-apply').find('.form-text').val(text);
+		$('#bulk-actions-apply').find('.form-post-textbox').val(text);
 		
 		actionPopupRevert();
 		
@@ -18750,7 +18750,7 @@ $(document).on('click','#stream-bulk-res',function(e){
 			
 			return;
 		}
-		$('#bulk-actions-apply').find('.form-text').val(text);
+		$('#bulk-actions-apply').find('.form-post-textbox').val(text);
 		
 		actionPopupRevert();
 		
@@ -18884,8 +18884,13 @@ function showToastForBulkActions(data){
 			}
 		}else if(status == 'ESCALATED'){
 			updatedAction = 'Escalated';
-		}else{
+		}else if(status == 'RESOLVED'){
 			updatedAction = 'Resolved';
+		}else{
+			var message = selPostIds.length +' records updated successfully';
+			$("#overlay-toast").html(message);
+			
+			return;
 		}
 		
 		var message = successCount +' records successfully moved to '+ updatedAction +'. \n'+ failedCount + ' failed to be moved  to ' + updatedAction + '.';
@@ -20199,4 +20204,10 @@ $('body').on('blur', '#user-notification-recipients', function() {
 		showToast();
 	}, payload, true);
 	
+});
+
+
+$(document).on('click','#action-edit-txt-box',function(e){
+	e.stopImmediatePropagation();
+	e.preventDefault();
 });
