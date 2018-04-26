@@ -19,7 +19,7 @@ public class ActionHistoryComparator implements Comparator<ActionHistory> {
 		} else if (actionHistory1.getCreatedDate() < actionHistory2.getCreatedDate()) {
 			return 1;
 		} else {
-			return 0;
+			return -1;
 		}
 	}
 }

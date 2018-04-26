@@ -73,78 +73,6 @@ $(document).ready(function() {
 		parentWindow = window.opener;
 	}
 	
-	var radioButtonDiv= $("<div style='text-align:left;margin-left:130px;max-height: 220px;overflow: auto;'>")
-	<c:forEach var="page" items="${pageNames}" varStatus="loop">
-		radioButtonDiv.append('<input type="radio" name="pageselection" value="${loop.index}"/>'+"${fn:escapeXml(page.name)}"+" <br/>");
-	</c:forEach>
-	$("#page").append(radioButtonDiv);
-
-	var saveButton= $("<div class='reg_btn'>save</div>");
-	var warnText = $("<div>No connected instagram accounts</div>")
-	<c:if test="${not empty pageNames}">
-		$("#page").append(saveButton);
-	</c:if>
-
-    <c:if test="${empty pageNames}">
-		$("#page").append(warnText);
-	</c:if>
-
-	 
-	saveButton.click(function() {
-		
-		if ( $(this).data('requestRunning') ) {
-			return;
-	    }
-		disable(this);
-		var selectedPage=$('input:radio[name=pageselection]:checked').val();
-		if(selectedPage == undefined){
-			$('#overlay-toast').html("Please select an account");
-			showToast();
-			enable(this);
-			return;
-		}
-		var selectedAccessFacebookToken;
-		var selectedProfileUrl;
-		var selectedProfileId;
-		<c:forEach var="page" items="${pageNames}"  varStatus="loop">
-		  if("${loop.index}" == selectedPage){
-			  selectedProfileUrl= "${page.profileUrl}";
-			  selectedAccessFacebookToken= "${page.accessToken}";
-			  selectedProfileId = "${page.id}";
-		  }
-		</c:forEach>
-		var facebookToken = {
-			'selectedAccessFacebookToken' : selectedAccessFacebookToken,
-			'selectedProfileUrl' :  selectedProfileUrl,
-			'fbAccessToken' : fbAccessToken,
-			'selectedProfileId' : selectedProfileId
-		};
-		$.ajax({
-			url : "${callback}",
-			type : "GET",
-			cache : false,
-			data : facebookToken,
-			async : false,
-			complete :function(e){
-				enable(this);
-				parentWindow.loadSocialMediaUrlInSettingsPage();
-				parentWindow.loadSocialMediaUrlInPopup();
-				checkIfFacebookSet = true;
-				setTimeout(function() {
-					window.close();
-				}, 3000);
-				
-			},
-			error : function(e) {
-				if(e.status == 504) {
-					redirectToLoginPageOnSessionTimeOut(e.status);
-					return;
-				}
-				redirectErrorpage();
-			}
-		});
-    });
-});
 	var isFixSocialMedia ="${isFixSocialMedia}";
 	var isNewUser = "${isNewUser}";
 	var fromDashboard = "${fromDashboard}";
@@ -209,17 +137,23 @@ $(document).ready(function() {
 			
 		}
 	}else{
+		
 		var radioButtonDiv= $("<div style='text-align:left;margin-left:130px;max-height: 220px;overflow: auto;'>")
 		<c:forEach var="page" items="${pageNames}" varStatus="loop">
 			radioButtonDiv.append('<input type="radio" name="pageselection" value="${loop.index}"/>'+"${fn:escapeXml(page.name)}"+" <br/>");
 		</c:forEach>
 		$("#page").append(radioButtonDiv);
-		
+
 		var saveButton= $("<div class='reg_btn'>save</div>");
+		var warnText = $("<div>No connected instagram accounts</div>")
 		<c:if test="${not empty pageNames}">
 			$("#page").append(saveButton);
 		</c:if>
-		 
+
+	    <c:if test="${empty pageNames}">
+			$("#page").append(warnText);
+		</c:if>
+		
 		saveButton.click(function() {
 			
 			if ( $(this).data('requestRunning') ) {
@@ -235,19 +169,22 @@ $(document).ready(function() {
 			}
 			var selectedAccessFacebookToken;
 			var selectedProfileUrl;
+			var selectedProfileId;
 			<c:forEach var="page" items="${pageNames}"  varStatus="loop">
 			  if("${loop.index}" == selectedPage){
 				  selectedProfileUrl= "${page.profileUrl}";
 				  selectedAccessFacebookToken= "${page.accessToken}";
+				  selectedProfileId = "${page.id}";
 			  }
 			</c:forEach>
 			var facebookToken = {
 				'selectedAccessFacebookToken' : selectedAccessFacebookToken,
 				'selectedProfileUrl' :  selectedProfileUrl,
-				'fbAccessToken' : fbAccessToken
+				'fbAccessToken' : fbAccessToken,
+				'selectedProfileId' : selectedProfileId
 			};
 			$.ajax({
-				url : './saveSelectedAccessFacebookToken.do',
+				url : "${callback}",
 				type : "GET",
 				cache : false,
 				data : facebookToken,
@@ -272,8 +209,6 @@ $(document).ready(function() {
 			});
 	    });
 	}
-	
-	
 });
 
 function fetchSocialProfileUrl(payload, callBackFunction){
