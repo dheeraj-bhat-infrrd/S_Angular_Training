@@ -98,7 +98,7 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
         ActionHistory actionHistory = new ActionHistory();
         actionHistory.setCreatedDate( new Date().getTime() );
         actionHistory.setActionType( ActionHistoryType.FLAGGED );
-        actionHistory.setText( "The post was <b class='soc-mon-bold-text'>flagged</b> for matching <b class='soc-mon-bold-text'>" + String.join( ",", foundKeyWords )  + "</b>");
+        actionHistory.setText( "The post was <b class='soc-mon-bold-text'>Flagged</b> for matching <b class='soc-mon-bold-text'>" + String.join( ",", foundKeyWords )  + "</b>");
         return actionHistory;
     }
 
