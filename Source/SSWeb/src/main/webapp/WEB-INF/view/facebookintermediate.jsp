@@ -145,13 +145,13 @@ $(document).ready(function() {
 		$("#page").append(radioButtonDiv);
 
 		var saveButton= $("<div class='reg_btn'>save</div>");
-		var warnText = $("<div>No connected instagram accounts</div>")
+		
 		<c:if test="${not empty pageNames}">
 			$("#page").append(saveButton);
 		</c:if>
 
-	    <c:if test="${empty pageNames}">
-			$("#page").append(warnText);
+	    <c:if test="${isPageListEmpty}">
+			$("#page").append("<div>No connected instagram accounts</div>");
 		</c:if>
 		
 		saveButton.click(function() {

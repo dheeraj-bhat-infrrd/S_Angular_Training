@@ -15,7 +15,7 @@
 			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 macro-form-txt">MonitorType</div>
 			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-1">
 				<div id="add-mon-type-dropdown" class="float-left add-mon-type-dropdown">
-					<div id="add-mon-type-select" class="bulk-actions-select" data-mon-type=2><div class="float-left" id="add-mon-type-sel-txt">Keyword Monitor</div> 
+					<div id="add-mon-type-select" class="bulk-actions-select" data-mon-type=2><div class="float-left" id="add-mon-type-sel-txt">Keyword Monitor, Google Alerts</div> 
 						<img src="${initParam.resourcesPath}/resources/images/chevron-down.png" id="add-mon-type-chevron-down" class="float-right bulk-actions-dropdown-img">
 						<img id="add-mon-type-chevron-up" src="${initParam.resourcesPath}/resources/images/chevron-up.png" class="hide float-right bulk-actions-dropdown-img">
 					</div>

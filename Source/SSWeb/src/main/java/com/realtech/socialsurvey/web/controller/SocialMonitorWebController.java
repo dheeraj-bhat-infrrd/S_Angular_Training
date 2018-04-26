@@ -189,7 +189,9 @@ public class SocialMonitorWebController {
 		if(!monitorTypeStr.isEmpty() && monitorTypeStr != null) {
 		    monitorTypeNumVal = Integer.valueOf( monitorTypeStr );
     		    
-		    if(monitorTypeNumVal>1) {
+		    if(monitorTypeNumVal==999) {
+		        return multiplePhrasesVOList;
+		    }else if(monitorTypeNumVal==2) {
 		        
 		        multiplePhrasesVOList.add( new MultiplePhrasesVO() );
 		        multiplePhrasesVOList.get(0).setPhrases( keyphraseList );

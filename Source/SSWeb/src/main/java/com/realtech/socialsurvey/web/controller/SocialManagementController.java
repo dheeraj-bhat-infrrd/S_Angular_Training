@@ -523,6 +523,7 @@ public class SocialManagementController
             }
             String fbAccessTokenStr = new Gson().toJson( accessToken, facebook4j.auth.AccessToken.class );
             model.addAttribute( "pageNames", facebookPages );
+            
             model.addAttribute( "fbAccessToken", fbAccessTokenStr );
             String mediaTokensStr = new Gson().toJson( mediaTokens, SocialMediaTokens.class );
             model.addAttribute( "mediaTokens", mediaTokensStr );
@@ -630,6 +631,10 @@ public class SocialManagementController
                 }
             }
 
+            if(facebookPages.isEmpty()){
+                model.addAttribute( "isPageListEmpty", true );
+            }
+            
             String fbAccessTokenStr = new Gson().toJson( accessToken, facebook4j.auth.AccessToken.class );
             model.addAttribute( "pageNames", facebookPages );
             model.addAttribute( "fbAccessToken", fbAccessTokenStr );

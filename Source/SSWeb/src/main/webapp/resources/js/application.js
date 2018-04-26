@@ -16465,12 +16465,17 @@ $(document).on('click','#mon-type-dropdown',function(e){
 });
 
 $(document).on('click','#add-mon-type-dropdown',function(e){
-	e.stopPropagation();
+	e.stopImmediatePropagation();
+	e.preventDefault();
+	
 	$('#add-mon-type-options').toggle();
 	$('#add-mon-type-chevron-down').toggle();
 	$('#add-mon-type-chevron-up').toggle();
 	
-	$('#add-mon-type-options').on('click','#add-mon-type-km',function(e){
+	$('#add-mon-type-options').css('width',$('.add-mon-type-dropdown').css('width'));
+	
+	$('#add-mon-type-km').off();
+	$('#add-mon-type-km').click(function(e){
 		e.stopPropagation();
 					
 		if($('#add-keyword-mon-unchecked').hasClass('hide')){
@@ -16479,21 +16484,14 @@ $(document).on('click','#add-mon-type-dropdown',function(e){
 		}else{
 			$('#add-keyword-mon-unchecked').addClass('hide');
 			$('#add-keyword-mon-checked').removeClass('hide');
-			$('#add-mon-type-select').attr('data-mon-type',0);
-			$('#monitor-type').val(0);
-			$('#add-mon-type-sel-txt').val('Keyword Monitor');
 		}
 		
-		if($('#add-keyword-mon-unchecked').hasClass('hide') && $('#add-google-alerts-mon-unchecked').hasClass('hide')){
-			$('#add-mon-type-select').attr('data-mon-type',2);
-			$('#monitor-type').val(2);
-			$('#add-mon-type-sel-txt').val('Keyword Monitor, Google Alerts');
-		}
-		
+		setMonitorType();
 		
 	});
 	
-	$('#add-mon-type-options').on('click','#add-mon-type-ga',function(e){
+	$('#add-mon-type-ga').off();
+	$('#add-mon-type-ga').click(function(e){
 		e.stopPropagation();
 				
 		if($('#add-google-alerts-mon-unchecked').hasClass('hide')){
@@ -16502,21 +16500,45 @@ $(document).on('click','#add-mon-type-dropdown',function(e){
 		}else{
 			$('#add-google-alerts-mon-unchecked').addClass('hide');
 			$('#add-google-alerts-mon-checked').removeClass('hide');
-			$('#add-mon-type-select').attr('data-mon-type',1);
-			$('#monitor-type').val(1);
-			$('#add-mon-type-sel-txt').val('Google Alerts');
-			
 		}
 		
-		if($('#add-keyword-mon-unchecked').hasClass('hide') && $('#add-google-alerts-mon-unchecked').hasClass('hide')){
-			$('#add-mon-type-select').attr('data-mon-type',2);
-			$('#monitor-type').val(2);
-			$('#add-mon-type-sel-txt').val('Keyword Monitor, Google Alerts');
-		}
+		setMonitorType();
 		
 	});
 	
 });
+
+function setMonitorType(){
+	if($('#add-keyword-mon-unchecked').hasClass('hide') && $('#add-google-alerts-mon-unchecked').hasClass('hide')){
+		
+		$('#add-mon-type-select').attr('data-mon-type',2);
+		$('#monitor-type').val(2);
+		$('#add-mon-type-sel-txt').html('Keyword Monitor, Google Alerts');
+		$('.add-mon-type-dropdown').css('width','auto');
+		
+	}else if($('#add-keyword-mon-unchecked').hasClass('hide')){
+		
+		$('#add-mon-type-select').attr('data-mon-type',0);
+		$('#monitor-type').val(0);
+		$('#add-mon-type-sel-txt').html('Keyword Monitor');
+		$('.add-mon-type-dropdown').css('width','150px');
+		
+	}else if($('#add-google-alerts-mon-unchecked').hasClass('hide')){
+		
+		$('#add-mon-type-select').attr('data-mon-type',1);
+		$('#monitor-type').val(1);
+		$('#add-mon-type-sel-txt').html('Google Alerts');
+		$('.add-mon-type-dropdown').css('width','150px');
+		
+	}else{
+		$('#add-mon-type-select').attr('data-mon-type',999);
+		$('#monitor-type').val(999);
+		$('#add-mon-type-sel-txt').html('None');
+		$('.add-mon-type-dropdown').css('width','150px');
+	}
+	
+	$('#add-mon-type-options').css('width',$('.add-mon-type-dropdown').css('width'));
+}
 
 $(document).on('click','#mon-type-keyword-mon',function(e){
 	e.stopImmediatePropagation();
@@ -16633,9 +16655,9 @@ $(document).on('click','#stream-feed-dropdown-options',function(e){
 function showAddMonitorPopup(){
 	$('#add-mon-popup').removeClass('hide');
 	
-	$(document).on('blur','#mon-type-txt-box',function(e){
+	$(document).on('blur','#monitor-keyphrase',function(e){
 		e.stopPropagation();
-		if($('#mon-type-txt-box').val() != '' && $('#mon-type-txt-box').val() != undefined && $('#mon-type-txt-box').val() != null){
+		if($('#monitor-keyphrase').val() != '' && $('#monitor-keyphrase').val() != undefined && $('#monitor-keyphrase').val() != null){
 			$('#add-mon-save-active').show();
 			$('#add-mon-save-inactive').hide();
 		}else{
@@ -16646,9 +16668,23 @@ function showAddMonitorPopup(){
 }
 
 function hideAddMonitorPopup(){
-	$('#mon-type-txt-box').val('');
+	$('#monitor-keyphrase').val('');
 	$('#add-mon-type-select').attr('data-mon-type',2);
 	$('#monitor-type').val(2);
+	$('#add-mon-type-sel-txt').html('Keyword Monitor, Google Alerts');
+	$('.add-mon-type-dropdown').css('width','auto');
+	$('#add-mon-type-options').css('width',$('.add-mon-type-dropdown').css('width'));
+	
+	if($('#add-keyword-mon-checked').hasClass('hide')){
+		$('#add-keyword-mon-unchecked').addClass('hide');
+		$('#add-keyword-mon-checked').removeClass('hide');
+	}
+	
+	if($('#add-google-alerts-mon-checked').hasClass('hide')){
+		$('#add-google-alerts-mon-unchecked').addClass('hide');
+		$('#add-google-alerts-mon-checked').removeClass('hide');
+	}
+	
 	$('#add-mon-popup').addClass('hide');
 }
 
@@ -16799,10 +16835,7 @@ function addMonitor(){
 				if (map.status == "success") {
 					$('#add-monitor-form').attr('data-status', 'new');
 					$("#overlay-toast").html("Successfully Added Monitor");
-					$('#add-mon-type-select').attr('data-mon-type',2);
-					$('#monitor-type').val(2);
 					
-					$('#monitor-keyphrase').html('');
 					var monitorData = JSON.parse(map.keywords);
 					drawMonitorList(monitorData);
 					hideAddMonitorPopup();
@@ -17628,10 +17661,12 @@ function drawStreamPage(streamPostList){
 		if(streamPostList[i].pictures != null && streamPostList[i].pictures != undefined){
 			for(var picI=0; picI<streamPostList[i].pictures.length; picI++){
 				
-				var picContainer = '<div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 float-right stream-post-pic-div" >'
-					   			+'<img src="'+streamPostList[i].pictures[picI]+'" class="stream-post-details-pic float-left stream-post-pic"></div>';
-				
-				$('#stream-post-details-cont-'+postId).append(picContainer);
+				if(streamPostList[i].pictures[picI] != null && streamPostList[i].pictures[picI] != undefined && streamPostList[i].pictures[picI] != ''){
+					var picContainer = '<div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 float-right stream-post-pic-div" >'
+			   			+'<img src="'+streamPostList[i].pictures[picI]+'" class="stream-post-details-pic float-left stream-post-pic"></div>';
+		
+					$('#stream-post-details-cont-'+postId).append(picContainer);
+				}
 			}	
 		}
 		
@@ -18632,7 +18667,7 @@ $(document).on('click','#stream-bulk-unflag',function(e){
 		$('#bulk-actions-apply').find('.form-macro-id').val('');
 		
 		var text = $('#action-edit-txt-box').val();
-		$('#bulk-actions-apply').find('.form-text').val(text);
+		$('#bulk-actions-apply').find('.form-post-textbox').val(text);
 		
 		actionPopupRevert();
 		
@@ -18668,7 +18703,7 @@ $(document).on('click','#stream-bulk-flag',function(e){
 		$('#bulk-actions-apply').find('.form-macro-id').val('');
 		
 		var text = $('#action-edit-txt-box').val();
-		$('#bulk-actions-apply').find('.form-text').val(text);
+		$('#bulk-actions-apply').find('.form-post-textbox').val(text);
 		
 		actionPopupRevert();
 		
@@ -18710,7 +18745,7 @@ $(document).on('click','#stream-bulk-esc',function(e){
 			
 			return;
 		}
-		$('#bulk-actions-apply').find('.form-text').val(text);
+		$('#bulk-actions-apply').find('.form-post-textbox').val(text);
 		
 		actionPopupRevert();
 		
@@ -18750,7 +18785,7 @@ $(document).on('click','#stream-bulk-res',function(e){
 			
 			return;
 		}
-		$('#bulk-actions-apply').find('.form-text').val(text);
+		$('#bulk-actions-apply').find('.form-post-textbox').val(text);
 		
 		actionPopupRevert();
 		
@@ -18884,8 +18919,13 @@ function showToastForBulkActions(data){
 			}
 		}else if(status == 'ESCALATED'){
 			updatedAction = 'Escalated';
-		}else{
+		}else if(status == 'RESOLVED'){
 			updatedAction = 'Resolved';
+		}else{
+			var message = selPostIds.length +' records updated successfully';
+			$("#overlay-toast").html(message);
+			
+			return;
 		}
 		
 		var message = successCount +' records successfully moved to '+ updatedAction +'. \n'+ failedCount + ' failed to be moved  to ' + updatedAction + '.';
@@ -20199,4 +20239,10 @@ $('body').on('blur', '#user-notification-recipients', function() {
 		showToast();
 	}, payload, true);
 	
+});
+
+
+$(document).on('click','#action-edit-txt-box',function(e){
+	e.stopImmediatePropagation();
+	e.preventDefault();
 });
