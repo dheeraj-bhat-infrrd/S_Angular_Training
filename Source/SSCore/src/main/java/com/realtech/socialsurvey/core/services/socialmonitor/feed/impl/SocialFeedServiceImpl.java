@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -164,7 +165,13 @@ public class SocialFeedServiceImpl implements SocialFeedService
                 socialMonitorFeedData.setFoundKeywords( socialResponseObject.getFoundKeywords() );
                 socialMonitorFeedData.setDuplicateCount( socialResponseObject.getDuplicateCount() );
                 socialMonitorFeedData.setPageLink( socialResponseObject.getPageLink() );
-                socialMonitorFeedData.setTextHighlighted( socialResponseObject.getTextHighlighted() );
+                
+                if(StringUtils.isNotEmpty( socialResponseObject.getTextHighlighted() )){
+                    socialMonitorFeedData.setTextHighlighted( socialResponseObject.getTextHighlighted() );
+                } else {
+                    socialMonitorFeedData.setTextHighlighted( socialResponseObject.getText() );
+                }
+                
                 socialMonitorStreamDataList.add( socialMonitorFeedData );
             }
             socialMonitorResponseData.setCount( mongoSocialFeedDao.getAllSocialFeedsCount( flag, status, feedtype, companyId,

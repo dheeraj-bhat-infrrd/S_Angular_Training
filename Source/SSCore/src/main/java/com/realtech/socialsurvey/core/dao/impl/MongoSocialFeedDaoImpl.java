@@ -6,6 +6,7 @@ import com.realtech.socialsurvey.core.dao.MongoSocialFeedDao;
 import com.realtech.socialsurvey.core.entities.*;
 import com.realtech.socialsurvey.core.enums.ProfileType;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -339,7 +340,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
             criteria.orOperator((Criteria.where(CommonConstants.COMPANY_ID).is(companyId)));
         }
         
-        if(searchText != null)
+        if(StringUtils.isNotEmpty( searchText ))
         {
             criteria.andOperator((Criteria.where( TEXT ).regex( Pattern.compile(searchText.trim() , Pattern.CASE_INSENSITIVE) )));
         }
