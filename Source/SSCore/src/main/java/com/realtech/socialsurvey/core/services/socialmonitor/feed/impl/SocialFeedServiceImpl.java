@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 
 import com.realtech.socialsurvey.core.commons.ActionHistoryComparator;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.MacrosComparator;
 import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.MongoSocialFeedDao;
@@ -334,6 +335,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
             }
             //update macro count only if the action is applied on the current postId
             if ( macroFlag && macroActionFlag != 1 ) {
+                socialMonitorMacro.setLastUsedTime( new Date().getTime() );
                 ( socialMonitorMacro.getMacroUsageTime() ).add( new Date().getTime() );
             }
         }
@@ -383,6 +385,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
         } else {
             LOG.warn( "The List is empty" );
         }
+        Collections.sort( macrosToAdd, new MacrosComparator() );
         return macrosToAdd;
 
     }
