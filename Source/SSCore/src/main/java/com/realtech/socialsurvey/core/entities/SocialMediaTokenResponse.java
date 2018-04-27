@@ -1,8 +1,12 @@
 package com.realtech.socialsurvey.core.entities;
 
 import java.io.Serializable;
+import java.util.Map;
 
+import com.google.gson.annotations.SerializedName;
 import com.realtech.socialsurvey.core.enums.ProfileType;
+import org.springframework.data.mongodb.core.mapping.Field;
+
 
 /**
  * Entity for social media response
@@ -17,6 +21,8 @@ public class SocialMediaTokenResponse implements Serializable
     private SocialMediaTokensForSM socialMediaTokens;
     private ProfileType profileType;
     private String profileImageUrl;
+    @Field("contact_details")
+    private ContactDetails contactDetails;
 
     public long getIden()
     {
@@ -70,5 +76,25 @@ public class SocialMediaTokenResponse implements Serializable
 
     public void setProfileImageUrl(String profileImageUrl) {
         this.profileImageUrl = profileImageUrl;
+    }
+
+
+    public ContactDetails getContactDetails()
+    {
+        return contactDetails;
+    }
+
+
+    public void setContactDetails( ContactDetails contactDetails )
+    {
+        this.contactDetails = contactDetails;
+    }
+
+
+    @Override public String toString()
+    {
+        return "SocialMediaTokenResponse{" + "iden=" + iden + ", companyId=" + companyId + ", socialMediaTokens="
+            + socialMediaTokens + ", profileType=" + profileType + ", profileImageUrl='" + profileImageUrl + '\''
+            + ", contactDetails=" + contactDetails + '\'' + '}';
     }
 }

@@ -1182,8 +1182,9 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         LOG.debug( "Fetching social media tokens from {}", collectionName );
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_SOCIAL_MEDIA_TOKENS ).exists( true )  );
-        query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).include( KEY_IDENTIFIER ).exclude( "_id" );
-        
+        query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).include( KEY_IDENTIFIER )
+            .include( KEY_CONTACT_DETAILS ).exclude( "_id" );
+
         if ( skipCount > 0 ) {
             query.skip( skipCount );
         }

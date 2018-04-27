@@ -10,11 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
-import com.realtech.socialsurvey.compute.entities.FacebookToken;
-import com.realtech.socialsurvey.compute.entities.LinkedInToken;
 import com.realtech.socialsurvey.compute.entities.LinkedInTokenForSM;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
-import com.realtech.socialsurvey.compute.entities.TwitterToken;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.entities.response.linkedin.LinkedinFeedData;
 import com.realtech.socialsurvey.compute.enums.ProfileType;
@@ -145,9 +142,8 @@ public class LinkedinFeedExtractorBolt extends BaseComputeBolt
         responseWrapper.setPostId( id );
         //Id is postId_companyId
         responseWrapper.setId( id + "_" + responseWrapper.getCompanyId() );
-
-        if(linkedinFeedData.getUpdateContent() != null && linkedinFeedData.getUpdateContent().getCompany() != null)
-            responseWrapper.setOwnerName( linkedinFeedData.getUpdateContent().getCompany().getName() );
+        responseWrapper.setOwnerName( mediaToken.getContactDetails().getName() );
+        responseWrapper.setOwnerEmail( mediaToken.getContactDetails().getMailDetails().getEmailId() );
 
         return responseWrapper;
     }
