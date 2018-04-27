@@ -4245,17 +4245,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         if ( user == null ) {
             throw new InvalidInputException( "User not found for userId:" + userId );
         }
-
-        //get primary profile profile of user
-        List<UserProfile> userProfiles = user.getUserProfiles();
-        for ( UserProfile userProfile : userProfiles ) {
-            if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_SS_ADMIN_PROFILE_ID ) {
-                // social survey admin
-                return true;
-            }
-        }
-
-        return false;
+        return isUserSocialSurveyAdmin( user );
     }
 
 
@@ -4897,6 +4887,30 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         } catch ( Exception databaseException ) {
             LOG.error( "Exception caught while checking for email id in USERS table." );
         }
+    }
+    
+    
+    
+    @Override
+    public boolean isUserSocialSurveyAdmin( User user ) {
+        LOG.trace( "method isUserSocialSurveyAdmin() called for {}", user );
+        if( user == null ) {
+            LOG.warn( "User object can't be null" );
+            return false;
+        } else {
+            
+            //get primary profile profile of user
+            List<UserProfile> userProfiles = user.getUserProfiles();
+            for ( UserProfile userProfile : userProfiles ) {
+                if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_SS_ADMIN_PROFILE_ID ) {
+                    // social survey administrator
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        
     }
     
 }

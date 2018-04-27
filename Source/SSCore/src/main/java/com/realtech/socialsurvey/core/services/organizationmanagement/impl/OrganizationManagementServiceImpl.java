@@ -9207,80 +9207,118 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     
     
     /**
-     *
-     * @param adminUser
-     * @param user
-     * @throws InvalidInputException
-     * @throws UndeliveredEmailException
-     * @throws NoRecordsFetchedException
-     */
-    @Override
-    public void sendUserAdditionMail( User adminUser, User user )
-        throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException
-    {
-        LOG.debug( "sending user adition mail" );
+    *
+    * @param adminUser
+    * @param user
+    * @throws InvalidInputException
+    * @throws UndeliveredEmailException
+    * @throws NoRecordsFetchedException
+    */
+   @Override
+   public void sendUserAdditionMail( User adminUser, User user )
+       throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException
+   {
+       LOG.debug( "sending user adition mail" );
 
-        if ( adminUser == null || user == null ) {
-            LOG.warn( "user details not specified for user addition mail" );
-            throw new InvalidInputException( "user details not specified for user addition mail" );
-        }
+       if ( adminUser == null || user == null ) {
+           LOG.warn( "user details not specified for user addition mail" );
+           throw new InvalidInputException( "user details not specified for user addition mail" );
+       }
+
+       if ( adminUser.isSuperAdmin() || userManagementService.isUserSocialSurveyAdmin( adminUser ) ) {
+           LOG.debug( "Usaer was added by a social survey addmin, aborting" );
+           return;
+       }
+
+       if ( user.getCompany() == null ) {
+           LOG.warn( "User added, is not associated with a company" );
+           return;
+       }
+
+       if ( user.isCompanyAdmin() ) {
+           LOG.debug( "company admin is the added user, aborting" );
+           return;
+       }
+
+       Set<String> recipients = new HashSet<>();
+       long companyId = user.getCompany().getCompanyId();
+       OrganizationUnitSettings companySettings = getCompanySettings( companyId );
+
+       if ( companySettings != null && companySettings.getUserAddDeleteNotificationRecipients() != null ) {
+           recipients.addAll( companySettings.getUserAddDeleteNotificationRecipients() );
+       }
+
+       if ( user.getCompany() != null ) {
+           recipients.add( userManagementService.getCompanyAdmin( companyId ).getEmailId() );
+       }
+
+       if ( recipients.isEmpty() ) {
+           LOG.debug( "No user addition notification mail recipient found" );
+           return;
+       }
 
 
-        if ( user.getCompany() == null ) {
-            LOG.warn( "User added, is not associated with a company" );
-            return;
-        }
+       emailServices.sendUserAdditionMail( recipients,
+           adminUser.getFirstName() + ( StringUtils.isEmpty( adminUser.getLastName() ) ? "" : " " + adminUser.getLastName() ),
+           adminUser.getEmailId(), user, getAgentSettings( user.getUserId() ) );
+   }
 
-        OrganizationUnitSettings companySettings = getCompanySettings( user.getCompany().getCompanyId() );
 
-        if ( companySettings == null || companySettings.getUserAddDeleteNotificationRecipients() == null
-            || companySettings.getUserAddDeleteNotificationRecipients().isEmpty() ) {
-            LOG.warn( "No user addition notification mail recipient found" );
-            return;
-        }
+   /**
+    * 
+    * @param adminUser
+    * @param user
+    * @throws InvalidInputException
+    * @throws UndeliveredEmailException
+    * @throws NoRecordsFetchedException
+    */
+   @Override
+   public void sendUserDeletionMail( User adminUser, User user )
+       throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException
+   {
+       LOG.debug( "sending user deletion mail" );
 
-        emailServices.sendUserAdditionMail( companySettings.getUserAddDeleteNotificationRecipients(),
-            adminUser.getFirstName() + ( StringUtils.isEmpty( adminUser.getLastName() ) ? "" : " " + adminUser.getLastName() ),
-            adminUser.getEmailId(), user, getAgentSettings( user.getUserId() ) );
-    }
-    
-    
-    /**
-     * 
-     * @param adminUser
-     * @param user
-     * @throws InvalidInputException
-     * @throws UndeliveredEmailException
-     * @throws NoRecordsFetchedException
-     */
-    @Override
-    public void sendUserDeletionMail( User adminUser, User user )
-        throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException
-    {
-        LOG.debug( "sending user deletion mail" );
+       if ( adminUser == null || user == null ) {
+           LOG.warn( "user details not specified for user deletion mail" );
+           throw new InvalidInputException( "user details not specified for user deletion mail" );
+       }
 
-        if ( adminUser == null || user == null ) {
-            LOG.warn( "user details not specified for user deletion mail" );
-            throw new InvalidInputException( "user details not specified for user deletion mail" );
-        }
-        
-        if ( user.getCompany() == null ) {
-            LOG.warn( "User to be deleted, is not associated with a company" );
-            return;
-        }
+       if ( user.getCompany() == null ) {
+           LOG.warn( "User to be deleted, is not associated with a company" );
+           return;
+       }
 
-        OrganizationUnitSettings companySettings = getCompanySettings( user.getCompany().getCompanyId() );
+       if ( adminUser.isSuperAdmin() || userManagementService.isUserSocialSurveyAdmin( adminUser ) ) {
+           LOG.debug( "User was deleted by a social survey addmin, aborting" );
+           return;
+       }
 
-        if ( companySettings == null || companySettings.getUserAddDeleteNotificationRecipients() == null
-            || companySettings.getUserAddDeleteNotificationRecipients().isEmpty() ) {
-            LOG.warn( "No user deletion notification mail recipient found" );
-            return;
-        }
+       if ( user.isCompanyAdmin() ) {
+           LOG.debug( "company admin is the deleted user, aborting" );
+           return;
+       }
 
-        emailServices.sendUserDeletionMail( companySettings.getUserAddDeleteNotificationRecipients(),
-            adminUser.getFirstName() + ( StringUtils.isEmpty( adminUser.getLastName() ) ? "" : " " + adminUser.getLastName() ),
-            adminUser.getEmailId(), user, getAgentSettings( user.getUserId() ) );
-    }
+       Set<String> recipients = new HashSet<>();
+       long companyId = user.getCompany().getCompanyId();
+       OrganizationUnitSettings companySettings = getCompanySettings( companyId );
+
+       if ( companySettings != null && companySettings.getUserAddDeleteNotificationRecipients() != null ) {
+           recipients.addAll( companySettings.getUserAddDeleteNotificationRecipients() );
+       }
+
+       if ( user.getCompany() != null ) {
+           recipients.add( userManagementService.getCompanyAdmin( companyId ).getEmailId() );
+       }
+
+       if ( recipients.isEmpty() ) {
+           LOG.debug( "No user deletion notification mail recipient found" );
+           return;
+       }
+
+       emailServices.sendUserDeletionMail( recipients,
+           adminUser.getFirstName() + ( StringUtils.isEmpty( adminUser.getLastName() ) ? "" : " " + adminUser.getLastName() ),
+           adminUser.getEmailId(), user, getAgentSettings( user.getUserId() ) );
+   }
     
     
     /**

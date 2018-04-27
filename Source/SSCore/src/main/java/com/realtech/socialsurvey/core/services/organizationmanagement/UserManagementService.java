@@ -645,5 +645,8 @@ public interface UserManagementService
     public User getActiveAgentByEmailAndCompany( long companyId, String emailId ) throws InvalidInputException,
         NoRecordsFetchedException;
 
+
+    public boolean isUserSocialSurveyAdmin( User user );
+
 }
 // JIRA SS-34 BY RM02 BOC
