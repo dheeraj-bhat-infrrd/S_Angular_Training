@@ -17522,6 +17522,9 @@ $(document).on('click','#stream-start-page-active',function(e){
 	e.stopImmediatePropagation();
 	e.preventDefault();
 	
+	var selPostIds = [];
+	$('#selected-post-ids').data('post-ids',selPostIds);
+	
 	var status = $('#stream-tabs').data('status');
 	var flag = $('#stream-tabs').data('flagged');
 	var text = $('#search-post').val();
@@ -17532,6 +17535,9 @@ $(document).on('click','#stream-start-page-active',function(e){
 $(document).on('click','#stream-prev-page-active',function(e){
 	e.stopImmediatePropagation();
 	e.preventDefault();	
+
+	var selPostIds = [];
+	$('#selected-post-ids').data('post-ids',selPostIds);
 	
 	var status = $('#stream-tabs').data('status');
 	var flag = $('#stream-tabs').data('flagged');
@@ -17544,6 +17550,9 @@ $(document).on('click','#stream-prev-page-active',function(e){
 $(document).on('click','#stream-next-page-active',function(e){
 	e.stopImmediatePropagation();
 	e.preventDefault();	
+
+	var selPostIds = [];
+	$('#selected-post-ids').data('post-ids',selPostIds);
 	
 	var status = $('#stream-tabs').data('status');
 	var flag = $('#stream-tabs').data('flagged');
@@ -17556,6 +17565,9 @@ $(document).on('click','#stream-next-page-active',function(e){
 $(document).on('click','#stream-end-page-active',function(e){
 	e.stopImmediatePropagation();
 	e.preventDefault();	
+
+	var selPostIds = [];
+	$('#selected-post-ids').data('post-ids',selPostIds);
 	
 	var status = $('#stream-tabs').data('status');
 	var flag = $('#stream-tabs').data('flagged');
