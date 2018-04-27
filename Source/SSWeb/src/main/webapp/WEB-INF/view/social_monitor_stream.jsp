@@ -140,6 +140,7 @@
 	</div>
 </div>
 
+<input type="hidden" id="action-type-sel" value=1>
 <form id="macro-form-apply">
 	<input type="hidden" id="macro-form-is-dup" class="macro-form-is-dup" name="macro-form-is-dup" value="false">
 	<input type="hidden" id="macro-form-post-id" class="macro-form-post-id" name="macro-form-post-id" value="">

@@ -17522,6 +17522,9 @@ $(document).on('click','#stream-start-page-active',function(e){
 	e.stopImmediatePropagation();
 	e.preventDefault();
 	
+	var selPostIds = [];
+	$('#selected-post-ids').data('post-ids',selPostIds);
+	
 	var status = $('#stream-tabs').data('status');
 	var flag = $('#stream-tabs').data('flagged');
 	var text = $('#search-post').val();
@@ -17532,6 +17535,9 @@ $(document).on('click','#stream-start-page-active',function(e){
 $(document).on('click','#stream-prev-page-active',function(e){
 	e.stopImmediatePropagation();
 	e.preventDefault();	
+
+	var selPostIds = [];
+	$('#selected-post-ids').data('post-ids',selPostIds);
 	
 	var status = $('#stream-tabs').data('status');
 	var flag = $('#stream-tabs').data('flagged');
@@ -17544,6 +17550,9 @@ $(document).on('click','#stream-prev-page-active',function(e){
 $(document).on('click','#stream-next-page-active',function(e){
 	e.stopImmediatePropagation();
 	e.preventDefault();	
+
+	var selPostIds = [];
+	$('#selected-post-ids').data('post-ids',selPostIds);
 	
 	var status = $('#stream-tabs').data('status');
 	var flag = $('#stream-tabs').data('flagged');
@@ -17556,6 +17565,9 @@ $(document).on('click','#stream-next-page-active',function(e){
 $(document).on('click','#stream-end-page-active',function(e){
 	e.stopImmediatePropagation();
 	e.preventDefault();	
+
+	var selPostIds = [];
+	$('#selected-post-ids').data('post-ids',selPostIds);
 	
 	var status = $('#stream-tabs').data('status');
 	var flag = $('#stream-tabs').data('flagged');
@@ -18062,6 +18074,8 @@ $(document).on('click','.bulk-macro-opt',function(e){
 	e.stopImmediatePropagation();
 	e.preventDefault();
 	
+	$('#action-type-sel').val(2);
+	
 	var macroId = $(this).find('.macro-list-data').attr('data-macro-id');
 	var flagged = $(this).find('.macro-list-data').attr('data-flagged');
 	var status = $(this).find('.macro-list-data').attr('data-status');
@@ -18086,9 +18100,9 @@ $(document).on('click','.bulk-macro-opt',function(e){
 	
 	callFormAjaxPostForSocMon(url,disableEle,'macro-form-apply');
 	
-	$('#bulk-macro-options').toggle();
+	$('#bulk-macro-options').addClass('hide');
 	
-	$('#bulk-mac-chevron-down').addClass('hide');
+	$('#bulk-mac-chevron-down').removeClass('hide');
 	
 	$('#bulk-mac-chevron-up').addClass('hide');
 });
@@ -18455,7 +18469,7 @@ function updatePostSuccess(postId,text,status,flagged,textActionType,map){
 			$('#stream-post-icn-cont-'+postId).find('.stream-flagged-icn').removeClass('hide');
 			
 			$('#act-cont'+postId+'-'+j).find('.action-flag-icn').removeClass('hide');	
-			$('#act-cont'+postId+'-'+j).find('.act-details-text').html('Post was FLAGGED manually by '+map.userName);
+			$('#act-cont'+postId+'-'+j).find('.act-details-text').html('Post was <b class="soc-mon-bold-text">Flagged</b> manually by <b class="soc-mon-bold-text">'+map.userName+'</b>');
 			
 			$('#action-form-container'+postId).find('.stream-action-flag').addClass('hide');
 			$('#action-form-container'+postId).find('.stream-action-unflag').removeClass('hide');
@@ -18466,7 +18480,7 @@ function updatePostSuccess(postId,text,status,flagged,textActionType,map){
 			$('#stream-post-icn-cont-'+postId).find('.stream-unflagged-icn').removeClass('hide');
 			
 			$('#act-cont'+postId+'-'+j).find('.action-flag-icn').removeClass('hide');	
-			$('#act-cont'+postId+'-'+j).find('.act-details-text').html('Post was UNFLAGGED manually by '+map.userName);
+			$('#act-cont'+postId+'-'+j).find('.act-details-text').html('Post was <b class="soc-mon-bold-text">Unflagged</b> manually by <b class="soc-mon-bold-text">'+map.userName+'</b>');
 			
 			$('#action-form-container'+postId).find('.stream-action-unflag').addClass('hide');
 			$('#action-form-container'+postId).find('.stream-action-flag').removeClass('hide');
@@ -18481,7 +18495,7 @@ function updatePostSuccess(postId,text,status,flagged,textActionType,map){
 		$('#stream-post-icn-cont-'+postId).find('.stream-esc-icn').removeClass('hide');
 		
 		$('#act-cont'+postId+'-'+j).find('.action-esc-icn').removeClass('hide');	
-		$('#act-cont'+postId+'-'+j).find('.act-details-text').html('Post was ESCALATED manually by '+map.userName);
+		$('#act-cont'+postId+'-'+j).find('.act-details-text').html('Post was <b class="soc-mon-bold-text">Escalated</b> manually by <b class="soc-mon-bold-text">'+map.userName+'</b>');
 		
 		$('#action-form-container'+postId).find('.stream-action-flag').addClass('hide');
 		$('#action-form-container'+postId).find('.stream-action-unflag').addClass('hide');
@@ -18493,7 +18507,7 @@ function updatePostSuccess(postId,text,status,flagged,textActionType,map){
 		$('#stream-post-icn-cont-'+postId).find('.stream-res-icn').removeClass('hide');
 		
 		$('#act-cont'+postId+'-'+j).find('.action-res-icn').removeClass('hide');	
-		$('#act-cont'+postId+'-'+j).find('.act-details-text').html('Post was RESOLVED manually by '+map.userName);
+		$('#act-cont'+postId+'-'+j).find('.act-details-text').html('Post was <b class="soc-mon-bold-text">Resolved</b> manually by <b class="soc-mon-bold-text">'+map.userName+'</b>');
 		
 		$('#action-form-container'+postId).find('.stream-action-flag').addClass('hide');
 		$('#action-form-container'+postId).find('.stream-action-unflag').addClass('hide');
@@ -18848,6 +18862,7 @@ function callFormAjaxPostForSocMon(url,disableEle,formId){
 			$('#stream-checked').toggle();
 			var selPostIds = [];
 			$('#selected-post-ids').data('post-ids',selPostIds);
+			$('#action-type-sel').val(1);
 		},
 		error : function(e) {
 			if(e.status == 504) {
@@ -18862,11 +18877,20 @@ function callFormAjaxPostForSocMon(url,disableEle,formId){
 
 function showToastForBulkActions(data){
 	var map = $.parseJSON(data);
-	
+	var actionTypeSel = parseInt($('#action-type-sel').val());
 	if (map.status == "success") {
 		var selPostIds = $('#selected-post-ids').data('post-ids');
-		var flagged = $('#bulk-actions-apply').find('.form-flagged').val();
-		var status = $('#bulk-actions-apply').find('.form-status').val();
+		var flagged;
+		var status;
+		
+		if(actionTypeSel == 1){
+			flagged = $('#bulk-actions-apply').find('.form-flagged').val();
+			status = $('#bulk-actions-apply').find('.form-status').val();
+		}else{
+			flagged = $('#macro-form-apply').find('.macro-form-flagged').val();
+			status = $('#macro-form-apply').find('.macro-form-status').val();
+		}
+		
 		var failedCount = 0;
 		var successCount = 0;
 		
