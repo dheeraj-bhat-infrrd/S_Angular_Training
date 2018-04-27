@@ -18,6 +18,7 @@ public class SocialMonitorMacro implements Serializable {
 	private List<Long> macroUsageTime;
 	private long createdOn;
 	private long modifiedOn;
+	private long lastUsedTime;
 
 	public String getMacroId() {
 		return macroId;
@@ -91,7 +92,17 @@ public class SocialMonitorMacro implements Serializable {
 		this.last7DaysMacroCount = last7DaysMacroCount;
 	}
 
-	@Override
+	public long getLastUsedTime()
+    {
+        return lastUsedTime;
+    }
+
+    public void setLastUsedTime( long lastUsedTime )
+    {
+        this.lastUsedTime = lastUsedTime;
+    }
+
+    @Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -116,12 +127,13 @@ public class SocialMonitorMacro implements Serializable {
 		return true;
 	}
 
-	@Override
-	public String toString() {
-		return "SocialMonitorMacro [macroId=" + macroId + ", macroName=" + macroName + ", description=" + description
-				+ ", actions=" + actions + ", active=" + active + ", last7DaysMacroCount="
-				+ last7DaysMacroCount + ", macroUsageTime=" + macroUsageTime + ", createdOn=" + createdOn
-				+ ", modifiedOn=" + modifiedOn + "]";
-	}
+    @Override
+    public String toString()
+    {
+        return "SocialMonitorMacro [macroId=" + macroId + ", macroName=" + macroName + ", description=" + description
+            + ", actions=" + actions + ", active=" + active + ", last7DaysMacroCount=" + last7DaysMacroCount
+            + ", macroUsageTime=" + macroUsageTime + ", createdOn=" + createdOn + ", modifiedOn=" + modifiedOn
+            + ", lastUsedTime=" + lastUsedTime + "]";
+    }
 
 }
