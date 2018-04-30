@@ -9581,7 +9581,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             for ( String phrase : multiplePhrasesVO.getPhrases() ) {
                 flag = 1;
                 for ( Keyword duplicateKeyword : companyFilterKeywords ) {
-                    if ( duplicateKeyword.getPhrase().equalsIgnoreCase( phrase )
+                    if ( duplicateKeyword.getPhrase().equalsIgnoreCase( phrase.trim() )
                         && duplicateKeyword.getMonitorType().equals( multiplePhrasesVO.getMonitorType() )
                         && duplicateKeyword.getStatus() == CommonConstants.STATUS_ACTIVE ) {
                         LOG.warn( "duplicate entry" );
@@ -9594,7 +9594,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                     Keyword keywordNew = new Keyword();
                     keywordNew.setCreatedOn( new Date().getTime() );
                     keywordNew.setModifiedOn( new Date().getTime() );
-                    keywordNew.setPhrase( phrase );
+                    keywordNew.setPhrase( phrase.trim() );
                     keywordNew.setId( UUID.randomUUID().toString() );
                     keywordNew.setStatus( CommonConstants.STATUS_ACTIVE );
                     keywordNew.setMonitorType( multiplePhrasesVO.getMonitorType() );
