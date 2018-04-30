@@ -10,7 +10,7 @@
 	<div class="container">
 		<div class="hm-header-row clearfix">
 			<div class="float-left hm-header-row-left hr-dsh-adj-lft"><spring:message code="label.usermanagement.header.key" /></div>
-					<div class="float-right hm-header-right text-center" onclick="javascript:showMainContent('./showaddsocialsurveyadmin.do');">Add Social Survey Admin</div>
+					<div class="float-right hm-header-right text-center" onclick="javascript:showMainContent('./showaddsocialsurveyadmin.do');">Add SocialSurvey Admin</div>
 			
 		</div>
 	</div>

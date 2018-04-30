@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Social Survey - API Documentation</title>
+<title>SocialSurvey - API Documentation</title>
 <link href='https://fonts.googleapis.com/css?family=Droid+Sans:400,700'
 	rel='stylesheet' type='text/css' />
 <link href='css/reset.css' media='screen' rel='stylesheet'

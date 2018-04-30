@@ -245,7 +245,7 @@ public class PublicSocialController {
 			
 			String message = surveyHandler.getFormattedSurveyScore( rating ) + "-Star Survey Response from " + session.getAttribute("firstName") + " "
 					+ session.getAttribute("lastName") + " for " + session.getAttribute("agentName")
-					+ " on Social Survey. Below is the feedback :\n " + session.getAttribute("review");
+					+ " on SocialSurvey. Below is the feedback :\n " + session.getAttribute("review");
 			message = message.replaceAll("null", "");
 			facebook.postStatusMessage(message);
 		}
@@ -308,7 +308,7 @@ public class PublicSocialController {
 			// Tweeting
 			String twitterMessage = surveyHandler.getFormattedSurveyScore( rating ) + "-Star Survey Response from " + session.getAttribute("firstName") + " "
 					+ session.getAttribute("lastName") + " for " + session.getAttribute("agentName")
-					+ " on @Social Survey. Below is the feedback :\n " + session.getAttribute("review");
+					+ " on @SocialSurvey. Below is the feedback :\n " + session.getAttribute("review");
 			twitterMessage = twitterMessage.replaceAll("null", "");
 			twitter.setOAuthAccessToken(new twitter4j.auth.AccessToken(accessToken.getToken(), accessToken.getTokenSecret()));
 			twitter.updateStatus(twitterMessage);
@@ -370,7 +370,7 @@ public class PublicSocialController {
 			// Post on linkedin
 			String message = surveyHandler.getFormattedSurveyScore( rating ) + "-Star Survey Response from " + session.getAttribute("firstName") + " "
 					+ session.getAttribute("lastName") + " for " + session.getAttribute("agentName")
-					+ " on Social Survey. Below is the feedback :\n " + session.getAttribute("review");
+					+ " on SocialSurvey. Below is the feedback :\n " + session.getAttribute("review");
 			message = message.replaceAll("null", "");
 			String linkedInPost = new StringBuilder(linkedInRestApiUri).substring(0, linkedInRestApiUri.length() - 1);
 			linkedInPost += "/shares?oauth2_access_token=" + accessToken;
