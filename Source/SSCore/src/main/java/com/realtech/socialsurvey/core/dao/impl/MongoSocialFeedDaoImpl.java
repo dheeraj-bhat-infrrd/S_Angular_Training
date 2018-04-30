@@ -19,6 +19,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -94,7 +95,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 	}
     
 	@Override
-	public void updateSocialFeed(SocialFeedsActionUpdate socialFeedsActionUpdate, String postId,
+	public void updateSocialFeed(SocialFeedsActionUpdate socialFeedsActionUpdate, String postId, Long companyId, 
 			List<ActionHistory> actionHistories, int updateFlag, String collectionName) {
 		LOG.debug("Method updateSocialFeed() started");
 
@@ -102,7 +103,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 
 		Query query = new Query();
 
-		query.addCriteria(Criteria.where(POST_ID).is(postId));
+		query.addCriteria(Criteria.where(KEY_IDENTIFIER).is(postId + "_" + companyId));
 
 		Update update = new Update();
 
@@ -399,15 +400,24 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         return organizationUnitSettings;
 	}
 
+
     @Override
-    public List<SocialResponseObject> getSocialPostsByIds( Set<String> postIds, String collectionName )
+    public List<SocialResponseObject> getSocialPostsByIds( Set<String> postIds, Long companyId, String collectionName )
     {
-        LOG.debug("Fetching Social Feeds for postIds {}", postIds);
+        LOG.debug( "Fetching Social Feeds for postIds {}", postIds );
+        Set<String> mongoIds = new HashSet<>();
+        String mongoId = null;
+        for ( String postId : postIds ) {
+            mongoId = postId + "_" + companyId;
+            mongoIds.add( mongoId );
+        }
         Query query = new Query();
 
-        query.addCriteria(Criteria.where(POST_ID).in(postIds));
 
-        return mongoTemplate.find(query, SocialResponseObject.class, collectionName);
+        query.addCriteria( Criteria.where( KEY_IDENTIFIER ).in( mongoIds ) );
+
+
+        return mongoTemplate.find( query, SocialResponseObject.class, collectionName );
     }
 
     @Override
