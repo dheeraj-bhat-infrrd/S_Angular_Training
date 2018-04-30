@@ -7878,6 +7878,9 @@ function showMasterQuestionPage() {
 			}
 		}
 		
+		// copy review text to clipboard
+		copyToClipboard( feedback, "Your feedback has been copied to clipboard" );
+		
 		if( isAbusive == false ){
 			if (mood != 'Great') {
 				$('#social-post-links').find('*').not('#google-business-btn, #google-btn').remove();
