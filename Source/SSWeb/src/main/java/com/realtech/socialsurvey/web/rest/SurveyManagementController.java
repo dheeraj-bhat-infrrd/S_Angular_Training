@@ -936,7 +936,7 @@ public class SurveyManagementController
 			List<String> companySocialList = socialMediaPostDetails.getCompanyMediaPostDetails().getSharedOn();
 
 			String facebookMessage = surveyHandler.getFormattedSurveyScore(rating) + "-Star Survey Response from " + customerDisplayName + " for "
-					+ agentName + " on Social Survey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
+					+ agentName + " on SocialSurvey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL
 					+ agentProfileLink;
 			facebookMessage += "\n Feedback : " + feedback;
 

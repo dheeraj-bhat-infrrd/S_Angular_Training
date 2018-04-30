@@ -74,7 +74,7 @@ $(document).ready(function() {
  }
  
  var pages = "${pageNames}";
- var selectPageText = $("<div style='margin-bottom: 10px; font-size: 19px; text-align: center; padding: 0px 10px;'> Select the profile, you want to connect to Social Survey! </div>");
+ var selectPageText = $("<div style='margin-bottom: 10px; font-size: 19px; text-align: center; padding: 0px 10px;'> Select the profile, you want to connect to SocialSurvey! </div>");
  if(pages.length > 0)
  	$("#page").append(selectPageText);
  

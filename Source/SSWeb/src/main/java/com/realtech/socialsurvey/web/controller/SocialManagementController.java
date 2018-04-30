@@ -1435,7 +1435,7 @@ public class SocialManagementController
         }
 
         String facebookMessage = surveyHandler.getFormattedSurveyScore( rating ) + "-Star Survey Response from "
-            + custDisplayName + " for " + agentName + " on Social Survey - view at " + applicationBaseUrl
+            + custDisplayName + " for " + agentName + " on SocialSurvey - view at " + applicationBaseUrl
             + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
         facebookMessage = facebookMessage.replaceAll( "null", "" );
 
