@@ -170,6 +170,7 @@ public class UserManagementController
         LOG.info( "Method to add a new user by existing admin, inviteNewUser() called." );
         HttpSession session = request.getSession( false );
         User admin = sessionHelper.getCurrentUser();
+        long adminId = (long)session.getAttribute( CommonConstants.REALTECH_USER_ID );
         try {
             if ( admin == null ) {
                 LOG.warn( "No user found in session" );
@@ -203,7 +204,7 @@ public class UserManagementController
                         throw new UserAlreadyExistsException( "User already exists with the email id : " + emailId );
                     } catch ( NoRecordsFetchedException noRecordsFetchedException ) {
                         LOG.error( "No records exist with the email id passed, inviting the new user", noRecordsFetchedException);
-                        user = userManagementService.inviteUser( admin, firstName, lastName, emailId );
+                        user = userManagementService.inviteUser( admin, firstName, lastName, emailId, adminId > 0 ? true : false );
                         String profileName = userManagementService.getUserSettings( user.getUserId() ).getProfileName();
                         userManagementService.sendRegistrationCompletionLink( emailId, firstName, lastName,
                             admin.getCompany().getCompanyId(), profileName, user.getLoginName(), false );
@@ -570,6 +571,7 @@ public class UserManagementController
     {
         LOG.info( "Method to deactivate an existing user, removeExistingUser() called." );
         Map<String, String> statusMap = new HashMap<String, String>();
+        
         String message = "";
         long userIdToRemove = 0;
 
@@ -589,6 +591,9 @@ public class UserManagementController
             }
 
             User loggedInUser = sessionHelper.getCurrentUser();
+            HttpSession session  = request.getSession( false );
+            long adminId = (long)session.getAttribute( CommonConstants.REALTECH_USER_ID );
+            
             User userToRemove = findUserById( userIdToRemove );
             if ( loggedInUser == null ) {
                 LOG.warn( "No user found in current session in removeExistingUser()." );
@@ -598,7 +603,7 @@ public class UserManagementController
             try {
                 if ( checkIfTheUserCanBeDeleted( loggedInUser, userToRemove ) ) {
                     userManagementService.deleteUserDataFromAllSources( loggedInUser, userIdToRemove,
-                        CommonConstants.STATUS_INACTIVE, false );
+                        CommonConstants.STATUS_INACTIVE, false, adminId > 0 ? true : false );
                 } else {
                     statusMap.put( "status", CommonConstants.ERROR );
                 }
