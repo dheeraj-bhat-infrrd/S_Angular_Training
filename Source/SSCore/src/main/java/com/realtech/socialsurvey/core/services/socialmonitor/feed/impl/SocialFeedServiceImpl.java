@@ -228,7 +228,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
             }
         }
         List<SocialResponseObject> socialResponseObjectsToAdd = mongoSocialFeedDao
-            .getSocialPostsByIds( socialFeedsActionUpdate.getPostIds(), MongoSocialFeedDaoImpl.SOCIAL_FEED_COLLECTION );
+            .getSocialPostsByIds( socialFeedsActionUpdate.getPostIds(), companyId, MongoSocialFeedDaoImpl.SOCIAL_FEED_COLLECTION );
         for ( SocialResponseObject socialResponseObject : socialResponseObjectsToAdd ) {
             List<ActionHistory> actionHistories = new ArrayList<>();
             updateFlag = 0;
@@ -325,7 +325,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
                         LOG.error( "Email could not be delivered", e );
                     }
                 }
-                mongoSocialFeedDao.updateSocialFeed( socialFeedsActionUpdate, socialResponseObject.getPostId(), actionHistories,
+                mongoSocialFeedDao.updateSocialFeed( socialFeedsActionUpdate, socialResponseObject.getPostId(), companyId, actionHistories,
                     updateFlag, MongoSocialFeedDaoImpl.SOCIAL_FEED_COLLECTION );
             }
             //add successful postIds
@@ -556,7 +556,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
     public SocialFeedsActionUpdate getPostIdsWithDuplicates(SocialFeedsActionUpdate socialFeedsActionUpdate, Long companyId)
     {
         List<SocialResponseObject> socialResponseObjects = mongoSocialFeedDao
-            .getSocialPostsByIds( socialFeedsActionUpdate.getPostIds(), MongoSocialFeedDaoImpl.SOCIAL_FEED_COLLECTION );
+            .getSocialPostsByIds( socialFeedsActionUpdate.getPostIds(), companyId, MongoSocialFeedDaoImpl.SOCIAL_FEED_COLLECTION );
         for ( SocialResponseObject socialResponseObject : socialResponseObjects ) {
             List<SocialResponseObject> duplicateSocialResponseObjects = mongoSocialFeedDao
                 .getDuplicatePostIds( socialResponseObject.getHash(), companyId );
