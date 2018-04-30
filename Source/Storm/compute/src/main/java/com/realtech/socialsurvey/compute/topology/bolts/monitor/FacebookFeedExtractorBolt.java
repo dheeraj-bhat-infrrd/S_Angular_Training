@@ -74,6 +74,7 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt implements Serial
     {
         try {
             SocialMediaTokenResponse mediaToken = (SocialMediaTokenResponse) input.getValueByField( "mediaToken" );
+            //LOG.info( "Username is : {}", mediaToken.getName() );
             Long companyId = mediaToken.getCompanyId();
 
             // Check rate limiting for company
@@ -157,6 +158,8 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt implements Serial
         //Id is postId_companyId
         responseWrapper.setId( facebookFeedData.getId() + "_" + responseWrapper.getCompanyId() );
         responseWrapper.setPictures(Arrays.asList(facebookFeedData.getFullPicture()));
+        responseWrapper.setOwnerName( mediaToken.getContactDetails().getName() );
+        responseWrapper.setOwnerEmail( mediaToken.getContactDetails().getMailDetails().getEmailId() );
 
         if ( facebookFeedData.getUpdatedTime() > 0 ) {
             responseWrapper.setUpdatedTime( facebookFeedData.getUpdatedTime() * 1000 );

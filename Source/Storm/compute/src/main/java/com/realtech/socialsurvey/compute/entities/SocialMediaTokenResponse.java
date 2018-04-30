@@ -17,6 +17,7 @@ public class SocialMediaTokenResponse implements Serializable
     private SocialMediaTokensForSM socialMediaTokens;
     private ProfileType profileType;
     private String profileImageUrl;
+    private ContactDetails contactDetails;
 
     public long getIden()
     {
@@ -71,5 +72,17 @@ public class SocialMediaTokenResponse implements Serializable
 
     public void setProfileImageUrl(String profileImageUrl) {
         this.profileImageUrl = profileImageUrl;
+    }
+
+
+    public ContactDetails getContactDetails()
+    {
+        return contactDetails;
+    }
+
+
+    public void setContactDetails( ContactDetails contactDetails )
+    {
+        this.contactDetails = contactDetails;
     }
 }
