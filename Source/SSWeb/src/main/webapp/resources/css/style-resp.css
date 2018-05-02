@@ -2046,8 +2046,11 @@
 	}
 	
 	.generate-report-date-range{
-		display: inline-grid;
 		margin-left: 0;
+	}
+	
+	.display-inline-grid {
+		display: inline-grid;
 	}
 	
 	.report-date{
@@ -2711,8 +2714,11 @@
 	}
 	
 	.generate-report-date-range{
-		display: inline-grid !important;
 		margin-left: 0;
+	}
+	
+	.display-inline-grid-imp {
+		display: inline-grid !important;
 	}
 	
 	.report-date{
