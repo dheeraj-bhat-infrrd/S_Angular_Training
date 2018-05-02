@@ -9545,9 +9545,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 MongoOrganizationUnitSettingDaoImpl.KEY_FILTER_KEYWORDS, companyFilterKeywords, companySettings,
                 MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
-            // update the redis with the keywords
-            redisDao.addKeywords( companyId, companyFilterKeywords );
-
         } else {
             LOG.debug( "Keywords are empty so skiping operation" );
         }
@@ -9557,6 +9554,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         }
         Collections.sort( filterKeywordsAdded, new FilterKeywordsComparator() );
+        
+        // update the redis with the keywords
+        redisDao.addKeywords( companyId, filterKeywordsAdded );
+        
         return filterKeywordsAdded;
     }
 
@@ -9607,11 +9608,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 MongoOrganizationUnitSettingDaoImpl.KEY_FILTER_KEYWORDS, companyFilterKeywords, companySettings,
                 MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
-            // update the redis with the keywords
-            redisDao.addKeywords( companyId, companyFilterKeywords );
-
         } else {
-            LOG.debug( "Keywords are empty so skiping operation" );
+            LOG.debug( "Keywords are empty so skipping operation" );
         }
         for ( Keyword keywordToAdd : companyFilterKeywords ) {
             if ( keywordToAdd.getStatus() == CommonConstants.STATUS_ACTIVE ) {
@@ -9619,6 +9617,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         }
         Collections.sort( filterKeywordsAdded, new FilterKeywordsComparator() );
+
+        // update the redis with the keywords
+        redisDao.addKeywords( companyId, filterKeywordsAdded );
+        
         return filterKeywordsAdded;
     }
 
