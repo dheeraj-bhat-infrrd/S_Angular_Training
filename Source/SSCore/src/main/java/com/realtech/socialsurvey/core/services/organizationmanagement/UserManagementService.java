@@ -649,5 +649,8 @@ public interface UserManagementService
 
     public boolean isUserSocialSurveyAdmin( User user );
 
+    
+    public List<UserProfile> getUserProfiles( long userId ) throws InvalidInputException;
+
 }
 // JIRA SS-34 BY RM02 BOC

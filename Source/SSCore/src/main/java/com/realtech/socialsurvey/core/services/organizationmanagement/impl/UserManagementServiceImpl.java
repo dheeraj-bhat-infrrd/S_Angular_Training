@@ -4911,5 +4911,22 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         
         
     }
+
+
+    @Override
+    public List<UserProfile> getUserProfiles( long userId ) throws InvalidInputException
+    {
+        LOG.debug( "method getUserProfiles() started" );
+        
+        if( userId <= 0 ) {
+            LOG.warn( "Invalid user ID" );
+            throw new InvalidInputException( "Invalid user ID" );
+        }
+        
+        List<UserProfile> profiles = userProfileDao.getUserProfiles( userId ); 
+
+        LOG.debug( "method getUserProfiles() finished" );
+        return profiles;
+    }
     
 }

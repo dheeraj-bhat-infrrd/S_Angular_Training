@@ -2012,6 +2012,57 @@ public class UserManagementController
         }
         return str;
     }
+    
+    
+    /**
+     * 
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping ( value = "/userprofileflags", method = RequestMethod.GET)
+    public String getProfileFlags( HttpServletRequest request )
+    {
+        LOG.info( "Method getProfileFlags() started." );
+        String userIdStr = request.getParameter( "userId" );
+        Map<String, String> response = new HashMap<>();
+
+        response.put( "success", "false" );
+        if ( !StringUtils.isEmpty( userIdStr ) ) {
+            try {
+                long userId = Long.parseLong( userIdStr );
+                List<UserProfile> profiles = userManagementService.getUserProfiles( userId );
+                response.put( "success", "true" );
+                response.put( "isBranchAdmin", "false" );
+                response.put( "isRegionAdmin", "false" );
+                response.put( "isAgent", "false" );
+                if ( profiles != null ) {
+                    for ( UserProfile profile : profiles ) {
+                        if ( profile.getStatus() == CommonConstants.STATUS_ACTIVE ) {
+                            if ( profile.getProfilesMaster()
+                                .getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID ) {
+                                response.put( "isAgent", "true" );
+                            } else if ( profile.getProfilesMaster()
+                                .getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
+                                response.put( "isBranchAdmin", "true" );
+                            } else if ( profile.getProfilesMaster()
+                                .getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
+                                response.put( "isRegionAdmin", "true" );
+                            }
+                        }
+                    }
+
+                }
+
+            } catch ( NumberFormatException | InvalidInputException parseError ) {
+                LOG.warn( "Unable to parse user ID, ", parseError );
+            }
+        }
+
+        String responseString = new Gson().toJson( response );
+        LOG.info( "Method getProfileFlags() finished." );
+        return responseString;
+    }
 }
 // JIRA SS-77 BY RM07 EOC
 // JIRA SS-37 BY RM02 EOC
