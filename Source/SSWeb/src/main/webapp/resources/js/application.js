@@ -1501,13 +1501,6 @@ function updateEventOnDashboardPageForReviews() {
 		var entityId = $('#rep-prof-container').data('column-value');
 		var entityType = $('#rep-prof-container').data('column-name');
 		
-		var copyText = $(this).parent().find('.linkedInSummary').val();
-		var $temp = $("<input>");
-	    $("body").append($temp);
-	    $temp.val(copyText).select();
-	    document.execCommand("copy");
-	    $temp.remove();
-		
 		
 		var payload = {
 			"surveyMongoId" :surveyMongoId,
@@ -1544,6 +1537,10 @@ function updateEventOnDashboardPageForReviews() {
 function linkedInShare(data,link,title){
 	if(data == false || data == 'false'){
 		if(title == 'LinkedIn'){
+			
+			var copyText = $(this).parent().find('.linkedInSummary').val();
+			copyToClipboard(copyText);
+			
 			$('#overlay-header').html("");
 			$('#overlay-text').html('<div style="text-align:left; display: grid;">The text of the post has been copied to clipboard. Please use the text to post in LinkedIn Page.</div>');
 			$('#overlay-continue').html("Ok");
