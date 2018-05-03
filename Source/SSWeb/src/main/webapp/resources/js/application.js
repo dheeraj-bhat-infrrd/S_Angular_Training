@@ -1501,13 +1501,6 @@ function updateEventOnDashboardPageForReviews() {
 		var entityId = $('#rep-prof-container').data('column-value');
 		var entityType = $('#rep-prof-container').data('column-name');
 		
-		var copyText = $(this).parent().find('.linkedInSummary').val();
-		var $temp = $("<input>");
-	    $("body").append($temp);
-	    $temp.val(copyText).select();
-	    document.execCommand("copy");
-	    $temp.remove();
-		
 		
 		var payload = {
 			"surveyMongoId" :surveyMongoId,
@@ -1544,6 +1537,10 @@ function updateEventOnDashboardPageForReviews() {
 function linkedInShare(data,link,title){
 	if(data == false || data == 'false'){
 		if(title == 'LinkedIn'){
+			
+			var copyText = $(this).parent().find('.linkedInSummary').val();
+			copyToClipboard(copyText);
+			
 			$('#overlay-header').html("");
 			$('#overlay-text').html('<div style="text-align:left; display: grid;">The text of the post has been copied to clipboard. Please use the text to post in LinkedIn Page.</div>');
 			$('#overlay-continue').html("Ok");
@@ -6462,14 +6459,14 @@ function confirmDeleteUser(userId, adminId) {
 	$('#overlay-continue').attr("onclick", "deleteUser('" + userId + "');");
 }
 
-function confirmDeleteUserProfile(profileId) {
+function confirmDeleteUserProfile(profileId, userId) {
 	$('#overlay-main').show();
 	$('#overlay-continue').show();
 	$('#overlay-continue').html("Delete");
 	$('#overlay-cancel').html("Cancel");
 	$('#overlay-header').html("Delete User Profile");
 	$('#overlay-text').html("Are you sure you want to delete user profile?");
-	$('#overlay-continue').attr("onclick", "deleteUserProfile('" + profileId + "');");
+	$('#overlay-continue').attr("onclick", "deleteUserProfile('" + profileId + "', '" + userId + "');");
 }
 
 /*
@@ -6499,14 +6496,14 @@ function deleteUser(userId) {
 }
 
 // Function to delete user profile
-function deleteUserProfile(profileId) {
+function deleteUserProfile(profileId,userId) {
 	showOverlay();
 	var payload = {
 		"profileId" : profileId
 	};
 	callAjaxPostWithPayloadData("./deleteuserprofile.do", function(data) {
 		if (data == "success") {
-
+			updateUserProfileTicksInManageTeam(userId);
 			// close the popup
 			$('#overlay-cancel').click();
 			// remove the tab from UI
@@ -6519,6 +6516,39 @@ function deleteUserProfile(profileId) {
 		}
 	}, payload, true);
 }
+
+function updateUserProfileTicksInManageTeam(userId){
+	var payload = {
+		"userId" : userId
+	};
+	callAjaxGetWithPayloadData("./fetchuserprofileflags.do", function(data) {
+		if( data != undefined ){
+			var response = JSON.parse(data);
+			if( response != undefined && response.success != undefined ){
+				if( response.success == "true" ){
+					if( response.isRegionAdmin  == "true" ){
+						addClassToJQueryElement( $('#user-row-' + userId).find('.v-tbl-rgn-adm'), "v-icn-tick" );
+					} else {
+						removeClassToJQueryElement( $('#user-row-' + userId).find('.v-tbl-rgn-adm'), "v-icn-tick" );
+					}
+					
+					if( response.isBranchAdmin  == "true" ){
+						addClassToJQueryElement( $('#user-row-' + userId).find('.v-tbl-of-adm'), "v-icn-tick" );
+					} else {
+						removeClassToJQueryElement( $('#user-row-' + userId).find('.v-tbl-of-adm'), "v-icn-tick" );
+					}
+					
+					if( response.isAgent  == "true" ){
+						addClassToJQueryElement( $('#user-row-' + userId).find('.v-tbl-ln-of'), "v-icn-tick" );
+					} else {
+						removeClassToJQueryElement( $('#user-row-' + userId).find('.v-tbl-ln-of'), "v-icn-tick" );
+					}
+				}
+			}
+		}
+	}, payload, true);
+}
+
 /*
  * Paint the user details form in the user management page
  */
@@ -6957,18 +6987,48 @@ function saveUserDetailsByAdmin() {
  */
 function saveUserAssignment(formId, disableEle) {
 	var url = "./addindividual.do";
+	var userId = $( "#" + formId).find("#selected-userid-hidden").val();
+	var isAdminCheck = $( "#" + formId).find("#is-admin-chk").val();
+	var assignToText = $("#assign-to-txt").val();
 	showOverlay();
-	callAjaxFormSubmit(url, saveUserAssignmentCallBack, formId, disableEle);
+	callAjaxFormSubmit(url, function(data){
+		hideOverlay();
+		displayMessage(data);
+		if( userId != undefined && data != undefined && data.indexOf("success") > -1 && assignToText != undefined && isAdminCheck != undefined ){
+			if( "Company" == assignToText ){
+				if( "true" == isAdminCheck ){
+					// do nothing
+				} else if( "false" == isAdminCheck ){
+					addClassToJQueryElement( $('#user-row-' + userId).find('.v-tbl-ln-of'), "v-icn-tick" );
+				}
+			} else if( "Region" == assignToText ){
+				if( "true" == isAdminCheck ){
+					addClassToJQueryElement( $('#user-row-' + userId).find('.v-tbl-rgn-adm'), "v-icn-tick" );
+				} else if( "false" == isAdminCheck ){
+					addClassToJQueryElement( $('#user-row-' + userId).find('.v-tbl-ln-of'), "v-icn-tick" );
+				}
+			} else if( "Office" == assignToText ){
+				if( "true" == isAdminCheck ){
+					addClassToJQueryElement( $('#user-row-' + userId).find('.v-tbl-of-adm'), "v-icn-tick" );
+				} else if( "false" == isAdminCheck ){
+					addClassToJQueryElement( $('#user-row-' + userId).find('.v-tbl-ln-of'), "v-icn-tick" );
+				}
+			}
+		}
+	}, formId, disableEle);
 }
 
-/**
- * callback for saveUserAssignment
- * 
- * @param data
- */
-function saveUserAssignmentCallBack(data) {
-	hideOverlay();
-	displayMessage(data);
+
+function addClassToJQueryElement( element, clazz ){
+	if( element != undefined && !element.hasClass(clazz) ){
+		element.addClass(clazz);
+	}
+}
+
+function removeClassToJQueryElement( element, clazz ){
+	if( element != undefined && element.hasClass(clazz) ){
+		element.removeClass(clazz);
+	}
 }
 
 // remove user profile
@@ -6979,7 +7039,9 @@ $(document).on('click', '.v-icn-rem-userprofile', function(e) {
 	}
 
 	var profileId = $(this).parent().data('profile-id');
-	confirmDeleteUserProfile(profileId);
+	var userIdArr = $(this).parent().parent().parent().parent().attr("id").split("-");
+	var userId = userIdArr[userIdArr.length -1];
+	confirmDeleteUserProfile(profileId, userId);
 });
 
 // remove user
@@ -7877,6 +7939,9 @@ function showMasterQuestionPage() {
 				onlyPostToSocialSurvey = false;
 			}
 		}
+		
+		// copy review text to clipboard
+		//copyToClipboard( feedback, "Your feedback has been copied to clipboard" );
 		
 		if( isAbusive == false ){
 			if (mood != 'Great') {

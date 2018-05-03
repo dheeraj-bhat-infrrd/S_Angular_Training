@@ -66,7 +66,7 @@
 								<input type="hidden" id="at-pst-cb" name="autopost" value="${autoPostEnabled}">
 								<div class="float-left bd-check-txt">Allow user to autopost</div>
 							</div>							
-							<c:if test="${ columnName == 'companyId' }">
+							<c:if test="${ isRealTechOrSSAdmin == 'true' and columnName == 'companyId' }">
 								<div class="review-sort-sel-col">
 									<div class="clearfix setting-sel-wrapper">
 										<div class="st-score-rt-top margin-top-twenty email-sel-item-resp sort-resp">

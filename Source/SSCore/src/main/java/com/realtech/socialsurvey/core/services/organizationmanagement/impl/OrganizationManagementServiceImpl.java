@@ -2758,7 +2758,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Transactional
     public Map<String, Object> addNewRegionWithUser( User user, String regionName, int isDefaultBySystem, String address1,
         String address2, String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
-        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail )
+        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail, boolean isAddedByRealtechOrSSAdmin )
         throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
     {
         LOG.debug( "Method addNewRegionWithUser called for user:" + user + " regionName:" + regionName + " isDefaultBySystem:"
@@ -2793,7 +2793,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         } else if ( emailIdsArray != null && emailIdsArray.length > 0 ) {
             LOG.debug( "Fetching users list to assign to the region" );
-            userMap = getUsersFromEmailIdsAndInvite( emailIdsArray, user, holdSendingMail, true );
+            userMap = getUsersFromEmailIdsAndInvite( emailIdsArray, user, holdSendingMail, true, isAddedByRealtechOrSSAdmin );
             List<User> assigneeUsers = userMap.get( CommonConstants.VALID_USERS_LIST );
 
             if ( assigneeUsers != null && !assigneeUsers.isEmpty() ) {
@@ -2831,7 +2831,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      */
     @Override
     public Map<String, List<User>> getUsersFromEmailIdsAndInvite( String[] emailIdsArray, User adminUser,
-        boolean holdSendingMail, boolean sendMail ) throws InvalidInputException
+        boolean holdSendingMail, boolean sendMail, boolean isAddedByRealtechOrSSAdmin ) throws InvalidInputException
     {
         LOG.debug( "Method getUsersFromEmailIds called for emailIdsArray:" + emailIdsArray );
         List<User> users = new ArrayList<User>();
@@ -2954,7 +2954,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                      */
                     try {
                         user = userManagementService.inviteUserToRegister( adminUser, firstName, lastName, emailId,
-                            holdSendingMail, sendMail, false );
+                            holdSendingMail, sendMail, false, isAddedByRealtechOrSSAdmin );
                     } catch ( UserAlreadyExistsException | UndeliveredEmailException | NoRecordsFetchedException e1 ) {
                         LOG.debug( "Exception in getUsersFromEmailIds while inviting a new user. Reason:" + e1.getMessage(),
                             e1 );
@@ -3231,7 +3231,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Transactional
     public Map<String, Object> addNewBranchWithUser( User user, String branchName, long regionId, int isDefaultBySystem,
         String address1, String address2, String country, String countryCode, String state, String city, String zipcode,
-        long selectedUserId, String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail )
+        long selectedUserId, String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail, boolean isAddedByRealtechOrSSAdmin )
         throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
     {
         Map<String, Object> map = new HashMap<String, Object>();
@@ -3262,7 +3262,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         } else if ( emailIdsArray != null && emailIdsArray.length > 0 ) {
             LOG.debug( "Fetching users list to assign to the branch" );
-            userMap = getUsersFromEmailIdsAndInvite( emailIdsArray, user, holdSendingMail, true );
+            userMap = getUsersFromEmailIdsAndInvite( emailIdsArray, user, holdSendingMail, true, isAddedByRealtechOrSSAdmin );
             List<User> assigneeUsers = userMap.get( CommonConstants.VALID_USERS_LIST );
 
             if ( assigneeUsers != null && !assigneeUsers.isEmpty() ) {
@@ -3401,7 +3401,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Override
     @Transactional
     public Map<String, Object> addIndividual( User adminUser, long selectedUserId, long branchId, long regionId,
-        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail, boolean sendMail )
+        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail, boolean sendMail, boolean isAddedByRealtechOrSSAdmin )
         throws InvalidInputException, NoRecordsFetchedException, SolrException, UserAssignmentException
     {
         LOG.debug( "Method addIndividual called for adminUser:" + adminUser + " branchId:" + branchId + " regionId:" + regionId
@@ -3419,7 +3419,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             assigneeUsers.add( assigneeUser );
         } else if ( emailIdsArray != null && emailIdsArray.length > 0 ) {
             LOG.debug( "Fetching users list for the email addresses provided" );
-            userMap = getUsersFromEmailIdsAndInvite( emailIdsArray, adminUser, holdSendingMail, sendMail );
+            userMap = getUsersFromEmailIdsAndInvite( emailIdsArray, adminUser, holdSendingMail, sendMail, isAddedByRealtechOrSSAdmin );
             assigneeUsers = userMap.get( CommonConstants.VALID_USERS_LIST );
         }
 
@@ -4864,7 +4864,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Transactional
     public Map<String, Object> updateRegion( User user, long regionId, String regionName, String address1, String address2,
         String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
-        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail )
+        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail, boolean isAddedByRealtechOrSSAdmin )
         throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
     {
         Map<String, Object> map = new HashMap<String, Object>();
@@ -4924,7 +4924,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         } else if ( emailIdsArray != null && emailIdsArray.length > 0 ) {
             LOG.debug( "Fetching users list to assign to the region" );
-            userMap = getUsersFromEmailIdsAndInvite( emailIdsArray, user, holdSendingMail, true );
+            userMap = getUsersFromEmailIdsAndInvite( emailIdsArray, user, holdSendingMail, true, isAddedByRealtechOrSSAdmin );
             List<User> assigneeUsers = userMap.get( CommonConstants.VALID_USERS_LIST );
 
             if ( assigneeUsers != null && !assigneeUsers.isEmpty() ) {
@@ -5016,7 +5016,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Transactional
     public Map<String, Object> updateBranch( User user, long branchId, long regionId, String branchName, String address1,
         String address2, String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
-        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail )
+        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail, boolean isAddedByRealtechOrSSAdmin )
         throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
     {
         Map<String, Object> map = new HashMap<String, Object>();
@@ -5121,7 +5121,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         } else if ( emailIdsArray != null && emailIdsArray.length > 0 ) {
             LOG.debug( "Fetching users list to assign to the branch" );
-            userMap = getUsersFromEmailIdsAndInvite( emailIdsArray, user, holdSendingMail, true );
+            userMap = getUsersFromEmailIdsAndInvite( emailIdsArray, user, holdSendingMail, true, isAddedByRealtechOrSSAdmin );
             List<User> assigneeUsers = userMap.get( CommonConstants.VALID_USERS_LIST );
 
             if ( assigneeUsers != null && !assigneeUsers.isEmpty() ) {
@@ -5419,7 +5419,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 for ( User user : company.getUsers() ) {
                     if ( CommonConstants.STATUS_INACTIVE != user.getStatus() ) {
                         userManagementService.deleteUserDataFromAllSources( loggedInUser, user.getUserId(),
-                            CommonConstants.STATUS_COMPANY_DELETED, false );
+                            CommonConstants.STATUS_COMPANY_DELETED, false, true );
 
                     }
                 }
@@ -9207,80 +9207,118 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     
     
     /**
-     *
-     * @param adminUser
-     * @param user
-     * @throws InvalidInputException
-     * @throws UndeliveredEmailException
-     * @throws NoRecordsFetchedException
-     */
-    @Override
-    public void sendUserAdditionMail( User adminUser, User user )
-        throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException
-    {
-        LOG.debug( "sending user adition mail" );
+    *
+    * @param adminUser
+    * @param user
+    * @throws InvalidInputException
+    * @throws UndeliveredEmailException
+    * @throws NoRecordsFetchedException
+    */
+   @Override
+   public void sendUserAdditionMail( User adminUser, User user )
+       throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException
+   {
+       LOG.debug( "sending user adition mail" );
 
-        if ( adminUser == null || user == null ) {
-            LOG.warn( "user details not specified for user addition mail" );
-            throw new InvalidInputException( "user details not specified for user addition mail" );
-        }
+       if ( adminUser == null || user == null ) {
+           LOG.warn( "user details not specified for user addition mail" );
+           throw new InvalidInputException( "user details not specified for user addition mail" );
+       }
+
+       if ( adminUser.isSuperAdmin() || userManagementService.isUserSocialSurveyAdmin( adminUser ) ) {
+           LOG.debug( "Usaer was added by a social survey addmin, aborting" );
+           return;
+       }
+
+       if ( user.getCompany() == null ) {
+           LOG.warn( "User added, is not associated with a company" );
+           return;
+       }
+
+       if ( user.isCompanyAdmin() ) {
+           LOG.debug( "company admin is the added user, aborting" );
+           return;
+       }
+
+       Set<String> recipients = new HashSet<>();
+       long companyId = user.getCompany().getCompanyId();
+       OrganizationUnitSettings companySettings = getCompanySettings( companyId );
+
+       if ( companySettings != null && companySettings.getUserAddDeleteNotificationRecipients() != null ) {
+           recipients.addAll( companySettings.getUserAddDeleteNotificationRecipients() );
+       }
+
+       if ( user.getCompany() != null ) {
+           recipients.add( userManagementService.getCompanyAdmin( companyId ).getEmailId() );
+       }
+
+       if ( recipients.isEmpty() ) {
+           LOG.debug( "No user addition notification mail recipient found" );
+           return;
+       }
 
 
-        if ( user.getCompany() == null ) {
-            LOG.warn( "User added, is not associated with a company" );
-            return;
-        }
+       emailServices.sendUserAdditionMail( recipients,
+           adminUser.getFirstName() + ( StringUtils.isEmpty( adminUser.getLastName() ) ? "" : " " + adminUser.getLastName() ),
+           adminUser.getEmailId(), user, getAgentSettings( user.getUserId() ) );
+   }
 
-        OrganizationUnitSettings companySettings = getCompanySettings( user.getCompany().getCompanyId() );
 
-        if ( companySettings == null || companySettings.getUserAddDeleteNotificationRecipients() == null
-            || companySettings.getUserAddDeleteNotificationRecipients().isEmpty() ) {
-            LOG.warn( "No user addition notification mail recipient found" );
-            return;
-        }
+   /**
+    * 
+    * @param adminUser
+    * @param user
+    * @throws InvalidInputException
+    * @throws UndeliveredEmailException
+    * @throws NoRecordsFetchedException
+    */
+   @Override
+   public void sendUserDeletionMail( User adminUser, User user )
+       throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException
+   {
+       LOG.debug( "sending user deletion mail" );
 
-        emailServices.sendUserAdditionMail( companySettings.getUserAddDeleteNotificationRecipients(),
-            adminUser.getFirstName() + ( StringUtils.isEmpty( adminUser.getLastName() ) ? "" : " " + adminUser.getLastName() ),
-            adminUser.getEmailId(), user, getAgentSettings( user.getUserId() ) );
-    }
-    
-    
-    /**
-     * 
-     * @param adminUser
-     * @param user
-     * @throws InvalidInputException
-     * @throws UndeliveredEmailException
-     * @throws NoRecordsFetchedException
-     */
-    @Override
-    public void sendUserDeletionMail( User adminUser, User user )
-        throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException
-    {
-        LOG.debug( "sending user deletion mail" );
+       if ( adminUser == null || user == null ) {
+           LOG.warn( "user details not specified for user deletion mail" );
+           throw new InvalidInputException( "user details not specified for user deletion mail" );
+       }
 
-        if ( adminUser == null || user == null ) {
-            LOG.warn( "user details not specified for user deletion mail" );
-            throw new InvalidInputException( "user details not specified for user deletion mail" );
-        }
-        
-        if ( user.getCompany() == null ) {
-            LOG.warn( "User to be deleted, is not associated with a company" );
-            return;
-        }
+       if ( user.getCompany() == null ) {
+           LOG.warn( "User to be deleted, is not associated with a company" );
+           return;
+       }
 
-        OrganizationUnitSettings companySettings = getCompanySettings( user.getCompany().getCompanyId() );
+       if ( adminUser.isSuperAdmin() || userManagementService.isUserSocialSurveyAdmin( adminUser ) ) {
+           LOG.debug( "User was deleted by a social survey addmin, aborting" );
+           return;
+       }
 
-        if ( companySettings == null || companySettings.getUserAddDeleteNotificationRecipients() == null
-            || companySettings.getUserAddDeleteNotificationRecipients().isEmpty() ) {
-            LOG.warn( "No user deletion notification mail recipient found" );
-            return;
-        }
+       if ( user.isCompanyAdmin() ) {
+           LOG.debug( "company admin is the deleted user, aborting" );
+           return;
+       }
 
-        emailServices.sendUserDeletionMail( companySettings.getUserAddDeleteNotificationRecipients(),
-            adminUser.getFirstName() + ( StringUtils.isEmpty( adminUser.getLastName() ) ? "" : " " + adminUser.getLastName() ),
-            adminUser.getEmailId(), user, getAgentSettings( user.getUserId() ) );
-    }
+       Set<String> recipients = new HashSet<>();
+       long companyId = user.getCompany().getCompanyId();
+       OrganizationUnitSettings companySettings = getCompanySettings( companyId );
+
+       if ( companySettings != null && companySettings.getUserAddDeleteNotificationRecipients() != null ) {
+           recipients.addAll( companySettings.getUserAddDeleteNotificationRecipients() );
+       }
+
+       if ( user.getCompany() != null ) {
+           recipients.add( userManagementService.getCompanyAdmin( companyId ).getEmailId() );
+       }
+
+       if ( recipients.isEmpty() ) {
+           LOG.debug( "No user deletion notification mail recipient found" );
+           return;
+       }
+
+       emailServices.sendUserDeletionMail( recipients,
+           adminUser.getFirstName() + ( StringUtils.isEmpty( adminUser.getLastName() ) ? "" : " " + adminUser.getLastName() ),
+           adminUser.getEmailId(), user, getAgentSettings( user.getUserId() ) );
+   }
     
     
     /**
