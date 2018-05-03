@@ -5293,25 +5293,33 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     .equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION ) ) {
                     surveyDetails.setRegionId( profile.getIden() );
                     surveyDetails.setCompanyId( companyId );
+                    surveyDetails.setRegionName(  profile.getContact_details().getName()  );
                 } else if ( collectionName
                     .equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION ) ) {
                     try {
                         Branch branch = branchDao.findById( Branch.class, profile.getIden() );
                         if ( branch != null ) {
                             surveyDetails.setRegionId( branch.getRegion().getRegionId() );
+                            surveyDetails.setRegionName(branch.getRegion().getRegion());
                         }
                     } catch ( Exception e ) {
                         LOG.error( "Could not find by branch details for id : " + profile.getIden(), e );
                     }
                     surveyDetails.setBranchId( profile.getIden() );
                     surveyDetails.setCompanyId( companyId );
+                    surveyDetails.setBranchName(  profile.getContact_details().getName()  );
                 } else if ( collectionName.equalsIgnoreCase( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION ) ) {
                     try {
                         Map<String, Long> agentDetailsMap = userProfileDao.findPrimaryUserProfileByAgentId( profile.getIden() );
                         if ( agentDetailsMap != null && agentDetailsMap.size() > 0 ) {
-                            surveyDetails.setRegionId( agentDetailsMap.get( CommonConstants.REGION_ID_COLUMN ) );
-                            surveyDetails.setBranchId( agentDetailsMap.get( CommonConstants.BRANCH_ID_COLUMN ) );
+                        		Branch branch = branchDao.findById( Branch.class,  agentDetailsMap.get( CommonConstants.BRANCH_ID_COLUMN )  );
+                        		Region region = branch.getRegion();
+                        		surveyDetails.setRegionId( agentDetailsMap.get( CommonConstants.REGION_ID_COLUMN ) );
+                        		surveyDetails.setBranchId( agentDetailsMap.get( CommonConstants.BRANCH_ID_COLUMN ) );
+                        		surveyDetails.setBranchName(branch.getBranch());
+                        		surveyDetails.setRegionName(region.getRegion());
                         }
+                        
                     } catch ( Exception e ) {
                         LOG.error( "Could not find by agent hierarchy details for id : " + profile.getIden(), e );
                     }
