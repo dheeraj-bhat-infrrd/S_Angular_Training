@@ -237,4 +237,7 @@ public interface SSApiIntegration
     @POST( "/v1/unsetcompres" )
     Response unsetCompRes(@Query ("entityId") long entityId);
     
+    @POST("/v1/unsetwebadd")
+    Response unsetWebAdd(@Query ("entityId") long entityId , @Query ("entityType") String entityType);
+    
 }

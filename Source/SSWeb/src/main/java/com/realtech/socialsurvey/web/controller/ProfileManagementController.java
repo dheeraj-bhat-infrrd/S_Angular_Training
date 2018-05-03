@@ -110,11 +110,14 @@ import com.realtech.socialsurvey.core.services.upload.impl.UploadUtils;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.core.utils.UrlValidationHelper;
+import com.realtech.socialsurvey.web.api.builder.SSApiIntergrationBuilder;
 import com.realtech.socialsurvey.web.common.ErrorCodes;
 import com.realtech.socialsurvey.web.common.ErrorResponse;
 import com.realtech.socialsurvey.web.common.JspResolver;
 import com.realtech.socialsurvey.web.util.BotRequestUtils;
 
+import retrofit.client.Response;
+import retrofit.mime.TypedByteArray;
 import sun.misc.BASE64Decoder;
 
 
@@ -181,6 +184,14 @@ public class ProfileManagementController
 
     @Autowired
     private SettingsManager settingsManager;
+    
+    private SSApiIntergrationBuilder ssApiIntergrationBuilder;
+
+    @Autowired
+    public void setSsApiIntergrationBuilder( SSApiIntergrationBuilder ssApiIntergrationBuilder )
+    {
+        this.ssApiIntergrationBuilder = ssApiIntergrationBuilder;
+    }
 
 
     @Transactional
@@ -318,7 +329,8 @@ public class ProfileManagementController
                 String disclaimer = profileManagementService.aggregateDisclaimer( regionProfile, CommonConstants.REGION_ID );
                 regionProfile.setDisclaimer( disclaimer );
                 regionProfile.setHiddenSection( companyProfile.isHiddenSection() );
-
+                //unset web address in edit profile if it's not for same heirarchy
+                unsetWebAdd(map,regionProfile,entityType);
                 String json = new Gson().toJson( regionProfile );
                 model.addAttribute( "profileJson", json );
 
@@ -385,6 +397,9 @@ public class ProfileManagementController
                 branchProfile.setDisclaimer( disclaimer );
                 branchProfile.setHiddenSection( companyProfile.isHiddenSection() );
 
+                //unset web address in edit profile if it's not for same heirarchy
+                unsetWebAdd(map,branchProfile,entityType);
+                
                 String json = new Gson().toJson( branchProfile );
                 model.addAttribute( "profileJson", json );
 
@@ -458,6 +473,8 @@ public class ProfileManagementController
                 individualProfile.setDisclaimer( disclaimer );
                 individualProfile.setHiddenSection( companyProfile.isHiddenSection() );
 
+                //unset web address in edit profile if it's not for same heirarchy
+                unsetWebAdd(map,individualProfile,entityType);
                 String json = new Gson().toJson( individualProfile );
                 model.addAttribute( "profileJson", json );
                 model.addAttribute( "companyProfileName", companyProfile.getProfileName() );
@@ -517,6 +534,25 @@ public class ProfileManagementController
         return JspResolver.PROFILE_EDIT;
     }
 
+    //unsetting web address for edit profile if it's not of the same hierarchy
+    private OrganizationUnitSettings unsetWebAdd(Map<SettingsForApplication, OrganizationUnit> map , OrganizationUnitSettings unitSetting, String entityType) {
+        LOG.debug( "functionality to unset web address if not of same heirarchy is called " );
+        //get map and unset settings
+        //SettingsForApplication.WEB_ADDRESS_WORK
+        if(map.containsKey( SettingsForApplication.WEB_ADDRESS_WORK ) ) {
+            //no need to have company heirarchy cause its the highest and will always be true and never execute this function
+            if ( map.get( SettingsForApplication.WEB_ADDRESS_WORK) == OrganizationUnit.COMPANY && !entityType.equals( CommonConstants.COMPANY_ID ) ) {
+                unitSetting.getContact_details().setWeb_addresses( new WebAddressSettings() );
+            } else if ( map.get( SettingsForApplication.WEB_ADDRESS_WORK) == OrganizationUnit.REGION && !entityType.equals( CommonConstants.REGION_ID ) ) {
+                unitSetting.getContact_details().setWeb_addresses( new WebAddressSettings() );
+            } else if ( map.get( SettingsForApplication.WEB_ADDRESS_WORK) == OrganizationUnit.BRANCH && !entityType.equals( CommonConstants.BRANCH_ID )) {
+                unitSetting.getContact_details().setWeb_addresses( new WebAddressSettings() );
+            } else if ( map.get( SettingsForApplication.WEB_ADDRESS_WORK) == OrganizationUnit.AGENT && !entityType.equals( CommonConstants.AGENT_ID ) ) {
+                unitSetting.getContact_details().setWeb_addresses( new WebAddressSettings() );
+            }
+        }
+        return unitSetting;
+    }
 
     /**
      *
@@ -5657,5 +5693,28 @@ public class ProfileManagementController
         LOG.info( "Method updateLendingTreeLink() finished from ProfileManagementController" );
         return JspResolver.MESSAGE_HEADER;
     }
+    
+    @ResponseBody
+    @RequestMapping ( value = "/unsetwebapp", method = RequestMethod.POST)
+    public String unsetWebAddress( Model model, HttpServletRequest request ) throws InvalidInputException
+    {
+        LOG.info( "Unset webaddress started." );
+        HttpSession session = request.getSession( false );
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        Response response = ssApiIntergrationBuilder.getIntegrationApi().unsetWebAdd( entityId, entityType );
+        OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session
+            .getAttribute( CommonConstants.USER_PROFILE_SETTINGS );
+        if ( profileSettings == null || entityType == null ) {
+                    throw new InvalidInputException( "No user settings found in session" );
+        }
+        //resetting the profile settings 
+        profileSettings.getContact_details().getWeb_addresses().setWork( "" );
+        LOG.info( "Web addresses updated successfully" );
+        model.addAttribute( "message", messageUtils.getDisplayMessage(
+            DisplayMessageConstants.WEB_ADDRESSES_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE ) );
+        return JspResolver.MESSAGE_HEADER;
+    }
+
 
 }

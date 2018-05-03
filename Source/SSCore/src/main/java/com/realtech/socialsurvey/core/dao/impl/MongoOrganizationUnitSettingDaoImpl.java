@@ -133,6 +133,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_SAVED_DIGEST_RECORD_YEAR = "savedDigestRecords.year";
     public static final String KEY_USER_ADD_DELETE_NOTIFICATION_RECIPIENTS = "userAddDeleteNotificationRecipients";
     
+    public static final String KEY_CONTACT_DETAILS_WEB_ADD_WORK = "contact_details.web_addresses.work";
+    
     
     @Value ( "${CDN_PATH}")
     private String amazonEndPoint;

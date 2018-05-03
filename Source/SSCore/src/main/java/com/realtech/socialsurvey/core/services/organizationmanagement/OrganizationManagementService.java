@@ -1664,4 +1664,6 @@ public interface OrganizationManagementService
     public void sendUserDeletionMail( User adminUser, User user )
         throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException;
 
+    public void unsetWebAddressInProfile( long entityId, String entityType ) throws NonFatalException;
+
 }
