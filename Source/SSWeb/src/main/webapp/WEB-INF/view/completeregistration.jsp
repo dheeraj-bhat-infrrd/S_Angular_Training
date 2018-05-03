@@ -22,7 +22,7 @@
 		<div class="float-left hdr-logo"></div>
 		<div class="float-right clearfix hdr-btns-wrapper">
 			<div class="float-left hdr-log-btn hdr-log-reg-btn"><spring:message code="label.signin.key" /></div>
-			<div class="float-left hdr-reg-btn hdr-log-reg-btn"><spring:message code="label.joinus.key" /></div>
+			<!-- <div class="float-left hdr-reg-btn hdr-log-reg-btn"><spring:message code="label.joinus.key" /></div> -->
 		</div>
 	</div>
 </div>

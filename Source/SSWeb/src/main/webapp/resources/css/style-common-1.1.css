@@ -1921,3 +1921,12 @@ span.footer-ul a:hover {
   bottom: 0;
   height: 100%;
 }
+
+.review-abusive-share-parent{
+	display: flex;
+    align-items: flex-start;
+}
+
+.review-abusive-share-btn{
+	margin:10px auto;
+}

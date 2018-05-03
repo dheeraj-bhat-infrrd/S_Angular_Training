@@ -90,7 +90,7 @@
 
  // close on success
  setTimeout(function() {
-$('#close-text').text("Please close the tab and continue by logining in to Social Survey.");
+$('#close-text').text("Please close the tab and continue by logining in to SocialSurvey.");
   window.close();
  }, 3000);
 });

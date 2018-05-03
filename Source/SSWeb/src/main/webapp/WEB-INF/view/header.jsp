@@ -374,18 +374,18 @@
 				<c:if test="${ highestrole == 1 }">
 					<div id="hdr-link-item-sm" class="hdr-link-item hdr-link-item-sm pos-relative">
 
-<%-- 						<a href="javascript:showMainContent('./showsocialmonitortpage.do')" onclick="showOverlay();"><spring:message code="label.socialmonitor.key" /></a>
- --%>						<div id="listings-manager-main" class="hide">
+						<a href="javascript:showMainContent('./showlistingsmanagerpage')" onclick="showOverlay();"><spring:message code="label.listingsmanager.key" /></a>
+						<%-- <div id="listings-manager-main" class="hide">
 							<div id="hdr-sm-settings-dropdown" class="hdr-link-item-dropdown-icn-sm"></div>
 							<div id="hdr-link-item-dropdown-sm" class="hdr-link-item-dropdown-sm hide">
-								<%-- <div class="hdr-link-item-dropdown-item-sm" onclick="showMainContent('./showsocialmonitortpage.do');">
+								<div class="hdr-link-item-dropdown-item-sm" onclick="showMainContent('./showsocialmonitortpage.do');">
 									<spring:message code="label.socialmonitor.key" />
-								</div> --%>
+								</div>
 								<div class="hdr-link-item-dropdown-item-sm" onclick="showMainContent('./showlistingsmanagerpage.do');">
 									<spring:message code="label.listingsmanager.key" />
 								</div>
 							</div>
-						</div>
+						</div> --%>
 					</div>
 				</c:if>
 				<c:if test="${ (isRealTechOrSSAdmin == true or isRealTechOrSSAdmin == 'true') and highestrole == 1 }">
