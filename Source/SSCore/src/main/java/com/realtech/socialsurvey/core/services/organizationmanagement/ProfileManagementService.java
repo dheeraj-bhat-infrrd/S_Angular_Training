@@ -749,4 +749,15 @@ public interface ProfileManagementService
      */
     public String copyImage( String source, String imageName ) throws Exception;
 
+
+    /**
+     * 
+     * @param collection
+     * @param unitSettings
+     * @param mediaTokens
+     * @throws InvalidInputException
+     */
+    public void disconnectSelectedSocialMedia( String collection, OrganizationUnitSettings unitSettings, SocialMediaTokens mediaTokens,
+        String keyToupdate ) throws InvalidInputException;
+
 }

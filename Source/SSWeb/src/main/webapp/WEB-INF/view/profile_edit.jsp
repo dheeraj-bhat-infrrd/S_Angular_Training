@@ -92,6 +92,30 @@
 		<c:set value="${profileSettings.hobbies}" var="hobbies"></c:set>
 	</c:if>
 </c:if>
+<div id="disconnect-overlay-main" class="overlay-main hide">
+		<div id="disconnect-overlay-pop-up" class="overlay-disable-wrapper">
+			<div id="disconnect-overlay-header" class="ol-header">
+				<!-- Populated by javascript -->
+			</div>
+			<div class="ol-content">
+				<div id="disconnect-overlay-text" class="ol-txt">
+					<!-- Populated by javascript -->
+				</div>
+				<div class="clearfix">
+					<div class="float-left ol-btn-wrapper">
+						<div id="disconnect-overlay-cancel" class="ol-btn cursor-pointer">
+							<!-- Populated by javascript -->
+						</div>
+					</div>
+					<div class="float-left ol-btn-wrapper">
+						<div id="disconnect-overlay-continue" class="ol-btn cursor-pointer">
+							<!-- Populated by javascript -->
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 <div id="rep-prof-container" data-profile-master-id="${profilemasterid}"
 			data-column-name="${columnName}" data-account-type="${accounttype}"
 			data-column-value="${columnValue}" class="hide dash-top-info dash-prof-wrapper pos-relative dash-size" >
@@ -159,6 +183,7 @@
 		</div>
 		<div class="clearfix gmb-wc-btn-row">
 			<div id="gmb-add-link" class="gmb-wc-sub-send-btn wc-final-submit">Add Link</div>
+			<div id="gmb-disconnect-link" class="gmb-wc-sub-send-btn wc-final-submit">Disconnect</div>
 		</div>
 	</div>
 </div>
