@@ -99,11 +99,11 @@ public class OrganizationManagementApiController
         if ( userId > 0 ) {
             try {
                 List<UserProfile> profiles = userManagementService.getUserProfiles( userId );
-                response.put( "success", "true" );
-                response.put( "isBranchAdmin", "false" );
-                response.put( "isRegionAdmin", "false" );
-                response.put( "isAgent", "false" );
                 if ( profiles != null ) {
+                    response.put( "success", "true" );
+                    response.put( "isBranchAdmin", "false" );
+                    response.put( "isRegionAdmin", "false" );
+                    response.put( "isAgent", "false" );
                     for ( UserProfile profile : profiles ) {
                         if ( profile.getStatus() == CommonConstants.STATUS_ACTIVE ) {
                             if ( profile.getProfilesMaster()
@@ -118,7 +118,8 @@ public class OrganizationManagementApiController
                             }
                         }
                     }
-
+                } else {
+                    response.put( "reason", "No user profiles found" );
                 }
 
             } catch ( InvalidInputException error ) {

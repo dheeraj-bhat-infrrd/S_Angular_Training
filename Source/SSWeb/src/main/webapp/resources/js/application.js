@@ -6521,7 +6521,7 @@ function updateUserProfileTicksInManageTeam(userId){
 	var payload = {
 		"userId" : userId
 	};
-	callAjaxGetWithPayloadData("./userprofileflags.do", function(data) {
+	callAjaxGetWithPayloadData("./fetchuserprofileflags.do", function(data) {
 		if( data != undefined ){
 			var response = JSON.parse(data);
 			if( response != undefined && response.success != undefined ){
