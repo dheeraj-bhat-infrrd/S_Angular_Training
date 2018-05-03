@@ -28,5 +28,5 @@ public class SwaggerConfig
             "Terms and Condition", new Contact( "SocialSurvey Dev", "www.socialsurvey.com", "nishit@socialsurvey.com" ),
             "Licence", "www.socialsurvey.com" );
     }
-
+    
 }
