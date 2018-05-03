@@ -630,8 +630,10 @@ public class EmailFormatHelper
 
     private String buildAgentDetailBulletList( String agentName, String agentEmail, String publicProfileUrl )
     {
-        return wrapUnorderedListTag( wrapListElementTag( agentName ) + wrapListElementTag( agentEmail )
-            + ( StringUtils.isEmpty( publicProfileUrl ) ? "" : wrapListElementTag( wrapHrefForLink( publicProfileUrl ) ) ) );
+        return wrapUnorderedListTag(
+            wrapListElementTag( "Name for User : " + agentName ) + wrapListElementTag( "Email : " + agentEmail )
+                + ( "Public Profile Link : " + ( StringUtils.isEmpty( publicProfileUrl ) ? ""
+                    : wrapListElementTag( wrapHrefForLink( publicProfileUrl ) ) ) ) );
     }
 
 

@@ -106,7 +106,22 @@
 <meta property="og:image" content="${profile.profileImageUrlThumbnail}" />
 <meta property="og:description" content="${descriptionTag}" />
 <meta property="og:profileLevel" content="${profileLevel}" />
-<meta property="og:title" content="${profName} ${title} ${companyName} ${location} ${vertical} Professional Reviews" />
+<c:choose>
+	<c:when test="${not empty profName}">
+		<c:choose>
+			<c:when test="${profileLevel == 'INDIVIDUAL'}">
+				<meta property="og:title" content="${profName} ${title} ${companyName} ${location} ${vertical} Professional Reviews" />
+			</c:when>
+			<c:otherwise>
+				<meta property="og:title" content="${profName} ${vertical} Reviews" />
+			</c:otherwise>
+		</c:choose>
+	</c:when>
+	<c:otherwise>
+		<meta property="og:title" content="<spring:message code="label.profile.title.key" />" />
+		<title></title>
+	</c:otherwise>
+</c:choose>
 <link rel="shortcut icon" href="/favicon.ico" sizes="16x16">
 <link rel="stylesheet"
 	href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">

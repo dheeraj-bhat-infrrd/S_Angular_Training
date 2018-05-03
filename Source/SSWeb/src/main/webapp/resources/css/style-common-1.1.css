@@ -1775,6 +1775,7 @@ span.footer-ul a:hover {
     border-bottom-left-radius: 8px;
     line-height: 40px;
     padding: 15px 10px;
+    display: flex;
 }
 
 .gmb-wc-sub-send-btn {
@@ -1919,4 +1920,13 @@ span.footer-ul a:hover {
 .rep-prof-pic-circle:hover .rep-prof-pic-overlay {
   bottom: 0;
   height: 100%;
+}
+
+.review-abusive-share-parent{
+	display: flex;
+    align-items: flex-start;
+}
+
+.review-abusive-share-btn{
+	margin:10px auto;
 }

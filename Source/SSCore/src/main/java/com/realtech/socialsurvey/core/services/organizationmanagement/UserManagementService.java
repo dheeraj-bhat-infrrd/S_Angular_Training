@@ -60,14 +60,15 @@ public interface UserManagementService
      * @param lastName
      * @param emailId
      * @param holdSendingMail
-     * @param isForHierarchyUpload TODO
+     * @param isForHierarchyUpload
+     * @param isAddedByRealtechOrSSAdmin
      * @throws InvalidInputException
      * @throws UserAlreadyExistsException
      * @throws UndeliveredEmailException
      * @throws NoRecordsFetchedException 
      */
     public User inviteUserToRegister( User admin, String firstName, String lastName, String emailId, boolean holdSendingMail,
-        boolean sendMail, boolean isForHierarchyUpload ) throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException, NoRecordsFetchedException;
+        boolean sendMail, boolean isForHierarchyUpload, boolean isAddedByRealtechOrSSAdmin ) throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException, NoRecordsFetchedException;
 
 
     /**
@@ -400,7 +401,7 @@ public interface UserManagementService
     public void updateUser( User user, Map<String, Object> map ) throws SolrException, InvalidInputException;
 
 
-    public User inviteUser( User admin, String firstName, String lastName, String emailId )
+    public User inviteUser( User admin, String firstName, String lastName, String emailId, boolean isAddedByRealtechOrSSAdmin )
         throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException, SolrException, NoRecordsFetchedException;
 
 
@@ -575,7 +576,7 @@ public interface UserManagementService
     void updateUserEmailMapping( User agent, long emailMappingId, int status ) throws InvalidInputException;
 
 
-    public void deleteUserDataFromAllSources( User loggedInUser, long userIdToBeDeleted, int status, boolean isForHierarchyUpload )
+    public void deleteUserDataFromAllSources( User loggedInUser, long userIdToBeDeleted, int status, boolean isForHierarchyUpload, boolean isDeletedByRealtechOrSSAdmin )
         throws InvalidInputException, SolrException;
 
 
@@ -644,6 +645,12 @@ public interface UserManagementService
     
     public User getActiveAgentByEmailAndCompany( long companyId, String emailId ) throws InvalidInputException,
         NoRecordsFetchedException;
+
+
+    public boolean isUserSocialSurveyAdmin( User user );
+
+    
+    public List<UserProfile> getUserProfiles( long userId ) throws InvalidInputException;
 
 }
 // JIRA SS-34 BY RM02 BOC

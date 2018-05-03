@@ -69,10 +69,15 @@ import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
+import com.realtech.socialsurvey.web.api.builder.SSApiIntergrationBuilder;
+import com.realtech.socialsurvey.web.api.exception.SSAPIException;
 import com.realtech.socialsurvey.web.common.ErrorCodes;
 import com.realtech.socialsurvey.web.common.ErrorMessages;
 import com.realtech.socialsurvey.web.common.ErrorResponse;
 import com.realtech.socialsurvey.web.common.JspResolver;
+
+import retrofit.client.Response;
+import retrofit.mime.TypedByteArray;
 
 
 // JIRA SS-37 BY RM02 BOC
@@ -119,6 +124,10 @@ public class UserManagementController
     @Autowired
     private Utils utils;
 
+
+    @Autowired
+    private SSApiIntergrationBuilder sSApiIntergrationBuilder;
+
     private final static int SOLR_BATCH_SIZE = 20;
 
 
@@ -149,7 +158,7 @@ public class UserManagementController
                 long usersCount = solrSearchService.countUsersByCompany( companyId, 0, SOLR_BATCH_SIZE );
                 session.setAttribute( "usersCount", usersCount );
             } catch ( MalformedURLException e ) {
-                LOG.warn( "MalformedURLException while fetching users count. " , e );
+                LOG.warn( "MalformedURLException while fetching users count. ", e );
                 throw new NonFatalException( "MalformedURLException while fetching users count", e );
             }
         } catch ( NonFatalException nonFatalException ) {
@@ -170,6 +179,7 @@ public class UserManagementController
         LOG.info( "Method to add a new user by existing admin, inviteNewUser() called." );
         HttpSession session = request.getSession( false );
         User admin = sessionHelper.getCurrentUser();
+        Long adminId = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
         try {
             if ( admin == null ) {
                 LOG.warn( "No user found in session" );
@@ -202,8 +212,10 @@ public class UserManagementController
                         model.addAttribute( "existingUserId", user.getUserId() );
                         throw new UserAlreadyExistsException( "User already exists with the email id : " + emailId );
                     } catch ( NoRecordsFetchedException noRecordsFetchedException ) {
-                        LOG.error( "No records exist with the email id passed, inviting the new user", noRecordsFetchedException);
-                        user = userManagementService.inviteUser( admin, firstName, lastName, emailId );
+                        LOG.error( "No records exist with the email id passed, inviting the new user",
+                            noRecordsFetchedException );
+                        user = userManagementService.inviteUser( admin, firstName, lastName, emailId,
+                            ( adminId != null && adminId > 0 ) ? true : false );
                         String profileName = userManagementService.getUserSettings( user.getUserId() ).getProfileName();
                         userManagementService.sendRegistrationCompletionLink( emailId, firstName, lastName,
                             admin.getCompany().getCompanyId(), profileName, user.getLoginName(), false );
@@ -219,7 +231,7 @@ public class UserManagementController
                         }
                     }
                 } else {
-                	LOG.warn("Limit for maximum users has already reached.");
+                    LOG.warn( "Limit for maximum users has already reached." );
                     throw new InvalidInputException( "Limit for maximum users has already reached.",
                         DisplayMessageConstants.MAX_USERS_LIMIT_REACHED );
                 }
@@ -229,11 +241,11 @@ public class UserManagementController
                     messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
                 return JspResolver.MESSAGE_HEADER;
             } catch ( UndeliveredEmailException e ) {
-            	LOG.warn( "UndeliveredEmailException in inviteNewUser() while inviting new user. Reason : ", e );
+                LOG.warn( "UndeliveredEmailException in inviteNewUser() while inviting new user. Reason : ", e );
                 throw new UndeliveredEmailException( e.getMessage(), DisplayMessageConstants.REGISTRATION_INVITE_GENERAL_ERROR,
                     e );
             } catch ( UserAlreadyExistsException e ) {
-            	LOG.warn( "UserAlreadyExistsException in inviteNewUser() while inviting new user. Reason : ", e );
+                LOG.warn( "UserAlreadyExistsException in inviteNewUser() while inviting new user. Reason : ", e );
                 throw new UserAlreadyExistsException( e.getMessage(), DisplayMessageConstants.EMAILID_ALREADY_TAKEN, e );
             }
             model.addAttribute( "userId", user.getUserId() );
@@ -330,7 +342,7 @@ public class UserManagementController
                 startIndex = Integer.parseInt( startIndexStr );
                 batchSize = Integer.parseInt( batchSizeStr );
             } catch ( NumberFormatException e ) {
-               LOG.warn( "NumberFormatException while searching for user id. Reason : ", e );
+                LOG.warn( "NumberFormatException while searching for user id. Reason : ", e );
                 throw new NonFatalException( "NumberFormatException while searching for user id", e );
             }
 
@@ -369,7 +381,7 @@ public class UserManagementController
                 model.addAttribute( "numFound", userManagementService.getUsersUnderBranchAdminCount( admin ) );
             }
         } catch ( NonFatalException nonFatalException ) {
-            LOG.error( "NonFatalException while searching for user id. Reason : " , nonFatalException );
+            LOG.error( "NonFatalException while searching for user id. Reason : ", nonFatalException );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
@@ -420,7 +432,7 @@ public class UserManagementController
                 LOG.debug( "User search result is : " + usersResult );
                 model.addAttribute( "numFound", usersResult.getNumFound() );
             } catch ( InvalidInputException invalidInputException ) {
-            	 LOG.warn( "InvalidInputException while searching for user id. Reason : ", invalidInputException );
+                LOG.warn( "InvalidInputException while searching for user id. Reason : ", invalidInputException );
                 throw new InvalidInputException( invalidInputException.getMessage(), invalidInputException );
             } catch ( MalformedURLException e ) {
                 LOG.warn( "Error occured while searching for email id in findUserByEmail(). Reason is ", e );
@@ -448,7 +460,7 @@ public class UserManagementController
 
             User admin = sessionHelper.getCurrentUser();
             if ( admin == null ) {
-            	LOG.warn("No user found in session");
+                LOG.warn( "No user found in session" );
                 throw new InvalidInputException( "No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION );
             }
 
@@ -461,7 +473,7 @@ public class UserManagementController
                 Type searchedUser = new TypeToken<UserFromSearch>() {}.getType();
                 adminUser = new Gson().fromJson( adminUserDoc.toString(), searchedUser );
             } catch ( SolrException e ) {
-            	LOG.warn("SolrException while searching for user id.Reason:",e);
+                LOG.warn( "SolrException while searching for user id.Reason:", e );
                 throw new NonFatalException( "SolrException while searching for user id.Reason:" + e.getMessage(),
                     DisplayMessageConstants.GENERAL_ERROR, e );
             }
@@ -483,7 +495,7 @@ public class UserManagementController
                 messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
         }
-        
+
         LOG.info( "Method for Finding users and redirecting to search page, findUsersByEmailIdAndRedirectToPage() Finished" );
 
         return JspResolver.USER_LIST_FOR_MANAGEMENT;
@@ -493,7 +505,8 @@ public class UserManagementController
     @RequestMapping ( value = "/findusersunderadmin", method = RequestMethod.GET)
     public String findUsersUnderAdminAndRedirectToPage( Model model, HttpServletRequest request ) throws NonFatalException
     {
-        LOG.info( "Method for Finding users under admin and redirecting to search page, findUsersUnderAdminAndRedirectToPage() started" );
+        LOG.info(
+            "Method for Finding users under admin and redirecting to search page, findUsersUnderAdminAndRedirectToPage() started" );
         int startIndex = 0;
         int batchSize = 0;
 
@@ -517,7 +530,7 @@ public class UserManagementController
 
             User admin = sessionHelper.getCurrentUser();
             if ( admin == null ) {
-            	LOG.warn("No user found in session");
+                LOG.warn( "No user found in session" );
                 throw new InvalidInputException( "No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION );
             }
 
@@ -530,7 +543,7 @@ public class UserManagementController
                 Type searchedUser = new TypeToken<UserFromSearch>() {}.getType();
                 adminUser = new Gson().fromJson( adminUserDoc.toString(), searchedUser );
             } catch ( SolrException e ) {
-            	LOG.warn("SolrException while searching for user id. Reason:",e);
+                LOG.warn( "SolrException while searching for user id. Reason:", e );
                 throw new NonFatalException( "SolrException while searching for user id.Reason:" + e.getMessage(),
                     DisplayMessageConstants.GENERAL_ERROR, e );
             }
@@ -555,8 +568,9 @@ public class UserManagementController
             throw new NonFatalException(
                 "Error occured while searching for users in findUsersUnderAdminAndRedirectToPage(). Reason is ", e );
         }
-        
-        LOG.info( "Method for Finding users under admin and redirecting to search page, findUsersUnderAdminAndRedirectToPage() finished" );
+
+        LOG.info(
+            "Method for Finding users under admin and redirecting to search page, findUsersUnderAdminAndRedirectToPage() finished" );
         return JspResolver.USER_LIST_FOR_MANAGEMENT;
     }
 
@@ -570,6 +584,7 @@ public class UserManagementController
     {
         LOG.info( "Method to deactivate an existing user, removeExistingUser() called." );
         Map<String, String> statusMap = new HashMap<String, String>();
+
         String message = "";
         long userIdToRemove = 0;
 
@@ -589,6 +604,9 @@ public class UserManagementController
             }
 
             User loggedInUser = sessionHelper.getCurrentUser();
+            HttpSession session = request.getSession( false );
+            Long adminId = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
+
             User userToRemove = findUserById( userIdToRemove );
             if ( loggedInUser == null ) {
                 LOG.warn( "No user found in current session in removeExistingUser()." );
@@ -598,12 +616,12 @@ public class UserManagementController
             try {
                 if ( checkIfTheUserCanBeDeleted( loggedInUser, userToRemove ) ) {
                     userManagementService.deleteUserDataFromAllSources( loggedInUser, userIdToRemove,
-                        CommonConstants.STATUS_INACTIVE, false );
+                        CommonConstants.STATUS_INACTIVE, false, ( adminId != null && adminId > 0 ) ? true : false );
                 } else {
                     statusMap.put( "status", CommonConstants.ERROR );
                 }
             } catch ( InvalidInputException e ) {
-                LOG.warn( "InvalidInputException found in removeExistingUser()",e );
+                LOG.warn( "InvalidInputException found in removeExistingUser()", e );
                 throw new InvalidInputException( e.getMessage(), DisplayMessageConstants.REGISTRATION_INVITE_GENERAL_ERROR, e );
             }
 
@@ -1165,13 +1183,13 @@ public class UserManagementController
             //get agent settings
             AgentSettings agentSettings = null;
             try {
-                agentSettings = organizationManagementService.getAgentSettings(user.getUserId());               
-            }catch(NoRecordsFetchedException e) {
-                    throw new InvalidInputException( "No settings found for user", DisplayMessageConstants.GENERAL_ERROR );
+                agentSettings = organizationManagementService.getAgentSettings( user.getUserId() );
+            } catch ( NoRecordsFetchedException e ) {
+                throw new InvalidInputException( "No settings found for user", DisplayMessageConstants.GENERAL_ERROR );
             }
-            
+
             //check if login is prevented for user
-            if(agentSettings.isLoginPrevented()) {
+            if ( agentSettings.isLoginPrevented() ) {
                 SecurityContextHolder.clearContext();
                 return JspResolver.LOGIN_DISABLED_PAGE;
             }
@@ -1179,7 +1197,7 @@ public class UserManagementController
             LOG.debug( "Adding newly registered user to principal session" );
             sessionHelper.loginOnRegistration( emailId, password );
             LOG.debug( "Successfully added registered user to principal session" );
-            
+
             AccountType accountType = null;
             HttpSession session = request.getSession( true );
             List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
@@ -1233,7 +1251,7 @@ public class UserManagementController
 
             // update the last login time and number of logins
             userManagementService.updateUserLoginTimeAndNum( user );
-        } catch (NonFatalException e ) {
+        } catch ( NonFatalException e ) {
             LOG.error( "NonFatalException while setting new Password. Reason : " + e.getMessage(), e );
             redirectAttributes.addFlashAttribute( "message",
                 messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
@@ -1553,11 +1571,12 @@ public class UserManagementController
                 throw new InvalidInputException( "InvalidInputException while getting user.Reason: " + e.getMessage(),
                     DisplayMessageConstants.GENERAL_ERROR, e );
             }
-            
+
             //partner survey details
-            model.addAttribute( "partnerSurveyAllowedForCompany", organizationManagementService.isPartnerSurveyAllowedForComapny( user.getCompany().getCompanyId() ) );
+            model.addAttribute( "partnerSurveyAllowedForCompany",
+                organizationManagementService.isPartnerSurveyAllowedForComapny( user.getCompany().getCompanyId() ) );
             model.addAttribute( "partnerSurveyAllowedForUser", agentSettings.isAllowPartnerSurvey() );
-           
+
 
             //user assignments
             UserHierarchyAssignments assignments = (UserHierarchyAssignments) session
@@ -1852,18 +1871,18 @@ public class UserManagementController
 
                 userManagementService.updateUserProfile( sessionUser, profileId, status );
                 userManagementService.updateUserProfilesStatus( sessionUser, profileId );
-                
+
                 //userManagementService.removeUserProfile( profileId );
 
                 userManagementService.updatePrimaryProfileOfUser( updatedUser );
                 updatedUser = userManagementService.getUserByUserId( updatedUser.getUserId() );
                 userManagementService.updateUserInSolr( updatedUser );
-                
-                
+
+
                 //move surveys if deleted assignment is an agent assignment and user also has another agent assignment
-                organizationManagementService.updateSurveyAssignments( updatedUser,userprofileList ,profileId);
-            
-                
+                organizationManagementService.updateSurveyAssignments( updatedUser, userprofileList, profileId );
+
+
                 userManagementService.updateUserCountModificationNotification( updatedUser.getCompany() );
 
                 if ( sessionUser.getUserId() == updatedUser.getUserId() ) {
@@ -2006,6 +2025,48 @@ public class UserManagementController
             str = str.replace( "\"", "&quot;" );
         }
         return str;
+    }
+
+
+    /**
+     * 
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping ( value = "/fetchuserprofileflags", method = RequestMethod.GET)
+    public String fetchUserProfileFlags( HttpServletRequest request )
+    {
+        LOG.info( "Method fetchUserProfileFlags() started." );
+        String userIdStr = request.getParameter( "userId" );
+        Map<String, String> response = new HashMap<>();
+
+        response.put( "success", "false" );
+
+        if ( StringUtils.isEmpty( userIdStr ) ) {
+            response.put( "success", "false" );
+            response.put( "reason", "Invalid user ID" );
+        } else {
+            try {
+                long userId = Long.parseLong( userIdStr );
+                Response apiResponse = sSApiIntergrationBuilder.getIntegrationApi().getUserProfileFlags( userId );
+                
+                TypedByteArray body = (TypedByteArray) apiResponse.getBody();
+                
+                if( body != null ) {
+                    String responseString = new String( body.getBytes() );
+                    return responseString;
+                }
+                
+            } catch ( NumberFormatException | SSAPIException error ) {
+                LOG.warn( "Unable get user profile flags", error );
+                response.put( "reason", error.getMessage() );
+            }
+        }
+
+        String responseString = new Gson().toJson( response );
+        LOG.info( "Method fetchUserProfileFlags() finished." );
+        return responseString;
     }
 }
 // JIRA SS-77 BY RM07 EOC
