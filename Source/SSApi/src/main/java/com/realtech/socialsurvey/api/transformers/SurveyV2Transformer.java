@@ -67,12 +67,12 @@ public class SurveyV2Transformer implements Transformer<SurveyGetV2VO, SurveyDet
             serviceProviderInfo.setServiceProviderName( d.getAgentName() );
             serviceProviderInfo.setServiceProviderId(d.getAgentId());
             //branch name
-            if( d.getBranchName().equalsIgnoreCase(CommonConstants.DEFAULT_BRANCH_NAME) )
+            if( StringUtils.equalsIgnoreCase(d.getBranchName() , CommonConstants.DEFAULT_BRANCH_NAME))
             		serviceProviderInfo.setServiceProviderOfficeName("N/A");
             else
             		serviceProviderInfo.setServiceProviderOfficeName(d.getBranchName());
             	//region name
-            if( d.getRegionName().equalsIgnoreCase(CommonConstants.DEFAULT_REGION_NAME) )
+            if( StringUtils.equalsIgnoreCase(d.getRegionName() , CommonConstants.DEFAULT_REGION_NAME))
             		serviceProviderInfo.setServiceProviderRegionName("N/A");
             else
             	serviceProviderInfo.setServiceProviderRegionName(d.getRegionName());
