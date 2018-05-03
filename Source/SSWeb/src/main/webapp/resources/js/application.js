@@ -7941,7 +7941,7 @@ function showMasterQuestionPage() {
 		}
 		
 		// copy review text to clipboard
-		copyToClipboard( feedback, "Your feedback has been copied to clipboard" );
+		//copyToClipboard( feedback, "Your feedback has been copied to clipboard" );
 		
 		if( isAbusive == false ){
 			if (mood != 'Great') {

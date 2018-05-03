@@ -237,4 +237,7 @@ public interface SSApiIntegration
     @POST( "/v1/unsetcompres" )
     Response unsetCompRes(@Query ("entityId") long entityId);
     
+    @GET( "/v1/userprofileflags" )
+    Response getUserProfileFlags(@Query ("userId") long userId);
+    
 }
