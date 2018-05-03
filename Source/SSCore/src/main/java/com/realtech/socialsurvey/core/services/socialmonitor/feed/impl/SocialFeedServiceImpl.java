@@ -99,6 +99,8 @@ public class SocialFeedServiceImpl implements SocialFeedService
 	}
 	
     private static final int NO_OF_DAYS = 7;
+    private static final String FLAGGED = "flagged";
+    private static final String UNFLAGGED = "unflagged";
 
 	@Override
     public SocialResponseObject<?> saveFeed( SocialResponseObject<?> socialFeed ) throws InvalidInputException
@@ -232,6 +234,8 @@ public class SocialFeedServiceImpl implements SocialFeedService
         for ( SocialResponseObject socialResponseObject : socialResponseObjectsToAdd ) {
             List<ActionHistory> actionHistories = new ArrayList<>();
             updateFlag = 0;
+            String previousStatus = null;
+            String currentStatus = null;
             if ( socialFeedsActionUpdate.getStatus() != null ) {
                 updateFlag = 1;
                 if ( macroFlag ) {
@@ -252,6 +256,9 @@ public class SocialFeedServiceImpl implements SocialFeedService
                         actionHistory.setOwnerName( socialFeedsActionUpdate.getUserName() );
                         actionHistory.setCreatedDate( new Date().getTime() );
                         actionHistories.add( actionHistory );
+                        previousStatus = UNFLAGGED;
+                        currentStatus = FLAGGED;
+                        
                     } else if ( !socialFeedsActionUpdate.isFlagged()
                         && ( socialResponseObject.getStatus().equals( SocialFeedStatus.NEW ) ) ) {
                         updateFlag = 2;
@@ -263,6 +270,8 @@ public class SocialFeedServiceImpl implements SocialFeedService
                         actionHistory.setOwnerName( socialFeedsActionUpdate.getUserName() );
                         actionHistory.setCreatedDate( new Date().getTime() );
                         actionHistories.add( actionHistory );
+                        previousStatus = FLAGGED;
+                        currentStatus = UNFLAGGED;
                     }
                 }
                 if ( !socialFeedsActionUpdate.getStatus().toString()
@@ -281,6 +290,14 @@ public class SocialFeedServiceImpl implements SocialFeedService
                         actionHistory.setOwnerName( socialFeedsActionUpdate.getUserName() );
                         actionHistory.setCreatedDate( new Date().getTime() );
                         actionHistories.add( actionHistory );
+                        if(socialResponseObject.isFlagged()) {
+                            previousStatus = FLAGGED;
+                        } else if(!socialResponseObject.isFlagged() && !socialResponseObject.getStatus().toString().equalsIgnoreCase( SocialFeedStatus.RESOLVED.toString() )) {
+                            previousStatus = UNFLAGGED;
+                        } else if(socialResponseObject.getStatus().toString().equalsIgnoreCase( SocialFeedStatus.RESOLVED.toString() )) {
+                            previousStatus = SocialFeedStatus.RESOLVED.toString().toLowerCase();
+                        }
+                        currentStatus = SocialFeedStatus.ESCALATED.toString().toLowerCase();         
                     } else if ( socialFeedsActionUpdate.getStatus().toString()
                         .equalsIgnoreCase( SocialFeedStatus.RESOLVED.toString() )
                         && socialResponseObject.getStatus().toString().equalsIgnoreCase( SocialFeedStatus.ESCALATED.toString() )
@@ -294,10 +311,13 @@ public class SocialFeedServiceImpl implements SocialFeedService
                         actionHistory.setOwnerName( socialFeedsActionUpdate.getUserName() );
                         actionHistory.setCreatedDate( new Date().getTime() );
                         actionHistories.add( actionHistory );
+                        previousStatus = SocialFeedStatus.ESCALATED.toString().toLowerCase();
+                        currentStatus = SocialFeedStatus.RESOLVED.toString().toLowerCase();
                     }
                 }
             }
-            if ( macroActionFlag != 1 && updateFlag != 1) {
+            if ( ( macroActionFlag != 1 && updateFlag != 1 )
+                || ( socialFeedsActionUpdate.getStatus().toString().equalsIgnoreCase( SocialFeedStatus.SUBMIT.toString() ) ) ) {
                 if ( ( socialFeedsActionUpdate.getTextActionType().toString()
                     .equalsIgnoreCase( TextActionType.PRIVATE_NOTE.toString() ) )
                     && ( socialFeedsActionUpdate.getText() != null ) && !( socialFeedsActionUpdate.getText().isEmpty() ) ) {
@@ -320,7 +340,9 @@ public class SocialFeedServiceImpl implements SocialFeedService
                     // send mail to the user
                     try {
                         emailServices.sendSocialMonitorActionMail( socialResponseObject.getOwnerEmail(),
-                            socialResponseObject.getOwnerName(), socialFeedsActionUpdate.getText() );
+                            socialResponseObject.getOwnerName(), socialFeedsActionUpdate.getText(),
+                            socialFeedsActionUpdate.getUserName(), previousStatus, currentStatus,
+                            socialResponseObject.getType().toString().toLowerCase() );
                     } catch ( UndeliveredEmailException e ) {
                         LOG.error( "Email could not be delivered", e );
                     }
@@ -329,7 +351,8 @@ public class SocialFeedServiceImpl implements SocialFeedService
                     updateFlag, MongoSocialFeedDaoImpl.SOCIAL_FEED_COLLECTION );
             }
             //add successful postIds
-            if ( updateFlag != 1 && macroActionFlag != 1) {
+            if ( ( updateFlag != 1 && macroActionFlag != 1 )
+                || ( socialFeedsActionUpdate.getStatus().toString().equalsIgnoreCase( SocialFeedStatus.SUBMIT.toString() ) ) ) {
                 successPostIds.add( socialResponseObject.getPostId() );
                 socialFeedActionResponse.setSuccessPostIds( successPostIds );
             }
