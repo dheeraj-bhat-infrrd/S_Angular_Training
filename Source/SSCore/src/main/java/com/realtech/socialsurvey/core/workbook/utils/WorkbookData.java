@@ -84,9 +84,9 @@ public class WorkbookData
     		+ "Number of email bounced,Number of emails dropped,Number of emails deferred,Number of emails opened,Number of Surveys Clicked";
     
 	private static final String SURVEY_TRANSACTION_REPORT_HEADERS = "Name,User ID,Email ID,TRX_MONTH,NMLS,License ID,Company Name,"
-			+ "Region Name,Branch Name,Total number of reviews [Zillow + Social Survey],Total number of Zillow Reviews,"
+			+ "Region Name,Branch Name,Total number of reviews [Zillow + SocialSurvey],Total number of Zillow Reviews,"
 			+ "Total number of 3rd party reviews,Total number of verified customer reviews,Total number of unverified customer reviews,"
-			+ "Total number of Social Survey Reviews,Total number of Abusive Reviews,Total number of Retake Reviews,"
+			+ "Total number of SocialSurvey Reviews,Total number of Abusive Reviews,Total number of Retake Reviews,"
 			+ "Total number of Retake Completed,Transaction Received by Source,Transaction Sent,Transaction Unprocessable,"
 			+ "Transaction Clicked,Transaction Completed,Transaction Partially Completed,Transaction Unopened,Transaction Duplicates";
 
@@ -1160,7 +1160,7 @@ public class WorkbookData
         userRankingReportToPopulate.add( "Company Name" );
         userRankingReportToPopulate.add( "Region Name" );
         userRankingReportToPopulate.add( "Branch Name" );
-        userRankingReportToPopulate.add( "Total number of reviews [Zillow + Social Survey]" );
+        userRankingReportToPopulate.add( "Total number of reviews [Zillow + SocialSurvey]" );
         userRankingReportToPopulate.add( "Average Score of Reviews [Average of Social Reviews" );
         userRankingReportToPopulate.add( "Rank Score" );
         userRankingReportToPopulate.add( "SPS Score");

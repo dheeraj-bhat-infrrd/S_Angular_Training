@@ -923,7 +923,7 @@ public class OrganizationManagementServiceImplTest
         Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( null );
         organizationManagementServiceImpl.addNewRegionWithUser( user, TestConstants.TEST_STRING, 0, "Pago Pago", "",
             "United States", "US", "AS", "Pago Pago", "65827", 1, new String[] { TestConstants.TEST_MAIL_ID_STRING }, false,
-            true );
+            true, true );
     }
 
 
@@ -983,7 +983,7 @@ public class OrganizationManagementServiceImplTest
             Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString() );
         Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( null );
         organizationManagementServiceImpl.addNewBranchWithUser( new User(), TestConstants.TEST_STRING, 1, 0, "Pago Pago", "",
-            "United States", "US", "AS", "Pago Pago", "65287", 1, TestConstants.TEST_EMPTY_ARRAY, false, true );
+            "United States", "US", "AS", "Pago Pago", "65287", 1, TestConstants.TEST_EMPTY_ARRAY, false, true, true );
 
     }
 
@@ -1046,7 +1046,7 @@ public class OrganizationManagementServiceImplTest
     {
         Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( null );
         organizationManagementServiceImpl.addIndividual( new User(), 1, 1, 1, TestConstants.TEST_EMPTY_ARRAY, false, true,
-            true );
+            true, true );
     }
 
 
@@ -1058,7 +1058,7 @@ public class OrganizationManagementServiceImplTest
             .getDefaultRegionForCompany( Mockito.any( Company.class ) );
         Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( new User() );
         organizationManagementServiceImpl.addIndividual( new User(), 1, 0, 0, TestConstants.TEST_EMPTY_ARRAY, false, true,
-            true );
+            true, true );
     }
 
 
@@ -1546,7 +1546,7 @@ public class OrganizationManagementServiceImplTest
     {
         organizationManagementServiceImpl.updateRegion( null, 1, TestConstants.TEST_STRING, "Pago Pago",
             TestConstants.TEST_EMPTY_STRING, "United States", "US", "AS", "Pago Pago", "65287", 1,
-            TestConstants.TEST_EMPTY_ARRAY, false, true );
+            TestConstants.TEST_EMPTY_ARRAY, false, true, true );
     }
 
 
@@ -1555,7 +1555,7 @@ public class OrganizationManagementServiceImplTest
         throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
     {
         organizationManagementServiceImpl.updateRegion( new User(), 1, null, "Pago Pago", TestConstants.TEST_EMPTY_STRING,
-            "United States", "US", "AS", "Pago Pago", "65287", 1, TestConstants.TEST_EMPTY_ARRAY, false, true );
+            "United States", "US", "AS", "Pago Pago", "65287", 1, TestConstants.TEST_EMPTY_ARRAY, false, true, true );
     }
 
 
@@ -1565,7 +1565,7 @@ public class OrganizationManagementServiceImplTest
     {
         organizationManagementServiceImpl.updateRegion( new User(), 1, TestConstants.TEST_EMPTY_STRING, "Pago Pago",
             TestConstants.TEST_EMPTY_STRING, "United States", "US", "AS", "Pago Pago", "65287", 1,
-            TestConstants.TEST_EMPTY_ARRAY, false, true );
+            TestConstants.TEST_EMPTY_ARRAY, false, true, true );
     }
 
 
@@ -1575,7 +1575,7 @@ public class OrganizationManagementServiceImplTest
     {
         organizationManagementServiceImpl.updateRegion( new User(), 0, TestConstants.TEST_STRING, "Pago Pago",
             TestConstants.TEST_EMPTY_STRING, "United States", "US", "AS", "Pago Pago", "65287", 1,
-            TestConstants.TEST_EMPTY_ARRAY, false, true );
+            TestConstants.TEST_EMPTY_ARRAY, false, true, true );
     }
 
 
@@ -1586,7 +1586,7 @@ public class OrganizationManagementServiceImplTest
         Mockito.when( regionDao.findById( Mockito.eq( Region.class ), Mockito.anyLong() ) ).thenReturn( null );
         organizationManagementServiceImpl.updateRegion( new User(), 1, TestConstants.TEST_STRING, "Pago Pago",
             TestConstants.TEST_EMPTY_STRING, "United States", "US", "AS", "Pago Pago", "65287", 1,
-            TestConstants.TEST_EMPTY_ARRAY, false, true );
+            TestConstants.TEST_EMPTY_ARRAY, false, true, true );
     }
 
 
@@ -1598,7 +1598,7 @@ public class OrganizationManagementServiceImplTest
         Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( null );
         organizationManagementServiceImpl.updateRegion( new User(), 1, TestConstants.TEST_STRING, "Pago Pago",
             TestConstants.TEST_EMPTY_STRING, "United States", "US", "AS", "Pago Pago", "65287", 1,
-            TestConstants.TEST_EMPTY_ARRAY, false, true );
+            TestConstants.TEST_EMPTY_ARRAY, false, true, true );
     }
 
 
@@ -1675,7 +1675,7 @@ public class OrganizationManagementServiceImplTest
     {
         organizationManagementServiceImpl.updateBranch( null, 1, 1, TestConstants.TEST_STRING, "Pago Pago",
             TestConstants.TEST_EMPTY_STRING, "United States", "US", "AS", "Pago Pago", "65287", 1,
-            TestConstants.TEST_EMPTY_ARRAY, false, true );
+            TestConstants.TEST_EMPTY_ARRAY, false, true, true );
     }
 
 
@@ -1684,7 +1684,7 @@ public class OrganizationManagementServiceImplTest
         throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
     {
         organizationManagementServiceImpl.updateBranch( new User(), 1, 1, null, "Pago Pago", TestConstants.TEST_EMPTY_STRING,
-            "United States", "US", "AS", "Pago Pago", "65287", 1, TestConstants.TEST_EMPTY_ARRAY, false, true );
+            "United States", "US", "AS", "Pago Pago", "65287", 1, TestConstants.TEST_EMPTY_ARRAY, false, true, true );
     }
 
 
@@ -1694,7 +1694,7 @@ public class OrganizationManagementServiceImplTest
     {
         organizationManagementServiceImpl.updateBranch( new User(), 1, 1, TestConstants.TEST_EMPTY_STRING, "Pago Pago",
             TestConstants.TEST_EMPTY_STRING, "United States", "US", "AS", "Pago Pago", "65287", 1,
-            TestConstants.TEST_EMPTY_ARRAY, false, true );
+            TestConstants.TEST_EMPTY_ARRAY, false, true, true );
     }
 
 
@@ -1704,7 +1704,7 @@ public class OrganizationManagementServiceImplTest
     {
         organizationManagementServiceImpl.updateBranch( new User(), 1, 1, TestConstants.TEST_STRING, null,
             TestConstants.TEST_EMPTY_STRING, "United States", "US", "AS", "Pago Pago", "65287", 1,
-            TestConstants.TEST_EMPTY_ARRAY, false, true );
+            TestConstants.TEST_EMPTY_ARRAY, false, true, true );
     }
 
 
@@ -1714,7 +1714,7 @@ public class OrganizationManagementServiceImplTest
     {
         organizationManagementServiceImpl.updateBranch( new User(), 1, 1, TestConstants.TEST_STRING,
             TestConstants.TEST_EMPTY_STRING, TestConstants.TEST_EMPTY_STRING, "United States", "US", "AS", "Pago Pago", "65287",
-            1, TestConstants.TEST_EMPTY_ARRAY, false, true );
+            1, TestConstants.TEST_EMPTY_ARRAY, false, true, true );
     }
 
 
@@ -1725,7 +1725,7 @@ public class OrganizationManagementServiceImplTest
         Mockito.when( branchDao.findById( Mockito.eq( Branch.class ), Mockito.anyLong() ) ).thenReturn( null );
         organizationManagementServiceImpl.updateBranch( new User(), 1, 1, TestConstants.TEST_STRING, "Pago Pago",
             TestConstants.TEST_EMPTY_STRING, "United States", "US", "AS", "Pago Pago", "65287", 1,
-            TestConstants.TEST_EMPTY_ARRAY, false, true );
+            TestConstants.TEST_EMPTY_ARRAY, false, true, true );
     }
 
 
@@ -1741,7 +1741,7 @@ public class OrganizationManagementServiceImplTest
         Mockito.when( regionDao.findById( Mockito.eq( Region.class ), Mockito.anyLong() ) ).thenReturn( null );
         organizationManagementServiceImpl.updateBranch( new User(), 1, 1, TestConstants.TEST_STRING, "Pago Pago",
             TestConstants.TEST_EMPTY_STRING, "United States", "US", "AS", "Pago Pago", "65287", 1,
-            TestConstants.TEST_EMPTY_ARRAY, false, true );
+            TestConstants.TEST_EMPTY_ARRAY, false, true, true );
     }
 
 
@@ -1770,7 +1770,7 @@ public class OrganizationManagementServiceImplTest
         Mockito.when( userDao.findById( Mockito.eq( User.class ), Mockito.anyLong() ) ).thenReturn( null );
         organizationManagementServiceImpl.updateBranch( new User(), 1, 1, TestConstants.TEST_STRING, "Pago Pago",
             TestConstants.TEST_EMPTY_STRING, "United States", "US", "AS", "Pago Pago", "65287", 1,
-            TestConstants.TEST_EMPTY_ARRAY, false, true );
+            TestConstants.TEST_EMPTY_ARRAY, false, true, true );
     }
 
 

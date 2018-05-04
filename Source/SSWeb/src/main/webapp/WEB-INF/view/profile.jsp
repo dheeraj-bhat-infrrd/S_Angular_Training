@@ -106,7 +106,22 @@
 <meta property="og:image" content="${profile.profileImageUrlThumbnail}" />
 <meta property="og:description" content="${descriptionTag}" />
 <meta property="og:profileLevel" content="${profileLevel}" />
-<meta property="og:title" content="${profName} ${title} ${companyName} ${location} ${vertical} Professional Reviews" />
+<c:choose>
+	<c:when test="${not empty profName}">
+		<c:choose>
+			<c:when test="${profileLevel == 'INDIVIDUAL'}">
+				<meta property="og:title" content="${profName} ${title} ${companyName} ${location} ${vertical} Professional Reviews" />
+			</c:when>
+			<c:otherwise>
+				<meta property="og:title" content="${profName} ${vertical} Reviews" />
+			</c:otherwise>
+		</c:choose>
+	</c:when>
+	<c:otherwise>
+		<meta property="og:title" content="<spring:message code="label.profile.title.key" />" />
+		<title></title>
+	</c:otherwise>
+</c:choose>
 <link rel="shortcut icon" href="/favicon.ico" sizes="16x16">
 <link rel="stylesheet"
 	href="${initParam.resourcesPath}/resources/css/bootstrap.min.css">
@@ -292,9 +307,9 @@
 				<div class="float-left hdr-log-btn hdr-log-reg-btn">
 					<spring:message code="label.signin.key" />
 				</div>
-				<div class="float-left hdr-reg-btn hdr-log-reg-btn">
+				<!-- <div class="float-left hdr-reg-btn hdr-log-reg-btn">
 					<spring:message code="label.joinus.key" />
-				</div>
+				</div>  -->
 			</div>
 		</div>
 	</div>
@@ -682,9 +697,10 @@
 								</c:choose>
 							</c:if>
 
-							<c:if test="${not empty workEmail }">
+							
 								<div class="prof-left-row prof-left-assoc bord-bot-dc">
 									<div class="left-contact-wrapper">
+										<c:if test="${not empty workEmail }">
 										<div id="prof-contact-hdr"
 											class="left-panel-header prof-contact-hdr">Contact
 											${profName}</div>
@@ -745,6 +761,7 @@
 												</div>
 											</form>
 										</div>
+										</c:if>
 										<c:if test="${not empty profile.disclaimer }">
 											<div class="prof-left-ach">
 												<div class="left-ach-wrapper">
@@ -756,7 +773,6 @@
 										</c:if>
 									</div>
 								</div>
-							</c:if>
 						</div>
 					</div>
 
