@@ -141,10 +141,7 @@ function landingFlow() {
     }
 	
 	showMainContent('./showreportingpage.do');
-	console.log(enableTokenRefresh);
-	console.log("${enableTokenRefresh}");
 	if (enableTokenRefresh == "true" || enableTokenRefresh == true) {
-		console.log("i'm inside");
 		//update social media
 		if (isSocialMediaExpired == "true" || isSocialMediaExpired == true) {
 			if ($("#rep-fix-social-media").length > 0) {
