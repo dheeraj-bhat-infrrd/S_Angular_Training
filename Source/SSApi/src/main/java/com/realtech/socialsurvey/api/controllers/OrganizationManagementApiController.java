@@ -81,6 +81,14 @@ public class OrganizationManagementApiController
             throw new SSApiException( "Unable to update encompass version, " + error.getMessage(), error );
         }
     }
+    
+    @RequestMapping ( value = "/unsetwebadd", method = RequestMethod.POST)
+    @ApiOperation ( value = "Unset web address in profile")
+    public void unsetWebAdd( long entityId ,String entityType) throws  NonFatalException
+    {
+        LOGGER.info( "Unset web address in profile for entityId : {} , entityType : {}",entityId,entityType );
+        organizationManagementService.unsetWebAddressInProfile( entityId, entityType );
+    }
 
 
     /**
