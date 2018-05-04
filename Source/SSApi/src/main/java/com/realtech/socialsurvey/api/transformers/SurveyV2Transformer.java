@@ -46,10 +46,12 @@ public class SurveyV2Transformer implements Transformer<SurveyGetV2VO, SurveyDet
         List<SurveyResponseV2VO> surveyResponses = new ArrayList<SurveyResponseV2VO>();
 
         if ( d != null ) {
+        		//Customer details
             transactionInfo.setCustomerEmail( d.getCustomerEmail() );
             transactionInfo.setCustomerFirstName( d.getCustomerFirstName() );
             transactionInfo.setCustomerLastName( d.getCustomerLastName() );
 
+            //Transaction details
             transactionInfo.setTransactionCity( d.getCity() );
             transactionInfo.setTransactionState( d.getState() );
             if ( d.getSurveyTransactionDate() != null )
@@ -59,9 +61,22 @@ public class SurveyV2Transformer implements Transformer<SurveyGetV2VO, SurveyDet
             if ( objects[0] != null && objects[0] instanceof SurveyPreInitiation )
                 transactionInfo.setSurveySentDateTime( CommonUtils.formatDate(
                     ( (SurveyPreInitiation) objects[0] ).getLastReminderTime(), CommonConstants.SURVEY_API_DATE_FORMAT ) );
+            
+            //Service provider details
             serviceProviderInfo.setServiceProviderEmail( d.getAgentEmailId() );
             serviceProviderInfo.setServiceProviderName( d.getAgentName() );
             serviceProviderInfo.setServiceProviderId(d.getAgentId());
+            //branch name
+            if( StringUtils.equalsIgnoreCase(d.getBranchName() , CommonConstants.DEFAULT_BRANCH_NAME))
+            		serviceProviderInfo.setServiceProviderOfficeName("N/A");
+            else
+            		serviceProviderInfo.setServiceProviderOfficeName(d.getBranchName());
+            	//region name
+            if( StringUtils.equalsIgnoreCase(d.getRegionName() , CommonConstants.DEFAULT_REGION_NAME))
+            		serviceProviderInfo.setServiceProviderRegionName("N/A");
+            else
+            	serviceProviderInfo.setServiceProviderRegionName(d.getRegionName());
+            	
             survey.setReviewId( d.get_id() );
             review.setSummary( d.getSummary() );
             review.setDescription( d.getReview() );
