@@ -487,7 +487,7 @@ public class SocialMonitorWebController {
         return listOfIds;   
     }
     
-    private SocialFeedsActionUpdate createSFAUFromRequest(HttpServletRequest request, String userName) {
+    private SocialFeedsActionUpdate createSFAUFromRequest(HttpServletRequest request, String userName, String userEmailId) {
     
     	String postId = request.getParameter("form-post-id");
     	String flaggedStr = request.getParameter("form-flagged");
@@ -525,6 +525,8 @@ public class SocialMonitorWebController {
     	socialFeedsActionUpdate.setText(text);
     	socialFeedsActionUpdate.setMacroId(macroId);
     	socialFeedsActionUpdate.setUserName(userName);
+    	socialFeedsActionUpdate.setUserEmailId( userEmailId );
+    	
     	
     	return socialFeedsActionUpdate;
     }
@@ -539,12 +541,13 @@ public class SocialMonitorWebController {
     	User user = sessionHelper.getCurrentUser();
         Long companyId = user.getCompany().getCompanyId();
         String userName = user.getFirstName() + " " + user.getLastName();
+        String userEmailId = user.getEmailId();
         
     	Map<String, String> statusMap = new HashMap<>();
     	String message = "";
     	String statusJson = "";
     	
-    	SocialFeedsActionUpdate socialFeedsActionUpdate = createSFAUFromRequest(request,userName);
+    	SocialFeedsActionUpdate socialFeedsActionUpdate = createSFAUFromRequest(request,userName, userEmailId);
     	
     	String isDup = request.getParameter("form-is-dup");
     	boolean duplicateFlag = false;

@@ -18,6 +18,7 @@ public class SocialFeedsActionUpdate implements Serializable {
 	private TextActionType textActionType;
 	private String text;
 	private String userName;
+	private String userEmailId;
 	private long createdOn;
 	private String macroId = "";
 
@@ -88,11 +89,22 @@ public class SocialFeedsActionUpdate implements Serializable {
 		this.macroId = macroId;
 	}
 
-	@Override
-	public String toString() {
-		return "SocialFeedsActionUpdate [postIds=" + postIds + ", flagged=" + flagged + ", status=" + status
-				+ ", textActionType=" + textActionType + ", text=" + text + ", userName=" + userName + ", createdOn="
-				+ createdOn + ", macroId=" + macroId + "]";
-	}
+	public String getUserEmailId()
+    {
+        return userEmailId;
+    }
+
+    public void setUserEmailId( String userEmailId )
+    {
+        this.userEmailId = userEmailId;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "SocialFeedsActionUpdate [postIds=" + postIds + ", flagged=" + flagged + ", status=" + status
+            + ", textActionType=" + textActionType + ", text=" + text + ", userName=" + userName + ", userEmailId="
+            + userEmailId + ", createdOn=" + createdOn + ", macroId=" + macroId + "]";
+    }
 
 }
