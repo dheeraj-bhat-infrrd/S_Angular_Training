@@ -239,5 +239,7 @@ public interface SSApiIntegration
     
     @POST("/v1/unsetwebadd")
     Response unsetWebAdd(@Query ("entityId") long entityId , @Query ("entityType") String entityType);
+    @GET( "/v1/userprofileflags" )
+    Response getUserProfileFlags(@Query ("userId") long userId);
     
 }
