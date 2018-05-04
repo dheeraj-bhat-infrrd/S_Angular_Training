@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 public class SurveyGetV2VO
 {
 
-    private long surveyId;
-    private String reviewId;
+    private long surveyId; // survey preinitiation id
+    private String reviewId; // mongo survey id
     private TransactionInfoGetV2VO transactionInfo;
     private ServiceProviderInfoV2 serviceProviderInfo;
     private ReviewV2VO review;
