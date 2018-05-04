@@ -2882,7 +2882,10 @@ public class EmailServicesImpl implements EmailServices
 
     @Async
 	@Override
-	public void sendSocialMonitorActionMail(String recipientMailId, String recipientName, String mailBody, String userName, String previousStatus, String currentStatus, String feedType) throws InvalidInputException, UndeliveredEmailException {
+    public void sendSocialMonitorActionMail( String recipientMailId, String recipientName, String mailBody, String userName,
+        String userEmailId, String previousStatus, String currentStatus, String feedType )
+        throws InvalidInputException, UndeliveredEmailException
+    {
 		LOG.info( "method sendSocialMonitorActionMail started" );
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
             LOG.error( "Recipient email Id is empty or null for sendSocialMonitorActionMail " );
@@ -2902,9 +2905,9 @@ public class EmailServicesImpl implements EmailServices
 
         if ( previousStatus != null && currentStatus != null ) {
             message = "Your " + feedType + " post was moved from <b>" + previousStatus + "</b> to <b>" + currentStatus
-                + "</b> by " + userName + " with message,";
+                + "</b> by " + userName + " [" + userEmailId + "] with message,";
         } else {
-            message = "Your " + feedType + " post has a message from " + userName + ",";
+            message = "Your " + feedType + " post has a message from " + userName + " [" + userEmailId + "] " + ",";
         }
         
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();

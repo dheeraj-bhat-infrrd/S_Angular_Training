@@ -486,7 +486,8 @@ public interface EmailServices
 
 
     public void sendSocialMonitorActionMail( String recipientMailId, String recipientName, String mailBody, String userName,
-        String previousStatus, String currentStatus, String feedType ) throws InvalidInputException, UndeliveredEmailException;
+        String userEmailId, String previousStatus, String currentStatus, String feedType )
+        throws InvalidInputException, UndeliveredEmailException;
 
 
     public void sendAbusiveNotifyMail(String source,String recipientMailId, String customerName, String customerMailId, String agentName,String agentMailId,

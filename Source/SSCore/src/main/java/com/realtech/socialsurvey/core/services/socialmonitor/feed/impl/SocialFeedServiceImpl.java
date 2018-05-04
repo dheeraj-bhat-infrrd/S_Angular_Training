@@ -341,8 +341,8 @@ public class SocialFeedServiceImpl implements SocialFeedService
                     try {
                         emailServices.sendSocialMonitorActionMail( socialResponseObject.getOwnerEmail(),
                             socialResponseObject.getOwnerName(), socialFeedsActionUpdate.getText(),
-                            socialFeedsActionUpdate.getUserName(), previousStatus, currentStatus,
-                            socialResponseObject.getType().toString().toLowerCase() );
+                            socialFeedsActionUpdate.getUserName(), socialFeedsActionUpdate.getUserEmailId(), previousStatus,
+                            currentStatus, socialResponseObject.getType().toString().toLowerCase() );
                     } catch ( UndeliveredEmailException e ) {
                         LOG.error( "Email could not be delivered", e );
                     }
