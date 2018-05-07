@@ -92,6 +92,10 @@
 		<c:set value="${profileSettings.hobbies}" var="hobbies"></c:set>
 	</c:if>
 </c:if>
+<c:if test="${not empty isAgentProfileDisabled}">
+	<c:set value="${isAgentProfileDisabled}" var="isAgentProfileDisabled"></c:set>
+</c:if>
+<div id="divReadOnlyFields">
 <div id="disconnect-overlay-main" class="overlay-main hide">
 		<div id="disconnect-overlay-pop-up" class="overlay-disable-wrapper">
 			<div id="disconnect-overlay-header" class="ol-header">
@@ -568,10 +572,15 @@
 	<div class="float-left mob-icn icn-star-smile"></div>
 	<div class="float-left mob-icn inc-more"></div>
 </div>
+</div>
 <script>
 var hiddenSection="${profileSettings.hiddenSection}";
 $(document).ready(function() {
-	
+	if(${profilemasterid} == 4 && ${isAgentProfileDisabled}){
+	    $("#divReadOnlyFields :input").attr("disabled", true);
+	}else{
+	    $("#divReadOnlyFields :input").attr("disabled", false);
+	}
 	$(document).attr("title", "Profile Settings");
 	updateViewAsScroll();
 	

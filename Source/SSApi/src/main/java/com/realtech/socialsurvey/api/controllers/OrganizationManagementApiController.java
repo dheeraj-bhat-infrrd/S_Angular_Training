@@ -141,5 +141,13 @@ public class OrganizationManagementApiController
         LOGGER.info( "Method getProfileFlags() finished." );
         return new ResponseEntity<>( response, HttpStatus.OK );
     }
+    
+    @RequestMapping ( value = "/flag/agentprofiles", method = RequestMethod.POST)
+    @ApiOperation ( value = "Api to disable or enable agent edit in profile")
+    public void flagAgentProfile( long companyId ,boolean isAgentProfileDisabled) throws  NonFatalException
+    {
+        LOGGER.info( "Api to disable or enable agent edit in profile for companyId : {} , isAgentProfileDisabled : {}",companyId,isAgentProfileDisabled );
+        organizationManagementService.updateAgentProfileDisable( companyId, isAgentProfileDisabled );
+    }
 
 }

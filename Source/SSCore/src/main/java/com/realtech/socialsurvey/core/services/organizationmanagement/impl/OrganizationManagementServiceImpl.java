@@ -9539,4 +9539,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
         return false;
     }
+    
+    @Override
+    public void updateAgentProfileDisable(long companyId , boolean isAgentProfileDisabled) throws InvalidInputException {
+        LOG.info( "disabling editing for agent profile page's for companyId:{}",companyId );
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden( MongoOrganizationUnitSettingDaoImpl.KEY_AGENT_PROFILE_DISABLED,
+            isAgentProfileDisabled, companyId,MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION  );
+        
+    }
 }

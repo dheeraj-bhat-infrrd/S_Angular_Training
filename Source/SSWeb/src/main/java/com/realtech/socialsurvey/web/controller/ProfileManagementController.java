@@ -232,6 +232,7 @@ public class ProfileManagementController
         List<SettingsDetails> settingsDetailsList = null;
         OrganizationUnitSettings profileSettings = null;
         Map<SettingsForApplication, OrganizationUnit> map = null;
+        boolean isAgentProfileDisabled = false;
         //Get the hierarchy details associated with the current profile
         try {
             Map<String, Long> hierarchyDetails = profileManagementService.getHierarchyDetailsByEntity( entityType, entityId );
@@ -444,6 +445,9 @@ public class ProfileManagementController
 
                 //Check if social media override is allowed
                 allowOverrideForSocialMedia = companyProfile.isAllowOverrideForSocialMedia();
+                
+                //chaeck if profile is disabled for agents
+                isAgentProfileDisabled = companyProfile.isAgentProfileDisabled();
 
                 try {
                     map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID_COLUMN,
@@ -499,6 +503,8 @@ public class ProfileManagementController
         }
 
         model.addAttribute( "allowOverrideForSocialMedia", allowOverrideForSocialMedia );
+        //setting attribute
+        model.addAttribute( "isAgentProfileDisabled", isAgentProfileDisabled );
         model.addAttribute( "profileSettings", profileSettings );
         session.setAttribute( CommonConstants.USER_PROFILE_SETTINGS, profileSettings );
 
