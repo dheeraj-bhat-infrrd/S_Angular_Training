@@ -95,6 +95,10 @@
 <c:if test="${not empty isAgentProfileDisabled}">
 	<c:set value="${isAgentProfileDisabled}" var="isAgentProfileDisabled"></c:set>
 </c:if>
+<!-- check for isRealTechOrSSAdmin -->
+<c:if test="${not empty isRealTechOrSSAdmin}">
+	<c:set value="${isRealTechOrSSAdmin}" var="isRealTechOrSSAdmin"></c:set>
+</c:if>
 <div id="divReadOnlyFields">
 <div id="disconnect-overlay-main" class="overlay-main hide">
 		<div id="disconnect-overlay-pop-up" class="overlay-disable-wrapper">
@@ -576,7 +580,10 @@
 <script>
 var hiddenSection="${profileSettings.hiddenSection}";
 $(document).ready(function() {
-	if(${profilemasterid} == 4 && ${isAgentProfileDisabled}){
+	console.log("${ isRealTechOrSSAdmin }");
+	console.log("${profilemasterid}");
+	console.log("${isAgentProfileDisabled}");
+	if(!${isRealTechOrSSAdmin} && ${profilemasterid} == 4 && ${isAgentProfileDisabled}){
 	    $("#divReadOnlyFields :input").attr("disabled", true);
 	}else{
 	    $("#divReadOnlyFields :input").attr("disabled", false);

@@ -506,6 +506,14 @@ public class ProfileManagementController
         //setting attribute
         model.addAttribute( "isAgentProfileDisabled", isAgentProfileDisabled );
         model.addAttribute( "profileSettings", profileSettings );
+        
+        //REALTECH_USER_ID is set only for real tech and SS admin
+        boolean isRealTechOrSSAdmin = false;
+        Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
+        if ( adminUserid != null ) {
+            isRealTechOrSSAdmin = true;
+        }
+        model.addAttribute( "isRealTechOrSSAdmin", isRealTechOrSSAdmin );
         session.setAttribute( CommonConstants.USER_PROFILE_SETTINGS, profileSettings );
 
         //email message to verify
