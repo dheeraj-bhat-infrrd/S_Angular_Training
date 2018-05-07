@@ -580,6 +580,7 @@
 <script>
 var hiddenSection="${profileSettings.hiddenSection}";
 $(document).ready(function() {
+	$(document).attr("title", "Profile Settings");
 	console.log("${ isRealTechOrSSAdmin }");
 	console.log("${profilemasterid}");
 	console.log("${isAgentProfileDisabled}");
@@ -588,7 +589,6 @@ $(document).ready(function() {
 	}else{
 	    $("#divReadOnlyFields :input").attr("disabled", false);
 	}
-	$(document).attr("title", "Profile Settings");
 	updateViewAsScroll();
 	
 	adjustImage();
