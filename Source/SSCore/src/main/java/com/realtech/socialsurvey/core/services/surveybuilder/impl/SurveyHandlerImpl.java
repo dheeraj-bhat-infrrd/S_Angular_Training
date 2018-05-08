@@ -325,12 +325,15 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 regionId = userProfile.getRegionId();
             }
         }
+        Branch branch = userManagementService.getBranchById(branchId);
+        Region region = userManagementService.getRegionById(regionId);
 
         SurveyDetails surveyDetails = new SurveyDetails();
         surveyDetails.setAgentId( surveyPreInitiation.getAgentId() );
         surveyDetails.setAgentName( agentName );
         surveyDetails.setAgentEmailId( surveyPreInitiation.getAgentEmailId() );
         surveyDetails.setBranchId( branchId );
+        surveyDetails.setBranchName(branch.getBranch());
         surveyDetails.setCustomerFirstName( surveyPreInitiation.getCustomerFirstName() );
         String lastName = surveyPreInitiation.getCustomerLastName();
         if ( lastName != null && !lastName.isEmpty() && !lastName.equalsIgnoreCase( "null" ) )
@@ -338,6 +341,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyDetails.setCompanyId( companyId );
         surveyDetails.setCustomerEmail( surveyPreInitiation.getCustomerEmailId() );
         surveyDetails.setRegionId( regionId );
+        surveyDetails.setRegionName(region.getRegion());
         surveyDetails.setStage( CommonConstants.INITIAL_INDEX );
         surveyDetails.setReminderCount( surveyPreInitiation.getReminderCounts() );
         surveyDetails.setModifiedOn( new Date( System.currentTimeMillis() ) );
@@ -3093,7 +3097,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         if ( user.getEmailId() != null && !user.getEmailId().isEmpty() )
             surveyDetails.setAgentEmailId( user.getEmailId() );
         Map<String, Long> profile = userManagementService.getPrimaryUserProfileByAgentId( user.getUserId() );
+        Branch branch = userManagementService.getBranchById( profile.get( CommonConstants.BRANCH_ID_COLUMN ) );
+        Region region = userManagementService.getRegionById( profile.get( CommonConstants.REGION_ID_COLUMN ) );
         surveyDetails.setBranchId( profile.get( CommonConstants.BRANCH_ID_COLUMN ) );
+        surveyDetails.setBranchName(branch.getBranch());
         surveyDetails.setCustomerFirstName( surveyImportVO.getCustomerFirstName() );
         String lastName = surveyImportVO.getCustomerLastName();
         if ( lastName != null && !lastName.isEmpty() && !lastName.equalsIgnoreCase( "null" ) )
@@ -3101,6 +3108,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         surveyDetails.setCompanyId( user.getCompany().getCompanyId() );
         surveyDetails.setCustomerEmail( surveyImportVO.getCustomerEmailAddress() );
         surveyDetails.setRegionId( profile.get( CommonConstants.REGION_ID_COLUMN ) );
+        surveyDetails.setRegionName(region.getRegion());
         surveyDetails.setStage( CommonConstants.SURVEY_STAGE_COMPLETE );
         surveyDetails.setReminderCount( 0 );
         surveyDetails.setModifiedOn( new Date( System.currentTimeMillis() ) );
@@ -4230,6 +4238,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         newSurveyDetails.setAgentName( surveyDetails.getAgentName() );
         newSurveyDetails.setAgreedToShare( surveyDetails.getAgreedToShare() );
         newSurveyDetails.setBranchId( surveyDetails.getBranchId() );
+        newSurveyDetails.setBranchName( surveyDetails.getBranchName() );
         newSurveyDetails.setCity( surveyDetails.getCity() );
         newSurveyDetails.setCompanyId( surveyDetails.getCompanyId() );
         newSurveyDetails.setCompleteProfileUrl( surveyDetails.getCompleteProfileUrl() );
@@ -4244,6 +4253,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         newSurveyDetails.setModifiedOn( surveyDetails.getModifiedOn() );
         newSurveyDetails.setMood( surveyDetails.getMood() );
         newSurveyDetails.setRegionId( surveyDetails.getRegionId() );
+        newSurveyDetails.setRegionName( surveyDetails.getRegionName() );
         newSurveyDetails.setReminderCount( surveyDetails.getReminderCount() );
         newSurveyDetails.setRetakeSurvey( surveyDetails.isRetakeSurvey() );
         newSurveyDetails.setReview( surveyDetails.getReview() );

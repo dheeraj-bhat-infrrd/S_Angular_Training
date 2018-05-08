@@ -8832,7 +8832,16 @@ function callBackOnUpdatePhoneNumbers(data) {
 
 // Function to update web addresses in contact details
 $(document).on('blur', '#contant-info-container input[data-web-address]', function() {
-	if ($('#prof-all-lock').val() != 'modified' || !$(this).val() || $(this).is('[readonly]')) {
+	if(!$(this).val()){
+		delay(function() {
+			callAjaxPOST("./unsetwebapp.do", callBackOnUpdateWebAddresses, true);
+		}, 0);
+		$('#overlay-toast').html("Web address has been removed");
+		showToast();
+		return;
+	}
+
+	if ($('#prof-all-lock').val() != 'modified' || $(this).is('[readonly]')) {
 		return;
 	}
 	if (!isValidUrl($(this).val().trim())) {
