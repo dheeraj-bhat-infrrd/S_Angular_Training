@@ -110,7 +110,14 @@
 	<c:when test="${not empty profName}">
 		<c:choose>
 			<c:when test="${profileLevel == 'INDIVIDUAL'}">
-				<meta property="og:title" content="${profName} ${title} ${companyName} ${location} ${vertical} Professional Reviews" />
+				<c:choose>
+					<c:when test="${companyName == companyNameForTitle}">
+						<meta property="og:title" content="${profName} ${title} ${companyNameForTitle} ${vertical} Professional Reviews" />
+					</c:when>
+					<c:otherwise>
+						<meta property="og:title" content="${profName} ${title} ${companyName} ${companyNameForTitle} ${vertical} Professional Reviews" />
+					</c:otherwise>
+				</c:choose>
 			</c:when>
 			<c:otherwise>
 				<meta property="og:title" content="${profName} ${vertical} Reviews" />
@@ -153,7 +160,14 @@
 		<c:when test="${not empty profName}">
 			<c:choose>
 				<c:when test="${profileLevel == 'INDIVIDUAL'}">
-					<title>${profName} ${title} ${companyName} ${location} ${vertical} Professional Reviews</title>
+					<c:choose>
+						<c:when test="${companyName == companyNameForTitle}">
+							<title>${profName} ${title} ${companyNameForTitle} ${vertical} Professional Reviews</title>
+						</c:when>
+						<c:otherwise>
+							<title>${profName} ${title} ${companyName} ${companyNameForTitle} ${vertical} Professional Reviews</title>
+						</c:otherwise>
+					</c:choose>
 					<meta name="keywords"
 						content="${profName}, ${title}, ${companyName}, ${location}, ${vertical}, professional, online, reputation, social, survey, reviews, rating">
 					<meta name="description"
