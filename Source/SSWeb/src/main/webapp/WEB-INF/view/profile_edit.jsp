@@ -292,7 +292,7 @@
 		</div>
 		<div class="container">
 			<div class="row">
-				<div class="prof-left-panel-wrapper margin-top-25 col-lg-4 col-md-4 col-sm-4 col-xs-12">
+				<div id="prof-whole-wrapper" class="prof-left-panel-wrapper margin-top-25 col-lg-4 col-md-4 col-sm-4 col-xs-12">
 					<div id="contact-wrapper" class="prof-left-row prof-left-info bord-bot-dc main-rt-adj">
 						<div class="left-contact-wrapper">
 							<div class="clearfix">
@@ -587,8 +587,11 @@ $(document).ready(function() {
 		 $("#divReadOnlyFields :input").css("pointer-events", "none");
 		 $("#divReadOnlyFields").find('textarea').css("pointer-events", "none");
 		 $("#prof-address-container").css("pointer-events", "none");
+		 $(".edit-pos-icn").hide();
 		 $("#prof-img-edit-cont").hide();
 		 $("#intro-body-text").css("pointer-events", "none");
+		 $("#prof-whole-wrapper").css("pointer-events", "none");
+		 
 		 
 	}
 	
