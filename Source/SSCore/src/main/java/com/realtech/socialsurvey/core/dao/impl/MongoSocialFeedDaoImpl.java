@@ -55,6 +55,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
     private static final String TWITTER_TOKEN = "twitterToken";
     private static final String LINKEDIN_TOKEN = "linkedInToken";
     private static final String INSTAGRAM_TOKEN = "instagramToken";
+    private static final String UPDATED_TIME = "updatedTime";
 
 
 
@@ -95,23 +96,26 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 	}
     
 	@Override
-	public void updateSocialFeed(SocialFeedsActionUpdate socialFeedsActionUpdate, String postId, Long companyId, 
+	public void updateSocialFeed(SocialFeedsActionUpdate socialFeedsActionUpdate, SocialResponseObject socialResponseObject, Long companyId, 
 			List<ActionHistory> actionHistories, int updateFlag, String collectionName) {
 		LOG.debug("Method updateSocialFeed() started");
 
-		LOG.debug("Updating {} document. Social feed id: {}", collectionName, postId);
+		LOG.debug("Updating {} document. Social feed id: {}", collectionName, socialResponseObject.getPostId());
 
 		Query query = new Query();
 
-		query.addCriteria(Criteria.where(KEY_IDENTIFIER).is(postId + "_" + companyId));
+		query.addCriteria(Criteria.where(KEY_IDENTIFIER).is(socialResponseObject.getPostId() + "_" + companyId));
 
 		Update update = new Update();
 
 		if (updateFlag == 2) {
+		    update.set( UPDATED_TIME, socialResponseObject.getUpdatedTime() );
 			update.set(FLAGGED, socialFeedsActionUpdate.isFlagged());
+			
 		} else if (updateFlag == 3) {
-			update.set(FLAGGED, false);
-			update.set(STATUS, socialFeedsActionUpdate.getStatus());
+            update.set( UPDATED_TIME, socialResponseObject.getUpdatedTime() );
+            update.set( FLAGGED, false );
+            update.set( STATUS, socialFeedsActionUpdate.getStatus() );
 		}
 		for (ActionHistory actionHistory : actionHistories) {
 			update.push(ACTION_HISTORY, actionHistory);
@@ -256,7 +260,12 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 		    criteria.andOperator((Criteria.where( TEXT ).regex( Pattern.compile(searchText.trim() , Pattern.CASE_INSENSITIVE) )));
         }
 		query.addCriteria(criteria);
-		query.with(new Sort(Sort.Direction.DESC, "updatedTime"));
+		
+		// ignoring stream tab on social monitor
+		if (status != null || flag) {
+	        query.with(new Sort(Sort.Direction.DESC, UPDATED_TIME));
+		}
+		
 		if (startIndex > -1) {
 			query.skip(startIndex);
 		}
