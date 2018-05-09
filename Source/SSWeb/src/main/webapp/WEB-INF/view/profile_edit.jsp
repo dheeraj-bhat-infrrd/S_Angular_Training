@@ -99,7 +99,7 @@
 <c:if test="${not empty isRealTechOrSSAdmin}">
 	<c:set value="${isRealTechOrSSAdmin}" var="isRealTechOrSSAdmin"></c:set>
 </c:if>
-<div id="divReadOnlyFields">
+
 <div id="disconnect-overlay-main" class="overlay-main hide">
 		<div id="disconnect-overlay-pop-up" class="overlay-disable-wrapper">
 			<div id="disconnect-overlay-header" class="ol-header">
@@ -186,8 +186,8 @@
 				</div>
 			</div>
 			<span class="gmb-span">PlaceID Selected : <span id="gmb-placeId-selected"></span></span>
-			<span class="gmb-span" style="margin-top:10px;">Selected Link :<span id="gmb-url-placeId"></span></span>
-			<span class="gmb-span" style="margin-top:20px;">Connected Link :<span id="gmb-connected-placeId" class="gmb-span"></span></span>
+			<span class="gmb-span" style="margin-top:10px;">Selected Link :<a id="gm-sel-link" href="#"><span id="gmb-url-placeId"></span></a></span>
+			<span class="gmb-span" style="margin-top:20px;">Connected Link :<a id="gm-con-link" href="#"><span id="gmb-connected-placeId" class="gmb-span"></span></a></span>
 		</div>
 		<div class="clearfix gmb-wc-btn-row">
 			<div id="gmb-add-link" class="gmb-wc-sub-send-btn wc-final-submit">Add Link</div>
@@ -195,6 +195,7 @@
 		</div>
 	</div>
 </div>
+
 <div class="hm-header-main-wrapper">
 	<div>
 		<c:choose>
@@ -224,6 +225,7 @@
 		</div>
 	</div>
 </div>
+<div id="divReadOnlyFields">
 <div class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
 	<input id="prof-all-lock" type="hidden" value="locked">
 	<div>
@@ -581,14 +583,14 @@
 var hiddenSection="${profileSettings.hiddenSection}";
 $(document).ready(function() {
 	$(document).attr("title", "Profile Settings");
-	console.log("${ isRealTechOrSSAdmin }");
-	console.log("${profilemasterid}");
-	console.log("${isAgentProfileDisabled}");
-	if(!${isRealTechOrSSAdmin} && ${profilemasterid} == 4 && ${isAgentProfileDisabled}){
-	    $("#divReadOnlyFields :input").attr("disabled", true);
-	}else{
-	    $("#divReadOnlyFields :input").attr("disabled", false);
+	if(("${isRealTechOrSSAdmin}" == false || "${isRealTechOrSSAdmin}" == "false" )&& parseInt("${profilemasterid}") == 4 && ( "${isAgentProfileDisabled}" == true || "${isAgentProfileDisabled}" == "true")){
+		 $("#divReadOnlyFields :input").css("pointer-events", "none");
+		 $("#prof-address-container").css("pointer-events", "none");
+		 $(".edit-pos-icn").hide();
 	}
+	
+	$("#prof-edit-social-link :input").css("pointer-events", "default");
+	
 	updateViewAsScroll();
 	
 	adjustImage();
