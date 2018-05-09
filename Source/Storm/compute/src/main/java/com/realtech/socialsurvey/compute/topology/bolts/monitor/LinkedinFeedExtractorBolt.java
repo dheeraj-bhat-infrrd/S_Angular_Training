@@ -52,6 +52,11 @@ public class LinkedinFeedExtractorBolt extends BaseComputeBolt
             if ( isRateLimitExceeded( /* pass media token*/ ) ) {
                 LOG.warn( "Rate limit exceeded" );
             }
+            else if(mediaToken.getSocialMediaTokens() != null && mediaToken.getSocialMediaTokens().getLinkedInToken() != null
+                && mediaToken.getSocialMediaTokens().getLinkedInToken().isTokenExpiryAlertSent()) {
+                LOG.warn( "Socialmedia Token has been expired having profileLink {}",
+                    mediaToken.getSocialMediaTokens().getLinkedInToken().getLinkedInPageLink() );
+            }
             // Get SocailMediaToken for company
             Long companyId = mediaToken.getCompanyId();
             

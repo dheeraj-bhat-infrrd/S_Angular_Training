@@ -1,14 +1,8 @@
 package com.realtech.socialsurvey.compute.feeds.impl;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.realtech.socialsurvey.compute.common.ComputeConstants;
 import com.realtech.socialsurvey.compute.common.FacebookAPIOperations;
+import com.realtech.socialsurvey.compute.common.SSAPIOperations;
 import com.realtech.socialsurvey.compute.dao.RedisSocialMediaStateDao;
 import com.realtech.socialsurvey.compute.dao.impl.RedisSocialMediaStateDaoImpl;
 import com.realtech.socialsurvey.compute.entities.FacebookTokenForSM;
@@ -16,14 +10,21 @@ import com.realtech.socialsurvey.compute.entities.FacebookXUsageHeader;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.compute.entities.response.FacebookFeedData;
 import com.realtech.socialsurvey.compute.entities.response.FacebookResponse;
+import com.realtech.socialsurvey.compute.enums.ProfileType;
 import com.realtech.socialsurvey.compute.exception.FacebookFeedException;
 import com.realtech.socialsurvey.compute.feeds.FacebookFeedProcessor;
 import com.realtech.socialsurvey.compute.utils.ConversionUtils;
 import com.realtech.socialsurvey.compute.utils.UrlHelper;
-
 import okhttp3.Headers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 import retrofit2.Response;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -85,7 +86,8 @@ public class FacebookFeedProcessorImpl implements FacebookFeedProcessor
                     since = String.valueOf( cal.getTimeInMillis() / 1000 );
                 }
 
-                FacebookResponse result = fetchFeeds( pageId, token.getFacebookAccessTokenToPost(), since, until, "" );
+                FacebookResponse result = fetchFeeds( pageId, token.getFacebookAccessTokenToPost(), since, until, "",
+                    mediaToken.getIden(), mediaToken.getProfileType());
 
                 if ( result != null ) {
                     feeds.addAll( result.getData() );
@@ -93,7 +95,7 @@ public class FacebookFeedProcessorImpl implements FacebookFeedProcessor
                         Map<String, String> queryMap = UrlHelper.getQueryParamsFromUrl( result.getPaging().getNext() );
 
                         result = fetchFeeds( pageId, token.getFacebookAccessTokenToPost(), queryMap.get( "since" ),
-                            queryMap.get( "until" ), queryMap.get( "__paging_token" ) );
+                            queryMap.get( "until" ), queryMap.get( "__paging_token" ), mediaToken.getIden(), mediaToken.getProfileType() );
 
                         if ( result != null ) {
                             feeds.addAll( result.getData() );
@@ -119,9 +121,12 @@ public class FacebookFeedProcessorImpl implements FacebookFeedProcessor
      * @param since
      * @param until
      * @param pagingToken
+     * @param iden
+     * @param profileType
      * @return
      */
-    private FacebookResponse fetchFeeds( String pageId, String accessToken, String since, String until, String pagingToken )
+    private FacebookResponse fetchFeeds( String pageId, String accessToken, String since, String until, String pagingToken,
+        long iden, ProfileType profileType )
     {
         try {
             Response<FacebookResponse> response = FacebookAPIOperations.getInstance().fetchFeeds( pageId, accessToken, since, until,
@@ -140,9 +145,14 @@ public class FacebookFeedProcessorImpl implements FacebookFeedProcessor
             } else if(e.getFacebookErrorCode() == 32){
                 // Page level rate limit
                 redisSocialMediaStateDao.setFacebookLockForPage( pageId, PAGE_BLOCK_TIME );
-            } 
+            }
+            else if(e.getFacebookErrorCode() == 190){
+                //update mongo expiryalertsent to true
+                SSAPIOperations.getInstance().updateTokenExpiryAlert(iden, ComputeConstants.FACEBOOK_TOKEN_EXPIRY_FIELD,
+                    true, profileType.getValue());
+            }
         }
-        
+
         return null;
     }
 

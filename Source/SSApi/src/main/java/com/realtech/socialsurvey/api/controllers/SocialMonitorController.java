@@ -342,4 +342,27 @@ public class SocialMonitorController
 
     }
 
+    @RequestMapping ( value = "v1/updateSocialMediaToken/collection{collection}/iden{iden}/fieldtoupdate{fieldtoupdate}/value{value}",
+        method = RequestMethod.GET)
+    @ApiOperation ( value = "Updates ")
+    public ResponseEntity<?> updateSocialMediaToken( HttpServletRequest request,
+        @RequestHeader ( "authorizationHeader") String authorizationHeader, @PathVariable("collection") String collection,
+        @PathVariable("iden") long iden, @PathVariable("fieldtoupdate") String fieldToUpdate, @PathVariable("value") boolean value)
+        throws SSApiException
+    {
+        try {
+            adminAuthenticationService.validateAuthHeader( authorizationHeader );
+            LOGGER.info( "SocialMonitorController.updateSocialMediaToken started" );
+            boolean updateStatus = organizationManagementService.updateSocialMediaToken(collection, iden, fieldToUpdate, value  );
+            LOGGER.info( "SocialMonitorController.updateSocialMediaToken completed successfully" );
+            return new ResponseEntity<>( updateStatus, HttpStatus.OK );
+        } catch ( AuthorizationException authoriztionFailure ) {
+            return new ResponseEntity<>( AUTH_FAILED, HttpStatus.UNAUTHORIZED );
+        }
+        catch ( InvalidInputException e ) {
+            throw new SSApiException( e.getMessage(), e );
+        }
+
+    }
+
 }

@@ -13,6 +13,9 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import com.realtech.socialsurvey.core.entities.*;
+import com.realtech.socialsurvey.core.enums.*;
+import com.realtech.socialsurvey.core.vo.SocialMediaVO;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.common.SolrDocumentList;
 import org.noggit.JSONUtil;
@@ -36,22 +39,6 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
-import com.realtech.socialsurvey.core.entities.AgentSettings;
-import com.realtech.socialsurvey.core.entities.Branch;
-import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
-import com.realtech.socialsurvey.core.entities.LicenseDetail;
-import com.realtech.socialsurvey.core.entities.LockSettings;
-import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.entities.UserAssignment;
-import com.realtech.socialsurvey.core.entities.UserFromSearch;
-import com.realtech.socialsurvey.core.entities.UserHierarchyAssignments;
-import com.realtech.socialsurvey.core.entities.UserProfile;
-import com.realtech.socialsurvey.core.entities.UserSettings;
-import com.realtech.socialsurvey.core.enums.AccountType;
-import com.realtech.socialsurvey.core.enums.DisplayMessageType;
-import com.realtech.socialsurvey.core.enums.OrganizationUnit;
-import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -351,23 +338,108 @@ public class UserManagementController
                 throw new NonFatalException( "SolrException while searching for user id.", e );
             }
 
+            List<UserFromSearch> usersList = null;
             if ( admin.isCompanyAdmin() ) {
-                List<UserFromSearch> usersList = userManagementService.getUsersUnderCompanyAdmin( admin, startIndex,
+                usersList = userManagementService.getUsersUnderCompanyAdmin( admin, startIndex,
                     batchSize );
                 usersList = userManagementService.checkUserCanEdit( admin, adminUser, usersList );
-                model.addAttribute( "userslist", usersList );
+
                 model.addAttribute( "numFound", userManagementService.getUsersUnderCompanyAdminCount( admin ) );
             } else if ( admin.isRegionAdmin() ) {
-                List<UserFromSearch> usersList = userManagementService.getUsersUnderRegionAdmin( admin, startIndex, batchSize );
+                usersList = userManagementService.getUsersUnderRegionAdmin( admin, startIndex, batchSize );
                 usersList = userManagementService.checkUserCanEdit( admin, adminUser, usersList );
-                model.addAttribute( "userslist", usersList );
+
                 model.addAttribute( "numFound", userManagementService.getUsersUnderRegionAdminCount( admin ) );
             } else if ( admin.isBranchAdmin() ) {
-                List<UserFromSearch> usersList = userManagementService.getUsersUnderBranchAdmin( admin, startIndex, batchSize );
+                usersList = userManagementService.getUsersUnderBranchAdmin( admin, startIndex, batchSize );
                 usersList = userManagementService.checkUserCanEdit( admin, adminUser, usersList );
-                model.addAttribute( "userslist", usersList );
+
                 model.addAttribute( "numFound", userManagementService.getUsersUnderBranchAdminCount( admin ) );
             }
+
+            //add socialmedia details of the users to UserFromSearch object
+            List<SocialMediaVO> socialMediaVOS = new ArrayList<>(  );
+            for(UserFromSearch user: usersList) {
+                //get the details of the socialmedia which the user has connected from mongo using user
+                SocialMediaTokens socialMediaTokens = organizationUnitSettingsDao.fetchSocialMediaTokens(
+                    MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, user.getUserId() );
+
+                if(socialMediaTokens.getFacebookToken() != null ){
+                    SocialMediaVO socialMediaVO = new SocialMediaVO();
+                    socialMediaVO.setSocialMedia( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                    if(socialMediaTokens.getFacebookToken().isTokenExpiryAlertSent() )
+                        socialMediaVO.setStatus( SocialMediaConnectionStatus.EXPIRED );
+                    else socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+                    socialMediaVOS.add( socialMediaVO );
+                }
+                if(socialMediaTokens.getInstagramToken() != null ){
+                    SocialMediaVO socialMediaVO = new SocialMediaVO();
+                    socialMediaVO.setSocialMedia( CommonConstants.INSTAGRAM_SOCIAL_SITE );
+                    if(socialMediaTokens.getInstagramToken().isTokenExpiryAlertSent() )
+                        socialMediaVO.setStatus( SocialMediaConnectionStatus.EXPIRED );
+                    else socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+                    socialMediaVOS.add( socialMediaVO );
+                }
+                if(socialMediaTokens.getFacebookPixelToken() != null ){
+                    SocialMediaVO socialMediaVO = new SocialMediaVO();
+                    socialMediaVO.setSocialMedia( CommonConstants.FACEBOOK_PIXEL);
+                    socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+                    socialMediaVOS.add( socialMediaVO );
+                }
+                if(socialMediaTokens.getGoogleBusinessToken() != null ){
+                    SocialMediaVO socialMediaVO = new SocialMediaVO();
+                    socialMediaVO.setSocialMedia( CommonConstants.GOOGLE_BUSINESS_SOCIAL_SITE );
+                    socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+                    socialMediaVOS.add( socialMediaVO );
+                }
+                if(socialMediaTokens.getGoogleToken() != null ){
+                    SocialMediaVO socialMediaVO = new SocialMediaVO();
+                    socialMediaVO.setSocialMedia( CommonConstants.GOOGLE_SOCIAL_SITE );
+                    socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+                    socialMediaVOS.add( socialMediaVO );
+                }
+                if(socialMediaTokens.getLendingTreeToken() != null ){
+                    SocialMediaVO socialMediaVO = new SocialMediaVO();
+                    socialMediaVO.setSocialMedia( CommonConstants.LENDINGTREE_SOCIAL_SITE );
+                    socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+                    socialMediaVOS.add( socialMediaVO );
+                }
+                if(socialMediaTokens.getLinkedInToken() != null ){
+                    SocialMediaVO socialMediaVO = new SocialMediaVO();
+                    socialMediaVO.setSocialMedia( CommonConstants.LINKEDIN_SOCIAL_SITE );
+                    if(socialMediaTokens.getLinkedInToken().isTokenExpiryAlertSent() )
+                        socialMediaVO.setStatus( SocialMediaConnectionStatus.EXPIRED );
+                    else socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+                    socialMediaVOS.add( socialMediaVO );
+                }
+                if(socialMediaTokens.getRealtorToken() != null ){
+                    SocialMediaVO socialMediaVO = new SocialMediaVO();
+                    socialMediaVO.setSocialMedia( CommonConstants.REALTOR_SOCIAL_SITE );
+                    socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+                    socialMediaVOS.add( socialMediaVO );
+                }
+                if(socialMediaTokens.getTwitterToken() != null ){
+                    SocialMediaVO socialMediaVO = new SocialMediaVO();
+                    socialMediaVO.setSocialMedia( CommonConstants.TWITTER_SOCIAL_SITE );
+                    socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+                    socialMediaVOS.add( socialMediaVO );
+                }
+                if(socialMediaTokens.getYelpToken() != null ){
+                    SocialMediaVO socialMediaVO = new SocialMediaVO();
+                    socialMediaVO.setSocialMedia( CommonConstants.YELP_SOCIAL_SITE );
+                    socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+                    socialMediaVOS.add( socialMediaVO );
+                }
+                if(socialMediaTokens.getZillowToken() != null ){
+                    SocialMediaVO socialMediaVO = new SocialMediaVO();
+                    socialMediaVO.setSocialMedia( CommonConstants.ZILLOW_SOCIAL_SITE );
+                    socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+                    socialMediaVOS.add( socialMediaVO );
+                }
+                user.setSocialMediaVOs( socialMediaVOS );
+            }
+            model.addAttribute( "userslist", usersList );
+
         } catch ( NonFatalException nonFatalException ) {
             LOG.error( "NonFatalException while searching for user id. Reason : " , nonFatalException );
             model.addAttribute( "message",

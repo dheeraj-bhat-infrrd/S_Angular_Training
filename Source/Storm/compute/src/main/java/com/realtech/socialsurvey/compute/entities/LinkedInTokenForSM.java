@@ -13,7 +13,7 @@ public class LinkedInTokenForSM implements Serializable
     private String linkedInId;
     private String linkedInPageLink;
     private String linkedInAccessToken;
-
+    private boolean tokenExpiryAlertSent;
 
     public String getLinkedInId()
     {
@@ -51,9 +51,22 @@ public class LinkedInTokenForSM implements Serializable
     }
 
 
-    @Override
-    public String toString()
+    public boolean isTokenExpiryAlertSent()
     {
-        return "LinkdenInToken [linkedInId=" + linkedInId + ", linkedInPageLink=" + linkedInPageLink + "]";
+        return tokenExpiryAlertSent;
+    }
+
+
+    public void setTokenExpiryAlertSent( boolean tokenExpiryAlertSent )
+    {
+        this.tokenExpiryAlertSent = tokenExpiryAlertSent;
+    }
+
+
+    @Override public String toString()
+    {
+        return "LinkedInTokenForSM{" + "linkedInId='" + linkedInId + '\'' + ", linkedInPageLink='" + linkedInPageLink + '\''
+            + ", linkedInAccessToken='" + linkedInAccessToken + '\'' + ", tokenExpiryAlertSent='" + tokenExpiryAlertSent + '\''
+            + '}';
     }
 }

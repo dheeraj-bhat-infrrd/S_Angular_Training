@@ -13,7 +13,7 @@ public class FacebookTokenForSM implements Serializable
     private String facebookPageLink;
     private String facebookAccessToken;
     private String facebookAccessTokenToPost;
-
+    private boolean tokenExpiryAlertSent;
 
     public String getFacebookId()
     {
@@ -63,9 +63,22 @@ public class FacebookTokenForSM implements Serializable
     }
 
 
-    @Override
-    public String toString()
+    public boolean isTokenExpiryAlertSent()
     {
-        return "FacebookToken [facebookId=" + facebookId + ", facebookPageLink=" + facebookPageLink + "]";
+        return tokenExpiryAlertSent;
+    }
+
+
+    public void setTokenExpiryAlertSent( boolean tokenExpiryAlertSent )
+    {
+        this.tokenExpiryAlertSent = tokenExpiryAlertSent;
+    }
+
+
+    @Override public String toString()
+    {
+        return "FacebookTokenForSM{" + "facebookId='" + facebookId + '\'' + ", facebookPageLink='" + facebookPageLink + '\''
+            + ", facebookAccessToken='" + facebookAccessToken + '\'' + ", facebookAccessTokenToPost='"
+            + facebookAccessTokenToPost + '\'' + ", tokenExpiryAlertSent='" + tokenExpiryAlertSent + '\'' + '}';
     }
 }

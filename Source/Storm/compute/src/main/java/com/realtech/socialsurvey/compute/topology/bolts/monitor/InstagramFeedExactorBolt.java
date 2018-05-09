@@ -44,6 +44,10 @@ public class InstagramFeedExactorBolt extends BaseComputeBolt {
                 Long companyId = mediaToken.getCompanyId();
                 if (isRateLimitExceeded( mediaToken)) {
                     LOG.warn(" Rate limit exceeded for instagram account {} ", igToken.getPageLink() );
+                } else if(mediaToken.getSocialMediaTokens()!=null && mediaToken.getSocialMediaTokens().getInstagramToken()!= null &&
+                    mediaToken.getSocialMediaTokens().getInstagramToken().isTokenExpiryAlertSent()) {
+                    LOG.warn( "Socialmedia Token has been expired having profileLink {}",
+                        mediaToken.getSocialMediaTokens().getInstagramToken().getPageLink() );
                 } else {
                     List<InstagramMediaData> feeds = instagramFeedProcessor.fetchFeeds(companyId, mediaToken);
                     LOG.debug( "Total tweet fetched : {}", feeds.size() );
