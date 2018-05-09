@@ -256,6 +256,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
                         actionHistory.setOwnerName( socialFeedsActionUpdate.getUserName() );
                         actionHistory.setCreatedDate( new Date().getTime() );
                         actionHistories.add( actionHistory );
+                        socialResponseObject.setUpdatedTime( new Date().getTime() );
                         previousStatus = UNFLAGGED;
                         currentStatus = FLAGGED;
                         
@@ -270,6 +271,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
                         actionHistory.setOwnerName( socialFeedsActionUpdate.getUserName() );
                         actionHistory.setCreatedDate( new Date().getTime() );
                         actionHistories.add( actionHistory );
+                        socialResponseObject.setUpdatedTime( new Date().getTime() );
                         previousStatus = FLAGGED;
                         currentStatus = UNFLAGGED;
                     }
@@ -290,6 +292,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
                         actionHistory.setOwnerName( socialFeedsActionUpdate.getUserName() );
                         actionHistory.setCreatedDate( new Date().getTime() );
                         actionHistories.add( actionHistory );
+                        socialResponseObject.setUpdatedTime( new Date().getTime() );
                         if(socialResponseObject.isFlagged()) {
                             previousStatus = FLAGGED;
                         } else if(!socialResponseObject.isFlagged() && !socialResponseObject.getStatus().toString().equalsIgnoreCase( SocialFeedStatus.RESOLVED.toString() )) {
@@ -311,6 +314,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
                         actionHistory.setOwnerName( socialFeedsActionUpdate.getUserName() );
                         actionHistory.setCreatedDate( new Date().getTime() );
                         actionHistories.add( actionHistory );
+                        socialResponseObject.setUpdatedTime( new Date().getTime() );
                         previousStatus = SocialFeedStatus.ESCALATED.toString().toLowerCase();
                         currentStatus = SocialFeedStatus.RESOLVED.toString().toLowerCase();
                     }
@@ -347,7 +351,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
                         LOG.error( "Email could not be delivered", e );
                     }
                 }
-                mongoSocialFeedDao.updateSocialFeed( socialFeedsActionUpdate, socialResponseObject.getPostId(), companyId, actionHistories,
+                mongoSocialFeedDao.updateSocialFeed( socialFeedsActionUpdate, socialResponseObject, companyId, actionHistories,
                     updateFlag, MongoSocialFeedDaoImpl.SOCIAL_FEED_COLLECTION );
             }
             //add successful postIds

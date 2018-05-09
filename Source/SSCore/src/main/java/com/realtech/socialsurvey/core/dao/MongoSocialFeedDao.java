@@ -14,7 +14,7 @@ public interface MongoSocialFeedDao
 
     long updateDuplicateCount(int hash, long companyId);
                     
-	public void updateSocialFeed(SocialFeedsActionUpdate socialFeedsActionUpdate, String postId, Long companyId, List<ActionHistory> actionHistory, int updateFlag, String collectionName);
+	public void updateSocialFeed(SocialFeedsActionUpdate socialFeedsActionUpdate, SocialResponseObject socialResponseObject, Long companyId, List<ActionHistory> actionHistory, int updateFlag, String collectionName);
 	
 	public OrganizationUnitSettings FetchMacros(Long companyId);
 	
