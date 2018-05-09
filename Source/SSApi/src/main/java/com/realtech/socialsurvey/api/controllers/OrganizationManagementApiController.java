@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +19,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.realtech.socialsurvey.api.exceptions.SSApiException;
+import com.realtech.socialsurvey.api.utils.RestUtils;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.exception.AuthorizationException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.services.admin.AdminAuthenticationService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -38,6 +43,12 @@ public class OrganizationManagementApiController
 
     @Autowired
     private UserManagementService userManagementService;
+    
+    @Autowired
+    private AdminAuthenticationService adminAuthenticationService;
+    
+    @Autowired
+    private RestUtils restUtils;
 
 
     @RequestMapping ( value = "/updateabusivemail", method = RequestMethod.POST)
@@ -140,6 +151,25 @@ public class OrganizationManagementApiController
 
         LOGGER.info( "Method getProfileFlags() finished." );
         return new ResponseEntity<>( response, HttpStatus.OK );
+    }
+    
+    @RequestMapping ( value = "/flag/agentprofiles", method = RequestMethod.POST)
+    @ApiOperation ( value = "Api to disable or enable agent edit in profile")
+    public  ResponseEntity<?> flagAgentProfile( long companyId , boolean isAgentProfileDisabled ,  HttpServletRequest request ) throws  NonFatalException
+    {
+        LOGGER.info( "Api to disable or enable agent edit in profile started" );
+        String authorizationHeader = request.getHeader( CommonConstants.SURVEY_API_REQUEST_PARAMETER_AUTHORIZATION );
+        //authorize request
+        try {
+            adminAuthenticationService.validateAuthHeader( authorizationHeader );
+            LOGGER.info( "Api to disable or enable agent edit in profile for companyId : {} , isAgentProfileDisabled : {}",isAgentProfileDisabled );
+
+        } catch ( AuthorizationException e ) {
+            return restUtils.getRestResponseEntity( HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", null, null, request, companyId );
+        }
+        organizationManagementService.updateAgentProfileDisable( companyId, isAgentProfileDisabled );
+        return restUtils.getRestResponseEntity( HttpStatus.OK, "Api to disable or enable agent edit in profile Successfully processed", null, null, request,
+            companyId );
     }
 
 }

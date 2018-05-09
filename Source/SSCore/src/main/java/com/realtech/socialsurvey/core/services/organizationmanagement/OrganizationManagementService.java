@@ -1671,4 +1671,7 @@ public interface OrganizationManagementService
 
     public void unsetWebAddressInProfile( long entityId, String entityType ) throws NonFatalException;
 
+
+    void updateAgentProfileDisable( long companyId, boolean isAgentProfileDisabled ) throws InvalidInputException;
+
 }
