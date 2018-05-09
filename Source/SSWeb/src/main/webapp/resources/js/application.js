@@ -17658,7 +17658,7 @@ function drawStreamPage(streamPostList){
 		
 		$('#stream-post-details-'+postId).find('.stream-user-name').html(streamPostList[i].ownerName);
 		$('#stream-post-details-'+postId).find('.stream-feed-type').html(streamPostList[i].type);
-		$('#stream-post-details-'+postId).find('.stream-feed-type').attr('data-link',streamPostList[i].pageLink);
+		$('#stream-post-details-'+postId).find('.stream-feed-type').attr('data-link',streamPostList[i].postLink);
 		
 		var lastUpdated = parseInt(streamPostList[i].updatedOn);
 		var lastUpdatedDate = new Date(lastUpdated);

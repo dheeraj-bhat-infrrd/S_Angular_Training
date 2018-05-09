@@ -100,6 +100,7 @@ public class InstagramFeedExactorBolt extends BaseComputeBolt {
         responseWrapper.setPictures(Arrays.asList(instagramMediaData.getMediaUrl()));
         responseWrapper.setOwnerName( mediaToken.getContactDetails().getName() );
         responseWrapper.setOwnerEmail( mediaToken.getContactDetails().getMailDetails().getEmailId() );
+        responseWrapper.setPostLink( instagramMediaData.getPostLink() );
 
         if ( instagramMediaData.getTimestamp() > 0 ) {
             responseWrapper.setCreatedTime( instagramMediaData.getTimestamp() * 1000 );
