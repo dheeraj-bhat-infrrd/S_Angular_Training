@@ -20,5 +20,8 @@ public class RedisKeyConstants
 
     public static final String PREVIOUS = "previous";
     public static final String CURRENT = "current";
+    
+    public static final String SOCIAL_MONITOR_COMPANYIDS = "socialMonitorEnabledCompanyIds";
+    public static final String COMPANYIDS = "companyIds";
 
 }

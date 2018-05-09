@@ -13,6 +13,9 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +35,9 @@ public class RedisDaoImpl implements RedisDao, InitializingBean {
     private static final String COMPANYKEYWORDS_KEY_PREFIX = "companykeywords:";
     private static final String TWITTER_LOCK = "twitterLock";
     private static final String FACEBOOK_LOCK = "facebookLock";
+    private static final String SOCIAL_MONITOR_COMPANYIDS = "socialMonitorEnabledCompanyIds";
+    private static final String COMPANYIDS = "companyIds";
+
 
     @Override
     public void addKeywords(long companyId, List<Keyword> keywords) {
@@ -68,9 +74,31 @@ public class RedisDaoImpl implements RedisDao, InitializingBean {
         
         return locks;
     }
+    
+
+    @Override
+    public void addCompanyIdsForSM( long companyId )
+    {
+        LOGGER.info( "Trying to add SocialMonitor enabled comapnyIds to redis ", companyId );
+
+        List<Long> companyIds = (List<Long>) hashOps.get( SOCIAL_MONITOR_COMPANYIDS, COMPANYIDS );
+        if ( companyIds == null || companyIds.isEmpty() ) {
+            companyIds = Arrays.asList( companyId );
+            hashOps.put( SOCIAL_MONITOR_COMPANYIDS, COMPANYIDS, new Gson().toJson( companyIds ) );
+        } else {
+            if ( !companyIds.contains( companyId ) ) {
+                companyIds.add( companyId );
+                hashOps.put( SOCIAL_MONITOR_COMPANYIDS, COMPANYIDS, new Gson().toJson( companyIds ) );
+            }
+        }
+
+
+    }
+    
 
     @Override
     public void afterPropertiesSet() throws Exception {
         redisTemplate.getConnectionFactory().getConnection().ping();
     }
+
 }

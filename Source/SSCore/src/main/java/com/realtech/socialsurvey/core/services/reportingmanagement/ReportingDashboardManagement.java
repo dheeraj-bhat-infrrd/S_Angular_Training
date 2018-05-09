@@ -387,4 +387,8 @@ public interface ReportingDashboardManagement
 
 
 	public List<SurveyInvitationEmailCountVO> getDataForSurveyInvitationMail(int month, int year, long companyId);
+	
+	
+    public boolean enableSocialMonitorToggle( long companyId, boolean socialMonitorFlag ) throws InvalidInputException, NoRecordsFetchedException;
+
 }

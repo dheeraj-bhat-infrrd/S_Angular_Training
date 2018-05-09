@@ -832,6 +832,10 @@ public class OrganizationManagementController
             // add send monthly digest email flag
             model.addAttribute( "sendMonthlyDigestMail", unitSettings.isSendMonthlyDigestMail() );
             
+            // add isSocialMonitorEnabled flag
+            model.addAttribute( "isSocialMonitorEnabled", unitSettings.isSocialMonitorEnabled() );
+            
+            
         } catch ( InvalidInputException | NoRecordsFetchedException e ) {
             LOG.error( "NonFatalException while fetching profile details. Reason : ", e );
             model.addAttribute( "message",
@@ -2090,6 +2094,11 @@ public class OrganizationManagementController
             // default digest flag is the new account type is enterprise
             if ( newAccountsMasterId == CommonConstants.ACCOUNTS_MASTER_ENTERPRISE) {
                 reportingDashboardManagement.updateSendDigestMailToggle( CommonConstants.COMPANY_ID_COLUMN, user.getCompany().getCompanyId(), true );
+            }
+            
+            // default socialMonitor flag if the new account type is enterprise
+            if ( newAccountsMasterId == CommonConstants.ACCOUNTS_MASTER_ENTERPRISE ) {
+                reportingDashboardManagement.enableSocialMonitorToggle( user.getCompany().getCompanyId(), true );
             }
             
             LOG.info( "message returned : " + message );
@@ -4197,6 +4206,27 @@ public class OrganizationManagementController
 
         LOG.info( "Method updateAddDeleteNotifyRecipients() finished." );
         return status;
+    }
+    
+
+    @RequestMapping ( value = "/enablesocialmonitortoggle", method = RequestMethod.POST)
+    @ResponseBody
+    public String enableSocialMonitorToggle( HttpServletRequest request )
+    {
+        LOG.info( "Method enableSocialMonitorToggle started" );
+        HttpSession session = request.getSession();
+
+        long companyId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+
+        try {
+            return String.valueOf( reportingDashboardManagement.enableSocialMonitorToggle( companyId,
+                Boolean.parseBoolean( request.getParameter( "isSocialMonitorEnabled" ) ) ) );
+        } catch ( Exception error ) {
+            LOG.error(
+                "Exception occured in enableSocialMonitorToggle() while updating social monitor flag. Nested exception is ",
+                error );
+            return "false";
+        }
     }
 }
 // JIRA: SS-24 BY RM02 EOC

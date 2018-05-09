@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,6 +57,7 @@ import com.realtech.socialsurvey.core.dao.GenericReportingDao;
 import com.realtech.socialsurvey.core.dao.NpsReportMonthDao;
 import com.realtech.socialsurvey.core.dao.NpsReportWeekDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.dao.RedisDao;
 import com.realtech.socialsurvey.core.dao.RegionDao;
 import com.realtech.socialsurvey.core.dao.ReportingSurveyPreInititationDao;
 import com.realtech.socialsurvey.core.dao.ScoreStatsOverallBranchDao;
@@ -361,7 +363,9 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
     
     @Autowired
     private StreamApiIntegrationBuilder streamApiIntegrationBuilder;
-
+    
+    @Autowired
+    private RedisDao redisDao;
 
     @Value ( "${FILE_DIRECTORY_LOCATION}")
     private String fileDirectoryLocation;
@@ -5258,4 +5262,37 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
 		}
 		return monthData;
 	}
+	
+
+    @Override
+    public boolean enableSocialMonitorToggle( long companyId, boolean socialMonitorFlag )
+        throws InvalidInputException, NoRecordsFetchedException
+    {
+        LOG.debug( "method enableSocialMonitorToggle() started." );
+
+        if ( companyId <= 0 ) {
+            LOG.warn( "companyId is invalid" );
+            throw new InvalidInputException( "companyId is invalid" );
+        }
+
+        OrganizationUnitSettings unitSettings = organizationManagementService.getCompanySettings( companyId );
+
+        if ( unitSettings == null ) {
+            LOG.warn( "settings are not specified" );
+            throw new InvalidInputException( "settings cannot be null." );
+        }
+
+        // update social monitor flag
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.SOCIAL_MONITOR_ENABLED, socialMonitorFlag, unitSettings,
+            CommonConstants.COMPANY_SETTINGS_COLLECTION );
+
+        //add companyIds which have enabled socialMonitor
+        if ( socialMonitorFlag ) {
+            redisDao.addCompanyIdsForSM( companyId );
+        }
+
+        LOG.debug( "method enableSocialMonitorToggle() finished." );
+        return true;
+    }
 }
