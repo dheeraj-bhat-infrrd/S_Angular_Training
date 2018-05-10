@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.compute.dao;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author manish
@@ -113,4 +114,10 @@ public interface RedisSocialMediaStateDao extends Serializable
      * @return
      */
     boolean isFacebookApplicationLockSet();
+    
+    /**
+     * Method to get SocialMonitor enabled companyIds
+     * @return
+     */
+    public List<Long> getCompanyIdsForSM();
 }

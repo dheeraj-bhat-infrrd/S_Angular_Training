@@ -3,15 +3,19 @@ package com.realtech.socialsurvey.compute.dao.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.compute.common.ComputeConstants;
 import com.realtech.socialsurvey.compute.common.LocalPropertyFileHandler;
 import com.realtech.socialsurvey.compute.common.RedisDB;
 import com.realtech.socialsurvey.compute.common.RedisKeyConstants;
 import com.realtech.socialsurvey.compute.dao.RedisSocialMediaStateDao;
+import com.realtech.socialsurvey.compute.utils.ConversionUtils;
 
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import java.io.Serializable;
+import java.util.List;
 
 
 /**
@@ -206,5 +210,18 @@ public class RedisSocialMediaStateDaoImpl implements RedisSocialMediaStateDao, S
         return false;
     }
 
+    @Override
+    public List<Long> getCompanyIdsForSM()
+    {
+        try ( Jedis jedis = RedisDB.getPoolInstance().getResource() ) {
+            LOG.info( "Executing method getCompanyIdsForSM {}" );
+            // Return all companyIds for SocialMonitor 
+            String companyIds = jedis.hget( RedisKeyConstants.SOCIAL_MONITOR_COMPANYIDS, RedisKeyConstants.COMPANYIDS );
+            return ConversionUtils.deserialize( companyIds, new TypeToken<List<Long>>() {}.getType() );
+        } catch ( JedisConnectionException e ) {
+            LOG.error( e.getMessage() );
+            return null;
+        }
+    }
 
 }

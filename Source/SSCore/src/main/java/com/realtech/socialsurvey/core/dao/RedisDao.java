@@ -11,4 +11,6 @@ public interface RedisDao {
     public Map<String, Long> getFacebookLock();
 
     public Map<String, Long> getTwitterLock();
+    
+    void addCompanyIdsForSM(long companyId);
 }
