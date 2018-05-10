@@ -92,6 +92,9 @@ public class OrganizationUnitSettings implements Serializable
     private List<SavedDigestRecord> savedDigestRecords;
     
     private Set<String> userAddDeleteNotificationRecipients;
+    
+    //SocialMonitor flag
+    private boolean isSocialMonitorEnabled;
 
 
     public List<Keyword> getFilterKeywords()
@@ -821,6 +824,18 @@ public class OrganizationUnitSettings implements Serializable
     }
 
 
+    public boolean isSocialMonitorEnabled()
+    {
+        return isSocialMonitorEnabled;
+    }
+
+
+    public void setSocialMonitorEnabled( boolean isSocialMonitorEnabled )
+    {
+        this.isSocialMonitorEnabled = isSocialMonitorEnabled;
+    }
+
+
     @Override
     public String toString()
     {
@@ -848,7 +863,9 @@ public class OrganizationUnitSettings implements Serializable
             + ", contactUsEmailsRoutedToCompanyAdmin=" + contactUsEmailsRoutedToCompanyAdmin + ", sendMonthlyDigestMail="
             + sendMonthlyDigestMail + ", filterKeywords=" + filterKeywords + ", socialMonitorMacros=" + socialMonitorMacros
             + ", savedDigestRecords=" + savedDigestRecords + ", userAddDeleteNotificationRecipients="
-            + userAddDeleteNotificationRecipients + ", entityAlertDetails=" + entityAlertDetails + "]";
+            + userAddDeleteNotificationRecipients + ", isSocialMonitorEnabled=" + isSocialMonitorEnabled
+            + ", entityAlertDetails=" + entityAlertDetails + "]";
     }
+
     
 }

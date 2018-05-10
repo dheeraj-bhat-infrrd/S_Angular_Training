@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.compute.topology.spouts;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -101,13 +102,18 @@ public class SocialMediaTokenExtractorSpout extends BaseComputeSpout
         }
     }
     
-    private void emitSocialMediaTokensToStream(Long companyId, SocialMediaTokenResponse mediaToken){
-        if ( mediaToken.getSocialMediaTokens() != null &&  (companyId != null)) {
+
+    private void emitSocialMediaTokensToStream( Long companyId, SocialMediaTokenResponse mediaToken )
+    {
+        if ( mediaToken.getSocialMediaTokens() != null && ( companyId != null ) ) {
             mediaToken.setCompanyId( companyId );
-            _collector.emit( "FacebookStream", new Values( companyId.toString(), mediaToken ) );
-            //_collector.emit( "LinkedinStream", new Values( companyId.toString(), mediaToken ) );
-            _collector.emit( "TwitterStream", new Values( companyId.toString(), mediaToken ) );
-            _collector.emit( "InstagramStream", new Values(companyId.toString(), mediaToken));
+            List<Long> companyIdsWithSM = redisSocialMediaStateDao.getCompanyIdsForSM();
+            if ( companyIdsWithSM.contains( companyId ) ) {
+                _collector.emit( "FacebookStream", new Values( companyId.toString(), mediaToken ) );
+                //_collector.emit( "LinkedinStream", new Values( companyId.toString(), mediaToken ) );
+                _collector.emit( "TwitterStream", new Values( companyId.toString(), mediaToken ) );
+                _collector.emit( "InstagramStream", new Values( companyId.toString(), mediaToken ) );
+            }
         }
     }
 

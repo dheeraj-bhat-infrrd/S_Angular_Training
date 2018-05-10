@@ -134,6 +134,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_LINKEDIN_ID = "socialMediaTokens.linkedInToken.linkedInId";
     public static final String KEY_LINKEDIN_PAGE_LINK = "socialMediaTokens.linkedInToken.linkedInPageLink";
     public static final String KEY_LINKEDIN_ACCESS_TOKEN = "socialMediaTokens.linkedInToken.linkedInAccessToken";
+    
+    public static final String SOCIAL_MONITOR_ENABLED = "isSocialMonitorEnabled";
 
 
     @Value ( "${CDN_PATH}")
