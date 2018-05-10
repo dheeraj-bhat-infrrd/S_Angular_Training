@@ -7425,7 +7425,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             } else {
                 LOG.debug( "Contact number is not set" );
             }
-            // skipping location
+            // skipping location  check for work too
             if ( regionSetting.getContact_details().getWeb_addresses() != null ) {
                 LOG.debug( "Web address is set" );
                 setterValue += SettingsForApplication.WEB_ADDRESS_WORK.getOrder() * 2;
@@ -7512,7 +7512,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             for ( Branch branch : branches ) {
                 try {
                     OrganizationUnitSettings branchSetting = getBranchSettingsDefault( branch.getBranchId() );
-                    processBranch( branchSetting, branch );
+                    processBranch( branchSetting, branch);
                 } catch ( NoRecordsFetchedException e ) {
                     LOG.error( "Could not get branches setting for " + branch.getBranch(), e );
                 }
@@ -7522,6 +7522,112 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
     }
 
+    private void processOnlyRegion( OrganizationUnitSettings regionSetting, Region region )
+    {
+        LOG.debug( "Processing region " + region.getRegion() );
+        long setterValue = 0l;
+        LOG.debug( "Getting details of region: " + region.getRegion() );
+        if ( regionSetting.getLogo() != null ) {
+            LOG.debug( "Logo is set" );
+            setterValue += SettingsForApplication.LOGO.getOrder() * 2;
+        } else {
+            LOG.debug( "Logo is not set" );
+        }
+        if ( regionSetting.getContact_details() != null ) {
+            if ( regionSetting.getContact_details().getAddress() != null ) {
+                LOG.debug( "Address is set" );
+                setterValue += SettingsForApplication.ADDRESS.getOrder() * 2;
+            } else {
+                LOG.debug( "Address is not set" );
+            }
+            if ( regionSetting.getContact_details().getContact_numbers() != null ) {
+                LOG.debug( "Contact number is set" );
+                setterValue += SettingsForApplication.PHONE.getOrder() * 2;
+            } else {
+                LOG.debug( "Contact number is not set" );
+            }
+            // skipping location
+            if ( regionSetting.getContact_details().getWeb_addresses() != null && regionSetting.getContact_details().getWeb_addresses().getWork() != null ) {
+                LOG.debug( "Web address is set" );
+                setterValue += SettingsForApplication.WEB_ADDRESS_WORK.getOrder() * 2;
+            } else {
+                LOG.debug( "Web address is not set" );
+            }
+            if ( regionSetting.getContact_details().getAbout_me() != null ) {
+                LOG.debug( "About me is set" );
+                setterValue += SettingsForApplication.ABOUT_ME.getOrder() * 2;
+            } else {
+                LOG.debug( "About me is not set" );
+            }
+            if ( regionSetting.getContact_details().getMail_ids() != null
+                && regionSetting.getContact_details().getMail_ids().getWork() != null ) {
+                LOG.debug( "Work email id is set" );
+                setterValue += SettingsForApplication.EMAIL_ID_WORK.getOrder() * 2;
+            } else {
+                LOG.debug( "Work email id is not set" );
+            }
+        }
+        if ( regionSetting.getSocialMediaTokens() != null ) {
+            if ( regionSetting.getSocialMediaTokens().getFacebookToken() != null ) {
+                LOG.debug( "Facebook is set" );
+                setterValue += SettingsForApplication.FACEBOOK.getOrder() * 2;
+            } else {
+                LOG.debug( "Facebook is not set" );
+            }
+            if ( regionSetting.getSocialMediaTokens().getTwitterToken() != null ) {
+                LOG.debug( "Twitter is set" );
+                setterValue += SettingsForApplication.TWITTER.getOrder() * 2;
+            } else {
+                LOG.debug( "Twitter is not set" );
+            }
+            if ( regionSetting.getSocialMediaTokens().getLinkedInToken() != null ) {
+                LOG.debug( "Linkedin is set" );
+                setterValue += SettingsForApplication.LINKED_IN.getOrder() * 2;
+            } else {
+                LOG.debug( "Linkedin is not set" );
+            }
+            if ( regionSetting.getSocialMediaTokens().getGoogleToken() != null ) {
+                LOG.debug( "Google+ is set" );
+                setterValue += SettingsForApplication.GOOGLE_PLUS.getOrder() * 2;
+            } else {
+                LOG.debug( "Google+ is not set" );
+            }
+            if ( regionSetting.getSocialMediaTokens().getYelpToken() != null ) {
+                LOG.debug( "Yelp is set" );
+                setterValue += SettingsForApplication.YELP.getOrder() * 2;
+            } else {
+                LOG.debug( "Yelp is not set" );
+            }
+            if ( regionSetting.getSocialMediaTokens().getZillowToken() != null ) {
+                LOG.debug( "Zillow is set" );
+                setterValue += SettingsForApplication.ZILLOW.getOrder() * 2;
+            } else {
+                LOG.debug( "Zillow is not set" );
+            }
+            if ( regionSetting.getSocialMediaTokens().getRealtorToken() != null ) {
+                LOG.debug( "Realtor is set" );
+                setterValue += SettingsForApplication.REALTOR.getOrder() * 2;
+            } else {
+                LOG.debug( "Realtor is not set" );
+            }
+            if ( regionSetting.getSocialMediaTokens().getLendingTreeToken() != null ) {
+                LOG.debug( "Lending tree is set" );
+                setterValue += SettingsForApplication.LENDING_TREE.getOrder() * 2;
+            } else {
+                LOG.debug( "Lending tree is not set" );
+            }
+            if ( regionSetting.getSocialMediaTokens().getGoogleBusinessToken() != null ) {
+                LOG.debug( "Google business is set" );
+                setterValue += SettingsForApplication.GOOGLE_BUSINESS.getOrder() * 2;
+            } else {
+                LOG.debug( "Google business is not set" );
+            }
+        }
+        LOG.debug( "Final Settings setter value : " + setterValue );
+        region.setSettingsSetStatus( String.valueOf( setterValue ) );
+        // update the values to company
+        updateRegion( region );
+    }
 
     private void processBranch( OrganizationUnitSettings branchSetting, Branch branch )
     {
@@ -7548,7 +7654,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 LOG.debug( "Contact number is not set" );
             }
             // skipping location
-            if ( branchSetting.getContact_details().getWeb_addresses() != null ) {
+            if ( branchSetting.getContact_details().getWeb_addresses() != null && branchSetting.getContact_details().getWeb_addresses().getWork() != null) {
                 LOG.debug( "Web address is set" );
                 setterValue += SettingsForApplication.WEB_ADDRESS_WORK.getOrder() * 4;
             } else {
@@ -7661,7 +7767,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 LOG.debug( "Contact number is not set" );
             }
             // skipping location
-            if ( companySetting.getContact_details().getWeb_addresses() != null ) {
+            if ( companySetting.getContact_details().getWeb_addresses() != null && companySetting.getContact_details().getWeb_addresses().getWork() != null) {
                 LOG.debug( "Web address is set" );
                 setterValue += SettingsForApplication.WEB_ADDRESS_WORK.getOrder() * 1;
             } else {
@@ -8976,7 +9082,62 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
 
     }
+    
+    @Override
+    public void unsetWebAddressInProfile( long entityId ,String entityType) throws NonFatalException
+    {
 
+        LOG.info( "Unset web address mail" );
+        OrganizationUnitSettings unitSettings = null;
+        if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+            unitSettings = getCompanySettings( entityId );
+            if ( unitSettings == null ) {
+                throw new InvalidInputException( "No company settings found in current session" );
+            }
+            unsetWebAddMongo(unitSettings,MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+            //once the settings are unset we have to change the SETTINGS_SET_STATUS for each hierarchy 
+            //so that getPrimaryHierarchyByEntity knows which is the closest heierarchy it should pick from 
+            processCompany( getCompanySettings( entityId ));
+
+        } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+            unitSettings = getRegionSettings( entityId );
+            if ( unitSettings == null ) {
+                throw new InvalidInputException( "No Region settings found in current session" );
+            }
+            unsetWebAddMongo(getRegionSettings( entityId ),MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
+            Region region = regionDao.findById( Region.class, entityId );
+            processOnlyRegion( getRegionSettings( entityId ), region);
+        } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+           unitSettings = getBranchSettingsDefault( entityId );
+            if ( unitSettings == null ) {
+                throw new InvalidInputException( "No Branch settings found in current session" );
+            }
+            unsetWebAddMongo(unitSettings,MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
+            Branch branch = branchDao.findById( Branch.class, entityId );
+            //get back the unit settings
+            processBranch( getBranchSettingsDefault( entityId ), branch );
+        } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+            unitSettings = userManagementService.getUserSettings( entityId );
+            if ( unitSettings == null ) {
+                throw new InvalidInputException( "No Agent settings found in current session" );
+            }
+            unsetWebAddMongo(unitSettings,MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
+        } else {
+            throw new InvalidInputException( "Invalid input exception occurred while updating web addresses.",
+                DisplayMessageConstants.GENERAL_ERROR );
+        }       
+      
+
+    }
+    
+    
+    public void unsetWebAddMongo(OrganizationUnitSettings unitSettings , String collection) throws InvalidInputException {
+        LOG.info( "Unset web address mail in mongo for collection : {}",collection );
+        if (collection != null && unitSettings.getContact_details().getWeb_addresses() != null ) {
+            unsetKey( unitSettings, MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAILS_WEB_ADD_WORK,
+                collection);
+        }
+    }
 
     @Override
     public boolean unsetKey( OrganizationUnitSettings companySettings, String keyToUpdate, String collectionName )
@@ -9377,5 +9538,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             LOG.debug( "method updateEncompassVersion() finished" );
         }
         return false;
+    }
+    
+    @Override
+    public void updateAgentProfileDisable(long companyId , boolean isAgentProfileDisabled) throws InvalidInputException {
+        LOG.info( "disabling editing for agent profile page's for companyId:{}",companyId );
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden( MongoOrganizationUnitSettingDaoImpl.KEY_AGENT_PROFILE_DISABLED,
+            isAgentProfileDisabled, companyId,MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION  );
+        
     }
 }

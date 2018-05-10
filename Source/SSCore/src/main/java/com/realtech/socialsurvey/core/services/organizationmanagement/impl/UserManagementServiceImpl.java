@@ -1636,7 +1636,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         userProfile.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         userProfile.setStatus( CommonConstants.STATUS_DELETE );
-        userProfileDao.update( userProfile );
+        userProfileDao.delete( userProfile );
 
         LOG.debug( "Method to delete a profile finished for profile : " + profileIdToDelete );
     }
