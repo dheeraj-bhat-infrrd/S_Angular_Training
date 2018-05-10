@@ -57,8 +57,12 @@ public class GoogleToken {
 		this.googleAccessTokenExpiresIn = googleAccessTokenExpiresIn;
 	}
 
-	@Override
-	public String toString() {
-		return "FacebookToken [googleId=" + googleId + ", googlePageLink=" + profileLink + "]";
+
+	@Override public String toString()
+	{
+		return "GoogleToken{" + "googleId='" + googleId + '\'' + ", profileLink='" + profileLink + '\''
+			+ ", googleAccessToken='" + googleAccessToken + '\'' + ", googleRefreshToken='" + googleRefreshToken + '\''
+			+ ", googleAccessTokenCreatedOn=" + googleAccessTokenCreatedOn + ", googleAccessTokenExpiresIn="
+			+ googleAccessTokenExpiresIn + '}';
 	}
 }

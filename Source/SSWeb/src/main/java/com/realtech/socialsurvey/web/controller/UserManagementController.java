@@ -358,84 +358,99 @@ public class UserManagementController
             }
 
             //add socialmedia details of the users to UserFromSearch object
-            List<SocialMediaVO> socialMediaVOS = new ArrayList<>(  );
+            SocialMediaVO socialMediaVO;
             for(UserFromSearch user: usersList) {
+                List<SocialMediaVO> socialMediaVOS = new ArrayList<>(  );
                 //get the details of the socialmedia which the user has connected from mongo using user
                 SocialMediaTokens socialMediaTokens = organizationUnitSettingsDao.fetchSocialMediaTokens(
                     MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, user.getUserId() );
 
-                if(socialMediaTokens.getFacebookToken() != null ){
-                    SocialMediaVO socialMediaVO = new SocialMediaVO();
-                    socialMediaVO.setSocialMedia( CommonConstants.FACEBOOK_SOCIAL_SITE );
-                    if(socialMediaTokens.getFacebookToken().isTokenExpiryAlertSent() )
-                        socialMediaVO.setStatus( SocialMediaConnectionStatus.EXPIRED );
-                    else socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+                    //facebook
+                    socialMediaVO = new SocialMediaVO( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                    if ( socialMediaTokens!= null && socialMediaTokens.getFacebookToken() != null ) {
+                        if ( socialMediaTokens.getFacebookToken().isTokenExpiryAlertSent() )
+                            socialMediaVO.setStatus( SocialMediaConnectionStatus.EXPIRED );
+                        else
+                            socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+                    }
                     socialMediaVOS.add( socialMediaVO );
-                }
-                if(socialMediaTokens.getInstagramToken() != null ){
-                    SocialMediaVO socialMediaVO = new SocialMediaVO();
-                    socialMediaVO.setSocialMedia( CommonConstants.INSTAGRAM_SOCIAL_SITE );
-                    if(socialMediaTokens.getInstagramToken().isTokenExpiryAlertSent() )
-                        socialMediaVO.setStatus( SocialMediaConnectionStatus.EXPIRED );
-                    else socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+
+                    //instagram
+                    socialMediaVO = new SocialMediaVO( CommonConstants.INSTAGRAM_SOCIAL_SITE );
+                    if ( socialMediaTokens!= null && socialMediaTokens.getInstagramToken() != null ) {
+                        if ( socialMediaTokens.getInstagramToken().isTokenExpiryAlertSent() )
+                            socialMediaVO.setStatus( SocialMediaConnectionStatus.EXPIRED );
+                        else
+                            socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+                    }
                     socialMediaVOS.add( socialMediaVO );
-                }
-                if(socialMediaTokens.getFacebookPixelToken() != null ){
-                    SocialMediaVO socialMediaVO = new SocialMediaVO();
-                    socialMediaVO.setSocialMedia( CommonConstants.FACEBOOK_PIXEL);
-                    socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+
+                    //facebookpixel
+                    socialMediaVO = new SocialMediaVO( CommonConstants.FACEBOOK_PIXEL );
+                    if ( socialMediaTokens!= null && socialMediaTokens.getFacebookPixelToken() != null ) {
+                        socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+                    }
                     socialMediaVOS.add( socialMediaVO );
-                }
-                if(socialMediaTokens.getGoogleBusinessToken() != null ){
-                    SocialMediaVO socialMediaVO = new SocialMediaVO();
-                    socialMediaVO.setSocialMedia( CommonConstants.GOOGLE_BUSINESS_SOCIAL_SITE );
-                    socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+
+                    //google business
+                    socialMediaVO = new SocialMediaVO( CommonConstants.GOOGLE_BUSINESS_SOCIAL_SITE );
+                    if ( socialMediaTokens!= null && socialMediaTokens.getGoogleBusinessToken() != null ) {
+                        socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+                    }
                     socialMediaVOS.add( socialMediaVO );
-                }
-                if(socialMediaTokens.getGoogleToken() != null ){
-                    SocialMediaVO socialMediaVO = new SocialMediaVO();
-                    socialMediaVO.setSocialMedia( CommonConstants.GOOGLE_SOCIAL_SITE );
-                    socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+
+                    //google
+                    socialMediaVO = new SocialMediaVO( CommonConstants.GOOGLE_SOCIAL_SITE );
+                    if ( socialMediaTokens!= null && socialMediaTokens.getGoogleToken() != null ) {
+                        socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+                    }
                     socialMediaVOS.add( socialMediaVO );
-                }
-                if(socialMediaTokens.getLendingTreeToken() != null ){
-                    SocialMediaVO socialMediaVO = new SocialMediaVO();
-                    socialMediaVO.setSocialMedia( CommonConstants.LENDINGTREE_SOCIAL_SITE );
-                    socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+
+                    //lendingtree
+                    socialMediaVO = new SocialMediaVO( CommonConstants.LENDINGTREE_SOCIAL_SITE );
+                    if ( socialMediaTokens!= null && socialMediaTokens.getLendingTreeToken() != null ) {
+                        socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+                    }
                     socialMediaVOS.add( socialMediaVO );
-                }
-                if(socialMediaTokens.getLinkedInToken() != null ){
-                    SocialMediaVO socialMediaVO = new SocialMediaVO();
-                    socialMediaVO.setSocialMedia( CommonConstants.LINKEDIN_SOCIAL_SITE );
-                    if(socialMediaTokens.getLinkedInToken().isTokenExpiryAlertSent() )
-                        socialMediaVO.setStatus( SocialMediaConnectionStatus.EXPIRED );
-                    else socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+
+                    //linkedin
+                    socialMediaVO = new SocialMediaVO( CommonConstants.LINKEDIN_SOCIAL_SITE );
+                    if ( socialMediaTokens!= null && socialMediaTokens.getLinkedInToken() != null ) {
+                        if ( socialMediaTokens.getLinkedInToken().isTokenExpiryAlertSent() )
+                            socialMediaVO.setStatus( SocialMediaConnectionStatus.EXPIRED );
+                        else
+                            socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+                    }
                     socialMediaVOS.add( socialMediaVO );
-                }
-                if(socialMediaTokens.getRealtorToken() != null ){
-                    SocialMediaVO socialMediaVO = new SocialMediaVO();
-                    socialMediaVO.setSocialMedia( CommonConstants.REALTOR_SOCIAL_SITE );
-                    socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+
+                    //realtor
+                    socialMediaVO = new SocialMediaVO( CommonConstants.REALTOR_SOCIAL_SITE );
+                    if ( socialMediaTokens!= null && socialMediaTokens.getRealtorToken() != null ) {
+                        socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+                    }
                     socialMediaVOS.add( socialMediaVO );
-                }
-                if(socialMediaTokens.getTwitterToken() != null ){
-                    SocialMediaVO socialMediaVO = new SocialMediaVO();
-                    socialMediaVO.setSocialMedia( CommonConstants.TWITTER_SOCIAL_SITE );
-                    socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+
+                    //twitter
+                    socialMediaVO = new SocialMediaVO( CommonConstants.TWITTER_SOCIAL_SITE );
+                    if ( socialMediaTokens!= null && socialMediaTokens.getTwitterToken() != null ) {
+                        socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+                    }
                     socialMediaVOS.add( socialMediaVO );
-                }
-                if(socialMediaTokens.getYelpToken() != null ){
-                    SocialMediaVO socialMediaVO = new SocialMediaVO();
-                    socialMediaVO.setSocialMedia( CommonConstants.YELP_SOCIAL_SITE );
-                    socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+
+                    //yelp
+                    socialMediaVO = new SocialMediaVO( CommonConstants.YELP_SOCIAL_SITE );
+                    if ( socialMediaTokens!= null && socialMediaTokens.getYelpToken() != null ) {
+                        socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+                    }
                     socialMediaVOS.add( socialMediaVO );
-                }
-                if(socialMediaTokens.getZillowToken() != null ){
-                    SocialMediaVO socialMediaVO = new SocialMediaVO();
-                    socialMediaVO.setSocialMedia( CommonConstants.ZILLOW_SOCIAL_SITE );
-                    socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+
+                    //zillow
+                    socialMediaVO = new SocialMediaVO( CommonConstants.ZILLOW_SOCIAL_SITE );
+                    if ( socialMediaTokens!= null && socialMediaTokens.getZillowToken() != null ) {
+                        socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+                    }
                     socialMediaVOS.add( socialMediaVO );
-                }
+
                 user.setSocialMediaVOs( socialMediaVOS );
             }
             model.addAttribute( "userslist", usersList );

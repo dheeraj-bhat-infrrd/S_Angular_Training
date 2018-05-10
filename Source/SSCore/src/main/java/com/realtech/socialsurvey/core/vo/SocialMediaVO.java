@@ -9,6 +9,23 @@ public class SocialMediaVO
     private SocialMediaConnectionStatus status;
 
 
+    public SocialMediaVO() { }
+
+
+    public SocialMediaVO( String socialMedia )
+    {
+        SocialMedia = socialMedia;
+        this.status = SocialMediaConnectionStatus.NOT_CONNECTED;
+    }
+
+
+    public SocialMediaVO( String socialMedia, SocialMediaConnectionStatus status )
+    {
+        SocialMedia = socialMedia;
+        this.status = status;
+    }
+
+
     public String getSocialMedia()
     {
         return SocialMedia;
