@@ -6259,6 +6259,22 @@ function updateSendDigestMailSiteSetting(issenddigestmailenabled, disableEle) {
 	
 }
 
+function enableSocialMonitorToggleSetting(issocialmonitorenabled, disableEle) {
+	var payload = {
+		"isSocialMonitorEnabled" : issocialmonitorenabled
+	};
+	
+	callAjaxPostWithPayloadData("./enablesocialmonitortoggle.do",function(data) {
+		if (data == "true") {
+			$('#overlay-toast').html("Social Monitor toggle Updated Sucessfully.");
+		} else {
+			$('#overlay-toast').html("Unable to toggle Social Monitor.");
+		}
+		showToast();
+	}, payload, true, disableEle);
+	
+}
+
 function updateVendastaAccessSetting(hasVendastaAcess, disableEle) {
 	var payload = {
 		"hasVendastaAcess" : hasVendastaAcess
@@ -12409,6 +12425,17 @@ $('body').on('click', '#survey-mail-thrhld-chk-box', function() {
 		updateSendDigestMailSiteSetting(false, '#survey-mail-thrhld-chk-box');
 	}
 });
+
+$('body').on('click', '#soc-mon-access-chk-box', function() {
+	if ($('#soc-mon-access-chk-box').hasClass('bd-check-img-checked')) {
+		$('#soc-mon-access-chk-box').removeClass('bd-check-img-checked');
+		enableSocialMonitorToggleSetting(true, '#soc-mon-access-chk-box');
+	} else {
+		$('#soc-mon-access-chk-box').addClass('bd-check-img-checked');
+		enableSocialMonitorToggleSetting(false, '#soc-mon-access-chk-box');
+	}
+});
+
 
 $('body').on('blur', '#digest-recipients', function() {
 	
