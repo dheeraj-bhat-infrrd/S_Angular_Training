@@ -113,7 +113,12 @@
 								<c:if test="${ columnName == 'companyId' }">
 									<div class="float-left listing-access-txt cust-resp-txt">Send user Add/Delete Notification Mail</div>
 									<textarea id="user-notification-recipients" class="dig-recp" style="margin-bottom:40px" placeholder="<spring:message code="label.placehoder.user.notify.emails.key" />" autocorrect="off" autocomplete="off" autocapitalize="off" spellcheck="false">${userNotifyRecipients}</textarea>
-								</c:if>	
+								</c:if>
+								<c:if test="${ columnName == 'companyId' }">
+									<div id="soc-mon-access-chk-box" class="float-left bd-check-img clear-both"></div>
+									<input type="hidden" id="soc-mon-access-cb" name="surveymailthrhld" value="${isSocialMonitorEnabled}">
+									<div class="float-left listing-access-txt cust-resp-txt">Enable Social Monitor</div>	
+								</c:if>
 							</c:if>
 							
                             <c:if test="${ not empty companyAdminSwitchId or isRealTechOrSSAdmin == true or user.isOwner == 1 }">
@@ -317,6 +322,10 @@ $(document).ready(function() {
 	
 	if("${sendMonthlyDigestMail}" == "false"){
 		$('#survey-mail-thrhld-chk-box').addClass('bd-check-img-checked');
+	}
+	
+	if("${isSocialMonitorEnabled}" == "false"){
+		$('#soc-mon-access-chk-box').addClass('bd-check-img-checked');
 	}
 	
 	var accountMasterId = "${accountMasterId}";
