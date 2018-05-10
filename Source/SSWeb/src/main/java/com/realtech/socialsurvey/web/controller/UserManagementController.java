@@ -1871,6 +1871,7 @@ public class UserManagementController
 
                 userManagementService.updateUserProfile( sessionUser, profileId, status );
                 userManagementService.updateUserProfilesStatus( sessionUser, profileId );
+                userManagementService.removeUserProfile( profileId );
 
                 //userManagementService.removeUserProfile( profileId );
 
