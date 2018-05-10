@@ -5287,10 +5287,8 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
             MongoOrganizationUnitSettingDaoImpl.SOCIAL_MONITOR_ENABLED, socialMonitorFlag, unitSettings,
             CommonConstants.COMPANY_SETTINGS_COLLECTION );
 
-        //add companyIds which have enabled socialMonitor
-        if ( socialMonitorFlag ) {
-            redisDao.addCompanyIdsForSM( companyId );
-        }
+        //update companyIds which have enabled/disabled socialMonitor
+        redisDao.updateCompanyIdsForSM( companyId, socialMonitorFlag );
 
         LOG.debug( "method enableSocialMonitorToggle() finished." );
         return true;

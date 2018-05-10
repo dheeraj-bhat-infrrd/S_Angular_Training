@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.dao.RedisDao;
 import com.realtech.socialsurvey.core.entities.Keyword;
 import org.slf4j.Logger;
@@ -14,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 
-import java.util.ArrayList;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -77,28 +78,40 @@ public class RedisDaoImpl implements RedisDao, InitializingBean {
     
 
     @Override
-    public void addCompanyIdsForSM( long companyId )
+    public void updateCompanyIdsForSM( long companyId, boolean isSocialMonitorEnabled )
     {
-        LOGGER.info( "Trying to add SocialMonitor enabled comapnyIds to redis ", companyId );
+        LOGGER.info( "Trying to update SocialMonitor enabled companyIds to redis ", companyId );
 
-        List<Long> companyIds = (List<Long>) hashOps.get( SOCIAL_MONITOR_COMPANYIDS, COMPANYIDS );
-        if ( companyIds == null || companyIds.isEmpty() ) {
-            companyIds = Arrays.asList( companyId );
-            hashOps.put( SOCIAL_MONITOR_COMPANYIDS, COMPANYIDS, new Gson().toJson( companyIds ) );
+        String companyIds = (String) hashOps.get( SOCIAL_MONITOR_COMPANYIDS, COMPANYIDS );
+        Type listType = new TypeToken<List<Long>>() {}.getType();
+        List<Long> companyIdList = new Gson().fromJson( companyIds, listType );
+        if ( !isSocialMonitorEnabled ) {
+            if ( companyIdList != null && !companyIdList.isEmpty() ) {
+                if ( companyIdList.contains( companyId ) ) {
+                    companyIdList.remove( companyId );
+                    hashOps.put( SOCIAL_MONITOR_COMPANYIDS, COMPANYIDS, new Gson().toJson( companyIdList ) );
+                }
+            }
         } else {
-            if ( !companyIds.contains( companyId ) ) {
-                companyIds.add( companyId );
-                hashOps.put( SOCIAL_MONITOR_COMPANYIDS, COMPANYIDS, new Gson().toJson( companyIds ) );
+            if ( companyIdList == null || companyIdList.isEmpty() ) {
+                companyIdList = Arrays.asList( companyId );
+                hashOps.put( SOCIAL_MONITOR_COMPANYIDS, COMPANYIDS, new Gson().toJson( companyIdList ) );
+            } else {
+                if ( !companyIdList.contains( companyId ) ) {
+                    companyIdList.add( companyId );
+                    hashOps.put( SOCIAL_MONITOR_COMPANYIDS, COMPANYIDS, new Gson().toJson( companyIdList ) );
+                }
             }
         }
 
-
     }
     
-
     @Override
     public void afterPropertiesSet() throws Exception {
         redisTemplate.getConnectionFactory().getConnection().ping();
     }
+
+
+    
 
 }
