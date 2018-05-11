@@ -1671,4 +1671,7 @@ public interface OrganizationManagementService
 
     public void unsetWebAddressInProfile( long entityId, String entityType ) throws NonFatalException;
 
+
+    public boolean updateEntitySettings( String entityType, long entityId, String flagToBeUpdated, String status );
+
 }

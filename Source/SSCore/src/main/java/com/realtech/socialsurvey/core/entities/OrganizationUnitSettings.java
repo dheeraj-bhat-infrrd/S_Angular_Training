@@ -60,18 +60,18 @@ public class OrganizationUnitSettings implements Serializable
     private boolean isLogoImageProcessed;
     private String[] hideSectionsFromProfilePage;
     private SocialMediaTokens deletedSocialTokens;
-    private boolean allowOverrideForSocialMedia;
+    private boolean allowOverrideForSocialMedia; // allow social media connection from auto login as well for all the entities of a company
     private boolean allowZillowAutoPost;
     // status of the record, A for active and D for deleted
     private String status;
     private boolean hiddenSection; // to hide public page of all the users of a company
-    private boolean sendEmailFromCompany;
+    private boolean sendEmailFromCompany; // send all the emails on behalf of company
     private String reviewSortCriteria;
     private String sendEmailThrough;
-    private boolean hideFromBreadCrumb;
+    private boolean hideFromBreadCrumb; // to hide any entity from breadcrumb
     private boolean hidePublicPage; //to hide entity form public page and sitemap
     private Set<String> digestRecipients;
-    private boolean includeForTransactionMonitor;
+    private boolean includeForTransactionMonitor; // include a company to transaction monitor
     private String encryptedId;
 
     // vendasta product details 

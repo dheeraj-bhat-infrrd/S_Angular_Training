@@ -9539,4 +9539,64 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
         return false;
     }
+    
+    @Override
+    public boolean updateEntitySettings( String entityType, long entityId, String flagToBeUpdated, String status )
+    {
+        try {
+            if ( entityType == null || entityType.isEmpty() ) {
+                throw new InvalidInputException( "Entity type is null" );
+            }
+            if ( flagToBeUpdated == null || flagToBeUpdated.isEmpty() ) {
+                throw new InvalidInputException( "settings flag to be updated is null" );
+            }
+            if ( status == null || status.isEmpty() ) {
+                throw new InvalidInputException( "value to update is null" );
+            }
+            OrganizationUnitSettings unitSettings = null;
+            
+            String collection = null;
+            if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                unitSettings = getCompanySettings( entityId );
+                collection = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
+            } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+                unitSettings = getRegionSettings( entityId );
+                collection = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
+            } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+                unitSettings = getBranchSettingsDefault( entityId );
+                collection = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
+            } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+                unitSettings = userManagementService.getUserSettings( entityId );
+                collection = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
+            } else {
+                throw new InvalidInputException( "Invalid input exception occurred while updating web addresses.",
+                    DisplayMessageConstants.GENERAL_ERROR );
+            }
+            if ( unitSettings == null ) {
+                throw new InvalidInputException(
+                    "No settings found for entityType " + entityType + "and entityId " + entityId );
+            }
+            
+            if ( flagToBeUpdated.equals( MongoOrganizationUnitSettingDaoImpl.KEY_HIDE_PUBLIC_PAGE )
+                || flagToBeUpdated.equals( MongoOrganizationUnitSettingDaoImpl.KEY_HIDDEN_SECTION )
+                || flagToBeUpdated.equals( MongoOrganizationUnitSettingDaoImpl.KEY_SEND_EMAIL_FROM_COMPANY )
+                || flagToBeUpdated.equals( MongoOrganizationUnitSettingDaoImpl.KEY_HIDE_FROM_BREAD_CRUMB )
+                || flagToBeUpdated.equals( MongoOrganizationUnitSettingDaoImpl.KEY_INCLUDE_FOR_TRANSACTION_MONITOR )
+                || flagToBeUpdated.equals( MongoOrganizationUnitSettingDaoImpl.KEY_ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA ) ) {
+                boolean flag = Boolean.parseBoolean( status );
+                organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden( flagToBeUpdated, flag,
+                    unitSettings.getIden(), collection );
+            }
+            else if (flagToBeUpdated.equals( MongoOrganizationUnitSettingDaoImpl.KEY_SEND_EMAIL_THROUGH)) {
+                organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden( flagToBeUpdated, status,
+                    unitSettings.getIden(), collection );
+            }
+            return true;
+        } catch ( InvalidInputException e ) {
+            LOG.error( "Invalid Input Exception occurred while updating settings", e );
+        } catch ( NoRecordsFetchedException e ) {
+            LOG.error( "No redords found while updating settings", e );
+        }
+        return false;
+    }
 }
