@@ -97,7 +97,7 @@ public interface SSApiIntegrationService
 			@Query("companyId")  long companyId);
 
     @Headers( "Content-Type: application/json" )
-    @PUT ( "v1/updateSocialMediaToken/collection{collection}/iden{iden}/fieldtoupdate{fieldtoupdate}/value{value}" )
+    @PUT ( "v1/updateSocialMediaToken/collection/{collection}/iden/{iden}/fieldtoupdate/{fieldtoupdate}/value/{value}" )
     Call<Boolean> updateSocialMediaToken( @Query ("iden") long iden, @Query ("fieldtoupdate") String fieldToUpdate,
         @Query ("value") boolean value, @Query ("collection") String collection, @Header( "authorizationHeader" ) String authHeader );
 }

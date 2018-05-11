@@ -342,8 +342,8 @@ public class SocialMonitorController
 
     }
 
-    @RequestMapping ( value = "v1/updateSocialMediaToken/collection{collection}/iden{iden}/fieldtoupdate{fieldtoupdate}/value{value}",
-        method = RequestMethod.GET)
+    @RequestMapping ( value = "/updateSocialMediaToken/collection/{collection}/iden/{iden}/fieldtoupdate/{fieldtoupdate}/value/{value}",
+        method = RequestMethod.PUT)
     @ApiOperation ( value = "Updates ")
     public ResponseEntity<?> updateSocialMediaToken( HttpServletRequest request,
         @RequestHeader ( "authorizationHeader") String authorizationHeader, @PathVariable("collection") String collection,
