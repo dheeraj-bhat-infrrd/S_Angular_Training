@@ -214,14 +214,10 @@ public class RedisSocialMediaStateDaoImpl implements RedisSocialMediaStateDao, S
     public List<Long> getCompanyIdsForSM()
     {
         try ( Jedis jedis = RedisDB.getPoolInstance().getResource() ) {
-            LOG.info( "Executing method getCompanyIdsForSM {}" );
+            LOG.info( "Executing method getCompanyIdsForSM" );
             // Return all companyIds for SocialMonitor 
             String companyIds = jedis.hget( RedisKeyConstants.SOCIAL_MONITOR_COMPANYIDS, RedisKeyConstants.COMPANYIDS );
             return ConversionUtils.deserialize( companyIds, new TypeToken<List<Long>>() {}.getType() );
-        } catch ( JedisConnectionException e ) {
-            LOG.error( e.getMessage() );
-            return null;
         }
     }
-
 }
