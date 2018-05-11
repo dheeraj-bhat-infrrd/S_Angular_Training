@@ -585,15 +585,10 @@
 var hiddenSection="${profileSettings.hiddenSection}";
 $(document).ready(function() {
 	$(document).attr("title", "Profile Settings");
-	console.log("${not empty companyAdminSwitchId }");
-	console.log("${not empty regionAdminSwitchId }");
-	console.log("${not empty branchAdminSwitchId }");
 	var checkIfAdmin = ${not empty companyAdminSwitchId } || ${not empty regionAdminSwitchId } || ${not empty branchAdminSwitchId };
 	console.log(checkIfAdmin);
-	console.log("is realtech admin : ${isRealTechOrSSAdmin} \n profilemasterid:${profilemasterid} \n isAgentProfileDisabled : ${isAgentProfileDisabled} \n check If Admin : "+checkIfAdmin );
 	if(("${isRealTechOrSSAdmin}" == false || "${isRealTechOrSSAdmin}" == "false" )&& parseInt("${profilemasterid}") == 4 && ( "${isAgentProfileDisabled}" == true || "${isAgentProfileDisabled}" == "true")
 			&&  (checkIfAdmin == false || checkIfAdmin == "false" )){
-		console.log("im locking u out");
 		 $("#divReadOnlyFields :input").css("pointer-events", "none");
 		 $("#divReadOnlyFields").find('textarea').css("pointer-events", "none");
 		 $("#prof-address-container").css("pointer-events", "none");
