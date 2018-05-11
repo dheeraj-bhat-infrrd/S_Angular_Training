@@ -87,4 +87,9 @@ public final class ComputeConstants
     
     public static final String AUTH_HEADER = "social.monitor.auth.header";
 
+    //social media token fields
+    public static final String FACEBOOK_TOKEN_EXPIRY_FIELD = "socialMediaTokens.facebookToken.tokenExpiryAlertSent";
+    public static final String LINKEDIN_TOKEN_EXPIRY_FIELD = "socialMediaTokens.linkedInToken.tokenExpiryAlertSent";
+    public static final String INSTAGRAM_TOKEN_EXPIRY_FIELD = "socialMediaTokens.instagramToken.tokenExpiryAlertSent";
+
 }

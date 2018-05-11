@@ -16,7 +16,6 @@ public class SocialMediaTokensForSM implements Serializable
     private TwitterTokenForSM twitterToken;
     private InstagramTokenForSM instagramToken;
 
-
     public FacebookTokenForSM getFacebookToken()
     {
         return facebookToken;
@@ -76,11 +75,11 @@ public class SocialMediaTokensForSM implements Serializable
         this.instagramToken = instagramToken;
     }
 
-    @Override
-    public String toString()
+
+    @Override public String toString()
     {
-        return "SocialMediaTokensForSM [facebookToken=" + facebookToken + ", googleToken=" + googleToken + ", linkedInToken="
-            + linkedInToken + ", twitterToken=" + twitterToken + ", instagramToken=" + instagramToken + "]";
+        return "SocialMediaTokensForSM{" + "facebookToken=" + facebookToken + ", googleToken=" + googleToken
+            + ", linkedInToken=" + linkedInToken + ", twitterToken=" + twitterToken + ", instagramToken=" + instagramToken
+            + '}';
     }
-    
 }

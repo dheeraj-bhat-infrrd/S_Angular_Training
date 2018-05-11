@@ -1,6 +1,8 @@
 package com.realtech.socialsurvey.compute.feeds.impl;
 
+import com.realtech.socialsurvey.compute.common.ComputeConstants;
 import com.realtech.socialsurvey.compute.common.FacebookAPIOperations;
+import com.realtech.socialsurvey.compute.common.SSAPIOperations;
 import com.realtech.socialsurvey.compute.dao.RedisSocialMediaStateDao;
 import com.realtech.socialsurvey.compute.dao.impl.RedisSocialMediaStateDaoImpl;
 import com.realtech.socialsurvey.compute.entities.FacebookXUsageHeader;
@@ -10,6 +12,7 @@ import com.realtech.socialsurvey.compute.entities.response.ConnectedInstagramAcc
 import com.realtech.socialsurvey.compute.entities.response.InstagramMedia;
 import com.realtech.socialsurvey.compute.entities.response.InstagramMediaData;
 import com.realtech.socialsurvey.compute.entities.response.InstagramResponse;
+import com.realtech.socialsurvey.compute.enums.ProfileType;
 import com.realtech.socialsurvey.compute.exception.FacebookFeedException;
 import com.realtech.socialsurvey.compute.feeds.InstagramFeedProcessor;
 import com.realtech.socialsurvey.compute.utils.ConversionUtils;
@@ -66,7 +69,7 @@ public class InstagramFeedProcessorImpl implements InstagramFeedProcessor {
 
         if(lastFetchedIgId == null || lastFetchedIgId.isEmpty() ){
             //run the extractor for the first time so get latest 50 records
-            instagramAccount = fetchFeeds( igToken.getId(), igToken.getAccessTokenToPost() );
+            instagramAccount = fetchFeeds( igToken.getId(), igToken.getAccessTokenToPost(), mediaToken.getIden(), mediaToken.getProfileType() );
             if ( instagramAccount != null && instagramAccount.getMedia() != null){
                 instagramMediaData.addAll(instagramAccount.getMedia().getData());
                 //save the first record in the redis
@@ -74,7 +77,7 @@ public class InstagramFeedProcessorImpl implements InstagramFeedProcessor {
             }
         } else{
             //Get all the feeds until we encounter the lastFetchedIgId
-            instagramAccount = fetchFeeds( igToken.getId(), igToken.getAccessTokenToPost() );
+            instagramAccount = fetchFeeds( igToken.getId(), igToken.getAccessTokenToPost(), mediaToken.getIden(), mediaToken.getProfileType() );
             if( instagramAccount != null){
                 instagramMedia = instagramAccount.getMedia();
                 instagramMediaData.addAll(addInstagramMedia(instagramMedia, lastFetchedIgId));
@@ -82,7 +85,7 @@ public class InstagramFeedProcessorImpl implements InstagramFeedProcessor {
                 then we'll fetch only till that record ignoring the rest.Hence the size < 50*/
                 while( instagramMediaData.size() == LIMIT && instagramMedia.getPaging() != null && instagramMedia.getPaging().getNext() != null ){
                     instagramMedia = fetchFeeds(pageId, instagramAccount.getId(), igToken.getAccessTokenToPost(),
-                            instagramMedia.getPaging().getCursors().getAfter());
+                            instagramMedia.getPaging().getCursors().getAfter(), mediaToken.getIden(), mediaToken.getProfileType());
                     instagramMediaData.addAll(addInstagramMedia(instagramMedia, lastFetchedIgId));
                 }
                 //save the lastestIgId for consecutive fetches
@@ -111,9 +114,11 @@ public class InstagramFeedProcessorImpl implements InstagramFeedProcessor {
      * Fetches the first batch of instagram media.
      * @param pageId
      * @param accessToken
+     * @param iden
+     * @param profileType
      * @return
      */
-    private ConnectedInstagramAccount fetchFeeds(String pageId, String accessToken) {
+    private ConnectedInstagramAccount fetchFeeds( String pageId, String accessToken, long iden, ProfileType profileType ) {
         try{
             Response<InstagramResponse> response = FacebookAPIOperations.getInstance().fetchMedia( pageId, accessToken );
 
@@ -122,7 +127,7 @@ public class InstagramFeedProcessorImpl implements InstagramFeedProcessor {
                 return response.body().getConnectedInstagramAccount();
             }
         } catch (FacebookFeedException e) {
-            handleError(pageId, e);
+            handleError(pageId, e, iden, profileType);
         }
         return null;
     }
@@ -132,9 +137,12 @@ public class InstagramFeedProcessorImpl implements InstagramFeedProcessor {
      * @param igAccountId
      * @param accessToken
      * @param after
+     * @param iden
+     * @param profileType
      * @return
      */
-    private InstagramMedia fetchFeeds(String pageId, String igAccountId, String accessToken, String after) {
+    private InstagramMedia fetchFeeds( String pageId, String igAccountId, String accessToken, String after, long iden,
+        ProfileType profileType ) {
         try {
             Response<InstagramMedia> response = FacebookAPIOperations.getInstance().fetchMedia( igAccountId, accessToken, after );
 
@@ -143,13 +151,13 @@ public class InstagramFeedProcessorImpl implements InstagramFeedProcessor {
                 return response.body();
             }
         } catch (FacebookFeedException e) {
-            handleError(igAccountId, e);
+            handleError(igAccountId, e, iden, profileType );
         }
 
         return null;
     }
 
-    private void handleError(String pageId, FacebookFeedException e) {
+    private void handleError( String pageId, FacebookFeedException e, long iden, ProfileType profileType ) {
         if(e.getFacebookErrorCode() == 4){
             // Application level
             redisSocialMediaStateDao.setFacebookLockForApplication(TOKEN_BLOCK_TIME );
@@ -162,6 +170,9 @@ public class InstagramFeedProcessorImpl implements InstagramFeedProcessor {
         } else if(e.getFacebookErrorCode() == 100){
             //trying to fetch instagram media from user
             LOG.error(e.getMessage());
+        } else if(e.getFacebookErrorCode() == 190) {
+            SSAPIOperations.getInstance().updateTokenExpiryAlert(iden, ComputeConstants.INSTAGRAM_TOKEN_EXPIRY_FIELD,
+                true, profileType.getValue());
         }
 
     }

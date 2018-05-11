@@ -14,7 +14,7 @@ public class InstagramTokenForSM implements Serializable
     private String pageLink;
     private String accessToken;
     private String accessTokenToPost;
-
+    private boolean tokenExpiryAlertSent;
 
     public String getId()
     {
@@ -64,10 +64,20 @@ public class InstagramTokenForSM implements Serializable
     }
 
 
-    @Override
-    public String toString()
+    public boolean isTokenExpiryAlertSent()
+    {
+        return tokenExpiryAlertSent;
+    }
+
+    public void setTokenExpiryAlertSent( boolean tokenExpiryAlertSent )
+    {
+        this.tokenExpiryAlertSent = tokenExpiryAlertSent;
+    }
+
+    @Override public String toString()
     {
         return "InstagramTokenForSM{" + "id='" + id + '\'' + ", pageLink='" + pageLink + '\'' + ", accessToken='" + accessToken
-            + '\'' + ", accessTokenToPost='" + accessTokenToPost + '\'' + '}';
+            + '\'' + ", accessTokenToPost='" + accessTokenToPost + '\'' + ", tokenExpiryAlertSent='" + tokenExpiryAlertSent
+            + '\'' + '}';
     }
 }

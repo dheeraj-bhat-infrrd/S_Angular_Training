@@ -114,8 +114,15 @@ public class FacebookToken {
         this.lastTokenExpiryValidationTime = lastTokenExpiryValidationTime;
     }
 
-    @Override
-	public String toString() {
-		return "FacebookToken [facebookId=" + facebookId + ", facebookPageLink=" + facebookPageLink + "]";
+
+	@Override public String toString()
+	{
+		return "FacebookToken{" + "facebookId='" + facebookId + '\'' + ", facebookPageLink='" + facebookPageLink + '\''
+			+ ", facebookAccessToken='" + facebookAccessToken + '\'' + ", facebookAccessTokenCreatedOn="
+			+ facebookAccessTokenCreatedOn + ", facebookAccessTokenExpiresOn=" + facebookAccessTokenExpiresOn
+			+ ", facebookPages=" + facebookPages + ", facebookAccessTokenToPost='" + facebookAccessTokenToPost + '\''
+			+ ", tokenExpiryAlertSent=" + tokenExpiryAlertSent + ", tokenExpiryAlertTime=" + tokenExpiryAlertTime
+			+ ", tokenExpiryAlertEmail='" + tokenExpiryAlertEmail + '\'' + ", lastTokenExpiryValidationTime="
+			+ lastTokenExpiryValidationTime + '}';
 	}
 }

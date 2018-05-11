@@ -24,4 +24,9 @@ public class FeedIngestionEntity {
 		this.socialMediaTokens = socialMediaTokens;
 	}
 
+
+	@Override public String toString()
+	{
+		return "FeedIngestionEntity{" + "iden=" + iden + ", socialMediaTokens=" + socialMediaTokens + '}';
+	}
 }

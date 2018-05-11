@@ -190,4 +190,22 @@ public class SSAPIOperations
 		RetrofitApiBuilder.apiBuilderInstance().validateResponse(response);
 		return response.body();
 	}
+
+
+    public Optional<Boolean> updateTokenExpiryAlert( long iden, String fieldToUpdate, boolean value, String profileTypeValue )
+    {
+        Call<Boolean> requestCall = RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationService().
+            updateSocialMediaToken(iden, fieldToUpdate, value, profileTypeValue, AUTH_HEADER);
+        Response<Boolean> response = null;
+        try {
+            response = requestCall.execute();
+        } catch ( IOException e ) {
+            LOG.error( "Exception while updating tokenExpiryAlert", e.getMessage() );
+        }
+        RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
+        if ( LOG.isTraceEnabled() ) {
+            LOG.trace( "updateTokenExpiryAlert response {}", response.body() );
+        }
+        return Optional.of( response.body() );
+    }
 }
