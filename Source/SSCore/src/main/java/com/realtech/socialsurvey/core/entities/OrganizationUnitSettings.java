@@ -90,6 +90,8 @@ public class OrganizationUnitSettings implements Serializable
     private List<SavedDigestRecord> savedDigestRecords;
     
     private Set<String> userAddDeleteNotificationRecipients;
+    
+    private boolean isAgentProfileDisabled;
 
 
     public List<Keyword> getFilterKeywords()
@@ -807,6 +809,17 @@ public class OrganizationUnitSettings implements Serializable
     public void setUserAddDeleteNotificationRecipients( Set<String> userAddDeleteNotificationRecipients )
     {
         this.userAddDeleteNotificationRecipients = userAddDeleteNotificationRecipients;
+    }
+
+    public boolean isAgentProfileDisabled()
+    {
+        return isAgentProfileDisabled;
+    }
+
+
+    public void setAgentProfileDisabled( boolean isAgentProfileDisabled )
+    {
+        this.isAgentProfileDisabled = isAgentProfileDisabled;
     }
 
 

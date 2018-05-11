@@ -16,6 +16,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.HierarchyRelocationTarget;
+import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -160,21 +161,48 @@ public class HierarchyLocationManagementServiceImpl implements HierarchyLocation
         long curentRegionId = 0l;
         long curentCompanyId = 0l;
         
-        //check, if user have assignments in different branches
-        Set<Long> existingBranchAssignments = new HashSet<Long>();
-        for ( UserProfile userProfile : userProfiles ) {
-            if(existingBranchAssignments.contains( userProfile.getBranchId() )){
-                throw new InvalidInputException("User " + userToBeRelocated.getUserId()  + " has assignments in different branches");
-            }else{
-                existingBranchAssignments.add(  userProfile.getBranchId()  );
-            }
-            
-            if(userProfile.getIsPrimary() == CommonConstants.IS_PRIMARY_TRUE){
-                curentBranchId = userProfile.getBranchId();
-                curentRegionId = userProfile.getRegionId();
-                curentCompanyId = userProfile.getCompany().getCompanyId();
+        
+        //check if user is assigned to valid company
+        LicenseDetail licenseDetail = null;
+        if(userToBeRelocated.getCompany() != null && ! userToBeRelocated.getCompany().getLicenseDetails().isEmpty()) {
+        		licenseDetail = userToBeRelocated.getCompany().getLicenseDetails().get(CommonConstants.INITIAL_INDEX);
+        }else {
+        	 	throw new InvalidInputException("Can't move user. User is assigned to an invalid company.");
+        }
+        
+        //check, if user is an individual account
+        if(licenseDetail.getAccountsMaster().getAccountsMasterId() == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
+        		userToBeRelocated.setIsOwner(CommonConstants.IS_NOT_OWNER);
+        		userToBeRelocated.setIsForcePassword(CommonConstants.NO);
+        		for ( UserProfile userProfile : userProfiles ) {
+        			if(userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+        				curentBranchId = userProfile.getBranchId();
+        				curentRegionId = userProfile.getRegionId();
+        				curentCompanyId = userProfile.getCompany().getCompanyId();
+        			}else {
+        				userProfiles.remove(userProfile);
+        			}
+        		}
+        		
+        }else {
+        		Set<Long> existingBranchAssignments = new HashSet<Long>();
+            for ( UserProfile userProfile : userProfiles ) {
+                if(existingBranchAssignments.contains( userProfile.getBranchId() )){
+                    throw new InvalidInputException("User " + userToBeRelocated.getUserId()  + " has assignments in different branches");
+                }else{
+                    existingBranchAssignments.add(  userProfile.getBranchId()  );
+                }
+                
+                if(userProfile.getIsPrimary() == CommonConstants.IS_PRIMARY_TRUE){
+                    curentBranchId = userProfile.getBranchId();
+                    curentRegionId = userProfile.getRegionId();
+                    curentCompanyId = userProfile.getCompany().getCompanyId();
+                }
             }
         }
+        
+        
+        
         
         //updating user Profile table for a user during relocation
 
