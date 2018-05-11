@@ -47,7 +47,7 @@
 	</c:otherwise>
 </c:choose>
 
-<div style="width: 70px; margin: 0 auto;">
+<div id="prof-img-edit-cont" style="width: 70px; margin: 0 auto;">
 	<div class="edit-prof-img-icn float-left">
 	</div>
 	<div class="prof-img-del-icn float-left">

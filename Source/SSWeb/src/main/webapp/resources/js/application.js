@@ -9754,6 +9754,7 @@ $('body').on('click', '#prof-edit-social-link .icn-google-business', function(e)
     }
     
     $('#gmb-connected-placeId').html(connectedLink);
+    $('#gm-con-link').attr('href',connectedLink);
     for(var i=1;i<=5;i++){
     	if(!($('#gmb-radio-'+i).hasClass('hide'))){
     		$('#gmb-radio-'+i).addClass('hide');
@@ -9791,11 +9792,13 @@ $('body').on('click', '#prof-edit-social-link .icn-google-business', function(e)
 		if(placeId!='customPlace'){
 			$('#gmb-placeId-selected').html(placeId);
 			$('#gmb-url-placeId').html("https://search.google.com/local/writereview?placeid="+placeId);
+			$('#gm-sel-link').attr('href',"https://search.google.com/local/writereview?placeid="+placeId);
 		}else{
 			placeId = $('#gmb-placeId').val();
 			if(placeId != '' && placeId!=null){
 				$('#gmb-placeId-selected').html(placeId);
 				$('#gmb-url-placeId').html("https://search.google.com/local/writereview?placeid="+placeId);	
+				$('#gm-sel-link').attr('href',"https://search.google.com/local/writereview?placeid="+placeId);
 			}
 		}
 	});
@@ -9806,6 +9809,7 @@ $('body').on('click', '#prof-edit-social-link .icn-google-business', function(e)
 			placeId = $('#gmb-placeId').val();
 			$('#gmb-placeId-selected').html(placeId);
 			$('#gmb-url-placeId').html("https://search.google.com/local/writereview?placeid="+placeId);
+			$('#gm-sel-link').attr('href',"https://search.google.com/local/writereview?placeid="+placeId)
 		}
 	}
 	
@@ -14782,6 +14786,7 @@ function initializeGmb() {
 	    	  $('#gmb-placeId'+index++).html(place.place_id);
 	    	  $('#gmb-placeId-selected').html(place.place_id);
 	    	  $('#gmb-url-placeId').html("https://search.google.com/local/writereview?placeid="+place.place_id);
+	    	  $('#gm-sel-link').attr('href',"https://search.google.com/local/writereview?placeid="+place.place_id);
 	      }else{
 	    	  $('#gmb-radio-'+index).removeClass('hide');
 	    	  $('#placeId'+index).attr('value',place.place_id);

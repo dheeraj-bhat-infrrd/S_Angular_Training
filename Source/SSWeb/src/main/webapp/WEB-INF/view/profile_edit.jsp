@@ -92,6 +92,14 @@
 		<c:set value="${profileSettings.hobbies}" var="hobbies"></c:set>
 	</c:if>
 </c:if>
+<c:if test="${not empty isAgentProfileDisabled}">
+	<c:set value="${isAgentProfileDisabled}" var="isAgentProfileDisabled"></c:set>
+</c:if>
+<!-- check for isRealTechOrSSAdmin -->
+<c:if test="${not empty isRealTechOrSSAdmin}">
+	<c:set value="${isRealTechOrSSAdmin}" var="isRealTechOrSSAdmin"></c:set>
+</c:if>
+
 <div id="disconnect-overlay-main" class="overlay-main hide">
 		<div id="disconnect-overlay-pop-up" class="overlay-disable-wrapper">
 			<div id="disconnect-overlay-header" class="ol-header">
@@ -178,8 +186,8 @@
 				</div>
 			</div>
 			<span class="gmb-span">PlaceID Selected : <span id="gmb-placeId-selected"></span></span>
-			<span class="gmb-span" style="margin-top:10px;">Selected Link :<span id="gmb-url-placeId"></span></span>
-			<span class="gmb-span" style="margin-top:20px;">Connected Link :<span id="gmb-connected-placeId" class="gmb-span"></span></span>
+			<span class="gmb-span" style="margin-top:10px;">Selected Link :<a id="gm-sel-link" href="#"><span id="gmb-url-placeId"></span></a></span>
+			<span class="gmb-span" style="margin-top:20px;">Connected Link :<a id="gm-con-link" href="#"><span id="gmb-connected-placeId" class="gmb-span"></span></a></span>
 		</div>
 		<div class="clearfix gmb-wc-btn-row">
 			<div id="gmb-add-link" class="gmb-wc-sub-send-btn wc-final-submit">Add Link</div>
@@ -187,6 +195,7 @@
 		</div>
 	</div>
 </div>
+
 <div class="hm-header-main-wrapper">
 	<div>
 		<c:choose>
@@ -216,6 +225,7 @@
 		</div>
 	</div>
 </div>
+<div id="divReadOnlyFields">
 <div class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
 	<input id="prof-all-lock" type="hidden" value="locked">
 	<div>
@@ -282,7 +292,7 @@
 		</div>
 		<div class="container">
 			<div class="row">
-				<div class="prof-left-panel-wrapper margin-top-25 col-lg-4 col-md-4 col-sm-4 col-xs-12">
+				<div id="prof-whole-wrapper" class="prof-left-panel-wrapper margin-top-25 col-lg-4 col-md-4 col-sm-4 col-xs-12">
 					<div id="contact-wrapper" class="prof-left-row prof-left-info bord-bot-dc main-rt-adj">
 						<div class="left-contact-wrapper">
 							<div class="clearfix">
@@ -568,11 +578,26 @@
 	<div class="float-left mob-icn icn-star-smile"></div>
 	<div class="float-left mob-icn inc-more"></div>
 </div>
+</div>
 <script>
 var hiddenSection="${profileSettings.hiddenSection}";
 $(document).ready(function() {
-	
 	$(document).attr("title", "Profile Settings");
+	var checkIfAdmin = ${not empty companyAdminSwitchId } || ${not empty regionAdminSwitchId } || ${not empty branchAdminSwitchId };
+	console.log(checkIfAdmin);
+	if(("${isRealTechOrSSAdmin}" == false || "${isRealTechOrSSAdmin}" == "false" )&& parseInt("${profilemasterid}") == 4 && ( "${isAgentProfileDisabled}" == true || "${isAgentProfileDisabled}" == "true")
+			&&  (checkIfAdmin == false || checkIfAdmin == "false" )){
+		 $("#divReadOnlyFields :input").css("pointer-events", "none");
+		 $("#divReadOnlyFields").find('textarea').css("pointer-events", "none");
+		 $("#prof-address-container").css("pointer-events", "none");
+		 $(".edit-pos-icn").hide();
+		 $("#prof-img-edit-cont").hide();
+		 $("#intro-body-text").css("pointer-events", "none");
+		 $("#prof-whole-wrapper").css("pointer-events", "none");
+	}
+	
+	$("#prof-edit-social-link :input").css("pointer-events", "default");
+	
 	updateViewAsScroll();
 	
 	adjustImage();
