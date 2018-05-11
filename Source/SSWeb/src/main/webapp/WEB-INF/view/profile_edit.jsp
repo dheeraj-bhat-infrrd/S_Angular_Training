@@ -99,6 +99,8 @@
 <c:if test="${not empty isRealTechOrSSAdmin}">
 	<c:set value="${isRealTechOrSSAdmin}" var="isRealTechOrSSAdmin"></c:set>
 </c:if>
+<!-- highest role -->
+<c:set var="highestrole" value="${highestrole}"></c:set>
 
 <div id="disconnect-overlay-main" class="overlay-main hide">
 		<div id="disconnect-overlay-pop-up" class="overlay-disable-wrapper">
@@ -583,7 +585,15 @@
 var hiddenSection="${profileSettings.hiddenSection}";
 $(document).ready(function() {
 	$(document).attr("title", "Profile Settings");
-	if(("${isRealTechOrSSAdmin}" == false || "${isRealTechOrSSAdmin}" == "false" )&& parseInt("${profilemasterid}") == 4 && ( "${isAgentProfileDisabled}" == true || "${isAgentProfileDisabled}" == "true")){
+	console.log("${not empty companyAdminSwitchId }");
+	console.log("${not empty regionAdminSwitchId }");
+	console.log("${not empty branchAdminSwitchId }");
+	var checkIfAdmin = ${not empty companyAdminSwitchId } || ${not empty regionAdminSwitchId } || ${not empty branchAdminSwitchId };
+	console.log(checkIfAdmin);
+	console.log("is realtech admin : ${isRealTechOrSSAdmin} \n profilemasterid:${profilemasterid} \n isAgentProfileDisabled : ${isAgentProfileDisabled} \n check If Admin : "+checkIfAdmin );
+	if(("${isRealTechOrSSAdmin}" == false || "${isRealTechOrSSAdmin}" == "false" )&& parseInt("${profilemasterid}") == 4 && ( "${isAgentProfileDisabled}" == true || "${isAgentProfileDisabled}" == "true")
+			&&  (checkIfAdmin == false || checkIfAdmin == "false" )){
+		console.log("im locking u out");
 		 $("#divReadOnlyFields :input").css("pointer-events", "none");
 		 $("#divReadOnlyFields").find('textarea').css("pointer-events", "none");
 		 $("#prof-address-container").css("pointer-events", "none");
@@ -591,8 +601,6 @@ $(document).ready(function() {
 		 $("#prof-img-edit-cont").hide();
 		 $("#intro-body-text").css("pointer-events", "none");
 		 $("#prof-whole-wrapper").css("pointer-events", "none");
-		 
-		 
 	}
 	
 	$("#prof-edit-social-link :input").css("pointer-events", "default");
