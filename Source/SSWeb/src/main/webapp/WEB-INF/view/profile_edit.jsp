@@ -99,8 +99,6 @@
 <c:if test="${not empty isRealTechOrSSAdmin}">
 	<c:set value="${isRealTechOrSSAdmin}" var="isRealTechOrSSAdmin"></c:set>
 </c:if>
-<!-- highest role -->
-<c:set var="highestrole" value="${highestrole}"></c:set>
 
 <div id="disconnect-overlay-main" class="overlay-main hide">
 		<div id="disconnect-overlay-pop-up" class="overlay-disable-wrapper">
