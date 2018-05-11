@@ -583,7 +583,10 @@
 var hiddenSection="${profileSettings.hiddenSection}";
 $(document).ready(function() {
 	$(document).attr("title", "Profile Settings");
-	if(("${isRealTechOrSSAdmin}" == false || "${isRealTechOrSSAdmin}" == "false" )&& parseInt("${profilemasterid}") == 4 && ( "${isAgentProfileDisabled}" == true || "${isAgentProfileDisabled}" == "true")){
+	var checkIfAdmin = ${not empty companyAdminSwitchId } || ${not empty regionAdminSwitchId } || ${not empty branchAdminSwitchId };
+	console.log(checkIfAdmin);
+	if(("${isRealTechOrSSAdmin}" == false || "${isRealTechOrSSAdmin}" == "false" )&& parseInt("${profilemasterid}") == 4 && ( "${isAgentProfileDisabled}" == true || "${isAgentProfileDisabled}" == "true")
+			&&  (checkIfAdmin == false || checkIfAdmin == "false" )){
 		 $("#divReadOnlyFields :input").css("pointer-events", "none");
 		 $("#divReadOnlyFields").find('textarea').css("pointer-events", "none");
 		 $("#prof-address-container").css("pointer-events", "none");
@@ -591,8 +594,6 @@ $(document).ready(function() {
 		 $("#prof-img-edit-cont").hide();
 		 $("#intro-body-text").css("pointer-events", "none");
 		 $("#prof-whole-wrapper").css("pointer-events", "none");
-		 
-		 
 	}
 	
 	$("#prof-edit-social-link :input").css("pointer-events", "default");
