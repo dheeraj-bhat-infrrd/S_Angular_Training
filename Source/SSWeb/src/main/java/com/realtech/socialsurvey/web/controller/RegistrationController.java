@@ -14,7 +14,6 @@ import java.util.TimeZone;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -556,12 +555,11 @@ public class RegistrationController
 	// JIRA - SS-536: Added for manual registration via invite
 	@RequestMapping(value = "/invitetoregister")
 	public String initManualRegistration(@RequestParam("q") String encryptedUrlParams, HttpServletRequest request, Model model,
-			RedirectAttributes redirectAttributes, HttpServletRequest resquest ) {
+			RedirectAttributes redirectAttributes) {
 		LOG.info("Manual invitation for registration");
 		// decrypt the url
 		String creatorEmailId = null;
 		String emailId = null;
-		HttpSession session = request.getSession( false );
 
 		try {
 			Map<String, String> urlParams = urlGenerator.decryptParameters(encryptedUrlParams);
@@ -608,13 +606,6 @@ public class RegistrationController
 
 			redirectAttributes.addFlashAttribute("isDirectRegistration", false);
 			
-			// check if the session exists, if so, Logout current user
-			if( session != null ) {
-			    session.invalidate();
-			    SecurityContextHolder.clearContext();
-			}
-
-
 			// check if the email id exists.
 			if (userManagementService.userExists(emailId)) {
 				redirectAttributes.addFlashAttribute("message", "The Email address is already taken");
