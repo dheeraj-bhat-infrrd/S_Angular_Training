@@ -658,6 +658,11 @@ public class OverviewManagementImpl implements OverviewManagement
             digest.setNps( nps );
 
         }
+        
+        if( overview == null && surveyStats == null ) {
+            digest.setDigestRecordNull( true );
+        }
+        
         return digest;
     }
 
@@ -708,6 +713,11 @@ public class OverviewManagementImpl implements OverviewManagement
             digest.setNps( nps );
 
         }
+        
+        if( overview == null && surveyStats == null ) {
+            digest.setDigestRecordNull( true );
+        }
+        
         return digest;
     }
 
@@ -756,6 +766,11 @@ public class OverviewManagementImpl implements OverviewManagement
             digest.setNpsPromoters( surveyStats.getNpsPromoters() );
             digest.setNps( nps );
         }
+        
+        if( overview == null && surveyStats == null ) {
+            digest.setDigestRecordNull( true );
+        }
+        
         return digest;
     }
 }

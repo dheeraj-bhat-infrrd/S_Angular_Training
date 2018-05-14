@@ -64,6 +64,8 @@ public class ModelAndViewHandler
     private static final String PROFILE_URL = "pageUrl";
     
     private static final String COMPANY_NAME = "companyName";
+    
+    private static final String COMPANY_NAME_FOR_TITLE = "companyNameForTitle";
 
     @Autowired
     private BotRequestUtils botRequestUtils;
@@ -91,6 +93,7 @@ public class ModelAndViewHandler
         model.addAttribute( COMPANY_PROFILE_NAME, profileAggregate.getCompanyProfileName() );
         model.addAttribute( PROFILE_URL, profileAggregate.getProfileUrl() );
         model.addAttribute( COMPANY_NAME, profileAggregate.getCompanyName() );
+        model.addAttribute( COMPANY_NAME_FOR_TITLE, profileAggregate.getCompanyName() );
 
         if ( CommonConstants.PROFILE_LEVEL_REGION.equals( profileAggregate.getProfileLevel() ) ) {
             model.addAttribute( REGION_PROFILE_NAME, profileAggregate.getProfileName() );
