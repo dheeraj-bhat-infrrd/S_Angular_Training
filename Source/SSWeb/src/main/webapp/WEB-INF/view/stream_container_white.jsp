@@ -9,8 +9,8 @@
 			<input type="hidden" class="post-id-details" data-post-id=>
 			<img src="${initParam.resourcesPath}/resources/images/check-no.png" class="stream-unchecked float-left stream-checkbox soc-mon-post-checkbox">
 			<img src="${initParam.resourcesPath}/resources/images/check-yes.png" class="stream-checked hide float-left stream-checkbox soc-mon-post-checkbox">
-			<img src="${initParam.resourcesPath}/resources/images/flag-gray.png" class="stream-unflagged-icn hide float-left soc-mon-post-icn">
-			<img src="${initParam.resourcesPath}/resources/images/flag-yellow.png" class="stream-flagged-icn hide float-left soc-mon-post-icn">
+			<img src="${initParam.resourcesPath}/resources/images/flag-gray.png" class="cursor-pointer stream-unflagged-icn hide float-left soc-mon-post-icn">
+			<img src="${initParam.resourcesPath}/resources/images/flag-yellow.png" class="cursor-pointer stream-flagged-icn hide float-left soc-mon-post-icn">
 			<img src="${initParam.resourcesPath}/resources/images/escalated-orange.png" class="stream-esc-icn hide float-left soc-mon-post-icn">
 			<img src="${initParam.resourcesPath}/resources/images/verified-green.png" class="stream-res-icn hide float-left soc-mon-post-icn">
 		</div>
