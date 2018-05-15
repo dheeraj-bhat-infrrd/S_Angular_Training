@@ -3470,6 +3470,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
 
         }
+        //update UserProfile if the user is a Social monitor admin
         List<UserProfile> userProfiles = socialMonitorUser.getUserProfiles();
         if ( isSocialMonitorAdmin ) {
             if ( userProfiles != null && !userProfiles.isEmpty() ) {
