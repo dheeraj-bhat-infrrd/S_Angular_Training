@@ -448,6 +448,8 @@ public class ProfileManagementController
                 
                 //chaeck if profile is disabled for agents
                 isAgentProfileDisabled = companyProfile.isAgentProfileDisabled();
+                if(!isAgentProfileDisabled)
+                    isAgentProfileDisabled = individualProfile.isAgentProfileDisabled();
 
                 try {
                     map = profileManagementService.getPrimaryHierarchyByEntity( CommonConstants.AGENT_ID_COLUMN,
