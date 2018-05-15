@@ -533,14 +533,15 @@ public interface OrganizationManagementService
 
     /**
      * Method to add a new user or assign existing user under a company/region or branch
-     * 
      * @param adminUser
      * @param selectedUserId
      * @param branchId
      * @param regionId
      * @param emailIdsArray
      * @param isAdmin
-     * @param holdSendingMail - true value will not send mail to the user till the record is verified.
+     * @param holdSendingMail
+     * @param sendMail
+     * @param isSocialMonitorAdmin
      * @return
      * @throws InvalidInputException
      * @throws NoRecordsFetchedException
@@ -548,7 +549,7 @@ public interface OrganizationManagementService
      * @throws UserAssignmentException
      */
     public Map<String, Object> addIndividual( User adminUser, long selectedUserId, long branchId, long regionId,
-        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail, boolean sendMail )
+        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail, boolean sendMail, boolean isSocialMonitorAdmin )
         throws InvalidInputException, NoRecordsFetchedException, SolrException, UserAssignmentException;
 
 

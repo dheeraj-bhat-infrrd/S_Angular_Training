@@ -276,6 +276,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     
     @Autowired
     private SocialMediaExceptionHandler socialMediaExceptionHandler;
+    
+    @Autowired
+    private GenericDao<ProfilesMaster, Integer> profilesMasterDao;
 
 
     /**
@@ -3400,7 +3403,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Override
     @Transactional
     public Map<String, Object> addIndividual( User adminUser, long selectedUserId, long branchId, long regionId,
-        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail, boolean sendMail )
+        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail, boolean sendMail, boolean isSocialMonitorAdmin  )
         throws InvalidInputException, NoRecordsFetchedException, SolrException, UserAssignmentException
     {
         LOG.debug( "Method addIndividual called for adminUser:" + adminUser + " branchId:" + branchId + " regionId:" + regionId
@@ -3408,12 +3411,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         List<User> assigneeUsers = null;
         Map<String, List<User>> userMap = new HashMap<String, List<User>>();
         Map<String, Object> map = new HashMap<String, Object>();
+        User socialMonitorUser = new User();
         if ( selectedUserId > 0l ) {
             LOG.debug( "Fetching user for selectedUserId " + selectedUserId );
             User assigneeUser = userDao.findById( User.class, selectedUserId );
             if ( assigneeUser == null ) {
                 throw new NoRecordsFetchedException( "No user found in db for selectedUserId:" + selectedUserId );
             }
+            socialMonitorUser = assigneeUser;
             assigneeUsers = new ArrayList<User>();
             assigneeUsers.add( assigneeUser );
         } else if ( emailIdsArray != null && emailIdsArray.length > 0 ) {
@@ -3464,6 +3469,37 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 }
             }
 
+        }
+        List<UserProfile> userProfiles = socialMonitorUser.getUserProfiles();
+        if ( isSocialMonitorAdmin ) {
+            if ( userProfiles != null && !userProfiles.isEmpty() ) {
+                for ( UserProfile profile : userProfiles ) {
+                    if ( ( profile.getUser().getUserId() == ( socialMonitorUser.getUserId() ) )
+                        && profile.getProfilesMaster() == profilesMasterDao.findById( ProfilesMaster.class,
+                            CommonConstants.PROFILES_MASTER_SM_ADMIN_PROFILE_ID )
+                        && profile.getStatus() == CommonConstants.STATUS_ACTIVE ) {
+                        throw new InvalidInputException(
+                            messageUtils.getDisplayMessage( DisplayMessageConstants.USER_ASSIGNMENT_ALREADY_EXISTS,
+                                DisplayMessageType.ERROR_MESSAGE ).getMessage() );
+                    }
+                }
+            }
+            UserProfile userProfile = new UserProfile();
+            userProfile.setProfilesMaster(
+                profilesMasterDao.findById( ProfilesMaster.class, CommonConstants.PROFILES_MASTER_SM_ADMIN_PROFILE_ID ) );
+            userProfile.setCompany( adminUser.getCompany() );
+            userProfile.setAgentId( socialMonitorUser.getUserId() );
+            userProfile.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
+            userProfile.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+            userProfile.setStatus( CommonConstants.STATUS_ACTIVE );
+            userProfile.setEmailId( socialMonitorUser.getEmailId() );
+            userProfile.setUser( socialMonitorUser );
+            userProfile.setCreatedBy( String.valueOf( adminUser.getUserId() ) );
+            userProfile.setModifiedBy( String.valueOf( adminUser.getUserId() ) );
+            userProfile.setIsPrimary( CommonConstants.IS_PRIMARY_FALSE );
+            userProfile.setProfileCompletionStage( CommonConstants.PROFILE_STAGES_COMPLETE );
+            userProfile.setIsProfileComplete( CommonConstants.STATUS_ACTIVE );
+            userProfileDao.save( userProfile );
         }
         LOG.debug( "Method addNewIndividual executed successfully" );
         if ( userMap != null ) {
