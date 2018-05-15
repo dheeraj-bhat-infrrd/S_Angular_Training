@@ -53,6 +53,7 @@ public interface CommonConstants
     public static final int PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID = 3;
     public static final int PROFILES_MASTER_AGENT_PROFILE_ID = 4;
     public static final int PROFILES_MASTER_SS_ADMIN_PROFILE_ID = 5;
+    public static final int PROFILES_MASTER_SM_ADMIN_PROFILE_ID = 6;
     public static final int PROFILES_MASTER_NO_PROFILE_ID = 10;
 
     /**
