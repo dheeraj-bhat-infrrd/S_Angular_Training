@@ -762,5 +762,23 @@ public class SocialFeedServiceImpl implements SocialFeedService
     }
 
 
+    /**
+     * method to fetch social feed having a given keyword
+     * @param keyword
+     * @param companyId
+     * @param startTime
+     * @param endTime
+     * @param pageSize
+     * @param skips
+     */
+    @Override public List<SocialResponseObject> getSocialFeed( String keyword, long companyId, long startTime, long endTime, int pageSize, int skips )
+        throws InvalidInputException
+    {
+        if( keyword.isEmpty() || companyId <= 0 || startTime <=0 || endTime <= 0 ){
+            throw new InvalidInputException( "specified input is invalid" );
+        }
+        return mongoSocialFeedDao.getSocialFeed(keyword, companyId, startTime, endTime, pageSize, skips);
+
+    }
 } 
 

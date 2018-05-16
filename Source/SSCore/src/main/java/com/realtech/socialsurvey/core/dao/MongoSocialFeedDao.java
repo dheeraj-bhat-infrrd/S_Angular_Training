@@ -47,7 +47,8 @@ public interface MongoSocialFeedDao
 	public long fetchLinkedinTokenCount(List<Long> ids, String collectioName);
 	
 	public long fetchInstagramTokenCount(List<Long> ids, String collectioName);
-	
+
+	List<SocialResponseObject> getSocialFeed( String keyword, long companyId, long startTime, long endTime, int pageSize, int skips );
 	
 	
 

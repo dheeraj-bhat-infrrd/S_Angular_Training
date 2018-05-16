@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.compute;
 
+import com.realtech.socialsurvey.compute.topology.bolts.GetSocialFeedReport;
 import org.apache.storm.Config;
 import org.apache.storm.generated.StormTopology;
 import org.apache.storm.topology.TopologyBuilder;
@@ -93,6 +94,10 @@ public class ReportsTopologyStarterHelper extends TopologyStarterHelper
 		// add the bolts
 		builder.setBolt("UpdateFileUploadStatusBolt", new UpdateFileUploadStatusBolt(), 1)
 				.shuffleGrouping("ReportGenerationSpout");
+
+		builder.setBolt( "GetSocialFeedReportDataBolt", new GetSocialFeedReport(), 1 )
+                .shuffleGrouping( "UpdateFileUploadStatusBolt" );
+
 		builder.setBolt("GetEmailReportDataBolt", new GetDataForEmailReport(), 1)
 				.shuffleGrouping("ReportGenerationSpout");
 		builder.setBolt("WriteReportToExcelBolt", new WriteReportToExcelBolt(), 1)
@@ -101,6 +106,9 @@ public class ReportsTopologyStarterHelper extends TopologyStarterHelper
 				.shuffleGrouping("WriteReportToExcelBolt");
 		builder.setBolt("FileUploadStatusAndFileNameUpdationBolt", new UpdateFileUploadStatusAndFileNameBolt(), 1)
 				.shuffleGrouping("UploadOnAmazonS3Bolt");
+
+
+
 		// Create the topology.
 		return builder.createTopology();
 	}

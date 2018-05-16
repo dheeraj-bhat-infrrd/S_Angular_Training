@@ -208,4 +208,14 @@ public class SSAPIOperations
         }
         return Optional.of( response.body() );
     }
+
+
+    public Optional<List<SocialResponseObject>> getDataForSocialMonitorReport( long companyId, String keyword, long startTime, long endTime, int pageSize,
+        int skips ) throws IOException
+    {
+        Call<List<SocialResponseObject>> requestCall =  RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationService().
+            getSocialFeedData(companyId, keyword, startTime, endTime, pageSize, skips, AUTH_HEADER);
+        Response<List<SocialResponseObject>> response = requestCall.execute();
+        return Optional.of( response.body() );
+    }
 }
