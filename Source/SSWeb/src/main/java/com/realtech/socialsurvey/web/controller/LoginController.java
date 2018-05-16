@@ -195,6 +195,7 @@ public class LoginController
         
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        String isAutoLogin = (String) session.getAttribute( CommonConstants.IS_AUTO_LOGIN );
 
         boolean hiddenSection = false;
         try {
@@ -210,7 +211,7 @@ public class LoginController
         if ( user.isSuperAdmin() ) {
             return JspResolver.ADMIN_LANDING;
         } else {
-            boolean enableTokenRefresh = false;
+            boolean enableTokenRefresh = true;
             boolean isTokenRefreshRequired = false;
             boolean isSocialMediaExpired = false;
             List<String> socialMediaListToRefresh = new ArrayList<>();
@@ -218,13 +219,15 @@ public class LoginController
                 Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
                 if ( adminUserid != null ) {
                     enableTokenRefresh = false;
-                } else if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
-                    enableTokenRefresh = organizationManagementService.getCompanySettings( user )
-                        .isAllowOverrideForSocialMedia();
-                } else {
-                    OrganizationUnitSettings companySettings = organizationManagementService
-                        .getCompanySettings( user.getCompany().getCompanyId() );
-                    enableTokenRefresh = companySettings.isAllowOverrideForSocialMedia();
+                } else if ( StringUtils.isNotEmpty( isAutoLogin )  ) {
+                    if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                        enableTokenRefresh = organizationManagementService.getCompanySettings( user )
+                            .isAllowOverrideForSocialMedia();
+                    } else {
+                        OrganizationUnitSettings companySettings = organizationManagementService
+                            .getCompanySettings( user.getCompany().getCompanyId() );
+                        enableTokenRefresh = companySettings.isAllowOverrideForSocialMedia();
+                    }
                 }
                 model.addAttribute( "enableTokenRefresh", enableTokenRefresh );
                 if ( enableTokenRefresh ) {
