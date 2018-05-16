@@ -192,7 +192,7 @@ public class LoginController
 
         HttpSession session = request.getSession( false );
         User user = sessionHelper.getCurrentUser();
-
+        
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
 
@@ -219,12 +219,12 @@ public class LoginController
                 if ( adminUserid != null ) {
                     enableTokenRefresh = false;
                 } else if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
-                    enableTokenRefresh = !organizationManagementService.getCompanySettings( user )
+                    enableTokenRefresh = organizationManagementService.getCompanySettings( user )
                         .isAllowOverrideForSocialMedia();
                 } else {
                     OrganizationUnitSettings companySettings = organizationManagementService
                         .getCompanySettings( user.getCompany().getCompanyId() );
-                    enableTokenRefresh = !companySettings.isAllowOverrideForSocialMedia();
+                    enableTokenRefresh = companySettings.isAllowOverrideForSocialMedia();
                 }
                 model.addAttribute( "enableTokenRefresh", enableTokenRefresh );
                 if ( enableTokenRefresh ) {
