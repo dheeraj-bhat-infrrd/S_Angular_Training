@@ -1,3 +1,4 @@
+
 //Functions to detect browser
 var is_chrome = navigator.userAgent.indexOf('Chrome') > -1;
 var is_explorer = navigator.userAgent.indexOf('MSIE') > -1;
@@ -4341,7 +4342,7 @@ function paintEditSection(data) {
 
 	bindSingleMultipleSelection();
 	bindAssignToSelectorClick();
-
+	
 	bindRegionSelectorEvents();
 
 	$("#btn-office-save").click(function(e) {
@@ -18256,9 +18257,17 @@ $(document).on('click','#bulk-edit-sub',function(e){
 	e.stopImmediatePropagation();
 	e.preventDefault();
 	
+	var text = $('#bulk-edit-txt-box').val();
+	if(text == '' || text == undefined || text == null){
+		$("#overlay-toast").html("Please enter some text for Mail/Private note.");
+		showToast();
+		
+		return;
+	}
+	
 	$('#bulk-actions-apply').find('.form-post-id').val($('#selected-post-ids').data('post-ids'));
 	$('#bulk-actions-apply').find('.form-flagged').val(false);
-	$('#bulk-actions-apply').find('.form-status').val('NONE');
+	$('#bulk-actions-apply').find('.form-status').val('SUBMIT');
 	$('#bulk-actions-apply').find('.form-macro-id').val('');
 	$('#bulk-actions-apply').find('.form-post-textbox').val( $('#bulk-edit-txt-box').val() );
 	
@@ -18341,6 +18350,67 @@ $(document).on('click','.stream-action-flag',function(e){
 	}, formId,disableEle);
 });
 
+$(document).on('click','.stream-unflagged-icn',function(e){
+	e.stopPropagation();
+	var postId = $(this).parent().find('.post-id-details').attr('data-post-id');
+	var formId = ('add-post-action-'+postId);
+	var disableEle = ('#stream-action-unflag-'+postId);
+	var textActionType = $('#action-form-cont'+postId).find('.form-text-act-type').val();
+	
+	$('#action-form-cont'+postId).find('.form-flagged').val(true);
+	$('#action-form-cont'+postId).find('.form-status').val('NEW');
+	
+	var url = './updatepostaction.do';
+	callAjaxFormSubmit(url, function(data) {
+		var map = $.parseJSON(data);
+		$("#overlay-toast").html(map.message);
+		showToast();
+		if (map.status == "success") {
+					
+			var text = $('#action-form-cont'+postId).find('.form-post-textbox').val();
+			
+			updatePostSuccess(postId,text,'NEW',true,textActionType,map);
+			
+			$('#action-form-cont'+postId).find('.form-post-textbox').val('');
+			$("#overlay-toast").html("Successfully Updated Post");
+			showToast();
+		} else {
+			$("#overlay-toast").html("Failed to update post. Please Try again");
+			showToast();
+		}
+	}, formId,disableEle);
+});
+
+$(document).on('click','.stream-flagged-icn',function(e){
+	e.stopPropagation();
+	var postId = $(this).parent().find('.post-id-details').attr('data-post-id');
+	var formId = ('add-post-action-'+postId);
+	var disableEle = ('#stream-action-flag-'+postId);
+	var textActionType = $('#action-form-cont'+postId).find('.form-text-act-type').val();
+	
+	$('#action-form-cont'+postId).find('.form-flagged').val(false);
+	$('#action-form-cont'+postId).find('.form-status').val('NEW');
+	
+	var url = './updatepostaction.do';
+	callAjaxFormSubmit(url, function(data) {
+		var map = $.parseJSON(data);
+		$("#overlay-toast").html(map.message);
+		showToast();
+		if (map.status == "success") {
+
+			var text = $('#action-form-cont'+postId).find('.form-post-textbox').val();			
+			
+			updatePostSuccess(postId,text,'NEW',false,textActionType,map);
+			
+			$('#action-form-cont'+postId).find('.form-post-textbox').val('');
+			$("#overlay-toast").html("Successfully Updated Post");
+			showToast();
+		} else {
+			$("#overlay-toast").html("Failed to update post. Please Try again");
+			showToast();
+		}
+	}, formId,disableEle);
+});
 
 $(document).on('click','.stream-action-esc',function(e){
 	e.stopPropagation();
@@ -18428,15 +18498,28 @@ $(document).on('click','.stream-action-submit',function(e){
 	$(this).attr('id','stream-action-submit-'+postId);
 	var formId = ('add-post-action-'+postId);
 	var disableEle = ('#stream-action-submit-'+postId);
-
+	
+	var text = $('#action-form-cont'+postId).find('.form-post-textbox').val();
+	if(text == '' || text == undefined || text == null){
+		$("#overlay-toast").html("Please enter some text for Mail/Private note.");
+		showToast();
+		
+		return;
+	}
+	
+	var currentFlag = $(this).closest('.action-form-cont').find('.form-flagged').val();
+	var currentStatus = $(this).closest('.action-form-cont').find('.form-status').val();
+	
+	$(this).closest('.action-form-cont').find('.form-flagged').val(false);
+	$(this).closest('.action-form-cont').find('.form-status').val('SUBMIT');
+	
 	var url = './updatepostaction.do';
 	callAjaxFormSubmit(url, function(data) {
 		var map = $.parseJSON(data);
 		$("#overlay-toast").html(map.message);
 		showToast();
 		if (map.status == "success") {
-			
-			var text = $('#action-form-cont'+postId).find('.form-post-textbox').val();
+						
 			if(text!='' && text != undefined && text!=null){
 				var actionHistoryMail = $('#action-history'+postId).html();
 				
@@ -18474,6 +18557,10 @@ $(document).on('click','.stream-action-submit',function(e){
 			$("#overlay-toast").html("Failed to update post. Please Try again");
 			showToast();
 		}
+		
+		$(this).closest('.action-form-cont').find('.form-flagged').val(currentFlag);
+		$(this).closest('.action-form-cont').find('.form-status').val(currentStatus);
+		
 	}, formId,disableEle);
 });
 
@@ -19828,6 +19915,17 @@ $(document).on('click','.dup-stream-action-submit',function(e){
 	var formId = 'dup-post-add-post-action';
 	var disableEle = '.dup-stream-action-submit';
 
+	var text = $('#dup-post-action-form-cont').find('.form-post-textbox').val();
+	if(text == '' || text == undefined || text == null){
+		$("#overlay-toast").html("Please enter some text for Mail/Private note.");
+		showToast();
+		
+		return;
+	}
+	
+	$(this).closest('.action-form-cont').find('.form-flagged').val(false);
+	$(this).closest('.action-form-cont').find('.form-status').val('SUBMIT');
+	
 	var url = './updatepostaction.do';
 	callAjaxFormSubmit(url, function(data) {
 		var map = $.parseJSON(data);
@@ -19835,7 +19933,6 @@ $(document).on('click','.dup-stream-action-submit',function(e){
 		showToast();
 		if (map.status == "success") {
 			
-			var text = $('#dup-post-action-form-cont').find('.form-post-textbox').val();
 			if(text!='' && text != undefined && text!=null){
 				var actionHistoryMail = $('#action-history'+postId).html();
 				

@@ -9,10 +9,12 @@ public class ActionHistory implements Serializable
 {
 
     private static final long serialVersionUID = 1L;
+    private String actionHistoryId;
     private long createdDate;
     private String ownerName;
     private String text;
     private ActionHistoryType actionType;
+    private boolean isStatusChange;
 
 
     public String getOwnerName()
@@ -63,11 +65,35 @@ public class ActionHistory implements Serializable
     }
 
 
+    public String getActionHistoryId()
+    {
+        return actionHistoryId;
+    }
+
+
+    public void setActionHistoryId( String actionHistoryId )
+    {
+        this.actionHistoryId = actionHistoryId;
+    }
+
+
+    public boolean isStatusChange()
+    {
+        return isStatusChange;
+    }
+
+
+    public void setStatusChange( boolean isStatusChange )
+    {
+        this.isStatusChange = isStatusChange;
+    }
+
+
     @Override
     public String toString()
     {
-        return "ActionHistory [createdDate=" + createdDate + ", ownerName=" + ownerName + ", text=" + text + ", actionType="
-            + actionType + "]";
+        return "ActionHistory [actionHistoryId=" + actionHistoryId + ", createdDate=" + createdDate + ", ownerName=" + ownerName
+            + ", text=" + text + ", actionType=" + actionType + ", isStatusChange=" + isStatusChange + "]";
     }
 
 

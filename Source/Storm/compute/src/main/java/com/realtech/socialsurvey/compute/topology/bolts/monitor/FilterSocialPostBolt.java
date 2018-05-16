@@ -96,9 +96,11 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
     private ActionHistory getFlaggedActionHistory( List<String> foundKeyWords )
     {
         ActionHistory actionHistory = new ActionHistory();
+        actionHistory.setActionHistoryId( UUID.randomUUID().toString() );
         actionHistory.setCreatedDate( new Date().getTime() );
         actionHistory.setActionType( ActionHistoryType.FLAGGED );
         actionHistory.setText( "The post was <b class='soc-mon-bold-text'>Flagged</b> for matching <b class='soc-mon-bold-text'>" + String.join( ",", foundKeyWords )  + "</b>");
+        actionHistory.setStatusChange( true );
         return actionHistory;
     }
 
