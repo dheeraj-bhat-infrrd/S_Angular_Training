@@ -169,6 +169,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
                 socialMonitorFeedData.setFoundKeywords( socialResponseObject.getFoundKeywords() );
                 socialMonitorFeedData.setDuplicateCount( socialResponseObject.getDuplicateCount() );
                 socialMonitorFeedData.setPageLink( socialResponseObject.getPageLink() );
+                socialMonitorFeedData.setPostLink( socialResponseObject.getPostLink() );
                 
                 if(StringUtils.isNotEmpty( socialResponseObject.getTextHighlighted() )){
                     socialMonitorFeedData.setTextHighlighted( socialResponseObject.getTextHighlighted() );

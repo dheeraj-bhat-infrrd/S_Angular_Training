@@ -2,39 +2,47 @@ package com.realtech.socialsurvey.compute.entities.response;
 
 import java.io.Serializable;
 
+import com.google.gson.annotations.SerializedName;
+
 public class InstagramMediaData implements Serializable{
 
     private static final long serialVersionUID = 1L;
 
-    private String ig_id;
+    @SerializedName ( "ig_id")
+    private String igId;
 
     private long timestamp;
 
-    private String media_url;
+    @SerializedName ( "media_url")
+    private String mediaUrl;
 
-    private String media_type;
+    @SerializedName ( "media_type")
+    private String mediaType;
 
     private String caption;
 
     private String id;
 
     private String username;
+    
+    @SerializedName ( "permalink")
+    private String postLink;
 
-    public String getIgId() { return this.ig_id; }
+    public String getIgId() { return this.igId; }
 
-    public void setIgId(String ig_id) { this.ig_id = ig_id; }
+    public void setIgId(String igId) { this.igId = igId; }
 
     public long getTimestamp() { return this.timestamp; }
 
     public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
 
-    public String getMediaUrl() { return this.media_url; }
+    public String getMediaUrl() { return this.mediaUrl; }
 
-    public void setMediaUrl(String media_url) { this.media_url = media_url; }
+    public void setMediaUrl(String mediaUrl) { this.mediaUrl = mediaUrl; }
 
-    public String getMediaType() { return this.media_type; }
+    public String getMediaType() { return this.mediaType; }
 
-    public void setMediaType(String media_type) { this.media_type = media_type; }
+    public void setMediaType(String mediaType) { this.mediaType = mediaType; }
 
     public String getCaption() {
         return caption;
@@ -61,10 +69,20 @@ public class InstagramMediaData implements Serializable{
     }
 
 
-    @Override public String toString()
+    public String getPostLink()
     {
-        return "InstagramMediaData{" + "ig_id='" + ig_id + '\'' + ", timestamp=" + timestamp + ", media_url='" + media_url
-            + '\'' + ", media_type='" + media_type + '\'' + ", caption='" + caption + '\'' + ", id='" + id + '\''
-            + ", username='" + username + '\'' + '}';
+        return postLink;
+    }
+
+    public void setPostLink( String postLink )
+    {
+        this.postLink = postLink;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "InstagramMediaData [igId=" + igId + ", timestamp=" + timestamp + ", mediaUrl=" + mediaUrl + ", mediaType="
+            + mediaType + ", caption=" + caption + ", id=" + id + ", username=" + username + ", postLink=" + postLink + "]";
     }
 }

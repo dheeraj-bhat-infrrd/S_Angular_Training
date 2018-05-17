@@ -29,6 +29,7 @@ public class SocialMonitorFeedData implements Serializable {
 	private List<String> foundKeywords;
 	private long duplicateCount;
     private String pageLink;
+    private String postLink;
     private String textHighlighted;
 
 	public String getPageLink()
@@ -180,6 +181,16 @@ public class SocialMonitorFeedData implements Serializable {
     }
 
 
+    public String getPostLink()
+    {
+        return postLink;
+    }
+
+    public void setPostLink( String postLink )
+    {
+        this.postLink = postLink;
+    }
+
     @Override
     public String toString()
     {
@@ -187,7 +198,8 @@ public class SocialMonitorFeedData implements Serializable {
             + branchId + ", agentId=" + agentId + ", text=" + text + ", pictures=" + pictures + ", updatedOn=" + updatedOn
             + ", ownerName=" + ownerName + ", ownerProfileImage=" + ownerProfileImage + ", flagged=" + flagged + ", type="
             + type + ", status=" + status + ", actionHistory=" + actionHistory + ", foundKeywords=" + foundKeywords
-            + ", duplicateCount=" + duplicateCount + ", pageLink=" + pageLink + ", textHighlighted=" + textHighlighted + "]";
+            + ", duplicateCount=" + duplicateCount + ", pageLink=" + pageLink + ", postLink=" + postLink + ", textHighlighted="
+            + textHighlighted + "]";
     }
 
     
