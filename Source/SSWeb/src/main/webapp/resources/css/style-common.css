@@ -11025,6 +11025,7 @@ img.lead-img {
     height: 30px;
     position: relative;
     float: right;
+    right: 15px;
 }
 
 .register-summit-btn{
