@@ -234,7 +234,6 @@ public class SocialFeedServiceImpl implements SocialFeedService
             .getSocialPostsByIds( socialFeedsActionUpdate.getPostIds(), companyId, MongoSocialFeedDaoImpl.SOCIAL_FEED_COLLECTION );
         for ( SocialResponseObject socialResponseObject : socialResponseObjectsToAdd ) {
             List<ActionHistory> actionHistories = new ArrayList<>();
-            String actionHistoryId = UUID.randomUUID().toString();
             updateFlag = 0;
             String previousStatus = null;
             String currentStatus = null;
@@ -253,12 +252,10 @@ public class SocialFeedServiceImpl implements SocialFeedService
                         if ( macroFlag ) {
                             macroActionFlag = 2;
                         }
-                        actionHistory.setActionHistoryId( actionHistoryId );
                         actionHistory.setActionType( ActionHistoryType.FLAGGED );
                         actionHistory.setText( "Post was <b class='soc-mon-bold-text'>Flagged</b> manually by " + "<b class='soc-mon-bold-text'>" + socialFeedsActionUpdate.getUserName() + "</b>" );
                         actionHistory.setOwnerName( socialFeedsActionUpdate.getUserName() );
                         actionHistory.setCreatedDate( new Date().getTime() );
-                        actionHistory.setStatusChange( true );
                         actionHistories.add( actionHistory );
                         socialResponseObject.setUpdatedTime( new Date().getTime() );
                         previousStatus = UNFLAGGED;
@@ -270,12 +267,10 @@ public class SocialFeedServiceImpl implements SocialFeedService
                         if ( macroFlag ) {
                             macroActionFlag = 2;
                         }
-                        actionHistory.setActionHistoryId( actionHistoryId );
                         actionHistory.setActionType( ActionHistoryType.UNFLAGGED );
                         actionHistory.setText( "Post was <b class='soc-mon-bold-text'>Unflagged</b> by " + "<b class='soc-mon-bold-text'>" + socialFeedsActionUpdate.getUserName() + "</b>" );
                         actionHistory.setOwnerName( socialFeedsActionUpdate.getUserName() );
                         actionHistory.setCreatedDate( new Date().getTime() );
-                        actionHistory.setStatusChange( true );
                         actionHistories.add( actionHistory );
                         socialResponseObject.setUpdatedTime( new Date().getTime() );
                         previousStatus = FLAGGED;
@@ -293,12 +288,10 @@ public class SocialFeedServiceImpl implements SocialFeedService
                         if ( macroFlag ) {
                             macroActionFlag = 3;
                         }
-                        actionHistory.setActionHistoryId( actionHistoryId );
                         actionHistory.setActionType( ActionHistoryType.ESCALATE );
                         actionHistory.setText( "Post was <b class='soc-mon-bold-text'>Escalated</b> by " + "<b class='soc-mon-bold-text'>" + socialFeedsActionUpdate.getUserName() + "</b>");
                         actionHistory.setOwnerName( socialFeedsActionUpdate.getUserName() );
                         actionHistory.setCreatedDate( new Date().getTime() );
-                        actionHistory.setStatusChange( true );
                         actionHistories.add( actionHistory );
                         socialResponseObject.setUpdatedTime( new Date().getTime() );
                         if(socialResponseObject.isFlagged()) {
@@ -317,12 +310,10 @@ public class SocialFeedServiceImpl implements SocialFeedService
                         if ( macroFlag ) {
                             macroActionFlag = 3;
                         }
-                        actionHistory.setActionHistoryId( actionHistoryId );
                         actionHistory.setActionType( ActionHistoryType.RESOLVED );
                         actionHistory.setText( "Post was <b class='soc-mon-bold-text'>Resolved</b> by " + "<b class='soc-mon-bold-text'>" + socialFeedsActionUpdate.getUserName() + "</b>" );
                         actionHistory.setOwnerName( socialFeedsActionUpdate.getUserName() );
                         actionHistory.setCreatedDate( new Date().getTime() );
-                        actionHistory.setStatusChange( true );
                         actionHistories.add( actionHistory );
                         socialResponseObject.setUpdatedTime( new Date().getTime() );
                         previousStatus = SocialFeedStatus.ESCALATED.toString().toLowerCase();
@@ -336,34 +327,20 @@ public class SocialFeedServiceImpl implements SocialFeedService
                     .equalsIgnoreCase( TextActionType.PRIVATE_NOTE.toString() ) )
                     && ( socialFeedsActionUpdate.getText() != null ) && !( socialFeedsActionUpdate.getText().isEmpty() ) ) {
                     ActionHistory actionHistory = new ActionHistory();
-                    actionHistory.setActionHistoryId( actionHistoryId );
                     actionHistory.setActionType( ActionHistoryType.PRIVATE_MESSAGE );
                     actionHistory.setText( socialFeedsActionUpdate.getText() );
                     actionHistory.setOwnerName( socialFeedsActionUpdate.getUserName() );
                     actionHistory.setCreatedDate( new Date().getTime() );
-                    if ( socialFeedsActionUpdate.getStatus().toString()
-                        .equalsIgnoreCase( SocialFeedStatus.SUBMIT.toString() ) ) {
-                        actionHistory.setStatusChange( false );
-                    } else {
-                        actionHistory.setStatusChange( true );
-                    }
                     actionHistories.add( actionHistory );
                 }
                 if ( ( socialFeedsActionUpdate.getTextActionType().toString()
                     .equalsIgnoreCase( TextActionType.SEND_EMAIL.toString() ) ) && ( socialFeedsActionUpdate.getText() != null )
                     && !( socialFeedsActionUpdate.getText().isEmpty() ) ) {
                     ActionHistory actionHistory = new ActionHistory();
-                    actionHistory.setActionHistoryId( actionHistoryId );
                     actionHistory.setActionType( ActionHistoryType.EMAIL );
                     actionHistory.setText( socialFeedsActionUpdate.getText() );
                     actionHistory.setOwnerName( socialFeedsActionUpdate.getUserName() );
                     actionHistory.setCreatedDate( new Date().getTime() );
-                    if ( socialFeedsActionUpdate.getStatus().toString()
-                        .equalsIgnoreCase( SocialFeedStatus.SUBMIT.toString() ) ) {
-                        actionHistory.setStatusChange( false );
-                    } else {
-                        actionHistory.setStatusChange( true );
-                    }
                     actionHistories.add( actionHistory );
                     // send mail to the user
                     try {
