@@ -4,6 +4,9 @@ import com.realtech.socialsurvey.compute.common.SSAPIOperations;
 import com.realtech.socialsurvey.compute.entities.ReportRequest;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.enums.ReportStatus;
+import com.realtech.socialsurvey.compute.exception.APIIntegrationException;
+import com.realtech.socialsurvey.compute.services.FailedMessagesService;
+import com.realtech.socialsurvey.compute.services.impl.FailedMessagesServiceImpl;
 import com.realtech.socialsurvey.compute.topology.bolts.emailreports.GetDataForEmailReport;
 import com.realtech.socialsurvey.compute.utils.ConversionUtils;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -52,15 +55,23 @@ public class GetSocialFeedReport extends BaseComputeBoltWithAck {
                 } else if ( response.isPresent() && !response.get().isEmpty() ) {
                     status = ReportStatus.PROCESSING.getValue();
                 } else if ( pageNum > 1 && ( !response.isPresent() || response.get().isEmpty() ) )
-                    status = ReportStatus.PROCESSING.getValue();
+                    status = ReportStatus.PROCESSED.getValue();
                 success = true;
-                LOG.info( "Emitting tuple with success = {},  fileUploadId = {}, status = {} ", success, fileUploadId, status );
-                _collector.emit( input, Arrays.asList( success, response.get(), fileUploadId, status, reportRequest ) );
+                LOG.info( "Emitting tuple with success = {},  fileUploadId = {}, status = {}, companyId = {}, enterAt = {}  ",
+                    success, fileUploadId, status, companyId, pageNum-1 );
+                _collector.emit( input, Arrays.asList( success, response.get(), fileUploadId, status, reportRequest, companyId, pageNum-1 ) );
                 pageNum ++;
             }while ( response != null && response.isPresent() );
 
-        } catch ( IOException e ) {
-            e.printStackTrace();
+        } catch ( APIIntegrationException | IllegalArgumentException | IOException e ) {
+            success = true;
+            LOG.error( "Exception occurred while fetching socialfeed data  ", e );
+            FailedMessagesService failedMessagesService = new FailedMessagesServiceImpl();
+            failedMessagesService.insertTemporaryFailedReportRequest( reportRequest );
+            LOG.info("Emitting tuple with success = {}, fileUploadId = {}, processingCompleted = {}",
+                success, fileUploadId, ReportStatus.FAILED.getValue() );
+            _collector.emit( input, Arrays.asList( success, response, fileUploadId, ReportStatus.FAILED.getValue(),
+                reportRequest ) );
         }
     }
 
@@ -73,6 +84,6 @@ public class GetSocialFeedReport extends BaseComputeBoltWithAck {
 
     @Override public void declareOutputFields( OutputFieldsDeclarer outputFieldsDeclarer )
     {
-        outputFieldsDeclarer.declare( new Fields( "isSuccess", "surveyMailList", "fileUploadId", "status", "reportRequest" ) );
+        outputFieldsDeclarer.declare( new Fields( "isSuccess", "socialFeed", "fileUploadId", "status", "reportRequest", "companyId", "enterAt" ) );
     }
 }
