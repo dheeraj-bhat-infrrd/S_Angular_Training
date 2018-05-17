@@ -9540,6 +9540,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         return false;
     }
     
+    //updating all agents of a particular company
     @Override
     public boolean updateEntitySettings( String entityType, long entityId, String flagToBeUpdated, String status )
     {
@@ -9606,6 +9607,21 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden( MongoOrganizationUnitSettingDaoImpl.KEY_AGENT_PROFILE_DISABLED,
             isAgentProfileDisabled, companyId,MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION  );
         
+    }
+    
+    //use this function updateKeyOrganizationUnitSettingsByInCriteria
+    //updating a list of agents to not be able to edit their profile
+    @Override
+    public void updateAgentsProfileDisable(List<Long> agentIds , boolean isAgentProfileDisabled) throws InvalidInputException {
+        LOG.info( "disabling editing for agent profile page's for agentId's:{}",agentIds );
+        if ( agentIds == null ) {
+            throw new InvalidInputException( "User ids cannot be null." );
+        }
+
+        List<Object> userIdList = new ArrayList<>();
+        userIdList.addAll( agentIds );
+        organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByInCriteria( MongoOrganizationUnitSettingDaoImpl.KEY_AGENT_PROFILE_DISABLED,
+            isAgentProfileDisabled, MongoOrganizationUnitSettingDaoImpl.KEY_IDEN,userIdList,MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION  );
     }
 }
 
