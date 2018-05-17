@@ -16,7 +16,9 @@ public class RedisKeyConstants
 
     public static final String MODIFIEDON = "modifiedOn";
     public static final String KEYWORDS = "keywords";
+    public static final String TRUSTED_SOURCES = "truestedSources";
     public static final String COMPANYKEYWORDS_KEY_PREFIX = "companykeywords:";
+    public static final String COMPANY_TRUSTED_SOURCES_KEY_PREFIX = "companytrustedsources:";
 
     public static final String PREVIOUS = "previous";
     public static final String CURRENT = "current";

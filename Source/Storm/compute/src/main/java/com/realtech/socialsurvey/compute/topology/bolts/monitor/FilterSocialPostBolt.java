@@ -1,8 +1,11 @@
 package com.realtech.socialsurvey.compute.topology.bolts.monitor;
 
 import com.realtech.socialsurvey.compute.dao.RedisCompanyKeywordsDao;
+import com.realtech.socialsurvey.compute.dao.RedisTrustedSourcesDao;
 import com.realtech.socialsurvey.compute.dao.impl.RedisCompanyKeywordsDaoImpl;
+import com.realtech.socialsurvey.compute.dao.impl.RedisTrustedSourcesDaoImpl;
 import com.realtech.socialsurvey.compute.entities.Keyword;
+import com.realtech.socialsurvey.compute.entities.SocialMonitorTrustedSource;
 import com.realtech.socialsurvey.compute.entities.SocialResponseType;
 import com.realtech.socialsurvey.compute.entities.TrieNode;
 import com.realtech.socialsurvey.compute.entities.response.ActionHistory;
@@ -40,6 +43,8 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
     private Map<Long, TrieNode> companyTrie = new HashMap<>();
 
     private  RedisCompanyKeywordsDao redisCompanyKeywordsDao = new RedisCompanyKeywordsDaoImpl();
+    
+    private  RedisTrustedSourcesDao redisTrustedSourcesDao = new RedisTrustedSourcesDaoImpl();
 
 
     @Override
@@ -51,21 +56,27 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
         long companyId = input.getLongByField( "companyId" );
         String postId = null;
         if ( post != null ) {
-            post.setStatus( SocialFeedStatus.NEW );
-            post.setActionHistory( new ArrayList<>() );
-            if ( post.getText() != null ) {
-                String text = post.getText();
-                postId = post.getPostId();
-                List<String> foundKeyWords;
-                TrieNode root = getTrieForCompany( companyId );
-                foundKeyWords = findPhrases( root, text );
-                if ( !foundKeyWords.isEmpty() ) {
-                    post.setFoundKeywords( foundKeyWords );
-                    post.setFlagged( Boolean.TRUE );
-                    post.getActionHistory().add( getFlaggedActionHistory( foundKeyWords ) );
-                    addTextHighlight(post);
-                }
-            }
+        		//check if post from trusted source
+        		if(isPostFromTrustedSource(post , companyId)){
+        			post.setStatus( SocialFeedStatus.RESOLVED );
+        		}else {
+        			post.setStatus( SocialFeedStatus.NEW );
+                    post.setActionHistory( new ArrayList<>() );
+                    if ( post.getText() != null ) {
+                        String text = post.getText();
+                        postId = post.getPostId();
+                        List<String> foundKeyWords;
+                        TrieNode root = getTrieForCompany( companyId );
+                        foundKeyWords = findPhrases( root, text );
+                        if ( !foundKeyWords.isEmpty() ) {
+                            post.setFoundKeywords( foundKeyWords );
+                            post.setFlagged( Boolean.TRUE );
+                            post.getActionHistory().add( getFlaggedActionHistory( foundKeyWords ) );
+                            addTextHighlight(post);
+                        }
+                    }
+        		}    	
+            
         }
         LOG.debug( "Emitting tuple with post having postId = {}",  postId);
         _collector.emit( input, Arrays.asList( companyId, post, socialResponseType ) );
@@ -248,4 +259,19 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
         return foundPhrases;
     }
 
+    private boolean isPostFromTrustedSource(SocialResponseObject<?> post , long companyId) 
+    {
+    		String postSource = post.getPostSource();
+    		if( StringUtils.isNotEmpty( postSource ) ) {
+        		List<SocialMonitorTrustedSource> trustedSources = redisTrustedSourcesDao.getCompanyTruestedSourcesForCompanyId(companyId);
+    			for( SocialMonitorTrustedSource trustedSource : trustedSources) {
+    				if(StringUtils.equalsIgnoreCase(postSource, trustedSource.getSource()) && trustedSource.getStatus() == 1 ) {
+    					return true;
+    				}
+    			}
+    		}
+    		
+    		return false;
+    }
+    
 }

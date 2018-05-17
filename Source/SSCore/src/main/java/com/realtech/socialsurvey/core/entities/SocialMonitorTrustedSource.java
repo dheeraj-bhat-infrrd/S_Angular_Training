@@ -1,4 +1,4 @@
-package com.realtech.socialsurvey.compute.entities;
+package com.realtech.socialsurvey.core.entities;
 
 import java.io.Serializable;
 

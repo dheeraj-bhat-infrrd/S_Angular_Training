@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.dao.RedisDao;
 import com.realtech.socialsurvey.core.entities.Keyword;
+import com.realtech.socialsurvey.core.entities.SocialMonitorTrustedSource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -34,6 +36,7 @@ public class RedisDaoImpl implements RedisDao, InitializingBean {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( RedisDaoImpl.class );
     private static final String COMPANYKEYWORDS_KEY_PREFIX = "companykeywords:";
+    private static final String COMPANY_TRUSTED_SOURCE_KEY_PREFIX = "companytrustedsources:";
     private static final String TWITTER_LOCK = "twitterLock";
     private static final String FACEBOOK_LOCK = "facebookLock";
     private static final String SOCIAL_MONITOR_COMPANYIDS = "socialMonitorEnabledCompanyIds";
@@ -77,7 +80,8 @@ public class RedisDaoImpl implements RedisDao, InitializingBean {
     }
     
 
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public void updateCompanyIdsForSM( long companyId, boolean isSocialMonitorEnabled )
     {
         LOGGER.info( "Trying to update SocialMonitor enabled companyIds to redis ", companyId );
@@ -104,6 +108,16 @@ public class RedisDaoImpl implements RedisDao, InitializingBean {
             }
         }
 
+    }
+    
+    @SuppressWarnings("unchecked")
+	@Override
+    public void addTruestedSources(long companyId, List<SocialMonitorTrustedSource> truestedSources) {
+        LOGGER.info("Trying to add truestedSources {} for comapnyId {} to redis ", truestedSources, companyId);
+        Map<String, Object> map = new HashMap<>();
+        map.put("truestedSources", new Gson().toJson(truestedSources));
+        map.put("modifiedOn", String.valueOf(System.currentTimeMillis()));
+        hashOps.putAll(COMPANY_TRUSTED_SOURCE_KEY_PREFIX + companyId, map);
     }
     
     @Override

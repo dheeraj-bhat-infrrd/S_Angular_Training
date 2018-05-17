@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -161,6 +162,9 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt implements Serial
         responseWrapper.setOwnerName( mediaToken.getContactDetails().getName() );
         responseWrapper.setOwnerEmail( mediaToken.getContactDetails().getMailDetails().getEmailId() );
 
+        if(facebookFeedData.getApplication() != null && StringUtils.isNotEmpty(facebookFeedData.getApplication().getName()))
+        		responseWrapper.setPostSource(facebookFeedData.getApplication().getName());
+        
         if ( facebookFeedData.getUpdatedTime() > 0 ) {
             responseWrapper.setUpdatedTime( facebookFeedData.getUpdatedTime() * 1000 );
         }

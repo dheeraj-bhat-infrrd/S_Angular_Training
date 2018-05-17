@@ -26,7 +26,6 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
 
-import com.realtech.socialsurvey.core.dao.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.solr.client.solrj.util.ClientUtils;
@@ -51,7 +50,22 @@ import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.FilterKeywordsComparator;
 import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
+import com.realtech.socialsurvey.core.commons.TrustedSourceComparator;
 import com.realtech.socialsurvey.core.commons.Utils;
+import com.realtech.socialsurvey.core.dao.BranchDao;
+import com.realtech.socialsurvey.core.dao.CompanyDao;
+import com.realtech.socialsurvey.core.dao.DisabledAccountDao;
+import com.realtech.socialsurvey.core.dao.GenericDao;
+import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.dao.RedisDao;
+import com.realtech.socialsurvey.core.dao.RegionDao;
+import com.realtech.socialsurvey.core.dao.RemovedUserDao;
+import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
+import com.realtech.socialsurvey.core.dao.UserDao;
+import com.realtech.socialsurvey.core.dao.UserInviteDao;
+import com.realtech.socialsurvey.core.dao.UserProfileDao;
+import com.realtech.socialsurvey.core.dao.UsercountModificationNotificationDao;
+import com.realtech.socialsurvey.core.dao.ZillowHierarchyDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AbusiveMailSettings;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
@@ -72,7 +86,6 @@ import com.realtech.socialsurvey.core.entities.EncompassSdkVersion;
 import com.realtech.socialsurvey.core.entities.Event;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
-import com.realtech.socialsurvey.core.entities.FeedIngestionEntityForSM;
 import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.FilterKeywordsResponse;
 import com.realtech.socialsurvey.core.entities.HierarchySettingsCompare;
@@ -97,6 +110,7 @@ import com.realtech.socialsurvey.core.entities.RetriedTransaction;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokensPaginated;
+import com.realtech.socialsurvey.core.entities.SocialMonitorTrustedSource;
 import com.realtech.socialsurvey.core.entities.StateLookup;
 import com.realtech.socialsurvey.core.entities.SurveyCompanyMapping;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
@@ -9846,4 +9860,66 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
         return false;
     }
+    
+    @Override
+    public List<SocialMonitorTrustedSource> addTrustedSourceToCompany( long companyId , String trustedSource ) throws InvalidInputException
+	{
+		LOG.debug("Get company settings for the companyId: {}", companyId);
+		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
+				companyId, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+
+		if(StringUtils.isEmpty(trustedSource)) {
+			throw new InvalidInputException("Invalid parameter passed. trustedSource can't be empty ");
+		}
+		if(companySettings == null) {
+			throw new InvalidInputException("Invalid companyId passed. No company setting found for given companyId ");
+		}
+		
+		//get existing  trusted sources for company
+		List<SocialMonitorTrustedSource> companyTrustedSources = companySettings.getSocialMonitorTrustedSources();
+		if (companyTrustedSources == null || companyTrustedSources.isEmpty())
+			companyTrustedSources = new ArrayList<SocialMonitorTrustedSource>();
+
+		//check if trusted source is already present
+		boolean isAleadyExist = false;
+		for (SocialMonitorTrustedSource currentTrustedSource : companyTrustedSources) {
+			if (currentTrustedSource.getSource().equalsIgnoreCase(trustedSource.trim())
+					&& currentTrustedSource.getStatus() == CommonConstants.STATUS_ACTIVE) {
+				LOG.warn("duplicate entry");
+				isAleadyExist = true;
+				break;
+			}
+		}
+		
+		// create new trusted source entity
+		if ( ! isAleadyExist) {
+			LOG.info("Adding new socialMonitorTrustedSource");
+			SocialMonitorTrustedSource socialMonitorTrustedSource = new SocialMonitorTrustedSource();
+			socialMonitorTrustedSource.setCreatedOn(new Date().getTime());
+			socialMonitorTrustedSource.setModifiedOn(new Date().getTime());
+			socialMonitorTrustedSource.setSource(trustedSource.trim());
+			socialMonitorTrustedSource.setId(UUID.randomUUID().toString());
+			socialMonitorTrustedSource.setStatus(CommonConstants.STATUS_ACTIVE);
+			companyTrustedSources.add(socialMonitorTrustedSource);
+		}
+
+		// save updated companyTrustedSources in mongo settings
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+				MongoOrganizationUnitSettingDaoImpl.KEY_TRUSTED_SOURCES, companyTrustedSources, companySettings,
+				MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+
+		//create truested sources to save in redis
+		List<SocialMonitorTrustedSource> companyTrustedSourcesToAdd = new ArrayList<SocialMonitorTrustedSource>();
+		for (SocialMonitorTrustedSource socialMonitorTrustedSource : companyTrustedSources) {
+			if (socialMonitorTrustedSource.getStatus() == CommonConstants.STATUS_ACTIVE) {
+				companyTrustedSourcesToAdd.add(socialMonitorTrustedSource);
+			}
+		}
+		Collections.sort(companyTrustedSourcesToAdd, new TrustedSourceComparator());
+
+		// update the redis with the trusted sources
+		redisDao.addTruestedSources(companyId, companyTrustedSourcesToAdd);
+
+		return companyTrustedSourcesToAdd;
+	}
 }

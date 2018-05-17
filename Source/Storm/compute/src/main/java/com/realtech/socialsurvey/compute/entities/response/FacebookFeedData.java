@@ -11,6 +11,7 @@ public class FacebookFeedData implements Serializable
     private String id;
     private String message;
     private String story;
+    private FacebookFeedApplication application;
     
     @SerializedName ( "created_time")
     private long createdTime;
@@ -144,4 +145,14 @@ public class FacebookFeedData implements Serializable
     {
         this.updatedTime = updatedTime;
     }
+
+
+	public FacebookFeedApplication getApplication() {
+		return application;
+	}
+
+
+	public void setApplication(FacebookFeedApplication application) {
+		this.application = application;
+	}
 }
