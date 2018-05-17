@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.realtech.socialsurvey.api.exceptions.SSApiException;
 import com.realtech.socialsurvey.api.utils.RestUtils;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.AgentDisableApiEntity;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.AuthorizationException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -157,17 +160,37 @@ public class OrganizationManagementApiController
     @ApiOperation ( value = "Api to disable or enable agent edit in profile")
     public  ResponseEntity<?> flagAgentProfile( long companyId , boolean isAgentProfileDisabled ,  HttpServletRequest request ) throws  NonFatalException
     {
-        LOGGER.info( "Api to disable or enable agent edit in profile started" );
+        LOGGER.info( "Api to disable or enable agent edit in profile started for companyId:{}",companyId );
         String authorizationHeader = request.getHeader( CommonConstants.SURVEY_API_REQUEST_PARAMETER_AUTHORIZATION );
         //authorize request
         try {
             adminAuthenticationService.validateAuthHeader( authorizationHeader );
-            LOGGER.info( "Api to disable or enable agent edit in profile for companyId : {} , isAgentProfileDisabled : {}",isAgentProfileDisabled );
+            LOGGER.info( "Api to disable or enable agent edit in profile for companyId : {} , isAgentProfileDisabled : {}",companyId,isAgentProfileDisabled );
 
         } catch ( AuthorizationException e ) {
             return restUtils.getRestResponseEntity( HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", null, null, request, companyId );
         }
         organizationManagementService.updateAgentProfileDisable( companyId, isAgentProfileDisabled );
+        return restUtils.getRestResponseEntity( HttpStatus.OK, "Api to disable or enable agent edit in profile Successfully processed", null, null, request,
+            companyId );
+    }
+    
+    @RequestMapping ( value = "/flag/agents/profile", method = RequestMethod.POST)
+    @ApiOperation ( value = "Api to disable or enable agent edit in profile")
+    public  ResponseEntity<?> flagAgentProfiles( @Valid @RequestBody AgentDisableApiEntity agentDisableApiEntity,  HttpServletRequest request ) throws  NonFatalException
+    {
+        LOGGER.info( "Api to disable or enable agents edit in profile started" );
+        long companyId = 0;
+        String authorizationHeader = request.getHeader( CommonConstants.SURVEY_API_REQUEST_PARAMETER_AUTHORIZATION );
+        //authorize request
+        try {
+            companyId = adminAuthenticationService.validateAuthHeader( authorizationHeader );
+            LOGGER.info( "Api to disable or enable agent edit in profile for agents, isAgentProfileDisabled : {}",agentDisableApiEntity.isAgentProfileDisabled() );
+
+        } catch ( AuthorizationException e ) {
+            return restUtils.getRestResponseEntity( HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", null, null, request, companyId );
+        }
+        organizationManagementService.updateAgentsProfileDisable( agentDisableApiEntity.getAgentIds(), agentDisableApiEntity.isAgentProfileDisabled() );
         return restUtils.getRestResponseEntity( HttpStatus.OK, "Api to disable or enable agent edit in profile Successfully processed", null, null, request,
             companyId );
     }

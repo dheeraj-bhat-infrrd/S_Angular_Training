@@ -1674,4 +1674,7 @@ public interface OrganizationManagementService
 
     void updateAgentProfileDisable( long companyId, boolean isAgentProfileDisabled ) throws InvalidInputException;
 
+
+    void updateAgentsProfileDisable( List<Long> agentId, boolean isAgentProfileDisabled ) throws InvalidInputException;
+
 }
