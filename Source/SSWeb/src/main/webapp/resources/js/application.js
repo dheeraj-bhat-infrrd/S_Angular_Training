@@ -363,6 +363,11 @@ $(document).on('click', function(e) {
 		$('#zillow-popup').hide();
 		enableBodyScroll();
 	} 
+	
+	if ($('#summit-popup-body').is(':visible')) {
+		$('#summit-popup').hide();
+	} 
+	
 
 });
 
@@ -397,6 +402,10 @@ $(document).on('keyup', function(e) {
 			$('#zillow-popup-body').html('');
 			enableBodyScroll();
 		}
+		
+		if ($('#summit-popup-body').is(':visible')) {
+			$('#summit-popup').hide();
+		} 
 	}
 });
 
@@ -16100,9 +16109,6 @@ function getSwearWords() {
 	 });
 }
 
-
-
-
 $('body').on('blur', '#user-notification-recipients', function() {
 	
 	// format email IDs
@@ -16121,4 +16127,48 @@ $('body').on('blur', '#user-notification-recipients', function() {
 		showToast();
 	}, payload, true);
 	
+});
+
+function showSummitPopup(){
+	$('#summit-popup').show();
+	showSummitRibbon();
+}
+
+function closeSummitPopup(){
+	$('#summit-popup').hide();
+}
+
+
+function showSummitRibbon(){
+	$('#summit-ribbon').show();
+}
+
+function closeSummitRibbon(){
+	$('#summit-ribbon').hide();
+}
+
+$(document).on('click','#register-summit-btn',function(e){
+	e.stopImmediatePropagation();
+	e.preventDefault();
+	closeSummitPopup();
+	window.open('https://www.eventbrite.com/e/create-wow-summit-registration-44165479137', '_blank');
+	
+});
+
+$(document).on('click','#close-summit-popup',function(e){
+	e.stopPropagation();
+		
+	closeSummitPopup();
+});
+
+$(document).on('click','#close-summit-ribbon',function(e){
+	e.stopPropagation();
+		
+	closeSummitRibbon();
+});
+
+$(document).on('click','#summit-popup-body',function(e){
+	e.stopPropagation();
+	e.stopImmediatePropagation();
+	e.preventDefault();
 });

@@ -112,6 +112,21 @@
 	</div>
 </div>
 
+<div id="summit-ribbon" class="hm-header-main-wrapper hm-hdr-bord-bot hide" style="background:#2f69aa">
+	<div class="container">
+		<div class="summit-ribbon">
+			<div id="close-summit-ribbon" class="close-summit-ribbon cursor-pointer"></div>
+		</div>
+	</div>
+</div>
+
+<div id="summit-popup" class="overlay-login summit-popup-outer hide">
+	<div id="summit-popup-body" class="summit-popup">
+		<div id="close-summit-popup" class="close-summit-popup cursor-pointer"></div>
+		<div id="register-summit-btn" class="register-summit-btn cursor-pointer"></div>
+	</div>
+</div>
+
 <div class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
 	<div>
 		<div class="container pos-relative">
@@ -341,5 +356,11 @@
 		cssForSafari();
 		
 		hideOverlay();
+		
+		var isSummitFirstTime = $('#summit-popup-details').val();
+		if(isSummitFirstTime == 'true'){
+			showSummitPopup();
+			$('#summit-popup-details').val('false');
+		}
 	});
 </script>
