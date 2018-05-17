@@ -1,8 +1,10 @@
 package com.realtech.socialsurvey.core.utils;
 
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
 
 
@@ -32,4 +34,16 @@ public class CommonUtils
             return new SimpleDateFormat( format ).format( date );
         }
     }
+    
+    public static long lastNdaysTimestamp(int noOfDays) {
+        Date today = new Date();
+        Date daysAgo = new DateTime(today).minusDays(noOfDays).toDate();
+        return daysAgo.getTime();
+    }
+    
+    public static Long daysToMilliseconds(int days){
+        Long result = Long.valueOf(days * 24 * 60 * 60 * 1000);
+        return result;
+    }
+   
 }

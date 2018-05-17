@@ -1886,6 +1886,10 @@ function drawRecentActivity(start,batchSize,tableHeader,recentActivityCount){
 					tableData += startDate + ' - ' + endDate;
 				}
 				tableData += "</td>";
+			} else if(recentActivityList[i][1] == 'Social Monitor Date based Report'){
+				tableData += '<td class="v-tbl-recent-activity fetch-email txt-bold tbl-black-text ">';
+				tableData += startDate + ' - ' + endDate;
+				tableData += "</td>";
 			} else{
 				tableData += "<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-black-text "+(startDate==null?("\">"+"All Time till date "):("\">"+(endDate==null?monthStartDate:startDate)))+(endDate==null?" ":" - "+endDate)+"</td>";
 			}

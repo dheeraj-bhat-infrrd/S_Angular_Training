@@ -48,6 +48,7 @@
  								<option value=<spring:message code="label.nps.report.value" /> data-report="nps-report"><spring:message code="label.nps.report.key" /></option>
 								<option value=<spring:message code="label.branch.ranking.monthly.report.value" /> data-report="company-user"><spring:message code="label.branch.ranking.report.key" /></option>
 								<option value=<spring:message code="label.survey.invitation.email.report.value" /> data-report="survey-invitation-email-report"><spring:message code="label.survey.invitation.email.report.key" /></option>
+								<option value=<spring:message code="label.social.monitor.date.report.value" /> data-report="social-monitor-date-report"><spring:message code="label.social.monitor.date.report.key" /></option>
 							</c:if>
   								<option value=<spring:message code="label.survey.results.report.value" /> data-report="survey-results"><spring:message code="label.survey.results.report.key" /></option>
  								<option value=<spring:message code="label.survey.transaction.report.value" /> data-report="survey-transaction-summary"><spring:message code="label.survey.transaction.report.key" /></option>
