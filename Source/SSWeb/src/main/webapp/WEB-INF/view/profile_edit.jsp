@@ -584,7 +584,6 @@ var hiddenSection="${profileSettings.hiddenSection}";
 $(document).ready(function() {
 	$(document).attr("title", "Profile Settings");
 	var checkIfAdmin = ${not empty companyAdminSwitchId } || ${not empty regionAdminSwitchId } || ${not empty branchAdminSwitchId };
-	console.log(checkIfAdmin);
 	if(("${isRealTechOrSSAdmin}" == false || "${isRealTechOrSSAdmin}" == "false" )&& parseInt("${profilemasterid}") == 4 && ( "${isAgentProfileDisabled}" == true || "${isAgentProfileDisabled}" == "true")
 			&&  (checkIfAdmin == false || checkIfAdmin == "false" )){
 		 $("#divReadOnlyFields :input").css("pointer-events", "none");
