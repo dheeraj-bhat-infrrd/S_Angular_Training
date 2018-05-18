@@ -515,7 +515,6 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
                 fileUpload.setEndDate( new Timestamp( new DateTime().withTimeAtStartOfDay().plusDays( 1 ).minusSeconds( 1 ).getMillis() ) );
 
             }
-            reportRequest.setFileUploadId(fileUpload.getFileUploadId());
             reportRequest.setCompanyId(fileUpload.getCompany().getCompanyId());
             socialMonitorReportRequest  = reportRequest;
         }
@@ -539,6 +538,7 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
 		}
 	
 		if ( reportId == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT || reportId == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD ) {
+		    socialMonitorReportRequest.setFileUploadId(fileUpload.getFileUploadId());
             streamApiIntegrationBuilder.getStreamApi().generateEmailReport(socialMonitorReportRequest);
 		}
     }
