@@ -14,6 +14,7 @@ import com.realtech.socialsurvey.core.entities.BranchRankingReportYear;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyDetailsReport;
 import com.realtech.socialsurvey.core.entities.DigestRequestData;
+import com.realtech.socialsurvey.core.entities.GenericReportingObject;
 import com.realtech.socialsurvey.core.entities.Digest;
 import com.realtech.socialsurvey.core.entities.MonthlyDigestAggregate;
 import com.realtech.socialsurvey.core.entities.NpsReportMonth;
@@ -35,7 +36,7 @@ import com.realtech.socialsurvey.core.vo.SurveyInvitationEmailCountVO;
 public interface ReportingDashboardManagement
 {
     public void createEntryInFileUploadForReporting( int reportId, Date startDate, Date endDate, Long entityId,
-        String entityType, Company company, Long adminUserid, int actualTimeZoneOffset )
+        String entityType, Company company, Long adminUserid, int actualTimeZoneOffset, GenericReportingObject genericReportingObject )
         throws InvalidInputException, NoRecordsFetchedException, FileNotFoundException, IOException;
 
 
