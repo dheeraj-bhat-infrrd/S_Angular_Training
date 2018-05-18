@@ -1,6 +1,5 @@
 package com.realtech.socialsurvey.core.utils;
 
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -37,7 +36,7 @@ public class CommonUtils
     
     public static long lastNdaysTimestamp(int noOfDays) {
         Date today = new Date();
-        Date daysAgo = new DateTime(today).minusDays(noOfDays).toDate();
+        Date daysAgo = new DateTime(today).minusDays(noOfDays).withTimeAtStartOfDay().toDate();
         return daysAgo.getTime();
     }
     

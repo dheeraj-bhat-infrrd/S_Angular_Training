@@ -1020,7 +1020,7 @@ public interface CommonConstants
     
     //Social Monitor reports
     public static final int FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT = 301;
-    public static final int FILE_UPLOAD_SOCIAL_MONITOR_KEYWORDS_REPORT = 302;
+    public static final int FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD= 302;
 
     public static final int NPS_REPORT_TYPE_WEEK = 1;
     public static final int NPS_REPORT_TYPE_MONTH = 2;
@@ -1434,6 +1434,7 @@ public interface CommonConstants
     public static final String REPORTING_DIGEST = "Monthly Digest";
     
     public static final String SOCIAL_MONITOR_DATE_REPORT = "Social Monitor Date based Report";
+    public static final String SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD = "Social Monitor Date Report for keyword";
 
     public static final String SURVEY_DETAILS_ID_COLUMN = "surveyDetailsId";
     public static final String SURVEY_RESULTS_REPORT_MODIFIED_ON = "reportModifiedOn";

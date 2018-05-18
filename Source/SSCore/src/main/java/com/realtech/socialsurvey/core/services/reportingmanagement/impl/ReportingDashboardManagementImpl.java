@@ -32,6 +32,7 @@ import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,6 +108,7 @@ import com.realtech.socialsurvey.core.entities.DigestRequestData;
 import com.realtech.socialsurvey.core.entities.DigestTemplateData;
 import com.realtech.socialsurvey.core.entities.EntityAlertDetails;
 import com.realtech.socialsurvey.core.entities.FileUpload;
+import com.realtech.socialsurvey.core.entities.GenericReportingObject;
 import com.realtech.socialsurvey.core.entities.MonthlyDigestAggregate;
 import com.realtech.socialsurvey.core.entities.NpsReportMonth;
 import com.realtech.socialsurvey.core.entities.NpsReportWeek;
@@ -407,7 +409,7 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
 
     @Override
     public void createEntryInFileUploadForReporting( int reportId, Date startDate, Date endDate, Long entityId,
-        String entityType, Company company, Long adminUserId, int actualTimeZoneOffset )
+        String entityType, Company company, Long adminUserId, int actualTimeZoneOffset, GenericReportingObject genericReportingObject )
         throws InvalidInputException, NoRecordsFetchedException, IOException
     {
         // adding entry in the feild and set status to pending
@@ -455,6 +457,8 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_DIGEST );
         } else if ( reportId == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT ) {
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT );
+        } else if ( reportId == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD ) {
+            fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD );
         }
 
         // get the time 23:59:59 in milliseconds
@@ -480,27 +484,35 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
             processDigestRequest( fileUpload );
         }
         
+        //Social Monitor reports
         ReportRequest socialMonitorReportRequest = new ReportRequest();
-        if ( reportId == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT ) {
+        if ( reportId == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT
+            || reportId == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD ) {
             ReportRequest reportRequest = new ReportRequest();
-            reportRequest.setReportType( ReportType.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT.getName() );
+            if ( reportId == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD ) {
+                reportRequest.setReportType( ReportType.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD.getName() );
+                reportRequest.setKeyword( genericReportingObject.getKeyword() );
+            }
+            if ( reportId == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT ) {
+                reportRequest.setReportType( ReportType.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT.getName() );
+            }
             if ( startDate != null && endDate != null ) {
-                reportRequest.setStartTime( startDate.getTime() );
-                reportRequest.setEndTime( endDate.getTime() );
+                reportRequest.setStartTime( fileUpload.getStartDate().getTime() );
+                reportRequest.setEndTime( fileUpload.getEndDate().getTime() );
             } else if ( startDate != null && endDate == null ) {
-                reportRequest.setStartTime( startDate.getTime() );
-                reportRequest.setEndTime( new Date().getTime() );
-                fileUpload.setEndDate( new Timestamp( new Date().getTime() ) );
+                reportRequest.setStartTime( fileUpload.getStartDate().getTime() );
+                reportRequest.setEndTime( new DateTime().withTimeAtStartOfDay().plusDays( 1 ).minusSeconds( 1 ).getMillis() );
+                fileUpload.setEndDate( new Timestamp(new DateTime().withTimeAtStartOfDay().plusDays( 1 ).minusSeconds( 1 ).getMillis()));
             } else if ( startDate == null && endDate != null ) {
                 reportRequest.setStartTime( endDate.getTime() - CommonUtils.daysToMilliseconds( NUMBER_OF_DAYS_SM_REPORT ) );
-                reportRequest.setEndTime( endDate.getTime() );
+                reportRequest.setEndTime( fileUpload.getEndDate().getTime() );
                 fileUpload.setStartDate(
                     new Timestamp( endDate.getTime() - CommonUtils.daysToMilliseconds( NUMBER_OF_DAYS_SM_REPORT ) ) );
             } else if ( startDate == null && endDate == null ) {
                 reportRequest.setStartTime( CommonUtils.lastNdaysTimestamp( NUMBER_OF_DAYS_SM_REPORT ) );
-                reportRequest.setEndTime( new Date().getTime() );
+                reportRequest.setEndTime( new DateTime().withTimeAtStartOfDay().plusDays( 1 ).minusSeconds( 1 ).getMillis() );
                 fileUpload.setStartDate( new Timestamp( CommonUtils.lastNdaysTimestamp( NUMBER_OF_DAYS_SM_REPORT ) ) );
-                fileUpload.setEndDate( new Timestamp( new Date().getTime() ) );
+                fileUpload.setEndDate( new Timestamp( new DateTime().withTimeAtStartOfDay().plusDays( 1 ).minusSeconds( 1 ).getMillis() ) );
 
             }
             reportRequest.setFileUploadId(fileUpload.getFileUploadId());
@@ -526,7 +538,7 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
 			streamApiIntegrationBuilder.getStreamApi().generateEmailReport(reportRequest);
 		}
 	
-		if ( reportId == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT ) {
+		if ( reportId == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT || reportId == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD ) {
             streamApiIntegrationBuilder.getStreamApi().generateEmailReport(socialMonitorReportRequest);
 		}
     }
