@@ -10980,7 +10980,7 @@ img.lead-img {
 
 .summit-popup{
 	position: relative;
-    top: 100px;
+    top: 0;
     width: 1140px;
     height: 681px;
     margin: 0 auto;
