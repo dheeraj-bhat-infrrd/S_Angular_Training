@@ -3,16 +3,12 @@
  */
 package com.realtech.socialsurvey.compute.topology.bolts.emailreports;
 
-import java.io.File;
-import java.io.IOException;
-import java.text.DateFormatSymbols;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
+import com.realtech.socialsurvey.compute.entities.ReportRequest;
+import com.realtech.socialsurvey.compute.entity.SurveyInvitationEmailCountMonth;
+import com.realtech.socialsurvey.compute.enums.ReportStatus;
+import com.realtech.socialsurvey.compute.services.FailedMessagesService;
+import com.realtech.socialsurvey.compute.services.impl.FailedMessagesServiceImpl;
+import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBoltWithAck;
 import com.realtech.socialsurvey.compute.utils.FileUtils;
 import com.realtech.socialsurvey.compute.utils.WorkBookUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -22,13 +18,10 @@ import org.apache.storm.tuple.Tuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.realtech.socialsurvey.compute.entities.ReportRequest;
-import com.realtech.socialsurvey.compute.entity.SurveyInvitationEmailCountMonth;
-import com.realtech.socialsurvey.compute.enums.ReportStatus;
-import com.realtech.socialsurvey.compute.services.FailedMessagesService;
-import com.realtech.socialsurvey.compute.services.impl.FailedMessagesServiceImpl;
-import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBoltWithAck;
-import com.realtech.socialsurvey.compute.utils.ConversionUtils;
+import java.io.File;
+import java.io.IOException;
+import java.text.DateFormatSymbols;
+import java.util.*;
 
 /**
  * @author Subhrajit
@@ -80,7 +73,7 @@ public class WriteReportToExcelBolt extends BaseComputeBoltWithAck {
 					+ (Calendar.getInstance().getTimeInMillis()) + EXCEL_FILE_EXTENSION;
 				try {
 					file = FileUtils.createFileInLocal(fileName, workbook);
-					fileBytes = ConversionUtils.convertFileToBytes(file);
+					fileBytes = FileUtils.convertFileToBytes(file);
 				} catch (IOException e) {
 					LOG.error("IO  exception occured ", e);
 					FailedMessagesService failedMessagesService = new FailedMessagesServiceImpl();

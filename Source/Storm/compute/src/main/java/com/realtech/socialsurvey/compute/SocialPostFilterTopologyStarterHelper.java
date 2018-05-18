@@ -79,10 +79,10 @@ public class SocialPostFilterTopologyStarterHelper extends TopologyStarterHelper
             new Fields( "companyId" ) );
         builder.setBolt( "SaveFeedsToMongoBolt", new SaveFeedsToMongoBolt(), 1 ).shuffleGrouping( "FilterSocialPostBolt" );
         builder.setBolt("UpdateSocialPostDuplicateCount", new UpdateSocialPostDuplicateCountBolt(), 1)
-                .shuffleGrouping("SaveFeedsToMongoBolt", "SUCCESS_STREAM");
+            .shuffleGrouping("SaveFeedsToMongoBolt", "SUCCESS_STREAM");
         builder.setBolt("RetryBolt", new RetryHandlerBolt(), 1)
-                .shuffleGrouping("SaveFeedsToMongoBolt", "RETRY_STREAM")
-                .shuffleGrouping("UpdateSocialPostDuplicateCount", "RETRY_STREAM");
+            .shuffleGrouping("SaveFeedsToMongoBolt", "RETRY_STREAM")
+            .shuffleGrouping("UpdateSocialPostDuplicateCount", "RETRY_STREAM");
 
         return builder.createTopology();
     }
@@ -100,7 +100,7 @@ public class SocialPostFilterTopologyStarterHelper extends TopologyStarterHelper
             ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) )
                 ? SocialPostFilterTopologyStarterHelper.TOPOLOGY_NAME
                 : ChararcterUtils.appendWithHypen( SocialPostFilterTopologyStarterHelper.TOPOLOGY_NAME,
-                    EnvConstants.getProfile() ) );
+                EnvConstants.getProfile() ) );
     }
 
 }

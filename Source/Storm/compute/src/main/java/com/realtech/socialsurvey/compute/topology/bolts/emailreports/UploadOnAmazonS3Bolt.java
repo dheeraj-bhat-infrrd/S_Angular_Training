@@ -1,28 +1,5 @@
 package com.realtech.socialsurvey.compute.topology.bolts.emailreports;
 
-import static com.realtech.socialsurvey.compute.common.ComputeConstants.AMAZON_ACCESS_KEY;
-import static com.realtech.socialsurvey.compute.common.ComputeConstants.AMAZON_BUCKET;
-import static com.realtech.socialsurvey.compute.common.ComputeConstants.AMAZON_ENDPOINT;
-import static com.realtech.socialsurvey.compute.common.ComputeConstants.AMAZON_REPORTS_BUCKET;
-import static com.realtech.socialsurvey.compute.common.ComputeConstants.AMAZON_SECRET_KEY;
-import static com.realtech.socialsurvey.compute.common.ComputeConstants.APPLICATION_PROPERTY_FILE;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.storm.task.OutputCollector;
-import org.apache.storm.task.TopologyContext;
-import org.apache.storm.topology.OutputFieldsDeclarer;
-import org.apache.storm.tuple.Fields;
-import org.apache.storm.tuple.Tuple;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Region;
@@ -40,7 +17,24 @@ import com.realtech.socialsurvey.compute.exception.UploadOnAmazonException;
 import com.realtech.socialsurvey.compute.services.FailedMessagesService;
 import com.realtech.socialsurvey.compute.services.impl.FailedMessagesServiceImpl;
 import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBoltWithAck;
-import com.realtech.socialsurvey.compute.utils.ConversionUtils;
+import com.realtech.socialsurvey.compute.utils.FileUtils;
+import org.apache.storm.task.OutputCollector;
+import org.apache.storm.task.TopologyContext;
+import org.apache.storm.topology.OutputFieldsDeclarer;
+import org.apache.storm.tuple.Fields;
+import org.apache.storm.tuple.Tuple;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import static com.realtech.socialsurvey.compute.common.ComputeConstants.*;
 
 public class UploadOnAmazonS3Bolt extends BaseComputeBoltWithAck
 {
@@ -76,11 +70,11 @@ public class UploadOnAmazonS3Bolt extends BaseComputeBoltWithAck
         String fileNameInS3 = null;
         ReportRequest reportRequest = (ReportRequest) input.getValueByField("reportRequest");
         String bucket = LocalPropertyFileHandler.getInstance()
-                .getProperty( APPLICATION_PROPERTY_FILE, AMAZON_BUCKET ).orElse( null );
+            .getProperty( APPLICATION_PROPERTY_FILE, AMAZON_BUCKET ).orElse( null );
         String reportBucketPath = LocalPropertyFileHandler.getInstance()
-                .getProperty( APPLICATION_PROPERTY_FILE, AMAZON_REPORTS_BUCKET ).orElse( null );
+            .getProperty( APPLICATION_PROPERTY_FILE, AMAZON_REPORTS_BUCKET ).orElse( null );
         String endpoints = LocalPropertyFileHandler.getInstance()
-                .getProperty(APPLICATION_PROPERTY_FILE, AMAZON_ENDPOINT ).orElse( null );
+            .getProperty(APPLICATION_PROPERTY_FILE, AMAZON_ENDPOINT ).orElse( null );
         String status = input.getStringByField("status");
         boolean isSuccess = input.getBooleanByField( "isSuccess");
 
@@ -89,7 +83,7 @@ public class UploadOnAmazonS3Bolt extends BaseComputeBoltWithAck
             LOG.info( "Uploading file: {}  to Amazon S3", fileName );
             //convert byte stream to file
             try {
-                file = ConversionUtils.convertBytesToFile(fileBytes, fileName);
+                file = FileUtils.convertBytesToFile(fileBytes, fileName);
                 if (fileBytes == null || file == null || !file.exists() || fileName == null || fileName.isEmpty()) {
                     LOG.error("Either file or file name is not present");
                     status = ReportStatus.FAILED.getValue();
@@ -101,7 +95,7 @@ public class UploadOnAmazonS3Bolt extends BaseComputeBoltWithAck
 
 
                     fileNameInS3 = endpoints + FILE_SEPARATOR + reportBucket + FILE_SEPARATOR
-                            + URLEncoder.encode(fileName, "UTF-8");
+                        + URLEncoder.encode(fileName, "UTF-8");
                     AmazonS3 s3Client = createAmazonClient(endpoints, reportBucket);
                     PutObjectResult result = s3Client.putObject(putObjectRequest);
                     LOG.info("Amazon Upload Etag: " + result.getETag());
@@ -127,9 +121,9 @@ public class UploadOnAmazonS3Bolt extends BaseComputeBoltWithAck
             success = true;
 
         LOG.info("Emitting tuple with success = {}, fileName = {}, fileUploadId = {}, status = {}", success, fileNameInS3,
-                input.getValueByField( "fileUploadId" ), status);
+            input.getValueByField( "fileUploadId" ), status);
         _collector.emit(input, Arrays.asList(success, fileNameInS3, input.getValueByField( "fileUploadId" ),
-                reportRequest, status));
+            reportRequest, status));
 
         //if the file is successfully uploaded , delete from the local
         if(file != null && file.exists()) {

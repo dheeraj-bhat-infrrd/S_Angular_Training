@@ -3,7 +3,6 @@ package com.realtech.socialsurvey.compute.topology.bolts.emailreports;
 import com.realtech.socialsurvey.compute.entities.ReportRequest;
 import com.realtech.socialsurvey.compute.entities.response.ActionHistory;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
-import com.realtech.socialsurvey.compute.entity.SurveyInvitationEmailCountMonth;
 import com.realtech.socialsurvey.compute.enums.ReportStatus;
 import com.realtech.socialsurvey.compute.enums.ReportType;
 import com.realtech.socialsurvey.compute.services.FailedMessagesService;
@@ -56,7 +55,7 @@ public class WriteSocialMonitorReportToExcel extends BaseComputeBoltWithAck
                 fileName = reportRequest.getReportType() + "_" + comapanyId + "_" + ( Calendar.getInstance().getTimeInMillis()) + EXCEL_FILE_EXTENSION;
                 try {
                     file = FileUtils.createFileInLocal(fileName, workbook);
-                    fileBytes = ConversionUtils.convertFileToBytes(file);
+                    fileBytes = FileUtils.convertFileToBytes(file);
                 } catch (IOException e) {
                     LOG.error("IO  exception occured ", e);
                     FailedMessagesService failedMessagesService = new FailedMessagesServiceImpl();
@@ -71,6 +70,7 @@ public class WriteSocialMonitorReportToExcel extends BaseComputeBoltWithAck
         LOG.info("Emitting tuple with success = {} , fileName = {}, status = {}", success, fileName, status);
         _collector.emit(input, Arrays.asList(success,fileName,fileBytes,input.getValueByField("fileUploadId"),
             input.getValueByField("reportRequest"), status));
+
         //if the file is successfully created , delete from the local
         if(file != null && file.exists()) {
             if(file.delete()) LOG.info(" {} has been successfully deleted ", fileName);
@@ -82,7 +82,7 @@ public class WriteSocialMonitorReportToExcel extends BaseComputeBoltWithAck
     private XSSFWorkbook writeReportToWorkbook( List<SocialResponseObject> socialResponseWrapper, String reportType,
         int enterAt )
     {
-        Map<Integer, List<Object>> data;
+        Map<Integer, List<Object>> data = null;
         if(reportType == ReportType.SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD.getName()) {
             if(enterAt ==1){
                 data = WorkBookUtils.writeReportHeader(SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD);
@@ -90,13 +90,13 @@ public class WriteSocialMonitorReportToExcel extends BaseComputeBoltWithAck
             }
             data = getSocialMonitorReportForKeywordToBeWrittenInSheet(socialResponseWrapper);
         }
-        else {
+       /* else {
             if ( enterAt == 1 ){
                 data = WorkBookUtils.writeReportHeader(SURVEY_INVITATION_EMAIL_REPORT_HEADER);
                 workbook = WorkBookUtils.createWorkbook(data);
             }
             data = getEmailReportToBeWrittenInSheet(socialResponseWrapper);
-        }
+        }*/
         workbook = WorkBookUtils.writeToWorkbook(data, workbook, (enterAt-1)*10+2);
         return workbook;
     }
@@ -104,44 +104,36 @@ public class WriteSocialMonitorReportToExcel extends BaseComputeBoltWithAck
 
     private Map<Integer,List<Object>> getSocialMonitorReportForKeywordToBeWrittenInSheet( List<SocialResponseObject> socialResponseWrapper )
     {
+        Map<Integer, List<Object>> socialFeedData = new TreeMap<>();
         if(workbook != null) {
-            {
-                Map<Integer, List<Object>> socialFeedData = new TreeMap<>();
-                List<Object> socialMonitorReportToPopulate;
-                int enterNext = 1;
-                for (SocialResponseObject socialFeed : socialResponseWrapper) {
-                    List<ActionHistory> actionHistories = socialFeed.getActionHistory();
-                    for( ActionHistory actionHistory : actionHistories ){
+            List<Object> socialMonitorReportToPopulate;
+            int enterNext = 1;
+            for (SocialResponseObject socialFeed : socialResponseWrapper) {
+                List<ActionHistory> actionHistories = socialFeed.getActionHistory();
+                for( ActionHistory actionHistory : actionHistories ){
 
-                        socialMonitorReportToPopulate = new ArrayList<Object>();
+                    socialMonitorReportToPopulate = new ArrayList<Object>();
 
-                        socialMonitorReportToPopulate.add(socialFeed.getOwnerName());
-                        socialMonitorReportToPopulate.add(socialFeed.getType());
-                        socialMonitorReportToPopulate.add(socialFeed.getText());
-                        socialMonitorReportToPopulate.add(socialFeed.getPageLink());
-                        socialMonitorReportToPopulate.add(actionHistory.getActionType());
-                        socialMonitorReportToPopulate.add(actionHistory.getOwnerName());
-                        socialMonitorReportToPopulate.add(actionHistory.getDelivered());
-                        socialMonitorReportToPopulate.add(socialFeed.getBounced());
-                        socialMonitorReportToPopulate.add(socialFeed.getDropped());
-                        socialMonitorReportToPopulate.add(socialFeed.getDiffered());
-                        socialMonitorReportToPopulate.add(socialFeed.getOpened());
-                        socialMonitorReportToPopulate.add(socialFeed.getLinkClicked());
+                    socialMonitorReportToPopulate.add(socialFeed.getOwnerName());
+                    socialMonitorReportToPopulate.add(socialFeed.getType());
+                    socialMonitorReportToPopulate.add(socialFeed.getText());
+                    socialMonitorReportToPopulate.add(socialFeed.getPageLink());
+                    socialMonitorReportToPopulate.add(actionHistory.getActionType());
+                    socialMonitorReportToPopulate.add(actionHistory.getOwnerName());
+                    socialMonitorReportToPopulate.add(ConversionUtils.convertToEst( actionHistory.getCreatedDate() ));
+                    socialMonitorReportToPopulate.add(actionHistory.getText());
 
-                        socialFeedData.put(enterNext++, socialMonitorReportToPopulate);
-                    }
-
+                    socialFeedData.put(enterNext++, socialMonitorReportToPopulate);
                 }
-                return socialFeedData;
             }
         }
-
+        return socialFeedData;
     }
 
 
     @Override public List<Object> prepareTupleForFailure()
     {
-        return null;
+        return Arrays.asList(false, null, null, -1, null, null);
     }
 
 

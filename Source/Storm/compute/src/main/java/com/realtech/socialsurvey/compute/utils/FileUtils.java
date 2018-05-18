@@ -8,6 +8,9 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static com.realtech.socialsurvey.compute.common.ComputeConstants.APPLICATION_PROPERTY_FILE;
 import static com.realtech.socialsurvey.compute.common.ComputeConstants.FILEUPLOAD_DIRECTORY_LOCATION;
@@ -50,4 +53,22 @@ public class FileUtils
         }
         return file;
     }
+
+    public static byte[] convertFileToBytes(File file) throws IOException {
+        byte[] fileBytes = null;
+        if(file != null){
+            fileBytes = Files.readAllBytes( Paths.get(file.getAbsolutePath()));
+        }
+        return fileBytes;
+    }
+
+    public static File convertBytesToFile(byte[] fileBytes, String fileName) throws IOException {
+        String fileDirectoryLocation = LocalPropertyFileHandler.getInstance()
+            .getProperty(APPLICATION_PROPERTY_FILE, FILEUPLOAD_DIRECTORY_LOCATION).orElse(null);
+
+        Path path = Paths.get(fileDirectoryLocation + File.separator + fileName );
+        Files.write(path, fileBytes);
+        return path.toFile();
+    }
+
 }
