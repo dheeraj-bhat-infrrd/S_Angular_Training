@@ -112,8 +112,8 @@
 	</div>
 </div>
 
-<div id="summit-ribbon" class="hm-header-main-wrapper hm-hdr-bord-bot hide" style="background:#2f69aa">
-	<div class="container">
+<div id="summit-ribbon" class="hm-hdr-bord-bot summit-ribbon-outer cursor-pointer hide">
+	<div class="container summit-ribbon-con">
 		<div class="summit-ribbon">
 			<div id="close-summit-ribbon" class="close-summit-ribbon cursor-pointer"></div>
 		</div>

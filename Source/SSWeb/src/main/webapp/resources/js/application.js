@@ -365,7 +365,7 @@ $(document).on('click', function(e) {
 	} 
 	
 	if ($('#summit-popup-body').is(':visible')) {
-		$('#summit-popup').hide();
+		closeSummitPopup();
 	} 
 	
 
@@ -404,7 +404,7 @@ $(document).on('keyup', function(e) {
 		}
 		
 		if ($('#summit-popup-body').is(':visible')) {
-			$('#summit-popup').hide();
+			closeSummitPopup();
 		} 
 	}
 });
@@ -16131,11 +16131,13 @@ $('body').on('blur', '#user-notification-recipients', function() {
 
 function showSummitPopup(){
 	$('#summit-popup').show();
-	showSummitRibbon();
+	disableBodyScroll();
 }
 
 function closeSummitPopup(){
 	$('#summit-popup').hide();
+	showSummitRibbon();
+	enableBodyScroll();
 }
 
 
@@ -16150,8 +16152,9 @@ function closeSummitRibbon(){
 $(document).on('click','#register-summit-btn',function(e){
 	e.stopImmediatePropagation();
 	e.preventDefault();
+	
 	closeSummitPopup();
-	window.open('https://www.eventbrite.com/e/create-wow-summit-registration-44165479137', '_blank');
+	window.open('http://www.createwowsummit.com', '_blank');
 	
 });
 
@@ -16159,6 +16162,14 @@ $(document).on('click','#close-summit-popup',function(e){
 	e.stopPropagation();
 		
 	closeSummitPopup();
+});
+
+$(document).on('click','#summit-ribbon',function(e){
+	e.stopPropagation();
+	e.stopImmediatePropagation();
+	e.preventDefault();
+	
+	window.open('http://www.createwowsummit.com', '_blank');
 });
 
 $(document).on('click','#close-summit-ribbon',function(e){
