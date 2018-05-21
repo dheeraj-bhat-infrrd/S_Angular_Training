@@ -159,6 +159,8 @@ import com.realtech.socialsurvey.core.enums.ReportType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.integration.stream.StreamApiConnectException;
+import com.realtech.socialsurvey.core.integration.stream.StreamApiException;
 import com.realtech.socialsurvey.core.integration.stream.StreamApiIntegrationBuilder;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
@@ -539,7 +541,13 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
 	
 		if ( reportId == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT || reportId == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD ) {
 		    socialMonitorReportRequest.setFileUploadId(fileUpload.getFileUploadId());
-            streamApiIntegrationBuilder.getStreamApi().generateEmailReport(socialMonitorReportRequest);
+		    try {
+	            streamApiIntegrationBuilder.getStreamApi().generateEmailReport(socialMonitorReportRequest);
+		    } catch(StreamApiException | StreamApiConnectException e) {
+		        LOG.error( "Could not stream social monitor report", e );
+		        fileUpload.setStatus( CommonConstants.STATUS_FAIL );
+		        fileUploadDao.saveOrUpdate( fileUpload );
+		    }
 		}
     }
 
