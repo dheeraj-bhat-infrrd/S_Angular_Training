@@ -80,7 +80,7 @@ public class UploadOnAmazonS3Bolt extends BaseComputeBoltWithAck
 
         if ( isSuccess  && status.equals(ReportStatus.PROCESSED.getValue() ) ){
             String reportBucket = bucket + "/" + reportBucketPath;
-            LOG.info( "Uploading file: {}  to Amazon S3", fileName );
+            LOG.debug( "Uploading file: {}  to Amazon S3", fileName );
             //convert byte stream to file
             try {
                 file = FileUtils.convertBytesToFile(fileBytes, fileName);
@@ -98,8 +98,8 @@ public class UploadOnAmazonS3Bolt extends BaseComputeBoltWithAck
                         + URLEncoder.encode(fileName, "UTF-8");
                     AmazonS3 s3Client = createAmazonClient(endpoints, reportBucket);
                     PutObjectResult result = s3Client.putObject(putObjectRequest);
-                    LOG.info("Amazon Upload Etag: " + result.getETag());
-                    LOG.info("Uploaded {} to Amazon s3 ", fileName);
+                    LOG.debug("Amazon Upload Etag: " + result.getETag());
+                    LOG.debug("Uploaded {} to Amazon s3 ", fileName);
                     success = true;
                 }
             } catch ( UploadOnAmazonException | UnsupportedEncodingException ex ) {
@@ -127,8 +127,8 @@ public class UploadOnAmazonS3Bolt extends BaseComputeBoltWithAck
 
         //if the file is successfully uploaded , delete from the local
         if(file != null && file.exists()) {
-            if(file.delete()) LOG.info(" {} has been successfully deleted ", fileName);
-            else LOG.info(" Unable to delete {} " , fileName);
+            if(file.delete()) LOG.debug(" {} has been successfully deleted ", fileName);
+            else LOG.error(" Unable to delete {} " , fileName);
         }
     }
 

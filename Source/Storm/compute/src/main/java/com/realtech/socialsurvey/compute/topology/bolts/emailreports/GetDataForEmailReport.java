@@ -44,13 +44,13 @@ public class GetDataForEmailReport extends BaseComputeBoltWithAck {
 
 	@Override
 	public void executeTuple(Tuple input) {
-		LOG.info("Executing query to fetch survey invitation mails data from table.");
 		
 		// get the report request from the tuple
         ReportRequest reportRequest = ConversionUtils.deserialize( input.getString( 0 ), ReportRequest.class );
         boolean success = false;
         
         if ( reportRequest.getReportType().equals( ReportType.SURVEY_INVITATION_EMAIL_REPORT.getName() ) ) {
+            LOG.info("Executing query to fetch survey invitation mails data from table.");
             long fileUploadId = reportRequest.getFileUploadId();
             List<SurveyInvitationEmailCountMonth> reportResponse = null;
             String status = null;

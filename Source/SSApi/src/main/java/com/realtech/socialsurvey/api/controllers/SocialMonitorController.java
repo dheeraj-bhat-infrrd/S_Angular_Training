@@ -365,7 +365,7 @@ public class SocialMonitorController
 
     }
 
-    @RequestMapping ( value = "/socialFeed/companyId/{companyId}")
+    @RequestMapping ( value = "/socialFeed/companyId/{companyId}", method = RequestMethod.GET)
     @ApiOperation( "Method to fetch socialfeed data based on given keyword from mongo" )
     public ResponseEntity<?> getSocialFeedData( HttpServletRequest request, @RequestHeader("authorizationHeader") String authorizationHeader,
         @PathVariable("companyId") long companyId, @RequestParam( "keyword" ) String keyword,

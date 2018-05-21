@@ -102,7 +102,7 @@ public interface SSApiIntegrationService
         @Query ("value") boolean value, @Query ("collection") String collection, @Header( "authorizationHeader" ) String authHeader );
 
     @Headers( "Content-Type: application/json" )
-    @GET( "/v1/socialFeed/companyId/{companyId}" )
+    @GET( "v1/socialFeed/companyId/{companyId}" )
     Call<List<SocialResponseObject>> getSocialFeedData( @Path( "companyId" ) long companyId, @Query( "keyword" ) String keyword,
         @Query( "startTime" ) long startTime, @Query( "endTime" ) long endTime, @Query( "pageSize" ) int pageSize, @Query( "skips" ) int skips,
         @Header( "authorizationHeader" ) String authHeader );

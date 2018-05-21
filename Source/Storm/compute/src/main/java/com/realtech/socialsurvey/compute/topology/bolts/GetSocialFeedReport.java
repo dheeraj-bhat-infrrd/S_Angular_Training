@@ -29,23 +29,22 @@ import java.util.Optional;
 public class GetSocialFeedReport extends BaseComputeBoltWithAck {
 
     private static final long serialVersionUID = 1L;
-    private static final Logger LOG = LoggerFactory.getLogger( GetDataForEmailReport.class );
+    private static final Logger LOG = LoggerFactory.getLogger( GetSocialFeedReport.class );
 
     @Override public void executeTuple( Tuple input )
     {
-        LOG.info( " Executing query to fetch data from SOCIAL_FEED_COLLECTION " );
         ReportRequest reportRequest = ConversionUtils.deserialize( input.getString( 0 ), ReportRequest.class );
         boolean success = false;
 
-        if(reportRequest.getReportType().equals( ReportType.SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD )) {
+        if(reportRequest.getReportType().equals( ReportType.SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD.getName() )) {
+            LOG.info( " Executing query to fetch data from SOCIAL_FEED_COLLECTION " );
             long fileUploadId = reportRequest.getFileUploadId();
             Optional<List<SocialResponseObject>> response = null;
             long companyId = reportRequest.getCompanyId();
             int pageNum = 1;
             int pageSize = 10;
             String status = null;
-            //TODO get the keywod from the request
-            String keyword = "testing";
+            String keyword = reportRequest.getKeyword();
 
             try {
                 do {
@@ -59,19 +58,19 @@ public class GetSocialFeedReport extends BaseComputeBoltWithAck {
                     } else if ( pageNum > 1 && ( !response.isPresent() || response.get().isEmpty() ) )
                         status = ReportStatus.PROCESSED.getValue();
                     success = true;
-                    LOG.info( "Emitting tuple with success = {},  fileUploadId = {}, status = {}, companyId = {}, enterAt = {}  ",
-                        success, fileUploadId, status, companyId, pageNum - 1 );
+                    LOG.info( "Emitting tuple with success = {}, data = {}, fileUploadId = {}, status = {}, companyId = {}, enterAt = {}  ",
+                        success, response.get(),  fileUploadId, status, companyId, pageNum );
                     _collector.emit( input, Arrays.asList( success, response.get(), fileUploadId,
-                        status, reportRequest, companyId, pageNum - 1 ) );
+                        status, reportRequest, pageNum ) );
                     pageNum++;
-                } while ( response != null && response.isPresent() );
+                } while ( status.equals( ReportStatus.PROCESSING.getValue() ) );
 
             } catch ( APIIntegrationException | IllegalArgumentException | IOException e ) {
                 success = true;
                 LOG.error( "Exception occurred while fetching socialfeed data  ", e );
                 FailedMessagesService failedMessagesService = new FailedMessagesServiceImpl();
                 failedMessagesService.insertTemporaryFailedReportRequest( reportRequest );
-                LOG.info( "Emitting tuple with success = {}, fileUploadId = {}, processingCompleted = {}", success,
+                LOG.error( "Emitting tuple with success = {}, fileUploadId = {}, processingCompleted = {}", success,
                     fileUploadId, ReportStatus.FAILED.getValue() );
                 _collector.emit( input,
                     Arrays.asList( success, response, fileUploadId, ReportStatus.FAILED.getValue(), reportRequest ) );
@@ -88,6 +87,6 @@ public class GetSocialFeedReport extends BaseComputeBoltWithAck {
 
     @Override public void declareOutputFields( OutputFieldsDeclarer outputFieldsDeclarer )
     {
-        outputFieldsDeclarer.declare( new Fields( "isSuccess", "socialFeed", "fileUploadId", "status", "reportRequest", "companyId", "enterAt" ) );
+        outputFieldsDeclarer.declare( new Fields( "isSuccess", "socialFeed", "fileUploadId", "status", "reportRequest", "enterAt" ) );
     }
 }

@@ -35,7 +35,9 @@ public class WriteSocialMonitorReportToExcel extends BaseComputeBoltWithAck
     public static final String SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD = "SocialSurvey User Name,Social Post Source,Post content,Post Link,Action,Owner Name,"
         + "Action Date,Comments";
 
-    @Override public void executeTuple( Tuple input )
+    @Override
+    @SuppressWarnings( "unchecked" )
+    public void executeTuple( Tuple input )
     {
         boolean success ;
         File file = null;
@@ -43,7 +45,6 @@ public class WriteSocialMonitorReportToExcel extends BaseComputeBoltWithAck
         byte[] fileBytes = null;
         String status = input.getStringByField( "status" );
         ReportRequest reportRequest = (ReportRequest) input.getValueByField("reportRequest");
-        long comapanyId = (long) input.getValueByField( "companyId" );
         int enterAt = (int) input.getValueByField( "enterAt" );
 
         if( status == ReportStatus.FAILED.getValue()){
@@ -52,7 +53,7 @@ public class WriteSocialMonitorReportToExcel extends BaseComputeBoltWithAck
             List<SocialResponseObject> socialResponseWrapper = (List<SocialResponseObject>) input.getValueByField("socialFeed");
             workbook = writeReportToWorkbook(socialResponseWrapper, reportRequest.getReportType(), enterAt );
             if ( workbook != null && status.equals(ReportStatus.PROCESSED.getValue()) ) {
-                fileName = reportRequest.getReportType() + "_" + comapanyId + "_" + ( Calendar.getInstance().getTimeInMillis()) + EXCEL_FILE_EXTENSION;
+                fileName = reportRequest.getReportType() + "_" + ( Calendar.getInstance().getTimeInMillis()) + EXCEL_FILE_EXTENSION;
                 try {
                     file = FileUtils.createFileInLocal(fileName, workbook);
                     fileBytes = FileUtils.convertFileToBytes(file);
@@ -73,8 +74,8 @@ public class WriteSocialMonitorReportToExcel extends BaseComputeBoltWithAck
 
         //if the file is successfully created , delete from the local
         if(file != null && file.exists()) {
-            if(file.delete()) LOG.info(" {} has been successfully deleted ", fileName);
-            else LOG.info(" Unable to delete {} " , fileName);
+            if(file.delete()) LOG.debug(" {} has been successfully deleted ", fileName);
+            else LOG.error(" Unable to delete {} " , fileName);
         }
     }
 
@@ -83,8 +84,8 @@ public class WriteSocialMonitorReportToExcel extends BaseComputeBoltWithAck
         int enterAt )
     {
         Map<Integer, List<Object>> data = null;
-        if(reportType == ReportType.SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD.getName()) {
-            if(enterAt ==1){
+        if(reportType.equals( ReportType.SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD.getName() )) {
+            if( enterAt == 1 ){
                 data = WorkBookUtils.writeReportHeader(SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD);
                 workbook = WorkBookUtils.createWorkbook(data);
             }
@@ -102,6 +103,7 @@ public class WriteSocialMonitorReportToExcel extends BaseComputeBoltWithAck
     }
 
 
+    @SuppressWarnings( "unchecked" )
     private Map<Integer,List<Object>> getSocialMonitorReportForKeywordToBeWrittenInSheet( List<SocialResponseObject> socialResponseWrapper )
     {
         Map<Integer, List<Object>> socialFeedData = new TreeMap<>();
@@ -115,10 +117,10 @@ public class WriteSocialMonitorReportToExcel extends BaseComputeBoltWithAck
                     socialMonitorReportToPopulate = new ArrayList<Object>();
 
                     socialMonitorReportToPopulate.add(socialFeed.getOwnerName());
-                    socialMonitorReportToPopulate.add(socialFeed.getType());
+                    socialMonitorReportToPopulate.add(socialFeed.getType().toString());
                     socialMonitorReportToPopulate.add(socialFeed.getText());
-                    socialMonitorReportToPopulate.add(socialFeed.getPageLink());
-                    socialMonitorReportToPopulate.add(actionHistory.getActionType());
+                    socialMonitorReportToPopulate.add(socialFeed.getPostLink());
+                    socialMonitorReportToPopulate.add(actionHistory.getActionType().toString());
                     socialMonitorReportToPopulate.add(actionHistory.getOwnerName());
                     socialMonitorReportToPopulate.add(ConversionUtils.convertToEst( actionHistory.getCreatedDate() ));
                     socialMonitorReportToPopulate.add(actionHistory.getText());
