@@ -17,6 +17,7 @@ public class ReportRequest implements Serializable
     private String expectedTimeZone;
     private long startTime;
 	private long endTime;
+    private String keyword;
 
 
     public long getFileUploadId()
@@ -145,16 +146,27 @@ public class ReportRequest implements Serializable
 		this.endTime = endTime;
 	}
 
+	public String getKeyword()
+    {
+        return keyword;
+    }
 
-	@Override
-	public String toString() {
-		return "ReportRequest [fileUploadId=" + fileUploadId + ", reportType=" + reportType
-				+ ", startDateExpectedTimeZone=" + startDateExpectedTimeZone + ", endDateExpectedTimeZone="
-				+ endDateExpectedTimeZone + ", profileLevel=" + profileLevel + ", profileValue=" + profileValue
-				+ ", companyId=" + companyId + ", actualTimeZone=" + actualTimeZone + ", expectedTimeZone="
-				+ expectedTimeZone + ", startTime=" + startTime + ", endTime=" + endTime + "]";
-	}
 
+    public void setKeyword( String keyword )
+    {
+        this.keyword = keyword;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return "ReportRequest [fileUploadId=" + fileUploadId + ", reportType=" + reportType + ", startDateExpectedTimeZone="
+            + startDateExpectedTimeZone + ", endDateExpectedTimeZone=" + endDateExpectedTimeZone + ", profileLevel="
+            + profileLevel + ", profileValue=" + profileValue + ", companyId=" + companyId + ", actualTimeZone="
+            + actualTimeZone + ", expectedTimeZone=" + expectedTimeZone + ", startTime=" + startTime + ", endTime=" + endTime
+            + ", keyword=" + keyword + "]";
+    }
 
 
 
