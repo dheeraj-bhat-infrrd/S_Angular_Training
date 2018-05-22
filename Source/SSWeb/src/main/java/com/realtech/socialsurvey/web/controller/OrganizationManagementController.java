@@ -876,8 +876,11 @@ public class OrganizationManagementController
         String sellerAgentEmail = request.getParameter( "seller-agnt-email" );
         String sellerAgentName = request.getParameter( "seller-agnt-name" );
         String propertyAddress = request.getParameter( "property-address" );
-        String loanProcessorName = request.getParameter( "loan-processor-name" );
         String loanProcessorEmail = request.getParameter( "loan-processor-email" );
+        String loanProcessorName = request.getParameter( "loan-processor-name" );
+        
+        String loanOfficerEmail = request.getParameter( "loan-officer-email" );
+        String loanOfficerName = request.getParameter( "loan-officer-name" );
 
         String version = request.getParameter( "sdk-version-selection-list" );
 
@@ -937,6 +940,14 @@ public class OrganizationManagementController
             encompassCrmInfo.setUrl( encompassUrl );
 
             encompassCrmInfo.setVersion( version );
+            
+            //save loan officer name and email fields details if given
+            if( ! StringUtils.isEmpty(loanOfficerEmail)) {
+            	encompassCrmInfo.setLoanOfficerEmail(loanOfficerEmail);
+            }
+            if( ! StringUtils.isEmpty(loanOfficerName)) {
+            	encompassCrmInfo.setLoanOfficerName(loanOfficerName);
+            }
 
             //check if it's need to update real state agent detail
             if ( !StringUtils.isEmpty( buyerAgentEmail ) || !StringUtils.isEmpty( buyerAgentName )
