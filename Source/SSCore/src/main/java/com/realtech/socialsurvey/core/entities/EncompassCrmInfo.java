@@ -13,6 +13,9 @@ public class EncompassCrmInfo extends CRMInfo
     private boolean generateReport;
     private String version;
     
+    private String loanOfficerEmail;
+    private String loanOfficerName;
+    
     private String buyerAgentEmail;
     private String buyerAgentName;
     private String sellerAgentEmail;
@@ -196,6 +199,26 @@ public class EncompassCrmInfo extends CRMInfo
 
 	public void setLoanProcessorName(String loanProcessorName) {
 		this.loanProcessorName = loanProcessorName;
+	}
+
+
+	public String getLoanOfficerEmail() {
+		return loanOfficerEmail;
+	}
+
+
+	public void setLoanOfficerEmail(String loanOfficerEmail) {
+		this.loanOfficerEmail = loanOfficerEmail;
+	}
+
+
+	public String getLoanOfficerName() {
+		return loanOfficerName;
+	}
+
+
+	public void setLoanOfficerName(String loanOfficerName) {
+		this.loanOfficerName = loanOfficerName;
 	}
 
 

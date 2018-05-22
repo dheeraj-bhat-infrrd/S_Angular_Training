@@ -14,6 +14,9 @@
 					<c:set var="encompassstate" value="${ appSettings.crm_info.state }" />
 					<c:set var="encompassversion" value="${ appSettings.crm_info.version }" />
 					
+					<c:set var="loanOfficerEmail" value="${ appSettings.crm_info.loanOfficerEmail }" />
+					<c:set var="loanOfficerName" value="${ appSettings.crm_info.loanOfficerName }" />
+					
 					<c:set var="buyerAgentEmail" value="${ appSettings.crm_info.buyerAgentEmail }" />
 					<c:set var="buyerAgentName" value="${ appSettings.crm_info.buyerAgentName }" />
 					<c:set var="sellerAgentEmail" value="${ appSettings.crm_info.sellerAgentEmail }" />
@@ -73,6 +76,9 @@
 							</div>
 						</div>
 					</div>
+					
+					
+					<!-- encompass url -->
 					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item">
 						<div class="hm-item-row item-row-OR clearfix float-left">
 							<div class="um-item-row-left width-offset text-right">
@@ -85,6 +91,9 @@
 							</div>
 						</div>
 					</div>
+					
+						<!-- trigger  field -->
+					
 					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item overflow-hidden"">
 						<div class="hm-item-row item-row-OR clearfix float-left">
 							<div class="um-item-row-left width-offset text-right">
@@ -98,6 +107,35 @@
 								<div class="rfr_icn icn-field-id en-icn"></div>
 								<input id="encompass-fieldId" type="text" class="um-item-row-txt um-item-row-txt-OR en-form-align-left" placeholder="Trigger fieldId" name="encompass-fieldId" value="${encompassfieldid}">
 								<div id="encompass-fieldId-error" class="hm-item-err-2"></div>
+							</div>
+						</div>
+					</div>
+					
+					<!-- loan officer details -->
+					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item">
+						<div class="hm-item-row item-row-OR clearfix float-left">
+							<div class="um-item-row-left width-offset text-right um-item-row-left-overflow">
+								<spring:message code="label.loan.officer.email.key" />
+							</div>
+							<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
+								<div class="rfr_icn icn-url en-icn"></div>
+								<input id="loan-officer-email" type="text" class="encompass-url-adj um-item-row-txt um-item-row-txt-OR en-user-name en-form-align-left" placeholder="Loan Officer Email" name="loan-officer-email" value="${loanOfficerEmail}">
+							</div>
+						</div>
+					</div>
+					
+					<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 um-panel-item overflow-hidden">
+						<div class="hm-item-row item-row-OR clearfix float-left">
+							<div class="um-item-row-left width-offset text-right um-item-row-left-overflow">
+								<spring:message code="label.loan.officer.name.key" />
+							</div>
+							<div class="clearfix float-right ">
+								<div class="um-item-row-icon margin-left-0"></div>
+								<div class="um-item-row-icon margin-left-0"></div>
+							</div>
+							<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj float-left">
+								<div class="rfr_icn icn-field-id en-icn"></div>
+								<input id="loan-officer-name" type="text" class="um-item-row-txt um-item-row-txt-OR en-form-align-left" placeholder="Loan Officer Name" name="loan-officer-name" value="${loanOfficerName}">
 							</div>
 						</div>
 					</div>
