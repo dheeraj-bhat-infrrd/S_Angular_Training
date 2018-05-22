@@ -13,6 +13,7 @@ var vendastaAccess = "false";
 var expiredSocialMediaList = JSON.parse('${expiredSocialMediaList}');
 var isTokenRefreshRequired = '${isTokenRefreshRequired}';
 var isSocialMediaExpired = '${isSocialMediaExpired}';
+var enableTokenRefresh = '${enableTokenRefresh}';
 
 $(document).ready(function() {
 	callAjaxGetWithPayloadData("/ishiddensection.do", function(data) {
@@ -141,22 +142,21 @@ function landingFlow() {
     }
 	
 	showMainContent('./showreportingpage.do');
-	
-	//update social media
-	if( isSocialMediaExpired == "true" || isSocialMediaExpired == true ){
-		if($("#rep-fix-social-media").length > 0){
-			$("#rep-fix-social-media").removeClass("hide");
+	if (enableTokenRefresh == "true" || enableTokenRefresh == true) {
+		//update social media
+		if (isSocialMediaExpired == "true" || isSocialMediaExpired == true) {
+			if ($("#rep-fix-social-media").length > 0) {
+				$("#rep-fix-social-media").removeClass("hide");
+			}
 		}
-		
-	}
-	if( isTokenRefreshRequired == "true" || isTokenRefreshRequired == true ){
-		var columnName = "${entityType}";
-		var columnValue = "${entityId}";
-		
-		for (var expiredSocialMedia in expiredSocialMediaList) {
-		 	 openAuthPageFixSocialMedia(expiredSocialMediaList[expiredSocialMedia], columnName, columnValue, "false");
+		if (isTokenRefreshRequired == "true" || isTokenRefreshRequired == true) {
+			var columnName = "${entityType}";
+			var columnValue = "${entityId}";
+			for ( var expiredSocialMedia in expiredSocialMediaList) {
+				openAuthPageFixSocialMedia( expiredSocialMediaList[expiredSocialMedia], columnName, columnValue, "false");
+				}
+			}
 		}
 	}
-}
 </script>
 <jsp:include page="footer.jsp" />

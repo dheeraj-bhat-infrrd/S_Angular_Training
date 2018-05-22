@@ -605,7 +605,7 @@ public class RegistrationController
 			}
 
 			redirectAttributes.addFlashAttribute("isDirectRegistration", false);
-
+			
 			// check if the email id exists.
 			if (userManagementService.userExists(emailId)) {
 				redirectAttributes.addFlashAttribute("message", "The Email address is already taken");

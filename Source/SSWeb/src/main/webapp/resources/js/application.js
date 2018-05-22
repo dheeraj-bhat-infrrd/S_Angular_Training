@@ -6091,6 +6091,19 @@ function updateAutoPostSetting(isautopostenabled, disableEle) {
 	});
 }
 
+function updateEntitySettings(settingName, settingStatus) {
+	var payload = {
+		"settingName" : settingName,
+		"settingStatus" : settingStatus
+	};
+	
+	callAjaxPostWithPayloadData("./updateentitysettings.do", function(data) {
+		$('#overlay-toast').html(data);
+		showToast();
+	}, payload, true);
+	
+}
+
 function updateAutoPostLinkToUserSiteSetting(isautopostlinktositeenabled, disableEle) {
 	var payload = {
 		"autopostlinktousersite" : isautopostlinktositeenabled
@@ -12304,6 +12317,56 @@ $('body').on('click', '#atpst-chk-box', function() {
 	} else {
 		$('#atpst-chk-box').addClass('bd-check-img-checked');
 		updateAutoPostSetting(false, '#atpst-chk-box');
+	}
+});
+
+$('body').on('click', '#hide-pp-chk-box', function() {
+	if ($('#hide-pp-chk-box').hasClass('bd-check-img-checked')) {
+		$('#hide-pp-chk-box').removeClass('bd-check-img-checked');
+		updateEntitySettings( "hidePublicPage", true);
+	} else {
+		$('#hide-pp-chk-box').addClass('bd-check-img-checked');
+		updateEntitySettings( "hidePublicPage", false);
+	}
+});
+
+$('body').on('click', '#hide-bread-crumb-chk-box', function() {
+	if ($('#hide-bread-crumb-chk-box').hasClass('bd-check-img-checked')) {
+		$('#hide-bread-crumb-chk-box').removeClass('bd-check-img-checked');
+		updateEntitySettings( "hideFromBreadCrumb", true);
+	} else {
+		$('#hide-bread-crumb-chk-box').addClass('bd-check-img-checked');
+		updateEntitySettings( "hideFromBreadCrumb", false);
+	}
+});
+
+$('body').on('click', '#hidden-section-chk-box', function() {
+	if ($('#hidden-section-chk-box').hasClass('bd-check-img-checked')) {
+		$('#hidden-section-chk-box').removeClass('bd-check-img-checked');
+		updateEntitySettings( "hiddenSection", true);
+	} else {
+		$('#hidden-section-chk-box').addClass('bd-check-img-checked');
+		updateEntitySettings( "hiddenSection", false);
+	}
+});
+
+$('body').on('click', '#mail-frm-cmpny-chk-box', function() {
+	if ($('#mail-frm-cmpny-chk-box').hasClass('bd-check-img-checked')) {
+		$('#mail-frm-cmpny-chk-box').removeClass('bd-check-img-checked');
+		updateEntitySettings( "sendEmailFromCompany", true);
+	} else {
+		$('#mail-frm-cmpny-chk-box').addClass('bd-check-img-checked');
+		updateEntitySettings( "sendEmailFromCompany", false);
+	}
+});
+
+$('body').on('click', '#ovride-sm-chk-box', function() {
+	if ($('#ovride-sm-chk-box').hasClass('bd-check-img-checked')) {
+		$('#ovride-sm-chk-box').removeClass('bd-check-img-checked');
+		updateEntitySettings( "allowOverrideForSocialMedia", true);
+	} else {
+		$('#ovride-sm-chk-box').addClass('bd-check-img-checked');
+		updateEntitySettings( "allowOverrideForSocialMedia", false);
 	}
 });
 
