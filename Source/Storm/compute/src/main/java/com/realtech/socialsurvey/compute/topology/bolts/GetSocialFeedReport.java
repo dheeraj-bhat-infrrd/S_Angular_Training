@@ -42,7 +42,7 @@ public class GetSocialFeedReport extends BaseComputeBoltWithAck {
             Optional<List<SocialResponseObject>> response = null;
             long companyId = reportRequest.getCompanyId();
             int pageNum = 1;
-            int pageSize = 10;
+            int pageSize = 100;
             String status = null;
             String keyword = reportRequest.getKeyword();
 
@@ -58,8 +58,8 @@ public class GetSocialFeedReport extends BaseComputeBoltWithAck {
                     } else if ( pageNum > 1 && ( !response.isPresent() || response.get().isEmpty() ) )
                         status = ReportStatus.PROCESSED.getValue();
                     success = true;
-                    LOG.info( "Emitting tuple with success = {}, data = {}, fileUploadId = {}, status = {}, companyId = {}, enterAt = {}  ",
-                        success, response.get(),  fileUploadId, status, companyId, pageNum );
+                    LOG.info( "Emitting tuple with success = {}, fileUploadId = {}, status = {}, companyId = {}, enterAt = {}  ",
+                        success, fileUploadId, status, companyId, pageNum );
                     _collector.emit( input, Arrays.asList( success, response.get(), fileUploadId,
                         status, reportRequest, pageNum ) );
                     pageNum++;

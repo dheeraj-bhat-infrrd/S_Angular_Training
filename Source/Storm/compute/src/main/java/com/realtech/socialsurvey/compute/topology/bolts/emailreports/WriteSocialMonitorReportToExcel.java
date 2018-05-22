@@ -88,7 +88,11 @@ public class WriteSocialMonitorReportToExcel extends BaseComputeBoltWithAck
             if( enterAt == 1 ){
                 data = WorkBookUtils.writeReportHeader(SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD);
                 workbook = WorkBookUtils.createWorkbook(data);
+                enterAt = 2;
             }
+            else
+                enterAt = workbook.getSheetAt( 0 ).getLastRowNum()+1;
+
             data = getSocialMonitorReportForKeywordToBeWrittenInSheet(socialResponseWrapper);
         }
        /* else {
@@ -98,7 +102,7 @@ public class WriteSocialMonitorReportToExcel extends BaseComputeBoltWithAck
             }
             data = getEmailReportToBeWrittenInSheet(socialResponseWrapper);
         }*/
-        workbook = WorkBookUtils.writeToWorkbook(data, workbook, (enterAt-1)*10+2);
+        workbook = WorkBookUtils.writeToWorkbook(data, workbook, enterAt);
         return workbook;
     }
 
