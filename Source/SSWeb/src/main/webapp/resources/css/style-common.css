@@ -1126,6 +1126,14 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 	line-height: 40px;
 }
 
+
+.um-item-row-left-overflow {
+	line-height: 20px;
+    text-align: center;
+    padding-left: 25px;
+}
+
+
 .vms-item-row-left {
 	padding-right: 10px;
 	width: 200px;
