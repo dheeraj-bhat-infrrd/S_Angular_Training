@@ -31,7 +31,7 @@ public class SSApiIntergrationBuilder implements InitializingBean
     public void afterPropertiesSet() throws Exception
     {
         LOG.info( "Initialising rest builder" );
-        RestAdapter apiAdaptor = new RestAdapter.Builder().setLogLevel( RestAdapter.LogLevel.FULL )
+        RestAdapter apiAdaptor = new RestAdapter.Builder().setLogLevel( RestAdapter.LogLevel.BASIC )
             .setErrorHandler( new SSApiErrorHandler() )
             .setEndpoint( apiEndPoint ).build();
         integrationApi = apiAdaptor.create( SSApiIntegration.class );
