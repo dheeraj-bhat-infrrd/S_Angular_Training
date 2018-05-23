@@ -236,9 +236,10 @@ public class SurveyManagementController
      */
     @ResponseBody
     @RequestMapping(value = "/data/getSwearWords" , method = RequestMethod.GET)
-    public String getSwearList() {
+    public String getSwearList(HttpServletRequest request) {
         LOG.info( "Method to get swear list started" );
-        Response response = ssApiIntergrationBuilder.getIntegrationApi().getSwearWordsList();
+        long companyId = Long.parseLong( request.getParameter("companyId") );
+        Response response = ssApiIntergrationBuilder.getIntegrationApi().getSwearWordsList(companyId);
         return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
 
     }
@@ -1788,6 +1789,7 @@ public class SurveyManagementController
 		surveyAndStage.put("source", surveyPreInitiation.getSurveySource());
 		surveyAndStage.put("hiddenSection", companySettings.isHiddenSection());
 		surveyAndStage.put("companyName", user.getCompany().getCompany());
+		surveyAndStage.put("companyId", companySettings.getIden());
 
 		LOG.info("Method getSurvey finished.");
 		return surveyAndStage;

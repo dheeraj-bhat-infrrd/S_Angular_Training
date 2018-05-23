@@ -7389,6 +7389,7 @@ function initSurveyWithUrl(q) {
 				surveyId = data.responseJSON.surveyId;
 				hiddenSection=data.responseJSON.hiddenSection;
 				companyName = data.responseJSON.companyName;
+				companyId = data.responseJSON.companyId;
 				paintSurveyPage(data);
 				var message = $("#pst-srvy-div .bd-check-txt").html();
 				if(hiddenSection){
@@ -7396,7 +7397,7 @@ function initSurveyWithUrl(q) {
 				}else{
 					$("#pst-srvy-div .bd-check-txt").html(message.replace("%s", agentName));
 				}
-				swearWords=getSwearWords();
+				swearWords=getSwearWords(companyId);
 			} 
 			else {
 				$('.sq-ques-wrapper').addClass( 'sq-main-txt' );
@@ -7938,6 +7939,7 @@ function showMasterQuestionPage() {
 			return;
 		}
 
+		console.log(swearWords);
 		var isAbusive = false;
 		var feedbackArr = feedback.split(" ");
 		for (var i = 0; i < feedbackArr.length; i++) {
@@ -7945,7 +7947,7 @@ function showMasterQuestionPage() {
 				isAbusive = true;
 			}
 		}
-
+		console.log("isAbusive:"+isAbusive);
 		var onlyPostToSocialSurvey = true;
 		if ($('#shr-post-chk-box').hasClass('bd-check-img-checked') == false ) {
 			if (isAbusive == false) {
@@ -16143,13 +16145,16 @@ function formatAllTimeSlots(dates){
 	return xAxisData;
 }
 
-function getSwearWords() {
-	 
+function getSwearWords(companyId) {
+	var payload = {
+			  "companyId" : companyId
+	};
 	 $.ajax({
 	 url : getLocationOrigin() + surveyUrl + "data/getSwearWords",
 	 async:true,
 	 type : "GET",
 	 cache : false,
+	 data : payload,
 	 dataType : "JSON",
 	 success : function(data) {
 	 swearWords=JSON.parse(data);
