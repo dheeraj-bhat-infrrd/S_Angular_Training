@@ -363,6 +363,11 @@ $(document).on('click', function(e) {
 		$('#zillow-popup').hide();
 		enableBodyScroll();
 	} 
+	
+	if ($('#summit-popup-body').is(':visible')) {
+		closeSummitPopup();
+	} 
+	
 
 });
 
@@ -397,6 +402,10 @@ $(document).on('keyup', function(e) {
 			$('#zillow-popup-body').html('');
 			enableBodyScroll();
 		}
+		
+		if ($('#summit-popup-body').is(':visible')) {
+			closeSummitPopup();
+		} 
 	}
 });
 
@@ -16168,9 +16177,6 @@ function getSwearWords(companyId) {
 	 });
 }
 
-
-
-
 $('body').on('blur', '#user-notification-recipients', function() {
 	
 	// format email IDs
@@ -16189,4 +16195,59 @@ $('body').on('blur', '#user-notification-recipients', function() {
 		showToast();
 	}, payload, true);
 	
+});
+
+function showSummitPopup(){
+	$('#summit-popup').show();
+	disableBodyScroll();
+}
+
+function closeSummitPopup(){
+	$('#summit-popup').hide();
+	showSummitRibbon();
+	enableBodyScroll();
+}
+
+
+function showSummitRibbon(){
+	$('#summit-ribbon').show();
+}
+
+function closeSummitRibbon(){
+	$('#summit-ribbon').hide();
+}
+
+$(document).on('click','#register-summit-btn',function(e){
+	e.stopImmediatePropagation();
+	e.preventDefault();
+	
+	closeSummitPopup();
+	window.open('http://www.createwowsummit.com', '_blank');
+	
+});
+
+$(document).on('click','#close-summit-popup',function(e){
+	e.stopPropagation();
+		
+	closeSummitPopup();
+});
+
+$(document).on('click','#summit-ribbon',function(e){
+	e.stopPropagation();
+	e.stopImmediatePropagation();
+	e.preventDefault();
+	
+	window.open('http://www.createwowsummit.com', '_blank');
+});
+
+$(document).on('click','#close-summit-ribbon',function(e){
+	e.stopPropagation();
+		
+	closeSummitRibbon();
+});
+
+$(document).on('click','#summit-popup-body',function(e){
+	e.stopPropagation();
+	e.stopImmediatePropagation();
+	e.preventDefault();
 });
