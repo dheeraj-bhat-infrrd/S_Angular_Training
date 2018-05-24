@@ -1832,6 +1832,8 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
                 recentActivityList.add( CommonConstants.REPORTING_DIGEST );
             } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT ) {
                 recentActivityList.add( CommonConstants.SOCIAL_MONITOR_DATE_REPORT );
+            } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD ) {
+                recentActivityList.add( CommonConstants.SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD );
             }
 
             recentActivityList.add( fileUpload.getStartDate() );
@@ -5353,4 +5355,27 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
         LOG.debug( "method enableSocialMonitorToggle() finished." );
         return true;
     }
+
+
+    @Override
+    public boolean isSocialMonitorEnabled( long companyId ) throws InvalidInputException, NoRecordsFetchedException
+    {
+        LOG.debug( "method enableSocialMonitorToggle() started." );
+
+        if ( companyId <= 0 ) {
+            LOG.warn( "companyId is invalid" );
+            throw new InvalidInputException( "companyId is invalid" );
+        }
+
+        OrganizationUnitSettings unitSettings = organizationManagementService.getCompanySettings( companyId );
+
+        if ( unitSettings == null ) {
+            LOG.warn( "settings are not specified" );
+            throw new InvalidInputException( "settings cannot be null." );
+        }
+
+        return unitSettings.isSocialMonitorEnabled();
+    }
+    
+    
 }

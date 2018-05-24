@@ -77,6 +77,8 @@ public class ReportingWebController
     private static final String ENTITY_ID = "entityId";
     private static final String ENTITY_TYPE = "entityType";
     private static final String TIME_FRAME = "timeFrame";
+    private static final String SOCIAL_MONITOR_FLAG = "isSocialMonitorEnabled";
+    
 
     private SessionHelper sessionHelper;
 
@@ -673,7 +675,7 @@ public class ReportingWebController
 
     //TO SHOW REPORTING UI
     @RequestMapping ( value = "/showreportspage", method = RequestMethod.GET)
-    public String showReportsPage( Model model, HttpServletRequest request )
+    public String showReportsPage( Model model, HttpServletRequest request ) throws InvalidInputException, NoRecordsFetchedException
     {
         LOG.info( "Showing reports page" );
         HttpSession session = request.getSession( false );
@@ -686,10 +688,14 @@ public class ReportingWebController
                 model.addAttribute( COLUMN_NAME, CommonConstants.AGENT_ID_COLUMN );
                 model.addAttribute( COLUMN_VALUE, entityId );
             } else {
+                if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                    model.addAttribute( SOCIAL_MONITOR_FLAG, reportingDashboardManagement.isSocialMonitorEnabled( entityId ) );
+                }
                 model.addAttribute( COLUMN_NAME, entityType );
                 model.addAttribute( COLUMN_VALUE, entityId );
             }
         }
+        
         
         // add the month name for month before last month
         Calendar calendar = Calendar.getInstance(); 

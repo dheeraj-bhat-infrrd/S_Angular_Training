@@ -48,7 +48,10 @@
  								<option value=<spring:message code="label.nps.report.value" /> data-report="nps-report"><spring:message code="label.nps.report.key" /></option>
 								<option value=<spring:message code="label.branch.ranking.monthly.report.value" /> data-report="company-user"><spring:message code="label.branch.ranking.report.key" /></option>
 								<option value=<spring:message code="label.survey.invitation.email.report.value" /> data-report="survey-invitation-email-report"><spring:message code="label.survey.invitation.email.report.key" /></option>
+							</c:if>
+							<c:if test="${(profilemasterid == 1 && isSocialMonitorEnabled == true)}"> 
 								<option value=<spring:message code="label.social.monitor.date.report.value" /> data-report="social-monitor-date-report"><spring:message code="label.social.monitor.date.report.key" /></option>
+								<option value=<spring:message code="label.social.monitor.date.keyword.report.value" /> data-report="social-monitor-date-keyword-report"><spring:message code="label.social.monitor.date.keyword.report.key" /></option>
 							</c:if>
   								<option value=<spring:message code="label.survey.results.report.value" /> data-report="survey-results"><spring:message code="label.survey.results.report.key" /></option>
  								<option value=<spring:message code="label.survey.transaction.report.value" /> data-report="survey-transaction-summary"><spring:message code="label.survey.transaction.report.key" /></option>
@@ -109,6 +112,13 @@
 							<input id="dsh-end-date" class="dsh-date-picker" placeholder="<spring:message code="label.enddate.key" />" style="width:100%; text-align:center">
 						</div>
 					</div>
+					<div id="sm-keywords" class="float-left board-div hide">
+						<div class="dash-btn-dl-sd-admin time-selector" style="width:150px; margin-top:-4px">
+							<select id="sm-keywords-selector" class="float-left dash-download-sel-item board-selector-choice" style="width:100%" required>
+								<option value="" selected disabled>--Select keyword--</option>
+							</select>	
+						</div>
+					</div>
 					<div class="dash-btn-dl-sd-admin generate-report-btn">
 						<div id="reports-generate-report-btn" class="dash-down-go-button float-right cursor-pointer" style="width:100%;">
 							<spring:message code="label.downloadsurveydata.key.click" />
@@ -147,6 +157,7 @@ $(document).ready(function() {
 	updateViewAsScroll();
 	bindDatePickerforSurveyDownload();
 	drawTransReportTimeFrames();
+	drawPhraseList();
 	
 	var selectedVal = $('#generate-survey-reports').val();
 	var key = parseInt(selectedVal);
@@ -174,6 +185,12 @@ $(document).ready(function() {
 		$('#email-rep-time-div').removeClass('hide');
 	}else{
 		$('#email-rep-time-div').addClass('hide');
+	}
+	
+	if(key == 302){
+		$('#sm-keywords').removeClass('hide');
+	}else{
+		$('#sm-keywords').addClass('hide');
 	}
 	
 	var startIndex=0;
