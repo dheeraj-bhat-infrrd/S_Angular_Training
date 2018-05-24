@@ -51,7 +51,8 @@ public class FileUploadDaoImpl extends GenericDaoImpl<FileUpload, Long> implemen
                 CommonConstants.FILE_UPLOAD_REPORTING_BRANCH_RANKING_MONTHLY_REPORT,
                 CommonConstants.FILE_UPLOAD_REPORTING_BRANCH_RANKING_YEARLY_REPORT,
                 CommonConstants.FILE_UPLOAD_REPORTING_DIGEST,
-                CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT) ) );
+                CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT,
+                CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD) ) );
             if ( startIndex > -1 ) {
                 criteria.setFirstResult( startIndex );
             }
@@ -91,7 +92,8 @@ public class FileUploadDaoImpl extends GenericDaoImpl<FileUpload, Long> implemen
                 CommonConstants.FILE_UPLOAD_REPORTING_BRANCH_RANKING_MONTHLY_REPORT,
                 CommonConstants.FILE_UPLOAD_REPORTING_BRANCH_RANKING_YEARLY_REPORT,
                 CommonConstants.FILE_UPLOAD_REPORTING_DIGEST,
-                CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT) ) );
+                CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT,
+                CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD) ) );
             criteria.setProjection( Projections.rowCount() );
             Long count = (Long) criteria.uniqueResult();
             LOG.info( "Method getRecentActivityCountForReporting() finished." );
