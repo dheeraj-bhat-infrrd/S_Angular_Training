@@ -410,7 +410,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             UserProfile userProfileAgent = userManagementService.createUserProfile( user, user.getCompany(), user.getEmailId(),
                 user.getUserId(), branch.getBranchId(), region.getRegionId(), profilesMaster.getProfileId(),
                 CommonConstants.IS_PRIMARY_TRUE, CommonConstants.PROFILE_STAGES_COMPLETE, CommonConstants.STATUS_ACTIVE,
-                String.valueOf( user.getUserId() ), String.valueOf( user.getUserId() ) );
+                String.valueOf( user.getUserId() ), String.valueOf( user.getUserId() ) );   
             userProfileDao.save( userProfileAgent );
 
         }
@@ -3411,14 +3411,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         List<User> assigneeUsers = null;
         Map<String, List<User>> userMap = new HashMap<String, List<User>>();
         Map<String, Object> map = new HashMap<String, Object>();
-        User socialMonitorUser = new User();
         if ( selectedUserId > 0l ) {
             LOG.debug( "Fetching user for selectedUserId " + selectedUserId );
             User assigneeUser = userDao.findById( User.class, selectedUserId );
             if ( assigneeUser == null ) {
                 throw new NoRecordsFetchedException( "No user found in db for selectedUserId:" + selectedUserId );
             }
-            socialMonitorUser = assigneeUser;
             assigneeUsers = new ArrayList<User>();
             assigneeUsers.add( assigneeUser );
         } else if ( emailIdsArray != null && emailIdsArray.length > 0 ) {
@@ -3427,7 +3425,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             assigneeUsers = userMap.get( CommonConstants.VALID_USERS_LIST );
         }
 
-        if ( assigneeUsers != null && !assigneeUsers.isEmpty() ) {
+        if ( (assigneeUsers != null && !assigneeUsers.isEmpty() ) && ! isSocialMonitorAdmin ) {
             /**
              * if branchId is provided, add the individual to specified branch
              */
@@ -3471,36 +3469,34 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         }
         //update UserProfile if the user is a Social monitor admin
-        List<UserProfile> userProfiles = socialMonitorUser.getUserProfiles();
+        int flag = 0;
         if ( isSocialMonitorAdmin ) {
-            if ( userProfiles != null && !userProfiles.isEmpty() ) {
-                for ( UserProfile profile : userProfiles ) {
-                    if ( ( profile.getUser().getUserId() == ( socialMonitorUser.getUserId() ) )
-                        && profile.getProfilesMaster() == profilesMasterDao.findById( ProfilesMaster.class,
-                            CommonConstants.PROFILES_MASTER_SM_ADMIN_PROFILE_ID )
-                        && profile.getStatus() == CommonConstants.STATUS_ACTIVE ) {
-                        throw new InvalidInputException(
-                            messageUtils.getDisplayMessage( DisplayMessageConstants.USER_ASSIGNMENT_ALREADY_EXISTS,
-                                DisplayMessageType.ERROR_MESSAGE ).getMessage() );
+            for ( User assigneeUser : assigneeUsers ) {
+                flag = 1;
+                List<UserProfile> userProfiles = assigneeUser.getUserProfiles();
+                if ( userProfiles != null && !userProfiles.isEmpty() ) {
+                    for ( UserProfile profile : userProfiles ) {
+                        if ( ( profile.getUser().getUserId() == ( assigneeUser.getUserId() ) )
+                            && profile.getProfilesMaster() == profilesMasterDao.findById( ProfilesMaster.class,
+                                CommonConstants.PROFILES_MASTER_SM_ADMIN_PROFILE_ID )
+                            && profile.getStatus() == CommonConstants.STATUS_ACTIVE ) {
+                            flag = 2;
+                            break;
+                        }
                     }
                 }
+                if ( flag == 1 ) {
+                    UserProfile userProfile = userManagementService.createUserProfile( assigneeUser, adminUser.getCompany(),
+                        assigneeUser.getEmailId(), assigneeUser.getUserId(), CommonConstants.DEFAULT_BRANCH_ID,
+                        CommonConstants.DEFAULT_REGION_ID, CommonConstants.PROFILES_MASTER_SM_ADMIN_PROFILE_ID,
+                        CommonConstants.IS_PRIMARY_FALSE, CommonConstants.PROFILE_STAGES_COMPLETE,
+                        CommonConstants.STATUS_ACTIVE, String.valueOf( adminUser.getUserId() ),
+                        String.valueOf( adminUser.getUserId() ) );
+                    userProfileDao.save( userProfile );
+                }
+
             }
-            UserProfile userProfile = new UserProfile();
-            userProfile.setProfilesMaster(
-                profilesMasterDao.findById( ProfilesMaster.class, CommonConstants.PROFILES_MASTER_SM_ADMIN_PROFILE_ID ) );
-            userProfile.setCompany( adminUser.getCompany() );
-            userProfile.setAgentId( socialMonitorUser.getUserId() );
-            userProfile.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
-            userProfile.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
-            userProfile.setStatus( CommonConstants.STATUS_ACTIVE );
-            userProfile.setEmailId( socialMonitorUser.getEmailId() );
-            userProfile.setUser( socialMonitorUser );
-            userProfile.setCreatedBy( String.valueOf( adminUser.getUserId() ) );
-            userProfile.setModifiedBy( String.valueOf( adminUser.getUserId() ) );
-            userProfile.setIsPrimary( CommonConstants.IS_PRIMARY_FALSE );
-            userProfile.setProfileCompletionStage( CommonConstants.PROFILE_STAGES_COMPLETE );
-            userProfile.setIsProfileComplete( CommonConstants.STATUS_ACTIVE );
-            userProfileDao.save( userProfile );
+
         }
         LOG.debug( "Method addNewIndividual executed successfully" );
         if ( userMap != null ) {
