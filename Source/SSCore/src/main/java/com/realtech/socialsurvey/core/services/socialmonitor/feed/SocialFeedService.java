@@ -116,5 +116,7 @@ public interface SocialFeedService
 
     List<SocialResponseObject> getSocialFeed( String keyword, long companyId, long startTime, long endTime, int pageSize, int skips )
         throws InvalidInputException;
-    
+
+    List<SocialResponseObject> getSocialFeed( long companyId, long startTime, long endTime, int pageSize, int skips )
+        throws InvalidInputException;
 }

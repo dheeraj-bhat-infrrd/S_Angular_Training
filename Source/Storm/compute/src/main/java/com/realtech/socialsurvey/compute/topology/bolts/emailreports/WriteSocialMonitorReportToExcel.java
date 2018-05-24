@@ -34,6 +34,8 @@ public class WriteSocialMonitorReportToExcel extends BaseComputeBoltWithAck
 
     public static final String SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD = "SocialSurvey User Name,Social Post Source,Post content,Post Link,Action,Owner Name,"
         + "Action Date,Comments";
+    public static final String SOCIAL_MONITOR_DATE_REPORT = "SocialSurvey User Name,Social Post Source,Post content,Post Link,If flagged automatic,"
+        + "Action,Owner Name,Action Date,Comments";
 
     @Override
     @SuppressWarnings( "unchecked" )
@@ -46,6 +48,7 @@ public class WriteSocialMonitorReportToExcel extends BaseComputeBoltWithAck
         String status = input.getStringByField( "status" );
         ReportRequest reportRequest = (ReportRequest) input.getValueByField("reportRequest");
         int enterAt = (int) input.getValueByField( "enterAt" );
+        long fileUploadId = (long) input.getValueByField("fileUploadId");
 
         if( status == ReportStatus.FAILED.getValue()){
             workbook = null;
@@ -62,15 +65,12 @@ public class WriteSocialMonitorReportToExcel extends BaseComputeBoltWithAck
                     FailedMessagesService failedMessagesService = new FailedMessagesServiceImpl();
                     failedMessagesService.insertTemporaryFailedReportRequest(reportRequest);
                 }
-                /*if (workbook == null || file == null || !file.exists() || fileBytes == null) {
-                    status = ReportStatus.FAILED.getValue();
-                }*/
             }
         }
         success = true;
-        LOG.info("Emitting tuple with success = {} , fileName = {}, status = {}", success, fileName, status);
-        _collector.emit(input, Arrays.asList(success,fileName,fileBytes,input.getValueByField("fileUploadId"),
-            input.getValueByField("reportRequest"), status));
+        LOG.info("Emitting tuple with success = {} , fileUploadId = {}, fileName = {}, status = {}", success, fileUploadId, fileName, status);
+        _collector.emit(input, Arrays.asList(success, fileName, fileBytes, fileUploadId,
+            reportRequest, status));
 
         //if the file is successfully created , delete from the local
         if(file != null && file.exists()) {
@@ -83,7 +83,7 @@ public class WriteSocialMonitorReportToExcel extends BaseComputeBoltWithAck
     private XSSFWorkbook writeReportToWorkbook( List<SocialResponseObject> socialResponseWrapper, String reportType,
         int enterAt )
     {
-        Map<Integer, List<Object>> data = null;
+        Map<Integer, List<Object>> data;
         if(reportType.equals( ReportType.SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD.getName() )) {
             if( enterAt == 1 ){
                 data = WorkBookUtils.writeReportHeader(SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD);
@@ -95,15 +95,63 @@ public class WriteSocialMonitorReportToExcel extends BaseComputeBoltWithAck
 
             data = getSocialMonitorReportForKeywordToBeWrittenInSheet(socialResponseWrapper);
         }
-       /* else {
+        else {
             if ( enterAt == 1 ){
-                data = WorkBookUtils.writeReportHeader(SURVEY_INVITATION_EMAIL_REPORT_HEADER);
+                data = WorkBookUtils.writeReportHeader(SOCIAL_MONITOR_DATE_REPORT);
                 workbook = WorkBookUtils.createWorkbook(data);
+                enterAt = 2;
             }
-            data = getEmailReportToBeWrittenInSheet(socialResponseWrapper);
-        }*/
+            else
+                enterAt = workbook.getSheetAt( 0 ).getLastRowNum()+1;
+
+            data = getSocialMonitorReportDateBasedToBeWrittenInSheet(socialResponseWrapper);
+        }
         workbook = WorkBookUtils.writeToWorkbook(data, workbook, enterAt);
         return workbook;
+    }
+
+
+    private Map<Integer,List<Object>> getSocialMonitorReportDateBasedToBeWrittenInSheet( List<SocialResponseObject> socialResponseWrapper )
+    {
+        Map<Integer, List<Object>> socialFeedData = new TreeMap<>();
+        if(workbook != null) {
+            List<Object> socialMonitorReportToPopulate;
+            int enterNext = 1;
+            for (SocialResponseObject socialFeed : socialResponseWrapper) {
+
+                if(socialFeed.getFoundKeywords() == null || socialFeed.getFoundKeywords().isEmpty()){
+                    socialMonitorReportToPopulate = new ArrayList<>();
+
+                    socialMonitorReportToPopulate.add(socialFeed.getOwnerName());
+                    socialMonitorReportToPopulate.add(socialFeed.getType().toString());
+                    socialMonitorReportToPopulate.add(socialFeed.getText());
+                    socialMonitorReportToPopulate.add(socialFeed.getPostLink());
+                    socialMonitorReportToPopulate.add( "No" );
+
+                    socialFeedData.put(enterNext++, socialMonitorReportToPopulate);
+                }
+                else {
+                    List<ActionHistory> actionHistories = socialFeed.getActionHistory();
+                    for( ActionHistory actionHistory : actionHistories ){
+
+                        socialMonitorReportToPopulate = new ArrayList<>();
+
+                        socialMonitorReportToPopulate.add(socialFeed.getOwnerName());
+                        socialMonitorReportToPopulate.add(socialFeed.getType().toString());
+                        socialMonitorReportToPopulate.add(socialFeed.getText());
+                        socialMonitorReportToPopulate.add(socialFeed.getPostLink());
+                        socialMonitorReportToPopulate.add("Yes");
+                        socialMonitorReportToPopulate.add(actionHistory.getActionType().toString());
+                        socialMonitorReportToPopulate.add(actionHistory.getOwnerName());
+                        socialMonitorReportToPopulate.add(ConversionUtils.convertToEst( actionHistory.getCreatedDate() ));
+                        socialMonitorReportToPopulate.add(actionHistory.getText());
+
+                        socialFeedData.put(enterNext++, socialMonitorReportToPopulate);
+                    }
+                }
+            }
+        }
+        return socialFeedData;
     }
 
 
@@ -118,7 +166,7 @@ public class WriteSocialMonitorReportToExcel extends BaseComputeBoltWithAck
                 List<ActionHistory> actionHistories = socialFeed.getActionHistory();
                 for( ActionHistory actionHistory : actionHistories ){
 
-                    socialMonitorReportToPopulate = new ArrayList<Object>();
+                    socialMonitorReportToPopulate = new ArrayList<>();
 
                     socialMonitorReportToPopulate.add(socialFeed.getOwnerName());
                     socialMonitorReportToPopulate.add(socialFeed.getType().toString());

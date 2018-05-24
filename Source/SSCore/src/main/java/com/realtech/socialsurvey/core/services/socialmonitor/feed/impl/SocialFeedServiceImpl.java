@@ -776,11 +776,21 @@ public class SocialFeedServiceImpl implements SocialFeedService
     @Override public List<SocialResponseObject> getSocialFeed( String keyword, long companyId, long startTime, long endTime, int pageSize, int skips )
         throws InvalidInputException
     {
-        if( keyword.isEmpty() || companyId <= 0 || startTime <=0 || endTime <= 0 ){
+        if( StringUtils.isEmpty( keyword ) || companyId <= 0 || startTime <=0 || endTime <= 0 ){
             throw new InvalidInputException( "specified input is invalid" );
         }
         return mongoSocialFeedDao.getSocialFeed(keyword, companyId, startTime, endTime, pageSize, skips);
 
+    }
+
+
+    @Override public List<SocialResponseObject> getSocialFeed( long companyId, long startTime, long endTime, int pageSize,
+        int skips ) throws InvalidInputException
+    {
+        if( companyId <= 0 || startTime <=0 || endTime <= 0 ){
+            throw new InvalidInputException( "specified input is invalid" );
+        }
+        return mongoSocialFeedDao.getSocialFeed( companyId, startTime, endTime, pageSize, skips);
     }
 } 
 

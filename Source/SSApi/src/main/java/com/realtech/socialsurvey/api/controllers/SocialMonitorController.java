@@ -374,8 +374,26 @@ public class SocialMonitorController
     {
         try{
             adminAuthenticationService.validateAuthHeader( authorizationHeader );
-            LOGGER.info( "SocialMonitor controller.getSocialFeedData started" );
+            LOGGER.info( "SocialMonitor controller.getSocialFeedData for keyword started" );
             List<SocialResponseObject> response = socialFeedService.getSocialFeed(keyword, companyId, startTime, endTime, pageSize, skips);
+            return new ResponseEntity<>( response, HttpStatus.OK );
+        } catch ( InvalidInputException e ){
+            throw new SSApiException( e.getMessage(), e );
+        } catch ( AuthorizationException e ) {
+            return new ResponseEntity<>( AUTH_FAILED, HttpStatus.UNAUTHORIZED );
+        }
+    }
+
+    @RequestMapping ( value = "/socialFeedData/companyId/{companyId}", method = RequestMethod.GET)
+    @ApiOperation( "Method to fetch socialfeed data within a particular date range from mongo" )
+    public ResponseEntity<?> getSocialFeedData( HttpServletRequest request, @RequestHeader("authorizationHeader") String authorizationHeader,
+        @PathVariable("companyId") long companyId, @RequestParam( "startTime" ) long startTime, @RequestParam( "endTime" ) long endTime, @RequestParam( "pageSize" ) int pageSize,
+        @RequestParam( "skips" ) int skips) throws SSApiException
+    {
+        try{
+            adminAuthenticationService.validateAuthHeader( authorizationHeader );
+            LOGGER.info( "SocialMonitor controller.getSocialFeedData started" );
+            List<SocialResponseObject> response = socialFeedService.getSocialFeed( companyId, startTime, endTime, pageSize, skips);
             return new ResponseEntity<>( response, HttpStatus.OK );
         } catch ( InvalidInputException e ){
             throw new SSApiException( e.getMessage(), e );
