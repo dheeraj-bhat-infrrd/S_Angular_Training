@@ -700,4 +700,16 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 		LOG.debug("Method to get userProfiles for companyId {} finished", companyId);
 		return (List<UserProfile>) criteria.list();
 	}
+
+    @Override
+    public List<UserProfile> getUserProfiles( long userId )
+    {
+        LOG.debug( "Method to find userProfile for userId: " + userId + " started." );
+        Criteria criteria = getSession().createCriteria( UserProfile.class );
+        criteria.add( Restrictions.eq( CommonConstants.USER_COLUMN + "." + CommonConstants.USER_ID, userId ) );
+        @SuppressWarnings ( "unchecked")
+        List<UserProfile> userProfiles = criteria.list();
+        LOG.debug( "Method to find userProfile for userId: " + userId + " finished." );        
+        return userProfiles;
+    }
  }

@@ -400,6 +400,7 @@ public interface OrganizationManagementService
      * @param emailIdsArray
      * @param isAdmin
      * @param holdSendingMail - true value will not send mail to the user till the record is verified.
+     * @param isAddedByRealtechOrSSAdmin
      * @return
      * @throws InvalidInputException
      * @throws SolrException
@@ -408,7 +409,7 @@ public interface OrganizationManagementService
      */
     public Map<String, Object> addNewRegionWithUser( User user, String regionName, int isDefaultBySystem, String address1,
         String address2, String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
-        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail )
+        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail, boolean isAddedByRealtechOrSSAdmin )
         throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException;
 
 
@@ -428,6 +429,7 @@ public interface OrganizationManagementService
      * @param selectedUserId
      * @param emailIdsArray
      * @param isAdmin
+     * @param isAddedByRealtechOrSSAdmin
      * @return
      * @throws InvalidInputException
      * @throws SolrException
@@ -436,7 +438,7 @@ public interface OrganizationManagementService
      */
     public Map<String, Object> updateRegion( User user, long regionId, String regionName, String address1, String address2,
         String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
-        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail )
+        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail, boolean isAddedByRealtechOrSSAdmin )
         throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException;
 
 
@@ -457,6 +459,7 @@ public interface OrganizationManagementService
      * @param selectedUserId
      * @param emailIdsArray
      * @param isAdmin
+     * @param isAddedByRealtechOrSSAdmin
      * @return
      * @throws InvalidInputException
      * @throws SolrException
@@ -465,7 +468,7 @@ public interface OrganizationManagementService
      */
     public Map<String, Object> updateBranch( User user, long branchId, long regionId, String branchName, String address1,
         String address2, String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
-        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail )
+        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail, boolean isAddedByRealtechOrSSAdmin )
         throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException;
 
 
@@ -503,6 +506,7 @@ public interface OrganizationManagementService
      * @param emailIdsArray
      * @param isAdmin
      * @param holdSendingMail - true value will not send mail to the user till the record is verified.
+     * @param isAddedByRealtechOrSSAdmin
      * @return
      * @throws InvalidInputException
      * @throws SolrException
@@ -511,7 +515,7 @@ public interface OrganizationManagementService
      */
     public Map<String, Object> addNewBranchWithUser( User user, String branchName, long regionId, int isDefaultBySystem,
         String address1, String address2, String country, String countryCode, String state, String city, String zipcode,
-        long selectedUserId, String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail )
+        long selectedUserId, String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail, boolean isAddedByRealtechOrSSAdmin )
         throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException;
 
 
@@ -539,9 +543,11 @@ public interface OrganizationManagementService
      * @param regionId
      * @param emailIdsArray
      * @param isAdmin
-     * @param holdSendingMail
+     * @param holdSendingMail - true value will not send mail to the user till the record is verified.
      * @param sendMail
+     * @param isAddedByRealtechOrSSAdmin
      * @param isSocialMonitorAdmin
+     *
      * @return
      * @throws InvalidInputException
      * @throws NoRecordsFetchedException
@@ -549,7 +555,7 @@ public interface OrganizationManagementService
      * @throws UserAssignmentException
      */
     public Map<String, Object> addIndividual( User adminUser, long selectedUserId, long branchId, long regionId,
-        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail, boolean sendMail, boolean isSocialMonitorAdmin )
+        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail, boolean sendMail, boolean isAddedByRealtechOrSSAdmin, boolean isSocialMonitorAdmin )
         throws InvalidInputException, NoRecordsFetchedException, SolrException, UserAssignmentException;
 
 
@@ -1372,7 +1378,7 @@ public interface OrganizationManagementService
 
 
     public Map<String, List<User>> getUsersFromEmailIdsAndInvite( String[] emailIdsArray, User adminUser,
-        boolean holdSendingMail, boolean sendMail ) throws InvalidInputException;
+        boolean holdSendingMail, boolean sendMail, boolean isAddedByRealtechOrSSAdmin ) throws InvalidInputException;
 
 
     public void pushZillowReviews( List<SurveyDetails> surveyDetailsList, String collectionName,
@@ -1714,6 +1720,20 @@ public interface OrganizationManagementService
     public void sendUserDeletionMail( User adminUser, User user )
         throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException;
 
+
     boolean updateSocialMediaToken( String collection, long iden, String fieldToUpdate, boolean value )
         throws InvalidInputException;
+
+    public void unsetWebAddressInProfile( long entityId, String entityType ) throws NonFatalException;
+
+
+
+    public boolean updateEntitySettings( String entityType, long entityId, String flagToBeUpdated, String status );
+
+    
+    void updateAgentProfileDisable( long companyId, boolean isAgentProfileDisabled ) throws InvalidInputException;
+
+
+    void updateAgentsProfileDisable( List<Long> agentId, boolean isAgentProfileDisabled ) throws InvalidInputException;
+
 }

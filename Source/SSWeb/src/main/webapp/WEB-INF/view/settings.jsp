@@ -66,7 +66,7 @@
 								<input type="hidden" id="at-pst-cb" name="autopost" value="${autoPostEnabled}">
 								<div class="float-left bd-check-txt">Allow user to autopost</div>
 							</div>							
-							<c:if test="${ columnName == 'companyId' }">
+							<c:if test="${ isRealTechOrSSAdmin == 'true' and columnName == 'companyId' }">
 								<div class="review-sort-sel-col">
 									<div class="clearfix setting-sel-wrapper">
 										<div class="st-score-rt-top margin-top-twenty email-sel-item-resp sort-resp">
@@ -79,10 +79,36 @@
 									</div>
 								</div>
 							</c:if>	
-							<c:if test="${ columnName != 'agentId' }">
-								<div id="customized-setting-div" class="st-score-rt-top" style="">Customized Feature Settings:</div>						
+							
+							<c:if test="${ columnName != 'agentId'  or isRealTechOrSSAdmin == true }">
+								<div id="customized-setting-div" class="st-score-rt-top" style="">Customized Feature Settings:</div>
+								<c:if test="${ isRealTechOrSSAdmin == true and columnName != 'companyId' }">	
+									<div id="hide-pp-chk-box" class="float-left bd-check-img clear-both"></div>
+									<input type="hidden" id="hide-pp-cb" name="hidepublicpage" value="${hidePublicPage}">
+									<div class="float-left customized-settings-child cust-resp-txt">Hide public page</div>
+									<div id="hide-bread-crumb-chk-box" class="float-left bd-check-img clear-both"></div>
+									<input type="hidden" id="hide-bc-cb" name="hidebreadcrumb" value="${hideFromBreadCrumb}">
+								<div class="float-left customized-settings-child cust-resp-txt">Hide from bread crumb</div>
+								</c:if>	
+								<c:if test="${ isRealTechOrSSAdmin == true and columnName == 'companyId' }">	
+									<div id="hide-pp-chk-box" class="float-left bd-check-img clear-both"></div>
+									<input type="hidden" id="hide-pp-cb" name="hidepublicpage" value="${hidePublicPage}">
+									<div class="float-left customized-settings-child cust-resp-txt">Hide public page</div>
+									<div id="hide-bread-crumb-chk-box" class="float-left bd-check-img clear-both"></div>
+									<input type="hidden" id="hide-bc-cb" name="hidebreadcrumb" value="${hideFromBreadCrumb}">
+									<div class="float-left customized-settings-child cust-resp-txt">Hide from bread crumb</div>
+									<div id="hidden-section-chk-box" class="float-left bd-check-img clear-both"></div>
+									<input type="hidden" id="hidden-section-cb" name="hiddensection" value="${hiddenSection}">
+									<div class="float-left customized-settings-child cust-resp-txt">Hide public pages of all agents</div>
+									<div id="mail-frm-cmpny-chk-box" class="float-left bd-check-img clear-both"></div>
+									<input type="hidden" id="mail-frm-cmpny-cb" name="sendmailfromcompany" value="${sendEmailFromCompany}">
+									<div class="float-left customized-settings-child cust-resp-txt">Send all mails on behalf of company</div>
+									<div id="ovride-sm-chk-box" class="float-left bd-check-img clear-both"></div>
+									<input type="hidden" id="ovride-sm-cb" name="overridesm" value="${allowOverrideForSocialMedia}">
+									<div class="float-left customized-settings-child cust-resp-txt">Allow admins to override social media</div>
+								</c:if>				
 								<c:if test="${ isRealTechOrSSAdmin == true and columnName == 'companyId' }">
-									<div id="atpst-lnk-usr-ste-chk-box" class="float-left bd-check-img"></div>
+									<div id="atpst-lnk-usr-ste-chk-box" class="float-left bd-check-img clear-both"></div>
 									<input type="hidden" id="at-pst-lnk-usr-ste-cb" name="autopostlinktousersite" value="${autoPostLinkToUserSite}">
 									<div class="float-left customized-settings-child cust-resp-txt">Allow autopost link to the user's website</div>
 								</c:if>
@@ -106,18 +132,21 @@
 									<input type="hidden" id="vndsta-access-cb" name="vendastaaccess" value="${vendastaAccess}">
 									<div class="float-left listing-access-txt cust-resp-txt" style="margin-bottom:0px;">Allow access to Listings Manager</div>
 								</c:if>
-								<div id="survey-mail-thrhld-chk-box" class="float-left bd-check-img clear-both"></div>
-								<input type="hidden" id="survey-mail-thrhld-cb" name="surveymailthrhld" value="${sendMonthlyDigestMail}">
-								<div class="float-left listing-access-txt cust-resp-txt">Send Monthly Digest Mail</div>
-								<textarea id="digest-recipients" class="dig-recp"  placeholder="<spring:message code="label.placehoder.digest.emails.key" />" autocorrect="off" autocomplete="off" autocapitalize="off" spellcheck="false">${digestRecipients}</textarea>
-								<c:if test="${ columnName == 'companyId' }">
-									<div class="float-left listing-access-txt cust-resp-txt">Send user Add/Delete Notification Mail</div>
-									<textarea id="user-notification-recipients" class="dig-recp" style="margin-bottom:40px" placeholder="<spring:message code="label.placehoder.user.notify.emails.key" />" autocorrect="off" autocomplete="off" autocapitalize="off" spellcheck="false">${userNotifyRecipients}</textarea>
-								</c:if>
+
 								<c:if test="${ columnName == 'companyId' }">
 									<div id="soc-mon-access-chk-box" class="float-left bd-check-img clear-both"></div>
 									<input type="hidden" id="soc-mon-access-cb" name="surveymailthrhld" value="${isSocialMonitorEnabled}">
-									<div class="float-left listing-access-txt cust-resp-txt">Enable Social Monitor</div>	
+									<div class="float-left listing-access-txt cust-resp-txt">Enable Social Monitor</div>
+
+								<c:if test="${ columnName != 'agentId'}">
+									<div id="survey-mail-thrhld-chk-box" class="float-left bd-check-img clear-both"></div>
+									<input type="hidden" id="survey-mail-thrhld-cb" name="surveymailthrhld" value="${sendMonthlyDigestMail}">
+									<div class="float-left listing-access-txt cust-resp-txt">Send Monthly Digest Mail</div>
+									<textarea id="digest-recipients" class="dig-recp"  placeholder="<spring:message code="label.placehoder.digest.emails.key" />" autocorrect="off" autocomplete="off" autocapitalize="off" spellcheck="false">${digestRecipients}</textarea>
+									<c:if test="${ columnName == 'companyId' }">
+										<div class="float-left listing-access-txt cust-resp-txt">Send user Add/Delete Notification Mail</div>
+										<textarea id="user-notification-recipients" class="dig-recp" style="margin-bottom:40px" placeholder="<spring:message code="label.placehoder.user.notify.emails.key" />" autocorrect="off" autocomplete="off" autocapitalize="off" spellcheck="false">${userNotifyRecipients}</textarea>
+									</c:if>	
 								</c:if>
 							</c:if>
 							
@@ -326,6 +355,25 @@ $(document).ready(function() {
 	
 	if("${isSocialMonitorEnabled}" == "false"){
 		$('#soc-mon-access-chk-box').addClass('bd-check-img-checked');
+
+	if("${hidePublicPage}" == "false"){
+		$('#hide-pp-chk-box').addClass('bd-check-img-checked');
+	}
+	
+	if("${hideFromBreadCrumb}" == "false"){
+		$('#hide-bread-crumb-chk-box').addClass('bd-check-img-checked');
+	}
+	
+	if("${hiddenSection}" == "false"){
+		$('#hidden-section-chk-box').addClass('bd-check-img-checked');
+	}
+	
+	if("${sendEmailFromCompany}" == "false"){
+		$('#mail-frm-cmpny-chk-box').addClass('bd-check-img-checked');
+	}
+	
+	if("${allowOverrideForSocialMedia}" == "false"){
+		$('#ovride-sm-chk-box').addClass('bd-check-img-checked');
 	}
 	
 	var accountMasterId = "${accountMasterId}";

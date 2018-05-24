@@ -5,6 +5,9 @@ public class ServiceProviderInfoV2
     private String serviceProviderName;
     private String serviceProviderEmail;
     private long serviceProviderId;
+    
+    private String serviceProviderOfficeName;
+    private String serviceProviderRegionName;
 
 
     public long getServiceProviderId() {
@@ -39,4 +42,24 @@ public class ServiceProviderInfoV2
     {
         this.serviceProviderEmail = serviceProviderEmail;
     }
+
+
+	public String getServiceProviderOfficeName() {
+		return serviceProviderOfficeName;
+	}
+
+
+	public void setServiceProviderOfficeName(String serviceProviderOfficeName) {
+		this.serviceProviderOfficeName = serviceProviderOfficeName;
+	}
+
+
+	public String getServiceProviderRegionName() {
+		return serviceProviderRegionName;
+	}
+
+
+	public void setServiceProviderRegionName(String serviceProviderRegionName) {
+		this.serviceProviderRegionName = serviceProviderRegionName;
+	}
 }
