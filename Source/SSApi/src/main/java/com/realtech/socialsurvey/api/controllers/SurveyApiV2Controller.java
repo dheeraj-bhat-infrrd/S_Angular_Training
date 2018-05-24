@@ -135,7 +135,7 @@ public class SurveyApiV2Controller
         try {
         		surveyPreInitiations = surveyHandler.validatePreinitiatedRecord( surveyPreInitiations );
 		} catch (InvalidInputException e) {
-            return restUtils.getRestResponseEntity( HttpStatus.NOT_ACCEPTABLE, e.getMessage(), null, null, request, companyId );
+            return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, e.getMessage(), null, null, request, companyId );
         }
 
         

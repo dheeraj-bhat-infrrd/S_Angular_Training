@@ -2101,8 +2101,7 @@ $('#prof-review-item').on('click', '.ppl-share-icns', function(e) {
 		
 		var copyText = $(this).parent().find('.linkedInSummary').val();
 		var decodedText = decodeURIComponent(copyText);
-		var dummyInput = $('<input>').val(decodedText).appendTo('body').select();
-		document.execCommand('copy');
+		copyToClipboard( decodedText );
 
 		$('#overlay-continue').off();
 		$('#overlay-continue').click(function() {
@@ -2166,8 +2165,7 @@ $('.sr-share-wrapper').on('click', '.ppl-share-icns', function(e) {
 		
 		var copyText = $(this).parent().find('.linkedInSummary').val();
 		var decodedText = decodeURIComponent(copyText);
-		var dummyInput = $('<input>').val(decodedText).appendTo('body').select();
-		document.execCommand('copy');
+		copyToClipboard( decodedText );
 
 		$('#overlay-continue').off();
 		$('#overlay-continue').click(function() {

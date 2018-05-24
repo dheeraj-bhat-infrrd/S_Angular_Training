@@ -568,7 +568,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     @Transactional
     @Override
     public User inviteUserToRegister( User admin, String firstName, String lastName, String emailId, boolean holdSendingMail,
-        boolean sendMail, boolean isForHierarchyUpload ) throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException, NoRecordsFetchedException
+        boolean sendMail, boolean isForHierarchyUpload, boolean isAddedByRealtechOrSSAdmin ) throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException, NoRecordsFetchedException
     {
         if ( firstName == null || firstName.isEmpty() ) {
             throw new InvalidInputException( "First name is either null or empty in inviteUserToRegister()." );
@@ -594,7 +594,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         insertAgentSettings( user );
         
         // send user addition mail
-        if( !isForHierarchyUpload  ) {
+        if( !isForHierarchyUpload && !isAddedByRealtechOrSSAdmin ) {
             organizationManagementService.sendUserAdditionMail( admin, user );
         }
 
@@ -1636,7 +1636,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         userProfile.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         userProfile.setStatus( CommonConstants.STATUS_DELETE );
-        userProfileDao.update( userProfile );
+        userProfileDao.delete( userProfile );
 
         LOG.debug( "Method to delete a profile finished for profile : " + profileIdToDelete );
     }
@@ -3140,7 +3140,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
     // Moved user addition from Controller.
     @Override
     @Transactional ( rollbackFor = { NonFatalException.class, FatalException.class })
-    public User inviteUser( User admin, String firstName, String lastName, String emailId )
+    public User inviteUser( User admin, String firstName, String lastName, String emailId, boolean isAddedByRealtechOrSSAdmin )
         throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException, SolrException, NoRecordsFetchedException
     {
         User user = inviteNewUser( admin, firstName, lastName, emailId );
@@ -3160,8 +3160,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             throw e;
         }
         
-        // send user addition mail
-        organizationManagementService.sendUserAdditionMail( admin, user );
+        if( !isAddedByRealtechOrSSAdmin ) {
+            // send user addition mail
+            organizationManagementService.sendUserAdditionMail( admin, user );
+        }
         
         LOG.debug( "Added newly added user {} to solr", user.getFirstName() );
 
@@ -3181,9 +3183,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         LOG.debug( "Adding newly added user {} to mongo", user.getFirstName() );
         insertAgentSettings( user );
-        
-        // send user addition mail
-        organizationManagementService.sendUserAdditionMail( user, user );
         
         LOG.debug( "Added newly added user {} to mongo", user.getFirstName() );
 
@@ -4245,29 +4244,19 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         if ( user == null ) {
             throw new InvalidInputException( "User not found for userId:" + userId );
         }
-
-        //get primary profile profile of user
-        List<UserProfile> userProfiles = user.getUserProfiles();
-        for ( UserProfile userProfile : userProfiles ) {
-            if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_SS_ADMIN_PROFILE_ID ) {
-                // social survey admin
-                return true;
-            }
-        }
-
-        return false;
+        return isUserSocialSurveyAdmin( user );
     }
 
 
     @Override
     @Transactional
-    public void deleteUserDataFromAllSources( User loggedInUser, long userIdToBeDeleted, int status, boolean isForHierarchyUpload )
+    public void deleteUserDataFromAllSources( User loggedInUser, long userIdToBeDeleted, int status, boolean isForHierarchyUpload, boolean isDeletedByRealtechOrSSAdmin )
         throws InvalidInputException, SolrException
     {
         LOG.debug( "Method deleteUserDataFromAllSources called for userId:" + userIdToBeDeleted );
         
         //send user deletion mail
-        if( !isForHierarchyUpload ) {
+        if( !isForHierarchyUpload && !isDeletedByRealtechOrSSAdmin ) {
             try {
                 organizationManagementService.sendUserDeletionMail( loggedInUser, getUserByUserId( userIdToBeDeleted ) );
             } catch ( NoRecordsFetchedException error ) {
@@ -4897,6 +4886,47 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         } catch ( Exception databaseException ) {
             LOG.error( "Exception caught while checking for email id in USERS table." );
         }
+    }
+    
+    
+    
+    @Override
+    public boolean isUserSocialSurveyAdmin( User user ) {
+        LOG.trace( "method isUserSocialSurveyAdmin() called for {}", user );
+        if( user == null ) {
+            LOG.warn( "User object can't be null" );
+            return false;
+        } else {
+            
+            //get primary profile profile of user
+            List<UserProfile> userProfiles = user.getUserProfiles();
+            for ( UserProfile userProfile : userProfiles ) {
+                if ( userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_SS_ADMIN_PROFILE_ID ) {
+                    // social survey administrator
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        
+    }
+
+
+    @Override
+    public List<UserProfile> getUserProfiles( long userId ) throws InvalidInputException
+    {
+        LOG.debug( "method getUserProfiles() started" );
+        
+        if( userId <= 0 ) {
+            LOG.warn( "Invalid user ID" );
+            throw new InvalidInputException( "Invalid user ID" );
+        }
+        
+        List<UserProfile> profiles = userProfileDao.getUserProfiles( userId ); 
+
+        LOG.debug( "method getUserProfiles() finished" );
+        return profiles;
     }
     
 }

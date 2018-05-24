@@ -105,6 +105,9 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String PROFILE_IMAGE_URL = "profileImageUrl";
 
     public static final String KEY_IS_LOGIN_PREVENTED = "isLoginPrevented";
+    public static final String KEY_SEND_EMAIL_FROM_COMPANY = "sendEmailFromCompany";
+    public static final String KEY_HIDE_FROM_BREAD_CRUMB = "hideFromBreadCrumb";
+    public static final String KEY_ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA = "allowOverrideForSocialMedia";
 
     public static final String KEY_DIGEST_RECIPIENTS = "digestRecipients";
     public static final String KEY_ENTITY_ALERT_DETAILS = "entityAlertDetails";
@@ -119,6 +122,10 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_SAVED_DIGEST_RECORD_MONTH = "savedDigestRecords.month";
     public static final String KEY_SAVED_DIGEST_RECORD_YEAR = "savedDigestRecords.year";
     public static final String KEY_USER_ADD_DELETE_NOTIFICATION_RECIPIENTS = "userAddDeleteNotificationRecipients";
+    
+    public static final String KEY_CONTACT_DETAILS_WEB_ADD_WORK = "contact_details.web_addresses.work";
+    
+    public static final String KEY_AGENT_PROFILE_DISABLED = "isAgentProfileDisabled";
     
     
     public static final String KEY_FACEBOOK_ID = "socialMediaTokens.facebookToken.facebookId";

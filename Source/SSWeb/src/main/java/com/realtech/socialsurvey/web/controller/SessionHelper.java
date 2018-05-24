@@ -591,7 +591,7 @@ public class SessionHelper
                 // fetching for all regions
                 if ( userProfile.getProfilesMaster()
                     .getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID ) {
-                    if ( userProfile.getRegionId() > 0l ) {
+                    if ( userProfile.getRegionId() > 0l && userProfile.getStatus() == CommonConstants.STATUS_ACTIVE ) {
                         long regionId = userProfile.getRegionId();
                         String regionName = regionsMap.get( regionId );
                         if ( regionName != null ) {
@@ -627,7 +627,7 @@ public class SessionHelper
             for ( UserProfile userProfile : user.getUserProfiles() ) {
                 if ( userProfile.getProfilesMaster()
                     .getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID ) {
-                    if ( userProfile.getBranchId() > 0l ) {
+                    if ( userProfile.getBranchId() > 0l && userProfile.getStatus() == CommonConstants.STATUS_ACTIVE ) {
                         long branchId = userProfile.getBranchId();
                         String branchName = branchesMap.get( branchId );
                         if ( branchName != null ) {

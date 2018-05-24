@@ -790,7 +790,13 @@ public class OrganizationManagementController
             OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( user );
             model.addAttribute( "reviewSortCriteria", profileManagementService.processSortCriteria( companySettings.getIden(),
                 companySettings.getReviewSortCriteria() ) );
-
+            
+            model.addAttribute( "hidePublicPage", unitSettings.isHidePublicPage() );
+            model.addAttribute( "hiddenSection", unitSettings.isHiddenSection() );
+            model.addAttribute( "hideFromBreadCrumb", unitSettings.getHideFromBreadCrumb() );
+            model.addAttribute( "allowOverrideForSocialMedia", unitSettings.isAllowOverrideForSocialMedia() );
+            model.addAttribute( "sendEmailFromCompany", unitSettings.isSendEmailFromCompany() );
+           
             //REALTECH_USER_ID is set only for real tech and SS admin
             boolean isRealTechOrSSAdmin = false;
             Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
@@ -874,8 +880,11 @@ public class OrganizationManagementController
         String sellerAgentEmail = request.getParameter( "seller-agnt-email" );
         String sellerAgentName = request.getParameter( "seller-agnt-name" );
         String propertyAddress = request.getParameter( "property-address" );
-        String loanProcessorName = request.getParameter( "loan-processor-name" );
         String loanProcessorEmail = request.getParameter( "loan-processor-email" );
+        String loanProcessorName = request.getParameter( "loan-processor-name" );
+        
+        String loanOfficerEmail = request.getParameter( "loan-officer-email" );
+        String loanOfficerName = request.getParameter( "loan-officer-name" );
 
         String version = request.getParameter( "sdk-version-selection-list" );
 
@@ -935,6 +944,14 @@ public class OrganizationManagementController
             encompassCrmInfo.setUrl( encompassUrl );
 
             encompassCrmInfo.setVersion( version );
+            
+            //save loan officer name and email fields details if given
+            if( ! StringUtils.isEmpty(loanOfficerEmail)) {
+            	encompassCrmInfo.setLoanOfficerEmail(loanOfficerEmail);
+            }
+            if( ! StringUtils.isEmpty(loanOfficerName)) {
+            	encompassCrmInfo.setLoanOfficerName(loanOfficerName);
+            }
 
             //check if it's need to update real state agent detail
             if ( !StringUtils.isEmpty( buyerAgentEmail ) || !StringUtils.isEmpty( buyerAgentName )
@@ -4228,5 +4245,25 @@ public class OrganizationManagementController
             return "false";
         }
     }
+
+    @ResponseBody
+    @RequestMapping ( value = "/updateentitysettings", method = RequestMethod.POST)
+    public String updateEntitySettings( HttpServletRequest request, Model model )
+    {
+        LOG.info( "Method updateEntitySettings() started." );
+        HttpSession session = request.getSession();
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String settingName = (String) request.getParameter( "settingName" );
+        String settingStatus = (String) request.getParameter( "settingStatus" );
+        String message = null;
+        if ( organizationManagementService.updateEntitySettings( entityType, entityId, settingName, settingStatus ) ) {
+            message = "Successfully updated settings";
+        } else {
+            message = "Some problem occurred while updating settings. Please try again later";
+        }
+        return message;
+    }
+        
 }
 // JIRA: SS-24 BY RM02 EOC

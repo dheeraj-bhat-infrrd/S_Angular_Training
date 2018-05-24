@@ -398,6 +398,11 @@ $(document).on('click', function(e) {
 		$('#macro-alerts-chevron-up').toggle();
 	}
 
+	if ($('#summit-popup-body').is(':visible')) {
+		closeSummitPopup();
+	} 
+	
+
 	if ($('#add-macro-action-options').is(':visible')) {
 		$('#add-macro-action-options').toggle();
 		$('#macro-action-chevron-down').toggle();
@@ -507,7 +512,7 @@ $(document).on('keyup', function(e) {
 			$('#zillow-popup-body').html('');
 			enableBodyScroll();
 		}
-		
+
 		checkSocMonDropdowns(null);
 		
 		if($('#monitor-bulk-action-options').is(':visible')){
@@ -546,6 +551,9 @@ $(document).on('keyup', function(e) {
 			$('#add-macro-action-options').toggle();
 			$('#macro-action-chevron-down').toggle();
 			$('#macro-action-chevron-up').toggle();
+		}
+		if ($('#summit-popup-body').is(':visible')) {
+			closeSummitPopup();
 		}
 	}
 });
@@ -1651,13 +1659,6 @@ function updateEventOnDashboardPageForReviews() {
 		var entityId = $('#rep-prof-container').data('column-value');
 		var entityType = $('#rep-prof-container').data('column-name');
 		
-		var copyText = $(this).parent().find('.linkedInSummary').val();
-		var $temp = $("<input>");
-	    $("body").append($temp);
-	    $temp.val(copyText).select();
-	    document.execCommand("copy");
-	    $temp.remove();
-		
 		
 		var payload = {
 			"surveyMongoId" :surveyMongoId,
@@ -1694,6 +1695,10 @@ function updateEventOnDashboardPageForReviews() {
 function linkedInShare(data,link,title){
 	if(data == false || data == 'false'){
 		if(title == 'LinkedIn'){
+			
+			var copyText = $(this).parent().find('.linkedInSummary').val();
+			copyToClipboard(copyText);
+			
 			$('#overlay-header').html("");
 			$('#overlay-text').html('<div style="text-align:left; display: grid;">The text of the post has been copied to clipboard. Please use the text to post in LinkedIn Page.</div>');
 			$('#overlay-continue').html("Ok");
@@ -6233,6 +6238,19 @@ function updateAutoPostSetting(isautopostenabled, disableEle) {
 	});
 }
 
+function updateEntitySettings(settingName, settingStatus) {
+	var payload = {
+		"settingName" : settingName,
+		"settingStatus" : settingStatus
+	};
+	
+	callAjaxPostWithPayloadData("./updateentitysettings.do", function(data) {
+		$('#overlay-toast').html(data);
+		showToast();
+	}, payload, true);
+	
+}
+
 function updateAutoPostLinkToUserSiteSetting(isautopostlinktositeenabled, disableEle) {
 	var payload = {
 		"autopostlinktousersite" : isautopostlinktositeenabled
@@ -6626,14 +6644,14 @@ function confirmDeleteUser(userId, adminId) {
 	$('#overlay-continue').attr("onclick", "deleteUser('" + userId + "');");
 }
 
-function confirmDeleteUserProfile(profileId) {
+function confirmDeleteUserProfile(profileId, userId) {
 	$('#overlay-main').show();
 	$('#overlay-continue').show();
 	$('#overlay-continue').html("Delete");
 	$('#overlay-cancel').html("Cancel");
 	$('#overlay-header').html("Delete User Profile");
 	$('#overlay-text').html("Are you sure you want to delete user profile?");
-	$('#overlay-continue').attr("onclick", "deleteUserProfile('" + profileId + "');");
+	$('#overlay-continue').attr("onclick", "deleteUserProfile('" + profileId + "', '" + userId + "');");
 }
 
 /*
@@ -6663,14 +6681,14 @@ function deleteUser(userId) {
 }
 
 // Function to delete user profile
-function deleteUserProfile(profileId) {
+function deleteUserProfile(profileId,userId) {
 	showOverlay();
 	var payload = {
 		"profileId" : profileId
 	};
 	callAjaxPostWithPayloadData("./deleteuserprofile.do", function(data) {
 		if (data == "success") {
-
+			updateUserProfileTicksInManageTeam(userId);
 			// close the popup
 			$('#overlay-cancel').click();
 			// remove the tab from UI
@@ -6683,6 +6701,39 @@ function deleteUserProfile(profileId) {
 		}
 	}, payload, true);
 }
+
+function updateUserProfileTicksInManageTeam(userId){
+	var payload = {
+		"userId" : userId
+	};
+	callAjaxGetWithPayloadData("./fetchuserprofileflags.do", function(data) {
+		if( data != undefined ){
+			var response = JSON.parse(data);
+			if( response != undefined && response.success != undefined ){
+				if( response.success == "true" ){
+					if( response.isRegionAdmin  == "true" ){
+						addClassToJQueryElement( $('#user-row-' + userId).find('.v-tbl-rgn-adm'), "v-icn-tick" );
+					} else {
+						removeClassToJQueryElement( $('#user-row-' + userId).find('.v-tbl-rgn-adm'), "v-icn-tick" );
+					}
+					
+					if( response.isBranchAdmin  == "true" ){
+						addClassToJQueryElement( $('#user-row-' + userId).find('.v-tbl-of-adm'), "v-icn-tick" );
+					} else {
+						removeClassToJQueryElement( $('#user-row-' + userId).find('.v-tbl-of-adm'), "v-icn-tick" );
+					}
+					
+					if( response.isAgent  == "true" ){
+						addClassToJQueryElement( $('#user-row-' + userId).find('.v-tbl-ln-of'), "v-icn-tick" );
+					} else {
+						removeClassToJQueryElement( $('#user-row-' + userId).find('.v-tbl-ln-of'), "v-icn-tick" );
+					}
+				}
+			}
+		}
+	}, payload, true);
+}
+
 /*
  * Paint the user details form in the user management page
  */
@@ -7121,18 +7172,48 @@ function saveUserDetailsByAdmin() {
  */
 function saveUserAssignment(formId, disableEle) {
 	var url = "./addindividual.do";
+	var userId = $( "#" + formId).find("#selected-userid-hidden").val();
+	var isAdminCheck = $( "#" + formId).find("#is-admin-chk").val();
+	var assignToText = $("#assign-to-txt").val();
 	showOverlay();
-	callAjaxFormSubmit(url, saveUserAssignmentCallBack, formId, disableEle);
+	callAjaxFormSubmit(url, function(data){
+		hideOverlay();
+		displayMessage(data);
+		if( userId != undefined && data != undefined && data.indexOf("success") > -1 && assignToText != undefined && isAdminCheck != undefined ){
+			if( "Company" == assignToText ){
+				if( "true" == isAdminCheck ){
+					// do nothing
+				} else if( "false" == isAdminCheck ){
+					addClassToJQueryElement( $('#user-row-' + userId).find('.v-tbl-ln-of'), "v-icn-tick" );
+				}
+			} else if( "Region" == assignToText ){
+				if( "true" == isAdminCheck ){
+					addClassToJQueryElement( $('#user-row-' + userId).find('.v-tbl-rgn-adm'), "v-icn-tick" );
+				} else if( "false" == isAdminCheck ){
+					addClassToJQueryElement( $('#user-row-' + userId).find('.v-tbl-ln-of'), "v-icn-tick" );
+				}
+			} else if( "Office" == assignToText ){
+				if( "true" == isAdminCheck ){
+					addClassToJQueryElement( $('#user-row-' + userId).find('.v-tbl-of-adm'), "v-icn-tick" );
+				} else if( "false" == isAdminCheck ){
+					addClassToJQueryElement( $('#user-row-' + userId).find('.v-tbl-ln-of'), "v-icn-tick" );
+				}
+			}
+		}
+	}, formId, disableEle);
 }
 
-/**
- * callback for saveUserAssignment
- * 
- * @param data
- */
-function saveUserAssignmentCallBack(data) {
-	hideOverlay();
-	displayMessage(data);
+
+function addClassToJQueryElement( element, clazz ){
+	if( element != undefined && !element.hasClass(clazz) ){
+		element.addClass(clazz);
+	}
+}
+
+function removeClassToJQueryElement( element, clazz ){
+	if( element != undefined && element.hasClass(clazz) ){
+		element.removeClass(clazz);
+	}
 }
 
 // remove user profile
@@ -7143,7 +7224,9 @@ $(document).on('click', '.v-icn-rem-userprofile', function(e) {
 	}
 
 	var profileId = $(this).parent().data('profile-id');
-	confirmDeleteUserProfile(profileId);
+	var userIdArr = $(this).parent().parent().parent().parent().attr("id").split("-");
+	var userId = userIdArr[userIdArr.length -1];
+	confirmDeleteUserProfile(profileId, userId);
 });
 
 // remove user
@@ -8044,6 +8127,9 @@ function showMasterQuestionPage() {
 			}
 		}
 		
+		// copy review text to clipboard
+		//copyToClipboard( feedback, "Your feedback has been copied to clipboard" );
+		
 		if( isAbusive == false ){
 			if (mood != 'Great') {
 				$('#social-post-links').find('*').not('#google-business-btn, #google-btn').remove();
@@ -8934,7 +9020,16 @@ function callBackOnUpdatePhoneNumbers(data) {
 
 // Function to update web addresses in contact details
 $(document).on('blur', '#contant-info-container input[data-web-address]', function() {
-	if ($('#prof-all-lock').val() != 'modified' || !$(this).val() || $(this).is('[readonly]')) {
+	if(!$(this).val()){
+		delay(function() {
+			callAjaxPOST("./unsetwebapp.do", callBackOnUpdateWebAddresses, true);
+		}, 0);
+		$('#overlay-toast').html("Web address has been removed");
+		showToast();
+		return;
+	}
+
+	if ($('#prof-all-lock').val() != 'modified' || $(this).is('[readonly]')) {
 		return;
 	}
 	if (!isValidUrl($(this).val().trim())) {
@@ -9834,6 +9929,7 @@ $('body').on('click', '#prof-edit-social-link .icn-google-business', function(e)
     }
     
     $('#gmb-connected-placeId').html(connectedLink);
+    $('#gm-con-link').attr('href',connectedLink);
     for(var i=1;i<=5;i++){
     	if(!($('#gmb-radio-'+i).hasClass('hide'))){
     		$('#gmb-radio-'+i).addClass('hide');
@@ -9871,11 +9967,13 @@ $('body').on('click', '#prof-edit-social-link .icn-google-business', function(e)
 		if(placeId!='customPlace'){
 			$('#gmb-placeId-selected').html(placeId);
 			$('#gmb-url-placeId').html("https://search.google.com/local/writereview?placeid="+placeId);
+			$('#gm-sel-link').attr('href',"https://search.google.com/local/writereview?placeid="+placeId);
 		}else{
 			placeId = $('#gmb-placeId').val();
 			if(placeId != '' && placeId!=null){
 				$('#gmb-placeId-selected').html(placeId);
 				$('#gmb-url-placeId').html("https://search.google.com/local/writereview?placeid="+placeId);	
+				$('#gm-sel-link').attr('href',"https://search.google.com/local/writereview?placeid="+placeId);
 			}
 		}
 	});
@@ -9886,6 +9984,7 @@ $('body').on('click', '#prof-edit-social-link .icn-google-business', function(e)
 			placeId = $('#gmb-placeId').val();
 			$('#gmb-placeId-selected').html(placeId);
 			$('#gmb-url-placeId').html("https://search.google.com/local/writereview?placeid="+placeId);
+			$('#gm-sel-link').attr('href',"https://search.google.com/local/writereview?placeid="+placeId)
 		}
 	}
 	
@@ -12391,6 +12490,56 @@ $('body').on('click', '#atpst-chk-box', function() {
 	}
 });
 
+$('body').on('click', '#hide-pp-chk-box', function() {
+	if ($('#hide-pp-chk-box').hasClass('bd-check-img-checked')) {
+		$('#hide-pp-chk-box').removeClass('bd-check-img-checked');
+		updateEntitySettings( "hidePublicPage", true);
+	} else {
+		$('#hide-pp-chk-box').addClass('bd-check-img-checked');
+		updateEntitySettings( "hidePublicPage", false);
+	}
+});
+
+$('body').on('click', '#hide-bread-crumb-chk-box', function() {
+	if ($('#hide-bread-crumb-chk-box').hasClass('bd-check-img-checked')) {
+		$('#hide-bread-crumb-chk-box').removeClass('bd-check-img-checked');
+		updateEntitySettings( "hideFromBreadCrumb", true);
+	} else {
+		$('#hide-bread-crumb-chk-box').addClass('bd-check-img-checked');
+		updateEntitySettings( "hideFromBreadCrumb", false);
+	}
+});
+
+$('body').on('click', '#hidden-section-chk-box', function() {
+	if ($('#hidden-section-chk-box').hasClass('bd-check-img-checked')) {
+		$('#hidden-section-chk-box').removeClass('bd-check-img-checked');
+		updateEntitySettings( "hiddenSection", true);
+	} else {
+		$('#hidden-section-chk-box').addClass('bd-check-img-checked');
+		updateEntitySettings( "hiddenSection", false);
+	}
+});
+
+$('body').on('click', '#mail-frm-cmpny-chk-box', function() {
+	if ($('#mail-frm-cmpny-chk-box').hasClass('bd-check-img-checked')) {
+		$('#mail-frm-cmpny-chk-box').removeClass('bd-check-img-checked');
+		updateEntitySettings( "sendEmailFromCompany", true);
+	} else {
+		$('#mail-frm-cmpny-chk-box').addClass('bd-check-img-checked');
+		updateEntitySettings( "sendEmailFromCompany", false);
+	}
+});
+
+$('body').on('click', '#ovride-sm-chk-box', function() {
+	if ($('#ovride-sm-chk-box').hasClass('bd-check-img-checked')) {
+		$('#ovride-sm-chk-box').removeClass('bd-check-img-checked');
+		updateEntitySettings( "allowOverrideForSocialMedia", true);
+	} else {
+		$('#ovride-sm-chk-box').addClass('bd-check-img-checked');
+		updateEntitySettings( "allowOverrideForSocialMedia", false);
+	}
+});
+
 $('body').on('click', '#atpst-lnk-usr-ste-chk-box', function() {
 	if ($('#atpst-lnk-usr-ste-chk-box').hasClass('bd-check-img-checked')) {
 		$('#atpst-lnk-usr-ste-chk-box').removeClass('bd-check-img-checked');
@@ -14827,6 +14976,7 @@ function initializeGmb() {
 	    	  $('#gmb-placeId'+index++).html(place.place_id);
 	    	  $('#gmb-placeId-selected').html(place.place_id);
 	    	  $('#gmb-url-placeId').html("https://search.google.com/local/writereview?placeid="+place.place_id);
+	    	  $('#gm-sel-link').attr('href',"https://search.google.com/local/writereview?placeid="+place.place_id);
 	      }else{
 	    	  $('#gmb-radio-'+index).removeClass('hide');
 	    	  $('#placeId'+index).attr('value',place.place_id);
@@ -16250,7 +16400,7 @@ $(document).on('click','#soc-mon-stream-tab',function(e){
 
 $(document).on('click','#soc-mon-alerts-tab',function(e){
 	e.stopPropagation();
-	
+
 	var streamTabClickDisabled = $('#soc-mon-alerts-tab').data('disabled');
 	if(streamTabClickDisabled){
 		return;
@@ -20399,6 +20549,61 @@ $('body').on('blur', '#user-notification-recipients', function() {
 
 
 $(document).on('click','#action-edit-txt-box',function(e){
+	e.stopImmediatePropagation();
+	e.preventDefault();
+});
+
+function showSummitPopup(){
+	$('#summit-popup').show();
+	disableBodyScroll();
+}
+
+function closeSummitPopup(){
+	$('#summit-popup').hide();
+	showSummitRibbon();
+	enableBodyScroll();
+}
+
+
+function showSummitRibbon(){
+	$('#summit-ribbon').show();
+}
+
+function closeSummitRibbon(){
+	$('#summit-ribbon').hide();
+}
+
+$(document).on('click','#register-summit-btn',function(e){
+	e.stopImmediatePropagation();
+	e.preventDefault();
+	
+	closeSummitPopup();
+	window.open('http://www.createwowsummit.com', '_blank');
+	
+});
+
+$(document).on('click','#close-summit-popup',function(e){
+	e.stopPropagation();
+		
+	closeSummitPopup();
+});
+
+$(document).on('click','#summit-ribbon',function(e){
+	e.stopPropagation();
+	e.stopImmediatePropagation();
+	e.preventDefault();
+	
+	window.open('http://www.createwowsummit.com', '_blank');
+});
+
+$(document).on('click','#close-summit-ribbon',function(e){
+	e.stopPropagation();
+		
+	closeSummitRibbon();
+});
+
+$(document).on('click','#summit-popup-body',function(e){
+	e.stopPropagation();
 	e.stopImmediatePropagation();
 	e.preventDefault();
 });

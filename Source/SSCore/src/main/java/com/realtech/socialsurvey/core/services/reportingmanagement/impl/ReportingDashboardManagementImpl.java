@@ -3446,23 +3446,39 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
         digestAggregate.setMonthUnderConcern( new DateFormatSymbols().getMonths()[monthUnderConcern - 1] );
         digestAggregate.setYearUnderConcern( String.valueOf( year ) );
 
-        // set NPS flag
-        digestAggregate.setHavingNpsSection( checkForNpsQuestion( profileLevel, entityId ) );
 
-        // initialize digestTemplate list
-        digestAggregate.setDigestList( new ArrayList<DigestTemplateData>() );
+        boolean hasDigestData = false;
 
-        // start populating with appropriate data for the Digest template
-        initializeAndPopulateDigestTemplateData( digestAggregate, digestList, monthUnderConcern );
+        for ( int i = 0; i < digestList.size(); i++ ) {
+            if ( !digestList.get( i ).isDigestRecordNull() && i != ( digestList.size() - 1 ) ) {
+                hasDigestData = true;
+                break;
+            }
+        }
 
-        // create and add the Digest Dependent Data in HTML format
-        constructAndPopulateChangeIndicatorIconsAndConclusionTextsForDigest( digestAggregate, digestList );
+        if ( !hasDigestData ) {
+            digestAggregate.setDigestDataAbsent( true );
+        } else {
 
-        // create rows of users with their ranking in HTML format
-        buildUserRankingRows( digestAggregate, userRankings );
+            // set NPS flag
+            digestAggregate.setHavingNpsSection( checkForNpsQuestion( profileLevel, entityId ) );
 
-        // create NPS section if NPS question enabled
-        buildNpsSection( digestAggregate );
+            // initialize digestTemplate list
+            digestAggregate.setDigestList( new ArrayList<DigestTemplateData>() );
+
+            // start populating with appropriate data for the Digest template
+            initializeAndPopulateDigestTemplateData( digestAggregate, digestList, monthUnderConcern );
+
+            // create and add the Digest Dependent Data in HTML format
+            constructAndPopulateChangeIndicatorIconsAndConclusionTextsForDigest( digestAggregate, digestList );
+
+            // create rows of users with their ranking in HTML format
+            buildUserRankingRows( digestAggregate, userRankings );
+
+            // create NPS section if NPS question enabled
+            buildNpsSection( digestAggregate );
+
+        }
 
         LOG.debug( "method buildMonthlyDigestAggregate() finished" );
         return digestAggregate;
@@ -3964,6 +3980,13 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
                         // get the digest aggregate object
                         MonthlyDigestAggregate digestAggregate = getMonthlyDigestAggregateForAHierarchy( digestRequest, month,
                             year );
+
+                        // check is digest data exists
+                        if ( digestAggregate.isDigestDataAbsent() ) {
+                            LOG.info( "Digest data for {} : {} is not present, Aborting", digestAggregate.getProfileLevel(),
+                                digestAggregate.getEntityName() );
+                            continue;
+                        }
 
 
                         // save the copy of digest generated for further use
