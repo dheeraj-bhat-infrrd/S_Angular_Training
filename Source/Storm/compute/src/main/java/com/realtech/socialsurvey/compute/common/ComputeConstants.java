@@ -92,4 +92,6 @@ public final class ComputeConstants
     public static final String LINKEDIN_TOKEN_EXPIRY_FIELD = "socialMediaTokens.linkedInToken.tokenExpiryAlertSent";
     public static final String INSTAGRAM_TOKEN_EXPIRY_FIELD = "socialMediaTokens.instagramToken.tokenExpiryAlertSent";
 
+    public static final String SOCIAL_MONITOR_REPORT_BATCH_SIZE = "SOCIAL_MONITOR_REPORT_BATCH_SIZE";
+
 }
