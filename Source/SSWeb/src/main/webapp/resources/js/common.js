@@ -396,7 +396,7 @@ function callAjaxGetWithPayloadData(url, callBackFunction, payload,isAsync,disab
 	});
 }
 
-function changeRatingPattern(rating, ratingParent, isOverallRating, source) {
+function changeRatingPattern(rating, ratingParent, isOverallRating, source, isProfilePage) {
 	var ratingIntVal = 0;
 	var roundedFloatingVal = parseFloat(rating).toFixed(2);
 	var ratingFloat= parseFloat(roundedFloatingVal).toFixed(2);
@@ -416,6 +416,10 @@ function changeRatingPattern(rating, ratingParent, isOverallRating, source) {
 	if (isOverallRating) {
 		ratingValHtml = "<div class='rating-rounded float-left'>" + roundedFloatingVal + " - </div>";
 	}
+	if (isProfilePage) {
+		ratingValHtml = "<div class='rating-rounded float-left'> <span itemprop='ratingValue'>"+ roundedFloatingVal + "</span> - </div>";
+	}
+	
 
 	ratingParent.html('');
 	ratingParent.append(ratingImgHtml);

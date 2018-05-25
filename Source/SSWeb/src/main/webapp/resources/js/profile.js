@@ -930,7 +930,7 @@ function paintReviews(result){
 	
 	$("#prof-reviews-header").parent().show();
 	$(".review-ratings").each(function() {
-		changeRatingPattern($(this).data("rating"), $(this), false, $(this).data("source"));
+		changeRatingPattern($(this).data("rating"), $(this), false, $(this).data("source"), true);
 	});
 	
 	setTimeout(function() {
