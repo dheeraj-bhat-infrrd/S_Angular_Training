@@ -401,12 +401,14 @@ public class SurveyManagementController
                 String surveyScore = String.valueOf( surveyHandler.getFormattedSurveyScore( survey.getScore() ) );
                 String agentName = ( agent.getLastName() != null && !agent.getLastName().isEmpty() )
                     ? ( agent.getFirstName() + " " + agent.getLastName() ) : agent.getFirstName();
-                
+                String propertyAddress = "";
+                if( survey.getPropertyAddress() != null)
+                    propertyAddress = "Property Address : "+survey.getPropertyAddress();
   
                 for ( Entry<String, String> admin : emailIdsToSendMail.entrySet() ) {
                     emailServices.sendSurveyCompletionMailToAdminsAndAgent( agentName, admin.getValue(), admin.getKey(),
                         surveyDetail, customerName, surveyScore, logoUrl, agentSettings.getCompleteProfileUrl(),
-                        customerDetail );
+                        customerDetail, propertyAddress );
                 }
                 
 

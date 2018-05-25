@@ -170,6 +170,12 @@
 									<div class="legend-wrapper">
 										<span class="legend">[survey_source]</span>
 									</div>
+									<div class="legend-wrapper">
+										<span class="legend">[property_address]</span>
+									</div>
+									<div class="legend-wrapper">
+										<span class="legend">[loan_processor_name]</span>
+									</div>
 								</div>
 								<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
 									<div class="legend-header hide-header">Description</div>
@@ -193,6 +199,8 @@
 									<div class="legend-wrapper" title="Yelp Link">Yelp Link</div>
 									<div class="legend-wrapper" title="User's licenses">Survey Source ID</div>
 									<div class="legend-wrapper" title="User's licenses">Survey Source</div>
+									<div class="legend-wrapper" title="Property Address">Property Address</div>
+									<div class="legend-wrapper" title="Loan Processor Name">Loan Processor Name</div>
 								</div>
 							</div>
 							<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin: 50px 10px 20px;">

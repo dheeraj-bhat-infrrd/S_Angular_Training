@@ -1351,7 +1351,7 @@ public class EmailServicesImpl implements EmailServices
     @Override
     public void sendSurveyCompletionMailToAdminsAndAgent( String agentName, String recipientName, String recipientMailId,
         String surveyDetail, String customerName, String rating, String logoUrl, String agentProfileLink,
-        String customerDetail ) throws InvalidInputException, UndeliveredEmailException
+        String customerDetail, String propertyAddress ) throws InvalidInputException, UndeliveredEmailException
     {
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
             LOG.warn( "Recipient email Id is empty or null for sending survey completion mail " );
@@ -1379,13 +1379,13 @@ public class EmailServicesImpl implements EmailServices
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName(
             EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_COMPLETION_ADMINS_MAIL_BODY );
-
+        
         if ( logoUrl == null || logoUrl.isEmpty() ) {
             messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, recipientName, customerName, rating,
-                agentName, customerDetail, surveyDetail, agentName, agentProfileLink, agentProfileLink, recipientMailId,
+                agentName,propertyAddress, customerDetail, surveyDetail, agentName, agentProfileLink, agentProfileLink, recipientMailId,
                 recipientMailId, String.valueOf( Calendar.getInstance().get( Calendar.YEAR ) ) ) );
         } else {
-            messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, recipientName, customerName, rating, agentName,
+            messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, recipientName, customerName, rating, agentName,propertyAddress,
                 customerDetail, surveyDetail, agentName, agentProfileLink, agentProfileLink, recipientMailId, recipientMailId,
                 String.valueOf( Calendar.getInstance().get( Calendar.YEAR ) ) ) );
         }

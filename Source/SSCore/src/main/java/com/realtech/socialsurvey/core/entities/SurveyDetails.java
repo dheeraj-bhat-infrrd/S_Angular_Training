@@ -102,6 +102,9 @@ public class SurveyDetails
     
     //abusive email set
     private boolean abusiveNotify;
+    
+    //adding property address to survey details
+    private String propertyAddress;
         
     public String getAgentEmailId()
     {
@@ -869,6 +872,18 @@ public class SurveyDetails
 	public void setAbusiveNotify(boolean abusiveNotify) {
 		this.abusiveNotify = abusiveNotify;
 	}
+
+
+    public String getPropertyAddress()
+    {
+        return propertyAddress;
+    }
+
+
+    public void setPropertyAddress( String propertyAddress )
+    {
+        this.propertyAddress = propertyAddress;
+    }
 
 	
 		
