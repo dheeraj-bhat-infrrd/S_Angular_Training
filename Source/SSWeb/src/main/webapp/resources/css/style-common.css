@@ -12140,3 +12140,150 @@ img.lead-img {
 .summit-ribbon-outer{
 	background: #ffcc32;
 }
+
+.mng-tbl-name{
+	width:15%;
+}
+
+.mng-tbl-email{
+	width:22%;
+}
+
+.mng-tbl-soc-conn{
+	width:25%;
+	padding-right:9px;
+}
+
+.mng-tbl-ticks{
+	width:5%;
+}
+
+.mgn-tbl-conn-icn{
+	width:10%;
+	height: 39px;
+	float: left;
+}
+
+.mng-fb-disc{
+	background: url(../socialConnectionIcons/fb_disc.png) no-repeat center;	
+}
+
+.mng-gp-disc{
+	background: url(../socialConnectionIcons/gplus_disc.png) no-repeat center;	
+}
+
+.mng-lt-disc{
+	background: url(../socialConnectionIcons/ltree_disc.png) no-repeat center;	
+}
+
+.mng-lin-disc{
+	background: url(../socialConnectionIcons/linkedin_disc.png) no-repeat center;	
+}
+
+.mng-rt-disc{
+	background: url(../socialConnectionIcons/realtor_disc.png) no-repeat center;	
+}
+
+.mng-zi-disc{
+	background: url(../socialConnectionIcons/zillow_disc.png) no-repeat center;	
+}
+
+.mng-yp-disc{
+	background: url(../socialConnectionIcons/yelp_disc.png) no-repeat center;	
+}
+
+.mng-tw-disc{
+	background: url(../socialConnectionIcons/twitter_disc.png) no-repeat center;	
+}
+
+.mng-fbp-disc{
+	background: url(../socialConnectionIcons/fbpixel_disc.png) no-repeat center;	
+}
+
+.mng-insta-disc{
+	background: url(../socialConnectionIcons/insta_disc.png) no-repeat center;	
+}
+
+.mng-fb-conn{
+	background: url(../socialConnectionIcons/fb_conn.png) no-repeat center;	
+}
+
+.mng-gp-conn{
+	background: url(../socialConnectionIcons/gplus_conn.png) no-repeat center;	
+}
+
+.mng-lt-conn{
+	background: url(../socialConnectionIcons/ltree_conn.png) no-repeat center;	
+}
+
+.mng-lin-conn{
+	background: url(../socialConnectionIcons/linkedin_conn.png) no-repeat center;	
+}
+
+.mng-rt-conn{
+	background: url(../socialConnectionIcons/realtor_conn.png) no-repeat center;	
+}
+
+.mng-zi-conn{
+	background: url(../socialConnectionIcons/zillow_conn.png) no-repeat center;	
+}
+
+.mng-yp-conn{
+	background: url(../socialConnectionIcons/yelp_conn.png) no-repeat center;	
+}
+
+.mng-tw-conn{
+	background: url(../socialConnectionIcons/twitter_conn.png) no-repeat center;	
+}
+
+.mng-fbp-conn{
+	background: url(../socialConnectionIcons/fbpixel_conn.png) no-repeat center;	
+}
+
+.mng-insta-conn{
+	background: url(../socialConnectionIcons/insta_conn.png) no-repeat center;	
+}
+
+.mng-fb-gray{
+	background: url(../socialConnectionIcons/fb_gray.png) no-repeat center;	
+}
+
+.mng-gp-gray{
+	background: url(../socialConnectionIcons/gplus_gray.png) no-repeat center;	
+}
+
+.mng-lt-gray{
+	background: url(../socialConnectionIcons/ltree_gray.png) no-repeat center;	
+}
+
+.mng-lin-gray{
+	background: url(../socialConnectionIcons/linkedin_gray.png) no-repeat center;	
+}
+
+.mng-rt-gray{
+	background: url(../socialConnectionIcons/realtor_gray.png) no-repeat center;	
+}
+
+.mng-zi-gray{
+	background: url(../socialConnectionIcons/zillow_gray.png) no-repeat center;	
+}
+
+.mng-yp-gray{
+	background: url(../socialConnectionIcons/yelp_gray.png) no-repeat center;	
+}
+
+.mng-tw-gray{
+	background: url(../socialConnectionIcons/twitter_gray.png) no-repeat center;	
+}
+
+.mng-fbp-gray{
+	background: url(../socialConnectionIcons/fbpixel_gray.png) no-repeat center;	
+}
+
+.mng-insta-gray{
+	background: url(../socialConnectionIcons/insta_gray.png) no-repeat center;	
+}
+
+.mng-tbl-pad-zero{
+	padding: 0;
+}

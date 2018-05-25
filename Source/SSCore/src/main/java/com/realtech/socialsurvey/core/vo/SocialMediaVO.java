@@ -5,7 +5,7 @@ import com.realtech.socialsurvey.core.enums.SocialMediaConnectionStatus;
 
 public class SocialMediaVO
 {
-    private String SocialMedia;
+    private String socialMedia;
     private SocialMediaConnectionStatus status;
 
 
@@ -14,27 +14,27 @@ public class SocialMediaVO
 
     public SocialMediaVO( String socialMedia )
     {
-        SocialMedia = socialMedia;
+        this.socialMedia = socialMedia;
         this.status = SocialMediaConnectionStatus.NOT_CONNECTED;
     }
 
 
     public SocialMediaVO( String socialMedia, SocialMediaConnectionStatus status )
     {
-        SocialMedia = socialMedia;
+    	this.socialMedia = socialMedia;
         this.status = status;
     }
 
 
     public String getSocialMedia()
     {
-        return SocialMedia;
+        return socialMedia;
     }
 
 
     public void setSocialMedia( String socialMedia )
     {
-        SocialMedia = socialMedia;
+    	this.socialMedia = socialMedia;
     }
 
 
@@ -52,6 +52,6 @@ public class SocialMediaVO
 
     @Override public String toString()
     {
-        return "SocialMediaVO{" + "SocialMedia='" + SocialMedia + '\'' + ", status='" + status + '\'' + '}';
+        return "SocialMediaVO{" + "SocialMedia='" + socialMedia + '\'' + ", status='" + status + '\'' + '}';
     }
 }

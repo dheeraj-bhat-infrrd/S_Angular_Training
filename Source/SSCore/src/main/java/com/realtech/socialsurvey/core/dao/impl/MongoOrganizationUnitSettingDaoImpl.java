@@ -1116,7 +1116,13 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         query.addCriteria( Criteria.where( KEY_IDEN ).is( iden ) );
         query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).exclude( "_id" );
         FeedIngestionEntity feedIngestionEntity = mongoTemplate.findOne( query, FeedIngestionEntity.class, collectionName );
-        return feedIngestionEntity.getSocialMediaTokens();
+        
+        SocialMediaTokens socialMediaTokens = null;
+        if(feedIngestionEntity != null) {
+        	socialMediaTokens = feedIngestionEntity.getSocialMediaTokens();
+        }
+        
+        return socialMediaTokens;
     }
 
 
