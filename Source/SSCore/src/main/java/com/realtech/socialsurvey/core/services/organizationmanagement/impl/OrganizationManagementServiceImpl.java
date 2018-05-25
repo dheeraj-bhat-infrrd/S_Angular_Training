@@ -3425,7 +3425,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             assigneeUsers = userMap.get( CommonConstants.VALID_USERS_LIST );
         }
 
-        if ( (assigneeUsers != null && !assigneeUsers.isEmpty() ) && ! isSocialMonitorAdmin ) {
+        if ( (assigneeUsers != null && !assigneeUsers.isEmpty() )  && !isSocialMonitorAdmin) {
             /**
              * if branchId is provided, add the individual to specified branch
              */
@@ -3472,6 +3472,19 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         int flag = 0;
         if ( isSocialMonitorAdmin ) {
             for ( User assigneeUser : assigneeUsers ) {
+                if ( selectedUserId == 0l ) {
+                    LOG.debug( "assigning individual(s) to company in addIndividual" );
+                    Region region = getDefaultRegionForCompany( adminUser.getCompany() );
+                    if ( region == null ) {
+                        throw new NoRecordsFetchedException( "No default region found for company while adding individual" );
+                    }
+
+                    if ( validateUserAssignment( adminUser, assigneeUser, userMap ) ) {
+                        assignRegionToUser( adminUser, region.getRegionId(), assigneeUser, isAdmin );
+                    }
+
+                }
+
                 flag = 1;
                 List<UserProfile> userProfiles = assigneeUser.getUserProfiles();
                 if ( userProfiles != null && !userProfiles.isEmpty() ) {
