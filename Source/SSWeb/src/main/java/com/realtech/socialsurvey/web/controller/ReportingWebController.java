@@ -688,9 +688,6 @@ public class ReportingWebController
                 model.addAttribute( COLUMN_NAME, CommonConstants.AGENT_ID_COLUMN );
                 model.addAttribute( COLUMN_VALUE, entityId );
             } else {
-                if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
-                    model.addAttribute( SOCIAL_MONITOR_FLAG, reportingDashboardManagement.isSocialMonitorEnabled( entityId ) );
-                }
                 model.addAttribute( COLUMN_NAME, entityType );
                 model.addAttribute( COLUMN_VALUE, entityId );
             }
@@ -703,6 +700,28 @@ public class ReportingWebController
         model.addAttribute( "monthBeforeLastMonth", new DateFormatSymbols().getMonths()[ calendar.get( Calendar.MONTH ) ] );
         
         return JspResolver.REPORTS;
+    }
+    
+    @RequestMapping ( value = "/showsocialmonitorreportspage", method = RequestMethod.GET)
+    public String showSocialMonitorReportsPage( Model model, HttpServletRequest request ) throws InvalidInputException, NoRecordsFetchedException
+    {
+        LOG.info( "Showing social monitor reports page" );
+        HttpSession session = request.getSession( false );
+        User user = sessionHelper.getCurrentUser();
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        boolean isIndividualAccount = isIndividualAccount( user );
+        if ( !isIndividualAccount ) {
+            if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+                model.addAttribute( COLUMN_NAME, CommonConstants.AGENT_ID_COLUMN );
+                model.addAttribute( COLUMN_VALUE, entityId );
+            } else {
+                model.addAttribute( COLUMN_NAME, entityType );
+                model.addAttribute( COLUMN_VALUE, entityId );
+            }
+        }
+         
+        return JspResolver.SOCIAL_MONITOR_REPORTS;
     }
 
 
