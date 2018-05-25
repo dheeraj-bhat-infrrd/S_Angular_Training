@@ -98,6 +98,9 @@
 			<%-- <div class="float-right hm-header-right text-center soc-mon-btn" onclick="">
 					<spring:message code="label.social.monitor.reports.key" />
 			</div> --%>
+			<div class="float-right hm-header-right text-center soc-mon-btn" onclick="javascript:showMainContent('./showsocialmonitorreportspage.do')">
+					<spring:message code="label.social.monitor.reports.key" />
+			</div>
 			<div class="float-right hm-header-right text-center soc-mon-btn" onclick="javascript:showMainContent('./showsocialmonitormacropage.do')">
 					<spring:message code="label.edit.macros.key" />
 			</div>

@@ -202,6 +202,7 @@ public interface JspResolver
     public static final String LEADERBOARD_PROFILE_IMAGE = "leaderboard_profile_image";
     public static final String REPORTING_TRANSACTION_DETAILS = "reporting_transaction_details";
     public static final String REPORTING_SCORE_STATS = "reporting_score_stats";
+    public static final String SOCIAL_MONITOR_REPORTS = "reporting_social_monitor_reports";
     
     public static final String SENDGRID_EMAIL_MNGMNT="sendgrid_email_management";
 }
