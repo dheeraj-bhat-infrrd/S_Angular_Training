@@ -37,63 +37,9 @@
 					<span class="generate-report-span-report" >Report</span>
 					<div class="dash-btn-dl-sd-admin report-selector" >
 						<select id="generate-survey-reports" class="float-left dash-download-sel-item report-selector-choice">
-							<c:if test="${profilemasterid != 4}">
- 								<option value=<spring:message code="label.survey.stats.report.value" /> data-report="survey-stats"><spring:message code="label.survey.stats.report.key" /></option>
- 								<option value=<spring:message code="label.verified.users.report.value" /> data-report="verified-users"><spring:message code="label.reports.verfied.users.report.key" /></option>
- 								<option value=<spring:message code="label.user.ranking.report.value" /> data-report="user-ranking"><spring:message code="label.user.ranking.report.key" /></option>
- 								<option value=<spring:message code="label.digest.copy.value" /> data-report="digest-copy"><spring:message code="label.digest.copy.key" /></option>
-  							</c:if>
-  							<c:if test="${profilemasterid == 1}"> 
- 								<option value=<spring:message code="label.company.user.report.value" /> data-report="company-user"><spring:message code="label.company.user.report.key" /></option>
- 								<option value=<spring:message code="label.nps.report.value" /> data-report="nps-report"><spring:message code="label.nps.report.key" /></option>
-								<option value=<spring:message code="label.branch.ranking.monthly.report.value" /> data-report="company-user"><spring:message code="label.branch.ranking.report.key" /></option>
-								<option value=<spring:message code="label.survey.invitation.email.report.value" /> data-report="survey-invitation-email-report"><spring:message code="label.survey.invitation.email.report.key" /></option>
-							</c:if>
-  								<option value=<spring:message code="label.survey.results.report.value" /> data-report="survey-results"><spring:message code="label.survey.results.report.key" /></option>
- 								<option value=<spring:message code="label.survey.transaction.report.value" /> data-report="survey-transaction-summary"><spring:message code="label.survey.transaction.report.key" /></option>
- 								<option value=<spring:message code="label.incomplete.survey.report.value" /> data-report="incomplete-survey-report"><spring:message code="label.incomplete.survey.report.key" /></option>
+							<option value=<spring:message code="label.social.monitor.date.report.value" /> data-report="social-monitor-date-report"><spring:message code="label.social.monitor.date.report.key" /></option>
+							<option value=<spring:message code="label.social.monitor.date.keyword.report.value" /> data-report="social-monitor-date-keyword-report"><spring:message code="label.social.monitor.date.keyword.report.key" /></option>
 						</select>	
-					</div>
-					<div id="report-time-div" class="float-left board-div hide">
-						<div class="dash-btn-dl-sd-admin time-selector" style="width:200px; margin-top:-5px">
-							<select id="report-time-selector" class="float-left dash-download-sel-item board-selector-choice" style="width:100%">
-								<option value=1 data-report="thisYear">This Year</option>
-								<option value=2 data-report="thisMonth">This Month</option>
-								<option value=3 data-report="lastYear">Last Year</option>
-								<option value=4 data-report="lastMonth">Last Month</option>
-							</select>	
-						</div>
-					</div>
-					<div id="trans-report-time-div" class="float-left board-div hide">
-						<div class="dash-btn-dl-sd-admin time-selector" style="width:200px; margin-top:-5px">
-							<select id="trans-report-time-selector" class="float-left dash-download-sel-item board-selector-choice" style="width:100%">
-								<option value=2 data-report="thisMonth">This Month</option>
-								<option value=3 data-report="lastMonth">Last Month</option>
-							</select>	
-						</div>
-					</div>
-					<div id="digest-time-div" class="float-left board-div hide">
-						<div class="dash-btn-dl-sd-admin time-selector" style="width:200px; margin-top:-5px">
-							<select id="digest-time-selector" class="float-left dash-download-sel-item board-selector-choice" style="width:100%">
-								<option value=1 data-report="lastMonth">Last Month</option>
-								<option value=2 data-report="monthBefore">${monthBeforeLastMonth}</option>
-							</select>	
-						</div>
-					</div>
-					<div id="nps-report-time-div" class="float-left board-div hide">
-						<div class="dash-btn-dl-sd-admin time-selector" style="width:200px; margin-top:-5px">
-							<select id="nps-report-time-selector" class="float-left dash-download-sel-item board-selector-choice" style="width:100%">
-							</select>	
-						</div>
-					</div>
-					<div id="email-rep-time-div" class="float-left board-div hide">
-						<div class="dash-btn-dl-sd-admin time-selector" style="width:200px; margin-top:-5px">
-							<select id="email-rep-selector" class="float-left dash-download-sel-item board-selector-choice" style="width:100%">
-								<option value=1 data-report="thisYear">All Time</option>
-								<option value=2 data-report="thisMonth">This Month</option>
-								<option value=3 data-report="lastYear">Last Month</option>
-							</select>	
-						</div>
 					</div>
 					<div class="generate-report-date-range" id="date-pickers">
 						<div style="display: -webkit-box; display:inline-flex;">
@@ -157,31 +103,6 @@ $(document).ready(function() {
 	
 	var selectedVal = $('#generate-survey-reports').val();
 	var key = parseInt(selectedVal);
-	if(key == 101 || key == 102 || key == 103 || key == 106 || key == 112 || key == 200 || key == 1001 || key==105 ){
-		$('#date-pickers').hide();
-	}
-	
-	if(key==105){
-		$('#trans-report-time-div').show();	
-	}
-	
-	if(key == 106 || key == 112){
-		$('#report-time-div').removeClass('hide');
-	}else{
-		$('#report-time-div').addClass('hide');
-	}
-	
-	if( key == 200 ){
-		$('#digest-time-div').removeClass('hide');
-	} else {
-		$('#digest-time-div').addClass('hide');
-	}
-		
-	if(key == 1001){
-		$('#email-rep-time-div').removeClass('hide');
-	}else{
-		$('#email-rep-time-div').addClass('hide');
-	}
 	
 	if(key == 302){
 		$('#sm-keywords').removeClass('hide');
