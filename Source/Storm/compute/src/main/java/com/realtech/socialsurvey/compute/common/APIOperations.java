@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.compute.common;
 import com.google.gson.JsonObject;
 import com.realtech.socialsurvey.compute.entities.EmailMessage;
 import com.realtech.socialsurvey.compute.entities.SolrEmailMessageWrapper;
+import com.realtech.socialsurvey.compute.entities.UserEvent;
 import com.realtech.socialsurvey.compute.entities.request.SolrAdd;
 import com.realtech.socialsurvey.compute.entities.request.SolrRequest;
 import com.realtech.socialsurvey.compute.entities.response.SOLRResponse;
@@ -170,4 +171,31 @@ public class APIOperations
                     LOG.trace( "Email messages response {}", response.body() );
         return response.body();
 	}
+	
+	
+    /**
+     * Inserts the user event in SOLR
+     * @param UserEvent
+     * @return
+     */
+    public boolean saveUserEventToSolr( UserEvent userEvent )
+    {
+        SolrRequest<UserEvent> solrRequest = new SolrRequest<>();
+        SolrAdd<UserEvent> solrAdd = new SolrAdd<>();
+        solrAdd.setDoc( userEvent );
+        solrRequest.setAdd( solrAdd );
+        Call<SOLRResponseObject<UserEvent>> requestCall = RetrofitApiBuilder.apiBuilderInstance()
+            .getSolrAPIIntergrationService().saveUserEvent( solrRequest, true );
+        try {
+            Response<SOLRResponseObject<UserEvent>> response = requestCall.execute();
+            RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
+            if ( LOG.isTraceEnabled() ) {
+                LOG.trace( "saved user event to solr : {}", response.body() );
+            }
+            return true;
+        } catch ( IOException | APIIntergrationException e ) {
+            LOG.error( "saveUserEventToSolr: IOException/ APIIntergrationException caught", e );
+            throw new SolrProcessingException( "Exception while saving user event to solr", e );
+        }
+    }
 }

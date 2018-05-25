@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.realtech.socialsurvey.core.dao.StreamFailureDao;
 import com.realtech.socialsurvey.core.entities.EmailEntity;
 import com.realtech.socialsurvey.core.entities.SendGridEventEntity;
+import com.realtech.socialsurvey.core.entities.UserEvent;
 import com.realtech.socialsurvey.core.services.stream.StreamMessagesService;
 
 /**
@@ -69,5 +70,12 @@ public class StreamMessagesServiceImpl implements StreamMessagesService
     {
     		LOG.debug( "update retry failed to strem message with id " );
         streamFailureDao.updateRetryFailedForStreamMsg(id , true);
+    }
+    
+    @Override
+    public boolean saveStreamUserEvent( UserEvent userEvent )
+    {
+        LOG.debug( "save failed user event with id {}", userEvent.getUserEventId() );   
+        return streamFailureDao.saveFailedUserEvent( userEvent );
     }
 }

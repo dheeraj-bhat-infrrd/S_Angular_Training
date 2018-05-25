@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.realtech.socialsurvey.core.entities.EmailEntity;
 import com.realtech.socialsurvey.core.entities.SendGridEventEntity;
+import com.realtech.socialsurvey.core.entities.UserEvent;
 
 /**
  * Handles stream messages
@@ -44,4 +45,11 @@ public interface StreamMessagesService
 	 * @param id
 	 */
 	public void updateRetryFailedForStreamMsg(String id);
+
+	/**
+	 * 
+	 * @param userEvent
+	 * @return
+	 */
+    public boolean saveStreamUserEvent( UserEvent userEvent );
 }

@@ -57,6 +57,12 @@ public class KafkaTopicSpoutBuilder
     // Batch processing topic
     private static final String BATCH_TOPIC = "batch-topic";
     private static final String BATCH_CONSUMER_GROUP = "bcg01";
+    
+    
+    // Batch processing topic
+    private static final String USER_EVENT_TOPIC = "user-event-topic";
+    private static final String USER_EVENT_CONSUMER_GROUP = "uecg01";
+    
 
     public static synchronized KafkaTopicSpoutBuilder getInstance(){
         if (kafkaTopicSpoutBuilder == null){
@@ -149,5 +155,22 @@ public class KafkaTopicSpoutBuilder
         batchSpoutConfig.scheme = new SchemeAsMultiScheme( new StringScheme() );
         LOG.info( "Batch topic spout initiated. Topic: {}, Consumer Group: {}", topicName, consumerGroup );
         return new KafkaSpout( batchSpoutConfig );
+    }
+    
+    
+    /**
+     * user event topic kafka spout
+     */
+    public  KafkaSpout userEventTopicSpout() {
+        ZkHosts zkHosts = new ZkHosts( zookeeperBrokers );
+        String topicName = ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? USER_EVENT_TOPIC
+                : ChararcterUtils.appendWithHypen(USER_EVENT_TOPIC, EnvConstants.getProfile() );
+        String consumerGroup = ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? USER_EVENT_CONSUMER_GROUP
+                : ChararcterUtils.appendWithHypen(USER_EVENT_CONSUMER_GROUP, EnvConstants.getProfile() );
+        SpoutConfig userEventSpoutConfig = new SpoutConfig( zkHosts, topicName, ZOOKEEPER_ROOT, consumerGroup );
+        userEventSpoutConfig.ignoreZkOffsets = false;
+        userEventSpoutConfig.scheme = new SchemeAsMultiScheme( new StringScheme() );
+        LOG.info( "user event topic spout initiated. Topic: {}, Consumer Group: {}", topicName, consumerGroup );
+        return new KafkaSpout( userEventSpoutConfig );
     }
 }

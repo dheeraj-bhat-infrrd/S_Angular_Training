@@ -121,5 +121,41 @@ public class FailedMessagesServiceImpl implements FailedMessagesService
         LOG.debug("Updating failed email message retry count with randonUUID {}", randomUUID);
         return failedEmailMessagesDao.updatedFailedEmailMessageRetryCount(randomUUID);
     }
+    
+    
+    @Override
+    public boolean insertUnsavedUserEvent( UserEvent userEvent, boolean willRetry, int retryCount, boolean wasRetrySuccessful, boolean isPermanentlyFailed, Throwable thrw ) 
+    {
+        LOG.debug("saving failed user event info");
+        
+        if( userEvent == null ) {
+            LOG.warn( "No user event specified" );
+            return false;
+        }
+        
+        LOG.debug( "Adding a unsaved user event {}", userEvent );
+        
+        UnsavedUserEvent unsavedEvent = new UnsavedUserEvent();
+        unsavedEvent.setData( userEvent );
+        unsavedEvent.setWillRetry( willRetry );
+        unsavedEvent.setRetryCounts( retryCount );
+        unsavedEvent.setRetrySuccessful( wasRetrySuccessful );
+        unsavedEvent.setPermanentFailure( isPermanentlyFailed );
+        
+        
+        if( thrw != null ) {
+            LOG.trace( "Error encountered while saving : {}", thrw );
+            unsavedEvent.setErrorMessage( thrw.getMessage() );
+            unsavedEvent.setThrwStr( thrw.toString() );
+            unsavedEvent.setThrwStacktrace( ThrowableUtils.controlledStacktrace( thrw ) );
+        }
+        
+        if( !willRetry && isPermanentlyFailed ) {
+            LOG.debug( "Persisting unsaved user event" );
+        } else {
+            LOG.debug( "Persisting temporarily unsaved user event" );
+        }
+        return failedEmailMessagesDao.insertUnsavedUserEvent( unsavedEvent );
+    }
 
 }
