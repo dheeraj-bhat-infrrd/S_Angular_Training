@@ -282,7 +282,7 @@
 				   </td>
 				</tr>
 				<tr class="u-tbl-row u-tbl-row-sel hide user-assignment-edit-row">
-					<td id="user-details-and-assignments-${userfromsearch.userId}" class="u-tbl-edit-td user-assignment-edit-div" colspan="6">
+					<td id="user-details-and-assignments-${userfromsearch.userId}" class="u-tbl-edit-td user-assignment-edit-div" colspan="7">
 						<!-- data populated from um-edit-row.jsp -->
 					</td>
 				</tr>
