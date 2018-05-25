@@ -208,7 +208,7 @@ public interface SSApiIntegration
         @Query ("isAbusive") boolean isAbusive, @Query ("agreedToShare") String agreedToShare  );
     
     @GET("/v2/swearwords")
-    Response getSwearWordsList();
+    Response getSwearWordsList(@Query ("companyId") long companyId);
 
     @DELETE("/v2/removesurveyquestion")
 	Response removeQuestionFromSurvey(@Query("userId") long userId,@Query("surveyQuestionId") long surveyQuestionId);

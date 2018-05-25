@@ -424,5 +424,9 @@ public interface SurveyHandler
 	public void validateAndProcessSurveyPreInitiation(SurveyPreInitiation survey) throws InvalidInputException;
 
 	public void updateSurveyAsAbusiveNotify(String get_id);
+	
+	public String[] fetchSwearWords( String entityType, long entityId ) throws InvalidInputException;
+
+    void updateSwearWords( String entityType, long entityId, String[] swearWords ) throws InvalidInputException;
 
 }
