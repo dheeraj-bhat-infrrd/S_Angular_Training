@@ -137,7 +137,8 @@
 									<div id="soc-mon-access-chk-box" class="float-left bd-check-img clear-both"></div>
 									<input type="hidden" id="soc-mon-access-cb" name="surveymailthrhld" value="${isSocialMonitorEnabled}">
 									<div class="float-left listing-access-txt cust-resp-txt">Enable Social Monitor</div>
-
+								</c:if>
+								
 								<c:if test="${ columnName != 'agentId'}">
 									<div id="survey-mail-thrhld-chk-box" class="float-left bd-check-img clear-both"></div>
 									<input type="hidden" id="survey-mail-thrhld-cb" name="surveymailthrhld" value="${sendMonthlyDigestMail}">
@@ -173,8 +174,7 @@
 									</div>
 								</div>
 							</div>
-					</c:if>
-							
+							</c:if>
 						</div>
 					</div>
 					</form>
@@ -355,7 +355,8 @@ $(document).ready(function() {
 	
 	if("${isSocialMonitorEnabled}" == "false"){
 		$('#soc-mon-access-chk-box').addClass('bd-check-img-checked');
-
+	}
+	
 	if("${hidePublicPage}" == "false"){
 		$('#hide-pp-chk-box').addClass('bd-check-img-checked');
 	}
