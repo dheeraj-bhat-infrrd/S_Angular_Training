@@ -16197,10 +16197,13 @@ function showSummitPopup(){
 	disableBodyScroll();
 }
 
-function closeSummitPopup(){
+function closeSummitPopup( doSendclickedEventInfo ){
 	$('#summit-popup').hide();
 	showSummitRibbon();
 	enableBodyScroll();
+	if( doSendclickedEventInfo != false ){
+		sendClickedEventInfo( "home.dashboard.summit.popup.close" );
+	}
 }
 
 
@@ -16209,21 +16212,23 @@ function showSummitRibbon(){
 }
 
 function closeSummitRibbon(){
+	
 	$('#summit-ribbon').hide();
+	sendClickedEventInfo( "home.dashboard.summit.ribbon.close" );
 }
 
 $(document).on('click','#register-summit-btn',function(e){
 	e.stopImmediatePropagation();
 	e.preventDefault();
 	
-	closeSummitPopup();
+	closeSummitPopup( false );
+	sendClickedEventInfo( "home.dashboard.summit.popup.register" );
 	window.open('http://www.createwowsummit.com', '_blank');
 	
 });
 
 $(document).on('click','#close-summit-popup',function(e){
 	e.stopPropagation();
-		
 	closeSummitPopup();
 });
 
@@ -16231,7 +16236,7 @@ $(document).on('click','#summit-ribbon',function(e){
 	e.stopPropagation();
 	e.stopImmediatePropagation();
 	e.preventDefault();
-	
+	sendClickedEventInfo( "home.dashboard.summit.ribbon.register" );
 	window.open('http://www.createwowsummit.com', '_blank');
 });
 
@@ -16246,3 +16251,16 @@ $(document).on('click','#summit-popup-body',function(e){
 	e.stopImmediatePropagation();
 	e.preventDefault();
 });
+
+
+function sendClickedEventInfo( event ){
+	if( event != undefined ){
+		// send the type of event that a user has triggered
+		$.ajax({
+			url : "./user/trackedevents/click.do",
+			type : "POST",
+			data : {"event" : String(event)},
+			async : true
+		});
+	}
+}
