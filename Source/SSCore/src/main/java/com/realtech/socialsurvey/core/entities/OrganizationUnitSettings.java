@@ -93,7 +93,8 @@ public class OrganizationUnitSettings implements Serializable
     
     private boolean isAgentProfileDisabled;
 
-
+    private String[] swearWords;
+    
     public List<Keyword> getFilterKeywords()
     {
         return filterKeywords;
@@ -820,6 +821,17 @@ public class OrganizationUnitSettings implements Serializable
     public void setAgentProfileDisabled( boolean isAgentProfileDisabled )
     {
         this.isAgentProfileDisabled = isAgentProfileDisabled;
+    }
+
+    public String[] getSwearWords()
+    {
+        return swearWords;
+    }
+
+
+    public void setSwearWords( String[] swearWords )
+    {
+        this.swearWords = swearWords;
     }
 
 
