@@ -1738,5 +1738,7 @@ public interface OrganizationManagementService
 
 
     void updateAgentsProfileDisable( List<Long> agentId, boolean isAgentProfileDisabled ) throws InvalidInputException;
+    
+    public boolean isSocialMonitorAdmin(Long agentId) throws InvalidInputException;
 
 }
