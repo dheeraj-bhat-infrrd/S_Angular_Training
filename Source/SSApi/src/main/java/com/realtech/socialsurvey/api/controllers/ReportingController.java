@@ -876,4 +876,17 @@ public class ReportingController
     	LOGGER.info("API call to get survey invitation email counts for month and year value.{}-{}",month,year);
     	return reportingDashboardManagement.getDataForSurveyInvitationMail(month,year,companyId ) ;
     }
+    
+    @RequestMapping ( value = "/getrecentactivityforsocialmonitorreporting", method = RequestMethod.GET)
+    @ApiOperation ( value = "Fetch Recent Activity for Social Monitor Reporting ")
+    public String getRecentActivityForSocialMonitor( Long entityId, String entityType, int startIndex, int batchSize ) throws NonFatalException
+    {
+        LOGGER.info( "Fetching Recent Activity for Social Monitor Reporting" );
+
+        String json = null;
+        List<List<Object>> recentActivityList = reportingDashboardManagement.getRecentActivityListForSocialMonitor( entityId, entityType,
+                startIndex, batchSize );
+        json = new Gson().toJson( recentActivityList );
+        return json;
+    }
 }

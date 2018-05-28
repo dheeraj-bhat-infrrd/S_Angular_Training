@@ -25,6 +25,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
@@ -4937,6 +4938,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         return profiles;
     }
     
+
     /*
      * Method to fetch all the agent/admin user profiles for the user
      */
@@ -4952,12 +4954,18 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         LOG.debug( "Method getAllAgentAdminProfilesForUser() called to fetch the list of agent/Admin profiles for the user" );
         Session session = sessionFactory.getCurrentSession();
         Criteria criteria = session.createCriteria( UserProfile.class );
-        criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN , CommonConstants.STATUS_ACTIVE ) );
-        criteria.add( Restrictions.eq( CommonConstants.USER_COLUMN, user ) );
-        criteria.add( Restrictions.eq( CommonConstants.COMPANY_COLUMN, user.getCompany()));
-        criteria.add( Restrictions.ne(  CommonConstants.PROFILE_MASTER_COLUMN, getProfilesMasterById( CommonConstants.PROFILES_MASTER_SM_ADMIN_PROFILE_ID) ) );
+        try {
+            criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ) );
+            criteria.add( Restrictions.eq( CommonConstants.USER_COLUMN, user ) );
+            criteria.add( Restrictions.eq( CommonConstants.COMPANY_COLUMN, user.getCompany() ) );
+            criteria.add( Restrictions.ne( CommonConstants.PROFILE_MASTER_COLUMN,
+                getProfilesMasterById( CommonConstants.PROFILES_MASTER_SM_ADMIN_PROFILE_ID ) ) );
+        } catch ( HibernateException hibernateException ) {
+            LOG.error( "HibernateException caught in getAllAgentAdminProfilesForUser().", hibernateException );
+            throw new DatabaseException( "HibernateException caught in getAllAgentAdminProfilesForUser().", hibernateException );
+        }
         LOG.debug( "Method getAllAgentAdminProfilesForUser() finised successfully" );
-        return (List<UserProfile>)criteria.list();
+        return (List<UserProfile>) criteria.list();
     }
     
 }
