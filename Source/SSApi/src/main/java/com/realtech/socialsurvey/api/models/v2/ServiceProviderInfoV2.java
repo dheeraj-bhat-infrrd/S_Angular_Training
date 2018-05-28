@@ -8,6 +8,8 @@ public class ServiceProviderInfoV2
     
     private String serviceProviderOfficeName;
     private String serviceProviderRegionName;
+    private long serviceProviderOfficeId;
+    private long serviceProviderRegionId;
 
 
     public long getServiceProviderId() {
@@ -62,4 +64,29 @@ public class ServiceProviderInfoV2
 	public void setServiceProviderRegionName(String serviceProviderRegionName) {
 		this.serviceProviderRegionName = serviceProviderRegionName;
 	}
+
+
+    public long getServiceProviderOfficeId()
+    {
+        return serviceProviderOfficeId;
+    }
+
+
+    public void setServiceProviderOfficeId( long serviceProviderOfficeId )
+    {
+        this.serviceProviderOfficeId = serviceProviderOfficeId;
+    }
+
+
+    public long getServiceProviderRegionId()
+    {
+        return serviceProviderRegionId;
+    }
+
+
+    public void setServiceProviderRegionId( long serviceProviderRegionId )
+    {
+        this.serviceProviderRegionId = serviceProviderRegionId;
+    }
+	
 }
