@@ -19,6 +19,8 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -35,6 +37,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
     private MongoTemplate mongoTemplate;
 
     public static final String SOCIAL_FEED_COLLECTION = "SOCIAL_FEED_COLLECTION";
+    public static final String SOCIAL_FEED_COLLECTION_ARCHIVE = "SOCIAL_FEED_COLLECTION_ARCHIVE";
     public static final String KEY_IDENTIFIER = "_id";
     private static final String HASH = "hash";
     private static final String COMPANY_ID = "companyId";
@@ -520,6 +523,32 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         socialResponseObjects.addAll( mongoTemplate.find( query, SocialResponseObject.class, SOCIAL_FEED_COLLECTION_ARCHIVE ) );
         LOG.info( "Response fetched from mongo is {}", socialResponseObjects );
         return socialResponseObjects;
+    }
+        
+    @Override
+    public boolean moveDocumentToArchiveCollection(int days)
+    {
+        try {
+            Query query = new Query();
+            query.addCriteria( Criteria.where( UPDATED_TIME ).lt( dateToArchiveOldData(days).getTime() ) );
+            List<SocialResponseObject> socialFeedData = mongoTemplate.find( query, SocialResponseObject.class,
+                SOCIAL_FEED_COLLECTION );
+            mongoTemplate.insert( socialFeedData, SOCIAL_FEED_COLLECTION_ARCHIVE );
+            mongoTemplate.remove( query, SocialResponseObject.class, SOCIAL_FEED_COLLECTION );
+            return true;
+        } catch ( Exception e ) {
+            LOG.error( "Error while archiving data", e );
+        }
+        return false;
+    }
+    
+    private static Date dateToArchiveOldData(int days) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE, -days);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        return calendar.getTime();
     }
 
 }
