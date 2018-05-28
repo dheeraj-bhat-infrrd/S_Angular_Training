@@ -1391,6 +1391,6 @@ return div.innerHTML;
 
 function paintAvgRatingForPpf(avgRating) {
 	if (avgRating != undefined) {
-		changeRatingPattern(avgRating, $("#rating-avg-comp"), true);
+		changeRatingPattern(avgRating, $("#rating-avg-comp"), true, undefined, true);
 	}
 }
