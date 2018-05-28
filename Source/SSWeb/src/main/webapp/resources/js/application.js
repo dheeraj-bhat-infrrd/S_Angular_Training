@@ -16597,14 +16597,7 @@ $(document).on('click','#add-macro-status',function(e){
 	$('#macro-status-chevron-down').toggle();
 	$('#macro-status-chevron-up').toggle();
 });
-function closeSummitPopup( doSendclickedEventInfo ){
-	$('#summit-popup').hide();
-	showSummitRibbon();
-	enableBodyScroll();
-	if( doSendclickedEventInfo != false ){
-		sendClickedEventInfo( "home.dashboard.summit.popup.close" );
-	}
-}
+
 
 $(document).on('click','#add-macro-alerts',function(e){
 	e.stopPropagation();
@@ -16633,11 +16626,6 @@ $(document).on('click','#add-macro-action',function(e){
 
 });
 
-function closeSummitRibbon(){
-	
-	$('#summit-ribbon').hide();
-	sendClickedEventInfo( "home.dashboard.summit.ribbon.close" );
-}
 
 $(document).on('click','#macro-status-dropdown',function(e){
 	e.stopPropagation();
@@ -20586,10 +20574,13 @@ function showSummitPopup(){
 	disableBodyScroll();
 }
 
-function closeSummitPopup(){
+function closeSummitPopup( doSendclickedEventInfo ){
 	$('#summit-popup').hide();
 	showSummitRibbon();
 	enableBodyScroll();
+	if( doSendclickedEventInfo != false ){
+		sendClickedEventInfo( "home.dashboard.summit.popup.close" );
+	}
 }
 
 
@@ -20598,21 +20589,24 @@ function showSummitRibbon(){
 }
 
 function closeSummitRibbon(){
+	
 	$('#summit-ribbon').hide();
+	sendClickedEventInfo( "home.dashboard.summit.ribbon.close" );
 }
+
 
 $(document).on('click','#register-summit-btn',function(e){
 	e.stopImmediatePropagation();
 	e.preventDefault();
 	
-	closeSummitPopup();
+	closeSummitPopup( false );
+	sendClickedEventInfo( "home.dashboard.summit.popup.register" );
 	window.open('http://www.createwowsummit.com', '_blank');
 	
 });
 
 $(document).on('click','#close-summit-popup',function(e){
 	e.stopPropagation();
-		
 	closeSummitPopup();
 });
 
@@ -20620,7 +20614,7 @@ $(document).on('click','#summit-ribbon',function(e){
 	e.stopPropagation();
 	e.stopImmediatePropagation();
 	e.preventDefault();
-	
+	sendClickedEventInfo( "home.dashboard.summit.ribbon.register" );
 	window.open('http://www.createwowsummit.com', '_blank');
 });
 
