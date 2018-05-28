@@ -20,12 +20,16 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.JobLogDetails;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
@@ -38,6 +42,8 @@ import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 @Component ( "userProfile")
 public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implements UserProfileDao
 {
+	@Autowired
+	CompanyDao companyDao;
 
     private static final Logger LOG = LoggerFactory.getLogger( UserProfileDaoImpl.class );
     private final String regionUserSearchQuery = "SELECT US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS, group_concat(UP.BRANCH_ID) as BRANCH_ID, group_concat(UP.REGION_ID) as REGION_ID, group_concat(UP.PROFILES_MASTER_ID) as PROFILES_MASTER_ID, CONCAT(US.FIRST_NAME, ( CASE WHEN US.LAST_NAME IS NOT NULL THEN CONCAT (' ', US.LAST_NAME) ELSE '' END)) as DISPLAY_NAME FROM  USER_PROFILE AS UP JOIN (SELECT USER_ID, REGION_ID, COMPANY_ID FROM USER_PROFILE where USER_ID = ? and PROFILES_MASTER_ID = ? and COMPANY_ID = ?) AS subQuery_UP ON subQuery_UP.REGION_ID = UP.REGION_ID and subQuery_UP.COMPANY_ID = UP.COMPANY_ID and UP.STATUS != ? JOIN USERS AS US ON US.USER_ID = UP.USER_ID GROUP BY US.USER_ID, US.FIRST_NAME, US.LAST_NAME, US.EMAIL_ID, US.LOGIN_NAME, US.IS_OWNER, US.COMPANY_ID, US.STATUS ORDER BY DISPLAY_NAME ASC";
@@ -678,6 +684,22 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
         return userProfiles.get( 0 );
     }
 
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<UserProfile> getUserProfiles(Long companyId) {
+		LOG.debug("Method to get userProfiles for companyId {} started", companyId);
+		Criteria criteria = getSession().createCriteria(UserProfile.class);
+		try {
+			criteria.add(Restrictions.eq(CommonConstants.COMPANY, companyDao.findById(Company.class, companyId)));
+			criteria.add(Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE));
+		} catch (HibernateException hibernateException) {
+			LOG.warn("Exception caught in getUserProfiles() ", hibernateException);
+			throw new DatabaseException("Exception caught in getUserProfiles() ", hibernateException);
+		}
+		LOG.debug("Method to get userProfiles for companyId {} finished", companyId);
+		return (List<UserProfile>) criteria.list();
+	}
 
     @Override
     public List<UserProfile> getUserProfiles( long userId )

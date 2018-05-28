@@ -4,8 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import com.realtech.socialsurvey.compute.exception.SolrProcessingException;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.tuple.Fields;
@@ -18,6 +16,7 @@ import com.realtech.socialsurvey.compute.common.EnvConstants;
 import com.realtech.socialsurvey.compute.common.LocalPropertyFileHandler;
 import com.realtech.socialsurvey.compute.entities.SendgridEvent;
 import com.realtech.socialsurvey.compute.entities.SolrEmailMessageWrapper;
+import com.realtech.socialsurvey.compute.exception.SolrProcessingException;
 import com.realtech.socialsurvey.compute.services.FailedMessagesService;
 import com.realtech.socialsurvey.compute.services.impl.FailedMessagesServiceImpl;
 import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBoltWithAck;

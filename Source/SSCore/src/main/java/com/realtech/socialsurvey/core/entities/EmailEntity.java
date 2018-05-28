@@ -49,6 +49,8 @@ public class EmailEntity implements Serializable
     private String agentEmailId;
     private boolean isRetried;
 
+    private boolean streamRetryFailed;
+
     public String get_id() {
 		return _id;
 	}
@@ -290,6 +292,16 @@ public class EmailEntity implements Serializable
     public void setRetried(boolean retried) {
         isRetried = retried;
     }
+
+    public boolean isStreamRetryFailed() {
+		return streamRetryFailed;
+	}
+
+
+	public void setStreamRetryFailed(boolean streamRetryFailed) {
+		this.streamRetryFailed = streamRetryFailed;
+	}
+
 
     @Override
     public String toString() {

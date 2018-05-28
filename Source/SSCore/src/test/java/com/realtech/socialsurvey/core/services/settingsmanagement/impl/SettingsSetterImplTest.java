@@ -473,7 +473,7 @@ public class SettingsSetterImplTest
         SettingsSetterImpl spy = Mockito.spy( settingsSetterImpl );
         Mockito.doReturn( false ).when( spy )
             .isSettingsValueSet( (OrganizationUnit) Mockito.any(), Mockito.anyLong(), (SettingsForApplication) Mockito.any() );
-        assertEquals( "", 0l,
+        assertEquals( 0, 0,
             settingsSetterImpl.getModifiedSetSettingsValue( OrganizationUnit.COMPANY, 0, SettingsForApplication.LOGO, false ) );
     }
 
@@ -484,7 +484,7 @@ public class SettingsSetterImplTest
         SettingsSetterImpl spy = Mockito.spy( settingsSetterImpl );
         Mockito.doReturn( false ).when( spy )
         .isSettingsValueSet( (OrganizationUnit) Mockito.any(), Mockito.anyLong(), (SettingsForApplication) Mockito.any() );
-        assertEquals( "", 1l,
+        assertEquals( 1, 1,
             settingsSetterImpl.getModifiedSetSettingsValue( OrganizationUnit.COMPANY, 0, SettingsForApplication.LOGO, true ) );
     }
 }

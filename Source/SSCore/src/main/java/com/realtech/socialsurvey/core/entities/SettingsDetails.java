@@ -6,7 +6,7 @@ package com.realtech.socialsurvey.core.entities;
 public class SettingsDetails {
 
 	private long lockSettingsHolder;
-	private long setSettingsHolder;
+	private double setSettingsHolder;
 
 	public long getLockSettingsHolder() {
 		return lockSettingsHolder;
@@ -16,11 +16,11 @@ public class SettingsDetails {
 		this.lockSettingsHolder = lockSettingsHolder;
 	}
 
-	public long getSetSettingsHolder() {
+	public double getSetSettingsHolder() {
 		return setSettingsHolder;
 	}
 
-	public void setSetSettingsHolder(long setSettingsHolder) {
+	public void setSetSettingsHolder(double setSettingsHolder) {
 		this.setSettingsHolder = setSettingsHolder;
 	}
 

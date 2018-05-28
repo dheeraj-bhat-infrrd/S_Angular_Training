@@ -1,11 +1,8 @@
 package com.realtech.socialsurvey.stream.controllers;
 
-import com.realtech.socialsurvey.stream.entities.FailedEmailMessage;
-import com.realtech.socialsurvey.stream.services.FailedMessagesService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -21,7 +18,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import com.realtech.socialsurvey.stream.entities.FailedEmailMessage;
+import com.realtech.socialsurvey.stream.services.FailedMessagesService;
+import com.realtech.socialsurvey.stream.services.FailedSocialPostService;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 
 /**
@@ -33,12 +37,19 @@ import java.util.List;
     
     private static final int NUMBER_OF_RECORDS = 10;
     private FailedMessagesService failedMessagesService;
+    private FailedSocialPostService failedSocialPostService;
 
 
     @Autowired public void setFailedMessagesService( FailedMessagesService failedMessagesService )
     {
         this.failedMessagesService = failedMessagesService;
     }
+    
+    @Autowired public void setFailedSocialPostService( FailedSocialPostService failedSocialPostService )
+    {
+        this.failedSocialPostService = failedSocialPostService;
+    }
+    
 
     
     /**
@@ -118,6 +129,21 @@ import java.util.List;
 		return new ResponseEntity<>(failedEmailMessages, HttpStatus.OK);
 
 	}
+	
+	
+	 @ApiOperation ( value = "Queues failed social posts to social monitor.", response = Void.class)
+	    @ApiResponses ( value = { @ApiResponse ( code = 201, message = "Successfully queued failed social posts."),
+	        @ApiResponse ( code = 401, message = "You are not authorized to view the resource"),
+	        @ApiResponse ( code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
+	        @ApiResponse ( code = 503, message = "Service not available") })
+	    @RequestMapping ( value = "/failed/socialposts", method = RequestMethod.GET)
+	    public ResponseEntity<?> queueReportGenerationRequest(  )
+	        throws InterruptedException, ExecutionException, TimeoutException
+	    {
+	        LOG.info( "Received request to generate reports in stream" );
+	        failedSocialPostService.queueFailedSocialPosts();
+	        return new ResponseEntity<>( HttpStatus.CREATED );
+	    }
 		    
  
 }

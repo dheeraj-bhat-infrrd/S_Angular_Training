@@ -24,6 +24,7 @@ public class ReportRequest implements Serializable{
 	private String expectedTimeZone;
 	private long startTime;
 	private long endTime;
+	private String keyword;
 
 	public long getFileUploadId() {
 		return fileUploadId;
@@ -122,8 +123,18 @@ public class ReportRequest implements Serializable{
 	public void setEndTime(long endTime) {
 		this.endTime = endTime;
 	}
+	
+	public String getKeyword()
+    {
+        return keyword;
+    }
 
-	public void transform( FileUpload fileUpload, int actualTimeZoneOffset )
+    public void setKeyword( String keyword )
+    {
+        this.keyword = keyword;
+    }
+
+    public void transform( FileUpload fileUpload, int actualTimeZoneOffset )
     {
         this.fileUploadId = fileUpload.getFileUploadId();
         this.reportType = ReportType.SURVEY_INVITATION_EMAIL_REPORT.getName();
@@ -227,12 +238,14 @@ public class ReportRequest implements Serializable{
             return null;
 	}
 
-	@Override
-	public String toString() {
-		return "ReportRequest [fileUploadId=" + fileUploadId + ", reportType=" + reportType
-				+ ", startDateExpectedTimeZone=" + startDateExpectedTimeZone + ", endDateExpectedTimeZone="
-				+ endDateExpectedTimeZone + ", profileLevel=" + profileLevel + ", profileValue=" + profileValue
-				+ ", companyId=" + companyId + ", actualTimeZone=" + actualTimeZone + ", expectedTimeZone="
-				+ expectedTimeZone + ", startTime=" + startTime + ", endTime=" + endTime + "]";
-	}
+    @Override
+    public String toString()
+    {
+        return "ReportRequest [fileUploadId=" + fileUploadId + ", reportType=" + reportType + ", startDateExpectedTimeZone="
+            + startDateExpectedTimeZone + ", endDateExpectedTimeZone=" + endDateExpectedTimeZone + ", profileLevel="
+            + profileLevel + ", profileValue=" + profileValue + ", companyId=" + companyId + ", actualTimeZone="
+            + actualTimeZone + ", expectedTimeZone=" + expectedTimeZone + ", startTime=" + startTime + ", endTime=" + endTime
+            + ", keyword=" + keyword + "]";
+    }
+
 }

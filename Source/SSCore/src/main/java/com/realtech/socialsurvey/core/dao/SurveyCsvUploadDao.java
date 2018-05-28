@@ -14,5 +14,5 @@ public interface SurveyCsvUploadDao
 
     public void updateSurveyCsvUpload( SurveyCsvInfo csvInfo );
 
-    public boolean doesFileUploadExist( String fileName, String uploaderEmail ); 
+    public boolean doesFileUploadExist( String fileName, String uploaderEmail );
 }

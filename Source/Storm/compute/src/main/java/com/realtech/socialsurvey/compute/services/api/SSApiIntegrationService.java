@@ -1,14 +1,25 @@
 package com.realtech.socialsurvey.compute.services.api;
 
+import java.util.List;
+
 import com.realtech.socialsurvey.compute.entities.FileUploadResponse;
 import com.realtech.socialsurvey.compute.entities.Keyword;
-import com.realtech.socialsurvey.compute.entities.SocialPost;
+import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
+import com.realtech.socialsurvey.compute.entities.SocialMediaTokensPaginated;
+import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
+import com.realtech.socialsurvey.compute.entities.response.TwitterFeedData;
+import com.realtech.socialsurvey.compute.entities.response.linkedin.LinkedinFeedData;
 import com.realtech.socialsurvey.compute.entity.SurveyInvitationEmailCountMonth;
 
 import retrofit2.Call;
-import retrofit2.http.*;
-
-import java.util.List;
+import retrofit2.http.Body;
+import retrofit2.http.GET;
+import retrofit2.http.Header;
+import retrofit2.http.Headers;
+import retrofit2.http.POST;
+import retrofit2.http.PUT;
+import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 
 /**
@@ -20,35 +31,58 @@ public interface SSApiIntegrationService
 {
     @Headers ( "Content-Type: application/json")
     @GET ( "v1/companies/{companyId}/keywords")
-    Call<List<Keyword>> getKeywordsForCompanyId( @Path ( "companyId") long companyId );
+    Call<List<Keyword>> getKeywordsForCompanyId( @Path ( "companyId") long companyId ,@Header("authorizationHeader") String authorizationHeader);
+
+
+    @Headers ( "Content-Type: application/json")
+    @GET ( "v1/companies/mediatokens")
+    Call<List<SocialMediaTokenResponse>> getMediaTokens(@Header("authorizationHeader") String authorizationHeader);
+    
+    @Headers ( "Content-Type: application/json")
+    @GET ( "v1/companies/mediaTokensPaginated")
+    Call<SocialMediaTokensPaginated> getMediaTokensPaginated(@Query ( "skipCount") int skipCount,@Query ( "batchSize") int batchSize, @Header("authorizationHeader") String authorizationHeader);
+
+    @Headers ( "Content-Type: application/json")
+    @POST ( "v1/feeds")
+    Call<SocialResponseObject> saveSocialFeed( @Body SocialResponseObject socialPostToMongo ,@Header("authorizationHeader") String authorizationHeader);
 
 
     @Headers ( "Content-Type: application/json")
     @POST ( "v1/feeds")
-    Call<SocialPost> saveSocialFeed( @Body SocialPost socialPostToMongo );
-
-    @Headers ( "Content-Type: application/json")
-    @PUT( "v1/fileUpload/{fileUploadId}/status/{status}" )
-    Call<FileUploadResponse> updateFileUploadStatus(@Path("fileUploadId") long fileUploadId,
-                                                    @Path("status") int status);
-
-    @Headers ( "Content-Type: application/json")
-    @POST( "v1/fileUpload/{fileUploadId}/status/{status}" )
-    Call<FileUploadResponse> updateFileUploadStatusAndLocation(@Path("fileUploadId") long fileUploadId,
-                                                               @Path("status") int status,
-                                                               @Body String fileName);
+    Call<SocialResponseObject<TwitterFeedData>> saveTwitterFeed(
+        @Body SocialResponseObject<TwitterFeedData> socialPostToMongo , @Header("authorizationHeader") String authorizationHeader);
 
 
     @Headers ( "Content-Type: application/json")
+    @POST ( "v1/feeds")
+    Call<SocialResponseObject<LinkedinFeedData>> saveLinkedinFeed(
+        @Body SocialResponseObject<LinkedinFeedData> socialPostToMongo , @Header("authorizationHeader") String authorizationHeader);
+
+
+    @Headers ( "Content-Type: application/json")
+    @PUT ( "v1/fileUpload/{fileUploadId}/status/{status}")
+    Call<FileUploadResponse> updateFileUploadStatus( @Path ( "fileUploadId") long fileUploadId, @Path ( "status") int status );
+
+
+    @Headers ( "Content-Type: application/json")
+    @POST ( "v1/fileUpload/{fileUploadId}/status/{status}")
+    Call<FileUploadResponse> updateFileUploadStatusAndLocation( @Path ( "fileUploadId") long fileUploadId,
+        @Path ( "status") int status, @Body String fileName );
+
+
+    @Headers ( "Content-Type: application/json")
+    @PUT ( "v1/feeds/hash/{hash}/companyId/{companyId}")
+    Call<Long> updateDuplicateCount( @Path ( "hash") int hash, @Path ( "companyId") long companyId, @Header("authorizationHeader") String authorizationHeader );
+
+
     @GET ( "v1/trxcount/agent")
-	Call<List<SurveyInvitationEmailCountMonth>> getReceivedCountsMonth(@Query("startDateInGmt") long startDate,
-			@Query("endDateInGmt") long endDate,@Query("startIndex") int startIndex,@Query("batchSize") int batchSize);
+    Call<List<SurveyInvitationEmailCountMonth>> getReceivedCountsMonth( @Query ( "startDateInGmt") long startDate,
+        @Query ( "endDateInGmt") long endDate, @Query ( "startIndex") int startIndex, @Query ( "batchSize") int batchSize, @Header("authorizationHeader") String authorizationHeader );
 
 
     @Headers ( "Content-Type: application/json")
     @POST ( "v1/agentEmailCountsMonth")
-	Call<Boolean> saveEmailCountMonthData(
-			@Body List<SurveyInvitationEmailCountMonth> agentEmailCountsMonth);
+    Call<Boolean> saveEmailCountMonthData( @Body List<SurveyInvitationEmailCountMonth> agentEmailCountsMonth );
 
 
     @Headers ( "Content-Type: application/json")
@@ -62,4 +96,19 @@ public interface SSApiIntegrationService
 	Call<List<SurveyInvitationEmailCountMonth>> getDataForEmailReport(@Query("month") int month,@Query("year") int year,
 			@Query("companyId")  long companyId);
 
+    @Headers( "Content-Type: application/json" )
+    @PUT ( "v1/updateSocialMediaToken/collection/{collection}/iden/{iden}/fieldtoupdate/{fieldtoupdate}/value/{value}" )
+    Call<Boolean> updateSocialMediaToken( @Query ("iden") long iden, @Query ("fieldtoupdate") String fieldToUpdate,
+        @Query ("value") boolean value, @Query ("collection") String collection, @Header( "authorizationHeader" ) String authHeader );
+
+    @Headers( "Content-Type: application/json" )
+    @GET( "v1/socialFeed/companyId/{companyId}" )
+    Call<List<SocialResponseObject>> getSocialFeedData( @Path( "companyId" ) long companyId, @Query( "keyword" ) String keyword,
+        @Query( "startTime" ) long startTime, @Query( "endTime" ) long endTime, @Query( "pageSize" ) int pageSize, @Query( "skips" ) int skips,
+        @Header( "authorizationHeader" ) String authHeader );
+
+    @Headers( "Content-Type: application/json" )
+    @GET( "v1/socialFeedData/companyId/{companyId}" )
+    Call<List<SocialResponseObject>> getSocialFeedData( @Path( "companyId" ) long companyId, @Query( "startTime" )  long startTime,
+        @Query( "endTime" ) long endTime, @Query( "pageSize" ) int pageSize, @Query( "skips" ) int skips, @Header( "authorizationHeader" ) String authHeader );
 }

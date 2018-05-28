@@ -1,16 +1,19 @@
 package com.realtech.socialsurvey.core.entities;
 
+import java.io.Serializable;
+
 /**
  * @author manish
  *
  */
-public class Keyword
-{
+
+public class Keyword implements Serializable {
     private String phrase;
     private String id;
     private long createdOn;
     private long modifiedOn;
     private int status;
+    private MonitorType monitorType;
 
 
     public int getStatus()
@@ -70,17 +73,26 @@ public class Keyword
     {
         this.modifiedOn = modifiedOn;
     }
+    
+
+    public MonitorType getMonitorType() {
+		return monitorType;
+	}
+
+
+	public void setMonitorType(MonitorType monitorType) {
+		this.monitorType = monitorType;
+	}
 
 
     @Override
-    public String toString()
-    {
-        return "FilterKeyword [phrase=" + phrase + ", id=" + id + ", createdOn=" + createdOn + ", modifiedOn=" + modifiedOn
-            + ", status=" + status + "]";
-    }
+	public String toString() {
+		return "Keyword [phrase=" + phrase + ", id=" + id + ", createdOn=" + createdOn + ", modifiedOn=" + modifiedOn
+				+ ", status=" + status + ", monitorType=" + monitorType + "]";
+	}
 
 
-    @Override
+	@Override
     public int hashCode()
     {
         final int prime = 31;

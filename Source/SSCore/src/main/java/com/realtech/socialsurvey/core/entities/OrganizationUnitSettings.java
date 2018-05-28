@@ -87,10 +87,18 @@ public class OrganizationUnitSettings implements Serializable
     
     private List<Keyword> filterKeywords;
     
+    //Social Monitor Macros
+    private List<SocialMonitorMacro> socialMonitorMacros;
     private List<SavedDigestRecord> savedDigestRecords;
     
     private Set<String> userAddDeleteNotificationRecipients;
     
+    //SocialMonitor flag
+    private boolean isSocialMonitorEnabled;
+    
+    //trusted sources for socail monitor
+    private List<SocialMonitorTrustedSource> socialMonitorTrustedSources;
+
     private boolean isAgentProfileDisabled;
 
     private String[] swearWords;
@@ -775,6 +783,15 @@ public class OrganizationUnitSettings implements Serializable
         this.entityAlertDetails = entityAlertDetails;
     }
     
+  
+    public List<SocialMonitorMacro> getSocialMonitorMacros() {
+		return socialMonitorMacros;
+	}
+
+
+	public void setSocialMonitorMacros(List<SocialMonitorMacro> socialMonitorMacros) {
+		this.socialMonitorMacros = socialMonitorMacros;
+	}
     
 
 
@@ -835,7 +852,29 @@ public class OrganizationUnitSettings implements Serializable
     }
 
 
-    @Override
+    public boolean isSocialMonitorEnabled()
+    {
+        return isSocialMonitorEnabled;
+    }
+
+
+    public void setSocialMonitorEnabled( boolean isSocialMonitorEnabled )
+    {
+        this.isSocialMonitorEnabled = isSocialMonitorEnabled;
+    }
+
+
+    public List<SocialMonitorTrustedSource> getSocialMonitorTrustedSources() {
+		return socialMonitorTrustedSources;
+	}
+
+
+	public void setSocialMonitorTrustedSources(List<SocialMonitorTrustedSource> socialMonitorTrustedSources) {
+		this.socialMonitorTrustedSources = socialMonitorTrustedSources;
+	}
+
+
+	@Override
     public String toString()
     {
         return "OrganizationUnitSettings [id=" + id + ", iden=" + iden + ", uniqueIdentifier=" + uniqueIdentifier
@@ -860,8 +899,11 @@ public class OrganizationUnitSettings implements Serializable
             + ", includeForTransactionMonitor=" + includeForTransactionMonitor + ", encryptedId=" + encryptedId
             + ", vendasta_rm_settings=" + vendasta_rm_settings + ", ranking_requirements=" + ranking_requirements
             + ", contactUsEmailsRoutedToCompanyAdmin=" + contactUsEmailsRoutedToCompanyAdmin + ", sendMonthlyDigestMail="
-            + sendMonthlyDigestMail + ", filterKeywords=" + filterKeywords + ", savedDigestRecords=" + savedDigestRecords
-            + ", userAddDeleteNotificationRecipients=" + userAddDeleteNotificationRecipients + ", entityAlertDetails=" + entityAlertDetails + "]";
+            + sendMonthlyDigestMail + ", filterKeywords=" + filterKeywords + ", socialMonitorMacros=" + socialMonitorMacros
+            + ", savedDigestRecords=" + savedDigestRecords + ", userAddDeleteNotificationRecipients="
+            + userAddDeleteNotificationRecipients + ", isSocialMonitorEnabled=" + isSocialMonitorEnabled
+            + ", entityAlertDetails=" + entityAlertDetails + "]";
     }
 
+    
 }

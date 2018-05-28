@@ -182,7 +182,7 @@ public interface EmailServices
      */
     public void sendSurveyCompletionMailToAdminsAndAgent( String agentName, String recipientName, String recipientMailId,
         String surveyDetail, String customerName, String rating, String logoUrl, String agentProfileLink,
-        String customerDetail ) throws InvalidInputException, UndeliveredEmailException;
+        String customerDetail, String propertyAddress ) throws InvalidInputException, UndeliveredEmailException;
 
 
     /**
@@ -483,6 +483,11 @@ public interface EmailServices
 
 
     public void sendEmailToUploaderForSuccessfulSurveyCsvUpload( SurveyCsvInfo csvInfo, String results ) throws InvalidInputException, UndeliveredEmailException;
+
+
+    public void sendSocialMonitorActionMail( String recipientMailId, String recipientName, String mailBody, String userName,
+        String userEmailId, String previousStatus, String currentStatus, String feedType )
+        throws InvalidInputException, UndeliveredEmailException;
 
 
     public void sendAbusiveNotifyMail(String source,String recipientMailId, String customerName, String customerMailId, String agentName,String agentMailId,

@@ -42,6 +42,9 @@
 	<c:if test="${not empty socialMediaTokens.zillowToken && not empty socialMediaTokens.zillowToken.zillowProfileLink}">
 		<c:set value="${socialMediaTokens.zillowToken.zillowProfileLink}" var="zillowLink"></c:set>
 	</c:if>
+	<c:if test="${not empty socialMediaTokens.instagramToken && not empty socialMediaTokens.instagramToken.pageLink}">
+		<c:set value="${socialMediaTokens.instagramToken.pageLink}" var="instagramLink"></c:set>
+	</c:if>
 	<c:set value="${socialMediaTokens.yelpToken}" var="yelpToken"></c:set>
 	<c:set value="${socialMediaTokens.lendingTreeToken}" var="lendingTreeToken"></c:set>
 	<c:set value="${socialMediaTokens.realtorToken}" var="realtorToken"></c:set>
@@ -284,6 +287,7 @@
 							<div id="icn-lendingtree" class="float-left social-item-icon icn-lendingtree" data-source="lendingtree" data-link="${lendingTreeToken.lendingTreeProfileLink}" title="LendingTree"></div>
 							<div id="icn-realtor" class="float-left social-item-icon icn-realtor" data-source="realtor" data-link="${realtorToken.realtorProfileLink}" title="Realtor"></div>
 							<div id="icn-fb-pxl" class="float-left social-item-icon icn-fb-pxl" data-source="facebookPixel" data-link="${facebookPixelToken.pixelId}" title="Facebook pixel"></div>
+							<div id="icn-insta" class="float-left social-item-icon icn-insta ${socialDisabled}" data-source="instagram" data-link="${instagramLink}" onclick="openAuthPage(event,'instagram', ${isAutoLogin}, this);" title="Instagram"></div>
 							<input id="social-token-text" type="text" class="social-token-text hide" placeholder='<spring:message code="label.socialpage.placeholder.key"/>'>
 						</div>
 					</c:if>

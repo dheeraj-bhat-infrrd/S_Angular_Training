@@ -1432,6 +1432,12 @@ $(document).on('change', '#generate-survey-reports', function() {
 		}
 	}
 	
+	if(key == 302){
+		$('#sm-keywords').removeClass('hide');
+	}else{
+		$('#sm-keywords').addClass('hide');
+	}
+	
 	if(key==105){
 		$('#trans-report-time-div').show();	
 	}else{
@@ -1720,7 +1726,16 @@ $(document).on('click', '#reports-generate-report-btn', function(e) {
 	var npsTimeFrame = parseInt($('#nps-report-time-selector').val());
 	var d = new Date();
 	var clientTimeZone = d.getTimezoneOffset();
-
+	var keywordStr = document.getElementById('sm-keywords-selector');
+	var keyword = keywordStr.options[keywordStr.selectedIndex].text;
+	var keywordValue = parseInt($('#sm-keywords-selector').val());
+	
+	if(isNaN(keywordValue) && key == 302){
+		$('#overlay-toast').html("Please select a keyword");
+		showToast();
+		return;
+	}
+	
 	if( key == 200 ){
 		digestMonthValue = $('#digest-time-selector').val()
 		var digestDates = getStartAndEndDateForDigest(parseInt(digestMonthValue));
@@ -1789,9 +1804,10 @@ $(document).on('click', '#reports-generate-report-btn', function(e) {
 			"endDate" : endDate,
 			"reportId" : key,
 			"clientTimeZone": clientTimeZone,
+			"keyword": keyword,
 		};
 	
-	showOverlay();
+	showOverlay();	
 		$.ajax({
 			url : "./savereportingdata.do",
 			type : "POST",
@@ -1897,6 +1913,10 @@ function drawRecentActivity(start,batchSize,tableHeader,recentActivityCount){
 				} else {
 					tableData += startDate + ' - ' + endDate;
 				}
+				tableData += "</td>";
+			} else if(recentActivityList[i][1] == 'Social Monitor Date based Report' || recentActivityList[i][1] == 'Social Monitor Date Report with keyword'){
+				tableData += '<td class="v-tbl-recent-activity fetch-email txt-bold tbl-black-text ">';
+				tableData += startDate + ' - ' + endDate;
 				tableData += "</td>";
 			} else{
 				tableData += "<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-black-text "+(startDate==null?("\">"+"All Time till date "):("\">"+(endDate==null?monthStartDate:startDate)))+(endDate==null?" ":" - "+endDate)+"</td>";
@@ -2565,6 +2585,8 @@ function reportingSocialMediaButtons(stages,columnName,columnValue){
 				contentToDisplay = 'Enter hobbies';
 			} else if (stages[i].profileStageKey == 'ACHIEVEMENTS_PRF') {
 				contentToDisplay = 'Enter achievements';
+			} else if (stages[i].profileStageKey == 'INSTAGRAM_PRF') {
+				contentToDisplay = '<div class="rep-instagram-btn"></div>';
 			}
 			
 			if (i == 0) {
@@ -2665,6 +2687,8 @@ var profileStageKey = $('#dsh-btn2').data('social');
 					contentToDisplay = 'Enter hobbies';
 				} else if (stages[i].profileStageKey == 'ACHIEVEMENTS_PRF') {
 					contentToDisplay = 'Enter achievements';
+				} else if (stages[i].profileStageKey == 'INSTAGRAM_PRF') {
+					contentToDisplay = '<div class="rep-instagram-btn"></div>';
 				}
 				
 				if(contentToDisplay != ''){
@@ -3506,6 +3530,55 @@ function autoRefresh(tableHeaderData){
 		
 		autoRefresh(tableHeaderData);
 	}, 30000);
+}
+
+function drawPhraseList(){
+	var startIndex = 0;
+	var batchSize = 100;
+
+	var payload = {
+			"startIndex" : startIndex,
+			"batchSize" : batchSize,
+			"monitorType" : '',
+			"text" : ''
+	}
+
+	$.ajax({
+		url : "/getmonitorslistbytype.do",
+		type : "GET",
+		data : payload,
+		cache : false,
+		dataType : "json",
+		success : function(response) {
+			var monitorData = response.filterKeywords;
+			var phraseList = [];
+			if(monitorData != undefined && monitorData != null){
+				for(var i = 0; i<monitorData.length; i++ ){
+					if(monitorData[i].status==1){
+						phraseList.push(monitorData[i].phrase);
+					}
+				}
+				var uniquePhraseList = phraseList.filter(function(elem, index, self) {
+				    return index === self.indexOf(elem);
+				})
+				populatePhrases(uniquePhraseList);
+			}
+		},
+		error : function(e){
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+		}
+	});
+}
+
+
+function populatePhrases(uniquePhraseList){
+	for(var i=0;i<uniquePhraseList.length;i++){
+		var option = '<option value="'+i+'">'+uniquePhraseList[i]+'</option>';
+		$('#sm-keywords-selector').append(option);
+	}
 }
 
 // new dashboard event handlers

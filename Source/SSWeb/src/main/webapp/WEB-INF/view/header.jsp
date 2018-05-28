@@ -9,6 +9,8 @@
 <!-- Account masters 1=Individual, 2=Team, 3=Company, 4=Enterprise, 5=Free Account -->
 <c:set var="accountMasterId" value="${user.company.licenseDetails[0].accountsMaster.accountsMasterId}"/>
 <c:set var="hiddenSectionDashboard" value="${hiddenSection}"/>
+<c:set var="isRealTechOrSSAdmin" value="${ isRealTechOrSSAdmin }"></c:set>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -230,6 +232,9 @@
 					<div class="header-links-item" onclick="showMainContent('./showlistingsmanagerpage.do')"><spring:message code="label.listingsmanager.key" /></div>
 					</div>					
 				</c:if> --%>
+				<c:if test="${ (isRealTechOrSSAdmin == true or isRealTechOrSSAdmin == 'true') and highestrole == 1 }">
+					<div class="header-links-item" onclick="showMainContent('./showsocialmonitorstreampage.do')"><spring:message code="label.social.monitor.key" /></div>
+				</c:if>
 				<c:if test="${hiddenSectionDashboard && highestrole != 4 }">
 				<div class="header-links-item" onclick="showMainContent('./showprofilepage.do')"><spring:message code="label.editprofile.key" /></div>
 				</c:if>
@@ -367,7 +372,7 @@
 				</c:if>
 				<%-- <c:if test="${ highestrole == 1 }">
 					<div id="hdr-link-item-sm" class="hdr-link-item hdr-link-item-sm pos-relative">
-						<a href="javascript:showMainContent('./showlistingsmanagerpage')" onclick="showOverlay();"><spring:message code="label.listingsmanager.key" /></a>
+						<a href="javascript:showMainContent('./showsocialmonitortpage.do')" onclick="showOverlay();"><spring:message code="label.socialmonitor.key" /></a>
 						<div id="listings-manager-main" class="hide">
 							<div id="hdr-sm-settings-dropdown" class="hdr-link-item-dropdown-icn-sm"></div>
 							<div id="hdr-link-item-dropdown-sm" class="hdr-link-item-dropdown-sm hide">
@@ -381,6 +386,11 @@
 						</div>
 					</div>
 				</c:if> --%>
+				<c:if test="${ (isRealTechOrSSAdmin == true or isRealTechOrSSAdmin == 'true') and highestrole == 1 }">
+					<div class="hdr-link-item">
+						<a href="javascript:showMainContent('./showsocialmonitorstreampage.do')" onclick="showOverlay();"><spring:message code="label.social.monitor.key" /></a>
+					</div>
+				</c:if>
 				<c:if test="${hiddenSectionDashboard && highestrole != 4 }">
 				<div class="hdr-link-item">
 					<a href="javascript:showMainContent('./showprofilepage.do')" onclick="showOverlay();"><spring:message code="label.editprofile.key" /></a>

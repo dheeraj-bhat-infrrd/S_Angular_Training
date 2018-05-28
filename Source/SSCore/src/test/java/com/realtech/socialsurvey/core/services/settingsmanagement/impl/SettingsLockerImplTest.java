@@ -272,9 +272,9 @@ public class SettingsLockerImplTest
         Mockito
             .doReturn( false )
             .when( settingsLockerImpl )
-            .isSettingsValueLocked( (OrganizationUnit) Matchers.any(), Matchers.anyLong(),
+            .isSettingsValueLocked( (OrganizationUnit) Matchers.any(), Matchers.anyDouble(),
                 (SettingsForApplication) Mockito.any() );
-        settingsLockerImpl.getModifiedSetSettingsValue( OrganizationUnit.COMPANY, 0, SettingsForApplication.LOGO, false );
+        settingsLockerImpl.getModifiedSetSettingsValue( OrganizationUnit.COMPANY, 0.0, SettingsForApplication.LOGO, false );
     }
 
 
@@ -284,8 +284,8 @@ public class SettingsLockerImplTest
         Mockito
             .doReturn( true )
             .when( settingsLockerImpl )
-            .isSettingsValueLocked( (OrganizationUnit) Matchers.any(), Matchers.anyLong(),
+            .isSettingsValueLocked( (OrganizationUnit) Matchers.any(), Matchers.anyDouble(),
                 (SettingsForApplication) Mockito.any() );
-        settingsLockerImpl.getModifiedSetSettingsValue( OrganizationUnit.COMPANY, 0, SettingsForApplication.LOGO, true );
+        settingsLockerImpl.getModifiedSetSettingsValue( OrganizationUnit.COMPANY, 0.0, SettingsForApplication.LOGO, true );
     }
 }
