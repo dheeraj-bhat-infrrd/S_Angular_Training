@@ -286,4 +286,8 @@ public interface SSApiIntegration
 
     @GET( "/v1/userprofileflags" )
     Response getUserProfileFlags(@Query ("userId") long userId);
+    
+    @GET("/v1/getrecentactivityforsocialmonitorreporting")
+    Response getRecentActivityForSocialMonitor(@Query ("entityId") Long entityId , @Query ("entityType") String entityType ,@Query ("startIndex") int startIndex , @Query ("batchSize") int batchSize);
+    
 }
