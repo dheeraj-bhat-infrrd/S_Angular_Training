@@ -46,4 +46,4 @@ public interface JobLogDetailsDao extends GenericReportingDao<JobLogDetails, Lon
 	public JobLogDetails getLastCentrelisedRun();
 
 
-	public void updateJobLog(JobLogDetails jobLogDetails) throws InvalidInputException; } 
+	public void updateJobLog(JobLogDetails jobLogDetails) throws InvalidInputException; }

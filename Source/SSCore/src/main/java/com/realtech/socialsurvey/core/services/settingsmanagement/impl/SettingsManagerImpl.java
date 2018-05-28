@@ -33,12 +33,12 @@ public class SettingsManagerImpl implements SettingsManager
 
 
     @Override
-    public Map<String, Long> calculateSettingsScore( List<SettingsDetails> settingsDetailsList )
+    public Map<String, Double> calculateSettingsScore( List<SettingsDetails> settingsDetailsList )
     {
         LOG.debug( "Inside method calcualteSettingsScore " );
-        long lockScore = 0;
-        long setScore = 0;
-        Map<String, Long> map = new HashMap<String, Long>();
+        double lockScore = 0;
+        double setScore = 0;
+        Map<String, Double> map = new HashMap<>();
         for ( SettingsDetails settingsDetails : settingsDetailsList ) {
             lockScore = lockScore + settingsDetails.getLockSettingsHolder();
             setScore = setScore + settingsDetails.getSetSettingsHolder();
@@ -63,13 +63,19 @@ public class SettingsManagerImpl implements SettingsManager
         String currentLockAggregateValue ) throws InvalidSettingsStateException
     {
         LOG.debug( "Getting a map of all the settings with the closest level of setter" );
+
+        currentLockAggregateValue = currentLockAggregateValue.split( "\\." ).length > 1 ? currentLockAggregateValue.split( "\\." )[0]
+            : currentLockAggregateValue ;
+        currentSetAggregateValue = currentSetAggregateValue.split( "\\." ).length > 1 ? currentSetAggregateValue.split( "\\." )[0]
+            : currentSetAggregateValue ;
+
         int lockValueLength = currentLockAggregateValue.length();
         int loopTillValue = ( currentSetAggregateValue.length() > lockValueLength ? currentSetAggregateValue.length()
             : lockValueLength );
 
         int counter = loopTillValue;
         Map<SettingsForApplication, OrganizationUnit> settingsMap = new HashMap<SettingsForApplication, OrganizationUnit>();
-        int setIndex = -1;
+        double setIndex = -1;
 
         int lockIndex = -1;
         while ( counter > 0 ) {
@@ -81,7 +87,7 @@ public class SettingsManagerImpl implements SettingsManager
                 // get values for both setting and lock
                 lockIndex = Integer.parseInt( currentLockAggregateValue.substring( lockCounter - 1, lockCounter ) );
                 if ( lockIndex == CommonConstants.LOCKED_BY_NONE ) {
-                    setIndex = Integer.parseInt( currentSetAggregateValue.substring( counter - 1, counter ) );
+                    setIndex = Double.parseDouble( currentSetAggregateValue.substring( counter - 1, counter ) );
                 }
 
             } else {

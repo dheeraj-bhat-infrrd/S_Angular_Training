@@ -2880,6 +2880,47 @@ public class EmailServicesImpl implements EmailServices
         sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, true, false );
     }
 
+    @Async
+	@Override
+    public void sendSocialMonitorActionMail( String recipientMailId, String recipientName, String mailBody, String userName,
+        String userEmailId, String previousStatus, String currentStatus, String feedType )
+        throws InvalidInputException, UndeliveredEmailException
+    {
+		LOG.info( "method sendSocialMonitorActionMail started" );
+        if ( recipientMailId == null || recipientMailId.isEmpty() ) {
+            LOG.error( "Recipient email Id is empty or null for sendSocialMonitorActionMail " );
+            throw new InvalidInputException(
+                "Recipient email Id is empty or null for sendSocialMonitorActionMail " );
+        }
+        if ( mailBody == null || mailBody.isEmpty() ) {
+            LOG.error( "mailBody is empty or null for sendSocialMonitorActionMail " );
+            throw new InvalidInputException( "Mail body is empty or null for sendSocialMonitorActionMail " );
+        }
+
+        String message = null;
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+        emailEntity.setMailType( CommonConstants.EMAIL_TYPE_SOCIAL_MONITOR_ACTION_MAIL_TO_USER );
+        String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.SOCIAL_MONITOR_ACTION_MAIL_SUBJECT;
+
+        if ( previousStatus != null && currentStatus != null ) {
+            message = "Your " + feedType + " post was moved from <b>" + previousStatus + "</b> to <b>" + currentStatus
+                + "</b> by " + userName + " [" + userEmailId + "] with message,";
+        } else {
+            message = "Your " + feedType + " post has a message from " + userName + " [" + userEmailId + "] " + ",";
+        }
+        
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+            + EmailTemplateConstants.SOCIAL_MONITOR_ACTION_MAIL_BODY );
+        messageBodyReplacements.setReplacementArgs(
+            Arrays.asList( appLogoUrl, recipientName, message, mailBody ) );
+           
+        LOG.trace( "Calling email sender to send mail" );
+        sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );
+        LOG.debug( "method sendSocialMonitorActionMail ended" );
+	}
+    
     //@Async
     @Override
     public boolean sendUserAdditionMail( Set<String> recipients, String addedAdminName, String addedAdminEmailId,

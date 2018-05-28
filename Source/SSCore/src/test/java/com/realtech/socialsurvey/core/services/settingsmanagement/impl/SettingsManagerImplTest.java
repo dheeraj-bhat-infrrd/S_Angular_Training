@@ -80,10 +80,10 @@ public class SettingsManagerImplTest
         settingsDetails4.setLockSettingsHolder( 4l );
         settingsDetails4.setSetSettingsHolder( 4l );
         settingsDetailsList.add( settingsDetails4 );
-        Map<String, Long> resultMap = settingsManagerImpl.calculateSettingsScore( settingsDetailsList );
-        assertEquals( "Result is not set by company, region and branch", (Long) 7l,
+        Map<String, Double> resultMap = settingsManagerImpl.calculateSettingsScore( settingsDetailsList );
+        assertEquals( "Result is not set by company, region and branch", (Double) 7.0,
             resultMap.get( CommonConstants.SETTING_SCORE ) );
-        assertEquals( "Result is not locked by company, region and branch", (Long) 7l,
+        assertEquals( "Result is not locked by company, region and branch", (Double) 7.0,
             resultMap.get( CommonConstants.LOCK_SCORE ) );
 
     }

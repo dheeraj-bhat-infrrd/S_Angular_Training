@@ -60,7 +60,7 @@ public interface SocialManagementService
     public Twitter getTwitterInstance();
 
 
-    public Facebook getFacebookInstance( String serverBaseUrl );
+    public Facebook getFacebookInstance( String serverBaseUrl, String facebookRedirectUri  );
 
 
     /**

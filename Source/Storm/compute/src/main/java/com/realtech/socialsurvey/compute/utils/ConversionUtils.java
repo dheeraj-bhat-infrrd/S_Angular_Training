@@ -1,27 +1,15 @@
 package com.realtech.socialsurvey.compute.utils;
 
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.Instant;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-
 import com.google.gson.Gson;
-import com.realtech.socialsurvey.compute.common.LocalPropertyFileHandler;
-import com.realtech.socialsurvey.compute.entities.ReportRequest;
-import com.realtech.socialsurvey.compute.services.FailedMessagesService;
-import com.realtech.socialsurvey.compute.services.impl.FailedMessagesServiceImpl;
-import com.realtech.socialsurvey.compute.topology.bolts.emailreports.WriteReportToExcelBolt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.realtech.socialsurvey.compute.common.ComputeConstants.APPLICATION_PROPERTY_FILE;
-import static com.realtech.socialsurvey.compute.common.ComputeConstants.FILEUPLOAD_DIRECTORY_LOCATION;
+import java.lang.reflect.Type;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 
 /**
@@ -108,20 +96,16 @@ public class ConversionUtils
         return  zonedDateTime.getZone().getId();
     }
 
-    public static byte[] convertFileToBytes(File file) throws IOException {
-        byte[] fileBytes = null;
-        if(file != null){
-            fileBytes = Files.readAllBytes(Paths.get(file.getAbsolutePath()));
-        }
-        return fileBytes;
+
+    /**
+     * Converts the given millies into EST
+     * @param millies
+     * @return
+     */
+    public static String convertToEst(long millies){
+        ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(millies),
+            ZoneId.of("-05:00"));
+        return zonedDateTime.format( DateTimeFormatter.ISO_OFFSET_DATE_TIME);
     }
 
-    public static File convertBytesToFile(byte[] fileBytes, String fileName) throws IOException {
-        String fileDirectoryLocation = LocalPropertyFileHandler.getInstance()
-                .getProperty(APPLICATION_PROPERTY_FILE, FILEUPLOAD_DIRECTORY_LOCATION).orElse(null);
-
-        Path path = Paths.get(fileDirectoryLocation + File.separator + fileName );
-        Files.write(path, fileBytes);
-        return path.toFile();
-    }
 }

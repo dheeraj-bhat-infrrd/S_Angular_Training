@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.compute;
 
 import com.realtech.socialsurvey.compute.common.ComputeConstants;
 import com.realtech.socialsurvey.compute.common.EnvConstants;
+import com.realtech.socialsurvey.compute.topology.bolts.GetSocialFeedReport;
 import com.realtech.socialsurvey.compute.topology.bolts.emailreports.*;
 import com.realtech.socialsurvey.compute.topology.spouts.KafkaTopicSpoutBuilder;
 import com.realtech.socialsurvey.compute.utils.ChararcterUtils;
@@ -71,33 +72,41 @@ public class ReportsTopologyStarterHelper extends TopologyStarterHelper
                message is not acked within this time frame, 
                Storm will fail the message on the spout. 
                Some spouts implementations will then replay the 
-               message at a later time. */ 
+               message at a later time. */
             config.put(Config.TOPOLOGY_MESSAGE_TIMEOUT_SECS, 300);
             return config;
         }
     }
 
 
-	@Override
-	protected StormTopology topology() {
-		LOG.info("Creating mail reports topology");
-		TopologyBuilder builder = new TopologyBuilder();
-		// add the spout
-		builder.setSpout("ReportGenerationSpout", KafkaTopicSpoutBuilder.getInstance().reportGenerationSpout(), 1);
-		// add the bolts
-		builder.setBolt("UpdateFileUploadStatusBolt", new UpdateFileUploadStatusBolt(), 1)
-				.shuffleGrouping("ReportGenerationSpout");
-		builder.setBolt("GetEmailReportDataBolt", new GetDataForEmailReport(), 1)
-				.shuffleGrouping("ReportGenerationSpout");
-		builder.setBolt("WriteReportToExcelBolt", new WriteReportToExcelBolt(), 1)
-				.fieldsGrouping("GetEmailReportDataBolt", new Fields("fileUploadId"));
-		builder.setBolt("UploadOnAmazonS3Bolt", new UploadOnAmazonS3Bolt(), 1)
-				.shuffleGrouping("WriteReportToExcelBolt");
-		builder.setBolt("FileUploadStatusAndFileNameUpdationBolt", new UpdateFileUploadStatusAndFileNameBolt(), 1)
-				.shuffleGrouping("UploadOnAmazonS3Bolt");
-		// Create the topology.
-		return builder.createTopology();
-	}
+    @Override
+    protected StormTopology topology() {
+        LOG.info("Creating mail reports topology");
+        TopologyBuilder builder = new TopologyBuilder();
+        // add the spout
+        builder.setSpout("ReportGenerationSpout", KafkaTopicSpoutBuilder.getInstance().reportGenerationSpout(), 1);
+        // add the bolts
+        builder.setBolt("UpdateFileUploadStatusBolt", new UpdateFileUploadStatusBolt(), 1)
+            .shuffleGrouping("ReportGenerationSpout");
+
+        builder.setBolt( "GetSocialFeedReportDataBolt", new GetSocialFeedReport(), 1 )
+            .shuffleGrouping( "ReportGenerationSpout" );
+        builder.setBolt("WriteSocialMonitorReportToExcel", new WriteSocialMonitorReportToExcel(), 1)
+            .fieldsGrouping("GetSocialFeedReportDataBolt", new Fields("fileUploadId"));
+
+        builder.setBolt("GetEmailReportDataBolt", new GetDataForEmailReport(), 1)
+            .shuffleGrouping("ReportGenerationSpout");
+        builder.setBolt("WriteReportToExcelBolt", new WriteReportToExcelBolt(), 1)
+            .fieldsGrouping("GetEmailReportDataBolt", new Fields("fileUploadId"));
+
+        builder.setBolt("UploadOnAmazonS3Bolt", new UploadOnAmazonS3Bolt(), 2)
+            .shuffleGrouping("WriteReportToExcelBolt").shuffleGrouping( "WriteSocialMonitorReportToExcel" );
+        builder.setBolt("FileUploadStatusAndFileNameUpdationBolt", new UpdateFileUploadStatusAndFileNameBolt(), 1)
+            .shuffleGrouping("UploadOnAmazonS3Bolt");
+
+        // Create the topology.
+        return builder.createTopology();
+    }
 
 
     public static void main( String[] args )
@@ -107,8 +116,8 @@ public class ReportsTopologyStarterHelper extends TopologyStarterHelper
         // DO NOT ADD ANY CODE BEFORE THIS LINE
         EnvConstants.runtimeParams( args );
         new ReportsTopologyStarterHelper().submitTopology( EnvConstants.getCluster().equals( EnvConstants.LOCAL_TOPOLOGY ),
-                ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ?
-                        REPORTS_TOPOLOGY :
-                        ChararcterUtils.appendWithHypen(REPORTS_TOPOLOGY, EnvConstants.getProfile() ) );
+            ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ?
+                REPORTS_TOPOLOGY :
+                ChararcterUtils.appendWithHypen(REPORTS_TOPOLOGY, EnvConstants.getProfile() ) );
     }
 }

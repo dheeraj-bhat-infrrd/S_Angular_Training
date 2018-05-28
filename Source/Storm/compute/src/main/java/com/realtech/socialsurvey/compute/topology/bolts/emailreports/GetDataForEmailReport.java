@@ -19,8 +19,8 @@ import com.realtech.socialsurvey.compute.entities.ReportRequest;
 import com.realtech.socialsurvey.compute.entity.SurveyInvitationEmailCountMonth;
 import com.realtech.socialsurvey.compute.enums.ReportStatus;
 import com.realtech.socialsurvey.compute.enums.ReportType;
+import com.realtech.socialsurvey.compute.exception.APIIntegrationException;
 import com.realtech.socialsurvey.compute.services.FailedMessagesService;
-import com.realtech.socialsurvey.compute.services.api.APIIntergrationException;
 import com.realtech.socialsurvey.compute.services.impl.FailedMessagesServiceImpl;
 import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBoltWithAck;
 import com.realtech.socialsurvey.compute.utils.ConversionUtils;
@@ -44,13 +44,13 @@ public class GetDataForEmailReport extends BaseComputeBoltWithAck {
 
 	@Override
 	public void executeTuple(Tuple input) {
-		LOG.info("Executing query to fetch survey invitation mails data from table.");
 		
 		// get the report request from the tuple
         ReportRequest reportRequest = ConversionUtils.deserialize( input.getString( 0 ), ReportRequest.class );
         boolean success = false;
         
         if ( reportRequest.getReportType().equals( ReportType.SURVEY_INVITATION_EMAIL_REPORT.getName() ) ) {
+            LOG.info("Executing query to fetch survey invitation mails data from table.");
             long fileUploadId = reportRequest.getFileUploadId();
             List<SurveyInvitationEmailCountMonth> reportResponse = null;
             String status = null;
@@ -77,7 +77,7 @@ public class GetDataForEmailReport extends BaseComputeBoltWithAck {
                     _collector.emit( input, Arrays.asList( success, reportResponse, fileUploadId, status,
                              reportRequest ) );
 
-            } catch ( APIIntergrationException | IllegalArgumentException | IOException ex ) {
+            } catch ( APIIntegrationException | IllegalArgumentException | IOException ex ) {
                 success = true;
                 LOG.error( "Exception occurred while fetching data from table ", ex );
                 FailedMessagesService failedMessagesService = new FailedMessagesServiceImpl();

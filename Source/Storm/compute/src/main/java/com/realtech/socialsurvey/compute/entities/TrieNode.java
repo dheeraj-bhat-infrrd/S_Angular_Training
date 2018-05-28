@@ -1,7 +1,7 @@
 package com.realtech.socialsurvey.compute.entities;
 
-import java.util.Map;
 import java.io.Serializable;
+import java.util.Map;
 
 
 /**
@@ -15,6 +15,7 @@ public class TrieNode implements Serializable
     private String value;
     private Map<String, TrieNode> children;
     private String phraseId;
+    private Long modifiedOn;
 
 
     public TrieNode()
@@ -60,6 +61,18 @@ public class TrieNode implements Serializable
     public void setPhraseId( String phraseId )
     {
         this.phraseId = phraseId;
+    }
+
+
+    public Long getModifiedOn()
+    {
+        return modifiedOn;
+    }
+
+
+    public void setModifiedOn( Long modifiedOn )
+    {
+        this.modifiedOn = modifiedOn;
     }
 
 

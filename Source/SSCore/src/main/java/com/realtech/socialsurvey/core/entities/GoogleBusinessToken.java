@@ -18,4 +18,10 @@ public class GoogleBusinessToken
 	{
 		this.googleBusinessLink = googleBusinessLink;
 	}
+
+
+	@Override public String toString()
+	{
+		return "GoogleBusinessToken{" + "googleBusinessLink='" + googleBusinessLink + '\'' + '}';
+	}
 }

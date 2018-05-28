@@ -78,4 +78,7 @@ public interface UserDao extends GenericDao<User, Long>
     public List<String> getRegisteredEmailsInTheCompany( Company company ) throws InvalidInputException;
 
 
+    public Map<Long, Long> getCompanyIdsForUserIds( List<Long> userIds );
+
+
 }

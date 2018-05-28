@@ -31,6 +31,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.GenericReportingObject;
 import com.realtech.socialsurvey.core.entities.JobLogDetailsResponse;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RankingRequirements;
@@ -76,6 +77,8 @@ public class ReportingWebController
     private static final String ENTITY_ID = "entityId";
     private static final String ENTITY_TYPE = "entityType";
     private static final String TIME_FRAME = "timeFrame";
+    private static final String SOCIAL_MONITOR_FLAG = "isSocialMonitorEnabled";
+    
 
     private SessionHelper sessionHelper;
 
@@ -549,11 +552,14 @@ public class ReportingWebController
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
         Company company = user.getCompany();
+        String keyword = request.getParameter("keyword");
+        GenericReportingObject genericReportingObject = new GenericReportingObject();
+        genericReportingObject.setKeyword( keyword );
         LOG.debug(
             "Creating entry in file upload for reportId {} with start date {} and end date {} for entity id {}, entity type {}",
             reportId, startDate, endDate, entityId, entityType );
         reportingDashboardManagement.createEntryInFileUploadForReporting( reportId, startDate, endDate, entityId, entityType,
-            company, adminUserid, actualTimeZoneOffset );
+            company, adminUserid, actualTimeZoneOffset, genericReportingObject);
         message = "The report is being generated";
         if ( reportId == CommonConstants.FILE_UPLOAD_SURVEY_INVITATION_EMAIL_REPORT ) {
             if ( startDate == null || endDate == null ) {
@@ -577,7 +583,7 @@ public class ReportingWebController
         int reportId = CommonConstants.FILE_UPLOAD_REPORTING_COMPANY_DETAILS_REPORT;
         LOG.debug( "Creating entry in file upload for report id {}", reportId );
         reportingDashboardManagement.createEntryInFileUploadForReporting( reportId, null, null, adminUserid,
-            CommonConstants.AGENT_ID_COLUMN, user.getCompany(), adminUserid, 0 );
+            CommonConstants.AGENT_ID_COLUMN, user.getCompany(), adminUserid, 0, null );
         message = "The report is being generated";
         return message;
     }
@@ -669,7 +675,7 @@ public class ReportingWebController
 
     //TO SHOW REPORTING UI
     @RequestMapping ( value = "/showreportspage", method = RequestMethod.GET)
-    public String showReportsPage( Model model, HttpServletRequest request )
+    public String showReportsPage( Model model, HttpServletRequest request ) throws InvalidInputException, NoRecordsFetchedException
     {
         LOG.info( "Showing reports page" );
         HttpSession session = request.getSession( false );
@@ -687,12 +693,35 @@ public class ReportingWebController
             }
         }
         
+        
         // add the month name for month before last month
         Calendar calendar = Calendar.getInstance(); 
         calendar.add(Calendar.MONTH, -2);
         model.addAttribute( "monthBeforeLastMonth", new DateFormatSymbols().getMonths()[ calendar.get( Calendar.MONTH ) ] );
         
         return JspResolver.REPORTS;
+    }
+    
+    @RequestMapping ( value = "/showsocialmonitorreportspage", method = RequestMethod.GET)
+    public String showSocialMonitorReportsPage( Model model, HttpServletRequest request ) throws InvalidInputException, NoRecordsFetchedException
+    {
+        LOG.info( "Showing social monitor reports page" );
+        HttpSession session = request.getSession( false );
+        User user = sessionHelper.getCurrentUser();
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        boolean isIndividualAccount = isIndividualAccount( user );
+        if ( !isIndividualAccount ) {
+            if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+                model.addAttribute( COLUMN_NAME, CommonConstants.AGENT_ID_COLUMN );
+                model.addAttribute( COLUMN_VALUE, entityId );
+            } else {
+                model.addAttribute( COLUMN_NAME, entityType );
+                model.addAttribute( COLUMN_VALUE, entityId );
+            }
+        }
+         
+        return JspResolver.SOCIAL_MONITOR_REPORTS;
     }
 
 

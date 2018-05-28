@@ -48,13 +48,16 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.FilterKeywordsComparator;
 import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
+import com.realtech.socialsurvey.core.commons.TrustedSourceComparator;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.CompanyDao;
 import com.realtech.socialsurvey.core.dao.DisabledAccountDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.dao.RedisDao;
 import com.realtech.socialsurvey.core.dao.RegionDao;
 import com.realtech.socialsurvey.core.dao.RemovedUserDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
@@ -84,6 +87,7 @@ import com.realtech.socialsurvey.core.entities.Event;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
 import com.realtech.socialsurvey.core.entities.FileUpload;
+import com.realtech.socialsurvey.core.entities.FilterKeywordsResponse;
 import com.realtech.socialsurvey.core.entities.HierarchySettingsCompare;
 import com.realtech.socialsurvey.core.entities.Keyword;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
@@ -93,6 +97,7 @@ import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.MailIdSettings;
+import com.realtech.socialsurvey.core.entities.MultiplePhrasesVO;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
@@ -102,7 +107,10 @@ import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.RegistrationStage;
 import com.realtech.socialsurvey.core.entities.RemovedUser;
 import com.realtech.socialsurvey.core.entities.RetriedTransaction;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokensPaginated;
+import com.realtech.socialsurvey.core.entities.SocialMonitorTrustedSource;
 import com.realtech.socialsurvey.core.entities.StateLookup;
 import com.realtech.socialsurvey.core.entities.SurveyCompanyMapping;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
@@ -123,6 +131,7 @@ import com.realtech.socialsurvey.core.entities.ZipCodeLookup;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
+import com.realtech.socialsurvey.core.enums.ProfileType;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.FatalException;
@@ -285,6 +294,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     private SurveyHandler surveyHandler;
 
 
+    @Autowired
+    private RedisDao redisDao;
+
     @Value ( "${HAPPY_TEXT}")
     private String happyText;
     @Value ( "${NEUTRAL_TEXT}")
@@ -376,6 +388,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     
     @Autowired
     private SocialMediaExceptionHandler socialMediaExceptionHandler;
+    
+    @Autowired
+    private GenericDao<ProfilesMaster, Integer> profilesMasterDao;
 
 
     /**
@@ -507,7 +522,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             UserProfile userProfileAgent = userManagementService.createUserProfile( user, user.getCompany(), user.getEmailId(),
                 user.getUserId(), branch.getBranchId(), region.getRegionId(), profilesMaster.getProfileId(),
                 CommonConstants.IS_PRIMARY_TRUE, CommonConstants.PROFILE_STAGES_COMPLETE, CommonConstants.STATUS_ACTIVE,
-                String.valueOf( user.getUserId() ), String.valueOf( user.getUserId() ) );
+                String.valueOf( user.getUserId() ), String.valueOf( user.getUserId() ) );   
             userProfileDao.save( userProfileAgent );
 
         }
@@ -931,7 +946,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 
     @Override
-    public OrganizationUnitSettings getCompanySettings( long companyId ) throws InvalidInputException
+    public OrganizationUnitSettings
+    getCompanySettings( long companyId ) throws InvalidInputException
     {
 
         LOG.debug( "Get company settings for the companyId: {} ", companyId );
@@ -1009,6 +1025,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         Keyword companyFilterKeyword = companyFilterKeywords.get( idIndex );
                         companyFilterKeyword.setModifiedOn( createdtime );
                         companyFilterKeyword.setPhrase( keyword.getPhrase() );
+                        companyFilterKeyword.setMonitorType( keyword.getMonitorType() );
                     }
                 } else {
 
@@ -1027,6 +1044,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                         keywordNew.setPhrase( keyword.getPhrase() );
                         keywordNew.setId( UUID.randomUUID().toString() );
                         keywordNew.setStatus( 1 );
+                        keywordNew.setMonitorType( keyword.getMonitorType() );
                         companyFilterKeywords.add( keywordNew );
                     }
                 }
@@ -1036,10 +1054,35 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 MongoOrganizationUnitSettingDaoImpl.KEY_FILTER_KEYWORDS, companyFilterKeywords, companySettings,
                 MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
 
+            //update the redis with the keywords
+            redisDao.addKeywords( companyId, companyFilterKeywords );
+
         } else {
             LOG.debug( "Keywords are empty so skiping operation" );
         }
         return companyFilterKeywords;
+    }
+
+
+    @Override
+    public Map<String, Long> getFacebookAndTwitterLocks( String lockType ) throws InvalidInputException
+    {
+        LOG.debug( "Method getFacebookAndTwitterLocks() started" );
+        if ( lockType != null && !lockType.equalsIgnoreCase( "facebook" ) && !lockType.equalsIgnoreCase( "twitter" ) ) {
+            LOG.warn( "" );
+            throw new InvalidInputException( "Invalid value passed for lockType", "400" );
+        }
+        Map<String, Long> resultList = new HashMap<>();
+        if ( lockType == null ) {
+            resultList.putAll( redisDao.getFacebookLock() );
+            resultList.putAll( redisDao.getTwitterLock() );
+        } else if ( lockType.equalsIgnoreCase( "facebook" ) ) {
+            resultList.putAll( redisDao.getFacebookLock() );
+        } else if ( lockType.equalsIgnoreCase( "twitter" ) ) {
+            resultList.putAll( redisDao.getTwitterLock() );
+        }
+        return resultList;
+
     }
 
 
@@ -1115,7 +1158,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * @see com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService#getCompanyKeywordsByCompanyId(long)
      */
     @Override
-    public List<Keyword> getCompanyKeywordsByCompanyId( long companyId ) throws InvalidInputException
+    public FilterKeywordsResponse getCompanyKeywordsByCompanyId( long companyId, int startIndex, int limit, String monitorType, String searchPhrase )
+        throws InvalidInputException
     {
         LOG.debug( "Get company settings for the companyId: {}", companyId );
         OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId,
@@ -1125,8 +1169,70 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             throw new InvalidInputException( "Company setting doesn't exist for company id", "400" );
         }
 
-        List<Keyword> companyFilterKeywords = companySettings.getFilterKeywords();
-        return companyFilterKeywords;
+        List<Keyword> allKeywords = companySettings.getFilterKeywords();
+        List<Keyword> companyFilterKeywords = new ArrayList<>();
+        if ( allKeywords != null && !allKeywords.isEmpty() ) {
+            for ( Keyword keyword : allKeywords ) { 
+                if(searchPhrase != null && !searchPhrase.isEmpty()) {
+                    if(keyword.getPhrase().toLowerCase().contains( searchPhrase.trim().toLowerCase() ) && keyword.getStatus() == CommonConstants.STATUS_ACTIVE) {
+                        companyFilterKeywords.add( keyword );
+                    }
+                }
+                else if ( keyword.getStatus() == CommonConstants.STATUS_ACTIVE ) {
+                    companyFilterKeywords.add( keyword );
+                }
+            }
+        }
+        List<Keyword> keywords = new ArrayList<>();
+        FilterKeywordsResponse filterKeywordsResponse = new FilterKeywordsResponse();
+        if ( companyFilterKeywords != null && !companyFilterKeywords.isEmpty() ) {
+            Collections.sort( companyFilterKeywords, new FilterKeywordsComparator() );
+
+            if ( monitorType == null || monitorType.isEmpty() ) {
+                filterKeywordsResponse.setMonitorType( "ALL" );
+                filterKeywordsResponse.setCount( companyFilterKeywords.size() );
+                if ( startIndex >= companyFilterKeywords.size() ) {
+                    filterKeywordsResponse.setMonitorType( null );
+                    filterKeywordsResponse.setCount( 0 );
+                    filterKeywordsResponse.setFilterKeywords( null );
+                } else if ( limit >= companyFilterKeywords.size() && startIndex < companyFilterKeywords.size() ) {
+                    filterKeywordsResponse
+                        .setFilterKeywords( companyFilterKeywords.subList( startIndex, companyFilterKeywords.size() ) );
+                } else {
+                    if ( startIndex + limit >= companyFilterKeywords.size() ) {
+                        filterKeywordsResponse
+                            .setFilterKeywords( companyFilterKeywords.subList( startIndex, companyFilterKeywords.size() ) );
+                    } else {
+                        filterKeywordsResponse
+                            .setFilterKeywords( companyFilterKeywords.subList( startIndex, startIndex + limit ) );
+                    }
+                }
+
+            } else {
+                for ( Keyword keyword : companyFilterKeywords ) {
+                    if ( monitorType.equalsIgnoreCase( keyword.getMonitorType().toString() ) ) {
+                        keywords.add( keyword );
+                    }
+                }
+                filterKeywordsResponse.setMonitorType( monitorType.toUpperCase() );
+                filterKeywordsResponse.setCount( keywords.size() );
+                if ( startIndex >= keywords.size() ) {
+                    filterKeywordsResponse.setMonitorType( null );
+                    filterKeywordsResponse.setCount( 0 );
+                    filterKeywordsResponse.setFilterKeywords( null );
+                } else if ( limit >= keywords.size() && startIndex < keywords.size() ) {
+                    filterKeywordsResponse.setFilterKeywords( keywords.subList( startIndex, keywords.size() ) );
+                } else {
+                    if ( startIndex + limit >= keywords.size() ) {
+                        filterKeywordsResponse.setFilterKeywords( keywords.subList( startIndex, keywords.size() ) );
+                    } else {
+                        filterKeywordsResponse.setFilterKeywords( keywords.subList( startIndex, startIndex + limit ) );
+                    }
+
+                }
+            }
+        }
+        return filterKeywordsResponse;
     }
 
 
@@ -1896,7 +2002,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     /**
      * Method to upgrade a default region to a region
      * 
-     * @param company
+     * @param region
      * @return
      * @throws InvalidInputException
      */
@@ -2311,7 +2417,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     /**
      * Method to fetch all regions of a company based on company id
      *
-     * @param companyProfileName
+     * @param companyId
      * @return
      * @throws InvalidInputException
      */
@@ -2386,7 +2492,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     /**
      * Method to fetch all regions of a company based on company id
      *
-     * @param companyProfileName
+     * @param searchKey
      * @return
      * @throws SolrException 
      * @throws InvalidInputException
@@ -2401,6 +2507,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         List<Region> regions = new ArrayList<Region>();
         List<SolrDocument> solrDocumentList = solrSearchService.searchBranchRegionOrAgentByNameForAdmin(
             CommonConstants.REGION_NAME_SOLR, ClientUtils.escapeQueryChars( searchKey ) );
+
 
         	for ( SolrDocument document : solrDocumentList ) {
         		try {
@@ -2433,6 +2540,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         List<SolrDocument> solrDocumentList = solrSearchService.searchBranchRegionOrAgentByNameForAdmin(
             CommonConstants.BRANCH_NAME_SOLR, ClientUtils.escapeQueryChars( searchKey ) );
 
+
         	for ( SolrDocument document : solrDocumentList ) {
         		try {
         			Branch branch = new Branch();
@@ -2464,6 +2572,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         List<UserFromSearch> users = new ArrayList<UserFromSearch>();
         List<SolrDocument> solrDocumentList = solrSearchService.searchBranchRegionOrAgentByNameForAdmin(
             CommonConstants.USER_DISPLAY_NAME_SOLR, ClientUtils.escapeQueryChars( searchKey ) );
+
 
 		for (SolrDocument document : solrDocumentList) {
 			try {
@@ -3409,7 +3518,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Override
     @Transactional
     public Map<String, Object> addIndividual( User adminUser, long selectedUserId, long branchId, long regionId,
-        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail, boolean sendMail, boolean isAddedByRealtechOrSSAdmin )
+        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail, boolean sendMail, boolean isAddedByRealtechOrSSAdmin, boolean isSocialMonitorAdmin )
         throws InvalidInputException, NoRecordsFetchedException, SolrException, UserAssignmentException
     {
         LOG.debug( "Method addIndividual called for adminUser:" + adminUser + " branchId:" + branchId + " regionId:" + regionId
@@ -3431,7 +3540,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             assigneeUsers = userMap.get( CommonConstants.VALID_USERS_LIST );
         }
 
-        if ( assigneeUsers != null && !assigneeUsers.isEmpty() ) {
+        if ( (assigneeUsers != null && !assigneeUsers.isEmpty() )  && !isSocialMonitorAdmin) {
             /**
              * if branchId is provided, add the individual to specified branch
              */
@@ -3471,6 +3580,48 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                     }
                     assignRegionToUser( adminUser, region.getRegionId(), assigneeUser, isAdmin );
                 }
+            }
+
+        }
+        //update UserProfile if the user is a Social monitor admin
+        int flag = 0;
+        if ( isSocialMonitorAdmin ) {
+            for ( User assigneeUser : assigneeUsers ) {
+                if ( selectedUserId == 0l ) {
+                    LOG.debug( "assigning individual(s) to company in addIndividual" );
+                    Region region = getDefaultRegionForCompany( adminUser.getCompany() );
+                    if ( region == null ) {
+                        throw new NoRecordsFetchedException( "No default region found for company while adding individual" );
+                    }
+
+                    if ( validateUserAssignment( adminUser, assigneeUser, userMap ) ) {
+                        assignRegionToUser( adminUser, region.getRegionId(), assigneeUser, isAdmin );
+                    }
+
+                }
+
+                flag = 1;
+                List<UserProfile> userProfiles = assigneeUser.getUserProfiles();
+                if ( userProfiles != null && !userProfiles.isEmpty() ) {
+                    for ( UserProfile profile : userProfiles ) {
+                        if ( ( profile.getUser().getUserId() == ( assigneeUser.getUserId() ) )
+                            && profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_SM_ADMIN_PROFILE_ID
+                            && profile.getStatus() == CommonConstants.STATUS_ACTIVE ) {
+                            flag = 2;
+                            break;
+                        }
+                    }
+                }
+                if ( flag == 1 ) {
+                    UserProfile userProfile = userManagementService.createUserProfile( assigneeUser, adminUser.getCompany(),
+                        assigneeUser.getEmailId(), assigneeUser.getUserId(), CommonConstants.DEFAULT_BRANCH_ID,
+                        CommonConstants.DEFAULT_REGION_ID, CommonConstants.PROFILES_MASTER_SM_ADMIN_PROFILE_ID,
+                        CommonConstants.IS_PRIMARY_FALSE, CommonConstants.PROFILE_STAGES_COMPLETE,
+                        CommonConstants.STATUS_ACTIVE, String.valueOf( adminUser.getUserId() ),
+                        String.valueOf( adminUser.getUserId() ) );
+                    userProfileDao.save( userProfile );
+                }
+
             }
 
         }
@@ -3763,7 +3914,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     /**
      * Method to fetch UserProfiles associated with a branch
      * 
-     * @param company
      * @param branchId
      * @return
      * @throws InvalidInputException
@@ -4799,6 +4949,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
          */
         Type searchedUsersList = new TypeToken<List<UserFromSearch>>() {}.getType();
         users = new Gson().fromJson( usersJson, searchedUsersList );
+
+        LOG.debug( "Method getUsersUnderRegionFromSolr executed successfully" );
         return users;
     }
 
@@ -4807,7 +4959,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * Method to get all users under the company from solr
      * 
      * @param company
-     * @param start
      * @return
      * @throws InvalidInputException
      * @throws NoRecordsFetchedException
@@ -5872,6 +6023,229 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
 
+    /* (non-Javadoc)
+     * @see com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService#fetchSocialMediaTokensResponse(int, int)
+     */
+    @Transactional
+    @Override
+    public List<SocialMediaTokenResponse> fetchSocialMediaTokensResponse( int skipCount, int batchSize )
+        throws InvalidInputException
+    {
+
+        LOG.info( "Inside method fetchSocialMediaTokensResponse" );
+        List<SocialMediaTokenResponse> socialMediaTokenResponseList = new ArrayList<>();
+
+        // fetch companies media token
+        List<SocialMediaTokenResponse> companiesMediaTokens = organizationUnitSettingsDao
+            .getSocialMediaTokensByCollection( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, 0, 0 );
+        for ( SocialMediaTokenResponse feedIngestionEntity : companiesMediaTokens ) {
+
+            if ( feedIngestionEntity.getSocialMediaTokens() != null ) {
+                socialMediaTokenResponseList.add(
+                    setSocialMediaTokenResponse( feedIngestionEntity, feedIngestionEntity.getIden(), ProfileType.COMPANY ) );
+            }
+
+
+            List<Long> regionIds = regionDao.getRegionIdsUnderCompany( feedIngestionEntity.getIden(), skipCount, batchSize );
+
+            List<SocialMediaTokenResponse> regionMediaTokens = organizationUnitSettingsDao
+                .fetchSocialMediaTokensForIds( regionIds, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+
+            for ( SocialMediaTokenResponse regionFeedIngestionEntity : regionMediaTokens ) {
+                socialMediaTokenResponseList.add( setSocialMediaTokenResponse( regionFeedIngestionEntity,
+                    feedIngestionEntity.getIden(), ProfileType.REGION ) );
+            }
+
+            List<Long> branchIds = branchDao.getBranchIdsUnderCompany( feedIngestionEntity.getIden(), skipCount, batchSize );
+
+            List<SocialMediaTokenResponse> branchMediaTokens = organizationUnitSettingsDao
+                .fetchSocialMediaTokensForIds( branchIds, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+
+            for ( SocialMediaTokenResponse branchFeedIngestionEntity : branchMediaTokens ) {
+                socialMediaTokenResponseList.add( setSocialMediaTokenResponse( branchFeedIngestionEntity,
+                    feedIngestionEntity.getIden(), ProfileType.BRANCH ) );
+            }
+
+            List<Long> userIds = getAgentIdsUnderCompany( feedIngestionEntity.getIden(), skipCount, batchSize );
+
+            List<SocialMediaTokenResponse> usersMediaTokens = organizationUnitSettingsDao.fetchSocialMediaTokensForIds( userIds,
+                MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+
+            for ( SocialMediaTokenResponse userFeedIngestionEntity : usersMediaTokens ) {
+                socialMediaTokenResponseList.add(
+                    setSocialMediaTokenResponse( userFeedIngestionEntity, feedIngestionEntity.getIden(), ProfileType.AGENT ) );
+            }
+        }
+        LOG.info( "End of method fetchSocialMediaTokensResponse" );
+        return socialMediaTokenResponseList;
+    }
+
+
+    @Override
+    @Transactional
+    public SocialMediaTokensPaginated fetchSocialMediaTokensPaginated( int skipCount, int batchSize )
+        throws InvalidInputException
+    {
+        LOG.info( "Inside method fetchSocialMediaTokensResponse" );
+        SocialMediaTokensPaginated socialMediaTokensPaginated = new SocialMediaTokensPaginated();
+        int totalRecord = 0;
+
+        // fetch companies media token
+        long companyTokensCount = organizationUnitSettingsDao
+            .getSocialMediaTokensCount( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        long regionTokensCount = organizationUnitSettingsDao
+            .getSocialMediaTokensCount( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+        long branchTokensCount = organizationUnitSettingsDao
+            .getSocialMediaTokensCount( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+        long agentTokensCount = organizationUnitSettingsDao
+            .getSocialMediaTokensCount( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+
+        if ( skipCount < companyTokensCount ) {
+            List<SocialMediaTokenResponse> companiesMediaTokens = organizationUnitSettingsDao
+                .getSocialMediaTokensByCollection( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
+                    skipCount, batchSize );
+
+            totalRecord = companiesMediaTokens.size();
+
+            socialMediaTokensPaginated.setCompaniesTokens( companiesMediaTokens );
+
+            if ( totalRecord < batchSize ) {
+                List<SocialMediaTokenResponse> regionsMediaTokens = organizationUnitSettingsDao
+                    .getSocialMediaTokensByCollection( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, 0,
+                        batchSize - totalRecord );
+                totalRecord += regionsMediaTokens.size();
+
+                socialMediaTokensPaginated.setRegionsTokens( regionsMediaTokens );
+
+                if ( totalRecord < batchSize ) {
+                    List<SocialMediaTokenResponse> branchMediaTokens = organizationUnitSettingsDao
+                        .getSocialMediaTokensByCollection( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
+                            0, batchSize - totalRecord );
+                    totalRecord += branchMediaTokens.size();
+                    socialMediaTokensPaginated.setBranchesTokens( branchMediaTokens );
+
+                    if ( totalRecord < batchSize ) {
+                        List<SocialMediaTokenResponse> agentMediaTokens = organizationUnitSettingsDao
+                            .getSocialMediaTokensByCollection(
+                                MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, 0,
+                                batchSize - totalRecord );
+                        totalRecord +=agentMediaTokens.size();
+                        socialMediaTokensPaginated.setAgentsTokens( agentMediaTokens );
+                    }
+                }
+            }
+        } else if ( skipCount < companyTokensCount + regionTokensCount ) {
+
+            List<SocialMediaTokenResponse> regionsMediaTokens = organizationUnitSettingsDao
+                .getSocialMediaTokensByCollection( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
+                    (int) ( skipCount - companyTokensCount ), batchSize );
+            totalRecord += regionsMediaTokens.size();
+
+            socialMediaTokensPaginated.setRegionsTokens( regionsMediaTokens );
+
+            if ( totalRecord < batchSize ) {
+                List<SocialMediaTokenResponse> branchMediaTokens = organizationUnitSettingsDao
+                    .getSocialMediaTokensByCollection( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, 0,
+                        batchSize - totalRecord );
+                totalRecord += branchMediaTokens.size();
+                socialMediaTokensPaginated.setBranchesTokens( branchMediaTokens );
+
+                if ( totalRecord < batchSize ) {
+                    List<SocialMediaTokenResponse> agentMediaTokens = organizationUnitSettingsDao
+                        .getSocialMediaTokensByCollection( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, 0,
+                            batchSize - totalRecord );
+                    totalRecord +=agentMediaTokens.size();
+                    socialMediaTokensPaginated.setAgentsTokens( agentMediaTokens );
+                }
+            }
+        } else if ( skipCount < companyTokensCount + regionTokensCount + branchTokensCount ) {
+            List<SocialMediaTokenResponse> branchMediaTokens = organizationUnitSettingsDao.getSocialMediaTokensByCollection(
+                MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
+                (int) ( skipCount - ( companyTokensCount + regionTokensCount ) ), batchSize );
+            totalRecord += branchMediaTokens.size();
+            socialMediaTokensPaginated.setBranchesTokens( branchMediaTokens );
+
+            if ( totalRecord < batchSize ) {
+                List<SocialMediaTokenResponse> agentMediaTokens = organizationUnitSettingsDao
+                    .getSocialMediaTokensByCollection( MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, 0,
+                        batchSize - totalRecord );
+                totalRecord +=agentMediaTokens.size();
+                socialMediaTokensPaginated.setAgentsTokens( agentMediaTokens );
+            }
+        } else if ( skipCount < companyTokensCount + regionTokensCount + branchTokensCount + agentTokensCount ) {
+            List<SocialMediaTokenResponse> agentMediaTokens = organizationUnitSettingsDao.getSocialMediaTokensByCollection(
+                MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+                (int) ( skipCount - ( companyTokensCount + regionTokensCount + branchTokensCount ) ), batchSize );
+            totalRecord +=agentMediaTokens.size();
+            socialMediaTokensPaginated.setAgentsTokens( agentMediaTokens );
+        }
+        
+        socialMediaTokensPaginated.setTotalRecord(totalRecord);
+
+        setCompanyIdsMap( socialMediaTokensPaginated );
+
+        LOG.info( "End of method fetchSocialMediaTokensResponse" );
+        return socialMediaTokensPaginated;
+    }
+    
+
+    /**
+     * Method to set companies map in social media paginated response.
+     * @param socialMediaTokensPaginated
+     */
+    private void setCompanyIdsMap( SocialMediaTokensPaginated socialMediaTokensPaginated )
+    {
+        LOG.debug( "Inside  setCompanyIdsMap" );
+        List<Long> regionIds = new ArrayList<>();
+
+        for ( SocialMediaTokenResponse regionToken : socialMediaTokensPaginated.getRegionsTokens() ) {
+            regionIds.add( regionToken.getIden() );
+        }
+
+        Map<Long, Long> regionCompanyIdMap = regionDao.getCompanyIdsForRegionIds( regionIds );
+        socialMediaTokensPaginated.setRegionCompanyIdMap( regionCompanyIdMap );
+
+        List<Long> branchIds = new ArrayList<>();
+        for ( SocialMediaTokenResponse branchToken : socialMediaTokensPaginated.getBranchesTokens() ) {
+            branchIds.add( branchToken.getIden() );
+        }
+
+        Map<Long, Long> branchCompanyIdMap = branchDao.getCompanyIdsForBranchIds( branchIds );
+        socialMediaTokensPaginated.setBranchCompanyIdMap( branchCompanyIdMap );
+
+        List<Long> userIds = new ArrayList<>();
+        for ( SocialMediaTokenResponse agentToken : socialMediaTokensPaginated.getAgentsTokens() ) {
+            userIds.add( agentToken.getIden() );
+        }
+
+        Map<Long, Long> userCompanyIdMap = userDao.getCompanyIdsForUserIds( userIds );
+        socialMediaTokensPaginated.setAgentCompanyIdMap( userCompanyIdMap );
+        LOG.debug( "End of setCompanyIdsMap" );
+    }
+
+
+    /**
+     * Populate SocialMediaTokenResponse from FeedIngestionEntity
+     * @param feedIngestionEntity
+     * @param profileType
+     * @return
+     */
+    private SocialMediaTokenResponse setSocialMediaTokenResponse(SocialMediaTokenResponse  feedIngestionEntity, long companyId,
+        ProfileType profileType )
+    {
+        if ( feedIngestionEntity != null ) {
+            SocialMediaTokenResponse socialMediaTokenResponse = new SocialMediaTokenResponse();
+            socialMediaTokenResponse.setIden( feedIngestionEntity.getIden() );
+            socialMediaTokenResponse.setCompanyId( companyId );
+            socialMediaTokenResponse.setProfileType( profileType );
+            socialMediaTokenResponse.setSocialMediaTokens( feedIngestionEntity.getSocialMediaTokens() );
+            socialMediaTokenResponse.setProfileImageUrl( feedIngestionEntity.getProfileImageUrl() );
+            return socialMediaTokenResponse;
+        }
+        return null;
+    }
+
+
     @Transactional
     @Override
     public void updateBranchProfileName( long branchId, String profileName )
@@ -6177,7 +6551,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * Method to update image for organization unit setting
      * 
      * @param iden
-     * @param fileName
+     * @param imgFileName
      * @param collectionName
      * @param imageType
      * @param flagValue
@@ -6754,7 +7128,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     /**
      * Method to get update map for updating regionId for user in solr on moving branch from one region to another
      * @param userList
-     * @param regionId
+     * @param newRegionId
      * @return 
      * @throws InvalidInputException
      */
@@ -7412,44 +7786,44 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     private void processRegion( OrganizationUnitSettings regionSetting, Region region )
     {
         LOG.debug( "Processing region " + region.getRegion() );
-        long setterValue = 0l;
+        double setterValue = 0l;
         LOG.debug( "Getting details of region: " + region.getRegion() );
         if ( regionSetting.getLogo() != null ) {
             LOG.debug( "Logo is set" );
-            setterValue += SettingsForApplication.LOGO.getOrder() * 2;
+            setterValue += SettingsForApplication.LOGO.getOrder()  * 2;
         } else {
             LOG.debug( "Logo is not set" );
         }
         if ( regionSetting.getContact_details() != null ) {
             if ( regionSetting.getContact_details().getAddress() != null ) {
                 LOG.debug( "Address is set" );
-                setterValue += SettingsForApplication.ADDRESS.getOrder() * 2;
+                setterValue +=  SettingsForApplication.ADDRESS.getOrder() * 2;
             } else {
                 LOG.debug( "Address is not set" );
             }
             if ( regionSetting.getContact_details().getContact_numbers() != null ) {
                 LOG.debug( "Contact number is set" );
-                setterValue += SettingsForApplication.PHONE.getOrder() * 2;
+                setterValue +=  SettingsForApplication.PHONE.getOrder() * 2;
             } else {
                 LOG.debug( "Contact number is not set" );
             }
             // skipping location  check for work too
             if ( regionSetting.getContact_details().getWeb_addresses() != null ) {
                 LOG.debug( "Web address is set" );
-                setterValue += SettingsForApplication.WEB_ADDRESS_WORK.getOrder() * 2;
+                setterValue +=  SettingsForApplication.WEB_ADDRESS_WORK.getOrder()  * 2;
             } else {
                 LOG.debug( "Web address is not set" );
             }
             if ( regionSetting.getContact_details().getAbout_me() != null ) {
                 LOG.debug( "About me is set" );
-                setterValue += SettingsForApplication.ABOUT_ME.getOrder() * 2;
+                setterValue +=  SettingsForApplication.ABOUT_ME.getOrder()  * 2;
             } else {
                 LOG.debug( "About me is not set" );
             }
             if ( regionSetting.getContact_details().getMail_ids() != null
                 && regionSetting.getContact_details().getMail_ids().getWork() != null ) {
                 LOG.debug( "Work email id is set" );
-                setterValue += SettingsForApplication.EMAIL_ID_WORK.getOrder() * 2;
+                setterValue +=  SettingsForApplication.EMAIL_ID_WORK.getOrder()  * 2;
             } else {
                 LOG.debug( "Work email id is not set" );
             }
@@ -7457,61 +7831,61 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( regionSetting.getSocialMediaTokens() != null ) {
             if ( regionSetting.getSocialMediaTokens().getFacebookToken() != null ) {
                 LOG.debug( "Facebook is set" );
-                setterValue += SettingsForApplication.FACEBOOK.getOrder() * 2;
+                setterValue +=  SettingsForApplication.FACEBOOK.getOrder()  * 2;
             } else {
                 LOG.debug( "Facebook is not set" );
             }
             if ( regionSetting.getSocialMediaTokens().getTwitterToken() != null ) {
                 LOG.debug( "Twitter is set" );
-                setterValue += SettingsForApplication.TWITTER.getOrder() * 2;
+                setterValue += SettingsForApplication.TWITTER.getOrder()  * 2;
             } else {
                 LOG.debug( "Twitter is not set" );
             }
             if ( regionSetting.getSocialMediaTokens().getLinkedInToken() != null ) {
                 LOG.debug( "Linkedin is set" );
-                setterValue += SettingsForApplication.LINKED_IN.getOrder() * 2;
+                setterValue +=  SettingsForApplication.LINKED_IN.getOrder() * 2;
             } else {
                 LOG.debug( "Linkedin is not set" );
             }
             if ( regionSetting.getSocialMediaTokens().getGoogleToken() != null ) {
                 LOG.debug( "Google+ is set" );
-                setterValue += SettingsForApplication.GOOGLE_PLUS.getOrder() * 2;
+                setterValue +=  SettingsForApplication.GOOGLE_PLUS.getOrder()  * 2;
             } else {
                 LOG.debug( "Google+ is not set" );
             }
             if ( regionSetting.getSocialMediaTokens().getYelpToken() != null ) {
                 LOG.debug( "Yelp is set" );
-                setterValue += SettingsForApplication.YELP.getOrder() * 2;
+                setterValue +=  SettingsForApplication.YELP.getOrder() * 2;
             } else {
                 LOG.debug( "Yelp is not set" );
             }
             if ( regionSetting.getSocialMediaTokens().getZillowToken() != null ) {
                 LOG.debug( "Zillow is set" );
-                setterValue += SettingsForApplication.ZILLOW.getOrder() * 2;
+                setterValue +=  SettingsForApplication.ZILLOW.getOrder()  * 2;
             } else {
                 LOG.debug( "Zillow is not set" );
             }
             if ( regionSetting.getSocialMediaTokens().getRealtorToken() != null ) {
                 LOG.debug( "Realtor is set" );
-                setterValue += SettingsForApplication.REALTOR.getOrder() * 2;
+                setterValue += SettingsForApplication.REALTOR.getOrder()  * 2;
             } else {
                 LOG.debug( "Realtor is not set" );
             }
             if ( regionSetting.getSocialMediaTokens().getLendingTreeToken() != null ) {
                 LOG.debug( "Lending tree is set" );
-                setterValue += SettingsForApplication.LENDING_TREE.getOrder() * 2;
+                setterValue +=  SettingsForApplication.LENDING_TREE.getOrder()  * 2;
             } else {
                 LOG.debug( "Lending tree is not set" );
             }
             if ( regionSetting.getSocialMediaTokens().getGoogleBusinessToken() != null ) {
                 LOG.debug( "Google business is set" );
-                setterValue += SettingsForApplication.GOOGLE_BUSINESS.getOrder() * 2;
+                setterValue +=  SettingsForApplication.GOOGLE_BUSINESS.getOrder()  * 2;
             } else {
                 LOG.debug( "Google business is not set" );
             }
         }
         LOG.debug( "Final Settings setter value : " + setterValue );
-        region.setSettingsSetStatus( String.valueOf( setterValue ) );
+        region.setSettingsSetStatus( String.valueOf( setterValue ).split( "." )[0] );
         // update the values to company
         updateRegion( region );
         // get list of branches for region
@@ -7640,7 +8014,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     private void processBranch( OrganizationUnitSettings branchSetting, Branch branch )
     {
         LOG.debug( "Updating details for branch " + branch.getBranch() );
-        long setterValue = 0l;
+        double setterValue = 0l;
         LOG.debug( "Getting details of branch: " + branch.getRegion() );
         if ( branchSetting.getLogo() != null ) {
             LOG.debug( "Logo is set" );
@@ -7651,26 +8025,26 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( branchSetting.getContact_details() != null ) {
             if ( branchSetting.getContact_details().getAddress() != null ) {
                 LOG.debug( "Address is set" );
-                setterValue += SettingsForApplication.ADDRESS.getOrder() * 4;
+                setterValue +=  SettingsForApplication.ADDRESS.getOrder() * 4;
             } else {
                 LOG.debug( "Address is not set" );
             }
             if ( branchSetting.getContact_details().getContact_numbers() != null ) {
                 LOG.debug( "Contact number is set" );
-                setterValue += SettingsForApplication.PHONE.getOrder() * 4;
+                setterValue +=  SettingsForApplication.PHONE.getOrder() * 4;
             } else {
                 LOG.debug( "Contact number is not set" );
             }
             // skipping location
             if ( branchSetting.getContact_details().getWeb_addresses() != null && branchSetting.getContact_details().getWeb_addresses().getWork() != null) {
                 LOG.debug( "Web address is set" );
-                setterValue += SettingsForApplication.WEB_ADDRESS_WORK.getOrder() * 4;
+                setterValue +=  SettingsForApplication.WEB_ADDRESS_WORK.getOrder()  * 4;
             } else {
                 LOG.debug( "Web address is not set" );
             }
             if ( branchSetting.getContact_details().getAbout_me() != null ) {
                 LOG.debug( "About me is set" );
-                setterValue += SettingsForApplication.ABOUT_ME.getOrder() * 4;
+                setterValue +=  SettingsForApplication.ABOUT_ME.getOrder() * 4;
             } else {
                 LOG.debug( "About me is not set" );
             }
@@ -7685,7 +8059,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( branchSetting.getSocialMediaTokens() != null ) {
             if ( branchSetting.getSocialMediaTokens().getFacebookToken() != null ) {
                 LOG.debug( "Facebook is set" );
-                setterValue += SettingsForApplication.FACEBOOK.getOrder() * 4;
+                setterValue += SettingsForApplication.FACEBOOK.getOrder()* 4;
             } else {
                 LOG.debug( "Facebook is not set" );
             }
@@ -7739,7 +8113,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         }
         LOG.debug( "Final Settings setter value : " + setterValue );
-        branch.setSettingsSetStatus( String.valueOf( setterValue ) );
+        branch.setSettingsSetStatus( String.valueOf( setterValue ).split( "." )[0] );
         // update the values to company
         updateBranch( branch );
     }
@@ -7747,7 +8121,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     private void processCompany( OrganizationUnitSettings companySetting )
     {
-        long setterValue = 0l;
+        double setterValue = 0l;
         /* String lockValue = "0";*/
         // get a the company id and get the company from SQL
         LOG.debug( "Getting details of company: " + companySetting.getIden() );
@@ -7854,7 +8228,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         LOG.debug( "Final Settings setter value : " + setterValue );
         /*    LOG.debug( "Final Settings locker value : " + lockValue );*/
-        company.setSettingsSetStatus( String.valueOf( setterValue ) );
+        company.setSettingsSetStatus( String.valueOf( setterValue ).split( "." )[0] );
         /* company.setSettingsLockStatus( lockValue );*/
         // update the values to company
         updateCompany( company );
@@ -9286,6 +9660,197 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.info( "Inside method updateHidePublicPageForUsers " );
         organizationUnitSettingsDao.updateHidePublicPageForUsers( userIdList, hidePublicPage );
     }
+    
+
+    @Override
+    public List<Keyword> deleteKeywordsFromCompany( long companyId, List<String> keywordIds ) throws InvalidInputException
+    {
+        LOG.debug( "Method deleteKeywordsFromCompany started for companyId {}", companyId );
+        if ( companyId <= 0 || keywordIds.isEmpty() || keywordIds == null ) {
+            LOG.warn( "Invalid input parameters" );
+            throw new InvalidInputException( "Invalid input parameters" );
+        }
+        List<Keyword> companyFilterKeywords = new ArrayList<>();
+        OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId,
+            CommonConstants.COMPANY_SETTINGS_COLLECTION );
+        if ( companySettings != null ) {
+            List<Keyword> keywords = companySettings.getFilterKeywords();
+            if ( keywords != null && !keywords.isEmpty() ) {
+                for ( String keywordId : keywordIds ) {
+                    for ( Keyword keyword : keywords ) {
+                        if ( keyword.getId().equalsIgnoreCase( keywordId ) ) {
+                            keyword.setStatus( CommonConstants.STATUS_INACTIVE );
+                            keyword.setModifiedOn( new Date().getTime() );
+                        }
+                    }
+                }
+                // Updating filterKeywords in OrganizationUnitSettings
+                organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+                    MongoOrganizationUnitSettingDaoImpl.KEY_FILTER_KEYWORDS, keywords, companySettings,
+                    MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+            } else {
+                LOG.warn( "The list of keywords is empty" );
+                throw new InvalidInputException( "keywords do not exist for the company" );
+            }
+            for ( Keyword keywordToAdd : keywords ) {
+                if ( keywordToAdd.getStatus() == CommonConstants.STATUS_ACTIVE ) {
+                    companyFilterKeywords.add( keywordToAdd );
+                }
+            }
+        }
+        Collections.sort( companyFilterKeywords, new FilterKeywordsComparator() );
+        return companyFilterKeywords;
+
+    }
+
+
+    @Override
+    public List<Keyword> addKeywordToCompanySettings( long companyId, Keyword keyword ) throws InvalidInputException
+    {
+        LOG.debug( "Get company settings for the companyId: {}", companyId );
+        OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        List<Keyword> companyFilterKeywords = companySettings.getFilterKeywords();
+        List<Keyword> filterKeywordsAdded = new ArrayList<>();
+        if ( keyword != null ) {
+            // setting
+            if ( companySettings.getFilterKeywords() == null || companySettings.getFilterKeywords().isEmpty()) {
+                companyFilterKeywords = new ArrayList<>();
+            }
+
+            int flag = 0;
+
+            if ( StringUtils.isNotEmpty( keyword.getId() ) ) {
+                flag = 1;
+                for ( int i = 0; i < companyFilterKeywords.size(); i++ ) {
+                    Keyword companyFilterKeyword = companyFilterKeywords.get( i );
+
+                    if ( keyword.getId() != null && companyFilterKeyword.getId().equals( keyword.getId() )
+                        && companyFilterKeyword.getStatus() == CommonConstants.STATUS_ACTIVE ) {
+                        flag = 2;
+                        if ( keyword.getPhrase() != null ) {
+                            if ( companyFilterKeyword.getPhrase().equalsIgnoreCase( keyword.getPhrase() ) ) {
+                                LOG.warn( "Phrase already exists" );
+                            } else {
+                                companyFilterKeyword.setPhrase( keyword.getPhrase() );
+                                companyFilterKeyword.setModifiedOn( new Date().getTime() );
+                            }
+                        }
+                        if ( keyword.getMonitorType() != null
+                            && !keyword.getMonitorType().equals( companyFilterKeyword.getMonitorType() ) ) {
+                            companyFilterKeyword.setMonitorType( keyword.getMonitorType() );
+                            companyFilterKeyword.setModifiedOn( new Date().getTime() );
+                        }
+                    }
+                }
+            }
+
+            if ( flag == 1 ) {
+                throw new InvalidInputException( "Keyword does not exist for given Id", "400" );
+            }
+            if ( flag == 0 ) {
+                for ( Keyword duplicateKeyword : companyFilterKeywords ) {
+                    if ( duplicateKeyword.getPhrase().equalsIgnoreCase( keyword.getPhrase() )
+                        && duplicateKeyword.getMonitorType().equals( keyword.getMonitorType() )
+                        && duplicateKeyword.getStatus() == CommonConstants.STATUS_ACTIVE ) {
+                        LOG.warn( "duplicate entry" );
+                        throw new InvalidInputException( "duplicate entry", "400" );
+                    }
+                }
+                LOG.info( "Adding new keyword" );
+                Keyword keywordNew = new Keyword();
+                keywordNew.setCreatedOn( new Date().getTime() );
+                keywordNew.setModifiedOn( new Date().getTime() );
+                keywordNew.setPhrase( keyword.getPhrase() );
+                keywordNew.setId( UUID.randomUUID().toString() );
+                keywordNew.setStatus( CommonConstants.STATUS_ACTIVE );
+                keywordNew.setMonitorType( keyword.getMonitorType() );
+                companyFilterKeywords.add( keywordNew );
+            }
+            // Updating filterKeywords in OrganizationUnitSettings
+            organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+                MongoOrganizationUnitSettingDaoImpl.KEY_FILTER_KEYWORDS, companyFilterKeywords, companySettings,
+                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        } else {
+            LOG.debug( "Keywords are empty so skiping operation" );
+        }
+        for ( Keyword keywordToAdd : companyFilterKeywords ) {
+            if ( keywordToAdd.getStatus() == CommonConstants.STATUS_ACTIVE ) {
+                filterKeywordsAdded.add( keywordToAdd );
+            }
+        }
+        Collections.sort( filterKeywordsAdded, new FilterKeywordsComparator() );
+        
+        // update the redis with the keywords
+        redisDao.addKeywords( companyId, filterKeywordsAdded );
+        
+        return filterKeywordsAdded;
+    }
+
+
+    @Override
+    public List<Keyword> addMultiplePhrasesToCompany( long companyId, MultiplePhrasesVO multiplePhrasesVO )
+        throws InvalidInputException
+    {
+        LOG.debug( "Get company settings for the companyId: {}", companyId );
+        OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        List<Keyword> companyFilterKeywords = companySettings.getFilterKeywords();
+        List<Keyword> filterKeywordsAdded = new ArrayList<>();
+        int flag = 0;
+
+        if ( multiplePhrasesVO != null ) {
+            if ( companySettings.getFilterKeywords() == null || companySettings.getFilterKeywords().isEmpty() ) {
+                companyFilterKeywords = new ArrayList<>();
+            }
+
+            for ( String phrase : multiplePhrasesVO.getPhrases() ) {
+                flag = 1;
+                for ( Keyword duplicateKeyword : companyFilterKeywords ) {
+                    if ( duplicateKeyword.getPhrase().equalsIgnoreCase( phrase.trim() )
+                        && duplicateKeyword.getMonitorType().equals( multiplePhrasesVO.getMonitorType() )
+                        && duplicateKeyword.getStatus() == CommonConstants.STATUS_ACTIVE ) {
+                        LOG.warn( "duplicate entry" );
+                        flag = 2;
+                        break;
+                    }
+                }
+                if ( flag == 1 ) {
+                    LOG.info( "Adding new keyword" );
+                    Keyword keywordNew = new Keyword();
+                    keywordNew.setCreatedOn( new Date().getTime() );
+                    keywordNew.setModifiedOn( new Date().getTime() );
+                    keywordNew.setPhrase( phrase.trim() );
+                    keywordNew.setId( UUID.randomUUID().toString() );
+                    keywordNew.setStatus( CommonConstants.STATUS_ACTIVE );
+                    keywordNew.setMonitorType( multiplePhrasesVO.getMonitorType() );
+                    companyFilterKeywords.add( keywordNew );
+                }
+
+            }
+            // Updating filterKeywords in OrganizationUnitSettings
+            organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+                MongoOrganizationUnitSettingDaoImpl.KEY_FILTER_KEYWORDS, companyFilterKeywords, companySettings,
+                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+
+        } else {
+            LOG.debug( "Keywords are empty so skipping operation" );
+        }
+        for ( Keyword keywordToAdd : companyFilterKeywords ) {
+            if ( keywordToAdd.getStatus() == CommonConstants.STATUS_ACTIVE ) {
+                filterKeywordsAdded.add( keywordToAdd );
+            }
+        }
+        Collections.sort( filterKeywordsAdded, new FilterKeywordsComparator() );
+
+        // update the redis with the keywords
+        redisDao.addKeywords( companyId, filterKeywordsAdded );
+        
+        return filterKeywordsAdded;
+    }
 
 
     @Override
@@ -9372,11 +9937,33 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.debug( "Updated the record successfully" );
 
         return true;
-    } 
-    
-    
+    }
+
     /**
-    *
+     *Updates socialmedia token
+     * @param collection
+     * @param iden
+     * @param fieldToUpdate
+     * @param value
+     */
+    @Override public boolean updateSocialMediaToken( String collection, long iden, String fieldToUpdate, boolean value )
+        throws InvalidInputException
+    {
+        if ( LOG.isDebugEnabled() ) {
+            LOG.debug( "method updateSocialMediaToken() called" );
+        }
+        if(collection == null || collection.isEmpty()) throw  new InvalidInputException( "Collection name is invalid" );
+        else if(iden <= 0) throw  new InvalidInputException( "iden is invalid" );
+        else if(fieldToUpdate == null || fieldToUpdate.isEmpty()) throw  new InvalidInputException( "FieldName is invalid" );
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden( fieldToUpdate, value, iden, collection );
+        if ( LOG.isDebugEnabled() ) {
+            LOG.debug( "method updateSocialMediaToken() completed" );
+        }
+        return true;
+    }
+
+
+    /**
     * @param adminUser
     * @param user
     * @throws InvalidInputException
@@ -9548,6 +10135,68 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         return false;
     }
     
+    @Override
+    public List<SocialMonitorTrustedSource> addTrustedSourceToCompany( long companyId , String trustedSource ) throws InvalidInputException
+	{
+		LOG.debug("Get company settings for the companyId: {}", companyId);
+		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
+				companyId, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+
+		if(StringUtils.isEmpty(trustedSource)) {
+			throw new InvalidInputException("Invalid parameter passed. trustedSource can't be empty ");
+		}
+		if(companySettings == null) {
+			throw new InvalidInputException("Invalid companyId passed. No company setting found for given companyId ");
+		}
+		
+		//get existing  trusted sources for company
+		List<SocialMonitorTrustedSource> companyTrustedSources = companySettings.getSocialMonitorTrustedSources();
+		if (companyTrustedSources == null || companyTrustedSources.isEmpty())
+			companyTrustedSources = new ArrayList<SocialMonitorTrustedSource>();
+
+		//check if trusted source is already present
+		boolean isAleadyExist = false;
+		for (SocialMonitorTrustedSource currentTrustedSource : companyTrustedSources) {
+			if (currentTrustedSource.getSource().equalsIgnoreCase(trustedSource.trim())
+					&& currentTrustedSource.getStatus() == CommonConstants.STATUS_ACTIVE) {
+				LOG.warn("duplicate entry");
+				isAleadyExist = true;
+				break;
+			}
+		}
+		
+		// create new trusted source entity
+		if ( ! isAleadyExist) {
+			LOG.info("Adding new socialMonitorTrustedSource");
+			SocialMonitorTrustedSource socialMonitorTrustedSource = new SocialMonitorTrustedSource();
+			socialMonitorTrustedSource.setCreatedOn(new Date().getTime());
+			socialMonitorTrustedSource.setModifiedOn(new Date().getTime());
+			socialMonitorTrustedSource.setSource(trustedSource.trim());
+			socialMonitorTrustedSource.setId(UUID.randomUUID().toString());
+			socialMonitorTrustedSource.setStatus(CommonConstants.STATUS_ACTIVE);
+			companyTrustedSources.add(socialMonitorTrustedSource);
+		}
+
+		// save updated companyTrustedSources in mongo settings
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+				MongoOrganizationUnitSettingDaoImpl.KEY_TRUSTED_SOURCES, companyTrustedSources, companySettings,
+				MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+
+		//create truested sources to save in redis
+		List<SocialMonitorTrustedSource> companyTrustedSourcesToAdd = new ArrayList<SocialMonitorTrustedSource>();
+		for (SocialMonitorTrustedSource socialMonitorTrustedSource : companyTrustedSources) {
+			if (socialMonitorTrustedSource.getStatus() == CommonConstants.STATUS_ACTIVE) {
+				companyTrustedSourcesToAdd.add(socialMonitorTrustedSource);
+			}
+		}
+		Collections.sort(companyTrustedSourcesToAdd, new TrustedSourceComparator());
+
+		// update the redis with the trusted sources
+		redisDao.addTruestedSources(companyId, companyTrustedSourcesToAdd);
+
+		return companyTrustedSourcesToAdd;
+	}
+
     //updating all agents of a particular company
     @Override
     public boolean updateEntitySettings( String entityType, long entityId, String flagToBeUpdated, String status )
@@ -9630,6 +10279,34 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         userIdList.addAll( agentIds );
         organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByInCriteria( MongoOrganizationUnitSettingDaoImpl.KEY_AGENT_PROFILE_DISABLED,
             isAgentProfileDisabled, MongoOrganizationUnitSettingDaoImpl.KEY_IDEN,userIdList,MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION  );
+    }
+
+
+    @Override
+    public boolean isSocialMonitorAdmin( Long agentId ) throws InvalidInputException
+    {
+        LOG.debug( "Method isSocialMonitorAdmin called for agentId:" + agentId );
+        if ( agentId < 0l ) {
+            throw new InvalidInputException( "Invalid agent id passed as argument " );
+        }
+
+
+        List<UserProfile> userProfiles = new ArrayList<>();
+        User user = userDao.findById( User.class, agentId );
+        if ( user != null && user.getStatus() == CommonConstants.STATUS_ACTIVE) {
+            userProfiles = user.getUserProfiles();
+        }
+
+        if ( userProfiles != null && !userProfiles.isEmpty() ) {
+            for ( UserProfile userProfile : userProfiles ) {
+                if ( userProfile.getUser().getUserId() == agentId
+                    && userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_SM_ADMIN_PROFILE_ID
+                    && userProfile.getStatus() == CommonConstants.STATUS_ACTIVE ) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
 
