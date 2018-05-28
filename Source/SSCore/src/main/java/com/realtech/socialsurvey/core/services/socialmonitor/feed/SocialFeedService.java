@@ -119,4 +119,13 @@ public interface SocialFeedService
 
     List<SocialResponseObject> getSocialFeed( long companyId, long startTime, long endTime, int pageSize, int skips )
         throws InvalidInputException;
+   
+    
+    /**
+     * Method to move document from social feed collection to archive collection
+     * @return true if operation is successful, else false.
+     */
+    public boolean moveDocumentToArchiveCollection();
+
+    
 }

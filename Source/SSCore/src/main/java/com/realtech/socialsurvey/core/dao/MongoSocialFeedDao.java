@@ -47,9 +47,18 @@ public interface MongoSocialFeedDao
 	public long fetchLinkedinTokenCount(List<Long> ids, String collectioName);
 	
 	public long fetchInstagramTokenCount(List<Long> ids, String collectioName);
+	
+	/**
+	 * Method to move document from social feed collection to archive collection
+	 * @param days : archive before days
+	 * @return true if operation is successful, else false.
+	 */
+	boolean moveDocumentToArchiveCollection( int days );
 
 	List<SocialResponseObject> getSocialFeed( String keyword, long companyId, long startTime, long endTime, int pageSize, int skips );
 
 
 	List<SocialResponseObject> getSocialFeed( long companyId, long startTime, long endTime, int pageSize, int skips );
+
+    
 }
