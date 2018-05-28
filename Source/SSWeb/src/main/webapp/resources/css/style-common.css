@@ -12142,16 +12142,23 @@ img.lead-img {
 }
 
 .mng-tbl-name{
-	width:15%;
+	width:17%;
 }
 
 .mng-tbl-email{
 	width:22%;
 }
 
+.mng-tbl-email-div{
+	width:260px;
+	overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .mng-tbl-soc-conn{
-	width:25%;
-	padding-right:9px;
+	width: 26%;
+    padding-right: 14px;
 }
 
 .mng-tbl-ticks{
@@ -12286,4 +12293,8 @@ img.lead-img {
 
 .mng-tbl-pad-zero{
 	padding: 0;
+}
+
+.mng-tbl-btns{
+	width: 20%;
 }

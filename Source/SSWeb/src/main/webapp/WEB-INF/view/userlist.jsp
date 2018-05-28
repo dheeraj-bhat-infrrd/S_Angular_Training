@@ -86,7 +86,7 @@
 				<tr class="u-tbl-row user-row" id="user-row-${userfromsearch.userId}" data-editable="${userfromsearch.canEdit}">
 					<td class="v-tbl-uname fetch-name mng-tbl-name" data-first-name="${userfromsearch.firstName}" data-last-name="${userfromsearch.lastName}"
 						data-user-id="${userfromsearch.userId}">${userfromsearch.displayName}</td>
-					<td class="v-tbl-email fetch-email mng-tbl-email">${userfromsearch.emailId}</td>
+					<td class="v-tbl-email fetch-email mng-tbl-email"><div class="mng-tbl-email-div" title="${userfromsearch.emailId}">${userfromsearch.emailId}</div></td>
 					<td class="v-tbl-email fetch-email mng-tbl-soc-conn">
 						<c:forEach var="socialMediaVO" items="${userfromsearch.socialMediaVOs}">
 							<c:set var="status" value="${socialMediaVO.status}" />
@@ -223,10 +223,6 @@
 	               		  			</c:choose>
 	               		  		</c:when>
 	               		  	</c:choose>
-	               		  	<script>
-	               		  		console.log("${status}");
-	               		  		console.log("${SocialMedia}");
-	               		  	</script>
                 		</c:forEach>
                 		<div class="${fbClass} mgn-tbl-conn-icn"></div>
 						<div class="${gpClass} mgn-tbl-conn-icn"></div>
@@ -242,7 +238,7 @@
 					<td class="v-tbl-rgn-adm mng-tbl-ticks ${regionadmintickclass}"></td>
 					<td class="v-tbl-of-adm mng-tbl-ticks ${branchadmintickclass}"></td>
 					<td class="v-tbl-ln-of mng-tbl-ticks ${agenttickclass}"></td>
-					<td class="v-tbl-btns v-tbl-btns-um">
+					<td class="v-tbl-btns v-tbl-btns-um mng-tbl-btns">
 						<div class="v-tbn-icn-dropdown hide"></div>
 						<div class="clearfix v-tbl-icn-wraper v-um-tbl-icn-wraper">
 							<c:choose>
@@ -286,7 +282,7 @@
 				   </td>
 				</tr>
 				<tr class="u-tbl-row u-tbl-row-sel hide user-assignment-edit-row">
-					<td id="user-details-and-assignments-${userfromsearch.userId}" class="u-tbl-edit-td user-assignment-edit-div" colspan="6">
+					<td id="user-details-and-assignments-${userfromsearch.userId}" class="u-tbl-edit-td user-assignment-edit-div" colspan="7">
 						<!-- data populated from um-edit-row.jsp -->
 					</td>
 				</tr>

@@ -1,37 +1,31 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
 // JIRA: SS-27: By RM05: BOC
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.lang.reflect.Type;
+import java.net.MalformedURLException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
-import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.commons.FilterKeywordsComparator;
-import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
-import com.realtech.socialsurvey.core.commons.Utils;
-import com.realtech.socialsurvey.core.dao.*;
-import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
-import com.realtech.socialsurvey.core.entities.*;
-import com.realtech.socialsurvey.core.enums.*;
-import com.realtech.socialsurvey.core.exception.*;
-import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
-import com.realtech.socialsurvey.core.services.mail.EmailServices;
-import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
-import com.realtech.socialsurvey.core.services.organizationmanagement.*;
-import com.realtech.socialsurvey.core.services.payment.Payment;
-import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
-import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionCancellationUnsuccessfulException;
-import com.realtech.socialsurvey.core.services.search.SolrSearchService;
-import com.realtech.socialsurvey.core.services.search.exception.SolrException;
-import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsLocker;
-import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
-import com.realtech.socialsurvey.core.services.social.SocialManagementService;
-import com.realtech.socialsurvey.core.services.social.SocialMediaExceptionHandler;
-import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
-import com.realtech.socialsurvey.core.utils.*;
-import com.realtech.socialsurvey.core.utils.images.ImageProcessor;
-import com.realtech.socialsurvey.core.workbook.utils.WorkbookData;
-import com.realtech.socialsurvey.core.workbook.utils.WorkbookOperations;
+import javax.annotation.Resource;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.solr.client.solrj.util.ClientUtils;
@@ -50,16 +44,129 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import javax.annotation.Resource;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.lang.reflect.Type;
-import java.net.MalformedURLException;
-import java.sql.Timestamp;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.FilterKeywordsComparator;
+import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
+import com.realtech.socialsurvey.core.commons.TrustedSourceComparator;
+import com.realtech.socialsurvey.core.commons.Utils;
+import com.realtech.socialsurvey.core.dao.BranchDao;
+import com.realtech.socialsurvey.core.dao.CompanyDao;
+import com.realtech.socialsurvey.core.dao.DisabledAccountDao;
+import com.realtech.socialsurvey.core.dao.GenericDao;
+import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.dao.RedisDao;
+import com.realtech.socialsurvey.core.dao.RegionDao;
+import com.realtech.socialsurvey.core.dao.RemovedUserDao;
+import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
+import com.realtech.socialsurvey.core.dao.UserDao;
+import com.realtech.socialsurvey.core.dao.UserInviteDao;
+import com.realtech.socialsurvey.core.dao.UserProfileDao;
+import com.realtech.socialsurvey.core.dao.UsercountModificationNotificationDao;
+import com.realtech.socialsurvey.core.dao.ZillowHierarchyDao;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.AbusiveMailSettings;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.BranchFromSearch;
+import com.realtech.socialsurvey.core.entities.BranchSettings;
+import com.realtech.socialsurvey.core.entities.CRMInfo;
+import com.realtech.socialsurvey.core.entities.CollectionDotloopProfileMapping;
+import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.CompanyHiddenNotification;
+import com.realtech.socialsurvey.core.entities.CompanyView;
+import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
+import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
+import com.realtech.socialsurvey.core.entities.CrmBatchTracker;
+import com.realtech.socialsurvey.core.entities.DisabledAccount;
+import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
+import com.realtech.socialsurvey.core.entities.EncompassSdkVersion;
+import com.realtech.socialsurvey.core.entities.Event;
+import com.realtech.socialsurvey.core.entities.FacebookToken;
+import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
+import com.realtech.socialsurvey.core.entities.FileUpload;
+import com.realtech.socialsurvey.core.entities.FilterKeywordsResponse;
+import com.realtech.socialsurvey.core.entities.HierarchySettingsCompare;
+import com.realtech.socialsurvey.core.entities.Keyword;
+import com.realtech.socialsurvey.core.entities.LicenseDetail;
+import com.realtech.socialsurvey.core.entities.LinkedInToken;
+import com.realtech.socialsurvey.core.entities.LockSettings;
+import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
+import com.realtech.socialsurvey.core.entities.MailContent;
+import com.realtech.socialsurvey.core.entities.MailContentSettings;
+import com.realtech.socialsurvey.core.entities.MailIdSettings;
+import com.realtech.socialsurvey.core.entities.MultiplePhrasesVO;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
+import com.realtech.socialsurvey.core.entities.ProfilesMaster;
+import com.realtech.socialsurvey.core.entities.RankingRequirements;
+import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.RegionFromSearch;
+import com.realtech.socialsurvey.core.entities.RegistrationStage;
+import com.realtech.socialsurvey.core.entities.RemovedUser;
+import com.realtech.socialsurvey.core.entities.RetriedTransaction;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokenResponse;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokensPaginated;
+import com.realtech.socialsurvey.core.entities.SocialMonitorTrustedSource;
+import com.realtech.socialsurvey.core.entities.StateLookup;
+import com.realtech.socialsurvey.core.entities.SurveyCompanyMapping;
+import com.realtech.socialsurvey.core.entities.SurveyDetails;
+import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
+import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
+import com.realtech.socialsurvey.core.entities.SurveySettings;
+import com.realtech.socialsurvey.core.entities.UploadStatus;
+import com.realtech.socialsurvey.core.entities.UploadValidation;
+import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserApiKey;
+import com.realtech.socialsurvey.core.entities.UserEmailMapping;
+import com.realtech.socialsurvey.core.entities.UserFromSearch;
+import com.realtech.socialsurvey.core.entities.UserHierarchyAssignments;
+import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.entities.VerticalCrmMapping;
+import com.realtech.socialsurvey.core.entities.VerticalsMaster;
+import com.realtech.socialsurvey.core.entities.ZipCodeLookup;
+import com.realtech.socialsurvey.core.enums.AccountType;
+import com.realtech.socialsurvey.core.enums.DisplayMessageType;
+import com.realtech.socialsurvey.core.enums.OrganizationUnit;
+import com.realtech.socialsurvey.core.enums.ProfileType;
+import com.realtech.socialsurvey.core.enums.SettingsForApplication;
+import com.realtech.socialsurvey.core.exception.DatabaseException;
+import com.realtech.socialsurvey.core.exception.FatalException;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
+import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
+import com.realtech.socialsurvey.core.services.mail.EmailServices;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserAssignmentException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UtilityService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ZillowUpdateService;
+import com.realtech.socialsurvey.core.services.payment.Payment;
+import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
+import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionCancellationUnsuccessfulException;
+import com.realtech.socialsurvey.core.services.search.SolrSearchService;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsLocker;
+import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
+import com.realtech.socialsurvey.core.services.social.SocialManagementService;
+import com.realtech.socialsurvey.core.services.social.SocialMediaExceptionHandler;
+import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
+import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
+import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
+import com.realtech.socialsurvey.core.utils.EncryptionHelper;
+import com.realtech.socialsurvey.core.utils.MessageUtils;
+import com.realtech.socialsurvey.core.utils.ZipCodeExclusionStrategy;
+import com.realtech.socialsurvey.core.utils.images.ImageProcessor;
+import com.realtech.socialsurvey.core.workbook.utils.WorkbookData;
+import com.realtech.socialsurvey.core.workbook.utils.WorkbookOperations;
 
 
 @DependsOn ( "generic")
@@ -10021,6 +10128,68 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         return false;
     }
     
+    @Override
+    public List<SocialMonitorTrustedSource> addTrustedSourceToCompany( long companyId , String trustedSource ) throws InvalidInputException
+	{
+		LOG.debug("Get company settings for the companyId: {}", companyId);
+		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
+				companyId, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+
+		if(StringUtils.isEmpty(trustedSource)) {
+			throw new InvalidInputException("Invalid parameter passed. trustedSource can't be empty ");
+		}
+		if(companySettings == null) {
+			throw new InvalidInputException("Invalid companyId passed. No company setting found for given companyId ");
+		}
+		
+		//get existing  trusted sources for company
+		List<SocialMonitorTrustedSource> companyTrustedSources = companySettings.getSocialMonitorTrustedSources();
+		if (companyTrustedSources == null || companyTrustedSources.isEmpty())
+			companyTrustedSources = new ArrayList<SocialMonitorTrustedSource>();
+
+		//check if trusted source is already present
+		boolean isAleadyExist = false;
+		for (SocialMonitorTrustedSource currentTrustedSource : companyTrustedSources) {
+			if (currentTrustedSource.getSource().equalsIgnoreCase(trustedSource.trim())
+					&& currentTrustedSource.getStatus() == CommonConstants.STATUS_ACTIVE) {
+				LOG.warn("duplicate entry");
+				isAleadyExist = true;
+				break;
+			}
+		}
+		
+		// create new trusted source entity
+		if ( ! isAleadyExist) {
+			LOG.info("Adding new socialMonitorTrustedSource");
+			SocialMonitorTrustedSource socialMonitorTrustedSource = new SocialMonitorTrustedSource();
+			socialMonitorTrustedSource.setCreatedOn(new Date().getTime());
+			socialMonitorTrustedSource.setModifiedOn(new Date().getTime());
+			socialMonitorTrustedSource.setSource(trustedSource.trim());
+			socialMonitorTrustedSource.setId(UUID.randomUUID().toString());
+			socialMonitorTrustedSource.setStatus(CommonConstants.STATUS_ACTIVE);
+			companyTrustedSources.add(socialMonitorTrustedSource);
+		}
+
+		// save updated companyTrustedSources in mongo settings
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+				MongoOrganizationUnitSettingDaoImpl.KEY_TRUSTED_SOURCES, companyTrustedSources, companySettings,
+				MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+
+		//create truested sources to save in redis
+		List<SocialMonitorTrustedSource> companyTrustedSourcesToAdd = new ArrayList<SocialMonitorTrustedSource>();
+		for (SocialMonitorTrustedSource socialMonitorTrustedSource : companyTrustedSources) {
+			if (socialMonitorTrustedSource.getStatus() == CommonConstants.STATUS_ACTIVE) {
+				companyTrustedSourcesToAdd.add(socialMonitorTrustedSource);
+			}
+		}
+		Collections.sort(companyTrustedSourcesToAdd, new TrustedSourceComparator());
+
+		// update the redis with the trusted sources
+		redisDao.addTruestedSources(companyId, companyTrustedSourcesToAdd);
+
+		return companyTrustedSourcesToAdd;
+	}
+
     //updating all agents of a particular company
     @Override
     public boolean updateEntitySettings( String entityType, long entityId, String flagToBeUpdated, String status )
@@ -10104,5 +10273,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByInCriteria( MongoOrganizationUnitSettingDaoImpl.KEY_AGENT_PROFILE_DISABLED,
             isAgentProfileDisabled, MongoOrganizationUnitSettingDaoImpl.KEY_IDEN,userIdList,MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION  );
     }
+
 }
 

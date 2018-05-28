@@ -95,6 +95,9 @@ public class OrganizationUnitSettings implements Serializable
     
     //SocialMonitor flag
     private boolean isSocialMonitorEnabled;
+    
+    //trusted sources for socail monitor
+    private List<SocialMonitorTrustedSource> socialMonitorTrustedSources;
 
     private boolean isAgentProfileDisabled;
 
@@ -849,7 +852,17 @@ public class OrganizationUnitSettings implements Serializable
     }
 
 
-    @Override
+    public List<SocialMonitorTrustedSource> getSocialMonitorTrustedSources() {
+		return socialMonitorTrustedSources;
+	}
+
+
+	public void setSocialMonitorTrustedSources(List<SocialMonitorTrustedSource> socialMonitorTrustedSources) {
+		this.socialMonitorTrustedSources = socialMonitorTrustedSources;
+	}
+
+
+	@Override
     public String toString()
     {
         return "OrganizationUnitSettings [id=" + id + ", iden=" + iden + ", uniqueIdentifier=" + uniqueIdentifier

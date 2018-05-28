@@ -39,6 +39,7 @@ import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokensPaginated;
+import com.realtech.socialsurvey.core.entities.SocialMonitorTrustedSource;
 import com.realtech.socialsurvey.core.entities.StateLookup;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
@@ -1721,7 +1722,9 @@ public interface OrganizationManagementService
         throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException;
 
 
-    boolean updateSocialMediaToken( String collection, long iden, String fieldToUpdate, boolean value )
+	public List<SocialMonitorTrustedSource> addTrustedSourceToCompany(long companyId, String trustedSource) throws InvalidInputException;
+
+	boolean updateSocialMediaToken( String collection, long iden, String fieldToUpdate, boolean value )
         throws InvalidInputException;
 
     public void unsetWebAddressInProfile( long entityId, String entityType ) throws NonFatalException;
