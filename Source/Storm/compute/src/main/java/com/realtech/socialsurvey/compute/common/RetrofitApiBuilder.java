@@ -1,11 +1,5 @@
 package com.realtech.socialsurvey.compute.common;
 
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.realtech.socialsurvey.compute.entities.FileUploadResponse;
 import com.realtech.socialsurvey.compute.entities.response.FacebookErrorResponse;
 import com.realtech.socialsurvey.compute.exception.APIIntegrationException;
@@ -17,13 +11,17 @@ import com.realtech.socialsurvey.compute.services.api.LinkedinApiIntegrationServ
 import com.realtech.socialsurvey.compute.services.api.SSApiIntegrationService;
 import com.realtech.socialsurvey.compute.services.api.SolrApiIntegrationService;
 import com.realtech.socialsurvey.compute.utils.ConversionUtils;
-
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import okhttp3.logging.HttpLoggingInterceptor.Level;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -223,6 +221,4 @@ public class RetrofitApiBuilder
             validateResponse(response);
         }
     }
-
-
 }

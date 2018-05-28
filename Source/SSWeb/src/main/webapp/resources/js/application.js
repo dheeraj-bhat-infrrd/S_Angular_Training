@@ -1,3 +1,4 @@
+
 //Functions to detect browser
 var is_chrome = navigator.userAgent.indexOf('Chrome') > -1;
 var is_explorer = navigator.userAgent.indexOf('MSIE') > -1;
@@ -397,6 +398,11 @@ $(document).on('click', function(e) {
 		$('#macro-alerts-chevron-up').toggle();
 	}
 
+	if ($('#summit-popup-body').is(':visible')) {
+		closeSummitPopup();
+	} 
+	
+
 	if ($('#add-macro-action-options').is(':visible')) {
 		$('#add-macro-action-options').toggle();
 		$('#macro-action-chevron-down').toggle();
@@ -506,7 +512,7 @@ $(document).on('keyup', function(e) {
 			$('#zillow-popup-body').html('');
 			enableBodyScroll();
 		}
-		
+
 		checkSocMonDropdowns(null);
 		
 		if($('#monitor-bulk-action-options').is(':visible')){
@@ -545,6 +551,9 @@ $(document).on('keyup', function(e) {
 			$('#add-macro-action-options').toggle();
 			$('#macro-action-chevron-down').toggle();
 			$('#macro-action-chevron-up').toggle();
+		}
+		if ($('#summit-popup-body').is(':visible')) {
+			closeSummitPopup();
 		}
 	}
 });
@@ -1650,13 +1659,6 @@ function updateEventOnDashboardPageForReviews() {
 		var entityId = $('#rep-prof-container').data('column-value');
 		var entityType = $('#rep-prof-container').data('column-name');
 		
-		var copyText = $(this).parent().find('.linkedInSummary').val();
-		var $temp = $("<input>");
-	    $("body").append($temp);
-	    $temp.val(copyText).select();
-	    document.execCommand("copy");
-	    $temp.remove();
-		
 		
 		var payload = {
 			"surveyMongoId" :surveyMongoId,
@@ -1693,6 +1695,10 @@ function updateEventOnDashboardPageForReviews() {
 function linkedInShare(data,link,title){
 	if(data == false || data == 'false'){
 		if(title == 'LinkedIn'){
+			
+			var copyText = $(this).parent().find('.linkedInSummary').val();
+			copyToClipboard(copyText);
+			
 			$('#overlay-header').html("");
 			$('#overlay-text').html('<div style="text-align:left; display: grid;">The text of the post has been copied to clipboard. Please use the text to post in LinkedIn Page.</div>');
 			$('#overlay-continue').html("Ok");
@@ -4341,7 +4347,7 @@ function paintEditSection(data) {
 
 	bindSingleMultipleSelection();
 	bindAssignToSelectorClick();
-
+	
 	bindRegionSelectorEvents();
 
 	$("#btn-office-save").click(function(e) {
@@ -6232,6 +6238,19 @@ function updateAutoPostSetting(isautopostenabled, disableEle) {
 	});
 }
 
+function updateEntitySettings(settingName, settingStatus) {
+	var payload = {
+		"settingName" : settingName,
+		"settingStatus" : settingStatus
+	};
+	
+	callAjaxPostWithPayloadData("./updateentitysettings.do", function(data) {
+		$('#overlay-toast').html(data);
+		showToast();
+	}, payload, true);
+	
+}
+
 function updateAutoPostLinkToUserSiteSetting(isautopostlinktositeenabled, disableEle) {
 	var payload = {
 		"autopostlinktousersite" : isautopostlinktositeenabled
@@ -6625,14 +6644,14 @@ function confirmDeleteUser(userId, adminId) {
 	$('#overlay-continue').attr("onclick", "deleteUser('" + userId + "');");
 }
 
-function confirmDeleteUserProfile(profileId) {
+function confirmDeleteUserProfile(profileId, userId) {
 	$('#overlay-main').show();
 	$('#overlay-continue').show();
 	$('#overlay-continue').html("Delete");
 	$('#overlay-cancel').html("Cancel");
 	$('#overlay-header').html("Delete User Profile");
 	$('#overlay-text').html("Are you sure you want to delete user profile?");
-	$('#overlay-continue').attr("onclick", "deleteUserProfile('" + profileId + "');");
+	$('#overlay-continue').attr("onclick", "deleteUserProfile('" + profileId + "', '" + userId + "');");
 }
 
 /*
@@ -6662,14 +6681,14 @@ function deleteUser(userId) {
 }
 
 // Function to delete user profile
-function deleteUserProfile(profileId) {
+function deleteUserProfile(profileId,userId) {
 	showOverlay();
 	var payload = {
 		"profileId" : profileId
 	};
 	callAjaxPostWithPayloadData("./deleteuserprofile.do", function(data) {
 		if (data == "success") {
-
+			updateUserProfileTicksInManageTeam(userId);
 			// close the popup
 			$('#overlay-cancel').click();
 			// remove the tab from UI
@@ -6682,6 +6701,39 @@ function deleteUserProfile(profileId) {
 		}
 	}, payload, true);
 }
+
+function updateUserProfileTicksInManageTeam(userId){
+	var payload = {
+		"userId" : userId
+	};
+	callAjaxGetWithPayloadData("./fetchuserprofileflags.do", function(data) {
+		if( data != undefined ){
+			var response = JSON.parse(data);
+			if( response != undefined && response.success != undefined ){
+				if( response.success == "true" ){
+					if( response.isRegionAdmin  == "true" ){
+						addClassToJQueryElement( $('#user-row-' + userId).find('.v-tbl-rgn-adm'), "v-icn-tick" );
+					} else {
+						removeClassToJQueryElement( $('#user-row-' + userId).find('.v-tbl-rgn-adm'), "v-icn-tick" );
+					}
+					
+					if( response.isBranchAdmin  == "true" ){
+						addClassToJQueryElement( $('#user-row-' + userId).find('.v-tbl-of-adm'), "v-icn-tick" );
+					} else {
+						removeClassToJQueryElement( $('#user-row-' + userId).find('.v-tbl-of-adm'), "v-icn-tick" );
+					}
+					
+					if( response.isAgent  == "true" ){
+						addClassToJQueryElement( $('#user-row-' + userId).find('.v-tbl-ln-of'), "v-icn-tick" );
+					} else {
+						removeClassToJQueryElement( $('#user-row-' + userId).find('.v-tbl-ln-of'), "v-icn-tick" );
+					}
+				}
+			}
+		}
+	}, payload, true);
+}
+
 /*
  * Paint the user details form in the user management page
  */
@@ -7120,18 +7172,48 @@ function saveUserDetailsByAdmin() {
  */
 function saveUserAssignment(formId, disableEle) {
 	var url = "./addindividual.do";
+	var userId = $( "#" + formId).find("#selected-userid-hidden").val();
+	var isAdminCheck = $( "#" + formId).find("#is-admin-chk").val();
+	var assignToText = $("#assign-to-txt").val();
 	showOverlay();
-	callAjaxFormSubmit(url, saveUserAssignmentCallBack, formId, disableEle);
+	callAjaxFormSubmit(url, function(data){
+		hideOverlay();
+		displayMessage(data);
+		if( userId != undefined && data != undefined && data.indexOf("success") > -1 && assignToText != undefined && isAdminCheck != undefined ){
+			if( "Company" == assignToText ){
+				if( "true" == isAdminCheck ){
+					// do nothing
+				} else if( "false" == isAdminCheck ){
+					addClassToJQueryElement( $('#user-row-' + userId).find('.v-tbl-ln-of'), "v-icn-tick" );
+				}
+			} else if( "Region" == assignToText ){
+				if( "true" == isAdminCheck ){
+					addClassToJQueryElement( $('#user-row-' + userId).find('.v-tbl-rgn-adm'), "v-icn-tick" );
+				} else if( "false" == isAdminCheck ){
+					addClassToJQueryElement( $('#user-row-' + userId).find('.v-tbl-ln-of'), "v-icn-tick" );
+				}
+			} else if( "Office" == assignToText ){
+				if( "true" == isAdminCheck ){
+					addClassToJQueryElement( $('#user-row-' + userId).find('.v-tbl-of-adm'), "v-icn-tick" );
+				} else if( "false" == isAdminCheck ){
+					addClassToJQueryElement( $('#user-row-' + userId).find('.v-tbl-ln-of'), "v-icn-tick" );
+				}
+			}
+		}
+	}, formId, disableEle);
 }
 
-/**
- * callback for saveUserAssignment
- * 
- * @param data
- */
-function saveUserAssignmentCallBack(data) {
-	hideOverlay();
-	displayMessage(data);
+
+function addClassToJQueryElement( element, clazz ){
+	if( element != undefined && !element.hasClass(clazz) ){
+		element.addClass(clazz);
+	}
+}
+
+function removeClassToJQueryElement( element, clazz ){
+	if( element != undefined && element.hasClass(clazz) ){
+		element.removeClass(clazz);
+	}
 }
 
 // remove user profile
@@ -7142,7 +7224,9 @@ $(document).on('click', '.v-icn-rem-userprofile', function(e) {
 	}
 
 	var profileId = $(this).parent().data('profile-id');
-	confirmDeleteUserProfile(profileId);
+	var userIdArr = $(this).parent().parent().parent().parent().attr("id").split("-");
+	var userId = userIdArr[userIdArr.length -1];
+	confirmDeleteUserProfile(profileId, userId);
 });
 
 // remove user
@@ -8043,6 +8127,9 @@ function showMasterQuestionPage() {
 			}
 		}
 		
+		// copy review text to clipboard
+		//copyToClipboard( feedback, "Your feedback has been copied to clipboard" );
+		
 		if( isAbusive == false ){
 			if (mood != 'Great') {
 				$('#social-post-links').find('*').not('#google-business-btn, #google-btn').remove();
@@ -8933,7 +9020,16 @@ function callBackOnUpdatePhoneNumbers(data) {
 
 // Function to update web addresses in contact details
 $(document).on('blur', '#contant-info-container input[data-web-address]', function() {
-	if ($('#prof-all-lock').val() != 'modified' || !$(this).val() || $(this).is('[readonly]')) {
+	if(!$(this).val()){
+		delay(function() {
+			callAjaxPOST("./unsetwebapp.do", callBackOnUpdateWebAddresses, true);
+		}, 0);
+		$('#overlay-toast').html("Web address has been removed");
+		showToast();
+		return;
+	}
+
+	if ($('#prof-all-lock').val() != 'modified' || $(this).is('[readonly]')) {
 		return;
 	}
 	if (!isValidUrl($(this).val().trim())) {
@@ -9833,6 +9929,7 @@ $('body').on('click', '#prof-edit-social-link .icn-google-business', function(e)
     }
     
     $('#gmb-connected-placeId').html(connectedLink);
+    $('#gm-con-link').attr('href',connectedLink);
     for(var i=1;i<=5;i++){
     	if(!($('#gmb-radio-'+i).hasClass('hide'))){
     		$('#gmb-radio-'+i).addClass('hide');
@@ -9870,11 +9967,13 @@ $('body').on('click', '#prof-edit-social-link .icn-google-business', function(e)
 		if(placeId!='customPlace'){
 			$('#gmb-placeId-selected').html(placeId);
 			$('#gmb-url-placeId').html("https://search.google.com/local/writereview?placeid="+placeId);
+			$('#gm-sel-link').attr('href',"https://search.google.com/local/writereview?placeid="+placeId);
 		}else{
 			placeId = $('#gmb-placeId').val();
 			if(placeId != '' && placeId!=null){
 				$('#gmb-placeId-selected').html(placeId);
 				$('#gmb-url-placeId').html("https://search.google.com/local/writereview?placeid="+placeId);	
+				$('#gm-sel-link').attr('href',"https://search.google.com/local/writereview?placeid="+placeId);
 			}
 		}
 	});
@@ -9885,6 +9984,7 @@ $('body').on('click', '#prof-edit-social-link .icn-google-business', function(e)
 			placeId = $('#gmb-placeId').val();
 			$('#gmb-placeId-selected').html(placeId);
 			$('#gmb-url-placeId').html("https://search.google.com/local/writereview?placeid="+placeId);
+			$('#gm-sel-link').attr('href',"https://search.google.com/local/writereview?placeid="+placeId)
 		}
 	}
 	
@@ -12390,6 +12490,56 @@ $('body').on('click', '#atpst-chk-box', function() {
 	}
 });
 
+$('body').on('click', '#hide-pp-chk-box', function() {
+	if ($('#hide-pp-chk-box').hasClass('bd-check-img-checked')) {
+		$('#hide-pp-chk-box').removeClass('bd-check-img-checked');
+		updateEntitySettings( "hidePublicPage", true);
+	} else {
+		$('#hide-pp-chk-box').addClass('bd-check-img-checked');
+		updateEntitySettings( "hidePublicPage", false);
+	}
+});
+
+$('body').on('click', '#hide-bread-crumb-chk-box', function() {
+	if ($('#hide-bread-crumb-chk-box').hasClass('bd-check-img-checked')) {
+		$('#hide-bread-crumb-chk-box').removeClass('bd-check-img-checked');
+		updateEntitySettings( "hideFromBreadCrumb", true);
+	} else {
+		$('#hide-bread-crumb-chk-box').addClass('bd-check-img-checked');
+		updateEntitySettings( "hideFromBreadCrumb", false);
+	}
+});
+
+$('body').on('click', '#hidden-section-chk-box', function() {
+	if ($('#hidden-section-chk-box').hasClass('bd-check-img-checked')) {
+		$('#hidden-section-chk-box').removeClass('bd-check-img-checked');
+		updateEntitySettings( "hiddenSection", true);
+	} else {
+		$('#hidden-section-chk-box').addClass('bd-check-img-checked');
+		updateEntitySettings( "hiddenSection", false);
+	}
+});
+
+$('body').on('click', '#mail-frm-cmpny-chk-box', function() {
+	if ($('#mail-frm-cmpny-chk-box').hasClass('bd-check-img-checked')) {
+		$('#mail-frm-cmpny-chk-box').removeClass('bd-check-img-checked');
+		updateEntitySettings( "sendEmailFromCompany", true);
+	} else {
+		$('#mail-frm-cmpny-chk-box').addClass('bd-check-img-checked');
+		updateEntitySettings( "sendEmailFromCompany", false);
+	}
+});
+
+$('body').on('click', '#ovride-sm-chk-box', function() {
+	if ($('#ovride-sm-chk-box').hasClass('bd-check-img-checked')) {
+		$('#ovride-sm-chk-box').removeClass('bd-check-img-checked');
+		updateEntitySettings( "allowOverrideForSocialMedia", true);
+	} else {
+		$('#ovride-sm-chk-box').addClass('bd-check-img-checked');
+		updateEntitySettings( "allowOverrideForSocialMedia", false);
+	}
+});
+
 $('body').on('click', '#atpst-lnk-usr-ste-chk-box', function() {
 	if ($('#atpst-lnk-usr-ste-chk-box').hasClass('bd-check-img-checked')) {
 		$('#atpst-lnk-usr-ste-chk-box').removeClass('bd-check-img-checked');
@@ -14826,6 +14976,7 @@ function initializeGmb() {
 	    	  $('#gmb-placeId'+index++).html(place.place_id);
 	    	  $('#gmb-placeId-selected').html(place.place_id);
 	    	  $('#gmb-url-placeId').html("https://search.google.com/local/writereview?placeid="+place.place_id);
+	    	  $('#gm-sel-link').attr('href',"https://search.google.com/local/writereview?placeid="+place.place_id);
 	      }else{
 	    	  $('#gmb-radio-'+index).removeClass('hide');
 	    	  $('#placeId'+index).attr('value',place.place_id);
@@ -16249,7 +16400,7 @@ $(document).on('click','#soc-mon-stream-tab',function(e){
 
 $(document).on('click','#soc-mon-alerts-tab',function(e){
 	e.stopPropagation();
-	
+
 	var streamTabClickDisabled = $('#soc-mon-alerts-tab').data('disabled');
 	if(streamTabClickDisabled){
 		return;
@@ -17685,7 +17836,7 @@ function drawStreamPage(streamPostList){
 		
 		$('#stream-post-details-'+postId).find('.stream-user-name').html(streamPostList[i].ownerName);
 		$('#stream-post-details-'+postId).find('.stream-feed-type').html(streamPostList[i].type);
-		$('#stream-post-details-'+postId).find('.stream-feed-type').attr('data-link',streamPostList[i].pageLink);
+		$('#stream-post-details-'+postId).find('.stream-feed-type').attr('data-link',streamPostList[i].postLink);
 		
 		var lastUpdated = parseInt(streamPostList[i].updatedOn);
 		var lastUpdatedDate = new Date(lastUpdated);
@@ -18256,9 +18407,17 @@ $(document).on('click','#bulk-edit-sub',function(e){
 	e.stopImmediatePropagation();
 	e.preventDefault();
 	
+	var text = $('#bulk-edit-txt-box').val();
+	if(text == '' || text == undefined || text == null){
+		$("#overlay-toast").html("Please enter some text for Mail/Private note.");
+		showToast();
+		
+		return;
+	}
+	
 	$('#bulk-actions-apply').find('.form-post-id').val($('#selected-post-ids').data('post-ids'));
 	$('#bulk-actions-apply').find('.form-flagged').val(false);
-	$('#bulk-actions-apply').find('.form-status').val('NONE');
+	$('#bulk-actions-apply').find('.form-status').val('SUBMIT');
 	$('#bulk-actions-apply').find('.form-macro-id').val('');
 	$('#bulk-actions-apply').find('.form-post-textbox').val( $('#bulk-edit-txt-box').val() );
 	
@@ -18341,6 +18500,67 @@ $(document).on('click','.stream-action-flag',function(e){
 	}, formId,disableEle);
 });
 
+$(document).on('click','.stream-unflagged-icn',function(e){
+	e.stopPropagation();
+	var postId = $(this).parent().find('.post-id-details').attr('data-post-id');
+	var formId = ('add-post-action-'+postId);
+	var disableEle = ('#stream-action-unflag-'+postId);
+	var textActionType = $('#action-form-cont'+postId).find('.form-text-act-type').val();
+	
+	$('#action-form-cont'+postId).find('.form-flagged').val(true);
+	$('#action-form-cont'+postId).find('.form-status').val('NEW');
+	
+	var url = './updatepostaction.do';
+	callAjaxFormSubmit(url, function(data) {
+		var map = $.parseJSON(data);
+		$("#overlay-toast").html(map.message);
+		showToast();
+		if (map.status == "success") {
+					
+			var text = $('#action-form-cont'+postId).find('.form-post-textbox').val();
+			
+			updatePostSuccess(postId,text,'NEW',true,textActionType,map);
+			
+			$('#action-form-cont'+postId).find('.form-post-textbox').val('');
+			$("#overlay-toast").html("Successfully Updated Post");
+			showToast();
+		} else {
+			$("#overlay-toast").html("Failed to update post. Please Try again");
+			showToast();
+		}
+	}, formId,disableEle);
+});
+
+$(document).on('click','.stream-flagged-icn',function(e){
+	e.stopPropagation();
+	var postId = $(this).parent().find('.post-id-details').attr('data-post-id');
+	var formId = ('add-post-action-'+postId);
+	var disableEle = ('#stream-action-flag-'+postId);
+	var textActionType = $('#action-form-cont'+postId).find('.form-text-act-type').val();
+	
+	$('#action-form-cont'+postId).find('.form-flagged').val(false);
+	$('#action-form-cont'+postId).find('.form-status').val('NEW');
+	
+	var url = './updatepostaction.do';
+	callAjaxFormSubmit(url, function(data) {
+		var map = $.parseJSON(data);
+		$("#overlay-toast").html(map.message);
+		showToast();
+		if (map.status == "success") {
+
+			var text = $('#action-form-cont'+postId).find('.form-post-textbox').val();			
+			
+			updatePostSuccess(postId,text,'NEW',false,textActionType,map);
+			
+			$('#action-form-cont'+postId).find('.form-post-textbox').val('');
+			$("#overlay-toast").html("Successfully Updated Post");
+			showToast();
+		} else {
+			$("#overlay-toast").html("Failed to update post. Please Try again");
+			showToast();
+		}
+	}, formId,disableEle);
+});
 
 $(document).on('click','.stream-action-esc',function(e){
 	e.stopPropagation();
@@ -18428,15 +18648,28 @@ $(document).on('click','.stream-action-submit',function(e){
 	$(this).attr('id','stream-action-submit-'+postId);
 	var formId = ('add-post-action-'+postId);
 	var disableEle = ('#stream-action-submit-'+postId);
-
+	
+	var text = $('#action-form-cont'+postId).find('.form-post-textbox').val();
+	if(text == '' || text == undefined || text == null){
+		$("#overlay-toast").html("Please enter some text for Mail/Private note.");
+		showToast();
+		
+		return;
+	}
+	
+	var currentFlag = $(this).closest('.action-form-cont').find('.form-flagged').val();
+	var currentStatus = $(this).closest('.action-form-cont').find('.form-status').val();
+	
+	$(this).closest('.action-form-cont').find('.form-flagged').val(false);
+	$(this).closest('.action-form-cont').find('.form-status').val('SUBMIT');
+	
 	var url = './updatepostaction.do';
 	callAjaxFormSubmit(url, function(data) {
 		var map = $.parseJSON(data);
 		$("#overlay-toast").html(map.message);
 		showToast();
 		if (map.status == "success") {
-			
-			var text = $('#action-form-cont'+postId).find('.form-post-textbox').val();
+						
 			if(text!='' && text != undefined && text!=null){
 				var actionHistoryMail = $('#action-history'+postId).html();
 				
@@ -18474,6 +18707,10 @@ $(document).on('click','.stream-action-submit',function(e){
 			$("#overlay-toast").html("Failed to update post. Please Try again");
 			showToast();
 		}
+		
+		$(this).closest('.action-form-cont').find('.form-flagged').val(currentFlag);
+		$(this).closest('.action-form-cont').find('.form-status').val(currentStatus);
+		
 	}, formId,disableEle);
 });
 
@@ -19828,6 +20065,17 @@ $(document).on('click','.dup-stream-action-submit',function(e){
 	var formId = 'dup-post-add-post-action';
 	var disableEle = '.dup-stream-action-submit';
 
+	var text = $('#dup-post-action-form-cont').find('.form-post-textbox').val();
+	if(text == '' || text == undefined || text == null){
+		$("#overlay-toast").html("Please enter some text for Mail/Private note.");
+		showToast();
+		
+		return;
+	}
+	
+	$(this).closest('.action-form-cont').find('.form-flagged').val(false);
+	$(this).closest('.action-form-cont').find('.form-status').val('SUBMIT');
+	
 	var url = './updatepostaction.do';
 	callAjaxFormSubmit(url, function(data) {
 		var map = $.parseJSON(data);
@@ -19835,7 +20083,6 @@ $(document).on('click','.dup-stream-action-submit',function(e){
 		showToast();
 		if (map.status == "success") {
 			
-			var text = $('#dup-post-action-form-cont').find('.form-post-textbox').val();
 			if(text!='' && text != undefined && text!=null){
 				var actionHistoryMail = $('#action-history'+postId).html();
 				
@@ -20302,6 +20549,61 @@ $('body').on('blur', '#user-notification-recipients', function() {
 
 
 $(document).on('click','#action-edit-txt-box',function(e){
+	e.stopImmediatePropagation();
+	e.preventDefault();
+});
+
+function showSummitPopup(){
+	$('#summit-popup').show();
+	disableBodyScroll();
+}
+
+function closeSummitPopup(){
+	$('#summit-popup').hide();
+	showSummitRibbon();
+	enableBodyScroll();
+}
+
+
+function showSummitRibbon(){
+	$('#summit-ribbon').show();
+}
+
+function closeSummitRibbon(){
+	$('#summit-ribbon').hide();
+}
+
+$(document).on('click','#register-summit-btn',function(e){
+	e.stopImmediatePropagation();
+	e.preventDefault();
+	
+	closeSummitPopup();
+	window.open('http://www.createwowsummit.com', '_blank');
+	
+});
+
+$(document).on('click','#close-summit-popup',function(e){
+	e.stopPropagation();
+		
+	closeSummitPopup();
+});
+
+$(document).on('click','#summit-ribbon',function(e){
+	e.stopPropagation();
+	e.stopImmediatePropagation();
+	e.preventDefault();
+	
+	window.open('http://www.createwowsummit.com', '_blank');
+});
+
+$(document).on('click','#close-summit-ribbon',function(e){
+	e.stopPropagation();
+		
+	closeSummitRibbon();
+});
+
+$(document).on('click','#summit-popup-body',function(e){
+	e.stopPropagation();
 	e.stopImmediatePropagation();
 	e.preventDefault();
 });

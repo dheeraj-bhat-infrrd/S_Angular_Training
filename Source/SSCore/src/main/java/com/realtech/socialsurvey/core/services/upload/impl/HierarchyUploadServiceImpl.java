@@ -595,7 +595,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
         //If sendMail = true, then you need to send the mail. So holdSendingMail should be false.
         try {
             uploadedUser = userManagementService.inviteUserToRegister( adminUser, user.getFirstName(), user.getLastName(),
-                user.getEmailId(), true, user.isSendMail(), true );
+                user.getEmailId(), true, user.isSendMail(), true, true );
 
             if ( uploadedUser == null ) {
                 throw new UserAdditionException( "Unable to add user with emailID : " + user.getEmailId() );
@@ -1003,7 +1003,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
 
         // Delete the user
         try {
-            userManagementService.deleteUserDataFromAllSources( adminUser, user.getUserId(), CommonConstants.STATUS_INACTIVE, true );
+            userManagementService.deleteUserDataFromAllSources( adminUser, user.getUserId(), CommonConstants.STATUS_INACTIVE, true, true );
 
         } catch ( Exception errorWhileDeletingUser ) {
             // process errors and return them to the user
@@ -1283,7 +1283,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
         }
         Map<String, Object> map = organizationManagementService.updateBranch( adminUser, branch.getBranchId(),
             branch.getRegionId(), branch.getBranchName(), branch.getBranchAddress1(), branch.getBranchAddress2(), country,
-            countryCode, branch.getBranchState(), branch.getBranchCity(), branch.getBranchZipcode(), 0, null, false, false );
+            countryCode, branch.getBranchState(), branch.getBranchCity(), branch.getBranchZipcode(), 0, null, false, false, true );
         newBranch = (Branch) map.get( CommonConstants.BRANCH_OBJECT );
         if ( newBranch == null ) {
             LOG.error( "No branch found with branchId :" + branch.getBranchId() );
@@ -1439,7 +1439,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
         Map<String, Object> map = organizationManagementService.updateRegion( adminUser, region.getRegionId(),
             region.getRegionName(), region.getRegionAddress1(), region.getRegionAddress2(), region.getRegionCountry(),
             region.getRegionCountryCode(), region.getRegionState(), region.getRegionCity(), region.getRegionZipcode(), 0, null,
-            false, false );
+            false, false, true );
         newRegion = (Region) map.get( CommonConstants.REGION_OBJECT );
 
         if ( newRegion == null ) {

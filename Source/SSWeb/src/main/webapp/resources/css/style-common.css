@@ -1126,6 +1126,14 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder
 	line-height: 40px;
 }
 
+
+.um-item-row-left-overflow {
+	line-height: 20px;
+    text-align: center;
+    padding-left: 25px;
+}
+
+
 .vms-item-row-left {
 	padding-right: 10px;
 	width: 200px;
@@ -12067,4 +12075,226 @@ img.lead-img {
 	
 .feeds-tw-icon{
     background: radial-gradient(white 50%,#26c0f4 50%);
+}
+
+.summit-popup{
+	position: relative;
+    top: 0;
+    width: 1140px;
+    height: 681px;
+    margin: 0 auto;
+    background-image: url(../images/summit_popup_lg.gif);
+    background-size:contain;
+    background-position:center;
+    border-radius: 8px;
+    background-repeat: no-repeat;
+}
+
+.close-summit-popup{
+	width: 50px;
+    height: 50px;
+    position: relative;
+    top: 23px;
+    right: 27px;
+    float: right;
+    z-index: 100000;
+}
+
+.summit-popup-outer{	
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 99999999;
+    min-height: 480px;
+    padding-bottom: 100px;
+    background: linear-gradient(#2f69aa, #216cab91);
+}
+
+.summit-ribbon{
+	background-image: url(../images/summit_ribbon.jpg);
+    background-size:contain;
+    background-position:center;
+    margin-left: -35px;
+    background-repeat: no-repeat;
+    height:50px;
+}
+
+.close-summit-ribbon{
+	width: 30px;
+    height: 30px;
+    position: relative;
+    float: right;
+    right: 22px;
+    top: 10px;
+}
+
+.register-summit-btn{
+    width: 130px;
+    height: 50px;
+    position: absolute;
+    right: 252px;
+    bottom: 137px;
+}
+
+.summit-ribbon-outer{
+	background: #ffcc32;
+}
+
+.mng-tbl-name{
+	width:17%;
+}
+
+.mng-tbl-email{
+	width:22%;
+}
+
+.mng-tbl-email-div{
+	width:260px;
+	overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.mng-tbl-soc-conn{
+	width: 26%;
+    padding-right: 14px;
+}
+
+.mng-tbl-ticks{
+	width:5%;
+}
+
+.mgn-tbl-conn-icn{
+	width:10%;
+	height: 39px;
+	float: left;
+}
+
+.mng-fb-disc{
+	background: url(../socialConnectionIcons/fb_disc.png) no-repeat center;	
+}
+
+.mng-gp-disc{
+	background: url(../socialConnectionIcons/gplus_disc.png) no-repeat center;	
+}
+
+.mng-lt-disc{
+	background: url(../socialConnectionIcons/ltree_disc.png) no-repeat center;	
+}
+
+.mng-lin-disc{
+	background: url(../socialConnectionIcons/linkedin_disc.png) no-repeat center;	
+}
+
+.mng-rt-disc{
+	background: url(../socialConnectionIcons/realtor_disc.png) no-repeat center;	
+}
+
+.mng-zi-disc{
+	background: url(../socialConnectionIcons/zillow_disc.png) no-repeat center;	
+}
+
+.mng-yp-disc{
+	background: url(../socialConnectionIcons/yelp_disc.png) no-repeat center;	
+}
+
+.mng-tw-disc{
+	background: url(../socialConnectionIcons/twitter_disc.png) no-repeat center;	
+}
+
+.mng-fbp-disc{
+	background: url(../socialConnectionIcons/fbpixel_disc.png) no-repeat center;	
+}
+
+.mng-insta-disc{
+	background: url(../socialConnectionIcons/insta_disc.png) no-repeat center;	
+}
+
+.mng-fb-conn{
+	background: url(../socialConnectionIcons/fb_conn.png) no-repeat center;	
+}
+
+.mng-gp-conn{
+	background: url(../socialConnectionIcons/gplus_conn.png) no-repeat center;	
+}
+
+.mng-lt-conn{
+	background: url(../socialConnectionIcons/ltree_conn.png) no-repeat center;	
+}
+
+.mng-lin-conn{
+	background: url(../socialConnectionIcons/linkedin_conn.png) no-repeat center;	
+}
+
+.mng-rt-conn{
+	background: url(../socialConnectionIcons/realtor_conn.png) no-repeat center;	
+}
+
+.mng-zi-conn{
+	background: url(../socialConnectionIcons/zillow_conn.png) no-repeat center;	
+}
+
+.mng-yp-conn{
+	background: url(../socialConnectionIcons/yelp_conn.png) no-repeat center;	
+}
+
+.mng-tw-conn{
+	background: url(../socialConnectionIcons/twitter_conn.png) no-repeat center;	
+}
+
+.mng-fbp-conn{
+	background: url(../socialConnectionIcons/fbpixel_conn.png) no-repeat center;	
+}
+
+.mng-insta-conn{
+	background: url(../socialConnectionIcons/insta_conn.png) no-repeat center;	
+}
+
+.mng-fb-gray{
+	background: url(../socialConnectionIcons/fb_gray.png) no-repeat center;	
+}
+
+.mng-gp-gray{
+	background: url(../socialConnectionIcons/gplus_gray.png) no-repeat center;	
+}
+
+.mng-lt-gray{
+	background: url(../socialConnectionIcons/ltree_gray.png) no-repeat center;	
+}
+
+.mng-lin-gray{
+	background: url(../socialConnectionIcons/linkedin_gray.png) no-repeat center;	
+}
+
+.mng-rt-gray{
+	background: url(../socialConnectionIcons/realtor_gray.png) no-repeat center;	
+}
+
+.mng-zi-gray{
+	background: url(../socialConnectionIcons/zillow_gray.png) no-repeat center;	
+}
+
+.mng-yp-gray{
+	background: url(../socialConnectionIcons/yelp_gray.png) no-repeat center;	
+}
+
+.mng-tw-gray{
+	background: url(../socialConnectionIcons/twitter_gray.png) no-repeat center;	
+}
+
+.mng-fbp-gray{
+	background: url(../socialConnectionIcons/fbpixel_gray.png) no-repeat center;	
+}
+
+.mng-insta-gray{
+	background: url(../socialConnectionIcons/insta_gray.png) no-repeat center;	
+}
+
+.mng-tbl-pad-zero{
+	padding: 0;
+}
+
+.mng-tbl-btns{
+	width: 20%;
 }

@@ -2046,8 +2046,11 @@
 	}
 	
 	.generate-report-date-range{
-		display: inline-grid;
 		margin-left: 0;
+	}
+	
+	.display-inline-grid {
+		display: inline-grid;
 	}
 	
 	.report-date{
@@ -2113,6 +2116,46 @@
 	
 	.my-rank{
 		margin-right:0;
+	}
+	
+	
+	/*summit popup resp styles*/
+	
+	.summit-popup{
+	    width: 100%;
+    	height: 230px;
+    	top: 50px;
+    	background-image: url(../images/summit_popup_sm.gif);
+	}
+	
+	.close-summit-popup{
+	    width: 20px;
+   		height: 20px;
+    	top: 9px;
+    	right: 4px;
+	}
+	
+	.register-summit-btn{
+	 	right: 72px;
+    	bottom: 44px;
+    	width: 60px;
+    	height: 21px;
+	}
+	
+	.summit-ribbon-con{
+		padding:0;
+	}
+	
+	.summit-ribbon{
+		margin: 0;
+		background-image: url(../images/summit_ribbon_sm.jpg);
+	}
+	
+	.close-summit-ribbon{
+		width: 18px;
+ 	    height: 18px;
+    	right: 0;
+    	top: 9px;
 	}
 }
 
@@ -2711,8 +2754,11 @@
 	}
 	
 	.generate-report-date-range{
-		display: inline-grid !important;
 		margin-left: 0;
+	}
+	
+	.display-inline-grid-imp {
+		display: inline-grid !important;
 	}
 	
 	.report-date{

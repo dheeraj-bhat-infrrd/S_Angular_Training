@@ -53,6 +53,7 @@ public interface CommonConstants
     public static final int PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID = 3;
     public static final int PROFILES_MASTER_AGENT_PROFILE_ID = 4;
     public static final int PROFILES_MASTER_SS_ADMIN_PROFILE_ID = 5;
+    public static final int PROFILES_MASTER_SM_ADMIN_PROFILE_ID = 6;
     public static final int PROFILES_MASTER_NO_PROFILE_ID = 10;
 
     /**
@@ -1016,6 +1017,10 @@ public interface CommonConstants
     
     //Generating survey invitation email report through storm
     public static final int FILE_UPLOAD_SURVEY_INVITATION_EMAIL_REPORT = 1001;
+    
+    //Social Monitor reports
+    public static final int FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT = 301;
+    public static final int FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD= 302;
 
     public static final int NPS_REPORT_TYPE_WEEK = 1;
     public static final int NPS_REPORT_TYPE_MONTH = 2;
@@ -1427,6 +1432,9 @@ public interface CommonConstants
     public static final String REPORTING_BRANCH_RANKING_YEARLY_REPORT = "Branch Ranking Report For Year";
     
     public static final String REPORTING_DIGEST = "Monthly Digest";
+    
+    public static final String SOCIAL_MONITOR_DATE_REPORT = "Social Monitor Date based Report";
+    public static final String SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD = "Social Monitor Date Report for keyword";
 
     public static final String SURVEY_DETAILS_ID_COLUMN = "surveyDetailsId";
     public static final String SURVEY_RESULTS_REPORT_MODIFIED_ON = "reportModifiedOn";

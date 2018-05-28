@@ -1,18 +1,6 @@
 package com.realtech.socialsurvey.compute.topology.bolts.monitor;
 
 
-import java.util.List;
-import java.util.Map;
-
-import org.apache.storm.task.OutputCollector;
-import org.apache.storm.task.TopologyContext;
-import org.apache.storm.topology.OutputFieldsDeclarer;
-import org.apache.storm.tuple.Fields;
-import org.apache.storm.tuple.Tuple;
-import org.apache.storm.tuple.Values;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.compute.common.ComputeConstants;
 import com.realtech.socialsurvey.compute.dao.RedisSocialMediaStateDao;
@@ -28,8 +16,18 @@ import com.realtech.socialsurvey.compute.feeds.impl.TwitterFeedProcessorImpl;
 import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBolt;
 import com.realtech.socialsurvey.compute.utils.ChararcterUtils;
 import com.realtech.socialsurvey.compute.utils.UrlHelper;
-
+import org.apache.storm.task.OutputCollector;
+import org.apache.storm.task.TopologyContext;
+import org.apache.storm.topology.OutputFieldsDeclarer;
+import org.apache.storm.tuple.Fields;
+import org.apache.storm.tuple.Tuple;
+import org.apache.storm.tuple.Values;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import redis.clients.jedis.exceptions.JedisConnectionException;
+
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -75,7 +73,7 @@ public class TwitterFeedExtractorBolt extends BaseComputeBolt
                     for (TwitterFeedData twitterFeedData : response) {
                         SocialResponseObject<TwitterFeedData> responseWrapper = createSocialResponseObject(mediaToken,
                                 twitterFeedData);
-                        responseWrapper.setPageLink( mediaToken.getSocialMediaTokens().getTwitterToken().getTwitterPageLink() );
+                        
                         String responseWrapperString = new Gson().toJson(responseWrapper);
                         _collector.emit(new Values(companyId.toString(), responseWrapperString, lastFetchedKey));
                         LOG.trace("Emitted successfully {}", responseWrapper);
@@ -123,6 +121,9 @@ public class TwitterFeedExtractorBolt extends BaseComputeBolt
     {
         SocialResponseObject<TwitterFeedData> responseWrapper = new SocialResponseObject<>( mediaToken.getCompanyId(),
             SocialFeedType.TWITTER, twitterFeedData.getText(), twitterFeedData, 1 );
+        
+        responseWrapper.setPageLink( mediaToken.getSocialMediaTokens().getTwitterToken().getTwitterPageLink() );
+        responseWrapper.setPostLink( mediaToken.getSocialMediaTokens().getTwitterToken().getTwitterPageLink() +"/status/"+ twitterFeedData.getId());
 
         if ( mediaToken.getProfileType() != null ) {
             responseWrapper.setProfileType( mediaToken.getProfileType() );

@@ -64,11 +64,15 @@ public class ActionHistory implements Serializable
     {
         this.createdDate = createdDate;
     }
-    
+
+
     @Override
     public String toString()
     {
         return "ActionHistory [createdDate=" + createdDate + ", ownerName=" + ownerName + ", text=" + text + ", actionType="
             + actionType + "]";
     }
+
+
+
 }

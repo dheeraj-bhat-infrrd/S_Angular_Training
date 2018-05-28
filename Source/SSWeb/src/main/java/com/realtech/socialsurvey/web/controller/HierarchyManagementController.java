@@ -445,6 +445,7 @@ public class HierarchyManagementController
     {
         LOG.info( "Method to add a region called in controller" );
         HttpSession session = request.getSession( false );
+        Long adminId = (Long)session.getAttribute( CommonConstants.REALTECH_USER_ID );
 
         try {
             String regionName = request.getParameter( "regionName" );
@@ -510,7 +511,7 @@ public class HierarchyManagementController
             try {
                 Map<String, Object> map = organizationManagementService.addNewRegionWithUser( loggedInUser, regionName.trim(),
                     CommonConstants.NO, regionAddress1, regionAddress2, regionCountry, regionCountryCode, regionState,
-                    regionCity, regionZipcode, selectedUserId, assigneeEmailIds, isAdmin, false );
+                    regionCity, regionZipcode, selectedUserId, assigneeEmailIds, isAdmin, false, ( adminId != null && adminId > 0 ) ? true : false );
                 Region region = (Region) map.get( CommonConstants.REGION_OBJECT );
                 List<User> invalidUserList = (List<User>) map.get( CommonConstants.INVALID_USERS_LIST );
                 addOrUpdateRegionInSession( region, session );
@@ -619,6 +620,7 @@ public class HierarchyManagementController
     {
         LOG.info( "Method to add a branch called in controller" );
         HttpSession session = request.getSession( false );
+        Long adminId = (Long)session.getAttribute( CommonConstants.REALTECH_USER_ID );
 
         try {
             String branchName = request.getParameter( "officeName" );
@@ -699,7 +701,7 @@ public class HierarchyManagementController
                 LOG.debug( "Calling service to add a new branch" );
                 Map<String, Object> map = organizationManagementService.addNewBranchWithUser( user, branchName.trim(), regionId,
                     CommonConstants.NO, branchAddress1, branchAddress2, branchCountry, branchCountryCode, branchState,
-                    branchCity, branchZipcode, selectedUserId, assigneeEmailIds, isAdmin, false );
+                    branchCity, branchZipcode, selectedUserId, assigneeEmailIds, isAdmin, false, ( adminId != null && adminId > 0 ) ? true : false );
                 Branch branch = (Branch) map.get( CommonConstants.BRANCH_OBJECT );
                 List<User> invalidUserList = (List<User>) map.get( CommonConstants.INVALID_USERS_LIST );
                 LOG.debug( "Successfully executed service to add a new branch" );
@@ -786,6 +788,7 @@ public class HierarchyManagementController
         LOG.info( "Method to add an individual called in controller" );
         HttpSession session = request.getSession( false );
         User user = sessionHelper.getCurrentUser();
+        Long adminId = (Long)session.getAttribute( CommonConstants.REALTECH_USER_ID );
 
         try {
             String strRegionId = request.getParameter( "regionId" );
@@ -793,6 +796,7 @@ public class HierarchyManagementController
             String selectedUserIdStr = request.getParameter( "selectedUserId" );
             String isAdminStr = request.getParameter( "isAdmin" );
             String userSelectionType = request.getParameter( "userSelectionType" );
+            String isSocialMonitorAdminStr = request.getParameter( "isSocialMonitorAdmin" );
 
             String selectedUserEmail = "";
             if ( userSelectionType != null ) {
@@ -820,9 +824,14 @@ public class HierarchyManagementController
             if ( isAdminStr != null && !isAdminStr.isEmpty() ) {
                 isAdmin = Boolean.parseBoolean( isAdminStr );
             }
+            
+            boolean isSocialMonitorAdmin = false;
+            if ( isSocialMonitorAdminStr != null && !isSocialMonitorAdminStr.isEmpty() ) {
+                isSocialMonitorAdmin = Boolean.parseBoolean( isSocialMonitorAdminStr );
+            }
 
             try {
-                validateAndParseIndividualDetails( user, selectedUserId, selectedUserEmail );
+                validateAndParseIndividualDetails( user, selectedUserId, selectedUserEmail, ( adminId != null && adminId > 0 ) ? true : false );
             } catch ( InvalidInputException e ) {
                 LOG.error( "InvalidInputException while parsing email ids", DisplayMessageConstants.GENERAL_ERROR, e );
             }
@@ -868,7 +877,8 @@ public class HierarchyManagementController
             try {
                 LOG.debug( "Calling service to add/assign invidual(s)" );
                 Map<String, Object> map = organizationManagementService.addIndividual( user, selectedUserId, branchId, regionId,
-                    assigneeEmailIds, isAdmin, false, true );
+                    assigneeEmailIds, isAdmin, false, true, ( adminId != null && adminId > 0 ) ? true : false, isSocialMonitorAdmin );
+
                 List<User> invalidUserList = (List<User>) map.get( CommonConstants.INVALID_USERS_LIST );
                 LOG.debug( "Successfully executed service to add a new branch" );
                 String invalidMessage = "These email address ";
@@ -1051,11 +1061,13 @@ public class HierarchyManagementController
 
             User user = sessionHelper.getCurrentUser();
             HttpSession session = request.getSession( false );
+            Long adminId = (Long)session.getAttribute( CommonConstants.REALTECH_USER_ID );
+
             try {
                 LOG.debug( "Calling service to update branch with Id : " + branchId );
                 Map<String, Object> map = organizationManagementService.updateBranch( user, branchId, regionId, branchName,
                     branchAddress1, branchAddress2, branchCountry, branchCountryCode, branchState, branchCity, branchZipcode,
-                    selectedUserId, assigneeEmailIds, isAdmin, false );
+                    selectedUserId, assigneeEmailIds, isAdmin, false, ( adminId != null && adminId > 0 ) ? true : false );
                 Branch branch = (Branch) map.get( CommonConstants.BRANCH_OBJECT );
                 List<User> invalidUserList = (List<User>) map.get( CommonConstants.INVALID_USERS_LIST );
                 addOrUpdateBranchInSession( branch, session );
@@ -1177,11 +1189,13 @@ public class HierarchyManagementController
 
             User user = sessionHelper.getCurrentUser();
             HttpSession session = request.getSession( false );
+            Long adminId = (Long)session.getAttribute( CommonConstants.REALTECH_USER_ID );
+
             try {
                 LOG.debug( "Calling service to update region with Id : " + regionId );
                 Map<String, Object> map = organizationManagementService.updateRegion( user, regionId, regionName,
                     regionAddress1, regionAddress2, regionCountry, regionCountryCode, regionState, regionCity, regionZipcode,
-                    selectedUserId, assigneeEmailIds, isAdmin, false );
+                    selectedUserId, assigneeEmailIds, isAdmin, false, ( adminId != null && adminId > 0 ) ? true : false );
                 Region region = (Region) map.get( CommonConstants.REGION_OBJECT );
                 List<User> invalidUserList = (List<User>) map.get( CommonConstants.INVALID_USERS_LIST );
                 addOrUpdateRegionInSession( region, session );
@@ -2057,10 +2071,11 @@ public class HierarchyManagementController
      * @param admin
      * @param selectedUserId
      * @param selectedUserEmail
+     * @param isAddedByRealtechOrSSAdmin
      * @return
      * @throws InvalidInputException
      */
-    private String[] validateAndParseIndividualDetails( User admin, long selectedUserId, String selectedUserEmail )
+    private String[] validateAndParseIndividualDetails( User admin, long selectedUserId, String selectedUserEmail, boolean isAddedByRealtechOrSSAdmin )
         throws InvalidInputException
     {
         LOG.info( "Method validateAndParseIndividualDetails called for selectedUserIdStr:" + selectedUserId
@@ -2130,7 +2145,7 @@ public class HierarchyManagementController
                                     : userEntity.getEmailId().substring( 0, userEntity.getEmailId().indexOf( "@" ) );
                                 String lastName = ( userEntity.getLastName() != null ) ? userEntity.getLastName() : null;
                                 userManagementService.inviteUserToRegister( admin, firstName, lastName, userEntity.getEmailId(),
-                                    false, true, false );
+                                    false, true, false, isAddedByRealtechOrSSAdmin );
 
                                 userEntity = new UserFromSearch();
                             } catch ( UserAlreadyExistsException | UndeliveredEmailException | NoRecordsFetchedException e ) {

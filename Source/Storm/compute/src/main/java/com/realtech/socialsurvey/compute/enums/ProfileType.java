@@ -6,17 +6,18 @@ package com.realtech.socialsurvey.compute.enums;
  */
 public enum ProfileType
 {
-    COMPANY( 0 ), REGION( 1 ), BRANCH( 2 ), AGENT( 3 );
+    COMPANY( "COMPANY_SETTINGS" ), REGION( "REGION_SETTINGS" ), BRANCH( "BRANCH_SETTINGS" ), AGENT( "AGENT_SETTINGS" );
 
-    private int value;
+    private String value;
 
-    ProfileType( int value )
+
+    ProfileType( String value )
     {
         this.value = value;
     }
 
 
-    public int getValue()
+    public String getValue()
     {
         return value;
     }

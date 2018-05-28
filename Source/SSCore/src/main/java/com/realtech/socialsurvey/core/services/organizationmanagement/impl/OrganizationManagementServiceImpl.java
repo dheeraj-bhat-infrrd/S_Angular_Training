@@ -383,6 +383,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     
     @Autowired
     private SocialMediaExceptionHandler socialMediaExceptionHandler;
+    
+    @Autowired
+    private GenericDao<ProfilesMaster, Integer> profilesMasterDao;
 
 
     /**
@@ -514,7 +517,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             UserProfile userProfileAgent = userManagementService.createUserProfile( user, user.getCompany(), user.getEmailId(),
                 user.getUserId(), branch.getBranchId(), region.getRegionId(), profilesMaster.getProfileId(),
                 CommonConstants.IS_PRIMARY_TRUE, CommonConstants.PROFILE_STAGES_COMPLETE, CommonConstants.STATUS_ACTIVE,
-                String.valueOf( user.getUserId() ), String.valueOf( user.getUserId() ) );
+                String.valueOf( user.getUserId() ), String.valueOf( user.getUserId() ) );   
             userProfileDao.save( userProfileAgent );
 
         }
@@ -1991,7 +1994,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     /**
      * Method to upgrade a default region to a region
      * 
-     * @param company
+     * @param region
      * @return
      * @throws InvalidInputException
      */
@@ -2406,7 +2409,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     /**
      * Method to fetch all regions of a company based on company id
      *
-     * @param companyProfileName
+     * @param companyId
      * @return
      * @throws InvalidInputException
      */
@@ -2481,7 +2484,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     /**
      * Method to fetch all regions of a company based on company id
      *
-     * @param companyProfileName
+     * @param searchKey
      * @return
      * @throws SolrException 
      * @throws InvalidInputException
@@ -2864,7 +2867,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Transactional
     public Map<String, Object> addNewRegionWithUser( User user, String regionName, int isDefaultBySystem, String address1,
         String address2, String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
-        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail )
+        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail, boolean isAddedByRealtechOrSSAdmin )
         throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
     {
         LOG.debug( "Method addNewRegionWithUser called for user:" + user + " regionName:" + regionName + " isDefaultBySystem:"
@@ -2899,7 +2902,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         } else if ( emailIdsArray != null && emailIdsArray.length > 0 ) {
             LOG.debug( "Fetching users list to assign to the region" );
-            userMap = getUsersFromEmailIdsAndInvite( emailIdsArray, user, holdSendingMail, true );
+            userMap = getUsersFromEmailIdsAndInvite( emailIdsArray, user, holdSendingMail, true, isAddedByRealtechOrSSAdmin );
             List<User> assigneeUsers = userMap.get( CommonConstants.VALID_USERS_LIST );
 
             if ( assigneeUsers != null && !assigneeUsers.isEmpty() ) {
@@ -2937,7 +2940,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      */
     @Override
     public Map<String, List<User>> getUsersFromEmailIdsAndInvite( String[] emailIdsArray, User adminUser,
-        boolean holdSendingMail, boolean sendMail ) throws InvalidInputException
+        boolean holdSendingMail, boolean sendMail, boolean isAddedByRealtechOrSSAdmin ) throws InvalidInputException
     {
         LOG.debug( "Method getUsersFromEmailIds called for emailIdsArray:" + emailIdsArray );
         List<User> users = new ArrayList<User>();
@@ -3060,7 +3063,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                      */
                     try {
                         user = userManagementService.inviteUserToRegister( adminUser, firstName, lastName, emailId,
-                            holdSendingMail, sendMail, false );
+                            holdSendingMail, sendMail, false, isAddedByRealtechOrSSAdmin );
                     } catch ( UserAlreadyExistsException | UndeliveredEmailException | NoRecordsFetchedException e1 ) {
                         LOG.debug( "Exception in getUsersFromEmailIds while inviting a new user. Reason:" + e1.getMessage(),
                             e1 );
@@ -3337,7 +3340,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Transactional
     public Map<String, Object> addNewBranchWithUser( User user, String branchName, long regionId, int isDefaultBySystem,
         String address1, String address2, String country, String countryCode, String state, String city, String zipcode,
-        long selectedUserId, String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail )
+        long selectedUserId, String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail, boolean isAddedByRealtechOrSSAdmin )
         throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
     {
         Map<String, Object> map = new HashMap<String, Object>();
@@ -3368,7 +3371,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         } else if ( emailIdsArray != null && emailIdsArray.length > 0 ) {
             LOG.debug( "Fetching users list to assign to the branch" );
-            userMap = getUsersFromEmailIdsAndInvite( emailIdsArray, user, holdSendingMail, true );
+            userMap = getUsersFromEmailIdsAndInvite( emailIdsArray, user, holdSendingMail, true, isAddedByRealtechOrSSAdmin );
             List<User> assigneeUsers = userMap.get( CommonConstants.VALID_USERS_LIST );
 
             if ( assigneeUsers != null && !assigneeUsers.isEmpty() ) {
@@ -3507,7 +3510,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Override
     @Transactional
     public Map<String, Object> addIndividual( User adminUser, long selectedUserId, long branchId, long regionId,
-        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail, boolean sendMail )
+        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail, boolean sendMail, boolean isAddedByRealtechOrSSAdmin, boolean isSocialMonitorAdmin )
         throws InvalidInputException, NoRecordsFetchedException, SolrException, UserAssignmentException
     {
         LOG.debug( "Method addIndividual called for adminUser:" + adminUser + " branchId:" + branchId + " regionId:" + regionId
@@ -3525,11 +3528,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             assigneeUsers.add( assigneeUser );
         } else if ( emailIdsArray != null && emailIdsArray.length > 0 ) {
             LOG.debug( "Fetching users list for the email addresses provided" );
-            userMap = getUsersFromEmailIdsAndInvite( emailIdsArray, adminUser, holdSendingMail, sendMail );
+            userMap = getUsersFromEmailIdsAndInvite( emailIdsArray, adminUser, holdSendingMail, sendMail, isAddedByRealtechOrSSAdmin );
             assigneeUsers = userMap.get( CommonConstants.VALID_USERS_LIST );
         }
 
-        if ( assigneeUsers != null && !assigneeUsers.isEmpty() ) {
+        if ( (assigneeUsers != null && !assigneeUsers.isEmpty() )  && !isSocialMonitorAdmin) {
             /**
              * if branchId is provided, add the individual to specified branch
              */
@@ -3569,6 +3572,49 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                     }
                     assignRegionToUser( adminUser, region.getRegionId(), assigneeUser, isAdmin );
                 }
+            }
+
+        }
+        //update UserProfile if the user is a Social monitor admin
+        int flag = 0;
+        if ( isSocialMonitorAdmin ) {
+            for ( User assigneeUser : assigneeUsers ) {
+                if ( selectedUserId == 0l ) {
+                    LOG.debug( "assigning individual(s) to company in addIndividual" );
+                    Region region = getDefaultRegionForCompany( adminUser.getCompany() );
+                    if ( region == null ) {
+                        throw new NoRecordsFetchedException( "No default region found for company while adding individual" );
+                    }
+
+                    if ( validateUserAssignment( adminUser, assigneeUser, userMap ) ) {
+                        assignRegionToUser( adminUser, region.getRegionId(), assigneeUser, isAdmin );
+                    }
+
+                }
+
+                flag = 1;
+                List<UserProfile> userProfiles = assigneeUser.getUserProfiles();
+                if ( userProfiles != null && !userProfiles.isEmpty() ) {
+                    for ( UserProfile profile : userProfiles ) {
+                        if ( ( profile.getUser().getUserId() == ( assigneeUser.getUserId() ) )
+                            && profile.getProfilesMaster() == profilesMasterDao.findById( ProfilesMaster.class,
+                                CommonConstants.PROFILES_MASTER_SM_ADMIN_PROFILE_ID )
+                            && profile.getStatus() == CommonConstants.STATUS_ACTIVE ) {
+                            flag = 2;
+                            break;
+                        }
+                    }
+                }
+                if ( flag == 1 ) {
+                    UserProfile userProfile = userManagementService.createUserProfile( assigneeUser, adminUser.getCompany(),
+                        assigneeUser.getEmailId(), assigneeUser.getUserId(), CommonConstants.DEFAULT_BRANCH_ID,
+                        CommonConstants.DEFAULT_REGION_ID, CommonConstants.PROFILES_MASTER_SM_ADMIN_PROFILE_ID,
+                        CommonConstants.IS_PRIMARY_FALSE, CommonConstants.PROFILE_STAGES_COMPLETE,
+                        CommonConstants.STATUS_ACTIVE, String.valueOf( adminUser.getUserId() ),
+                        String.valueOf( adminUser.getUserId() ) );
+                    userProfileDao.save( userProfile );
+                }
+
             }
 
         }
@@ -3861,7 +3907,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     /**
      * Method to fetch UserProfiles associated with a branch
      * 
-     * @param company
      * @param branchId
      * @return
      * @throws InvalidInputException
@@ -4897,6 +4942,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
          */
         Type searchedUsersList = new TypeToken<List<UserFromSearch>>() {}.getType();
         users = new Gson().fromJson( usersJson, searchedUsersList );
+
+        LOG.debug( "Method getUsersUnderRegionFromSolr executed successfully" );
         return users;
     }
 
@@ -4905,7 +4952,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * Method to get all users under the company from solr
      * 
      * @param company
-     * @param start
      * @return
      * @throws InvalidInputException
      * @throws NoRecordsFetchedException
@@ -4970,7 +5016,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Transactional
     public Map<String, Object> updateRegion( User user, long regionId, String regionName, String address1, String address2,
         String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
-        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail )
+        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail, boolean isAddedByRealtechOrSSAdmin )
         throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
     {
         Map<String, Object> map = new HashMap<String, Object>();
@@ -5030,7 +5076,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         } else if ( emailIdsArray != null && emailIdsArray.length > 0 ) {
             LOG.debug( "Fetching users list to assign to the region" );
-            userMap = getUsersFromEmailIdsAndInvite( emailIdsArray, user, holdSendingMail, true );
+            userMap = getUsersFromEmailIdsAndInvite( emailIdsArray, user, holdSendingMail, true, isAddedByRealtechOrSSAdmin );
             List<User> assigneeUsers = userMap.get( CommonConstants.VALID_USERS_LIST );
 
             if ( assigneeUsers != null && !assigneeUsers.isEmpty() ) {
@@ -5122,7 +5168,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Transactional
     public Map<String, Object> updateBranch( User user, long branchId, long regionId, String branchName, String address1,
         String address2, String country, String countryCode, String state, String city, String zipcode, long selectedUserId,
-        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail )
+        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail, boolean isAddedByRealtechOrSSAdmin )
         throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException
     {
         Map<String, Object> map = new HashMap<String, Object>();
@@ -5227,7 +5273,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         } else if ( emailIdsArray != null && emailIdsArray.length > 0 ) {
             LOG.debug( "Fetching users list to assign to the branch" );
-            userMap = getUsersFromEmailIdsAndInvite( emailIdsArray, user, holdSendingMail, true );
+            userMap = getUsersFromEmailIdsAndInvite( emailIdsArray, user, holdSendingMail, true, isAddedByRealtechOrSSAdmin );
             List<User> assigneeUsers = userMap.get( CommonConstants.VALID_USERS_LIST );
 
             if ( assigneeUsers != null && !assigneeUsers.isEmpty() ) {
@@ -5525,7 +5571,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 for ( User user : company.getUsers() ) {
                     if ( CommonConstants.STATUS_INACTIVE != user.getStatus() ) {
                         userManagementService.deleteUserDataFromAllSources( loggedInUser, user.getUserId(),
-                            CommonConstants.STATUS_COMPANY_DELETED, false );
+                            CommonConstants.STATUS_COMPANY_DELETED, false, true );
 
                     }
                 }
@@ -6498,7 +6544,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
      * Method to update image for organization unit setting
      * 
      * @param iden
-     * @param fileName
+     * @param imgFileName
      * @param collectionName
      * @param imageType
      * @param flagValue
@@ -7075,7 +7121,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     /**
      * Method to get update map for updating regionId for user in solr on moving branch from one region to another
      * @param userList
-     * @param regionId
+     * @param newRegionId
      * @return 
      * @throws InvalidInputException
      */
@@ -7754,7 +7800,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             } else {
                 LOG.debug( "Contact number is not set" );
             }
-            // skipping location
+            // skipping location  check for work too
             if ( regionSetting.getContact_details().getWeb_addresses() != null ) {
                 LOG.debug( "Web address is set" );
                 setterValue +=  SettingsForApplication.WEB_ADDRESS_WORK.getOrder()  * 2;
@@ -7841,7 +7887,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             for ( Branch branch : branches ) {
                 try {
                     OrganizationUnitSettings branchSetting = getBranchSettingsDefault( branch.getBranchId() );
-                    processBranch( branchSetting, branch );
+                    processBranch( branchSetting, branch);
                 } catch ( NoRecordsFetchedException e ) {
                     LOG.error( "Could not get branches setting for " + branch.getBranch(), e );
                 }
@@ -7851,6 +7897,112 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
     }
 
+    private void processOnlyRegion( OrganizationUnitSettings regionSetting, Region region )
+    {
+        LOG.debug( "Processing region " + region.getRegion() );
+        long setterValue = 0l;
+        LOG.debug( "Getting details of region: " + region.getRegion() );
+        if ( regionSetting.getLogo() != null ) {
+            LOG.debug( "Logo is set" );
+            setterValue += SettingsForApplication.LOGO.getOrder() * 2;
+        } else {
+            LOG.debug( "Logo is not set" );
+        }
+        if ( regionSetting.getContact_details() != null ) {
+            if ( regionSetting.getContact_details().getAddress() != null ) {
+                LOG.debug( "Address is set" );
+                setterValue += SettingsForApplication.ADDRESS.getOrder() * 2;
+            } else {
+                LOG.debug( "Address is not set" );
+            }
+            if ( regionSetting.getContact_details().getContact_numbers() != null ) {
+                LOG.debug( "Contact number is set" );
+                setterValue += SettingsForApplication.PHONE.getOrder() * 2;
+            } else {
+                LOG.debug( "Contact number is not set" );
+            }
+            // skipping location
+            if ( regionSetting.getContact_details().getWeb_addresses() != null && regionSetting.getContact_details().getWeb_addresses().getWork() != null ) {
+                LOG.debug( "Web address is set" );
+                setterValue += SettingsForApplication.WEB_ADDRESS_WORK.getOrder() * 2;
+            } else {
+                LOG.debug( "Web address is not set" );
+            }
+            if ( regionSetting.getContact_details().getAbout_me() != null ) {
+                LOG.debug( "About me is set" );
+                setterValue += SettingsForApplication.ABOUT_ME.getOrder() * 2;
+            } else {
+                LOG.debug( "About me is not set" );
+            }
+            if ( regionSetting.getContact_details().getMail_ids() != null
+                && regionSetting.getContact_details().getMail_ids().getWork() != null ) {
+                LOG.debug( "Work email id is set" );
+                setterValue += SettingsForApplication.EMAIL_ID_WORK.getOrder() * 2;
+            } else {
+                LOG.debug( "Work email id is not set" );
+            }
+        }
+        if ( regionSetting.getSocialMediaTokens() != null ) {
+            if ( regionSetting.getSocialMediaTokens().getFacebookToken() != null ) {
+                LOG.debug( "Facebook is set" );
+                setterValue += SettingsForApplication.FACEBOOK.getOrder() * 2;
+            } else {
+                LOG.debug( "Facebook is not set" );
+            }
+            if ( regionSetting.getSocialMediaTokens().getTwitterToken() != null ) {
+                LOG.debug( "Twitter is set" );
+                setterValue += SettingsForApplication.TWITTER.getOrder() * 2;
+            } else {
+                LOG.debug( "Twitter is not set" );
+            }
+            if ( regionSetting.getSocialMediaTokens().getLinkedInToken() != null ) {
+                LOG.debug( "Linkedin is set" );
+                setterValue += SettingsForApplication.LINKED_IN.getOrder() * 2;
+            } else {
+                LOG.debug( "Linkedin is not set" );
+            }
+            if ( regionSetting.getSocialMediaTokens().getGoogleToken() != null ) {
+                LOG.debug( "Google+ is set" );
+                setterValue += SettingsForApplication.GOOGLE_PLUS.getOrder() * 2;
+            } else {
+                LOG.debug( "Google+ is not set" );
+            }
+            if ( regionSetting.getSocialMediaTokens().getYelpToken() != null ) {
+                LOG.debug( "Yelp is set" );
+                setterValue += SettingsForApplication.YELP.getOrder() * 2;
+            } else {
+                LOG.debug( "Yelp is not set" );
+            }
+            if ( regionSetting.getSocialMediaTokens().getZillowToken() != null ) {
+                LOG.debug( "Zillow is set" );
+                setterValue += SettingsForApplication.ZILLOW.getOrder() * 2;
+            } else {
+                LOG.debug( "Zillow is not set" );
+            }
+            if ( regionSetting.getSocialMediaTokens().getRealtorToken() != null ) {
+                LOG.debug( "Realtor is set" );
+                setterValue += SettingsForApplication.REALTOR.getOrder() * 2;
+            } else {
+                LOG.debug( "Realtor is not set" );
+            }
+            if ( regionSetting.getSocialMediaTokens().getLendingTreeToken() != null ) {
+                LOG.debug( "Lending tree is set" );
+                setterValue += SettingsForApplication.LENDING_TREE.getOrder() * 2;
+            } else {
+                LOG.debug( "Lending tree is not set" );
+            }
+            if ( regionSetting.getSocialMediaTokens().getGoogleBusinessToken() != null ) {
+                LOG.debug( "Google business is set" );
+                setterValue += SettingsForApplication.GOOGLE_BUSINESS.getOrder() * 2;
+            } else {
+                LOG.debug( "Google business is not set" );
+            }
+        }
+        LOG.debug( "Final Settings setter value : " + setterValue );
+        region.setSettingsSetStatus( String.valueOf( setterValue ) );
+        // update the values to company
+        updateRegion( region );
+    }
 
     private void processBranch( OrganizationUnitSettings branchSetting, Branch branch )
     {
@@ -7877,7 +8029,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 LOG.debug( "Contact number is not set" );
             }
             // skipping location
-            if ( branchSetting.getContact_details().getWeb_addresses() != null ) {
+            if ( branchSetting.getContact_details().getWeb_addresses() != null && branchSetting.getContact_details().getWeb_addresses().getWork() != null) {
                 LOG.debug( "Web address is set" );
                 setterValue +=  SettingsForApplication.WEB_ADDRESS_WORK.getOrder()  * 4;
             } else {
@@ -7990,7 +8142,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 LOG.debug( "Contact number is not set" );
             }
             // skipping location
-            if ( companySetting.getContact_details().getWeb_addresses() != null ) {
+            if ( companySetting.getContact_details().getWeb_addresses() != null && companySetting.getContact_details().getWeb_addresses().getWork() != null) {
                 LOG.debug( "Web address is set" );
                 setterValue += SettingsForApplication.WEB_ADDRESS_WORK.getOrder() * 1;
             } else {
@@ -9305,7 +9457,62 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
 
     }
+    
+    @Override
+    public void unsetWebAddressInProfile( long entityId ,String entityType) throws NonFatalException
+    {
 
+        LOG.info( "Unset web address mail" );
+        OrganizationUnitSettings unitSettings = null;
+        if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+            unitSettings = getCompanySettings( entityId );
+            if ( unitSettings == null ) {
+                throw new InvalidInputException( "No company settings found in current session" );
+            }
+            unsetWebAddMongo(unitSettings,MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+            //once the settings are unset we have to change the SETTINGS_SET_STATUS for each hierarchy 
+            //so that getPrimaryHierarchyByEntity knows which is the closest heierarchy it should pick from 
+            processCompany( getCompanySettings( entityId ));
+
+        } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+            unitSettings = getRegionSettings( entityId );
+            if ( unitSettings == null ) {
+                throw new InvalidInputException( "No Region settings found in current session" );
+            }
+            unsetWebAddMongo(getRegionSettings( entityId ),MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
+            Region region = regionDao.findById( Region.class, entityId );
+            processOnlyRegion( getRegionSettings( entityId ), region);
+        } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+           unitSettings = getBranchSettingsDefault( entityId );
+            if ( unitSettings == null ) {
+                throw new InvalidInputException( "No Branch settings found in current session" );
+            }
+            unsetWebAddMongo(unitSettings,MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
+            Branch branch = branchDao.findById( Branch.class, entityId );
+            //get back the unit settings
+            processBranch( getBranchSettingsDefault( entityId ), branch );
+        } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+            unitSettings = userManagementService.getUserSettings( entityId );
+            if ( unitSettings == null ) {
+                throw new InvalidInputException( "No Agent settings found in current session" );
+            }
+            unsetWebAddMongo(unitSettings,MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
+        } else {
+            throw new InvalidInputException( "Invalid input exception occurred while updating web addresses.",
+                DisplayMessageConstants.GENERAL_ERROR );
+        }       
+      
+
+    }
+    
+    
+    public void unsetWebAddMongo(OrganizationUnitSettings unitSettings , String collection) throws InvalidInputException {
+        LOG.info( "Unset web address mail in mongo for collection : {}",collection );
+        if (collection != null && unitSettings.getContact_details().getWeb_addresses() != null ) {
+            unsetKey( unitSettings, MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAILS_WEB_ADD_WORK,
+                collection);
+        }
+    }
 
     @Override
     public boolean unsetKey( OrganizationUnitSettings companySettings, String keyToUpdate, String collectionName )
@@ -9723,84 +9930,144 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.debug( "Updated the record successfully" );
 
         return true;
-    } 
-    
-    
-    /**
-     *
-     * @param adminUser
-     * @param user
-     * @throws InvalidInputException
-     * @throws UndeliveredEmailException
-     * @throws NoRecordsFetchedException
-     */
-    @Override
-    public void sendUserAdditionMail( User adminUser, User user )
-        throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException
-    {
-        LOG.debug( "sending user adition mail" );
-
-        if ( adminUser == null || user == null ) {
-            LOG.warn( "user details not specified for user addition mail" );
-            throw new InvalidInputException( "user details not specified for user addition mail" );
-        }
-
-
-        if ( user.getCompany() == null ) {
-            LOG.warn( "User added, is not associated with a company" );
-            return;
-        }
-
-        OrganizationUnitSettings companySettings = getCompanySettings( user.getCompany().getCompanyId() );
-
-        if ( companySettings == null || companySettings.getUserAddDeleteNotificationRecipients() == null
-            || companySettings.getUserAddDeleteNotificationRecipients().isEmpty() ) {
-            LOG.warn( "No user addition notification mail recipient found" );
-            return;
-        }
-
-        emailServices.sendUserAdditionMail( companySettings.getUserAddDeleteNotificationRecipients(),
-            adminUser.getFirstName() + ( StringUtils.isEmpty( adminUser.getLastName() ) ? "" : " " + adminUser.getLastName() ),
-            adminUser.getEmailId(), user, getAgentSettings( user.getUserId() ) );
     }
-    
-    
+
     /**
-     * 
-     * @param adminUser
-     * @param user
-     * @throws InvalidInputException
-     * @throws UndeliveredEmailException
-     * @throws NoRecordsFetchedException
+     *Updates socialmedia token
+     * @param collection
+     * @param iden
+     * @param fieldToUpdate
+     * @param value
      */
-    @Override
-    public void sendUserDeletionMail( User adminUser, User user )
-        throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException
+    @Override public boolean updateSocialMediaToken( String collection, long iden, String fieldToUpdate, boolean value )
+        throws InvalidInputException
     {
-        LOG.debug( "sending user deletion mail" );
-
-        if ( adminUser == null || user == null ) {
-            LOG.warn( "user details not specified for user deletion mail" );
-            throw new InvalidInputException( "user details not specified for user deletion mail" );
+        if ( LOG.isDebugEnabled() ) {
+            LOG.debug( "method updateSocialMediaToken() called" );
         }
-        
-        if ( user.getCompany() == null ) {
-            LOG.warn( "User to be deleted, is not associated with a company" );
-            return;
+        if(collection == null || collection.isEmpty()) throw  new InvalidInputException( "Collection name is invalid" );
+        else if(iden <= 0) throw  new InvalidInputException( "iden is invalid" );
+        else if(fieldToUpdate == null || fieldToUpdate.isEmpty()) throw  new InvalidInputException( "FieldName is invalid" );
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden( fieldToUpdate, value, iden, collection );
+        if ( LOG.isDebugEnabled() ) {
+            LOG.debug( "method updateSocialMediaToken() completed" );
         }
-
-        OrganizationUnitSettings companySettings = getCompanySettings( user.getCompany().getCompanyId() );
-
-        if ( companySettings == null || companySettings.getUserAddDeleteNotificationRecipients() == null
-            || companySettings.getUserAddDeleteNotificationRecipients().isEmpty() ) {
-            LOG.warn( "No user deletion notification mail recipient found" );
-            return;
-        }
-
-        emailServices.sendUserDeletionMail( companySettings.getUserAddDeleteNotificationRecipients(),
-            adminUser.getFirstName() + ( StringUtils.isEmpty( adminUser.getLastName() ) ? "" : " " + adminUser.getLastName() ),
-            adminUser.getEmailId(), user, getAgentSettings( user.getUserId() ) );
+        return true;
     }
+
+
+    /**
+    * @param adminUser
+    * @param user
+    * @throws InvalidInputException
+    * @throws UndeliveredEmailException
+    * @throws NoRecordsFetchedException
+    */
+   @Override
+   public void sendUserAdditionMail( User adminUser, User user )
+       throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException
+   {
+       LOG.debug( "sending user adition mail" );
+
+       if ( adminUser == null || user == null ) {
+           LOG.warn( "user details not specified for user addition mail" );
+           throw new InvalidInputException( "user details not specified for user addition mail" );
+       }
+
+       if ( adminUser.isSuperAdmin() || userManagementService.isUserSocialSurveyAdmin( adminUser ) ) {
+           LOG.debug( "Usaer was added by a social survey addmin, aborting" );
+           return;
+       }
+
+       if ( user.getCompany() == null ) {
+           LOG.warn( "User added, is not associated with a company" );
+           return;
+       }
+
+       if ( user.isCompanyAdmin() ) {
+           LOG.debug( "company admin is the added user, aborting" );
+           return;
+       }
+
+       Set<String> recipients = new HashSet<>();
+       long companyId = user.getCompany().getCompanyId();
+       OrganizationUnitSettings companySettings = getCompanySettings( companyId );
+
+       if ( companySettings != null && companySettings.getUserAddDeleteNotificationRecipients() != null ) {
+           recipients.addAll( companySettings.getUserAddDeleteNotificationRecipients() );
+       }
+
+       if ( user.getCompany() != null ) {
+           recipients.add( userManagementService.getCompanyAdmin( companyId ).getEmailId() );
+       }
+
+       if ( recipients.isEmpty() ) {
+           LOG.debug( "No user addition notification mail recipient found" );
+           return;
+       }
+
+
+       emailServices.sendUserAdditionMail( recipients,
+           adminUser.getFirstName() + ( StringUtils.isEmpty( adminUser.getLastName() ) ? "" : " " + adminUser.getLastName() ),
+           adminUser.getEmailId(), user, getAgentSettings( user.getUserId() ) );
+   }
+
+
+   /**
+    * 
+    * @param adminUser
+    * @param user
+    * @throws InvalidInputException
+    * @throws UndeliveredEmailException
+    * @throws NoRecordsFetchedException
+    */
+   @Override
+   public void sendUserDeletionMail( User adminUser, User user )
+       throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException
+   {
+       LOG.debug( "sending user deletion mail" );
+
+       if ( adminUser == null || user == null ) {
+           LOG.warn( "user details not specified for user deletion mail" );
+           throw new InvalidInputException( "user details not specified for user deletion mail" );
+       }
+
+       if ( user.getCompany() == null ) {
+           LOG.warn( "User to be deleted, is not associated with a company" );
+           return;
+       }
+
+       if ( adminUser.isSuperAdmin() || userManagementService.isUserSocialSurveyAdmin( adminUser ) ) {
+           LOG.debug( "User was deleted by a social survey addmin, aborting" );
+           return;
+       }
+
+       if ( user.isCompanyAdmin() ) {
+           LOG.debug( "company admin is the deleted user, aborting" );
+           return;
+       }
+
+       Set<String> recipients = new HashSet<>();
+       long companyId = user.getCompany().getCompanyId();
+       OrganizationUnitSettings companySettings = getCompanySettings( companyId );
+
+       if ( companySettings != null && companySettings.getUserAddDeleteNotificationRecipients() != null ) {
+           recipients.addAll( companySettings.getUserAddDeleteNotificationRecipients() );
+       }
+
+       if ( user.getCompany() != null ) {
+           recipients.add( userManagementService.getCompanyAdmin( companyId ).getEmailId() );
+       }
+
+       if ( recipients.isEmpty() ) {
+           LOG.debug( "No user deletion notification mail recipient found" );
+           return;
+       }
+
+       emailServices.sendUserDeletionMail( recipients,
+           adminUser.getFirstName() + ( StringUtils.isEmpty( adminUser.getLastName() ) ? "" : " " + adminUser.getLastName() ),
+           adminUser.getEmailId(), user, getAgentSettings( user.getUserId() ) );
+   }
     
     
     /**
@@ -9922,4 +10189,90 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 		return companyTrustedSourcesToAdd;
 	}
+
+    //updating all agents of a particular company
+    @Override
+    public boolean updateEntitySettings( String entityType, long entityId, String flagToBeUpdated, String status )
+    {
+        try {
+            if ( entityType == null || entityType.isEmpty() ) {
+                throw new InvalidInputException( "Entity type is null" );
+            }
+            if ( flagToBeUpdated == null || flagToBeUpdated.isEmpty() ) {
+                throw new InvalidInputException( "settings flag to be updated is null" );
+            }
+            if ( status == null || status.isEmpty() ) {
+                throw new InvalidInputException( "value to update is null" );
+            }
+            OrganizationUnitSettings unitSettings = null;
+            
+            String collection = null;
+            if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                unitSettings = getCompanySettings( entityId );
+                collection = MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION;
+            } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+                unitSettings = getRegionSettings( entityId );
+                collection = MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION;
+            } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+                unitSettings = getBranchSettingsDefault( entityId );
+                collection = MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION;
+            } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
+                unitSettings = userManagementService.getUserSettings( entityId );
+                collection = MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION;
+            } else {
+                throw new InvalidInputException( "Invalid input exception occurred while updating web addresses.",
+                    DisplayMessageConstants.GENERAL_ERROR );
+            }
+            if ( unitSettings == null ) {
+                throw new InvalidInputException(
+                    "No settings found for entityType " + entityType + "and entityId " + entityId );
+            }
+            
+            if ( flagToBeUpdated.equals( MongoOrganizationUnitSettingDaoImpl.KEY_HIDE_PUBLIC_PAGE )
+                || flagToBeUpdated.equals( MongoOrganizationUnitSettingDaoImpl.KEY_HIDDEN_SECTION )
+                || flagToBeUpdated.equals( MongoOrganizationUnitSettingDaoImpl.KEY_SEND_EMAIL_FROM_COMPANY )
+                || flagToBeUpdated.equals( MongoOrganizationUnitSettingDaoImpl.KEY_HIDE_FROM_BREAD_CRUMB )
+                || flagToBeUpdated.equals( MongoOrganizationUnitSettingDaoImpl.KEY_INCLUDE_FOR_TRANSACTION_MONITOR )
+                || flagToBeUpdated.equals( MongoOrganizationUnitSettingDaoImpl.KEY_ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA ) ) {
+                boolean flag = Boolean.parseBoolean( status );
+                organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden( flagToBeUpdated, flag,
+                    unitSettings.getIden(), collection );
+            }
+            else if (flagToBeUpdated.equals( MongoOrganizationUnitSettingDaoImpl.KEY_SEND_EMAIL_THROUGH)) {
+                organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden( flagToBeUpdated, status,
+                    unitSettings.getIden(), collection );
+            }
+            return true;
+        } catch ( InvalidInputException e ) {
+            LOG.error( "Invalid Input Exception occurred while updating settings", e );
+        } catch ( NoRecordsFetchedException e ) {
+            LOG.error( "No redords found while updating settings", e );
+        }
+        return false;
+    }
+
+    @Override
+    public void updateAgentProfileDisable(long companyId , boolean isAgentProfileDisabled) throws InvalidInputException {
+        LOG.info( "disabling editing for agent profile page's for companyId:{}",companyId );
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden( MongoOrganizationUnitSettingDaoImpl.KEY_AGENT_PROFILE_DISABLED,
+            isAgentProfileDisabled, companyId,MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION  );
+        
+    }
+    
+    //use this function updateKeyOrganizationUnitSettingsByInCriteria
+    //updating a list of agents to not be able to edit their profile
+    @Override
+    public void updateAgentsProfileDisable(List<Long> agentIds , boolean isAgentProfileDisabled) throws InvalidInputException {
+        LOG.info( "disabling editing for agent profile page's for agentId's:{}",agentIds );
+        if ( agentIds == null ) {
+            throw new InvalidInputException( "User ids cannot be null." );
+        }
+
+        List<Object> userIdList = new ArrayList<>();
+        userIdList.addAll( agentIds );
+        organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByInCriteria( MongoOrganizationUnitSettingDaoImpl.KEY_AGENT_PROFILE_DISABLED,
+            isAgentProfileDisabled, MongoOrganizationUnitSettingDaoImpl.KEY_IDEN,userIdList,MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION  );
+    }
+
 }
+

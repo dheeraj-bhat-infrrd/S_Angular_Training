@@ -132,9 +132,6 @@ public class AccountServiceImpl implements AccountService
             //solr, mongo with status 'I'. Set the force password column to 1.
             user = userService.addUser( user.getFirstName(), user.getLastName(), user.getEmailId(), phone, company );
             ids.put( "userId", user.getUserId() );
-            
-            // send user addition mail
-            organizationManagementService.sendUserAdditionMail( user, user );
 
             // Send registration email to user, Send mail to sales lead, maybe to support
             userService.sendRegistrationEmail( user, planId );

@@ -104,8 +104,14 @@ public class LinkedInToken {
         this.lastTokenExpiryValidationTime = lastTokenExpiryValidationTime;
     }
 
-    @Override
-	public String toString() {
-		return "LinkdenInToken [linkedInId=" + linkedInId + ", linkedInPageLink=" + linkedInPageLink + "]";
+
+	@Override public String toString()
+	{
+		return "LinkedInToken{" + "linkedInId='" + linkedInId + '\'' + ", linkedInPageLink='" + linkedInPageLink + '\''
+			+ ", linkedInAccessToken='" + linkedInAccessToken + '\'' + ", linkedInAccessTokenCreatedOn="
+			+ linkedInAccessTokenCreatedOn + ", linkedInAccessTokenExpiresIn=" + linkedInAccessTokenExpiresIn
+			+ ", tokenExpiryAlertSent=" + tokenExpiryAlertSent + ", tokenExpiryAlertTime=" + tokenExpiryAlertTime
+			+ ", tokenExpiryAlertEmail='" + tokenExpiryAlertEmail + '\'' + ", lastTokenExpiryValidationTime="
+			+ lastTokenExpiryValidationTime + '}';
 	}
 }

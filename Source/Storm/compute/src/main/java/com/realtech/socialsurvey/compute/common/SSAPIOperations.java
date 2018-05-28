@@ -190,4 +190,42 @@ public class SSAPIOperations
 		RetrofitApiBuilder.apiBuilderInstance().validateResponse(response);
 		return response.body();
 	}
+
+
+    public Optional<Boolean> updateTokenExpiryAlert( long iden, String fieldToUpdate, boolean value, String profileTypeValue )
+    {
+        Call<Boolean> requestCall = RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationService().
+            updateSocialMediaToken(iden, fieldToUpdate, value, profileTypeValue, AUTH_HEADER);
+        Response<Boolean> response = null;
+        try {
+            response = requestCall.execute();
+        } catch ( IOException e ) {
+            LOG.error( "Exception while updating tokenExpiryAlert", e.getMessage() );
+        }
+        RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
+        if ( LOG.isTraceEnabled() ) {
+            LOG.trace( "updateTokenExpiryAlert response {}", response.body() );
+        }
+        return Optional.of( response.body() );
+    }
+
+
+    public Optional<List<SocialResponseObject>> getDataForSocialMonitorReport( long companyId, String keyword, long startTime, long endTime, int pageSize,
+        int skips ) throws IOException
+    {
+        Call<List<SocialResponseObject>> requestCall =  RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationService().
+            getSocialFeedData(companyId, keyword, startTime, endTime, pageSize, skips, AUTH_HEADER);
+        Response<List<SocialResponseObject>> response = requestCall.execute();
+        return Optional.of( response.body() );
+    }
+
+
+    public Optional<List<SocialResponseObject>> getDataForSocialMonitorReport( long companyId, long startTime, long endTime, int pageSize, int skips )
+        throws IOException
+    {
+        Call<List<SocialResponseObject>> requestCall =  RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationService().
+            getSocialFeedData(companyId, startTime, endTime, pageSize, skips, AUTH_HEADER);
+        Response<List<SocialResponseObject>> response = requestCall.execute();
+        return Optional.of( response.body() );
+    }
 }

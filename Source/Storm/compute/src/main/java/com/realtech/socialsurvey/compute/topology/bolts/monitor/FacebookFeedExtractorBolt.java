@@ -81,7 +81,14 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt implements Serial
             // Check rate limiting for company
             if ( isRateLimitExceeded( mediaToken ) ) {
                 LOG.warn( "Rate limit exceeded" );
-            } else {
+            }
+            //check if the facebook token has expired
+            else if(mediaToken.getSocialMediaTokens()!=null && mediaToken.getSocialMediaTokens().getFacebookToken()!= null &&
+                mediaToken.getSocialMediaTokens().getFacebookToken().isTokenExpiryAlertSent()) {
+                LOG.warn( "Socialmedia Token has been expired having profileLink {}",
+                    mediaToken.getSocialMediaTokens().getFacebookToken().getFacebookPageLink() );
+            }
+            else {
                 List<FacebookFeedData> feeds = facebookFeedProcessor.fetchFeeds( companyId, mediaToken );
 
                 String lastFetchedKey = getLastFetchedKey( mediaToken );
@@ -161,6 +168,7 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt implements Serial
         responseWrapper.setPictures(Arrays.asList(facebookFeedData.getFullPicture()));
         responseWrapper.setOwnerName( mediaToken.getContactDetails().getName() );
         responseWrapper.setOwnerEmail( mediaToken.getContactDetails().getMailDetails().getEmailId() );
+        responseWrapper.setPostLink( facebookFeedData.getPostLink() );
 
         if(facebookFeedData.getApplication() != null && StringUtils.isNotEmpty(facebookFeedData.getApplication().getName()))
         		responseWrapper.setPostSource(facebookFeedData.getApplication().getName());

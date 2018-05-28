@@ -1,15 +1,11 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Pattern;
-
+import com.mongodb.BasicDBObject;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.entities.*;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,22 +22,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
-import com.mongodb.BasicDBObject;
-import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
-import com.realtech.socialsurvey.core.entities.AgentRankingReport;
-import com.realtech.socialsurvey.core.entities.AgentSettings;
-import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
-import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
-import com.realtech.socialsurvey.core.entities.FeedIngestionEntityForSM;
-import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
-import com.realtech.socialsurvey.core.entities.ProfileUrlEntity;
-import com.realtech.socialsurvey.core.entities.SavedDigestRecord;
-import com.realtech.socialsurvey.core.entities.SocialMediaTokenResponse;
-import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
-import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import java.util.*;
+import java.util.regex.Pattern;
 
 
 /**
@@ -124,6 +106,9 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_TRUSTED_SOURCES = "socialMonitorTrustedSources";
     
     public static final String KEY_IS_LOGIN_PREVENTED = "isLoginPrevented";
+    public static final String KEY_SEND_EMAIL_FROM_COMPANY = "sendEmailFromCompany";
+    public static final String KEY_HIDE_FROM_BREAD_CRUMB = "hideFromBreadCrumb";
+    public static final String KEY_ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA = "allowOverrideForSocialMedia";
 
     public static final String KEY_DIGEST_RECIPIENTS = "digestRecipients";
     public static final String KEY_ENTITY_ALERT_DETAILS = "entityAlertDetails";
@@ -138,6 +123,10 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_SAVED_DIGEST_RECORD_MONTH = "savedDigestRecords.month";
     public static final String KEY_SAVED_DIGEST_RECORD_YEAR = "savedDigestRecords.year";
     public static final String KEY_USER_ADD_DELETE_NOTIFICATION_RECIPIENTS = "userAddDeleteNotificationRecipients";
+    
+    public static final String KEY_CONTACT_DETAILS_WEB_ADD_WORK = "contact_details.web_addresses.work";
+    
+    public static final String KEY_AGENT_PROFILE_DISABLED = "isAgentProfileDisabled";
     
     
     public static final String KEY_FACEBOOK_ID = "socialMediaTokens.facebookToken.facebookId";
@@ -1127,8 +1116,14 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_IDEN ).is( iden ) );
         query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).exclude( "_id" );
-        SocialMediaTokens tokens = mongoTemplate.findOne( query, SocialMediaTokens.class, collectionName );
-        return tokens;
+        FeedIngestionEntity feedIngestionEntity = mongoTemplate.findOne( query, FeedIngestionEntity.class, collectionName );
+        
+        SocialMediaTokens socialMediaTokens = null;
+        if(feedIngestionEntity != null) {
+        	socialMediaTokens = feedIngestionEntity.getSocialMediaTokens();
+        }
+        
+        return socialMediaTokens;
     }
 
 

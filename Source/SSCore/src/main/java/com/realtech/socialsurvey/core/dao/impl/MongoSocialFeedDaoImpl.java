@@ -56,6 +56,8 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
     private static final String LINKEDIN_TOKEN = "linkedInToken";
     private static final String INSTAGRAM_TOKEN = "instagramToken";
     private static final String UPDATED_TIME = "updatedTime";
+    public static final String CREATED_TIME = "createdTime";
+    public static final String FOUND_KEYWORDS = "foundKeywords";
 
 
 
@@ -491,6 +493,32 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         query.addCriteria(
             Criteria.where( IDEN ).in( ids ).and( SOCIAL_MEDIA_TOKENS + "." + INSTAGRAM_TOKEN ).exists( true ) );
         return mongoTemplate.count( query, collectioName );
+    }
+
+    @Override
+    public List<SocialResponseObject> getSocialFeed( String keyword, long companyId, long startTime, long endTime, int pageSize, int skips )
+    {
+        LOG.debug( "Method to fetch socialFeed for a particular keyword and date range started" );
+        Query query = new Query(  );
+        query.addCriteria( Criteria.where( COMPANY_ID ).is( companyId ) ).
+            addCriteria( Criteria.where( CREATED_TIME ).lte( endTime ).gte( startTime ) ).
+            addCriteria( Criteria.where( FOUND_KEYWORDS ).is( keyword ) ).skip( skips ).limit( pageSize );
+        List<SocialResponseObject> socialResponseObjects =  mongoTemplate.find( query, SocialResponseObject.class, SOCIAL_FEED_COLLECTION );
+        LOG.info( "Response fetched from mongo is {}", socialResponseObjects );
+        return socialResponseObjects;
+    }
+
+
+    @Override public List<SocialResponseObject> getSocialFeed( long companyId, long startTime, long endTime, int pageSize,
+        int skips )
+    {
+        LOG.debug( "Method to fetch socialFeed within a particular date range started" );
+        Query query = new Query(  );
+        query.addCriteria( Criteria.where( COMPANY_ID ).is( companyId ) ).
+            addCriteria( Criteria.where( CREATED_TIME ).lte( endTime ).gte( startTime ) ).skip( skips ).limit( pageSize );
+        List<SocialResponseObject> socialResponseObjects =  mongoTemplate.find( query, SocialResponseObject.class, SOCIAL_FEED_COLLECTION );
+        LOG.info( "Response fetched from mongo is {}", socialResponseObjects );
+        return socialResponseObjects;
     }
 
 }

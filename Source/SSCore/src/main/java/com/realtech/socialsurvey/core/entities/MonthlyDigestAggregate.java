@@ -18,6 +18,7 @@ public class MonthlyDigestAggregate implements Serializable
     private String avgRatingTxt;
     private String surveyPercentageTxt;
     private String statisfactionRatingTxt;
+    private boolean isDigestDataAbsent;
 
     // contains rank, name, average score and total reviews
     private String userRankingHtmlSection;
@@ -198,14 +199,26 @@ public class MonthlyDigestAggregate implements Serializable
     }
 
 
+    public boolean isDigestDataAbsent()
+    {
+        return isDigestDataAbsent;
+    }
+
+
+    public void setDigestDataAbsent( boolean isDigestDataAbsent )
+    {
+        this.isDigestDataAbsent = isDigestDataAbsent;
+    }
+
+
     @Override
     public String toString()
     {
         return "MonthlyDigestAggregate [profileLevel=" + profileLevel + ", entityId=" + entityId + ", entityName=" + entityName
             + ", recipientMailIds=" + recipientMailIds + ", monthUnderConcern=" + monthUnderConcern + ", yearUnderConcern="
             + yearUnderConcern + ", digestList=" + digestList + ", avgRatingTxt=" + avgRatingTxt + ", surveyPercentageTxt="
-            + surveyPercentageTxt + ", statisfactionRatingTxt=" + statisfactionRatingTxt + ", userRankingHtmlRows="
-            + userRankingHtmlSection + ", npsHtmlsection=" + npsHtmlsection + ", havingNpsSection=" + havingNpsSection
-            + ", npsInferenceTxt=" + npsInferenceTxt + "]";
+            + surveyPercentageTxt + ", statisfactionRatingTxt=" + statisfactionRatingTxt + ", isDigestDataAbsent="
+            + isDigestDataAbsent + ", userRankingHtmlSection=" + userRankingHtmlSection + ", npsHtmlsection=" + npsHtmlsection
+            + ", havingNpsSection=" + havingNpsSection + ", npsInferenceTxt=" + npsInferenceTxt + "]";
     }
 }

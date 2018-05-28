@@ -19,13 +19,17 @@ public class FacebookFeedData implements Serializable
     @SerializedName ( "updated_time")
     private long updatedTime;
 
-    @SerializedName( "full_picture" )
+    @SerializedName ( "full_picture")
     private String fullPicture;
-    
+
+    @SerializedName ( "permalink_url")
+    private String postLink;
+
     private String picture;
-    
+
     private FacebookFeedFrom from;
-    
+
+
     public String getFullPicture()
     {
         return fullPicture;
@@ -99,8 +103,6 @@ public class FacebookFeedData implements Serializable
     {
         this.message = message;
     }
-    
-    
 
 
     public String getStory()
@@ -112,14 +114,6 @@ public class FacebookFeedData implements Serializable
     public void setStory( String story )
     {
         this.story = story;
-    }
-
-
-    @Override
-    public String toString()
-    {
-        return "FacebookFeedData [id=" + id + ", message=" + message + ", story=" + story + ", createdTime=" + createdTime
-            + ", updatedTime=" + updatedTime + ", link=" + link + "]";
     }
 
 
@@ -146,7 +140,6 @@ public class FacebookFeedData implements Serializable
         this.updatedTime = updatedTime;
     }
 
-
 	public FacebookFeedApplication getApplication() {
 		return application;
 	}
@@ -155,4 +148,24 @@ public class FacebookFeedData implements Serializable
 	public void setApplication(FacebookFeedApplication application) {
 		this.application = application;
 	}
+
+	public String getPostLink()
+    {
+        return postLink;
+    }
+
+
+    public void setPostLink( String postLink )
+    {
+        this.postLink = postLink;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "FacebookFeedData [id=" + id + ", message=" + message + ", story=" + story + ", createdTime=" + createdTime
+            + ", updatedTime=" + updatedTime + ", fullPicture=" + fullPicture + ", postLink=" + postLink + ", picture="
+            + picture + ", from=" + from + ", link=" + link + "]";
+    }
+
 }

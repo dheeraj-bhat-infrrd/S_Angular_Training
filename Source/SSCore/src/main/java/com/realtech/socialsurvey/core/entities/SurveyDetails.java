@@ -22,6 +22,9 @@ public class SurveyDetails
     private long regionId;
     private long branchId;    
 
+    private String regionName;
+    private String branchName;
+    
     //customer details
     private String customerFirstName;
     private String customerLastName;
@@ -280,7 +283,27 @@ public class SurveyDetails
     }
 
 
-    public int getStage()
+    public String getRegionName() {
+		return regionName;
+	}
+
+
+	public void setRegionName(String regionName) {
+		this.regionName = regionName;
+	}
+
+
+	public String getBranchName() {
+		return branchName;
+	}
+
+
+	public void setBranchName(String branchName) {
+		this.branchName = branchName;
+	}
+
+
+	public int getStage()
     {
         return stage;
     }

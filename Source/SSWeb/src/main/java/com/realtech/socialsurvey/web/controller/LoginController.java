@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.util.ArrayList;
 // JIRA SS-21 : by RM-06 : BOC
 import java.util.List;
 import java.util.Map;
@@ -194,6 +195,7 @@ public class LoginController
         
         long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        String isAutoLogin = (String) session.getAttribute( CommonConstants.IS_AUTO_LOGIN );
 
         boolean hiddenSection = false;
         try {
@@ -213,30 +215,51 @@ public class LoginController
             model.addAttribute( "isRealTechOrSSAdmin", isRealTechOrSSAdmin );
             
             //get detail of expire social media
+        } catch ( InvalidInputException e ) {
+            LOG.error( "fetching hiddensction varibale value failed." + e );
+        }
+        if ( user.isSuperAdmin() ) {
+            return JspResolver.ADMIN_LANDING;
+        } else {
+            boolean enableTokenRefresh = true;
             boolean isTokenRefreshRequired = false;
             boolean isSocialMediaExpired = false;
-            List<String> socialMediaListToRefresh = null;
-            if ( entityType == CommonConstants.AGENT_ID_COLUMN || entityType == CommonConstants.COMPANY_ID_COLUMN ) {
-                socialMediaListToRefresh = organizationManagementService.validateSocailMedia( entityType, entityId );
-                if ( !socialMediaListToRefresh.isEmpty() ) {
-                    isTokenRefreshRequired = true;
+            List<String> socialMediaListToRefresh = new ArrayList<>();
+            try {
+                Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
+                if ( adminUserid != null ) {
+                    enableTokenRefresh = false;
+                } else if ( StringUtils.isNotEmpty( isAutoLogin )  ) {
+                    if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                        enableTokenRefresh = organizationManagementService.getCompanySettings( user )
+                            .isAllowOverrideForSocialMedia();
+                    } else {
+                        OrganizationUnitSettings companySettings = organizationManagementService
+                            .getCompanySettings( user.getCompany().getCompanyId() );
+                        enableTokenRefresh = companySettings.isAllowOverrideForSocialMedia();
+                    }
                 }
-                if ( !organizationManagementService.getExpiredSocailMedia( entityType, entityId ).isEmpty() )
-                    isSocialMediaExpired = true;
+                model.addAttribute( "enableTokenRefresh", enableTokenRefresh );
+                if ( enableTokenRefresh ) {
+                    //get detail of expire social media           
+                    if ( entityType == CommonConstants.AGENT_ID_COLUMN || entityType == CommonConstants.COMPANY_ID_COLUMN ) {
+                        socialMediaListToRefresh = organizationManagementService.validateSocailMedia( entityType, entityId );
+                        if ( !socialMediaListToRefresh.isEmpty() ) {
+                            isTokenRefreshRequired = true;
+                        }
+                        if ( !organizationManagementService.getExpiredSocailMedia( entityType, entityId ).isEmpty() )
+                            isSocialMediaExpired = true;
+                    }
+                }
+            } catch ( InvalidInputException e ) {
+                LOG.error( "fetching hiddensction varibale value failed.", e );
+            } catch ( NoRecordsFetchedException e ) {
+                LOG.error( "No records found while checking social media expiry.", e );
             }
             model.addAttribute( "isSocialMediaExpired", isSocialMediaExpired );
             model.addAttribute( "isTokenRefreshRequired", isTokenRefreshRequired );
             model.addAttribute( "expiredSocialMediaList", new Gson().toJson( socialMediaListToRefresh ) );
-        } catch ( InvalidInputException e ) {
-            LOG.error( "fetching hiddensction varibale value failed." + e );
-        } catch ( NoRecordsFetchedException e ) {
-            LOG.error( "No records found while checking social media expiry.", e );
         }
-
-        if ( user.isSuperAdmin() ) {
-            return JspResolver.ADMIN_LANDING;
-        }
-
         return JspResolver.LANDING;
     }
 

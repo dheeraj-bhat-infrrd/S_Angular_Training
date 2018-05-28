@@ -18,7 +18,7 @@ import com.realtech.socialsurvey.compute.dao.impl.RedisSocialMediaStateDaoImpl;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokensPaginated;
 import com.realtech.socialsurvey.compute.enums.ProfileType;
-
+import redis.clients.jedis.exceptions.JedisConnectionException;
 
 
 /**
@@ -97,7 +97,10 @@ public class SocialMediaTokenExtractorSpout extends BaseComputeSpout
                 } while(mediaTokensResultPaginated.isPresent());
             }
             // End loop for companies
-        } catch ( Exception e ) {
+        } catch ( JedisConnectionException jedisConnectionException ) {
+            LOG.error( "Unbale to connect to redis ", jedisConnectionException.getMessage() );
+        }
+        catch ( Exception e ) {
             LOG.error( "Error in SocialMediaTokenExtractorSpout.nextTuple()", e );
         }
     }
@@ -108,7 +111,7 @@ public class SocialMediaTokenExtractorSpout extends BaseComputeSpout
         if ( mediaToken.getSocialMediaTokens() != null && ( companyId != null ) ) {
             mediaToken.setCompanyId( companyId );
             List<Long> companyIdsWithSM = redisSocialMediaStateDao.getCompanyIdsForSM();
-            if ( companyIdsWithSM.contains( companyId ) ) {
+            if (companyIdsWithSM != null && !companyIdsWithSM.isEmpty() && companyIdsWithSM.contains( companyId ) ) {
                 _collector.emit( "FacebookStream", new Values( companyId.toString(), mediaToken ) );
                 //_collector.emit( "LinkedinStream", new Values( companyId.toString(), mediaToken ) );
                 _collector.emit( "TwitterStream", new Values( companyId.toString(), mediaToken ) );
