@@ -17,8 +17,8 @@ import com.realtech.socialsurvey.compute.entities.SolrEmailMessageWrapper;
 import com.realtech.socialsurvey.compute.entities.response.SOLRResponse;
 import com.realtech.socialsurvey.compute.enums.ReportStatus;
 import com.realtech.socialsurvey.compute.enums.ReportType;
+import com.realtech.socialsurvey.compute.exception.APIIntegrationException;
 import com.realtech.socialsurvey.compute.services.FailedMessagesService;
-import com.realtech.socialsurvey.compute.services.api.APIIntergrationException;
 import com.realtech.socialsurvey.compute.services.impl.FailedMessagesServiceImpl;
 import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBoltWithAck;
 import com.realtech.socialsurvey.compute.utils.ConversionUtils;
@@ -91,7 +91,7 @@ public class QuerySolrToFetchSurveyRelatedMailBolt extends BaseComputeBoltWithAc
                             pageNum, BATCH_SIZE, reportRequest ) );
 
                 } while ( solrResponse.getNumFound() != 0 && solrResponse.getStart() < solrResponse.getNumFound() );
-            } catch ( APIIntergrationException | IllegalArgumentException | IOException ex ) {
+            } catch ( APIIntegrationException | IllegalArgumentException | IOException ex ) {
                 success = true;
                 LOG.error( "Exception occurred while querying solr " + ex.getMessage() );
                 FailedMessagesService failedMessagesService = new FailedMessagesServiceImpl();

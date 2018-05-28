@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.migration.DataMigrationService;
-import com.wordnik.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiOperation;
 
 /**
  * @author Subhrajit This is the API controller data migration activity.

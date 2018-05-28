@@ -985,7 +985,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
         workEmail.setValue( emailId );
 
         boolean isWorkEmailLockedByCompany = settingsLocker.isSettingsValueLocked( OrganizationUnit.COMPANY,
-            Long.parseLong( user.getCompany().getSettingsLockStatus() ), SettingsForApplication.EMAIL_ID_WORK );
+            Double.parseDouble( user.getCompany().getSettingsLockStatus() ), SettingsForApplication.EMAIL_ID_WORK );
 
         AgentSettings agentSettings = organizationManagementService.getAgentSettings( user.getUserId() );
 

@@ -5,6 +5,8 @@ import java.io.Serializable;
 import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Entity;
 
+import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
+
 
 @Entity ( "failed_messages")
 public class FailedSocialPost extends FailedMessage implements Serializable
@@ -13,16 +15,16 @@ public class FailedSocialPost extends FailedMessage implements Serializable
     private static final long serialVersionUID = 1L;
 
     @Embedded
-    private SocialPost data;
+    private SocialResponseObject<?> data;
 
 
-    public SocialPost getData()
+    public SocialResponseObject<?> getData()
     {
         return data;
     }
 
 
-    public void setData( SocialPost data )
+    public void setData( SocialResponseObject<?> data )
     {
         this.data = data;
     }

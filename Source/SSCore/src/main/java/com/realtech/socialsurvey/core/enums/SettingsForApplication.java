@@ -6,40 +6,41 @@ package com.realtech.socialsurvey.core.enums;
 public enum SettingsForApplication
 {
 
-    LOGO( 1l, 1 ),
-    ADDRESS( 10l, 2 ),
-    PHONE( 100l, 3 ),
-    LOCATION( 1000l, 4 ),
-    FACEBOOK( 10000l, 5 ),
-    TWITTER( 100000l, 6 ),
-    LINKED_IN( 1000000l, 7 ),
-    GOOGLE_PLUS( 10000000l, 8 ),
-    YELP( 100000000l, 9 ),
-    ZILLOW( 1000000000l, 10 ),
-    REALTOR( 10000000000l, 11 ),
-    LENDING_TREE( 100000000000l, 12 ),
-    WEB_ADDRESS_WORK( 1000000000000l, 13 ),
-    WEB_ADDRESS_PERSONAL( 100000000000000l, 15 ),
-    ABOUT_ME( 1000000000000000l, 16 ),
-    EMAIL_ID_PERSONAL( 10000000000000000l, 17 ),
-    EMAIL_ID_WORK( 100000000000000000l, 18 ),
-    GOOGLE_BUSINESS( 1000000000000000000l, 19 );
+    LOGO( "1", 1 ),
+    ADDRESS( "10", 2 ),
+    PHONE( "100", 3 ),
+    LOCATION( "1000", 4 ),
+    FACEBOOK( "10000", 5 ),
+    TWITTER( "100000", 6 ),
+    LINKED_IN( "1000000", 7 ),
+    GOOGLE_PLUS( "10000000", 8 ),
+    YELP( "100000000", 9 ),
+    ZILLOW( "1000000000", 10 ),
+    REALTOR( "10000000000", 11 ),
+    LENDING_TREE( "100000000000", 12 ),
+    WEB_ADDRESS_WORK( "1000000000000", 13 ),
+    WEB_ADDRESS_PERSONAL( "100000000000000", 15 ),
+    ABOUT_ME( "1000000000000000", 16 ),
+    EMAIL_ID_PERSONAL( "10000000000000000", 17 ),
+    EMAIL_ID_WORK( "100000000000000000", 18 ),
+    GOOGLE_BUSINESS( "1000000000000000000", 19 ),
+    INSTAGRAM( "10000000000000000000" , 20 );
 
-    private final long order;
+    private final String order;
     private final int index; // the order is the not the index. 1 means units, 2 means tens decimal
                              // places and so on.
 
 
-    SettingsForApplication( long order, int index )
+    SettingsForApplication( String order, int index )
     {
         this.order = order;
         this.index = index;
     }
 
 
-    public long getOrder()
+    public double getOrder()
     {
-        return this.order;
+        return Double.parseDouble( this.order );
     }
 
 
@@ -87,6 +88,8 @@ public enum SettingsForApplication
             return EMAIL_ID_WORK;
         } else if ( index == 19 ) {
             return GOOGLE_BUSINESS;
+        } else if ( index ==20 ) {
+            return INSTAGRAM;
         } else {
             return null;
         }

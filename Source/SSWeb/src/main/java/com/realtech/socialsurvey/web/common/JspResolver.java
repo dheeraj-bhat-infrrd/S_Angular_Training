@@ -28,6 +28,13 @@ public interface JspResolver
     public static final String NEWREGISTRATION = "new_registration";
     public static final String NEW_ACCOUNT_SIGNUP = "new_accountsignup";
     public static final String NEW_ACCOUNT_SIGNUP_LINKEDIN = "new_accountsignup";
+    public static final String SOCIAL_MONITOR_PAGE="social_monitor";
+    public static final String SOCIAL_MONITOR_STREAM_PAGE="social_monitor_stream";
+    public static final String SOCIAL_MONITOR_MACRO_PAGE="social_monitor_macro";
+    public static final String SOCIAL_MONITOR_ADD_MACRO_PAGE="social_monitor_add_macro";
+    public static final String STREAM_CONTAINER_PAGE="stream_container_white";
+    public static final String STREAM_ACTION_CONTAINER_PAGE="stream_action_container_gray";
+    public static final String SOCIAL_MONITOR_DUPLICATE_POPUP="social_monitor_duplicate_popup";
 
     // Generic pages
     public static final String INDEX = "index";
@@ -195,6 +202,7 @@ public interface JspResolver
     public static final String LEADERBOARD_PROFILE_IMAGE = "leaderboard_profile_image";
     public static final String REPORTING_TRANSACTION_DETAILS = "reporting_transaction_details";
     public static final String REPORTING_SCORE_STATS = "reporting_score_stats";
+    public static final String SOCIAL_MONITOR_REPORTS = "reporting_social_monitor_reports";
     
     public static final String SENDGRID_EMAIL_MNGMNT="sendgrid_email_management";
 }

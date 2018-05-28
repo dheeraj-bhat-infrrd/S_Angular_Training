@@ -18,10 +18,8 @@ public class MongoDB
 {
     private static final Logger LOG = LoggerFactory.getLogger( MongoDB.class );
     private static final String DB_NAME = ComputeConstants.STREAM_DATABASE;
-    private static final String SS_DB_NAME = ComputeConstants.SS_DATABASE;
     private static Datastore datastore;
-    private static Datastore ssDatastore;
-    
+
     static {
         String mongoUri = LocalPropertyFileHandler.getInstance()
             .getProperty( ComputeConstants.APPLICATION_PROPERTY_FILE, ComputeConstants.MONGO_DB_URI ).orElse( null );
@@ -30,12 +28,11 @@ public class MongoDB
             Morphia morphia = new Morphia();
             morphia.mapPackage( "com.realtech.socialsurvey.compute.entities" );
             datastore = morphia.createDatastore( mongoClient, DB_NAME );
-            ssDatastore = morphia.createDatastore( mongoClient, SS_DB_NAME );
-            
-        }else {
+        } else {
             LOG.warn( "Could not get mongoUri value" );
         }
     }
+
 
     /**
      * Returns morphia datastore
@@ -44,14 +41,5 @@ public class MongoDB
     public Datastore datastore()
     {
         return datastore;
-    }
-
-    /**
-     * Returns morphia datastore
-     * @return
-     */
-    public Datastore datastoreForSSDb()
-    {
-        return ssDatastore;
     }
 }

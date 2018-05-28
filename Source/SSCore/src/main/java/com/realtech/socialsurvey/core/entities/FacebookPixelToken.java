@@ -24,4 +24,9 @@ public class FacebookPixelToken
         this.pixelImgTag = pixelImgTag;
     }
 
+
+    @Override public String toString()
+    {
+        return "FacebookPixelToken{" + "pixelId='" + pixelId + '\'' + ", pixelImgTag='" + pixelImgTag + '\'' + '}';
+    }
 }

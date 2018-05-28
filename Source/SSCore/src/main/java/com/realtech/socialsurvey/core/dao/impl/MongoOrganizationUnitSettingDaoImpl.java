@@ -1,15 +1,11 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Pattern;
-
+import com.mongodb.BasicDBObject;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.entities.*;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,20 +22,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
-import com.mongodb.BasicDBObject;
-import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
-import com.realtech.socialsurvey.core.entities.AgentRankingReport;
-import com.realtech.socialsurvey.core.entities.AgentSettings;
-import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
-import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
-import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
-import com.realtech.socialsurvey.core.entities.ProfileUrlEntity;
-import com.realtech.socialsurvey.core.entities.SavedDigestRecord;
-import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
-import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import java.util.*;
+import java.util.regex.Pattern;
 
 
 /**
@@ -102,6 +86,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_LENDINGTREE_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.lendingTreeToken";
     public static final String KEY_REALTOR_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.realtorToken";
     public static final String KEY_GOOGLE_BUSINESS_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.googleBusinessToken";
+    public static final String KEY_INSTAGRAM_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.instagramToken";
     public static final String KEY_FACEBOOK_PIXEL_SOCIAL_MEDIA_TOKEN = "socialMediaTokens.facebookPixelToken";
     public static final String KEY_CONTACT_NAME = "contact_details.name";
     public static final String KEY_POSTIONS = "positions";
@@ -117,6 +102,9 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_HIDE_PUBLIC_PAGE = "hidePublicPage";
     public static final String KEY_INCLUDE_FOR_TRANSACTION_MONITOR = "includeForTransactionMonitor";
     public static final String KEY_FILTER_KEYWORDS = "filterKeywords";
+    public static final String PROFILE_IMAGE_URL = "profileImageUrl";
+    public static final String KEY_TRUSTED_SOURCES = "socialMonitorTrustedSources";
+    
     public static final String KEY_IS_LOGIN_PREVENTED = "isLoginPrevented";
     public static final String KEY_SEND_EMAIL_FROM_COMPANY = "sendEmailFromCompany";
     public static final String KEY_HIDE_FROM_BREAD_CRUMB = "hideFromBreadCrumb";
@@ -142,6 +130,23 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     
     public static final String KEY_SWEAR_WORDS = "swearWords";
     
+    public static final String KEY_FACEBOOK_ID = "socialMediaTokens.facebookToken.facebookId";
+    public static final String KEY_FACEBOOK_PAGE_LINK = "socialMediaTokens.facebookToken.facebookPageLink";
+    public static final String KEY_FACEBOOK_ACCESS_TOKEN = "socialMediaTokens.facebookToken.facebookAccessToken";
+    public static final String KEY_FACEBOOK_ACCESS_TOKEN_TO_POST = "socialMediaTokens.facebookToken.facebookAccessTokenToPost";
+    
+    public static final String KEY_TWITTER_ID = "socialMediaTokens.twitterToken.twitterId";
+    public static final String KEY_TWITTER_PAGE_LINK = "socialMediaTokens.twitterToken.twitterPageLink";
+    public static final String KEY_TWITTER_ACCESS_TOKEN = "socialMediaTokens.twitterToken.twitterAccessToken";
+    public static final String KEY_TWITTER_ACCESS_TOKEN_SECRET = "socialMediaTokens.twitterToken.twitterAccessTokenSecret";
+    
+    public static final String KEY_LINKEDIN_ID = "socialMediaTokens.linkedInToken.linkedInId";
+    public static final String KEY_LINKEDIN_PAGE_LINK = "socialMediaTokens.linkedInToken.linkedInPageLink";
+    public static final String KEY_LINKEDIN_ACCESS_TOKEN = "socialMediaTokens.linkedInToken.linkedInAccessToken";
+    
+    public static final String SOCIAL_MONITOR_ENABLED = "isSocialMonitorEnabled";
+
+
     @Value ( "${CDN_PATH}")
     private String amazonEndPoint;
 
@@ -180,7 +185,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         LOG.debug( "Fetch organization unit settings from {} for id: {}" , collectionName, identifier );
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_IDENTIFIER ).is( identifier ) );
-        query.fields().exclude( KEY_LINKEDIN_PROFILEDATA );
+        query.fields().exclude( KEY_LINKEDIN_PROFILEDATA );	
         OrganizationUnitSettings settings = mongoTemplate.findOne( query, OrganizationUnitSettings.class, collectionName );
         setCompleteUrlForSettings( settings, collectionName );
         return settings;
@@ -550,6 +555,30 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         tokens = mongoTemplate.find( query, FeedIngestionEntity.class, collectionName );
         LOG.debug( "Fetched " + ( tokens != null ? tokens.size() : "none" ) + " items with social media tokens from "
             + collectionName );
+        return tokens;
+    }
+    
+    
+    @Override
+    public List<SocialMediaTokenResponse> fetchSocialMediaTokensForIds( List<Long> ids, String collectionName )
+    {
+        LOG.debug( "Fetching social media tokens from {}", collectionName );
+        List<SocialMediaTokenResponse> tokens = null;
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_SOCIAL_MEDIA_TOKENS ).exists( true ) );
+        query.addCriteria( Criteria.where( "iden" ).in( ids ) );
+        query.fields().include( KEY_FACEBOOK_ID ).include( KEY_FACEBOOK_PAGE_LINK ).include( KEY_FACEBOOK_ACCESS_TOKEN )
+            .include( KEY_FACEBOOK_ACCESS_TOKEN_TO_POST )
+
+            .include( KEY_TWITTER_PAGE_LINK ).include( KEY_TWITTER_ACCESS_TOKEN ).include( KEY_TWITTER_ID )
+            .include( KEY_TWITTER_ACCESS_TOKEN_SECRET )
+
+            .include( KEY_LINKEDIN_ID ).include( KEY_LINKEDIN_PAGE_LINK ).include( KEY_LINKEDIN_ACCESS_TOKEN )
+            .include( KEY_IDENTIFIER ).exclude( "_id" )
+            .include( PROFILE_IMAGE_URL );
+        tokens = mongoTemplate.find( query, SocialMediaTokenResponse.class, collectionName );
+        LOG.debug( "Fetched {} items with social media tokens from {}", ( tokens != null ? tokens.size() : "none" ),
+            collectionName );
         return tokens;
     }
 
@@ -1088,8 +1117,14 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_IDEN ).is( iden ) );
         query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).exclude( "_id" );
-        SocialMediaTokens tokens = mongoTemplate.findOne( query, SocialMediaTokens.class, collectionName );
-        return tokens;
+        FeedIngestionEntity feedIngestionEntity = mongoTemplate.findOne( query, FeedIngestionEntity.class, collectionName );
+        
+        SocialMediaTokens socialMediaTokens = null;
+        if(feedIngestionEntity != null) {
+        	socialMediaTokens = feedIngestionEntity.getSocialMediaTokens();
+        }
+        
+        return socialMediaTokens;
     }
 
 
@@ -1139,6 +1174,35 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         }
         return entityIds;
     }
+    
+    @Override
+    public List<SocialMediaTokenResponse> getSocialMediaTokensByCollection( String collectionName, int skipCount, int batchSize )
+    {
+        LOG.debug( "Fetching social media tokens from {}", collectionName );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_SOCIAL_MEDIA_TOKENS ).exists( true )  );
+        query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).include( KEY_IDENTIFIER )
+            .include( KEY_CONTACT_DETAILS ).exclude( "_id" );
+
+        if ( skipCount > 0 ) {
+            query.skip( skipCount );
+        }
+        if ( batchSize > 0 ) {
+            query.limit( batchSize );
+        }
+        return mongoTemplate.find( query, SocialMediaTokenResponse.class, collectionName );
+    }
+    
+    @Override
+    public long getSocialMediaTokensCount( String collectionName)
+    {
+        LOG.debug( "Fetching social media tokens record count from {}", collectionName );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_SOCIAL_MEDIA_TOKENS ).exists( true )  );
+        query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).include( KEY_IDENTIFIER ).exclude( "_id" );
+        return mongoTemplate.count( query, collectionName );
+    }
+    
     
     /**
      * Method to fetch the company ID list who have opted for monthly digest mail

@@ -1,12 +1,17 @@
 package com.realtech.socialsurvey.compute.services.impl;
 
-import com.realtech.socialsurvey.compute.common.FailedMessageConstants;
-import com.realtech.socialsurvey.compute.entities.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.realtech.socialsurvey.compute.common.FailedMessageConstants;
 import com.realtech.socialsurvey.compute.dao.FailedMessagesDao;
 import com.realtech.socialsurvey.compute.dao.impl.FailedMessagesDaoImpl;
+import com.realtech.socialsurvey.compute.entities.EmailMessage;
+import com.realtech.socialsurvey.compute.entities.FailedEmailMessage;
+import com.realtech.socialsurvey.compute.entities.FailedReportRequest;
+import com.realtech.socialsurvey.compute.entities.FailedSocialPost;
+import com.realtech.socialsurvey.compute.entities.ReportRequest;
+import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.services.FailedMessagesService;
 import com.realtech.socialsurvey.compute.utils.ThrowableUtils;
 
@@ -45,11 +50,12 @@ public class FailedMessagesServiceImpl implements FailedMessagesService
     }
     
     @Override
-    public void insertPermanentlyFailedSocialPost( SocialPost post, Throwable thrw )
+    public void insertPermanentlyFailedSocialPost( SocialResponseObject<?> post, Throwable thrw )
     {
         LOG.debug( "Adding a failed email message {}", post );
         LOG.trace( "Error encountered: {}", thrw );
         FailedSocialPost failedSocialPost = new FailedSocialPost();
+        failedSocialPost.setMessageType(FailedMessageConstants.SOCIAL_POST_MESSAGE);
         failedSocialPost.setRetryCounts( 0 );
         failedSocialPost.setRetrySuccessful( false );
         failedSocialPost.setWillRetry( false );
@@ -59,7 +65,21 @@ public class FailedMessagesServiceImpl implements FailedMessagesService
         failedSocialPost.setThrwStr( thrw.toString() );
         failedSocialPost.setThrwStacktrace( ThrowableUtils.controlledStacktrace( thrw ) );
         LOG.debug( "Persisting failed social post messages" );
-        failedEmailMessagesDao.insertFailedFailedSocialPost( failedSocialPost );
+        failedEmailMessagesDao.insertFailedSocialPost( failedSocialPost );
+    }
+
+    @Override
+    public void insertTemporaryFailedSocialPost(SocialResponseObject<?> post) {
+        LOG.debug( "Adding a temporary failed socialPost. This message will be retried" );
+        FailedSocialPost failedSocialPost = new FailedSocialPost();
+        failedSocialPost.setMessageType( FailedMessageConstants.SOCIAL_POST_MESSAGE);
+        failedSocialPost.setRetryCounts( 0 );
+        failedSocialPost.setRetrySuccessful( false );
+        failedSocialPost.setWillRetry( true );
+        failedSocialPost.setPermanentFailure( false );
+        failedSocialPost.setData( post );
+        LOG.debug( "Persisting temporarily failed social post" );
+        failedEmailMessagesDao.insertFailedSocialPost( failedSocialPost );
     }
 
 
@@ -120,6 +140,18 @@ public class FailedMessagesServiceImpl implements FailedMessagesService
     public int updateFailedEmailMessageRetryCount(String randomUUID) {
         LOG.debug("Updating failed email message retry count with randonUUID {}", randomUUID);
         return failedEmailMessagesDao.updatedFailedEmailMessageRetryCount(randomUUID);
+    }
+
+    @Override
+    public int deleteFailedSocialPost(String postId) {
+        LOG.debug("Deleting temporary failed social post with postId {}", postId);
+        return failedEmailMessagesDao.deleteFailedSocialPost(postId);
+    }
+
+    @Override
+    public int updateFailedSocialPostRetryCount(String postId) {
+        LOG.debug("Updating failed social post retryCount having postId {}", postId);
+        return failedEmailMessagesDao.updateFailedSocialPostRetryCount(postId);
     }
 
 }

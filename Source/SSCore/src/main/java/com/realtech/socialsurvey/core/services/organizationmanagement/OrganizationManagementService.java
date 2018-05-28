@@ -25,16 +25,21 @@ import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.DisabledAccount;
 import com.realtech.socialsurvey.core.entities.EncompassSdkVersion;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
-import com.realtech.socialsurvey.core.entities.HierarchySettingsCompare;
+import com.realtech.socialsurvey.core.entities.FilterKeywordsResponse;
 import com.realtech.socialsurvey.core.entities.Keyword;
+import com.realtech.socialsurvey.core.entities.HierarchySettingsCompare;
 import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
+import com.realtech.socialsurvey.core.entities.MultiplePhrasesVO;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokensPaginated;
+import com.realtech.socialsurvey.core.entities.SocialMonitorTrustedSource;
 import com.realtech.socialsurvey.core.entities.StateLookup;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
@@ -533,7 +538,6 @@ public interface OrganizationManagementService
 
     /**
      * Method to add a new user or assign existing user under a company/region or branch
-     * 
      * @param adminUser
      * @param selectedUserId
      * @param branchId
@@ -541,7 +545,10 @@ public interface OrganizationManagementService
      * @param emailIdsArray
      * @param isAdmin
      * @param holdSendingMail - true value will not send mail to the user till the record is verified.
+     * @param sendMail
      * @param isAddedByRealtechOrSSAdmin
+     * @param isSocialMonitorAdmin
+     *
      * @return
      * @throws InvalidInputException
      * @throws NoRecordsFetchedException
@@ -549,7 +556,7 @@ public interface OrganizationManagementService
      * @throws UserAssignmentException
      */
     public Map<String, Object> addIndividual( User adminUser, long selectedUserId, long branchId, long regionId,
-        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail, boolean sendMail, boolean isAddedByRealtechOrSSAdmin )
+        String[] emailIdsArray, boolean isAdmin, boolean holdSendingMail, boolean sendMail, boolean isAddedByRealtechOrSSAdmin, boolean isSocialMonitorAdmin )
         throws InvalidInputException, NoRecordsFetchedException, SolrException, UserAssignmentException;
 
 
@@ -1547,7 +1554,7 @@ public interface OrganizationManagementService
      * @return
      * @throws InvalidInputException 
      */
-    List<Keyword> getCompanyKeywordsByCompanyId( long companyId ) throws InvalidInputException;
+    public FilterKeywordsResponse getCompanyKeywordsByCompanyId( long companyId, int startIndex, int limit, String monitorType, String searchPhrase ) throws InvalidInputException;
     
     /**
      * Method to enable keyword by keyword id
@@ -1582,6 +1589,15 @@ public interface OrganizationManagementService
 
     public Set<String> getAdminEmailsSpecificForAHierarchy( String profileLevel, long iden ) throws InvalidInputException;
 
+
+    /**
+     * Method to fetch all media tokens with profile name
+     * @param skipCount
+     * @param batchSize
+     * @return
+     * @throws InvalidInputException 
+     */
+    List<SocialMediaTokenResponse> fetchSocialMediaTokensResponse(int skipCount, int batchSize ) throws InvalidInputException;
 
 	public List<Long> filterCompanyIdsByStatus(List<Long> companies, String status) throws InvalidInputException;
 
@@ -1628,6 +1644,9 @@ public interface OrganizationManagementService
     
 	void updateIsLoginPreventedForUser( Long userId, boolean isLoginPrevented ) throws InvalidInputException;
 
+    public Map<String, Long> getFacebookAndTwitterLocks( String lockType ) throws InvalidInputException;
+
+    
 
 	void updateIsLoginPreventedForUsers( List<Long> userIdList, boolean isLoginPrevented ) throws InvalidInputException;
 
@@ -1636,6 +1655,39 @@ public interface OrganizationManagementService
     
     
     void updateHidePublicPageForUsers( List<Long> userIdList, boolean hidePublicPage ) throws InvalidInputException;
+    
+
+    /**
+     * Method to delete keywords from company
+     * @param companyId
+     * @param keywordIds
+     * @return
+     * @throws InvalidInputException
+     */
+    public List<Keyword> deleteKeywordsFromCompany( long companyId, List<String> keywordIds ) throws InvalidInputException;
+
+
+    /**
+     * Method to add or update keyword to a company
+     * @param companyId
+     * @param keyword
+     * @return
+     * @throws InvalidInputException
+     */
+    public List<Keyword> addKeywordToCompanySettings( long companyId, Keyword keyword ) throws InvalidInputException;
+
+    public SocialMediaTokensPaginated fetchSocialMediaTokensPaginated( int skipCount, int batchSize )
+        throws InvalidInputException;
+
+    /**
+     * Method to add multiple phrases in a keyword to a company
+     * @param companyId
+     * @param multiplePhrasesVO
+     * @return
+     * @throws InvalidInputException
+     */
+    public List<Keyword> addMultiplePhrasesToCompany( long companyId, MultiplePhrasesVO multiplePhrasesVO ) throws InvalidInputException;
+
 
 
     public List<String> validateSocailMedia( String columnName, long columnValue ) throws InvalidInputException, NoRecordsFetchedException;
@@ -1669,6 +1721,12 @@ public interface OrganizationManagementService
     public void sendUserDeletionMail( User adminUser, User user )
         throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException;
 
+
+	public List<SocialMonitorTrustedSource> addTrustedSourceToCompany(long companyId, String trustedSource) throws InvalidInputException;
+
+	boolean updateSocialMediaToken( String collection, long iden, String fieldToUpdate, boolean value )
+        throws InvalidInputException;
+
     public void unsetWebAddressInProfile( long entityId, String entityType ) throws NonFatalException;
 
 
@@ -1680,5 +1738,7 @@ public interface OrganizationManagementService
 
 
     void updateAgentsProfileDisable( List<Long> agentId, boolean isAgentProfileDisabled ) throws InvalidInputException;
+    
+    public boolean isSocialMonitorAdmin(Long agentId) throws InvalidInputException;
 
 }
