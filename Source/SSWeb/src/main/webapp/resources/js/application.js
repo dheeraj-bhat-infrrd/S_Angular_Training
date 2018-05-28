@@ -4524,12 +4524,35 @@ function bindAdminCheckBoxClick() {
 		if ($(this).hasClass('bd-check-img-checked')) {
 			$(this).removeClass('bd-check-img-checked');
 			$(this).next("#is-admin-chk").val("true");
+			$(this).next("#is-soc-mon-admin-chk").val("true");
 			$(this).next("#is-ignore").val("true");
 		} else {
 			$(this).addClass('bd-check-img-checked');
 			$(this).next("#is-admin-chk").val("false");
+			$(this).next("#is-soc-mon-admin-chk").val("false");
 			$(this).next("#is-ignore").val("false");
 		}
+		
+		if ($('#is-soc-mon-admin-chk').val() == "true") {
+			$('#user-assignment-cont').hide();
+			$('#bd-assign-to').hide();
+			$('#bd-region-selector').hide();
+			$('#bd-office-selector').hide();
+			$('#admin-privilege-div').hide();
+		}else{
+			$('#user-assignment-cont').show();
+			$('#admin-privilege-div').show();
+			$('#bd-assign-to').show();
+			
+			var assignTo = $("#assign-to-txt").attr("data-assignto");
+			if(assignTo == 'office' || assignTo == 'Office'){
+				$('#bd-office-selector').show();
+			}else if(assignTo == 'region' || assignTo == 'Region'){
+				$('#bd-region-selector').show();
+			}
+			showSelectorsByAssignToOption(assignTo);
+		}
+		
 		if ($('#is-ignore').val() == "true") {
 			if ($('#match-user-email').val() != "") {
 				$('#match-user-email').val('');
@@ -4543,6 +4566,8 @@ function bindAdminCheckBoxClick() {
 
 	});
 }
+
+
 
 /**
  * Method to show/hide the other selectors based on the assign to option selected
@@ -4823,6 +4848,11 @@ function validateOfficeName(elementId) {
  * @returns {Boolean}
  */
 function validateRegionSelector(hiddenElementId, textElementId) {
+	
+	if($('#is-soc-mon-admin-chk').val() == true || $('#is-soc-mon-admin-chk').val() == 'true'){
+		return true;
+	}
+	
 	var assignToType = $("#assign-to-txt").attr("data-assignto");
 	if (assignToType == 'region') {
 		if ($('#' + hiddenElementId).val() == "" || $('#' + textElementId).val() == "") {
@@ -4841,7 +4871,7 @@ function validateRegionSelector(hiddenElementId, textElementId) {
 function validateOfficeForm() {
 	isOfficeValid = true;
 	var isFocussed = false;
-
+	
 	if (!validateOfficeName('office-name-txt')) {
 		isOfficeValid = false;
 		if (!isFocussed) {
@@ -4973,6 +5003,11 @@ var isIndividualValid;
  * @returns {Boolean}
  */
 function validateOfficeSelector(hiddenElementId, textElementId) {
+	
+	if($('#is-soc-mon-admin-chk').val() == true || $('#is-soc-mon-admin-chk').val() == 'true'){
+		return true;
+	}
+	
 	var assignToType = $("#assign-to-txt").attr("data-assignto");
 	if (assignToType == 'office') {
 		if ($('#' + hiddenElementId).val() == "" || $('#' + textElementId).val() == "") {
@@ -5006,7 +5041,7 @@ function validateIndividualSelection(elementId) {
 function validateIndividualForm() {
 	isIndividualValid = true;
 	var isFocussed = false;
-
+	
 	if (!validateRegionSelector('selected-region-txt', 'selected-region-id-hidden')) {
 		isIndividualValid = false;
 		if (!isFocussed) {
@@ -7098,10 +7133,12 @@ $(document).on('click', '#user-assign-btn', function(e) {
 
 	$('#user-edit-btn-row').hide();
 	$('#user-assignment-cont').show();
+	$('#soc-mon-admin-privilege-div').show();
 	$('#btn-save-user-assignment').show();
 
 	$("#user-edit-save").off('click');
 	$("#user-edit-save").on('click', function(e) {
+		
 		if (validateIndividualForm()) {
 			saveUserAssignment("user-assignment-form", '#user-edit-save');
 
@@ -16774,33 +16811,6 @@ $(document).on('click','#mon-type-google-alerts',function(e){
 	}
 });
 
-/*$(document).on('click','#google-alerts-mon-unchecked',function(e){
-	e.stopPropagation();
-	$('#google-alerts-mon-unchecked').addClass('hide');
-	$('#google-alerts-mon-checked').removeClass('hide');
-	getMonitors();
-});
-
-$(document).on('click','#google-alerts-mon-checked',function(e){
-	e.stopPropagation();
-	$('#google-alerts-mon-unchecked').removeClass('hide');
-	$('#google-alerts-mon-checked').addClass('hide');
-	getMonitors();
-});
-
-$(document).on('click','#keyword-mon-unchecked',function(e){
-	e.stopPropagation();
-	$('#keyword-mon-unchecked').addClass('hide');
-	$('#keyword-mon-checked').removeClass('hide');
-	getMonitors();
-});
-
-$(document).on('click','#keyword-mon-checked',function(e){
-	e.stopPropagation();
-	$('#keyword-mon-unchecked').removeClass('hide');
-	$('#keyword-mon-checked').addClass('hide');
-	getMonitors();	
-});*/
 
 $(document).on('click','#stream-usr-selection',function(e){
 	e.stopImmediatePropagation();
