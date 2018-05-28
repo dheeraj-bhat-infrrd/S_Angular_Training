@@ -63,6 +63,7 @@ public class SocialResponseObject<T> implements Serializable
     private List<String> foundKeywords;
     private List<ActionHistory> actionHistory;
     private boolean isRetried;
+    private String postSource;
 
     public T getResponse()
     {
@@ -350,7 +351,22 @@ public class SocialResponseObject<T> implements Serializable
         this.postLink = postLink;
     }
     
-    @Override
+    public String getPostSource() {
+		return postSource;
+	}
+
+
+	public void setPostSource(String postSource) {
+		this.postSource = postSource;
+	}
+
+
+	public void setRetried(boolean isRetried) {
+		this.isRetried = isRetried;
+	}
+
+
+	@Override
     public String toString()
     {
         return "SocialResponseObject [id=" + id + ", postId=" + postId + ", text=" + text + ", textHighlighted="
