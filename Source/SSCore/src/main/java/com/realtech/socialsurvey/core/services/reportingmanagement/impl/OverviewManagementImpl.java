@@ -659,7 +659,7 @@ public class OverviewManagementImpl implements OverviewManagement
 
         }
         
-        if( overview == null && surveyStats == null ) {
+        if( isOverviewDataNull( digest, overview, true ) && surveyStats == null ) {
             digest.setDigestRecordNull( true );
         }
         
@@ -714,7 +714,7 @@ public class OverviewManagementImpl implements OverviewManagement
 
         }
         
-        if( overview == null && surveyStats == null ) {
+        if( isOverviewDataNull( digest, overview, true ) && surveyStats == null ) {
             digest.setDigestRecordNull( true );
         }
         
@@ -767,10 +767,89 @@ public class OverviewManagementImpl implements OverviewManagement
             digest.setNps( nps );
         }
         
-        if( overview == null && surveyStats == null ) {
+        if( isOverviewDataNull( digest, overview, true ) && surveyStats == null ) {
             digest.setDigestRecordNull( true );
         }
         
         return digest;
+    }
+
+
+    private boolean isOverviewDataNull( Digest digest, OverviewCompanyMonth overview, boolean dontConsiderUserCount )
+    {
+        if( overview == null ) {
+            digest.setHasZeroUserCount( true );
+            return true;
+        } else {
+            
+            if( overview.getCumulativeUserCount() <= 0l ) {
+                digest.setHasZeroUserCount( true );
+            }
+            
+            if( overview.getCompleted() == 0 &&
+                overview.getCompletePercentage() == 0.0f &&
+                ( overview.getCumulativeUserCount() == 0 || dontConsiderUserCount ) &&
+                overview.getIncomplete() == 0 &&
+                overview.getIncompletePercentage() == 0.0f &&
+                overview.getProcessed() == 0 &&
+                overview.getRating() == 0.0f &&
+                overview.getTotalReview() == 0 ) {
+                return true;
+            } else {
+                return false; 
+            } 
+        }
+    }
+    
+    private boolean isOverviewDataNull( Digest digest, OverviewRegionMonth overview, boolean dontConsiderUserCount )
+    {
+        if( overview == null ) {
+            digest.setHasZeroUserCount( true );
+            return true;
+        } else {
+            
+            if( overview.getCumulativeUserCount() <= 0l ) {
+                digest.setHasZeroUserCount( true );
+            }
+            
+            if( overview.getCompleted() == 0 &&
+                overview.getCompletePercentage() == 0.0f &&
+                ( overview.getCumulativeUserCount() == 0 || dontConsiderUserCount ) &&
+                overview.getIncomplete() == 0 &&
+                overview.getIncompletePercentage() == 0.0f &&
+                overview.getProcessed() == 0 &&
+                overview.getRating() == 0.0f &&
+                overview.getTotalReview() == 0 ) {
+                return true;
+            } else {
+                return false; 
+            } 
+        }
+    }
+    
+    private boolean isOverviewDataNull( Digest digest, OverviewBranchMonth overview, boolean dontConsiderUserCount )
+    {
+        if( overview == null ) {
+            digest.setHasZeroUserCount( true );
+            return true;
+        } else {
+            
+            if( overview.getCumulativeUserCount() <= 0l ) {
+                digest.setHasZeroUserCount( true );
+            }
+            
+            if( overview.getCompleted() == 0 &&
+                overview.getCompletePercentage() == 0.0f &&
+                ( overview.getCumulativeUserCount() == 0 || dontConsiderUserCount ) &&
+                overview.getIncomplete() == 0 &&
+                overview.getIncompletePercentage() == 0.0f &&
+                overview.getProcessed() == 0 &&
+                overview.getRating() == 0.0f &&
+                overview.getTotalReview() == 0 ) {
+                return true;
+            } else {
+                return false; 
+            } 
+        }
     }
 }
