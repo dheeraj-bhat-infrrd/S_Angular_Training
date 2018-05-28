@@ -128,6 +128,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     
     public static final String KEY_AGENT_PROFILE_DISABLED = "isAgentProfileDisabled";
     
+    public static final String KEY_SWEAR_WORDS = "swearWords";
     
     public static final String KEY_FACEBOOK_ID = "socialMediaTokens.facebookToken.facebookId";
     public static final String KEY_FACEBOOK_PAGE_LINK = "socialMediaTokens.facebookToken.facebookPageLink";
@@ -1384,5 +1385,43 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
             contactDetails = settings.getContact_details();
         return contactDetails;
     }
+    
+    @Override
+    public OrganizationUnitSettings fetchSavedSwearWords( String entityType, long entityId ) throws InvalidInputException
+    {
+        LOG.debug( "Method fetchSavedSwearWords() to fetch swear words list running." );
+
+        String collectionName = null;
+
+        if ( CommonConstants.COMPANY_ID.equals( entityType ) ) {
+            collectionName = CommonConstants.COMPANY_SETTINGS_COLLECTION;
+        }
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_IDEN ).is( entityId ) );
+        
+        query.fields().include( KEY_SWEAR_WORDS ).exclude( CommonConstants.DEFAULT_MONGO_ID_COLUMN );
+        return mongoTemplate.findOne( query, OrganizationUnitSettings.class, collectionName );
+    }
+    
+    @Override
+    public void updateSwearWords( String entityType, long entityId, String[] swearWords ) throws InvalidInputException
+    {
+        LOG.debug( "Method saveSwearWords() to update swear words list started." );
+        String collectionName = null;
+
+        
+        if ( CommonConstants.COMPANY_ID.equals( entityType )  ) {
+            collectionName = CommonConstants.COMPANY_SETTINGS_COLLECTION;
+        } 
+        
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_IDEN ).is( entityId ) );
+        Update update = new Update();
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, System.currentTimeMillis() );
+        update.set( KEY_SWEAR_WORDS, swearWords );
+        mongoTemplate.updateFirst( query, update, collectionName );
+        LOG.debug( "Method saveDigestRecord() to update digest record list started." );
+    }
+
 
 }

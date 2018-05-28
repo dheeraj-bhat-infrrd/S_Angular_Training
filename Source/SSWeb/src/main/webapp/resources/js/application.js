@@ -7563,6 +7563,7 @@ function initSurveyWithUrl(q) {
 				surveyId = data.responseJSON.surveyId;
 				hiddenSection=data.responseJSON.hiddenSection;
 				companyName = data.responseJSON.companyName;
+				companyId = data.responseJSON.companyId;
 				paintSurveyPage(data);
 				var message = $("#pst-srvy-div .bd-check-txt").html();
 				if(hiddenSection){
@@ -7570,7 +7571,7 @@ function initSurveyWithUrl(q) {
 				}else{
 					$("#pst-srvy-div .bd-check-txt").html(message.replace("%s", agentName));
 				}
-				swearWords=getSwearWords();
+				swearWords=getSwearWords(companyId);
 			} 
 			else {
 				$('.sq-ques-wrapper').addClass( 'sq-main-txt' );
@@ -8112,6 +8113,7 @@ function showMasterQuestionPage() {
 			return;
 		}
 
+		console.log(swearWords);
 		var isAbusive = false;
 		var feedbackArr = feedback.split(" ");
 		for (var i = 0; i < feedbackArr.length; i++) {
@@ -8119,7 +8121,7 @@ function showMasterQuestionPage() {
 				isAbusive = true;
 			}
 		}
-
+		console.log("isAbusive:"+isAbusive);
 		var onlyPostToSocialSurvey = true;
 		if ($('#shr-post-chk-box').hasClass('bd-check-img-checked') == false ) {
 			if (isAbusive == false) {
@@ -16333,14 +16335,16 @@ function formatAllTimeSlots(dates){
 	return xAxisData;
 }
 
-
-function getSwearWords() {
-	 
+function getSwearWords(companyId) {
+	var payload = {
+			  "companyId" : companyId
+	};
 	 $.ajax({
 	 url : getLocationOrigin() + surveyUrl + "data/getSwearWords",
 	 async:true,
 	 type : "GET",
 	 cache : false,
+	 data : payload,
 	 dataType : "JSON",
 	 success : function(data) {
 	 swearWords=JSON.parse(data);
@@ -16556,6 +16560,14 @@ $(document).on('click','#add-macro-status',function(e){
 	$('#macro-status-chevron-down').toggle();
 	$('#macro-status-chevron-up').toggle();
 });
+function closeSummitPopup( doSendclickedEventInfo ){
+	$('#summit-popup').hide();
+	showSummitRibbon();
+	enableBodyScroll();
+	if( doSendclickedEventInfo != false ){
+		sendClickedEventInfo( "home.dashboard.summit.popup.close" );
+	}
+}
 
 $(document).on('click','#add-macro-alerts',function(e){
 	e.stopPropagation();
@@ -16584,6 +16596,12 @@ $(document).on('click','#add-macro-action',function(e){
 
 });
 
+function closeSummitRibbon(){
+	
+	$('#summit-ribbon').hide();
+	sendClickedEventInfo( "home.dashboard.summit.ribbon.close" );
+}
+
 $(document).on('click','#macro-status-dropdown',function(e){
 	e.stopPropagation();
 	$('#macro-status-options').toggle();
@@ -16603,6 +16621,7 @@ $(document).on('click','#macro-active-container',function(e){
 		$('#active-macros-list').addClass('hide');
 		$('#empty-macros-list').removeClass('hide');
 	}
+
 	
 	$('#inactive-macros-list').addClass('hide');
 });
@@ -16652,8 +16671,7 @@ $(document).on('click','#mon-type-dropdown',function(e){
 
 $(document).on('click','#add-mon-type-dropdown',function(e){
 	e.stopImmediatePropagation();
-	e.preventDefault();
-	
+	e.preventDefault();	
 	$('#add-mon-type-options').toggle();
 	$('#add-mon-type-chevron-down').toggle();
 	$('#add-mon-type-chevron-up').toggle();
@@ -20607,3 +20625,15 @@ $(document).on('click','#summit-popup-body',function(e){
 	e.stopImmediatePropagation();
 	e.preventDefault();
 });
+
+function sendClickedEventInfo( event ){
+	if( event != undefined ){
+		// send the type of event that a user has triggered
+		$.ajax({
+			url : "./user/trackedevents/click.do",
+			type : "POST",
+			data : {"event" : String(event)},
+			async : true
+		});
+	}
+}

@@ -159,6 +159,7 @@ import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.social.SocialMediaExceptionHandler;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
+import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
@@ -288,6 +289,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     @Autowired
     private SurveyBuilder surveyBuilder;
+    
+    @Autowired
+    private SurveyHandler surveyHandler;
+
 
     @Autowired
     private RedisDao redisDao;
@@ -743,6 +748,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         // set default profile stages.
         companySettings.setProfileStages( profileCompletionList.getDefaultProfileCompletionList( false ) );
+        
+        //adding swear words list to a newly created company 
+        companySettings.setSwearWords( surveyHandler.getSwearList() );
 
         // Setting default values for mail content in Mail content settings of company settings.
         String takeSurveyMail = "";

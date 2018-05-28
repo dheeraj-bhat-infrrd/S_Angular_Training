@@ -67,16 +67,22 @@ public class SurveyV2Transformer implements Transformer<SurveyGetV2VO, SurveyDet
             serviceProviderInfo.setServiceProviderName( d.getAgentName() );
             serviceProviderInfo.setServiceProviderId(d.getAgentId());
             //branch name
-            if( StringUtils.equalsIgnoreCase(d.getBranchName() , CommonConstants.DEFAULT_BRANCH_NAME))
-            		serviceProviderInfo.setServiceProviderOfficeName("N/A");
-            else
-            		serviceProviderInfo.setServiceProviderOfficeName(d.getBranchName());
-            	//region name
-            if( StringUtils.equalsIgnoreCase(d.getRegionName() , CommonConstants.DEFAULT_REGION_NAME))
-            		serviceProviderInfo.setServiceProviderRegionName("N/A");
-            else
-            	serviceProviderInfo.setServiceProviderRegionName(d.getRegionName());
-            	
+            if ( StringUtils.equalsIgnoreCase( d.getBranchName(), CommonConstants.DEFAULT_BRANCH_NAME ) ) {
+                serviceProviderInfo.setServiceProviderOfficeName( "N/A" );
+                serviceProviderInfo.setServiceProviderOfficeId( CommonConstants.DEFAULT_BRANCH_ID );
+            } else {
+                serviceProviderInfo.setServiceProviderOfficeName( d.getBranchName() );
+                serviceProviderInfo.setServiceProviderOfficeId( d.getBranchId() );
+            }
+            //region name
+            if ( StringUtils.equalsIgnoreCase( d.getRegionName(), CommonConstants.DEFAULT_REGION_NAME ) ) {
+                serviceProviderInfo.setServiceProviderRegionName( "N/A" );
+                serviceProviderInfo.setServiceProviderRegionId( CommonConstants.DEFAULT_REGION_ID );
+            } else {
+                serviceProviderInfo.setServiceProviderRegionName( d.getRegionName() );
+                serviceProviderInfo.setServiceProviderRegionId( d.getRegionId() );
+            }
+
             survey.setReviewId( d.get_id() );
             review.setSummary( d.getSummary() );
             review.setDescription( d.getReview() );
