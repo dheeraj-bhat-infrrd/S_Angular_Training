@@ -10287,6 +10287,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     {
         LOG.debug( "Method isSocialMonitorAdmin called for agentId:" + agentId );
         if ( agentId < 0l ) {
+            LOG.error( "Invalid agent id passed as argument " );
             throw new InvalidInputException( "Invalid agent id passed as argument " );
         }
 

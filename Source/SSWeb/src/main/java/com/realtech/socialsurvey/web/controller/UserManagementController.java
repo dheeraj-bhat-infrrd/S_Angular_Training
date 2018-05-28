@@ -79,6 +79,7 @@ public class UserManagementController
     private static final Logger LOG = LoggerFactory.getLogger( UserManagementController.class );
     private static final String ROLE_ADMIN = "Admin";
     private static final String ROLE_USER = "User";
+    private static final String ROLE_SM_ADMIN = "SM Admin";
 
     @Autowired
     private MessageUtils messageUtils;
@@ -1762,7 +1763,13 @@ public class UserManagementController
                         }
                         assignment.setRole( ROLE_USER );
                         break;
-
+                        
+                    case CommonConstants.PROFILES_MASTER_SM_ADMIN_PROFILE_ID:
+                        assignment.setEntityId( user.getCompany().getCompanyId() );
+                        assignment.setEntityName( user.getCompany().getCompany() );
+                        assignment.setRole( ROLE_SM_ADMIN );
+                        break;
+                        
                     default:
                 }
                 userAssignments.add( assignment );
@@ -1951,8 +1958,11 @@ public class UserManagementController
                 User updatedUser = userManagementService.getUserByProfileId( profileId );
 
                 List<UserProfile> userprofileList = userManagementService.getAllUserProfilesForUser( updatedUser );
-                if ( userprofileList.size() == 1 && userprofileList.get( 0 ).getUserProfileId() == profileId ) {
-                    return messageUtils.getDisplayMessage( DisplayMessageConstants.NOT_ABLE_TO_DELETE_USER_PRIFILE,
+                List<UserProfile> userProfilesAgentAdmin = userManagementService.getAllAgentAdminProfilesForUser( updatedUser );
+                if ( ( userprofileList.size() == 1 && userprofileList.get( 0 ).getUserProfileId() == profileId )
+                    || ( userProfilesAgentAdmin.size() == 1
+                        && userProfilesAgentAdmin.get( 0 ).getUserProfileId() == profileId ) ) {
+                    return messageUtils.getDisplayMessage( DisplayMessageConstants.NOT_ABLE_TO_DELETE_USER_PROFILE,
                         DisplayMessageType.ERROR_MESSAGE ).getMessage();
                 }
 

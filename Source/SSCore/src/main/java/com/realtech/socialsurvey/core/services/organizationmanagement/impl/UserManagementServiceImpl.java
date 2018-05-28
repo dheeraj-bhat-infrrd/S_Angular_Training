@@ -24,6 +24,10 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;
 import org.slf4j.Logger;
@@ -58,6 +62,7 @@ import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyIgnoredEmailMapping;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.EmailAttachment;
+import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -235,6 +240,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Autowired
     private GenericDao<CompanyIgnoredEmailMapping, Long> companyIgnoredEmailMappingDao;
+    
+    @Autowired
+    SessionFactory sessionFactory;
 
     @Value ( "${PARAM_ORDER_TAKE_SURVEY_REMINDER}")
     private String paramOrderTakeSurveyReminder;
@@ -4927,6 +4935,29 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         LOG.debug( "method getUserProfiles() finished" );
         return profiles;
+    }
+    
+    /*
+     * Method to fetch all the agent/admin user profiles for the user
+     */
+    @SuppressWarnings ( "unchecked")
+    @Override
+    @Transactional
+    public List<UserProfile> getAllAgentAdminProfilesForUser( User user ) throws InvalidInputException
+    {
+        if ( user == null ) {
+            LOG.error( "User object passed was null" );
+            throw new InvalidInputException( "User object passed was null" );
+        }
+        LOG.debug( "Method getAllAgentAdminProfilesForUser() called to fetch the list of agent/Admin profiles for the user" );
+        Session session = sessionFactory.getCurrentSession();
+        Criteria criteria = session.createCriteria( UserProfile.class );
+        criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN , CommonConstants.STATUS_ACTIVE ) );
+        criteria.add( Restrictions.eq( CommonConstants.USER_COLUMN, user ) );
+        criteria.add( Restrictions.eq( CommonConstants.COMPANY_COLUMN, user.getCompany()));
+        criteria.add( Restrictions.ne(  CommonConstants.PROFILE_MASTER_COLUMN, getProfilesMasterById( CommonConstants.PROFILES_MASTER_SM_ADMIN_PROFILE_ID) ) );
+        LOG.debug( "Method getAllAgentAdminProfilesForUser() finised successfully" );
+        return (List<UserProfile>)criteria.list();
     }
     
 }
