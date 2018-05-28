@@ -62,8 +62,6 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
     public static final String CREATED_TIME = "createdTime";
     public static final String FOUND_KEYWORDS = "foundKeywords";
 
-    public static final String SOCIAL_FEED_COLLECTION_ARCHIVE = "SOCIAL_FEED_COLLECTION_ARCHIVE";
-
 
     @Override
     public void insertSocialFeed( SocialResponseObject<?> socialFeed, String collectionName )
