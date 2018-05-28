@@ -62,8 +62,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
     public static final String CREATED_TIME = "createdTime";
     public static final String FOUND_KEYWORDS = "foundKeywords";
 
-
-
+    public static final String SOCIAL_FEED_COLLECTION_ARCHIVE = "SOCIAL_FEED_COLLECTION_ARCHIVE";
 
 
     @Override
@@ -507,6 +506,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
             addCriteria( Criteria.where( CREATED_TIME ).lte( endTime ).gte( startTime ) ).
             addCriteria( Criteria.where( FOUND_KEYWORDS ).is( keyword ) ).skip( skips ).limit( pageSize );
         List<SocialResponseObject> socialResponseObjects =  mongoTemplate.find( query, SocialResponseObject.class, SOCIAL_FEED_COLLECTION );
+        socialResponseObjects.addAll( mongoTemplate.find( query, SocialResponseObject.class, SOCIAL_FEED_COLLECTION_ARCHIVE ) );
         LOG.info( "Response fetched from mongo is {}", socialResponseObjects );
         return socialResponseObjects;
     }
@@ -520,6 +520,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         query.addCriteria( Criteria.where( COMPANY_ID ).is( companyId ) ).
             addCriteria( Criteria.where( CREATED_TIME ).lte( endTime ).gte( startTime ) ).skip( skips ).limit( pageSize );
         List<SocialResponseObject> socialResponseObjects =  mongoTemplate.find( query, SocialResponseObject.class, SOCIAL_FEED_COLLECTION );
+        socialResponseObjects.addAll( mongoTemplate.find( query, SocialResponseObject.class, SOCIAL_FEED_COLLECTION_ARCHIVE ) );
         LOG.info( "Response fetched from mongo is {}", socialResponseObjects );
         return socialResponseObjects;
     }
