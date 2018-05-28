@@ -23,7 +23,7 @@ public class FacebookAPIOperations
 
     private static FacebookAPIOperations apiOperations;
     
-    private static final String FIELDS ="story,message,created_time,updated_time,full_picture,picture,message_tags,from,permalink_url";
+    private static final String FIELDS ="story,message,created_time,updated_time,full_picture,picture,message_tags,from,permalink_url,application";
     private static final String LIMIT = "100";
 
     private static final String IG_FIELDS = "ig_id,caption,media_url,media_type,timestamp,username,permalink";

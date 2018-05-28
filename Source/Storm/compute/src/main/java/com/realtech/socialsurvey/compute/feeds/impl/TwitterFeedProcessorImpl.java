@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -153,6 +154,8 @@ public class TwitterFeedProcessorImpl implements TwitterFeedProcessor
         feed.setPictures(
             Arrays.stream( status.getMediaEntities() ).map( x -> x.getMediaURL() ).collect( Collectors.toList() ) );
         feed.setUserName( status.getUser().getScreenName() );
+        
+        feed.setSource(getTwitterFeedSource(status.getSource()));
         RateLimitStatus rateLimitStatus = status.getRateLimitStatus();
         if ( rateLimitStatus != null ) {
             feed.setRemaining( status.getRateLimitStatus().getRemaining() );
@@ -162,6 +165,15 @@ public class TwitterFeedProcessorImpl implements TwitterFeedProcessor
         return feed;
     }
 
+    private String getTwitterFeedSource(String rawSource) 
+    {
+    		String source = null;		
+    		if(StringUtils.isNotEmpty(rawSource) && StringUtils.contains(rawSource, ">")  && StringUtils.contains(rawSource, "</a>") ) {
+    			source = rawSource.substring(rawSource.indexOf(">") + 1, rawSource.indexOf("</a>"));
+    		}
+    		return source;
+    }
+    
     /*public static void main( String[] args )
     {
         TwitterToken token= new TwitterToken();

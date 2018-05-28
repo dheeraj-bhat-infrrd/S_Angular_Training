@@ -103,7 +103,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_INCLUDE_FOR_TRANSACTION_MONITOR = "includeForTransactionMonitor";
     public static final String KEY_FILTER_KEYWORDS = "filterKeywords";
     public static final String PROFILE_IMAGE_URL = "profileImageUrl";
-
+    public static final String KEY_TRUSTED_SOURCES = "socialMonitorTrustedSources";
+    
     public static final String KEY_IS_LOGIN_PREVENTED = "isLoginPrevented";
     public static final String KEY_SEND_EMAIL_FROM_COMPANY = "sendEmailFromCompany";
     public static final String KEY_HIDE_FROM_BREAD_CRUMB = "hideFromBreadCrumb";

@@ -26,6 +26,7 @@ import com.realtech.socialsurvey.core.entities.Keyword;
 import com.realtech.socialsurvey.core.entities.MultiplePhrasesVO;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokensPaginated;
+import com.realtech.socialsurvey.core.entities.SocialMonitorTrustedSource;
 import com.realtech.socialsurvey.core.entities.SocialResponseObject;
 import com.realtech.socialsurvey.core.exception.AuthorizationException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -341,6 +342,29 @@ public class SocialMonitorController
         }
 
     }
+
+    
+    @RequestMapping ( value = "/companies/{companyId}/trustedSource", method = RequestMethod.POST)
+    @ApiOperation ( value = "Add truested source to the company", response = SocialMonitorTrustedSource.class, responseContainer = "List")
+	@ApiResponses(value = { @ApiResponse ( code = 200, message = "Successfully updated trusted source")})
+    public ResponseEntity<?> addTrustedSourceToCompany( @PathVariable ( "companyId") long companyId,
+                                                   @Valid @RequestParam String trustedSource, @RequestHeader ( "authorizationHeader") String authorizationHeader ) throws SSApiException
+	{
+		try {
+			adminAuthenticationService.validateAuthHeader(authorizationHeader);
+			try {
+				LOGGER.info("SocialMonitorController.addTrustedSourceToCompany started");
+				List<SocialMonitorTrustedSource> trustedSources = organizationManagementService
+						.addTrustedSourceToCompany(companyId, trustedSource);
+				LOGGER.info("SocialMonitorController.addTrustedSourceToCompany completed successfully");
+				return new ResponseEntity<>(trustedSources, HttpStatus.OK);
+			} catch (NonFatalException e) {
+				throw new SSApiException(e.getMessage(), e.getErrorCode());
+			}
+		} catch (AuthorizationException authoriztionFailure) {
+			return new ResponseEntity<>(AUTH_FAILED, HttpStatus.UNAUTHORIZED);
+		}
+	}
 
     @RequestMapping ( value = "/updateSocialMediaToken/collection/{collection}/iden/{iden}/fieldtoupdate/{fieldtoupdate}/value/{value}",
         method = RequestMethod.PUT)

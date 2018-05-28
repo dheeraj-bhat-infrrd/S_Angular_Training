@@ -1,9 +1,9 @@
 package com.realtech.socialsurvey.compute.dao;
 
-import com.realtech.socialsurvey.compute.entities.Keyword;
-
 import java.io.Serializable;
 import java.util.List;
+
+import com.realtech.socialsurvey.compute.entities.Keyword;
 
 
 public interface RedisCompanyKeywordsDao extends Serializable
@@ -21,4 +21,5 @@ public interface RedisCompanyKeywordsDao extends Serializable
      * @return
      */
     public long getKeywordModifiedOn( long companyIden );
+
 }
