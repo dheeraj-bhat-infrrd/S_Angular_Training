@@ -36,6 +36,16 @@
 							</div>
 			</c:if>		
 			
+			<div class="v-edit-row clearfix hide" id="soc-mon-admin-privilege-div">
+				<div class="float-left v-ed-lbl" style="color: transparent;">'</div>
+				<div class="float-left v-ed-txt pos-relative">
+					<div class="bd-frm-check-wrapper clearfix">
+						<div class="float-left bd-check-img bd-check-img-checked"></div>
+						<input type="hidden" name="isSocialMonitorAdmin" value="false" id="is-soc-mon-admin-chk">
+					    <div class="float-left bd-check-txt"><spring:message code="label.grant.socialmonitor.adminprivileges.key"/></div>
+					</div>
+				</div>
+			</div>
 			
 			<div id="user-assignment-cont" class="hide">
 				<c:choose>
