@@ -51,24 +51,31 @@ See here for more details: http://gordondickens.com/wordpress/2013/03/27/sawing-
             <Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</Pattern>
         </layout>
     </appender>
-	<appender name="auditlog" class="ch.qos.logback.core.rolling.RollingFileAppender">
-	    <file>../standalone/log/audit.log</file>
+	<!-- <appender name="auditlog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+	    <file>/standalone/log/audit.log</file>
 	    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
 			<Pattern>
 				%d{yyyy-MM-dd HH:mm:ss} - %msg%n
 			</Pattern>
 		</encoder>
 	    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<!-- rollover daily -->
+			rollover daily
 			<fileNamePattern>${DEV_HOME}/archived/audit.%d{yyyy-MM-dd HH:mm:ss}.%i.log
                         </fileNamePattern>
 			<timeBasedFileNamingAndTriggeringPolicy
 				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-				
+				<maxFileSize>10MB</maxFileSize>
 			</timeBasedFileNamingAndTriggeringPolicy>
 		</rollingPolicy>
 	</appender>
-	
+	 -->
+	 <appender name="auditlog" class="ch.qos.logback.core.FileAppender">
+        <file>~/standalone/log/audit.log</file>
+        <append>true</append>
+        <encoder>
+            <pattern>%-4relative [%thread] %-5level %logger{35} - %msg %n</pattern>
+        </encoder>
+    </appender>
 	
     <!-- <logger name="org.hibernate" level="debug"/> -->
    <!-- Uncomment and add your logger here: -->
@@ -78,7 +85,7 @@ See here for more details: http://gordondickens.com/wordpress/2013/03/27/sawing-
     <logger name="org.hibernate.SQL">
         <appender-ref ref="sqllogfile"/>        
     </logger>
-	<logger name="com.realtech.socialsurvey.core.services.audit.impl" level="info" additivity="false">
+	<logger name="Audit" level="INFO" >
 		<appender-ref ref="auditlog" />
 	</logger>
     <root level="INFO">

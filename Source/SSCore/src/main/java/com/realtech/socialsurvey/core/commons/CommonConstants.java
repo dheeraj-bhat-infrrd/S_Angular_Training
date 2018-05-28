@@ -221,6 +221,8 @@ public interface CommonConstants
     public static final String PROFILE_LEVEL_COLUMN = "profileLevel";
     public static final String ENCOMPASS_SDK_VERSION_COLUMN = "sdkVersion";
     public static final String INCLUDE_IN_TRANSACTION_MONITOR = "includeInTransactionMonitor";
+    public static final String PROPERTY_ADDRESS = "propertyAddress";
+    public static final String LOAN_PROCESSOR_NAME = "loanProcessorName";
 
     //batch type constant for batch tracker
     public static final String BATCH_TYPE_REVIEW_COUNT_UPDATER = "reviewCountUpdater";

@@ -16,8 +16,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.realtech.socialsurvey.core.commons.ActionHistoryComparator;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -93,6 +95,9 @@ public class SocialFeedServiceImpl implements SocialFeedService
     UserProfileDao userProfileDao;
     
     private EmailServices emailServices;
+    
+    @Value("${SOCIAL_FEEDS_ARCHIVE_DAYS_BEFORE}")
+    private int archiveSocialFeedBeforeDays;
 
 	@Autowired
 	public void setEmailServices(EmailServices emailServices) {
@@ -791,6 +796,12 @@ public class SocialFeedServiceImpl implements SocialFeedService
             throw new InvalidInputException( "specified input is invalid" );
         }
         return mongoSocialFeedDao.getSocialFeed( companyId, startTime, endTime, pageSize, skips);
+    }
+
+    @Override
+    public boolean moveDocumentToArchiveCollection()
+    {
+        return mongoSocialFeedDao.moveDocumentToArchiveCollection(archiveSocialFeedBeforeDays);
     }
 } 
 

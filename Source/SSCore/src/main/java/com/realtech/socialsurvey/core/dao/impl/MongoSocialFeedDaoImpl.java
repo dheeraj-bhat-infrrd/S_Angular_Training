@@ -19,6 +19,8 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -35,6 +37,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
     private MongoTemplate mongoTemplate;
 
     public static final String SOCIAL_FEED_COLLECTION = "SOCIAL_FEED_COLLECTION";
+    public static final String SOCIAL_FEED_COLLECTION_ARCHIVE = "SOCIAL_FEED_COLLECTION_ARCHIVE";
     public static final String KEY_IDENTIFIER = "_id";
     private static final String HASH = "hash";
     private static final String COMPANY_ID = "companyId";
@@ -58,9 +61,6 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
     private static final String UPDATED_TIME = "updatedTime";
     public static final String CREATED_TIME = "createdTime";
     public static final String FOUND_KEYWORDS = "foundKeywords";
-
-
-
 
 
     @Override
@@ -504,6 +504,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
             addCriteria( Criteria.where( CREATED_TIME ).lte( endTime ).gte( startTime ) ).
             addCriteria( Criteria.where( FOUND_KEYWORDS ).is( keyword ) ).skip( skips ).limit( pageSize );
         List<SocialResponseObject> socialResponseObjects =  mongoTemplate.find( query, SocialResponseObject.class, SOCIAL_FEED_COLLECTION );
+        socialResponseObjects.addAll( mongoTemplate.find( query, SocialResponseObject.class, SOCIAL_FEED_COLLECTION_ARCHIVE ) );
         LOG.info( "Response fetched from mongo is {}", socialResponseObjects );
         return socialResponseObjects;
     }
@@ -517,8 +518,35 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         query.addCriteria( Criteria.where( COMPANY_ID ).is( companyId ) ).
             addCriteria( Criteria.where( CREATED_TIME ).lte( endTime ).gte( startTime ) ).skip( skips ).limit( pageSize );
         List<SocialResponseObject> socialResponseObjects =  mongoTemplate.find( query, SocialResponseObject.class, SOCIAL_FEED_COLLECTION );
+        socialResponseObjects.addAll( mongoTemplate.find( query, SocialResponseObject.class, SOCIAL_FEED_COLLECTION_ARCHIVE ) );
         LOG.info( "Response fetched from mongo is {}", socialResponseObjects );
         return socialResponseObjects;
+    }
+        
+    @Override
+    public boolean moveDocumentToArchiveCollection(int days)
+    {
+        try {
+            Query query = new Query();
+            query.addCriteria( Criteria.where( UPDATED_TIME ).lt( dateToArchiveOldData(days).getTime() ) );
+            List<SocialResponseObject> socialFeedData = mongoTemplate.find( query, SocialResponseObject.class,
+                SOCIAL_FEED_COLLECTION );
+            mongoTemplate.insert( socialFeedData, SOCIAL_FEED_COLLECTION_ARCHIVE );
+            mongoTemplate.remove( query, SocialResponseObject.class, SOCIAL_FEED_COLLECTION );
+            return true;
+        } catch ( Exception e ) {
+            LOG.error( "Error while archiving data", e );
+        }
+        return false;
+    }
+    
+    private static Date dateToArchiveOldData(int days) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE, -days);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        return calendar.getTime();
     }
 
 }

@@ -534,6 +534,23 @@
 				</map>
 		</property>
 		<property name="durability" value="true" />
+	</bean>
+	
+	<!-- Archive social feed data job -->
+	<bean name="archiveSocialFeedCollectionJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass" value="com.realtech.socialsurvey.core.starter.ArchiveSocialFeedCollectionJob" />
+		<property name="jobDataMap">
+			<map>
+				<entry key="socialFeedService" value-ref="socialFeedService" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
+	
+	<!-- Run the job every day 6:30 GMT -->
+	<bean id="archiveSocialFeedCollectionCronTrigger"  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="archiveSocialFeedCollectionJob" />
+		<property name="cronExpression" value="0 30 6 * * ?" />
 	</bean> 
 	
 	<!-- setting cron for Review Count Updater -->
@@ -851,6 +868,7 @@
 				<ref bean="surveyInvitationEmailCountJobPastMonth" />
 				<ref bean="surveyInvitationEmailCountJobThisMonth" />
 				<!-- <ref bean="failedstreammsgprocessorjobdetail" />  -->
+				<ref bean="archiveSocialFeedCollectionJob" />
 			</list>
 		</property>
 
@@ -893,6 +911,7 @@
 				<ref bean="surveyInvitationEmailCountCronPastMonth" />
 				<ref bean="surveyInvitationEmailCountCronThisMonth" />
 				<!--  <ref bean="failedstreammsgprocessorceron" />  -->
+				<ref bean="archiveSocialFeedCollectionCronTrigger" />
 			</list>
 		</property>
 		<property name="quartzProperties">

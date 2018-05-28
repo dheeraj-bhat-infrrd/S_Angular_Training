@@ -182,7 +182,7 @@ public interface EmailServices
      */
     public void sendSurveyCompletionMailToAdminsAndAgent( String agentName, String recipientName, String recipientMailId,
         String surveyDetail, String customerName, String rating, String logoUrl, String agentProfileLink,
-        String customerDetail ) throws InvalidInputException, UndeliveredEmailException;
+        String customerDetail, String propertyAddress ) throws InvalidInputException, UndeliveredEmailException;
 
 
     /**

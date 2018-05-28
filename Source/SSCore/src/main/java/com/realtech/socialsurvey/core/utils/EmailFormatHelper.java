@@ -222,6 +222,8 @@ public class EmailFormatHelper
         String lending_tree_link = null;
         String realtor_com_link = null;
         String yelp_link = null;
+        //JIRA SS-1504
+        String property_address = null;
 
         //JIRA SS-626 begin
         try {
@@ -344,6 +346,9 @@ public class EmailFormatHelper
         Map<String, String> surveyMap = fetchSurveySourceId( agentId, recipientMailId, initiatedDate );
         content = content.replace( "[survey_source_id]", surveyMap.get( CommonConstants.SURVEY_SOURCE_ID_COLUMN ) );
         content = content.replace( "[survey_source]", surveyMap.get( CommonConstants.SURVEY_SOURCE_COLUMN ) );
+        //JIRA SS-1504
+        content = content.replace("[property_address]", surveyMap.get( CommonConstants.PROPERTY_ADDRESS ) );
+        content = content.replace("[loan_processor_name]", surveyMap.get( CommonConstants.LOAN_PROCESSOR_NAME ) );
         //JIRA SS-626 end
         content = content.replaceAll( "null", "" );
         LOG.info( "Method to replace legends with values called, replaceLegends() ended" );
@@ -502,6 +507,11 @@ public class EmailFormatHelper
         content = StringUtils.replace( content, "[survey_source_id]",
             surveyMap.get( CommonConstants.SURVEY_SOURCE_ID_COLUMN ) );
         content = StringUtils.replace( content, "[survey_source]", surveyMap.get( CommonConstants.SURVEY_SOURCE_COLUMN ) );
+        //JIRA SS-1504
+        content = StringUtils.replace( content, "[property_address]", surveyMap.get( CommonConstants.PROPERTY_ADDRESS ) );
+        
+        content = StringUtils.replace( content, "[loan_processor_name]", surveyMap.get( CommonConstants.LOAN_PROCESSOR_NAME ) );
+
         //JIRA SS-626 end
         content = StringUtils.replace( content, "null", "" );
         LOG.info( "Method to replace legends with values called, replaceLegends() ended" );
@@ -539,6 +549,8 @@ public class EmailFormatHelper
         }
         String surveySourceId = "";
         String surveySource = "";
+        String propertyAddress = "";
+        String loanProcessorName = "";
         List<SurveyPreInitiation> surveyList = surveyPreInitiationDao.getValidSurveyByAgentIdAndCustomeEmail( agentId,
             customerEmailAddress );
         if ( surveyList.isEmpty() ) {
@@ -551,6 +563,10 @@ public class EmailFormatHelper
                     surveySourceId = fetchSurveySourceId( survey );
                     if ( survey.getSurveySource() != null )
                         surveySource = survey.getSurveySource();
+                    if(survey.getPropertyAddress() != null)
+                        propertyAddress = survey.getPropertyAddress();
+                    if(survey.getLoanProcessorName() != null)
+                        loanProcessorName = survey.getLoanProcessorName();
                     break;
                 }
             }
@@ -559,11 +575,17 @@ public class EmailFormatHelper
             surveySourceId = fetchSurveySourceId( survey );
             if ( survey.getSurveySource() != null )
                 surveySource = survey.getSurveySource();
+            if(survey.getPropertyAddress() != null)
+                propertyAddress = survey.getPropertyAddress();
+            if(survey.getLoanProcessorName() != null)
+                loanProcessorName = survey.getLoanProcessorName();
         }
         LOG.info( "Method fetchSurveySourceId finished for agentId : " + agentId + " and customer : " + customerEmailAddress );
         surveyMap.put( CommonConstants.SURVEY_SOURCE_ID_COLUMN,
             !StringUtils.isEmpty( surveySourceId ) ? surveySourceId : "--" );
         surveyMap.put( CommonConstants.SURVEY_SOURCE_COLUMN, surveySource );
+        surveyMap.put( CommonConstants.PROPERTY_ADDRESS, propertyAddress );
+        surveyMap.put( CommonConstants.LOAN_PROCESSOR_NAME, loanProcessorName );
         return surveyMap;
     }
 
