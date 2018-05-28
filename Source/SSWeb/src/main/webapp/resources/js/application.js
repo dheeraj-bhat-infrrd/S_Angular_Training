@@ -16811,33 +16811,6 @@ $(document).on('click','#mon-type-google-alerts',function(e){
 	}
 });
 
-/*$(document).on('click','#google-alerts-mon-unchecked',function(e){
-	e.stopPropagation();
-	$('#google-alerts-mon-unchecked').addClass('hide');
-	$('#google-alerts-mon-checked').removeClass('hide');
-	getMonitors();
-});
-
-$(document).on('click','#google-alerts-mon-checked',function(e){
-	e.stopPropagation();
-	$('#google-alerts-mon-unchecked').removeClass('hide');
-	$('#google-alerts-mon-checked').addClass('hide');
-	getMonitors();
-});
-
-$(document).on('click','#keyword-mon-unchecked',function(e){
-	e.stopPropagation();
-	$('#keyword-mon-unchecked').addClass('hide');
-	$('#keyword-mon-checked').removeClass('hide');
-	getMonitors();
-});
-
-$(document).on('click','#keyword-mon-checked',function(e){
-	e.stopPropagation();
-	$('#keyword-mon-unchecked').removeClass('hide');
-	$('#keyword-mon-checked').addClass('hide');
-	getMonitors();	
-});*/
 
 $(document).on('click','#stream-usr-selection',function(e){
 	e.stopImmediatePropagation();
