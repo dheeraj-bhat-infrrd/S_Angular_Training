@@ -93,7 +93,7 @@ public class GetSocialFeedReport extends BaseComputeBoltWithAck {
 
     @Override public List<Object> prepareTupleForFailure()
     {
-        return Arrays.asList( false, null, -1, null, null, -1, 0 );
+        return Arrays.asList( false, null, -1, null, null, -1 );
     }
 
 
