@@ -1,5 +1,7 @@
 package com.realtech.socialsurvey.core.enums;
 
+import java.math.BigInteger;
+
 /**
  * Holds the available settings in the application and the
  */
@@ -38,9 +40,9 @@ public enum SettingsForApplication
     }
 
 
-    public double getOrder()
+    public BigInteger getOrder()
     {
-        return Double.parseDouble( this.order );
+        return new BigInteger( this.order );
     }
 
 

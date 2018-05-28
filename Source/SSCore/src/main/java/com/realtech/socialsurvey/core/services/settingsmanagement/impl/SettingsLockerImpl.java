@@ -1,5 +1,7 @@
 package com.realtech.socialsurvey.core.services.settingsmanagement.impl;
 
+import java.math.BigInteger;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -25,7 +27,7 @@ public class SettingsLockerImpl implements SettingsLocker {
 			throw new InvalidInputException("Invalid values set to lock the settings");
 		}
 		LOG.debug("Setting lock values for company: " + company.getCompanyId() + " for settings " + settings + " with lock status: " + hasBeenLocked);
-		double modifiedSettingsLockValue = getModifiedSetSettingsValue(OrganizationUnit.COMPANY, Double.parseDouble(company.getSettingsLockStatus()),
+		BigInteger modifiedSettingsLockValue = getModifiedSetSettingsValue(OrganizationUnit.COMPANY,  new BigInteger(company.getSettingsLockStatus()),
 				settings, hasBeenLocked);
 		company.setSettingsLockStatus(String.valueOf(modifiedSettingsLockValue));
 		LOG.debug("Setting lock values for company: " + company.getCompanyId() + " completed.");
@@ -39,7 +41,7 @@ public class SettingsLockerImpl implements SettingsLocker {
 			throw new InvalidInputException("Invalid values set to lock the region");
 		}
 		LOG.debug("Setting lock values for region: " + region.getRegionId() + " for settings " + settings + " with lock status: " + hasBeenLocked);
-		double modifiedSettingsLockValue = getModifiedSetSettingsValue(OrganizationUnit.REGION, Double.parseDouble(region.getSettingsLockStatus()),
+		BigInteger modifiedSettingsLockValue = getModifiedSetSettingsValue(OrganizationUnit.REGION, new BigInteger(region.getSettingsLockStatus()),
 				settings, hasBeenLocked);
 		region.setSettingsLockStatus(String.valueOf(modifiedSettingsLockValue));
 		LOG.debug("Setting lock values for region: " + region.getRegionId() + " completed.");
@@ -53,7 +55,7 @@ public class SettingsLockerImpl implements SettingsLocker {
 			throw new InvalidInputException("Invalid values set to lock the branch");
 		}
 		LOG.debug("Setting lock values for branch: " + branch.getBranchId() + " for settings " + settings + " with lock status: " + hasBeenLocked);
-		double modifiedSettingsLockValue = getModifiedSetSettingsValue(OrganizationUnit.BRANCH, Double.parseDouble(branch.getSettingsLockStatus()),
+		BigInteger modifiedSettingsLockValue = getModifiedSetSettingsValue(OrganizationUnit.BRANCH, new BigInteger(branch.getSettingsLockStatus()),
 				settings, hasBeenLocked);
 		branch.setSettingsLockStatus(String.valueOf(modifiedSettingsLockValue));
 		LOG.debug("Setting lock values for branch: " + branch.getBranchId() + " completed.");
@@ -61,7 +63,7 @@ public class SettingsLockerImpl implements SettingsLocker {
 	}
 
 	@Override
-	public boolean isSettingsValueLocked(OrganizationUnit organizationUnit, Double currentLockValue, SettingsForApplication settings) {
+	public boolean isSettingsValueLocked(OrganizationUnit organizationUnit, BigInteger currentLockValue, SettingsForApplication settings) {
 		LOG.debug("Checking if the value is locked for the settings");
 		LOG.info("Checking is setting value locked for organizationUnit " + organizationUnit + " lock value " + currentLockValue + " and settings " + settings.toString() );
 		boolean isValueLocked = false;
@@ -131,11 +133,11 @@ public class SettingsLockerImpl implements SettingsLocker {
 		return organizationUnit;
 	}
 
-	double getModifiedSetSettingsValue(OrganizationUnit organizationUnit, Double currentLockValue, SettingsForApplication settings,
+	BigInteger getModifiedSetSettingsValue(OrganizationUnit organizationUnit, BigInteger currentLockValue, SettingsForApplication settings,
 									   boolean hasBeenLocked) throws InvalidSettingsStateException {
 		LOG.debug("Finding the modified settings lock value");
-		double valueToBeReturned = currentLockValue;
-		double valueToBeAdded = 0l;
+		BigInteger valueToBeReturned = currentLockValue;
+		BigInteger valueToBeAdded = BigInteger.valueOf(0);
 		boolean isValueAlreadyLocked = false; // check if the value can be added or not
 		if (organizationUnit == OrganizationUnit.COMPANY) {
 			LOG.debug("Setting lock for company");
@@ -143,16 +145,16 @@ public class SettingsLockerImpl implements SettingsLocker {
 		}
 		else if (organizationUnit == OrganizationUnit.REGION) {
 			LOG.debug("Setting lock for region");
-			valueToBeAdded = 2 * settings.getOrder();
+			valueToBeAdded = (BigInteger.valueOf(2) ).multiply(settings.getOrder() );
 		}
 		else if (organizationUnit == OrganizationUnit.BRANCH) {
 			LOG.debug("Setting lock for branch");
-			valueToBeAdded = 4 * settings.getOrder();
+			valueToBeAdded = (BigInteger.valueOf(4) ).multiply(settings.getOrder());
 		}
 		isValueAlreadyLocked = isSettingsValueLocked(organizationUnit, currentLockValue, settings);
 		if (hasBeenLocked) {
 			if (!isValueAlreadyLocked) {
-				valueToBeReturned = currentLockValue + valueToBeAdded;
+				valueToBeReturned = currentLockValue.add( valueToBeAdded );
 			}
 			else {
 				LOG.warn("Cannot lock an already locked entity.");
@@ -161,7 +163,7 @@ public class SettingsLockerImpl implements SettingsLocker {
 		}
 		else {
 			if (isValueAlreadyLocked) {
-				valueToBeReturned = currentLockValue - valueToBeAdded;
+				valueToBeReturned = currentLockValue.subtract( valueToBeAdded );
 			}
 			else {
 				LOG.warn("Cannot unlock an already unlocked entity.");

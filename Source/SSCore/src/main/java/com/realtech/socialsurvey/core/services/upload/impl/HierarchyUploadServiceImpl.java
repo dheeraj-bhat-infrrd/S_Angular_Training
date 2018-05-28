@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.services.upload.impl;
 
 import java.awt.Image;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.URL;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -985,7 +986,7 @@ public class HierarchyUploadServiceImpl implements HierarchyUploadService
         workEmail.setValue( emailId );
 
         boolean isWorkEmailLockedByCompany = settingsLocker.isSettingsValueLocked( OrganizationUnit.COMPANY,
-            Double.parseDouble( user.getCompany().getSettingsLockStatus() ), SettingsForApplication.EMAIL_ID_WORK );
+            new BigInteger( user.getCompany().getSettingsLockStatus() ), SettingsForApplication.EMAIL_ID_WORK );
 
         AgentSettings agentSettings = organizationManagementService.getAgentSettings( user.getUserId() );
 

@@ -1,5 +1,7 @@
 package com.realtech.socialsurvey.core.services.settingsmanagement;
 
+import java.math.BigInteger;
+
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.Region;
@@ -57,7 +59,7 @@ public interface SettingsSetter {
 	 * @param settings
 	 * @return
 	 */
-	public boolean isSettingsValueSet(OrganizationUnit organizationUnit, double currentSetValue, SettingsForApplication settings);
+	public boolean isSettingsValueSet(OrganizationUnit organizationUnit, BigInteger currentSetValue, SettingsForApplication settings);
 
 	/**
 	 * Check the settings set status

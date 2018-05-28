@@ -1,5 +1,7 @@
 package com.realtech.socialsurvey.core.services.settingsmanagement;
 
+import java.math.BigInteger;
+
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.Region;
@@ -54,7 +56,7 @@ public interface SettingsLocker {
 	 * @param settings
 	 * @return
 	 */
-	public boolean isSettingsValueLocked(OrganizationUnit organizationUnit, Double currentLockValue, SettingsForApplication settings);
+	public boolean isSettingsValueLocked(OrganizationUnit organizationUnit, BigInteger currentLockValue, SettingsForApplication settings);
 
 	/**
 	 * Checks the settings lock status
