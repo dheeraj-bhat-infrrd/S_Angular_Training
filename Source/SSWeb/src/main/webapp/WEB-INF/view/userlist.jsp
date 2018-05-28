@@ -87,7 +87,7 @@
 					<td class="v-tbl-uname fetch-name mng-tbl-name" data-first-name="${userfromsearch.firstName}" data-last-name="${userfromsearch.lastName}"
 						data-user-id="${userfromsearch.userId}">${userfromsearch.displayName}</td>
 					<td class="v-tbl-email fetch-email mng-tbl-email"><div class="mng-tbl-email-div" title="${userfromsearch.emailId}">${userfromsearch.emailId}</div></td>
-					<td class="v-tbl-email fetch-email mng-tbl-soc-conn">
+					<td class="v-tbl-email mng-tbl-soc-conn">
 						<c:forEach var="socialMediaVO" items="${userfromsearch.socialMediaVOs}">
 							<c:set var="status" value="${socialMediaVO.status}" />
 	               		  	<c:set var="socialMedia" value="${socialMediaVO.socialMedia}" />

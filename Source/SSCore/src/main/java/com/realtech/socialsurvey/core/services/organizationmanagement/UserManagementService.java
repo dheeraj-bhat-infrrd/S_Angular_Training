@@ -651,6 +651,8 @@ public interface UserManagementService
 
     
     public List<UserProfile> getUserProfiles( long userId ) throws InvalidInputException;
+    
+    public List<UserProfile> getAllAgentAdminProfilesForUser( User user ) throws InvalidInputException;
 
 }
 // JIRA SS-34 BY RM02 BOC

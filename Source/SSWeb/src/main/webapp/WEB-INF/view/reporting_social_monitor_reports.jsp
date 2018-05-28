@@ -22,10 +22,8 @@
 	<div class="container">
 		<div class="hm-header-row clearfix">
 			<div class="float-left hm-header-row-left hr-dsh-adj-lft">
-				<spring:message code="label.reporting.key" />
+				Social Monitor Reporting
 			</div>
-			<!-- Add user assignment dropdown -->
-			<jsp:include page="user_assignment_dropdown.jsp"></jsp:include>
 		</div>
 	</div>
 </div>
