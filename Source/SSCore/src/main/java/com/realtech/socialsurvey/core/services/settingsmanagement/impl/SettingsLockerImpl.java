@@ -63,8 +63,11 @@ public class SettingsLockerImpl implements SettingsLocker {
 	@Override
 	public boolean isSettingsValueLocked(OrganizationUnit organizationUnit, Double currentLockValue, SettingsForApplication settings) {
 		LOG.debug("Checking if the value is locked for the settings");
+		LOG.info("Checking is setting value locked for organizationUnit " + organizationUnit + " lock value " + currentLockValue + " and settings " + settings.toString() );
 		boolean isValueLocked = false;
 		String sCurrentLockValue = String.valueOf(currentLockValue);
+		LOG.info("string sCurrentLockValue is " + sCurrentLockValue);
+		LOG.info("string index is " + settings.getIndex());
 		// find index of the settings to be checked for.
 		// get the length of the value. Get the index from enum and deduct it from the length
 		if (sCurrentLockValue.length() >= settings.getIndex()) {
