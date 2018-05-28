@@ -49,39 +49,41 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
 
     @Override
     public void executeTuple( Tuple input )
-    {
-        LOG.debug( "Executing filter social post bolt" );
-        SocialResponseObject<?> post = (SocialResponseObject<?>) input.getValueByField( "post" );
-        SocialResponseType socialResponseType = (SocialResponseType) input.getValueByField( "type" );
-        long companyId = input.getLongByField( "companyId" );
-        String postId = null;
-        if ( post != null ) {
-        		//check if post from trusted source
-        		if(isPostFromTrustedSource(post , companyId)){
-        			post.setStatus( SocialFeedStatus.RESOLVED );
-        		}else {
-        			post.setStatus( SocialFeedStatus.NEW );
-                    post.setActionHistory( new ArrayList<>() );
-                    if ( post.getText() != null ) {
-                        String text = post.getText();
-                        postId = post.getPostId();
-                        List<String> foundKeyWords;
-                        TrieNode root = getTrieForCompany( companyId );
-                        foundKeyWords = findPhrases( root, text );
-                        if ( !foundKeyWords.isEmpty() ) {
-                            post.setFoundKeywords( foundKeyWords );
-                            post.setFlagged( Boolean.TRUE );
-                            post.getActionHistory().add( getFlaggedActionHistory( foundKeyWords ) );
-                            addTextHighlight(post);
-                        }
-                    }
-        		}    	
-            
-        }
-        LOG.debug( "Emitting tuple with post having postId = {}",  postId);
-        _collector.emit( input, Arrays.asList( companyId, post, socialResponseType ) );
+	{
+		LOG.debug("Executing filter social post bolt");
+		SocialResponseObject<?> post = (SocialResponseObject<?>) input.getValueByField("post");
+		SocialResponseType socialResponseType = (SocialResponseType) input.getValueByField("type");
+		long companyId = input.getLongByField("companyId");
+		String postId = null;
+		if (post != null) {
+			post.setActionHistory(new ArrayList<>());
+			if (post.getText() != null) {
+				String text = post.getText();
+				postId = post.getPostId();
+				List<String> foundKeyWords;
+				TrieNode root = getTrieForCompany(companyId);
+				foundKeyWords = findPhrases(root, text);
+				if (!foundKeyWords.isEmpty()) {
+					post.setFoundKeywords(foundKeyWords);
+					post.setFlagged(Boolean.TRUE);
+					post.getActionHistory().add(getFlaggedActionHistory(foundKeyWords));
+					addTextHighlight(post);
+				}
+				
+				// check if post from trusted source
+				if (isPostFromTrustedSource(post, companyId)) {
+					post.setStatus(SocialFeedStatus.RESOLVED);			
+					post.getActionHistory().add(getTrustedSourceActionHistory(post.getPostSource())); 
+				} else {
+					post.setStatus(SocialFeedStatus.NEW);
+				}
+			}
 
-    }
+		}
+		LOG.debug("Emitting tuple with post having postId = {}", postId);
+		_collector.emit(input, Arrays.asList(companyId, post, socialResponseType));
+
+	}
 
     /**
      * Method to add text highlighting
@@ -274,4 +276,12 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
     		return false;
     }
     
+    private ActionHistory getTrustedSourceActionHistory( String source )
+    {
+        ActionHistory actionHistory = new ActionHistory();
+        actionHistory.setCreatedDate( new Date().getTime() );
+        actionHistory.setActionType( ActionHistoryType.RESOLVED );
+        actionHistory.setText( "The post was <b class='soc-mon-bold-text'>Resolved</b> for having source<b class='soc-mon-bold-text'>" + source + "</b>");
+        return actionHistory;
+    }
 }
