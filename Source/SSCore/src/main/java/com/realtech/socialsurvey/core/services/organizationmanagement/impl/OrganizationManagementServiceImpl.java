@@ -3597,8 +3597,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 if ( userProfiles != null && !userProfiles.isEmpty() ) {
                     for ( UserProfile profile : userProfiles ) {
                         if ( ( profile.getUser().getUserId() == ( assigneeUser.getUserId() ) )
-                            && profile.getProfilesMaster() == profilesMasterDao.findById( ProfilesMaster.class,
-                                CommonConstants.PROFILES_MASTER_SM_ADMIN_PROFILE_ID )
+                            && profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_SM_ADMIN_PROFILE_ID
                             && profile.getStatus() == CommonConstants.STATUS_ACTIVE ) {
                             flag = 2;
                             break;
@@ -10274,5 +10273,32 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             isAgentProfileDisabled, MongoOrganizationUnitSettingDaoImpl.KEY_IDEN,userIdList,MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION  );
     }
 
+
+    @Override
+    public boolean isSocialMonitorAdmin( Long agentId ) throws InvalidInputException
+    {
+        LOG.debug( "Method isSocialMonitorAdmin called for agentId:" + agentId );
+        if ( agentId < 0l ) {
+            throw new InvalidInputException( "Invalid agent id passed as argument " );
+        }
+
+
+        List<UserProfile> userProfiles = new ArrayList<>();
+        User user = userDao.findById( User.class, agentId );
+        if ( user != null && user.getStatus() == CommonConstants.STATUS_ACTIVE) {
+            userProfiles = user.getUserProfiles();
+        }
+
+        if ( userProfiles != null && !userProfiles.isEmpty() ) {
+            for ( UserProfile userProfile : userProfiles ) {
+                if ( userProfile.getUser().getUserId() == agentId
+                    && userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_SM_ADMIN_PROFILE_ID
+                    && userProfile.getStatus() == CommonConstants.STATUS_ACTIVE ) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }
 
