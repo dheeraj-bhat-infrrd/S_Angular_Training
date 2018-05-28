@@ -358,7 +358,7 @@
 		hideOverlay();
 		
 		var isSummitFirstTime = $('#summit-popup-details').val();
-		if(isSummitFirstTime == 'true'){
+		if(isSummitFirstTime == 'true' && parseInt(profileMasterIdLead) == 1){
 			showSummitPopup();
 			$('#summit-popup-details').val('false');
 		}

@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.gson.Gson;
 import com.realtech.socialsurvey.api.exceptions.SSApiException;
 import com.realtech.socialsurvey.api.models.SurveyPutVO;
 import com.realtech.socialsurvey.api.models.v2.IncompeteSurveyGetVO;
@@ -59,15 +60,23 @@ import io.swagger.annotations.ApiOperation;
 public class SurveyApiV2Controller
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( SurveyApiV2Controller.class );
+    Logger AUDIT_LOG = LoggerFactory.getLogger("Audit");
+    private static final Logger AUDIT_app = LoggerFactory.getLogger("auditlog");
 
+    
     @Autowired
     private SurveysAndReviewsV2VOTransformer surveysAndReviewsV2VOTransformer;
     
     @Autowired
     private IncompleteSurveyVOTransformer incompleteSurveyVOTransformer;  
 
-    @Autowired
     private SurveyHandler surveyHandler;
+    
+    @Autowired
+    public void setSurveyHandler(SurveyHandler surveyHandler) {
+        this.surveyHandler = surveyHandler;
+    }
+
 
     @Autowired
     private AdminAuthenticationService adminAuthenticationService;
@@ -91,7 +100,7 @@ public class SurveyApiV2Controller
 		this.surveyBuilder = surveyBuilder;
 	}
 
-
+    
 	@RequestMapping ( value = "/surveys", method = RequestMethod.PUT)
     @ApiOperation ( value = "Post Survey Transaction")
     public ResponseEntity<?> postSurveyTransaction( @Valid @RequestBody SurveyPutVO surveyModel, HttpServletRequest request )
@@ -452,9 +461,9 @@ public class SurveyApiV2Controller
     
     @RequestMapping ( value = "/swearwords",method = RequestMethod.GET)
     @ApiOperation ( value = "Get Swear Words" )
-    public String getSwearWordsList(){
+    public String getSwearWordsList(long companyId) throws InvalidInputException{
         LOGGER.info("Method getSwearWordsList() started to send swear word list");
-        return surveyHandler.getSwearWords() ;
+        return new Gson().toJson(surveyHandler.fetchSwearWords( "companyId", companyId ));
     }
 
    
@@ -760,5 +769,53 @@ public class SurveyApiV2Controller
             companyId );
     }
     
+    @RequestMapping ( value = "/swearwords/{companyId}", method = RequestMethod.GET)
+    @ApiOperation ( value = "Get Swear Words")
+    public ResponseEntity<?> getSwearWords( @PathVariable ( "companyId") long companyId, HttpServletRequest request )
+        throws SSApiException, InvalidInputException
+    {
+        LOGGER.info( "SurveyApiController.getSwearWords started for companyId:{}",companyId );
+
+        //authorize request
+        long companyIdAuth = 0;
+        String[] swear_words = null;
+        String authorizationHeader = request.getHeader( CommonConstants.SURVEY_API_REQUEST_PARAMETER_AUTHORIZATION );
+        try {
+            companyIdAuth = adminAuthenticationService.validateAuthHeader( authorizationHeader );
+            if(companyId != companyIdAuth)
+                return restUtils.getRestResponseEntity( HttpStatus.UNAUTHORIZED, "YOU NEED TO USE AUTH OF THE SAME COMPANY", null, null, request, companyId );
+        } catch ( AuthorizationException e1 ) {
+            return restUtils.getRestResponseEntity( HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", null, null, request, companyId );
+        }
+        swear_words = surveyHandler.fetchSwearWords( "companyId", companyId );
+        return restUtils.getRestResponseEntity( HttpStatus.OK, "Request Successfully processed", "swearWords", swear_words, request,
+            companyId );
+    }
+    
+    @RequestMapping ( value = "/swearwords/{companyId}", method = RequestMethod.POST)
+    @ApiOperation ( value = "post swear words Transaction")
+    public ResponseEntity<?> postSwearWords( @PathVariable ( "companyId") long companyId, HttpServletRequest request , @RequestBody String[] swearWords)
+        throws SSApiException, InvalidInputException
+    {
+        LOGGER.info( "SurveyApiController.getSwearWords started for companyId:{}",companyId );
+        AUDIT_LOG.info("Swear words list was changed by companyId : {} \n the swear word list is : {}",companyId,swearWords );
+        AUDIT_app.info("test reference");
+
+
+        //authorize request
+        long companyIdAuth = 0;
+        String authorizationHeader = request.getHeader( CommonConstants.SURVEY_API_REQUEST_PARAMETER_AUTHORIZATION );
+        try {
+            companyIdAuth = adminAuthenticationService.validateAuthHeader( authorizationHeader );
+            if(companyId != companyIdAuth)
+                return restUtils.getRestResponseEntity( HttpStatus.UNAUTHORIZED, "YOU NEED TO USE AUTH OF THE SAME COMPANY", null, null, request, companyId );
+        } catch ( AuthorizationException e1 ) {
+            return restUtils.getRestResponseEntity( HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", null, null, request, companyId );
+        }
+        surveyHandler.updateSwearWords( "companyId", companyId, swearWords );
+        return restUtils.getRestResponseEntity( HttpStatus.OK, "Request Successfully processed", null, null, request,
+            companyId );
+    }
+
 }
 

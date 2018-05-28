@@ -37,6 +37,8 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -119,6 +121,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 {
 
     private static final Logger LOG = LoggerFactory.getLogger( SurveyHandlerImpl.class );
+    
+
 
     private static String SWEAR_WORDS;
 
@@ -371,6 +375,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 surveyPreInitiation.getCustomerEmailId(), surveyPreInitiation.getCustomerLastName(), lastName );
         } else {
             survey = surveyDetailsDao.getSurveyBySurveyPreIntitiationId( surveyPreInitiation.getSurveyPreIntitiationId() );
+        }
+        
+        if(surveyPreInitiation.getPropertyAddress() != null) {
+            surveyDetails.setPropertyAddress( surveyPreInitiation.getPropertyAddress() );
         }
 
         if ( survey == null ) {
@@ -5071,4 +5079,18 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 		}
 
 	}
+    
+    @Override 
+    public String[] fetchSwearWords(String entityType, long entityId) throws InvalidInputException {
+        String[] returnSwear = organizationUnitSettingsDao.fetchSavedSwearWords( entityType, entityId ).getSwearWords();
+        LOG.debug( "returnSwear:{}",returnSwear );
+        return returnSwear;
+    }
+    
+    @Override 
+    public void updateSwearWords( String entityType, long entityId, String[] swearWords ) throws InvalidInputException {
+        organizationUnitSettingsDao.updateSwearWords( entityType, entityId , swearWords);
+    }
+
 }
+

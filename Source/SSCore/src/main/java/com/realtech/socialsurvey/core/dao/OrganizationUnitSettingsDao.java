@@ -343,4 +343,10 @@ public interface OrganizationUnitSettingsDao
 
 
     void updateSocialMediaForUsers( List<Long> userIdList, boolean disableSocialMediaTokens );
+
+
+    OrganizationUnitSettings fetchSavedSwearWords( String entityType, long entityId ) throws InvalidInputException;
+
+
+    void updateSwearWords( String entityType, long entityId, String[] swearWords ) throws InvalidInputException;
 }
