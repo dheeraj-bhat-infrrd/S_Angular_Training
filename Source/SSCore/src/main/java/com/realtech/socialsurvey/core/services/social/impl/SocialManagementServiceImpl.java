@@ -2216,6 +2216,17 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 updateSocialConnectionsHistory( entityType, entityId, mediaTokens, socialMedia,
                     CommonConstants.SOCIAL_MEDIA_DISCONNECTED );
             }
+            if ( mediaTokens.getInstagramToken() != null ) {
+                String socialMedia = CommonConstants.INSTAGRAM_SOCIAL_SITE;
+                SettingsForApplication settings = SettingsForApplication.INSTAGRAM;
+                // disconnect social network in mongo
+                disconnectSocialNetwork( socialMedia, true, unitSettings, collection );
+                // Update settings set status
+                updateSettingsSetStatusByEntityType( entityType, entityId, settings, unset );
+                // update social connections history
+                updateSocialConnectionsHistory( entityType, entityId, mediaTokens, socialMedia,
+                    CommonConstants.SOCIAL_MEDIA_DISCONNECTED );
+            }
 
             // Finally unset SocialMediaTokens
             removeSocialMediaTokens( unitSettings, collection );

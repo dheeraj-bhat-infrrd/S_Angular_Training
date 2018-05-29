@@ -1,5 +1,7 @@
 package com.realtech.socialsurvey.core.services.settingsmanagement.impl;
 
+import java.math.BigInteger;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -27,7 +29,7 @@ public class SettingsSetterImpl implements SettingsSetter {
 			throw new InvalidInputException("Invalid input sent for settings update");
 		}
 		LOG.debug("Setting values to company " + company);
-		double modifiedSetSettingsValue = getModifiedSetSettingsValue(OrganizationUnit.COMPANY, Double.parseDouble(company.getSettingsSetStatus()),
+		BigInteger modifiedSetSettingsValue = getModifiedSetSettingsValue(OrganizationUnit.COMPANY, new BigInteger(company.getSettingsSetStatus()),
 				settings, hasBeenSet);
 		String modifiedSetSettingsStringValue = String.valueOf( modifiedSetSettingsValue );
 		company.setSettingsSetStatus(modifiedSetSettingsStringValue.split( "\\." ).length > 1 ? modifiedSetSettingsStringValue.split( "\\." )[0]
@@ -43,7 +45,7 @@ public class SettingsSetterImpl implements SettingsSetter {
 			throw new InvalidInputException("Invalid input sent for settings update");
 		}
 		LOG.debug("Setting values to region " + region);
-		double modifiedSetSettingsValue = getModifiedSetSettingsValue(OrganizationUnit.REGION, Double.parseDouble(region.getSettingsSetStatus()), settings,
+		BigInteger modifiedSetSettingsValue = getModifiedSetSettingsValue(OrganizationUnit.REGION, new BigInteger(region.getSettingsSetStatus()), settings,
 				hasBeenSet);
 		String modifiedSetSettingsStringValue = String.valueOf( modifiedSetSettingsValue );
 		region.setSettingsSetStatus(modifiedSetSettingsStringValue.split( "\\." ).length > 1 ? modifiedSetSettingsStringValue.split( "\\." )[0]
@@ -59,7 +61,7 @@ public class SettingsSetterImpl implements SettingsSetter {
 			throw new InvalidInputException("Invalid input sent for settings update");
 		}
 		LOG.debug("Setting values to branch " + branch);
-		double modifiedSetSettingsValue = getModifiedSetSettingsValue(OrganizationUnit.BRANCH, Double.parseDouble(branch.getSettingsSetStatus()), settings,
+		BigInteger modifiedSetSettingsValue = getModifiedSetSettingsValue(OrganizationUnit.BRANCH, new BigInteger(branch.getSettingsSetStatus()), settings,
 				hasBeenSet);
 		String modifiedSetSettingsStringValue = String.valueOf( modifiedSetSettingsValue );
 		branch.setSettingsSetStatus(modifiedSetSettingsStringValue.split( "\\." ).length > 1 ? modifiedSetSettingsStringValue.split( "\\." )[0]
@@ -67,11 +69,11 @@ public class SettingsSetterImpl implements SettingsSetter {
 		return branch;
 	}
 
-	double getModifiedSetSettingsValue(OrganizationUnit organizationUnit, double currentSetValue, SettingsForApplication settings,
+	BigInteger getModifiedSetSettingsValue(OrganizationUnit organizationUnit, BigInteger currentSetValue, SettingsForApplication settings,
 									   boolean hasBeenSet) {
 		LOG.debug("Finding the modified set settings value");
-		double valueToBeReturned = currentSetValue;
-		double valueToBeAdded = 0l;
+		BigInteger valueToBeReturned = currentSetValue;
+		BigInteger valueToBeAdded = BigInteger.valueOf(0);
 		boolean isValueAlreadySet = false; // check if the value can be added or not
 		if (organizationUnit == OrganizationUnit.COMPANY) {
 			LOG.debug("Setting set for company");
@@ -79,28 +81,28 @@ public class SettingsSetterImpl implements SettingsSetter {
 		}
 		else if (organizationUnit == OrganizationUnit.REGION) {
 			LOG.debug("Setting set for region");
-			valueToBeAdded = 2 *  settings.getOrder() ;
+			valueToBeAdded =  settings.getOrder().multiply(BigInteger.valueOf(2)) ;
 		}
 		else if (organizationUnit == OrganizationUnit.BRANCH) {
 			LOG.debug("Setting set for branch");
-			valueToBeAdded = 4 *  settings.getOrder() ;
+			valueToBeAdded = settings.getOrder().multiply(BigInteger.valueOf(4)) ;
 		}
 		isValueAlreadySet = isSettingsValueSet(organizationUnit, currentSetValue, settings);
 		if (hasBeenSet) {
 			if (!isValueAlreadySet) {
-				valueToBeReturned = currentSetValue + valueToBeAdded;
+				valueToBeReturned = currentSetValue.add( valueToBeAdded);
 			}
 		}
 		else {
 			if (isValueAlreadySet) {
-				valueToBeReturned = currentSetValue - valueToBeAdded;
+				valueToBeReturned = currentSetValue.subtract( valueToBeAdded );
 			}
 		}
 		return valueToBeReturned;
 	}
 
 	@Override
-	public boolean isSettingsValueSet(OrganizationUnit organizationUnit, double currentSetValue, SettingsForApplication settings) {
+	public boolean isSettingsValueSet(OrganizationUnit organizationUnit, BigInteger currentSetValue, SettingsForApplication settings) {
 		LOG.debug("Checking if the value is set for the settings");
 		boolean isValueSet = false;
 		String sCurrentSetValue = String.valueOf(currentSetValue).split( "\\." ).length > 1 ?

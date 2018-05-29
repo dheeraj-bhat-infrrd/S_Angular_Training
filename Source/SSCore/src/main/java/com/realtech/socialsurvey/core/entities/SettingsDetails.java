@@ -1,12 +1,14 @@
 package com.realtech.socialsurvey.core.entities;
 
+import java.math.BigInteger;
+
 /**
  * Holds detials of the settings set by organization unit
  */
 public class SettingsDetails {
 
 	private long lockSettingsHolder;
-	private double setSettingsHolder;
+	private BigInteger setSettingsHolder;
 
 	public long getLockSettingsHolder() {
 		return lockSettingsHolder;
@@ -16,11 +18,11 @@ public class SettingsDetails {
 		this.lockSettingsHolder = lockSettingsHolder;
 	}
 
-	public double getSetSettingsHolder() {
+	public BigInteger getSetSettingsHolder() {
 		return setSettingsHolder;
 	}
 
-	public void setSetSettingsHolder(double setSettingsHolder) {
+	public void setSetSettingsHolder(BigInteger setSettingsHolder) {
 		this.setSettingsHolder = setSettingsHolder;
 	}
 

@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
+import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -7263,12 +7264,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 // get the branch settings
                 try {
                     branchSettings = getBranchSettings( branch.getBranchId() );
-                    long actualHierachySettings = getHierarchySettings( branchSettings.getOrganizationUnitSettings(),
+                    BigInteger actualHierachySettings = getHierarchySettings( branchSettings.getOrganizationUnitSettings(),
                         OrganizationUnit.BRANCH );
-                    if ( actualHierachySettings != Long.valueOf( branch.getSettingsSetStatus() ) ) {
+                    if ( actualHierachySettings != new BigInteger( branch.getSettingsSetStatus() ) ) {
                         compareObject = new HierarchySettingsCompare();
                         compareObject.setId( branch.getBranchId() );
-                        compareObject.setCurrentValue( Long.valueOf( branch.getSettingsSetStatus() ) );
+                        compareObject.setCurrentValue( new BigInteger( branch.getSettingsSetStatus() ) );
                         compareObject.setExpectedValue( actualHierachySettings );
                         compareObjects.add( compareObject );
                     }
@@ -7294,11 +7295,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                 // get the region settings
                 try {
                     regionSettings = getRegionSettings( region.getRegionId() );
-                    long actualHierachySettings = getHierarchySettings( regionSettings, OrganizationUnit.REGION );
-                    if ( actualHierachySettings != Long.valueOf( region.getSettingsSetStatus() ) ) {
+                    BigInteger actualHierachySettings = getHierarchySettings( regionSettings, OrganizationUnit.REGION );
+                    if ( actualHierachySettings != new BigInteger( region.getSettingsSetStatus() ) ) {
                         compareObject = new HierarchySettingsCompare();
                         compareObject.setId( region.getRegionId() );
-                        compareObject.setCurrentValue( Long.valueOf( region.getSettingsSetStatus() ) );
+                        compareObject.setCurrentValue( new BigInteger( region.getSettingsSetStatus() ) );
                         compareObject.setExpectedValue( actualHierachySettings );
                         compareObjects.add( compareObject );
                     }
@@ -7312,11 +7313,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
 
-    long getHierarchySettings( OrganizationUnitSettings unitSettings, OrganizationUnit organizationUnit )
+    BigInteger getHierarchySettings( OrganizationUnitSettings unitSettings, OrganizationUnit organizationUnit )
         throws InvalidInputException
     {
         LOG.debug( "Getting current hierarchy settings " );
-        long setterValue = 0l;
+        BigInteger setterValue =  BigInteger.valueOf(0);
         int factor = -1;
         if ( organizationUnit == OrganizationUnit.COMPANY ) {
             factor = 1;
@@ -7329,40 +7330,44 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
         if ( unitSettings.getLogo() != null ) {
             LOG.debug( "Logo is set" );
-            setterValue += SettingsForApplication.LOGO.getOrder() * factor;
+            setterValue = setterValue.add( SettingsForApplication.LOGO.getOrder().multiply( BigInteger.valueOf(factor) ) );
         } else {
             LOG.debug( "Logo is not set" );
         }
         if ( unitSettings.getContact_details() != null ) {
             if ( unitSettings.getContact_details().getAddress() != null ) {
                 LOG.debug( "Address is set" );
-                setterValue += SettingsForApplication.ADDRESS.getOrder() * factor;
+                setterValue = setterValue.add( SettingsForApplication.ADDRESS.getOrder().multiply( BigInteger.valueOf(factor) ) );
             } else {
                 LOG.debug( "Address is not set" );
             }
             if ( unitSettings.getContact_details().getContact_numbers() != null ) {
                 LOG.debug( "Contact number is set" );
-                setterValue += SettingsForApplication.PHONE.getOrder() * factor;
+                setterValue = setterValue.add( SettingsForApplication.PHONE.getOrder().multiply( BigInteger.valueOf(factor) ) );
+
             } else {
                 LOG.debug( "Contact number is not set" );
             }
             // skipping location
             if ( unitSettings.getContact_details().getWeb_addresses() != null ) {
                 LOG.debug( "Web address is set" );
-                setterValue += SettingsForApplication.WEB_ADDRESS_WORK.getOrder() * factor;
+                setterValue = setterValue.add( SettingsForApplication.WEB_ADDRESS_WORK.getOrder().multiply( BigInteger.valueOf(factor) ) );
+
             } else {
                 LOG.debug( "Web address is not set" );
             }
             if ( unitSettings.getContact_details().getAbout_me() != null ) {
                 LOG.debug( "About me is set" );
-                setterValue += SettingsForApplication.ABOUT_ME.getOrder() * factor;
+                setterValue = setterValue.add( SettingsForApplication.ABOUT_ME.getOrder().multiply( BigInteger.valueOf(factor) ) );
+
             } else {
                 LOG.debug( "About me is not set" );
             }
             if ( unitSettings.getContact_details().getMail_ids() != null
                 && unitSettings.getContact_details().getMail_ids().getWork() != null ) {
                 LOG.debug( "Work email id is set" );
-                setterValue += SettingsForApplication.EMAIL_ID_WORK.getOrder() * factor;
+                setterValue = setterValue.add( SettingsForApplication.EMAIL_ID_WORK.getOrder().multiply( BigInteger.valueOf(factor) ) );
+
             } else {
                 LOG.debug( "Work email id is not set" );
             }
@@ -7370,57 +7375,73 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( unitSettings.getSocialMediaTokens() != null ) {
             if ( unitSettings.getSocialMediaTokens().getFacebookToken() != null ) {
                 LOG.debug( "Facebook is set" );
-                setterValue += SettingsForApplication.FACEBOOK.getOrder() * factor;
+                setterValue = setterValue.add( SettingsForApplication.FACEBOOK.getOrder().multiply( BigInteger.valueOf(factor) ) );
+
             } else {
                 LOG.debug( "Facebook is not set" );
             }
             if ( unitSettings.getSocialMediaTokens().getTwitterToken() != null ) {
                 LOG.debug( "Twitter is set" );
-                setterValue += SettingsForApplication.TWITTER.getOrder() * factor;
+                setterValue = setterValue.add( SettingsForApplication.TWITTER.getOrder().multiply( BigInteger.valueOf(factor) ) );
+
             } else {
                 LOG.debug( "Twitter is not set" );
             }
             if ( unitSettings.getSocialMediaTokens().getLinkedInToken() != null ) {
                 LOG.debug( "Linkedin is set" );
-                setterValue += SettingsForApplication.LINKED_IN.getOrder() * factor;
+                setterValue = setterValue.add( SettingsForApplication.LINKED_IN.getOrder().multiply( BigInteger.valueOf(factor) ) );
+
             } else {
                 LOG.debug( "Linkedin is not set" );
             }
             if ( unitSettings.getSocialMediaTokens().getGoogleToken() != null ) {
                 LOG.debug( "Google+ is set" );
-                setterValue += SettingsForApplication.GOOGLE_PLUS.getOrder() * factor;
+                setterValue = setterValue.add( SettingsForApplication.GOOGLE_PLUS.getOrder().multiply( BigInteger.valueOf(factor) ) );
+
             } else {
                 LOG.debug( "Google+ is not set" );
             }
             if ( unitSettings.getSocialMediaTokens().getYelpToken() != null ) {
                 LOG.debug( "Yelp is set" );
-                setterValue += SettingsForApplication.YELP.getOrder() * factor;
+                setterValue = setterValue.add( SettingsForApplication.YELP.getOrder().multiply( BigInteger.valueOf(factor) ) );
+
             } else {
                 LOG.debug( "Yelp is not set" );
             }
             if ( unitSettings.getSocialMediaTokens().getZillowToken() != null ) {
                 LOG.debug( "Zillow is set" );
-                setterValue += SettingsForApplication.ZILLOW.getOrder() * factor;
+                setterValue = setterValue.add( SettingsForApplication.ZILLOW.getOrder().multiply( BigInteger.valueOf(factor) ) );
             } else {
                 LOG.debug( "Zillow is not set" );
             }
             if ( unitSettings.getSocialMediaTokens().getRealtorToken() != null ) {
                 LOG.debug( "Realtor is set" );
-                setterValue += SettingsForApplication.REALTOR.getOrder() * factor;
+                setterValue = setterValue.add( SettingsForApplication.REALTOR.getOrder().multiply( BigInteger.valueOf(factor) ) );
+
             } else {
                 LOG.debug( "Realtor is not set" );
             }
             if ( unitSettings.getSocialMediaTokens().getLendingTreeToken() != null ) {
                 LOG.debug( "Lending tree is set" );
-                setterValue += SettingsForApplication.LENDING_TREE.getOrder() * factor;
+                setterValue = setterValue.add( SettingsForApplication.LENDING_TREE.getOrder().multiply( BigInteger.valueOf(factor) ) );
+
             } else {
                 LOG.debug( "Lending tree is not set" );
             }
             if ( unitSettings.getSocialMediaTokens().getGoogleBusinessToken() != null ) {
                 LOG.debug( "Google business is set" );
-                setterValue += SettingsForApplication.GOOGLE_BUSINESS.getOrder() * factor;
+                setterValue = setterValue.add( SettingsForApplication.GOOGLE_BUSINESS.getOrder().multiply( BigInteger.valueOf(factor) ) );
+
             } else {
                 LOG.debug( "Google business is not set" );
+            }
+            
+            if ( unitSettings.getSocialMediaTokens().getInstagramToken() != null ) {
+                LOG.debug( "Instagram is set" );
+                setterValue = setterValue.add( SettingsForApplication.INSTAGRAM.getOrder().multiply( BigInteger.valueOf(factor) ) );
+
+            } else {
+                LOG.debug( "Instagram is not set" );
             }
         }
         LOG.debug( "Final Settings setter value : " + setterValue );
@@ -7786,44 +7807,49 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     private void processRegion( OrganizationUnitSettings regionSetting, Region region )
     {
         LOG.debug( "Processing region " + region.getRegion() );
-        double setterValue = 0l;
+        BigInteger setterValue = new BigInteger("0");
         LOG.debug( "Getting details of region: " + region.getRegion() );
         if ( regionSetting.getLogo() != null ) {
             LOG.debug( "Logo is set" );
-            setterValue += SettingsForApplication.LOGO.getOrder()  * 2;
+            setterValue.add( SettingsForApplication.LOGO.getOrder().multiply( BigInteger.valueOf( 2 ) ) );
         } else {
             LOG.debug( "Logo is not set" );
         }
         if ( regionSetting.getContact_details() != null ) {
             if ( regionSetting.getContact_details().getAddress() != null ) {
                 LOG.debug( "Address is set" );
-                setterValue +=  SettingsForApplication.ADDRESS.getOrder() * 2;
+                setterValue.add( SettingsForApplication.ADDRESS.getOrder().multiply( BigInteger.valueOf( 2 ) ) );
+
             } else {
                 LOG.debug( "Address is not set" );
             }
             if ( regionSetting.getContact_details().getContact_numbers() != null ) {
                 LOG.debug( "Contact number is set" );
-                setterValue +=  SettingsForApplication.PHONE.getOrder() * 2;
+                setterValue.add( SettingsForApplication.PHONE.getOrder().multiply( BigInteger.valueOf( 2 ) ) );
+
             } else {
                 LOG.debug( "Contact number is not set" );
             }
             // skipping location  check for work too
             if ( regionSetting.getContact_details().getWeb_addresses() != null ) {
                 LOG.debug( "Web address is set" );
-                setterValue +=  SettingsForApplication.WEB_ADDRESS_WORK.getOrder()  * 2;
+                setterValue.add( SettingsForApplication.WEB_ADDRESS_WORK.getOrder().multiply( BigInteger.valueOf( 2 ) ) );
+
             } else {
                 LOG.debug( "Web address is not set" );
             }
             if ( regionSetting.getContact_details().getAbout_me() != null ) {
                 LOG.debug( "About me is set" );
-                setterValue +=  SettingsForApplication.ABOUT_ME.getOrder()  * 2;
+                setterValue.add( SettingsForApplication.ABOUT_ME.getOrder().multiply( BigInteger.valueOf( 2 ) ) );
+
             } else {
                 LOG.debug( "About me is not set" );
             }
             if ( regionSetting.getContact_details().getMail_ids() != null
                 && regionSetting.getContact_details().getMail_ids().getWork() != null ) {
                 LOG.debug( "Work email id is set" );
-                setterValue +=  SettingsForApplication.EMAIL_ID_WORK.getOrder()  * 2;
+                setterValue.add( SettingsForApplication.EMAIL_ID_WORK.getOrder().multiply( BigInteger.valueOf( 2 ) ) );
+
             } else {
                 LOG.debug( "Work email id is not set" );
             }
@@ -7831,57 +7857,74 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( regionSetting.getSocialMediaTokens() != null ) {
             if ( regionSetting.getSocialMediaTokens().getFacebookToken() != null ) {
                 LOG.debug( "Facebook is set" );
-                setterValue +=  SettingsForApplication.FACEBOOK.getOrder()  * 2;
+                setterValue.add( SettingsForApplication.FACEBOOK.getOrder().multiply( BigInteger.valueOf( 2 ) ) );
+
             } else {
                 LOG.debug( "Facebook is not set" );
             }
             if ( regionSetting.getSocialMediaTokens().getTwitterToken() != null ) {
                 LOG.debug( "Twitter is set" );
-                setterValue += SettingsForApplication.TWITTER.getOrder()  * 2;
+                setterValue.add( SettingsForApplication.TWITTER.getOrder().multiply( BigInteger.valueOf( 2 ) ) );
+
             } else {
                 LOG.debug( "Twitter is not set" );
             }
             if ( regionSetting.getSocialMediaTokens().getLinkedInToken() != null ) {
                 LOG.debug( "Linkedin is set" );
-                setterValue +=  SettingsForApplication.LINKED_IN.getOrder() * 2;
+                setterValue.add( SettingsForApplication.LINKED_IN.getOrder().multiply( BigInteger.valueOf( 2 ) ) );
+
             } else {
                 LOG.debug( "Linkedin is not set" );
             }
             if ( regionSetting.getSocialMediaTokens().getGoogleToken() != null ) {
                 LOG.debug( "Google+ is set" );
-                setterValue +=  SettingsForApplication.GOOGLE_PLUS.getOrder()  * 2;
+                setterValue.add( SettingsForApplication.GOOGLE_PLUS.getOrder().multiply( BigInteger.valueOf( 2 ) ) );
+
             } else {
                 LOG.debug( "Google+ is not set" );
             }
             if ( regionSetting.getSocialMediaTokens().getYelpToken() != null ) {
                 LOG.debug( "Yelp is set" );
-                setterValue +=  SettingsForApplication.YELP.getOrder() * 2;
+                setterValue.add( SettingsForApplication.YELP.getOrder().multiply( BigInteger.valueOf( 2 ) ) );
+
             } else {
                 LOG.debug( "Yelp is not set" );
             }
             if ( regionSetting.getSocialMediaTokens().getZillowToken() != null ) {
                 LOG.debug( "Zillow is set" );
-                setterValue +=  SettingsForApplication.ZILLOW.getOrder()  * 2;
+                setterValue.add( SettingsForApplication.ZILLOW.getOrder().multiply( BigInteger.valueOf( 2 ) ) );
+
             } else {
                 LOG.debug( "Zillow is not set" );
             }
             if ( regionSetting.getSocialMediaTokens().getRealtorToken() != null ) {
                 LOG.debug( "Realtor is set" );
-                setterValue += SettingsForApplication.REALTOR.getOrder()  * 2;
+                setterValue.add( SettingsForApplication.REALTOR.getOrder().multiply( BigInteger.valueOf( 2 ) ) );
+
             } else {
                 LOG.debug( "Realtor is not set" );
             }
             if ( regionSetting.getSocialMediaTokens().getLendingTreeToken() != null ) {
                 LOG.debug( "Lending tree is set" );
-                setterValue +=  SettingsForApplication.LENDING_TREE.getOrder()  * 2;
+                setterValue.add( SettingsForApplication.LENDING_TREE.getOrder().multiply( BigInteger.valueOf( 2 ) ) );
+
             } else {
                 LOG.debug( "Lending tree is not set" );
             }
             if ( regionSetting.getSocialMediaTokens().getGoogleBusinessToken() != null ) {
                 LOG.debug( "Google business is set" );
-                setterValue +=  SettingsForApplication.GOOGLE_BUSINESS.getOrder()  * 2;
+                setterValue.add( SettingsForApplication.GOOGLE_BUSINESS.getOrder().multiply( BigInteger.valueOf( 2 ) ) );
+
             } else {
                 LOG.debug( "Google business is not set" );
+            }
+            
+            if ( regionSetting.getSocialMediaTokens().getInstagramToken() != null ) {
+                LOG.debug( "Instagram  is set" );
+                setterValue.add( SettingsForApplication.INSTAGRAM.getOrder().multiply( BigInteger.valueOf( 2 ) ) );
+
+            } else {
+                LOG.debug( "Instagram is not set" );
             }
         }
         LOG.debug( "Final Settings setter value : " + setterValue );
@@ -7907,44 +7950,49 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     private void processOnlyRegion( OrganizationUnitSettings regionSetting, Region region )
     {
         LOG.debug( "Processing region " + region.getRegion() );
-        long setterValue = 0l;
+        BigInteger setterValue = BigInteger.valueOf(0);
         LOG.debug( "Getting details of region: " + region.getRegion() );
         if ( regionSetting.getLogo() != null ) {
             LOG.debug( "Logo is set" );
-            setterValue += SettingsForApplication.LOGO.getOrder() * 2;
+            setterValue.add( SettingsForApplication.LOGO.getOrder().multiply( BigInteger.valueOf( 2 ) ) );
         } else {
             LOG.debug( "Logo is not set" );
         }
         if ( regionSetting.getContact_details() != null ) {
             if ( regionSetting.getContact_details().getAddress() != null ) {
                 LOG.debug( "Address is set" );
-                setterValue += SettingsForApplication.ADDRESS.getOrder() * 2;
+                setterValue.add( SettingsForApplication.ADDRESS.getOrder().multiply( BigInteger.valueOf( 2 ) ) );
+
             } else {
                 LOG.debug( "Address is not set" );
             }
             if ( regionSetting.getContact_details().getContact_numbers() != null ) {
                 LOG.debug( "Contact number is set" );
-                setterValue += SettingsForApplication.PHONE.getOrder() * 2;
+                setterValue.add( SettingsForApplication.PHONE.getOrder().multiply( BigInteger.valueOf( 2 ) ) );
+
             } else {
                 LOG.debug( "Contact number is not set" );
             }
             // skipping location
             if ( regionSetting.getContact_details().getWeb_addresses() != null && regionSetting.getContact_details().getWeb_addresses().getWork() != null ) {
                 LOG.debug( "Web address is set" );
-                setterValue += SettingsForApplication.WEB_ADDRESS_WORK.getOrder() * 2;
+                setterValue.add( SettingsForApplication.WEB_ADDRESS_WORK.getOrder().multiply( BigInteger.valueOf( 2 ) ) );
+
             } else {
                 LOG.debug( "Web address is not set" );
             }
             if ( regionSetting.getContact_details().getAbout_me() != null ) {
                 LOG.debug( "About me is set" );
-                setterValue += SettingsForApplication.ABOUT_ME.getOrder() * 2;
+                setterValue.add( SettingsForApplication.ABOUT_ME.getOrder().multiply( BigInteger.valueOf( 2 ) ) );
+
             } else {
                 LOG.debug( "About me is not set" );
             }
             if ( regionSetting.getContact_details().getMail_ids() != null
                 && regionSetting.getContact_details().getMail_ids().getWork() != null ) {
                 LOG.debug( "Work email id is set" );
-                setterValue += SettingsForApplication.EMAIL_ID_WORK.getOrder() * 2;
+                setterValue.add( SettingsForApplication.EMAIL_ID_WORK.getOrder().multiply( BigInteger.valueOf( 2 ) ) );
+
             } else {
                 LOG.debug( "Work email id is not set" );
             }
@@ -7952,57 +8000,74 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( regionSetting.getSocialMediaTokens() != null ) {
             if ( regionSetting.getSocialMediaTokens().getFacebookToken() != null ) {
                 LOG.debug( "Facebook is set" );
-                setterValue += SettingsForApplication.FACEBOOK.getOrder() * 2;
+                setterValue.add( SettingsForApplication.FACEBOOK.getOrder().multiply( BigInteger.valueOf( 2 ) ) );
+
             } else {
                 LOG.debug( "Facebook is not set" );
             }
             if ( regionSetting.getSocialMediaTokens().getTwitterToken() != null ) {
                 LOG.debug( "Twitter is set" );
-                setterValue += SettingsForApplication.TWITTER.getOrder() * 2;
+                setterValue.add( SettingsForApplication.TWITTER.getOrder().multiply( BigInteger.valueOf( 2 ) ) );
+
             } else {
                 LOG.debug( "Twitter is not set" );
             }
             if ( regionSetting.getSocialMediaTokens().getLinkedInToken() != null ) {
                 LOG.debug( "Linkedin is set" );
-                setterValue += SettingsForApplication.LINKED_IN.getOrder() * 2;
+                setterValue.add( SettingsForApplication.LINKED_IN.getOrder().multiply( BigInteger.valueOf( 2 ) ) );
+
             } else {
                 LOG.debug( "Linkedin is not set" );
             }
             if ( regionSetting.getSocialMediaTokens().getGoogleToken() != null ) {
                 LOG.debug( "Google+ is set" );
-                setterValue += SettingsForApplication.GOOGLE_PLUS.getOrder() * 2;
+                setterValue.add( SettingsForApplication.GOOGLE_PLUS.getOrder().multiply( BigInteger.valueOf( 2 ) ) );
+
             } else {
                 LOG.debug( "Google+ is not set" );
             }
             if ( regionSetting.getSocialMediaTokens().getYelpToken() != null ) {
                 LOG.debug( "Yelp is set" );
-                setterValue += SettingsForApplication.YELP.getOrder() * 2;
+                setterValue.add( SettingsForApplication.YELP.getOrder().multiply( BigInteger.valueOf( 2 ) ) );
+
             } else {
                 LOG.debug( "Yelp is not set" );
             }
             if ( regionSetting.getSocialMediaTokens().getZillowToken() != null ) {
                 LOG.debug( "Zillow is set" );
-                setterValue += SettingsForApplication.ZILLOW.getOrder() * 2;
+                setterValue.add( SettingsForApplication.ZILLOW.getOrder().multiply( BigInteger.valueOf( 2 ) ) );
+
             } else {
                 LOG.debug( "Zillow is not set" );
             }
             if ( regionSetting.getSocialMediaTokens().getRealtorToken() != null ) {
                 LOG.debug( "Realtor is set" );
-                setterValue += SettingsForApplication.REALTOR.getOrder() * 2;
+                setterValue.add( SettingsForApplication.REALTOR.getOrder().multiply( BigInteger.valueOf( 2 ) ) );
+
             } else {
                 LOG.debug( "Realtor is not set" );
             }
             if ( regionSetting.getSocialMediaTokens().getLendingTreeToken() != null ) {
                 LOG.debug( "Lending tree is set" );
-                setterValue += SettingsForApplication.LENDING_TREE.getOrder() * 2;
+                setterValue.add( SettingsForApplication.LENDING_TREE.getOrder().multiply( BigInteger.valueOf( 2 ) ) );
+
             } else {
                 LOG.debug( "Lending tree is not set" );
             }
             if ( regionSetting.getSocialMediaTokens().getGoogleBusinessToken() != null ) {
                 LOG.debug( "Google business is set" );
-                setterValue += SettingsForApplication.GOOGLE_BUSINESS.getOrder() * 2;
+                setterValue.add( SettingsForApplication.GOOGLE_BUSINESS.getOrder().multiply( BigInteger.valueOf( 2 ) ) );
+
             } else {
                 LOG.debug( "Google business is not set" );
+            }
+            
+            if ( regionSetting.getSocialMediaTokens().getInstagramToken() != null ) {
+                LOG.debug( "Instagram  is set" );
+                setterValue.add( SettingsForApplication.INSTAGRAM.getOrder().multiply( BigInteger.valueOf( 2 ) ) );
+
+            } else {
+                LOG.debug( "Instagram  is not set" );
             }
         }
         LOG.debug( "Final Settings setter value : " + setterValue );
@@ -8014,44 +8079,49 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     private void processBranch( OrganizationUnitSettings branchSetting, Branch branch )
     {
         LOG.debug( "Updating details for branch " + branch.getBranch() );
-        double setterValue = 0l;
+        BigInteger setterValue = BigInteger.valueOf(0);
         LOG.debug( "Getting details of branch: " + branch.getRegion() );
         if ( branchSetting.getLogo() != null ) {
             LOG.debug( "Logo is set" );
-            setterValue += SettingsForApplication.LOGO.getOrder() * 4;
+            setterValue.add( SettingsForApplication.LOGO.getOrder().multiply( BigInteger.valueOf( 4 ) ) );
         } else {
             LOG.debug( "Logo is not set" );
         }
         if ( branchSetting.getContact_details() != null ) {
             if ( branchSetting.getContact_details().getAddress() != null ) {
                 LOG.debug( "Address is set" );
-                setterValue +=  SettingsForApplication.ADDRESS.getOrder() * 4;
+                setterValue.add( SettingsForApplication.ADDRESS.getOrder().multiply( BigInteger.valueOf( 4 ) ) );
+
             } else {
                 LOG.debug( "Address is not set" );
             }
             if ( branchSetting.getContact_details().getContact_numbers() != null ) {
                 LOG.debug( "Contact number is set" );
-                setterValue +=  SettingsForApplication.PHONE.getOrder() * 4;
+                setterValue.add( SettingsForApplication.PHONE.getOrder().multiply( BigInteger.valueOf( 4 ) ) );
+
             } else {
                 LOG.debug( "Contact number is not set" );
             }
             // skipping location
             if ( branchSetting.getContact_details().getWeb_addresses() != null && branchSetting.getContact_details().getWeb_addresses().getWork() != null) {
                 LOG.debug( "Web address is set" );
-                setterValue +=  SettingsForApplication.WEB_ADDRESS_WORK.getOrder()  * 4;
+                setterValue.add( SettingsForApplication.WEB_ADDRESS_WORK.getOrder().multiply( BigInteger.valueOf( 4 ) ) );
+
             } else {
                 LOG.debug( "Web address is not set" );
             }
             if ( branchSetting.getContact_details().getAbout_me() != null ) {
                 LOG.debug( "About me is set" );
-                setterValue +=  SettingsForApplication.ABOUT_ME.getOrder() * 4;
+                setterValue.add( SettingsForApplication.ABOUT_ME.getOrder().multiply( BigInteger.valueOf( 4 ) ) );
+
             } else {
                 LOG.debug( "About me is not set" );
             }
             if ( branchSetting.getContact_details().getMail_ids() != null
                 && branchSetting.getContact_details().getMail_ids().getWork() != null ) {
                 LOG.debug( "Work email id is set" );
-                setterValue += SettingsForApplication.EMAIL_ID_WORK.getOrder() * 4;
+                setterValue.add( SettingsForApplication.EMAIL_ID_WORK.getOrder().multiply( BigInteger.valueOf( 4 ) ) );
+
             } else {
                 LOG.debug( "Work email id is not set" );
             }
@@ -8059,57 +8129,74 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( branchSetting.getSocialMediaTokens() != null ) {
             if ( branchSetting.getSocialMediaTokens().getFacebookToken() != null ) {
                 LOG.debug( "Facebook is set" );
-                setterValue += SettingsForApplication.FACEBOOK.getOrder()* 4;
+                setterValue.add( SettingsForApplication.FACEBOOK.getOrder().multiply( BigInteger.valueOf( 4 ) ) );
+
             } else {
                 LOG.debug( "Facebook is not set" );
             }
             if ( branchSetting.getSocialMediaTokens().getTwitterToken() != null ) {
                 LOG.debug( "Twitter is set" );
-                setterValue += SettingsForApplication.TWITTER.getOrder() * 4;
+                setterValue.add( SettingsForApplication.TWITTER.getOrder().multiply( BigInteger.valueOf( 4 ) ) );
+
             } else {
                 LOG.debug( "Twitter is not set" );
             }
             if ( branchSetting.getSocialMediaTokens().getLinkedInToken() != null ) {
                 LOG.debug( "Linkedin is set" );
-                setterValue += SettingsForApplication.LINKED_IN.getOrder() * 4;
+                setterValue.add( SettingsForApplication.LINKED_IN.getOrder().multiply( BigInteger.valueOf( 4 ) ) );
+
             } else {
                 LOG.debug( "Linkedin is not set" );
             }
             if ( branchSetting.getSocialMediaTokens().getGoogleToken() != null ) {
                 LOG.debug( "Google+ is set" );
-                setterValue += SettingsForApplication.GOOGLE_PLUS.getOrder() * 4;
+                setterValue.add( SettingsForApplication.GOOGLE_PLUS.getOrder().multiply( BigInteger.valueOf( 4 ) ) );
+
             } else {
                 LOG.debug( "Google+ is not set" );
             }
             if ( branchSetting.getSocialMediaTokens().getYelpToken() != null ) {
                 LOG.debug( "Yelp is set" );
-                setterValue += SettingsForApplication.YELP.getOrder() * 4;
+                setterValue.add( SettingsForApplication.YELP.getOrder().multiply( BigInteger.valueOf( 4 ) ) );
+
             } else {
                 LOG.debug( "Yelp is not set" );
             }
             if ( branchSetting.getSocialMediaTokens().getZillowToken() != null ) {
                 LOG.debug( "Zillow is set" );
-                setterValue += SettingsForApplication.ZILLOW.getOrder() * 4;
+                setterValue.add( SettingsForApplication.ZILLOW.getOrder().multiply( BigInteger.valueOf( 4 ) ) );
+
             } else {
                 LOG.debug( "Zillow is not set" );
             }
             if ( branchSetting.getSocialMediaTokens().getRealtorToken() != null ) {
                 LOG.debug( "Realtor is set" );
-                setterValue += SettingsForApplication.REALTOR.getOrder() * 4;
+                setterValue.add( SettingsForApplication.REALTOR.getOrder().multiply( BigInteger.valueOf( 4 ) ) );
+
             } else {
                 LOG.debug( "Realtor is not set" );
             }
             if ( branchSetting.getSocialMediaTokens().getLendingTreeToken() != null ) {
                 LOG.debug( "Lending tree is set" );
-                setterValue += SettingsForApplication.LENDING_TREE.getOrder() * 4;
+                setterValue.add( SettingsForApplication.LENDING_TREE.getOrder().multiply( BigInteger.valueOf( 4 ) ) );
+
             } else {
                 LOG.debug( "Lending tree is not set" );
             }
             if ( branchSetting.getSocialMediaTokens().getGoogleBusinessToken() != null ) {
                 LOG.debug( "Google business is set" );
-                setterValue += SettingsForApplication.GOOGLE_BUSINESS.getOrder() * 4;
+                setterValue.add( SettingsForApplication.GOOGLE_BUSINESS.getOrder().multiply( BigInteger.valueOf( 4 ) ) );
+
             } else {
                 LOG.debug( "Google business is not set" );
+            }
+            
+            if ( branchSetting.getSocialMediaTokens().getInstagramToken() != null ) {
+                LOG.debug( "Instagram is set" );
+                setterValue.add( SettingsForApplication.INSTAGRAM.getOrder().multiply( BigInteger.valueOf( 4 ) ) );
+
+            } else {
+                LOG.debug( "Instagram is not set" );
             }
         }
         LOG.debug( "Final Settings setter value : " + setterValue );
@@ -8121,7 +8208,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
     private void processCompany( OrganizationUnitSettings companySetting )
     {
-        double setterValue = 0l;
+    		BigInteger setterValue = BigInteger.valueOf(0);
         /* String lockValue = "0";*/
         // get a the company id and get the company from SQL
         LOG.debug( "Getting details of company: " + companySetting.getIden() );
@@ -8129,7 +8216,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         LOG.debug( "Checking for all the values that can be set for " + company.getCompany() );
         if ( companySetting.getLogo() != null ) {
             LOG.debug( "Logo is set" );
-            setterValue += SettingsForApplication.LOGO.getOrder() * 1;
+            setterValue.add( SettingsForApplication.LOGO.getOrder().multiply( BigInteger.valueOf( 1 ) ) );
             // lock the logo
             /* lockValue = "1";*/
         } else {
@@ -8138,33 +8225,38 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( companySetting.getContact_details() != null ) {
             if ( companySetting.getContact_details().getAddress() != null ) {
                 LOG.debug( "Address is set" );
-                setterValue += SettingsForApplication.ADDRESS.getOrder() * 1;
+                setterValue.add( SettingsForApplication.ADDRESS.getOrder().multiply( BigInteger.valueOf( 1 ) ) );
+
             } else {
                 LOG.debug( "Address is not set" );
             }
             if ( companySetting.getContact_details().getContact_numbers() != null ) {
                 LOG.debug( "Contact number is set" );
-                setterValue += SettingsForApplication.PHONE.getOrder() * 1;
+                setterValue.add( SettingsForApplication.PHONE.getOrder().multiply( BigInteger.valueOf( 1 ) ) );
+
             } else {
                 LOG.debug( "Contact number is not set" );
             }
             // skipping location
             if ( companySetting.getContact_details().getWeb_addresses() != null && companySetting.getContact_details().getWeb_addresses().getWork() != null) {
                 LOG.debug( "Web address is set" );
-                setterValue += SettingsForApplication.WEB_ADDRESS_WORK.getOrder() * 1;
+                setterValue.add( SettingsForApplication.WEB_ADDRESS_WORK.getOrder().multiply( BigInteger.valueOf( 1 ) ) );
+
             } else {
                 LOG.debug( "Web address is not set" );
             }
             if ( companySetting.getContact_details().getAbout_me() != null ) {
                 LOG.debug( "About me is set" );
-                setterValue += SettingsForApplication.ABOUT_ME.getOrder() * 1;
+                setterValue.add( SettingsForApplication.ABOUT_ME.getOrder().multiply( BigInteger.valueOf( 1 ) ) );
+
             } else {
                 LOG.debug( "About me is not set" );
             }
             if ( companySetting.getContact_details().getMail_ids() != null
                 && companySetting.getContact_details().getMail_ids().getWork() != null ) {
                 LOG.debug( "Work email id is set" );
-                setterValue += SettingsForApplication.EMAIL_ID_WORK.getOrder() * 1;
+                setterValue.add( SettingsForApplication.EMAIL_ID_WORK.getOrder().multiply( BigInteger.valueOf( 1 ) ) );
+
             } else {
                 LOG.debug( "Work email id is not set" );
             }
@@ -8172,57 +8264,74 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         if ( companySetting.getSocialMediaTokens() != null ) {
             if ( companySetting.getSocialMediaTokens().getFacebookToken() != null ) {
                 LOG.debug( "Facebook is set" );
-                setterValue += SettingsForApplication.FACEBOOK.getOrder() * 1;
+                setterValue.add( SettingsForApplication.FACEBOOK.getOrder().multiply( BigInteger.valueOf( 1 ) ) );
+
             } else {
                 LOG.debug( "Facebook is not set" );
             }
             if ( companySetting.getSocialMediaTokens().getTwitterToken() != null ) {
                 LOG.debug( "Twitter is set" );
-                setterValue += SettingsForApplication.TWITTER.getOrder() * 1;
+                setterValue.add( SettingsForApplication.TWITTER.getOrder().multiply( BigInteger.valueOf( 1 ) ) );
+
             } else {
                 LOG.debug( "Twitter is not set" );
             }
             if ( companySetting.getSocialMediaTokens().getLinkedInToken() != null ) {
                 LOG.debug( "Linkedin is set" );
-                setterValue += SettingsForApplication.LINKED_IN.getOrder() * 1;
+                setterValue.add( SettingsForApplication.LINKED_IN.getOrder().multiply( BigInteger.valueOf( 1 ) ) );
+
             } else {
                 LOG.debug( "Linkedin is not set" );
             }
             if ( companySetting.getSocialMediaTokens().getGoogleToken() != null ) {
                 LOG.debug( "Google+ is set" );
-                setterValue += SettingsForApplication.GOOGLE_PLUS.getOrder() * 1;
+                setterValue.add( SettingsForApplication.GOOGLE_PLUS.getOrder().multiply( BigInteger.valueOf( 1 ) ) );
+
             } else {
                 LOG.debug( "Google+ is not set" );
             }
             if ( companySetting.getSocialMediaTokens().getYelpToken() != null ) {
                 LOG.debug( "Yelp is set" );
-                setterValue += SettingsForApplication.YELP.getOrder() * 1;
+                setterValue.add( SettingsForApplication.YELP.getOrder().multiply( BigInteger.valueOf( 1 ) ) );
+
             } else {
                 LOG.debug( "Yelp is not set" );
             }
             if ( companySetting.getSocialMediaTokens().getZillowToken() != null ) {
                 LOG.debug( "Zillow is set" );
-                setterValue += SettingsForApplication.ZILLOW.getOrder() * 1;
+                setterValue.add( SettingsForApplication.ZILLOW.getOrder().multiply( BigInteger.valueOf( 1 ) ) );
+
             } else {
                 LOG.debug( "Zillow is not set" );
             }
             if ( companySetting.getSocialMediaTokens().getRealtorToken() != null ) {
                 LOG.debug( "Realtor is set" );
-                setterValue += SettingsForApplication.REALTOR.getOrder() * 1;
+                setterValue.add( SettingsForApplication.REALTOR.getOrder().multiply( BigInteger.valueOf( 1 ) ) );
+
             } else {
                 LOG.debug( "Realtor is not set" );
             }
             if ( companySetting.getSocialMediaTokens().getLendingTreeToken() != null ) {
                 LOG.debug( "Lending tree is set" );
-                setterValue += SettingsForApplication.LENDING_TREE.getOrder() * 1;
+                setterValue.add( SettingsForApplication.LENDING_TREE.getOrder().multiply( BigInteger.valueOf( 1 ) ) );
+
             } else {
                 LOG.debug( "Lending tree is not set" );
             }
             if ( companySetting.getSocialMediaTokens().getGoogleBusinessToken() != null ) {
                 LOG.debug( "Google business is set" );
-                setterValue += SettingsForApplication.GOOGLE_BUSINESS.getOrder() * 1;
+                setterValue.add( SettingsForApplication.GOOGLE_BUSINESS.getOrder().multiply( BigInteger.valueOf( 1 ) ) );
+
             } else {
                 LOG.debug( "Google business is not set" );
+            }
+            
+            if ( companySetting.getSocialMediaTokens().getInstagramToken() != null ) {
+                LOG.debug( "Instagram is set" );
+                setterValue.add( SettingsForApplication.INSTAGRAM.getOrder().multiply( BigInteger.valueOf( 1 ) ) );
+
+            } else {
+                LOG.debug( "Instagram is not set" );
             }
         }
 
