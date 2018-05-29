@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -2223,7 +2224,7 @@ public class ProfileManagementController
             }
 
             boolean isWorkEmailLockedByCompany = settingsLocker.isSettingsValueLocked( OrganizationUnit.COMPANY,
-                Double.parseDouble( user.getCompany().getSettingsLockStatus() ), SettingsForApplication.EMAIL_ID_WORK );
+            		new BigInteger( user.getCompany().getSettingsLockStatus() ), SettingsForApplication.EMAIL_ID_WORK );
 
             ContactDetailsSettings sessionContactDetail = profileSettings.getContact_details();
 

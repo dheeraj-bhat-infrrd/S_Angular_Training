@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.web.controller;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigInteger;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -549,11 +550,11 @@ public class OrganizationManagementController
         if ( accountType == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
             LOG.debug( "Check if logo is set" );
             if ( settingsSetter.isSettingsValueSet( OrganizationUnit.COMPANY,
-                Long.parseLong( user.getCompany().getSettingsSetStatus() ), SettingsForApplication.LOGO ) ) {
+                new BigInteger( user.getCompany().getSettingsSetStatus() ), SettingsForApplication.LOGO ) ) {
                 LOG.debug( "Unlocking the logo" );
                 try {
                     if ( settingsLocker.isSettingsValueLocked( OrganizationUnit.COMPANY,
-                        Double.parseDouble( user.getCompany().getSettingsLockStatus() ), SettingsForApplication.LOGO ) ) {
+                    		new BigInteger( user.getCompany().getSettingsLockStatus() ), SettingsForApplication.LOGO ) ) {
                         settingsLocker.lockSettingsValueForCompany( user.getCompany(), SettingsForApplication.LOGO, false );
                     }
                 } catch ( InvalidSettingsStateException e ) {
