@@ -197,7 +197,7 @@ public class APIOperations
                 LOG.trace( "saved user event to solr : {}", response.body() );
             }
             return true;
-        } catch ( IOException | APIIntergrationException e ) {
+        } catch ( IOException | APIIntegrationException e ) {
             LOG.error( "saveUserEventToSolr: IOException/ APIIntergrationException caught", e );
             throw new SolrProcessingException( "Exception while saving user event to solr", e );
         }

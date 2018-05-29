@@ -11,6 +11,8 @@ import com.realtech.socialsurvey.compute.entities.FailedEmailMessage;
 import com.realtech.socialsurvey.compute.entities.FailedReportRequest;
 import com.realtech.socialsurvey.compute.entities.FailedSocialPost;
 import com.realtech.socialsurvey.compute.entities.ReportRequest;
+import com.realtech.socialsurvey.compute.entities.UnsavedUserEvent;
+import com.realtech.socialsurvey.compute.entities.UserEvent;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.services.FailedMessagesService;
 import com.realtech.socialsurvey.compute.utils.ThrowableUtils;
