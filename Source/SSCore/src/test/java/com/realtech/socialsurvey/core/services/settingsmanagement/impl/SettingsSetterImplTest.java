@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.math.BigInteger;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -105,7 +107,7 @@ public class SettingsSetterImplTest
     public void isSettingsValueSetTestCurrentValueLessThanSettings()
     {
         SettingsForApplication settings = SettingsForApplication.LOGO;
-        long currentSetValue = 10000000l;
+        BigInteger currentSetValue = BigInteger.valueOf( 10000000);
         assertEquals( "Test", false, settingsSetterImpl.isSettingsValueSet( null, currentSetValue, settings ) );
     }
 
@@ -466,25 +468,4 @@ public class SettingsSetterImplTest
         assertEquals( "OrganizationUnit is not null", OrganizationUnit.BRANCH, settingsSetterImpl.getLowestSetterLevel( 7 ) );
     }
 
-
-    @Test
-    public void testGetModifiedSetSettingsValueAlreadyLockedNotSet() throws InvalidSettingsStateException
-    {
-        SettingsSetterImpl spy = Mockito.spy( settingsSetterImpl );
-        Mockito.doReturn( false ).when( spy )
-            .isSettingsValueSet( (OrganizationUnit) Mockito.any(), Mockito.anyLong(), (SettingsForApplication) Mockito.any() );
-        assertEquals( 0, 0,
-            settingsSetterImpl.getModifiedSetSettingsValue( OrganizationUnit.COMPANY, 0, SettingsForApplication.LOGO, false ) );
-    }
-
-
-    @Test
-    public void testGetModifiedSetSettingsValueAlreadyLockedSettingSet() throws InvalidSettingsStateException
-    {
-        SettingsSetterImpl spy = Mockito.spy( settingsSetterImpl );
-        Mockito.doReturn( false ).when( spy )
-        .isSettingsValueSet( (OrganizationUnit) Mockito.any(), Mockito.anyLong(), (SettingsForApplication) Mockito.any() );
-        assertEquals( 1, 1,
-            settingsSetterImpl.getModifiedSetSettingsValue( OrganizationUnit.COMPANY, 0, SettingsForApplication.LOGO, true ) );
-    }
 }

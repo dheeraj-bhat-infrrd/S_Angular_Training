@@ -1,10 +1,12 @@
 package com.realtech.socialsurvey.core.entities;
 
+import java.math.BigInteger;
+
 public class HierarchySettingsCompare
 {
     private long id;
-    private long currentValue;
-    private long expectedValue;
+    private BigInteger currentValue;
+    private BigInteger expectedValue;
 
 
     public long getId()
@@ -19,25 +21,25 @@ public class HierarchySettingsCompare
     }
 
 
-    public long getCurrentValue()
+    public BigInteger getCurrentValue()
     {
         return currentValue;
     }
 
 
-    public void setCurrentValue( long currentValue )
+    public void setCurrentValue( BigInteger currentValue )
     {
         this.currentValue = currentValue;
     }
 
 
-    public long getExpectedValue()
+    public BigInteger getExpectedValue()
     {
         return expectedValue;
     }
 
 
-    public void setExpectedValue( long expectedValue )
+    public void setExpectedValue( BigInteger expectedValue )
     {
         this.expectedValue = expectedValue;
     }
