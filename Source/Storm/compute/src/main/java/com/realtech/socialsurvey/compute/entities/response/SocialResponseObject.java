@@ -60,8 +60,8 @@ public class SocialResponseObject<T> implements Serializable
     private List<String> foundKeywords;
     private List<ActionHistory> actionHistory;
     private boolean isRetried;
-    
-    private String postSource;
+    private boolean fromTrustedSource;
+	private String postSource;
 
     public T getResponse()
     {
@@ -351,6 +351,15 @@ public class SocialResponseObject<T> implements Serializable
         this.postLink = postLink;
     }
 
+    public boolean isFromTrustedSource() {
+		return fromTrustedSource;
+	}
+
+
+	public void setFromTrustedSource(boolean fromTrustedSource) {
+		this.fromTrustedSource = fromTrustedSource;
+	} 
+    
     public String getPostSource() {
 		return postSource;
 	}
