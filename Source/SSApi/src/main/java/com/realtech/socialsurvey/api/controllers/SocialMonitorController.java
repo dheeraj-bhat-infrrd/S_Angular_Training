@@ -426,4 +426,26 @@ public class SocialMonitorController
         }
     }
 
+    @RequestMapping ( value = "/companies/{companyId}/trustedSource/remove", method = RequestMethod.POST)
+    @ApiOperation ( value = "Remove trusted source to the company", response = SocialMonitorTrustedSource.class, responseContainer = "List")
+    @ApiResponses(value = { @ApiResponse ( code = 200, message = "Successfully updated trusted source")})
+    public ResponseEntity<?> removeTrustedSourceToCompany( @PathVariable ( "companyId") long companyId,
+                                                   @Valid @RequestParam String trustedSource, @RequestHeader ( "authorizationHeader") String authorizationHeader ) throws SSApiException
+    {
+        try {
+            adminAuthenticationService.validateAuthHeader(authorizationHeader);
+            try {
+                LOGGER.info("SocialMonitorController.removeTrustedSourceToCompany started");
+                List<SocialMonitorTrustedSource> trustedSources = organizationManagementService
+                        .removeTrustedSourceToCompany(companyId, trustedSource);
+                LOGGER.info("SocialMonitorController.removeTrustedSourceToCompany completed successfully");
+                return new ResponseEntity<>(trustedSources, HttpStatus.OK);
+            } catch (NonFatalException e) {
+                throw new SSApiException(e.getMessage(), e.getErrorCode());
+            }
+        } catch (AuthorizationException authoriztionFailure) {
+            return new ResponseEntity<>(AUTH_FAILED, HttpStatus.UNAUTHORIZED);
+        }
+    }
+
 }
