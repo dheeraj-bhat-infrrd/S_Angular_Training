@@ -4,6 +4,7 @@ package com.realtech.socialsurvey.core.services.hierarchylocationmanagement.impl
 import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -174,13 +175,17 @@ public class HierarchyLocationManagementServiceImpl implements HierarchyLocation
         if(licenseDetail.getAccountsMaster().getAccountsMasterId() == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL) {
         		userToBeRelocated.setIsOwner(CommonConstants.IS_NOT_OWNER);
         		userToBeRelocated.setIsForcePassword(CommonConstants.NO);
-        		for ( UserProfile userProfile : userProfiles ) {
+        		ListIterator<UserProfile> userProfileItr = userProfiles.listIterator();
+                while ( userProfileItr.hasNext() ) {
+                    UserProfile userProfile = userProfileItr.next();
         			if(userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
         				curentBranchId = userProfile.getBranchId();
         				curentRegionId = userProfile.getRegionId();
         				curentCompanyId = userProfile.getCompany().getCompanyId();
         			}else {
-        				userProfiles.remove(userProfile);
+        				//userProfiles.remove(userProfile);
+        			    //remove from iterator instead of list modifies the underlying list 
+        				userProfileItr.remove();
         			}
         		}
         		

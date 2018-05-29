@@ -1,13 +1,16 @@
 package com.realtech.socialsurvey.core.services.settingsmanagement.impl;
 
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.SettingsSetterDao;
 import com.realtech.socialsurvey.core.entities.SettingsDetails;
@@ -33,15 +36,18 @@ public class SettingsManagerImpl implements SettingsManager
 
 
     @Override
-    public Map<String, Double> calculateSettingsScore( List<SettingsDetails> settingsDetailsList )
+    public Map<String, BigInteger> calculateSettingsScore( List<SettingsDetails> settingsDetailsList )
     {
         LOG.debug( "Inside method calcualteSettingsScore " );
-        double lockScore = 0;
-        double setScore = 0;
-        Map<String, Double> map = new HashMap<>();
+        BigInteger lockScore = BigInteger.valueOf(0);
+        BigInteger setScore = BigInteger.valueOf(0);
+        Map<String, BigInteger> map = new HashMap<>();
         for ( SettingsDetails settingsDetails : settingsDetailsList ) {
-            lockScore = lockScore + settingsDetails.getLockSettingsHolder();
-            setScore = setScore + settingsDetails.getSetSettingsHolder();
+            lockScore = new BigInteger(lockScore.toByteArray());
+            lockScore.add( BigInteger.valueOf(settingsDetails.getLockSettingsHolder()));
+            
+            setScore  = new BigInteger(setScore.toByteArray());
+            setScore.add( settingsDetails.getSetSettingsHolder());
         }
         map.put( CommonConstants.SETTING_SCORE, setScore );
         map.put( CommonConstants.LOCK_SCORE, lockScore );

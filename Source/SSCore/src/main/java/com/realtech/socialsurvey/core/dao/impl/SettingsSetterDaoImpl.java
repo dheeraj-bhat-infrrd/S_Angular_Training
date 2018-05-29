@@ -1,7 +1,9 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
@@ -9,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 import com.realtech.socialsurvey.core.dao.SettingsSetterDao;
 import com.realtech.socialsurvey.core.entities.SettingsDetails;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
@@ -55,21 +58,21 @@ public class SettingsSetterDaoImpl extends GenericDaoImpl<SettingsDetails, Long>
             scoreList = query.list();
             for ( Object[] row : scoreList ) {
                 SettingsDetails companySettingsDetails = new SettingsDetails();
-                companySettingsDetails.setSetSettingsHolder( Double.valueOf( String.valueOf( row[0] ) ) );
+                companySettingsDetails.setSetSettingsHolder( new BigInteger( String.valueOf( row[0] ) ) );
                 companySettingsDetails.setLockSettingsHolder( Long.valueOf( String.valueOf( row[1] ) ) );
                 SettingsDetails regionSettingsDetails = null;
                 if ( row.length > 2 && row.length <= 4 ) {
                     regionSettingsDetails = new SettingsDetails();
-                    regionSettingsDetails.setSetSettingsHolder( Double.valueOf( String.valueOf( row[2] ) ) );
+                    regionSettingsDetails.setSetSettingsHolder( new BigInteger( String.valueOf( row[2] ) ) );
                     regionSettingsDetails.setLockSettingsHolder( Long.valueOf( String.valueOf( row[3] ) ) );
                 }
                 SettingsDetails branchSettingsDetails = null;
                 if ( row.length > 4 ) {
                     regionSettingsDetails = new SettingsDetails();
-                    regionSettingsDetails.setSetSettingsHolder( Double.valueOf( String.valueOf( row[2] ) ) );
+                    regionSettingsDetails.setSetSettingsHolder( new BigInteger( String.valueOf( row[2] ) ) );
                     regionSettingsDetails.setLockSettingsHolder( Long.valueOf( String.valueOf( row[3] ) ) );
                     branchSettingsDetails = new SettingsDetails();
-                    branchSettingsDetails.setSetSettingsHolder( Double.valueOf( String.valueOf( row[4] ) ) );
+                    branchSettingsDetails.setSetSettingsHolder( new BigInteger( String.valueOf( row[4] ) ) );
                     branchSettingsDetails.setLockSettingsHolder( Long.valueOf( String.valueOf( row[5] ) ) );
                 }
                 scoreListObject.add( companySettingsDetails );
