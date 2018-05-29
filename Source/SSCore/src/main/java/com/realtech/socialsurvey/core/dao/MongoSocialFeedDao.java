@@ -62,11 +62,11 @@ public interface MongoSocialFeedDao
 
     /**
      * @param companyId
-     * @param type
+     * @param trustedSource
      * @param actionHistory
      * @return
      */
-    public long updateForTrustedSource( long companyId, String type, ActionHistory actionHistory );
+    public long updateForTrustedSource( long companyId, String trustedSource, ActionHistory actionHistory );
 
     
 }

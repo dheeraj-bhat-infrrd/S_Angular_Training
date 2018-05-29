@@ -63,6 +63,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
     public static final String CREATED_TIME = "createdTime";
     public static final String FOUND_KEYWORDS = "foundKeywords";
     private static final String FROM_TRUSTED_SOURCE = "fromTrustedSource";
+    private static final String POST_SOURCE="postSource";
     
 
 
@@ -550,12 +551,12 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
     }
     
     @Override
-    public long updateForTrustedSource(long companyId , String type , ActionHistory actionHistory) {
+    public long updateForTrustedSource(long companyId , String trustedSource , ActionHistory actionHistory) {
         if(LOG.isDebugEnabled()){
-            LOG.debug("Fetching posts for trustedSource = {} and companyId = {}", type, companyId);
+            LOG.debug("Fetching posts for trustedSource = {} and companyId = {}", trustedSource, companyId);
         }
 
-            Query updateQuery = new Query().addCriteria( Criteria.where( COMPANY_ID ).is( companyId ) ).addCriteria( Criteria.where( FEED_TYPE ).is( type ) ).addCriteria( Criteria.where( STATUS ).in( SocialFeedStatus.NEW,SocialFeedStatus.ESCALATED ) );
+            Query updateQuery = new Query().addCriteria( Criteria.where( COMPANY_ID ).is( companyId ) ).addCriteria( Criteria.where( POST_SOURCE ).is( trustedSource ) ).addCriteria( Criteria.where( STATUS ).in( SocialFeedStatus.NEW,SocialFeedStatus.ESCALATED ) );
             Update update = new Update();
             //update fromTrustedSource 
             update.set(FROM_TRUSTED_SOURCE, true);
