@@ -20641,3 +20641,287 @@ function sendClickedEventInfo( event ){
 		});
 	}
 }
+
+function getRecentActivityCountForSocialMonitor(){
+	var recentActivityCount=0;
+	$.ajax({
+		url : "/fetchrecentactivitiescountforsocialmonitor.do",
+		type : "GET",
+		cache : false,
+		async : false,
+		dataType : "json",
+		success : function(response) {
+			recentActivityCount = parseInt(response);
+			$('#soc-mon-rec-act-data').attr('data-count',recentActivityCount);
+		},
+		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			recentActivityCount = 0;
+			$('#soc-mon-rec-act-data').attr('data-count',recentActivityCount);
+		}
+	});
+}
+
+function getRecentActivityListForSocialMonitor(startIndex, batchSize,tableHeaderData,recentActivityCount){
+	
+	var recentActivityList=null;
+	var payload={
+			"startIndex" : startIndex,
+			"batchSize" : batchSize
+	}
+	$.ajax({
+		url : "/fetchrecentactivitiesforsocialmonitor.do?startIndex="+payload.startIndex+"&batchSize="+payload.batchSize,
+		type : "GET",
+		cache : false,
+		dataType : "json",
+		success :function(data){
+			drawRecentActivityForSocialMonitor(data,startIndex, batchSize,tableHeaderData,recentActivityCount);
+		},
+		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+		}
+	});	
+}
+
+function drawRecentActivityForSocialMonitor(data,startIndex, batchSize,tableHeaderData,recentActivityCount){
+	var tableData=''; 
+	var recentActivityList = JSON.parse(data);
+	
+	var curDate = new Date();
+	var curYear = curDate.getFullYear();
+	
+	for(var i=0;i<recentActivityList.length;i++){
+		
+		var statusString = getStatusString(recentActivityList[i][6]);
+		var startDate = getDateFromDateTime(recentActivityList[i][2]);
+		var endDate =getDateFromDateTime(recentActivityList[i][3]);
+		var monthStartDate = getMonthFromDateTime(recentActivityList[i][2]);
+		var downloadLink = recentActivityList[i][7];
+		var fileUploadId = recentActivityList[i][8];
+		var reportType = recentActivityList[i][9];
+		
+		tableData += "<tr id='soc-mon-recent-activity-row"+i+"' class=\"u-tbl-row user-row \">"
+			+"<td data-file-upload-id='"+fileUploadId+"' data-link='"+downloadLink+"' class=\"v-tbl-recent-activity fetch-name soc-mon-file-details hide\">"+i+"</td>"
+			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold tbl-black-text\">"+recentActivityList[i][0]+"</td>"
+			+"<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-blue-text\">"+recentActivityList[i][1]+"</td>";
+			
+		if(recentActivityList[i][1] == 'Social Monitor Date based Report' || recentActivityList[i][1] == 'Social Monitor Date Report with keyword'){
+				tableData += '<td class="v-tbl-recent-activity fetch-email txt-bold tbl-black-text ">';
+				tableData += startDate + ' - ' + endDate;
+				tableData += "</td>";
+		}else{
+			tableData += "<td class=\"v-tbl-recent-activity fetch-email txt-bold tbl-black-text "+(startDate==null?("\">"+"All Time till date "):("\">"+(endDate==null?monthStartDate:startDate)))+(endDate==null?" ":" - "+endDate)+"</td>";
+		}
+		
+		tableData +="<td class=\"v-tbl-recent-activity fetch-name txt-bold tbl-black-text\">"+recentActivityList[i][4]+" "+recentActivityList[i][5]+"</td>";
+		
+		if(recentActivityList[i][6]==0){	
+			tableData +="<td class=\"v-tbl-recent-activity fetch-name txt-bold \" style='font-size:13px !important;'><a id=\"downloadLink"+i+"\"class='txt-bold tbl-blue-text socMondownloadLink cursor-pointer'>"+statusString+"</a></td>"
+			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold \" ><a id=\"recent-act-delete-row"+i+"\" class='txt-bold soc-mon-recent-act-delete-x cursor-pointer'>X</a></td>"
+			+"</tr>";
+		}else if(recentActivityList[i][6]==3){
+		  	tableData +="<td class=\"v-tbl-recent-activity fetch-name txt-bold \" style='font-size:13px !important;'> No records found </td>"
+			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold \" ><a id=\"recent-act-delete-row"+i+"\" class='txt-bold soc-mon-recent-act-delete-x cursor-pointer'>X</a></td>"
+			+"</tr>";
+		  }else if(recentActivityList[i][6]==4){
+			tableData +="<td class=\"v-tbl-recent-activity fetch-name txt-bold \" style='font-size:13px !important;'>"+statusString+"</td>"
+			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold\" ><a id=\"recent-act-delete-row"+i+"\" class='txt-bold soc-mon-recent-act-delete-x cursor-pointer'>X</a></td>"
+			+"</tr>";
+		} else if(recentActivityList[i][6]==5){	
+			tableData +="<td class=\"v-tbl-recent-activity fetch-name txt-bold \" style='font-size:13px !important;'><a id=\"viewLink"+i+"\"class='txt-bold tbl-blue-text socMondownloadLink cursor-pointer'>"+statusString+"</a></td>"
+			+"<td class=\"v-tbl-recent-activity fetch-name txt-bold \" ><a id=\"recent-act-delete-row"+i+"\" class='txt-bold soc-mon-recent-act-delete-x cursor-pointer'>X</a></td>"
+			+"</tr>";
+		}else{
+			tableData +="<td class=\"v-tbl-recent-activity fetch-name txt-bold \" style='font-size:13px !important;'>"+statusString+"</td>"
+				+"<td class=\"v-tbl-recent-activity fetch-name txt-bold\" >  </td>"
+				+"</tr>";
+		}
+	}
+	
+	var recentActivityCount = parseInt($('#soc-mon-rec-act-data').attr('data-count'));
+	if(recentActivityCount == 0){
+		tableData='';
+		tableData+="</table><div style='text-align:center; margin:20px auto'><span class='incomplete-trans-span'>There are No Recent Activities</span></div>";
+		$('#soc-mon-recent-activity-list-table').html(tableData);
+	}else{
+		$('#soc-mon-recent-activity-list-table').html(tableHeaderData+tableData+"</table>");
+	}
+	
+	$('#soc-mon-rec-act-data').attr('data-start-index',startIndex);
+}
+
+function showHidePaginateButtonsForSocialMonitor(startIndex,recentActivityCount){
+
+	if(startIndex == 0){
+		$('#soc-mon-rec-act-page-previous').hide();
+	}else{
+		$('#soc-mon-rec-act-page-previous').show();
+	}
+	
+	if((recentActivityCount-startIndex)<=10){
+		$('#soc-mon-rec-act-page-next').hide();
+	}else{
+		$('#soc-mon-rec-act-page-next').show();
+	}
+	
+	if(recentActivityCount == 0){
+		$('#soc-mon-rec-act-page-previous').hide();
+		$('#soc-mon-rec-act-page-next').hide();
+	}
+}
+
+$(document).on('click','.socMondownloadLink',function(e){
+	var clickedID = this.id;
+	var indexRecentActivity = clickedID.match(/\d+$/)[0];
+	var downloadLink=$('#soc-mon-recent-activity-row'+indexRecentActivity).find('.soc-mon-file-details').attr('data-link');
+
+	window.location=downloadLink;
+});
+
+$(document).on('click','.soc-mon-recent-act-delete-x',function(e){
+	showOverlay();
+	var clickedID = this.id;
+	var indexRecentActivity = clickedID.match(/\d+$/)[0];
+	var fileUploadId=parseInt($('#soc-mon-recent-activity-row'+indexRecentActivity).find('.soc-mon-file-details').attr('data-file-upload-id'));
+	deleteRecentActivityForSocialMonitor(fileUploadId, indexRecentActivity);
+});
+
+function deleteRecentActivityForSocialMonitor(fileUploadId,idIndex){
+	showOverlay();
+	var tableHeaderData="<table class=\"v-um-tbl\" style=\"margin-bottom:15px\" >"
+		+"<tr id=\"u-tbl-header\" class=\"u-tbl-header\">"
+		+"<td class=\"v-tbl-recent-activity \">Requested On</td>"
+		+"<td class=\"v-tbl-recent-activity\">Report</td>"
+		+"<td class=\"v-tbl-recent-activity\" \>Date Range</td>"
+		+"<td class=\"v-tbl-recent-activity \">Requested By</td>"
+		+"<td class=\"v-tbl-recent-activity\" style='width:25%'>Status</td>"
+		+"<td class=\"v-tbl-recent-activity \"></td>"
+		+"</tr>";
+	
+	$.ajax({
+		url : "./deletefromrecentactivities.do?fileUploadId="+fileUploadId,
+		type : "POST",
+		dataType:"TEXT",
+		async:false,
+		success : function(data) {
+			success=true;
+			messageToDisplay = data;
+			
+		},
+		complete : function() {	
+			hideOverlay();
+			
+			getRecentActivityCountForSocialMonitor();
+			var recentActivityCount= parseInt($('#soc-mon-rec-act-data').attr('data-count'));
+			var startIndex=parseInt($('#soc-mon-rec-act-data').attr('data-start-index'));
+			
+			$('#soc-mon-recent-activity-row'+idIndex).fadeOut(500)
+				.promise()
+				.done(function(){
+					if(recentActivityCount <= startIndex){
+						getRecentActivityListForSocialMonitor(startIndex-10, 10,tableHeaderData,recentActivityCount);
+					}else if(recentActivityCount>=10){
+						getRecentActivityListForSocialMonitor(startIndex, 10,tableHeaderData,recentActivityCount);
+					}
+					showHidePaginateButtonsForSocialMonitor(startIndex, recentActivityCount);
+					
+					if(recentActivityCount == 0){
+						var tableData='';
+						tableData+="</table><div style='text-align:center; margin:20px auto'><span class='incomplete-trans-span'>There are No Recent Activities</span></div>";
+						$('#soc-mon-recent-activity-list-table').html(tableData);
+					}
+				});
+			},
+		error : function(e) {
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			messageToDisplay="Sorry! Failed to delete the activity. Please try again later";
+			showError(messageToDisplay);
+		}
+	});
+}
+
+$(document).on('click', '#soc-mon-reports-generate-report-btn', function(e) {
+	
+	var selectedValue = $('#generate-survey-reports').val();
+	var key = parseInt(selectedValue);
+	var startDate = $('#dsh-start-date').val();
+	var endDate = $("#dsh-end-date").val();
+	var digestMonthValue = 0;
+	var npsTimeFrame = parseInt($('#nps-report-time-selector').val());
+	var d = new Date();
+	var clientTimeZone = d.getTimezoneOffset();
+	var keywordStr = document.getElementById('sm-keywords-selector');
+	var keyword = keywordStr.options[keywordStr.selectedIndex].text;
+	var keywordValue = parseInt($('#sm-keywords-selector').val());
+	
+	if(isNaN(keywordValue) && key == 302){
+		$('#overlay-toast').html("Please select a keyword");
+		showToast();
+		return;
+	}
+	
+	var success = false;
+	var messageToDisplay;
+	var payload = {
+			"startDate" : startDate,
+			"endDate" : endDate,
+			"reportId" : key,
+			"clientTimeZone": clientTimeZone,
+			"keyword": keyword,
+		};
+	
+	showOverlay();	
+		$.ajax({
+			url : "./savereportingdata.do",
+			type : "POST",
+			data: payload,
+			dataType:"TEXT",
+			async:false,
+			success : function(data) {
+				success=true;
+				messageToDisplay = data;
+				showInfoForReporting(messageToDisplay);
+			},
+			complete : function() {	
+				hideOverlay();
+				
+				var tableHeaderData="<table class=\"v-um-tbl\" style=\"margin-bottom:15px\" >"
+					+"<tr id=\"u-tbl-header\" class=\"u-tbl-header\">"
+					+"<td class=\"v-tbl-recent-activity \">Requested On</td>"
+					+"<td class=\"v-tbl-recent-activity\">Report</td>"
+					+"<td class=\"v-tbl-recent-activity\" \>Date Range</td>"
+					+"<td class=\"v-tbl-recent-activity \">Requested By</td>"
+					+"<td class=\"v-tbl-recent-activity\" style='width:25%'>Status</td>"
+					+"<td class=\"v-tbl-recent-activity \"></td>"
+					+"</tr>";
+				
+				getRecentActivityCountForSocialMonitor();
+				var recentActivityCount= parseInt($('#soc-mon-rec-act-data').attr('data-count'));
+				
+				getRecentActivityListForSocialMonitor(0, 10,tableHeaderData,recentActivityCount);
+				showHidePaginateButtonsForSocialMonitor(0, recentActivityCount);
+				
+				if(recentActivityCount == 0){
+					var tableData='';
+					tableData+="</table><div style='text-align:center; margin:20px auto'><span class='incomplete-trans-span'>There are No Recent Activities</span></div>";
+					$('#soc-mon-recent-activity-list-table').html(tableData);
+				}
+			},
+			error : function(e) {
+				showError("Your request could not be processed at the moment. Please try again later!");
+				if (e.status == 504) {
+					redirectToLoginPageOnSessionTimeOut(e.status);
+					return;
+				}
+			}
+		});
+});
