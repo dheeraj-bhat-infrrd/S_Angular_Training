@@ -59,6 +59,8 @@ public class SocialResponseObject<T> implements Serializable
     private List<String> foundKeywords;
     private List<ActionHistory> actionHistory;
     private boolean isRetried;
+    private boolean fromTrustedSource;
+    private String postSource;
 
 
     public T getResponse()
@@ -359,6 +361,24 @@ public class SocialResponseObject<T> implements Serializable
         this.postLink = postLink;
     }
     
+    public boolean isFromTrustedSource() {
+        return fromTrustedSource;
+    }
+
+
+    public void setFromTrustedSource(boolean fromTrustedSource) {
+        this.fromTrustedSource = fromTrustedSource;
+    } 
+    
+    public String getPostSource() {
+        return postSource;
+    }
+
+
+    public void setPostSource(String postSource) {
+        this.postSource = postSource;
+    }
+    
     @Override
     public String toString()
     {
@@ -368,7 +388,9 @@ public class SocialResponseObject<T> implements Serializable
             + ownerEmail + ", response=" + response + ", type=" + type + ", flagged=" + flagged + ", status=" + status
             + ", companyId=" + companyId + ", regionId=" + regionId + ", branchId=" + branchId + ", agentId=" + agentId
             + ", profileType=" + profileType + ", hash=" + hash + ", duplicateCount=" + duplicateCount + ", foundKeywords="
-            + foundKeywords + ", actionHistory=" + actionHistory + ", isRetried=" + isRetried + "]";
+            + foundKeywords + ", actionHistory=" + actionHistory + ", isRetried=" + isRetried + ", fromTrustedSource="
+            + fromTrustedSource + ", postSource=" + postSource + "]";
     }
+    
 
 }

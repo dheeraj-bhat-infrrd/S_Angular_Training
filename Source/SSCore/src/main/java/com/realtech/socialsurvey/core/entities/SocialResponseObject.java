@@ -385,7 +385,8 @@ public class SocialResponseObject<T> implements Serializable
             + ownerEmail + ", response=" + response + ", type=" + type + ", flagged=" + flagged + ", status=" + status
             + ", companyId=" + companyId + ", regionId=" + regionId + ", branchId=" + branchId + ", agentId=" + agentId
             + ", profileType=" + profileType + ", hash=" + hash + ", duplicateCount=" + duplicateCount + ", foundKeywords="
-            + foundKeywords + ", actionHistory=" + actionHistory + ", isRetried=" + isRetried + "]";
+            + foundKeywords + ", actionHistory=" + actionHistory + ", isRetried=" + isRetried + ", fromTrustedSource="
+            + fromTrustedSource + ", postSource=" + postSource + "]";
     }
     
 }
