@@ -5,6 +5,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.MongoSocialFeedDao;
 import com.realtech.socialsurvey.core.entities.*;
 import com.realtech.socialsurvey.core.enums.ProfileType;
+import com.realtech.socialsurvey.core.enums.SocialFeedStatus;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -61,6 +62,8 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
     private static final String UPDATED_TIME = "updatedTime";
     public static final String CREATED_TIME = "createdTime";
     public static final String FOUND_KEYWORDS = "foundKeywords";
+    private static final String FROM_TRUSTED_SOURCE = "fromTrustedSource";
+    
 
 
     @Override
@@ -548,5 +551,21 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         calendar.set(Calendar.SECOND, 0);
         return calendar.getTime();
     }
+    
+    @Override
+    public long updateForTrustedSource(long companyId , String type , ActionHistory actionHistory) {
+        if(LOG.isDebugEnabled()){
+            LOG.debug("Fetching posts for trustedSource = {} and companyId = {}", type, companyId);
+        }
 
+            Query updateQuery = new Query().addCriteria( Criteria.where( COMPANY_ID ).is( companyId ) ).addCriteria( Criteria.where( FEED_TYPE ).is( type ) ).addCriteria( Criteria.where( STATUS ).in( SocialFeedStatus.NEW,SocialFeedStatus.ESCALATED ) );
+            Update update = new Update();
+            //update fromTrustedSource 
+            update.set(FROM_TRUSTED_SOURCE, true);
+            //update status to RESOLVED
+            update.set(STATUS, SocialFeedStatus.RESOLVED);
+            update.push( ACTION_HISTORY, actionHistory );
+            WriteResult result = mongoTemplate.updateMulti(updateQuery, update, SOCIAL_FEED_COLLECTION);
+            return result.getN();
+    }
 }

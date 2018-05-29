@@ -60,5 +60,13 @@ public interface MongoSocialFeedDao
 
 	List<SocialResponseObject> getSocialFeed( long companyId, long startTime, long endTime, int pageSize, int skips );
 
+    /**
+     * @param companyId
+     * @param type
+     * @param actionHistory
+     * @return
+     */
+    public long updateForTrustedSource( long companyId, String type, ActionHistory actionHistory );
+
     
 }
