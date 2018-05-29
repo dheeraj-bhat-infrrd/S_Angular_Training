@@ -170,7 +170,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
                     Collections.sort( socialResponseObject.getActionHistory(), new ActionHistoryComparator() );
                 }
                 socialMonitorFeedData.setActionHistory( socialResponseObject.getActionHistory() );
-                socialMonitorFeedData.setUpdatedOn( socialResponseObject.getUpdatedTime() );
+                socialMonitorFeedData.setUpdatedOn( socialResponseObject.getCreatedTime() );
                 socialMonitorFeedData.setFoundKeywords( socialResponseObject.getFoundKeywords() );
                 socialMonitorFeedData.setDuplicateCount( socialResponseObject.getDuplicateCount() );
                 socialMonitorFeedData.setPageLink( socialResponseObject.getPageLink() );
@@ -337,6 +337,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
                     actionHistory.setText( socialFeedsActionUpdate.getText() );
                     actionHistory.setOwnerName( socialFeedsActionUpdate.getUserName() );
                     actionHistory.setCreatedDate( new Date().getTime() );
+                    socialResponseObject.setUpdatedTime( new Date().getTime() );
                     actionHistories.add( actionHistory );
                 }
                 if ( ( socialFeedsActionUpdate.getTextActionType().toString()
@@ -347,6 +348,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
                     actionHistory.setText( socialFeedsActionUpdate.getText() );
                     actionHistory.setOwnerName( socialFeedsActionUpdate.getUserName() );
                     actionHistory.setCreatedDate( new Date().getTime() );
+                    socialResponseObject.setUpdatedTime( new Date().getTime() );
                     actionHistories.add( actionHistory );
                     // send mail to the user
                     try {
