@@ -57,7 +57,7 @@ public interface SettingsSetter {
 	 * @param settings
 	 * @return
 	 */
-	public boolean isSettingsValueSet(OrganizationUnit organizationUnit, long currentSetValue, SettingsForApplication settings);
+	public boolean isSettingsValueSet(OrganizationUnit organizationUnit, double currentSetValue, SettingsForApplication settings);
 
 	/**
 	 * Check the settings set status
@@ -66,7 +66,7 @@ public interface SettingsSetter {
 	 * @param organizationUnit
 	 * @return
 	 */
-	public boolean checkSettingsSetStatus(int settingNumber, OrganizationUnit organizationUnit);
+	public boolean checkSettingsSetStatus( double settingNumber, OrganizationUnit organizationUnit);
 
 	/**
 	 * Finds out all te level who have set the settings value
@@ -84,5 +84,5 @@ public interface SettingsSetter {
 	 * @return
 	 * @throws InvalidSettingsStateException
 	 */
-	public OrganizationUnit getLowestSetterLevel(int setUnitValue) throws InvalidSettingsStateException;
+	public OrganizationUnit getLowestSetterLevel( double setUnitValue) throws InvalidSettingsStateException;
 }

@@ -17,7 +17,7 @@ import com.realtech.socialsurvey.compute.exception.UploadOnAmazonException;
 import com.realtech.socialsurvey.compute.services.FailedMessagesService;
 import com.realtech.socialsurvey.compute.services.impl.FailedMessagesServiceImpl;
 import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBoltWithAck;
-import com.realtech.socialsurvey.compute.utils.ConversionUtils;
+import com.realtech.socialsurvey.compute.utils.FileUtils;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -70,20 +70,20 @@ public class UploadOnAmazonS3Bolt extends BaseComputeBoltWithAck
         String fileNameInS3 = null;
         ReportRequest reportRequest = (ReportRequest) input.getValueByField("reportRequest");
         String bucket = LocalPropertyFileHandler.getInstance()
-                .getProperty( APPLICATION_PROPERTY_FILE, AMAZON_BUCKET ).orElse( null );
+            .getProperty( APPLICATION_PROPERTY_FILE, AMAZON_BUCKET ).orElse( null );
         String reportBucketPath = LocalPropertyFileHandler.getInstance()
-                .getProperty( APPLICATION_PROPERTY_FILE, AMAZON_REPORTS_BUCKET ).orElse( null );
+            .getProperty( APPLICATION_PROPERTY_FILE, AMAZON_REPORTS_BUCKET ).orElse( null );
         String endpoints = LocalPropertyFileHandler.getInstance()
-                .getProperty(APPLICATION_PROPERTY_FILE, AMAZON_ENDPOINT ).orElse( null );
+            .getProperty(APPLICATION_PROPERTY_FILE, AMAZON_ENDPOINT ).orElse( null );
         String status = input.getStringByField("status");
         boolean isSuccess = input.getBooleanByField( "isSuccess");
 
         if ( isSuccess  && status.equals(ReportStatus.PROCESSED.getValue() ) ){
             String reportBucket = bucket + "/" + reportBucketPath;
-            LOG.info( "Uploading file: {}  to Amazon S3", fileName );
+            LOG.debug( "Uploading file: {}  to Amazon S3", fileName );
             //convert byte stream to file
             try {
-                file = ConversionUtils.convertBytesToFile(fileBytes, fileName);
+                file = FileUtils.convertBytesToFile(fileBytes, fileName);
                 if (fileBytes == null || file == null || !file.exists() || fileName == null || fileName.isEmpty()) {
                     LOG.error("Either file or file name is not present");
                     status = ReportStatus.FAILED.getValue();
@@ -95,11 +95,11 @@ public class UploadOnAmazonS3Bolt extends BaseComputeBoltWithAck
 
 
                     fileNameInS3 = endpoints + FILE_SEPARATOR + reportBucket + FILE_SEPARATOR
-                            + URLEncoder.encode(fileName, "UTF-8");
+                        + URLEncoder.encode(fileName, "UTF-8");
                     AmazonS3 s3Client = createAmazonClient(endpoints, reportBucket);
                     PutObjectResult result = s3Client.putObject(putObjectRequest);
-                    LOG.info("Amazon Upload Etag: " + result.getETag());
-                    LOG.info("Uploaded {} to Amazon s3 ", fileName);
+                    LOG.debug("Amazon Upload Etag: " + result.getETag());
+                    LOG.debug("Uploaded {} to Amazon s3 ", fileName);
                     success = true;
                 }
             } catch ( UploadOnAmazonException | UnsupportedEncodingException ex ) {
@@ -121,14 +121,14 @@ public class UploadOnAmazonS3Bolt extends BaseComputeBoltWithAck
             success = true;
 
         LOG.info("Emitting tuple with success = {}, fileName = {}, fileUploadId = {}, status = {}", success, fileNameInS3,
-                input.getValueByField( "fileUploadId" ), status);
+            input.getValueByField( "fileUploadId" ), status);
         _collector.emit(input, Arrays.asList(success, fileNameInS3, input.getValueByField( "fileUploadId" ),
-                reportRequest, status));
+            reportRequest, status));
 
         //if the file is successfully uploaded , delete from the local
         if(file != null && file.exists()) {
-            if(file.delete()) LOG.info(" {} has been successfully deleted ", fileName);
-            else LOG.info(" Unable to delete {} " , fileName);
+            if(file.delete()) LOG.debug(" {} has been successfully deleted ", fileName);
+            else LOG.error(" Unable to delete {} " , fileName);
         }
     }
 

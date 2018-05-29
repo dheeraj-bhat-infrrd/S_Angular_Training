@@ -1,5 +1,8 @@
 package com.realtech.socialsurvey.compute.utils;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Utility class for character array operations
  * @author nishit
@@ -12,6 +15,8 @@ public class ChararcterUtils
     private ChararcterUtils()
     {}
 
+    private static final String RETWEET_REGEX = "(^rt\\s*@(.*):\\s)(.*)";
+    private static final Pattern PATTERN = Pattern.compile( RETWEET_REGEX, Pattern.CASE_INSENSITIVE );
 
     /**
      * Escapes SOLR query characters
@@ -40,4 +45,19 @@ public class ChararcterUtils
         return word + "-" + appendWord;
     }
 
+
+    /**
+     * Escapes RT @<>: from the post
+     * @param text
+     * @return
+     */
+    public static String getTextIfRetweet( String text )
+    {
+        Matcher matcher = PATTERN.matcher( text );
+        if ( matcher.matches() ) {
+            text = matcher.group( 3 );
+        }
+        return text;
+    }
+    
 }

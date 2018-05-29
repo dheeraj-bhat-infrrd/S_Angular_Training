@@ -1,23 +1,46 @@
 package com.realtech.socialsurvey.web.controller;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.servlet.UnavailableException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.ExternalApiCallDetailsDao;
+import com.realtech.socialsurvey.core.dao.SocialPostDao;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.*;
+import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.enums.AccountType;
+import com.realtech.socialsurvey.core.enums.DisplayMessageType;
+import com.realtech.socialsurvey.core.enums.SettingsForApplication;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.integration.zillow.FetchZillowReviewBodyByNMLS;
+import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationAgentApi;
+import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationLenderApi;
+import com.realtech.socialsurvey.core.integration.zillow.ZillowIntergrationApiBuilder;
+import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
+import com.realtech.socialsurvey.core.services.generator.URLGenerator;
+import com.realtech.socialsurvey.core.services.mail.EmailServices;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.search.SolrSearchService;
+import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
+import com.realtech.socialsurvey.core.services.social.SocialAsyncService;
+import com.realtech.socialsurvey.core.services.social.SocialManagementService;
+import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
+import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
+import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
+import com.realtech.socialsurvey.core.utils.MessageUtils;
+import com.realtech.socialsurvey.web.common.ErrorResponse;
+import com.realtech.socialsurvey.web.common.JspResolver;
+import com.realtech.socialsurvey.web.common.TokenHandler;
+import com.realtech.socialsurvey.web.util.RequestUtils;
+import facebook4j.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -40,77 +63,18 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import retrofit.mime.TypedByteArray;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.dao.ExternalApiCallDetailsDao;
-import com.realtech.socialsurvey.core.dao.SocialPostDao;
-import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
-import com.realtech.socialsurvey.core.entities.AgentSettings;
-import com.realtech.socialsurvey.core.entities.Branch;
-import com.realtech.socialsurvey.core.entities.Company;
-import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
-import com.realtech.socialsurvey.core.entities.ExternalAPICallDetails;
-import com.realtech.socialsurvey.core.entities.FacebookPage;
-import com.realtech.socialsurvey.core.entities.GoogleToken;
-import com.realtech.socialsurvey.core.entities.LenderRef;
-import com.realtech.socialsurvey.core.entities.LinkedinUserProfileResponse;
-import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
-import com.realtech.socialsurvey.core.entities.ProfileStage;
-import com.realtech.socialsurvey.core.entities.Region;
-import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
-import com.realtech.socialsurvey.core.entities.SocialMonitorData;
-import com.realtech.socialsurvey.core.entities.SocialMonitorPost;
-import com.realtech.socialsurvey.core.entities.SocialPost;
-import com.realtech.socialsurvey.core.entities.SurveyDetails;
-import com.realtech.socialsurvey.core.entities.TwitterToken;
-import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.entities.UserSettings;
-import com.realtech.socialsurvey.core.entities.ZillowToken;
-import com.realtech.socialsurvey.core.enums.AccountType;
-import com.realtech.socialsurvey.core.enums.DisplayMessageType;
-import com.realtech.socialsurvey.core.enums.SettingsForApplication;
-import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
-import com.realtech.socialsurvey.core.exception.NonFatalException;
-import com.realtech.socialsurvey.core.integration.zillow.FetchZillowReviewBodyByNMLS;
-import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationAgentApi;
-import com.realtech.socialsurvey.core.integration.zillow.ZillowIntegrationLenderApi;
-import com.realtech.socialsurvey.core.integration.zillow.ZillowIntergrationApiBuilder;
-import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
-import com.realtech.socialsurvey.core.services.generator.URLGenerator;
-import com.realtech.socialsurvey.core.services.mail.EmailServices;
-import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
-import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
-import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
-import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
-import com.realtech.socialsurvey.core.services.search.SolrSearchService;
-import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
-import com.realtech.socialsurvey.core.services.social.SocialAsyncService;
-import com.realtech.socialsurvey.core.services.social.SocialManagementService;
-import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
-import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
-import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
-import com.realtech.socialsurvey.core.utils.MessageUtils;
-import com.realtech.socialsurvey.web.common.ErrorResponse;
-import com.realtech.socialsurvey.web.common.JspResolver;
-import com.realtech.socialsurvey.web.common.TokenHandler;
-import com.realtech.socialsurvey.web.util.RequestUtils;
-
-import facebook4j.Facebook;
-import facebook4j.FacebookException;
+import javax.servlet.UnavailableException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.*;
 
 
 /**
@@ -179,6 +143,12 @@ public class SocialManagementController
 
     @Value ( "${FB_URI}")
     private String facebookUri;
+
+    // Instagram
+    @Value ( "${IG_REDIRECT_URI}" )
+    private String instagramRedirectUri;
+    @Value ( "${IG_URI}")
+    private String instagramUri;
 
     // LinkedIn
     @Value ( "${LINKED_IN_REST_API_URI}")
@@ -303,13 +273,12 @@ public class SocialManagementController
 
             // Building facebook authUrl
             case "facebook":
-                Facebook facebook = socialManagementService.getFacebookInstance( serverBaseUrl );
-
+                Facebook facebook = socialManagementService.getFacebookInstance( serverBaseUrl, facebookRedirectUri );
                 // Setting authUrl in model
                 session.setAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN, facebook );
                 model.addAttribute( CommonConstants.SOCIAL_AUTH_URL,
                     facebook.getOAuthAuthorizationURL( serverBaseUrl + facebookRedirectUri ) );
-
+                model.addAttribute(CommonConstants.CALLBACK, "./saveSelectedAccessFacebookToken.do");
                 break;
 
             // Building twitter authUrl
@@ -368,12 +337,21 @@ public class SocialManagementController
             case "rss":
                 break;
 
+            case "instagram" :
+                Facebook fb = socialManagementService.getFacebookInstance( serverBaseUrl, instagramRedirectUri );
+
+                // Setting authUrl in model
+                session.setAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN, fb );
+                model.addAttribute( CommonConstants.SOCIAL_AUTH_URL,
+                        fb.getOAuthAuthorizationURL( serverBaseUrl + instagramRedirectUri ) );
+                break;
+
             default:
                 LOG.error( "Social Network Type invalid in getSocialAuthPage" );
         }
 
         model.addAttribute( CommonConstants.MESSAGE, CommonConstants.YES );
-        if ( socialNetwork.equalsIgnoreCase( "facebook" ) )
+        if ( socialNetwork.equalsIgnoreCase( "facebook" ) || socialNetwork.equalsIgnoreCase("instagram") )
             return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;
         else if ( socialNetwork.equalsIgnoreCase( "zillow" ) ) {
             session.setAttribute( "zillowNonLenderURI", CommonConstants.ZILLOW_PROFILE_URL);
@@ -545,6 +523,7 @@ public class SocialManagementController
             }
             String fbAccessTokenStr = new Gson().toJson( accessToken, facebook4j.auth.AccessToken.class );
             model.addAttribute( "pageNames", facebookPages );
+            
             model.addAttribute( "fbAccessToken", fbAccessTokenStr );
             String mediaTokensStr = new Gson().toJson( mediaTokens, SocialMediaTokens.class );
             model.addAttribute( "mediaTokens", mediaTokensStr );
@@ -560,10 +539,124 @@ public class SocialManagementController
         model.addAttribute( CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES );
         model.addAttribute( "isNewUser", isNewUser );
         model.addAttribute( "socialNetwork", "facebook" );
+        model.addAttribute(CommonConstants.CALLBACK, "./saveSelectedAccessFacebookToken.do");
         LOG.info( "Facebook Access tokens obtained and added to mongo successfully!" );
         return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;
     }
 
+    /**
+     * The url that Facebook send request to with the oauth verification code
+     * @param model
+     * @param request
+     * @return
+     */
+    @RequestMapping ( value = "/instagramAuth", method = RequestMethod.GET)
+    public String authenticateInstagramAccess( Model model, HttpServletRequest request ) {
+        LOG.info( "Instagram authentication url requested" );
+        User user = sessionHelper.getCurrentUser();
+        HttpSession session = request.getSession( false );
+        AccountType accountType = (AccountType) session.getAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION );
+        if ( session.getAttribute( "columnName" ) != null ) {
+            String columnName = (String) session.getAttribute( "columnName" );
+            String columnValue = (String) session.getAttribute( "columnValue" );
+            session.removeAttribute( "columnName" );
+            session.removeAttribute( "columnValue" );
+            model.addAttribute( "columnName", columnName );
+            model.addAttribute( "columnValue", columnValue );
+            model.addAttribute( "fromDashboard", 1 );
+        }
+
+        try {
+            UserSettings userSettings = (UserSettings) session
+                    .getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+            long entityId = (long) session.getAttribute(CommonConstants.ENTITY_ID_COLUMN);
+            String entityType = (String) session.getAttribute(CommonConstants.ENTITY_TYPE_COLUMN);
+            if (userSettings == null || entityType == null) {
+                throw new InvalidInputException("No user settings found in session");
+            }
+
+            // On auth error
+            String errorCode = request.getParameter("error");
+            if (errorCode != null) {
+                LOG.error("Error code : {}", errorCode);
+                model.addAttribute(CommonConstants.ERROR, CommonConstants.YES);
+                return JspResolver.SOCIAL_AUTH_MESSAGE;
+            }
+
+            // Getting Oauth accesstoken for facebook
+            String oauthCode = request.getParameter("code");
+            Facebook facebook = (Facebook) session.getAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
+            String profileLink = null;
+            facebook4j.auth.AccessToken accessToken = null;
+            List<FacebookPage> facebookPages = new ArrayList<>();
+            List<Account> accounts = new ArrayList<>();
+
+            accessToken = facebook.getOAuthAccessToken(oauthCode,
+                    requestUtils.getRequestServerName(request) + instagramRedirectUri);
+            facebook4j.User fbUser = facebook.getUser(facebook.getId());
+
+            // no need to show the user facebook personal account as cannot be connected instagram business profiles
+
+            //get all fb pages connected to instagram using pagination
+            ResponseList<Account> resultList;
+            Reading reading = new Reading().limit( 25 );
+            resultList = facebook.getAccounts( reading );
+            if(resultList != null){
+                accounts.addAll( resultList );
+            }
+
+            while ( resultList!= null && resultList.getPaging() != null && resultList.getPaging().getNext() != null ) {
+                resultList = facebook.fetchNext( resultList.getPaging() );
+                accounts.addAll( resultList );
+            }
+
+            Map<String, String> params = new HashMap<>();
+            params.put("fields", "connected_instagram_account{username}");
+
+            //convert Facebook account to SS entity
+            FacebookPage facebookPage ;
+            RawAPIResponse response ;
+            for ( Account account : accounts ) {
+                //check if the page is connected to valid instagram account and add to facebookpages list
+                response = facebook.callGetAPI(account.getId(), params);
+                if( response.asJSONObject().has("connected_instagram_account") ) {
+                    facebookPage = new FacebookPage();
+                    facebookPage.setId(account.getId());
+                    facebookPage.setName(account.getName());
+                    facebookPage.setAccessToken(account.getAccessToken());
+                    facebookPage.setCategory(account.getCategory());
+                    facebookPage.setProfileUrl(instagramUri.concat(response.asJSONObject().
+                            getJSONObject("connected_instagram_account").getString("username")));
+                    facebookPages.add(facebookPage);
+                }
+            }
+
+            if(facebookPages.isEmpty()){
+                model.addAttribute( "isPageListEmpty", true );
+            }
+            
+            String fbAccessTokenStr = new Gson().toJson( accessToken, facebook4j.auth.AccessToken.class );
+            model.addAttribute( "pageNames", facebookPages );
+            model.addAttribute( "fbAccessToken", fbAccessTokenStr );
+        }
+        catch ( FacebookException e ) {
+            LOG.error( "Error while creating access token for facebook: " , e );
+        }
+        catch ( Exception e ) {
+            session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
+            LOG.error( "Exception while getting facebook access token. Reason : " , e );
+            return JspResolver.SOCIAL_AUTH_MESSAGE;
+        }
+
+        // Updating attributes
+        session.removeAttribute( CommonConstants.SOCIAL_REQUEST_TOKEN );
+        model.addAttribute( CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES );
+
+        model.addAttribute(CommonConstants.CALLBACK, "./saveSelectedAccessInstagramToken.do");
+        model.addAttribute( "socialNetwork", "instagram" );
+        LOG.info( "Instagram authentication completed" );
+        return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;
+    }
 
     @ResponseBody
     @RequestMapping ( value = "/saveSelectedAccessFacebookToken")
@@ -675,6 +768,174 @@ public class SocialManagementController
         return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;
     }
 
+    @ResponseBody
+    @RequestMapping ( value = "/saveSelectedAccessInstagramToken")
+    public String saveSelectedAccessInstagramToken( Model model, HttpServletRequest request ){
+        LOG.info( " Trying to save selected Instagram " );
+        String selectedAccessToken = request.getParameter( "selectedAccessFacebookToken" );
+        String selectedProfileUrl = request.getParameter( "selectedProfileUrl" );
+        String selectedProfileId = request.getParameter("selectedProfileId");
+        User user = sessionHelper.getCurrentUser();
+        HttpSession session = request.getSession( false );
+        AccountType accountType = (AccountType) session.getAttribute( CommonConstants.ACCOUNT_TYPE_IN_SESSION );
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+
+        int accountMasterId = accountType.getValue();
+        if ( session.getAttribute( "columnName" ) != null ) {
+            String columnName = (String) session.getAttribute( "columnName" );
+            String columnValue = (String) session.getAttribute( "columnValue" );
+            session.removeAttribute( "columnName" );
+            session.removeAttribute( "columnValue" );
+            model.addAttribute( "columnName", columnName );
+            model.addAttribute( "columnValue", columnValue );
+            model.addAttribute( "fromDashboard", 1 );
+        }
+
+        if ( session.getAttribute( "isFixSocialMedia" ) != null ) {
+            model.addAttribute( "isFixSocialMedia", 1 );
+        }
+
+        boolean updated = false;
+        SocialMediaTokens mediaTokens = null;
+        String fbAccessTokenStr = request.getParameter( "fbAccessToken" );
+        if ( fbAccessTokenStr == null || fbAccessTokenStr.isEmpty() ) {
+            LOG.error( "Facebook access token is empty!" );
+        }
+
+        facebook4j.auth.AccessToken accessToken = new Gson().fromJson( fbAccessTokenStr, facebook4j.auth.AccessToken.class );
+
+        try {
+            //create the instagram token
+            InstagramToken instagramToken = new InstagramToken();
+            instagramToken.setId(selectedProfileId);
+            instagramToken.setAccessTokenToPost(selectedAccessToken);
+            instagramToken.setPageLink(selectedProfileUrl);
+            instagramToken.setAccessToken(selectedAccessToken);
+            instagramToken.setAccessTokenCreatedOn(System.currentTimeMillis());
+            instagramToken.setTokenExpiryAlertSent( false );
+            instagramToken.setTokenExpiryAlertEmail( null );
+            instagramToken.setTokenExpiryAlertTime( null );
+
+            if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+                OrganizationUnitSettings companySettings = organizationManagementService
+                        .getCompanySettings(user.getCompany().getCompanyId());
+                if (companySettings == null) {
+                    throw new InvalidInputException("No company settings found in current session");
+                }
+
+                mediaTokens = companySettings.getSocialMediaTokens();
+                mediaTokens.setInstagramToken(instagramToken);
+                socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
+                        companySettings, mediaTokens );
+                //update SETTINGS_SET_STATUS of COMPANY table to set.
+                Company company = userManagementService.getCompanyById( companySettings.getIden() );
+                if ( company != null ) {
+                    settingsSetter.setSettingsValueForCompany( company, SettingsForApplication.INSTAGRAM,
+                            CommonConstants.SET_SETTINGS );
+                    userManagementService.updateCompany( company );
+                }
+                for ( ProfileStage stage : companySettings.getProfileStages() ) {
+                    if ( stage.getProfileStageKey().equalsIgnoreCase( "INSTAGRAM_PRF" ) ) {
+                        stage.setStatus( CommonConstants.STATUS_INACTIVE );
+                    }
+                }
+                profileManagementService.updateProfileStages( companySettings.getProfileStages(), companySettings,
+                        MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+                updated = true;
+            } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+                OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings( entityId );
+                if ( regionSettings == null ) {
+                    throw new InvalidInputException( "No Region settings found in current session" );
+                }
+                mediaTokens = regionSettings.getSocialMediaTokens();
+                mediaTokens.setInstagramToken(instagramToken);
+                socialManagementService.updateSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
+                        regionSettings, mediaTokens );
+                //update SETTINGS_SET_STATUS of REGION table to set.
+                Region region = userManagementService.getRegionById( regionSettings.getIden() );
+                if ( region != null ) {
+                    settingsSetter.setSettingsValueForRegion( region, SettingsForApplication.INSTAGRAM,
+                            CommonConstants.SET_SETTINGS );
+                    userManagementService.updateRegion( region );
+                }
+                for ( ProfileStage stage : regionSettings.getProfileStages() ) {
+                    if ( stage.getProfileStageKey().equalsIgnoreCase( "INSTAGRAM_PRF" ) ) {
+                        stage.setStatus( CommonConstants.STATUS_INACTIVE );
+                    }
+                }
+                profileManagementService.updateProfileStages( regionSettings.getProfileStages(), regionSettings,
+                        MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+                updated = true;
+            } else if( entityType.equals( CommonConstants.BRANCH_ID_COLUMN )) {
+                OrganizationUnitSettings branchSettings = organizationManagementService.getBranchSettingsDefault( entityId );
+                if ( branchSettings == null ) {
+                    throw new InvalidInputException( "No Branch settings found in current session" );
+                }
+                mediaTokens = branchSettings.getSocialMediaTokens();
+                mediaTokens.setInstagramToken(instagramToken);
+                socialManagementService.updateSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
+                branchSettings, mediaTokens );
+                //update SETTINGS_SET_STATUS of BRANCH table to set.
+                Branch branch = userManagementService.getBranchById( branchSettings.getIden() );
+                if ( branch != null ) {
+                    settingsSetter.setSettingsValueForBranch( branch, SettingsForApplication.INSTAGRAM,
+                            CommonConstants.SET_SETTINGS );
+                    userManagementService.updateBranch( branch );
+                }
+
+                for ( ProfileStage stage : branchSettings.getProfileStages() ) {
+                    if ( stage.getProfileStageKey().equalsIgnoreCase( "INSTAGRAM_PRF" ) ) {
+                        stage.setStatus( CommonConstants.STATUS_INACTIVE );
+                    }
+                }
+                profileManagementService.updateProfileStages( branchSettings.getProfileStages(), branchSettings,
+                        MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+                updated = true;
+            } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN )
+                    || accountMasterId == CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL ) {
+                AgentSettings agentSettings = userManagementService.getUserSettings(entityId);
+                if (agentSettings == null) {
+                    throw new InvalidInputException("No Agent settings found in current session");
+                }
+                mediaTokens = agentSettings.getSocialMediaTokens();
+                mediaTokens.setInstagramToken(instagramToken);
+                socialManagementService.updateAgentSocialMediaTokens( agentSettings, mediaTokens );
+
+                for ( ProfileStage stage : agentSettings.getProfileStages() ) {
+                    if ( stage.getProfileStageKey().equalsIgnoreCase( "INSTAGRAM_PRF" ) ) {
+                        stage.setStatus( CommonConstants.STATUS_INACTIVE );
+                    }
+                }
+                profileManagementService.updateProfileStages( agentSettings.getProfileStages(), agentSettings,
+                        MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+                updated = true;
+            }
+
+            if ( !updated ) {
+                throw new InvalidInputException( "Invalid input exception occurred while saving access token for instagram",
+                        DisplayMessageConstants.GENERAL_ERROR );
+            }
+
+            //get detail of expire social media
+            boolean isSocialMediaExpired = false;
+            if(organizationManagementService.getExpiredSocailMedia( entityType, entityId ).size() > 0)
+                isSocialMediaExpired = true;
+            session.setAttribute( "isSocialMediaExpired" , isSocialMediaExpired );
+
+            //Add action to social connection history
+            socialManagementService.updateSocialConnectionsHistory( entityType, entityId, mediaTokens,
+                    CommonConstants.INSTAGRAM_SOCIAL_SITE, CommonConstants.SOCIAL_MEDIA_CONNECTED );
+
+        }
+        catch ( InvalidInputException | NoRecordsFetchedException e ) {
+            LOG.error( "Error while saving access token for instagram to post: ", e );
+        } catch ( NonFatalException e ) {
+            LOG.error( "Error setting settings value. Reason : ", e );
+        }
+        model.addAttribute( "socialNetwork", "instagram" );
+        return JspResolver.SOCIAL_FACEBOOK_INTERMEDIATE;
+    }
 
     /**
      * The url that twitter send request to with the oauth verification code
@@ -967,7 +1228,7 @@ public class SocialManagementController
             HttpGet httpGet = new HttpGet( linkedinProfileUri + accessToken );
             String basicProfileStr = httpclient.execute( httpGet, new BasicResponseHandler() );
             LinkedinUserProfileResponse profileData = new Gson().fromJson( basicProfileStr, LinkedinUserProfileResponse.class );
-            String profileLink = (String) profileData.getSiteStandardProfileRequest().getUrl();
+            String profileLink = profileData.getPublicProfileUrl();
 
             boolean updated = false;
             int accountMasterId = accountType.getValue();
@@ -2466,6 +2727,14 @@ public class SocialManagementController
                     profileUrl = usersettings.getAgentSettings().getSocialMediaTokens().getZillowToken().getZillowProfileLink();
                 }
             }
+        } else if ( socialNetwork.equalsIgnoreCase( "instagram" ) ) {
+            if ( usersettings != null && usersettings.getAgentSettings() != null
+                    && usersettings.getAgentSettings().getSocialMediaTokens() != null
+                    && usersettings.getAgentSettings().getSocialMediaTokens().getInstagramToken() != null ) {
+                if ( usersettings.getAgentSettings().getSocialMediaTokens().getInstagramToken().getPageLink() != null ) {
+                    profileUrl = usersettings.getAgentSettings().getSocialMediaTokens().getInstagramToken().getPageLink();
+                }
+            }
         }
 
         LOG.info( "Method getProfileUrl() finished from SocialManagementController" );
@@ -2598,10 +2867,10 @@ public class SocialManagementController
     }
     
     private Boolean checkForExistiongProfile(OrganizationUnitSettings unitSettings) {
-        if(unitSettings != null 
-            && ( unitSettings.getSocialMediaTokens() == null 
+        if(unitSettings != null
+            && ( unitSettings.getSocialMediaTokens() == null
             || unitSettings.getSocialMediaTokens().getZillowToken() == null )) {
-            return false; 
+            return false;
             //"no-zillow"
         } else {
             return true;
@@ -2660,6 +2929,10 @@ public class SocialManagementController
                 case CommonConstants.ZILLOW_SOCIAL_SITE:
                     settings = SettingsForApplication.ZILLOW;
                     isZillow = true;
+                    break;
+
+                case CommonConstants.INSTAGRAM_SOCIAL_SITE:
+                    settings = SettingsForApplication.INSTAGRAM;
                     break;
 
                 default:
@@ -2834,6 +3107,10 @@ public class SocialManagementController
 		            && tokens.getGoogleBusinessToken().getGoogleBusinessLink() != null ) {
 		            model.addAttribute( "googleBusinessLink", tokens.getGoogleBusinessToken().getGoogleBusinessLink() );
 	            }
+                if ( tokens.getInstagramToken() != null
+                        && tokens.getInstagramToken().getPageLink() != null ) {
+                    model.addAttribute( "instagramLink", tokens.getInstagramToken().getPageLink() );
+                }
             }
         } catch ( NonFatalException e ) {
             LOG.error( "Exception occured in getSocialMediaTokenonSettingsPage()" );

@@ -1,9 +1,9 @@
 package com.realtech.socialsurvey.compute.entities;
 
+import java.io.Serializable;
+
 import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Entity;
-
-import java.io.Serializable;
 
 @Entity( "failed_messages")
 public class FailedReportRequest extends FailedMessage implements Serializable {

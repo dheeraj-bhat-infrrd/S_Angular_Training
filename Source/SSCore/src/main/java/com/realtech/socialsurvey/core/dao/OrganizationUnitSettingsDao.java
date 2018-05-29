@@ -10,10 +10,13 @@ import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
+import com.realtech.socialsurvey.core.entities.FeedIngestionEntityForSM;
+import com.realtech.socialsurvey.core.entities.Keyword;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
 import com.realtech.socialsurvey.core.entities.ProfileUrlEntity;
 import com.realtech.socialsurvey.core.entities.SavedDigestRecord;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -46,6 +49,8 @@ public interface OrganizationUnitSettingsDao
      * Fetches the organization unit settings for the given identifier and collection name
      * 
      * @param identifier
+     * @param limit 
+     * @param startIndex 
      * @param collectionName
      * @return
      */
@@ -297,6 +302,25 @@ public interface OrganizationUnitSettingsDao
     public List<OrganizationUnitSettings> fetchCompaniesByAlertType( String alertType , List<Long> companyIds );
 
 
+    /**
+     * Find Media tokens for ids by collection name
+     * @param ids
+     * @param collectionName
+     * @return
+     */
+    public List<SocialMediaTokenResponse> fetchSocialMediaTokensForIds( List<Long> ids, String collectionName );
+
+
+    /**
+     * Get all social media tokan by collection name
+     * @param collectionName
+     * @param skipCount
+     * @param numOfRecords
+     * @return
+     */
+    public List<SocialMediaTokenResponse> getSocialMediaTokensByCollection( String collectionName, int skipCount, int numOfRecords );
+    
+        
     public void saveDigestRecord( String profileLevel, long entityId, SavedDigestRecord digestRecord ) throws InvalidInputException;
 
 
@@ -308,6 +332,12 @@ public interface OrganizationUnitSettingsDao
 
     void updateHidePublicPageForUsers( List<Long> userIdList, boolean hidePublicPage );
 
+    /**
+     * Method to get social media tokens count
+     * @param collectionName
+     * @return
+     */
+    public long getSocialMediaTokensCount( String collectionName );
 
 	public ContactDetailsSettings fetchContactDetailByEncryptedId(String encryptedId, String collection);
 

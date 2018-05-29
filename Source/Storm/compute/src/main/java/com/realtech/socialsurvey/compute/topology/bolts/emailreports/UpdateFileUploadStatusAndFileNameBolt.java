@@ -1,25 +1,27 @@
 package com.realtech.socialsurvey.compute.topology.bolts.emailreports;
 
-import com.realtech.socialsurvey.compute.common.RetrofitApiBuilder;
-import com.realtech.socialsurvey.compute.entities.FileUploadResponse;
-import com.realtech.socialsurvey.compute.entities.ReportRequest;
-import com.realtech.socialsurvey.compute.enums.FileUploadStatus;
-import com.realtech.socialsurvey.compute.exception.FileUploadUpdationException;
-import com.realtech.socialsurvey.compute.services.FailedMessagesService;
-import com.realtech.socialsurvey.compute.services.api.APIIntergrationException;
-import com.realtech.socialsurvey.compute.services.impl.FailedMessagesServiceImpl;
-import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBoltWithAck;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.realtech.socialsurvey.compute.common.RetrofitApiBuilder;
+import com.realtech.socialsurvey.compute.entities.FileUploadResponse;
+import com.realtech.socialsurvey.compute.entities.ReportRequest;
+import com.realtech.socialsurvey.compute.enums.FileUploadStatus;
+import com.realtech.socialsurvey.compute.exception.APIIntegrationException;
+import com.realtech.socialsurvey.compute.exception.FileUploadUpdationException;
+import com.realtech.socialsurvey.compute.services.FailedMessagesService;
+import com.realtech.socialsurvey.compute.services.impl.FailedMessagesServiceImpl;
+import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBoltWithAck;
+
 import retrofit2.Call;
 import retrofit2.Response;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
 public class UpdateFileUploadStatusAndFileNameBolt extends BaseComputeBoltWithAck {
 
@@ -81,7 +83,7 @@ public class UpdateFileUploadStatusAndFileNameBolt extends BaseComputeBoltWithAc
                 FailedMessagesService failedMessagesService = new FailedMessagesServiceImpl();
                 failedMessagesService.insertPermanentlyFailedReportRequest(reportRequest, ex);
             }
-            catch (IOException | APIIntergrationException ex) {
+            catch (IOException | APIIntegrationException ex) {
                 LOG.error("Exception occurred while updating the status of fileUploadTable " + ex.getMessage());
                 FailedMessagesService failedMessagesService = new FailedMessagesServiceImpl();
                 failedMessagesService.insertTemporaryFailedReportRequest(reportRequest);

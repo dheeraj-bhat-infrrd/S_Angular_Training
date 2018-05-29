@@ -796,6 +796,7 @@ public class HierarchyManagementController
             String selectedUserIdStr = request.getParameter( "selectedUserId" );
             String isAdminStr = request.getParameter( "isAdmin" );
             String userSelectionType = request.getParameter( "userSelectionType" );
+            String isSocialMonitorAdminStr = request.getParameter( "isSocialMonitorAdmin" );
 
             String selectedUserEmail = "";
             if ( userSelectionType != null ) {
@@ -822,6 +823,11 @@ public class HierarchyManagementController
             boolean isAdmin = false;
             if ( isAdminStr != null && !isAdminStr.isEmpty() ) {
                 isAdmin = Boolean.parseBoolean( isAdminStr );
+            }
+            
+            boolean isSocialMonitorAdmin = false;
+            if ( isSocialMonitorAdminStr != null && !isSocialMonitorAdminStr.isEmpty() ) {
+                isSocialMonitorAdmin = Boolean.parseBoolean( isSocialMonitorAdminStr );
             }
 
             try {
@@ -871,7 +877,8 @@ public class HierarchyManagementController
             try {
                 LOG.debug( "Calling service to add/assign invidual(s)" );
                 Map<String, Object> map = organizationManagementService.addIndividual( user, selectedUserId, branchId, regionId,
-                    assigneeEmailIds, isAdmin, false, true, ( adminId != null && adminId > 0 ) ? true : false );
+                    assigneeEmailIds, isAdmin, false, true, ( adminId != null && adminId > 0 ) ? true : false, isSocialMonitorAdmin );
+
                 List<User> invalidUserList = (List<User>) map.get( CommonConstants.INVALID_USERS_LIST );
                 LOG.debug( "Successfully executed service to add a new branch" );
                 String invalidMessage = "These email address ";

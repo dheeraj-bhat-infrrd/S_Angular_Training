@@ -205,6 +205,16 @@ public class LoginController
                 hiddenSection = settings.isHiddenSection();
                 model.addAttribute( "hiddenSection", hiddenSection );
             }
+            
+            //REALTECH_USER_ID is set only for real tech and SS admin
+            boolean isRealTechOrSSAdmin = false;
+            Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
+            if ( adminUserid != null ) {
+                isRealTechOrSSAdmin = true;
+            }
+            model.addAttribute( "isRealTechOrSSAdmin", isRealTechOrSSAdmin );
+            
+            //get detail of expire social media
         } catch ( InvalidInputException e ) {
             LOG.error( "fetching hiddensction varibale value failed." + e );
         }

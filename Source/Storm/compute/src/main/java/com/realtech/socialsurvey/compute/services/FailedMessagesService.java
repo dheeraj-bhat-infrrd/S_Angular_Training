@@ -2,7 +2,7 @@ package com.realtech.socialsurvey.compute.services;
 
 import com.realtech.socialsurvey.compute.entities.EmailMessage;
 import com.realtech.socialsurvey.compute.entities.ReportRequest;
-import com.realtech.socialsurvey.compute.entities.SocialPost;
+import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 
 /**
  * Operations on failed messages while processing
@@ -26,13 +26,6 @@ public interface FailedMessagesService
     public void insertTemporaryFailedEmailMessage(EmailMessage emailMessage);
 
     /**
-     * Insert failed social post
-     * @param post
-     * @param thrw
-     */
-    public void insertPermanentlyFailedSocialPost( SocialPost post, Throwable thrw );
-
-    /**
      * Inserts failed report request. These request will not be retried
      * @param reportRequest
      * @param thrw
@@ -45,6 +38,11 @@ public interface FailedMessagesService
      */
     void insertTemporaryFailedReportRequest(ReportRequest reportRequest);
 
+    /*Inserts permanent failed socialPost*/
+    void insertPermanentlyFailedSocialPost( SocialResponseObject<?> post, Throwable thrw );
+
+    /* Inserts temporary failed socialPost */
+    void insertTemporaryFailedSocialPost(SocialResponseObject<?> post);
     /**
      * Deletes failed email message
      * @param emailMessage
@@ -52,4 +50,8 @@ public interface FailedMessagesService
     int deleteFailedEmailMessage(String emailMessage);
 
     int updateFailedEmailMessageRetryCount(String randomUUID);
+
+    int deleteFailedSocialPost(String postId);
+
+    int updateFailedSocialPostRetryCount(String postId);
 }

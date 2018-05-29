@@ -12,7 +12,7 @@ import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSe
  */
 public interface SettingsManager {
 
-	public Map<String, Long> calculateSettingsScore(List<SettingsDetails> settingsDetails);
+	public Map<String, Double> calculateSettingsScore(List<SettingsDetails> settingsDetails);
 
 	public List<SettingsDetails> getScoreForCompleteHeirarchy(long companyId, long branchId, long regionId);
 

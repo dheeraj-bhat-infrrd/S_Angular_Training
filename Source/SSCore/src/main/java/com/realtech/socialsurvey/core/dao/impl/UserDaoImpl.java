@@ -1,8 +1,10 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -580,6 +582,41 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao
         LOG.warn( "Exception caught in getRegisteredEmailsInTheCompany() ", hibernateException );
         throw new DatabaseException( "Exception caught in getRegisteredEmailsInTheCompany() ", hibernateException );
     }
+    }
+
+
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public Map<Long, Long> getCompanyIdsForUserIds( List<Long> userIds )
+    {
+        LOG.debug( "Inside method getCompanyIdsForUserIds {}", userIds );
+        if ( userIds.isEmpty() ) {
+            return Collections.emptyMap();
+        }
+        Query query = null;
+        try {
+            query = getSession().createQuery( "select u.userId, u.company.companyId from User u where u.userId in (:ids)" );
+            query.setParameterList( "ids", userIds );
+
+            Map<Long, Long> userCompanyIdsMap = new HashMap<>();
+
+            List<Object> result = (List<Object>) query.list();
+            Iterator<Object> itr = result.iterator();
+
+            while ( itr.hasNext() ) {
+                Object[] obj = (Object[]) itr.next();
+                Long userId = (Long) obj[0];
+                Long companyId = (Long) obj[1];
+                userCompanyIdsMap.put( userId, companyId );
+                LOG.trace( "userId {} and company Id {}", userId, companyId );
+            }
+
+            return userCompanyIdsMap;
+
+        } catch ( HibernateException e ) {
+            LOG.error( "HibernateException caught in getCompanyIdsForUserIds(). Reason: " + e.getMessage(), e );
+            throw new DatabaseException( "HibernateException caught in getCompanyIdsForUserIds().", e );
+        }
     }
     
 }

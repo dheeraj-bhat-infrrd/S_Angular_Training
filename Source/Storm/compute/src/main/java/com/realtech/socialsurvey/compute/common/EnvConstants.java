@@ -119,6 +119,39 @@ public class EnvConstants
         }
     }
 
+    /**
+     * Gets the twitter consumer key from environment. If not found then returns the value from system property
+     * @return
+     */
+    public static Optional<String> twitterConsumerKey() {
+        String consumerKey = System.getenv( ComputeConstants.TWITTER_CONSUMER_KEY ) != null
+                ? System.getenv( ComputeConstants.TWITTER_CONSUMER_KEY )
+                : System.getProperty( ComputeConstants.TWITTER_CONSUMER_KEY );
+        if ( consumerKey != null ) {
+            LOG.info( "Found Twitter consumer key. Applying the key." );
+            return Optional.of( consumerKey );
+        } else {
+            LOG.warn( "Could not find Twitter consumer key. This could potentially cause problems." );
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Gets the twitter consumer secret from environment. If not found then returns the value from system property
+     * @return
+     */
+    public static Optional<String> twitterConsumerSecret() {
+        String consumerSecret = System.getenv( ComputeConstants.TWITTER_CONSUMER_SECRET ) != null
+                ? System.getenv( ComputeConstants.TWITTER_CONSUMER_SECRET )
+                : System.getProperty( ComputeConstants.TWITTER_CONSUMER_SECRET );
+        if ( consumerSecret != null ) {
+            LOG.info( "Found Twitter consumer secret. Applying the key." );
+            return Optional.of( consumerSecret );
+        } else {
+            LOG.warn( "Could not find Twitter consumer secret. This could potentially cause problems." );
+            return Optional.empty();
+        }
+    }
 
     public static String getProfile()
     {

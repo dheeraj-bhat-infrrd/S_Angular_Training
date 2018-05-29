@@ -27,9 +27,11 @@ public class SettingsSetterImpl implements SettingsSetter {
 			throw new InvalidInputException("Invalid input sent for settings update");
 		}
 		LOG.debug("Setting values to company " + company);
-		long modifiedSetSettingsValue = getModifiedSetSettingsValue(OrganizationUnit.COMPANY, Long.parseLong(company.getSettingsSetStatus()),
+		double modifiedSetSettingsValue = getModifiedSetSettingsValue(OrganizationUnit.COMPANY, Double.parseDouble(company.getSettingsSetStatus()),
 				settings, hasBeenSet);
-		company.setSettingsSetStatus(String.valueOf(modifiedSetSettingsValue));
+		String modifiedSetSettingsStringValue = String.valueOf( modifiedSetSettingsValue );
+		company.setSettingsSetStatus(modifiedSetSettingsStringValue.split( "\\." ).length > 1 ? modifiedSetSettingsStringValue.split( "\\." )[0]
+			: modifiedSetSettingsStringValue);
 		return company;
 	}
 
@@ -41,9 +43,11 @@ public class SettingsSetterImpl implements SettingsSetter {
 			throw new InvalidInputException("Invalid input sent for settings update");
 		}
 		LOG.debug("Setting values to region " + region);
-		long modifiedSetSettingsValue = getModifiedSetSettingsValue(OrganizationUnit.REGION, Long.parseLong(region.getSettingsSetStatus()), settings,
+		double modifiedSetSettingsValue = getModifiedSetSettingsValue(OrganizationUnit.REGION, Double.parseDouble(region.getSettingsSetStatus()), settings,
 				hasBeenSet);
-		region.setSettingsSetStatus(String.valueOf(modifiedSetSettingsValue));
+		String modifiedSetSettingsStringValue = String.valueOf( modifiedSetSettingsValue );
+		region.setSettingsSetStatus(modifiedSetSettingsStringValue.split( "\\." ).length > 1 ? modifiedSetSettingsStringValue.split( "\\." )[0]
+			: modifiedSetSettingsStringValue);
 		return region;
 	}
 
@@ -55,29 +59,31 @@ public class SettingsSetterImpl implements SettingsSetter {
 			throw new InvalidInputException("Invalid input sent for settings update");
 		}
 		LOG.debug("Setting values to branch " + branch);
-		long modifiedSetSettingsValue = getModifiedSetSettingsValue(OrganizationUnit.BRANCH, Long.parseLong(branch.getSettingsSetStatus()), settings,
+		double modifiedSetSettingsValue = getModifiedSetSettingsValue(OrganizationUnit.BRANCH, Double.parseDouble(branch.getSettingsSetStatus()), settings,
 				hasBeenSet);
-		branch.setSettingsSetStatus(String.valueOf(modifiedSetSettingsValue));
+		String modifiedSetSettingsStringValue = String.valueOf( modifiedSetSettingsValue );
+		branch.setSettingsSetStatus(modifiedSetSettingsStringValue.split( "\\." ).length > 1 ? modifiedSetSettingsStringValue.split( "\\." )[0]
+			: modifiedSetSettingsStringValue);
 		return branch;
 	}
 
-	long getModifiedSetSettingsValue(OrganizationUnit organizationUnit, long currentSetValue, SettingsForApplication settings,
-			boolean hasBeenSet) {
+	double getModifiedSetSettingsValue(OrganizationUnit organizationUnit, double currentSetValue, SettingsForApplication settings,
+									   boolean hasBeenSet) {
 		LOG.debug("Finding the modified set settings value");
-		long valueToBeReturned = currentSetValue;
-		long valueToBeAdded = 0l;
+		double valueToBeReturned = currentSetValue;
+		double valueToBeAdded = 0l;
 		boolean isValueAlreadySet = false; // check if the value can be added or not
 		if (organizationUnit == OrganizationUnit.COMPANY) {
 			LOG.debug("Setting set for company");
-			valueToBeAdded = settings.getOrder();
+			valueToBeAdded =  settings.getOrder();
 		}
 		else if (organizationUnit == OrganizationUnit.REGION) {
 			LOG.debug("Setting set for region");
-			valueToBeAdded = 2 * settings.getOrder();
+			valueToBeAdded = 2 *  settings.getOrder() ;
 		}
 		else if (organizationUnit == OrganizationUnit.BRANCH) {
 			LOG.debug("Setting set for branch");
-			valueToBeAdded = 4 * settings.getOrder();
+			valueToBeAdded = 4 *  settings.getOrder() ;
 		}
 		isValueAlreadySet = isSettingsValueSet(organizationUnit, currentSetValue, settings);
 		if (hasBeenSet) {
@@ -94,16 +100,18 @@ public class SettingsSetterImpl implements SettingsSetter {
 	}
 
 	@Override
-	public boolean isSettingsValueSet(OrganizationUnit organizationUnit, long currentSetValue, SettingsForApplication settings) {
+	public boolean isSettingsValueSet(OrganizationUnit organizationUnit, double currentSetValue, SettingsForApplication settings) {
 		LOG.debug("Checking if the value is set for the settings");
 		boolean isValueSet = false;
-		String sCurrentSetValue = String.valueOf(currentSetValue);
+		String sCurrentSetValue = String.valueOf(currentSetValue).split( "\\." ).length > 1 ?
+			String.valueOf(currentSetValue).split( "\\." )[0] : String.valueOf(currentSetValue);
 		// find index of the settings to be checked for.
 		// get the length of the value. Get the index from enum and deduct it from the length
 		if (sCurrentSetValue.length() >= settings.getIndex()) {
 			String sSettingNumber = sCurrentSetValue.substring(sCurrentSetValue.length() - settings.getIndex(),
 					sCurrentSetValue.length() - settings.getIndex() + 1);
-			isValueSet = checkSettingsSetStatus(Integer.parseInt(sSettingNumber), organizationUnit);
+			LOG.info( "sSettingNumber {}" ,  sSettingNumber );
+			isValueSet = checkSettingsSetStatus(Double.parseDouble(sSettingNumber), organizationUnit);
 		}
 		else {
 			// value is not set at all
@@ -113,7 +121,7 @@ public class SettingsSetterImpl implements SettingsSetter {
 	}
 
 	@Override
-	public boolean checkSettingsSetStatus(int settingNumber, OrganizationUnit organizationUnit) {
+	public boolean checkSettingsSetStatus( double settingNumber, OrganizationUnit organizationUnit) {
 		LOG.debug("Checking for set status " + settingNumber + " and organiztion unit " + organizationUnit);
 		boolean setStatus = false;
 		if (organizationUnit == OrganizationUnit.COMPANY) {
@@ -141,7 +149,9 @@ public class SettingsSetterImpl implements SettingsSetter {
 	public SettingsSetterLevel getSettingsSetLevel(long currentSetAggregateValue, SettingsForApplication settings) {
 		LOG.debug("Getting all the levels where settings are set for aggregate value: " + currentSetAggregateValue);
 		SettingsSetterLevel level = new SettingsSetterLevel();
-		String sCurrentSetValue = String.valueOf(currentSetAggregateValue);
+		//String sCurrentSetValue = String.valueOf(currentSetAggregateValue);
+		String sCurrentSetValue = String.valueOf(currentSetAggregateValue).split( "\\." ).length > 1 ?
+			String.valueOf(currentSetAggregateValue).split( "\\." )[0] : String.valueOf(currentSetAggregateValue);
 		// find index of the settings to be checked for.
 		// get the length of the value. Get the index from enum and deduct it from the length
 		if (sCurrentSetValue.length() >= settings.getIndex()) {
@@ -179,7 +189,7 @@ public class SettingsSetterImpl implements SettingsSetter {
 	}
 
 	@Override
-	public OrganizationUnit getLowestSetterLevel(int setUnitValue) throws InvalidSettingsStateException {
+	public OrganizationUnit getLowestSetterLevel( double setUnitValue) throws InvalidSettingsStateException {
 		LOG.debug("Getting the lowest setter level for " + setUnitValue);
 		OrganizationUnit organizationUnit = null;
 		if (setUnitValue == CommonConstants.SET_BY_NONE) {

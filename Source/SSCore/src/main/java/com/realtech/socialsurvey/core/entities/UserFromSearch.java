@@ -1,5 +1,7 @@
 package com.realtech.socialsurvey.core.entities;
 
+import com.realtech.socialsurvey.core.vo.SocialMediaVO;
+
 import java.util.List;
 
 /**
@@ -31,6 +33,7 @@ public class UserFromSearch {
 	private List<Long> agentIds;
 	private long reviewCount;
 	private boolean isProfileImageSet;
+	private List<SocialMediaVO> socialMediaVOs;
 
 	public List<Long> getRegions() {
 		return regions;
@@ -240,9 +243,23 @@ public class UserFromSearch {
         this.isProfileImageSet = isProfileImageSet;
     }
 
-    @Override
-	public String toString() {
-		return "user id: " + userId + "\temailId: " + emailId + "\tdisplayName: " + displayName + "\tstatus: " + status + "\tisRegionAdmin: "
-				+ isRegionAdmin + "\tisBranchAdmin: " + isBranchAdmin + "\tisAgent: " + isAgent + "\tcanEdit: " + canEdit;
+
+	public List<SocialMediaVO> getSocialMediaVOs()
+	{
+		return socialMediaVOs;
+	}
+
+
+	public void setSocialMediaVOs( List<SocialMediaVO> socialMediaVOs )
+	{
+		this.socialMediaVOs = socialMediaVOs;
+	}
+
+
+	@Override public String toString()
+	{
+		return "UserFromSearch{" + "userId=" + userId + ", emailId='" + emailId + '\'' + ", displayName='" + displayName + '\''
+			+ ", status=" + status + ", isRegionAdmin=" + isRegionAdmin + ", isBranchAdmin=" + isBranchAdmin + ", isAgent="
+			+ isAgent + ", canEdit=" + canEdit + ", socialMediaVOs=" + socialMediaVOs + '}';
 	}
 }
