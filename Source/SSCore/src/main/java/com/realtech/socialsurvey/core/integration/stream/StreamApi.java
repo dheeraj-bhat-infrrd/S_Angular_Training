@@ -9,6 +9,7 @@ import com.realtech.socialsurvey.core.entities.UserEvent;
 
 import retrofit.client.Response;
 import retrofit.http.Body;
+import retrofit.http.GET;
 import retrofit.http.Header;
 import retrofit.http.POST;
 
@@ -34,9 +35,13 @@ public interface StreamApi
 
     @POST ( "/api/v1/stream/batch")
     public Response triggerBatch( @Body ReportRequest reportRequest );
-
+    
+    
+    @GET("/api/v1/analyze/failed/socialposts")
+    public Response queueFailedSocialFeeds();
+    
 
     @POST ( "/api/v1/stream/userevent")
     public Response submitUserEvent( @Header ("Authorization")  String streamApiAccessKey, @Body UserEvent userEvent );
-
+    
 }

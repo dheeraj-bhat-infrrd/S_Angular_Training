@@ -37,7 +37,7 @@ import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.api.AccountService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
-import com.wordnik.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiOperation;
 
 
 @RestController

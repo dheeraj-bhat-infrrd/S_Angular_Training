@@ -1,7 +1,10 @@
 package com.realtech.socialsurvey.web.api;
 
 
-
+import com.realtech.socialsurvey.core.entities.Keyword;
+import com.realtech.socialsurvey.core.entities.MultiplePhrasesVO;
+import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
+import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
 import com.realtech.socialsurvey.core.entities.UserEvent;
 import com.realtech.socialsurvey.web.api.entities.AccountRegistrationAPIRequest;
@@ -10,15 +13,12 @@ import com.realtech.socialsurvey.web.api.entities.VendastaRmCreateRequest;
 import com.realtech.socialsurvey.web.entities.CompanyProfile;
 import com.realtech.socialsurvey.web.entities.Payment;
 import com.realtech.socialsurvey.web.entities.PersonalProfile;
-
 import retrofit.client.Response;
-import retrofit.http.Body;
-import retrofit.http.DELETE;
-import retrofit.http.GET;
-import retrofit.http.POST;
-import retrofit.http.PUT;
-import retrofit.http.Path;
-import retrofit.http.Query;
+import retrofit.http.*;
+
+import java.util.List;
+
+import org.springframework.web.bind.annotation.RequestHeader;
 
 
 public interface SSApiIntegration
@@ -220,6 +220,50 @@ public interface SSApiIntegration
     @GET ( "/v1/lastsuccessfuletltime" )
     Response getLastSuccessfulEtlTimeApi();
     
+    @GET("/v1/companies/{companyId}/keywords")
+    public Response getCompanyKeywords(@Path ( "companyId") long companyId, @Query("startIndex") int startIndex, @Query("limit") int limit,  @Query("monitorType") String monitorType, @Query("searchPhrase") String searchPhrase, @Header("authorizationHeader") String authorizationHeader);
+    
+    @POST("/v1/companies/{companyId}/keywords")
+    public Response addKeywordsToCompany(@Path ( "companyId") long companyId, @Body List<Keyword> keywordsRequest);
+    
+	@GET("/v1/showsocialfeeds")
+	public Response showStreamSocialPosts(@Query("startIndex") int startIndex, @Query("limit") int limit,
+			@Query("status") String status, @Query("flag") boolean flag, @Query("feedtype") List<String> feedtype,
+			@Query("companyId") Long companyId, @Query("regionIds") List<Long> regionIds,
+			@Query("branchIds") List<Long> branchIds, @Query("agentIds") List<Long> agentIds, @Query("searchText") String searchText,@Query("isCompanySet") boolean isCompanySet, @Header("authorizationHeader") String authorizationHeader);
+    
+    @PUT( "/v1/updatesocialfeeds/action")
+    public Response saveSocialFeedsForAction(@Body SocialFeedsActionUpdate socialFeedsActionUpdate,
+			@Query("companyId") Long companyId, @Query("duplicateFlag") boolean duplicateFlag, @Header("authorizationHeader") String authorizationHeader);
+    
+    @GET("/v1/socialfeedsmacro/company/{companyId}")
+    public Response showMacrosForEntity(@Path("companyId") long companyId, @Query("searchMacros") String searchMacros, @Header("authorizationHeader") String authorizationHeader);
+    
+    @POST("/v1/update/socialfeedsmacro")
+    public Response updateMacrosForEntity(@Body SocialMonitorMacro socialMonitorMacro, @Query("companyId") long companyId, @Header("authorizationHeader") String authorizationHeader);
+    
+    @GET("/v1/socialfeedsmacro/company/{companyId}/macro/{macroId}")
+    public Response getMacroById(@Path("companyId") Long companyId, @Path("macroId") long macroId, @Header("authorizationHeader") String authorizationHeader);
+    
+    @GET("/v1/segments/company/{companyId}")
+    public Response getSegmentsByCompanyId(@Path("companyId") Long companyId, @Header("authorizationHeader") String authorizationHeader);
+    
+    @GET("/v1/users/company/{companyId}")
+    public Response getUsersByCompanyId(@Path("companyId") Long companyId, @Header("authorizationHeader") String authorizationHeader);
+    
+    @POST("/v1/company/{companyId}/keyword")
+    public Response addKeywordToCompany(@Path ( "companyId") long companyId, @Body Keyword keywordsRequest, @Header("authorizationHeader") String authorizationHeader);
+    
+    @POST("/v1/company/{companyId}/keyword/phrases")
+    public Response addMultiplePhrasesToCompany(@Path ( "companyId") long companyId, @Body MultiplePhrasesVO multiplePhrasesVO, @Header("authorizationHeader") String authorizationHeader);
+    
+    @DELETE ( "/v1/company/{companyId}/keywords")
+    public Response deleteKeywordsFromCompany( @Path ( "companyId") long companyId,
+        @Query ( "keywordIds") List<String> keywordIds, @Header("authorizationHeader") String authorizationHeader );
+    
+    @GET("/v1/feedtypes/company/{companyId}")
+    public Response getFeedTypesByCompanyId(@Path("companyId") Long companyId, @Header("authorizationHeader") String authorizationHeader);
+    
     @GET ( "/v1/lastsuccessfuletltime/isetlrunning" )
     Response isEtlRunning();
     
@@ -237,10 +281,10 @@ public interface SSApiIntegration
     
     @POST( "/v1/unsetcompres" )
     Response unsetCompRes(@Query ("entityId") long entityId);
-    
+
     @POST("/v1/unsetwebadd")
     Response unsetWebAdd(@Query ("entityId") long entityId , @Query ("entityType") String entityType);
+
     @GET( "/v1/userprofileflags" )
     Response getUserProfileFlags(@Query ("userId") long userId);
-    
 }

@@ -32,11 +32,13 @@ import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,6 +58,7 @@ import com.realtech.socialsurvey.core.dao.GenericReportingDao;
 import com.realtech.socialsurvey.core.dao.NpsReportMonthDao;
 import com.realtech.socialsurvey.core.dao.NpsReportWeekDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.dao.RedisDao;
 import com.realtech.socialsurvey.core.dao.RegionDao;
 import com.realtech.socialsurvey.core.dao.ReportingSurveyPreInititationDao;
 import com.realtech.socialsurvey.core.dao.ScoreStatsOverallBranchDao;
@@ -105,6 +108,7 @@ import com.realtech.socialsurvey.core.entities.DigestRequestData;
 import com.realtech.socialsurvey.core.entities.DigestTemplateData;
 import com.realtech.socialsurvey.core.entities.EntityAlertDetails;
 import com.realtech.socialsurvey.core.entities.FileUpload;
+import com.realtech.socialsurvey.core.entities.GenericReportingObject;
 import com.realtech.socialsurvey.core.entities.MonthlyDigestAggregate;
 import com.realtech.socialsurvey.core.entities.NpsReportMonth;
 import com.realtech.socialsurvey.core.entities.NpsReportWeek;
@@ -151,9 +155,12 @@ import com.realtech.socialsurvey.core.entities.UserRankingThisYearMain;
 import com.realtech.socialsurvey.core.entities.UserRankingThisYearRegion;
 import com.realtech.socialsurvey.core.enums.EntityErrorAlertType;
 import com.realtech.socialsurvey.core.enums.EntityWarningAlertType;
+import com.realtech.socialsurvey.core.enums.ReportType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.integration.stream.StreamApiConnectException;
+import com.realtech.socialsurvey.core.integration.stream.StreamApiException;
 import com.realtech.socialsurvey.core.integration.stream.StreamApiIntegrationBuilder;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
@@ -164,6 +171,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.UserManage
 import com.realtech.socialsurvey.core.services.reportingmanagement.OverviewManagement;
 import com.realtech.socialsurvey.core.services.reportingmanagement.ReportingDashboardManagement;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
+import com.realtech.socialsurvey.core.utils.CommonUtils;
 import com.realtech.socialsurvey.core.vo.SurveyTransactionReportVO;
 import com.realtech.socialsurvey.core.vo.SurveyInvitationEmailCountVO;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookData;
@@ -361,7 +369,9 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
     
     @Autowired
     private StreamApiIntegrationBuilder streamApiIntegrationBuilder;
-
+    
+    @Autowired
+    private RedisDao redisDao;
 
     @Value ( "${FILE_DIRECTORY_LOCATION}")
     private String fileDirectoryLocation;
@@ -395,11 +405,13 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
     public static final int DIGEST_MAIL_BATCH_SIZE = 50;
 
     public static final int NUMBER_OF_DAYS = 3;
+    
+    public static final int NUMBER_OF_DAYS_SM_REPORT = 7;
 
 
     @Override
     public void createEntryInFileUploadForReporting( int reportId, Date startDate, Date endDate, Long entityId,
-        String entityType, Company company, Long adminUserId, int actualTimeZoneOffset )
+        String entityType, Company company, Long adminUserId, int actualTimeZoneOffset, GenericReportingObject genericReportingObject )
         throws InvalidInputException, NoRecordsFetchedException, IOException
     {
         // adding entry in the feild and set status to pending
@@ -445,6 +457,10 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_BRANCH_RANKING_YEARLY_REPORT );
         } else if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_DIGEST ) {
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_REPORTING_DIGEST );
+        } else if ( reportId == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT ) {
+            fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT );
+        } else if ( reportId == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD ) {
+            fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD );
         }
 
         // get the time 23:59:59 in milliseconds
@@ -469,6 +485,41 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
         if ( reportId == CommonConstants.FILE_UPLOAD_REPORTING_DIGEST ) {
             processDigestRequest( fileUpload );
         }
+        
+        //Social Monitor reports
+        ReportRequest socialMonitorReportRequest = new ReportRequest();
+        if ( reportId == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT
+            || reportId == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD ) {
+            ReportRequest reportRequest = new ReportRequest();
+            if ( reportId == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD ) {
+                reportRequest.setReportType( ReportType.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD.getName() );
+                reportRequest.setKeyword( genericReportingObject.getKeyword() );
+            }
+            if ( reportId == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT ) {
+                reportRequest.setReportType( ReportType.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT.getName() );
+            }
+            if ( startDate != null && endDate != null ) {
+                reportRequest.setStartTime( fileUpload.getStartDate().getTime() );
+                reportRequest.setEndTime( fileUpload.getEndDate().getTime() );
+            } else if ( startDate != null && endDate == null ) {
+                reportRequest.setStartTime( fileUpload.getStartDate().getTime() );
+                reportRequest.setEndTime( new DateTime().withTimeAtStartOfDay().plusDays( 1 ).minusSeconds( 1 ).getMillis() );
+                fileUpload.setEndDate( new Timestamp(new DateTime().withTimeAtStartOfDay().plusDays( 1 ).minusSeconds( 1 ).getMillis()));
+            } else if ( startDate == null && endDate != null ) {
+                reportRequest.setStartTime( endDate.getTime() - CommonUtils.daysToMilliseconds( NUMBER_OF_DAYS_SM_REPORT ) );
+                reportRequest.setEndTime( fileUpload.getEndDate().getTime() );
+                fileUpload.setStartDate(
+                    new Timestamp( endDate.getTime() - CommonUtils.daysToMilliseconds( NUMBER_OF_DAYS_SM_REPORT ) ) );
+            } else if ( startDate == null && endDate == null ) {
+                reportRequest.setStartTime( CommonUtils.lastNdaysTimestamp( NUMBER_OF_DAYS_SM_REPORT ) );
+                reportRequest.setEndTime( new DateTime().withTimeAtStartOfDay().plusDays( 1 ).minusSeconds( 1 ).getMillis() );
+                fileUpload.setStartDate( new Timestamp( CommonUtils.lastNdaysTimestamp( NUMBER_OF_DAYS_SM_REPORT ) ) );
+                fileUpload.setEndDate( new Timestamp( new DateTime().withTimeAtStartOfDay().plusDays( 1 ).minusSeconds( 1 ).getMillis() ) );
+
+            }
+            reportRequest.setCompanyId(fileUpload.getCompany().getCompanyId());
+            socialMonitorReportRequest  = reportRequest;
+        }
 
         fileUpload = fileUploadDao.save( fileUpload );
         
@@ -486,6 +537,17 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
 			reportRequest.setFileUploadId(fileUpload.getFileUploadId());
 			reportRequest.setCompanyId(fileUpload.getCompany().getCompanyId());
 			streamApiIntegrationBuilder.getStreamApi().generateEmailReport(reportRequest);
+		}
+	
+		if ( reportId == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT || reportId == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD ) {
+		    socialMonitorReportRequest.setFileUploadId(fileUpload.getFileUploadId());
+		    try {
+	            streamApiIntegrationBuilder.getStreamApi().generateEmailReport(socialMonitorReportRequest);
+		    } catch(StreamApiException | StreamApiConnectException e) {
+		        LOG.error( "Could not stream social monitor report", e );
+		        fileUpload.setStatus( CommonConstants.STATUS_FAIL );
+		        fileUploadDao.saveOrUpdate( fileUpload );
+		    }
 		}
     }
 
@@ -1768,6 +1830,10 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
                 recentActivityList.add( CommonConstants.REPORTING_BRANCH_RANKING_YEARLY_REPORT );
             } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_DIGEST ) {
                 recentActivityList.add( CommonConstants.REPORTING_DIGEST );
+            } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT ) {
+                recentActivityList.add( CommonConstants.SOCIAL_MONITOR_DATE_REPORT );
+            } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD ) {
+                recentActivityList.add( CommonConstants.SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD );
             }
 
             recentActivityList.add( fileUpload.getStartDate() );
@@ -5288,4 +5354,58 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
 		}
 		return monthData;
 	}
+	
+
+    @Override
+    public boolean enableSocialMonitorToggle( long companyId, boolean socialMonitorFlag )
+        throws InvalidInputException, NoRecordsFetchedException
+    {
+        LOG.debug( "method enableSocialMonitorToggle() started." );
+
+        if ( companyId <= 0 ) {
+            LOG.warn( "companyId is invalid" );
+            throw new InvalidInputException( "companyId is invalid" );
+        }
+
+        OrganizationUnitSettings unitSettings = organizationManagementService.getCompanySettings( companyId );
+
+        if ( unitSettings == null ) {
+            LOG.warn( "settings are not specified" );
+            throw new InvalidInputException( "settings cannot be null." );
+        }
+
+        // update social monitor flag
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.SOCIAL_MONITOR_ENABLED, socialMonitorFlag, unitSettings,
+            CommonConstants.COMPANY_SETTINGS_COLLECTION );
+
+        //update companyIds which have enabled/disabled socialMonitor
+        redisDao.updateCompanyIdsForSM( companyId, socialMonitorFlag );
+
+        LOG.debug( "method enableSocialMonitorToggle() finished." );
+        return true;
+    }
+
+
+    @Override
+    public boolean isSocialMonitorEnabled( long companyId ) throws InvalidInputException, NoRecordsFetchedException
+    {
+        LOG.debug( "method enableSocialMonitorToggle() started." );
+
+        if ( companyId <= 0 ) {
+            LOG.warn( "companyId is invalid" );
+            throw new InvalidInputException( "companyId is invalid" );
+        }
+
+        OrganizationUnitSettings unitSettings = organizationManagementService.getCompanySettings( companyId );
+
+        if ( unitSettings == null ) {
+            LOG.warn( "settings are not specified" );
+            throw new InvalidInputException( "settings cannot be null." );
+        }
+
+        return unitSettings.isSocialMonitorEnabled();
+    }
+    
+    
 }

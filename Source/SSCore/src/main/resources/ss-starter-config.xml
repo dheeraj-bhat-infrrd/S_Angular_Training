@@ -436,6 +436,19 @@
 		<property name="durability" value="true" />
 	</bean>
 	
+	<!-- Setting social-monitor feed retry job detail -->
+	<bean id="socialfeedretryjobdetail"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass"
+			value="com.realtech.socialsurvey.core.starter.RetryFailedSocialFeeds" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="socialFeedService" value-ref="socialFeedService" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
+	
 	<bean id="surveysourceidupdater"
 		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 		<property name="jobClass"
@@ -521,6 +534,23 @@
 				</map>
 		</property>
 		<property name="durability" value="true" />
+	</bean>
+	
+	<!-- Archive social feed data job -->
+	<bean name="archiveSocialFeedCollectionJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass" value="com.realtech.socialsurvey.core.starter.ArchiveSocialFeedCollectionJob" />
+		<property name="jobDataMap">
+			<map>
+				<entry key="socialFeedService" value-ref="socialFeedService" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
+	
+	<!-- Run the job every day 6:30 GMT -->
+	<bean id="archiveSocialFeedCollectionCronTrigger"  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="archiveSocialFeedCollectionJob" />
+		<property name="cronExpression" value="0 30 6 * * ?" />
 	</bean> 
 	
 	<!-- setting cron for Review Count Updater -->
@@ -729,6 +759,13 @@
 		<property name="startDelay" value="2000" />
 	</bean>
 	
+	<!-- setting cron for social-monitor feed retry -->
+	<bean id="socialfeedretrycron"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="socialfeedretryjobdetail" />
+		<property name="cronExpression" value="0 0 0/1 1/1 * ?" />
+	</bean>
+	
 	<bean id="surveysourceidupdatercron"
 		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
 		<property name="jobDetail" ref="surveysourceidupdater" />
@@ -818,6 +855,7 @@
 				<!-- <ref bean="hierarchysettingsjobdetail" /> -->
 				<ref bean="zillowreviewprocessandautopostjobdetail" />
 				<ref bean="surveyimporterjobdetail" />
+				<ref bean="socialfeedretryjobdetail" />
 				<!-- <ref bean="deleteUsedVendastaTickets" />-->
 				<!-- <ref bean="remaxEntitiesTransfer" /> -->
 				<!-- <ref bean="updateExistingCompanyPrice" /> -->
@@ -830,6 +868,7 @@
 				<ref bean="surveyInvitationEmailCountJobPastMonth" />
 				<ref bean="surveyInvitationEmailCountJobThisMonth" />
 				<!-- <ref bean="failedstreammsgprocessorjobdetail" />  -->
+				<ref bean="archiveSocialFeedCollectionJob" />
 			</list>
 		</property>
 
@@ -859,6 +898,7 @@
 				<!-- <ref bean="hierarchysettingscron" /> -->
 				<ref bean="zillowreviewprocessandautopostcron" />
 				<ref bean="surveyimportercron" />
+				<ref bean="socialfeedretrycron" />
 				<!-- <ref bean="remaxEntitiesTransfercron" /> -->
 				<!-- <ref bean="updateExistingCompanyPricecron" /> -->
 				<!-- <ref bean="hideUsersFromSearchcron" /> -->
@@ -871,6 +911,7 @@
 				<ref bean="surveyInvitationEmailCountCronPastMonth" />
 				<ref bean="surveyInvitationEmailCountCronThisMonth" />
 				<!--  <ref bean="failedstreammsgprocessorceron" />  -->
+				<ref bean="archiveSocialFeedCollectionCronTrigger" />
 			</list>
 		</property>
 		<property name="quartzProperties">
@@ -917,6 +958,8 @@
 	<bean id="socialMediaExceptionHandler"
 		class="com.realtech.socialsurvey.core.services.social.impl.SocialMediaExceptionHandlerImpl" />	
 	<bean id="loneWolfRestUtils" class="com.realtech.socialsurvey.core.utils.LoneWolfRestUtils" />
+	<bean id="socialFeedService"
+		class="com.realtech.socialsurvey.core.services.socialmonitor.feed.impl.SocialFeedServiceImpl" />
 
 	<bean id="loneWolfIntegrationService"
 		class="com.realtech.socialsurvey.core.services.lonewolf.impl.LoneWolfIntegrationServiceImpl">

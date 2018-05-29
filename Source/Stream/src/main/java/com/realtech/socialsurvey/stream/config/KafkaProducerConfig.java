@@ -29,6 +29,9 @@ public class KafkaProducerConfig
     @Value ( "${kafka.topic.reportTopic}" )
     private String reportTopic;
     
+    @Value ( "${kafka.topic.socialMonitorTopic}" )
+    private String socialMonitorTopic;
+    
 	@Value("${kafka.topic.batchTopic}" )
     private String batchTopic;
 	
@@ -91,8 +94,16 @@ public class KafkaProducerConfig
     }
     
     /**
-     * Kafka template for capturing email report batch information
+     * Kafka template for capturing social monitor information
      */
+    @Bean(name = "socialMonitorTemplate")
+    public KafkaTemplate<String, String> kafkaSocialMonitorTemplate(){
+        KafkaTemplate<String, String> kafkaTemplate = new KafkaTemplate<>( producerFactory() );
+        kafkaTemplate.setMessageConverter( new StringJsonMessageConverter() );
+        kafkaTemplate.setDefaultTopic(socialMonitorTopic);
+        return kafkaTemplate;
+    }
+    
     @Bean(name = "batchTemplate")
     public KafkaTemplate<String, String> kafkaBatchProcessingTemplate(){
         KafkaTemplate<String, String> kafkaTemplate = new KafkaTemplate<>( producerFactory() );

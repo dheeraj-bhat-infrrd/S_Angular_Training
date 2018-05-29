@@ -21,6 +21,7 @@ kafka:
     solrTopic: solr-topic
     emailEventsTopic: mail-events-topic
     reportTopic: report-topic
+    socialMonitorTopic: social-monitor-topic
     batchTopic: batch-topic
     userEventTopic: user-event-topic
 
@@ -48,6 +49,7 @@ kafka:
     solrTopic: solr-topic-dev
     emailEventsTopic: mail-events-topic-dev
     reportTopic: report-topic-dev
+    socialMonitorTopic: social-monitor-topic-dev
     batchTopic: batch-topic-dev
     userEventTopic: user-event-topic-dev
 
@@ -77,6 +79,7 @@ kafka:
     solrTopic: solr-topic-demo
     emailEventsTopic: mail-events-topic-demo
     reportTopic: report-topic-demo
+    socialMonitorTopic: social-monitor-topic-demo
     batchTopic: batch-topic-demo
     userEventTopic: user-event-topic-demo
     
@@ -109,6 +112,7 @@ kafka:
     solrTopic: solr-topic-stage
     emailEventsTopic: mail-events-topic-stage
     reportTopic: report-topic-stage
+    socialMonitorTopic: social-monitor-topic-stage
     batchTopic: batch-topic-stage
     userEventTopic: user-event-topic-stage
     

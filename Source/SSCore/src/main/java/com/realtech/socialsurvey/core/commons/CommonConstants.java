@@ -53,6 +53,7 @@ public interface CommonConstants
     public static final int PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID = 3;
     public static final int PROFILES_MASTER_AGENT_PROFILE_ID = 4;
     public static final int PROFILES_MASTER_SS_ADMIN_PROFILE_ID = 5;
+    public static final int PROFILES_MASTER_SM_ADMIN_PROFILE_ID = 6;
     public static final int PROFILES_MASTER_NO_PROFILE_ID = 10;
 
     /**
@@ -220,6 +221,8 @@ public interface CommonConstants
     public static final String PROFILE_LEVEL_COLUMN = "profileLevel";
     public static final String ENCOMPASS_SDK_VERSION_COLUMN = "sdkVersion";
     public static final String INCLUDE_IN_TRANSACTION_MONITOR = "includeInTransactionMonitor";
+    public static final String PROPERTY_ADDRESS = "propertyAddress";
+    public static final String LOAN_PROCESSOR_NAME = "loanProcessorName";
 
     //batch type constant for batch tracker
     public static final String BATCH_TYPE_REVIEW_COUNT_UPDATER = "reviewCountUpdater";
@@ -461,6 +464,7 @@ public interface CommonConstants
     public static final String GOOGLE_BUSINESS_SOCIAL_SITE = "google business";
     public static final String GOOGLE_SOCIAL_SITE = "google";
     public static final String SOCIAL_SURVEY_SOCIAL_SITE = "socialsurvey";
+    public static final String INSTAGRAM_SOCIAL_SITE = "instagram";
     public static final String TWITTER_BASE_URL = "www.twitter.com/";
     public static final String COMPANY_ID = "companyId";
     public static final String REGION_ID = "regionId";
@@ -1015,6 +1019,10 @@ public interface CommonConstants
     
     //Generating survey invitation email report through storm
     public static final int FILE_UPLOAD_SURVEY_INVITATION_EMAIL_REPORT = 1001;
+    
+    //Social Monitor reports
+    public static final int FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT = 301;
+    public static final int FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD= 302;
 
     public static final int NPS_REPORT_TYPE_WEEK = 1;
     public static final int NPS_REPORT_TYPE_MONTH = 2;
@@ -1426,6 +1434,9 @@ public interface CommonConstants
     public static final String REPORTING_BRANCH_RANKING_YEARLY_REPORT = "Branch Ranking Report For Year";
     
     public static final String REPORTING_DIGEST = "Monthly Digest";
+    
+    public static final String SOCIAL_MONITOR_DATE_REPORT = "Social Monitor Date based Report";
+    public static final String SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD = "Social Monitor Date Report for keyword";
 
     public static final String SURVEY_DETAILS_ID_COLUMN = "surveyDetailsId";
     public static final String SURVEY_RESULTS_REPORT_MODIFIED_ON = "reportModifiedOn";
@@ -1549,6 +1560,7 @@ public interface CommonConstants
     public static final String EMAIL_TYPE_UNSUCCESSFUL_SURVEY_CSV_UPLOAD_MAIL_TO_ADMIN = "UNSUCCESSFUL_SURVEY_CSV_UPLOAD_MAIL_TO_ADMIN";
     public static final String EMAIL_TYPE_UNSUCCESSFUL_SURVEY_CSV_UPLOAD_MAIL_TO_UPLOADER = "UNSUCCESSFUL_SURVEY_CSV_UPLOAD_MAIL_TO_UPLOADER";
     public static final String EMAIL_TYPE_SUCCESSFUL_SURVEY_CSV_UPLOAD_MAIL_TO_UPLOADER = "SUCCESSFUL_SURVEY_CSV_UPLOAD_MAIL_TO_UPLOADER";
+    public static final String EMAIL_TYPE_SOCIAL_MONITOR_ACTION_MAIL_TO_USER = "EMAIL_TYPE_SOCIAL_MONITOR_ACTION_MAIL_TO_USER";
     public static final String EMAIL_TYPE_ABUSIVE_HANDLE_MAIL = "ABUSIVE_HANDLE_MAIL";
     public static final String EMAIL_TYPE_USER_ADDITION_MAIL = "USER_ADDITION_MAIL";
     public static final String EMAIL_TYPE_USER_DELETION_MAIL = "USER_DELETION_MAIL";
@@ -1569,11 +1581,11 @@ public interface CommonConstants
     public static final String INVALID_CAPTCHA = "invalidCaptcha";
     
     //trnsaction monitor alert type
-    public static final String ALERT_TYPE_ERROR = "error";    
+    public static final String ALERT_TYPE_ERROR = "error";
     public static final String ALERT_TYPE_WARNING = "warning";
-    public static final String ALERT_TYPE_NORMAL = "normal"; 
+    public static final String ALERT_TYPE_NORMAL = "normal";
 
-    public static final String COMMA_SEPERATOR_PATTERN = "\\s*,\\s*"; 
+    public static final String COMMA_SEPERATOR_PATTERN = "\\s*,\\s*";
  
 
     //JobLogDetails
@@ -1637,4 +1649,8 @@ public interface CommonConstants
     public static final String TIME_FRAME_THIS_MONTH = "ThisMonth";
     public static final String TIME_FRAME_ALL_TIME = "AllTime";
     
+    //social monitor constants
+    public static final String PROFILE_TYPE = "profileType";
+
+    public static final String CALLBACK = "callback";
 }

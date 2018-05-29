@@ -8,4 +8,5 @@ public class FailedMessageConstants
     private FailedMessageConstants(){}
 
     public static final String EMAIL_MESSAGES = "EMAIL_MESSAGES";
+    public static final String SOCIAL_POST_MESSAGE = "SOCIAL_POST_MESSAGE";
 }

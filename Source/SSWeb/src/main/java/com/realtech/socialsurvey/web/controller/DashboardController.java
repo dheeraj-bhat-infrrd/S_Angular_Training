@@ -2080,6 +2080,9 @@ public class DashboardController
             if ( tokens.getZillowToken() != null && tokens.getZillowToken().getZillowProfileLink() != null ) {
                 model.addAttribute( "zillowProfileUrl", tokens.getZillowToken().getZillowProfileLink() );
             }
+            if ( tokens.getInstagramToken() != null && tokens.getInstagramToken().getPageLink() != null ) {
+                model.addAttribute( "instagramProfileUrl", tokens.getInstagramToken().getPageLink() );
+            }
         }
 
         return JspResolver.LINKEDIN_IMPORT_SOCIAL_LINKS;

@@ -19,7 +19,7 @@ import com.realtech.socialsurvey.core.services.admin.AdminAuthenticationService;
 import com.realtech.socialsurvey.core.services.hierarchylocationmanagement.HierarchyLocationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
-import com.wordnik.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiOperation;
 
 
 @RestController

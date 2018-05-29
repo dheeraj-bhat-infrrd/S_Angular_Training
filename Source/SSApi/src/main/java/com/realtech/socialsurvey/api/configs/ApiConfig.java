@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import java.util.List;
@@ -76,5 +77,14 @@ public class ApiConfig extends WebMvcConfigurerAdapter
         // Here we add our custom-configured HttpMessageConverter
         converters.add( jacksonMessageConverter() );
         super.configureMessageConverters( converters );
+    }
+    
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("swagger-ui.html")
+          .addResourceLocations("classpath:/META-INF/resources/");
+     
+        registry.addResourceHandler("/webjars/**")
+          .addResourceLocations("classpath:/META-INF/resources/webjars/");
     }
 }

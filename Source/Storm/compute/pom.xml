@@ -33,6 +33,8 @@
 		<retrofit.version>2.3.0</retrofit.version>
 		<!-- OKHttp3 -->
 		<okhttp3.version>3.9.0</okhttp3.version>
+		<kafka.version>0.11.0.1</kafka.version>
+		<jedis.version>2.9.0</jedis.version>
 		<!-- Hibernate -->
 		<hibernate.version>4.2.1.Final</hibernate.version>
 	</properties>
@@ -72,6 +74,14 @@
 			<version>${storm.version}</version>
 			<scope>provided</scope>
 		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.apache.storm/storm-kafka-client -->
+		<dependency>
+			<groupId>org.apache.storm</groupId>
+			<artifactId>storm-kafka-client</artifactId>
+			<version>${storm.version}</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.apache.storm</groupId>
 			<artifactId>storm-kafka</artifactId>
@@ -85,9 +95,14 @@
 			</exclusions>
 		</dependency>
 		<dependency>
+	        <groupId>org.apache.kafka</groupId>
+	        <artifactId>kafka-clients</artifactId>
+	        <version>${kafka.version}</version>
+	    </dependency>
+		<dependency>
 			<groupId>org.apache.kafka</groupId>
 			<artifactId>kafka_2.11</artifactId>
-			<version>0.11.0.1</version>
+			<version>${kafka.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.apache.zookeeper</groupId>
@@ -103,6 +118,14 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+	
+		<!-- https://mvnrepository.com/artifact/org.twitter4j/twitter4j-core -->
+		<dependency>
+			<groupId>org.twitter4j</groupId>
+			<artifactId>twitter4j-core</artifactId>
+			<version>4.0.6</version>
+		</dependency>
+			
 
 		<!-- Mongo -->
 		<dependency>
@@ -164,6 +187,15 @@
 			<version>1.9.13</version>
 			<scope>compile</scope>
 		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/redis.clients/jedis -->
+		<dependency>
+			<groupId>redis.clients</groupId>
+			<artifactId>jedis</artifactId>
+			<version>${jedis.version}</version>
+		<!-- Dependency for solr java api -->
+		</dependency>
+		
 
 		<!-- MySQL Connector -->
 		<dependency>

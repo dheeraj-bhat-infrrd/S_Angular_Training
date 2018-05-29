@@ -1,5 +1,12 @@
 package com.realtech.socialsurvey.compute.common;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.gson.JsonObject;
 import com.realtech.socialsurvey.compute.entities.EmailMessage;
 import com.realtech.socialsurvey.compute.entities.SolrEmailMessageWrapper;
@@ -8,17 +15,13 @@ import com.realtech.socialsurvey.compute.entities.request.SolrAdd;
 import com.realtech.socialsurvey.compute.entities.request.SolrRequest;
 import com.realtech.socialsurvey.compute.entities.response.SOLRResponse;
 import com.realtech.socialsurvey.compute.entities.response.SOLRResponseObject;
+import com.realtech.socialsurvey.compute.exception.APIIntegrationException;
 import com.realtech.socialsurvey.compute.exception.SolrProcessingException;
-import com.realtech.socialsurvey.compute.services.api.APIIntergrationException;
 import com.realtech.socialsurvey.compute.utils.ChararcterUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import retrofit2.Call;
 import retrofit2.Response;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
 
 
 /**
@@ -96,8 +99,8 @@ public class APIOperations
             if ( response.body().getResponse().getNumFound() > 0 ) {
                 solrEmailMessageWrapper = response.body().getResponse().getDocs().get( 0 );
             }
-        } catch ( IOException | APIIntergrationException e ) {
-            LOG.error( "getUniqueEmailMessage: IOException/ APIIntergrationException caught", e );
+        } catch ( IOException | APIIntegrationException e ) {
+            LOG.error( "getUniqueEmailMessage: IOException/ APIIntegrationException caught", e );
         }
         if ( solrEmailMessageWrapper != null ) {
             return Optional.of( solrEmailMessageWrapper );
@@ -113,7 +116,8 @@ public class APIOperations
      * @return list of emails
      */
     public SOLRResponse<SolrEmailMessageWrapper> getEmailMessagesFromSolr(String query, String fieldQuery, String fieldList, int batchSize , int pageNum)
-            throws IOException, APIIntergrationException {
+            throws IOException, APIIntegrationException
+    {
         Call<SOLRResponseObject<SolrEmailMessageWrapper>> requestCall ;
         Response<SOLRResponseObject<SolrEmailMessageWrapper>> response ;
         SOLRResponse<SolrEmailMessageWrapper> solrResponse = null ;
@@ -147,8 +151,8 @@ public class APIOperations
                 LOG.trace( "post email to solr response {}", response.body() );
             }
             return true;
-        } catch ( IOException | APIIntergrationException e ) {
-            LOG.error( "postEmailToSolr: IOException/ APIIntergrationException caught", e );
+        } catch ( IOException | APIIntegrationException e ) {
+            LOG.error( "postEmailToSolr: IOException/ APIIntegrationException caught", e );
             throw new SolrProcessingException( "Exception while posting email message to solr", e );
         }
     }

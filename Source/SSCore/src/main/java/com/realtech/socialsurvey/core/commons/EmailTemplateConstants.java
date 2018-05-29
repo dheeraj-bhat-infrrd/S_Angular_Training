@@ -196,6 +196,9 @@ public final class EmailTemplateConstants {
     public static final String DIGEST_ERROR_MAIL_BODY = "DigestErrorMailBody.html";
     public static final String DIGEST_ERROR_MAIL_SUBJECT = "DigestErrorMailSubject.txt";
     
+    public static final String SOCIAL_MONITOR_ACTION_MAIL_SUBJECT = "SocialMonitorActionMailSubject.txt";
+    public static final String SOCIAL_MONITOR_ACTION_MAIL_BODY = "SocialMonitorActionMailBody.html";
+
     public static final String SURVEY_ABUSIVE_HANDLER_MAIL_SUBJECT = "SurveyAbusiveHandlerMailSubject.txt";
     public static final String SURVEY_ABUSIVE_HANDLER_MAIL_BODY = "SurveyAbusiveHandlerMailBody.html";
 

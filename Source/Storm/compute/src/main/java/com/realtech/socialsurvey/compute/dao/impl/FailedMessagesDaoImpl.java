@@ -1,5 +1,12 @@
 package com.realtech.socialsurvey.compute.dao.impl;
 
+import org.mongodb.morphia.Datastore;
+import org.mongodb.morphia.query.Query;
+import org.mongodb.morphia.query.UpdateOperations;
+import org.mongodb.morphia.query.UpdateResults;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.mongodb.WriteResult;
 import com.realtech.socialsurvey.compute.common.MongoDB;
 import com.realtech.socialsurvey.compute.dao.FailedMessagesDao;
@@ -7,13 +14,6 @@ import com.realtech.socialsurvey.compute.entities.FailedEmailMessage;
 import com.realtech.socialsurvey.compute.entities.FailedReportRequest;
 import com.realtech.socialsurvey.compute.entities.FailedSocialPost;
 import com.realtech.socialsurvey.compute.entities.UnsavedUserEvent;
-
-import org.mongodb.morphia.Datastore;
-import org.mongodb.morphia.query.Query;
-import org.mongodb.morphia.query.UpdateOperations;
-import org.mongodb.morphia.query.UpdateResults;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -44,7 +44,7 @@ public class FailedMessagesDaoImpl implements FailedMessagesDao
     }
 
     @Override
-    public boolean insertFailedFailedSocialPost( FailedSocialPost failedSocialPost )
+    public boolean insertFailedSocialPost(FailedSocialPost failedSocialPost )
     {
         LOG.debug( "Inserting failed Social Post: {}", failedSocialPost );
         mongoDB.datastore().save( failedSocialPost );
@@ -84,6 +84,31 @@ public class FailedMessagesDaoImpl implements FailedMessagesDao
     }
 
 
+    @Override
+    public int deleteFailedSocialPost(String postId) {
+        LOG.debug("Deleting failed social post with postId {}", postId);
+        Query<FailedSocialPost> query = mongoDB.datastore().createQuery(FailedSocialPost.class)
+                .field("data.postId").equal(postId)
+                .field("permanentFailure").equal(false);
+        final WriteResult result = mongoDB.datastore().delete(query);
+        return result.getN();
+    }
+
+    @Override
+    public int updateFailedSocialPostRetryCount(String postId) {
+        final Datastore datastore = mongoDB.datastore();
+        LOG.debug("Updating retryCount of socialpost having postId {}", postId);
+        final Query<FailedSocialPost> query = datastore.createQuery(FailedSocialPost.class)
+                .field("data.postId").equal(postId)
+                .field("permanentFailure").equal(false);
+        final UpdateOperations<FailedSocialPost> updateOperations = datastore.createUpdateOperations(FailedSocialPost.class)
+                .inc("retryCounts", 1)
+                .set("data.isRetried", true);
+        final UpdateResults updateResults = datastore.update(query, updateOperations);
+        return updateResults.getUpdatedCount();
+    }
+    
+    
     @Override
     public boolean insertUnsavedUserEvent( UnsavedUserEvent unsavedEvent )
     {

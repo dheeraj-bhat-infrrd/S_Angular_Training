@@ -3710,9 +3710,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             regionId );
 
         LOG.debug( "Calculate lock and setting score " );
-        Map<String, Long> totalScore = settingsManager.calculateSettingsScore( settingsDetailsList );
-        long currentLockAggregateValue = totalScore.get( CommonConstants.LOCK_SCORE );
-        long currentSetAggregateValue = totalScore.get( CommonConstants.SETTING_SCORE );
+        Map<String, Double> totalScore = settingsManager.calculateSettingsScore( settingsDetailsList );
+        Double currentLockAggregateValue = totalScore.get( CommonConstants.LOCK_SCORE );
+        Double currentSetAggregateValue = totalScore.get( CommonConstants.SETTING_SCORE );
 
         if ( entityType.equalsIgnoreCase( CommonConstants.AGENT_ID ) ) {
             if ( !settingsLocker.isSettingsValueLocked( OrganizationUnit.COMPANY, currentLockAggregateValue,
@@ -3765,7 +3765,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     .substring( sCurrentLockValue.length() - SettingsForApplication.EMAIL_ID_WORK.getIndex() + 1 );
 
                 sCurrentLockValue = preIndexLockValueSubString + indexLockValueSubString + postIndexLockValueSubString;
-                currentLockAggregateValue = Long.parseLong( sCurrentLockValue );
+                currentLockAggregateValue = Double.parseDouble( sCurrentLockValue );
 
             }
 
@@ -4980,8 +4980,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         boolean workEmailLocked = true;
         List<SettingsDetails> settingsDetailsList = settingsManager.getScoreForCompleteHeirarchy( companyId, branchId,
             regionId );
-        Map<String, Long> totalScore = settingsManager.calculateSettingsScore( settingsDetailsList );
-        long currentLockAggregateValue = totalScore.get( CommonConstants.LOCK_SCORE );
+        Map<String, Double> totalScore = settingsManager.calculateSettingsScore( settingsDetailsList );
+        Double currentLockAggregateValue = totalScore.get( CommonConstants.LOCK_SCORE );
         LockSettings parentLock = new LockSettings();
 
         if ( entityType.equalsIgnoreCase( CommonConstants.COMPANY_ID_COLUMN ) ) {
@@ -5123,7 +5123,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 
     boolean checkIfSettingLockedByOrganization( OrganizationUnit unit, SettingsForApplication settingsforApplications,
-        long currentLockValue )
+        Double currentLockValue )
     {
         LOG.debug( "Inside method getLogoLockedByCompany " );
         if ( settingsLocker.isSettingsValueLocked( unit, currentLockValue, settingsforApplications ) ) {

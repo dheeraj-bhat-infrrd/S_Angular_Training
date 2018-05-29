@@ -5,6 +5,7 @@ public class LinkedinUserProfileResponse {
 	String firstName;
 	String headLine;
 	String id;
+	String publicProfileUrl;
 	LinkedinUserProfileUrlResponse siteStandardProfileRequest;
 	public String getFirstName() {
 		return firstName;
@@ -30,4 +31,12 @@ public class LinkedinUserProfileResponse {
 	public void setSiteStandardProfileRequest(LinkedinUserProfileUrlResponse siteStandardProfileRequest) {
 		this.siteStandardProfileRequest = siteStandardProfileRequest;
 	}
+    public String getPublicProfileUrl()
+    {
+        return publicProfileUrl;
+    }
+    public void setPublicProfileUrl( String publicProfileUrl )
+    {
+        this.publicProfileUrl = publicProfileUrl;
+    }
 }

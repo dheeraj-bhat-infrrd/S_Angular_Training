@@ -29,7 +29,7 @@
 		</div>
 	</div>
 
-	<div class="container v-um-container">
+	<div class="container v-um-container mng-tbl-pad-zero">
 		<div class="v-um-header clearfix">
 			<div class="v-um-hdr-left float-left"><spring:message code="label.usermanagement.head.browseruser.key" /></div>
 			<div class="v-um-hdr-right v-um-hdr-search float-right">
@@ -39,7 +39,7 @@
 				<input type="hidden" id="users-count" value="${usersCount}">
 			</div>
 		</div>
-		<div class="v-um-tbl-wrapper" id="user-list">
+		<div class="v-um-tbl-wrapper mng-tbl-pad-zero" id="user-list">
 			<!-- Fill in the user list jsp -->
 		</div>
 		<div id="paginate-buttons" style="width: 100px; margin: 0 auto;">

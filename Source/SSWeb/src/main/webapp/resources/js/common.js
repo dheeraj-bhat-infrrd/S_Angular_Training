@@ -302,6 +302,33 @@ function callAjaxFormSubmit(url, callBackFunction, formId,disableEle) {
 	});
 }
 
+function callAjaxFormSubmitWithComplete(url, callBackFunction,completeCallBackFunction, formId,disableEle) {
+	if ( $(disableEle).data('requestRunning') ) {
+		return;
+    }
+	
+	disable(disableEle);
+	var $form = $("#" + formId);
+	var payLoad = $form.serialize();
+	$.ajax({
+		url : url,
+		headers: {          
+            Accept : "text/plain; charset=utf-8"   
+		},
+		type : "POST",
+		data : payLoad,
+		success : callBackFunction,
+		complete: completeCallBackFunction,
+		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			redirectErrorpage();
+		}
+	});
+}
+
 /**
  * Generic function to be used for making form submission with ajax post
  */
@@ -396,7 +423,7 @@ function callAjaxGetWithPayloadData(url, callBackFunction, payload,isAsync,disab
 	});
 }
 
-function changeRatingPattern(rating, ratingParent, isOverallRating, source) {
+function changeRatingPattern(rating, ratingParent, isOverallRating, source, isProfilePage) {
 	var ratingIntVal = 0;
 	var roundedFloatingVal = parseFloat(rating).toFixed(2);
 	var ratingFloat= parseFloat(roundedFloatingVal).toFixed(2);
@@ -416,6 +443,10 @@ function changeRatingPattern(rating, ratingParent, isOverallRating, source) {
 	if (isOverallRating) {
 		ratingValHtml = "<div class='rating-rounded float-left'>" + roundedFloatingVal + " - </div>";
 	}
+	if (isProfilePage) {
+		ratingValHtml = "<div class='rating-rounded float-left'> <span itemprop='ratingValue'>"+ roundedFloatingVal + "</span> - </div>";
+	}
+	
 
 	ratingParent.html('');
 	ratingParent.append(ratingImgHtml);
@@ -1387,6 +1418,6 @@ return div.innerHTML;
 
 function paintAvgRatingForPpf(avgRating) {
 	if (avgRating != undefined) {
-		changeRatingPattern(avgRating, $("#rating-avg-comp"), true);
+		changeRatingPattern(avgRating, $("#rating-avg-comp"), true, undefined, true);
 	}
 }

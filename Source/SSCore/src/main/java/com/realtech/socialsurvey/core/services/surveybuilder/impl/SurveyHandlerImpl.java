@@ -376,6 +376,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         } else {
             survey = surveyDetailsDao.getSurveyBySurveyPreIntitiationId( surveyPreInitiation.getSurveyPreIntitiationId() );
         }
+        
+        if(surveyPreInitiation.getPropertyAddress() != null) {
+            surveyDetails.setPropertyAddress( surveyPreInitiation.getPropertyAddress() );
+        }
 
         if ( survey == null ) {
             surveyDetailsDao.insertSurveyDetails( surveyDetails );

@@ -18,12 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.api.models.response.FileUploadResponse;
-import com.realtech.socialsurvey.core.entities.SurveyInvitationEmailCountMonth;
 import com.realtech.socialsurvey.core.entities.CompanyActiveUsersStats;
-import com.realtech.socialsurvey.core.entities.DigestRequestData;
 import com.realtech.socialsurvey.core.entities.CompanyDetailsReport;
 import com.realtech.socialsurvey.core.entities.CompanySurveyStatusStats;
 import com.realtech.socialsurvey.core.entities.CompanyView;
+import com.realtech.socialsurvey.core.entities.DigestRequestData;
+import com.realtech.socialsurvey.core.entities.SurveyInvitationEmailCountMonth;
 import com.realtech.socialsurvey.core.entities.SurveyResultsReportVO;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -32,10 +32,11 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.reportingmanagement.DashboardGraphManagement;
 import com.realtech.socialsurvey.core.services.reportingmanagement.OverviewManagement;
 import com.realtech.socialsurvey.core.services.reportingmanagement.ReportingDashboardManagement;
+
+import io.swagger.annotations.ApiOperation;
 import com.realtech.socialsurvey.core.vo.SurveyTransactionReportVO;
 import com.realtech.socialsurvey.core.vo.SurveyInvitationEmailCountVO;
-import com.wordnik.swagger.annotations.ApiOperation;
-
+import io.swagger.annotations.ApiOperation;
 
 
 @RestController

@@ -1,6 +1,9 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -9,9 +12,11 @@ import java.util.TreeMap;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -167,6 +172,71 @@ public class RegionDaoImpl extends GenericDaoImpl<Region, Long> implements Regio
         }
         LOG.info( "Method to get all region ids under company id : " + companyId + ",getRegionIdsUnderCompany() ended." );
         return criteria.list();
+    }
+    
+    /**
+     * Method to get Region Ids of a company
+     * @param companyId
+     * @return
+     * @throws InvalidInputException
+     */
+    @SuppressWarnings ( "unchecked")
+    @Override
+    @Transactional
+    public List<Long> getRegionIdsOfCompany( long companyId ) throws InvalidInputException
+    {
+        if ( companyId <= 0 ) {
+            throw new InvalidInputException( "Invalid company id passed in getRegionIdsUnderCompany method" );
+        }
+        LOG.info( "Method to get all region ids under company id : " + companyId + ",getRegionIdsUnderCompany() started." );
+        Criteria criteria = null;
+        try {
+            criteria = getSession().createCriteria( Region.class );
+            criteria.setProjection( Projections.property( CommonConstants.REGION_ID_COLUMN ).as(
+                CommonConstants.REGION_ID_COLUMN ) );
+            criteria.add( Restrictions.eq( CommonConstants.COMPANY_COLUMN, companyDao.findById( Company.class, companyId ) ) );
+            criteria.add( Restrictions.eq( CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.NO ) );
+            criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ) );
+        } catch ( HibernateException e ) {
+            LOG.error( "HibernateException caught in getRegionIdsUnderCompany(). Reason: " + e.getMessage(), e );
+            throw new DatabaseException( "HibernateException caught in getRegionIdsUnderCompany().", e );
+        }
+        LOG.info( "Method to get all region ids under company id : " + companyId + ",getRegionIdsUnderCompany() ended." );
+        return criteria.list();
+    }
+    
+
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public Map<Long, Long> getCompanyIdsForRegionIds( List<Long> regionIds )
+    {
+        LOG.debug( "Inside method getCompanyIdsForRegionIds {}", regionIds );
+        if ( regionIds.isEmpty() ) {
+            return Collections.emptyMap();
+        }
+
+        try {
+            Query query = getSession()
+                .createQuery( "select r.regionId, r.company.companyId from Region r where r.regionId in (:ids)" );
+            query.setParameterList( "ids", regionIds );
+
+            Map<Long, Long> regionCompanyIdsMap = new HashMap<>();
+
+            List<Object> result = (List<Object>) query.list();
+            Iterator<Object> itr = result.iterator();
+
+            while ( itr.hasNext() ) {
+                Object[] obj = (Object[]) itr.next();
+                Long regionId = (Long) obj[0];
+                Long companyId = (Long) obj[1];
+                regionCompanyIdsMap.put( regionId, companyId );
+                LOG.trace( "regionID {} and company Id {}", regionId, companyId );
+            }
+            return regionCompanyIdsMap;
+        } catch ( HibernateException e ) {
+            LOG.error( "HibernateException caught in getRegionIdsUnderCompany(). Reason: " + e.getMessage(), e );
+            throw new DatabaseException( "HibernateException caught in getRegionIdsUnderCompany().", e );
+        }
     }
 
 }
