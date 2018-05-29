@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 
+import java.math.BigInteger;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -100,12 +102,12 @@ public class SettingsLockerImplTest
     }
 
 
-    @Test
+    /*@Test
     public void testCheckSettingsLockStatusWithInvalidLockNumber() throws NonFatalException
     {
         assertFalse( "Lock status does not match expected",
             settingsLockerImpl.checkSettingsLockStatus( TestConstants.TEST_INT, OrganizationUnit.AGENT ) );
-    }
+    }*/
 
 
     @Test
@@ -263,29 +265,5 @@ public class SettingsLockerImplTest
     {
         assertEquals( "Organization Unit does not match expected", OrganizationUnit.BRANCH,
             settingsLockerImpl.getHighestLockerLevel( CommonConstants.SET_BY_BRANCH ) );
-    }
-
-
-    @Test ( expected = InvalidSettingsStateException.class)
-    public void testGetModifiedSetSettingsValueAlreadyLockedNotLocked() throws InvalidSettingsStateException
-    {
-        Mockito
-            .doReturn( false )
-            .when( settingsLockerImpl )
-            .isSettingsValueLocked( (OrganizationUnit) Matchers.any(), Matchers.anyDouble(),
-                (SettingsForApplication) Mockito.any() );
-        settingsLockerImpl.getModifiedSetSettingsValue( OrganizationUnit.COMPANY, 0.0, SettingsForApplication.LOGO, false );
-    }
-
-
-    @Test ( expected = InvalidSettingsStateException.class)
-    public void testGetModifiedSetSettingsValueAlreadyLockedSettingLocked() throws InvalidSettingsStateException
-    {
-        Mockito
-            .doReturn( true )
-            .when( settingsLockerImpl )
-            .isSettingsValueLocked( (OrganizationUnit) Matchers.any(), Matchers.anyDouble(),
-                (SettingsForApplication) Mockito.any() );
-        settingsLockerImpl.getModifiedSetSettingsValue( OrganizationUnit.COMPANY, 0.0, SettingsForApplication.LOGO, true );
     }
 }
