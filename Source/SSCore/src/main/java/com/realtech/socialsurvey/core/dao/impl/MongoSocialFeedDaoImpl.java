@@ -114,14 +114,13 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 		Update update = new Update();
 
 		if (updateFlag == 2) {
-		    update.set( UPDATED_TIME, socialResponseObject.getUpdatedTime() );
 			update.set(FLAGGED, socialFeedsActionUpdate.isFlagged());
 			
 		} else if (updateFlag == 3) {
-            update.set( UPDATED_TIME, socialResponseObject.getUpdatedTime() );
             update.set( FLAGGED, false );
             update.set( STATUS, socialFeedsActionUpdate.getStatus() );
 		}
+		update.set( UPDATED_TIME, socialResponseObject.getUpdatedTime() );
 		for (ActionHistory actionHistory : actionHistories) {
 			update.push(ACTION_HISTORY, actionHistory);
 			mongoTemplate.updateFirst(query, update, collectionName);
@@ -266,10 +265,8 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         }
 		query.addCriteria(criteria);
 		
-		// ignoring stream tab on social monitor
-		if (status != null || flag) {
-	        query.with(new Sort(Sort.Direction.DESC, UPDATED_TIME));
-		}
+		//Sort all posts
+        query.with( new Sort( Sort.Direction.DESC, UPDATED_TIME ) );
 		
 		if (startIndex > -1) {
 			query.skip(startIndex);
