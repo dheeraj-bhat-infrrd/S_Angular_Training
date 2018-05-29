@@ -159,6 +159,7 @@ import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsLocker
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.social.SocialMediaExceptionHandler;
+import com.realtech.socialsurvey.core.services.socialmonitor.feed.SocialFeedService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
@@ -393,6 +394,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Autowired
     private GenericDao<ProfilesMaster, Integer> profilesMasterDao;
 
+    @Autowired
+    private SocialFeedService socialFeedService;
 
     /**
      * This method adds a new company and updates the same for current user and all its user
@@ -10303,9 +10306,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		// update the redis with the trusted sources
 		redisDao.addTruestedSources(companyId, companyTrustedSourcesToAdd);
 
+		//To update former posts to resolved for the given trusted source
+		socialFeedService.updateTrustedSourceForFormerLists(companyId,trustedSource);
+
 		return companyTrustedSourcesToAdd;
 	}
-
+ 
     //updating all agents of a particular company
     @Override
     public boolean updateEntitySettings( String entityType, long entityId, String flagToBeUpdated, String status )
