@@ -1741,4 +1741,14 @@ public interface OrganizationManagementService
     
     public boolean isSocialMonitorAdmin(Long agentId) throws InvalidInputException;
 
+
+    /**
+     * @param companyId
+     * @param trustedSource
+     * @return
+     * @throws InvalidInputException
+     */
+    public List<SocialMonitorTrustedSource> removeTrustedSourceToCompany( long companyId, String trustedSource )
+        throws InvalidInputException;
+
 }
