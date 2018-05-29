@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.compute.dao.impl;
 
+import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -169,7 +170,11 @@ public class RedisSocialMediaStateDaoImpl implements RedisSocialMediaStateDao, S
             if ( jedis.exists( RedisKeyConstants.WAIT_FOR_NEXT_FETCH ) || jedis.exists( RedisKeyConstants.IS_KAFKA_DOWN ) ) {
                 return true;
             } else {
-                jedis.setex( RedisKeyConstants.WAIT_FOR_NEXT_FETCH, waitForNextFetchTime, "true" );
+                int redisWaitForNextFetchTime = NumberUtils.toInt(jedis.get( RedisKeyConstants.WAIT_FOR_NEXT_FETCH_TIME ));
+
+                // Check fi redis has ttl for wait for next time.
+                int ttlForNextFetch = (redisWaitForNextFetchTime == 0) ? waitForNextFetchTime: redisWaitForNextFetchTime;
+                jedis.setex( RedisKeyConstants.WAIT_FOR_NEXT_FETCH, ttlForNextFetch, "true" );
                 return false;
             }
         }
@@ -200,14 +205,6 @@ public class RedisSocialMediaStateDaoImpl implements RedisSocialMediaStateDao, S
         try ( Jedis jedis = RedisDB.getPoolInstance().getResource() ) {
             return jedis.ttl( key );
         }
-    }
-
-
-    @Override
-    public boolean setWaitForNextFetch( int seconds )
-    {
-        // TODO Auto-generated method stub
-        return false;
     }
 
     @Override
