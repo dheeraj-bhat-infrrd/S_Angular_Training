@@ -3703,7 +3703,6 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         boolean phoneNumberLocked = true;
         AgentSettings unitSettings = null;
         LOG.debug( "Inside method getPrimaryHeirarchyByEntity for entity " + entityType );
-        LOG.info( "getPrimaryHierarchyByEntity called for  entity type " + entityType + " with id " + entityId);
         Map<String, Long> hierarchyDetails = getHierarchyDetailsByEntity( entityType, entityId );
         long companyId = hierarchyDetails.get( CommonConstants.COMPANY_ID_COLUMN );
         long regionId = hierarchyDetails.get( CommonConstants.REGION_ID_COLUMN );

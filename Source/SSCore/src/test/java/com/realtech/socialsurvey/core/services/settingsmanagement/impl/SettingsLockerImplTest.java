@@ -266,28 +266,4 @@ public class SettingsLockerImplTest
         assertEquals( "Organization Unit does not match expected", OrganizationUnit.BRANCH,
             settingsLockerImpl.getHighestLockerLevel( CommonConstants.SET_BY_BRANCH ) );
     }
-
-
-    @Test ( expected = InvalidSettingsStateException.class)
-    public void testGetModifiedSetSettingsValueAlreadyLockedNotLocked() throws InvalidSettingsStateException
-    {
-        Mockito
-            .doReturn( false )
-            .when( settingsLockerImpl )
-            .isSettingsValueLocked( (OrganizationUnit) Matchers.any(), BigInteger.valueOf(0),
-                (SettingsForApplication) Mockito.any() );
-        settingsLockerImpl.getModifiedSetSettingsValue( OrganizationUnit.COMPANY, BigInteger.valueOf(0), SettingsForApplication.LOGO, false );
-    }
-
-
-    @Test ( expected = InvalidSettingsStateException.class)
-    public void testGetModifiedSetSettingsValueAlreadyLockedSettingLocked() throws InvalidSettingsStateException
-    {
-        Mockito
-            .doReturn( true )
-            .when( settingsLockerImpl )
-            .isSettingsValueLocked( (OrganizationUnit) Matchers.any(), BigInteger.valueOf(0),
-                (SettingsForApplication) Mockito.any() );
-        settingsLockerImpl.getModifiedSetSettingsValue( OrganizationUnit.COMPANY, BigInteger.valueOf(0), SettingsForApplication.LOGO, true );
-    }
 }
