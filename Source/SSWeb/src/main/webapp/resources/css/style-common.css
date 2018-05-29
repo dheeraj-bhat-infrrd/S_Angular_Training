@@ -9786,11 +9786,11 @@ ul.accordion li>a:before {
     font-size: 12px !important;
 }
 
-.recent-act-delete-x, .recent-act-delete-x:active, .recent-act-delete-x:visited{
+.soc-mon-recent-act-delete-x, .soc-mon-recent-act-delete-x:active, .soc-mon-recent-act-delete-x:visited, .recent-act-delete-x, .recent-act-delete-x:active, .recent-act-delete-x:visited{
 	color:#666 !important;
 }
 
-.recent-act-delete-x:hover{
+.recent-act-delete-x:hover, .soc-mon-recent-act-delete-x:hover{
 	color:#a2a0a0 !important;
 }
 
