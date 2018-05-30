@@ -7,6 +7,6 @@ import com.realtech.socialsurvey.compute.entities.SocialMonitorTrustedSource;
 
 public interface RedisTrustedSourcesDao extends Serializable {
 
-	public List<SocialMonitorTrustedSource> getCompanyTruestedSourcesForCompanyId(long companyIden);
+	public List<SocialMonitorTrustedSource> getCompanyTrustedSourcesForCompanyId(long companyIden);
 
 }
