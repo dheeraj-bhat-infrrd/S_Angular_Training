@@ -127,5 +127,12 @@ public interface SocialFeedService
      */
     public boolean moveDocumentToArchiveCollection();
 
+    /**
+     * @param companyId
+     * @param trustedSource
+     * @throws InvalidInputException 
+     */
+    public void updateTrustedSourceForFormerLists( long companyId, String trustedSource ) throws InvalidInputException;
+
     
 }
