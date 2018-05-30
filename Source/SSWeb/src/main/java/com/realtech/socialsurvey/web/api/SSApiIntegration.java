@@ -286,4 +286,11 @@ public interface SSApiIntegration
 
     @GET( "/v1/userprofileflags" )
     Response getUserProfileFlags(@Query ("userId") long userId);
+    
+    @POST( "/v1/sethasregisteredforsummit" )
+    Response setHasRegisteredForSummit(@Query("companyId") Long companyId,@Query("hasRegisteredForSummit") boolean hasRegisteredForSummit);
+    
+    @POST( "/v1/setshowsummitpopup" )
+    Response setShowSummitPopup(@Query("companyId") Long companyId,@Query("isShowSummitPopup") boolean isShowSummitPopup);
+    
 }

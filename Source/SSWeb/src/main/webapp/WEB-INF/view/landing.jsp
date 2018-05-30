@@ -1,7 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <jsp:include page="header.jsp" />
 <input type="hidden" id="social_media_details" data-social-media-expired="${isSocialMediaExpired}" data-social-media-refresh="${isTokenRefreshRequired}" data-expired-social-media-list=>
-<input type="hidden" id="summit-popup-details" value="true">
 <div id="main-content"></div>
 <jsp:include page="scripts.jsp"/>
 <script src="${initParam.resourcesPath}/resources/js/intlTelInput.js"></script>

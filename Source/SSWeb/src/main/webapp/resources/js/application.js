@@ -20641,3 +20641,73 @@ function sendClickedEventInfo( event ){
 		});
 	}
 }
+
+function setHasRegisteredForSummit(hasRegisteredForSummit){
+	
+	var payload = {
+			"hasRegisteredForSummit" : hasRegisteredForSummit
+	}
+	
+	var url = './sethasregisteredforsummit.do';
+	
+	$.ajax({
+		url : url,
+		type : "POST",
+		data : payload,
+		success : function(data){
+			console.log(data);
+		},
+		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+		}
+	});
+	
+}
+
+function setShowSummitPopup(isShowSummitPopup){
+	
+	var payload = {
+			"isShowSummitPopup" : isShowSummitPopup
+	}
+	
+	var url = './setshowsummitpopup.do';
+	
+	$.ajax({
+		url : url,
+		type : "POST",
+		data : payload,
+		success : function(data){
+			console.log(data);
+		},
+		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+		}
+	});
+	
+}
+
+function setActiveSessionForPopup(){
+	
+	var url = './setactivesessionforpopup.do';
+	
+	$.ajax({
+		url : url,
+		type : "POST",
+		success : function(data){
+			console.log(data);
+		},
+		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+		}
+	});
+	
+}

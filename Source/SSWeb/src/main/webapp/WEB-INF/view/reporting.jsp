@@ -54,6 +54,9 @@
 		<c:set value="4" var="profilemasterid"></c:set>
 	</c:when>
 </c:choose>
+<c:set var="activeSession" value="${activeSession }"></c:set>
+<c:set var="hasRegisteredForSummit" value="${hasRegisteredForSummit }"></c:set>
+<c:set var="isShowSummitPopup" value="${isShowSummitPopup }"></c:set>
 
 <div class="overlay-loader hide"></div>
 <input type="hidden"  id="reporting-data-div" data-profile-master-id="${profilemasterid}" data-user-id="${userId}" data-column-name="${columnName}" data-column-value="${columnValue}">
@@ -357,10 +360,22 @@
 		
 		hideOverlay();
 		
-		var isSummitFirstTime = $('#summit-popup-details').val();
-		if(isSummitFirstTime == 'true' && parseInt(profileMasterIdLead) == 1){
-			showSummitPopup();
-			$('#summit-popup-details').val('false');
+		var hasRegisteredForSummit = "${hasRegisteredForSummit}";
+		var activeSession = "${activeSession}";
+		var isShowSummitPopup ="${isShowSummitPopup}";
+		
+		console.log(hasRegisteredForSummit);
+		console.log(activeSession);
+		console.log(isShowSummitPopup);
+		
+		if(activeSession == 'false' && activeSession != false){
+			if(hasRegisteredForSummit == 'false' || hasRegisteredForSummit == false){
+				if(isShowSummitPopup == 'false' || isShowSummitPopup == 'false'){
+					showSummitPopup();
+				}else if(isShowSummitPopup == 'true' || isShowSummitPopup == 'true'){
+					showSummitRibbon();
+				}
+			}
 		}
 	});
 </script>

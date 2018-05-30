@@ -349,4 +349,16 @@ public interface OrganizationUnitSettingsDao
 
 
     void updateSwearWords( String entityType, long entityId, String[] swearWords ) throws InvalidInputException;
+
+
+	OrganizationUnitSettings hasRegisteredForSummit(long companyId) throws InvalidInputException;
+
+
+	void updateHasRegisteredForSummit(long companyId, boolean isShowSummitPopup) throws InvalidInputException;
+
+
+	OrganizationUnitSettings isShowSummitPopup(long companyId) throws InvalidInputException;
+
+
+	void updateShowSummitPopup(long companyId, boolean isShowSummitPopup) throws InvalidInputException;
 }

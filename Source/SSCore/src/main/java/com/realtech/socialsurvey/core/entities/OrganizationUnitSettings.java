@@ -73,7 +73,7 @@ public class OrganizationUnitSettings implements Serializable
     private Set<String> digestRecipients;
     private boolean includeForTransactionMonitor; // include a company to transaction monitor
     private String encryptedId;
-
+    
     // vendasta product details 
     private VendastaProductSettings vendasta_rm_settings;
 
@@ -103,7 +103,31 @@ public class OrganizationUnitSettings implements Serializable
 
     private String[] swearWords;
     
-    public List<Keyword> getFilterKeywords()
+    private boolean hasRegisteredForSummit;
+    
+    private boolean isShowSummitPopup;
+    
+    public boolean isShowSummitPopup() {
+		return isShowSummitPopup;
+	}
+
+
+	public void setShowSummitPopup(boolean isShowSummitPopup) {
+		this.isShowSummitPopup = isShowSummitPopup;
+	}
+
+
+	public boolean hasRegisteredForSummit() {
+		return hasRegisteredForSummit;
+	}
+
+
+	public void sethasRegisteredForSummit(boolean showSummitPopup) {
+		this.hasRegisteredForSummit = showSummitPopup;
+	}
+
+
+	public List<Keyword> getFilterKeywords()
     {
         return filterKeywords;
     }
