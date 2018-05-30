@@ -233,7 +233,7 @@
 						<div class="${ypClass} mgn-tbl-conn-icn"></div>
 						<div class="${twClass} mgn-tbl-conn-icn"></div>
 						<div class="${fbpClass} mgn-tbl-conn-icn"></div>
-						<div class="${instaClass} mgn-tbl-conn-icn"></div>
+						<%-- <div class="${instaClass} mgn-tbl-conn-icn"></div> --%>
 					</td>
 					<td class="v-tbl-rgn-adm mng-tbl-ticks ${regionadmintickclass}"></td>
 					<td class="v-tbl-of-adm mng-tbl-ticks ${branchadmintickclass}"></td>
