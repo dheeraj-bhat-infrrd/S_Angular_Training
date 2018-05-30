@@ -44,10 +44,10 @@ public class SettingsManagerImpl implements SettingsManager
         Map<String, BigInteger> map = new HashMap<>();
         for ( SettingsDetails settingsDetails : settingsDetailsList ) {
             lockScore = new BigInteger(lockScore.toByteArray());
-            lockScore.add( BigInteger.valueOf(settingsDetails.getLockSettingsHolder()));
+            lockScore = lockScore.add( BigInteger.valueOf(settingsDetails.getLockSettingsHolder()));
             
             setScore  = new BigInteger(setScore.toByteArray());
-            setScore.add( settingsDetails.getSetSettingsHolder());
+            setScore = setScore.add( settingsDetails.getSetSettingsHolder());
         }
         map.put( CommonConstants.SETTING_SCORE, setScore );
         map.put( CommonConstants.LOCK_SCORE, lockScore );
