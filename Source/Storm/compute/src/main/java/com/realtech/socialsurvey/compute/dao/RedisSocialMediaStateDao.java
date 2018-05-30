@@ -52,13 +52,6 @@ public interface RedisSocialMediaStateDao extends Serializable
     public boolean waitForNextFetch();
     
     /**
-     * Set wati for next fetch in redis
-     * @param seconds
-     * @return
-     */
-    public boolean setWaitForNextFetch( int seconds );
-
-    /**
      * Add key with TTL
      * @param key
      * @param value

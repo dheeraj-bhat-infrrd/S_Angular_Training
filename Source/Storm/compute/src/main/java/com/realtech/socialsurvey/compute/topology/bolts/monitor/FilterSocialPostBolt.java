@@ -258,24 +258,28 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
             foundPhrases.add( phrase );
             LOG.trace( "end matching {}", phrase );
         }
-
+        
         LOG.debug( "End of findPhrase method, foundkeywords:{}", foundPhrases );
         return foundPhrases;
     }
+    
 
-    private boolean isPostFromTrustedSource(SocialResponseObject<?> post , long companyId) 
+    private boolean isPostFromTrustedSource( SocialResponseObject<?> post, long companyId )
     {
-    		String postSource = post.getPostSource();
-    		if( StringUtils.isNotEmpty( postSource ) ) {
-        		List<SocialMonitorTrustedSource> trustedSources = redisTrustedSourcesDao.getCompanyTruestedSourcesForCompanyId(companyId);
-    			for( SocialMonitorTrustedSource trustedSource : trustedSources) {
-    				if(StringUtils.equalsIgnoreCase(postSource, trustedSource.getSource()) && trustedSource.getStatus() == 1 ) {
-    					return true;
-    				}
-    			}
-    		}
-    		
-    		return false;
+        String postSource = post.getPostSource();
+        if ( StringUtils.isNotEmpty( postSource ) ) {
+            List<SocialMonitorTrustedSource> trustedSources = redisTrustedSourcesDao
+                .getCompanyTrustedSourcesForCompanyId( companyId );
+            if ( trustedSources != null ) {
+                for ( SocialMonitorTrustedSource trustedSource : trustedSources ) {
+                    if ( StringUtils.equalsIgnoreCase( postSource, trustedSource.getSource() )
+                        && trustedSource.getStatus() == 1 ) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
     
     private ActionHistory getTrustedSourceActionHistory( String source )

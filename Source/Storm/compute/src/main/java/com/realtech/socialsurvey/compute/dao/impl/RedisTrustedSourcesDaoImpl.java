@@ -22,7 +22,7 @@ public class RedisTrustedSourcesDaoImpl implements RedisTrustedSourcesDao {
     private static final Logger LOG = LoggerFactory.getLogger( RedisTrustedSourcesDaoImpl.class );
 	
 	 @Override
-	    public List<SocialMonitorTrustedSource> getCompanyTruestedSourcesForCompanyId( long companyIden )
+	    public List<SocialMonitorTrustedSource> getCompanyTrustedSourcesForCompanyId( long companyIden )
 	    {
 	        try ( Jedis jedis = RedisDB.getPoolInstance().getResource() ) {
 	            LOG.info( "Executing method getCompanyTruestedSourcesForCompanyId {}", companyIden );
