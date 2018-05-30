@@ -18,6 +18,13 @@
 		<c:set value="4" var="profilemasterid"></c:set>
 	</c:when>
 </c:choose>
+
+<c:set var="requestedKey"><spring:message code="label.recent.activity.requested.key" /></c:set>
+<c:set var="reportKey"><spring:message code="label.recent.activity.report.key" /></c:set>
+<c:set var="dateRangeKey"><spring:message code="label.recent.activity.daterange.key" /></c:set>
+<c:set var="requestedByKey"><spring:message code="label.recent.activity.requestedby.key" /></c:set>
+<c:set var="statusKey"><spring:message code="label.recent.activity.status.key" /></c:set>
+
 <div class="hm-header-main-wrapper hm-hdr-bord-bot">
 	<div class="container">
 		<div class="hm-header-row clearfix">
@@ -60,7 +67,7 @@
 						</div>
 					</div>
 					<div class="dash-btn-dl-sd-admin generate-report-btn">
-						<div id="reports-generate-report-btn" class="dash-down-go-button float-right cursor-pointer" style="width:100%;">
+						<div id="soc-mon-reports-generate-report-btn" class="dash-down-go-button float-right cursor-pointer" style="width:100%;">
 							<spring:message code="label.downloadsurveydata.key.click" />
 						</div>
 					</div>
@@ -78,8 +85,9 @@
 					</div>
 				</div>
 			</div>
+			
 			<div class="v-um-tbl-wrapper" id="recent-activity-list" style="width:90%; margin:30px auto;">
-				<jsp:include page="reporting_recentActivityList.jsp"></jsp:include>
+				<jsp:include page="social_monitor_reporting_list.jsp"></jsp:include>
 			</div>
 			<div id="empty-list-msg-div" class="hide">
 				<div style="text-align:center; margin:30% auto">
@@ -87,16 +95,15 @@
 				</div>
 			</div>
 			<div id="rec-act-paginate-buttons" style="width: 100px; margin: 0 auto; ">
-				<div id="rec-act-page-previous" class="float-left paginate-button"><spring:message code="label.previous.key" /></div>
-				<div id="rec-act-page-next" class="float-right paginate-button"><spring:message code="label.next.key" /></div>
+				<div id="soc-mon-rec-act-page-previous" class="float-left paginate-button"><spring:message code="label.previous.key" /></div>
+				<div id="soc-mon-rec-act-page-next" class="float-right paginate-button"><spring:message code="label.next.key" /></div>
 			</div>		
 </div>
 <script>
 $(document).ready(function() {
-	$(document).attr("title", "Reporting");
+	$(document).attr("title", "Social Monitor Reporting");
 	updateViewAsScroll();
 	bindDatePickerforSurveyDownload();
-	drawTransReportTimeFrames();
 	drawPhraseList();
 	
 	var selectedVal = $('#generate-survey-reports').val();
@@ -110,24 +117,34 @@ $(document).ready(function() {
 	
 	var startIndex=0;
 	var recentActivityCount;
-	var tableHeaderData= getTableHeader();
-	$('#rec-act-page-previous').click(function(){
-		startIndex=getStartIndex();	
+	var batchSize = 10;
+	var tableHeaderData="<table class=\"v-um-tbl\" style=\"margin-bottom:15px\" >"
+		+"<tr id=\"u-tbl-header\" class=\"u-tbl-header\">"
+		+"<td class=\"v-tbl-recent-activity \">${requestedKey}</td>"
+		+"<td class=\"v-tbl-recent-activity\">${reportKey}</td>"
+		+"<td class=\"v-tbl-recent-activity\" \>${dateRangeKey}</td>"
+		+"<td class=\"v-tbl-recent-activity \">${requestedByKey}</td>"
+		+"<td class=\"v-tbl-recent-activity\" style='width:25%'>${statusKey}</td>"
+		+"<td class=\"v-tbl-recent-activity \"></td>"
+		+"</tr>";
+	
+	$('#soc-mon-rec-act-page-previous').click(function(){
+		startIndex=parseInt($('#soc-mon-rec-act-data').attr('data-start-index'));
 		startIndex-=10;
-		recentActivityCount=getRecentActivityCount();
-		drawRecentActivity(startIndex, batchSize,tableHeaderData,recentActivityCount);
-		showHidePaginateButtons(startIndex, recentActivityCount);
+		$('#soc-mon-rec-act-data').attr('data-start-index',startIndex);
+		recentActivityCount= parseInt($('#soc-mon-rec-act-data').attr('data-count'));
+		getRecentActivityListForSocialMonitor(startIndex, batchSize,tableHeaderData,recentActivityCount);
+		showHidePaginateButtonsForSocialMonitor(startIndex, recentActivityCount);
 	});
 
-	$('#rec-act-page-next').click(function(){
-		startIndex=getStartIndex();
+	$('#soc-mon-rec-act-page-next').click(function(){
+		startIndex=parseInt($('#soc-mon-rec-act-data').attr('data-start-index'));
 		startIndex+=10;
-		recentActivityCount=getRecentActivityCount();
-		drawRecentActivity(startIndex, batchSize,tableHeaderData,recentActivityCount);
-		showHidePaginateButtons(startIndex, recentActivityCount);
+		$('#soc-mon-rec-act-data').attr('data-start-index',startIndex);
+		recentActivityCount= parseInt($('#soc-mon-rec-act-data').attr('data-count'));
+		getRecentActivityListForSocialMonitor(startIndex, batchSize,tableHeaderData,recentActivityCount);
+		showHidePaginateButtonsForSocialMonitor(startIndex, recentActivityCount);
 	});
-	
-	autoRefresh(tableHeaderData);	
-		
+			
 });
 </script>

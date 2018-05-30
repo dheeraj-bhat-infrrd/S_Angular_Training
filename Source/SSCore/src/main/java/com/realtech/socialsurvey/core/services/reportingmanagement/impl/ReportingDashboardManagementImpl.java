@@ -1830,10 +1830,6 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
                 recentActivityList.add( CommonConstants.REPORTING_BRANCH_RANKING_YEARLY_REPORT );
             } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_DIGEST ) {
                 recentActivityList.add( CommonConstants.REPORTING_DIGEST );
-            } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT ) {
-                recentActivityList.add( CommonConstants.SOCIAL_MONITOR_DATE_REPORT );
-            } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD ) {
-                recentActivityList.add( CommonConstants.SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD );
             }
 
             recentActivityList.add( fileUpload.getStartDate() );
@@ -5398,6 +5394,45 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
         }
 
         return unitSettings.isSocialMonitorEnabled();
+    }
+
+
+    @Override
+    public List<List<Object>> getRecentActivityListForSocialMonitor( Long entityId, String entityType, int startIndex,
+        int batchSize ) throws InvalidInputException
+    {
+        List<List<Object>> recentActivity = new ArrayList<>();
+        for ( FileUpload fileUpload : fileUploadDao.findRecentActivityForSocialMonitorReporting( entityId, entityType,
+            startIndex, batchSize ) ) {
+            List<Object> recentActivityList = new ArrayList<>();
+            User user = userManagementService.getUserByUserId( fileUpload.getAdminUserId() );
+            recentActivityList
+                .add( utils.convertDateToTimeZone( fileUpload.getCreatedOn().getTime(), CommonConstants.TIMEZONE_EST ) );
+            // Set the ReportName according to the upload type
+            if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT ) {
+                recentActivityList.add( CommonConstants.SOCIAL_MONITOR_DATE_REPORT );
+            } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD ) {
+                recentActivityList.add( CommonConstants.SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD );
+            }
+
+            recentActivityList.add( fileUpload.getStartDate() );
+            recentActivityList.add( fileUpload.getEndDate() );
+            recentActivityList.add( user.getFirstName() );
+            recentActivityList.add( user.getLastName() );
+            recentActivityList.add( fileUpload.getStatus() );
+            recentActivityList.add( fileUpload.getFileName() );
+            recentActivityList.add( fileUpload.getFileUploadId() );
+            recentActivityList.add( fileUpload.getUploadType() );
+            recentActivity.add( recentActivityList );
+        }
+        return recentActivity;
+    }
+    
+    @Override
+    public Long getRecentActivityCountForSocialMonitor( Long entityId, String entityType )
+    {
+        return fileUploadDao.getRecentActivityCountForSocialMonitorReporting( entityId, entityType );
+
     }
     
     

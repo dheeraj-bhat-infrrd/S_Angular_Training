@@ -50,9 +50,7 @@ public class FileUploadDaoImpl extends GenericDaoImpl<FileUpload, Long> implemen
                 CommonConstants.FILE_UPLOAD_SURVEY_INVITATION_EMAIL_REPORT,
                 CommonConstants.FILE_UPLOAD_REPORTING_BRANCH_RANKING_MONTHLY_REPORT,
                 CommonConstants.FILE_UPLOAD_REPORTING_BRANCH_RANKING_YEARLY_REPORT,
-                CommonConstants.FILE_UPLOAD_REPORTING_DIGEST,
-                CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT,
-                CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD) ) );
+                CommonConstants.FILE_UPLOAD_REPORTING_DIGEST ) ) );
             if ( startIndex > -1 ) {
                 criteria.setFirstResult( startIndex );
             }
@@ -91,9 +89,7 @@ public class FileUploadDaoImpl extends GenericDaoImpl<FileUpload, Long> implemen
                 CommonConstants.FILE_UPLOAD_SURVEY_INVITATION_EMAIL_REPORT,
                 CommonConstants.FILE_UPLOAD_REPORTING_BRANCH_RANKING_MONTHLY_REPORT,
                 CommonConstants.FILE_UPLOAD_REPORTING_BRANCH_RANKING_YEARLY_REPORT,
-                CommonConstants.FILE_UPLOAD_REPORTING_DIGEST,
-                CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT,
-                CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD) ) );
+                CommonConstants.FILE_UPLOAD_REPORTING_DIGEST ) ) );
             criteria.setProjection( Projections.rowCount() );
             Long count = (Long) criteria.uniqueResult();
             LOG.info( "Method getRecentActivityCountForReporting() finished." );
@@ -154,4 +150,58 @@ public class FileUploadDaoImpl extends GenericDaoImpl<FileUpload, Long> implemen
         int affectedColumns  = query.executeUpdate();
         return affectedColumns;
     }
+
+
+    @Override
+    public List<FileUpload> findRecentActivityForSocialMonitorReporting( long entityId, String entityType, int startIndex,
+        int batchSize )
+    {
+        LOG.info( "method to fetch Recent Activity findRecentActivityForSocialMonitorReporting() started " );
+        Criteria criteria = getSession().createCriteria( FileUpload.class );
+        try {
+            criteria.add( Restrictions.eq( CommonConstants.PROFILE_VALUE_COLUMN, entityId ) );
+            criteria.add( Restrictions.eq( CommonConstants.PROFILE_LEVEL_COLUMN, entityType ) );
+            criteria.add( Restrictions.eq( CommonConstants.SHOW_ON_UI_COLUMN, true ) );
+            criteria.add( Restrictions.in( CommonConstants.FILE_UPLOAD_TYPE_COLUMN,
+                Arrays.asList( CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT,
+                    CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD ) ) );
+            if ( startIndex > -1 ) {
+                criteria.setFirstResult( startIndex );
+            }
+            if ( batchSize > -1 ) {
+                criteria.setMaxResults( batchSize );
+            }
+            criteria.addOrder( Order.desc( CommonConstants.MODIFIED_ON_COLUMN ) );
+        } catch ( HibernateException hibernateException ) {
+            LOG.error( "HibernateException caught in findRecentActivityForSocialMonitorReporting().", hibernateException );
+            throw new DatabaseException( "HibernateException caught in findRecentActivityForSocialMonitorReporting().",
+                hibernateException );
+        }
+        return (List<FileUpload>) criteria.list();
+    }
+    
+    @Override
+    public long getRecentActivityCountForSocialMonitorReporting(long entityId , String entityType){
+        LOG.info( "method to fetch Recent Activity getRecentActivityCountForSocialMonitorReporting() started " );
+        Criteria criteria = getSession().createCriteria( FileUpload.class );
+        try{
+
+            criteria.add( Restrictions.eq( CommonConstants.PROFILE_VALUE_COLUMN , entityId ) );
+            criteria.add( Restrictions.eq( CommonConstants.PROFILE_LEVEL_COLUMN , entityType ) );
+            criteria.add( Restrictions.eq( CommonConstants.SHOW_ON_UI_COLUMN , true ) );
+            criteria.add( Restrictions.in( CommonConstants.FILE_UPLOAD_TYPE_COLUMN, 
+                Arrays.asList(
+                CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT,
+                CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD) ) );
+            criteria.setProjection( Projections.rowCount() );
+            Long count = (Long) criteria.uniqueResult();
+            LOG.info( "Method getRecentActivityCountForSocialMonitorReporting() finished." );
+            return count.longValue();
+        } catch ( HibernateException hibernateException ) {
+            LOG.error( "HibernateException caught in getRecentActivityCountForSocialMonitorReporting().", hibernateException );
+            throw new DatabaseException( "HibernateException caught in getRecentActivityCountForSocialMonitorReporting().", hibernateException );
+        }
+    }
+    
+    
 }
