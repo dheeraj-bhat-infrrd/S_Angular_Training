@@ -2682,10 +2682,13 @@ public class OrganizationManagementController
             }
 
             HttpSession session = request.getSession();
+            
+            String activeSession = (String) session.getAttribute("activeSession");
             Long superAdminUserId = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
             User adminUser = sessionHelper.getCurrentUser();
             User newUser = userManagementService.getUserByUserId( id );
-
+            
+            
             HttpSession newSession = request.getSession( true );
             if ( adminUser.isCompanyAdmin() ) {
                 newSession.setAttribute( CommonConstants.COMPANY_ADMIN_SWITCH_USER_ID, adminUser.getUserId() );
@@ -2700,6 +2703,8 @@ public class OrganizationManagementController
 
             //Set the autologin attribute as true
             newSession.setAttribute( CommonConstants.IS_AUTO_LOGIN, "true" );
+            newSession.setAttribute("activeSession",activeSession);
+            
             sessionHelper.loginAdminAs( newUser.getLoginName(), CommonConstants.BYPASS_PWD );
 
         } catch ( NonFatalException e ) {
@@ -2715,6 +2720,8 @@ public class OrganizationManagementController
     {
 
         HttpSession session = request.getSession();
+        String activeSession = (String) session.getAttribute("activeSession");
+        
         Long adminUserid = null;
         if ( session.getAttribute( CommonConstants.COMPANY_ADMIN_SWITCH_USER_ID ) != null ) {
             adminUserid = (Long) session.getAttribute( CommonConstants.COMPANY_ADMIN_SWITCH_USER_ID );
@@ -2757,6 +2764,7 @@ public class OrganizationManagementController
 
             session = request.getSession( true );
             sessionHelper.loginAdminAs( adminUser.getLoginName(), CommonConstants.BYPASS_PWD );
+            session.setAttribute("activeSession",activeSession);
         } catch ( NonFatalException e ) {
             LOG.error( "Exception occurred in switchToAdminUser() method , reason : " + e.getMessage() );
             return "failure";

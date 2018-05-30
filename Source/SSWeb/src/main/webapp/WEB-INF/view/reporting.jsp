@@ -127,6 +127,16 @@
 	<div id="summit-popup-body" class="summit-popup">
 		<div id="close-summit-popup" class="close-summit-popup cursor-pointer"></div>
 		<div id="register-summit-btn" class="register-summit-btn cursor-pointer"></div>
+		<div class="summit-checkbox-cont clearfix">
+			<div class="float-left wc-width" id="">
+				<div id="summit-do-not-show" class="float-left summit-check" data-checked=false></div>
+	     		<div class="float-left wc-dashboard-text summit-check-text">Do not show this again</div>
+			</div>
+			<div class="float-left wc-width summit-popup-check-right" id="">
+				<div id="summit-already-reg" class="float-left summit-check" data-checked=false></div>
+	     		<div class="float-left wc-dashboard-text summit-check-text">I already registered</div>
+			</div>
+		</div>
 	</div>
 </div>
 

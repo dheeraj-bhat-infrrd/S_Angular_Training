@@ -12298,3 +12298,36 @@ img.lead-img {
 .mng-tbl-btns{
 	width: 20%;
 }
+
+.summit-checkbox-cont{
+	display: flex;
+    position: absolute;
+    bottom: 35px;
+    margin-left: 55px;
+}
+
+.summit-popup-check-right{
+	margin-left: 15px;
+}
+
+.summit-check-text{
+	color: white;
+    font-weight: bold !important;
+    margin-left: 7px !important;
+    font-size: 14px;
+}
+
+.summit-check{
+	width: 16px;
+    height: 16px;
+    background-image: url(../images/checkbox-blank.png);
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    margin: 13px 0 0 !important;
+}
+
+.summit-checked{
+	background-image:url(../images/checkbox-marked.png);
+}

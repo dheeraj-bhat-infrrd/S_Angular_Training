@@ -20711,3 +20711,36 @@ function setActiveSessionForPopup(){
 	});
 	
 }
+
+$(document).on('click','#summit-do-not-show',function(e){
+	e.stopImmediatePropagation();
+	e.preventDefault();
+	
+	var checked = $(this).attr('data-checked');
+	if(checked == true || checked == 'true'){
+		 $(this).attr('data-checked',false);
+		 $(this).removeClass('summit-checked');
+		 setShowSummitPopup(false);
+	}else{
+		$(this).attr('data-checked',true);
+		 $(this).addClass('summit-checked');
+		 setShowSummitPopup(true);
+	}
+});
+
+$(document).on('click','#summit-already-reg',function(e){
+	e.stopImmediatePropagation();
+	e.preventDefault();
+	
+	var checked = $(this).attr('data-checked');
+	if(checked == true || checked == 'true'){
+		 $(this).attr('data-checked',false);
+		 $(this).removeClass('summit-checked');
+		 setHasRegisteredForSummit(false);
+	}else{
+		$(this).attr('data-checked',true);
+		 $(this).addClass('summit-checked');
+		 setHasRegisteredForSummit(true);
+	}
+	
+});
