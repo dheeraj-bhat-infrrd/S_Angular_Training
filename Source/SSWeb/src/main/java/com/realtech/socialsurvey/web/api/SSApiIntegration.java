@@ -289,5 +289,11 @@ public interface SSApiIntegration
     
     @GET("/v1/getrecentactivityforsocialmonitorreporting")
     Response getRecentActivityForSocialMonitor(@Query ("entityId") Long entityId , @Query ("entityType") String entityType ,@Query ("startIndex") int startIndex , @Query ("batchSize") int batchSize);
+
+    @POST( "/v1/sethasregisteredforsummit" )
+    Response setHasRegisteredForSummit(@Query("companyId") Long companyId,@Query("hasRegisteredForSummit") boolean hasRegisteredForSummit);
+    
+    @POST( "/v1/setshowsummitpopup" )
+    Response setShowSummitPopup(@Query("companyId") Long companyId,@Query("isShowSummitPopup") boolean isShowSummitPopup);
     
 }

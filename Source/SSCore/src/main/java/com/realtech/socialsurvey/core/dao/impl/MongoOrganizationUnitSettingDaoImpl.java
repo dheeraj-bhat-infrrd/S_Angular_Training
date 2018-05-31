@@ -145,7 +145,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_LINKEDIN_ACCESS_TOKEN = "socialMediaTokens.linkedInToken.linkedInAccessToken";
     
     public static final String SOCIAL_MONITOR_ENABLED = "isSocialMonitorEnabled";
-
+    public static final String HAS_REGISTERED_FOR_SUMMIT = "hasRegisteredForSummit";
+    public static final String IS_SHOW_SUMMIT_POPUP = "isShowSummitPopup";
 
     @Value ( "${CDN_PATH}")
     private String amazonEndPoint;
@@ -1422,6 +1423,59 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         mongoTemplate.updateFirst( query, update, collectionName );
         LOG.debug( "Method saveDigestRecord() to update digest record list started." );
     }
+    
+    @Override
+    public OrganizationUnitSettings hasRegisteredForSummit( long companyId ) throws InvalidInputException
+    {
+        LOG.debug( "Method hasRegisteredForSummit() running." );
 
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_IDEN ).is( companyId ) );
+        
+        query.fields().include( HAS_REGISTERED_FOR_SUMMIT ).exclude( CommonConstants.DEFAULT_MONGO_ID_COLUMN );
+        return mongoTemplate.findOne( query, OrganizationUnitSettings.class, CommonConstants.COMPANY_SETTINGS_COLLECTION );
+    }
+
+    @Override
+    public void updateHasRegisteredForSummit( long companyId, boolean hasRegisteredForSummit ) throws InvalidInputException
+    {
+        LOG.debug( "Method updateHasRegisteredForSummit() started." );
+        
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_IDEN ).is( companyId ) );
+        Update update = new Update();
+        
+        update.set( HAS_REGISTERED_FOR_SUMMIT, hasRegisteredForSummit );
+        
+        mongoTemplate.updateFirst( query, update, CommonConstants.COMPANY_SETTINGS_COLLECTION );
+        LOG.debug( "Method updateHasRegisteredForSummit() finished." );
+    }
+    
+    @Override
+    public OrganizationUnitSettings isShowSummitPopup( long companyId ) throws InvalidInputException
+    {
+        LOG.debug( "Method getShowSummitPopupFlag() to fetch show summit popup flag running." );
+
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_IDEN ).is( companyId ) );
+        
+        query.fields().include( IS_SHOW_SUMMIT_POPUP ).exclude( CommonConstants.DEFAULT_MONGO_ID_COLUMN );
+        return mongoTemplate.findOne( query, OrganizationUnitSettings.class, CommonConstants.COMPANY_SETTINGS_COLLECTION );
+    }
+
+    @Override
+    public void updateShowSummitPopup( long companyId, boolean isShowSummitPopup ) throws InvalidInputException
+    {
+        LOG.debug( "Method updateShowSummitPopupFlag() to update showSummitPopup started." );
+        
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_IDEN ).is( companyId ) );
+        Update update = new Update();
+        
+        update.set( IS_SHOW_SUMMIT_POPUP, isShowSummitPopup );
+        
+        mongoTemplate.updateFirst( query, update, CommonConstants.COMPANY_SETTINGS_COLLECTION );
+        LOG.debug( "Method updateHasRegisteredForSummit() finished." );
+    }
 
 }

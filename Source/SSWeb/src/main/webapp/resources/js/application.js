@@ -20686,6 +20686,55 @@ function getRecentActivityListForSocialMonitor(startIndex, batchSize,tableHeader
 				return;
 			}
 		}
+	});
+}
+
+function setHasRegisteredForSummit(hasRegisteredForSummit){
+	
+	var payload = {
+			"hasRegisteredForSummit" : hasRegisteredForSummit
+	}
+	
+	var url = './sethasregisteredforsummit.do';
+	
+	$.ajax({
+		url : url,
+		type : "POST",
+		data : payload,
+		success : function(data){
+			console.log(data);
+		},
+		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+		}
+	});
+	
+}
+
+function setShowSummitPopup(isShowSummitPopup){
+	
+	var payload = {
+			"isShowSummitPopup" : isShowSummitPopup
+	}
+	
+	var url = './setshowsummitpopup.do';
+	
+	$.ajax({
+		url : url,
+		type : "POST",
+		data : payload,
+		success : function(data){
+			console.log(data);
+		},
+		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+		}
 	});	
 }
 
@@ -20924,4 +20973,56 @@ $(document).on('click', '#soc-mon-reports-generate-report-btn', function(e) {
 				}
 			}
 		});
+});
+
+function setActiveSessionForPopup(){
+	
+	var url = './setactivesessionforpopup.do';
+	
+	$.ajax({
+		url : url,
+		type : "POST",
+		success : function(data){
+			console.log(data);
+		},
+		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+		}
+	});
+	
+}
+
+$(document).on('click','#summit-do-not-show',function(e){
+	e.stopImmediatePropagation();
+	e.preventDefault();
+	
+	var checked = $(this).attr('data-checked');
+	if(checked == true || checked == 'true'){
+		 $(this).attr('data-checked',false);
+		 $(this).removeClass('summit-checked');
+		 setShowSummitPopup(false);
+	}else{
+		$(this).attr('data-checked',true);
+		 $(this).addClass('summit-checked');
+		 setShowSummitPopup(true);
+	}
+});
+
+$(document).on('click','#summit-already-reg',function(e){
+	e.stopImmediatePropagation();
+	e.preventDefault();
+	
+	var checked = $(this).attr('data-checked');
+	if(checked == true || checked == 'true'){
+		 $(this).attr('data-checked',false);
+		 $(this).removeClass('summit-checked');
+		 setHasRegisteredForSummit(false);
+	}else{
+		$(this).attr('data-checked',true);
+		 $(this).addClass('summit-checked');
+		 setHasRegisteredForSummit(true);
+	}
 });

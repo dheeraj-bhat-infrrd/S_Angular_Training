@@ -10481,5 +10481,52 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         redisDao.addTruestedSources(companyId, companyTrustedSourcesToAdd);
         return companyTrustedSourcesToAdd;
     }
+
+
+	@Override
+	public boolean hasRegisteredForSummit(Long companyId) throws InvalidInputException {
+		 LOG.debug( "Method hasRegisteredForSummit called for companyId:" + companyId );
+	     if ( companyId < 0l ) {
+	    	LOG.error( "Invalid company id passed as argument " );
+	       	throw new InvalidInputException( "Invalid company id passed as argument " );
+	     }
+	
+	     return organizationUnitSettingsDao.hasRegisteredForSummit(companyId).hasRegisteredForSummit();
+	}
+
+
+	@Override
+	public void setHasRegisteredForSummit(Long companyId, boolean hasRegisteredForSummit) throws InvalidInputException {
+		 LOG.debug( "Method hasRegisteredForSummit called for companyId:" + companyId );
+	     if ( companyId < 0l ) {
+	    	LOG.error( "Invalid company id passed as argument " );
+	       	throw new InvalidInputException( "Invalid company id passed as argument " );
+	     }
+	     
+	     organizationUnitSettingsDao.updateHasRegisteredForSummit(companyId, hasRegisteredForSummit);
+	}
+	
+	@Override
+	public boolean isShowSummitPopup(Long companyId) throws InvalidInputException {
+		 LOG.debug( "Method isShowSummitPopup called for companyId:" + companyId );
+	     if ( companyId < 0l ) {
+	    	LOG.error( "Invalid company id passed as argument " );
+	       	throw new InvalidInputException( "Invalid company id passed as argument " );
+	     }
+	
+	     return organizationUnitSettingsDao.isShowSummitPopup(companyId).isShowSummitPopup();
+	}
+
+
+	@Override
+	public void setShowSummitPopup(Long companyId, boolean isShowSummitPopup) throws InvalidInputException {
+		 LOG.debug( "Method hasRegisteredForSummit called for companyId:" + companyId );
+	     if ( companyId < 0l ) {
+	    	LOG.error( "Invalid company id passed as argument " );
+	       	throw new InvalidInputException( "Invalid company id passed as argument " );
+	     }
+	     
+	     organizationUnitSettingsDao.updateShowSummitPopup(companyId, isShowSummitPopup);
+	}
 }
 
