@@ -333,8 +333,8 @@
 												<div class="float-right popup-close-icn zillow-popup-close-icn  wc-final-skip-close" style="cursor:pointer;"></div>
 											</div>
 											<div class="welcome-popup-body-wrapper popup-body clearfix">
-												<div class="popup-padding-bottom">SocialSurvey can connect to your Zillow profile to automatically fetch up to the last 50 approved reviews in addition to provioding a link to your Zillow profile on your SocailSurvey public page. Your Zillow profile page may also be used to ask customers who give you a GREAT review to share that review manually on you Zillow profile.</div>
-												<div class="popup-padding-bottom">Zillow does not allow third parties, such as SocialSurvey, to post reviews automatically to Zillow profiles. Zillow reviews are not made avaiable to be shared on SocialSurvey until they have been manually audited by Zillow staff which typically takes 10 business days.</div>
+												<div class="popup-padding-bottom">SocialSurvey can connect to your Zillow profile to automatically fetch up to the last 50 approved reviews in addition to providing a link to your Zillow profile on your SocialSurvey public page. Your Zillow profile page may also be used to ask customers who give you a GREAT review to share that review manually on you Zillow profile.</div>
+												<div class="popup-padding-bottom">Zillow does not allow third parties, such as SocialSurvey, to post reviews automatically to Zillow profiles. Zillow reviews are not made available to be shared on SocialSurvey until they have been manually audited by Zillow staff which typically takes 10 business days.</div>
 											</div>
 										</div>
 										<div>
