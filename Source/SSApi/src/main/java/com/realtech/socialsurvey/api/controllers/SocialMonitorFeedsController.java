@@ -56,7 +56,7 @@ public class SocialMonitorFeedsController {
 	}
 	
 
-    @RequestMapping ( value = "/showsocialfeeds", method = RequestMethod.GET)
+    @RequestMapping ( value = "/showsocialfeeds", method = RequestMethod.POST)
     @ApiOperation ( value = "Get Social posts for Social monitor", response = SocialMonitorResponseData.class)
     @ApiResponses ( value = { @ApiResponse ( code = 200, message = "Successfully fetched the list of social feeds") })
     public ResponseEntity<?> showStreamSocialPosts( int startIndex, int limit,
