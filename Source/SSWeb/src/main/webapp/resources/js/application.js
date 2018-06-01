@@ -17610,7 +17610,7 @@ function getStreamPosts(startIndex,status,flag,text){
 	
 	lastgetStreamPostRequestToDelete = $.ajax({
 		url : "/getsocialpostsforstream.do",
-		type : "GET",
+		type : "POST",
 		data: payload,
 		cache : false,
 		dataType : "json",

@@ -406,7 +406,7 @@ public class SocialMonitorWebController {
     }
     
     @ResponseBody
-    @RequestMapping ( value = "/getsocialpostsforstream", method = RequestMethod.GET)
+    @RequestMapping ( value = "/getsocialpostsforstream", method = RequestMethod.POST)
     public String getSocialPostsForStream(Model model, HttpServletRequest request) {
     	
         LOG.info( "Method to fetch Social Posts for Social Monitor Stream,  getSocialPostsForStream() Started" );

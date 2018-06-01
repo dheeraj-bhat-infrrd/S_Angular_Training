@@ -225,7 +225,7 @@ public interface SSApiIntegration
     @POST("/v1/companies/{companyId}/keywords")
     public Response addKeywordsToCompany(@Path ( "companyId") long companyId, @Body List<Keyword> keywordsRequest);
     
-	@GET("/v1/showsocialfeeds")
+	@POST("/v1/showsocialfeeds")
 	public Response showStreamSocialPosts(@Query("startIndex") int startIndex, @Query("limit") int limit,
 			@Query("status") String status, @Query("flag") boolean flag, @Query("feedtype") List<String> feedtype,
 			@Query("companyId") Long companyId, @Query("regionIds") List<Long> regionIds,
