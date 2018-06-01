@@ -62,6 +62,7 @@ import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.dao.impl.MongoSurveyDetailsDaoImpl;
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AgentMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
@@ -2982,6 +2983,52 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             solrSearchService.updateReviewCountOfUserInSolr( fromUser );
         }
         LOG.debug( "Method to move surveys from one user to another user,moveSurveysToAnotherUser() call ended" );
+    }
+
+
+    @Override
+    @Transactional
+    public void moveSurveyBetweenUsers( long surveyPreinitiationId, long toUserId )
+        throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        if ( surveyPreinitiationId <= 0 ) {
+            LOG.error( "Invalid from user id passed as parameter" );
+            throw new InvalidInputException( "Invalid from user id passed as parameter" );
+        }
+        if ( toUserId <= 0 ) {
+            LOG.error( "Invalid to user id passed as parameter" );
+            throw new InvalidInputException( "Invalid to user id passed as parameter" );
+        }
+        try {
+            User toUser = userManagementService.getUserByUserId( toUserId );
+            UserProfile toUserProfile = getUserProfileWhereAgentForUser( toUser );
+            long fromUserId = getAgentIdFromSurveyPreInitiation( surveyPreinitiationId );
+            // replace agent id in Survey Pre Initiation
+            surveyPreInitiationDao.updateAgentInfoOfPreInitiatedSurvey( surveyPreinitiationId, toUser );
+            /// replace agent id in Details
+            surveyDetailsDao.updateAgentInfoInSurveyBySPI( surveyPreinitiationId, toUser, toUserProfile );
+
+            LOG.debug( "Updating review count of user :{} ", toUserId );
+            solrSearchService.updateReviewCountOfUserInSolr( toUser );
+            if ( fromUserId != 0 ) {
+                LOG.debug( "Updating review count of user :{} ", fromUserId );
+                User fromUser = userManagementService.getUserByUserId( fromUserId );
+                solrSearchService.updateReviewCountOfUserInSolr( fromUser );
+            }
+        } catch ( InvalidInputException e ) {
+            throw new NoRecordsFetchedException( "Either user or survey could not be found" );
+        }
+
+    }
+
+
+    private long getAgentIdFromSurveyPreInitiation( long surveyPreinitiationId )
+    {
+        SurveyDetails survey = surveyDetailsDao.getsurveyFromSurveyPreinitiationId( surveyPreinitiationId );
+        if ( survey != null ) {
+            return survey.getAgentId();
+        }
+        return 0;
     }
 
 
