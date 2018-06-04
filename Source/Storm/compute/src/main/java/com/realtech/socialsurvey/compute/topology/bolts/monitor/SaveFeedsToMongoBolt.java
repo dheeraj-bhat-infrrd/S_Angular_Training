@@ -50,15 +50,17 @@ public class SaveFeedsToMongoBolt extends BaseComputeBoltWithAck
                 addSocialPostToMongo(socialPost);
                 isSuccess = true;
                 _collector.emit("RETRY_STREAM", input, new Values(isSuccess, socialPost));
-            } catch (MongoSaveException duplicateKeyException) {
+            } catch (MongoSaveException ex) {
                 if(socialPost.isRetried()) {
-                    LOG.info("Social post having postId = {} was already saved in mongo.But duplicateCount not updated.", postId);
+                    LOG.warn("Social post having postId = {} was already saved in mongo.But duplicateCount not updated.", postId);
                     isSuccess = true;
-                } else
-                    LOG.warn("Duplicate post with postId {} !!! Hence not saving to mongo", postId);
+                } else {
+                    LOG.warn("Post with postId {} could not get saved to mongo", postId);
+                }
+                LOG.error("Exception occurred", ex );
             } catch (IOException | APIIntegrationException e) {
                 //save the feed into mongo as temporary exception if it happened for first time
-                LOG.error("Exception occured", e.getMessage());
+                LOG.error("Exception occurred", e);
                 if(!socialPost.isRetried()){
                     FailedMessagesService failedMessagesService = new FailedMessagesServiceImpl();
                     failedMessagesService.insertTemporaryFailedSocialPost(socialPost);

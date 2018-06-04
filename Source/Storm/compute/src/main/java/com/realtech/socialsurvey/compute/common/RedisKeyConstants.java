@@ -26,4 +26,6 @@ public class RedisKeyConstants
     public static final String SOCIAL_MONITOR_COMPANYIDS = "socialMonitorEnabledCompanyIds";
     public static final String COMPANYIDS = "companyIds";
 
+    public static final String WAIT_FOR_NEXT_FETCH_TIME = "waitForNextFetchTime";
+
 }

@@ -407,5 +407,25 @@ public interface ReportingDashboardManagement
      * @throws NoRecordsFetchedException
      */
     public boolean isSocialMonitorEnabled( long companyId ) throws InvalidInputException, NoRecordsFetchedException;
+    
+    /**
+     * Method to get recent activity list for Social Monitor
+     * @param entityId
+     * @param entityType
+     * @param startIndex
+     * @param batchSize
+     * @return
+     * @throws InvalidInputException
+     */
+    public List<List<Object>> getRecentActivityListForSocialMonitor( Long entityId, String entityType, int startIndex, int batchSize )
+        throws InvalidInputException;
+    
+    /**
+     * Method to get count of recent activity list for Social Monitor
+     * @param entityId
+     * @param entityType
+     * @return
+     */
+    public Long getRecentActivityCountForSocialMonitor( Long entityId, String entityType );
 
 }
