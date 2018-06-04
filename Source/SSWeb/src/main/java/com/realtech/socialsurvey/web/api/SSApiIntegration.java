@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.web.api;
 
 import com.realtech.socialsurvey.core.entities.Keyword;
 import com.realtech.socialsurvey.core.entities.MultiplePhrasesVO;
+import com.realtech.socialsurvey.core.entities.SocialFeedFilter;
 import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
 import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
@@ -225,12 +226,8 @@ public interface SSApiIntegration
     @POST("/v1/companies/{companyId}/keywords")
     public Response addKeywordsToCompany(@Path ( "companyId") long companyId, @Body List<Keyword> keywordsRequest);
     
-    @FormUrlEncoded
-	@POST("/v1/showsocialfeeds")
-	public Response showStreamSocialPosts(@Field("startIndex") int startIndex, @Field("limit") int limit,
-	    @Field("status") String status, @Field("flag") boolean flag, @Field("feedtype") List<String> feedtype,
-	    @Field("companyId") Long companyId, @Field("regionIds") List<Long> regionIds,
-	    @Field("branchIds") List<Long> branchIds, @Field("agentIds") List<Long> agentIds, @Field("searchText") String searchText,@Field("isCompanySet") boolean isCompanySet, @Header("authorizationHeader") String authorizationHeader);
+    @POST("/v1/showsocialfeeds")
+    public Response showStreamSocialPosts(@Body SocialFeedFilter socialFeedFilter, @Header("authorizationHeader") String authorizationHeader);
     
     @PUT( "/v1/updatesocialfeeds/action")
     public Response saveSocialFeedsForAction(@Body SocialFeedsActionUpdate socialFeedsActionUpdate,

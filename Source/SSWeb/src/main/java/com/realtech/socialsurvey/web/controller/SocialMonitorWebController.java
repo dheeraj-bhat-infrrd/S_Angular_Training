@@ -475,8 +475,22 @@ public class SocialMonitorWebController {
        
        String authorizationHeader = "Basic " + authHeader;
        
-       Response response = ssApiIntergrationBuilder.getIntegrationApi().showStreamSocialPosts(startIndex, batchSize, status, flag, feedType, companyId, regionIds, branchIds, agentIds,text,isCompanySet, authorizationHeader);
-        		
+       SocialFeedFilter filter = new SocialFeedFilter();
+       
+       filter.setStartIndex( startIndex );
+       filter.setLimit( batchSize );
+       filter.setStatus( status );
+       filter.setFlag( flag );
+       filter.setFeedtype( feedType );
+       filter.setCompanyId( companyId );
+       filter.setRegionIds( regionIds );
+       filter.setBranchIds( branchIds );
+       filter.setAgentIds( agentIds );
+       filter.setSearchText( text );
+       filter.setCompanySet( isCompanySet );
+       
+       Response response = ssApiIntergrationBuilder.getIntegrationApi().showStreamSocialPosts(filter, authorizationHeader);
+       
         return new String( ( (TypedByteArray) response.getBody() ).getBytes(),Charset.forName("UTF-8") );
        
     }

@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.realtech.socialsurvey.api.exceptions.SSApiException;
 import com.realtech.socialsurvey.core.entities.SegmentsVO;
 import com.realtech.socialsurvey.core.entities.SocialFeedActionResponse;
+import com.realtech.socialsurvey.core.entities.SocialFeedFilter;
 import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
 import com.realtech.socialsurvey.core.entities.SocialMonitorFeedTypeVO;
 import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
@@ -59,14 +60,7 @@ public class SocialMonitorFeedsController {
     @RequestMapping ( value = "/showsocialfeeds", method = RequestMethod.POST)
     @ApiOperation ( value = "Get Social posts for Social monitor", response = SocialMonitorResponseData.class)
     @ApiResponses ( value = { @ApiResponse ( code = 200, message = "Successfully fetched the list of social feeds") })
-    public ResponseEntity<?> showStreamSocialPosts( int startIndex, int limit,
-        @RequestParam ( value = "status", required = false) String status,
-        @RequestParam ( value = "flag", required = false) boolean flag, @RequestParam List<String> feedtype,
-        @RequestParam ( value = "companyId", required = false) Long companyId,
-        @RequestParam ( value = "regionIds", required = false) List<Long> regionIds,
-        @RequestParam ( value = "branchIds", required = false) List<Long> branchIds,
-        @RequestParam ( value = "agentIds", required = false) List<Long> agentIds,
-        @RequestParam ( value = "searchText", required = false) String searchText, boolean isCompanySet,
+    public ResponseEntity<?> showStreamSocialPosts( @RequestBody SocialFeedFilter socialFeedFilter, 
         @RequestHeader ( "authorizationHeader") String authorizationHeader ) throws InvalidInputException, SSApiException
     {
 		LOGGER.info("Fetching the list of Social posts for social monitor");
@@ -74,8 +68,8 @@ public class SocialMonitorFeedsController {
 		try {
 		    adminAuthenticationService.validateAuthHeader( authorizationHeader );
             try {
-                socialMonitorResponseData = socialFeedService.getAllSocialPosts(startIndex, limit, status, flag, feedtype,
-                        companyId, regionIds, branchIds, agentIds, searchText, isCompanySet);
+                socialMonitorResponseData = socialFeedService.getAllSocialPosts(socialFeedFilter.getStartIndex(), socialFeedFilter.getLimit(), socialFeedFilter.getStatus(), socialFeedFilter.isFlag(), socialFeedFilter.getFeedtype(),
+                    socialFeedFilter.getCompanyId(), socialFeedFilter.getRegionIds(), socialFeedFilter.getBranchIds(), socialFeedFilter.getAgentIds(), socialFeedFilter.getSearchText(), socialFeedFilter.isCompanySet());
             } catch (InvalidInputException ie) {
                 LOGGER.error("Invalid input exception caught while fetching social feeds", ie);
                 throw new SSApiException("Invalid input exception caught while fetching social feeds", ie);
