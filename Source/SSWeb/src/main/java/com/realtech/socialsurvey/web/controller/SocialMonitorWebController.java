@@ -1,11 +1,11 @@
-                                    package com.realtech.socialsurvey.web.controller;
-
+package com.realtech.socialsurvey.web.controller;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.*;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.enums.SocialFeedStatus;
 import com.realtech.socialsurvey.core.enums.TextActionType;
+import com.realtech.socialsurvey.core.services.reportingmanagement.ReportingDashboardManagement;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.api.builder.SSApiIntergrationBuilder;
@@ -23,6 +23,8 @@ import retrofit.client.Response;
 import retrofit.mime.TypedByteArray;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -60,6 +62,13 @@ public class SocialMonitorWebController {
     @Autowired
     private SSApiIntergrationBuilder ssApiIntergrationBuilder;
     
+    private ReportingDashboardManagement reportingDashboardManagement;
+    
+    @Autowired
+    public void setReportingDashboardManagement( ReportingDashboardManagement reportingDashboardManagement )
+    {
+        this.reportingDashboardManagement = reportingDashboardManagement;
+    }
     /*
      * Web API to return JSP name for social monitor web page (Add monitor page)
      */
@@ -757,5 +766,47 @@ public class SocialMonitorWebController {
         
         return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
     }
+    
+    @ResponseBody
+    @RequestMapping ( value = "/fetchrecentactivitiesforsocialmonitor", method = RequestMethod.GET)
+    public String fetchRecentActivity( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Fetching Recent Activity for Social Monitor" );
+        HttpSession session = request.getSession( false );
+
+        int startIndex = 0;
+        int batchSize = 0;
+        String startIndexStr = request.getParameter( "startIndex" );
+        String batchSizeStr = request.getParameter( "batchSize" );
+        if ( startIndexStr != null && !startIndexStr.isEmpty() ) {
+            startIndex = Integer.parseInt( startIndexStr );
+        }
+        if ( batchSizeStr != null && !batchSizeStr.isEmpty() ) {
+            batchSize = Integer.parseInt( batchSizeStr );
+        }
+        
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        
+        LOG.debug( "Getting recent activity for Social Monitor for entity id {}, entity type {}, startIndex {} and barch size {}", entityId,
+            entityType, startIndex, batchSize );
+        Response response = ssApiIntergrationBuilder.getIntegrationApi().getRecentActivityForSocialMonitor(entityId, entityType, startIndex, batchSize);
+        return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+    }
+    
+    @ResponseBody
+    @RequestMapping ( value = "/fetchrecentactivitiescountforsocialmonitor")
+    public String getIncompleteSurveyCount( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method to get recent activity count for social monitor." );
+        HttpSession session = request.getSession( false );
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        LOG.debug( "Method to get recent activity count for social monitor for entityType {} and entityId {}", entityType, entityId );
+        long count = reportingDashboardManagement.getRecentActivityCountForSocialMonitor( entityId, entityType );
+        LOG.info( "Method to get recent activity count for social monitor finished." );
+        return String.valueOf( count );
+    }
+
 
 }

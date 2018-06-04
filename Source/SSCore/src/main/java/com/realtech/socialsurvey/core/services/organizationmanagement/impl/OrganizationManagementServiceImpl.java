@@ -159,6 +159,7 @@ import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsLocker
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.social.SocialMediaExceptionHandler;
+import com.realtech.socialsurvey.core.services.socialmonitor.feed.SocialFeedService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
@@ -393,6 +394,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Autowired
     private GenericDao<ProfilesMaster, Integer> profilesMasterDao;
 
+    @Autowired
+    private SocialFeedService socialFeedService;
 
     /**
      * This method adds a new company and updates the same for current user and all its user
@@ -10303,9 +10306,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		// update the redis with the trusted sources
 		redisDao.addTruestedSources(companyId, companyTrustedSourcesToAdd);
 
+		//To update former posts to resolved for the given trusted source
+		socialFeedService.updateTrustedSourceForFormerLists(companyId,trustedSource);
+
 		return companyTrustedSourcesToAdd;
 	}
-
+ 
     //updating all agents of a particular company
     @Override
     public boolean updateEntitySettings( String entityType, long entityId, String flagToBeUpdated, String status )
@@ -10418,5 +10424,109 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
         return false;
     }
+    
+    @Override
+    public List<SocialMonitorTrustedSource> removeTrustedSourceToCompany( long companyId , String trustedSource ) throws InvalidInputException
+    {
+        LOG.debug("Get company settings for the companyId: {}", companyId);
+        OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
+                companyId, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+
+        if(StringUtils.isEmpty(trustedSource)) {
+            throw new InvalidInputException("Invalid parameter passed. trustedSource can't be empty ");
+        }
+        if(companySettings == null) {
+            throw new InvalidInputException("Invalid companyId passed. No company setting found for given companyId ");
+        }
+        
+        //get existing  trusted sources for company
+        List<SocialMonitorTrustedSource> companyTrustedSources = companySettings.getSocialMonitorTrustedSources();
+        if (companyTrustedSources == null || companyTrustedSources.isEmpty())
+            companyTrustedSources = new ArrayList<SocialMonitorTrustedSource>();
+
+        boolean doesNotExist = true;
+        //check if trusted source is already present
+        Iterator<SocialMonitorTrustedSource> currentTrustedSourceItr = companyTrustedSources.iterator();
+        while (currentTrustedSourceItr.hasNext()) {
+            SocialMonitorTrustedSource currentTrustedSource = currentTrustedSourceItr.next();
+            if (currentTrustedSource.getSource().equalsIgnoreCase(trustedSource.trim())
+                    && currentTrustedSource.getStatus() == CommonConstants.STATUS_ACTIVE) {
+                LOG.debug( "trusted source exists in the list" );
+                doesNotExist = false;
+                currentTrustedSourceItr.remove();
+
+            }
+        }
+        
+        //if trusted source doesn't exist in list through exception
+        if(doesNotExist) {
+            throw new InvalidInputException("Trusted source doesn't exist for given companyId ");
+        }
+        
+        // save updated companyTrustedSources in mongo settings
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+                MongoOrganizationUnitSettingDaoImpl.KEY_TRUSTED_SOURCES, companyTrustedSources, companySettings,
+                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+
+        //create trusted sources to save in redis
+        List<SocialMonitorTrustedSource> companyTrustedSourcesToAdd = new ArrayList<SocialMonitorTrustedSource>();
+        for (SocialMonitorTrustedSource socialMonitorTrustedSource : companyTrustedSources) {
+            if (socialMonitorTrustedSource.getStatus() == CommonConstants.STATUS_ACTIVE) {
+                companyTrustedSourcesToAdd.add(socialMonitorTrustedSource);
+            }
+        }
+        Collections.sort(companyTrustedSourcesToAdd, new TrustedSourceComparator());
+
+        // update the redis with the trusted sources
+        redisDao.addTruestedSources(companyId, companyTrustedSourcesToAdd);
+        return companyTrustedSourcesToAdd;
+    }
+
+
+	@Override
+	public boolean hasRegisteredForSummit(Long companyId) throws InvalidInputException {
+		 LOG.debug( "Method hasRegisteredForSummit called for companyId:" + companyId );
+	     if ( companyId < 0l ) {
+	    	LOG.error( "Invalid company id passed as argument " );
+	       	throw new InvalidInputException( "Invalid company id passed as argument " );
+	     }
+	
+	     return organizationUnitSettingsDao.hasRegisteredForSummit(companyId).hasRegisteredForSummit();
+	}
+
+
+	@Override
+	public void setHasRegisteredForSummit(Long companyId, boolean hasRegisteredForSummit) throws InvalidInputException {
+		 LOG.debug( "Method hasRegisteredForSummit called for companyId:" + companyId );
+	     if ( companyId < 0l ) {
+	    	LOG.error( "Invalid company id passed as argument " );
+	       	throw new InvalidInputException( "Invalid company id passed as argument " );
+	     }
+	     
+	     organizationUnitSettingsDao.updateHasRegisteredForSummit(companyId, hasRegisteredForSummit);
+	}
+	
+	@Override
+	public boolean isShowSummitPopup(Long companyId) throws InvalidInputException {
+		 LOG.debug( "Method isShowSummitPopup called for companyId:" + companyId );
+	     if ( companyId < 0l ) {
+	    	LOG.error( "Invalid company id passed as argument " );
+	       	throw new InvalidInputException( "Invalid company id passed as argument " );
+	     }
+	
+	     return organizationUnitSettingsDao.isShowSummitPopup(companyId).isShowSummitPopup();
+	}
+
+
+	@Override
+	public void setShowSummitPopup(Long companyId, boolean isShowSummitPopup) throws InvalidInputException {
+		 LOG.debug( "Method hasRegisteredForSummit called for companyId:" + companyId );
+	     if ( companyId < 0l ) {
+	    	LOG.error( "Invalid company id passed as argument " );
+	       	throw new InvalidInputException( "Invalid company id passed as argument " );
+	     }
+	     
+	     organizationUnitSettingsDao.updateShowSummitPopup(companyId, isShowSummitPopup);
+	}
 }
 

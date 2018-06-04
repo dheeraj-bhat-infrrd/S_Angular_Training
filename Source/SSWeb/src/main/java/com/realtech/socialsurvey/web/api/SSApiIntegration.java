@@ -226,11 +226,12 @@ public interface SSApiIntegration
     @POST("/v1/companies/{companyId}/keywords")
     public Response addKeywordsToCompany(@Path ( "companyId") long companyId, @Body List<Keyword> keywordsRequest);
     
+    @FormUrlEncoded
 	@POST("/v1/showsocialfeeds")
-	public Response showStreamSocialPosts(@Query("startIndex") int startIndex, @Query("limit") int limit,
-			@Query("status") String status, @Query("flag") boolean flag, @Query("feedtype") List<String> feedtype,
-			@Query("companyId") Long companyId, @Query("regionIds") List<Long> regionIds,
-			@Query("branchIds") List<Long> branchIds, @Query("agentIds") List<Long> agentIds, @Query("searchText") String searchText,@Query("isCompanySet") boolean isCompanySet, @Header("authorizationHeader") String authorizationHeader);
+	public Response showStreamSocialPosts(@Field("startIndex") int startIndex, @Field("limit") int limit,
+	    @Field("status") String status, @Field("flag") boolean flag, @Field("feedtype") List<String> feedtype,
+	    @Field("companyId") Long companyId, @Field("regionIds") List<Long> regionIds,
+	    @Field("branchIds") List<Long> branchIds, @Field("agentIds") List<Long> agentIds, @Field("searchText") String searchText,@Field("isCompanySet") boolean isCompanySet, @Header("authorizationHeader") String authorizationHeader);
     
     @PUT( "/v1/updatesocialfeeds/action")
     public Response saveSocialFeedsForAction(@Body SocialFeedsActionUpdate socialFeedsActionUpdate,
@@ -290,5 +291,11 @@ public interface SSApiIntegration
     
     @GET("/v1/getrecentactivityforsocialmonitorreporting")
     Response getRecentActivityForSocialMonitor(@Query ("entityId") Long entityId , @Query ("entityType") String entityType ,@Query ("startIndex") int startIndex , @Query ("batchSize") int batchSize);
+
+    @POST( "/v1/sethasregisteredforsummit" )
+    Response setHasRegisteredForSummit(@Query("companyId") Long companyId,@Query("hasRegisteredForSummit") boolean hasRegisteredForSummit);
+    
+    @POST( "/v1/setshowsummitpopup" )
+    Response setShowSummitPopup(@Query("companyId") Long companyId,@Query("isShowSummitPopup") boolean isShowSummitPopup);
     
 }

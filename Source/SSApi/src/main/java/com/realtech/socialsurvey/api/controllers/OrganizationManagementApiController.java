@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.api.controllers;
 
 
+import com.google.gson.Gson;
 import com.realtech.socialsurvey.api.exceptions.SSApiException;
 import com.realtech.socialsurvey.api.utils.RestUtils;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -46,6 +47,7 @@ public class OrganizationManagementApiController
     @Autowired
     private RestUtils restUtils;
 
+    private static final String AUTH_FAILED = "AUTHORIZATION FAILED";
 
     @RequestMapping ( value = "/updateabusivemail", method = RequestMethod.POST)
     @ApiOperation ( value = "Updating abusive mail settings")
@@ -187,5 +189,32 @@ public class OrganizationManagementApiController
         return restUtils.getRestResponseEntity( HttpStatus.OK, "Api to disable or enable agent edit in profile Successfully processed", null, null, request,
             companyId );
     }
-
+    
+    @RequestMapping ( value = "/sethasregisteredforsummit", method = RequestMethod.POST)
+    @ApiOperation ( value = "Set hasRegisteredForSummit")
+    public ResponseEntity<?> setHasRegisteredForSummit(long companyId, boolean hasRegisteredForSummit) throws SSApiException
+    {
+        try {
+            organizationManagementService.setHasRegisteredForSummit(companyId, hasRegisteredForSummit);
+            LOGGER.info( "setHasregisteredforsummit completed successfully" );
+            return new ResponseEntity<>( "Successfully updated", HttpStatus.OK );
+                
+        } catch ( NonFatalException e ) {
+            throw new SSApiException( e.getMessage(), e.getErrorCode() );
+        }
+    }
+    
+    @RequestMapping ( value = "/setshowsummitpopup", method = RequestMethod.POST)
+    @ApiOperation ( value = "Set IsShowSummitPopup")
+    public ResponseEntity<?> setShowSummitPopup(long companyId, boolean isShowSummitPopup) throws SSApiException
+    {
+        try {
+            organizationManagementService.setShowSummitPopup(companyId, isShowSummitPopup);
+            LOGGER.info( "setShowSummitPopup completed successfully" );
+            return new ResponseEntity<>( "Successfully updated", HttpStatus.OK );
+                
+        } catch ( NonFatalException e ) {
+            throw new SSApiException( e.getMessage(), e.getErrorCode() );
+        }
+    }
 }

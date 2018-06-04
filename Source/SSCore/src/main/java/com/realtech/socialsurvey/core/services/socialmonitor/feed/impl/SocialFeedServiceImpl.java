@@ -170,12 +170,13 @@ public class SocialFeedServiceImpl implements SocialFeedService
                     Collections.sort( socialResponseObject.getActionHistory(), new ActionHistoryComparator() );
                 }
                 socialMonitorFeedData.setActionHistory( socialResponseObject.getActionHistory() );
-                socialMonitorFeedData.setUpdatedOn( socialResponseObject.getUpdatedTime() );
+                socialMonitorFeedData.setUpdatedOn( socialResponseObject.getCreatedTime() );
                 socialMonitorFeedData.setFoundKeywords( socialResponseObject.getFoundKeywords() );
                 socialMonitorFeedData.setDuplicateCount( socialResponseObject.getDuplicateCount() );
                 socialMonitorFeedData.setPageLink( socialResponseObject.getPageLink() );
                 socialMonitorFeedData.setPostLink( socialResponseObject.getPostLink() );
-                
+                socialMonitorFeedData.setFromTrustedSource(socialResponseObject.isFromTrustedSource());
+                socialMonitorFeedData.setPostSource(socialResponseObject.getPostSource());
                 if(StringUtils.isNotEmpty( socialResponseObject.getTextHighlighted() )){
                     socialMonitorFeedData.setTextHighlighted( socialResponseObject.getTextHighlighted() );
                 } else {
@@ -337,6 +338,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
                     actionHistory.setText( socialFeedsActionUpdate.getText() );
                     actionHistory.setOwnerName( socialFeedsActionUpdate.getUserName() );
                     actionHistory.setCreatedDate( new Date().getTime() );
+                    socialResponseObject.setUpdatedTime( new Date().getTime() );
                     actionHistories.add( actionHistory );
                 }
                 if ( ( socialFeedsActionUpdate.getTextActionType().toString()
@@ -347,6 +349,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
                     actionHistory.setText( socialFeedsActionUpdate.getText() );
                     actionHistory.setOwnerName( socialFeedsActionUpdate.getUserName() );
                     actionHistory.setCreatedDate( new Date().getTime() );
+                    socialResponseObject.setUpdatedTime( new Date().getTime() );
                     actionHistories.add( actionHistory );
                     // send mail to the user
                     try {
@@ -802,6 +805,26 @@ public class SocialFeedServiceImpl implements SocialFeedService
     public boolean moveDocumentToArchiveCollection()
     {
         return mongoSocialFeedDao.moveDocumentToArchiveCollection(archiveSocialFeedBeforeDays);
+    }
+    
+    private ActionHistory getTrustedSourceActionHistory( String source )
+    {
+        ActionHistory actionHistory = new ActionHistory();
+        actionHistory.setCreatedDate( new Date().getTime() );
+        actionHistory.setActionType( ActionHistoryType.RESOLVED );
+        actionHistory.setText( "The post was <b class='soc-mon-bold-text'>Resolved</b> for having source<b class='soc-mon-bold-text'>" + source + "</b>");
+        return actionHistory;
+    }
+    
+    @Override
+    public void updateTrustedSourceForFormerLists(long companyId, String trustedSource) throws InvalidInputException {
+        if(LOG.isDebugEnabled()){
+            LOG.debug( "Updating the new and escalated status to resolved for trusted source : {} for companyId : {} ",trustedSource,companyId ); 
+        }
+        //get the getTrustedSourceActionHistory use update.push
+        ActionHistory actionHistory = getTrustedSourceActionHistory( trustedSource );
+        mongoSocialFeedDao.updateForTrustedSource( companyId, trustedSource, actionHistory );
+        
     }
 } 
 

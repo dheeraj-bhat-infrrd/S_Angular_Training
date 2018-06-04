@@ -1740,5 +1740,23 @@ public interface OrganizationManagementService
     void updateAgentsProfileDisable( List<Long> agentId, boolean isAgentProfileDisabled ) throws InvalidInputException;
     
     public boolean isSocialMonitorAdmin(Long agentId) throws InvalidInputException;
+    
+    public boolean hasRegisteredForSummit(Long companyId) throws InvalidInputException;
+    
+    public void setHasRegisteredForSummit(Long companyId, boolean isShowSummitPopup) throws InvalidInputException;
+
+	boolean isShowSummitPopup(Long companyId) throws InvalidInputException;
+
+	void setShowSummitPopup(Long companyId, boolean isShowSummitPopup) throws InvalidInputException;
+
+
+    /**
+     * @param companyId
+     * @param trustedSource
+     * @return
+     * @throws InvalidInputException
+     */
+    public List<SocialMonitorTrustedSource> removeTrustedSourceToCompany( long companyId, String trustedSource )
+        throws InvalidInputException;
 
 }

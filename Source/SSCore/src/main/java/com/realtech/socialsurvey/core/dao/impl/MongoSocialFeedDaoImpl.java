@@ -5,6 +5,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.MongoSocialFeedDao;
 import com.realtech.socialsurvey.core.entities.*;
 import com.realtech.socialsurvey.core.enums.ProfileType;
+import com.realtech.socialsurvey.core.enums.SocialFeedStatus;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -61,6 +62,9 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
     private static final String UPDATED_TIME = "updatedTime";
     public static final String CREATED_TIME = "createdTime";
     public static final String FOUND_KEYWORDS = "foundKeywords";
+    private static final String FROM_TRUSTED_SOURCE = "fromTrustedSource";
+    private static final String POST_SOURCE="postSource";
+    
 
 
     @Override
@@ -111,14 +115,13 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 		Update update = new Update();
 
 		if (updateFlag == 2) {
-		    update.set( UPDATED_TIME, socialResponseObject.getUpdatedTime() );
 			update.set(FLAGGED, socialFeedsActionUpdate.isFlagged());
 			
 		} else if (updateFlag == 3) {
-            update.set( UPDATED_TIME, socialResponseObject.getUpdatedTime() );
             update.set( FLAGGED, false );
             update.set( STATUS, socialFeedsActionUpdate.getStatus() );
 		}
+		update.set( UPDATED_TIME, socialResponseObject.getUpdatedTime() );
 		for (ActionHistory actionHistory : actionHistories) {
 			update.push(ACTION_HISTORY, actionHistory);
 			mongoTemplate.updateFirst(query, update, collectionName);
@@ -263,10 +266,8 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         }
 		query.addCriteria(criteria);
 		
-		// ignoring stream tab on social monitor
-		if (status != null || flag) {
-	        query.with(new Sort(Sort.Direction.DESC, UPDATED_TIME));
-		}
+		//Sort all posts
+        query.with( new Sort( Sort.Direction.DESC, UPDATED_TIME ) );
 		
 		if (startIndex > -1) {
 			query.skip(startIndex);
@@ -548,5 +549,21 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         calendar.set(Calendar.SECOND, 0);
         return calendar.getTime();
     }
+    
+    @Override
+    public long updateForTrustedSource(long companyId , String trustedSource , ActionHistory actionHistory) {
+        if(LOG.isDebugEnabled()){
+            LOG.debug("Fetching posts for trustedSource = {} and companyId = {}", trustedSource, companyId);
+        }
 
+            Query updateQuery = new Query().addCriteria( Criteria.where( COMPANY_ID ).is( companyId ) ).addCriteria( Criteria.where( POST_SOURCE ).is( trustedSource ) ).addCriteria( Criteria.where( STATUS ).in( SocialFeedStatus.NEW,SocialFeedStatus.ESCALATED ) );
+            Update update = new Update();
+            //update fromTrustedSource 
+            update.set(FROM_TRUSTED_SOURCE, true);
+            //update status to RESOLVED
+            update.set(STATUS, SocialFeedStatus.RESOLVED);
+            update.push( ACTION_HISTORY, actionHistory );
+            WriteResult result = mongoTemplate.updateMulti(updateQuery, update, SOCIAL_FEED_COLLECTION);
+            return result.getN();
+    }
 }
