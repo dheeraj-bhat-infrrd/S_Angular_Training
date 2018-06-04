@@ -4544,13 +4544,16 @@ function bindAdminCheckBoxClick() {
 			$('#admin-privilege-div').show();
 			$('#bd-assign-to').show();
 			
-			var assignTo = $("#assign-to-txt").attr("data-assignto");
-			if(assignTo == 'office' || assignTo == 'Office'){
-				$('#bd-office-selector').show();
-			}else if(assignTo == 'region' || assignTo == 'Region'){
-				$('#bd-region-selector').show();
+			if($(this).attr('type') == 'socialMonitorCheckbox'){
+				var assignTo = $("#assign-to-txt").attr("data-assignto");
+				if(assignTo == 'office' || assignTo == 'Office'){
+					$('#bd-office-selector').show();
+				}else if(assignTo == 'region' || assignTo == 'Region'){
+					$('#bd-region-selector').show();
+				}
+				showSelectorsByAssignToOption(assignTo);
 			}
-			showSelectorsByAssignToOption(assignTo);
+			
 		}
 		
 		if ($('#is-ignore').val() == "true") {
