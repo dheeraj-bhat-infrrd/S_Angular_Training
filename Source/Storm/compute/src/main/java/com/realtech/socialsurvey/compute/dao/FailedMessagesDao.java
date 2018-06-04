@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.compute.dao;
 import com.realtech.socialsurvey.compute.entities.FailedEmailMessage;
 import com.realtech.socialsurvey.compute.entities.FailedReportRequest;
 import com.realtech.socialsurvey.compute.entities.FailedSocialPost;
+import com.realtech.socialsurvey.compute.entities.UnsavedUserEvent;
 
 
 /**
@@ -45,7 +46,7 @@ public interface FailedMessagesDao
      */
     int updatedFailedEmailMessageRetryCount(String randomUUID);
 
-    /**
+     /**
      * Deletes temporary failed social post
      * @param postId
      * @return
@@ -58,4 +59,11 @@ public interface FailedMessagesDao
      * @return
      */
     int updateFailedSocialPostRetryCount(String postId);
+
+    /**
+    * 
+    * @param unsavedEvent
+    * @return
+    */
+   public boolean insertUnsavedUserEvent( UnsavedUserEvent unsavedEvent );
 }

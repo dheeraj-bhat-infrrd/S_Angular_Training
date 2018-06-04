@@ -34,6 +34,9 @@ public class KafkaProducerConfig
     
 	@Value("${kafka.topic.batchTopic}" )
     private String batchTopic;
+	
+	@Value ( "${kafka.topic.userEventTopic}")
+    private String userEventTopic;
 
     @Bean
     public ProducerFactory<String, String> producerFactory()
@@ -106,6 +109,19 @@ public class KafkaProducerConfig
         KafkaTemplate<String, String> kafkaTemplate = new KafkaTemplate<>( producerFactory() );
         kafkaTemplate.setMessageConverter( new StringJsonMessageConverter() );
         kafkaTemplate.setDefaultTopic(batchTopic);
+        return kafkaTemplate;
+    }
+    
+    
+    /**
+     * Kafka template for capturing user event originated from the browser
+     * @return
+     */
+    @Bean(name = "userEventTemplate")
+    public KafkaTemplate<String, String> kafkaUserEventTemplate(){
+        KafkaTemplate<String, String> kafkaTemplate = new KafkaTemplate<>( producerFactory() );
+        kafkaTemplate.setMessageConverter( new StringJsonMessageConverter() );
+        kafkaTemplate.setDefaultTopic( userEventTopic );
         return kafkaTemplate;
     }
 }

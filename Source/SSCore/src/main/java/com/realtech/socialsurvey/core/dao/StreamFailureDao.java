@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.realtech.socialsurvey.core.entities.EmailEntity;
 import com.realtech.socialsurvey.core.entities.SendGridEventEntity;
+import com.realtech.socialsurvey.core.entities.UserEvent;
 
 /**
  * Handles stream failure messages
@@ -44,4 +45,11 @@ public interface StreamFailureDao
 	 * @param updatedValue
 	 */
 	public void updateRetryFailedForStreamMsg(String id, boolean updatedValue);
+
+	/**
+	 * 
+	 * @param userEvent
+	 * @return
+	 */
+    public boolean saveFailedUserEvent( UserEvent userEvent );
 }

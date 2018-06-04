@@ -6,6 +6,7 @@ import com.realtech.socialsurvey.core.entities.MultiplePhrasesVO;
 import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
 import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
+import com.realtech.socialsurvey.core.entities.UserEvent;
 import com.realtech.socialsurvey.web.api.entities.AccountRegistrationAPIRequest;
 import com.realtech.socialsurvey.web.api.entities.CaptchaAPIRequest;
 import com.realtech.socialsurvey.web.api.entities.VendastaRmCreateRequest;

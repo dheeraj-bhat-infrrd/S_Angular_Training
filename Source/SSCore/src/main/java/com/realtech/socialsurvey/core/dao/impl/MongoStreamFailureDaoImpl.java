@@ -1,9 +1,5 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
-import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.entities.SendGridEventEntity;
-import com.realtech.socialsurvey.core.entities.SurveyDetails;
-
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -15,9 +11,11 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.StreamFailureDao;
 import com.realtech.socialsurvey.core.entities.EmailEntity;
-import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.SendGridEventEntity;
+import com.realtech.socialsurvey.core.entities.UserEvent;
 
 /**
  * Records failed stream messages in mongo collection 'FAILED_STREAM_MESSAGES'
@@ -32,8 +30,11 @@ public class MongoStreamFailureDaoImpl implements StreamFailureDao
     
     private static final String FAILED_STREAM_MESSAGES_COLLECTION = "FAILED_STREAM_MESSAGES";
     private static final String FAILED_CLICK_EVENTS_COLLECTION = CommonConstants.FAILED_CLICK_EVENTS_COLLECTION;
+    private static final String FAILED_USER_EVENT_COLLECTION = "FAILED_USER_EVENT";
+    
     
     private static final String KEY_STREAM_RETRY_FAILED = "streamRetryFailed";
+    
     
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -100,5 +101,15 @@ public class MongoStreamFailureDaoImpl implements StreamFailureDao
          mongoTemplate.updateFirst( query, update, EmailEntity.class, FAILED_STREAM_MESSAGES_COLLECTION );
          LOG.debug( "Updated the unit setting" );
     	
+    }
+
+    @Override
+    public boolean saveFailedUserEvent( UserEvent userEvent )
+    {
+        LOG.debug( "Inserting failed user event" );
+        LOG.trace( "Inserting user event into failed messages {}", userEvent );
+        mongoTemplate.insert( userEvent, FAILED_USER_EVENT_COLLECTION );
+        LOG.debug( "Inserted failed used event" );
+        return true;
     }
 }
