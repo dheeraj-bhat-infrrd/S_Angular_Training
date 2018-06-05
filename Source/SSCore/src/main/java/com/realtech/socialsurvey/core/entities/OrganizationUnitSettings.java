@@ -881,21 +881,7 @@ public class OrganizationUnitSettings implements Serializable
     {
         return isSocialMonitorEnabled;
     }
-
-
-    public void setSocialMonitorEnabled( boolean isSocialMonitorEnabled )
-    {
-        this.isSocialMonitorEnabled = isSocialMonitorEnabled;
-    }
-
-
-    public List<SocialMonitorTrustedSource> getSocialMonitorTrustedSources() {
-		return socialMonitorTrustedSources;
-	}
-
-
-	public void setSocialMonitorTrustedSources(List<SocialMonitorTrustedSource> socialMonitorTrustedSources) {
-		this.socialMonitorTrustedSources = socialMonitorTrustedSources;
+	
 
     public void setSocialMonitorEnabled( boolean isSocialMonitorEnabled )
     {
@@ -911,9 +897,6 @@ public class OrganizationUnitSettings implements Serializable
 	public void setSocialMonitorTrustedSources(List<SocialMonitorTrustedSource> socialMonitorTrustedSources) {
 		this.socialMonitorTrustedSources = socialMonitorTrustedSources;
 	}
-
-
-
 
     public boolean getIsCopyToClipboard()
     {
