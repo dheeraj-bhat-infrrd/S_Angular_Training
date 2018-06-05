@@ -106,6 +106,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_TRUSTED_SOURCES = "socialMonitorTrustedSources";
     
     public static final String KEY_IS_LOGIN_PREVENTED = "isLoginPrevented";
+    public static final String KEY_IS_COPY_TO_CLIPBOARD = "isCopyToClipboard";
     public static final String KEY_SEND_EMAIL_FROM_COMPANY = "sendEmailFromCompany";
     public static final String KEY_HIDE_FROM_BREAD_CRUMB = "hideFromBreadCrumb";
     public static final String KEY_ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA = "allowOverrideForSocialMedia";

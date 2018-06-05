@@ -10397,6 +10397,16 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
 
+
+    @Override
+    public void updateCopyToClipBoardSettings( long companyId, boolean updateCopyToClipBoardSetting )
+    {
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden(
+            MongoOrganizationUnitSettingDaoImpl.KEY_IS_COPY_TO_CLIPBOARD, updateCopyToClipBoardSetting, companyId,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        
+    }
+
     @Override
     public boolean isSocialMonitorAdmin( Long agentId ) throws InvalidInputException
     {
@@ -10529,4 +10539,3 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	     organizationUnitSettingsDao.updateShowSummitPopup(companyId, isShowSummitPopup);
 	}
 }
-

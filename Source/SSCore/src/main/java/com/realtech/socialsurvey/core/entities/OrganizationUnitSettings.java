@@ -73,7 +73,8 @@ public class OrganizationUnitSettings implements Serializable
     private Set<String> digestRecipients;
     private boolean includeForTransactionMonitor; // include a company to transaction monitor
     private String encryptedId;
-    
+    private boolean isCopyToClipboard;
+
     // vendasta product details 
     private VendastaProductSettings vendasta_rm_settings;
 
@@ -895,7 +896,35 @@ public class OrganizationUnitSettings implements Serializable
 
 	public void setSocialMonitorTrustedSources(List<SocialMonitorTrustedSource> socialMonitorTrustedSources) {
 		this.socialMonitorTrustedSources = socialMonitorTrustedSources;
+
+    public void setSocialMonitorEnabled( boolean isSocialMonitorEnabled )
+    {
+        this.isSocialMonitorEnabled = isSocialMonitorEnabled;
+    }
+
+
+    public List<SocialMonitorTrustedSource> getSocialMonitorTrustedSources() {
+		return socialMonitorTrustedSources;
 	}
+
+
+	public void setSocialMonitorTrustedSources(List<SocialMonitorTrustedSource> socialMonitorTrustedSources) {
+		this.socialMonitorTrustedSources = socialMonitorTrustedSources;
+	}
+
+
+
+
+    public boolean getIsCopyToClipboard()
+    {
+        return isCopyToClipboard;
+    }
+
+
+    public void setIsCopyToClipboard( boolean isCopyToClipboard )
+    {
+        this.isCopyToClipboard = isCopyToClipboard;
+    }
 
 
 	@Override
@@ -921,11 +950,14 @@ public class OrganizationUnitSettings implements Serializable
             + ", reviewSortCriteria=" + reviewSortCriteria + ", sendEmailThrough=" + sendEmailThrough + ", hideFromBreadCrumb="
             + hideFromBreadCrumb + ", hidePublicPage=" + hidePublicPage + ", digestRecipients=" + digestRecipients
             + ", includeForTransactionMonitor=" + includeForTransactionMonitor + ", encryptedId=" + encryptedId
-            + ", vendasta_rm_settings=" + vendasta_rm_settings + ", ranking_requirements=" + ranking_requirements
-            + ", contactUsEmailsRoutedToCompanyAdmin=" + contactUsEmailsRoutedToCompanyAdmin + ", sendMonthlyDigestMail="
-            + sendMonthlyDigestMail + ", filterKeywords=" + filterKeywords + ", socialMonitorMacros=" + socialMonitorMacros
-            + ", savedDigestRecords=" + savedDigestRecords + ", userAddDeleteNotificationRecipients="
-            + userAddDeleteNotificationRecipients + ", isSocialMonitorEnabled=" + isSocialMonitorEnabled
+            + ", isCopyToClipboard=" + isCopyToClipboard + ", vendasta_rm_settings=" + vendasta_rm_settings
+            + ", ranking_requirements=" + ranking_requirements + ", contactUsEmailsRoutedToCompanyAdmin="
+            + contactUsEmailsRoutedToCompanyAdmin + ", sendMonthlyDigestMail=" + sendMonthlyDigestMail + ", filterKeywords="
+            + filterKeywords + ", socialMonitorMacros=" + socialMonitorMacros + ", savedDigestRecords=" + savedDigestRecords
+            + ", userAddDeleteNotificationRecipients=" + userAddDeleteNotificationRecipients + ", isSocialMonitorEnabled="
+            + isSocialMonitorEnabled + ", socialMonitorTrustedSources=" + socialMonitorTrustedSources
+            + ", isAgentProfileDisabled=" + isAgentProfileDisabled + ", swearWords=" + Arrays.toString( swearWords )
+            + ", hasRegisteredForSummit=" + hasRegisteredForSummit + ", isShowSummitPopup=" + isShowSummitPopup
             + ", entityAlertDetails=" + entityAlertDetails + "]";
     }
 

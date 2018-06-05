@@ -1792,6 +1792,9 @@ public class SurveyManagementController
 		surveyAndStage.put("hiddenSection", companySettings.isHiddenSection());
 		surveyAndStage.put("companyName", user.getCompany().getCompany());
 		surveyAndStage.put("companyId", companySettings.getIden());
+		if(companySettings != null) {
+		    surveyAndStage.put("copyToClipBoard", companySettings.getIsCopyToClipboard());
+		}
 
 		LOG.info("Method getSurvey finished.");
 		return surveyAndStage;

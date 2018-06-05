@@ -6384,6 +6384,28 @@ function updateUpdateTransactionMonitorForCompany(updateTransactionMonitorSettin
 	
 }
 
+function updateCopyToClipBoardSettings(updateCopyToClipBoardSetting, disableEle) {
+	var payload = {
+		"updateCopyToClipBoardSetting" : updateCopyToClipBoardSetting
+	};
+	
+	callAjaxGetWithPayloadData("./updatecopytoclipboardsettings.do",function(data) {
+		if (data == "success"){
+			if ($('#copyto-clipboard-chk-box').hasClass('bd-check-img-checked')) {
+				$('#copyto-clipboard-chk-box').removeClass('bd-check-img-checked');
+			}	
+			else{
+				$('#copyto-clipboard-chk-box').addClass('bd-check-img-checked');
+			}
+			$('#overlay-toast').html("Content updated successfully");
+		}else{
+			$('#overlay-toast').html(data);
+		}
+		showToast();
+	}, payload, true, disableEle);
+	
+}
+
 
 function resetTextForMoodFlow(mood, resetId) {
 	var payload = {
@@ -7600,6 +7622,8 @@ function initSurveyWithUrl(q) {
 				surveyId = data.responseJSON.surveyId;
 				hiddenSection=data.responseJSON.hiddenSection;
 				companyName = data.responseJSON.companyName;
+				var copyToClipboard = data.responseJSON.copyToClipBoard;
+				$('#prof-container').attr('data-copy-to-clipboard',copyToClipboard);
 				companyId = data.responseJSON.companyId;
 				paintSurveyPage(data);
 				var message = $("#pst-srvy-div .bd-check-txt").html();
@@ -8167,7 +8191,10 @@ function showMasterQuestionPage() {
 		}
 		
 		// copy review text to clipboard
-		//copyToClipboard( feedback, "Your feedback has been copied to clipboard" );
+		var copyToClipBoard = $('#prof-container').attr('data-copy-to-clipboard');
+		if(copyToClipBoard == 'true'){
+			copyToClipboard( feedback, "Your feedback has been copied to clipboard" );
+		}		
 		
 		if( isAbusive == false ){
 			if (mood != 'Great') {
@@ -12602,6 +12629,14 @@ $('body').on('click', '#incld-fr-trans-mntr-chk-box', function() {
 		updateUpdateTransactionMonitorForCompany(true, '#incld-fr-trans-mntr-chk-box');
 	} else {
 		updateUpdateTransactionMonitorForCompany(false, '#incld-fr-trans-mntr-chk-box');
+	}
+});
+// Copy to clipboard check box action
+$('body').on('click', '#copyto-clipboard-chk-box', function() {
+	if ($('#copyto-clipboard-chk-box').hasClass('bd-check-img-checked')) {
+		updateCopyToClipBoardSettings(true, '#copyto-clipboard-chk-box');
+	} else {
+		updateCopyToClipBoardSettings(false, '#copyto-clipboard-chk-box');
 	}
 });
 
