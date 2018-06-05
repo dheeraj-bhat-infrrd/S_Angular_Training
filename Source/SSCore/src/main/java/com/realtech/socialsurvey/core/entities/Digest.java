@@ -27,6 +27,7 @@ public class Digest implements Serializable
     private long npsDetractors;
     private long npsPassives;
     private boolean isDigestRecordNull;
+    private boolean hasZeroUserCount;
 
 
     public String getProfileLevel()
@@ -269,6 +270,18 @@ public class Digest implements Serializable
     }
 
 
+    public boolean getHasZeroUserCount()
+    {
+        return hasZeroUserCount;
+    }
+
+
+    public void setHasZeroUserCount( boolean hasZeroUserCount )
+    {
+        this.hasZeroUserCount = hasZeroUserCount;
+    }
+
+
     @Override
     public String toString()
     {
@@ -278,6 +291,6 @@ public class Digest implements Serializable
             + ", surveyCompletionRate=" + surveyCompletionRate + ", sps=" + sps + ", promoters=" + promoters + ", detractors="
             + detractors + ", passives=" + passives + ", totalCompletedReviews=" + totalCompletedReviews + ", nps=" + nps
             + ", npsPromoters=" + npsPromoters + ", npsDetractors=" + npsDetractors + ", npsPassives=" + npsPassives
-            + ", isDigestRecordNull=" + isDigestRecordNull + "]";
+            + ", isDigestRecordNull=" + isDigestRecordNull + ", hasZeroUserCount=" + hasZeroUserCount + "]";
     }
 }

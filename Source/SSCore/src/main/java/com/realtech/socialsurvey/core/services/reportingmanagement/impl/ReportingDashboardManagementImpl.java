@@ -38,7 +38,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -172,8 +171,8 @@ import com.realtech.socialsurvey.core.services.reportingmanagement.OverviewManag
 import com.realtech.socialsurvey.core.services.reportingmanagement.ReportingDashboardManagement;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.utils.CommonUtils;
-import com.realtech.socialsurvey.core.vo.SurveyTransactionReportVO;
 import com.realtech.socialsurvey.core.vo.SurveyInvitationEmailCountVO;
+import com.realtech.socialsurvey.core.vo.SurveyTransactionReportVO;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookData;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookOperations;
 
@@ -3444,17 +3443,23 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
 
 
         boolean hasDigestData = false;
+        boolean hasUserCountData = false; 
 
         for ( int i = 0; i < digestList.size(); i++ ) {
-            if ( !digestList.get( i ).isDigestRecordNull() && i != ( digestList.size() - 1 ) ) {
-                hasDigestData = true;
-                break;
+            if (  i != ( digestList.size() - 1 ) ) {
+                if( !digestList.get( i ).isDigestRecordNull() )
+                    hasDigestData = true;
+                if( !digestList.get( i ).getHasZeroUserCount() )
+                    hasUserCountData = true;
+                if( hasDigestData && hasUserCountData )
+                    break;
             }
         }
 
-        if ( !hasDigestData ) {
-            digestAggregate.setDigestDataAbsent( true );
-        } else {
+        digestAggregate.setDigestDataAbsent( hasDigestData ? false : true );
+        digestAggregate.setUserCountDataAbsent( hasUserCountData ? false : true );
+        
+        if ( hasDigestData || hasUserCountData ) {
 
             // set NPS flag
             digestAggregate.setHavingNpsSection( checkForNpsQuestion( profileLevel, entityId ) );
@@ -3977,16 +3982,17 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
                         MonthlyDigestAggregate digestAggregate = getMonthlyDigestAggregateForAHierarchy( digestRequest, month,
                             year );
 
+                        // save the copy of digest generated for further use
+                        if( !digestAggregate.isDigestDataAbsent() || !digestAggregate.isUserCountDataAbsent() ) {
+                            constructAndSaveDigestCopy( digestAggregate );
+                        }
+                        
                         // check is digest data exists
                         if ( digestAggregate.isDigestDataAbsent() ) {
                             LOG.info( "Digest data for {} : {} is not present, Aborting", digestAggregate.getProfileLevel(),
                                 digestAggregate.getEntityName() );
                             continue;
                         }
-
-
-                        // save the copy of digest generated for further use
-                        constructAndSaveDigestCopy( digestAggregate );
 
                         processRecipients( digestAggregate, digestRequest );
 
