@@ -69,18 +69,17 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
 					post.getActionHistory().add(getFlaggedActionHistory(foundKeyWords));
 					addTextHighlight(post);
 				}
-				
-				// check if post from trusted source
-				if (isPostFromTrustedSource(post, companyId)) {
-					post.setStatus(SocialFeedStatus.RESOLVED);		
-					post.setFromTrustedSource(true);
-					post.getActionHistory().add(getTrustedSourceActionHistory(post.getPostSource())); 
-				} else {
-					post.setStatus(SocialFeedStatus.NEW);
-					post.setFromTrustedSource(false);
-				}
 			}
-
+			
+			// check if post from trusted source
+            if (isPostFromTrustedSource(post, companyId)) {
+                post.setStatus(SocialFeedStatus.RESOLVED);      
+                post.setFromTrustedSource(true);
+                post.getActionHistory().add(getTrustedSourceActionHistory(post.getPostSource())); 
+            } else {
+                post.setStatus(SocialFeedStatus.NEW);
+                post.setFromTrustedSource(false);
+            }
 		}
 		LOG.debug("Emitting tuple with post having postId = {}", postId);
 		_collector.emit(input, Arrays.asList(companyId, post, socialResponseType));
