@@ -402,6 +402,12 @@ public class DigestMailHelper
         // top ten ranked users HTML
         messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getUserRankingHtmlSection() ) );
 
+        // newsletter footer
+        if( justSaveCopy ) {
+            messageBodyReplacementsList.add( getDefaultFooter() );
+        } else {
+            messageBodyReplacementsList.add( getNewsLetterFooter() );
+        }
 
         // generate digest email disclaimer when needed
         if ( !justSaveCopy && StringUtils.isNotEmpty( digestRecipient ) ) {
@@ -468,6 +474,18 @@ public class DigestMailHelper
             digest = digest.replaceFirst( "%s", Matcher.quoteReplacement( replacement ) );
         }
         return digest;
+    }
+    
+    private String getNewsLetterFooter() {
+        return "<table width=\"100%\" bgcolor=\"#FFFFFF\" cellspacing=\"0\" cellpadding=\"0\"><tbody>" + 
+            "<tr> <td height=\"40\" style=\"font-size:0;line-height:0;\"></td></tr>" + 
+            "<tr> <td height=\"40\" style=\"text-align:  center;font-size: 16px;\">" + 
+            "<span>To stay updated with latest happenings at SocialSurvey, checkout our Wow newsletter <a href=\"https://www.socialsurvey.com/newsletter\">https://www.socialsurvey.com/newsletter</a><a></a></span></td></tr>" + 
+            "<tr> <td height=\"40\" style=\"font-size:0;line-height:0;\"></td></tr></tbody></table>";
+    }
+    
+    private String getDefaultFooter() {
+        return "<td height=\"80\" style=\"font-size:0;line-height:0;\"></td>";
     }
 
 }
