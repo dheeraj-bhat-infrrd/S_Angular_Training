@@ -3476,7 +3476,7 @@ public class OrganizationManagementController
         String emailAddress = request.getParameter( "emailAddress" );
         String agentIdStr = request.getParameter( "agentId" );
         String ignoredEmailStr = request.getParameter( "ignoredEmail" );
-
+        LOG.info( "Method to saveUserEmailMapping for transientEmail: {} , agentId: {} , ignoreEmailFlag: {}",emailAddress,agentIdStr,ignoredEmailStr );
         try {
             boolean ignoredEmail;
             long agentId;
