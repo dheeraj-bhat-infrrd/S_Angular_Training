@@ -402,12 +402,9 @@ public class DigestMailHelper
         // top ten ranked users HTML
         messageBodyReplacementsList.add( StringUtils.defaultString( digestAggregate.getUserRankingHtmlSection() ) );
 
-        // newsletter footer
-        if( justSaveCopy ) {
-            messageBodyReplacementsList.add( getDefaultFooter() );
-        } else {
-            messageBodyReplacementsList.add( getNewsLetterFooter() );
-        }
+        // newsletter footer ( replacing default footer, 05-06-2018 )
+        messageBodyReplacementsList.add( getNewsLetterFooter() );
+        
 
         // generate digest email disclaimer when needed
         if ( !justSaveCopy && StringUtils.isNotEmpty( digestRecipient ) ) {
