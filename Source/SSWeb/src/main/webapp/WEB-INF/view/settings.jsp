@@ -132,6 +132,12 @@
 									<input type="hidden" id="vndsta-access-cb" name="vendastaaccess" value="${vendastaAccess}">
 									<div class="float-left listing-access-txt cust-resp-txt" style="margin-bottom:0px;">Allow access to Listings Manager</div>
 								</c:if>
+								
+								<c:if test="${ columnName == 'companyId' }">
+									<div id="copyto-clipboard-chk-box" class="float-left bd-check-img clear-both"></div>
+									<input type="hidden" id="copyto-clipboard-cb" name="copytoclipboard" value="${copyToClipBoard}">
+									<div class="float-left listing-access-txt cust-resp-txt" style="margin-bottom:0px;">Copy review text to clip-board</div>
+								</c:if>
 
 								<c:if test="${ columnName == 'companyId' }">
 									<div id="soc-mon-access-chk-box" class="float-left bd-check-img clear-both"></div>
@@ -347,6 +353,9 @@ $(document).ready(function() {
 
 	if("${allowPartnerSurvey}" == "false" && "${isRealTechOrSSAdmin}" == "true"){
 		$('#alw-ptnr-srvy-chk-box').addClass('bd-check-img-checked');
+	}
+	if("${copyToClipBoard}" == "false"){
+		$('#copyto-clipboard-chk-box').addClass('bd-check-img-checked');
 	}
 	
 	if("${sendMonthlyDigestMail}" == "false"){

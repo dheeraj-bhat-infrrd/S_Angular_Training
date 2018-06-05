@@ -1759,4 +1759,7 @@ public interface OrganizationManagementService
     public List<SocialMonitorTrustedSource> removeTrustedSourceToCompany( long companyId, String trustedSource )
         throws InvalidInputException;
 
+
+    public void updateCopyToClipBoardSettings( long companyId, boolean updateCopyToClipBoardSetting );
+
 }

@@ -103,8 +103,6 @@ import com.realtech.socialsurvey.core.workbook.utils.WorkbookData;
 import com.realtech.socialsurvey.web.api.builder.SSApiIntergrationBuilder;
 import com.realtech.socialsurvey.web.common.JspResolver;
 
-import retrofit.client.Response;
-
 
 // JIRA: SS-24 BY RM02 BOC
 /**
@@ -838,6 +836,11 @@ public class OrganizationManagementController
             
             // add send monthly digest email flag
             model.addAttribute( "sendMonthlyDigestMail", unitSettings.isSendMonthlyDigestMail() );
+            model.addAttribute( "copyToClipBoard", unitSettings.getIsCopyToClipboard() );
+            
+            // add isSocialMonitorEnabled flag
+            model.addAttribute( "isSocialMonitorEnabled", unitSettings.isSocialMonitorEnabled() );
+            
             
             // add isSocialMonitorEnabled flag
             model.addAttribute( "isSocialMonitorEnabled", unitSettings.isSocialMonitorEnabled() );
@@ -2971,7 +2974,6 @@ public class OrganizationManagementController
 
         String message = "";
         User user = sessionHelper.getCurrentUser();
-        String mailIDStr = "";
        
 
         try {
@@ -4235,6 +4237,38 @@ public class OrganizationManagementController
     }
     
 
+    @RequestMapping ( value = "/updatecopytoclipboardsettings", method = RequestMethod.GET)
+    @ResponseBody
+    public String updateCopyToClipBoardSettings( HttpServletRequest request )
+    {
+        LOG.info( "Method to update updateTransactionMonitorSettingForCompany started" );
+
+        try {
+
+            HttpSession session = request.getSession();
+            long companyId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+
+            String updateCopyToClipBoardSettingStr = request.getParameter( "updateCopyToClipBoardSetting" );
+
+            boolean updateCopyToClipBoardSetting = Boolean.parseBoolean( updateCopyToClipBoardSettingStr );
+
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
+            if(companySettings == null){
+                throw new InvalidInputException("Wrong input passed. No company found for given id");
+            }
+           
+            organizationManagementService.updateCopyToClipBoardSettings( companyId, updateCopyToClipBoardSetting );
+
+
+        } catch ( Exception error ) {
+            LOG.error( "Exception occured in updateCopyToClipBoardSettings(). Nested exception is ", error );
+            return error.getMessage();
+        }
+
+        LOG.info( "Method to update copy to clipboard finished" );
+        return "success";
+    }
+    
     @RequestMapping ( value = "/enablesocialmonitortoggle", method = RequestMethod.POST)
     @ResponseBody
     public String enableSocialMonitorToggle( HttpServletRequest request )
