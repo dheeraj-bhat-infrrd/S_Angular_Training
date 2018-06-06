@@ -3983,11 +3983,7 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
                             year );
 
                         // save the copy of digest generated for further use
-<<<<<<< HEAD
-                        if( !digestAggregate.isUserCountDataAbsent() ) {
-=======
                         if( !digestAggregate.isDigestDataAbsent() || !digestAggregate.isUserCountDataAbsent() ) {
->>>>>>> upstream/master
                             constructAndSaveDigestCopy( digestAggregate );
                         }
                         
