@@ -40,7 +40,7 @@
 				<div class="float-left v-ed-lbl" style="color: transparent;">'</div>
 				<div class="float-left v-ed-txt pos-relative">
 					<div class="bd-frm-check-wrapper clearfix">
-						<div class="float-left bd-check-img bd-check-img-checked"></div>
+						<div class="float-left bd-check-img bd-check-img-checked" type="socialMonitorCheckbox" ></div>
 						<input type="hidden" name="isSocialMonitorAdmin" value="false" id="is-soc-mon-admin-chk">
 					    <div class="float-left bd-check-txt"><spring:message code="label.grant.socialmonitor.adminprivileges.key"/></div>
 					</div>

@@ -10528,6 +10528,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	}
 
 
+
 	@Override
 	public void setShowSummitPopup(Long companyId, boolean isShowSummitPopup) throws InvalidInputException {
 		 LOG.debug( "Method hasRegisteredForSummit called for companyId:" + companyId );
