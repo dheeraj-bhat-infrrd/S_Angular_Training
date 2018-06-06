@@ -38,7 +38,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -172,8 +171,8 @@ import com.realtech.socialsurvey.core.services.reportingmanagement.OverviewManag
 import com.realtech.socialsurvey.core.services.reportingmanagement.ReportingDashboardManagement;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.utils.CommonUtils;
-import com.realtech.socialsurvey.core.vo.SurveyTransactionReportVO;
 import com.realtech.socialsurvey.core.vo.SurveyInvitationEmailCountVO;
+import com.realtech.socialsurvey.core.vo.SurveyTransactionReportVO;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookData;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookOperations;
 
@@ -3984,7 +3983,7 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
                             year );
 
                         // save the copy of digest generated for further use
-                        if( !digestAggregate.isUserCountDataAbsent() ) {
+                        if( !digestAggregate.isDigestDataAbsent() || !digestAggregate.isUserCountDataAbsent() ) {
                             constructAndSaveDigestCopy( digestAggregate );
                         }
                         
