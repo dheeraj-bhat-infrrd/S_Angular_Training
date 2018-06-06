@@ -3479,6 +3479,11 @@ public class OrganizationManagementController
         String agentIdStr = request.getParameter( "agentId" );
         String ignoredEmailStr = request.getParameter( "ignoredEmail" );
         LOG.info( "Method to saveUserEmailMapping for transientEmail: {} , agentId: {} , ignoreEmailFlag: {}",emailAddress,agentIdStr,ignoredEmailStr );
+        HttpSession session = request.getSession( false );
+        //REALTECH_USER_ID is set only for real tech and SS admin
+        Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
+
+
         try {
             boolean ignoredEmail;
             long agentId;
@@ -3509,7 +3514,14 @@ public class OrganizationManagementController
                     userManagementService.saveIgnoredEmailCompanyMappingAndUpdateSurveyPreinitiation( emailAddress,
                         loggedInUser.getCompany().getCompanyId() );
                 } else {
-                    userManagementService.saveEmailUserMappingAndUpdateAgentIdInSurveyPreinitiation( emailAddress, agentId );
+                    //if realtech get id of super admin , else logged in user
+                    if ( adminUserid != null ) {
+                        userManagementService.saveEmailUserMappingAndUpdateAgentIdInSurveyPreinitiation( emailAddress, agentId,
+                            adminUserid.toString() );
+                    } else {
+                        userManagementService.saveEmailUserMappingAndUpdateAgentIdInSurveyPreinitiation( emailAddress, agentId,
+                            String.valueOf( loggedInUser.getUserId() ) );
+                    }
                 }
             }
 
@@ -3622,6 +3634,8 @@ public class OrganizationManagementController
         String statusStr = request.getParameter( "status" );
         long emailMappingId;
         int status;
+        HttpSession session = request.getSession( false );
+        Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
 
         try {
 
@@ -3638,8 +3652,18 @@ public class OrganizationManagementController
             if ( user == null || user.getCompany() == null ) {
                 throw new NonFatalException( "Insufficient permission for this process" );
             }
+            
+            User loggedInUser = sessionHelper.getCurrentUser();
+            if ( loggedInUser == null ) {
+                throw new NonFatalException( "Insufficient permission for this process" );
+            } 
+            
+            if ( adminUserid != null ) {
+                userManagementService.updateUserEmailMapping( adminUserid.toString(), emailMappingId, status );
+            }else {
+                userManagementService.updateUserEmailMapping( String.valueOf( loggedInUser.getUserId() ), emailMappingId, status ); 
+            }
 
-            userManagementService.updateUserEmailMapping( user, emailMappingId, status );
 
             message = messageUtils.getDisplayMessage( DisplayMessageConstants.UPDATE_EMAIL_MAPPING_FOR_USER__SUCCESSFUL,
                 DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
@@ -3661,11 +3685,13 @@ public class OrganizationManagementController
 
     @ResponseBody
     @RequestMapping ( value = "/saveemailmappingsforuser", method = RequestMethod.POST)
-    public String saveUserEmailMappingsForUser( HttpServletRequest request, Model model )
+    public String saveUserEmailMappingsForUser( HttpServletRequest request, Model model ) throws NonFatalException
     {
         LOG.info( "Method to get saveUserEmailMappingsForUser started" );
         String emailIds = request.getParameter( "emailIds" );
         String agentIdStr = request.getParameter( "agentId" );
+        HttpSession session = request.getSession( false );
+        Long adminUserid = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
 
         try {
             long agentId;
@@ -3704,6 +3730,11 @@ public class OrganizationManagementController
 
             }
 
+            //getting logged in user details
+            User loggedInUser = sessionHelper.getCurrentUser();
+            if ( loggedInUser == null || loggedInUser.getCompany() == null ) {
+                throw new NonFatalException( "Insufficient permission for this process" );
+            }
 
             for ( String emailId : emailIdList ) {
                 try {
@@ -3713,7 +3744,11 @@ public class OrganizationManagementController
                         		throw new UserAlreadyExistsException("The email addresss " + emailId + " is already present in our database." );
                     }
                 } catch ( NoRecordsFetchedException e ) {
-                    userManagementService.saveEmailUserMappingAndUpdateAgentIdInSurveyPreinitiation( emailId, agentId );
+                    if ( adminUserid != null ) {
+                        userManagementService.saveEmailUserMappingAndUpdateAgentIdInSurveyPreinitiation( emailId, agentId, adminUserid.toString());
+                    }else {
+                        userManagementService.saveEmailUserMappingAndUpdateAgentIdInSurveyPreinitiation( emailId, agentId, String.valueOf( loggedInUser.getUserId() ) );
+                    }
 
                 }
             }
