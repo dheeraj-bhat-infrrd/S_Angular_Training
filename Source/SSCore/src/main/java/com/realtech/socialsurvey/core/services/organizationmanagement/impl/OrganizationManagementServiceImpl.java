@@ -1162,6 +1162,31 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
 
+    
+    @Override
+    public int getKeywordCount(long companyId) throws InvalidInputException{
+    	 LOG.debug( "Get company settings for the companyId: {}", companyId );
+         OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId,
+             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+         
+         if ( companySettings == null ) {
+             throw new InvalidInputException( "Company setting doesn't exist for company id", "400" );
+         }
+
+         List<Keyword> allKeywords = companySettings.getFilterKeywords();
+         List<Keyword> companyFilterKeywords = new ArrayList<>();
+         
+         if ( allKeywords != null && !allKeywords.isEmpty() ) {
+             for ( Keyword keyword : allKeywords ) { 
+            	 if ( keyword.getStatus() == CommonConstants.STATUS_ACTIVE ) {
+                     companyFilterKeywords.add( keyword );
+                 }
+             }
+         }
+         
+    	return companyFilterKeywords.size();
+    }
+    
     /* (non-Javadoc)
      * @see com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService#getCompanyKeywordsByCompanyId(long)
      */

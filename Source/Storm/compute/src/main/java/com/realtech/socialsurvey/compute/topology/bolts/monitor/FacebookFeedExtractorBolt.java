@@ -75,7 +75,6 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt implements Serial
     {
         try {
             SocialMediaTokenResponse mediaToken = (SocialMediaTokenResponse) input.getValueByField( "mediaToken" );
-            //LOG.info( "Username is : {}", mediaToken.getName() );
             Long companyId = mediaToken.getCompanyId();
 
             // Check rate limiting for company

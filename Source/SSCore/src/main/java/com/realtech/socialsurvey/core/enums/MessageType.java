@@ -1,12 +1,17 @@
 package com.realtech.socialsurvey.core.enums;
 
-public enum ActionHistoryType
+/**
+ * @author Lavanya
+ */
+
+/*Represents message type of each action*/
+public enum MessageType
 {
-    FLAGGED(0), UNFLAGGED(1), ESCALATE(2), RESOLVED(3), SUBMIT(4) ;
-    
+    EMAIL( 0 ), PRIVATE_MESSAGE( 1 );
+
     private int value;
 
-    ActionHistoryType( int value )
+    MessageType( int value )
     {
         this.value = value;
     }
@@ -15,5 +20,4 @@ public enum ActionHistoryType
     {
         return value;
     }
-
 }

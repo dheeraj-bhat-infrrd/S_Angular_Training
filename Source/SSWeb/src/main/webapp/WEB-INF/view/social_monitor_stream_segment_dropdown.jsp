@@ -2,7 +2,7 @@
 	<input id="segment-data" data-companyId=0 data-regionIds=[] data-branchIds=[] type="hidden"> 
 	<input id="seg-reg-data" type="hidden" val=>
 	<input id="seg-bra-data" type="hidden" val=>
-	<div class="stream-dropdown-select">Segments (<div id="stream-segment-count" class="stream-dropdown-count-div">5</div> Selected)<img src="${initParam.resourcesPath}/resources/images/chevron-down.png" id="seg-chevron-down" class="float-right macro-dropdown-chevron"><img id="seg-chevron-up" src="${initParam.resourcesPath}/resources/images/chevron-up.png" class="hide float-right macro-dropdown-chevron"></div>
+	<div class="stream-dropdown-select">Segments (<div id="stream-segment-count" class="stream-dropdown-count-div">0</div> Selected)<img src="${initParam.resourcesPath}/resources/images/chevron-down.png" id="seg-chevron-down" class="float-right macro-dropdown-chevron"><img id="seg-chevron-up" src="${initParam.resourcesPath}/resources/images/chevron-up.png" class="hide float-right macro-dropdown-chevron"></div>
 	<div id="stream-seg-dropdown-options" class="hide float-left stream-dropdown-actions">
 		<div class="stream-dropdown-option-container">
 			<img src="${initParam.resourcesPath}/resources/images/check-no.png"  class="seg-unchecked float-left margin-right-10 cursor-pointer">

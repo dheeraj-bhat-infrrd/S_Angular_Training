@@ -38,13 +38,13 @@ public class UpdateSocialPostDuplicateCountBolt extends BaseComputeBoltWithAck {
 
         if(success && hash != 0) {
             try {
-                Optional<Long> updatedPosts = updateSocialPostDuplicateCount(hash, companyId);
-                if (updatedPosts.isPresent() &&  updatedPosts.get() > 1) {
+                Optional<Long> updatedPosts = updateSocialPostDuplicateCount(hash, companyId, socialPost.getId());
+                if (updatedPosts.isPresent() &&  updatedPosts.get() == 1) {
                     isSuccess = true;
-                    LOG.info(" Total {} docs were successfully updated for having hash {} and postId {} ",
-                            updatedPosts.get(), hash, socialPost.getPostId());
+                    LOG.debug(" Post with id {} and hash {} is successfully updated with isDuplicate {} ",
+                             socialPost.getPostId(),hash, true);
                     _collector.emit("RETRY_STREAM", tuple, new Values(isSuccess, socialPost));
-                } else if ( !updatedPosts.isPresent() || updatedPosts.get() == 0){
+                } else if ( !updatedPosts.isPresent() || updatedPosts.get() == null){
                     LOG.error("Something went wrong while updating the social post having postId {}", socialPost.getPostId());
                     failedMessagesService.insertPermanentlyFailedSocialPost(socialPost,
                             new Exception("Something went wrong while updating the social post"));
@@ -68,8 +68,8 @@ public class UpdateSocialPostDuplicateCountBolt extends BaseComputeBoltWithAck {
         return new Values(false, 0L, null);
     }
 
-    private Optional<Long> updateSocialPostDuplicateCount(int hash, long companyId) throws IOException {
-        return SSAPIOperations.getInstance().updateSocialPostDuplicateCount(hash, companyId);
+    private Optional<Long> updateSocialPostDuplicateCount( int hash, long companyId, String id ) throws IOException {
+        return SSAPIOperations.getInstance().updateSocialPostDuplicateCount(hash, companyId, id);
     }
 
     @Override

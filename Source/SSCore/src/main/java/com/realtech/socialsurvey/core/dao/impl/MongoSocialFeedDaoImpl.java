@@ -63,8 +63,8 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
     public static final String CREATED_TIME = "createdTime";
     public static final String FOUND_KEYWORDS = "foundKeywords";
     private static final String FROM_TRUSTED_SOURCE = "fromTrustedSource";
-    private static final String POST_SOURCE="postSource";
-    
+    private static final String POST_SOURCE = "postSource";
+    public static final String IS_DUPLICATE = "isDuplicate";
 
 
     @Override
@@ -80,25 +80,29 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
     }
 
     @Override
-	public long updateDuplicateCount(int hash, long companyId) {
+	public long updateDuplicateCount( int hash, long companyId, String id ) {
 		if(LOG.isDebugEnabled()){
 			LOG.debug("Fetching count of duplicate posts with hash = {} and companyId = {}", hash, companyId);
 		}
 		Query query = new  Query();
-		query.addCriteria(Criteria.where(HASH).is(hash).and(COMPANY_ID).is(companyId));
-		long duplicates =  mongoTemplate.count(query, SOCIAL_FEED_COLLECTION);
+		Update update = new Update();
+		query.addCriteria(Criteria.where(HASH).is(hash).and(COMPANY_ID).is(companyId).and( IS_DUPLICATE ).is( false )
+            .and( KEY_IDENTIFIER ).ne( id ));
+		update.inc( DUPLICATE_COUNT, 1 );
+		WriteResult updatedDocs =  mongoTemplate.updateFirst(query, update, SOCIAL_FEED_COLLECTION);
 
 		//if duplicates = 1, then there is only one post with the hash so no need to update the duplicateCount
-		if(duplicates > 1) {
+		if(updatedDocs.getN() == 1) {
 			if (LOG.isDebugEnabled()) {
-				LOG.debug("Updating posts with duplicateCount {} having hash = {} ", duplicates, hash);
+				LOG.debug("Updating posts with isDuplicate {} having hash = {} and id = {} ", true, hash, id);
 			}
-			Query updateQuery = new Query().addCriteria(Criteria.where(HASH).is(hash).and(COMPANY_ID).is(companyId));
-			Update update = new Update().set(DUPLICATE_COUNT, duplicates);
-			WriteResult result = mongoTemplate.updateMulti(updateQuery, update, SOCIAL_FEED_COLLECTION);
+			Query updateQuery = new Query().addCriteria(Criteria.where(HASH).is(hash).and(COMPANY_ID).is(companyId).
+            and( KEY_IDENTIFIER ).is( id ));
+			Update duplicateUpdate = new Update().set(IS_DUPLICATE, true);
+			WriteResult result = mongoTemplate.updateFirst(updateQuery, duplicateUpdate, SOCIAL_FEED_COLLECTION);
 			return result.getN();
 		}
-		else return duplicates;
+		else return updatedDocs.getN();
 	}
     
 	@Override
@@ -193,6 +197,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 		LOG.debug("Fetching All Social Feeds");
 		Query query = new Query();
 		List<Criteria> criterias = new ArrayList<>();
+		//Alerts page
 		if (flag) {
 			if (companyId != null) {
 				criterias.add((Criteria.where(CommonConstants.COMPANY_ID).is(companyId)
@@ -211,7 +216,9 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
                     .andOperator((Criteria.where(CommonConstants.PROFILE_TYPE).is(ProfileType.AGENT)), (Criteria.where(FLAGGED).is(flag)), (Criteria.where(FEED_TYPE).in(feedtype)))));
 			}
 			
-		} else if (status != null && !flag) {
+		} 
+		//Escalations and Resolved page
+		else if (status != null && !flag) {
             if (companyId != null) {
                 criterias.add((Criteria.where(CommonConstants.COMPANY_ID).is(companyId).andOperator((Criteria.where(CommonConstants.PROFILE_TYPE).is(ProfileType.COMPANY)),
                         (Criteria.where(CommonConstants.STATUS_COLUMN).is(status.toUpperCase())),
@@ -233,7 +240,9 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
                         (Criteria.where(FEED_TYPE).in(feedtype)))));
             }
     
-        } else if (status == null && !flag) {
+        } 
+		//Stream page
+		else if (status == null && !flag) {
             if (companyId != null) {
                 criterias.add((Criteria.where(CommonConstants.COMPANY_ID).is(companyId)
                         .andOperator((Criteria.where(CommonConstants.PROFILE_TYPE).is(ProfileType.COMPANY)),Criteria.where(FEED_TYPE).in(feedtype))));
@@ -260,11 +269,14 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 		    criteria.orOperator((Criteria.where(CommonConstants.COMPANY_ID).is(companyId)));
 		}
 		
+		//Text search
 		if(searchText != null && !searchText.isEmpty())
         {
 		    criteria.andOperator((Criteria.where( TEXT ).regex( Pattern.compile(searchText.trim() , Pattern.CASE_INSENSITIVE) )));
         }
-		query.addCriteria(criteria);
+		
+		//Exclude duplicate posts
+        query.addCriteria( criteria.andOperator( Criteria.where( IS_DUPLICATE ).is( false ) ) );
 		
 		//Sort all posts
         query.with( new Sort( Sort.Direction.DESC, UPDATED_TIME ) );
@@ -285,6 +297,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 		LOG.debug("Fetching All Social Feeds count");
 		Query query = new Query();
 		List<Criteria> criterias = new ArrayList<>();
+		//Alerts page
 		if (flag) {
             if (companyId != null) {
                 criterias.add((Criteria.where(CommonConstants.COMPANY_ID).is(companyId)
@@ -303,7 +316,9 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
                     .andOperator((Criteria.where(CommonConstants.PROFILE_TYPE).is(ProfileType.AGENT)), (Criteria.where(FLAGGED).is(flag)), (Criteria.where(FEED_TYPE).in(feedtype)))));
             }
             
-        } else if (status != null && !flag) {
+        }
+		//Escalations and resolved page
+		else if (status != null && !flag) {
 			if (companyId != null) {
 				criterias.add((Criteria.where(CommonConstants.COMPANY_ID).is(companyId).andOperator((Criteria.where(CommonConstants.PROFILE_TYPE).is(ProfileType.COMPANY)),
 						(Criteria.where(CommonConstants.STATUS_COLUMN).is(status.toUpperCase())),
@@ -325,7 +340,9 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 						(Criteria.where(FEED_TYPE).in(feedtype)))));
 			}
 	
-		} else if (status == null && !flag) {
+		} 
+		//Stream page
+		else if (status == null && !flag) {
 			if (companyId != null) {
 				criterias.add((Criteria.where(CommonConstants.COMPANY_ID).is(companyId)
 						.andOperator((Criteria.where(CommonConstants.PROFILE_TYPE).is(ProfileType.COMPANY)),Criteria.where(FEED_TYPE).in(feedtype))));
@@ -353,12 +370,14 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
             criteria.orOperator((Criteria.where(CommonConstants.COMPANY_ID).is(companyId)));
         }
         
+        //Text search
         if(StringUtils.isNotEmpty( searchText ))
         {
             criteria.andOperator((Criteria.where( TEXT ).regex( Pattern.compile(searchText.trim() , Pattern.CASE_INSENSITIVE) )));
         }
         
-        query.addCriteria(criteria);
+        //Exclude duplicate posts
+        query.addCriteria(criteria.andOperator( Criteria.where( IS_DUPLICATE ).is( false ) ));
 
 		return mongoTemplate.count(query, SOCIAL_FEED_COLLECTION);
 	}
@@ -437,7 +456,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
     {
         LOG.debug("Fetching duplicate posts with hash = {} and companyId = {}", hash, companyId);
         Query query = new  Query();
-        query.addCriteria(Criteria.where(HASH).is(hash).and(COMPANY_ID).is(companyId));
+        query.addCriteria(Criteria.where(HASH).is(hash).and(COMPANY_ID).is(companyId).and( IS_DUPLICATE ).is( true ));
         query.fields().exclude( KEY_IDENTIFIER ).include(POST_ID);
         return mongoTemplate.find( query, SocialResponseObject.class, SOCIAL_FEED_COLLECTION );
     }
@@ -496,15 +515,20 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         return mongoTemplate.count( query, collectioName );
     }
 
+
     @Override
-    public List<SocialResponseObject> getSocialFeed( String keyword, long companyId, long startTime, long endTime, int pageSize, int skips )
+    public List<SocialResponseObject> getSocialFeed( String keyword, long companyId, long startTime, long endTime, int pageSize,
+        int skips )
     {
         LOG.debug( "Method to fetch socialFeed for a particular keyword and date range started" );
-        Query query = new Query(  );
-        query.addCriteria( Criteria.where( COMPANY_ID ).is( companyId ) ).
-            addCriteria( Criteria.where( CREATED_TIME ).lte( endTime ).gte( startTime ) ).
-            addCriteria( Criteria.where( FOUND_KEYWORDS ).is( keyword ) ).skip( skips ).limit( pageSize );
-        List<SocialResponseObject> socialResponseObjects =  mongoTemplate.find( query, SocialResponseObject.class, SOCIAL_FEED_COLLECTION );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( COMPANY_ID ).is( companyId ) )
+            .addCriteria( Criteria.where( CREATED_TIME ).lte( endTime ).gte( startTime ) )
+            .addCriteria(
+                Criteria.where( FOUND_KEYWORDS ).regex( Pattern.compile( keyword, Pattern.CASE_INSENSITIVE ) ) )
+            .skip( skips ).limit( pageSize );
+        List<SocialResponseObject> socialResponseObjects = mongoTemplate.find( query, SocialResponseObject.class,
+            SOCIAL_FEED_COLLECTION );
         socialResponseObjects.addAll( mongoTemplate.find( query, SocialResponseObject.class, SOCIAL_FEED_COLLECTION_ARCHIVE ) );
         LOG.info( "Response fetched from mongo is {}", socialResponseObjects );
         return socialResponseObjects;
@@ -565,5 +589,26 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
             update.push( ACTION_HISTORY, actionHistory );
             WriteResult result = mongoTemplate.updateMulti(updateQuery, update, SOCIAL_FEED_COLLECTION);
             return result.getN();
+    }
+
+
+    @Override
+    public SocialResponseObject getSocialPost( Long companyId, String postId, String collectionName )
+    {
+        LOG.debug( "Fetching Social Feed for postId {}", postId );
+        String mongoId = null;
+        mongoId = postId + "_" + companyId;
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_IDENTIFIER ).is( mongoId ) );
+        return mongoTemplate.findOne( query, SocialResponseObject.class, collectionName );
+    }
+
+    @Override
+    public List<SocialResponseObject> getAllDuplicatePostDetails( Long companyId, int hash )
+    {
+        LOG.debug("Fetching duplicate posts with hash = {} and companyId = {}", hash, companyId);
+        Query query = new  Query();
+        query.addCriteria(Criteria.where(HASH).is(hash).and(COMPANY_ID).is(companyId).and( IS_DUPLICATE ).is( true ));
+        return mongoTemplate.find( query, SocialResponseObject.class, SOCIAL_FEED_COLLECTION );
     }
 }

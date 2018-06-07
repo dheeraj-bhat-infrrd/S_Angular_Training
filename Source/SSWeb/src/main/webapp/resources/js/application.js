@@ -17034,7 +17034,7 @@ function drawMonitorList(monitorData){
 	var selectedMonitors = [];
 	$('#selectedMonitors').data('idList',selectedMonitors);
 	
-	if(monitorData==null || monitorData.length <= 0){
+	if(monitorData==null || monitorData.length <= 0 || monitorData==undefined){
 		$('#empty-monitors').show();
 		return;
 	}else{
@@ -17166,6 +17166,7 @@ function addMonitor(){
 					
 					var monitorData = JSON.parse(map.keywords);
 					drawMonitorList(monitorData);
+					
 					hideAddMonitorPopup();
 					showToast();
 				} else {
@@ -17226,19 +17227,7 @@ function getMonitors(text){
 		success : function(response) {
 			var monitorData = response.filterKeywords;
 			
-			if(monitorData != undefined && monitorData != null){
-				if(monitorData.length > 0){
-					$('#empty-monitors').addClass('hide');
-					$('#monitor-list-container').removeClass('hide');
-					drawMonitorList(monitorData);
-				}else{
-					$('#empty-monitors').removeClass('hide');
-					$('#monitor-list-container').addClass('hide');
-				}
-			}else{
-				$('#empty-monitors').removeClass('hide');
-				$('#monitor-list-container').addClass('hide');
-			}
+			drawMonitorList(monitorData);
 		},
 		error : function(e){
 			if (e.status == 504) {
@@ -17246,7 +17235,6 @@ function getMonitors(text){
 				return;
 			}
 			$('#empty-monitors').removeClass('hide');
-			$('#monitor-list-container').addClass('hide');
 			$('#overlay-toast').html('Unable to fetch monitors.');
 			showToast();
 		}
@@ -17696,7 +17684,7 @@ var streamActionContainer;
 var lastgetStreamPostRequestToDelete=null;
 function getStreamPosts(startIndex,status,flag,text){
 	
-	var batchSize = 10;
+	var batchSize = 50;
 	showDashOverlay('#stream-dash');
 	if(status == undefined){
 		status = 'none';
@@ -17765,6 +17753,8 @@ function getStreamPosts(startIndex,status,flag,text){
 			
 			$('#stream-pagination').data('startIndex',startIndex);
 			$('#stream-pagination').data('count',response.count);
+			$('#stream-pagination-bottom').data('startIndex',startIndex);
+			$('#stream-pagination-bottom').data('count',response.count);
 		},
 		complete: function(){
 			hideDashOverlay('#stream-dash');
@@ -17810,40 +17800,59 @@ function drawPaginationForSocialMonitor(count,startIndex,batchSize){
 	if(count <= (batchSize+startIndex)){
 		$('#stream-next-page-active').addClass('hide');
 		$('#stream-next-page').removeClass('hide');
+		$('#stream-next-page-active-bottom').addClass('hide');
+		$('#stream-next-page-bottom').removeClass('hide');
 	}else{
 		$('#stream-next-page-active').removeClass('hide');
 		$('#stream-next-page').addClass('hide');
+		$('#stream-next-page-active-bottom').removeClass('hide');
+		$('#stream-next-page-bottom').addClass('hide');
 	}
 	
-	if(startIndex < count-(count%10) && count > batchSize){
+	if(startIndex < count-(count%50) && count > batchSize){
 		$('#stream-end-page-active').removeClass('hide');
 		$('#stream-end-page').addClass('hide');
+		$('#stream-end-page-active-bottom').removeClass('hide');
+		$('#stream-end-page-bottom').addClass('hide');
 	}else{
 		$('#stream-end-page-active').addClass('hide');
 		$('#stream-end-page').removeClass('hide');
+		$('#stream-end-page-active-bottom').addClass('hide');
+		$('#stream-end-page-bottom').removeClass('hide');
 	}
 	
 	if(startIndex < batchSize){
 		$('#stream-prev-page-active').addClass('hide');
 		$('#stream-prev-page').removeClass('hide');
+		$('#stream-prev-page-active-bottom').addClass('hide');
+		$('#stream-prev-page-bottom').removeClass('hide');
 	}else{
 		$('#stream-prev-page').addClass('hide');
 		$('#stream-prev-page-active').removeClass('hide');
+		$('#stream-prev-page-bottom').addClass('hide');
+		$('#stream-prev-page-active-bottom').removeClass('hide');
 	}
 	
 	if(startIndex == 0){
 		$('#stream-start-page-active').addClass('hide');
 		$('#stream-start-page').removeClass('hide');
+		$('#stream-start-page-active-bottom').addClass('hide');
+		$('#stream-start-page-bottom').removeClass('hide');
 	}else{
 		$('#stream-start-page').addClass('hide');
-		$('#stream-start-page-active').removeClass('hide');		
+		$('#stream-start-page-active').removeClass('hide');
+		$('#stream-start-page-bottom').addClass('hide');
+		$('#stream-start-page-active-bottom').removeClass('hide');			
 	}
 	
 	$('#stream-item-count').html(count);
-	var pageCount = Math.ceil(count/10);
-	var pageNo = (startIndex/10)+1;
+	$('#stream-item-count-bottom').html(count);
+	var pageCount = Math.ceil(count/50);
+	var pageNo = (startIndex/50)+1;
 	$('#stream-page-count').html(pageCount);
 	$('#stream-page-no').html(pageNo);
+	$('#stream-page-count-bottom').html(pageCount);
+	$('#stream-page-no-bottom').html(pageNo);
 }
 
 $(document).on('click','#stream-start-page-active',function(e){
@@ -17869,7 +17878,7 @@ $(document).on('click','#stream-prev-page-active',function(e){
 	
 	var status = $('#stream-tabs').data('status');
 	var flag = $('#stream-tabs').data('flagged');
-	var startIndex = $('#stream-pagination').data('startIndex') - 10;
+	var startIndex = $('#stream-pagination').data('startIndex') - 50;
 	var text = $('#search-post').val();
 	
 	getStreamPosts(startIndex, status, flag,text);
@@ -17884,7 +17893,7 @@ $(document).on('click','#stream-next-page-active',function(e){
 	
 	var status = $('#stream-tabs').data('status');
 	var flag = $('#stream-tabs').data('flagged');
-	var startIndex = $('#stream-pagination').data('startIndex') + 10;
+	var startIndex = $('#stream-pagination').data('startIndex') + 50;
 	var text = $('#search-post').val();
 	
 	getStreamPosts(startIndex, status, flag,text);
@@ -17899,8 +17908,78 @@ $(document).on('click','#stream-end-page-active',function(e){
 	
 	var status = $('#stream-tabs').data('status');
 	var flag = $('#stream-tabs').data('flagged');
+	var startIndex = $('#stream-pagination').data('startIndex');
+	var pageNo = (startIndex/50)+1;
 	var count = $('#stream-pagination').data('count');
-	var startIndex = count - (count % 10);
+	startIndex = count-(count%50);
+	if(count%50 == 0){
+		startIndex-=50;
+	}
+	var text = $('#search-post').val();
+	
+	getStreamPosts(startIndex, status, flag,text);
+});
+
+$(document).on('click','#stream-start-page-active-bottom',function(e){
+	e.stopImmediatePropagation();
+	e.preventDefault();
+	
+	var selPostIds = [];
+	$('#selected-post-ids').data('post-ids',selPostIds);
+	
+	var status = $('#stream-tabs').data('status');
+	var flag = $('#stream-tabs').data('flagged');
+	var text = $('#search-post').val();
+	
+	getStreamPosts(0, status, flag,text);
+});
+
+$(document).on('click','#stream-prev-page-active-bottom',function(e){
+	e.stopImmediatePropagation();
+	e.preventDefault();	
+
+	var selPostIds = [];
+	$('#selected-post-ids').data('post-ids',selPostIds);
+	
+	var status = $('#stream-tabs').data('status');
+	var flag = $('#stream-tabs').data('flagged');
+	var startIndex = $('#stream-pagination').data('startIndex') - 50;
+	var text = $('#search-post').val();
+	
+	getStreamPosts(startIndex, status, flag,text);
+});
+
+$(document).on('click','#stream-next-page-active-bottom',function(e){
+	e.stopImmediatePropagation();
+	e.preventDefault();	
+
+	var selPostIds = [];
+	$('#selected-post-ids').data('post-ids',selPostIds);
+	
+	var status = $('#stream-tabs').data('status');
+	var flag = $('#stream-tabs').data('flagged');
+	var startIndex = $('#stream-pagination').data('startIndex') + 50;
+	var text = $('#search-post').val();
+	
+	getStreamPosts(startIndex, status, flag,text);
+});
+
+$(document).on('click','#stream-end-page-active-bottom',function(e){
+	e.stopImmediatePropagation();
+	e.preventDefault();	
+
+	var selPostIds = [];
+	$('#selected-post-ids').data('post-ids',selPostIds);
+	
+	var status = $('#stream-tabs').data('status');
+	var flag = $('#stream-tabs').data('flagged');
+	var startIndex = $('#stream-pagination').data('startIndex');
+	var pageNo = (startIndex/50)+1;
+	var count = $('#stream-pagination').data('count');
+	startIndex = count-(count%50);
+	if(count%50 == 0){
+		startIndex-=50;
+	}
 	var text = $('#search-post').val();
 	
 	getStreamPosts(startIndex, status, flag,text);
@@ -17992,8 +18071,25 @@ function drawStreamPage(streamPostList){
 		$('#stream-post-details-'+postId).find('.stream-post-date').html(lastUpdatedDateStr);
 		
 		if(streamPostList[i].duplicateCount > 1){
+			$('#stream-post-details-'+postId).find('.stream-dup-container').removeClass('hide');
 			$('#stream-post-details-'+postId).find('.post-dup').removeClass('hide');
 			$('#stream-post-details-'+postId).find('.post-dup').find('.dup-count').html(streamPostList[i].duplicateCount);
+		}
+		
+		var postSource = streamPostList[i].postSource;
+		var fromTrustedSource = streamPostList[i].fromTrustedSource;
+		
+		if(postSource != "" && postSource != null && postSource != undefined){
+			$('#stream-post-details-'+postId).find('.ts-container').removeClass('hide');
+			$('#stream-post-details-'+postId).find('.ts-source').html(postSource);
+			$('#stream-post-details-'+postId).find('.ts-source').attr('data-trusted',fromTrustedSource);
+			$('#stream-post-details-'+postId).find('.ts-source').attr('data-source',postSource);
+			
+			if(fromTrustedSource == true || fromTrustedSource == 'true'){
+				$('#stream-post-details-'+postId).find('.ts-act-icon').removeClass('ts-add');
+				$('#stream-post-details-'+postId).find('.ts-act-icon').addClass('ts-remove');
+				$('#stream-post-details-'+postId).find('.trusted-source').removeClass('hide');
+			}
 		}
 		
 		$('#stream-post-details-cont-'+postId).find('.stream-post-details-text').html(streamPostList[i].textHighlighted);
@@ -18082,24 +18178,7 @@ function drawStreamPage(streamPostList){
 			$('#add-post-action-'+postId).find('.form-status').val(status);
 			
 			var url = './updatepostactionwithmacro.do';
-			callAjaxFormSubmit(url,function(data){
-				
-				var map = $.parseJSON(data);
-				$("#overlay-toast").html(map.message);
-				showToast();
-				if (map.status == "success") {
-							
-					updatePostSuccess(postId,text,status,flagged,textActionType,map);
-										
-					$('#action-form-cont'+postId).find('.form-post-textbox').val('');
-					$("#overlay-toast").html("Successfully Updated Post");
-					showToast();
-				} else {
-					$("#overlay-toast").html("Failed to update post. Please Try again");
-					showToast();
-				}
-				
-			},'macro-form-apply');
+			callFormAjaxPostForSocMonBtn(url,'macro-form-apply',postId);
 			
 			if($(this).closest('.stream-macro-dropdown').find('.mac-chevron-down').hasClass('hide')){
 				$(this).closest('.stream-macro-dropdown').find('.mac-chevron-down').removeClass('hide');
@@ -18148,19 +18227,43 @@ function drawStreamPage(streamPostList){
 				$('#act-cont'+postId+'-'+j).addClass('stream-action-container-white');
 			}
 			
-			if(sortedActionHistory[j].actionType == 'UNFLAGGED'){
-				$('#act-cont'+postId+'-'+j).find('.action-flag-icn').removeClass('hide');
-			}else if(sortedActionHistory[j].actionType == 'FLAGGED'){
-				$('#act-cont'+postId+'-'+j).find('.action-flag-icn').removeClass('hide');
-			}else if(sortedActionHistory[j].actionType == 'ESCALATE'){
-				$('#act-cont'+postId+'-'+j).find('.action-esc-icn').removeClass('hide');
-			}else if(sortedActionHistory[j].actionType == 'RESOLVED'){
-				$('#act-cont'+postId+'-'+j).find('.action-res-icn').removeClass('hide');
-			}else if(sortedActionHistory[j].actionType == 'EMAIL'){
-				$('#act-cont'+postId+'-'+j).find('.action-mail-icn').removeClass('hide');
+			if(sortedActionHistory[j].actionType == 'SUBMIT'){
+				$('#act-cont'+postId+'-'+j).find('.act-action-msg').removeClass('hide');
+				if(sortedActionHistory[j].messageType == 'EMAIL'){
+					$('#act-cont'+postId+'-'+j).find('.action-msg-icn').removeClass('hide');
+					$('#act-cont'+postId+'-'+j).find('.action-mail-icn').removeClass('hide');
+				}
 				$('#act-cont'+postId+'-'+j).addClass('stream-action-mail');
+				$('#act-cont'+postId+'-'+j).find('.act-details-msg-text').html(sortedActionHistory[j].message);
+			}else{
+				$('#act-cont'+postId+'-'+j).find('.action-icn').removeClass('hide');
+				if(sortedActionHistory[j].actionType == 'UNFLAGGED'){
+					$('#act-cont'+postId+'-'+j).find('.action-flag-icn').removeClass('hide');
+				}else if(sortedActionHistory[j].actionType == 'FLAGGED'){
+					$('#act-cont'+postId+'-'+j).find('.action-flag-icn').removeClass('hide');
+				}else if(sortedActionHistory[j].actionType == 'ESCALATE'){
+					$('#act-cont'+postId+'-'+j).find('.action-esc-icn').removeClass('hide');
+				}else if(sortedActionHistory[j].actionType == 'RESOLVED'){
+					$('#act-cont'+postId+'-'+j).find('.action-res-icn').removeClass('hide');
+				}
+				
+				$('#act-cont'+postId+'-'+j).find('.act-action').removeClass('hide');
+				$('#act-cont'+postId+'-'+j).find('.act-details-text').html(sortedActionHistory[j].text);
+				
+				if(sortedActionHistory[j].messageType != "" && sortedActionHistory[j].messageType != null && sortedActionHistory[j].messageType != undefined){
+					$('#act-cont'+postId+'-'+j).find('.act-details-msg-type').removeClass('hide');
+					$('#act-cont'+postId+'-'+j).find('.act-action-msg').removeClass('hide');
+					
+					if(sortedActionHistory[j].messageType == 'PRIVATE_MESSAGE'){
+						$('#act-cont'+postId+'-'+j).find('.act-details-msg-type').html('Private Note');
+					}else if(sortedActionHistory[j].messageType == 'EMAIL'){
+						$('#act-cont'+postId+'-'+j).find('.act-details-msg-type').html('Email');
+					}
+					
+					$('#act-cont'+postId+'-'+j).find('.act-details-msg-text').html(sortedActionHistory[j].message);
+				}
 			}
-			$('#act-cont'+postId+'-'+j).find('.act-details-text').html(sortedActionHistory[j].text);
+			
 			var lastUpdatedAction = parseInt(sortedActionHistory[j].createdDate);
 			var lastUpdatedDateAction = new Date(lastUpdatedAction);
 			var lastUpdatedDateActionStr = monthName[lastUpdatedDateAction.getMonth()]+' '+(lastUpdatedDateAction.getDate()%10!=lastUpdatedDateAction.getDate()?lastUpdatedDateAction.getDate():('0'+lastUpdatedDateAction.getDate()))+', '+lastUpdatedDateAction.getFullYear()
@@ -18578,6 +18681,52 @@ var lastUpdatedDateAction;
 var lastUpdatedDateActionStr;
 var monthName=new Array("January","February","March","April","May","June","July","August","September","October","November","December");
 
+function callFormAjaxPostForSocMonBtn(url,formId,postId){
+	
+	var status = $('#stream-tabs').data('status');
+	var flag = $('#stream-tabs').data('flagged');
+	var startIndex = $('#stream-pagination').data('startIndex');
+	
+	var $form = $('#'+formId);
+	var payLoad = $form.serialize();
+	$.ajax({
+		url : url,
+		headers: {          
+            Accept : "text/plain; charset=utf-8"   
+		},
+		type : "POST",
+		data : payLoad,
+		success : function(data) {
+			var map = $.parseJSON(data);
+			$("#overlay-toast").html(map.message);
+			showToast();
+			if (map.status == "success") {
+						
+				var text = $('#action-form-cont'+postId).find('.form-post-textbox').val();
+				
+				$('#action-form-cont'+postId).find('.form-post-textbox').val('');
+				$("#overlay-toast").html("Successfully Updated Post");
+				showToast();
+			} else {
+				$("#overlay-toast").html("Failed to update post. Please Try again");
+				showToast();
+			}
+		},
+		complete: function(data){
+			getStreamPosts(startIndex,status,flag);
+		},
+		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			$("#overlay-toast").html("Failed to update post. Please Try again");
+			showToast();
+		}
+	});
+}
+
+
 $(document).on('click','.stream-action-unflag',function(e){
 	e.stopPropagation();
 	var postId = $(this).closest('.action-form-cont').find('.form-post-id').val();
@@ -18590,24 +18739,7 @@ $(document).on('click','.stream-action-unflag',function(e){
 	$(this).closest('.action-form-cont').find('.form-status').val('NEW');
 	
 	var url = './updatepostaction.do';
-	callAjaxFormSubmit(url, function(data) {
-		var map = $.parseJSON(data);
-		$("#overlay-toast").html(map.message);
-		showToast();
-		if (map.status == "success") {
-					
-			var text = $('#action-form-cont'+postId).find('.form-post-textbox').val();
-			
-			updatePostSuccess(postId,text,'NEW',false,textActionType,map);
-			
-			$('#action-form-cont'+postId).find('.form-post-textbox').val('');
-			$("#overlay-toast").html("Successfully Updated Post");
-			showToast();
-		} else {
-			$("#overlay-toast").html("Failed to update post. Please Try again");
-			showToast();
-		}
-	}, formId,disableEle);
+	callFormAjaxPostForSocMonBtn(url,formId,postId);
 });
 
 $(document).on('click','.stream-action-flag',function(e){
@@ -18622,24 +18754,7 @@ $(document).on('click','.stream-action-flag',function(e){
 	$(this).closest('.action-form-cont').find('.form-status').val('NEW');
 	
 	var url = './updatepostaction.do';
-	callAjaxFormSubmit(url, function(data) {
-		var map = $.parseJSON(data);
-		$("#overlay-toast").html(map.message);
-		showToast();
-		if (map.status == "success") {
-
-			var text = $('#action-form-cont'+postId).find('.form-post-textbox').val();			
-			
-			updatePostSuccess(postId,text,'NEW',true,textActionType,map);
-			
-			$('#action-form-cont'+postId).find('.form-post-textbox').val('');
-			$("#overlay-toast").html("Successfully Updated Post");
-			showToast();
-		} else {
-			$("#overlay-toast").html("Failed to update post. Please Try again");
-			showToast();
-		}
-	}, formId,disableEle);
+	callFormAjaxPostForSocMonBtn(url,formId,postId);
 });
 
 $(document).on('click','.stream-unflagged-icn',function(e){
@@ -18653,24 +18768,7 @@ $(document).on('click','.stream-unflagged-icn',function(e){
 	$('#action-form-cont'+postId).find('.form-status').val('NEW');
 	
 	var url = './updatepostaction.do';
-	callAjaxFormSubmit(url, function(data) {
-		var map = $.parseJSON(data);
-		$("#overlay-toast").html(map.message);
-		showToast();
-		if (map.status == "success") {
-					
-			var text = $('#action-form-cont'+postId).find('.form-post-textbox').val();
-			
-			updatePostSuccess(postId,text,'NEW',true,textActionType,map);
-			
-			$('#action-form-cont'+postId).find('.form-post-textbox').val('');
-			$("#overlay-toast").html("Successfully Updated Post");
-			showToast();
-		} else {
-			$("#overlay-toast").html("Failed to update post. Please Try again");
-			showToast();
-		}
-	}, formId,disableEle);
+	callFormAjaxPostForSocMonBtn(url,formId,postId);
 });
 
 $(document).on('click','.stream-flagged-icn',function(e){
@@ -18684,24 +18782,7 @@ $(document).on('click','.stream-flagged-icn',function(e){
 	$('#action-form-cont'+postId).find('.form-status').val('NEW');
 	
 	var url = './updatepostaction.do';
-	callAjaxFormSubmit(url, function(data) {
-		var map = $.parseJSON(data);
-		$("#overlay-toast").html(map.message);
-		showToast();
-		if (map.status == "success") {
-
-			var text = $('#action-form-cont'+postId).find('.form-post-textbox').val();			
-			
-			updatePostSuccess(postId,text,'NEW',false,textActionType,map);
-			
-			$('#action-form-cont'+postId).find('.form-post-textbox').val('');
-			$("#overlay-toast").html("Successfully Updated Post");
-			showToast();
-		} else {
-			$("#overlay-toast").html("Failed to update post. Please Try again");
-			showToast();
-		}
-	}, formId,disableEle);
+	callFormAjaxPostForSocMonBtn(url,formId,postId);
 });
 
 $(document).on('click','.stream-action-esc',function(e){
@@ -18724,23 +18805,7 @@ $(document).on('click','.stream-action-esc',function(e){
 	$(this).closest('.action-form-cont').find('.form-status').val('ESCALATED');
 	
 	var url = './updatepostaction.do';
-	callAjaxFormSubmit(url, function(data) {
-		var map = $.parseJSON(data);
-		$("#overlay-toast").html(map.message);
-		showToast();
-		if (map.status == "success") {
-			
-			updatePostSuccess(postId,text,'ESCALATED',true,textActionType,map)
-			
-			$('#action-form-cont'+postId).find('.form-post-textbox').val('');
-			$("#overlay-toast").html("Successfully Updated Post");
-			showToast();
-			
-		} else {
-			$("#overlay-toast").html("Failed to update post. Please Try again");
-			showToast();
-		}
-	}, formId,disableEle);
+	callFormAjaxPostForSocMonBtn(url,formId,postId);
 });
 
 $(document).on('click','.stream-action-res',function(e){
@@ -18765,23 +18830,7 @@ $(document).on('click','.stream-action-res',function(e){
 	$(this).closest('.action-form-cont').find('.form-status').val('RESOLVED');
 	
 	var url = './updatepostaction.do';
-	callAjaxFormSubmit(url, function(data) {
-		var map = $.parseJSON(data);
-		$("#overlay-toast").html(map.message);
-		showToast();
-		if (map.status == "success") {
-	
-			updatePostSuccess(postId,text,'RESOLVED',false,textActionType,map)
-			
-			$('#action-form-cont'+postId).find('.form-post-textbox').val('');
-			$("#overlay-toast").html("Successfully Updated Post");
-			showToast();
-			
-		} else {
-			$("#overlay-toast").html("Failed to update post. Please Try again");
-			showToast();
-		}
-	}, formId,disableEle);
+	callFormAjaxPostForSocMonBtn(url,formId,postId);
 });
 
 $(document).on('click','.stream-action-submit',function(e){
@@ -18806,54 +18855,8 @@ $(document).on('click','.stream-action-submit',function(e){
 	$(this).closest('.action-form-cont').find('.form-status').val('SUBMIT');
 	
 	var url = './updatepostaction.do';
-	callAjaxFormSubmit(url, function(data) {
-		var map = $.parseJSON(data);
-		$("#overlay-toast").html(map.message);
-		showToast();
-		if (map.status == "success") {
-						
-			if(text!='' && text != undefined && text!=null){
-				var actionHistoryMail = $('#action-history'+postId).html();
-				
-				$('#action-history'+postId).prepend(streamActionContainer);
-				var j = parseInt($('#action-history'+postId).attr('data-count'));
-				$('#act-cont').attr('id','act-cont'+postId+'-'+j);
-				$('#action-history'+postId).attr('data-count',(j+1));
-				
-				if($('#stream-post-cont-'+postId).hasClass('stream-container-gray')){
-					$('#act-cont'+postId+'-'+j).addClass('stream-action-container-white');
-				}
-				
-				if($('#action-form-cont'+postId).find('.form-text-act-type').val() == 'SEND_EMAIL'){
-					$('#act-cont'+postId+'-'+j).find('.action-mail-icn').removeClass('hide');
-					$('#act-cont'+postId+'-'+j).addClass('stream-action-mail');	
-				}
-				$('#act-cont'+postId+'-'+j).find('.act-details-text').html(text);
-				
-				lastUpdatedAction = (new Date()).getTime();
-				lastUpdatedDateAction = new Date(lastUpdatedAction);
-				lastUpdatedDateActionStr = monthName[lastUpdatedDateAction.getMonth()]+' '+(lastUpdatedDateAction.getDate()%10!=lastUpdatedDateAction.getDate()?lastUpdatedDateAction.getDate():('0'+lastUpdatedDateAction.getDate()))+', '+lastUpdatedDateAction.getFullYear()
-				+' at '+(lastUpdatedDateAction.getHours()%10!=lastUpdatedDateAction.getHours()?lastUpdatedDateAction.getHours():('0'+lastUpdatedDateAction.getHours()))+':'
-				+(lastUpdatedDateAction.getMinutes()%10!=lastUpdatedDateAction.getMinutes()?lastUpdatedDateAction.getMinutes():('0'+lastUpdatedDateAction.getMinutes()))+':'
-				+(lastUpdatedDateAction.getSeconds()%10!=lastUpdatedDateAction.getSeconds()?lastUpdatedDateAction.getSeconds():('0'+lastUpdatedDateAction.getSeconds()));
-				
-				$('#act-cont'+postId+'-'+j).find('.act-details-date').html(lastUpdatedDateActionStr);
-				$('#act-cont'+postId+'-'+j).fadeIn('slow');
-				//$('#action-history'+postId).append(actionHistoryMail);
-			}
-			
-			$('#action-form-cont'+postId).find('.form-post-textbox').val('');
-			$("#overlay-toast").html("Successfully Updated Post");
-			showToast();
-		} else {
-			$("#overlay-toast").html("Failed to update post. Please Try again");
-			showToast();
-		}
-		
-		$(this).closest('.action-form-cont').find('.form-flagged').val(currentFlag);
-		$(this).closest('.action-form-cont').find('.form-status').val(currentStatus);
-		
-	}, formId,disableEle);
+
+	callFormAjaxPostForSocMonBtn(url,formId,postId);
 });
 
 function updatePostSuccess(postId,text,status,flagged,textActionType,map){
@@ -21101,21 +21104,101 @@ $(document).on('click', '#soc-mon-reports-generate-report-btn', function(e) {
 		});
 });
 
-function setActiveSessionForPopup(){
+$(document).on('click','.ts-add',function(e){
+	e.stopImmediatePropagation();
+	e.preventDefault();
 	
-	var url = './setactivesessionforpopup.do';
+	var trustedSource = $(this).parent().find('.ts-source').attr('data-source');
+	addTrustedSource(trustedSource,$(this));
+});
+
+function addTrustedSource(trustedSource,element){
+	
+	var payload = {"trustedSource" : trustedSource};
+	var fromTrustedSource = element.parent().find('.ts-source').attr('data-trusted');
+	
+	if(fromTrustedSource == true || fromTrustedSource == "true"){
+		$('#overlay-toast').html("This is already a trusted source.");
+		showToast();
+		return;
+	}
 	
 	$.ajax({
-		url : url,
+		url : './addtrustedsource.do',
+		headers: {          
+            Accept : "text/plain; charset=utf-8"   
+		},
 		type : "POST",
+		data : payload,
 		success : function(data){
-			console.log(data);
+			var response = JSON.parse(data);
+			
+			$('#overlay-toast').html(response.message);
+			
+			if(response.status == 'success'){
+				element.parent().find('.ts-source').attr('data-trusted',true);
+				element.removeClass('ts-add');
+				element.addClass('ts-remove');
+				element.parent().find('.trusted-source').removeClass('hide');
+			}
+			showToast();
 		},
 		error : function(e) {
 			if(e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
 				return;
 			}
+			$('#overlay-toast').html("Failed to add trusted source");
+			showToast();
+		}
+	});
+}
+
+$(document).on('click','.ts-remove',function(e){
+	e.stopImmediatePropagation();
+	e.preventDefault();
+	
+	var trustedSource = $(this).parent().find('.ts-source').attr('data-source');
+	removeTrustedSource(trustedSource,$(this));
+});
+
+function removeTrustedSource(trustedSource,element){
+	
+	var payload = {"trustedSource" : trustedSource};
+	var fromTrustedSource = element.parent().find('.ts-source').attr('data-trusted');
+	
+	if(fromTrustedSource == false || fromTrustedSource == "false"){
+		$('#overlay-toast').html("This is not a trusted source.");
+		showToast();
+		return;
+	}
+	
+	$.ajax({
+		url : './removetrustedsource.do',
+		headers: {          
+            Accept : "text/plain; charset=utf-8"   
+		},
+		type : "POST",
+		data : payload,
+		success : function(data){
+			var response = JSON.parse(data);
+			$('#overlay-toast').html(response.message);
+			
+			if(response.status == 'success'){
+				element.parent().find('.ts-source').attr('data-trusted',false);
+				element.addClass('ts-add');
+				element.removeClass('ts-remove');
+				element.parent().find('.trusted-source').addClass('hide');
+			}
+			showToast();
+		},
+		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+			$('#overlay-toast').html("Failed to remove trusted source");
+			showToast();
 		}
 	});
 	
@@ -21152,3 +21235,21 @@ $(document).on('click','#summit-already-reg',function(e){
 		 setHasRegisteredForSummit(true);
 	}
 });
+
+function setActiveSessionForPopup(){
+	
+	var url = './setactivesessionforpopup.do';
+	
+	$.ajax({
+		url : url,
+		type : "POST",
+		success : function(data){
+		},
+		error : function(e) {
+			if(e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+		}
+	});
+}
