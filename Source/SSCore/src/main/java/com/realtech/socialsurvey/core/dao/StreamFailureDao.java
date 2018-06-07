@@ -5,6 +5,8 @@ import java.util.List;
 import com.realtech.socialsurvey.core.entities.EmailEntity;
 import com.realtech.socialsurvey.core.entities.SendGridEventEntity;
 import com.realtech.socialsurvey.core.entities.UserEvent;
+import com.realtech.socialsurvey.core.entities.ftp.FtpUploadRequest;
+import com.realtech.socialsurvey.core.entities.integration.stream.FailedStreamMessage;
 
 /**
  * Handles stream failure messages
@@ -18,33 +20,62 @@ public interface StreamFailureDao
      * @param emailEntity
      * @return
      */
-    public boolean insertFailedEmailMessage(EmailEntity emailEntity);
+    public boolean insertFailedEmailMessage( EmailEntity emailEntity );
+
 
     /**
      * Inserts the failed click events into mongo
      * @param sendGridEventEntity
      * @return
      */
-    public boolean insertFailedClickEvent(SendGridEventEntity sendGridEventEntity);
+    public boolean insertFailedClickEvent( SendGridEventEntity sendGridEventEntity );
+
 
     /**
      * 
      * @return
      */
-    public List<EmailEntity> getAllFailedStreamMessages(int start , int batchSize);
+    public List<EmailEntity> getAllFailedStreamEmailMessages( int start, int batchSize );
 
-	/**
-	 * 
-	 * @param id
-	 */
-	public void deleteFailedStreamMsg(String id);
 
-	/**
-	 * 
-	 * @param id
-	 * @param updatedValue
-	 */
-	public void updateRetryFailedForStreamMsg(String id, boolean updatedValue);
+    /**
+     * 
+     * @param id
+     */
+    public void deleteFailedStreamMsg( String id );
+
+
+    /**
+     * 
+     * @param id
+     * @param updatedValue
+     */
+    public void updateRetryFailedForStreamMsg( String id, boolean updatedValue );
+
+
+    /**
+     * 
+     * @param failedStreamMessage
+     * @return
+     */
+    public <T> boolean insertFailedStreamMessage( FailedStreamMessage<T> failedStreamMessage );
+
+
+    /**
+     * 
+     * @param start
+     * @param batchSize
+     * @return
+     */
+    public List<FailedStreamMessage<FtpUploadRequest>> getFtpFailedStreamMessages( int start, int batchSize );
+
+
+    /**
+     * 
+     * @param id
+     * @return
+     */
+    public FailedStreamMessage<FtpUploadRequest> getFailedStreamMessage( String id );
 
 	/**
 	 * 

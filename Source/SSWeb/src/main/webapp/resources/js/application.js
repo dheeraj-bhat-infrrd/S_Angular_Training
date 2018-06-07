@@ -5691,6 +5691,14 @@ function saveEncompassDetails(formid) {
 	}
 }
 
+//ftp
+function saveFtpDetails(formid) {
+	if (validateFtpInput(formid)) {
+		var url = "./saveftpdetails.do";
+		callAjaxFormSubmit(url, testConnectionSaveCallBack, formid);
+	}
+}
+
 function saveLoneWolfDetails(formid , warn) {
 	if (validateLoneWolfInput(formid)) {
 		var lonewolfClientId = $("#lone-client").val();
@@ -5913,6 +5921,37 @@ function validateEncompassInput(elementId) {
 	}
 
 	return isEncompassValid;
+}
+
+//validate ftp 
+var isFtpValid;
+function validateFtpInput(elementId) {
+	isFtpValid = true;
+	var isFocussed = false;
+
+	if (!validateFtpUserName('ftp-username')) {
+		isFtpValid = false;
+		if (!isFocussed) {
+			$('#ftp-username').focus();
+			isFocussed = true;
+		}
+	}
+	if (!validateFtpPassword('ftp-password')) {
+		isFtpValid = false;
+		if (!isFocussed) {
+			$('#ftp-password').focus();
+			isFocussed = true;
+		}
+	}
+	if (!validateURL('ftp-url')) {
+		isFtpValid = false;
+		if (!isFocussed) {
+			$('#ftp-url').focus();
+			isFocussed = true;
+		}
+	}
+
+	return isFtpValid;
 }
 
 // Check for encompass input fields for testConnection (except fieldid)
@@ -14217,6 +14256,15 @@ $(document).on('click', '#en-dry-save', function(e) {
 	}
 
 });
+
+$(document).on('click', '#ftp-save', function(e) {
+	e.stopPropagation();
+	if (validateFtpInput('ftp-form-div')) {
+			initiateFtpSaveConnection(false);
+	}
+
+});
+
 $(document).on('click', '#lone-get-classification', function(e) {
 	e.stopPropagation();
 	if (validateLoneWolfInput('lone-wolf-form-div')) {
@@ -14299,6 +14347,27 @@ function initiateEncompassSaveConnection(warn) {
 	}
 }
 
+function initiateFtpSaveConnection(warn) {
+	var username = document.getElementById('ftp-username').value;
+	var password = document.getElementById('ftp-password').value;
+	var url = document.getElementById('ftp-url').value;
+	var directory = document.getElementById('ftp-dir').value;
+	var payload = {
+		"username" : username,
+		"password" : password,
+		"url" : url,
+		"directory"  : directory
+	};
+	//TODO uncomment the test connection after development 
+	// by passed test credentials for develpment
+	//showOverlay();
+	//callAjaxGetWithPayloadData(getLocationOrigin() + "/rest/encompass/testcredentials.do", saveEncompassDetailsCallBack, payload, true, '#en-dry-save');
+	saveFtpDetails("ftp-form");
+	if (warn) {
+		$('#overlay-cancel').click();
+	}
+}
+
 function initiateLoneWolfSaveConnection(warn) {
 	var client = document.getElementById('lone-client').value;
 	var payload = {
@@ -14360,6 +14429,25 @@ function showEncompassButtons() {
 		$('#en-generate-report').hide();
 	}
 }
+
+//ftp button state
+function showFtpButtons() {
+	var state = $("#ftp-state").val();
+	if (state == 'dryrun') {
+		$('#en-dry-enable').show();
+		$('#en-generate-report').show();
+		$('#en-disconnect').hide();
+	} else if (state == 'prod') {
+		$('#en-disconnect').show();
+		$('#en-dry-enable').hide();
+		$('#en-generate-report').hide();
+	} else {
+		$('#en-disconnect').hide();
+		$('#en-dry-enable').hide();
+		$('#en-generate-report').hide();
+	}
+}
+
 // lone wolf button state
 function showLoneWolfButtons() {
 	var state = $("#lone-state").val();

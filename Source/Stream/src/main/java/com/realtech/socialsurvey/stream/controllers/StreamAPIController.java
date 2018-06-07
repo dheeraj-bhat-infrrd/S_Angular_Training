@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.realtech.socialsurvey.stream.entities.TransactionIngestionMessage;
 import com.realtech.socialsurvey.stream.entities.ReportRequest;
 import com.realtech.socialsurvey.stream.messages.EmailMessage;
 import com.realtech.socialsurvey.stream.messages.SendgridEvent;
@@ -53,6 +54,8 @@ public class StreamAPIController
 
     private AuthenticationService authenticationService;
     
+    private KafkaTemplate<String, String> kafkaTransactionIngestionTemplate;
+    
     @Value ( "${kafka.topic.solrTopic}")
     private String solrTopic;
 
@@ -72,7 +75,7 @@ public class StreamAPIController
         this.kafkaEmailTemplate = kafkaEmailTemplate;
     }
 
-
+    
     @Autowired
     @Qualifier ( "emailEventsTemplate")
     public void setKafkaEmailEventsTemplate( KafkaTemplate<String, String> kafkaEmailEventsTemplate )
@@ -104,10 +107,19 @@ public class StreamAPIController
         this.kafkaBatchProcessingTemplate = kafkaBatchProcessingTemplate;
     }
     
+    
     @Autowired
     public void setAuthenticationService( AuthenticationService authenticationService )
     {
         this.authenticationService = authenticationService;
+    }
+
+    
+    @Autowired
+    @Qualifier ( "transactionIngestionTemplate")
+    public void setKafkaTransactionIngestionTemplate(KafkaTemplate<String, String> kafkaTransactionIngestionTemplate)
+    {
+        this.kafkaTransactionIngestionTemplate = kafkaTransactionIngestionTemplate;
     }
 
 
@@ -207,6 +219,22 @@ public class StreamAPIController
         LOG.trace( "Event : {}", userEvent );
         kafkaUserEventTemplate.send( new GenericMessage<>( userEvent ) ).get( 60, TimeUnit.SECONDS );
         return new ResponseEntity<>( HttpStatus.CREATED );
+    }
+    
+    
+    @ApiOperation ( value = "Upload surveys transaction request.", response = Void.class)
+    @ApiResponses ( value = { @ApiResponse ( code = 201, message = "Upload surveys transaction requested."),
+        @ApiResponse ( code = 401, message = "You are not authorized to access the resource"),
+        @ApiResponse ( code = 403, message = "Accessing the resource, you were trying to reach is forbidden"),
+        @ApiResponse ( code = 503, message = "Service not available") })
+    @RequestMapping ( value = "/transaction/ingestion", method = RequestMethod.POST)
+    public ResponseEntity<?> queueTransactionIngestionRequest( @RequestBody TransactionIngestionMessage transactionIngestionMessage )
+        throws InterruptedException, ExecutionException, TimeoutException
+    {
+        LOG.info( "Received request to upload surveys transaction request in stream" );
+        LOG.debug( "Transaction request {}", transactionIngestionMessage );
+        kafkaTransactionIngestionTemplate.send( new GenericMessage<>( transactionIngestionMessage ) ).get( 60, TimeUnit.SECONDS );
+        return new ResponseEntity<>( HttpStatus.OK );
     }
 
 }

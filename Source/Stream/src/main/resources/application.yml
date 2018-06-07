@@ -24,6 +24,7 @@ kafka:
     socialMonitorTopic: social-monitor-topic
     batchTopic: batch-topic
     userEventTopic: user-event-topic
+    transactionIngestionTopic: transaction-ingestion-topic
 
 ---
 
@@ -52,6 +53,7 @@ kafka:
     socialMonitorTopic: social-monitor-topic-dev
     batchTopic: batch-topic-dev
     userEventTopic: user-event-topic-dev
+    transactionIngestionTopic: transaction-ingestion-topic-dev
 
 api:
   security:
@@ -82,6 +84,8 @@ kafka:
     socialMonitorTopic: social-monitor-topic-demo
     batchTopic: batch-topic-demo
     userEventTopic: user-event-topic-demo
+    transactionIngestionTopic: transaction-ingestion-topic-demo
+
     
 api:
   security:
@@ -115,6 +119,7 @@ kafka:
     socialMonitorTopic: social-monitor-topic-stage
     batchTopic: batch-topic-stage
     userEventTopic: user-event-topic-stage
+    transactionIngestionTopic: transaction-ingestion-topic-stage
     
 api:
   security:

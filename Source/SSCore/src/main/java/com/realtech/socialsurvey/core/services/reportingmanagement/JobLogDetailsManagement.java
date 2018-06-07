@@ -1,6 +1,5 @@
 package com.realtech.socialsurvey.core.services.reportingmanagement;
 
-import com.realtech.socialsurvey.core.entities.JobLogDetails;
 import com.realtech.socialsurvey.core.entities.JobLogDetailsResponse;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 

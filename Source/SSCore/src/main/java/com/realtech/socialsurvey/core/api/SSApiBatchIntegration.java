@@ -2,8 +2,15 @@ package com.realtech.socialsurvey.core.api;
 
 import java.sql.Timestamp;
 
+import com.realtech.socialsurvey.core.entities.ftp.FtpUploadRequest;
+import com.realtech.socialsurvey.core.entities.integration.stream.FailedStreamMessage;
+
 import retrofit.client.Response;
+import retrofit.http.Body;
+import retrofit.http.DELETE;
 import retrofit.http.GET;
+import retrofit.http.POST;
+import retrofit.http.Path;
 import retrofit.http.Query;
 
 
@@ -94,17 +101,19 @@ public interface SSApiBatchIntegration
     @GET ( "/v1/getcompanyactiveusercountforpastday")
     Response getCompanyActiveUserCountForPastDay();
 
-    
+
     @GET ( "/v1/gettotaltransactioncountforpast5days")
     Response getTotalTransactionCountForPast5Days();
- 
+
+
     @GET ( "/v1/gettransactioncountforpast3days")
     Response getTransactionCountForPast3Days();
- 
+
+
     @GET ( "/v1/getsendsurveycountforpast5days")
     Response getSendSurveyCountForPast5Days();
- 
-    
+
+
     @GET ( "/v1/getsurvestatsforpast7daysforallcompanies")
     Response getSurveStatsForPast7daysForAllCompanies();
 
@@ -116,13 +125,39 @@ public interface SSApiBatchIntegration
     @GET ( "/v1/getcompletedsurveycountforpastndays")
     Response getCompletedSurveyCountForPastNDays();
 
-	@GET("/v1/branchranking/month/year")
-	Response getBranchRankingReport(@Query("companyId") long companyId, @Query("month") int month,
-			@Query("year") int year, @Query("type") int type);
+
+    @GET ( "/v1/branchranking/month/year")
+    Response getBranchRankingReport( @Query ( "companyId") long companyId, @Query ( "month") int month,
+        @Query ( "year") int year, @Query ( "type") int type );
 
 
-	@GET("/v1/emailreport/month/year")
-	Response getSurveyInvitationEmailReport(@Query("companyId") long companyId,@Query("month") int month,
-			@Query("year") int year);
+    @GET ( "/v1/emailreport/month/year")
+    Response getSurveyInvitationEmailReport( @Query ( "companyId") long companyId, @Query ( "month") int month,
+        @Query ( "year") int year );
 
+
+    @GET ( "/v1/crm/ftp/info/company")
+    Response getFtpConnections( @Query ( "status") String status, @Query ( "startIndex") int startIndex,
+        @Query ( "batchSize") int batchSize );
+
+
+    @POST ( "/v1/crm/ftp/stream/failed")
+    Response saveFailedFtpStreamMessage( @Body FailedStreamMessage<FtpUploadRequest> failedStreamMessage );
+
+
+    @DELETE ( "/v1/crm/ftp/stream/failed")
+    Response deleteFailedFtpStreamMessage( @Query ( "failedStreamMessageId") String failedStreamMessageId );
+
+
+    @GET ( "/v1/crm/ftp/stream/failed")
+    Response getFailedFtpStreamMessage( @Query ( "messageClass") String messageClass, @Query ( "startIndex") int startIndex,
+        @Query ( "batchSize") int batchSize );
+
+
+    @GET ( "/v1/getftpcrm/{companyId}/{ftpId}")
+    Response getFtpCrm( @Path ( "companyId") long companyId, @Path ( "ftpId") long ftpId );
+    
+    
+    @POST ( "/v1/crm/ftp/stream/failed/{id}/update")
+    Response updateRetryFailedForFailedFtpStreamMessage( @Path ( "id" ) String id, @Body Object dummy );
 }

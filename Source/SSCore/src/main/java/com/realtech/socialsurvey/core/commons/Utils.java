@@ -7,6 +7,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.security.SecureRandom;
@@ -19,10 +21,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -428,4 +430,17 @@ public class Utils
         return String.format( "%." + precision + "f", args);
     }
     
+    public String extractHostName( String urlString )
+    {
+        if ( StringUtils.isEmpty( urlString ) ) {
+            return StringUtils.EMPTY;
+        } else {
+            try {
+                return new URL( urlString ).getHost();
+            } catch ( MalformedURLException e ) {
+                LOG.warn( "extractHostName(): Not a valid URL: {}", urlString );
+                return StringUtils.EMPTY;
+            }
+        }
+    }
 }

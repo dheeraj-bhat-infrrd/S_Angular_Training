@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -4341,15 +4342,17 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     // Method to update agentId in SurveyPreInitiation 
     @Override
     @Transactional
-    public List<SurveyPreInitiation> validatePreinitiatedRecord( List<SurveyPreInitiation> surveyPreInitiations )
+    public List<SurveyPreInitiation> validatePreinitiatedRecord( List<SurveyPreInitiation> surveyPreInitiations , long companyId )
         throws InvalidInputException
     {
 
         LOG.debug( "Method processPreinitiatedRecord validatePreinitiatedRecord started " );
 
+        int duplicateSurveyInterval = getDuplicateSurveyIntervalForCompany(companyId);
+        
         for ( SurveyPreInitiation survey : surveyPreInitiations ) {
             // validate, verify, cross-verify and setup the survey pre-initiation object
-            validateAndProcessSurveyPreInitiation( survey );
+            validateAndProcessSurveyPreInitiation( survey , duplicateSurveyInterval);
         }
 
         LOG.debug( "Method processPreinitiatedRecord validatePreinitiatedRecord finished " );
@@ -4372,7 +4375,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      * @throws InvalidInputException
      */
     @Override
-    public void validateAndProcessSurveyPreInitiation( SurveyPreInitiation survey ) throws InvalidInputException
+    public void validateAndProcessSurveyPreInitiation( SurveyPreInitiation survey , int duplicateSurveyInterval ) throws InvalidInputException
     {
         // null and syntax checks
         checkForSyntaxInSurveyPreInitiationData( survey );
@@ -4402,7 +4405,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 			// check if survey has already been sent to the given email id within the time
 			// of discourse
-			checkForAlreadyExistingSurvey(survey, user);
+			checkForAlreadyExistingSurvey(survey, user, duplicateSurveyInterval);
 
 			// set the agent ID
 			survey.setAgentId(user.getUserId());
@@ -4413,13 +4416,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 			}
 
 			//update status
-			if (survey.getStatus() != CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD)
-				survey.setStatus(CommonConstants.SURVEY_STATUS_PRE_INITIATED);
-			
+			survey.setStatus(CommonConstants.SURVEY_STATUS_PRE_INITIATED);		
 		} else {
 			// user is not present so mark record as mismatch
-			if (survey.getStatus() != CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD)
-				survey.setStatus(CommonConstants.STATUS_SURVEYPREINITIATION_MISMATCH_RECORD);
+			survey.setStatus(CommonConstants.STATUS_SURVEYPREINITIATION_MISMATCH_RECORD);
 		}
 		
         
@@ -4536,9 +4536,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      * @param user
      * @throws InvalidInputException
      */
-    private void checkForAlreadyExistingSurvey( SurveyPreInitiation survey, User user ) throws InvalidInputException
+    private void checkForAlreadyExistingSurvey( SurveyPreInitiation survey, User user, int duplicateSurveyInterval ) throws InvalidInputException
     {
-        int duplicateSurveyInterval = getDuplicateSurveyIntervalForCompany( user.getCompany().getCompanyId() );
         List<SurveyPreInitiation> incompleteSurveyCustomers = null;
 
         // get incomplete survey depending on the survey re-take interval
@@ -4690,9 +4689,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     @Override
     public boolean createEntryForSurveyUploadWithCsv( String hierarchyType, MultipartFile tempFile, String fileName,
-        long hierarchyId, User user, String uploaderEmail ) throws NonFatalException, UnsupportedEncodingException
+        long hierarchyId, User user, String uploaderEmail ) throws NonFatalException, IOException
     {
-        LOG.debug( "createEntryForSurveyUploadWithCsv started for user with Id: " + user.getUserId() );
+        LOG.debug( "createEntryForSurveyUploadWithCsv started for user with Id: {}", user.getUserId() );
         String stamp = "";
 
         if ( hierarchyId <= 0 ) {
@@ -4711,7 +4710,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         // Set the new filename
         String savedFileName = stamp + user.getUserId() + "_" + new Date( System.currentTimeMillis() ).toString() + ".csv";
 
-        String fileUrl = fileUploadService.uploadFileAtSurveyCsvBucket( tempFile, savedFileName );
+        File convFile = new File( URLEncoder.encode( fileName, "UTF-8" ) );
+        tempFile.transferTo( convFile );
+        
+        String fileUrl = fileUploadService.uploadFileAtSurveyCsvBucket( convFile, savedFileName );
 
         SurveyCsvInfo csvInfo = new SurveyCsvInfo();
         csvInfo.setFileName( fileName );
@@ -4725,7 +4727,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         csvInfo.setStatus( CommonConstants.STATUS_ACTIVE );
 
         surveyCsvUploadDao.createEntryForSurveyCsvUpload( csvInfo );
-        LOG.debug( "createEntryForSurveyUploadWithCsv completed for user with Id: " + user.getUserId() );
+        LOG.debug( "createEntryForSurveyUploadWithCsv completed for user with Id: {}", user.getUserId() );
         return true;
     }
 
@@ -4939,7 +4941,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
                     // perform all the necessary checks for the SPI object 
-                    validateAndProcessSurveyPreInitiation( survey );
+                    int duplicateSurveyInterval = getDuplicateSurveyIntervalForCompany(csvInfo.getCompanyId());
+                    validateAndProcessSurveyPreInitiation( survey , duplicateSurveyInterval );
 
 
                     // depending on the hierarchy at which the file was uploaded, start the survey process

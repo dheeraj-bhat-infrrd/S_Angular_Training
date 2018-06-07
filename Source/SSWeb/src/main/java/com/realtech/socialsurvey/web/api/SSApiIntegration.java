@@ -10,6 +10,7 @@ import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
 import com.realtech.socialsurvey.core.entities.UserEvent;
 import com.realtech.socialsurvey.web.api.entities.AccountRegistrationAPIRequest;
 import com.realtech.socialsurvey.web.api.entities.CaptchaAPIRequest;
+import com.realtech.socialsurvey.web.api.entities.FtpCreateRequest;
 import com.realtech.socialsurvey.web.api.entities.VendastaRmCreateRequest;
 import com.realtech.socialsurvey.web.entities.CompanyProfile;
 import com.realtech.socialsurvey.web.entities.Payment;
@@ -294,5 +295,8 @@ public interface SSApiIntegration
     
     @POST( "/v1/setshowsummitpopup" )
     Response setShowSummitPopup(@Query("companyId") Long companyId,@Query("isShowSummitPopup") boolean isShowSummitPopup);
+    
+    @POST( "/v1/setftpcrm/{companyId}" )
+    Response setFtpCrm(@Path ("companyId") long companyId , @Body FtpCreateRequest ftpInfo);
     
 }

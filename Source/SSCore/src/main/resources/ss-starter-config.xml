@@ -530,7 +530,6 @@
 		<property name="jobDataAsMap">
 			<map>
 				<entry key="streamMessagesService" value-ref="streamMessagesService" />
-				<entry key="streamApiIntegrationBuilder" value-ref="streamApiIntegrationBuilder" />
 				</map>
 		</property>
 		<property name="durability" value="true" />
@@ -552,6 +551,19 @@
 		<property name="jobDetail" ref="archiveSocialFeedCollectionJob" />
 		<property name="cronExpression" value="0 30 6 * * ?" />
 	</bean> 
+	
+	
+	<bean id="ftpfileuploader"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass"
+			value="com.realtech.socialsurvey.core.starter.FTPFileUploader" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="ftpManagement" value-ref="ftpManagement" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
 	
 	<!-- setting cron for Review Count Updater -->
 	<bean id="solrreviewcounterupdatercron"
@@ -827,6 +839,12 @@
 		<property name="startDelay" value="2000" />
 	</bean>
 	
+	<bean id="ftpfileuploadercron"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="ftpfileuploader" />
+        <property name="cronExpression" value="0 0/5 * * * ?" />
+	</bean>
+	
 
 	<!-- Scheduler factory -->
 	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
@@ -869,6 +887,7 @@
 				<ref bean="surveyInvitationEmailCountJobThisMonth" />
 				<!-- <ref bean="failedstreammsgprocessorjobdetail" />  -->
 				<ref bean="archiveSocialFeedCollectionJob" />
+				<ref bean="ftpfileuploader" />
 			</list>
 		</property>
 
@@ -912,6 +931,7 @@
 				<ref bean="surveyInvitationEmailCountCronThisMonth" />
 				<!--  <ref bean="failedstreammsgprocessorceron" />  -->
 				<ref bean="archiveSocialFeedCollectionCronTrigger" />
+				<ref bean="ftpfileuploadercron" />
 			</list>
 		</property>
 		<property name="quartzProperties">
@@ -1057,4 +1077,8 @@
 		
 	<bean id="streamApiIntegrationBuilder"
 		class="com.realtech.socialsurvey.core.integration.stream.StreamApiIntegrationBuilder" />
+
+	<!-- dependency for monthlyDigestStarter -->	
+	<bean id="ftpManagement" 
+		class="com.realtech.socialsurvey.core.services.ftpmanagement.impl.FTPManagementImpl" />
 </beans>
