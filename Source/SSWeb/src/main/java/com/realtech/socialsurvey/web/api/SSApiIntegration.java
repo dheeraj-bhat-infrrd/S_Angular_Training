@@ -296,6 +296,16 @@ public interface SSApiIntegration
     @POST( "/v1/setshowsummitpopup" )
     Response setShowSummitPopup(@Query("companyId") Long companyId,@Query("isShowSummitPopup") boolean isShowSummitPopup);
     
+    @GET ( "/v1/duplicateposts/company/{companyId}/post/{postId}")
+    public Response getDuplicatePosts( @Path ( "companyId") long companyId, @Path ( "postId") String postId,
+        @Header ( "authorizationHeader") String authorizationHeader );
+
+    @POST("/v1/companies/{companyId}/trustedSource")
+    Response addTrustedSourceToCompany(@Path ( "companyId") long companyId, @Query ("trustedSource") String trustedSource,  @Header("authorizationHeader") String authorizationHeader);
+    
+    @POST("/v1/companies/{companyId}/trustedSource/remove")
+    Response removeTrustedSourceToCompany(@Path ( "companyId") long companyId, @Query ("trustedSource") String trustedSource,  @Header("authorizationHeader") String authorizationHeader);
+    
     @POST( "/v1/setftpcrm/{companyId}" )
     Response setFtpCrm(@Path ("companyId") long companyId , @Body FtpCreateRequest ftpInfo);
     

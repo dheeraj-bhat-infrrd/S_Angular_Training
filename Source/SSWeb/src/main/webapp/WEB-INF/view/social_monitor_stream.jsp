@@ -185,12 +185,12 @@
 						</div>
 					</div>
 					<div id="stream-pagination" class="float-right soc-mon-pagination" data-startIndex=0 data-count=0>
-						<div class="soc-mon-pag-text"><span id="stream-item-count" class="soc-mon-bold-text">7</span> items</div>
+						<div class="soc-mon-pag-text"><span id="stream-item-count" class="soc-mon-bold-text">0</span> items</div>
 						<div id="stream-start-page" class="soc-mon-pag"><img src="${initParam.resourcesPath}/resources/images/chevron-double-left.png" class="soc-mon-pag-icn"></div>
 						<div id="stream-start-page-active" class="hide soc-mon-pag-active"><img src="${initParam.resourcesPath}/resources/images/chevron-double-left-blue.png" class="soc-mon-pag-icn"></div>
 						<div id="stream-prev-page" class="soc-mon-pag"><img src="${initParam.resourcesPath}/resources/images/chevron-left.png"  class="soc-mon-pag-icn"></div>
 						<div id="stream-prev-page-active" class="soc-mon-pag-active hide"><img src="${initParam.resourcesPath}/resources/images/chevron-left-blue.png" class="soc-mon-pag-icn"></div>
-						<div class="soc-mon-pag-text"><span id="stream-page-no" class="soc-mon-bold-text">1</span> of <span id="stream-page-count" class="soc-mon-bold-text">1</span></div>
+						<div class="soc-mon-pag-text"><span id="stream-page-no" class="soc-mon-bold-text">0</span> of <span id="stream-page-count" class="soc-mon-bold-text">0</span></div>
 						<div id="stream-next-page" class="soc-mon-pag"><img src="${initParam.resourcesPath}/resources/images/chevron-right.png" class="soc-mon-pag-icn"></div>
 						<div id="stream-next-page-active" class="soc-mon-pag-active hide"><img src="${initParam.resourcesPath}/resources/images/chevron-right-blue.png" class="soc-mon-pag-icn"></div>
 						<div id="stream-end-page" class="soc-mon-pag"><img src="${initParam.resourcesPath}/resources/images/chevron-double-right.png" class="soc-mon-pag-icn"></div>
@@ -205,6 +205,26 @@
 	</div>
 	<div  id="stream-posts" class="dash-container container">
 		
+	</div>
+	<div class="dash-container container">
+		<div class="hm-header-main-wrapper hm-hdr-bord-bot soc-mon-sub-hdr" style="border-top: 1px solid #d6d6d6;">
+			<div class="container" style="width:100%">
+				<div class="hm-header-row clearfix">
+					<div id="stream-pagination-bottom" class="float-right soc-mon-pagination" data-startIndex=0 data-count=0>
+						<div class="soc-mon-pag-text-bottom"><span id="stream-item-count-bottom" class="soc-mon-bold-text">7</span> items</div>
+						<div id="stream-start-page-bottom" class="soc-mon-pag"><img src="${initParam.resourcesPath}/resources/images/chevron-double-left.png" class="soc-mon-pag-icn"></div>
+						<div id="stream-start-page-active-bottom" class="hide soc-mon-pag-active"><img src="${initParam.resourcesPath}/resources/images/chevron-double-left-blue.png" class="soc-mon-pag-icn"></div>
+						<div id="stream-prev-page-bottom" class="soc-mon-pag"><img src="${initParam.resourcesPath}/resources/images/chevron-left.png"  class="soc-mon-pag-icn"></div>
+						<div id="stream-prev-page-active-bottom" class="soc-mon-pag-active hide"><img src="${initParam.resourcesPath}/resources/images/chevron-left-blue.png" class="soc-mon-pag-icn"></div>
+						<div class="soc-mon-pag-text-bottom"><span id="stream-page-no-bottom" class="soc-mon-bold-text">1</span> of <span id="stream-page-count-bottom" class="soc-mon-bold-text">1</span></div>
+						<div id="stream-next-page-bottom" class="soc-mon-pag"><img src="${initParam.resourcesPath}/resources/images/chevron-right.png" class="soc-mon-pag-icn"></div>
+						<div id="stream-next-page-active-bottom" class="soc-mon-pag-active hide"><img src="${initParam.resourcesPath}/resources/images/chevron-right-blue.png" class="soc-mon-pag-icn"></div>
+						<div id="stream-end-page-bottom" class="soc-mon-pag"><img src="${initParam.resourcesPath}/resources/images/chevron-double-right.png" class="soc-mon-pag-icn"></div>
+						<div id="stream-end-page-active-bottom" class="soc-mon-pag-active hide"><img src="${initParam.resourcesPath}/resources/images/chevron-double-right-blue.png" class="soc-mon-pag-icn"></div>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 <script>

@@ -31,9 +31,20 @@
 								
 				</div>
 			</div>
-			<div class="post-dup col-lg-3 col-md-2 col-sm-2 col-xs-2 float-left soc-mon-post-dup hide">
-				<img src="${initParam.resourcesPath}/resources/images/duplicates.png" class="float-left soc-mon-post-dup-icn">
-				<div class="soc-mon-post-dup-num float-left">Manage <span class="dup-count"></span> duplicates</div>
+			<div class="col-lg-3 col-md-2 col-sm-2 col-xs-2 float-left ts-container hide">
+				<div class=" float-right ts-source" data-source="" data-trusted=false>
+					
+				</div>
+				<div class="float-right ts-act-icon ts-add"></div>
+				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 float-left trusted-source hide">
+					Trusted Source
+				</div>
+			</div>
+			<div class="stream-dup-container col-lg-12 col-md-12 col-sm-12 col-xs-12 float-right hide">
+				<div class="post-dup col-lg-3 col-md-3 col-sm-3 col-xs-3 float-right soc-mon-post-dup hide">
+					<img src="${initParam.resourcesPath}/resources/images/duplicates.png" class="float-left soc-mon-post-dup-icn">
+					<div class="soc-mon-post-dup-num float-left">Manage <span class="dup-count"></span> duplicates</div>
+				</div>
 			</div>
 		</div>
 		<div class="stream-post-details-text col-lg-10 col-md-10 col-sm-10 col-xs-10 stream-post-text float-right">

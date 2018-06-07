@@ -1,9 +1,10 @@
 package com.realtech.socialsurvey.core.entities;
 
-import java.io.Serializable;
-import java.util.Date;
-
 import com.realtech.socialsurvey.core.enums.ActionHistoryType;
+import com.realtech.socialsurvey.core.enums.MessageType;
+
+import java.io.Serializable;
+
 
 /**
  * Action history for social post
@@ -16,6 +17,8 @@ public class ActionHistory implements Serializable
     private long createdDate;
     private String ownerName;
     private String text;
+    private String message;
+    private MessageType messageType;
     private ActionHistoryType actionType;
 
 
@@ -65,11 +68,34 @@ public class ActionHistory implements Serializable
     }
 
 
-    @Override
-    public String toString()
+    public String getMessage()
     {
-        return "ActionHistory [createdDate=" + createdDate + ", ownerName=" + ownerName + ", text=" + text + ", actionType="
-            + actionType + "]";
+        return message;
+    }
+
+
+    public void setMessage( String message )
+    {
+        this.message = message;
+    }
+
+
+    public MessageType getMessageType()
+    {
+        return messageType;
+    }
+
+
+    public void setMessageType( MessageType messageType )
+    {
+        this.messageType = messageType;
+    }
+
+
+    @Override public String toString()
+    {
+        return "ActionHistory{" + "createdDate=" + createdDate + ", ownerName='" + ownerName + '\'' + ", text='" + text + '\''
+            + ", message='" + message + '\'' + ", messageType=" + messageType + ", actionType=" + actionType + '}';
     }
 
 

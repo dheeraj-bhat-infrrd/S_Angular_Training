@@ -689,9 +689,9 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 	@Override
 	public List<UserProfile> getUserProfiles(Long companyId) {
 		LOG.debug("Method to get userProfiles for companyId {} started", companyId);
-		Criteria criteria = getSession().createCriteria(UserProfile.class);
+		Criteria criteria = getSession().createCriteria(UserProfile.class).createAlias(CommonConstants.COMPANY , "comp" );
 		try {
-			criteria.add(Restrictions.eq(CommonConstants.COMPANY, companyDao.findById(Company.class, companyId)));
+			criteria.add(Restrictions.eq("comp.companyId", companyId));
 			criteria.add(Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE));
 		} catch (HibernateException hibernateException) {
 			LOG.warn("Exception caught in getUserProfiles() ", hibernateException);

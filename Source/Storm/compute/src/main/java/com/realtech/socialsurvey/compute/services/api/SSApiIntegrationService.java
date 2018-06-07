@@ -82,9 +82,10 @@ public interface SSApiIntegrationService
 
 
     @Headers ( "Content-Type: application/json")
-    @PUT ( "v1/feeds/hash/{hash}/companyId/{companyId}")
-    Call<Long> updateDuplicateCount( @Path ( "hash") int hash, @Path ( "companyId") long companyId,
-        @Header ( "authorizationHeader") String authorizationHeader );
+    @PUT ( "v1/feeds/id/{id}/hash/{hash}/companyId/{companyId}")
+    Call<Long> updateDuplicateCount( @Path ("hash") int hash, @Path ("companyId") long companyId,
+        @Path( "id" ) String id, @Header ("authorizationHeader") String authorizationHeader );
+
 
 
     @GET ( "v1/trxcount/agent")
@@ -116,7 +117,8 @@ public interface SSApiIntegrationService
         @Query ( "value") boolean value, @Query ( "collection") String collection,
         @Header ( "authorizationHeader") String authHeader );
 
-
+    
+    
     @Headers ( "Content-Type: application/json")
     @GET ( "v1/socialFeed/companyId/{companyId}")
     Call<List<SocialResponseObject>> getSocialFeedData( @Path ( "companyId") long companyId, @Query ( "keyword") String keyword,
@@ -129,7 +131,6 @@ public interface SSApiIntegrationService
     Call<List<SocialResponseObject>> getSocialFeedData( @Path ( "companyId") long companyId,
         @Query ( "startTime") long startTime, @Query ( "endTime") long endTime, @Query ( "pageSize") int pageSize,
         @Query ( "skips") int skips, @Header ( "authorizationHeader") String authHeader );
-
 
     @Headers ( "Content-Type: application/json")
     @GET ( "v1/getftpcrm/{companyId}/{ftpId}")

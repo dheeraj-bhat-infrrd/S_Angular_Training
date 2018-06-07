@@ -1,54 +1,12 @@
 package com.realtech.socialsurvey.core.services.socialmonitor.feed.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
-import javax.annotation.Resource;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.RandomUtils;
-import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.DependsOn;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.realtech.socialsurvey.core.commons.ActionHistoryComparator;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.MacrosComparator;
-import com.realtech.socialsurvey.core.dao.BranchDao;
-import com.realtech.socialsurvey.core.dao.CompanyDao;
-import com.realtech.socialsurvey.core.dao.MongoSocialFeedDao;
-import com.realtech.socialsurvey.core.dao.RegionDao;
-import com.realtech.socialsurvey.core.dao.UserDao;
-import com.realtech.socialsurvey.core.dao.UserProfileDao;
+import com.realtech.socialsurvey.core.dao.*;
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialFeedDaoImpl;
-import com.realtech.socialsurvey.core.entities.ActionHistory;
-import com.realtech.socialsurvey.core.entities.Company;
-import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.SegmentsEntity;
-import com.realtech.socialsurvey.core.entities.SegmentsVO;
-import com.realtech.socialsurvey.core.entities.SocialFeedActionResponse;
-import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
-import com.realtech.socialsurvey.core.entities.SocialMonitorFeedData;
-import com.realtech.socialsurvey.core.entities.SocialMonitorFeedTypeVO;
-import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
-import com.realtech.socialsurvey.core.entities.SocialMonitorResponseData;
-import com.realtech.socialsurvey.core.entities.SocialMonitorUsersVO;
-import com.realtech.socialsurvey.core.entities.SocialResponseObject;
-import com.realtech.socialsurvey.core.entities.UserProfile;
-import com.realtech.socialsurvey.core.enums.ActionHistoryType;
-import com.realtech.socialsurvey.core.enums.ProfileType;
-import com.realtech.socialsurvey.core.enums.SocialFeedStatus;
-import com.realtech.socialsurvey.core.enums.TextActionType;
+import com.realtech.socialsurvey.core.entities.*;
+import com.realtech.socialsurvey.core.enums.*;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.integration.stream.StreamApiConnectException;
 import com.realtech.socialsurvey.core.integration.stream.StreamApiException;
@@ -58,6 +16,18 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.socialmonitor.feed.SocialFeedService;
+import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+import java.util.*;
 
 
 /**
@@ -237,6 +207,8 @@ public class SocialFeedServiceImpl implements SocialFeedService
                 }
             }
         }
+        
+        Set<String> postIds = socialFeedsActionUpdate.getPostIds();
         List<SocialResponseObject> socialResponseObjectsToAdd = mongoSocialFeedDao
             .getSocialPostsByIds( socialFeedsActionUpdate.getPostIds(), companyId, MongoSocialFeedDaoImpl.SOCIAL_FEED_COLLECTION );
         for ( SocialResponseObject socialResponseObject : socialResponseObjectsToAdd ) {
@@ -263,6 +235,12 @@ public class SocialFeedServiceImpl implements SocialFeedService
                         actionHistory.setText( "Post was <b class='soc-mon-bold-text'>Flagged</b> manually by " + "<b class='soc-mon-bold-text'>" + socialFeedsActionUpdate.getUserName() + "</b>" );
                         actionHistory.setOwnerName( socialFeedsActionUpdate.getUserName() );
                         actionHistory.setCreatedDate( new Date().getTime() );
+                        if(socialFeedsActionUpdate.getTextActionType().equals( TextActionType.SEND_EMAIL )){
+                            actionHistory.setMessageType(  MessageType.EMAIL );
+                            // send mail to the user
+                            sendMail(socialResponseObject, socialFeedsActionUpdate, previousStatus, currentStatus);
+                        } else actionHistory.setMessageType(  MessageType.PRIVATE_MESSAGE );
+                        actionHistory.setMessage( socialFeedsActionUpdate.getText() );
                         actionHistories.add( actionHistory );
                         socialResponseObject.setUpdatedTime( new Date().getTime() );
                         previousStatus = UNFLAGGED;
@@ -278,6 +256,12 @@ public class SocialFeedServiceImpl implements SocialFeedService
                         actionHistory.setText( "Post was <b class='soc-mon-bold-text'>Unflagged</b> by " + "<b class='soc-mon-bold-text'>" + socialFeedsActionUpdate.getUserName() + "</b>" );
                         actionHistory.setOwnerName( socialFeedsActionUpdate.getUserName() );
                         actionHistory.setCreatedDate( new Date().getTime() );
+                        if(socialFeedsActionUpdate.getTextActionType().equals( TextActionType.SEND_EMAIL )){
+                            actionHistory.setMessageType(  MessageType.EMAIL );
+                            // send mail to the user
+                            sendMail(socialResponseObject, socialFeedsActionUpdate, previousStatus, currentStatus);
+                        } else actionHistory.setMessageType(  MessageType.PRIVATE_MESSAGE );
+                        actionHistory.setMessage( socialFeedsActionUpdate.getText() );
                         actionHistories.add( actionHistory );
                         socialResponseObject.setUpdatedTime( new Date().getTime() );
                         previousStatus = FLAGGED;
@@ -299,6 +283,12 @@ public class SocialFeedServiceImpl implements SocialFeedService
                         actionHistory.setText( "Post was <b class='soc-mon-bold-text'>Escalated</b> by " + "<b class='soc-mon-bold-text'>" + socialFeedsActionUpdate.getUserName() + "</b>");
                         actionHistory.setOwnerName( socialFeedsActionUpdate.getUserName() );
                         actionHistory.setCreatedDate( new Date().getTime() );
+                        actionHistory.setMessage( socialFeedsActionUpdate.getText() );
+                        if(socialFeedsActionUpdate.getTextActionType().equals( TextActionType.SEND_EMAIL )){
+                            actionHistory.setMessageType(  MessageType.EMAIL );
+                            // send mail to the user
+                            sendMail(socialResponseObject, socialFeedsActionUpdate, previousStatus, currentStatus);
+                        } else actionHistory.setMessageType(  MessageType.PRIVATE_MESSAGE );
                         actionHistories.add( actionHistory );
                         socialResponseObject.setUpdatedTime( new Date().getTime() );
                         if(socialResponseObject.isFlagged()) {
@@ -321,6 +311,12 @@ public class SocialFeedServiceImpl implements SocialFeedService
                         actionHistory.setText( "Post was <b class='soc-mon-bold-text'>Resolved</b> by " + "<b class='soc-mon-bold-text'>" + socialFeedsActionUpdate.getUserName() + "</b>" );
                         actionHistory.setOwnerName( socialFeedsActionUpdate.getUserName() );
                         actionHistory.setCreatedDate( new Date().getTime() );
+                        if(socialFeedsActionUpdate.getTextActionType().equals( TextActionType.SEND_EMAIL )){
+                            actionHistory.setMessageType(  MessageType.EMAIL );
+                            // send mail to the user
+                            sendMail(socialResponseObject, socialFeedsActionUpdate, previousStatus, currentStatus);
+                        } else actionHistory.setMessageType(  MessageType.PRIVATE_MESSAGE );
+                        actionHistory.setMessage( socialFeedsActionUpdate.getText() );
                         actionHistories.add( actionHistory );
                         socialResponseObject.setUpdatedTime( new Date().getTime() );
                         previousStatus = SocialFeedStatus.ESCALATED.toString().toLowerCase();
@@ -328,42 +324,24 @@ public class SocialFeedServiceImpl implements SocialFeedService
                     }
                 }
             }
-            if ( ( macroActionFlag != 1 && updateFlag != 1 )
-                || ( socialFeedsActionUpdate.getStatus().toString().equalsIgnoreCase( SocialFeedStatus.SUBMIT.toString() ) ) ) {
-                if ( ( socialFeedsActionUpdate.getTextActionType().toString()
-                    .equalsIgnoreCase( TextActionType.PRIVATE_NOTE.toString() ) )
-                    && ( socialFeedsActionUpdate.getText() != null ) && !( socialFeedsActionUpdate.getText().isEmpty() ) ) {
+            if ( socialFeedsActionUpdate.getStatus().toString().equalsIgnoreCase( SocialFeedStatus.SUBMIT.toString() ) ) {
+                if ( socialFeedsActionUpdate.getText() != null  && !socialFeedsActionUpdate.getText().isEmpty() ) {
                     ActionHistory actionHistory = new ActionHistory();
-                    actionHistory.setActionType( ActionHistoryType.PRIVATE_MESSAGE );
-                    actionHistory.setText( socialFeedsActionUpdate.getText() );
+                    actionHistory.setActionType( ActionHistoryType.SUBMIT );
+                    if(socialFeedsActionUpdate.getTextActionType().equals( TextActionType.SEND_EMAIL )){
+                        actionHistory.setMessageType(  MessageType.EMAIL );
+                        // send mail to the user
+                        sendMail(socialResponseObject, socialFeedsActionUpdate, previousStatus, currentStatus);
+                    } else actionHistory.setMessageType(  MessageType.PRIVATE_MESSAGE );
+                    actionHistory.setMessage( socialFeedsActionUpdate.getText() );
                     actionHistory.setOwnerName( socialFeedsActionUpdate.getUserName() );
                     actionHistory.setCreatedDate( new Date().getTime() );
                     socialResponseObject.setUpdatedTime( new Date().getTime() );
                     actionHistories.add( actionHistory );
                 }
-                if ( ( socialFeedsActionUpdate.getTextActionType().toString()
-                    .equalsIgnoreCase( TextActionType.SEND_EMAIL.toString() ) ) && ( socialFeedsActionUpdate.getText() != null )
-                    && !( socialFeedsActionUpdate.getText().isEmpty() ) ) {
-                    ActionHistory actionHistory = new ActionHistory();
-                    actionHistory.setActionType( ActionHistoryType.EMAIL );
-                    actionHistory.setText( socialFeedsActionUpdate.getText() );
-                    actionHistory.setOwnerName( socialFeedsActionUpdate.getUserName() );
-                    actionHistory.setCreatedDate( new Date().getTime() );
-                    socialResponseObject.setUpdatedTime( new Date().getTime() );
-                    actionHistories.add( actionHistory );
-                    // send mail to the user
-                    try {
-                        emailServices.sendSocialMonitorActionMail( socialResponseObject.getOwnerEmail(),
-                            socialResponseObject.getOwnerName(), socialFeedsActionUpdate.getText(),
-                            socialFeedsActionUpdate.getUserName(), socialFeedsActionUpdate.getUserEmailId(), previousStatus,
-                            currentStatus, socialResponseObject.getType().toString().toLowerCase() );
-                    } catch ( UndeliveredEmailException e ) {
-                        LOG.error( "Email could not be delivered", e );
-                    }
-                }
-                mongoSocialFeedDao.updateSocialFeed( socialFeedsActionUpdate, socialResponseObject, companyId, actionHistories,
-                    updateFlag, MongoSocialFeedDaoImpl.SOCIAL_FEED_COLLECTION );
             }
+            mongoSocialFeedDao.updateSocialFeed( socialFeedsActionUpdate, socialResponseObject, companyId, actionHistories,
+                updateFlag, MongoSocialFeedDaoImpl.SOCIAL_FEED_COLLECTION );
             //add successful postIds
             if ( ( updateFlag != 1 && macroActionFlag != 1 )
                 || ( socialFeedsActionUpdate.getStatus().toString().equalsIgnoreCase( SocialFeedStatus.SUBMIT.toString() ) ) ) {
@@ -385,13 +363,28 @@ public class SocialFeedServiceImpl implements SocialFeedService
 
     }
 
-    @Override
-    public long updateDuplicateCount(int hash, long companyId) throws InvalidInputException {
-        LOG.info("Executing updateDuplicateCount method with hash = {}, companyId = {}", hash, companyId);
-        if( hash  == 0 || companyId <= 0){
-            throw new InvalidInputException( "companyId cannot be <= 0 or hash cannot be 0" );
+
+    private void sendMail( SocialResponseObject socialResponseObject, SocialFeedsActionUpdate socialFeedsActionUpdate,
+        String previousStatus, String currentStatus ) throws InvalidInputException
+    {
+        try {
+            emailServices.sendSocialMonitorActionMail( socialResponseObject.getOwnerEmail(),
+                socialResponseObject.getOwnerName(), socialFeedsActionUpdate.getText(),
+                socialFeedsActionUpdate.getUserName(), socialFeedsActionUpdate.getUserEmailId(), previousStatus,
+                currentStatus, socialResponseObject.getType().toString().toLowerCase() );
+        } catch ( UndeliveredEmailException e ) {
+            LOG.error( "Email could not be delivered", e );
         }
-        return mongoSocialFeedDao.updateDuplicateCount(hash, companyId);
+    }
+
+
+    @Override
+    public long updateDuplicateCount( int hash, long companyId, String id ) throws InvalidInputException {
+        LOG.info("Executing updateDuplicateCount method with hash = {}, companyId = {} and id = {}", hash, companyId, id);
+        if( hash  == 0 || companyId <= 0 || StringUtils.isEmpty( id )){
+            throw new InvalidInputException( "companyId cannot be <= 0 or hash cannot be 0 or id should not be null or empty" );
+        }
+        return mongoSocialFeedDao.updateDuplicateCount(hash, companyId, id);
     }
 
 
@@ -554,12 +547,13 @@ public class SocialFeedServiceImpl implements SocialFeedService
 					socialMonitorUsersVO.setRegionId(userProfile.getRegionId());
 					socialMonitorUsersVO.setBranchId(userProfile.getBranchId());
 					socialMonitorUsersVO.setUserId(userProfile.getAgentId());
-
-					socialMonitorUsersVO.setName(mongoSocialFeedDao.getAllUserDetails(userProfile.getAgentId())
-							.getContact_details().getName());
-					socialMonitorUsersVO.setProfileImageUrl(
-							mongoSocialFeedDao.getAllUserDetails(userProfile.getAgentId()).getProfileImageUrl());
-					usersList.add(socialMonitorUsersVO);
+					
+					if(!usersList.contains( socialMonitorUsersVO )){
+    					OrganizationUnitSettings userDetails = mongoSocialFeedDao.getAllUserDetails(userProfile.getAgentId());
+    					socialMonitorUsersVO.setName(userDetails.getContact_details().getName());
+    					socialMonitorUsersVO.setProfileImageUrl(userDetails.getProfileImageUrl());
+	                    usersList.add(socialMonitorUsersVO);
+					}
 				}
 			}
 		}
@@ -826,5 +820,79 @@ public class SocialFeedServiceImpl implements SocialFeedService
         mongoSocialFeedDao.updateForTrustedSource( companyId, trustedSource, actionHistory );
         
     }
+
+
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public SocialMonitorResponseData getDuplicatePosts( Long companyId, String postId ) throws InvalidInputException
+    {
+        LOG.debug( "Fetching duplicate posts with companyId {} and postId {}", companyId, postId );
+        if ( companyId <= 0 || StringUtils.isEmpty( postId ) ) {
+            LOG.error( "Invalid companyId or postId" );
+            throw new InvalidInputException( "Invalid companyId or postId" );
+        }
+        OrganizationUnitSettings organizationUnitSettings;
+        List<SocialResponseObject> duplicateSocialResponseObjects = new ArrayList<>();
+        SocialMonitorResponseData socialMonitorResponseData = new SocialMonitorResponseData();
+        List<SocialMonitorFeedData> socialMonitorStreamDataList = new ArrayList<>();
+        SocialResponseObject socialPostResponseObject = mongoSocialFeedDao.getSocialPost( companyId, postId, MongoSocialFeedDaoImpl.SOCIAL_FEED_COLLECTION );
+        if(socialPostResponseObject != null) {
+            duplicateSocialResponseObjects = mongoSocialFeedDao.getAllDuplicatePostDetails( companyId, socialPostResponseObject.getHash() );
+        }
+        if ( duplicateSocialResponseObjects != null && !duplicateSocialResponseObjects.isEmpty() ) {
+            for ( SocialResponseObject socialResponseObject : duplicateSocialResponseObjects ) {
+                SocialMonitorFeedData socialMonitorFeedData = new SocialMonitorFeedData();
+                if ( socialResponseObject.getProfileType().equals( ProfileType.COMPANY ) ) {
+                    organizationUnitSettings = mongoSocialFeedDao.getProfileImageUrl( socialResponseObject.getCompanyId(),
+                        CommonConstants.COMPANY_SETTINGS_COLLECTION );
+                } else if ( socialResponseObject.getProfileType().equals( ProfileType.REGION ) ) {
+                    organizationUnitSettings = mongoSocialFeedDao.getProfileImageUrl( socialResponseObject.getRegionId(),
+                        CommonConstants.REGION_SETTINGS_COLLECTION );
+                } else if ( socialResponseObject.getProfileType().equals( ProfileType.BRANCH ) ) {
+                    organizationUnitSettings = mongoSocialFeedDao.getProfileImageUrl( socialResponseObject.getBranchId(),
+                        CommonConstants.BRANCH_SETTINGS_COLLECTION );
+                } else {
+                    organizationUnitSettings = mongoSocialFeedDao.getProfileImageUrl( socialResponseObject.getAgentId(),
+                        CommonConstants.AGENT_SETTINGS_COLLECTION );
+                }
+                socialMonitorFeedData.setType( socialResponseObject.getType() );
+                socialMonitorFeedData.setStatus( socialResponseObject.getStatus() );
+                socialMonitorFeedData.setText( socialResponseObject.getText() );
+                socialMonitorFeedData.setPictures( socialResponseObject.getPictures() );
+                socialMonitorFeedData.setOwnerName( socialResponseObject.getOwnerName() );
+                if ( organizationUnitSettings != null ) {
+                    socialMonitorFeedData.setOwnerProfileImage( organizationUnitSettings.getProfileImageUrl() );
+                }
+                socialMonitorFeedData.setCompanyId( socialResponseObject.getCompanyId() );
+                socialMonitorFeedData.setRegionId( socialResponseObject.getRegionId() );
+                socialMonitorFeedData.setBranchId( socialResponseObject.getBranchId() );
+                socialMonitorFeedData.setAgentId( socialResponseObject.getAgentId() );
+                socialMonitorFeedData.setPostId( socialResponseObject.getPostId() );
+                socialMonitorFeedData.setFlagged( socialResponseObject.isFlagged() );
+                if ( socialResponseObject.getActionHistory() != null ) {
+                    Collections.sort( socialResponseObject.getActionHistory(), new ActionHistoryComparator() );
+                }
+                socialMonitorFeedData.setActionHistory( socialResponseObject.getActionHistory() );
+                socialMonitorFeedData.setUpdatedOn( socialResponseObject.getCreatedTime() );
+                socialMonitorFeedData.setFoundKeywords( socialResponseObject.getFoundKeywords() );
+                socialMonitorFeedData.setDuplicateCount( socialResponseObject.getDuplicateCount() );
+                socialMonitorFeedData.setPageLink( socialResponseObject.getPageLink() );
+                socialMonitorFeedData.setPostLink( socialResponseObject.getPostLink() );
+                socialMonitorFeedData.setFromTrustedSource( socialResponseObject.isFromTrustedSource() );
+                socialMonitorFeedData.setPostSource( socialResponseObject.getPostSource() );
+                if ( StringUtils.isNotEmpty( socialResponseObject.getTextHighlighted() ) ) {
+                    socialMonitorFeedData.setTextHighlighted( socialResponseObject.getTextHighlighted() );
+                } else {
+                    socialMonitorFeedData.setTextHighlighted( socialResponseObject.getText() );
+                }
+                socialMonitorStreamDataList.add( socialMonitorFeedData );
+            }
+        }
+        socialMonitorResponseData.setCount( duplicateSocialResponseObjects.size() );
+        socialMonitorResponseData.setStatus( "DUPLICATES" );
+        socialMonitorResponseData.setSocialMonitorFeedData( socialMonitorStreamDataList );
+        return socialMonitorResponseData;
+    }
+    
 } 
 

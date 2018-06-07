@@ -137,10 +137,10 @@ public class SSAPIOperations
             return true;
     }
 
-    public Optional<Long> updateSocialPostDuplicateCount( int hash, long comapnyId ) throws IOException {
+    public Optional<Long> updateSocialPostDuplicateCount( int hash, long comapnyId, String id ) throws IOException {
         LOG.info( "Executing updateSocialPostDuplicateCount method" );
         Call<Long> requestCall = RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationService()
-            .updateDuplicateCount( hash, comapnyId , AUTH_HEADER);
+            .updateDuplicateCount( hash, comapnyId, id, AUTH_HEADER);
             Response<Long> response = requestCall.execute();
             RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
             if ( LOG.isTraceEnabled() ) {

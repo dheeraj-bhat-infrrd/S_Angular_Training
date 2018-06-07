@@ -33,9 +33,9 @@ public class WriteSocialMonitorReportToExcel extends BaseComputeBoltWithAck
     private transient XSSFWorkbook workbook;
 
     public static final String SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD = "SocialSurvey User Name,Social Post Source,Post content,Post Link,Action,Owner Name,"
-        + "Action Date,Comments";
+        + "Action Date,Comments,MessageType,Message";
     public static final String SOCIAL_MONITOR_DATE_REPORT = "SocialSurvey User Name,Social Post Source,Post content,Post Link,If flagged automatic,"
-        + "Action,Owner Name,Action Date,Comments";
+        + "Action,Owner Name,Action Date,Comments,MessageType,Message";
 
     @Override
     @SuppressWarnings( "unchecked" )
@@ -110,7 +110,7 @@ public class WriteSocialMonitorReportToExcel extends BaseComputeBoltWithAck
         return workbook;
     }
 
-
+    @SuppressWarnings( "unchecked" )
     private Map<Integer,List<Object>> getSocialMonitorReportDateBasedToBeWrittenInSheet( List<SocialResponseObject> socialResponseWrapper )
     {
         Map<Integer, List<Object>> socialFeedData = new TreeMap<>();
@@ -119,7 +119,7 @@ public class WriteSocialMonitorReportToExcel extends BaseComputeBoltWithAck
             int enterNext = 1;
             for (SocialResponseObject socialFeed : socialResponseWrapper) {
 
-                if(socialFeed.getFoundKeywords() == null || socialFeed.getFoundKeywords().isEmpty()){
+                if( socialFeed.getActionHistory() == null || socialFeed.getActionHistory().isEmpty() ){
                     socialMonitorReportToPopulate = new ArrayList<>();
 
                     socialMonitorReportToPopulate.add(socialFeed.getOwnerName());
@@ -140,12 +140,15 @@ public class WriteSocialMonitorReportToExcel extends BaseComputeBoltWithAck
                         socialMonitorReportToPopulate.add(socialFeed.getType().toString());
                         socialMonitorReportToPopulate.add(socialFeed.getText());
                         socialMonitorReportToPopulate.add(socialFeed.getPostLink());
-                        socialMonitorReportToPopulate.add("Yes");
+                        socialMonitorReportToPopulate.add(socialFeed.getFoundKeywords()== null || socialFeed.getActionHistory().isEmpty() ? "No" : "Yes");
                         socialMonitorReportToPopulate.add(actionHistory.getActionType().toString());
                         socialMonitorReportToPopulate.add(actionHistory.getOwnerName());
                         socialMonitorReportToPopulate.add(ConversionUtils.convertToEst( actionHistory.getCreatedDate() ));
                         socialMonitorReportToPopulate.add(actionHistory.getText());
-
+                        if(actionHistory.getMessageType() != null){
+                            socialMonitorReportToPopulate.add( actionHistory.getMessageType().toString() );
+                            socialMonitorReportToPopulate.add( actionHistory.getMessage() );
+                        }
                         socialFeedData.put(enterNext++, socialMonitorReportToPopulate);
                     }
                 }
@@ -176,6 +179,10 @@ public class WriteSocialMonitorReportToExcel extends BaseComputeBoltWithAck
                     socialMonitorReportToPopulate.add(actionHistory.getOwnerName());
                     socialMonitorReportToPopulate.add(ConversionUtils.convertToEst( actionHistory.getCreatedDate() ));
                     socialMonitorReportToPopulate.add(actionHistory.getText());
+                    if(actionHistory.getMessageType() != null){
+                        socialMonitorReportToPopulate.add( actionHistory.getMessageType().toString() );
+                        socialMonitorReportToPopulate.add( actionHistory.getMessage() );
+                    }
 
                     socialFeedData.put(enterNext++, socialMonitorReportToPopulate);
                 }

@@ -255,6 +255,29 @@ public class SocialMonitorFeedsController {
 
     }
     
-    
+
+    @RequestMapping ( value = "/duplicateposts/company/{companyId}/post/{postId}", method = RequestMethod.GET)
+    @ApiOperation ( value = "Get all duplicate posts of a particular post", response = SocialMonitorResponseData.class)
+    @ApiResponses ( value = { @ApiResponse ( code = 200, message = "Successfully fetched duplicate posts of a particular post") })
+    public ResponseEntity<?> getDuplicatePosts( @PathVariable Long companyId, @PathVariable String postId, 
+        @RequestHeader ( "authorizationHeader") String authorizationHeader ) throws InvalidInputException, SSApiException
+    {
+        LOGGER.info("Fetching the list duplicate posts of a particular post");
+        SocialMonitorResponseData socialMonitorResponseData;
+        try {
+            adminAuthenticationService.validateAuthHeader( authorizationHeader );
+            try {
+                socialMonitorResponseData = socialFeedService.getDuplicatePosts( companyId, postId );
+            } catch (InvalidInputException ie) {
+                LOGGER.error("Invalid input exception caught while fetching social feeds", ie);
+                throw new SSApiException("Invalid input exception caught while fetching social feeds", ie);
+            }
+        } catch ( AuthorizationException authoriztionFailure ) {
+            return new ResponseEntity<>( AUTH_FAILED, HttpStatus.UNAUTHORIZED );
+        }
+
+        return new ResponseEntity<>(socialMonitorResponseData, HttpStatus.OK);
+        
+    }
 
 }

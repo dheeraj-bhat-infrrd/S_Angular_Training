@@ -12299,6 +12299,61 @@ img.lead-img {
 	width: 20%;
 }
 
+.ts-container{
+	padding:  0;
+}
+
+.ts-source{
+	font-size:  12px;
+    width: auto;
+    font-weight: bold !important;
+    margin-right:  10px;
+}
+
+.ts-act-icon{
+	 margin-right: 10px;
+	 width: 18px;
+	 height: 18px;
+	 background-size: contain;
+	 background-position:centre;
+	 background-repeat: no-repeat;
+	 cursor:pointer;
+}
+
+.ts-remove{
+	background-image: url(../images/ts-remove.png);
+}
+
+.ts-remove:hover{
+	background-image: url(../images/ts-remove-hover.png);
+}
+
+.ts-add{
+	background-image: url(../images/ts-add.png);
+}
+
+.ts-add:hover{
+	background-image: url(../images/ts-add-hover.png);
+}
+
+.trusted-source{
+	font-size:  12px;
+    padding:  0;
+    margin-top:  10px;
+    height: 25px;
+    color: white;
+    background: #295ea0;
+    border-radius: 3px;
+    text-align:  center;
+    font-weight:  bold !important;
+    line-height: 25px;
+}
+
+.stream-dup-container{
+	margin-top:  10px;
+	padding:0;
+}
+
 .summit-checkbox-cont{
 	display: flex;
     position: absolute;
@@ -12330,4 +12385,17 @@ img.lead-img {
 
 .summit-checked{
 	background-image:url(../images/checkbox-marked.png);
+}
+
+.act-details-msg-type{
+	background: #a9a9a9;
+    border-radius: 3px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    color: white;
+    font-weight: bold !important;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-left: 20px;
+    font-size: 12px;
 }
