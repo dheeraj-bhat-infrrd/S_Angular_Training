@@ -39,6 +39,7 @@ public class SurveyPreinitiationTransformer implements Transformer<SurveyPutVO, 
 		
 		
 		long companyId = (Long) objects[0];
+		String surveySource = ( String ) objects[1];
 		
 		TransactionInfoPutVO transactionInfo = a.getTransactionInfo();
 		ServiceProviderInfo serviceProviderInfo = a.getServiceProviderInfo();
@@ -74,12 +75,15 @@ public class SurveyPreinitiationTransformer implements Transformer<SurveyPutVO, 
 		surveyPreInitiationBorrower.setCustomerFirstName(transactionInfo.getCustomer1FirstName());
 		surveyPreInitiationBorrower.setCustomerLastName(transactionInfo.getCustomer1LastName());
 		 
-		surveyPreInitiationBorrower.setSurveySource("API");
+		surveyPreInitiationBorrower.setSurveySource(surveySource);
 		surveyPreInitiationBorrower.setEngagementClosedTime(new Timestamp(date.getTime()));
 		surveyPreInitiationBorrower.setSurveySourceId(transactionInfo.getTransactionRef());
 		surveyPreInitiationBorrower.setCity(transactionInfo.getTransactionCity());
 		surveyPreInitiationBorrower.setState(transactionInfo.getTransactionState());
         surveyPreInitiationBorrower.setTransactionType(transactionInfo.getTransactionType());
+        //adding property address feild to save in survey pre initiation
+        surveyPreInitiationBorrower.setPropertyAddress( transactionInfo.getPropertyAddress() );
+
 		 
 		surveyPreInitiationBorrower.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
 		surveyPreInitiationBorrower.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
@@ -91,39 +95,42 @@ public class SurveyPreinitiationTransformer implements Transformer<SurveyPutVO, 
         if(! StringUtils.isBlank(transactionInfo.getCustomer2Email()) || ! StringUtils.isBlank(transactionInfo.getCustomer2FirstName())){
         	
         	if(StringUtils.isBlank(transactionInfo.getCustomer2Email()))
-    			throw new InvalidInputException("Invalid input passed. Customer2Email can't be null or empty");
+    			throw new InvalidInputException("Invalid input passed. customer2Email can't be null or empty");
     		if(StringUtils.isBlank(transactionInfo.getCustomer2FirstName()))
-    			throw new InvalidInputException("Invalid input passed. Customer2FirstName can't be null or empty");
-        	
-        	SurveyPreInitiation surveyPreInitiationCoBorrower = new SurveyPreInitiation();
-        	surveyPreInitiationCoBorrower.setAgentEmailId(serviceProviderInfo.getServiceProviderEmail());
-        	surveyPreInitiationCoBorrower.setAgentName(serviceProviderInfo.getServiceProviderName());
-    		surveyPreInitiationCoBorrower.setCompanyId(companyId);
+    			throw new InvalidInputException("Invalid input passed. customer2FirstName can't be null or empty");
+        
+    		//check if both email ids are different, if yes than process 2nd as well
+    		if( ! transactionInfo.getCustomer2Email().equalsIgnoreCase(transactionInfo.getCustomer2FirstName())) {
+    			SurveyPreInitiation surveyPreInitiationCoBorrower = new SurveyPreInitiation();
+            	surveyPreInitiationCoBorrower.setAgentEmailId(serviceProviderInfo.getServiceProviderEmail());
+            	surveyPreInitiationCoBorrower.setAgentName(serviceProviderInfo.getServiceProviderName());
+        		surveyPreInitiationCoBorrower.setCompanyId(companyId);
 
-    		 
-        	surveyPreInitiationCoBorrower.setCustomerEmailId(transactionInfo.getCustomer2Email());
-        	surveyPreInitiationCoBorrower.setCustomerFirstName(transactionInfo.getCustomer2FirstName());
-        	surveyPreInitiationCoBorrower.setCustomerLastName(transactionInfo.getCustomer2LastName());
-    		 
-        	surveyPreInitiationCoBorrower.setSurveySource("API");
-        	surveyPreInitiationCoBorrower.setEngagementClosedTime(new Timestamp(date.getTime()));
-        	surveyPreInitiationCoBorrower.setSurveySourceId(transactionInfo.getTransactionRef());
-        	surveyPreInitiationCoBorrower.setCity(transactionInfo.getTransactionCity());
-        	surveyPreInitiationCoBorrower.setState(transactionInfo.getTransactionState());
-        	surveyPreInitiationCoBorrower.setTransactionType(transactionInfo.getTransactionType());
-    		 
-        	surveyPreInitiationCoBorrower.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
-        	surveyPreInitiationCoBorrower.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
-        	surveyPreInitiationCoBorrower.setLastReminderTime( utils.convertEpochDateToTimestamp() );
-        	surveyPreInitiationCoBorrower.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED );
-        	
-        	if( transactionInfo.getCustomer1Email().equalsIgnoreCase( transactionInfo.getCustomer2Email()) ){
-                surveyPreInitiationCoBorrower.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD );
-        	}
-        	surveyPreInitiations.add( surveyPreInitiationCoBorrower );
-         }
-
-		return surveyPreInitiations;
+        		 
+            	surveyPreInitiationCoBorrower.setCustomerEmailId(transactionInfo.getCustomer2Email());
+            	surveyPreInitiationCoBorrower.setCustomerFirstName(transactionInfo.getCustomer2FirstName());
+            	surveyPreInitiationCoBorrower.setCustomerLastName(transactionInfo.getCustomer2LastName());
+        		 
+            	surveyPreInitiationCoBorrower.setSurveySource(surveySource);
+            	surveyPreInitiationCoBorrower.setEngagementClosedTime(new Timestamp(date.getTime()));
+            	surveyPreInitiationCoBorrower.setSurveySourceId(transactionInfo.getTransactionRef());
+            	surveyPreInitiationCoBorrower.setCity(transactionInfo.getTransactionCity());
+            	surveyPreInitiationCoBorrower.setState(transactionInfo.getTransactionState());
+            	surveyPreInitiationCoBorrower.setTransactionType(transactionInfo.getTransactionType());
+        		 
+            	surveyPreInitiationCoBorrower.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
+            	surveyPreInitiationCoBorrower.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
+            	surveyPreInitiationCoBorrower.setLastReminderTime( utils.convertEpochDateToTimestamp() );
+            	surveyPreInitiationCoBorrower.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_NOT_PROCESSED );
+            	
+            	if( transactionInfo.getCustomer1Email().equalsIgnoreCase( transactionInfo.getCustomer2Email()) ){
+                    surveyPreInitiationCoBorrower.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD );
+            	}
+            	surveyPreInitiations.add( surveyPreInitiationCoBorrower );
+             }
+    		}
+    		
+        return surveyPreInitiations;
 	}
 
 	@Override

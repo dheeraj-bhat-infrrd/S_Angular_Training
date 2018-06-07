@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.compute.services;
 
 import com.realtech.socialsurvey.compute.entities.EmailMessage;
 import com.realtech.socialsurvey.compute.entities.ReportRequest;
+import com.realtech.socialsurvey.compute.entities.UserEvent;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 
 /**
@@ -54,4 +55,17 @@ public interface FailedMessagesService
     int deleteFailedSocialPost(String postId);
 
     int updateFailedSocialPostRetryCount(String postId);
+
+    /**
+     * 
+     * @param userEvent
+     * @param willRetry
+     * @param retryCount
+     * @param wasRetrySuccessful
+     * @param isPermanentlyFailed
+     * @param thrw
+     * @return
+     */
+    public boolean insertUnsavedUserEvent( UserEvent userEvent, boolean willRetry, int retryCount, boolean wasRetrySuccessful,
+        boolean isPermanentlyFailed, Throwable thrw );
 }

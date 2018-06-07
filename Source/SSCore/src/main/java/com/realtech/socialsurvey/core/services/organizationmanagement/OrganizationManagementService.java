@@ -1,4 +1,3 @@
-
 package com.realtech.socialsurvey.core.services.organizationmanagement;
 
 import java.io.IOException;
@@ -43,6 +42,7 @@ import com.realtech.socialsurvey.core.entities.SocialMonitorTrustedSource;
 import com.realtech.socialsurvey.core.entities.StateLookup;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
+import com.realtech.socialsurvey.core.entities.TransactionSourceFtp;
 import com.realtech.socialsurvey.core.entities.UploadValidation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
@@ -50,6 +50,7 @@ import com.realtech.socialsurvey.core.entities.UserHierarchyAssignments;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.VerticalCrmMapping;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
+import com.realtech.socialsurvey.core.entities.ftp.FtpSurveyResponse;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -1693,6 +1694,7 @@ public interface OrganizationManagementService
     public List<String> validateSocailMedia( String columnName, long columnValue ) throws InvalidInputException, NoRecordsFetchedException;
 
 	ContactDetailsSettings fetchContactDetailByEncryptedId(String encryptedId, String collection);
+
 	
 	void updateSocialMediaForUser( Long userId, boolean disableSocialMediaTokens ) throws InvalidInputException;
 	
@@ -1749,7 +1751,6 @@ public interface OrganizationManagementService
 
 	void setShowSummitPopup(Long companyId, boolean isShowSummitPopup) throws InvalidInputException;
 
-
     /**
      * @param companyId
      * @param trustedSource
@@ -1758,5 +1759,43 @@ public interface OrganizationManagementService
      */
     public List<SocialMonitorTrustedSource> removeTrustedSourceToCompany( long companyId, String trustedSource )
         throws InvalidInputException;
+
+
+    public void updateCopyToClipBoardSettings( long companyId, boolean updateCopyToClipBoardSetting );
+
+    
+    /**
+     * @param companyId
+     * @param encompassCrmInfo
+     * @throws InvalidInputException 
+     */
+    public void setFtpInfo(Long companyId, TransactionSourceFtp transactionSourceFtp) throws InvalidInputException;
+
+
+    /**
+     * @param companyId
+     * @param ftpId
+     * @return
+     */
+    public TransactionSourceFtp fetchFtpInfo( Long companyId, Long ftpId );
+
+
+    /**
+     * @param companyId
+     * @param ftpId
+     * @param mailId
+     * @throws NonFatalException
+     */
+    public void updateFtpMailService( long companyId, long ftpId, String mailId ) throws NonFatalException;
+    
+    /**
+     * @param companyId
+     * @param ftpId
+     * @param s3FileLocation
+     * @param ftpSurveyResponse
+     * @throws InvalidInputException
+     * @throws UndeliveredEmailException
+     */
+    public void sendCompletionMailService( long companyId, long ftpId, String s3FileLocation, FtpSurveyResponse ftpSurveyResponse ) throws InvalidInputException, UndeliveredEmailException;
 
 }

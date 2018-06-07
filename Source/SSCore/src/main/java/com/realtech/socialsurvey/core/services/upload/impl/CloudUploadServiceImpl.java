@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.services.upload.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,21 +85,24 @@ public class CloudUploadServiceImpl implements FileUploadService
 
     @Value ( "${AMAZON_SECRET_KEY}")
     private String secretKey;
-    
+
     @Value ( "${AMAZON_REPORTS_BUCKET}")
     private String reportBucket;
-    
+
     @Value ( "${AMAZON_OLD_REPORTS_BUCKET}")
     private String oldReportBucket;
-    
+
     @Value ( "${AMAZON_DIGEST_BUCKET}")
     private String digestBucket;
+
+    @Value ( "${AMAZON_FTP_BUCKET}")
+    private String ftpBucket;
 
 
     @Override
     public String uploadProfileImageFile( File file, String imageName, boolean preserveFileName ) throws InvalidInputException
     {
-        LOG.info( "Method uploadProfileImageFile inside AmazonUploadServiceImpl called for image {}" , imageName);
+        LOG.info( "Method uploadProfileImageFile inside AmazonUploadServiceImpl called for image {}", imageName );
         try {
             return uploadImage( file, imageName, bucket + CommonConstants.FILE_SEPARATOR + imageBucket, preserveFileName );
         } catch ( InvalidInputException e ) {
@@ -141,15 +146,15 @@ public class CloudUploadServiceImpl implements FileUploadService
                 DisplayMessageConstants.INVALID_LOGO_FILE );
         }
     }
-    
-    
+
+
     @Override
     public String uploadOldReport( File file, String fileName ) throws NonFatalException
     {
         String bucketString = bucket + CommonConstants.FILE_SEPARATOR + oldReportBucket;
-        
+
         uploadFileAtSpecifiedBucket( file, fileName, bucketString, false );
-        
+
         return endpoint + CommonConstants.FILE_SEPARATOR + bucketString + CommonConstants.FILE_SEPARATOR + fileName;
     }
 
@@ -159,17 +164,36 @@ public class CloudUploadServiceImpl implements FileUploadService
     {
         uploadFileAtSpecifiedBucket( file, fileName, bucket + CommonConstants.FILE_SEPARATOR + reportBucket, false );
     }
-    
+
+
     @Override
     public void uploadFileAtDefautBucket( File file, String fileName ) throws NonFatalException
     {
         uploadFile( file, fileName, bucket, false );
     }
-    
+
+
     @Override
     public void uploadFileAtDigestBucket( File file, String fileName ) throws NonFatalException
     {
         uploadFile( file, fileName, bucket + "/" + digestBucket, false );
+    }
+
+
+    @Override
+    public String uploadFileAtFTPBucket( File file, String fileName ) throws NonFatalException, UnsupportedEncodingException
+    {
+        uploadFile( file, fileName, bucket + "/" + ftpBucket, false );
+        return endpoint + CommonConstants.FILE_SEPARATOR + bucket + CommonConstants.FILE_SEPARATOR + ftpBucket
+            + CommonConstants.FILE_SEPARATOR + URLEncoder.encode( fileName, CommonConstants.UTF_8_ENCODING );
+    }
+
+
+    @Override
+    public boolean deleteFileAtFTPBucket( String fileName ) throws NonFatalException
+    {
+        deleteObjectFromBucket( fileName, bucket + "/" + ftpBucket );
+        return true;
     }
 
 
@@ -329,6 +353,35 @@ public class CloudUploadServiceImpl implements FileUploadService
 
 
     /**
+     * Method to delete a file in a specified bucket
+     * 
+     * @param key
+     * @param bucket
+     * @throws InvalidInputException
+     */
+    @Override
+    public void deleteObjectFromBucket( String key, String bucket ) throws InvalidInputException
+    {
+        LOG.debug( "method deleteObjectFromBucket() called" );
+        if ( StringUtils.isEmpty( key ) ) {
+            LOG.error( "file name is not specified" );
+            throw new InvalidInputException( "file name is not specified" );
+        } else if ( StringUtils.isEmpty( bucket ) ) {
+            LOG.error( "target bucket is not specified" );
+            throw new InvalidInputException( "target bucket is not specified" );
+        }
+
+        try {
+            createAmazonClient( endpoint, bucket ).deleteObject( bucket, key );
+        } catch ( AmazonClientException e ) {
+            LOG.error( "AmazonClientException caught while deleting object with key : {}", key );
+            throw new FatalException( "AmazonClientException caught while deleting object with key : " + key );
+        }
+        LOG.debug( "method deleteObjectFromBucket() finished" );
+    }
+
+
+    /**
      * Method to create AmazonS3 client
      */
     public AmazonS3 createAmazonClient( String endpoint, String bucket )
@@ -359,8 +412,8 @@ public class CloudUploadServiceImpl implements FileUploadService
         }
         fileUploadDao.update( fileUpload );
     }
-    
-    
+
+
     /*
      * method to upload a csv file filled with customer details and return the URI
      * 
@@ -369,17 +422,15 @@ public class CloudUploadServiceImpl implements FileUploadService
      * @return String
      */
     @Override
-    public String uploadFileAtSurveyCsvBucket( MultipartFile file, String fileName ) throws NonFatalException
+    public String uploadFileAtSurveyCsvBucket( File file, String fileName ) throws NonFatalException
     {
         LOG.debug( "Method uploadFileAtSurveyCsvBucket called" );
 
-        if ( !file.isEmpty() ) {
+        if ( file != null && StringUtils.isNotEmpty( fileName ) ) {
             try {
-                File convFile = new File( URLEncoder.encode( fileName, "UTF-8" ) );
-                file.transferTo( convFile );
 
                 // uploading in social survey's application bucket, inside "amazonSurveyCsvBucket" folder
-                uploadFile( convFile, fileName, bucket + CommonConstants.FILE_SEPARATOR + amazonSurveyCsvBucket, false );
+                uploadFile( file, fileName, bucket + CommonConstants.FILE_SEPARATOR + amazonSurveyCsvBucket, false );
 
                 return endpoint + CommonConstants.FILE_SEPARATOR + bucket + CommonConstants.FILE_SEPARATOR
                     + amazonSurveyCsvBucket + CommonConstants.FILE_SEPARATOR + URLEncoder.encode( fileName, "UTF-8" );
@@ -390,7 +441,7 @@ public class CloudUploadServiceImpl implements FileUploadService
             }
         } else {
             LOG.error( "Method fuploadFileAtSurveyCsvBucket failed to upload" );
-            throw new InvalidInputException( "Upload failed: because the file with name " + fileName + " was empty" );
+            throw new InvalidInputException( "Upload failed: because the file or file name was empty" );
         }
     }
 

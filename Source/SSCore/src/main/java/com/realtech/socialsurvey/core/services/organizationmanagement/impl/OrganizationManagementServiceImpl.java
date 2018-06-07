@@ -8,6 +8,7 @@ import java.lang.reflect.Type;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -21,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -118,6 +120,7 @@ import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
+import com.realtech.socialsurvey.core.entities.TransactionSourceFtp;
 import com.realtech.socialsurvey.core.entities.UploadStatus;
 import com.realtech.socialsurvey.core.entities.UploadValidation;
 import com.realtech.socialsurvey.core.entities.User;
@@ -129,6 +132,7 @@ import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.VerticalCrmMapping;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.entities.ZipCodeLookup;
+import com.realtech.socialsurvey.core.entities.ftp.FtpSurveyResponse;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
@@ -9814,8 +9818,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         return companyFilterKeywords;
 
     }
-
-
+    
+    
     @Override
     public List<Keyword> addKeywordToCompanySettings( long companyId, Keyword keyword ) throws InvalidInputException
     {
@@ -10397,6 +10401,16 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
 
+
+    @Override
+    public void updateCopyToClipBoardSettings( long companyId, boolean updateCopyToClipBoardSetting )
+    {
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden(
+            MongoOrganizationUnitSettingDaoImpl.KEY_IS_COPY_TO_CLIPBOARD, updateCopyToClipBoardSetting, companyId,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        
+    }
+
     @Override
     public boolean isSocialMonitorAdmin( Long agentId ) throws InvalidInputException
     {
@@ -10518,6 +10532,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	}
 
 
+
 	@Override
 	public void setShowSummitPopup(Long companyId, boolean isShowSummitPopup) throws InvalidInputException {
 		 LOG.debug( "Method hasRegisteredForSummit called for companyId:" + companyId );
@@ -10528,5 +10543,83 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	     
 	     organizationUnitSettingsDao.updateShowSummitPopup(companyId, isShowSummitPopup);
 	}
-}
 
+    
+     @Override 
+     public void setFtpInfo(Long companyId ,TransactionSourceFtp transactionSourceFtp) throws InvalidInputException 
+     {
+         LOG.info( "Inside method setFtpInfo" );
+         
+             //get companySettings
+             OrganizationUnitSettings companySettings = getCompanySettings( companyId );
+             
+             if ( companySettings == null ) {
+                 throw new InvalidInputException( "Company settings cannot be null." );
+             }
+             
+             organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+                 MongoOrganizationUnitSettingDaoImpl.KEY_FTP_INFO, transactionSourceFtp, companySettings,
+                 MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+             LOG.debug( "Updated the record successfully" );
+         
+     }
+     
+     //
+     @Override
+     public TransactionSourceFtp fetchFtpInfo(Long companyId , Long ftpId) {
+         LOG.info( "inside service class to fetch the ftp info for companyId : {} . ftpId : {}",companyId,ftpId );
+         return organizationUnitSettingsDao.fetchFileHeaderMapper(companyId,ftpId);
+     }
+     
+     @Override
+     public void updateFtpMailService(long companyId,  long ftpId ,String mailId) throws NonFatalException {
+    
+         LOG.info("Update ftp mail for companyId: {} , ftpId : {} , mail:{}",companyId,ftpId,mailId);
+         mailId = checkValidMail(mailId);
+         List<TransactionSourceFtp> transactionSourceFtpList = organizationUnitSettingsDao.fetchTransactionFtpListActive(companyId);
+         for(TransactionSourceFtp transactionSourceFtp : transactionSourceFtpList) {
+             if(transactionSourceFtp.getFtpId() == ftpId) {
+                 transactionSourceFtp.setEmailId(mailId);
+                 break;
+             }
+         }
+         organizationUnitSettingsDao.updateFtpTransaction(companyId,transactionSourceFtpList);
+    
+     }
+     
+     @Override
+     public void sendCompletionMailService(long companyId , long ftpId , String s3FileLocation ,FtpSurveyResponse ftpSurveyResponse ) throws InvalidInputException, UndeliveredEmailException {
+         LOG.debug("send ftp successfull mail for companyId: {} , ftpId : {} ",companyId,ftpId); 
+         Company company = companyDao.findById( Company.class, companyId );
+         String companyName = company.getCompany();
+         TransactionSourceFtp transactionSourceFtp = fetchFtpInfo( companyId, ftpId );
+         String ftpMailId = transactionSourceFtp.getEmailId();
+         String ftpErrorHtml = "";
+         if (ftpSurveyResponse.getErrorMessage() != null && !ftpSurveyResponse.getErrorMessage().isEmpty()) {
+             ftpErrorHtml = createHtmlForFtpError( ftpSurveyResponse.getErrorMessage() );
+         }
+         //get time and file name from s3location
+         String lastIndex = s3FileLocation.substring( s3FileLocation.lastIndexOf( '/' )+1).trim();
+         String fileName = lastIndex;
+         String timeStamp = lastIndex.substring( lastIndex.lastIndexOf( '_' )+1,lastIndex.indexOf( '.' ) );
+         emailServices.sendFtpSuccessMail( companyName, utils.convertDateToTimeZone( Long.parseLong( timeStamp ), CommonConstants.TIMEZONE_EST ) , fileName, ftpSurveyResponse, ftpMailId, ftpErrorHtml );
+     }
+     
+     private String createHtmlForFtpError(Map<Integer, String> errorMessages) {
+         String errorHtml = "";
+         for(Map.Entry<Integer,String> errorMsg : errorMessages.entrySet()) {
+             errorHtml += "<br/><span>&bull; </span>Row "+errorMsg.getKey()+" ERROR: "+errorMsg.getValue()+".";
+         }
+         return errorHtml;
+     }
+     
+     private String convertToUTC(String timeStamp) {
+         Timestamp time = new Timestamp( Long.parseLong( timeStamp ) );
+         Date date=new Date(time.getTime());  
+         final TimeZone tz = TimeZone.getTimeZone("UTC");
+         final SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd hh:mm:ss zzz yyyy");
+         formatter.setTimeZone(tz);
+         return formatter.format(date);
+     }
+
+}

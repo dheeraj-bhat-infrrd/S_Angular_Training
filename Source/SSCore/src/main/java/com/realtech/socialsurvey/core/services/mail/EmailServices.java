@@ -11,6 +11,7 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyCsvInfo;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.ftp.FtpSurveyResponse;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
 
@@ -501,5 +502,26 @@ public interface EmailServices
 
     public boolean sendUserDeletionMail( Set<String> recipients, String deletedAdminName, String deletedAdminEmailId, User deletedUser,
         OrganizationUnitSettings agentSettings ) throws InvalidInputException, UndeliveredEmailException;
+
+
+    public void sendFtpProcessingErrorMailForCompany( Set<String> recipients, long companyId, String reason, String stackTrace, boolean isFromBatch, boolean sendOnlyToSocialSurveyAdmin )
+        throws InvalidInputException, UndeliveredEmailException;
+
+
+    /**
+     * @param CompanyName
+     * @param fileDate
+     * @param fileName
+     * @param ftpSurveyResponse
+     * @param agentMailId
+     * @param recipientMailId
+     * @throws InvalidInputException
+     * @throws UndeliveredEmailException
+     */
+    public void sendFtpSuccessMail( String CompanyName, String fileDate, String fileName, FtpSurveyResponse ftpSurveyResponse,
+        String agentMailId, String recipientMailId ) throws InvalidInputException, UndeliveredEmailException;
+
+
+
 
 }

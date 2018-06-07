@@ -49,6 +49,7 @@ import com.realtech.socialsurvey.core.entities.ComplaintResolutionSettings;
 import com.realtech.socialsurvey.core.entities.DisplayMessage;
 import com.realtech.socialsurvey.core.entities.DotLoopCrmInfo;
 import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
+import com.realtech.socialsurvey.core.entities.FileHeaderMapper;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.LockSettings;
 import com.realtech.socialsurvey.core.entities.MailContent;
@@ -101,9 +102,8 @@ import com.realtech.socialsurvey.core.vo.SurveyPreInitiationList;
 import com.realtech.socialsurvey.core.vo.UserList;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookData;
 import com.realtech.socialsurvey.web.api.builder.SSApiIntergrationBuilder;
+import com.realtech.socialsurvey.web.api.entities.FtpCreateRequest;
 import com.realtech.socialsurvey.web.common.JspResolver;
-
-import retrofit.client.Response;
 
 
 // JIRA: SS-24 BY RM02 BOC
@@ -838,6 +838,11 @@ public class OrganizationManagementController
             
             // add send monthly digest email flag
             model.addAttribute( "sendMonthlyDigestMail", unitSettings.isSendMonthlyDigestMail() );
+            model.addAttribute( "copyToClipBoard", unitSettings.getIsCopyToClipboard() );
+            
+            // add isSocialMonitorEnabled flag
+            model.addAttribute( "isSocialMonitorEnabled", unitSettings.isSocialMonitorEnabled() );
+            
             
             // add isSocialMonitorEnabled flag
             model.addAttribute( "isSocialMonitorEnabled", unitSettings.isSocialMonitorEnabled() );
@@ -1018,7 +1023,71 @@ public class OrganizationManagementController
         return response;
     }
 
+    @RequestMapping ( value = "/saveftpdetails", method = RequestMethod.POST)
+    @ResponseBody
+    public String saveFtpDetails( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Saving ftp details" );
+        User user = sessionHelper.getCurrentUser();
+        request.setAttribute( "saveftpdetails", "true" );
 
+        String ftpUsername = request.getParameter( "ftp-username" );
+        String ftpPassword = request.getParameter( "ftp-password" );
+        String ftpUrl = request.getParameter( "ftp-url" );
+        String ftpDir = request.getParameter( "ftp-dir" );
+        
+        Map<String, Object> responseMap = new HashMap<String, Object>();
+        String message;
+        boolean status = true;
+
+        try {
+
+            if ( ftpUsername == null || ftpUsername.isEmpty() ) {
+                LOG.warn( "Method saveFtpDetails is throwing an InvalidInputException since user name can not be empty" );
+                throw new InvalidInputException( "User name can not be empty" );
+            }
+            if ( ftpPassword == null || ftpPassword.isEmpty() ) {
+                LOG.warn( "Method saveFtpDetails is throwing an InvalidInputException since password can not be empty" );
+                throw new InvalidInputException( "Password can not be empty" );
+            }
+            if ( ftpUrl == null || ftpUrl.isEmpty() ) {
+                LOG.warn( "Method saveFtpDetails is throwing an InvalidInputException since url can not be empty" );
+                throw new InvalidInputException( "Url can not be empty" );
+            }
+            if ( ftpDir == null || ftpDir.isEmpty() ) {
+                LOG.warn( "Method saveFtpDetails is throwing an InvalidInputException since directory can not be empty" );
+                throw new InvalidInputException( "directory can not be empty" );
+            }
+
+            // encrypting the password
+            String cipherPassword = encryptionHelper.encryptAES( ftpPassword, "" );
+            
+            //create ftpCreateRequest object
+            FtpCreateRequest ftpCreateRequest = new FtpCreateRequest();
+            ftpCreateRequest.setUsername( ftpUsername );
+            ftpCreateRequest.setPassword( cipherPassword );
+            ftpCreateRequest.setFtpServerUrl( ftpUrl );
+            ftpCreateRequest.setFtpDirectoryPath( ftpDir );
+            
+            
+            //call api to save ftp data
+            ssApiIntergrationBuilder.getIntegrationApi().setFtpCrm(user.getCompany().getCompanyId() , ftpCreateRequest);
+
+            message = messageUtils.getDisplayMessage( DisplayMessageConstants.FTP_DATA_UPDATE_SUCCESSFUL,
+                DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException while testing encompass detials. Reason : ", e );
+            status = false;
+            message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
+        }
+        responseMap.put( "status", status );
+        responseMap.put( "message", message );
+        String response = new Gson().toJson( responseMap );
+        LOG.info( "Saving ftp details completed successfully" );
+        return response;
+    }
+
+    
     /**
      * Method to enable an encompass connection
      * 
@@ -2971,7 +3040,6 @@ public class OrganizationManagementController
 
         String message = "";
         User user = sessionHelper.getCurrentUser();
-        String mailIDStr = "";
        
 
         try {
@@ -4235,6 +4303,38 @@ public class OrganizationManagementController
     }
     
 
+    @RequestMapping ( value = "/updatecopytoclipboardsettings", method = RequestMethod.GET)
+    @ResponseBody
+    public String updateCopyToClipBoardSettings( HttpServletRequest request )
+    {
+        LOG.info( "Method to update updateTransactionMonitorSettingForCompany started" );
+
+        try {
+
+            HttpSession session = request.getSession();
+            long companyId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+
+            String updateCopyToClipBoardSettingStr = request.getParameter( "updateCopyToClipBoardSetting" );
+
+            boolean updateCopyToClipBoardSetting = Boolean.parseBoolean( updateCopyToClipBoardSettingStr );
+
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
+            if(companySettings == null){
+                throw new InvalidInputException("Wrong input passed. No company found for given id");
+            }
+           
+            organizationManagementService.updateCopyToClipBoardSettings( companyId, updateCopyToClipBoardSetting );
+
+
+        } catch ( Exception error ) {
+            LOG.error( "Exception occured in updateCopyToClipBoardSettings(). Nested exception is ", error );
+            return error.getMessage();
+        }
+
+        LOG.info( "Method to update copy to clipboard finished" );
+        return "success";
+    }
+    
     @RequestMapping ( value = "/enablesocialmonitortoggle", method = RequestMethod.POST)
     @ResponseBody
     public String enableSocialMonitorToggle( HttpServletRequest request )

@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -62,6 +63,7 @@ import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.dao.impl.MongoSurveyDetailsDaoImpl;
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AgentMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
@@ -2985,6 +2987,52 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     }
 
 
+    @Override
+    @Transactional
+    public void moveSurveyBetweenUsers( long surveyPreinitiationId, long toUserId )
+        throws InvalidInputException, NoRecordsFetchedException, SolrException
+    {
+        if ( surveyPreinitiationId <= 0 ) {
+            LOG.error( "Invalid from user id passed as parameter" );
+            throw new InvalidInputException( "Invalid from user id passed as parameter" );
+        }
+        if ( toUserId <= 0 ) {
+            LOG.error( "Invalid to user id passed as parameter" );
+            throw new InvalidInputException( "Invalid to user id passed as parameter" );
+        }
+        try {
+            User toUser = userManagementService.getUserByUserId( toUserId );
+            UserProfile toUserProfile = getUserProfileWhereAgentForUser( toUser );
+            long fromUserId = getAgentIdFromSurveyPreInitiation( surveyPreinitiationId );
+            // replace agent id in Survey Pre Initiation
+            surveyPreInitiationDao.updateAgentInfoOfPreInitiatedSurvey( surveyPreinitiationId, toUser );
+            /// replace agent id in Details
+            surveyDetailsDao.updateAgentInfoInSurveyBySPI( surveyPreinitiationId, toUser, toUserProfile );
+
+            LOG.debug( "Updating review count of user :{} ", toUserId );
+            solrSearchService.updateReviewCountOfUserInSolr( toUser );
+            if ( fromUserId != 0 ) {
+                LOG.debug( "Updating review count of user :{} ", fromUserId );
+                User fromUser = userManagementService.getUserByUserId( fromUserId );
+                solrSearchService.updateReviewCountOfUserInSolr( fromUser );
+            }
+        } catch ( InvalidInputException e ) {
+            throw new NoRecordsFetchedException( "Either user or survey could not be found" );
+        }
+
+    }
+
+
+    private long getAgentIdFromSurveyPreInitiation( long surveyPreinitiationId )
+    {
+        SurveyDetails survey = surveyDetailsDao.getsurveyFromSurveyPreinitiationId( surveyPreinitiationId );
+        if ( survey != null ) {
+            return survey.getAgentId();
+        }
+        return 0;
+    }
+
+
     UserProfile getUserProfileWhereAgentForUser( User user )
     {
         LOG.debug( "Method to find user profile where user is agent, getUserProfileWhereAgentForUser started" );
@@ -4294,15 +4342,17 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     // Method to update agentId in SurveyPreInitiation 
     @Override
     @Transactional
-    public List<SurveyPreInitiation> validatePreinitiatedRecord( List<SurveyPreInitiation> surveyPreInitiations )
+    public List<SurveyPreInitiation> validatePreinitiatedRecord( List<SurveyPreInitiation> surveyPreInitiations , long companyId )
         throws InvalidInputException
     {
 
         LOG.debug( "Method processPreinitiatedRecord validatePreinitiatedRecord started " );
 
+        int duplicateSurveyInterval = getDuplicateSurveyIntervalForCompany(companyId);
+        
         for ( SurveyPreInitiation survey : surveyPreInitiations ) {
             // validate, verify, cross-verify and setup the survey pre-initiation object
-            validateAndProcessSurveyPreInitiation( survey );
+            validateAndProcessSurveyPreInitiation( survey , duplicateSurveyInterval);
         }
 
         LOG.debug( "Method processPreinitiatedRecord validatePreinitiatedRecord finished " );
@@ -4325,7 +4375,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      * @throws InvalidInputException
      */
     @Override
-    public void validateAndProcessSurveyPreInitiation( SurveyPreInitiation survey ) throws InvalidInputException
+    public void validateAndProcessSurveyPreInitiation( SurveyPreInitiation survey , int duplicateSurveyInterval ) throws InvalidInputException
     {
         // null and syntax checks
         checkForSyntaxInSurveyPreInitiationData( survey );
@@ -4355,7 +4405,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 			// check if survey has already been sent to the given email id within the time
 			// of discourse
-			checkForAlreadyExistingSurvey(survey, user);
+			checkForAlreadyExistingSurvey(survey, user, duplicateSurveyInterval);
 
 			// set the agent ID
 			survey.setAgentId(user.getUserId());
@@ -4366,13 +4416,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 			}
 
 			//update status
-			if (survey.getStatus() != CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD)
-				survey.setStatus(CommonConstants.SURVEY_STATUS_PRE_INITIATED);
-			
+			survey.setStatus(CommonConstants.SURVEY_STATUS_PRE_INITIATED);		
 		} else {
 			// user is not present so mark record as mismatch
-			if (survey.getStatus() != CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD)
-				survey.setStatus(CommonConstants.STATUS_SURVEYPREINITIATION_MISMATCH_RECORD);
+			survey.setStatus(CommonConstants.STATUS_SURVEYPREINITIATION_MISMATCH_RECORD);
 		}
 		
         
@@ -4489,9 +4536,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
      * @param user
      * @throws InvalidInputException
      */
-    private void checkForAlreadyExistingSurvey( SurveyPreInitiation survey, User user ) throws InvalidInputException
+    private void checkForAlreadyExistingSurvey( SurveyPreInitiation survey, User user, int duplicateSurveyInterval ) throws InvalidInputException
     {
-        int duplicateSurveyInterval = getDuplicateSurveyIntervalForCompany( user.getCompany().getCompanyId() );
         List<SurveyPreInitiation> incompleteSurveyCustomers = null;
 
         // get incomplete survey depending on the survey re-take interval
@@ -4643,9 +4689,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     @Override
     public boolean createEntryForSurveyUploadWithCsv( String hierarchyType, MultipartFile tempFile, String fileName,
-        long hierarchyId, User user, String uploaderEmail ) throws NonFatalException, UnsupportedEncodingException
+        long hierarchyId, User user, String uploaderEmail ) throws NonFatalException, IOException
     {
-        LOG.debug( "createEntryForSurveyUploadWithCsv started for user with Id: " + user.getUserId() );
+        LOG.debug( "createEntryForSurveyUploadWithCsv started for user with Id: {}", user.getUserId() );
         String stamp = "";
 
         if ( hierarchyId <= 0 ) {
@@ -4664,7 +4710,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         // Set the new filename
         String savedFileName = stamp + user.getUserId() + "_" + new Date( System.currentTimeMillis() ).toString() + ".csv";
 
-        String fileUrl = fileUploadService.uploadFileAtSurveyCsvBucket( tempFile, savedFileName );
+        File convFile = new File( URLEncoder.encode( fileName, "UTF-8" ) );
+        tempFile.transferTo( convFile );
+        
+        String fileUrl = fileUploadService.uploadFileAtSurveyCsvBucket( convFile, savedFileName );
 
         SurveyCsvInfo csvInfo = new SurveyCsvInfo();
         csvInfo.setFileName( fileName );
@@ -4678,7 +4727,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         csvInfo.setStatus( CommonConstants.STATUS_ACTIVE );
 
         surveyCsvUploadDao.createEntryForSurveyCsvUpload( csvInfo );
-        LOG.debug( "createEntryForSurveyUploadWithCsv completed for user with Id: " + user.getUserId() );
+        LOG.debug( "createEntryForSurveyUploadWithCsv completed for user with Id: {}", user.getUserId() );
         return true;
     }
 
@@ -4892,7 +4941,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
                     // perform all the necessary checks for the SPI object 
-                    validateAndProcessSurveyPreInitiation( survey );
+                    int duplicateSurveyInterval = getDuplicateSurveyIntervalForCompany(csvInfo.getCompanyId());
+                    validateAndProcessSurveyPreInitiation( survey , duplicateSurveyInterval );
 
 
                     // depending on the hierarchy at which the file was uploaded, start the survey process

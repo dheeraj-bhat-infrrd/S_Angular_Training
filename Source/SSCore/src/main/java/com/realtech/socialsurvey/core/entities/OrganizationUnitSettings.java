@@ -73,7 +73,8 @@ public class OrganizationUnitSettings implements Serializable
     private Set<String> digestRecipients;
     private boolean includeForTransactionMonitor; // include a company to transaction monitor
     private String encryptedId;
-    
+    private boolean isCopyToClipboard;
+
     // vendasta product details 
     private VendastaProductSettings vendasta_rm_settings;
 
@@ -106,6 +107,8 @@ public class OrganizationUnitSettings implements Serializable
     private boolean hasRegisteredForSummit;
     
     private boolean isShowSummitPopup;
+    
+    private List<TransactionSourceFtp> transactionSourceFtpList;
     
     public boolean isShowSummitPopup() {
 		return isShowSummitPopup;
@@ -829,6 +832,20 @@ public class OrganizationUnitSettings implements Serializable
     {
         this.savedDigestRecords = savedDigestRecords;
     }
+    
+    
+
+
+    public List<TransactionSourceFtp> getTransactionSourceFtpList()
+    {
+        return transactionSourceFtpList;
+    }
+
+
+    public void setTransactionSourceFtpList( List<TransactionSourceFtp> transactionSourceFtpList )
+    {
+        this.transactionSourceFtpList = transactionSourceFtpList;
+    }
 
 
     public String getEncryptedId() {
@@ -880,7 +897,7 @@ public class OrganizationUnitSettings implements Serializable
     {
         return isSocialMonitorEnabled;
     }
-
+	
 
     public void setSocialMonitorEnabled( boolean isSocialMonitorEnabled )
     {
@@ -897,8 +914,19 @@ public class OrganizationUnitSettings implements Serializable
 		this.socialMonitorTrustedSources = socialMonitorTrustedSources;
 	}
 
+    public boolean getIsCopyToClipboard()
+    {
+        return isCopyToClipboard;
+    }
 
-	@Override
+
+    public void setIsCopyToClipboard( boolean isCopyToClipboard )
+    {
+        this.isCopyToClipboard = isCopyToClipboard;
+    }
+
+
+    @Override
     public String toString()
     {
         return "OrganizationUnitSettings [id=" + id + ", iden=" + iden + ", uniqueIdentifier=" + uniqueIdentifier
@@ -921,13 +949,15 @@ public class OrganizationUnitSettings implements Serializable
             + ", reviewSortCriteria=" + reviewSortCriteria + ", sendEmailThrough=" + sendEmailThrough + ", hideFromBreadCrumb="
             + hideFromBreadCrumb + ", hidePublicPage=" + hidePublicPage + ", digestRecipients=" + digestRecipients
             + ", includeForTransactionMonitor=" + includeForTransactionMonitor + ", encryptedId=" + encryptedId
-            + ", vendasta_rm_settings=" + vendasta_rm_settings + ", ranking_requirements=" + ranking_requirements
-            + ", contactUsEmailsRoutedToCompanyAdmin=" + contactUsEmailsRoutedToCompanyAdmin + ", sendMonthlyDigestMail="
-            + sendMonthlyDigestMail + ", filterKeywords=" + filterKeywords + ", socialMonitorMacros=" + socialMonitorMacros
-            + ", savedDigestRecords=" + savedDigestRecords + ", userAddDeleteNotificationRecipients="
-            + userAddDeleteNotificationRecipients + ", isSocialMonitorEnabled=" + isSocialMonitorEnabled
-            + ", entityAlertDetails=" + entityAlertDetails + "]";
+            + ", isCopyToClipboard=" + isCopyToClipboard + ", vendasta_rm_settings=" + vendasta_rm_settings
+            + ", ranking_requirements=" + ranking_requirements + ", contactUsEmailsRoutedToCompanyAdmin="
+            + contactUsEmailsRoutedToCompanyAdmin + ", sendMonthlyDigestMail=" + sendMonthlyDigestMail + ", filterKeywords="
+            + filterKeywords + ", socialMonitorMacros=" + socialMonitorMacros + ", savedDigestRecords=" + savedDigestRecords
+            + ", userAddDeleteNotificationRecipients=" + userAddDeleteNotificationRecipients + ", isSocialMonitorEnabled="
+            + isSocialMonitorEnabled + ", socialMonitorTrustedSources=" + socialMonitorTrustedSources
+            + ", isAgentProfileDisabled=" + isAgentProfileDisabled + ", swearWords=" + Arrays.toString( swearWords )
+            + ", hasRegisteredForSummit=" + hasRegisteredForSummit + ", isShowSummitPopup=" + isShowSummitPopup
+            + ", transactionSourceFtpList=" + transactionSourceFtpList + ", entityAlertDetails=" + entityAlertDetails + "]";
     }
-
     
 }

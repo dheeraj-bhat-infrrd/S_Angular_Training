@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.services.upload;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -99,8 +100,17 @@ public interface FileUploadService
     public void updateFileUploadRecord( FileUpload fileUpload ) throws InvalidInputException;
 
     
-    public String uploadFileAtSurveyCsvBucket( MultipartFile tempFile, String fileName ) throws NonFatalException;
+    public String uploadFileAtSurveyCsvBucket( File tempFile, String fileName ) throws NonFatalException;
 
 
     public void uploadFileAtDigestBucket( File file, String fileName ) throws NonFatalException;
+
+
+    public String uploadFileAtFTPBucket( File file, String fileName ) throws NonFatalException, UnsupportedEncodingException;
+
+
+    public void deleteObjectFromBucket( String key, String bucket ) throws InvalidInputException;
+
+
+    public boolean deleteFileAtFTPBucket( String fileName ) throws NonFatalException;
 }

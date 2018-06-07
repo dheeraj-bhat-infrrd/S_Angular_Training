@@ -63,6 +63,11 @@
 								test="${mapping.crmMaster.crmName == 'Lone Wolf' && profilemasterid == 4}">
 							</c:when> 
 							
+							<c:when
+								test="${mapping.crmMaster.crmName == 'FTP' && profilemasterid != 1}">
+								<%-- Skip if crm mapping ftp and not company admin --%>
+							</c:when>
+							
 							<c:otherwise>
 								<div class="crm-settings-dropdown-item"
 									data-crm-type="${mapping.crmMaster.crmName }">${mapping.crmMaster.crmName }</div>
@@ -93,6 +98,14 @@
 								<jsp:include page="lone_wolf.jsp"></jsp:include>
 							</div>
 						</c:when> 
+						
+						<c:when
+							test="${mapping.crmMaster.crmName == 'FTP' && profilemasterid == 1}">
+							<div class="crm-setting-cont hide"
+								data-crm-type="${mapping.crmMaster.crmName }">
+								<jsp:include page="ftp.jsp"></jsp:include>
+							</div>
+						</c:when>
 					</c:choose>
 				</c:forEach>
 			</div>

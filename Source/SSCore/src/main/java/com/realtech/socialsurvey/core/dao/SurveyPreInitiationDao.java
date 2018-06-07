@@ -156,4 +156,7 @@ public interface SurveyPreInitiationDao extends GenericDao<SurveyPreInitiation, 
 
 
 	public List<Object[]> getReceivedCountForDate(String startDateStr, String endDateStr, int startIndex, int batchSize);
+
+
+    void updateAgentInfoOfPreInitiatedSurvey( long surveyPreinitiatinId, User toUser ) throws InvalidInputException;
 }

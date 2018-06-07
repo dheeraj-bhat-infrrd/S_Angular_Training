@@ -94,4 +94,10 @@ public final class ComputeConstants
 
     public static final String SOCIAL_MONITOR_REPORT_BATCH_SIZE = "SOCIAL_MONITOR_REPORT_BATCH_SIZE";
 
+    //Download from S3 to local temp
+    public static final String LOCAL_DIR_LOCATION = "LOCAL_DIR_LOCATION";
+    
+    //ftp batching
+    public static final String ACCESS_TOKEN = "ACCESS_TOKEN";
+    public static final String FTP_SURVEY_BATCH_SIZE = "FTP_SURVEY_BATCH_SIZE";
 }

@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.services.surveybuilder;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.List;
@@ -383,7 +384,7 @@ public interface SurveyHandler
     void disconnectAllSurveysFromWithUser( long agentId ) throws InvalidInputException;
 
 
-    List<SurveyPreInitiation> validatePreinitiatedRecord( List<SurveyPreInitiation> surveyPreInitiations ) throws InvalidInputException;
+    List<SurveyPreInitiation> validatePreinitiatedRecord( List<SurveyPreInitiation> surveyPreInitiations , long companyId ) throws InvalidInputException;
     
     /**
      * method to build survey completion threshold Map
@@ -401,7 +402,7 @@ public interface SurveyHandler
 
 
     public boolean createEntryForSurveyUploadWithCsv( String hierarchyType, MultipartFile tempFile, String fileName, long hierarchyId,
-        User user, String uploaderEmail ) throws NonFatalException, UnsupportedEncodingException;
+        User user, String uploaderEmail ) throws NonFatalException, IOException;
 
 
     public void processActiveSurveyCsvUploads();
@@ -421,12 +422,15 @@ public interface SurveyHandler
     public SurveysAndReviewsVO getIncompelteSurveysByFilterCriteria( Long startSurveyID, Date startTransactionDate,
         List<Long> userIds, int startIndex, int count, long companyId );
 
-	public void validateAndProcessSurveyPreInitiation(SurveyPreInitiation survey) throws InvalidInputException;
+	public void validateAndProcessSurveyPreInitiation(SurveyPreInitiation survey , int duplicateSurveyInterval) throws InvalidInputException;
 
 	public void updateSurveyAsAbusiveNotify(String get_id);
 	
 	public String[] fetchSwearWords( String entityType, long entityId ) throws InvalidInputException;
 
     void updateSwearWords( String entityType, long entityId, String[] swearWords ) throws InvalidInputException;
+
+    public void moveSurveyBetweenUsers( long surveyPreinitiationId, long toUserId )
+        throws InvalidInputException, NoRecordsFetchedException, SolrException;
 
 }

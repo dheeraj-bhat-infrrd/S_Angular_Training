@@ -5691,6 +5691,14 @@ function saveEncompassDetails(formid) {
 	}
 }
 
+//ftp
+function saveFtpDetails(formid) {
+	if (validateFtpInput(formid)) {
+		var url = "./saveftpdetails.do";
+		callAjaxFormSubmit(url, testConnectionSaveCallBack, formid);
+	}
+}
+
 function saveLoneWolfDetails(formid , warn) {
 	if (validateLoneWolfInput(formid)) {
 		var lonewolfClientId = $("#lone-client").val();
@@ -5913,6 +5921,37 @@ function validateEncompassInput(elementId) {
 	}
 
 	return isEncompassValid;
+}
+
+//validate ftp 
+var isFtpValid;
+function validateFtpInput(elementId) {
+	isFtpValid = true;
+	var isFocussed = false;
+
+	if (!validateFtpUserName('ftp-username')) {
+		isFtpValid = false;
+		if (!isFocussed) {
+			$('#ftp-username').focus();
+			isFocussed = true;
+		}
+	}
+	if (!validateFtpPassword('ftp-password')) {
+		isFtpValid = false;
+		if (!isFocussed) {
+			$('#ftp-password').focus();
+			isFocussed = true;
+		}
+	}
+	if (!validateURL('ftp-url')) {
+		isFtpValid = false;
+		if (!isFocussed) {
+			$('#ftp-url').focus();
+			isFocussed = true;
+		}
+	}
+
+	return isFtpValid;
 }
 
 // Check for encompass input fields for testConnection (except fieldid)
@@ -6377,6 +6416,28 @@ function updateUpdateTransactionMonitorForCompany(updateTransactionMonitorSettin
 			}	
 			else{
 				$('#incld-fr-trans-mntr-chk-box').addClass('bd-check-img-checked');
+			}
+			$('#overlay-toast').html("Content updated successfully");
+		}else{
+			$('#overlay-toast').html(data);
+		}
+		showToast();
+	}, payload, true, disableEle);
+	
+}
+
+function updateCopyToClipBoardSettings(updateCopyToClipBoardSetting, disableEle) {
+	var payload = {
+		"updateCopyToClipBoardSetting" : updateCopyToClipBoardSetting
+	};
+	
+	callAjaxGetWithPayloadData("./updatecopytoclipboardsettings.do",function(data) {
+		if (data == "success"){
+			if ($('#copyto-clipboard-chk-box').hasClass('bd-check-img-checked')) {
+				$('#copyto-clipboard-chk-box').removeClass('bd-check-img-checked');
+			}	
+			else{
+				$('#copyto-clipboard-chk-box').addClass('bd-check-img-checked');
 			}
 			$('#overlay-toast').html("Content updated successfully");
 		}else{
@@ -7603,6 +7664,8 @@ function initSurveyWithUrl(q) {
 				surveyId = data.responseJSON.surveyId;
 				hiddenSection=data.responseJSON.hiddenSection;
 				companyName = data.responseJSON.companyName;
+				var copyToClipboard = data.responseJSON.copyToClipBoard;
+				$('#prof-container').attr('data-copy-to-clipboard',copyToClipboard);
 				companyId = data.responseJSON.companyId;
 				paintSurveyPage(data);
 				var message = $("#pst-srvy-div .bd-check-txt").html();
@@ -8170,7 +8233,10 @@ function showMasterQuestionPage() {
 		}
 		
 		// copy review text to clipboard
-		//copyToClipboard( feedback, "Your feedback has been copied to clipboard" );
+		var copyToClipBoard = $('#prof-container').attr('data-copy-to-clipboard');
+		if(copyToClipBoard == 'true'){
+			copyToClipboard( feedback, "Your feedback has been copied to clipboard" );
+		}		
 		
 		if( isAbusive == false ){
 			if (mood != 'Great') {
@@ -12607,6 +12673,14 @@ $('body').on('click', '#incld-fr-trans-mntr-chk-box', function() {
 		updateUpdateTransactionMonitorForCompany(false, '#incld-fr-trans-mntr-chk-box');
 	}
 });
+// Copy to clipboard check box action
+$('body').on('click', '#copyto-clipboard-chk-box', function() {
+	if ($('#copyto-clipboard-chk-box').hasClass('bd-check-img-checked')) {
+		updateCopyToClipBoardSettings(true, '#copyto-clipboard-chk-box');
+	} else {
+		updateCopyToClipBoardSettings(false, '#copyto-clipboard-chk-box');
+	}
+});
 
 $('body').on('click', '#survey-mail-thrhld-chk-box', function() {
 	if ($('#survey-mail-thrhld-chk-box').hasClass('bd-check-img-checked')) {
@@ -14182,6 +14256,15 @@ $(document).on('click', '#en-dry-save', function(e) {
 	}
 
 });
+
+$(document).on('click', '#ftp-save', function(e) {
+	e.stopPropagation();
+	if (validateFtpInput('ftp-form-div')) {
+			initiateFtpSaveConnection(false);
+	}
+
+});
+
 $(document).on('click', '#lone-get-classification', function(e) {
 	e.stopPropagation();
 	if (validateLoneWolfInput('lone-wolf-form-div')) {
@@ -14264,6 +14347,27 @@ function initiateEncompassSaveConnection(warn) {
 	}
 }
 
+function initiateFtpSaveConnection(warn) {
+	var username = document.getElementById('ftp-username').value;
+	var password = document.getElementById('ftp-password').value;
+	var url = document.getElementById('ftp-url').value;
+	var directory = document.getElementById('ftp-dir').value;
+	var payload = {
+		"username" : username,
+		"password" : password,
+		"url" : url,
+		"directory"  : directory
+	};
+	//TODO uncomment the test connection after development 
+	// by passed test credentials for develpment
+	//showOverlay();
+	//callAjaxGetWithPayloadData(getLocationOrigin() + "/rest/encompass/testcredentials.do", saveEncompassDetailsCallBack, payload, true, '#en-dry-save');
+	saveFtpDetails("ftp-form");
+	if (warn) {
+		$('#overlay-cancel').click();
+	}
+}
+
 function initiateLoneWolfSaveConnection(warn) {
 	var client = document.getElementById('lone-client').value;
 	var payload = {
@@ -14325,6 +14429,25 @@ function showEncompassButtons() {
 		$('#en-generate-report').hide();
 	}
 }
+
+//ftp button state
+function showFtpButtons() {
+	var state = $("#ftp-state").val();
+	if (state == 'dryrun') {
+		$('#en-dry-enable').show();
+		$('#en-generate-report').show();
+		$('#en-disconnect').hide();
+	} else if (state == 'prod') {
+		$('#en-disconnect').show();
+		$('#en-dry-enable').hide();
+		$('#en-generate-report').hide();
+	} else {
+		$('#en-disconnect').hide();
+		$('#en-dry-enable').hide();
+		$('#en-generate-report').hide();
+	}
+}
+
 // lone wolf button state
 function showLoneWolfButtons() {
 	var state = $("#lone-state").val();

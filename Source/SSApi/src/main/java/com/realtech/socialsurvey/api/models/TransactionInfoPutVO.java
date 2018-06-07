@@ -16,6 +16,9 @@ public class TransactionInfoPutVO {
  	private String customer2FirstName;
  	private String customer2LastName;
  	private String customer2Email;
+ 	
+ 	 //adding property address feild 
+    private String propertyAddress;
 
  	
  	
@@ -85,5 +88,14 @@ public class TransactionInfoPutVO {
 	public void setCustomer2Email(String customer2Email) {
 		this.customer2Email = customer2Email;
 	}
-	 	
+    public String getPropertyAddress()
+    {
+        return propertyAddress;
+    }
+    public void setPropertyAddress( String propertyAddress )
+    {
+        this.propertyAddress = propertyAddress;
+    }
+	 
+	
 }

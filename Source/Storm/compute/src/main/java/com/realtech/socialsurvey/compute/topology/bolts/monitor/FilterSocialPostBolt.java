@@ -70,12 +70,12 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
 					addTextHighlight(post);
 				}
 			}
-			
+
 			// check if post from trusted source
             if (isPostFromTrustedSource(post, companyId)) {
-                post.setStatus(SocialFeedStatus.RESOLVED);      
+                post.setStatus(SocialFeedStatus.RESOLVED);
                 post.setFromTrustedSource(true);
-                post.getActionHistory().add(getTrustedSourceActionHistory(post.getPostSource())); 
+                post.getActionHistory().add(getTrustedSourceActionHistory(post.getPostSource()));
             } else {
                 post.setStatus(SocialFeedStatus.NEW);
                 post.setFromTrustedSource(false);

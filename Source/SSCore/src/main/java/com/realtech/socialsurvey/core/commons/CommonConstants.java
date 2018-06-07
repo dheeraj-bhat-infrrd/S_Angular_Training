@@ -250,6 +250,7 @@ public interface CommonConstants
     public static final String BATCH_TYPE_MONTHLY_DIGEST_STARTER = "MonthlyDigestStarter";
     public static final String BATCH_TYPE_SURVEY_CSV_UPLOAD_PROCESSOR = "SurveyCsvUploadProcessor";
     public static final String BATCH_TYPE_TRANSACTION_ACTIVITY_MONITOR = "transactionActivityMonitor";
+    public static final String BATCH_TYPE_FTP_FILE_UPLOADER = "FTPFileUploader";
 
     
     //batch name constant for batch tracker
@@ -280,6 +281,7 @@ public interface CommonConstants
     public static final String BATCH_NAME_MONTHLY_DIGEST_STARTER = "Monthly digest process starter for companies";
     public static final String BATCH_NAME_SURVEY_CSV_UPLOAD_PROCESSOR = "Survey CSV file Upload Processor";
     public static final String BATCH_NAME_TRANSACTION_ACTIVITY_MONITOR = "Transaction Activity Monitor";
+    public static final String BATCH_NAME_FTP_FILE_UPLOADER = "FTP files uploader";
 
 
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_BILLING_REPORT = "Billing report";
@@ -590,7 +592,9 @@ public interface CommonConstants
     public static final String SYMBOL_FULLSTOP = ".";
 
     // settings constants
+    public static final String CRM_INFO_SOURCE_API = "API";
     public static final String CRM_INFO_SOURCE_ENCOMPASS = "encompass";
+    public static final String CRM_INFO_SOURCE_FTP = "ftp";
     public static final String CRM_SOURCE_ENCOMPASS = "ENCOMPASS";
     public static final String CRM_SOURCE_DOTLOOP = "DOTLOOP";
     public static final String SURVEY_SOURCE_BULK_UPLOAD = "bulk";
@@ -1564,7 +1568,9 @@ public interface CommonConstants
     public static final String EMAIL_TYPE_ABUSIVE_HANDLE_MAIL = "ABUSIVE_HANDLE_MAIL";
     public static final String EMAIL_TYPE_USER_ADDITION_MAIL = "USER_ADDITION_MAIL";
     public static final String EMAIL_TYPE_USER_DELETION_MAIL = "USER_DELETION_MAIL";
-
+    public static final String EMAIL_TYPE_FTP_FILE_UPLOADER = "FTP_FILE_UPLOADER";
+    public static final String EMAIL_TYPE_FTP_SUCCESSFULLY_PROCESSED_MAIL = "FTP_SUCCESSFULLY_PROCESSED_MAIL";
+    
     public static final String REDIRECT = "redirect:/";
     public static final String EVENT_CLICK = "click";
 
@@ -1653,4 +1659,11 @@ public interface CommonConstants
     public static final String PROFILE_TYPE = "profileType";
 
     public static final String CALLBACK = "callback";
+
+    public static final String FTP_SERVER_ONE = "FTP1";
+    public static final String FTP_SERVER_TWO = "FTP2";
+
+    public static final String UTF_8_ENCODING = "UTF-8";
+
+    public static final String OS_LINUX = "linux";
 }
