@@ -75,7 +75,7 @@ public class BaseRestException extends RuntimeException {
 		restError.setErrorCode(errorCode.getErrorCode());
 		restError.setMessage(errorCode.getMessage());
 		restError.setDebugMessage(debugMessage);
-		restError.setThrw( thrw );
+		//restError.setThrw( thrw );
 		return restError;
 	}
 

@@ -429,4 +429,7 @@ public interface SurveyHandler
 
     void updateSwearWords( String entityType, long entityId, String[] swearWords ) throws InvalidInputException;
 
+    public void moveSurveyBetweenUsers( long surveyPreinitiationId, long toUserId )
+        throws InvalidInputException, NoRecordsFetchedException, SolrException;
+
 }
