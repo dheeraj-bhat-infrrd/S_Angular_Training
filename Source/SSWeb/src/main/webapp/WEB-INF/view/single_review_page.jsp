@@ -96,7 +96,7 @@
 						</c:choose>
 						<span> for transaction completed in </span>
 						<c:choose>
-                        	<c:when test="${ not empty singleReviewItem.surveyTransactionDate} ">
+                        	<c:when test= "${not empty singleReviewItem.surveyTransactionDate}">
                             	<fmt:formatDate type="date" pattern="MMMM YYYY" value="${ singleReviewItem.surveyTransactionDate}" />
 								<c:choose>
 									<c:when test="${not empty singleReviewItem.city && not empty singleReviewItem.state}">
