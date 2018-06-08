@@ -379,4 +379,11 @@ public interface SurveyDetailsDao
 
 	void updateSourceDetailInExistingSurveyDetails(SurveyDetails surveyDetails);
 
+
+    public void updateAgentInfoInSurveyBySPI( long surveyPreInitiationId, User toUser, UserProfile toUserProfile )
+        throws InvalidInputException;
+
+
+    public SurveyDetails getsurveyFromSurveyPreinitiationId( long surveyPreinitiationId );
+
 }

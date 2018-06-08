@@ -1,6 +1,5 @@
 package com.realtech.socialsurvey.core.dao;
 
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -10,14 +9,13 @@ import com.realtech.socialsurvey.core.entities.AgentRankingReport;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
-import com.realtech.socialsurvey.core.entities.FeedIngestionEntityForSM;
-import com.realtech.socialsurvey.core.entities.Keyword;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
 import com.realtech.socialsurvey.core.entities.ProfileUrlEntity;
 import com.realtech.socialsurvey.core.entities.SavedDigestRecord;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.TransactionSourceFtp;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 
@@ -361,4 +359,29 @@ public interface OrganizationUnitSettingsDao
 
 
 	void updateShowSummitPopup(long companyId, boolean isShowSummitPopup) throws InvalidInputException;
+
+	
+    public List<TransactionSourceFtp> getFtpConnectionsForCompany( String status, int startIndex, int batchSize );
+    
+    /**
+     * 
+     * @param companyId
+     * @param ftpId
+     * @return
+     */
+    public TransactionSourceFtp fetchFileHeaderMapper( long companyId, long ftpId );
+
+    /**
+     * @param companyId
+     * @param transactionSourceFtp
+     */
+    public void updateFtpTransaction( long companyId, List<TransactionSourceFtp> transactionSourceFtp);
+
+
+    /**
+     * @param companyId
+     * @return
+     */
+    public List<TransactionSourceFtp> fetchTransactionFtpListActive( long companyId );
+
 }

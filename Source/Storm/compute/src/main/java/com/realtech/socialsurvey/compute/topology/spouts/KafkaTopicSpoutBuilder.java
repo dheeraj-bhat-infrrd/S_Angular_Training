@@ -58,12 +58,15 @@ public class KafkaTopicSpoutBuilder
     private static final String BATCH_TOPIC = "batch-topic";
     private static final String BATCH_CONSUMER_GROUP = "bcg01";
     
-    
     // Batch processing topic
     private static final String USER_EVENT_TOPIC = "user-event-topic";
     private static final String USER_EVENT_CONSUMER_GROUP = "uecg01";
     
-
+    //Survey Ingestion Topic
+    private static final String TRANSACTION_INGESTION_TOPIC = "transaction-ingestion-topic";
+    private static final String TRANSACTION_INGESTION_GROUP = "tig01";
+    
+    
     public static synchronized KafkaTopicSpoutBuilder getInstance(){
         if (kafkaTopicSpoutBuilder == null){
             kafkaTopicSpoutBuilder = new KafkaTopicSpoutBuilder();
@@ -172,5 +175,21 @@ public class KafkaTopicSpoutBuilder
         userEventSpoutConfig.scheme = new SchemeAsMultiScheme( new StringScheme() );
         LOG.info( "user event topic spout initiated. Topic: {}, Consumer Group: {}", topicName, consumerGroup );
         return new KafkaSpout( userEventSpoutConfig );
+    }
+    
+    /**
+     * survey ingestion kafka spout
+     */
+    public  KafkaSpout transactionIngestionSpout() {
+        ZkHosts zkHosts = new ZkHosts( zookeeperBrokers );
+        String topicName = ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? TRANSACTION_INGESTION_TOPIC
+                : ChararcterUtils.appendWithHypen(TRANSACTION_INGESTION_TOPIC, EnvConstants.getProfile() );
+        String consumerGroup = ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? TRANSACTION_INGESTION_GROUP
+                : ChararcterUtils.appendWithHypen(TRANSACTION_INGESTION_GROUP, EnvConstants.getProfile() );
+        SpoutConfig transactionIngestionSpoutConfig = new SpoutConfig( zkHosts, topicName, ZOOKEEPER_ROOT, consumerGroup );
+        transactionIngestionSpoutConfig.ignoreZkOffsets = false;
+        transactionIngestionSpoutConfig.scheme = new SchemeAsMultiScheme( new StringScheme() );
+        LOG.info( "Survey transaction Ingestion topic spout initiated. Topic: {}, Consumer Group: {}", topicName, consumerGroup );
+        return new KafkaSpout( transactionIngestionSpoutConfig );
     }
 }

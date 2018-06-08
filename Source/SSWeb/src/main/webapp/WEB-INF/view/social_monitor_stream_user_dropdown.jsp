@@ -1,7 +1,7 @@
 <div id="stream-usr-dropdown" class="float-left soc-mon-stream-dropdown">
 	<input id="usr-list-data" data-userIds=[] type="hidden"> 
 	<input id="usr-data" type="hidden" val=>
-	<div class="stream-dropdown-select">Users (<div id="stream-user-count" class="stream-dropdown-count-div">5</div> Selected)<img src="${initParam.resourcesPath}/resources/images/chevron-down.png" id="usr-chevron-down" class="float-right macro-dropdown-chevron"><img id="usr-chevron-up" src="${initParam.resourcesPath}/resources/images/chevron-up.png" class="hide float-right macro-dropdown-chevron"></div>
+	<div class="stream-dropdown-select">Users (<div id="stream-user-count" class="stream-dropdown-count-div">0</div> Selected)<img src="${initParam.resourcesPath}/resources/images/chevron-down.png" id="usr-chevron-down" class="float-right macro-dropdown-chevron"><img id="usr-chevron-up" src="${initParam.resourcesPath}/resources/images/chevron-up.png" class="hide float-right macro-dropdown-chevron"></div>
 	<div id="stream-usr-dropdown-options" class="hide float-left stream-dropdown-actions">
 		<div id="UsrOptions" class="usr-dropdown-toggle stream-dropdown-option-first">
 			<div id="company" class="stream-dropdown-option-container" data-iden="">

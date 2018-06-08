@@ -43,6 +43,7 @@ import com.realtech.socialsurvey.core.entities.Plan;
 import com.realtech.socialsurvey.core.entities.SurveyCsvInfo;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.ftp.FtpSurveyResponse;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.integration.stream.StreamApiConnectException;
 import com.realtech.socialsurvey.core.integration.stream.StreamApiException;
@@ -2765,6 +2766,66 @@ public class EmailServicesImpl implements EmailServices
     }
 
 
+    @Async
+    @Override
+    public void sendFtpProcessingErrorMailForCompany( Set<String> recipients, long companyId, String reason, String stackTrace, boolean isFromBatch, boolean sendOnlyToSocialSurveyAdmin )
+        throws InvalidInputException, UndeliveredEmailException
+    {
+        LOG.debug( "sendFtpProcessingErrorMailForCompany() started" );
+        if ( companyId <= 0 ) {
+            LOG.warn( "company ID is not specified" );
+            throw new InvalidInputException( "company ID is not specified" );
+        } else if ( StringUtils.isEmpty( stackTrace ) ) {
+            LOG.warn( "error stack trace not Specified" );
+            throw new InvalidInputException( "error stack trace not Specified" );
+        } else if ( reason == null ) {
+            LOG.warn( "Reason for failure not Specified" );
+            throw new InvalidInputException( "Reason for failure not Specified" );
+        }
+        
+        List<String> mailRecipients = new ArrayList<>();
+        
+        if( recipients != null && !recipients.isEmpty() ) {
+            mailRecipients.addAll( recipients );
+        }
+        
+        EmailEntity emailEntityForSSAdmin = prepareEmailEntityForSendingEmail( applicationAdminEmail );
+        emailEntityForSSAdmin.setMailType( CommonConstants.EMAIL_TYPE_FTP_FILE_UPLOADER );        
+
+        FileContentReplacements messageSubjectReplacements = new FileContentReplacements();
+        messageSubjectReplacements
+            .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.FTP_BATCH_ERROR_MAIL_SUBJECT );
+        messageSubjectReplacements
+            .setReplacementArgs( Arrays.asList( isFromBatch ? "batch" : "topology", String.valueOf( companyId ) ) );
+
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        messageBodyReplacements
+            .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.FTP_BATCH_ERROR_MAIL_BODY );
+        messageBodyReplacements.setReplacementArgs(
+            Arrays.asList( appLogoUrl, isFromBatch ? "batch" : "topology", String.valueOf( companyId ), reason, stackTrace ) );
+        
+
+        LOG.trace( "sendFtpProcessingErrorMailForCompany() finishing" );
+        sendEmailWithSubjectAndBodyReplacements( emailEntityForSSAdmin, messageSubjectReplacements, messageBodyReplacements, false,
+            false );
+        
+        if( !mailRecipients.isEmpty() && !sendOnlyToSocialSurveyAdmin ) {
+            
+            EmailEntity emailEntityForRecipients = prepareEmailEntityForSendingEmail( mailRecipients );
+            emailEntityForRecipients.setMailType( CommonConstants.EMAIL_TYPE_FTP_FILE_UPLOADER );
+        
+            // don't show stack trace for configured mails  
+            messageBodyReplacements.setReplacementArgs(
+                Arrays.asList( appLogoUrl, isFromBatch ? "batch" : "topology", String.valueOf( companyId ), reason, StringUtils.EMPTY ) );
+            
+            sendEmailWithSubjectAndBodyReplacements( emailEntityForRecipients, messageSubjectReplacements, messageBodyReplacements, false,
+                false );
+        }
+        
+        
+    }
+
+
     @Override
     public void sendEmailToAdminForUnsuccessfulSurveyCsvUpload( SurveyCsvInfo csvInfo, String errorMessage )
         throws InvalidInputException, UndeliveredEmailException
@@ -2879,6 +2940,7 @@ public class EmailServicesImpl implements EmailServices
 
         sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, true, false );
     }
+
 
     @Async
 	@Override
@@ -3005,6 +3067,48 @@ public class EmailServicesImpl implements EmailServices
 
         LOG.debug( "method sendUserDeletionMail() finished" );
         return true;
+    }
+
+    @Async
+    @Override
+    public void sendFtpSuccessMail( String companyName, String fileDate, String fileName, FtpSurveyResponse ftpSurveyResponse,
+        String ftpMailId, String ftpErrorHtml ) throws InvalidInputException, UndeliveredEmailException
+    {
+        if ( ftpMailId == null || ftpMailId.isEmpty() ) {
+            LOG.warn( "Recipient email Id is empty or null for sending ftp success mail " );
+            throw new InvalidInputException( "Recipient email Id is empty or null for sending ftp success mail " );
+        }
+
+        String[] mailIds = ftpMailId.split( "," );
+        List<String> mailIdList = new ArrayList<>();
+
+        for ( String mailId : mailIds ) {
+            mailIdList.add( mailId.trim() );
+        }
+
+        LOG.debug( "Sending ftp success email to : {}", ftpMailId );
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( mailIdList );
+        emailEntity.setMailType( CommonConstants.EMAIL_TYPE_FTP_SUCCESSFULLY_PROCESSED_MAIL );
+
+        FileContentReplacements messageSubjectReplacements = new FileContentReplacements();
+        messageSubjectReplacements.setFileName(
+            EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.FTP_SUCCESSFULLY_PROCESSED_MAIL_SUBJECT );
+        messageSubjectReplacements.setReplacementArgs( Arrays.asList( companyName ) );
+
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        messageBodyReplacements.setFileName(
+            EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.FTP_SUCCESSFULLY_PROCESSED_MAIL_BODY );
+
+        //SS-1435: Send survey details too.
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, companyName, fileName, fileDate,
+            String.valueOf( ftpSurveyResponse.getTotalTransaction() ), String.valueOf( ftpSurveyResponse.getTotalSurveys() ),
+            String.valueOf( ftpSurveyResponse.getCustomer1Count() ), String.valueOf( ftpSurveyResponse.getCustomer2Count() ),
+            String.valueOf( ftpSurveyResponse.getErrorNum() ), ftpErrorHtml ) );
+
+        LOG.trace( "Calling email sender to send mail" );
+        sendEmailWithSubjectAndBodyReplacements( emailEntity, messageSubjectReplacements, messageBodyReplacements, false,
+            false );
+        LOG.debug( "Successfully sent ftp success mail" );
     }
 
 }

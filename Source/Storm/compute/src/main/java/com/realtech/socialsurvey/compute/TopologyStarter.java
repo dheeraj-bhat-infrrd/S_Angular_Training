@@ -52,11 +52,15 @@ public class TopologyStarter
                 ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? ReportsTopologyStarterHelper.REPORTS_TOPOLOGY
                         : ChararcterUtils.appendWithHypen( ReportsTopologyStarterHelper.REPORTS_TOPOLOGY,
                         EnvConstants.getProfile() ) );
-        
         // user event topology
         new UserEventTopologyStarterHelper().submitTopology( EnvConstants.getCluster().equals( EnvConstants.LOCAL_TOPOLOGY ),
                 ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? UserEventTopologyStarterHelper.USER_EVENT_TOPOLOGY
                         : ChararcterUtils.appendWithHypen( UserEventTopologyStarterHelper.USER_EVENT_TOPOLOGY,
                         EnvConstants.getProfile() ) );
+        //Transaction ingestion topology
+        new TransactionIngestionTopologyStarterHelper().submitTopology( EnvConstants.getCluster().equals( EnvConstants.LOCAL_TOPOLOGY ),
+            ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? TransactionIngestionTopologyStarterHelper.TRANSACTION_INGESTION_TOPOLOGY
+                    : ChararcterUtils.appendWithHypen( TransactionIngestionTopologyStarterHelper.TRANSACTION_INGESTION_TOPOLOGY,
+                    EnvConstants.getProfile() ) );
     }
 }

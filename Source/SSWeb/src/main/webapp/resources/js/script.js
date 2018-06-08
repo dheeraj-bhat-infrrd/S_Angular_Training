@@ -724,6 +724,52 @@ function validateEncompassPassword(elementId) {
 	}
 }
 
+//Function to validate the username
+function validateFtpUserName(elementId) {
+	if ($(window).width() < 768) {
+		if ($('#' + elementId).val() != "") {
+			$('#' + elementId).next('.hm-item-err-2').hide();
+			return true;
+		} else {
+			$('#overlay-toast').html('Please enter user name');
+			showToast();
+			return false;
+		}
+	} else {
+		if ($('#' + elementId).val() != "") {
+			$('#' + elementId).next('.hm-item-err-2').hide();
+			return true;
+		} else {
+			$('#' + elementId).next('.hm-item-err-2').html('Please enter user name.');
+			$('#' + elementId).next('.hm-item-err-2').show();
+			return false;
+		}
+	}
+}
+
+// function to validate a password in form
+function validateFtpPassword(elementId) {
+	if ($(window).width() < 768) {
+		if ($('#' + elementId).val() != "") {
+			$('#' + elementId).next('.hm-item-err-2').hide();
+			return true;
+		} else {
+			$('#overlay-toast').html('Please enter password');
+			showToast();
+			return false;
+		}
+	} else {
+		if ($('#' + elementId).val() != "") {
+			$('#' + elementId).next('.hm-item-err-2').hide();
+			return true;
+		} else {
+			$('#' + elementId).next('.hm-item-err-2').html('Please enter password.');
+			$('#' + elementId).next('.hm-item-err-2').show();
+			return false;
+		}
+	}
+}
+
 // Function to validate the url
 function validateURL(elementId) {
 	if ($(window).width() < 768) {

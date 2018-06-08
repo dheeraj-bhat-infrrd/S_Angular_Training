@@ -7,9 +7,12 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.realtech.socialsurvey.compute.entities.FailedFtpRequest;
 import com.realtech.socialsurvey.compute.entities.Keyword;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokensPaginated;
+import com.realtech.socialsurvey.compute.entities.TransactionIngestionMessage;
+import com.realtech.socialsurvey.compute.entities.response.FtpSurveyResponse;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.entity.SurveyInvitationEmailCountMonth;
 import com.realtech.socialsurvey.compute.exception.APIIntegrationException;
@@ -90,7 +93,8 @@ public class SSAPIOperations
             return Optional.empty();
         }
     }
-    
+
+
     /**
      * Get keyword for company id
      * @param batchSize 
@@ -133,10 +137,10 @@ public class SSAPIOperations
             return true;
     }
 
-    public Optional<Long> updateSocialPostDuplicateCount( int hash, long comapnyId ) throws IOException {
+    public Optional<Long> updateSocialPostDuplicateCount( int hash, long comapnyId, String id ) throws IOException {
         LOG.info( "Executing updateSocialPostDuplicateCount method" );
         Call<Long> requestCall = RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationService()
-            .updateDuplicateCount( hash, comapnyId , AUTH_HEADER);
+            .updateDuplicateCount( hash, comapnyId, id, AUTH_HEADER);
             Response<Long> response = requestCall.execute();
             RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
             if ( LOG.isTraceEnabled() ) {
@@ -153,11 +157,12 @@ public class SSAPIOperations
 		return response.body();
 		
 	}
+	
 
-
-	public boolean saveEmailCountMonthData(List<SurveyInvitationEmailCountMonth> agentEmailCountsMonth) {
-        Call<Boolean> requestCall = RetrofitApiBuilder.apiBuilderInstance()
-            .getSSAPIIntergrationServiceWithIncreasedTimeOut().saveEmailCountMonthData( agentEmailCountsMonth );
+    public boolean saveEmailCountMonthData( List<SurveyInvitationEmailCountMonth> agentEmailCountsMonth )
+    {
+        Call<Boolean> requestCall = RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationServiceWithIncreasedTimeOut()
+            .saveEmailCountMonthData( agentEmailCountsMonth );
         try {
             Response<Boolean> response = requestCall.execute();
             RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
@@ -169,8 +174,7 @@ public class SSAPIOperations
             LOG.error( "IOException/ APIIntergrationException caught", e );
             return false;
         }
-		
-	}
+    }
 
 
 	public List<SurveyInvitationEmailCountMonth> getAllTimeDataForSurveyInvitationMail(int startIndex, int bATCH_SIZE) throws IOException {
@@ -227,5 +231,50 @@ public class SSAPIOperations
             getSocialFeedData(companyId, startTime, endTime, pageSize, skips, AUTH_HEADER);
         Response<List<SocialResponseObject>> response = requestCall.execute();
         return Optional.of( response.body() );
+    }
+    
+    public String processFailedFtpRequest( String errorMessage, TransactionIngestionMessage transactionIngestionMessage, boolean sendOnlyToSocialSurveyAdmin )
+        throws IOException
+    {
+        LOG.info( "method processFailedFtpRequest() called." );
+
+        FailedFtpRequest failedFtpRequest = new FailedFtpRequest();
+        failedFtpRequest.setReasonForFailure( errorMessage );
+        failedFtpRequest.setTransactionIngestionMessage( transactionIngestionMessage );
+        failedFtpRequest.setSendOnlyToSocialSurveyAdmin( sendOnlyToSocialSurveyAdmin );
+
+        Call<String> requestCall = RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationService()
+            .manageFtpFileProcessingFailure( failedFtpRequest );
+
+        try {
+            Response<String> response = requestCall.execute();
+            RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
+            if ( LOG.isTraceEnabled() ) {
+                LOG.trace( "response {}", response.body() );
+            }
+            return response.body();
+        } catch ( IOException | APIIntegrationException e ) {
+            LOG.error( "IOException/ APIIntergrationException caught", e );
+            throw new IOException( e );
+        }
+    }
+    
+    public String processSuccessFtpRequest( long companyId , long ftpId , String s3FileLocation ,FtpSurveyResponse ftpSurveyResponse )
+        throws IOException
+    {
+        LOG.info( "method processSuccessFtpRequest() called." );
+
+        Call<String> requestCall = RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationService().sendCompletionMail(companyId,ftpId,s3FileLocation, ftpSurveyResponse );
+        try {
+            Response<String> response = requestCall.execute();
+            RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
+            if ( LOG.isTraceEnabled() ) {
+                LOG.trace( "response {}", response.body() );
+            }
+            return response.body();
+        } catch ( IOException | APIIntegrationException e ) {
+            LOG.error( "IOException/ APIIntergrationException caught", e );
+            throw new IOException( e );
+        }        
     }
 }

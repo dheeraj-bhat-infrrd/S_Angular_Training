@@ -1,6 +1,6 @@
 <input type="hidden" id="feed-data" data-feeds=[] val="">
 <div id="stream-feed-dropdown" class="float-left soc-mon-stream-dropdown">
-	<div class="stream-dropdown-select">Feeds (<div id="stream-feed-count" class="stream-dropdown-count-div">5</div> Selected)<img src="${initParam.resourcesPath}/resources/images/chevron-down.png" id="feed-chevron-down" class="float-right macro-dropdown-chevron"><img id="feed-chevron-up" src="${initParam.resourcesPath}/resources/images/chevron-up.png" class="hide float-right macro-dropdown-chevron"></div>
+	<div class="stream-dropdown-select">Feeds (<div id="stream-feed-count" class="stream-dropdown-count-div">0</div> Selected)<img src="${initParam.resourcesPath}/resources/images/chevron-down.png" id="feed-chevron-down" class="float-right macro-dropdown-chevron"><img id="feed-chevron-up" src="${initParam.resourcesPath}/resources/images/chevron-up.png" class="hide float-right macro-dropdown-chevron"></div>
 	<div id="stream-feed-dropdown-options" class="hide float-left stream-dropdown-actions">
 		<div id="feed-facebook" class="stream-dropdown-option-container hide" data-feed="FACEBOOK">
 			<img src="${initParam.resourcesPath}/resources/images/check-no.png"  class="feed-unchecked hide float-left margin-right-10 cursor-pointer">

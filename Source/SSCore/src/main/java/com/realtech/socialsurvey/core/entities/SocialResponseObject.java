@@ -65,6 +65,7 @@ public class SocialResponseObject<T> implements Serializable
     private boolean isRetried;
     private boolean fromTrustedSource;
     private String postSource;
+    private boolean isDuplicate;
 
     public T getResponse()
     {
@@ -376,17 +377,28 @@ public class SocialResponseObject<T> implements Serializable
 	}
 
 
-	@Override
-    public String toString()
+    public boolean isDuplicate()
     {
-        return "SocialResponseObject [id=" + id + ", postId=" + postId + ", text=" + text + ", textHighlighted="
-            + textHighlighted + ", pageLink=" + pageLink + ", postLink=" + postLink + ", pictures=" + pictures
-            + ", updatedTime=" + updatedTime + ", createdTime=" + createdTime + ", ownerName=" + ownerName + ", ownerEmail="
-            + ownerEmail + ", response=" + response + ", type=" + type + ", flagged=" + flagged + ", status=" + status
-            + ", companyId=" + companyId + ", regionId=" + regionId + ", branchId=" + branchId + ", agentId=" + agentId
-            + ", profileType=" + profileType + ", hash=" + hash + ", duplicateCount=" + duplicateCount + ", foundKeywords="
-            + foundKeywords + ", actionHistory=" + actionHistory + ", isRetried=" + isRetried + ", fromTrustedSource="
-            + fromTrustedSource + ", postSource=" + postSource + "]";
+        return isDuplicate;
     }
-    
+
+
+    public void setIsDuplicate( boolean duplicate )
+    {
+        isDuplicate = duplicate;
+    }
+
+
+    @Override public String toString()
+    {
+        return "SocialResponseObject{" + "id='" + id + '\'' + ", postId='" + postId + '\'' + ", text='" + text + '\''
+            + ", textHighlighted='" + textHighlighted + '\'' + ", pageLink='" + pageLink + '\'' + ", postLink='" + postLink
+            + '\'' + ", pictures=" + pictures + ", updatedTime=" + updatedTime + ", createdTime=" + createdTime
+            + ", ownerName='" + ownerName + '\'' + ", ownerEmail='" + ownerEmail + '\'' + ", response=" + response + ", type="
+            + type + ", flagged=" + flagged + ", status=" + status + ", companyId=" + companyId + ", regionId=" + regionId
+            + ", branchId=" + branchId + ", agentId=" + agentId + ", profileType=" + profileType + ", hash=" + hash
+            + ", duplicateCount=" + duplicateCount + ", foundKeywords=" + foundKeywords + ", actionHistory=" + actionHistory
+            + ", isRetried=" + isRetried + ", fromTrustedSource=" + fromTrustedSource + ", postSource='" + postSource + '\''
+            + ", isDuplicate=" + isDuplicate + '}';
+    }
 }

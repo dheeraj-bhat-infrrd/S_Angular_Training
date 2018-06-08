@@ -205,4 +205,10 @@ public final class EmailTemplateConstants {
     public static final String USER_ADDITION_MAIL_SUBJECT = "UserAdditionMailSubject.txt";
     public static final String USER_DELETION_MAIL_SUBJECT = "UserDeletionMailSubject.txt";
 
+    
+    public static final String FTP_BATCH_ERROR_MAIL_BODY = "FtpBatchErrorMailBody.html";
+    public static final String FTP_BATCH_ERROR_MAIL_SUBJECT = "FtpBatchErrorMailSubject.txt";
+    
+    public static final String FTP_SUCCESSFULLY_PROCESSED_MAIL_BODY = "FtpSuccessfullyProcessedMailBody.html";
+    public static final String FTP_SUCCESSFULLY_PROCESSED_MAIL_SUBJECT = "FtpSuccessfullyProcessedMailSubject.txt";
 }

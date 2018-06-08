@@ -38,6 +38,9 @@ public class KafkaProducerConfig
 	@Value ( "${kafka.topic.userEventTopic}")
     private String userEventTopic;
 
+    @Value ( "${kafka.topic.transactionIngestionTopic}" )
+    private String transactionIngestionTopic;
+    
     @Bean
     public ProducerFactory<String, String> producerFactory()
     {
@@ -122,6 +125,18 @@ public class KafkaProducerConfig
         KafkaTemplate<String, String> kafkaTemplate = new KafkaTemplate<>( producerFactory() );
         kafkaTemplate.setMessageConverter( new StringJsonMessageConverter() );
         kafkaTemplate.setDefaultTopic( userEventTopic );
+        return kafkaTemplate;
+    }
+    
+    
+    /**
+     * Kafka template for uploading surveys from s3
+     */
+    @Bean(name = "transactionIngestionTemplate")
+    public KafkaTemplate<String, String> kafkaTransactionIngestionTemplate(){
+        KafkaTemplate<String, String> kafkaTemplate = new KafkaTemplate<>( producerFactory() );
+        kafkaTemplate.setMessageConverter( new StringJsonMessageConverter() );
+        kafkaTemplate.setDefaultTopic(transactionIngestionTopic);
         return kafkaTemplate;
     }
 }

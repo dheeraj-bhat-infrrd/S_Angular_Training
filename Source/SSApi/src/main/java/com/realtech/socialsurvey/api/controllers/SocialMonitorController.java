@@ -227,10 +227,10 @@ public class SocialMonitorController
     }
 
 
-    @RequestMapping ( value = "/feeds/hash/{hash}/companyId/{companyId}", method = RequestMethod.PUT)
+    @RequestMapping ( value = "/feeds/id/{id}/hash/{hash}/companyId/{companyId}", method = RequestMethod.PUT)
     @ApiOperation ( value = "Updates duplicateCount field matching the given hash of social feed collection")
     public ResponseEntity<?> updateDuplicateCount( @PathVariable ( "hash") int hash,
-        @PathVariable ( "companyId") long companyId, HttpServletRequest request,
+        @PathVariable ( "companyId") long companyId, @PathVariable("id") String id, HttpServletRequest request,
         @RequestHeader ( "authorizationHeader") String authorizationHeader ) throws SSApiException
     {
         try {
@@ -238,7 +238,7 @@ public class SocialMonitorController
             try {
                 LOGGER.info( "SocialMonitorController.updateDuplicateCount started" );
                 // updates duplicateCount of social post collection
-                long updatedDocs = socialFeedService.updateDuplicateCount( hash, companyId );
+                long updatedDocs = socialFeedService.updateDuplicateCount( hash, companyId, id );
                 LOGGER.info( "SocialMonitorController.updateDuplicateCount completed successfully" );
                 return new ResponseEntity<>( updatedDocs, HttpStatus.OK );
             } catch ( InvalidInputException e ) {

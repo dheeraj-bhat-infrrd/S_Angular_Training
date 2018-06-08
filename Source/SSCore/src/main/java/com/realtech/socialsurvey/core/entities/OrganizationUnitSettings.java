@@ -108,6 +108,8 @@ public class OrganizationUnitSettings implements Serializable
     
     private boolean isShowSummitPopup;
     
+    private List<TransactionSourceFtp> transactionSourceFtpList;
+    
     public boolean isShowSummitPopup() {
 		return isShowSummitPopup;
 	}
@@ -830,6 +832,20 @@ public class OrganizationUnitSettings implements Serializable
     {
         this.savedDigestRecords = savedDigestRecords;
     }
+    
+    
+
+
+    public List<TransactionSourceFtp> getTransactionSourceFtpList()
+    {
+        return transactionSourceFtpList;
+    }
+
+
+    public void setTransactionSourceFtpList( List<TransactionSourceFtp> transactionSourceFtpList )
+    {
+        this.transactionSourceFtpList = transactionSourceFtpList;
+    }
 
 
     public String getEncryptedId() {
@@ -910,7 +926,7 @@ public class OrganizationUnitSettings implements Serializable
     }
 
 
-	@Override
+    @Override
     public String toString()
     {
         return "OrganizationUnitSettings [id=" + id + ", iden=" + iden + ", uniqueIdentifier=" + uniqueIdentifier
@@ -941,8 +957,7 @@ public class OrganizationUnitSettings implements Serializable
             + isSocialMonitorEnabled + ", socialMonitorTrustedSources=" + socialMonitorTrustedSources
             + ", isAgentProfileDisabled=" + isAgentProfileDisabled + ", swearWords=" + Arrays.toString( swearWords )
             + ", hasRegisteredForSummit=" + hasRegisteredForSummit + ", isShowSummitPopup=" + isShowSummitPopup
-            + ", entityAlertDetails=" + entityAlertDetails + "]";
+            + ", transactionSourceFtpList=" + transactionSourceFtpList + ", entityAlertDetails=" + entityAlertDetails + "]";
     }
-
     
 }

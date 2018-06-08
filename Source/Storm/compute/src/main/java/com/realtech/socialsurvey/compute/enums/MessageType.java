@@ -1,0 +1,23 @@
+package com.realtech.socialsurvey.compute.enums;
+
+/**
+ * @author Lavanya
+ */
+
+/*Represents message type of each action*/
+public enum MessageType
+{
+    EMAIL( 0 ), PRIVATE_MESSAGE( 1 );
+
+    private int value;
+
+    MessageType( int value )
+    {
+        this.value = value;
+    }
+
+    public int getValue()
+    {
+        return value;
+    }
+}

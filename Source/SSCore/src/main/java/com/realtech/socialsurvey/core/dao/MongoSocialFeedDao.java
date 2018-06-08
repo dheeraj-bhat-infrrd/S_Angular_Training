@@ -12,7 +12,7 @@ public interface MongoSocialFeedDao
 {
     public void insertSocialFeed( SocialResponseObject<?> socialFeed, String collectionName );
 
-    long updateDuplicateCount(int hash, long companyId);
+    long updateDuplicateCount( int hash, long companyId, String id );
                     
 	public void updateSocialFeed(SocialFeedsActionUpdate socialFeedsActionUpdate, SocialResponseObject socialResponseObject, Long companyId, List<ActionHistory> actionHistory, int updateFlag, String collectionName);
 	
@@ -67,6 +67,22 @@ public interface MongoSocialFeedDao
      * @return
      */
     public long updateForTrustedSource( long companyId, String trustedSource, ActionHistory actionHistory );
+    
+    /**
+     * Method to get a social post
+     * @param companyId
+     * @param postId
+     * @return
+     */
+    public SocialResponseObject getSocialPost( Long companyId, String postId, String collectionName );
+    
+    /**
+     * Method to get all duplicate post details
+     * @param companyId
+     * @param hash
+     * @return
+     */
+    public List<SocialResponseObject> getAllDuplicatePostDetails(Long companyId, int hash);
 
     
 }

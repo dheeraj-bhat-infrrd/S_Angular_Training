@@ -5,6 +5,8 @@ import com.realtech.socialsurvey.core.entities.*;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.enums.SocialFeedStatus;
 import com.realtech.socialsurvey.core.enums.TextActionType;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.reportingmanagement.ReportingDashboardManagement;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
@@ -63,6 +65,9 @@ public class SocialMonitorWebController {
     private SSApiIntergrationBuilder ssApiIntergrationBuilder;
     
     private ReportingDashboardManagement reportingDashboardManagement;
+    
+    @Autowired
+    private OrganizationManagementService organizationManagementService;
     
     @Autowired
     public void setReportingDashboardManagement( ReportingDashboardManagement reportingDashboardManagement )
@@ -239,6 +244,16 @@ public class SocialMonitorWebController {
 		
 		String authorizationHeader = "Basic " + authHeader;
 		
+		int currentCount = 0;
+		
+		try {
+			currentCount = organizationManagementService.getKeywordCount(companyId);
+		} catch (InvalidInputException e) {
+			 LOG.error("Exception occured while fetching monitor count, while adding new monitor.", e);
+	            message = "Unable to add monitor";
+	            statusMap.put(STATUS, CommonConstants.ERROR);
+		}
+		
 		Response response =null;
     	Integer successCount = 0;
     	try {
@@ -250,7 +265,14 @@ public class SocialMonitorWebController {
         	            
                         response = ssApiIntergrationBuilder.getIntegrationApi().addMultiplePhrasesToCompany( companyId, newKeyword, authorizationHeader );
                         
-                        successCount++;
+                        int newCount = organizationManagementService.getKeywordCount(companyId);
+                        
+                        if(newCount > currentCount);
+                        {
+                        	successCount++;
+                        }
+                        currentCount = newCount;
+                        
         	    }
         	    message = messageUtils.getDisplayMessage(DisplayMessageConstants.ADD_MONITOR_SUCCESSFUL,
                     DisplayMessageType.SUCCESS_MESSAGE).getMessage();
@@ -821,6 +843,84 @@ public class SocialMonitorWebController {
         LOG.info( "Method to get recent activity count for social monitor finished." );
         return String.valueOf( count );
     }
-
+    
+    @ResponseBody
+    @RequestMapping ( value = "/addtrustedsource", method = RequestMethod.POST)
+    public String addTrustedSource(Model model, HttpServletRequest request) {
+    	
+    	LOG.info( "Method to add trusted source for social monitor." );
+        String trustedSource = request.getParameter( "trustedSource" );
+        
+        User user = sessionHelper.getCurrentUser();
+        Long companyId = user.getCompany().getCompanyId();
+        
+        Map<String, String> statusMap = new HashMap<>();
+        String message = "";
+        String statusJson = "";
+        
+        Response response = null;
+        
+        String authorizationHeader = "Basic " + authHeader;
+        
+        try {
+           
+            response = ssApiIntergrationBuilder.getIntegrationApi().addTrustedSourceToCompany(companyId, trustedSource, authorizationHeader);
+            message =  "Successfully added Trusted Source";
+            String trustedSources = new String(((TypedByteArray) response.getBody()).getBytes());
+            statusMap.put("trustedSources", trustedSources);
+            statusMap.put(STATUS, CommonConstants.SUCCESS_ATTRIBUTE);
+         }catch(Exception e){
+            LOG.error("Exception occured in SS-API while updating post action.", e);
+            message = "Unable to add Trusted Source";
+            statusMap.put(STATUS, CommonConstants.ERROR);
+         }
+        
+        statusMap.put(MESSAGE, message);
+        statusJson = new Gson().toJson(statusMap);
+        
+        LOG.info( "Method to add trusted source for social monitor finished." );
+        
+        return statusJson;
+    }
+    
+    @ResponseBody
+    @RequestMapping ( value = "/removetrustedsource", method = RequestMethod.POST)
+    public String removeTrustedSource(Model model, HttpServletRequest request) {
+        
+    	LOG.info( "Method to remove trusted source for social monitor." );
+    	
+        String trustedSource = request.getParameter( "trustedSource" );
+        
+        User user = sessionHelper.getCurrentUser();
+        Long companyId = user.getCompany().getCompanyId();
+        
+        Map<String, String> statusMap = new HashMap<>();
+        String message = "";
+        String statusJson = "";
+        
+        Response response = null;
+        
+        String authorizationHeader = "Basic " + authHeader;
+        
+        try {
+           
+            response = ssApiIntergrationBuilder.getIntegrationApi().removeTrustedSourceToCompany(companyId, trustedSource, authorizationHeader);
+            message =  "Successfully removed Trusted Source";
+            String trustedSources = new String(((TypedByteArray) response.getBody()).getBytes());
+            statusMap.put("trustedSources", trustedSources);
+            statusMap.put(STATUS, CommonConstants.SUCCESS_ATTRIBUTE);
+         }catch(Exception e){
+            LOG.error("Exception occured in SS-API while updating post action.", e);
+            message = "Unable to remove Trusted Source";
+            statusMap.put(STATUS, CommonConstants.ERROR);
+         }
+        
+        statusMap.put(MESSAGE, message);
+        statusJson = new Gson().toJson(statusMap);
+        
+        LOG.info( "Method to remove trusted source for social monitor finished." );
+        
+        return statusJson;
+    }
 
 }
