@@ -152,10 +152,10 @@ public class TwitterFeedExtractorBolt extends BaseComputeBolt
         responseWrapper.setOwnerName( mediaToken.getContactDetails().getName() );
         responseWrapper.setOwnerEmail( mediaToken.getContactDetails().getMailDetails().getEmailId() );
         responseWrapper.setPostSource(twitterFeedData.getSource());
-        responseWrapper.setUpdatedTime(new Date().getTime());
         
         if ( twitterFeedData.getCreatedAt() != null ) {
             responseWrapper.setCreatedTime( twitterFeedData.getCreatedAt().getTime() );
+            responseWrapper.setUpdatedTime( twitterFeedData.getCreatedAt().getTime() );
         }
 
         return responseWrapper;

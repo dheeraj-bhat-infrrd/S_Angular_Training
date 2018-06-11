@@ -173,9 +173,10 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt implements Serial
 
         if(facebookFeedData.getApplication() != null && StringUtils.isNotEmpty(facebookFeedData.getApplication().getName()))
         		responseWrapper.setPostSource(facebookFeedData.getApplication().getName());
-        
-        // Setting update to current time.
-        responseWrapper.setUpdatedTime(new Date().getTime());
+
+        if ( facebookFeedData.getUpdatedTime() > 0 ) {
+            responseWrapper.setUpdatedTime( facebookFeedData.getUpdatedTime() * 1000 );
+        }
 
         if ( facebookFeedData.getCreatedTime() > 0 ) {
             responseWrapper.setCreatedTime( facebookFeedData.getCreatedTime() * 1000 );
