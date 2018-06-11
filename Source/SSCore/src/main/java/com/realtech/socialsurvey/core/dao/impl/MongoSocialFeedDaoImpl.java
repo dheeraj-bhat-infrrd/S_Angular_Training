@@ -460,7 +460,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         LOG.debug( "Method to fetch socialFeed for a particular keyword and date range started" );
         Query query = new Query();
         query.addCriteria( Criteria.where( COMPANY_ID ).is( companyId ) )
-            .addCriteria( Criteria.where( CREATED_TIME ).lte( endTime ).gte( startTime ) )
+            .addCriteria( Criteria.where( UPDATED_TIME ).lte( endTime ).gte( startTime ) )
             .addCriteria(
                 Criteria.where( FOUND_KEYWORDS ).regex( Pattern.compile( keyword, Pattern.CASE_INSENSITIVE ) ) )
             .skip( skips ).limit( pageSize );
