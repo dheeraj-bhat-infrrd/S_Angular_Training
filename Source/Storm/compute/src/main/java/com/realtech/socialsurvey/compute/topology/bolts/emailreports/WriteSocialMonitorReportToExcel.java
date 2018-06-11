@@ -15,6 +15,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
+import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -140,11 +141,11 @@ public class WriteSocialMonitorReportToExcel extends BaseComputeBoltWithAck
                         socialMonitorReportToPopulate.add(socialFeed.getType().toString());
                         socialMonitorReportToPopulate.add(socialFeed.getText());
                         socialMonitorReportToPopulate.add(socialFeed.getPostLink());
-                        socialMonitorReportToPopulate.add(socialFeed.getFoundKeywords()== null || socialFeed.getActionHistory().isEmpty() ? "No" : "Yes");
+                        socialMonitorReportToPopulate.add(socialFeed.getFoundKeywords()== null ||    socialFeed.getActionHistory().isEmpty() ? "No" : "Yes");
                         socialMonitorReportToPopulate.add(actionHistory.getActionType().toString());
                         socialMonitorReportToPopulate.add(actionHistory.getOwnerName());
                         socialMonitorReportToPopulate.add(ConversionUtils.convertToEst( actionHistory.getCreatedDate() ));
-                        socialMonitorReportToPopulate.add(actionHistory.getText());
+                        socialMonitorReportToPopulate.add( Jsoup.parse( actionHistory.getText() ).text());
                         if(actionHistory.getMessageType() != null){
                             socialMonitorReportToPopulate.add( actionHistory.getMessageType().toString() );
                             socialMonitorReportToPopulate.add( actionHistory.getMessage() );
