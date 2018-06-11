@@ -122,7 +122,7 @@ public class KafkaTopicSpoutBuilder
         String consumerGroup = ( EnvConstants.getProfile().equals( EnvConstants.PROFILE_PROD ) ) ? SOCIAL_POST_CONSUMER_GROUP
                 : ChararcterUtils.appendWithHypen( SOCIAL_POST_CONSUMER_GROUP, EnvConstants.getProfile() );
         SpoutConfig socialPostSpoutConfig = new SpoutConfig( zkHosts, topicName, ZOOKEEPER_ROOT, consumerGroup );
-        socialPostSpoutConfig.ignoreZkOffsets = true;
+        socialPostSpoutConfig.ignoreZkOffsets = false;
         socialPostSpoutConfig.scheme = new SchemeAsMultiScheme( new StringScheme() );
         LOG.info( "Social post topic spout initiated. Topic: {}, Consumer Group: {}",  topicName, consumerGroup );
         return new KafkaSpout( socialPostSpoutConfig );
