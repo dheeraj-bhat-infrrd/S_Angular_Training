@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -151,9 +152,10 @@ public class TwitterFeedExtractorBolt extends BaseComputeBolt
         responseWrapper.setOwnerName( mediaToken.getContactDetails().getName() );
         responseWrapper.setOwnerEmail( mediaToken.getContactDetails().getMailDetails().getEmailId() );
         responseWrapper.setPostSource(twitterFeedData.getSource());
+        responseWrapper.setUpdatedTime(new Date().getTime());
+        
         if ( twitterFeedData.getCreatedAt() != null ) {
             responseWrapper.setCreatedTime( twitterFeedData.getCreatedAt().getTime() );
-            responseWrapper.setUpdatedTime( twitterFeedData.getCreatedAt().getTime() );
         }
 
         return responseWrapper;
