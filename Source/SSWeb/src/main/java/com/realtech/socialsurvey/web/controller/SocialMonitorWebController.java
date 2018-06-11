@@ -3,6 +3,7 @@ import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.*;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
+import com.realtech.socialsurvey.core.enums.SocialFeedActionType;
 import com.realtech.socialsurvey.core.enums.SocialFeedStatus;
 import com.realtech.socialsurvey.core.enums.TextActionType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -336,7 +337,6 @@ public class SocialMonitorWebController {
 		int count = 0;
 		
 		Actions actions= new Actions();
-		boolean flagged = false;
 		String socialFeedStatus;
 		int alert=0;
 		
@@ -349,11 +349,9 @@ public class SocialMonitorWebController {
 				break;
 				
 			case 1: socialFeedStatus = "NEW";
-				flagged = true;
 				break;
 			
 			case 2: socialFeedStatus = "ESCALATED";
-				flagged = true;
 				break;
 			
 			case 3: socialFeedStatus = "RESOLVED";
@@ -363,7 +361,6 @@ public class SocialMonitorWebController {
 		}
 		
 		actions.setSocialFeedStatus(SocialFeedStatus.valueOf(socialFeedStatus));
-		actions.setFlagged(flagged);
 		actions.setText(actionText);
 		actions.setTextActionType(TextActionType.valueOf(actionType));
 		
@@ -441,7 +438,6 @@ public class SocialMonitorWebController {
         String startIndexStr = request.getParameter(START_INDEX);
         String batchSizeStr = request.getParameter(BATCH_SIZE);
         String status = request.getParameter(STATUS);
-        String flagStr = request.getParameter(FLAG);
         String companyIdStr = request.getParameter( "company" );
         String regionIdStr = request.getParameter( "region" );
         String branchIdStr = request.getParameter( "branch" );
@@ -456,7 +452,6 @@ public class SocialMonitorWebController {
         
         int startIndex=0;
         int batchSize=10;
-        boolean flag = false;
         
         if ( startIndexStr != null && !startIndexStr.isEmpty() ) {
         	startIndex = Integer.valueOf( startIndexStr );
@@ -468,10 +463,6 @@ public class SocialMonitorWebController {
         
         if(status.equalsIgnoreCase("none") || status.isEmpty()){
             status=null;
-        }
-        
-       if ( flagStr != null && !flagStr.isEmpty() ) {
-        	flag = Boolean.valueOf( flagStr );
         }
   
        regionIds = splitList( regionIdStr );
@@ -502,7 +493,6 @@ public class SocialMonitorWebController {
        filter.setStartIndex( startIndex );
        filter.setLimit( batchSize );
        filter.setStatus( status );
-       filter.setFlag( flag );
        filter.setFeedtype( feedType );
        filter.setCompanyId( companyId );
        filter.setRegionIds( regionIds );
@@ -535,12 +525,10 @@ public class SocialMonitorWebController {
     private SocialFeedsActionUpdate createSFAUFromRequest(HttpServletRequest request, String userName, String userEmailId) {
     
     	String postId = request.getParameter("form-post-id");
-    	String flaggedStr = request.getParameter("form-flagged");
     	String statusStr = request.getParameter("form-status");
     	String textActType = request.getParameter("form-text-act-type");
     	String text = request.getParameter("form-post-textbox");
     	String macroId = request.getParameter("form-post-act-macro-id");
-    	    	
     	String[] postIdList = postId.split(",");
     	List<String> postIds = new ArrayList<>();
     	
@@ -553,19 +541,7 @@ public class SocialMonitorWebController {
     	
     	SocialFeedsActionUpdate socialFeedsActionUpdate = new SocialFeedsActionUpdate();
     	socialFeedsActionUpdate.setPostIds(postIdSet);
-    	
-    	boolean flagged = false;
-    	if(flaggedStr!=null && !flaggedStr.isEmpty() && flaggedStr.equalsIgnoreCase("true")) {
-    		flagged = true;
-    	}
-    	socialFeedsActionUpdate.setFlagged(flagged);
-    	
-    	if(statusStr.equalsIgnoreCase("NONE")){
-    		socialFeedsActionUpdate.setStatus(null);
-    	}else {
-    		socialFeedsActionUpdate.setStatus(SocialFeedStatus.valueOf(statusStr));
-    	}
-    	
+    	socialFeedsActionUpdate.setActionType(SocialFeedActionType.valueOf(statusStr));
     	socialFeedsActionUpdate.setTextActionType(TextActionType.valueOf(textActType));
     	socialFeedsActionUpdate.setText(text);
     	socialFeedsActionUpdate.setMacroId(macroId);
@@ -629,7 +605,6 @@ public class SocialMonitorWebController {
     private SocialFeedsActionUpdate createSFAUFromRequestForMacro(HttpServletRequest request, String userName) {
         
     	String postId = request.getParameter("macro-form-post-id");
-    	String flaggedStr = request.getParameter("macro-form-flagged");
     	String statusStr = request.getParameter("macro-form-status");
     	String textActType = request.getParameter("macro-form-text-act-type");
     	String text = request.getParameter("macro-form-text");
@@ -647,19 +622,7 @@ public class SocialMonitorWebController {
     	
         SocialFeedsActionUpdate socialFeedsActionUpdate = new SocialFeedsActionUpdate();
     	socialFeedsActionUpdate.setPostIds(postIdSet);
-    	
-    	boolean flagged = false;
-    	if(flaggedStr!=null && !flaggedStr.isEmpty() && flaggedStr.equalsIgnoreCase("true")) {
-    		flagged = true;
-    	}
-    	socialFeedsActionUpdate.setFlagged(flagged);
-    	
-    	if(statusStr.equalsIgnoreCase("NONE")){
-    		socialFeedsActionUpdate.setStatus(null);
-    	}else {
-    		socialFeedsActionUpdate.setStatus(SocialFeedStatus.valueOf(statusStr));
-    	}
-    	
+    	socialFeedsActionUpdate.setActionType(SocialFeedActionType.valueOf(statusStr));
     	socialFeedsActionUpdate.setTextActionType(TextActionType.valueOf(textActType));
     	socialFeedsActionUpdate.setText(text);
     	socialFeedsActionUpdate.setMacroId(macroId);
@@ -921,6 +884,30 @@ public class SocialMonitorWebController {
         LOG.info( "Method to remove trusted source for social monitor finished." );
         
         return statusJson;
+    }
+    
+    @ResponseBody
+    @RequestMapping ( value = "/getduplicatesbypostid", method = RequestMethod.GET)
+    public String getDuplicatesByPostId(Model model, HttpServletRequest request) {
+        
+        User user = sessionHelper.getCurrentUser();
+        Long companyId = user.getCompany().getCompanyId();
+        
+        String postId = request.getParameter( "postId" );
+        
+        String authorizationHeader = "Basic " + authHeader;
+        
+        Response response = ssApiIntergrationBuilder.getIntegrationApi().getDuplicatePosts(companyId, postId, authorizationHeader);
+        
+        return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+    }
+    
+    @RequestMapping ( value = "/getdupcontainer", method = RequestMethod.GET)
+    public String getDupContainer( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Social Monitor Duplicate container page fetched" );
+        
+        return JspResolver.STREAM_DUP_CONTAINER;
     }
 
 }

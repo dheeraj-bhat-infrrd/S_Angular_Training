@@ -160,9 +160,9 @@
 							    <c:if test="${feedback.source ne 'customer'}">
                                     <div style="clear:both"><spring:message code="label.completedTransaction.key"/>
                                            <c:choose>
-                                        <c:when test="${ not empty feedback.surveyTransactionDate} ">
+                                        <c:when test= "${not empty feedback.surveyTransactionDate}">
                                             <span class="completedOn" data-modified="false" data-modifiedon="<fmt:formatDate type="date" pattern="MMMM-YYYY"
-                            value="${ feedback.surveyTransactionDate}" />"> </span>
+                            value="${feedback.surveyTransactionDate}" />"></span>
 														<c:choose>
 															<c:when test="${not empty feedback.city && not empty feedback.state}">
 																<span> in ${feedback.city}, ${feedback.state}.</span>

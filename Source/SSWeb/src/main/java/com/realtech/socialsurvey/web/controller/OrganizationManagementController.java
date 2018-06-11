@@ -49,7 +49,6 @@ import com.realtech.socialsurvey.core.entities.ComplaintResolutionSettings;
 import com.realtech.socialsurvey.core.entities.DisplayMessage;
 import com.realtech.socialsurvey.core.entities.DotLoopCrmInfo;
 import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
-import com.realtech.socialsurvey.core.entities.FileHeaderMapper;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.LockSettings;
 import com.realtech.socialsurvey.core.entities.MailContent;
@@ -2181,11 +2180,6 @@ public class OrganizationManagementController
             // default digest flag is the new account type is enterprise
             if ( newAccountsMasterId == CommonConstants.ACCOUNTS_MASTER_ENTERPRISE) {
                 reportingDashboardManagement.updateSendDigestMailToggle( CommonConstants.COMPANY_ID_COLUMN, user.getCompany().getCompanyId(), true );
-            }
-            
-            // default socialMonitor flag if the new account type is enterprise
-            if ( newAccountsMasterId == CommonConstants.ACCOUNTS_MASTER_ENTERPRISE ) {
-                reportingDashboardManagement.enableSocialMonitorToggle( user.getCompany().getCompanyId(), true );
             }
             
             LOG.info( "message returned : " + message );
@@ -4345,7 +4339,7 @@ public class OrganizationManagementController
         long companyId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
 
         try {
-            return String.valueOf( reportingDashboardManagement.enableSocialMonitorToggle( companyId,
+            return String.valueOf( organizationManagementService.enableSocialMonitorToggle( companyId,
                 Boolean.parseBoolean( request.getParameter( "isSocialMonitorEnabled" ) ) ) );
         } catch ( Exception error ) {
             LOG.error(
