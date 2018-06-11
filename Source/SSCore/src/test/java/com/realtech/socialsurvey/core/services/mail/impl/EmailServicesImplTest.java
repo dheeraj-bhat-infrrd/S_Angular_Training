@@ -600,70 +600,70 @@ public class EmailServicesImplTest
     @Test ( expected = InvalidInputException.class)
     public void sendContactUsMailTestRecipientEmailIdNull() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendContactUsMail( null, "test", "test", "test", "test" );
+        emailServicesImpl.sendContactUsMail( null, "test", "test", "test", "test", "test", "test" );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void sendContactUsMailTestRecipientEmailIdEmpty() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendContactUsMail( "", "test", "test", "test", "test" );
+        emailServicesImpl.sendContactUsMail( new ArrayList<String>(), "test", "test", "test", "test" , "test", "test");
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void sendContactUsMailTestDisplayNameNull() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendContactUsMail( "test", null, "test", "test", "test" );
+        emailServicesImpl.sendContactUsMail(  new ArrayList<String>(), null, "test", "test", "test" , "test", "test");
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void sendContactUsMailTestDisplayNameEmpty() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendContactUsMail( "test", "", "test", "test", "test" );
+        emailServicesImpl.sendContactUsMail(  new ArrayList<String>(), "test", "", "test", "test", "test", "test" );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void sendContactUsMailTestSenderNameNull() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendContactUsMail( "test", "test", null, "test", "test" );
+        emailServicesImpl.sendContactUsMail(  new ArrayList<String>(), "test", "test", null, "test" , "test", "test");
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void sendContactUsMailTestSenderNameEmpty() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendContactUsMail( "test", "test", "", "test", "test" );
+        emailServicesImpl.sendContactUsMail(  new ArrayList<String>(), "test", "test", "", "test", "test", "test" );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void sendContactUsMailTestSenderEmailIdNull() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendContactUsMail( "test", "test", "test", null, "test" );
+        emailServicesImpl.sendContactUsMail(  new ArrayList<String>(), "test", "test", "test", null, "test", "test" );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void sendContactUsMailTestSenderEmailIdEmpty() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendContactUsMail( "test", "test", "test", "", "test" );
+        emailServicesImpl.sendContactUsMail(  new ArrayList<String>(), "test", "test", "test", "", "test", "test" );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void sendContactUsMailTestMessageNull() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendContactUsMail( "test", "test", "test", "test", null );
+        emailServicesImpl.sendContactUsMail( new ArrayList<String>(), "test", "test", "test", "test", null, "test" );
     }
 
 
     @Test ( expected = InvalidInputException.class)
     public void sendContactUsMailTestMessageEmpty() throws InvalidInputException, UndeliveredEmailException
     {
-        emailServicesImpl.sendContactUsMail( "test", "test", "test", "test", "" );
+        emailServicesImpl.sendContactUsMail( new ArrayList<String>(), "test", "test", "test", "test", "","test" );
     }
 
     //Tests for sendSurveyRelatedMail
