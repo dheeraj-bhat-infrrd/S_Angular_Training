@@ -1218,6 +1218,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         LOG.debug( "Fetching social media tokens from {}", collectionName );
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_SOCIAL_MEDIA_TOKENS ).exists( true )  );
+        query.addCriteria( Criteria.where( KEY_STATUS )
+            .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) ) );
         query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).include( KEY_IDENTIFIER )
             .include( KEY_CONTACT_DETAILS ).exclude( "_id" );
 
@@ -1230,12 +1232,15 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         return mongoTemplate.find( query, SocialMediaTokenResponse.class, collectionName );
     }
     
+
     @Override
-    public long getSocialMediaTokensCount( String collectionName)
+    public long getSocialMediaTokensCount( String collectionName )
     {
         LOG.debug( "Fetching social media tokens record count from {}", collectionName );
         Query query = new Query();
-        query.addCriteria( Criteria.where( KEY_SOCIAL_MEDIA_TOKENS ).exists( true )  );
+        query.addCriteria( Criteria.where( KEY_SOCIAL_MEDIA_TOKENS ).exists( true ) );
+        query.addCriteria( Criteria.where( KEY_STATUS )
+            .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) ) );
         query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).include( KEY_IDENTIFIER ).exclude( "_id" );
         return mongoTemplate.count( query, collectionName );
     }

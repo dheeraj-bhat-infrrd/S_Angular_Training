@@ -15,7 +15,6 @@ public class SocialFeedFilter implements Serializable
     private int startIndex;
     private int limit;
     private String status;
-    private boolean flag;
     private List<String> feedtype;
     private Long companyId;
     private List<Long> regionIds;
@@ -59,19 +58,6 @@ public class SocialFeedFilter implements Serializable
     {
         this.status = status;
     }
-
-
-    public boolean isFlag()
-    {
-        return flag;
-    }
-
-
-    public void setFlag( boolean flag )
-    {
-        this.flag = flag;
-    }
-
 
     public List<String> getFeedtype()
     {

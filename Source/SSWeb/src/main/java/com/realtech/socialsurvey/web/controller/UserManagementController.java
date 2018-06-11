@@ -51,6 +51,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.reportingmanagement.ReportingDashboardManagement;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.settingsmanagement.impl.InvalidSettingsStateException;
@@ -112,7 +113,9 @@ public class UserManagementController
     @Autowired
     private Utils utils;
 
-
+    @Autowired
+    private ReportingDashboardManagement reportingDashboardManagement;
+    
     @Autowired
     private SSApiIntergrationBuilder sSApiIntergrationBuilder;
 
@@ -1781,7 +1784,16 @@ public class UserManagementController
             model.addAttribute( "emailId", user.getEmailId() );
             model.addAttribute( "userId", user.getUserId() );
             model.addAttribute( "status", user.getStatus() );
-
+            
+            try {
+            	boolean isSocialMonitorEnabled = reportingDashboardManagement.isSocialMonitorEnabled(user.getCompany().getCompanyId());
+            	model.addAttribute( "isSocialMonitorEnabled", isSocialMonitorEnabled );
+            }catch ( InvalidInputException e ) {
+                LOG.error( "fetching isSocialMonitorEnabled varibale value failed.", e );
+            }catch ( NoRecordsFetchedException e ) {
+                LOG.error( "No records found while checking if social monitor enabled.", e );
+            }
+            
             // returning in descending order
             Collections.reverse( userAssignments );
             model.addAttribute( "profiles", userAssignments );
