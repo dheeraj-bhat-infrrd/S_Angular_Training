@@ -60,7 +60,7 @@ public class SocialPostFilterTopologyStarterHelper extends TopologyStarterHelper
             return config;
         } else {
             Config config = new Config();
-            config.put( Config.TOPOLOGY_MAX_SPOUT_PENDING, 10 );
+            config.put( Config.TOPOLOGY_MAX_SPOUT_PENDING, 50 );
             config.put( Config.STORM_NIMBUS_RETRY_TIMES, 3 );
             return config;
         }
