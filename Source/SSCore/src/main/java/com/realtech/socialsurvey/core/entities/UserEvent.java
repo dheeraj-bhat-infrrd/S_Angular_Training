@@ -19,7 +19,7 @@ public class UserEvent implements Serializable
     private long entityId;
     private long userId;
     private long superAdminId;
-    private long timestamp;
+    private String eventDate;
 
 
     public UserEvent( EventType eventType )
@@ -106,15 +106,15 @@ public class UserEvent implements Serializable
     }
 
 
-    public long getTimestamp()
+    public String getEventDate()
     {
-        return timestamp;
+        return eventDate;
     }
 
 
-    public void setTimestamp( long timestamp )
+    public void setEventDate( String timestamp )
     {
-        this.timestamp = timestamp;
+        this.eventDate = timestamp;
     }
 
 
@@ -123,7 +123,7 @@ public class UserEvent implements Serializable
     {
         return "UserEvent [userEventId=" + userEventId + ", eventType=" + eventType + ", event=" + event + ", entityType="
             + entityType + ", entityId=" + entityId + ", userId=" + userId + ", superAdminId=" + superAdminId + ", timestamp="
-            + timestamp + "]";
+            + eventDate + "]";
     }
 
 

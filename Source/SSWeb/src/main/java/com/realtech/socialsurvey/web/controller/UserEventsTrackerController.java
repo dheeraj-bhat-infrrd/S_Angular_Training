@@ -1,5 +1,9 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -75,7 +79,10 @@ public class UserEventsTrackerController
                 clickedEvent.setEntityId( entityId );
                 clickedEvent.setUserId( user.getUserId() );
                 clickedEvent.setEvent( clickedEventStr );
-                clickedEvent.setTimestamp( System.currentTimeMillis() );
+                //setting date format according to solr format
+                SimpleDateFormat sdf = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss.SSSXXX" );
+                sdf.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
+                clickedEvent.setEventDate( sdf.format( new Date( System.currentTimeMillis() ) ) );
                 clickedEvent.setSuperAdminId( realtechAdminId != null ? realtechAdminId : 0l );
 
                 try {
