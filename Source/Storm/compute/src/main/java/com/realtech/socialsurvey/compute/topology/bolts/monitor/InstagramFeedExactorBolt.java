@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -107,9 +108,10 @@ public class InstagramFeedExactorBolt extends BaseComputeBolt {
         responseWrapper.setOwnerEmail( mediaToken.getContactDetails().getMailDetails().getEmailId() );
         responseWrapper.setPostLink( instagramMediaData.getPostLink() );
 
+        responseWrapper.setUpdatedTime(new Date().getTime());
+        
         if ( instagramMediaData.getTimestamp() > 0 ) {
             responseWrapper.setCreatedTime( instagramMediaData.getTimestamp() * 1000 );
-            responseWrapper.setUpdatedTime( instagramMediaData.getTimestamp() * 1000 );
         }
 
         return responseWrapper;

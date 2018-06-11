@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.compute.topology.bolts.monitor;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -141,7 +142,7 @@ public class LinkedinFeedExtractorBolt extends BaseComputeBolt
             }
         }
 
-        responseWrapper.setUpdatedTime( updatedDate );
+        responseWrapper.setUpdatedTime(new Date().getTime());
         responseWrapper.setCreatedTime( updatedDate );
 
         responseWrapper.setHash( responseWrapper.getText().hashCode() );
