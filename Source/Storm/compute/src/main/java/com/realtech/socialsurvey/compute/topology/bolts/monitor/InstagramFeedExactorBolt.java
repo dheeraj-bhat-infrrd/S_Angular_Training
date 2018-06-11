@@ -8,6 +8,7 @@ import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.compute.entities.response.InstagramMediaData;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.enums.ProfileType;
+import com.realtech.socialsurvey.compute.enums.SocialFeedStatus;
 import com.realtech.socialsurvey.compute.enums.SocialFeedType;
 import com.realtech.socialsurvey.compute.feeds.InstagramFeedProcessor;
 import com.realtech.socialsurvey.compute.feeds.impl.InstagramFeedProcessorImpl;
@@ -79,7 +80,7 @@ public class InstagramFeedExactorBolt extends BaseComputeBolt {
     private SocialResponseObject<InstagramMediaData> createSocialResponseObject(SocialMediaTokenResponse mediaToken,
                                                                                 InstagramMediaData instagramMediaData) {
         SocialResponseObject<InstagramMediaData> responseWrapper = new SocialResponseObject<>( mediaToken.getCompanyId(),
-                SocialFeedType.INSTAGRAM, instagramMediaData.getCaption(), instagramMediaData, 1 );
+                SocialFeedType.INSTAGRAM, instagramMediaData.getCaption(), instagramMediaData, 1, SocialFeedStatus.NEW );
 
         if ( mediaToken.getProfileType() != null ) {
             responseWrapper.setProfileType( mediaToken.getProfileType() );

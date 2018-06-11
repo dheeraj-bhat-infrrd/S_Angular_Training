@@ -25,8 +25,8 @@ import com.realtech.socialsurvey.core.entities.DisabledAccount;
 import com.realtech.socialsurvey.core.entities.EncompassSdkVersion;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
 import com.realtech.socialsurvey.core.entities.FilterKeywordsResponse;
-import com.realtech.socialsurvey.core.entities.Keyword;
 import com.realtech.socialsurvey.core.entities.HierarchySettingsCompare;
+import com.realtech.socialsurvey.core.entities.Keyword;
 import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
@@ -35,7 +35,6 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
-import com.realtech.socialsurvey.core.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokensPaginated;
 import com.realtech.socialsurvey.core.entities.SocialMonitorTrustedSource;
@@ -1591,15 +1590,6 @@ public interface OrganizationManagementService
     public Set<String> getAdminEmailsSpecificForAHierarchy( String profileLevel, long iden ) throws InvalidInputException;
 
 
-    /**
-     * Method to fetch all media tokens with profile name
-     * @param skipCount
-     * @param batchSize
-     * @return
-     * @throws InvalidInputException 
-     */
-    List<SocialMediaTokenResponse> fetchSocialMediaTokensResponse(int skipCount, int batchSize ) throws InvalidInputException;
-
 	public List<Long> filterCompanyIdsByStatus(List<Long> companies, String status) throws InvalidInputException;
 
 
@@ -1798,5 +1788,17 @@ public interface OrganizationManagementService
      * @throws UndeliveredEmailException
      */
     public void sendCompletionMailService( long companyId, long ftpId, String s3FileLocation, FtpSurveyResponse ftpSurveyResponse ) throws InvalidInputException, UndeliveredEmailException;
+
+
+    /**
+     * Method to update social monitor toggle
+     * @param companyId
+     * @param socialMonitorFlag
+     * @return
+     * @throws InvalidInputException
+     * @throws NoRecordsFetchedException
+     */
+    public boolean enableSocialMonitorToggle( long companyId, boolean socialMonitorFlag )
+        throws InvalidInputException, NoRecordsFetchedException;
 
 }

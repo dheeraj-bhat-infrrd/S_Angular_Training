@@ -7,7 +7,6 @@ import com.realtech.socialsurvey.compute.entities.BulkSurveyPutVO;
 import com.realtech.socialsurvey.compute.entities.FailedFtpRequest;
 import com.realtech.socialsurvey.compute.entities.FileUploadResponse;
 import com.realtech.socialsurvey.compute.entities.Keyword;
-import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.compute.entities.SocialMediaTokensPaginated;
 import com.realtech.socialsurvey.compute.entities.TransactionSourceFtp;
 import com.realtech.socialsurvey.compute.entities.response.FtpSurveyResponse;
@@ -38,11 +37,6 @@ public interface SSApiIntegrationService
     @GET ( "v1/companies/{companyId}/keywords")
     Call<List<Keyword>> getKeywordsForCompanyId( @Path ( "companyId") long companyId,
         @Header ( "authorizationHeader") String authorizationHeader );
-
-
-    @Headers ( "Content-Type: application/json")
-    @GET ( "v1/companies/mediatokens")
-    Call<List<SocialMediaTokenResponse>> getMediaTokens( @Header ( "authorizationHeader") String authorizationHeader );
 
 
     @Headers ( "Content-Type: application/json")

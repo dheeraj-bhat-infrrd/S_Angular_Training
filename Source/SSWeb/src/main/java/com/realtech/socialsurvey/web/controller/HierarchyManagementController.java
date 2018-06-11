@@ -46,6 +46,7 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserAssignmentException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.reportingmanagement.ReportingDashboardManagement;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
@@ -78,6 +79,9 @@ public class HierarchyManagementController
 
     @Autowired
     private UserManagementService userManagementService;
+
+    @Autowired
+    private ReportingDashboardManagement reportingDashboardManagement;
 
 
     /**
@@ -2019,6 +2023,19 @@ public class HierarchyManagementController
     public String getIndividualEditPage( Model model )
     {
         LOG.info( "Method getIndividualEditPage called" );
+        
+        User admin = sessionHelper.getCurrentUser();
+        long companyId = admin.getCompany().getCompanyId();
+        
+        try {
+        	boolean isSocialMonitorEnabled = reportingDashboardManagement.isSocialMonitorEnabled(companyId);
+        	model.addAttribute( "isSocialMonitorEnabled", isSocialMonitorEnabled );
+        }catch ( InvalidInputException e ) {
+            LOG.error( "fetching isSocialMonitorEnabled varibale value failed.", e );
+        }catch ( NoRecordsFetchedException e ) {
+            LOG.error( "No records found while checking if social monitor enabled.", e );
+        }
+        
         return JspResolver.HIERARCHY_INDIVIDUAL_EDIT;
     }
 

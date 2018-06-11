@@ -43,6 +43,7 @@ import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.reportingmanagement.ReportingDashboardManagement;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -70,6 +71,9 @@ public class LoginController
     private AuthenticationService authenticationService;
     @Autowired
     private OrganizationManagementService organizationManagementService;
+    
+    @Autowired
+    private ReportingDashboardManagement reportingDashboardManagement;
     
     @Value ( "${ENABLE_CAPTCHA}")
     private String enableCaptcha;
@@ -251,6 +255,7 @@ public class LoginController
                             isSocialMediaExpired = true;
                     }
                 }
+               
             } catch ( InvalidInputException e ) {
                 LOG.error( "fetching hiddensction varibale value failed.", e );
             } catch ( NoRecordsFetchedException e ) {
@@ -259,6 +264,31 @@ public class LoginController
             model.addAttribute( "isSocialMediaExpired", isSocialMediaExpired );
             model.addAttribute( "isTokenRefreshRequired", isTokenRefreshRequired );
             model.addAttribute( "expiredSocialMediaList", new Gson().toJson( socialMediaListToRefresh ) );
+            
+            boolean isSocialMonitorAdmin = false;
+            boolean isSocialMonitorEnabled = false;
+            
+            try {
+                isSocialMonitorEnabled = reportingDashboardManagement.isSocialMonitorEnabled(user.getCompany().getCompanyId());
+                if(entityType == CommonConstants.AGENT_ID_COLUMN) {
+                	 
+                	if(user.isCompanyAdmin()) {
+                		 isSocialMonitorAdmin = true;
+                	 }else {
+                		 isSocialMonitorAdmin = organizationManagementService.isSocialMonitorAdmin(entityId);
+                	 }
+                	
+                }else if(entityType == CommonConstants.COMPANY_ID_COLUMN) {
+                	 isSocialMonitorAdmin = true;
+                }    
+            } catch ( InvalidInputException e ) {
+                LOG.error( "fetching isSocialMonitorEnabled varibale value failed.", e );
+            } catch ( NoRecordsFetchedException e ) {
+                LOG.error( "No records found while checking if social monitor enabled.", e );
+            }
+            
+            model.addAttribute( "isSocialMonitorEnabled", isSocialMonitorEnabled );
+            model.addAttribute( "isSocialMonitorAdmin", isSocialMonitorAdmin );
         }
         return JspResolver.LANDING;
     }
