@@ -142,7 +142,7 @@ public class LinkedinFeedExtractorBolt extends BaseComputeBolt
             }
         }
 
-        responseWrapper.setUpdatedTime(new Date().getTime());
+        responseWrapper.setUpdatedTime( updatedDate );
         responseWrapper.setCreatedTime( updatedDate );
 
         responseWrapper.setHash( responseWrapper.getText().hashCode() );
