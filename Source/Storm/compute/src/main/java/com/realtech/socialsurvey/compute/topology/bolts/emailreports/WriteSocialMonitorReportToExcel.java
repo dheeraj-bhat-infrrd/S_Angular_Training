@@ -131,6 +131,7 @@ public class WriteSocialMonitorReportToExcel extends BaseComputeBoltWithAck
                     socialMonitorReportToPopulate.add(socialFeed.getText());
                     socialMonitorReportToPopulate.add(socialFeed.getPostLink());
                     socialMonitorReportToPopulate.add( "No" );
+                    socialMonitorReportToPopulate.add( socialFeed.getStatus() );
 
                     socialFeedData.put(enterNext++, socialMonitorReportToPopulate);
                 }
@@ -150,7 +151,6 @@ public class WriteSocialMonitorReportToExcel extends BaseComputeBoltWithAck
                         socialMonitorReportToPopulate.add(actionHistory.getOwnerName());
                         socialMonitorReportToPopulate.add(ConversionUtils.convertToEst( actionHistory.getCreatedDate() ));
                         socialMonitorReportToPopulate.add( StringUtils.isEmpty( actionHistory.getText() ) ? "" : Jsoup.parse( actionHistory.getText() ).text() );
-
                         if(actionHistory.getMessageType() != null){
                             socialMonitorReportToPopulate.add( actionHistory.getMessageType().toString() );
                             socialMonitorReportToPopulate.add( actionHistory.getMessage() );
