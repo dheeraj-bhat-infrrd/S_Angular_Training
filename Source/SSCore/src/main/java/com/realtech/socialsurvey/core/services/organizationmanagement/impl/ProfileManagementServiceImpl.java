@@ -2486,14 +2486,27 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         OrganizationUnitSettings companySettings = organizationUnitSettingsDao
             .fetchOrganizationUnitSettingsByProfileName( companyProfileName, CommonConstants.COMPANY_SETTINGS_COLLECTION );
         LOG.debug( "Settings fetched from mongo!" );
+        
+        
+      //Fetch the companysettings to first check if we have route all Contact Us emails to the Company Admin only
+        LOG.debug( "Fetching the agent settings from mongo for the company with profile name : " + profileName );
+        OrganizationUnitSettings agentSettings = organizationUnitSettingsDao
+            .fetchOrganizationUnitSettingsByProfileName( profileName, CommonConstants.AGENT_SETTINGS_COLLECTION );
+        LOG.debug( "Settings fetched from mongo!" );
 
+        
+        List<String> recepients = new ArrayList<String>();
+        
+        
         if ( companySettings.isContactUsEmailsRoutedToCompanyAdmin() ) {
             settings = companySettings;
         } else {
+        		//always send mail to company admin as well
+        		recepients.add(companySettings.getContact_details().getMail_ids().getWork()) ;
+        	
             if ( profileType.equals( CommonConstants.PROFILE_LEVEL_INDIVIDUAL ) ) {
-                LOG.debug( "Fetching the agent settings from mongo for the agent with profile name : " + profileName );
-                settings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName( profileName,
-                    CommonConstants.AGENT_SETTINGS_COLLECTION );
+            		//Agent settings are already fetched, re-use that
+                settings = agentSettings;
                 if ( settings != null
                     && ( settings.getContact_details() == null || settings.getContact_details().getMail_ids() == null
                         || StringUtils.isEmpty( settings.getContact_details().getMail_ids().getWork() ) ) ) {
@@ -2555,9 +2568,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         }
 
         if ( settings != null ) {
-            LOG.debug( "Sending the contact us mail to the agent" );
-            emailServices.sendContactUsMail( settings.getContact_details().getMail_ids().getWork(),
-                settings.getContact_details().getName(), senderName, senderMailId, message );
+            LOG.debug( "Sending the contact us mail to the agent along with admin" );
+            recepients.add(settings.getContact_details().getMail_ids().getWork()) ;
+            emailServices.sendContactUsMail( recepients,
+                settings.getContact_details().getName(), senderName, senderMailId, agentSettings.getContact_details().getMail_ids().getWork(), agentSettings.getContact_details().getName(), message );
             LOG.debug( "Contact us mail sent!" );
         } else {
             LOG.error( "No records found for profile settings of profile name: {}, profile type: {} in mongo", profileName,
