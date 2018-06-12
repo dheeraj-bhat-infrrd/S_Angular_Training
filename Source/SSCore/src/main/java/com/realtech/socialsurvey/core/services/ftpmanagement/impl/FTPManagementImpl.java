@@ -561,7 +561,7 @@ public class FTPManagementImpl implements FTPManagement
 
                 response = commandExecutionResponse.getResponse() == null ? "" : commandExecutionResponse.getResponse();
 
-                if ( commandExecutionResponse.getStatus() > 1 ) {
+                if ( commandExecutionResponse.getStatus() > 0 ) {
                     LOG.debug( "command execution failed : {}", command );
                     LOG.debug( "Remote execution output: {}", response );
                     throw new IOException( "command execution failed" );

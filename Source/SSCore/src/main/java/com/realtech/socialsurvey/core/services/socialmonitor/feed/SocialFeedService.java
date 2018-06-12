@@ -48,7 +48,7 @@ public interface SocialFeedService
      * @return
      * @throws InvalidInputException
      */
-    public SocialMonitorResponseData getAllSocialPosts(int startIndex, int limit, String status, boolean flag, List<String> feedtype, Long companyId, List<Long> regionIds, List<Long> branchIds, List<Long> agentIds, String searchText, boolean isCompanySet) throws InvalidInputException;
+    public SocialMonitorResponseData getAllSocialPosts(int startIndex, int limit, String status, List<String> feedtype, Long companyId, List<Long> regionIds, List<Long> branchIds, List<Long> agentIds, String searchText, boolean isCompanySet) throws InvalidInputException;
         
     /**
      * Update actions and macros on feeds
@@ -143,6 +143,13 @@ public interface SocialFeedService
     * @throws InvalidInputException
     */
     public SocialMonitorResponseData getDuplicatePosts(Long companyId, String postId) throws InvalidInputException;
+
+    /**
+     * Remove fromTrustedSource to false in mongo for social feed collection
+     * @param companyId
+     * @param trustedSource
+     */
+    public void updateForRemoveTrustedSource( long companyId, String trustedSource );
 
     
 }

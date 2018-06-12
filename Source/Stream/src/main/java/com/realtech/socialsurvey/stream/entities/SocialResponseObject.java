@@ -22,13 +22,14 @@ public class SocialResponseObject<T> implements Serializable
     {}
 
 
-    public SocialResponseObject( long companyId, SocialFeedType type, String text, T response, long duplicateCount )
+    public SocialResponseObject( long companyId, SocialFeedType type, String text, T response, long duplicateCount, SocialFeedStatus status )
     {
         this.companyId = companyId;
         this.type = type;
         this.text = text;
         this.response = response;
         this.duplicateCount = duplicateCount;
+        this.status = status;
     }
 
 
@@ -46,7 +47,6 @@ public class SocialResponseObject<T> implements Serializable
 
     private T response;
     private SocialFeedType type;
-    private boolean flagged;
     private SocialFeedStatus status;
     private long companyId;
     private long regionId;
@@ -132,18 +132,6 @@ public class SocialResponseObject<T> implements Serializable
     public void setType( SocialFeedType type )
     {
         this.type = type;
-    }
-
-
-    public boolean isFlagged()
-    {
-        return flagged;
-    }
-
-
-    public void setFlagged( boolean flagged )
-    {
-        this.flagged = flagged;
     }
 
 
@@ -392,16 +380,16 @@ public class SocialResponseObject<T> implements Serializable
     }
 
 
-    @Override public String toString()
+    @Override
+    public String toString()
     {
-        return "SocialResponseObject{" + "id='" + id + '\'' + ", postId='" + postId + '\'' + ", text='" + text + '\''
-            + ", textHighlighted='" + textHighlighted + '\'' + ", pageLink='" + pageLink + '\'' + ", postLink='" + postLink
-            + '\'' + ", pictures=" + pictures + ", updatedTime=" + updatedTime + ", createdTime=" + createdTime
-            + ", ownerName='" + ownerName + '\'' + ", ownerEmail='" + ownerEmail + '\'' + ", response=" + response + ", type="
-            + type + ", flagged=" + flagged + ", status=" + status + ", companyId=" + companyId + ", regionId=" + regionId
-            + ", branchId=" + branchId + ", agentId=" + agentId + ", profileType=" + profileType + ", hash=" + hash
-            + ", duplicateCount=" + duplicateCount + ", foundKeywords=" + foundKeywords + ", actionHistory=" + actionHistory
-            + ", isRetried=" + isRetried + ", fromTrustedSource=" + fromTrustedSource + ", postSource='" + postSource + '\''
-            + ", isDuplicate=" + isDuplicate + '}';
+        return "SocialResponseObject [id=" + id + ", postId=" + postId + ", text=" + text + ", textHighlighted="
+            + textHighlighted + ", pageLink=" + pageLink + ", postLink=" + postLink + ", pictures=" + pictures
+            + ", updatedTime=" + updatedTime + ", createdTime=" + createdTime + ", ownerName=" + ownerName + ", ownerEmail="
+            + ownerEmail + ", response=" + response + ", type=" + type + ", status=" + status + ", companyId=" + companyId
+            + ", regionId=" + regionId + ", branchId=" + branchId + ", agentId=" + agentId + ", profileType=" + profileType
+            + ", hash=" + hash + ", duplicateCount=" + duplicateCount + ", foundKeywords=" + foundKeywords + ", actionHistory="
+            + actionHistory + ", isRetried=" + isRetried + ", fromTrustedSource=" + fromTrustedSource + ", postSource="
+            + postSource + ", isDuplicate=" + isDuplicate + "]";
     }
 }

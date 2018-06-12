@@ -388,16 +388,6 @@ public interface ReportingDashboardManagement
 
 
 	public List<SurveyInvitationEmailCountVO> getDataForSurveyInvitationMail(int month, int year, long companyId);
-	
-	/**
-	 * Method to update social monitor toggle
-	 * @param companyId
-	 * @param socialMonitorFlag
-	 * @return
-	 * @throws InvalidInputException
-	 * @throws NoRecordsFetchedException
-	 */
-    public boolean enableSocialMonitorToggle( long companyId, boolean socialMonitorFlag ) throws InvalidInputException, NoRecordsFetchedException;
     
     /**
      * Method to get social monitor flag

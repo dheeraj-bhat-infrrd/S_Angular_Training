@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.compute.topology.bolts.monitor;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +24,7 @@ import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.compute.entities.response.FacebookFeedData;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.enums.ProfileType;
+import com.realtech.socialsurvey.compute.enums.SocialFeedStatus;
 import com.realtech.socialsurvey.compute.enums.SocialFeedType;
 import com.realtech.socialsurvey.compute.feeds.FacebookFeedProcessor;
 import com.realtech.socialsurvey.compute.feeds.impl.FacebookFeedProcessorImpl;
@@ -142,7 +144,7 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt implements Serial
         FacebookFeedData facebookFeedData )
     {
         SocialResponseObject<FacebookFeedData> responseWrapper = new SocialResponseObject<>( mediaToken.getCompanyId(),
-            SocialFeedType.FACEBOOK, facebookFeedData.getMessage(), facebookFeedData, 1 );
+            SocialFeedType.FACEBOOK, facebookFeedData.getMessage(), facebookFeedData, 1, SocialFeedStatus.NEW );
 
         if ( mediaToken.getProfileType() != null ) {
             responseWrapper.setProfileType( mediaToken.getProfileType() );
@@ -171,7 +173,7 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt implements Serial
 
         if(facebookFeedData.getApplication() != null && StringUtils.isNotEmpty(facebookFeedData.getApplication().getName()))
         		responseWrapper.setPostSource(facebookFeedData.getApplication().getName());
-        
+
         if ( facebookFeedData.getUpdatedTime() > 0 ) {
             responseWrapper.setUpdatedTime( facebookFeedData.getUpdatedTime() * 1000 );
         }

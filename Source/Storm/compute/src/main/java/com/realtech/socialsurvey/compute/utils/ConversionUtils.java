@@ -105,7 +105,8 @@ public class ConversionUtils
     public static String convertToEst(long millies){
         ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(millies),
             ZoneId.of("-05:00"));
-        return zonedDateTime.format( DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(" MM/dd/yyyy H:m:s a");
+        return zonedDateTime.format(formatter);
     }
 
 }

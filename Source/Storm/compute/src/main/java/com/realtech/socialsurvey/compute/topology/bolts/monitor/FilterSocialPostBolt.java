@@ -45,6 +45,8 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
 
     private static final String WORD_SEPARATOR = "\\W+";
     private static final String SPACE_SEPARATOR = " ";
+    private static final String OWNERNAME_SYSTEM = "System";
+
 
     private Map<Long, TrieNode> companyTrie = new HashMap<>();
 
@@ -68,7 +70,8 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
                 foundKeyWords = findPhrases(root, text);
                 if (!foundKeyWords.isEmpty()) {
                     post.setFoundKeywords(foundKeyWords);
-                    post.setFlagged(Boolean.TRUE);
+                    post.setStatus( SocialFeedStatus.ALERT );
+
                     post.getActionHistory().add(getFlaggedActionHistory(foundKeyWords));
                     addTextHighlight(post);
                 }
@@ -79,9 +82,6 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
                 post.setStatus(SocialFeedStatus.RESOLVED);
                 post.setFromTrustedSource(true);
                 post.getActionHistory().add(getTrustedSourceActionHistory(post.getPostSource()));
-            } else {
-                post.setStatus(SocialFeedStatus.NEW);
-                post.setFromTrustedSource(false);
             }
         }
         LOG.debug("Emitting tuple with post having postId = {} and post = {}", post.getPostId(), post);
@@ -114,6 +114,7 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
         ActionHistory actionHistory = new ActionHistory();
         actionHistory.setCreatedDate( new Date().getTime() );
         actionHistory.setActionType( ActionHistoryType.FLAGGED );
+        actionHistory.setOwnerName( OWNERNAME_SYSTEM );
         actionHistory.setText( "The post was <b class='soc-mon-bold-text'>Flagged</b> for matching <b class='soc-mon-bold-text'>" + String.join( ",", foundKeyWords )  + "</b>");
         return actionHistory;
     }
@@ -288,7 +289,8 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
         ActionHistory actionHistory = new ActionHistory();
         actionHistory.setCreatedDate( new Date().getTime() );
         actionHistory.setActionType( ActionHistoryType.RESOLVED );
-        actionHistory.setText( "The post was <b class='soc-mon-bold-text'>Resolved</b> for having source<b class='soc-mon-bold-text'>" + source + "</b>");
+        actionHistory.setOwnerName( OWNERNAME_SYSTEM );
+        actionHistory.setText( "The post was <b class='soc-mon-bold-text'>Resolved</b> for having source <b class='soc-mon-bold-text'>" + source + "</b>");
         return actionHistory;
     }
 }

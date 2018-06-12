@@ -1411,10 +1411,10 @@ public class EmailServicesImpl implements EmailServices
      */
     @Async
     @Override
-    public void sendContactUsMail( String recipientEmailId, String displayName, String senderName, String senderEmailId,
+    public void sendContactUsMail( List<String> recipientEmailIds, String displayName, String senderName, String senderEmailId, String agentName, String agentEmail,
         String message ) throws InvalidInputException, UndeliveredEmailException
     {
-        if ( recipientEmailId == null || recipientEmailId.isEmpty() ) {
+        if ( recipientEmailIds == null || recipientEmailIds.isEmpty()  ) {
             LOG.warn( "Recipient email id is null or empty!" );
             throw new InvalidInputException( "Recipient email id is null or empty!" );
         }
@@ -1435,8 +1435,8 @@ public class EmailServicesImpl implements EmailServices
             throw new InvalidInputException( "message is null or empty!" );
         }
 
-        LOG.debug( "Sending contact us email to : {}", recipientEmailId );
-        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientEmailId );
+        LOG.debug( "Sending contact us email to : {}", recipientEmailIds );
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientEmailIds );
         emailEntity.setMailType( CommonConstants.EMAIL_TYPE_CONTACT_US_MAIL );
 
         FileContentReplacements subjectReplacements = new FileContentReplacements();
@@ -1448,7 +1448,7 @@ public class EmailServicesImpl implements EmailServices
         messageBodyReplacements
             .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.CONTACT_US_MAIL_BODY );
         messageBodyReplacements
-            .setReplacementArgs( Arrays.asList( appLogoUrl, displayName, senderName, senderEmailId, message ) );
+            .setReplacementArgs( Arrays.asList( appLogoUrl, displayName, senderName, senderEmailId, agentName, agentEmail, message ) );
 
         LOG.trace( "Calling email sender to send mail" );
         sendEmailWithSubjectAndBodyReplacements( emailEntity, subjectReplacements, messageBodyReplacements, false, false );

@@ -11,7 +11,6 @@ public class Actions implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 	private SocialFeedStatus socialFeedStatus;
-	private boolean flagged;
 	private TextActionType textActionType;
 	private String text;
 
@@ -21,14 +20,6 @@ public class Actions implements Serializable {
 
 	public void setSocialFeedStatus(SocialFeedStatus socialFeedStatus) {
 		this.socialFeedStatus = socialFeedStatus;
-	}
-
-	public boolean isFlagged() {
-		return flagged;
-	}
-
-	public void setFlagged(boolean flagged) {
-		this.flagged = flagged;
 	}
 
 	public TextActionType getTextActionType() {
@@ -49,7 +40,7 @@ public class Actions implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Actions [socialFeedStatus=" + socialFeedStatus + ", flagged=" + flagged + ", textActionType="
+		return "Actions [socialFeedStatus=" + socialFeedStatus + ", textActionType="
 				+ textActionType + ", text=" + text + "]";
 	}
 
