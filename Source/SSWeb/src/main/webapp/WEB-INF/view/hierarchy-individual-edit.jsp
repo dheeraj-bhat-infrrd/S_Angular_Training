@@ -4,6 +4,7 @@
 <c:set var="user" value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" />
 <c:set var="accountType" value="${user.company.licenseDetails[0].accountsMaster.accountName}" />
 <form id="edit-individual-form">
+
 		<c:if test="${isSocialMonitorEnabled}">
 			<div class="bd-hr-form-item clearfix" id="soc-mon-admin-privilege-div">
 			    <div class="float-left bd-frm-left"></div>

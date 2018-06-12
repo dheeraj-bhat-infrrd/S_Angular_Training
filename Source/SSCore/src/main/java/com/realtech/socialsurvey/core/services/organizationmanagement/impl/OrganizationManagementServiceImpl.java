@@ -10463,7 +10463,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         List<UserProfile> userProfiles = new ArrayList<>();
         User user = userDao.findById( User.class, agentId );
-        if ( user != null && user.getStatus() == CommonConstants.STATUS_ACTIVE) {
+        if ( user != null && (user.getStatus() == CommonConstants.STATUS_ACTIVE || user.getStatus() == CommonConstants.STATUS_NOT_VERIFIED)) {
             userProfiles = user.getUserProfiles();
         }
 
