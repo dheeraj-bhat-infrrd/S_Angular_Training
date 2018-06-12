@@ -267,7 +267,7 @@ public class RemoteAccessUtils
      * @throws InvalidInputException
      */
     public RemoteAccessResponse transferFile( RemoteAccessConfig remoteAccessConfig, File localFile,
-        RemoteFileDelivery sendOrReceive, boolean preserveFileTimestamps, String remoteFilePath )
+        RemoteFileDelivery sendOrReceive, boolean preserveFileTimestamps, String remoteFilePath, boolean withSudo )
         throws RemoteAccessException, InvalidInputException
     {
         LOG.debug( "method transferFile() started" );
@@ -303,7 +303,7 @@ public class RemoteAccessUtils
             executionChannel = (ChannelExec) session.openChannel( SSH_CHANNEL_TYPE_EXEC );
 
 
-            String command = buildScpCommand( sendOrReceive, preserveFileTimestamps, remoteFilePath );
+            String command = buildScpCommand( sendOrReceive, preserveFileTimestamps, remoteFilePath, withSudo );
 
 
             LOG.trace( "Executing command in remote server : {}", command );
@@ -443,11 +443,14 @@ public class RemoteAccessUtils
      * @param sendOrReceive
      * @param preserveFileTimestamps
      * @param remoteFilePath
+     * @param withSudo 
      * @return
      */
-    private String buildScpCommand( RemoteFileDelivery sendOrReceive, boolean preserveFileTimestamps, String remoteFilePath )
+    private String buildScpCommand( RemoteFileDelivery sendOrReceive, boolean preserveFileTimestamps, String remoteFilePath,
+        boolean withSudo )
     {
-        StringBuilder command = new StringBuilder( SCP_COMMAND + SCP_SEPERATOR );
+        StringBuilder command = new StringBuilder(
+            ( withSudo ? SUDO + SCP_SEPERATOR : StringUtils.EMPTY ) + SCP_COMMAND + SCP_SEPERATOR );
 
         if ( preserveFileTimestamps ) {
             command.append( SCP_PRESERVE_TIMESTAMP_OPTION + SCP_SEPERATOR );
@@ -583,9 +586,11 @@ public class RemoteAccessUtils
     }
 
 
-    public static String fetchCommandToGetFileNamesFromDirectory( String directoryPath, boolean includeHidden )
+    public static String fetchCommandToGetFileNamesFromDirectory( String directoryPath, boolean includeHidden,
+        boolean withSudo )
     {
-        return LS + SCP_SEPERATOR + ( StringUtils.isEmpty( directoryPath ) ? "" : directoryPath + SCP_SEPERATOR )
+        return ( withSudo ? SUDO + SCP_SEPERATOR : StringUtils.EMPTY ) + LS + SCP_SEPERATOR
+            + ( StringUtils.isEmpty( directoryPath ) ? "" : directoryPath + SCP_SEPERATOR )
             + ( includeHidden ? LS_INCLUDE_HIDDEN_OPTION + SCP_SEPERATOR : "" ) + LS_APPEND_SLASH_TO_DIRECTORY_OPTION + PIPE
             + GREP + SCP_SEPERATOR + GREP_NOT_INCLUDE_OPTION + SCP_SEPERATOR + CommonConstants.FILE_SEPARATOR;
     }
