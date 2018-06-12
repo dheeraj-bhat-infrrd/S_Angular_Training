@@ -10,7 +10,7 @@
 <script src="${initParam.resourcesPath}/resources/jcrop/jquery.Jcrop.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/common.js"></script>
 <script src="https://www.google.com/jsapi?autoload={'modules':[{'name':'visualization','version':'1','packages':['corechart']}]}"></script>
-<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD9jQwXMXClknN42BJ6_Q4Yhv03Dx92dO4&libraries=places"></script>
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAddhKOfDqR0afPeR3evTiRIb8AirlDEYk&libraries=places"></script>
 <!--local api key : AIzaSyDpVwB45-GtZK5JiMdArP2L07FzfDzdNIY -->
 <script src="${initParam.resourcesPath}/resources/js/script.js"></script>
 <script src="https://js.braintreegateway.com/v2/braintree.js"></script>
