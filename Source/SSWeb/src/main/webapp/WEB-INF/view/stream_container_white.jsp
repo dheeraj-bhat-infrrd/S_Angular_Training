@@ -31,19 +31,19 @@
 								
 				</div>
 			</div>
-			<div class="col-lg-3 col-md-2 col-sm-2 col-xs-2 float-left ts-container hide">
-				<div class=" float-right ts-source" data-source="" data-trusted=false>
-					
-				</div>
-				<div class="float-right ts-act-icon ts-add"></div>
-				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 float-left trusted-source hide">
-					Trusted Source
-				</div>
+			<div class="stream-dup-container post-dup col-lg-3 col-md-3 col-sm-3 col-xs-3 float-right soc-mon-post-dup hide">
+				<img src="${initParam.resourcesPath}/resources/images/duplicates.png" class="float-left soc-mon-post-dup-icn">
+				<div class="soc-mon-post-dup-num float-left">Manage <span class="dup-count"></span> duplicates</div>
 			</div>
-			<div class="stream-dup-container col-lg-12 col-md-12 col-sm-12 col-xs-12 float-right hide">
-				<div class="post-dup col-lg-3 col-md-3 col-sm-3 col-xs-3 float-right soc-mon-post-dup hide">
-					<img src="${initParam.resourcesPath}/resources/images/duplicates.png" class="float-left soc-mon-post-dup-icn">
-					<div class="soc-mon-post-dup-num float-left">Manage <span class="dup-count"></span> duplicates</div>
+			<div class="ts-container col-lg-12 col-md-12 col-sm-12 col-xs-12 float-right hide">
+				<div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 float-right ts-details">
+					<div class=" float-right ts-source" data-source="" data-trusted=false>
+						
+					</div>
+					<div class="float-right ts-act-icon ts-add" title="Add Trusted Source"></div>
+					<div class="float-right trusted-source hide">
+						Trusted Source
+					</div>
 				</div>
 			</div>
 		</div>
@@ -56,7 +56,6 @@
 		<form id="add-post-action" class="">
 		<input type="hidden" id="form-is-dup" class="form-is-dup" name="form-is-dup" value="false">
 		<input type="hidden" id="form-post-id" class="form-post-id" name="form-post-id" value="">
-		<input type="hidden" id="form-flagged" class="form-flagged" name="form-flagged" value="false">
 		<input type="hidden" id="form-status" name="form-status" class="form-status" value="false">
 		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 			<input type="hidden" id="form-text-act-type" class="form-text-act-type" name="form-text-act-type" value="SEND_EMAIL">

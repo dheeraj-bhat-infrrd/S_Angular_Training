@@ -139,7 +139,7 @@
 									<div class="float-left listing-access-txt cust-resp-txt" style="margin-bottom:0px;">Copy review text to clip-board</div>
 								</c:if>
 
-								<c:if test="${ columnName == 'companyId' }">
+								<c:if test="${ isRealTechOrSSAdmin == true }">
 									<div id="soc-mon-access-chk-box" class="float-left bd-check-img clear-both"></div>
 									<input type="hidden" id="soc-mon-access-cb" name="surveymailthrhld" value="${isSocialMonitorEnabled}">
 									<div class="float-left listing-access-txt cust-resp-txt">Enable Social Monitor</div>

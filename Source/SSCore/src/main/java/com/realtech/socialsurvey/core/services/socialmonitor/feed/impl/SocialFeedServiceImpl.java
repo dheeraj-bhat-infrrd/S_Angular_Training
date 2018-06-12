@@ -77,6 +77,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
     private static final int NO_OF_DAYS = 7;
     private static final String FLAGGED = "flagged";
     private static final String UNFLAGGED = "unflagged";
+    private static final String OWNERNAME_SYSTEM = "System";
 
 	@Override
     public SocialResponseObject<?> saveFeed( SocialResponseObject<?> socialFeed ) throws InvalidInputException
@@ -93,7 +94,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
 
     @SuppressWarnings ( "unchecked")
     @Override
-    public SocialMonitorResponseData getAllSocialPosts( int startIndex, int limit, String status, boolean flag,
+    public SocialMonitorResponseData getAllSocialPosts( int startIndex, int limit, String status,
         List<String> feedtype, Long companyId, List<Long> regionIds, List<Long> branchIds, List<Long> agentIds,
         String searchText, boolean isCompanySet ) throws InvalidInputException
     {
@@ -104,7 +105,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
         List<SocialResponseObject> socialResponseObjects;
         OrganizationUnitSettings organizationUnitSettings;
 
-        socialResponseObjects = mongoSocialFeedDao.getAllSocialFeeds( startIndex, limit, flag, status, feedtype, companyId,
+        socialResponseObjects = mongoSocialFeedDao.getAllSocialFeeds( startIndex, limit, status, feedtype, companyId,
             regionIds, branchIds, agentIds, searchText, isCompanySet );
         if ( socialResponseObjects != null && !socialResponseObjects.isEmpty() ) {
             for ( SocialResponseObject socialResponseObject : socialResponseObjects ) {
@@ -135,7 +136,6 @@ public class SocialFeedServiceImpl implements SocialFeedService
                 socialMonitorFeedData.setBranchId( socialResponseObject.getBranchId() );
                 socialMonitorFeedData.setAgentId( socialResponseObject.getAgentId() );
                 socialMonitorFeedData.setPostId( socialResponseObject.getPostId() );
-                socialMonitorFeedData.setFlagged( socialResponseObject.isFlagged() );
                 if ( socialResponseObject.getActionHistory() != null ) {
                     Collections.sort( socialResponseObject.getActionHistory(), new ActionHistoryComparator() );
                 }
@@ -155,14 +155,13 @@ public class SocialFeedServiceImpl implements SocialFeedService
                 
                 socialMonitorStreamDataList.add( socialMonitorFeedData );
             }
-            socialMonitorResponseData.setCount( mongoSocialFeedDao.getAllSocialFeedsCount( flag, status, feedtype, companyId,
+            socialMonitorResponseData.setCount( mongoSocialFeedDao.getAllSocialFeedsCount( status, feedtype, companyId,
                 regionIds, branchIds, agentIds, searchText, isCompanySet ) );
-            if ( flag ) {
-                socialMonitorResponseData.setStatus( "FLAGGED" );
-            } else if ( status != null && !flag ) {
+            
+            if ( status != null ) {
                 socialMonitorResponseData.setStatus( status.toUpperCase() );
-            } else if ( status == null && !flag ) {
-                socialMonitorResponseData.setStatus( "ALL" );
+            } else {
+                socialMonitorResponseData.setStatus( "NEW" );
             }
             socialMonitorResponseData.setSocialMonitorFeedData( socialMonitorStreamDataList );
         } else {
@@ -207,8 +206,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
                 }
             }
         }
-        
-        Set<String> postIds = socialFeedsActionUpdate.getPostIds();
+
         List<SocialResponseObject> socialResponseObjectsToAdd = mongoSocialFeedDao
             .getSocialPostsByIds( socialFeedsActionUpdate.getPostIds(), companyId, MongoSocialFeedDaoImpl.SOCIAL_FEED_COLLECTION );
         for ( SocialResponseObject socialResponseObject : socialResponseObjectsToAdd ) {
@@ -216,16 +214,18 @@ public class SocialFeedServiceImpl implements SocialFeedService
             updateFlag = 0;
             String previousStatus = null;
             String currentStatus = null;
-            if ( socialFeedsActionUpdate.getStatus() != null ) {
+            if ( socialFeedsActionUpdate.getActionType() != null ) {
                 updateFlag = 1;
                 if ( macroFlag ) {
                     macroActionFlag = 1;
                 }
-                if ( socialResponseObject.isFlagged() != socialFeedsActionUpdate.isFlagged()
-                    && !( socialFeedsActionUpdate.getStatus().equals( SocialFeedStatus.RESOLVED ) )
-                    && !( socialFeedsActionUpdate.getStatus().equals( SocialFeedStatus.ESCALATED ) ) ) {
+                
+                // Setting FLAGGED/UN-FLAGGED
+                if ( !socialResponseObject.getStatus().toString().equals(socialFeedsActionUpdate.getActionType().toString())
+                    && !( socialFeedsActionUpdate.getActionType().equals( SocialFeedActionType.RESOLVED ) )
+                    && !( socialFeedsActionUpdate.getActionType().equals( SocialFeedActionType.ESCALATED ) ) ) {
                     ActionHistory actionHistory = new ActionHistory();
-                    if ( socialFeedsActionUpdate.isFlagged()
+                    if ( socialFeedsActionUpdate.getActionType().equals( SocialFeedActionType.ALERT )
                         && ( socialResponseObject.getStatus().equals( SocialFeedStatus.NEW ) ) ) {
                         updateFlag = 2;
                         if ( macroFlag ) {
@@ -243,11 +243,12 @@ public class SocialFeedServiceImpl implements SocialFeedService
                         actionHistory.setMessage( socialFeedsActionUpdate.getText() );
                         actionHistories.add( actionHistory );
                         socialResponseObject.setUpdatedTime( new Date().getTime() );
+                        socialResponseObject.setStatus( SocialFeedStatus.ALERT );
                         previousStatus = UNFLAGGED;
                         currentStatus = FLAGGED;
                         
-                    } else if ( !socialFeedsActionUpdate.isFlagged()
-                        && ( socialResponseObject.getStatus().equals( SocialFeedStatus.NEW ) ) ) {
+                    } else if ( socialFeedsActionUpdate.getActionType().equals( SocialFeedActionType.NEW )
+                        && ( socialResponseObject.getStatus().equals( SocialFeedStatus.ALERT ) ) ) {
                         updateFlag = 2;
                         if ( macroFlag ) {
                             macroActionFlag = 2;
@@ -264,17 +265,17 @@ public class SocialFeedServiceImpl implements SocialFeedService
                         actionHistory.setMessage( socialFeedsActionUpdate.getText() );
                         actionHistories.add( actionHistory );
                         socialResponseObject.setUpdatedTime( new Date().getTime() );
+                        socialResponseObject.setStatus( SocialFeedStatus.NEW );
                         previousStatus = FLAGGED;
                         currentStatus = UNFLAGGED;
                     }
                 }
-                if ( !socialFeedsActionUpdate.getStatus().toString()
-                    .equalsIgnoreCase( socialResponseObject.getStatus().toString() )
-                    && socialFeedsActionUpdate.getStatus() != null
-                    && !socialFeedsActionUpdate.getStatus().toString().equalsIgnoreCase( SocialFeedStatus.NEW.toString() ) ) {
+                
+                // Setting ESCALATE/RESOLVED
+                if ( !socialFeedsActionUpdate.getActionType().toString().equals( socialResponseObject.getStatus().toString() )
+                    && !socialFeedsActionUpdate.getActionType().equals( SocialFeedActionType.NEW ) ) {
                     ActionHistory actionHistory = new ActionHistory();
-                    if ( socialFeedsActionUpdate.getStatus().toString()
-                        .equalsIgnoreCase( SocialFeedStatus.ESCALATED.toString() ) ) {
+                    if ( socialFeedsActionUpdate.getActionType().equals( SocialFeedActionType.ESCALATED ) ) {
                         updateFlag = 3;
                         if ( macroFlag ) {
                             macroActionFlag = 3;
@@ -291,18 +292,17 @@ public class SocialFeedServiceImpl implements SocialFeedService
                         } else actionHistory.setMessageType(  MessageType.PRIVATE_MESSAGE );
                         actionHistories.add( actionHistory );
                         socialResponseObject.setUpdatedTime( new Date().getTime() );
-                        if(socialResponseObject.isFlagged()) {
+                        if(socialResponseObject.getStatus().equals( SocialFeedStatus.ALERT )) {
                             previousStatus = FLAGGED;
-                        } else if(!socialResponseObject.isFlagged() && !socialResponseObject.getStatus().toString().equalsIgnoreCase( SocialFeedStatus.RESOLVED.toString() )) {
+                        } else if(!socialResponseObject.getStatus().equals( SocialFeedStatus.NEW )) {
                             previousStatus = UNFLAGGED;
-                        } else if(socialResponseObject.getStatus().toString().equalsIgnoreCase( SocialFeedStatus.RESOLVED.toString() )) {
+                        } else if(socialResponseObject.getStatus().equals( SocialFeedStatus.RESOLVED )) {
                             previousStatus = SocialFeedStatus.RESOLVED.toString().toLowerCase();
                         }
+                        socialResponseObject.setStatus( SocialFeedStatus.ESCALATED );
                         currentStatus = SocialFeedStatus.ESCALATED.toString().toLowerCase();         
-                    } else if ( socialFeedsActionUpdate.getStatus().toString()
-                        .equalsIgnoreCase( SocialFeedStatus.RESOLVED.toString() )
-                        && socialResponseObject.getStatus().toString().equalsIgnoreCase( SocialFeedStatus.ESCALATED.toString() )
-                        && !socialResponseObject.isFlagged() ) {
+                    } else if ( socialFeedsActionUpdate.getActionType().equals( SocialFeedActionType.RESOLVED )
+                        && socialResponseObject.getStatus().equals( SocialFeedStatus.ESCALATED )) {
                         updateFlag = 3;
                         if ( macroFlag ) {
                             macroActionFlag = 3;
@@ -319,12 +319,16 @@ public class SocialFeedServiceImpl implements SocialFeedService
                         actionHistory.setMessage( socialFeedsActionUpdate.getText() );
                         actionHistories.add( actionHistory );
                         socialResponseObject.setUpdatedTime( new Date().getTime() );
+                        socialResponseObject.setStatus( SocialFeedStatus.RESOLVED );
                         previousStatus = SocialFeedStatus.ESCALATED.toString().toLowerCase();
                         currentStatus = SocialFeedStatus.RESOLVED.toString().toLowerCase();
                     }
                 }
             }
-            if ( socialFeedsActionUpdate.getStatus().toString().equalsIgnoreCase( SocialFeedStatus.SUBMIT.toString() ) ) {
+            
+            // Updating PRIVATE NOTE/SEND EMAIL
+            if ( socialFeedsActionUpdate.getActionType().equals( SocialFeedActionType.SUBMIT ) ) {
+
                 if ( socialFeedsActionUpdate.getText() != null  && !socialFeedsActionUpdate.getText().isEmpty() ) {
                     ActionHistory actionHistory = new ActionHistory();
                     actionHistory.setActionType( ActionHistoryType.SUBMIT );
@@ -344,7 +348,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
                 updateFlag, MongoSocialFeedDaoImpl.SOCIAL_FEED_COLLECTION );
             //add successful postIds
             if ( ( updateFlag != 1 && macroActionFlag != 1 )
-                || ( socialFeedsActionUpdate.getStatus().toString().equalsIgnoreCase( SocialFeedStatus.SUBMIT.toString() ) ) ) {
+                || ( socialFeedsActionUpdate.getActionType().equals( SocialFeedActionType.SUBMIT) ) ) {
                 successPostIds.add( socialResponseObject.getPostId() );
                 socialFeedActionResponse.setSuccessPostIds( successPostIds );
             }
@@ -806,6 +810,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
         ActionHistory actionHistory = new ActionHistory();
         actionHistory.setCreatedDate( new Date().getTime() );
         actionHistory.setActionType( ActionHistoryType.RESOLVED );
+        actionHistory.setOwnerName( OWNERNAME_SYSTEM );
         actionHistory.setText( "The post was <b class='soc-mon-bold-text'>Resolved</b> for having source<b class='soc-mon-bold-text'>" + source + "</b>");
         return actionHistory;
     }
@@ -813,12 +818,21 @@ public class SocialFeedServiceImpl implements SocialFeedService
     @Override
     public void updateTrustedSourceForFormerLists(long companyId, String trustedSource) throws InvalidInputException {
         if(LOG.isDebugEnabled()){
-            LOG.debug( "Updating the new and escalated status to resolved for trusted source : {} for companyId : {} ",trustedSource,companyId ); 
+            LOG.debug( "Updating the new, alert, and escalated status to resolved for trusted source : {} for companyId : {} ",trustedSource,companyId ); 
         }
         //get the getTrustedSourceActionHistory use update.push
         ActionHistory actionHistory = getTrustedSourceActionHistory( trustedSource );
         mongoSocialFeedDao.updateForTrustedSource( companyId, trustedSource, actionHistory );
         
+    }
+    
+    @Override
+    public void updateForRemoveTrustedSource( long companyId, String trustedSource )
+    {
+        if(LOG.isDebugEnabled()){
+            LOG.debug( "Updating fromTrustedSource to false for trusted source : {} for companyId : {} ",trustedSource,companyId ); 
+        }
+        mongoSocialFeedDao.updateForRemoveTrustedSource( companyId, trustedSource );
     }
 
 
@@ -868,7 +882,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
                 socialMonitorFeedData.setBranchId( socialResponseObject.getBranchId() );
                 socialMonitorFeedData.setAgentId( socialResponseObject.getAgentId() );
                 socialMonitorFeedData.setPostId( socialResponseObject.getPostId() );
-                socialMonitorFeedData.setFlagged( socialResponseObject.isFlagged() );
+
                 if ( socialResponseObject.getActionHistory() != null ) {
                     Collections.sort( socialResponseObject.getActionHistory(), new ActionHistoryComparator() );
                 }

@@ -185,26 +185,6 @@ public class SocialMonitorController
         }
 
     }
-
-
-    @RequestMapping ( value = "/companies/mediatokens", method = RequestMethod.GET)
-    @ApiOperation ( value = "Fetch media tokens")
-    public ResponseEntity<?> fetchSocialMediaTokens( HttpServletRequest request,
-        @RequestHeader ( "authorizationHeader") String authorizationHeader ) throws SSApiException, InvalidInputException
-    {
-        try {
-            adminAuthenticationService.validateAuthHeader( authorizationHeader );
-            LOGGER.info( "SocialMonitorController.fetchSocialMediaTokens started" );
-            // get company setting for login user
-            List<SocialMediaTokenResponse> mediaTokens = organizationManagementService.fetchSocialMediaTokensResponse( 0, 0 );
-            LOGGER.info( "SocialMonitorController.fetchSocialMediaTokens completed successfully" );
-            return new ResponseEntity<>( mediaTokens, HttpStatus.OK );
-        } catch ( AuthorizationException authoriztionFailure ) {
-            return new ResponseEntity<>( AUTH_FAILED, HttpStatus.UNAUTHORIZED );
-        }
-
-
-    }
     
     
     @RequestMapping ( value = "/companies/mediaTokensPaginated", method = RequestMethod.GET)

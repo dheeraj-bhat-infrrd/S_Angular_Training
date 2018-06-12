@@ -10,6 +10,7 @@ import com.realtech.socialsurvey.compute.entities.TwitterTokenForSM;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.entities.response.TwitterFeedData;
 import com.realtech.socialsurvey.compute.enums.ProfileType;
+import com.realtech.socialsurvey.compute.enums.SocialFeedStatus;
 import com.realtech.socialsurvey.compute.enums.SocialFeedType;
 import com.realtech.socialsurvey.compute.feeds.TwitterFeedProcessor;
 import com.realtech.socialsurvey.compute.feeds.impl.TwitterFeedProcessorImpl;
@@ -120,7 +121,7 @@ public class TwitterFeedExtractorBolt extends BaseComputeBolt
         TwitterFeedData twitterFeedData )
     {
         SocialResponseObject<TwitterFeedData> responseWrapper = new SocialResponseObject<>( mediaToken.getCompanyId(),
-            SocialFeedType.TWITTER, twitterFeedData.getText(), twitterFeedData, 1 );
+            SocialFeedType.TWITTER, twitterFeedData.getText(), twitterFeedData, 1, SocialFeedStatus.NEW );
         
         responseWrapper.setPageLink( mediaToken.getSocialMediaTokens().getTwitterToken().getTwitterPageLink() );
         responseWrapper.setPostLink( mediaToken.getSocialMediaTokens().getTwitterToken().getTwitterPageLink() +"/status/"+ twitterFeedData.getId());

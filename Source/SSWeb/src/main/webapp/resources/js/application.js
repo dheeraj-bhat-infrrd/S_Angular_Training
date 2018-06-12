@@ -16555,13 +16555,12 @@ $(document).on('click','#soc-mon-stream-tab',function(e){
 	$('#res-inactive').show();
 	$('#res-active').hide();
 	
-	$('#stream-tabs').data('flagged',false);
-	$('#stream-tabs').data('status','none');
+	$('#stream-tabs').data('status','NEW');
 	
 	drawBulkMacroListDropdown(macrosForStream);
 	var text = $('#search-post').val();
 	
-	getStreamPosts(0,'none',false,text);
+	getStreamPosts(0,'NEW',text);
 	
 });
 
@@ -16594,14 +16593,13 @@ $(document).on('click','#soc-mon-alerts-tab',function(e){
 	$('#res-inactive').show();
 	$('#res-active').hide();
 	
-	$('#stream-tabs').data('flagged',true);
-	$('#stream-tabs').data('status','NEW');
+	$('#stream-tabs').data('status','ALERT');
 	
 	drawBulkMacroListDropdown(macrosForStream);
 	
 	var text = $('#search-post').val();
 	
-	getStreamPosts(0,'NEW',true,text);
+	getStreamPosts(0,'ALERT' ,text);
 });
 
 $(document).on('click','#soc-mon-escalated-tab',function(e){
@@ -16633,14 +16631,13 @@ $(document).on('click','#soc-mon-escalated-tab',function(e){
 	$('#res-inactive').show();
 	$('#res-active').hide();
 	
-	$('#stream-tabs').data('flagged',false);
 	$('#stream-tabs').data('status','ESCALATED');
 	
 	drawBulkMacroListDropdown(macrosForStream);
 	
 	var text = $('#search-post').val();
 	
-	getStreamPosts(0,'ESCALATED',false,text);
+	getStreamPosts(0,'ESCALATED',text);
 	
 });
 
@@ -16673,14 +16670,13 @@ $(document).on('click','#soc-mon-resolved-tab',function(e){
 	$('#res-inactive').hide();
 	$('#res-active').show();
 	
-	$('#stream-tabs').data('flagged',false);
 	$('#stream-tabs').data('status','RESOLVED');
 	
 	drawBulkMacroListDropdown(macrosForStream);
 	
 	var text = $('#search-post').val();
 	
-	getStreamPosts(0,'RESOLVED',false,text);
+	getStreamPosts(0,'RESOLVED', text);
 	
 });
 
@@ -17261,7 +17257,7 @@ function drawMacroList(macroList){
 					+'<div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 macro-list-item">'+macroName+'</div>'
 					+'<div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 macro-list-item-usage">'+last7DaysMacroCount+'</div>'
 					+'<input type="hidden" id="macro-'+macroId+'" name="monitor-type" data-macroId="'+macroId+'" data-macro-name="'+macroName+'" data-description="'+description
-					+'" data-alert="'+actions.socialFeedStatus+'" data-flagged='+actions.flagged+' data-action-type="'+actions.textActionType+'" data-action-text="'+actions.text+'" data-active='+active+' data-last-used='+last7DaysMacroCount+' data-usage='+usage+' data-last-updated="'+createdOn+'" >'
+					+'" data-alert="'+actions.socialFeedStatus+' data-action-type="'+actions.textActionType+'" data-action-text="'+actions.text+'" data-active='+active+' data-last-used='+last7DaysMacroCount+' data-usage='+usage+' data-last-updated="'+createdOn+'" >'
 					+'</div>';
 		
 		if(active==true || active=='true'){
@@ -17280,7 +17276,6 @@ function drawMacroList(macroList){
 		 "macroName" : $('#macro-'+macroId).attr('data-macro-name'),
 		 "description" : $('#macro-'+macroId).attr('data-description'),
 		 "alert" : $('#macro-'+macroId).attr('data-alert'),
-		 "flagged" : $('#macro-'+macroId).attr('data-flagged'),
 		 "actionType" : $('#macro-'+macroId).attr('data-action-type'),
 		 "actionText" : $('#macro-'+macroId).attr('data-action-text'),
 		 "active" : $('#macro-'+macroId).attr('data-active'),
@@ -17321,7 +17316,6 @@ function drawMacroData(macroId,macroData){
 	var macroName= macroData.macroName;
 	var description= macroData.description;
 	var alert= macroData.alert;
-	var flagged= macroData.flagged;
 	var actionType= macroData.actionType;
 	var actionText= macroData.actionText;
 	var active= macroData.active;
@@ -17367,13 +17361,11 @@ function drawMacroData(macroId,macroData){
 	}
 	
 	if(alert == 'NEW'){
-		if(flagged == true || flagged == 'true'){
-			$('#macro-alert').val(1);
-			$('#macro-alert-text').html('Flag');
-		}else if(flagged == false || flagged == 'false'){
 			$('#macro-alert').val(0);
 			$('#macro-alert-text').html('Unflag');
-		}
+	}else if(alert == 'ALERT'){
+		$('#macro-alert').val(1);
+		$('#macro-alert-text').html('Flag');
 	}else if(alert == 'ESCALATED'){
 		$('#macro-alert').val(2);
 		$('#macro-alert-text').html('Escalate');
@@ -17680,18 +17672,15 @@ function fetchJspData(data){
 }
 
 var streamActionContainer;
+var dupContainer;
 
 var lastgetStreamPostRequestToDelete=null;
-function getStreamPosts(startIndex,status,flag,text){
+function getStreamPosts(startIndex,status,text){
 	
 	var batchSize = 50;
 	showDashOverlay('#stream-dash');
 	if(status == undefined){
 		status = 'none';
-	}
-	
-	if(flag == undefined){
-		flag=false;
 	}
 	
 	if(text == null || text == undefined){
@@ -17713,7 +17702,6 @@ function getStreamPosts(startIndex,status,flag,text){
 		"startIndex":startIndex,
 		"batchSize":batchSize,
 		"status":status,
-		"flag":flag,
 		"company":companyId,
 		"region":regionIds,
 		"branch":branchIds,
@@ -17863,10 +17851,9 @@ $(document).on('click','#stream-start-page-active',function(e){
 	$('#selected-post-ids').data('post-ids',selPostIds);
 	
 	var status = $('#stream-tabs').data('status');
-	var flag = $('#stream-tabs').data('flagged');
 	var text = $('#search-post').val();
 	
-	getStreamPosts(0, status, flag,text);
+	getStreamPosts(0, status, text);
 });
 
 $(document).on('click','#stream-prev-page-active',function(e){
@@ -17877,11 +17864,10 @@ $(document).on('click','#stream-prev-page-active',function(e){
 	$('#selected-post-ids').data('post-ids',selPostIds);
 	
 	var status = $('#stream-tabs').data('status');
-	var flag = $('#stream-tabs').data('flagged');
 	var startIndex = $('#stream-pagination').data('startIndex') - 50;
 	var text = $('#search-post').val();
 	
-	getStreamPosts(startIndex, status, flag,text);
+	getStreamPosts(startIndex, status, text);
 });
 
 $(document).on('click','#stream-next-page-active',function(e){
@@ -17892,11 +17878,10 @@ $(document).on('click','#stream-next-page-active',function(e){
 	$('#selected-post-ids').data('post-ids',selPostIds);
 	
 	var status = $('#stream-tabs').data('status');
-	var flag = $('#stream-tabs').data('flagged');
 	var startIndex = $('#stream-pagination').data('startIndex') + 50;
 	var text = $('#search-post').val();
 	
-	getStreamPosts(startIndex, status, flag,text);
+	getStreamPosts(startIndex, status, text);
 });
 
 $(document).on('click','#stream-end-page-active',function(e){
@@ -17907,7 +17892,7 @@ $(document).on('click','#stream-end-page-active',function(e){
 	$('#selected-post-ids').data('post-ids',selPostIds);
 	
 	var status = $('#stream-tabs').data('status');
-	var flag = $('#stream-tabs').data('flagged');
+
 	var startIndex = $('#stream-pagination').data('startIndex');
 	var pageNo = (startIndex/50)+1;
 	var count = $('#stream-pagination').data('count');
@@ -17917,7 +17902,8 @@ $(document).on('click','#stream-end-page-active',function(e){
 	}
 	var text = $('#search-post').val();
 	
-	getStreamPosts(startIndex, status, flag,text);
+	getStreamPosts(startIndex, status, text);
+
 });
 
 $(document).on('click','#stream-start-page-active-bottom',function(e){
@@ -17928,10 +17914,9 @@ $(document).on('click','#stream-start-page-active-bottom',function(e){
 	$('#selected-post-ids').data('post-ids',selPostIds);
 	
 	var status = $('#stream-tabs').data('status');
-	var flag = $('#stream-tabs').data('flagged');
 	var text = $('#search-post').val();
 	
-	getStreamPosts(0, status, flag,text);
+	getStreamPosts(0, status, text);
 });
 
 $(document).on('click','#stream-prev-page-active-bottom',function(e){
@@ -17942,11 +17927,11 @@ $(document).on('click','#stream-prev-page-active-bottom',function(e){
 	$('#selected-post-ids').data('post-ids',selPostIds);
 	
 	var status = $('#stream-tabs').data('status');
-	var flag = $('#stream-tabs').data('flagged');
 	var startIndex = $('#stream-pagination').data('startIndex') - 50;
 	var text = $('#search-post').val();
 	
-	getStreamPosts(startIndex, status, flag,text);
+	getStreamPosts(startIndex, status, text);
+
 });
 
 $(document).on('click','#stream-next-page-active-bottom',function(e){
@@ -17957,11 +17942,10 @@ $(document).on('click','#stream-next-page-active-bottom',function(e){
 	$('#selected-post-ids').data('post-ids',selPostIds);
 	
 	var status = $('#stream-tabs').data('status');
-	var flag = $('#stream-tabs').data('flagged');
 	var startIndex = $('#stream-pagination').data('startIndex') + 50;
 	var text = $('#search-post').val();
 	
-	getStreamPosts(startIndex, status, flag,text);
+	getStreamPosts(startIndex, status, text);
 });
 
 $(document).on('click','#stream-end-page-active-bottom',function(e){
@@ -17972,7 +17956,6 @@ $(document).on('click','#stream-end-page-active-bottom',function(e){
 	$('#selected-post-ids').data('post-ids',selPostIds);
 	
 	var status = $('#stream-tabs').data('status');
-	var flag = $('#stream-tabs').data('flagged');
 	var startIndex = $('#stream-pagination').data('startIndex');
 	var pageNo = (startIndex/50)+1;
 	var count = $('#stream-pagination').data('count');
@@ -17982,7 +17965,7 @@ $(document).on('click','#stream-end-page-active-bottom',function(e){
 	}
 	var text = $('#search-post').val();
 	
-	getStreamPosts(startIndex, status, flag,text);
+	getStreamPosts(startIndex, status,text);
 });
 
 function drawStreamPage(streamPostList){
@@ -17991,6 +17974,9 @@ function drawStreamPage(streamPostList){
 	
 	getJspData('./getstreamcontainer.do');
 	var streamContainer = jspData;
+	
+	getJspData('./getdupcontainer.do');
+	dupContainer = jspData;
 	
 	getJspData('./getstreamactioncontainer.do');
 	streamActionContainer = jspData;
@@ -18011,20 +17997,17 @@ function drawStreamPage(streamPostList){
 		}
 		
 		var status = streamPostList[i].status;
-		var flagged  = streamPostList[i].flagged;
 		
 		if(status=='NEW'){
-			if(flagged == true || flagged == 'true'){
-				$('#stream-post-icn-cont-'+postId).find('.stream-flagged-icn').removeClass('hide');
-				$('#action-form-container'+postId).find('.stream-action-unflag').removeClass('hide');
-				$('#action-form-container'+postId).find('.stream-action-esc').removeClass('hide');
-				$('#action-form-container'+postId).find('.stream-action-submit').removeClass('hide');
-			}else{
 				$('#stream-post-icn-cont-'+postId).find('.stream-unflagged-icn').removeClass('hide');
 				$('#action-form-container'+postId).find('.stream-action-flag').removeClass('hide');
 				$('#action-form-container'+postId).find('.stream-action-esc').removeClass('hide');
 				$('#action-form-container'+postId).find('.stream-action-submit').removeClass('hide');
-			}
+		}else if(status == 'ALERT'){
+			$('#stream-post-icn-cont-'+postId).find('.stream-flagged-icn').removeClass('hide');
+			$('#action-form-container'+postId).find('.stream-action-unflag').removeClass('hide');
+			$('#action-form-container'+postId).find('.stream-action-esc').removeClass('hide');
+			$('#action-form-container'+postId).find('.stream-action-submit').removeClass('hide');
 		}else if(status == 'ESCALATED'){
 			$('#stream-post-icn-cont-'+postId).find('.stream-esc-icn').removeClass('hide');
 			$('#action-form-container'+postId).find('.stream-action-res').removeClass('hide');
@@ -18072,7 +18055,6 @@ function drawStreamPage(streamPostList){
 		
 		if(streamPostList[i].duplicateCount > 1){
 			$('#stream-post-details-'+postId).find('.stream-dup-container').removeClass('hide');
-			$('#stream-post-details-'+postId).find('.post-dup').removeClass('hide');
 			$('#stream-post-details-'+postId).find('.post-dup').find('.dup-count').html(streamPostList[i].duplicateCount);
 		}
 		
@@ -18089,6 +18071,7 @@ function drawStreamPage(streamPostList){
 				$('#stream-post-details-'+postId).find('.ts-act-icon').removeClass('ts-add');
 				$('#stream-post-details-'+postId).find('.ts-act-icon').addClass('ts-remove');
 				$('#stream-post-details-'+postId).find('.trusted-source').removeClass('hide');
+				$('#stream-post-details-'+postId).find('.ts-act-icon').attr('title','Remove Trusted Source')
 			}
 		}
 		
@@ -18123,7 +18106,6 @@ function drawStreamPage(streamPostList){
 		});
 		
 		$('#add-post-action').attr('id','add-post-action-'+postId);
-		$('#add-post-action-'+postId).find('.form-flagged').val(streamPostList[i].flagged);
 		$('#add-post-action-'+postId).find('.form-status').val(streamPostList[i].status);
 		$('#add-post-action-'+postId).find('.form-post-id').val(postId);
 		
@@ -18158,7 +18140,6 @@ function drawStreamPage(streamPostList){
 			var postId =  $(this).find('.macro-list-data').attr('data-post-id');
 			var macroId = $(this).find('.macro-list-data').attr('data-macro-id');
 			var macroName =$(this).find('.macro-list-data').attr('data-macro-name');
-			var flagged = $(this).find('.macro-list-data').attr('data-flagged');
 			var status = $(this).find('.macro-list-data').attr('data-status');
 			var textActionType = $(this).find('.macro-list-data').attr('data-text-action-type');
 			var text = $(this).find('.macro-list-data').attr('data-text');
@@ -18168,13 +18149,11 @@ function drawStreamPage(streamPostList){
 			}
 			
 			$('#macro-form-post-id').val(postId);
-			$('#macro-form-flagged').val(flagged);
 			$('#macro-form-status').val(status);
 			$('#macro-form-text-act-type').val(textActionType);
 			$('#macro-form-macro-id').val(macroId);
 			$('#macro-form-text').val(text);
 			
-			$('#add-post-action-'+postId).find('.form-flagged').val(flagged);
 			$('#add-post-action-'+postId).find('.form-status').val(status);
 			
 			var url = './updatepostactionwithmacro.do';
@@ -18286,7 +18265,6 @@ function drawMacroListDropdown(postId,macroList){
 		var macroName=macroList[m].macroName;
 		var active = macroList[m].active;
 		var actions=macroList[m].actions;
-		var flagged = actions.flagged;
 		var status = actions.socialFeedStatus;
 		var textActionType = actions.textActionType;
 		var text = actions.text;
@@ -18294,53 +18272,38 @@ function drawMacroListDropdown(postId,macroList){
 			text='';
 		}
 		
-		if(flagged == 'true' || flagged == true){
-			flagged= true;
-		}else{
-			flagged=false;
-		}
-		
-		var postFlagged = $('#add-post-action-'+postId).find('.form-flagged').val();
 		var postStatus = $('#add-post-action-'+postId).find('.form-status').val();
 		
-		if(postFlagged == 'true' || postFlagged == true){
-			postFlagged= true;
-		}else{
-			postFlagged=false;
-		}
-		
 		var inputDiv = '<input type="hidden" id="macro-'+postId+'-'+macroId+'" class="macro-list-data" data-post-id="'+postId+'" data-macro-id="'+macroId
-		+'" data-macro-name="'+macroName+'" data-flagged='+flagged+' data-status="'+status+'" data-text-action-type="'+textActionType+'" data-text="'+text+'">';
+		+'" data-macro-name="'+macroName+'" data-status="'+status+'" data-text-action-type="'+textActionType+'" data-text="'+text+'">';
 		var macroDiv = '<div id="macro-option-'+macroId+'" data-macro-id="'+macroId+'" class="macro-opt">'+inputDiv+macroName+'</div>';
 		var macroDivDisabled = '<div id="macro-option-'+macroId+'" data-macro-id="'+macroId+'" class="macro-disabled">'+inputDiv+macroName+'</div>';
 		
 		var disableMacro = false;
 		if(active == true || active == 'true'){
 			if((postStatus == 'RESOLVED')){
-				if(status != 'NEW' && status != 'RESOLVED'){	
+				if(status != 'NEW' && status != 'ALERT' && status != 'RESOLVED'){	
 					$('#action-form-container'+postId).find('.macro-options-list').append(macroDiv);
 				}else{
 					disableMacro = true;
 				}
 			}else if(postStatus == 'ESCALATED'){
-				if(status != 'NEW' && status != 'ESCALATED'){	
+				if(status != 'NEW' && status != 'ALERT' && status != 'ESCALATED'){	
 					$('#action-form-container'+postId).find('.macro-options-list').append(macroDiv);
 				}else{
 					disableMacro = true;
 				}
 			}else if(postStatus == 'NEW'){
-				if(postFlagged == true || flagged =='true'){
-					if(!(status == 'NEW' && (flagged =='true' || flagged == true)) && status != "RESOLVED"){
-						$('#action-form-container'+postId).find('.macro-options-list').append(macroDiv);
-					}else{
-						disableMacro = true;
-					}
+				if(status != 'NEW' && status != "RESOLVED"){
+					$('#action-form-container'+postId).find('.macro-options-list').append(macroDiv);
 				}else{
-					if(!(status == 'NEW' && (flagged =='false' || flagged == false)) && status != "RESOLVED"){
-						$('#action-form-container'+postId).find('.macro-options-list').append(macroDiv);
-					}else{
-						disableMacro = true;
-					}
+					disableMacro = true;
+				}
+			}else if(postStatus == 'ALERT'){
+				if(status != 'ALERT' && status != "RESOLVED"){
+					$('#action-form-container'+postId).find('.macro-options-list').append(macroDiv);
+				}else{
+					disableMacro = true;
 				}
 			}
 		}
@@ -18360,7 +18323,6 @@ function drawBulkMacroListDropdown(macroList){
 		var macroName=macroList[m].macroName;
 		var active = macroList[m].active;
 		var actions=macroList[m].actions;
-		var flagged = actions.flagged;
 		var status = actions.socialFeedStatus;
 		var textActionType = actions.textActionType;
 		var text = actions.text;
@@ -18368,18 +18330,10 @@ function drawBulkMacroListDropdown(macroList){
 			text='';
 		}
 		
-		if(flagged == 'true' || flagged == true){
-			flagged= true;
-		}else{
-			flagged=false;
-		}
-		
-		var postFlagged = $('#soc-mon-alerts-tab').hasClass('soc-mon-alert-active');
 		var postStatus = 'NEW';
 				
 		if( $('#soc-mon-stream-tab').hasClass('soc-mon-stream-active')){
-			postFlagged = false;
-			postStatus = 'NONE';
+			postStatus = 'NEW';
 			
 			$('#bulk-edit-unflag').show();
 			$('#bulk-edit-flag').show();
@@ -18392,7 +18346,6 @@ function drawBulkMacroListDropdown(macroList){
 			$('#bulk-edit-res').addClass('bulk-act-btn');
 			$('#bulk-edit-sub').addClass('bulk-act-btn');
 		}else if( $('#soc-mon-escalated-tab').hasClass('soc-mon-esc-active')){
-			postFlagged = false;
 			postStatus = 'ESCALATED';
 			
 			$('#bulk-edit-unflag').hide();
@@ -18406,7 +18359,6 @@ function drawBulkMacroListDropdown(macroList){
 			$('#bulk-edit-res').removeClass('bulk-act-btn');
 			$('#bulk-edit-sub').removeClass('bulk-act-btn');
 		}else if( $('#soc-mon-resolved-tab').hasClass('soc-mon-res-active')){
-			postFlagged = false;
 			postStatus = 'RESOLVED';
 			
 			$('#bulk-edit-unflag').hide();
@@ -18420,6 +18372,7 @@ function drawBulkMacroListDropdown(macroList){
 			$('#bulk-edit-res').removeClass('bulk-act-btn');
 			$('#bulk-edit-sub').removeClass('bulk-act-btn');
 		}else if($('#soc-mon-alerts-tab').hasClass('soc-mon-alert-active')){
+			postStatus = 'ALERT';
 			$('#bulk-edit-unflag').show();
 			$('#bulk-edit-flag').hide();
 			$('#bulk-edit-esc').show();
@@ -18432,14 +18385,8 @@ function drawBulkMacroListDropdown(macroList){
 			$('#bulk-edit-sub').removeClass('bulk-act-btn');
 		}
 		
-		if(postFlagged == 'true' || postFlagged == true){
-			postFlagged= true;
-		}else{
-			postFlagged=false;
-		}
-		
 		var inputDiv = '<input type="hidden" id="bulk-macro-'+macroId+'" class="macro-list-data" data-macro-id="'+macroId
-		+'" data-macro-name="'+macroName+'" data-flagged='+flagged+' data-status="'+status+'" data-text-action-type="'+textActionType+'" data-text="'+text+'">';
+		+'" data-macro-name="'+macroName+'" data-status="'+status+'" data-text-action-type="'+textActionType+'" data-text="'+text+'">';
 		var macroDiv = '<div id="bulk-macro-option-'+macroId+'" data-macro-id="'+macroId+'" class="bulk-macro-opt">'+inputDiv+macroName+'</div>';
 		var macroDivDisabled = '<div id="bulk-macro-option-'+macroId+'" data-macro-id="'+macroId+'" class="macro-disabled">'+inputDiv+macroName+'</div>';
 		
@@ -18447,24 +18394,22 @@ function drawBulkMacroListDropdown(macroList){
 		
 		if(active == true || active == 'true'){
 			if((postStatus == 'RESOLVED')){
-				if(status != 'NEW' && status != 'RESOLVED'){	
+				if(status != 'NEW' && status != 'ALERT' && status != 'RESOLVED'){	
 					$('#bulk-macro-options').append(macroDiv);
 				}else{
 					disableMacro = true;
 				}
 			}else if(postStatus == 'ESCALATED'){
-				if(status != 'NEW' && status != 'ESCALATED'){	
+				if(status != 'NEW' && status != 'ALERT' && status != 'ESCALATED'){	
 					$('#bulk-macro-options').append(macroDiv);
 				}else{
 					disableMacro = true;
 				}
-			}else if(postStatus == 'NEW'){
-				if(postFlagged == true || flagged =='true'){
-					if(!(status == 'NEW' && (flagged =='true' || flagged == true)) && status != "RESOLVED"){
-						$('#bulk-macro-options').append(macroDiv);
-					}else{
-						disableMacro = true;
-					}
+			}else if(postStatus == 'ALERT'){
+				if(status != 'ALERT' && status != "RESOLVED"){
+					$('#bulk-macro-options').append(macroDiv);
+				}else{
+					disableMacro = true;
 				}
 			}else{
 				$('#bulk-macro-options').append(macroDiv);
@@ -18508,7 +18453,6 @@ $(document).on('click','.bulk-macro-opt',function(e){
 	$('#action-type-sel').val(2);
 	
 	var macroId = $(this).find('.macro-list-data').attr('data-macro-id');
-	var flagged = $(this).find('.macro-list-data').attr('data-flagged');
 	var status = $(this).find('.macro-list-data').attr('data-status');
 	var textActionType = $(this).find('.macro-list-data').attr('data-text-action-type');
 	var text = $(this).find('.macro-list-data').attr('data-text');
@@ -18517,8 +18461,8 @@ $(document).on('click','.bulk-macro-opt',function(e){
 		text='';
 	}
 	
+	$('#bulk-actions-apply').find('.form-status').val(status);
 	$('#macro-form-post-id').val($('#selected-post-ids').data('post-ids'));
-	$('#macro-form-flagged').val(flagged);
 	$('#macro-form-status').val(status);
 	$('#macro-form-text-act-type').val(textActionType);
 	$('#macro-form-macro-id').val(macroId);
@@ -18561,7 +18505,6 @@ $(document).on('click','#bulk-edit-unflag',function(e){
 	e.preventDefault();
 	
 	$('#bulk-actions-apply').find('.form-post-id').val($('#selected-post-ids').data('post-ids'));
-	$('#bulk-actions-apply').find('.form-flagged').val(false);
 	$('#bulk-actions-apply').find('.form-status').val('NEW');
 	$('#bulk-actions-apply').find('.form-macro-id').val('');
 	$('#bulk-actions-apply').find('.form-post-textbox').val( $('#bulk-edit-txt-box').val() );
@@ -18580,8 +18523,7 @@ $(document).on('click','#bulk-edit-flag',function(e){
 	e.preventDefault();
 	
 	$('#bulk-actions-apply').find('.form-post-id').val($('#selected-post-ids').data('post-ids'));
-	$('#bulk-actions-apply').find('.form-flagged').val(true);
-	$('#bulk-actions-apply').find('.form-status').val('NEW');
+	$('#bulk-actions-apply').find('.form-status').val('ALERT');
 	$('#bulk-actions-apply').find('.form-macro-id').val('');
 	$('#bulk-actions-apply').find('.form-post-textbox').val( $('#bulk-edit-txt-box').val() );
 	
@@ -18599,7 +18541,6 @@ $(document).on('click','#bulk-edit-esc',function(e){
 	e.preventDefault();
 	
 	$('#bulk-actions-apply').find('.form-post-id').val($('#selected-post-ids').data('post-ids'));
-	$('#bulk-actions-apply').find('.form-flagged').val(false);
 	$('#bulk-actions-apply').find('.form-status').val('ESCALATED');
 	$('#bulk-actions-apply').find('.form-macro-id').val('');
 	$('#bulk-actions-apply').find('.form-post-textbox').val( $('#bulk-edit-txt-box').val() );
@@ -18626,7 +18567,6 @@ $(document).on('click','#bulk-edit-res',function(e){
 	e.preventDefault();
 	
 	$('#bulk-actions-apply').find('.form-post-id').val($('#selected-post-ids').data('post-ids'));
-	$('#bulk-actions-apply').find('.form-flagged').val(false);
 	$('#bulk-actions-apply').find('.form-status').val('RESOLVED');
 	$('#bulk-actions-apply').find('.form-macro-id').val('');
 	$('#bulk-actions-apply').find('.form-post-textbox').val( $('#bulk-edit-txt-box').val() );
@@ -18661,7 +18601,6 @@ $(document).on('click','#bulk-edit-sub',function(e){
 	}
 	
 	$('#bulk-actions-apply').find('.form-post-id').val($('#selected-post-ids').data('post-ids'));
-	$('#bulk-actions-apply').find('.form-flagged').val(false);
 	$('#bulk-actions-apply').find('.form-status').val('SUBMIT');
 	$('#bulk-actions-apply').find('.form-macro-id').val('');
 	$('#bulk-actions-apply').find('.form-post-textbox').val( $('#bulk-edit-txt-box').val() );
@@ -18684,7 +18623,7 @@ var monthName=new Array("January","February","March","April","May","June","July"
 function callFormAjaxPostForSocMonBtn(url,formId,postId){
 	
 	var status = $('#stream-tabs').data('status');
-	var flag = $('#stream-tabs').data('flagged');
+
 	var startIndex = $('#stream-pagination').data('startIndex');
 	
 	var $form = $('#'+formId);
@@ -18713,7 +18652,7 @@ function callFormAjaxPostForSocMonBtn(url,formId,postId){
 			}
 		},
 		complete: function(data){
-			getStreamPosts(startIndex,status,flag);
+			getStreamPosts(startIndex,status);
 		},
 		error : function(e) {
 			if(e.status == 504) {
@@ -18735,7 +18674,6 @@ $(document).on('click','.stream-action-unflag',function(e){
 	var disableEle = ('#stream-action-unflag-'+postId);
 	var textActionType = $('#action-form-cont'+postId).find('.form-text-act-type').val();
 	
-	$(this).closest('.action-form-cont').find('.form-flagged').val(false);
 	$(this).closest('.action-form-cont').find('.form-status').val('NEW');
 	
 	var url = './updatepostaction.do';
@@ -18750,8 +18688,7 @@ $(document).on('click','.stream-action-flag',function(e){
 	var disableEle = ('#stream-action-flag-'+postId);
 	var textActionType = $('#action-form-cont'+postId).find('.form-text-act-type').val();
 	
-	$(this).closest('.action-form-cont').find('.form-flagged').val(true);
-	$(this).closest('.action-form-cont').find('.form-status').val('NEW');
+	$(this).closest('.action-form-cont').find('.form-status').val('ALERT');
 	
 	var url = './updatepostaction.do';
 	callFormAjaxPostForSocMonBtn(url,formId,postId);
@@ -18764,8 +18701,7 @@ $(document).on('click','.stream-unflagged-icn',function(e){
 	var disableEle = ('#stream-action-unflag-'+postId);
 	var textActionType = $('#action-form-cont'+postId).find('.form-text-act-type').val();
 	
-	$('#action-form-cont'+postId).find('.form-flagged').val(true);
-	$('#action-form-cont'+postId).find('.form-status').val('NEW');
+	$('#action-form-cont'+postId).find('.form-status').val('ALERT');
 	
 	var url = './updatepostaction.do';
 	callFormAjaxPostForSocMonBtn(url,formId,postId);
@@ -18778,7 +18714,6 @@ $(document).on('click','.stream-flagged-icn',function(e){
 	var disableEle = ('#stream-action-flag-'+postId);
 	var textActionType = $('#action-form-cont'+postId).find('.form-text-act-type').val();
 	
-	$('#action-form-cont'+postId).find('.form-flagged').val(false);
 	$('#action-form-cont'+postId).find('.form-status').val('NEW');
 	
 	var url = './updatepostaction.do';
@@ -18801,7 +18736,6 @@ $(document).on('click','.stream-action-esc',function(e){
 		return;
 	}
 	
-	$(this).closest('.action-form-cont').find('.form-flagged').val(true);
 	$(this).closest('.action-form-cont').find('.form-status').val('ESCALATED');
 	
 	var url = './updatepostaction.do';
@@ -18826,7 +18760,6 @@ $(document).on('click','.stream-action-res',function(e){
 		return;
 	}
 	
-	$(this).closest('.action-form-cont').find('.form-flagged').val(false);
 	$(this).closest('.action-form-cont').find('.form-status').val('RESOLVED');
 	
 	var url = './updatepostaction.do';
@@ -18848,125 +18781,13 @@ $(document).on('click','.stream-action-submit',function(e){
 		return;
 	}
 	
-	var currentFlag = $(this).closest('.action-form-cont').find('.form-flagged').val();
 	var currentStatus = $(this).closest('.action-form-cont').find('.form-status').val();
 	
-	$(this).closest('.action-form-cont').find('.form-flagged').val(false);
 	$(this).closest('.action-form-cont').find('.form-status').val('SUBMIT');
 	
 	var url = './updatepostaction.do';
-
 	callFormAjaxPostForSocMonBtn(url,formId,postId);
 });
-
-function updatePostSuccess(postId,text,status,flagged,textActionType,map){
-	
-	$('#action-history'+postId).prepend(streamActionContainer);
-	var j = parseInt($('#action-history'+postId).attr('data-count'));
-	$('#act-cont').attr('id','act-cont'+postId+'-'+j);
-	$('#action-history'+postId).attr('data-count',(j+1));
-	
-	if($('#stream-post-cont-'+postId).hasClass('stream-container-gray')){
-		$('#act-cont'+postId+'-'+j).addClass('stream-action-container-white');
-	}
-	
-	lastUpdatedAction = (new Date()).getTime();
-	lastUpdatedDateAction = new Date(lastUpdatedAction);
-	lastUpdatedDateActionStr = monthName[lastUpdatedDateAction.getMonth()]+' '+(lastUpdatedDateAction.getDate()%10!=lastUpdatedDateAction.getDate()?lastUpdatedDateAction.getDate():('0'+lastUpdatedDateAction.getDate()))+', '+lastUpdatedDateAction.getFullYear()
-	+' at '+(lastUpdatedDateAction.getHours()%10!=lastUpdatedDateAction.getHours()?lastUpdatedDateAction.getHours():('0'+lastUpdatedDateAction.getHours()))+':'
-	+(lastUpdatedDateAction.getMinutes()%10!=lastUpdatedDateAction.getMinutes()?lastUpdatedDateAction.getMinutes():('0'+lastUpdatedDateAction.getMinutes()))+':'
-	+(lastUpdatedDateAction.getSeconds()%10!=lastUpdatedDateAction.getSeconds()?lastUpdatedDateAction.getSeconds():('0'+lastUpdatedDateAction.getSeconds()));
-	
-	$('#act-cont'+postId+'-'+j).find('.act-details-date').html(lastUpdatedDateActionStr);
-	
-	if(status == 'NEW'){
-		if(flagged == true || flagged == 'true'){
-			
-			$('#stream-post-icn-cont-'+postId).find('.stream-unflagged-icn').addClass('hide');
-			$('#stream-post-icn-cont-'+postId).find('.stream-flagged-icn').removeClass('hide');
-			
-			$('#act-cont'+postId+'-'+j).find('.action-flag-icn').removeClass('hide');	
-			$('#act-cont'+postId+'-'+j).find('.act-details-text').html('Post was <b class="soc-mon-bold-text">Flagged</b> manually by <b class="soc-mon-bold-text">'+map.userName+'</b>');
-			
-			$('#action-form-container'+postId).find('.stream-action-flag').addClass('hide');
-			$('#action-form-container'+postId).find('.stream-action-unflag').removeClass('hide');
-			
-		}else{
-			
-			$('#stream-post-icn-cont-'+postId).find('.stream-flagged-icn').addClass('hide');
-			$('#stream-post-icn-cont-'+postId).find('.stream-unflagged-icn').removeClass('hide');
-			
-			$('#act-cont'+postId+'-'+j).find('.action-flag-icn').removeClass('hide');	
-			$('#act-cont'+postId+'-'+j).find('.act-details-text').html('Post was <b class="soc-mon-bold-text">Unflagged</b> manually by <b class="soc-mon-bold-text">'+map.userName+'</b>');
-			
-			$('#action-form-container'+postId).find('.stream-action-unflag').addClass('hide');
-			$('#action-form-container'+postId).find('.stream-action-flag').removeClass('hide');
-			
-		}
-		
-	}else if(status == 'ESCALATED'){
-		
-		$('#stream-post-icn-cont-'+postId).find('.stream-unflagged-icn').addClass('hide');
-		$('#stream-post-icn-cont-'+postId).find('.stream-flagged-icn').addClass('hide');
-		$('#stream-post-icn-cont-'+postId).find('.stream-res-icn').addClass('hide');
-		$('#stream-post-icn-cont-'+postId).find('.stream-esc-icn').removeClass('hide');
-		
-		$('#act-cont'+postId+'-'+j).find('.action-esc-icn').removeClass('hide');	
-		$('#act-cont'+postId+'-'+j).find('.act-details-text').html('Post was <b class="soc-mon-bold-text">Escalated</b> manually by <b class="soc-mon-bold-text">'+map.userName+'</b>');
-		
-		$('#action-form-container'+postId).find('.stream-action-flag').addClass('hide');
-		$('#action-form-container'+postId).find('.stream-action-unflag').addClass('hide');
-		$('#action-form-container'+postId).find('.stream-action-esc').addClass('hide');
-		$('#action-form-container'+postId).find('.stream-action-res').removeClass('hide');
-		
-	}else if(status == 'RESOLVED'){
-		$('#stream-post-icn-cont-'+postId).find('.stream-esc-icn').addClass('hide');
-		$('#stream-post-icn-cont-'+postId).find('.stream-res-icn').removeClass('hide');
-		
-		$('#act-cont'+postId+'-'+j).find('.action-res-icn').removeClass('hide');	
-		$('#act-cont'+postId+'-'+j).find('.act-details-text').html('Post was <b class="soc-mon-bold-text">Resolved</b> manually by <b class="soc-mon-bold-text">'+map.userName+'</b>');
-		
-		$('#action-form-container'+postId).find('.stream-action-flag').addClass('hide');
-		$('#action-form-container'+postId).find('.stream-action-unflag').addClass('hide');
-		$('#action-form-container'+postId).find('.stream-action-res').addClass('hide');
-		$('#action-form-container'+postId).find('.stream-action-esc').removeClass('hide');
-	}
-	$('#act-cont'+postId+'-'+j).fadeIn('slow');
-	
-	if(text!='' && text != undefined && text!=null){
-		var actionHistoryMail = $('#action-history'+postId).html();
-		
-		$('#action-history'+postId).prepend(streamActionContainer);
-		j = parseInt($('#action-history'+postId).attr('data-count'));
-		$('#act-cont').attr('id','act-cont'+postId+'-'+j);
-		$('#action-history'+postId).attr('data-count',(j+1));
-		
-		if($('#stream-post-cont-'+postId).hasClass('stream-container-gray')){
-			$('#act-cont'+postId+'-'+j).addClass('stream-action-container-white');
-		}
-		
-		if(textActionType == 'SEND_EMAIL'){
-			$('#act-cont'+postId+'-'+j).find('.action-mail-icn').removeClass('hide');
-			$('#act-cont'+postId+'-'+j).addClass('stream-action-mail');	
-		}
-		$('#act-cont'+postId+'-'+j).find('.act-details-text').html(text);
-		
-		lastUpdatedAction = (new Date()).getTime();
-		lastUpdatedDateAction = new Date(lastUpdatedAction);
-		lastUpdatedDateActionStr = monthName[lastUpdatedDateAction.getMonth()]+' '+(lastUpdatedDateAction.getDate()%10!=lastUpdatedDateAction.getDate()?lastUpdatedDateAction.getDate():('0'+lastUpdatedDateAction.getDate()))+', '+lastUpdatedDateAction.getFullYear()
-		+' at '+(lastUpdatedDateAction.getHours()%10!=lastUpdatedDateAction.getHours()?lastUpdatedDateAction.getHours():('0'+lastUpdatedDateAction.getHours()))+':'
-		+(lastUpdatedDateAction.getMinutes()%10!=lastUpdatedDateAction.getMinutes()?lastUpdatedDateAction.getMinutes():('0'+lastUpdatedDateAction.getMinutes()))+':'
-		+(lastUpdatedDateAction.getSeconds()%10!=lastUpdatedDateAction.getSeconds()?lastUpdatedDateAction.getSeconds():('0'+lastUpdatedDateAction.getSeconds()));
-		
-		$('#act-cont'+postId+'-'+j).find('.act-details-date').html(lastUpdatedDateActionStr);
-		$('#act-cont'+postId+'-'+j).fadeIn('slow');
-		//$('#action-history'+postId).append(actionHistoryMail);
-		
-	}
-	
-	var macroList = macrosForStream;
-	drawMacroListDropdown(postId,macroList);
-}
 
 $(document).on('click','#stream-unchecked',function(e){
 	e.stopImmediatePropagation();
@@ -19093,7 +18914,6 @@ $(document).on('click','#stream-bulk-unflag',function(e){
 		e.preventDefault();
 		
 		$('#bulk-actions-apply').find('.form-post-id').val($('#selected-post-ids').data('post-ids'));
-		$('#bulk-actions-apply').find('.form-flagged').val(false);
 		$('#bulk-actions-apply').find('.form-status').val('NEW');
 		$('#bulk-actions-apply').find('.form-macro-id').val('');
 		
@@ -19129,8 +18949,7 @@ $(document).on('click','#stream-bulk-flag',function(e){
 		e.preventDefault();
 		
 		$('#bulk-actions-apply').find('.form-post-id').val($('#selected-post-ids').data('post-ids'));
-		$('#bulk-actions-apply').find('.form-flagged').val(true);
-		$('#bulk-actions-apply').find('.form-status').val('NEW');
+		$('#bulk-actions-apply').find('.form-status').val('ALERT');
 		$('#bulk-actions-apply').find('.form-macro-id').val('');
 		
 		var text = $('#action-edit-txt-box').val();
@@ -19165,7 +18984,6 @@ $(document).on('click','#stream-bulk-esc',function(e){
 		e.preventDefault();
 		
 		$('#bulk-actions-apply').find('.form-post-id').val($('#selected-post-ids').data('post-ids'));
-		$('#bulk-actions-apply').find('.form-flagged').val(false);
 		$('#bulk-actions-apply').find('.form-status').val('ESCALATED');
 		$('#bulk-actions-apply').find('.form-macro-id').val('');
 
@@ -19205,7 +19023,6 @@ $(document).on('click','#stream-bulk-res',function(e){
 	$(document).on('click','#action-edit-res',function(e){
 		
 		$('#bulk-actions-apply').find('.form-post-id').val($('#selected-post-ids').data('post-ids'));
-		$('#bulk-actions-apply').find('.form-flagged').val(false);
 		$('#bulk-actions-apply').find('.form-status').val('RESOLVED');
 		$('#bulk-actions-apply').find('.form-macro-id').val('');
 
@@ -19259,7 +19076,6 @@ function callFormAjaxPostForSocMon(url,disableEle,formId){
 	disable(disableEle);
 	
 	var status = $('#stream-tabs').data('status');
-	var flag = $('#stream-tabs').data('flagged');
 	var startIndex = $('#stream-pagination').data('startIndex');
 	
 	var $form = $('#'+formId);
@@ -19274,7 +19090,7 @@ function callFormAjaxPostForSocMon(url,disableEle,formId){
 		success : showToastForBulkActions,
 		complete: function(data){
 			enable(disableEle);
-			getStreamPosts(startIndex,status,flag);
+			getStreamPosts(startIndex,status);
 			$('#stream-unchecked').toggle();
 			$('#stream-checked').toggle();
 			var selPostIds = [];
@@ -19294,78 +19110,30 @@ function callFormAjaxPostForSocMon(url,disableEle,formId){
 
 function showToastForBulkActions(data){
 	var map = $.parseJSON(data);
+	var status = $('#bulk-actions-apply').find('.form-status').val();
+	
 	var actionTypeSel = parseInt($('#action-type-sel').val());
 	if (map.status == "success") {
-		var selPostIds = $('#selected-post-ids').data('post-ids');
-		var flagged;
-		var status;
+		var totalPosts = $('#selected-post-ids').data('post-ids');
+		var successPosts = (JSON.parse(map.Success)).successPostIds;
 		
-		if(actionTypeSel == 1){
-			flagged = $('#bulk-actions-apply').find('.form-flagged').val();
-			status = $('#bulk-actions-apply').find('.form-status').val();
-		}else{
-			flagged = $('#macro-form-apply').find('.macro-form-flagged').val();
-			status = $('#macro-form-apply').find('.macro-form-status').val();
-		}
-		
-		var failedCount = 0;
-		var successCount = 0;
-		
-		for(var i=0;i<selPostIds.length;i++){
-			var postId = selPostIds[i];
-			var postFlagged = $('#add-post-action-'+postId).find('.form-flagged').val();
-			var postStatus = $('#add-post-action-'+postId).find('.form-status').val();
-			
-			if(postStatus == 'NEW'){
-				if(status == 'RESOLVED'){
-					failedCount++;
-				}else if(status == 'NEW'){
-					if(flagged == 'true' || flagged == true){
-						if(postFlagged == 'true' || postFlagged == true){
-								failedCount++;
-						}else{
-							successCount++;
-						}
-					}else{
-						if(postFlagged == 'false' || postFlagged == false){
-							failedCount++;
-						}else{
-							successCount++;
-						}
-					}
-				}else{
-					successCount++;
-				}
-			}else if(postStatus == 'ESCALATED'){
-				if(status == 'RESOLVED'){
-					successCount++;
-				}else{
-					failedCount++;
-				}
-			}else if(postStatus == 'RESOLVED'){
-				if(status == 'ESCALATED'){
-					successCount++;
-				}else{
-					failedCount++;
-				}
-			}
-		}
-		
+		var successCount = successPosts.length;
+		var total = totalPosts.length;
+		var failedCount = total - successCount;
+				
 		var updatedAction = 'Unflagged';
 		if(status == 'NEW'){
-			if(flagged == true || flagged == 'true'){
-				updatedAction = "Flagged";
-			}else{
-				updatedAction = "Unflagged";
-			}
+			updatedAction = "Unflagged";
+		}else if(status == 'ALERT'){
+			updatedAction = "Flagged";
 		}else if(status == 'ESCALATED'){
 			updatedAction = 'Escalated';
 		}else if(status == 'RESOLVED'){
 			updatedAction = 'Resolved';
 		}else{
-			var message = selPostIds.length +' records updated successfully';
+			var message = totalPosts.length +' records updated successfully';
 			$("#overlay-toast").html(message);
-			
+			showToast();
 			return;
 		}
 		
@@ -19611,11 +19379,10 @@ $(document).on('click','.seg-unchecked',function(e){
 	$('#stream-segment-count').html(count+regionIds.length+branchIds.length);
 	
 	var status = $('#stream-tabs').data('status');
-	var flag = $('#stream-tabs').data('flagged');
 	var startIndex = $('#stream-pagination').data('startIndex');
 	var text = $('#search-post').val();
 	
-	getStreamPosts(0, status, flag,text);
+	getStreamPosts(0, status, text);
 	
 });
 
@@ -19656,11 +19423,10 @@ $(document).on('click','.seg-checked',function(e){
 	$('#stream-segment-count').html(count+regionIds.length+branchIds.length);
 	
 	var status = $('#stream-tabs').data('status');
-	var flag = $('#stream-tabs').data('flagged');
 	var startIndex = $('#stream-pagination').data('startIndex');
 	var text = $('#search-post').val();
 	
-	getStreamPosts(0, status, flag,text);
+	getStreamPosts(0, status, text);
 });
 
 function getUsersByCompanyId(){
@@ -19784,11 +19550,10 @@ $(document).on('click','.usr-seg-unchecked',function(e){
 	$('#usr-list-data').data('userIds',userIdList);
 	
 	var status = $('#stream-tabs').data('status');
-	var flag = $('#stream-tabs').data('flagged');
 	var startIndex = $('#stream-pagination').data('startIndex');
 	var text = $('#search-post').val();
 	
-	getStreamPosts(0, status, flag,text);
+	getStreamPosts(0, status, text);
 });
 
 $(document).on('click','.usr-seg-checked',function(e){
@@ -19819,11 +19584,10 @@ $(document).on('click','.usr-seg-checked',function(e){
 	$('#usr-list-data').data('userIds',userIdList);
 	
 	var status = $('#stream-tabs').data('status');
-	var flag = $('#stream-tabs').data('flagged');
 	var startIndex = $('#stream-pagination').data('startIndex');
 	var text = $('#search-post').val();
 	
-	getStreamPosts(0, status, flag,text);
+	getStreamPosts(0, status, text);
 });
 
 $(document).on('click','.usr-unchecked',function(e){
@@ -19846,11 +19610,10 @@ $(document).on('click','.usr-unchecked',function(e){
 	$('#usr-list-data').data('userIds',userIdList);
 	
 	var status = $('#stream-tabs').data('status');
-	var flag = $('#stream-tabs').data('flagged');
 	var startIndex = $('#stream-pagination').data('startIndex');
 	var text = $('#search-post').val();
 	
-	getStreamPosts(0, status, flag,text);
+	getStreamPosts(0, status, text);
 });
 
 $(document).on('click','.usr-checked',function(e){
@@ -19872,11 +19635,10 @@ $(document).on('click','.usr-checked',function(e){
 	$('#usr-list-data').data('userIds',userIdList);
 	 
 	var status = $('#stream-tabs').data('status');
-	var flag = $('#stream-tabs').data('flagged');
 	var startIndex = $('#stream-pagination').data('startIndex');
 	var text = $('#search-post').val();
 	
-	getStreamPosts(0, status, flag,text);
+	getStreamPosts(0, status, text);
 	
 });
 
@@ -19925,11 +19687,10 @@ $(document).on('click','.feed-unchecked',function(e){
 	$('#stream-feed-count').html(feedsList.length);
 	
 	var status = $('#stream-tabs').data('status');
-	var flag = $('#stream-tabs').data('flagged');
 	var startIndex = $('#stream-pagination').data('startIndex');
 	var text = $('#search-post').val();
 	
-	getStreamPosts(0, status, flag,text);
+	getStreamPosts(0, status, text);
 });
 
 $(document).on('click','.feed-checked',function(e){
@@ -19951,30 +19712,10 @@ $(document).on('click','.feed-checked',function(e){
 	$('#stream-feed-count').html(feedsList.length);
 	
 	var status = $('#stream-tabs').data('status');
-	var flag = $('#stream-tabs').data('flagged');
 	var startIndex = $('#stream-pagination').data('startIndex');
 	var text = $('#search-post').val();
 	
-	getStreamPosts(0, status, flag,text);
-});
-
-$(document).on('click','.post-dup',function(e){
-	e.stopImmediatePropagation();
-	e.preventDefault();
-	
-	$('#duplicate-post-popup').removeClass('hide');
-	showDashOverlay('#dup-dash');
-	
-	var postText = $(this).parent().parent().find('.stream-post-details-text').html();
-	var postPic = $(this).parent().parent().find('.stream-post-details-pic').attr('src');
-	var postId = $(this).parent().parent().find('.post-id-details').attr('data-post-id');
-	
-	var postDetails = {
-		"postText" : postText,
-		"postPic" : postPic,
-		"postId" : postId
-	};
-	drawDuplicatePopupDetails(postDetails);
+	getStreamPosts(0, status, text);
 });
 
 $(document).on('click','#dismiss-duplicate-post-popup',function(e){
@@ -20006,40 +19747,17 @@ function drawDuplicatePopup(){
 	});
 }
 
-function drawDuplicatePopupDetails(postDetails){
-	
-	$('#dup-post-text').html(postDetails.postText);
-	$('#dup-post-img').attr('src',postDetails.postPic);
-	
-	var postId = postDetails.postId;
-	
-	var status = $('#add-post-action-'+postId).find('.form-status').val();
-	var flagged = $('#add-post-action-'+postId).find('.form-flagged').val();
-	
-	$('#dup-post-add-post-action').find('.form-is-dup').val(true);
-	$('#macro-form-is-dup').val(true);
-	$('#dup-post-add-post-action').find('.form-post-id').val(postId);
-	$('#dup-post-add-post-action').find('.form-status').val(status);
-	$('#dup-post-add-post-action').find('.form-flagged').val(flagged);
-	
-	checkDupActionBtns(status,flagged,postId);
-	
-	hideDashOverlay('#dup-dash');
-}
-
-function checkDupActionBtns(status,flagged,postId){
+function checkDupActionBtns(status,postId){
 	if(status=='NEW'){
-		if(flagged == true || flagged == 'true'){
-			$('.dup-stream-action-unflag').removeClass('hide');
-			$('.dup-stream-action-flag').addClass('hide');
-			$('.dup-stream-action-esc').removeClass('hide');
-			$('.dup-stream-action-res').addClass('hide');
-		}else{
 			$('.dup-stream-action-unflag').addClass('hide');
 			$('.dup-stream-action-flag').removeClass('hide');
 			$('.dup-stream-action-esc').removeClass('hide');
 			$('.dup-stream-action-res').addClass('hide');
-		}
+	}else if(status == 'ALERT'){
+		$('.dup-stream-action-unflag').removeClass('hide');
+		$('.dup-stream-action-flag').addClass('hide');
+		$('.dup-stream-action-esc').removeClass('hide');
+		$('.dup-stream-action-res').addClass('hide');
 	}else if(status == 'ESCALATED'){
 		$('.dup-stream-action-unflag').addClass('hide');
 		$('.dup-stream-action-flag').addClass('hide');
@@ -20063,31 +19781,15 @@ $(document).on('click','.dup-stream-action-unflag',function(e){
 	var disableEle = '.dup-stream-action-unflag';
 	var textActionType = $('#dup-post-action-form-cont').find('.form-text-act-type').val();
 	
-	$(this).closest('.action-form-cont').find('.form-flagged').val(false);
 	$(this).closest('.action-form-cont').find('.form-status').val('NEW');
 	
 	var url = './updatepostaction.do';
-	callAjaxFormSubmit(url, function(data) {
-		var map = $.parseJSON(data);
-		$("#overlay-toast").html(map.message);
-		showToast();
-		if (map.status == "success") {
-					
-			var text = $('#dup-post-action-form-cont').find('.form-post-textbox').val();
-			
-			updatePostSuccess(postId,text,'NEW',false,textActionType,map);
-			
-			$('#dup-post-action-form-cont').find('.form-post-textbox').val('');
-			
-			checkDupActionBtns('NEW',false,postId);
-						
-			$("#overlay-toast").html("Successfully Updated Post");
-			showToast();
-		} else {
-			$("#overlay-toast").html("Failed to update post. Please Try again");
-			showToast();
-		}
-	}, formId,disableEle);
+	callFormAjaxPostForSocMonBtn(url,formId,postId);
+	
+	$('#duplicate-post-popup').addClass('hide');
+	
+	$('#dup-post-add-post-action').find('.form-is-dup').val(false);
+	$('#macro-form-is-dup').val(false);
 });
 
 $(document).on('click','.dup-stream-action-flag',function(e){
@@ -20097,30 +19799,15 @@ $(document).on('click','.dup-stream-action-flag',function(e){
 	var disableEle = '.dup-stream-action-flag';
 	var textActionType = $('#dup-post-action-form-cont').find('.form-text-act-type').val();
 	
-	$(this).closest('.action-form-cont').find('.form-flagged').val(true);
-	$(this).closest('.action-form-cont').find('.form-status').val('NEW');
+	$(this).closest('.action-form-cont').find('.form-status').val('ALERT');
 	
 	var url = './updatepostaction.do';
-	callAjaxFormSubmit(url, function(data) {
-		var map = $.parseJSON(data);
-		$("#overlay-toast").html(map.message);
-		showToast();
-		if (map.status == "success") {
-
-			var text = $('#dup-post-action-form-cont').find('.form-post-textbox').val();			
-			
-			updatePostSuccess(postId,text,'NEW',true,textActionType,map);
-			
-			checkDupActionBtns('NEW',true,postId);
-						
-			$('#dup-post-action-form-cont').find('.form-post-textbox').val('');
-			$("#overlay-toast").html("Successfully Updated Post");
-			showToast();
-		} else {
-			$("#overlay-toast").html("Failed to update post. Please Try again");
-			showToast();
-		}
-	}, formId,disableEle);
+	callFormAjaxPostForSocMonBtn(url,formId,postId);
+	
+	$('#duplicate-post-popup').addClass('hide');
+	
+	$('#dup-post-add-post-action').find('.form-is-dup').val(false);
+	$('#macro-form-is-dup').val(false);
 });
 
 
@@ -20139,29 +19826,15 @@ $(document).on('click','.dup-stream-action-esc',function(e){
 		return;
 	}
 	
-	$(this).closest('.action-form-cont').find('.form-flagged').val(true);
 	$(this).closest('.action-form-cont').find('.form-status').val('ESCALATED');
 	
 	var url = './updatepostaction.do';
-	callAjaxFormSubmit(url, function(data) {
-		var map = $.parseJSON(data);
-		$("#overlay-toast").html(map.message);
-		showToast();
-		if (map.status == "success") {
-			
-			updatePostSuccess(postId,text,'ESCALATED',false,textActionType,map)
-			
-			checkDupActionBtns('ESCALATED',false,postId);
+	callFormAjaxPostForSocMonBtn(url,formId,postId);
+
+	$('#duplicate-post-popup').addClass('hide');
 	
-			$('#dup-post-action-form-cont').find('.form-post-textbox').val('');
-			$("#overlay-toast").html("Successfully Updated Post");
-			showToast();
-			
-		} else {
-			$("#overlay-toast").html("Failed to update post. Please Try again");
-			showToast();
-		}
-	}, formId,disableEle);
+	$('#dup-post-add-post-action').find('.form-is-dup').val(false);
+	$('#macro-form-is-dup').val(false);
 });
 
 $(document).on('click','.dup-stream-action-res',function(e){
@@ -20179,29 +19852,15 @@ $(document).on('click','.dup-stream-action-res',function(e){
 		return;
 	}
 	
-	$(this).closest('.action-form-cont').find('.form-flagged').val(false);
 	$(this).closest('.action-form-cont').find('.form-status').val('RESOLVED');
 	
 	var url = './updatepostaction.do';
-	callAjaxFormSubmit(url, function(data) {
-		var map = $.parseJSON(data);
-		$("#overlay-toast").html(map.message);
-		showToast();
-		if (map.status == "success") {
+	callFormAjaxPostForSocMonBtn(url,formId,postId);
+
+	$('#duplicate-post-popup').addClass('hide');
 	
-			updatePostSuccess(postId,text,'RESOLVED',false,textActionType,map)
-			
-			checkDupActionBtns('RESOLVED',false,postId);
-	
-			$('#dup-post-action-form-cont').find('.form-post-textbox').val('');
-			$("#overlay-toast").html("Successfully Updated Post");
-			showToast();
-			
-		} else {
-			$("#overlay-toast").html("Failed to update post. Please Try again");
-			showToast();
-		}
-	}, formId,disableEle);
+	$('#dup-post-add-post-action').find('.form-is-dup').val(false);
+	$('#macro-form-is-dup').val(false);
 });
 
 $(document).on('click','.dup-stream-action-submit',function(e){
@@ -20218,53 +19877,15 @@ $(document).on('click','.dup-stream-action-submit',function(e){
 		return;
 	}
 	
-	$(this).closest('.action-form-cont').find('.form-flagged').val(false);
 	$(this).closest('.action-form-cont').find('.form-status').val('SUBMIT');
 	
 	var url = './updatepostaction.do';
-	callAjaxFormSubmit(url, function(data) {
-		var map = $.parseJSON(data);
-		$("#overlay-toast").html(map.message);
-		showToast();
-		if (map.status == "success") {
-			
-			if(text!='' && text != undefined && text!=null){
-				var actionHistoryMail = $('#action-history'+postId).html();
-				
-				$('#action-history'+postId).prepend(streamActionContainer);
-				var j = $('#action-history'+postId).attr('data-count');
-				$('#act-cont').attr('id','act-cont'+postId+'-'+j);
-				
-				if($('#stream-post-cont-'+postId).hasClass('stream-container-gray')){
-					$('#act-cont'+postId+'-'+j).addClass('stream-action-container-white');
-				}
-				
-				if($('#dup-post-action-form-cont').find('.form-text-act-type').val() == 'SEND_EMAIL'){
-					$('#act-cont'+postId+'-'+j).find('.action-mail-icn').removeClass('hide');
-					$('#act-cont'+postId+'-'+j).addClass('stream-action-mail');	
-				}
-				$('#act-cont'+postId+'-'+j).find('.act-details-text').html(text);
-				
-				lastUpdatedAction = (new Date()).getTime();
-				lastUpdatedDateAction = new Date(lastUpdatedAction);
-				lastUpdatedDateActionStr = monthName[lastUpdatedDateAction.getMonth()]+' '+(lastUpdatedDateAction.getDate()%10!=lastUpdatedDateAction.getDate()?lastUpdatedDateAction.getDate():('0'+lastUpdatedDateAction.getDate()))+', '+lastUpdatedDateAction.getFullYear()
-				+' at '+(lastUpdatedDateAction.getHours()%10!=lastUpdatedDateAction.getHours()?lastUpdatedDateAction.getHours():('0'+lastUpdatedDateAction.getHours()))+':'
-				+(lastUpdatedDateAction.getMinutes()%10!=lastUpdatedDateAction.getMinutes()?lastUpdatedDateAction.getMinutes():('0'+lastUpdatedDateAction.getMinutes()))+':'
-				+(lastUpdatedDateAction.getSeconds()%10!=lastUpdatedDateAction.getSeconds()?lastUpdatedDateAction.getSeconds():('0'+lastUpdatedDateAction.getSeconds()));
-				
-				$('#act-cont'+postId+'-'+j).find('.act-details-date').html(lastUpdatedDateActionStr);
-				$('#act-cont'+postId+'-'+j).fadeIn('slow');
-				//$('#action-history'+postId).append(actionHistoryMail);
-			}
-			
-			$('#action-form-cont'+postId).find('.form-post-textbox').val('');
-			$("#overlay-toast").html("Successfully Updated Post");
-			showToast();
-		} else {
-			$("#overlay-toast").html("Failed to update post. Please Try again");
-			showToast();
-		}
-	}, formId,disableEle);
+	callFormAjaxPostForSocMonBtn(url,formId,postId);
+
+	$('#duplicate-post-popup').addClass('hide');
+	
+	$('#dup-post-add-post-action').find('.form-is-dup').val(false);
+	$('#macro-form-is-dup').val(false);
 });
 
 function drawDupMacroListDropdown(postId){
@@ -20275,7 +19896,6 @@ function drawDupMacroListDropdown(postId){
 		var macroName=macroList[m].macroName;
 		var active = macroList[m].active;
 		var actions=macroList[m].actions;
-		var flagged = actions.flagged;
 		var status = actions.socialFeedStatus;
 		var textActionType = actions.textActionType;
 		var text = actions.text;
@@ -20283,53 +19903,38 @@ function drawDupMacroListDropdown(postId){
 			text='';
 		}
 		
-		if(flagged == 'true' || flagged == true){
-			flagged= true;
-		}else{
-			flagged=false;
-		}
-		
-		var postFlagged = $('#dup-post-add-post-action').find('.form-flagged').val();
 		var postStatus = $('#dup-post-add-post-action').find('.form-status').val();
 		
-		if(postFlagged == 'true' || postFlagged == true){
-			postFlagged= true;
-		}else{
-			postFlagged=false;
-		}
-		
 		var inputDiv = '<input type="hidden" id="dup-macro-'+postId+'-'+macroId+'" class="macro-list-data" data-post-id="'+postId+'" data-macro-id="'+macroId
-		+'" data-macro-name="'+macroName+'" data-flagged='+flagged+' data-status="'+status+'" data-text-action-type="'+textActionType+'" data-text="'+text+'">';
+		+'" data-macro-name="'+macroName+'" data-status="'+status+'" data-text-action-type="'+textActionType+'" data-text="'+text+'">';
 		var macroDiv = '<div id="dup-macro-option-'+macroId+'" data-macro-id="'+macroId+'" class="dup-macro-opt">'+inputDiv+macroName+'</div>';
 		var macroDivDisabled = '<div id="dup-macro-option-'+macroId+'" data-macro-id="'+macroId+'" class="macro-disabled">'+inputDiv+macroName+'</div>';
 		
 		var disableMacro = false;
 		if(active == true || active == 'true'){
 			if((postStatus == 'RESOLVED')){
-				if(status != 'NEW' && status != 'RESOLVED'){	
+				if(status != 'NEW' && status != 'ALERT' && status != 'RESOLVED'){	
 					$('#dup-post-action-form-container').find('.macro-options-list').append(macroDiv);
 				}else{
 					disableMacro = true;
 				}
 			}else if(postStatus == 'ESCALATED'){
-				if(status != 'NEW' && status != 'ESCALATED'){	
+				if(status != 'NEW' && status != 'ALERT' && status != 'ESCALATED'){	
 					$('#dup-post-action-form-container').find('.macro-options-list').append(macroDiv);
 				}else{
 					disableMacro = true;
 				}
 			}else if(postStatus == 'NEW'){
-				if(postFlagged == true || flagged =='true'){
-					if(!(status == 'NEW' && (flagged =='true' || flagged == true)) && status != "RESOLVED"){
-						$('#dup-post-action-form-container').find('.macro-options-list').append(macroDiv);
-					}else{
-						disableMacro = true;
-					}
+				if(status != 'ALERT' && status != "RESOLVED"){
+					$('#dup-post-action-form-container').find('.macro-options-list').append(macroDiv);
 				}else{
-					if(!(status == 'NEW' && (flagged =='false' || flagged == false)) && status != "RESOLVED"){
-						$('#dup-post-action-form-container').find('.macro-options-list').append(macroDiv);
-					}else{
 						disableMacro = true;
-					}
+				}
+			}else if(postStatus == 'ALERT'){
+				if(status != 'ALERT' && status != "RESOLVED"){
+					$('#dup-post-action-form-container').find('.macro-options-list').append(macroDiv);
+				}else{
+					disableMacro = true;
 				}
 			}
 		}
@@ -20347,7 +19952,6 @@ $(document).on('click','.dup-macro-opt',function(e){
 	var postId =  $(this).find('.macro-list-data').attr('data-post-id');
 	var macroId = $(this).find('.macro-list-data').attr('data-macro-id');
 	var macroName =$(this).find('.macro-list-data').attr('data-macro-name');
-	var flagged = $(this).find('.macro-list-data').attr('data-flagged');
 	var status = $(this).find('.macro-list-data').attr('data-status');
 	var textActionType = $(this).find('.macro-list-data').attr('data-text-action-type');
 	var text = $(this).find('.macro-list-data').attr('data-text');
@@ -20357,39 +19961,22 @@ $(document).on('click','.dup-macro-opt',function(e){
 	}
 	
 	$('#macro-form-post-id').val(postId);
-	$('#macro-form-flagged').val(flagged);
 	$('#macro-form-status').val(status);
 	$('#macro-form-text-act-type').val(textActionType);
 	$('#macro-form-macro-id').val(macroId);
 	$('#macro-form-text').val(text);
 	
-	$('#add-post-action-'+postId).find('.form-flagged').val(flagged);
 	$('#add-post-action-'+postId).find('.form-status').val(status);
 	
-	$('#dup-post-action-form-cont').find('.form-flagged').val(flagged);
 	$('#dup-post-action-form-cont').find('.form-status').val(status);
 	
 	var url = './updatepostactionwithmacro.do';
-	callAjaxFormSubmit(url,function(data){
-		
-		var map = $.parseJSON(data);
-		$("#overlay-toast").html(map.message);
-		showToast();
-		if (map.status == "success") {
-					
-			updatePostSuccess(postId,text,status,flagged,textActionType,map);
-								
-			checkDupActionBtns(status,flagged,postId);
-			
-			$('#action-form-cont'+postId).find('.form-post-textbox').val('');
-			$("#overlay-toast").html("Successfully Updated Post");
-			showToast();
-		} else {
-			$("#overlay-toast").html("Failed to update post. Please Try again");
-			showToast();
-		}
-		
-	},'macro-form-apply');
+	callFormAjaxPostForSocMonBtn(url,'macro-form-apply',postId);
+	
+	$('#duplicate-post-popup').addClass('hide');
+	
+	$('#dup-post-add-post-action').find('.form-is-dup').val(false);
+	$('#macro-form-is-dup').val(false);
 	
 	if($(this).closest('.stream-macro-dropdown').find('.mac-chevron-down').hasClass('hide')){
 		$(this).closest('.stream-macro-dropdown').find('.mac-chevron-down').removeClass('hide');
@@ -20422,40 +20009,36 @@ $(document).on('click','#soc-mon-stream-search-clr',function(e){
 	$(this).hide();
 	
 	var status = $('#stream-tabs').data('status');
-	var flag = $('#stream-tabs').data('flagged');
 	var startIndex = $('#stream-pagination').data('startIndex');
 	
-	getStreamPosts(0, status, flag);
+	getStreamPosts(0, status);
 });
 
 $(document).on('click','#soc-mon-stream-search-icn',function(e){
 	
 	var status = $('#stream-tabs').data('status');
-	var flag = $('#stream-tabs').data('flagged');
 	var startIndex = $('#stream-pagination').data('startIndex');
 	var text = $('#search-post').val();
 	
-	getStreamPosts(0, status, flag, text);
+	getStreamPosts(0, status, text);
 });
 
 $(document).on('keyup','#search-post', function(e){
 	if(e.keyCode == 13){
 		var status = $('#stream-tabs').data('status');
-		var flag = $('#stream-tabs').data('flagged');
 		var startIndex = $('#stream-pagination').data('startIndex');
 		var text = $('#search-post').val();
 		
-		getStreamPosts(0, status, flag, text);
+		getStreamPosts(0, status, text);
 	}else if(e.keyCode == 27){
 		
 		$('#search-post').val('');
 		$('#soc-mon-stream-search-clr').hide();
 		
 		var status = $('#stream-tabs').data('status');
-		var flag = $('#stream-tabs').data('flagged');
 		var startIndex = $('#stream-pagination').data('startIndex');
 		
-		getStreamPosts(0, status, flag);
+		getStreamPosts(0, status);
 	}
 });
 
@@ -21143,6 +20726,7 @@ function addTrustedSource(trustedSource,element){
 			}
 			showToast();
 		},
+		complete:refreshPostsForTrustedSource,
 		error : function(e) {
 			if(e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
@@ -21191,7 +20775,9 @@ function removeTrustedSource(trustedSource,element){
 				element.parent().find('.trusted-source').addClass('hide');
 			}
 			showToast();
+
 		},
+		complete:refreshPostsForTrustedSource,
 		error : function(e) {
 			if(e.status == 504) {
 				redirectToLoginPageOnSessionTimeOut(e.status);
@@ -21202,6 +20788,12 @@ function removeTrustedSource(trustedSource,element){
 		}
 	});
 	
+}
+
+function refreshPostsForTrustedSource(){
+	var status = $('#stream-tabs').data('status');
+	var startIndex = $('#stream-pagination').data('startIndex');
+	getStreamPosts(startIndex,status);
 }
 
 $(document).on('click','#summit-do-not-show',function(e){
@@ -21252,4 +20844,149 @@ function setActiveSessionForPopup(){
 			}
 		}
 	});
+}
+
+function getDuplicatePosts(postId){
+	
+	var payload = {
+			"postId" : postId
+	}
+	
+	$.ajax({
+		url : "/getduplicatesbypostid.do",
+		type : "GET",
+		cache : false,
+		dataType : "json",
+		data: payload,
+		success : function(response) {
+			var duplicatePosts = response;
+			drawDuplicatePopupDetails(duplicatePosts,postId);
+		},
+		complete:function(){
+			hideDashOverlay('#dup-dash');
+		},
+		error : function(e){
+			if (e.status == 504) {
+				redirectToLoginPageOnSessionTimeOut(e.status);
+				return;
+			}
+		}
+	});
+} 
+
+$(document).on('click','.post-dup',function(e){
+	e.stopImmediatePropagation();
+	e.preventDefault();
+	
+	$('#duplicate-post-popup').removeClass('hide');
+	showDashOverlay('#dup-dash');
+	
+	var postId = $(this).parent().parent().parent().find('.post-id-details').attr('data-post-id');
+	
+	getDuplicatePosts(postId);
+});
+
+function drawDuplicatePopupDetails(postDetails,mainPostId){
+	console.log(postDetails);
+	
+	$('#dup-post-details-cont').html('');
+	
+	for(var i=0;i<postDetails.socialMonitorFeedData.length;i++){
+		var post = postDetails.socialMonitorFeedData[i];
+		
+		var postId = post.postId;
+		var text = post.textHighlighted;
+		var pictures = post.pictures;
+		var status = post.status;
+		var ownerProfileImage = post.ownerProfileImage;
+		var ownerName = post.ownerName;
+		var type = post.type;
+		
+		var lastUpdated = parseInt(post.updatedOn);
+		var lastUpdatedDate = new Date(lastUpdated);
+		
+		var monthName=new Array("January","February","March","April","May","June","July","August","September","October","November","December");
+		var lastUpdatedDateStr = monthName[lastUpdatedDate.getMonth()]+' '+(lastUpdatedDate.getDate()%10!=lastUpdatedDate.getDate()?lastUpdatedDate.getDate():('0'+lastUpdatedDate.getDate()))+', '+lastUpdatedDate.getFullYear()
+								+' at '+(lastUpdatedDate.getHours()%10!=lastUpdatedDate.getHours()?lastUpdatedDate.getHours():('0'+lastUpdatedDate.getHours()))+':'
+								+(lastUpdatedDate.getMinutes()%10!=lastUpdatedDate.getMinutes()?lastUpdatedDate.getMinutes():('0'+lastUpdatedDate.getMinutes()))+':'
+								+(lastUpdatedDate.getSeconds()%10!=lastUpdatedDate.getSeconds()?lastUpdatedDate.getSeconds():('0'+lastUpdatedDate.getSeconds()));
+		
+		
+		$('#dup-post-details-cont').append(dupContainer);
+		
+		$('#stream-dup-cont').attr('id','stream-dup-cont-'+postId);
+		
+		if(i%2 != 0){
+			$('#stream-dup-cont-'+postId).addClass('stream-container-gray');
+		}
+		
+		$('#stream-dup-cont-'+postId).find('.post-id-details').data('post-id',postId);
+		
+		if(status == 'NEW'){
+			$('#stream-dup-cont-'+postId).find('.dup-stream-unflagged-icn').removeClass('hide');
+		}else if(status == 'ALERT'){
+			$('#stream-dup-cont-'+postId).find('.dup-stream-flagged-icn').removeClass('hide');
+		}else if(status == 'ESCALATED'){
+			$('#stream-dup-cont-'+postId).find('.dup-stream-esc-icn').removeClass('hide');
+		}else if(status == 'RESOLVED'){
+			$('#stream-dup-cont-'+postId).find('.dup-stream-res-icn').removeClass('hide');
+		}
+		
+		$('#stream-dup-cont-'+postId).find('.stream-res-icn').attr('src',ownerProfileImage);
+		
+		if(type == 'FACEBOOK'){
+			$('#stream-dup-cont-'+postId).find('.stream-res-feed-icn').attr('src','resources/images/ss-icon-small-facebook.png');
+		}else if(type == 'LINKEDIN'){
+			$('#stream-dup-cont-'+postId).find('.stream-res-feed-icn').attr('src','resources/images/ss-icon-small-linkedin.png');
+		}else if(type == 'TWITTER'){
+			$('#stream-dup-cont-'+postId).find('.stream-res-feed-icn').attr('src','resources/images/ss-icon-small-twitter.png');
+		}else if(type == 'INSTAGRAM'){
+			$('#stream-dup-cont-'+postId).find('.stream-res-feed-icn').attr('src','resources/images/social_instagram.png');
+			$('#stream-dup-cont-'+postId).find('.stream-res-feed-icn').addClass('stream-feed-insta');
+		}
+		
+		$('#stream-dup-cont-'+postId).find('.stream-user-name').html(ownerName);
+		$('#stream-dup-cont-'+postId).find('.stream-feed-type').html(type);
+		$('#stream-dup-cont-'+postId).find('.stream-post-date').html(lastUpdatedDateStr);
+		
+		var postSource = post.postSource;
+		var fromTrustedSource = post.fromTrustedSource;
+		
+		if(postSource != "" && postSource != null && postSource != undefined){
+			$('#stream-dup-cont-'+postId).find('.ts-container').removeClass('hide');
+			$('#stream-dup-cont-'+postId).find('.ts-source').html(postSource);
+			$('#stream-dup-cont-'+postId).find('.ts-source').attr('data-trusted',fromTrustedSource);
+			$('#stream-dup-cont-'+postId).find('.ts-source').attr('data-source',postSource);
+			
+			if(fromTrustedSource == true || fromTrustedSource == 'true'){
+				$('#stream-dup-cont-'+postId).find('.ts-act-icon').removeClass('ts-add');
+				$('#stream-dup-cont-'+postId).find('.ts-act-icon').addClass('ts-remove');
+				$('#stream-dup-cont-'+postId).find('.trusted-source').removeClass('hide');
+			}
+		}
+		
+		$('#stream-dup-cont-'+postId).find('.stream-post-details-text').html(text);
+		
+		if(pictures != null && pictures != undefined){
+			for(var picI=0; picI<pictures.length; picI++){
+				
+				if(pictures[picI] != null && pictures[picI] != undefined && pictures[picI] != ''){
+					var picContainer = '<div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 float-right stream-post-pic-div" >'
+			   			+'<img src="'+pictures[picI]+'" class="stream-post-details-pic float-left stream-post-pic"></div>';
+		
+					$('#stream-dup-cont-'+postId).append(picContainer);
+				}
+			}	
+		}
+		
+	}
+	
+	var status = $('#add-post-action-'+mainPostId).find('.form-status').val();
+	
+	$('#dup-post-add-post-action').find('.form-is-dup').val(true);
+	$('#macro-form-is-dup').val(true);
+	$('#dup-post-add-post-action').find('.form-post-id').val(mainPostId);
+	$('#dup-post-add-post-action').find('.form-status').val(status);
+	
+	checkDupActionBtns(status,postId);
 }

@@ -100,6 +100,7 @@ import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.MailIdSettings;
+import com.realtech.socialsurvey.core.entities.MonitorType;
 import com.realtech.socialsurvey.core.entities.MultiplePhrasesVO;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
@@ -346,6 +347,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     
     @Value ( "${TOKEN_REFRESH_INTERVAL}")
     private int tokenRefreshInterval;
+    
+
+    @Value ( "${SOCIAL_MONITOR_DEFAULT_KEYWORDS}")
+    private String socialMonitorDefaultKeywords;
 
     @Autowired
     private ProfileCompletionList profileCompletionList;
@@ -6056,64 +6061,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
 
-    /* (non-Javadoc)
-     * @see com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService#fetchSocialMediaTokensResponse(int, int)
-     */
-    @Transactional
-    @Override
-    public List<SocialMediaTokenResponse> fetchSocialMediaTokensResponse( int skipCount, int batchSize )
-        throws InvalidInputException
-    {
-
-        LOG.info( "Inside method fetchSocialMediaTokensResponse" );
-        List<SocialMediaTokenResponse> socialMediaTokenResponseList = new ArrayList<>();
-
-        // fetch companies media token
-        List<SocialMediaTokenResponse> companiesMediaTokens = organizationUnitSettingsDao
-            .getSocialMediaTokensByCollection( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, 0, 0 );
-        for ( SocialMediaTokenResponse feedIngestionEntity : companiesMediaTokens ) {
-
-            if ( feedIngestionEntity.getSocialMediaTokens() != null ) {
-                socialMediaTokenResponseList.add(
-                    setSocialMediaTokenResponse( feedIngestionEntity, feedIngestionEntity.getIden(), ProfileType.COMPANY ) );
-            }
-
-
-            List<Long> regionIds = regionDao.getRegionIdsUnderCompany( feedIngestionEntity.getIden(), skipCount, batchSize );
-
-            List<SocialMediaTokenResponse> regionMediaTokens = organizationUnitSettingsDao
-                .fetchSocialMediaTokensForIds( regionIds, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
-
-            for ( SocialMediaTokenResponse regionFeedIngestionEntity : regionMediaTokens ) {
-                socialMediaTokenResponseList.add( setSocialMediaTokenResponse( regionFeedIngestionEntity,
-                    feedIngestionEntity.getIden(), ProfileType.REGION ) );
-            }
-
-            List<Long> branchIds = branchDao.getBranchIdsUnderCompany( feedIngestionEntity.getIden(), skipCount, batchSize );
-
-            List<SocialMediaTokenResponse> branchMediaTokens = organizationUnitSettingsDao
-                .fetchSocialMediaTokensForIds( branchIds, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
-
-            for ( SocialMediaTokenResponse branchFeedIngestionEntity : branchMediaTokens ) {
-                socialMediaTokenResponseList.add( setSocialMediaTokenResponse( branchFeedIngestionEntity,
-                    feedIngestionEntity.getIden(), ProfileType.BRANCH ) );
-            }
-
-            List<Long> userIds = getAgentIdsUnderCompany( feedIngestionEntity.getIden(), skipCount, batchSize );
-
-            List<SocialMediaTokenResponse> usersMediaTokens = organizationUnitSettingsDao.fetchSocialMediaTokensForIds( userIds,
-                MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
-
-            for ( SocialMediaTokenResponse userFeedIngestionEntity : usersMediaTokens ) {
-                socialMediaTokenResponseList.add(
-                    setSocialMediaTokenResponse( userFeedIngestionEntity, feedIngestionEntity.getIden(), ProfileType.AGENT ) );
-            }
-        }
-        LOG.info( "End of method fetchSocialMediaTokensResponse" );
-        return socialMediaTokenResponseList;
-    }
-
-
     @Override
     @Transactional
     public SocialMediaTokensPaginated fetchSocialMediaTokensPaginated( int skipCount, int batchSize )
@@ -9992,6 +9939,74 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         
         return filterKeywordsAdded;
     }
+    
+    @Override
+    public boolean enableSocialMonitorToggle( long companyId, boolean socialMonitorFlag )
+        throws InvalidInputException, NoRecordsFetchedException
+    {
+        LOG.debug( "method enableSocialMonitorToggle() started for companyId : {}", companyId);
+
+        if ( companyId <= 0 ) {
+            LOG.warn( "companyId is invalid: {}", companyId);
+            throw new InvalidInputException( "companyId is invalid" );
+        }
+
+        OrganizationUnitSettings unitSettings = getCompanySettings( companyId );
+
+        if ( unitSettings == null ) {
+            LOG.warn( "OrganizationSettings are not fournd for company id {}", companyId );
+            throw new InvalidInputException( "OrganizationSettings are not fournd for company id " +companyId );
+        }
+
+        // Set default keywords in Company setting
+        if ( socialMonitorFlag && ( unitSettings.getFilterKeywords() == null || unitSettings.getFilterKeywords().isEmpty() ) ) {
+            List<Keyword> defaultFilterKeywords = createDefaultKeywordList();
+            organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+                MongoOrganizationUnitSettingDaoImpl.KEY_FILTER_KEYWORDS, defaultFilterKeywords, unitSettings,
+                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+            //update the redis with the keywords
+            redisDao.addKeywords( companyId, defaultFilterKeywords );
+        }
+
+        // update social monitor flag
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.SOCIAL_MONITOR_ENABLED, socialMonitorFlag, unitSettings,
+            CommonConstants.COMPANY_SETTINGS_COLLECTION );
+
+        //update companyIds which have enabled/disabled socialMonitor
+        redisDao.updateCompanyIdsForSM( companyId, socialMonitorFlag );
+
+        LOG.debug( "method enableSocialMonitorToggle() finished." );
+        return true;
+    }
+
+
+    /**
+     * Method to create default keyword list from property file comma separated list.
+     * @return : returns Keyword objects
+     */
+    private List<Keyword> createDefaultKeywordList()
+    {
+        LOG.debug( "Adding default keywords in company settings" );
+        List<Keyword> defaultKeywords = new ArrayList<>();
+        if ( StringUtils.isNotBlank( socialMonitorDefaultKeywords ) ) {
+            long createdtime = new Date().getTime();
+            String[] defaultPhrase = socialMonitorDefaultKeywords.split( "," );
+            for ( int i = 0; i < defaultPhrase.length; i++ ) {
+                if(StringUtils.isNotBlank( defaultPhrase[i] )){
+                    Keyword keywordNew = new Keyword();
+                    keywordNew.setCreatedOn( createdtime );
+                    keywordNew.setModifiedOn( createdtime );
+                    keywordNew.setPhrase( defaultPhrase[i].trim() );
+                    keywordNew.setId( UUID.randomUUID().toString() );
+                    keywordNew.setStatus( CommonConstants.STATUS_ACTIVE );
+                    keywordNew.setMonitorType( MonitorType.KEYWORD_MONITOR );
+                    defaultKeywords.add( keywordNew );
+                }
+            }
+        }
+        return defaultKeywords;
+    }
 
 
     @Override
@@ -10468,12 +10483,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     public List<SocialMonitorTrustedSource> removeTrustedSourceToCompany( long companyId , String trustedSource ) throws InvalidInputException
     {
         LOG.debug("Get company settings for the companyId: {}", companyId);
-        OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
-                companyId, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
-
+        
         if(StringUtils.isEmpty(trustedSource)) {
             throw new InvalidInputException("Invalid parameter passed. trustedSource can't be empty ");
         }
+        
+        OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
+                companyId, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+        
         if(companySettings == null) {
             throw new InvalidInputException("Invalid companyId passed. No company setting found for given companyId ");
         }
@@ -10481,7 +10498,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         //get existing  trusted sources for company
         List<SocialMonitorTrustedSource> companyTrustedSources = companySettings.getSocialMonitorTrustedSources();
         if (companyTrustedSources == null || companyTrustedSources.isEmpty())
-            companyTrustedSources = new ArrayList<SocialMonitorTrustedSource>();
+            companyTrustedSources = new ArrayList<>();
 
         boolean doesNotExist = true;
         //check if trusted source is already present
@@ -10490,7 +10507,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             SocialMonitorTrustedSource currentTrustedSource = currentTrustedSourceItr.next();
             if (currentTrustedSource.getSource().equalsIgnoreCase(trustedSource.trim())
                     && currentTrustedSource.getStatus() == CommonConstants.STATUS_ACTIVE) {
-                LOG.debug( "trusted source exists in the list" );
+                LOG.debug( "trusted source : {} exists in the list", trustedSource);
                 doesNotExist = false;
                 currentTrustedSourceItr.remove();
 
@@ -10502,13 +10519,16 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             throw new InvalidInputException("Trusted source doesn't exist for given companyId ");
         }
         
+        // Updating fromTrustedSource to false.
+        socialFeedService.updateForRemoveTrustedSource(companyId, trustedSource);
+        
         // save updated companyTrustedSources in mongo settings
         organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
                 MongoOrganizationUnitSettingDaoImpl.KEY_TRUSTED_SOURCES, companyTrustedSources, companySettings,
                 MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 
         //create trusted sources to save in redis
-        List<SocialMonitorTrustedSource> companyTrustedSourcesToAdd = new ArrayList<SocialMonitorTrustedSource>();
+        List<SocialMonitorTrustedSource> companyTrustedSourcesToAdd = new ArrayList<>();
         for (SocialMonitorTrustedSource socialMonitorTrustedSource : companyTrustedSources) {
             if (socialMonitorTrustedSource.getStatus() == CommonConstants.STATUS_ACTIVE) {
                 companyTrustedSourcesToAdd.add(socialMonitorTrustedSource);

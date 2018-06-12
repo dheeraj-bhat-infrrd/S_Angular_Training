@@ -134,7 +134,7 @@
 <input type="hidden" id="selected-post-ids" data-post-ids='[]'>
 <div class="dash-wrapper-main">
 	<div class="dash-container container">
-		<div id="stream-tabs" class="clearfix" data-flagged=false data-status="none">
+		<div id="stream-tabs" class="clearfix" data-status="NEW">
 			<div id="soc-mon-stream-tab" class="soc-mon-tab soc-mon-stream-active" data-disabled=true><img id="stream-inactive" src="${initParam.resourcesPath}/resources/images/stream-gray.png"  class="hide soc-mon-icns"><img id="stream-active" src="${initParam.resourcesPath}/resources/images/stream-blue.png" class="soc-mon-icns">Stream</div>
 			<div id="soc-mon-alerts-tab" class="soc-mon-tab" data-disabled=false><img id="alert-inactive" src="${initParam.resourcesPath}/resources/images/flag-gray.png" class="soc-mon-icns"><img id="alert-active" src="${initParam.resourcesPath}/resources/images/flag-yellow.png" class="hide soc-mon-icns">Alerts</div>
 			<div id="soc-mon-escalated-tab" class="soc-mon-tab" data-disabled=false><img id="esc-inactive" src="${initParam.resourcesPath}/resources/images/escalated-gray.png" class="soc-mon-icns"><img id="esc-active" src="${initParam.resourcesPath}/resources/images/escalated-orange.png" class="hide soc-mon-icns">Escalations</div>
@@ -147,7 +147,6 @@
 <form id="macro-form-apply">
 	<input type="hidden" id="macro-form-is-dup" class="macro-form-is-dup" name="macro-form-is-dup" value="false">
 	<input type="hidden" id="macro-form-post-id" class="macro-form-post-id" name="macro-form-post-id" value="">
-	<input type="hidden" id="macro-form-flagged" class="macro-form-flagged" name="macro-form-flagged" value="false">
 	<input type="hidden" id="macro-form-status" name="macro-form-status" class="macro-form-status" value="NEW">
 	<input type="hidden" id="macro-form-text-act-type" class="macro-form-text-act-type" name="macro-form-text-act-type" value="SEND_EMAIL">
 	<input type="hidden" id="macro-form-macro-id" class="macro-form-macro-id" name="macro-form-macro-id" value="">
@@ -157,7 +156,6 @@
 <form id="bulk-actions-apply">
 	<input type="hidden" id="form-is-dup" class="form-is-dup" name="form-is-dup" value="false">
 	<input type="hidden" id="form-post-id" class="form-post-id" name="form-post-id" value="">
-	<input type="hidden" id="form-flagged" class="form-flagged" name="form-flagged" value="false">
 	<input type="hidden" id="form-status" name="form-status" class="form-status" value="NEW">
 	<input type="hidden" id="form-text-act-type" class="form-text-act-type" name="form-text-act-type" value="SEND_EMAIL">
 	<input type="hidden" id="form-macro-id" class="form-macro-id" name="form-macro-id" value="">
@@ -211,12 +209,12 @@
 			<div class="container" style="width:100%">
 				<div class="hm-header-row clearfix">
 					<div id="stream-pagination-bottom" class="float-right soc-mon-pagination" data-startIndex=0 data-count=0>
-						<div class="soc-mon-pag-text-bottom"><span id="stream-item-count-bottom" class="soc-mon-bold-text">7</span> items</div>
+						<div class="soc-mon-pag-text-bottom"><span id="stream-item-count-bottom" class="soc-mon-bold-text">0</span> items</div>
 						<div id="stream-start-page-bottom" class="soc-mon-pag"><img src="${initParam.resourcesPath}/resources/images/chevron-double-left.png" class="soc-mon-pag-icn"></div>
 						<div id="stream-start-page-active-bottom" class="hide soc-mon-pag-active"><img src="${initParam.resourcesPath}/resources/images/chevron-double-left-blue.png" class="soc-mon-pag-icn"></div>
 						<div id="stream-prev-page-bottom" class="soc-mon-pag"><img src="${initParam.resourcesPath}/resources/images/chevron-left.png"  class="soc-mon-pag-icn"></div>
 						<div id="stream-prev-page-active-bottom" class="soc-mon-pag-active hide"><img src="${initParam.resourcesPath}/resources/images/chevron-left-blue.png" class="soc-mon-pag-icn"></div>
-						<div class="soc-mon-pag-text-bottom"><span id="stream-page-no-bottom" class="soc-mon-bold-text">1</span> of <span id="stream-page-count-bottom" class="soc-mon-bold-text">1</span></div>
+						<div class="soc-mon-pag-text-bottom"><span id="stream-page-no-bottom" class="soc-mon-bold-text">0</span> of <span id="stream-page-count-bottom" class="soc-mon-bold-text">0</span></div>
 						<div id="stream-next-page-bottom" class="soc-mon-pag"><img src="${initParam.resourcesPath}/resources/images/chevron-right.png" class="soc-mon-pag-icn"></div>
 						<div id="stream-next-page-active-bottom" class="soc-mon-pag-active hide"><img src="${initParam.resourcesPath}/resources/images/chevron-right-blue.png" class="soc-mon-pag-icn"></div>
 						<div id="stream-end-page-bottom" class="soc-mon-pag"><img src="${initParam.resourcesPath}/resources/images/chevron-double-right.png" class="soc-mon-pag-icn"></div>
@@ -232,7 +230,7 @@
 $(document).ready(function() {
 	$(document).attr("title", "Social Monitor");
 	getMacrosForStream();
-	getStreamPosts(0,'none',false);
+	getStreamPosts(0,'NEW');
 	getSegmentsByCompanyId();	
 });
 </script>

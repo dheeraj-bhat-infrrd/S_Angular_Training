@@ -1004,7 +1004,7 @@
 																					code="label.completedTransaction.key" />
 																				<c:choose>
 																					<c:when
-																						test="${ not empty reviewItem.surveyTransactionDate} ">
+																						test= "${not empty reviewItem.surveyTransactionDate}">
 																						<span class="completedOn">
 																						<fmt:formatDate
 																								type="date" pattern="MMMM YYYY"

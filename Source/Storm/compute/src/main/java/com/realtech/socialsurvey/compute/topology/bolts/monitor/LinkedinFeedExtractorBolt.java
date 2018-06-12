@@ -15,6 +15,7 @@ import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.entities.response.linkedin.LinkedinFeedData;
 import com.realtech.socialsurvey.compute.enums.ProfileType;
+import com.realtech.socialsurvey.compute.enums.SocialFeedStatus;
 import com.realtech.socialsurvey.compute.enums.SocialFeedType;
 import com.realtech.socialsurvey.compute.feeds.LinkedinFeedProcessor;
 import com.realtech.socialsurvey.compute.feeds.impl.LinkedinFeedProcessorImpl;
@@ -125,7 +126,7 @@ public class LinkedinFeedExtractorBolt extends BaseComputeBolt
         }
 
         SocialResponseObject<LinkedinFeedData> responseWrapper = new SocialResponseObject<>( mediaToken.getCompanyId(),
-            SocialFeedType.LINKEDIN, text, linkedinFeedData, 1 );
+            SocialFeedType.LINKEDIN, text, linkedinFeedData, 1, SocialFeedStatus.NEW );
 
         if ( mediaToken.getProfileType() != null ) {
             responseWrapper.setProfileType( mediaToken.getProfileType() );
