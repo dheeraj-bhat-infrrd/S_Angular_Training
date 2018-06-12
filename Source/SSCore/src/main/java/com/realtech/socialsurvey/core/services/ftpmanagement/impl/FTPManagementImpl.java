@@ -297,7 +297,7 @@ public class FTPManagementImpl implements FTPManagement
             }
 
             emailServices.sendFtpProcessingErrorMailForCompany( recipients, companyId,
-                "Error while processing ftp connection, please contact the administrator",
+                "Error while processing ftp connection, please contact the social survey administrator",
                 StringUtils.join( invalidFtpInfo.getStackTrace(), FTP_HTML_LINE_FEED ), true, false );
             return false;
         }
@@ -368,7 +368,7 @@ public class FTPManagementImpl implements FTPManagement
 
             // download the file from remote server
             fileTransferResponse = remoteAccessUtils.transferFile( serverConfig, localFile, RemoteFileDelivery.RECEIVE, true,
-                directoryPath + CommonConstants.FILE_SEPARATOR + processOriginalFileName( fileName, os ) );
+                directoryPath + CommonConstants.FILE_SEPARATOR + processOriginalFileName( fileName, os ), true );
             if ( fileTransferResponse == null || fileTransferResponse.getStatus() > 0 ) {
                 LOG.warn( "Unable to retreive the file fromm the FTP server" );
                 throw new NonFatalException( "Unable to retreive the file from the FTP server" );
@@ -550,7 +550,7 @@ public class FTPManagementImpl implements FTPManagement
 
         try {
             // get the list FTP files in the remote server to the be processed 
-            String command = RemoteAccessUtils.fetchCommandToGetFileNamesFromDirectory( directoryPath, false );
+            String command = RemoteAccessUtils.fetchCommandToGetFileNamesFromDirectory( directoryPath, false, true );
 
             LOG.debug( "executing command on the remote server : {}", command );
             commandExecutionResponse = remoteAccessUtils.executeCommand( serverConfig, command );
@@ -561,7 +561,8 @@ public class FTPManagementImpl implements FTPManagement
 
                 response = commandExecutionResponse.getResponse() == null ? "" : commandExecutionResponse.getResponse();
 
-                if ( commandExecutionResponse.getStatus() > 0 ) {
+                // exit status is 1 if there are no files in the remote folder
+                if ( commandExecutionResponse.getStatus() > 1 ) {
                     LOG.debug( "command execution failed : {}", command );
                     LOG.debug( "Remote execution output: {}", response );
                     throw new IOException( "command execution failed" );
