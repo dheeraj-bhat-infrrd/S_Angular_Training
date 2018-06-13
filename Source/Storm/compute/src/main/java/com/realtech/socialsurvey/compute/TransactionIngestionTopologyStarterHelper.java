@@ -52,7 +52,7 @@ public class TransactionIngestionTopologyStarterHelper extends TopologyStarterHe
             return config;
         } else {
             Config config = new Config();
-            config.put( Config.TOPOLOGY_MAX_SPOUT_PENDING, 5000 );
+            config.put( Config.TOPOLOGY_MAX_SPOUT_PENDING, 1 );
             config.put( Config.STORM_NIMBUS_RETRY_TIMES, 3 );
             /* The maximum amount of time given to the topology to 
                fully process a message emitted by a spout. If the 
