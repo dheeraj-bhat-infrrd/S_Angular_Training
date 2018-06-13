@@ -34,7 +34,6 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.integration.EngagementProcessingStatus;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.vo.SurveyPreInitiationList;
 
 
 @Component ( "surveypreinitiation")
@@ -961,58 +960,4 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
 		LOG.debug("query to fetch data for email report : {}", query.toString());
 		return query.list();
 	}
-	
-
-    @SuppressWarnings ( "unchecked")
-    @Override
-    public List<SurveyPreInitiation> getUnmatchedPreInitiatedSurveysForEmail( long companyId, String transactionEmail,
-        int start, int batch )
-    {
-        LOG.info( "Method getUnmatchedPreInitiatedSurveys() started." );
-        Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class, "surveyPreInitiation" );
-        try {
-            criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
-            criteria.add( Restrictions.eq( CommonConstants.AGENT_ID_COLUMN, CommonConstants.DEFAULT_AGENT_ID ) );
-            criteria.add( Restrictions.eq( CommonConstants.SURVEY_AGENT_EMAIL_ID_COLUMN, transactionEmail ) );
-            criteria.add(
-                Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEYPREINITIATION_MISMATCH_RECORD ) );
-            criteria.addOrder( Order.desc( CommonConstants.ENGAGEMENT_CLOSED_TIME ) );
-            if ( start > -1 )
-                criteria.setFirstResult( start );
-            if ( batch > -1 )
-                criteria.setMaxResults( batch );
-            LOG.info( "CRITERIA : {}",criteria );
-            LOG.info( "Method getUnmatchedPreInitiatedSurveys() finished." );
-            return criteria.list();
-        } catch ( HibernateException e ) {
-            LOG.error( "Exception caught in getUnmatchedPreInitiatedSurveys() ", e );
-            throw new DatabaseException( "Exception caught in getUnmatchedPreInitiatedSurveys() ", e );
-        }
-    }
-    
-    // Method to get incomplete survey list for sending reminder mail.
-    @Override
-    public long getUnmatchedPreInitiatedSurveyForEmailCount( long companyId, String transactionEmail )
-    {
-        LOG.info( "Method getUnmatchedPreInitiatedSurveyForEmailCount() started." );
-        Criteria criteria = getSession().createCriteria( SurveyPreInitiation.class, "surveyPreInitiation" );
-        try {
-            criteria.add( Restrictions.eq( CommonConstants.COMPANY_ID_COLUMN, companyId ) );
-            criteria.add( Restrictions.eq( CommonConstants.AGENT_ID_COLUMN, CommonConstants.DEFAULT_AGENT_ID ) );
-            criteria.add( Restrictions.eq( CommonConstants.SURVEY_AGENT_EMAIL_ID_COLUMN, transactionEmail ) );
-            criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN,
-                CommonConstants.STATUS_SURVEYPREINITIATION_MISMATCH_RECORD ) );
-            criteria.setProjection( Projections.rowCount() );
-            //remove after testing
-            LOG.info( "CRITERIA : {}",criteria );
-            Long count = (Long) criteria.uniqueResult();
-            LOG.info( "Method getUnmatchedPreInitiatedSurveyForEmailCount() finished." );
-            return count.longValue();
-        } catch ( HibernateException e ) {
-            LOG.error( "Exception caught in getUnmatchedPreInitiatedSurveyForEmailCount() ", e );
-            throw new DatabaseException( "Exception caught in getUnmatchedPreInitiatedSurveyForEmailCount() ", e );
-        }
-    }
-
-
 }
