@@ -4373,6 +4373,30 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
         }
     }
+    
+    @Transactional
+    @Override
+    public SurveyPreInitiationList getUnmatchedPreInitiatedSurveysForEmail( long companyId, String transactionEmail , int startIndex, int batchSize, long count)
+        throws InvalidInputException
+    {
+        LOG.debug( "method getUnmatchedPreInitiatedSurveysForEmail called for company id : {} and transactionEmail:{}", companyId, transactionEmail );
+        SurveyPreInitiationList surveyPreInitiationListVO = new SurveyPreInitiationList();
+        if ( companyId <= 0 ) {
+            throw new InvalidInputException( " Wrong parameter passed : companyId is invalid " );
+        }
+
+        List<SurveyPreInitiation> surveyPreInitiations = surveyPreInitiationDao.getUnmatchedPreInitiatedSurveysForEmail( companyId,transactionEmail,
+            startIndex, batchSize );
+        surveyPreInitiationListVO.setSurveyPreInitiationList( surveyPreInitiations );
+        // function shd be called only once
+        if ( count == -1 ) {
+            surveyPreInitiationListVO.setTotalRecord( surveyPreInitiationDao.getUnmatchedPreInitiatedSurveyForEmailCount( companyId , transactionEmail ) );
+        } else {
+            surveyPreInitiationListVO.setTotalRecord( count );
+        }
+        return surveyPreInitiationListVO;
+    }
+
 
 
 }

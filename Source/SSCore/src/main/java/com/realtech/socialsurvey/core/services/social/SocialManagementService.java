@@ -354,5 +354,17 @@ public interface SocialManagementService
     public boolean manualPostToLinkedInForEntity( String entityType, Long entityId, String surveyMongoId );
 
 
+    /**
+     * @param companyId
+     * @param transactionEmail
+     * @param startIndex
+     * @param batchSize
+     * @param count
+     * @return
+     * @throws InvalidInputException
+     */
+    public SurveyPreInitiationList getUnmatchedPreInitiatedSurveysForEmail( long companyId, String transactionEmail , int startIndex, int batchSize, long count) throws InvalidInputException;
+
+
 }
 // JIRA SS-34 BY RM02 BOC

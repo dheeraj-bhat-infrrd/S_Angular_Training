@@ -42,6 +42,8 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.stream.StreamMessagesService;
+import com.realtech.socialsurvey.core.services.social.SocialManagementService;
+import com.realtech.socialsurvey.core.vo.SurveyPreInitiationList;
 
 import io.swagger.annotations.ApiOperation;
 
@@ -71,6 +73,9 @@ public class OrganizationManagementApiController
     
     @Autowired
     private RestUtils restUtils;
+    
+    @Autowired
+    private SocialManagementService socialManagementService;
 
     
     @RequestMapping ( value = "/updateabusivemail", method = RequestMethod.POST)
@@ -377,4 +382,23 @@ public class OrganizationManagementApiController
         organizationManagementService.updateFtpMailService(companyId,ftpId,email);
         return new ResponseEntity<>( "Success", HttpStatus.OK );
     }
+    
+    @RequestMapping ( value = "/mismatched/emailId/{companyId}", method = RequestMethod.GET)
+    @ApiOperation ( value = "Fetch mismatched survey for emailId")
+    public ResponseEntity<?> fetchMismatchedSurveyForEmail( @PathVariable long companyId, String transactionEmail , int startIndex, int batchSize, long count,  HttpServletRequest request) throws  NonFatalException
+    {
+        LOGGER.info( "Fetch mismatched survey for emailId for companyId : {} , transactionEmail : {}",companyId,transactionEmail );
+        String authorizationHeader = request.getHeader( CommonConstants.SURVEY_API_REQUEST_PARAMETER_AUTHORIZATION );
+        //authorize request
+        try {
+            adminAuthenticationService.validateAuthHeader( authorizationHeader );
+        } catch ( AuthorizationException e ) {
+            return restUtils.getRestResponseEntity( HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", null, null, request, companyId );
+        }
+        SurveyPreInitiationList surveyPreInitiationList = socialManagementService.getUnmatchedPreInitiatedSurveysForEmail( companyId, transactionEmail, startIndex, batchSize, count );
+        return restUtils.getRestResponseEntity( HttpStatus.OK, "Api to fetch mismatched survey for emailId Successfully processed", "SurveyPreInitiationList", surveyPreInitiationList, request,
+            companyId );
+    }
+
+
 }
