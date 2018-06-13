@@ -43,6 +43,6 @@ public interface SolrApiIntegrationService
     		@Query("facet.limit") int facetLimit,@Query("facet.mincount") int facetMinCount);
     
     @Headers("Content-Type: application/json")
-    @POST("ss-userevent/update/json")
+    @POST("ss-userevents/update/json")
     Call<SOLRResponseObject<UserEvent>> saveUserEvent(@Body SolrRequest<UserEvent> entity, @Query("commit") boolean commit);
 }
