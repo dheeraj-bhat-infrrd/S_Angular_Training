@@ -23,7 +23,6 @@ var cityLookupList; // cityLookupList
 var phoneFormat = '(ddd) ddd-dddd'; // defualt phone format
 var selectedCountryRegEx = "";
 var findProCompanyProfileName;
-var mismatchPopupHeader = "</br>could not be automatically be associated with a user in your account.";
 
 const PRICING_URL = "http://www.socialsurvey.com/pricing/";
 
@@ -2546,16 +2545,15 @@ function paintUnmatchedUser(usersList) {
 		var untrack = "";
 		if (usersSize > 0) {
 			usersList.surveyPreInitiationList.forEach(function(arrayItem) {
+
 				var engagementClosedate = new Date(arrayItem.engagementClosedTime);
 				var engagementClosedatePart = engagementClosedate.toDateString();
-				//untrack += '<div class="un-row">' + '						<div style="width:15%" class="float-left unmatchtab ss-id" title="' + undefinedval(arrayItem.agentName) + '">' + undefinedval(arrayItem.agentName) + '</div>' + '						<div style="width:20%" class="float-left unmatchtab ss-eid" title="' + undefinedval(arrayItem.agentEmailId) + '">' + undefinedval(arrayItem.agentEmailId) + '</div>' + '						<div style="width:30%" class="float-left unmatchtab ss-cname" title="' + undefinedval(arrayItem.customerFirstName) + '">' + undefinedval(arrayItem.customerFirstName) + '<span style="margin-left:2px;">' + undefinedval(arrayItem.customerLastName) + '</span> <br> <span style="margin-left:2px;" title="' + undefinedval(arrayItem.customerEmailId) + '"> < ' + undefinedval(arrayItem.customerEmailId) + ' > </span></div>' + '						<div style="width:15%" class="float-left unmatchtab ss-date" title="' + undefinedval(engagementClosedatePart) + '">' + undefinedval(engagementClosedatePart) + '</div>' + '						<div style="width:20%;color:#009FE0;" class="float-left unmatchtab ss-process cursor-pointer" >Process</div>' + '						</div>';
-				//adding another div to the original
-				untrack += '<div class="un-row">' + '						<div style="width:15%" class="float-left unmatchtab ss-id" title="' + undefinedval(arrayItem.agentName) + '">' + undefinedval(arrayItem.agentName) + '</div>' + '						<div style="width:20%" class="float-left unmatchtab ss-eid" title="' + undefinedval(arrayItem.agentEmailId) + '">' + undefinedval(arrayItem.agentEmailId) + '</div>' + '						<div style="width:30%" class="float-left unmatchtab ss-cname" title="' + undefinedval(arrayItem.customerFirstName) + '">' + undefinedval(arrayItem.customerFirstName) + '<span style="margin-left:2px;">' + undefinedval(arrayItem.customerLastName) + '</span> <br> <span style="margin-left:2px;" title="' + undefinedval(arrayItem.customerEmailId) + '"> < ' + undefinedval(arrayItem.customerEmailId) + ' > </span></div>' + '						<div style="width:15%" class="float-left unmatchtab ss-date" title="' + undefinedval(engagementClosedatePart) + '">' + undefinedval(engagementClosedatePart) + '</div>' + '						<div style="width:20%;color:#009FE0;" class="float-left unmatchtab ss-process cursor-pointer" >Process</div>' + '	<div style="width:20%;color:#009FE0;" class="float-left unmatchtab ss-process-new cursor-pointer" >Pro</div>' + '					</div>';
+				untrack += '<div class="un-row">' + '						<div style="width:15%" class="float-left unmatchtab ss-id" title="' + undefinedval(arrayItem.agentName) + '">' + undefinedval(arrayItem.agentName) + '</div>' + '						<div style="width:20%" class="float-left unmatchtab ss-eid" title="' + undefinedval(arrayItem.agentEmailId) + '">' + undefinedval(arrayItem.agentEmailId) + '</div>' + '						<div style="width:30%" class="float-left unmatchtab ss-cname" title="' + undefinedval(arrayItem.customerFirstName) + '">' + undefinedval(arrayItem.customerFirstName) + '<span style="margin-left:2px;">' + undefinedval(arrayItem.customerLastName) + '</span> <br> <span style="margin-left:2px;" title="' + undefinedval(arrayItem.customerEmailId) + '"> < ' + undefinedval(arrayItem.customerEmailId) + ' > </span></div>' + '						<div style="width:15%" class="float-left unmatchtab ss-date" title="' + undefinedval(engagementClosedatePart) + '">' + undefinedval(engagementClosedatePart) + '</div>' + '						<div style="width:20%;color:#009FE0;" class="float-left unmatchtab ss-process cursor-pointer" >Process</div>' + '						</div>';
+
 			});
 
 			$('#new').html(untrack);
 			bindClickEventForProcessButton();
-			bindClickEventForProcessNewButton();
 
 		}
 	}
@@ -2630,45 +2628,6 @@ function bindClickEventForProcessButton() {
 		$('#overlay-continue').html("Save");
 		$('#overlay-cancel').html("Cancel");
 		$('#overlay-header').html("Match User");
-		$('#overlay-text').html(popup);
-
-		$('#overlay-continue').click(function() {
-			saveUserMap(user);
-			$('#overlay-continue').unbind('click');
-		});
-		$('#overlay-main').show();
-		bindAdminCheckBoxClick();
-		attachAutocompleteAliasDropdown();
-	});
-	if ($('#is-ignore').val() == true) {
-		if ($('#match-user-email').val() != "") {
-			$('#match-user-email').val('');
-			$('#match-user-email').attr('agent-id', 0);
-			$('#match-user-email').attr("disabled");
-		}
-	}
-
-}
-
-function bindClickEventForProcessNewButton() {
-
-	$('.ss-process-new').click(function(e) {
-		var id = $(this).parent().find(".ss-id").text();
-		var user = $(this).parent().find(".ss-eid").text();
-		var customer = $(this).parent().find(".ss-cname").text();
-
-		var popup = document.getElementById("popup-new");
-
-		$('#popup_id').html(id)
-		$('#popup_user').html(user)
-		$('#popup_customer').html(customer);
-		$('#popup-new').removeClass('hide');
-		$('#popup-header').removeClass('hide');
-		e.stopPropagation();
-		$('#overlay-continue').html("Save");
-		$('#overlay-cancel').html("Cancel");
-		$('#overlay-header').css("padding","0");
-		$('#overlay-header').html(document.getElementById("popup-header"));
 		$('#overlay-text').html(popup);
 
 		$('#overlay-continue').click(function() {

@@ -35,57 +35,8 @@
 						<div style="width:30%" class="float-left unmatchtab unhr-row">Customer</div>
 						<div style="width:15%" class="float-left unmatchtab unhr-row">Date</div>
 						<div style="width:20%" class="float-left unmatchtab unhr-row">Action</div>
-						<!-- this is adding new header -->
-						<div style="width:20%" class="float-left unmatchtab unhr-row">A</div>
 					</div>
 					<div id="new" ></div>
-					<div id="popup-header" class="hide" style="background-color:#0d6cbf;color: white;border-top: 0;line-height: 25px;padding: 10px;
-    font-size: 20px;">
-						<div id="popup_user" style="font-weight: bold !important;"></div>
-						<div style="font-size: 12px">could not be automatically be associated with a user in your account.</div>
-					</div>
-					<div id="popup-new" class="col-lg-12 hide">
-						<div
-							style="background-color: #b5b7bc; font-size: 15px; height: 40px; color: #3a62a3; font-weight: bolder;">
-							<div class="col-lg-4"></div>
-							<div
-								style="height: inherit; color: #3a62a3; background-color: #d9dce2; text-align: left; padding-top: 10px;"
-								class="col-lg-8">What can we do for you?</div>
-						</div>
-						<div id="popup-new-left" class="col-lg-4">
-							<div>you have 9 transactions in this status</div>
-						</div>
-						<div id="popup-new-right" class="col-lg-8">
-							<div>
-								<div class="">Add <span id="popup_user"></span> as an alias for a current user and send surveys for all transactions. </div>
-								<div class="float-left bd-frm-left-un pos-relative">
-									<input id="match-user-email" class="bd-frm-rt-txt bd-dd-img">
-								</div>
-								<div>Assign</div>
-							</div>
-							<div>
-								<div>Create a <b>new user</b> account for <span id="popup_user" style="color:#3a62a3">invalid@domain</span>and <b>send</b> 
-								surveys for all transactions</div>
-								<div>Add User</div>
-							</div>
-							<div>
-								<div><b>Archive</b> these transactions and automatically <b>ignore</b> <span id="popup_user" style="color:#3a62a3">invalid@domain</span>
-								going forward</div>
-								<div class="bd-hr-form-item clearfix" id="ignore">
-								<div class="float-left bd-frm-left-un"></div>
-								<div class="float-left bd-frm-right">
-									<div class="bd-frm-check-wrapper clearfix bd-check-wrp">
-										<div class="float-left bd-check-img bd-check-img-checked"></div>
-										<input type="hidden" name="isIgnore" value="false"
-											id="is-ignore" class="ignore-clear">
-										<div class="float-left bd-check-txt bd-check-sm">Always
-											Ignore</div>
-									</div>
-								</div>
-							</div>
-							</div>
-						</div>
-					</div>
 					<div id="new-no-data" class="hide un-no-data"></div>
 					<div id="un-new-paginate-btn" class="paginate-buttons-survey clearfix hide" data-start="0" data-total="0" data-batch="10">
 						<div id="un-new-prev" class="float-left sur-paginate-btn">&lt; Prev</div>

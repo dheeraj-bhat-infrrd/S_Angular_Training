@@ -13,7 +13,6 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.integration.EngagementProcessingStatus;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.vo.SurveyPreInitiationList;
 
 
 public interface SurveyPreInitiationDao extends GenericDao<SurveyPreInitiation, Long>
@@ -160,21 +159,4 @@ public interface SurveyPreInitiationDao extends GenericDao<SurveyPreInitiation, 
 
 
     void updateAgentInfoOfPreInitiatedSurvey( long surveyPreinitiatinId, User toUser ) throws InvalidInputException;
-    /**
-     * @param companyId
-     * @param transactionEmail
-     * @param start
-     * @param batch
-     * @return
-     */
-    public List<SurveyPreInitiation> getUnmatchedPreInitiatedSurveysForEmail( long companyId, String transactionEmail, int start,
-        int batch );
-
-
-    /**
-     * @param companyId
-     * @param transactionEmail
-     * @return
-     */
-    public long getUnmatchedPreInitiatedSurveyForEmailCount( long companyId, String transactionEmail );
 }

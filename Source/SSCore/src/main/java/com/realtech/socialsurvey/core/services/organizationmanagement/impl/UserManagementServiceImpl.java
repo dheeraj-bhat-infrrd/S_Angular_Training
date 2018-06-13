@@ -3790,6 +3790,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         }
         //if no agent profile found throw an exception
         throw new NoRecordsFetchedException( "No agent found" );
+
     }
     
     /**
@@ -3988,7 +3989,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 
     @Override
-    public User saveEmailUserMapping( String emailId, long userId , String createdAndModifiedBy) throws InvalidInputException, NoRecordsFetchedException
+    public User saveEmailUserMapping( String emailId, long userId ) throws InvalidInputException, NoRecordsFetchedException
     {
         LOG.debug( "Method to saveEmailUserMapping for : " + emailId + " started." );
         if ( emailId == null || emailId.isEmpty() ) {
@@ -4008,9 +4009,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         userEmailMapping.setCreatedOn( new Timestamp( System.currentTimeMillis() ) );
         //TODO : Modify createdBy and modifiedBy to store the actual admin's ID
-        userEmailMapping.setCreatedBy( createdAndModifiedBy );
+        userEmailMapping.setCreatedBy( CommonConstants.ADMIN_USER_NAME );
         userEmailMapping.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
-        userEmailMapping.setModifiedBy( createdAndModifiedBy );
+        userEmailMapping.setModifiedBy( CommonConstants.ADMIN_USER_NAME );
         userEmailMappingDao.save( userEmailMapping );
         return user;
     }
@@ -4169,9 +4170,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Transactional
     @Override
-    public void updateUserEmailMapping( String modifiedBy, long emailMappingId, int status ) throws InvalidInputException
+    public void updateUserEmailMapping( User agent, long emailMappingId, int status ) throws InvalidInputException
     {
         LOG.debug( "Method to updateUserEmailMapping for  emailMappingId : " + emailMappingId + " started." );
+        if ( agent == null ) {
+            throw new InvalidInputException( "Passed parameter agent is null " );
+        }
 
         Map<String, Object> queries = new HashMap<String, Object>();
         queries.put( "userEmailMappingId", emailMappingId );
@@ -4184,7 +4188,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
         UserEmailMapping userEmailMapping = userEmailMappings.get( 0 );
         userEmailMapping.setStatus( status );
-        userEmailMapping.setModifiedBy( modifiedBy );
+        userEmailMapping.setModifiedBy( String.valueOf( agent.getUserId() ) );
         userEmailMapping.setModifiedOn( new Timestamp( System.currentTimeMillis() ) );
         userEmailMappingDao.update( userEmailMapping );
 
@@ -4821,12 +4825,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Override
     @Transactional ( rollbackFor = Exception.class)
-    public void saveEmailUserMappingAndUpdateAgentIdInSurveyPreinitiation( String emailId, long userId , String createdAndModifiedBy)
+    public void saveEmailUserMappingAndUpdateAgentIdInSurveyPreinitiation( String emailId, long userId )
         throws InvalidInputException, NoRecordsFetchedException
     {
         User user = userDao.findById(User.class, userId);
         socialManagementService.updateAgentIdOfSurveyPreinitiationRecordsForEmail( user, emailId );
-        this.saveEmailUserMapping( emailId, userId , createdAndModifiedBy);
+        this.saveEmailUserMapping( emailId, userId );
     }
 
 

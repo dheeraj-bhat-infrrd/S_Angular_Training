@@ -547,7 +547,7 @@ public interface UserManagementService
     void deleteSSAdmin( User admin, long ssAdminId ) throws InvalidInputException;
 
 
-    User saveEmailUserMapping( String emailId, long userId , String createdAndModifiedBy) throws InvalidInputException, NoRecordsFetchedException;
+    User saveEmailUserMapping( String emailId, long userId ) throws InvalidInputException, NoRecordsFetchedException;
 
 
     CompanyIgnoredEmailMapping saveIgnoredEmailCompanyMapping( String emailId, long companyId )
@@ -573,7 +573,7 @@ public interface UserManagementService
     boolean isUserSocialSurveyAdmin( long userId ) throws InvalidInputException;
 
 
-    void updateUserEmailMapping( String modifiedBy, long emailMappingId, int status ) throws InvalidInputException;
+    void updateUserEmailMapping( User agent, long emailMappingId, int status ) throws InvalidInputException;
 
 
     public void deleteUserDataFromAllSources( User loggedInUser, long userIdToBeDeleted, int status, boolean isForHierarchyUpload, boolean isDeletedByRealtechOrSSAdmin )
@@ -623,7 +623,7 @@ public interface UserManagementService
     public Set<Long> getUserIdsUnderAdmin( User adminUser ) throws InvalidInputException;
 
 
-    public void saveEmailUserMappingAndUpdateAgentIdInSurveyPreinitiation( String emailId, long userId , String createdAndModifiedBy)
+    public void saveEmailUserMappingAndUpdateAgentIdInSurveyPreinitiation( String emailId, long userId )
         throws InvalidInputException, NoRecordsFetchedException;
 
 
