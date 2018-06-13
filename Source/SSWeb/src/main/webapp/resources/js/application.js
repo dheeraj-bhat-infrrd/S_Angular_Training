@@ -20235,8 +20235,8 @@ function checkFeedTypes(feedData){
 	}
 	
 	if(feedData.linkedin == true || feedData.linkedin == 'true'){
-		$('#feed-linkedin').removeClass('hide');
-		feedTypes.push("LINKEDIN");
+		$('#feed-linkedin').addClass('hide');
+//		feedTypes.push("LINKEDIN");
 	}
 	
 	if(feedData.instagram == true || feedData.instagram == 'true'){

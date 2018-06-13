@@ -290,7 +290,7 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
         actionHistory.setCreatedDate( new Date().getTime() );
         actionHistory.setActionType( ActionHistoryType.RESOLVED );
         actionHistory.setOwnerName( OWNERNAME_SYSTEM );
-        actionHistory.setText( "The post was <b class='soc-mon-bold-text'>Resolved</b> for having source<b class='soc-mon-bold-text'>" + source + "</b>");
+        actionHistory.setText( "The post was <b class='soc-mon-bold-text'>Resolved</b> for having source <b class='soc-mon-bold-text'>" + source + "</b>");
         return actionHistory;
     }
 }

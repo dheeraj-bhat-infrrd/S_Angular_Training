@@ -46,12 +46,12 @@ public class TwitterFeedProcessorImpl implements TwitterFeedProcessor
         this.redisSocialMediaStateDao = new RedisSocialMediaStateDaoImpl();
     }
 
-    private static final int PAGE_SIZE = 200;
+    private static final int PAGE_SIZE = 20;
     public static final int TWITTER_MIN_LIMIT = 100;
 
     private static final int TWITTER_FIRST_RETRIEVAL_COUNT = NumberUtils.toInt( LocalPropertyFileHandler.getInstance()
         .getProperty( ComputeConstants.APPLICATION_PROPERTY_FILE, ComputeConstants.TWITTER_FIRST_RETRIEVAL_COUNT )
-        .orElse( "200" ) );
+        .orElse( "20" ) );
 
     @Override
     public List<TwitterFeedData> fetchFeed( long companyId, SocialMediaTokenResponse mediaToken, String twitterConsumerKey,

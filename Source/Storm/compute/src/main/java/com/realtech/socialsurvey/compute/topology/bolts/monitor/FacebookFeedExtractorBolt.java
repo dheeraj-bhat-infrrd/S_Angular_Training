@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.compute.topology.bolts.monitor;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -172,7 +173,7 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt implements Serial
 
         if(facebookFeedData.getApplication() != null && StringUtils.isNotEmpty(facebookFeedData.getApplication().getName()))
         		responseWrapper.setPostSource(facebookFeedData.getApplication().getName());
-        
+
         if ( facebookFeedData.getUpdatedTime() > 0 ) {
             responseWrapper.setUpdatedTime( facebookFeedData.getUpdatedTime() * 1000 );
         }

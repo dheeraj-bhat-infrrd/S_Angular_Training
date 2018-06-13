@@ -460,7 +460,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         LOG.debug( "Method to fetch socialFeed for a particular keyword and date range started" );
         Query query = new Query();
         query.addCriteria( Criteria.where( COMPANY_ID ).is( companyId ) )
-            .addCriteria( Criteria.where( CREATED_TIME ).lte( endTime ).gte( startTime ) )
+            .addCriteria( Criteria.where( UPDATED_TIME ).lte( endTime ).gte( startTime ) )
             .addCriteria(
                 Criteria.where( FOUND_KEYWORDS ).regex( Pattern.compile( keyword, Pattern.CASE_INSENSITIVE ) ) )
             .skip( skips ).limit( pageSize );
@@ -478,7 +478,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         LOG.debug( "Method to fetch socialFeed within a particular date range started" );
         Query query = new Query(  );
         query.addCriteria( Criteria.where( COMPANY_ID ).is( companyId ) ).
-            addCriteria( Criteria.where( CREATED_TIME ).lte( endTime ).gte( startTime ) ).skip( skips ).limit( pageSize );
+            addCriteria( Criteria.where( UPDATED_TIME ).lte( endTime ).gte( startTime ) ).skip( skips ).limit( pageSize );
         List<SocialResponseObject> socialResponseObjects =  mongoTemplate.find( query, SocialResponseObject.class, SOCIAL_FEED_COLLECTION );
         socialResponseObjects.addAll( mongoTemplate.find( query, SocialResponseObject.class, SOCIAL_FEED_COLLECTION_ARCHIVE ) );
         LOG.info( "Response fetched from mongo is {}", socialResponseObjects );
