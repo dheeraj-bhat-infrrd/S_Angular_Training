@@ -308,7 +308,7 @@ public class ReportingWebController
 
         String profileName = "";
         
-        if(entityType == "companyId") {
+        if("companyId".equals( entityType)) {
         	 String activeSession = (String) session.getAttribute("activeSession");
         	 if(activeSession != null) {
         		 session.setAttribute("activeSession","true");
