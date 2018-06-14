@@ -115,6 +115,9 @@ public class OverviewRegion implements Serializable
     @Column ( name = "nps_promoter_percentage")
     private float npsPromoterPercentage;
     
+    @Column ( name = "unsubscribed_count")
+    private int unsubscribed;
+    
     public String getOverviewRegionId()
     {
         return overviewRegionId;
@@ -444,6 +447,16 @@ public class OverviewRegion implements Serializable
         this.npsPromoterPercentage = npsPromoterPercentage;
     }
 
+    public int getUnsubscribed()
+    {
+        return unsubscribed;
+    }
+
+    public void setUnsubscribed( int unsubscribed )
+    {
+        this.unsubscribed = unsubscribed;
+    }
+
     @Override
     public String toString()
     {
@@ -458,8 +471,7 @@ public class OverviewRegion implements Serializable
             + processed + ", unprocessed=" + unprocessed + ", thirdParty=" + thirdParty + ", npsScore=" + npsScore
             + ", npsDetractors=" + npsDetractors + ", npsDetractorPercentage=" + npsDetractorPercentage + ", npsPassives="
             + npsPassives + ", npsPassivesPercentage=" + npsPassivesPercentage + ", npsPromoters=" + npsPromoters
-            + ", npsPromoterPercentage=" + npsPromoterPercentage + "]";
+            + ", npsPromoterPercentage=" + npsPromoterPercentage + ", unsubscribed=" + unsubscribed + "]";
     }
-    
-    
+
 }

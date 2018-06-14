@@ -63,6 +63,8 @@
     <field name="surveySourceId" type="text" indexed="true" stored="true"/>
     <field name="recipientsName" type="text" indexed="true" stored="true" multiValued="true" />   
     <field name="isRetried" type="boolean" indexed="false" stored="true" />
+    <field name="isEmailUnsubscribed" type="boolean" indexed="true" stored="true" />
+    <field name="unsubscribedEmails" type="text" indexed="true" stored="true" multiValued="true" />
   </fields>
 
  <uniqueKey>randomUUID</uniqueKey>

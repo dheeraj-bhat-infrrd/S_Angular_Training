@@ -165,12 +165,17 @@ hr{
 			<div id="corrupted-lbl"><span class="trans-font-style">Corrupted</span></div>
 			<div id="corrupted-lbl-value"><span id="corrupted-lbl-span" class="trans-font-style"></span></div>
 		</div>
-		<div id="other-details" class="inline-flex-class" style="margin-bottom:85px;">
+		<div id="other-details" class="inline-flex-class">
 			<div class="unprocessed-background-rect"></div>
 			<div id="other-lbl-rect" class="other-lbl-rect-div hide" style="margin-left: -15px;"></div>
 			<div id="other-lbl"><span class="trans-font-style">Other</span></div>
 			<div id="other-lbl-value"><span id="other-lbl-span" class="trans-font-style">26</span></div>
 		</div>
-			
+		<div id="unsubscribed-count" class="inline-flex-class" style="margin-bottom:75px;">
+			<div class="unprocessed-background-rect"></div>
+			<div id="unsubscribed-lbl-rect" class="social-posts-lbl-rect-div hide" style="margin-left: -15px;"></div>
+			<div id="unsubscribed-lbl"><span class="trans-font-style">Unsubscribed</span></div>
+			<div id="unsubscribed-lbl-value"><span id="unsubscribed-lbl-span" class="trans-font-style"></span></div>
+		</div>
 	</div>
 </div>

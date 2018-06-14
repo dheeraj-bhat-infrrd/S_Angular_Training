@@ -170,7 +170,7 @@ public interface EmailServices
                                String surveyLink, String logoUrl, String customerFirstName, String customerLastName, String customerEmailId,
                                String emailType, String senderName, String senderEmailAddress, String mailSubject, String mailBody,
                                AgentSettings agentSettings, long branchId, long regionId, String surveySourceId, long agentId,
-                               long companyId, boolean sentFromCompany) throws InvalidInputException, UndeliveredEmailException;
+                               long companyId, boolean sentFromCompany, String unsubscribedURL) throws InvalidInputException, UndeliveredEmailException;
 
     /**
      * Sends the survey complete admin mail

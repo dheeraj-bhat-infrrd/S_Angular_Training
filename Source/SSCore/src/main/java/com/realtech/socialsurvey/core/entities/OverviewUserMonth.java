@@ -75,6 +75,9 @@ public class OverviewUserMonth implements Serializable
 
     @Column ( name = "year")
     private int year;
+    
+    @Column ( name = "unsubscribed_count")
+    private int unsubscribed;
 
     public String getOverviewUserMonthId()
     {
@@ -272,6 +275,16 @@ public class OverviewUserMonth implements Serializable
         return serialVersionUID;
     }
 
+    public int getUnsubscribed()
+    {
+        return unsubscribed;
+    }
+
+    public void setUnsubscribed( int unsubscribed )
+    {
+        this.unsubscribed = unsubscribed;
+    }
+
     @Override
     public String toString()
     {
@@ -280,11 +293,9 @@ public class OverviewUserMonth implements Serializable
             + ", zillowReviews=" + zillowReviews + ", unprocessed=" + unprocessed + ", unassigned=" + unassigned
             + ", duplicate=" + duplicate + ", corrupted=" + corrupted + ", other=" + other + ", completePercentage="
             + completePercentage + ", incompletePercentage=" + incompletePercentage + ", rating=" + rating + ", totalReview="
-            + totalReview + ", thirdParty=" + thirdParty + ", month=" + month + ", year=" + year + "]";
+            + totalReview + ", thirdParty=" + thirdParty + ", month=" + month + ", year=" + year + ", unsubscribed="
+            + unsubscribed + "]";
     }
 
-    
-    
-    
 
 }

@@ -197,11 +197,8 @@
     </attributes>
   </connection>
   <order>
-  <hop> <from>user_profile</from><to>GroupUserByBranch</to><enabled>Y</enabled> </hop>
-  <hop> <from>GroupUserByBranch</from><to>MergeOnUserId</to><enabled>Y</enabled> </hop>
   <hop> <from>jsForMainBranch</from><to>UUID_overview_branch</to><enabled>Y</enabled> </hop>
   <hop> <from>jsForPercentage</from><to>jsForIncompleteSurveys</to><enabled>Y</enabled> </hop>
-  <hop> <from>MergeOnUserId</from><to>Group byBranchId2</to><enabled>Y</enabled> </hop>
   <hop> <from>Group byBranchId2</from><to>SortBasedOnBranchId</to><enabled>Y</enabled> </hop>
   <hop> <from>survey_details extra zillow</from><to>Extra Zillow group</to><enabled>Y</enabled> </hop>
   <hop> <from>Memory Group by</from><to>Sort BranchId 2</to><enabled>Y</enabled> </hop>
@@ -230,6 +227,9 @@
   <hop> <from>Sort BranchId 2</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>Sort Social Post</from><to>Multiway Merge Join</to><enabled>Y</enabled> </hop>
   <hop> <from>Multiway Merge Join</from><to>jsForMainBranch</to><enabled>Y</enabled> </hop>
+  <hop> <from>user_profile</from><to>MergeOnUserId</to><enabled>Y</enabled> </hop>
+  <hop> <from>MergeOnUserId</from><to>Sort rows 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>Sort rows 2</from><to>Group byBranchId2</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Extra Zillow group</name>
@@ -516,48 +516,17 @@
           <type>SUM</type>
           <valuefield/>
         </field>
+        <field>
+          <aggregate>unsubscribed_count</aggregate>
+          <subject>unsubscribed_count</subject>
+          <type>SUM</type>
+          <valuefield/>
+        </field>
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>555</xloc>
-      <yloc>110</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>GroupUserByBranch</name>
-    <type>GroupBy</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-      <all_rows>N</all_rows>
-      <ignore_aggregate>N</ignore_aggregate>
-      <field_ignore/>
-      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
-      <prefix>grp</prefix>
-      <add_linenr>N</add_linenr>
-      <linenr_fieldname/>
-      <give_back_row>N</give_back_row>
-      <group>
-        <field>
-          <name>BRANCH_ID</name>
-        </field>
-        <field>
-          <name>USER_ID</name>
-        </field>
-      </group>
-      <fields>
-      </fields>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>222</xloc>
-      <yloc>56</yloc>
+      <yloc>117</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -743,6 +712,12 @@
         <mask/>
         <set_empty_string>N</set_empty_string>
         </field>
+      <field>
+        <name>unsubscribed_count</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -864,7 +839,7 @@
            <schema_name/>
            </partitioning>
 <join_type>INNER</join_type>
-<step1>GroupUserByBranch</step1>
+<step1>user_profile</step1>
 <step2>overview_user</step2>
     <keys_1>
       <key>USER_ID</key>
@@ -874,8 +849,8 @@
     </keys_2>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>389</xloc>
-      <yloc>110</yloc>
+      <xloc>243</xloc>
+      <yloc>117</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1206,7 +1181,7 @@
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>841</xloc>
-      <yloc>110</yloc>
+      <yloc>117</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -1531,6 +1506,10 @@
           <column_name>nps_score</column_name>
           <stream_name>nps_score_var</stream_name>
         </field>
+        <field>
+          <column_name>unsubscribed_count</column_name>
+          <stream_name>unsubscribed_count</stream_name>
+        </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -1552,7 +1531,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  overview_user_id&#xd;&#xa;, user_id&#xd;&#xa;, sps_score&#xd;&#xa;, total_detractors&#xd;&#xa;, detractors_percentage&#xd;&#xa;, total_passives&#xd;&#xa;, passives_percentage&#xd;&#xa;, total_promoters&#xd;&#xa;, promoter_percentage&#xd;&#xa;, total_corrupted&#xd;&#xa;, unassigned&#xd;&#xa;, total_duplicate&#xd;&#xa;, total_archieved&#xd;&#xa;, incomplete&#xd;&#xa;, total_survey_sent&#xd;&#xa;, completed&#xd;&#xa;, social_posts&#xd;&#xa;, zillow_reviews&#xd;&#xa;, total_reviews&#xd;&#xa;, rating&#xd;&#xa;, completed_percentage&#xd;&#xa;, incomplete_percentage&#xd;&#xa;, processed&#xd;&#xa;, unprocessed&#xd;&#xa;, nps_score&#xd;&#xa;, nps_detractors&#xd;&#xa;, nps_detractors_percentage&#xd;&#xa;, nps_passives&#xd;&#xa;, nps_passives_percentage&#xd;&#xa;, nps_promoters&#xd;&#xa;, nps_promoter_percentage&#xd;&#xa;FROM overview_user&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  overview_user_id&#xd;&#xa;, user_id&#xd;&#xa;, sps_score&#xd;&#xa;, total_detractors&#xd;&#xa;, detractors_percentage&#xd;&#xa;, total_passives&#xd;&#xa;, passives_percentage&#xd;&#xa;, total_promoters&#xd;&#xa;, promoter_percentage&#xd;&#xa;, total_corrupted&#xd;&#xa;, unassigned&#xd;&#xa;, total_duplicate&#xd;&#xa;, total_archieved&#xd;&#xa;, incomplete&#xd;&#xa;, total_survey_sent&#xd;&#xa;, completed&#xd;&#xa;, social_posts&#xd;&#xa;, zillow_reviews&#xd;&#xa;, total_reviews&#xd;&#xa;, rating&#xd;&#xa;, completed_percentage&#xd;&#xa;, incomplete_percentage&#xd;&#xa;, processed&#xd;&#xa;, unprocessed&#xd;&#xa;, nps_score&#xd;&#xa;, nps_detractors&#xd;&#xa;, nps_detractors_percentage&#xd;&#xa;, nps_passives&#xd;&#xa;, nps_passives_percentage&#xd;&#xa;, nps_promoters&#xd;&#xa;, nps_promoter_percentage&#xa;, unsubscribed_count&#xd;&#xa;FROM overview_user&#xa;order by user_id&#x3b;&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -1670,6 +1649,40 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>71</xloc>
       <yloc>56</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Sort rows 2</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <directory>&#x25;&#x25;java.io.tmpdir&#x25;&#x25;</directory>
+      <prefix>out</prefix>
+      <sort_size>1000000</sort_size>
+      <free_memory/>
+      <compress>N</compress>
+      <compress_variable/>
+      <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>BRANCH_ID</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>395</xloc>
+      <yloc>117</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
