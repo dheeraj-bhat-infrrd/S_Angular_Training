@@ -59,9 +59,9 @@
 			<div class="float-right hm-header-right text-center soc-mon-btn" onclick="javascript:showMainContent('./showsocialmonitorstreampage.do')">
 					<spring:message code="label.view.stream.key" />
 			</div>
-			<%-- <div class="float-right hm-header-right text-center soc-mon-btn" onclick="">
+			<div class="float-right hm-header-right text-center soc-mon-btn" onclick="javascript:showMainContent('./showsocialmonitorreportspage.do')">
 					<spring:message code="label.social.monitor.reports.key" />
-			</div> --%>
+			</div>
 		</div>
 	</div>
 </div>

@@ -260,6 +260,10 @@ function closeMoblieScreenMenu() {
 
 // Function to logout
 function userLogout() {
+	if(sessionStorage) {
+		sessionStorage.clear();
+	}
+	
 	window.location.href = 'j_spring_security_logout';
 }
 
@@ -19148,25 +19152,42 @@ function showToastForBulkActions(data){
 }
 
 function getSegmentsByCompanyId(){
-	$.ajax({
-		url : "/getsegmentsbycompanyid.do",
-		type : "GET",
-		cache : false,
-		dataType : "json",
-		success : function(response) {
-			var segments = response;
+	
+	var callAjax = true;
+	var companyId = $("#companyId").val();
+	if(sessionStorage) {
+		var segments = JSON.parse(sessionStorage.getItem("sm-filter-segments-"+companyId));
+		if(segments){
 			drawSegmentList(segments);
-		},
-		complete:function(){
 			getUsersByCompanyId();
-		},
-		error : function(e){
-			if (e.status == 504) {
-				redirectToLoginPageOnSessionTimeOut(e.status);
-				return;
+			callAjax = false;
+		} 
+	} 
+	
+	if(callAjax){
+		$.ajax({
+			url : "/getsegmentsbycompanyid.do",
+			type : "GET",
+			cache : false,
+			dataType : "json",
+			success : function(response) {
+				var segments = response;
+				drawSegmentList(segments);
+				if(sessionStorage) {
+					sessionStorage.setItem("sm-filter-segments-"+companyId, JSON.stringify(segments));
+				}
+			},
+			complete:function(e){
+				getUsersByCompanyId();
+			},
+			error : function(e){
+				if (e.status == 504) {
+					redirectToLoginPageOnSessionTimeOut(e.status);
+					return;
+				}
 			}
-		}
-	});
+		});
+	}
 }
 
 function drawSegmentList(segments){
@@ -19430,22 +19451,37 @@ $(document).on('click','.seg-checked',function(e){
 });
 
 function getUsersByCompanyId(){
-	$.ajax({
-		url : "/getusersbycompanyid.do",
-		type : "GET",
-		cache : false,
-		dataType : "json",
-		success : function(response) {
-			var userList = response;
+	var callAjax = true;
+	var companyId = $("#companyId").val();
+	if(sessionStorage) {
+		var userList = JSON.parse(sessionStorage.getItem("sm-filter-users-"+companyId));
+		if(userList){
 			drawUserList(userList);
-		},
-		error : function(e){
-			if (e.status == 504) {
-				redirectToLoginPageOnSessionTimeOut(e.status);
-				return;
+			callAjax = false;
+		} 
+	} 
+	
+	if(callAjax){
+		$.ajax({
+			url : "/getusersbycompanyid.do",
+			type : "GET",
+			cache : false,
+			dataType : "json",
+			success : function(response) {
+				var userList = response;
+				drawUserList(userList);
+				if(sessionStorage) {
+					sessionStorage.setItem("sm-filter-users-"+companyId, JSON.stringify(userList));
+				}
+			},
+			error : function(e){
+				if (e.status == 504) {
+					redirectToLoginPageOnSessionTimeOut(e.status);
+					return;
+				}
 			}
-		}
-	});
+		});
+	}
 }
 
 function drawUserList(userList){

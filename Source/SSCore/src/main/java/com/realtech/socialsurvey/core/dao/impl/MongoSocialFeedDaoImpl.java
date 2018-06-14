@@ -45,7 +45,6 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
     private static final String COMPANY_ID = "companyId";
     private static final String DUPLICATE_COUNT = "duplicateCount";
     private static final String POST_ID = "postId";
-    private static final String FLAGGED = "flagged";
     private static final String FEED_TYPE = "type";
     private static final String ACTION_HISTORY = "actionHistory";
     private static final String IDEN = "iden";
@@ -460,10 +459,11 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         LOG.debug( "Method to fetch socialFeed for a particular keyword and date range started" );
         Query query = new Query();
         query.addCriteria( Criteria.where( COMPANY_ID ).is( companyId ) )
-            .addCriteria( Criteria.where( UPDATED_TIME ).lte( endTime ).gte( startTime ) )
+            .addCriteria( Criteria.where( CREATED_TIME ).lte( endTime ).gte( startTime ) )
             .addCriteria(
                 Criteria.where( FOUND_KEYWORDS ).regex( Pattern.compile( keyword, Pattern.CASE_INSENSITIVE ) ) )
-            .skip( skips ).limit( pageSize );
+            .skip( skips ).limit( pageSize )
+            .with( new Sort( Sort.Direction.DESC, CREATED_TIME) );
         List<SocialResponseObject> socialResponseObjects = mongoTemplate.find( query, SocialResponseObject.class,
             SOCIAL_FEED_COLLECTION );
         socialResponseObjects.addAll( mongoTemplate.find( query, SocialResponseObject.class, SOCIAL_FEED_COLLECTION_ARCHIVE ) );
@@ -478,7 +478,8 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         LOG.debug( "Method to fetch socialFeed within a particular date range started" );
         Query query = new Query(  );
         query.addCriteria( Criteria.where( COMPANY_ID ).is( companyId ) ).
-            addCriteria( Criteria.where( UPDATED_TIME ).lte( endTime ).gte( startTime ) ).skip( skips ).limit( pageSize );
+            addCriteria( Criteria.where( CREATED_TIME ).lte( endTime ).gte( startTime ) ).skip( skips ).limit( pageSize )
+            .with( new Sort( Sort.Direction.DESC, CREATED_TIME) );
         List<SocialResponseObject> socialResponseObjects =  mongoTemplate.find( query, SocialResponseObject.class, SOCIAL_FEED_COLLECTION );
         socialResponseObjects.addAll( mongoTemplate.find( query, SocialResponseObject.class, SOCIAL_FEED_COLLECTION_ARCHIVE ) );
         LOG.info( "Response fetched from mongo is {}", socialResponseObjects );
@@ -518,21 +519,25 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         if ( LOG.isDebugEnabled() ) {
             LOG.debug( "Fetching posts for trustedSource = {} and companyId = {}", trustedSource, companyId );
         }
-        
-        Query updateQuery1 = new Query().addCriteria( Criteria.where( COMPANY_ID ).is( companyId ) )
-            .addCriteria( Criteria.where( POST_SOURCE ).is( trustedSource ) )
-            .addCriteria( Criteria.where( STATUS ).is( SocialFeedStatus.RESOLVED ) );
+
+        //Check that escalated posts aren't auto- resolved when source marked as trusted
+        Criteria updateCriteria1 = Criteria.where( COMPANY_ID ).is( companyId ).and( POST_SOURCE ).is( trustedSource )
+            .and( STATUS ).in( SocialFeedStatus.ESCALATED, SocialFeedStatus.RESOLVED );
+        Query updateQuery1 = new Query().addCriteria( updateCriteria1 );
         Update update1 = new Update();
+
         //update fromTrustedSource 
         update1.set( FROM_TRUSTED_SOURCE, true );
-        
+
         WriteResult result1 = mongoTemplate.updateMulti( updateQuery1, update1, SOCIAL_FEED_COLLECTION );
-        long updateCount =  result1.getN();
-        
-        
-        Query updateQuery2 = new Query().addCriteria( Criteria.where( COMPANY_ID ).is( companyId ) )
-            .addCriteria( Criteria.where( POST_SOURCE ).is( trustedSource ) )
-            .addCriteria( Criteria.where( STATUS ).ne( SocialFeedStatus.RESOLVED ) );
+        long updateCount = result1.getN();
+
+        //Update actionHistory and status for new and flagged posts
+        Criteria updateCriteria2 = Criteria.where( COMPANY_ID ).is( companyId ).and( POST_SOURCE ).is( trustedSource )
+            .andOperator( Criteria.where( STATUS ).ne( SocialFeedStatus.ESCALATED ),
+                Criteria.where( STATUS ).ne( SocialFeedStatus.RESOLVED ) );
+
+        Query updateQuery2 = new Query().addCriteria( updateCriteria2 );
         Update update2 = new Update();
         //update fromTrustedSource 
         update2.set( FROM_TRUSTED_SOURCE, true );
@@ -542,11 +547,11 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         update2.set( UPDATED_TIME, new Date().getTime() );
         WriteResult result2 = mongoTemplate.updateMulti( updateQuery2, update2, SOCIAL_FEED_COLLECTION );
         updateCount += result2.getN();
-        
+
         if ( LOG.isDebugEnabled() ) {
             LOG.debug( "Successfully updated posts for trustedSource = {} and companyId = {}", trustedSource, companyId );
         }
-        
+
         return updateCount;
     }
     

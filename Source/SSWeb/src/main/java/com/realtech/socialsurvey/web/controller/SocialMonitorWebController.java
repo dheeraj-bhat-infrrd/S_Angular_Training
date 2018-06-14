@@ -119,6 +119,11 @@ public class SocialMonitorWebController {
     {
         LOG.info( "Social Monitor Stream Page Started" );
         
+        User user = sessionHelper.getCurrentUser();
+        Long companyId = user.getCompany().getCompanyId();
+        
+        model.addAttribute( "companyId", companyId );
+        
         return JspResolver.SOCIAL_MONITOR_STREAM_PAGE;
     }
     

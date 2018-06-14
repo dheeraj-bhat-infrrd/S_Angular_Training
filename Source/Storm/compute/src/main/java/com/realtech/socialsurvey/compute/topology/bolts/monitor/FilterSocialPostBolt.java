@@ -63,6 +63,7 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
         long companyId = input.getLongByField("companyId");
         if (post != null) {
             post.setActionHistory(new ArrayList<>());
+            ActionHistory actionHistory;
             if (post.getText() != null) {
                 String text = post.getText();
                 List<String> foundKeyWords;
@@ -71,8 +72,9 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
                 if (!foundKeyWords.isEmpty()) {
                     post.setFoundKeywords(foundKeyWords);
                     post.setStatus( SocialFeedStatus.ALERT );
-
-                    post.getActionHistory().add(getFlaggedActionHistory(foundKeyWords));
+                    actionHistory = getFlaggedActionHistory(foundKeyWords);
+                    post.getActionHistory().add( actionHistory );
+                    post.setUpdatedTime( actionHistory.getCreatedDate() );
                     addTextHighlight(post);
                 }
             }
@@ -81,7 +83,9 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
             if (isPostFromTrustedSource(post, companyId)) {
                 post.setStatus(SocialFeedStatus.RESOLVED);
                 post.setFromTrustedSource(true);
-                post.getActionHistory().add(getTrustedSourceActionHistory(post.getPostSource()));
+                actionHistory = getTrustedSourceActionHistory(post.getPostSource());
+                post.getActionHistory().add(actionHistory);
+                post.setUpdatedTime( actionHistory.getCreatedDate() );
             }
         }
         LOG.debug("Emitting tuple with post having postId = {} and post = {}", post.getPostId(), post);
