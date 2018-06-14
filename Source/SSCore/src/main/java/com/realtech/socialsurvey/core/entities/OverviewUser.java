@@ -117,6 +117,9 @@ public class OverviewUser implements Serializable {
 
     @Column ( name = "nps_promoter_percentage")
     private float npsPromoterPercentage;
+    
+    @Column ( name = "unsubscribed_count")
+    private int unsubscribed;
 
     public String getOverviewUserId()
     {
@@ -444,6 +447,16 @@ public class OverviewUser implements Serializable {
         return serialVersionUID;
     }
 
+    public int getUnsubscribed()
+    {
+        return unsubscribed;
+    }
+
+    public void setUnsubscribed( int unsubscribed )
+    {
+        this.unsubscribed = unsubscribed;
+    }
+
     @Override
     public String toString()
     {
@@ -458,11 +471,7 @@ public class OverviewUser implements Serializable {
             + ", processed=" + processed + ", unprocessed=" + unprocessed + ", npsScore=" + npsScore + ", npsDetractors="
             + npsDetractors + ", npsDetractorPercentage=" + npsDetractorPercentage + ", npsPassives=" + npsPassives
             + ", npsPassivesPercentage=" + npsPassivesPercentage + ", npsPromoters=" + npsPromoters + ", npsPromoterPercentage="
-            + npsPromoterPercentage + "]";
+            + npsPromoterPercentage + ", unsubscribed=" + unsubscribed + "]";
     }
 
-
-   
-
-    
 }

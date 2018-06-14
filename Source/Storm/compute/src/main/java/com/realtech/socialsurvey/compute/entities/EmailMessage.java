@@ -48,6 +48,8 @@ public class EmailMessage implements Serializable
     protected long agentId;
     protected String agentEmailId;
     protected boolean isRetried;
+    protected boolean isEmailUnsubscribed;
+    protected List<String> unsubscribedEmails;
 
     public String getRandomUUID()
     {
@@ -287,34 +289,44 @@ public class EmailMessage implements Serializable
         return isRetried;
     }
 
-    @Override
-    public String toString() {
-        return "EmailMessage{" +
-                "randomUUID='" + randomUUID + '\'' +
-                ", recipients=" + recipients +
-                ", subject='" + subject + '\'' +
-                ", body='" + body + '\'' +
-                ", recipientType=" + recipientType +
-                ", senderEmailId='" + senderEmailId + '\'' +
-                ", senderName='" + senderName + '\'' +
-                ", senderPassword='" + senderPassword + '\'' +
-                ", sendEmailThrough='" + sendEmailThrough + '\'' +
-                ", mailType='" + mailType + '\'' +
-                ", companyId=" + companyId +
-                ", sendMailToSalesLead=" + sendMailToSalesLead +
-                ", holdSendingMail=" + holdSendingMail +
-                ", attachments=" + attachments +
-                ", surveySourceId='" + surveySourceId + '\'' +
-                ", recipientsName=" + recipientsName +
-                ", branchName='" + branchName + '\'' +
-                ", regionName='" + regionName + '\'' +
-                ", branchId=" + branchId +
-                ", regionId=" + regionId +
-                ", agentId=" + agentId +
-                ", agentEmailId='" + agentEmailId + '\'' +
-                ", isRetried=" + isRetried +
-                '}';
+    public boolean isEmailUnsubscribed()
+    {
+        return isEmailUnsubscribed;
     }
+
+
+    public void setEmailUnsubscribed( boolean isEmailUnsubscribed )
+    {
+        this.isEmailUnsubscribed = isEmailUnsubscribed;
+    }
+
+
+    public List<String> getUnsubscribedEmails()
+    {
+        return unsubscribedEmails;
+    }
+
+
+    public void setUnsubscribedEmails( List<String> unsubscribedEmails )
+    {
+        this.unsubscribedEmails = unsubscribedEmails;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return "EmailMessage [randomUUID=" + randomUUID + ", recipients=" + recipients + ", subject=" + subject + ", body="
+            + body + ", recipientType=" + recipientType + ", senderEmailId=" + senderEmailId + ", senderName=" + senderName
+            + ", senderPassword=" + senderPassword + ", sendEmailThrough=" + sendEmailThrough + ", mailType=" + mailType
+            + ", companyId=" + companyId + ", sendMailToSalesLead=" + sendMailToSalesLead + ", holdSendingMail="
+            + holdSendingMail + ", attachments=" + attachments + ", surveySourceId=" + surveySourceId + ", recipientsName="
+            + recipientsName + ", branchName=" + branchName + ", regionName=" + regionName + ", branchId=" + branchId
+            + ", regionId=" + regionId + ", agentId=" + agentId + ", agentEmailId=" + agentEmailId + ", isRetried=" + isRetried
+            + ", isEmailUnsubscribed=" + isEmailUnsubscribed + ", unsubscribedEmails=" + unsubscribedEmails + "]";
+    }
+
+
 }
 
 // JIRA: SS-7: By RM02: EOC

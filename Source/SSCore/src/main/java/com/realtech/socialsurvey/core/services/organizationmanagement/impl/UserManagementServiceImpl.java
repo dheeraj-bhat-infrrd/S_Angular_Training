@@ -96,6 +96,7 @@ import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
+import com.realtech.socialsurvey.core.services.mail.EmailUnsubscribeService;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
@@ -256,6 +257,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Value ( "${APPLICATION_LOGO_URL}")
     private String applicationLogoUrl;
+    
+    @Autowired
+    private EmailUnsubscribeService unsubscribeService;
 
 
     /**
@@ -4580,6 +4584,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                     //check if we have send invitation mail already
                     if(survey.getLastReminderTime().compareTo( epochReminderDate )  > 0){
                         LOG.warn( "We have already send invitation mail for customer " + survey.getCustomerEmailId() );
+                        continue;
+                    }
+                    
+                    //Check if customer email id is unsubscribed.
+                    if ( unsubscribeService.isUnsubscribed( survey.getCustomerEmailId(), survey.getCompanyId() ) ) {
+                        LOG.debug( "Customer has unsubscribed his email {} either for the company {} or for social survey.",
+                            survey.getCustomerEmailId(), survey.getCompanyId() );
                         continue;
                     }
                     

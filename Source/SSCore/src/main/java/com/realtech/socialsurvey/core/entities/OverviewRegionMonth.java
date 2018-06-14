@@ -78,6 +78,8 @@ public class OverviewRegionMonth implements Serializable
     @Column ( name = "cumulative_user_count" )
     private int cumulativeUserCount;
 
+    @Column ( name = "unsubscribed_count")
+    private int unsubscribed;
 
     public String getOverviewRegionMonthId()
     {
@@ -326,6 +328,18 @@ public class OverviewRegionMonth implements Serializable
     }
 
 
+    public int getUnsubscribed()
+    {
+        return unsubscribed;
+    }
+
+
+    public void setUnsubscribed( int unsubscribed )
+    {
+        this.unsubscribed = unsubscribed;
+    }
+
+
     @Override
     public String toString()
     {
@@ -335,7 +349,7 @@ public class OverviewRegionMonth implements Serializable
             + ", duplicate=" + duplicate + ", corrupted=" + corrupted + ", other=" + other + ", completePercentage="
             + completePercentage + ", incompletePercentage=" + incompletePercentage + ", rating=" + rating + ", totalReview="
             + totalReview + ", month=" + month + ", year=" + year + ", thirdParty=" + thirdParty + ", cumulativeUserCount="
-            + cumulativeUserCount + "]";
+            + cumulativeUserCount + ", unsubscribed=" + unsubscribed + "]";
     }
 
 }

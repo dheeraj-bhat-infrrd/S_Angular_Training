@@ -54,7 +54,8 @@ public class SaveMailToSolrBolt extends BaseComputeBoltWithAck
         boolean isNew = false;
         boolean deliveryAttempted = false;
         // get the email message
-        EmailMessage emailMessage = ConversionUtils.deserialize( input.getString( 0 ), EmailMessage.class );
+        //EmailMessage emailMessage = ConversionUtils.deserialize( input.getString( 0 ), EmailMessage.class );
+        EmailMessage emailMessage = (EmailMessage) input.getValueByField( "emailMessage" );
         // check if the mail is already saved and email delivery was attempted
         Optional<SolrEmailMessageWrapper> optionalSolrEmailMessage = APIOperations.getInstance()
             .getEmailMessageFromSOLR( emailMessage );

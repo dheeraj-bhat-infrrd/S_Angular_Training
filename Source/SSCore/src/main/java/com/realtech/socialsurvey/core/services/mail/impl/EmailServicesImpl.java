@@ -1270,7 +1270,7 @@ public class EmailServicesImpl implements EmailServices
         String agentFirstName, String agentPhone, String agentTitle, String surveyLink, String logoUrl,
         String customerFirstName, String customerLastName, String customerEmailId, String emailType, String senderName,
         String senderEmailAddress, String mailSubject, String mailBody, AgentSettings agentSettings, long branchId,
-        long regionId, String surveySourceId, long agentId, long companyId, boolean sentFromCompany )
+        long regionId, String surveySourceId, long agentId, long companyId, boolean sentFromCompany, String unsubscribedURL )
         throws InvalidInputException, UndeliveredEmailException
     {
 
@@ -1319,12 +1319,12 @@ public class EmailServicesImpl implements EmailServices
         mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, appBaseUrl, logoUrl, shortSurveyLink,
             customerFirstName, customerLastName, agentName, agentFirstName, agentSignature, customerEmailId, user.getEmailId(),
             companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(),
-            companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone );
+            companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone, unsubscribedURL );
 
         mailBody = emailFormatHelper.replaceLegends( false, mailBody, appBaseUrl, logoUrl, shortSurveyLink, customerFirstName,
             customerLastName, agentName, agentFirstName, agentSignature, customerEmailId, user.getEmailId(), companyName,
             dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer,
-            agentDisclaimer, agentLicenses, agentTitle, agentPhone );
+            agentDisclaimer, agentLicenses, agentTitle, agentPhone, unsubscribedURL );
 
         //send the email
         if ( mailSubject == null || mailSubject.isEmpty() ) {

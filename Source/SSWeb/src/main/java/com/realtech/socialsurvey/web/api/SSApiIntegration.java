@@ -286,6 +286,77 @@ public interface SSApiIntegration
 
     @GET( "/v1/userprofileflags" )
     Response getUserProfileFlags(@Query ("userId") long userId);
+
+
+    @POST( "/v1/unsubscribe/email" )
+    String unsubscribeEmail(@Query("companyId") long companyId, @Query("emailId") String emailId, @Query("agentId") long agentId,
+        @Query("flag") boolean flag );
+    
+    @GET("/v1/getrecentactivityforsocialmonitorreporting")
+    Response getRecentActivityForSocialMonitor(@Query ("entityId") Long entityId , @Query ("entityType") String entityType ,@Query ("startIndex") int startIndex , @Query ("batchSize") int batchSize);
+
+    @POST( "/v1/sethasregisteredforsummit" )
+    Response setHasRegisteredForSummit(@Query("companyId") Long companyId,@Query("hasRegisteredForSummit") boolean hasRegisteredForSummit);
+    
+    @POST( "/v1/setshowsummitpopup" )
+    Response setShowSummitPopup(@Query("companyId") Long companyId,@Query("isShowSummitPopup") boolean isShowSummitPopup);
+    
+    @GET ( "/v1/duplicateposts/company/{companyId}/post/{postId}")
+    public Response getDuplicatePosts( @Path ( "companyId") long companyId, @Path ( "postId") String postId,
+        @Header ( "authorizationHeader") String authorizationHeader );
+
+    @POST("/v1/companies/{companyId}/trustedSource")
+    Response addTrustedSourceToCompany(@Path ( "companyId") long companyId, @Query ("trustedSource") String trustedSource,  @Header("authorizationHeader") String authorizationHeader);
+    
+    @POST("/v1/companies/{companyId}/trustedSource/remove")
+    Response removeTrustedSourceToCompany(@Path ( "companyId") long companyId, @Query ("trustedSource") String trustedSource,  @Header("authorizationHeader") String authorizationHeader);
+    
+    @POST( "/v1/setftpcrm/{companyId}" )
+    Response setFtpCrm(@Path ("companyId") long companyId , @Body FtpCreateRequest ftpInfo);
+    
+    @GET("/v1/getrecentactivityforsocialmonitorreporting")
+    Response getRecentActivityForSocialMonitor(@Query ("entityId") Long entityId , @Query ("entityType") String entityType ,@Query ("startIndex") int startIndex , @Query ("batchSize") int batchSize);
+
+    @POST( "/v1/sethasregisteredforsummit" )
+    Response setHasRegisteredForSummit(@Query("companyId") Long companyId,@Query("hasRegisteredForSummit") boolean hasRegisteredForSummit);
+    
+    @POST( "/v1/setshowsummitpopup" )
+    Response setShowSummitPopup(@Query("companyId") Long companyId,@Query("isShowSummitPopup") boolean isShowSummitPopup);
+    
+    @GET ( "/v1/duplicateposts/company/{companyId}/post/{postId}")
+    public Response getDuplicatePosts( @Path ( "companyId") long companyId, @Path ( "postId") String postId,
+        @Header ( "authorizationHeader") String authorizationHeader );
+
+    @POST("/v1/companies/{companyId}/trustedSource")
+    Response addTrustedSourceToCompany(@Path ( "companyId") long companyId, @Query ("trustedSource") String trustedSource,  @Header("authorizationHeader") String authorizationHeader);
+    
+    @POST("/v1/companies/{companyId}/trustedSource/remove")
+    Response removeTrustedSourceToCompany(@Path ( "companyId") long companyId, @Query ("trustedSource") String trustedSource,  @Header("authorizationHeader") String authorizationHeader);
+    
+    @POST( "/v1/setftpcrm/{companyId}" )
+    Response setFtpCrm(@Path ("companyId") long companyId , @Body FtpCreateRequest ftpInfo);
+    
+    @GET("/v1/getrecentactivityforsocialmonitorreporting")
+    Response getRecentActivityForSocialMonitor(@Query ("entityId") Long entityId , @Query ("entityType") String entityType ,@Query ("startIndex") int startIndex , @Query ("batchSize") int batchSize);
+
+    @POST( "/v1/sethasregisteredforsummit" )
+    Response setHasRegisteredForSummit(@Query("companyId") Long companyId,@Query("hasRegisteredForSummit") boolean hasRegisteredForSummit);
+    
+    @POST( "/v1/setshowsummitpopup" )
+    Response setShowSummitPopup(@Query("companyId") Long companyId,@Query("isShowSummitPopup") boolean isShowSummitPopup);
+    
+    @GET ( "/v1/duplicateposts/company/{companyId}/post/{postId}")
+    public Response getDuplicatePosts( @Path ( "companyId") long companyId, @Path ( "postId") String postId,
+        @Header ( "authorizationHeader") String authorizationHeader );
+
+    @POST("/v1/companies/{companyId}/trustedSource")
+    Response addTrustedSourceToCompany(@Path ( "companyId") long companyId, @Query ("trustedSource") String trustedSource,  @Header("authorizationHeader") String authorizationHeader);
+    
+    @POST("/v1/companies/{companyId}/trustedSource/remove")
+    Response removeTrustedSourceToCompany(@Path ( "companyId") long companyId, @Query ("trustedSource") String trustedSource,  @Header("authorizationHeader") String authorizationHeader);
+    
+    @POST( "/v1/setftpcrm/{companyId}" )
+    Response setFtpCrm(@Path ("companyId") long companyId , @Body FtpCreateRequest ftpInfo);
     
     @GET("/v1/getrecentactivityforsocialmonitorreporting")
     Response getRecentActivityForSocialMonitor(@Query ("entityId") Long entityId , @Query ("entityType") String entityType ,@Query ("startIndex") int startIndex , @Query ("batchSize") int batchSize);

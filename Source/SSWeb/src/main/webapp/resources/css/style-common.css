@@ -9983,6 +9983,11 @@ ul.accordion li>a:before {
     margin-right: 141px;
 }
 
+#unsubscribed-lbl{
+    margin-left: 15px;
+    margin-right: 52px;
+}
+
 .trans-font-style{
 	font-weight: 600 !important;
     font-size: 14px;

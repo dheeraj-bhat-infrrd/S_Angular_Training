@@ -72,6 +72,9 @@ public class OverviewUserYear implements Serializable
     @Column ( name = "third_party")
     private int thirdParty;
     
+    @Column ( name = "unsubscribed_count")
+    private int unsubscribed;
+    
     public String getOverviewUserYearId()
     {
         return overviewUserYearId;
@@ -259,6 +262,16 @@ public class OverviewUserYear implements Serializable
         this.thirdParty = thirdParty;
     }
 
+    public int getUnsubscribed()
+    {
+        return unsubscribed;
+    }
+
+    public void setUnsubscribed( int unsubscribed )
+    {
+        this.unsubscribed = unsubscribed;
+    }
+
     @Override
     public String toString()
     {
@@ -267,8 +280,7 @@ public class OverviewUserYear implements Serializable
             + zillowReviews + ", unprocessed=" + unprocessed + ", unassigned=" + unassigned + ", duplicate=" + duplicate
             + ", corrupted=" + corrupted + ", other=" + other + ", completePercentage=" + completePercentage
             + ", incompletePercentage=" + incompletePercentage + ", rating=" + rating + ", totalReview=" + totalReview
-            + ", year=" + year + ", thirdParty=" + thirdParty + "]";
+            + ", year=" + year + ", thirdParty=" + thirdParty + ", unsubscribed=" + unsubscribed + "]";
     }
-    
-    
+
 }

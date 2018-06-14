@@ -206,4 +206,6 @@ public interface JspResolver
     public static final String SOCIAL_MONITOR_REPORTS = "reporting_social_monitor_reports";
     
     public static final String SENDGRID_EMAIL_MNGMNT="sendgrid_email_management";
+    
+    public static final String UNSUBSCRIBE_MESSAGE = "unsubscribe_message";
 }

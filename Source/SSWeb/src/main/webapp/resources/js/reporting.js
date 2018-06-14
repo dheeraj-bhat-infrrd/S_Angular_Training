@@ -2160,6 +2160,7 @@ function updateReportingDashboard(){
 	$('#duplicate-lbl-rect').hide();
 	$('#corrupted-lbl-rect').hide();
 	$('#other-lbl-rect').hide();
+	$('#unsubscribed-lbl-rect').hide();
 }
 
 function drawLeaderboardTableStructure(userRankingList,userId,profileMasterId){
@@ -2734,6 +2735,7 @@ function clickProcessedDiv(){
 	$('#duplicate-lbl-rect').hide();
 	$('#corrupted-lbl-rect').hide();
 	$('#other-lbl-rect').hide();
+	$('#unsubscribed-lbl-rect').hide();
 	$('#processed-trans-div').fadeTo('fast','1.0');
 	$('#unprocessed-trans-div').fadeTo('fast','0.2');
 	
@@ -2769,6 +2771,7 @@ function clickUnprocessedDiv(){
 	$('#duplicate-lbl-rect').show();
 	$('#corrupted-lbl-rect').show();
 	$('#other-lbl-rect').show();
+	$('#unsubscribed-lbl-rect').show();
 	$('#unprocessed-trans-div').fadeTo('fast','1.0');
 	$('#processed-trans-div').fadeTo('fast','0.2');
 	
@@ -2828,6 +2831,7 @@ function drawTransactionStats(overviewYearData){
 		$('#corrupted-lbl-span').html(overviewYearData.Corrupted);
 		var other = overviewYearData.Unprocessed - (overviewYearData.Unassigned + overviewYearData.Duplicate + overviewYearData.Corrupted);
 		$('#other-lbl-span').html(other);
+		$('#unsubscribed-lbl-span').html(overviewYearData.Unsubscribed);
 		$('#unclicked-trans-graph').removeClass('hide');
 		$('#processed-trans-graph').addClass('hide');
 		$('#unprocessed-trans-graph').addClass('hide');
@@ -2856,6 +2860,7 @@ function drawTransactionStats(overviewYearData){
 		$('#unassigned-lbl-span-sel').html(0);
 		$('#corrupted-lbl-span').html(0);
 		$('#other-lbl-span').html(0);
+		$('#unsubscribed-lbl-span').html(0);
 		$('#unclicked-trans-graph').addClass('hide');
 		$('#processed-trans-graph').addClass('hide');
 		$('#unprocessed-trans-graph').addClass('hide');
@@ -3636,6 +3641,7 @@ $(document).on('click','#chart-icn-btn',function(e){
 	$('#duplicate-lbl-rect').hide();
 	$('#corrupted-lbl-rect').hide();
 	$('#other-lbl-rect').hide();
+	$('#unsubscribed-lbl-rect').hide();
 	
 	$('#unprocessed-trans-div').fadeTo('fast','1.0');
 	$('#processed-trans-div').fadeTo('fast','1.0');
