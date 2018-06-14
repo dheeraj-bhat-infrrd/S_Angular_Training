@@ -131,7 +131,7 @@ public class WriteSocialMonitorReportToExcel extends BaseComputeBoltWithAck
                     socialMonitorReportToPopulate.add(socialFeed.getText());
                     socialMonitorReportToPopulate.add(socialFeed.getPostLink());
                     socialMonitorReportToPopulate.add( "No" );
-                    socialMonitorReportToPopulate.add( socialFeed.getStatus() );
+                    socialMonitorReportToPopulate.add( socialFeed.getStatus().toString() );
 
                     socialFeedData.put(enterNext++, socialMonitorReportToPopulate);
                 }

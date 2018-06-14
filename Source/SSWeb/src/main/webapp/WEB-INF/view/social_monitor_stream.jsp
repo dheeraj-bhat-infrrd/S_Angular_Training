@@ -3,6 +3,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
+<input id="companyId" value="${companyId}" type="hidden"/>
 <div id="bulk-options-popup" class="hide bulk-action-popup">
 	<button type="button" class="close bulk-options-dismiss" id="dismiss-bulk-options">&times;</button>
 	<div id="stream-bulk-actions-popup-body" class="col-lg-6 col-md-6 col-sm-6 col-xs-6 bulk-action-edit-container">
@@ -95,9 +96,6 @@
 			<div class="float-right hm-header-right text-center soc-mon-btn" onclick="javascript:showMainContent('./showsocialmonitorpage.do')">
 					<spring:message code="label.edit.monitors.key" />
 			</div>
-			<%-- <div class="float-right hm-header-right text-center soc-mon-btn" onclick="">
-					<spring:message code="label.social.monitor.reports.key" />
-			</div> --%>
 			<div class="float-right hm-header-right text-center soc-mon-btn" onclick="javascript:showMainContent('./showsocialmonitorreportspage.do')">
 					<spring:message code="label.social.monitor.reports.key" />
 			</div>
@@ -209,12 +207,12 @@
 			<div class="container" style="width:100%">
 				<div class="hm-header-row clearfix">
 					<div id="stream-pagination-bottom" class="float-right soc-mon-pagination" data-startIndex=0 data-count=0>
-						<div class="soc-mon-pag-text-bottom"><span id="stream-item-count-bottom" class="soc-mon-bold-text">0</span> items</div>
+						<div class="soc-mon-pag-text"><span id="stream-item-count-bottom" class="soc-mon-bold-text">0</span> items</div>
 						<div id="stream-start-page-bottom" class="soc-mon-pag"><img src="${initParam.resourcesPath}/resources/images/chevron-double-left.png" class="soc-mon-pag-icn"></div>
 						<div id="stream-start-page-active-bottom" class="hide soc-mon-pag-active"><img src="${initParam.resourcesPath}/resources/images/chevron-double-left-blue.png" class="soc-mon-pag-icn"></div>
 						<div id="stream-prev-page-bottom" class="soc-mon-pag"><img src="${initParam.resourcesPath}/resources/images/chevron-left.png"  class="soc-mon-pag-icn"></div>
 						<div id="stream-prev-page-active-bottom" class="soc-mon-pag-active hide"><img src="${initParam.resourcesPath}/resources/images/chevron-left-blue.png" class="soc-mon-pag-icn"></div>
-						<div class="soc-mon-pag-text-bottom"><span id="stream-page-no-bottom" class="soc-mon-bold-text">0</span> of <span id="stream-page-count-bottom" class="soc-mon-bold-text">0</span></div>
+						<div class="soc-mon-pag-text"><span id="stream-page-no-bottom" class="soc-mon-bold-text">0</span> of <span id="stream-page-count-bottom" class="soc-mon-bold-text">0</span></div>
 						<div id="stream-next-page-bottom" class="soc-mon-pag"><img src="${initParam.resourcesPath}/resources/images/chevron-right.png" class="soc-mon-pag-icn"></div>
 						<div id="stream-next-page-active-bottom" class="soc-mon-pag-active hide"><img src="${initParam.resourcesPath}/resources/images/chevron-right-blue.png" class="soc-mon-pag-icn"></div>
 						<div id="stream-end-page-bottom" class="soc-mon-pag"><img src="${initParam.resourcesPath}/resources/images/chevron-double-right.png" class="soc-mon-pag-icn"></div>
@@ -231,6 +229,6 @@ $(document).ready(function() {
 	$(document).attr("title", "Social Monitor");
 	getMacrosForStream();
 	getStreamPosts(0,'NEW');
-	getSegmentsByCompanyId();	
+	getSegmentsByCompanyId();
 });
 </script>

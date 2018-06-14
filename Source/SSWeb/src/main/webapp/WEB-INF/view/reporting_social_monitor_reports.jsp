@@ -31,6 +31,12 @@
 			<div class="float-left hm-header-row-left hr-dsh-adj-lft">
 				Social Monitor Reporting
 			</div>
+			<div class="float-right hm-header-right text-center soc-mon-btn" onclick="javascript:showMainContent('./showsocialmonitorpage.do')">
+					<spring:message code="label.edit.monitors.key" />
+			</div>
+			<div class="float-right hm-header-right text-center soc-mon-btn" onclick="javascript:showMainContent('./showsocialmonitorstreampage.do')">
+					<spring:message code="label.view.stream.key" />
+			</div>
 		</div>
 	</div>
 </div>
