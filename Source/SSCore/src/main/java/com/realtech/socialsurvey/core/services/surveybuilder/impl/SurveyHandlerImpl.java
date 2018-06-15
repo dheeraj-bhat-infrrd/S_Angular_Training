@@ -1371,11 +1371,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         //replace the legends
         mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, null, custFirstName,
             custLastName, agentName, agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ),
-            currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone );
+            currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone , user.getUserId() );
 
         mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, null, custFirstName,
             custLastName, agentName ,agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ),
-            currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone );
+            currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone, user.getUserId() );
 
         //JIRA SS-473 end
 
@@ -1525,7 +1525,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, null, custFirstName,
                 custLastName, agentName, agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName,
                 dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer,
-                agentDisclaimer, agentLicenses, agentTitle, agentPhone );
+                agentDisclaimer, agentLicenses, agentTitle, agentPhone, user.getUserId() );
 
             String mailSubject = surveyCompletionUnpleasant.getMail_subject();
             if ( mailSubject == null || mailSubject.isEmpty() ) {
@@ -1535,7 +1535,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, null, custFirstName,
                 custLastName, agentName, agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName,
                 dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer,
-                agentDisclaimer, agentLicenses, agentTitle, agentPhone );
+                agentDisclaimer, agentLicenses, agentTitle, agentPhone, user.getUserId() );
             //JIRA SS-473 end
 
             //For Company with hidden agents
@@ -1694,11 +1694,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         //replace legends
         mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, "", custFirstName,
             custLastName, agentName, agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ),
-            currentYear, fullAddress, links, user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone );
+            currentYear, fullAddress, links, user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone, user.getUserId() );
 
         mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, "", custFirstName,
             custLastName, agentName, agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ),
-            currentYear, fullAddress, links, user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone );
+            currentYear, fullAddress, links, user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone, user.getUserId() );
         //JIRA SS-473 end
 
 

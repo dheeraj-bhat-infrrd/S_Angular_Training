@@ -1319,12 +1319,12 @@ public class EmailServicesImpl implements EmailServices
         mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, appBaseUrl, logoUrl, shortSurveyLink,
             customerFirstName, customerLastName, agentName, agentFirstName, agentSignature, customerEmailId, user.getEmailId(),
             companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(),
-            companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone );
+            companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone, agentId );
 
         mailBody = emailFormatHelper.replaceLegends( false, mailBody, appBaseUrl, logoUrl, shortSurveyLink, customerFirstName,
             customerLastName, agentName, agentFirstName, agentSignature, customerEmailId, user.getEmailId(), companyName,
             dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer,
-            agentDisclaimer, agentLicenses, agentTitle, agentPhone );
+            agentDisclaimer, agentLicenses, agentTitle, agentPhone, agentId );
 
         //send the email
         if ( mailSubject == null || mailSubject.isEmpty() ) {
