@@ -244,15 +244,15 @@ public class SendMailBolt extends BaseComputeBoltWithAck
     @Override
     public void executeTuple( Tuple input )
     {
-        LOG.debug( "Executing send mail bolt." );
+        LOG.info( "Executing send mail bolt." );
         boolean isSuccess = false;
         boolean isTemporaryException = false;
         // get the email message
         EmailMessage emailMessage = (EmailMessage) input.getValueByField( "emailMessage" );
         boolean deliveryAttempted = input.getBooleanByField( "deliveryAttempted" );
-        LOG.debug( "deliveryAttempted {}", deliveryAttempted );
+        LOG.info( "deliveryAttempted {}", deliveryAttempted );
         if ( !deliveryAttempted ) {
-            LOG.debug( "New mail. Should send and update SOLR" );
+            LOG.info( "New mail. Should send and update SOLR" );
             // the email from SOLR
             Optional<SolrEmailMessageWrapper> optionalSolrEmailMessage = APIOperations.getInstance()
                     .getEmailMessageFromSOLR( emailMessage );
@@ -262,14 +262,14 @@ public class SendMailBolt extends BaseComputeBoltWithAck
                 if ( solrEmailMessage.getEmailAttemptedDate() == null ) {
                     // message is not sent
                     try {
-                        LOG.trace( "Validating email" );
+                        LOG.info( "Validating email" );
                         validateEmailMessage( emailMessage );
                         if ( emailMessage.getSendEmailThrough() == null || emailMessage.getSendEmailThrough().isEmpty() ) {
-                            LOG.debug( "Mail to be sent through social survey me account." );
+                            LOG.info( "Mail to be sent through social survey me account." );
                             emailMessage.setSendEmailThrough( ComputeConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_ME );
                         }
                         String responseId = sendMail( emailMessage );
-                        LOG.debug( "Mail sent successfully. Now updating the mail attempted time" );
+                        LOG.info( "Mail sent successfully. Now updating the mail attempted time" );
                         // update solr with current attempted date and sendgrid id
                         solrEmailMessage.setSendgridMessageId( responseId );
                         solrEmailMessage.setEmailAttemptedDate( ConversionUtils.convertCurrentEpochMillisToSolrTrieFormat() );
