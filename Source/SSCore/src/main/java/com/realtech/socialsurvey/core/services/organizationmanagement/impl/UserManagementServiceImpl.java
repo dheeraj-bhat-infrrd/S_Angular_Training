@@ -9,6 +9,7 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -4564,6 +4565,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 //iterating throgh the surveys
                 for ( SurveyPreInitiation survey : surveysForInvitationMail ) {
                     
+                		//TODO: remove this check
+                		long DAY_IN_MS = 1000 * 60 * 60 * 24;
+                		Date CRITERIA_DATE = new Date(System.currentTimeMillis() - (45 * DAY_IN_MS));
+                		if(survey.getCreatedOn().before(new Timestamp(CRITERIA_DATE.getTime())) ) 
+                			continue; 
+                		
+                	
                     User user = null;
                     try {
                         user = getUserByUserId( survey.getAgentId() );
@@ -4599,7 +4607,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 
                 //Do not send reminder email if it is disabled for company
                 if(isReminderDisabled){
-                    LOG.info( "Auto Reminder is diabled for company : " + company.getCompanyId() );
+                    LOG.info( "Auto Reminder is disabled for company : " + company.getCompanyId() );
                     continue;
                 }
                 
@@ -4622,6 +4630,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 for ( SurveyPreInitiation survey : incompleteSurveyCustomers ) {
                     LOG.debug( "Processing survey pre initiation id: " + survey.getSurveyPreIntitiationId() );
 
+                  //TODO: remove this check
+            		long DAY_IN_MS = 1000 * 60 * 60 * 24;
+            		Date CRITERIA_DATE = new Date(System.currentTimeMillis() - (15 * DAY_IN_MS));
+            		if(survey.getCreatedOn().before(new Timestamp(CRITERIA_DATE.getTime())) ) 
+            			continue; 
+            		
+                    
                     User user = null;
                     try {
                         user = getUserByUserId( survey.getAgentId() );
