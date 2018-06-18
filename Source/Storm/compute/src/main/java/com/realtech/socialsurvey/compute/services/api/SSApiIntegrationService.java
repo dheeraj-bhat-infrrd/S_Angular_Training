@@ -146,4 +146,8 @@ public interface SSApiIntegrationService
     @POST ( "v1/crm/ftp/complete/mail")
     Call<String> sendCompletionMail( @Query ( "companyId") long companyId, @Query ( "ftpId") long ftpId,
         @Query ( "s3FileLocation") String s3FileLocation, @Body FtpSurveyResponse ftpSurveyResponse );
+    
+    @Headers ( "Content-Type: application/json")
+    @GET ( "/v1//checkIfSurveyIsOld/{customerEmailId}")
+    Call<String> checkIfSurveyIsOld( @Query ( "customerEmailId") String customerEmailId );
 }

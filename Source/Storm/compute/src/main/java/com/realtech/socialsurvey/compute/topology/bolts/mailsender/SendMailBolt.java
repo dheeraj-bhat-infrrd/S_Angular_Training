@@ -25,6 +25,7 @@ import com.realtech.socialsurvey.compute.common.APIOperations;
 import com.realtech.socialsurvey.compute.common.ComputeConstants;
 import com.realtech.socialsurvey.compute.common.EmailConstants;
 import com.realtech.socialsurvey.compute.common.LocalPropertyFileHandler;
+import com.realtech.socialsurvey.compute.common.SSAPIOperations;
 import com.realtech.socialsurvey.compute.entities.EmailAttachment;
 import com.realtech.socialsurvey.compute.entities.EmailMessage;
 import com.realtech.socialsurvey.compute.entities.SolrEmailMessageWrapper;
@@ -268,12 +269,28 @@ public class SendMailBolt extends BaseComputeBoltWithAck
                             LOG.info( "Mail to be sent through social survey me account." );
                             emailMessage.setSendEmailThrough( ComputeConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_ME );
                         }
-                        String responseId = sendMail( emailMessage );
-                        LOG.info( "Mail sent successfully. Now updating the mail attempted time" );
-                        // update solr with current attempted date and sendgrid id
-                        solrEmailMessage.setSendgridMessageId( responseId );
-                        solrEmailMessage.setEmailAttemptedDate( ConversionUtils.convertCurrentEpochMillisToSolrTrieFormat() );
-                        APIOperations.getInstance().postEmailToSolr( solrEmailMessage );
+                        //check if mail is old
+                    		String isSurveyOld = "false";
+                        if( !StringUtils.isEmpty(emailMessage.getMailType()) &&  emailMessage.getMailType().equalsIgnoreCase(EmailConstants.EMAIL_TYPE_SURVEY_INVITATION_MAIL))
+                        {
+                        	try {
+								 isSurveyOld = SSAPIOperations.getInstance().checkIfSurveyEmailIsOld(emailMessage.getRecipients().get(0));
+							} catch (Exception e) {
+								LOG.error("ERROR ERROR WHILE CHECKING OLD" , e );
+							}
+                        }
+                        if(isSurveyOld.equalsIgnoreCase("true"))
+                        {
+                        	LOG.warn("OldSurvey Mail. Not Sending mail to " + emailMessage.getRecipients().get(0));
+                        }else {
+                            String responseId = sendMail( emailMessage );
+                            LOG.info( "Mail sent successfully. Now updating the mail attempted time" );
+                            // update solr with current attempted date and sendgrid id
+                            solrEmailMessage.setSendgridMessageId( responseId );
+                            solrEmailMessage.setEmailAttemptedDate( ConversionUtils.convertCurrentEpochMillisToSolrTrieFormat() );
+                            APIOperations.getInstance().postEmailToSolr( solrEmailMessage );
+                        }
+                        
                         isSuccess = true;
                     } catch ( QueueingMessageProcessingException | MailProcessingException | SolrProcessingException e ) {
                         LOG.error( "Error while queueing/ processing email message.", e );

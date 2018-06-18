@@ -253,4 +253,21 @@ public class SSAPIOperations
             throw new IOException( e );
         }        
     }
+    
+    //checkIfSurveyIsOld
+    public String checkIfSurveyEmailIsOld(String recepientEmailId) throws IOException 
+    {
+    	Call<String> requestCall = RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationService().checkIfSurveyIsOld(recepientEmailId);
+    		try {
+                Response<String> response = requestCall.execute();
+                RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
+                if ( LOG.isTraceEnabled() ) {
+                    LOG.trace( "response {}", response.body() );
+                }
+                return response.body();
+            } catch ( IOException | APIIntegrationException e ) {
+                LOG.error( "IOException/ APIIntergrationException caught", e );
+                throw new IOException( e );
+            }  
+    }
 }
