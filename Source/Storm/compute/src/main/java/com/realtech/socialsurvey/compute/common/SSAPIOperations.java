@@ -262,7 +262,7 @@ public class SSAPIOperations
                 Response<String> response = requestCall.execute();
                 RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
                 if ( LOG.isTraceEnabled() ) {
-                    LOG.trace( "response {}", response.body() );
+                    LOG.info( "checkIfSurveyEmailIsOld response {}", response.body() );
                 }
                 return response.body();
             } catch ( IOException | APIIntegrationException e ) {

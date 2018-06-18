@@ -264,6 +264,8 @@ public class SendMailBolt extends BaseComputeBoltWithAck
                     // message is not sent
                     try {
                         LOG.info( "Validating email" );
+                        LOG.info("Mail type is  " + emailMessage.getMailType());
+                        LOG.info("Sending Mail to " + emailMessage.getRecipients().get(0));
                         validateEmailMessage( emailMessage );
                         if ( emailMessage.getSendEmailThrough() == null || emailMessage.getSendEmailThrough().isEmpty() ) {
                             LOG.info( "Mail to be sent through social survey me account." );
@@ -279,6 +281,7 @@ public class SendMailBolt extends BaseComputeBoltWithAck
 								LOG.error("ERROR ERROR WHILE CHECKING OLD" , e );
 							}
                         }
+                        LOG.info("Value of isSurveyOld is " + isSurveyOld);
                         if(isSurveyOld.equalsIgnoreCase("true"))
                         {
                         	LOG.warn("OldSurvey Mail. Not Sending mail to " + emailMessage.getRecipients().get(0));
