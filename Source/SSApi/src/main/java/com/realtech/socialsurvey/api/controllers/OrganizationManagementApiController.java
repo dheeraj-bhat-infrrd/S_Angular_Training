@@ -1,6 +1,8 @@
 package com.realtech.socialsurvey.api.controllers;
 
 
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +30,7 @@ import com.realtech.socialsurvey.api.models.request.FailedStormMessage;
 import com.realtech.socialsurvey.api.utils.RestUtils;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AgentDisableApiEntity;
+import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.TransactionSourceFtp;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.ftp.FtpSurveyResponse;
@@ -42,6 +45,7 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.stream.StreamMessagesService;
+import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 
 import io.swagger.annotations.ApiOperation;
 
@@ -71,6 +75,9 @@ public class OrganizationManagementApiController
     
     @Autowired
     private RestUtils restUtils;
+    
+    @Autowired
+    private SurveyHandler surveyHandler;
 
     
     @RequestMapping ( value = "/updateabusivemail", method = RequestMethod.POST)
@@ -376,5 +383,25 @@ public class OrganizationManagementApiController
         LOGGER.info( "Configuring ftp email companyId:{} , ftpId:{} , email : {}",companyId,ftpId,email );
         organizationManagementService.updateFtpMailService(companyId,ftpId,email);
         return new ResponseEntity<>( "Success", HttpStatus.OK );
+    }
+    
+    @RequestMapping ( value = "/checkIfSurveyIsOld", method = RequestMethod.GET)
+    @ApiOperation ( value = "get ftp crm info")
+    public ResponseEntity<?> checkIfSurveyIsOld(  HttpServletRequest request )
+        throws SSApiException
+    {
+        LOGGER.info( "SurveyApiController.checkIfSurveyIsOld started" );        
+       String customerEmailId = request.getParameter("customerEmailId");
+        //authorize request
+        SurveyPreInitiation surveyPreInitiation = surveyHandler.getPreInitiatedSurveyByCustomer(customerEmailId);
+        long DAY_IN_MS = 1000 * 60 * 60 * 24;
+		Date CRITERIA_DATE = new Date(System.currentTimeMillis() - (30 * DAY_IN_MS));
+		if(surveyPreInitiation != null && surveyPreInitiation.getCreatedOn().before(new Timestamp(CRITERIA_DATE.getTime())) ) {
+			return new ResponseEntity<>( "true", HttpStatus.OK );
+		}else {
+			return new ResponseEntity<>( "false", HttpStatus.OK );
+		}
+        
+        
     }
 }

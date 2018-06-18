@@ -1791,6 +1791,21 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     }
 
 
+    @Override
+    @Transactional
+    public SurveyPreInitiation getPreInitiatedSurveyByCustomer( String customerEmailId )
+    {
+        LOG.debug( "Method getPreInitiatedSurveyByCustomer() started for id " + customerEmailId );
+        Criterion criteria = Restrictions.eq( "customerEmailId", customerEmailId );
+        List<SurveyPreInitiation> surveyPreInitiation = surveyPreInitiationDao.findByCriteria( SurveyPreInitiation.class,
+        		criteria );
+        LOG.debug( "Method getPreInitiatedSurveyByCustomer() finished for id " + customerEmailId );
+        if(surveyPreInitiation != null && !surveyPreInitiation.isEmpty())
+        		return surveyPreInitiation.get(0);
+        else
+        		return null;
+    }
+    
     // MEthod to delete survey pre initiation record from MySQL after making an entry into Mongo.
     @Override
     @Transactional
