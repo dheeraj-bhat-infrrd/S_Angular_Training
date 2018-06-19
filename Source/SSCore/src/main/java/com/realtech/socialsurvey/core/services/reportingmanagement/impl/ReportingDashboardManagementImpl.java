@@ -532,14 +532,20 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
 			reportRequest.setFileUploadId(fileUpload.getFileUploadId());
 			reportRequest.setCompanyId(fileUpload.getCompany().getCompanyId());
 			streamApiIntegrationBuilder.getStreamApi().generateEmailReport(reportRequest);
-		}
-	
-		if ( reportId == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT || reportId == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD ) {
+		}else if ( reportId == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT || reportId == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD ) {
 		    socialMonitorReportRequest.setFileUploadId(fileUpload.getFileUploadId());
 		    try {
 	            streamApiIntegrationBuilder.getStreamApi().generateEmailReport(socialMonitorReportRequest);
 		    } catch(StreamApiException | StreamApiConnectException e) {
 		        LOG.error( "Could not stream social monitor report", e );
+		        fileUpload.setStatus( CommonConstants.STATUS_FAIL );
+		        fileUploadDao.saveOrUpdate( fileUpload );
+		    }
+		}else {
+			try {
+	            streamApiIntegrationBuilder.getStreamApi().generateEmailReport(socialMonitorReportRequest);
+		    } catch(StreamApiException | StreamApiConnectException e) {
+		        LOG.error( "Could not stream  report", e );
 		        fileUpload.setStatus( CommonConstants.STATUS_FAIL );
 		        fileUploadDao.saveOrUpdate( fileUpload );
 		    }
