@@ -541,14 +541,6 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
 		        fileUpload.setStatus( CommonConstants.STATUS_FAIL );
 		        fileUploadDao.saveOrUpdate( fileUpload );
 		    }
-		}else {
-			try {
-	            streamApiIntegrationBuilder.getStreamApi().generateEmailReport(socialMonitorReportRequest);
-		    } catch(StreamApiException | StreamApiConnectException e) {
-		        LOG.error( "Could not stream  report", e );
-		        fileUpload.setStatus( CommonConstants.STATUS_FAIL );
-		        fileUploadDao.saveOrUpdate( fileUpload );
-		    }
 		}
     }
 
