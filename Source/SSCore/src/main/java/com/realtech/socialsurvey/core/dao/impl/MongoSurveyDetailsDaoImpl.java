@@ -310,7 +310,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
 
     @Override
-    public void updateSurveyAsAbusive( String surveyMongoId, String reporterEmail, String reporterName )
+    public void updateSurveyAsAbusive( String surveyMongoId, String reporterEmail, String reporterName, String reportReason )
     {
         LOG.debug( "Method updateSurveyAsAbusive() to mark survey as abusive started." );
         Query query = new Query();
@@ -325,7 +325,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         query.addCriteria( Criteria.where( CommonConstants.SURVEY_ID_COLUMN ).is( surveyMongoId ) );
         update = new Update();
         update.set( CommonConstants.SURVEY_ID_COLUMN, surveyMongoId );
-        update.push( CommonConstants.ABUSE_REPORTERS_COLUMN, new ReporterDetail( reporterName, reporterEmail ) );
+        update.push( CommonConstants.ABUSE_REPORTERS_COLUMN, new ReporterDetail( reporterName, reporterEmail, reportReason ) );
         mongoTemplate.upsert( query, update, ABS_REPORTER_DETAILS_COLLECTION );
         LOG.debug( "Method updateSurveyAsAbusive() to mark survey as abusive finished." );
     }
@@ -2232,7 +2232,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         AbuseReporterDetails absReporterDetailForApp = new AbuseReporterDetails();
         Set<ReporterDetail> abuseReportersForApp = new HashSet<ReporterDetail>();
         abuseReportersForApp.add( new ReporterDetail( CommonConstants.REPORT_ABUSE_BY_APPLICATION_NAME,
-            CommonConstants.REPORT_ABUSE_BY_APPLICATION_EMAIL ) );
+            CommonConstants.REPORT_ABUSE_BY_APPLICATION_EMAIL, CommonConstants.REPORT_ABUSE_BY_APPLICATION_REASON ) );
         absReporterDetailForApp.setAbuseReporters( abuseReportersForApp );
 
         List<AbusiveSurveyReportWrapper> abusiveSurveyReports = new ArrayList<AbusiveSurveyReportWrapper>();

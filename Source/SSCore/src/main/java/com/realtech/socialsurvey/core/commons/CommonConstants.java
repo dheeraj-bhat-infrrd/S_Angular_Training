@@ -1096,6 +1096,7 @@ public interface CommonConstants
     //mark abusive by application constant
     public static final String REPORT_ABUSE_BY_APPLICATION_NAME = "Application";
     public static final String REPORT_ABUSE_BY_APPLICATION_EMAIL = "Reported By Application";
+    public static final String REPORT_ABUSE_BY_APPLICATION_REASON = "Abusive words found";
 
     // sendgrid inbound mail status
     public static final String SENDGRID_OK_STATUS = "OK";

@@ -504,10 +504,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     @Override
-    public void updateSurveyAsAbusive( String surveymongoId, String reporterEmail, String reporterName )
+    public void updateSurveyAsAbusive( String surveymongoId, String reporterEmail, String reporterName, String reportReason )
     {
         LOG.debug( "Method updateSurveyAsAbusive() to mark the survey as abusive, started" );
-        surveyDetailsDao.updateSurveyAsAbusive( surveymongoId, reporterEmail, reporterName );
+        surveyDetailsDao.updateSurveyAsAbusive( surveymongoId, reporterEmail, reporterName, reportReason );
         LOG.debug( "Method updateSurveyAsAbusive() to mark the survey as abusive, finished" );
     }
 
