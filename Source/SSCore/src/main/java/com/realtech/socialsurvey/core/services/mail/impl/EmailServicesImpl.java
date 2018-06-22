@@ -1319,12 +1319,14 @@ public class EmailServicesImpl implements EmailServices
         mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, appBaseUrl, logoUrl, shortSurveyLink,
             customerFirstName, customerLastName, agentName, agentFirstName, agentSignature, customerEmailId, user.getEmailId(),
             companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(),
-            companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone, unsubscribedURL );
+            companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone, unsubscribedURL,
+            branchAndRegion.get( CommonConstants.BRANCH_NAME_COLUMN ), branchAndRegion.get( CommonConstants.REGION_COLUMN ));
 
         mailBody = emailFormatHelper.replaceLegends( false, mailBody, appBaseUrl, logoUrl, shortSurveyLink, customerFirstName,
             customerLastName, agentName, agentFirstName, agentSignature, customerEmailId, user.getEmailId(), companyName,
             dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer,
-            agentDisclaimer, agentLicenses, agentTitle, agentPhone, unsubscribedURL );
+            agentDisclaimer, agentLicenses, agentTitle, agentPhone, unsubscribedURL,
+            branchAndRegion.get( CommonConstants.BRANCH_NAME_COLUMN ), branchAndRegion.get( CommonConstants.REGION_COLUMN ));
 
         //send the email
         if ( mailSubject == null || mailSubject.isEmpty() ) {

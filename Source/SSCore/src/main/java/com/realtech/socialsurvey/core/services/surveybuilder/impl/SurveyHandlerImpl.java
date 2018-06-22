@@ -42,6 +42,7 @@ import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -53,8 +54,10 @@ import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
+import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.dao.RegionDao;
 import com.realtech.socialsurvey.core.dao.SurveyCsvUploadDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
@@ -264,6 +267,13 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     
     @Autowired
     private EmailUnsubscribeService unsubscribeService;
+    
+    @javax.annotation.Resource
+    @Qualifier ( "branch")
+    private BranchDao branchDao;
+    
+    @Autowired
+    private RegionDao regionDao;
 
     private static final int USER_EMAIL_ID_INDEX = 3;
     private static final int SURVEY_SOURCE_ID_INDEX = 2;
@@ -1388,12 +1398,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, null, custFirstName,
             custLastName, agentName, agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ),
             currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone,
-            unsubscribedUrl);
+            unsubscribedUrl, branchDao.findById( Branch.class, branchId ).getBranch(), regionDao.findById( Region.class, regionId ).getRegion());
 
         mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, null, custFirstName,
             custLastName, agentName ,agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ),
             currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone,
-            unsubscribedUrl);
+            unsubscribedUrl, branchDao.findById( Branch.class, branchId ).getBranch(), regionDao.findById( Region.class, regionId ).getRegion());
 
         //JIRA SS-473 end
 
@@ -1540,12 +1550,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             if ( agentSettings.getLicenses() != null && agentSettings.getLicenses().getAuthorized_in() != null ) {
                 agentLicenses = StringUtils.join( agentSettings.getLicenses().getAuthorized_in(), ',' );
             }
-            
+
             String unsubscribedUrl = buildUnsubscribedUrl( user.getUserId(), custEmail, user.getCompany().getCompanyId() );
             mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, null, custFirstName,
                 custLastName, agentName, agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName,
                 dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer,
-                agentDisclaimer, agentLicenses, agentTitle, agentPhone, unsubscribedUrl );
+                agentDisclaimer, agentLicenses, agentTitle, agentPhone, unsubscribedUrl,
+                branchDao.findById( Branch.class, branchId ).getBranch(),
+                regionDao.findById( Region.class, regionId ).getRegion() );
 
             String mailSubject = surveyCompletionUnpleasant.getMail_subject();
             if ( mailSubject == null || mailSubject.isEmpty() ) {
@@ -1555,7 +1567,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, null, custFirstName,
                 custLastName, agentName, agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName,
                 dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer,
-                agentDisclaimer, agentLicenses, agentTitle, agentPhone, unsubscribedUrl );
+                agentDisclaimer, agentLicenses, agentTitle, agentPhone, unsubscribedUrl,
+                branchDao.findById( Branch.class, branchId ).getBranch(),
+                regionDao.findById( Region.class, regionId ).getRegion() );
             //JIRA SS-473 end
 
             //For Company with hidden agents
@@ -1716,12 +1730,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, "", custFirstName,
             custLastName, agentName, agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ),
             currentYear, fullAddress, links, user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone,
-            unsubscribedUrl);
+            unsubscribedUrl, branchDao.findById( Branch.class, branchId ).getBranch(), regionDao.findById( Region.class, regionId ).getRegion());
 
         mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, "", custFirstName,
             custLastName, agentName, agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ),
             currentYear, fullAddress, links, user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone,
-            unsubscribedUrl);
+            unsubscribedUrl, branchDao.findById( Branch.class, branchId ).getBranch(), regionDao.findById( Region.class, regionId ).getRegion());
         //JIRA SS-473 end
 
 
