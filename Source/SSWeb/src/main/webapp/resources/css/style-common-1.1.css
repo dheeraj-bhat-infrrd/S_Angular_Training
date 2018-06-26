@@ -1930,3 +1930,12 @@ span.footer-ul a:hover {
 .review-abusive-share-btn{
 	margin:10px auto;
 }
+
+.abuse-text-window {
+	text-overflow: ellipsis;
+	overflow-x: hidden; 
+}
+.overflow-y-scroll {
+		overflow-y: auto;
+		max-height: 150px;
+	}

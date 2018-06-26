@@ -2009,7 +2009,7 @@ public class DashboardController
             String customerName = surveyDetails.getCustomerFirstName() + " " + surveyDetails.getCustomerLastName();
 
             //make survey as abusive
-            surveyHandler.updateSurveyAsAbusive( surveyMongoId, surveyDetails.getCustomerEmail(), customerName );
+            surveyHandler.updateSurveyAsAbusive( surveyMongoId, surveyDetails.getCustomerEmail(), customerName, reason );
 
             // Calling email services method to send mail to the Application
             // level admin.

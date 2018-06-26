@@ -521,6 +521,11 @@
 	.sr-logo-cont{
 		display:none;
 	}
+	
+	.overflow-x-scroll {
+		overflow-x: auto;
+	}
+
 }
 
 
@@ -533,6 +538,7 @@
 	.prof-img-height {
 		height: 195px;
 	}
+
 }
 
 

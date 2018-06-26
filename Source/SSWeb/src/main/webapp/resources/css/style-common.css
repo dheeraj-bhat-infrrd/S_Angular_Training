@@ -9106,7 +9106,7 @@ label.url-change-input-label {
 	border-bottom: 1px solid #dcdcdc;
 }
 
-.abuse-review-hdr-row .abuse-report-col {
+.abuse-review-hdr-row {
 	font-family: 'opensanssemibold';
 }
 
@@ -9981,6 +9981,11 @@ ul.accordion li>a:before {
 #other-lbl{
 	margin-left: 15px;
     margin-right: 141px;
+}
+
+#unsubscribed-lbl{
+    margin-left: 15px;
+    margin-right: 52px;
 }
 
 .trans-font-style{

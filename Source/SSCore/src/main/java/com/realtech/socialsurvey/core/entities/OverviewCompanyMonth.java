@@ -75,9 +75,11 @@ public class OverviewCompanyMonth implements Serializable
     @Column ( name = "third_party")
     private int thirdParty;
 
-    
     @Column ( name = "cumulative_user_count" )
     private int cumulativeUserCount;
+    
+    @Column ( name = "unsubscribed_count")
+    private int unsubscribed;
 
 
     public String getOverviewCompanyMonthId()
@@ -327,6 +329,18 @@ public class OverviewCompanyMonth implements Serializable
     }
 
 
+    public int getUnsubscribed()
+    {
+        return unsubscribed;
+    }
+
+
+    public void setUnsubscribed( int unsubscribed )
+    {
+        this.unsubscribed = unsubscribed;
+    }
+
+
     @Override
     public String toString()
     {
@@ -336,7 +350,8 @@ public class OverviewCompanyMonth implements Serializable
             + ", duplicate=" + duplicate + ", corrupted=" + corrupted + ", other=" + other + ", completePercentage="
             + completePercentage + ", incompletePercentage=" + incompletePercentage + ", rating=" + rating + ", totalReview="
             + totalReview + ", month=" + month + ", year=" + year + ", thirdParty=" + thirdParty + ", cumulativeUserCount="
-            + cumulativeUserCount + "]";
+            + cumulativeUserCount + ", unsubscribed=" + unsubscribed + "]";
     }
+
 
 }

@@ -254,6 +254,22 @@ public class SSAPIOperations
         }        
     }
     
+    public boolean isEmailUnsubscribed( String recipient, long companyId )
+    {
+        Call<Boolean> request = RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationService()
+            .isEmailUnsubscribed( recipient, companyId );
+        Response<Boolean> response = null;
+        try {
+            response = request.execute();
+        } catch ( IOException e ) {
+            LOG.error( "Exception while fetching email unsubscribed status." );
+        }
+        if ( response != null ) {
+            return response.body();
+        }
+        return false;
+    }
+
     //checkIfSurveyIsOld
     public String checkIfSurveyEmailIsOld(String recepientEmailId) throws IOException 
     {

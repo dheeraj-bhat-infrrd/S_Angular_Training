@@ -645,6 +645,12 @@
         <mask/>
         <set_empty_string>N</set_empty_string>
         </field>
+      <field>
+        <name>unsubscribed</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -828,6 +834,12 @@
         <field>
           <aggregate>total_deleted</aggregate>
           <subject>total_deleted</subject>
+          <type>SUM</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>unsubscribed</aggregate>
+          <subject>unsubscribed</subject>
           <type>SUM</type>
           <valuefield/>
         </field>
@@ -1761,7 +1773,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var total_incomplete_transactions_var &#x3d; total_initiated &#x2b; total_pre_initiated &#x2b; total_deleted&#x3b;&#xd;&#xa;var total_processed &#x3d; total_initiated &#x2b; total_pre_initiated &#x2b; total_completed &#x2b; total_deleted&#x3b;&#xd;&#xa;var total_unprocessed &#x3d; total_corrupted &#x2b; total_duplicate &#x2b; total_archieved &#x2b; total_ignored &#x2b; total_unassigned &#x2b; total_not_allowed&#x3b;&#xd;&#xa;&#xd;&#xa;var complete_percentage &#x3d; 0&#x3b;&#xd;&#xa;var incomplete_percentage &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_processed &#x21;&#x3d; 0 &#x26;&#x26; total_processed &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	complete_percentage &#x3d; &#x28;total_completed&#x2f;total_processed&#x29;&#x2a;100.00&#x3b;&#xd;&#xa;	incomplete_percentage &#x3d; &#x28;total_incomplete_transactions_var&#x2f;total_processed&#x29;&#x2a;100.00&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var other &#x3d; total_unprocessed - &#x28;total_corrupted &#x2b; total_unassigned &#x2b; total_duplicate&#x29;&#x3b;&#xd;&#xa;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var total_incomplete_transactions_var &#x3d; total_initiated &#x2b; total_pre_initiated &#x2b; total_deleted&#x3b;&#xd;&#xa;var total_processed &#x3d; total_initiated &#x2b; total_pre_initiated &#x2b; total_completed &#x2b; total_deleted&#x3b;&#xd;&#xa;var total_unprocessed &#x3d; total_corrupted &#x2b; total_duplicate &#x2b; total_archieved &#x2b; total_ignored &#xa;						&#x2b; total_unassigned &#x2b; total_not_allowed &#x2b; unsubscribed&#x3b;&#xd;&#xa;&#xd;&#xa;var complete_percentage &#x3d; 0&#x3b;&#xd;&#xa;var incomplete_percentage &#x3d; 0&#x3b;&#xd;&#xa;if&#x28;total_processed &#x21;&#x3d; 0 &#x26;&#x26; total_processed &#x21;&#x3d; null&#x29;&#x7b;&#xd;&#xa;	complete_percentage &#x3d; &#x28;total_completed&#x2f;total_processed&#x29;&#x2a;100.00&#x3b;&#xd;&#xa;	incomplete_percentage &#x3d; &#x28;total_incomplete_transactions_var&#x2f;total_processed&#x29;&#x2a;100.00&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;var other &#x3d; total_unprocessed - &#x28;total_corrupted &#x2b; total_unassigned &#x2b; total_duplicate &#x2b; unsubscribed&#x29;&#x3b;&#xd;&#xa;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>total_incomplete_transactions_var</name>
         <rename>total_incomplete_transactions_var</rename>
         <type>Number</type>
@@ -1821,7 +1833,7 @@
     <optimizationLevel>9</optimizationLevel>
     <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var total_corrupted &#x3d; 0&#x3b;&#xd;&#xa;var total_duplicate &#x3d; 0&#x3b;&#xd;&#xa;var total_unassigned &#x3d; 0&#x3b;&#xd;&#xa;var total_pre_initiated &#x3d; 0&#x3b;&#xd;&#xa;var total_initiated &#x3d; 0&#x3b;&#xd;&#xa;var total_archieved &#x3d; 0&#x3b;&#xd;&#xa;var total_ignored &#x3d; 0&#x3b;&#xd;&#xa;var total_not_allowed &#x3d; 0&#x3b;&#xd;&#xa;var total_deleted &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;STATUS &#x3d;&#x3d; 0&#x29;&#x7b;&#xd;&#xa;	total_deleted &#x3d; status_count&#x3b;&#xd;&#xa;&#x7d;else if&#x28;STATUS &#x3d;&#x3d; 3&#x29;&#x7b;&#xd;&#xa;	total_corrupted &#x3d; status_count&#x3b;&#xd;&#xa;&#x7d;else if&#x28;STATUS &#x3d;&#x3d; 5&#x29;&#x7b;&#xd;&#xa;	total_duplicate&#x3d;status_count&#x3b;&#xd;&#xa;&#x7d;else if&#x28;STATUS &#x3d;&#x3d; 8&#x29;&#x7b;&#xd;&#xa;	total_archieved&#x3d;status_count&#x3b;&#xd;&#xa;&#x7d;else if&#x28;STATUS &#x3d;&#x3d; 10&#x29;&#x7b;&#xd;&#xa;	total_unassigned &#x3d; status_count&#x3b;&#xd;&#xa;&#x7d;else if&#x28;STATUS &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;	total_pre_initiated &#x3d; status_count&#x3b;&#xd;&#xa;&#x7d;else if&#x28;STATUS &#x3d;&#x3d; 2&#x29;&#x7b;&#xd;&#xa;	total_initiated &#x3d; status_count&#x3b;&#xd;&#xa;&#x7d;else if&#x28;STATUS &#x3d;&#x3d; 9&#x29;&#x7b;&#xd;&#xa;	total_ignored &#x3d; status_count&#x3b;&#xd;&#xa;&#x7d;else if&#x28;STATUS &#x3d;&#x3d; 11&#x29;&#x7b;&#xd;&#xa;	total_not_allowed &#x3d; status_count&#x3b;&#xd;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;</jsScript_script>
+        <jsScript_script>&#x2f;&#x2f;Script here&#xd;&#xa;&#xd;&#xa;var total_corrupted &#x3d; 0&#x3b;&#xd;&#xa;var total_duplicate &#x3d; 0&#x3b;&#xd;&#xa;var total_unassigned &#x3d; 0&#x3b;&#xd;&#xa;var total_pre_initiated &#x3d; 0&#x3b;&#xd;&#xa;var total_initiated &#x3d; 0&#x3b;&#xd;&#xa;var total_archieved &#x3d; 0&#x3b;&#xd;&#xa;var total_ignored &#x3d; 0&#x3b;&#xd;&#xa;var total_not_allowed &#x3d; 0&#x3b;&#xd;&#xa;var total_deleted &#x3d; 0&#x3b;&#xa;var unsubscribed &#x3d; 0&#x3b;&#xd;&#xa;&#xd;&#xa;if&#x28;STATUS &#x3d;&#x3d; 0&#x29;&#x7b;&#xd;&#xa;	total_deleted &#x3d; status_count&#x3b;&#xd;&#xa;&#x7d;else if&#x28;STATUS &#x3d;&#x3d; 3&#x29;&#x7b;&#xd;&#xa;	total_corrupted &#x3d; status_count&#x3b;&#xd;&#xa;&#x7d;else if&#x28;STATUS &#x3d;&#x3d; 5&#x29;&#x7b;&#xd;&#xa;	total_duplicate&#x3d;status_count&#x3b;&#xd;&#xa;&#x7d;else if&#x28;STATUS &#x3d;&#x3d; 8&#x29;&#x7b;&#xd;&#xa;	total_archieved&#x3d;status_count&#x3b;&#xd;&#xa;&#x7d;else if&#x28;STATUS &#x3d;&#x3d; 10&#x29;&#x7b;&#xd;&#xa;	total_unassigned &#x3d; status_count&#x3b;&#xd;&#xa;&#x7d;else if&#x28;STATUS &#x3d;&#x3d; 1&#x29;&#x7b;&#xd;&#xa;	total_pre_initiated &#x3d; status_count&#x3b;&#xd;&#xa;&#x7d;else if&#x28;STATUS &#x3d;&#x3d; 2&#x29;&#x7b;&#xd;&#xa;	total_initiated &#x3d; status_count&#x3b;&#xd;&#xa;&#x7d;else if&#x28;STATUS &#x3d;&#x3d; 9&#x29;&#x7b;&#xd;&#xa;	total_ignored &#x3d; status_count&#x3b;&#xd;&#xa;&#x7d;else if&#x28;STATUS &#x3d;&#x3d; 11&#x29;&#x7b;&#xd;&#xa;	total_not_allowed &#x3d; status_count&#x3b;&#xd;&#xa;&#x7d; else if&#x28;STATUS &#x3d;&#x3d; 12&#x29;&#x7b;&#xa;	unsubscribed &#x3d; status_count&#x3b;&#xa;&#x7d;&#xd;&#xa;&#xd;&#xa;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>total_corrupted</name>
         <rename>total_corrupted</rename>
         <type>Number</type>
@@ -1872,7 +1884,13 @@
         <replace>N</replace>
       </field>      <field>        <name>total_deleted</name>
         <rename>total_deleted</rename>
-        <type>String</type>
+        <type>Integer</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>unsubscribed</name>
+        <rename>unsubscribed</rename>
+        <type>Integer</type>
         <length>-1</length>
         <precision>-1</precision>
         <replace>N</replace>
@@ -1988,6 +2006,10 @@
         <field>
           <column_name>third_party</column_name>
           <stream_name>third_party</stream_name>
+        </field>
+        <field>
+          <column_name>unsubscribed_count</column_name>
+          <stream_name>unsubscribed</stream_name>
         </field>
     </fields>
      <cluster_schema/>

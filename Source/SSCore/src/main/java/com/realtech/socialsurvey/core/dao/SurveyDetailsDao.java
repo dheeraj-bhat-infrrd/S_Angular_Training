@@ -178,7 +178,7 @@ public interface SurveyDetailsDao
     public SurveyDetails getSurveyBySourceSourceIdAndMongoCollection( String surveySourceId, long iden, String collectionName );
 
 
-    void updateSurveyAsAbusive( String surveyMongoId, String reporterEmail, String reporterName );
+    void updateSurveyAsAbusive( String surveyMongoId, String reporterEmail, String reporterName, String reportReason  );
 
 
     public List<AbusiveSurveyReportWrapper> getSurveysReporetedAsAbusive( int start, int rows );

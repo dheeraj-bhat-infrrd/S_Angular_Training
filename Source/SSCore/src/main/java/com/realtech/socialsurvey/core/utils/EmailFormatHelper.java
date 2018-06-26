@@ -162,7 +162,7 @@ public class EmailFormatHelper
         String custFirstName, String custLastName, String agentName, String agentFirstName, String agentSignature,
         String recipientMailId, String senderEmail, String companyName, String initiatedDate, String currentYear,
         String fullAddress, String links, String agentProfileName, String companyDisclaimer, String agentDisclaimer,
-        String agentLicense, String agentTitle, String agentPhoneNumber , long userId ) throws InvalidInputException
+        String agentLicense, String agentTitle, String agentPhoneNumber, String unsubscribeUrl , long userId ) throws InvalidInputException
     {
         LOG.info( "Method to replace legends with values called, replaceLegends() started" );
         if ( StringUtils.isEmpty( content ) ) {
@@ -203,6 +203,8 @@ public class EmailFormatHelper
         content = content.replace( "[AgentDisclaimer]", agentDisclaimer );
         content = content.replace( "[AgentLicense]", agentLicense );
         //JIRA SS-473 end
+        //JIRA SS-1547
+        content = content.replace( "[unsubscribeUrl]", unsubscribeUrl );
         String company_facebook_link = null;
         String company_twitter_link = null;
         String company_linkedin_link = null;

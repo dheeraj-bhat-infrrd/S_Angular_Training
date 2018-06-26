@@ -54,10 +54,12 @@ public class SaveMailToSolrBolt extends BaseComputeBoltWithAck
         boolean isNew = false;
         boolean deliveryAttempted = false;
         // get the email message
-        EmailMessage emailMessage = ConversionUtils.deserialize( input.getString( 0 ), EmailMessage.class );
-        LOG.info("Starting bol to save mail for recepient " + emailMessage.getRecipients().get(0));
+        //EmailMessage emailMessage = ConversionUtils.deserialize( input.getString( 0 ), EmailMessage.class );
+        EmailMessage emailMessage = (EmailMessage) input.getValueByField( "emailMessage" );
+        LOG.info("Starting bolt to save mail for recipient " + emailMessage.getRecipients().get(0));
+
         // check if the mail is already saved and email delivery was attempted
-        LOG.info("Gettign mail from solr by UUID " + emailMessage.getRandomUUID());
+        LOG.info("Getting mail from solr by UUID " + emailMessage.getRandomUUID());
         Optional<SolrEmailMessageWrapper> optionalSolrEmailMessage = APIOperations.getInstance()
             .getEmailMessageFromSOLR( emailMessage );
         if ( optionalSolrEmailMessage.isPresent() ) {

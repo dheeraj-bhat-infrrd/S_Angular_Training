@@ -161,6 +161,7 @@ public interface CommonConstants
     public static final int STATUS_SURVEYPREINITIATION_DELETED = 0;
     public static final int STATUS_SURVEYPREINITIATION_MISMATCH_RECORD = 10;
     public static final int STATUS_SURVEYPREINITIATION_SURVEY_NOT_ALLOWED = 11;
+    public static final int STATUS_SURVEYPREINITIATION_UNSUBSCRIBED = 12;
 
     public static final int SURVEY_PARTICIPANT_TYPE_BORROWER = 1;
     public static final int SURVEY_PARTICIPANT_TYPE_COBORROWER = 2;
@@ -1095,6 +1096,7 @@ public interface CommonConstants
     //mark abusive by application constant
     public static final String REPORT_ABUSE_BY_APPLICATION_NAME = "Application";
     public static final String REPORT_ABUSE_BY_APPLICATION_EMAIL = "Reported By Application";
+    public static final String REPORT_ABUSE_BY_APPLICATION_REASON = "Abusive words found";
 
     // sendgrid inbound mail status
     public static final String SENDGRID_OK_STATUS = "OK";
@@ -1666,4 +1668,19 @@ public interface CommonConstants
     public static final String UTF_8_ENCODING = "UTF-8";
 
     public static final String OS_LINUX = "linux";
+
+    //Unsubscribed Email Constatns SS-1547
+    public static final int STATUS_UNSUBSCRIBED = 1;
+    public static final int STATUS_RESUBSCRIBED = 2;
+    public static final int LEVEL_APPLICATION = 1;
+    public static final int LEVEL_COMPANY = 2;
+    public static final String LEVEL_COLUMN = "level";
+    public static final String UNSUBSCRIBE_URL = "rest/unsubscribe/customeremail";
+    public static final String STATUS_SS_USER_ADMIN = "Can not unsubscribe. Email id belongs to social survey user or admin.";
+    public static final String STATUS_ALREADY_UNSUBSCRIBED = "Can not unsubscribe. Email id has already been unsubscribed.";
+    public static final String STATUS_SUCCESS_UNSUBSCRIBE = "Email id successfully unsubscribed.";
+    public static final String STATUS_ALREADY_RESUBSCRIBED = "Can not resubscribe. Email id already resubscribed.";
+    public static final String STATUS_NOT_IN_UNSUBSCRIBED_LIST = "Can not resubscribe. Email id not unsubscribed before.";
+    public static final String STATUS_SUCCESS_RESUBSCRIBE = "Email id successfully resubscribed.";
+    public static final String STATUS_UNSUBSCRIBE_FAILED = "FAILED TO UNSUBSCRIBE";
 }

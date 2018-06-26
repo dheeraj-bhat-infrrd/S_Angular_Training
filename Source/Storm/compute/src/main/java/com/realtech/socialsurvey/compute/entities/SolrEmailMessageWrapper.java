@@ -45,6 +45,8 @@ public class SolrEmailMessageWrapper extends EmailMessage
         this.agentId = emailMessage.agentId;
         this.agentEmailId = emailMessage.agentEmailId;
         this.isRetried = emailMessage.isRetried;
+        this.isEmailUnsubscribed = emailMessage.isEmailUnsubscribed;
+        this.unsubscribedEmails = emailMessage.unsubscribedEmails;
         
         if(emailMessage.attachments != null && !emailMessage.attachments.isEmpty()){
             attachmentDetail = new ArrayList<>();
