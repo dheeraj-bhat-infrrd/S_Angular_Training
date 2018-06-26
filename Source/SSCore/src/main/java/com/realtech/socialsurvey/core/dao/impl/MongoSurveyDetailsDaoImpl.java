@@ -2698,6 +2698,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         update.set( CommonConstants.BRANCH_ID_COLUMN, toUserProfile.getBranchId() );
         update.set( CommonConstants.COMPANY_ID_COLUMN, toUserProfile.getCompany().getCompanyId() );
         
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
+        
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.debug( "Method updateAgentIdOfSurveys() to update agent ids when survey moved from one to another user finished." );
 
@@ -2726,6 +2728,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         update.set( CommonConstants.BRANCH_ID_COLUMN, toUserProfile.getBranchId() );
         update.set( CommonConstants.COMPANY_ID_COLUMN, toUserProfile.getCompany().getCompanyId() );
         
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
+
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.debug( "Method updateAgentIdOfSurveys() to update agent ids when survey moved from one to another user finished." );
 
@@ -3049,6 +3053,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         //add company id criteria
         query.addCriteria( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ) );
 
+        //exclude abusive surveys
+        query.addCriteria( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( false ) );
 
         // add status criteria
         query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
@@ -3105,6 +3111,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         Query query = new Query();
         //add company id criteria
         query.addCriteria( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ) );
+        
+        //exclude abusive surveys
+        query.addCriteria( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( false ) );
 
 
         // add status criteria
@@ -3153,6 +3162,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         BasicDBList pipeline = new BasicDBList();
         //match for non abusive reviews
         pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.COMPANY_ID_COLUMN , companyId ) ) );
+        
+        //exclude abusive surveys
+        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.IS_ABUSIVE_COLUMN , false ) ) );
 
         // add status criteria
         pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.STAGE_COLUMN ,  CommonConstants.SURVEY_STAGE_COMPLETE  ) ) );

@@ -532,9 +532,7 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
 			reportRequest.setFileUploadId(fileUpload.getFileUploadId());
 			reportRequest.setCompanyId(fileUpload.getCompany().getCompanyId());
 			streamApiIntegrationBuilder.getStreamApi().generateEmailReport(reportRequest);
-		}
-	
-		if ( reportId == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT || reportId == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD ) {
+		}else if ( reportId == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT || reportId == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD ) {
 		    socialMonitorReportRequest.setFileUploadId(fileUpload.getFileUploadId());
 		    try {
 	            streamApiIntegrationBuilder.getStreamApi().generateEmailReport(socialMonitorReportRequest);

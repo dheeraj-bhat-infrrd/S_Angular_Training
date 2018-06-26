@@ -162,7 +162,7 @@ public class EmailFormatHelper
         String custFirstName, String custLastName, String agentName, String agentFirstName, String agentSignature,
         String recipientMailId, String senderEmail, String companyName, String initiatedDate, String currentYear,
         String fullAddress, String links, String agentProfileName, String companyDisclaimer, String agentDisclaimer,
-        String agentLicense, String agentTitle, String agentPhoneNumber, String unsubscribeUrl ) throws InvalidInputException
+        String agentLicense, String agentTitle, String agentPhoneNumber, String unsubscribeUrl , long userId ) throws InvalidInputException
     {
         LOG.info( "Method to replace legends with values called, replaceLegends() started" );
         if ( StringUtils.isEmpty( content ) ) {
@@ -229,7 +229,7 @@ public class EmailFormatHelper
 
         //JIRA SS-626 begin
         try {
-            User user = userManagementService.getUserByEmailAddress( senderEmail );
+            User user = userManagementService.getUserByUserId(userId);
             if ( user == null ) {
                 throw new NoRecordsFetchedException( "No user found" );
             }

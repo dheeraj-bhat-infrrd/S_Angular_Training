@@ -433,4 +433,6 @@ public interface SurveyHandler
     public void moveSurveyBetweenUsers( long surveyPreinitiationId, long toUserId )
         throws InvalidInputException, NoRecordsFetchedException, SolrException;
 
+	SurveyPreInitiation getPreInitiatedSurveyByCustomer(String customerEmailId);
+
 }
