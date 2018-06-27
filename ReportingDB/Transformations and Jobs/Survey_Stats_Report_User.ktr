@@ -114,8 +114,9 @@
     <data_tablespace/>
     <index_tablespace/>
     <attributes>
-      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCompression</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useServerPrepStmts</code><attribute>false</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
@@ -130,23 +131,24 @@
   </connection>
   <connection>
     <name>SS_INFO_CONNECTION</name>
-    <server>&#x24;&#x7b;mysql_host&#x7d;</server>
+    <server>&#x24;&#x7b;SS_MYSQL_HOST&#x7d;</server>
     <type>MYSQL</type>
     <access>Native</access>
-    <database>&#x24;&#x7b;mysql_master_schema_name&#x7d;</database>
-    <port>&#x24;&#x7b;mysql_port_no&#x7d;</port>
-    <username>&#x24;&#x7b;mysql_user_name&#x7d;</username>
-    <password>&#x24;&#x7b;mysql_password&#x7d;</password>
+    <database>&#x24;&#x7b;SS_MYSQL_SCHEMA&#x7d;</database>
+    <port>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</port>
+    <username>&#x24;&#x7b;SS_MYSQL_USER_NAME&#x7d;</username>
+    <password>&#x24;&#x7b;SS_MYSQL_PASSWORD&#x7d;</password>
     <servername/>
     <data_tablespace/>
     <index_tablespace/>
     <attributes>
-      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
-      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCompression</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useServerPrepStmts</code><attribute>false</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
       <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
-      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;mysql_port_no&#x7d;</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</attribute></attribute>
       <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
       <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
       <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
@@ -197,7 +199,6 @@
   <hop> <from>Join User Survey Details</from><to>Filter Detractors</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey Details</from><to>Filter Passives</to><enabled>Y</enabled> </hop>
   <hop> <from>Join User Survey Details</from><to>Filter Promoters</to><enabled>Y</enabled> </hop>
-  <hop> <from>Join User Survey Details</from><to>Sort rows Avg Rating</to><enabled>Y</enabled> </hop>
   <hop> <from>Report Id  Detractors</from><to>Sort  Detractors</to><enabled>Y</enabled> </hop>
   <hop> <from>Report Id Abusive</from><to>Sort rows 10 2</to><enabled>Y</enabled> </hop>
   <hop> <from>Report Id Avg rating</from><to>Sort Avg Rating</to><enabled>Y</enabled> </hop>
@@ -268,6 +269,8 @@
   <hop> <from>Join User Survey Details</from><to>Filter Completed</to><enabled>Y</enabled> </hop>
   <hop> <from>Modified Java Script Value</from><to>delta </to><enabled>Y</enabled> </hop>
   <hop> <from>delta </from><to>survey_stats_report_id</to><enabled>Y</enabled> </hop>
+  <hop> <from>Join User Survey Details</from><to>Filter Abusive 2</to><enabled>Y</enabled> </hop>
+  <hop> <from>Filter Abusive 2</from><to>Sort rows Avg Rating</to><enabled>Y</enabled> </hop>
   </order>
   <step>
     <name>Filter Abusive</name>
@@ -400,6 +403,13 @@
    <function>&#x3c;&#x3e;</function>
    <rightvalue/>
    <value><name>constant</name><type>String</type><text>3rd Party Review</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>IS_ABUSIVE</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>Integer</type><text>0</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>   </condition>
   </conditions>
  </condition>
     </compare>
@@ -477,6 +487,13 @@
    <function>&#x3c;&#x3e;</function>
    <rightvalue/>
    <value><name>constant</name><type>String</type><text>3rd Party Review</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>IS_ABUSIVE</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>Integer</type><text>0</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>   </condition>
   </conditions>
  </condition>
     </compare>
@@ -727,6 +744,13 @@
    <function>&#x3c;&#x3e;</function>
    <rightvalue/>
    <value><name>constant</name><type>String</type><text>3rd Party Review</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>IS_ABUSIVE</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>Integer</type><text>0</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>   </condition>
   </conditions>
  </condition>
     </compare>
@@ -833,6 +857,13 @@
    <function>&#x3c;&#x3e;</function>
    <rightvalue/>
    <value><name>constant</name><type>String</type><text>3rd Party Review</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>   </condition>
+  <condition>
+   <negated>N</negated>
+   <operator>AND</operator>
+   <leftvalue>IS_ABUSIVE</leftvalue>
+   <function>&#x3d;</function>
+   <rightvalue/>
+   <value><name>constant</name><type>Integer</type><text>0</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>   </condition>
   </conditions>
  </condition>
     </compare>
@@ -4680,8 +4711,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1642</xloc>
-      <yloc>565</yloc>
+      <xloc>1645</xloc>
+      <yloc>640</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -5326,6 +5357,46 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>236</xloc>
       <yloc>1110</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Filter Abusive 2</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Sort rows Avg Rating</send_true_to>
+<send_false_to/>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <conditions>
+  <condition>
+   <negated>N</negated>
+   <conditions>
+    <condition>
+     <negated>N</negated>
+     <operator>OR</operator>
+     <leftvalue>IS_ABUSIVE</leftvalue>
+     <function>&#x3d;</function>
+     <rightvalue/>
+     <value><name>constant</name><type>Integer</type><text>0</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>&#x23;&#x3b;-&#x23;</mask></value>     </condition>
+    </conditions>
+   </condition>
+  </conditions>
+ </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1643</xloc>
+      <yloc>558</yloc>
       <draw>Y</draw>
       </GUI>
     </step>

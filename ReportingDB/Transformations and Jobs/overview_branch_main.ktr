@@ -1557,7 +1557,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, AGENT_NAME&#xd;&#xa;, SOURCE&#xd;&#xa;, BRANCH_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, REGION_ID&#xd;&#xa;, SCORE&#xd;&#xa;, IS_ABUSIVE&#xd;&#xa;FROM survey_details&#xd;&#xa;where BRANCH_ID &#x21;&#x3d; 0 and STAGE&#x3d;-1&#xd;&#xa;order by SURVEY_DETAILS_ID</sql>
+    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, AGENT_NAME&#xd;&#xa;, SOURCE&#xd;&#xa;, BRANCH_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, REGION_ID&#xd;&#xa;, SCORE&#xd;&#xa;, IS_ABUSIVE&#xd;&#xa;FROM survey_details&#xd;&#xa;where BRANCH_ID &#x21;&#x3d; 0 and STAGE&#x3d;-1 and IS_ABUSIVE&#x3d;0&#xd;&#xa;order by SURVEY_DETAILS_ID</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>

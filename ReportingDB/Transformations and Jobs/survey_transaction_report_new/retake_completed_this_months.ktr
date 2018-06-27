@@ -185,7 +185,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xa;  SURVEY_DETAILS_ID&#xa;, AGENT_ID&#xa;, month&#x28;SURVEY_COMPLETED_DATE_EST&#x29; as month&#xa;, year&#x28;SURVEY_COMPLETED_DATE_EST&#x29; as year&#xa;FROM survey_details&#xa;where RETAKE_SURVEY &#x3d; 1 and STAGE&#x3d;-1&#xa;AND month&#x28;SURVEY_COMPLETED_DATE_EST&#x29; &#x3d; month&#x28;curdate&#x28;&#x29;&#x29;&#xa;AND year&#x28;SURVEY_COMPLETED_DATE_EST&#x29; &#x3d; year&#x28;curdate&#x28;&#x29;&#x29;&#xa;AND AGENT_ID &#x21;&#x3d; 0&#xa;order by AGENT_ID,month,year&#x3b;</sql>
+    <sql>SELECT&#xa;  SURVEY_DETAILS_ID&#xa;, AGENT_ID&#xa;, month&#x28;SURVEY_COMPLETED_DATE_EST&#x29; as month&#xa;, year&#x28;SURVEY_COMPLETED_DATE_EST&#x29; as year&#xa;FROM survey_details&#xa;where RETAKE_SURVEY &#x3d; 1 and STAGE&#x3d;-1&#xa;AND month&#x28;SURVEY_COMPLETED_DATE_EST&#x29; &#x3d; month&#x28;curdate&#x28;&#x29;&#x29;&#xa;AND year&#x28;SURVEY_COMPLETED_DATE_EST&#x29; &#x3d; year&#x28;curdate&#x28;&#x29;&#x29;&#xa;AND AGENT_ID &#x21;&#x3d; 0 and IS_ABUSIVE&#x3d;0 &#xa;order by AGENT_ID,month,year&#x3b;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>

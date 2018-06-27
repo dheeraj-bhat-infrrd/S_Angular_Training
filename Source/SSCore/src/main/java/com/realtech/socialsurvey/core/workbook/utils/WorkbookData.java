@@ -1160,7 +1160,7 @@ public class WorkbookData
         userRankingReportToPopulate.add( "Company Name" );
         userRankingReportToPopulate.add( "Region Name" );
         userRankingReportToPopulate.add( "Branch Name" );
-        userRankingReportToPopulate.add( "Total number of reviews [Zillow + SocialSurvey]" );
+        userRankingReportToPopulate.add( "Total number of SocialSurvey reviews" );
         userRankingReportToPopulate.add( "Average Score of Reviews [Average of Social Reviews" );
         userRankingReportToPopulate.add( "Rank Score" );
         userRankingReportToPopulate.add( "SPS Score");
