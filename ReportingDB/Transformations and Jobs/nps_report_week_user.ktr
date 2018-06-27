@@ -103,6 +103,34 @@
       <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
     </attributes>
   </connection>
+  <connection>
+    <name>SS_INFO_CONNECTION</name>
+    <server>&#x24;&#x7b;SS_MYSQL_HOST&#x7d;</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>&#x24;&#x7b;SS_MYSQL_SCHEMA&#x7d;</database>
+    <port>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</port>
+    <username>&#x24;&#x7b;SS_MYSQL_USER_NAME&#x7d;</username>
+    <password>&#x24;&#x7b;SS_MYSQL_PASSWORD&#x7d;</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCompression</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useServerPrepStmts</code><attribute>false</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
   <order>
   <hop> <from>Generate random value</from><to>Table output</to><enabled>Y</enabled> </hop>
   <hop> <from>If field value is null</from><to>Generate random value</to><enabled>Y</enabled> </hop>
@@ -793,7 +821,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, AGENT_NAME&#xd;&#xa;, STAGE&#xd;&#xa;, NPS_SCORE&#xd;&#xa;, SURVEY_COMPLETED_DATE_EST&#xd;&#xa;,DATE_FORMAT&#x28;DATE_ADD&#x28;SURVEY_COMPLETED_DATE_EST, INTERVAL&#x28;-WEEKDAY&#x28;SURVEY_COMPLETED_DATE_EST&#x29;&#x29; DAY&#x29;,&#x27;&#x25;Y&#x2f;&#x25;m&#x2f;&#x25;d &#x25;H&#x3a;&#x25;i&#x3a;&#x25;s.000&#x27;&#x29; AS FIRST_DAY&#xd;&#xa;FROM survey_details&#xd;&#xa;WHERE STAGE &#x3d; -1 AND  NPS_SCORE &#x3c;&#x3e; -1 &#xd;&#xa;AND WEEK&#x28;SURVEY_COMPLETED_DATE_EST,1&#x29; &#x3e;&#x3d; WEEK&#x28;NOW&#x28;&#x29; - INTERVAL 2 WEEK,1&#x29;</sql>
+    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, AGENT_NAME&#xd;&#xa;, STAGE&#xd;&#xa;, NPS_SCORE&#xd;&#xa;, SURVEY_COMPLETED_DATE_EST&#xd;&#xa;,DATE_FORMAT&#x28;DATE_ADD&#x28;SURVEY_COMPLETED_DATE_EST, INTERVAL&#x28;-WEEKDAY&#x28;SURVEY_COMPLETED_DATE_EST&#x29;&#x29; DAY&#x29;,&#x27;&#x25;Y&#x2f;&#x25;m&#x2f;&#x25;d &#x25;H&#x3a;&#x25;i&#x3a;&#x25;s.000&#x27;&#x29; AS FIRST_DAY&#xd;&#xa;FROM survey_details&#xd;&#xa;WHERE STAGE &#x3d; -1 AND  NPS_SCORE &#x3c;&#x3e; -1 &#xd;&#xa;AND WEEK&#x28;SURVEY_COMPLETED_DATE_EST,1&#x29; &#x3e;&#x3d; WEEK&#x28;NOW&#x28;&#x29; - INTERVAL 2 WEEK,1&#x29;&#xa;and IS_ABUSIVE&#x3d;0&#x3b;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>

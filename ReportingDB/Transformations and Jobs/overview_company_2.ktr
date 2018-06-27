@@ -1873,7 +1873,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, AGENT_NAME&#xd;&#xa;, BRANCH_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, REGION_ID&#xd;&#xa;, SCORE&#xd;&#xa;,SOURCE&#xd;&#xa;, month&#x28;SURVEY_COMPLETED_DATE_EST&#x29; AS MONTH_Data&#xd;&#xa;, year&#x28;SURVEY_COMPLETED_DATE_EST&#x29; AS Year_Data&#xd;&#xa;, IS_ABUSIVE&#xd;&#xa;FROM survey_details&#xd;&#xa;where COMPANY_ID &#x21;&#x3d; 0 and STAGE&#x3d;-1 &#xa;AND SURVEY_COMPLETED_DATE_EST &#x3e;&#x3d; DATE_FORMAT&#x28;DATE_SUB&#x28; NOW&#x28;&#x29;, INTERVAL 5 MONTH &#x29;,&#x27;&#x25;Y-&#x25;m-01 00&#x3a;00&#x3a;00&#x27;&#x29; &#xd;&#xa;order by SURVEY_DETAILS_ID</sql>
+    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, AGENT_NAME&#xd;&#xa;, BRANCH_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, REGION_ID&#xd;&#xa;, SCORE&#xd;&#xa;,SOURCE&#xd;&#xa;, month&#x28;SURVEY_COMPLETED_DATE_EST&#x29; AS MONTH_Data&#xd;&#xa;, year&#x28;SURVEY_COMPLETED_DATE_EST&#x29; AS Year_Data&#xd;&#xa;, IS_ABUSIVE&#xd;&#xa;FROM survey_details&#xd;&#xa;where COMPANY_ID &#x21;&#x3d; 0 and STAGE&#x3d;-1 &#xa;AND SURVEY_COMPLETED_DATE_EST &#x3e;&#x3d; DATE_FORMAT&#x28;DATE_SUB&#x28; NOW&#x28;&#x29;, INTERVAL 5 MONTH &#x29;,&#x27;&#x25;Y-&#x25;m-01 00&#x3a;00&#x3a;00&#x27;&#x29; &#xa; and IS_ABUSIVE&#x3d;0 &#xd;&#xa;order by SURVEY_DETAILS_ID</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -1899,7 +1899,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, AGENT_NAME&#xd;&#xa;, BRANCH_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, REGION_ID&#xd;&#xa;, month&#x28;SURVEY_COMPLETED_DATE_EST&#x29; AS MONTH_Data&#xd;&#xa;, year&#x28;SURVEY_COMPLETED_DATE_EST&#x29; AS Year_Data&#xd;&#xa;FROM survey_details&#xd;&#xa;where COMPANY_ID &#x21;&#x3d; 0 AND SOURCE like &#x27;Zillow&#x27; &#xa;AND SURVEY_COMPLETED_DATE_EST &#x3e;&#x3d; DATE_FORMAT&#x28;DATE_SUB&#x28; NOW&#x28;&#x29;, INTERVAL 5 MONTH &#x29;,&#x27;&#x25;Y-&#x25;m-01 00&#x3a;00&#x3a;00&#x27;&#x29; &#xd;&#xa;order by COMPANY_ID&#x3b;&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, AGENT_NAME&#xd;&#xa;, BRANCH_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, REGION_ID&#xd;&#xa;, month&#x28;SURVEY_COMPLETED_DATE_EST&#x29; AS MONTH_Data&#xd;&#xa;, year&#x28;SURVEY_COMPLETED_DATE_EST&#x29; AS Year_Data&#xd;&#xa;FROM survey_details&#xd;&#xa;where COMPANY_ID &#x21;&#x3d; 0 AND SOURCE like &#x27;Zillow&#x27; &#xa;AND SURVEY_COMPLETED_DATE_EST &#x3e;&#x3d; DATE_FORMAT&#x28;DATE_SUB&#x28; NOW&#x28;&#x29;, INTERVAL 5 MONTH &#x29;,&#x27;&#x25;Y-&#x25;m-01 00&#x3a;00&#x3a;00&#x27;&#x29; &#xa; and IS_ABUSIVE&#x3d;0 &#xd;&#xa;order by COMPANY_ID&#x3b;&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
