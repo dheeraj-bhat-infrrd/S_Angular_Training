@@ -1,5 +1,8 @@
 package com.realtech.socialsurvey.compute.dao.impl;
 
+import java.io.Serializable;
+import java.util.List;
+
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,10 +16,6 @@ import com.realtech.socialsurvey.compute.dao.RedisSocialMediaStateDao;
 import com.realtech.socialsurvey.compute.utils.ConversionUtils;
 
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.exceptions.JedisConnectionException;
-
-import java.io.Serializable;
-import java.util.List;
 
 
 /**
@@ -27,7 +26,7 @@ import java.util.List;
 public class RedisSocialMediaStateDaoImpl implements RedisSocialMediaStateDao, Serializable
 {
     private static final long serialVersionUID = 1L;
-    private static final Logger LOG = LoggerFactory.getLogger( RedisCompanyKeywordsDaoImpl.class );
+    private static final Logger LOG = LoggerFactory.getLogger( RedisSocialMediaStateDaoImpl.class );
     private static final String TWITTER_LOCK = "twitterLock:";
     private static final String FACEBOOK_LOCK = "facebookLock:";
 

@@ -150,4 +150,8 @@ public interface SSApiIntegrationService
     @Headers ( "Content-Type: application/json")
     @GET ( "v1/unsubscribe/isunsubscribed")
     Call<Boolean> isEmailUnsubscribed(@Query("emailId") String recipient,@Query("companyId") long companyId );
+
+    
+    @GET ( "/v1//checkIfSurveyIsOld")
+    Call<String> checkIfSurveyIsOld( @Query ( "customerEmailId") String customerEmailId );
 }

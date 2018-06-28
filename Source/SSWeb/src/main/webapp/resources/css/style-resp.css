@@ -3176,6 +3176,11 @@
 	.padding-top-one-third {
 		padding-top: 33%;
 	}
+	
+	.abuse-text-hdr-window {
+		min-width: 380px;
+	}
+
 }
 
 

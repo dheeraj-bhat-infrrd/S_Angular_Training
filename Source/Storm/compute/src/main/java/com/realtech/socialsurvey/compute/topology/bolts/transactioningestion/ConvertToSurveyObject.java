@@ -10,6 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -45,6 +46,7 @@ public class ConvertToSurveyObject extends BaseComputeBoltWithAck
     private static final List<String> DATE_FORMATS = Arrays.asList("MM-dd-yyyy HH:mm:ss.SSS", "MM-dd-yyyy" , "MM/dd/yyyy" , "MM/dd/yyyy HH:mm:ss.SSS"); 
     
     private static final String SYSTEM_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    private List<String> UNMATCHED_FILE_HEADERS  = null;
 
     @Override
     public void declareOutputFields( OutputFieldsDeclarer outputFieldsDeclarer )
@@ -76,13 +78,18 @@ public class ConvertToSurveyObject extends BaseComputeBoltWithAck
                     if ( transactionSourceFtp != null ) {
                         surveyList = readFromCsv( targetPath.toString(), transactionSourceFtp.getFileHeaderMapper() );
                         LOG.debug( "the surveyList is : {}", surveyList );
-                        if ( !surveyList.isEmpty() ) {
+                        if(surveyList == null) {
+                            LOG.warn( "The required system mandatory header's were not mapped" );
+                            SSAPIOperations.getInstance().processFailedFtpRequest(
+                                createErrorForHeaders(),
+                                transactionIngestionMessage, false );
+                        }else  if ( !surveyList.isEmpty() ) {
                             bulkSurveyPutVO = convertToBulk( surveyList, companyId, transactionSourceFtp.getFtpSource() );
                             success = true;
-                        } else {
-                            LOG.warn( "Either the headers are invalid or there is no transaction data in the file" );
+                        }  else {
+                            LOG.warn( "There is no transaction data in the file" );
                             SSAPIOperations.getInstance().processFailedFtpRequest(
-                                "Either the headers are invalid or there is no transaction data in the file",
+                                "There is no transaction data in the file",
                                 transactionIngestionMessage, false );
                         }
                     }
@@ -143,9 +150,10 @@ public class ConvertToSurveyObject extends BaseComputeBoltWithAck
                     actualFileHeader = actualHeader( line.split( "," ), fileHeaderMapper );
                     if ( actualFileHeader == null ) {
                         LOG.debug( "mandatory feilds don't exist for file : {}", csvFileURI );
-                        //call another api if all madatory feilds don't exist 
-                        //and break
-                        break;
+                        //Find the headers which weren't matched with the system
+                        intersectionHeaders(line.split( "," ),fileHeaderMapper.values());
+                        //return null to differentiate if it failed because of headers
+                        return null;
                     }
                     start = false;
                 } else {
@@ -259,7 +267,7 @@ public class ConvertToSurveyObject extends BaseComputeBoltWithAck
         return bulkSurveyPutVO;
     }
     
-    //this is to remode the BOM character if exists in csv 
+    //this is to remove the BOM character if exists in csv 
     //disrupts the header mapping cause it's usually present in the first line 
     private static String removeUTF8BOM(String firstLine) {
         if (firstLine.startsWith(UTF8_BOM)) {
@@ -280,6 +288,31 @@ public class ConvertToSurveyObject extends BaseComputeBoltWithAck
             }
         }
             return "";
+    }
+    
+
+    //finding the header's from file which weren't mapped to any header in the mapping
+    //basically an intersection of the functionality
+    private void intersectionHeaders( String[] internalFileKey, Collection<String> fileHeaderValues )
+    {
+        UNMATCHED_FILE_HEADERS = new ArrayList<>();
+        for ( String fileHeader : internalFileKey ) {
+            if ( !fileHeaderValues.contains( fileHeader ) ) {
+                UNMATCHED_FILE_HEADERS.add( fileHeader );
+            }
+        }
+    }
+
+
+    //error message for no mandatory headers
+    private String createErrorForHeaders()
+    {
+        String createErrorMessage = "The system required mandatory header's <i>" + Arrays.toString( MANDATORY_FIELDS )
+            + "</i> were not mapped <br/> The file headers which don't match the system's mapping are <br/> <ul>";
+        for ( String unmatched : UNMATCHED_FILE_HEADERS )
+            createErrorMessage += "<li>" + unmatched + "</li>";
+        createErrorMessage += "</ul>";
+        return createErrorMessage;
     }
 
 }

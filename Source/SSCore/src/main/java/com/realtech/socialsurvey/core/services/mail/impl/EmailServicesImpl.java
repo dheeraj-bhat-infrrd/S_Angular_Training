@@ -1322,12 +1322,12 @@ public class EmailServicesImpl implements EmailServices
         mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, appBaseUrl, logoUrl, shortSurveyLink,
             customerFirstName, customerLastName, agentName, agentFirstName, agentSignature, customerEmailId, user.getEmailId(),
             companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(),
-            companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone, unsubscribedURL,branchName,regionName);
+            companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone, unsubscribedURL,agentId,branchName,regionName);
 
         mailBody = emailFormatHelper.replaceLegends( false, mailBody, appBaseUrl, logoUrl, shortSurveyLink, customerFirstName,
             customerLastName, agentName, agentFirstName, agentSignature, customerEmailId, user.getEmailId(), companyName,
             dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer,
-            agentDisclaimer, agentLicenses, agentTitle, agentPhone, unsubscribedURL,branchName,regionName);
+            agentDisclaimer, agentLicenses, agentTitle, agentPhone, unsubscribedURL,agentId,branchName,regionName);
 
         //send the email
         if ( mailSubject == null || mailSubject.isEmpty() ) {

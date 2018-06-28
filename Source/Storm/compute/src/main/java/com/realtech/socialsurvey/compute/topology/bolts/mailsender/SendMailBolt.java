@@ -25,6 +25,7 @@ import com.realtech.socialsurvey.compute.common.APIOperations;
 import com.realtech.socialsurvey.compute.common.ComputeConstants;
 import com.realtech.socialsurvey.compute.common.EmailConstants;
 import com.realtech.socialsurvey.compute.common.LocalPropertyFileHandler;
+import com.realtech.socialsurvey.compute.common.SSAPIOperations;
 import com.realtech.socialsurvey.compute.entities.EmailAttachment;
 import com.realtech.socialsurvey.compute.entities.EmailMessage;
 import com.realtech.socialsurvey.compute.entities.SolrEmailMessageWrapper;
@@ -244,7 +245,7 @@ public class SendMailBolt extends BaseComputeBoltWithAck
     @Override
     public void executeTuple( Tuple input )
     {
-        LOG.debug( "Executing send mail bolt." );
+        LOG.info( "Executing send mail bolt." );
         boolean isSuccess = false;
         boolean isTemporaryException = false;
         // get the email message
@@ -265,7 +266,7 @@ public class SendMailBolt extends BaseComputeBoltWithAck
             LOG.warn( "All the recipients has been unsubscribed for email {}", emailMessage );
         } else {
             if ( !deliveryAttempted ) {
-                LOG.debug( "New mail. Should send and update SOLR" );
+                LOG.info( "New mail. Should send and update SOLR" );
                 // the email from SOLR
                 Optional<SolrEmailMessageWrapper> optionalSolrEmailMessage = APIOperations.getInstance()
                     .getEmailMessageFromSOLR( emailMessage );
@@ -275,18 +276,20 @@ public class SendMailBolt extends BaseComputeBoltWithAck
                     if ( solrEmailMessage.getEmailAttemptedDate() == null ) {
                         // message is not sent
                         try {
-                            LOG.trace( "Validating email" );
+                            LOG.info( "Validating email" );
+                            LOG.info("Mail type is  " + emailMessage.getMailType());
+                            LOG.info("Sending Mail to " + emailMessage.getRecipients().get(0));
                             validateEmailMessage( emailMessage );
                             if ( emailMessage.getSendEmailThrough() == null || emailMessage.getSendEmailThrough().isEmpty() ) {
-                                LOG.debug( "Mail to be sent through social survey me account." );
+                                LOG.info( "Mail to be sent through social survey me account." );
                                 emailMessage.setSendEmailThrough( ComputeConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_ME );
                             }
+                            
                             String responseId = sendMail( emailMessage );
-                            LOG.debug( "Mail sent successfully. Now updating the mail attempted time" );
+                            LOG.info( "Mail sent successfully. Now updating the mail attempted time" );
                             // update solr with current attempted date and sendgrid id
                             solrEmailMessage.setSendgridMessageId( responseId );
-                            solrEmailMessage
-                                .setEmailAttemptedDate( ConversionUtils.convertCurrentEpochMillisToSolrTrieFormat() );
+                            solrEmailMessage.setEmailAttemptedDate( ConversionUtils.convertCurrentEpochMillisToSolrTrieFormat() );
                             APIOperations.getInstance().postEmailToSolr( solrEmailMessage );
                             isSuccess = true;
                         } catch ( QueueingMessageProcessingException | MailProcessingException | SolrProcessingException e ) {

@@ -921,6 +921,35 @@
     </step>
 
   <step>
+    <name>Multiway Merge Join</name>
+    <type>MultiwayMergeJoin</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <join_type>FULL OUTER</join_type>
+    <step0>Sort rows 2</step0>
+    <step1>Sort rows 2 2</step1>
+    <step2>Sort rows 2 3</step2>
+    <number_input>3</number_input>
+    <keys>
+      <key>AGENT_ID_temp</key>
+      <key>AGENT_ID_COMB</key>
+      <key>AGENT_ID_COMB</key>
+    </keys>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1371</xloc>
+      <yloc>211</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
     <name>Null to Zero</name>
     <type>ScriptValueMod</type>
     <description/>
@@ -1737,7 +1766,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, SURVEY_PRE_INTITIATION_ID&#xd;&#xa;, MOOD&#xd;&#xa;,SOURCE as SURVEY_SOURCE&#xd;&#xa;, year&#x28;date_sub&#x28;curdate&#x28;&#x29;,interval 1 year&#x29;&#x29; AS Year_Data&#xd;&#xa;FROM survey_details&#xd;&#xa;where year&#x28;SURVEY_COMPLETED_DATE_EST&#x29; &#x3c;&#x3e; YEAR&#x28;CURRENT_TIMESTAMP&#x29;&#xd;&#xa;and stage &#x3d; -1 and SOURCE not in &#x28;&#x22;Zillow&#x22;, &#x22;admin&#x22;, &#x22;agent&#x22;, &#x22;customer&#x22;, &#x22;3rd Party Review&#x22;, &#x22;upload&#x22;, &#x22;CSV_UPLOAD&#x22;&#x29;&#xd;&#xa;order by SURVEY_PRE_INTITIATION_ID&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, SURVEY_PRE_INTITIATION_ID&#xd;&#xa;, MOOD&#xd;&#xa;,SOURCE as SURVEY_SOURCE&#xd;&#xa;, year&#x28;date_sub&#x28;curdate&#x28;&#x29;,interval 1 year&#x29;&#x29; AS Year_Data&#xd;&#xa;FROM survey_details&#xd;&#xa;where year&#x28;SURVEY_COMPLETED_DATE_EST&#x29; &#x3c;&#x3e; YEAR&#x28;CURRENT_TIMESTAMP&#x29;&#xd;&#xa;and stage &#x3d; -1 and SOURCE not in &#x28;&#x22;Zillow&#x22;, &#x22;admin&#x22;, &#x22;agent&#x22;, &#x22;customer&#x22;, &#x22;3rd Party Review&#x22;, &#x22;upload&#x22;, &#x22;CSV_UPLOAD&#x22;&#x29;&#xd;&#xa;and is_abusive&#x3d;0&#xa;order by SURVEY_PRE_INTITIATION_ID&#x3b;&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -2166,35 +2195,6 @@
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
       <xloc>1050</xloc>
       <yloc>542</yloc>
-      <draw>Y</draw>
-      </GUI>
-    </step>
-
-  <step>
-    <name>Multiway Merge Join</name>
-    <type>MultiwayMergeJoin</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-         <partitioning>
-           <method>none</method>
-           <schema_name/>
-           </partitioning>
-    <join_type>FULL OUTER</join_type>
-    <step0>Sort rows 2</step0>
-    <step1>Sort rows 2 2</step1>
-    <step2>Sort rows 2 3</step2>
-    <number_input>3</number_input>
-    <keys>
-      <key>AGENT_ID_temp</key>
-      <key>AGENT_ID_COMB</key>
-      <key>AGENT_ID_COMB</key>
-    </keys>
-     <cluster_schema/>
- <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1371</xloc>
-      <yloc>211</yloc>
       <draw>Y</draw>
       </GUI>
     </step>

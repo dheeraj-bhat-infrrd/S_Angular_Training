@@ -180,7 +180,7 @@ public interface SurveyHandler
     public SurveyPreInitiation saveSurveyPreInitiationObject( SurveyPreInitiation surveyPreInitiation ) throws InvalidInputException;
 
 
-    void updateSurveyAsAbusive( String surveymongoId, String reporterEmail, String reporterName );
+    void updateSurveyAsAbusive( String surveymongoId, String reporterEmail, String reporterName, String reportReason );
 
 
     /**
@@ -432,5 +432,7 @@ public interface SurveyHandler
 
     public void moveSurveyBetweenUsers( long surveyPreinitiationId, long toUserId )
         throws InvalidInputException, NoRecordsFetchedException, SolrException;
+
+	SurveyPreInitiation getPreInitiatedSurveyByCustomer(String customerEmailId);
 
 }

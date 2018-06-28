@@ -514,10 +514,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
 
     @Override
-    public void updateSurveyAsAbusive( String surveymongoId, String reporterEmail, String reporterName )
+    public void updateSurveyAsAbusive( String surveymongoId, String reporterEmail, String reporterName, String reportReason )
     {
         LOG.debug( "Method updateSurveyAsAbusive() to mark the survey as abusive, started" );
-        surveyDetailsDao.updateSurveyAsAbusive( surveymongoId, reporterEmail, reporterName );
+        surveyDetailsDao.updateSurveyAsAbusive( surveymongoId, reporterEmail, reporterName, reportReason );
         LOG.debug( "Method updateSurveyAsAbusive() to mark the survey as abusive, finished" );
     }
 
@@ -1408,12 +1408,13 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, null, custFirstName,
             custLastName, agentName, agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ),
             currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone,
-            unsubscribedUrl, branchName, regionName );
+            unsubscribedUrl,user.getUserId(), branchName, regionName );
+
 
         mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, null, custFirstName,
             custLastName, agentName ,agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ),
-            currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone,
-            unsubscribedUrl, branchName, regionName );
+            currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone, unsubscribedUrl,
+            user.getUserId(), branchName, regionName );
 
         //JIRA SS-473 end
 
@@ -1575,7 +1576,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, null, custFirstName,
                 custLastName, agentName, agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName,
                 dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer,
-                agentDisclaimer, agentLicenses, agentTitle, agentPhone, unsubscribedUrl, branchName, regionName );
+                agentDisclaimer, agentLicenses, agentTitle, agentPhone, unsubscribedUrl, user.getUserId(), branchName, regionName );
 
             String mailSubject = surveyCompletionUnpleasant.getMail_subject();
             if ( mailSubject == null || mailSubject.isEmpty() ) {
@@ -1585,7 +1586,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, null, custFirstName,
                 custLastName, agentName, agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName,
                 dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer,
-                agentDisclaimer, agentLicenses, agentTitle, agentPhone, unsubscribedUrl, branchName, regionName);
+                agentDisclaimer, agentLicenses, agentTitle, agentPhone, unsubscribedUrl, user.getUserId(), branchName, regionName );
             //JIRA SS-473 end
 
             //For Company with hidden agents
@@ -1756,12 +1757,12 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, "", custFirstName,
             custLastName, agentName, agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ),
             currentYear, fullAddress, links, user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone,
-            unsubscribedUrl, branchName, regionName);
+            unsubscribedUrl, user.getUserId(), branchName, regionName);
 
         mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, "", custFirstName,
             custLastName, agentName, agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ),
             currentYear, fullAddress, links, user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone,
-            unsubscribedUrl, branchName, regionName);
+            unsubscribedUrl,user.getUserId(), branchName, regionName);
         //JIRA SS-473 end
 
 
@@ -1854,6 +1855,21 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     }
 
 
+    @Override
+    @Transactional
+    public SurveyPreInitiation getPreInitiatedSurveyByCustomer( String customerEmailId )
+    {
+        LOG.debug( "Method getPreInitiatedSurveyByCustomer() started for id " + customerEmailId );
+        Criterion criteria = Restrictions.eq( "customerEmailId", customerEmailId );
+        List<SurveyPreInitiation> surveyPreInitiation = surveyPreInitiationDao.findByCriteria( SurveyPreInitiation.class,
+        		criteria );
+        LOG.debug( "Method getPreInitiatedSurveyByCustomer() finished for id " + customerEmailId );
+        if(surveyPreInitiation != null && !surveyPreInitiation.isEmpty())
+        		return surveyPreInitiation.get(0);
+        else
+        		return null;
+    }
+    
     // MEthod to delete survey pre initiation record from MySQL after making an entry into Mongo.
     @Override
     @Transactional

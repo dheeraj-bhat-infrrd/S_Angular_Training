@@ -31,12 +31,12 @@
 					<div id="sys-invite-sent-graph" class="trans-monitor-graph-div"></div>
 				</div>
 				<div class="trans-monitor-graph-col-sys">
-					<span class="trans-monitor-graph-span">Unprocessed Transactions</span>
-					<div id="sys-unpro-trans-graph" class="trans-monitor-graph-div"></div>
-				</div>
-				<div class="trans-monitor-graph-col-sys">
 					<span class="trans-monitor-graph-span">Reminders Sent</span>
 					<div id="sys-rem-sent-graph" class="trans-monitor-graph-div"></div>
+				</div>
+				<div class="trans-monitor-graph-col-sys">
+					<span class="trans-monitor-graph-span">Unprocessed Transactions</span>
+					<div id="sys-unpro-trans-graph" class="trans-monitor-graph-div"></div>
 				</div>
 				<div class="trans-monitor-graph-col-sys">
 					<span class="trans-monitor-graph-span">Surveys Completed</span>

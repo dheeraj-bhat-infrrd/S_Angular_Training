@@ -56,20 +56,23 @@ public class SaveMailToSolrBolt extends BaseComputeBoltWithAck
         // get the email message
         //EmailMessage emailMessage = ConversionUtils.deserialize( input.getString( 0 ), EmailMessage.class );
         EmailMessage emailMessage = (EmailMessage) input.getValueByField( "emailMessage" );
+        LOG.info("Starting bolt to save mail for recipient " + emailMessage.getRecipients().get(0));
+
         // check if the mail is already saved and email delivery was attempted
+        LOG.info("Getting mail from solr by UUID " + emailMessage.getRandomUUID());
         Optional<SolrEmailMessageWrapper> optionalSolrEmailMessage = APIOperations.getInstance()
             .getEmailMessageFromSOLR( emailMessage );
         if ( optionalSolrEmailMessage.isPresent() ) {
             // if mail present in system, but delivery was not attempted, then don't save and emit with status not attempted.
             SolrEmailMessageWrapper solrEmailMessageWrapper = optionalSolrEmailMessage.get();
             if ( solrEmailMessageWrapper.getEmailAttemptedDate() == null ) {
-                LOG.debug( "Message was saved but not sent." );
+                LOG.info( "Message was saved but not sent." );
                 success = true;
                 deliveryAttempted = false;
                 isNew = false;
             } else {
                 // if mail was attempted, then don't save and emit the bolt with status attempted
-                LOG.debug( "Message was saved and sent." );
+                LOG.info( "Message was saved and sent." );
                 success = true;
                 deliveryAttempted = true;
                 isNew = false;
@@ -78,12 +81,12 @@ public class SaveMailToSolrBolt extends BaseComputeBoltWithAck
             // if mail not sent, then save and emit the tuple
             try {
                 addEmailMessageToSOLR( emailMessage );
-                LOG.debug( "Mail saved to solr" );
+                LOG.info( "Mail saved to solr" );
                 success = true;
                 deliveryAttempted = false;
                 isNew = true;
             } catch ( SolrProcessingException e ) {
-                LOG.warn( "Could not save the email message {}", emailMessage );
+                LOG.error( "Could not save the email message {}", emailMessage );
                 FailedMessagesService failedMessageService = new FailedMessagesServiceImpl();
                 failedMessageService.insertPermanentlyFailedEmailMessage( emailMessage, e );
                 success = false;

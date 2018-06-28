@@ -77,6 +77,7 @@ public class OverviewManagementImpl implements OverviewManagement
     private static final String NPS_DETRACTORPERCENTAGE = "NpsDetractorPercentage";
     private static final String NPS_PASSIVESPERCENTAGE = "NpsPassivesPercentage";
     private static final String NPS_PROMOTERPERCENTAGE = "NpsPromoterPercentage";
+    private static final String UNSUBSCRIBE = "Unsubscribed";
 
     @Autowired
     private OverviewUserDao overviewUserDao;
@@ -224,6 +225,7 @@ public class OverviewManagementImpl implements OverviewManagement
                 overviewMap.put( RATING, overviewUser.getRating() );
                 overviewMap.put( TOTALREVIEW, overviewUser.getTotalReviews() );
                 overviewMap.put( THIRDPARTY, overviewUser.getThirdParty() );
+                overviewMap.put( UNSUBSCRIBE, overviewUser.getUnsubscribed() );
             }
 
         } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
@@ -243,6 +245,7 @@ public class OverviewManagementImpl implements OverviewManagement
                 overviewMap.put( RATING, overviewBranch.getRating() );
                 overviewMap.put( TOTALREVIEW, overviewBranch.getTotalReviews() );
                 overviewMap.put( THIRDPARTY, overviewBranch.getThirdParty() );
+                overviewMap.put( UNSUBSCRIBE, overviewBranch.getUnsubscribed() );
             }
 
 
@@ -263,6 +266,7 @@ public class OverviewManagementImpl implements OverviewManagement
                 overviewMap.put( RATING, overviewRegion.getRating() );
                 overviewMap.put( TOTALREVIEW, overviewRegion.getTotalReviews() );
                 overviewMap.put( THIRDPARTY, overviewRegion.getThirdParty() );
+                overviewMap.put( UNSUBSCRIBE, overviewRegion.getUnsubscribed() );
             }
 
         } else if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
@@ -282,6 +286,7 @@ public class OverviewManagementImpl implements OverviewManagement
                 overviewMap.put( RATING, overviewCompany.getRating() );
                 overviewMap.put( TOTALREVIEW, overviewCompany.getTotalReviews() );
                 overviewMap.put( THIRDPARTY, overviewCompany.getThirdParty() );
+                overviewMap.put( UNSUBSCRIBE, overviewCompany.getUnsubscribed() );
 
             }
         }
@@ -393,6 +398,7 @@ public class OverviewManagementImpl implements OverviewManagement
                 overviewMap.put( RATING, overviewUserMonth.getRating() );
                 overviewMap.put( TOTALREVIEW, overviewUserMonth.getTotalReview() );
                 overviewMap.put( THIRDPARTY, overviewUserMonth.getThirdParty() );
+                overviewMap.put( UNSUBSCRIBE, overviewUserMonth.getUnsubscribed() );
 
             }
 
@@ -414,6 +420,7 @@ public class OverviewManagementImpl implements OverviewManagement
                 overviewMap.put( RATING, overviewBranchMonth.getRating() );
                 overviewMap.put( TOTALREVIEW, overviewBranchMonth.getTotalReview() );
                 overviewMap.put( THIRDPARTY, overviewBranchMonth.getThirdParty() );
+                overviewMap.put( UNSUBSCRIBE, overviewBranchMonth.getUnsubscribed() );
 
             }
 
@@ -435,6 +442,7 @@ public class OverviewManagementImpl implements OverviewManagement
                 overviewMap.put( RATING, overviewRegionMonth.getRating() );
                 overviewMap.put( TOTALREVIEW, overviewRegionMonth.getTotalReview() );
                 overviewMap.put( THIRDPARTY, overviewRegionMonth.getThirdParty() );
+                overviewMap.put( UNSUBSCRIBE, overviewRegionMonth.getUnsubscribed() );
 
             }
 
@@ -456,6 +464,7 @@ public class OverviewManagementImpl implements OverviewManagement
                 overviewMap.put( RATING, overviewCompanyMonth.getRating() );
                 overviewMap.put( TOTALREVIEW, overviewCompanyMonth.getTotalReview() );
                 overviewMap.put( THIRDPARTY, overviewCompanyMonth.getThirdParty() );
+                overviewMap.put( UNSUBSCRIBE, overviewCompanyMonth.getUnsubscribed() );
             }
 
         }
@@ -493,6 +502,7 @@ public class OverviewManagementImpl implements OverviewManagement
                 overviewMap.put( RATING, overviewUserYear.getRating() );
                 overviewMap.put( TOTALREVIEW, overviewUserYear.getTotalReview() );
                 overviewMap.put( THIRDPARTY, overviewUserYear.getThirdParty() );
+                overviewMap.put( UNSUBSCRIBE, overviewUserYear.getUnsubscribed() );
 
             }
 
@@ -513,6 +523,7 @@ public class OverviewManagementImpl implements OverviewManagement
                 overviewMap.put( RATING, overviewBranchYear.getRating() );
                 overviewMap.put( TOTALREVIEW, overviewBranchYear.getTotalReview() );
                 overviewMap.put( THIRDPARTY, overviewBranchYear.getThirdParty() );
+                overviewMap.put( UNSUBSCRIBE, overviewBranchYear.getUnsubscribed() );
 
             }
 
@@ -533,6 +544,7 @@ public class OverviewManagementImpl implements OverviewManagement
                 overviewMap.put( RATING, overviewRegionYear.getRating() );
                 overviewMap.put( TOTALREVIEW, overviewRegionYear.getTotalReview() );
                 overviewMap.put( THIRDPARTY, overviewRegionYear.getThirdParty() );
+                overviewMap.put( UNSUBSCRIBE, overviewRegionYear.getUnsubscribed() );
 
             }
 
@@ -554,6 +566,7 @@ public class OverviewManagementImpl implements OverviewManagement
                 overviewMap.put( RATING, overviewCompanyYear.getRating() );
                 overviewMap.put( TOTALREVIEW, overviewCompanyYear.getTotalReview() );
                 overviewMap.put( THIRDPARTY, overviewCompanyYear.getThirdParty() );
+                overviewMap.put( UNSUBSCRIBE, overviewCompanyYear.getUnsubscribed() );
 
             }
 
