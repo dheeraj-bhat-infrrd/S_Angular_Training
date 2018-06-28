@@ -1394,16 +1394,26 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         }
         
         String unsubscribedUrl = buildUnsubscribedUrl( user.getUserId(), custEmail, user.getCompany().getCompanyId() );
+        Branch branch = branchDao.findById( Branch.class, branchId );
+        String branchName = "";
+        if(branch.getIsDefaultBySystem() == 0) {
+            branchName = branch.getBranch();
+        }
+        Region region = regionDao.findById( Region.class, regionId );
+        String regionName = "";
+        if(region.getIsDefaultBySystem() == 0) {
+            regionName = region.getRegion();
+        }
         //replace the legends
         mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, null, custFirstName,
             custLastName, agentName, agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ),
             currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone,
-            unsubscribedUrl, branchDao.findById( Branch.class, branchId ).getBranch(), regionDao.findById( Region.class, regionId ).getRegion());
+            unsubscribedUrl, branchName, regionName );
 
         mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, null, custFirstName,
             custLastName, agentName ,agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ),
             currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone,
-            unsubscribedUrl, branchDao.findById( Branch.class, branchId ).getBranch(), regionDao.findById( Region.class, regionId ).getRegion());
+            unsubscribedUrl, branchName, regionName );
 
         //JIRA SS-473 end
 
@@ -1552,12 +1562,20 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             }
 
             String unsubscribedUrl = buildUnsubscribedUrl( user.getUserId(), custEmail, user.getCompany().getCompanyId() );
+            Branch branch = branchDao.findById( Branch.class, branchId );
+            String branchName = "";
+            if(branch.getIsDefaultBySystem() == 0) {
+                branchName = branch.getBranch();
+            }
+            Region region = regionDao.findById( Region.class, regionId );
+            String regionName = "";
+            if(region.getIsDefaultBySystem() == 0) {
+                regionName = region.getRegion();
+            }
             mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, null, custFirstName,
                 custLastName, agentName, agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName,
                 dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer,
-                agentDisclaimer, agentLicenses, agentTitle, agentPhone, unsubscribedUrl,
-                branchDao.findById( Branch.class, branchId ).getBranch(),
-                regionDao.findById( Region.class, regionId ).getRegion() );
+                agentDisclaimer, agentLicenses, agentTitle, agentPhone, unsubscribedUrl, branchName, regionName );
 
             String mailSubject = surveyCompletionUnpleasant.getMail_subject();
             if ( mailSubject == null || mailSubject.isEmpty() ) {
@@ -1567,9 +1585,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, null, custFirstName,
                 custLastName, agentName, agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName,
                 dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer,
-                agentDisclaimer, agentLicenses, agentTitle, agentPhone, unsubscribedUrl,
-                branchDao.findById( Branch.class, branchId ).getBranch(),
-                regionDao.findById( Region.class, regionId ).getRegion() );
+                agentDisclaimer, agentLicenses, agentTitle, agentPhone, unsubscribedUrl, branchName, regionName);
             //JIRA SS-473 end
 
             //For Company with hidden agents
@@ -1726,16 +1742,26 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             agentLicenses = StringUtils.join( agentSettings.getLicenses().getAuthorized_in(), ',' );
         }
         String unsubscribedUrl = buildUnsubscribedUrl( user.getUserId(), custEmail, user.getCompany().getCompanyId() );
+        Branch branch = branchDao.findById( Branch.class, branchId );
+        String branchName = "";
+        if(branch.getIsDefaultBySystem() == 0) {
+            branchName = branch.getBranch();
+        }
+        Region region = regionDao.findById( Region.class, regionId );
+        String regionName = "";
+        if(region.getIsDefaultBySystem() == 0) {
+            regionName = region.getRegion();
+        }
         //replace legends
         mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, "", custFirstName,
             custLastName, agentName, agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ),
             currentYear, fullAddress, links, user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone,
-            unsubscribedUrl, branchDao.findById( Branch.class, branchId ).getBranch(), regionDao.findById( Region.class, regionId ).getRegion());
+            unsubscribedUrl, branchName, regionName);
 
         mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, "", custFirstName,
             custLastName, agentName, agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ),
             currentYear, fullAddress, links, user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone,
-            unsubscribedUrl, branchDao.findById( Branch.class, branchId ).getBranch(), regionDao.findById( Region.class, regionId ).getRegion());
+            unsubscribedUrl, branchName, regionName);
         //JIRA SS-473 end
 
 
