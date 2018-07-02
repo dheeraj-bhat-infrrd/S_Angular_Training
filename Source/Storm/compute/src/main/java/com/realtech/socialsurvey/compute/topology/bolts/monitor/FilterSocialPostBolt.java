@@ -43,7 +43,8 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
     private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger( FilterSocialPostBolt.class );
 
-    private static final String WORD_SEPARATOR = "\\W+";
+    //regex for matching all non word characters except (%)
+    private static final String WORD_SEPARATOR = "[^\\w(%)]|_";
     private static final String SPACE_SEPARATOR = " ";
     private static final String OWNERNAME_SYSTEM = "System";
 
@@ -259,11 +260,12 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
             }
         }
 
-        if ( node.getPhraseId() != null ) {
+        //removed as keywords are added twice due to this condition
+        /*if ( node.getPhraseId() != null ) {
             String phrase = phraseBuffer.toString().trim();
             foundPhrases.add( phrase );
             LOG.trace( "end matching {}", phrase );
-        }
+        }*/
 
         LOG.debug( "End of findPhrase method, foundkeywords:{}", foundPhrases );
         return foundPhrases;

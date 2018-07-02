@@ -38,6 +38,7 @@ import java.util.*;
 @Component
 public class SocialFeedServiceImpl implements SocialFeedService
 {
+    private static final String REPLIED_VIA_EMAIL_TEXT = "Replied via email by <b class='soc-mon-bold-text'> %s </b>";
     private static final Logger LOG = LoggerFactory.getLogger( SocialFeedServiceImpl.class );
     @Autowired
     MongoSocialFeedDao mongoSocialFeedDao;
@@ -78,6 +79,8 @@ public class SocialFeedServiceImpl implements SocialFeedService
     private static final String FLAGGED = "flagged";
     private static final String UNFLAGGED = "unflagged";
     private static final String OWNERNAME_SYSTEM = "System";
+    private static final String TRUSTED_SOURCE = "TRUSTED-SOURCE";
+    private static final String NEW_FEEDS = "NEW";
 
 	@Override
     public SocialResponseObject<?> saveFeed( SocialResponseObject<?> socialFeed ) throws InvalidInputException
@@ -94,9 +97,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
 
     @SuppressWarnings ( "unchecked")
     @Override
-    public SocialMonitorResponseData getAllSocialPosts( int startIndex, int limit, String status,
-        List<String> feedtype, Long companyId, List<Long> regionIds, List<Long> branchIds, List<Long> agentIds,
-        String searchText, boolean isCompanySet ) throws InvalidInputException
+    public SocialMonitorResponseData getAllSocialPosts( SocialFeedFilter socialFeedFilter ) throws InvalidInputException
     {
         LOG.debug( "Fetching social posts" );
 
@@ -105,8 +106,11 @@ public class SocialFeedServiceImpl implements SocialFeedService
         List<SocialResponseObject> socialResponseObjects;
         OrganizationUnitSettings organizationUnitSettings;
 
-        socialResponseObjects = mongoSocialFeedDao.getAllSocialFeeds( startIndex, limit, status, feedtype, companyId,
-            regionIds, branchIds, agentIds, searchText, isCompanySet );
+        socialResponseObjects = mongoSocialFeedDao.getAllSocialFeeds( socialFeedFilter.getStartIndex(),
+            socialFeedFilter.getLimit(), socialFeedFilter.getStatus(), socialFeedFilter.getFeedtype(),
+            socialFeedFilter.getCompanyId(), socialFeedFilter.getRegionIds(), socialFeedFilter.getBranchIds(),
+            socialFeedFilter.getAgentIds(), socialFeedFilter.getSearchText(), socialFeedFilter.isCompanySet(),
+            socialFeedFilter.isFromTrustedSource() );
         if ( socialResponseObjects != null && !socialResponseObjects.isEmpty() ) {
             for ( SocialResponseObject socialResponseObject : socialResponseObjects ) {
                 SocialMonitorFeedData socialMonitorFeedData = new SocialMonitorFeedData();
@@ -155,13 +159,18 @@ public class SocialFeedServiceImpl implements SocialFeedService
                 
                 socialMonitorStreamDataList.add( socialMonitorFeedData );
             }
-            socialMonitorResponseData.setCount( mongoSocialFeedDao.getAllSocialFeedsCount( status, feedtype, companyId,
-                regionIds, branchIds, agentIds, searchText, isCompanySet ) );
+            socialMonitorResponseData.setCount( mongoSocialFeedDao.getAllSocialFeedsCount( socialFeedFilter.getStatus(),
+                socialFeedFilter.getFeedtype(), socialFeedFilter.getCompanyId(), socialFeedFilter.getRegionIds(),
+                socialFeedFilter.getBranchIds(), socialFeedFilter.getAgentIds(), socialFeedFilter.getSearchText(),
+                socialFeedFilter.isCompanySet(), socialFeedFilter.isFromTrustedSource() ) );
             
-            if ( status != null ) {
-                socialMonitorResponseData.setStatus( status.toUpperCase() );
+            if(socialFeedFilter.isFromTrustedSource()) {
+                socialMonitorResponseData.setStatus( TRUSTED_SOURCE );
+            }
+            else if ( socialFeedFilter.getStatus() != null ) {
+                socialMonitorResponseData.setStatus( socialFeedFilter.getStatus().toUpperCase() );
             } else {
-                socialMonitorResponseData.setStatus( "NEW" );
+                socialMonitorResponseData.setStatus( NEW_FEEDS );
             }
             socialMonitorResponseData.setSocialMonitorFeedData( socialMonitorStreamDataList );
         } else {
@@ -372,10 +381,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
         String previousStatus, String currentStatus ) throws InvalidInputException
     {
         try {
-            emailServices.sendSocialMonitorActionMail( socialResponseObject.getOwnerEmail(),
-                socialResponseObject.getOwnerName(), socialFeedsActionUpdate.getText(),
-                socialFeedsActionUpdate.getUserName(), socialFeedsActionUpdate.getUserEmailId(), previousStatus,
-                currentStatus, socialResponseObject.getType().toString().toLowerCase() );
+            emailServices.sendSocialMonitorActionMail(socialResponseObject, socialFeedsActionUpdate, previousStatus, currentStatus);
         } catch ( UndeliveredEmailException e ) {
             LOG.error( "Email could not be delivered", e );
         }
@@ -907,6 +913,24 @@ public class SocialFeedServiceImpl implements SocialFeedService
         socialMonitorResponseData.setSocialMonitorFeedData( socialMonitorStreamDataList );
         return socialMonitorResponseData;
     }
-    
+
+
+    @Override
+    public void addEmailReplyAsCommentToSocialPost( String postId, String mailFrom, String mailTo, String mailBody,
+        String subject )
+    {
+        LOG.info( "Method addEmailReplyAsCommentToSocialPost, updating post for post id {}", postId );
+        ActionHistory actionHistory = new ActionHistory();
+        actionHistory.setActionType( ActionHistoryType.SUBMIT );
+        actionHistory.setMessageType( MessageType.EMAIL_REPLY );
+        actionHistory.setCreatedDate( new Date().getTime() );
+        actionHistory.setText( String.format( REPLIED_VIA_EMAIL_TEXT, mailFrom ) );
+        actionHistory.setOwnerName( mailFrom );
+        actionHistory.setMessage( mailBody );
+
+        mongoSocialFeedDao.updateActionHistory( postId, actionHistory );
+
+        LOG.info( "Method addEmailReplyAsCommentToSocialPost, successfully added comment in post id for post id {}", postId );
+    }
 } 
 

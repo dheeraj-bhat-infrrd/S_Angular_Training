@@ -68,8 +68,7 @@ public class SocialMonitorFeedsController {
 		try {
 		    adminAuthenticationService.validateAuthHeader( authorizationHeader );
             try {
-                socialMonitorResponseData = socialFeedService.getAllSocialPosts(socialFeedFilter.getStartIndex(), socialFeedFilter.getLimit(), socialFeedFilter.getStatus(), socialFeedFilter.getFeedtype(),
-                    socialFeedFilter.getCompanyId(), socialFeedFilter.getRegionIds(), socialFeedFilter.getBranchIds(), socialFeedFilter.getAgentIds(), socialFeedFilter.getSearchText(), socialFeedFilter.isCompanySet());
+                socialMonitorResponseData = socialFeedService.getAllSocialPosts(socialFeedFilter);
             } catch (InvalidInputException ie) {
                 LOGGER.error("Invalid input exception caught while fetching social feeds", ie);
                 throw new SSApiException("Invalid input exception caught while fetching social feeds", ie);

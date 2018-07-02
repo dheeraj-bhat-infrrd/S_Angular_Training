@@ -27,8 +27,11 @@ public class FacebookFeedData implements Serializable
 
     private String picture;
 
-    private FacebookFeedFrom from;
+    private FacebookObjectFrom from;
 
+    private FBObjectLikes likes;
+
+    private FBObjectComments comments;
 
     public String getFullPicture()
     {
@@ -42,7 +45,7 @@ public class FacebookFeedData implements Serializable
     }
 
 
-    public FacebookFeedFrom getFrom()
+    public FacebookObjectFrom getFrom()
     {
         return from;
     }
@@ -60,7 +63,7 @@ public class FacebookFeedData implements Serializable
     }
 
 
-    public void setFrom( FacebookFeedFrom from )
+    public void setFrom( FacebookObjectFrom from )
     {
         this.from = from;
     }
@@ -160,12 +163,37 @@ public class FacebookFeedData implements Serializable
         this.postLink = postLink;
     }
 
-    @Override
-    public String toString()
+
+    public FBObjectLikes getLikes()
     {
-        return "FacebookFeedData [id=" + id + ", message=" + message + ", story=" + story + ", createdTime=" + createdTime
-            + ", updatedTime=" + updatedTime + ", fullPicture=" + fullPicture + ", postLink=" + postLink + ", picture="
-            + picture + ", from=" + from + ", link=" + link + "]";
+        return likes;
+    }
+
+
+    public void setLikes( FBObjectLikes likes )
+    {
+        this.likes = likes;
+    }
+
+
+    public FBObjectComments getComments()
+    {
+        return comments;
+    }
+
+
+    public void setComments( FBObjectComments comments )
+    {
+        this.comments = comments;
+    }
+
+
+    @Override public String toString()
+    {
+        return "FacebookFeedData{" + "id='" + id + '\'' + ", message='" + message + '\'' + ", story='" + story + '\''
+            + ", application=" + application + ", createdTime=" + createdTime + ", updatedTime=" + updatedTime
+            + ", fullPicture='" + fullPicture + '\'' + ", postLink='" + postLink + '\'' + ", picture='" + picture + '\''
+            + ", from=" + from + ", likes=" + likes + ", comments=" + comments + ", link='" + link + '\'' + '}';
     }
 
 }

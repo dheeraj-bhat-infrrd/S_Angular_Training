@@ -23,6 +23,7 @@ import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.socialmonitor.feed.SocialFeedService;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 
 
@@ -48,6 +49,9 @@ public class IncomingMailController
 
     @Autowired
     private OrganizationManagementService organizationManagementService;
+    
+    @Autowired
+    private SocialFeedService socialFeedService;
     
     @Autowired
     private EmailServices emailServices;
@@ -84,6 +88,12 @@ public class IncomingMailController
         String mailFrom = request.getParameter( "from" );
         String mailTo = request.getParameter( "to" );
         String headers = request.getParameter( "headers" );
+        
+        LOG.info( "HTML from sendgrid, {}",  mailBody);
+        LOG.info( "subject from sendgrid, {}",  subject);
+        LOG.info( "mailto from sendgrid, {}",  mailTo);
+        LOG.info( "mailFrom from sendgrid, {}",  mailFrom);
+        LOG.info( "headers from sendgrid, {}",  headers);
 
         if ( mailFrom == null || mailFrom.isEmpty() ) {
             LOG.error( "From address is missing from request" );
@@ -108,11 +118,26 @@ public class IncomingMailController
             LOG.error( "Header content is missing from request" );
             return CommonConstants.SENDGRID_OK_STATUS;
         }
+        
 
         LOG.info( "Proceeding to resolve mailTo : " + mailTo );
         LOG.info( "subject:" +subject + "\n mailFrom:" + mailFrom + "\n mailTo:" +mailTo+ "\n header:" +headers);
         String sendUsingDomain = getDefaultDomainFromEmail(mailTo);
         LOG.info( "finished getDefaultDomainFromTo and the sendUsingDomain :" +sendUsingDomain );
+        
+        String postId = getPostIdFromMailTo( mailTo, sendUsingDomain );
+        
+        if(postId != null) {
+            // TODO add message as comment.
+            List<String> senderInfo = retrieveSenderInfoFromMailId( mailFrom );
+            String senderName = mailFrom;
+            if(senderInfo.isEmpty()) {
+                senderName = senderInfo.get( 0 );
+            }
+            socialFeedService.addEmailReplyAsCommentToSocialPost(postId,senderName, mailTo, mailBody, subject );
+            return CommonConstants.SENDGRID_OK_STATUS;
+        }
+        
         String resolvedMailto = resolveMailTo( mailTo ,sendUsingDomain );
         if ( resolvedMailto == null || resolvedMailto.isEmpty() ) {
             LOG.error( "Resolved Mail id found null or empty" );
@@ -213,6 +238,29 @@ public class IncomingMailController
         LOG.info( "Mail id resolved to : " + resolvedMailId );
         LOG.info( "Method resolveMailTo() call ended to resolve mail to email id" );
         return resolvedMailId;
+    }
+    
+    private String getPostIdFromMailTo( String mailTo , String defaultEmailDomain ) throws InvalidInputException
+    {
+        if ( mailTo == null || mailTo.isEmpty() ) {
+            LOG.error( "Mail To passed cannot be null or empty" );
+            return null;
+        }
+
+        LOG.info( "Method getPostIdFromMailTo() called to get post it from email id" );
+        
+        //user email regex
+        String agentEmailRegex = "post-(.*)@" + Matcher.quoteReplacement( defaultEmailDomain );
+        Pattern agentTegexPattern = Pattern.compile( agentEmailRegex );
+        Matcher agentRegexMatcher = agentTegexPattern.matcher( mailTo );
+        
+        if ( agentRegexMatcher.find() ) {
+            LOG.info( "Mail id contains post id to add comment" );
+            String userEncryptedId = agentRegexMatcher.group( 1 );
+            return userEncryptedId;
+        } else {
+            return null;
+        }
     }
 
 

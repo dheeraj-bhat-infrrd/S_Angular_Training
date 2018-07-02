@@ -1,21 +1,5 @@
 package com.realtech.socialsurvey.compute.topology.bolts.monitor;
 
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.storm.task.OutputCollector;
-import org.apache.storm.task.TopologyContext;
-import org.apache.storm.topology.OutputFieldsDeclarer;
-import org.apache.storm.tuple.Fields;
-import org.apache.storm.tuple.Tuple;
-import org.apache.storm.tuple.Values;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.compute.dao.RedisSocialMediaStateDao;
 import com.realtech.socialsurvey.compute.dao.impl.RedisSocialMediaStateDaoImpl;
@@ -30,7 +14,21 @@ import com.realtech.socialsurvey.compute.feeds.FacebookFeedProcessor;
 import com.realtech.socialsurvey.compute.feeds.impl.FacebookFeedProcessorImpl;
 import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBolt;
 import com.realtech.socialsurvey.compute.utils.UrlHelper;
+import org.apache.commons.lang.StringUtils;
+import org.apache.storm.task.OutputCollector;
+import org.apache.storm.task.TopologyContext;
+import org.apache.storm.topology.OutputFieldsDeclarer;
+import org.apache.storm.tuple.Fields;
+import org.apache.storm.tuple.Tuple;
+import org.apache.storm.tuple.Values;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import redis.clients.jedis.exceptions.JedisConnectionException;
+
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -181,6 +179,9 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt implements Serial
         if ( facebookFeedData.getCreatedTime() > 0 ) {
             responseWrapper.setCreatedTime( facebookFeedData.getCreatedTime() * 1000 );
         }
+
+        responseWrapper.setTotalLikesCount( facebookFeedData.getLikes().getSummary().getTotalCount() );
+        responseWrapper.setTotalCommentsCount( facebookFeedData.getComments().getSummary().getTotalCount() );
 
         return responseWrapper;
     }

@@ -9787,6 +9787,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         }
         Collections.sort( companyFilterKeywords, new FilterKeywordsComparator() );
+        
+        // update redis with the keywords
+        redisDao.addKeywords( companyId, companyFilterKeywords );
         return companyFilterKeywords;
 
     }

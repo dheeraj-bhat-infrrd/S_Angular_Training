@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.realtech.socialsurvey.core.entities.SegmentsVO;
 import com.realtech.socialsurvey.core.entities.SocialFeedActionResponse;
+import com.realtech.socialsurvey.core.entities.SocialFeedFilter;
 import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
 import com.realtech.socialsurvey.core.entities.SocialMonitorFeedTypeVO;
 import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
@@ -38,17 +39,12 @@ public interface SocialFeedService
 
 
     /**
-     * Gets all feeds on social monitor based on the flag, status and feed type
-    /** Gets all feeds on social monitor based on the flag
-     * @param profileId
-     * @param profileLevel
-     * @param startIndex
-     * @param limit
-     * @param flag
+     * Gets all feeds in social monitor
+     * @param socialFeedFilter
      * @return
      * @throws InvalidInputException
      */
-    public SocialMonitorResponseData getAllSocialPosts(int startIndex, int limit, String status, List<String> feedtype, Long companyId, List<Long> regionIds, List<Long> branchIds, List<Long> agentIds, String searchText, boolean isCompanySet) throws InvalidInputException;
+    public SocialMonitorResponseData getAllSocialPosts(SocialFeedFilter socialFeedFilter) throws InvalidInputException;
         
     /**
      * Update actions and macros on feeds
@@ -150,6 +146,17 @@ public interface SocialFeedService
      * @param trustedSource
      */
     public void updateForRemoveTrustedSource( long companyId, String trustedSource );
+
+    /**
+     * Add mail reply as comment in social post
+     * @param postId
+     * @param mailFrom
+     * @param mailTo
+     * @param mailBody
+     * @param subject
+     */
+    public void addEmailReplyAsCommentToSocialPost( String postId, String mailFrom, String mailTo, String mailBody,
+        String subject );
 
     
 }
