@@ -51,10 +51,10 @@ public class IncomingMailController
     private OrganizationManagementService organizationManagementService;
     
     @Autowired
-    private SocialFeedService socialFeedService;
+    private EmailServices emailServices;
     
     @Autowired
-    private EmailServices emailServices;
+    private SocialFeedService socialFeedService;
 
     @Autowired
     private EncryptionHelper encryptionHelper;

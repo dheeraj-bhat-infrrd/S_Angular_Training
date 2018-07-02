@@ -100,15 +100,11 @@ public class SocialFeedServiceImpl implements SocialFeedService
     @Autowired
     UserProfileDao userProfileDao;
     
+    @Autowired
     private EmailServices emailServices;
     
     @Value("${SOCIAL_FEEDS_ARCHIVE_DAYS_BEFORE}")
     private int archiveSocialFeedBeforeDays;
-
-	@Autowired
-	public void setEmailServices(EmailServices emailServices) {
-		this.emailServices = emailServices;
-	}
 	
     private static final int NO_OF_DAYS = 7;
     private static final String FLAGGED = "flagged";
