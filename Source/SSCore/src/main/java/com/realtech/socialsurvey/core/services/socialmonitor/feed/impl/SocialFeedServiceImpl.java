@@ -1,12 +1,59 @@
 package com.realtech.socialsurvey.core.services.socialmonitor.feed.impl;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.stereotype.Component;
+
 import com.realtech.socialsurvey.core.commons.ActionHistoryComparator;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.MacrosComparator;
-import com.realtech.socialsurvey.core.dao.*;
+import com.realtech.socialsurvey.core.dao.BranchDao;
+import com.realtech.socialsurvey.core.dao.CompanyDao;
+import com.realtech.socialsurvey.core.dao.MongoSocialFeedDao;
+import com.realtech.socialsurvey.core.dao.RegionDao;
+import com.realtech.socialsurvey.core.dao.UserDao;
+import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialFeedDaoImpl;
-import com.realtech.socialsurvey.core.entities.*;
-import com.realtech.socialsurvey.core.enums.*;
+import com.realtech.socialsurvey.core.entities.ActionHistory;
+import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.SegmentsEntity;
+import com.realtech.socialsurvey.core.entities.SegmentsVO;
+import com.realtech.socialsurvey.core.entities.SocialFeedActionResponse;
+import com.realtech.socialsurvey.core.entities.SocialFeedFilter;
+import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
+import com.realtech.socialsurvey.core.entities.SocialMonitorFeedData;
+import com.realtech.socialsurvey.core.entities.SocialMonitorFeedTypeVO;
+import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
+import com.realtech.socialsurvey.core.entities.SocialMonitorResponseData;
+import com.realtech.socialsurvey.core.entities.SocialMonitorUsersVO;
+import com.realtech.socialsurvey.core.entities.SocialResponseObject;
+import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.enums.ActionHistoryType;
+import com.realtech.socialsurvey.core.enums.MessageType;
+import com.realtech.socialsurvey.core.enums.ProfileType;
+import com.realtech.socialsurvey.core.enums.SocialFeedActionType;
+import com.realtech.socialsurvey.core.enums.SocialFeedStatus;
+import com.realtech.socialsurvey.core.enums.TextActionType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.integration.stream.StreamApiConnectException;
 import com.realtech.socialsurvey.core.integration.stream.StreamApiException;
@@ -16,18 +63,6 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.socialmonitor.feed.SocialFeedService;
-import org.apache.commons.lang.StringUtils;
-import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.DependsOn;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
-import java.util.*;
 
 
 /**
@@ -926,11 +961,34 @@ public class SocialFeedServiceImpl implements SocialFeedService
         actionHistory.setCreatedDate( new Date().getTime() );
         actionHistory.setText( String.format( REPLIED_VIA_EMAIL_TEXT, mailFrom ) );
         actionHistory.setOwnerName( mailFrom );
-        actionHistory.setMessage( mailBody );
+        actionHistory.setMessage( getTextFromHtmlBody(mailBody));
 
         mongoSocialFeedDao.updateActionHistory( postId, actionHistory );
 
         LOG.info( "Method addEmailReplyAsCommentToSocialPost, successfully added comment in post id for post id {}", postId );
+    }
+    
+
+    private String getTextFromHtmlBody( String html )
+    {
+        LOG.debug( "Inside method getTextFromHtmlBody" );
+        Document doc;
+        doc = Jsoup.parse( html );
+        Elements htmlLines = doc.select( "div" );
+        StringBuilder htmlText = new StringBuilder();
+        if ( htmlLines != null && htmlLines.size() > 0 ) {
+            for ( Element node : htmlLines.get( 0 ).getAllElements() ) {
+                if ( node.nodeName().equals( "br" ) ) {
+                    htmlText.append( "\n" );
+                } else if ( node.hasText() ) {
+                    htmlText.append( node.ownText() ).append( "\n" );
+                }
+            }
+        } else {
+            return html;
+        }
+        LOG.debug( "End of method getTextFromHtmlBody" );
+        return htmlText.toString();
     }
 } 
 
