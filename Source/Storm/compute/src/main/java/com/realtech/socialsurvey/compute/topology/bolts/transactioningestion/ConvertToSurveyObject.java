@@ -43,7 +43,7 @@ public class ConvertToSurveyObject extends BaseComputeBoltWithAck
     private static final Logger LOG = LoggerFactory.getLogger( ConvertToSurveyObject.class );
     private static final String[] MANDATORY_FIELDS = { "bor1Email", "bor1FirstName", "servicer", "serviceremail", "fileName" };
     private static final String UTF8_BOM = "\uFEFF";
-    private static final List<String> DATE_FORMATS = Arrays.asList("MM-dd-yyyy HH:mm:ss.SSS", "MM-dd-yyyy" , "MM/dd/yyyy" , "MM/dd/yyyy HH:mm:ss.SSS"); 
+    private static final List<String> DATE_FORMATS = Arrays.asList( "MM-dd-yy HH:mm:ss.SSS", "MM-dd-yy" , "MM/dd/yy" , "MM/dd/yy HH:mm:ss.SSS", "MM-dd-yyyy HH:mm:ss.SSS", "MM-dd-yyyy" , "MM/dd/yyyy" , "MM/dd/yyyy HH:mm:ss.SSS" ); 
     
     private static final String SYSTEM_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
     private List<String> UNMATCHED_FILE_HEADERS  = null;
@@ -280,6 +280,7 @@ public class ConvertToSurveyObject extends BaseComputeBoltWithAck
     private String multipleDateFormat(List<String> dateFormats , String strDate) {
         for(String format: dateFormats){
             SimpleDateFormat sdf = new SimpleDateFormat(format);
+            sdf.setLenient(false);
             try{
                 sdf.parse(strDate);
                 return format;
