@@ -8,6 +8,8 @@ import com.realtech.socialsurvey.core.entities.DigestRequestData;
 import com.realtech.socialsurvey.core.entities.EmailAttachment;
 import com.realtech.socialsurvey.core.entities.MonthlyDigestAggregate;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
+import com.realtech.socialsurvey.core.entities.SocialResponseObject;
 import com.realtech.socialsurvey.core.entities.SurveyCsvInfo;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
@@ -486,8 +488,8 @@ public interface EmailServices
     public void sendEmailToUploaderForSuccessfulSurveyCsvUpload( SurveyCsvInfo csvInfo, String results ) throws InvalidInputException, UndeliveredEmailException;
 
 
-    public void sendSocialMonitorActionMail( String recipientMailId, String recipientName, String mailBody, String userName,
-        String userEmailId, String previousStatus, String currentStatus, String feedType )
+    public void sendSocialMonitorActionMail(SocialResponseObject socialResponseObject, SocialFeedsActionUpdate socialFeedsActionUpdate,
+        String previousStatus, String currentStatus )
         throws InvalidInputException, UndeliveredEmailException;
 
 

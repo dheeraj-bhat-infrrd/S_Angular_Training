@@ -6,12 +6,12 @@
 			<img src="${initParam.resourcesPath}/resources/images/escalated-orange.png" class="dup-stream-esc-icn hide float-left soc-mon-post-icn">
 			<img src="${initParam.resourcesPath}/resources/images/verified-green.png" class="dup-stream-res-icn hide float-left soc-mon-post-icn">
 		</div>
-		<div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 soc-mon-post-details">
+		<div class="col-lg-11 col-md-11 col-sm-11 col-xs-11 soc-mon-post-details">
 			<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 float-left soc-mon-post-prof-pic-div">
 				<img src="" class="stream-res-icn float-left soc-mon-prof-pic">
 				<img src="" class="stream-res-feed-icn float-left soc-mon-prof-pic-media-dup">
 			</div>
-			<div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 float-left" >
+			<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 float-left" >
 				<div class="stream-user-name row soc-mon-user-name">
 								
 				</div>
@@ -22,14 +22,17 @@
 								
 				</div>
 			</div>
-			<div class="col-lg-3 col-md-2 col-sm-2 col-xs-2 float-left ts-container hide">
-				<div class=" float-right ts-source" data-source="" data-trusted=false>
-					
+			<div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 float-left ts-container hide">
+
+				<div class="float-right ts-action">
+					<div class=" float-right ts-source" data-source=""
+						data-trusted=false></div>
+					<div class="float-right ts-act-icon ts-add"></div>
+	
 				</div>
-				<div class="float-right ts-act-icon ts-add"></div>
-				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 float-left trusted-source hide">
-					Trusted Source
-				</div>
+				<div
+					class="col-lg-12 col-md-12 col-sm-12 col-xs-12 float-left trusted-source hide">
+					Trusted Source</div>
 			</div>
 		</div>
 		<div class="stream-post-details-text col-lg-11 col-md-11 col-sm-11 col-xs-11 stream-post-text float-right">

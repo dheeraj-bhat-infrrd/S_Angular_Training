@@ -66,6 +66,9 @@ public class SocialResponseObject<T> implements Serializable
     private boolean fromTrustedSource;
     private String postSource;
     private boolean isDuplicate;
+    private int totalLikesCount;
+    private int totalCommentsCount;
+    private long retweetCount;
 
     public T getResponse()
     {
@@ -377,17 +380,53 @@ public class SocialResponseObject<T> implements Serializable
     }
 
 
-    @Override
-    public String toString()
+    public int getTotalLikesCount()
     {
-        return "SocialResponseObject [id=" + id + ", postId=" + postId + ", text=" + text + ", textHighlighted="
-            + textHighlighted + ", pageLink=" + pageLink + ", postLink=" + postLink + ", pictures=" + pictures
-            + ", updatedTime=" + updatedTime + ", createdTime=" + createdTime + ", ownerName=" + ownerName + ", ownerEmail="
-            + ownerEmail + ", response=" + response + ", type=" + type + ", status=" + status + ", companyId=" + companyId
-            + ", regionId=" + regionId + ", branchId=" + branchId + ", agentId=" + agentId + ", profileType=" + profileType
-            + ", hash=" + hash + ", duplicateCount=" + duplicateCount + ", foundKeywords=" + foundKeywords + ", actionHistory="
-            + actionHistory + ", isRetried=" + isRetried + ", fromTrustedSource=" + fromTrustedSource + ", postSource="
-            + postSource + ", isDuplicate=" + isDuplicate + "]";
+        return totalLikesCount;
+    }
 
+
+    public void setTotalLikesCount( int totalLikesCount )
+    {
+        this.totalLikesCount = totalLikesCount;
+    }
+
+
+    public int getTotalCommentsCount()
+    {
+        return totalCommentsCount;
+    }
+
+
+    public void setTotalCommentsCount( int totalCommentsCount )
+    {
+        this.totalCommentsCount = totalCommentsCount;
+    }
+
+
+    public long getRetweetCount()
+    {
+        return retweetCount;
+    }
+
+
+    public void setRetweetCount( long retweetCount )
+    {
+        this.retweetCount = retweetCount;
+    }
+
+
+    @Override public String toString()
+    {
+        return "SocialResponseObject{" + "id='" + id + '\'' + ", postId='" + postId + '\'' + ", text='" + text + '\''
+            + ", textHighlighted='" + textHighlighted + '\'' + ", pageLink='" + pageLink + '\'' + ", postLink='" + postLink
+            + '\'' + ", pictures=" + pictures + ", updatedTime=" + updatedTime + ", createdTime=" + createdTime
+            + ", ownerName='" + ownerName + '\'' + ", ownerEmail='" + ownerEmail + '\'' + ", response=" + response + ", type="
+            + type + ", status=" + status + ", companyId=" + companyId + ", regionId=" + regionId + ", branchId=" + branchId
+            + ", agentId=" + agentId + ", profileType=" + profileType + ", hash=" + hash + ", duplicateCount=" + duplicateCount
+            + ", foundKeywords=" + foundKeywords + ", actionHistory=" + actionHistory + ", isRetried=" + isRetried
+            + ", fromTrustedSource=" + fromTrustedSource + ", postSource='" + postSource + '\'' + ", isDuplicate=" + isDuplicate
+            + ", totalLikesCount=" + totalLikesCount + ", totalCommentsCount=" + totalCommentsCount + ", retweetCount="
+            + retweetCount + '}';
     }
 }

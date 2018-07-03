@@ -37,13 +37,14 @@
 			</div>
 			<div class="ts-container col-lg-12 col-md-12 col-sm-12 col-xs-12 float-right hide">
 				<div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 float-right ts-details">
-					<div class=" float-right ts-source" data-source="" data-trusted=false>
-						
+					<div class="float-right ts-action">
+						<div class=" float-right ts-source" data-source=""
+							data-trusted=false></div>
+						<div class="float-right ts-act-icon ts-add"
+							title="Add Trusted Source"></div>
 					</div>
-					<div class="float-right ts-act-icon ts-add" title="Add Trusted Source"></div>
-					<div class="float-right trusted-source hide">
-						Trusted Source
-					</div>
+
+					<div class="float-right trusted-source hide">Trusted Source</div>
 				</div>
 			</div>
 		</div>

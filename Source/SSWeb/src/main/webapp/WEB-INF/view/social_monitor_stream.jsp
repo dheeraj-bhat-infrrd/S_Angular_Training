@@ -29,7 +29,7 @@
 				Flag
 			</div>
 			<div id="bulk-edit-esc" class="col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn bulk-stream-action-esc bulk-act-btn">
-			Escalate
+				Escalate
 			</div>
 			<div id="bulk-edit-res" class="col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn bulk-stream-action-res bulk-act-btn">
 				Resolve
@@ -132,11 +132,12 @@
 <input type="hidden" id="selected-post-ids" data-post-ids='[]'>
 <div class="dash-wrapper-main">
 	<div class="dash-container container">
-		<div id="stream-tabs" class="clearfix" data-status="NEW">
+		<div id="stream-tabs" class="clearfix" data-status="NEW" data-trusted-source=false>
 			<div id="soc-mon-stream-tab" class="soc-mon-tab soc-mon-stream-active" data-disabled=true><img id="stream-inactive" src="${initParam.resourcesPath}/resources/images/stream-gray.png"  class="hide soc-mon-icns"><img id="stream-active" src="${initParam.resourcesPath}/resources/images/stream-blue.png" class="soc-mon-icns">Stream</div>
 			<div id="soc-mon-alerts-tab" class="soc-mon-tab" data-disabled=false><img id="alert-inactive" src="${initParam.resourcesPath}/resources/images/flag-gray.png" class="soc-mon-icns"><img id="alert-active" src="${initParam.resourcesPath}/resources/images/flag-yellow.png" class="hide soc-mon-icns">Alerts</div>
 			<div id="soc-mon-escalated-tab" class="soc-mon-tab" data-disabled=false><img id="esc-inactive" src="${initParam.resourcesPath}/resources/images/escalated-gray.png" class="soc-mon-icns"><img id="esc-active" src="${initParam.resourcesPath}/resources/images/escalated-orange.png" class="hide soc-mon-icns">Escalations</div>
 			<div id="soc-mon-resolved-tab" class="soc-mon-tab" data-disabled=false><img id="res-inactive" src="${initParam.resourcesPath}/resources/images/verified-gray.png" class="soc-mon-icns"><img id="res-active" src="${initParam.resourcesPath}/resources/images/verified-green.png" class="hide soc-mon-icns">Resolutions</div>
+			<div id="soc-mon-trusted-tab" class="soc-mon-tab" data-disabled=false><img id="trust-inactive" src="${initParam.resourcesPath}/resources/images/verified-gray.png" class="soc-mon-icns"><img id="trust-active" src="${initParam.resourcesPath}/resources/images/verified-green.png" class="hide soc-mon-icns">Trusted Source</div>
 		</div>
 	</div>
 </div>
@@ -186,7 +187,11 @@
 						<div id="stream-start-page-active" class="hide soc-mon-pag-active"><img src="${initParam.resourcesPath}/resources/images/chevron-double-left-blue.png" class="soc-mon-pag-icn"></div>
 						<div id="stream-prev-page" class="soc-mon-pag"><img src="${initParam.resourcesPath}/resources/images/chevron-left.png"  class="soc-mon-pag-icn"></div>
 						<div id="stream-prev-page-active" class="soc-mon-pag-active hide"><img src="${initParam.resourcesPath}/resources/images/chevron-left-blue.png" class="soc-mon-pag-icn"></div>
-						<div class="soc-mon-pag-text"><span id="stream-page-no" class="soc-mon-bold-text">0</span> of <span id="stream-page-count" class="soc-mon-bold-text">0</span></div>
+						<div class="paginate-sel-box float-left">
+							<input id="sel-page-soc-mon" type="text" pattern="[0-9]*" class="sel-page" value="0"/>
+							<span class="paginate-divider">/</span>
+							<span id="stream-page-count" class="paginate-total-pages">0</span>
+						</div>
 						<div id="stream-next-page" class="soc-mon-pag"><img src="${initParam.resourcesPath}/resources/images/chevron-right.png" class="soc-mon-pag-icn"></div>
 						<div id="stream-next-page-active" class="soc-mon-pag-active hide"><img src="${initParam.resourcesPath}/resources/images/chevron-right-blue.png" class="soc-mon-pag-icn"></div>
 						<div id="stream-end-page" class="soc-mon-pag"><img src="${initParam.resourcesPath}/resources/images/chevron-double-right.png" class="soc-mon-pag-icn"></div>
@@ -212,7 +217,11 @@
 						<div id="stream-start-page-active-bottom" class="hide soc-mon-pag-active"><img src="${initParam.resourcesPath}/resources/images/chevron-double-left-blue.png" class="soc-mon-pag-icn"></div>
 						<div id="stream-prev-page-bottom" class="soc-mon-pag"><img src="${initParam.resourcesPath}/resources/images/chevron-left.png"  class="soc-mon-pag-icn"></div>
 						<div id="stream-prev-page-active-bottom" class="soc-mon-pag-active hide"><img src="${initParam.resourcesPath}/resources/images/chevron-left-blue.png" class="soc-mon-pag-icn"></div>
-						<div class="soc-mon-pag-text"><span id="stream-page-no-bottom" class="soc-mon-bold-text">0</span> of <span id="stream-page-count-bottom" class="soc-mon-bold-text">0</span></div>
+						<div class="paginate-sel-box float-left">
+							<input id="sel-page-soc-mon-bottom" type="text" pattern="[0-9]*" class="sel-page" value="0"/>
+							<span class="paginate-divider">/</span>
+							<span id="stream-page-count-bottom" class="paginate-total-pages">0</span>
+						</div>
 						<div id="stream-next-page-bottom" class="soc-mon-pag"><img src="${initParam.resourcesPath}/resources/images/chevron-right.png" class="soc-mon-pag-icn"></div>
 						<div id="stream-next-page-active-bottom" class="soc-mon-pag-active hide"><img src="${initParam.resourcesPath}/resources/images/chevron-right-blue.png" class="soc-mon-pag-icn"></div>
 						<div id="stream-end-page-bottom" class="soc-mon-pag"><img src="${initParam.resourcesPath}/resources/images/chevron-double-right.png" class="soc-mon-pag-icn"></div>

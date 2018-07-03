@@ -22,6 +22,7 @@ public class SocialFeedFilter implements Serializable
     private List<Long> agentIds;
     private String searchText;
     private boolean companySet;
+    private boolean fromTrustedSource;
 
 
     public int getStartIndex()
@@ -140,6 +141,28 @@ public class SocialFeedFilter implements Serializable
     public void setCompanySet( boolean companySet )
     {
         this.companySet = companySet;
+    }
+
+
+    public boolean isFromTrustedSource()
+    {
+        return fromTrustedSource;
+    }
+
+
+    public void setFromTrustedSource( boolean fromTrustedSource )
+    {
+        this.fromTrustedSource = fromTrustedSource;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return "SocialFeedFilter [startIndex=" + startIndex + ", limit=" + limit + ", status=" + status + ", feedtype="
+            + feedtype + ", companyId=" + companyId + ", regionIds=" + regionIds + ", branchIds=" + branchIds + ", agentIds="
+            + agentIds + ", searchText=" + searchText + ", companySet=" + companySet + ", fromTrustedSource="
+            + fromTrustedSource + "]";
     }
 
 }

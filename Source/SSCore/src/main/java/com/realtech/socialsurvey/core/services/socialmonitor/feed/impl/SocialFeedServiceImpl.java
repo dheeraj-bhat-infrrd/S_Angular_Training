@@ -1,12 +1,59 @@
 package com.realtech.socialsurvey.core.services.socialmonitor.feed.impl;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.stereotype.Component;
+
 import com.realtech.socialsurvey.core.commons.ActionHistoryComparator;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.MacrosComparator;
-import com.realtech.socialsurvey.core.dao.*;
+import com.realtech.socialsurvey.core.dao.BranchDao;
+import com.realtech.socialsurvey.core.dao.CompanyDao;
+import com.realtech.socialsurvey.core.dao.MongoSocialFeedDao;
+import com.realtech.socialsurvey.core.dao.RegionDao;
+import com.realtech.socialsurvey.core.dao.UserDao;
+import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialFeedDaoImpl;
-import com.realtech.socialsurvey.core.entities.*;
-import com.realtech.socialsurvey.core.enums.*;
+import com.realtech.socialsurvey.core.entities.ActionHistory;
+import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.SegmentsEntity;
+import com.realtech.socialsurvey.core.entities.SegmentsVO;
+import com.realtech.socialsurvey.core.entities.SocialFeedActionResponse;
+import com.realtech.socialsurvey.core.entities.SocialFeedFilter;
+import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
+import com.realtech.socialsurvey.core.entities.SocialMonitorFeedData;
+import com.realtech.socialsurvey.core.entities.SocialMonitorFeedTypeVO;
+import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
+import com.realtech.socialsurvey.core.entities.SocialMonitorResponseData;
+import com.realtech.socialsurvey.core.entities.SocialMonitorUsersVO;
+import com.realtech.socialsurvey.core.entities.SocialResponseObject;
+import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.enums.ActionHistoryType;
+import com.realtech.socialsurvey.core.enums.MessageType;
+import com.realtech.socialsurvey.core.enums.ProfileType;
+import com.realtech.socialsurvey.core.enums.SocialFeedActionType;
+import com.realtech.socialsurvey.core.enums.SocialFeedStatus;
+import com.realtech.socialsurvey.core.enums.TextActionType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.integration.stream.StreamApiConnectException;
 import com.realtech.socialsurvey.core.integration.stream.StreamApiException;
@@ -16,18 +63,6 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.socialmonitor.feed.SocialFeedService;
-import org.apache.commons.lang.StringUtils;
-import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.DependsOn;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
-import java.util.*;
 
 
 /**
@@ -38,6 +73,7 @@ import java.util.*;
 @Component
 public class SocialFeedServiceImpl implements SocialFeedService
 {
+    private static final String REPLIED_VIA_EMAIL_TEXT = "Replied via email by <b class='soc-mon-bold-text'> %s </b>";
     private static final Logger LOG = LoggerFactory.getLogger( SocialFeedServiceImpl.class );
     @Autowired
     MongoSocialFeedDao mongoSocialFeedDao;
@@ -64,20 +100,18 @@ public class SocialFeedServiceImpl implements SocialFeedService
     @Autowired
     UserProfileDao userProfileDao;
     
+    @Autowired
     private EmailServices emailServices;
     
     @Value("${SOCIAL_FEEDS_ARCHIVE_DAYS_BEFORE}")
     private int archiveSocialFeedBeforeDays;
-
-	@Autowired
-	public void setEmailServices(EmailServices emailServices) {
-		this.emailServices = emailServices;
-	}
 	
     private static final int NO_OF_DAYS = 7;
     private static final String FLAGGED = "flagged";
     private static final String UNFLAGGED = "unflagged";
     private static final String OWNERNAME_SYSTEM = "System";
+    private static final String TRUSTED_SOURCE = "TRUSTED-SOURCE";
+    private static final String NEW_FEEDS = "NEW";
 
 	@Override
     public SocialResponseObject<?> saveFeed( SocialResponseObject<?> socialFeed ) throws InvalidInputException
@@ -94,9 +128,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
 
     @SuppressWarnings ( "unchecked")
     @Override
-    public SocialMonitorResponseData getAllSocialPosts( int startIndex, int limit, String status,
-        List<String> feedtype, Long companyId, List<Long> regionIds, List<Long> branchIds, List<Long> agentIds,
-        String searchText, boolean isCompanySet ) throws InvalidInputException
+    public SocialMonitorResponseData getAllSocialPosts( SocialFeedFilter socialFeedFilter ) throws InvalidInputException
     {
         LOG.debug( "Fetching social posts" );
 
@@ -105,8 +137,11 @@ public class SocialFeedServiceImpl implements SocialFeedService
         List<SocialResponseObject> socialResponseObjects;
         OrganizationUnitSettings organizationUnitSettings;
 
-        socialResponseObjects = mongoSocialFeedDao.getAllSocialFeeds( startIndex, limit, status, feedtype, companyId,
-            regionIds, branchIds, agentIds, searchText, isCompanySet );
+        socialResponseObjects = mongoSocialFeedDao.getAllSocialFeeds( socialFeedFilter.getStartIndex(),
+            socialFeedFilter.getLimit(), socialFeedFilter.getStatus(), socialFeedFilter.getFeedtype(),
+            socialFeedFilter.getCompanyId(), socialFeedFilter.getRegionIds(), socialFeedFilter.getBranchIds(),
+            socialFeedFilter.getAgentIds(), socialFeedFilter.getSearchText(), socialFeedFilter.isCompanySet(),
+            socialFeedFilter.isFromTrustedSource() );
         if ( socialResponseObjects != null && !socialResponseObjects.isEmpty() ) {
             for ( SocialResponseObject socialResponseObject : socialResponseObjects ) {
                 SocialMonitorFeedData socialMonitorFeedData = new SocialMonitorFeedData();
@@ -155,13 +190,18 @@ public class SocialFeedServiceImpl implements SocialFeedService
                 
                 socialMonitorStreamDataList.add( socialMonitorFeedData );
             }
-            socialMonitorResponseData.setCount( mongoSocialFeedDao.getAllSocialFeedsCount( status, feedtype, companyId,
-                regionIds, branchIds, agentIds, searchText, isCompanySet ) );
+            socialMonitorResponseData.setCount( mongoSocialFeedDao.getAllSocialFeedsCount( socialFeedFilter.getStatus(),
+                socialFeedFilter.getFeedtype(), socialFeedFilter.getCompanyId(), socialFeedFilter.getRegionIds(),
+                socialFeedFilter.getBranchIds(), socialFeedFilter.getAgentIds(), socialFeedFilter.getSearchText(),
+                socialFeedFilter.isCompanySet(), socialFeedFilter.isFromTrustedSource() ) );
             
-            if ( status != null ) {
-                socialMonitorResponseData.setStatus( status.toUpperCase() );
+            if(socialFeedFilter.isFromTrustedSource()) {
+                socialMonitorResponseData.setStatus( TRUSTED_SOURCE );
+            }
+            else if ( socialFeedFilter.getStatus() != null ) {
+                socialMonitorResponseData.setStatus( socialFeedFilter.getStatus().toUpperCase() );
             } else {
-                socialMonitorResponseData.setStatus( "NEW" );
+                socialMonitorResponseData.setStatus( NEW_FEEDS );
             }
             socialMonitorResponseData.setSocialMonitorFeedData( socialMonitorStreamDataList );
         } else {
@@ -372,10 +412,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
         String previousStatus, String currentStatus ) throws InvalidInputException
     {
         try {
-            emailServices.sendSocialMonitorActionMail( socialResponseObject.getOwnerEmail(),
-                socialResponseObject.getOwnerName(), socialFeedsActionUpdate.getText(),
-                socialFeedsActionUpdate.getUserName(), socialFeedsActionUpdate.getUserEmailId(), previousStatus,
-                currentStatus, socialResponseObject.getType().toString().toLowerCase() );
+            emailServices.sendSocialMonitorActionMail(socialResponseObject, socialFeedsActionUpdate, previousStatus, currentStatus);
         } catch ( UndeliveredEmailException e ) {
             LOG.error( "Email could not be delivered", e );
         }
@@ -907,6 +944,47 @@ public class SocialFeedServiceImpl implements SocialFeedService
         socialMonitorResponseData.setSocialMonitorFeedData( socialMonitorStreamDataList );
         return socialMonitorResponseData;
     }
+
+
+    @Override
+    public void addEmailReplyAsCommentToSocialPost( String postId, String mailFrom, String mailTo, String mailBody,
+        String subject )
+    {
+        LOG.info( "Method addEmailReplyAsCommentToSocialPost, updating post for post id {}", postId );
+        ActionHistory actionHistory = new ActionHistory();
+        actionHistory.setActionType( ActionHistoryType.SUBMIT );
+        actionHistory.setMessageType( MessageType.EMAIL_REPLY );
+        actionHistory.setCreatedDate( new Date().getTime() );
+        actionHistory.setText( String.format( REPLIED_VIA_EMAIL_TEXT, mailFrom ) );
+        actionHistory.setOwnerName( mailFrom );
+        actionHistory.setMessage( getTextFromHtmlBody(mailBody));
+
+        mongoSocialFeedDao.updateActionHistory( postId, actionHistory );
+
+        LOG.info( "Method addEmailReplyAsCommentToSocialPost, successfully added comment in post id for post id {}", postId );
+    }
     
+
+    private String getTextFromHtmlBody( String html )
+    {
+        LOG.debug( "Inside method getTextFromHtmlBody" );
+        Document doc;
+        doc = Jsoup.parse( html );
+        Elements htmlLines = doc.select( "div" );
+        StringBuilder htmlText = new StringBuilder();
+        if ( htmlLines != null && htmlLines.size() > 0 ) {
+            for ( Element node : htmlLines.get( 0 ).getAllElements() ) {
+                if ( node.nodeName().equals( "br" ) ) {
+                    htmlText.append( "\n" );
+                } else if ( node.hasText() ) {
+                    htmlText.append( node.ownText() ).append( "\n" );
+                }
+            }
+        } else {
+            return html;
+        }
+        LOG.debug( "End of method getTextFromHtmlBody" );
+        return htmlText.toString();
+    }
 } 
 

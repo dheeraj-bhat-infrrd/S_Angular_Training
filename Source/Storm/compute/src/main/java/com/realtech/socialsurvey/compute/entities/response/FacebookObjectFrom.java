@@ -10,7 +10,7 @@ import java.io.Serializable;
  * @author manish
  *
  */
-public class FacebookFeedFrom implements Serializable
+public class FacebookObjectFrom implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
@@ -45,7 +45,7 @@ public class FacebookFeedFrom implements Serializable
     @Override
     public String toString()
     {
-        return "FacebookFeedFrom [id=" + id + ", name=" + name + "]";
+        return "FacebookObjectFrom [id=" + id + ", name=" + name + "]";
     }
 
 

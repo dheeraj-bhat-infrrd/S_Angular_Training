@@ -449,6 +449,12 @@ public class SocialMonitorWebController {
         String agentIdStr = request.getParameter( "user" );
         String feedsStr = request.getParameter( "feeds" );
         String text = request.getParameter("text");
+        String trustedSourceStr = request.getParameter("fromTrustedSource");
+        
+        boolean fromTrustedSource = false;
+        if(trustedSourceStr != null && trustedSourceStr.equals( "true" )){
+            fromTrustedSource = true;
+        }
         
         List<String> feedType = new ArrayList<>();
         List<Long> regionIds;
@@ -505,6 +511,7 @@ public class SocialMonitorWebController {
        filter.setAgentIds( agentIds );
        filter.setSearchText( text );
        filter.setCompanySet( isCompanySet );
+       filter.setFromTrustedSource( fromTrustedSource );
        
        Response response = ssApiIntergrationBuilder.getIntegrationApi().showStreamSocialPosts(filter, authorizationHeader);
        

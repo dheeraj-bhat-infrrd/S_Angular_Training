@@ -22,9 +22,15 @@ public interface MongoSocialFeedDao
 	
 	public void updateMacroList(List<SocialMonitorMacro> socialMonitorMacros, long companyId);
 	
-	public List<SocialResponseObject> getAllSocialFeeds(int startIndex, int limit, String status, List<String> feedtype, Long companyId, List<Long> regionId, List<Long> branchId, List<Long> agentid, String searchText, boolean isCompanySet);
+
+    public List<SocialResponseObject> getAllSocialFeeds( int startIndex, int limit, String status, List<String> feedtype,
+        Long companyId, List<Long> regionId, List<Long> branchId, List<Long> agentid, String searchText, boolean isCompanySet,
+        boolean fromTrustedSource );
+
 	
-	public long getAllSocialFeedsCount(String status, List<String> feedtype, Long companyId, List<Long> regionId, List<Long> branchId, List<Long> agentid, String searchText, boolean isCompanySet);
+    public long getAllSocialFeedsCount( String status, List<String> feedtype, Long companyId, List<Long> regionId,
+        List<Long> branchId, List<Long> agentid, String searchText, boolean isCompanySet, boolean fromTrustedSource );
+
 	
 	public OrganizationUnitSettings getCompanyDetails(Long companyId);
 	
@@ -91,5 +97,13 @@ public interface MongoSocialFeedDao
      * @return
      */
     public long updateForRemoveTrustedSource( long companyId, String trustedSource );
+
+    /**
+     * Add action history by mongoId
+     * @param mongoId
+     * @param actionHistory
+     * @return
+     */
+    public long updateActionHistory( String mongoId, ActionHistory actionHistory );
     
 }

@@ -488,7 +488,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, NPS_SCORE&#xd;&#xa;, month&#x28;SURVEY_COMPLETED_DATE_EST&#x29; AS MONTH_Data&#xd;&#xa;, year&#x28;SURVEY_COMPLETED_DATE_EST&#x29; AS Year_Data&#xd;&#xa;FROM survey_details&#xd;&#xa;WHERE STAGE&#x3d;-1 AND AGENT_ID &#x21;&#x3d; 0 AND NPS_SCORE &#x3e; -1 AND NPS_SCORE &#x3c;&#x3d; 10&#x3b;&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, NPS_SCORE&#xd;&#xa;, month&#x28;SURVEY_COMPLETED_DATE_EST&#x29; AS MONTH_Data&#xd;&#xa;, year&#x28;SURVEY_COMPLETED_DATE_EST&#x29; AS Year_Data&#xd;&#xa;FROM survey_details&#xd;&#xa;WHERE STAGE&#x3d;-1 AND AGENT_ID &#x21;&#x3d; 0 AND NPS_SCORE &#x3e; -1 AND NPS_SCORE &#x3c;&#x3d; 10 and IS_ABUSIVE&#x3d;0 &#x3b;&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
