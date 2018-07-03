@@ -4467,8 +4467,13 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 				survey.setAgentName(user.getFirstName() + user.getLastName() == null ? "" : " " + user.getLastName());
 			}
 
-			//update status
-			survey.setStatus(CommonConstants.SURVEY_STATUS_PRE_INITIATED);		
+            //if borrower email is equal to coborrower email , we set the status of the survey to duplicate
+            //but status should change from STATUS_SURVEYPREINITIATION_NOT_PROCESSED to SURVEY_STATUS_PRE_INITIATED
+            //and not from STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD to SURVEY_STATUS_PRE_INITIATED
+            if ( survey.getStatus() != CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD ) {
+                //update status
+                survey.setStatus( CommonConstants.SURVEY_STATUS_PRE_INITIATED );
+            }
 		} else {
 			// user is not present so mark record as mismatch
 			survey.setStatus(CommonConstants.STATUS_SURVEYPREINITIATION_MISMATCH_RECORD);
