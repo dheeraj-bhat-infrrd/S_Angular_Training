@@ -3412,6 +3412,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         Update update = new Update();
         update.set( CommonConstants.BRANCH_ID_COLUMN, branchId );
         update.set( CommonConstants.REGION_ID_COLUMN, regionId );
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date( System.currentTimeMillis() ) );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
 
         //update branch media post details
