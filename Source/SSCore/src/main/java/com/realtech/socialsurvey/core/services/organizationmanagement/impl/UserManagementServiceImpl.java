@@ -921,11 +921,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         if ( emailId == null || emailId.isEmpty() ) {
             throw new InvalidInputException( "Email id is null or empty" );
         }
-        Company company = companyDao.findById( Company.class, companyId );
 
-        Map<String, Object> queries = new HashMap<String, Object>();
+        Map<String, Object> queries = new HashMap<>();
         queries.put( CommonConstants.EMAIL_ID, emailId );
-        queries.put( CommonConstants.COMPANY, company );
+        queries.put( CommonConstants.COMPANY + "." + CommonConstants.COMPANY_ID_COLUMN, companyId );
         queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
         List<UserEmailMapping> userEmailMappings = userEmailMappingDao.findByKeyValue( UserEmailMapping.class, queries );
         LOG.info( "List of UserEmailMapping got by getUserByEmailAddress: {} ", userEmailMappings );
