@@ -1903,7 +1903,7 @@ public class ProfileController
             }
             
             //make survey as abusive
-            surveyHandler.updateSurveyAsAbusive( surveyMongoId, reporterEmail, reporterName );
+            surveyHandler.updateSurveyAsAbusive( surveyMongoId, reporterEmail, reporterName, reason );
 
             String customerName = surveyDetails.getCustomerFirstName() + surveyDetails.getCustomerLastName();
             // Calling email services method to send mail to the Application level admin.

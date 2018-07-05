@@ -22,7 +22,6 @@ public class SocialMonitorFeedData implements Serializable {
 	private long updatedOn;
 	private String ownerName = "";
 	private String ownerProfileImage="";
-	private boolean flagged;
 	private SocialFeedType type;
 	private SocialFeedStatus status;
 	private List<ActionHistory> actionHistory;
@@ -31,7 +30,9 @@ public class SocialMonitorFeedData implements Serializable {
     private String pageLink;
     private String postLink;
     private String textHighlighted;
-
+    private boolean fromTrustedSource;
+    private String postSource;
+    
 	public String getPageLink()
     {
         return pageLink;
@@ -130,14 +131,6 @@ public class SocialMonitorFeedData implements Serializable {
 		this.ownerName = ownerName;
 	}
 
-	public boolean isFlagged() {
-		return flagged;
-	}
-
-	public void setFlagged(boolean flagged) {
-		this.flagged = flagged;
-	}
-
 	public List<ActionHistory> getActionHistory() {
 		return actionHistory;
 	}
@@ -191,17 +184,30 @@ public class SocialMonitorFeedData implements Serializable {
         this.postLink = postLink;
     }
 
-    @Override
+    public boolean isFromTrustedSource() {
+		return fromTrustedSource;
+	}
+
+	public void setFromTrustedSource(boolean fromTrustedSource) {
+		this.fromTrustedSource = fromTrustedSource;
+	}
+
+	public String getPostSource() {
+		return postSource;
+	}
+
+	public void setPostSource(String postSource) {
+		this.postSource = postSource;
+	}
+
+	@Override
     public String toString()
     {
         return "SocialMonitorFeedData [postId=" + postId + ", companyId=" + companyId + ", regionId=" + regionId + ", branchId="
             + branchId + ", agentId=" + agentId + ", text=" + text + ", pictures=" + pictures + ", updatedOn=" + updatedOn
-            + ", ownerName=" + ownerName + ", ownerProfileImage=" + ownerProfileImage + ", flagged=" + flagged + ", type="
-            + type + ", status=" + status + ", actionHistory=" + actionHistory + ", foundKeywords=" + foundKeywords
-            + ", duplicateCount=" + duplicateCount + ", pageLink=" + pageLink + ", postLink=" + postLink + ", textHighlighted="
-            + textHighlighted + "]";
+            + ", ownerName=" + ownerName + ", ownerProfileImage=" + ownerProfileImage + ", type=" + type + ", status=" + status
+            + ", actionHistory=" + actionHistory + ", foundKeywords=" + foundKeywords + ", duplicateCount=" + duplicateCount
+            + ", pageLink=" + pageLink + ", postLink=" + postLink + ", textHighlighted=" + textHighlighted
+            + ", fromTrustedSource=" + fromTrustedSource + ", postSource=" + postSource + "]";
     }
-
-    
-
 }

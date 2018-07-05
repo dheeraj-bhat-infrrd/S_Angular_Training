@@ -101,9 +101,8 @@ import com.realtech.socialsurvey.core.vo.SurveyPreInitiationList;
 import com.realtech.socialsurvey.core.vo.UserList;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookData;
 import com.realtech.socialsurvey.web.api.builder.SSApiIntergrationBuilder;
+import com.realtech.socialsurvey.web.api.entities.FtpCreateRequest;
 import com.realtech.socialsurvey.web.common.JspResolver;
-
-import retrofit.client.Response;
 
 
 // JIRA: SS-24 BY RM02 BOC
@@ -838,6 +837,11 @@ public class OrganizationManagementController
             
             // add send monthly digest email flag
             model.addAttribute( "sendMonthlyDigestMail", unitSettings.isSendMonthlyDigestMail() );
+            model.addAttribute( "copyToClipBoard", unitSettings.getIsCopyToClipboard() );
+            
+            // add isSocialMonitorEnabled flag
+            model.addAttribute( "isSocialMonitorEnabled", unitSettings.isSocialMonitorEnabled() );
+            
             
             // add isSocialMonitorEnabled flag
             model.addAttribute( "isSocialMonitorEnabled", unitSettings.isSocialMonitorEnabled() );
@@ -1018,7 +1022,71 @@ public class OrganizationManagementController
         return response;
     }
 
+    @RequestMapping ( value = "/saveftpdetails", method = RequestMethod.POST)
+    @ResponseBody
+    public String saveFtpDetails( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Saving ftp details" );
+        User user = sessionHelper.getCurrentUser();
+        request.setAttribute( "saveftpdetails", "true" );
 
+        String ftpUsername = request.getParameter( "ftp-username" );
+        String ftpPassword = request.getParameter( "ftp-password" );
+        String ftpUrl = request.getParameter( "ftp-url" );
+        String ftpDir = request.getParameter( "ftp-dir" );
+        
+        Map<String, Object> responseMap = new HashMap<String, Object>();
+        String message;
+        boolean status = true;
+
+        try {
+
+            if ( ftpUsername == null || ftpUsername.isEmpty() ) {
+                LOG.warn( "Method saveFtpDetails is throwing an InvalidInputException since user name can not be empty" );
+                throw new InvalidInputException( "User name can not be empty" );
+            }
+            if ( ftpPassword == null || ftpPassword.isEmpty() ) {
+                LOG.warn( "Method saveFtpDetails is throwing an InvalidInputException since password can not be empty" );
+                throw new InvalidInputException( "Password can not be empty" );
+            }
+            if ( ftpUrl == null || ftpUrl.isEmpty() ) {
+                LOG.warn( "Method saveFtpDetails is throwing an InvalidInputException since url can not be empty" );
+                throw new InvalidInputException( "Url can not be empty" );
+            }
+            if ( ftpDir == null || ftpDir.isEmpty() ) {
+                LOG.warn( "Method saveFtpDetails is throwing an InvalidInputException since directory can not be empty" );
+                throw new InvalidInputException( "directory can not be empty" );
+            }
+
+            // encrypting the password
+            String cipherPassword = encryptionHelper.encryptAES( ftpPassword, "" );
+            
+            //create ftpCreateRequest object
+            FtpCreateRequest ftpCreateRequest = new FtpCreateRequest();
+            ftpCreateRequest.setUsername( ftpUsername );
+            ftpCreateRequest.setPassword( cipherPassword );
+            ftpCreateRequest.setFtpServerUrl( ftpUrl );
+            ftpCreateRequest.setFtpDirectoryPath( ftpDir );
+            
+            
+            //call api to save ftp data
+            ssApiIntergrationBuilder.getIntegrationApi().setFtpCrm(user.getCompany().getCompanyId() , ftpCreateRequest);
+
+            message = messageUtils.getDisplayMessage( DisplayMessageConstants.FTP_DATA_UPDATE_SUCCESSFUL,
+                DisplayMessageType.SUCCESS_MESSAGE ).getMessage();
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonFatalException while testing encompass detials. Reason : ", e );
+            status = false;
+            message = messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ).getMessage();
+        }
+        responseMap.put( "status", status );
+        responseMap.put( "message", message );
+        String response = new Gson().toJson( responseMap );
+        LOG.info( "Saving ftp details completed successfully" );
+        return response;
+    }
+
+    
     /**
      * Method to enable an encompass connection
      * 
@@ -2114,11 +2182,6 @@ public class OrganizationManagementController
                 reportingDashboardManagement.updateSendDigestMailToggle( CommonConstants.COMPANY_ID_COLUMN, user.getCompany().getCompanyId(), true );
             }
             
-            // default socialMonitor flag if the new account type is enterprise
-            if ( newAccountsMasterId == CommonConstants.ACCOUNTS_MASTER_ENTERPRISE ) {
-                reportingDashboardManagement.enableSocialMonitorToggle( user.getCompany().getCompanyId(), true );
-            }
-            
             LOG.info( "message returned : " + message );
         } catch ( InvalidInputException | NoRecordsFetchedException | SolrException | UndeliveredEmailException e ) {
             LOG.error( "NonFatalException while upgrading subscription. Message : " + e.getMessage(), e );
@@ -2682,10 +2745,13 @@ public class OrganizationManagementController
             }
 
             HttpSession session = request.getSession();
+            
+            String activeSession = (String) session.getAttribute("activeSession");
             Long superAdminUserId = (Long) session.getAttribute( CommonConstants.REALTECH_USER_ID );
             User adminUser = sessionHelper.getCurrentUser();
             User newUser = userManagementService.getUserByUserId( id );
-
+            
+            
             HttpSession newSession = request.getSession( true );
             if ( adminUser.isCompanyAdmin() ) {
                 newSession.setAttribute( CommonConstants.COMPANY_ADMIN_SWITCH_USER_ID, adminUser.getUserId() );
@@ -2700,6 +2766,8 @@ public class OrganizationManagementController
 
             //Set the autologin attribute as true
             newSession.setAttribute( CommonConstants.IS_AUTO_LOGIN, "true" );
+            newSession.setAttribute("activeSession",activeSession);
+            
             sessionHelper.loginAdminAs( newUser.getLoginName(), CommonConstants.BYPASS_PWD );
 
         } catch ( NonFatalException e ) {
@@ -2715,6 +2783,8 @@ public class OrganizationManagementController
     {
 
         HttpSession session = request.getSession();
+        String activeSession = (String) session.getAttribute("activeSession");
+        
         Long adminUserid = null;
         if ( session.getAttribute( CommonConstants.COMPANY_ADMIN_SWITCH_USER_ID ) != null ) {
             adminUserid = (Long) session.getAttribute( CommonConstants.COMPANY_ADMIN_SWITCH_USER_ID );
@@ -2757,6 +2827,7 @@ public class OrganizationManagementController
 
             session = request.getSession( true );
             sessionHelper.loginAdminAs( adminUser.getLoginName(), CommonConstants.BYPASS_PWD );
+            session.setAttribute("activeSession",activeSession);
         } catch ( NonFatalException e ) {
             LOG.error( "Exception occurred in switchToAdminUser() method , reason : " + e.getMessage() );
             return "failure";
@@ -2963,7 +3034,6 @@ public class OrganizationManagementController
 
         String message = "";
         User user = sessionHelper.getCurrentUser();
-        String mailIDStr = "";
        
 
         try {
@@ -3468,7 +3538,7 @@ public class OrganizationManagementController
         String emailAddress = request.getParameter( "emailAddress" );
         String agentIdStr = request.getParameter( "agentId" );
         String ignoredEmailStr = request.getParameter( "ignoredEmail" );
-
+        LOG.info( "Method to saveUserEmailMapping for transientEmail: {} , agentId: {} , ignoreEmailFlag: {}",emailAddress,agentIdStr,ignoredEmailStr );
         try {
             boolean ignoredEmail;
             long agentId;
@@ -4227,6 +4297,38 @@ public class OrganizationManagementController
     }
     
 
+    @RequestMapping ( value = "/updatecopytoclipboardsettings", method = RequestMethod.GET)
+    @ResponseBody
+    public String updateCopyToClipBoardSettings( HttpServletRequest request )
+    {
+        LOG.info( "Method to update updateTransactionMonitorSettingForCompany started" );
+
+        try {
+
+            HttpSession session = request.getSession();
+            long companyId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+
+            String updateCopyToClipBoardSettingStr = request.getParameter( "updateCopyToClipBoardSetting" );
+
+            boolean updateCopyToClipBoardSetting = Boolean.parseBoolean( updateCopyToClipBoardSettingStr );
+
+            OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings( companyId );
+            if(companySettings == null){
+                throw new InvalidInputException("Wrong input passed. No company found for given id");
+            }
+           
+            organizationManagementService.updateCopyToClipBoardSettings( companyId, updateCopyToClipBoardSetting );
+
+
+        } catch ( Exception error ) {
+            LOG.error( "Exception occured in updateCopyToClipBoardSettings(). Nested exception is ", error );
+            return error.getMessage();
+        }
+
+        LOG.info( "Method to update copy to clipboard finished" );
+        return "success";
+    }
+    
     @RequestMapping ( value = "/enablesocialmonitortoggle", method = RequestMethod.POST)
     @ResponseBody
     public String enableSocialMonitorToggle( HttpServletRequest request )
@@ -4237,7 +4339,7 @@ public class OrganizationManagementController
         long companyId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
 
         try {
-            return String.valueOf( reportingDashboardManagement.enableSocialMonitorToggle( companyId,
+            return String.valueOf( organizationManagementService.enableSocialMonitorToggle( companyId,
                 Boolean.parseBoolean( request.getParameter( "isSocialMonitorEnabled" ) ) ) );
         } catch ( Exception error ) {
             LOG.error(

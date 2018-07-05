@@ -1,17 +1,10 @@
 package com.realtech.socialsurvey.core.services.mail.impl;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -24,6 +17,7 @@ import com.realtech.socialsurvey.core.entities.EmailAttachment;
 import com.realtech.socialsurvey.core.entities.EmailEntity;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.mail.EmailSender;
+import com.realtech.socialsurvey.core.services.mail.EmailUnsubscribeService;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.sendgrid.SendGrid;
 import com.sendgrid.SendGrid.Email;
@@ -81,6 +75,9 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
     private SendGrid sendGrid1;
 
     private SendGrid sendGrid2;
+    
+    @Autowired
+    private EmailUnsubscribeService unsubscribeService;
 
 
     @Override
@@ -115,7 +112,18 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
         } else {
             sendEmailThrough = emailEntity.getSendEmailThrough();
         }
+        
+        // Remove the unsubscribed recipient id.
         List<String> recipients = emailEntity.getRecipients();
+        List<String> newRecipients = emailEntity.getRecipients();
+        long companyId = emailEntity.getCompanyId();
+        for(String recipient : recipients) {
+            if(unsubscribeService.isUnsubscribed( recipient, companyId )) {
+                newRecipients.remove( recipient );
+            }
+        }
+        recipients = newRecipients;
+        
         if ( recipients == null || recipients.isEmpty() ) {
             LOG.warn( "Recipient list is empty for sending mail" );
             throw new InvalidInputException( "Recipient list is empty for sending mail" );
@@ -123,7 +131,7 @@ public class SendGridEmailSenderImpl implements EmailSender, InitializingBean
 
         boolean mailSent = true;
         Email email = new Email();
-        email.addTo( emailEntity.getRecipients().toArray( new String[emailEntity.getRecipients().size()] ) );
+        email.addTo( recipients.toArray( new String[recipients.size()] ) );
         //No need to encrypt user id , JIRA SS-60
         email.setFrom( emailEntity.getSenderEmailId() );
         email.setFromName( emailEntity.getSenderName() );

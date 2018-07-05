@@ -13,6 +13,7 @@ import com.realtech.socialsurvey.compute.dao.FailedMessagesDao;
 import com.realtech.socialsurvey.compute.entities.FailedEmailMessage;
 import com.realtech.socialsurvey.compute.entities.FailedReportRequest;
 import com.realtech.socialsurvey.compute.entities.FailedSocialPost;
+import com.realtech.socialsurvey.compute.entities.UnsavedUserEvent;
 
 
 /**
@@ -82,6 +83,7 @@ public class FailedMessagesDaoImpl implements FailedMessagesDao
         return updateResults.getUpdatedCount();
     }
 
+
     @Override
     public int deleteFailedSocialPost(String postId) {
         LOG.debug("Deleting failed social post with postId {}", postId);
@@ -104,5 +106,14 @@ public class FailedMessagesDaoImpl implements FailedMessagesDao
                 .set("data.isRetried", true);
         final UpdateResults updateResults = datastore.update(query, updateOperations);
         return updateResults.getUpdatedCount();
+    }
+    
+    
+    @Override
+    public boolean insertUnsavedUserEvent( UnsavedUserEvent unsavedEvent )
+    {
+        LOG.debug( "Inserting unsaved user event : {}", unsavedEvent );
+        mongoDB.datastore().save( unsavedEvent );
+        return true;
     }
 }

@@ -1,12 +1,17 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
-import com.mongodb.BasicDBObject;
-import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
-import com.realtech.socialsurvey.core.entities.*;
-import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Pattern;
+
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -22,8 +27,22 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
-import java.util.*;
-import java.util.regex.Pattern;
+import com.mongodb.BasicDBObject;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.entities.AgentRankingReport;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
+import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
+import com.realtech.socialsurvey.core.entities.ProfileUrlEntity;
+import com.realtech.socialsurvey.core.entities.SavedDigestRecord;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokenResponse;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.TransactionSourceFtp;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 
 
 /**
@@ -106,6 +125,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_TRUSTED_SOURCES = "socialMonitorTrustedSources";
     
     public static final String KEY_IS_LOGIN_PREVENTED = "isLoginPrevented";
+    public static final String KEY_IS_COPY_TO_CLIPBOARD = "isCopyToClipboard";
     public static final String KEY_SEND_EMAIL_FROM_COMPANY = "sendEmailFromCompany";
     public static final String KEY_HIDE_FROM_BREAD_CRUMB = "hideFromBreadCrumb";
     public static final String KEY_ALLOW_OVERRIDE_FOR_SOCIAL_MEDIA = "allowOverrideForSocialMedia";
@@ -113,8 +133,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_DIGEST_RECIPIENTS = "digestRecipients";
     public static final String KEY_ENTITY_ALERT_DETAILS = "entityAlertDetails";
     public static final String KEY_IS_ERROR_ALERT = "isErrorAlert";
-    public static final String KEY_IS_WARNING_ALERT_= "isWarningAlert";
-    
+    public static final String KEY_IS_WARNING_ALERT_ = "isWarningAlert";
+
     public static final String KEY_ABUSIVE_EMAIL_SETTING = "survey_settings.abusive_mail_settings";
     public static final String KEY_COMPLAINT_RESOLUTION_SETTING = "survey_settings.complaint_res_settings";
 
@@ -122,6 +142,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_SAVED_DIGEST_RECORD_DATE = "savedDigestRecords.uploadedDate";
     public static final String KEY_SAVED_DIGEST_RECORD_MONTH = "savedDigestRecords.month";
     public static final String KEY_SAVED_DIGEST_RECORD_YEAR = "savedDigestRecords.year";
+
+
     public static final String KEY_USER_ADD_DELETE_NOTIFICATION_RECIPIENTS = "userAddDeleteNotificationRecipients";
     
     public static final String KEY_CONTACT_DETAILS_WEB_ADD_WORK = "contact_details.web_addresses.work";
@@ -145,7 +167,17 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     public static final String KEY_LINKEDIN_ACCESS_TOKEN = "socialMediaTokens.linkedInToken.linkedInAccessToken";
     
     public static final String SOCIAL_MONITOR_ENABLED = "isSocialMonitorEnabled";
+    public static final String HAS_REGISTERED_FOR_SUMMIT = "hasRegisteredForSummit";
+    public static final String IS_SHOW_SUMMIT_POPUP = "isShowSummitPopup";
+    
+    public static final String KEY_FTP_INFO = "transactionSourceFtpList";
 
+    //key to get the transactionSourceFtp feilds
+    public static final String KEY_TRANSACTION_SOURCE_FTP = "transactionSourceFtpList";
+    public static final String KEY_TRANSACTION_SOURCE_FTP_ID = "ftpId";
+    public static final String KEY_TRANSACTION_SOURCE_FTP_STATUS = "status";
+    public static final String KEY_TRANSACTION_SOURCE_FTP_DOLLAR = "transactionSourceFtpList.$";
+    public static final String KEY_TRANSACTION_SOURCE_FTP_EMAIL = "emailId";
 
     @Value ( "${CDN_PATH}")
     private String amazonEndPoint;
@@ -182,7 +214,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
     @Override
     public OrganizationUnitSettings fetchOrganizationUnitSettingsById( long identifier, String collectionName )
     {
-        LOG.debug( "Fetch organization unit settings from {} for id: {}" , collectionName, identifier );
+        LOG.debug( "Fetch organization unit settings from {} for id: {}", collectionName, identifier );
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_IDENTIFIER ).is( identifier ) );
         query.fields().exclude( KEY_LINKEDIN_PROFILEDATA );	
@@ -320,9 +352,10 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         Update update = new Update().set( MongoOrganizationUnitSettingDaoImpl.KEY_IS_LOGIN_PREVENTED, isLoginPrevented );
         mongoTemplate.updateMulti( query, update, OrganizationUnitSettings.class, AGENT_SETTINGS_COLLECTION );
     }
-    
+
+
     @Override
-    public void updateHidePublicPageForUsers ( List<Long> userIdList, boolean hidePublicPage )
+    public void updateHidePublicPageForUsers( List<Long> userIdList, boolean hidePublicPage )
     {
         LOG.debug( "updating IsLoginPreventedForUsers in Mongo" );
         Query query = new Query();
@@ -351,6 +384,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         
         mongoTemplate.updateMulti( query, update, OrganizationUnitSettings.class, AGENT_SETTINGS_COLLECTION );
     }
+
 
     /**
      * Fetchs the list of names of logos being used.
@@ -951,13 +985,13 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 
 
     @Override
-    public void updateImageForOrganizationUnitSetting( long iden, String imgFileName,  String imgThumbnailFileName, String rectangularThumbnailFileName, String collectionName, String imageType,
-        boolean flagValue, boolean isThumbnail ) throws InvalidInputException
+    public void updateImageForOrganizationUnitSetting( long iden, String imgFileName, String imgThumbnailFileName,
+        String rectangularThumbnailFileName, String collectionName, String imageType, boolean flagValue, boolean isThumbnail )
+        throws InvalidInputException
     {
         LOG.debug( "Updating thumbnail image details for collection : " + collectionName + " ID: " + iden + " imageType : "
             + imageType + " with filename : " + imgFileName );
-        if ( iden <= 0l ||  collectionName == null || collectionName.isEmpty()
-            || imageType == null || imageType.isEmpty() ) {
+        if ( iden <= 0l || collectionName == null || collectionName.isEmpty() || imageType == null || imageType.isEmpty() ) {
             throw new InvalidInputException( "Invalid input provided to the method updateImage" );
         }
         Query query = new Query();
@@ -989,13 +1023,14 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         if ( !( isThumbnail ) ) {
 
         }
-        
+
         update.set( CommonConstants.MODIFIED_ON_COLUMN, System.currentTimeMillis() );
 
         mongoTemplate.updateMulti( query, update, OrganizationUnitSettings.class, collectionName );
         LOG.debug( "Updated thumbnail image details" );
     }
-    
+
+
     @Override
     public void removeImageForOrganizationUnitSetting( long iden, String collectionName, boolean isThumbnail, String imageType )
         throws InvalidInputException
@@ -1039,7 +1074,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         if ( !( isThumbnail ) ) {
 
         }
-        
+
         update.set( CommonConstants.MODIFIED_ON_COLUMN, System.currentTimeMillis() );
 
         mongoTemplate.updateMulti( query, update, OrganizationUnitSettings.class, collectionName );
@@ -1166,7 +1201,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         query.addCriteria( Criteria.where( KEY_STATUS )
             .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) ) );
         query.addCriteria( Criteria.where( KEY_HIDDEN_SECTION ).is( true ) );
-        List<OrganizationUnitSettings> settings = mongoTemplate.find( query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION );
+        List<OrganizationUnitSettings> settings = mongoTemplate.find( query, OrganizationUnitSettings.class,
+            COMPANY_SETTINGS_COLLECTION );
         if ( settings != null && !settings.isEmpty() ) {
             for ( OrganizationUnitSettings setting : settings ) {
                 entityIds.add( setting.getIden() );
@@ -1175,12 +1211,15 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         return entityIds;
     }
     
+    
     @Override
     public List<SocialMediaTokenResponse> getSocialMediaTokensByCollection( String collectionName, int skipCount, int batchSize )
     {
         LOG.debug( "Fetching social media tokens from {}", collectionName );
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_SOCIAL_MEDIA_TOKENS ).exists( true )  );
+        query.addCriteria( Criteria.where( KEY_STATUS )
+            .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) ) );
         query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).include( KEY_IDENTIFIER )
             .include( KEY_CONTACT_DETAILS ).exclude( "_id" );
 
@@ -1193,12 +1232,15 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         return mongoTemplate.find( query, SocialMediaTokenResponse.class, collectionName );
     }
     
+
     @Override
-    public long getSocialMediaTokensCount( String collectionName)
+    public long getSocialMediaTokensCount( String collectionName )
     {
         LOG.debug( "Fetching social media tokens record count from {}", collectionName );
         Query query = new Query();
-        query.addCriteria( Criteria.where( KEY_SOCIAL_MEDIA_TOKENS ).exists( true )  );
+        query.addCriteria( Criteria.where( KEY_SOCIAL_MEDIA_TOKENS ).exists( true ) );
+        query.addCriteria( Criteria.where( KEY_STATUS )
+            .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) ) );
         query.fields().include( KEY_SOCIAL_MEDIA_TOKENS ).include( KEY_IDENTIFIER ).exclude( "_id" );
         return mongoTemplate.count( query, collectionName );
     }
@@ -1208,7 +1250,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
      * Method to fetch the company ID list who have opted for monthly digest mail
      */
     @Override
-    public List<OrganizationUnitSettings> getMonthlyDigestEnabledEntities( String collectionType, int startIndex, int batchSize )
+    public List<OrganizationUnitSettings> getMonthlyDigestEnabledEntities( String collectionType, int startIndex,
+        int batchSize )
     {
         LOG.debug( "Method getCompaniesOptedForSendingMonthlyDigest() started." );
 
@@ -1216,9 +1259,9 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_STATUS )
             .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) ) );
-        query.addCriteria(
-            new Criteria().orOperator( Criteria.where( KEY_SEND_MONTHLY_DIGEST_MAIL ).is( true ),Criteria.where( KEY_DIGEST_RECIPIENTS )
-                .exists( true ).andOperator( Criteria.where( KEY_DIGEST_RECIPIENTS ).ne( Collections.emptySet() ) ) ) );
+        query.addCriteria( new Criteria().orOperator( Criteria.where( KEY_SEND_MONTHLY_DIGEST_MAIL ).is( true ),
+            Criteria.where( KEY_DIGEST_RECIPIENTS ).exists( true )
+                .andOperator( Criteria.where( KEY_DIGEST_RECIPIENTS ).ne( Collections.emptySet() ) ) ) );
 
         if ( startIndex > -1 ) {
             query.skip( startIndex );
@@ -1234,98 +1277,102 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         LOG.debug( "Method getCompaniesOptedForSendingMonthlyDigest() finished." );
         return unitSettings;
     }
-    
-    
+
+
     @Override
     public List<Long> getHiddenPublicPagesEntityIds( String collection )
     {
-        LOG.debug( "method getHiddenPublicPagesEntityIds started for collection {} " , collection );
-        
+        LOG.debug( "method getHiddenPublicPagesEntityIds started for collection {} ", collection );
+
         List<Long> entityIds = new ArrayList<Long>();
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_DEFAULT_BY_SYSTEM ).is( false ) );
         query.addCriteria( Criteria.where( KEY_STATUS )
             .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) ) );
         query.addCriteria( Criteria.where( KEY_HIDE_PUBLIC_PAGE ).is( true ) );
-        
+
         query.fields().include( KEY_IDEN );
-        
+
         List<OrganizationUnitSettings> settings = mongoTemplate.find( query, OrganizationUnitSettings.class, collection );
         if ( settings != null && !settings.isEmpty() ) {
             for ( OrganizationUnitSettings setting : settings ) {
                 entityIds.add( setting.getIden() );
             }
         }
-        
-        LOG.debug( "method getHiddenPublicPagesEntityIds finished for collection {} " , collection );
+
+        LOG.debug( "method getHiddenPublicPagesEntityIds finished for collection {} ", collection );
         return entityIds;
-    
-        
+
+
     }
-    
+
+
     @Override
-    public List<OrganizationUnitSettings> getCompaniesForTransactionMonitor(List<Long> companyIds)
+    public List<OrganizationUnitSettings> getCompaniesForTransactionMonitor( List<Long> companyIds )
     {
-        LOG.debug( "method getCompaniesForTransactionMonitor started ");
-        
+        LOG.debug( "method getCompaniesForTransactionMonitor started " );
+
         Query query = new Query();
-        
-        query.addCriteria( Criteria.where(  KEY_IDEN).in( companyIds ));
-        
+
+        query.addCriteria( Criteria.where( KEY_IDEN ).in( companyIds ) );
+
         //include companies those have enabled monitoring
-        query.addCriteria( Criteria.where( KEY_INCLUDE_FOR_TRANSACTION_MONITOR ).is( true ));
-        
+        query.addCriteria( Criteria.where( KEY_INCLUDE_FOR_TRANSACTION_MONITOR ).is( true ) );
+
         query.fields().include( KEY_IDEN ).include( KEY_CONTACT_DETAILS );
         query.addCriteria( Criteria.where( KEY_STATUS )
             .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) ) );
-                
-        List<OrganizationUnitSettings> settings = mongoTemplate.find( query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION );
-        
-        LOG.debug( "method getCompaniesForTransactionMonitor finished ");
+
+        List<OrganizationUnitSettings> settings = mongoTemplate.find( query, OrganizationUnitSettings.class,
+            COMPANY_SETTINGS_COLLECTION );
+
+        LOG.debug( "method getCompaniesForTransactionMonitor finished " );
         return settings;
-    
-        
+
+
     }
-    
+
+
     @Override
     public List<OrganizationUnitSettings> fetchCompaniesByAlertType( String alertType, List<Long> companyIds )
     {
         LOG.info( "method fetchCompaniesByAlertType started for alertType {} and companyIds {}", alertType, companyIds );
         Query query = new Query();
-        query.addCriteria( Criteria.where(  KEY_IDEN).in( companyIds ));
+        query.addCriteria( Criteria.where( KEY_IDEN ).in( companyIds ) );
 
         //include companies those have enabled monitoring
-        query.addCriteria( Criteria.where( KEY_INCLUDE_FOR_TRANSACTION_MONITOR ).is( true ));
-        
+        query.addCriteria( Criteria.where( KEY_INCLUDE_FOR_TRANSACTION_MONITOR ).is( true ) );
+
         query.addCriteria( Criteria.where( KEY_STATUS )
             .nin( Arrays.asList( CommonConstants.STATUS_DELETED_MONGO, CommonConstants.STATUS_INCOMPLETE_MONGO ) ) );
-        
-        if(alertType.equalsIgnoreCase( CommonConstants.ALERT_TYPE_ERROR )){
-            query.addCriteria( Criteria.where( KEY_ENTITY_ALERT_DETAILS + "." + KEY_IS_ERROR_ALERT ).is( true ));
 
-        }else if(alertType.equalsIgnoreCase( CommonConstants.ALERT_TYPE_WARNING )){
-            query.addCriteria( Criteria.where( KEY_ENTITY_ALERT_DETAILS + "." + KEY_IS_WARNING_ALERT_ ).is( true ));
-        }else if(alertType.equalsIgnoreCase( CommonConstants.ALERT_TYPE_NORMAL )){
-            query.addCriteria( Criteria.where( KEY_ENTITY_ALERT_DETAILS + "." + KEY_IS_ERROR_ALERT ).is( false ));
-            query.addCriteria( Criteria.where( KEY_ENTITY_ALERT_DETAILS + "." + KEY_IS_WARNING_ALERT_ ).is( false ));
+        if ( alertType.equalsIgnoreCase( CommonConstants.ALERT_TYPE_ERROR ) ) {
+            query.addCriteria( Criteria.where( KEY_ENTITY_ALERT_DETAILS + "." + KEY_IS_ERROR_ALERT ).is( true ) );
+
+        } else if ( alertType.equalsIgnoreCase( CommonConstants.ALERT_TYPE_WARNING ) ) {
+            query.addCriteria( Criteria.where( KEY_ENTITY_ALERT_DETAILS + "." + KEY_IS_WARNING_ALERT_ ).is( true ) );
+        } else if ( alertType.equalsIgnoreCase( CommonConstants.ALERT_TYPE_NORMAL ) ) {
+            query.addCriteria( Criteria.where( KEY_ENTITY_ALERT_DETAILS + "." + KEY_IS_ERROR_ALERT ).is( false ) );
+            query.addCriteria( Criteria.where( KEY_ENTITY_ALERT_DETAILS + "." + KEY_IS_WARNING_ALERT_ ).is( false ) );
         }
-        
-        
-        
-        List<OrganizationUnitSettings> settingsList = mongoTemplate.find( query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION );
+
+
+        List<OrganizationUnitSettings> settingsList = mongoTemplate.find( query, OrganizationUnitSettings.class,
+            COMPANY_SETTINGS_COLLECTION );
         LOG.info( "method fetchCompaniesByAlertType finished for alertType {} and companyIds {}", alertType, companyIds );
-       
+
         return settingsList;
     }
 
 
     @Override
-    public void saveDigestRecord( String profileLevel, long entityId, SavedDigestRecord digestRecord ) throws InvalidInputException
+    public void saveDigestRecord( String profileLevel, long entityId, SavedDigestRecord digestRecord )
+        throws InvalidInputException
     {
         LOG.debug( "Method saveDigestRecord() to update digest record list started." );
-        
+
         String collectionName = null;
-        
+
         if ( CommonConstants.PROFILE_LEVEL_COMPANY.equals( profileLevel ) ) {
             collectionName = CommonConstants.COMPANY_SETTINGS_COLLECTION;
         } else if ( CommonConstants.PROFILE_LEVEL_REGION.equals( profileLevel ) ) {
@@ -1336,7 +1383,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
             LOG.warn( "Invalid profile type" );
             throw new InvalidInputException( "Invalid profile type" );
         }
-        
+
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_IDEN ).is( entityId ) );
         Update update = new Update();
@@ -1364,10 +1411,10 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
             LOG.warn( "Invalid profile type" );
             throw new InvalidInputException( "Invalid profile type" );
         }
-        
+
         Query query = new Query();
         query.addCriteria( Criteria.where( KEY_IDEN ).is( entityId ) );
-        
+
         query.fields().include( KEY_SAVED_DIGEST_RECORD ).exclude( CommonConstants.DEFAULT_MONGO_ID_COLUMN );
         return mongoTemplate.findOne( query, OrganizationUnitSettings.class, collectionName );
     }
@@ -1422,6 +1469,153 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
         mongoTemplate.updateFirst( query, update, collectionName );
         LOG.debug( "Method saveDigestRecord() to update digest record list started." );
     }
+    
+    @Override
+    public OrganizationUnitSettings hasRegisteredForSummit( long companyId ) throws InvalidInputException
+    {
+        LOG.debug( "Method hasRegisteredForSummit() running." );
+
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_IDEN ).is( companyId ) );
+        
+        query.fields().include( HAS_REGISTERED_FOR_SUMMIT ).exclude( CommonConstants.DEFAULT_MONGO_ID_COLUMN );
+        return mongoTemplate.findOne( query, OrganizationUnitSettings.class, CommonConstants.COMPANY_SETTINGS_COLLECTION );
+    }
+
+    @Override
+    public void updateHasRegisteredForSummit( long companyId, boolean hasRegisteredForSummit ) throws InvalidInputException
+    {
+        LOG.debug( "Method updateHasRegisteredForSummit() started." );
+        
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_IDEN ).is( companyId ) );
+        Update update = new Update();
+        
+        update.set( HAS_REGISTERED_FOR_SUMMIT, hasRegisteredForSummit );
+        
+        mongoTemplate.updateFirst( query, update, CommonConstants.COMPANY_SETTINGS_COLLECTION );
+        LOG.debug( "Method updateHasRegisteredForSummit() finished." );
+    }
+    
+    @Override
+    public OrganizationUnitSettings isShowSummitPopup( long companyId ) throws InvalidInputException
+    {
+        LOG.debug( "Method getShowSummitPopupFlag() to fetch show summit popup flag running." );
+
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_IDEN ).is( companyId ) );
+        
+        query.fields().include( IS_SHOW_SUMMIT_POPUP ).exclude( CommonConstants.DEFAULT_MONGO_ID_COLUMN );
+        return mongoTemplate.findOne( query, OrganizationUnitSettings.class, CommonConstants.COMPANY_SETTINGS_COLLECTION );
+    }
+
+    @Override
+    public void updateShowSummitPopup( long companyId, boolean isShowSummitPopup ) throws InvalidInputException
+    {
+        LOG.debug( "Method updateShowSummitPopupFlag() to update showSummitPopup started." );
+        
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_IDEN ).is( companyId ) );
+        Update update = new Update();
+        
+        update.set( IS_SHOW_SUMMIT_POPUP, isShowSummitPopup );
+        
+        mongoTemplate.updateFirst( query, update, CommonConstants.COMPANY_SETTINGS_COLLECTION );
+        LOG.debug( "Method updateHasRegisteredForSummit() finished." );
+    }
 
 
+    /**
+     * Method to get a list of active FTP connections information
+     * @param state
+     * @return
+     */
+    @Override
+    public List<TransactionSourceFtp> getFtpConnectionsForCompany( String status, int startIndex, int batchSize )
+    {
+        LOG.debug( "Getting ftp connectinos for company " );
+
+        List<OrganizationUnitSettings> companiesWithFtpConnections = null;
+        Query query = new Query();
+
+        query.addCriteria( Criteria.where( KEY_FTP_INFO ).exists( true ) );
+
+        if ( startIndex > -1 ) {
+            query.skip( startIndex );
+        }
+        if ( batchSize > -1 ) {
+            query.limit( batchSize );
+        }
+
+        query.with( new Sort( Sort.Direction.ASC, KEY_IDEN ) );
+
+        LOG.debug( "Query: {}", query );
+        companiesWithFtpConnections = mongoTemplate.find( query, OrganizationUnitSettings.class,
+            CommonConstants.COMPANY_SETTINGS_COLLECTION );
+
+        if ( companiesWithFtpConnections != null && !companiesWithFtpConnections.isEmpty() ) {
+            List<TransactionSourceFtp> ftpInfoList = new ArrayList<>();
+            for ( OrganizationUnitSettings company : companiesWithFtpConnections ) {
+                if ( company.getTransactionSourceFtpList() != null && !company.getTransactionSourceFtpList().isEmpty() ) {
+                    for ( TransactionSourceFtp ftp : company.getTransactionSourceFtpList() ) {
+                        if ( StringUtils.equals( status, ftp.getStatus() ) ) {
+                            ftpInfoList.add( ftp );  
+                        }
+                    }
+                }
+            }
+            return ftpInfoList;
+        } else {
+            return Collections.emptyList();
+        }
+    }
+    
+    @Override
+    public TransactionSourceFtp fetchFileHeaderMapper(long companyId , long ftpId ) {
+        LOG.debug( "The method fetchFileHeaderMapper() to fetch file header started for companyId: {} , ftpId: {}",companyId,ftpId );
+        TransactionSourceFtp transactionSourceFtp = null;
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_IDEN ).is( companyId ) );
+        query.addCriteria( Criteria.where( KEY_TRANSACTION_SOURCE_FTP ).elemMatch( Criteria.where( KEY_TRANSACTION_SOURCE_FTP_ID ).is( ftpId ).and(  KEY_TRANSACTION_SOURCE_FTP_STATUS ).is( 'A' ) ) );
+        query.fields().include( KEY_TRANSACTION_SOURCE_FTP_DOLLAR).exclude( CommonConstants.DEFAULT_MONGO_ID_COLUMN );
+        OrganizationUnitSettings organizationUnitSettings = mongoTemplate.findOne( query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION );
+        if(organizationUnitSettings != null && organizationUnitSettings.getTransactionSourceFtpList() != null && organizationUnitSettings.getTransactionSourceFtpList().size() ==1) {
+            
+            transactionSourceFtp =  organizationUnitSettings.getTransactionSourceFtpList().get( 0 );
+        }
+        LOG.info( "query : {} \n transactionSourceFtp : {}",query,organizationUnitSettings );
+        return transactionSourceFtp;
+        
+    }
+    
+    @Override
+    public List<TransactionSourceFtp> fetchTransactionFtpListActive(long companyId ) {
+        LOG.debug( "The method fetchTransactionFtpListActive() to fetch active ftp list started for companyId: {} ",companyId );
+        List<TransactionSourceFtp> transactionSourceFtpList = null;
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_IDEN ).is( companyId ) );
+        query.addCriteria( Criteria.where(  KEY_TRANSACTION_SOURCE_FTP+"."+KEY_TRANSACTION_SOURCE_FTP_STATUS ).is( 'A' )  );
+        OrganizationUnitSettings organizationUnitSettings = mongoTemplate.findOne( query, OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION );
+        if(organizationUnitSettings != null && organizationUnitSettings.getTransactionSourceFtpList() != null) {
+            
+            transactionSourceFtpList =  organizationUnitSettings.getTransactionSourceFtpList();
+        }
+        LOG.info( "query : {} \n transactionSourceFtpList : {}",query,transactionSourceFtpList );
+        return transactionSourceFtpList;
+        
+    }
+    
+    
+    @Override
+    public void updateFtpTransaction(long companyId , List<TransactionSourceFtp> transactionSourceFtp) {
+        LOG.debug( "The method fetchFileHeaderMapper() to fetch file header started for companyId: {} ",companyId);
+        Query query = new Query();
+        query.addCriteria( Criteria.where( KEY_IDEN ).is( companyId ) );
+        Update update = new Update();
+        update.set( KEY_TRANSACTION_SOURCE_FTP , transactionSourceFtp);
+
+        mongoTemplate.updateFirst( query, update, COMPANY_SETTINGS_COLLECTION );
+        LOG.info( "query : {} ",query );
+        
+    }
 }

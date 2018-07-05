@@ -5,16 +5,19 @@
 <c:set var="accountType" value="${user.company.licenseDetails[0].accountsMaster.accountName}" />
 <form id="edit-individual-form">
 
-		<div class="bd-hr-form-item clearfix" id="soc-mon-admin-privilege-div">
-		    <div class="float-left bd-frm-left"></div>
-		    <div class="float-left bd-frm-right">
-		        <div class="bd-frm-check-wrapper clearfix bd-check-wrp">
-		            <div class="float-left bd-check-img bd-check-img-checked"></div>
-		            <input type="hidden" name="isSocialMonitorAdmin" value="false" id="is-soc-mon-admin-chk" class="ignore-clear">
-		            <div class="float-left bd-check-txt bd-check-sm"><spring:message code="label.grant.socialmonitor.adminprivileges.key"/></div>
-		        </div>
-		    </div>
-		</div>
+		<c:if test="${isSocialMonitorEnabled}">
+			<div class="bd-hr-form-item clearfix" id="soc-mon-admin-privilege-div">
+			    <div class="float-left bd-frm-left"></div>
+			    <div class="float-left bd-frm-right">
+			        <div class="bd-frm-check-wrapper clearfix bd-check-wrp">
+			            <div class="float-left bd-check-img bd-check-img-checked" type="socialMonitorCheckbox"></div>
+			            <input type="hidden" name="isSocialMonitorAdmin" value="false" id="is-soc-mon-admin-chk" class="ignore-clear">
+			            <div class="float-left bd-check-txt bd-check-sm"><spring:message code="label.grant.socialmonitor.adminprivileges.key"/></div>
+			        </div>
+			    </div>
+			</div>
+		</c:if>
+		
 	    <c:choose>
 		    <c:when test="${accountType == 'Enterprise'}"> 
 	    	<div id="bd-assign-to" class="bd-hr-form-item clearfix">

@@ -3,6 +3,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
+<input id="companyId" value="${companyId}" type="hidden"/>
 <div id="bulk-options-popup" class="hide bulk-action-popup">
 	<button type="button" class="close bulk-options-dismiss" id="dismiss-bulk-options">&times;</button>
 	<div id="stream-bulk-actions-popup-body" class="col-lg-6 col-md-6 col-sm-6 col-xs-6 bulk-action-edit-container">
@@ -28,7 +29,7 @@
 				Flag
 			</div>
 			<div id="bulk-edit-esc" class="col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn bulk-stream-action-esc bulk-act-btn">
-			Escalate
+				Escalate
 			</div>
 			<div id="bulk-edit-res" class="col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn bulk-stream-action-res bulk-act-btn">
 				Resolve
@@ -95,9 +96,6 @@
 			<div class="float-right hm-header-right text-center soc-mon-btn" onclick="javascript:showMainContent('./showsocialmonitorpage.do')">
 					<spring:message code="label.edit.monitors.key" />
 			</div>
-			<%-- <div class="float-right hm-header-right text-center soc-mon-btn" onclick="">
-					<spring:message code="label.social.monitor.reports.key" />
-			</div> --%>
 			<div class="float-right hm-header-right text-center soc-mon-btn" onclick="javascript:showMainContent('./showsocialmonitorreportspage.do')">
 					<spring:message code="label.social.monitor.reports.key" />
 			</div>
@@ -134,11 +132,12 @@
 <input type="hidden" id="selected-post-ids" data-post-ids='[]'>
 <div class="dash-wrapper-main">
 	<div class="dash-container container">
-		<div id="stream-tabs" class="clearfix" data-flagged=false data-status="none">
+		<div id="stream-tabs" class="clearfix" data-status="NEW" data-trusted-source=false>
 			<div id="soc-mon-stream-tab" class="soc-mon-tab soc-mon-stream-active" data-disabled=true><img id="stream-inactive" src="${initParam.resourcesPath}/resources/images/stream-gray.png"  class="hide soc-mon-icns"><img id="stream-active" src="${initParam.resourcesPath}/resources/images/stream-blue.png" class="soc-mon-icns">Stream</div>
 			<div id="soc-mon-alerts-tab" class="soc-mon-tab" data-disabled=false><img id="alert-inactive" src="${initParam.resourcesPath}/resources/images/flag-gray.png" class="soc-mon-icns"><img id="alert-active" src="${initParam.resourcesPath}/resources/images/flag-yellow.png" class="hide soc-mon-icns">Alerts</div>
 			<div id="soc-mon-escalated-tab" class="soc-mon-tab" data-disabled=false><img id="esc-inactive" src="${initParam.resourcesPath}/resources/images/escalated-gray.png" class="soc-mon-icns"><img id="esc-active" src="${initParam.resourcesPath}/resources/images/escalated-orange.png" class="hide soc-mon-icns">Escalations</div>
 			<div id="soc-mon-resolved-tab" class="soc-mon-tab" data-disabled=false><img id="res-inactive" src="${initParam.resourcesPath}/resources/images/verified-gray.png" class="soc-mon-icns"><img id="res-active" src="${initParam.resourcesPath}/resources/images/verified-green.png" class="hide soc-mon-icns">Resolutions</div>
+			<div id="soc-mon-trusted-tab" class="soc-mon-tab" data-disabled=false><img id="trust-inactive" src="${initParam.resourcesPath}/resources/images/verified-gray.png" class="soc-mon-icns"><img id="trust-active" src="${initParam.resourcesPath}/resources/images/verified-green.png" class="hide soc-mon-icns">Trusted Source</div>
 		</div>
 	</div>
 </div>
@@ -147,7 +146,6 @@
 <form id="macro-form-apply">
 	<input type="hidden" id="macro-form-is-dup" class="macro-form-is-dup" name="macro-form-is-dup" value="false">
 	<input type="hidden" id="macro-form-post-id" class="macro-form-post-id" name="macro-form-post-id" value="">
-	<input type="hidden" id="macro-form-flagged" class="macro-form-flagged" name="macro-form-flagged" value="false">
 	<input type="hidden" id="macro-form-status" name="macro-form-status" class="macro-form-status" value="NEW">
 	<input type="hidden" id="macro-form-text-act-type" class="macro-form-text-act-type" name="macro-form-text-act-type" value="SEND_EMAIL">
 	<input type="hidden" id="macro-form-macro-id" class="macro-form-macro-id" name="macro-form-macro-id" value="">
@@ -157,7 +155,6 @@
 <form id="bulk-actions-apply">
 	<input type="hidden" id="form-is-dup" class="form-is-dup" name="form-is-dup" value="false">
 	<input type="hidden" id="form-post-id" class="form-post-id" name="form-post-id" value="">
-	<input type="hidden" id="form-flagged" class="form-flagged" name="form-flagged" value="false">
 	<input type="hidden" id="form-status" name="form-status" class="form-status" value="NEW">
 	<input type="hidden" id="form-text-act-type" class="form-text-act-type" name="form-text-act-type" value="SEND_EMAIL">
 	<input type="hidden" id="form-macro-id" class="form-macro-id" name="form-macro-id" value="">
@@ -185,12 +182,16 @@
 						</div>
 					</div>
 					<div id="stream-pagination" class="float-right soc-mon-pagination" data-startIndex=0 data-count=0>
-						<div class="soc-mon-pag-text"><span id="stream-item-count" class="soc-mon-bold-text">7</span> items</div>
+						<div class="soc-mon-pag-text"><span id="stream-item-count" class="soc-mon-bold-text">0</span> items</div>
 						<div id="stream-start-page" class="soc-mon-pag"><img src="${initParam.resourcesPath}/resources/images/chevron-double-left.png" class="soc-mon-pag-icn"></div>
 						<div id="stream-start-page-active" class="hide soc-mon-pag-active"><img src="${initParam.resourcesPath}/resources/images/chevron-double-left-blue.png" class="soc-mon-pag-icn"></div>
 						<div id="stream-prev-page" class="soc-mon-pag"><img src="${initParam.resourcesPath}/resources/images/chevron-left.png"  class="soc-mon-pag-icn"></div>
 						<div id="stream-prev-page-active" class="soc-mon-pag-active hide"><img src="${initParam.resourcesPath}/resources/images/chevron-left-blue.png" class="soc-mon-pag-icn"></div>
-						<div class="soc-mon-pag-text"><span id="stream-page-no" class="soc-mon-bold-text">1</span> of <span id="stream-page-count" class="soc-mon-bold-text">1</span></div>
+						<div class="paginate-sel-box float-left">
+							<input id="sel-page-soc-mon" type="text" pattern="[0-9]*" class="sel-page" value="0"/>
+							<span class="paginate-divider">/</span>
+							<span id="stream-page-count" class="paginate-total-pages">0</span>
+						</div>
 						<div id="stream-next-page" class="soc-mon-pag"><img src="${initParam.resourcesPath}/resources/images/chevron-right.png" class="soc-mon-pag-icn"></div>
 						<div id="stream-next-page-active" class="soc-mon-pag-active hide"><img src="${initParam.resourcesPath}/resources/images/chevron-right-blue.png" class="soc-mon-pag-icn"></div>
 						<div id="stream-end-page" class="soc-mon-pag"><img src="${initParam.resourcesPath}/resources/images/chevron-double-right.png" class="soc-mon-pag-icn"></div>
@@ -206,13 +207,37 @@
 	<div  id="stream-posts" class="dash-container container">
 		
 	</div>
+	<div class="dash-container container">
+		<div class="hm-header-main-wrapper hm-hdr-bord-bot soc-mon-sub-hdr" style="border-top: 1px solid #d6d6d6;">
+			<div class="container" style="width:100%">
+				<div class="hm-header-row clearfix">
+					<div id="stream-pagination-bottom" class="float-right soc-mon-pagination" data-startIndex=0 data-count=0>
+						<div class="soc-mon-pag-text"><span id="stream-item-count-bottom" class="soc-mon-bold-text">0</span> items</div>
+						<div id="stream-start-page-bottom" class="soc-mon-pag"><img src="${initParam.resourcesPath}/resources/images/chevron-double-left.png" class="soc-mon-pag-icn"></div>
+						<div id="stream-start-page-active-bottom" class="hide soc-mon-pag-active"><img src="${initParam.resourcesPath}/resources/images/chevron-double-left-blue.png" class="soc-mon-pag-icn"></div>
+						<div id="stream-prev-page-bottom" class="soc-mon-pag"><img src="${initParam.resourcesPath}/resources/images/chevron-left.png"  class="soc-mon-pag-icn"></div>
+						<div id="stream-prev-page-active-bottom" class="soc-mon-pag-active hide"><img src="${initParam.resourcesPath}/resources/images/chevron-left-blue.png" class="soc-mon-pag-icn"></div>
+						<div class="paginate-sel-box float-left">
+							<input id="sel-page-soc-mon-bottom" type="text" pattern="[0-9]*" class="sel-page" value="0"/>
+							<span class="paginate-divider">/</span>
+							<span id="stream-page-count-bottom" class="paginate-total-pages">0</span>
+						</div>
+						<div id="stream-next-page-bottom" class="soc-mon-pag"><img src="${initParam.resourcesPath}/resources/images/chevron-right.png" class="soc-mon-pag-icn"></div>
+						<div id="stream-next-page-active-bottom" class="soc-mon-pag-active hide"><img src="${initParam.resourcesPath}/resources/images/chevron-right-blue.png" class="soc-mon-pag-icn"></div>
+						<div id="stream-end-page-bottom" class="soc-mon-pag"><img src="${initParam.resourcesPath}/resources/images/chevron-double-right.png" class="soc-mon-pag-icn"></div>
+						<div id="stream-end-page-active-bottom" class="soc-mon-pag-active hide"><img src="${initParam.resourcesPath}/resources/images/chevron-double-right-blue.png" class="soc-mon-pag-icn"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 <script>
 /* var  is_dashboard_loaded = window.is_dashboard_loaded; */
 $(document).ready(function() {
 	$(document).attr("title", "Social Monitor");
 	getMacrosForStream();
-	getStreamPosts(0,'none',false);
-	getSegmentsByCompanyId();	
+	getStreamPosts(0,'NEW');
+	getSegmentsByCompanyId();
 });
 </script>

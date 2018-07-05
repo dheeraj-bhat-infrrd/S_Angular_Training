@@ -35,7 +35,8 @@ public interface JspResolver
     public static final String STREAM_CONTAINER_PAGE="stream_container_white";
     public static final String STREAM_ACTION_CONTAINER_PAGE="stream_action_container_gray";
     public static final String SOCIAL_MONITOR_DUPLICATE_POPUP="social_monitor_duplicate_popup";
-
+    public static final String STREAM_DUP_CONTAINER="stream_dup_container";
+    
     // Generic pages
     public static final String INDEX = "index";
     public static final String LOGIN = "login";
@@ -205,4 +206,6 @@ public interface JspResolver
     public static final String SOCIAL_MONITOR_REPORTS = "reporting_social_monitor_reports";
     
     public static final String SENDGRID_EMAIL_MNGMNT="sendgrid_email_management";
+    
+    public static final String UNSUBSCRIBE_MESSAGE = "unsubscribe_message";
 }

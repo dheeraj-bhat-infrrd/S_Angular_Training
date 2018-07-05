@@ -1,4 +1,3 @@
-
 package com.realtech.socialsurvey.core.services.organizationmanagement;
 
 import java.io.IOException;
@@ -26,8 +25,8 @@ import com.realtech.socialsurvey.core.entities.DisabledAccount;
 import com.realtech.socialsurvey.core.entities.EncompassSdkVersion;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
 import com.realtech.socialsurvey.core.entities.FilterKeywordsResponse;
-import com.realtech.socialsurvey.core.entities.Keyword;
 import com.realtech.socialsurvey.core.entities.HierarchySettingsCompare;
+import com.realtech.socialsurvey.core.entities.Keyword;
 import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
@@ -36,13 +35,13 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
-import com.realtech.socialsurvey.core.entities.SocialMediaTokenResponse;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokensPaginated;
 import com.realtech.socialsurvey.core.entities.SocialMonitorTrustedSource;
 import com.realtech.socialsurvey.core.entities.StateLookup;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
+import com.realtech.socialsurvey.core.entities.TransactionSourceFtp;
 import com.realtech.socialsurvey.core.entities.UploadValidation;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
@@ -50,6 +49,7 @@ import com.realtech.socialsurvey.core.entities.UserHierarchyAssignments;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.VerticalCrmMapping;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
+import com.realtech.socialsurvey.core.entities.ftp.FtpSurveyResponse;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -1590,15 +1590,6 @@ public interface OrganizationManagementService
     public Set<String> getAdminEmailsSpecificForAHierarchy( String profileLevel, long iden ) throws InvalidInputException;
 
 
-    /**
-     * Method to fetch all media tokens with profile name
-     * @param skipCount
-     * @param batchSize
-     * @return
-     * @throws InvalidInputException 
-     */
-    List<SocialMediaTokenResponse> fetchSocialMediaTokensResponse(int skipCount, int batchSize ) throws InvalidInputException;
-
 	public List<Long> filterCompanyIdsByStatus(List<Long> companies, String status) throws InvalidInputException;
 
 
@@ -1693,6 +1684,7 @@ public interface OrganizationManagementService
     public List<String> validateSocailMedia( String columnName, long columnValue ) throws InvalidInputException, NoRecordsFetchedException;
 
 	ContactDetailsSettings fetchContactDetailByEncryptedId(String encryptedId, String collection);
+
 	
 	void updateSocialMediaForUser( Long userId, boolean disableSocialMediaTokens ) throws InvalidInputException;
 	
@@ -1740,5 +1732,73 @@ public interface OrganizationManagementService
     void updateAgentsProfileDisable( List<Long> agentId, boolean isAgentProfileDisabled ) throws InvalidInputException;
     
     public boolean isSocialMonitorAdmin(Long agentId) throws InvalidInputException;
+    
+    public boolean hasRegisteredForSummit(Long companyId) throws InvalidInputException;
+    
+    public void setHasRegisteredForSummit(Long companyId, boolean isShowSummitPopup) throws InvalidInputException;
+
+	boolean isShowSummitPopup(Long companyId) throws InvalidInputException;
+
+	void setShowSummitPopup(Long companyId, boolean isShowSummitPopup) throws InvalidInputException;
+
+    /**
+     * @param companyId
+     * @param trustedSource
+     * @return
+     * @throws InvalidInputException
+     */
+    public List<SocialMonitorTrustedSource> removeTrustedSourceToCompany( long companyId, String trustedSource )
+        throws InvalidInputException;
+
+	int getKeywordCount(long companyId) throws InvalidInputException;
+
+    public void updateCopyToClipBoardSettings( long companyId, boolean updateCopyToClipBoardSetting );
+
+    
+    /**
+     * @param companyId
+     * @param encompassCrmInfo
+     * @throws InvalidInputException 
+     */
+    public void setFtpInfo(Long companyId, TransactionSourceFtp transactionSourceFtp) throws InvalidInputException;
+
+
+    /**
+     * @param companyId
+     * @param ftpId
+     * @return
+     */
+    public TransactionSourceFtp fetchFtpInfo( Long companyId, Long ftpId );
+
+
+    /**
+     * @param companyId
+     * @param ftpId
+     * @param mailId
+     * @throws NonFatalException
+     */
+    public void updateFtpMailService( long companyId, long ftpId, String mailId ) throws NonFatalException;
+    
+    /**
+     * @param companyId
+     * @param ftpId
+     * @param s3FileLocation
+     * @param ftpSurveyResponse
+     * @throws InvalidInputException
+     * @throws UndeliveredEmailException
+     */
+    public void sendCompletionMailService( long companyId, long ftpId, String s3FileLocation, FtpSurveyResponse ftpSurveyResponse ) throws InvalidInputException, UndeliveredEmailException;
+
+
+    /**
+     * Method to update social monitor toggle
+     * @param companyId
+     * @param socialMonitorFlag
+     * @return
+     * @throws InvalidInputException
+     * @throws NoRecordsFetchedException
+     */
+    public boolean enableSocialMonitorToggle( long companyId, boolean socialMonitorFlag )
+        throws InvalidInputException, NoRecordsFetchedException;
 
 }

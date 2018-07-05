@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import com.realtech.socialsurvey.compute.common.ComputeConstants;
 import com.realtech.socialsurvey.compute.common.EnvConstants;
+import com.realtech.socialsurvey.compute.topology.bolts.mailsender.CheckUnsubscribedMailId;
 import com.realtech.socialsurvey.compute.topology.bolts.mailsender.RetryHandlerBolt;
 import com.realtech.socialsurvey.compute.topology.bolts.mailsender.SaveMailToSolrBolt;
 import com.realtech.socialsurvey.compute.topology.bolts.mailsender.SendMailBolt;
@@ -75,7 +76,8 @@ public class MailTopologyStarterHelper extends TopologyStarterHelper
         // add mail kafka spout
         builder.setSpout( "MailSenderSpout", KafkaTopicSpoutBuilder.getInstance().emailTopicKafkaSpout(), 1 );
         // add bolts
-        builder.setBolt( "SaveMailToSolrBolt", new SaveMailToSolrBolt(), 1 ).shuffleGrouping( "MailSenderSpout" );
+        builder.setBolt( "CheckUnsubscribedBolt", new CheckUnsubscribedMailId(), 1 ).shuffleGrouping( "MailSenderSpout" );
+        builder.setBolt( "SaveMailToSolrBolt", new SaveMailToSolrBolt(), 1 ).shuffleGrouping( "CheckUnsubscribedBolt" );
         builder.setBolt( "SendMailBolt", new SendMailBolt(), 1 ).shuffleGrouping( "SaveMailToSolrBolt" );
         builder.setBolt("RetryHandlerBolt" , new RetryHandlerBolt(), 1).shuffleGrouping("SendMailBolt");
 

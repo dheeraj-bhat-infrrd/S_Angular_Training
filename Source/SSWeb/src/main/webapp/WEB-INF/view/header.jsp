@@ -9,7 +9,7 @@
 <!-- Account masters 1=Individual, 2=Team, 3=Company, 4=Enterprise, 5=Free Account -->
 <c:set var="accountMasterId" value="${user.company.licenseDetails[0].accountsMaster.accountsMasterId}"/>
 <c:set var="hiddenSectionDashboard" value="${hiddenSection}"/>
-<c:set var="isRealTechOrSSAdmin" value="${ isRealTechOrSSAdmin }"></c:set>
+<c:set var="isRealTechOrSSAdmin" value="${isRealTechOrSSAdmin}"></c:set>
 
 <!DOCTYPE html>
 <html>
@@ -213,7 +213,7 @@
 				<c:if test="${ highestrole == 1 }">
 					<div class="header-links-item" onclick="javascript:showMainContent('./showrankingsettings.do')"><spring:message code="label.ranking.settings.key" /></div>
 				</c:if>
-				<c:if test="${ not empty realTechAdminId }">
+				<c:if test="${not empty realTechAdminId}">
 					<div id="vndsta-setting-one" class="header-links-item hide" onclick="showMainContent('./showlistingsmanagersettings.do')"><spring:message code="label.vendastaproductsettings.key" /></div>
 				</c:if>
 				</c:if>
@@ -232,10 +232,12 @@
 					<div class="header-links-item" onclick="showMainContent('./showlistingsmanagerpage.do')"><spring:message code="label.listingsmanager.key" /></div>
 					</div>					
 				</c:if> --%>
-				<c:if test="${ (isRealTechOrSSAdmin == true or isRealTechOrSSAdmin == 'true') and highestrole == 1 }">
-					<div class="header-links-item" onclick="showMainContent('./showsocialmonitorstreampage.do')"><spring:message code="label.social.monitor.key" /></div>
+				<c:if test="${isSocialMonitorEnabled == true}">
+					<c:if test="${isSocialMonitorAdmin == true}">
+						<div class="header-links-item" onclick="showMainContent('./showsocialmonitorstreampage.do')"><spring:message code="label.social.monitor.key" /></div>
+					</c:if>
 				</c:if>
-				<c:if test="${hiddenSectionDashboard && highestrole != 4 }">
+				<c:if test="${hiddenSectionDashboard && highestrole != 4}">
 				<div class="header-links-item" onclick="showMainContent('./showprofilepage.do')"><spring:message code="label.editprofile.key" /></div>
 				</c:if>
 				<c:if test="${!hiddenSectionDashboard}">
@@ -244,10 +246,10 @@
 				<div class="header-links-item" onclick="showMainContent('./showchangepasswordpage.do')"><spring:message code="label.changepassword.key"/></div>
 				<div class="header-links-item" onclick="showMainContent('./showhelppage.do')"><spring:message code="label.help.key"/></div>
 				<c:choose>
-					<c:when test="${ not empty realTechAdminId }">
+					<c:when test="${not empty realTechAdminId}">
 						<div class="header-links-item" onclick="userSwitchToAdmin();"><spring:message code="label.switch.key" /></div>
 					</c:when>
-					<c:when test="${ not empty companyAdminSwitchId || not empty regionAdminSwitchId || not empty branchAdminSwitchId}">
+					<c:when test="${not empty companyAdminSwitchId || not empty regionAdminSwitchId || not empty branchAdminSwitchId}">
 						<div class="header-links-item" onclick="userSwitchToCompAdmin();"><spring:message code="label.switch.key" /></div>
 					</c:when>
 				</c:choose>
@@ -280,7 +282,7 @@
 <!-- 				<div class="hdr-link-item hdr-link-active"> -->
 <%-- 					<a id="dashboard-link" href="javascript:showMainContent('./dashboard.do')" onclick="showOverlay();"><spring:message code="label.header.dashboard.key" /></a> --%>
 <!-- 				</div> -->
-				<c:if test="${accountMasterId > 1 && accountMasterId < 5 && highestrole != 4 }">
+				<c:if test="${accountMasterId > 1 && accountMasterId < 5 && highestrole != 4}">
 					<div class="hdr-link-item">
 						<a href="javascript:showMainContent('./showusermangementpage.do')" onclick="showOverlay();"><spring:message code="label.header.usermanagement.key" /></a>
 					</div>
@@ -291,7 +293,7 @@
 					</div>
 				</c:if>
 				<c:if test="${accountMasterId != 5 }">
-				<c:if test="${hiddenSectionDashboard && highestrole!=4 }">
+				<c:if test="${hiddenSectionDashboard && highestrole!=4}">
 					<div id="hdr-link-item-config" class="hdr-link-item hdr-link-item-config pos-relative">
 						<a href="javascript:showMainContent('./showcompanysettings.do')" onclick="showOverlay();"><spring:message code="label.configure.key" /></a>
 						<div id="hdr-config-settings-dropdown" class="hdr-link-item-dropdown-icn"></div>
@@ -322,7 +324,7 @@
 									<spring:message code="label.ranking.settings.key" />
 								</div>
 							</c:if>
-							<c:if test="${ not empty realTechAdminId }">
+							<c:if test="${not empty realTechAdminId}">
 								<div id="vndsta-setting-two" class="hdr-link-item-dropdown-item hide" onclick="showMainContent('./showlistingsmanagersettings.do');">
 									<spring:message code="label.vendastaproductsettings.key" />
 								</div>
@@ -356,12 +358,12 @@
 									<spring:message code="label.appsettings.key" />
 								</div>
 							</c:if>
-							<c:if test="${ highestrole == 1 }">
+							<c:if test="${highestrole == 1}">
 								<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showrankingsettings.do');">
 									<spring:message code="label.ranking.settings.key" />
 								</div>
 							</c:if>
-							<c:if test="${ not empty realTechAdminId }">
+							<c:if test="${not empty realTechAdminId}">
 								<div id="vndsta-setting-three" class="hdr-link-item-dropdown-item hide" onclick="showMainContent('./showlistingsmanagersettings.do');">
 									<spring:message code="label.vendastaproductsettings.key" />
 								</div>
@@ -386,10 +388,12 @@
 						</div>
 					</div>
 				</c:if> --%>
-				<c:if test="${ (isRealTechOrSSAdmin == true or isRealTechOrSSAdmin == 'true') and highestrole == 1 }">
-					<div class="hdr-link-item">
-						<a href="javascript:showMainContent('./showsocialmonitorstreampage.do')" onclick="showOverlay();"><spring:message code="label.social.monitor.key" /></a>
-					</div>
+				<c:if test="${isSocialMonitorEnabled == true}">
+					<c:if test="${isSocialMonitorAdmin == true}">
+						<div class="hdr-link-item">
+							<a href="javascript:showMainContent('./showsocialmonitorstreampage.do')" onclick="showOverlay();"><spring:message code="label.social.monitor.key" /></a>
+						</div>
+					</c:if>
 				</c:if>
 				<c:if test="${hiddenSectionDashboard && highestrole != 4 }">
 				<div class="hdr-link-item">

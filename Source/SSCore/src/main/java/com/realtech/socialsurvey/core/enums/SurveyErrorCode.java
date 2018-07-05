@@ -13,7 +13,8 @@ public enum SurveyErrorCode
     CORRUPT_RECORD_INCORRECT_REGION_BRANCH( "Agent does not belong to correct region or branch." ),
     NOT_KNOWN( "Reason not found." ),
     USER_DELETED( "Agent is deleted" ),
-    SURVEY_NOT_ALLOWED( "Survey is not allowed for agent.");
+    SURVEY_NOT_ALLOWED( "Survey is not allowed for agent."),
+    UNSUBSCRIBED_CUSTOMER_EMAIL( "Customer has unsubscribed emails either from company or from SocialSurvey Application." );
 
     private String value;
 

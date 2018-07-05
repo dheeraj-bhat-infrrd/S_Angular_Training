@@ -279,7 +279,7 @@ public class ReportingWebController
     {
 
         LOG.info( "showReportingPage: Started" );
-
+        
         long branchId = 0;
         long regionId = 0;
         long companyId = 0;
@@ -307,7 +307,23 @@ public class ReportingWebController
         String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
 
         String profileName = "";
-
+        
+        if("companyId".equals( entityType)) {
+        	 String activeSession = (String) session.getAttribute("activeSession");
+        	 if(activeSession != null) {
+        		 session.setAttribute("activeSession","true");
+        	 }else{
+        		 session.setAttribute("activeSession","false");
+        	 }
+        	 
+        	 boolean hasRegisteredForSummit = organizationManagementService.hasRegisteredForSummit(entityId);
+             session.setAttribute("hasRegisteredForSummit", hasRegisteredForSummit);
+             boolean isShowSummitPopup = organizationManagementService.isShowSummitPopup(entityId);
+             session.setAttribute("isShowSummitPopup", isShowSummitPopup);
+        }else {
+        	session.setAttribute("hasRegisteredForSummit", true);
+        }
+       
         //get unitSetting's and set session attribute column's 
         sessionHelper.updateSelectedProfile( session, entityId, entityType );
 
@@ -376,7 +392,20 @@ public class ReportingWebController
         return JspResolver.REPORTING_DASHBOARD;
     }
 
+    @ResponseBody
+    @RequestMapping ( value = "/setactivesessionforpopup", method = RequestMethod.GET)
+    public String setActiveSessionForPopup( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method to setactivesessionforpopup() Started" );
+        HttpSession session = request.getSession( false );
 
+        session.setAttribute("activeSession","true");
+
+        LOG.info( "setactivesessionforpopup() Finished" );
+        return new String( "Active Session set as true" );
+
+    }
+    
     @ResponseBody
     @RequestMapping ( value = "/fetchspsfromreportingoverview", method = RequestMethod.GET)
     public String reportingOverviewSpsStats( Model model, HttpServletRequest request )
@@ -1247,6 +1276,70 @@ public class ReportingWebController
         String responseString = null;
         responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
         return responseString;
+    }
+    
+    @RequestMapping ( value = "/sethasregisteredforsummit", method = RequestMethod.POST)
+    @ResponseBody
+    public String setHasRegisteredForSummit( HttpServletRequest request )
+    {
+        LOG.info( "Method setHasregisteredforsummit() started" );
+        HttpSession session = request.getSession();
+
+        long companyId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        
+        String hasRegisteredForSummitStr = request.getParameter( "hasRegisteredForSummit" );
+        boolean hasRegisteredForSummit = false;
+        if(hasRegisteredForSummitStr.equalsIgnoreCase("true")){
+        	hasRegisteredForSummit = true;
+        }
+        
+        Response response = null;
+        
+        try {
+        	 response = ssApiIntergrationBuilder.getIntegrationApi().setHasRegisteredForSummit(companyId, hasRegisteredForSummit);
+
+        	 LOG.info( "Method to setHasregisteredforsummit() finished." );
+        	        String responseString = null;
+        	        responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+        	        return responseString;
+        } catch ( Exception error ) {
+            LOG.error(
+                "Exception occured in setHasregisteredforsummit(). Nested exception is ",
+                error );
+            return "false";
+        }
+    }
+    
+    @RequestMapping ( value = "/setshowsummitpopup", method = RequestMethod.POST)
+    @ResponseBody
+    public String setShowSummitPopup( HttpServletRequest request )
+    {
+        LOG.info( "Method setShowSummitPopup() started" );
+        HttpSession session = request.getSession();
+
+        long companyId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        
+        String isShowSummitPopupStr = request.getParameter( "isShowSummitPopup" );
+        boolean isShowSummitPopup = false;
+        if(isShowSummitPopupStr.equalsIgnoreCase("true")){
+        	isShowSummitPopup = true;
+        }
+        
+        Response response = null;
+        
+        try {
+        	 response = ssApiIntergrationBuilder.getIntegrationApi().setShowSummitPopup(companyId, isShowSummitPopup);
+
+        	 LOG.info( "Method to setShowSummitPopup() finished." );
+        	        String responseString = null;
+        	        responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+        	        return responseString;
+        } catch ( Exception error ) {
+            LOG.error(
+                "Exception occured in setShowSummitPopup(). Nested exception is ",
+                error );
+            return "false";
+        }
     }
 
 }

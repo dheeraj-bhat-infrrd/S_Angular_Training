@@ -25,6 +25,7 @@ import com.realtech.socialsurvey.compute.common.APIOperations;
 import com.realtech.socialsurvey.compute.common.ComputeConstants;
 import com.realtech.socialsurvey.compute.common.EmailConstants;
 import com.realtech.socialsurvey.compute.common.LocalPropertyFileHandler;
+import com.realtech.socialsurvey.compute.common.SSAPIOperations;
 import com.realtech.socialsurvey.compute.entities.EmailAttachment;
 import com.realtech.socialsurvey.compute.entities.EmailMessage;
 import com.realtech.socialsurvey.compute.entities.SolrEmailMessageWrapper;
@@ -244,58 +245,76 @@ public class SendMailBolt extends BaseComputeBoltWithAck
     @Override
     public void executeTuple( Tuple input )
     {
-        LOG.debug( "Executing send mail bolt." );
+        LOG.info( "Executing send mail bolt." );
         boolean isSuccess = false;
         boolean isTemporaryException = false;
         // get the email message
         EmailMessage emailMessage = (EmailMessage) input.getValueByField( "emailMessage" );
         boolean deliveryAttempted = input.getBooleanByField( "deliveryAttempted" );
         LOG.debug( "deliveryAttempted {}", deliveryAttempted );
-        if ( !deliveryAttempted ) {
-            LOG.debug( "New mail. Should send and update SOLR" );
-            // the email from SOLR
-            Optional<SolrEmailMessageWrapper> optionalSolrEmailMessage = APIOperations.getInstance()
+        LOG.trace( "Removing unsubscribed emails from recipients list" );
+
+        List<String> unsubscribed = emailMessage.getUnsubscribedEmails();
+        if ( unsubscribed != null && !unsubscribed.isEmpty() ) {
+            List<String> recipients = emailMessage.getRecipients();
+            recipients.removeAll( unsubscribed );
+            emailMessage.setRecipients( recipients );
+
+        }
+        if ( emailMessage.getRecipients() != null && emailMessage.getRecipients().size() == 0
+            && emailMessage.getUnsubscribedEmails() != null && emailMessage.getUnsubscribedEmails().size() > 0 ) {
+            LOG.warn( "All the recipients has been unsubscribed for email {}", emailMessage );
+        } else {
+            if ( !deliveryAttempted ) {
+                LOG.info( "New mail. Should send and update SOLR" );
+                // the email from SOLR
+                Optional<SolrEmailMessageWrapper> optionalSolrEmailMessage = APIOperations.getInstance()
                     .getEmailMessageFromSOLR( emailMessage );
-            if ( optionalSolrEmailMessage.isPresent() ) {
-                SolrEmailMessageWrapper solrEmailMessage = optionalSolrEmailMessage.get();
-                // check if if the message was already sent
-                if ( solrEmailMessage.getEmailAttemptedDate() == null ) {
-                    // message is not sent
-                    try {
-                        LOG.trace( "Validating email" );
-                        validateEmailMessage( emailMessage );
-                        if ( emailMessage.getSendEmailThrough() == null || emailMessage.getSendEmailThrough().isEmpty() ) {
-                            LOG.debug( "Mail to be sent through social survey me account." );
-                            emailMessage.setSendEmailThrough( ComputeConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_ME );
-                        }
-                        String responseId = sendMail( emailMessage );
-                        LOG.debug( "Mail sent successfully. Now updating the mail attempted time" );
-                        // update solr with current attempted date and sendgrid id
-                        solrEmailMessage.setSendgridMessageId( responseId );
-                        solrEmailMessage.setEmailAttemptedDate( ConversionUtils.convertCurrentEpochMillisToSolrTrieFormat() );
-                        APIOperations.getInstance().postEmailToSolr( solrEmailMessage );
-                        isSuccess = true;
-                    } catch ( QueueingMessageProcessingException | MailProcessingException | SolrProcessingException e ) {
-                        LOG.error( "Error while queueing/ processing email message.", e );
-                        LOG.warn( "Message processing will NOT be retried. Message will be logged for inspection." );
-                        FailedMessagesService failedMessageService = new FailedMessagesServiceImpl();
-                        failedMessageService.insertPermanentlyFailedEmailMessage( emailMessage, e );
-                    } catch ( TemporaryMailProcessingException e ) {
-                        //insert into mongo only if it failed for the first time
-                        if(!emailMessage.isRetried()) {
+                if ( optionalSolrEmailMessage.isPresent() ) {
+                    SolrEmailMessageWrapper solrEmailMessage = optionalSolrEmailMessage.get();
+                    // check if if the message was already sent
+                    if ( solrEmailMessage.getEmailAttemptedDate() == null ) {
+                        // message is not sent
+                        try {
+                            LOG.info( "Validating email" );
+                            LOG.info("Mail type is  " + emailMessage.getMailType());
+                            LOG.info("Sending Mail to " + emailMessage.getRecipients().get(0));
+                            validateEmailMessage( emailMessage );
+                            if ( emailMessage.getSendEmailThrough() == null || emailMessage.getSendEmailThrough().isEmpty() ) {
+                                LOG.info( "Mail to be sent through social survey me account." );
+                                emailMessage.setSendEmailThrough( ComputeConstants.SEND_EMAIL_THROUGH_SOCIALSURVEY_ME );
+                            }
+                            
+                            String responseId = sendMail( emailMessage );
+                            LOG.info( "Mail sent successfully. Now updating the mail attempted time" );
+                            // update solr with current attempted date and sendgrid id
+                            solrEmailMessage.setSendgridMessageId( responseId );
+                            solrEmailMessage.setEmailAttemptedDate( ConversionUtils.convertCurrentEpochMillisToSolrTrieFormat() );
+                            APIOperations.getInstance().postEmailToSolr( solrEmailMessage );
+                            isSuccess = true;
+                        } catch ( QueueingMessageProcessingException | MailProcessingException | SolrProcessingException e ) {
+                            LOG.error( "Error while queueing/ processing email message.", e );
+                            LOG.warn( "Message processing will NOT be retried. Message will be logged for inspection." );
                             FailedMessagesService failedMessageService = new FailedMessagesServiceImpl();
-                            failedMessageService.insertTemporaryFailedEmailMessage( emailMessage );
+                            failedMessageService.insertPermanentlyFailedEmailMessage( emailMessage, e );
+                        } catch ( TemporaryMailProcessingException e ) {
+                            //insert into mongo only if it failed for the first time
+                            if ( !emailMessage.isRetried() ) {
+                                FailedMessagesService failedMessageService = new FailedMessagesServiceImpl();
+                                failedMessageService.insertTemporaryFailedEmailMessage( emailMessage );
+                            }
+                            //else increase the retryCount by 1
+                            else
+                                isTemporaryException = true;
                         }
-                        //else increase the retryCount by 1
-                        else isTemporaryException = true;
                     }
+                } else {
+                    // TODO: Handle when email message is not present in SOLR
+                    LOG.warn( "MAIL SHOULD HAVE BEEN PRESENT. THIS MESSAGE SHOULD BE HANDLED IMMEDIATELY." );
                 }
             } else {
-                // TODO: Handle when email message is not present in SOLR
-                LOG.warn( "MAIL SHOULD HAVE BEEN PRESENT. THIS MESSAGE SHOULD BE HANDLED IMMEDIATELY." );
+                LOG.warn( "Email {} was already sent.", emailMessage );
             }
-        } else {
-            LOG.warn( "Email {} was already sent.", emailMessage );
         }
         _collector.emit( input, Arrays.asList( isSuccess, emailMessage.getMailType(), emailMessage, isTemporaryException ) );
     }

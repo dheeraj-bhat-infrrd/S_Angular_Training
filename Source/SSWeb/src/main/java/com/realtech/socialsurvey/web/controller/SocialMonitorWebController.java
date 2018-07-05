@@ -1,11 +1,14 @@
-                                    package com.realtech.socialsurvey.web.controller;
-
+package com.realtech.socialsurvey.web.controller;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.*;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
+import com.realtech.socialsurvey.core.enums.SocialFeedActionType;
 import com.realtech.socialsurvey.core.enums.SocialFeedStatus;
 import com.realtech.socialsurvey.core.enums.TextActionType;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.reportingmanagement.ReportingDashboardManagement;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.api.builder.SSApiIntergrationBuilder;
@@ -23,6 +26,8 @@ import retrofit.client.Response;
 import retrofit.mime.TypedByteArray;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -60,6 +65,16 @@ public class SocialMonitorWebController {
     @Autowired
     private SSApiIntergrationBuilder ssApiIntergrationBuilder;
     
+    private ReportingDashboardManagement reportingDashboardManagement;
+    
+    @Autowired
+    private OrganizationManagementService organizationManagementService;
+    
+    @Autowired
+    public void setReportingDashboardManagement( ReportingDashboardManagement reportingDashboardManagement )
+    {
+        this.reportingDashboardManagement = reportingDashboardManagement;
+    }
     /*
      * Web API to return JSP name for social monitor web page (Add monitor page)
      */
@@ -103,6 +118,11 @@ public class SocialMonitorWebController {
     public String showSocialMonitorStreamPage( Model model, HttpServletRequest request )
     {
         LOG.info( "Social Monitor Stream Page Started" );
+        
+        User user = sessionHelper.getCurrentUser();
+        Long companyId = user.getCompany().getCompanyId();
+        
+        model.addAttribute( "companyId", companyId );
         
         return JspResolver.SOCIAL_MONITOR_STREAM_PAGE;
     }
@@ -230,6 +250,16 @@ public class SocialMonitorWebController {
 		
 		String authorizationHeader = "Basic " + authHeader;
 		
+		int currentCount = 0;
+		
+		try {
+			currentCount = organizationManagementService.getKeywordCount(companyId);
+		} catch (InvalidInputException e) {
+			 LOG.error("Exception occured while fetching monitor count, while adding new monitor.", e);
+	            message = "Unable to add monitor";
+	            statusMap.put(STATUS, CommonConstants.ERROR);
+		}
+		
 		Response response =null;
     	Integer successCount = 0;
     	try {
@@ -241,7 +271,14 @@ public class SocialMonitorWebController {
         	            
                         response = ssApiIntergrationBuilder.getIntegrationApi().addMultiplePhrasesToCompany( companyId, newKeyword, authorizationHeader );
                         
-                        successCount++;
+                        int newCount = organizationManagementService.getKeywordCount(companyId);
+                        
+                        if(newCount > currentCount);
+                        {
+                        	successCount++;
+                        }
+                        currentCount = newCount;
+                        
         	    }
         	    message = messageUtils.getDisplayMessage(DisplayMessageConstants.ADD_MONITOR_SUCCESSFUL,
                     DisplayMessageType.SUCCESS_MESSAGE).getMessage();
@@ -305,7 +342,6 @@ public class SocialMonitorWebController {
 		int count = 0;
 		
 		Actions actions= new Actions();
-		boolean flagged = false;
 		String socialFeedStatus;
 		int alert=0;
 		
@@ -318,11 +354,9 @@ public class SocialMonitorWebController {
 				break;
 				
 			case 1: socialFeedStatus = "NEW";
-				flagged = true;
 				break;
 			
 			case 2: socialFeedStatus = "ESCALATED";
-				flagged = true;
 				break;
 			
 			case 3: socialFeedStatus = "RESOLVED";
@@ -332,7 +366,6 @@ public class SocialMonitorWebController {
 		}
 		
 		actions.setSocialFeedStatus(SocialFeedStatus.valueOf(socialFeedStatus));
-		actions.setFlagged(flagged);
 		actions.setText(actionText);
 		actions.setTextActionType(TextActionType.valueOf(actionType));
 		
@@ -397,7 +430,7 @@ public class SocialMonitorWebController {
     }
     
     @ResponseBody
-    @RequestMapping ( value = "/getsocialpostsforstream", method = RequestMethod.GET)
+    @RequestMapping ( value = "/getsocialpostsforstream", method = RequestMethod.POST)
     public String getSocialPostsForStream(Model model, HttpServletRequest request) {
     	
         LOG.info( "Method to fetch Social Posts for Social Monitor Stream,  getSocialPostsForStream() Started" );
@@ -410,13 +443,18 @@ public class SocialMonitorWebController {
         String startIndexStr = request.getParameter(START_INDEX);
         String batchSizeStr = request.getParameter(BATCH_SIZE);
         String status = request.getParameter(STATUS);
-        String flagStr = request.getParameter(FLAG);
         String companyIdStr = request.getParameter( "company" );
         String regionIdStr = request.getParameter( "region" );
         String branchIdStr = request.getParameter( "branch" );
         String agentIdStr = request.getParameter( "user" );
         String feedsStr = request.getParameter( "feeds" );
         String text = request.getParameter("text");
+        String trustedSourceStr = request.getParameter("fromTrustedSource");
+        
+        boolean fromTrustedSource = false;
+        if(trustedSourceStr != null && trustedSourceStr.equals( "true" )){
+            fromTrustedSource = true;
+        }
         
         List<String> feedType = new ArrayList<>();
         List<Long> regionIds;
@@ -425,7 +463,6 @@ public class SocialMonitorWebController {
         
         int startIndex=0;
         int batchSize=10;
-        boolean flag = false;
         
         if ( startIndexStr != null && !startIndexStr.isEmpty() ) {
         	startIndex = Integer.valueOf( startIndexStr );
@@ -437,10 +474,6 @@ public class SocialMonitorWebController {
         
         if(status.equalsIgnoreCase("none") || status.isEmpty()){
             status=null;
-        }
-        
-       if ( flagStr != null && !flagStr.isEmpty() ) {
-        	flag = Boolean.valueOf( flagStr );
         }
   
        regionIds = splitList( regionIdStr );
@@ -466,8 +499,22 @@ public class SocialMonitorWebController {
        
        String authorizationHeader = "Basic " + authHeader;
        
-       Response response = ssApiIntergrationBuilder.getIntegrationApi().showStreamSocialPosts(startIndex, batchSize, status, flag, feedType, companyId, regionIds, branchIds, agentIds,text,isCompanySet, authorizationHeader);
-        		
+       SocialFeedFilter filter = new SocialFeedFilter();
+       
+       filter.setStartIndex( startIndex );
+       filter.setLimit( batchSize );
+       filter.setStatus( status );
+       filter.setFeedtype( feedType );
+       filter.setCompanyId( companyId );
+       filter.setRegionIds( regionIds );
+       filter.setBranchIds( branchIds );
+       filter.setAgentIds( agentIds );
+       filter.setSearchText( text );
+       filter.setCompanySet( isCompanySet );
+       filter.setFromTrustedSource( fromTrustedSource );
+       
+       Response response = ssApiIntergrationBuilder.getIntegrationApi().showStreamSocialPosts(filter, authorizationHeader);
+       
         return new String( ( (TypedByteArray) response.getBody() ).getBytes(),Charset.forName("UTF-8") );
        
     }
@@ -490,12 +537,10 @@ public class SocialMonitorWebController {
     private SocialFeedsActionUpdate createSFAUFromRequest(HttpServletRequest request, String userName, String userEmailId) {
     
     	String postId = request.getParameter("form-post-id");
-    	String flaggedStr = request.getParameter("form-flagged");
     	String statusStr = request.getParameter("form-status");
     	String textActType = request.getParameter("form-text-act-type");
     	String text = request.getParameter("form-post-textbox");
     	String macroId = request.getParameter("form-post-act-macro-id");
-    	    	
     	String[] postIdList = postId.split(",");
     	List<String> postIds = new ArrayList<>();
     	
@@ -508,19 +553,7 @@ public class SocialMonitorWebController {
     	
     	SocialFeedsActionUpdate socialFeedsActionUpdate = new SocialFeedsActionUpdate();
     	socialFeedsActionUpdate.setPostIds(postIdSet);
-    	
-    	boolean flagged = false;
-    	if(flaggedStr!=null && !flaggedStr.isEmpty() && flaggedStr.equalsIgnoreCase("true")) {
-    		flagged = true;
-    	}
-    	socialFeedsActionUpdate.setFlagged(flagged);
-    	
-    	if(statusStr.equalsIgnoreCase("NONE")){
-    		socialFeedsActionUpdate.setStatus(null);
-    	}else {
-    		socialFeedsActionUpdate.setStatus(SocialFeedStatus.valueOf(statusStr));
-    	}
-    	
+    	socialFeedsActionUpdate.setActionType(SocialFeedActionType.valueOf(statusStr));
     	socialFeedsActionUpdate.setTextActionType(TextActionType.valueOf(textActType));
     	socialFeedsActionUpdate.setText(text);
     	socialFeedsActionUpdate.setMacroId(macroId);
@@ -584,7 +617,6 @@ public class SocialMonitorWebController {
     private SocialFeedsActionUpdate createSFAUFromRequestForMacro(HttpServletRequest request, String userName) {
         
     	String postId = request.getParameter("macro-form-post-id");
-    	String flaggedStr = request.getParameter("macro-form-flagged");
     	String statusStr = request.getParameter("macro-form-status");
     	String textActType = request.getParameter("macro-form-text-act-type");
     	String text = request.getParameter("macro-form-text");
@@ -602,19 +634,7 @@ public class SocialMonitorWebController {
     	
         SocialFeedsActionUpdate socialFeedsActionUpdate = new SocialFeedsActionUpdate();
     	socialFeedsActionUpdate.setPostIds(postIdSet);
-    	
-    	boolean flagged = false;
-    	if(flaggedStr!=null && !flaggedStr.isEmpty() && flaggedStr.equalsIgnoreCase("true")) {
-    		flagged = true;
-    	}
-    	socialFeedsActionUpdate.setFlagged(flagged);
-    	
-    	if(statusStr.equalsIgnoreCase("NONE")){
-    		socialFeedsActionUpdate.setStatus(null);
-    	}else {
-    		socialFeedsActionUpdate.setStatus(SocialFeedStatus.valueOf(statusStr));
-    	}
-    	
+    	socialFeedsActionUpdate.setActionType(SocialFeedActionType.valueOf(statusStr));
     	socialFeedsActionUpdate.setTextActionType(TextActionType.valueOf(textActType));
     	socialFeedsActionUpdate.setText(text);
     	socialFeedsActionUpdate.setMacroId(macroId);
@@ -756,6 +776,150 @@ public class SocialMonitorWebController {
         Response response = ssApiIntergrationBuilder.getIntegrationApi().getFeedTypesByCompanyId( companyId, authorizationHeader );
         
         return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+    }
+    
+    @ResponseBody
+    @RequestMapping ( value = "/fetchrecentactivitiesforsocialmonitor", method = RequestMethod.GET)
+    public String fetchRecentActivity( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Fetching Recent Activity for Social Monitor" );
+        HttpSession session = request.getSession( false );
+
+        int startIndex = 0;
+        int batchSize = 0;
+        String startIndexStr = request.getParameter( "startIndex" );
+        String batchSizeStr = request.getParameter( "batchSize" );
+        if ( startIndexStr != null && !startIndexStr.isEmpty() ) {
+            startIndex = Integer.parseInt( startIndexStr );
+        }
+        if ( batchSizeStr != null && !batchSizeStr.isEmpty() ) {
+            batchSize = Integer.parseInt( batchSizeStr );
+        }
+        
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        
+        LOG.debug( "Getting recent activity for Social Monitor for entity id {}, entity type {}, startIndex {} and barch size {}", entityId,
+            entityType, startIndex, batchSize );
+        Response response = ssApiIntergrationBuilder.getIntegrationApi().getRecentActivityForSocialMonitor(entityId, entityType, startIndex, batchSize);
+        return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+    }
+    
+    @ResponseBody
+    @RequestMapping ( value = "/fetchrecentactivitiescountforsocialmonitor")
+    public String getIncompleteSurveyCount( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method to get recent activity count for social monitor." );
+        HttpSession session = request.getSession( false );
+        long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+        String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+        LOG.debug( "Method to get recent activity count for social monitor for entityType {} and entityId {}", entityType, entityId );
+        long count = reportingDashboardManagement.getRecentActivityCountForSocialMonitor( entityId, entityType );
+        LOG.info( "Method to get recent activity count for social monitor finished." );
+        return String.valueOf( count );
+    }
+    
+    @ResponseBody
+    @RequestMapping ( value = "/addtrustedsource", method = RequestMethod.POST)
+    public String addTrustedSource(Model model, HttpServletRequest request) {
+    	
+    	LOG.info( "Method to add trusted source for social monitor." );
+        String trustedSource = request.getParameter( "trustedSource" );
+        
+        User user = sessionHelper.getCurrentUser();
+        Long companyId = user.getCompany().getCompanyId();
+        
+        Map<String, String> statusMap = new HashMap<>();
+        String message = "";
+        String statusJson = "";
+        
+        Response response = null;
+        
+        String authorizationHeader = "Basic " + authHeader;
+        
+        try {
+           
+            response = ssApiIntergrationBuilder.getIntegrationApi().addTrustedSourceToCompany(companyId, trustedSource, authorizationHeader);
+            message =  "Successfully added Trusted Source";
+            String trustedSources = new String(((TypedByteArray) response.getBody()).getBytes());
+            statusMap.put("trustedSources", trustedSources);
+            statusMap.put(STATUS, CommonConstants.SUCCESS_ATTRIBUTE);
+         }catch(Exception e){
+            LOG.error("Exception occured in SS-API while updating post action.", e);
+            message = "Unable to add Trusted Source";
+            statusMap.put(STATUS, CommonConstants.ERROR);
+         }
+        
+        statusMap.put(MESSAGE, message);
+        statusJson = new Gson().toJson(statusMap);
+        
+        LOG.info( "Method to add trusted source for social monitor finished." );
+        
+        return statusJson;
+    }
+    
+    @ResponseBody
+    @RequestMapping ( value = "/removetrustedsource", method = RequestMethod.POST)
+    public String removeTrustedSource(Model model, HttpServletRequest request) {
+        
+    	LOG.info( "Method to remove trusted source for social monitor." );
+    	
+        String trustedSource = request.getParameter( "trustedSource" );
+        
+        User user = sessionHelper.getCurrentUser();
+        Long companyId = user.getCompany().getCompanyId();
+        
+        Map<String, String> statusMap = new HashMap<>();
+        String message = "";
+        String statusJson = "";
+        
+        Response response = null;
+        
+        String authorizationHeader = "Basic " + authHeader;
+        
+        try {
+           
+            response = ssApiIntergrationBuilder.getIntegrationApi().removeTrustedSourceToCompany(companyId, trustedSource, authorizationHeader);
+            message =  "Successfully removed Trusted Source";
+            String trustedSources = new String(((TypedByteArray) response.getBody()).getBytes());
+            statusMap.put("trustedSources", trustedSources);
+            statusMap.put(STATUS, CommonConstants.SUCCESS_ATTRIBUTE);
+         }catch(Exception e){
+            LOG.error("Exception occured in SS-API while updating post action.", e);
+            message = "Unable to remove Trusted Source";
+            statusMap.put(STATUS, CommonConstants.ERROR);
+         }
+        
+        statusMap.put(MESSAGE, message);
+        statusJson = new Gson().toJson(statusMap);
+        
+        LOG.info( "Method to remove trusted source for social monitor finished." );
+        
+        return statusJson;
+    }
+    
+    @ResponseBody
+    @RequestMapping ( value = "/getduplicatesbypostid", method = RequestMethod.GET)
+    public String getDuplicatesByPostId(Model model, HttpServletRequest request) {
+        
+        User user = sessionHelper.getCurrentUser();
+        Long companyId = user.getCompany().getCompanyId();
+        
+        String postId = request.getParameter( "postId" );
+        
+        String authorizationHeader = "Basic " + authHeader;
+        
+        Response response = ssApiIntergrationBuilder.getIntegrationApi().getDuplicatePosts(companyId, postId, authorizationHeader);
+        
+        return new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+    }
+    
+    @RequestMapping ( value = "/getdupcontainer", method = RequestMethod.GET)
+    public String getDupContainer( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Social Monitor Duplicate container page fetched" );
+        
+        return JspResolver.STREAM_DUP_CONTAINER;
     }
 
 }

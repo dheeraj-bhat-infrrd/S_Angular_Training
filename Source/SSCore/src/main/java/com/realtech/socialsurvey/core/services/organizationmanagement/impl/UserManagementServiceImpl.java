@@ -9,6 +9,7 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -96,6 +97,7 @@ import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.batchtracker.BatchTrackerService;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
+import com.realtech.socialsurvey.core.services.mail.EmailUnsubscribeService;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
@@ -256,6 +258,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
     @Value ( "${APPLICATION_LOGO_URL}")
     private String applicationLogoUrl;
+    
+    @Autowired
+    private EmailUnsubscribeService unsubscribeService;
 
 
     /**
@@ -4564,6 +4569,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 //iterating throgh the surveys
                 for ( SurveyPreInitiation survey : surveysForInvitationMail ) {
                     
+                		//TODO: remove this check
+                		long DAY_IN_MS = 1000 * 60 * 60 * 24;
+                		Date CRITERIA_DATE = new Date(System.currentTimeMillis() - (45 * DAY_IN_MS));
+                		if(survey.getCreatedOn().before(new Timestamp(CRITERIA_DATE.getTime())) ) 
+                			continue; 
+                		
+                	
                     User user = null;
                     try {
                         user = getUserByUserId( survey.getAgentId() );
@@ -4583,6 +4595,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                         continue;
                     }
                     
+                    //Check if customer email id is unsubscribed.
+                    if ( unsubscribeService.isUnsubscribed( survey.getCustomerEmailId(), survey.getCompanyId() ) ) {
+                        LOG.debug( "Customer has unsubscribed his email {} either for the company {} or for social survey.",
+                            survey.getCustomerEmailId(), survey.getCompanyId() );
+                        continue;
+                    }
+                    
                     
                     try {
                         LOG.debug( "Sending survey initiation mail" );
@@ -4599,7 +4618,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 
                 //Do not send reminder email if it is disabled for company
                 if(isReminderDisabled){
-                    LOG.info( "Auto Reminder is diabled for company : " + company.getCompanyId() );
+                    LOG.info( "Auto Reminder is disabled for company : " + company.getCompanyId() );
                     continue;
                 }
                 
@@ -4622,6 +4641,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
                 for ( SurveyPreInitiation survey : incompleteSurveyCustomers ) {
                     LOG.debug( "Processing survey pre initiation id: " + survey.getSurveyPreIntitiationId() );
 
+                  //TODO: remove this check
+            		long DAY_IN_MS = 1000 * 60 * 60 * 24;
+            		Date CRITERIA_DATE = new Date(System.currentTimeMillis() - (15 * DAY_IN_MS));
+            		if(survey.getCreatedOn().before(new Timestamp(CRITERIA_DATE.getTime())) ) 
+            			continue; 
+            		
+                    
                     User user = null;
                     try {
                         user = getUserByUserId( survey.getAgentId() );

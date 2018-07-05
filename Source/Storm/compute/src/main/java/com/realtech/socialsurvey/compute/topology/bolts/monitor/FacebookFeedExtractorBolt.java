@@ -1,10 +1,19 @@
 package com.realtech.socialsurvey.compute.topology.bolts.monitor;
 
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
+import com.google.gson.Gson;
+import com.realtech.socialsurvey.compute.dao.RedisSocialMediaStateDao;
+import com.realtech.socialsurvey.compute.dao.impl.RedisSocialMediaStateDaoImpl;
+import com.realtech.socialsurvey.compute.entities.FacebookTokenForSM;
+import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
+import com.realtech.socialsurvey.compute.entities.response.FacebookFeedData;
+import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
+import com.realtech.socialsurvey.compute.enums.ProfileType;
+import com.realtech.socialsurvey.compute.enums.SocialFeedStatus;
+import com.realtech.socialsurvey.compute.enums.SocialFeedType;
+import com.realtech.socialsurvey.compute.feeds.FacebookFeedProcessor;
+import com.realtech.socialsurvey.compute.feeds.impl.FacebookFeedProcessorImpl;
+import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBolt;
+import com.realtech.socialsurvey.compute.utils.UrlHelper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
@@ -14,21 +23,12 @@ import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.gson.Gson;
-import com.realtech.socialsurvey.compute.dao.RedisSocialMediaStateDao;
-import com.realtech.socialsurvey.compute.dao.impl.RedisSocialMediaStateDaoImpl;
-import com.realtech.socialsurvey.compute.entities.FacebookTokenForSM;
-import com.realtech.socialsurvey.compute.entities.SocialMediaTokenResponse;
-import com.realtech.socialsurvey.compute.entities.response.FacebookFeedData;
-import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
-import com.realtech.socialsurvey.compute.enums.ProfileType;
-import com.realtech.socialsurvey.compute.enums.SocialFeedType;
-import com.realtech.socialsurvey.compute.feeds.FacebookFeedProcessor;
-import com.realtech.socialsurvey.compute.feeds.impl.FacebookFeedProcessorImpl;
-import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBolt;
-import com.realtech.socialsurvey.compute.utils.UrlHelper;
 import redis.clients.jedis.exceptions.JedisConnectionException;
+
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -75,7 +75,6 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt implements Serial
     {
         try {
             SocialMediaTokenResponse mediaToken = (SocialMediaTokenResponse) input.getValueByField( "mediaToken" );
-            //LOG.info( "Username is : {}", mediaToken.getName() );
             Long companyId = mediaToken.getCompanyId();
 
             // Check rate limiting for company
@@ -143,7 +142,7 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt implements Serial
         FacebookFeedData facebookFeedData )
     {
         SocialResponseObject<FacebookFeedData> responseWrapper = new SocialResponseObject<>( mediaToken.getCompanyId(),
-            SocialFeedType.FACEBOOK, facebookFeedData.getMessage(), facebookFeedData, 1 );
+            SocialFeedType.FACEBOOK, facebookFeedData.getMessage(), facebookFeedData, 1, SocialFeedStatus.NEW );
 
         if ( mediaToken.getProfileType() != null ) {
             responseWrapper.setProfileType( mediaToken.getProfileType() );
@@ -172,7 +171,7 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt implements Serial
 
         if(facebookFeedData.getApplication() != null && StringUtils.isNotEmpty(facebookFeedData.getApplication().getName()))
         		responseWrapper.setPostSource(facebookFeedData.getApplication().getName());
-        
+
         if ( facebookFeedData.getUpdatedTime() > 0 ) {
             responseWrapper.setUpdatedTime( facebookFeedData.getUpdatedTime() * 1000 );
         }
@@ -180,6 +179,9 @@ public class FacebookFeedExtractorBolt extends BaseComputeBolt implements Serial
         if ( facebookFeedData.getCreatedTime() > 0 ) {
             responseWrapper.setCreatedTime( facebookFeedData.getCreatedTime() * 1000 );
         }
+
+        responseWrapper.setTotalLikesCount( facebookFeedData.getLikes().getSummary().getTotalCount() );
+        responseWrapper.setTotalCommentsCount( facebookFeedData.getComments().getSummary().getTotalCount() );
 
         return responseWrapper;
     }

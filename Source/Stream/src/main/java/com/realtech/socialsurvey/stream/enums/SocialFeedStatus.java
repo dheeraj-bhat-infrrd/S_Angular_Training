@@ -2,7 +2,7 @@ package com.realtech.socialsurvey.stream.enums;
 
 public enum SocialFeedStatus
 {
-    NEW( 0 ), ESCALATED( 1 ), RESOLVED( 2 ), SUBMIT( 3 );
+    NEW( 0 ), ALERT(1), ESCALATED( 2 ), RESOLVED( 3 );
 
     private int value;
 

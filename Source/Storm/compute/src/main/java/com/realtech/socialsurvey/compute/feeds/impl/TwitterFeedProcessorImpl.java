@@ -46,18 +46,18 @@ public class TwitterFeedProcessorImpl implements TwitterFeedProcessor
         this.redisSocialMediaStateDao = new RedisSocialMediaStateDaoImpl();
     }
 
-    private static final int PAGE_SIZE = 200;
+    private static final int PAGE_SIZE = 20;
     public static final int TWITTER_MIN_LIMIT = 100;
 
     private static final int TWITTER_FIRST_RETRIEVAL_COUNT = NumberUtils.toInt( LocalPropertyFileHandler.getInstance()
         .getProperty( ComputeConstants.APPLICATION_PROPERTY_FILE, ComputeConstants.TWITTER_FIRST_RETRIEVAL_COUNT )
-        .orElse( "200" ) );
+        .orElse( "20" ) );
 
     @Override
     public List<TwitterFeedData> fetchFeed( long companyId, SocialMediaTokenResponse mediaToken, String twitterConsumerKey,
         String twitterConsumerSecret )
     {
-        LOG.info( "Getting tweets with id: {}", companyId );
+        LOG.info( "Getting tweets with id: {}", companyId);
 
         List<TwitterFeedData> feedData = new ArrayList<>();
 
@@ -91,7 +91,6 @@ public class TwitterFeedProcessorImpl implements TwitterFeedProcessor
                 }
 
                 resultList = twitter.getUserTimeline( pageId, paging );
-
                 //save the twitterSecondsUnitlRest in redis if remainingCount becomes <= 100
                 if ( LOG.isDebugEnabled() ) {
                     LOG.debug( "RateLimit status for page {} is {} ", pageId, resultList.getRateLimitStatus() );
@@ -120,10 +119,14 @@ public class TwitterFeedProcessorImpl implements TwitterFeedProcessor
             }
 
         } catch ( TwitterException e ) {
+            LOG.error( "Exception in Twitter feed extraction while fetching data for {}, Reason: ",pageId, e );
             // if the rate limit has been over used by any chance then blacklist the socialtoken
-            LOG.error( "Exception in Twitter feed extraction. Reason: ", e );
             if ( e.getErrorCode() == 88 ) {
+                LOG.warn( "Rate limit exceeded. Error code {}", e.getErrorCode() );
                 redisSocialMediaStateDao.setTwitterLock( 900, pageId );
+            } else if(e.getErrorCode() == 32) {
+                LOG.warn( "There was an issue with the authentication data for the request. Error code {}", e.getErrorCode() );
+                redisSocialMediaStateDao.setTwitterLock( 3600, pageId );
             }
         } catch ( JedisConnectionException e ) {
             LOG.error( "Not able to connect to redis", e );
@@ -146,15 +149,18 @@ public class TwitterFeedProcessorImpl implements TwitterFeedProcessor
         
         if(status.isRetweeted()){
             feed.setId( status.getRetweetedStatus().getId());
+            feed.setFavoriteCount( status.getRetweetedStatus().getFavoriteCount() );
         } else {
             feed.setId( status.getId() );
+            feed.setFavoriteCount( status.getFavoriteCount() );
         }
         
         feed.setRetweetCount( status.getRetweetCount() );
         feed.setPictures(
             Arrays.stream( status.getMediaEntities() ).map( x -> x.getMediaURL() ).collect( Collectors.toList() ) );
         feed.setUserName( status.getUser().getScreenName() );
-        
+        feed.setRetweetCount( status.getRetweetCount() );
+
         feed.setSource(getTwitterFeedSource(status.getSource()));
         RateLimitStatus rateLimitStatus = status.getRateLimitStatus();
         if ( rateLimitStatus != null ) {

@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.api.controllers;
 
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -7,7 +8,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,7 +28,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.api.exceptions.SSApiException;
+import com.realtech.socialsurvey.api.models.BulkSurveyPutVO;
 import com.realtech.socialsurvey.api.models.SurveyPutVO;
+import com.realtech.socialsurvey.api.models.TransactionInfoPutVO;
+import com.realtech.socialsurvey.api.models.v2.BulkSurveyProcessResponseVO;
 import com.realtech.socialsurvey.api.models.v2.IncompeteSurveyGetVO;
 import com.realtech.socialsurvey.api.models.v2.SurveyCountVO;
 import com.realtech.socialsurvey.api.models.v2.SurveyGetV2VO;
@@ -100,7 +103,6 @@ public class SurveyApiV2Controller
 		this.surveyBuilder = surveyBuilder;
 	}
 
-    
 	@RequestMapping ( value = "/surveys", method = RequestMethod.PUT)
     @ApiOperation ( value = "Post Survey Transaction")
     public ResponseEntity<?> postSurveyTransaction( @Valid @RequestBody SurveyPutVO surveyModel, HttpServletRequest request )
@@ -122,27 +124,24 @@ public class SurveyApiV2Controller
         //parse input object
         List<SurveyPreInitiation> surveyPreInitiations;
         try {
-            surveyPreInitiations = surveyPreinitiationTransformer.transformApiRequestToDomainObject( surveyModel, companyId );
+            surveyPreInitiations = surveyPreinitiationTransformer.transformApiRequestToDomainObject( surveyModel, companyId , CommonConstants.CRM_INFO_SOURCE_API);
         } catch ( InvalidInputException e ) {
             return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, e.getMessage(), null, null, request, companyId );
         }
 
         //duplicate check
-        List<String> customerEmailIds = new ArrayList<String>();
-        ListIterator<SurveyPreInitiation> iter = surveyPreInitiations.listIterator();
-        while(iter.hasNext()) {
-        		SurveyPreInitiation surveyPreInitiation = iter.next();
-        		if(customerEmailIds.contains(surveyPreInitiation.getCustomerEmailId())) {
-        			iter.remove();
-        			message += " Skipping duplicate customer email id " + surveyPreInitiation.getCustomerEmailId() + ".";
-        		}
-        		customerEmailIds.add(surveyPreInitiation.getCustomerEmailId());
+        TransactionInfoPutVO transactionInfo = surveyModel.getTransactionInfo();
+        if( ! StringUtils.isEmpty(transactionInfo.getCustomer1Email() ) && ! StringUtils.isEmpty(transactionInfo.getCustomer2Email() ) ) {
+        		if(transactionInfo.getCustomer1Email().equalsIgnoreCase(transactionInfo.getCustomer2Email()))
+        			message += " Skipping duplicate customer email id " + transactionInfo.getCustomer1Email() + ".";
         }
+        			
+        	
         
         
         //validate survey
         try {
-        		surveyPreInitiations = surveyHandler.validatePreinitiatedRecord( surveyPreInitiations );
+        		surveyPreInitiations = surveyHandler.validatePreinitiatedRecord( surveyPreInitiations , companyId );
 		} catch (InvalidInputException e) {
             return restUtils.getRestResponseEntity( HttpStatus.BAD_REQUEST, e.getMessage(), null, null, request, companyId );
         }
@@ -769,6 +768,7 @@ public class SurveyApiV2Controller
             companyId );
     }
     
+
     @RequestMapping ( value = "/swearwords/{companyId}", method = RequestMethod.GET)
     @ApiOperation ( value = "Get Swear Words")
     public ResponseEntity<?> getSwearWords( @PathVariable ( "companyId") long companyId, HttpServletRequest request )
@@ -815,6 +815,79 @@ public class SurveyApiV2Controller
         surveyHandler.updateSwearWords( "companyId", companyId, swearWords );
         return restUtils.getRestResponseEntity( HttpStatus.OK, "Request Successfully processed", null, null, request,
             companyId );
+    }
+    
+    /**
+     * 
+     * @param bulkSurveyPutVO
+     * @param request
+     * @return
+     * @throws SSApiException
+     */
+    @RequestMapping ( value = "/bulksurveys", method = RequestMethod.PUT)
+    @ApiOperation ( value = "Post Multiple Survey Transactions")
+    public ResponseEntity<?> postBulkSurveyTransactions( @Valid @RequestBody BulkSurveyPutVO bulkSurveyPutVO, HttpServletRequest request )
+        throws SSApiException
+    {
+        LOGGER.info( "SurveyApiController.postMultipleSurveyTransactions started" );
+        request.setAttribute( "input", bulkSurveyPutVO );
+        List<BulkSurveyProcessResponseVO> bulkSurveyProcessResponseVOs = new ArrayList<BulkSurveyProcessResponseVO>();
+        String message = "Surveys successfully processed.";
+        
+        String authorizationHeader = request.getHeader( CommonConstants.SURVEY_API_REQUEST_PARAMETER_AUTHORIZATION );
+        //authorize request
+        try {
+            long authCompanyId = adminAuthenticationService.validateAuthHeader( authorizationHeader );
+            if(authCompanyId != CommonConstants.DEFAULT_COMPANY_ID)
+                return restUtils.getRestResponseEntity( HttpStatus.UNAUTHORIZED, "Passed auth token is not for default company 1", null, null, request, 0l );
+        } catch ( AuthorizationException e ) {
+            return restUtils.getRestResponseEntity( HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", null, null, request, 0l );
+        }
+
+        if(bulkSurveyPutVO == null)
+                return restUtils.getRestResponseEntity( HttpStatus.NOT_ACCEPTABLE, "Passed Body is null or empty", null, null, request, 0l );
+        
+        long companyId = bulkSurveyPutVO.getCompanyId();
+        if(companyId <= 0l)
+            return restUtils.getRestResponseEntity( HttpStatus.NOT_ACCEPTABLE, "Passed companyId is  invalid", null, null, request, 0l );
+            
+        //check if survey list is present
+        List<SurveyPutVO> surveyPutVOs = bulkSurveyPutVO.getSurveys();
+        if(surveyPutVOs == null || surveyPutVOs.size() == 0)
+                return restUtils.getRestResponseEntity( HttpStatus.NOT_ACCEPTABLE, "Survey list can not be null or empty", null, null, request, companyId );
+    
+                        
+        //parse input object
+        List<SurveyPreInitiation> transactionSurveyPreInitiations;
+        for (SurveyPutVO surveyPutVO : surveyPutVOs) {
+            // create response VO
+            BulkSurveyProcessResponseVO bulkSurveyProcessResponseVO = new BulkSurveyProcessResponseVO();
+            Map<String, Long> surveyIds = new HashMap<String, Long>();
+            try {
+                //transform api object to domain object
+                transactionSurveyPreInitiations = surveyPreinitiationTransformer.transformApiRequestToDomainObject(surveyPutVO, companyId, bulkSurveyPutVO.getSource());
+                // validate survey
+                transactionSurveyPreInitiations = surveyHandler.validatePreinitiatedRecord(transactionSurveyPreInitiations, companyId);
+                //save validated object
+                for (SurveyPreInitiation surveyPreInitiation : transactionSurveyPreInitiations) {
+                    surveyPreInitiation = surveyHandler.saveSurveyPreInitiationObject(surveyPreInitiation);
+                    surveyIds.put(surveyPreInitiation.getCustomerEmailId(), surveyPreInitiation.getSurveyPreIntitiationId());
+                }           
+                //fill response vo
+                bulkSurveyProcessResponseVO.setProcessed(true);
+                bulkSurveyProcessResponseVO.setSurveyIds(surveyIds);
+                bulkSurveyProcessResponseVOs.add(bulkSurveyProcessResponseVO);
+            } catch (InvalidInputException e) {
+                //fill response vo
+                bulkSurveyProcessResponseVO.setProcessed(false);
+                bulkSurveyProcessResponseVO.setErrorMessage(e.getMessage());
+                bulkSurveyProcessResponseVOs.add(bulkSurveyProcessResponseVO);
+            }
+        }
+        LOGGER.info( "SurveyApiController.postSurveyTransaction completed successfully" );
+        
+        return restUtils.getRestResponseEntity( HttpStatus.CREATED, message, "response", bulkSurveyProcessResponseVOs,
+                request, companyId );
     }
 
 }

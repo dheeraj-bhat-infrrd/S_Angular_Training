@@ -28,6 +28,12 @@ public class InstagramMediaData implements Serializable{
     @SerializedName ( "permalink")
     private String postLink;
 
+    @SerializedName ( "like_count")
+    private int likeCount;
+
+    @SerializedName ( "comments_count")
+    private int commentsCount;
+
     public String getIgId() { return this.igId; }
 
     public void setIgId(String igId) { this.igId = igId; }
@@ -79,10 +85,36 @@ public class InstagramMediaData implements Serializable{
         this.postLink = postLink;
     }
 
-    @Override
-    public String toString()
+
+    public int getLikeCount()
     {
-        return "InstagramMediaData [igId=" + igId + ", timestamp=" + timestamp + ", mediaUrl=" + mediaUrl + ", mediaType="
-            + mediaType + ", caption=" + caption + ", id=" + id + ", username=" + username + ", postLink=" + postLink + "]";
+        return likeCount;
+    }
+
+
+    public void setLikeCount( int likeCount )
+    {
+        this.likeCount = likeCount;
+    }
+
+
+    public int getCommentsCount()
+    {
+        return commentsCount;
+    }
+
+
+    public void setCommentsCount( int commentsCount )
+    {
+        this.commentsCount = commentsCount;
+    }
+
+
+    @Override public String toString()
+    {
+        return "InstagramMediaData{" + "igId='" + igId + '\'' + ", timestamp=" + timestamp + ", mediaUrl='" + mediaUrl + '\''
+            + ", mediaType='" + mediaType + '\'' + ", caption='" + caption + '\'' + ", id='" + id + '\'' + ", username='"
+            + username + '\'' + ", postLink='" + postLink + '\'' + ", likeCount='" + likeCount + '\'' + ", commentsCount='"
+            + commentsCount + '\'' + '}';
     }
 }

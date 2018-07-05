@@ -15,13 +15,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.realtech.socialsurvey.stream.entities.TransactionIngestionMessage;
 import com.realtech.socialsurvey.stream.entities.ReportRequest;
 import com.realtech.socialsurvey.stream.messages.EmailMessage;
 import com.realtech.socialsurvey.stream.messages.SendgridEvent;
+import com.realtech.socialsurvey.stream.messages.UserEvent;
+import com.realtech.socialsurvey.stream.services.AuthenticationService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -41,10 +45,16 @@ public class StreamAPIController
     private KafkaTemplate<String, String> kafkaEmailEventsTemplate;
 
     private KafkaTemplate<String, String> kafkaStringTemplate;
-    
+
     private KafkaTemplate<String, String> kafkaReportGenerationTemplate;
+
+    private KafkaTemplate<String, String> kafkaBatchProcessingTemplate;
+
+    private KafkaTemplate<String, String> kafkaUserEventTemplate;
+
+    private AuthenticationService authenticationService;
     
-    private KafkaTemplate<String, String> kafkaBatchProcessingTemplate;    
+    private KafkaTemplate<String, String> kafkaTransactionIngestionTemplate;
     
     @Value ( "${kafka.topic.solrTopic}")
     private String solrTopic;
@@ -76,20 +86,44 @@ public class StreamAPIController
 
     @Autowired
     @Qualifier ( "reportTemplate")
-    public void setKafkaReportGenerationTemplate(KafkaTemplate<String, String> kafkaReportGenerationTemplate)
+    public void setKafkaReportGenerationTemplate( KafkaTemplate<String, String> kafkaReportGenerationTemplate )
     {
         this.kafkaReportGenerationTemplate = kafkaReportGenerationTemplate;
+    }
+
+
+    @Autowired
+    @Qualifier ( "userEventTemplate")
+    public void setKafkaUserEventTemplate( KafkaTemplate<String, String> kafkaUserEventTemplate )
+    {
+        this.kafkaUserEventTemplate = kafkaUserEventTemplate;
+    }
+
+
+    @Autowired
+    @Qualifier ( "batchTemplate")
+    public void setKafkaBatchProcessingTemplate( KafkaTemplate<String, String> kafkaBatchProcessingTemplate )
+    {
+        this.kafkaBatchProcessingTemplate = kafkaBatchProcessingTemplate;
     }
     
     
     @Autowired
-    @Qualifier ( "batchTemplate")
-    public void setKafkaBatchProcessingTemplate(KafkaTemplate<String, String> kafkaBatchProcessingTemplate) {
-		this.kafkaBatchProcessingTemplate = kafkaBatchProcessingTemplate;
-	}
+    public void setAuthenticationService( AuthenticationService authenticationService )
+    {
+        this.authenticationService = authenticationService;
+    }
+
+    
+    @Autowired
+    @Qualifier ( "transactionIngestionTemplate")
+    public void setKafkaTransactionIngestionTemplate(KafkaTemplate<String, String> kafkaTransactionIngestionTemplate)
+    {
+        this.kafkaTransactionIngestionTemplate = kafkaTransactionIngestionTemplate;
+    }
 
 
-	@ApiOperation ( value = "Queues an email message.", response = Void.class)
+    @ApiOperation ( value = "Queues an email message.", response = Void.class)
     @ApiResponses ( value = { @ApiResponse ( code = 201, message = "Successfully queued the message"),
         @ApiResponse ( code = 401, message = "You are not authorized to view the resource"),
         @ApiResponse ( code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
@@ -150,8 +184,8 @@ public class StreamAPIController
         kafkaReportGenerationTemplate.send( new GenericMessage<>( reportRequest ) ).get( 60, TimeUnit.SECONDS );
         return new ResponseEntity<>( HttpStatus.CREATED );
     }
-    
-    
+
+
     @ApiOperation ( value = "Processes batch for survey invitation email report.", response = Void.class)
     @ApiResponses ( value = { @ApiResponse ( code = 201, message = "Report generation requested."),
         @ApiResponse ( code = 401, message = "You are not authorized to view the resource"),
@@ -165,6 +199,42 @@ public class StreamAPIController
         LOG.debug( "Report request {}", reportRequest );
         kafkaBatchProcessingTemplate.send( new GenericMessage<>( reportRequest ) ).get( 60, TimeUnit.SECONDS );
         return new ResponseEntity<>( HttpStatus.CREATED );
+    }
+    
+    
+    @ApiOperation ( value = "Recieves and queues user events originated from the browser.", response = Void.class)
+    @ApiResponses ( value = { @ApiResponse ( code = 201, message = "Acknowledged the message"),
+        @ApiResponse ( code = 401, message = "You are not authorized to access the resource"),
+        @ApiResponse ( code = 403, message = "Accessing the resource you were trying to reach is forbidden"),
+        @ApiResponse ( code = 503, message = "Service not available") })
+    @RequestMapping ( value = "/userevent", method = RequestMethod.POST)
+    public ResponseEntity<?> receiveUserEvent( @RequestBody UserEvent userEvent, @RequestHeader( value = "Authorization" ) String apiAccessKey  )
+        throws InterruptedException, ExecutionException, TimeoutException
+    {
+        LOG.info( "Received user event" );
+        if( !authenticationService.isApiAccessKeyValid( apiAccessKey ) ) {
+            LOG.warn( "Invalid api access key : {}", apiAccessKey );
+            return new ResponseEntity<>( HttpStatus.UNAUTHORIZED );
+        }
+        LOG.trace( "Event : {}", userEvent );
+        kafkaUserEventTemplate.send( new GenericMessage<>( userEvent ) ).get( 60, TimeUnit.SECONDS );
+        return new ResponseEntity<>( HttpStatus.CREATED );
+    }
+    
+    
+    @ApiOperation ( value = "Upload surveys transaction request.", response = Void.class)
+    @ApiResponses ( value = { @ApiResponse ( code = 201, message = "Upload surveys transaction requested."),
+        @ApiResponse ( code = 401, message = "You are not authorized to access the resource"),
+        @ApiResponse ( code = 403, message = "Accessing the resource, you were trying to reach is forbidden"),
+        @ApiResponse ( code = 503, message = "Service not available") })
+    @RequestMapping ( value = "/transaction/ingestion", method = RequestMethod.POST)
+    public ResponseEntity<?> queueTransactionIngestionRequest( @RequestBody TransactionIngestionMessage transactionIngestionMessage )
+        throws InterruptedException, ExecutionException, TimeoutException
+    {
+        LOG.info( "Received request to upload surveys transaction request in stream" );
+        LOG.debug( "Transaction request {}", transactionIngestionMessage );
+        kafkaTransactionIngestionTemplate.send( new GenericMessage<>( transactionIngestionMessage ) ).get( 60, TimeUnit.SECONDS );
+        return new ResponseEntity<>( HttpStatus.OK );
     }
 
 }

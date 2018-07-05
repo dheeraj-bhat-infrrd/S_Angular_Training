@@ -23,6 +23,8 @@ kafka:
     reportTopic: report-topic
     socialMonitorTopic: social-monitor-topic
     batchTopic: batch-topic
+    userEventTopic: user-event-topic
+    transactionIngestionTopic: transaction-ingestion-topic
 
 ---
 
@@ -50,6 +52,12 @@ kafka:
     reportTopic: report-topic-dev
     socialMonitorTopic: social-monitor-topic-dev
     batchTopic: batch-topic-dev
+    userEventTopic: user-event-topic-dev
+    transactionIngestionTopic: transaction-ingestion-topic-dev
+
+api:
+  security:
+    key: ia2c57486abe60g3f856f73id2d9d585bhdgfi04bg74cihjdh074hc8d420be15cge26i8b76ag35b67d92ehg0g9iggadhbi8fjfaf50i7h8ejf9h5fdde8d6jeafb18ggi0e7ai89j3dgic01bb
 
 ---
 
@@ -75,6 +83,13 @@ kafka:
     reportTopic: report-topic-demo
     socialMonitorTopic: social-monitor-topic-demo
     batchTopic: batch-topic-demo
+    userEventTopic: user-event-topic-demo
+    transactionIngestionTopic: transaction-ingestion-topic-demo
+
+    
+api:
+  security:
+    key: hghgj0bd525c7b73ff9h657a086ebdi6103ee6g403afc713ad7bi6a6361b0h1fg44i29175jbb739dge2eiff9i9g1ab6g65j9ib954ah293b25c10f1a7c90c93i79fc9012hjfj83e8be0af0e
 
 ---
 
@@ -103,6 +118,12 @@ kafka:
     reportTopic: report-topic-stage
     socialMonitorTopic: social-monitor-topic-stage
     batchTopic: batch-topic-stage
+    userEventTopic: user-event-topic-stage
+    transactionIngestionTopic: transaction-ingestion-topic-stage
+    
+api:
+  security:
+    key: 2j4ii4ccd50bg2gjhf1jd745cbgc4abgg8f5j7e1b7d4jdd8a5dabajbajh83a36fcafgic71d96db1403db34dc8d5cc78cf4bj8j7cc5g8h4e2d53deh2ff924da7d5f7df6h016dc7e6b7ef68c8
 
 ---
 
@@ -126,3 +147,7 @@ management:
 kafka:
   brokerAddress: 172.30.0.48:9092
 
+
+api:
+  security:
+    key: 6g077iej80j4h419bg01dh4jcf4h35c6af1ff45g1e71h8a97j1a8eg8fbcgb6hc4ag23ia1j997f567b351ad7ih52j6ec624j9cf61j6df1cc70hbji0bf5a6ji04c7j4dfbg8caf4hfh7139i2g

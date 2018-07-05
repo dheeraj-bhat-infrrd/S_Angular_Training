@@ -38,7 +38,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,7 +57,6 @@ import com.realtech.socialsurvey.core.dao.GenericReportingDao;
 import com.realtech.socialsurvey.core.dao.NpsReportMonthDao;
 import com.realtech.socialsurvey.core.dao.NpsReportWeekDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
-import com.realtech.socialsurvey.core.dao.RedisDao;
 import com.realtech.socialsurvey.core.dao.RegionDao;
 import com.realtech.socialsurvey.core.dao.ReportingSurveyPreInititationDao;
 import com.realtech.socialsurvey.core.dao.ScoreStatsOverallBranchDao;
@@ -172,8 +170,8 @@ import com.realtech.socialsurvey.core.services.reportingmanagement.OverviewManag
 import com.realtech.socialsurvey.core.services.reportingmanagement.ReportingDashboardManagement;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.utils.CommonUtils;
-import com.realtech.socialsurvey.core.vo.SurveyTransactionReportVO;
 import com.realtech.socialsurvey.core.vo.SurveyInvitationEmailCountVO;
+import com.realtech.socialsurvey.core.vo.SurveyTransactionReportVO;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookData;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookOperations;
 
@@ -369,9 +367,6 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
     
     @Autowired
     private StreamApiIntegrationBuilder streamApiIntegrationBuilder;
-    
-    @Autowired
-    private RedisDao redisDao;
 
     @Value ( "${FILE_DIRECTORY_LOCATION}")
     private String fileDirectoryLocation;
@@ -537,9 +532,7 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
 			reportRequest.setFileUploadId(fileUpload.getFileUploadId());
 			reportRequest.setCompanyId(fileUpload.getCompany().getCompanyId());
 			streamApiIntegrationBuilder.getStreamApi().generateEmailReport(reportRequest);
-		}
-	
-		if ( reportId == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT || reportId == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD ) {
+		}else if ( reportId == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT || reportId == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD ) {
 		    socialMonitorReportRequest.setFileUploadId(fileUpload.getFileUploadId());
 		    try {
 	            streamApiIntegrationBuilder.getStreamApi().generateEmailReport(socialMonitorReportRequest);
@@ -1830,10 +1823,6 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
                 recentActivityList.add( CommonConstants.REPORTING_BRANCH_RANKING_YEARLY_REPORT );
             } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_DIGEST ) {
                 recentActivityList.add( CommonConstants.REPORTING_DIGEST );
-            } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT ) {
-                recentActivityList.add( CommonConstants.SOCIAL_MONITOR_DATE_REPORT );
-            } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD ) {
-                recentActivityList.add( CommonConstants.SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD );
             }
 
             recentActivityList.add( fileUpload.getStartDate() );
@@ -3448,17 +3437,23 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
 
 
         boolean hasDigestData = false;
+        boolean hasUserCountData = false; 
 
         for ( int i = 0; i < digestList.size(); i++ ) {
-            if ( !digestList.get( i ).isDigestRecordNull() && i != ( digestList.size() - 1 ) ) {
-                hasDigestData = true;
-                break;
+            if (  i != ( digestList.size() - 1 ) ) {
+                if( !digestList.get( i ).isDigestRecordNull() )
+                    hasDigestData = true;
+                if( !digestList.get( i ).getHasZeroUserCount() )
+                    hasUserCountData = true;
+                if( hasDigestData && hasUserCountData )
+                    break;
             }
         }
 
-        if ( !hasDigestData ) {
-            digestAggregate.setDigestDataAbsent( true );
-        } else {
+        digestAggregate.setDigestDataAbsent( hasDigestData ? false : true );
+        digestAggregate.setUserCountDataAbsent( hasUserCountData ? false : true );
+        
+        if ( hasDigestData || hasUserCountData ) {
 
             // set NPS flag
             digestAggregate.setHavingNpsSection( checkForNpsQuestion( profileLevel, entityId ) );
@@ -3981,16 +3976,17 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
                         MonthlyDigestAggregate digestAggregate = getMonthlyDigestAggregateForAHierarchy( digestRequest, month,
                             year );
 
+                        // save the copy of digest generated for further use
+                        if( !digestAggregate.isDigestDataAbsent() || !digestAggregate.isUserCountDataAbsent() ) {
+                            constructAndSaveDigestCopy( digestAggregate );
+                        }
+                        
                         // check is digest data exists
                         if ( digestAggregate.isDigestDataAbsent() ) {
                             LOG.info( "Digest data for {} : {} is not present, Aborting", digestAggregate.getProfileLevel(),
                                 digestAggregate.getEntityName() );
                             continue;
                         }
-
-
-                        // save the copy of digest generated for further use
-                        constructAndSaveDigestCopy( digestAggregate );
 
                         processRecipients( digestAggregate, digestRequest );
 
@@ -5349,36 +5345,7 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
 	}
 	
 
-    @Override
-    public boolean enableSocialMonitorToggle( long companyId, boolean socialMonitorFlag )
-        throws InvalidInputException, NoRecordsFetchedException
-    {
-        LOG.debug( "method enableSocialMonitorToggle() started." );
-
-        if ( companyId <= 0 ) {
-            LOG.warn( "companyId is invalid" );
-            throw new InvalidInputException( "companyId is invalid" );
-        }
-
-        OrganizationUnitSettings unitSettings = organizationManagementService.getCompanySettings( companyId );
-
-        if ( unitSettings == null ) {
-            LOG.warn( "settings are not specified" );
-            throw new InvalidInputException( "settings cannot be null." );
-        }
-
-        // update social monitor flag
-        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
-            MongoOrganizationUnitSettingDaoImpl.SOCIAL_MONITOR_ENABLED, socialMonitorFlag, unitSettings,
-            CommonConstants.COMPANY_SETTINGS_COLLECTION );
-
-        //update companyIds which have enabled/disabled socialMonitor
-        redisDao.updateCompanyIdsForSM( companyId, socialMonitorFlag );
-
-        LOG.debug( "method enableSocialMonitorToggle() finished." );
-        return true;
-    }
-
+    
 
     @Override
     public boolean isSocialMonitorEnabled( long companyId ) throws InvalidInputException, NoRecordsFetchedException

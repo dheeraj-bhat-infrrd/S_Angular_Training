@@ -8,6 +8,7 @@ import java.lang.reflect.Type;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -21,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -98,6 +100,7 @@ import com.realtech.socialsurvey.core.entities.LoopProfileMapping;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.MailIdSettings;
+import com.realtech.socialsurvey.core.entities.MonitorType;
 import com.realtech.socialsurvey.core.entities.MultiplePhrasesVO;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileImageUrlData;
@@ -118,6 +121,7 @@ import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
+import com.realtech.socialsurvey.core.entities.TransactionSourceFtp;
 import com.realtech.socialsurvey.core.entities.UploadStatus;
 import com.realtech.socialsurvey.core.entities.UploadValidation;
 import com.realtech.socialsurvey.core.entities.User;
@@ -129,6 +133,7 @@ import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.VerticalCrmMapping;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.entities.ZipCodeLookup;
+import com.realtech.socialsurvey.core.entities.ftp.FtpSurveyResponse;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
@@ -159,6 +164,7 @@ import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsLocker
 import com.realtech.socialsurvey.core.services.settingsmanagement.SettingsSetter;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.social.SocialMediaExceptionHandler;
+import com.realtech.socialsurvey.core.services.socialmonitor.feed.SocialFeedService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
@@ -341,6 +347,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     
     @Value ( "${TOKEN_REFRESH_INTERVAL}")
     private int tokenRefreshInterval;
+    
+
+    @Value ( "${SOCIAL_MONITOR_DEFAULT_KEYWORDS}")
+    private String socialMonitorDefaultKeywords;
 
     @Autowired
     private ProfileCompletionList profileCompletionList;
@@ -393,6 +403,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Autowired
     private GenericDao<ProfilesMaster, Integer> profilesMasterDao;
 
+    @Autowired
+    private SocialFeedService socialFeedService;
 
     /**
      * This method adds a new company and updates the same for current user and all its user
@@ -1155,6 +1167,31 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
 
+    
+    @Override
+    public int getKeywordCount(long companyId) throws InvalidInputException{
+    	 LOG.debug( "Get company settings for the companyId: {}", companyId );
+         OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById( companyId,
+             MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+         
+         if ( companySettings == null ) {
+             throw new InvalidInputException( "Company setting doesn't exist for company id", "400" );
+         }
+
+         List<Keyword> allKeywords = companySettings.getFilterKeywords();
+         List<Keyword> companyFilterKeywords = new ArrayList<>();
+         
+         if ( allKeywords != null && !allKeywords.isEmpty() ) {
+             for ( Keyword keyword : allKeywords ) { 
+            	 if ( keyword.getStatus() == CommonConstants.STATUS_ACTIVE ) {
+                     companyFilterKeywords.add( keyword );
+                 }
+             }
+         }
+         
+    	return companyFilterKeywords.size();
+    }
+    
     /* (non-Javadoc)
      * @see com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService#getCompanyKeywordsByCompanyId(long)
      */
@@ -6024,64 +6061,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
 
-    /* (non-Javadoc)
-     * @see com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService#fetchSocialMediaTokensResponse(int, int)
-     */
-    @Transactional
-    @Override
-    public List<SocialMediaTokenResponse> fetchSocialMediaTokensResponse( int skipCount, int batchSize )
-        throws InvalidInputException
-    {
-
-        LOG.info( "Inside method fetchSocialMediaTokensResponse" );
-        List<SocialMediaTokenResponse> socialMediaTokenResponseList = new ArrayList<>();
-
-        // fetch companies media token
-        List<SocialMediaTokenResponse> companiesMediaTokens = organizationUnitSettingsDao
-            .getSocialMediaTokensByCollection( MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, 0, 0 );
-        for ( SocialMediaTokenResponse feedIngestionEntity : companiesMediaTokens ) {
-
-            if ( feedIngestionEntity.getSocialMediaTokens() != null ) {
-                socialMediaTokenResponseList.add(
-                    setSocialMediaTokenResponse( feedIngestionEntity, feedIngestionEntity.getIden(), ProfileType.COMPANY ) );
-            }
-
-
-            List<Long> regionIds = regionDao.getRegionIdsUnderCompany( feedIngestionEntity.getIden(), skipCount, batchSize );
-
-            List<SocialMediaTokenResponse> regionMediaTokens = organizationUnitSettingsDao
-                .fetchSocialMediaTokensForIds( regionIds, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
-
-            for ( SocialMediaTokenResponse regionFeedIngestionEntity : regionMediaTokens ) {
-                socialMediaTokenResponseList.add( setSocialMediaTokenResponse( regionFeedIngestionEntity,
-                    feedIngestionEntity.getIden(), ProfileType.REGION ) );
-            }
-
-            List<Long> branchIds = branchDao.getBranchIdsUnderCompany( feedIngestionEntity.getIden(), skipCount, batchSize );
-
-            List<SocialMediaTokenResponse> branchMediaTokens = organizationUnitSettingsDao
-                .fetchSocialMediaTokensForIds( branchIds, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
-
-            for ( SocialMediaTokenResponse branchFeedIngestionEntity : branchMediaTokens ) {
-                socialMediaTokenResponseList.add( setSocialMediaTokenResponse( branchFeedIngestionEntity,
-                    feedIngestionEntity.getIden(), ProfileType.BRANCH ) );
-            }
-
-            List<Long> userIds = getAgentIdsUnderCompany( feedIngestionEntity.getIden(), skipCount, batchSize );
-
-            List<SocialMediaTokenResponse> usersMediaTokens = organizationUnitSettingsDao.fetchSocialMediaTokensForIds( userIds,
-                MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
-
-            for ( SocialMediaTokenResponse userFeedIngestionEntity : usersMediaTokens ) {
-                socialMediaTokenResponseList.add(
-                    setSocialMediaTokenResponse( userFeedIngestionEntity, feedIngestionEntity.getIden(), ProfileType.AGENT ) );
-            }
-        }
-        LOG.info( "End of method fetchSocialMediaTokensResponse" );
-        return socialMediaTokenResponseList;
-    }
-
-
     @Override
     @Transactional
     public SocialMediaTokensPaginated fetchSocialMediaTokensPaginated( int skipCount, int batchSize )
@@ -9808,11 +9787,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             }
         }
         Collections.sort( companyFilterKeywords, new FilterKeywordsComparator() );
+        
+        // update redis with the keywords
+        redisDao.addKeywords( companyId, companyFilterKeywords );
         return companyFilterKeywords;
 
     }
-
-
+    
+    
     @Override
     public List<Keyword> addKeywordToCompanySettings( long companyId, Keyword keyword ) throws InvalidInputException
     {
@@ -9959,6 +9941,74 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         redisDao.addKeywords( companyId, filterKeywordsAdded );
         
         return filterKeywordsAdded;
+    }
+    
+    @Override
+    public boolean enableSocialMonitorToggle( long companyId, boolean socialMonitorFlag )
+        throws InvalidInputException, NoRecordsFetchedException
+    {
+        LOG.debug( "method enableSocialMonitorToggle() started for companyId : {}", companyId);
+
+        if ( companyId <= 0 ) {
+            LOG.warn( "companyId is invalid: {}", companyId);
+            throw new InvalidInputException( "companyId is invalid" );
+        }
+
+        OrganizationUnitSettings unitSettings = getCompanySettings( companyId );
+
+        if ( unitSettings == null ) {
+            LOG.warn( "OrganizationSettings are not fournd for company id {}", companyId );
+            throw new InvalidInputException( "OrganizationSettings are not fournd for company id " +companyId );
+        }
+
+        // Set default keywords in Company setting
+        if ( socialMonitorFlag && ( unitSettings.getFilterKeywords() == null || unitSettings.getFilterKeywords().isEmpty() ) ) {
+            List<Keyword> defaultFilterKeywords = createDefaultKeywordList();
+            organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+                MongoOrganizationUnitSettingDaoImpl.KEY_FILTER_KEYWORDS, defaultFilterKeywords, unitSettings,
+                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+            //update the redis with the keywords
+            redisDao.addKeywords( companyId, defaultFilterKeywords );
+        }
+
+        // update social monitor flag
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+            MongoOrganizationUnitSettingDaoImpl.SOCIAL_MONITOR_ENABLED, socialMonitorFlag, unitSettings,
+            CommonConstants.COMPANY_SETTINGS_COLLECTION );
+
+        //update companyIds which have enabled/disabled socialMonitor
+        redisDao.updateCompanyIdsForSM( companyId, socialMonitorFlag );
+
+        LOG.debug( "method enableSocialMonitorToggle() finished." );
+        return true;
+    }
+
+
+    /**
+     * Method to create default keyword list from property file comma separated list.
+     * @return : returns Keyword objects
+     */
+    private List<Keyword> createDefaultKeywordList()
+    {
+        LOG.debug( "Adding default keywords in company settings" );
+        List<Keyword> defaultKeywords = new ArrayList<>();
+        if ( StringUtils.isNotBlank( socialMonitorDefaultKeywords ) ) {
+            long createdtime = new Date().getTime();
+            String[] defaultPhrase = socialMonitorDefaultKeywords.split( "," );
+            for ( int i = 0; i < defaultPhrase.length; i++ ) {
+                if(StringUtils.isNotBlank( defaultPhrase[i] )){
+                    Keyword keywordNew = new Keyword();
+                    keywordNew.setCreatedOn( createdtime );
+                    keywordNew.setModifiedOn( createdtime );
+                    keywordNew.setPhrase( defaultPhrase[i].trim() );
+                    keywordNew.setId( UUID.randomUUID().toString() );
+                    keywordNew.setStatus( CommonConstants.STATUS_ACTIVE );
+                    keywordNew.setMonitorType( MonitorType.KEYWORD_MONITOR );
+                    defaultKeywords.add( keywordNew );
+                }
+            }
+        }
+        return defaultKeywords;
     }
 
 
@@ -10303,9 +10353,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		// update the redis with the trusted sources
 		redisDao.addTruestedSources(companyId, companyTrustedSourcesToAdd);
 
+		//To update former posts to resolved for the given trusted source
+		socialFeedService.updateTrustedSourceForFormerLists(companyId,trustedSource);
+
 		return companyTrustedSourcesToAdd;
 	}
-
+ 
     //updating all agents of a particular company
     @Override
     public boolean updateEntitySettings( String entityType, long entityId, String flagToBeUpdated, String status )
@@ -10391,6 +10444,16 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     }
 
 
+
+    @Override
+    public void updateCopyToClipBoardSettings( long companyId, boolean updateCopyToClipBoardSetting )
+    {
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettingsByIden(
+            MongoOrganizationUnitSettingDaoImpl.KEY_IS_COPY_TO_CLIPBOARD, updateCopyToClipBoardSetting, companyId,
+            MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+        
+    }
+
     @Override
     public boolean isSocialMonitorAdmin( Long agentId ) throws InvalidInputException
     {
@@ -10403,7 +10466,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
         List<UserProfile> userProfiles = new ArrayList<>();
         User user = userDao.findById( User.class, agentId );
-        if ( user != null && user.getStatus() == CommonConstants.STATUS_ACTIVE) {
+        if ( user != null && (user.getStatus() == CommonConstants.STATUS_ACTIVE || user.getStatus() == CommonConstants.STATUS_NOT_VERIFIED)) {
             userProfiles = user.getUserProfiles();
         }
 
@@ -10418,5 +10481,193 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
         }
         return false;
     }
-}
+    
+    @Override
+    public List<SocialMonitorTrustedSource> removeTrustedSourceToCompany( long companyId , String trustedSource ) throws InvalidInputException
+    {
+        LOG.debug("Get company settings for the companyId: {}", companyId);
+        
+        if(StringUtils.isEmpty(trustedSource)) {
+            throw new InvalidInputException("Invalid parameter passed. trustedSource can't be empty ");
+        }
+        
+        OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(
+                companyId, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+        
+        if(companySettings == null) {
+            throw new InvalidInputException("Invalid companyId passed. No company setting found for given companyId ");
+        }
+        
+        //get existing  trusted sources for company
+        List<SocialMonitorTrustedSource> companyTrustedSources = companySettings.getSocialMonitorTrustedSources();
+        if (companyTrustedSources == null || companyTrustedSources.isEmpty())
+            companyTrustedSources = new ArrayList<>();
 
+        boolean doesNotExist = true;
+        //check if trusted source is already present
+        Iterator<SocialMonitorTrustedSource> currentTrustedSourceItr = companyTrustedSources.iterator();
+        while (currentTrustedSourceItr.hasNext()) {
+            SocialMonitorTrustedSource currentTrustedSource = currentTrustedSourceItr.next();
+            if (currentTrustedSource.getSource().equalsIgnoreCase(trustedSource.trim())
+                    && currentTrustedSource.getStatus() == CommonConstants.STATUS_ACTIVE) {
+                LOG.debug( "trusted source : {} exists in the list", trustedSource);
+                doesNotExist = false;
+                currentTrustedSourceItr.remove();
+
+            }
+        }
+        
+        //if trusted source doesn't exist in list through exception
+        if(doesNotExist) {
+            throw new InvalidInputException("Trusted source doesn't exist for given companyId ");
+        }
+        
+        // Updating fromTrustedSource to false.
+        socialFeedService.updateForRemoveTrustedSource(companyId, trustedSource);
+        
+        // save updated companyTrustedSources in mongo settings
+        organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+                MongoOrganizationUnitSettingDaoImpl.KEY_TRUSTED_SOURCES, companyTrustedSources, companySettings,
+                MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+
+        //create trusted sources to save in redis
+        List<SocialMonitorTrustedSource> companyTrustedSourcesToAdd = new ArrayList<>();
+        for (SocialMonitorTrustedSource socialMonitorTrustedSource : companyTrustedSources) {
+            if (socialMonitorTrustedSource.getStatus() == CommonConstants.STATUS_ACTIVE) {
+                companyTrustedSourcesToAdd.add(socialMonitorTrustedSource);
+            }
+        }
+        Collections.sort(companyTrustedSourcesToAdd, new TrustedSourceComparator());
+
+        // update the redis with the trusted sources
+        redisDao.addTruestedSources(companyId, companyTrustedSourcesToAdd);
+        return companyTrustedSourcesToAdd;
+    }
+
+
+	@Override
+	public boolean hasRegisteredForSummit(Long companyId) throws InvalidInputException {
+		 LOG.debug( "Method hasRegisteredForSummit called for companyId:" + companyId );
+	     if ( companyId < 0l ) {
+	    	LOG.error( "Invalid company id passed as argument " );
+	       	throw new InvalidInputException( "Invalid company id passed as argument " );
+	     }
+	
+	     return organizationUnitSettingsDao.hasRegisteredForSummit(companyId).hasRegisteredForSummit();
+	}
+
+
+	@Override
+	public void setHasRegisteredForSummit(Long companyId, boolean hasRegisteredForSummit) throws InvalidInputException {
+		 LOG.debug( "Method hasRegisteredForSummit called for companyId:" + companyId );
+	     if ( companyId < 0l ) {
+	    	LOG.error( "Invalid company id passed as argument " );
+	       	throw new InvalidInputException( "Invalid company id passed as argument " );
+	     }
+	     
+	     organizationUnitSettingsDao.updateHasRegisteredForSummit(companyId, hasRegisteredForSummit);
+	}
+	
+	@Override
+	public boolean isShowSummitPopup(Long companyId) throws InvalidInputException {
+		 LOG.debug( "Method isShowSummitPopup called for companyId:" + companyId );
+	     if ( companyId < 0l ) {
+	    	LOG.error( "Invalid company id passed as argument " );
+	       	throw new InvalidInputException( "Invalid company id passed as argument " );
+	     }
+	
+	     return organizationUnitSettingsDao.isShowSummitPopup(companyId).isShowSummitPopup();
+	}
+
+
+
+	@Override
+	public void setShowSummitPopup(Long companyId, boolean isShowSummitPopup) throws InvalidInputException {
+		 LOG.debug( "Method hasRegisteredForSummit called for companyId:" + companyId );
+	     if ( companyId < 0l ) {
+	    	LOG.error( "Invalid company id passed as argument " );
+	       	throw new InvalidInputException( "Invalid company id passed as argument " );
+	     }
+	     
+	     organizationUnitSettingsDao.updateShowSummitPopup(companyId, isShowSummitPopup);
+	}
+
+    
+     @Override 
+     public void setFtpInfo(Long companyId ,TransactionSourceFtp transactionSourceFtp) throws InvalidInputException 
+     {
+         LOG.info( "Inside method setFtpInfo" );
+         
+             //get companySettings
+             OrganizationUnitSettings companySettings = getCompanySettings( companyId );
+             
+             if ( companySettings == null ) {
+                 throw new InvalidInputException( "Company settings cannot be null." );
+             }
+             
+             organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(
+                 MongoOrganizationUnitSettingDaoImpl.KEY_FTP_INFO, transactionSourceFtp, companySettings,
+                 MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION );
+             LOG.debug( "Updated the record successfully" );
+         
+     }
+     
+     //
+     @Override
+     public TransactionSourceFtp fetchFtpInfo(Long companyId , Long ftpId) {
+         LOG.info( "inside service class to fetch the ftp info for companyId : {} . ftpId : {}",companyId,ftpId );
+         return organizationUnitSettingsDao.fetchFileHeaderMapper(companyId,ftpId);
+     }
+     
+     @Override
+     public void updateFtpMailService(long companyId,  long ftpId ,String mailId) throws NonFatalException {
+    
+         LOG.info("Update ftp mail for companyId: {} , ftpId : {} , mail:{}",companyId,ftpId,mailId);
+         mailId = checkValidMail(mailId);
+         List<TransactionSourceFtp> transactionSourceFtpList = organizationUnitSettingsDao.fetchTransactionFtpListActive(companyId);
+         for(TransactionSourceFtp transactionSourceFtp : transactionSourceFtpList) {
+             if(transactionSourceFtp.getFtpId() == ftpId) {
+                 transactionSourceFtp.setEmailId(mailId);
+                 break;
+             }
+         }
+         organizationUnitSettingsDao.updateFtpTransaction(companyId,transactionSourceFtpList);
+    
+     }
+     
+     @Override
+     public void sendCompletionMailService(long companyId , long ftpId , String s3FileLocation ,FtpSurveyResponse ftpSurveyResponse ) throws InvalidInputException, UndeliveredEmailException {
+         LOG.debug("send ftp successfull mail for companyId: {} , ftpId : {} ",companyId,ftpId); 
+         Company company = companyDao.findById( Company.class, companyId );
+         String companyName = company.getCompany();
+         TransactionSourceFtp transactionSourceFtp = fetchFtpInfo( companyId, ftpId );
+         String ftpMailId = transactionSourceFtp.getEmailId();
+         String ftpErrorHtml = "";
+         if (ftpSurveyResponse.getErrorMessage() != null && !ftpSurveyResponse.getErrorMessage().isEmpty()) {
+             ftpErrorHtml = createHtmlForFtpError( ftpSurveyResponse.getErrorMessage() );
+         }
+         //get time and file name from s3location
+         String lastIndex = s3FileLocation.substring( s3FileLocation.lastIndexOf( '/' )+1).trim();
+         String fileName = lastIndex;
+         String timeStamp = lastIndex.substring( lastIndex.lastIndexOf( '_' )+1,lastIndex.indexOf( '.' ) );
+         emailServices.sendFtpSuccessMail( companyName, utils.convertDateToTimeZone( Long.parseLong( timeStamp ), CommonConstants.TIMEZONE_EST ) , fileName, ftpSurveyResponse, ftpMailId, ftpErrorHtml );
+     }
+     
+     private String createHtmlForFtpError(Map<Integer, String> errorMessages) {
+         String errorHtml = "";
+         for(Map.Entry<Integer,String> errorMsg : errorMessages.entrySet()) {
+             errorHtml += "<br/><span>&bull; </span>Row "+errorMsg.getKey()+" ERROR: "+errorMsg.getValue()+".";
+         }
+         return errorHtml;
+     }
+     
+     private String convertToUTC(String timeStamp) {
+         Timestamp time = new Timestamp( Long.parseLong( timeStamp ) );
+         Date date=new Date(time.getTime());  
+         final TimeZone tz = TimeZone.getTimeZone("UTC");
+         final SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd hh:mm:ss zzz yyyy");
+         formatter.setTimeZone(tz);
+         return formatter.format(date);
+     }
+
+}

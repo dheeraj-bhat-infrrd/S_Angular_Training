@@ -1,0 +1,97 @@
+db.getCollection('COMPANY_SETTINGS')
+.find({"mail_content.take_survey_mail.mail_body":{$regex : ".*contact <a href=\"mailto:support@socialsurvey.com\" style=\"color: #989EA6; font-weight: normal; text-decoration: underline; word-break: break-word;\">support@socialsurvey.com</a>*"}})
+.forEach(function(e,i){
+	e.mail_content.take_survey_mail.mail_body = e.mail_content.take_survey_mail.mail_body.replace("contact <a href=\"mailto:support@socialsurvey.com\" style=\"color: #989EA6; font-weight: normal; text-decoration: underline; word-break: break-word;\">support@socialsurvey.com</a>", "<a href=\"%s\" style=\"color: #989EA6; font-weight: normal; text-decoration: underline; word-break: break-word;\">Click Here</a>");
+	db.COMPANY_SETTINGS.save(e);
+});
+
+db.getCollection('COMPANY_SETTINGS')
+.find({"mail_content.take_survey_reminder_mail.mail_body":{$regex : ".*contact <a href=\"mailto:support@socialsurvey.com\" style=\"color: #989EA6; font-weight: normal; text-decoration: underline; word-break: break-word;\">support@socialsurvey.com</a>*"}})
+.forEach(function(e,i){
+	e.mail_content.take_survey_reminder_mail.mail_body = e.mail_content.take_survey_reminder_mail.mail_body.replace("contact <a href=\"mailto:support@socialsurvey.com\" style=\"color: #989EA6; font-weight: normal; text-decoration: underline; word-break: break-word;\">support@socialsurvey.com</a>", "<a href=\"%s\" style=\"color: #989EA6; font-weight: normal; text-decoration: underline; word-break: break-word;\">Click Here</a>");
+	db.COMPANY_SETTINGS.save(e);
+});
+
+
+db.getCollection('COMPANY_SETTINGS')
+.find({"mail_content.restart_survey_mail.mail_body":{$regex : ".*contact <a href=\"mailto:support@socialsurvey.com\" style=\"color: #989EA6; font-weight: normal; text-decoration: underline; word-break: break-word;\">support@socialsurvey.com</a>*"}})
+.forEach(function(e,i){
+	e.mail_content.restart_survey_mail.mail_body = e.mail_content.restart_survey_mail.mail_body.replace("contact <a href=\"mailto:support@socialsurvey.com\" style=\"color: #989EA6; font-weight: normal; text-decoration: underline; word-break: break-word;\">support@socialsurvey.com</a>", "<a href=\"%s\" style=\"color: #989EA6; font-weight: normal; text-decoration: underline; word-break: break-word;\">Click Here</a>");
+	db.COMPANY_SETTINGS.save(e);
+});
+
+
+db.getCollection('COMPANY_SETTINGS')
+.find({"mail_content.survey_completion_mail.mail_body":{$regex : ".*contact <a href=\"mailto:support@socialsurvey.com\" style=\"color: #989EA6; font-weight: normal; text-decoration: underline; word-break: break-word;\">support@socialsurvey.com</a>*"}})
+.forEach(function(e,i){
+	e.mail_content.survey_completion_mail.mail_body = e.mail_content.survey_completion_mail.mail_body.replace("contact <a href=\"mailto:support@socialsurvey.com\" style=\"color: #989EA6; font-weight: normal; text-decoration: underline; word-break: break-word;\">support@socialsurvey.com</a>", "<a href=\"%s\" style=\"color: #989EA6; font-weight: normal; text-decoration: underline; word-break: break-word;\">Click Here</a>");
+	db.COMPANY_SETTINGS.save(e);
+});
+
+
+db.getCollection('COMPANY_SETTINGS')
+.find({"mail_content.social_post_reminder_mail.mail_body":{$regex : ".*contact <a href=\"mailto:support@socialsurvey.com\" style=\"color: #989EA6; font-weight: normal; text-decoration: underline; word-break: break-word;\">support@socialsurvey.com</a>*"}})
+.forEach(function(e,i){
+	e.mail_content.social_post_reminder_mail.mail_body = e.mail_content.social_post_reminder_mail.mail_body.replace("contact <a href=\"mailto:support@socialsurvey.com\" style=\"color: #989EA6; font-weight: normal; text-decoration: underline; word-break: break-word;\">support@socialsurvey.com</a>", "<a href=\"%s\" style=\"color: #989EA6; font-weight: normal; text-decoration: underline; word-break: break-word;\">Click Here</a>");
+	db.COMPANY_SETTINGS.save(e);
+});
+
+
+db.getCollection('COMPANY_SETTINGS')
+.find({"mail_content.survey_completion_unpleasant_mail.mail_body":{$regex : ".*contact <a href=\"mailto:support@socialsurvey.com\" style=\"color: #989EA6; font-weight: normal; text-decoration: underline; word-break: break-word;\">support@socialsurvey.com</a>*"}})
+.forEach(function(e,i){
+	e.mail_content.survey_completion_unpleasant_mail.mail_body = e.mail_content.survey_completion_unpleasant_mail.mail_body.replace("contact <a href=\"mailto:support@socialsurvey.com\" style=\"color: #989EA6; font-weight: normal; text-decoration: underline; word-break: break-word;\">support@socialsurvey.com</a>", "<a href=\"%s\" style=\"color: #989EA6; font-weight: normal; text-decoration: underline; word-break: break-word;\">Click Here</a>");
+	db.COMPANY_SETTINGS.save(e);
+});
+
+
+
+
+
+
+db.getCollection('COMPANY_SETTINGS')
+.find({"mail_content.take_survey_mail.mail_body":{$regex : ".*<a href=\"%s\" style=\"color: #989EA6; font-weight: normal; text-decoration: underline; word-break: break-word;\">Click Here</a>*"}})
+.forEach(function(e){
+	e.mail_content.take_survey_mail.param_order.splice(e.mail_content.take_survey_mail.param_order.length-3,0,"unsubscribeUrl");
+	db.COMPANY_SETTINGS.save(e);
+});
+
+
+db.getCollection('COMPANY_SETTINGS')
+.find({"mail_content.take_survey_reminder_mail.mail_body":{$regex : ".*<a href=\"%s\" style=\"color: #989EA6; font-weight: normal; text-decoration: underline; word-break: break-word;\">Click Here</a>*"}})
+.forEach(function(e){
+	e.mail_content.take_survey_reminder_mail.param_order.splice(e.mail_content.take_survey_reminder_mail.param_order.length-3,0,"unsubscribeUrl");
+	db.COMPANY_SETTINGS.save(e);
+});
+
+
+db.getCollection('COMPANY_SETTINGS')
+.find({"mail_content.restart_survey_mail.mail_body":{$regex : ".*<a href=\"%s\" style=\"color: #989EA6; font-weight: normal; text-decoration: underline; word-break: break-word;\">Click Here</a>*"}})
+.forEach(function(e){
+	e.mail_content.restart_survey_mail.param_order.splice(e.mail_content.restart_survey_mail.param_order.length-3,0,"unsubscribeUrl");
+	db.COMPANY_SETTINGS.save(e);
+});
+
+
+db.getCollection('COMPANY_SETTINGS')
+.find({"mail_content.survey_completion_mail.mail_body":{$regex : ".*<a href=\"%s\" style=\"color: #989EA6; font-weight: normal; text-decoration: underline; word-break: break-word;\">Click Here</a>*"}})
+.forEach(function(e){
+	e.mail_content.survey_completion_mail.param_order.splice(e.mail_content.survey_completion_mail.param_order.length-3,0,"unsubscribeUrl");
+	db.COMPANY_SETTINGS.save(e);
+});
+
+
+db.getCollection('COMPANY_SETTINGS')
+.find({"mail_content.social_post_reminder_mail.mail_body":{$regex : ".*<a href=\"%s\" style=\"color: #989EA6; font-weight: normal; text-decoration: underline; word-break: break-word;\">Click Here</a>*"}})
+.forEach(function(e){
+	e.mail_content.social_post_reminder_mail.param_order.splice(e.mail_content.social_post_reminder_mail.param_order.length-3,0,"unsubscribeUrl");
+	db.COMPANY_SETTINGS.save(e);
+});
+
+
+db.getCollection('COMPANY_SETTINGS')
+.find({"mail_content.survey_completion_unpleasant_mail.mail_body":{$regex : ".*<a href=\"%s\" style=\"color: #989EA6; font-weight: normal; text-decoration: underline; word-break: break-word;\">Click Here</a>*"}})
+.forEach(function(e){
+	e.mail_content.survey_completion_unpleasant_mail.param_order.splice(e.mail_content.survey_completion_unpleasant_mail.param_order.length-3,0,"unsubscribeUrl");
+	db.COMPANY_SETTINGS.save(e);
+});

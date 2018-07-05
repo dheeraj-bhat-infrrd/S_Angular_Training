@@ -161,6 +161,7 @@ public interface CommonConstants
     public static final int STATUS_SURVEYPREINITIATION_DELETED = 0;
     public static final int STATUS_SURVEYPREINITIATION_MISMATCH_RECORD = 10;
     public static final int STATUS_SURVEYPREINITIATION_SURVEY_NOT_ALLOWED = 11;
+    public static final int STATUS_SURVEYPREINITIATION_UNSUBSCRIBED = 12;
 
     public static final int SURVEY_PARTICIPANT_TYPE_BORROWER = 1;
     public static final int SURVEY_PARTICIPANT_TYPE_COBORROWER = 2;
@@ -250,6 +251,7 @@ public interface CommonConstants
     public static final String BATCH_TYPE_MONTHLY_DIGEST_STARTER = "MonthlyDigestStarter";
     public static final String BATCH_TYPE_SURVEY_CSV_UPLOAD_PROCESSOR = "SurveyCsvUploadProcessor";
     public static final String BATCH_TYPE_TRANSACTION_ACTIVITY_MONITOR = "transactionActivityMonitor";
+    public static final String BATCH_TYPE_FTP_FILE_UPLOADER = "FTPFileUploader";
 
     
     //batch name constant for batch tracker
@@ -280,6 +282,7 @@ public interface CommonConstants
     public static final String BATCH_NAME_MONTHLY_DIGEST_STARTER = "Monthly digest process starter for companies";
     public static final String BATCH_NAME_SURVEY_CSV_UPLOAD_PROCESSOR = "Survey CSV file Upload Processor";
     public static final String BATCH_NAME_TRANSACTION_ACTIVITY_MONITOR = "Transaction Activity Monitor";
+    public static final String BATCH_NAME_FTP_FILE_UPLOADER = "FTP files uploader";
 
 
     public static final String BATCH_FILE_UPLOAD_REPORTS_GENERATOR_BILLING_REPORT = "Billing report";
@@ -590,7 +593,9 @@ public interface CommonConstants
     public static final String SYMBOL_FULLSTOP = ".";
 
     // settings constants
+    public static final String CRM_INFO_SOURCE_API = "API";
     public static final String CRM_INFO_SOURCE_ENCOMPASS = "encompass";
+    public static final String CRM_INFO_SOURCE_FTP = "ftp";
     public static final String CRM_SOURCE_ENCOMPASS = "ENCOMPASS";
     public static final String CRM_SOURCE_DOTLOOP = "DOTLOOP";
     public static final String SURVEY_SOURCE_BULK_UPLOAD = "bulk";
@@ -1091,6 +1096,7 @@ public interface CommonConstants
     //mark abusive by application constant
     public static final String REPORT_ABUSE_BY_APPLICATION_NAME = "Application";
     public static final String REPORT_ABUSE_BY_APPLICATION_EMAIL = "Reported By Application";
+    public static final String REPORT_ABUSE_BY_APPLICATION_REASON = "Abusive words found";
 
     // sendgrid inbound mail status
     public static final String SENDGRID_OK_STATUS = "OK";
@@ -1564,7 +1570,9 @@ public interface CommonConstants
     public static final String EMAIL_TYPE_ABUSIVE_HANDLE_MAIL = "ABUSIVE_HANDLE_MAIL";
     public static final String EMAIL_TYPE_USER_ADDITION_MAIL = "USER_ADDITION_MAIL";
     public static final String EMAIL_TYPE_USER_DELETION_MAIL = "USER_DELETION_MAIL";
-
+    public static final String EMAIL_TYPE_FTP_FILE_UPLOADER = "FTP_FILE_UPLOADER";
+    public static final String EMAIL_TYPE_FTP_SUCCESSFULLY_PROCESSED_MAIL = "FTP_SUCCESSFULLY_PROCESSED_MAIL";
+    
     public static final String REDIRECT = "redirect:/";
     public static final String EVENT_CLICK = "click";
 
@@ -1653,4 +1661,26 @@ public interface CommonConstants
     public static final String PROFILE_TYPE = "profileType";
 
     public static final String CALLBACK = "callback";
+
+    public static final String FTP_SERVER_ONE = "FTP1";
+    public static final String FTP_SERVER_TWO = "FTP2";
+
+    public static final String UTF_8_ENCODING = "UTF-8";
+
+    public static final String OS_LINUX = "linux";
+
+    //Unsubscribed Email Constatns SS-1547
+    public static final int STATUS_UNSUBSCRIBED = 1;
+    public static final int STATUS_RESUBSCRIBED = 2;
+    public static final int LEVEL_APPLICATION = 1;
+    public static final int LEVEL_COMPANY = 2;
+    public static final String LEVEL_COLUMN = "level";
+    public static final String UNSUBSCRIBE_URL = "rest/unsubscribe/customeremail";
+    public static final String STATUS_SS_USER_ADMIN = "Can not unsubscribe. Email id belongs to social survey user or admin.";
+    public static final String STATUS_ALREADY_UNSUBSCRIBED = "Can not unsubscribe. Email id has already been unsubscribed.";
+    public static final String STATUS_SUCCESS_UNSUBSCRIBE = "Email id successfully unsubscribed.";
+    public static final String STATUS_ALREADY_RESUBSCRIBED = "Can not resubscribe. Email id already resubscribed.";
+    public static final String STATUS_NOT_IN_UNSUBSCRIBED_LIST = "Can not resubscribe. Email id not unsubscribed before.";
+    public static final String STATUS_SUCCESS_RESUBSCRIBE = "Email id successfully resubscribed.";
+    public static final String STATUS_UNSUBSCRIBE_FAILED = "FAILED TO UNSUBSCRIBE";
 }

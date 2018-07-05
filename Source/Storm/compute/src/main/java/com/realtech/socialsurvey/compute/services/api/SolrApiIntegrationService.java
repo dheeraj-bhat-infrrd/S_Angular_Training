@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.google.gson.JsonObject;
 import com.realtech.socialsurvey.compute.entities.SolrEmailMessageWrapper;
+import com.realtech.socialsurvey.compute.entities.UserEvent;
 import com.realtech.socialsurvey.compute.entities.request.SolrRequest;
 import com.realtech.socialsurvey.compute.entities.response.SOLRResponseObject;
 
@@ -40,4 +41,8 @@ public interface SolrApiIntegrationService
     Call<JsonObject> getEmailCounts(@Query("q") String query, @Query("fq") String fieldQuery, @Query("rows") int rows, @Query("wt") String wt,
     		@Query("facet") Boolean facet, @Query("facet.field")String facetField, @Query("facet.pivot") List<String> facetPivot,
     		@Query("facet.limit") int facetLimit,@Query("facet.mincount") int facetMinCount);
+    
+    @Headers("Content-Type: application/json")
+    @POST("ss-userevents/update/json")
+    Call<SOLRResponseObject<UserEvent>> saveUserEvent(@Body SolrRequest<UserEvent> entity, @Query("commit") boolean commit);
 }

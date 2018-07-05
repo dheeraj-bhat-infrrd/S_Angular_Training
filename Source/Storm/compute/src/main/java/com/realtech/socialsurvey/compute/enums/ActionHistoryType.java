@@ -2,7 +2,7 @@ package com.realtech.socialsurvey.compute.enums;
 
 public enum ActionHistoryType
 {
-    FLAGGED(0), UNFLAGGED(1), ESCALATE(2), RESOLVED(3), PRIVATE_MESSAGE(4), EMAIL(5);
+    FLAGGED(0), UNFLAGGED(1), ESCALATE(2), RESOLVED(3), SUBMIT(4);
     
     private int value;
 

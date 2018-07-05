@@ -1,18 +1,14 @@
 package com.realtech.socialsurvey.compute.topology.bolts.monitor;
 
-import com.realtech.socialsurvey.compute.dao.RedisCompanyKeywordsDao;
-import com.realtech.socialsurvey.compute.dao.RedisTrustedSourcesDao;
-import com.realtech.socialsurvey.compute.dao.impl.RedisCompanyKeywordsDaoImpl;
-import com.realtech.socialsurvey.compute.dao.impl.RedisTrustedSourcesDaoImpl;
-import com.realtech.socialsurvey.compute.entities.Keyword;
-import com.realtech.socialsurvey.compute.entities.SocialMonitorTrustedSource;
-import com.realtech.socialsurvey.compute.entities.SocialResponseType;
-import com.realtech.socialsurvey.compute.entities.TrieNode;
-import com.realtech.socialsurvey.compute.entities.response.ActionHistory;
-import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
-import com.realtech.socialsurvey.compute.enums.ActionHistoryType;
-import com.realtech.socialsurvey.compute.enums.SocialFeedStatus;
-import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBoltWithAck;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.tuple.Fields;
@@ -21,8 +17,18 @@ import org.apache.storm.tuple.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
-import java.util.regex.Pattern;
+import com.realtech.socialsurvey.compute.dao.RedisCompanyKeywordsDao;
+import com.realtech.socialsurvey.compute.dao.RedisTrustedSourcesDao;
+import com.realtech.socialsurvey.compute.dao.impl.RedisCompanyKeywordsDaoImpl;
+import com.realtech.socialsurvey.compute.dao.impl.RedisTrustedSourcesDaoImpl;
+import com.realtech.socialsurvey.compute.entities.Keyword;
+import com.realtech.socialsurvey.compute.entities.SocialMonitorTrustedSource;
+import com.realtech.socialsurvey.compute.entities.TrieNode;
+import com.realtech.socialsurvey.compute.entities.response.ActionHistory;
+import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
+import com.realtech.socialsurvey.compute.enums.ActionHistoryType;
+import com.realtech.socialsurvey.compute.enums.SocialFeedStatus;
+import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBoltWithAck;
 
 
 /**
@@ -37,55 +43,55 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
     private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger( FilterSocialPostBolt.class );
 
-    private static final String WORD_SEPARATOR = "\\W+";
+    //regex for matching all non word characters except (%)
+    private static final String WORD_SEPARATOR = "[^\\w(%)]|_";
     private static final String SPACE_SEPARATOR = " ";
+    private static final String OWNERNAME_SYSTEM = "System";
+
 
     private Map<Long, TrieNode> companyTrie = new HashMap<>();
 
     private  RedisCompanyKeywordsDao redisCompanyKeywordsDao = new RedisCompanyKeywordsDaoImpl();
-    
+
     private  RedisTrustedSourcesDao redisTrustedSourcesDao = new RedisTrustedSourcesDaoImpl();
 
 
     @Override
     public void executeTuple( Tuple input )
-	{
-		LOG.debug("Executing filter social post bolt");
-		SocialResponseObject<?> post = (SocialResponseObject<?>) input.getValueByField("post");
-		SocialResponseType socialResponseType = (SocialResponseType) input.getValueByField("type");
-		long companyId = input.getLongByField("companyId");
-		String postId = null;
-		if (post != null) {
-			post.setActionHistory(new ArrayList<>());
-			if (post.getText() != null) {
-				String text = post.getText();
-				postId = post.getPostId();
-				List<String> foundKeyWords;
-				TrieNode root = getTrieForCompany(companyId);
-				foundKeyWords = findPhrases(root, text);
-				if (!foundKeyWords.isEmpty()) {
-					post.setFoundKeywords(foundKeyWords);
-					post.setFlagged(Boolean.TRUE);
-					post.getActionHistory().add(getFlaggedActionHistory(foundKeyWords));
-					addTextHighlight(post);
-				}
-				
-				// check if post from trusted source
-				if (isPostFromTrustedSource(post, companyId)) {
-					post.setStatus(SocialFeedStatus.RESOLVED);		
-					post.setFromTrustedSource(true);
-					post.getActionHistory().add(getTrustedSourceActionHistory(post.getPostSource())); 
-				} else {
-					post.setStatus(SocialFeedStatus.NEW);
-					post.setFromTrustedSource(false);
-				}
-			}
+    {
+        LOG.debug("Executing filter social post bolt");
+        SocialResponseObject<?> post = (SocialResponseObject<?>) input.getValueByField("post");
+        long companyId = input.getLongByField("companyId");
+        if (post != null) {
+            post.setActionHistory(new ArrayList<>());
+            ActionHistory actionHistory;
+            if (post.getText() != null) {
+                String text = post.getText();
+                List<String> foundKeyWords;
+                TrieNode root = getTrieForCompany(companyId);
+                foundKeyWords = findPhrases(root, text);
+                if (!foundKeyWords.isEmpty()) {
+                    post.setFoundKeywords(foundKeyWords);
+                    post.setStatus( SocialFeedStatus.ALERT );
+                    actionHistory = getFlaggedActionHistory(foundKeyWords);
+                    post.getActionHistory().add( actionHistory );
+                    post.setUpdatedTime( actionHistory.getCreatedDate() );
+                    addTextHighlight(post);
+                }
+            }
 
-		}
-		LOG.debug("Emitting tuple with post having postId = {}", postId);
-		_collector.emit(input, Arrays.asList(companyId, post, socialResponseType));
-
-	}
+            // check if post from trusted source
+            if (isPostFromTrustedSource(post, companyId)) {
+                post.setStatus(SocialFeedStatus.RESOLVED);
+                post.setFromTrustedSource(true);
+                actionHistory = getTrustedSourceActionHistory(post.getPostSource());
+                post.getActionHistory().add(actionHistory);
+                post.setUpdatedTime( actionHistory.getCreatedDate() );
+            }
+        }
+        LOG.debug("Emitting tuple with post having postId = {} and post = {}", post.getPostId(), post);
+        _collector.emit(input, Arrays.asList(companyId, post));
+    }
 
     /**
      * Method to add text highlighting
@@ -104,7 +110,7 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
 
     @Override
     public List<Object> prepareTupleForFailure() {
-        return new Values(0L, null, null);
+        return new Values(0L, null);
     }
 
 
@@ -113,6 +119,7 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
         ActionHistory actionHistory = new ActionHistory();
         actionHistory.setCreatedDate( new Date().getTime() );
         actionHistory.setActionType( ActionHistoryType.FLAGGED );
+        actionHistory.setOwnerName( OWNERNAME_SYSTEM );
         actionHistory.setText( "The post was <b class='soc-mon-bold-text'>Flagged</b> for matching <b class='soc-mon-bold-text'>" + String.join( ",", foundKeyWords )  + "</b>");
         return actionHistory;
     }
@@ -179,7 +186,7 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
     @Override
     public void declareOutputFields( OutputFieldsDeclarer declarer )
     {
-        declarer.declare( new Fields( "companyId", "post", "type" ) );
+        declarer.declare( new Fields( "companyId", "post" ) );
     }
 
 
@@ -225,7 +232,7 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
         if ( StringUtils.isEmpty( textBody ) ) {
             return Collections.emptyList();
         }
-        
+
         String[] words = textBody.split( WORD_SEPARATOR );
         List<String> foundPhrases = new ArrayList<>();
         StringBuilder phraseBuffer = new StringBuilder();
@@ -253,16 +260,17 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
             }
         }
 
-        if ( node.getPhraseId() != null ) {
+        //removed as keywords are added twice due to this condition
+        /*if ( node.getPhraseId() != null ) {
             String phrase = phraseBuffer.toString().trim();
             foundPhrases.add( phrase );
             LOG.trace( "end matching {}", phrase );
-        }
-        
+        }*/
+
         LOG.debug( "End of findPhrase method, foundkeywords:{}", foundPhrases );
         return foundPhrases;
     }
-    
+
 
     private boolean isPostFromTrustedSource( SocialResponseObject<?> post, long companyId )
     {
@@ -281,13 +289,14 @@ public class FilterSocialPostBolt extends BaseComputeBoltWithAck
         }
         return false;
     }
-    
+
     private ActionHistory getTrustedSourceActionHistory( String source )
     {
         ActionHistory actionHistory = new ActionHistory();
         actionHistory.setCreatedDate( new Date().getTime() );
         actionHistory.setActionType( ActionHistoryType.RESOLVED );
-        actionHistory.setText( "The post was <b class='soc-mon-bold-text'>Resolved</b> for having source<b class='soc-mon-bold-text'>" + source + "</b>");
+        actionHistory.setOwnerName( OWNERNAME_SYSTEM );
+        actionHistory.setText( "The post was <b class='soc-mon-bold-text'>Resolved</b> for having source <b class='soc-mon-bold-text'>" + source + "</b>");
         return actionHistory;
     }
 }

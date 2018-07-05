@@ -82,6 +82,12 @@
 									<div class="legend-wrapper">
 										<span class="legend">[AgentPhoneNumber]</span>
 									</div>
+									<div class="legend-wrapper">
+										<span class="legend">[BranchName]</span>
+									</div>
+									<div class="legend-wrapper">
+										<span class="legend">[RegionName]</span>
+									</div>
 								</div>
 								<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
 									<div class="legend-header" >Description</div>
@@ -104,6 +110,8 @@
 									<div class="legend-wrapper" title="User's licenses">User's licenses</div>
 									<div class="legend-wrapper" title="User's title">User's title</div>
 									<div class="legend-wrapper" title="User's phone number">User's phone number</div>
+									<div class="legend-wrapper" title="Branch Name">Branch Name</div>
+									<div class="legend-wrapper" title="Region Name">Region Name</div>
 									<br /> <br />
 								</div>
 							</div>

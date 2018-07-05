@@ -3,21 +3,14 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
-<div id="dup-post-cont" class="dash-stats-wrapper bord-bot-dc clearfix stream-container dup-post-cont"  >
-	<div id="dup-post-details-cont" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 soc-mon-post-container bottom-padding-stream dup-post-details">
-		<input type="hidden" class="post-id-details" data-post-id=>
-		<div id="dup-post-text" class="stream-post-details-text col-lg-12 col-md-12 col-sm-12 col-xs-12 stream-post-text float-right dup-post-act-cont">
+<div id="dup-post-cont" class="dash-stats-wrapper bord-bot-dc clearfix stream-container dup-post-cont"  data-count=0>
+	<div id="dup-post-details-cont" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 soc-mon-post-container bottom-padding-stream dup-post-details ">
 		
-		</div>
-		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 float-right stream-post-pic-div dup-post-pic-cont" >
-			<img id="dup-post-img" src="" class="stream-post-details-pic float-left stream-post-pic dup-post-pic">
-		</div>
 	</div>
 	<div id="dup-post-action-form-cont" class="action-form-cont col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-padding-stream dup-post-act-cont">
 		<form id="dup-post-add-post-action" class="">
 		<input type="hidden" id="form-is-dup" class="form-is-dup" name="form-is-dup" value="false">
 		<input type="hidden" id="form-post-id" class="form-post-id" name="form-post-id" value="">
-		<input type="hidden" id="form-flagged" class="form-flagged" name="form-flagged" value="false">
 		<input type="hidden" id="form-status" name="form-status" class="form-status" value="false">
 		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 dup-post-act-cont">
 			<input type="hidden" id="form-text-act-type" class="form-text-act-type" name="form-text-act-type" value="SEND_EMAIL">
@@ -35,19 +28,19 @@
 				<img src="${initParam.resourcesPath}/resources/images/chevron-down.png" class="mac-chevron-down macro-dropdown-chevron">
 				<img src="${initParam.resourcesPath}/resources/images/chevron-up.png" class="hide mac-chevron-up macro-dropdown-chevron">
 			</div>
-			<div class="hide col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn dup-stream-action-unflag">
+			<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn dup-stream-action-unflag dup-act-btn">
 							Unflag
 			</div>
-			<div class="hide col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn dup-stream-action-flag">
+			<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn dup-stream-action-flag dup-act-btn">
 							Flag
 			</div>
-			<div class="hide col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn dup-stream-action-esc">
+			<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn dup-stream-action-esc dup-act-btn">
 							Escalate
 			</div>
-			<div class="hide col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn dup-stream-action-res">
+			<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn dup-stream-action-res dup-act-btn">
 							Resolve
 			</div>
-			<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn dup-stream-action-submit">
+			<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 stream-actions-btn dup-stream-action-submit dup-act-btn">
 							Submit
 			</div>
 			<div class="hide macro-options-list float-left macro-options dup-macro-options">

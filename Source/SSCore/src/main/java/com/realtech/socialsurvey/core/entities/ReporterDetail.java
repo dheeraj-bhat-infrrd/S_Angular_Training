@@ -4,12 +4,16 @@ public class ReporterDetail
 {
     private String reporterName;
     private String reporterEmail;
+    private String reportReason;
 
-    public ReporterDetail(String reporterName, String reporterEmail )
+
+    public ReporterDetail( String reporterName, String reporterEmail, String reportReason )
     {
         this.reporterName = reporterName;
         this.reporterEmail = reporterEmail;
+        this.reportReason = reportReason;
     }
+
 
     public String getReporterName()
     {
@@ -33,9 +37,23 @@ public class ReporterDetail
     {
         this.reporterEmail = reporterEmail;
     }
-    
+
+
+    public String getReportReason()
+    {
+        return reportReason;
+    }
+
+
+    public void setReportReason( String reportReason )
+    {
+        this.reportReason = reportReason;
+    }
+
+
     @Override
-    public String toString() {
+    public String toString()
+    {
         return "reporterName: " + reporterName + "\tuserProfileName: " + reporterEmail;
     }
 }

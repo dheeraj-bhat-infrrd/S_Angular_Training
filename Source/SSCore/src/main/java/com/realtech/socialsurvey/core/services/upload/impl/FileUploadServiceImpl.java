@@ -172,7 +172,7 @@ public class FileUploadServiceImpl implements FileUploadService
 
 
     @Override
-    public String uploadFileAtSurveyCsvBucket( MultipartFile tempFile, String fileName ) throws NonFatalException
+    public String uploadFileAtSurveyCsvBucket( File tempFile, String fileName ) throws NonFatalException
     {
         // TODO Auto-generated method stub
         return null;
@@ -184,5 +184,29 @@ public class FileUploadServiceImpl implements FileUploadService
     {
         // TODO Auto-generated method stub
         
+    }
+
+
+    @Override
+    public String uploadFileAtFTPBucket( File file, String fileName ) throws NonFatalException
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+    @Override
+    public void deleteObjectFromBucket( String key, String bucket ) throws InvalidInputException
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+
+    @Override
+    public boolean deleteFileAtFTPBucket( String fileName ) throws NonFatalException
+    {
+        // TODO Auto-generated method stub
+        return false;
     }
 }

@@ -1,0 +1,12 @@
+ALTER TABLE `overview_branch` ADD COLUMN `unsubscribed_count` INT(11) NOT NULL DEFAULT 0;
+ALTER TABLE `overview_branch_month` ADD COLUMN `unsubscribed_count` INT(11) NOT NULL DEFAULT 0;
+ALTER TABLE `overview_branch_year` ADD COLUMN `unsubscribed_count` INT(11) NOT NULL DEFAULT 0;
+ALTER TABLE `overview_region` ADD COLUMN `unsubscribed_count` INT(11) NOT NULL DEFAULT 0;
+ALTER TABLE `overview_region_month` ADD COLUMN `unsubscribed_count` INT(11) NOT NULL DEFAULT 0;
+ALTER TABLE `overview_region_year` ADD COLUMN `unsubscribed_count` INT(11) NOT NULL DEFAULT 0;
+ALTER TABLE `overview_company` ADD COLUMN `unsubscribed_count` INT(11) NOT NULL DEFAULT 0;
+ALTER TABLE `overview_company_month` ADD COLUMN `unsubscribed_count` INT(11) NOT NULL DEFAULT 0;
+ALTER TABLE `overview_company_year` ADD COLUMN `unsubscribed_count` INT(11) NOT NULL DEFAULT 0;
+ALTER TABLE `overview_user` ADD COLUMN `unsubscribed_count` INT(11) NOT NULL DEFAULT 0;
+ALTER TABLE `overview_user_month` ADD COLUMN `unsubscribed_count` INT(11) NOT NULL DEFAULT 0;
+ALTER TABLE `overview_user_year` ADD COLUMN `unsubscribed_count` INT(11) NOT NULL DEFAULT 0;

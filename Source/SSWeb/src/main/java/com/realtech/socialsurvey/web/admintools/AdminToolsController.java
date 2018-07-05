@@ -226,6 +226,55 @@ public class AdminToolsController
 
 
     /**
+     * Method to move surveys for a pre-initiation id to another user id 
+     * /
+     */
+    @ResponseBody
+    @RequestMapping ( value = "/movesurvey")
+    public Response moveASurveyBetweenUsers( @QueryParam ( value = "survey_preinitiation_id") long survey_preinitiation_id,
+        @QueryParam ( value = "to_user") long to_user, HttpServletRequest request )
+    {
+        Response response = null;
+        long surveyPreinitiationId = 0;
+        long toUserId = 0;
+        try {
+            try {
+                LOG.info( "Method to move a survey with preinitiation id :{}  to user id : {} started.",
+                    survey_preinitiation_id, to_user );
+                LOG.info( "Checking for authorization to perform survey move operation" );
+                String authorizationHeader = request.getHeader( "Authorization" );
+                validateAuthHeader( authorizationHeader );
+                LOG.info( "Authorization confirmed to perform survey move operation" );
+                surveyPreinitiationId = Long.valueOf( survey_preinitiation_id ).longValue();
+                toUserId = Long.valueOf( to_user ).longValue();
+                if ( surveyPreinitiationId <= 0 )
+                    throw new InvalidInputException( "Invalid surveyPreinitiationId passed as parameter" );
+                if ( toUserId <= 0 )
+                    throw new InvalidInputException( "Invalid to user id passed as parameter" );
+                LOG.info( "Moving survey from one user to another operation started" );
+                surveyHandler.moveSurveyBetweenUsers( surveyPreinitiationId, toUserId );
+                LOG.info( "Moving surveys from one user to another operation finished" );
+                response = Response.ok( "Surveys for pre-initiation id : " + surveyPreinitiationId
+                    + " has been successfully moved to user id : " + to_user ).build();
+            } catch ( Exception e ) {
+                LOG.error( "Error occurred while moving surveys for pre-initiation id : " + surveyPreinitiationId
+                    + " to user id : " + to_user + ", Reason : ", e );
+                throw new InternalServerException( new AdminToolsErrorCode( CommonConstants.ERROR_CODE_GENERAL,
+                    CommonConstants.SERVICE_CODE_GENERAL, "Error occurred while moving surveys for pre-initiation id : "
+                        + surveyPreinitiationId + " to user id : " + to_user ),
+                    e.getMessage(), e );
+            }
+        } catch ( BaseRestException e ) {
+            LOG.error( "Error occurred while moving surveys for pre-initiation id : " + surveyPreinitiationId + " to user id : "
+                + to_user + ", Reason : ", e );
+            response = getErrorResponse( e );
+        }
+        LOG.info( "Method to move surveys for pre-initiation id :{} to user id : {} ended.", surveyPreinitiationId, to_user );
+        return response;
+    }
+
+
+    /**
      * Return the incorrect branches
      * 
      * @return

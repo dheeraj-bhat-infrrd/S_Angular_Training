@@ -22,13 +22,14 @@ public class SocialResponseObject<T> implements Serializable
     {}
 
 
-    public SocialResponseObject( long companyId, SocialFeedType type, String text, T response, long duplicateCount )
+    public SocialResponseObject( long companyId, SocialFeedType type, String text, T response, long duplicateCount, SocialFeedStatus status )
     {
         this.companyId = companyId;
         this.type = type;
         this.text = text;
         this.response = response;
         this.duplicateCount = duplicateCount;
+        this.status = status;
     }
 
 
@@ -46,7 +47,6 @@ public class SocialResponseObject<T> implements Serializable
 
     private T response;
     private SocialFeedType type;
-    private boolean flagged;
     private SocialFeedStatus status;
     private long companyId;
     private long regionId;
@@ -61,7 +61,10 @@ public class SocialResponseObject<T> implements Serializable
     private boolean isRetried;
     private boolean fromTrustedSource;
     private String postSource;
-
+    private boolean isDuplicate;
+    private int totalLikesCount;
+    private int totalCommentsCount;
+    private long retweetCount;
 
     public T getResponse()
     {
@@ -132,18 +135,6 @@ public class SocialResponseObject<T> implements Serializable
     public void setType( SocialFeedType type )
     {
         this.type = type;
-    }
-
-
-    public boolean isFlagged()
-    {
-        return flagged;
-    }
-
-
-    public void setFlagged( boolean flagged )
-    {
-        this.flagged = flagged;
     }
 
 
@@ -378,19 +369,67 @@ public class SocialResponseObject<T> implements Serializable
     public void setPostSource(String postSource) {
         this.postSource = postSource;
     }
-    
-    @Override
-    public String toString()
-    {
-        return "SocialResponseObject [id=" + id + ", postId=" + postId + ", text=" + text + ", textHighlighted="
-            + textHighlighted + ", pageLink=" + pageLink + ", postLink=" + postLink + ", pictures=" + pictures
-            + ", updatedTime=" + updatedTime + ", createdTime=" + createdTime + ", ownerName=" + ownerName + ", ownerEmail="
-            + ownerEmail + ", response=" + response + ", type=" + type + ", flagged=" + flagged + ", status=" + status
-            + ", companyId=" + companyId + ", regionId=" + regionId + ", branchId=" + branchId + ", agentId=" + agentId
-            + ", profileType=" + profileType + ", hash=" + hash + ", duplicateCount=" + duplicateCount + ", foundKeywords="
-            + foundKeywords + ", actionHistory=" + actionHistory + ", isRetried=" + isRetried + ", fromTrustedSource="
-            + fromTrustedSource + ", postSource=" + postSource + "]";
-    }
-    
 
+
+    public boolean isDuplicate()
+    {
+        return isDuplicate;
+    }
+
+
+    public void setDuplicate( boolean duplicate )
+    {
+        isDuplicate = duplicate;
+    }
+
+
+    public int getTotalLikesCount()
+    {
+        return totalLikesCount;
+    }
+
+
+    public void setTotalLikesCount( int totalLikesCount )
+    {
+        this.totalLikesCount = totalLikesCount;
+    }
+
+
+    public int getTotalCommentsCount()
+    {
+        return totalCommentsCount;
+    }
+
+
+    public void setTotalCommentsCount( int totalCommentsCount )
+    {
+        this.totalCommentsCount = totalCommentsCount;
+    }
+
+
+    public long getRetweetCount()
+    {
+        return retweetCount;
+    }
+
+
+    public void setRetweetCount( long retweetCount )
+    {
+        this.retweetCount = retweetCount;
+    }
+
+
+    @Override public String toString()
+    {
+        return "SocialResponseObject{" + "id='" + id + '\'' + ", postId='" + postId + '\'' + ", text='" + text + '\''
+            + ", textHighlighted='" + textHighlighted + '\'' + ", pageLink='" + pageLink + '\'' + ", postLink='" + postLink
+            + '\'' + ", pictures=" + pictures + ", updatedTime=" + updatedTime + ", createdTime=" + createdTime
+            + ", ownerName='" + ownerName + '\'' + ", ownerEmail='" + ownerEmail + '\'' + ", response=" + response + ", type="
+            + type + ", status=" + status + ", companyId=" + companyId + ", regionId=" + regionId + ", branchId=" + branchId
+            + ", agentId=" + agentId + ", profileType=" + profileType + ", hash=" + hash + ", duplicateCount=" + duplicateCount
+            + ", foundKeywords=" + foundKeywords + ", actionHistory=" + actionHistory + ", isRetried=" + isRetried
+            + ", fromTrustedSource=" + fromTrustedSource + ", postSource='" + postSource + '\'' + ", isDuplicate=" + isDuplicate
+            + ", totalLikesCount=" + totalLikesCount + ", totalCommentsCount=" + totalCommentsCount + ", retweetCount="
+            + retweetCount + '}';
+    }
 }

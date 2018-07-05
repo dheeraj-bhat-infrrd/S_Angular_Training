@@ -185,26 +185,6 @@ public class SocialMonitorController
         }
 
     }
-
-
-    @RequestMapping ( value = "/companies/mediatokens", method = RequestMethod.GET)
-    @ApiOperation ( value = "Fetch media tokens")
-    public ResponseEntity<?> fetchSocialMediaTokens( HttpServletRequest request,
-        @RequestHeader ( "authorizationHeader") String authorizationHeader ) throws SSApiException, InvalidInputException
-    {
-        try {
-            adminAuthenticationService.validateAuthHeader( authorizationHeader );
-            LOGGER.info( "SocialMonitorController.fetchSocialMediaTokens started" );
-            // get company setting for login user
-            List<SocialMediaTokenResponse> mediaTokens = organizationManagementService.fetchSocialMediaTokensResponse( 0, 0 );
-            LOGGER.info( "SocialMonitorController.fetchSocialMediaTokens completed successfully" );
-            return new ResponseEntity<>( mediaTokens, HttpStatus.OK );
-        } catch ( AuthorizationException authoriztionFailure ) {
-            return new ResponseEntity<>( AUTH_FAILED, HttpStatus.UNAUTHORIZED );
-        }
-
-
-    }
     
     
     @RequestMapping ( value = "/companies/mediaTokensPaginated", method = RequestMethod.GET)
@@ -227,10 +207,10 @@ public class SocialMonitorController
     }
 
 
-    @RequestMapping ( value = "/feeds/hash/{hash}/companyId/{companyId}", method = RequestMethod.PUT)
+    @RequestMapping ( value = "/feeds/id/{id}/hash/{hash}/companyId/{companyId}", method = RequestMethod.PUT)
     @ApiOperation ( value = "Updates duplicateCount field matching the given hash of social feed collection")
     public ResponseEntity<?> updateDuplicateCount( @PathVariable ( "hash") int hash,
-        @PathVariable ( "companyId") long companyId, HttpServletRequest request,
+        @PathVariable ( "companyId") long companyId, @PathVariable("id") String id, HttpServletRequest request,
         @RequestHeader ( "authorizationHeader") String authorizationHeader ) throws SSApiException
     {
         try {
@@ -238,7 +218,7 @@ public class SocialMonitorController
             try {
                 LOGGER.info( "SocialMonitorController.updateDuplicateCount started" );
                 // updates duplicateCount of social post collection
-                long updatedDocs = socialFeedService.updateDuplicateCount( hash, companyId );
+                long updatedDocs = socialFeedService.updateDuplicateCount( hash, companyId, id );
                 LOGGER.info( "SocialMonitorController.updateDuplicateCount completed successfully" );
                 return new ResponseEntity<>( updatedDocs, HttpStatus.OK );
             } catch ( InvalidInputException e ) {
@@ -423,6 +403,28 @@ public class SocialMonitorController
             throw new SSApiException( e.getMessage(), e );
         } catch ( AuthorizationException e ) {
             return new ResponseEntity<>( AUTH_FAILED, HttpStatus.UNAUTHORIZED );
+        }
+    }
+
+    @RequestMapping ( value = "/companies/{companyId}/trustedSource/remove", method = RequestMethod.POST)
+    @ApiOperation ( value = "Remove trusted source to the company", response = SocialMonitorTrustedSource.class, responseContainer = "List")
+    @ApiResponses(value = { @ApiResponse ( code = 200, message = "Successfully updated trusted source")})
+    public ResponseEntity<?> removeTrustedSourceToCompany( @PathVariable ( "companyId") long companyId,
+                                                   @Valid @RequestParam String trustedSource, @RequestHeader ( "authorizationHeader") String authorizationHeader ) throws SSApiException
+    {
+        try {
+            adminAuthenticationService.validateAuthHeader(authorizationHeader);
+            try {
+                LOGGER.info("SocialMonitorController.removeTrustedSourceToCompany started");
+                List<SocialMonitorTrustedSource> trustedSources = organizationManagementService
+                        .removeTrustedSourceToCompany(companyId, trustedSource);
+                LOGGER.info("SocialMonitorController.removeTrustedSourceToCompany completed successfully");
+                return new ResponseEntity<>(trustedSources, HttpStatus.OK);
+            } catch (NonFatalException e) {
+                throw new SSApiException(e.getMessage(), e.getErrorCode());
+            }
+        } catch (AuthorizationException authoriztionFailure) {
+            return new ResponseEntity<>(AUTH_FAILED, HttpStatus.UNAUTHORIZED);
         }
     }
 

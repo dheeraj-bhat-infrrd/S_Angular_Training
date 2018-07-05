@@ -54,6 +54,9 @@
 		<c:set value="4" var="profilemasterid"></c:set>
 	</c:when>
 </c:choose>
+<c:set var="activeSession" value="${activeSession }"></c:set>
+<c:set var="hasRegisteredForSummit" value="${hasRegisteredForSummit }"></c:set>
+<c:set var="isShowSummitPopup" value="${isShowSummitPopup }"></c:set>
 
 <div class="overlay-loader hide"></div>
 <input type="hidden"  id="reporting-data-div" data-profile-master-id="${profilemasterid}" data-user-id="${userId}" data-column-name="${columnName}" data-column-value="${columnValue}">
@@ -124,6 +127,16 @@
 	<div id="summit-popup-body" class="summit-popup">
 		<div id="close-summit-popup" class="close-summit-popup cursor-pointer"></div>
 		<div id="register-summit-btn" class="register-summit-btn cursor-pointer"></div>
+		<div class="summit-checkbox-cont clearfix">
+			<div class="float-left wc-width" id="">
+				<div id="summit-do-not-show" class="float-left summit-check" data-checked=false></div>
+	     		<div class="float-left wc-dashboard-text summit-check-text">Do not show this again</div>
+			</div>
+			<div class="float-left wc-width summit-popup-check-right" id="">
+				<div id="summit-already-reg" class="float-left summit-check" data-checked=false></div>
+	     		<div class="float-left wc-dashboard-text summit-check-text">I already registered</div>
+			</div>
+		</div>
 	</div>
 </div>
 
@@ -357,10 +370,22 @@
 		
 		hideOverlay();
 		
-		var isSummitFirstTime = $('#summit-popup-details').val();
-		if(isSummitFirstTime == 'true' && parseInt(profileMasterIdLead) == 1){
-			showSummitPopup();
-			$('#summit-popup-details').val('false');
+		var hasRegisteredForSummit = "${hasRegisteredForSummit}";
+		var activeSession = "${activeSession}";
+		var isShowSummitPopup ="${isShowSummitPopup}";
+		
+		console.log(hasRegisteredForSummit);
+		console.log(activeSession);
+		console.log(isShowSummitPopup);
+		
+		if(activeSession == 'false' && activeSession != false){
+			if(hasRegisteredForSummit == 'false' || hasRegisteredForSummit == false){
+				if(isShowSummitPopup == 'false' || isShowSummitPopup == 'false'){
+					showSummitPopup();
+				}else if(isShowSummitPopup == 'true' || isShowSummitPopup == 'true'){
+					showSummitRibbon();
+				}
+			}
 		}
 	});
 </script>

@@ -310,7 +310,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
 
     @Override
-    public void updateSurveyAsAbusive( String surveyMongoId, String reporterEmail, String reporterName )
+    public void updateSurveyAsAbusive( String surveyMongoId, String reporterEmail, String reporterName, String reportReason )
     {
         LOG.debug( "Method updateSurveyAsAbusive() to mark survey as abusive started." );
         Query query = new Query();
@@ -325,7 +325,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         query.addCriteria( Criteria.where( CommonConstants.SURVEY_ID_COLUMN ).is( surveyMongoId ) );
         update = new Update();
         update.set( CommonConstants.SURVEY_ID_COLUMN, surveyMongoId );
-        update.push( CommonConstants.ABUSE_REPORTERS_COLUMN, new ReporterDetail( reporterName, reporterEmail ) );
+        update.push( CommonConstants.ABUSE_REPORTERS_COLUMN, new ReporterDetail( reporterName, reporterEmail, reportReason ) );
         mongoTemplate.upsert( query, update, ABS_REPORTER_DETAILS_COLLECTION );
         LOG.debug( "Method updateSurveyAsAbusive() to mark survey as abusive finished." );
     }
@@ -2232,7 +2232,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         AbuseReporterDetails absReporterDetailForApp = new AbuseReporterDetails();
         Set<ReporterDetail> abuseReportersForApp = new HashSet<ReporterDetail>();
         abuseReportersForApp.add( new ReporterDetail( CommonConstants.REPORT_ABUSE_BY_APPLICATION_NAME,
-            CommonConstants.REPORT_ABUSE_BY_APPLICATION_EMAIL ) );
+            CommonConstants.REPORT_ABUSE_BY_APPLICATION_EMAIL, CommonConstants.REPORT_ABUSE_BY_APPLICATION_REASON ) );
         absReporterDetailForApp.setAbuseReporters( abuseReportersForApp );
 
         List<AbusiveSurveyReportWrapper> abusiveSurveyReports = new ArrayList<AbusiveSurveyReportWrapper>();
@@ -2687,7 +2687,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
 
         LOG.debug( "Method updateAgentIdOfSurveys() to update agent ids when survey moved from one to another user started." );
         //updating social media post details
-        updateSocialMediaPostDetails( fromUserId, toUserProfile );
+        updateSocialMediaPostDetails( CommonConstants.AGENT_ID_COLUMN, fromUserId, toUserProfile );
         Query query = new Query();
         query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( fromUserId ) );
         Update update = new Update();
@@ -2698,19 +2698,51 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         update.set( CommonConstants.BRANCH_ID_COLUMN, toUserProfile.getBranchId() );
         update.set( CommonConstants.COMPANY_ID_COLUMN, toUserProfile.getCompany().getCompanyId() );
         
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
+        
+        mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
+        LOG.debug( "Method updateAgentIdOfSurveys() to update agent ids when survey moved from one to another user finished." );
+
+    }
+    
+    @Override
+    public void updateAgentInfoInSurveyBySPI( long surveyPreInitiationId, User toUser, UserProfile toUserProfile ) throws InvalidInputException
+    {
+        if ( surveyPreInitiationId <= 0l )
+            throw new InvalidInputException( "Invalid surveyPreInitiationId passed in updateAgentInfoInSurveyBySPI()" );
+        if ( toUser == null )
+            throw new InvalidInputException( "toUser passed cannot be null in updateAgentInfoInSurveyBySPI()" );
+        if ( toUserProfile == null )
+            throw new InvalidInputException( "toUser's user profile passed cannot be null in updateAgentInfoInSurveyBySPI()" );
+
+        LOG.debug( "Method updateAgentInfoInSurveyBySPI() to update agent id when survey moved from one to another user started." );
+        //updating social media post details
+        updateSocialMediaPostDetails( CommonConstants.SURVEY_PREINITIATION_ID_COLUMN,surveyPreInitiationId, toUserProfile );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.SURVEY_PREINITIATION_ID_COLUMN ).is( surveyPreInitiationId ) );
+        Update update = new Update();
+        update.set( CommonConstants.AGENT_ID_COLUMN, toUser.getUserId() );
+        update.set( CommonConstants.AGENT_NAME_COLUMN,
+            toUser.getFirstName() + ( toUser.getLastName() == null ? "" : " " + toUser.getLastName() ) );
+        update.set( CommonConstants.REGION_ID_COLUMN, toUserProfile.getRegionId() );
+        update.set( CommonConstants.BRANCH_ID_COLUMN, toUserProfile.getBranchId() );
+        update.set( CommonConstants.COMPANY_ID_COLUMN, toUserProfile.getCompany().getCompanyId() );
+        
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date() );
+
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.debug( "Method updateAgentIdOfSurveys() to update agent ids when survey moved from one to another user finished." );
 
     }
 
 
-    private void updateSocialMediaPostDetails( long fromUserId, UserProfile toUserProfile )
+    private void updateSocialMediaPostDetails( String fieldName, long keyId, UserProfile toUserProfile )
     {
 
         //update agent media post details
         Query query = new Query();
         Update update = new Update();
-        query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( fromUserId ) );
+        query.addCriteria( Criteria.where( fieldName ).is( keyId ) );
         query.addCriteria( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN ).exists( true ) );
         query.addCriteria( Criteria
             .where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.AGENT_MEDIA_POST_DETAILS_COLUMN )
@@ -2728,7 +2760,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         //update branch media post details
         query = new Query();
         update = new Update();
-        query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( fromUserId ) );
+        query.addCriteria( Criteria.where( fieldName ).is( keyId ) );
         query.addCriteria( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN ).exists( true ) );
         query
             .addCriteria( Criteria
@@ -2744,7 +2776,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         //update region media post details
         query = new Query();
         update = new Update();
-        query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( fromUserId ) );
+        query.addCriteria( Criteria.where( fieldName ).is( keyId ) );
         query.addCriteria( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN ).exists( true ) );
         query
             .addCriteria( Criteria
@@ -2759,7 +2791,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         //update company media post details
         query = new Query();
         update = new Update();
-        query.addCriteria( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).is( fromUserId ) );
+        query.addCriteria( Criteria.where( fieldName ).is( keyId ) );
         query.addCriteria( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN ).exists( true ) );
         query
             .addCriteria( Criteria
@@ -3021,6 +3053,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         //add company id criteria
         query.addCriteria( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ) );
 
+        //exclude abusive surveys
+        query.addCriteria( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( false ) );
 
         // add status criteria
         query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
@@ -3077,6 +3111,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         Query query = new Query();
         //add company id criteria
         query.addCriteria( Criteria.where( CommonConstants.COMPANY_ID_COLUMN ).is( companyId ) );
+        
+        //exclude abusive surveys
+        query.addCriteria( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( false ) );
 
 
         // add status criteria
@@ -3125,6 +3162,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         BasicDBList pipeline = new BasicDBList();
         //match for non abusive reviews
         pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.COMPANY_ID_COLUMN , companyId ) ) );
+        
+        //exclude abusive surveys
+        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.IS_ABUSIVE_COLUMN , false ) ) );
 
         // add status criteria
         pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.STAGE_COLUMN ,  CommonConstants.SURVEY_STAGE_COMPLETE  ) ) );
@@ -3372,6 +3412,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         Update update = new Update();
         update.set( CommonConstants.BRANCH_ID_COLUMN, branchId );
         update.set( CommonConstants.REGION_ID_COLUMN, regionId );
+        update.set( CommonConstants.MODIFIED_ON_COLUMN, new Date( System.currentTimeMillis() ) );
         mongoTemplate.updateMulti( query, update, SURVEY_DETAILS_COLLECTION );
 
         //update branch media post details
@@ -3612,5 +3653,14 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         mongoTemplate.upsert( query, update, SURVEY_DETAILS_COLLECTION );
         LOG.debug( "Method updateSurveyAsAbusiveNotify() to mark survey as abusive notify finished." );
 	
+	}
+	
+	@Override
+    public SurveyDetails getsurveyFromSurveyPreinitiationId(long surveyPreinitiationId) {
+	    LOG.debug( "Method getAgentIdFromSurveyPreinitiationId()  started." );
+        Query query = new Query();
+        query.addCriteria( Criteria.where( CommonConstants.SURVEY_PREINITIATION_ID_COLUMN ).is( surveyPreinitiationId ) );
+        SurveyDetails survey = mongoTemplate.findOne(query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION);
+        return survey;
 	}
 }

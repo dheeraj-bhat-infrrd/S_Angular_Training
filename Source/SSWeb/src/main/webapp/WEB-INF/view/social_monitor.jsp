@@ -59,9 +59,9 @@
 			<div class="float-right hm-header-right text-center soc-mon-btn" onclick="javascript:showMainContent('./showsocialmonitorstreampage.do')">
 					<spring:message code="label.view.stream.key" />
 			</div>
-			<%-- <div class="float-right hm-header-right text-center soc-mon-btn" onclick="">
+			<div class="float-right hm-header-right text-center soc-mon-btn" onclick="javascript:showMainContent('./showsocialmonitorreportspage.do')">
 					<spring:message code="label.social.monitor.reports.key" />
-			</div> --%>
+			</div>
 		</div>
 	</div>
 </div>
@@ -113,11 +113,11 @@
 	</div>
 	
 	<div id="monitor-list-container" class="dash-container container mon-type-container zero-padding">
-		
+		<div id="empty-monitors" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 clearfix monitors-empty-div hide">
+			<span class="incomplete-trans-span monitors-empty-span">No monitors found</span>
+		</div>
 	</div>
-	<div  id="empty-monitors" class="hide dash-container container mon-type-container zero-padding">
-		<span class="incomplete-trans-span stream-alert">No monitors found.</span>
-	</div>
+	
 </div>
 
 <script>

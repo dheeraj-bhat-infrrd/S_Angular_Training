@@ -12,7 +12,7 @@ public interface MongoSocialFeedDao
 {
     public void insertSocialFeed( SocialResponseObject<?> socialFeed, String collectionName );
 
-    long updateDuplicateCount(int hash, long companyId);
+    long updateDuplicateCount( int hash, long companyId, String id );
                     
 	public void updateSocialFeed(SocialFeedsActionUpdate socialFeedsActionUpdate, SocialResponseObject socialResponseObject, Long companyId, List<ActionHistory> actionHistory, int updateFlag, String collectionName);
 	
@@ -22,9 +22,15 @@ public interface MongoSocialFeedDao
 	
 	public void updateMacroList(List<SocialMonitorMacro> socialMonitorMacros, long companyId);
 	
-	public List<SocialResponseObject> getAllSocialFeeds(int startIndex, int limit, boolean flag, String status, List<String> feedtype, Long companyId, List<Long> regionId, List<Long> branchId, List<Long> agentid, String searchText, boolean isCompanySet);
+
+    public List<SocialResponseObject> getAllSocialFeeds( int startIndex, int limit, String status, List<String> feedtype,
+        Long companyId, List<Long> regionId, List<Long> branchId, List<Long> agentid, String searchText, boolean isCompanySet,
+        boolean fromTrustedSource );
+
 	
-	public long getAllSocialFeedsCount(boolean flag, String status, List<String> feedtype, Long companyId, List<Long> regionId, List<Long> branchId, List<Long> agentid, String searchText, boolean isCompanySet);
+    public long getAllSocialFeedsCount( String status, List<String> feedtype, Long companyId, List<Long> regionId,
+        List<Long> branchId, List<Long> agentid, String searchText, boolean isCompanySet, boolean fromTrustedSource );
+
 	
 	public OrganizationUnitSettings getCompanyDetails(Long companyId);
 	
@@ -60,5 +66,44 @@ public interface MongoSocialFeedDao
 
 	List<SocialResponseObject> getSocialFeed( long companyId, long startTime, long endTime, int pageSize, int skips );
 
+    /**
+     * @param companyId
+     * @param trustedSource
+     * @param actionHistory
+     * @return
+     */
+    public long updateForTrustedSource( long companyId, String trustedSource, ActionHistory actionHistory );
+    
+    /**
+     * Method to get a social post
+     * @param companyId
+     * @param postId
+     * @return
+     */
+    public SocialResponseObject getSocialPost( Long companyId, String postId, String collectionName );
+    
+    /**
+     * Method to get all duplicate post details
+     * @param companyId
+     * @param hash
+     * @return
+     */
+    public List<SocialResponseObject> getAllDuplicatePostDetails(Long companyId, int hash);
+
+    /**
+     * Method to to set fromTrustedSource to false
+     * @param companyId
+     * @param trustedSource
+     * @return
+     */
+    public long updateForRemoveTrustedSource( long companyId, String trustedSource );
+
+    /**
+     * Add action history by mongoId
+     * @param mongoId
+     * @param actionHistory
+     * @return
+     */
+    public long updateActionHistory( String mongoId, ActionHistory actionHistory );
     
 }

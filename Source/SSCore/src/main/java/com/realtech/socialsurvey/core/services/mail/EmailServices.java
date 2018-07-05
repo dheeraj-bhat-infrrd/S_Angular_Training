@@ -8,9 +8,12 @@ import com.realtech.socialsurvey.core.entities.DigestRequestData;
 import com.realtech.socialsurvey.core.entities.EmailAttachment;
 import com.realtech.socialsurvey.core.entities.MonthlyDigestAggregate;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
+import com.realtech.socialsurvey.core.entities.SocialResponseObject;
 import com.realtech.socialsurvey.core.entities.SurveyCsvInfo;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.ftp.FtpSurveyResponse;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
 
@@ -169,7 +172,7 @@ public interface EmailServices
                                String surveyLink, String logoUrl, String customerFirstName, String customerLastName, String customerEmailId,
                                String emailType, String senderName, String senderEmailAddress, String mailSubject, String mailBody,
                                AgentSettings agentSettings, long branchId, long regionId, String surveySourceId, long agentId,
-                               long companyId, boolean sentFromCompany) throws InvalidInputException, UndeliveredEmailException;
+                               long companyId, boolean sentFromCompany, String unsubscribedURL) throws InvalidInputException, UndeliveredEmailException;
 
     /**
      * Sends the survey complete admin mail
@@ -196,7 +199,7 @@ public interface EmailServices
      * @throws InvalidInputException
      * @throws UndeliveredEmailException
      */
-    public void sendContactUsMail( String recipientEmailId, String displayName, String senderName, String senderEmailId,
+    public void sendContactUsMail( List<String> recipientEmailIds, String displayName, String senderName, String senderEmailId, String agentName, String agentEmail,
         String message ) throws InvalidInputException, UndeliveredEmailException;
 
 
@@ -485,8 +488,8 @@ public interface EmailServices
     public void sendEmailToUploaderForSuccessfulSurveyCsvUpload( SurveyCsvInfo csvInfo, String results ) throws InvalidInputException, UndeliveredEmailException;
 
 
-    public void sendSocialMonitorActionMail( String recipientMailId, String recipientName, String mailBody, String userName,
-        String userEmailId, String previousStatus, String currentStatus, String feedType )
+    public void sendSocialMonitorActionMail(SocialResponseObject socialResponseObject, SocialFeedsActionUpdate socialFeedsActionUpdate,
+        String previousStatus, String currentStatus )
         throws InvalidInputException, UndeliveredEmailException;
 
 
@@ -501,5 +504,26 @@ public interface EmailServices
 
     public boolean sendUserDeletionMail( Set<String> recipients, String deletedAdminName, String deletedAdminEmailId, User deletedUser,
         OrganizationUnitSettings agentSettings ) throws InvalidInputException, UndeliveredEmailException;
+
+
+    public void sendFtpProcessingErrorMailForCompany( Set<String> recipients, long companyId, String reason, String stackTrace, boolean isFromBatch, boolean sendOnlyToSocialSurveyAdmin )
+        throws InvalidInputException, UndeliveredEmailException;
+
+
+    /**
+     * @param CompanyName
+     * @param fileDate
+     * @param fileName
+     * @param ftpSurveyResponse
+     * @param agentMailId
+     * @param recipientMailId
+     * @throws InvalidInputException
+     * @throws UndeliveredEmailException
+     */
+    public void sendFtpSuccessMail( String CompanyName, String fileDate, String fileName, FtpSurveyResponse ftpSurveyResponse,
+        String agentMailId, String recipientMailId ) throws InvalidInputException, UndeliveredEmailException;
+
+
+
 
 }

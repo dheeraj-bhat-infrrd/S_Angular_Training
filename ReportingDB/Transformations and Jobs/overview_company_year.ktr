@@ -530,6 +530,12 @@
         <mask/>
         <set_empty_string>N</set_empty_string>
         </field>
+      <field>
+        <name>unsubscribed_count</name>
+        <value>0</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+        </field>
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -606,6 +612,12 @@
           <aggregate>num_of_users</aggregate>
           <subject>USER_ID</subject>
           <type>COUNT_DISTINCT</type>
+          <valuefield/>
+        </field>
+        <field>
+          <aggregate>unsubscribed_count</aggregate>
+          <subject>unsubscribed_count</subject>
+          <type>SUM</type>
           <valuefield/>
         </field>
       </fields>
@@ -1563,6 +1575,10 @@
           <column_name>third_party</column_name>
           <stream_name>third_party</stream_name>
         </field>
+        <field>
+          <column_name>unsubscribed_count</column_name>
+          <stream_name>unsubscribed_count</stream_name>
+        </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -1584,7 +1600,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  overview_user_year_id&#xd;&#xa;, user_id&#xd;&#xa;, processed&#xd;&#xa;, completed&#xd;&#xa;, incomplete&#xd;&#xa;, social_posts&#xd;&#xa;, zillow_reviews&#xd;&#xa;, unprocessed&#xd;&#xa;, unassigned&#xd;&#xa;, duplicate&#xd;&#xa;, corrupted&#xd;&#xa;, other&#xd;&#xa;, complete_percentage&#xd;&#xa;, incomplete_percentage&#xd;&#xa;, rating&#xd;&#xa;, total_review&#xd;&#xa;, third_party&#xd;&#xa;, year&#xd;&#xa;FROM overview_user_year order by user_id&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  overview_user_year_id&#xd;&#xa;, user_id&#xd;&#xa;, processed&#xd;&#xa;, completed&#xd;&#xa;, incomplete&#xd;&#xa;, social_posts&#xd;&#xa;, zillow_reviews&#xd;&#xa;, unprocessed&#xd;&#xa;, unassigned&#xd;&#xa;, duplicate&#xd;&#xa;, corrupted&#xd;&#xa;, other&#xd;&#xa;, complete_percentage&#xd;&#xa;, incomplete_percentage&#xd;&#xa;, rating&#xd;&#xa;, total_review&#xd;&#xa;, third_party&#xa;, unsubscribed_count&#xd;&#xa;, year&#xd;&#xa;FROM overview_user_year order by user_id&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -1610,7 +1626,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, AGENT_NAME&#xd;&#xa;, BRANCH_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, REGION_ID&#xd;&#xa;, SCORE&#xd;&#xa;,SOURCE&#xd;&#xa;, year&#x28;SURVEY_COMPLETED_DATE_EST&#x29; AS Year_Data&#xd;&#xa;, IS_ABUSIVE&#xd;&#xa;FROM survey_details&#xd;&#xa;where COMPANY_ID &#x21;&#x3d; 0 and STAGE&#x3d;-1&#xd;&#xa;order by SURVEY_DETAILS_ID</sql>
+    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, AGENT_NAME&#xd;&#xa;, BRANCH_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, REGION_ID&#xd;&#xa;, SCORE&#xd;&#xa;,SOURCE&#xd;&#xa;, year&#x28;SURVEY_COMPLETED_DATE_EST&#x29; AS Year_Data&#xd;&#xa;, IS_ABUSIVE&#xd;&#xa;FROM survey_details&#xd;&#xa;where COMPANY_ID &#x21;&#x3d; 0 and STAGE&#x3d;-1 and IS_ABUSIVE&#x3d;0 &#xd;&#xa;order by SURVEY_DETAILS_ID</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -1636,7 +1652,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, AGENT_NAME&#xd;&#xa;, BRANCH_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, REGION_ID&#xd;&#xa;, year&#x28;SURVEY_COMPLETED_DATE_EST&#x29; AS Year_Data&#xd;&#xa;FROM survey_details&#xd;&#xa;where COMPANY_ID &#x21;&#x3d; 0 AND SOURCE like &#x27;Zillow&#x27;&#xd;&#xa;order by COMPANY_ID&#x3b;&#xd;&#xa;</sql>
+    <sql>SELECT&#xd;&#xa;  SURVEY_DETAILS_ID&#xd;&#xa;, AGENT_ID&#xd;&#xa;, AGENT_NAME&#xd;&#xa;, BRANCH_ID&#xd;&#xa;, COMPANY_ID&#xd;&#xa;, REGION_ID&#xd;&#xa;, year&#x28;SURVEY_COMPLETED_DATE_EST&#x29; AS Year_Data&#xd;&#xa;FROM survey_details&#xd;&#xa;where COMPANY_ID &#x21;&#x3d; 0 AND SOURCE like &#x27;Zillow&#x27; and IS_ABUSIVE&#x3d;0 &#xd;&#xa;order by COMPANY_ID&#x3b;&#xd;&#xa;</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>

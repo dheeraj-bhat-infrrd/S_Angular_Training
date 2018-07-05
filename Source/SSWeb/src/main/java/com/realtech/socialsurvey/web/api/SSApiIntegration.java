@@ -1,23 +1,31 @@
 package com.realtech.socialsurvey.web.api;
 
 
+import java.util.List;
+
 import com.realtech.socialsurvey.core.entities.Keyword;
 import com.realtech.socialsurvey.core.entities.MultiplePhrasesVO;
+import com.realtech.socialsurvey.core.entities.SocialFeedFilter;
 import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
 import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
 import com.realtech.socialsurvey.web.api.entities.AccountRegistrationAPIRequest;
 import com.realtech.socialsurvey.web.api.entities.CaptchaAPIRequest;
+import com.realtech.socialsurvey.web.api.entities.FtpCreateRequest;
 import com.realtech.socialsurvey.web.api.entities.VendastaRmCreateRequest;
 import com.realtech.socialsurvey.web.entities.CompanyProfile;
 import com.realtech.socialsurvey.web.entities.Payment;
 import com.realtech.socialsurvey.web.entities.PersonalProfile;
+
 import retrofit.client.Response;
-import retrofit.http.*;
-
-import java.util.List;
-
-import org.springframework.web.bind.annotation.RequestHeader;
+import retrofit.http.Body;
+import retrofit.http.DELETE;
+import retrofit.http.GET;
+import retrofit.http.Header;
+import retrofit.http.POST;
+import retrofit.http.PUT;
+import retrofit.http.Path;
+import retrofit.http.Query;
 
 
 public interface SSApiIntegration
@@ -189,14 +197,14 @@ public interface SSApiIntegration
     Response getScoreStatsQuestion(@Query ("entityId") Long entityId, @Query ("entityType") String entityType, @Query ("currentMonth") int currentMonth, @Query ("currentYear") int currentYear);
     
     @GET("/v1/getaccountstatisticsreportstatus")
-	Response getAccountStatisticsRecentActivity(@Query("reportId") Long reportId);
+    Response getAccountStatisticsRecentActivity(@Query("reportId") Long reportId);
     //reporting:END
     
     @POST("/v2/addquestiontosurvey")
-	Response addQuestionToExistingSurvey(@Body SurveyQuestionDetails questionDetails);
+    Response addQuestionToExistingSurvey(@Body SurveyQuestionDetails questionDetails);
 
     @PUT("/v2/updatesurveyquestion")
-	Response updateQuestionFromExistingSurvey(@Body SurveyQuestionDetails questionDetails);
+    Response updateQuestionFromExistingSurvey(@Body SurveyQuestionDetails questionDetails);
     
     //survey api's 
     @POST("/v2/surveys/{surveyId}/response")
@@ -211,7 +219,7 @@ public interface SSApiIntegration
     Response getSwearWordsList(@Query ("companyId") long companyId);
 
     @DELETE("/v2/removesurveyquestion")
-	Response removeQuestionFromSurvey(@Query("userId") long userId,@Query("surveyQuestionId") long surveyQuestionId);
+    Response removeQuestionFromSurvey(@Query("userId") long userId,@Query("surveyQuestionId") long surveyQuestionId);
     
     @GET ( "/v1/npsstats" )
     Response getReportingNpsStats(@Query ("entityId") Long entityId , @Query ("entityType") String entityType);
@@ -225,15 +233,12 @@ public interface SSApiIntegration
     @POST("/v1/companies/{companyId}/keywords")
     public Response addKeywordsToCompany(@Path ( "companyId") long companyId, @Body List<Keyword> keywordsRequest);
     
-	@GET("/v1/showsocialfeeds")
-	public Response showStreamSocialPosts(@Query("startIndex") int startIndex, @Query("limit") int limit,
-			@Query("status") String status, @Query("flag") boolean flag, @Query("feedtype") List<String> feedtype,
-			@Query("companyId") Long companyId, @Query("regionIds") List<Long> regionIds,
-			@Query("branchIds") List<Long> branchIds, @Query("agentIds") List<Long> agentIds, @Query("searchText") String searchText,@Query("isCompanySet") boolean isCompanySet, @Header("authorizationHeader") String authorizationHeader);
+    @POST("/v1/showsocialfeeds")
+    public Response showStreamSocialPosts(@Body SocialFeedFilter socialFeedFilter, @Header("authorizationHeader") String authorizationHeader);
     
     @PUT( "/v1/updatesocialfeeds/action")
     public Response saveSocialFeedsForAction(@Body SocialFeedsActionUpdate socialFeedsActionUpdate,
-			@Query("companyId") Long companyId, @Query("duplicateFlag") boolean duplicateFlag, @Header("authorizationHeader") String authorizationHeader);
+            @Query("companyId") Long companyId, @Query("duplicateFlag") boolean duplicateFlag, @Header("authorizationHeader") String authorizationHeader);
     
     @GET("/v1/socialfeedsmacro/company/{companyId}")
     public Response showMacrosForEntity(@Path("companyId") long companyId, @Query("searchMacros") String searchMacros, @Header("authorizationHeader") String authorizationHeader);
@@ -289,5 +294,27 @@ public interface SSApiIntegration
     
     @GET("/v1/getrecentactivityforsocialmonitorreporting")
     Response getRecentActivityForSocialMonitor(@Query ("entityId") Long entityId , @Query ("entityType") String entityType ,@Query ("startIndex") int startIndex , @Query ("batchSize") int batchSize);
+
+    @POST( "/v1/sethasregisteredforsummit" )
+    Response setHasRegisteredForSummit(@Query("companyId") Long companyId,@Query("hasRegisteredForSummit") boolean hasRegisteredForSummit);
     
+    @POST( "/v1/setshowsummitpopup" )
+    Response setShowSummitPopup(@Query("companyId") Long companyId,@Query("isShowSummitPopup") boolean isShowSummitPopup);
+    
+    @GET ( "/v1/duplicateposts/company/{companyId}/post/{postId}")
+    public Response getDuplicatePosts( @Path ( "companyId") long companyId, @Path ( "postId") String postId,
+        @Header ( "authorizationHeader") String authorizationHeader );
+
+    @POST("/v1/companies/{companyId}/trustedSource")
+    Response addTrustedSourceToCompany(@Path ( "companyId") long companyId, @Query ("trustedSource") String trustedSource,  @Header("authorizationHeader") String authorizationHeader);
+    
+    @POST("/v1/companies/{companyId}/trustedSource/remove")
+    Response removeTrustedSourceToCompany(@Path ( "companyId") long companyId, @Query ("trustedSource") String trustedSource,  @Header("authorizationHeader") String authorizationHeader);
+    
+    @POST( "/v1/setftpcrm/{companyId}" )
+    Response setFtpCrm(@Path ("companyId") long companyId , @Body FtpCreateRequest ftpInfo);
+    
+    @POST( "/v1/unsubscribe/email" )
+    String unsubscribeEmail(@Query("companyId") long companyId, @Query("emailId") String emailId, @Query("agentId") long agentId,
+        @Query("flag") boolean flag );
 }

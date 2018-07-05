@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.compute.topology.bolts.emailreports;
 import com.realtech.socialsurvey.compute.entities.ReportRequest;
 import com.realtech.socialsurvey.compute.entities.response.ActionHistory;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
+import com.realtech.socialsurvey.compute.enums.ActionHistoryType;
 import com.realtech.socialsurvey.compute.enums.ReportStatus;
 import com.realtech.socialsurvey.compute.enums.ReportType;
 import com.realtech.socialsurvey.compute.services.FailedMessagesService;
@@ -11,10 +12,12 @@ import com.realtech.socialsurvey.compute.topology.bolts.BaseComputeBoltWithAck;
 import com.realtech.socialsurvey.compute.utils.ConversionUtils;
 import com.realtech.socialsurvey.compute.utils.FileUtils;
 import com.realtech.socialsurvey.compute.utils.WorkBookUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
+import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,9 +36,10 @@ public class WriteSocialMonitorReportToExcel extends BaseComputeBoltWithAck
     private transient XSSFWorkbook workbook;
 
     public static final String SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD = "SocialSurvey User Name,Social Post Source,Post content,Post Link,Action,Owner Name,"
-        + "Action Date,Comments";
-    public static final String SOCIAL_MONITOR_DATE_REPORT = "SocialSurvey User Name,Social Post Source,Post content,Post Link,If flagged automatic,"
-        + "Action,Owner Name,Action Date,Comments";
+        + "Action Date,Comments,MessageType,Message";
+    public static final String SOCIAL_MONITOR_DATE_REPORT = "SocialSurvey User Name,Social Post Source,Post content,Post Link,Flagged Manually,"
+
+        + "Action,Owner Name,Action Date,Comments,MessageType,Message";
 
     @Override
     @SuppressWarnings( "unchecked" )
@@ -110,7 +114,7 @@ public class WriteSocialMonitorReportToExcel extends BaseComputeBoltWithAck
         return workbook;
     }
 
-
+    @SuppressWarnings( "unchecked" )
     private Map<Integer,List<Object>> getSocialMonitorReportDateBasedToBeWrittenInSheet( List<SocialResponseObject> socialResponseWrapper )
     {
         Map<Integer, List<Object>> socialFeedData = new TreeMap<>();
@@ -119,7 +123,7 @@ public class WriteSocialMonitorReportToExcel extends BaseComputeBoltWithAck
             int enterNext = 1;
             for (SocialResponseObject socialFeed : socialResponseWrapper) {
 
-                if(socialFeed.getFoundKeywords() == null || socialFeed.getFoundKeywords().isEmpty()){
+                if( socialFeed.getActionHistory() == null || socialFeed.getActionHistory().isEmpty() ){
                     socialMonitorReportToPopulate = new ArrayList<>();
 
                     socialMonitorReportToPopulate.add(socialFeed.getOwnerName());
@@ -127,6 +131,7 @@ public class WriteSocialMonitorReportToExcel extends BaseComputeBoltWithAck
                     socialMonitorReportToPopulate.add(socialFeed.getText());
                     socialMonitorReportToPopulate.add(socialFeed.getPostLink());
                     socialMonitorReportToPopulate.add( "No" );
+                    socialMonitorReportToPopulate.add( socialFeed.getStatus().toString() );
 
                     socialFeedData.put(enterNext++, socialMonitorReportToPopulate);
                 }
@@ -140,12 +145,16 @@ public class WriteSocialMonitorReportToExcel extends BaseComputeBoltWithAck
                         socialMonitorReportToPopulate.add(socialFeed.getType().toString());
                         socialMonitorReportToPopulate.add(socialFeed.getText());
                         socialMonitorReportToPopulate.add(socialFeed.getPostLink());
-                        socialMonitorReportToPopulate.add("Yes");
+                        socialMonitorReportToPopulate.add(socialFeed.getFoundKeywords()== null &&
+                            actionHistory.getActionType().equals( ActionHistoryType.FLAGGED ) ? "Yes" : "No");
                         socialMonitorReportToPopulate.add(actionHistory.getActionType().toString());
                         socialMonitorReportToPopulate.add(actionHistory.getOwnerName());
                         socialMonitorReportToPopulate.add(ConversionUtils.convertToEst( actionHistory.getCreatedDate() ));
-                        socialMonitorReportToPopulate.add(actionHistory.getText());
-
+                        socialMonitorReportToPopulate.add( StringUtils.isEmpty( actionHistory.getText() ) ? "" : Jsoup.parse( actionHistory.getText() ).text() );
+                        if(actionHistory.getMessageType() != null){
+                            socialMonitorReportToPopulate.add( actionHistory.getMessageType().toString() );
+                            socialMonitorReportToPopulate.add( actionHistory.getMessage() );
+                        }
                         socialFeedData.put(enterNext++, socialMonitorReportToPopulate);
                     }
                 }
@@ -175,7 +184,11 @@ public class WriteSocialMonitorReportToExcel extends BaseComputeBoltWithAck
                     socialMonitorReportToPopulate.add(actionHistory.getActionType().toString());
                     socialMonitorReportToPopulate.add(actionHistory.getOwnerName());
                     socialMonitorReportToPopulate.add(ConversionUtils.convertToEst( actionHistory.getCreatedDate() ));
-                    socialMonitorReportToPopulate.add(actionHistory.getText());
+                    socialMonitorReportToPopulate.add( StringUtils.isEmpty( actionHistory.getText() ) ? "" : Jsoup.parse( actionHistory.getText() ).text() );
+                    if(actionHistory.getMessageType() != null){
+                        socialMonitorReportToPopulate.add( actionHistory.getMessageType().toString() );
+                        socialMonitorReportToPopulate.add( actionHistory.getMessage() );
+                    }
 
                     socialFeedData.put(enterNext++, socialMonitorReportToPopulate);
                 }

@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
@@ -31,6 +30,7 @@ import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.DigestRequestData;
 import com.realtech.socialsurvey.core.entities.EmailAttachment;
 import com.realtech.socialsurvey.core.entities.EmailEntity;
@@ -40,9 +40,12 @@ import com.realtech.socialsurvey.core.entities.ForwardMailDetails;
 import com.realtech.socialsurvey.core.entities.MonthlyDigestAggregate;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Plan;
+import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
+import com.realtech.socialsurvey.core.entities.SocialResponseObject;
 import com.realtech.socialsurvey.core.entities.SurveyCsvInfo;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.ftp.FtpSurveyResponse;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.integration.stream.StreamApiConnectException;
 import com.realtech.socialsurvey.core.integration.stream.StreamApiException;
@@ -1269,7 +1272,7 @@ public class EmailServicesImpl implements EmailServices
         String agentFirstName, String agentPhone, String agentTitle, String surveyLink, String logoUrl,
         String customerFirstName, String customerLastName, String customerEmailId, String emailType, String senderName,
         String senderEmailAddress, String mailSubject, String mailBody, AgentSettings agentSettings, long branchId,
-        long regionId, String surveySourceId, long agentId, long companyId, boolean sentFromCompany )
+        long regionId, String surveySourceId, long agentId, long companyId, boolean sentFromCompany, String unsubscribedURL )
         throws InvalidInputException, UndeliveredEmailException
     {
 
@@ -1278,7 +1281,10 @@ public class EmailServicesImpl implements EmailServices
             throw new InvalidInputException( "Recipient email Id is empty or null for sending survey completion mail " );
         }
 
-        Map<String, String> branchAndRegion = branchDao.getBranchAndRegionName( regionId, branchId );
+        Branch branch = branchDao.findById( Branch.class, branchId );
+        
+        String branchName = (branch.getIsDefaultBySystem() == 0 ) ? branch.getBranch() : "";
+        String regionName = (branch.getRegion().getIsDefaultBySystem() == 0) ? branch.getRegion().getRegion() : "";
 
         String companyName = user.getCompany().getCompany();
         String agentSignature = emailFormatHelper.buildAgentSignature( agentName, agentPhone, agentTitle, companyName );
@@ -1318,12 +1324,12 @@ public class EmailServicesImpl implements EmailServices
         mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, appBaseUrl, logoUrl, shortSurveyLink,
             customerFirstName, customerLastName, agentName, agentFirstName, agentSignature, customerEmailId, user.getEmailId(),
             companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(),
-            companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone );
+            companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone, unsubscribedURL,agentId,branchName,regionName);
 
         mailBody = emailFormatHelper.replaceLegends( false, mailBody, appBaseUrl, logoUrl, shortSurveyLink, customerFirstName,
             customerLastName, agentName, agentFirstName, agentSignature, customerEmailId, user.getEmailId(), companyName,
             dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer,
-            agentDisclaimer, agentLicenses, agentTitle, agentPhone );
+            agentDisclaimer, agentLicenses, agentTitle, agentPhone, unsubscribedURL,agentId,branchName,regionName);
 
         //send the email
         if ( mailSubject == null || mailSubject.isEmpty() ) {
@@ -1332,8 +1338,8 @@ public class EmailServicesImpl implements EmailServices
         }
         emailEntity.setMailType( emailType );
         emailEntity.setRecipientsName( Arrays.asList( customerFirstName + " " + customerLastName ) );
-        emailEntity.setBranchName( branchAndRegion.get( CommonConstants.BRANCH_NAME_COLUMN ) );
-        emailEntity.setRegionName( branchAndRegion.get( CommonConstants.REGION_COLUMN ) );
+        emailEntity.setBranchName( branch.getBranch() );
+        emailEntity.setRegionName( branch.getRegion().getRegion() );
         emailEntity.setCompanyId( companyId );
         emailEntity.setSurveySourceId( surveySourceId );
         emailEntity.setRegionId( regionId );
@@ -1410,10 +1416,10 @@ public class EmailServicesImpl implements EmailServices
      */
     @Async
     @Override
-    public void sendContactUsMail( String recipientEmailId, String displayName, String senderName, String senderEmailId,
+    public void sendContactUsMail( List<String> recipientEmailIds, String displayName, String senderName, String senderEmailId, String agentName, String agentEmail,
         String message ) throws InvalidInputException, UndeliveredEmailException
     {
-        if ( recipientEmailId == null || recipientEmailId.isEmpty() ) {
+        if ( recipientEmailIds == null || recipientEmailIds.isEmpty()  ) {
             LOG.warn( "Recipient email id is null or empty!" );
             throw new InvalidInputException( "Recipient email id is null or empty!" );
         }
@@ -1434,8 +1440,8 @@ public class EmailServicesImpl implements EmailServices
             throw new InvalidInputException( "message is null or empty!" );
         }
 
-        LOG.debug( "Sending contact us email to : {}", recipientEmailId );
-        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientEmailId );
+        LOG.debug( "Sending contact us email to : {}", recipientEmailIds );
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientEmailIds );
         emailEntity.setMailType( CommonConstants.EMAIL_TYPE_CONTACT_US_MAIL );
 
         FileContentReplacements subjectReplacements = new FileContentReplacements();
@@ -1447,7 +1453,7 @@ public class EmailServicesImpl implements EmailServices
         messageBodyReplacements
             .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.CONTACT_US_MAIL_BODY );
         messageBodyReplacements
-            .setReplacementArgs( Arrays.asList( appLogoUrl, displayName, senderName, senderEmailId, message ) );
+            .setReplacementArgs( Arrays.asList( appLogoUrl, displayName, senderName, senderEmailId, agentName, agentEmail, message ) );
 
         LOG.trace( "Calling email sender to send mail" );
         sendEmailWithSubjectAndBodyReplacements( emailEntity, subjectReplacements, messageBodyReplacements, false, false );
@@ -2765,6 +2771,66 @@ public class EmailServicesImpl implements EmailServices
     }
 
 
+    @Async
+    @Override
+    public void sendFtpProcessingErrorMailForCompany( Set<String> recipients, long companyId, String reason, String stackTrace, boolean isFromBatch, boolean sendOnlyToSocialSurveyAdmin )
+        throws InvalidInputException, UndeliveredEmailException
+    {
+        LOG.debug( "sendFtpProcessingErrorMailForCompany() started" );
+        if ( companyId <= 0 ) {
+            LOG.warn( "company ID is not specified" );
+            throw new InvalidInputException( "company ID is not specified" );
+        } else if ( StringUtils.isEmpty( stackTrace ) ) {
+            LOG.warn( "error stack trace not Specified" );
+            throw new InvalidInputException( "error stack trace not Specified" );
+        } else if ( reason == null ) {
+            LOG.warn( "Reason for failure not Specified" );
+            throw new InvalidInputException( "Reason for failure not Specified" );
+        }
+        
+        List<String> mailRecipients = new ArrayList<>();
+        
+        if( recipients != null && !recipients.isEmpty() ) {
+            mailRecipients.addAll( recipients );
+        }
+        
+        EmailEntity emailEntityForSSAdmin = prepareEmailEntityForSendingEmail( applicationAdminEmail );
+        emailEntityForSSAdmin.setMailType( CommonConstants.EMAIL_TYPE_FTP_FILE_UPLOADER );        
+
+        FileContentReplacements messageSubjectReplacements = new FileContentReplacements();
+        messageSubjectReplacements
+            .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.FTP_BATCH_ERROR_MAIL_SUBJECT );
+        messageSubjectReplacements
+            .setReplacementArgs( Arrays.asList( isFromBatch ? "batch" : "topology", String.valueOf( companyId ) ) );
+
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        messageBodyReplacements
+            .setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.FTP_BATCH_ERROR_MAIL_BODY );
+        messageBodyReplacements.setReplacementArgs(
+            Arrays.asList( appLogoUrl, isFromBatch ? "batch" : "topology", String.valueOf( companyId ), reason, stackTrace ) );
+        
+
+        LOG.trace( "sendFtpProcessingErrorMailForCompany() finishing" );
+        sendEmailWithSubjectAndBodyReplacements( emailEntityForSSAdmin, messageSubjectReplacements, messageBodyReplacements, false,
+            false );
+        
+        if( !mailRecipients.isEmpty() && !sendOnlyToSocialSurveyAdmin ) {
+            
+            EmailEntity emailEntityForRecipients = prepareEmailEntityForSendingEmail( mailRecipients );
+            emailEntityForRecipients.setMailType( CommonConstants.EMAIL_TYPE_FTP_FILE_UPLOADER );
+        
+            // don't show stack trace for configured mails  
+            messageBodyReplacements.setReplacementArgs(
+                Arrays.asList( appLogoUrl, isFromBatch ? "batch" : "topology", String.valueOf( companyId ), reason, StringUtils.EMPTY ) );
+            
+            sendEmailWithSubjectAndBodyReplacements( emailEntityForRecipients, messageSubjectReplacements, messageBodyReplacements, false,
+                false );
+        }
+        
+        
+    }
+
+
     @Override
     public void sendEmailToAdminForUnsuccessfulSurveyCsvUpload( SurveyCsvInfo csvInfo, String errorMessage )
         throws InvalidInputException, UndeliveredEmailException
@@ -2880,12 +2946,20 @@ public class EmailServicesImpl implements EmailServices
         sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, true, false );
     }
 
+
     @Async
 	@Override
-    public void sendSocialMonitorActionMail( String recipientMailId, String recipientName, String mailBody, String userName,
-        String userEmailId, String previousStatus, String currentStatus, String feedType )
+    public void sendSocialMonitorActionMail( SocialResponseObject socialResponseObject, SocialFeedsActionUpdate socialFeedsActionUpdate,
+        String previousStatus, String currentStatus )
         throws InvalidInputException, UndeliveredEmailException
     {
+        String recipientMailId = socialResponseObject.getOwnerEmail();
+        String recipientName = socialResponseObject.getOwnerName();
+        String mailBody = socialFeedsActionUpdate.getText();
+        String userName = socialFeedsActionUpdate.getUserName();
+        String userEmailId = socialFeedsActionUpdate.getUserEmailId();
+        String feedType = socialResponseObject.getType().toString().toLowerCase();
+        
 		LOG.info( "method sendSocialMonitorActionMail started" );
         if ( recipientMailId == null || recipientMailId.isEmpty() ) {
             LOG.error( "Recipient email Id is empty or null for sendSocialMonitorActionMail " );
@@ -2897,24 +2971,31 @@ public class EmailServicesImpl implements EmailServices
             throw new InvalidInputException( "Mail body is empty or null for sendSocialMonitorActionMail " );
         }
 
-        String message = null;
+        
         EmailEntity emailEntity = prepareEmailEntityForSendingEmail( recipientMailId );
+        
+        // Set
+        String senderEmailAddress = "post-"+ socialResponseObject.getId() +"@" + defaultSendGridMeEmailDomain;
+        emailEntity.setSenderEmailId(senderEmailAddress);
+        
         emailEntity.setMailType( CommonConstants.EMAIL_TYPE_SOCIAL_MONITOR_ACTION_MAIL_TO_USER );
         String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SOCIAL_MONITOR_ACTION_MAIL_SUBJECT;
 
+        String message = null;
         if ( previousStatus != null && currentStatus != null ) {
             message = "Your " + feedType + " post was moved from <b>" + previousStatus + "</b> to <b>" + currentStatus
                 + "</b> by " + userName + " [" + userEmailId + "] with message,";
         } else {
             message = "Your " + feedType + " post has a message from " + userName + " [" + userEmailId + "] " + ",";
         }
-        
+        String postLinkText= "Here is link to your post - " + socialResponseObject.getPostLink();
+                
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName( EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
             + EmailTemplateConstants.SOCIAL_MONITOR_ACTION_MAIL_BODY );
         messageBodyReplacements.setReplacementArgs(
-            Arrays.asList( appLogoUrl, recipientName, message, mailBody ) );
+            Arrays.asList( appLogoUrl, recipientName, message, mailBody, postLinkText ) );
            
         LOG.trace( "Calling email sender to send mail" );
         sendEmailWithBodyReplacements( emailEntity, subjectFileName, messageBodyReplacements, false, false );
@@ -3005,6 +3086,48 @@ public class EmailServicesImpl implements EmailServices
 
         LOG.debug( "method sendUserDeletionMail() finished" );
         return true;
+    }
+
+    @Async
+    @Override
+    public void sendFtpSuccessMail( String companyName, String fileDate, String fileName, FtpSurveyResponse ftpSurveyResponse,
+        String ftpMailId, String ftpErrorHtml ) throws InvalidInputException, UndeliveredEmailException
+    {
+        if ( ftpMailId == null || ftpMailId.isEmpty() ) {
+            LOG.warn( "Recipient email Id is empty or null for sending ftp success mail " );
+            throw new InvalidInputException( "Recipient email Id is empty or null for sending ftp success mail " );
+        }
+
+        String[] mailIds = ftpMailId.split( "," );
+        List<String> mailIdList = new ArrayList<>();
+
+        for ( String mailId : mailIds ) {
+            mailIdList.add( mailId.trim() );
+        }
+
+        LOG.debug( "Sending ftp success email to : {}", ftpMailId );
+        EmailEntity emailEntity = prepareEmailEntityForSendingEmail( mailIdList );
+        emailEntity.setMailType( CommonConstants.EMAIL_TYPE_FTP_SUCCESSFULLY_PROCESSED_MAIL );
+
+        FileContentReplacements messageSubjectReplacements = new FileContentReplacements();
+        messageSubjectReplacements.setFileName(
+            EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.FTP_SUCCESSFULLY_PROCESSED_MAIL_SUBJECT );
+        messageSubjectReplacements.setReplacementArgs( Arrays.asList( companyName ) );
+
+        FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        messageBodyReplacements.setFileName(
+            EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.FTP_SUCCESSFULLY_PROCESSED_MAIL_BODY );
+
+        //SS-1435: Send survey details too.
+        messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, companyName, fileName, fileDate,
+            String.valueOf( ftpSurveyResponse.getTotalTransaction() ), String.valueOf( ftpSurveyResponse.getTotalSurveys() ),
+            String.valueOf( ftpSurveyResponse.getCustomer1Count() ), String.valueOf( ftpSurveyResponse.getCustomer2Count() ),
+            String.valueOf( ftpSurveyResponse.getErrorNum() ), ftpErrorHtml ) );
+
+        LOG.trace( "Calling email sender to send mail" );
+        sendEmailWithSubjectAndBodyReplacements( emailEntity, messageSubjectReplacements, messageBodyReplacements, false,
+            false );
+        LOG.debug( "Successfully sent ftp success mail" );
     }
 
 }

@@ -82,7 +82,7 @@ public class FacebookFeedProcessorImpl implements FacebookFeedProcessor
                 if ( since == null || since.isEmpty() ) {
                     Calendar cal = Calendar.getInstance();
                     until = String.valueOf( cal.getTimeInMillis() / 1000 );
-                    cal.add( Calendar.DAY_OF_YEAR, -10 );
+                    cal.add( Calendar.DAY_OF_YEAR, -5 );
                     since = String.valueOf( cal.getTimeInMillis() / 1000 );
                 }
 

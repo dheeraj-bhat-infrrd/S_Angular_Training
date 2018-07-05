@@ -501,6 +501,32 @@ public class SurveyPreInitiationDaoImpl extends GenericDaoImpl<SurveyPreInitiati
         LOG.info( "Method to update pre initiated surveys agent id from " + fromUserId + " to " + toUser.getUserId()
             + " ended." );
     }
+    
+
+    @Override
+    public void updateAgentInfoOfPreInitiatedSurvey( long surveyPreinitiatinId, User toUser ) throws InvalidInputException
+    {
+
+        if ( surveyPreinitiatinId <= 0l ) {
+            throw new InvalidInputException( "Invalid from agent id : " + surveyPreinitiatinId );
+        }
+
+        if ( toUser == null ) {
+            throw new InvalidInputException( "To agent passed cannot be null" );
+        }
+        LOG.info( "Updating pre initiated surveys for id:{} to agent:{}", surveyPreinitiatinId, toUser.getUserId() );
+        String queryStr = "UPDATE SURVEY_PRE_INITIATION SET AGENT_ID = ?, AGENT_NAME=?,AGENT_EMAILID=?, MODIFIED_ON=?, COMPANY_ID=? WHERE SURVEY_PRE_INITIATION_ID = ?";
+        Query query = getSession().createSQLQuery( queryStr );
+        query.setParameter( 0, toUser.getUserId() );
+        query.setParameter( 1, toUser.getFirstName() + ( toUser.getLastName() == null ? "" : " " + toUser.getLastName() ) );
+        query.setParameter( 2, toUser.getEmailId() );
+        query.setParameter( 3, new Timestamp( System.currentTimeMillis() ) );
+        query.setParameter( 4, toUser.getCompany().getCompanyId() );
+        query.setParameter( 5, surveyPreinitiatinId );
+        query.executeUpdate();
+        LOG.info( "Updating pre initiated surveys for id:{} to agent:{}", surveyPreinitiatinId, toUser.getUserId() );
+
+    }
 
 
     // Method to get incomplete survey list for sending reminder mail.
