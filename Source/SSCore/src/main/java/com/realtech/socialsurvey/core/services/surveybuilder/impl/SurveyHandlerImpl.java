@@ -2042,8 +2042,10 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             //check is customer last name is null and customer first name have more then one words
             if(StringUtils.isEmpty(survey.getCustomerLastName()) && survey.getCustomerFirstName().indexOf(" ") > 0 ) {
             		if( survey.getCustomerFirstName().length() >= survey.getCustomerFirstName().indexOf(" ") + 2 ) {
-            			String newFirstName = survey.getCustomerFirstName().substring(0, survey.getCustomerFirstName().indexOf(" ") + 2 );
+            			String newFirstName = survey.getCustomerFirstName().substring(0, survey.getCustomerFirstName().indexOf(" ") );
+            			String newLastName = survey.getCustomerFirstName().substring( survey.getCustomerFirstName().indexOf(" ") + 1 , survey.getCustomerFirstName().length());
             			survey.setCustomerFirstName(newFirstName);
+            			survey.setCustomerLastName(newLastName);
         			}
             }
             
