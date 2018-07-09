@@ -172,7 +172,12 @@ public class EmailFormatHelper
 
         long agentId = 0;
         String customerName = getCustomerDisplayNameForEmail( custFirstName, custLastName );
-
+        
+        //take initial of second half  of first name if there is one
+        if(custFirstName.indexOf(" ") > 0 && custFirstName.length() >= custFirstName.indexOf(" ") + 2 ) {
+        		custFirstName = custFirstName.substring(0, custFirstName.indexOf(" ") + 2 );
+		}
+        
         content = content.replaceAll( "\\[BaseUrl\\]", "" + baseUrl );
         content = content.replaceAll( "\\[AppBaseUrl\\]", "" + baseUrl );
         content = content.replaceAll( "\\[LogoUrl\\]", "" + logoUrl );
