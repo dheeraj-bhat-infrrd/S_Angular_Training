@@ -72,8 +72,8 @@ import com.realtech.socialsurvey.core.utils.JsoupHtmlToTextUtils;
 @Component
 public class SocialFeedServiceImpl implements SocialFeedService
 {
-    private static final String GMAIL_REPLY_REGEX = ".*On.*(\\s+\\n+\\r+)?\\n*\\s*wrote:";
-    private static final String OUTLOOK_EMAIL_REGEX = "From:\\s*\\w+\\s*Sent: \\w+(\\s+\\w+)*";
+    private static final String GMAIL_REPLY_REGEX = ".\\n*On.*(\\s+\\n+\\r+)? wrote:";
+    private static final String OUTLOOK_EMAIL_REGEX = "From:.*Sent:.*To:";
     private static final String REPLIED_VIA_EMAIL_TEXT = "Replied via email by <b class='soc-mon-bold-text'> %s </b>";
     private static final Logger LOG = LoggerFactory.getLogger( SocialFeedServiceImpl.class );
     @Autowired
