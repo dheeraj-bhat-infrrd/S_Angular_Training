@@ -128,7 +128,6 @@ public class IncomingMailController
         String postId = getPostIdFromMailTo( mailTo, sendUsingDomain );
         
         if(postId != null) {
-            // TODO add message as comment.
             List<String> senderInfo = retrieveSenderInfoFromMailId( mailFrom );
             String senderName = mailFrom;
             if(senderInfo.isEmpty()) {

@@ -13,8 +13,6 @@ import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +61,7 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.socialmonitor.feed.SocialFeedService;
+import com.realtech.socialsurvey.core.utils.JsoupHtmlToTextUtils;
 
 
 /**
@@ -73,6 +72,8 @@ import com.realtech.socialsurvey.core.services.socialmonitor.feed.SocialFeedServ
 @Component
 public class SocialFeedServiceImpl implements SocialFeedService
 {
+    private static final String GMAIL_REPLY_REGEX = ".*On.*(\\s+\\n+\\r+)?\\n*\\s*wrote:";
+    private static final String OUTLOOK_EMAIL_REGEX = "From:\\s*\\w+\\s*Sent: \\w+(\\s+\\w+)*";
     private static final String REPLIED_VIA_EMAIL_TEXT = "Replied via email by <b class='soc-mon-bold-text'> %s </b>";
     private static final Logger LOG = LoggerFactory.getLogger( SocialFeedServiceImpl.class );
     @Autowired
@@ -102,6 +103,9 @@ public class SocialFeedServiceImpl implements SocialFeedService
     
     @Autowired
     private EmailServices emailServices;
+    
+    @Autowired
+    private JsoupHtmlToTextUtils jsoupHtmlToTextUtils;
     
     @Value("${SOCIAL_FEEDS_ARCHIVE_DAYS_BEFORE}")
     private int archiveSocialFeedBeforeDays;
@@ -957,7 +961,7 @@ public class SocialFeedServiceImpl implements SocialFeedService
         actionHistory.setCreatedDate( new Date().getTime() );
         actionHistory.setText( String.format( REPLIED_VIA_EMAIL_TEXT, mailFrom ) );
         actionHistory.setOwnerName( mailFrom );
-        actionHistory.setMessage( getTextFromHtmlBody(mailBody));
+        actionHistory.setMessage( extractReplyFromHtml(mailBody));
 
         mongoSocialFeedDao.updateActionHistory( postId, actionHistory );
 
@@ -965,26 +969,24 @@ public class SocialFeedServiceImpl implements SocialFeedService
     }
     
 
-    private String getTextFromHtmlBody( String html )
+    /**
+     * Method to extract reply from email chain
+     * @param mailBodyHtml
+     * @return
+     */
+    private String extractReplyFromHtml( String mailBodyHtml )
     {
-        LOG.debug( "Inside method getTextFromHtmlBody" );
-        Document doc;
-        doc = Jsoup.parse( html );
-        Elements htmlLines = doc.select( "div" );
-        StringBuilder htmlText = new StringBuilder();
-        if ( htmlLines != null && htmlLines.size() > 0 ) {
-            for ( Element node : htmlLines.get( 0 ).getAllElements() ) {
-                if ( node.nodeName().equals( "br" ) ) {
-                    htmlText.append( "\n" );
-                } else if ( node.hasText() ) {
-                    htmlText.append( node.ownText() ).append( "\n" );
-                }
-            }
-        } else {
-            return html;
+        Document doc = Jsoup.parse( mailBodyHtml );
+        String mailBodyText = jsoupHtmlToTextUtils.getPlainText( doc );
+        String[] replyTextArr = mailBodyText.split( OUTLOOK_EMAIL_REGEX );
+        if ( replyTextArr.length > 1 ) {
+            return replyTextArr[0];
         }
-        LOG.debug( "End of method getTextFromHtmlBody" );
-        return htmlText.toString();
+        replyTextArr = mailBodyText.split( GMAIL_REPLY_REGEX );
+        if ( replyTextArr.length > 1 ) {
+            return replyTextArr[0];
+        }
+        return mailBodyText;
     }
 } 
 
