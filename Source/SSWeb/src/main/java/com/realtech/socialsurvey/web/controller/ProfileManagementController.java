@@ -332,7 +332,7 @@ public class ProfileManagementController
                 regionProfile.setDisclaimer( disclaimer );
                 regionProfile.setHiddenSection( companyProfile.isHiddenSection() );
                 //unset web address in edit profile if it's not for same heirarchy
-                unsetWebAdd(map,regionProfile,entityType);
+                //unsetWebAdd(map,regionProfile,entityType);
                 String json = new Gson().toJson( regionProfile );
                 model.addAttribute( "profileJson", json );
 
@@ -400,7 +400,7 @@ public class ProfileManagementController
                 branchProfile.setHiddenSection( companyProfile.isHiddenSection() );
 
                 //unset web address in edit profile if it's not for same heirarchy
-                unsetWebAdd(map,branchProfile,entityType);
+                //unsetWebAdd(map,branchProfile,entityType);
                 
                 String json = new Gson().toJson( branchProfile );
                 model.addAttribute( "profileJson", json );
@@ -481,7 +481,7 @@ public class ProfileManagementController
                 individualProfile.setHiddenSection( companyProfile.isHiddenSection() );
 
                 //unset web address in edit profile if it's not for same heirarchy
-                unsetWebAdd(map,individualProfile,entityType);
+                //unsetWebAdd(map,individualProfile,entityType);
                 String json = new Gson().toJson( individualProfile );
                 model.addAttribute( "profileJson", json );
                 model.addAttribute( "companyProfileName", companyProfile.getProfileName() );
