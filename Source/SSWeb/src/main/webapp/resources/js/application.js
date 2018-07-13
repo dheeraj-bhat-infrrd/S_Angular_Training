@@ -18305,7 +18305,6 @@ function drawStreamPage(streamPostList){
 					$('#act-cont'+postId+'-'+j).find('.action-mail-icn').removeClass('hide');
 				}
 				$('#act-cont'+postId+'-'+j).addClass('stream-action-mail');
-				$('#act-cont'+postId+'-'+j).find('.act-details-msg-text').html(sortedActionHistory[j].message);
 				
 				if(sortedActionHistory[j].messageType == 'EMAIL_REPLY'){
 					$('#act-cont'+postId+'-'+j).find('.act-action').removeClass('hide');
@@ -18313,6 +18312,9 @@ function drawStreamPage(streamPostList){
 					$('#act-cont'+postId+'-'+j).find('.act-details-msg-type').removeClass('hide');
 					$('#act-cont'+postId+'-'+j).find('.act-action-msg').removeClass('hide');
 					$('#act-cont'+postId+'-'+j).find('.act-details-msg-type').html('Email reply');
+					$('#act-cont'+postId+'-'+j).find('.act-details-msg-text').html("<pre class='email-reply-text'>"+sortedActionHistory[j].message+"</pre>");
+				} else {
+					$('#act-cont'+postId+'-'+j).find('.act-details-msg-text').html(sortedActionHistory[j].message);
 				}
 			}else{
 				$('#act-cont'+postId+'-'+j).find('.action-icn').removeClass('hide');
