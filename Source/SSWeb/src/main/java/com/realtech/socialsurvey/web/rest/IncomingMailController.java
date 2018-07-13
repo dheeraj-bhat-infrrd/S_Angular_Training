@@ -1,6 +1,8 @@
 package com.realtech.socialsurvey.web.rest;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -12,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -89,11 +92,7 @@ public class IncomingMailController
         String mailTo = request.getParameter( "to" );
         String headers = request.getParameter( "headers" );
         
-        LOG.info( "HTML from sendgrid, {}",  mailBody);
-        LOG.info( "subject from sendgrid, {}",  subject);
-        LOG.info( "mailto from sendgrid, {}",  mailTo);
-        LOG.info( "mailFrom from sendgrid, {}",  mailFrom);
-        LOG.info( "headers from sendgrid, {}",  headers);
+        LOG.debug( "HTML from sendgrid, {}",  mailBody);
 
         if ( mailFrom == null || mailFrom.isEmpty() ) {
             LOG.error( "From address is missing from request" );
@@ -120,17 +119,17 @@ public class IncomingMailController
         }
         
 
-        LOG.info( "Proceeding to resolve mailTo : " + mailTo );
-        LOG.info( "subject:" +subject + "\n mailFrom:" + mailFrom + "\n mailTo:" +mailTo+ "\n header:" +headers);
+        LOG.info( "Proceeding to resolve mailTo : {}", mailTo );
+        LOG.info( "subject: {}\n mailFrom: {}\n mailTo: {}\n header: {}",subject, mailFrom, mailTo, headers);
         String sendUsingDomain = getDefaultDomainFromEmail(mailTo);
-        LOG.info( "finished getDefaultDomainFromTo and the sendUsingDomain :" +sendUsingDomain );
+        LOG.info( "finished getDefaultDomainFromTo and the sendUsingDomain :{}",sendUsingDomain );
         
         String postId = getPostIdFromMailTo( mailTo, sendUsingDomain );
         
         if(postId != null) {
             List<String> senderInfo = retrieveSenderInfoFromMailId( mailFrom );
             String senderName = mailFrom;
-            if(senderInfo.isEmpty()) {
+            if(!CollectionUtils.isEmpty( senderInfo )) {
                 senderName = senderInfo.get( 0 );
             }
             socialFeedService.addEmailReplyAsCommentToSocialPost(postId,senderName, mailTo, mailBody, subject );
@@ -142,8 +141,8 @@ public class IncomingMailController
             LOG.error( "Resolved Mail id found null or empty" );
             return CommonConstants.SENDGRID_OK_STATUS;
         }
-        LOG.info( "Resolved mailTo : " + resolvedMailto );
-        LOG.info( "Proceeding to retrieve sender information from mailFrom :" + mailFrom );
+        LOG.info( "Resolved mailTo : {}", resolvedMailto );
+        LOG.info( "Proceeding to retrieve sender information from mailFrom :{}", mailFrom );
         List<String> senderInfo = retrieveSenderInfoFromMailId( mailFrom );
         if ( senderInfo == null || senderInfo.isEmpty() ) {
             LOG.error( "Sender Info found null or empty" );
@@ -155,7 +154,7 @@ public class IncomingMailController
             LOG.error( "Message ID found null or empty" );
             return CommonConstants.SENDGRID_OK_STATUS;
         }
-        LOG.info( "Message Id : " + messageId );
+        LOG.info( "Message Id : {}", messageId );
         LOG.info( "calling forwardCustomerReplyMail" );
         emailServices.forwardCustomerReplyMail( resolvedMailto, subject, mailBody, senderInfo.get( 0 ), senderInfo.get( 1 ),
             messageId , sendUsingDomain);
@@ -215,7 +214,7 @@ public class IncomingMailController
         if ( agentRegexMatcher.find() ) {
             LOG.info( "Mail id belongs to agent mail id format" );
             String userEncryptedId = agentRegexMatcher.group( 1 );
-            LOG.info( "userEncryptedId id from the mail id is " + userEncryptedId );
+            LOG.info( "userEncryptedId id from the mail id is {}", userEncryptedId );
             ContactDetailsSettings contactDetailsSettings = userManagementService.fetchAgentContactDetailByEncryptedId( userEncryptedId );
             if(contactDetailsSettings != null && contactDetailsSettings.getMail_ids() != null  )
                 resolvedMailId = contactDetailsSettings.getMail_ids().getWork();
@@ -234,7 +233,7 @@ public class IncomingMailController
 	        .contains( NULL_USER_EMAIL_ADDRESS ) || mailTo.contains( NULL_USER_EMAIL_ADDRESS_DEMO ) ) {
 	        resolvedMailId = applicationAdminEmail;
         }
-        LOG.info( "Mail id resolved to : " + resolvedMailId );
+        LOG.info( "Mail id resolved to : {}", resolvedMailId );
         LOG.info( "Method resolveMailTo() call ended to resolve mail to email id" );
         return resolvedMailId;
     }
@@ -263,20 +262,20 @@ public class IncomingMailController
     }
 
 
-    private List<String> retrieveSenderInfoFromMailId( String mailFrom ) throws NumberFormatException, InvalidInputException
+    private List<String> retrieveSenderInfoFromMailId( String mailFrom )
     {
         if ( mailFrom == null || mailFrom.isEmpty() ) {
             LOG.error( "Mail From passed cannot be null or empty" );
-            return null;
+            return Collections.emptyList();
         }
         LOG.info( "Method retrieveSenderInfoFromMailId() called to retrieve sender information from mail from id" );
-        List<String> senderInfo = new ArrayList<String>();
+        List<String> senderInfo = new ArrayList<>();
         String parts[] = mailFrom.split( "<" );
         if ( parts.length == 2 ) {
             senderInfo.add( parts[0].trim() );
             senderInfo.add( parts[1].replaceAll( ">", "" ).trim() );
         }
-        LOG.info( "Sender Information : " + senderInfo );
+        LOG.info( "Sender Information : {}", senderInfo );
         LOG.info( "Method retrieveSenderInfoFromMailId() call ended to retrieve sender information from mail from id" );
         return senderInfo;
     }
@@ -294,7 +293,9 @@ public class IncomingMailController
         Pattern pattern = Pattern.compile( messageIDRegex );
         Matcher matcher = pattern.matcher( headers );
         if ( matcher.find() ) {
-            LOG.info( "Found Message id in message header : " + matcher.group( 1 ) );
+            if(LOG.isDebugEnabled()) {
+                LOG.debug( "Found Message id in message header : {}", matcher.group( 1 ) );
+            }
             return matcher.group( 1 ).trim();
         }
         LOG.error( "Could not find message Id in the header" );

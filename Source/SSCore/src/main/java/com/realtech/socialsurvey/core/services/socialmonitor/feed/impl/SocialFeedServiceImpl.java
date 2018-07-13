@@ -11,8 +11,6 @@ import javax.annotation.Resource;
 
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,8 +70,6 @@ import com.realtech.socialsurvey.core.utils.JsoupHtmlToTextUtils;
 @Component
 public class SocialFeedServiceImpl implements SocialFeedService
 {
-    private static final String GMAIL_REPLY_REGEX = ".\\n*On.*(\\s+\\n+\\r+)? wrote:";
-    private static final String OUTLOOK_EMAIL_REGEX = "From:.*Sent:.*To:";
     private static final String REPLIED_VIA_EMAIL_TEXT = "Replied via email by <b class='soc-mon-bold-text'> %s </b>";
     private static final Logger LOG = LoggerFactory.getLogger( SocialFeedServiceImpl.class );
     @Autowired
@@ -961,32 +957,11 @@ public class SocialFeedServiceImpl implements SocialFeedService
         actionHistory.setCreatedDate( new Date().getTime() );
         actionHistory.setText( String.format( REPLIED_VIA_EMAIL_TEXT, mailFrom ) );
         actionHistory.setOwnerName( mailFrom );
-        actionHistory.setMessage( extractReplyFromHtml(mailBody));
+        actionHistory.setMessage(jsoupHtmlToTextUtils.extractReplyFromHtml(mailBody));
 
         mongoSocialFeedDao.updateActionHistory( postId, actionHistory );
 
         LOG.info( "Method addEmailReplyAsCommentToSocialPost, successfully added comment in post id for post id {}", postId );
-    }
-    
-
-    /**
-     * Method to extract reply from email chain
-     * @param mailBodyHtml
-     * @return
-     */
-    private String extractReplyFromHtml( String mailBodyHtml )
-    {
-        Document doc = Jsoup.parse( mailBodyHtml );
-        String mailBodyText = jsoupHtmlToTextUtils.getPlainText( doc );
-        String[] replyTextArr = mailBodyText.split( OUTLOOK_EMAIL_REGEX );
-        if ( replyTextArr.length > 1 ) {
-            return replyTextArr[0];
-        }
-        replyTextArr = mailBodyText.split( GMAIL_REPLY_REGEX );
-        if ( replyTextArr.length > 1 ) {
-            return replyTextArr[0];
-        }
-        return mailBodyText;
     }
 } 
 
