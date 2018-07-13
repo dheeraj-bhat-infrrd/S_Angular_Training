@@ -17,6 +17,13 @@ public class TransactionInfoPutVO {
  	private String customer2LastName;
  	private String customer2Email;
  	
+    private String buyerFirstName;
+    private String buyerLastName;
+    private String buyerEmail;
+    private String sellerFirstName;
+    private String sellerLastName;
+    private String sellerEmail;
+ 	
  	 //adding property address feild 
     private String propertyAddress;
 
@@ -95,6 +102,54 @@ public class TransactionInfoPutVO {
     public void setPropertyAddress( String propertyAddress )
     {
         this.propertyAddress = propertyAddress;
+    }
+    public String getBuyerFirstName()
+    {
+        return buyerFirstName;
+    }
+    public void setBuyerFirstName( String buyerFirstName )
+    {
+        this.buyerFirstName = buyerFirstName;
+    }
+    public String getBuyerLastName()
+    {
+        return buyerLastName;
+    }
+    public void setBuyerLastName( String buyerLastName )
+    {
+        this.buyerLastName = buyerLastName;
+    }
+    public String getBuyerEmail()
+    {
+        return buyerEmail;
+    }
+    public void setBuyerEmail( String buyerEmail )
+    {
+        this.buyerEmail = buyerEmail;
+    }
+    public String getSellerFirstName()
+    {
+        return sellerFirstName;
+    }
+    public void setSellerFirstName( String sellerFirstName )
+    {
+        this.sellerFirstName = sellerFirstName;
+    }
+    public String getSellerLastName()
+    {
+        return sellerLastName;
+    }
+    public void setSellerLastName( String sellerLastName )
+    {
+        this.sellerLastName = sellerLastName;
+    }
+    public String getSellerEmail()
+    {
+        return sellerEmail;
+    }
+    public void setSellerEmail( String sellerEmail )
+    {
+        this.sellerEmail = sellerEmail;
     }
 	 
 	
