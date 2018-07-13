@@ -7,7 +7,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.sql.Timestamp;
 import java.text.DateFormat;
@@ -38,10 +37,9 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-import org.slf4j.MarkerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -53,15 +51,16 @@ import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
+import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.dao.RegionDao;
 import com.realtech.socialsurvey.core.dao.SurveyCsvUploadDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.SurveyPreInitiationDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
-import com.realtech.socialsurvey.core.dao.impl.MongoSurveyDetailsDaoImpl;
 import com.realtech.socialsurvey.core.entities.AbusiveSurveyReportWrapper;
 import com.realtech.socialsurvey.core.entities.AgentMediaPostDetails;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
@@ -264,6 +263,13 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     
     @Autowired
     private EmailUnsubscribeService unsubscribeService;
+    
+    @javax.annotation.Resource
+    @Qualifier ( "branch")
+    private BranchDao branchDao;
+    
+    @Autowired
+    private RegionDao regionDao;
 
     private static final int USER_EMAIL_ID_INDEX = 3;
     private static final int SURVEY_SOURCE_ID_INDEX = 2;
@@ -1384,16 +1390,27 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
         }
         
         String unsubscribedUrl = buildUnsubscribedUrl( user.getUserId(), custEmail, user.getCompany().getCompanyId() );
+        Branch branch = branchDao.findById( Branch.class, branchId );
+        String branchName = "";
+        if(branch.getIsDefaultBySystem() == 0) {
+            branchName = branch.getBranch();
+        }
+        Region region = regionDao.findById( Region.class, regionId );
+        String regionName = "";
+        if(region.getIsDefaultBySystem() == 0) {
+            regionName = region.getRegion();
+        }
         //replace the legends
         mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, null, custFirstName,
             custLastName, agentName, agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ),
-            currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone, unsubscribedUrl,
-            user.getUserId() );
+            currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone,
+            unsubscribedUrl,user.getUserId(), branchName, regionName );
+
 
         mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, null, custFirstName,
             custLastName, agentName ,agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ),
             currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone, unsubscribedUrl,
-            user.getUserId() );
+            user.getUserId(), branchName, regionName );
 
         //JIRA SS-473 end
 
@@ -1540,12 +1557,22 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             if ( agentSettings.getLicenses() != null && agentSettings.getLicenses().getAuthorized_in() != null ) {
                 agentLicenses = StringUtils.join( agentSettings.getLicenses().getAuthorized_in(), ',' );
             }
-            
+
             String unsubscribedUrl = buildUnsubscribedUrl( user.getUserId(), custEmail, user.getCompany().getCompanyId() );
+            Branch branch = branchDao.findById( Branch.class, branchId );
+            String branchName = "";
+            if(branch.getIsDefaultBySystem() == 0) {
+                branchName = branch.getBranch();
+            }
+            Region region = regionDao.findById( Region.class, regionId );
+            String regionName = "";
+            if(region.getIsDefaultBySystem() == 0) {
+                regionName = region.getRegion();
+            }
             mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, null, custFirstName,
                 custLastName, agentName, agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName,
                 dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer,
-                agentDisclaimer, agentLicenses, agentTitle, agentPhone, unsubscribedUrl, user.getUserId() );
+                agentDisclaimer, agentLicenses, agentTitle, agentPhone, unsubscribedUrl, user.getUserId(), branchName, regionName );
 
             String mailSubject = surveyCompletionUnpleasant.getMail_subject();
             if ( mailSubject == null || mailSubject.isEmpty() ) {
@@ -1555,7 +1582,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, null, custFirstName,
                 custLastName, agentName, agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName,
                 dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer,
-                agentDisclaimer, agentLicenses, agentTitle, agentPhone, unsubscribedUrl, user.getUserId() );
+                agentDisclaimer, agentLicenses, agentTitle, agentPhone, unsubscribedUrl, user.getUserId(), branchName, regionName );
             //JIRA SS-473 end
 
             //For Company with hidden agents
@@ -1712,16 +1739,26 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
             agentLicenses = StringUtils.join( agentSettings.getLicenses().getAuthorized_in(), ',' );
         }
         String unsubscribedUrl = buildUnsubscribedUrl( user.getUserId(), custEmail, user.getCompany().getCompanyId() );
+        Branch branch = branchDao.findById( Branch.class, branchId );
+        String branchName = "";
+        if(branch.getIsDefaultBySystem() == 0) {
+            branchName = branch.getBranch();
+        }
+        Region region = regionDao.findById( Region.class, regionId );
+        String regionName = "";
+        if(region.getIsDefaultBySystem() == 0) {
+            regionName = region.getRegion();
+        }
         //replace legends
         mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, applicationBaseUrl, logoUrl, "", custFirstName,
             custLastName, agentName, agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ),
-            currentYear, fullAddress, links, user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone, unsubscribedUrl,
-            user.getUserId() );
+            currentYear, fullAddress, links, user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone,
+            unsubscribedUrl, user.getUserId(), branchName, regionName);
 
         mailBody = emailFormatHelper.replaceLegends( false, mailBody, applicationBaseUrl, logoUrl, "", custFirstName,
             custLastName, agentName, agentFirstName, agentSignature, custEmail, user.getEmailId(), companyName, dateFormat.format( new Date() ),
-            currentYear, fullAddress, links, user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone, unsubscribedUrl,
-            user.getUserId() );
+            currentYear, fullAddress, links, user.getProfileName(), companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone,
+            unsubscribedUrl,user.getUserId(), branchName, regionName);
         //JIRA SS-473 end
 
 
@@ -4481,14 +4518,15 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 				survey.setAgentName(user.getFirstName() + user.getLastName() == null ? "" : " " + user.getLastName());
 			}
 
-            //if borrower email is equal to coborrower email , we set the status of the survey to duplicate
-            //but status should change from STATUS_SURVEYPREINITIATION_NOT_PROCESSED to SURVEY_STATUS_PRE_INITIATED
-            //and not from STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD to SURVEY_STATUS_PRE_INITIATED
-            if ( survey.getStatus() != CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD ) {
-                //update status
-                survey.setStatus( CommonConstants.SURVEY_STATUS_PRE_INITIATED );
-            }
-		} else {
+			//if borrower email is equal to coborrower email , we set the status of the survey to duplicate
+			//but status should change from STATUS_SURVEYPREINITIATION_NOT_PROCESSED to SURVEY_STATUS_PRE_INITIATED
+			//and not from STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD to SURVEY_STATUS_PRE_INITIATED
+			if(survey.getStatus() != CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD) {
+			  //update status
+                survey.setStatus(CommonConstants.SURVEY_STATUS_PRE_INITIATED);  
+			}
+		}//The status shouldn't be marked as mismatched if it's a duplicate 
+		else if(survey.getStatus() != CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD){
 			// user is not present so mark record as mismatch
 			survey.setStatus(CommonConstants.STATUS_SURVEYPREINITIATION_MISMATCH_RECORD);
 		}

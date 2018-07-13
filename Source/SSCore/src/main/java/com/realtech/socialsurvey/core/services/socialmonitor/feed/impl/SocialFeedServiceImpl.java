@@ -11,10 +11,6 @@ import javax.annotation.Resource;
 
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +59,7 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.socialmonitor.feed.SocialFeedService;
+import com.realtech.socialsurvey.core.utils.JsoupHtmlToTextUtils;
 
 
 /**
@@ -102,6 +99,9 @@ public class SocialFeedServiceImpl implements SocialFeedService
     
     @Autowired
     private EmailServices emailServices;
+    
+    @Autowired
+    private JsoupHtmlToTextUtils jsoupHtmlToTextUtils;
     
     @Value("${SOCIAL_FEEDS_ARCHIVE_DAYS_BEFORE}")
     private int archiveSocialFeedBeforeDays;
@@ -957,34 +957,11 @@ public class SocialFeedServiceImpl implements SocialFeedService
         actionHistory.setCreatedDate( new Date().getTime() );
         actionHistory.setText( String.format( REPLIED_VIA_EMAIL_TEXT, mailFrom ) );
         actionHistory.setOwnerName( mailFrom );
-        actionHistory.setMessage( getTextFromHtmlBody(mailBody));
+        actionHistory.setMessage(jsoupHtmlToTextUtils.extractReplyFromHtml(mailBody));
 
         mongoSocialFeedDao.updateActionHistory( postId, actionHistory );
 
         LOG.info( "Method addEmailReplyAsCommentToSocialPost, successfully added comment in post id for post id {}", postId );
-    }
-    
-
-    private String getTextFromHtmlBody( String html )
-    {
-        LOG.debug( "Inside method getTextFromHtmlBody" );
-        Document doc;
-        doc = Jsoup.parse( html );
-        Elements htmlLines = doc.select( "div" );
-        StringBuilder htmlText = new StringBuilder();
-        if ( htmlLines != null && htmlLines.size() > 0 ) {
-            for ( Element node : htmlLines.get( 0 ).getAllElements() ) {
-                if ( node.nodeName().equals( "br" ) ) {
-                    htmlText.append( "\n" );
-                } else if ( node.hasText() ) {
-                    htmlText.append( node.ownText() ).append( "\n" );
-                }
-            }
-        } else {
-            return html;
-        }
-        LOG.debug( "End of method getTextFromHtmlBody" );
-        return htmlText.toString();
     }
 } 
 

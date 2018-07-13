@@ -12457,3 +12457,9 @@ img.lead-img {
     border-radius: 50%;
 }
 
+pre.email-reply-text {
+	background: transparent;
+	border: 0px;
+	font-family: inherit;
+	margin-bottom: 0px;
+}

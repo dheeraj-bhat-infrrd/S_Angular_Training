@@ -9,7 +9,6 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -64,7 +63,6 @@ import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyIgnoredEmailMapping;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.EmailAttachment;
-import com.realtech.socialsurvey.core.entities.FileUpload;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -897,6 +895,39 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         queries.put( CommonConstants.EMAIL_ID, emailId );
         queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
         List<UserEmailMapping> userEmailMappings = userEmailMappingDao.findByKeyValue( UserEmailMapping.class, queries );
+        if ( userEmailMappings == null || userEmailMappings.isEmpty() ) {
+            User user = userDao.getActiveUser( emailId );
+            return user;
+        } else {
+            return userEmailMappings.get( CommonConstants.INITIAL_INDEX ).getUser();
+        }
+    }
+
+
+    /**
+     * Method to get user by email address and companyId from userEmailMapping
+     * @param emailId
+     * @return
+     * @throws InvalidInputException
+     * @throws NoRecordsFetchedException
+     */
+    @Transactional
+    @Override
+    public User getUserByEmailAndCompanyFromUserEmailMappings( long companyId, String emailId )
+        throws InvalidInputException, NoRecordsFetchedException
+    {
+        LOG.debug( "Method getUserByEmailAndCompanyFromUserEmailMappings having emailId : {} companyId:{} started.", emailId,
+            companyId );
+        if ( emailId == null || emailId.isEmpty() ) {
+            throw new InvalidInputException( "Email id is null or empty" );
+        }
+
+        Map<String, Object> queries = new HashMap<>();
+        queries.put( CommonConstants.EMAIL_ID, emailId );
+        queries.put( CommonConstants.COMPANY + "." + CommonConstants.COMPANY_ID_COLUMN, companyId );
+        queries.put( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE );
+        List<UserEmailMapping> userEmailMappings = userEmailMappingDao.findByKeyValue( UserEmailMapping.class, queries );
+        LOG.info( "List of UserEmailMapping got by getUserByEmailAddress: {} ", userEmailMappings );
         if ( userEmailMappings == null || userEmailMappings.isEmpty() ) {
             User user = userDao.getActiveUser( emailId );
             return user;
@@ -3783,10 +3814,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
             throw new NoRecordsFetchedException( "No company found with the id " + companyId );
         }
 
-        User user = getUserByEmailAddress( emailId );
-        if ( user.getCompany().getCompanyId() != companyId ) {
-            throw new NoRecordsFetchedException( "No agent found in given company" );
-        }
+        User user = getUserByEmailAndCompanyFromUserEmailMappings( companyId, emailId );
         
         List<UserProfile> userProfiles = user.getUserProfiles();
         for(UserProfile profile : userProfiles){

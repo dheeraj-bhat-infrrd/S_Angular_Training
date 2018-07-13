@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
@@ -31,6 +30,7 @@ import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.DigestRequestData;
 import com.realtech.socialsurvey.core.entities.EmailAttachment;
 import com.realtech.socialsurvey.core.entities.EmailEntity;
@@ -1281,7 +1281,10 @@ public class EmailServicesImpl implements EmailServices
             throw new InvalidInputException( "Recipient email Id is empty or null for sending survey completion mail " );
         }
 
-        Map<String, String> branchAndRegion = branchDao.getBranchAndRegionName( regionId, branchId );
+        Branch branch = branchDao.findById( Branch.class, branchId );
+        
+        String branchName = (branch.getIsDefaultBySystem() == 0 ) ? branch.getBranch() : "";
+        String regionName = (branch.getRegion().getIsDefaultBySystem() == 0) ? branch.getRegion().getRegion() : "";
 
         String companyName = user.getCompany().getCompany();
         String agentSignature = emailFormatHelper.buildAgentSignature( agentName, agentPhone, agentTitle, companyName );
@@ -1321,12 +1324,12 @@ public class EmailServicesImpl implements EmailServices
         mailSubject = emailFormatHelper.replaceLegends( true, mailSubject, appBaseUrl, logoUrl, shortSurveyLink,
             customerFirstName, customerLastName, agentName, agentFirstName, agentSignature, customerEmailId, user.getEmailId(),
             companyName, dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(),
-            companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone, unsubscribedURL, agentId );
+            companyDisclaimer, agentDisclaimer, agentLicenses, agentTitle, agentPhone, unsubscribedURL,agentId,branchName,regionName);
 
         mailBody = emailFormatHelper.replaceLegends( false, mailBody, appBaseUrl, logoUrl, shortSurveyLink, customerFirstName,
             customerLastName, agentName, agentFirstName, agentSignature, customerEmailId, user.getEmailId(), companyName,
             dateFormat.format( new Date() ), currentYear, fullAddress, "", user.getProfileName(), companyDisclaimer,
-            agentDisclaimer, agentLicenses, agentTitle, agentPhone, unsubscribedURL, agentId );
+            agentDisclaimer, agentLicenses, agentTitle, agentPhone, unsubscribedURL,agentId,branchName,regionName);
 
         //send the email
         if ( mailSubject == null || mailSubject.isEmpty() ) {
@@ -1335,8 +1338,8 @@ public class EmailServicesImpl implements EmailServices
         }
         emailEntity.setMailType( emailType );
         emailEntity.setRecipientsName( Arrays.asList( customerFirstName + " " + customerLastName ) );
-        emailEntity.setBranchName( branchAndRegion.get( CommonConstants.BRANCH_NAME_COLUMN ) );
-        emailEntity.setRegionName( branchAndRegion.get( CommonConstants.REGION_COLUMN ) );
+        emailEntity.setBranchName( branch.getBranch() );
+        emailEntity.setRegionName( branch.getRegion().getRegion() );
         emailEntity.setCompanyId( companyId );
         emailEntity.setSurveySourceId( surveySourceId );
         emailEntity.setRegionId( regionId );
