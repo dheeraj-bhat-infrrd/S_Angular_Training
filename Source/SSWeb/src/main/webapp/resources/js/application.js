@@ -402,9 +402,9 @@ $(document).on('click', function(e) {
 		$('#macro-alerts-chevron-up').toggle();
 	}
 
-	if ($('#summit-popup-body').is(':visible')) {
+	/*if ($('#summit-popup-body').is(':visible')) {
 		closeSummitPopup();
-	} 
+	} */
 	
 
 	if ($('#add-macro-action-options').is(':visible')) {
@@ -556,9 +556,9 @@ $(document).on('keyup', function(e) {
 			$('#macro-action-chevron-down').toggle();
 			$('#macro-action-chevron-up').toggle();
 		}
-		if ($('#summit-popup-body').is(':visible')) {
+		/*if ($('#summit-popup-body').is(':visible')) {
 			closeSummitPopup();
-		}
+		}*/
 	}
 });
 
