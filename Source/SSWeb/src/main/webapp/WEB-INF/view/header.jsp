@@ -33,7 +33,7 @@
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/spectrum.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/fontselector.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/prettify.css">
-	<link rel="stylesheet" href="${initParam.resourcesPath}/widget/css/widget.css">
+	<link rel="stylesheet" href="${initParam.widgetResourcesPath}/widget/css/widget.css">
 </head>
 <body>
 	<div id="overlay-linkedin-import" class="overlay-login overlay-main hide"></div>

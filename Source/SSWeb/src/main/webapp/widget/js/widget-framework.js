@@ -237,7 +237,7 @@ function drawWidgetReviews($, widgetDetails, profileName, profileLevel, companyP
 	};
 
 	callAjaxGetWithPayloadJsonpData($, ssHost +'/rest/widget/getreviews', function(data) {
-		paintWidgetReviews($, data);
+		paintWidgetReviews($, data, resourcesHost, ssHost);
 		paintWidgetReviewStyles($, widgetDetails);
 
 		var initialNumberOfReviews = parseInt($('#ss-widget-review-div').attr('data-initalRev'));
