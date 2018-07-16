@@ -1,0 +1,431 @@
+.w-100 {
+    width: 100%!important;
+}
+
+.widget-btns {
+    background: #247ac2;
+    margin-top: 15px;
+    text-align: center;
+    color: white;
+    text-transform: uppercase;
+    font-size: 12px;
+    height: 25px;
+    border-radius: 3px;
+    line-height: 25px;
+    cursor:pointer;
+}
+
+.widget-pad-zero{
+	padding:0;
+}
+
+.widget-left-pad-zero{
+	padding-left:0;
+}
+
+.widget-right-pad-zero{
+	padding-right:0;
+}
+
+.ss-widget-rating{
+	color: #247ac2;
+    text-align:  center;
+    font-size: 33px;
+}
+
+.ss-widget-rating-stars{
+	text-align:  center;
+    color: #247ac2;
+    font-size:  16px;
+    display:flex;
+}
+
+.ss-widget-rev-count{
+	text-align:  center;
+    font-size: 11px;
+    font-weight:  bold !important;
+    color:  #868686;
+}
+
+.widget-contact-us-btn{
+	opacity:0.8;
+	margin-top:5px;
+}
+
+.ss-widget-rating-details{
+	background: #247ac2;
+    color: #f1f1f1;
+    font-size: 11px;
+    height:  22px;
+    line-height:  22px;
+    cursor: pointer;
+    margin-top:  15px;
+}
+
+.ss-widget-rating-cont{
+	margin-top: 15px;
+}
+
+.ss-widget-star-cont{
+	padding: 0;
+    display:  flex;
+    margin-top:  5px;
+}
+
+.ss-widget-rating-bar{
+	height:18px;
+}
+
+.ss-widget-rating-perc{
+	font-size: 11px;
+    font-weight:  bold !important;
+}
+
+.widget-star-blue{
+	color: #247ac2;
+}
+
+.widget-blue-bar{
+	background: #247ac2;
+}
+
+.widget-star-green{
+	color: #38c260;
+}
+
+.widget-green-bar{
+	background: #38c260;
+}
+
+.widget-star-yellow{
+	color: #fed71c;
+}
+
+.widget-yellow-bar{
+	background: #fed71c;
+}
+
+.widget-star-orange{
+	color: #fdb63a;
+}
+
+.widget-orange-bar{
+	background: #fdb63a;
+}
+
+.widget-star-red{
+	color: #fc7640;
+}
+
+.widget-red-bar{
+	background: #fc7640;
+}
+
+.ss-widget-opt-cont{
+	padding: 0;
+    background: #247ac2;
+    color: #f1f1f1;
+    font-size:  11px;
+}
+
+.ss-widget-rating-detils-container{
+	 margin-bottom:  15px;
+}
+
+.ss-widget-opt-text{
+    line-height:  25px;
+}
+
+.ss-widget-options-dropdown{
+	margin-top:10px;	
+}
+
+.ss-widget-opt{
+	text-align:  left;
+    padding-right:  0;
+    padding-left:  10px;
+    padding-bottom:  10px;
+}
+
+.ss-widget-opt-head-text{
+	font-weight:  bold !important;
+    padding-bottom: 10px;
+}
+
+.ss-widget-order-cont{
+	text-align:right;
+}
+
+.ss-widget-order-text{
+	margin-bottom:  5px;
+	cursor: pointer
+}
+
+.ss-widget-rev-cont{
+	border: 1px solid #c9ddef;
+    padding-left: 0;
+    padding-right: 0;
+    padding-bottom: 10px;
+}
+
+.ss-widget-rev-head{
+	background: #247ac2;
+    color: #f1f1f1;
+    font-size: 11px;
+    height: 25px;
+    line-height: 23px;
+    padding: 0 15px;
+}
+
+.ss-widget-rev{
+	border-bottom: 2px solid #8fbae0;
+    padding-top: 10px;
+    padding-bottom:  10px;
+    max-height: 240px;
+}
+
+.ss-widget-rev-date{
+	font-size:  8px;
+    font-weight:  bold !important;
+}
+
+.ss-widget-prov-by{
+	font-size: 8px;
+}
+
+.ss-widget-prov-source{
+	width: 50px;
+    margin-left:  10px;
+}
+
+.ss-widget-rev-details{
+	display:  flex;
+    margin-top:  10px;
+    padding-left:  0;
+}
+
+.ss-widget-prof-pic-cont{
+	width: 50px;
+    height: 50px;
+}
+
+.ss-widget-prof-pic{
+	width: 50px;
+    height: 50px;
+    border-radius: 50%;
+}
+
+.ss-widget-rev-prof-details{
+	margin-left: 15px;
+	line-height: 16px;
+}
+
+.ss-widget-rev-prof-name{
+	font-size: 12px;
+    font-weight:  bold !important;
+    color: black;
+    margin-top:  5px;
+}
+
+.ss-widget-rev-prof-title{
+	font-size:  10px;
+}
+
+.ss-widget-rev-stars{
+	padding: 10px 15px 0;
+    font-size:  20px;
+    letter-spacing:  -2px;
+    color: #247ac2;
+    padding-left: 0;
+    display: flex;
+}
+
+.ss-widget-rev-cust-name{
+	font-size:  12px;
+    font-weight:  bold !important;
+    color:  black;
+    padding-left: 0;
+}
+
+.ss-widget-rev-cust-addr{
+	font-size:  10px;
+    font-weight:  bold !important;
+    color: #999;
+}
+
+.ss-widget-rev-text-cont{
+	display: flex;
+    margin-top: 5px;
+    padding-left: 0;
+}
+
+.ss-widget-rev-text-quote{
+	font-size: 40px;
+    color: #d8d8d8;
+    line-height: 40px;
+}
+
+.ss-widget-rev-text{
+	margin-top: 10px;
+	margin-left: 10px;
+	font-size: 12px;
+	max-height: 50px;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+}
+
+.ss-widget-load-more-btn{
+	width: 100px;
+    background: #247ac2;
+    color: white;
+    height: 30px;
+    margin: 20px auto;
+    text-align: center;
+    line-height: 28px;
+    font-weight: bold !important;
+    border-radius: 3px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.ss-widget-powered-by{
+	font-size: 9px;
+    text-align: center;
+}
+
+.ss-widget-text-bold{
+	font-weight: bold !important;
+}
+
+.ss-widget-read-more{
+	right: 0px;
+    position: absolute;
+    bottom: -4px;
+    text-align: center;
+    margin: 0;
+    background: white;
+    line-height:22px;
+}
+
+.ss-widget-half-black-star{
+    width: 8px;
+    overflow:  hidden;
+}
+
+.ss-widget-half-white-star{
+   	margin-left: -8px;
+}
+
+.ss-widget-quat-black-star{
+    width: 6px;
+    overflow:  hidden;
+}
+
+.ss-widget-quat-white-star{
+   	margin-left: -6px;
+}
+
+.ss-widget-3quat-black-star{
+    width: 10px;
+    overflow:  hidden;
+}
+
+.ss-widget-3quat-white-star{
+   	margin-left: -10px;
+}
+
+.ss-widget-star-container{
+	display: flex;
+    width: 15px;
+    margin-right: 3px;
+}
+
+.ss-widget-order-text-active{
+	font-weight: bold !important;
+	font-size: 12px;
+}
+
+.ss-widget-rev-score{
+	color: #999;
+    font-size: 13px;
+    line-height: 28px;
+    margin-left: 8px;
+    letter-spacing: normal;
+}
+
+.ss-wi-verified-badge {
+	background: url(../images/ss-verified-customer.png) no-repeat;
+	cursor: pointer;
+	background-size: contain;
+    background-position:center;
+}
+
+.ss-wi-verify-image{
+	height: 14px;
+    width: 50px;
+    margin-left: 5px;
+}
+
+.ss-wi-zillow-badge{
+	background: url(../images/zillow-badge.png) no-repeat;
+	width: 26px;
+    float: right;
+    background-size: contain;
+    background-position:center;
+}
+
+.ss-wi-verify-image-zillow {
+    height: 14px;
+    width: 50px;
+    margin-left: 5px;
+}
+
+.ss-wi-unverified-badge  {
+    background: url(../images/unverified-customer-badge.png) no-repeat;
+    cursor: pointer;
+    background-size: contain;
+    background-position:center;
+}
+
+.ss-wi-verify-image-ss{
+	height: 14px;
+    width: 50px;
+    margin-left: 5px;
+}
+
+.float-right {
+    float: right;
+}
+
+.ss-widget-star-box{
+	display: flex;
+    margin: 0 auto;
+    margin-top: 5px;
+}
+
+.ss-widget-rating-btn-cont{
+	padding-top:10px;
+}
+
+#ss-widget-dash{
+	position: absolute;
+	width: 100%%;
+	height: 100%;
+	z-index: 9999999;
+	background: url(../images/dashloader.gif) no-repeat center;
+	background-size: 40px 40px;
+	background-color: rgba(255, 255, 255, 0.7);
+}
+
+.ss-widget-default-dp{
+	border: 2px solid #b3b1b1;
+}
+
+.ss-widget-pow-by{
+	line-height: 13px;
+}
+
+.cursor-pointer{
+	cursor:pointer;
+}

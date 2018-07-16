@@ -1683,4 +1683,66 @@ public interface CommonConstants
     public static final String STATUS_NOT_IN_UNSUBSCRIBED_LIST = "Can not resubscribe. Email id not unsubscribed before.";
     public static final String STATUS_SUCCESS_RESUBSCRIBE = "Email id successfully resubscribed.";
     public static final String STATUS_UNSUBSCRIBE_FAILED = "FAILED TO UNSUBSCRIBE";
+    
+    // Widget Constants
+    public static final String WIDGET_CONFIGURATION_COLUMN = "widgetConfiguration";
+    public static final String WIDGET_FONT = "font";
+    public static final String WIDGET_BACKGROUND_COLOR = "backgroundColor";
+    public static final String WIDGET_RATING_AND_STAR_COLOR = "ratingAndStarColor";
+    public static final String WIDGET_BAR_GRAPH_COLOR = "barGraphColor";
+    public static final String WIDGET_FOREGROUND_COLOR = "foregroundColor";
+    public static final String WIDGET_FONT_THEME = "fontTheme";
+    public static final String WIDGET_EMBEDDED_FONT_THEME = "embeddedFontTheme";
+    public static final String WIDGET_MAX_REVIEWS_ON_LOAD_MORE = "maxReviewsOnLoadMore";
+    public static final String WIDGET_INITIAL_NUMBER_OF_REVIEWS = "initialNumberOfReviews";
+    public static final String WIDGET_HIDE_BAR_GRAPH = "hideBarGraph";
+    public static final String WIDGET_HIDE_OPTIONS = "hideOptions";
+    public static final String WIDGET_SORT_ORDER = "reviewSortOrder";
+    public static final String WIDGET_REVIEW_SOURCES = "reviewSources";
+    public static final String WIDGET_ALLOW_MODEST_BRANDING = "allowModestBranding";
+    public static final String WIDGET_HISTORY = "history";
+    public static final String WIDGET_BUTTON1_TEXT = "buttonOneName";
+    public static final String WIDGET_BUTTON1_LINK = "buttonOneLink";
+    public static final String WIDGET_BUTTON1_OPACITY = "buttonOneOpacity";
+    public static final String WIDGET_BUTTON2_TEXT = "buttonTwoName";
+    public static final String WIDGET_BUTTON2_LINK = "buttonTwoLink";
+    public static final String WIDGET_BUTTON2_OPACITY = "buttonTwoOpacity";
+    public static final String WIDGET_LOAD_MORE_BUTTON_TEXT = "reviewLoaderName";
+    public static final String WIDGET_LOAD_MORE_BUTTON_OPACITY = "reviewLoaderOpacity";
+    public static final String WIDGET_SEO_TITLE = "seoTitle";
+    public static final String WIDGET_SEO_DESCRIPTION = "seoDescription";
+    public static final String WIDGET_SEO_KEYWORDS = "seoKeywords";
+    
+    public static final String WIDGET_ORDER_NEWEST_FIRST = "newestFirst";
+    public static final String WIDGET_ORDER_OLDEST_FIRST = "oldestFirst";
+    public static final String WIDGET_ORDER_HIGEST_RATING_FIRST = "highestRatingFirst";
+    public static final String WIDGET_ORDER_LOWEST_RATING_FIRST = "lowestRatingFirst";
+    
+    public static final String WIDGET_DEFAULT_FONT = "OpenSans, SansSerif";
+    public static final String WIDGET_DEFAULT_BACKGROUND_COLOR = "#ffffff";
+    public static final String WIDGET_DEFAULT_RATING_AND_STAR_COLOR = "#257bc4";
+    public static final String WIDGET_DEFAULT_BAR_GRAPH_COLOR = "#4490cb";
+    public static final String WIDGET_DEFAULT_FOREGROUND_COLOR = "#247bc4";
+    public static final String WIDGET_DEFAULT_FONT_THEME = "#555";
+    public static final String WIDGET_DEFAULT_EMBEDDED_FONT_THEME = "#ffffff";
+    public static final String WIDGET_DEFAULT_MAX_REVIEWS_ON_LOAD_MORE = "3";
+    public static final String WIDGET_DEFAULT_INITIAL_NUMBER_OF_REVIEWS = "3";
+    public static final String WIDGET_DEFAULT_HIDE_BAR_GRAPH = "false";
+    public static final String WIDGET_DEFAULT_HIDE_OPTIONS = "false";
+    public static final String WIDGET_DEFAULT_SORT_ORDER = WIDGET_ORDER_HIGEST_RATING_FIRST;
+    public static final String WIDGET_DEFAULT_ALLOW_MODEST_BRANDING = "true";
+    public static final String WIDGET_DEFAULT_BUTTON1_TEXT = "CONTACT US";
+    public static final String WIDGET_DEFAULT_BUTTON1_LINK = "WIDGET_DEFAULT_BUTTON1_LINK";
+
+    public static final String WIDGET_DEFAULT_BUTTON1_OPACITY = "0.7";
+    public static final String WIDGET_DEFAULT_BUTTON2_TEXT = "WRITE A REVIEW";
+    public static final String WIDGET_DEFAULT_BUTTON2_LINK = null;
+    public static final String WIDGET_DEFAULT_BUTTON2_OPACITY = "1";
+    public static final String WIDGET_DEFAULT_LOAD_MORE_BUTTON_TEXT = "LOAD MORE";
+    public static final String WIDGET_DEFAULT_LOAD_MORE_BUTTON_OPACITY = "1";
+
+    public static final String REQUEST_MESSAGE = "requestMessage";
+
+    public static final String CONTACT_US_HASH = "#contact-info";
+
 }

@@ -962,7 +962,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
      */
     @Override
     public List<SurveyDetails> getFeedbacks( String columnName, long columnValue, int start, int rows, double startScore,
-        double limitScore, boolean fetchAbusive, Date startDate, Date endDate, String sortCriteria )
+        double limitScore, boolean fetchAbusive, Date startDate, Date endDate, String sortCriteria, List<String> surveySources, String order )
     {
         LOG.debug( "Method to fetch all the feedbacks from SURVEY_DETAILS collection, getFeedbacks() started." );
 
@@ -1018,7 +1018,24 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             query.limit( rows );
         }
 
-        query.with( new Sort( Sort.Direction.DESC, CommonConstants.SURVEY_UPDATED_DATE_COLUMN ) );
+        
+        if( surveySources != null && !surveySources.isEmpty() ) {
+            query.addCriteria( Criteria.where( CommonConstants.SURVEY_SOURCE_COLUMN ).in( surveySources ) );
+        }
+        
+        
+        if( CommonConstants.WIDGET_ORDER_NEWEST_FIRST.equals( order ) ) {  
+            query.with( new Sort( Sort.Direction.DESC, CommonConstants.SURVEY_UPDATED_DATE_COLUMN ) );
+        }  else if( CommonConstants.WIDGET_ORDER_OLDEST_FIRST.equals( order ) ) {
+            query.with( new Sort( Sort.Direction.ASC, CommonConstants.SURVEY_UPDATED_DATE_COLUMN ) );
+        } else if( CommonConstants.WIDGET_ORDER_HIGEST_RATING_FIRST.equals( order ) ) {
+            query.with( new Sort( Sort.Direction.DESC, CommonConstants.SCORE_COLUMN ) );
+        } else if( CommonConstants.WIDGET_ORDER_LOWEST_RATING_FIRST.equals( order ) ) {
+            query.with( new Sort( Sort.Direction.ASC, CommonConstants.SCORE_COLUMN ) );
+        } else {
+            query.with( new Sort( Sort.Direction.DESC, CommonConstants.SURVEY_UPDATED_DATE_COLUMN ) );
+        }
+        
 
         /*if ( sortCriteria != null && sortCriteria.equalsIgnoreCase( CommonConstants.REVIEWS_SORT_CRITERIA_DATE ) )
             query.with( new Sort( Sort.Direction.DESC, CommonConstants.MODIFIED_ON_COLUMN ) );
@@ -1147,6 +1164,53 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
     }
 
 
+    @Override
+    public long getSimpleFeedBacksCount( String columnName, long columnValue, double startScore, double limitScore, boolean fetchAbusive )
+    {
+        LOG.debug(
+            "Method getSimpleFeedBacksCount started for columnName: {} columnValue: {} startScore {} limitScore: {} and fetchAbusive: {}",
+            columnName, columnValue, startScore, limitScore, fetchAbusive );
+        Query query = new Query();
+        if ( columnName != null ) {
+            query.addCriteria( Criteria.where( columnName ).is( columnValue ) );
+        }
+        /**
+         * fetching only completed surveys
+         */
+        query.addCriteria( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) );
+        
+        if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
+            query.addCriteria( Criteria.where( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) );
+        }
+
+        /**
+         * adding isAbusive criteria only if fetch abusive flag is false, i.e only non abusive posts
+         * are to be fetched else fetch all the records
+         */
+        if ( !fetchAbusive ) {
+            query.addCriteria( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) );
+        }
+
+        if ( startScore > -1 && limitScore > -1 ) {
+            query.addCriteria( new Criteria().andOperator( Criteria.where( CommonConstants.SCORE_COLUMN ).gte( startScore ),
+                Criteria.where( CommonConstants.SCORE_COLUMN ).lt( limitScore ) ) );
+        } else {
+            if( startScore > -1 ) {
+                query.addCriteria( Criteria.where( CommonConstants.SCORE_COLUMN ).gte( startScore ) );
+            }
+            
+            if( limitScore > -1 ) {
+                query.addCriteria( Criteria.where( CommonConstants.SCORE_COLUMN ).lte( limitScore ) );
+            }
+        }
+        
+
+        long feedBackCount = mongoTemplate.count( query, SURVEY_DETAILS_COLLECTION );
+        LOG.debug( "Method getSimpleFeedBacksCount executed successfully.Returning feedBackCount: {}", feedBackCount );
+        return feedBackCount;
+    }
+
+    
     /*
      * Returns a list of survey which are not yet competed by customers.Sorted on date (
      * descending). ColumnName can be "agentId/branchId/regionId/companyId". ColumnValue should be

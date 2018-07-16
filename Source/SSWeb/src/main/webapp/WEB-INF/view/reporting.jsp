@@ -123,7 +123,7 @@
 	</div>
 </div>
 
-<div id="summit-popup" class="overlay-login summit-popup-outer hide">
+<!-- <div id="summit-popup" class="overlay-login summit-popup-outer hide">
 	<div id="summit-popup-body" class="summit-popup">
 		<div id="close-summit-popup" class="close-summit-popup cursor-pointer"></div>
 		<div id="register-summit-btn" class="register-summit-btn cursor-pointer"></div>
@@ -138,7 +138,7 @@
 			</div>
 		</div>
 	</div>
-</div>
+</div> -->
 
 <div class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
 	<div>

@@ -733,7 +733,7 @@ public class ProfileController
             try {
                 List<SurveyDetails> reviews = profileManagementService.getReviews( companyId, minScore, maxScore, start,
                     numRows, CommonConstants.PROFILE_LEVEL_COMPANY, false, null, null,
-                    profileManagementService.processSortCriteria( companyId, sortCriteria ) );
+                    profileManagementService.processSortCriteria( companyId, sortCriteria ), null, null, false );
                 //This is added to get the agent's app ID and profile URL 
                 //DO NOT REMOVE!
                 profileManagementService.setAgentProfileUrlForReview( reviews );
@@ -826,7 +826,7 @@ public class ProfileController
 
                 List<SurveyDetails> reviews = profileManagementService.getReviews( regionId, minScore, maxScore, start, numRows,
                     CommonConstants.PROFILE_LEVEL_REGION, false, null, null, profileManagementService.processSortCriteria(
-                        userManagementService.getRegionById( regionId ).getCompany().getCompanyId(), sortCriteria ) );
+                        userManagementService.getRegionById( regionId ).getCompany().getCompanyId(), sortCriteria ), null, null, false );
                 //This is added to get the agent's app ID and profile URL 
                 //DO NOT REMOVE!
                 profileManagementService.setAgentProfileUrlForReview( reviews );
@@ -1193,7 +1193,7 @@ public class ProfileController
                 }
                 List<SurveyDetails> reviews = profileManagementService.getReviews( branchId, minScore, maxScore, start, numRows,
                     CommonConstants.PROFILE_LEVEL_BRANCH, false, null, null, profileManagementService.processSortCriteria(
-                        userManagementService.getBranchById( branchId ).getCompany().getCompanyId(), sortCriteria ) );
+                        userManagementService.getBranchById( branchId ).getCompany().getCompanyId(), sortCriteria ), null, null, false );
                 //This is added to get the agent's app ID and profile URL 
                 //DO NOT REMOVE!
                 profileManagementService.setAgentProfileUrlForReview( reviews );
@@ -1376,7 +1376,7 @@ public class ProfileController
             }
             List<SurveyDetails> reviews = profileManagementService.getReviews( agentId, minScore, maxScore, start, numRows,
                 CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, null, null, profileManagementService.processSortCriteria(
-                    userManagementService.getUserByUserId( agentId ).getCompany().getCompanyId(), sortCriteria ) );
+                    userManagementService.getUserByUserId( agentId ).getCompany().getCompanyId(), sortCriteria ), null, null, false );
             profileManagementService.setAgentProfileUrlForReview( reviews );
             String json = new Gson().toJson( reviews );
             LOG.debug( "reviews json : " + json );

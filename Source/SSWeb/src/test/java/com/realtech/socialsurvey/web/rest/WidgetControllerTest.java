@@ -1,9 +1,10 @@
 package com.realtech.socialsurvey.web.rest;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.forwardedUrl;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -61,7 +62,7 @@ public class WidgetControllerTest
 
     @Test ( expected = NestedServletException.class)
     public void testFetchWidgetForInvalidIden() throws Exception
-    {
+    {        
         this.mockMvc.perform( get( "/widget/{profileType}/{iden}", "company", 0l ) ).andExpect( status().is( 404 ) );
     }
 
@@ -84,7 +85,7 @@ public class WidgetControllerTest
         Mockito.when(
             profileManagementService.getReviews( Mockito.anyLong(), Mockito.anyDouble(), Mockito.anyDouble(), Mockito.anyInt(),
                 Mockito.anyInt(), Mockito.anyString(), Mockito.anyBoolean(), (Date) Mockito.anyObject(),
-                (Date) Mockito.anyObject(), Mockito.anyString() ) ).thenReturn( new ArrayList<SurveyDetails>() );
+                (Date) Mockito.anyObject(), Mockito.anyString(), Mockito.anyListOf( String.class ), Mockito.anyString(), Mockito.anyBoolean() ) ).thenReturn( new ArrayList<SurveyDetails>() );
         Whitebox.setInternalState( controller, "applicationBaseUrl", "test" );
         this.mockMvc.perform( get( "/widget/{profileType}/{iden}", "company", 1l ) ).andExpect( status().isOk() )
             .andExpect( model().attribute( "profileLevel", "COMPANY" ) ).andExpect( model().attribute( "averageRating", 5.0 ) )

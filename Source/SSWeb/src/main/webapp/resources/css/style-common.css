@@ -1540,6 +1540,7 @@ button.paypal.is-active {
 
 
 .ol-header {
+	text-align: center;
 	line-height: 50px;
 	font-size: 16px;
 	border-bottom: 1px solid #dcdcdc;
@@ -9131,6 +9132,14 @@ label.url-change-input-label {
 	height: 200px;
 }
 
+#widget-js-code-area, #widget-js-cust-code-area, #widget-jsi-code-area {
+	white-space: pre-wrap;
+    word-break: break-word;
+    overflow: visible;
+    text-align : left;
+}
+
+
 .v-tbl-wid {
 	width: 4%;
 }
@@ -9482,6 +9491,13 @@ label.url-change-input-label {
 	padding: 10px;
 	margin: 1px;
 }
+
+.new-widget-display {
+	height: fit-content !important;
+	padding: 10px;
+	margin: 1px;
+}
+
 .widget-btn-cpy{
 	margin-left: auto;
 	margin-right: auto;

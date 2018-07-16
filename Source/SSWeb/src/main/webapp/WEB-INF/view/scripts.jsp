@@ -2,7 +2,7 @@
 
 <script src="${initParam.resourcesPath}/resources/js/jquery-2.1.1.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/date.js"></script>
-<script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/jquery-ui.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/jquery.mask.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/perfect-scrollbar.jquery.min.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/bootstrap.min.js"></script>
@@ -25,3 +25,9 @@
 <script src="${initParam.resourcesPath}/resources/js/googleloader.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/reporting.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/phoneFormat.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/spectrum.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/jquery.fontselector.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/jquery.prettify.js"></script>
+<script src="${initParam.resourcesPath}/widget/js/widget-framework.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/widgetPageLoader.js"></script>
+

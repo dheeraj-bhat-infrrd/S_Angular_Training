@@ -354,11 +354,14 @@ public interface ProfileManagementService
      * @param profileLevel
      * @param startDate
      * @param endDate
+     * @param surveySources TODO
+     * @param order TODO
+     * @param addAgentInfo TODO
      * @return
      * @throws InvalidInputException
      */
     public List<SurveyDetails> getReviews( long iden, double startScore, double limitScore, int startIndex, int numOfRows,
-        String profileLevel, boolean fetchAbusive, Date startDate, Date endDate, String sortCriteria )
+        String profileLevel, boolean fetchAbusive, Date startDate, Date endDate, String sortCriteria, List<String> surveySources, String order, boolean addAgentInfo )
         throws InvalidInputException;
 
 
@@ -759,5 +762,9 @@ public interface ProfileManagementService
      */
     public void disconnectSelectedSocialMedia( String collection, OrganizationUnitSettings unitSettings, SocialMediaTokens mediaTokens,
         String keyToupdate ) throws InvalidInputException;
+
+
+    public long getSimpleReviewsCount( long iden, double minScore, double maxScore, String profileLevel, boolean fetchAbusive )
+        throws InvalidInputException;
 
 }

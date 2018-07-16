@@ -4998,22 +4998,22 @@ public class ProfileManagementController
             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
                 reviewItems = profileManagementService.getReviews( companyId, minScore, maxScore, startIndex, numRows,
                     CommonConstants.PROFILE_LEVEL_COMPANY, fetchAbusive, null, null,
-                    profileManagementService.processSortCriteria( companyId, null ) );
+                    profileManagementService.processSortCriteria( companyId, null ), null, null, false );
                 unitSettings = organizationManagementService.getCompanySettings( entityId );
             } else if ( entityType.equals( CommonConstants.REGION_ID_COLUMN ) ) {
                 reviewItems = profileManagementService.getReviews( entityId, minScore, maxScore, startIndex, numRows,
                     CommonConstants.PROFILE_LEVEL_REGION, fetchAbusive, null, null,
-                    profileManagementService.processSortCriteria( companyId, null ) );
+                    profileManagementService.processSortCriteria( companyId, null ), null, null, false );
                 unitSettings = organizationManagementService.getRegionSettings( entityId );
             } else if ( entityType.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
                 reviewItems = profileManagementService.getReviews( entityId, minScore, maxScore, startIndex, numRows,
                     CommonConstants.PROFILE_LEVEL_BRANCH, fetchAbusive, null, null,
-                    profileManagementService.processSortCriteria( companyId, null ) );
+                    profileManagementService.processSortCriteria( companyId, null ), null, null, false );
                 unitSettings = organizationManagementService.getBranchSettingsDefault( entityId );
             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) ) {
                 reviewItems = profileManagementService.getReviews( user.getUserId(), minScore, maxScore, startIndex, numRows,
                     CommonConstants.PROFILE_LEVEL_INDIVIDUAL, fetchAbusive, null, null,
-                    profileManagementService.processSortCriteria( companyId, null ) );
+                    profileManagementService.processSortCriteria( companyId, null ), null, null, false );
                 unitSettings = organizationManagementService.getAgentSettings( entityId );
             } else {
                 throw new InvalidInputException( "Invalid profile level." );

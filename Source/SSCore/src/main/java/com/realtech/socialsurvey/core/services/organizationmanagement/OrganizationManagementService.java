@@ -1801,4 +1801,13 @@ public interface OrganizationManagementService
     public boolean enableSocialMonitorToggle( long companyId, boolean socialMonitorFlag )
         throws InvalidInputException, NoRecordsFetchedException;
 
+    /**
+     * 
+     * @param entityId
+     * @param entityType
+     * @return
+     * @throws InvalidInputException
+     */
+    public OrganizationUnitSettings getEntitySettings( long entityId, String entityType ) throws InvalidInputException;
+
 }

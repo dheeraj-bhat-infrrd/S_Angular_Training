@@ -551,7 +551,7 @@ public class DashboardController
             boolean hiddenSection = false;
             try {
                 surveyDetails = profileManagementService.getReviews( iden, -1, -1, startIndex, batchSize, profileLevel, false,
-                    null, null, "date" );
+                    null, null, "date", null, null, false );
                 profileManagementService.setAgentProfileUrlForReview( surveyDetails );
 
                 OrganizationUnitSettings settings = organizationManagementService
