@@ -17,12 +17,12 @@ public class TransactionInfoPutVO {
  	private String customer2LastName;
  	private String customer2Email;
  	
-    private String buyerFirstName;
-    private String buyerLastName;
-    private String buyerEmail;
-    private String sellerFirstName;
-    private String sellerLastName;
-    private String sellerEmail;
+    private String buyerAgentFirstName;
+    private String buyerAgentLastName;
+    private String buyerAgentEmail;
+    private String sellerAgentFirstName;
+    private String sellerAgentLastName;
+    private String sellerAgentEmail;
  	
  	 //adding property address feild 
     private String propertyAddress;
@@ -103,53 +103,53 @@ public class TransactionInfoPutVO {
     {
         this.propertyAddress = propertyAddress;
     }
-    public String getBuyerFirstName()
+    public String getBuyerAgentFirstName()
     {
-        return buyerFirstName;
+        return buyerAgentFirstName;
     }
-    public void setBuyerFirstName( String buyerFirstName )
+    public void setBuyerAgentFirstName( String buyerAgentFirstName )
     {
-        this.buyerFirstName = buyerFirstName;
+        this.buyerAgentFirstName = buyerAgentFirstName;
     }
-    public String getBuyerLastName()
+    public String getBuyerAgentLastName()
     {
-        return buyerLastName;
+        return buyerAgentLastName;
     }
-    public void setBuyerLastName( String buyerLastName )
+    public void setBuyerAgentLastName( String buyerAgentLastName )
     {
-        this.buyerLastName = buyerLastName;
+        this.buyerAgentLastName = buyerAgentLastName;
     }
-    public String getBuyerEmail()
+    public String getBuyerAgentEmail()
     {
-        return buyerEmail;
+        return buyerAgentEmail;
     }
-    public void setBuyerEmail( String buyerEmail )
+    public void setBuyerAgentEmail( String buyerAgentEmail )
     {
-        this.buyerEmail = buyerEmail;
+        this.buyerAgentEmail = buyerAgentEmail;
     }
-    public String getSellerFirstName()
+    public String getSellerAgentFirstName()
     {
-        return sellerFirstName;
+        return sellerAgentFirstName;
     }
-    public void setSellerFirstName( String sellerFirstName )
+    public void setSellerAgentFirstName( String sellerAgentFirstName )
     {
-        this.sellerFirstName = sellerFirstName;
+        this.sellerAgentFirstName = sellerAgentFirstName;
     }
-    public String getSellerLastName()
+    public String getSellerAgentLastName()
     {
-        return sellerLastName;
+        return sellerAgentLastName;
     }
-    public void setSellerLastName( String sellerLastName )
+    public void setSellerAgentLastName( String sellerAgentLastName )
     {
-        this.sellerLastName = sellerLastName;
+        this.sellerAgentLastName = sellerAgentLastName;
     }
-    public String getSellerEmail()
+    public String getSellerAgentEmail()
     {
-        return sellerEmail;
+        return sellerAgentEmail;
     }
-    public void setSellerEmail( String sellerEmail )
+    public void setSellerAgentEmail( String sellerAgentEmail )
     {
-        this.sellerEmail = sellerEmail;
+        this.sellerAgentEmail = sellerAgentEmail;
     }
 	 
 	
