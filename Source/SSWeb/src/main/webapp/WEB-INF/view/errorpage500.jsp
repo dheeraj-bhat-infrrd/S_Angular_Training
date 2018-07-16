@@ -40,7 +40,7 @@
             <div class="err-line-1 text-center">OOPS!!! That wasn't supposed to happen.</div>
             <div class="err-line-2 text-center">We apologize for the inconvenience. Click the link below to be redirected to the home page.</div>
             <div class="err-page-btn">Go back to Homepage</div>
-            <div class="err-line-3 text-center">If this persists, please send a quick message to <u>support@socialsurvey.me</u> and tell us what you did to get this error page, so we can get it fixed.</div>
+            <div class="err-line-3 text-center">If this persists, please send a quick message to <u>support@socialsurvey.com</u> and tell us what you did to get this error page, so we can get it fixed.</div>
         </div>
 
         <div class="footer-main-wrapper">
