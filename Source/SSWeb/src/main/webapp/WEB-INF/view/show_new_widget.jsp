@@ -281,14 +281,14 @@
 						onclick="javascript:copyWidgetToClipboard('widget-js-cust-code-area')">Copy
 						to clipboard</div>
 				</div>
-				<br/><br/><br/><br/>
-				<div class="st-new-widget-txt" style="font-weight: 600 !important;">
+				<!-- <br/><br/><br/><br/> -->
+				<div class="st-new-widget-txt hide" style="font-weight: 600 !important;">
 					<spring:message code="label.widgetjsidesc.key" />
 				</div>
-				<div id="widget-jsi-container" class="prof-user-address prof-edit-icn">
+				<div id="widget-jsi-container" class="prof-user-address prof-edit-icn hide">
 					<pre class="prettyprint" id="widget-jsi-code-area"></pre>
 				</div>
-				<div class="ol-btn-wrapper widget-copy widget-btn-cpy" >
+				<div class="ol-btn-wrapper widget-copy widget-btn-cpy hide" >
 					<div id="overlay-continue-jsi" class="ol-btn cursor-pointer"
 						onclick="javascript:copyWidgetToClipboard('widget-jsi-code-area')">Copy
 						to clipboard</div>
