@@ -28,6 +28,6 @@
 <script src="${initParam.resourcesPath}/resources/js/spectrum.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/jquery.fontselector.js"></script>
 <script src="${initParam.resourcesPath}/resources/js/jquery.prettify.js"></script>
-<script src="${initParam.resourcesPath}/widget/js/widget-framework.js"></script>
-<script src="${initParam.widgetResourcesPath}/resources/js/widgetPageLoader.js"></script>
+<script src="${initParam.widgetResourcesPath}/widget/js/widget-framework.js"></script>
+<script src="${initParam.resourcesPath}/resources/js/widgetPageLoader.js"></script>
 
