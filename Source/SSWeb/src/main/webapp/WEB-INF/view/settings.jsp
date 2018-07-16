@@ -390,6 +390,7 @@ $(document).ready(function() {
 	if (accountMasterId != 5) {
 		
 		autoAppendRatingDropdown('#st-dd-wrapper-min-post', "st-dd-item st-dd-item-min-post");
+		
 		changeRatingPattern($('#rating-min-post').val(), $('#rating-min-post-parent'));
 		$('#rating-min-post').off('click');
 		$('#rating-min-post').on('click', function(){

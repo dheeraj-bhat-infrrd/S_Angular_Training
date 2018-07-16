@@ -1010,6 +1010,10 @@
 				});
 			}, 5000);
 			
+			if( window.location.hash != undefined ){
+				$('body').scrollTop($(window.location.hash).offset().top);
+			}
+			
 		});
 	</script>
 </body>

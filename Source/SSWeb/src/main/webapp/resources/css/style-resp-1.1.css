@@ -526,6 +526,9 @@
 		overflow-x: auto;
 	}
 
+	.widget-conf-hist-resp {
+		height: 150px !important;
+	}
 }
 
 
@@ -538,7 +541,6 @@
 	.prof-img-height {
 		height: 195px;
 	}
-
 }
 
 
@@ -661,6 +663,9 @@
     .sort-resp {
     	width: 300px;
     }
+   	.widget-conf-cont{
+		width:60% !important;
+	}
 }
 
 
@@ -949,6 +954,55 @@
 	}
 }
 
+
+@media (max-width: 374px) {
+	.widget-conf-cont {
+		width: 95%;
+		height: 100px;
+	}
+	.widget-chk-adj-resp {
+		height: 50px;
+	}
+	.widget-txt-bx-adj-resp {
+		height: 200px;
+	}
+}
+
+@media (max-width: 350px) {
+	.widget-conf-cont {
+		width: 100%;
+		height: 120px;
+	}
+	
+	.widget-chk-adj-resp {
+		height: 50px;
+	}
+	
+	.widget-txt-bx-adj-resp {
+		height: 200px;
+	}
+}
+
+@media (max-width: 425px) {
+	.widget-chk-adj-resp {
+		height: 50px;
+	}
+}
+
+@media (min-width: 375px) {
+	.widget-conf-cont {
+		width: 95%;
+	}
+}
+
+
+@media (min-width: 475px) {
+	.widget-conf-cont {
+		width: 85%;
+	}
+}
+
+
 /* ============== ANTHING ABOVE TABLETS ==============*/
 @media (min-width: 992px) {
 	.margin-bottom-resp {
@@ -956,5 +1010,32 @@
 	}
 	.cust-div-resp {
 	margin-top: 40px;
+	}
+	
+	.widget-save-resp {
+		padding: 20% 0%;
+	}
+		
+	.widget-hist-adj {
+		width: 290px;
+	}
+	
+	.widget-conf-cont{
+		width:75%;
+	}
+}
+
+@media ( min-width: 1120px ) {
+
+	.widget-save-resp {
+		padding: 8% 0%;
+	}
+	
+	.widget-hist-adj {
+		width: 320px;
+	}
+	
+	.widget-conf-cont {
+		width: 70%;
 	}
 }

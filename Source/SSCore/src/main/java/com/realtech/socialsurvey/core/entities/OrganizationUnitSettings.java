@@ -8,6 +8,8 @@ import java.util.Set;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.realtech.socialsurvey.core.entities.widget.WidgetConfiguration;
+
 
 /**
  * Holds the company settings
@@ -109,6 +111,9 @@ public class OrganizationUnitSettings implements Serializable
     private boolean isShowSummitPopup;
     
     private List<TransactionSourceFtp> transactionSourceFtpList;
+    
+    //widget configuration
+    private WidgetConfiguration widgetConfiguration;
     
     public boolean isShowSummitPopup() {
 		return isShowSummitPopup;
@@ -926,6 +931,18 @@ public class OrganizationUnitSettings implements Serializable
     }
 
 
+    public WidgetConfiguration getWidgetConfiguration()
+    {
+        return widgetConfiguration;
+    }
+
+
+    public void setWidgetConfiguration( WidgetConfiguration widgetConfiguration )
+    {
+        this.widgetConfiguration = widgetConfiguration;
+    }
+
+
     @Override
     public String toString()
     {
@@ -957,7 +974,8 @@ public class OrganizationUnitSettings implements Serializable
             + isSocialMonitorEnabled + ", socialMonitorTrustedSources=" + socialMonitorTrustedSources
             + ", isAgentProfileDisabled=" + isAgentProfileDisabled + ", swearWords=" + Arrays.toString( swearWords )
             + ", hasRegisteredForSummit=" + hasRegisteredForSummit + ", isShowSummitPopup=" + isShowSummitPopup
-            + ", transactionSourceFtpList=" + transactionSourceFtpList + ", entityAlertDetails=" + entityAlertDetails + "]";
+            + ", transactionSourceFtpList=" + transactionSourceFtpList + ", entityAlertDetails=" + entityAlertDetails
+            + ", widgetConfiguration=" + widgetConfiguration + "]";
     }
-    
+
 }

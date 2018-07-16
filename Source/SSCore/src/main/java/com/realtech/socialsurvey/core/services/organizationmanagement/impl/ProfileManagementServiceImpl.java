@@ -1883,7 +1883,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
      */
     @Override
     public List<SurveyDetails> getReviews( long iden, double startScore, double limitScore, int startIndex, int numOfRows,
-        String profileLevel, boolean fetchAbusive, Date startDate, Date endDate, String sortCriteria )
+        String profileLevel, boolean fetchAbusive, Date startDate, Date endDate, String sortCriteria, List<String> surveySources, String order, boolean addAgentInfo )
         throws InvalidInputException
     {
         LOG.debug(
@@ -1909,14 +1909,23 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         String idenColumnName = getIdenColumnNameFromProfileLevel( profileLevel );
         surveyDetails = surveyDetailsDao.getFeedbacks( idenColumnName, iden, startIndex, numOfRows, startScore, limitScore,
-            fetchAbusive, startDate, endDate, sortCriteria );
+            fetchAbusive, startDate, endDate, sortCriteria, surveySources, order );
 
         //TODO : remove this . Temporary fix for Zillow review URl
         if ( surveyDetails != null && surveyDetails.size() > 0 ) {
             for ( SurveyDetails review : surveyDetails ) {
-                if ( review != null && "Zillow".equalsIgnoreCase( review.getSource() ) ) {
-                    if ( StringUtils.isEmpty( review.getSourceId() ) ) {
-                        review.setSourceId( review.getCompleteProfileUrl() );
+                if ( review != null ) {
+                    if( "Zillow".equalsIgnoreCase( review.getSource() ) ) {
+                        if ( StringUtils.isEmpty( review.getSourceId() ) ) {
+                            review.setSourceId( review.getCompleteProfileUrl() );
+                        }
+                    }
+                    if( review.getAgentId() > 0 && addAgentInfo ) {
+                        OrganizationUnitSettings agent = organizationUnitSettingsDao.fetchAgentSettingsById( review.getAgentId() );
+                        if( agent.getContact_details() != null ) {
+                            review.setAgentTitle( agent.getContact_details().getTitle() );
+                        }
+                        review.setAgentProfileImage( agent.getProfileImageUrl() );
                     }
                 }
             }
@@ -2072,6 +2081,22 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         reviewsCount = surveyDetailsDao.getFeedBacksCount( idenColumnName, iden, minScore, maxScore, fetchAbusive,
             notRecommended, includeZillow, zillowReviewCount );
         LOG.debug( "Method getReviewsCount executed successfully. Returning reviewsCount: {}", reviewsCount );
+        return reviewsCount;
+    }
+    
+    @Override
+    public long getSimpleReviewsCount( long iden, double minScore, double maxScore, String profileLevel, boolean fetchAbusive ) throws InvalidInputException
+    {
+        LOG.debug( "Method getSimpleReviewsCount called for iden: {}  minscore: {}  maxscore: {}  profilelevel: {}", iden, minScore,
+            maxScore, profileLevel );
+        if ( iden <= 0l ) {
+            LOG.warn( "Iden is invalid for getting reviews count" );
+            throw new InvalidInputException( "Iden is invalid for getting reviews count" );
+        }
+        long reviewsCount = 0;
+        String idenColumnName = getIdenColumnNameFromProfileLevel( profileLevel );
+        reviewsCount = surveyDetailsDao.getSimpleFeedBacksCount( idenColumnName, iden, minScore, maxScore, fetchAbusive );
+        LOG.debug( "Method getSimpleReviewsCount executed successfully. Returning reviewsCount: {}", reviewsCount );
         return reviewsCount;
     }
 
@@ -5868,7 +5893,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
             profileAggregate.getProfileLevel(), false, false, false, 0 ) );
         profileAggregate.setReviews( isBotRequest
             ? getReviews( profileUnderConcern.getIden(), -1, -1, -1, CommonConstants.USER_AGENT_NUMBER_REVIEWS,
-                profileAggregate.getProfileLevel(), false, null, null, processSortCriteria( companyProfile.getIden(), null ) )
+                profileAggregate.getProfileLevel(), false, null, null, processSortCriteria( companyProfile.getIden(), null ), null, null, false )
             : null );
 
         // NOTE: It was decided not to show Social posts on the UI. So not fetching anymore.

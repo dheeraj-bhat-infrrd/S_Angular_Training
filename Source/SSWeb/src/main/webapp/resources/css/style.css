@@ -285,7 +285,7 @@
 .wd-score-txt{
 	 height: 110px;
     line-height: 26px;
-    width: 50%;
+    width: 40%;
 }
 
 .icn-spanner {
@@ -349,6 +349,13 @@
     line-height: 26px;
     width: 100%;
 }
+
+.st-new-widget-txt {
+    line-height: 26px;
+    width: 100%;
+    text-align: center;
+}
+
 /* ============== new registration style==============*/
 
 .reg-left-container{
