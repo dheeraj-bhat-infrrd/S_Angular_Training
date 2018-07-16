@@ -1380,7 +1380,7 @@ public class EmailServicesImpl implements EmailServices
         FileContentReplacements subjectReplacements = new FileContentReplacements();
         subjectReplacements.setFileName(
             EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_COMPLETION_ADMINS_MAIL_SUBJECT );
-        subjectReplacements.setReplacementArgs( Arrays.asList( rating, customerName, agentName ) );
+        subjectReplacements.setReplacementArgs( Arrays.asList( rating, agentName, customerName ) );
 
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
         messageBodyReplacements.setFileName(
