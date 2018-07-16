@@ -89,31 +89,31 @@ public class SurveyPreinitiationTransformer implements Transformer<SurveyPutVO, 
             }
         }
         
-        if ( !StringUtils.isBlank( transactionInfo.getBuyerEmail() )
-            || !StringUtils.isBlank( transactionInfo.getBuyerFirstName() ) ) {
+        if ( !StringUtils.isBlank( transactionInfo.getBuyerAgentEmail() )
+            || !StringUtils.isBlank( transactionInfo.getBuyerAgentFirstName() ) ) {
 
-            if ( StringUtils.isBlank( transactionInfo.getBuyerEmail() ) )
+            if ( StringUtils.isBlank( transactionInfo.getBuyerAgentEmail() ) )
                 throw new InvalidInputException( "Invalid input passed. buyerEmail can't be null or empty" );
-            if ( StringUtils.isBlank( transactionInfo.getBuyerFirstName() ) )
+            if ( StringUtils.isBlank( transactionInfo.getBuyerAgentFirstName() ) )
                 throw new InvalidInputException( "Invalid input passed. buyerFirstName can't be null or empty" );
             surveyPreInitiation = transformingSubObjects(transactionInfo, serviceProviderInfo, BUYER, companyId, surveySource);
             if(surveyPreInitiation != null) {
-                if(!noDuplicates.add( transactionInfo.getBuyerEmail() )) {
+                if(!noDuplicates.add( transactionInfo.getBuyerAgentEmail() )) {
                     surveyPreInitiation.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD );
                 }
                 surveyPreInitiations.add( surveyPreInitiation );
             }
         }
-        if ( !StringUtils.isBlank( transactionInfo.getSellerEmail() )
-            || !StringUtils.isBlank( transactionInfo.getSellerFirstName() ) ) {
+        if ( !StringUtils.isBlank( transactionInfo.getSellerAgentEmail() )
+            || !StringUtils.isBlank( transactionInfo.getSellerAgentFirstName() ) ) {
 
-            if ( StringUtils.isBlank( transactionInfo.getSellerEmail() ) )
+            if ( StringUtils.isBlank( transactionInfo.getSellerAgentEmail() ) )
                 throw new InvalidInputException( "Invalid input passed. sellerEmail can't be null or empty" );
-            if ( StringUtils.isBlank( transactionInfo.getSellerFirstName() ) )
+            if ( StringUtils.isBlank( transactionInfo.getSellerAgentFirstName() ) )
                 throw new InvalidInputException( "Invalid input passed. sellerFirstName can't be null or empty" );
             surveyPreInitiation = transformingSubObjects(transactionInfo, serviceProviderInfo, SELLER, companyId, surveySource);
             if(surveyPreInitiation != null) {
-                if(!noDuplicates.add( transactionInfo.getSellerEmail() )) {
+                if(!noDuplicates.add( transactionInfo.getSellerAgentEmail() )) {
                     surveyPreInitiation.setStatus( CommonConstants.STATUS_SURVEYPREINITIATION_DUPLICATE_RECORD );
                 }
                 surveyPreInitiations.add( surveyPreInitiation );
@@ -147,14 +147,14 @@ public class SurveyPreinitiationTransformer implements Transformer<SurveyPutVO, 
             surveyPreInitiation.setCustomerLastName( transactionInfo.getCustomer2LastName() );
             surveyPreInitiation.setParticipantType( CommonConstants.SURVEY_PARTICIPANT_TYPE_COBORROWER );
         }else if ( participant.equals( BUYER )) {
-            surveyPreInitiation.setCustomerEmailId( transactionInfo.getBuyerEmail() );
-            surveyPreInitiation.setCustomerFirstName( transactionInfo.getBuyerFirstName() );
-            surveyPreInitiation.setCustomerLastName( transactionInfo.getBuyerLastName() );
+            surveyPreInitiation.setCustomerEmailId( transactionInfo.getBuyerAgentEmail() );
+            surveyPreInitiation.setCustomerFirstName( transactionInfo.getBuyerAgentFirstName() );
+            surveyPreInitiation.setCustomerLastName( transactionInfo.getBuyerAgentLastName() );
             surveyPreInitiation.setParticipantType( CommonConstants.SURVEY_PARTICIPANT_TYPE_BUYER_AGENT );
         }else if ( participant.equals( SELLER )) {
-            surveyPreInitiation.setCustomerEmailId( transactionInfo.getSellerEmail() );
-            surveyPreInitiation.setCustomerFirstName( transactionInfo.getSellerFirstName() );
-            surveyPreInitiation.setCustomerLastName( transactionInfo.getSellerLastName() );
+            surveyPreInitiation.setCustomerEmailId( transactionInfo.getSellerAgentEmail() );
+            surveyPreInitiation.setCustomerFirstName( transactionInfo.getSellerAgentFirstName() );
+            surveyPreInitiation.setCustomerLastName( transactionInfo.getSellerAgentLastName() );
             surveyPreInitiation.setParticipantType( CommonConstants.SURVEY_PARTICIPANT_TYPE_SELLER_AGENT );
         }else {
             participantAdded = false;
