@@ -1,1 +1,1 @@
-%s Survey Score from %s for %s
+%s Survey Score for %s from %s
