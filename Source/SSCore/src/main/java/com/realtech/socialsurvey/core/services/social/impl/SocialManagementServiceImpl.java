@@ -3613,15 +3613,15 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
             FacebookPage facebookPage = null;
             for ( Account account : accounts ) {
                 facebookPage = new FacebookPage();
-                facebookPage.setId( account.getId() );
-                facebookPage.setName( account.getName() );
+                facebookPage.setId( account.getId() + " " + i);
+                facebookPage.setName( account.getName()  + " " + i);
                 facebookPage.setAccessToken( account.getAccessToken() );
                 facebookPage.setCategory( account.getCategory() );
                 facebookPage.setProfileUrl( facebookUri.concat( account.getId() ) );
                 facebookPages.add( facebookPage );
             }
             }
-            
+            LOG.info("Page list size is " + facebookPages.size());
         } catch ( FacebookException e ) {
             LOG.error( "Error while creating access token for facebook: " + e.getLocalizedMessage(), e );
         }
