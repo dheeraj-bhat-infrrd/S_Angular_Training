@@ -88,13 +88,23 @@ public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements Com
 
     @SuppressWarnings ( "unchecked")
     @Override
-    public List<Company> searchCompaniesByName( String namePattern )
+    public List<Object[]> searchCompaniesByName( String namePattern )
     {
+        String queryString = "select c.company_id,c.company from COMPANY c "
+            + "inner join (select u.company_id,count(u.user_id) as user_count "
+            + "from USERS u where u.status in (1,2) group by u.company_id) a "
+            + "on c.company_id = a.company_id and c.status=1 and a.user_count > 2 "
+            + "and c.company like :namePattern";
         Session session = sessionFactory.getCurrentSession();
+        Query query = session.createSQLQuery( queryString );
+        query.setParameter( "namePattern", namePattern+"%" );
+        List<Object[]> result = query.list();
+        return result;
+        /*Session session = sessionFactory.getCurrentSession();
         Criteria criteria = session.createCriteria( Company.class );
         criteria.add( Restrictions.like( "company", namePattern, MatchMode.START ) );
         criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ) );
-        return criteria.list();
+        return criteria.list();*/
     }
 
 

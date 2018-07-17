@@ -16,7 +16,7 @@ public interface CompanyDao extends GenericDao<Company, Long> {
 
 	public List<Company> searchBetweenTimeIntervals(Timestamp lowerTime, Timestamp higherTime);
 	
-	public List<Company> searchCompaniesByName(String namePattern);
+	public List<Object[]> searchCompaniesByName(String namePattern);
 
 	public List<Long> searchCompaniesByNameAndKeyValue(String namePattern, int accountType, int status , boolean inCompleteCompany , Timestamp startDate);
 
