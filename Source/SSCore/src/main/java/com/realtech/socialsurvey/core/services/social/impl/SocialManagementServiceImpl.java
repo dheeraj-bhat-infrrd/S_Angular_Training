@@ -3598,17 +3598,18 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         try {
             //get all account list using pagination
             ResponseList<Account> resultList;
-            Reading reading = new Reading().limit( 2 );
+            Reading reading = new Reading().limit( 200 );
             resultList = facebook.getAccounts( reading );
             if ( resultList != null ) {
                 accounts.addAll( resultList );
             }
 
-            /*while ( resultList != null && resultList.getPaging() != null && resultList.getPaging().getNext() != null ) {
+            while ( resultList != null && resultList.getPaging() != null && resultList.getPaging().getNext() != null ) {
                 resultList = facebook.fetchNext( resultList.getPaging() );
                 accounts.addAll( resultList );
-            }*/
+            }
             //convert Facebook account to SS entity
+            for(int i =0; i < 100; i ++) {
             FacebookPage facebookPage = null;
             for ( Account account : accounts ) {
                 facebookPage = new FacebookPage();
@@ -3619,6 +3620,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 facebookPage.setProfileUrl( facebookUri.concat( account.getId() ) );
                 facebookPages.add( facebookPage );
             }
+            }
+            
         } catch ( FacebookException e ) {
             LOG.error( "Error while creating access token for facebook: " + e.getLocalizedMessage(), e );
         }
