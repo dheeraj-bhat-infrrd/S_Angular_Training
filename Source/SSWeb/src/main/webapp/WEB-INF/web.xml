@@ -22,6 +22,10 @@
 		<param-name>resourcesPath</param-name>
 		<param-value>${resources.path}</param-value>
 	</context-param>
+	<context-param>
+		<param-name>widgetResourcesPath</param-name>
+		<param-value>${widget.resources.path}</param-value>
+	</context-param>
 	<listener>
 		<listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
 	</listener>

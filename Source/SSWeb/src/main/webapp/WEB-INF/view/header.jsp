@@ -30,6 +30,10 @@
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/style-resp-1.1.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/perfect-scrollbar.min.css">
 	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/intlTelInput.css">
+	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/spectrum.css">
+	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/fontselector.css">
+	<link rel="stylesheet" href="${initParam.resourcesPath}/resources/css/prettify.css">
+	<link rel="stylesheet" href="${initParam.widgetResourcesPath}/widget/css/widget.css">
 </head>
 <body>
 	<div id="overlay-linkedin-import" class="overlay-login overlay-main hide"></div>
@@ -216,6 +220,18 @@
 				<c:if test="${not empty realTechAdminId}">
 					<div id="vndsta-setting-one" class="header-links-item hide" onclick="showMainContent('./showlistingsmanagersettings.do')"><spring:message code="label.vendastaproductsettings.key" /></div>
 				</c:if>
+				<c:if test="${!hiddenSectionDashboard}">
+					<div class="header-links-item" onclick="showMainContent('./showwidget.do');"><spring:message code="label.showwidget.key" /></div>
+					<div class="header-links-item" onclick="showMainContent('./shownewwidget.do');"><spring:message code="label.shownewwidget.key" /></div>
+				</c:if>
+				<c:if test="${hiddenSectionDashboard && highestrole != 4 }">
+					<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showwidget.do');">
+						<spring:message code="label.showwidget.key" />
+					</div>
+					<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./shownewwidget.do');">
+						<spring:message code="label.shownewwidget.key" />
+					</div>
+				</c:if>
 				</c:if>
 				<c:if test="${accountMasterId > 1 && accountMasterId <5 && highestrole != 4}">
 					<div class="header-links-item" onclick="showMainContent('./viewhierarchy.do');"><spring:message code="label.viewcompanyhierachy.key" /></div>
@@ -314,6 +330,11 @@
 									<spring:message code="label.showwidget.key" />
 								</div>
 							</c:if>
+							<c:if test="true">
+								<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./shownewwidget.do');">
+									<spring:message code="label.shownewwidget.key" />
+								</div>
+							</c:if>
 							<c:if test="${accountMasterId > 1 && accountMasterId != 5}">
 								<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showapps.do');">
 									<spring:message code="label.appsettings.key" />
@@ -351,6 +372,11 @@
 							<c:if test="true">
 								<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./showwidget.do');">
 									<spring:message code="label.showwidget.key" />
+								</div>
+							</c:if>
+							<c:if test="true">
+								<div class="hdr-link-item-dropdown-item" onclick="showMainContent('./shownewwidget.do');">
+									<spring:message code="label.shownewwidget.key" />
 								</div>
 							</c:if>
 							<c:if test="${accountMasterId > 1 && accountMasterId != 5}">

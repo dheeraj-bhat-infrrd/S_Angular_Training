@@ -219,6 +219,9 @@ var curWeekTransMonUnproGraphData = new Array();
 var KEYWORD_MONITOR='KEYWORD_MONITOR';
 var GOOGLE_ALERTS='GOOGLE_ALERTS';
 var jspData;
+
+var widgetDropDownHandlerSetup = false;
+
 /**
  * js functions for landing page
  */
@@ -402,9 +405,9 @@ $(document).on('click', function(e) {
 		$('#macro-alerts-chevron-up').toggle();
 	}
 
-	if ($('#summit-popup-body').is(':visible')) {
+	/*if ($('#summit-popup-body').is(':visible')) {
 		closeSummitPopup();
-	} 
+	} */
 	
 
 	if ($('#add-macro-action-options').is(':visible')) {
@@ -556,9 +559,9 @@ $(document).on('keyup', function(e) {
 			$('#macro-action-chevron-down').toggle();
 			$('#macro-action-chevron-up').toggle();
 		}
-		if ($('#summit-popup-body').is(':visible')) {
+		/*if ($('#summit-popup-body').is(':visible')) {
 			closeSummitPopup();
-		}
+		}*/
 	}
 });
 
@@ -3292,10 +3295,17 @@ function autoAppendEmailCriteriaDropdown(emailCriteriaId, classes) {
 
 
 //Generic functions
-function autoAppendTextDropdown(elementId, classes, listOfValues) {
-	listOfValues.map(function( item ){
-		$(elementId).append($('<div/>').addClass(classes).text(item));
-	});
+function autoAppendTextDropdown(elementId, classes, listOfValues, appendAsHtml ) {
+	
+	if( true === appendAsHtml ){
+		listOfValues.map(function( item ){
+			$(elementId).append($('<div/>').addClass(classes).html(item));
+		});
+	} else {
+		listOfValues.map(function( item ){
+			$(elementId).append($('<div/>').addClass(classes).text(item));
+		});
+	}
 }
 
 var ratingMouseUp = function (e){
@@ -21255,3 +21265,106 @@ $(document).on('click','#phone-number-work',function(e){
 		showToast();
 	}
 });
+
+
+function initSpectrum(elementJQObject, color, allowEmpty, changeFn){
+	elementJQObject.spectrum({
+	    color: color,
+	    flat: false,
+	    showInput: true,
+	    showInitial: true,
+	    allowEmpty: allowEmpty,
+	    showAlpha: false,
+	    disabled: false,
+	    localStorageKey: "widget",
+	    showPalette: true,
+	    showPaletteOnly: true,
+	    togglePaletteOnly: true,
+	    showSelectionPalette: true,
+	    clickoutFiresChange: true,
+	    cancelText: "cancel",
+	    chooseText: "pick",
+	    togglePaletteMoreText: "advanced",
+	    togglePaletteLessText: "basic",
+	    containerClassName: "widget-cp-cont",
+	    replacerClassName: "widget-rp-cp-cont",
+	    preferredFormat: "hex",
+	    maxSelectionSize: 5,
+	    palette: [        
+	    	["#000","#444","#666","#999","#ccc","#eee","#f3f3f3","#fff"],
+	        ["#f00","#f90","#ff0","#0f0","#0ff","#00f","#90f","#f0f"],
+	        ["#f4cccc","#fce5cd","#fff2cc","#d9ead3","#d0e0e3","#cfe2f3","#d9d2e9","#ead1dc"],
+	        ["#ea9999","#f9cb9c","#ffe599","#b6d7a8","#a2c4c9","#9fc5e8","#b4a7d6","#d5a6bd"],
+	        ["#e06666","#f6b26b","#ffd966","#93c47d","#76a5af","#6fa8dc","#8e7cc3","#c27ba0"],
+	        ["#c00","#e69138","#f1c232","#6aa84f","#45818e","#3d85c6","#674ea7","#a64d79"],
+	        ["#900","#b45f06","#bf9000","#38761d","#134f5c","#0b5394","#351c75","#741b47"],
+	        ["#600","#783f04","#7f6000","#274e13","#0c343d","#073763","#20124d","#4c1130"]],
+	    selectionPalette: ["red", "green", "blue", "gold"],
+	    change : changeFn
+	});
+}
+
+function initFontPicker(targetInputTagJQObject, font, changeFn ) {
+	targetInputTagJQObject.fontSelector({
+		'hide_fallbacks' : true,
+		'initial' : font,
+		'fonts' : getFont(),
+		'selected' : changeFn
+	});
+}
+
+function getFont(font){
+	
+	var fonts = [
+		'Arial,Arial,Helvetica,sans-serif',
+		'Arial Black,Arial Black,Gadget,sans-serif',
+		'Comic Sans MS,Comic Sans MS,cursive',
+		'Courier New,Courier New,Courier,monospace',
+		'Georgia,Georgia,serif',
+		'Impact,Charcoal,sans-serif',
+		'Lucida Console,Monaco,monospace',
+		'Lucida Sans Unicode,Lucida Grande,sans-serif',
+		'Palatino Linotype,Book Antiqua,Palatino,serif',
+		'Tahoma,Geneva,sans-serif',
+		'Times New Roman,Times,serif',
+		'Trebuchet MS,Helvetica,sans-serif',
+		'Verdana,Geneva,sans-serif',
+		'Gill Sans,Geneva,sans-serif',
+		'OpenSans, SansSerif'
+		];
+	
+	if( font === undefined ){
+		return fonts;
+	}
+	
+	for( var i = 0; i < fonts.length; i++ ){
+		if( fonts[i].indexOf(font.trim()) == 0 ){
+			return font[i];
+		}
+	}
+	
+	return ""; 
+	
+}
+
+//Overlay Popup generic
+function createGenericConfirmPopup(header, text, ok, cancel) {
+	$('#overlay-header').html(header);
+	$("#overlay-text").html(text);
+	$('#overlay-continue').html(ok);
+	$('#overlay-cancel').html(cancel);
+
+	$('#overlay-header').show()
+	$('#overlay-main').show();
+}
+
+function shakeElement( id, direction, times, distance, speed ){
+	$(id).effect("shake",{times:times,distance:distance,direction:direction},speed);
+}
+
+function setupWidgetDropdownHandler(){
+	if( false === widgetDropDownHandlerSetup ){
+		widgetDropDownHandlerSetup = true;
+		$(document).on('click', socialSurveyJavascriptWidget.dropdownHandler);
+	}
+}

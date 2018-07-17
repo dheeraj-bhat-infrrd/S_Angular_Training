@@ -63,6 +63,7 @@ import com.realtech.socialsurvey.core.entities.UserEmailMapping;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.entities.VerticalCrmMapping;
+import com.realtech.socialsurvey.core.entities.widget.WidgetConfigurationRequest;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
@@ -102,7 +103,11 @@ import com.realtech.socialsurvey.core.vo.UserList;
 import com.realtech.socialsurvey.core.workbook.utils.WorkbookData;
 import com.realtech.socialsurvey.web.api.builder.SSApiIntergrationBuilder;
 import com.realtech.socialsurvey.web.api.entities.FtpCreateRequest;
+import com.realtech.socialsurvey.web.api.exception.SSAPIException;
 import com.realtech.socialsurvey.web.common.JspResolver;
+
+import retrofit.client.Response;
+import retrofit.mime.TypedByteArray;
 
 
 // JIRA: SS-24 BY RM02 BOC
@@ -584,6 +589,41 @@ public class OrganizationManagementController
         model.addAttribute( "applicationBaseUrl", applicationBaseUrl );
         LOG.info( "Method showWidget of OrganizationManagementController completed successfully" );
         return JspResolver.SHOW_WIDGET;
+    }
+    
+    @RequestMapping ( value = "/shownewwidget", method = RequestMethod.GET)
+    public String showNewWidget( Model model, HttpServletRequest request )
+    {
+        LOG.info( "Method showNewWidget of OrganizationManagementController called" );
+        
+        try {  
+            User user = sessionHelper.getCurrentUser();
+            HttpSession session = request.getSession( false );
+            long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+            String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+            
+            OrganizationUnitSettings unitSettings = organizationManagementService.getEntitySettings( entityId, entityType );
+            OrganizationUnitSettings companySettings;
+            
+            companySettings = organizationManagementService.getCompanySettings( user.getCompany().getCompanyId() );
+            
+            
+            model.addAttribute( "applicationBaseUrl", applicationBaseUrl );
+            model.addAttribute( "profileName", unitSettings.getProfileName() );
+            model.addAttribute( "companyProfileName", companySettings.getProfileName() );
+            model.addAttribute( "resourcesUrl", endpoint );
+            
+            
+        } catch ( NonFatalException e ) {
+            LOG.error( "NonfatalException while showing javascript widget settings. Reason: ", e );
+            model.addAttribute( "message",
+                messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
+            return JspResolver.MESSAGE_HEADER;
+        }
+
+        
+        LOG.info( "Method showNewWidget of OrganizationManagementController completed successfully" );
+        return JspResolver.SHOW_NEW_WIDGET;
     }
 
 
@@ -4366,6 +4406,100 @@ public class OrganizationManagementController
             message = "Some problem occurred while updating settings. Please try again later";
         }
         return message;
+    }    
+
+    @ResponseBody
+    @RequestMapping ( value = "/savewidgetconfiguration", method=RequestMethod.POST)
+    public String saveWidgetConfiguration( HttpServletRequest request )
+    {
+        LOG.info( "Method saveWidgetConfiguration() started to store widget configuration." );
+
+        try {
+            WidgetConfigurationRequest widgetConfigurationRequest = new WidgetConfigurationRequest();
+            widgetConfigurationRequest.setFont( request.getParameter( CommonConstants.WIDGET_FONT ) );
+            widgetConfigurationRequest.setBackgroundColor( request.getParameter( CommonConstants.WIDGET_BACKGROUND_COLOR ) );
+            widgetConfigurationRequest
+                .setRatingAndStarColor( request.getParameter( CommonConstants.WIDGET_RATING_AND_STAR_COLOR ) );
+            widgetConfigurationRequest.setBarGraphColor( request.getParameter( CommonConstants.WIDGET_BAR_GRAPH_COLOR ) );
+            widgetConfigurationRequest.setForegroundColor( request.getParameter( CommonConstants.WIDGET_FOREGROUND_COLOR ) );
+            widgetConfigurationRequest.setFontTheme( request.getParameter( CommonConstants.WIDGET_FONT_THEME ) );
+            widgetConfigurationRequest
+                .setEmbeddedFontTheme( request.getParameter( CommonConstants.WIDGET_EMBEDDED_FONT_THEME ) );
+            widgetConfigurationRequest.setButtonOneName( request.getParameter( CommonConstants.WIDGET_BUTTON1_TEXT ) );
+            widgetConfigurationRequest.setButtonOneLink( request.getParameter( CommonConstants.WIDGET_BUTTON1_LINK ) );
+            widgetConfigurationRequest.setButtonOneOpacity( request.getParameter( CommonConstants.WIDGET_BUTTON1_OPACITY ) );
+            widgetConfigurationRequest.setButtonTwoName( request.getParameter( CommonConstants.WIDGET_BUTTON2_TEXT ) );
+            widgetConfigurationRequest.setButtonTwoLink( request.getParameter( CommonConstants.WIDGET_BUTTON2_LINK ) );
+            widgetConfigurationRequest.setButtonTwoOpacity( request.getParameter( CommonConstants.WIDGET_BUTTON2_OPACITY ) );
+            widgetConfigurationRequest
+                .setReviewLoaderName( request.getParameter( CommonConstants.WIDGET_LOAD_MORE_BUTTON_TEXT ) );
+            widgetConfigurationRequest
+                .setReviewLoaderOpacity( request.getParameter( CommonConstants.WIDGET_LOAD_MORE_BUTTON_OPACITY ) );
+            widgetConfigurationRequest.setReviewSortOrder( request.getParameter( CommonConstants.WIDGET_SORT_ORDER ) );
+            widgetConfigurationRequest.setMaxReviewsOnLoadMore( request.getParameter( CommonConstants.WIDGET_MAX_REVIEWS_ON_LOAD_MORE ) );
+            widgetConfigurationRequest.setInitialNumberOfReviews( request.getParameter( CommonConstants.WIDGET_INITIAL_NUMBER_OF_REVIEWS ) );
+            widgetConfigurationRequest.setHideBarGraph( request.getParameter( CommonConstants.WIDGET_HIDE_BAR_GRAPH ) );
+            widgetConfigurationRequest.setHideOptions( request.getParameter( CommonConstants.WIDGET_HIDE_OPTIONS ) );
+            widgetConfigurationRequest.setAllowModestBranding(request.getParameter( CommonConstants.WIDGET_ALLOW_MODEST_BRANDING ) );
+            widgetConfigurationRequest.setReviewSources( request.getParameter( CommonConstants.WIDGET_REVIEW_SOURCES ) );
+            widgetConfigurationRequest.setRequestMessage( request.getParameter( CommonConstants.REQUEST_MESSAGE ) );
+            widgetConfigurationRequest.setSeoTitle( request.getParameter( CommonConstants.WIDGET_SEO_TITLE ) );
+            widgetConfigurationRequest.setSeoKeywords( request.getParameter( CommonConstants.WIDGET_SEO_KEYWORDS ) );
+            widgetConfigurationRequest.setSeoDescription( request.getParameter( CommonConstants.WIDGET_SEO_DESCRIPTION ) );
+
+            
+            HttpSession session = request.getSession();
+            User user = sessionHelper.getCurrentUser();
+            long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+            String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+            Response response = null;
+
+            response = ssApiIntergrationBuilder.getIntegrationApi().saveWidgetConfiguration( entityId, entityType,
+                user.getUserId(), widgetConfigurationRequest );
+
+            LOG.info( "Method to saveWidgetConfiguration() finished." );
+            String responseString = null;
+            responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+            return responseString;
+        } catch ( SSAPIException e ) {
+            LOG.error( "Unable to save widget configuration.", e );
+            return e.getMessage();
+        } catch ( Exception e ) {
+            LOG.error( "Unable to save widget configuration.", e );
+            return "could not save widget configuration";
+        }
+    }
+    
+    @ResponseBody
+    @RequestMapping ( value = "/resetwidgetconfiguration", method=RequestMethod.POST)
+    public String resetWidgetConfiguration( HttpServletRequest request )
+    {
+        LOG.info( "Method resetWidgetConfiguration() started to store widget configuration." );
+
+        try {
+            String message =  request.getParameter( CommonConstants.REQUEST_MESSAGE );
+
+            
+            HttpSession session = request.getSession();
+            User user = sessionHelper.getCurrentUser();
+            long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
+            String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
+            Response response = null;
+
+            response = ssApiIntergrationBuilder.getIntegrationApi().resetWidgetConfiguration( entityId, entityType,
+                user.getUserId(), message );
+
+            LOG.info( "Method to resetWidgetConfiguration() finished." );
+            String responseString = null;
+            responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
+            return responseString;
+        } catch ( SSAPIException e ) {
+            LOG.error( "Unable to reset widget configuration.", e );
+            return e.getMessage();
+        } catch ( Exception e ) {
+            LOG.error( "Unable to reset widget configuration.", e );
+            return "could not reset widget configuration";
+        }
     }
         
 }

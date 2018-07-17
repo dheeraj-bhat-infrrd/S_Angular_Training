@@ -2076,6 +2076,20 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                 errorCode = SurveyErrorCode.UNSUBSCRIBED_CUSTOMER_EMAIL.name();
             }
 
+            //check is customer last name is null or customer first name have more then one words
+            if( survey.getCustomerFirstName().indexOf(" ") > 0 ) {
+            		if( survey.getCustomerFirstName().length() >= survey.getCustomerFirstName().indexOf(" ") + 2 ) {
+            			String newFirstName = survey.getCustomerFirstName().substring(0, survey.getCustomerFirstName().indexOf(" ") );
+            			String newLastName = survey.getCustomerFirstName().substring( survey.getCustomerFirstName().indexOf(" ") + 1 , survey.getCustomerFirstName().length());
+            			survey.setCustomerFirstName(newFirstName);
+            			//append if there is already last name 
+            			if(StringUtils.isEmpty(survey.getCustomerLastName()))
+            				survey.setCustomerLastName(newLastName);
+            			else
+            				survey.setCustomerLastName(newLastName + " " + survey.getCustomerLastName());
+        			}
+            }
+            
             if ( status == CommonConstants.STATUS_SURVEYPREINITIATION_PROCESSED ) {
                 if ( survey.getSurveySource().equalsIgnoreCase( CommonConstants.CRM_SOURCE_DOTLOOP ) ) {
                     status = validateUnitsettingsForDotloop( user, survey );

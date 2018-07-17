@@ -121,6 +121,7 @@ public interface JspResolver
     public static final String REVIEWS_UNDER_RESOLUTION_REPORTS = "reviewsunderresolution";
     public static final String ABUSIVE_REVIEWS_REPORTS = "abusivereviewsreports";
     public static final String SHOW_WIDGET = "show_widget";
+    public static final String SHOW_NEW_WIDGET = "show_new_widget";
     public static final String VENDASTA_SETTINGS = "listingsManagerSettings";
     public static final String LISTINGS_MANAGER_SETTINGS_ERROR = "listingsManagerSettingsError";
 

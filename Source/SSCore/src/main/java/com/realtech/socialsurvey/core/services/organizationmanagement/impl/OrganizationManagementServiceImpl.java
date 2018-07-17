@@ -10669,5 +10669,30 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
          formatter.setTimeZone(tz);
          return formatter.format(date);
      }
+     
+     
+     
+     @Override
+     public OrganizationUnitSettings getEntitySettings( long entityId, String entityType ) throws InvalidInputException
+     {
+         OrganizationUnitSettings unitSettings = null;
+         try {
+             if ( entityType.equals( CommonConstants.COMPANY_ID_COLUMN ) || entityType.equals( CommonConstants.PROFILE_LEVEL_COMPANY ) ) {
+                 unitSettings = getCompanySettings( entityId );
+             } else if ( entityType.equals( CommonConstants.AGENT_ID_COLUMN ) || entityType.equals( CommonConstants.PROFILE_LEVEL_INDIVIDUAL ) ) {
+                 unitSettings = getAgentSettings( entityId );
+             } else if ( entityType.equalsIgnoreCase( CommonConstants.BRANCH_ID_COLUMN ) || entityType.equals( CommonConstants.PROFILE_LEVEL_BRANCH ) ) {
+                 unitSettings = getBranchSettingsDefault( entityId );
+             } else if ( entityType.equalsIgnoreCase( CommonConstants.REGION_ID_COLUMN ) || entityType.equals( CommonConstants.PROFILE_LEVEL_REGION ) ) {
+                 unitSettings = getRegionSettings( entityId );
+             } else {
+                 throw new InvalidInputException( "Invalid entity type passed." );
+             }
+         } catch ( InvalidInputException | NoRecordsFetchedException e ) {
+             LOG.error( "Either invalid entity type was passed or no records were found.", e );
+             throw new InvalidInputException( "Either an invalid entity type was passed or no records were found." );
+         }
+         return unitSettings;
+     }
 
 }

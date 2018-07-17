@@ -7,29 +7,31 @@ import java.util.List;
 public class SurveyDetails
 {
     /**
-	 * 
-	 */
+     * 
+     */
 
-	private String _id;
-   
+    private String _id;
+
     //agent details
     private long agentId;
     private String agentName;
     private String agentEmailId;
+    private String agentTitle;
+    private String agentProfileImage;
 
     //entity ids
     private long companyId;
     private long regionId;
-    private long branchId;    
+    private long branchId;
 
     private String regionName;
     private String branchName;
-    
+
     //customer details
     private String customerFirstName;
     private String customerLastName;
     private String customerEmail;
-    
+
     //transaction details
     private long surveyPreIntitiationId;
     private String initiatedBy;
@@ -41,7 +43,7 @@ public class SurveyDetails
     private String source;
     private String sourceId;
     private Date surveyTransactionDate;
-    
+
     //review details
     private int stage;
     private double score;
@@ -79,33 +81,34 @@ public class SurveyDetails
     private Date surveyUpdatedDate;
     private Date createdOn;
     private Date modifiedOn;
-    
+
     //
     private boolean showSurveyOnUI;
     private boolean editable;
     private boolean underResolution;
-    
+
     //abusive details
     private boolean isAbusive;
     private boolean isAbuseRepByUser;
     private Date lastAbuseReportedDate;
-    
+
     //retake details
     private boolean openRetakeSurveyRequest;
     private boolean retakeSurvey;
     private int noOfRetake;
     private Date lastRetakeRequestDate;
-    private List<RetakeSurveyHistory> retakeSurveyHistory; 
-    
+    private List<RetakeSurveyHistory> retakeSurveyHistory;
+
     //NPS details
     private int npsScore = -1;
-    
+
     //abusive email set
     private boolean abusiveNotify;
-    
+
     //adding property address to survey details
     private String propertyAddress;
-        
+
+
     public String getAgentEmailId()
     {
         return agentEmailId;
@@ -286,27 +289,31 @@ public class SurveyDetails
     }
 
 
-    public String getRegionName() {
-		return regionName;
-	}
+    public String getRegionName()
+    {
+        return regionName;
+    }
 
 
-	public void setRegionName(String regionName) {
-		this.regionName = regionName;
-	}
+    public void setRegionName( String regionName )
+    {
+        this.regionName = regionName;
+    }
 
 
-	public String getBranchName() {
-		return branchName;
-	}
+    public String getBranchName()
+    {
+        return branchName;
+    }
 
 
-	public void setBranchName(String branchName) {
-		this.branchName = branchName;
-	}
+    public void setBranchName( String branchName )
+    {
+        this.branchName = branchName;
+    }
 
 
-	public int getStage()
+    public int getStage()
     {
         return stage;
     }
@@ -616,6 +623,8 @@ public class SurveyDetails
     {
         this.socialMediaPostDetails = socialMediaPostDetails;
     }
+
+
     public boolean isUnderResolution()
     {
         return underResolution;
@@ -747,6 +756,7 @@ public class SurveyDetails
         this.surveyType = surveyType;
     }
 
+
     public String getGoogleBusinessProfileUrl()
     {
         return googleBusinessProfileUrl;
@@ -759,28 +769,28 @@ public class SurveyDetails
     }
 
 
-	public String getCity()
-	{
-		return city;
-	}
+    public String getCity()
+    {
+        return city;
+    }
 
 
-	public void setCity( String city )
-	{
-		this.city = city;
-	}
+    public void setCity( String city )
+    {
+        this.city = city;
+    }
 
 
-	public String getState()
-	{
-		return state;
-	}
+    public String getState()
+    {
+        return state;
+    }
 
 
-	public void setState( String state )
-	{
-		this.state = state;
-	}
+    public void setState( String state )
+    {
+        this.state = state;
+    }
 
 
     public Date getSurveyUpdatedDate()
@@ -818,6 +828,7 @@ public class SurveyDetails
         this.npsScore = npsScore;
     }
 
+
     public int getNoOfRetake()
     {
         return noOfRetake;
@@ -848,30 +859,34 @@ public class SurveyDetails
     }
 
 
-    	public void setRetakeSurveyHistory( List<RetakeSurveyHistory> retakeSurveyHistory )
+    public void setRetakeSurveyHistory( List<RetakeSurveyHistory> retakeSurveyHistory )
     {
         this.retakeSurveyHistory = retakeSurveyHistory;
     }
 
 
-	public boolean isOpenRetakeSurveyRequest() {
-		return openRetakeSurveyRequest;
-	}
+    public boolean isOpenRetakeSurveyRequest()
+    {
+        return openRetakeSurveyRequest;
+    }
 
 
-	public void setOpenRetakeSurveyRequest(boolean openRetakeSurveyRequest) {
-		this.openRetakeSurveyRequest = openRetakeSurveyRequest;
-	}
+    public void setOpenRetakeSurveyRequest( boolean openRetakeSurveyRequest )
+    {
+        this.openRetakeSurveyRequest = openRetakeSurveyRequest;
+    }
 
 
-	public boolean isAbusiveNotify() {
-		return abusiveNotify;
-	}
+    public boolean isAbusiveNotify()
+    {
+        return abusiveNotify;
+    }
 
 
-	public void setAbusiveNotify(boolean abusiveNotify) {
-		this.abusiveNotify = abusiveNotify;
-	}
+    public void setAbusiveNotify( boolean abusiveNotify )
+    {
+        this.abusiveNotify = abusiveNotify;
+    }
 
 
     public String getPropertyAddress()
@@ -885,7 +900,29 @@ public class SurveyDetails
         this.propertyAddress = propertyAddress;
     }
 
-	
-		
-    
+
+    public String getAgentTitle()
+    {
+        return agentTitle;
+    }
+
+
+    public void setAgentTitle( String agentTitle )
+    {
+        this.agentTitle = agentTitle;
+    }
+
+
+    public String getAgentProfileImage()
+    {
+        return agentProfileImage;
+    }
+
+
+    public void setAgentProfileImage( String agentProfileImage )
+    {
+        this.agentProfileImage = agentProfileImage;
+    }
+
+
 }

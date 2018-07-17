@@ -74,7 +74,7 @@ public interface SurveyDetailsDao
 
 
     public List<SurveyDetails> getFeedbacks( String columnName, long columNValue, int start, int rows, double startScore,
-        double limitScore, boolean fetchAbusive, Date startDate, Date endDate, String sortCriteria );
+        double limitScore, boolean fetchAbusive, Date startDate, Date endDate, String sortCriteria, List<String> surveySources, String order );
 
 
     public long getFeedBacksCount( String columnName, long columnValue, double startScore, double limitScore,
@@ -385,5 +385,9 @@ public interface SurveyDetailsDao
 
 
     public SurveyDetails getsurveyFromSurveyPreinitiationId( long surveyPreinitiationId );
+
+
+    public long getSimpleFeedBacksCount( String columnName, long columnValue, double startScore, double limitScore,
+        boolean fetchAbusive );
 
 }

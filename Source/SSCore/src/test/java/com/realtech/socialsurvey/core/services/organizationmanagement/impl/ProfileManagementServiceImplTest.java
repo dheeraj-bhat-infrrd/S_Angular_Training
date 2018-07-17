@@ -986,7 +986,7 @@ public class ProfileManagementServiceImplTest
     @Test ( expected = InvalidInputException.class)
     public void testGetReviewsWithInvalidIden() throws InvalidInputException
     {
-        profileManagementServiceImpl.getReviews( 0, 0, 0, 0, 0, TestConstants.TEST_STRING, false, null, null, null );
+        profileManagementServiceImpl.getReviews( 0, 0, 0, 0, 0, TestConstants.TEST_STRING, false, null, null, null, null, null, false );
     }
 
 
