@@ -3604,10 +3604,10 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 accounts.addAll( resultList );
             }
 
-            while ( resultList != null && resultList.getPaging() != null && resultList.getPaging().getNext() != null ) {
+            /*while ( resultList != null && resultList.getPaging() != null && resultList.getPaging().getNext() != null ) {
                 resultList = facebook.fetchNext( resultList.getPaging() );
                 accounts.addAll( resultList );
-            }
+            }*/
             //convert Facebook account to SS entity
             FacebookPage facebookPage = null;
             for ( Account account : accounts ) {
