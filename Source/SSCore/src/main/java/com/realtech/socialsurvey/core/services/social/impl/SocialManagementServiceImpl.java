@@ -3598,7 +3598,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
         try {
             //get all account list using pagination
             ResponseList<Account> resultList;
-            Reading reading = new Reading().limit( 25 );
+            Reading reading = new Reading().limit( 2 );
             resultList = facebook.getAccounts( reading );
             if ( resultList != null ) {
                 accounts.addAll( resultList );
