@@ -10,7 +10,7 @@ public class BulkSurveyProcessResponseVO
     
     private String errorMessage;
     
-    private Map<String, Long> surveyIds = new HashMap<String, Long>();
+    private Map<Integer, Long> surveyIds = new HashMap<>();
 
     public boolean isProcessed() {
         return processed;
@@ -28,11 +28,11 @@ public class BulkSurveyProcessResponseVO
         this.errorMessage = errorMessage;
     }
 
-    public Map<String, Long> getSurveyIds() {
+    public Map<Integer, Long> getSurveyIds() {
         return surveyIds;
     }
 
-    public void setSurveyIds(Map<String, Long> surveyIds) {
+    public void setSurveyIds(Map<Integer, Long> surveyIds) {
         this.surveyIds = surveyIds;
     }
     
