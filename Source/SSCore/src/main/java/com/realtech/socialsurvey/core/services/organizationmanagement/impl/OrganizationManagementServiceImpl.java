@@ -5929,7 +5929,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
     @Transactional
     public List<Company> getCompaniesByName( String namePattern )
     {
-        return companyDao.searchCompaniesByName( namePattern );
+        List<Company> companyList = new ArrayList<>();
+        List<Object[]> result = companyDao.searchCompaniesByName( namePattern );
+        for(Object[] obj : result) {
+            Company company = new Company();
+            company.setCompanyId( Long.parseLong( obj[0].toString() ) );
+            company.setCompany( (String) obj[1] );
+            companyList.add( company );
+        }   
+        return companyList;
     }
 
 
