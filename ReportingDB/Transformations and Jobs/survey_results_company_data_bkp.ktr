@@ -102,6 +102,34 @@
       <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
     </attributes>
   </connection>
+  <connection>
+    <name>SS_INFO_CONNECTION</name>
+    <server>&#x24;&#x7b;SS_MYSQL_HOST&#x7d;</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>&#x24;&#x7b;SS_MYSQL_SCHEMA&#x7d;</database>
+    <port>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</port>
+    <username>&#x24;&#x7b;SS_MYSQL_USER_NAME&#x7d;</username>
+    <password>&#x24;&#x7b;SS_MYSQL_PASSWORD&#x7d;</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCompression</code><attribute>true</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useServerPrepStmts</code><attribute>false</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>&#x24;&#x7b;SS_MYSQL_PORT&#x7d;</attribute></attribute>
+      <attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
   <order>
   </order>
   <step>
@@ -120,7 +148,7 @@
     <single_statement>N</single_statement>
     <replace_variables>N</replace_variables>
     <quoteString>N</quoteString>
-    <sql>insert into survey_results_company_report_bkp&#x28;SURVEY_RESULTS_COMPANY_REPORT_BKP_ID, SURVEY_DETAILS_ID, COMPANY_ID, AGENT_ID, USER_FIRST_NAME, USER_LAST_NAME&#xd;&#xa;, CUSTOMER_FIRST_NAME, CUSTOMER_LAST_NAME, SURVEY_SENT_DATE, SURVEY_COMPLETED_DATE, TIME_INTERVAL, SURVEY_SOURCE&#xd;&#xa;, SURVEY_SOURCE_ID, SURVEY_SCORE, GATEWAY, CUSTOMER_COMMENTS, AGREED_TO_SHARE, BRANCH_NAME, PARTICIPANT_TYPE, AGENT_EMAILID&#xd;&#xa;,CUSTOMER_EMAIL_ID, CLICK_THROUGH_FOR_COMPANY&#xd;&#xa;, CLICK_THROUGH_FOR_AGENT, CLICK_THROUGH_FOR_REGION, CLICK_THROUGH_FOR_BRANCH, STATE,CITY,REPORT_MODIFIED_ON, IS_DELETED&#x29; &#xd;&#xa;&#x28;SELECT SURVEY_RESULTS_COMPANY_REPORT_ID, SURVEY_DETAILS_ID, COMPANY_ID, AGENT_ID, USER_FIRST_NAME, USER_LAST_NAME&#xd;&#xa;, CUSTOMER_FIRST_NAME, CUSTOMER_LAST_NAME, SURVEY_SENT_DATE, SURVEY_COMPLETED_DATE, TIME_INTERVAL, SURVEY_SOURCE&#xd;&#xa;, SURVEY_SOURCE_ID, SURVEY_SCORE, GATEWAY, CUSTOMER_COMMENTS, AGREED_TO_SHARE, BRANCH_NAME, PARTICIPANT_TYPE, AGENT_EMAILID&#xd;&#xa;,CUSTOMER_EMAIL_ID, CLICK_THROUGH_FOR_COMPANY&#xd;&#xa;, CLICK_THROUGH_FOR_AGENT, CLICK_THROUGH_FOR_REGION, CLICK_THROUGH_FOR_BRANCH, STATE,CITY,REPORT_MODIFIED_ON, 1&#xd;&#xa;FROM survey_results_company_report &#x29;&#x3b;&#xd;&#xa;&#xd;&#xa;truncate survey_results_company_report&#x3b;&#xd;&#xa;</sql>
+    <sql>truncate survey_results_company_report&#x3b;&#xd;&#xa;</sql>
     <set_params>N</set_params>
     <insert_field/>
     <update_field/>
