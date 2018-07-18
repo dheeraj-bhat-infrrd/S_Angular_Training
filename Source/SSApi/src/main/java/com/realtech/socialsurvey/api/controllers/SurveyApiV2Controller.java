@@ -862,7 +862,7 @@ public class SurveyApiV2Controller
         for (SurveyPutVO surveyPutVO : surveyPutVOs) {
             // create response VO
             BulkSurveyProcessResponseVO bulkSurveyProcessResponseVO = new BulkSurveyProcessResponseVO();
-            Map<String, Long> surveyIds = new HashMap<String, Long>();
+            Map<Integer, Long> surveyIds = new HashMap<>();
             try {
                 //transform api object to domain object
                 transactionSurveyPreInitiations = surveyPreinitiationTransformer.transformApiRequestToDomainObject(surveyPutVO, companyId, bulkSurveyPutVO.getSource());
@@ -871,7 +871,8 @@ public class SurveyApiV2Controller
                 //save validated object
                 for (SurveyPreInitiation surveyPreInitiation : transactionSurveyPreInitiations) {
                     surveyPreInitiation = surveyHandler.saveSurveyPreInitiationObject(surveyPreInitiation);
-                    surveyIds.put(surveyPreInitiation.getCustomerEmailId(), surveyPreInitiation.getSurveyPreIntitiationId());
+                    if(surveyPreInitiation.getStatus() == CommonConstants.SURVEY_STATUS_PRE_INITIATED)
+                        surveyIds.put(surveyPreInitiation.getParticipantType(), surveyPreInitiation.getSurveyPreIntitiationId());
                 }           
                 //fill response vo
                 bulkSurveyProcessResponseVO.setProcessed(true);

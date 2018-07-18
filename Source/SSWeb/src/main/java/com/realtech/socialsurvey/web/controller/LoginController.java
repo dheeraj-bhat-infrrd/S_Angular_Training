@@ -429,6 +429,7 @@ public class LoginController
             //check if login is prevented for user
             if(agentSettings.isLoginPrevented() &&  ! StringUtils.equals(((String) session.getAttribute( CommonConstants.IS_AUTO_LOGIN)), "true")  ) {
             		session.invalidate();
+            	model.addAttribute( "userId", user.getUserId() );
                 SecurityContextHolder.clearContext();
                 model.addAttribute( CommonConstants.DISABLED_ACCOUNT_FLAG, CommonConstants.YES );
                 return JspResolver.LOGIN_DISABLED_PAGE;
@@ -551,7 +552,7 @@ public class LoginController
         return "redirect:/" + redirectTo + ".do";
     }
 
-
+    
     /**
      * Start the companyinformation page
      * 

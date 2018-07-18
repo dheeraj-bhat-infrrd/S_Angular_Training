@@ -1,1 +1,1 @@
-Successfully processed FTP - %s
+Finished processing FTP - %s

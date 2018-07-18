@@ -16,6 +16,13 @@ public class TransactionInfoPutVO
     private String customer2LastName;
     private String customer2Email;
     
+    private String buyerAgentFirstName;
+    private String buyerAgentLastName;
+    private String buyerAgentEmail;
+    private String sellerAgentFirstName;
+    private String sellerAgentLastName;
+    private String sellerAgentEmail;
+    
     //adding property address feild 
     private String propertyAddress;
 
@@ -163,5 +170,75 @@ public class TransactionInfoPutVO
         this.propertyAddress = propertyAddress;
     }
 
-    
+    public String getBuyerAgentFirstName()
+    {
+        return buyerAgentFirstName;
+    }
+
+
+    public void setBuyerAgentFirstName( String buyerAgentFirstName )
+    {
+        this.buyerAgentFirstName = buyerAgentFirstName;
+    }
+
+
+    public String getBuyerAgentLastName()
+    {
+        return buyerAgentLastName;
+    }
+
+
+    public void setBuyerAgentLastName( String buyerAgentLastName )
+    {
+        this.buyerAgentLastName = buyerAgentLastName;
+    }
+
+
+    public String getBuyerAgentEmail()
+    {
+        return buyerAgentEmail;
+    }
+
+
+    public void setBuyerAgentEmail( String buyerAgentEmail )
+    {
+        this.buyerAgentEmail = buyerAgentEmail;
+    }
+
+
+    public String getSellerAgentFirstName()
+    {
+        return sellerAgentFirstName;
+    }
+
+
+    public void setSellerAgentFirstName( String sellerAgentFirstName )
+    {
+        this.sellerAgentFirstName = sellerAgentFirstName;
+    }
+
+
+    public String getSellerAgentLastName()
+    {
+        return sellerAgentLastName;
+    }
+
+
+    public void setSellerAgentLastName( String sellerAgentLastName )
+    {
+        this.sellerAgentLastName = sellerAgentLastName;
+    }
+
+
+    public String getSellerAgentEmail()
+    {
+        return sellerAgentEmail;
+    }
+
+
+    public void setSellerAgentEmail( String sellerAgentEmail )
+    {
+        this.sellerAgentEmail = sellerAgentEmail;
+    }
+
 }

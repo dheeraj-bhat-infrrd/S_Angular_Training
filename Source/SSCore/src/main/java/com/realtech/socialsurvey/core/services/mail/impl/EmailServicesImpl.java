@@ -3122,6 +3122,7 @@ public class EmailServicesImpl implements EmailServices
         messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, companyName, fileName, fileDate,
             String.valueOf( ftpSurveyResponse.getTotalTransaction() ), String.valueOf( ftpSurveyResponse.getTotalSurveys() ),
             String.valueOf( ftpSurveyResponse.getCustomer1Count() ), String.valueOf( ftpSurveyResponse.getCustomer2Count() ),
+            String.valueOf( ftpSurveyResponse.getBuyerCount() ), String.valueOf( ftpSurveyResponse.getSellerCount() ),
             String.valueOf( ftpSurveyResponse.getErrorNum() ), ftpErrorHtml ) );
 
         LOG.trace( "Calling email sender to send mail" );

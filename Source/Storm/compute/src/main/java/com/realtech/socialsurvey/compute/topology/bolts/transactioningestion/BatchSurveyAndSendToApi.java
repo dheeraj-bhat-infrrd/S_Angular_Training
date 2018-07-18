@@ -35,6 +35,10 @@ public class BatchSurveyAndSendToApi extends BaseComputeBoltWithAck
 {
     private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger( ConvertToSurveyObject.class );
+    public static final int SURVEY_PARTICIPANT_TYPE_BORROWER = 1;
+    public static final int SURVEY_PARTICIPANT_TYPE_COBORROWER = 2;
+    public static final int SURVEY_PARTICIPANT_TYPE_BUYER_AGENT = 3;
+    public static final int SURVEY_PARTICIPANT_TYPE_SELLER_AGENT = 4;
     
     @Override
     public void declareOutputFields( OutputFieldsDeclarer arg0 )
@@ -158,6 +162,8 @@ public class BatchSurveyAndSendToApi extends BaseComputeBoltWithAck
         int totalSurvey = ftpSurveyResponse.getTotalSurveys();
         int customer1Count = ftpSurveyResponse.getCustomer1Count();
         int customer2Count = ftpSurveyResponse.getCustomer2Count();
+        int buyerCount = ftpSurveyResponse.getBuyerCount();
+        int sellerCount = ftpSurveyResponse.getSellerCount();
         int errorNum = ftpSurveyResponse.getErrorNum();
         //since startIndex starts from 0 we need to add 1
         //since we are not including header line we need to include that one too
@@ -166,13 +172,22 @@ public class BatchSurveyAndSendToApi extends BaseComputeBoltWithAck
         for(BulkSurveyProcessResponseVO bulkResponse:responseData) {
             //if processed is true update totalSurveys,customer1Count,customer2Count
             if(bulkResponse.isProcessed()) {
-                ++totalSurvey;
-                ++customer1Count;
-                if(bulkResponse.getSurveyIds().size()>1) {
+                if(bulkResponse.getSurveyIds().containsKey(SURVEY_PARTICIPANT_TYPE_BORROWER)) {
+                    ++totalSurvey;
+                    ++customer1Count;
+                }
+                if(bulkResponse.getSurveyIds().containsKey(SURVEY_PARTICIPANT_TYPE_COBORROWER)) {
                     ++totalSurvey;
                     ++customer2Count;
                 }
-                    
+                if(bulkResponse.getSurveyIds().containsKey(SURVEY_PARTICIPANT_TYPE_BUYER_AGENT)) {
+                    ++totalSurvey;
+                    ++buyerCount;
+                }
+                if(bulkResponse.getSurveyIds().containsKey(SURVEY_PARTICIPANT_TYPE_SELLER_AGENT)) {
+                    ++totalSurvey;
+                    ++sellerCount;
+                }
             }else {
                 //else update errorNum,errorMessage
                 ++errorNum;
@@ -183,6 +198,8 @@ public class BatchSurveyAndSendToApi extends BaseComputeBoltWithAck
         ftpSurveyResponse.setTotalSurveys( totalSurvey );
         ftpSurveyResponse.setCustomer1Count( customer1Count );
         ftpSurveyResponse.setCustomer2Count( customer2Count );
+        ftpSurveyResponse.setBuyerCount( buyerCount );
+        ftpSurveyResponse.setSellerCount( sellerCount );
         ftpSurveyResponse.setErrorNum( errorNum );
         ftpSurveyResponse.setErrorMessage( errorMessage );
         
