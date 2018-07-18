@@ -451,8 +451,7 @@ public interface SSApiIntegration
         @Query ( "companyProfileName") String companyProfileName, @Query ( "hideHistory") boolean hideHistory );
 
 
-    @POST ( "/v1/resetwidgetconfiguration")
-    Response resetWidgetConfiguration( @Query ( "entityId") long entityId, @Query ( "entityType") String entityType,
-        @Query ( "userId") long userId, @Query ( "requestMessage") String message );
+    @GET ( "/v1/getdefaultwidgetconfiguration")
+    Response getDefaultWidgetConfiguration( @Query ( "entityId") long entityId, @Query ( "entityType") String entityType );
 
 }

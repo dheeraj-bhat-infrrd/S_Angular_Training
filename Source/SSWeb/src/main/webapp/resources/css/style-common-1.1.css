@@ -2041,3 +2041,7 @@ span.footer-ul a:hover {
 	color: red;
 }
 
+.disable-page-logout {
+	color: #fff;
+	font-weight : bold !important; 
+}

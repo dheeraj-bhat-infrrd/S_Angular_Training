@@ -75,9 +75,9 @@
 			loadCss($, resourcesHost + "/widget/css/bootstrap.min.css");
 			loadCss($, resourcesHost + "/widget/css/widget.css");
 			loadScript(resourcesHost + "/widget/js/widget-framework.js", function() {
-				var companyProfileName = $('#ss-new-widget-js').data('company-profile-name');
-				var profileName = $('#ss-new-widget-js').data('profile-name');
-				var profileLevel = $('#ss-new-widget-js').data('profile-level');
+				var companyProfileName = $(currScript).data('company-profile-name');
+				var profileName = $(currScript).data('profile-name');
+				var profileLevel = $(currScript).data('profile-level');
 				var widOuterContainer = undefined;
 				if (dataContainer != undefined && dataContainer != "" && dataContainer != null ) {
 					widOuterContainer = $('#' + dataContainer);

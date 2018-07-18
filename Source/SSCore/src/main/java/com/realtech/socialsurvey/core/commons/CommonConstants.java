@@ -1718,7 +1718,7 @@ public interface CommonConstants
     public static final String WIDGET_ORDER_HIGEST_RATING_FIRST = "highestRatingFirst";
     public static final String WIDGET_ORDER_LOWEST_RATING_FIRST = "lowestRatingFirst";
     
-    public static final String WIDGET_DEFAULT_FONT = "OpenSans, SansSerif";
+    public static final String WIDGET_DEFAULT_FONT = "Open Sans, Sans-Serif";
     public static final String WIDGET_DEFAULT_BACKGROUND_COLOR = "#ffffff";
     public static final String WIDGET_DEFAULT_RATING_AND_STAR_COLOR = "#257bc4";
     public static final String WIDGET_DEFAULT_BAR_GRAPH_COLOR = "#4490cb";

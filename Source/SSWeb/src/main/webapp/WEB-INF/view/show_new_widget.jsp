@@ -250,7 +250,7 @@
 						<div id="widget-conf-save" class="ol-btn cursor-pointer">Save</div>
 					</div>
 					<div class="float-right" style="width: 55%;">
-						<div id="widget-conf-reset" class="ol-btn cursor-pointer">Reset</div>
+						<div id="widget-conf-reset" class="ol-btn cursor-pointer">Load Defaults</div>
 					</div>
 				    <div class="widget-error hide"></div>
 				</div>
@@ -281,14 +281,14 @@
 						onclick="javascript:copyWidgetToClipboard('widget-js-cust-code-area')">Copy
 						to clipboard</div>
 				</div>
-				<!-- <br/><br/><br/><br/> -->
-				<div class="st-new-widget-txt hide" style="font-weight: 600 !important;">
+				<br/><br/><br/><br/>
+				<div class="st-new-widget-txt" style="font-weight: 600 !important;">
 					<spring:message code="label.widgetjsidesc.key" />
 				</div>
-				<div id="widget-jsi-container" class="prof-user-address prof-edit-icn hide">
+				<div id="widget-jsi-container" class="prof-user-address prof-edit-icn">
 					<pre class="prettyprint" id="widget-jsi-code-area"></pre>
 				</div>
-				<div class="ol-btn-wrapper widget-copy widget-btn-cpy hide" >
+				<div class="ol-btn-wrapper widget-copy widget-btn-cpy" >
 					<div id="overlay-continue-jsi" class="ol-btn cursor-pointer"
 						onclick="javascript:copyWidgetToClipboard('widget-jsi-code-area')">Copy
 						to clipboard</div>
@@ -303,7 +303,7 @@ var wAppBaseUrl = "${applicationBaseUrl}";
 var wProfileLevel = "${profileLevel}";
 var wProfileName = "${profileName}";
 var wCompanyProfileName = "${companyProfileName}";
-var resourcesUrl = "${resourcesUrl}";
+var resourcesUrl = "${initParam.widgetResourcesPath}";
 
 var bonf = false;
 var btnf = false;

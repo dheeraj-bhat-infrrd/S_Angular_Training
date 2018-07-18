@@ -269,7 +269,7 @@ var socialSurveyJavascriptWidget = {
 						revSources = revSources.substring(0, revSources.length - 12);
 					}
 					socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.reviewSources = revSources;
-				}else {
+				} else {
 					socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.reviewSources = "SocialSurvey Verified,Zillow";
 				}
 			}
@@ -401,21 +401,20 @@ var socialSurveyJavascriptWidget = {
 			}
 			socialSurveyJavascriptWidget.displayPreview();
 		});
-		
-		
-		$('#title-tag-text').on( "change", function(){
+
+		$('#title-tag-text').on("change", function() {
 			socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.seoTitle = $('#title-tag-text').val();
-			//socialSurveyJavascriptWidget.displayPreview();
+			// socialSurveyJavascriptWidget.displayPreview();
 		});
-		
-		$('#kw-tag-text').on( "change", function(){
+
+		$('#kw-tag-text').on("change", function() {
 			socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.seoKeywords = $('#kw-tag-text').val();
-			//socialSurveyJavascriptWidget.displayPreview();
+			// socialSurveyJavascriptWidget.displayPreview();
 		});
-		
-		$('#dsc-tg-txt').on( "change", function(){
+
+		$('#dsc-tg-txt').on("change", function() {
 			socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.seoDescription = $('#dsc-tg-txt').val();
-			//socialSurveyJavascriptWidget.displayPreview();
+			// socialSurveyJavascriptWidget.displayPreview();
 		});
 
 		$('#st-dd-wrapper-conf-history').on('click', '.conf-history-option-item', function(event) {
@@ -444,7 +443,7 @@ var socialSurveyJavascriptWidget = {
 			$('#overlay-continue').on('click', function() {
 				if (socialSurveyJavascriptWidget.validateSaveResetMessage()) {
 					socialSurveyJavascriptWidget.saveConfiguration($('.widget-commit-bx').val());
-			
+
 					overlayRevert();
 					$('#overlay-continue').off('click');
 					$('#overlay-cancel').off('click');
@@ -459,7 +458,7 @@ var socialSurveyJavascriptWidget = {
 			socialSurveyJavascriptWidget.dropdownHandler(event);
 		})
 
-		$('#widget-conf-reset').on('click', function(event) {
+		/*$('#widget-conf-reset').on('click', function(event) {
 			event.stopPropagation();
 			createGenericConfirmPopup("Reset Widget Configuration", 'Tag this change with a short message<br/><br/> <input type="text" class="st-item-row-txt widget-commit-bx" placeholder="message"><div class="widget-message-error hide"></div>', "Submit", "Cancel");
 			$('#overlay-continue').on('click', function() {
@@ -476,6 +475,15 @@ var socialSurveyJavascriptWidget = {
 				$('#overlay-cancel').off('click');
 				overlayRevert();
 			});
+			// continue processing other events
+			socialSurveyJavascriptWidget.dropdownHandler(event);
+		})*/
+		
+		
+		$('#widget-conf-reset').on('click', function(event) {
+			event.stopPropagation();
+			socialSurveyJavascriptWidget.resetConfiguration();
+
 			// continue processing other events
 			socialSurveyJavascriptWidget.dropdownHandler(event);
 		})
@@ -705,13 +713,7 @@ var socialSurveyJavascriptWidget = {
 	},
 
 	displayPreview : function() {
-		
-		var resourcePath = resourcesUrl;
-		if( wAppBaseUrl.indexOf('socialsurvey') >= 0 || wAppBaseUrl.indexOf('localhost') >= 0 || wAppBaseUrl.indexOf('127.0.0.1') >= 0 ) {
-			resourcePath = wAppBaseUrl.substring(0, wAppBaseUrl.length -1);
-		}
-
-		drawWidgetFramework($, $('#basic-widget-view'), socialSurveyJavascriptWidget.widgetDetails, wProfileName, wProfileLevel, wCompanyProfileName, resourcePath, wAppBaseUrl.substring(0, wAppBaseUrl.length -1) );
+		drawWidgetFramework($, $('#basic-widget-view'), socialSurveyJavascriptWidget.widgetDetails, wProfileName, wProfileLevel, wCompanyProfileName, resourcesUrl, wAppBaseUrl.substring(0, wAppBaseUrl.length - 1));
 	},
 
 	applyHistory : function(historyIndex) {
@@ -814,12 +816,12 @@ var socialSurveyJavascriptWidget = {
 			this.showValidationError("On load review count must be a number less than 1000");
 			return false;
 
-		} else if ( $('#button-one-name').val().length > 15 ) {
+		} else if ($('#button-one-name').val().length > 15) {
 
 			this.showValidationError("Button one name must not have more than 15 characters.");
 			return false;
 
-		} else if ( $('#button-two-name').val().length > 15 ) {
+		} else if ($('#button-two-name').val().length > 15) {
 
 			this.showValidationError("Button two name must not have more than 15 characters.");
 			return false;
@@ -852,16 +854,18 @@ var socialSurveyJavascriptWidget = {
 		hideOverlay();
 	},
 
-	resetConfiguration : function(message) {
+	resetConfiguration : function() {
 		showOverlay();
-		var payload = {
-			"requestMessage" : message
-		};
-		callAjaxPostWithPayloadData('./resetwidgetconfiguration.do', this.saveWidgetConfigCallback, payload, false);
-		this.loadConfiguration();
+		callAjaxGET('./getdefaultwidgetconfiguration.do', this.getDefaultWidgetConfigCallback, false);
 		this.populateConfiguration();
 		this.displayPreview();
 		hideOverlay();
+	},
+	
+	getDefaultWidgetConfigCallback : function(data) {
+		data = $.parseJSON(data);
+		data.history = socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.history;
+		socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration = data;
 	},
 
 	validateSaveResetMessage : function() {
@@ -902,7 +906,7 @@ var socialSurveyJavascriptWidget = {
 		var bodyJsCust = "";
 		var bodyJsi = "";
 
-		bodyJs = '&lt;script id="ss-new-widget-js"\n	data-company-profile-name=\"' + wCompanyProfileName + '\"\n 	data-profile-name=\"' + wProfileName + '\"\n	data-profile-level=\"' + wProfileLevel + '\"\n' + '	type="text/javascript"\n ' + '	src=\"' + wAppBaseUrl + 'widget/js/ss-widget-bootstrap.js\" &gt;\n&lt;/script&gt;';
+		bodyJs = '&lt;script id="ss-new-widget-js"\n	data-company-profile-name=\"' + wCompanyProfileName + '\"\n 	data-profile-name=\"' + wProfileName + '\"\n	data-profile-level=\"' + wProfileLevel + '\"\n' + '	type="text/javascript"\n ' + '	src=\"' + resourcesUrl + '/widget/js/ss-widget-bootstrap.js\" &gt;\n&lt;/script&gt;';
 
 		$("#widget-js-code-area").html(bodyJs);
 		$('#overlay-continue-js').click(function() {
@@ -910,7 +914,7 @@ var socialSurveyJavascriptWidget = {
 			$('#overlay-continue-js').unbind('click');
 		});
 
-		bodyJsCust = '&lt;script id="ss-new-widget-js"\n	data-company-profile-name=\"' + wCompanyProfileName + '\"\n 	data-profile-name=\"' + wProfileName + '\"\n	data-profile-level=\"' + wProfileLevel + '\"\n' + '	data-container = ""\n	type="text/javascript"\n	src=\"' + wAppBaseUrl + 'widget/js/ss-widget-bootstrap.js\" &gt;\n&lt;/script&gt;';
+		bodyJsCust = '&lt;script id="ss-new-widget-js"\n	data-company-profile-name=\"' + wCompanyProfileName + '\"\n 	data-profile-name=\"' + wProfileName + '\"\n	data-profile-level=\"' + wProfileLevel + '\"\n' + '	data-container = ""\n	type="text/javascript"\n	src=\"' + resourcesUrl + '/widget/js/ss-widget-bootstrap.js\" &gt;\n&lt;/script&gt;';
 
 		$("#widget-js-cust-code-area").html(bodyJsCust);
 		$('#overlay-continue-js-cust').click(function() {
@@ -918,7 +922,7 @@ var socialSurveyJavascriptWidget = {
 			$('#overlay-continue-js-cust').unbind('click');
 		});
 
-		bodyJsi = '&lt;iframe id="ss-new-widget-iframe" frameborder="0" width="100%" height="500px" style="overflow-y: scroll;" &gt;\n' + '\n' + '\n' + '\n' + '&lt;script id="ss-new-widget-js"\n	data-company-profile-name=\"' + wCompanyProfileName + '\"\n 	data-profile-name=\"' + wProfileName + '\"\n	data-profile-level=\"' + wProfileLevel + '\"\n' + '	type="text/javascript"\n ' + '	src=\"' + wAppBaseUrl + 'widget/js/ss-widget-bootstrap.js\" &gt;\n&lt;/script&gt;' + '\n' + '\n' + '\n' + '&lt;script type="text/javascript"&gt;\n' + '	window.onload = function() { window.parent.postMessage( document.body.scrollHeight,"*")};\n' + '&lt;/script&gt;\n' + '\n' + '&lt;/iframe&gt;\n' + '&lt;script type="text/javascript"&gt;\n' + '$(document).ready(function(){\n' + '	var myEventMethod = window.addEventListener ? "addEventListener" : "attachEvent";\n' + '	var myEventListener = window[myEventMethod];\n' + '	var myEventMessage = myEventMethod == "attachEvent" ? "onmessage" : "message";\n' + '	myEventListener( myEventMessage, function (e) {\n' + '		if (e.data === parseInt(e.data))\n' + '			document.getElementById("ss-new-widget-iframe").height = e.data + "px";\n' + '	}, false);\n' + '});\n' + '&lt;/script&gt;\n';
+		bodyJsi = '&lt;iframe id="ss-new-widget-iframe" frameborder="0" width="100%" height="100%"&gt;&lt;/iframe&gt;\n' + '\n' + '&lt;script&gt;\n' + 'window.onload = function(){\n' + '	var widgetIFrameHead = document.getElementById("ss-new-widget-iframe").contentWindow.document.getElementsByTagName("head")[0];\n' + '	var widgetIframeBody = document.getElementById("ss-new-widget-iframe").contentWindow.document.getElementsByTagName("body")[0];\n' + '	var widgetScript = document.createElement("script");\n' + '	var widgetContainer = document.createElement("div");\n' + '	widgetContainer.id = "ss-new-widget-container";\n' + '	widgetScript.type = "text/javascript";\n' + '	widgetScript.setAttribute( "data-company-profile-name", \"' + wCompanyProfileName + '\" );\n' + '	widgetScript.setAttribute( "data-profile-name", \"' + wProfileName + '\" );\n' + '	widgetScript.setAttribute( "data-profile-level", \"' + wProfileLevel + '\" );\n' + '	widgetScript.setAttribute( "data-container", "ss-new-widget-container" );\n' + '	widgetScript.src = \"' + resourcesUrl + '/widget/js/ss-widget-bootstrap.js\";\n' + '	widgetIFrameHead.appendChild(widgetScript);\n' + '	widgetIframeBody.appendChild(widgetContainer);\n' + '};\n' + '&lt;/script&gt;';
 
 		$("#widget-jsi-code-area").html(bodyJsi);
 		$('#overlay-continue-jsi').click(function() {
