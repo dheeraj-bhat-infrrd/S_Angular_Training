@@ -1928,8 +1928,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                     }
                     
                     if( unitSettings.getContact_details() != null ) {
-                        review.setAgentTitle( unitSettings.getContact_details().getTitle() );
-                        review.setAgentName( unitSettings.getContact_details().getName() );                        
+                        review.setAgentTitle( unitSettings.getContact_details().getTitle() );                      
                     }
                     review.setAgentProfileImage( unitSettings.getProfileImageUrl() );
                 }
