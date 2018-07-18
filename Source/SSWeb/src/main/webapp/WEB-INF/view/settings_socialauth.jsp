@@ -92,7 +92,7 @@
 	<div id="edt-prof-zillow-lnk" class="float-left soc-nw-icn-link"
 		data-social='zillow'>${zillowLink}</div>
 </div>
-<%-- <div class="soc-nw-icns-cont clearfix">
+<div class="soc-nw-icns-cont clearfix">
 	<c:choose>
 		<c:when test="${not empty instagramLink}">
 			<div class="social-media-disconnect float-left ${socialDisabled}"
@@ -107,4 +107,4 @@
 		onclick="openAuthPage(event,'instagram', ${isAutoLogin}, this);" data-link="${instagramLink}"></div>
 	<div id="edt-prof-insta-lnk" class="float-left soc-nw-icn-link"
 		data-social='instagram'>${instagramLink}</div>
-</div> --%>
+</div>

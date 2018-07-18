@@ -1920,13 +1920,18 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                             review.setSourceId( review.getCompleteProfileUrl() );
                         }
                     }
+                    OrganizationUnitSettings unitSettings = null;
                     if( review.getAgentId() > 0 && addAgentInfo ) {
-                        OrganizationUnitSettings agent = organizationUnitSettingsDao.fetchAgentSettingsById( review.getAgentId() );
-                        if( agent.getContact_details() != null ) {
-                            review.setAgentTitle( agent.getContact_details().getTitle() );
-                        }
-                        review.setAgentProfileImage( agent.getProfileImageUrl() );
+                        unitSettings = organizationUnitSettingsDao.fetchAgentSettingsById( review.getAgentId() );
+                    } else {
+                        unitSettings = organizationManagementService.getEntitySettings( iden, idenColumnName );
                     }
+                    
+                    if( unitSettings.getContact_details() != null ) {
+                        review.setAgentTitle( unitSettings.getContact_details().getTitle() );
+                        review.setAgentName( unitSettings.getContact_details().getName() );                        
+                    }
+                    review.setAgentProfileImage( unitSettings.getProfileImageUrl() );
                 }
             }
         }

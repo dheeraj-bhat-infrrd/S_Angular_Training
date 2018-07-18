@@ -29,6 +29,7 @@ import com.realtech.socialsurvey.core.entities.widget.WidgetConfiguration;
 import com.realtech.socialsurvey.core.entities.widget.WidgetConfigurationRequest;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.widget.WidgetManagementService;
@@ -50,6 +51,9 @@ public class WidgetApiController
 
     @Autowired
     private ProfileManagementService profileManagementService;
+    
+    @Autowired
+    private OrganizationManagementService organizationManagementService;
 
 
     @ResponseBody
@@ -57,7 +61,6 @@ public class WidgetApiController
     @ApiOperation ( value = "save widget configuration")
     public String saveWidgetConfiguration( @Query ( "entityId") long entityId, @Query ( "entityType") String entityType,
         @Query ( "userId") long userId, @RequestBody WidgetConfigurationRequest widgetConfigurationRequest )
-        throws SSApiException
     {
         LOG.info( "Method saveWidgetConfiguration() started to store widget configuration from ss-api." );
         try {
@@ -72,18 +75,16 @@ public class WidgetApiController
 
 
     @ResponseBody
-    @RequestMapping ( value = "/resetwidgetconfiguration", method = RequestMethod.POST)
-    @ApiOperation ( value = "reset widget configuration")
-    public String resetWidgetConfiguration( @Query ( "entityId") long entityId, @Query ( "entityType") String entityType,
-        @Query ( "userId") long userId, @Query ( "requestMessage") String requestMessage ) throws SSApiException
+    @RequestMapping ( value = "/getdefaultwidgetconfiguration", method = RequestMethod.GET)
+    @ApiOperation ( value = "get Default widget configuration")
+    public WidgetConfiguration getDefaultWidgetConfiguration( @Query ( "entityId") long entityId, @Query ( "entityType") String entityType ) throws SSApiException
     {
-        LOG.info( "Method resetWidgetConfiguration() started to store widget configuration from ss-api." );
+        LOG.info( "Method getDefaultWidgetConfiguration() started to get default widget configuration from ss-api." );
         try {
-            widgetManagementService.resetWidgetConfigurationForEntity( entityId, entityType, userId, requestMessage );
-            return "Widget Configuration Successfully Updated";
+            return widgetManagementService.getDefaultWidgetConfiguration( organizationManagementService.getEntitySettings( entityId, entityType ), entityType );
         } catch ( InvalidInputException e ) {
-            LOG.error( "could not reset widget configuration", e );
-            return e.getMessage();
+            LOG.error( "could not get default widget configuration", e );
+            throw new SSApiException( "could not get default widget configuration", e );
         }
     }
 

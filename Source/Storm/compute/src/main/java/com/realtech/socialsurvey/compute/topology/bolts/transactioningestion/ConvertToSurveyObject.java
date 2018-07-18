@@ -182,15 +182,25 @@ public class ConvertToSurveyObject extends BaseComputeBoltWithAck
                     transactionInfoPutVO.setCustomer2Email( actualFileHeader.containsKey( "bor2Email" ) ? entries[actualFileHeader.get( "bor2Email" )] : "" );
                     transactionInfoPutVO.setCustomer2FirstName( actualFileHeader.containsKey( "bor2FirstName" ) ?  entries[actualFileHeader.get( "bor2FirstName" )] : "" );
                     transactionInfoPutVO.setCustomer2LastName(actualFileHeader.containsKey( "bor2LastName" ) ?  entries[actualFileHeader.get( "bor2LastName" )] : "");
-                    transactionInfoPutVO.setTransactionCity( entries[actualFileHeader.get( "subPropCity" )] );
+                    transactionInfoPutVO.setTransactionCity(actualFileHeader.containsKey( "subPropCity" ) ? entries[actualFileHeader.get( "subPropCity" )] : ""  );
                     transactionInfoPutVO.setTransactionDate(systemDate);
                     transactionInfoPutVO.setTransactionRef( actualFileHeader.containsKey( "fileName" ) ? entries[actualFileHeader.get( "fileName" )] : "" );
                     transactionInfoPutVO.setTransactionState(actualFileHeader.containsKey( "subPropState" ) ?  entries[actualFileHeader.get( "subPropState" )]  : "" );
                     transactionInfoPutVO.setTransactionType(actualFileHeader.containsKey( "loanPurpose" ) ?  entries[actualFileHeader.get( "loanPurpose" )]  : "" );
                     transactionInfoPutVO.setTransactionType(actualFileHeader.containsKey( "propertyAddress" ) ?  entries[actualFileHeader.get( "propertyAddress" )]  : "" );
-                                    
+                    //adding buyer and seller feilds
+                    transactionInfoPutVO.setBuyerAgentEmail( actualFileHeader.containsKey( "buyerAgentEmail" ) ? entries[actualFileHeader.get( "buyerAgentEmail" )] : "" );
+                    transactionInfoPutVO.setBuyerAgentFirstName( actualFileHeader.containsKey( "buyerAgentFirstName" ) ?  entries[actualFileHeader.get( "buyerAgentFirstName" )] : "" );
+                    transactionInfoPutVO.setBuyerAgentLastName(actualFileHeader.containsKey( "buyerAgentLastName" ) ?  entries[actualFileHeader.get( "buyerAgentLastName" )] : "");
+                    transactionInfoPutVO.setSellerAgentEmail( actualFileHeader.containsKey( "sellerAgentEmail" ) ? entries[actualFileHeader.get( "sellerAgentEmail" )] : "" );
+                    transactionInfoPutVO.setSellerAgentFirstName( actualFileHeader.containsKey( "sellerAgentFirstName" ) ?  entries[actualFileHeader.get( "sellerAgentFirstName" )] : "" );
+                    transactionInfoPutVO.setSellerAgentLastName(actualFileHeader.containsKey( "sellerAgentLastName" ) ?  entries[actualFileHeader.get( "sellerAgentLastName" )] : "");
+                    //adding buyer and seller participants 
+                
                     serviceProviderInfo.setServiceProviderEmail( entries[actualFileHeader.get( "serviceremail" )]  );
                     serviceProviderInfo.setServiceProviderName(  entries[actualFileHeader.get( "servicer" )]   );
+                    
+                    
                     
                     surveyVO.setServiceProviderInfo( serviceProviderInfo );
                     surveyVO.setTransactionInfo( transactionInfoPutVO );

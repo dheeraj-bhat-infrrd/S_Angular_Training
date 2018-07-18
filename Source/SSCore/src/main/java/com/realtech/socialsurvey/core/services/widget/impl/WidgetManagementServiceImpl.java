@@ -448,6 +448,7 @@ public class WidgetManagementServiceImpl implements WidgetManagementService
     }
 
 
+    @Override
     public WidgetConfiguration getDefaultWidgetConfiguration( OrganizationUnitSettings unitSettings, String unitSettingType )
     {
         LOG.info( "Started getDefaultWidgetConfiguration() method." );

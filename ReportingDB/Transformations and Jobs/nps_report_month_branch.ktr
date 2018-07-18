@@ -243,7 +243,7 @@
            <schema_name/>
            </partitioning>
     <connection>SS_Centralized_Mysql_Conn</connection>
-    <commit>1000</commit>
+    <commit>10000</commit>
     <update_bypassed>N</update_bypassed>
     <lookup>
       <schema/>
@@ -299,6 +299,16 @@
         <update>N</update>
       </value>
       <value>
+        <name>nps_report_month_id</name>
+        <rename>nps_report_month_id</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>month</name>
+        <rename>month</rename>
+        <update>N</update>
+      </value>
+      <value>
         <name>responders</name>
         <rename>responders</rename>
         <update>Y</update>
@@ -327,16 +337,6 @@
         <name>detractors_percent</name>
         <rename>detractors_percentage</rename>
         <update>Y</update>
-      </value>
-      <value>
-        <name>nps_report_month_id</name>
-        <rename>nps_report_month_id</rename>
-        <update>N</update>
-      </value>
-      <value>
-        <name>month</name>
-        <rename>month</rename>
-        <update>N</update>
       </value>
     </lookup>
      <cluster_schema/>

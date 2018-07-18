@@ -146,12 +146,11 @@ public class TwitterFeedProcessorImpl implements TwitterFeedProcessor
         TwitterFeedData feed = new TwitterFeedData();
         feed.setText( status.getText() );
         feed.setCreatedAt( status.getCreatedAt() );
-        
+        feed.setId( status.getId() );
+
         if(status.isRetweeted()){
-            feed.setId( status.getRetweetedStatus().getId());
             feed.setFavoriteCount( status.getRetweetedStatus().getFavoriteCount() );
         } else {
-            feed.setId( status.getId() );
             feed.setFavoriteCount( status.getFavoriteCount() );
         }
         

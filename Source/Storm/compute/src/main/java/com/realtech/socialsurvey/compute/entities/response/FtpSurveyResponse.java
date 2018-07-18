@@ -10,6 +10,8 @@ public class FtpSurveyResponse
     private int totalSurveys;
     private int customer1Count;
     private int customer2Count;
+    private int buyerCount;
+    private int sellerCount;
     private int errorNum;
     private Map<Integer, String> errorMessage = new HashMap<>();
 
@@ -85,5 +87,30 @@ public class FtpSurveyResponse
         this.errorMessage = errorMessage;
     }
 
+
+    public int getBuyerCount()
+    {
+        return buyerCount;
+    }
+
+
+    public void setBuyerCount( int buyerCount )
+    {
+        this.buyerCount = buyerCount;
+    }
+
+
+    public int getSellerCount()
+    {
+        return sellerCount;
+    }
+
+
+    public void setSellerCount( int sellerCount )
+    {
+        this.sellerCount = sellerCount;
+    }
+
+    
 
 }
