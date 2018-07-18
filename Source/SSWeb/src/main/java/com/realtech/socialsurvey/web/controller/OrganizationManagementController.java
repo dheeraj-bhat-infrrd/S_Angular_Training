@@ -4471,34 +4471,30 @@ public class OrganizationManagementController
     }
     
     @ResponseBody
-    @RequestMapping ( value = "/resetwidgetconfiguration", method=RequestMethod.POST)
-    public String resetWidgetConfiguration( HttpServletRequest request )
+    @RequestMapping ( value = "/getdefaultwidgetconfiguration", method=RequestMethod.GET)
+    public String getDefaultWidgetConfiguration( HttpServletRequest request )
     {
-        LOG.info( "Method resetWidgetConfiguration() started to store widget configuration." );
+        LOG.info( "Method getDefaultWidgetConfiguration() started to store widget configuration." );
 
         try {
-            String message =  request.getParameter( CommonConstants.REQUEST_MESSAGE );
-
             
             HttpSession session = request.getSession();
-            User user = sessionHelper.getCurrentUser();
             long entityId = (long) session.getAttribute( CommonConstants.ENTITY_ID_COLUMN );
             String entityType = (String) session.getAttribute( CommonConstants.ENTITY_TYPE_COLUMN );
             Response response = null;
 
-            response = ssApiIntergrationBuilder.getIntegrationApi().resetWidgetConfiguration( entityId, entityType,
-                user.getUserId(), message );
+            response = ssApiIntergrationBuilder.getIntegrationApi().getDefaultWidgetConfiguration( entityId, entityType );
 
-            LOG.info( "Method to resetWidgetConfiguration() finished." );
+            LOG.info( "Method to getDefaultWidgetConfiguration() finished." );
             String responseString = null;
             responseString = new String( ( (TypedByteArray) response.getBody() ).getBytes() );
             return responseString;
         } catch ( SSAPIException e ) {
-            LOG.error( "Unable to reset widget configuration.", e );
+            LOG.error( "Unable to get default widget configuration.", e );
             return e.getMessage();
         } catch ( Exception e ) {
-            LOG.error( "Unable to reset widget configuration.", e );
-            return "could not reset widget configuration";
+            LOG.error( "Unable to get default widget configuration.", e );
+            return "could not get default widget configuration";
         }
     }
         

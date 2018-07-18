@@ -34,7 +34,7 @@
 		<div class="float-left hdr-logo"></div>
 		<div class="float-right clearfix hdr-btns-wrapper">
 			<div class="float-left hdr-log-btn hdr-log-reg-btn" >
-				<a href="j_spring_security_logout"><spring:message code="label.logout.key" /></a>
+				<a class="disable-page-logout" href="j_spring_security_logout"><spring:message code="label.logout.key" /></a>
 			</div>
 		</div>
 	</div>

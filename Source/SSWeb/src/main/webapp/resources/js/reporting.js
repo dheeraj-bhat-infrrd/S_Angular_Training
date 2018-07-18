@@ -2586,9 +2586,9 @@ function reportingSocialMediaButtons(stages,columnName,columnValue){
 				contentToDisplay = 'Enter hobbies';
 			} else if (stages[i].profileStageKey == 'ACHIEVEMENTS_PRF') {
 				contentToDisplay = 'Enter achievements';
-			} /*else if (stages[i].profileStageKey == 'INSTAGRAM_PRF') {
+			} else if (stages[i].profileStageKey == 'INSTAGRAM_PRF') {
 				contentToDisplay = '<div class="rep-instagram-btn"></div>';
-			}*/
+			}
 			
 			if (i == 0) {
 				$('#rep-social-media').removeClass('hide');
@@ -2688,9 +2688,9 @@ var profileStageKey = $('#dsh-btn2').data('social');
 					contentToDisplay = 'Enter hobbies';
 				} else if (stages[i].profileStageKey == 'ACHIEVEMENTS_PRF') {
 					contentToDisplay = 'Enter achievements';
-				} /*else if (stages[i].profileStageKey == 'INSTAGRAM_PRF') {
+				} else if (stages[i].profileStageKey == 'INSTAGRAM_PRF') {
 					contentToDisplay = '<div class="rep-instagram-btn"></div>';
-				}*/
+				}
 				
 				if(contentToDisplay != ''){
 					$('#empty-rep-social-media').addClass('hide');
