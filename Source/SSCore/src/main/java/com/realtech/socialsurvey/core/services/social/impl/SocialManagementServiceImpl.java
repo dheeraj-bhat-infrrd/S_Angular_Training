@@ -3619,6 +3619,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
                 facebookPage.setProfileUrl( facebookUri.concat( account.getId() ) );
                 facebookPages.add( facebookPage );
             }
+            
         } catch ( FacebookException e ) {
             LOG.error( "Error while creating access token for facebook: " + e.getLocalizedMessage(), e );
         }
