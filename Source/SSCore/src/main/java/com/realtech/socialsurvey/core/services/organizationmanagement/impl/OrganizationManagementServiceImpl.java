@@ -5935,6 +5935,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             Company company = new Company();
             company.setCompanyId( Long.parseLong( obj[0].toString() ) );
             company.setCompany( (String) obj[1] );
+            company.setStatus( Integer.parseInt( obj[2].toString() ) );
             companyList.add( company );
         }   
         return companyList;
