@@ -376,7 +376,7 @@ public class AdminToolsController
     }
 
 
-    private void validateAuthHeader( String authorizationHeader ) throws InvalidInputException
+    private long validateAuthHeader( String authorizationHeader ) throws InvalidInputException
     {
         LOG.debug( " method validateAuthHeader started" );
 
@@ -412,7 +412,7 @@ public class AdminToolsController
         }
        
         LOG.debug( " method validateAuthHeader ended" );
-        
+        return comapnyId;
     }
 
 
@@ -764,5 +764,42 @@ public class AdminToolsController
         }
     }
 
+
+    @ResponseBody
+    @RequestMapping ( value = "/decodeencompasspassword", method = RequestMethod.POST)
+    public Response decodeEncompassPassword( HttpServletRequest request )
+	{
+		LOG.info("Method manualPostToLinkedin started");
+		String authorizationHeader = request.getHeader("Authorization");
+		String encryptedPassword = request.getParameter("encryptedPassword");
+
+		try {
+
+			// authorize request
+			try {
+				long comapnyId = validateAuthHeader(authorizationHeader);
+				if(comapnyId != CommonConstants.REALTECH_ADMIN_ID) {
+					throw new InvalidInputException("Invalid auth header.");
+				}
+			} catch (InvalidInputException e) {
+				return Response.status(Response.Status.UNAUTHORIZED).tag(e.getMessage()).build();
+			}
+			
+			//validate request
+			if (StringUtils.isEmpty(encryptedPassword))
+				throw new InvalidInputException("Parameter encryptedPassword is missing");
+			
+			 String decryptedPassword = encryptionHelper.decryptAES( encryptedPassword, "" );
+			//return response entity
+			return Response.status(Response.Status.OK)
+					.tag("Decrypted password is  " + decryptedPassword).build();
+		}catch(InvalidInputException e) {
+			LOG.error("Error in decodeEncompassPassword " , e);
+			return Response.status(Response.Status.BAD_REQUEST ).tag(e.getMessage()).build();
+		}catch(Exception e) {
+			LOG.error("Error in decodeEncompassPassword " , e);
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR ).tag(e.getMessage()).build();
+		}
+	}
 
 }
