@@ -1560,6 +1560,13 @@ public class SurveyManagementController
 		Integer stage = null;
 		Map<String, Object> surveyAndStage = new HashMap<>();
 		List<SurveyQuestionDetails> surveyQuestionDetails = surveyBuilder.getSurveyByAgent(user);
+		//replace legend in each survey text to show on take survey UI
+        for(SurveyQuestionDetails surveyQuestion : surveyQuestionDetails) {
+        		String newQuestionText = emailFormatHelper.replaceLegends(false, surveyQuestion.getQuestion(), url, null, null, surveyPreInitiation.getCustomerFirstName(), surveyPreInitiation.getCustomerLastName(), 
+        				surveyPreInitiation.getAgentName(), null, null, surveyPreInitiation.getCustomerEmailId(), surveyPreInitiation.getAgentEmailId(), null, null, null, null, null, null,
+        				null, null, null, null, null, null, surveyPreInitiation.getAgentId(), null, null);
+        		surveyQuestion.setQuestion(newQuestionText);
+        }
 		boolean editable = false;
 		BranchSettings branchSettings = null;
 		OrganizationUnitSettings regionSettings = null;
