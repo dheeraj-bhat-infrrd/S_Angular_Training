@@ -9,6 +9,7 @@ import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Values;
+import org.apache.storm.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,6 +55,8 @@ public class SocialMediaTokenExtractorSpout extends BaseComputeSpout
     public void nextTuple()
     {
         try {
+            // Check every 5 second for waitForNextFetch
+            Utils.sleep( 5000 );
             if ( !redisSocialMediaStateDao.waitForNextFetch() ) {
                 // get all media tokens
                 int skipCount =0;
@@ -93,12 +96,13 @@ public class SocialMediaTokenExtractorSpout extends BaseComputeSpout
                         } else {
                             skipCount += PAGE_SIZE;
                         }
-                    } 
+                    }
+                    Utils.sleep( 300 );
                 } while(mediaTokensResultPaginated.isPresent());
             }
             // End loop for companies
         } catch ( JedisConnectionException jedisConnectionException ) {
-            LOG.error( "Unbale to connect to redis ", jedisConnectionException.getMessage() );
+            LOG.error( "Unbale to connect to redis {}", jedisConnectionException.getMessage() );
         }
         catch ( Exception e ) {
             LOG.error( "Error in SocialMediaTokenExtractorSpout.nextTuple()", e );

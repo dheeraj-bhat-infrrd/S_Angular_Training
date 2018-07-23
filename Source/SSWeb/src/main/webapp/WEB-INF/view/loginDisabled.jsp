@@ -68,9 +68,8 @@
 <div id="" class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
 	<div class="container reg_panel_container">
 		<div class="reg_header text-center"><spring:message code="label.account.disabled.notification.key" /></div>
-		<div class="reg_lkin_wrapper text-center">
-			<div class="reg_lin_lin2"><spring:message code="label.account.login.disabled.title.key" /></div>
-			<div class="reg_lin_lin2"><spring:message code="label.account.login.disabled.text.key" /></div>
+		<div class="reg_lkin_wrapper">
+			<div class="reg_lin_lin2"><pre class="email-reply-text"><spring:message code="label.account.login.disabled.text.key" /></pre></div>
 			<div class="reg_btn" id="enable-login">Enable Login</div>
 			<div style="display: none"><form id='enableLoginForm' action="./rest/user/enableuserlogin/${userId}" method="get"></form></div>
 		</div>
