@@ -1562,9 +1562,9 @@ public class SurveyManagementController
 		List<SurveyQuestionDetails> surveyQuestionDetails = surveyBuilder.getSurveyByAgent(user);
 		//replace legend in each survey text to show on take survey UI
         for(SurveyQuestionDetails surveyQuestion : surveyQuestionDetails) {
-        		String newQuestionText = emailFormatHelper.replaceLegends(false, surveyQuestion.getQuestion(), url, null, null, surveyPreInitiation.getCustomerFirstName(), surveyPreInitiation.getCustomerLastName(), 
-        				surveyPreInitiation.getAgentName(), null, null, surveyPreInitiation.getCustomerEmailId(), surveyPreInitiation.getAgentEmailId(), null, null, null, null, null, null,
-        				null, null, null, null, null, null, surveyPreInitiation.getAgentId(), null, null);
+        		String newQuestionText = emailFormatHelper.replaceLegends(false, surveyQuestion.getQuestion(), url, "", "", surveyPreInitiation.getCustomerFirstName(), surveyPreInitiation.getCustomerLastName(), 
+        				surveyPreInitiation.getAgentName(), "", "", surveyPreInitiation.getCustomerEmailId(), surveyPreInitiation.getAgentEmailId(), "", "", "", "", "", "",
+        				"", "", "", "", "", "", surveyPreInitiation.getAgentId(), "", "");
         		surveyQuestion.setQuestion(newQuestionText);
         }
 		boolean editable = false;
