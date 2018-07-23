@@ -1561,7 +1561,7 @@ public class SurveyManagementController
 		Map<String, Object> surveyAndStage = new HashMap<>();
 		List<SurveyQuestionDetails> surveyQuestionDetails = surveyBuilder.getSurveyByAgent(user);
 		//replace legend in each survey text to show on take survey UI
-		DateFormat dateFormat = new SimpleDateFormat( "yyyy/MM/dd" );
+		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
         for(SurveyQuestionDetails surveyQuestion : surveyQuestionDetails) {
         		String newQuestionText = emailFormatHelper.replaceLegends(false, surveyQuestion.getQuestion(), url, "", "", surveyPreInitiation.getCustomerFirstName(), surveyPreInitiation.getCustomerLastName(), 
         				surveyPreInitiation.getAgentName(), "", "", surveyPreInitiation.getCustomerEmailId(), surveyPreInitiation.getAgentEmailId(), "", dateFormat.format( new Date() ), "", "", "", "",
@@ -1684,7 +1684,6 @@ public class SurveyManagementController
 		String facebookPixelTag = organizationManagementService.getFacebookPixelImageTagsFromHierarchy( companySettings, regionSettings, bSetting, unitSettings );
 		surveyAndStage.put("facebookPixelTag", facebookPixelTag);
 		
-		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
 		Map<String, String> surveyMap = emailFormatHelper.fetchSurveySourceId(user.getUserId(), survey.getCustomerEmail(),
 				dateFormat.format(new Date()));
 		if (companySettings != null && companySettings.getSurvey_settings() != null) {
