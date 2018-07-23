@@ -90,7 +90,7 @@ public class CompanyDaoImpl extends GenericDaoImpl<Company, Long> implements Com
     @Override
     public List<Object[]> searchCompaniesByName( String namePattern )
     {
-        String queryString = "select c.company_id,c.company from COMPANY c "
+        String queryString = "select c.company_id,c.company,c.status from COMPANY c "
             + "inner join (select u.company_id,count(u.user_id) as user_count "
             + "from USERS u where u.status in (1,2) group by u.company_id) a "
             + "on c.company_id = a.company_id and c.status=1 and a.user_count > 2 "
