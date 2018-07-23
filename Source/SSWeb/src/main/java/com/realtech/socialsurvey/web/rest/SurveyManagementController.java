@@ -1561,9 +1561,10 @@ public class SurveyManagementController
 		Map<String, Object> surveyAndStage = new HashMap<>();
 		List<SurveyQuestionDetails> surveyQuestionDetails = surveyBuilder.getSurveyByAgent(user);
 		//replace legend in each survey text to show on take survey UI
+		DateFormat dateFormat = new SimpleDateFormat( "yyyy/MM/dd" );
         for(SurveyQuestionDetails surveyQuestion : surveyQuestionDetails) {
         		String newQuestionText = emailFormatHelper.replaceLegends(false, surveyQuestion.getQuestion(), url, "", "", surveyPreInitiation.getCustomerFirstName(), surveyPreInitiation.getCustomerLastName(), 
-        				surveyPreInitiation.getAgentName(), "", "", surveyPreInitiation.getCustomerEmailId(), surveyPreInitiation.getAgentEmailId(), "", "", "", "", "", "",
+        				surveyPreInitiation.getAgentName(), "", "", surveyPreInitiation.getCustomerEmailId(), surveyPreInitiation.getAgentEmailId(), "", dateFormat.format( new Date() ), "", "", "", "",
         				"", "", "", "", "", "", surveyPreInitiation.getAgentId(), "", "");
         		surveyQuestion.setQuestion(newQuestionText);
         }
