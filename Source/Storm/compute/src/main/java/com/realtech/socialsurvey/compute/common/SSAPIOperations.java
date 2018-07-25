@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.compute.common;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -285,5 +286,24 @@ public class SSAPIOperations
                 LOG.error( "IOException/ APIIntergrationException caught", e );
                 throw new IOException( e );
             }  
+    }
+    
+
+    public Map<String, Map<String, String>> getProfileNameDateDataForWidgetReport( long companyId ) throws IOException
+    {
+        Call<Map<String, Map<String, String>>> request = RetrofitApiBuilder.apiBuilderInstance()
+            .getSSAPIIntergrationServiceWithIncreasedTimeOut().getProfileNameDateDataForWidgetReport( companyId );
+        Response<Map<String, Map<String, String>>> response = request.execute();
+        RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
+        return response.body();
+    }
+
+
+    public List<String> getTemplateDateDataForWidgetReport() throws IOException
+    {
+        Call<List<String>> request = RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationService().getWidgetScripts();
+        Response<List<String>> response = request.execute();
+        RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
+        return response.body();
     }
 }

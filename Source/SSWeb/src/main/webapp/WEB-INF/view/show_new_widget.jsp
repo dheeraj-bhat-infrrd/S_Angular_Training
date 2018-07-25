@@ -304,6 +304,9 @@ var wProfileLevel = "${profileLevel}";
 var wProfileName = "${profileName}";
 var wCompanyProfileName = "${companyProfileName}";
 var resourcesUrl = "${initParam.widgetResourcesPath}";
+var widgetPlaceAndForget = "${widgetPlaceAndForget}";
+var widgetCustomContainer = "${widgetCustomContainer}";
+var widgetJavascriptIframe = "${widgetJavascriptIframe}";
 
 var bonf = false;
 var btnf = false;

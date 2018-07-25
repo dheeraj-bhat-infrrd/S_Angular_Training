@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.web.controller;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -41,6 +42,7 @@ import com.braintreegateway.exceptions.AuthorizationException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.WidgetTemplateConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AbusiveMailSettings;
 import com.realtech.socialsurvey.core.entities.AccountsMaster;
@@ -96,6 +98,7 @@ import com.realtech.socialsurvey.core.services.upload.HierarchyUploadService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EmailFormatHelper;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
+import com.realtech.socialsurvey.core.utils.FileOperations;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.core.utils.StateLookupExclusionStrategy;
 import com.realtech.socialsurvey.core.vo.SurveyPreInitiationList;
@@ -175,6 +178,9 @@ public class OrganizationManagementController
     
     @Autowired
     private SSApiIntergrationBuilder ssApiIntergrationBuilder;
+    
+    @Autowired
+    private FileOperations fileOperations;
 
     @Value ( "${CDN_PATH}")
     private String endpoint;
@@ -612,13 +618,32 @@ public class OrganizationManagementController
             model.addAttribute( "profileName", unitSettings.getProfileName() );
             model.addAttribute( "companyProfileName", companySettings.getProfileName() );
             model.addAttribute( "resourcesUrl", endpoint );
-            
+            model.addAttribute( "widgetPlaceAndForget",
+                URLEncoder.encode(
+                    fileOperations.getContentFromFile(
+                        WidgetTemplateConstants.WIDGET_TEMPLATES_FOLDER + WidgetTemplateConstants.WIDGET_PLACE_AND_FORGET ),
+                    CommonConstants.UTF_8_ENCODING ) );
+            model.addAttribute( "widgetCustomContainer",
+                URLEncoder.encode(
+                    fileOperations.getContentFromFile(
+                        WidgetTemplateConstants.WIDGET_TEMPLATES_FOLDER + WidgetTemplateConstants.WIDGET_CUSTOM_CONTAINER ),
+                    CommonConstants.UTF_8_ENCODING ) );
+            model.addAttribute( "widgetJavascriptIframe",
+                URLEncoder.encode(
+                    fileOperations.getContentFromFile(
+                        WidgetTemplateConstants.WIDGET_TEMPLATES_FOLDER + WidgetTemplateConstants.WIDGET_JAVASCRIPT_IFRAME ),
+                    CommonConstants.UTF_8_ENCODING ) );
+
             
         } catch ( NonFatalException e ) {
             LOG.error( "NonfatalException while showing javascript widget settings. Reason: ", e );
             model.addAttribute( "message",
                 messageUtils.getDisplayMessage( e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE ) );
             return JspResolver.MESSAGE_HEADER;
+        } catch( UnsupportedEncodingException e ) {
+            LOG.error( "NonfatalException while showing javascript widget settings. Reason: ", e );
+            model.addAttribute( "message", "UTF-8 not supported" );
+            return JspResolver.MESSAGE_HEADER;            
         }
 
         

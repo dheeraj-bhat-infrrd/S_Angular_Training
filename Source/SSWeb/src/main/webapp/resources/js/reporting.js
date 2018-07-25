@@ -1414,7 +1414,7 @@ $(document).on('change', '#generate-survey-reports', function() {
 	
 	var selectedVal = $('#generate-survey-reports').val();
 	var key = parseInt(selectedVal);
-	if(key == 101 || key == 102 || key == 103 || key == 106 || key == 110 || key == 112 || key == 200 || key == 1001 || key==105){
+	if(key == 101 || key == 102 || key == 103 || key == 106 || key == 110 || key == 112 || key == 200 || key == 1001 || key==105 || key == 303 ){
 		$('#date-pickers').hide();
 		if( $('#date-pickers').hasClass( 'display-inline-grid' ) ){
 			$('#date-pickers').removeClass( 'display-inline-grid' )

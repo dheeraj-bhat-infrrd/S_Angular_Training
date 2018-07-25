@@ -100,4 +100,13 @@ public final class ComputeConstants
     //ftp batching
     public static final String ACCESS_TOKEN = "ACCESS_TOKEN";
     public static final String FTP_SURVEY_BATCH_SIZE = "FTP_SURVEY_BATCH_SIZE";
+    
+    public static final String PROFILE_LEVEL_COMPANY  = "COMPANY";
+    public static final String PROFILE_LEVEL_REGION  = "REGION";
+    public static final String PROFILE_LEVEL_BRANCH  = "BRANCH";
+    public static final String PROFILE_LEVEL_INDIVIDUAL  = "INDIVIDUAL";
+    
+    public static String WIDGET_RESOURCES_URL = "WIDGET_RESOURCES_URL";
+
+
 }

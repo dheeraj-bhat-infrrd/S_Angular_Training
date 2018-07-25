@@ -390,4 +390,7 @@ public interface SurveyDetailsDao
     public long getSimpleFeedBacksCount( String columnName, long columnValue, double startScore, double limitScore,
         boolean fetchAbusive );
 
+
+    public List<String> getDistinctValues( String queryKey, Object value, String field );
+
 }

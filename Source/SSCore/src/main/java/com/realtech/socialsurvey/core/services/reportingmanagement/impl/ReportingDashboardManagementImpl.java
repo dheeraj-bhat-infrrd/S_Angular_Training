@@ -456,6 +456,8 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT );
         } else if ( reportId == CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD ) {
             fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD );
+        } else if( reportId == CommonConstants.FILE_UPLOAD_WIDGET_REPORT ) {
+            fileUpload.setUploadType( CommonConstants.FILE_UPLOAD_WIDGET_REPORT );
         }
 
         // get the time 23:59:59 in milliseconds
@@ -541,7 +543,19 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
 		        fileUpload.setStatus( CommonConstants.STATUS_FAIL );
 		        fileUploadDao.saveOrUpdate( fileUpload );
 		    }
-		}
+        } else if ( reportId == CommonConstants.FILE_UPLOAD_WIDGET_REPORT ) {
+            ReportRequest widgetReportRequest = new ReportRequest();
+            widgetReportRequest.setReportType( ReportType.WIDGET_REPORT.getName() );
+            widgetReportRequest.setFileUploadId( fileUpload.getFileUploadId() );
+            widgetReportRequest.setCompanyId( fileUpload.getCompany().getCompanyId() );
+            try {
+                streamApiIntegrationBuilder.getStreamApi().generateEmailReport(widgetReportRequest);
+            } catch ( StreamApiException | StreamApiConnectException e ) {
+                LOG.error( "Could not stream widget report", e );
+                fileUpload.setStatus( CommonConstants.STATUS_FAIL );
+                fileUploadDao.saveOrUpdate( fileUpload );
+            }
+        }
     }
 
 
@@ -1823,6 +1837,8 @@ public class ReportingDashboardManagementImpl<K> implements ReportingDashboardMa
                 recentActivityList.add( CommonConstants.REPORTING_BRANCH_RANKING_YEARLY_REPORT );
             } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_REPORTING_DIGEST ) {
                 recentActivityList.add( CommonConstants.REPORTING_DIGEST );
+            } else if ( fileUpload.getUploadType() == CommonConstants.FILE_UPLOAD_WIDGET_REPORT ) {
+                recentActivityList.add( CommonConstants.WIDGET_REPORT );
             }
 
             recentActivityList.add( fileUpload.getStartDate() );

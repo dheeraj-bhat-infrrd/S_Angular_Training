@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -25,6 +26,7 @@ import com.realtech.socialsurvey.core.entities.widget.WidgetConfigurationRequest
 import com.realtech.socialsurvey.core.entities.widget.WidgetHistory;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.widget.WidgetManagementService;
 
 
@@ -39,6 +41,9 @@ public class WidgetManagementServiceImpl implements WidgetManagementService
 
     @Autowired
     private OrganizationManagementService organizationManagementService;
+
+    @Autowired
+    private ProfileManagementService profileManagementService;
 
 
     @Value ( "${APPLICATION_BASE_URL}")
@@ -101,25 +106,25 @@ public class WidgetManagementServiceImpl implements WidgetManagementService
     {
         LOG.info( "Started resetWidgetConfigurationForEntity() method." );
         WidgetConfiguration widgetConfiguration = null;
-        
+
         OrganizationUnitSettings unitSettings = organizationManagementService.getEntitySettings( entityId, entityType );
         widgetConfiguration = unitSettings.getWidgetConfiguration();
         Map<String, String> historyMap = getDefaultConfigurationMap( unitSettings, entityType, entityId );
-        
-        
+
+
         if ( widgetConfiguration == null ) {
             widgetConfiguration = new WidgetConfiguration();
         } else {
-            
+
             // keep only history
-            if( widgetConfiguration.getHistory() != null ) {
+            if ( widgetConfiguration.getHistory() != null ) {
                 WidgetConfiguration tempWidgetConfig = new WidgetConfiguration();
                 tempWidgetConfig.setHistory( widgetConfiguration.getHistory() );
                 widgetConfiguration = tempWidgetConfig;
             }
         }
-        
-        
+
+
         //setting history
         WidgetHistory history = new WidgetHistory();
 
@@ -134,7 +139,7 @@ public class WidgetManagementServiceImpl implements WidgetManagementService
         }
 
         widgetConfiguration.getHistory().add( history );
-        
+
         saveConfigurationInMongo( entityType, entityId, widgetConfiguration );
         LOG.info( "Finished resetWidgetConfigurationForEntity() method." );
         return widgetConfiguration;
@@ -142,10 +147,11 @@ public class WidgetManagementServiceImpl implements WidgetManagementService
     }
 
 
-    private Map<String, String> getDefaultConfigurationMap(OrganizationUnitSettings unitSettings, String entityType, long entityId)
+    private Map<String, String> getDefaultConfigurationMap( OrganizationUnitSettings unitSettings, String entityType,
+        long entityId )
     {
         Map<String, String> historyMap = new HashMap<>();
-        
+
         historyMap.put( CommonConstants.WIDGET_FONT, CommonConstants.WIDGET_DEFAULT_FONT );
         historyMap.put( CommonConstants.WIDGET_BACKGROUND_COLOR, CommonConstants.WIDGET_DEFAULT_BACKGROUND_COLOR );
         historyMap.put( CommonConstants.WIDGET_RATING_AND_STAR_COLOR, CommonConstants.WIDGET_DEFAULT_RATING_AND_STAR_COLOR );
@@ -153,31 +159,35 @@ public class WidgetManagementServiceImpl implements WidgetManagementService
         historyMap.put( CommonConstants.WIDGET_FONT_THEME, CommonConstants.WIDGET_DEFAULT_FONT_THEME );
         historyMap.put( CommonConstants.WIDGET_EMBEDDED_FONT_THEME, CommonConstants.WIDGET_DEFAULT_EMBEDDED_FONT_THEME );
         historyMap.put( CommonConstants.WIDGET_BUTTON1_TEXT, CommonConstants.WIDGET_DEFAULT_BUTTON1_TEXT );
-        historyMap.put( CommonConstants.WIDGET_BUTTON1_LINK, unitSettings.getCompleteProfileUrl() + CommonConstants.CONTACT_US_HASH );
+        historyMap.put( CommonConstants.WIDGET_BUTTON1_LINK,
+            unitSettings.getCompleteProfileUrl() + CommonConstants.CONTACT_US_HASH );
         historyMap.put( CommonConstants.WIDGET_BUTTON1_OPACITY, CommonConstants.WIDGET_DEFAULT_BUTTON1_OPACITY );
         historyMap.put( CommonConstants.WIDGET_BUTTON2_TEXT, CommonConstants.WIDGET_DEFAULT_BUTTON2_TEXT );
         historyMap.put( CommonConstants.WIDGET_BUTTON2_LINK, getDefaultButtonTwoLink( entityType, entityId ) );
         historyMap.put( CommonConstants.WIDGET_BUTTON2_OPACITY, CommonConstants.WIDGET_DEFAULT_BUTTON2_OPACITY );
         historyMap.put( CommonConstants.WIDGET_LOAD_MORE_BUTTON_TEXT, CommonConstants.WIDGET_DEFAULT_LOAD_MORE_BUTTON_TEXT );
-        historyMap.put( CommonConstants.WIDGET_LOAD_MORE_BUTTON_OPACITY, CommonConstants.WIDGET_DEFAULT_LOAD_MORE_BUTTON_OPACITY );
-        historyMap.put( CommonConstants.WIDGET_MAX_REVIEWS_ON_LOAD_MORE, CommonConstants.WIDGET_DEFAULT_MAX_REVIEWS_ON_LOAD_MORE );
-        historyMap.put( CommonConstants.WIDGET_INITIAL_NUMBER_OF_REVIEWS, CommonConstants.WIDGET_DEFAULT_INITIAL_NUMBER_OF_REVIEWS );
+        historyMap.put( CommonConstants.WIDGET_LOAD_MORE_BUTTON_OPACITY,
+            CommonConstants.WIDGET_DEFAULT_LOAD_MORE_BUTTON_OPACITY );
+        historyMap.put( CommonConstants.WIDGET_MAX_REVIEWS_ON_LOAD_MORE,
+            CommonConstants.WIDGET_DEFAULT_MAX_REVIEWS_ON_LOAD_MORE );
+        historyMap.put( CommonConstants.WIDGET_INITIAL_NUMBER_OF_REVIEWS,
+            CommonConstants.WIDGET_DEFAULT_INITIAL_NUMBER_OF_REVIEWS );
         historyMap.put( CommonConstants.WIDGET_HIDE_BAR_GRAPH, CommonConstants.WIDGET_DEFAULT_HIDE_BAR_GRAPH );
         historyMap.put( CommonConstants.WIDGET_HIDE_OPTIONS, CommonConstants.WIDGET_DEFAULT_HIDE_OPTIONS );
         historyMap.put( CommonConstants.WIDGET_SORT_ORDER, CommonConstants.WIDGET_DEFAULT_SORT_ORDER );
         historyMap.put( CommonConstants.WIDGET_ALLOW_MODEST_BRANDING, CommonConstants.WIDGET_DEFAULT_ALLOW_MODEST_BRANDING );
-        historyMap.put( CommonConstants.WIDGET_BAR_GRAPH_COLOR, null);
+        historyMap.put( CommonConstants.WIDGET_BAR_GRAPH_COLOR, null );
         historyMap.put( CommonConstants.WIDGET_REVIEW_SOURCES, null );
         historyMap.put( CommonConstants.WIDGET_SEO_TITLE, null );
         historyMap.put( CommonConstants.WIDGET_SEO_KEYWORDS, null );
         historyMap.put( CommonConstants.WIDGET_SEO_DESCRIPTION, null );
-        
+
         return historyMap;
     }
 
 
-    private void buildHistoryMap( WidgetConfigurationRequest widgetConfigurationRequest, WidgetConfiguration widgetConfiguration,
-        Map<String, String> historyMap )
+    private void buildHistoryMap( WidgetConfigurationRequest widgetConfigurationRequest,
+        WidgetConfiguration widgetConfiguration, Map<String, String> historyMap )
     {
         if ( StringUtils.isNotEmpty( widgetConfigurationRequest.getFont() ) ) {
             if ( !StringUtils.equals( widgetConfigurationRequest.getFont(), widgetConfiguration.getFont() ) ) {
@@ -555,7 +565,8 @@ public class WidgetManagementServiceImpl implements WidgetManagementService
                 }
 
                 if ( StringUtils.isEmpty( widgetConfiguration.getButtonOneLink() ) ) {
-                    widgetConfiguration.setButtonOneLink( unitSettings.getCompleteProfileUrl() + CommonConstants.CONTACT_US_HASH );
+                    widgetConfiguration
+                        .setButtonOneLink( unitSettings.getCompleteProfileUrl() + CommonConstants.CONTACT_US_HASH );
                 }
 
 
@@ -637,6 +648,45 @@ public class WidgetManagementServiceImpl implements WidgetManagementService
             }
             return applicationBaseUrl + "/initfindapro.do?profileLevel=" + profileLevel + "&iden=" + iden;
         }
+    }
+
+
+    @Override
+    public List<String> getListOfAvailableSources( String profileLevel, long iden ) throws InvalidInputException
+    {
+        LOG.debug( "method getListOfAvailableSources() started" );
+        Set<String> availableSources = null;
+        
+        List<String> mongoSources = profileManagementService.getAvailableSurveySources( profileLevel, iden );
+        if( mongoSources != null && !mongoSources.isEmpty() ) {
+            
+            availableSources = new HashSet<>();
+            
+            for( String source : mongoSources ) { 
+                switch( source.trim() ) {
+                    case CommonConstants.SURVEY_REQUEST_ADMIN:
+                    case CommonConstants.SURVEY_REQUEST_AGENT:
+                    case CommonConstants.RETAKE_REQUEST_CUSTOMER: {availableSources.add( CommonConstants.POST_SOURCE_SOCIAL_SURVEY ); break;}
+                    case CommonConstants.SURVEY_SOURCE_ZILLOW: {availableSources.add( CommonConstants.SURVEY_SOURCE_ZILLOW ); break;}
+                    case CommonConstants.CRM_INFO_SOURCE_ENCOMPASS:
+                    case CommonConstants.CRM_SOURCE_LONEWOLF:
+                    case CommonConstants.CRM_SOURCE_DOTLOOP:
+                    case CommonConstants.CRM_INFO_SOURCE_FTP:
+                    case CommonConstants.CRM_INFO_SOURCE_API:{availableSources.add( CommonConstants.SURVEY_SOURCE_SOCIAL_SURVEY_VERIFIED ); break;}
+                    case CommonConstants.CHR_FACEBOOK: {availableSources.add( CommonConstants.CHR_FACEBOOK ); break;}
+                    case CommonConstants.CHR_WIDGET_LINKEDIN: {availableSources.add( CommonConstants.CHR_WIDGET_LINKEDIN ); break;}
+                    case CommonConstants.CHR_GOOGLE: {availableSources.add( CommonConstants.CHR_GOOGLE ); break;}
+                    default: {
+                        if( StringUtils.isNotEmpty( source ) ) {
+                            availableSources.add( source );
+                        }
+                    }
+                }
+            }
+        }
+        
+        LOG.debug( "method getListOfAvailableSources() finished" );
+        return new ArrayList<>( availableSources );
     }
 
 }

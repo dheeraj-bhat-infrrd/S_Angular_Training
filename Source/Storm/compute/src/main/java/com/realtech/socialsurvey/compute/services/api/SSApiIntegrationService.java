@@ -154,4 +154,12 @@ public interface SSApiIntegrationService
     
     @GET ( "/v1//checkIfSurveyIsOld")
     Call<String> checkIfSurveyIsOld( @Query ( "customerEmailId") String customerEmailId );
+    
+    @Headers ( "Content-Type: application/json")
+    @GET ( "v1/hierarchy/company/{identifier}/profilenames")
+    Call<Map<String, Map<String, String>>> getProfileNameDateDataForWidgetReport( @Path ( "identifier") long companyId );
+    
+    @Headers ( "Content-Type: application/json")
+    @GET ( "v1/widget/scripts")
+    Call<List<String>> getWidgetScripts();
 }

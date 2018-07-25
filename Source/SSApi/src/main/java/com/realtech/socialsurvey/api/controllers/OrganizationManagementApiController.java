@@ -2,8 +2,10 @@ package com.realtech.socialsurvey.api.controllers;
 
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +32,7 @@ import com.realtech.socialsurvey.api.models.request.FailedStormMessage;
 import com.realtech.socialsurvey.api.utils.RestUtils;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AgentDisableApiEntity;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.TransactionSourceFtp;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -403,5 +406,18 @@ public class OrganizationManagementApiController
 		}
         
         
+    }
+    
+    @RequestMapping ( value = "/hierarchy/company/{identifier}/profilenames", method = RequestMethod.GET)
+    @ApiOperation ( value = "get profile names of a heirarchy")
+    public Map<String, Map<String, String>> getProfileNamesForHeirarchy( @PathVariable ( "identifier") long iden ) throws SSApiException
+    {
+        LOGGER.info( "Method getProfileNamesForHeirarchy() started to get profile names from ss-api." );
+        try {
+            return organizationManagementService.getProfileNameMapForCompany( iden );
+        } catch ( Exception e ) {
+            LOGGER.error( "could not get profile names", e );
+            throw new SSApiException( "could not get profile names", e );
+        }
     }
 }

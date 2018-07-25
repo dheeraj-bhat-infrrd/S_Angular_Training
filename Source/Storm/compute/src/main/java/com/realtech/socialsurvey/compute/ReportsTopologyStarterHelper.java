@@ -4,6 +4,8 @@ import com.realtech.socialsurvey.compute.common.ComputeConstants;
 import com.realtech.socialsurvey.compute.common.EnvConstants;
 import com.realtech.socialsurvey.compute.topology.bolts.GetSocialFeedReport;
 import com.realtech.socialsurvey.compute.topology.bolts.emailreports.*;
+import com.realtech.socialsurvey.compute.topology.bolts.widget.reports.WidgetDataProcessingBolt;
+import com.realtech.socialsurvey.compute.topology.bolts.widget.reports.WriteWidgetReportToExcelBolt;
 import com.realtech.socialsurvey.compute.topology.spouts.KafkaTopicSpoutBuilder;
 import com.realtech.socialsurvey.compute.utils.ChararcterUtils;
 import org.apache.storm.Config;
@@ -93,14 +95,21 @@ public class ReportsTopologyStarterHelper extends TopologyStarterHelper
             .shuffleGrouping( "ReportGenerationSpout" );
         builder.setBolt("WriteSocialMonitorReportToExcel", new WriteSocialMonitorReportToExcel(), 1)
             .fieldsGrouping("GetSocialFeedReportDataBolt", new Fields("fileUploadId"));
+        
 
         builder.setBolt("GetEmailReportDataBolt", new GetDataForEmailReport(), 1)
             .shuffleGrouping("ReportGenerationSpout");
         builder.setBolt("WriteReportToExcelBolt", new WriteReportToExcelBolt(), 1)
             .fieldsGrouping("GetEmailReportDataBolt", new Fields("fileUploadId"));
+        
+        
+        builder.setBolt("WidgetDataProcessingBolt", new WidgetDataProcessingBolt(), 1)
+        .shuffleGrouping("ReportGenerationSpout");
+    builder.setBolt("WriteWidgetReportToExcelBolt", new WriteWidgetReportToExcelBolt(), 1)
+        .fieldsGrouping("WidgetDataProcessingBolt", new Fields("fileUploadId"));
 
         builder.setBolt("UploadOnAmazonS3Bolt", new UploadOnAmazonS3Bolt(), 2)
-            .shuffleGrouping("WriteReportToExcelBolt").shuffleGrouping( "WriteSocialMonitorReportToExcel" );
+            .shuffleGrouping("WriteReportToExcelBolt").shuffleGrouping( "WriteSocialMonitorReportToExcel" ).shuffleGrouping( "WriteWidgetReportToExcelBolt" );
         builder.setBolt("FileUploadStatusAndFileNameUpdationBolt", new UpdateFileUploadStatusAndFileNameBolt(), 1)
             .shuffleGrouping("UploadOnAmazonS3Bolt");
 

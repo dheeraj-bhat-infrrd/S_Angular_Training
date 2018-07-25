@@ -1440,6 +1440,8 @@ public interface CommonConstants
     public static final String REPORTING_BRANCH_RANKING_YEARLY_REPORT = "Branch Ranking Report For Year";
     
     public static final String REPORTING_DIGEST = "Monthly Digest";
+    public static final String WIDGET_REPORT = "Widget Script Report";
+
     
     public static final String SOCIAL_MONITOR_DATE_REPORT = "Social Monitor Date based Report";
     public static final String SOCIAL_MONITOR_DATE_REPORT_FOR_KEYWORD = "Social Monitor Date Report for keyword";
@@ -1744,5 +1746,16 @@ public interface CommonConstants
     public static final String REQUEST_MESSAGE = "requestMessage";
 
     public static final String CONTACT_US_HASH = "#contact-info";
+
+    public static final String SURVEY_SOURCE_SOCIAL_SURVEY_VERIFIED = "SocialSurvey Verified";
+
+    public static final String CHR_WIDGET_LINKEDIN = "LinkedIn";
+    
+    
+    public static final String WIDGET_SCRIPT_TYPE_PAF = "placeAndForget";
+    public static final String WIDGET_SCRIPT_TYPE_CC = "customContainer";
+    public static final String WIDGET_SCRIPT_TYPE_JI = "javascriptIframe";
+
+    public static final int FILE_UPLOAD_WIDGET_REPORT = 303;    
 
 }
