@@ -104,8 +104,15 @@ public class InstagramFeedExactorBolt extends BaseComputeBolt {
         //Id is postId_companyId
         responseWrapper.setId( instagramMediaData.getIgId() + "_" + responseWrapper.getCompanyId() );
         responseWrapper.setPictures(Arrays.asList(instagramMediaData.getMediaUrl()));
-        responseWrapper.setOwnerName( mediaToken.getContactDetails().getName() );
-        responseWrapper.setOwnerEmail( mediaToken.getContactDetails().getMailDetails().getEmailId() );
+        
+        // Setting contact details.
+        if(mediaToken.getContactDetails() != null) {
+            responseWrapper.setOwnerName( mediaToken.getContactDetails().getName() );
+            if(mediaToken.getContactDetails().getMailDetails() != null) {
+                responseWrapper.setOwnerEmail( mediaToken.getContactDetails().getMailDetails().getEmailId() );
+            }
+        }
+
         responseWrapper.setPostLink( instagramMediaData.getPostLink() );
         responseWrapper.setTotalLikesCount( instagramMediaData.getLikeCount() );
         responseWrapper.setTotalCommentsCount( instagramMediaData.getCommentsCount() );
