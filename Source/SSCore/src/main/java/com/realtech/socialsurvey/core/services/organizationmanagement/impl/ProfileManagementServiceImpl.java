@@ -4807,13 +4807,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                 //ModifiedOn set to current date
                 Date currentDate = new Date( System.currentTimeMillis() );
                 surveyDetails.setModifiedOn( currentDate );
-                surveyDetails.setCreatedOn( createdDate );
+                surveyDetails.setCreatedOn( dateOfService );
                 surveyDetails.setAgreedToShare( "true" );
                 surveyDetails.setAbusive( isAbusive );
                 surveyDetails.setAbuseRepByUser( false );
                 surveyDetails.setShowSurveyOnUI( true );
-                surveyDetails.setSurveyCompletedDate( createdDate );
-                surveyDetails.setSurveyUpdatedDate( createdDate );
+                surveyDetails.setSurveyCompletedDate( dateOfService );
+                surveyDetails.setSurveyUpdatedDate( dateOfService );
                 surveyDetails.setSurveyTransactionDate( dateOfService );
 
                 // saving zillow review summary
@@ -4857,7 +4857,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                             String sourceId = (String) review.get( "reviewURL" );
                             String reviewDescription = (String) review.get( "description" );
                             String summary = (String) review.get( "reviewSummary" );
-                            String createdDate = (String) review.get( "reviewDate" );
+                            String reviewDate = (String) review.get( "reviewDate" );
                             String reviewerProfileUrl = (String) review.get( "reviewerLink" );
                             String customerFirstName = (String) review.get( "reviewer" );
                             Double score = Double.valueOf(
@@ -4876,14 +4876,14 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                             //ModifiedOn set to current date
                             Date currentDate = new Date( System.currentTimeMillis() );
                             surveyDetails.setModifiedOn( currentDate );
-                            surveyDetails.setCreatedOn( convertStringToDate( createdDate ) );
+                            surveyDetails.setCreatedOn( convertStringToDate( reviewDate ) );
                             surveyDetails.setAgreedToShare( "true" );
                             surveyDetails.setAbusive( isAbusive );
                             surveyDetails.setAbuseRepByUser( false );
                             surveyDetails.setShowSurveyOnUI( true );
-                            surveyDetails.setSurveyCompletedDate( convertStringToDate( createdDate ) );
-                            surveyDetails.setSurveyUpdatedDate( convertStringToDate( createdDate ) );
-                            surveyDetails.setSurveyTransactionDate( convertStringToDate( createdDate ) );
+                            surveyDetails.setSurveyCompletedDate( convertStringToDate( reviewDate ) );
+                            surveyDetails.setSurveyUpdatedDate( convertStringToDate( reviewDate ) );
+                            surveyDetails.setSurveyTransactionDate( convertStringToDate( reviewDate ) );
 
                             // saving zillow review summary
                             surveyDetails.setSummary( summary );
