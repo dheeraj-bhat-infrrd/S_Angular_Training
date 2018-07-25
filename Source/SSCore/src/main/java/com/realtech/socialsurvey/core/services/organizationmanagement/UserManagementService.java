@@ -658,5 +658,13 @@ public interface UserManagementService
     public User getUserByEmailAndCompanyFromUserEmailMappings( long companyId, String emailId )
         throws InvalidInputException, NoRecordsFetchedException;
 
+
+    /**
+     * @param usersList
+     * @return
+     * @throws InvalidInputException
+     */
+    public List<UserFromSearch> getUserSocialMediaList( List<UserFromSearch> usersList ) throws InvalidInputException;
+
 }
 // JIRA SS-34 BY RM02 BOC
