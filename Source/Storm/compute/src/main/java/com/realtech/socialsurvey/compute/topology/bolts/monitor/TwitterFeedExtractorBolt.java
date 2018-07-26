@@ -149,8 +149,15 @@ public class TwitterFeedExtractorBolt extends BaseComputeBolt
         //Id is postId_companyId
         responseWrapper.setId( String.valueOf( twitterFeedData.getId() ) + "_" + responseWrapper.getCompanyId() );
         responseWrapper.setPictures(twitterFeedData.getPictures());
-        responseWrapper.setOwnerName( mediaToken.getContactDetails().getName() );
-        responseWrapper.setOwnerEmail( mediaToken.getContactDetails().getMailDetails().getEmailId() );
+        
+        //Setting contact details.
+        if(mediaToken.getContactDetails() != null) {
+            responseWrapper.setOwnerName( mediaToken.getContactDetails().getName() );
+            if(mediaToken.getContactDetails().getMailDetails() != null) {
+                responseWrapper.setOwnerEmail( mediaToken.getContactDetails().getMailDetails().getEmailId() );
+            }
+        }
+        
         responseWrapper.setPostSource(twitterFeedData.getSource());
         responseWrapper.setTotalLikesCount( twitterFeedData.getFavoriteCount() );
         responseWrapper.setRetweetCount( twitterFeedData.getRetweetCount() );
