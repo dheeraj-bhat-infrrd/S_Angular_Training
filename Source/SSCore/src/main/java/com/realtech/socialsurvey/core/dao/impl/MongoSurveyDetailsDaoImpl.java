@@ -428,7 +428,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         if ( columnName != null ) {
             query.addCriteria( Criteria.where( columnName ).is( columnValue ) );
         }
-        query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ).lte( endDate ) );
+        query.addCriteria( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).gte( startDate ).lte( endDate ) );
         if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
             query.addCriteria( Criteria.where( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) );
         }
@@ -581,8 +581,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         // Returns max value for date in the month set in Calendar instance.
         calendar.set( year, month, calendar.getActualMaximum( 5 ) );
         Date endDate = calendar.getTime();
-        Query query = new Query( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) );
-        query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) );
+        Query query = new Query( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).gte( startDate ) );
+        query.addCriteria( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).lte( endDate ) );
         LOG.debug(
             "Method to get count of total number of surveys taken in a given month and year, getTotalSurveyCountByMonth() finished." );
         return mongoTemplate.count( query, SURVEY_DETAILS_COLLECTION );
@@ -624,13 +624,13 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         }
 
         if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
-            query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ).andOperator(
-                Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ),
+            query.addCriteria( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).lte( endDate ).andOperator(
+                Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).gte( startDate ),
                 Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ),
                 Criteria.where( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) ) );
         } else {
-            query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ).andOperator(
-                Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ),
+            query.addCriteria( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).lte( endDate ).andOperator(
+                Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).gte( startDate ),
                 Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ) );
         }
 
@@ -638,8 +638,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         if ( !aggregateAbusive && !realtechAdmin ) {
             if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
                 aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
-                    Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ),
-                    Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) ),
+                    Aggregation.match( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).lte( endDate ) ),
+                    Aggregation.match( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).gte( startDate ) ),
                     Aggregation.match( Criteria.where( columnName ).is( columnValue ) ),
                     Aggregation
                         .match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
@@ -648,8 +648,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
                     Aggregation.group( columnName ).sum( CommonConstants.SCORE_COLUMN ).as( "total_score" ) );
             } else {
                 aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
-                    Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ),
-                    Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) ),
+                    Aggregation.match( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).lte( endDate ) ),
+                    Aggregation.match( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).gte( startDate ) ),
                     Aggregation.match( Criteria.where( columnName ).is( columnValue ) ),
                     Aggregation
                         .match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
@@ -659,8 +659,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         } else if ( aggregateAbusive && !realtechAdmin ) {
             if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
                 aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
-                    Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ),
-                    Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) ),
+                    Aggregation.match( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).lte( endDate ) ),
+                    Aggregation.match( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).gte( startDate ) ),
                     Aggregation.match( Criteria.where( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) ),
                     Aggregation.match( Criteria.where( columnName ).is( columnValue ) ),
                     Aggregation
@@ -668,8 +668,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
                     Aggregation.group( columnName ).sum( CommonConstants.SCORE_COLUMN ).as( "total_score" ) );
             } else {
                 aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
-                    Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ),
-                    Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) ),
+                    Aggregation.match( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).lte( endDate ) ),
+                    Aggregation.match( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).gte( startDate ) ),
                     Aggregation.match( Criteria.where( columnName ).is( columnValue ) ),
                     Aggregation
                         .match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
@@ -678,16 +678,16 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         } else {
             if ( considerOnlyLatestSurveys.equalsIgnoreCase( CommonConstants.YES_STRING ) ) {
                 aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
-                    Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ),
+                    Aggregation.match( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).lte( endDate ) ),
                     Aggregation.match( Criteria.where( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) ),
-                    Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) ),
+                    Aggregation.match( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).gte( startDate ) ),
                     Aggregation
                         .match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
                     Aggregation.group( columnName ).sum( CommonConstants.SCORE_COLUMN ).as( "total_score" ) );
             } else {
                 aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
-                    Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ),
-                    Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) ),
+                    Aggregation.match( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).lte( endDate ) ),
+                    Aggregation.match( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).gte( startDate ) ),
                     Aggregation
                         .match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
                     Aggregation.group( columnName ).sum( CommonConstants.SCORE_COLUMN ).as( "total_score" ) );
@@ -734,16 +734,16 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         calendar.set( year, month, calendar.getActualMaximum( 5 ) );
         Date endDate = calendar.getTime();
         Query query = new Query( Criteria.where( columnName ).is( columnValue ).andOperator(
-            Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ),
-            Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) ) );
+            Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).lte( endDate ),
+            Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).gte( startDate ) ) );
         long count = mongoTemplate.count( query, SURVEY_DETAILS_COLLECTION );
         if ( count < 3 ) {
             LOG.debug( columnName + " " + columnValue + " does not qualify for calculation of rating. Returning..." );
             return -1;
         }
         TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
-            Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ),
-            Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) ),
+            Aggregation.match( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).lte( endDate ) ),
+            Aggregation.match( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).gte( startDate ) ),
             Aggregation.match( Criteria.where( columnName ).is( columnValue ) ),
             Aggregation.group( columnName ).sum( CommonConstants.SCORE_COLUMN ).as( "total_score" ) );
 
@@ -780,12 +780,12 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         TypedAggregation<SurveyDetails> aggregation;
         if ( columnName == null ) {
             aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
-                Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ).lte( endDate ) ),
+                Aggregation.match( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).gte( startDate ).lte( endDate ) ),
                 Aggregation.unwind( "sharedOn" ), Aggregation.group( "sharedOn" ).count().as( "count" ) ).withOptions(Aggregation.newAggregationOptions().allowDiskUse(true).build());
         } else {
             aggregation = new TypedAggregation<SurveyDetails>( SurveyDetails.class,
                 Aggregation.match( Criteria.where( columnName ).is( columnValue ) ),
-                Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ).lte( endDate ) ),
+                Aggregation.match( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).gte( startDate ).lte( endDate ) ),
                 Aggregation.unwind( "sharedOn" ), Aggregation.group().count().as( "count" ) ).withOptions(Aggregation.newAggregationOptions().allowDiskUse(true).build());
         }
         AggregationResults<SurveyDetails> result = mongoTemplate.aggregate( aggregation, SURVEY_DETAILS_COLLECTION,
@@ -874,11 +874,11 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             }
 
             if ( startDate != null && endDate == null ) {
-                criteriaList.add( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) );
+                criteriaList.add( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).gte( startDate ) );
             } else if ( startDate == null && endDate != null ) {
-                criteriaList.add( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) );
+                criteriaList.add( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).lte( endDate ) );
             } else if ( startDate != null && endDate != null ) {
-                criteriaList.add( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ).lte( endDate ) );
+                criteriaList.add( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).gte( startDate ).lte( endDate ) );
             }
 
             criteriaList.add( Criteria.where( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN ).exists( true ) );
@@ -982,12 +982,12 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         }
         query.fields().exclude( CommonConstants.SOCIAL_MEDIA_POST_RESPONSE_DETAILS_COLUMN );
         if ( startDate != null && endDate != null ) {
-            query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate )
-                .andOperator( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ) );
+            query.addCriteria( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).gte( startDate )
+                .andOperator( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).lte( endDate ) ) );
         } else if ( startDate != null ) {
-            query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) );
+            query.addCriteria( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).gte( startDate ) );
         } else if ( endDate != null ) {
-            query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) );
+            query.addCriteria( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).lte( endDate ) );
         }
 
         /**
@@ -1025,15 +1025,15 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         
         
         if( CommonConstants.WIDGET_ORDER_NEWEST_FIRST.equals( order ) ) {  
-            query.with( new Sort( Sort.Direction.DESC, CommonConstants.SURVEY_UPDATED_DATE_COLUMN ) );
+            query.with( new Sort( Sort.Direction.DESC, CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ) );
         }  else if( CommonConstants.WIDGET_ORDER_OLDEST_FIRST.equals( order ) ) {
-            query.with( new Sort( Sort.Direction.ASC, CommonConstants.SURVEY_UPDATED_DATE_COLUMN ) );
+            query.with( new Sort( Sort.Direction.ASC, CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ) );
         } else if( CommonConstants.WIDGET_ORDER_HIGEST_RATING_FIRST.equals( order ) ) {
             query.with( new Sort( Sort.Direction.DESC, CommonConstants.SCORE_COLUMN ) );
         } else if( CommonConstants.WIDGET_ORDER_LOWEST_RATING_FIRST.equals( order ) ) {
             query.with( new Sort( Sort.Direction.ASC, CommonConstants.SCORE_COLUMN ) );
         } else {
-            query.with( new Sort( Sort.Direction.DESC, CommonConstants.SURVEY_UPDATED_DATE_COLUMN ) );
+            query.with( new Sort( Sort.Direction.DESC, CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ) );
         }
         
 
@@ -1294,14 +1294,14 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             query.addCriteria( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( false ) );
         }
         if ( startDate != null && endDate == null ) {
-            query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) );
+            query.addCriteria( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).gte( startDate ) );
         }
         if ( endDate != null && startDate == null ) {
-            query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) );
+            query.addCriteria( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).lte( endDate ) );
         }
         if ( startDate != null && endDate != null ) {
-            query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate )
-                .andOperator( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ) );
+            query.addCriteria( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).gte( startDate )
+                .andOperator( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).lte( endDate ) ) );
         }
         if ( filterZillowAnd3rdPartyReviews ) {
             query.addCriteria( Criteria.where( CommonConstants.SOURCE_COLUMN )
@@ -1341,14 +1341,14 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             query.addCriteria( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( false ) );
         }
         if ( startDate != null && endDate == null ) {
-            query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) );
+            query.addCriteria( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).gte( startDate ) );
         }
         if ( endDate != null && startDate == null ) {
-            query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) );
+            query.addCriteria( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).lte( endDate ) );
         }
         if ( startDate != null && endDate != null ) {
-            query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate )
-                .andOperator( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ) );
+            query.addCriteria( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).gte( startDate )
+                .andOperator( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).lte( endDate ) ) );
         }
         if(LOG.isDebugEnabled()) {
             LOG.debug( "Query: {}" , query.toString() );
@@ -1386,14 +1386,14 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             query.addCriteria( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( false ) );
         }
         if ( startDate != null && endDate == null ) {
-            query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) );
+            query.addCriteria( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).gte( startDate ) );
         }
         if ( endDate != null && startDate == null ) {
-            query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) );
+            query.addCriteria( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).lte( endDate ) );
         }
         if ( startDate != null && endDate != null ) {
-            query.addCriteria( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate )
-                .andOperator( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ) );
+            query.addCriteria( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).gte( startDate )
+                .andOperator( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).lte( endDate ) ) );
         }
         if(LOG.isDebugEnabled()) {
             LOG.debug( "Query: {}" , query.toString() );
@@ -1483,13 +1483,13 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         // match non abusive survey
         pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.IS_ABUSIVE_COLUMN, false ) ) );
         // match start date
-        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.MODIFIED_ON_COLUMN,
+        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN,
             new BasicDBObject( "$gte", new Date( startDate.getTime() ) ) ) ) );
         // match end date
-        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.MODIFIED_ON_COLUMN,
+        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN,
             new BasicDBObject( "$lte", new Date( endDate.getTime() ) ) ) ) );
         // add projection
-        BasicDBObject projectionObject = new BasicDBObject( CommonConstants.MODIFIED_ON_COLUMN, 1 );
+        BasicDBObject projectionObject = new BasicDBObject( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN, 1 );
         BasicDBList modifiedOnList = new BasicDBList();
         modifiedOnList.add( "$modifiedOn" );
         BasicDBObject yearDBObject = new BasicDBObject( "$year", modifiedOnList );
@@ -1663,13 +1663,13 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         pipeline.add( new BasicDBObject( "$match",
             new BasicDBObject( CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN, new BasicDBObject( "$exists", true ) ) ) );
         // match start date
-        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.MODIFIED_ON_COLUMN,
+        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN,
             new BasicDBObject( "$gte", new Date( startDate.getTime() ) ) ) ) );
         // match end date
-        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.MODIFIED_ON_COLUMN,
+        pipeline.add( new BasicDBObject( "$match", new BasicDBObject( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN,
             new BasicDBObject( "$lte", new Date( endDate.getTime() ) ) ) ) );
         // add projection level 1
-        BasicDBObject firstProjectionObject = new BasicDBObject( CommonConstants.MODIFIED_ON_COLUMN, 1 );
+        BasicDBObject firstProjectionObject = new BasicDBObject( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN, 1 );
         // add agent post detail column
         firstProjectionObject.append(
             CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.AGENT_MEDIA_POST_DETAILS_COLUMN, 1 );
@@ -1692,7 +1692,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             "$" + CommonConstants.SOCIAL_MEDIA_POST_DETAILS_COLUMN + "." + CommonConstants.BRANCH_MEDIA_POST_DETAILS_COLUMN ) );
 
         // add projection level 2 to get count of each level
-        BasicDBObject secondProjectionObject = new BasicDBObject( CommonConstants.MODIFIED_ON_COLUMN, 1 );
+        BasicDBObject secondProjectionObject = new BasicDBObject( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN, 1 );
         BasicDBList agentPostCountDBList = new BasicDBList();
         agentPostCountDBList.add( "$socialMediaPostDetails.agentMediaPostDetails.sharedOn" );
         agentPostCountDBList.add( new BasicDBList() );
@@ -1718,7 +1718,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         secondProjectionObject.append( "companyPostsCount", companyPostsCount );
         pipeline.add( new BasicDBObject( "$project", secondProjectionObject ) );
 
-        BasicDBObject thirdProjectionObject = new BasicDBObject( CommonConstants.MODIFIED_ON_COLUMN, 1 );
+        BasicDBObject thirdProjectionObject = new BasicDBObject( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN, 1 );
         BasicDBList modifiedOnList = new BasicDBList();
 
         BasicDBList countAdditionList = new BasicDBList();
@@ -1898,8 +1898,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
                         .match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
                     Aggregation.match( Criteria.where( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) ),
                     Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ),
-                    Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) ),
-                    Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).lte( endDate ) ),
+                    Aggregation.match( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).gte( startDate ) ),
+                    Aggregation.match( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).lte( endDate ) ),
                     Aggregation
                         .match( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ),
                     Aggregation.match( Criteria.where( CommonConstants.SOURCE_COLUMN ).nin(
@@ -1912,7 +1912,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
                         .match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
                     Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ),
                     Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) ),
-                    Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).lte( endDate ) ),
+                    Aggregation.match( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).lte( endDate ) ),
                     Aggregation
                         .match( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ),
                     Aggregation.match( Criteria.where( CommonConstants.SOURCE_COLUMN ).nin(
@@ -1927,7 +1927,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
                         .match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
                     Aggregation.match( Criteria.where( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) ),
                     Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ),
-                    Aggregation.match( Criteria.where( CommonConstants.CREATED_ON ).gte( startDate ) ),
+                    Aggregation.match( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).gte( startDate ) ),
                     Aggregation
                         .match( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ),
                     Aggregation.match( Criteria.where( CommonConstants.SOURCE_COLUMN ).nin(
@@ -2049,8 +2049,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
                         .match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
                     Aggregation.match( Criteria.where( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) ),
                     Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ),
-                    Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) ),
-                    Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ),
+                    Aggregation.match( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).gte( startDate ) ),
+                    Aggregation.match( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).lte( endDate ) ),
                     Aggregation
                         .match( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ),
                     Aggregation.match( Criteria.where( CommonConstants.SOURCE_COLUMN ).nin(
@@ -2062,8 +2062,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
                     Aggregation
                         .match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
                     Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ),
-                    Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) ),
-                    Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ),
+                    Aggregation.match( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).gte( startDate ) ),
+                    Aggregation.match( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).lte( endDate ) ),
                     Aggregation
                         .match( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ),
                     Aggregation.match( Criteria.where( CommonConstants.SOURCE_COLUMN ).nin(
@@ -2078,7 +2078,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
                         .match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
                     Aggregation.match( Criteria.where( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) ),
                     Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ),
-                    Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) ),
+                    Aggregation.match( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).gte( startDate ) ),
                     Aggregation
                         .match( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ),
                     Aggregation.match( Criteria.where( CommonConstants.SOURCE_COLUMN ).nin(
@@ -2090,7 +2090,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
                     Aggregation
                         .match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
                     Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ),
-                    Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).gte( startDate ) ),
+                    Aggregation.match( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).gte( startDate ) ),
                     Aggregation
                         .match( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ),
                     Aggregation.match( Criteria.where( CommonConstants.SOURCE_COLUMN ).nin(
@@ -2105,7 +2105,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
                         .match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
                     Aggregation.match( Criteria.where( CommonConstants.SHOW_SURVEY_ON_UI_COLUMN ).is( true ) ),
                     Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ),
-                    Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ),
+                    Aggregation.match( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).lte( endDate ) ),
                     Aggregation
                         .match( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ),
                     Aggregation.match( Criteria.where( CommonConstants.SOURCE_COLUMN ).nin(
@@ -2117,7 +2117,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
                     Aggregation
                         .match( Criteria.where( CommonConstants.STAGE_COLUMN ).is( CommonConstants.SURVEY_STAGE_COMPLETE ) ),
                     Aggregation.match( Criteria.where( CommonConstants.IS_ABUSIVE_COLUMN ).is( fetchAbusive ) ),
-                    Aggregation.match( Criteria.where( CommonConstants.MODIFIED_ON_COLUMN ).lte( endDate ) ),
+                    Aggregation.match( Criteria.where( CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ).lte( endDate ) ),
                     Aggregation
                         .match( Criteria.where( CommonConstants.AGENT_ID_COLUMN ).ne( CommonConstants.DEFAULT_AGENT_ID ) ),
                     Aggregation.match( Criteria.where( CommonConstants.SOURCE_COLUMN ).nin(
@@ -3151,7 +3151,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
             query.addCriteria( Criteria.where( CommonConstants.RETAKE_SURVEY_COLUMN ).is( true ) );
 
         //get the oldest record
-        query.with( new Sort( Sort.Direction.DESC, CommonConstants.MODIFIED_ON_COLUMN ) );
+        query.with( new Sort( Sort.Direction.DESC, CommonConstants.SURVEY_COMPLETED_DATE_COLUMN ) );
 
         if ( start > 0 )
             query.skip( start );
