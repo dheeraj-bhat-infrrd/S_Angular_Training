@@ -71,6 +71,7 @@ import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RemovedUser;
 import com.realtech.socialsurvey.core.entities.SettingsDetails;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SurveyPreInitiation;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
@@ -84,6 +85,7 @@ import com.realtech.socialsurvey.core.entities.UsercountModificationNotification
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.OrganizationUnit;
 import com.realtech.socialsurvey.core.enums.SettingsForApplication;
+import com.realtech.socialsurvey.core.enums.SocialMediaConnectionStatus;
 import com.realtech.socialsurvey.core.enums.SurveyErrorCode;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.FatalException;
@@ -112,6 +114,7 @@ import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
+import com.realtech.socialsurvey.core.vo.SocialMediaVO;
 import com.realtech.socialsurvey.core.vo.UserList;
 
 
@@ -5022,4 +5025,105 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
         return (List<UserProfile>) criteria.list();
     }
     
+    @Override
+    @Transactional
+    public List<UserFromSearch> getUserSocialMediaList( List<UserFromSearch> usersList ) throws InvalidInputException
+    {
+        SocialMediaVO socialMediaVO;
+        for(UserFromSearch user: usersList) {
+            List<SocialMediaVO> socialMediaVOS = new ArrayList<>(  );
+            //get the details of the socialmedia which the user has connected from mongo using user
+            SocialMediaTokens socialMediaTokens = organizationUnitSettingsDao.fetchSocialMediaTokens(
+                MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, user.getUserId() );
+
+                //facebook
+                socialMediaVO = new SocialMediaVO( CommonConstants.FACEBOOK_SOCIAL_SITE );
+                if ( socialMediaTokens!= null && socialMediaTokens.getFacebookToken() != null ) {
+                    if ( socialMediaTokens.getFacebookToken().isTokenExpiryAlertSent() )
+                        socialMediaVO.setStatus( SocialMediaConnectionStatus.EXPIRED );
+                    else
+                        socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+                }
+                socialMediaVOS.add( socialMediaVO );
+
+                //instagram
+                socialMediaVO = new SocialMediaVO( CommonConstants.INSTAGRAM_SOCIAL_SITE );
+                if ( socialMediaTokens!= null && socialMediaTokens.getInstagramToken() != null ) {
+                    if ( socialMediaTokens.getInstagramToken().isTokenExpiryAlertSent() )
+                        socialMediaVO.setStatus( SocialMediaConnectionStatus.EXPIRED );
+                    else
+                        socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+                }
+                socialMediaVOS.add( socialMediaVO );
+
+                //facebookpixel
+                socialMediaVO = new SocialMediaVO( CommonConstants.FACEBOOK_PIXEL );
+                if ( socialMediaTokens!= null && socialMediaTokens.getFacebookPixelToken() != null ) {
+                    socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+                }
+                socialMediaVOS.add( socialMediaVO );
+
+                //google business
+                socialMediaVO = new SocialMediaVO( CommonConstants.GOOGLE_BUSINESS_SOCIAL_SITE );
+                if ( socialMediaTokens!= null && socialMediaTokens.getGoogleBusinessToken() != null ) {
+                    socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+                }
+                socialMediaVOS.add( socialMediaVO );
+
+                //google
+                socialMediaVO = new SocialMediaVO( CommonConstants.GOOGLE_SOCIAL_SITE );
+                if ( socialMediaTokens!= null && socialMediaTokens.getGoogleToken() != null ) {
+                    socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+                }
+                socialMediaVOS.add( socialMediaVO );
+
+                //lendingtree
+                socialMediaVO = new SocialMediaVO( CommonConstants.LENDINGTREE_SOCIAL_SITE );
+                if ( socialMediaTokens!= null && socialMediaTokens.getLendingTreeToken() != null ) {
+                    socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+                }
+                socialMediaVOS.add( socialMediaVO );
+
+                //linkedin
+                socialMediaVO = new SocialMediaVO( CommonConstants.LINKEDIN_SOCIAL_SITE );
+                if ( socialMediaTokens!= null && socialMediaTokens.getLinkedInToken() != null ) {
+                    if ( socialMediaTokens.getLinkedInToken().isTokenExpiryAlertSent() )
+                        socialMediaVO.setStatus( SocialMediaConnectionStatus.EXPIRED );
+                    else
+                        socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+                }
+                socialMediaVOS.add( socialMediaVO );
+
+                //realtor
+                socialMediaVO = new SocialMediaVO( CommonConstants.REALTOR_SOCIAL_SITE );
+                if ( socialMediaTokens!= null && socialMediaTokens.getRealtorToken() != null ) {
+                    socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+                }
+                socialMediaVOS.add( socialMediaVO );
+
+                //twitter
+                socialMediaVO = new SocialMediaVO( CommonConstants.TWITTER_SOCIAL_SITE );
+                if ( socialMediaTokens!= null && socialMediaTokens.getTwitterToken() != null ) {
+                    socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+                }
+                socialMediaVOS.add( socialMediaVO );
+
+                //yelp
+                socialMediaVO = new SocialMediaVO( CommonConstants.YELP_SOCIAL_SITE );
+                if ( socialMediaTokens!= null && socialMediaTokens.getYelpToken() != null ) {
+                    socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+                }
+                socialMediaVOS.add( socialMediaVO );
+
+                //zillow
+                socialMediaVO = new SocialMediaVO( CommonConstants.ZILLOW_SOCIAL_SITE );
+                if ( socialMediaTokens!= null && socialMediaTokens.getZillowToken() != null ) {
+                    socialMediaVO.setStatus( SocialMediaConnectionStatus.CONNECTED );
+                }
+                socialMediaVOS.add( socialMediaVO );
+
+            user.setSocialMediaVOs( socialMediaVOS );
+        }
+        return usersList;
+    }
 }

@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.realtech.socialsurvey.api.exceptions.SSApiException;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.WidgetTemplateConstants;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.widget.WidgetConfiguration;
@@ -33,6 +34,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.widget.WidgetManagementService;
+import com.realtech.socialsurvey.core.utils.FileOperations;
 
 import io.swagger.annotations.ApiOperation;
 import retrofit.http.Query;
@@ -51,9 +53,12 @@ public class WidgetApiController
 
     @Autowired
     private ProfileManagementService profileManagementService;
-    
+
     @Autowired
     private OrganizationManagementService organizationManagementService;
+
+    @Autowired
+    private FileOperations fileOperations;
 
 
     @ResponseBody
@@ -77,11 +82,13 @@ public class WidgetApiController
     @ResponseBody
     @RequestMapping ( value = "/getdefaultwidgetconfiguration", method = RequestMethod.GET)
     @ApiOperation ( value = "get Default widget configuration")
-    public WidgetConfiguration getDefaultWidgetConfiguration( @Query ( "entityId") long entityId, @Query ( "entityType") String entityType ) throws SSApiException
+    public WidgetConfiguration getDefaultWidgetConfiguration( @Query ( "entityId") long entityId,
+        @Query ( "entityType") String entityType ) throws SSApiException
     {
         LOG.info( "Method getDefaultWidgetConfiguration() started to get default widget configuration from ss-api." );
         try {
-            return widgetManagementService.getDefaultWidgetConfiguration( organizationManagementService.getEntitySettings( entityId, entityType ), entityType );
+            return widgetManagementService.getDefaultWidgetConfiguration(
+                organizationManagementService.getEntitySettings( entityId, entityType ), entityType );
         } catch ( InvalidInputException e ) {
             LOG.error( "could not get default widget configuration", e );
             throw new SSApiException( "could not get default widget configuration", e );
@@ -169,6 +176,8 @@ public class WidgetApiController
             long fiveStar = profileManagementService.getSimpleReviewsCount( unitSettings.getIden(), 5, 5.1, profileLevel,
                 false );
             double averageRating = profileManagementService.getAverageRatings( unitSettings.getIden(), profileLevel, false );
+            List<String> availableSources = widgetManagementService.getListOfAvailableSources( profileLevel,
+                unitSettings.getIden() );
 
             if ( hideHistory ) {
                 widgetConfiguration.setHistory( null );
@@ -182,6 +191,8 @@ public class WidgetApiController
             responseMap.put( "fourStar", fourStar );
             responseMap.put( "fiveStar", fiveStar );
             responseMap.put( "averageRating", averageRating );
+            responseMap.put( "availableSources", availableSources );
+
 
             return new ResponseEntity<>( responseMap, HttpStatus.OK );
         } catch ( InvalidInputException e ) {
@@ -212,5 +223,40 @@ public class WidgetApiController
             throw new InvalidInputException( "Either an invalid profile type was passed or no records were found." );
         }
         return unitSettings;
+    }
+
+
+    @RequestMapping ( value = "/widget/scripts", method = RequestMethod.GET)
+    @ApiOperation ( value = "get widget script template")
+    public List<String> getWidgetScript( @Query ( "scriptType") String scriptType ) throws SSApiException
+    {
+        LOG.info( "Method getWidgetScript() started to store widget configuration from ss-api." );
+        try {
+
+            List<String> widgetScriptList = new ArrayList<>();
+
+            if ( CommonConstants.WIDGET_SCRIPT_TYPE_PAF.equals( scriptType ) ) {
+                widgetScriptList.add( fileOperations.getContentFromFile(
+                    WidgetTemplateConstants.WIDGET_TEMPLATES_FOLDER + WidgetTemplateConstants.WIDGET_PLACE_AND_FORGET ) );
+            } else if ( CommonConstants.WIDGET_SCRIPT_TYPE_CC.equals( scriptType ) ) {
+                widgetScriptList.add( fileOperations.getContentFromFile(
+                    WidgetTemplateConstants.WIDGET_TEMPLATES_FOLDER + WidgetTemplateConstants.WIDGET_CUSTOM_CONTAINER ) );
+            } else if ( CommonConstants.WIDGET_SCRIPT_TYPE_JI.equals( scriptType ) ) {
+                widgetScriptList.add( fileOperations.getContentFromFile(
+                    WidgetTemplateConstants.WIDGET_TEMPLATES_FOLDER + WidgetTemplateConstants.WIDGET_JAVASCRIPT_IFRAME ) );
+            } else {
+                widgetScriptList.add( fileOperations.getContentFromFile(
+                    WidgetTemplateConstants.WIDGET_TEMPLATES_FOLDER + WidgetTemplateConstants.WIDGET_PLACE_AND_FORGET ) );
+                widgetScriptList.add( fileOperations.getContentFromFile(
+                    WidgetTemplateConstants.WIDGET_TEMPLATES_FOLDER + WidgetTemplateConstants.WIDGET_CUSTOM_CONTAINER ) );
+                widgetScriptList.add( fileOperations.getContentFromFile(
+                    WidgetTemplateConstants.WIDGET_TEMPLATES_FOLDER + WidgetTemplateConstants.WIDGET_JAVASCRIPT_IFRAME ) );
+            }
+
+            return widgetScriptList;
+        } catch ( Exception e ) {
+            LOG.error( "could not get widget script", e );
+            throw new SSApiException( "could not get widget script", e );
+        }
     }
 }

@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.compute.topology.bolts.transactioningestion;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.text.ParseException;
@@ -13,10 +14,19 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
@@ -70,32 +80,27 @@ public class ConvertToSurveyObject extends BaseComputeBoltWithAck
         long ftpId = transactionIngestionMessage.getFtpId();
         if ( prevSucccess ) {
             Path targetPath = (Path) input.getValueByField( "targetPath" );
-            String extension = getExtention( targetPath );
-            if ( extension.equals( "csv" ) ) {
-                try {
-                    TransactionSourceFtp transactionSourceFtp = fetchFtpData( companyId, ftpId );
-                    LOG.debug( "the transactionSourceFtp is : {}", transactionSourceFtp );
-                    if ( transactionSourceFtp != null ) {
-                        surveyList = readFromCsv( targetPath.toString(), transactionSourceFtp.getFileHeaderMapper() );
-                        LOG.debug( "the surveyList is : {}", surveyList );
-                        if(surveyList == null) {
-                            LOG.warn( "The required system mandatory header's were not mapped" );
-                            SSAPIOperations.getInstance().processFailedFtpRequest(
-                                createErrorForHeaders(),
-                                transactionIngestionMessage, false );
-                        }else  if ( !surveyList.isEmpty() ) {
-                            bulkSurveyPutVO = convertToBulk( surveyList, companyId, transactionSourceFtp.getFtpSource() );
-                            success = true;
-                        }  else {
-                            LOG.warn( "There is no transaction data in the file" );
-                            SSAPIOperations.getInstance().processFailedFtpRequest(
-                                "There is no transaction data in the file",
-                                transactionIngestionMessage, false );
-                        }
+            try {
+                TransactionSourceFtp transactionSourceFtp = fetchFtpData( companyId, ftpId );
+                LOG.debug( "the transactionSourceFtp is : {}", transactionSourceFtp );
+                if ( transactionSourceFtp != null ) {
+                   surveyList = createSurveyList(targetPath, transactionSourceFtp.getFileHeaderMapper(), transactionIngestionMessage);
+                    LOG.debug( "the surveyList is : {}", surveyList );
+                    if ( surveyList == null ) {
+                        LOG.warn( "The required system mandatory header's were not mapped" );
+                        SSAPIOperations.getInstance().processFailedFtpRequest( createErrorForHeaders(),
+                            transactionIngestionMessage, false );
+                    } else if ( !surveyList.isEmpty() ) {
+                        bulkSurveyPutVO = convertToBulk( surveyList, companyId, transactionSourceFtp.getFtpSource() );
+                        success = true;
+                    } else {
+                        LOG.warn( "There is no transaction data in the file" );
+                        SSAPIOperations.getInstance().processFailedFtpRequest( "There is no transaction data in the file",
+                            transactionIngestionMessage, false );
                     }
-                } catch ( IOException e ) {
-                    LOG.error( "Failed to convert to survey object targetPath: {} on local", targetPath );
                 }
+            } catch ( IOException e ) {
+                LOG.error( "Failed to convert to survey object targetPath: {} on local", targetPath );
             }
             LOG.info( "Emitting tuple with success = {} , transactionIngestionMessage = {}, surveyList = {}", success,
                 targetPath, surveyList );
@@ -124,7 +129,7 @@ public class ConvertToSurveyObject extends BaseComputeBoltWithAck
     }
 
 
-    private List<SurveyPutVO> readFromCsv( String csvFileURI, Map<String, String> fileHeaderMapper ) throws IOException
+    private List<SurveyPutVO> readFromCsv( String csvFileURI, Map<String, String> fileHeaderMapper ) throws IOException, ParseException
     {
 
         LOG.debug( "method readFromCsv started" );
@@ -132,6 +137,8 @@ public class ConvertToSurveyObject extends BaseComputeBoltWithAck
         List<SurveyPutVO> surveyList = new ArrayList<>();
         Map<String, Integer> actualFileHeader = new HashMap<>();
         String dateFormat = null;
+        String systemDate = null;
+        int lineNumber = 0;
 
         try ( BufferedReader reader = new BufferedReader( new InputStreamReader( new FileInputStream( csvFileURI ) ) ) ) {
 
@@ -147,22 +154,19 @@ public class ConvertToSurveyObject extends BaseComputeBoltWithAck
                 String[] entries = line.split( ",", -1 );
                 if ( start ) {
                     line = removeUTF8BOM(line);
-                    actualFileHeader = actualHeader( line.split( "," ), fileHeaderMapper );
+                    actualFileHeader = actualHeader( new ArrayList<>(Arrays.asList(line.split( "," ))), fileHeaderMapper );
                     if ( actualFileHeader == null ) {
                         LOG.debug( "mandatory feilds don't exist for file : {}", csvFileURI );
                         //Find the headers which weren't matched with the system
-                        intersectionHeaders(line.split( "," ),fileHeaderMapper.values());
+                        intersectionHeaders(new ArrayList<>(Arrays.asList(line.split( "," ))),fileHeaderMapper.values());
                         //return null to differentiate if it failed because of headers
                         return null;
                     }
+                    ++lineNumber;
                     start = false;
-                } else {
-                    SurveyPutVO surveyVO = new SurveyPutVO();
-                    TransactionInfoPutVO transactionInfoPutVO = new TransactionInfoPutVO();
-                    ServiceProviderInfo serviceProviderInfo = new ServiceProviderInfo();
-                    String systemDate = null;
+                } else if(ifEntryNotEmpty(new ArrayList<>(Arrays.asList(entries)))){
 
-                    if ( actualFileHeader.containsKey( "fundedDate" ) && dateFormat != "" ) {
+                    if ( actualFileHeader.containsKey( "fundedDate" ) ) {
                         String actualFileDate = entries[actualFileHeader.get( "fundedDate" )];
 
                         if ( dateFormat == null ) {
@@ -175,38 +179,10 @@ public class ConvertToSurveyObject extends BaseComputeBoltWithAck
 
                     } else
                         systemDate = new SimpleDateFormat( SYSTEM_DATE_FORMAT ).format( Calendar.getInstance().getTime() );
+                    surveyList.add( creatingSurveyObject(new ArrayList<>(Arrays.asList(entries)), actualFileHeader, systemDate, ++lineNumber) );
                     
-                    transactionInfoPutVO.setCustomer1Email( entries[actualFileHeader.get( "bor1Email" )] );
-                    transactionInfoPutVO.setCustomer1FirstName( entries[actualFileHeader.get( "bor1FirstName" )] );
-                    transactionInfoPutVO.setCustomer1LastName(actualFileHeader.containsKey( "bor1LastName" ) ? entries[actualFileHeader.get( "bor1LastName" )] : "" );
-                    transactionInfoPutVO.setCustomer2Email( actualFileHeader.containsKey( "bor2Email" ) ? entries[actualFileHeader.get( "bor2Email" )] : "" );
-                    transactionInfoPutVO.setCustomer2FirstName( actualFileHeader.containsKey( "bor2FirstName" ) ?  entries[actualFileHeader.get( "bor2FirstName" )] : "" );
-                    transactionInfoPutVO.setCustomer2LastName(actualFileHeader.containsKey( "bor2LastName" ) ?  entries[actualFileHeader.get( "bor2LastName" )] : "");
-                    transactionInfoPutVO.setTransactionCity(actualFileHeader.containsKey( "subPropCity" ) ? entries[actualFileHeader.get( "subPropCity" )] : ""  );
-                    transactionInfoPutVO.setTransactionDate(systemDate);
-                    transactionInfoPutVO.setTransactionRef( actualFileHeader.containsKey( "fileName" ) ? entries[actualFileHeader.get( "fileName" )] : "" );
-                    transactionInfoPutVO.setTransactionState(actualFileHeader.containsKey( "subPropState" ) ?  entries[actualFileHeader.get( "subPropState" )]  : "" );
-                    transactionInfoPutVO.setTransactionType(actualFileHeader.containsKey( "loanPurpose" ) ?  entries[actualFileHeader.get( "loanPurpose" )]  : "" );
-                    transactionInfoPutVO.setTransactionType(actualFileHeader.containsKey( "propertyAddress" ) ?  entries[actualFileHeader.get( "propertyAddress" )]  : "" );
-                    //adding buyer and seller feilds
-                    transactionInfoPutVO.setBuyerAgentEmail( actualFileHeader.containsKey( "buyerAgentEmail" ) ? entries[actualFileHeader.get( "buyerAgentEmail" )] : "" );
-                    transactionInfoPutVO.setBuyerAgentFirstName( actualFileHeader.containsKey( "buyerAgentFirstName" ) ?  entries[actualFileHeader.get( "buyerAgentFirstName" )] : "" );
-                    transactionInfoPutVO.setBuyerAgentLastName(actualFileHeader.containsKey( "buyerAgentLastName" ) ?  entries[actualFileHeader.get( "buyerAgentLastName" )] : "");
-                    transactionInfoPutVO.setSellerAgentEmail( actualFileHeader.containsKey( "sellerAgentEmail" ) ? entries[actualFileHeader.get( "sellerAgentEmail" )] : "" );
-                    transactionInfoPutVO.setSellerAgentFirstName( actualFileHeader.containsKey( "sellerAgentFirstName" ) ?  entries[actualFileHeader.get( "sellerAgentFirstName" )] : "" );
-                    transactionInfoPutVO.setSellerAgentLastName(actualFileHeader.containsKey( "sellerAgentLastName" ) ?  entries[actualFileHeader.get( "sellerAgentLastName" )] : "");
-                    //adding buyer and seller participants 
-                
-                    serviceProviderInfo.setServiceProviderEmail( entries[actualFileHeader.get( "serviceremail" )]  );
-                    serviceProviderInfo.setServiceProviderName(  entries[actualFileHeader.get( "servicer" )]   );
-                    
-                    
-                    
-                    surveyVO.setServiceProviderInfo( serviceProviderInfo );
-                    surveyVO.setTransactionInfo( transactionInfoPutVO );
-
-                    surveyList.add( surveyVO );
-                    
+                } else {
+                    surveyList.add(creatingEmptySurveyObject(++lineNumber));
                 }
 
             }
@@ -214,13 +190,204 @@ public class ConvertToSurveyObject extends BaseComputeBoltWithAck
         } catch ( IOException readError ) {
             LOG.error( "Unable read CSV file." );
             throw new IOException( "Unable to read Csv from the source" );
-        }  catch ( ParseException e ) {
-            LOG.error( "Failed to parse format:{} for file:{}", dateFormat, csvFileURI );
         }
+        return surveyList;
+    }
+    
 
+    private List<SurveyPutVO> readFromXlsx( String xlsxFileURI, Map<String, String> fileHeaderMapper )
+        throws IOException, ParseException
+    {
+        LOG.debug( "method to read an xlsx" );
+        List<SurveyPutVO> surveyList = new ArrayList<>();
+        Map<String, Integer> actualFileHeader = new HashMap<>();
+        String dateFormat = null;
+        boolean start = true;
+        String systemDate = null;
+
+        //input the file
+        InputStream excelFileToRead = new FileInputStream( xlsxFileURI );
+        XSSFWorkbook wb = new XSSFWorkbook( excelFileToRead );
+        XSSFSheet sheet = wb.getSheetAt( 0 );
+        XSSFRow row;
+        Iterator rows = sheet.rowIterator();
+        int lineNumber = 0;
+        while ( lineNumber < sheet.getPhysicalNumberOfRows() ) {
+            row = sheet.getRow( lineNumber );
+            if(row == null) {
+                surveyList.add(creatingEmptySurveyObject(++lineNumber));
+                continue;
+            }
+            ArrayList<String> entries = readCompleteXSSFRow(row);
+
+            if ( start ) {
+                actualFileHeader = actualHeader( entries, fileHeaderMapper );
+                if ( actualFileHeader == null ) {
+                    LOG.debug( "mandatory feilds don't exist for file : {}", xlsxFileURI );
+                    //Find the headers which weren't matched with the system
+                    intersectionHeaders( entries, fileHeaderMapper.values() );
+                    //return null to differentiate if it failed because of headers
+                    return null;
+                }
+                ++lineNumber;
+                start = false;
+            } else if(ifEntryNotEmpty(entries)){
+
+                if ( actualFileHeader.containsKey( "fundedDate" ) ) {
+                    String actualFileDate = entries.get( actualFileHeader.get( "fundedDate" ) );
+
+                    if ( dateFormat == null ) {
+                        dateFormat = multipleDateFormat( DATE_FORMATS, actualFileDate );
+                    }
+
+                    Date fileDate = new SimpleDateFormat( dateFormat ).parse( actualFileDate );
+                    systemDate = new SimpleDateFormat( SYSTEM_DATE_FORMAT ).format( fileDate );
+
+
+                } else
+                    systemDate = new SimpleDateFormat( SYSTEM_DATE_FORMAT ).format( Calendar.getInstance().getTime() );
+
+
+                surveyList.add( creatingSurveyObject( entries, actualFileHeader, systemDate, ++lineNumber ) );
+
+            } else {
+                surveyList.add(creatingEmptySurveyObject(++lineNumber));
+            }
+            
+        }
         return surveyList;
     }
 
+
+    private ArrayList<String> readCompleteXSSFRow( XSSFRow row )
+    {
+        ArrayList<String> entries = new ArrayList<>();
+        for ( int i = 0; i < row.getLastCellNum(); i++ ) {
+            Cell cell = row.getCell( i );
+            if ( cell == null ) {
+                entries.add( "" );
+            } else {
+                entries.add( new DataFormatter().formatCellValue( cell ) );
+            }
+        }
+        return entries;
+    }
+    
+    private List<SurveyPutVO> readFromXls( String xlsFileURI, Map<String, String> fileHeaderMapper )
+        throws IOException, ParseException
+    {
+        LOG.debug( "method to read an xls" );
+        List<SurveyPutVO> surveyList = new ArrayList<>();
+        Map<String, Integer> actualFileHeader = new HashMap<>();
+        String dateFormat = null;
+        boolean start = true;
+        String systemDate = null;
+
+        //input the file
+        InputStream excelFileToRead = new FileInputStream( xlsFileURI );
+        HSSFWorkbook hb = new HSSFWorkbook( excelFileToRead );
+        HSSFSheet sheet = hb.getSheetAt( 0 );
+        HSSFRow row;
+        Iterator rows = sheet.rowIterator();
+        //keeping line count since we are skipping empty rows
+        int lineNumber = 0;
+        while ( lineNumber < sheet.getPhysicalNumberOfRows() ) {
+            row = sheet.getRow( lineNumber );
+            if ( row == null ) {
+                surveyList.add( creatingEmptySurveyObject( ++lineNumber ) );
+                continue;
+            }
+            ArrayList<String> entries = readCompleteHSSFRow(row);
+            
+            if ( start ) {
+                actualFileHeader = actualHeader( entries, fileHeaderMapper );
+                if ( actualFileHeader == null ) {
+                    LOG.debug( "mandatory feilds don't exist for file : {}", xlsFileURI );
+                    //Find the headers which weren't matched with the system
+                    intersectionHeaders( entries, fileHeaderMapper.values() );
+                    //return null to differentiate if it failed because of headers
+                    return null;
+                }
+                ++lineNumber;
+                start = false;
+            } else if(ifEntryNotEmpty(entries)) {
+
+                if ( actualFileHeader.containsKey( "fundedDate" ) ) {
+                    String actualFileDate = entries.get( actualFileHeader.get( "fundedDate" ) );
+
+                    if ( dateFormat == null ) {
+                        dateFormat = multipleDateFormat( DATE_FORMATS, actualFileDate );
+                    }
+
+                    Date fileDate = new SimpleDateFormat( dateFormat ).parse( actualFileDate );
+                    systemDate = new SimpleDateFormat( SYSTEM_DATE_FORMAT ).format( fileDate );
+
+
+                } else
+                    systemDate = new SimpleDateFormat( SYSTEM_DATE_FORMAT ).format( Calendar.getInstance().getTime() );
+
+
+                surveyList.add( creatingSurveyObject( entries, actualFileHeader, systemDate, ++lineNumber ) );
+
+            }else {
+                surveyList.add(creatingEmptySurveyObject(++lineNumber));
+            }
+           
+        }
+        return surveyList;
+    }
+    
+    private ArrayList<String> readCompleteHSSFRow( HSSFRow row )
+    {
+        ArrayList<String> entries = new ArrayList<>();
+        for ( int i = 0; i < row.getLastCellNum(); i++ ) {
+            Cell cell = row.getCell( i );
+            if ( cell == null ) {
+                entries.add( "" );
+            } else {
+                entries.add( new DataFormatter().formatCellValue( cell ) );
+            }
+        }
+        return entries;
+    }
+
+    private SurveyPutVO creatingSurveyObject(ArrayList<String> entries, Map<String, Integer> actualFileHeader, String systemDate, int lineNumber ) {
+        SurveyPutVO surveyVO = new SurveyPutVO();
+        TransactionInfoPutVO transactionInfoPutVO = new TransactionInfoPutVO();
+        ServiceProviderInfo serviceProviderInfo = new ServiceProviderInfo();
+        
+        
+        transactionInfoPutVO.setCustomer1Email( entries.get(actualFileHeader.get( "bor1Email" )) );
+        transactionInfoPutVO.setCustomer1FirstName( entries.get(actualFileHeader.get( "bor1FirstName" )) );
+        transactionInfoPutVO.setCustomer1LastName(actualFileHeader.containsKey( "bor1LastName" ) ? entries.get(actualFileHeader.get( "bor1LastName" )) : "" );
+        transactionInfoPutVO.setCustomer2Email( actualFileHeader.containsKey( "bor2Email" ) ? entries.get(actualFileHeader.get( "bor2Email" )) : "" );
+        transactionInfoPutVO.setCustomer2FirstName( actualFileHeader.containsKey( "bor2FirstName" ) ?  entries.get(actualFileHeader.get( "bor2FirstName" )) : "" );
+        transactionInfoPutVO.setCustomer2LastName(actualFileHeader.containsKey( "bor2LastName" ) ?  entries.get(actualFileHeader.get( "bor2LastName" )) : "");
+        transactionInfoPutVO.setTransactionCity(actualFileHeader.containsKey( "subPropCity" ) ? entries.get(actualFileHeader.get( "subPropCity" )) : ""  );
+        transactionInfoPutVO.setTransactionDate(systemDate);
+        transactionInfoPutVO.setTransactionRef( actualFileHeader.containsKey( "fileName" ) ? entries.get(actualFileHeader.get( "fileName" )) : "" );
+        transactionInfoPutVO.setTransactionState(actualFileHeader.containsKey( "subPropState" ) ?  entries.get(actualFileHeader.get( "subPropState" ))  : "" );
+        transactionInfoPutVO.setTransactionType(actualFileHeader.containsKey( "loanPurpose" ) ?  entries.get(actualFileHeader.get( "loanPurpose" ))  : "" );
+        transactionInfoPutVO.setTransactionType(actualFileHeader.containsKey( "propertyAddress" ) ?  entries.get(actualFileHeader.get( "propertyAddress" ))  : "" );
+        //adding buyer and seller feilds
+        transactionInfoPutVO.setBuyerAgentEmail( actualFileHeader.containsKey( "buyerAgentEmail" ) ? entries.get(actualFileHeader.get( "buyerAgentEmail" )) : "" );
+        transactionInfoPutVO.setBuyerAgentFirstName( actualFileHeader.containsKey( "buyerAgentFirstName" ) ?  entries.get(actualFileHeader.get( "buyerAgentFirstName" )) : "" );
+        transactionInfoPutVO.setBuyerAgentLastName(actualFileHeader.containsKey( "buyerAgentLastName" ) ?  entries.get(actualFileHeader.get( "buyerAgentLastName" )) : "");
+        transactionInfoPutVO.setSellerAgentEmail( actualFileHeader.containsKey( "sellerAgentEmail" ) ? entries.get(actualFileHeader.get( "sellerAgentEmail" )) : "" );
+        transactionInfoPutVO.setSellerAgentFirstName( actualFileHeader.containsKey( "sellerAgentFirstName" ) ?  entries.get(actualFileHeader.get( "sellerAgentFirstName" )) : "" );
+        transactionInfoPutVO.setSellerAgentLastName(actualFileHeader.containsKey( "sellerAgentLastName" ) ?  entries.get(actualFileHeader.get( "sellerAgentLastName" )) : "");
+        //adding buyer and seller participants 
+    
+        serviceProviderInfo.setServiceProviderEmail( entries.get(actualFileHeader.get( "serviceremail" ))  );
+        serviceProviderInfo.setServiceProviderName(  entries.get(actualFileHeader.get( "servicer" ))   );
+        
+        
+        //adding line count
+        surveyVO.setLineNumber( lineNumber );
+        surveyVO.setServiceProviderInfo( serviceProviderInfo );
+        surveyVO.setTransactionInfo( transactionInfoPutVO );
+        return surveyVO;
+    }
 
     private TransactionSourceFtp fetchFtpData( long companyId, long ftpId )
     {
@@ -240,7 +407,7 @@ public class ConvertToSurveyObject extends BaseComputeBoltWithAck
 
     }
     
-    private Map<String,Integer> actualHeader(String[] entries , Map<String,String> fileHeaderMapper){
+    private Map<String,Integer> actualHeader(ArrayList<String> entries , Map<String,String> fileHeaderMapper){
         Map<String,Integer> internalFileHeader = new HashMap<>();
         Map<String,Integer> actualFileHeader = new HashMap<>();
         int position = 0;
@@ -304,11 +471,11 @@ public class ConvertToSurveyObject extends BaseComputeBoltWithAck
 
     //finding the header's from file which weren't mapped to any header in the mapping
     //basically an intersection of the functionality
-    private void intersectionHeaders( String[] internalFileKey, Collection<String> fileHeaderValues )
+    private void intersectionHeaders( ArrayList<String> internalFileKey, Collection<String> fileHeaderValues )
     {
         UNMATCHED_FILE_HEADERS = new ArrayList<>();
         for ( String fileHeader : internalFileKey ) {
-            if ( !fileHeaderValues.contains( fileHeader ) ) {
+            if ( !fileHeaderValues.contains( fileHeader ) && !fileHeader.isEmpty()) {
                 UNMATCHED_FILE_HEADERS.add( fileHeader );
             }
         }
@@ -325,5 +492,45 @@ public class ConvertToSurveyObject extends BaseComputeBoltWithAck
         createErrorMessage += "</ul>";
         return createErrorMessage;
     }
+    
+    private List<SurveyPutVO> createSurveyList(Path targetPath, Map<String,String> fileHeaderMapper, TransactionIngestionMessage transactionIngestionMessage) throws IOException {
+        List<SurveyPutVO> surveyList = new ArrayList<>();
+        String extension = getExtention( targetPath );
+        try {
+            if ( extension.equals( "csv" ) ) {
+                surveyList = readFromCsv( targetPath.toString(), fileHeaderMapper );
+            } else if ( extension.equals( "xlsx" ) ) {
+                surveyList = readFromXlsx( targetPath.toString(), fileHeaderMapper );
+            } else if ( extension.equals( "xls" ) ) {
+                surveyList = readFromXls( targetPath.toString(), fileHeaderMapper );
+            }
+        } catch ( ParseException e ) {
+            LOG.warn( "System is not able to parse the given date" );
+            SSAPIOperations.getInstance().processFailedFtpRequest( "System is not able to parse the given date in the file",
+                transactionIngestionMessage, false );
+        }
+        return surveyList;
+    }
+    
+    //check if the complete row is empty
+    private boolean ifEntryNotEmpty(ArrayList<String> entries) {
+        boolean isNotEmpty = false;
+        for(String entry : entries){
+            if(!entry.trim().isEmpty()) {
+                isNotEmpty = true;
+                break;
+            }
+        }
+        return isNotEmpty;
+    }
 
+    //creating null ServiceProviderInfo and TransactionInfo object if the row is empty
+    private SurveyPutVO creatingEmptySurveyObject(int lineNumber ) {
+        SurveyPutVO surveyVO = new SurveyPutVO();
+        //adding line count
+        surveyVO.setLineNumber( lineNumber );
+        surveyVO.setServiceProviderInfo( null );
+        surveyVO.setTransactionInfo( null );
+        return surveyVO;
+    }
 }

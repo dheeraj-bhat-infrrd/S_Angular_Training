@@ -1921,16 +1921,21 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                         }
                     }
                     OrganizationUnitSettings unitSettings = null;
-                    if( review.getAgentId() > 0 && addAgentInfo ) {
-                        unitSettings = organizationUnitSettingsDao.fetchAgentSettingsById( review.getAgentId() );
-                    } else {
-                        unitSettings = organizationManagementService.getEntitySettings( iden, idenColumnName );
+                    if( addAgentInfo ) {
+                        if( review.getAgentId() > 0 ) {
+                            unitSettings = organizationUnitSettingsDao.fetchAgentSettingsById( review.getAgentId() );
+                        } else {
+                            unitSettings = organizationManagementService.getEntitySettings( iden, idenColumnName );
+                        }
+                        
+                        if( unitSettings.getContact_details() != null ) {
+                            review.setAgentTitle( unitSettings.getContact_details().getTitle() );
+                            if( StringUtils.isEmpty( review.getAgentName() ) ) {
+                                review.setAgentName( unitSettings.getContact_details().getName() );  
+                            }
+                        }
+                        review.setAgentProfileImage( unitSettings.getProfileImageUrl() );
                     }
-                    
-                    if( unitSettings.getContact_details() != null ) {
-                        review.setAgentTitle( unitSettings.getContact_details().getTitle() );                        
-                    }
-                    review.setAgentProfileImage( unitSettings.getProfileImageUrl() );
                 }
             }
         }
@@ -6789,4 +6794,22 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
         LOG.debug( "Method updateMailSettings() finished from ProfileManagementController" );
         return contactDetailsSettings;
     }
+    
+    
+    @Override
+    public List<String> getAvailableSurveySources( String profileLevel, long iden ) throws InvalidInputException
+    {
+        LOG.debug(
+            "Method getAvailableSurveySources called for iden: {} profileLevel: {}",iden, profileLevel );        
+        
+        if ( iden <= 0l ) {
+            LOG.warn( "iden is invalid while fetching available survey sources" );
+            throw new InvalidInputException( "iden is invalid while fetching available survey sources" );
+        }
+
+        String idenColumnName = getIdenColumnNameFromProfileLevel( profileLevel );
+        return surveyDetailsDao.getDistinctValues( idenColumnName, iden, CommonConstants.SURVEY_SOURCE_COLUMN );
+    }
+
+    
 }

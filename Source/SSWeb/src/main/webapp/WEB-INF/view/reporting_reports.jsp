@@ -48,6 +48,7 @@
  								<option value=<spring:message code="label.nps.report.value" /> data-report="nps-report"><spring:message code="label.nps.report.key" /></option>
 								<option value=<spring:message code="label.branch.ranking.monthly.report.value" /> data-report="company-user"><spring:message code="label.branch.ranking.report.key" /></option>
 								<option value=<spring:message code="label.survey.invitation.email.report.value" /> data-report="survey-invitation-email-report"><spring:message code="label.survey.invitation.email.report.key" /></option>
+ 								<option value=<spring:message code="label.widget.script.report.value" /> data-report="widget-script"><spring:message code="label.widget.script.report.key" /></option>
 							</c:if>
   								<option value=<spring:message code="label.survey.results.report.value" /> data-report="survey-results"><spring:message code="label.survey.results.report.key" /></option>
  								<option value=<spring:message code="label.survey.transaction.report.value" /> data-report="survey-transaction-summary"><spring:message code="label.survey.transaction.report.key" /></option>
@@ -157,7 +158,7 @@ $(document).ready(function() {
 	
 	var selectedVal = $('#generate-survey-reports').val();
 	var key = parseInt(selectedVal);
-	if(key == 101 || key == 102 || key == 103 || key == 106 || key == 112 || key == 200 || key == 1001 || key==105 ){
+	if(key == 101 || key == 102 || key == 103 || key == 106 || key == 112 || key == 200 || key == 1001 || key==105 || key == 303 ){
 		$('#date-pickers').hide();
 	}
 	

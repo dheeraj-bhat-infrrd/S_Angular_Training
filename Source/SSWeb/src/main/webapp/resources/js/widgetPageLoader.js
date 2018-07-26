@@ -906,24 +906,49 @@ var socialSurveyJavascriptWidget = {
 		var bodyJsCust = "";
 		var bodyJsi = "";
 
-		bodyJs = '&lt;script id="ss-new-widget-js"\n	data-company-profile-name=\"' + wCompanyProfileName + '\"\n 	data-profile-name=\"' + wProfileName + '\"\n	data-profile-level=\"' + wProfileLevel + '\"\n' + '	type="text/javascript"\n ' + '	src=\"' + resourcesUrl + '/widget/js/ss-widget-bootstrap.js\" &gt;\n&lt;/script&gt;';
+		bodyJs = decodeURIComponent(widgetPlaceAndForget);
+		bodyJs = bodyJs.replace( /\\n/g, "\n" );
+		bodyJs = bodyJs.replace( /\\"/g, '"' );
+		bodyJs = bodyJs.replace( /\+/g, ' ' );
+		bodyJs = bodyJs.replace( "%s", wCompanyProfileName );
+		bodyJs = bodyJs.replace( "%s", wProfileName );
+		bodyJs = bodyJs.replace( "%s", wProfileLevel );
+		bodyJs = bodyJs.replace( "%s", resourcesUrl );
 
+		
 		$("#widget-js-code-area").html(bodyJs);
 		$('#overlay-continue-js').click(function() {
 			copyWidgetToClipboard("widget-js-code-area");
 			$('#overlay-continue-js').unbind('click');
 		});
 
-		bodyJsCust = '&lt;script id="ss-new-widget-js"\n	data-company-profile-name=\"' + wCompanyProfileName + '\"\n 	data-profile-name=\"' + wProfileName + '\"\n	data-profile-level=\"' + wProfileLevel + '\"\n' + '	data-container = ""\n	type="text/javascript"\n	src=\"' + resourcesUrl + '/widget/js/ss-widget-bootstrap.js\" &gt;\n&lt;/script&gt;';
 
+		bodyJsCust = decodeURIComponent(widgetCustomContainer);
+		bodyJsCust = bodyJsCust.replace( /\\n/g, "\n" );
+		bodyJsCust = bodyJsCust.replace( /\\"/g, '"' );
+		bodyJsCust = bodyJsCust.replace( /\+/g, ' ' );
+		bodyJsCust = bodyJsCust.replace( "%s", wCompanyProfileName );
+		bodyJsCust = bodyJsCust.replace( "%s", wProfileName );
+		bodyJsCust = bodyJsCust.replace( "%s", wProfileLevel );
+		bodyJsCust = bodyJsCust.replace( "%s", resourcesUrl );
+		
 		$("#widget-js-cust-code-area").html(bodyJsCust);
 		$('#overlay-continue-js-cust').click(function() {
 			copyWidgetToClipboard("widget-js-cust-code-area");
 			$('#overlay-continue-js-cust').unbind('click');
 		});
+		
+		
 
-		bodyJsi = '&lt;iframe id="ss-new-widget-iframe" frameborder="0" width="100%" height="100%"&gt;&lt;/iframe&gt;\n' + '\n' + '&lt;script&gt;\n' + 'window.onload = function(){\n' + '	var widgetIFrameHead = document.getElementById("ss-new-widget-iframe").contentWindow.document.getElementsByTagName("head")[0];\n' + '	var widgetIframeBody = document.getElementById("ss-new-widget-iframe").contentWindow.document.getElementsByTagName("body")[0];\n' + '	var widgetScript = document.createElement("script");\n' + '	var widgetContainer = document.createElement("div");\n' + '	widgetContainer.id = "ss-new-widget-container";\n' + '	widgetScript.type = "text/javascript";\n' + '	widgetScript.setAttribute( "data-company-profile-name", \"' + wCompanyProfileName + '\" );\n' + '	widgetScript.setAttribute( "data-profile-name", \"' + wProfileName + '\" );\n' + '	widgetScript.setAttribute( "data-profile-level", \"' + wProfileLevel + '\" );\n' + '	widgetScript.setAttribute( "data-container", "ss-new-widget-container" );\n' + '	widgetScript.src = \"' + resourcesUrl + '/widget/js/ss-widget-bootstrap.js\";\n' + '	widgetIFrameHead.appendChild(widgetScript);\n' + '	widgetIframeBody.appendChild(widgetContainer);\n' + '};\n' + '&lt;/script&gt;';
-
+		bodyJsi = decodeURIComponent(widgetJavascriptIframe);
+		bodyJsi = bodyJsi.replace( /\\n/g, "\n" );
+		bodyJsi = bodyJsi.replace( /\\"/g, '"' );
+		bodyJsi = bodyJsi.replace( /\+/g, ' ' );
+		bodyJsi = bodyJsi.replace( "%s", wCompanyProfileName );
+		bodyJsi = bodyJsi.replace( "%s", wProfileName );
+		bodyJsi = bodyJsi.replace( "%s", wProfileLevel );
+		bodyJsi = bodyJsi.replace( "%s", resourcesUrl );
+		
 		$("#widget-jsi-code-area").html(bodyJsi);
 		$('#overlay-continue-jsi').click(function() {
 			copyWidgetToClipboard("widget-jsi-code-area");

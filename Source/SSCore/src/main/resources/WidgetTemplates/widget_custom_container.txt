@@ -1,0 +1,1 @@
+&lt;script id="ss-new-widget-js"\n	data-company-profile-name=\"%s\"\n 	data-profile-name=\"%s\"\n	data-profile-level=\"%s\"\n	data-container = ""\n	type="text/javascript"\n	src=\"%s/widget/js/ss-widget-bootstrap.js\" &gt;\n&lt;/script&gt;

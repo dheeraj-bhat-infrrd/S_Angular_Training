@@ -3727,4 +3727,12 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao
         SurveyDetails survey = mongoTemplate.findOne(query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION);
         return survey;
 	}
+
+
+    @SuppressWarnings ( "unchecked")
+    @Override
+    public List<String> getDistinctValues( String queryKey, Object value, String field )
+    {
+        return mongoTemplate.getCollection( SURVEY_DETAILS_COLLECTION ).distinct(field, new Query( Criteria.where( queryKey ).is( value ) ).getQueryObject() );
+    }
 }

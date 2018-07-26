@@ -1,6 +1,8 @@
 package com.realtech.socialsurvey.core.services.widget;
 
 
+import java.util.List;
+
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.widget.WidgetConfiguration;
 import com.realtech.socialsurvey.core.entities.widget.WidgetConfigurationRequest;
@@ -22,6 +24,9 @@ public interface WidgetManagementService
 
 
     public WidgetConfiguration getDefaultWidgetConfiguration( OrganizationUnitSettings unitSettings, String unitSettingType );
+
+
+    public List<String> getListOfAvailableSources( String profileLevel, long iden ) throws InvalidInputException;
 
 
 }

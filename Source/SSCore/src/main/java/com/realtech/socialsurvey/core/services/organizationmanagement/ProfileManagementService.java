@@ -767,4 +767,7 @@ public interface ProfileManagementService
     public long getSimpleReviewsCount( long iden, double minScore, double maxScore, String profileLevel, boolean fetchAbusive )
         throws InvalidInputException;
 
+
+    public List<String> getAvailableSurveySources( String profileLevel, long iden ) throws InvalidInputException;
+
 }

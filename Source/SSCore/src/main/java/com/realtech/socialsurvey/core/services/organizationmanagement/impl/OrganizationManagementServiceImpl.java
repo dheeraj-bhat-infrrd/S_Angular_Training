@@ -10704,4 +10704,79 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
          return unitSettings;
      }
 
+
+    @Override
+    public Map<String,Map<String,String>> getProfileNameMapForCompany( long iden ) throws InvalidInputException
+    {
+        Map<String,Map<String,String>> profileNameMap = new HashMap<>();
+        Map<String,String> companyProfileNameMap = null;
+        Map<String,String> regionProfileNameMap = null;
+        Map<String,String> branchProfileNameMap = null;
+        Map<String,String> userProfileNameMap = null;
+        
+
+        OrganizationUnitSettings companySettings = getCompanySettings( iden );
+        List<Long> regionIds = getRegionIdsUnderCompany( iden, -1, -1 );
+        List<Long> branchIds = getBranchIdsUnderCompany( iden, -1, -1 );
+        List<Long> agentIds = getAgentIdsUnderCompany( iden, -1, -1 );
+
+        List<OrganizationUnitSettings> regionSettingsList = organizationUnitSettingsDao
+            .fetchOrganizationUnitSettingsForMultipleIds( new HashSet<Long>( regionIds ),
+                MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+        List<OrganizationUnitSettings> branchSettingsList = organizationUnitSettingsDao
+            .fetchOrganizationUnitSettingsForMultipleIds( new HashSet<Long>( branchIds ),
+                MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION );
+        List<OrganizationUnitSettings> agentSettingsList = organizationUnitSettingsDao
+            .fetchOrganizationUnitSettingsForMultipleIds( new HashSet<Long>( agentIds ),
+                MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION );
+
+        companyProfileNameMap = new HashMap<>();
+        if ( companySettings.getContact_details() != null ) {
+            companyProfileNameMap.put( companySettings.getProfileName(), companySettings.getContact_details().getName() );
+        } else {
+            companyProfileNameMap.put( companySettings.getProfileName(), null );
+        }
+
+        if ( regionSettingsList != null && !regionSettingsList.isEmpty() ) {
+            regionProfileNameMap = new HashMap<>();
+            for ( OrganizationUnitSettings regionSettings : regionSettingsList ) {
+                if ( regionSettings.getContact_details() != null ) {
+                    regionProfileNameMap.put( regionSettings.getProfileName(), regionSettings.getContact_details().getName() );
+                } else {
+                    regionProfileNameMap.put( regionSettings.getProfileName(), null );
+                }
+            }
+        }
+
+
+        if ( branchSettingsList != null && !branchSettingsList.isEmpty() ) {
+            branchProfileNameMap = new HashMap<>();
+            for ( OrganizationUnitSettings branchSettings : branchSettingsList ) {
+                if ( branchSettings.getContact_details() != null ) {
+                    branchProfileNameMap.put( branchSettings.getProfileName(), branchSettings.getContact_details().getName() );
+                } else {
+                    branchProfileNameMap.put( branchSettings.getProfileName(), null );
+                }
+            }
+        }
+
+        if ( agentSettingsList != null && !agentSettingsList.isEmpty() ) {
+            userProfileNameMap = new HashMap<>();
+            for ( OrganizationUnitSettings agentSettings : agentSettingsList ) {
+                if ( agentSettings.getContact_details() != null ) {
+                    userProfileNameMap.put( agentSettings.getProfileName(), agentSettings.getContact_details().getName() );
+                } else {
+                    userProfileNameMap.put( agentSettings.getProfileName(), null );
+                }
+            }
+        }
+
+
+        profileNameMap.put( CommonConstants.PROFILE_LEVEL_COMPANY, companyProfileNameMap );
+        profileNameMap.put( CommonConstants.PROFILE_LEVEL_REGION, regionProfileNameMap );
+        profileNameMap.put( CommonConstants.PROFILE_LEVEL_BRANCH, branchProfileNameMap );
+        profileNameMap.put( CommonConstants.PROFILE_LEVEL_INDIVIDUAL, userProfileNameMap );
+        return profileNameMap;
+    }
+
 }

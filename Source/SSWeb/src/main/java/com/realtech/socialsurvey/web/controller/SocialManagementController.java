@@ -825,6 +825,8 @@ public class SocialManagementController
                 }
 
                 mediaTokens = companySettings.getSocialMediaTokens();
+                if(mediaTokens == null)
+                    mediaTokens = new SocialMediaTokens();
                 mediaTokens.setInstagramToken(instagramToken);
                 socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
                         companySettings, mediaTokens );
@@ -849,6 +851,8 @@ public class SocialManagementController
                     throw new InvalidInputException( "No Region settings found in current session" );
                 }
                 mediaTokens = regionSettings.getSocialMediaTokens();
+                if(mediaTokens == null)
+                    mediaTokens = new SocialMediaTokens();
                 mediaTokens.setInstagramToken(instagramToken);
                 socialManagementService.updateSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
                         regionSettings, mediaTokens );
@@ -873,6 +877,8 @@ public class SocialManagementController
                     throw new InvalidInputException( "No Branch settings found in current session" );
                 }
                 mediaTokens = branchSettings.getSocialMediaTokens();
+                if(mediaTokens == null)
+                    mediaTokens = new SocialMediaTokens();
                 mediaTokens.setInstagramToken(instagramToken);
                 socialManagementService.updateSocialMediaTokens( MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
                 branchSettings, mediaTokens );
@@ -899,6 +905,8 @@ public class SocialManagementController
                     throw new InvalidInputException("No Agent settings found in current session");
                 }
                 mediaTokens = agentSettings.getSocialMediaTokens();
+                if(mediaTokens == null)
+                    mediaTokens = new SocialMediaTokens();
                 mediaTokens.setInstagramToken(instagramToken);
                 socialManagementService.updateAgentSocialMediaTokens( agentSettings, mediaTokens );
 

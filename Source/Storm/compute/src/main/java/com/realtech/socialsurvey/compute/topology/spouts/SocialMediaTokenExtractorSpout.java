@@ -74,13 +74,13 @@ public class SocialMediaTokenExtractorSpout extends BaseComputeSpout
                         }
 
                         for ( SocialMediaTokenResponse regionsToken : mediaTokens.getRegionsTokens() ) {
-                            Long companyId = mediaTokensResultPaginated.get().getAgentCompanyIdMap().get( regionsToken.getIden() );
+                            Long companyId = mediaTokensResultPaginated.get().getRegionCompanyIdMap().get( regionsToken.getIden() );
                             regionsToken.setProfileType( ProfileType.REGION );
                             emitSocialMediaTokensToStream( companyId, regionsToken );
                         }
 
                         for ( SocialMediaTokenResponse branchesToken : mediaTokens.getBranchesTokens() ) {
-                            Long companyId = mediaTokensResultPaginated.get().getAgentCompanyIdMap().get( branchesToken.getIden() );
+                            Long companyId = mediaTokensResultPaginated.get().getBranchCompanyIdMap().get( branchesToken.getIden() );
                             branchesToken.setProfileType( ProfileType.BRANCH );
                             emitSocialMediaTokensToStream( companyId, branchesToken );
                         }

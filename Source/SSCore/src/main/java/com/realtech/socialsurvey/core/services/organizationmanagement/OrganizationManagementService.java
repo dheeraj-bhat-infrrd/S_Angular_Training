@@ -1810,4 +1810,7 @@ public interface OrganizationManagementService
      */
     public OrganizationUnitSettings getEntitySettings( long entityId, String entityType ) throws InvalidInputException;
 
+
+    public Map<String,Map<String,String>> getProfileNameMapForCompany( long iden ) throws InvalidInputException;
+
 }

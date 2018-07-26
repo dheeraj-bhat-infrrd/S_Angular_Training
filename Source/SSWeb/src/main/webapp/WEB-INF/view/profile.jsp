@@ -554,6 +554,12 @@
 										title="Facebook"></div>
 								</c:if>
 								<c:if
+									test="${not empty profile.socialMediaTokens.instagramToken && not empty profile.socialMediaTokens.instagramToken.pageLink}">
+									<div id="icn-fb" class="float-left social-item-icon icn-insta"
+										data-link="${profile.socialMediaTokens.instagramToken.pageLink}"
+										title="Instagram"></div>
+								</c:if>
+								<c:if
 									test="${not empty profile.socialMediaTokens.twitterToken && not empty profile.socialMediaTokens.twitterToken.twitterPageLink}">
 									<div id="icn-twit" class="float-left social-item-icon icn-twit"
 										data-link="${profile.socialMediaTokens.twitterToken.twitterPageLink}"
