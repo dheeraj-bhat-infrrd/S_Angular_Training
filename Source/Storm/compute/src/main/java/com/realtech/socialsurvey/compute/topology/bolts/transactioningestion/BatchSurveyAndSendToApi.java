@@ -165,9 +165,6 @@ public class BatchSurveyAndSendToApi extends BaseComputeBoltWithAck
         int buyerCount = ftpSurveyResponse.getBuyerCount();
         int sellerCount = ftpSurveyResponse.getSellerCount();
         int errorNum = ftpSurveyResponse.getErrorNum();
-        //since startIndex starts from 0 we need to add 1
-        //since we are not including header line we need to include that one too
-        int countLoop = 1+1+startIndex;
         Map<Integer, String> errorMessage = ftpSurveyResponse.getErrorMessage();
         for(BulkSurveyProcessResponseVO bulkResponse:responseData) {
             //if processed is true update totalSurveys,customer1Count,customer2Count
@@ -191,9 +188,8 @@ public class BatchSurveyAndSendToApi extends BaseComputeBoltWithAck
             }else {
                 //else update errorNum,errorMessage
                 ++errorNum;
-                errorMessage.put( countLoop, bulkResponse.getErrorMessage() );
+                errorMessage.put( bulkResponse.getLineNumber(), bulkResponse.getErrorMessage() );
             }
-            ++countLoop;
         }
         ftpSurveyResponse.setTotalSurveys( totalSurvey );
         ftpSurveyResponse.setCustomer1Count( customer1Count );

@@ -10,6 +10,8 @@ public class BulkSurveyProcessResponseVO {
 	private String errorMessage;
 	
 	private Map<Integer, Long> surveyIds = new HashMap<>();
+	
+	private int lineNumber;
 
 	public boolean isProcessed() {
 		return isProcessed;
@@ -34,6 +36,16 @@ public class BulkSurveyProcessResponseVO {
 	public void setSurveyIds(Map<Integer, Long> surveyIds) {
 		this.surveyIds = surveyIds;
 	}
+
+    public int getLineNumber()
+    {
+        return lineNumber;
+    }
+
+    public void setLineNumber( int lineNumber )
+    {
+        this.lineNumber = lineNumber;
+    }
 	
 	
 

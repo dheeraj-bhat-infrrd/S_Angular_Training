@@ -1,6 +1,5 @@
 package com.realtech.socialsurvey.api.controllers;
 
-import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -864,6 +863,9 @@ public class SurveyApiV2Controller
             BulkSurveyProcessResponseVO bulkSurveyProcessResponseVO = new BulkSurveyProcessResponseVO();
             Map<Integer, Long> surveyIds = new HashMap<>();
             try {
+                if(surveyPutVO.getServiceProviderInfo() == null && surveyPutVO.getTransactionInfo() == null) {
+                    throw new InvalidInputException( "The row is empty" );
+                }
                 //transform api object to domain object
                 transactionSurveyPreInitiations = surveyPreinitiationTransformer.transformApiRequestToDomainObject(surveyPutVO, companyId, bulkSurveyPutVO.getSource());
                 // validate survey
@@ -877,11 +879,13 @@ public class SurveyApiV2Controller
                 //fill response vo
                 bulkSurveyProcessResponseVO.setProcessed(true);
                 bulkSurveyProcessResponseVO.setSurveyIds(surveyIds);
+                bulkSurveyProcessResponseVO.setLineNumber( surveyPutVO.getLineNumber() );
                 bulkSurveyProcessResponseVOs.add(bulkSurveyProcessResponseVO);
             } catch (InvalidInputException e) {
                 //fill response vo
                 bulkSurveyProcessResponseVO.setProcessed(false);
                 bulkSurveyProcessResponseVO.setErrorMessage(e.getMessage());
+                bulkSurveyProcessResponseVO.setLineNumber( surveyPutVO.getLineNumber() );
                 bulkSurveyProcessResponseVOs.add(bulkSurveyProcessResponseVO);
             }
         }

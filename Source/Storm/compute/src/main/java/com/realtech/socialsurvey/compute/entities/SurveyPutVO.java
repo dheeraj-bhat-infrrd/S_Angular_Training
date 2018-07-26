@@ -4,6 +4,7 @@ public class SurveyPutVO
 {
     private TransactionInfoPutVO transactionInfo;
     private ServiceProviderInfo serviceProviderInfo;
+    private int lineNumber;
 
 
     public TransactionInfoPutVO getTransactionInfo()
@@ -27,6 +28,18 @@ public class SurveyPutVO
     public void setServiceProviderInfo( ServiceProviderInfo serviceProviderInfo )
     {
         this.serviceProviderInfo = serviceProviderInfo;
+    }
+
+
+    public int getLineNumber()
+    {
+        return lineNumber;
+    }
+
+
+    public void setLineNumber( int lineNumber )
+    {
+        this.lineNumber = lineNumber;
     }
 
 
