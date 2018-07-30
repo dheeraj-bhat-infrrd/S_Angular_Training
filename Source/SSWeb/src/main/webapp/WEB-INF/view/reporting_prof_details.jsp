@@ -24,6 +24,18 @@
 		<c:set value="4" var="profilemasterid"></c:set>
 	</c:when>
 </c:choose>
+
+<meta property="isAutoLogin" content="${isAutoLogin}" />
+<meta property="allowOverrideForSocialMedia" content="${allowOverrideForSocialMedia}" />
+<c:choose>
+	<c:when test="${isAutoLogin == 'true' && allowOverrideForSocialMedia == 'false' }">
+		<c:set var="isAutoLogin" value="true"></c:set>
+	</c:when>
+	<c:otherwise>
+		<c:set var="isAutoLogin" value="false"></c:set>
+	</c:otherwise>
+</c:choose>
+
 <c:if test="${not empty cannonicalusersettings && not empty cannonicalusersettings.companySettings && not empty cannonicalusersettings.companySettings.vertical}">
 	<c:set value="${cannonicalusersettings.companySettings.vertical}" var="verticalVal"></c:set>
 </c:if>
