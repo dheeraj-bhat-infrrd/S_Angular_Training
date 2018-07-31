@@ -21368,3 +21368,13 @@ function setupWidgetDropdownHandler(){
 		$(document).on('click', socialSurveyJavascriptWidget.dropdownHandler);
 	}
 }
+
+$(document).on('click','#fb-policy-close',function(e){
+	e.stopImmediatePropagation();
+	e.preventDefault();
+	e.stopPropagation();
+	
+	$('#fb-policy-banner').hide();
+	sessionStorage.setItem("fbPopup",false);
+});
+

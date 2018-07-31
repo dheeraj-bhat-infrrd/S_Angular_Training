@@ -12479,3 +12479,36 @@ pre.email-reply-text {
 	font-family: inherit;
 	margin-bottom: 0px;
 }
+
+.alert-fb-policy{
+	background-image: url(../images/escalated-orange.png);
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: 20px;
+    height: 20px;
+    margin: auto;
+    margin-right: 0;
+}
+
+.close-fb-policy{
+	background-image: url(../images/close-fb.png);
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: 20px;
+    height: 20px;
+    margin: auto;
+    margin-left: 0;
+}
+
+.fb-policy-txt{
+	font-weight: bold !important;
+    color: #727272;
+}
+
+.fb-policy-ban-cont{
+	height: 100%;
+    display: flex;
+    align-items: center;
+}

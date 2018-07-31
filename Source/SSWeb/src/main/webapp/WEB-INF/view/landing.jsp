@@ -15,6 +15,9 @@ var isSocialMediaExpired = '${isSocialMediaExpired}';
 var enableTokenRefresh = '${enableTokenRefresh}';
 
 $(document).ready(function() {
+	sessionStorage.setItem("newSession",false);
+	sessionStorage.setItem("fbPopup",true);
+	
 	callAjaxGetWithPayloadData("/ishiddensection.do", function(data) {
 		hiddenSection = data;
 		// Show popup if any active session found
