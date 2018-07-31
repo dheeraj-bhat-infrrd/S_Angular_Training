@@ -98,6 +98,8 @@ var happyTextComplete;
 var neutralTexCompletet;
 var sadTextComplete;
 var rating = -1; // default value to be used to post on social survey in case of "ok" or "unpleasant" mood
+var reviewText;
+var reviewRating;
 var firstName;
 var lastName;
 var surveyUrl = "/rest/survey/";
@@ -111,6 +113,10 @@ var googleBusinessEnabled;
 var agentProfileLink;
 var agentFullProfileLink;
 var companyLogo;
+var zillowReviewLink;
+var isAutoFillReviewContentForZillowPost;
+var subjectContentForZillowPost;
+var reviewFooterContentForZillowPost;
 
 // Verticals master
 var verticalsMasterList;
@@ -7768,6 +7774,10 @@ function paintSurveyPage(jsonData) {
 	fb_app_id = jsonData.responseJSON.fbAppId;
 	google_plus_app_id = jsonData.responseJSON.googlePlusAppId;
 	surveyId = jsonData.responseJSON.surveyId;
+	zillowReviewLink =  jsonData.responseJSON.zillowLink;
+	subjectContentForZillowPost = jsonData.responseJSON.subjectContentForZillowPost;
+	isAutoFillReviewContentForZillowPost = jsonData.responseJSON.isAutoFillReviewContentForZillowPost;
+	reviewFooterContentForZillowPost = jsonData.responseJSON.reviewFooterContentForZillowPost;
 
 	// If social token availiable populate the links
 	// if (googleEnabled) {
@@ -7787,7 +7797,21 @@ function paintSurveyPage(jsonData) {
 	}*/
 
 	if (zillowEnabled) {
-		$('#zillow-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.zillowLink));
+		
+		//add rating for zillow post
+		var unProcessedZillowReviewLink = zillowReviewLink + "&rating=" + rating;
+		// add title to zillow post
+		if(subjectContentForZillowPost != null && subjectContentForZillowPost != undefined)
+			unProcessedZillowReviewLink = unProcessedZillowReviewLink + "&title=" + subjectContentForZillowPost;
+		//add review footer if given along with review
+		var reviewTextForZillow = reviewText;
+		if(reviewFooterContentForZillowPost != null && reviewFooterContentForZillowPost != undefined )
+			reviewTextForZillow = reviewTextForZillow + " - " + reviewFooterContentForZillowPost;
+		//add review text for zillow post if company enabled
+		if(isAutoFillReviewContentForZillowPost)
+			unProcessedZillowReviewLink = unProcessedZillowReviewLink + "&content=" + reviewTextForZillow;
+		
+		$('#zillow-btn').attr("href", returnValidWebAddress(unProcessedZillowReviewLink));
 	} else {
 		$('#zillow-btn').remove();
 	}
@@ -7815,6 +7839,47 @@ function paintSurveyPage(jsonData) {
 	if (stage != undefined)
 		qno = stage;
 	paintSurveyPageFromJson();
+}
+
+
+function paintSocialMediaIconsOnSurveyCompletion(){
+if (zillowEnabled) {
+		
+		//add rating for zillow post
+		var unProcessedZillowReviewLink = zillowReviewLink + "&rating=" + rating;
+		// add title to zillow post
+		if(subjectContentForZillowPost != null && subjectContentForZillowPost != undefined)
+			unProcessedZillowReviewLink = unProcessedZillowReviewLink + "&title=" + subjectContentForZillowPost;
+		//add review footer if given along with review
+		var reviewTextForZillow = reviewText;
+		if(reviewFooterContentForZillowPost != null && reviewFooterContentForZillowPost != undefined )
+			reviewTextForZillow = reviewTextForZillow + " - " + reviewFooterContentForZillowPost;
+		//add review text for zillow post if company enabled
+		if(isAutoFillReviewContentForZillowPost)
+			unProcessedZillowReviewLink = unProcessedZillowReviewLink + "&content=" + reviewTextForZillow;
+		
+		$('#zillow-btn').attr("href", returnValidWebAddress(unProcessedZillowReviewLink));
+	} else {
+		$('#zillow-btn').remove();
+	}
+
+	if (lendingtreeEnabled) {
+		$('#lt-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.lendingtreeLink));
+	} else {
+		$('#lt-btn').remove();
+	}
+
+	if (realtorEnabled) {
+		$('#realtor-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.realtorLink) + "#reviews-section");
+	} else {
+		$('#realtor-btn').remove();
+	}
+
+	if (googleBusinessEnabled) {
+		$('#google-business-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.googleBusinessLink));
+	} else {
+		$('#google-business-btn').remove();
+	}
 }
 
 /*
@@ -8223,6 +8288,7 @@ function showMasterQuestionPage() {
 	} else {
 		// if ($('#pst-srvy-div').is(':visible'))
 		// autoPost = $('#post-survey').is(":checked");
+		reviewText  = $("#text-area").val(); //update global variable
 		var feedback = $("#text-area").val();
 		if (feedback == null || feedback == "") {
 			$('#overlay-toast').html('Please enter feedback to continue');
@@ -8275,6 +8341,9 @@ function showMasterQuestionPage() {
 		// call method to post the review and update the review count
 		postToSocialMedia(feedback, isAbusive, onlyPostToSocialSurvey, isIsoEncoded);
 
+		//paint socialmedia icons on survey thank you page
+		paintSocialMediaIconsOnSurveyCompletion();
+		
 		updateCustomerResponse(feedback, $('#shr-pst-cb').val(), isAbusive, isIsoEncoded);
 		$("div[data-ques-type]").hide();
 		$("div[data-ques-type='error']").show();

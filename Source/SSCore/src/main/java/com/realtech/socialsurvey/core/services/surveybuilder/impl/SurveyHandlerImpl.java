@@ -246,6 +246,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
     @Value ( "${APPLICATION_ADMIN_NAME}")
     private String applicationAdminName;
 
+    @Value ( "${ZILLOW_REVIEW_POST_URL}")
+    private String zillowReviewwPostUrl;
+    
     @Autowired
     private Utils utils;
 
@@ -3562,15 +3565,17 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
 
     @Override
     public void updateSurveyStageForZillow( OrganizationUnitSettings unitSettings, BranchSettings branchSettings,
-        OrganizationUnitSettings regionSettings, OrganizationUnitSettings companySettings, Map<String, Object> surveyAndStage )
+        OrganizationUnitSettings regionSettings, OrganizationUnitSettings companySettings, Map<String, Object> surveyAndStage, SurveyDetails surveyDetails  )
     {
         // Fetching Zillow Url
         try {
+        	
+        	String zillowScreenName = "";
             if ( unitSettings != null && unitSettings.getSocialMediaTokens() != null
                 && unitSettings.getSocialMediaTokens().getZillowToken() != null
                 && unitSettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink() != null ) {
                 surveyAndStage.put( "zillowEnabled", true );
-                surveyAndStage.put( "zillowLink", unitSettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink() );
+                zillowScreenName = unitSettings.getSocialMediaTokens().getZillowToken().getZillowScreenName();
             } else {
                 // Adding Zillow Url of the closest in hierarchy connected with Zillow.
                 if ( branchSettings != null && branchSettings.getOrganizationUnitSettings() != null
@@ -3579,23 +3584,38 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean
                     && branchSettings.getOrganizationUnitSettings().getSocialMediaTokens().getZillowToken()
                         .getZillowProfileLink() != null ) {
                     surveyAndStage.put( "zillowEnabled", true );
-                    surveyAndStage.put( "zillowLink", branchSettings.getOrganizationUnitSettings().getSocialMediaTokens()
-                        .getZillowToken().getZillowProfileLink() );
+                    zillowScreenName = unitSettings.getSocialMediaTokens().getZillowToken().getZillowScreenName();
                 } else if ( regionSettings != null && regionSettings.getSocialMediaTokens() != null
                     && regionSettings.getSocialMediaTokens().getZillowToken() != null
                     && regionSettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink() != null ) {
-                    surveyAndStage.put( "zillowEnabled", true );
-                    surveyAndStage.put( "zillowLink",
-                        regionSettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink() );
+                		surveyAndStage.put( "zillowEnabled", true );
+                			zillowScreenName = unitSettings.getSocialMediaTokens().getZillowToken().getZillowScreenName();
                 } else if ( companySettings != null && companySettings.getSocialMediaTokens() != null
                     && companySettings.getSocialMediaTokens().getZillowToken() != null
                     && companySettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink() != null ) {
                     surveyAndStage.put( "zillowEnabled", true );
-                    surveyAndStage.put( "zillowLink",
-                        companySettings.getSocialMediaTokens().getZillowToken().getZillowProfileLink() );
+                    zillowScreenName = unitSettings.getSocialMediaTokens().getZillowToken().getZillowScreenName();
                 } else
                     surveyAndStage.put( "zillowEnabled", false );
             }
+            
+            //put link in map
+            String zillowPostUrl = zillowReviewwPostUrl.replaceAll( "\\[screenName\\]", "" + zillowScreenName );
+            zillowPostUrl = zillowPostUrl.replaceAll( "\\[dateOfService\\]", "" + surveyDetails.getSurveyTransactionDate() );
+            surveyAndStage.put( "zillowLink", zillowPostUrl );
+            
+            //check if adding review text is enabled for zillow review share
+			if (companySettings.getZillowShareConfig() != null) {
+
+				surveyAndStage.put("isAutoFillReviewContentForZillowPost", companySettings.getZillowShareConfig().isAutoFillReviewContent());
+
+				if (!StringUtils.isEmpty(companySettings.getZillowShareConfig().getSubjectContent()))
+					surveyAndStage.put("subjectContentForZillowPost", companySettings.getZillowShareConfig().getSubjectContent());
+				
+				if (!StringUtils.isEmpty(companySettings.getZillowShareConfig().getReviewFooterContent()))
+					surveyAndStage.put("reviewFooterContentForZillowPost", companySettings.getZillowShareConfig().getReviewFooterContent());
+			}
+            
         } catch ( NullPointerException e ) {
             surveyAndStage.put( "zillowEnabled", false );
         }
