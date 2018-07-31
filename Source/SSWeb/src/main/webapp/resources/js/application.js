@@ -7862,24 +7862,6 @@ if (zillowEnabled) {
 	} else {
 		$('#zillow-btn').remove();
 	}
-
-	if (lendingtreeEnabled) {
-		$('#lt-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.lendingtreeLink));
-	} else {
-		$('#lt-btn').remove();
-	}
-
-	if (realtorEnabled) {
-		$('#realtor-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.realtorLink) + "#reviews-section");
-	} else {
-		$('#realtor-btn').remove();
-	}
-
-	if (googleBusinessEnabled) {
-		$('#google-business-btn').attr("href", returnValidWebAddress(jsonData.responseJSON.googleBusinessLink));
-	} else {
-		$('#google-business-btn').remove();
-	}
 }
 
 /*
