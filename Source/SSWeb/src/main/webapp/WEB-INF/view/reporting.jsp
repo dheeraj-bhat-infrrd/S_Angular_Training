@@ -124,7 +124,7 @@
 				</div>
 				
 				<div class="fb-policy-txt align-center col-lg-8 col-sm-8 col-md-8 col-xs-8 fb-policy-ban-cont">
-					Facebook Policy Change: Beginning August 1st, Facebook will no longer allow Apps such as SocialSurvey to automatically publish posts to Facebook profiles.
+					Facebook Policy Change: Be sure to connect your SocialSurvey account to your Facebook Business Page. Beginning August 1st, Facebook will no longer allow Apps such as SocialSurvey to automatically publish posts to Personal Pages.  Click settings above to connect. An exciting update is coming soon.
 				</div>
 				
 				<div class="col-lg-2 col-sm-2 col-md-2 col-xs-2 fb-policy-ban-cont">
@@ -135,13 +135,13 @@
 	</div>
 </div>
 
-<div id="summit-ribbon" class="hm-hdr-bord-bot summit-ribbon-outer cursor-pointer hide">
+<!--<div id="summit-ribbon" class="hm-hdr-bord-bot summit-ribbon-outer cursor-pointer hide">
 	<div class="container summit-ribbon-con">
 		<div class="summit-ribbon">
 			<div id="close-summit-ribbon" class="close-summit-ribbon cursor-pointer"></div>
 		</div>
 	</div>
-</div>
+</div> -->
 
 <!-- <div id="summit-popup" class="overlay-login summit-popup-outer hide">
 	<div id="summit-popup-body" class="summit-popup">
