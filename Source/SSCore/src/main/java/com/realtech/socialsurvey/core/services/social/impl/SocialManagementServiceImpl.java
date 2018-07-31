@@ -1744,6 +1744,14 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
             // create socialMediaPostResponseDetails object
             SocialMediaPostResponseDetails socialMediaPostResponseDetails = surveyDetails.getSocialMediaPostResponseDetails();
+            
+            //TEMP FIX
+            if(socialMediaPostResponseDetails != null) {
+            		LOG.warn("DUPLICSTE AUTO POST REQUEST for survey "  + surveyDetails.get_id());
+            		return false;
+            }
+            		
+            
             if ( socialMediaPostResponseDetails == null ) {
                 socialMediaPostResponseDetails = new SocialMediaPostResponseDetails();
             }
