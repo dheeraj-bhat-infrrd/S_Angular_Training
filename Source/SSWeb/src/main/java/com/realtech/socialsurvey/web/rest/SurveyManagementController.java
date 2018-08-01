@@ -471,7 +471,7 @@ public class SurveyManagementController
 	    
         StringBuilder customerDetail = new StringBuilder( "<div style=\"margin: 15px 0px 15px 0px;\">" );
    
-        customerDetail.append( "Here are the customer details:" );
+        customerDetail.append( "<p style=\"font-weight:bold\">Here are the customer details:</p>" );
             
         customerDetail.append( "<div style=\"margin: 10px 0px 10px 10px;\">" );
         customerDetail.append( "Customer Name: " );

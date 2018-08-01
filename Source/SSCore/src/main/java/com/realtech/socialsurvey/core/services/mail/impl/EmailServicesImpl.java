@@ -1383,15 +1383,18 @@ public class EmailServicesImpl implements EmailServices
         subjectReplacements.setReplacementArgs( Arrays.asList( rating, agentName, customerName ) );
 
         FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+        /*messageBodyReplacements.setFileName(
+            EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_COMPLETION_ADMINS_MAIL_BODY );*/
         messageBodyReplacements.setFileName(
-            EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_COMPLETION_ADMINS_MAIL_BODY );
+                EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_COMPLETION_ADMINS_MAIL_BODY_NEW );
+        
         
         if ( logoUrl == null || logoUrl.isEmpty() ) {
-            messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, recipientName, customerName, rating,
-                agentName,propertyAddress, customerDetail, surveyDetail, agentName, agentProfileLink, agentProfileLink, recipientMailId,
+            messageBodyReplacements.setReplacementArgs( Arrays.asList( appLogoUrl, recipientName, customerName, rating, 
+                agentName,"https://www.google.com", propertyAddress, customerDetail, surveyDetail, agentName, agentProfileLink, agentProfileLink, recipientMailId,
                 recipientMailId, String.valueOf( Calendar.getInstance().get( Calendar.YEAR ) ) ) );
         } else {
-            messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, recipientName, customerName, rating, agentName,propertyAddress,
+            messageBodyReplacements.setReplacementArgs( Arrays.asList( logoUrl, recipientName, customerName, rating, agentName, "https://www.google.com", propertyAddress,
                 customerDetail, surveyDetail, agentName, agentProfileLink, agentProfileLink, recipientMailId, recipientMailId,
                 String.valueOf( Calendar.getInstance().get( Calendar.YEAR ) ) ) );
         }
