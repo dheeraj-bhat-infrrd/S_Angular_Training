@@ -51,6 +51,20 @@ public class SurveyV2Transformer implements Transformer<SurveyGetV2VO, SurveyDet
             transactionInfo.setCustomerFirstName( d.getCustomerFirstName() );
             transactionInfo.setCustomerLastName( d.getCustomerLastName() );
 
+          //check is customer last name is null or customer first name have more then one words
+            if(  d.getCustomerEmail().indexOf(" ") > 0 ) {
+            		if(  d.getCustomerFirstName().length() >=  d.getCustomerFirstName() .indexOf(" ") + 2 ) {
+            			String newFirstName =  d.getCustomerFirstName().substring(0,  d.getCustomerFirstName() .indexOf(" ") );
+            			String partialLastName =  d.getCustomerFirstName().substring(  d.getCustomerFirstName() .indexOf(" ") + 1 ,  d.getCustomerFirstName() .length());
+            			transactionInfo.setCustomerFirstName(newFirstName);
+            			//append if there is already last name 
+            			if(StringUtils.isEmpty( d.getCustomerLastName() ))
+            				transactionInfo.setCustomerLastName(partialLastName);
+            			else
+            				transactionInfo.setCustomerLastName(partialLastName + " " +  d.getCustomerLastName() );
+        			}
+            }
+            
             //Transaction details
             transactionInfo.setTransactionCity( d.getCity() );
             transactionInfo.setTransactionState( d.getState() );
@@ -150,7 +164,21 @@ public class SurveyV2Transformer implements Transformer<SurveyGetV2VO, SurveyDet
                     CommonConstants.SURVEY_API_DATE_FORMAT ) );
             if ( StringUtils.isBlank( transactionInfo.getTransactionRef() ) )
                 transactionInfo.setTransactionRef( surveyPreInitiation.getSurveySourceId() );
-            //if not updates in mongo then we update from sql
+
+          //check is customer last name is null or customer first name have more then one words
+            if( surveyPreInitiation.getCustomerFirstName().indexOf(" ") > 0 ) {
+            		if( surveyPreInitiation.getCustomerFirstName().length() >= surveyPreInitiation.getCustomerFirstName().indexOf(" ") + 2 ) {
+            			String newFirstName = surveyPreInitiation.getCustomerFirstName().substring(0, surveyPreInitiation.getCustomerFirstName().indexOf(" ") );
+            			String partialLastName = surveyPreInitiation.getCustomerFirstName().substring( surveyPreInitiation.getCustomerFirstName().indexOf(" ") + 1 , surveyPreInitiation.getCustomerFirstName().length());
+            			transactionInfo.setCustomerFirstName(newFirstName);
+            			//append if there is already last name 
+            			if(StringUtils.isEmpty(surveyPreInitiation.getCustomerLastName()))
+            				transactionInfo.setCustomerLastName(partialLastName);
+            			else
+            				transactionInfo.setCustomerLastName(partialLastName + " " + surveyPreInitiation.getCustomerLastName());
+        			}
+            }
+            
             //but since we aren't updating the type feild in mongo we directly update 
             transactionInfo.setTransactionType( surveyPreInitiation.getTransactionType() );
 

@@ -1773,8 +1773,9 @@ public class SurveyManagementController
 			surveyAndStage.put("googleEnabled", false);
 		}
 
+		
 		// zillow
-		surveyHandler.updateSurveyStageForZillow(unitSettings, branchSettings, regionSettings, companySettings, surveyAndStage);
+		surveyHandler.updateSurveyStageForZillow(unitSettings, branchSettings, regionSettings, companySettings, surveyAndStage, survey);
 
 		// Fetching LendingTree Url
 		surveyHandler.updateSurveyStageForLendingTree(unitSettings, branchSettings, regionSettings, companySettings, surveyAndStage);

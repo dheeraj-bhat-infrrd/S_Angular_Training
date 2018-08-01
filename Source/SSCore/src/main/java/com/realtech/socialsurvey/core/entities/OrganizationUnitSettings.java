@@ -115,6 +115,8 @@ public class OrganizationUnitSettings implements Serializable
     //widget configuration
     private WidgetConfiguration widgetConfiguration;
     
+    private ZillowShareConfig zillowShareConfig;
+    
     public boolean isShowSummitPopup() {
 		return isShowSummitPopup;
 	}
@@ -943,7 +945,17 @@ public class OrganizationUnitSettings implements Serializable
     }
 
 
-    @Override
+    public ZillowShareConfig getZillowShareConfig() {
+		return zillowShareConfig;
+	}
+
+
+	public void setZillowShareConfig(ZillowShareConfig zillowShareConfig) {
+		this.zillowShareConfig = zillowShareConfig;
+	}
+
+
+	@Override
     public String toString()
     {
         return "OrganizationUnitSettings [id=" + id + ", iden=" + iden + ", uniqueIdentifier=" + uniqueIdentifier

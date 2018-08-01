@@ -386,6 +386,18 @@ public class ReportingWebController
         }
         model.addAttribute( "isRealTechOrSSAdmin", isRealTechOrSSAdmin );
 
+        boolean allowOverrideForSocialMedia = false;
+        boolean hiddenSection = false;
+        //Code to determine if social media can be overridden during autologin
+        OrganizationUnitSettings companySettings = organizationManagementService
+                .getCompanySettings( user.getCompany().getCompanyId() );
+            allowOverrideForSocialMedia = companySettings.isAllowOverrideForSocialMedia();
+            hiddenSection = companySettings.isHiddenSection();
+        
+        model.addAttribute( "allowOverrideForSocialMedia", allowOverrideForSocialMedia );
+        model.addAttribute( "hiddenSection", hiddenSection );
+        
+        
         model.addAttribute( "profileSettings", profileSettings );
         model.addAttribute( "lastSuccessfulRun", lastSuccessfulRun );
         session.setAttribute( CommonConstants.USER_PROFILE_SETTINGS, profileSettings );
