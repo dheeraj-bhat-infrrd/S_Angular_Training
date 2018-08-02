@@ -52,7 +52,7 @@ public class SurveyV2Transformer implements Transformer<SurveyGetV2VO, SurveyDet
             transactionInfo.setCustomerLastName( d.getCustomerLastName() );
 
           //check is customer last name is null or customer first name have more then one words
-            if(  d.getCustomerEmail().indexOf(" ") > 0 ) {
+            if(  d.getCustomerFirstName().indexOf(" ") > 0 ) {
             		if(  d.getCustomerFirstName().length() >=  d.getCustomerFirstName() .indexOf(" ") + 2 ) {
             			String newFirstName =  d.getCustomerFirstName().substring(0,  d.getCustomerFirstName() .indexOf(" ") );
             			String partialLastName =  d.getCustomerFirstName().substring(  d.getCustomerFirstName() .indexOf(" ") + 1 ,  d.getCustomerFirstName() .length());
