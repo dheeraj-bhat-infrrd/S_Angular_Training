@@ -855,8 +855,8 @@
 				<ref bean="incompletesocialpostjobdetail" />
 				<ref bean="incompletesurveyjobdetail" />
 				<ref bean="updatesubscriptionpricejobdetail" />
-				<ref bean="socialfeedingesterjobdetail" />
-				<ref bean="socialpostsimportjobdetail" />
+				<!--<ref bean="socialfeedingesterjobdetail" />-->
+				<!--<ref bean="socialpostsimportjobdetail" />-->
 				<ref bean="accountdeactivatorjobdetail" />
 				<ref bean="deactivatedaccountpurgerjobdetail" />
 				<ref bean="imageloaderjobdetail" />
@@ -898,8 +898,8 @@
 				<ref bean="incompletesocialpostcron" />
 				<ref bean="incompletesurveycron" />
 				<ref bean="updatesubscriptionpricecron" />
-				<ref bean="socialfeedingestercron" />
-				<ref bean="socialpostimportcron" />
+				<!--<ref bean="socialfeedingestercron" />-->
+				<!--<ref bean="socialpostimportcron" />-->
 				<ref bean="accountdeactivatorcron" />
 				<ref bean="deactivatedaccountpurgercron" />
 				<ref bean="crmdataagentidmappercron" />
