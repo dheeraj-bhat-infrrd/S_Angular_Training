@@ -239,11 +239,11 @@ public class SocialMonitorController
     }
     
 
-    @RequestMapping ( value = "/company/{companyId}/keywords", method = RequestMethod.DELETE)
+    @RequestMapping ( value = "/company/{companyId}/keywords", method = RequestMethod.POST)
     @ApiOperation ( value = "Delete keywords from the company", response = Keyword.class, responseContainer = "List")
     @ApiResponses ( value = { @ApiResponse ( code = 200, message = "Successfully deleted the keywords") })
     public ResponseEntity<?> deleteKeywordsFromCompany( @PathVariable ( "companyId") long companyId,
-        @RequestParam List<String> keywordIds, @RequestHeader ( "authorizationHeader") String authorizationHeader )
+        @RequestBody List<String> keywordIds, @RequestHeader ( "authorizationHeader") String authorizationHeader )
         throws SSApiException
     {
         try {
