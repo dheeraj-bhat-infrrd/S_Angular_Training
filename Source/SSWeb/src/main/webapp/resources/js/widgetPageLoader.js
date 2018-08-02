@@ -437,9 +437,27 @@ var socialSurveyJavascriptWidget = {
 
 		});
 
+		var lockHierarchy = undefined;
+
+		var lockHistory = socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.lockHistory;
+
+		if (lockHistory != undefined && lockHistory != null && lockHistory.length > 0 && lockHistory[lockHistory.length - 1].action == "lock") {
+			lockHierarchy = "";
+			socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.lockLowerHierarchy = "true";
+		} else {
+			lockHierarchy = "bd-check-img-checked";
+		}
+
+		var overrideLockBtn = undefined;
+		if (wProfileLevel == 'INDIVIDUAL') {
+			overrideLockBtn = '';
+		} else {
+			overrideLockBtn = '<div style="padding: 3% 3% 1% 3%;text-align:  left;"><div id="ovrde-save-chk-box" class="float-left bd-check-img bd-check-img-checked" style="height: 40px;"></div><div class="widget-conf-txt">Override Lower Hierarchy</div></div>' + '<div style="padding: 0% 3% 3% 3%;text-align:  left;"><div id="lock-save-chk-box" class="float-left bd-check-img ' + lockHierarchy + '" style="height: 40px;"></div><div class="widget-conf-txt">Override And Lock Lower Hierarchy</div></div>';
+		}
+
 		$('#widget-conf-save').on('click', function(event) {
 			event.stopPropagation();
-			createGenericConfirmPopup("Save Widget Configuration", 'Tag this change with a short message<br/><br/> <input type="text" class="st-item-row-txt widget-commit-bx" placeholder="message"><div class="widget-message-error hide"></div>', "Submit", "Cancel");
+			createGenericConfirmPopup("Save Widget Configuration", 'Tag this change with a short message<br/><br/> <input type="text" class="st-item-row-txt widget-commit-bx" placeholder="message"><div class="widget-message-error hide"></div>' + overrideLockBtn, "Submit", "Cancel");
 			$('#overlay-continue').on('click', function() {
 				if (socialSurveyJavascriptWidget.validateSaveResetMessage()) {
 					socialSurveyJavascriptWidget.saveConfiguration($('.widget-commit-bx').val());
@@ -458,28 +476,12 @@ var socialSurveyJavascriptWidget = {
 			socialSurveyJavascriptWidget.dropdownHandler(event);
 		})
 
-		/*$('#widget-conf-reset').on('click', function(event) {
-			event.stopPropagation();
-			createGenericConfirmPopup("Reset Widget Configuration", 'Tag this change with a short message<br/><br/> <input type="text" class="st-item-row-txt widget-commit-bx" placeholder="message"><div class="widget-message-error hide"></div>', "Submit", "Cancel");
-			$('#overlay-continue').on('click', function() {
-				if (socialSurveyJavascriptWidget.validateSaveResetMessage()) {
-					socialSurveyJavascriptWidget.resetConfiguration($('.widget-commit-bx').val());
+		/*
+		 * $('#widget-conf-reset').on('click', function(event) { event.stopPropagation(); createGenericConfirmPopup("Reset Widget Configuration", 'Tag this change with a short message<br/><br/> <input type="text" class="st-item-row-txt widget-commit-bx" placeholder="message"><div class="widget-message-error hide"></div>', "Submit", "Cancel"); $('#overlay-continue').on('click', function() { if (socialSurveyJavascriptWidget.validateSaveResetMessage()) { socialSurveyJavascriptWidget.resetConfiguration($('.widget-commit-bx').val());
+		 * 
+		 * overlayRevert(); $('#overlay-continue').off('click'); $('#overlay-cancel').off('click'); } }); $('#overlay-cancel').on('click', function() { $('#overlay-continue').off('click'); $('#overlay-cancel').off('click'); overlayRevert(); }); // continue processing other events socialSurveyJavascriptWidget.dropdownHandler(event); })
+		 */
 
-					overlayRevert();
-					$('#overlay-continue').off('click');
-					$('#overlay-cancel').off('click');
-				}
-			});
-			$('#overlay-cancel').on('click', function() {
-				$('#overlay-continue').off('click');
-				$('#overlay-cancel').off('click');
-				overlayRevert();
-			});
-			// continue processing other events
-			socialSurveyJavascriptWidget.dropdownHandler(event);
-		})*/
-		
-		
 		$('#widget-conf-reset').on('click', function(event) {
 			event.stopPropagation();
 			socialSurveyJavascriptWidget.resetConfiguration();
@@ -497,6 +499,40 @@ var socialSurveyJavascriptWidget = {
 
 		$('#widget-reload-conf').on('click', function() {
 			showMainContent('./shownewwidget.do');
+		});
+
+		$("#overlay-pop-up").off('click', "#ovrde-save-chk-box").on('click', "#ovrde-save-chk-box", function() {
+
+			if (!$("#lock-save-chk-box").hasClass('bd-check-img-checked')) {
+				$("#lock-save-chk-box").addClass('bd-check-img-checked');
+				socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.lockLowerHierarchy = "false";
+			}
+
+			if ($("#ovrde-save-chk-box").hasClass('bd-check-img-checked')) {
+				$("#ovrde-save-chk-box").removeClass('bd-check-img-checked');
+				socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.overrideLowerHierarchy = "true";
+			} else {
+				$("#ovrde-save-chk-box").addClass('bd-check-img-checked');
+				socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.overrideLowerHierarchy = "false";
+			}
+
+		});
+
+		$("#overlay-pop-up").off('click', "#lock-save-chk-box").on('click', "#lock-save-chk-box", function() {
+
+			if (!$("#ovrde-save-chk-box").hasClass('bd-check-img-checked')) {
+				$("#ovrde-save-chk-box").addClass('bd-check-img-checked');
+				socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.overrideLowerHierarchy = "false";
+			}
+
+			if ($("#lock-save-chk-box").hasClass('bd-check-img-checked')) {
+				$("#lock-save-chk-box").removeClass('bd-check-img-checked');
+				socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.lockLowerHierarchy = "true";
+			} else {
+				$("#lock-save-chk-box").addClass('bd-check-img-checked');
+				socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.lockLowerHierarchy = "false";
+			}
+
 		});
 
 		// click corrections
@@ -706,6 +742,10 @@ var socialSurveyJavascriptWidget = {
 		// load history
 		autoAppendTextDropdown("#st-dd-wrapper-conf-history", "st-dd-item conf-history-option-item cursor-pointer widget-select-bx widget-hist-adj", historyDivList, true);
 
+		if (socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.lockFlag != 0) {
+			$(".widget-code").addClass("disable");
+		}
+
 	},
 
 	configHistoryDivCreator : function(id, message, timestamp) {
@@ -861,7 +901,7 @@ var socialSurveyJavascriptWidget = {
 		this.displayPreview();
 		hideOverlay();
 	},
-	
+
 	getDefaultWidgetConfigCallback : function(data) {
 		data = $.parseJSON(data);
 		data.history = socialSurveyJavascriptWidget.widgetDetails.widgetConfiguration.history;
@@ -907,48 +947,44 @@ var socialSurveyJavascriptWidget = {
 		var bodyJsi = "";
 
 		bodyJs = decodeURIComponent(widgetPlaceAndForget);
-		bodyJs = bodyJs.replace( /\\n/g, "\n" );
-		bodyJs = bodyJs.replace( /\\"/g, '"' );
-		bodyJs = bodyJs.replace( /\+/g, ' ' );
-		bodyJs = bodyJs.replace( "%s", wCompanyProfileName );
-		bodyJs = bodyJs.replace( "%s", wProfileName );
-		bodyJs = bodyJs.replace( "%s", wProfileLevel );
-		bodyJs = bodyJs.replace( "%s", resourcesUrl );
+		bodyJs = bodyJs.replace(/\\n/g, "\n");
+		bodyJs = bodyJs.replace(/\\"/g, '"');
+		bodyJs = bodyJs.replace(/\+/g, ' ');
+		bodyJs = bodyJs.replace("%s", wCompanyProfileName);
+		bodyJs = bodyJs.replace("%s", wProfileName);
+		bodyJs = bodyJs.replace("%s", wProfileLevel);
+		bodyJs = bodyJs.replace("%s", resourcesUrl);
 
-		
 		$("#widget-js-code-area").html(bodyJs);
 		$('#overlay-continue-js').click(function() {
 			copyWidgetToClipboard("widget-js-code-area");
 			$('#overlay-continue-js').unbind('click');
 		});
 
-
 		bodyJsCust = decodeURIComponent(widgetCustomContainer);
-		bodyJsCust = bodyJsCust.replace( /\\n/g, "\n" );
-		bodyJsCust = bodyJsCust.replace( /\\"/g, '"' );
-		bodyJsCust = bodyJsCust.replace( /\+/g, ' ' );
-		bodyJsCust = bodyJsCust.replace( "%s", wCompanyProfileName );
-		bodyJsCust = bodyJsCust.replace( "%s", wProfileName );
-		bodyJsCust = bodyJsCust.replace( "%s", wProfileLevel );
-		bodyJsCust = bodyJsCust.replace( "%s", resourcesUrl );
-		
+		bodyJsCust = bodyJsCust.replace(/\\n/g, "\n");
+		bodyJsCust = bodyJsCust.replace(/\\"/g, '"');
+		bodyJsCust = bodyJsCust.replace(/\+/g, ' ');
+		bodyJsCust = bodyJsCust.replace("%s", wCompanyProfileName);
+		bodyJsCust = bodyJsCust.replace("%s", wProfileName);
+		bodyJsCust = bodyJsCust.replace("%s", wProfileLevel);
+		bodyJsCust = bodyJsCust.replace("%s", resourcesUrl);
+
 		$("#widget-js-cust-code-area").html(bodyJsCust);
 		$('#overlay-continue-js-cust').click(function() {
 			copyWidgetToClipboard("widget-js-cust-code-area");
 			$('#overlay-continue-js-cust').unbind('click');
 		});
-		
-		
 
 		bodyJsi = decodeURIComponent(widgetJavascriptIframe);
-		bodyJsi = bodyJsi.replace( /\\n/g, "\n" );
-		bodyJsi = bodyJsi.replace( /\\"/g, '"' );
-		bodyJsi = bodyJsi.replace( /\+/g, ' ' );
-		bodyJsi = bodyJsi.replace( "%s", wCompanyProfileName );
-		bodyJsi = bodyJsi.replace( "%s", wProfileName );
-		bodyJsi = bodyJsi.replace( "%s", wProfileLevel );
-		bodyJsi = bodyJsi.replace( "%s", resourcesUrl );
-		
+		bodyJsi = bodyJsi.replace(/\\n/g, "\n");
+		bodyJsi = bodyJsi.replace(/\\"/g, '"');
+		bodyJsi = bodyJsi.replace(/\+/g, ' ');
+		bodyJsi = bodyJsi.replace("%s", wCompanyProfileName);
+		bodyJsi = bodyJsi.replace("%s", wProfileName);
+		bodyJsi = bodyJsi.replace("%s", wProfileLevel);
+		bodyJsi = bodyJsi.replace("%s", resourcesUrl);
+
 		$("#widget-jsi-code-area").html(bodyJsi);
 		$('#overlay-continue-jsi').click(function() {
 			copyWidgetToClipboard("widget-jsi-code-area");

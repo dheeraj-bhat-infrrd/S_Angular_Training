@@ -3964,6 +3964,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         OrganizationUnitSettings regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileUrl(
             profileUrl, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+        
+        if( regionSettings == null ) {
+            throw new ProfileNotFoundException( "no such region" );
+        }
 
         return regionSettings;
     }

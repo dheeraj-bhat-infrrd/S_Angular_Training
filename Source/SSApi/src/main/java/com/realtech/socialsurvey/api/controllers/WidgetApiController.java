@@ -181,6 +181,7 @@ public class WidgetApiController
 
             if ( hideHistory ) {
                 widgetConfiguration.setHistory( null );
+                widgetConfiguration.setLockHistory( null );
             }
 
             Map<String, Object> responseMap = new HashMap<>();

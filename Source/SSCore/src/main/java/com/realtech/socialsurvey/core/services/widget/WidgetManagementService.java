@@ -29,4 +29,38 @@ public interface WidgetManagementService
     public List<String> getListOfAvailableSources( String profileLevel, long iden ) throws InvalidInputException;
 
 
+    /**
+     * @param unitSettings
+     * @param isLocked
+     * @return
+     */
+    public WidgetConfiguration updateLockSettingsLog( WidgetConfiguration widgetConfiguration, Boolean isLocked );
+
+
+    /**
+     * @param profileLevel
+     * @param profileId
+     * @param unitSettings
+     * @param lockFlag
+     * @param isLocked
+     * @return
+     */
+    public OrganizationUnitSettings updateLowerHeirarchyLock( String profileLevel, long profileId,
+        OrganizationUnitSettings unitSettings, int lockFlag, boolean isLocked );
+
+
+    /**
+     * @param profileLevel
+     * @param isLocked
+     * @return
+     */
+    public int createLockFlag( String profileLevel, boolean isLocked );
+
+
+    public boolean hasLockedLowerHierarchy( WidgetConfiguration widgetConfiguration );
+
+
+    public void saveConfigurationInMongo( String entityType, long entityId, WidgetConfiguration widgetConfiguration )
+        throws InvalidInputException;
+
 }

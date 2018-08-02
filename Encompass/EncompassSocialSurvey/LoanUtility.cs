@@ -126,14 +126,18 @@ namespace EncompassSocialSurvey
 
 
                 LoanService loanService = new LoanService();
-                crmBatchTracker = loanService.getCrmBatchTracker(runningCompanyId, EncompassSocialSurveyConstant.SURVEY_SOURCE);
+                DateTime lastRunTime = EncompassSocialSurveyConstant.EPOCH_TIME;
 
-                //update the recent record fetch start date or if crm batch tracker is null than insert new entry
-                InsertOrUpdateLastRunStartTime(crmBatchTracker, loanService, runningCompanyId, EncompassSocialSurveyConstant.SURVEY_SOURCE);
+                if( isProductionRun ){
+                    crmBatchTracker = loanService.getCrmBatchTracker(runningCompanyId, EncompassSocialSurveyConstant.SURVEY_SOURCE);
 
-                DateTime lastRunTime = crmBatchTracker.RecentRecordFetchedDate;
-                Logger.Info("Last Record Fetch time is " + lastRunTime);
+                    //update the recent record fetch start date or if crm batch tracker is null than insert new entry
+                    InsertOrUpdateLastRunStartTime(crmBatchTracker, loanService, runningCompanyId, EncompassSocialSurveyConstant.SURVEY_SOURCE);
 
+                    lastRunTime = crmBatchTracker.RecentRecordFetchedDate;
+                    Logger.Info("Last Record Fetch time is " + lastRunTime);
+                }
+                
                 // process number of days to query
                 int noOfDays = determineNumberOfDays(lastRunTime, runningCompanyId, isProductionRun, noOfDaysToFetch);
 
@@ -207,7 +211,7 @@ namespace EncompassSocialSurvey
         private int determineNumberOfDays(DateTime lastRunTime, long runningCompanyId, bool isProductionRun, int noOfDaysToFetch)
         {
             int noOfDays = 0;
-            if (isProductionRun)
+            if (isProductionRun && DateTime.Compare(lastRunTime, EncompassSocialSurveyConstant.EPOCH_TIME) != 0 )
             {
                 int result = DateTime.Compare(lastRunTime, EncompassSocialSurveyConstant.EPOCH_TIME);
                 if (result != 0)

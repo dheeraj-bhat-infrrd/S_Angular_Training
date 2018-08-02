@@ -4471,6 +4471,8 @@ public class OrganizationManagementController
             widgetConfigurationRequest.setSeoTitle( request.getParameter( CommonConstants.WIDGET_SEO_TITLE ) );
             widgetConfigurationRequest.setSeoKeywords( request.getParameter( CommonConstants.WIDGET_SEO_KEYWORDS ) );
             widgetConfigurationRequest.setSeoDescription( request.getParameter( CommonConstants.WIDGET_SEO_DESCRIPTION ) );
+            widgetConfigurationRequest.setOverrideLowerHierarchy( request.getParameter( CommonConstants.WIDGET_OVERRIDE_LOWER_HIERARCHY ) );
+            widgetConfigurationRequest.setLockLowerHierarchy( request.getParameter( CommonConstants.WIDGET_LOCK_LOWER_HIERARCHY ) );
 
             
             HttpSession session = request.getSession();

@@ -152,8 +152,11 @@ public class BranchDaoImpl extends GenericDaoImpl<Branch, Long> implements Branc
         LOG.debug( "Method to get all branches for company,getBranchesForCompany() started." );
         Criteria criteria = getSession().createCriteria( Branch.class );
         criteria.add( Restrictions.eq( CommonConstants.REGION_COLUMN, regionDao.findById( Region.class, regionId ) ) );
-        criteria.add( Restrictions.eq( CommonConstants.IS_DEFAULT_BY_SYSTEM, isDefault ) );
-        criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ) );
+        
+        if( isDefault == CommonConstants.YES || isDefault == CommonConstants.NO ) {
+            criteria.add( Restrictions.eq( CommonConstants.IS_DEFAULT_BY_SYSTEM, isDefault ) );
+        }
+                criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ) );
         criteria.addOrder(Order.asc("branch"));
         if ( start > 0 )
             criteria.setFirstResult( start );
@@ -341,6 +344,41 @@ public class BranchDaoImpl extends GenericDaoImpl<Branch, Long> implements Branc
             LOG.error( "HibernateException caught in getCompanyIdsForBranchIds(). Reason: " + e.getMessage(), e );
             throw new DatabaseException( "HibernateException caught in getCompanyIdsForBranchIds().", e );
         }
+    }
+    
+    @SuppressWarnings ( "unchecked")
+    @Override
+    @Transactional
+    public List<Long> getBranchIdsOfRegion( long regionId, int isDefault, int batch, int start ) throws InvalidInputException
+    {
+        if ( regionId <= 0 ) {
+            throw new InvalidInputException( "Invalid region id passed in getBranchIdsOfRegion method" );
+        }
+        LOG.info( "Method to get all branch ids under region id : {},getBranchIdsOfRegion() started.", regionId );
+        Criteria criteria = null;
+        try {
+            criteria = getSession().createCriteria( Branch.class );
+            criteria.setProjection( Projections.property( CommonConstants.BRANCH_ID_COLUMN ).as(
+                CommonConstants.BRANCH_ID_COLUMN ) );
+            criteria.add( Restrictions.eq( CommonConstants.REGION_COLUMN, regionDao.findById( Region.class, regionId ) ) );
+
+            if( isDefault == CommonConstants.YES || isDefault == CommonConstants.NO ) {
+                criteria.add( Restrictions.eq( CommonConstants.IS_DEFAULT_BY_SYSTEM, isDefault ) );
+            }
+            
+            criteria.add( Restrictions.eq( CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE ) );
+            
+            if ( start > 0 )
+                criteria.setFirstResult( start );
+            if ( batch > 0 )
+                criteria.setFetchSize( batch );
+            
+        } catch ( HibernateException e ) {
+            LOG.error( "HibernateException caught in getBranchIdsOfRegion(). Reason: " + e.getMessage(), e );
+            throw new DatabaseException( "HibernateException caught in getBranchIdsOfRegion().", e );
+        }
+        LOG.info( "Method to get all branch ids under region id : {},getBranchIdsOfRegion() ended.", regionId );
+        return criteria.list();
     }
     
 }

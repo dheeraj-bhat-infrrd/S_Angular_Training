@@ -29,6 +29,8 @@ public class WidgetConfigurationRequest
     private String seoKeywords;
     private String seoDescription;
     private String requestMessage;
+    private String overrideLowerHierarchy;
+    private String lockLowerHierarchy;
 
 
     public String getFont()
@@ -343,6 +345,30 @@ public class WidgetConfigurationRequest
     }
 
 
+    public String getOverrideLowerHierarchy()
+    {
+        return overrideLowerHierarchy;
+    }
+
+
+    public void setOverrideLowerHierarchy( String overrideLowerHierarchy )
+    {
+        this.overrideLowerHierarchy = overrideLowerHierarchy;
+    }
+
+
+    public String getLockLowerHierarchy()
+    {
+        return lockLowerHierarchy;
+    }
+
+
+    public void setLockLowerHierarchy( String lockLowerHierarchy )
+    {
+        this.lockLowerHierarchy = lockLowerHierarchy;
+    }
+
+
     @Override
     public String toString()
     {
@@ -355,8 +381,8 @@ public class WidgetConfigurationRequest
             + ", initialNumberOfReviews=" + initialNumberOfReviews + ", hideBarGraph=" + hideBarGraph + ", hideOptions="
             + hideOptions + ", reviewSortOrder=" + reviewSortOrder + ", reviewSources=" + reviewSources
             + ", allowModestBranding=" + allowModestBranding + ", seoTitle=" + seoTitle + ", seoKeywords=" + seoKeywords
-            + ", seoDescription=" + seoDescription + ", requestMessage=" + requestMessage + "]";
+            + ", seoDescription=" + seoDescription + ", requestMessage=" + requestMessage + ", overrideLowerHierarchy="
+            + overrideLowerHierarchy + ", lockLowerHierarchy=" + lockLowerHierarchy + "]";
     }
-
 
 }
