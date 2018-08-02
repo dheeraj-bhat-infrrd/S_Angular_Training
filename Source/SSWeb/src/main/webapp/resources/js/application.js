@@ -7859,6 +7859,10 @@ if (zillowEnabled) {
 			unProcessedZillowReviewLink = unProcessedZillowReviewLink + "&content=" + reviewTextForZillow;
 		
 		$('#zillow-btn').attr("href", returnValidWebAddress(unProcessedZillowReviewLink));
+		
+		$('#zillow_workflow_url').attr("href", returnValidWebAddress(unProcessedZillowReviewLink));
+		
+		
 	} else {
 		$('#zillow-btn').remove();
 	}
@@ -8320,12 +8324,7 @@ function showMasterQuestionPage() {
 			isIsoEncoded = true;
 		}
 
-		// call method to post the review and update the review count
-		postToSocialMedia(feedback, isAbusive, onlyPostToSocialSurvey, isIsoEncoded);
-
-		//paint socialmedia icons on survey thank you page
-		paintSocialMediaIconsOnSurveyCompletion();
-		
+		// save survey response
 		updateCustomerResponse(feedback, $('#shr-pst-cb').val(), isAbusive, isIsoEncoded);
 		$("div[data-ques-type]").hide();
 		$("div[data-ques-type='error']").show();
@@ -8353,6 +8352,13 @@ function showMasterQuestionPage() {
 		else
 			$('#content').html(sadTextComplete);
 		// $('#content').html("Congratulations! You have completed survey for " + agentName+ ".\nThanks for your participation.");
+		
+		// call method to post the review and update the review count
+		postToSocialMedia(feedback, isAbusive, onlyPostToSocialSurvey, isIsoEncoded);
+
+		//paint socialmedia icons on survey thank you page
+		paintSocialMediaIconsOnSurveyCompletion();
+		
 	}
 	return;
 }
