@@ -237,6 +237,7 @@
    				    <div class="widget-conf-txt float-left">Allow Modest Branding</div>
 				</div>
 				
+				
 				<div class="widget-conf-cont widget-conf-hist-resp" style="padding: 7% 0%">
 				    <div class="widget-conf-txt float-left" style="padding: 4% 0%;">History</div>
 				    <div class="float-right">
@@ -247,7 +248,7 @@
 				
 				<div class="widget-conf-cont widget-save-resp">
 					<div class="float-left" style="width: 45%;">
-						<div id="widget-conf-save" class="ol-btn cursor-pointer">Save</div>
+						<div id="widget-conf-save" class="ol-btn cursor-pointer">Save OR Override</div>
 					</div>
 					<div class="float-right" style="width: 55%;">
 						<div id="widget-conf-reset" class="ol-btn cursor-pointer">Load Defaults</div>

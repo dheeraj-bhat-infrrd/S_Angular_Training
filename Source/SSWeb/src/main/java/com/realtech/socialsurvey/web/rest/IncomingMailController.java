@@ -122,8 +122,9 @@ public class IncomingMailController
         LOG.info( "Proceeding to resolve mailTo : {}", mailTo );
         LOG.info( "subject: {}\n mailFrom: {}\n mailTo: {}\n header: {}",subject, mailFrom, mailTo, headers);
         String sendUsingDomain = getDefaultDomainFromEmail(mailTo);
+
         LOG.info( "finished getDefaultDomainFromTo and the sendUsingDomain :{}",sendUsingDomain );
-        
+
         String postId = getPostIdFromMailTo( mailTo, sendUsingDomain );
         
         if(postId != null) {

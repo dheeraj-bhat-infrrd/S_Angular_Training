@@ -8,6 +8,7 @@ import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
+import org.apache.storm.utils.TupleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,24 +22,28 @@ public class RetryHandlerBolt extends BaseComputeBoltWithAck{
 
     @Override
     public void executeTuple(Tuple input) {
-        boolean success = input.getBooleanByField("isSuccess");
-        SocialResponseObject<?> post = (SocialResponseObject<?>) input.getValueByField("post");
+        if(!TupleUtils.isTick( input )) {
+            boolean success = input.getBooleanByField( "isSuccess" );
+            SocialResponseObject<?> post = (SocialResponseObject<?>) input.getValueByField( "post" );
 
-        FailedMessagesService failedMessagesService = new FailedMessagesServiceImpl();
+            FailedMessagesService failedMessagesService = new FailedMessagesServiceImpl();
 
-        if(post != null){
-            if(success && post.isRetried()){
-                int nRemoved = failedMessagesService.deleteFailedSocialPost(post.getPostId());
-                if(nRemoved == 1)
-                    LOG.info("SocialPost with postId {} has been successfully deleted", post.getPostId());
-                else
-                    LOG.error("Something went wrong while deleting socialpost having postId {}", post.getPostId());
-            } else if(!success && post.isRetried()){
-                int updatedCount = failedMessagesService.updateFailedSocialPostRetryCount(post.getPostId());
-                if(updatedCount == 1)
-                    LOG.info("SocialPost retrycount with postId {} has been successfully incremented by 1", post.getPostId());
-                else
-                    LOG.error("Something went wrong while incrementing socialpost retryCount having postId {}", post.getPostId());
+            if ( post != null ) {
+                if ( success && post.isRetried() ) {
+                    int nRemoved = failedMessagesService.deleteFailedSocialPost( post.getPostId() );
+                    if ( nRemoved == 1 )
+                        LOG.info( "SocialPost with postId {} has been successfully deleted", post.getPostId() );
+                    else
+                        LOG.error( "Something went wrong while deleting socialpost having postId {}", post.getPostId() );
+                } else if ( !success /*&& post.isRetried()*/ ) {
+                    /*int updatedCount = */ failedMessagesService.insertTemporaryFailedSocialPost( post );
+                    /*if ( updatedCount == 1 )
+                        LOG.info( "SocialPost retrycount with postId {} has been successfully incremented by 1",
+                            post.getPostId() );
+                    else
+                        LOG.error( "Something went wrong while incrementing socialpost retryCount having postId {}",
+                            post.getPostId() );*/
+                }
             }
         }
 

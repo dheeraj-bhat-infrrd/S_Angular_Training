@@ -1,29 +1,17 @@
 package com.realtech.socialsurvey.compute.services.api;
 
-import java.util.List;
-import java.util.Map;
-
-import com.realtech.socialsurvey.compute.entities.BulkSurveyPutVO;
-import com.realtech.socialsurvey.compute.entities.FailedFtpRequest;
-import com.realtech.socialsurvey.compute.entities.FileUploadResponse;
-import com.realtech.socialsurvey.compute.entities.Keyword;
-import com.realtech.socialsurvey.compute.entities.SocialMediaTokensPaginated;
-import com.realtech.socialsurvey.compute.entities.TransactionSourceFtp;
+import com.realtech.socialsurvey.compute.entities.*;
+import com.realtech.socialsurvey.compute.entities.response.BulkWriteErrorVO;
 import com.realtech.socialsurvey.compute.entities.response.FtpSurveyResponse;
 import com.realtech.socialsurvey.compute.entities.response.SocialResponseObject;
 import com.realtech.socialsurvey.compute.entities.response.TwitterFeedData;
 import com.realtech.socialsurvey.compute.entities.response.linkedin.LinkedinFeedData;
 import com.realtech.socialsurvey.compute.entity.SurveyInvitationEmailCountMonth;
-
 import retrofit2.Call;
-import retrofit2.http.Body;
-import retrofit2.http.GET;
-import retrofit2.http.Header;
-import retrofit2.http.Headers;
-import retrofit2.http.POST;
-import retrofit2.http.PUT;
-import retrofit2.http.Path;
-import retrofit2.http.Query;
+import retrofit2.http.*;
+
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -146,15 +134,24 @@ public interface SSApiIntegrationService
     @POST ( "v1/crm/ftp/complete/mail")
     Call<String> sendCompletionMail( @Query ( "companyId") long companyId, @Query ( "ftpId") long ftpId,
         @Query ( "s3FileLocation") String s3FileLocation, @Body FtpSurveyResponse ftpSurveyResponse );
-    
+
+    @Headers ( "Content-Type: application/json")
+    @POST ( "v1/feeds/saveAndUpdate")
+    Call<Long> savePostAndupdateDuplicateCount( @Body SocialResponseObject socialPost, @Header ( "authorizationHeader") String authHeader );
+
+
     @Headers ( "Content-Type: application/json")
     @GET ( "v1/unsubscribe/isunsubscribed")
     Call<Boolean> isEmailUnsubscribed(@Query("emailId") String recipient,@Query("companyId") long companyId );
 
-    
+
     @GET ( "/v1//checkIfSurveyIsOld")
     Call<String> checkIfSurveyIsOld( @Query ( "customerEmailId") String customerEmailId );
-    
+
+    @Headers ( "Content-Type: application/json")
+    @POST( "v1/feeds/bulk" )
+    Call<List<BulkWriteErrorVO>> saveSocialFeeds( @Body List<SocialResponseObject> socialPosts, @Header ( "authorizationHeader") String authHeader );
+
     @Headers ( "Content-Type: application/json")
     @GET ( "v1/hierarchy/company/{identifier}/profilenames")
     Call<Map<String, Map<String, String>>> getProfileNameDateDataForWidgetReport( @Path ( "identifier") long companyId );

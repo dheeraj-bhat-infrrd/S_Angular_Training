@@ -1756,6 +1756,20 @@ public interface CommonConstants
     public static final String WIDGET_SCRIPT_TYPE_CC = "customContainer";
     public static final String WIDGET_SCRIPT_TYPE_JI = "javascriptIframe";
 
-    public static final int FILE_UPLOAD_WIDGET_REPORT = 303;    
+    public static final int FILE_UPLOAD_WIDGET_REPORT = 303;
+
+    public static final String WIDGET_OVERRIDE_LOWER_HIERARCHY = "overrideLowerHierarchy";    
+    public static final String WIDGET_LOCK_LOWER_HIERARCHY = "lockLowerHierarchy";    
+    
+
+    public static final String WIDGET_DEFAULT_OVERRIDE_LOWER_HIERARCHY = "false";    
+    public static final String WIDGET_DEFAULT_LOCK_LOWER_HIERARCHY = "false";
+    
+    public static final String WIDGET_LOCK = "lock"; 
+    public static final String WIDGET_UNLOCK = "unlock"; 
+    
+    public static final int WIDGET_LOCK_SET_BY_COMPANY = 4;
+    public static final int WIDGET_LOCK_SET_BY_REGION = 2;
+    public static final int WIDGET_LOCK_SET_BY_BRANCH = 1;
 
 }

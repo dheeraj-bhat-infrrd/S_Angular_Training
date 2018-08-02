@@ -276,13 +276,13 @@ public class SocialResponseObject<T> implements Serializable
     }
 
 
-    public boolean isRetried()
+    public boolean getIsRetried()
     {
         return isRetried;
     }
 
 
-    public void setRetried( boolean retried )
+    public void setIsRetried( boolean retried )
     {
         isRetried = retried;
     }

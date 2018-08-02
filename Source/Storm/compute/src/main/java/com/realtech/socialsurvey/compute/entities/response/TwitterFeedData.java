@@ -9,7 +9,7 @@ import java.util.List;
 public class TwitterFeedData implements Serializable
 {
     private static final long serialVersionUID = 1L;
-    private Date createdAt;
+    private long createdAt;
     private long id;
     private String text;
     private int displayTextRangeStart = -1;
@@ -37,13 +37,13 @@ public class TwitterFeedData implements Serializable
     private String[] withheldInCountries = null;
 
 
-    public Date getCreatedAt()
+    public long getCreatedAt()
     {
         return createdAt;
     }
 
 
-    public void setCreatedAt( Date createdAt )
+    public void setCreatedAt( long createdAt )
     {
         this.createdAt = createdAt;
     }

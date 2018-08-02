@@ -345,9 +345,9 @@ public interface SSApiIntegration
         @Header ( "authorizationHeader") String authorizationHeader );
 
 
-    @DELETE ( "/v1/company/{companyId}/keywords")
+    @POST ( "/v1/company/{companyId}/keywords")
     public Response deleteKeywordsFromCompany( @Path ( "companyId") long companyId,
-        @Query ( "keywordIds") List<String> keywordIds, @Header ( "authorizationHeader") String authorizationHeader );
+        @Body List<String> keywordIds, @Header ( "authorizationHeader") String authorizationHeader );
 
 
     @GET ( "/v1/feedtypes/company/{companyId}")

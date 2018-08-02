@@ -31,6 +31,12 @@ public class WidgetConfiguration
     private String seoTitle;
     private String seoKeywords;
     private String seoDescription;
+    private List<WidgetLockHistory> lockHistory;
+    private long actionByProfileId;
+    private String actionByProfileLevel;
+    private long actionOn;
+    private int lockFlag = 0;
+
 
 
     public String getFont()
@@ -344,6 +350,64 @@ public class WidgetConfiguration
         this.seoDescription = seoDescription;
     }
 
+    public List<WidgetLockHistory> getLockHistory()
+    {
+        return lockHistory;
+    }
+
+
+    public void setLockHistory( List<WidgetLockHistory> lockHistory )
+    {
+        this.lockHistory = lockHistory;
+    }
+
+
+    public long getActionByProfileId()
+    {
+        return actionByProfileId;
+    }
+
+
+    public void setActionByProfileId( long actionByProfileId )
+    {
+        this.actionByProfileId = actionByProfileId;
+    }
+
+
+    public String getActionByProfileLevel()
+    {
+        return actionByProfileLevel;
+    }
+
+
+    public void setActionByProfileLevel( String actionByProfileLevel )
+    {
+        this.actionByProfileLevel = actionByProfileLevel;
+    }
+
+
+    public long getActionOn()
+    {
+        return actionOn;
+    }
+
+
+    public void setActionOn( long actionOn )
+    {
+        this.actionOn = actionOn;
+    }
+
+    public int getLockFlag()
+    {
+        return lockFlag;
+    }
+
+
+    public void setLockFlag( int lockFlag )
+    {
+        this.lockFlag = lockFlag;
+    }
+
 
     @Override
     public String toString()
@@ -357,6 +421,8 @@ public class WidgetConfiguration
             + ", initialNumberOfReviews=" + initialNumberOfReviews + ", hideBarGraph=" + hideBarGraph + ", hideOptions="
             + hideOptions + ", reviewSortOrder=" + reviewSortOrder + ", reviewSources=" + reviewSources
             + ", allowModestBranding=" + allowModestBranding + ", history=" + history + ", seoTitle=" + seoTitle
-            + ", seoKeywords=" + seoKeywords + ", seoDescription=" + seoDescription + "]";
+            + ", seoKeywords=" + seoKeywords + ", seoDescription=" + seoDescription + ", lockHistory=" + lockHistory
+            + ", actionByProfileId=" + actionByProfileId + ", actionByProfileLevel=" + actionByProfileLevel + ", actionOn="
+            + actionOn + ", lockFlag=" + lockFlag + "]";
     }
 }

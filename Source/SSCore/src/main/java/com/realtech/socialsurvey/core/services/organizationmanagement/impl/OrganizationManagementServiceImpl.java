@@ -1227,25 +1227,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
             Collections.sort( companyFilterKeywords, new FilterKeywordsComparator() );
 
             if ( monitorType == null || monitorType.isEmpty() ) {
+                keywords = companyFilterKeywords;
                 filterKeywordsResponse.setMonitorType( "ALL" );
-                filterKeywordsResponse.setCount( companyFilterKeywords.size() );
-                if ( startIndex >= companyFilterKeywords.size() ) {
-                    filterKeywordsResponse.setMonitorType( null );
-                    filterKeywordsResponse.setCount( 0 );
-                    filterKeywordsResponse.setFilterKeywords( null );
-                } else if ( limit >= companyFilterKeywords.size() && startIndex < companyFilterKeywords.size() ) {
-                    filterKeywordsResponse
-                        .setFilterKeywords( companyFilterKeywords.subList( startIndex, companyFilterKeywords.size() ) );
-                } else {
-                    if ( startIndex + limit >= companyFilterKeywords.size() ) {
-                        filterKeywordsResponse
-                            .setFilterKeywords( companyFilterKeywords.subList( startIndex, companyFilterKeywords.size() ) );
-                    } else {
-                        filterKeywordsResponse
-                            .setFilterKeywords( companyFilterKeywords.subList( startIndex, startIndex + limit ) );
-                    }
-                }
-
             } else {
                 for ( Keyword keyword : companyFilterKeywords ) {
                     if ( monitorType.equalsIgnoreCase( keyword.getMonitorType().toString() ) ) {
@@ -1253,20 +1236,26 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
                     }
                 }
                 filterKeywordsResponse.setMonitorType( monitorType.toUpperCase() );
-                filterKeywordsResponse.setCount( keywords.size() );
-                if ( startIndex >= keywords.size() ) {
-                    filterKeywordsResponse.setMonitorType( null );
-                    filterKeywordsResponse.setCount( 0 );
-                    filterKeywordsResponse.setFilterKeywords( null );
-                } else if ( limit >= keywords.size() && startIndex < keywords.size() ) {
+            }
+            
+            //If limit is -1, it means that we should be sending *ALL* keywords
+            if(limit == -1){
+                //Setting limit to total keywords count
+                limit = keywords.size();
+            }
+            
+            filterKeywordsResponse.setCount( keywords.size() );
+            if ( startIndex >= keywords.size() ) {
+                filterKeywordsResponse.setMonitorType( null );
+                filterKeywordsResponse.setCount( 0 );
+                filterKeywordsResponse.setFilterKeywords( null );
+            } else if ( limit >= keywords.size() && startIndex < keywords.size() ) {
+                filterKeywordsResponse.setFilterKeywords( keywords.subList( startIndex, keywords.size() ) );
+            } else {
+                if ( startIndex + limit >= keywords.size() ) {
                     filterKeywordsResponse.setFilterKeywords( keywords.subList( startIndex, keywords.size() ) );
                 } else {
-                    if ( startIndex + limit >= keywords.size() ) {
-                        filterKeywordsResponse.setFilterKeywords( keywords.subList( startIndex, keywords.size() ) );
-                    } else {
-                        filterKeywordsResponse.setFilterKeywords( keywords.subList( startIndex, startIndex + limit ) );
-                    }
-
+                    filterKeywordsResponse.setFilterKeywords( keywords.subList( startIndex, startIndex + limit ) );
                 }
             }
         }

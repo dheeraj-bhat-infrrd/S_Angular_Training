@@ -1,55 +1,13 @@
 package com.realtech.socialsurvey.core.services.socialmonitor.feed.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
-import javax.annotation.Resource;
-
-import org.apache.commons.lang.StringUtils;
-import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.DependsOn;
-import org.springframework.stereotype.Component;
-
+import com.mongodb.BulkWriteError;
 import com.realtech.socialsurvey.core.commons.ActionHistoryComparator;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.MacrosComparator;
-import com.realtech.socialsurvey.core.dao.BranchDao;
-import com.realtech.socialsurvey.core.dao.CompanyDao;
-import com.realtech.socialsurvey.core.dao.MongoSocialFeedDao;
-import com.realtech.socialsurvey.core.dao.RegionDao;
-import com.realtech.socialsurvey.core.dao.UserDao;
-import com.realtech.socialsurvey.core.dao.UserProfileDao;
+import com.realtech.socialsurvey.core.dao.*;
 import com.realtech.socialsurvey.core.dao.impl.MongoSocialFeedDaoImpl;
-import com.realtech.socialsurvey.core.entities.ActionHistory;
-import com.realtech.socialsurvey.core.entities.Company;
-import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.SegmentsEntity;
-import com.realtech.socialsurvey.core.entities.SegmentsVO;
-import com.realtech.socialsurvey.core.entities.SocialFeedActionResponse;
-import com.realtech.socialsurvey.core.entities.SocialFeedFilter;
-import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
-import com.realtech.socialsurvey.core.entities.SocialMonitorFeedData;
-import com.realtech.socialsurvey.core.entities.SocialMonitorFeedTypeVO;
-import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
-import com.realtech.socialsurvey.core.entities.SocialMonitorResponseData;
-import com.realtech.socialsurvey.core.entities.SocialMonitorUsersVO;
-import com.realtech.socialsurvey.core.entities.SocialResponseObject;
-import com.realtech.socialsurvey.core.entities.UserProfile;
-import com.realtech.socialsurvey.core.enums.ActionHistoryType;
-import com.realtech.socialsurvey.core.enums.MessageType;
-import com.realtech.socialsurvey.core.enums.ProfileType;
-import com.realtech.socialsurvey.core.enums.SocialFeedActionType;
-import com.realtech.socialsurvey.core.enums.SocialFeedStatus;
-import com.realtech.socialsurvey.core.enums.TextActionType;
+import com.realtech.socialsurvey.core.entities.*;
+import com.realtech.socialsurvey.core.enums.*;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.integration.stream.StreamApiConnectException;
 import com.realtech.socialsurvey.core.integration.stream.StreamApiException;
@@ -60,6 +18,20 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileNotFoundException;
 import com.realtech.socialsurvey.core.services.socialmonitor.feed.SocialFeedService;
 import com.realtech.socialsurvey.core.utils.JsoupHtmlToTextUtils;
+import com.realtech.socialsurvey.core.vo.BulkWriteErrorVO;
+import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.data.mongodb.BulkOperationException;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+import java.util.*;
 
 
 /**
@@ -420,12 +392,20 @@ public class SocialFeedServiceImpl implements SocialFeedService
 
 
     @Override
-    public long updateDuplicateCount( int hash, long companyId, String id ) throws InvalidInputException {
-        LOG.info("Executing updateDuplicateCount method with hash = {}, companyId = {} and id = {}", hash, companyId, id);
-        if( hash  == 0 || companyId <= 0 || StringUtils.isEmpty( id )){
-            throw new InvalidInputException( "companyId cannot be <= 0 or hash cannot be 0 or id should not be null or empty" );
+    public void updateDuplicateCount( List<SocialResponseObject<?>> socialFeeds ) throws InvalidInputException {
+        LOG.debug("Executing updateDuplicateCount method with posts = {}", Arrays.toString( socialFeeds.toArray() ));
+        if( socialFeeds == null || socialFeeds.isEmpty()){
+            throw new InvalidInputException( "socialFeeds cannot be null or empty" );
         }
-        return mongoSocialFeedDao.updateDuplicateCount(hash, companyId, id);
+
+        for(SocialResponseObject socialFeed: socialFeeds){
+            SocialResponseObject post = mongoSocialFeedDao.getSocialPost( socialFeed.getCompanyId(), socialFeed.getPostId(),
+                MongoSocialFeedDaoImpl.SOCIAL_FEED_COLLECTION );
+            //update only if the post is present in db and if its not already updated
+            if(socialFeed.getHash() !=0 &&  post !=null && !post.isDuplicate() ){
+                mongoSocialFeedDao.updateDuplicateCount( socialFeed.getHash(), socialFeed.getCompanyId(), socialFeed.getId() );
+            }
+        }
     }
 
 
@@ -963,5 +943,36 @@ public class SocialFeedServiceImpl implements SocialFeedService
 
         LOG.info( "Method addEmailReplyAsCommentToSocialPost, successfully added comment in post id for post id {}", postId );
     }
-} 
+
+    @Override public List<BulkWriteErrorVO> saveFeeds( List<SocialResponseObject<?>> socialFeeds ) throws InvalidInputException
+    {
+        LOG.debug( "Inside saveFeeds method {}" , socialFeeds);
+        List<BulkWriteErrorVO> errors = new ArrayList<>( );
+        if( socialFeeds == null || socialFeeds.isEmpty() ){
+            throw new InvalidInputException( "SocialFeeds cannt be null or empy" );
+        }
+        try{
+            mongoSocialFeedDao.insertSocialFeeds( socialFeeds, MongoSocialFeedDaoImpl.SOCIAL_FEED_COLLECTION );
+        } catch (  BulkOperationException bulkWriteException ) {
+            List<BulkWriteError> bulkWriteErrors = bulkWriteErrors = bulkWriteException.getErrors();
+            for(BulkWriteError error: bulkWriteErrors){
+                errors.add( new BulkWriteErrorVO( error.getIndex(), error.getCode(), error.getMessage() ) );
+            }
+        }
+        LOG.debug( "End of save feed method" );
+        return errors;
+    }
+
+
+    @Override public long updateDuplicateCount( int hash, long companyId, String id ) throws InvalidInputException
+    {
+        LOG.debug("Executing updateDuplicateCount of post with id = {}"
+            + " and hash = {} ", id, hash);
+        if( id == null || companyId <= 0){
+            throw new InvalidInputException( "Id cannot be null or company id is invalid " );
+        }
+
+        return mongoSocialFeedDao.updateDuplicateCount( hash, companyId, id );
+    }
+}
 

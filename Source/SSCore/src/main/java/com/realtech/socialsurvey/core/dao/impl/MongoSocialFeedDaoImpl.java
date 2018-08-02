@@ -5,27 +5,20 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.MongoSocialFeedDao;
 import com.realtech.socialsurvey.core.entities.*;
 import com.realtech.socialsurvey.core.enums.ProfileType;
-import com.realtech.socialsurvey.core.enums.SocialFeedActionType;
 import com.realtech.socialsurvey.core.enums.SocialFeedStatus;
-
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 
 
@@ -81,56 +74,75 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
     }
 
     @Override
-	public long updateDuplicateCount( int hash, long companyId, String id ) {
-		if(LOG.isDebugEnabled()){
-			LOG.debug("Fetching count of duplicate posts with hash = {} and companyId = {}", hash, companyId);
-		}
-		Query query = new  Query();
-		Update update = new Update();
-		query.addCriteria(Criteria.where(HASH).is(hash).and(COMPANY_ID).is(companyId).and( IS_DUPLICATE ).is( false )
-            .and( KEY_IDENTIFIER ).ne( id ));
-		update.inc( DUPLICATE_COUNT, 1 );
-		WriteResult updatedDocs =  mongoTemplate.updateFirst(query, update, SOCIAL_FEED_COLLECTION);
+    public int updateDuplicateCount( int hash, long companyId, String id ) {
+        if(LOG.isDebugEnabled()){
+            LOG.debug("Fetching count of duplicate posts with hash = {} and companyId = {}", hash, companyId);
+        }
 
-		//if duplicates = 1, then there is only one post with the hash so no need to update the duplicateCount
-		if(updatedDocs.getN() == 1) {
-			if (LOG.isDebugEnabled()) {
-				LOG.debug("Updating posts with isDuplicate {} having hash = {} and id = {} ", true, hash, id);
-			}
-			Query updateQuery = new Query().addCriteria(Criteria.where(HASH).is(hash).and(COMPANY_ID).is(companyId).
-            and( KEY_IDENTIFIER ).is( id ));
-			Update duplicateUpdate = new Update().set(IS_DUPLICATE, true);
-			WriteResult result = mongoTemplate.updateFirst(updateQuery, duplicateUpdate, SOCIAL_FEED_COLLECTION);
-			return result.getN();
-		}
-		else return updatedDocs.getN();
-	}
-    
-	@Override
-	public void updateSocialFeed(SocialFeedsActionUpdate socialFeedsActionUpdate, SocialResponseObject socialResponseObject, Long companyId, 
-			List<ActionHistory> actionHistories, int updateFlag, String collectionName) {
-		LOG.debug("Method updateSocialFeed() started");
+        Query query = new  Query();
+        Update update = new Update();
+        String originalPostId = null;
+        long originalPostDuplicateCount = 0;
+        // check if there is an original post with the same hash is present in DB
+        query.addCriteria( Criteria.where( HASH ).is( hash ).and( COMPANY_ID ).is( companyId ).and( IS_DUPLICATE ).is( false )
+            .and( DUPLICATE_COUNT ).gt( 1 ));
+        SocialResponseObject originalPost = mongoTemplate.findOne( query, SocialResponseObject.class, SOCIAL_FEED_COLLECTION );
 
-		LOG.debug("Updating {} document. Social feed id: {}", collectionName, socialResponseObject.getPostId());
+        //no original post already exists in db then the current doc become original post and the other posts
+        //with matching hash will be its duplicates
+        if(originalPost == null){
+            originalPostId = id;
+            originalPostDuplicateCount = 1;
+        } else {
+            originalPostId = originalPost.getId();
+            originalPostDuplicateCount = originalPost.getDuplicateCount();
+        }
 
-		Query query = new Query();
+        query = new Query().addCriteria(Criteria.where(HASH).is(hash).and(COMPANY_ID).is(companyId).and( IS_DUPLICATE ).is( false )
+            .and( KEY_IDENTIFIER ).ne( originalPostId ));
+        update.set( IS_DUPLICATE, true );
+        WriteResult updatedDocs =  mongoTemplate.updateMulti( query, update, SOCIAL_FEED_COLLECTION);
 
-		query.addCriteria(Criteria.where(KEY_IDENTIFIER).is(socialResponseObject.getPostId() + "_" + companyId));
+        //if duplicates > 1, then there are duplicae posts hence , update the duplicate count to the
+        // updatedDocsCount+originalPostsDuplicateCount
+        if(updatedDocs.getN() > 0) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(" Updating duplicate count of post having hash = {} and id = {} ", true, hash, id);
+            }
+            Query updateQuery = new Query().addCriteria(Criteria.where(HASH).is(hash).and(COMPANY_ID).is(companyId).
+                and( KEY_IDENTIFIER ).is( originalPostId ));
+            Update duplicateUpdate = new Update().set(DUPLICATE_COUNT, originalPostDuplicateCount+updatedDocs.getN());
+            WriteResult duplicateCountUpdate =  mongoTemplate.updateFirst(updateQuery, duplicateUpdate, SOCIAL_FEED_COLLECTION);
+            return duplicateCountUpdate.getN();
+        }
+        return 0;
+    }
 
-		Update update = new Update();
+    @Override
+    public void updateSocialFeed(SocialFeedsActionUpdate socialFeedsActionUpdate, SocialResponseObject socialResponseObject, Long companyId,
+        List<ActionHistory> actionHistories, int updateFlag, String collectionName) {
+        LOG.debug("Method updateSocialFeed() started");
 
-		// Changing status for NEW/ALERT/ESCALATE/RESOLVED
-		if (updateFlag == 3 || updateFlag == 2) {
+        LOG.debug("Updating {} document. Social feed id: {}", collectionName, socialResponseObject.getPostId());
+
+        Query query = new Query();
+
+        query.addCriteria(Criteria.where(KEY_IDENTIFIER).is(socialResponseObject.getPostId() + "_" + companyId));
+
+        Update update = new Update();
+
+        // Changing status for NEW/ALERT/ESCALATE/RESOLVED
+        if (updateFlag == 3 || updateFlag == 2) {
             update.set( STATUS, socialResponseObject.getStatus());
-		}
-		
-		update.set( UPDATED_TIME, socialResponseObject.getUpdatedTime() );
-		for (ActionHistory actionHistory : actionHistories) {
-			update.push(ACTION_HISTORY, actionHistory);
-			mongoTemplate.updateFirst(query, update, collectionName);
-		}
-		LOG.debug("Successfully updated {}", collectionName);
-	}
+        }
+
+        update.set( UPDATED_TIME, socialResponseObject.getUpdatedTime() );
+        for (ActionHistory actionHistory : actionHistories) {
+            update.push(ACTION_HISTORY, actionHistory);
+            mongoTemplate.updateFirst(query, update, collectionName);
+        }
+        LOG.debug("Successfully updated {}", collectionName);
+    }
 
 
     @Override
@@ -144,51 +156,51 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 
     }
 
-	@Override
-	public OrganizationUnitSettings FetchMacros(Long companyId) {
-		LOG.debug("Fetching Macros from COMAPNY_SETTINGS");
-		Query query = new Query();
+    @Override
+    public OrganizationUnitSettings FetchMacros(Long companyId) {
+        LOG.debug("Fetching Macros from COMAPNY_SETTINGS");
+        Query query = new Query();
 
-		query.addCriteria(Criteria.where(IDEN).is(companyId));
-		query.fields().exclude( KEY_IDENTIFIER ).include( SOCIALMONITOR_MACROS );
+        query.addCriteria(Criteria.where(IDEN).is(companyId));
+        query.fields().exclude( KEY_IDENTIFIER ).include( SOCIALMONITOR_MACROS );
 
-		return mongoTemplate.findOne(query, OrganizationUnitSettings.class,
-				CommonConstants.COMPANY_SETTINGS_COLLECTION);
+        return mongoTemplate.findOne(query, OrganizationUnitSettings.class,
+            CommonConstants.COMPANY_SETTINGS_COLLECTION);
 
-	}
+    }
 
-	@Override
-	public void updateMacros(SocialMonitorMacro socialMonitorMacro, long companyId) {
-		LOG.debug("Updating Macros in COMPANY_SETTINGS");
-		Query query = new Query();
+    @Override
+    public void updateMacros(SocialMonitorMacro socialMonitorMacro, long companyId) {
+        LOG.debug("Updating Macros in COMPANY_SETTINGS");
+        Query query = new Query();
 
-		query.addCriteria(Criteria.where(IDEN).is(companyId));
+        query.addCriteria(Criteria.where(IDEN).is(companyId));
 
-		Update update = new Update();
+        Update update = new Update();
 
-		update.addToSet(SOCIALMONITOR_MACROS, socialMonitorMacro);
+        update.addToSet(SOCIALMONITOR_MACROS, socialMonitorMacro);
 
-		mongoTemplate.updateFirst(query, update, CommonConstants.COMPANY_SETTINGS_COLLECTION);
-		LOG.debug("Updated {}", CommonConstants.COMPANY_SETTINGS_COLLECTION);
+        mongoTemplate.updateFirst(query, update, CommonConstants.COMPANY_SETTINGS_COLLECTION);
+        LOG.debug("Updated {}", CommonConstants.COMPANY_SETTINGS_COLLECTION);
 
-	}
+    }
 
-	@Override
-	public void updateMacroList(List<SocialMonitorMacro> socialMonitorMacros, long companyId) {
-		LOG.debug("Updating Macro count in COMPANY_SETTINGS");
-		
-		Query query = new Query();
-		
-		query.addCriteria(Criteria.where(IDEN).is(companyId));
-		
-		Update update = new Update();
+    @Override
+    public void updateMacroList(List<SocialMonitorMacro> socialMonitorMacros, long companyId) {
+        LOG.debug("Updating Macro count in COMPANY_SETTINGS");
 
-		update.set(SOCIALMONITOR_MACROS, socialMonitorMacros);
-		
-		mongoTemplate.updateFirst(query, update, CommonConstants.COMPANY_SETTINGS_COLLECTION);
-		LOG.debug("Updated {}", CommonConstants.COMPANY_SETTINGS_COLLECTION);
-		
-	}
+        Query query = new Query();
+
+        query.addCriteria(Criteria.where(IDEN).is(companyId));
+
+        Update update = new Update();
+
+        update.set(SOCIALMONITOR_MACROS, socialMonitorMacros);
+
+        mongoTemplate.updateFirst(query, update, CommonConstants.COMPANY_SETTINGS_COLLECTION);
+        LOG.debug("Updated {}", CommonConstants.COMPANY_SETTINGS_COLLECTION);
+
+    }
 
 
     @Override
@@ -232,7 +244,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         if ( fromTrustedSource ) {
             criteria.orOperator( ( Criteria.where( FROM_TRUSTED_SOURCE ).is( fromTrustedSource ) )
                 .orOperator( criterias.toArray( new Criteria[criterias.size()] ) ) );
-        } 
+        }
         //Stream, Alerts, Escalation, Resolved criteria
         else if(!criterias.isEmpty() && criterias != null && isCompanySet){
             criteria.orOperator( ( Criteria.where( STATUS ).is( status.toUpperCase() )
@@ -304,7 +316,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         if ( fromTrustedSource ) {
             criteria.orOperator( ( Criteria.where( FROM_TRUSTED_SOURCE ).is( fromTrustedSource ) )
                 .orOperator( criterias.toArray( new Criteria[criterias.size()] ) ) );
-        } 
+        }
         //Stream, Alerts, Escalation, Resolved criteria
         else if(!criterias.isEmpty() && criterias != null && isCompanySet){
             criteria.orOperator( ( Criteria.where( STATUS ).is( status.toUpperCase() )
@@ -323,22 +335,22 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 
         return mongoTemplate.count( query, SOCIAL_FEED_COLLECTION );
     }
-	
-	@Override
-	public OrganizationUnitSettings getCompanyDetails(Long companyId) {
-		LOG.debug( "Fetching company details from {}", CommonConstants.COMPANY_SETTINGS_COLLECTION );
-		OrganizationUnitSettings organizationUnitSettings = null;
+
+    @Override
+    public OrganizationUnitSettings getCompanyDetails(Long companyId) {
+        LOG.debug( "Fetching company details from {}", CommonConstants.COMPANY_SETTINGS_COLLECTION );
+        OrganizationUnitSettings organizationUnitSettings = null;
         Query query = new Query();
         query.addCriteria( Criteria.where( "iden" ).is( companyId ) );
         query.fields().exclude( KEY_IDENTIFIER ).include(IDEN).include(CONTACT_DETAILS + "." + NAME).include(PROFILE_IMAGE_URL);
         organizationUnitSettings = mongoTemplate.findOne( query, OrganizationUnitSettings.class, CommonConstants.COMPANY_SETTINGS_COLLECTION );
         LOG.debug( "Fetched company details from {}", CommonConstants.COMPANY_SETTINGS_COLLECTION );
         return organizationUnitSettings;
-	}
+    }
 
-	@Override
-	public List<OrganizationUnitSettings> getAllRegionDetails(List<Long> regionIds) {
-		LOG.debug( "Fetching all region details from {}", CommonConstants.REGION_SETTINGS_COLLECTION );
+    @Override
+    public List<OrganizationUnitSettings> getAllRegionDetails(List<Long> regionIds) {
+        LOG.debug( "Fetching all region details from {}", CommonConstants.REGION_SETTINGS_COLLECTION );
         List<OrganizationUnitSettings> organizationUnitSettings = null;
         Query query = new Query();
         query.addCriteria( Criteria.where( "iden" ).in( regionIds ) );
@@ -346,12 +358,12 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         organizationUnitSettings = mongoTemplate.find( query, OrganizationUnitSettings.class, CommonConstants.REGION_SETTINGS_COLLECTION );
         LOG.debug( "Fetched all region details from {}", CommonConstants.REGION_SETTINGS_COLLECTION );
         return organizationUnitSettings;
-	}
+    }
 
 
-	@Override
-	public List<OrganizationUnitSettings> getAllBranchDetails(List<Long> branchIds) {
-		LOG.debug( "Fetching all branch details from {}", CommonConstants.BRANCH_SETTINGS_COLLECTION );
+    @Override
+    public List<OrganizationUnitSettings> getAllBranchDetails(List<Long> branchIds) {
+        LOG.debug( "Fetching all branch details from {}", CommonConstants.BRANCH_SETTINGS_COLLECTION );
         List<OrganizationUnitSettings> organizationUnitSettings = null;
         Query query = new Query();
         query.addCriteria( Criteria.where( "iden" ).in( branchIds ) );
@@ -359,11 +371,11 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         organizationUnitSettings = mongoTemplate.find( query, OrganizationUnitSettings.class, CommonConstants.BRANCH_SETTINGS_COLLECTION );
         LOG.debug( "Fetched all branch details from {}", CommonConstants.BRANCH_SETTINGS_COLLECTION );
         return organizationUnitSettings;
-	}
+    }
 
-	@Override
-	public OrganizationUnitSettings getAllUserDetails(Long userId) {
-		LOG.debug( "Fetching all user details from {}", CommonConstants.AGENT_SETTINGS_COLLECTION );
+    @Override
+    public OrganizationUnitSettings getAllUserDetails(Long userId) {
+        LOG.debug( "Fetching all user details from {}", CommonConstants.AGENT_SETTINGS_COLLECTION );
         OrganizationUnitSettings organizationUnitSettings = null;
         Query query = new Query();
         query.addCriteria( Criteria.where( "iden" ).is( userId ) );
@@ -371,7 +383,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         organizationUnitSettings = mongoTemplate.findOne( query, OrganizationUnitSettings.class, CommonConstants.AGENT_SETTINGS_COLLECTION );
         LOG.debug( "Fetched all user details from {}", CommonConstants.AGENT_SETTINGS_COLLECTION );
         return organizationUnitSettings;
-	}
+    }
 
 
     @Override
@@ -411,7 +423,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         query.addCriteria(Criteria.where(IDEN).is(iden));
         query.fields().exclude( KEY_IDENTIFIER ).include(PROFILE_IMAGE_URL);
         return mongoTemplate.findOne( query, OrganizationUnitSettings.class, collectionName );
-       
+
     }
 
 
@@ -491,7 +503,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         LOG.info( "Response fetched from mongo is {}", socialResponseObjects );
         return socialResponseObjects;
     }
-        
+
     @Override
     public boolean moveDocumentToArchiveCollection(int days)
     {
@@ -508,7 +520,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         }
         return false;
     }
-    
+
     private static Date dateToArchiveOldData(int days) {
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DATE, -days);
@@ -517,7 +529,7 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         calendar.set(Calendar.SECOND, 0);
         return calendar.getTime();
     }
-    
+
 
     @Override
     public long updateForTrustedSource( long companyId, String trustedSource, ActionHistory actionHistory )
@@ -560,8 +572,8 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
 
         return updateCount;
     }
-    
-    
+
+
     @Override
     public long updateForRemoveTrustedSource( long companyId, String trustedSource )
     {
@@ -609,5 +621,18 @@ public class MongoSocialFeedDaoImpl implements MongoSocialFeedDao, InitializingB
         query.addCriteria(Criteria.where(HASH).is(hash).and(COMPANY_ID).is(companyId));
         return mongoTemplate.find( query, SocialResponseObject.class, SOCIAL_FEED_COLLECTION );
     }
+
+    @Override public void insertSocialFeeds( List<SocialResponseObject<?>> socialFeeds, String socialFeedCollection )
+    {
+        if ( LOG.isDebugEnabled() ) {
+            LOG.debug( "Inserting into {}. Object: {}", socialFeedCollection, Arrays.toString( socialFeeds.toArray() ) );
+        }
+
+        mongoTemplate.bulkOps( BulkOperations.BulkMode.UNORDERED, SOCIAL_FEED_COLLECTION  ).insert( socialFeeds ).execute();
+
+        LOG.debug( "Inserted into {}", socialFeedCollection );
+    }
+
+
 
 }

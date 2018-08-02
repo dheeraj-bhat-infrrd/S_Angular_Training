@@ -1921,6 +1921,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
                         }
                     }
                     OrganizationUnitSettings unitSettings = null;
+                    
                     if( addAgentInfo ) {
                         if( review.getAgentId() > 0 ) {
                             unitSettings = organizationUnitSettingsDao.fetchAgentSettingsById( review.getAgentId() );
@@ -3964,6 +3965,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
         OrganizationUnitSettings regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileUrl(
             profileUrl, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION );
+        
+        if( regionSettings == null ) {
+            throw new ProfileNotFoundException( "no such region" );
+        }
 
         return regionSettings;
     }

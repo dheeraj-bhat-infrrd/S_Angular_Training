@@ -1,10 +1,7 @@
 package com.realtech.socialsurvey.core.dao;
 
-import com.realtech.socialsurvey.core.entities.ActionHistory;
-import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.SocialFeedsActionUpdate;
-import com.realtech.socialsurvey.core.entities.SocialMonitorMacro;
-import com.realtech.socialsurvey.core.entities.SocialResponseObject;
+import com.realtech.socialsurvey.core.entities.*;
+
 import java.util.List;
 import java.util.Set;
 
@@ -12,7 +9,7 @@ public interface MongoSocialFeedDao
 {
     public void insertSocialFeed( SocialResponseObject<?> socialFeed, String collectionName );
 
-    long updateDuplicateCount( int hash, long companyId, String id );
+    int updateDuplicateCount( int hash, long companyId, String id );
                     
 	public void updateSocialFeed(SocialFeedsActionUpdate socialFeedsActionUpdate, SocialResponseObject socialResponseObject, Long companyId, List<ActionHistory> actionHistory, int updateFlag, String collectionName);
 	
@@ -105,5 +102,11 @@ public interface MongoSocialFeedDao
      * @return
      */
     public long updateActionHistory( String mongoId, ActionHistory actionHistory );
-    
+
+	/**
+	 * Bulk inserts social feeds into mongo
+	 * @param socialFeeds
+	 * @param socialFeedCollection
+	 */
+	void insertSocialFeeds( List<SocialResponseObject<?>> socialFeeds, String socialFeedCollection );
 }

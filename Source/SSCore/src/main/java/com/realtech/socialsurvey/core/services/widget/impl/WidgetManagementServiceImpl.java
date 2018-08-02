@@ -10,20 +10,25 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.BranchDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.widget.WidgetConfiguration;
 import com.realtech.socialsurvey.core.entities.widget.WidgetConfigurationRequest;
 import com.realtech.socialsurvey.core.entities.widget.WidgetHistory;
+import com.realtech.socialsurvey.core.entities.widget.WidgetLockHistory;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
@@ -45,6 +50,13 @@ public class WidgetManagementServiceImpl implements WidgetManagementService
     @Autowired
     private ProfileManagementService profileManagementService;
 
+    @Resource
+    @Qualifier ( "branch")
+    private BranchDao branchDao;
+
+    @Autowired
+    private ProcessWidgetOverrideAndLock processWidgetOverrideAndLock;
+
 
     @Value ( "${APPLICATION_BASE_URL}")
     private String applicationBaseUrl;
@@ -64,7 +76,11 @@ public class WidgetManagementServiceImpl implements WidgetManagementService
         //configuring widget and adding to history
         buildHistoryMap( widgetConfigurationRequest, widgetConfiguration, historyMap );
 
-        if ( historyMap.isEmpty() ) {
+        boolean override = StringUtils.equals( widgetConfigurationRequest.getOverrideLowerHierarchy(), "true" );
+        boolean overrideAndLock = StringUtils.equals( widgetConfigurationRequest.getLockLowerHierarchy(), "true" );
+
+        if ( historyMap.isEmpty() && !override
+            && Boolean.compare( hasLockedLowerHierarchy( widgetConfiguration ), overrideAndLock ) == 0 && !overrideAndLock ) {
             LOG.warn( "Nothing to save" );
             throw new InvalidInputException( "Nothing to save" );
         }
@@ -77,7 +93,21 @@ public class WidgetManagementServiceImpl implements WidgetManagementService
             widgetConfiguration = new WidgetConfiguration();
         }
 
-        saveChangesToconfiguration( widgetConfiguration, historyMap );
+        if ( !historyMap.isEmpty() ) {
+            saveChangesToconfiguration( widgetConfiguration, historyMap );
+        }
+
+        // process overriding widget configuration and or lock them in
+        if ( override ) {
+            processWidgetOverrideAndLock.processOverrideAndLock( entityId, entityType, userId, widgetConfigurationRequest,
+                false, false, true );
+        } else if ( overrideAndLock
+            || Boolean.compare( hasLockedLowerHierarchy( widgetConfiguration ), overrideAndLock ) != 0 ) {
+            updateLockSettingsLog( widgetConfiguration, overrideAndLock );
+            processWidgetOverrideAndLock.processOverrideAndLock( entityId, entityType, userId,
+                createWidgetRequestCopy( widgetConfigurationRequest ), true, overrideAndLock, false );
+        }
+
 
         //setting history
         WidgetHistory history = new WidgetHistory();
@@ -97,6 +127,58 @@ public class WidgetManagementServiceImpl implements WidgetManagementService
         LOG.info( "Finished saveWidgetConfigurationForEntity() method." );
         return widgetConfiguration;
 
+    }
+
+
+    private WidgetConfigurationRequest createWidgetRequestCopy( WidgetConfigurationRequest widgetConfigurationRequest )
+    {
+        WidgetConfigurationRequest request = new WidgetConfigurationRequest();
+        request.setButtonOneLink( widgetConfigurationRequest.getButtonOneLink() );
+        request.setAllowModestBranding( widgetConfigurationRequest.getAllowModestBranding() );
+        request.setBackgroundColor( widgetConfigurationRequest.getBackgroundColor() );
+        request.setBarGraphColor( widgetConfigurationRequest.getBarGraphColor() );
+        request.setButtonOneName( widgetConfigurationRequest.getButtonOneName() );
+        request.setButtonOneOpacity( widgetConfigurationRequest.getButtonOneOpacity() );
+        request.setButtonTwoLink( widgetConfigurationRequest.getButtonTwoLink() );
+        request.setButtonTwoName( widgetConfigurationRequest.getButtonTwoName() );
+        request.setButtonTwoOpacity( widgetConfigurationRequest.getButtonTwoOpacity() );
+        request.setEmbeddedFontTheme( widgetConfigurationRequest.getEmbeddedFontTheme() );
+        request.setFont( widgetConfigurationRequest.getFont() );
+        request.setFontTheme( widgetConfigurationRequest.getFontTheme() );
+        request.setForegroundColor( widgetConfigurationRequest.getForegroundColor() );
+        request.setHideBarGraph( widgetConfigurationRequest.getHideBarGraph() );
+        request.setHideOptions( widgetConfigurationRequest.getHideOptions() );
+        request.setInitialNumberOfReviews( widgetConfigurationRequest.getInitialNumberOfReviews() );
+        request.setLockLowerHierarchy( widgetConfigurationRequest.getOverrideLowerHierarchy() );
+        request.setMaxReviewsOnLoadMore( widgetConfigurationRequest.getMaxReviewsOnLoadMore() );
+        request.setOverrideLowerHierarchy( widgetConfigurationRequest.getOverrideLowerHierarchy() );
+        request.setRatingAndStarColor( widgetConfigurationRequest.getRatingAndStarColor() );
+        request.setRequestMessage( widgetConfigurationRequest.getRequestMessage() );
+        request.setReviewLoaderName( widgetConfigurationRequest.getReviewLoaderName() );
+        request.setReviewLoaderOpacity( widgetConfigurationRequest.getReviewLoaderOpacity() );
+        request.setReviewSortOrder( widgetConfigurationRequest.getReviewSortOrder() );
+        request.setReviewSources( widgetConfigurationRequest.getReviewSources() );
+        request.setSeoDescription( widgetConfigurationRequest.getSeoDescription() );
+        request.setSeoKeywords( widgetConfigurationRequest.getSeoKeywords() );
+        request.setSeoTitle( widgetConfigurationRequest.getSeoTitle() );
+        return request;
+    }
+
+
+    @Override
+    public boolean hasLockedLowerHierarchy( WidgetConfiguration widgetConfiguration )
+    {
+        if ( widgetConfiguration != null && widgetConfiguration.getLockHistory() != null ) {
+            if ( !widgetConfiguration.getLockHistory().isEmpty() ) {
+                return StringUtils.equals(
+                    widgetConfiguration.getLockHistory().get( widgetConfiguration.getLockHistory().size() - 1 ).getAction(),
+                    CommonConstants.WIDGET_LOCK );
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
 
 
@@ -176,6 +258,7 @@ public class WidgetManagementServiceImpl implements WidgetManagementService
         historyMap.put( CommonConstants.WIDGET_HIDE_OPTIONS, CommonConstants.WIDGET_DEFAULT_HIDE_OPTIONS );
         historyMap.put( CommonConstants.WIDGET_SORT_ORDER, CommonConstants.WIDGET_DEFAULT_SORT_ORDER );
         historyMap.put( CommonConstants.WIDGET_ALLOW_MODEST_BRANDING, CommonConstants.WIDGET_DEFAULT_ALLOW_MODEST_BRANDING );
+        historyMap.put( CommonConstants.WIDGET_LOCK_LOWER_HIERARCHY, CommonConstants.WIDGET_DEFAULT_LOCK_LOWER_HIERARCHY );
         historyMap.put( CommonConstants.WIDGET_BAR_GRAPH_COLOR, null );
         historyMap.put( CommonConstants.WIDGET_REVIEW_SOURCES, null );
         historyMap.put( CommonConstants.WIDGET_SEO_TITLE, null );
@@ -496,6 +579,7 @@ public class WidgetManagementServiceImpl implements WidgetManagementService
     }
 
 
+    @Override
     public void saveConfigurationInMongo( String entityType, long entityId, WidgetConfiguration widgetConfiguration )
         throws InvalidInputException
     {
@@ -618,6 +702,7 @@ public class WidgetManagementServiceImpl implements WidgetManagementService
                 if ( StringUtils.isEmpty( widgetConfiguration.getAllowModestBranding() ) ) {
                     widgetConfiguration.setAllowModestBranding( CommonConstants.WIDGET_DEFAULT_ALLOW_MODEST_BRANDING );
                 }
+
             }
 
         } else {
@@ -646,7 +731,7 @@ public class WidgetManagementServiceImpl implements WidgetManagementService
                 || unitSettingType.equals( CommonConstants.PROFILE_LEVEL_REGION ) ) {
                 profileLevel = CommonConstants.PROFILE_LEVEL_REGION;
             }
-            return applicationBaseUrl + "/initfindapro.do?profileLevel=" + profileLevel + "&iden=" + iden;
+            return applicationBaseUrl + "initfindapro.do?profileLevel=" + profileLevel + "&iden=" + iden;
         }
     }
 
@@ -656,37 +741,133 @@ public class WidgetManagementServiceImpl implements WidgetManagementService
     {
         LOG.debug( "method getListOfAvailableSources() started" );
         Set<String> availableSources = null;
-        
+
         List<String> mongoSources = profileManagementService.getAvailableSurveySources( profileLevel, iden );
-        if( mongoSources != null && !mongoSources.isEmpty() ) {
-            
+        if ( mongoSources != null && !mongoSources.isEmpty() ) {
+
             availableSources = new HashSet<>();
-            
-            for( String source : mongoSources ) { 
-                switch( source.trim() ) {
+
+            for ( String source : mongoSources ) {
+                switch ( source.trim() ) {
                     case CommonConstants.SURVEY_REQUEST_ADMIN:
                     case CommonConstants.SURVEY_REQUEST_AGENT:
-                    case CommonConstants.RETAKE_REQUEST_CUSTOMER: {availableSources.add( CommonConstants.POST_SOURCE_SOCIAL_SURVEY ); break;}
-                    case CommonConstants.SURVEY_SOURCE_ZILLOW: {availableSources.add( CommonConstants.SURVEY_SOURCE_ZILLOW ); break;}
+                    case CommonConstants.RETAKE_REQUEST_CUSTOMER: {
+                        availableSources.add( CommonConstants.POST_SOURCE_SOCIAL_SURVEY );
+                        break;
+                    }
+                    case CommonConstants.SURVEY_SOURCE_ZILLOW: {
+                        availableSources.add( CommonConstants.SURVEY_SOURCE_ZILLOW );
+                        break;
+                    }
                     case CommonConstants.CRM_INFO_SOURCE_ENCOMPASS:
                     case CommonConstants.CRM_SOURCE_LONEWOLF:
                     case CommonConstants.CRM_SOURCE_DOTLOOP:
                     case CommonConstants.CRM_INFO_SOURCE_FTP:
-                    case CommonConstants.CRM_INFO_SOURCE_API:{availableSources.add( CommonConstants.SURVEY_SOURCE_SOCIAL_SURVEY_VERIFIED ); break;}
-                    case CommonConstants.CHR_FACEBOOK: {availableSources.add( CommonConstants.CHR_FACEBOOK ); break;}
-                    case CommonConstants.CHR_WIDGET_LINKEDIN: {availableSources.add( CommonConstants.CHR_WIDGET_LINKEDIN ); break;}
-                    case CommonConstants.CHR_GOOGLE: {availableSources.add( CommonConstants.CHR_GOOGLE ); break;}
+                    case CommonConstants.CRM_INFO_SOURCE_API: {
+                        availableSources.add( CommonConstants.SURVEY_SOURCE_SOCIAL_SURVEY_VERIFIED );
+                        break;
+                    }
+                    case CommonConstants.CHR_FACEBOOK: {
+                        availableSources.add( CommonConstants.CHR_FACEBOOK );
+                        break;
+                    }
+                    case CommonConstants.CHR_WIDGET_LINKEDIN: {
+                        availableSources.add( CommonConstants.CHR_WIDGET_LINKEDIN );
+                        break;
+                    }
+                    case CommonConstants.CHR_GOOGLE: {
+                        availableSources.add( CommonConstants.CHR_GOOGLE );
+                        break;
+                    }
                     default: {
-                        if( StringUtils.isNotEmpty( source ) ) {
+                        if ( StringUtils.isNotEmpty( source ) ) {
                             availableSources.add( source );
                         }
                     }
                 }
             }
         }
-        
         LOG.debug( "method getListOfAvailableSources() finished" );
-        return new ArrayList<>( availableSources );
+        return availableSources == null ? null : new ArrayList<>( availableSources );
     }
 
+
+    //create a function to add lock to history at the higher hierarchy
+    @Override
+    public WidgetConfiguration updateLockSettingsLog( WidgetConfiguration widgetConfiguration, Boolean isLocked )
+    {
+        LOG.debug( "Adding lock/unlock settings for higher heirarchy, isLocked:{}", isLocked );
+
+        if ( widgetConfiguration == null ) {
+            widgetConfiguration = new WidgetConfiguration();
+        }
+
+        if ( widgetConfiguration.getLockHistory() == null ) {
+            widgetConfiguration.setLockHistory( new ArrayList<WidgetLockHistory>() );
+        }
+
+        WidgetLockHistory lockHistory = new WidgetLockHistory();
+        lockHistory.setTimestamp( System.currentTimeMillis() );
+        lockHistory.setAction( isLocked ? CommonConstants.WIDGET_LOCK : CommonConstants.WIDGET_UNLOCK );
+
+        widgetConfiguration.getLockHistory().add( lockHistory );
+        return widgetConfiguration;
+    }
+
+
+    //create a function to change lock settings, for all the lower hierarchy and update  latest action
+    //the locking is done by bitwise or of the lock flag with the settings ( settingFlag | lockFlag)
+    //the unlocking is done by bitwise and of the negated lock flag ( settingFlag & ~lockFlag) 
+    //Note - negation is done by createLockFlag function hence it's not done here 
+    @Override
+    public OrganizationUnitSettings updateLowerHeirarchyLock( String profileLevel, long profileId,
+        OrganizationUnitSettings unitSettings, int lockFlag, boolean isLocked )
+    {
+        LOG.debug( "Updating lock/unlock settings for lower heirarchy,by profileLevel:{},profileId:{},isLocked:{}, lockFlag:{}",
+            profileLevel, profileId, isLocked, lockFlag );
+        WidgetConfiguration widgetConfiguration = unitSettings.getWidgetConfiguration();
+
+        if ( widgetConfiguration == null ) {
+            widgetConfiguration = new WidgetConfiguration();
+            unitSettings.setWidgetConfiguration( widgetConfiguration );
+        }
+
+        widgetConfiguration.setActionByProfileId( profileId );
+        widgetConfiguration.setActionByProfileLevel( profileLevel );
+        widgetConfiguration.setActionOn( System.currentTimeMillis() );
+        if ( isLocked ) {
+            widgetConfiguration.setLockFlag( widgetConfiguration.getLockFlag() | lockFlag );
+        } else {
+            widgetConfiguration.setLockFlag( widgetConfiguration.getLockFlag() & lockFlag );
+        }
+
+        return unitSettings;
+    }
+
+
+    //creating lock flag
+    //each position in the lock flag(111) represents Company,Region,Branch respectively
+    //each position in the unlock flag(000) represents Company,Region,Branch respectively
+    //this is done to know which postion in the heirarchy has locked the lower heirarchy
+    //and the number 111 is a bit representation for 6
+    @Override
+    public int createLockFlag( String profileLevel, boolean isLocked )
+    {
+        int lockFlag;
+        if ( profileLevel.equals( CommonConstants.COMPANY_ID_COLUMN ) ) {
+            lockFlag = CommonConstants.WIDGET_LOCK_SET_BY_COMPANY;
+        } else if ( profileLevel.equals( CommonConstants.REGION_ID_COLUMN ) ) {
+            lockFlag = CommonConstants.WIDGET_LOCK_SET_BY_REGION;
+        } else if ( profileLevel.equals( CommonConstants.BRANCH_ID_COLUMN ) ) {
+            lockFlag = CommonConstants.WIDGET_LOCK_SET_BY_BRANCH;
+        } else {
+            //fall back if the profileLevel is wrong , we return 0
+            lockFlag = 0;
+            isLocked = true;
+        }
+        if ( !isLocked ) {
+            lockFlag = ~lockFlag;
+        }
+        return lockFlag;
+    }
 }

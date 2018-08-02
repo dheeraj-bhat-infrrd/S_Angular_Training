@@ -53,7 +53,7 @@ public class WidgetApiController
 
     @Autowired
     private ProfileManagementService profileManagementService;
-
+    
     @Autowired
     private OrganizationManagementService organizationManagementService;
 
@@ -181,6 +181,7 @@ public class WidgetApiController
 
             if ( hideHistory ) {
                 widgetConfiguration.setHistory( null );
+                widgetConfiguration.setLockHistory( null );
             }
 
             Map<String, Object> responseMap = new HashMap<>();

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.realtech.socialsurvey.compute.entities.response.BulkWriteErrorVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -254,7 +255,21 @@ public class SSAPIOperations
             throw new IOException( e );
         }        
     }
-    
+
+
+    public Optional<Long> savePostAndUpdateSocialPostDuplicateCount( SocialResponseObject<?> socialPost ) throws IOException
+    {
+        LOG.info( "Executing savePostAndUpdateSocialPostDuplicateCount method" );
+        Call<Long> requestCall = RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationService()
+            .savePostAndupdateDuplicateCount( socialPost, AUTH_HEADER );
+        Response<Long> response = requestCall.execute();
+        RetrofitApiBuilder.apiBuilderInstance().validateSavePostToMongoResponse( response );
+        if ( LOG.isTraceEnabled() ) {
+            LOG.trace( "updateSocialPostDuplicateCount response {}", response.body() );
+        }
+        return Optional.of( response.body() );
+    }
+
     public boolean isEmailUnsubscribed( String recipient, long companyId )
     {
         Call<Boolean> request = RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationService()
@@ -287,7 +302,18 @@ public class SSAPIOperations
                 throw new IOException( e );
             }  
     }
-    
+
+    public Optional<List<BulkWriteErrorVO>> bulkInsertToMongo( List<SocialResponseObject> socialPosts ) throws IOException
+    {
+        LOG.debug( "Executing bulkInsertToMongo method" );
+        Call<List<BulkWriteErrorVO>> requestCall = RetrofitApiBuilder.apiBuilderInstance().getSSAPIIntergrationServiceWithIncreasedTimeOut().saveSocialFeeds( socialPosts, AUTH_HEADER );
+        Response<List<BulkWriteErrorVO>> response = requestCall.execute();
+        RetrofitApiBuilder.apiBuilderInstance().validateResponse( response );
+        if ( LOG.isTraceEnabled() ) {
+            LOG.trace( "updateSocialPostDuplicateCount response {}", response.body() );
+        }
+        return Optional.of( response.body() );
+    }
 
     public Map<String, Map<String, String>> getProfileNameDateDataForWidgetReport( long companyId ) throws IOException
     {

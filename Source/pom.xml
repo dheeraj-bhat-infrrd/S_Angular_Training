@@ -17,7 +17,7 @@
 		<servlet.version>3.0.1</servlet.version>
 
 		<!-- Spring -->
-		<spring-framework.version>4.1.4.RELEASE</spring-framework.version>
+		<spring-framework.version>4.3.5.RELEASE</spring-framework.version>
 		<spring.security>3.2.3.RELEASE</spring.security>
 		<org.springframework.security.oauth-version>2.0.9.RELEASE</org.springframework.security.oauth-version>
 
