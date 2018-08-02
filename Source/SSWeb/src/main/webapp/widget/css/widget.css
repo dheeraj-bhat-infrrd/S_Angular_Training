@@ -13,6 +13,7 @@
     border-radius: 3px;
     line-height: 25px;
     cursor:pointer;
+    box-shadow: 1px 2px rgba(0, 0, 0, 0.08);
 }
 
 .widget-pad-zero{
@@ -36,8 +37,9 @@
 .ss-widget-rating-stars{
 	text-align:  center;
     color: #247ac2;
-    font-size:  16px;
+    font-size:  20px;
     display:flex;
+    letter-spacing: -1px;
 }
 
 .ss-widget-rev-count{
@@ -162,7 +164,6 @@
 }
 
 .ss-widget-rev-cont{
-	border: 1px solid #c9ddef;
     padding-left: 0;
     padding-right: 0;
     padding-bottom: 10px;
@@ -287,6 +288,7 @@
     border-radius: 3px;
     font-size: 12px;
     cursor: pointer;
+    box-shadow: 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .ss-widget-powered-by{
@@ -309,21 +311,21 @@
 }
 
 .ss-widget-half-black-star{
-    width: 8px;
+    width: 9px;
     overflow:  hidden;
 }
 
 .ss-widget-half-white-star{
-   	margin-left: -8px;
+   	margin-left: -9px;
 }
 
 .ss-widget-quat-black-star{
-    width: 6px;
+    width: 7px;
     overflow:  hidden;
 }
 
 .ss-widget-quat-white-star{
-   	margin-left: -6px;
+   	margin-left: -7px;
 }
 
 .ss-widget-3quat-black-star{
@@ -428,4 +430,17 @@
 
 .cursor-pointer{
 	cursor:pointer;
+}
+
+.ss-widget-review-div-container{
+	border-left: 1px solid #c9ddef;
+    padding: 0;
+}
+
+.ss-widget-options-container{
+	margin-bottom: 10px;
+}
+
+.ss-widget-main-rat-cont{
+	margin-right: 7px;
 }

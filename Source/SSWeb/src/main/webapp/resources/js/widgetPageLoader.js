@@ -975,7 +975,7 @@ var socialSurveyJavascriptWidget = {
 			copyWidgetToClipboard("widget-js-cust-code-area");
 			$('#overlay-continue-js-cust').unbind('click');
 		});
-
+		
 		bodyJsi = decodeURIComponent(widgetJavascriptIframe);
 		bodyJsi = bodyJsi.replace(/\\n/g, "\n");
 		bodyJsi = bodyJsi.replace(/\\"/g, '"');

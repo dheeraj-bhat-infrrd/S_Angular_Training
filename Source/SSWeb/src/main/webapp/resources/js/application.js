@@ -21387,7 +21387,7 @@ function getFont(font){
 		'Trebuchet MS,Helvetica,sans-serif',
 		'Verdana,Geneva,sans-serif',
 		'Gill Sans,Geneva,sans-serif',
-		'OpenSans, SansSerif'
+		'Open Sans, Sans-Serif'
 		];
 	
 	if( font === undefined ){

@@ -53,7 +53,7 @@ public class WidgetApiController
 
     @Autowired
     private ProfileManagementService profileManagementService;
-
+    
     @Autowired
     private OrganizationManagementService organizationManagementService;
 
